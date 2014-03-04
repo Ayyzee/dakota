@@ -8,7 +8,7 @@ namespace __mph
 
 void some_func(int)
 {
-  char* flintstone;
+  const char* flintstone = "some first name";
   //
   switch (__mph::_fred00pebbles00wilma00(flintstone))
   {
@@ -21,7 +21,7 @@ void some_func(int)
     default:
       ;
   }
-  char* rubble;
+  const char* rubble = "some first name";
   //
   switch (__mph::_bamm_bamm00barney00betty00(rubble))
   {
