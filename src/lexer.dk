@@ -1,0 +1,1028 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cctype>;
+include <cerrno>;
+include <cstring>;
+include <cstdio>;
+
+module dakota-util;
+
+klass cstring;
+klass str128;
+klass tokenid;
+
+noexport boole-t ident-type?(cstring-t buf)
+{
+  boole-t result = false;
+  if (3 <= buf.len)
+    if ((('_' == buf.ptr[buf.len - 2]) ||
+         ('-' == buf.ptr[buf.len - 2])) &&
+         ('t' == buf.ptr[buf.len - 1]))
+      result = true;
+  return result;
+}
+
+klass lexer
+{
+  slots
+  {
+    off-t          length;
+    off-t          current-position;
+    char8-t*       buffer;
+
+    const char8-t* filename;
+    uint32-t       line;
+    uint32-t       previous-column;
+    uint32-t       column;
+
+    object-t       open-tokens;
+  }
+
+  method object-t init(object-t self,
+                       file-t         file =>     stdin,
+                       const char8-t* filename => NULL)
+  {
+    self = dk:init(super);
+
+    if (NULL != filename)
+    {
+      self.filename = filename;
+      file = fopen(self.filename, "r");
+      if (NULL == file)
+      {
+        str128-t buf = "";
+        strerror-r(errno, buf, sizeof(buf));
+        fprintf(stderr, "%s", buf);
+        throw make(exception:klass, message => "oops");
+      }
+      fseeko(file, 0L, SEEK-END);
+      self.length = ftello(file);
+      rewind(file);
+      self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (self.length + 1));
+      fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
+      // check for embedded NUL?
+      self.buffer[self.length] = NUL;
+      fclose(file);
+      self.current-position = 0;
+    }
+    else
+    {
+      self.filename = NULL;
+      fpos-t fpos;
+      fgetpos(file, &fpos);
+      fseeko(file, 0L, SEEK-END);
+      self.length = ftello(file);
+      fsetpos(file, &fpos);
+      self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (self.length + 1));
+      fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
+      // check for embedded NUL?
+      self.buffer[self.length] = NUL;
+      fsetpos(file, &fpos);
+      self.current-position = 0;
+    }
+    self.line =     1;
+    self.previous-column = 0;
+    self.column =   0;
+
+    self.open-tokens = make(deque:klass);
+    return self;
+  }
+
+  method object-t dealloc(object-t self)
+  {
+    free(self.buffer);
+    object-t result = dk:dealloc(super);
+    return result;
+  }
+
+  method const char8-t* filename(object-t self)
+  {
+    return cast(const char8-t*)(self.filename);
+  }
+    
+  /* method */ noexport inline char8-t previous-char8(object-t self)
+  {
+    assert(0 != self.current-position);
+    char8-t c = self.buffer[self.current-position - 1];
+    return c;
+  }
+  /* method */ noexport inline char8-t current-char8(object-t self)
+  {
+    char8-t c = self.buffer[self.current-position];
+    return c;
+  }
+  /* method */ noexport inline void unget-char8(object-t self)
+  {
+    assert(0 != self.current-position);
+    self.current-position--;
+    char8-t c = current-char8(self);
+    if ('\n' == c)
+    {
+      self.line--;
+      self.column = self.previous-column;
+    }
+    else
+    {
+      if (0 == self.column)
+      {
+        self.line--;
+        self.column = self.previous-column;
+      }
+      else
+      {
+        //
+        self.column--;
+      }
+    }
+    return;
+  }
+
+  /* method */ noexport inline char8-t get-char8(object-t self)
+  {
+    char8-t c = current-char8(self);
+    self.current-position++;
+    if (NUL != c)
+    {
+      if ('\n' == c)
+      {
+        self.previous-column = self.column + 1;
+        self.line++;
+        self.column = 0;
+      }
+      else
+      {
+        self.previous-column = self.column;
+        //
+        self.column++;
+      }
+    }
+    return c;
+  }
+
+  method object-t tokenize(object-t self)
+  {
+    object-t seq = make(vector:klass);
+    object-t token;
+    object-t leading-ws = make(vector:klass);
+
+    while (NULL != (token = dk:lex(self)))
+    {
+      if (0 == dk:tokenid(token))
+      {
+        dk:add-last(leading-ws, token);
+      }
+      else
+      {
+        unless (dk:empty?(leading-ws))
+        {
+          dk:leading-ws=(token, leading-ws);
+          leading-ws = make(vector:klass);
+        }
+        dk:add-last(seq, token);
+      }
+    }
+    return seq;
+  }
+
+  method object-t lex(object-t self)
+  {
+    while (1)
+    {
+      char8-t c1 = get-char8(self);
+      switch (c1)
+      {
+        // whitespace
+        case '\t': case ' ':
+        case '\n': case '\r': case '\v':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          while (1)
+          {
+            char8-t c2 = get-char8(self);
+            switch (c2)
+            {
+              case '\t': case ' ':
+              case '\n': case '\r': case '\v':
+              {
+                cstring:concat(&buf, c2);
+                break;
+              }
+              default:
+              {
+                unget-char8(self);
+                object-t token = make(token:klass, tokenid => 0, buffer => buf.ptr,
+                                      line => -1, column => -1);
+                return token;
+              }
+            }
+          }
+        }
+        case '#':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          boole-t escaped? = false;
+          while (1)
+          {
+            char8-t c2 = get-char8(self);
+            cstring:concat(&buf, c2);
+            switch (c2)
+            {
+              case '\\':
+                escaped? = true;
+                break;
+              case '\n':
+                if (escaped?)
+                {
+                  escaped? = false;
+                }
+                else
+                {
+                  escaped? = false;
+                  object-t token = make(token:klass, tokenid => 0, buffer => buf.ptr,
+                                        line => -1, column => -1);
+                  return token;
+                }
+                break;
+              default:
+                escaped? = false;
+            }
+          }
+        }
+        case '/':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          while (1)
+          {
+            char8-t c2 = get-char8(self);
+            switch (c2)
+            {
+              // // comments
+              case '/':
+              {
+                cstring:concat(&buf, c2);
+                while (1)
+                {
+                  char8-t c3 = get-char8(self);
+                  cstring:concat(&buf, c3);
+                  switch (c3)
+                  {
+                    case '\n':
+                    {
+                      object-t token = make(token:klass, tokenid => 0, buffer => buf.ptr,
+                                            line => -1, column => -1);
+                      return token;
+                    }
+                  }
+                }
+                abort();
+              }
+              // /* comments
+              case '*':
+              {
+                cstring:concat(&buf, c2);
+                char8-t c3;
+                char8-t c4 = get-char8(self);
+                while (1)
+                {
+                  c3 = c4;
+                  cstring:concat(&buf, c3);
+                  c4 = get-char8(self);
+
+                  if ('*' == c3 && '/' == c4)
+                    break;
+                }
+                cstring:concat(&buf, c4);
+                object-t token = make(token:klass, tokenid => 0, buffer => buf.ptr,
+                                      line => -1, column => -1);
+                return token;
+                // / op
+              }
+            } // switch (c2)
+            unget-char8(self);
+            object-t token = make(token:klass, tokenid => '/', buffer => buf.ptr,
+                                  line => self.line, column => self.column - buf.len);
+            return token;
+          } // while (1)
+          break;
+        } // case '/':
+
+        // single quoted string
+        case '\'':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          boole-t escaped? = false;
+          while (1)
+          {
+            char8-t c2 = get-char8(self);
+            cstring:concat(&buf, c2);
+            switch (c2)
+            {
+              case '\\':
+                escaped? = !escaped?;
+                break;
+              case '\'':
+                if (escaped?)
+                {
+                  escaped? = false;
+                }
+                else
+                {
+                  escaped? = false;
+                  object-t token = make(token:klass, tokenid => 'sqst', buffer => buf.ptr,
+                                        line => self.line, column => self.column - buf.len);
+                  return token;
+                }
+                break;
+              default:
+                escaped? = false;
+            }
+          }
+        }
+
+        // double quoted string
+        case '"':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          boole-t escaped? = false;
+          while (1)
+          {
+            char8-t c2 = get-char8(self);
+            cstring:concat(&buf, c2);
+            switch (c2)
+            {
+              case '\\':
+                escaped? = !escaped?;
+                break;
+              case '"':
+                if (escaped?)
+                {
+                  escaped? = false;
+                }
+                else
+                {
+                  escaped? = false;
+                  object-t token = make(token:klass, tokenid => 'dqst', buffer => buf.ptr,
+                                        line => self.line, column => self.column - buf.len);
+                  return token;
+                }
+                break;
+              default:
+                escaped? = false;
+            }
+          }
+        }
+        case '0':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case 'x': case 'X':
+            {
+              do
+              {
+                cstring:concat(&buf, c2);
+                c2 = get-char8(self);
+              }while (isxdigit(c2));
+              unget-char8(self);
+              object-t token = make(token:klass, tokenid => 'nmbr', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7':
+            {
+              do
+              {
+                cstring:concat(&buf, c2);
+                c2 = get-char8(self);
+              }while (isdigit(c2) && '8' != c2 && '9' != c2);
+              unget-char8(self);
+              object-t token = make(token:klass, tokenid => 'nmbr', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => 'nmbr', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '8': case '9':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          do
+          {
+            cstring:concat(&buf, c1);
+            c1 = get-char8(self);
+          }while (isdigit(c1));
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => 'nmbr', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+
+        case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':
+        case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
+        case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':
+        case 'v': case 'w': case 'x': case 'y': case 'z':
+
+        case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
+        case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
+        case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':
+        case 'V': case 'W': case 'X': case 'Y': case 'Z':
+
+        case '_': //case '-':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          //cstring:concat(&buf, c1);
+          do
+          {
+            cstring:concat(&buf, c1);
+            c1 = get-char8(self);
+          }while (isalnum(c1) || '_' == c1 || '-' == c1);
+          unget-char8(self);
+          while (!isalnum(previous-char8(self)) && '_' != previous-char8(self))
+          {
+            unget-char8(self);
+            buf.ptr[buf.len - 1] = NUL;
+            buf.len--;
+          }
+          tokenid-t tokenid = 'idnt';
+          if (ident-type?(buf))
+            tokenid = 'type';
+          object-t token = make(token:klass, tokenid => tokenid, buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '!':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '!':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '!!', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '!=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '!', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '$':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => '$', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '%':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '%=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '%', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '&':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '&':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '&&', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '&=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '&', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '(':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t open-token = make(open-token:klass, tokenid => '(', buffer => buf.ptr,
+                                     line => self.line, column => self.column - buf.len);
+          dk:push(self.open-tokens, open-token);
+          return open-token;
+        }
+        case ')':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => ')', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          object-t open-token;
+          do
+          {
+            open-token = dk:pop(self.open-tokens);
+          } while ('<' == dk:tokenid(open-token));
+
+          if ('(' != dk:tokenid(open-token))
+            throw make(syntax-exception:klass, token => token, filename => self.filename, message => "not balenced");
+          dk:close-token=(open-token, token);
+          return token;
+        }
+        case '*':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '/':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '*/', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '*=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '*', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '+':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '+':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '++', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '+=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '+', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case ',':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => ',', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '-':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '-':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '--', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '-=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '>':
+            {
+              cstring:concat(&buf, c2);
+              char8-t c3 = get-char8(self);
+              switch (c3)
+              {
+                case '*':
+                {
+                  cstring:concat(&buf, c3);
+                  object-t token = make(token:klass, tokenid => '->*', buffer => buf.ptr,
+                                        line => self.line, column => self.column - buf.len);
+                  return token;
+                }
+              }
+              unget-char8(self);
+              object-t token = make(token:klass, tokenid => '->', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '-', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '.':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '*':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '.*', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '.':
+            {
+              cstring:concat(&buf, c2);
+              char8-t c3 = get-char8(self);
+              switch (c3)
+              {
+                case '.':
+                {
+                  cstring:concat(&buf, c3);
+                  object-t token = make(token:klass, tokenid => '...', buffer => buf.ptr,
+                                        line => self.line, column => self.column - buf.len);
+                  return token;
+                }
+              }
+              unget-char8(self);
+              object-t token = make(token:klass, tokenid => '..', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '.', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case ':':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case ':':
+            {
+              cstring:concat(&buf, c2);
+              char8-t c3 = get-char8(self);
+              switch (c3)
+              {
+                case '*':
+                {
+                  cstring:concat(&buf, c3);
+                  object-t token = make(token:klass, tokenid => '::*', buffer => buf.ptr,
+                                        line => self.line, column => self.column - buf.len);
+                  return token;
+                }
+              }
+              unget-char8(self);
+              object-t token = make(token:klass, tokenid => '::', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => ':', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case ';':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => ';', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '<':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '<':
+            {
+              cstring:concat(&buf, c2);
+              char8-t c3 = get-char8(self);
+              switch (c3)
+              {
+                case '=':
+                {
+                  cstring:concat(&buf, c3);
+                  object-t token = make(token:klass, tokenid => '<<=', buffer => buf.ptr,
+                                        line => self.line, column => self.column - buf.len);
+                  return token;
+                }
+              }
+              unget-char8(self);
+              object-t token = make(token:klass, tokenid => '<<', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '<=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t open-token = make(open-token:klass, tokenid => '<', buffer => buf.ptr,
+                                     line => self.line, column => self.column - buf.len);
+          dk:push(self.open-tokens, open-token);
+          return open-token;
+        }
+        case '=':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '=':
+            { 
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '==', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '>':
+            { 
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '=>', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '=', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '>':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '>=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '>':
+            {
+              char8-t c3 = get-char8(self);
+              switch (c3)
+              {
+                case '=':
+                {
+                  cstring:concat(&buf, c3);
+                  object-t token = make(token:klass, tokenid => '>>=', buffer => buf.ptr,
+                                        line => self.line, column => self.column - buf.len);
+                  return token;
+                }
+              }
+              unget-char8(self);
+              object-t token = make(token:klass, tokenid => '>>', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '>', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          object-t open-token = dk:pop(self.open-tokens);
+          if ('<' != dk:tokenid(open-token))
+            dk:push(self.open-tokens, open-token);
+          else
+            dk:close-token=(open-token, token);
+          return token;
+        }
+        case '?':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => '?', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '@':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => '@', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '[':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t open-token = make(open-token:klass, tokenid => '[', buffer => buf.ptr,
+                                     line => self.line, column => self.column - buf.len);
+          dk:push(self.open-tokens, open-token);
+          return open-token;
+        }
+        case ']':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => ']', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          object-t open-token;
+          do
+          {
+            open-token = dk:pop(self.open-tokens);
+          } while ('<' == dk:tokenid(open-token));
+
+          if ('[' != dk:tokenid(open-token))
+            throw make(syntax-exception:klass, token => token, filename => self.filename, message => "not balenced");
+          dk:close-token=(open-token, token);
+          return token;
+        }
+        case '^':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '^=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '^', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '`':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => '`', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '{':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t open-token = make(open-token:klass, tokenid => '{', buffer => buf.ptr,
+                                     line => self.line, column => self.column - buf.len);
+          dk:push(self.open-tokens, open-token);
+          return open-token;
+        }
+        case '|':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          char8-t c2 = get-char8(self);
+          switch (c2)
+          {
+            case '=':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '|=', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+            case '|':
+            {
+              cstring:concat(&buf, c2);
+              object-t token = make(token:klass, tokenid => '||', buffer => buf.ptr,
+                                    line => self.line, column => self.column - buf.len);
+              return token;
+            }
+          }
+          unget-char8(self);
+          object-t token = make(token:klass, tokenid => '|', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        case '}':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => '}', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          object-t open-token;
+          do
+          {
+            open-token = dk:pop(self.open-tokens);
+          } while ('<' == dk:tokenid(open-token));
+
+          if ('{' != dk:tokenid(open-token))
+            throw make(syntax-exception:klass, token => token, filename => self.filename, message => "not balenced");
+          dk:close-token=(open-token, token);
+          return token;
+        }
+        case '~':
+        {
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => '~', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+        default:
+        {
+          if (NUL == c1)
+            return NULL;
+          char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          cstring:concat(&buf, c1);
+          object-t token = make(token:klass, tokenid => 'undf', buffer => buf.ptr,
+                                line => self.line, column => self.column - buf.len);
+          return token;
+        }
+      }
+    }
+  }
+}

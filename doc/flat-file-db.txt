@@ -1,0 +1,9 @@
+key => value
+
+http://foo/bar
+key uses the notation: //foo/bar/ster terminated by "\n\t"
+value immediatly following key terminated by "\n"
+
+if value starts with '//', then its really a key in database
+
+this also requires that keys be at least strlen('//') long so the compares to [0] and [1] don't have to be range checked.

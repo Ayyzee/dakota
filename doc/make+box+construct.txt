@@ -1,0 +1,9 @@
+object-t dk:make(object-t klass, point-t $point => point(0,0), dimension-t $dimension => dimension(85, 110));
+slots-t* unbox(object-t self);
+
+object-t rect:box(rect-t* rect);
+rect-t* rect:unbox(object-t object);
+
+object-t rect:make(point-t point, dimension-t dimension);
+
+rect-t rect(point-t point, dimension-t dimension);

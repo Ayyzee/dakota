@@ -1,0 +1,334 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <fcntl.h>;
+include <getopt.h>;
+include <netinet/in.h>;
+include <stdarg.h>;
+include <stdio.h>;
+include <stdlib.h>;
+include <sys/resource.h>;
+include <sys/socket.h>;
+include <sys/stat.h>;
+include <sys/time.h>;
+include <sys/types.h>;
+include <unistd.h>;
+
+include "common.h";
+include "config.h";
+include "recruiter.h";
+include "util.h";
+include "volunteer.h";
+
+klass event;
+klass event-queue;
+klass event-queue-klass;
+klass fd;
+klass xin4-addr;
+klass xoption;
+klass xsa-family;
+klass xsockaddr-in4;
+
+enum
+{
+  DE-OPT-NULL = 0,
+
+  DE-OPT-DAEMON = 256,
+  DE-OPT-HELP,
+  DE-OPT-SET-PRIORITY,
+  DE-OPT-VERSION,
+  DE-OPT-GROUP-ADDRESS,
+  DE-OPT-GROUP-PORT,
+  DE-OPT-RECRUITER-LOOPBACK-ADDR, // defaults to xin4-addr:k-loopback
+  DE-OPT-RECRUITER-LOOPBACK-PORT,
+  DE-OPT-RECRUITER-ADDR, // defaults to xin4-addr:k-any
+  DE-OPT-RECRUITER-PORT,
+  DE-OPT-XINETD,
+  DE-OPT-RECRUITER,
+  DE-OPT-RECRUITER-ONLY,
+  DE-OPT-VOLUNTEER,
+  DE-OPT-VOLUNTEER-ONLY,
+  DE-OPT-PID-FILE,
+  DE-OPT-LOG-FILE,
+  DE-OPT-JOBS,
+};
+
+noexport int32-t opt-daemon = 0;
+
+noexport xsockaddr-in4-t group-sin = xsockaddr-in4-create(GROUP-ADDR, GROUP-PORT);
+noexport xsockaddr-in4-t recruiter-loopback-sin = xsockaddr-in4-create(RECRUITER-LOOPBACK-ADDR, RECRUITER-LOOPBACK-PORT);
+
+noexport boole-t opt-xinetd = false;
+noexport boole-t opt-recruiter = false;
+noexport boole-t opt-recruiter-only = false;
+noexport boole-t opt-volunteer = false;
+noexport boole-t opt-volunteer-only = false;
+const char8-t* opt-log-file = "distexec.log";
+const char8-t* opt-pid-file = "distexec.pid";
+noexport int32-t opt-jobs = 3;
+
+noexport void handle-opts(int32-t argc, char8-t** argv)
+{
+  int32-t unrecognized-opt-cnt = 0;
+  int32-t n;
+  // options descriptor
+  xoption-t longopts[] =
+  {
+    { "daemon", no-argument, NULL, DE-OPT-DAEMON },
+    { "help",  no-argument, NULL, DE-OPT-HELP },
+    { "set-priority", required-argument, NULL, DE-OPT-SET-PRIORITY },
+    { "version", no-argument, NULL, DE-OPT-VERSION },
+    { "group-address", required-argument, NULL, DE-OPT-GROUP-ADDRESS },
+    { "group-port", required-argument, NULL, DE-OPT-GROUP-PORT },
+    { "recruiter-loopback-addr", required-argument, NULL, DE-OPT-RECRUITER-LOOPBACK-ADDR },
+    { "recruiter-loopback-port", required-argument, NULL, DE-OPT-RECRUITER-LOOPBACK-PORT },
+    { "recruiter-addr", required-argument, NULL, DE-OPT-RECRUITER-ADDR },
+    { "recruiter-port", required-argument, NULL, DE-OPT-RECRUITER-PORT },
+    { "xinetd", no-argument, NULL, DE-OPT-XINETD },
+    { "recruiter", no-argument, NULL, DE-OPT-RECRUITER },
+    { "recruiter-only", no-argument, NULL, DE-OPT-RECRUITER-ONLY },
+    { "volunteer", no-argument, NULL, DE-OPT-VOLUNTEER },
+    { "volunteer-only", no-argument, NULL, DE-OPT-VOLUNTEER-ONLY },
+    { "pid-file", required-argument, NULL, DE-OPT-PID-FILE },
+    { "log-file", required-argument, NULL, DE-OPT-LOG-FILE },
+    { "jobs", required-argument, NULL, DE-OPT-JOBS },
+    { NULL, 0, NULL, 0 }
+  };
+  int32-t opt;
+
+  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL)))
+  {
+    switch (opt)
+    {
+      case DE-OPT-DAEMON:
+      {
+        opt-daemon = 1;
+        int32-t nodir; int32-t noclose;
+        sys:daemon(nodir = 1, noclose = 0);
+        break;
+      }
+      case DE-OPT-HELP:
+      {
+      //xoption:usage(longopts);
+        xoption:usage(box(longopts)); // hackhack: xoption:usage(xoption:slots-t*) missing
+        sys:exit(EXIT-SUCCESS);
+        break;
+      }
+      case DE-OPT-SET-PRIORITY:
+      {
+        int32-t priority = int32-from-string(optarg, 0);
+        n = sys:setpriority(PRIO-PROCESS, sys:getpid(), priority);  sc(n);
+        break;
+      }
+      case DE-OPT-VERSION:
+      {
+        const char8-t* progname = "distexecd";
+        const char8-t* version = "1.0";
+        sys:fprintf(stdout, "%s %s\n", progname, version);
+        sys:exit(EXIT-SUCCESS);
+        break;
+      }
+      case DE-OPT-GROUP-ADDRESS:
+      {
+        group-sin.sin-addr = addr-from-string(optarg, xin4-addr:k-none);
+        break;
+      }
+      case DE-OPT-GROUP-PORT:
+      {
+        group-sin.sin-port = port-from-string(optarg, 0);
+        break;
+      }
+      case DE-OPT-RECRUITER-LOOPBACK-ADDR:
+      {
+        // finishfinish
+        break;
+      }
+      case DE-OPT-RECRUITER-LOOPBACK-PORT:
+      {
+        recruiter-loopback-sin.sin-port = port-from-string(optarg, 0);
+        break;
+      }
+      case DE-OPT-RECRUITER-ADDR:
+      {
+        // finishfinish
+        break;
+      }
+      case DE-OPT-RECRUITER-PORT:
+      {
+        // finishfinish
+        break;
+      }
+      case DE-OPT-XINETD:
+      {
+        opt-xinetd = true;
+        break;
+      }
+      case DE-OPT-RECRUITER:
+      {
+        opt-recruiter = true;
+        break;
+      }
+      case DE-OPT-RECRUITER-ONLY:
+      {
+        opt-recruiter-only = true;
+        break;
+      }
+      case DE-OPT-VOLUNTEER:
+      {
+        opt-volunteer = true;
+        break;
+      }
+      case DE-OPT-VOLUNTEER-ONLY:
+      {
+        opt-volunteer-only = true;
+        break;
+      }
+      case DE-OPT-PID-FILE:
+      {
+        opt-pid-file = optarg;
+        break;
+      }
+      case DE-OPT-LOG-FILE:
+      {
+        opt-log-file = optarg;
+        break;
+      }
+      case DE-OPT-JOBS:
+      {
+        opt-jobs = int32-from-string(optarg, 0);
+        break;
+      }
+      default:
+      {
+        unrecognized-opt-cnt++;
+        break;
+      }
+    }
+  }
+  argc -= optind;
+  argv += optind;
+  if (unrecognized-opt-cnt)
+  {
+    sys:exit(EXIT-FAILURE);
+  }
+  if (!opt-daemon)
+  {
+    n = sys:chdir("/");  sc(n);
+  }
+  return;
+}
+
+static void __attribute__((constructor)) initializer()
+{
+  // should put openlog() here but getprogname() return "" pre-main() on Darwin
+  return;
+}
+
+static void __attribute__((destructor)) finalizer()
+{
+#if USE-SYSLOG
+  sys:closelog();
+#else
+  mom:closelog();
+#endif
+  return;
+}
+
+int-t main(int-t argc, char** argv, char** envp)
+{
+#ifndef HAVE-GETPROGNAME
+  sys:setprogname(argv[0]);
+#endif
+//   FILE* pid-file = sys:fopen("distexecd.pid", "w"); // bugbug
+//   sys:fprintf(pid-file, "%i", sys:getpid()); // bugbug
+//   sys:fclose(pid-file); // bugbug
+#if USE-SYSLOG
+  sys:openlog(sys:getprogname(), LOG-PID | LOG-NDELAY | LOG-PERROR, LOG-DAEMON);
+#else
+  mom:openlog(sys:getprogname(), LOG-PID | LOG-NDELAY | LOG-PERROR, LOG-DAEMON);
+#endif
+  handle-opts(argc, argv);
+  int-t n;
+  timespec ts = { 120, 0 };
+  timespec* tsp;
+
+  struct stat st;
+  fd-t fd = STDIN-FILENO;
+  n = sys:fstat(fd, &st);  sc(n);
+
+  switch (S-IFMT & st.st-mode)
+  {
+    case S-IFSOCK:
+    {
+      // is it a 'recruiter' or 'volunteer' ?
+      int-t socktype;
+      xsocklen-t optlen = sizeof(socktype);
+      n = sys:getsockopt(fd, SOL-SOCKET, SO-TYPE, &socktype, &optlen);  sc(n);
+
+      xsockaddr-in4-t sin = {0};
+      n = in4-getsockname(fd, &sin);  sc(n);
+      char8-t addrstr[INET-ADDRSTRLEN];
+      in4-ntop(sin.sin-addr, addrstr, sizeof(addrstr) - (1));
+      MOM-LOG-SOCKINFO("fd=%i %s:%i/%s", fd, addrstr, sin.sin-port, strsocktype(socktype));
+      //
+      break;
+    }
+    case S-IFREG:
+      break;
+    case S-IFCHR:
+      break;
+    default:
+      goto __failure;
+  }
+
+  if (opt-xinetd && opt-recruiter && opt-volunteer)
+    goto __failure;
+
+  if (opt-xinetd && !opt-recruiter && !opt-volunteer)
+    goto __failure;
+
+  if (opt-recruiter-only && opt-volunteer-only)
+    goto __failure;
+
+  if (!opt-volunteer-only)
+  {
+    if (opt-xinetd && opt-recruiter)
+      init-recruiter-ls-ss(STDIN-FILENO);
+    else
+      init-recruiter-ls(recruiter-loopback-sin);
+    init-recruiter-us();
+    sin4-dump(group-sin);
+    mc-connection = init-recruiter-mc(group-sin); // not a server
+  }
+  if (!opt-recruiter-only)
+  {
+    if (opt-xinetd && opt-volunteer)
+      init-volunteer-ms-ss(STDIN-FILENO);
+    else
+      init-volunteer-ms(group-sin);
+  }
+
+  if (!opt-xinetd)
+    tsp = NULL;
+  else
+    tsp = &ts;
+
+  dk:loop(dk:get-current(event-queue:klass), tsp);
+  sys:exit(EXIT-SUCCESS);
+  __failure:
+  sys:exit(EXIT-FAILURE);
+}

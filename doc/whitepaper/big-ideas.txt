@@ -1,0 +1,153 @@
+# Dakota
+
+* is
+   * both
+      * object system for proceedural C++
+      * language extensions
+   * implemented as
+      * a precompiler using a macro system
+         * backends to standard C++ compiler
+      * a runtime system
+
+* goals
+   * to improve the producity and creativity of software engineers
+   * to improve use and reuse (both planned and ad-hoc)
+      * klasses, meta-klasses, and traits
+   * to add dynamic features to C++ with an eye toward performance/footprint
+   * to address the Perl/Python prototype, C++ deployment issue
+      * scripting languages
+         * interpreted
+         * garbage collected
+         * regular expressions
+         * file i/o
+         * interactive shell
+
+* objections
+
+* the death of the function is greatly exaggerated
+
+* influences
+   * Objective-C (Smalltalk & C)
+   * CLOS
+   * Dylan
+
+* overview
+   * dynamic klass-based object system
+   * uses instantiation rather than construction
+   * single inheritence with traits
+   * state (instance variables)
+   * behavior (instance methods)
+
+* state & behavior
+   * loosly coupled (unlike C++)
+   * allows for klass/trait distinction
+
+* dynamic
+   * dynamic object system
+      * dynamically typed while being strongly typed at runtime
+      * klasses and meta-klasses can be created dynamically
+   * dynamically loaded (DLLs or DSOs)
+
+* freedoms
+   * klasses can be easily constructed across several files (or even several libraries)
+   * klasses can be modified without sourced code access
+
+* extended method name character set
+   * my-method=()
+   * my-method!()
+   * my-method?()
+
+* sequence literals
+   * $my-symbol
+   * $"my-string"
+   * $[ my-element-0, my-element-1 ]
+   * ${ my-element-0, my-element-1 }
+   * ${ my-key-0 => my-element-0, my-key-1 => my-element-1 }
+
+* improved control flow syntax
+   * unless
+   * until
+
+* keyword arguments
+   * optional keyword arguments (has a default value)
+   * required keyword arguments
+   * improves readability
+   * improves API evolution
+
+* traits
+   * cite
+   * stateless mixins
+   * similiar to Objective-C protocols or Java interfaces but with implementation
+
+* distributed objects
+   * layered on top of serialization (JSON)
+      * layered on top of reflection
+         * layered on top introspection
+
+* macro system
+   * "Dylan Reference Manual" by Andrew Shalit (1996)
+   * "D-Expressions: Lisp Power, Dylan Style" by Jonathan Bachrach and Keith Playford (1999)
+   * modeled after Dylan's macro system
+   * hygenic
+   * not proceedural
+
+* version 1.0 will be meta-circular (i.e. self hosting)
+   * Dakota syntax is implemented using the Dakota macro system
+
+* future directions
+   * poor man's eval (nib-ware?)
+   * unloading & reloading of modified klasses into a running executable
+   * module system
+
+* proper meta-klass system
+   * "Metaclasses are First Class : the ObjVlisp Model" by Pierre Cointe (1987)
+   * explicit metaklass system (vs implicit in Smalltalk and Objective-C)
+   * klasses are instance of metaklasses
+   * 'object' is root of inheritence   hierarchy and  
+     'klass'  is root of instantiation hierarchy
+
+* deprecation of cpp
+   * no requirement to write a header not even for a library
+   * code will generally be cpp directive free except
+      * conditional compilation
+
+* interposing
+   * klass
+   * method & generic function
+      * before & after
+
+* meta-programming
+   * compile-time meta-programming
+      * authoring grammar extensions using the macro system
+   * run-time meta-programming
+      * authoring meta-klasses
+
+* hopes
+   * Dakota course in academia as an example OO language
+
+* primers
+   * Dakota for C++ programmers
+   * Dakota for Objective-C programmers
+   * Dakota for Java programmers
+   * Dakota for CLOS/Dylan programmers
+
+direct klass to struct exportation when needed
+
+instantiation vs construction
+  avoid the "factory method" model
+
+docstrings (like Python)
+serialization via JSON (Perl/Python/...)
+bridges to scripting languages via serialization
+naturally bridges to C/C++
+
+uses the intersection of windows dlls and unix so (no external symbols)
+PCRE wrapper
+
+no silly 80% solution for klass slots & klass methods
+
+old ideas
+  single invocation model (methods & generic functions are functions)
+  proper metaklass system (20 years)
+  dylan macro system (12 years)
+  docstrings (from Lisp/Scheme)

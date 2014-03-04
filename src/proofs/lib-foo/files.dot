@@ -1,0 +1,52 @@
+digraph
+{
+  graph [ rankdir = "TB" ];
+  graph [ label = "dakota --shared --output lib/foo.so foo-1.dk foo-2.dk /.../regex.so /.../util.so", fontcolor = red ];
+  graph [ size = "8,8" ];
+  node [ shape = plaintext ];
+
+  "/.../regex.so" -> "obj/.../regex.so.ctlg";
+  "obj/.../regex.so.ctlg" -> "obj/.../regex.so.ctlg.rep";
+  "obj/.../regex.so.ctlg.rep" -> "obj/lib/foo.rep";
+  "obj/.../regex.so.ctlg" [ fontcolor = gray ];
+  "obj/.../regex.so.ctlg.rep" [ fontcolor = gray ];
+
+  "/.../util.so" -> "obj/.../util.so.ctlg";
+  "obj/.../util.so.ctlg" -> "obj/.../util.so.ctlg.rep";
+  "obj/.../util.so.ctlg.rep" -> "obj/lib/foo.rep";
+  "obj/.../util.so.ctlg" [ fontcolor = gray ];
+  "obj/.../util.so.ctlg.rep" [ fontcolor = gray ];
+
+  // foo (rt)
+ "obj/lib/foo.rep" -> "obj/rt/lib/foo.dk";
+ "obj/rt/lib/foo.dk" -> "obj/rt/lib/foo.cc";
+ "obj/rt/lib/foo.cc" -> "obj/rt/lib/foo.o";
+ "obj/rt/lib/foo.o" -> "lib/foo.so";
+ "obj/rt/lib/foo.dk" [ fontcolor = gray ];
+
+  // foo-1
+  "foo-1.dk" -> "obj/foo-1.cc";
+  "foo-1.dk" -> "obj/foo-1.dk.rep";
+  "obj/foo-1.dk.rep" -> "obj/lib/foo.rep";
+  "obj/lib/foo.rep" -> "obj/nrt/foo-1.dk";
+  "obj/nrt/foo-1.dk" -> "obj/nrt/foo-1.cc";
+  "obj/nrt/foo-1.cc" -> "obj/nrt/foo-1.o";
+  "obj/nrt/foo-1.o" ->  "lib/foo.so";
+  "obj/foo-1.cc" -> "obj/nrt/foo-1.cc" [ dir = back, color = green ];
+  "obj/lib/foo.rep" -> "obj/foo-1.cc";
+  "obj/foo-1.dk.rep" [ fontcolor = gray ];
+  "obj/nrt/foo-1.dk" [ fontcolor = gray ];
+
+  // foo-2
+  "foo-2.dk" -> "obj/foo-2.cc";
+  "foo-2.dk" -> "obj/foo-2.dk.rep";
+  "obj/foo-2.dk.rep" -> "obj/lib/foo.rep";
+  "obj/lib/foo.rep" -> "obj/nrt/foo-2.dk";
+  "obj/nrt/foo-2.dk" -> "obj/nrt/foo-2.cc";
+  "obj/nrt/foo-2.cc" -> "obj/nrt/foo-2.o";
+  "obj/nrt/foo-2.o" ->  "lib/foo.so";
+  "obj/foo-2.cc" -> "obj/nrt/foo-2.cc" [ dir = back, color = green ];
+  "obj/lib/foo.rep" -> "obj/foo-2.cc";
+  "obj/nrt/foo-2.dk" [ fontcolor = gray ];
+  "obj/foo-2.dk.rep" [ fontcolor = gray ];
+}

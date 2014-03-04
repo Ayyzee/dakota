@@ -1,0 +1,25 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass fred
+{
+  method object-t init(object-t self)
+  {
+    return self;
+  }
+
+  method object-t va:wilma(object-t self, va-list-t args)
+  {
+    printf("%s()\n", __func__);
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t o = make(fred:klass);
+  selector-t s = selector(va:wilma(object-t, va-list-t));
+  method-t m = dk:method-for-selector(dk:klass(o), s);
+  USE(m);
+//   va-method-t vm = dk:va-method-for-selector(dk:klass(o));
+  return 0;
+}

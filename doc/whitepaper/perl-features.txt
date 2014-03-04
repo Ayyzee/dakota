@@ -1,0 +1,47 @@
+split: splits a string into a sequence of strings and returns that sequence.
+join: joins a sequence of strings into a single string and returns that string.
+splice: removes elements denoted by 'offset' & 'length' and replaces with element of 'sequence'
+map: evaluates callback for each element of sequence and returns a sequence of the results.
+keys:
+elements: (aka values)
+=>: corresponds-to
+slice: [a..b]
+
+tie/untie: ???
+
+statement-oriented control structures:
+  statement if     expression;
+  statement unless expression;
+
+---
+Perl has several kinds of control structures.
+
+  It has block-oriented control structures, similar to those in the C
+  and Java programming languages. Conditions are surrounded by
+  parentheses, and controlled blocks are surrounded by braces:
+
+    if ( cond ) { ... }
+    if ( cond ) { ... } else { ... } 
+    if ( cond ) { ... } elsif ( cond ) { ... } else { ... } 
+
+  Where only a single statement is being controlled, statement
+  modifiers provide a lighter syntax:
+
+    statement if      cond ;
+    statement unless  cond ;
+    statement while   cond ;
+    statement until   cond ;
+    statement foreach list ;
+---
+
+It also has statement-oriented control structures:
+
+    statement if     expression;
+    statement unless expression;
+
+and expression-oriented control structures:
+
+    expression and expression;
+    expression or  expression;
+
+open(FOO, "foo") or die "Can't open foo: $!\n";

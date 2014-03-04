@@ -1,0 +1,28 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  method object-t init(object-t self)
+  {
+    klass = null; // error
+    self = dk:init(super);
+    return self;
+  }
+}
+
+klass k2
+{
+  superklass k1;
+
+  method object-t init(object-t self)
+  {
+    self = dk:init(super);
+    return self;
+  }
+}
+
+int-t main()
+{
+  make(k2:klass);
+  return 0;
+}

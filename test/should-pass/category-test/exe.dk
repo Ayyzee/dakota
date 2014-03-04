@@ -1,0 +1,13 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+
+klass foobar;
+
+int-t main()
+{
+  object-t o = make(foobar:klass);
+  dk:foo(o);
+  dk:bar(o);
+  return 0;
+}

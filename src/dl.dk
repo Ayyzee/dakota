@@ -1,0 +1,75 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <dlfcn.h>; // struct Dl-info, dladdr()
+
+include "dl.h";
+
+// returns NULL if no exact match
+noexport const char8-t*
+symbol-name-from-address(void* saddr)
+{
+  const char8-t* result = NULL;
+#if defined WIN32
+#error "not yet implemented on win32"
+#else
+  Dl-info dli;
+  if (0 != dladdr(saddr, &dli) && (dli.dli-saddr == saddr))
+    result = dli.dli-sname;
+#endif
+  return result;
+}
+
+noexport void
+load-library(const char8-t* name)
+{
+#if defined WIN32
+  //fprintf(stdout, "LoadLibrary(\"%s\")\n", name);
+  HINSTANCE h-dll = LoadLibrary(name);
+
+  if (NULL == h-dll)
+  {
+//     DWORD last-error = GetLastError();
+//     LPVOID last-error-msg-buf;
+//     FormatMessage(FORMAT-MESSAGE-ALLOCATE-BUFFER | FORMAT-MESSAGE-FROM-SYSTEM,
+//                   NULL,
+//                   last-error,
+//                   MAKELANGID(LANG-NEUTRAL, SUBLANG-DEFAULT), // Default language
+//                   (LPTSTR) &last-error-msg-buf,
+//                   0,
+//                   NULL);
+//     MessageBox(NULL, (LPTSTR)last-error-msg-buf, "GetLastError", MB-OK | MB-ICONINFORMATION);
+//     LocalFree(last-error-msg-buf);
+
+    fprintf(stderr, "%s:%i: ERROR: LoadLibrary(\"%s\").\n",
+            __FILE__, __LINE__, name);
+    throw "bummer";
+  }
+#else
+  //fprintf(stdout, "//dlopen(\"%s\", RTLD-NOW)\n", name);
+  void* dl-handle = dlopen(name, RTLD-NOW);
+
+  if (NULL == dl-handle)
+  {
+    const char8-t* error = dlerror();
+    fprintf(stderr, "%s:%i: ERROR: dlopen(\"%s\", RTLD-NOW): %s\n",
+            __FILE__, __LINE__, name, error);
+    throw "bummer";
+  }
+  // should record dl-handle and directory-string for dlclose()
+#endif // WIN32
+  return;
+}

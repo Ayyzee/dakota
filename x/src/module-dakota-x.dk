@@ -1,0 +1,68 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+module dakota-x export    gdb,
+                          xin-port,
+                          xin-port:slots-t,
+                          xin4-addr,
+                          xin4-addr:slots-t,
+                          xin6-addr,
+                          xin6-addr:slots-t,
+                          xipv4-mreq,
+                          xipv4-mreq:slots-t,
+                          xipv6-mreq,
+                          xipv6-mreq:slots-t,
+                          xoption,
+                          xoption:slots-t,
+                          xoption:usage(),
+                          xpipe,
+                          xpipe:slots-t,
+                          xpipe:init(slots-t*),
+                          xsa-family,
+                          xsa-family:slots-t,
+                          xsigaction,
+                          xsigaction:slots-t,
+                          xsigaction-cb,
+                          xsigaction-cb:slots-t,
+                          xsiginfo,
+                          xsiginfo:slots-t,
+                          xsignal,
+                          xsignal:slots-t,
+                          xsockaddr,
+                          xsockaddr-in4,
+                          xsockaddr-in4:family(),
+                          xsockaddr-in4:port(),
+                          xsockaddr-in4:slots-t,
+                          xsockaddr-in6,
+                          xsockaddr-in6:family(),
+                          xsockaddr-in6:port(),
+                          xsockaddr-in6:slots-t,
+                          xsockaddr-un,
+                          xsockaddr-un:slots-t,
+                          xsocket,
+                          xsocket:slots-t,
+                          xsocket-in,
+                          xsocket-in:slots-t,
+                          xsocket-type,
+                          xsocket-type:name(),
+                          xsocket-type:slots-t,
+                          xsocket-type:slots-t,
+                          xsocket-un,
+                          xsocket-un:slots-t,
+                          xsocklen,
+                          xsocklen:slots-t,
+                          xstat,
+                          xstat:slots-t;

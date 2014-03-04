@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>interpose klass decl</title>
+</head>
+<body>
+<pre>
+klass b
+{
+  superklass a;
+}
+<img src="./interpose-klass-decl-0.png"/>
+<hr/>
+klass c
+{
+  superklass b;
+}
+<img src="./interpose-klass-decl-1.png"/>
+
+// or
+
+klass c
+{
+  interpose b;
+}
+<img src="./interpose-klass-decl-2.png"/>
+</pre>
+</body>
+</html>

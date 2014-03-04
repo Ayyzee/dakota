@@ -1,0 +1,41 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// NOTE: enum and typedefs are both decls and defns
+
+// so we won't confuse the parser
+#define KLASS namespace
+#define METHOD
+
+// DECL
+KLASS object { struct SLOTS-t; } // object:SLOTS-t
+typedef object:SLOTS-t* OBJECT-t; // special case
+
+KLASS k1 { struct SLOTS-t; } // k1:SLOTS-t
+KLASS k2 { union  SLOTS-t; } // k2:SLOTS-t
+#if 0
+KLASS k3 { enum   SLOTS-t; } // k3:SLOTS-t
+#endif
+KLASS k3 { enum SLOTS-t { k-none = 0 }; } // k3:SLOTS-t, k3:k-none
+KLASS k4 { typedef int32-t SLOTS-t; } // k4:SLOTS-t
+KLASS k1 { METHOD OBJECT-t m1(OBJECT-t); } // k1:m1(OBJECT-t)
+
+// DEFN
+#if 0
+KLASS k1 { struct SLOTS-t { }; } // k1:SLOTS-t
+KLASS k2 { union  SLOTS-t { }; } // k2:SLOTS-t
+KLASS k1 { METHOD OBJECT-t m1(OBJECT-t self) { return self; } } // k1:m1(OBJECT-t)
+#else
+struct k1:SLOTS-t { };
+union  k2:SLOTS-t { };
+METHOD OBJECT-t k1:m1(OBJECT-t self) { return self; } // k1:m1(OBJECT-t)
+#endif
+
+
+KLASS e1 { enum SLOTS-t { k-none = 0 }; }
+void f1(e1:SLOTS-t* a) // '*' implies decl, but type requires defn
+{
+}
+KLASS e2 { typedef int32-t SLOTS-t; }
+void f2(e2:SLOTS-t* a) // '*' implies decl, but type requires defn
+{
+}

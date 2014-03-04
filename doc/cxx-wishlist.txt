@@ -1,0 +1,4 @@
+finally (finally {})
+designated initializers on POD types ({ .x = 0, .y = 0 })
+compound literals on POD types ((int32_t[]){ o1, o2 }, or (super-t){klass, self})
+variadic macros (...)

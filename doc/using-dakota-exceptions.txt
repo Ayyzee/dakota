@@ -1,0 +1,1 @@
+catch blocks must be contiguos for object types

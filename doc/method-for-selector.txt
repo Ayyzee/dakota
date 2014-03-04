@@ -1,0 +1,12 @@
+abstract-klass:method-for-selector()
+
+abstract-klass:add-method-for-selector()
+
+abstract-klass:remove-method-for-selector()
+
+
+     object-t init-methods(object-t self);
+     object-t add-method-for-selector(object-t self, selector-t selector, method-t method);
+     object-t remove-method-for-selector(object-t self, selector-t selector);
+     method-t method-for-selector(object-t self, selector-t selector);
+

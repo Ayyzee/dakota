@@ -1,0 +1,9 @@
+{
+  'files' => [
+    '/usr/local/lib/libdakota-util.$SO_EXT',
+    'exe.dk',
+    'syntax-tree.dk'
+  ],
+  'name' => 'exe',
+  'self-file' => 'project.rep'
+}

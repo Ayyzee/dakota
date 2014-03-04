@@ -1,0 +1,24 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <ctype.h>;
+include <assert.h>;
+
+noexport boole-t space?(int-t c)
+{
+  return isspace(c);
+}
+
+int-t main(int-t argc, const char8-t* const* argv)
+{
+  const char8-t* const* filenames = &argv[1];
+  assert(NULL != *filenames);
+  const char8-t* filename;
+
+  while (NULL != (filename = *filenames++))
+  {
+    object-t f = make(input-file:klass, filename => filename);
+    object-t t = dk:split(f, space?);
+    dk:dump(t);
+  }
+  return 0;
+}

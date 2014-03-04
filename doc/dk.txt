@@ -1,0 +1,12 @@
+subcmds:
+  init
+  add
+  remove
+  files
+  name
+  name=
+
+--repository=<>
+--var=<>
+--directory=<>
+--abs-path

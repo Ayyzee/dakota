@@ -1,0 +1,5 @@
+Cyclone has tuples, which are anonymous structs with fields numbered
+0, 1, 2, ... For example, $(int,string_t) is a pair of an int and a
+string_t. An example value of this type is $(4,"cyclone"). To extract
+a field from a tuple, you use array-like notation: you write x[0], not
+x.0.

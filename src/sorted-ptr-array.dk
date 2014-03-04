@@ -1,0 +1,185 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cstdlib>;
+include <cstring>;
+
+module dakota;
+
+klass result;
+klass std-compare;
+
+klass sorted-ptr-array
+{
+  slots
+  {
+    void**        elements;
+    uint32-t      count;
+    uint32-t      capacity;
+    uint32-t      size;
+    std-compare-t compare;
+  }
+
+  noexport slots-t* create(uint32-t capacity, uint32-t size, std-compare-t compare)
+  {
+    assert(0 != capacity);
+    assert(0 != size);
+    assert(NULL != compare);
+    slots-t* result = cast(slots-t*)malloc(sizeof(slots-t));
+    result->elements = cast(void**)malloc(size * capacity);
+    result->count =    0;
+    result->capacity = capacity;
+    result->size =     size;
+    result->compare =  compare;
+    return result;
+  }
+
+  method slots-t* sort(slots-t* t)
+  {
+    qsort(t->elements, t->count, t->size, t->compare);
+    return t;
+  }
+  
+  //(-(insertion point) - 1)
+  noexport result-t search(slots-t* t, const void* key)
+  {
+    assert(NULL != key);
+
+    result-t result = { NULL, UINT32-MAX };
+    int-t comparison;
+    boole-t should-increment = false;
+
+    uint32-t i = 0;
+    uint32-t l = 0;
+    uint32-t u = t->count;
+
+    while (l < u)
+    {
+      i = l + ((u - l) / 2); // calc midpoint without overflowing
+      const void** p = cast(const void**)(cast(uint8-t*)(t->elements) + (i * t->size));
+      comparison = t->compare(key, *p);
+
+      if (0 > comparison)
+      {
+        should-increment = false;
+        u = i;
+      }
+      else-if (0 < comparison)
+      {
+        should-increment = true;
+        l = i + 1;
+      }
+      else
+      {
+        result.element = *p;
+        break;
+      }
+    }
+    if (NULL == result.element && should-increment)
+      i++;
+    result.offset = i;
+    return result;
+  }
+
+  noexport slots-t* add-at(slots-t* t, const void* key, uint32-t offset)
+  {
+    assert(NULL != key);
+    assert(offset <= t->count);
+
+    memmove(cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
+            cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
+            (t->count - offset) * t->size);
+    memcpy(cast(uint8-t*)(t->elements) + (t->size * (offset + 0)), &key, t->size);
+    t->count++;
+    return t;
+  }
+
+  noexport const void* at(slots-t* t, uint32-t offset)
+  {
+    assert(offset < t->count);
+    assert(0 < t->count);
+
+    const void* element = *cast(const void**)(cast(uint8-t*)(t->elements) + (t->size * offset));
+    return element;
+  }
+
+  // key not required
+  noexport const void* remove-at(slots-t* t, const void* key, uint32-t offset)
+  {
+    assert(offset < t->count);
+    assert(0 < t->count);
+
+    const void* element = at(t, offset);
+    memmove(cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
+            cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
+            (t->count - offset - 1) * t->size); // this arg may be zero
+    if (NULL != key)
+      assert(0 == t->compare(key, element));
+    memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, t->size);
+    t->count--;
+    return element;
+  }
+
+  noexport slots-t* add(slots-t* t, const void* key)
+  {
+    assert(NULL != key);
+
+    result-t result = search(t, key);
+    if (NULL == result.element)
+      add-at(t, key, result.offset);
+    return t;
+  }
+
+  noexport const void* intern(slots-t* t, const void* key)
+  {
+    assert(NULL != key);
+    const void* element = key;
+    result-t result = search(t, key);
+
+    if (NULL != result.element)
+      element = result.element;
+    else
+      add-at(t, key, result.offset);
+    return element;
+  }
+
+  noexport const void* remove-last(slots-t* t)
+  {
+  //assert(0 < t->count);
+
+    const void* element;
+    if (0 != t->count)
+    {
+      element = at(t, t->count - 1);
+      memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, t->size);
+      t->count--;
+    }
+    else
+    {
+      element = NULL;
+    }
+    return element;
+  }
+
+  noexport const void* bsearch(slots-t* t, const void* key)
+  {
+    assert(NULL != key);
+ 
+    result-t result = search(t, key);
+    return result.element;
+  }
+}

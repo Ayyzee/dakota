@@ -1,0 +1,10 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+int-t main()
+{
+//  object buf = cstring::construct( { } );
+
+  object-t str = make(string:klass, bytes => "hello world!");
+  dk:dump(str);
+  return 0;
+}

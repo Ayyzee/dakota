@@ -1,0 +1,50 @@
+include <assert.h>;
+
+include "exception.h";
+
+void dkt-handler-context-add(handler-context-t*, exception-handler-t); // hackhack
+void dkt-handler-context-remove(handler-context-t*); // hackhack
+void dkt-throw-object(object-t exception); // hackhack
+
+klass exception-handler;
+klass handler-context;
+
+void bar(uint-t v)
+{
+  if (k-throw & v)
+    dkt-throw-object(make(exception:klass));
+}
+uint-t some-handler-var = 0;
+boole-t some-handler(object-t exception)
+{
+  assert(0 != (k-throw & some-handler-var));
+  boole-t result;
+  if (k-handle & some-handler-var)
+    result = true;
+  else
+    result = false;
+  USE(exception);
+  return result;
+}
+void foo(uint-t v)
+{
+  printf("%s(%i)\n", __func__, v);
+  handler-context-t _hc_; dkt-handler-context-add(&_hc_, some-handler); try
+                                                                        {
+									  some-handler-var = v;
+                                                                          bar(v);
+                                                                          printf("%s(%i) no-exception\n", __func__, v);
+                          dkt-handler-context-remove(&_hc_);            }
+                                                                        catch (system-exception:klass e1)
+                                                                        {
+                          dkt-handler-context-remove(&_hc_);              printf("%s(%i) caught(<%s>)\n", __func__, v, dk:name(dk:klass(e1)));
+                                                                        }
+                                                                        catch (exception:klass e2)
+                                                                        {
+                          dkt-handler-context-remove(&_hc_);              printf("%s(%i) caught(<%s>)\n", __func__, v, dk:name(dk:klass(e2)));
+                                                                        }
+                                                                        catch (...)
+                                                                        {
+                          dkt-handler-context-remove(&_hc_);              printf("%s(%i) caught(<...>)\n", __func__, v);
+                                                                        }
+}

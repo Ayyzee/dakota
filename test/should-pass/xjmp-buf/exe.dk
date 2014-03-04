@@ -1,0 +1,11 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass xjmp-buf
+{
+  slots jmp-buf;
+}
+
+int-t main()
+{
+  return 0;
+}

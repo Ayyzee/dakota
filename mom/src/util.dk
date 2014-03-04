@@ -1,0 +1,231 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <getopt.h>;
+include <netinet/in.h>;
+include <stdarg.h>;
+include <stdio.h>;
+include <stdlib.h>;
+include <string.h>;
+include <sys/socket.h>;
+include <sys/stat.h>;
+include <sys/types.h>;
+include <sys/types.h>;
+include <unistd.h>;
+
+#ifndef __STDC-FORMAT-MACROS
+#define __STDC-FORMAT-MACROS
+#endif //__STDC-FORMAT-MACROS
+include <inttypes.h>;
+
+include "config.h";
+include "endian.h";
+include "hacks.h";
+include "inet.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass xin-port;
+klass xin4-addr;
+klass xoption;
+klass xsa-family;
+klass xsocklen;
+
+// what should resolve-path() do when given a path beginning with . or ./ or ../
+// should it get the cwd and prepend it?
+// should it just return the path given to it?
+
+export char8-t* resolve-path(char8-t* path, size-t pathlen, const char8-t* file)
+{
+  path[0] = (char8-t)0;
+  char8-t* pathvar = sys:getenv("PATH");
+  char8-t* pathvarbuf = (char8-t*)sys:malloc(strlen(pathvar) + 1); // can be longer than MAXPATHLEN
+  char8-t* iterator = pathvarbuf;
+  char8-t* p;
+  sys:strcpy(pathvarbuf, pathvar);
+  
+  while (NULL != (p = sys:strsep(&iterator, ":")))
+  {
+    sys:snprintf(path, pathlen, "%s/%s", p, file);
+    struct stat st;
+    int32-t n = sys:stat(path, &st);
+    if (0 == n)
+      break;
+    path[0] = (char8-t)0;
+  }
+  sys:free(pathvarbuf);
+  return path;
+}
+
+noexport int32-t int32-from-string-base(const char8-t* str, int32-t default-int32, int32-t base)
+{
+  int32-t int32 = default-int32;
+  if (NULL != str && (char8-t)0 != str[0])
+  {
+    errno = 0;
+    int32 = sys:strtoimax(str, NULL, base);  zeroneen(errno);
+  }
+  return int32;
+}
+
+noexport uint32-t uint32-from-string-base(const char8-t* str, uint32-t default-uint32, int32-t base)
+{
+  uint32-t uint32 = default-uint32;
+  if (NULL != str && (char8-t)0 != str[0])
+  {
+    errno = 0;
+    uint32 = sys:strtoimax(str, NULL, base);  zeroneen(errno);
+  }
+  return uint32;
+}
+
+noexport int16-t int16-from-string-base(const char8-t* str, int16-t default-int16, int32-t base)
+{
+  int16-t int16 = default-int16;
+  if (NULL != str && (char8-t)0 != str[0])
+  {
+    errno = 0;
+    int16 = sys:strtoimax(str, NULL, base);  zeroneen(errno);
+  }
+  return int16;
+}
+
+noexport uint16-t uint16-from-string-base(const char8-t* str, uint16-t default-uint16, int32-t base)
+{
+  uint16-t uint16 = default-uint16;
+  if (NULL != str && (char8-t)0 != str[0])
+  {
+    errno = 0;
+    uint16 = sys:strtoumax(str, NULL, base);  zeroneen(errno);
+  }
+  return uint16;
+}
+
+export int32-t int32-from-string(const char8-t* str, int32-t default-int32)
+{
+  int32-t int32 = int32-from-string-base(str, default-int32, 10);
+  return int32;
+}
+
+noexport uint32-t uint32-from-string(const char8-t* str, uint32-t default-uint32)
+{
+  uint32-t uint32 = uint32-from-string-base(str, default-uint32, 10);
+  return uint32;
+}
+
+noexport int16-t int16-from-string(const char8-t* str, int16-t default-int16)
+{
+  int16-t int16 = int16-from-string-base(str, default-int16, 10);
+  return int16;  
+}
+
+noexport uint16-t uint16-from-string(const char8-t* str, uint16-t default-uint16)
+{
+  uint16-t uint16 = uint16-from-string-base(str, default-uint16, 10);
+  return uint16;  
+}
+
+export xin-port-t port-from-string(const char8-t* port-str, xin-port-t default-port)
+{
+  xin-port-t port = (xin-port-t)uint16-from-string-base(port-str, default-port, 10);
+  return port;
+}
+
+export xin-port-t port-from-hex-string(const char8-t* port-str, xin-port-t default-port)
+{
+  xin-port-t port = (xin-port-t)uint16-from-string-base(port-str, default-port, 16);
+  return port;
+}
+
+noexport int16-t int16-getenv(const char8-t* key, int16-t default-int16)
+{
+  int16-t int16 = int16-from-string(sys:getenv(key), default-int16);
+  return int16;
+}
+
+noexport uint16-t uint16-getenv(const char8-t* key, uint16-t default-uint16)
+{
+  uint16-t uint16 = uint16-from-string(sys:getenv(key), default-uint16);
+  return uint16;
+}
+
+noexport int32-t int32-getenv(const char8-t* key, int32-t default-int32)
+{
+  int32-t int32 = int32-from-string(sys:getenv(key), default-int32);
+  return int32;
+}
+
+noexport uint32-t uint32-getenv(const char8-t* key, uint32-t default-uint32)
+{
+  uint32-t uint32 = uint32-from-string(sys:getenv(key), default-uint32);
+  return uint32;
+}
+
+export xin-port-t port-getenv(const char8-t* key, xin-port-t default-port)
+{
+  xin-port-t port = port-from-string(sys:getenv(key), default-port);
+  return port;
+}
+
+export xin4-addr-t addr-from-string(const char8-t* addr-str, xin4-addr-t default-addr)
+{
+  xin4-addr-t addr = default-addr;
+  if (NULL != addr-str && (char8-t)0 != addr-str[0])
+  {
+    struct in-addr s = {0};
+    int32-t n = sys:inet-pton(xsa-family:k-in4, addr-str, &s);
+    s.s-addr = ntoh32(s.s-addr); //endend
+
+    if (-1 != n)
+    {
+      addr.s-addr = s.s-addr;
+    }
+  }
+  return addr;
+}
+
+noexport const char8-t* addr-to-string(xin4-addr-t addr, char8-t* buf, xsocklen-t buflen)
+{
+  const char8-t* p = in4-ntop(addr, buf, buflen);
+  return p;
+}
+
+export xin4-addr-t addr-getenv(const char8-t* key, xin4-addr-t default-addr)
+{
+  xin4-addr-t addr = addr-from-string(sys:getenv(key), default-addr);
+  return addr;  
+}
+
+// aaa.bbb.ccc.eee:ppppp
+noexport xsockaddr-in4-t* string-to-sockaddr-in(const char8-t* str, xsockaddr-in4-t* sinp)
+{
+  if (NULL != str && NULL != sinp)
+  {
+    char8-t addr-str[INET-ADDRSTRLEN + 1 + 5 + (1)] = "";
+    sys:strncpy(addr-str, str, sizeof(str) - (1));
+
+    char8-t* port-str = sys:strchr(str, ':'); // nullnull
+    *port-str = (char8-t)0;
+    port-str++;
+
+    sinp->sin-addr = addr-from-string(str, xin4-addr:k-none);
+    sinp->sin-port = port-from-string(port-str, 0);
+  }
+  return sinp;
+}

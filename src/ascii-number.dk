@@ -1,0 +1,160 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cstdlib>;
+include <cstring>;
+
+include "dakota-private.h";
+
+module dakota-util;
+
+klass ascii-number-klass;
+
+klass ascii-number
+{
+  klass klass;
+
+  slots
+  {
+    char8-t* ascii-string;
+    int32-t  number;
+  }
+
+  method uintmax-t hash(object-t self)
+  {
+    return cast(uintmax-t)(self.number);
+  }
+
+  method int-t compare(object-t self, object-t other)
+  {
+    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
+    int-t result;
+    if (dk:instance?(other, klass))
+    {
+      slots-t* s1 = unbox(self);
+      slots-t* s2 = unbox(other);
+      result = s1->number - s2->number;
+    }
+    else
+    {
+      result = dk:compare(super, other);
+    }
+    result = normalize-compare-result(result);
+    return result;
+  }
+
+  method boole-t equal?(object-t self, object-t other)
+  {
+    boole-t state;
+
+    if (dk:instance?(other, klass))
+    {
+      slots-t* s1 = unbox(self);
+      slots-t* s2 = unbox(other);
+
+      if (s1->number == s2->number)
+        state = true;
+      else
+        state = false;
+    }
+    else
+    {
+      state = false;
+    }
+    return state;
+  }
+
+  noexport int32-t power(int32-t base, int32-t exp)
+  {
+    int32-t rtn;
+
+    if (0 == exp)
+    {
+      rtn = 1;
+    }
+    else
+    {
+      rtn = base;
+
+      while (1 != exp)
+      {
+        rtn *= base;
+        exp--;
+      }
+    }
+    return rtn;
+  }
+
+  // hackhack: similiar code in string.dk
+  noexport void reverse(char8-t* buffer, uint32-t length)
+  {
+    if (0 != length)
+    {
+      uint32-t head-offset = 0, tail-offset = length - 1;
+
+      while (head-offset < tail-offset)
+      {
+        char8-t head-char = buffer[head-offset];
+        buffer[head-offset] = buffer[tail-offset];
+        buffer[tail-offset] = head-char;
+        head-offset++; tail-offset--;
+      }
+    }
+    return;
+  }
+
+  noexport void convert(int32-t num, int32-t base, const char8-t* digits, char8-t* buffer)
+  {
+    int32-t  digit-num = 1;
+    uint32-t offset =    0;
+
+    do
+    {
+      int32-t digit-pos = (num % power(base, digit-num))/(power(base, digit-num - 1));
+      char8-t digit = digits[digit-pos];
+      buffer[offset] = digit;
+      offset++;
+    } until (num < power(base, digit-num++));
+
+    buffer[offset] = NUL;
+    reverse(buffer, offset);
+    return;
+  }
+
+  method object-t init(object-t self, int32-t number => 0)
+  {
+    self = dk:init(super);
+    self.number = number;
+    self.ascii-string = cast(char8-t*)malloc(sizeof(char8-t) * (32 + 1));
+    object-t kls = dk:klass(self);
+    const char8-t* digits = dk:digits(kls);
+    uint32-t base = cast(uint32-t)safe-strlen(digits);
+    convert(number, cast(int32-t)(base), digits, self.ascii-string);
+    return self;
+  }
+
+  method object-t dealloc(object-t self)
+  {
+    free(self.ascii-string);
+    object-t result = dk:dealloc(super);
+    return result;
+  }
+
+  method const char8-t* ascii-string(object-t self)
+  {
+    return self.ascii-string;
+  }
+}

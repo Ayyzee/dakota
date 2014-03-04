@@ -1,0 +1,246 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <assert.h>;
+include <errno.h>;
+include <stdint.h>;
+include <stdio.h>;
+include <stdlib.h>;
+include <string.h>;
+include <sys/types.h>;
+include <sys/uio.h>;
+include <unistd.h>;
+
+#ifndef __STDC-FORMAT-MACROS
+#define __STDC-FORMAT-MACROS
+#endif //__STDC-FORMAT-MACROS
+include <inttypes.h>;
+
+include "hacks.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass cstring;
+klass fd;
+klass msg-id;
+klass cstring;
+
+klass msg
+{
+  klass msg-klass;
+
+  slots
+  {
+    uint32-t tag;
+    msg-id-t id;
+    cstring-t buf;
+  }
+  
+  method object-t init(object-t self, uint32-t tag => {}, cstring-t val => {}, msg-id-t id => 0)
+  {
+    self = dk:init(super);
+    self.tag = tag;
+    self.id =  id;
+    self.buf.len = 4 + 4 + 8 + val.len;
+    self.buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * (self.buf.len + 1));
+    // bugbug
+    int32-t n;
+    
+    if (0 == val.len) // hackhack
+    {
+      n = sys:snprintf(self.buf.ptr, self.buf.len + 1, "%04x%04x%08x", tag, val.len, id); sc(n); // slowslow
+    }
+    else
+    {
+      n = sys:snprintf(self.buf.ptr, self.buf.len + 1, "%04x%04x%08x%.*s", tag, val.len, id, val.len, val.ptr); sc(n); // slowslow
+    }
+    MOM-LOG-CREATE("%s:%s() = 0x%08x", __klass__, __func__, (uint32-t)self);
+    return self;
+  }
+
+  method object-t clone(object-t self)
+  {
+    object-t clone = make(msg:klass,
+                          tag => self.tag,
+                          id =>  self.id,
+                          val => dk:val(self));
+    return clone;
+  }
+
+  method uint32-t tag(object-t self)
+  {
+    uint32-t result = self.tag;
+    return result;
+  }
+
+  method msg-id-t id(object-t self)
+  {
+    msg-id-t result = self.id;
+    return result;
+  }
+
+  method msg-id-t id=(object-t self, msg-id-t id)
+  {
+    //assert(0 != id);
+    self.id = id;
+    char8-t idstr[8 + 1]; idstr[0] = (char8-t)0;
+    int32-t n = sys:snprintf(idstr, 8 + 1, "%08x", self.id); sc(n); // slowslow
+    sys:strncpy(self.buf.ptr + 4 + 4, idstr, 8);
+    return id;
+  }
+
+  method cstring-t val(object-t self)
+  {
+    cstring-t result = { self.buf.ptr + 4 + 4 + 8,
+                         self.buf.len - 4 - 4 - 8 };
+    return result;
+  }
+
+  method cstring-t buf(object-t self)
+  {
+    cstring-t result = { self.buf.ptr,
+                         self.buf.len };
+    return result;
+  }
+
+  method object-t free(object-t self)
+  {
+    MOM-LOG-FREE("%s:%s(0x%08x)", __klass__, __func__, (uint32-t)self);
+    sys:free(self.buf.ptr); self.buf.ptr = NULL;
+    sys:free(self); self = NULL;
+    return NULL;
+  }
+
+  method char8-t* statestr(object-t self, char8-t* buf, size-t buf-len)
+  {
+    sys:snprintf(buf, buf-len, "%.*s", cast(int-t)buf-len, self.buf.ptr);
+    return buf;
+  }
+
+  method int32-t dump(object-t self)
+  {
+    int32-t n;
+    fd-t fd = STDERR-FILENO;
+    
+    if (NULL == self)
+    {
+      char8-t str[] = "NULL";
+      size-t sizeof-buf = 1 + strlen(str) + 1 + 1;
+      char8-t buf[sizeof-buf];
+      n = sys:snprintf(buf, sizeof-buf, "{%s}", str); sc(n);
+      n = sys:write(fd, buf, strlen(buf)); sc(n); //we can use n rather than strlen(), right?
+    }
+    else
+    {
+      uint32-t tag = self.tag;
+      msg-id-t id =  self.id;
+      cstring-t val = dk:val(self);
+      
+//       if (0 == tag || NULL == val.ptr)
+//       {
+//         len = 0;
+//         val = "";
+//       }
+//       else
+//       {
+//         if (0 == len)
+//         {
+//           len = strlen(val);
+//         }
+//       }
+      uint32-t buf-len = 4 + 4 + 8 + val.len;
+      char8-t   buf[1 + buf-len + 1 + 1];
+      n = sys:snprintf(buf, 1 + buf-len + 1 + 1, "{%04x%04x%08x%.*s}", tag, val.len, id, val.len, val.ptr); sc(n); // slowslow
+      n = sys:write(fd, buf, 1 + buf-len + 1); sc(n);
+    }
+    return n;
+  }
+
+  method int32-t write(object-t self, fd-t fd)
+  {
+    int32-t n = 0;
+    cstring-t val = dk:val(self);
+    //if (0 != self.len)
+      n = sys:write(fd, val.ptr, val.len); sc(n); // bugbug: write entire msg
+    return n;
+  }
+
+//   int32-t serialize-to-fd(object-t self, fd-t fd)
+//   {
+//     int32-t n = sys:write(fd, self.buf, self.buf-len);  sc(n); // bugbug: write entire msg
+//     return n;
+//   }
+}
+
+  noexport intmax-t intmax-from-hexbuf(char8-t* buf, int32-t buf-len)
+  {
+    char8-t decstr[buf-len + 1];
+    sys:strncpy(decstr, buf, buf-len);
+    decstr[buf-len] = (char8-t)0;
+    errno = 0;
+    intmax-t dec = sys:strtoimax(decstr, (char8-t**)NULL, 16);  zeroneen(errno);
+    if (0 == dec && 0 != errno)
+    {
+      MOM-LOG-ERROR-ERRNO(errno);
+      goto __failure;
+    }
+    //   MOM-LOG(mom:LOG-GENERIC-FLAG, "%s", decstr);
+    return dec;
+    __failure:
+    return -1;
+  }
+
+klass msg-klass
+{
+  superklass klass;
+
+    method object-t deserialize(object-t self, char8-t* buf, size-t* buf-lenp)
+    {
+      assert(NULL != buf);
+      assert(NULL != buf-lenp);
+      assert(0 <= *buf-lenp);
+      object-t instance = NULL;
+
+      if (4 + 4 + 8 <= *buf-lenp)
+      {
+        uint32-t tag = intmax-from-hexbuf(buf, 4);
+        uint32-t len = intmax-from-hexbuf(buf + 4, 4);
+        msg-id-t id =  intmax-from-hexbuf(buf + 4 + 4, 8);
+        
+        if (4 + 4 + 8 + len <= *buf-lenp)
+        {
+          instance = dk:alloc(msg:klass);
+          // bugbug
+          msg:unbox(instance)->buf.len = 4 + 4 + 8 + len;
+          msg:unbox(instance)->buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * (msg:unbox(instance)->buf.len + 1));
+          // bugbug
+          
+          sys:memcpy(msg:unbox(instance)->buf.ptr, buf, msg:unbox(instance)->buf.len);
+          msg:unbox(instance)->buf.ptr[msg:unbox(instance)->buf.len] = (char8-t)0;
+          sys:memmove(buf, buf + msg:unbox(instance)->buf.len, *buf-lenp - msg:unbox(instance)->buf.len);
+          buf[*buf-lenp - msg:unbox(instance)->buf.len] = (char8-t)0;
+          *buf-lenp -= msg:unbox(instance)->buf.len;
+          
+          msg:unbox(instance)->tag = tag;
+          msg:unbox(instance)->id =  id;
+          msg:unbox(instance)->buf = msg:unbox(instance)->buf; // bugbug:  should we be using the leading 4 + 4 + 8?
+        }
+      }
+      return instance;
+    }
+}

@@ -1,0 +1,19 @@
+PASS  The test was sucessful.
+FAIL  The test failed.
+XFAIL The test is marked as an expected failure (see below), and it failed indeed.
+XPASS The test is marked as an expected failure, but passed so it is not a failure anymore. 
+
+
+should-pass and did-pass  PASS
+should-pass and did-fail  FAIL
+
+should-fail and did-pass  XPASS
+should-fail and did-fail  XFAILE
+
+should-pass
+  do-pass
+  do-fail // error
+
+should-fail
+  do-pass // error
+  do-fail

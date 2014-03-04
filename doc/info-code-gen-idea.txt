@@ -1,0 +1,21 @@
+    info info
+    {
+      { $name,            $base26-ascii-number-klass },
+      { $superklass-name, $ascii-number },
+    }
+
+becomes
+
+    property-t info-properties[] =
+    {
+      { "name",            (uintptr-t)&$base26-ascii-number-klass },
+      { "superklass-name", (uintptr-t)&$ascii-number },
+    };
+    info-t info = { info-properties, ARRAY-COUNT(info-properties), NULL };
+
+---
+
+klass info
+{
+...
+}

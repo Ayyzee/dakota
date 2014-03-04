@@ -1,0 +1,26 @@
+should be able to interpose an "uncoopertive" application using environment variables
+should be able to interpose in a "coopertive" application without using environment variables
+
+add2
+remove1
+promote1
+demote1
+
+interpose2
+depose1
+
+interpose: add then promote
+depose:    demote then remove
+
++ k1 k2
+- k1 = k2
+> k1
+< k1
+
++> k1 k2
+<- k1 = k2
+
+use case: interpose (+>)
+c interposes a
+
+DK_

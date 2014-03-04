@@ -1,0 +1,106 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+
+module dakota;
+
+klass output-stream;
+
+klass no-such-keyword-exception
+{
+  superklass exception;
+
+  slots
+  {
+    object-t     object;
+    signature-t* signature;
+    uintmax-t    keyword;
+    symbol-t     symbol;
+  }
+
+  method object-t init(object-t self,
+                       object-t     object =>    {},
+                       signature-t* signature => {},
+                       symbol-t     symbol =>    {})
+  {
+    assert(NULL != object);
+    assert(NULL != signature);
+
+    self = dk:init(super);
+
+    self.object = object;
+    self.signature = signature;
+    self.symbol = symbol;
+    return self;
+  }
+
+  method object-t dump(object-t self)
+  {
+    dk:dump(super);
+    fprintf(stderr, "%p:%p {", cast(void*)(self), cast(void*)unbox(self));
+
+    // object
+    if (NULL != self.object)
+      fprintf(stderr, " object=%p", cast(void*)(self.object));
+    else
+      fprintf(stderr, " object=%s", $NULL);
+
+    // signature
+    if (NULL != self.signature)
+      fprintf(stderr, ", signature=%p \"%s(%s)\"", cast(void*)(self.signature), self.signature->name, self.signature->parameter-types);
+    else
+      fprintf(stderr, ", signature=%s", $NULL);
+
+    // symbol
+    if (NULL != self.symbol)
+      fprintf(stderr, ", symbol=%p $%s", cast(void*)(self.symbol), self.symbol);
+    else
+      fprintf(stderr, ", symbol=%s", $NULL);
+
+    fprintf(stderr, " }\n");
+
+    if (NULL != self.object)
+      dk:dump(self.object);
+
+    return self;
+  }
+
+  method object-t print(object-t self, object-t out)
+  {
+    dk:print(super, out);
+
+    if (dk:instance?(self.object, klass:klass))
+    {
+      symbol-t name;
+      if (NULL == (name = dk:name(self.object)))
+        name = $NULL;
+      dk:print-format(out, ": %p <%s>", self.object, name);
+    }
+    else-if (NULL != self.object)
+      dk:print-format(out, ": %p", self.object);
+    else
+      dk:print-format(out, ": %s", NULL);
+
+    object-t object-klass = dk:klass(self.object);
+    dk:print-format(out, " of <%s> %s(%s): no such keyword '%s'",
+                    dk:name(object-klass),
+                    self.signature->name,
+                    self.signature->parameter-types,
+                    self.symbol);
+    return self;
+  }
+}

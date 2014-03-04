@@ -1,0 +1,69 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  superklass object;
+  slots
+  {
+    int32-t value;
+  }
+
+  method object-t write-part(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+    dk:write-element(out, self.value, "value");
+    dk:write-slots-end(out);
+    return self;
+  }
+}
+
+klass k2
+{
+  superklass k1;
+  slots
+  {
+    int32-t value;
+  }
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+    dk:write-element(out, self.value, "value");
+    dk:write-slots-end(out);
+    return self;
+  }
+}
+
+klass k3
+{
+  superklass k2;
+  slots
+  {
+    int32-t value;
+  }
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+    dk:write-element(out, self.value, "value");
+    dk:write-slots-end(out);
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t parser = make(perl-parser:klass);
+  object-t property-list = dk:read-property-list(parser);
+
+//   object-t i = make(k3:klass);
+//   object-t ooutput-stream = make(perl-object-output-stream:klass);
+//   dk:write(ooutput-stream, i);
+
+  object-t poutput-stream = make(xml-object-output-stream:klass);
+  dk:write(poutput-stream, property-list);
+
+  dk:close(poutput-stream);
+  return 0;
+}

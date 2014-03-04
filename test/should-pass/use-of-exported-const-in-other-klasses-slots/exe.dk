@@ -1,0 +1,19 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  export const uint-t length = 2;
+}
+
+klass k2
+{
+  slots
+  {
+    uint-t[k1:length] slot-0;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

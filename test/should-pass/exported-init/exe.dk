@@ -1,0 +1,25 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass thing
+{
+  export method object-t init(object-t self)
+  {
+    return self;
+  }
+}
+
+int-t main()
+{
+  int-t status = 0;
+  try
+  {
+    object-t o = make(thing:klass);
+    USE(o);
+  }
+  catch(...)
+  {
+    fprintf(stderr, "ERROR: uncaught unknown exception was thrown\n");
+    status = 1;
+  }
+  return status;
+}

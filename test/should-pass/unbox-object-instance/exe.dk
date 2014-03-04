@@ -1,0 +1,10 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass object;
+
+int-t main()
+{
+  object-t o = make(object:klass);
+  object:slots-t* s = object:unbox(o);
+  return 0;
+}

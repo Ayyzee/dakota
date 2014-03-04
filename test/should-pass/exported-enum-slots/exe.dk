@@ -1,0 +1,41 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  slots
+  {
+    int-t ss1;
+    int-t ss2;
+  }
+}
+klass k2
+{
+  slots union
+  {
+    int-t    su1;
+    char8-t* su2;
+  }
+}
+klass k3
+{
+  slots enum
+  {
+    se1 = 1,
+    se2 = 2
+  }
+  export enum n-t
+  {
+    ne3 = 3,
+    ne4 = 4
+  }
+  export enum
+  {
+    ae5 = 5,
+    ae6 = 6
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

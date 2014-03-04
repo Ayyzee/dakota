@@ -1,0 +1,16 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  method object-t init(object-t self, char8-t** args => {})
+  {
+    self = dk:init(super);
+    //
+    return self;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

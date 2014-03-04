@@ -1,0 +1,12 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+int-t main()
+{
+  printf("%s\n", $plusplus);
+  printf("%p\n", $"++");
+  printf("%i\n", $'++');
+
+  printf("%s\n", $NULL);
+
+  return 0;
+}

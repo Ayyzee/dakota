@@ -1,0 +1,132 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-                     
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <fcntl.h>;
+include <netinet/in.h>;
+include <sys/socket.h>;
+include <sys/stat.h>;
+include <sys/types.h>;
+
+include "inet.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass xin-port;
+klass xsa-family;
+klass xsockaddr-in4;
+klass xsocklen;
+
+noexport const char8-t* fd-typestr(uint-t type)
+{
+  const char8-t* result = NULL;
+
+  switch (type)
+  {
+    case S-IFSOCK: result = "S-IFSOCK"; break;
+    case S-IFLNK:  result = "S-IFLNK";  break;
+    case S-IFREG:  result = "S-IFREG";  break;
+    case S-IFBLK:  result = "S-IFBLK";  break;
+    case S-IFDIR:  result = "S-IFDIR";  break;
+    case S-IFCHR:  result = "S-IFCHR";  break;
+    case S-IFIFO:  result = "S-IFIFO";  break;
+  }
+  return result;
+}
+
+klass fd
+{
+  slots int-t;
+
+  export method int-t add-nonblock(slots-t fd)
+  {
+    int-t flags, n;
+    flags = n = sys:fcntl(fd, F-GETFL, 0);
+    if (-1 != n)
+    {
+      flags |= O-NONBLOCK;
+      n = sys:fcntl(fd, F-SETFL, flags);
+    }
+    return n;
+  }
+
+  export method slots-t dump(slots-t fd)
+  {
+    struct stat st;
+    int-t n;
+    const char8-t* s;
+    n = sys:fstat(fd, &st);
+  
+    if (-1 == n)
+    {
+      // maybe a signal
+      // maybe a pid
+    }
+    else
+    {
+      const char8-t* typestr = fd-typestr(S-IFMT & st.st-mode);
+      switch (S-IFMT & st.st-mode)
+      {
+        case S-IFSOCK:
+        {
+          int-t socktype;
+          xsocklen-t socktypelen = sizeof(socktype);
+          n = sys:getsockopt(fd, SOL-SOCKET, SO-TYPE, &socktype, &socktypelen);  sc(n);
+          const char8-t* socktypestr = strsocktype(socktype);
+          xsockaddr-in4-t sockname = {0};
+          n = in4-getsockname(fd, &sockname);
+          if (-1 == n)
+          {
+            MOM-LOG-INFO("fd=%i %s/%s:", fd, typestr, socktypestr);
+          }
+          else
+          {
+            char8-t sockname-addrstr[INET-ADDRSTRLEN];
+            s = in4-ntop(sockname.sin-addr, sockname-addrstr, sizeof(sockname-addrstr) - (1));
+            if (-1 == n)
+            {
+              MOM-LOG-ERROR("error: in4-ntop()");
+            }
+            else
+            {
+              xsockaddr-in4-t peername = {0};
+              n = in4-getpeername(fd, &peername);
+              if (-1 == n)
+              {
+                MOM-LOG-INFO("fd=%i %s/%s %s:%i", fd, typestr, socktypestr,
+                            sockname-addrstr, sockname.sin-port);
+              }
+              else
+              {
+                char8-t peername-addrstr[INET-ADDRSTRLEN];
+                s = in4-ntop(peername.sin-addr, peername-addrstr, sizeof(peername-addrstr) - (1));
+                MOM-LOG-INFO("fd=%i %s/%s %s:%i > %s:%i", fd, typestr, socktypestr,
+                            sockname-addrstr, sockname.sin-port,
+                            peername-addrstr, peername.sin-port);
+              }
+            }
+          }
+          break;
+        }
+        default:
+          MOM-LOG-INFO("fd=%i %s", fd, typestr);
+      }
+    }
+    return fd;
+  }
+}

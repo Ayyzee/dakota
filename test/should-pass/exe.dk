@@ -1,0 +1,16 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass object
+{
+  method object-t foobar(object-t self)
+  {
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t o = make(string:klass);
+  dk:foobar(o);
+  return 0;
+}

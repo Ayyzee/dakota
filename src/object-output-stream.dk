@@ -1,0 +1,142 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+
+module dakota;
+
+klass std-compare;
+klass uint32;
+
+klass object-output-stream
+{
+  superklass output-stream;
+  klass      klass;
+
+  slots
+  {
+    object-t objects;    // sorted-set (ptr) <objects already written>
+    object-t object-from-id; // sorted-table key=id, value=object <objects to be written>
+    uint32-t id;
+    object-t id-from-object;        // sorted-table (ptr) key=object, value=id
+  }
+
+  object-t initialize(object-t kls)
+  {
+    dk-klass-for-name(sorted-set:__klass__); // hackhack
+    dk-klass-for-name(sorted-table:__klass__); // hackhack
+    return kls;
+  }
+
+  object-t finalize(object-t kls)
+  {
+    return kls;
+  }
+
+  method object-t init(object-t self, file-t file => stdout)
+  {
+    self = dk:init(super, file => file);
+    assert(NULL != file);
+//     equal-predicate-t equal? = cast(equal-predicate-t)dk:method-for-selector(object:klass,
+//                                                                                        selector(equal?(object-t, object-t));
+//     compare-t compare = cast(compare-t)dk:method-for-selector(object:klass,
+//                                                                selector(compare(object-t, object-t));
+    self.objects =        make(sorted-set:klass);
+    self.object-from-id = make(sorted-table:klass);
+    self.id-from-object = make(sorted-table:klass);
+    self.id =         0;
+    return self;
+  }
+
+  method object-t write-slots-start(object-t self, object-t kls)
+  {
+    dk:write-table-start(self, NULL);
+    if (1)
+      dk:write-element(self, dk:name(kls), "-slots"); //optional
+    return self;
+  }
+
+  method object-t write-slots-end(object-t self)
+  {
+    dk:write-table-end(self);
+    return self;
+  }
+
+  method object-t write(object-t self, object-t object)
+  {
+    dk:write-table-start(self, NULL);
+    dk:write-element-id(self, object);
+    dk:write-table-end(self);
+    return self;
+  }
+
+  method object-t write-element-id(object-t self, object-t object)
+  {
+    unless (dk:contains?(self.objects, object))
+    {
+      dk:add(self.objects, object); // only grows, never shrinks
+      object-t id = dk:at(self.id-from-object, object, NULL);
+
+      if (NULL == id)
+      {
+        id = uint32:box(self.id);
+        dk:add(self.id-from-object, object, id);
+        self.id++;
+      }
+      dk:remove(self.object-from-id, id); // remove if present
+      dk:write-sequence-start(self, dk:utf8-from(id));
+//       object-t object-klass = dk:klass(object);
+//       dk:write-element(self, dk:name(object-klass), "-klass");
+
+//       if (dk:instance?(object, klass:klass))
+//         dk:write-element(self, dk:name(object), "name");
+
+      dk:write-slots(object, self);
+      dk:write-sequence-end(self);
+  
+      while (object-t o = dk:remove-last(self.object-from-id))
+        dk:write-element-id(self, dk:element(o)); // recursive
+    }
+    return self;
+  }
+
+  method object-t write-element-idref(object-t self, object-t object, const char8-t* key)
+  {
+    // bugbug: key == NULL is valid
+    object-t id = dk:at(self.id-from-object, object, NULL);
+    
+    if (NULL == id)
+    {
+      id = uint32:box(self.id);
+      dk:add(self.id-from-object, object, id);
+      self.id++;
+    }
+    dk:add(self.object-from-id, id, object);
+
+    dk:write-table-start(self, key);
+    dk:write-element(self, dk:utf8-from(id), "idref");
+    dk:write-table-end(self);
+
+    return self;
+  }
+  method object-t write-element(object-t self, const char8-t* t, const char8-t* key);
+  method object-t write-element(object-t self, int32-t t, const char8-t* key);
+  method object-t write-element(object-t self, uint32-t t, const char8-t* key);
+  method object-t write-table-start(object-t self, const char8-t* key);
+  method object-t write-table-end(object-t self);
+  method object-t write-sequence-start(object-t self, const char8-t* key);
+  method object-t write-sequence-end(object-t self);
+}

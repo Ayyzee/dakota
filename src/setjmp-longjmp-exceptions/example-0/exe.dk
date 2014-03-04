@@ -1,0 +1,9 @@
+void foo(boole-t v);
+
+int-t main()
+{
+  foo(0); // shouldn't throw
+  foo(1); // should throw
+
+  return 0;
+}

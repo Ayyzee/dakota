@@ -1,0 +1,8 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+int-t main()
+{
+  object-t str = $"yet another string test";
+  dk:dump(str);
+  return 0;
+}

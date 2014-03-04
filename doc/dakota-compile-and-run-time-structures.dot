@@ -1,0 +1,48 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "dakota-compile-and-run-time-structures"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = "LR",
+        center = true,
+        size = "7.5,10" ];
+
+  node [ shape = "record" ];
+
+  rt_instance1 [label="{ <klass> klass }|{ }|{ }"];
+  rt_instance1_ptr [ label ="", shape = point, style = invis ];
+
+  rt_instance2 [label="{ <klass> klass }|{ }|{ }"];
+  rt_instance2_ptr [ label ="", shape = point, style = invis ];
+
+  rt_klass [label="{ <klass> klass }|{ methods }|{ offset }|{ <superklass> superklass }|{ <info> info }"];
+
+  rt_instance1_ptr ->  rt_instance1:klass;
+  rt_instance2_ptr ->  rt_instance2:klass;
+  rt_instance1:klass -> rt_klass:klass;
+  rt_instance2:klass -> rt_klass:klass;
+
+  ct_klass1 [label="{ <base> base }|{ count }|{ <next> next }"];
+  
+  rt_klass_klass [ label ="", style = invis ];
+  rt_klass:klass ->rt_klass_klass [ color = grey ];
+  rt_klass:info -> ct_klass1;
+  "NULL" [ shape = plaintext ];
+  ct_klass1:next -> "NULL";
+
+  ct_klass1_info [label="{ <base> $name }|{ $size }|{ <method_selectors> $method-selectors }|{ <method_addresses> $method-addresses }|{ <slots> $slots }|{<type> $type}|{<va_method_selectors> $va-method-selectors}|{<va_method_addresses> $va-method-addresses}|{<superklass_name> $superklass-name}|{<klass_name> $klass-name}|{<interfaces> $interfaces}|{<traits> $traits}|{<intialize> $intialize}"];
+
+  ct_klass1:base -> ct_klass1_info;
+}

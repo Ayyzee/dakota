@@ -1,0 +1,77 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <stdlib.h>;
+include <unistd.h>;
+
+include "common.h";
+include "config.h";
+include "inet.h";
+include "proxy-lc.h";
+include "tags.h";
+include "util.h";
+
+klass callback;
+klass connection;
+klass cstring;
+klass event;
+klass event-queue;
+klass fd;
+klass msg;
+klass msg-id;
+klass cstring;
+klass deque;
+
+object-t lc-exit-value-rcv-msg(object-t lc-connection,
+                               object-t exit-value-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(lc-connection), exit-value-msg->tag, __klass__, __func__);
+  match(exit-value, dk:tag(exit-value-msg));
+  cstring-t valstr = dk:val(exit-value-msg);
+  int32-t value = int32-from-string(valstr.ptr, ~0);
+  dk:free(lc-connection);
+  sys:exit(WEXITSTATUS(value));
+  return lc-connection;
+}
+
+object-t lc-rcv-msg-callback(object-t lc-connection,
+                             object-t rcv-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(lc-connection), rcv-msg->tag, __klass__, __func__);
+  switch (dk:tag(rcv-msg))
+  {
+    case exit-value:
+    {
+      dk:invoke(lc-connection, lc-exit-value-rcv-msg, rcv-msg);
+      break;
+    }
+    case child-stdout:
+    {
+      dk:write(rcv-msg, STDOUT-FILENO); // invokeinvoke
+      break;
+    }
+    case child-stderr:
+    {
+      dk:write(rcv-msg, STDERR-FILENO); // invokeinvoke
+      break;
+    }
+    default:
+    {
+      MOM-LOG-ERROR("error: unknown tag=0x%x", dk:tag(rcv-msg));
+    }
+  }
+  return lc-connection;
+}

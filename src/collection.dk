@@ -1,0 +1,99 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+
+include "dakota-private.h";
+
+module dakota;
+
+klass std-compare;
+
+// export object-t
+// dk-va-add-all(object-t self, va-list-t args)
+// {
+//   object-t element;
+//   while (NULL != (element = va-arg(args, object-t)))
+//     dk:add(self, element);
+//   return self;
+// }
+
+// export sentinel object-t
+// dk-add-all(object-t self, ...)
+// {
+//   va-list-t args;
+//   va-start(args, self);
+//   object-t result = dk-va-add-all(self, args);
+//   va-end(args);
+//   return result;
+// }
+
+klass collection
+{
+  superklass object;
+
+  trait forward-iterator;
+
+  method object-t write-lite(object-t self, object-t out)
+  {
+    USE(out);
+    return self;
+  }
+
+  method object-t writeln-lite(object-t self, object-t out)
+  {
+    dk:write-lite(self, out);
+    dk:write(out, "\n");
+    return self;
+  }
+
+//   method object-t add-all(object-t self, const char8-t* const* strings, symbol-t encoding => $utf-8)
+//   {
+//     assert(NULL != strings);
+//     assert(NULL != encoding);
+//     while (NULL != *strings) // rnielsen: modifying a parameter - bad practice?
+//     {
+//       object-t string = make(string:klass, bytes => *strings, encoding => encoding);
+//       strings++;
+//       dk:add(self, string);
+//     }
+//     return null;
+//   }
+
+  method object-t add-all(object-t self, object-t collection)
+  {
+    for (object-t element in collection)
+      dk:add(self, element);
+    return collection;
+  }
+
+  // items are NULL terminated lists of objects
+  method object-t add-items(object-t self, object-t[] items)
+  {
+    object-t arg;
+    object-t* args = items;
+    while (NULL != (arg = *args++))
+      dk:add(self, arg);
+    return self; // nullnull?
+  }
+
+  method object-t add(object-t self, object-t element);
+  method object-t forward-iterator(object-t self);
+
+  //     method uint32-t size(object-t self);
+  //     method boole-t empty?(object-t self);
+  //     method object-t empty(object-t self);
+}

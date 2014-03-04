@@ -1,0 +1,23 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+
+int-t main()
+{
+  object-t assoc1 = make(assoc:klass,
+                        key => $"key0",
+                        element => $"element0");
+
+  object-t assoc2 = make(assoc:klass,
+                        key => $"key0",
+                        element => $"element0");
+
+  intptr-t result = dk:compare(assoc1, assoc2);
+  assert(0 == result);
+
+//   object-t perl-object-output-stream = make(perl-object-output-stream:klass);
+//   dk:write(perl-object-output-stream, assoc);
+//   dk:close(perl-object-output-stream);
+
+  return 0;
+}

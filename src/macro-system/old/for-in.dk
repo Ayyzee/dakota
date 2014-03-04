@@ -1,0 +1,38 @@
+// for (object-t o in objects) {}
+// =>
+// for (object-t _iter_ = dk:forward-iterator(objects);
+//      object-t o = dk:next(_iter_); ) {}
+
+// for (thing:slots-t* s in objects) {}
+// =>
+// for (object-t _iterator_ = dk:forward-iterator(objects);
+//      thing:slots-t* s =  thing:unbox(dk:next(_iterator_)); ) {}
+
+// for (thing:slots-t& s in objects) {}
+// =>
+// for (object-t _iterator_ = dk:forward-iterator(objects);
+//      thing:slots-t& s = *thing:unbox(dk:next(_iterator_)); ) {}
+
+// for (thing:slots-t  s in objects) {}
+// =>
+// for (object-t _iterator_ = dk:forward-iterator(objects);
+//      thing:slots-t  s = *thing:unbox(dk:next(_iterator_)); ) {}
+
+macro for-in
+{
+  { for ( object-t ?element~ident in ?collection~qual-ident ) }
+    =>
+    { for (object-t _iterator_ = dk:forward-iterator(?collection); object-t ?element = dk:next(_iterator_); ) }
+
+  { for ( ?kls-name~qual-ident : slots-t * ?element~ident in ?collection~qual-ident ) }
+    =>
+    { for (object-t _iterator_ = dk:forward-iterator(?collection); ?kls-name:slots-t* ?element =  ?kls-name:unbox(dk:next(_iterator_)); ) }
+
+  { for ( ?kls-name~qual-ident : slots-t & ?element~ident in ?collection~qual-ident ) }
+    =>
+    { for (object-t _iterator_ = dk:forward-iterator(?collection); ?kls-name:slots-t& ?element = *?kls-name:unbox(dk:next(_iterator_)); ) }
+
+  { for ( ?kls-name~qual-ident : slots-t ?element~ident in ?collection~qual-ident ) }
+    =>
+    { for (object-t _iterator_ = dk:forward-iterator(?collection); ?kls-name:slots-t  ?element = *?kls-name:unbox(dk:next(_iterator_)); ) }
+}

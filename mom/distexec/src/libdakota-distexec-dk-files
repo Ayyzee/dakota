@@ -1,0 +1,13 @@
+libdakota_distexec_dk_files :=\
+ common.dk\
+ connection-for-msg-id.dk\
+ execution-context.dk\
+ proxy-lc.dk\
+ recruiter-ls.dk\
+ recruiter-us.dk\
+ recruiter.dk\
+ volunteer-ms.dk\
+ volunteer-uc.dk\
+ volunteer.dk\
+ work-queue.dk\
+ work.dk\

@@ -1,0 +1,80 @@
+Though I am the sole implementor, Dakota has been co-designed by  
+myself and the great Kaelin Colclasure (copied).  All the good ideas  
+are his; the bad ones are mine. :-)
+
+Also, we've been getting a warmer response from our target market by  
+presenting Dakota as an extension of procedural C++; its an  
+alternative object system (rather than presenting Dakota as a new  
+language).  Who is our target market?  Top notch systems developers  
+who already have significant investment in C/C++ (both intellectually  
+and code equity).  Dakota is a pragmatic (but powerful) system for  
+those who engineer complex software for industrial use.
+
+Dakota is a dynamic (class-based) object system for the procedural  
+language C++.  Using C++ as a better C, Dakota layers a dynamic  
+object system (with a proper metaclass system).  Rather than using  
+the C++ style syntax of object.method(...), Dakota opts for a more  
+functional (umm procedural) style using generic (aka polymorphic)  
+functions.  This choice has served Dakota really well since generic  
+function & methods are just functions (no hidden argument like in C+ 
++) so its much more natural for callback based programming, etc.   
+Also, Dakota has a unique separation of state and behavior so that  
+behavior can be added orthogonally to the class hierarchy; this  
+abstraction is called 'traits'.  Think of traits as Java interface,  
+but not limited to being purely declarative, but they can also be  
+definitive; they can include implementation!  Dakota also supports  
+true keyword argument functions.  Under normal circumstances Dakota  
+does not require that you author a header file; its has a symbol  
+repository. :-)
+
+Dakota started when Kaelin and I met on a mailing about object- 
+oriented extensions to C/C++ and we had opposing views.  Kaelin was  
+continually winning the battle (all through email), so I decide to  
+change my tactics and call him directly on the phone (to set him  
+straight :-).  We've been great friends ever since and the Dakota  
+design has really benefited from having two authors. [there is more  
+to this story, but I'll save that for a latter date :-]
+
+Originally Dakota was modeled after Objective-C.  I wanted to create  
+an Objective-C like object system for C/C++, but without the  
+Smalltalk syntax so it would be more acceptable to C/C++  
+programmers.  Kaelin once said "Objective-C looks like a train wreck  
+of C and Smalltalk".  As we began to explore this domain more we  
+became convinced (really Kaelin convinced me :-) that a CLOS or Dylan  
+model (classes, slots, generic functions & methods) would be a better  
+culture fit for our target market.  Though we modeled it after these  
+powerful (but little used in industry) languages, we built it on top  
+of ANSI C++.  Dakota is implemented as a pre-compiler which uses any C 
+++ compiler as its back end.  This allows the end consumers to use  
+all the tools they currently have and ease the adoption of Dakota.
+
+Kaelin's background is in distributed systems, and he is the tech  
+lead for Spotlight (Apple's distributed "desktop" search).  Kaelin is  
+one of the best engineers I've ever had the honor of working with  
+(and learning from).  He's also really broadly skilled and  
+knowledgeable in languages and their appropriate application to  
+problem domains.
+
+My (applicable) background?  I was at NeXT in the early 90s where I  
+was exposed to Objective-C.  Later I was at Xerox PARC working on  
+Aspect Oriented Programming (AOP) and eventually AspectJ.  Then some  
+fun distributed systems employ at (the original) Napster.  Nearly  
+completing the circle, I ended up at Apple  working on developer  
+tools (Apple acquired NeXT though many would argue it was a reverse- 
+acquisition :-).  While at Apple I (along with the great Nick  
+Kledzik) rewrote the dynamic loader from scratch.  Though this might  
+not seem very applicable, it was a very eye-opening experience and  
+has influenced Dakota's design significantly. [ more on this  
+later ... ]  I'm now at Google working on distributed systems.
+
+From the beginning we decided to develop Dakota as an open-source  
+technology.  Dakota is currently feature complete, and is a working  
+system that could be used today.  The next stage of its development  
+is to make it meta-circular (aka self-hosting or simply "written in  
+its self").  As soon as its fully meta-circular we'll declare it  
+version 1.0 and aggressively promote it (what ever that means).
+
+One of the areas we're thinking about is how to make Dakota a  
+desirable system for the development of concurrent (and eventually  
+distributed) systems.  With all the multi-core improvements of late  
+we suspect this could be the "killer app" of Dakota.

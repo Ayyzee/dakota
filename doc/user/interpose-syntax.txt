@@ -1,0 +1,32 @@
+interpose
+{
+  $klass1, $klass2,
+  $klass3, $klass4
+}
+
+or
+
+interpose $klass1, $klass2;
+interpose $klass3, $klass4;
+
+or
+
+interpose $klass_a, $klass_b, $klass_c;
+
+means $klass_b ips $klass_a, $klass_c ips $klass_b
+
+klass foo
+{
+  interpose $bar;
+}
+
+means
+
+interpose $bar, $foo;
+
+means $foo ips $bar
+
+===
+
+interpose k1, i1;
+interpose i1, i2;

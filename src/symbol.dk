@@ -1,0 +1,100 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cstring>;
+
+include "dakota-private.h";
+
+module dakota;
+
+import uintmax-t
+dk-hash(const char8-t*);
+
+klass symbol
+{
+  slots const char8-t*;
+
+  method uint32-t length(slots-t s)
+  {
+    uint32-t result = cast(uint32-t)safe-strlen(s);
+    return result;
+  }
+
+  method int-t compare(slots-t s, slots-t other-s)
+  {
+    int-t result;
+    if (s == other-s)
+      result = 0;
+    else
+      result = cast(int-t)safe-strcmp(s, other-s);
+    result = normalize-compare-result(result);
+    //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
+    return result;
+  }
+
+  method int-t compare(slots-t* s, slots-t* other-s)
+  {
+    int-t result = compare(*s, *other-s);
+    return result;
+  }
+
+  method int-t compare(object-t self, object-t other)
+  {
+    int-t result;
+
+    if (dk:instance?(other, klass))
+    {
+      slots-t* s1 = unbox(self);
+      slots-t* s2 = unbox(other);
+      result = compare(s1, s2);
+    }
+    else
+    {
+      result = dk:compare(super, other);
+    }
+    result = normalize-compare-result(result);
+    return result;
+  }
+
+  method object-t dump(object-t self)
+  {
+    dk:dump(super);
+    fprintf(stderr, "%p:%p { \"%s\" }\n",
+            cast(void*)(self), cast(void*)unbox(self), dk:utf8-from(self));
+    return self;
+  }
+
+  method uintmax-t hash(slots-t s)
+  {
+    uintmax-t value = dk-hash(s);
+    return value;
+  }
+
+  method const char8-t* utf8-from(object-t self)
+  {
+    const char8-t* utf8 = *unbox(self);
+    return utf8;
+  }
+
+  method object-t write-lite(object-t self, object-t out)
+  {
+    const char8-t* utf8 = dk:utf8-from(self);
+    dk:write(out, "\"");
+    dk:write(out, utf8);
+    dk:write(out, "\"");
+    return self;
+  }
+}

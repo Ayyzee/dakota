@@ -1,0 +1,64 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdlib.h>; // abort()
+include <getopt.h>; // getopt-long(), struct option
+
+const int-t opt-base = 256;
+
+static struct option longopts[] =
+{
+  { "help",  no-argument, NULL, opt-base + 0 },
+  { "set-priority", required-argument, NULL, opt-base + 1 },
+
+  { NULL, 0, NULL, 0 }
+};
+
+static
+int
+handle-opts(int-t argc, char8-t** argv, struct option* longopts)
+{
+  int-t opt;
+
+  while (-1 != (opt = getopt-long(argc, argv, "", longopts, NULL)))
+  {
+    if (opt-base > opt)
+    { // errors
+      if (':' == opt || '?' == opt)
+      {
+        printf("%i = %c\n", opt, opt);
+      }
+      else
+      {
+        abort();
+      }
+    }
+    else if (opt-base <= opt)
+    {
+      struct option* o = &longopts[opt - opt-base];
+      printf("%s", o->name);
+      if (o->has-arg)
+      {
+        printf(" = \"%s\"", optarg);
+      }
+      printf("\n");
+    }
+  }
+  return optind;
+}
+
+int
+main(int-t argc, char8-t** argv, char8-t** envp)
+{
+  int-t i = handle-opts(argc, argv, longopts);
+
+  for (; i < argc; i++)
+  {
+    printf("argv[%i] = \"%s\"\n", i, argv[i]);
+  }
+  char8-t* v;
+  while (NULL != (v = *envp++))
+  {
+    printf("%s\n", v);
+  }
+  return 0;
+}

@@ -1,0 +1,53 @@
+#include <stdio.h>
+typedef char char8_t;
+typedef unsigned int uint_t;
+
+
+
+
+
+
+${ const char8_t*; uint_t; }
+bar1()
+{
+  ${ const char8_t*; uint_t; } result = { "war & peace", 996 };
+  return result;
+}
+
+${ const char8_t*; uint_t; }
+bar2()
+{
+  ${ const char8_t*; uint_t; } result;
+  //
+  result.0 = "war & peace";
+  result.1 = 996;
+  return result;
+}
+
+void
+foo1()
+{
+  ${ const char8_t*; uint_t; } book = bar1();
+  printf("\"%s\", %i\n",
+         book.0,
+         book.1);
+}
+
+void
+foo2()
+{
+  ${ const char8_t* title; uint_t pages; } book;
+  //
+  book = bar2();//
+  printf("\"%s\", %i\n",
+         book.title,
+         book.pages);
+}
+
+int_t
+main()
+{
+  foo1();
+  foo2();
+  return 0;
+}

@@ -1,0 +1,39 @@
+MAJOR DIFFERENCES
+
+0: statically typed (vs dynamically typed)
+
+1: to tighly bind state & behavior
+[behavior is dependant on state]
+
+class point_t
+{
+  int x;
+  int y;
+
+  int distance(point-t point)
+  {
+    //...
+  }
+  void translate(int x, int y)
+  {
+    //...
+  }
+}
+
+1.1: state->behavior(args)
+
+1.1.1: implicit 'this' argument 
+
+1.1.2: different syntax (and type) than "regular" functions
+
+1.2: prevents behavior-only sharing (traits)
+
+2: dedicated contructors
+
+2.1: name of class
+
+2.2: special semantics
+
+3: no root class
+
+4: source code is split between interface & implementation files (creating dependancies)

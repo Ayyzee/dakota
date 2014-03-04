@@ -1,0 +1,12 @@
+Add registering symbol/keyword pairs to the runtime to confirm that the same symbol always hashes to the same keyword.
+Sort methods metadata lexically 
+Support (categories) on klasses, traits, interfaces
+Added __subklass <>; syntax and semantics
+Re-enable reflection
+Use catalog!!
+Reduce unneeded symbol generation (see empty.dk)
+Finish __KLASSES in code gen
+clean up use of property list
+convert other *-pairs to property lists
+sort klass-props
+use va-methods

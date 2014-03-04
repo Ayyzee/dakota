@@ -1,0 +1,22 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+
+klass object-output-stream;
+klass vector; // hackhack
+
+int-t main(int-t argc, char8-t**argv)
+{
+//   assert(1 + 1 == argc);
+//   char8-t* filename = argv[1];
+  const char8-t* filename = "ops.txt";
+  object-t ops-stream = make(input-file:klass, filename => filename);
+  object-t ops = dk:split(ops-stream, NULL);
+
+  dk:dump(ops);
+
+//   object-t obj-out = make(perl-object-output-stream:klass);
+//   dk:write(obj-out, ops);
+
+  return 0;
+}

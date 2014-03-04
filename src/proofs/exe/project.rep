@@ -1,0 +1,7 @@
+{
+  'files' => [
+    'exe.dk'
+  ],
+  'name' => 'exe',
+  'self-file' => 'project.rep'
+}

@@ -1,0 +1,29 @@
+{
+  'files' => [
+    'gdb.dk',
+    'module-dakota-x.dk',
+    'xin-port.dk',
+    'xin4-addr.dk',
+    'xin6-addr.dk',
+    'xipv4-mreq.dk',
+    'xipv6-mreq.dk',
+    'xoption.dk',
+    'xpipe.dk',
+    'xsa-family.dk',
+    'xsigaction-cb.dk',
+    'xsigaction.dk',
+    'xsiginfo.dk',
+    'xsignal.dk',
+    'xsockaddr-in4.dk',
+    'xsockaddr-in6.dk',
+    'xsockaddr-un.dk',
+    'xsockaddr.dk',
+    'xsocket-in.dk',
+    'xsocket-un.dk',
+    'xsocket.dk',
+    'xsocklen.dk',
+    'xstat.dk'
+  ],
+  'name' => 'dakota-x.$SO_EXT',
+  'self-file' => 'dakota-x.rep'
+}

@@ -1,0 +1,22 @@
+// 8.5x11 portrait
+// dot -Tps2 -Gpage=8.5,11 -Gsize=7.5,10
+  graph [ page = "8.5,11" ];
+  graph [ size = "7.5,10" ];
+
+// 8.5x11 landscape
+// dot -Tps2 -Gpage=8.5,11 -Gsize=10,7.5 -Grotate=90 
+  graph [ page = "8.5,11" ];
+  graph [ size = "10,7.5" ];
+  graph [ rotate = 90 ];
+
+
+// 11x17 portrait
+// dot -Tps2 -Gpage=11,17 -Gsize=10,16
+  graph [ page = "11,17" ];
+  graph [ size = "10,16" ];
+
+// 11x17 landscape
+// dot -Tps2 -Gpage=11,17 -Gsize=16,10 -Grotate=90 
+  graph [ page = "11,17" ];
+  graph [ size = "16,10" ];
+  graph [ rotate = 90 ];

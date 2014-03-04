@@ -1,0 +1,29 @@
+deal correctly with "connection refused"
+
+send umask
+
+connection:
+  handle partial read()s and write()s
+
+msg:
+  make write()s non-blocking
+
+replace connection-for-msg-id with ...
+
+msg-handler: slot void* udata becomes msg:slots-t*
+
+event-handler: slot void* udata becomes event:slots-t*
+
+finish command line options
+
+clean up excessive HAVE_{} and add trailing comment
+
+finish context adt
+
+fix memory leaks
+
+check for and fix descriptor leaks
+
+integrate xinetd support
+
+finish SUPPORT-STDIN-PIPE

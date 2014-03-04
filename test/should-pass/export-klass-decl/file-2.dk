@@ -1,0 +1,16 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include "x.h"; // this is here so its easy to track the code gen
+
+module test-1;
+
+klass k1;
+
+klass k2
+{
+  method k1:slots-t m1(object-t self)
+  {
+    k1:slots-t result = {0};
+    return result;
+  }
+}

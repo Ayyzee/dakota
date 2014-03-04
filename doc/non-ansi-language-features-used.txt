@@ -1,0 +1,19 @@
+designated initializers:
+  assoc:slots-t a = { key => some-key, element => some-element };
+  // becomes
+  assoc:slots-t a = { .key = some-key, .element = some-element };
+
+compound literals:
+  point:box({ some-x, some-y });
+  // becomes
+  point:box(cast(point:slots-t){ some-x, some-y });
+
+  dk:some-func(super, some-arg);
+  // becomes
+  dk:some-func(cast(super:slots-t){ self, klass }, some-arg);
+
+  <can be combined with designated initializers>
+
+  point:box({ x => some-x, y => some-y });
+  // becomes
+  point:box(cast(point:slots-t){ .x => some-x, .y => some-y });

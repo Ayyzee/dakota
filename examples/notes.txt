@@ -1,0 +1,24 @@
+need to add examples that show
+
+keyword arguments with complex defaults
+exported slots
+iterator
+klass with initialize function
+trait with initialize
+metaklass'
+slots as typedefs of system specified struct
+slots as array type
+slots as a function pointer
+boxing/unboxing
+collection literals
+cstrings
+symbols
+exported const
+exported enum
+general collections
+tracing
+method alias
+interposing
+va method defn
+dynamic klass creation
+showing use of dakota-introspector

@@ -1,0 +1,9 @@
+asm         dynamic-cast  namespace  reinterpret-cast  try
+bool        explicit      new        static-cast       typeid
+catch       false         operator   template          typename
+class       friend        private    this              using
+const-cast  inline        public     throw             virtual
+delete      mutable       protected  true              wchar-t
+
+and      bitand   compl   not-eq   or-eq   xor-eq
+and-eq   bitor    not     or       xor

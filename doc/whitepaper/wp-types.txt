@@ -1,0 +1,32 @@
+object-t
+
+slots-t // special
+method-t
+boole-t // false, true
+selector-t
+symbol-t
+cstring-t
+va-list-t
+
+int-t, uint-t
+
+// from <stdint.h>
+int8-t,  uint8-t
+int16-t, uint16-t
+int32-t, uint32-t
+int64-t, uint64-t
+
+char8-t  // for utf-8
+char16-t // for utf-16
+char32-t // for utf-32
+
+str32-t
+str64-t
+str128-t
+str256-t
+str512-t
+str1024-t
+
+float32-t  // single precision
+float64-t  // double precision
+float128-t // quad precision

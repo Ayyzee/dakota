@@ -1,0 +1,113 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <getopt.h>;
+include <netinet/in.h>;
+include <stdlib.h>;
+include <sys/socket.h>;
+include <sys/types.h>;
+
+include "common.h";
+include "config.h";
+include "recruiter.h";
+include "tags.h";
+include "util.h";
+
+klass event;
+klass event-queue;
+klass xoption;
+
+enum
+{
+  DE-OPT-GROUP-ADDRESS = 256,
+  DE-OPT-GROUP-PORT,
+};
+
+noexport xsockaddr-in4-t mg-sin = xsockaddr-in4-create(xin4-addr-create(239,255,102,50), 57054); // dede
+
+noexport void handle-opts(int32-t argc, char8-t** argv)
+{
+  int32-t unrecognized-opt-cnt = 0;
+  // options descriptor
+  noexport xoption-t longopts[] =
+  {
+    { "group-address", required-argument, NULL, DE-OPT-GROUP-ADDRESS },
+    { "group-port", required-argument, NULL, DE-OPT-GROUP-PORT },
+    { NULL, 0, NULL, 0 }
+  };
+  int32-t opt;
+
+  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL)))
+  {
+    switch (opt)
+    {
+      case DE-OPT-GROUP-ADDRESS:
+      {
+        mg-sin.sin-addr = addr-from-string(optarg, xin4-addr:k-none);
+        break;
+      }
+      case DE-OPT-GROUP-PORT:
+      {
+        mg-sin.sin-port = port-from-string(optarg, 0);
+        break;
+      }
+      default:
+      {
+        unrecognized-opt-cnt++;
+        break;
+      }
+    }
+  }
+  argc -= optind;
+  argv += optind;
+  if (unrecognized-opt-cnt || ((0 == mg-sin.sin-addr.s-addr) || (0 == mg-sin.sin-port)))
+  {
+    sys:exit(EXIT-FAILURE);
+  }
+  return;
+}
+
+noexport object-t us-need-work-rcv-msg-callback(object-t us-connection, object-t need-work-msg)
+{
+  match(need-work, need-work-msg->tag);
+  sys:fprintf(stdout, "%s\n", dk:addrstr(us-connection));
+  object-t no-work-msg = make(msg:klass, tag => no-work);
+  dk:snd-msg(us-connection, no-work-msg);
+  return us-connection;
+}
+
+int-t main(int-t argc, char8-t** argv, char8-t** envp)
+{
+#ifndef HAVE-GETPROGNAME
+  sys:setprogname(argv[0]);
+#endif
+  handle-opts(argc, argv);
+  xin-port-t us-port = RECRUITER-PORT; // hackhack
+
+  // should be cleaned up
+  char8-t buf[4 + 1];
+  sys:sprintf(buf, "%04x", us-port);
+  object-t have-work-msg = make(msg:klass, tag => have-work, cstring(buf));
+
+  object-t us-connection = init-recruiter-us();
+  dk:rcv-msg-callback=(us-connection, us-need-work-rcv-msg-callback);
+
+  object-t mc-connection = init-recruiter-mc(mg-sin);
+  dk:snd-msg(mc-connection, have-work-msg);
+
+  dk:loop(dk:get-current(event-queue:klass), NULL);
+}

@@ -1,0 +1,53 @@
+include "efoo.h";
+include <ebar.h>;
+
+include "ifoo.h";
+include <ibar.h>;
+
+module my-sample;
+
+klass string;
+klass assoc;
+trait table;
+trait set;
+// klass foo;
+// klass bar;
+
+klass foo
+{
+  superklass sklass-1;
+
+  klass kklass-1;
+
+  trait tfoo;
+  trait tbar;
+
+  slots
+  {
+  }
+}
+klass bar
+{
+  superklass sklass-2;
+
+  klass kklass-2;
+
+  slots
+  {
+  }
+}
+
+klass foo;
+klass bar;
+
+trait my-trait
+{
+  superklass sklass-2; // illegal
+
+  klass kklass-2; // illegal
+
+  slots // illegal
+  {
+  }
+}
+

@@ -1,0 +1,17 @@
+Dakota is not (yet) installed with autoconf.  The only (currently) supported platforms are darwin and linux.
+
+cd dakota
+
+# for darwin
+./configure-darwin
+
+# for linux
+./configure-linux
+
+# then
+
+cd src
+
+make
+# or
+make install

@@ -1,0 +1,5 @@
+getprogname()
+strerror()
+strerror_r() // GNU & POSIX
+strsignal()
+strsignal_r()

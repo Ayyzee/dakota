@@ -1,0 +1,169 @@
+add support for bit-fields to slots?
+
+merge perl-dump-exported-klasses and dump-exported-klasses
+  find a way to dump language neutral and then add a 'dakota' and 'perl' formatter
+
+remove mutable-sorted-ptr-array and use mutable-sorted-array in its place
+
+add
+  dk-intern(object-t) implementation
+
+missing:  export method int-t xoption:usage(slots-t*)
+
+abort() if ...;
+=>
+if (...) abort();
+
+SWIG wrapper
+
+good idea?
+  slots-t* s = self; // really slots-t* s = unbox(self);
+  (slots-t*)self     // really unbox(self)
+
+generate and use unbox(object-t, const char-t* file, int32-t line) & dk-unbox-check(...)
+
+support
+  klass foo { export const uint32-t bar = 42; }
+  generalize std-{input,output,error}
+
+slot-value
+subseq
+
+formalize __kw_selector__
+
+add dependency to makefiles for compiler driver 'dakota'
+
+fix double rewriting problem with keyword argument processing functions
+  DK_KEYWORD_PAIR_NULL, NULL, DK_KEYWORD_PAIR_NULL, NULL
+
+reimplement 'finally' using gcc extension taking the address of a label???
+
+deque:write-slots()
+
+<<<
+error generation for keyword arg processing function
+fix --keep-going
+fix should-generate-make
+fix category methods (incorrectly) replacing category methods (klasses and traits)
+supporting dynamic categories
+merge method-for-selector()s
+va-method-for()
+add _selector_ to init()
+add --keep-going to bin/dakota
+write test cases for compiler driver
+autoconf/automake
+replace $"bummer"
+replace "oops"
+  stage 1) $"oops"
+  stage 2) something sane
+add ka-signature()
+convert to new cstrings
+get interposing table code working
+>>>
+
+use libltdl as a abstraction over dlopen(), LoadLibrary(), ...
+
+support kw arg functions other than just 'init'
+  parser needs to feed back info to code-generator and rewriter
+
+determine the ROUND-ALIGNMENT factor
+
+support miniumal files support (merging into rep) using the Makefile automatic variable $?
+
+add support for __format-printf and __format-scanf to carry over to generated generic functions
+
+abstract-klass:init(object-t, object-t){}
+
+-fno-common
+
+add test for DK_VA_ARG_BOOLEAN_T
+
+consider using GNU Nana (http://www.gnu.org/software/nana)
+
+fix cstring:dump(slots-t*) use of printf()
+
+support gcc statement expressions for keyword arguments RHS ({ })
+
+add mudflap support
+  linux only
+
+char-t buffer[1024]; buffer[0] = (char-t)0;
+
+These should be sorted-arrays
+  static signature_assoc_node_t imported_selectors_va[]
+  static signature_assoc_node_t imported_selectors[]
+
+no-such-method-exception.dk: __noexport char-t* dk-cstring-from-selector(char-t* buffer, selector-t selector) {}
+
+only generate __klass__, __method__, and __signature__ when needed
+
+for-each rewriting on seperate lines???
+
+arbitrary table slot on object
+
+iterate over 'keys' & 'elements' of table
+
+default-value becomes default-result
+
+in dakota_parser.pm: rename do_it(), foobar()
+
+write dk_method_for_selector_small (smallest/slowest)
+
+write autorelease system
+
+support this:
+    __method __alias(method-for-selector-fast) method-t method-for-selector(object-t self, selector-t selector);
+    static method-t method-for-selector-fast(object-t self, selector-t selector)
+    {}
+
+init box methods
+
+support this:
+    __export __method object-t init(object-t self)
+
+allow echoing of introspection on a per klass/trait boundry
+
+string: string & mutable-string
+vector: vector & mutable-vector (expandable vs fixed)
+deque: deque & mutable-deque
+{hashed,sorted}-set: {hashed,sorted}-set & mutable-{hashed,sorted}-set
+
+fix the sorted-by-string-value vs sorted-by-symbol-value issue
+
+fix stupid uses of fprintf() in output-stream
+
+add methods to tracing
+
+add empty tests (empty klass, traits, ...)
+
+add tests to try to use super in trait methods or box methods
+
+add tests that try to set multiple superklass, mutiple metaklasses, maybe even multiple klass defns (using comma)
+
+add __export support for methods in __trait(s)
+
+consider these exports:
+  00031b18 T object::va::init(object::slots_t*, char*)
+  00031818 T object::init(object::slots_t*)
+  00004ea8 T object::init(object::slots_t*, ...)
+
+only add symbols (likes 'traits') when appropriate, not allways
+
+array slices (also split)
+
+need to rework use of stat() in dakota.dk
+
+support Objective-C View* style declaration (especially in 'for each' clause)
+  can not use association-t* because this means the internal slots of association instances
+  could use something similiar to the exception catching syntax
+  for (association:klass assoc : table)
+  or
+  for (<association> : table)
+
+emacs:
+  mode that will show the corresponding dk.cc file
+  which-function-mode (requires Imenu support)
+  how can one add
+    (c-set-offset 'label '+)
+    ...
+    in // -*- ... -*-

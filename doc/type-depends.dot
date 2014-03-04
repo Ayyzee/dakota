@@ -1,0 +1,76 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "type-depends"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = TB, center = true, page = "8.5,11", size = "7.5,10" ];
+  edge [ dir = back ];
+  node [ shape = box ];
+
+//   "..." -> "struct slots-t {...}";
+
+
+  "..."         [ shape = plaintext, label = "...\nuse" ];
+  "kk-t"        [ shape = plaintext ];
+  "kk-t*"       [ shape = plaintext ];
+  "kk:slots-t"  [ shape = plaintext ];
+  "kk:slots-t*" [ shape = plaintext ];
+  "kk:xx-t"     [ shape = plaintext ];
+
+  "kk-t"        -> "...";
+  "kk-t*"       -> "...";
+  "kk:slots-t"  -> "...";
+  "kk:slots-t*" -> "...";
+  "kk:xx-t"     -> "...";
+
+  "ns kk { struct slots-t {...} }" -> "kk:slots-t";
+  "ns kk { struct slots-t {...} }" -> "typedef kk:slots-t kk-t 2;";
+  "ns kk { struct slots-t; }"      -> "kk:slots-t*";
+  "ns kk { struct slots-t; }"      -> "typedef kk:slots-t kk-t 1;";
+  "ns kk { typedef ... slots-t; }" -> "kk:slots-t" [ color = green ];
+  "ns kk { typedef ... slots-t; }" -> "kk:slots-t*";
+  "ns kk { typedef ... slots-t; }" -> "typedef kk:slots-t kk-t 1;";
+  "ns kk { typedef ... slots-t; }" -> "typedef kk:slots-t kk-t 2;";
+  "ns kk { typedef ... xx-t; }"    -> "kk:xx-t" [ color = green ];
+  "ns kk { enum xx-t; }"           -> "kk:xx-t";
+  "typedef kk:slots-t kk-t 1;"     -> "kk-t*";
+  "typedef kk:slots-t kk-t 2;"     -> "kk-t";
+
+  "typedef kk:slots-t kk-t 1;" [ label = "typedef kk:slots-t kk-t;" ];
+  "typedef kk:slots-t kk-t 2;" [ label = "typedef kk:slots-t kk-t;" ];
+
+  {
+    rank = same;
+    "kk-t";
+    "kk-t*";
+    "kk:slots-t";
+    "kk:slots-t*";
+    "kk:xx-t";
+  }
+
+  {
+    rank = same;
+    "ns kk { struct slots-t {...} }";
+    "ns kk { struct slots-t {...} }";
+    "ns kk { struct slots-t; }";
+    "ns kk { struct slots-t; }";
+    "ns kk { typedef ... slots-t; }";
+    "ns kk { typedef ... slots-t; }";
+    "ns kk { typedef ... slots-t; }";
+    "ns kk { typedef ... slots-t; }";
+    "ns kk { typedef ... xx-t; }";
+    "ns kk { enum xx-t; }";
+  }
+}

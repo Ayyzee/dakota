@@ -1,0 +1,14 @@
+collection
+set
+sorted-set
+hashed-set
+table
+sorted-table
+hashed-table
+counted-set
+sorted-counted-set
+hashed-counted-set
+sequence
+deque
+vector
+stack

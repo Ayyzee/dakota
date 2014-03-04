@@ -1,0 +1,43 @@
+Greetings Dakotans,
+
+Here is a new feature we should consider:
+
+Currently
+
+klass foo
+{
+  export slots { ...}
+}
+
+implies
+
+typedef foo:slots-t foo-t; // this is auto-generated
+
+But what if the user wanted
+
+typedef 
+
+
+klass foo
+{
+  export slots { ...} as bar-t;
+}
+
+
+klass foo
+{
+  export * slots { ...}
+}
+
+typedef *foo:slots-t foo-t
+
+
+int32-t[2] foo;
+
+void ()() bar;
+
+const * int32-t foo;
+
+
+const char-t* const * =>
+* const* const char-t

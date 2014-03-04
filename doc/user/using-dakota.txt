@@ -1,0 +1,35 @@
+klass not class
+__ prefix for language extensions
+uses foo-bar (rather than foo_bar or fooBar)
+is a precompiler (more than just a preprocessor)
+uses "generic" functions for polymorphic dispatch (similiar to CLOS or Dylan)
+is dynamically typed (vs statically typed)
+is a hybred language
+has a true first klass metaklass system modeled after ObjVLisp
+object state is called "slots"
+object behavior is called "methods"
+normal objects do not expose their slots to consumers (not even subklasses)
+box objects do expose their slots to all consumers
+  - limitations
+traits are a mechanism of reuse which is behavior only (no state)
+  - limitations
+interfaces are declaritive only (traits and klasses are definitive)
+klasses/traits/interfaces compare and contrast
+catalogs are a rough approximation of headers for a library
+conventional
+  /usr/lib/libfoo.so
+  /usr/include/foo.h
+dakota
+  /usr/lib/libfoo.so
+  /usr/ctlg/libfoo.ctlg
+ctlgs are distilled version of the sources with only the min code defn remaining.  [...]
+
+dynamic object system for precedural language language C++
+new language
+
+complete c++ lexer
+only 10-15% of tokens are considered by parser
+
+catelog:
+
+c++ tightly bound state & behavior

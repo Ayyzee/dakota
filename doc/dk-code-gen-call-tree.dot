@@ -1,0 +1,94 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "dk-code-gen-call-tree"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR, center = true, size = "15,10" page = "8.5,11" ];
+  edge [];
+  node [ shape = box, style = rounded ];
+
+"method::type_decl" -> { "_last"; "arg_type::list_types"; "arg::type"; };
+"generate_cxx_footer_ka_method_defn" -> { "arg_type::list_types"; "kw_method::type_decl"; "path::string"; "arg::type"; "arg_type::list_pair"; "path::pop"; "arg_type::names"; "dk::print_in_col_string"; "method::type_decl"; "path::push"; "dk::print"; "no_op"; };
+"generics::_parse" -> { "method::is_va_list"; "Dakota::deep_copy"; "type_trans"; };
+"dk::get_scope" -> { "rep::generate_index"; "GetOptions"; "dk::file_basenames"; "dk::generate_dk_cxx"; "dk::generate_cxx_code_gen_tree"; "Dakota::deep_copy"; "dk::parse"; "dk::generate_cxx"; "rep::merge"; };
+"generics::print_generic_defn" -> { "dk::print_in_col_string"; "arg_type::list_names"; "method::is_va_list"; "arg_type::list_types"; "arg::type"; "dk::print"; "no_op"; "arg_type::list_pair"; "arg_type::names"; };
+"dump_err" [ style = filled, color = lightgrey ];
+"dump_err" -> { "Data::Dumper::DumperX"; } [ color = lightgrey ];
+"common::generate_selectors" -> { "dk::print_in_col_string"; "method::varargs_from_qual_va_list"; "method::is_va_list"; "dk::print"; "common::print_selector"; };
+"dk::generate_cxx" -> { "dk::generate_cxx_footer"; "dk::generate_cxx_header"; "dk::klass_names_from_file"; "Dakota::convert_dk_to_cxx"; "dk::generate_imported_klasses_info"; "dk::print_in_col_string"; "generics::parse"; "Dakota::hash"; "Dakota::make_ident_symbol"; "generics::generate"; "dk::print"; "no_op"; };
+"generics::generate_va_make_defn" -> { "dk::print_in_col_string"; };
+"klass::va_list_methods" -> { "method::is_va_list"; };
+"generics::generate_make_defn" [ style = filled, color = lightgrey ];
+"generics::generate_make_defn" -> { "dk::print_in_col_string"; } [ color = lightgrey ];
+"generics::print_super_generic_defn" -> { "dk::print_in_col_string"; "arg_type::super"; "method::is_va_list"; "arg_type::list_names"; "arg_type::list_types"; "arg::type"; "dk::print"; "no_op"; "arg_type::list_pair"; "arg_type::names"; };
+"generics::generate_va_generic_defns" -> { "method::is_va_list"; "path::push"; "method::print_va_method_defn"; "Dakota::deep_copy"; "path::pop"; };
+"common::print_ka_signature" -> { "arg_type::list_types"; "method::has_keyword_args"; "method::keyword_names"; "arg_type::list_pair"; "arg_type::names"; "dk::print_in_col_string"; "method::is_va_list"; "method::keyword_defaults"; "dk::print"; "no_op"; };
+"function::decl" -> { "arg_type::list_types"; "function::signature"; "arg::type"; "no_op"; };
+"dk::parse" -> { "Data::Dumper::DumperX"; "Dakota::scalar_from_file"; };
+"generics::print_offset_defn" -> { "dk::print_in_col_string"; "method::is_va_list"; "arg_type::list_types"; "dk::print"; "no_op"; "arg_type::list_pair"; "arg_type::names"; };
+"generics::generate_offset_defns" -> { "dk::print_in_col_string"; "method::is_va_list"; "generics::print_offset_defn"; };
+"arg_type::va" -> { "Dakota::deep_copy"; };
+"dk::generate_cxx_footer" -> { "dk::print_in_col_string"; "dk::generate_cxx_footer"; "path::push"; "no_op"; "dk::generate_cxx_footer_klass"; "path::pop"; };
+"rep::_generate" -> { "rep::_generate"; "path::push"; "Dakota::deep_copy"; "Dakota::scalar_to_file"; "Dakota::scalar_from_file"; "path::pop"; };
+"arg_type::list_pair" -> { "arg::type"; };
+"dk::generate_cxx_footer_klass" -> { "arg_type::list_types"; "path::string"; "arg::type"; "dk::print_in_col_string"; "method::is_va_list"; "Dakota::make_ident_symbol"; "generate_cxx_footer_ka_method_defn"; "method::type"; "dk::print"; "no_op"; "klass::va_list_methods"; "arg_type::va"; };
+"rep::_merge" -> { "Dakota::deep_copy"; "rep::_merge"; };
+"method::qual_va_list_from_varargs" [ style = filled, color = lightgrey ];
+"method::qual_va_list_from_varargs" -> { "Dakota::deep_copy"; } [ color = lightgrey ];
+"generics::_generate" -> { "generics::generate_generic_defns"; "generics::_generate"; "dk::print_in_col_string"; "path::push"; "dk::print"; "generics::generate_va_generic_defns"; "generics::generate_va_make_defn"; };
+"generics::parse" -> { "generics::_parse"; "function::signature"; "path::push"; "generics::klass_scope_from_klass_name"; "Dakota::deep_copy"; "Dakota::scalar_from_file"; "path::pop"; };
+"generics::key" [ style = filled, color = lightgrey ];
+"generics::key" -> { "no_op"; "type_trans"; } [ color = lightgrey ];
+"klasses::generate_ka_signatures" [ style = filled, color = lightgrey ];
+"klasses::generate_ka_signatures" -> { "path::string"; "method::has_keyword_args"; "common::print_ka_signature"; } [ color = lightgrey ];
+"kw_arg_type::list_types" -> { "arg::type"; };
+"rep::merge" -> { "Dakota::scalar_to_file"; "Dakota::scalar_from_file"; "rep::_merge"; };
+"kw_method::type_decl" -> { "_last"; "arg::type"; "kw_arg_type::list_types"; };
+"dk::generate_cxx_header_klass" -> { "method::print_va_method_defn"; "path::pop"; "dk::print_in_col_string"; "Dakota::make_ident_symbol"; "path::push"; "function::decl"; "dk::print"; "Dakota::deep_copy"; "klass::va_list_methods"; };
+"function::signature" -> { "arg_type::list_types"; "no_op"; };
+"method::type" -> { "arg_type::list_types"; "arg::type"; };
+"dk::generate_cxx_code_gen_tree" -> { "Data::Dumper::DumperX"; "dk::_generate_cxx_code_gen_tree"; };
+"generics::generate_generic_defns" -> { "dk::print_in_col_string"; "method::is_va_list"; "generics::print_generic_defn"; "generics::print_super_generic_defn"; };
+"arg_type::list_types" -> { "arg::type"; };
+"path::string" -> { "no_op"; };
+"common::print_selector" -> { "dk::print_in_col_string"; "method::is_va_list"; "arg_type::list_types"; "Dakota::make_ident_symbol"; "dk::print"; "no_op"; "arg_type::list_pair"; "arg_type::names"; };
+"dk::_generate_cxx_code_gen_tree" -> { "dk::get_scope"; "path::push"; "path::pop"; "dk::_generate_cxx_code_gen_tree"; };
+"arg_type::super" -> { "Dakota::deep_copy"; };
+"dk::generate_ka_signatures_klass" [ style = filled, color = lightgrey ];
+"dk::generate_ka_signatures_klass" -> { "dk::print_in_col_string"; "method::is_va_list"; "path::string"; "method::has_keyword_args"; "common::print_ka_signature"; "klass::va_list_methods"; } [ color = lightgrey ];
+"dk::generate_dk_cxx" -> { "Dakota::convert_dk_to_cxx"; };
+"dk::generate_ka_signatures" -> { "dk::print_in_col_string"; "dk::generate_ka_signatures"; "path::push"; "no_op"; "path::pop"; };
+"generics::generate" -> { "generics::_generate"; "dk::print_in_col_string"; "dk::print"; "common::generate_selectors"; "generics::generate_offset_defns"; };
+"by_numeric_value" [ style = filled, color = lightgrey ];
+"dk::generate_cxx_header" -> { "dk::print_in_col_string"; "dk::generate_cxx_header"; "dk::generate_cxx_header_klass"; "path::push"; "no_op"; "path::pop"; };
+"method::print_va_method_defn" -> { "dk::print_in_col_string"; "method::type_decl"; "arg_type::list_types"; "arg_type::list_names"; "arg::type"; "dk::print"; "no_op"; "arg_type::list_pair"; "arg_type::names"; "arg_type::va"; };
+"method::varargs_from_unqual_va_list" [ style = filled, color = lightgrey ];
+"method::varargs_from_unqual_va_list" -> { "Dakota::deep_copy"; } [ color = lightgrey ];
+"dk::generate_imported_klasses_info" -> { "path::push"; "Dakota::deep_copy"; "path::pop"; "dk::generate_imported_klasses_info"; };
+"dk::print_in_col_string" -> { "dk::print"; };
+"method::varargs_from_qual_va_list" -> { "Dakota::deep_copy"; };
+"method::unqual_va_list_from_varargs" [ style = filled, color = lightgrey ];
+"method::unqual_va_list_from_varargs" -> { "Dakota::deep_copy"; } [ color = lightgrey ];
+"method::is_varargs" [ style = filled, color = lightgrey ];
+"method::is_varargs" -> { "arg::type"; } [ color = lightgrey ];
+"generics::generate_va_make_defns" [ style = filled, color = lightgrey ];
+"generics::generate_va_make_defns" -> { "method::is_va_list"; "path::push"; "method::print_va_method_defn"; "Dakota::deep_copy"; "path::pop"; } [ color = lightgrey ];
+"main" [ style = filled, color = lightgrey ];
+"method::super_method" [ style = filled, color = lightgrey ];
+"method::super_method" -> { "arg_type::super"; "Dakota::deep_copy"; } [ color = lightgrey ];
+"rep::generate_index" -> { "rep::_generate"; "Dakota::scalar_from_file"; };
+"method::compare" [ style = filled, color = lightgrey ];
+"method::compare" -> { "function::signature"; "Dakota::scalar_from_file"; } [ color = lightgrey ];
+}

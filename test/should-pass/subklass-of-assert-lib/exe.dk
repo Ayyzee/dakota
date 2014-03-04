@@ -1,0 +1,24 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+
+int-t main()
+{
+  object-t o1 = make(k1:klass);
+  object-t o2 = make(k2:klass);
+  object-t o3 = make(k3:klass);
+
+  assert(0 == dk:subklass?(dk:klass(o1), k1:klass));
+  assert(1 == dk:subklass?(dk:klass(o2), k1:klass));
+  assert(1 == dk:subklass?(dk:klass(o3), k1:klass));
+
+  assert(0 == dk:subklass?(dk:klass(o1), k2:klass));
+  assert(0 == dk:subklass?(dk:klass(o2), k2:klass));
+  assert(1 == dk:subklass?(dk:klass(o3), k2:klass));
+
+  assert(0 == dk:subklass?(dk:klass(o1), k3:klass));
+  assert(0 == dk:subklass?(dk:klass(o2), k3:klass));
+  assert(0 == dk:subklass?(dk:klass(o3), k3:klass));
+
+  return 0;
+}

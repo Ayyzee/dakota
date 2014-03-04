@@ -1,0 +1,123 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+
+module dakota;
+
+klass object-output-stream;
+
+klass assoc
+{
+  slots
+  {
+    object-t key;
+    object-t element;
+  }
+
+  method object-t init(object-t self,
+                       object-t key =>     null,
+                       object-t element => null)
+  {
+    self = dk:init(super);
+    self.key =     key;
+    self.element = element;
+    return self;
+  }
+
+  method object-t dump(object-t self)
+  {
+    dk:dump(super);
+    dk:dump(self.key);
+    dk:dump(self.element);
+    return self;
+  }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+
+    dk:write-element-idref(out, self.key,     "key");
+    dk:write-element-idref(out, self.element, "element");
+
+    dk:write-slots-end(out);
+    return self;
+  }
+
+  method boole-t equal?(object-t self, object-t other)
+  {
+    boole-t result;
+    object-t key = self;
+    if (dk:instance?(key, klass))
+      key = unbox(key)->key;
+    assert(NULL != key);
+    object-t other-key = other;
+    if (dk:instance?(other-key, klass))
+      other-key = unbox(other-key)->key;
+    assert(NULL != other-key);
+    result = dk:equal?(key, other-key);
+    return result;
+  }
+
+  method int-t compare(object-t self, object-t other)
+  {
+    int-t result;
+    object-t key = self;
+    if (dk:instance?(key, klass))
+      key = unbox(key)->key;
+    assert(NULL != key);
+    object-t other-key = other;
+    if (dk:instance?(other-key, klass))
+      other-key = unbox(other-key)->key;
+    assert(NULL != other-key);
+    result = dk:compare(key, other-key);
+    return result;
+  }
+
+  method uintmax-t hash(object-t self)
+  {
+    uintmax-t result;
+    object-t key = self;
+    if (dk:instance?(key, klass))
+      key = unbox(key)->key;
+    assert(NULL != key);
+    result = dk:hash(key);
+    return result;
+  }
+
+  method object-t key=(object-t self, object-t key)
+  {
+    self.key = key;
+    return self;
+  }
+
+  method object-t element=(object-t self, object-t element)
+  {
+    self.element = element;
+    return self;
+  }
+
+  method object-t key(object-t self)
+  {
+    return self.key;
+  }
+
+  method object-t element(object-t self)
+  {
+    return self.element;
+  }
+}

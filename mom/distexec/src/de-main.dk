@@ -1,0 +1,100 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <getopt.h>;
+include <stdio.h>;
+include <stdlib.h>;
+
+include "sc.h";
+
+enum
+{
+  DE-OPT-NULL = 0,
+
+  DE-OPT-DAEMON = 256,
+  DE-OPT-HELP,
+  DE-OPT-VERSION,
+  DE-OPT-PID-FILE,
+  DE-OPT-LOG-FILE,
+};
+
+noexport xoption-t longopts[] =
+{
+  { "daemon", no-argument, NULL, DE-OPT-DAEMON },
+  { "help",  no-argument, NULL, DE-OPT-HELP },
+  { "version", no-argument, NULL, DE-OPT-VERSION },
+  { "pid-file", required-argument, NULL, DE-OPT-PID-FILE },
+  { "log-file", required-argument, NULL, DE-OPT-LOG-FILE },
+  { NULL, 0, NULL, DE-OPT-NULL }
+};
+
+noexport const char8-t* posixly-correct = "POSIXLY-CORRECT";
+
+noexport int-t handle-opts(int-t argc, char8-t** argv)
+{
+  int-t n;
+  int-t should-overwrite;
+  char8-t* old-posixly-correct = sys:getenv(posixly-correct);
+  n = setenv(posixly-correct, "1", should-overwrite = 1);  sc(n);
+  int-t opt;
+
+  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL)))
+  {
+    switch (opt)
+    {
+      case DE-OPT-DAEMON: { break; }
+      case DE-OPT-HELP: { break; }
+      case DE-OPT-VERSION: { break; }
+      case DE-OPT-PID-FILE: { break; }
+      case DE-OPT-LOG-FILE: { break; }
+      default: { sys:fprintf(stdout, "error\n"); } // this should not happen because of POSIXLY-CORRECT
+    }
+  }
+  if (NULL == old-posixly-correct)
+  {
+    n = unsetenv(posixly-correct);  sc(n);
+  }
+  else
+  {
+    n = setenv(posixly-correct, old-posixly-correct, should-overwrite = 1);  sc(n);
+  }
+  return optind;
+}
+
+noexport void dump-command(int-t argc, char8-t** argv)
+{
+  char8-t* delim = "";
+  char8-t* arg;
+  int-t i;
+  for (i = 0; i < argc; i++)
+  {
+    arg = argv[i];
+    sys:fprintf(stdout, "%s%s", delim, arg);
+    delim = " ";
+  }
+  sys:fprintf(stdout, "\n");
+  return;
+}
+
+int-t main(int-t argc, char8-t** argv, char8-t** envp)
+{
+  int-t c = handle-opts(argc, argv);
+
+  dump-command(c, argv);
+  dump-command(argc - c, argv + c);
+
+  sys:exit(EXIT-SUCCESS);
+}

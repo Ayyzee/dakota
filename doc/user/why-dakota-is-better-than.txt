@@ -1,0 +1,30 @@
+C++
+
+Java
+
+C#
+
+Objective-C
+
+SmallTalk
+
+CLOS
+
+Dylan
+
+complete klass/metaklass system (no mirror like in ST or OC)
+** lose the distiction of instance vs klass variables/methods
+dynamically typed
+instantiation over construction
+highly tunable (dispatch style, mono-morphic methods, ...)
+single inheritence + traits + interfaces
+** diamond inheritence is only a problem for 'state', not 'behavior'
+** significant improvement for decomposition
+ideal for callback oriented programming
+(everythings an object vs everythings a function)
+true keyword arguments avoids the n-factorial contructor problem
+no fragel base class delimma
+box() and unbox()
+only a precompiler
+natural to transition from ADTs to Dakota klasses
+integrated with the features common to all dynamic libraries and dynamic loaders

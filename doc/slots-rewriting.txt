@@ -1,0 +1,10 @@
+slots;
+
+slots { ... }
+
+slots type-t;
+
+slots type-t[...];
+
+slots object-t (*)(object-t);
+

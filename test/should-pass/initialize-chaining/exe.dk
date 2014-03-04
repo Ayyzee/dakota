@@ -1,0 +1,51 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+include <string.h>;
+
+static char8-t buf[16] = "";
+
+klass k1
+{
+  object-t initialize(object-t kls)
+  {
+    strcat(buf, __klass__);
+    fprintf(stderr, "%s(%p <%s>)\n", __func__, (void*)kls, __klass__);
+    assert(klass == kls);
+    return kls;
+  }
+}
+
+klass k2
+{
+  superklass k1;
+
+  object-t initialize(object-t kls)
+  {
+    strcat(buf, __klass__);
+    fprintf(stderr, "%s(%p <%s>)\n", __func__, (void*)kls, __klass__);
+    assert(klass == kls);
+    return kls;
+  }
+}
+
+klass k3
+{
+  superklass k2;
+
+  object-t initialize(object-t kls)
+  {
+    strcat(buf, __klass__);
+    fprintf(stderr, "%s(%p <%s>)\n", __func__, (void*)kls, __klass__);
+    assert(klass == kls);
+    return kls;
+  }
+}
+
+int-t main()
+{
+  object-t o = make(k3:klass);
+  USE(o);
+  assert(0 == strcmp("k1k2k3", buf));
+  return 0;
+}

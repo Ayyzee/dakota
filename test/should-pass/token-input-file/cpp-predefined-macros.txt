@@ -1,0 +1,6 @@
+__DATE__
+__FILE__
+__LINE__
+__STDC__
+__TIME__
+__cplusplus

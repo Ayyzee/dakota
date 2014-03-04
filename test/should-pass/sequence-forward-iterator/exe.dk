@@ -1,0 +1,70 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdio.h>;
+include <assert.h>;
+
+static void check-for(object-t collection)
+{
+  printf("%i[", dk:size(collection));
+  char8-t* delim = "";
+  for (object-t iter = dk:forward-iterator(collection);
+       dk:next?(iter);
+       dk:next(iter))
+  {
+    object-t e = dk:element(iter);
+    printf("%s%i", delim, *uint32:unbox(e));
+    delim = ",";
+  }
+  printf("]");
+  return;
+}
+
+static void check-for-each(object-t collection)
+{
+  printf("%i[", dk:size(collection));
+  char8-t* delim = "";
+  for (object-t e in collection)
+  {
+    printf("%s%i", delim, *uint32:unbox(e));
+    delim = ",";
+  }
+  printf("]");
+  return;
+}
+
+static const uint32-t count = 9;
+
+static void check(object-t klass, object-t (*add)(object-t, object-t), void (*check-for-func)(object-t))
+{
+  object-t c = make(klass);
+  char8-t* delim = "";
+
+  for (uint32-t i = 2; i < count; i += 3)
+  {
+    printf("%s", delim);
+    delim = ", ";
+    check-for-func(c);
+    add(c, uint32:box(i));
+    check-for-func(c);
+  }
+  printf("\n");
+  return;
+}
+
+static void check(object-t klass, object-t (*add)(object-t, object-t))
+{
+  check(klass, add, check-for-each);
+  check(klass, add, check-for);
+  return;
+}
+
+int-t main()
+{
+  check(vector:klass, dk:add-last);
+  check(deque:klass,  dk:add-last);
+
+  return 0;
+}
+
+// can remove add-last() as argument
+

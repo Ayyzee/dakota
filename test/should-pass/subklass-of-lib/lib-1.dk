@@ -1,0 +1,18 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module test-1;
+
+klass k1
+{
+  superklass object;
+}
+
+klass k2
+{
+  superklass k1;
+}
+
+klass k3
+{
+  superklass k2;
+}

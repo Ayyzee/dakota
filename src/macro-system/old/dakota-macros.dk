@@ -1,0 +1,153 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// ident, qual-ident, type, block, list, seq
+
+macro ka-method-defn
+{
+  { method ?:type ?:qual-ident ( object-t self , ?ka-defn ) }
+  =>
+  { method ?type ?qual-ident ( object-t self , ?ka-defn ) }
+
+  ka-defn
+  { }
+  =>
+  { }
+
+  { ?:type ?:ident , ... }
+  =>
+  { ?type ?ident , ... }
+
+  { ?:type ?:ident => ?:block , ... }
+  =>
+  { ?type ?ident , ... }
+
+  { ?:type ?:ident => ?:block }
+  =>
+  { ?type ?ident }
+}
+macro ka-method-use
+{
+  { dk : ?:ident ( ?ka-list ) }
+  =>
+  { dk : ?ident ( ?ka-list ) }
+
+  ka-list
+  { ?lhs:ident => ?rhs:ident , ... }
+  =>
+  { ?lhs , ?rhs , ... }
+
+  { ?lhs:ident => ?rhs:ident }
+  =>
+  { ?lhs , ?rhs , NULL }
+
+  { ?:ident , ... }
+  =>
+  { ?ident , ... }
+}
+macro unbox-use
+{
+  { ?:qual-ident : slots-t * ?s-ident:ident = unbox(?o-ident:ident) }
+  =>
+  { ?qual-ident : slots-t * ?s-ident = ?qual-ident : unbox(?o-ident) }
+
+  { ?:qual-ident : slots-t & ?s-ident:ident = * unbox(?o-ident:ident) }
+  =>
+  { ?qual-ident : slots-t & ?s-ident = * ?qual-ident : unbox(?o-ident) }
+}
+macro constructor-use
+{
+  { ?:klass-name ?:seq }
+  =>
+  { ?klass-name : construct ?seq }
+}
+macro for-iterator
+{
+  { for (?:qual-ident : slots-t * ?e-ident:ident in ?o-ident:ident) }
+  =>
+  { for (object-t _iteractor_ = dk:forward-iterator(?o-ident); ?qual-ident : slots-t * ?e-ident = ?qual-ident : unbox(dk:next(_iterator_)); ) }
+
+  { for (slots-t * ?e-ident:ident in ?o-ident:ident) }
+  =>
+  { for (object-t _iteractor_ = dk:forward-iterator(?o-ident); slots-t * ?e-ident = unbox(dk:next(_iterator_)); ) }
+
+  { for (object-t ?e-ident:ident in ?o-ident:ident) }
+  =>
+  { for (object-t _iteractor_ = dk:forward-iterator(?o-ident); object-t ?e-ident = dk:next(_iterator_); ) }
+}
+macro case-keywords
+{
+  { case ?:cstring : }
+  =>
+  { case keyword : ?cstring : }
+
+  { case ?:symbol : }
+  =>
+  { case keyword : ?symbol : }
+}
+macro expand-scoped-namespace-decl
+{
+  { ?sub-scope }
+  =>
+  { ?sub-scope }
+
+  sub-scope
+  { }
+  =>
+  { }
+
+  { namespace ?scope:ident : ... ; }
+  =>
+  { namespace ?scope { namespace ... ; } }
+
+  { namespace ?scope:ident : ?name:ident ; }
+  =>
+  { namespace ?scope { namespace ?name ; } }
+}
+macro inline-generic-use
+{
+  { dk : klass ?:list }
+  =>
+  { ?list -> klass }
+}
+macro selector-cpp-use
+{
+  { selector ( ?:qual-ident ?:list ) }
+  =>
+  { selector ( ?qual-ident , ?list ) }
+}
+macro selector-use
+{
+  { selector ( ?:qual-ident ?:list ) }
+  =>
+  { cast(selector-function-t, cast(selector-t* (*) ?list, __selector : ?qual-ident ) ) }
+}
+macro throw-use
+{
+  { throw make ?:list }
+  =>
+  { throw dk-current-exception = make ?list }
+
+  { throw ?:cstring }
+  =>
+  { throw dk-current-exception-cstring = ?cstring }
+}
+macro slots-defn
+{
+  { slots ?:block }
+  =>
+  { struct slots-t ?block ; }
+
+  { slots ; }
+  =>
+  { struct slots-t ; }
+
+  { slots ?:type ; }
+  =>
+  { typedef ?type slots-t ; }
+}
+macro array-type
+{
+  { ?:type ?:seq ?:ident }
+  =>
+  { ?type ?ident ?seq }
+}

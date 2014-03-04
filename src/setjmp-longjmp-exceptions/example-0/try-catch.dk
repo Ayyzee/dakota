@@ -1,0 +1,38 @@
+
+
+
+
+
+
+
+void bar(boole-t v)
+{
+  if (v)
+    handle(make(exception:klass));
+}
+boole-t some-handler(object-t exception)
+{
+  boole-t result = false;
+  USE(exception);
+  return result;
+}
+void foo(boole-t v)
+{
+  try (some-handler)
+  {
+    bar(v);
+    printf("no exception\n");
+  }
+  catch (system-exception:klass e1)
+  {
+    printf("catch (%s:""klass)\n", dk:name(dk:klass(e1)));
+  }
+  catch (exception:klass e2)
+  {
+    printf("catch (%s:""klass)\n", dk:name(dk:klass(e2)));
+  }
+  catch (...)
+  {
+    printf("catch (...)\n");
+  }
+}

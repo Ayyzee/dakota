@@ -1,0 +1,13 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+int-t main()
+{
+  object-t s0 = make(string:klass, bytes => "hello world!");
+
+  object-t s = dk:alloc(string:klass);
+  s = dk:init(s, bytes => "hello world!");
+
+  dk:println(s, std-output);
+  dk:release(s);
+  return 0;
+}

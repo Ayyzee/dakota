@@ -1,0 +1,143 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <assert.h>;
+include <stdlib.h>;
+include <unistd.h>;
+
+include "common.h";
+include "connection-for-msg-id.h";
+include "inet.h";
+include "recruiter-ls.h";
+include "recruiter-us.h";
+include "tags.h";
+include "util.h";
+include "work-queue.h";
+
+klass callback;
+klass connection;
+klass cstring;
+klass event;
+klass event-queue;
+klass execution-context;
+klass fd;
+klass msg;
+klass msg-id;
+klass cstring;
+klass deque;
+klass work;
+
+noexport const char8-t* DE-LOG-WORK = NULL;
+
+static void __attribute__((constructor)) initializer()
+{
+  DE-LOG-WORK = sys:getenv("DE_LOG_WORK");
+  return;
+}
+
+
+object-t us-need-work-rcv-msg(object-t us-connection,
+                              object-t need-work-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(us-connection), dk:tag(need-work-msg), __klass__, __func__);
+  match(need-work, dk:tag(need-work-msg));
+  object-t work = dk:remove-first(work-queue);
+  dk:rcv-msg-callback=(us-connection, us-rcv-msg-callback);
+
+  if (NULL != work)
+  {
+//     assert(0 != work->msg->id);
+    match(exec-work, dk:tag(dk:msg(work)));
+    connection-for-msg-id-add(dk:id(dk:msg(work)), dk:connection(work));
+
+    if(DE-LOG-WORK)
+    {
+      const char8-t* addrstr = dk:addrstr(us-connection);
+      cstring-t msgstr = dk:val(dk:msg(work));
+        MOM-LOG-INFO("start: id=%i, host=%s, cmd=\"%s\"",
+                    dk:id(dk:msg(work)), addrstr, msgstr.ptr); // skip cnt
+    }
+    dk:snd-msg(us-connection, dk:msg(work));
+  }
+  else
+  {
+    object-t no-work-msg = make(msg:klass, tag => no-work);
+    dk:snd-msg(us-connection, no-work-msg);
+  }
+  return us-connection;
+}
+
+object-t us-bridge-no-ack-rcv-msg(object-t us-connection,
+                                  object-t rcv-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(us-connection), rcv-msg->tag, __klass__, __func__);
+  dk:rcv-msg-callback=(us-connection, us-rcv-msg-callback);
+  object-t ls-connection = connection-for-msg-id-id(dk:id(rcv-msg));
+  // us => ls bridge
+  dk:snd-msg(ls-connection, rcv-msg);
+  return us-connection;
+}
+
+object-t us-bridge-rcv-msg(object-t us-connection,
+                           object-t rcv-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(us-connection), dk:tag(rcv-msg), __klass__, __func__);
+  match(exit-value, dk:tag(rcv-msg));
+  if(DE-LOG-WORK)
+  {
+    cstring-t rcv-msg-str = dk:val(rcv-msg);
+    int32-t value = int32-from-string(rcv-msg-str.ptr, EXIT-FAILURE);
+    MOM-LOG-INFO("finish: id=%i, sys:exit=%i", dk:id(rcv-msg), value);
+  }
+  object-t ack-msg = make(msg:klass, tag => ack);
+  dk:id=(ack-msg, dk:id(rcv-msg)); // even if its zero :-(
+  dk:snd-msg(us-connection, ack-msg);
+
+  us-bridge-no-ack-rcv-msg(us-connection, rcv-msg);
+
+  //connection-for-msg-id-remove(rcv-msg); // bugbug
+  return us-connection;
+}
+
+object-t us-rcv-msg-callback(object-t us-connection,
+                             object-t rcv-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(us-connection), dk:tag(rcv-msg), __klass__, __func__);
+  switch (dk:tag(rcv-msg))
+  {
+    case need-work:
+    {
+      dk:invoke(us-connection, us-need-work-rcv-msg, rcv-msg);
+      break;
+    }
+    case child-stdout:
+    case child-stderr:
+    {
+      dk:invoke(us-connection, us-bridge-no-ack-rcv-msg, rcv-msg);
+      break;
+    }
+    case exit-value:
+    {
+      dk:invoke(us-connection, us-bridge-rcv-msg, rcv-msg);
+      break;
+    }
+    default:
+    {
+      MOM-LOG-ERROR("error: unknown tag=0x%x", dk:tag(rcv-msg));
+    }
+  }
+  return us-connection;
+}

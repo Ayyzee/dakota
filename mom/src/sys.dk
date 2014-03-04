@@ -1,0 +1,618 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-                                        
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <assert.h>;
+include <dlfcn.h>;
+include <fcntl.h>;
+include <netinet/in.h>;
+include <signal.h>;
+include <stdlib.h>;
+include <string.h>;
+include <sys/socket.h>;
+include <sys/stat.h>;
+include <sys/types.h>;
+include <sys/wait.h>;
+include <unistd.h>;
+
+#ifndef _GNU-SOURCE
+#define _GNU-SOURCE
+#endif //_GNU-SOURCE
+include <getopt.h>;
+
+include "compat-getprogname.h";
+include "config.h";
+include "hacks.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass event-queue;
+klass event-queue-klass;
+klass fd;
+klass xoption;
+
+noexport const char8-t* __klass__ = "sys";
+
+int-t sys:pipe(int-t fds[2])
+{
+  int-t n = ::pipe(fds);  sc(n);
+  if (-1 != n)
+  {
+    MOM-LOG-FD("fd=%i %s::%s(fd=%i fd=%i)", fds[0], __klass__, __func__, fds[0], fds[1]);
+    MOM-LOG-FD("fd=%i %s::%s(fd=%i fd=%i)", fds[1], __klass__, __func__, fds[0], fds[1]);
+  }
+  return n;
+}
+
+int-t sys:close(int-t fd)
+{
+  int-t n;
+  object-t eq = dk:get-current(event-queue:klass);
+  dk:will-close(eq, fd);
+  n = ::close(fd);  sc(n);
+  if (-1 != n)
+  {
+    dk:did-close(eq, fd);
+    MOM-LOG-CLOSE("fd=%i %s::%s()", fd, __klass__, __func__);
+  }
+  return n;
+}
+
+void* sys:malloc(size-t size)
+{
+  void* p;
+  p = ::malloc(size);  nulleqen(p);
+  return p;
+}
+
+void sys:free(void* ptr)
+{
+  ::free(ptr);
+  return;
+}
+
+ssize-t sys:read(int-t fd, void* buf, size-t len)
+{
+  ssize-t n;
+  n = ::read(fd, buf, len);  nbsc(n);
+  if (-1 != n)
+    MOM-LOG-READ("fd=%i %s::%s() = %zi", fd, __klass__, __func__, n);
+  if (0 == len)
+    fd:dump(fd);
+  return n;
+}
+
+ssize-t sys:recvfrom(int-t fd, void* buf, size-t len, int-t flags, struct sockaddr *sa, socklen-t* salen)
+{
+  ssize-t n;
+  n = ::recvfrom(fd, buf, len, flags, sa, salen);  nbsc(n);
+  if (-1 != n)
+    MOM-LOG-READ("fd=%i %s::%s() = %zi", fd, __klass__, __func__, n);
+  return n;
+}
+
+ssize-t sys:write(int-t fd, const void* buf, size-t len)
+{
+  ssize-t n;
+  n = ::write(fd, buf, len);  nbsc(n);
+  if (-1 != n)
+    MOM-LOG-WRITE("fd=%i %s::%s() = %zi/%zi", fd, __klass__, __func__, n, len);
+  if (0 == len)
+    fd:dump(fd);
+  return n;
+}
+
+ssize-t sys:sendto(int-t fd, const void* buf, size-t len, int-t flags, const struct sockaddr *sa, socklen-t salen)
+{
+  ssize-t n;
+  n = ::sendto(fd, buf, len, flags, sa, salen);  sc(n);
+  if (-1 != n)
+    MOM-LOG-WRITE("fd=%i %s::%s() = %zi/%zi", fd, __klass__, __func__, n, len);
+  return n;
+}
+
+pid-t sys:fork()
+{
+  pid-t ppid = sys:getpid();
+  USE(ppid);
+  pid-t n;
+  n = ::fork();  sc(n);
+  if (0 < n) // in parent
+    MOM-LOG-PROC("ppid=%i pid=%i %s::%s()", ppid, n, __klass__, __func__);
+  return n;
+}
+
+int-t sys:socket(int-t domain, int-t type, int-t protocol)
+{
+  int-t n;
+  n = ::socket(domain, type, protocol);  sc(n);
+  if (-1 != n)
+    MOM-LOG-FD("fd=%i %s::%s()", n, __klass__, __func__);
+  return n;
+}
+
+int-t sys:connect(int-t fd, const struct sockaddr *name, socklen-t namelen)
+{
+  int-t n;
+
+  ::sleep(2);
+
+  n = ::connect(fd, name, namelen);  nbsc(n);
+  // bugbug: if returns -1 and errno is not EWOULDBLOCK or EINPROGRESS
+  // already encoded in nbsc() macro
+  MOM-LOG-FD("fd=%i %s::%s() = %i \"%s\"", fd, __klass__, __func__, n, sys:strerror(errno));
+  if (-1 != n)
+    fd:dump(fd);
+  return n;
+}
+
+int-t sys:accept(int-t fd, struct sockaddr *addr, socklen-t* addrlen)
+{
+  int-t n;
+  // bugbug: if returns -1 and errno is not EWOULDBLOCK or EINPROGRESS
+  // already encoded in nbsc() macro
+  n = ::accept(fd, addr, addrlen);  nbsc(n);
+  MOM-LOG-FD("fd=%i %s::%s() = fd=%i", fd, __klass__, __func__, n);
+  if (-1 != n)
+    fd:dump(n);
+  return n;
+}
+
+int-t sys:listen(int-t fd, int-t backlog)
+{
+  int-t n;
+  n = ::listen(fd, backlog);  sc(n);
+  return n;
+}
+
+int-t sys:getsockopt(int-t fd, int-t level, int-t optname, void* optval, socklen-t* optlen)
+{
+  int-t n;
+  n = ::getsockopt(fd, level, optname, optval, optlen);  sc(n);
+  return n;
+}
+
+int-t sys:setsockopt(int-t fd, int-t level, int-t optname, const void* optval, socklen-t optlen)
+{
+  int-t n;
+  n = ::setsockopt(fd, level, optname, optval, optlen);  sc(n);
+  return n;
+}
+
+int-t sys:bind(int-t fd, const sockaddr* name, socklen-t namelen)
+{
+  int-t n;
+  n = ::bind(fd, name, namelen);  sc(n);
+  return n;
+}
+
+int-t sys:fcntl(int-t fd, int-t cmd, int-t arg)
+{
+  int-t n;
+  n = ::fcntl(fd, cmd, arg);  sc(n);
+  return n;
+}
+int-t sys:dup2(int-t fd, int-t newfd)
+{
+  int-t n;
+  n = ::dup2(fd, newfd);  sc(n);
+  if (-1 != n)
+  {
+    MOM-LOG-FD("fd=%i %s::%s(fd=%i, fd=%i)", fd, __klass__, __func__, fd, newfd);
+    MOM-LOG-FD("fd=%i %s::%s(fd=%i, fd=%i)", newfd, __klass__, __func__, fd, newfd);
+  }
+  return n;
+}
+const char8-t* sys:inet-ntop(int-t af, const void* src, char8-t* dst, socklen-t size)
+{
+  const char8-t* p;
+  p = ::inet-ntop(af, src, dst, size);  nulleqen(p);
+  return p;
+}
+int-t sys:inet-pton(int-t af, const char8-t* src, void* dst)
+{
+  int-t n;
+  n = ::inet-pton(af, src, dst);  sc(n);
+  return n;
+}
+#if HAVE-KQUEUE
+int-t sys:kqueue()
+{
+  int-t n;
+  n = ::kqueue(); // logged by kqueue-create()
+  return n;
+}
+int-t sys:kevent(int-t kq,
+                const struct kevent *changelist, int-t nchanges,
+                struct kevent *eventlist, int-t nevents,
+                const struct timespec *timeout)
+{
+  int-t n;
+  n = ::kevent(kq, changelist, nchanges, eventlist, nevents, timeout); // logged by kqueue-create()
+  return n;
+}
+#else
+#if HAVE-EPOLL
+int-t sys:epoll-create(int-t size)
+{
+  int-t n = ::epoll-create(size);  sc(n);
+  MOM-LOG-FD("fd=%i %s::%s()", n, __klass__, __func__);
+  return n;
+}
+
+int-t sys:epoll-ctl(int-t epfd, int-t op, int-t fd, struct epoll-event* event)
+{
+  int-t n;
+  char8-t buf[64];
+  MOM-LOG-IOMUX("fd=%i %s::%s(fd=%i, op=%i, fd=%i, event={%s})",
+               epfd, __klass__, __func__, epfd, op, fd, dk:statestr(event, buf, sizeof(buf) - (1)));
+  n = ::epoll-ctl(epfd, op, fd, event);  sc(n);
+  if (-1 == n)
+  {
+    int-t optval;
+    socklen-t optlen = sizeof(optval);
+    int-t n = sys:getsockopt(fd, SOL-SOCKET, SO-ERROR, &optval, &optlen);  sc(n);
+    MOM-LOG-ERROR("error: fd=%i errno=%i \"%s\"", fd, optval, sys:strerror(optval));
+  }
+  //MOM-LOG-FD("fd=%i %s::%s()", epfd, __klass__, __func__);
+  return n;
+}
+
+int-t sys:epoll-wait(int-t epfd, struct epoll-event* events, int-t maxevents, int-t timeout)
+{
+  int-t n;
+  MOM-LOG-IOMUX("fd=%i %s::%s()", epfd, __klass__, __func__);
+  n = ::epoll-wait(epfd, events, maxevents, timeout);  iomux(n);
+  return n;
+}
+#endif
+#endif
+
+int-t sys:sigaction(int-t sig,
+                   const struct sigaction* act,
+                   struct sigaction* oact)
+{
+  int-t n;
+  n = ::sigaction(sig, act, oact);  sc(n);
+  return n;
+}
+
+int-t sys:sigpending(sigset-t* set)
+{
+  int-t n;
+  n = ::sigpending(set);  sc(n);
+  return n;
+}
+
+int-t sys:sigsuspend(const sigset-t* sigmask)
+{
+  int-t n;
+  n = ::sigsuspend(sigmask); // always returns -1 and sets `errno' to EINTR
+  return n;
+}
+
+int-t sys:sigprocmask(int-t how, const sigset-t* set, sigset-t* oset)
+{
+  int-t n;
+  n = ::sigprocmask(how, set, oset);  sc(n);
+  return n;
+}
+
+char8-t* sys:getenv(const char8-t* name)
+{
+  char8-t* p = ::getenv(name);  // can not fail
+  return p;
+}
+
+intmax-t sys:strtoimax(const char8-t* nptr, char8-t** endptr, int-t base)
+{
+  // returns 0 on failure
+  intmax-t n = ::strtoimax(nptr, endptr, base);
+  if (0 == n && 0 != errno)
+    zeroeqen(n);
+  return n;
+}
+
+uintmax-t sys:strtoumax(const char8-t* nptr, char8-t** endptr, int-t base)
+{
+  // returns 0 on failure
+  uintmax-t n = ::strtoumax(nptr, endptr, base);
+  if (0 == n && 0 != errno)
+    zeroeqen(n);
+  return n;
+}
+
+pid-t sys:getpid()
+{
+  // can not fail
+  pid-t n = ::getpid();
+  return n;
+}
+
+FILE* sys:fopen(const char8-t* path, const char8-t* mode)
+{
+  FILE* p = ::fopen(path, mode);  nulleqen(p);
+  return p;
+}
+
+int-t sys:fflush(FILE* file)
+{
+  int-t n;
+  n = ::fflush(file);  sc(n);
+  return n;
+}
+
+int-t sys:fclose(FILE* file)
+{
+  int-t n;
+  n = ::fclose(file);  sc(n);
+  return n;
+}
+
+int-t sys:fprintf(FILE* stream, const char8-t* format, ...)
+{
+  va-list-t args;
+  va-start(args, format);
+  int-t n;
+  n = ::vfprintf(stream, format, args);  sc(n);
+  va-end(args);
+  return n;
+}
+
+int-t sys:snprintf(char8-t* str, size-t size, const char8-t* format, ...)
+{
+  va-list-t args;
+  va-start(args, format);
+  int-t n;
+  n = ::vsnprintf(str, size, format, args);  sc(n);
+  va-end(args);
+  return n;
+}
+
+int-t sys:vfprintf(FILE* stream, const char8-t* format, va-list-t args)
+{
+  int-t n;
+  n = ::vfprintf(stream, format, args);  sc(n);
+  return n;
+}
+
+int-t sys:vsnprintf(char8-t* str, size-t size, const char8-t* format, va-list-t args)
+{
+  int-t n;
+  n = ::vsnprintf(str, size, format, args);  sc(n);
+  return n;
+}
+
+struct tm * sys:localtime-r(const time-t* timep, struct tm *result)
+{
+  struct tm* tm;
+  tm = ::localtime-r(timep, result);
+  return tm;
+}
+
+void sys:abort()
+{
+  mom:syslog-flush();
+  ::abort();
+  return;
+}
+
+pid-t sys:waitpid(pid-t wpid, int-t* status, int-t options)
+{
+  pid-t pid = ::waitpid(wpid, status, options);
+
+  if (0 < pid)
+    MOM-LOG-PROC("pid=%i %s::%s()", pid, __klass__, __func__);
+
+  return pid;
+}
+
+void sys:exit(int-t status)
+{
+  MOM-LOG-PROC("pid=%i %s::%s(%i)", sys:getpid(), __klass__, __func__, status);
+  ::exit(status);
+  return;
+}
+
+int-t sys:stat(const char8-t* path, struct stat *buf)
+{
+  int-t n;
+  n = ::stat(path, buf);
+  return n;
+}
+int-t sys:fstat(int-t fd, struct stat *buf)
+{
+  int-t n;
+  n = ::fstat(fd, buf);
+  return n;
+}
+int-t sys:getsockname(int-t s, struct sockaddr *name, socklen-t* namelen)
+{
+  int-t n;
+  n = ::getsockname(s, name, namelen);
+  return n;
+}
+
+int-t sys:getpeername(int-t s, struct sockaddr *name, socklen-t* namelen)
+{
+  int-t n;
+  n = ::getpeername(s, name, namelen);
+  return n;
+}
+
+int-t sys:chdir(const char8-t* path)
+{
+  int-t n;
+  n = ::chdir(path);
+  return n;
+}
+char8-t* sys:getcwd(char8-t* buf, size-t size)
+{
+  char8-t* result;
+  result = ::getcwd(buf, size);
+  return result;
+}
+
+char8-t* sys:strcat(char8-t* dest, const char8-t* src)
+{
+  char8-t* result;
+  result = ::strcat(dest, src);
+  return result;
+}
+
+char8-t* sys:strchr(const char8-t* s, int-t c)
+{
+  char8-t* result;
+  result = ::strchr(s, c);
+  return result;
+}
+
+char8-t* sys:strcpy(char8-t* dest, const char8-t* src)
+{
+  char8-t* result;
+  result = ::strcpy(dest, src);
+  return result;
+}
+
+char8-t* sys:strerror(int-t errnum)
+{
+  char8-t* result;
+  result = ::strerror(errnum);
+  return result;
+}
+
+char8-t* sys:strncpy(char8-t* dest, const char8-t* src, size-t n)
+{
+  char8-t* result;
+  result = ::strncpy(dest, src, n);
+  return result;
+}
+
+char8-t* sys:strrchr(const char8-t* s, int-t c)
+{
+  char8-t* result;
+  result = ::strrchr(s, c);
+  return result;
+}
+
+char8-t* sys:strsep(char8-t** stringp, const char8-t* delim)
+{
+  char8-t* result;
+  result = ::strsep(stringp, delim);
+  return result;
+}
+
+int-t sys:execve(const char8-t* filename, char8-t* const argv [], char8-t* const envp[])
+{
+  int-t n;
+  n = ::execve(filename, argv, envp);
+  return n;
+}
+
+int-t sys:gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+  int-t n;
+  n = ::gettimeofday(tv, tz);
+  return n;
+}
+
+char8-t* sys:strerror-r(int-t errnum, char8-t* buf, size-t l)
+{
+  int-t n;
+  n = ::strerror-r(errnum, buf, l);
+  return buf;
+}
+
+size-t sys:strftime(char8-t* s, size-t max, const char8-t* format, const struct tm *tm)
+{
+  size-t n;
+  n = ::strftime(s, max, format, tm);
+  return n;
+}
+
+void* sys:memcpy(void* dest, const void* src, size-t l)
+{
+  void* result;
+  result = ::memcpy(dest, src, l);
+  return result;
+}
+
+void* sys:memmove(void* dest, const void* src, size-t l)
+{
+  void* result;
+  result = ::memmove(dest, src, l);
+  return result;
+}
+
+int-t sys:daemon(int-t nochdir, int-t noclose)
+{
+  int-t n;
+  n = ::daemon(nochdir, noclose);
+  return n;
+}
+
+int-t sys:setpriority(int-t which, int-t who, int-t prio)
+{
+  int-t n;
+  n = ::setpriority(which, who, prio);
+  return n;  
+}
+void* sys:dlopen(const char8-t* filename, int-t flag)
+{
+  void* result;
+  result = ::dlopen(filename, flag);
+  return result;
+}
+char8-t* sys:dlerror(void)
+{
+  char8-t* result;
+  result = ::dlerror();
+  return result;
+}
+void* sys:dlsym(void* handle, const char8-t* symbol)
+{
+  void* result;
+  result = ::dlsym(handle, symbol);
+  return result;
+}
+int-t sys:dlclose(void* handle)
+{
+  int-t n;
+  n = ::dlclose(handle);
+  return n;
+}
+
+int-t sys:getopt-long(int-t argc, char8-t* const argv[], const char8-t* optstring, const xoption-t* longopts, int-t* longindex)
+{
+  int-t n;
+  n = ::getopt-long(argc, argv, optstring, longopts, longindex);
+  return n;
+}
+
+const char8-t* sys:getprogname(void)
+{
+  const char8-t* result;
+  result = ::getprogname();
+  return result;
+}
+
+void sys:setprogname(const char8-t* progname)
+{
+  ::setprogname(progname);
+  return;
+}

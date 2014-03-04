@@ -1,0 +1,100 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// include <unistd.h>;
+// include <stdlib.h>;
+// include <arpa/inet.h>;
+// include <sys/sysctl.h>;
+
+include "common.h";
+include "inet.h";
+include "tags.h";
+include "util.h";
+include "volunteer-uc.h";
+
+klass connection;
+klass cstring;
+klass event;
+klass event-queue;
+klass fd;
+klass msg;
+klass msg-id;
+klass cstring;
+klass xin4-addr;
+klass xin-port;
+klass xsa-family;
+klass xsockaddr-in4;
+
+noexport object-t uc-connection = NULL;
+
+int32-t work-count-max = 3; // hackhack
+
+static void __attribute__((constructor)) initializer()
+{
+#if 0
+  if (0 == (work-count-max = int32-getenv("DE_WORK_COUNT_MAX", 0)))
+  {
+    int32-t cpu-count-max;
+    size-t cpu-count-max-size = sizeof(cpu-count-max);
+    int32-t n = sysctlbyname("hw.logicalcpu", &cpu-count-max, &cpu-count-max-size, NULL, 0); sc(n);
+    work-count-max = 2 * cpu-count-max;
+    // hw.logicalcpu can change as the power managment mode changes
+    // eventually these power management mode changes will be kqueue events
+  }
+  //MOM-LOG(mom:LOG-GENERIC-FLAG, "work-count-max: %i", cpu-count-max);
+#endif
+  return;
+}
+
+int32-t work-count = 0;
+
+
+object-t ms-rcv-msg-callback(object-t ms-connection,
+                             object-t have-work-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(ms-connection), have-work-msg->tag, __klass__, __func__);
+  match(have-work, dk:tag(have-work-msg));
+  // do not dk:remove() since we want to get future multicast msgs
+  // could be have-no-work
+  xsockaddr-in4-t sin = xsockaddr-in4-create(xin4-addr:k-any, 0);
+
+  sin.sin-addr = dk:peer-addr(ms-connection);
+  cstring-t have-work-msg-str = dk:val(have-work-msg);
+  MOM-LOG-INFO("hex-port=%s", have-work-msg-str.ptr);
+  sin.sin-port = port-from-hex-string(have-work-msg-str.ptr, 0);
+
+  sin4-dump(sin);
+  sin4-dump(sin);
+  sin4-dump(sin);
+
+//   char8-t addrstr[INET-ADDRSTRLEN + (1)];  addrstr[0] = (char8-t)0;
+//   in4-ntop(&ms-connection->sin.sin-addr, addrstr, sizeof(addrstr) - (1));
+//   MOM-LOG-HOST("%s:0x%x", addrstr, port);
+
+  // rnrn: convert to shared connection
+
+  if (work-count-max > work-count)
+  {
+    work-count++;
+    // ms => uc bridge
+    uc-connection = make(connection:klass, callback => uc-rcv-msg-callback);
+    fd-t n = dk:establish(uc-connection, sin, connection:k-client);  sc(n);
+    MOM-LOG-FD("fd=%i #volunteer-uc-fd", dk:fd(uc-connection));
+    object-t need-work-msg = make(msg:klass, tag => need-work);
+    dk:snd-msg(uc-connection, need-work-msg);
+  }
+  return ms-connection;
+}

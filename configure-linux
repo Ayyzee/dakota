@@ -1,0 +1,8 @@
+#!/bin/sh -u
+
+sysname=linux
+
+cp config-$sysname.h include/config.h
+cp config-$sysname.mk config.mk
+cp config-$sysname.sh config.sh
+cp .gdbinit-$sysname src/.gdbinit

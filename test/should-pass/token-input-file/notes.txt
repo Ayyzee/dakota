@@ -1,0 +1,24 @@
+tokenize horizontal whitespace (one or more contigious)
+tokenize vertical whitespace (one or more contigious)
+
+tokenize //...\n
+tokenize /*...*/
+
+separate state machine for cpp & cxx
+
+\\n
+
+# define < foo.h >
+# define " foo.h "
+
+\n
+\s*#\s*cpp-keyword ... \n
+
+where are escapes used in cpp/cxx?
+  cpp:
+    \\n
+
+  cxx:
+    \\n
+    " \\ \" "
+    " \r\n\t... "

@@ -1,0 +1,20 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  export enum t1-t
+  {
+    k-no = 0,
+    k-yes = 1
+  }
+
+  slots
+  {
+    t1-t s1;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

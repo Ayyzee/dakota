@@ -1,0 +1,13 @@
+rootdir := ../../..
+
+include $(rootdir)/config.mk
+
+all: bin/test
+
+bin/test: test.dk
+	dakota --output $@ $^
+
+check: bin/test
+
+clean:
+	rm -rf obj bin *~

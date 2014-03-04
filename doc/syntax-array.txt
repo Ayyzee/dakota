@@ -1,0 +1,15 @@
+in C:
+
+int
+foo(int foo[])
+{
+
+}
+
+in Dakota:
+
+int
+foo(int[] foo)
+{
+
+}

@@ -1,0 +1,77 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "3-node-deque"
+{
+  graph [ label = "\G", fontcolor = red ];
+  //graph [ rankdir = "LR", center = true, rotate = 90, size = "10,7.5" ];
+  graph [ rankdir = "LR", center = true, size = "7.5,10" ];
+  node [ shape = plaintext ];
+//   edge [ constraint = false ];
+
+  "r" [ label =
+ 		<
+		<table>
+			<tr><td port="first">first</td></tr>
+			<tr><td port="last">last</td></tr>
+		</table>
+		>
+  ];
+
+  "n1" [ label =
+ 		<
+		<table>
+			<tr><td port="element">element</td></tr>
+			<tr><td port="prev">prev</td></tr>
+			<tr><td port="next">next</td></tr>
+		</table>
+		>
+  ];
+  "n2" [ label =
+ 		<
+		<table>
+			<tr><td port="element">element</td></tr>
+			<tr><td port="prev">prev</td></tr>
+			<tr><td port="next">next</td></tr>
+		</table>
+		>
+  ];
+  "n3" [ label =
+ 		<
+		<table>
+			<tr><td port="element">element</td></tr>
+			<tr><td port="prev">prev</td></tr>
+			<tr><td port="next">next</td></tr>
+		</table>
+		>
+  ];
+
+  r:first -> n1;
+  r:last -> n3;
+
+  n1:element -> "x";
+  "n1-prev-NULL" -> n1:prev [ dir = back ];
+  n1:next -> n2;
+
+  n2:element -> "y";
+  n1 -> n2:prev [ dir = back ];
+  n2:next -> n3;
+
+  n3:element -> "z";
+  n2 -> n3:prev [ dir = back ];
+  n3:next -> "n3-prev-NULL";
+
+  "n1-prev-NULL" [ label = "NULL" ];
+  "n3-prev-NULL" [ label = "NULL" ];
+}

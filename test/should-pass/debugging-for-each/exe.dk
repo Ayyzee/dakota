@@ -1,0 +1,28 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdio.h>;
+
+static int* forward-iterator(int* i)
+{
+  *i = 0;
+  return i;
+}
+
+static void* next-element(int* i)
+{
+  (*i)++;
+  if (4 > *i)
+    return (void*)*i;
+  else
+    return NULL;
+}
+
+int-t main()
+{
+  int-t o;
+  for (int* i = forward-iterator(&o); void* e = next-element(i); )
+  {
+    printf("%p\n", e);
+  }
+  return 0;
+}

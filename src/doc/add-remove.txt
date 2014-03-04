@@ -1,0 +1,14 @@
+  add()             // add if absent
+  add-absent()      // throw if present
+
+  set()             // add if absent, replace if present
+  set-absent()      // throw if present
+  set-present()     // throw if absent
+
+  remove()          // remove if present
+  remove-present()  // throw if absent
+
+  replace()         // replace if present
+  replace-present() // throw if absent
+    =>
+    set-present()

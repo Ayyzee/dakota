@@ -1,0 +1,45 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass sequence;
+
+int-t main()
+{
+  object-t sequence = dk:make(vector:klass); // ...
+
+//   for (object-t element : sequence)
+//   {
+//     // use element
+//   }
+
+  for (object-t element, iterator = dk:forward-iterator(sequence);
+       dk:has-element(iterator);
+       element = dk:next-element(iterator))
+  {
+    // use element
+    // or
+    // use get-element(), set-element()
+  }
+
+  for (object-t element, iterator = dk:forward-iterator(sequence);
+       (element = dk:next-element(iterator));
+      )
+  {
+    // use element
+    // or
+    // use get-element(), set-element()
+  }
+
+  object-t element, iterator = dk:forward-iterator(sequence);
+  while ((element = dk:next-element(iterator)))
+  {
+    // use element
+  }
+
+  return 0;
+}
+
+// for (object-t xxx : sequence)
+
+// becomes
+
+// for (object-t xxx, _iterator_ = dk:forward-iterator(sequence) ; (xxx = dk:next-element(_iterator_)) ; )

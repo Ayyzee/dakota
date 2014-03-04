@@ -1,0 +1,79 @@
+
+=>
+
+:=
+
+.. (perl/python: range)
+
+<(  )>
+
+<[  ]>
+
+<{  }>
+
+:{  }:
+
+<:  :>
+
+<+  +>
+
+-<  >-
+
+<<<  >>>
+
+<{  }>
+
+~~
+
+=~ (perl: pattern binding)
+
+!~ (perl: negated pattern binding)
+
+^^
+
+** (perl: exponentiation)
+
+@
+
+$
+
+<> (python: not equal)
+
+%%
+
+?=
+
+x (perl: repetition)
+
+<=> (perl/ruby: comparison)
+
+=== (ruby: case comparison)
+
+!~ (ruby: 
+
+.= (perl: concatenation)
+
+&&=
+||=
+**=
+
+:foo (ruby: symbol)
+
+[:] (python: slices)
+
+BEGIN {} END {}
+
+%=
+
+$=
+
+<?
+
+>?
+
+switch (c)
+  case 'a' .. 'z':
+
+typedef name = exp;
+
+`ls -l`

@@ -1,0 +1,110 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "driver-file-depends"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = TB, rotate = 0, center = true,
+        page = "8.5,11", size = "7.5,10" ];
+  edge [ dir = back ];
+  node [ shape = box, style = rounded, width = "1.25" ];
+
+  subgraph "cluster-detail"
+  {
+    graph [ label = "" ];
+
+    "y1.so.ctlg" -> "y1.so.ctlg.rep";
+    "y2.so.ctlg" -> "y2.so.ctlg.rep";
+
+    "y1.so.ctlg.rep" -> "z.rep";
+    "y2.so.ctlg.rep" -> "z.rep";
+
+    "x1.dk.rep" -> "z.rep";
+    "x2.dk.rep" -> "z.rep";
+
+    "z.rep" [ color = green ];
+
+    {
+      rank = same;
+      "y1.so.ctlg";
+      "y2.so.ctlg";
+    }
+    {
+      rank = same;
+      "x1.dk.rep";
+      "x2.dk.rep";
+      "y1.so.ctlg.rep";
+      "y2.so.ctlg.rep";
+    }
+  }
+
+  "x1.dk" -> "x1.dk.rep" [ weight = 2 ];
+  "x2.dk" -> "x2.dk.rep" [ weight = 2 ];
+
+  "x1.dk" -> "x1.cc";
+  "x2.dk" -> "x2.cc";
+
+  "x1.cc" -> "nrt/x1.cc";
+  "x2.cc" -> "nrt/x2.cc";
+
+  "y1.so" -> "y1.so.ctlg"
+  "y2.so" -> "y2.so.ctlg"
+
+  "z.rep" -> "nrt/x1.cc";
+  "z.rep" -> "nrt/x2.cc";
+  "z.rep" -> "rt/z.cc";
+
+  "x1.dk.rep" -> "nrt/x1.cc" [ weight = 2 ];
+  "x2.dk.rep" -> "nrt/x2.cc" [ weight = 2 ];
+
+  "nrt/x1.cc" -> "nrt/x1.o" [ weight = 2 ];
+  "nrt/x2.cc" -> "nrt/x2.o" [ weight = 2 ];
+  "rt/z.cc" -> "rt/z.o";
+
+  "nrt/x1.o" -> "z.so";
+  "nrt/x2.o" -> "z.so";
+  "rt/z.o" ->  "z.so";
+
+  "x1.dk" [ color = blue ];
+  "x2.dk" [ color = blue ];
+
+  "y1.so" [ color = yellow ];
+  "y2.so" [ color = yellow ];
+  "z.so"  [ color = yellow ];
+
+  {
+    rank = same;
+    "x1.cc";
+    "x2.cc";
+  }
+  {
+    rank = same;
+    "x1.dk";
+    "x2.dk";
+    "y1.so";
+    "y2.so";
+  }
+  {
+    rank = same;
+    "nrt/x1.cc";
+    "nrt/x2.cc";
+    "rt/z.cc";
+  }
+  {
+    rank = same;
+    "nrt/x1.o";
+    "nrt/x2.o";
+    "rt/z.o";
+  }
+}

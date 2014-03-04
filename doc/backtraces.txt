@@ -1,0 +1,11 @@
+dk:length()
+string:length()
+
+dk:init()
+string:va:init()
+string:init()
+
+dk:make()
+dk:init()
+string:va:init()
+string:init()

@@ -1,0 +1,80 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "compiler-driver-call-tree"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR ];
+  graph [ center = true ];
+  //graph [ rotate = 90 ];
+  graph [ size = "7.5,10" ];
+  //graph [ ratio = fill ];
+  //graph [ ordering = out ];
+  node [ shape = box ];
+  node [ height = 0.3 ];
+
+  "rt--obj-from-rep" [ color = blue ];
+  "rt--dk-from-rep" [ color = blue ];
+
+  "h-from-rep" [ color = blue ];
+  "dk-from-rep" [ color = blue ];
+
+  "rt--obj-from-rep" -> "rt--dk-from-rep";
+  "rt--dk-from-rep" -> "outfiles-from-infiles";
+  "h-from-rep" -> "outfiles-from-infiles";
+
+  "rt--obj-from-rep" -> "cc-from-dk";
+  "rt--obj-from-rep" -> "obj-from-cc";
+  "rt--obj-from-rep" -> "h-from-rep";
+  "obj-from-cc" -> "outfiles-from-infiles" [ color = green, style = dashed ];
+
+  "loop-obj-from-dk" -> "cc-from-dk";
+  "loop-obj-from-dk" -> "obj-from-cc";
+  "loop-obj-from-dk" -> "rep-from-dk";
+  "loop-obj-from-dk" -> "h-from-rep";
+  "loop-obj-from-dk" -> "dk-from-rep";
+  "dk-from-rep" -> "outfiles-from-infiles";
+  "cc-from-dk" -> "outfiles-from-infiles";
+  "dk-from-so" -> "outfiles-from-infiles" [ color = red, style = dashed ];
+  "rep-from-dk" -> "outfiles-from-infiles";
+  "outfiles-from-infiles" -> "exec-cmd" [ style = dashed ];
+  "outfiles-from-infiles" -> "";
+
+  "loop-rep-from-so" -> "dk-from-so";
+  "loop-rep-from-so" -> "rep-from-dk";
+  "loop-rep-from-dk" -> "rep-from-dk";// [ color = gray ];
+  "start" -> "loop-rep-from-dk";// [ color = gray ];
+  "start" -> "loop-obj-from-dk";
+  "start" -> "rt--obj-from-rep";
+  "start" -> "loop-rep-from-so";
+
+  "start" -> "so-from-obj";
+  "start" -> "dso-from-obj";
+  "start" -> "exe-from-obj";
+
+  "so-from-obj" -> "outfiles-from-infiles" [ color = green, style = dashed ];
+  "dso-from-obj" -> "outfiles-from-infiles" [ color = green, style = dashed ];
+  "exe-from-obj" -> "outfiles-from-infiles" [ color = green, style = dashed ];
+
+  "start" -> "loop-obj-from-cc" [ color = gray ];
+  "loop-obj-from-cc" -> "obj-from-cc" [ color = gray ];
+  "loop-obj-from-cc" [ color = gray, fontcolor = gray ];
+
+  "exec-cmd" -> "g++" [ color = green, style = dashed ];
+  "exec-cmd" -> "dakota-introspector" [ color = red, style = dashed ];
+  "g++" [ style = rounded ];
+  "dakota-introspector" [ style = rounded ];
+
+    { rank = same; "obj-from-cc"; "dso-from-obj"; "so-from-obj"; "exe-from-obj" };
+}

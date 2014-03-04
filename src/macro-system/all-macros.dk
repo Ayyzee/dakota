@@ -1,0 +1,134 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// const uint32:slots-t** len => cast(uint32-t**)strlen(str)
+//                        len => cast(uint32-t**)strlen(str)
+// should also handle more complex lhs and rhs
+// ?type-ident should be ?type
+// ?token should be something more complex
+macro ka-arg
+{
+  { ?type-ident ?ident => ?token }
+  =>
+    { ?type-ident ?ident }
+
+  { ?ident => ?token }
+  =>
+    { &__keyword:?ident, ?token }
+}
+
+macro super
+{
+  { dk : ?ident ( super ?wildcard ) }
+  =>
+    { dk:?ident((super-t){self, klass} ?wildcard) }
+}
+
+macro va-super
+{
+  { dk : va : ?ident ( super ?wildcard ) }
+  =>
+    { dk:va:?ident((super-t){self, klass} ?wildcard) }
+}
+
+macro method
+{
+  { method ?type-ident ?ident ( object-t self ?wildcard ) }
+  =>
+    { noexport ?type-ident ?ident ( object-t self ?wildcard ) }
+}
+
+macro va-method
+{
+  { method ?type-ident va : ?ident ( object-t self ?wildcard ) }
+  =>
+    { noexport ?type-ident va : ?ident ( object-t self ?wildcard ) }
+}
+
+macro slots-use
+{
+  { self . ?ident }
+  =>
+    { unbox(self)->?ident }
+}
+
+macro klass-defn
+{
+  { klass ?ident { ?wildcard } }
+  =>
+    { namespace ?ident { ?wildcard } }
+}
+
+macro klass-decl
+{
+  { klass ?ident ; }
+  =>
+    { }
+}
+
+macro superklass-decl
+{
+  { superklass ?ident ; }
+  =>
+    { }
+}
+
+macro trait-defn
+{
+  { trait ?ident { ?wildcard } }
+  =>
+    { namespace ?ident { ?wildcard } }
+}
+
+macro trait-decl
+{
+  { trait ?ident ; }
+  =>
+    { }
+}
+
+macro slots-defn
+{
+  { slots { ?wildcard } }
+  =>
+    { struct slots-t { ?wildcard } ; }
+}
+
+macro slots
+{
+  { slots ; }
+  =>
+    { struct slots-t ; }
+
+  { slots ?wildcard ; }
+  =>
+    { typedef ?wildcard slots-t ; } // will be wrong for function ptr and array types
+}
+
+// typedef int (*)(int, int) slots-t;
+macro typedef-function-ptr
+{
+  ?return-type => ?wildcard
+
+  { typedef ?return-type ( * ) ( ?wildcard ) ?ident }
+  =>
+    { typedef ?return-type ( * ?ident ) ( ?wildcard ) }
+}
+
+macro typedef-array
+{
+  ?type => ?wildcard
+
+  { typedef ?type [ ?wildcard ] slots-t }
+  =>
+      { typedef ?type slots-t [ ?wildcard ] }
+}
+
+macro for-in
+{
+  ?element => ?ident
+  ?collection => ?ident
+
+  { for (object-t ?element in ?collection) }
+  =>
+    { for (object-t _iterator_ = dk:forward-iterator(?collection); object-t ?element = dk:next(_iterator_); ) }
+}

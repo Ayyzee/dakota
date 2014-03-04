@@ -1,0 +1,31 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+
+klass sequence;
+klass output-stream;
+klass token;
+klass tokenid;
+
+int-t main(int argc, char** argv)
+{
+  for (uint32-t i = 1; NULL != argv[i]; i++)
+  {
+    const char8-t* filename = argv[i];
+//     printf("\n// %s\n", filename);
+    try
+    {
+      object-t l = make(lexer:klass, filename => filename);
+      object-t s = dk:tokenize(l);
+      for (object-t t in s)
+        dk:println(t, std-output);
+    }
+    catch (syntax-exception:klass e)
+    {
+      dk:print-shallow(e, std-error);
+      exit(EXIT-FAILURE);
+    }
+//     dk:dump(st);
+  }
+  return 0;
+}

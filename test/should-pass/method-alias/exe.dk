@@ -1,0 +1,19 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  method object-t real-method(object-t self)
+  {
+    log-method();
+    return self;
+  }
+
+  method alias(real-method) object-t alias-method(object-t self);
+}
+
+int-t main()
+{
+  object-t i = make(k1:klass);
+  dk:alias-method(i);
+  return 0;
+}

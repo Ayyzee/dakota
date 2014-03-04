@@ -1,0 +1,60 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008 Robert Nielsen <robert.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "collection-set-klasses"
+{
+// 	label = "\G";
+	graph [ rankdir = LR, size = "5,7" ];
+	node [ shape = rect, style = rounded, width = 1.75 ];
+  edge [ dir = back ];
+
+//   "collection" -> "sequence";
+//   "sequence" -> "vector";
+//   "sequence" -> "deque";
+
+// set
+  "collection" -> "hashed-set";
+  "collection" -> "sorted-set";
+
+  "set" [ color = blue ];
+  "hashed-set" -> "set" [ dir = backward ];
+  "set" -> "sorted-set";
+  { rank = same; "hashed-set"; "sorted-set"; "set" };
+
+// table
+	"hashed-set" -> "hashed-table";
+	"sorted-set" -> "sorted-table";
+
+  "table" [ color = blue ];
+  "hashed-table" -> "table" [ dir = forward ];
+  "table" -> "sorted-table";
+  { rank = same; "hashed-table"; "sorted-table"; "table" };
+
+// counted-set
+	"hashed-set" -> "hashed-counted-set";
+	"sorted-set" -> "sorted-counted-set";
+
+  "counted-set" [ color = blue ];
+  "hashed-counted-set" -> "counted-set" [ dir = forward ];
+  "counted-set" -> "sorted-counted-set";
+  { rank = same; "hashed-counted-set"; "sorted-counted-set"; "counted-set" };
+
+// JUST FOR LAYOUT PURPOSES
+  edge [ style = invis, weight = 2 ];
+  "counted-set" -> "table";
+  "hashed-counted-set" -> "hashed-table";
+  "sorted-counted-set" -> "sorted-table";
+}

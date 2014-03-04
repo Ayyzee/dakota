@@ -1,0 +1,31 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass output-stream;
+
+klass foobar
+{
+  method object-t foo(object-t self)
+	{
+    dk:print-format(std-output, "%s:%s(%s)\n", __klass__, __method__, __signature__->parameter-types);
+    return self;
+  }
+}
+
+klass foobar
+{
+  method object-t bar(object-t self)
+	{
+    dk:print-format(std-output, "%s:%s(%s)\n", __klass__, __method__, __signature__->parameter-types);
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t o = make(foobar:klass);
+
+  dk:bar(o);
+  dk:foo(o);
+
+  return 0;
+}

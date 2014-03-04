@@ -1,0 +1,32 @@
+null is a singleton of the klass null/Volumes/Users/rnielsen/dakota/dakota/doc/introspection.dot 
+
+klass vector
+{
+  void initialize(object-t kls)
+  { ... }
+
+  method alias(add-last) object-t push(object-t self, object-t element);
+  method object-t add-last(object-t self, object-t element)
+  { ... }
+
+  method alias(remove-last) object-t pop(object-t self);
+  method object-t remove-last(object-t self)
+  { ... }
+}
+
+
+selectors
+
+overloaded functions (generics/methods)
+
+multiple inheritense of state vs behavior
+
+__klass__
+__method__
+__seletor__
+
+empty?()
+add!()
+
+a few big features
+that affect many small improvements

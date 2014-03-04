@@ -1,0 +1,66 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <string.h>;
+
+klass lexer;
+klass token;
+klass tokenid;
+klass sequence; // hackhack: should be implied by use of for-each construct
+
+int-t main(int argc, char** argv)
+{
+  object-t l = make(lexer:klass, filename => argv[1]);
+  object-t seq = dk:tokenize(l);
+
+  printf("[\n");
+  for (object-t token in seq)
+  {
+    // tokenid
+    tokenid-t tokenid = dk:tokenid(token);
+    printf("  { 'tokenid' => ");
+    if (128 > tokenid)
+    {
+      printf("\'%c\'   ", tokenid);
+    }
+    else
+    {
+      char8-t[5] str = "";
+      tokenid:str-from(tokenid, str, sizeof(str) - 1);
+      printf("'%c%c%c%c'", str[0], str[1], str[2], str[3]);
+    }
+
+    // buffer
+    const char8-t* buffer = dk:buffer(token);
+    printf(", 'buffer' => ");
+    if ('\n' == buffer[0])
+    {
+      uint-t i = 0;
+      printf("'");
+      while ('\n' == buffer[i++])
+        printf("\\n");
+      printf("'");
+    }
+    else
+    {
+      // should escape embedded single quotes
+      printf("\'%s\'", buffer);
+    }
+    printf(" },\n");
+  }
+  printf("],\n");
+  return 0;
+}

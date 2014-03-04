@@ -1,0 +1,253 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <assert.h>;
+include <sys/types.h>;
+include <sys/uio.h>;
+include <unistd.h>;
+
+include "config.h";
+include "log.h";
+include "sys.h";
+
+include <sys/event.h>;
+
+#if HAVE-KQUEUE
+// __BEGIN-DECLS
+// include <sys/event.h>;
+// __END-DECLS
+
+// klass event { typedef struct kevent slots-t; }
+#define IS-SET-READ(e)  (EVFILT-READ  == (e)->filter)
+#define IS-SET-WRITE(e) (EVFILT-WRITE == (e)->filter)
+#define IS-SET-EOF(e) (EV-EOF & (e)->flags)
+#define IS-SET-ERROR(e) (EV-ERROR & (e)->flags)
+#else
+#if HAVE-EPOLL
+
+// klass event { typedef struct epoll-event slots-t; }
+#define IS-SET-READ(e)  (EPOLLIN  & (e)->events)
+#define IS-SET-WRITE(e) (EPOLLOUT & (e)->events)
+#define IS-SET-EOF(e) (EPOLLHUP & (e)->events)
+#define IS-SET-ERROR(e) (EPOLLERR & (e)->events)
+#endif
+#endif
+
+module dakota-mom;
+
+klass event-queue;
+klass fd;
+klass msg;
+klass msg-id;
+klass cstring;
+
+// odd because it just aliases struct kevent/epoll-event to slots-t
+klass event
+{
+  slots struct kevent;
+
+  export enum
+  {
+    k-null =    0,
+    k-read =    EVFILT-READ,
+    k-write =   EVFILT-WRITE,
+    k-proc =    EVFILT-PROC,
+    k-signal =  EVFILT-SIGNAL
+  };
+
+  method slots-t* init(slots-t* s)
+  {
+#if HAVE-KQUEUE
+    EV-SET(s, ~0, event:k-null, 0, 0, 0, NULL); // ident = -1, filter = 0, data = 0
+#else
+#if HAVE-EPOLL
+    dk:filter=(s, event:k-null);
+    dk:ident=(s, ~0);
+    dk:data=(s, 0);
+#endif
+#endif
+    return s;
+  }
+
+  method object-t init(object-t self)
+  {
+    self = dk:init(super);
+    init(unbox(self));
+    return self;
+  }
+
+  method int16-t filter=(slots-t* s, int16-t filter)
+  {
+#if HAVE-KQUEUE
+    s->filter = filter;
+#else
+#if HAVE-EPOLL
+    uint16-t events;
+    switch (filter)
+    {
+      case event:k-read:
+        events = EPOLLIN;// | EPOLLHUP | EPOLLERR;
+        break;
+      case event:k-write:
+        events = EPOLLOUT;// | EPOLLHUP | EPOLLERR;
+        break;
+      case event:k-signal:
+      case event:k-proc:
+      case event:k-null:
+        events = 0;
+        break;
+      default:
+      {
+        errno = EINVAL;
+        goto __failure;
+      }
+    }
+    s->events = events;
+#endif
+#endif
+  return filter;
+//  __failure:
+//  return -1;
+  }
+
+  method slots-t* set(slots-t* s,
+                      int16-t  filter,
+                      uint32-t ident,
+                      void* udata)
+  {
+#if HAVE-KQUEUE
+    EV-SET(s, ident, filter, 0, 0, 0, udata);
+#else
+#if HAVE-EPOLL
+    dk:filter=(s, filter);
+    dk:ident=(s, ident);
+    dk:data=(s, event:k-null);
+#endif
+#endif
+    return s;
+  }
+
+  method char8-t* statestr(object-t self, char8-t* buf, size-t buf-len)
+  {
+#if HAVE-KQUEUE
+    sys:snprintf(buf, buf-len, "NOT FINISHED");
+#else
+#if HAVE-EPOLL
+    uint32-t events = self.events;
+    events &= ~EPOLLERR;
+    events &= ~EPOLLHUP;
+    sys:snprintf(buf, buf-len, "events=0x%x, ident=%i, data=%i",
+                  events, dk:ident(self), dk:data(self));
+#endif
+#endif
+    return buf;
+  }
+
+  method object-t dump(object-t self)
+  {
+#if HAVE-KQUEUE
+    MOM-LOG-INFO("ident=%u, filter=%i, flags=0x%x, fflags=0x%x, data=%u, udata=%p",
+            (uint-t)self.ident, self.filter, self.flags, self.fflags, (int)self.data, self.udata);
+#else
+#if HAVE-EPOLL
+    char8-t buf[64];
+    dk:statestr(self, buf, sizeof(buf) - (1));
+    MOM-LOG-INFO("event={%s}", buf);
+#endif
+#endif
+    return self;
+  }
+
+  /*noexport*/ const uint64-t low-order = 0x00000000ffffffff;
+  /*noexport*/ const uint64-t high-order = low-order << 0x20;
+
+  method uint32-t ident(slots-t* s)
+  {
+#if HAVE-KQUEUE
+    uint32-t result = s->ident;
+#else
+#if HAVE-EPOLL
+    uint32-t result = ( s->data.u64 & low-order );
+#endif
+#endif
+    return result;
+  }
+  
+  method uint32-t data(slots-t* s)
+  {
+#if HAVE-KQUEUE
+    uint32-t result = s->data;
+#else
+#if HAVE-EPOLL
+    uint32-t result = ( s->data.u64 >> 0x20 );
+#endif
+#endif
+    return result;
+  }
+  
+  method uint32-t ident=(slots-t* s, uint32-t ident)
+  {
+#if HAVE-KQUEUE
+    s->ident = ident;
+#else
+#if HAVE-EPOLL
+    uint64-t ffident64 = ident;
+    s->data.u64 &= high-order;
+    s->data.u64 |= ffident64;
+#endif
+#endif
+    return ident;
+  }
+  
+  method uint32-t data=(slots-t* s, uint32-t data)
+  {
+#if HAVE-KQUEUE
+    s->data = data;
+#else
+#if HAVE-EPOLL
+    uint64-t data64ff = data;
+    data64ff <<= 0x20;
+    s->data.u64 &= low-order;
+    s->data.u64 |= data64ff;
+#endif
+#endif
+    return data;
+  }
+
+  method boole-t read?(slots-t* s)
+  {
+    boole-t result = IS-SET-READ(s);
+    return result;
+  }
+
+  method boole-t write?(slots-t* s)
+  {
+    boole-t result = IS-SET-WRITE(s);
+    return result;
+  }
+
+  method boole-t eof?(slots-t* s)
+  {
+    boole-t result = IS-SET-EOF(s);
+    return result;
+  }
+
+  method boole-t error?(slots-t* s)
+  {
+    boole-t result = IS-SET-ERROR(s);
+    return result;
+  }
+}

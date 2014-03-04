@@ -1,0 +1,9 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module test-1;
+
+klass k1
+{
+  export const char8-t* myname = "myrhs";
+  export enum answer-t { no = 0, yes = 1 }
+}

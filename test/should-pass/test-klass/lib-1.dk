@@ -1,0 +1,26 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module test-1;
+
+klass test-klass-superklass
+{
+}
+klass test-klass-klass
+{
+  superklass klass;
+}
+trait test-klass-trait-a
+{
+}
+trait test-klass-trait-b
+{
+}
+
+klass test-klass
+{
+  superklass  test-klass-superklass;
+  klass       test-klass-klass;
+
+  trait       test-klass-trait-a;
+  trait       test-klass-trait-b;
+}

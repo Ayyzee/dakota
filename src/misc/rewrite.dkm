@@ -1,0 +1,64 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// throw make
+// throw dk-current-exception = make
+
+__macro rewrite-throws
+{
+  {  throw make                         }
+  {  throw make dk-current-exception =  }
+}
+
+// point:box({x,y})
+// point:box((point-t){x,y})
+
+__macro rewrite-boxes
+{
+  {  $ident : box  \(                \{  ..  \}  \)  }
+  {  $1     : box  \(  \(  $1-t  \)  \{  $2  \}  \)  }
+}
+
+// __slots { .. }
+// struct slots-t { .. } ;
+
+__macro rewrite-slots
+{
+  {  __slots         \{  ..  \}      }
+  {  struct slots-t  \{  $1  \}  \;  }
+}
+
+__macro rewrite-kw-params-comma
+{
+  {  \$ $ident = ... ,  }
+  {     $1           ,  }
+}
+
+__macro rewrite-kw-params-no-comma
+{
+  {  \$ $ident = ...  }
+  {     $1            }
+}
+
+// __macro rewrite-kw-params
+// {
+//   rewrite-kw-params-comma;
+//   rewrite-kw-params-no-comma;
+// }
+
+__macro rewrite-method-body
+{
+  {  self . $ident  }
+  {  unbox  \(  self  \)  ->  $1  }
+}
+
+__macro add-method-vars($arg0, $arg1)
+{
+  {  ...  }
+  {  const char-t __method__[] = \"$arg1\" \;  $1  }
+}
+
+__macro rewrite-method-defn
+{
+  {  __method ... $qual-ident \(                   ..  \) \{                                                            ..  \} }
+  {  __method $1  $2          \( rewrite-kw-params($3) \) \{  const char-t __method__[] = \"$2\" \; rewrite-method-body($4) \} }
+}

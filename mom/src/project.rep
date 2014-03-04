@@ -1,0 +1,27 @@
+{
+  'files' => [
+    '/usr/local/lib/libdakota-util.$SO_EXT',
+    '/usr/local/lib/libdakota-x.$SO_EXT',
+    'callback.dk',
+    'compat-getprogname.dk',
+    'connection.dk',
+    'event-queue.dk',
+    'event.dk',
+    'fd.dk',
+    'handler.dk',
+    'inet.dk',
+    'kqueue-apis.dk',
+    'log.dk',
+    'module-dakota-mom.dk',
+    'msg-id.dk',
+    'msg.dk',
+    'pid.dk',
+    'process.dk',
+    'pstatus.dk',
+    'sys.dk',
+    'unnamed-pipe.dk',
+    'util.dk'
+  ],
+  'name' => 'libdakota-mom.$SO_EXT',
+  'self-file' => 'project.rep'
+}

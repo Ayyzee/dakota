@@ -1,0 +1,38 @@
+/*
+overview
+*/
+
+trait set;
+klass point
+{
+  superklass object;
+  klass klass; // how do you like them apples?
+  
+  slots;
+  slots
+  {
+    int-t x; // only whole numbers
+    int-t y;
+  }
+  slots int32-t (*)(void *, char *);
+  slots int[2];
+  slots uint32-t;
+  /*
+    method description here
+  */
+
+  method object-t init(object-t self, int-t x => 0, int-t y => 0)
+  {
+    self = dk:init(super);
+    self = dk:init(super, other-arg);
+    make(klass);
+    make(klass, name => fred, length => 4)
+    self.x
+    self.y
+    throw "hello world"
+    throw $foo-bar
+    throw $"--out--"
+  //for (object-t element in collection)
+    for (object-t element in collection)
+  }
+}

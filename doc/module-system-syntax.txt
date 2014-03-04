@@ -1,0 +1,19 @@
+
+export klass foo;
+export [klass] slots foo:slots-t|slots-t;
+
+same as
+
+export box foo;
+
+import|export [klass|trait|interface] foo;
+import|export [klass|trait|interface] method foo:size-of;
+import|export [klass] slots foo:slots-t;
+
+export klass rect;
+export klass rect { slots; method width; method height; }
+
+
+export xml:parser, xml:element;
+
+export xml:parser:slots-t, abstract-klass:alloc, string;

@@ -1,0 +1,15 @@
+in C:
+
+int
+foo(void *(*bar)(char *))
+{
+
+}
+
+in Dakota:
+
+int
+foo(void *(*)(char *) bar)
+{
+
+}

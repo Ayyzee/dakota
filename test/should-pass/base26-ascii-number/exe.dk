@@ -1,0 +1,25 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass object;
+klass klass;
+klass ascii-number;
+
+int-t main()
+{
+  int-t rtn = 0;
+
+  try
+  {
+    object-t info = dk-make-named-info($base26-ascii-number-klass, $superklass-name, $ascii-number, NULL);
+    object-t base26-ascii-number-klass = make(ascii-number-klass:klass, info => info, digits => "abcdefghijklmnopqrstuvwxyz");
+    dk:dump(base26-ascii-number-klass);
+    object-t base26-ascii-number = make(base26-ascii-number-klass, number => 42);
+    USE(base26-ascii-number);
+  }
+  catch(...)
+  {
+    fprintf(stderr, "ERROR: uncaught unknown exception was thrown\n");
+    rtn = 1;
+  }
+  return rtn;
+}

@@ -1,0 +1,85 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// macro macro-ident-1 { ?pat-var-name-a }
+
+// macro macro-ident-2
+// {
+//   pat-var-ident-1 { ?pat-var-name-a }
+//   pat-var-ident-2 { ?pat-var-name-b }
+
+//   sub-rule-ident-1 { { } => { } }
+//   sub-rule-ident-2 { { } => { } }
+
+//   { } => { }
+//   { } => { }
+// }
+
+// -alias-: ident { ?ident }
+// -sub-rule-: ident { -macro-body- }
+// -macro-: macro ident { -macro-body- }
+// -macro-body-: -alias- -sub-rule- -rule-
+// -rule-: -block- => -block-
+
+digraph "macro-system"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR, center = true ];
+
+  node [ shape = point ];
+
+//   node [ label = "" ];
+
+  00 [ label = "", shape = doublecircle ];
+  99 [ label = "", shape = doublecircle ];
+
+  00 -> 05 [ label = "macro" ];
+
+  05 -> 07 [ label = "ident", fontcolor = green ];
+
+  07 -> 10 [ label = "{" ];
+
+  10 -> 10 [ label = "alias", fontcolor = blue ];
+  10 -> 10 [ label = "rule", fontcolor = blue ];
+  10 -> 10 [ label = "sub-rule", fontcolor = blue ];
+
+  10 -> 99 [ label = "}" ];
+
+  "alias" -> 40 [ label = "ident", fontcolor = green ];
+  
+  40 -> 50 [ label = "{" ];
+  50 -> 60 [ label = "?ident", fontcolor = green ];
+  60 -> 70 [ label = "}" ];
+
+  "alias" [ shape = circle, fontcolor = blue ];
+  "sub-rule" [ shape = circle, fontcolor = blue ];
+
+  "sub-rule" -> 80 [ label = "ident", fontcolor = green ];
+  80 -> 90 [ label = "{" ];
+  90 [ label = "macro-body", fontcolor = blue ];
+  90 -> 91 [ label = "}" ];
+
+  90 -> 90 [ label = "alias", fontcolor = blue ];
+  90 -> 90 [ label = "rule", fontcolor = blue ];
+  90 -> 90 [ label = "sub-rule", fontcolor = blue ];
+
+  "rule" [ shape = circle, fontcolor = blue ];
+  "rule" -> 92 [ label = "{" ];
+  92 -> 93 [ label = "tokens", fontcolor = green ];
+  93 -> 94 [ label = "}" ];
+  94 -> 95 [ label = "=>" ];
+  95 -> 96 [ label = "{" ];
+  96 -> 97 [ label = "tokens", fontcolor = green ];
+  97 -> 98 [ label = "}" ];
+}

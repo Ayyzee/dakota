@@ -1,0 +1,78 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+module dakota;
+
+trait forward-iterator;
+
+/// first, last, at, ...
+klass sequence
+{
+  superklass collection;
+
+  method object-t write-lite(object-t self, object-t out)
+  {
+    dk:write(out, "[");
+    const char8-t* delim = "";
+
+    for (object-t element in self)
+    {
+      dk:write(out, delim);
+      dk:write-lite(element, out);
+      delim = ",";
+    }
+
+    dk:write(out, "]");
+    return self;
+  }
+
+  method object-t add-all-first(object-t self, object-t collection)
+  {
+    for (object-t element in collection)
+      dk:add-first(self, element);
+    return collection;
+  }
+
+  method object-t add-all-last(object-t self, object-t collection)
+  {
+    for (object-t element in collection)
+      dk:add-last(self, element);
+    return collection;
+  }
+
+  method object-t add-first(object-t self, object-t element);
+  method object-t add-last(object-t self, object-t element);
+  method object-t remove-first(object-t self);
+  method object-t remove-last(object-t self);
+
+  //     method uint32-t first-index(object-t self, object-t element);
+  //     method uint32-t last-index(object-t self, object-t element);
+
+  //     method object-t first(object-t self);
+  //     method object-t last(object-t self);
+  //     method object-t add-first(object-t self, object-t element);
+  //     method object-t add-last(object-t self, object-t element);
+  //     method object-t remove-first(object-t self);
+  //     method object-t remove-last(object-t self);
+  //     method object-t replace-first(object-t self, object-t element);
+  //     method object-t replace-last(object-t self, object-t element);
+  //     method object-t reverse(object-t self);
+
+  //     method object-t add-at(object-t self, uint32-t offset, object-t element);
+  //     method object-t remove-at(object-t self, uint32-t offset);
+  //     method object-t at(object-t self, uint32-t offset); // o = a[i]  vs  o = at(a, i);
+  //     method object-t replace-at(object-t self, uint32-t offset, object-t object);
+}

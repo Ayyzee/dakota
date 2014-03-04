@@ -1,0 +1,23 @@
+klass k1
+{
+  slots
+  {
+  }
+
+  method slots-t* init(slots-t* s)
+  {
+    return s;
+  }
+
+  method object-t init(object-t self)
+  {
+    self = dk:init(super);
+    init(unbox(self));
+    return self;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

@@ -1,0 +1,22 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdint.h>;
+
+klass k1
+{
+  slots
+  {
+    int32-t s1;
+  }
+
+  method slots-t* init(slots-t* s, int32-t s1 => 0)
+  {
+    s->s1 = s1;
+    return s;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

@@ -1,0 +1,8 @@
+{
+  'files' => [
+    'foo-1.dk',
+    'foo-2.dk'
+  ],
+  'name' => 'foo.$SO_EXT',
+  'self-file' => 'project.rep'
+}

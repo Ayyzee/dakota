@@ -1,0 +1,26 @@
+C#
+  Int32 x = 5; 
+
+  object o = x; // Implicit Boxing
+  x = o;        // Implicit UnBoxing
+
+  object o = (object)x; // Explicit Boxing
+  x = (Int32)o;         // Explicit UnBoxing    
+
+  value-types: created on stack (java calls these "primitive-types")
+  reference-types: created on heap
+
+  converting value-type to reference-type is boxing
+
+  in dakota:
+    rect-t r;
+    object-t o;
+
+    o = (object-t)r; // boxing
+      becomes
+    o = box(r);      // boxing
+
+    r = (rect-t)o;    // unboxing
+      becomes
+    r = unbox(o, &r); // unboxing
+

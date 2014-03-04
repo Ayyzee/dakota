@@ -1,0 +1,164 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cerrno>;
+include <cstring>;
+
+include "dakota-private.h";
+
+#if HAVE-CONFIG-H
+include "config.h";
+#endif
+
+module dakota;
+
+klass str128;
+
+klass output-stream
+{
+  STATIC const char8-t* gbl-endl = "\n";
+
+  slots
+  {
+    file-t out;
+  }
+
+  method object-t init(object-t self, file-t file => stdout)
+  {
+    self = dk:init(super);
+    self.out = file;
+    return self;
+  }
+
+  method object-t close(object-t self)
+  {
+#if defined DEBUG
+    if (stdout == self.out)
+      dk-log(DK-LOG-WARNING, "closing 'stdout'");
+    else-if (stderr == self.out)
+      dk-log(DK-LOG-WARNING, "closing 'stderr'");
+#endif // DEBUG
+    int rtn = fclose(self.out);
+
+    if (0 != rtn)
+    {
+      str128-t buf = "";
+      strerror-r(errno, buf, sizeof(buf));
+      fprintf(stderr, "%s", buf);
+      throw make(exception:klass, message => "oops");
+    }
+    return self;
+  }
+
+  // hackhack?  use print below?
+  method object-t write(object-t self, const char8-t* string)
+  {
+    uint32-t len = cast(uint32-t)safe-strlen(string);
+    fwrite(string, sizeof(char8-t), len, self.out);
+    return self;
+  }
+
+  method object-t print(object-t self, const char8-t* string)
+  {
+    uint32-t len = cast(uint32-t)safe-strlen(string);
+    fwrite(string, sizeof(char8-t), len, self.out);
+    return self;
+  }
+
+  noexport object-t pad-to-col(object-t self, uint32-t col)
+  {
+    for (uint32-t i = 0; i < col; i++)
+      dk:print(self, "  "); // two spaces per column :-) [my way]
+    return self;
+  }
+
+  method format-va-printf(2) object-t va:print-format(object-t self, const char8-t* format, va-list-t args)
+  {
+    char8-t[128] buffer = ""; // hackhack - magic number
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    dk:print(self, cast(const char8-t*)(buffer));
+    return self;
+  }
+
+  method format-va-printf(2) object-t va:println-format(object-t self, const char8-t* format, va-list-t args)
+  {
+    char8-t[128] buffer = ""; // hackhack - magic number
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    dk:println(self, cast(const char8-t*)(buffer));
+    return self;
+  }
+
+  method object-t print(object-t self, object-t object)
+  {
+    dk:print(object, self);
+    return self;
+  }
+
+  method object-t print-shallow(object-t self, object-t object)
+  {
+    dk:print-shallow(object, self);
+    return self;
+  }
+
+  method object-t println(object-t self, const char8-t* string)
+  {
+    dk:print(self, string);
+    dk:print(self, output-stream:gbl-endl);
+    return self;
+  }
+
+  method object-t println(object-t self, object-t object)
+  {
+    dk:print(self, object);
+    dk:print(self, output-stream:gbl-endl);
+    return self;
+  }
+
+  method object-t println-shallow(object-t self, object-t object)
+  {
+    dk:print-shallow(self, object);
+    dk:print(self, output-stream:gbl-endl);
+    return self;
+  }
+
+  method object-t print-in-col(object-t self, const char8-t* string, uint32-t col)
+  {
+    pad-to-col(self, col);
+    dk:print(self, string);
+    return self;
+  }
+
+  method object-t print-in-col(object-t self, object-t object, uint32-t col)
+  {
+    pad-to-col(self, col);
+    dk:print(self, object);
+    return self;
+  }
+
+  method object-t println-in-col(object-t self, const char8-t* string, uint32-t col)
+  {
+    dk:print-in-col(self, string, col);
+    dk:print(self, "\n");
+    return self;
+  }
+
+  method object-t println-in-col(object-t self, object-t object, uint32-t col)
+  {
+    dk:print-in-col(self, object, col);
+    dk:print(self, "\n");
+    return self;
+  }
+}

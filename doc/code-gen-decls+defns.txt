@@ -1,0 +1,18 @@
+box klass 'object'        slots  decl
+box klass     *           slots  decl
+box klass 'object'        slots  defn
+box klass     *           slots  defn
+    klass     *           slots  decl
+    klass     *           slots  defn
+box klass     *    export method decl
+    klass     *    export method decl
+box klass     *           method decl
+    klass     *           method decl
+
+
+
+
+box then export then non-box
+decl then defn
+export then non-export
+slots then methods

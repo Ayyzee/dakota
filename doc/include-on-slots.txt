@@ -1,0 +1,8 @@
+klass xsockaddr-in
+{
+  export slots sockaddr-in <netinet/in.h>;
+}
+klass xsockaddr-un
+{
+  export slots sockaddr-un <sys/un.h>;
+}

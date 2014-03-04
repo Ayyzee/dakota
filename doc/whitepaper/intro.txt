@@ -1,0 +1,28 @@
+Dakota
+
+[ Dakota is in developement and is planned to be released (opensource) in Aug ]
+
+Dakota is a C-dialect programming system.  It consists of three areas;
+  1) macro system that can be used to write language extensions
+  2) dynamic object system for proceedural C++ (written in the macro system)
+  3) a number of language extensions (written in the macro system)
+
+Dakota is written as a precompiler for any standard compilant C++ compiler.
+
+The Dakota object system is dynamic, klass-based, and employs single
+inheritence with the addition of traits.  It has explicit metaklasses
+which supports user level meta-programming.
+
+Other notable object system features include true keyword arguments,
+and boxing/unboxing of all primitive types.  Since the object system
+is dynamic, it benefits from instantiation rather than construction as
+its object creation model.  Also, though the object system is
+klass-based objects, after instatiation, can be utilized by its
+behavior (rather than the more limited utilization by type).  The
+phrase "duck typing" accrately describes the typing style of Dakota.
+
+hybred, not pure OO
+
+re-introducing the function
+
+

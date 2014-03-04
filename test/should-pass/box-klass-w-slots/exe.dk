@@ -1,0 +1,17 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+//include <stdint.h>;
+
+klass k1
+{
+  slots
+  {
+    int32-t s1;
+    int32-t s2;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

@@ -1,0 +1,21 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass str128;
+
+// klass k1
+// {
+//   slots
+//   {
+//     int32-t[2] fds;
+//   }
+// }
+
+klass k1
+{
+  slots int32-t[2];
+}
+
+int-t main()
+{
+  return 0;
+}

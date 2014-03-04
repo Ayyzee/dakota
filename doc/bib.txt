@@ -1,0 +1,17 @@
+
+
+["Classes: An Abstract Data Type Facility for the C Language", B. Stroustrup, CSTR-84 Bell Labs, Apr 1980]. Also in [SIGPLAN Notices (Jan 1982)].
+
+cfront: C++ to C translator
+
+c++front: Dakota to C++
+
+genealogy
+
+pragmatic
+
+declaration looks like use
+
+http://www.gotw.ca/publications/c_family_interview.htm
+
+Cointe, P.: Metaclasses are first class: the ObjVLisp model. In: Object Oriented Programming Systems Languages and Applications. (1987) 156-162

@@ -1,0 +1,12 @@
+box klass vs klass vs trait vs interface
+
+// return-type, parameter-types, exception-types
+slots-t* (struct) vs slot-t (non-array typedef) vs slot-t* (array typedef) vs object-t vs super-t
+
+void vs non-void return-type
+
+exported-method vs method vs method-other vs exported-method-other
+va-list-t vs non-va-list-t method
+
+struct slots-t vs typedef slots-t vs typedef slot-t vs typedef slot-t[]
+$rk:{slots-t*,slot-t,slot-t*}

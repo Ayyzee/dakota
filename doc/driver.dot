@@ -1,0 +1,42 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "driver"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = TB, page = "8.5,11", size = "7.5,10", center = true ];
+  node [ shape = plaintext ];
+
+  "code-generator" -> "macro-rewriter-2" [ color = gray, weight = 2 ];
+  "lexer" -> "macro-rewriter-1" [ color = gray, weight = 2 ];
+  "macro-lexer-1\nmacro-parser-1" -> "lexer" [ color = gray ];
+  "macro-lexer-1\nmacro-parser-1" -> "macro-rewriter-1" [ color = gray ];
+  "macro-lexer-2\nmacro-parser-2" -> "code-generator" [ color = gray ];
+  "macro-lexer-2\nmacro-parser-2" -> "macro-rewriter-2" [ color = gray ];
+  "macro-rewriter-1" -> "parser" [ color = gray ];
+  "macro-rewriter-2" -> "compiler" [ color = gray ];
+  "parser" -> "code-generator" [ color = gray ];
+
+  { rank = same; "macro-lexer-1\nmacro-parser-1"; "lexer" }
+  { rank = same; "macro-lexer-2\nmacro-parser-2"; "code-generator" }
+
+//   "driver" -> "code-generator";
+//   "driver" -> "compiler";
+//   "driver" -> "lexer";
+//   "driver" -> "macro-lexer-1\nmacro-parser-1";
+//   "driver" -> "macro-lexer-2\nmacro-parser-2";
+//   "driver" -> "macro-rewriter-1";
+//   "driver" -> "macro-rewriter-2";
+//   "driver" -> "parser";
+}

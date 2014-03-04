@@ -1,0 +1,33 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass sequence;
+klass assoc;
+
+int-t main()
+{
+  object-t sequence = make(vector:klass);
+  // ...
+
+  for (object-t element in sequence)
+    printf("%p\n", (void*)element);
+
+  // should rewrite to
+
+  for (object-t _iterator_ = dk:forward-iterator(sequence); object-t element = dk:next(_iterator_); )
+    printf("%p\n", (void*)element);
+
+//---
+
+  object-t table = make(sorted-table:klass);
+  // ...
+
+  for (assoc-t* assoc in table)
+    printf("%p = %p\n", (void*)assoc->key, (void*)assoc->element);
+
+  // should rewrite to
+
+  for (object-t _iterator_ = dk:forward-iterator(table); assoc-t* assoc = assoc:unbox(dk:next(_iterator_)); )
+    printf("%p = %p\n", (void*)assoc->key, (void*)assoc->element);
+
+  return 0;
+}

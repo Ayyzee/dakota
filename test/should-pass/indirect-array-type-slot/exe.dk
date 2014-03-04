@@ -1,0 +1,19 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass my-pipe
+{
+  slots int-t[2];
+}
+
+klass my-context
+{
+  slots
+  {
+    my-pipe:slots-t fds;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

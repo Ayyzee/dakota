@@ -1,0 +1,175 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cctype>;
+include <cerrno>;
+include <cstring>;
+include <cstdio>;
+
+noexport boole-t
+space?(int-t c)
+{
+  return isspace(c);
+}
+
+module dakota-util;
+
+klass str128;
+
+klass input-file
+{
+  slots
+  {
+    off-t          length;
+    off-t          current-position;
+    char8-t*       buffer;
+
+    const char8-t* filename;
+    int32-t        line;
+    int32-t        column;
+  }
+
+  method object-t init(object-t self,
+                       file-t         file =>     NULL,
+                       const char8-t* filename => NULL)
+  {
+    self = dk:init(super);
+    assert(!(NULL != file && NULL != filename)); // these are mutually exclusive
+    assert(stdout != file);
+    assert(stderr != file);
+
+    if (NULL == file && NULL == filename)
+      file = stdin; // default
+
+    if (NULL != filename)
+    {
+      file = fopen(filename, "r");
+
+      if (NULL == file)
+        throw make(system-exception:klass, errnum => errno);
+    }
+    self.filename = filename; // copycopy: should make a copy?
+    fpos-t fpos;
+    fgetpos(file, &fpos);
+    fseeko(file, 0L, SEEK-END);
+    self.length = ftello(file); // this might be longer than needed
+    fsetpos(file, &fpos);
+    self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (self.length + 1));
+    fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
+    self.buffer[self.length] = NUL;
+
+    // check for embedded NUL?
+
+    if (NULL != filename)
+      fclose(file);
+    else
+      fsetpos(file, &fpos);
+
+    self.current-position = 0;
+    self.column = 0;
+    self.line = 1;
+    return self;
+  }
+
+  method object-t dealloc(object-t self)
+  {
+    free(self.buffer);
+    object-t result = dk:dealloc(super);
+    return result;
+  }
+
+  method const char8-t* filename(object-t self)
+  {
+    return cast(const char8-t*)(self.filename);
+  }
+  
+  method object-t put-char8(object-t self, char8-t c)
+  {
+    if (0 == self.current-position)
+      throw "oops";
+    if (c != self.buffer[self.current-position - 1])
+      throw "oops";
+    self.current-position--;
+    if ('\n' == c)
+    {
+      self.line--;
+      // where is column left?
+    }
+    else
+    {
+      self.column--;
+    }
+    return null;
+  }
+
+  method char8-t get-char8(object-t self)
+  {
+    char8-t c = self.buffer[self.current-position++];
+    if (0 != c)
+    {
+      if ('\n' == c)
+      {
+        self.line++;
+        self.column = 0;
+      }
+      else
+      {
+        self.column++;
+      }
+    }
+    return c;
+  }
+
+  method object-t split(object-t self, type-predicate-t type?)
+  {
+    object-t result = make(vector:klass);
+
+    if (NULL == type?)
+      type? = space?;
+    
+    char8-t c;
+    while (1)
+    {
+      str128-t  ws-buf = "";
+      uint32-t ws-buf-pos = 0;
+      while (type?(c = dk:get-char8(self)))
+      {
+        ws-buf[ws-buf-pos] = c;
+        ws-buf-pos++;
+        ws-buf[ws-buf-pos] = NUL;
+      }
+      if (NUL == c)
+        return result;
+      dk:put-char8(self, c);
+
+      str128-t  buf = "";
+      uint32-t buf-pos = 0;
+      until (type?(c = dk:get-char8(self)))
+      {
+        buf[buf-pos] = c;
+        buf-pos++;
+        buf[buf-pos] = NUL;
+      }
+      object-t t = make(token:klass, line => self.line, column => self.column, buffer => buf);
+      dk:add-last(result, t);
+
+      if (NUL == c)
+        return result;
+    }
+    return result;
+  }
+}

@@ -1,0 +1,50 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+include <string.h>;
+
+trait t1
+{
+  method symbol-t f1(object-t self)
+	{
+    return __klass__;
+  }
+  method symbol-t f2(object-t self)
+	{
+    return __klass__;
+  }
+}
+
+trait t2
+{
+  method symbol-t f2(object-t self)
+	{
+    return __klass__;
+  }
+  method symbol-t f3(object-t self)
+	{
+    return __klass__;
+  }
+}
+
+klass k1
+{
+  trait t1;
+  trait t2;
+}
+
+int-t main()
+{
+  object-t o = make(k1:klass);
+
+  symbol-t s1 = dk:f1(o);
+  symbol-t s2 = dk:f2(o);
+  symbol-t s3 = dk:f3(o);
+
+  char buf[16] = "";
+  snprintf(buf, sizeof(buf) - 1, "%s %s %s", s1, s2, s3);
+  fprintf(stderr, "%s\n", buf);
+  assert(!strcmp("t1 t1 t2", buf));
+
+  return 0;
+}

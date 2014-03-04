@@ -1,0 +1,22 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#include <stdio.h>
+
+int-t main()
+{
+  fprintf(stderr, "pre-try{}\n");
+  try // line 8
+  {
+    fprintf(stderr, "try{}\n");
+    throw 0;
+  }
+  catch (...)
+  {
+    fprintf(stderr, "catch (...){}\n");
+  }
+  finally
+  {
+    fprintf(stderr, "finally{}\n");
+  }
+  return 0; // line 21
+}

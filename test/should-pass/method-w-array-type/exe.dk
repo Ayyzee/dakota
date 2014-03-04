@@ -1,0 +1,14 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  method object-t m1(object-t self, char8-t[7777] a1, int32-t a2)
+  {
+    return self;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

@@ -1,0 +1,16 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass features; // hackhack
+
+int-t main()
+{
+  object-t assoc = make(assoc:klass,
+                        key =>     $"key0",
+                        element => $"element0");
+
+  object-t perl-object-output-stream = make(perl-object-output-stream:klass);
+  dk:write(perl-object-output-stream, assoc);
+  dk:close(perl-object-output-stream);
+
+  return 0;
+}

@@ -1,0 +1,22 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+__macro macro-name ($arg0, $arg1)
+{
+  aaa($arg0);
+  bbb;
+  { ... }
+  { ... }
+  ccc ;
+  ddd ;
+}
+
+// __slots ;
+// struct slots-t ;
+
+// __slots $type ;
+// typedef $type slots-t ;
+
+// __slots $type [ .. ] ;
+// typedef $type slots-t [ .. ] ;
+
+// __method ... $qual_ident(..)

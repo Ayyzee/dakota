@@ -1,0 +1,4 @@
+export klass exception-handler
+{
+  export slots boole-t (*)(object-t exception);
+}

@@ -1,0 +1,32 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass features; // hackhack
+
+int-t main()
+{
+//   int-t overwrite;
+//   setenv("DK_TRACE", "", overwrite = 1);
+
+  object-t vector = make(vector:klass);
+
+  object-t o1 = make(string:klass, bytes => "mother");
+  object-t o2 = make(string:klass, bytes => "father");
+
+  dk:add-last(vector, o1);
+  dk:add-last(vector, vector);
+  dk:add-last(vector, dk:klass(vector));
+  dk:add-last(vector, null);
+  dk:add-last(vector, o2);
+
+  {
+    object-t perl-object-output-stream = make(perl-object-output-stream:klass);
+    dk:write(perl-object-output-stream, vector);
+    dk:close(perl-object-output-stream);
+  }
+//   {
+//   object-t xml-object-output-stream = make(xml-object-output-stream:klass);
+//   dk:write(xml-object-output-stream, vector);
+//   }
+
+  return 0;
+}

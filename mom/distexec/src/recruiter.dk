@@ -1,0 +1,96 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include "common.h";
+include "inet.h";
+include "recruiter-ls.h";
+include "recruiter-us.h";
+include "util.h";
+include "volunteer-ms.h";
+include "work-queue.h";
+
+klass connection;
+klass cstring;
+klass event;
+klass event-queue;
+klass fd;
+klass msg;
+klass msg-id;
+klass cstring;
+klass xin4-addr;
+klass xin-port;
+klass xsa-family;
+klass xsockaddr-in4;
+
+object-t mc-connection = NULL;
+
+object-t init-recruiter-mc(xsockaddr-in4-t mc-sin)
+{
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "%s()", __func__);
+  // mc
+  object-t mc-connection = make(connection:klass, callback => NULL);
+  fd-t n = dk:establish(mc-connection, mc-sin, connection:k-client);  sc(n);
+  fd-t mc-fd = dk:fd(mc-connection);
+  MOM-LOG-FD("fd=%i #recruiter-mc-fd", mc-fd);
+  
+  if (!sys:getenv("DE_GROUP_LOOPBACK"))
+  {
+    u-char optval = 0;
+    int32-t n = sys:setsockopt(mc-fd, IPPROTO-IP, IP-MULTICAST-LOOP, &optval, sizeof(optval)); sc(n);
+  }
+  return mc-connection;
+}
+
+xsockaddr-in4-t us-sin = xsockaddr-in4-create(xin4-addr:k-any, 0);
+
+static void __attribute__((constructor)) initializer()
+{
+  us-sin.sin-addr = addr-getenv("DE_RECRUITER_ADDR", RECRUITER-ADDR);
+  us-sin.sin-port = port-getenv("DE_RECRUITER_PORT", RECRUITER-PORT);
+  return;
+}
+
+object-t init-recruiter-us()
+{
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "%s()", __func__);
+  work-queue = make(deque:klass);
+  // us
+  object-t us-connection = make(connection:klass, callback => us-rcv-msg-callback);
+  fd-t us-fd = dk:establish(us-connection, us-sin, connection:k-server);  sc(us-fd);
+  MOM-LOG-FD("fd=%i #recruiter-us-fd", us-fd);
+  return us-connection;
+}
+
+object-t init-recruiter-ls-ss(fd-t ls-fd)
+{
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "%s()", __func__);
+  // ls
+  MOM-LOG-FD("fd=%i #recruiter-ls-fd", ls-fd);
+  object-t ls-connection = make(connection:klass, callback => ls-rcv-msg-callback);
+  fd-t fd = dk:establish(ls-connection, ls-fd, connection:k-accept);  sc(fd);
+  //assert(fd == ls-fd);
+  return ls-connection;
+}
+
+object-t init-recruiter-ls(xsockaddr-in4-t ls-sin)
+{
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "%s()", __func__);
+  // ls
+  int32-t backlog;
+  fd-t ls-fd = ucast-server(ls-sin, backlog = 1024);
+  object-t ls-connection = init-recruiter-ls-ss(ls-fd);
+  return ls-connection;
+}

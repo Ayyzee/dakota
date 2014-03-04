@@ -1,0 +1,44 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+module dakota-util;
+
+klass hashed-table
+{
+  superklass hashed-set;
+  trait      table;
+
+  object-t initialize(object-t kls)
+  {
+    dk-klass-for-name(assoc:__klass__); // hackhack
+    return kls;
+  }
+
+  object-t finalize(object-t kls)
+  {
+    return kls;
+  }
+
+  method object-t init(object-t self,
+                       equal-predicate-t equal? => cast(equal-predicate-t)dk:method-for-selector(assoc:klass, selector(equal?(object-t, object-t))),
+                       hash-t            hash =>   cast(hash-t           )dk:method-for-selector(assoc:klass, selector(hash(object-t))),
+                       object-t          elements => NULL,
+                       object-t*         items =>    NULL)
+  {
+    self = dk:init(super, equal? => equal?, hash => hash, elements => elements, items => items);
+    return self;
+  }
+}

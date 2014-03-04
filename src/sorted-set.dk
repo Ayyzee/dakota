@@ -1,0 +1,306 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cstdlib>;
+include <cstring>;
+
+include "sorted-ptr-array.h";
+
+#if DKT-WORKAROUND
+namespace sorted-ptr-array
+{
+  noexport result-t search(slots-t*, const void*);
+}
+#endif
+
+module dakota;
+
+klass sorted-ptr-array;
+klass object-output-stream;
+klass result;
+klass std-compare;
+
+klass sorted-set
+{
+  superklass collection;
+
+  trait set;
+
+  slots
+  {
+    sorted-ptr-array:slots-t sa;
+    uint32-t                         iterator-state;
+  }
+
+  STATIC const uint32-t gbl-default-capacity = 64; // shall never be 0
+
+  // 'elements' is a collection (of objects)
+  // 'items' is a NULL terminated array (of objects)
+  // using compound literals 'items' can be used as follows:
+  // dk:init(o, items => (object-t[]){ o1, o2, NULL });
+
+  method object-t init(object-t self,
+                       uint32-t          initial-capacity => gbl-default-capacity,
+                       compare-t         compare =>          dk:compare,
+                       equal-predicate-t equal? =>           dk:equal?, // bugbug: not used
+                       object-t          elements =>         NULL,
+                       object-t*         items =>            NULL)
+  {
+    assert(0 != initial-capacity);
+    assert(NULL != compare);
+    assert(NULL != equal?); // bugbug: not used
+    assert(null != elements);
+
+    self = dk:init(super);
+    self.sa.compare = cast(std-compare-t)(compare);
+    self.sa.size =    cast(uint32-t)sizeof(self.sa.elements[0]);
+    self.sa.capacity = gbl-default-capacity;
+    self.sa.elements = cast(void**)malloc(self.sa.size * self.sa.capacity);
+    self.sa.count = 0;
+
+    self.iterator-state = 0;
+
+    if (NULL != elements)
+      dk:add-all(self, elements);
+
+    if (NULL != items)
+      dk:add-items(self, items);
+    return self;
+  }
+
+  method object-t dealloc(object-t self)
+  {
+    free(self.sa.elements);
+    object-t result = dk:dealloc(super);
+    return result;
+  }
+
+  method object-t add(object-t self, object-t element)
+  {
+    self.iterator-state++;
+
+    result-t result = sorted-ptr-array:search(&self.sa, element);
+
+//     if (should-throw && NULL != result.element)
+//       throw "oops";
+
+  //if (NULL == result.element)
+    {
+      if (self.sa.count == self.sa.capacity)
+      {
+        self.sa.capacity *= 2; // the growth algorithm should be consumer setable
+        self.sa.elements = cast(void**)realloc(self.sa.elements, self.sa.size * self.sa.capacity);
+      }
+      sorted-ptr-array:add-at(&self.sa, element, result.offset);
+    }
+    return element;
+  }
+
+  method object-t empty(object-t self)
+  {
+    self.iterator-state++;
+    self.sa.count = 0; // hackhack
+    return self;
+  }
+
+  method object-t at(object-t self, object-t object1, object-t default-value)
+  {
+    object-t object2 = default-value;
+    result-t result = sorted-ptr-array:search(&self.sa, object1);
+
+    if (NULL != result.element)
+      object2 = cast(object-t)sorted-ptr-array:at(&self.sa, result.offset);
+    return object2;
+  }
+
+  method object-t at(object-t self, object-t object1)
+  {
+    object-t result = dk:at(self, object1, NULL);
+    if (NULL == result)
+      throw make(exception:klass, message => "oops");
+    return result;
+  }
+
+  method boole-t contains?(object-t self, object-t key)
+  {
+    boole-t state;
+
+    if (NULL == dk:at(self, key, NULL))
+      state = false;
+    else
+      state = true;
+    return state;
+  }
+
+  method boole-t empty?(object-t self)
+  {
+    boole-t state;
+
+    if (0 == self.sa.count)
+      state = true;
+    else
+      state = false;
+    return state;
+  }
+
+  method object-t remove(object-t self, object-t element)
+  {
+    result-t result = sorted-ptr-array:search(&self.sa, element);
+    object-t object = null;
+
+    if (NULL != result.element)
+    {
+      self.iterator-state++;
+      // element not required
+      object = cast(object-t)sorted-ptr-array:remove-at(&self.sa, element, result.offset);
+    }
+    return object;
+  }
+
+  method object-t remove-last(object-t self)
+  {
+    object-t object = NULL;
+    if (0 != self.sa.count)
+    {
+      self.iterator-state++;
+      object = cast(object-t)sorted-ptr-array:remove-last(&self.sa);
+    }
+    return object; // returns NULL on error
+  }
+
+  method object-t copy-shallow(object-t self)
+  {
+    object-t kls = dk:klass(self);
+    object-t copy = make(kls);
+    slots-t* s1 = unbox(self);
+    slots-t* s2 = unbox(copy);
+    *s2 = *s1;
+    s2->sa.elements = cast(void**)malloc(s2->sa.size * s2->sa.capacity);
+    memcpy(s2->sa.elements, s1->sa.elements, s2->sa.size * s2->sa.capacity);
+    s2->iterator-state = 0;
+    return copy;
+  }
+
+  method uint32-t size(object-t self)
+  {
+    return self.sa.count;
+  }
+
+  method object-t forward-iterator(object-t self)
+  {
+    object-t forward-iterator = make(sorted-set-forward-iterator:klass, sorted-set => self);
+    return forward-iterator;
+  }
+
+  method object-t dump(object-t self)
+  {
+    dk:dump(super);
+    fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
+            cast(void*)(self), cast(void*)unbox(self), self.sa.count, self.sa.capacity);
+    for (object-t element in self)
+      dk:dump(element);
+    return self;
+  }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+
+    dk:write-sequence-start(out, "elements");
+
+    for (object-t element in self)
+      dk:write-element-idref(out, element, NULL);
+    dk:write-sequence-end(out);
+
+    dk:write-slots-end(out);
+    return self;
+  }
+}
+
+klass sorted-set-forward-iterator
+{
+  trait forward-iterator;
+
+  slots
+  {
+    object-t sorted-set;
+    uint32-t offset;
+
+    uint32-t  iterator-state;
+  }
+
+  method object-t init(object-t self, object-t sorted-set => {})
+  {
+    self = dk:init(super);
+    assert(dk:instance?(sorted-set, sorted-set:klass));
+    sorted-set:slots-t* ss = sorted-set:unbox(sorted-set);
+    self.sorted-set = sorted-set;
+    self.offset = 0;
+    self.iterator-state = ss->iterator-state;
+    return self;
+  }
+
+  noexport void check-iterator-state(object-t self)
+  {
+    sorted-set:slots-t* ss = sorted-set:unbox(self.sorted-set);
+
+    if (self.iterator-state != ss->iterator-state)
+    {
+      fprintf(stderr, "%i == %i\n", self.iterator-state, ss->iterator-state);
+      throw make(exception:klass, message => "oops");
+    }
+    return;
+  }
+
+  method boole-t next?(object-t self)
+  {
+    check-iterator-state(self);
+    sorted-set:slots-t* ss = sorted-set:unbox(self.sorted-set);
+    boole-t result;
+    if (self.offset < ss->sa.count)
+      result = true;
+    else
+      result = false;
+    return result;
+  }
+
+  method object-t next(object-t self)
+  {
+    check-iterator-state(self);
+    object-t element = NULL;
+    if (dk:next?(self))
+    {
+      element = dk:element(self);
+      self.offset++;
+    }
+    return element;
+  }
+
+  method object-t element(object-t self)
+  {
+    check-iterator-state(self);
+    object-t element = NULL;
+    if (dk:next?(self))
+    {
+      sorted-set:slots-t* ss = sorted-set:unbox(self.sorted-set);
+      element = cast(object-t)sorted-ptr-array:at(&ss->sa, self.offset);
+      assert(NULL != element);
+    }
+    return element; // returns NULL on error
+  }
+}

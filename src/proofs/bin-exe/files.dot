@@ -1,0 +1,19 @@
+digraph
+{
+  graph [ rankdir = "TB" ];
+  graph [ label = "dakota --output bin/exe exe.dk", fontcolor = red ];
+  graph [ size = "8,8" ];
+  node [ shape = plaintext ];
+
+  "/usr/local/lib/libdakota.so" -> "obj/usr/local/lib/libdakota.so.ctlg";
+  "obj/usr/local/lib/libdakota.so.ctlg" -> "obj/usr/local/lib/libdakota.so.ctlg.rep";
+  "obj/usr/local/lib/libdakota.so.ctlg.rep" -> "obj/bin/exe.rep";
+
+  "exe.dk" -> "obj/exe.cc";
+  "exe.dk" -> "obj/exe.dk.rep" -> "obj/nrt/exe.dk" -> "obj/nrt/exe.cc" -> "obj/nrt/exe.o" -> "bin/exe";
+  "exe.dk" -> "obj/bin/exe.rep" -> "obj/rt/bin/exe.dk" -> "obj/rt/bin/exe.cc" -> "obj/rt/bin/exe.o" -> "bin/exe";
+
+  { rank = same; "obj/exe.cc"; "obj/exe.dk.rep" }
+
+  "obj/exe.cc" -> "obj/nrt/exe.cc" [ constraint = false, dir = back, color = green ];
+}

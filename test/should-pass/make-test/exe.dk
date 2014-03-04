@@ -1,0 +1,17 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass test
+{
+  method object-t init(object-t self)
+  {
+    self = dk:init(super);
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t s = make(test:klass);
+  USE(s);
+  return 0;
+}

@@ -1,0 +1,338 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// ${ key1 => element1, key2 => element2 }
+// =>
+// dk-add-all(make(DEFAULT_TABLE-KLASS),
+//                 assoc:box({box(key1), box(element1)}),
+//                 assoc:box({box(key2), box(element2)}), NULL)
+macro table-literal
+{
+  { $ { ?table-pairs } }
+  =>
+  { dk-add-all(make(DEFAULT-TABLE-KLASS) ?table-pairs, NULL) }
+
+  table-pairs
+  {
+    {} => {}
+
+    { , ?table-pair ... }
+    =>
+    { , ?table-pair ... }
+
+    { ?table-pair ... }
+    =>
+    { ?table-pair ... }
+  }
+  table-pair
+  {
+    { ?qual-ident => ?expression }
+    =>
+    { assoc:box({box(?qual-ident), box(?expression)}) }
+  }
+}
+macro keyword-args
+{
+  { ?qual-ident ( ?list1 ?kw-arg-pairs ) }
+  =>
+  { ?qual-ident ( ?list1 ?kw-arg-pairs ) }
+
+  kw-arg-pairs
+  {
+    {} => {}
+
+    { , ?type ?ident => ?expression ... }
+    =>
+    { , ?type ?ident ... }
+
+    { , ?ident => ?expression ... }
+    =>
+    { , KEYWORD(?ident) , ARG(?expression) ... }
+  }
+}
+macro box-symbol
+{
+  { symbol:box(?symbol) }
+  =>
+  { symbol:box(?symbol) }
+
+  { box(?symbol) }
+  =>
+  { symbol:box(?symbol) }
+}
+macro box-literal-cstring
+{
+  { str:box(?literal-cstring) }
+  =>
+  { str:box(?literal-cstring) }
+
+  { box(?literal-cstring) }
+  =>
+  { str:box(?literal-cstring) }
+}
+macro box
+{
+  { ?qual-ident : box ( { ?all } ) }
+  { ?qual-ident:box(cast(?qual-ident:slots-t){ ?all }) }
+}
+macro unbox-ptr
+{
+  { ?qual-ident : slots-t * ?ident = unbox ( ?all ) }
+  =>
+  { ?qual-ident:slots-t* ?ident = ?qual-ident:unbox(?all) }
+}
+macro unbox-ref
+{
+  { ?qual-ident : slots-t & ?ident = * unbox ( ?all ) }
+  =>
+  { ?qual-ident:slots-t& ?ident = *?qual-ident:unbox(?all) }
+}
+// this is wrong! leaks memory!
+macro literal-string-object
+{
+  { $ ?literal-cstring }
+  =>
+    { str:box(?literal-cstring) }
+}
+// could be handled by something like &rewrite_compound_literal()
+macro super
+{
+  { dk : ?ident ( super, ?arg-list ) }
+  =>
+  { dk:?ident(cast(super:slots-t){self, klass}, ?arg-list) }
+
+  { dk : va: ?ident ( super, ?arg-list ) }
+  =>
+  { dk:va:?ident(cast(super:slots-t){self, klass}, ?arg-list) }
+}
+macro slot-access
+{
+  { self . ?ident }
+  =>
+  { unbox ( self ) -> ?ident }
+}
+macro symbol
+{
+  { $ ?ident }
+  =>
+  { __symbol :: _ ## ?ident }
+}
+macro klass-decl
+{
+  { klass ?qual-ident ; } => {}
+}
+macro trait-decl
+{
+  { trait ?qual-ident ; } => {}
+}
+macro superklass-decl
+{
+  { superklass ?qual-ident ; } => {}
+}
+macro interpose-decl
+{
+  { interpose ?qual-ident ; } => {}
+}
+macro klass-defn
+{
+  { klass ?qual-ident { ?all } }
+  =>
+  { namespace ?qual-ident { ?all } }
+}
+macro trait-defn
+{
+  { trait ?qual-ident { ?all } }
+  =>
+  { namespace ?qual-ident { ?all } }
+}
+macro includes
+{
+  { include <?all> ; }
+  =>
+  { \# include < ## ?all ## > }
+
+  { include "?all" ; }
+  =>
+  { \# include " ## ?all ## " }
+}
+// optimization
+macro dk-klass
+{
+  { dk : klass ( ?expression ) }
+  =>
+  { ( ?expression ) -> klass }
+}
+// optimization
+macro dk-superklass
+{
+  { dk : superklass ( ?expression ) }
+  =>
+  { klass : unbox ( ?expression ) -> superklass }
+}
+macro selector
+{
+  { selector ( ?qual-ident ?parm-list ) }
+  =>
+  { *(cast(dkt-selector-function-t)(cast(selector-t* (*)?param-list) __selector:name))() }
+}
+macro char
+{
+  { unsigned char }
+  =>
+  { uchar8-t }
+
+  { signed char }
+  =>
+  { schar8-t }
+
+  { char }
+  =>
+  { char8-t }
+}
+macro int
+{
+  { unsigned int }
+  =>
+  { uint-t }
+
+  { signed int }
+  =>
+  { int-t }
+
+  { int }
+  =>
+  { int-t }
+}
+macro va-list
+{
+  { va-list }
+  =>
+  { va-list-t }
+}
+macro unless
+{
+  { unless ( ?expression ) }
+  =>
+  { if (0 == ?expression) }
+}
+macro until
+{
+  { until ( ?expression ) }
+  =>
+  { while (0 == ?expression) }
+}
+macro slots-struct
+{
+  { slots struct { ?all } }
+  =>
+  { struct slots-t { ?all }; }
+}
+macro slots-union
+{
+  { slots union { ?all } }
+  =>
+  { union slots-t { ?all }; }
+}
+macro slots-enum
+{
+  { slots enum { ?all } }
+  =>
+  { enum slots-t { ?all }; }
+}
+macro slots-typedef
+{
+  { slots ?qual-type-ident ; }
+  =>
+  { typedef ?qual-type-ident slots-t; }
+}
+macro array-type
+{
+  { ?qual-type [ ?expression ] ?ident }
+  =>
+  { ?qual-type ?ident[?expression] }
+}
+macro function-type
+{
+  { ?qual-type ( ?ptrs ) ( ?all ) ?ident }
+  =>
+  { ?qual-type (?ptrs?ident)(?all) }
+
+  // zero or more OR one or more?
+  ptrs
+  {
+    {} => {}
+
+    { * ... }
+    =>
+    { * ... }
+  }
+}
+macro make
+{
+  { make ( ?expression , ?args-in ) }
+  =>
+  { dk:init(dk:alloc(?expression), ?args-in) }
+}
+macro throw-literal-object
+{
+  { throw $ ?literal-cstring }
+  =>
+  { dkt-throw-object($ ## ?literal-cstring) }
+}
+macro throw-literal-sequence
+{
+  { throw $ [ ?all ] }
+  =>
+  { dkt-throw-object($ ## [ ?all ]) }
+}
+macro throw-literal-set
+{
+  { throw $ { ?all } }
+  =>
+    { dkt-throw-object($ ## { ?all }) }
+}
+macro throw-make
+{
+  { throw make ( ?all ) }
+  =>
+  { dkt-throw-object(make(?all)) }
+}
+macro throw-dk-init
+{
+  { throw dk : init ( ?all ) }
+  =>
+  { dkt-throw-object(dk:init(?all)) }
+}
+macro throw-box
+{
+  { throw ?qual-ident : box ( ?all ) }
+  =>
+  { dkt-throw-object(?qual-ident:box(?all)) }
+
+  { throw box ( ?all ) }
+  =>
+  { dkt-throw-object(box(?all)) }
+}
+macro throw-cstring
+{
+  { throw ?literal-cstring }
+  =>
+  { dkt-throw-str(?literal-cstring) }
+}
+macro throw-symbol
+{
+  { throw ?symbol }
+  =>
+  { dkt-throw-str(?symbol) }
+}
+macro throw-self
+{
+  { throw self }
+  =>
+  { dkt-throw-object(self) }
+}
+macro throw-klass
+{
+  { throw klass }
+  =>
+  { dkt-throw-object(klass) }
+}

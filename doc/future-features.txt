@@ -1,0 +1,20 @@
+short circuiting mono-morphic generic functions
+---
+support , (comma) on traits decl within a klass
+
+for example this:
+  trait foo;
+  trait bar;
+could be
+  trait foo, bar;
+---
+support format-va-printf() and format-va-scanf() decorators on methods and
+have them propagated through to the generic function definitions.
+
+for example this:
+  method format-va-printf(2) object-t va:print-format(object-t self, const char8-t* format, va-list-t args)
+would dictate generic functions be generated like:
+  format-va-printf(2) object-t va:print-format(object self, const char8-t* format, va-list-t)
+and
+  format-printf(2) object-t print-format(object self, const char8-t* format, ...)
+---

@@ -1,0 +1,35 @@
+klasses:
+  may have __box (box() and unbox() functions)
+  may have __slot or __slots
+  may have __superklass
+  have superklass (has-behaviour superklass-of())
+  may have __klass (aka metaklass)
+  have klass (has-behaviour klass-of())
+  have klass variable
+  may use klass variable (generally in make() and super)
+  may have __initialize
+
+  methods:
+    may have __method(s) definitions
+    may have __method(s) declarations
+    may have __method(s) definitions that use super
+    may have __trait(s)
+    may have __interface(s)
+    may have __alias(s)
+
+klasses (categories):
+
+traits (subset of klasses):
+  shall not have __klass (aka metaklass)
+  shall not have __box
+  shall not have __slot or __slots
+  shall not have __superklass
+  shall not use klass variable
+
+  methods:
+    shall not have __method(s) definitions that use super
+
+interfaces (subset of traits):
+
+  methods:
+    shall not have __method(s) definitions

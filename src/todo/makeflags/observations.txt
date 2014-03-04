@@ -1,0 +1,9 @@
+MAKEFLAGS="abc ..." -> "-abc ..."
+
+or
+
+MAKEFLAGS="-abc ..." -> "-a -b -c ..."
+
+or
+
+MAKEFLAGS="--abc ..."

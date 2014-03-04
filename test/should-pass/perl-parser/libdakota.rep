@@ -1,0 +1,6897 @@
+{
+  'keywords' => {
+    'compare' => undef,
+    'keyword' => undef,
+    'object' => undef,
+    'deque' => undef,
+    'file' => undef,
+    'equal?' => undef,
+    'size' => undef,
+    'key' => undef,
+    'fill' => undef,
+    'vector' => undef,
+    'kls' => undef,
+    'info' => undef,
+    'superkls' => undef,
+    'symbol' => undef,
+    'initial-capacity' => undef,
+    'selector' => undef,
+    'sorted-set' => undef,
+    'capacity' => undef,
+    'element' => undef,
+    'message' => undef,
+    'utf8' => undef,
+    'errnum' => undef,
+    'length' => undef,
+    'filename' => undef,
+    'start' => undef
+  },
+  'generics' => {
+    'compare' => undef,
+    'add-method-for-selector' => undef,
+    'write-element-idref' => undef,
+    'dealloc' => undef,
+    'print' => undef,
+    'key' => undef,
+    'init' => undef,
+    'println' => undef,
+    'add-at' => undef,
+    'remove-last' => undef,
+    'replace-at' => undef,
+    'int32-value' => undef,
+    'contains-all?' => undef,
+    'tokenize' => undef,
+    'utf8-from' => undef,
+    'elements' => undef,
+    'name' => undef,
+    'write-element' => undef,
+    'remove-method-for-selector' => undef,
+    'element' => undef,
+    'autorelease' => undef,
+    'hash' => undef,
+    'add-last' => undef,
+    'superklass' => undef,
+    'top' => undef,
+    'remove-first' => undef,
+    'current-pool' => undef,
+    'va:println-format' => undef,
+    'element?' => undef,
+    'alloc' => undef,
+    'add-first' => undef,
+    'instance?' => undef,
+    'assoc-at' => undef,
+    'counts' => undef,
+    'size' => undef,
+    'write-table-end' => undef,
+    'add-all-first' => undef,
+    'empty?' => undef,
+    'key=' => undef,
+    'write-slots' => undef,
+    'last' => undef,
+    'release' => undef,
+    'klass' => undef,
+    'println-format' => undef,
+    'sort' => undef,
+    'dump-methods' => undef,
+    'length' => undef,
+    'write-sequence-start' => undef,
+    'print-in-col' => undef,
+    'method-for-selector' => undef,
+    'pop' => undef,
+    'write-slots-start' => undef,
+    'write-element-id' => undef,
+    'next' => undef,
+    'remove' => undef,
+    'search' => undef,
+    'uint32-value' => undef,
+    'count-for' => undef,
+    'first?' => undef,
+    'copy' => undef,
+    'contains?' => undef,
+    'test-dump' => undef,
+    'element-at' => undef,
+    'read' => undef,
+    'write' => undef,
+    'remove-at' => undef,
+    'add-all' => undef,
+    'reverse' => undef,
+    'replace' => undef,
+    'push' => undef,
+    'print-shallow' => undef,
+    'append-sequence' => undef,
+    'println-shallow' => undef,
+    'intern' => undef,
+    'print-format' => undef,
+    'add' => undef,
+    'dump' => undef,
+    'bsearch' => undef,
+    'equal?' => undef,
+    'append' => undef,
+    'println-in-col' => undef,
+    'keys' => undef,
+    'close' => undef,
+    'check' => undef,
+    'element=' => undef,
+    'add-assoc' => undef,
+    'at' => undef,
+    'forward-iterator' => undef,
+    'empty' => undef,
+    'subklass?' => undef,
+    'boolean-value' => undef,
+    'pools' => undef,
+    'va:print-format' => undef,
+    'perform-method-for-selector' => undef,
+    'retain' => undef,
+    'write-slots-end' => undef,
+    'first' => undef,
+    'copy-shallow' => undef,
+    'remove-all' => undef,
+    'write-sequence-end' => undef,
+    'retain-all' => undef,
+    'add-all-last' => undef,
+    'write-table-start' => undef
+  },
+  'klasses' => {
+    'sorted-counted-set' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'sorted-set',
+      'methods' => {
+        'init(object-t, equal-predicate-t, compare-t)' => {
+          'ka-names' => [
+            'equal?',
+            'compare'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'equal-predicate-t'
+            ],
+            [
+              'compare-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'cast',
+              '(',
+              'equal-predicate-t',
+              ',',
+              'dk',
+              ':',
+              'method-for-selector',
+              '(',
+              'assoc',
+              ':',
+              'klass',
+              ',',
+              'selector',
+              '(',
+              'equal?',
+              '(',
+              'object-t',
+              ',',
+              'object-t',
+              ')',
+              ')',
+              ')',
+              ')'
+            ],
+            [
+              'cast',
+              '(',
+              'compare-t',
+              ',',
+              'dk',
+              ':',
+              'method-for-selector',
+              '(',
+              'assoc',
+              ':',
+              'klass',
+              ',',
+              'selector',
+              '(',
+              'compare',
+              '(',
+              'object-t',
+              ',',
+              'object-t',
+              ')',
+              ')',
+              ')',
+              ')'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        }
+      },
+      'includes' => {},
+      'traits' => [
+        'counted-set'
+      ]
+    },
+    'sequence' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'collection',
+      'methods' => {
+        'add-all-last(object-t, object-t)' => {
+          'generics' => {
+            'add-last' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-all-last'
+          ]
+        },
+        'add-last(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-last'
+          ]
+        },
+        'add-first(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-first'
+          ]
+        },
+        'remove-first(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-first'
+          ]
+        },
+        'remove-last(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        },
+        'add-all-first(object-t, object-t)' => {
+          'generics' => {
+            'add-first' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-all-first'
+          ]
+        }
+      },
+      'klass' => 'klass',
+      'includes' => {}
+    },
+    'deque-forward-iterator' => {
+      'is-defined' => 1,
+      'methods' => {
+        'element(object-t)' => {
+          'generics' => {
+            'element?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element'
+          ]
+        },
+        'init(object-t, object-t)' => {
+          'generics' => {
+            'instance?' => undef,
+            'init' => undef
+          },
+          'is-defined' => 1,
+          'ka-names' => [
+            'deque'
+          ],
+          'supers' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'next(object-t)' => {
+          'generics' => {
+            'element?' => undef,
+            'element' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'next'
+          ]
+        },
+        'element=(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element='
+          ]
+        },
+        'remove(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove'
+          ]
+        },
+        'element?(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'element?'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'deque' => 'object-t'
+          },
+          {
+            'node' => 'node:slots-t*'
+          },
+          {
+            'iterator-state' => 'uint32-t'
+          }
+        ]
+      },
+      'includes' => {},
+      'traits' => [
+        'forward-iterator'
+      ]
+    },
+    'sorted-array' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'intern(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'intern'
+          ]
+        },
+        'add(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'remove-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'remove-at'
+          ]
+        },
+        'remove-last(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        },
+        'sort(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'sort'
+          ]
+        },
+        'element-at(slots-t*, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'element-at'
+          ]
+        },
+        'add-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'add-at'
+          ]
+        },
+        'bsearch(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'bsearch'
+          ]
+        },
+        'search(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'result-t'
+          ],
+          'name' => [
+            'search'
+          ]
+        }
+      },
+      'methods' => {
+        'intern(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'intern'
+          ]
+        },
+        'add(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'remove-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'name' => [
+            'remove-at'
+          ]
+        },
+        'remove-last(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        },
+        'sort(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'sort'
+          ]
+        },
+        'element-at(slots-t*, uint32-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'name' => [
+            'element-at'
+          ]
+        },
+        'add-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'name' => [
+            'add-at'
+          ]
+        },
+        'bsearch(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'bsearch'
+          ]
+        },
+        'search(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'result-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'search'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'elements' => 'ptr-t'
+          },
+          {
+            'count' => 'uint32-t'
+          },
+          {
+            'capacity' => 'uint32-t'
+          },
+          {
+            'size' => 'uint32-t'
+          },
+          {
+            'compare' => 'std-compare-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'deque' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'sequence',
+      'methods' => {
+        'first(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'first'
+          ]
+        },
+        'add-first(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-first'
+          ]
+        },
+        'copy-shallow(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'copy-shallow'
+          ]
+        },
+        'remove-first(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-first'
+          ]
+        },
+        'top(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'top'
+          ],
+          'alias' => [
+            'last'
+          ]
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        },
+        'test-dump(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'test-dump'
+          ]
+        },
+        'last(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'last'
+          ]
+        },
+        'pop(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'pop'
+          ],
+          'alias' => [
+            'remove-last'
+          ]
+        },
+        'add(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add'
+          ],
+          'alias' => [
+            'add-last'
+          ]
+        },
+        'remove-last(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        },
+        'push(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'push'
+          ],
+          'alias' => [
+            'add-last'
+          ]
+        },
+        'reverse(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'reverse'
+          ]
+        },
+        'size(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'size'
+          ]
+        },
+        'empty?(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'empty?'
+          ]
+        },
+        'empty(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'empty'
+          ]
+        },
+        'init(object-t, object-t)' => {
+          'ka-names' => [
+            'element'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'NULL'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'add-last(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-last'
+          ]
+        },
+        'dump(object-t)' => {
+          'generics' => {
+            'write-slots' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'forward-iterator(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'forward-iterator'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'first' => 'node:slots-t*'
+          },
+          {
+            'last' => 'node:slots-t*'
+          },
+          {
+            'size' => 'uint32-t'
+          },
+          {
+            'iterator-state' => 'uint32-t'
+          }
+        ]
+      },
+      'includes' => {},
+      'traits' => [
+        'stack'
+      ]
+    },
+    'symbol-pair' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'symbol' => 'symbol-t'
+          },
+          {
+            'keyword' => 'keyword-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'file' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'FILE*'
+      },
+      'includes' => {}
+    },
+    'selector-node' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'dump'
+          ]
+        }
+      },
+      'methods' => {
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'key' => 'selector-t*'
+          },
+          {
+            'next' => 'slots-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'string' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'hash(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'name' => [
+            'hash'
+          ]
+        },
+        'intern(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'symbol-t'
+          ],
+          'name' => [
+            'intern'
+          ]
+        },
+        'boolean-value(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'boolean-value'
+          ]
+        },
+        'print(object-t, object-t)' => {
+          'generics' => {
+            'utf8-from' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots' => undef,
+            'write-slots-end' => undef,
+            'write-element' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        },
+        'length(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'length'
+          ]
+        },
+        'utf8-from(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'const',
+            'char-t',
+            '*'
+          ],
+          'name' => [
+            'utf8-from'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        },
+        'append-sequence(object-t, object-t)' => {
+          'generics' => {
+            'utf8-from' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'append-sequence'
+          ]
+        },
+        'uint32-value(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'uint32-value'
+          ]
+        },
+        'init(object-t, const char-t*, uint32-t, uint32-t)' => {
+          'ka-names' => [
+            'utf8',
+            'start',
+            'length'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ],
+            [
+              'uint32-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              '""'
+            ],
+            [
+              '0'
+            ],
+            [
+              'safe-strlen',
+              '(',
+              'utf8',
+              ')',
+              '-',
+              'start'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'tokenize(object-t, const char-t*)' => {
+          'generics' => {
+            'add-last' => undef,
+            'make' => undef,
+            'klass' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'tokenize'
+          ]
+        },
+        'append(object-t, const char-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'append'
+          ]
+        },
+        'int32-value(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'int32-t'
+          ],
+          'name' => [
+            'int32-value'
+          ]
+        },
+        'dump(object-t)' => {
+          'generics' => {
+            'dump' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'dump' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'tokenize(object-t, object-t)' => {
+          'generics' => {
+            'tokenize' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'tokenize'
+          ]
+        },
+        'append(object-t, object-t)' => {
+          'generics' => {
+            'utf8-from' => undef,
+            'append' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'append'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'ptr' => 'char-t*'
+          },
+          {
+            'len' => 'uint32-t'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'autorelease-pool-klass' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'klass',
+      'methods' => {
+        'pools(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'pools'
+          ]
+        },
+        'init(object-t, named-info-node:slots-t*)' => {
+          'generics' => {
+            'make' => undef,
+            'init' => undef
+          },
+          'is-defined' => 1,
+          'ka-names' => [
+            'info'
+          ],
+          'supers' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'named-info-node',
+              ':',
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'current-pool(object-t)' => {
+          'generics' => {
+            'top' => undef,
+            'empty?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'current-pool'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'pools' => 'object-t'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'named-enum-info' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'name' => 'const char-t*'
+          },
+          {
+            'info' => 'enum-info-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'vector-forward-iterator' => {
+      'is-defined' => 1,
+      'methods' => {
+        'element(object-t)' => {
+          'generics' => {
+            'element?' => undef,
+            'at' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element'
+          ]
+        },
+        'init(object-t, object-t)' => {
+          'generics' => {
+            'init' => undef
+          },
+          'is-defined' => 1,
+          'ka-names' => [
+            'vector'
+          ],
+          'supers' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'next(object-t)' => {
+          'generics' => {
+            'element?' => undef,
+            'element' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'next'
+          ]
+        },
+        'first?(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'first?'
+          ]
+        },
+        'element=(object-t, object-t)' => {
+          'generics' => {
+            'replace-at' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element='
+          ]
+        },
+        'element?(object-t)' => {
+          'generics' => {
+            'at' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'element?'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'vector' => 'object-t'
+          },
+          {
+            'count' => 'uint32-t'
+          },
+          {
+            'index' => 'uint32-t'
+          },
+          {
+            'iterator-state' => 'uint32-t'
+          }
+        ]
+      },
+      'includes' => {},
+      'traits' => [
+        'forward-iterator'
+      ]
+    },
+    'vector' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'sequence',
+      'methods' => {
+        'first(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'first'
+          ]
+        },
+        'replace(object-t, object-t, object-t)' => {
+          'generics' => {
+            'next' => undef,
+            'element?' => undef,
+            'element=' => undef,
+            'equal?' => undef,
+            'forward-iterator' => undef,
+            'element' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'replace'
+          ]
+        },
+        'contains?(object-t, object-t)' => {
+          'generics' => {
+            'equal?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'contains?'
+          ]
+        },
+        'add-first(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-first'
+          ]
+        },
+        'remove(object-t, object-t)' => {
+          'generics' => {
+            'equal?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove'
+          ]
+        },
+        'copy-shallow(object-t)' => {
+          'generics' => {
+            'make' => undef,
+            'klass' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'copy-shallow'
+          ]
+        },
+        'top(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'top'
+          ],
+          'alias' => [
+            'last'
+          ]
+        },
+        'at(object-t, uint32-t)' => {
+          'generics' => {
+            'make' => undef,
+            'at' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        },
+        'remove-first(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-first'
+          ]
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots' => undef,
+            'write-slots-end' => undef,
+            'write-element-idref' => undef,
+            'write-sequence-start' => undef,
+            'write-sequence-end' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        },
+        'init(object-t, uint32-t, object-t)' => {
+          'ka-names' => [
+            'initial-capacity',
+            'fill'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'gbl-default-initial-capacity'
+            ],
+            [
+              'gbl-default-fill'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'remove-at(object-t, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-at'
+          ]
+        },
+        'last(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'last'
+          ]
+        },
+        'add(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add'
+          ],
+          'alias' => [
+            'add-last'
+          ]
+        },
+        'pop(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'pop'
+          ],
+          'alias' => [
+            'remove-last'
+          ]
+        },
+        'replace-at(object-t, uint32-t, object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'replace-at'
+          ]
+        },
+        'remove-last(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        },
+        'push(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'push'
+          ],
+          'alias' => [
+            'add-last'
+          ]
+        },
+        'reverse(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'reverse'
+          ]
+        },
+        'size(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'size'
+          ]
+        },
+        'empty?(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'empty?'
+          ]
+        },
+        'add-last(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-last'
+          ]
+        },
+        'empty(object-t)' => {
+          'generics' => {
+            'next' => undef,
+            'element?' => undef,
+            'element=' => undef,
+            'forward-iterator' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'empty'
+          ]
+        },
+        'dump(object-t)' => {
+          'generics' => {
+            'dump' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'dump' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'forward-iterator(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'forward-iterator'
+          ]
+        },
+        'at(object-t, uint32-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'elements' => 'object-t*'
+          },
+          {
+            'count' => 'uint32-t'
+          },
+          {
+            'capacity' => 'uint32-t'
+          },
+          {
+            'size' => 'uint32-t'
+          },
+          {
+            'fill' => 'object-t'
+          },
+          {
+            'iterator-state' => 'uint32-t'
+          }
+        ]
+      },
+      'includes' => {},
+      'traits' => [
+        'stack'
+      ]
+    },
+    'property' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'check(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'int32-t'
+          ],
+          'name' => [
+            'check'
+          ]
+        }
+      },
+      'methods' => {
+        'check(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'int32-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'check'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'key' => 'symbol-t'
+          },
+          {
+            'element' => 'uintptr-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'symbol' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'hash(slots-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t'
+            ]
+          ],
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'name' => [
+            'hash'
+          ]
+        },
+        'length(slots-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'length'
+          ]
+        }
+      },
+      'methods' => {
+        'hash(slots-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'hash'
+          ]
+        },
+        'length(slots-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'uint32-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'length'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        }
+      },
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'const char-t*'
+      },
+      'includes' => {}
+    },
+    'selector' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'dump'
+          ]
+        }
+      },
+      'methods' => {
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'value' => 'uint32-t'
+          },
+          {
+            'return-type' => 'cstring-t'
+          },
+          {
+            'name' => 'cstring-t'
+          },
+          {
+            'parameter-types' => 'cstring-t'
+          },
+          {
+            'exception-types' => 'cstring-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'str128' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'char-t[128]'
+      },
+      'includes' => {}
+    },
+    'cstring' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'length(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'length'
+          ]
+        },
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'dump'
+          ]
+        }
+      },
+      'methods' => {
+        'length(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'uint32-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'length'
+          ]
+        },
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots' => undef,
+            'write-slots-end' => undef,
+            'write-element' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'ptr' => 'const char-t*'
+          },
+          {
+            'len' => 'uint32-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'sorted-set-forward-iterator' => {
+      'is-defined' => 1,
+      'methods' => {
+        'element(object-t)' => {
+          'generics' => {
+            'element?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element'
+          ]
+        },
+        'init(object-t, object-t)' => {
+          'generics' => {
+            'instance?' => undef,
+            'init' => undef
+          },
+          'is-defined' => 1,
+          'ka-names' => [
+            'sorted-set'
+          ],
+          'supers' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'next(object-t)' => {
+          'generics' => {
+            'element?' => undef,
+            'element' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'next'
+          ]
+        },
+        'element?(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'element?'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'sorted-set' => 'object-t'
+          },
+          {
+            'offset' => 'uint32-t'
+          },
+          {
+            'iterator-state' => 'uint32-t'
+          }
+        ]
+      },
+      'includes' => {},
+      'traits' => [
+        'forward-iterator'
+      ]
+    },
+    'result' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'element' => 'const-ptr-t'
+          },
+          {
+            'offset' => 'uint32-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'keyword' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'uintptr-t'
+      },
+      'includes' => {
+        '<stdint.h>' => {
+          'keyword' => undef
+        }
+      }
+    },
+    'object' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'hash(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'name' => [
+            'hash'
+          ]
+        },
+        'dealloc(object-t)' => {
+          'generics' => {
+            'release' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dealloc'
+          ]
+        },
+        'copy(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'copy'
+          ]
+        },
+        'println(object-t, object-t)' => {
+          'generics' => {
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'println'
+          ]
+        },
+        'print(object-t, object-t)' => {
+          'generics' => {
+            'utf8-from' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        },
+        'instance?(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'instance?'
+          ]
+        },
+        'equal?(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'equal?'
+          ]
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots-end' => undef,
+            'write-element-idref' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        },
+        'autorelease(object-t)' => {
+          'generics' => {
+            'add' => undef,
+            'current-pool' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'autorelease'
+          ]
+        },
+        'release(object-t)' => {
+          'generics' => {
+            'dealloc' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'release'
+          ]
+        },
+        'perform-method-for-selector(object-t, selector-t*)' => {
+          'generics' => {
+            'method-for-selector' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'selector-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'perform-method-for-selector'
+          ]
+        },
+        'dump(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'utf8-from(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'const',
+            'char-t',
+            '*'
+          ],
+          'name' => [
+            'utf8-from'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        },
+        'retain(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'retain'
+          ]
+        }
+      },
+      'exported-methods' => {
+        'init(object-t)' => {
+          'is-defined' => 1,
+          'is-exported' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'klass' => 'object-t'
+          },
+          {
+            'retain-count' => 'uint32-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {},
+      'has-exported-behavior' => 1
+    },
+    'named-info-node' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'at(slots-t*, symbol-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'symbol-t'
+            ]
+          ],
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        },
+        'search(slots-t*, symbol-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'symbol-t'
+            ]
+          ],
+          'return-type' => [
+            'property',
+            ':',
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'search'
+          ]
+        },
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'sort(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'sort'
+          ]
+        },
+        'check(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'int32-t'
+          ],
+          'name' => [
+            'check'
+          ]
+        },
+        'at(slots-t*, symbol-t, uintptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'symbol-t'
+            ],
+            [
+              'uintptr-t'
+            ]
+          ],
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        }
+      },
+      'methods' => {
+        'at(slots-t*, symbol-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'symbol-t'
+            ]
+          ],
+          'name' => [
+            'at'
+          ]
+        },
+        'search(slots-t*, symbol-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'property',
+            ':',
+            'slots-t',
+            '*'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'symbol-t'
+            ]
+          ],
+          'name' => [
+            'search'
+          ]
+        },
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'sort(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'sort'
+          ]
+        },
+        'check(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'int32-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'check'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        },
+        'at(slots-t*, symbol-t, uintptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'symbol-t'
+            ],
+            [
+              'uintptr-t'
+            ]
+          ],
+          'name' => [
+            'at'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'elements' => 'property:slots-t*'
+          },
+          {
+            'count' => 'uint32-t'
+          },
+          {
+            'next' => 'slots-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'no-such-keyword-exception' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'exception',
+      'methods' => {
+        'init(object-t, object-t, selector-t*, symbol-t)' => {
+          'generics' => {
+            'init' => undef
+          },
+          'is-defined' => 1,
+          'ka-names' => [
+            'object',
+            'selector',
+            'symbol'
+          ],
+          'supers' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'selector-t',
+              '*'
+            ],
+            [
+              'symbol-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'dump(object-t)' => {
+          'generics' => {
+            'dump' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'dump' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'print(object-t, object-t)' => {
+          'generics' => {
+            'print-format' => undef,
+            'name' => undef,
+            'klass' => undef,
+            'instance?' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'print' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'object' => 'object-t'
+          },
+          {
+            'selector' => 'selector-t*'
+          },
+          {
+            'keyword' => 'keyword-t'
+          },
+          {
+            'symbol' => 'symbol-t'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'collection' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'object',
+      'methods' => {
+        'add-all(object-t, const char-t*const*)' => {
+          'generics' => {
+            'make' => undef,
+            'add' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*',
+              'const',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-all'
+          ]
+        },
+        'add(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'forward-iterator(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'forward-iterator'
+          ]
+        },
+        'add-all(object-t, object-t)' => {
+          'generics' => {
+            'add' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-all'
+          ]
+        }
+      },
+      'klass' => 'klass',
+      'includes' => {},
+      'traits' => [
+        'forward-iterator'
+      ]
+    },
+    'node' => {
+      'is-defined' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'element' => 'object-t'
+          },
+          {
+            'prev' => 'slots-t*'
+          },
+          {
+            'next' => 'slots-t*'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'sorted-ptr-array' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'intern(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'intern'
+          ]
+        },
+        'add(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'remove-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'remove-at'
+          ]
+        },
+        'remove-last(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        },
+        'sort(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'sort'
+          ]
+        },
+        'element-at(slots-t*, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'element-at'
+          ]
+        },
+        'add-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'add-at'
+          ]
+        },
+        'bsearch(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'name' => [
+            'bsearch'
+          ]
+        },
+        'search(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'return-type' => [
+            'result-t'
+          ],
+          'name' => [
+            'search'
+          ]
+        }
+      },
+      'methods' => {
+        'intern(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'intern'
+          ]
+        },
+        'add(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'remove-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'name' => [
+            'remove-at'
+          ]
+        },
+        'remove-last(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        },
+        'sort(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'sort'
+          ]
+        },
+        'element-at(slots-t*, uint32-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'name' => [
+            'element-at'
+          ]
+        },
+        'add-at(slots-t*, const-ptr-t, uint32-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'name' => [
+            'add-at'
+          ]
+        },
+        'bsearch(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'const-ptr-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'bsearch'
+          ]
+        },
+        'search(slots-t*, const-ptr-t)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'result-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const-ptr-t'
+            ]
+          ],
+          'name' => [
+            'search'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'elements' => 'ptr-t*'
+          },
+          {
+            'count' => 'uint32-t'
+          },
+          {
+            'capacity' => 'uint32-t'
+          },
+          {
+            'size' => 'uint32-t'
+          },
+          {
+            'compare' => 'std-compare-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'boolean' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'bool'
+      },
+      'includes' => {}
+    },
+    'uint32' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots' => undef,
+            'write-slots-end' => undef,
+            'write-element' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        }
+      },
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'uint32-t'
+      },
+      'includes' => {
+        '<stdint.h>' => {
+          'uint32' => undef
+        }
+      }
+    },
+    'slots-info' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'type' => 'symbol-t'
+          },
+          {
+            'size' => 'uint32-t'
+          },
+          {
+            'name' => 'symbol-t'
+          },
+          {
+            'offset' => 'uint32-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'method' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'object-t(*)(object-t)'
+      },
+      'includes' => {}
+    },
+    'output-stream' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'va:println-format(object-t, const char-t*, va-list-t)' => {
+          'generics' => {
+            'println' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ],
+            [
+              'va-list-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'is-va' => 1,
+          'name' => [
+            'va',
+            ':',
+            'println-format'
+          ],
+          'attributes' => [
+            'format-va-printf'
+          ]
+        },
+        'print(object-t, const char-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        },
+        'print-in-col(object-t, const char-t*, uint32-t)' => {
+          'generics' => {
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print-in-col'
+          ]
+        },
+        'println-shallow(object-t, object-t)' => {
+          'generics' => {
+            'print-shallow' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'println-shallow'
+          ]
+        },
+        'println(object-t, object-t)' => {
+          'generics' => {
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'println'
+          ]
+        },
+        'print-shallow(object-t, object-t)' => {
+          'generics' => {
+            'print-shallow' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print-shallow'
+          ]
+        },
+        'print(object-t, object-t)' => {
+          'generics' => {
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        },
+        'va:print-format(object-t, const char-t*, va-list-t)' => {
+          'generics' => {
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ],
+            [
+              'va-list-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'is-va' => 1,
+          'name' => [
+            'va',
+            ':',
+            'print-format'
+          ],
+          'attributes' => [
+            'format-va-printf'
+          ]
+        },
+        'println-in-col(object-t, const char-t*, uint32-t)' => {
+          'generics' => {
+            'print-in-col' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'println-in-col'
+          ]
+        },
+        'print-in-col(object-t, object-t, uint32-t)' => {
+          'generics' => {
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print-in-col'
+          ]
+        },
+        'init(object-t, file-t)' => {
+          'ka-names' => [
+            'file'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'file-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'stdout'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'write(object-t, const char-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write'
+          ]
+        },
+        'println-in-col(object-t, object-t, uint32-t)' => {
+          'generics' => {
+            'print-in-col' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'println-in-col'
+          ]
+        },
+        'close(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'close'
+          ]
+        },
+        'println(object-t, const char-t*)' => {
+          'generics' => {
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'println'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'out' => 'file-t'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'symbol-assoc-node' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'dump'
+          ]
+        }
+      },
+      'methods' => {
+        'dump(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'compare' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'key' => 'symbol-t'
+          },
+          {
+            'element' => 'uintptr-t'
+          },
+          {
+            'next' => 'slots-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'object-output-stream' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'output-stream',
+      'methods' => {
+        'write-table-start(object-t, const char-t*)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-table-start'
+          ]
+        },
+        'write-element-idref(object-t, object-t, const char-t*)' => {
+          'generics' => {
+            'write-table-end' => undef,
+            'utf8-from' => undef,
+            'add' => undef,
+            'at' => undef,
+            'write-element' => undef,
+            'write-table-start' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-element-idref'
+          ]
+        },
+        'write-slots-end(object-t)' => {
+          'generics' => {
+            'write-table-end' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots-end'
+          ]
+        },
+        'write-element(object-t, const char-t*, const char-t*)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-element'
+          ]
+        },
+        'write-sequence-end(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-sequence-end'
+          ]
+        },
+        'write-slots-start(object-t, object-t)' => {
+          'generics' => {
+            'name' => undef,
+            'write-element' => undef,
+            'write-table-start' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots-start'
+          ]
+        },
+        'write-sequence-start(object-t, const char-t*)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-sequence-start'
+          ]
+        },
+        'write-element(object-t, int32-t, const char-t*)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'int32-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-element'
+          ]
+        },
+        'write-table-end(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-table-end'
+          ]
+        },
+        'init(object-t, file-t)' => {
+          'ka-names' => [
+            'file'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'make' => undef,
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'file-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'stdout'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'write(object-t, object-t)' => {
+          'generics' => {
+            'write-table-end' => undef,
+            'write-element-id' => undef,
+            'write-table-start' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write'
+          ]
+        },
+        'write-element-id(object-t, object-t)' => {
+          'generics' => {
+            'write-slots' => undef,
+            'write-element-id' => undef,
+            'utf8-from' => undef,
+            'remove' => undef,
+            'add' => undef,
+            'element' => undef,
+            'contains?' => undef,
+            'remove-last' => undef,
+            'write-sequence-start' => undef,
+            'at' => undef,
+            'write-sequence-end' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-element-id'
+          ]
+        },
+        'write-element(object-t, uint32-t, const char-t*)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-element'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'objects' => 'object-t'
+          },
+          {
+            'object-from-id' => 'object-t'
+          },
+          {
+            'id' => 'uint32-t'
+          },
+          {
+            'id-from-object' => 'object-t'
+          }
+        ]
+      },
+      'klass' => 'klass',
+      'includes' => {}
+    },
+    'const-info' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'name' => 'const char-t*'
+          },
+          {
+            'type' => 'const char-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'sorted-set' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'collection',
+      'methods' => {
+        'at(object-t, object-t)' => {
+          'generics' => {
+            'make' => undef,
+            'at' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        },
+        'contains?(object-t, object-t)' => {
+          'generics' => {
+            'at' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'contains?'
+          ]
+        },
+        'copy-shallow(object-t)' => {
+          'generics' => {
+            'make' => undef,
+            'klass' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'copy-shallow'
+          ]
+        },
+        'remove(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove'
+          ]
+        },
+        'init(object-t, equal-predicate-t, uint32-t, compare-t)' => {
+          'ka-names' => [
+            'equal?',
+            'initial-capacity',
+            'compare'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'equal-predicate-t'
+            ],
+            [
+              'uint32-t'
+            ],
+            [
+              'compare-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'dk',
+              ':',
+              'equal?'
+            ],
+            [
+              'gbl-default-capacity'
+            ],
+            [
+              'dk',
+              ':',
+              'compare'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots' => undef,
+            'write-slots-end' => undef,
+            'write-element-idref' => undef,
+            'write-sequence-start' => undef,
+            'write-sequence-end' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        },
+        'size(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'size'
+          ]
+        },
+        'empty?(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'empty?'
+          ]
+        },
+        'at(object-t, object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        },
+        'add(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'empty(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'empty'
+          ]
+        },
+        'forward-iterator(object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'forward-iterator'
+          ]
+        },
+        'remove-last(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-last'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'sa' => 'sorted-ptr-array:slots-t'
+          },
+          {
+            'iterator-state' => 'uint32-t'
+          }
+        ]
+      },
+      'includes' => {},
+      'traits' => [
+        'set'
+      ]
+    },
+    'enum-info' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'name' => 'const char-t*'
+          },
+          {
+            'value' => 'const char-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'va-method' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'is-exported' => 1,
+        'type' => 'object-t(*)(object-t,...)'
+      },
+      'includes' => {}
+    },
+    'autorelease-pool' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'release(object-t)' => {
+          'generics' => {
+            'dealloc' => undef,
+            'release' => undef,
+            'pop' => undef,
+            'klass' => undef,
+            'pools' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'release'
+          ]
+        },
+        'init(object-t)' => {
+          'generics' => {
+            'push' => undef,
+            'make' => undef,
+            'klass' => undef,
+            'pools' => undef,
+            'init' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'add(object-t, object-t)' => {
+          'generics' => {
+            'add' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'dealloc(object-t)' => {
+          'generics' => {
+            'dealloc' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'dealloc' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dealloc'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'counted-elements' => 'object-t'
+          }
+        ]
+      },
+      'klass' => 'autorelease-pool-klass',
+      'includes' => {}
+    },
+    'super' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'object' => 'object-t'
+          },
+          {
+            'klass' => 'object-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'sorted-table' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'sorted-set',
+      'methods' => {
+        'init(object-t, equal-predicate-t, compare-t)' => {
+          'ka-names' => [
+            'equal?',
+            'compare'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'equal-predicate-t'
+            ],
+            [
+              'compare-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'cast',
+              '(',
+              'equal-predicate-t',
+              ',',
+              'dk',
+              ':',
+              'method-for-selector',
+              '(',
+              'assoc',
+              ':',
+              'klass',
+              ',',
+              'selector',
+              '(',
+              'equal?',
+              '(',
+              'object-t',
+              ',',
+              'object-t',
+              ')',
+              ')',
+              ')',
+              ')'
+            ],
+            [
+              'cast',
+              '(',
+              'compare-t',
+              ',',
+              'dk',
+              ':',
+              'method-for-selector',
+              '(',
+              'assoc',
+              ':',
+              'klass',
+              ',',
+              'selector',
+              '(',
+              'compare',
+              '(',
+              'object-t',
+              ',',
+              'object-t',
+              ')',
+              ')',
+              ')',
+              ')'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        }
+      },
+      'includes' => {},
+      'traits' => [
+        'table'
+      ]
+    },
+    'klass' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'raw-methods' => {
+        'dump-methods(slots-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'slots-t',
+            '*'
+          ],
+          'name' => [
+            'dump-methods'
+          ]
+        }
+      },
+      'methods' => {
+        'add-method-for-selector(object-t, selector-t*, method-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'selector-t',
+              '*'
+            ],
+            [
+              'method-t'
+            ]
+          ],
+          'return-type' => [
+            'method-t'
+          ],
+          'name' => [
+            'add-method-for-selector'
+          ]
+        },
+        'remove-method-for-selector(object-t, selector-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'selector-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'method-t'
+          ],
+          'name' => [
+            'remove-method-for-selector'
+          ]
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots' => undef,
+            'write-slots-end' => undef,
+            'write-element-idref' => undef,
+            'write-element' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        },
+        'dump-methods(slots-t*)' => {
+          'is-defined' => 1,
+          'return-type' => [
+            'object-t'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'name' => [
+            'dump-methods'
+          ]
+        },
+        'init(object-t, named-info-node:slots-t*)' => {
+          'is-defined' => 1,
+          'ka-names' => [
+            'info'
+          ],
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'named-info-node',
+              ':',
+              'slots-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'superklass(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'superklass'
+          ]
+        },
+        'name(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'symbol-t'
+          ],
+          'name' => [
+            'name'
+          ]
+        },
+        'dump(object-t)' => {
+          'generics' => {
+            'dump' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'dump'
+          ]
+        },
+        'subklass?(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'subklass?'
+          ]
+        },
+        'utf8-from(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'const',
+            'char-t',
+            '*'
+          ],
+          'name' => [
+            'utf8-from'
+          ]
+        },
+        'method-for-selector(object-t, selector-t*)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'selector-t',
+              '*'
+            ]
+          ],
+          'return-type' => [
+            'method-t'
+          ],
+          'name' => [
+            'method-for-selector'
+          ]
+        }
+      },
+      'exported-methods' => {
+        'alloc(object-t)' => {
+          'is-defined' => 1,
+          'is-exported' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'alloc'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'methods' => 'method-t*'
+          },
+          {
+            'methods-count' => 'uint32-t'
+          },
+          {
+            'size' => 'uint32-t'
+          },
+          {
+            'offset' => 'uint32-t'
+          },
+          {
+            'superklass' => 'object-t'
+          },
+          {
+            'name' => 'symbol-t'
+          },
+          {
+            'info' => 'named-info-node:slots-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {},
+      'has-exported-behavior' => 1
+    },
+    'input-stream' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'read(object-t, ptr-t, uint32-t, uint32-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'ptr-t'
+            ],
+            [
+              'uint32-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'read'
+          ]
+        },
+        'close(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'close'
+          ]
+        },
+        'init(object-t, file-t, const char-t*)' => {
+          'ka-names' => [
+            'file',
+            'filename'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'make' => undef,
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'file-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'NULL'
+            ],
+            [
+              'NULL'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'file' => 'file-t'
+          },
+          {
+            'filename' => 'const char-t*'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'assoc' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'element(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element'
+          ]
+        },
+        'hash(object-t)' => {
+          'generics' => {
+            'hash' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'uintptr-t'
+          ],
+          'name' => [
+            'hash'
+          ]
+        },
+        'key=(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'key='
+          ]
+        },
+        'element=(object-t, object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element='
+          ]
+        },
+        'equal?(object-t, object-t)' => {
+          'generics' => {
+            'equal?' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'equal?'
+          ]
+        },
+        'write-slots(object-t, object-t)' => {
+          'generics' => {
+            'write-slots-start' => undef,
+            'write-slots' => undef,
+            'write-slots-end' => undef,
+            'write-element-idref' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'write-slots' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'write-slots'
+          ]
+        },
+        'compare(object-t, object-t)' => {
+          'generics' => {
+            'compare' => undef,
+            'instance?' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'intptr-t'
+          ],
+          'name' => [
+            'compare'
+          ]
+        },
+        'key(object-t)' => {
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'key'
+          ]
+        },
+        'init(object-t, object-t, object-t)' => {
+          'ka-names' => [
+            'key',
+            'element'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'null'
+            ],
+            [
+              'null'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'key' => 'object-t'
+          },
+          {
+            'element' => 'object-t'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    },
+    'no-such-method-exception' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'exception',
+      'methods' => {
+        'init(object-t, object-t, object-t, object-t, selector-t*)' => {
+          'ka-names' => [
+            'object',
+            'superkls',
+            'kls',
+            'selector'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'klass' => undef,
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'selector-t',
+              '*'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              'NULL'
+            ],
+            [
+              'NULL'
+            ],
+            [
+              'NULL'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'print(object-t, object-t)' => {
+          'generics' => {
+            'print-format' => undef,
+            'utf8-from' => undef,
+            'superklass' => undef,
+            'instance?' => undef,
+            'klass' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'print' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'object' => 'object-t'
+          },
+          {
+            'kls' => 'object-t'
+          },
+          {
+            'selector' => 'selector-t*'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'exception' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'object',
+      'methods' => {
+        'init(object-t, const char-t*)' => {
+          'ka-names' => [
+            'message'
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ],
+          'is-defined' => 1,
+          'generics' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'const',
+              'char-t',
+              '*'
+            ]
+          ],
+          'ka-defaults' => [
+            [
+              '__DK-NAME',
+              '(',
+              '__DK-KLASS',
+              '(',
+              'self',
+              ')',
+              ')'
+            ]
+          ],
+          'supers' => {
+            'init' => undef
+          }
+        },
+        'print(object-t, object-t)' => {
+          'generics' => {
+            'print-format' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'message' => 'const char-t*'
+          }
+        ]
+      },
+      'includes' => {}
+    },
+    'system-exception' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'superklass' => 'exception',
+      'methods' => {
+        'init(object-t, int-t)' => {
+          'generics' => {
+            'init' => undef
+          },
+          'is-defined' => 1,
+          'ka-names' => [
+            'errnum'
+          ],
+          'supers' => {
+            'init' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'int-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'init'
+          ]
+        },
+        'print(object-t, object-t)' => {
+          'generics' => {
+            'print-format' => undef,
+            'print' => undef
+          },
+          'is-defined' => 1,
+          'supers' => {
+            'print' => undef
+          },
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'print'
+          ]
+        }
+      },
+      'slots' => {
+        'info' => [
+          {
+            'errnum' => 'int-t'
+          },
+          {
+            'name' => 'const char-t*'
+          },
+          {
+            'strerror' => 'str128-t'
+          }
+        ]
+      },
+      'includes' => {
+        '<errno.h>' => {
+          'system-exception' => undef
+        }
+      }
+    },
+    'method-alias' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'slots' => {
+        'info' => [
+          {
+            'alias-selector' => 'selector-t*'
+          },
+          {
+            'method-selector' => 'selector-t*'
+          }
+        ],
+        'is-exported' => 1
+      },
+      'includes' => {}
+    }
+  },
+  'cstrings' => {
+    'bummer' => undef
+  },
+  'symbols' => {
+    'compare' => undef,
+    'deque-forward-iterator' => undef,
+    'dealloc' => undef,
+    'file' => undef,
+    'selector-node' => undef,
+    'print' => undef,
+    'if' => undef,
+    'init' => undef,
+    'key' => undef,
+    'println' => undef,
+    'contains-all?' => undef,
+    'imported-selectors-va' => undef,
+    'vector' => undef,
+    'symbol' => undef,
+    'elements' => undef,
+    'bool' => undef,
+    'name' => undef,
+    'errnum' => undef,
+    'method-selectors' => undef,
+    'autorelease' => undef,
+    'hash' => undef,
+    'add-last' => undef,
+    'superklass' => undef,
+    'exported-method-selectors' => undef,
+    'method-t' => undef,
+    'klass-name' => undef,
+    'start' => undef,
+    'has-exported-behavior' => undef,
+    'char-t[128]' => undef,
+    'va:println-format' => undef,
+    'element?' => undef,
+    'no-such-keyword-exception' => undef,
+    'instance?' => undef,
+    'node' => undef,
+    'add-first' => undef,
+    'sorted-ptr-array' => undef,
+    'write-table-end' => undef,
+    'boolean' => undef,
+    'add-all-first' => undef,
+    'empty?' => undef,
+    'output-stream' => undef,
+    'write-slots' => undef,
+    'const-info' => undef,
+    'uintptr-t' => undef,
+    'last' => undef,
+    'super' => undef,
+    'utf8' => undef,
+    'sort' => undef,
+    'length' => undef,
+    'filename' => undef,
+    'no-such-method-exception' => undef,
+    'write-sequence-start' => undef,
+    'print-in-col' => undef,
+    'method-for-selector' => undef,
+    'system-exception' => undef,
+    'method-addresses' => undef,
+    'traits' => undef,
+    'write-slots-start' => undef,
+    'interposers' => undef,
+    'next' => undef,
+    'remove' => undef,
+    'sorted-counted-set' => undef,
+    'sorted-array' => undef,
+    'first?' => undef,
+    'symbol-pair' => undef,
+    'autorelease-pool-klass' => undef,
+    'copy' => undef,
+    'method-aliases' => undef,
+    'element-at' => undef,
+    'intptr-t' => undef,
+    'vector-forward-iterator' => undef,
+    'endif' => undef,
+    'includes' => undef,
+    'write' => undef,
+    'remove-at' => undef,
+    'add-all' => undef,
+    'selector' => undef,
+    'stack' => undef,
+    'null' => undef,
+    'has-exported-state' => undef,
+    'replace' => undef,
+    'push' => undef,
+    'print-shallow' => undef,
+    'sorted-set-forward-iterator' => undef,
+    'type' => undef,
+    'result-t' => undef,
+    'const-ptr-t' => undef,
+    'object' => undef,
+    'add' => undef,
+    'bsearch' => undef,
+    ':' => undef,
+    '*' => undef,
+    'equal?' => undef,
+    'initialize' => undef,
+    'println-in-col' => undef,
+    'keys' => undef,
+    'uint32' => undef,
+    'fill' => undef,
+    'close' => undef,
+    'check' => undef,
+    'add-assoc' => undef,
+    'boolean-value' => undef,
+    'pools' => undef,
+    'perform-method-for-selector' => undef,
+    'write-slots-end' => undef,
+    'initial-capacity' => undef,
+    'autorelease-pool' => undef,
+    'message' => undef,
+    'superklass-name' => undef,
+    'counted-set' => undef,
+    'write-table-start' => undef,
+    '<errno.h>' => undef,
+    'write-element-idref' => undef,
+    'add-method-for-selector' => undef,
+    'sequence' => undef,
+    'table' => undef,
+    'string' => undef,
+    'add-at' => undef,
+    'remove-last' => undef,
+    'replace-at' => undef,
+    'int32-value' => undef,
+    'tokenize' => undef,
+    'kls' => undef,
+    'property' => undef,
+    'utf8-from' => undef,
+    'str128' => undef,
+    'FILE*' => undef,
+    'write-element' => undef,
+    'remove-method-for-selector' => undef,
+    'element' => undef,
+    'provides' => undef,
+    'imported-selectors' => undef,
+    'const' => undef,
+    'top' => undef,
+    'object-t(*)(object-t)' => undef,
+    'remove-first' => undef,
+    'exported-method-addresses' => undef,
+    'current-pool' => undef,
+    'result' => undef,
+    'keyword' => undef,
+    'alloc' => undef,
+    'named-info-node' => undef,
+    'collection' => undef,
+    'assoc-at' => undef,
+    'counts' => undef,
+    'va-method-selectors' => undef,
+    '<stdint.h>' => undef,
+    'object-t' => undef,
+    'size' => undef,
+    'uint32-t' => undef,
+    'exported-klasses' => undef,
+    'slots-info' => undef,
+    'method' => undef,
+    'const char-t*' => undef,
+    'set' => undef,
+    'superkls' => undef,
+    'key=' => undef,
+    'info' => undef,
+    'slots-t' => undef,
+    'object-output-stream' => undef,
+    'sorted-set' => undef,
+    'va-method' => undef,
+    'va-method-addresses' => undef,
+    'enum-info' => undef,
+    'release' => undef,
+    'define' => undef,
+    'sorted-table' => undef,
+    'klass' => undef,
+    'dump-methods' => undef,
+    'is-exported' => undef,
+    'boolean-t' => undef,
+    'method-alias' => undef,
+    'pop' => undef,
+    'write-element-id' => undef,
+    'search' => undef,
+    'symbol-t' => undef,
+    'uint32-value' => undef,
+    'count-for' => undef,
+    'deque' => undef,
+    'named-enum-info' => undef,
+    'contains?' => undef,
+    'test-dump' => undef,
+    'read' => undef,
+    'imported-klasses' => undef,
+    'interpose-name' => undef,
+    'cstring' => undef,
+    'reverse' => undef,
+    'append-sequence' => undef,
+    'println-shallow' => undef,
+    'intern' => undef,
+    'NULL' => undef,
+    'dump' => undef,
+    'slots-type' => undef,
+    'append' => undef,
+    'element=' => undef,
+    'int32-t' => undef,
+    'at' => undef,
+    'requires' => undef,
+    'subklass?' => undef,
+    'forward-iterator' => undef,
+    'empty' => undef,
+    'va:print-format' => undef,
+    'symbol-assoc-node' => undef,
+    'retain' => undef,
+    'first' => undef,
+    'capacity' => undef,
+    'copy-shallow' => undef,
+    'remove-all' => undef,
+    'input-stream' => undef,
+    'assoc' => undef,
+    'char-t' => undef,
+    'exception' => undef,
+    'write-sequence-end' => undef,
+    'retain-all' => undef,
+    'add-all-last' => undef,
+    'object-t(*)(object-t,...)' => undef
+  },
+  'should-generate-make' => 1,
+  'includes' => {
+    '<errno.h>' => {
+      'system-exception' => undef
+    },
+    '<stdint.h>' => {
+      'keyword' => undef
+    }
+  },
+  'traits' => {
+    'stack' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'push(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'push'
+          ]
+        },
+        'empty(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'empty'
+          ]
+        },
+        'pop(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'pop'
+          ]
+        },
+        'top(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'top'
+          ]
+        },
+        'empty?(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'empty?'
+          ]
+        }
+      },
+      'includes' => {}
+    },
+    'table' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'has-initialize' => 1,
+      'methods' => {
+        'add(object-t, object-t, object-t)' => {
+          'generics' => {
+            'add' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add'
+          ]
+        },
+        'at(object-t, object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        },
+        'keys(object-t)' => {
+          'generics' => {
+            'add-last' => undef,
+            'make' => undef,
+            'size' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'keys'
+          ]
+        },
+        'elements(object-t)' => {
+          'generics' => {
+            'add-last' => undef,
+            'make' => undef,
+            'size' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'elements'
+          ]
+        },
+        'assoc-at(object-t, object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'assoc-at'
+          ]
+        }
+      },
+      'requires' => [
+        'collection'
+      ],
+      'includes' => {}
+    },
+    'counted-set' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'has-initialize' => 1,
+      'methods' => {
+        'add-assoc(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'add-assoc'
+          ]
+        },
+        'at(object-t, object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'at'
+          ]
+        },
+        'counts(object-t)' => {
+          'generics' => {
+            'add-last' => undef,
+            'make' => undef,
+            'size' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'counts'
+          ]
+        },
+        'count-for(object-t, object-t, uint32-t)' => {
+          'generics' => {
+            'assoc-at' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'uint32-t'
+            ]
+          ],
+          'return-type' => [
+            'uint32-t'
+          ],
+          'name' => [
+            'count-for'
+          ]
+        },
+        'elements(object-t)' => {
+          'generics' => {
+            'add-last' => undef,
+            'make' => undef,
+            'size' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'elements'
+          ]
+        },
+        'assoc-at(object-t, object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'assoc-at'
+          ]
+        }
+      },
+      'requires' => [
+        'collection'
+      ],
+      'includes' => {}
+    },
+    'forward-iterator' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'element(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element'
+          ]
+        },
+        'next(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'next'
+          ]
+        },
+        'element=(object-t, object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'element='
+          ]
+        },
+        'remove(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove'
+          ]
+        },
+        'element?(object-t)' => {
+          'parameter-types' => [
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'element?'
+          ]
+        }
+      },
+      'includes' => {}
+    },
+    'set' => {
+      'is-defined' => 1,
+      'is-exported' => 1,
+      'methods' => {
+        'contains-all?(object-t, object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'boolean-t'
+          ],
+          'name' => [
+            'contains-all?'
+          ]
+        },
+        'retain-all(object-t, object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'retain-all'
+          ]
+        },
+        'remove-all(object-t, object-t)' => {
+          'generics' => {
+            'make' => undef
+          },
+          'is-defined' => 1,
+          'parameter-types' => [
+            [
+              'object-t'
+            ],
+            [
+              'object-t'
+            ]
+          ],
+          'return-type' => [
+            'object-t'
+          ],
+          'name' => [
+            'remove-all'
+          ]
+        }
+      },
+      'includes' => {}
+    }
+  }
+}

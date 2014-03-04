@@ -1,0 +1,80 @@
+// Copyright (C) 2007, 2008 Robert Nielsen <robert.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "inherit+instant"
+{
+//   label = "\G";
+  graph [ rankdir = "LR",
+        center = true,
+        size = "5,7" ];
+
+  edge [ dir = "back",
+       style = "dotted" ];
+
+  "inherit-null-instance" [ label = "null",
+                  shape = "plaintext" ];
+
+  node [ shape = "box",
+       style = "rounded",
+       width = "2.0" ];
+
+  "inherit-object"        [ label = "object" ];
+  "inherit-klass"         [ label = "klass" ];
+  "inherit-null"      [ label = "null" ];
+  "inherit-object"        -> "inherit-klass";
+  "inherit-object"        -> "inherit-null";
+  "inherit-null-instance" -> "inherit-object";
+
+  "inherit-base-2-ascii-number" [ color = green ];
+  "inherit-base-64-ascii-number" [ color = green ];
+  "inherit-base-2-ascii-number" [ label = "base-2-ascii-number" ];
+  "inherit-base-64-ascii-number" [ label = "base-64-ascii-number" ];
+  "inherit-ascii-number"  [ label = "ascii-number" ];
+  "inherit-ascii-number-klass"  [ label = "ascii-number-klass" ];
+  "inherit-object"        -> "inherit-ascii-number";
+  "inherit-klass"         -> "inherit-ascii-number-klass";
+  "inherit-ascii-number"  -> "inherit-base-2-ascii-number";
+  "inherit-ascii-number"  -> "inherit-base-64-ascii-number";
+
+  edge [ dir = "back",
+       style = "solid" ];
+
+  "instant-null-instance" [ label = "null",
+                  shape = "plaintext" ];
+
+  node [ shape = "box",
+       style = "rounded",
+       width = "2.0" ];
+
+  "instant-object"     [ label = "object" ];
+  "instant-klass"     [ label = "klass" ];
+  "instant-null"      [ label = "null" ];
+
+
+  "instant-klass"              -> "instant-klass";
+  "instant-klass"              -> "instant-object";
+  "instant-klass"     -> "instant-null";
+  "instant-null"               -> "instant-null-instance";
+
+  "instant-base-2-ascii-number" [ color = green ];
+  "instant-base-64-ascii-number" [ color = green ];
+  "instant-ascii-number"  [ label = "ascii-number" ];
+  "instant-ascii-number-klass"  [ label = "ascii-number-klass" ];
+  "instant-base-2-ascii-number" [ label = "base-2-ascii-number" ];
+  "instant-base-64-ascii-number" [ label = "base-64-ascii-number" ];
+  "instant-klass"     -> "instant-ascii-number";
+  "instant-klass"              -> "instant-ascii-number-klass";
+  "instant-ascii-number-klass" -> "instant-base-2-ascii-number";
+  "instant-ascii-number-klass" -> "instant-base-64-ascii-number";
+}

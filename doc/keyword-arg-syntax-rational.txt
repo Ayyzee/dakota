@@ -1,0 +1,11 @@
+consider this method from the vector klass:
+
+method object-t init(object-t self, object-t $vector)
+{
+}
+
+object-t $vector
+
+=>
+
+$vector => object-t vector

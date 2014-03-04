@@ -1,0 +1,11 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass text-output-stream;
+klass features; // hackhack
+
+int-t main()
+{
+  int-t none = text-output-stream:k-none;
+  USE(none);
+  return 0;
+}

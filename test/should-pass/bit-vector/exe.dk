@@ -1,0 +1,57 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass bit-vector;
+
+int-t main()
+{
+  object-t o1 = make(bit-vector:klass);
+//   dk:dump(o1);
+
+  for (uint32-t i = 10; i < 46; i++)
+    dk:bit=(o1, i, true);
+  dk:dump(o1);
+
+  object-t o2 = make(bit-vector:klass);
+
+  for (uint32-t i = 18; i < 54; i++)
+    dk:bit=(o2, i, true);
+  dk:dump(o2);
+
+  object-t o3;
+  object-t o1-copy;
+  intptr-t v;
+
+  o1-copy = dk:copy-shallow(o1);
+  o3 = dk:bit-and(o1-copy, o2);
+  dk:dump(o3);
+
+  o1-copy = dk:copy-shallow(o1);
+  o3 = dk:bit-or(o1-copy, o2);
+  dk:dump(o3);
+
+  o1-copy = dk:copy-shallow(o1);
+  v = dk:compare(o1-copy, o2);
+  printf("%i\n", (int-t)v);
+
+  o1-copy = dk:copy-shallow(o1);
+  v = dk:compare(o2, o1-copy);
+  printf("%i\n", (int-t)v);
+
+  o1-copy = dk:copy-shallow(o1);
+  v = dk:compare(o1-copy, o1);
+  printf("%i\n", (int-t)v);
+
+//   for (uint32-t i = 0; i <= 63; i++)
+//   {
+//     dk:bit=(o, 63 - i, true);
+//     dk:dump(o);
+//   }
+
+//   for (uint32-t i = 0; i <= 63; i++)
+//   {
+//     dk:bit=(o, 63 - i, false);
+//     dk:dump(o);
+//   }
+
+  return 0;
+}

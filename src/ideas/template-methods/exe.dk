@@ -1,0 +1,26 @@
+template <typename t> t t-max(t a, t b)
+{
+  if (a >= b)
+    return a;
+  return b;
+}
+
+klass int32
+{
+  slots int32-t;
+
+  method template(t-max) slots-t max(slots-t, slots-t);
+}
+
+// alias() example for comparison
+klass deque
+{
+  // ...
+
+  method alias(add-last) object-t push(object-t, object-t);
+
+  method object-t add-last(object-t self, object-t element)
+  {
+    //...
+  }
+}

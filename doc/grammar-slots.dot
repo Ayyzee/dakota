@@ -1,0 +1,73 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// slots { <type> <identifier> ; ... }
+// slots struct|union slots-t { <type> <identifier> ; ... }
+// slots <type> ;
+// slots typedef <type> slots-t ;
+// slots enum slots-t { <identifier> = <expression> , ... }
+
+digraph "grammar-slots"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR, center = true ];
+  graph [ page = "8.5,11", size = "7.5,10" ];
+//   graph [ concentrate = true ];
+  node [ shape = circle ];
+
+  "slots" [ shape = doublecircle, fontcolor = blue ];
+
+  00 [ label = "" ];
+  99 [ label = "" ];
+
+//   node [ label = "", width = 0.25 ];
+
+  99 [ shape = doublecircle ];
+
+  slots -> 00 [ label = "slots" ];
+  00 -> s1 [ label = "struct\nunion" ];
+  00 -> s2 [ label = "slots-t" ];
+  s1 -> s2 [ label = "slots-t" ];
+  s2 -> s3 [ label = "{" ];
+  00 -> s3 [ label = "{" ];
+  s1 -> s3 [ label = "{" ];
+  s3 -> s4 [ label = "type", fontcolor = blue ];
+  s3 -> 99 [ label = "}" ];
+  s4 -> s5 [ label = "ident", fontcolor = blue ];
+  s5 -> s6 [ label = ";" ];
+  s4 -> s6 [ label = "type", fontcolor = blue, dir = back, color = green ];
+  s6 -> 99 [ label = "}" ];
+
+  00 -> t3 [ label = "type", fontcolor = blue ];
+  t3 -> 99 [ label = ";" ];
+
+  00 -> t1 [ label = "typedef" ];
+  t1 -> t2 [ label = "type", fontcolor = blue ];
+  t2 -> t3 [ label = "slots-t" ];
+
+  00 -> e1 [ label = "enum" ];
+  e1 -> e2 [ label = "slots-t" ];
+  e2 -> e3 [ label = "{" ];
+  e1 -> e3 [ label = "{" ];
+  e3 -> e4 [ label = "ident", fontcolor = blue ];
+  e3 -> 99 [ label = "}" ];
+  e4 -> e5 [ label = "=" ];
+  e5 -> e6 [ label = "expr", fontcolor = blue ];
+  e6 -> e7 [ label = "," ];
+  e4 -> e7 [ label = "ident", fontcolor = blue, dir = back, color = green ];
+  e4 -> e7 [ label = "," ];
+  e7 -> 99 [ label = "}" ];
+  e6 -> 99 [ label = "}" ];
+  e4 -> 99 [ label = "}" ];
+}

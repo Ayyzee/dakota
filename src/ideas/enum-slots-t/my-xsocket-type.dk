@@ -1,0 +1,27 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <sys/socket.h>;
+
+export klass my-xsocket-type
+{
+  export slots enum
+  {
+    k-stream = SOCK-STREAM,
+    k-dgram =  SOCK-DGRAM,
+    k-raw =    SOCK-RAW
+  }
+}
+
+export klass my-point
+{
+  export slots /*struct*/
+  {
+    int-t x;
+    int-t y;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

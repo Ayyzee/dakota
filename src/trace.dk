@@ -1,0 +1,170 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+module dakota;
+
+STATIC uint32-t gbl-trace-column = 0;
+
+noexport format-va-printf(2) int-t
+trace-vfprintf(file-t file, const char8-t* format, va-list-t args)
+{
+  const char8-t* col = "  "; // two spaces per column :-) [my way]
+  for (uint32-t i = 0; i < gbl-trace-column; i++)
+  {
+    if (0 == i)
+      fprintf(file, "%s", col);
+    else
+      fprintf(file, "%c%s", '.', col);
+  }
+  int-t result = vfprintf(file, format, args);
+  // bugbug: need to adjust result
+  return result;
+}
+noexport format-printf(2) int-t
+trace-fprintf(file-t file, const char8-t* format, ...)
+{
+  va-list-t args;
+  va-start(args, format);
+  int-t result = trace-vfprintf(file, format, args);
+  va-end(args);
+  return result;
+}
+
+noexport int-t
+dk-va-trace-before(const signature-t* signature, method-t m, super-t context, va-list-t args)
+{
+  USE(args);
+  gbl-trace-column++;
+  int-t result;
+  result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
+                         signature->name, signature->parameter-types + sizeof("object-t") - 1,
+                         cast(void*)(context.self), dkt-name(dkt-klass(context.self)),
+                         cast(void*)(context.klass), dkt-name(context.klass),
+                         cast(void*)cast(uintptr-t)(m));
+  return result;
+}
+
+noexport int-t
+dk-va-trace-before(const signature-t* signature, method-t m, object-t object, va-list-t args)
+{
+  USE(args);
+  gbl-trace-column++;
+  int-t result;
+  result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
+                         signature->name, signature->parameter-types,
+                         cast(void*)(object), dkt-name(dkt-klass(object)),
+                         cast(void*)cast(uintptr-t)(m));
+  return result;
+}
+
+noexport int-t
+dk-va-trace-after(const signature-t* signature, method-t m, super-t context, va-list-t args)
+{
+  USE(args);
+  gbl-trace-column--;
+  int-t result;
+  result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
+                         signature->name, signature->parameter-types + sizeof("object-t") - 1,
+                         cast(void*)(context.self), dkt-name(dkt-klass(context.self)),
+                         cast(void*)(context.klass), dkt-name(context.klass),
+                         cast(void*)cast(uintptr-t)(m));
+  return result;
+}
+
+noexport int-t
+dk-va-trace-after(const signature-t* signature, method-t m, object-t object, va-list-t args)
+{
+  USE(args);
+  gbl-trace-column--;
+  int-t result;
+  result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
+                         signature->name, signature->parameter-types,
+                         cast(void*)(object), dkt-name(dkt-klass(object)),
+                         cast(void*)cast(uintptr-t)(m));
+  return result;
+}
+
+#if defined DEBUG
+export int-t
+dk-trace-before(const signature-t* signature, method-t m, super-t context, ...)
+{
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, context);
+  if (NULL != getenv("DK_TRACE"))
+    result = dk-va-trace-before(signature, m, context, args);
+  va-end(args);
+  return result;
+}
+
+export int-t
+dk-trace-before(const signature-t* signature, method-t m, object-t object, ...)
+{
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, object);
+  if (NULL != getenv("DK_TRACE"))
+    result = dk-va-trace-before(signature, m, object, args);
+  va-end(args);
+  return result;
+}
+
+export int-t
+dk-trace-after(const signature-t* signature, method-t m, super-t context, ...)
+{
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, context);
+  if (NULL != getenv("DK_TRACE"))
+    result = dk-va-trace-after(signature, m, context, args);
+  va-end(args);
+  return result;
+}
+
+export int-t
+dk-trace-after(const signature-t* signature, method-t m, object-t object, ...)
+{
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, object);
+  if (NULL != getenv("DK_TRACE"))
+    result = dk-va-trace-after(signature, m, object, args);
+  va-end(args);
+  return result;
+}
+
+export int-t
+dk-va-trace-before-init(object-t kls, va-list-t args)
+{
+  gbl-trace-column++;
+  int-t result = 0;
+  if (NULL != getenv("DK_MAKE_TRACE"))
+    result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
+                           cast(void*)(kls), dkt-name(kls), cast(void*)(args));
+  return result;
+}
+
+export int-t
+dk-va-trace-after-init(object-t kls, va-list-t args)
+{
+  gbl-trace-column--;
+  int-t result = 0;
+  if (NULL != getenv("DK_MAKE_TRACE"))
+    result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
+                           cast(void*)(kls), dkt-name(kls), cast(void*)(args));
+  return result;
+}
+#endif

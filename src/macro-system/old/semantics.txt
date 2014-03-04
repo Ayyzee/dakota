@@ -1,0 +1,25 @@
+* macro
+ * shall have at least one ruleset
+ * may have sub-rulesets
+
+* main-ruleset
+ * shall have both a lhs and rhs
+ * shall scan forward for first token of lhs
+ * may have empty lhs
+ * may have empty rhs
+ * rhs shall be empty when lhs is empty
+ * may use macros or sub-rulesets or constraints
+ * shall **not** use self recursively
+
+* sub-ruleset (same as ruleset)
+ * shall be named
+ * may use self recursively
+
+* constraint
+ * shall **not** scan forward for first token of lhs
+ * may use other constraints
+ * shall be compiled
+ * in=(sst, range), out=range
+
+* token
+ * literal character sequence

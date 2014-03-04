@@ -1,0 +1,67 @@
+Introducing Dakota
+
+In the last 15 years our industry has experienced a programming
+language renaissance.  With the introduction of Perl, Python, Java/C#,
+Ruby, & Scala (just to name a few) there is now quite a wide range of
+choices when it comes to scripting languages, and languages that run on
+top of a virtual machine (vm).
+
+However, there are many domains that still prefer to use the
+foundation languages of C/C++.  These domains include technology that
+can not afford the resource loss that is associated with these
+scripting/vm languages.  The primary requirements in these domains are
+fastest execution and smallest runtime footprint. Also native access
+to the operating system types and APIs.
+
+[What about technologies that allow you to program in a scripting/vm
+language but ultimately do C/C++ code generation?]
+
+In comparison with the advances in scripting/vm languages, we (as an
+industry) have made little progress improving or replacing the
+foundational languages of C/C++.  Though improvements have occurred in the
+available libraries and in the tool-chain, the base languages have not
+really improved much.
+
+Why?  Momentum, investment, existing code-bases, existing tools, and
+native access to the operating system types and APIs just to name a few.  And,
+of course, culture.  More on culture later.
+
+Enter Dakota.
+
+Before introducing Dakota, I'll list the reason why software engineers
+might not consider using an alternative to C/C++.
+
+  individual competence
+  legacy code bases
+  lack of tool-chain support
+    compiler
+    debugger
+    profiler  
+
+features that prevent rejection
+
+features that encourage exploration
+
+features that ease adoption
+  Dakota source code seamlessly coexists with standard C/C++ source code (even in the same source file)
+  Dakota consumes and produces C/C++ types and APIs
+  Dakota consumes and produces industry standard shared-libraries/dynamic-link-libraries
+  uses current tool-chain (C/C++ compilers, debuggers, profilers, ...)
+  direct and native access to existing C/C++ types and APIs, code-bases, libraries, etc
+  using Dakota is not an all-or-nothing decision; use what you need, omit what you don't
+  many knobs to adjust the performance tradeoffs
+    short circuit monomorphic methods of a sealed system to remove gratuitous dynamic dispatch
+    exporting slots and methods to allows direct access (value class)
+  very high correlation between code authored by user and code (ultimately) passed to the compiler
+  direct (and unsurprising) mapping between code authored by user and the C/C++ symbols
+  source-to-source translation maintains authors comments and whitespace (including newlines)
+  dakota-features
+    generic functions and methods are simply functions
+    slots are simply (pod) structs (or even primitive types)
+    Dakota symbols are simply interned strings (and can be used anywhere a const char* could be used)
+  designed with ease of refactoring in mind
+  no need to decide upfront "should this be an object or just a simple struct and dedicated functions?"
+  code is traslated from Dakota to C/proceedural-C++
+  entirely ANSI C/C++ implementation (no use of assembler)
+  Dakota's object system is not a wrapper over the C++ object system
+  Dakota does not use templates or the C++ object system in its implementation or in its code generation

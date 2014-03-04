@@ -1,0 +1,159 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "code-gen-paths"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR, page = "8.5,11", size = "7.5,10", center = true ]; node [ shape = plaintext ];
+  "decl-initialize" -> "decl/initialize-(";
+   "decl-void" -> "decl-initialize";
+   "decl/initialize" -> "decl-void";
+   "decl/initialize-(" -> "decl/initialize-)";
+   "decl/initialize-)" -> "decl/initialize-;";
+   "decl/method" -> "decl/method-qt";
+   "decl/method-(" -> "decl/method-)";
+   "decl/method-)" -> "decl/method-;";
+   "decl/method-qi" -> "decl/method-(";
+   "decl/method-qt" -> "decl/method-qi";
+   "defn-initialize" -> "defn/initialize-(";
+   "defn-is" -> "defn/initialize-}";
+   "defn-void" -> "defn-initialize";
+   "defn/initialize" -> "defn-void";
+   "defn/initialize-(" -> "defn/initialize-)";
+   "defn/initialize-)" -> "defn/initialize-{";
+   "defn/initialize-{" -> "defn-is";
+   "defn/method" -> "defn/method-qt";
+   "defn/method-(" -> "defn/method-)";
+   "defn/method-)" -> "defn/method-{";
+   "defn/method-ms" -> "defn/method-}";
+   "defn/method-qi" -> "defn/method-(";
+   "defn/method-qt" -> "defn/method-qi";
+   "defn/method-{" -> "defn/method-ms";
+   "fs" -> "fs-decl-klass\lfs-decl-trait\l";
+   "fs" -> "fs-defn-klass";
+   "fs" -> "fs-defn-trait";
+   "fs" -> "fs-export\lfs-noexport\l";
+   "fs" -> "fs-import";
+   "fs-decl-klass-qi" -> "fs-;";
+   "fs-decl-klass\lfs-decl-trait\l" -> "fs-decl-klass-qi";
+   "fs-defn-klass" -> "fs-defn-klass-qi";
+   "fs-defn-klass-ks" -> "fs-defn-klass-}";
+   "fs-defn-klass-qi" -> "fs-defn-klass-{";
+   "fs-defn-klass-{" -> "fs-defn-klass-ks";
+   "fs-defn-trait" -> "fs-defn-trait-qi";
+   "fs-defn-trait-qi" -> "fs-defn-trait-{";
+   "fs-defn-trait-ts" -> "fs-defn-trait-}";
+   "fs-defn-trait-{" -> "fs-defn-trait-ts";
+   "fs-export\lfs-noexport\l" -> "fs-defn-klass";
+   "fs-export\lfs-noexport\l" -> "fs-defn-trait";
+   "fs-import" -> "fs-decl-klass\lfs-decl-trait\l";
+   "initialize" -> "initialize-decl/initialize";
+   "initialize" -> "initialize-defn/initialize";
+   "ks" -> "ks-decl-slots";
+   "ks" -> "ks-defn-slots";
+   "ks" -> "ks-export\lks-noexport\l";
+   "ks" -> "ks-import";
+   "ks" -> "ks-initialize";
+   "ks" -> "ks-method";
+   "ks" -> "ks-superklass\lks-klass\l";
+   "ks-decl-qi" -> "ks-;";
+   "ks-decl-slots" -> "ks-decl-slots-qt";
+   "ks-decl-slots-qt" -> "ks-;";
+   "ks-defn-slots" -> "ks-defn-slots-{";
+   "ks-defn-slots-{" -> "ks-ss";
+   "ks-export\lks-noexport\l" -> "ks-defn-slots";
+   "ks-export\lks-noexport\l" -> "ks-initialize";
+   "ks-export\lks-noexport\l" -> "ks-method";
+   "ks-import" -> "ks-decl-slots";
+   "ks-import" -> "ks-decl/initialize";
+   "ks-import" -> "ks-decl/method";
+   "ks-ss" -> "ks-defn-slots-}";
+   "ks-ss" -> "ks-ss";
+   "ks-superklass\lks-klass\l" -> "ks-decl-qi";
+   "method" -> "method-decl/method";
+   "method" -> "method-defn/method";
+   "ts" -> "ts-export\lts-noexport\l";
+   "ts" -> "ts-import";
+   "ts" -> "ts-initialize";
+   "ts" -> "ts-method";
+   "ts-export\lts-noexport\l" -> "ts-initialize";
+   "ts-export\lts-noexport\l" -> "ts-method";
+   "ts-import" -> "ts-decl/initialize";
+   "ts-import" -> "ts-decl/method";
+
+  "decl-initialize" [ label = "initialize" ];
+   "decl-void" [ label = "void" ];
+   "decl/initialize-(" [ label = "(" ];
+   "decl/initialize-)" [ label = ")" ];
+   "decl/initialize-;" [ label = ";" ];
+   "decl/method-(" [ label = "(" ];
+   "decl/method-)" [ label = ")" ];
+   "decl/method-;" [ label = ";" ];
+   "decl/method-qi" [ label = "qi" ];
+   "decl/method-qt" [ label = "qt" ];
+   "defn-initialize" [ label = "initialize" ];
+   "defn-is" [ label = "is" ];
+   "defn-void" [ label = "void" ];
+   "defn/initialize-(" [ label = "(" ];
+   "defn/initialize-)" [ label = ")" ];
+   "defn/initialize-{" [ label = "{" ];
+   "defn/initialize-}" [ label = "}" ];
+   "defn/method-(" [ label = "(" ];
+   "defn/method-)" [ label = ")" ];
+   "defn/method-ms" [ label = "ms" ];
+   "defn/method-qi" [ label = "qi" ];
+   "defn/method-qt" [ label = "qt" ];
+   "defn/method-{" [ label = "{" ];
+   "defn/method-}" [ label = "}" ];
+   "fs-;" [ label = ";" ];
+   "fs-decl-klass-qi" [ label = "qi" ];
+   "fs-decl-klass\lfs-decl-trait\l" [ label = "klass\ltrait\l" ];
+   "fs-defn-klass" [ label = "klass" ];
+   "fs-defn-klass-ks" [ label = "ks" ];
+   "fs-defn-klass-qi" [ label = "qi" ];
+   "fs-defn-klass-{" [ label = "{" ];
+   "fs-defn-klass-}" [ label = "}" ];
+   "fs-defn-trait" [ label = "trait" ];
+   "fs-defn-trait-qi" [ label = "qi" ];
+   "fs-defn-trait-ts" [ label = "ts" ];
+   "fs-defn-trait-{" [ label = "{" ];
+   "fs-defn-trait-}" [ label = "}" ];
+   "fs-export\lfs-noexport\l" [ label = "export\lnoexport\l" ];
+   "fs-import" [ label = "import" ];
+   "initialize-decl/initialize" [ label = "decl/initialize" ];
+   "initialize-defn/initialize" [ label = "defn/initialize" ];
+   "ks-;" [ label = ";" ];
+   "ks-decl-qi" [ label = "qi" ];
+   "ks-decl-slots" [ label = "slots" ];
+   "ks-decl-slots-qt" [ label = "qt" ];
+   "ks-decl/initialize" [ label = "decl/initialize" ];
+   "ks-decl/method" [ label = "decl/method" ];
+   "ks-defn-slots" [ label = "slots" ];
+   "ks-defn-slots-{" [ label = "{" ];
+   "ks-defn-slots-}" [ label = "}" ];
+   "ks-export\lks-noexport\l" [ label = "export\lnoexport\l" ];
+   "ks-import" [ label = "import" ];
+   "ks-initialize" [ label = "initialize" ];
+   "ks-method" [ label = "method" ];
+   "ks-ss" [ label = "ss" ];
+   "ks-superklass\lks-klass\l" [ label = "superklass\lklass\l" ];
+   "method-decl/method" [ label = "decl/method" ];
+   "method-defn/method" [ label = "defn/method" ];
+   "ts-decl/initialize" [ label = "decl/initialize" ];
+   "ts-decl/method" [ label = "decl/method" ];
+   "ts-export\lts-noexport\l" [ label = "export\lnoexport\l" ];
+   "ts-import" [ label = "import" ];
+   "ts-initialize" [ label = "initialize" ];
+   "ts-method" [ label = "method" ];
+}

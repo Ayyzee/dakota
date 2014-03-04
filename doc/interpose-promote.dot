@@ -1,0 +1,129 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "interpose"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = TB, center = true, page = "8.5,11", size = "7.5,10" ];
+  node [ shape = circle ];
+
+  subgraph cluster3
+  {
+       label = "-> add\l<- remove\l";
+
+       //
+       // a_2_1, b_2_1
+       a_2_1 -> b_2_1;
+       a_2_1 [ label = a ];
+       b_2_1 [ label = b ];
+       //
+
+       // a_2_2, b_2_2, b_2_2
+       a_2_2 -> b_2_2;
+       a_2_2 -> c_2_2 [ weight = 0.5 ];
+       a_2_2 [ label = a ];
+       b_2_2 [ label = b ];
+       c_2_2 [ label = "" ];
+
+       node [ style = invis]; edge [ style = invis ];
+       // a_2_3, b_2_3, c_2_3
+       a_2_3 -> c_2_3 -> b_2_3;
+       a_2_3 [ label = a ];
+       b_2_3 [ label = b ];
+       c_2_3 [ label = "" ];
+       node [ style = solid]; edge [ style = solid ];
+
+       node [ style = invis]; edge [ style = invis ];
+       // layout purposes
+       a_2_1 -> a_2_2;
+       a_2_2 -> a_2_3;
+       node [ style = solid]; edge [ style = solid ];
+
+       { rank = same; a_2_1; a_2_2; a_2_3 };
+       { rank = same; b_2_1; b_2_2; b_2_3 };
+       { rank = same;        c_2_2; c_2_3 };
+  }
+  subgraph cluster1
+  {
+       label = "-> promote\l<- demote\l";
+
+       node [ style = invis]; edge [ style = invis ];
+       // a_0_1, b_0_1
+       a_0_1 -> b_0_1;
+       a_0_1 [ label = a ];
+       b_0_1 [ label = b ];
+       node [ style = solid]; edge [ style = solid ];
+
+       //
+       // a_0_2, b_0_2, b_0_2
+       a_0_2 -> b_0_2;
+       a_0_2 -> c_0_2 [ weight = 0.5 ];
+       a_0_2 [ label = a ];
+       b_0_2 [ label = b ];
+       c_0_2 [ label = "" ];
+       //
+
+       // a_0_3, b_0_3, c_0_3
+       a_0_3 -> c_0_3 -> b_0_3;
+       a_0_3 [ label = a ];
+       b_0_3 [ label = b ];
+       c_0_3 [ label = "" ];
+
+       node [ style = invis]; edge [ style = invis ];
+       // layout purposes
+       a_0_1 -> a_0_2;
+       a_0_2 -> a_0_3;
+       node [ style = solid]; edge [ style = solid ];
+
+       { rank = same; a_0_1; a_0_2; a_0_3 };
+       { rank = same; b_0_1; b_0_2; b_0_3 };
+       { rank = same;        c_0_2; c_0_3 };
+  }
+  subgraph cluster2
+  {
+       label = "-> interpose\l<- depose\l";
+
+       //
+       // a_1_1, b_1_1
+       a_1_1 -> b_1_1;
+       a_1_1 [ label = a ];
+       b_1_1 [ label = b ];
+       //
+
+       node [ style = invis]; edge [ style = invis ];
+       // a_1_2, b_1_2, b_1_2
+       a_1_2 -> b_1_2;
+       a_1_2 -> c_1_2 [ weight = 0.5 ];
+       a_1_2 [ label = a ];
+       b_1_2 [ label = b ];
+       c_1_2 [ label = "" ];
+       node [ style = solid]; edge [ style = solid ];
+
+       // a_1_3, b_1_3, c_1_3
+       a_1_3 -> c_1_3 -> b_1_3;
+       a_1_3 [ label = a ];
+       b_1_3 [ label = b ];
+       c_1_3 [ label = "" ];
+
+       node [ style = invis]; edge [ style = invis ];
+       // layout purposes
+       a_1_1 -> a_1_2;
+       a_1_2 -> a_1_3;
+       node [ style = solid]; edge [ style = solid ];
+
+       { rank = same; a_1_1; a_1_2; a_1_3 };
+       { rank = same; b_1_1; b_1_2; b_1_3 };
+       { rank = same;        c_1_2; c_1_3 };
+  }
+}

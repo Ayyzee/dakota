@@ -1,0 +1,368 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+
+//  2^n: prime < 2^n
+// ----|--------------------
+//  128: 127
+//  256: 251
+//  512: 509
+// 1024: 1021
+
+STATIC const uint32-t gbl-prime = 127;
+
+// when the user submits a non-prime number, decrement until a prime is found
+
+module dakota-util;
+
+klass object-output-stream;
+
+klass hashed-set
+{
+  superklass collection;
+
+  trait set;
+
+  slots
+  {
+    uint32-t num-buckets;
+    object-t buckets; // a vector of deques
+    uint32-t size;
+
+    equal-predicate-t equal?;
+    hash-t            hash;
+
+    uint32-t iterator-state;
+  }
+
+  object-t initialize(object-t kls)
+  {
+    dk-klass-for-name(vector:__klass__); // hackhack
+    return kls;
+  }
+
+  object-t finalize(object-t kls)
+  {
+    return kls;
+  }
+
+  // 'elements' is a collection (of objects)
+  // 'items' is a NULL terminated array (of objects)
+  // using compound literals 'items' can be used as follows:
+  // dk:init(o, items => (object-t[]){ o1, o2, NULL });
+
+  method object-t init(object-t self,
+                       hash-t            hash =>     dk:hash,
+                       equal-predicate-t equal? =>   dk:equal?,
+                       object-t          elements => NULL,
+                       object-t*         items =>    NULL)
+  {
+    assert(NULL != hash);
+    assert(NULL != equal?);
+    assert(null != elements);
+
+    self = dk:init(super);
+    self.num-buckets = gbl-prime;
+    self.buckets = make(vector:klass, initial-capacity => self.num-buckets, fill => NULL);
+    self.size = 0;
+    self.equal? = equal?;
+    self.hash = hash;
+
+    self.iterator-state = 0;
+
+    if (NULL != elements)
+      dk:add-all(self, elements);
+
+    if (NULL != items)
+      dk:add-items(self, items);
+    return self;
+  }
+
+  method object-t add(object-t self, object-t object1)
+  {
+    self.iterator-state++;
+
+    uint32-t index =
+#ifdef MOD-SIZE-CAST-HACK
+      cast(uint32-t)
+#endif
+      self.hash(object1) % self.num-buckets;
+    object-t deque = dk:at(self.buckets, index, NULL);
+
+    if (NULL == deque)
+    {
+      deque = make(deque:klass);
+      dk:add-first(deque, object1);
+      self.size++; // bugbug - could wrap
+      // why use replace-at?  should be add-at
+      dk:replace-at(self.buckets, index, deque);
+    }
+    else
+    {
+      object-t element = NULL;
+
+      for (object-t object2 in deque)
+      {
+        if (self.equal?(object1, object2))
+        {
+          element = object2;
+          break;
+        }
+      }
+
+//       if (should-throw && NULL != element)
+//         throw "oops";
+
+      if (NULL != element)
+      {
+        dk:add-first(deque, object1);
+        self.size++; // bugbug - could wrap
+      }
+    }
+    return object1;
+  }
+
+  method object-t empty(object-t self)
+  {
+    self.iterator-state++;
+    dk:empty(self.buckets);
+    return self;
+  }
+
+  method object-t at(object-t self, object-t object1, object-t default-value)
+  {
+
+    uint32-t index = 
+#ifdef MOD-SIZE-CAST-HACK
+      cast(uint32-t)
+#endif
+      self.hash(object1) % self.num-buckets;
+    object-t deque = dk:at(self.buckets, index, NULL);
+    object-t result = default-value;
+
+    if (NULL != deque)
+    {
+      for (object-t object2 in deque)
+      {
+        if (self.equal?(object1, object2))
+        {
+          result = object2;
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  method boole-t contains?(object-t self, object-t key)
+  {
+    boole-t state;
+
+    if (NULL == dk:at(self, key, NULL))
+      state = false;
+    else
+      state = true;
+    return state;
+  }
+
+  method boole-t empty?(object-t self)
+  {
+    boole-t state;
+
+    if (0 == self.size)
+      state = true;
+    else
+      state = false;
+    return state;
+  }
+
+  method object-t remove(object-t self, object-t element)
+  {
+    self.iterator-state++;
+    object-t object = null;
+
+    uint32-t index =
+#ifdef MOD-SIZE-CAST-HACK
+      cast(uint32-t)
+#endif
+      self.hash(element) % self.num-buckets;
+    object-t deque = dk:at(self.buckets, index, NULL);
+
+    if (NULL != deque)
+    {
+      for (object-t forward-iterator = dk:forward-iterator(deque);
+           object-t element2 = dk:next(forward-iterator); )
+      {
+        //printf("element: %s\n", dk:name(element));
+        //printf("element2: %s\n", dk:name(element2));
+
+        if (self.equal?(element, element2))
+        {
+          //            object-t remove-not-yet-tested;
+          // NOT TESTED!!!
+          object = dk:remove(forward-iterator); //element2
+          self.size--;
+          break;
+        }
+      }
+    }
+    return object;
+  }
+
+  method object-t copy-shallow(object-t self)
+  {
+    object-t kls = dk:klass(self);
+    object-t copy = make(kls);
+    slots-t* s1 = unbox(self);
+    slots-t* s2 = unbox(copy);
+    *s2 = *s1;
+    s2->buckets = dk:copy-shallow(s1->buckets);
+    s2->iterator-state = 0;
+    return copy;
+  }
+
+  method uint32-t size(object-t self)
+  {
+    return self.size;
+  }
+
+  method object-t forward-iterator(object-t self)
+  {
+    object-t forward-iterator = make(hashed-set-forward-iterator:klass, hashed-set => self);
+    return forward-iterator;
+  }
+
+  method object-t dump(object-t self)
+  {
+    dk:dump(super);
+    fprintf(stderr, "%p:%p { size=%u, elements=[] }\n",
+            cast(void*)(self), cast(void*)unbox(self), self.size);
+    for (object-t element in self)
+      dk:dump(element);
+    return self;
+  }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+
+    dk:write-sequence-start(out, "elements");
+
+    for (object-t element in self)
+      dk:write-element-idref(out, element, NULL);
+    dk:write-sequence-end(out);
+
+    dk:write-slots-end(out);
+    return self;
+  }
+}
+
+klass hashed-set-forward-iterator
+{
+  trait forward-iterator;
+
+  slots
+  {
+    object-t hashed-set;
+    object-t vector-iter; // set one time per instantiation
+    object-t deque-iter;  // set many times per instantiation
+
+    uint32-t  iterator-state;
+  }
+
+  noexport void check-iterator-state(object-t self)
+  {
+    hashed-set:slots-t* hs = hashed-set:unbox(self.hashed-set);
+
+    if (self.iterator-state != hs->iterator-state)
+      throw make(exception:klass, message => "oops");
+    return;
+  }
+
+  method object-t init(object-t self, object-t hashed-set => {})
+  {
+    self = dk:init(super);
+    assert(null != hashed-set);
+    hashed-set:slots-t* hs = hashed-set:unbox(hashed-set);
+    self.hashed-set = hashed-set;
+    self.vector-iter = dk:forward-iterator(hs->buckets);
+    self.iterator-state = hs->iterator-state;
+    self.deque-iter = NULL;
+    object-t deque = dk:next(self.vector-iter);
+    if (NULL != deque)
+    {
+      assert(0 != dk:size(deque));
+      self.deque-iter = dk:forward-iterator(deque);
+    }
+    return self;
+  }
+
+  method boole-t next?(object-t self)
+  {
+    check-iterator-state(self);
+    boole-t result = false;
+    if (NULL != self.deque-iter)
+      result = dk:next?(self.deque-iter);
+    return result;
+  }
+
+  noexport object-t next-deque-iterator(object-t vector-iter)
+  {
+    object-t deque = dk:next(vector-iter);
+    object-t deque-iter = NULL;
+    if (NULL != deque)
+    {
+      assert(0 != dk:size(deque));
+      deque-iter = dk:forward-iterator(deque);
+    }
+    return deque-iter;
+  }
+
+  method object-t next(object-t self)
+  {
+    check-iterator-state(self);
+    object-t element = NULL;
+    if (dk:next?(self))
+    {
+      element = dk:next(self.deque-iter);
+      if (NULL == element)
+      {
+        self.deque-iter = next-deque-iterator(self.vector-iter);
+        if (NULL != self.deque-iter)
+          element = dk:next(self.deque-iter); // may return NULL
+      }
+      if (NULL != element)
+        if (NULL != self.deque-iter)
+          unless (dk:next?(self.deque-iter))
+            self.deque-iter = next-deque-iterator(self.vector-iter); // may return NULL
+    }
+    return element;
+  }
+
+  method object-t element(object-t self)
+  {
+    check-iterator-state(self);
+    object-t element = NULL;
+    if (dk:next?(self))
+    {
+      element = dk:element(self.deque-iter);
+      assert(NULL != element);
+    }
+    return element; // returns NULL on error
+  }
+}

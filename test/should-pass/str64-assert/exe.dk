@@ -1,0 +1,46 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+include <string.h>;
+
+static str64-t s1 = "mother";
+static str64-t s2 = "father";
+static str64-t s3 = "sister";
+
+int-t main()
+{
+  {
+    object-t o1 = str64:box(s1);
+    object-t o2 = str64:box(s2);
+    object-t o3 = str64:box(s3);
+
+    str64-t* s1p = str64:unbox(o1);
+    str64-t* s2p = str64:unbox(o2);
+    str64-t* s3p = str64:unbox(o3);
+
+    assert(0 == strcmp(s1, *s1p));
+    assert(0 == strcmp(s2, *s2p));
+    assert(0 == strcmp(s3, *s3p));
+  }
+  {
+    object-t o1 = str64:box("mother"); // bugbug: not 64 chars in length (memcpy())
+    object-t o2 = str64:box("father"); // bugbug: not 64 chars in length (memcpy())
+    object-t o3 = str64:box("sister"); // bugbug: not 64 chars in length (memcpy())
+
+    assert(0 == strcmp("mother", *str64:unbox(o1)));
+    assert(0 == strcmp("father", *str64:unbox(o2)));
+    assert(0 == strcmp("sister", *str64:unbox(o3)));
+  }
+  return 0;
+}
+
+klass file-permissions
+{
+  slots char8-t[3]; // rwx
+
+  method intptr-t compare(slots-t* slots, slots-t* other-slots)
+  {
+    int32-t result = strncmp((const char8-t*)slots, (const char8-t*)other-slots, sizeof(slots-t));
+    return result;
+  }
+}

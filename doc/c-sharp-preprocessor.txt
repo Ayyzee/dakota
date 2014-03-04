@@ -1,0 +1,15 @@
+#if
+#else
+#elif
+#endif
+#define
+#undef
+#warning
+#error
+#line
+...
+
+no #include
+#define can not define macro (with or without args)
+#define simply defines a boolean constant to true
+#undef simply defines a boolean constant to false

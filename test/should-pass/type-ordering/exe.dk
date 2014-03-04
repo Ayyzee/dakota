@@ -1,0 +1,23 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <signal.h>;
+
+klass xsiginfo
+{
+  slots siginfo-t;
+}
+
+klass xsigaction-cb
+{
+  slots void (*)(xsignal-t, xsiginfo-t*, void*);
+}
+
+klass xsignal
+{
+  slots int-t;
+}
+
+int-t main()
+{
+  return 0;
+}

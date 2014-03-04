@@ -1,0 +1,36 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <string.h>;
+include <assert.h>;
+
+static int32-t arg1 = 42;
+static const char8-t* arg2 = "so long and thanks for all the fish";
+
+klass k1
+{
+  method object-t init(object-t self, int32-t meaning-of-life => 0, const char8-t* message => NULL)
+  {
+    self = dk:init(super);
+    assert(arg1 == meaning-of-life);
+    assert(0 == strcmp(arg2, message));
+    return self;
+  }
+}
+
+klass k2
+{
+  superklass k1;
+
+ method object-t va:init(object-t self, va-list-t args)
+  {
+    self = dk:va:init(super, args);
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t o = make(k2:klass, meaning-of-life => arg1, message => arg2);
+  USE(o);
+  return 0;
+}

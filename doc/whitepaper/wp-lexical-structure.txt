@@ -1,0 +1,56 @@
+compatible with C++ lexical structure with a few additions
+
+- : $
+
+The character - (dash) may be used for interior characters of an
+identifier.
+  [a - (dash) is simply converted to an _ (underscore)]
+
+examples:
+  method-for-selector
+  object-output-stream
+  iterator-state
+  klass-name
+
+The character : (colon) may be used where :: (scope resolution operator)
+is required.
+  [a : (colon) simply converted to a :: (scope resolution operator)]
+
+examples:
+  dk:utf8-from
+  dk:add-last
+  dk:va:init
+  named-info:slots-t
+  output-stream:klass
+
+The character $ (dollar) may immediately precede any identifier
+character sequence or single or double-quoted string.
+
+examples:
+  $klass-name
+  $us-ascii
+  $"hello world"
+  $'hello world'
+
+Also, the character $ is used to introduce set, table, and sequence literal-collections.
+
+The character sequence => (corresponds-to) is used to denote key/element
+relationships.  It is used in keyword arguments and (table) literal collections.
+
+examples:
+  $[ xx, yy ]              //  literal collection (sequence)
+  ${ xx => aa, yy => bb }  //  literal collection (table)
+  ${ xx, yy }              //  literal collection (set)
+
+  make(sorted-set:klass, initial-capacity => my-capacity, compare => my-compare)
+
+The characters ? (question) or ! (exclamation) or = (equal) may be
+used as the last character of an identifier.
+
+The ? character is used to declare a predicate   function (method or generic function).
+The ! character is used to declare a destructive function (method or generic function).
+The = character is used to declare a setter      function (method or generic function).
+
+examples:
+  xxx
+  xxx

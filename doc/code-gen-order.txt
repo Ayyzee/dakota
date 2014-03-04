@@ -1,0 +1,3 @@
+- klass (exported slots) typedecl
+
+- klass export method decl

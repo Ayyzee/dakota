@@ -1,0 +1,52 @@
+Dakota
+
+A dynamic object system for enhanced procedural C++.
+
+The Dakota (dynamic) object system is an alternative object system
+that can (and does) co-exist with C++ (static) object system.
+
+[define procedural C++]
+[define enhanced procedural C++]
+[explain Dakota's relationship to procedural C++]
+[explain Dakota's relationship to templates both in implementation and compare/contrast]
+
+Dakota Object System overview:
+  klass/trait/superklass/self/slots/method
+  equal sign suffix in method name identifiers (foo=())
+    useful in setter methods (method that take a value, set it, and return it)
+  literal immutable collections
+
+Dakota (non Object System) language enhancements:
+  interior dashes in identifers (context sensitive)
+  question mark suffix in identifiers (foo?)
+    useful for boolean variables
+    useful for predicate fuctions
+  single colon for scope resolution operator (context sensitive)
+  symbols (definition implied by use)
+  switch statements using symbols or string constants
+  tuples
+  simple "finally" on exceptions
+  language consistent include syntax
+
+aggregate POD-struct type
+  no base classes
+  no static data
+  no private/protected data
+  no non-POD data
+  no virtual functions
+  no (user-declared) constructors
+  no (user-defined) destructors
+  no (user-defined) copy constructors
+  no (user-defined) assignment operator
+
+built using
+  aggregate POD-struct types
+  overloaded functions
+  namespaces
+  exceptions
+
+built not using
+  class
+  non-POD types
+
+klass klass { klass klass; }

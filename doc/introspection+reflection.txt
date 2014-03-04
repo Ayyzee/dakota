@@ -1,0 +1,16 @@
+type introspection:
+  instance?()
+  subklass?()
+  behavior?()
+
+reflection (metaklass system):
+  klass-for-name()
+  [make?]
+  method-for-selector()
+  perform-method-for-selector()
+  [use of signatures?]
+  we can reflect on
+    klasses/traits
+    slots
+    methods
+    generics

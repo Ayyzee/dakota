@@ -1,0 +1,11 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module signal-stuff;
+
+from <signal.h> export struct sigaction,
+                       siginfo-t;
+
+export xsigaction,
+       xsigaction:slots-t,
+       xsiginfo,
+       xsiginfo:slots-t;

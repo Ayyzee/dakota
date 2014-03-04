@@ -1,0 +1,56 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+int-t MOM-VLOG-INFO(const char8-t* format, va-list-t args)
+{
+  int-t result = mom:vsyslog(LOG-INFO | LOG-DAEMON, args);
+  return result;
+}
+int-t MOM-VLOG-WARNING(const char8-t* format, va-list-t args)
+{
+  int-t result = mom:vsyslog(LOG-WARNING | LOG-DAEMON, args);
+  return result;
+}
+int-t MOM-VLOG-ERROR(const char8-t* format, va-list-t args)
+{
+  int-t result = mom:vsyslog(LOG-ERROR | LOG-DAEMON, args);
+  return result;
+}
+
+int-t MOM-LOG-INFO(const char8-t* format, ...)
+{
+  va-list-t args;
+  va-start(args, format);
+  int-t result = MOM-VLOG-INFO(format, args);
+  va-end(args);
+  return result;
+}
+int-t MOM-LOG-WARNING(const char8-t* format, ...)
+{
+  va-list-t args;
+  va-start(args, format);
+  int-t result = MOM-VLOG-WARNING(format, args);
+  va-end(args);
+  return result;
+}
+int-t MOM-LOG-ERROR(const char8-t* format, ...)
+{
+  va-list-t args;
+  va-start(args, format);
+  int-t result = MOM-VLOG-ERROR(format, args);
+  va-end(args);
+  return result;
+}

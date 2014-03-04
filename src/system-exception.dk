@@ -1,0 +1,58 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cerrno>;
+include <cstring>;
+
+include "dakota-private.h";
+
+module dakota;
+
+klass output-stream;
+klass str128;
+
+klass system-exception
+{
+  superklass exception;
+
+  slots
+  {
+    int-t          errnum;
+    const char8-t* name;
+    str128-t       strerror;
+  }
+
+  method object-t init(object-t self, int-t errnum => {})
+  {
+    self = dk:init(super);
+    assert(0 != errnum);
+    self.errnum = errnum;
+    self.name = strerror-name(self.errnum);
+    strerror-r(self.errnum, self.strerror, sizeof(self.strerror));
+    return self;
+  }
+
+  method object-t print(object-t self, object-t out)
+  {
+    if (null == out)
+      out = std-error;
+    dk:print(super, out);
+    dk:print-format(out, ": errno=%s (\"%s\")\n",
+                    self.name, self.strerror);
+    return self;
+  }
+}

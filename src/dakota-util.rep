@@ -1,0 +1,30 @@
+{
+  'files' => [
+    'ascii-number-klass.dk',
+    'ascii-number.dk',
+    'cstring.dk',
+    'dimension.dk',
+    'float32.dk',
+    'float64.dk',
+    'hashed-counted-set.dk',
+    'hashed-set.dk',
+    'hashed-table.dk',
+    'input-file.dk',
+    'lexer.dk',
+    'module-dakota-util.dk',
+    'open-token.dk',
+    'pair.dk',
+    'perl-object-output-stream.dk',
+    'perl-parser.dk',
+    'point.dk',
+    'rect.dk',
+    'slot-info.dk',
+    'syntax-exception.dk',
+    'text-output-stream.dk',
+    'token.dk',
+    'tokenid.dk',
+    'xml-object-output-stream.dk'
+  ],
+  'name' => 'dakota-util.$SO_EXT',
+  'self-file' => 'dakota-util.rep'
+}

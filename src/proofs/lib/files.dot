@@ -1,0 +1,19 @@
+digraph
+{
+  graph [ rankdir = "TB" ];
+  graph [ label = "dakota --shared --output lib.so lib.dk", fontcolor = red ];
+  graph [ size = "8,8" ];
+  node [ shape = plaintext ];
+
+  "/usr/local/lib/libdakota.so" -> "obj/usr/local/lib/libdakota.so.ctlg";
+  "obj/usr/local/lib/libdakota.so.ctlg" -> "obj/usr/local/lib/libdakota.so.ctlg.rep";
+  "obj/usr/local/lib/libdakota.so.ctlg.rep" -> "obj/lib.rep";
+
+  "lib.dk" -> "obj/lib.cc";
+  "lib.dk" -> "obj/lib.dk.rep" -> "obj/nrt/lib.dk" -> "obj/nrt/lib.cc" -> "obj/nrt/lib.o" -> "lib.so";
+  "lib.dk" -> "obj/lib.rep" -> "obj/rt/lib.dk" -> "obj/rt/lib.cc" -> "obj/rt/lib.o" -> "lib.so";
+
+  { rank = same; "obj/lib.cc"; "obj/lib.dk.rep" }
+
+  "obj/lib.cc" -> "obj/nrt/lib.cc" [ constraint = false, dir = back, color = green ];
+}

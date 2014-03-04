@@ -1,0 +1,27 @@
+gcc                       foo.c bar.c => a.out
+gcc             -o output foo.c bar.c => output
+
+gcc -dynamiclib           foo.c bar.c => a.out
+gcc -dynamiclib -o output foo.c bar.c => output
+
+===
+
+gcc -c                    foo.c bar.c => foo.o bar.o
+gcc -c          -o output foo.c bar.c => output
+
+---
+
+gcc -c -o output
+gcc --compile --output output
+
+gcc -S -o output
+gcc --assemble --output output
+
+dakota --precompile --output output
+
+dakota --compile             foo.dk bar.dk => foo.o bar.o
+dakota --compile --output <> foo.dk bar.dk => <>
+
+dakota --shared
+
+dakota major-modes: "precompile", "compile", "shared", ""

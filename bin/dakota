@@ -1,0 +1,153 @@
+#!/usr/bin/perl -w
+
+# Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+use strict;
+use warnings;
+
+package dakota;
+
+my $prefix;
+
+BEGIN
+{
+    $prefix = '/usr/local';
+    if ($ENV{'DK_PREFIX'})
+    { $prefix = $ENV{'DK_PREFIX'}; }
+
+    unshift @INC, "$prefix/lib";
+};
+
+use dakota;
+
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Indent    = 1; # default = 2
+
+use Getopt::Long;
+$Getopt::Long::ignorecase = 0;
+
+my $sysname = lc(`uname -s`);
+chop $sysname;
+
+my $CXX;
+my $SO_EXT;
+
+if (defined $ENV{'CXX'}) {
+    $CXX = $ENV{'CXX'};
+}
+else {
+    $CXX = 'g++'; # default
+}
+
+if (defined $ENV{'SO_EXT'}) {
+    $SO_EXT = $ENV{'SO_EXT'};
+}
+elsif ('darwin' eq $sysname) {
+    $SO_EXT = 'dylib'; # darwin default
+}
+else {
+    $SO_EXT = 'so'; # non-darwin default
+}
+
+#if (!exists $ENV{'SO_EXT'})
+$ENV{'SO_EXT'} = $SO_EXT;
+
+#if (!exists $ENV{'CXX'})
+{ $ENV{'CXX'} = $CXX; } # default CXX
+
+if (!exists $ENV{'CXXFLAGS'})
+{ $ENV{'CXXFLAGS'} = ''; } # default CXXFLAGS
+
+if (!exists $ENV{'EXTRA_CXXFLAGS'})
+{ $ENV{'EXTRA_CXXFLAGS'} = ''; } # default EXTRA_CXXFLAGS
+
+if (!exists $ENV{'LDFLAGS'})
+{ $ENV{'LDFLAGS'} = ''; } # default LDFLAGS
+
+if (!exists $ENV{'EXTRA_LDFLAGS'})
+{ $ENV{'EXTRA_LDFLAGS'} = ''; } # default EXTRA_LDFLAGS
+
+my $root_cmd = { 'opts' => { 'include-directory' => [], 'define-macro' => [] }, 'reps' => [] };
+
+&GetOptions($$root_cmd{'opts'},
+            'precompile',          # gcc-ish (--compile)
+            'compile',             # gcc-like
+            'shared',              # gcc-like
+            'dynamic',             # gcc-like
+            'name=s',              # ld-sh (-soname <>)
+            'keep-going',          # make-like
+            'define-macro=s',      # gcc-like
+            'include-directory=s', # gcc-like
+            'directory=s',         # make-like
+            'output=s',            # gcc-like
+            'nodefaultlibs',       # gcc-like
+            'makeflags=s',         # similiar to env var MAKEFLAGS
+	   #'compiler=s',          # similiar to env var CXX
+	   #'compiler-flags=s',    # similiar to env vars EXTRA_CXXFLAGS & CXXFLAGS
+	   #'linker=s',            # similiar to env var LD
+	   #'linker-flags=s',      # similiar to env vars EXTRA_LDFLAGS & LDFLAGS
+            );
+# --jobs=
+# --quiet
+# --help
+# --verbose
+
+$$root_cmd{'inputs'} = \@ARGV;
+
+if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV)
+{
+    #`dakota --help`;
+    exit 1;
+}
+
+if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'})
+{
+    my $libdakota = "$prefix/lib/libdakota.$ENV{'SO_EXT'}";
+    if ($$root_cmd{'opts'}{'output'} ne $libdakota)
+    {
+	&_add_last($$root_cmd{'inputs'}, $libdakota);
+    }
+}
+if ($$root_cmd{'opts'}{'include-directory'})
+{
+    my $flags = '';
+    foreach my $dir (@{$$root_cmd{'opts'}{'include-directory'}})
+    {
+	$flags .= " --include-directory $dir";
+    }
+    $ENV{'EXTRA_CXXFLAGS'} .= $flags;
+}
+
+if ($$root_cmd{'opts'}{'define-macro'})
+{
+    my $flags = '';
+    foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}})
+    {
+	$flags .= " --define-macro $mcr";
+    }
+    $ENV{'EXTRA_CXXFLAGS'} .= $flags;
+}
+
+if ($$root_cmd{'opts'}{'directory'})
+{
+    chdir $$root_cmd{'opts'}{'directory'};
+}
+
+my $result = &start($root_cmd);
+exit $result;

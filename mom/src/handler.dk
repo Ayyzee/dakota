@@ -1,0 +1,117 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef _GNU-SOURCE
+#define _GNU-SOURCE
+#endif //_GNU-SOURCE
+include <dlfcn.h>;
+
+include "assert.h";
+include "config.h";
+include "hacks.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass callback;
+klass klass;
+
+klass handler
+{
+  slots
+  {
+    callback:slots-t callback;
+    object-t self; // normally a connection:slots-t*
+    object-t udata;
+  }
+
+  method object-t init(object-t self, object-t object => NULL, callback:slots-t callback => NULL, object-t udata => NULL)
+  {
+    self = dk:init(super);
+    self.callback = callback;
+    self.self = object;
+    self.udata = udata;
+    return self;
+  }
+
+  method char8-t* statestr(object-t self, char8-t* buf, size-t buf-len)
+  {
+    throw $oops;
+    return buf;
+  }
+
+  method object-t log(object-t self, object-t object)
+  {
+    assert(NULL != self.callback);
+    __unused const char8-t* sname = "<unknown>";
+#if USE-DLADDR
+    Dl-info dli = {0};  int-t n = dladdr((const void*)self.callback, &dli);
+    if (0 != n && dli.dli-saddr == self.callback)
+      sname = dli.dli-sname;
+    else
+      MOM-LOG-WARNING-DL();
+#endif
+    char8-t buf[64] = "";
+    if (NULL != object)
+      dk:statestr(object, buf, sizeof(buf));
+    MOM-LOG-INVOKE("%s (self=%p, %s='%s')", sname, self.self, dk:name(dk:klass(object)), buf);
+    return self;
+  }
+
+  method object-t invoke(object-t self, object-t object)
+  {
+    dk:log(self, object);
+    self.callback(self.self, object);
+    return self;
+  }
+
+  method callback:slots-t callback(object-t self)
+  {
+    callback:slots-t result = self.callback;
+    return result;
+  }
+
+  method object-t object(object-t self)
+  {
+    object-t result = self.self;
+    return result;
+  }
+
+  method object-t udata(object-t self)
+  {
+    object-t result = self.udata;
+    return result;
+  }
+
+  method object-t object=(object-t self, object-t object)
+  {
+    self.self = object;
+    return object;
+  }
+
+  method object-t udata=(object-t self, object-t udata)
+  {
+    self.udata = udata;
+    return udata;
+  }
+
+  method callback:slots-t callback=(object-t self, callback:slots-t callback)
+  {
+    self.callback = callback;
+    return callback;
+  }
+}

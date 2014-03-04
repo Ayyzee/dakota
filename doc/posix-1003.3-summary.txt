@@ -1,0 +1,8 @@
+PASS
+FAIL
+UNRESOLVED
+UNTESTED
+UNSUPPORTED
+
+XFAIL (expected to fail)
+XPASS (expected to fail, but passes)

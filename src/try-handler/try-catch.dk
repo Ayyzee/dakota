@@ -1,0 +1,50 @@
+include <assert.h>;
+
+include "exception.h";
+
+
+
+
+
+
+
+
+void bar(uint-t v)
+{
+  if (k-throw & v)
+    throw make(exception:klass);
+}
+uint-t some-handler-var = 0;
+boole-t some-handler(object-t exception)
+{
+  assert(0 != (k-throw & some-handler-var));
+  boole-t result;
+  if (k-handle & some-handler-var)
+    result = true;
+  else
+    result = false;
+  USE(exception);
+  return result;
+}
+void foo(uint-t v)
+{
+  printf("%s(%i)\n", __func__, v);
+  try (some-handler)
+  {
+    some-handler-var = v;
+    bar(v);
+    printf("%s(%i) no-exception\n", __func__, v);
+  }
+  catch (system-exception:klass e1)
+  {
+    printf("%s(%i) caught(<%s>)\n", __func__, v, dk:name(dk:klass(e1)));
+  }
+  catch (exception:klass e2)
+  {
+    printf("%s(%i) caught(<%s>)\n", __func__, v, dk:name(dk:klass(e2)));
+  }
+  catch (...)
+  {
+    printf("%s(%i) caught(<...>)\n", __func__, v);
+  }
+}

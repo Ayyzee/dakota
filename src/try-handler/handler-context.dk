@@ -1,0 +1,48 @@
+include <stdio.h>;
+include <unistd.h>;
+include <assert.h>;
+
+export klass handler-context
+{
+  export slots
+  {
+    exception-handler:slots-t handler;
+    slots-t*                  next;
+  }
+  slots-t* current = NULL;
+
+  method slots-t* add(slots-t* s, slots-t* o)
+  {
+    assert(s == current);
+    assert(s != o);
+    o->next = s;
+    current = s = o;
+    return s;
+  }
+  method slots-t* remove(slots-t* s, slots-t* o)
+  {
+    assert(s == current);
+    assert(s == o);
+    current = s = s->next;
+    return s;
+  }
+}
+void dkt-handler-context-add(handler-context-t* hc, exception-handler-t handler)
+{
+  hc->handler = handler;
+  hc->next =    NULL;
+  handler-context:add(handler-context:current, hc);
+  return;
+}
+void dkt-handler-context-remove(handler-context-t* hc)
+{
+  handler-context:remove(handler-context:current, hc);
+  return;
+}
+void dkt-throw-object(object-t exception)
+{
+  printf("%s(<%s>)\n", __func__, dk:name(dk:klass(exception)));
+  if (NULL == handler-context:current || !handler-context:current->handler(exception))
+    throw exception;
+  printf("%s(<%s>) exception-handled\n", __func__, dk:name(dk:klass(exception)));
+}

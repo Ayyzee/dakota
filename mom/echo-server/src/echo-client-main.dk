@@ -1,0 +1,51 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include "inet.h";
+
+klass callback;
+klass event;
+klass event-queue;
+klass fd;
+klass msg-id;
+klass xin4-addr;
+klass xin-port;
+klass xsockaddr-in4;
+klass cstring;
+
+noexport void start-client(xin4-addr-t addr, xin-port-t port, callback-t rcv-msg-callback, object-t msg)
+{
+  object-t connection = make(connection:klass, callback => rcv-msg-callback);
+  xsockaddr-in4-t sin = xsockaddr-in4-create(addr, port);
+  dk:establish(connection, sin, connection:k-client);
+  dk:snd-msg(connection, msg);
+  dk:loop(dk:get-current(event-queue:klass), event-queue:k-forever);
+}
+
+export object-t client-rcv-msg-callback(object-t connection, object-t rcv-msg)
+{
+  dk:dump(rcv-msg);
+  exit(0);
+}
+
+int-t main(int-t argc, char8-t** argv)
+{
+  xin4-addr-t addr = xin4-addr:k-loopback;
+  xin-port-t   port = 7777;
+  object-t msg = make(msg:klass, tag => 42, val => cast(cstring-t){ "42", 2, 2 }); // ...
+  start-client(addr, port, client-rcv-msg-callback, msg);
+  return 0;
+}

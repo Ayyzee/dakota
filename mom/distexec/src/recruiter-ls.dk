@@ -1,0 +1,79 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <stdlib.h>;
+include <unistd.h>;
+
+include "common.h";
+include "inet.h";
+include "recruiter-ls.h";
+include "recruiter.h";
+include "tags.h";
+include "work-queue.h";
+
+klass callback;
+klass connection;
+klass event;
+klass event-queue;
+klass fd;
+klass msg-id;
+klass cstring;
+klass deque;
+
+extern xsockaddr-in4-t us-sin; // hackhack
+
+
+object-t ls-exec-work-rcv-msg(object-t ls-connection,
+                              object-t exec-work-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(ls-connection), dk:tag(exec-work-msg), __klass__, __func__);
+  match(exec-work, dk:tag(exec-work-msg));
+  object-t work = make(work:klass,
+                       connection => ls-connection,
+                       msg => exec-work-msg);
+  dk:add-last(work-queue, work);
+  // ls => mc bridge
+  object-t val = make(cstring:klass, len => 4 + (1));
+  cstring:slots-t* val-slots = unbox(val);
+  sys:snprintf(val-slots->ptr, 4 + (1), "%04x", us-sin.sin-port);
+  MOM-LOG-INFO("port=0x%x (%i)", us-sin.sin-port, us-sin.sin-port);
+  sin4-dump(us-sin);
+  object-t have-work-msg = make(msg:klass,
+                                tag => have-work,
+                                val => *val-slots);
+  dk:snd-msg(mc-connection, have-work-msg);
+  return ls-connection;
+}
+
+object-t ls-rcv-msg-callback(object-t ls-connection,
+                             object-t rcv-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(ls-connection), rcv-msg->tag, __klass__, __func__);
+  switch (dk:tag(rcv-msg))
+  {
+    case exec-work:
+    {
+      dk:invoke(ls-connection, ls-exec-work-rcv-msg, rcv-msg);
+      break;
+    }
+    default:
+    {
+      MOM-LOG-ERROR("error: unknown tag=0x%x", dk:tag(rcv-msg));
+    }
+  }
+  return ls-connection;
+}

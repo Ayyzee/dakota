@@ -1,0 +1,38 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  // default klass
+  superklass klass;
+
+  method object-t bar(object-t self)
+  {
+    return self;
+  }
+}
+
+klass o1
+{
+  klass k1;
+  // default superklass is 'object'
+
+  method object-t foo(object-t self)
+  {
+    object-t kls = dk:klass(self);
+    dk:bar(kls);
+    return self;
+  }
+}
+
+klass o2
+{
+  // default klass
+  superklass o1;
+}
+
+int-t main()
+{
+  object-t i2 = make(o2:klass);
+  dk:foo(i2);
+  return 0;
+}

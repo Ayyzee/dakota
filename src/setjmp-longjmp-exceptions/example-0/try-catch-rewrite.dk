@@ -1,0 +1,38 @@
+namespace exception-context { noexport noreturn void default-handler(object-t exception); } // hackhack
+void exception-context-add(exception-context-t*, exception-handler-t); // hackhack
+void exception-context-remove(exception-context-t*); // hackhack
+
+klass exception-context;
+klass exception-handler;
+
+void bar(boole-t v)
+{
+  if (v)
+    handle(make(exception:klass));
+}
+boole-t some-handler(object-t exception)
+{
+  boole-t result = false;
+  USE(exception);
+  return result;
+}
+void foo(boole-t v)
+{
+  exception-context-t _ec_; exception-context-add(&_ec_, some-handler); if (0 == setjmp(_ec_.state))
+                                                                        {
+									  bar(v);
+									  printf("no exception\n");
+                            exception-context-remove(&_ec_);            }
+                                                                        else if (dk:instance?(_ec_.exception, system-exception:klass))
+                                                                        {
+                            object-t e1 = _ec_.exception;                 printf("catch (%s:""klass)\n", dk:name(dk:klass(e1)));
+                                                                        }
+                                                                        else if (dk:instance?(_ec_.exception, exception:klass))
+                                                                        {
+                            object-t e2 = _ec_.exception;                 printf("catch (%s:""klass)\n", dk:name(dk:klass(e2)));
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                          printf("catch (...)\n");
+                                                                        }
+}

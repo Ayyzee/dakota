@@ -1,0 +1,11 @@
+in Objective-C
+  for (id e in s)
+
+in Java
+  for (Object e : s)
+
+in C#
+  for (object e : s)
+
+in Dakota
+  for (object-t e : s)

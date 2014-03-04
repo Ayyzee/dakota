@@ -1,0 +1,613 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <assert.h>;
+include <dlfcn.h>;
+include <sys/stat.h>;
+include <unistd.h>;
+
+include "hacks.h";
+include "inet.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass callback;
+klass cstring;
+klass event;
+klass event-queue;
+klass event-queue-klass;
+klass fd;
+klass handler;
+klass msg;
+klass msg-id;
+klass msg-klass;
+klass deque;
+klass xin-port;
+klass xin4-addr;
+klass xsa-family;
+klass xsockaddr-in4;
+klass xsocklen;
+
+klass connection
+{
+  /*noexport*/ const int32-t read-buf-capacity = 64 * 1024;
+  /*noexport*/ const int32-t write-buf-capacity = 64 * 1024;
+  /*noexport*/ const int32-t read-error-count-max = 9;
+  /*noexport*/ const int32-t write-0-count-max = 9;
+
+  noexport int32-t read-error-count = 0;
+  noexport int32-t write-0-count = 0;
+
+  export enum fd-state-t
+  {
+    k-read =    1,
+    k-write =   2,
+    k-connect = 3,
+    k-accept =  4
+  };
+
+  export enum ep-type-t
+  {
+    k-client = 1,
+    k-server = 2
+  };
+
+  slots
+  {
+    fd-t fd;
+    
+    xsockaddr-in4-t sin;
+    xsockaddr-in4-t peer; // recvfrom() address
+    
+    char8-t[INET-ADDRSTRLEN] addrstr;
+    
+    object-t read-event-handler;
+    object-t write-event-handler;
+    
+    object-t rcv-msg-handler;
+    
+    //object-t rcv-msgs; // fifo
+    object-t snd-msgs; // fifo
+    
+    cstring-t read-buf;
+    cstring-t write-buf;
+
+    boole-t write-is-enabled;
+//     error-t error;
+  }
+
+//   method object-t error(object-t self)
+//   {
+//     return self.error;
+//   }
+
+  method fd-t fd(object-t self)
+  {
+    assert(-1 != self.fd);
+    return self.fd;
+  }
+
+  method xin4-addr-t peer-addr(object-t self)
+  {
+//     fd:dump(self.fd);
+//     sin4-dump(self.peer);
+    //int-t n = in4-getpeername(self.fd, &self.peer);  sc(n);
+    sin4-dump(self.peer);
+    assert(INADDR-NONE != self.peer.sin-addr.s-addr);
+//     if (-1 == n)
+//       sys:abort();
+    return self.peer.sin-addr;
+  }
+
+  method const char8-t* addrstr(object-t self)
+  {
+    return self.addrstr;
+  }
+
+  method object-t enable-write-event-handler(object-t self)
+  {
+    if (false == self.write-is-enabled)
+    {
+      object-t eq = dk:get-current(event-queue:klass);
+      dk:add(eq, event:k-write, self.fd, box(self.write-event-handler));
+      self.write-is-enabled = true;
+    }
+    else
+      MOM-LOG-WARNING("error: write already enabled");
+    return self;
+  }
+
+  method object-t disable-write-event-handler(object-t self)
+  {
+    assert(true == self.write-is-enabled);
+    object-t eq = dk:get-current(event-queue:klass);
+    dk:remove(eq, event:k-write, self.fd);
+    self.write-is-enabled = false;
+    return self;
+  }
+
+  method callback-t rcv-msg-callback=(object-t self, callback-t rcv-msg-callback)
+  {
+  //MOM-LOG(mom:LOG-GENERIC-FLAG, "  rcv-msg-callback=%p", rcv-msg-callback);
+    dk:callback=(self.rcv-msg-handler, rcv-msg-callback);
+    return rcv-msg-callback;
+  }
+
+  method object-t snd-msg(object-t self, object-t msg)
+  {
+    MOM-LOG-SND-MSG("fd=%i %s:%s(\"%.*s\")", self.fd, __klass__, __func__, dk:buf(msg).len, dk:buf(msg).ptr);
+    dk:add-last(self.snd-msgs, msg);
+    if (!self.write-is-enabled)
+    {
+      //fd:dump(self.fd);
+      if (INADDR-NONE != self.peer.sin-addr.s-addr)
+        dk:enable-write-event-handler(self);
+    }
+    return self;
+  }
+
+  method object-t read-event-handler(object-t self)
+  {
+    object-t result = self.read-event-handler;
+    return result;
+  }
+
+  method object-t write-event-handler(object-t self)
+  {
+    object-t result = self.write-event-handler;
+    return result;
+  }
+
+  method callback-t read-event-callback=(object-t self, callback-t read-event-callback)
+  {
+  //MOM-LOG(mom:LOG-GENERIC-FLAG, "  read-event-callback=%p", read-event-callback);
+    dk:callback=(self.read-event-handler, read-event-callback);
+    object-t eq = dk:get-current(event-queue:klass);
+    dk:add(eq, event:k-read, self.fd, self.read-event-handler);
+    return read-event-callback;
+  }
+
+  method callback-t write-event-callback=(object-t self, callback-t write-event-callback)
+  {
+  //MOM-LOG(mom:LOG-GENERIC-FLAG, "  write-event-callback=%p", write-event-callback);
+    dk:callback=(self.write-event-handler, write-event-callback);
+    return write-event-callback;
+  }
+
+  method object-t log(object-t self, callback-t msg-callback, object-t msg)
+  {
+    assert(NULL != msg-callback);
+    assert(NULL != msg);
+    __unused const char8-t* sname = "<unknown>";
+#if USE-DLADDR
+    Dl-info dli = {0};  int-t n = dladdr((const void*)msg-callback, &dli);
+    if (0 != n && dli.dli-saddr == msg-callback)
+      sname = dli.dli-sname;
+    else
+      MOM-LOG-WARNING-DL();
+#endif
+    char8-t buf[4 + 4 + 8 + 4 + (1)] = ""; //01234567890123456789 : 20 + (1)
+    dk:statestr(msg, buf, sizeof(buf));
+    MOM-LOG-INVOKE("%s (self=%p, msg='%s')", sname, self, buf);
+    return self;
+  }
+
+  method object-t invoke(object-t self, callback-t msg-callback, object-t msg)
+  {
+    dk:log(self, msg-callback, msg);
+    object-t msg-handler = make(handler:klass,
+                                object => self,
+                                callback => msg-callback);
+    dk:invoke(msg-handler, msg);
+    return self;
+  }
+
+  export method object-t write-event-callback(object-t self, object-t event)
+  {
+    MOM-LOG-CALLBACK("fd=%i %s:%s()", self.fd, __klass__, __func__);
+    assert(true == self.write-is-enabled);
+//   MOM-LOG(mom:LOG-GENERIC-FLAG, "  event->data = %li", event->data);
+//   MOM-LOG(mom:LOG-GENERIC-FLAG, "  IS-SET-EOF(event) = %i", IS-SET-EOF(event));
+    if (dk:eof?(event))
+    {
+      MOM-LOG-EOF("fd=%i #EOF on write connection", self.fd);
+      dk:delayed-free(self);
+    }
+    else
+    {
+      while (0 != dk:size(self.snd-msgs))
+      {
+        object-t msg = dk:remove-first(self.snd-msgs);
+        //assert(dk:buf(msg).len <= event->data);
+        MOM-LOG-SND-MSG("fd=%i connection-snd-msg(\"%.*s\")", self.fd, dk:buf(msg).len, dk:buf(msg).ptr);
+#if 1
+        cstring-t msg-buf = dk:buf(msg);
+        int32-t len = sys:write(self.fd, msg-buf.ptr, msg-buf.len); nbsc(len);
+        assert(-1 != len);
+        assert(msg-buf.len == cast(uint32-t)len);
+//         MOM-LOG-WRITE("%i: connection-write(\"%.*s\", %i) = %i",
+//                      self.fd, len, msg->buf.ptr, msg->buf.len, len);
+#else
+        int32-t len = sys:write(self.fd, self.write-buf.ptr, self.write-buf.len); nbsc(len);
+//         MOM-LOG(mom:LOG-GENERIC-FLAG, "write(%i, \"%.*s\", %i) = %i",
+//                self.fd, len, self.write-buf, self.write-buf.len, len);
+        self.write-buf.len -= len;
+        sys:memcpy(self.write-buf.ptr, self.write-buf.ptr + len, self.write-buf.len);
+#endif
+        if (0 != len)
+        {
+            write-0-count = 0;
+        }
+        else
+        {
+          MOM-LOG-ERROR-ERRNO(errno);
+          write-0-count++;
+          
+          if (write-0-count-max < write-0-count)
+          {
+            MOM-LOG-ERROR("error: fd=%i BUGBUG: %i consecutive write() of length 0", self.fd, write-0-count);
+            dk:delayed-free(self);
+            write-0-count = 0;
+          }
+        }
+      }
+      dk:disable-write-event-handler(self);
+    }
+    return self;
+  }
+
+  export method object-t read-event-callback(object-t self, object-t event)
+  {
+    MOM-LOG-CALLBACK("fd=%i %s:%s()", self.fd, __klass__, __func__);
+//   MOM-LOG(mom:LOG-GENERIC-FLAG, "  event->data = %li", event->data);
+//   MOM-LOG(mom:LOG-GENERIC-FLAG, "  IS-SET-EOF(event) = %i", IS-SET-EOF(event));
+#if 0
+      int32-t len = sys:read(self.fd, self.read-buf.ptr + self.read-buf.len,
+                             self.read-buf.capacity - self.read-buf.len); nbsc(len);
+#else
+      int32-t flags;
+      int32-t len = in4-recvfrom(self.fd, self.read-buf.ptr + self.read-buf.len,
+                                  self.read-buf.capacity - self.read-buf.len,
+                                  flags = 0, &self.peer);  nbsc(len);
+      //sin-ntoh(&self.peer);
+#endif
+      if (-1 == len)
+      {
+        MOM-LOG-ERROR-ERRNO(errno);
+        if (ECONNRESET == errno)
+        {
+          dk:delayed-free(self);
+          return self; // stylestyle: more than one return per function
+        }
+        read-error-count++;
+
+        if (read-error-count-max < read-error-count)
+        {
+          MOM-LOG-ERROR("error: fd=%i BUGBUG: %i consecutive read() errors", self.fd, read-error-count);
+          dk:delayed-free(self);
+          read-error-count = 0;
+        }
+      }
+      else
+      if (0 == len)
+      {
+          MOM-LOG-EOF("fd=%i #EOF on read connection", self.fd);
+          dk:delayed-free(self);
+      }
+      else
+      {
+//         MOM-LOG-READ("%i: connection-read(\"%.*s\") = %i",
+//                     self.fd, len, self.read-buf.ptr + self.read-buf.len, len);
+        self.read-buf.len += len;
+        object-t rcv-msg;
+        while (NULL != (rcv-msg = dk:deserialize(msg:klass, self.read-buf.ptr, &self.read-buf.len)))
+        {
+          MOM-LOG-RCV-MSG("fd=%i connection-rcv-msg(\"%.*s\")",
+                         self.fd, dk:buf(rcv-msg).len, dk:buf(rcv-msg).ptr);
+          dk:invoke(self.rcv-msg-handler, rcv-msg);
+          if (NULL == self.read-buf.ptr) // hackhack
+            break;
+        }
+        read-error-count = 0;
+      }
+    return self;
+  }
+
+//   method object-t connect(object-t self)
+//   {
+//     int32-t n = in4-connect(self.fd, self.
+//   }
+
+
+  method object-t post-connect(object-t self)
+  {
+    int32-t n = in4-getpeername(self.fd, &self.peer);  sc(n);
+    MOM-LOG-INFO("fd=%i connect() completed", self.fd);
+    //fd:dump(self.fd);
+    dk:write-event-callback=(self, write-event-callback);
+    if (false == self.write-is-enabled && NULL != dk:first(self.snd-msgs))
+      dk:enable-write-event-handler(self);
+    return self;
+  }
+
+  export method object-t connect-write-event-callback(object-t self, object-t event)
+  {
+    //assert(dk:ident(event) == self.fd);
+    MOM-LOG-CALLBACK("fd=%i %s:%s()", self.fd, __klass__, __func__);
+    int32-t optval;
+    xsocklen-t optlen = sizeof(optval);
+    int32-t n = sys:getsockopt(self.fd, SOL-SOCKET, SO-ERROR, &optval, &optlen);  sc(n);
+    if (0 == optval)
+      dk:post-connect(self);
+    else
+      MOM-LOG-ERROR-ERRNO(optval);
+    return self;
+  }
+
+  export method object-t accept-read-event-callback(object-t self, object-t event)
+  {
+    xsockaddr-in4-t sin = xsockaddr-in4-create(xin4-addr:k-any, 0);
+
+    fd-t fd = in4-accept(self.fd, &sin); sc(fd);
+    MOM-LOG-FD("fd=%i #accept-fd", fd);
+    MOM-LOG-CALLBACK("fd=%i fd=%i %s:%s()", self.fd, fd, __klass__, __func__);
+    fd:add-nonblock(fd);
+
+    object-t next-connection = make(klass,
+                                    callback => dk:callback(self.rcv-msg-handler));
+    fd-t n = dk:establish(next-connection, fd, connection:k-read);  sc(n);
+
+    slots-t* next-connection-slots = unbox(next-connection);
+    in4-ntop(sin.sin-addr, next-connection-slots->addrstr, sizeof(next-connection-slots->addrstr) - (1));
+    MOM-LOG-HOST("fd=%i %s:%i", fd, next-connection-slots->addrstr, sin.sin-port);
+
+    return self;
+  }
+
+  method object-t init(object-t self, callback-t callback => {})
+  {
+    self = dk:init(super);
+
+    self.read-event-handler = make(handler:klass,
+                                   object => self);
+    self.write-event-handler = make(handler:klass,
+                                    object => self);
+    self.rcv-msg-handler = make(handler:klass,
+                                object => self,
+                                callback => callback);
+
+    self.write-buf.len = 0;
+    self.write-buf.capacity = write-buf-capacity;
+    self.write-buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * self.write-buf.capacity);
+    // bugbug
+    
+    self.read-buf.len = 0;
+    self.read-buf.capacity = read-buf-capacity;
+    self.read-buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * self.read-buf.capacity);
+    // bugbug
+    
+    self.snd-msgs = make(deque:klass);
+    
+    self.sin =  xsockaddr-in4-create(xin4-addr:k-none, 0);
+    self.peer = xsockaddr-in4-create(xin4-addr:k-none, 0);
+    
+    self.addrstr[0] = (char8-t)0;
+    
+    self.write-is-enabled = false;
+
+//     self.error.num = 0;
+//     self.error.str[0] = (char8-t)0;
+
+    return self;
+  }
+
+//   method int32-t flag-error(object-t self, int32-t num)
+//   {
+//     assert(0 != errno);
+//     self.error.num = num;
+//     const char8-t* str = sys:strerror(num);
+//     if (NULL == str)
+//       str = "";
+//     sys:strncpy(self.error.str, str, sizeof(self.error.str));
+//     self.error.str[sizeof(self.error.str) - (1)] = (char8-t)0;
+//     return -1;
+//   }
+
+  method fd-t establish(object-t self, fd-t fd, connection:fd-state-t state)
+  {
+    MOM-LOG-INFO("%s", __PRETTY-FUNCTION__);
+    assert(-1 != fd);
+    MOM-LOG(mom:LOG-GENERIC-FLAG | mom:LOG-CONN-FLAG,
+           "fd=%i %s:%s()", fd, __klass__, __func__);
+    self.fd = fd;
+
+    switch (state)
+    {
+      case connection:k-accept:
+        dk:read-event-callback=(self,  accept-read-event-callback);
+        dk:write-event-callback=(self, write-event-callback);
+        break;
+      case connection:k-connect:
+        dk:read-event-callback=(self,  read-event-callback);
+        dk:write-event-callback=(self, connect-write-event-callback);
+        dk:enable-write-event-handler(self);
+        break;
+      case connection:k-read:
+//         peer-size = sizeof(self.peer);
+//         n = in4-getpeername(self.fd, &self.peer);  sc(n);
+        dk:read-event-callback=(self,  read-event-callback);
+        dk:write-event-callback=(self, write-event-callback);
+        break;
+      case connection:k-write:
+//         peer-size = sizeof(self.peer);
+//         n = in4-getpeername(self.fd, &self.peer);  sc(n);
+        dk:read-event-callback=(self,  read-event-callback);
+        dk:write-event-callback=(self, write-event-callback);
+        break;
+      default:
+      {
+//         dk:flag-error(self, EINVAL);
+        goto __failure;
+      }
+    }
+    MOM-LOG-CREATE("fd=%i %s:%s() = 0x%08x", self.fd, __klass__, __func__, (uint32-t)self);
+    return fd;
+    __failure:
+    return -1;
+  }
+
+  method fd-t establish(object-t self, xsockaddr-in4-t sin, connection:ep-type-t type)
+  {
+    MOM-LOG-INFO("%s", __PRETTY-FUNCTION__);
+    assert(INADDR-NONE != sin.sin-addr.s-addr);
+    sin4-dump(sin);
+    fd-t fd;
+    fd-t n;
+    fd-state-t state;
+
+    if (!IN-MULTICAST(sin.sin-addr.s-addr) && connection:k-client == type)
+    {
+      fd = ucast-client(sin);  sc(fd);
+    }
+    else
+    if (!IN-MULTICAST(sin.sin-addr.s-addr) && connection:k-server == type)
+    {
+      fd = ucast-server(sin, 128);  sc(fd);
+      state = connection:k-accept;
+    }
+    else
+    if (IN-MULTICAST(sin.sin-addr.s-addr) && connection:k-client == type)
+    {
+      fd = mcast-client(sin);  sc(fd);
+    }
+    else
+    if (IN-MULTICAST(sin.sin-addr.s-addr) && connection:k-server == type)
+    {
+      fd = mcast-server(sin);  sc(fd);
+      state = connection:k-read;
+    }
+    else
+    {
+//       dk:flag-error(self, EINVAL);
+      goto __failure;
+    }
+
+    if (-1 == fd)
+    {
+//       dk:flag-error(self, errno);
+      goto __failure;
+    }
+
+//     if (connection:k-server == type)
+//     {
+//       fd:dump(fd);
+//       int32-t n = in4-getpeername(fd, &self.sin);  sc(n);
+//     }
+
+    if (connection:k-client == type)
+    {
+      int32-t n = in4-getsockname(fd, &self.sin);  sc(n);
+    }
+
+    if (connection:k-client == type)
+    {
+      int32-t n = in4-connect(fd, sin);  //nbsc(n);
+      if (0 == n)
+      {
+        state = connection:k-write;
+      }
+      else
+      if (-1 == n && EINPROGRESS == errno)
+      {
+        state = connection:k-connect;
+      }
+      else
+      {
+//         dk:flag-error(self, errno);
+        sin4-dump(sin);
+        MOM-LOG-ERROR-ERRNO(errno);
+        goto __failure;
+      }
+    }
+    n = dk:establish(self, fd, state);  sc(n);
+    if (-1 == n)
+      goto __failure;
+
+    if (connection:k-client == type && connection:k-write == state)
+        dk:post-connect(self);
+
+    return fd;
+    __failure:
+    sys:close(fd); // may or may not succeed
+    return -1;
+  }
+
+  method int32-t close(object-t self)
+  {
+    int32-t n = 0;
+    if (-1 != self.fd)
+    {
+      object-t eq = dk:get-current(event-queue:klass);
+      dk:remove(eq, event:k-read, self.fd);
+      if (self.write-is-enabled)
+      {
+        dk:remove(eq, event:k-write, self.fd);
+      }
+      n = sys:close(self.fd);
+      self.fd = -1;
+    }
+    return n;
+  }
+
+  method object-t free(object-t self)
+  {
+    MOM-LOG(mom:LOG-GENERIC-FLAG, "fd=%i %s:%s()", self.fd, __klass__, __func__);
+    MOM-LOG-CONN("fd=%i %s:%s()", self.fd, __klass__, __func__);
+    MOM-LOG-FREE("fd=%i %s:%s(0x%08x)", self.fd, __klass__, __func__, (uint32-t)self);
+    dk:close(self);
+    self.snd-msgs = dk:free(self.snd-msgs);
+
+    sys:free(self.write-buf.ptr); self.write-buf.ptr = NULL;
+    sys:free(self.read-buf.ptr); self.read-buf.ptr = NULL;
+
+    self.read-event-handler = dk:free(self.read-event-handler);
+    self.write-event-handler = dk:free(self.write-event-handler);
+    self.rcv-msg-handler = dk:free(self.rcv-msg-handler);
+
+    sys:free(self); self = NULL;
+    return NULL;
+  }
+
+  method object-t free-handler-callback(object-t self)
+  {
+    //self = dk:free(self);
+    return self;
+  }
+
+  method object-t delayed-free(object-t self)
+  {
+    dk:close(self);
+    object-t handler = make(handler:klass,
+                            object => self,
+                            callback => free-handler-callback);
+    object-t eq = dk:get-current(event-queue:klass);
+    dk:add(eq, handler);
+    return self;
+  }
+}

@@ -1,0 +1,31 @@
+Dakota is a dynamic (class-based) object system for the procedural
+language C++.  Using C++ as a better C, Dakota layers a dynamic object
+system (with a proper metaclass system).  Rather than using the C++
+style syntax of object.method(...), Dakota opts for a more functional
+(umm procedural) style using generic (aka polymorphic) functions.
+This choice has served Dakota really well since generic function &
+methods are just functions (no hidden argument like in C++) so its
+much more natural for callback based programming, etc.  Also, Dakota
+has a unique separation of state and behavior so that behavior can be
+added orthogonally to the class hierarchy; this abstraction is called
+'traits'.  Think of traits as Java interface, but not limited to being
+purely declarative, but they can also be definitive; they can include
+implementation!  Dakota also supports true keyword argument functions.
+Under normal circumstances Dakota does not require that you author a
+header file; its has a symbol repository. :-)
+
+This project started out 12 years ago to create a portable Objective-C
+(I was at NeXT in 1990).  But as I learned about CLOS and Dylan, I
+decided to follow this model.  Expect to see impressive dynamic
+interpositioning (class, method, and generic function) as well as
+features of Aspect Oriented Programming (like in AspectJ).  Why?
+Because I was on the team at Xerox PARC that developed AOP and AspectJ
+(under Gregor Kiczales, also of CLOS fame).
+
+Dakota is implemented as a precompiler that uses g++, so all the tools
+you are familiar with (for doing C++ development) are supported.
+Right now the parser, code generator, and compiler driver are in Perl.
+But soon to be rewritten in Dakota.
+
+A feature I've recently decided to add is a macro system like Dylan.
+But this is just in the beginnings of the design phase.

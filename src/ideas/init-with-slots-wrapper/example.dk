@@ -1,0 +1,18 @@
+klass string-klass
+{
+  klass klass;
+
+  // user authored
+
+  method object-t init(object-t self, named-info-node:slots-t* info-slots => NULL)
+  {
+    ...
+  }
+
+  // implies
+
+  method object-t init(object-t self, named-info-node:slots-t* info-slots => NULL, object-t info => NULL)
+  {
+    ...
+  }
+}

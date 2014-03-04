@@ -1,0 +1,8 @@
+  { "obj/usr/local/lib/libdakota.dylib.ctlg", [ "/usr/local/lib/libdakota.dylib", ] },
+  { "obj/usr/local/lib/libdakota.dylib.ctlg.rep", [ "obj/usr/local/lib/libdakota.dylib.ctlg", ] },
+  { "obj/exe.dk.rep", [ "exe.dk", ] },
+  { "obj/exe.rep", [ "obj/exe.dk.rep", ] },
+  { "obj/nrt/exe.cc", [ "exe.dk", ] },
+  { "obj/nrt/exe.o", [ "obj/nrt/exe.cc", ] },
+  { "obj/rt/exe.o", [ "obj/rt/exe.cc", ] },
+  { "exe", [ "obj/rt/exe.o","obj/nrt/exe.o","/usr/local/lib/libdakota.dylib", ] },

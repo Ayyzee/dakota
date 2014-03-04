@@ -1,0 +1,38 @@
+digraph {
+  graph [ rankdir = LR, center = true, margin = "0.25" ];
+  graph [ page = "8.5,11", size = "7.5,10" ];
+  node [ shape = circle ];
+//   "99" [ shape = doublecircle ];
+  "qual-type-ident" [ shape = doubleoctagon, fontcolor = blue ];
+  type [ shape = doubleoctagon, fontcolor = blue ];
+
+  node [ label = "", width = 0.25 ];
+
+  399 [ shape = doublecircle ];
+
+  "qual-type-ident" -> 300 [ label = ":" ];
+  "qual-type-ident" -> 310 [ label = "ident", fontcolor = blue ];
+  300 -> 310 [ label = "ident", fontcolor = blue ];
+  310 -> 300 [ label = ":", color = green ];
+  300 -> 399 [ label = "type-ident", fontcolor = blue ];
+  "qual-type-ident" -> 399 [ label = "type-ident", fontcolor = blue ];
+
+  type -> 20 [ label = "struct\lunion\lenum\lclass\l"];
+  20 -> 30 [ label = "qual-type-ident", fontcolor = blue ];
+  type -> 30 [ label = "qual-type-ident", fontcolor = blue ];
+//   30 -> 40 [ label = "const" ];
+//   30 -> 40 [ label = "*" ];
+
+  30 -> 30 [ label = "const" ];
+  30 -> 30 [ label = "*" ];
+
+  30 -> 40 [ label = "[" ];
+  30 -> 60 [ label = "&" ];
+  40 -> 50 [ label = "..." ];
+  50 -> 60 [ label = "]" ];
+
+  60 -> 40 [ label = "[", color = green ];
+
+  30 [ shape = doublecircle ];
+  60 [ shape = doublecircle ];
+}

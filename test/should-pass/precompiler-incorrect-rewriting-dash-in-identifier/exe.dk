@@ -1,0 +1,14 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdio.h>;
+
+int-t main()
+{
+  int-t foo-bar = 14;
+  
+  int-t foo = 45;
+  int-t bar = 3;
+  
+  printf("%i == %i\n", foo - bar, foo-bar);
+  return 0;
+}

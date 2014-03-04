@@ -1,0 +1,17 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  method object-t init(object-t self, object-t $token, const char8-t* filename)
+  {
+    self = dk:init(super);
+    return self;
+  }
+} 
+
+int-t main()
+{
+  object-t o = make(k1:klass, token => null, filename => NULL);
+  USE(o);
+  return 0;
+}

@@ -1,0 +1,37 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module test-1;
+
+  trait printable
+  {
+    method object-t name0(object-t self, const char8-t* arg1)
+    {
+      //
+      return null;
+    }
+
+    method object-t va:name1(object-t self, const char8-t* format, va-list-t args)
+    {
+      //
+      return null;
+    }
+    
+    method object-t name2(object-t self, const char8-t* arg1)
+    {
+      //
+      return self;
+    }
+
+
+    method object-t va:name3(object-t self, const char8-t* format, va-list-t args)
+    {
+      //
+      return self;
+    }
+
+    method object-t name4(object-t self)
+    {
+      //
+      return self;
+    }
+  }

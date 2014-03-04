@@ -1,0 +1,13 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module test-1;
+
+klass k1
+{
+  slots int-t;
+
+  method slots-t f1(slots-t s)
+  {
+    return s;
+  }
+}

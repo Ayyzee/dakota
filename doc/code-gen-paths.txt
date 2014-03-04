@@ -1,0 +1,70 @@
+fs: fs-import fs-export|fs-noexport
+fs: fs-decl-klass|fs-decl-trait fs-defn-klass fs-defn-trait
+fs-export|fs-noexport: fs-defn-klass fs-defn-trait
+fs-import: fs-decl-klass|fs-decl-trait
+fs-decl-klass|fs-decl-trait: fs-decl-klass-qi
+fs-decl-klass-qi: fs-;
+
+fs-defn-klass: fs-defn-klass-qi
+fs-defn-klass-qi: fs-defn-klass-{
+fs-defn-klass-{: fs-defn-klass-ks
+fs-defn-klass-ks: fs-defn-klass-}
+
+fs-defn-trait: fs-defn-trait-qi
+fs-defn-trait-qi: fs-defn-trait-{
+fs-defn-trait-{: fs-defn-trait-ts
+fs-defn-trait-ts: fs-defn-trait-}
+
+ts: ts-import ts-export|ts-noexport ts-initialize
+ts: ts-method
+ts-export|ts-noexport: ts-initialize ts-method
+ts-import: ts-decl/initialize ts-decl/method
+
+ks: ks-import ks-export|ks-noexport ks-decl-slots ks-defn-slots ks-superklass|ks-klass ks-initialize
+ks: ks-method
+ks-export|ks-noexport: ks-defn-slots ks-initialize ks-method
+ks-import: ks-decl-slots ks-decl/initialize ks-decl/method
+
+decl/method: decl/method-qt
+decl/method-qt: decl/method-qi
+decl/method-qi: decl/method-(
+decl/method-(: decl/method-)
+decl/method-): decl/method-;
+
+defn/method: defn/method-qt
+defn/method-qt: defn/method-qi
+defn/method-qi: defn/method-(
+defn/method-(: defn/method-)
+defn/method-): defn/method-{
+defn/method-{: defn/method-ms
+defn/method-ms: defn/method-}
+
+decl/initialize: decl-void
+decl-void: decl-initialize
+decl-initialize: decl/initialize-(
+decl/initialize-(: decl/initialize-)
+decl/initialize-): decl/initialize-;
+
+defn/initialize: defn-void
+defn-void: defn-initialize
+defn-initialize: defn/initialize-(
+defn/initialize-(: defn/initialize-)
+defn/initialize-{: defn-is
+defn-is:  defn/initialize-}
+
+defn/initialize-(:  defn/initialize-)
+defn/initialize-):  defn/initialize-{
+
+ks-decl-slots: ks-decl-slots-qt
+ks-decl-slots-qt: ks-;
+
+ks-defn-slots: ks-defn-slots-{
+ks-defn-slots-{: ks-ss
+ks-ss: ks-ss
+ks-ss: ks-defn-slots-}
+
+ks-superklass|ks-klass: ks-decl-qi
+ks-decl-qi: ks-;
+
+initialize: initialize-decl/initialize initialize-defn/initialize
+method: method-decl/method method-defn/method

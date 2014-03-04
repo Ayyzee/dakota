@@ -1,0 +1,34 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+include <netinet/in.h>;
+export klass my-xsockaddr-in
+{
+  export slots struct sockaddr-in;
+}
+export klass k0
+{
+  slots;
+}
+export klass k1
+{
+  slots struct;
+}
+export klass k2
+{
+  slots
+  { }
+}
+export klass k3
+{
+  slots struct
+  { }
+}
+export klass k4
+{
+  export slots
+  { }
+}
+export klass k5
+{
+  export slots struct
+  { }
+}

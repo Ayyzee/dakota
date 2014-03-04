@@ -1,0 +1,243 @@
+<html>
+<head>
+<title>Introducing Dakota</title>
+</head>
+<body>
+
+<ul>
+<li><b>original goals</b>
+<ul>
+<li>make (systems) programming fun and productive
+<li>Objective-C feature set in a more traditional C/C++ syntax
+<ul>
+<li>+ exceptions
+<li>+ traits
+</ul>
+</ul>
+<li><b>influences/implementations</b>
+<ul>
+<li>Objective-C (C meets SmallTalk)
+<ul>
+<li>NeXT
+<li>Apple
+</ul>
+<li>DYLAN & CLOS (object systems in functional languages)
+<ul>
+<li>thanks John McCarthy!
+<li>literature
+</ul>
+<li>SmallTalk
+<ul>
+<li>thanks Dan Ingalls!
+<li>literature
+</ul>
+<li>AOP/AspectJ
+<ul>
+<li>thanks Mik Kersten!
+<li>Xerox PARC
+</ul>
+<li>dynamic linker/loader (w/ Nick Kledzik)
+<ul>
+<li>Apple (Darwin) Tiger 10.4.x
+</ul>
+</ul>
+<li><b>intro</b>
+<ul>
+<li>hybrid language/system
+<li>pragmatic/evolutionary approach to "raising the bar"
+<li>dynamically typed object system for procedural language C++
+<ul>
+<li>using C++ as a better C (namespaces, exceptions, ...)
+<li>not a layer over the C++ object system
+</ul>
+<li>supports meta-programing (not a full MOP)
+<li>klass (not class) used consistently :-)
+<li>terminology
+<ul>
+<li>object-t
+<li>self, klass, super
+<li>generic functions
+<li>methods
+<li>slots
+<li>make()
+<li>symbols
+<li>keyword arguments
+</ul>
+<li>un-terminology
+<ul>
+<li>constructor/destructor
+<li>member variables/functions
+<li>instance/klass variables
+<li>instance/klass methods
+</ul>
+<li>single inheritance & traits
+<li>introspection, reflection, & serialization
+<li>explicit proper metaklass system (modeled after ObjVlisp)
+<li>uses instantiation rather than construction
+<li>interpositioning (klass, method, or generics) NYR
+<li>no header files
+<ul>
+<li>dakota-introspector /usr/local/lib/libfoo.so
+</ul>
+<li>project symbol repository
+<ul>
+<li>single executable or library
+<li>skeletal klass definition information
+</ul>
+</ul>
+<li><b>metaklasses</b>
+<ul>
+<li>modeled after ObjVlisp
+<ul>
+<li>"Metaclasses are first class : the ObjVlisp model" by Pierre Cointe (1987)
+</ul>
+<li>klasses are instances of klasses; these klasses are called metaklasses
+<li>explicit, non-anonymous like in SmallTalk
+<li>minimal, number of metaklass < number of klass
+<li>(the klass) object is root of inheritance hierarchy,
+<li>(the klass) klass is root of instantiation hierarchy
+</ul>
+<img src="inherit+instant-1.png"><br>
+<hr>
+<img src="inherit+instant-2.png"><br>
+
+<li><b>symbol repository</b>
+<ul>
+<li>no headers
+<li>minimize recompiles
+<li>very fast dynamic linking
+</ul>
+<li><b>traits</b>
+<ul>
+<li>Objective-C: protocols with implementation
+<li>Java/C#: interfaces with implementation
+<li>...: stateless mixins
+<li>proper subset of a klass (a degenerate klass)
+<ul>
+<li>no superklass, no metaklass, no slots
+</ul>
+<li>traits can (of course) use other traits
+<li>klass/trait division
+</ul>
+<img src="collection-set-klasses.png"><br>
+<li><b>dynamic</b>
+<ul>
+<li>dynamic dispatch based on dynamic type of an object
+<li>dynamic klass creation
+<ul>
+<li>ascii-number, ascii-number-klass used to dynamic create base-42-ascii-number
+</ul>
+<li>dynamic method association / dissociation
+<li>dynamic library loading
+<ul>
+<li>not like java class files
+<li>how many exported systems?
+</ul>
+</ul>
+<li><b>key points</b>
+<ul>
+<li>similar to ADT style/constructs
+<li>state & behavior are not excessively intertwined
+<li>traits improve abstraction & reuse
+<li>correct default visibility
+<li>re-factoring
+<li>experimentation
+<li>performance knobs
+<ul>
+<li>remove dynamic dispatch when not required
+<ul>
+<li>monomorphic methods in a sealed system
+</ul>
+<li>allow direct access to slots/methods when needed
+<ul>
+<li>__export __method object-t compare(...) { ... }
+<li>__export __slots { ... }
+<ul>
+<li>slots-t* slots = unbox(object);
+</ul>
+<li>NXRECT
+<li>klass <-> struct
+</ul>
+<li>generic functions can be inlined (or even written in assembler)
+<li>caching method pointer for direct (non-dispatched) execution
+<li>meta-information can be minimized for deployment
+</ul>
+</ul>
+<li><b>keyword arguments</b>
+<ul>
+<li> required
+<li> optional (default value)
+</ul>
+<li><b>hygienic macro system (NRY)</b>
+<ul>
+<li>modeled after Dylan
+<ul>
+<li>"Dylan Reference Manual" Andrew Shalit, David Moon, Orca Starbuck (mid 1990s)
+</ul>
+<li>arrived at the need for a token based match & replacement system
+</ul>
+<li><b>implementation</b>
+<ul>
+<li>uses pre-compiler
+<li>uses compiler driver (dakota) and library (libdakota.so)
+<li>klasses are just namespaces (and namespaces are open)
+<li>slots are just structs (unless they are not)
+<li>methods are just functions
+<li>generic functions are just functions
+<li>generic functions definitions are implied
+<li>make(kls, ...) is not a generic function, its a cover for dk:init(dk:init(kls), ...)
+<li>unboxing, boxing
+</ul>
+<li><b>pragmatic</b>
+<ul>
+<li>use object system where appropriate
+<li>use klass/trait scoped slots and methods where appropriate
+<li>use primitive types where appropriate
+<li>bridge to other languages/systems/technologies is via C/C++ *native*
+<li>generates C++ code
+<li>thus uses C++ compilers (gcc)
+<li>thus can use C++ debuggers (gdb)
+<li>thus can use C++ profilers, etc
+<li>working on an emacs mode (help!)
+</ul>
+<li><b>advanced feature</b>
+<ul>
+<li>wrapping already defined structures
+<li>slots-t* methods
+<li>va methods
+<ul>
+<li>va:print-format()
+</ul>
+</ul>
+<li><b>visibility</b>
+<ul>
+<li>implicit visibility for decl: __import
+<li>implicit visibility for defn: __noexport
+<li>explicit visibility: __export
+<li>klasses decl/defn
+<li>slots   decl/defn
+<li>methods decl/defn
+</ul>
+<li><b>legal:</b>
+<ul>
+<li>will be opensourced
+<ul>
+<li>dakota.org
+<li>Subversion
+</ul>
+<li>what is the *best* license for unimpeded adoption?
+</ul>
+<li><b>what about ... ?</b>
+<ul>
+<li>memory management (help!)
+<li>distributed objects
+<li>a module system
+<li>a condition system (help!)
+<ul>
+<li>calling vs unwinding exceptions
+</ul>
+<li>win32 support (help!)
+<li>unicode/wide character support (help!)
+<li>why the name Dakota?
+</body>
+</html>

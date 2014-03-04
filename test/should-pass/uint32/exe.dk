@@ -1,0 +1,13 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass uint32;
+
+int-t main()
+{
+  uint32-t v = 42;
+  object-t o = uint32:box(v);
+  uint32-t* u = uint32:unbox(o);
+
+  printf("%u == %u\n", v, *u);
+  return 0;
+}

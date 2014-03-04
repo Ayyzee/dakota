@@ -1,0 +1,78 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "grammar-type"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR, center = true ];
+  graph [ page = "8.5,11", size = "7.5,10" ];
+//   graph [ concentrate = true ];
+  node [ shape = circle ];
+
+  "type" [ shape = doublecircle, fontcolor = blue ];
+  ptr    [ shape = plaintext, fontcolor = blue ];
+  "qual-type-ident" [ shape = plaintext, fontcolor = blue ];
+
+  node [ label = "", width = 0.25 ];
+
+  "999" [ shape = doublecircle ];
+
+  "type" -> 060 [ label = "qual-type-ident", fontcolor = "blue" ];
+  050 -> 070 [ label = "qual-type-ident", fontcolor = "blue" ];
+  050 -> 060 [ label = "qual-type-ident", fontcolor = "blue" ];
+  "type" -> 060 [ label = "void" ];
+  050 -> 020 [ label = "struct\nunion\nenum" ];
+  "type" -> 015 [ label = "struct\nunion\nenum" ];
+  015 -> 020 [ label = "const" ];
+  "type" -> 050 [ label = "const" ];
+  "type" -> 070 [ label = "qual-type-ident", fontcolor = "blue" ];
+  020 -> 060 [ label = "qual-type-ident", fontcolor = "blue" ];
+  060 -> 070 [ label = "ptr", fontcolor = "blue" ];
+  "type" -> 030 [ label = "qual-type-ident", fontcolor = "blue" ];
+  020 -> 070 [ label = "qual-type-ident", fontcolor = "blue" ];
+  030 -> 070 [ label = "const" ];
+  050 -> 060 [ label = "void" ];
+  "type" -> 070 [ label = "void" ];
+  "type" -> 020 [ label = "struct\nunion\nenum" ];
+  030 -> 060 [ label = "const" ];
+
+  070 -> 999 [ style = dashed ]; // intentionally empty
+
+  "type" -> 040 [ label = "void" ];
+  040 -> 060 [ label = "const" ];
+  070 -> 080 [ label = "[" ];
+  080 -> 090 [ label = "..." ];
+  090 -> 999 [ label = "]" ];
+
+  080 -> 999 [ label = "[", dir = back, color = green ];
+
+  070 -> 100 [ label = "(" ];
+  100 -> 100 [ label = "*", color = green ];
+  100 -> 130 [ label = ")" ];
+  130 -> 140 [ label = "(" ];
+  140 -> 150 [ label = "type", fontcolor = blue ];
+  140 -> 150 [ label = ",", dir = back, color = green ];
+  140 -> 999 [ label = ")" ];
+  150 -> 999 [ label = ")" ];
+
+  ptr -> 299 [ label = "*" ];
+  299 -> 299 [ label = "*" ];
+  ptr -> 299 [ label = "const", dir = back, color = green ];
+
+  "qual-type-ident" -> 300 [ label = ":" ];
+  300 -> 310 [ label = "ident", fontcolor = blue ];
+  300 -> 310 [ label = ":", dir = back, color = green ];
+  300 -> 399 [ label = "type-ident", fontcolor = blue ];
+  "qual-type-ident" -> 399 [ label = "type-ident", fontcolor = blue ];
+}

@@ -1,0 +1,13 @@
+slots {}
+slots;
+
+slots sockaddr-in;
+slots  int32-t;
+
+slots int32-t[2];
+
+slot
+{
+  int32-t x;
+  int32-t y;
+}

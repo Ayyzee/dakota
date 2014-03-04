@@ -1,0 +1,37 @@
+// generated code for imported method
+klass k1
+{
+  namespace __method
+  {
+    method-t* m1(object-t, char8-t*)
+    {
+      static method-t result;
+      return &result;
+    }
+  }
+
+  /*method*/ int-t m1(object-t self, char8-t* arg1)
+  {
+    static int-t (*_func_)(object-t, char8-t*) = *cast(int-t (**)(object-t, char8-t*))((cast(method-t* (*)())cast(method-t* (*)(object-t, char8-t*))__method:m1)());
+    int-t result = _func_(self, arg1);
+    return result;
+  }
+}
+
+// dummy function for testing this proof
+int-t dummy(object-t self, char8-t*)
+{
+  log-func();
+  return 0;
+}
+
+int-t main()
+{
+  // set by runtime
+  int-t (**func)(object-t, char8-t*) = cast(int-t (**)(object-t, char8-t*))((cast(method-t* (*)())cast(method-t* (*)(object-t, char8-t*))k1:__method:m1)());
+  *func = dummy;
+
+  k1:m1(NULL, 0); // test
+
+  return 0;
+}

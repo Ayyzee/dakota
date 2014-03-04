@@ -1,0 +1,68 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass thing
+{
+  // user authored
+  method boole-t empty?(object-t self)
+  {
+    boole-t result = false; // hackhack
+    return result;
+  }
+  method object-t empty!(object-t self)
+  {
+    // hackhack
+    return self;
+  }
+
+  // could be auto-generated if empty!() is defined
+  // could be implemented as a generic rather than a method
+  method object-t empty(object-t self)
+  {
+    //object-t result = dk:copy(self);
+    //dk:empty!(result);
+    object-t result = null;
+    return result;
+  }
+}
+
+
+klass other-thing
+{
+  slots
+  {
+    int32-t count;
+  }
+
+  method int32-t count(object-t self)
+  {
+    int32-t count = self.count;
+    return count;
+  }
+
+  method object-t count=(object-t self, int32-t count)
+  {
+    self.count = count;
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t t1 = make(thing:klass);
+  
+  if (!dk:empty?(t1))
+    ;
+  
+  object-t t2 = dk:empty(t1);
+
+  dk:empty!(t1);
+
+  //
+
+  object-t o = make(other-thing:klass);
+
+  dk:count=(o, 7);
+
+  USE(t2);
+  return 0;
+}

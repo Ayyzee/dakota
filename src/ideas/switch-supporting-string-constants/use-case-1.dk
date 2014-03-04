@@ -1,0 +1,24 @@
+  method object-t advance-statement(object-t self)
+  {
+    object-t current = dk:current(self);
+    advance-count++;
+
+      while (null != current)
+      {
+        switch (dk:tokenid(current))
+        {
+          case "{":
+            current = dk:advance-balenced(self);
+            return current;
+          case "}":
+          case ";":
+            self.offset++;
+            current = dk:current(self);
+            return current;
+          default:
+            self.offset++;
+            current = dk:current(self);
+        }
+      }
+    return current;
+  }

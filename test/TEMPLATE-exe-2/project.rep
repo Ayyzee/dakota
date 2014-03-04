@@ -1,0 +1,9 @@
+{
+  'files' => [
+    'exe.dk',
+    'lib-1.$SO_EXT',
+    'lib-2.$SO_EXT'
+  ],
+  'name' => 'exe',
+  'self-file' => 'project.rep'
+}

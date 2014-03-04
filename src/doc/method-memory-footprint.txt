@@ -1,0 +1,10 @@
+// fastest + largest
+// method-t method = klass.methods[selector]
+num-methods * sizeof(method-t)
+
+// num-unique-methods < 256
+// method-t method = exe.unique-methods[selector]
+num-methods * sizeof(uint8-t) + num-unique-methods * sizeof(method-t)
+
+// num-unique-methods < 16k
+num-methods * sizeof(uint16-t) + num-unique-methods * sizeof(method-t)

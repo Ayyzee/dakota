@@ -1,0 +1,62 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cstring>;
+
+include "dakota-private.h";
+
+module dakota;
+
+klass property
+{
+  slots
+  {
+    symbol-t  key;
+    uintptr-t element;
+  }
+
+  method int-t compare(slots-t* slots, slots-t* other-slots)
+  {
+    int-t result = symbol:compare(slots->key, other-slots->key);
+    result = normalize-compare-result(result);
+    return result;
+  }
+
+  method int32-t check(slots-t* s)
+  {
+    if (NULL == s->key)
+      abort();
+    return 0;
+  }
+
+  method int-t compare(object-t self, object-t other)
+  {
+    int-t result;
+
+    if (dk:instance?(other, klass))
+    {
+      slots-t* s1 = unbox(self);
+      slots-t* s2 = unbox(other);
+      result = compare(s1, s2);
+    }
+    else
+    {
+      result = dk:compare(super, other);
+    }
+    result = normalize-compare-result(result);
+    return result;
+  }
+}

@@ -1,0 +1,24 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  export enum foo-t
+  {
+    e1 = 1,
+    e2 = 2
+  }
+  slots
+  {
+    int32-t x;
+    int32-t y;
+  }
+}
+
+int-t main()
+{
+  int-t e1 = k1:e1;
+  USE(e1);
+  int-t e2 = k1:e2;
+  USE(e2);
+  return 0;
+}

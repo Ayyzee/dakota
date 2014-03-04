@@ -1,0 +1,195 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cstdlib>;
+
+#ifndef __STDC-FORMAT-MACROS
+#define __STDC-FORMAT-MACROS
+#endif //__STDC-FORMAT-MACROS
+include <inttypes.h>;
+
+module dakota;
+
+klass object-output-stream;
+klass output-stream;
+klass resource-usage;
+
+klass object
+{
+  slots
+  {
+    object-t klass;
+    uint32-t retain-count;
+  }
+
+  //     klass klass;
+
+  // keep private, or koenig lookup will cause all
+  // hell to break loose :-)
+  //     noexport slots-t* unbox(object-t object) // special-case
+  //     {
+  //       return object;
+  //     }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+  //dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+
+    dk:write-element-idref(out, dkt-klass(self), "klass");
+
+    dk:write-slots-end(out);
+    return self;
+  }
+
+  method int-t compare(object-t self, object-t other)
+  {
+    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
+    intptr-t result = cast(uint8-t*)self - cast(uint8-t*)(other);
+    result = normalize-compare-result(result);
+    return cast(int-t)(result);
+  }
+
+  method boole-t equal?(object-t self, object-t other)
+  {
+    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dk-klass(other)));
+    boole-t state = false;
+
+    if (0 == compare(self, other))
+      state = true;
+    return state;
+  }
+
+  export method boole-t instance?(object-t self, object-t kls)
+  {
+    boole-t state = false;
+    object-t tmp-kls = dkt-klass(self);
+
+    while (null != tmp-kls)
+    {
+      if (tmp-kls == kls)
+      {
+        state = true;
+        break;
+      }
+      tmp-kls = dkt-superklass(tmp-kls);
+    }
+    return state;
+  }
+
+  method object-t perform-method-for-selector(object-t self, selector-t selector)
+  {
+    object-t kls = dkt-klass(self);
+    method-t m = dk:method-for-selector(kls, selector);
+    object-t value = m(self);
+    return value;
+  }
+
+  // documented to do nothing
+  method object-t init(object-t self)
+  {
+    return self;
+  }
+
+  method object-t copy(object-t self)
+  {
+    USE(self);
+    throw make(exception:klass, message => "not yet implemented");
+    return NULL;
+  }
+
+  method object-t dealloc(object-t self)
+  {
+    dk:release(dkt-klass(self));
+    free(self);
+    return NULL;
+  }
+
+  method object-t retain(object-t self)
+  {
+    self->retain-count++;
+    return self;
+  }
+
+  method object-t release(object-t self)
+  {
+    self->retain-count--;
+    if (0 == self->retain-count)
+      self = dk:dealloc(self);
+    return self;
+  }
+
+  method object-t autorelease(object-t self)
+  {
+    object-t current-pool = dk:current-pool(autorelease-pool:klass);
+    dk:add(current-pool, self);
+    return self;
+  }
+
+//   method object-t klass(object-t self)
+//   {
+//     object-t kls = dk-klass(self);
+//     return kls;
+//   }
+
+  method uintmax-t hash(object-t self)
+  {
+    return cast(uintmax-t)(self);
+  }
+
+  method object-t dump(object-t self)
+  {
+    symbol-t klass-name = $NULL;
+
+    // klass
+    if (NULL != dkt-klass(self) && NULL != dkt-name(dkt-klass(self)))
+      klass-name = dkt-name(dkt-klass(self));
+    if (NULL != dkt-klass(self))
+      fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(void*)(self), cast(void*)(self), cast(void*)dkt-klass(self), klass-name);
+    else
+      fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), $NULL);
+
+//     if (NULL != dk-klass(self) && self != dk-klass(self))
+//       dk:dump(dk-klass(self));
+
+    return self;
+  }
+
+  method const char8-t* utf8-from(object-t self)
+  {
+    char8-t* buffer = cast(char8-t*)malloc(2 + PRIxPTR-WIDTH + (1));
+    snprintf(buffer, 2 + PRIxPTR-WIDTH + (1), "0x%0*" PRIxPTR,
+             PRIxPTR-WIDTH, cast(uintptr-t)(self));
+    return cast(const char8-t*)(buffer);
+  }
+
+  method object-t print(object-t self, object-t out)
+  {
+    if (null == out)
+      out = std-output;
+    const char8-t* utf8 = dk:utf8-from(self);
+    dk:print(out, utf8);
+    return self;
+  }
+  method object-t println(object-t self, object-t out)
+  {
+    if (null == out)
+      out = std-output;
+    dk:print(self, out);
+    dk:print(out, "\n");
+    return self;
+  }
+}

@@ -1,0 +1,15 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  slots
+  {
+    object-t o1;
+    object-t o2;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

@@ -1,0 +1,14 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  slots
+  {
+    char8-t[4] buf;
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

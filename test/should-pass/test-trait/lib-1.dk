@@ -1,0 +1,16 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module test-1;
+
+trait test-trait-trait-a
+{
+}
+trait test-trait-trait-b
+{
+}
+
+trait test-trait
+{
+  trait       test-trait-trait-a;
+  trait       test-trait-trait-b;
+}

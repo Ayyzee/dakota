@@ -1,0 +1,10 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+namespace string {}
+
+int-t main()
+{
+  object-t str = make(string:klass, bytes => "hello world!");
+  dk:println(str, std-output);
+  return 0;
+}

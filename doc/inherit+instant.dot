@@ -1,0 +1,41 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "inherit+instant2"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR, center = true, page = "8.5,11", size = "7.5,10" ];
+  edge [ dir = back ];
+  node [ shape = box, style = rounded ];
+  
+  "null-instance1" [ label = "null", shape = plaintext ];
+  "null-instance"  [ label = "null", shape = plaintext ];
+
+  node [ width = "1.5" ];
+  
+  "null1"           [ label = "null" ];
+  "object1"         [ label = "object" ];
+  "klass1"          [ label = "klass" ];
+  
+  edge [ style = solid ];
+  "object1"         -> "klass1";
+  "object1"         -> "null1";
+  "null-instance1"  -> "object1";
+
+  edge [ style = dashed ];
+  "klass"          -> "klass";
+  "klass"          -> "object";
+  "klass"          -> "null";
+  "null"           -> "null-instance";
+}

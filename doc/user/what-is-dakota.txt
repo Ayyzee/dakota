@@ -1,0 +1,30 @@
+What is Dakota?  Dakota is a dynamic object system for the procedural
+language C++.  The basic idea is that C++ is a better C, but a
+terrible static object system.  So Dakota is the replacement for the
+C++ object system.  Dakota's class-based object system is dynamic, has
+true metaclasses, traits, and it built on top of procedural C++
+(really C w/ overloaded functions, namespaces, exceptions).
+
+Dakota's main influences are Objective-C (C & Smalltalk), CLOS (Common
+Lisp Object System), and Dylan.  Dakota is to C++ like CLOS is to
+Common Lisp.
+
+Dakota is implemented as a precompiler, and currently works on darwin
+& linux using g++.  It has worked on VC++ in the past, so I expect it
+to be an easy port to bring up on win32 platforms.
+
+Dakota is a work in progress, and I'm in the process of rewriting it
+in terms of its self (making it fully meta-circular).
+
+Dakota does not employ the object.method(...) style of invocation.
+Rather, Dakota uses method(object, ...) 
+
+Polymorphism is more obviously expressed directly in source code which
+eases understanding and maintainence.
+
+Dakota klasses are implemented in C++ namespaces, so the 'object'
+klass is in the namespace "object".  The method
+is-instance-of(object-t self) on the klass object is
+object:is-instance-of(object-t self).  The method is dynamically
+dispatched to by calling the generic (polymorphic) function
+dk:is-instance-of(object-t).

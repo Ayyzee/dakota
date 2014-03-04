@@ -1,0 +1,21 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+trait t1
+{
+  method object-t foobar(object-t self)
+  {
+    return self;
+  }
+}
+
+klass object
+{
+  trait t1;
+}
+
+int-t main()
+{
+  object-t o = make(string:klass);
+  dk:foobar(o);
+  return 0;
+}

@@ -1,0 +1,60 @@
+The options are 01, 10, or 11.
+
+Keywords (LHS) with or without leading $
+Using corresponds-to (=>) or =
+
+      || =  | => |
+======++====+====+
+w/o $ || na | 01 |
+------++----+----+
+w   $ || 10 | 11 |
+------++----+----+
+
+Also note that the keywords without leading $ require an empty RHS (=> {}) for required arguments.
+
+These examples show both definition and use.
+
+// 00 is not not applicable (same syntax as C++ default arguments)
+
+// or
+
+// 01
+klass k1
+{
+  method object-t init(object-t self,
+                         uint32-t length => {},
+                         uint32-t size => 1024)
+  {
+    dk:init(super, length => length, size => size);
+    return self;
+  }
+}
+
+// or
+
+// 10
+klass k1
+{
+  method object-t init(object-t self,
+                         uint32-t $length,
+                         uint32-t $size = 1024)
+  {
+    dk:init(super, $length = length, $size = size);
+    return self;
+  }
+}
+
+// or
+
+// 11
+klass k1
+{
+  method object-t init(object-t self,
+                         uint32-t $length,
+                         uint32-t $size => 1024)
+  {
+    dk:init(super, $length => length, $size => size);
+    return self;
+  }
+}
+

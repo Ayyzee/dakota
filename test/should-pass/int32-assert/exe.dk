@@ -1,0 +1,16 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+
+klass int32;
+
+int-t main()
+{
+  int32-t v = -42;
+  object-t o = int32:box(v);
+  int32-t* i = int32:unbox(o);
+
+  assert(v == *i);
+  
+  return 0;
+}

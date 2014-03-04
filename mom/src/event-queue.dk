@@ -1,0 +1,665 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <assert.h>;
+include <err.h>;
+include <errno.h>;
+include <netinet/in.h>;
+include <signal.h>;
+include <stdlib.h>;
+include <string.h>;
+include <sys/socket.h>;
+include <sys/stat.h>;
+include <sys/types.h>;
+include <sys/wait.h>;
+include <time.h>;
+include <unistd.h>;
+
+#ifndef __STDC-FORMAT-MACROS
+#define __STDC-FORMAT-MACROS
+#endif //__STDC-FORMAT-MACROS
+include <inttypes.h>;
+
+include "config.h";
+include "hacks.h";
+include "inet.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass callback;
+klass connection;
+klass event;
+klass fd;
+klass handler;
+klass msg;
+klass msg-id;
+klass cstring;
+
+enum { k-undef = -1, k-read = 0, k-write = 1 }; // hackhack
+
+#if HAVE-KQUEUE
+include "kqueue-apis.h";
+#elif HAVE-EPOLL
+noexport
+int-t
+milliseconds-from-timespec(const timespec* timeout)
+{
+  int-t val = -1; // forever
+  if (NULL != timeout)
+  {
+    val = (timeout->tv-sec * 1000) + (timeout->tv-nsec / (1000 * 1000));
+    // bugbug: can overflow
+  }
+  return val;
+}
+#else
+#error
+#endif
+
+klass event-queue
+{
+  klass event-queue-klass;
+
+  slots
+  {
+    intptr-t kq;
+    uint64-t loop-count;
+
+#if HAVE-EPOLL
+//     int32-t[1024]  events-for-ident;
+//     object-t[1024] read-event-handler-for-ident;
+//     object-t[1024] write-event-handler-for-ident;
+#endif
+
+    int32-t  events-sum;
+    int32-t  events-size;
+    event:slots-t* events;
+    object-t delayed-handlers;
+
+//     error-t error;
+  }
+
+  export const timespec* k-forever = NULL;
+
+  /*noexport*/ const int-t initial-event-size = 1024; // never zero, always even
+  /*noexport*/ const int-t create-size-hint =  initial-event-size;
+
+#define USE-KQUEUE-SIGNAL-FILTER 0
+
+#if HAVE-KQUEUE && USE-KQUEUE-SIGNAL-FILTER
+#else
+
+//hackhack
+
+  noexport int-t sigs[2];
+  noexport object-t sigs-read-event-handler;
+  noexport struct sigaction sa;
+  noexport object-t event-handler-for-child-proc-exit[64 * 1024]; //hackhack
+  noexport object-t delivered-sigs-handler[sizeof(sigset-t) * 8];
+  noexport sigset-t allsigs;
+  noexport void sigs-handler(int-t sig, siginfo-t* si, void* uap)
+  {
+    int-t old-errno = errno;
+    sigset-t oldmask;
+    int-t n = sys:sigprocmask(SIG-BLOCK, &allsigs, &oldmask);  sc(n);
+    MOM-LOG-SIGINFO("%s() signo=%i, pid=%i, status=%i, code=%i",
+                __func__, si->si-signo, si->si-pid, si->si-status, si->si-code);
+    while (1)
+    {
+      int-t len = sys:write(sigs[k-write], si, sizeof(*si));
+
+      if (-1 != len && sizeof(*si) != len)
+      {
+        n = sys:sigprocmask(SIG-SETMASK, &oldmask, NULL);  sc(n);
+        goto __failure;
+      }
+      if (-1 != len || (EINTR != errno))
+        break;
+    }
+
+    n = sys:sigprocmask(SIG-SETMASK, &oldmask, NULL);  sc(n);
+    errno = old-errno;
+    return;
+
+    __failure:
+    n = sys:sigprocmask(SIG-SETMASK, &oldmask, NULL);  sc(n);
+    MOM-LOG-ERROR("error: sigs-handler()");
+    return;
+  }
+
+//   method object-t error(object-t self)
+//   {
+//     return self.error;
+//   }
+
+//   method int-t flag-error(object-t self, int-t num)
+//   {
+//     assert(0 != errno);
+//     self.error.num = num;
+//     const char8-t* str = sys:strerror(num);
+//     if (NULL == str)
+//       str = "";
+//     sys:strncpy(self.error.str, str, sizeof(self.error.str));
+//     self.error.str[sizeof(self.error.str) - (1)] = cast(char8-t)0;
+//     return -1;
+//   }
+
+  method object-t sigs-read-event-callback(object-t self, object-t event)
+  {
+    siginfo-t si;
+    pid-t pid;
+    int-t len = sys:read(sigs[k-read], &si, sizeof(si));
+
+    if (-1 != len && sizeof(si) != len)
+      goto __failure;
+//     MOM-LOG-INFO("%s() pid=%i, status=%i, code=%i, signo=%i",
+//                 __func__, si.si-pid, si.si-status, si.si-code, si.si-signo);
+    int-t status;
+    pid = sys:waitpid(si.si-pid, &status, WNOHANG);
+
+    if (0 < pid)
+    {
+//       MOM-LOG-INFO("waitpid() pid=%i status=%i", pid, status);
+      object-t eh = event-handler-for-child-proc-exit[pid];
+      event-handler-for-child-proc-exit[pid] = cast(object-t)0x3333;
+      object-t e = make(event:klass);
+      dk:set(e, /*filter*/ event:k-proc, /*ident*/ pid, eh);
+      dk:data=(e, status);
+      dk:invoke(eh, e);
+      return self;
+    }
+    else
+    if (0 == pid)
+    {
+      MOM-LOG-ERROR("error: %s(): child not awaiting", __func__);
+    }
+    else
+    if (0 > pid)
+    {
+      int-t num = errno;
+//       dk:flag-error(self, num);
+      MOM-LOG-ERROR-ERRNO(num);
+      goto __failure;
+    }
+    return self;
+    __failure:
+    MOM-LOG-ERROR("error: %s()", __func__);
+    return NULL;
+  }
+#endif
+
+  method object-t init(object-t self)
+  {
+    self = dk:init(super);
+
+#if HAVE-KQUEUE
+    self.kq = kqueue-create(); sc(self.kq);
+#elif HAVE-EPOLL
+    self.kq = sys:epoll-create(create-size-hint); sc(self.kq);
+#else
+#error
+#endif
+    MOM-LOG-FD("fd=%" PRIiPTR " #iomux-fd", self.kq);
+
+    self.loop-count = 0;
+    
+#if HAVE-EPOLL
+    for (uint32-t i = 0; i < 1024; i++) // hackhack
+    {
+      self.events-for-ident[i] = -1;
+      self.read-event-handler-for-ident[i] =  NULL;
+      self.write-event-handler-for-ident[i] = NULL;
+    }
+    for (uint32-t i = 0; i < sizeof(event-handler-for-child-proc-exit)/sizeof(event-handler-for-child-proc-exit[0]); i++)
+    {
+      event-handler-for-child-proc-exit[i] = NULL;
+    }
+#endif
+
+    self.events-sum = 0;
+    self.events-size = initial-event-size;
+    self.events = cast(event:slots-t*)sys:malloc(sizeof(event:slots-t) * self.events-size);
+    // bugbug
+    for (int32-t i = 0; i < self.events-size; i++)
+    {
+      event:init(&self.events[i]);
+    }
+
+    self.delayed-handlers = make(vector:klass);
+
+    int-t n;
+    n = sigfillset(&allsigs);  sc(n);
+
+    sigset-t empty-ss;
+    n = sigemptyset(&empty-ss);  sc(n);
+    sa.sa-sigaction = sigs-handler;
+    sa.sa-flags = SA-SIGINFO;
+    sa.sa-mask = empty-ss;
+    
+    n = sys:sigaction(SIGCHLD, &sa, NULL);  sc(n);
+
+    sigs-read-event-handler = make(handler:klass,
+                                   callback => sigs-read-event-callback,
+                                   object => self);
+
+    n = sys:pipe(sigs);  sc(n);
+    if (-1 != n)
+    {
+      MOM-LOG-FD("fd=%i #event-queue-signal-pipe-read", sigs[k-read]);
+      MOM-LOG-FD("fd=%i #event-queue-signal-pipe-write", sigs[k-write]);
+      dk:add(self, event:k-read, sigs[k-read], sigs-read-event-handler);
+    }
+
+//     self.error.num = 0;
+//     self.error.str[0] = cast(char8-t)0;
+
+    return self;
+  }
+
+  method object-t free(object-t self)
+  {
+    sys:free(self.events);  self.events =  NULL;
+    sys:free(self); self = NULL;
+    return NULL;
+  }
+
+  method object-t will-close(object-t self, fd-t fd)
+  {
+#if HAVE-EPOLL
+    dk:remove(self, event:k-read, fd); 
+    dk:remove(self, event:k-write, fd); 
+#endif
+    return self;
+  }
+
+  method object-t did-close(object-t self, fd-t fd)
+  {
+#if HAVE-EPOLL
+#endif
+    return self;
+  }
+
+  method int32-t change-event(object-t self, event:slots-t* event, int32-t op)
+  {
+    event:slots-t change-ev = *event;
+#if HAVE-KQUEUE
+    assert(0 == op);
+    int32-t events-count = kqueue-ctl(self.kq,
+                                      &change-ev, 1);
+#elif HAVE-EPOLL
+    assert(0 != op);
+    uint32-t ident = dk:ident(&change-ev);
+    int32-t events-count = sys:epoll-ctl(self.kq,
+                                         op,
+                                         ident,
+                                         &change-ev);
+#else
+#error
+#endif
+    if (-1 == events-count)
+    {
+      switch (errno)
+      {
+        default:
+          int-t num = errno;
+//           dk:flag-error(self, num);
+          MOM-LOG-ERROR-ERRNO(num);
+          goto __failure;
+      }
+    }
+    return events-count;
+    __failure:
+    return -1;
+  }
+
+  method int32-t add(object-t self, object-t h)
+  {
+    int32-t result = dk:add(self.delayed-handlers, h);
+    return result;
+  }
+
+  method int32-t add(object-t self, int16-t filter, uintptr-t ident, object-t eh)
+  {
+    assert(event:k-null != filter);
+    int32-t op;
+    int32-t n;
+    event:slots-t event = {0};
+    event:set(&event, filter, ident, eh);
+    if (event:k-read == filter)
+    { MOM-LOG-CHANGE-EVENT("fd=%u +r eh=%p", cast(uint-t)ident, eh); }
+    else
+    if (event:k-write == filter)
+    { MOM-LOG-CHANGE-EVENT("fd=%u +w eh=%p", cast(uint-t)ident, eh); }
+    else
+    if (event:k-signal == filter)
+    { MOM-LOG-CHANGE-EVENT("fd=%u +* eh=%p", cast(uint-t)ident, eh); }
+    else
+    if (event:k-proc == filter)
+    { MOM-LOG-CHANGE-EVENT("pid=%u +~ eh=%p", cast(uint-t)ident, eh); }
+    else
+    { MOM-LOG-CHANGE-EVENT("error: pid=%u +? eh=%p", cast(uint-t)ident, eh); }
+#if HAVE-KQUEUE
+    event.flags |=  EV-ADD;
+#if USE-KQUEUE-SIGNAL-FILTER
+    n = dk:change-event(self, &event, op = 0);  sc(n);
+#else
+    if (event:k-signal == filter)
+    {
+      delivered-sigs-handler[ident] = eh;
+    }
+    else
+    if (event:k-proc == filter)
+    {
+      event-handler-for-child-proc-exit[ident] = eh;
+    }
+    else
+    {
+      n = dk:change-event(self, &event, op = 0);  sc(n);
+    }
+#endif // USE-KQUEUE-SIGNAL-FILTER
+#else
+#if HAVE-EPOLL
+    if (event:k-signal == filter)
+    {
+      delivered-sigs-handler[ident] = eh;
+    }
+    else
+    if (event:k-proc == filter)
+    {
+      event-handler-for-child-proc-exit[ident] = eh;
+    }
+    else
+    {
+      if (event:k-read == filter)
+      {
+        self.read-event-handler-for-ident[ident] = eh;
+      }
+      else
+      if (event:k-write == filter)
+      {
+        self.write-event-handler-for-ident[ident] = eh;
+      }
+      else
+      {
+        int-t num = EINVAL;
+//         dk:flag-error(self, num);
+        MOM-LOG-ERROR-ERRNO(num);
+        goto __failure;
+      }
+//       uint32-t ev-before = self.events-for-ident[ident];
+      //
+
+      if (-1 == self.events-for-ident[ident])
+      {
+        op = EPOLL-CTL-ADD;
+        //
+        self.events-sum++;
+      }
+      else
+      {
+        op = EPOLL-CTL-MOD;
+        event.events |= self.events-for-ident[ident];
+      }
+      self.events-for-ident[ident] = event.events;
+//       MOM-LOG-INFO("add: %i: %i: 0x%x -> 0x%x  %i",
+//                   filter, ident, ev-before, self.events-for-ident[ident], op);
+      event.events |= ( EPOLLHUP | EPOLLERR );
+      n = dk:change-event(self, &event, op);  sc(n);
+    }
+#endif
+#endif
+    return n;
+//  __failure:
+//  return -1;
+  }
+
+  method int32-t remove(object-t self, int16-t filter, uintptr-t ident)
+  {
+    assert(event:k-null != filter);
+    int32-t op;
+    int32-t n;
+    event:slots-t event = {0};
+    event:set(&event, filter, ident, NULL);
+    if (event:k-read == filter)
+    { MOM-LOG-CHANGE-EVENT("fd=%u -r", cast(uint-t)ident); }
+    else
+    if (event:k-write == filter)
+    { MOM-LOG-CHANGE-EVENT("fd=%u -w", cast(uint-t)ident); }
+    else
+    if (event:k-signal == filter)
+    { MOM-LOG-CHANGE-EVENT("fd=%u -*", cast(uint-t)ident); }
+    else
+    if (event:k-proc == filter)
+    { MOM-LOG-CHANGE-EVENT("pid=%u -~", cast(uint-t)ident); }
+    else
+    { MOM-LOG-CHANGE-EVENT("error: pid=%u -?", cast(uint-t)ident); }
+#if HAVE-KQUEUE
+    event.flags |= EV-DELETE;
+#if USE-KQUEUE-SIGNAL-FILTER
+    n = dk:change-event(self, &event, op = 0);  sc(n);
+#else
+    if (event:k-signal == filter)
+    {
+      delivered-sigs-handler[ident] = cast(object-t)0x5555;
+    }
+    else
+    if (event:k-proc == filter)
+    {
+      event-handler-for-child-proc-exit[ident] = cast(object-t)0x7777;
+    }
+    else
+    {
+      n = dk:change-event(self, &event, op = 0);  sc(n);
+    }
+#endif // USE-KQUEUE-SIGNAL-FILTER
+#else
+#if HAVE-EPOLL
+    if (event:k-signal == filter)
+    {
+      delivered-sigs-handler[ident] = cast(object-t)0x5555;
+    }
+    else
+    if (event:k-proc == filter)
+    {
+      event-handler-for-child-proc-exit[ident] = cast(object-t)0x7777;
+    }
+    else
+    {
+      if (-1 == self.events-for-ident[ident])
+      {
+        //MOM-LOG-WARNING("warning: already removed");
+      }
+      else
+      {
+        if (event:k-read == filter)
+        {
+          self.read-event-handler-for-ident[ident] = cast(object-t)0x7777;
+        }
+        else
+        if (event:k-write == filter)
+        {
+          self.write-event-handler-for-ident[ident] = cast(object-t)0x9999;
+        }
+        else
+        {
+          int-t num = EINVAL;
+//           dk:flag-error(self, num);
+          MOM-LOG-ERROR-ERRNO(num);
+          goto __failure;
+        }
+//         uint32-t ev-before = self.events-for-ident[ident];
+        self.events-for-ident[ident] &= ~event.events;
+
+        if (0 == self.events-for-ident[ident])
+        {
+          op = EPOLL-CTL-DEL;
+          self.events-for-ident[ident] = -1;
+          self.events-sum--;
+        }
+        else
+        {
+          op = EPOLL-CTL-MOD;
+          event.events = self.events-for-ident[ident];
+        }
+        //
+//         MOM-LOG-INFO("remove: %i: %i: 0x%x -> 0x%x  %i",
+//                     filter, ident, ev-before, self.events-for-ident[ident], op);
+        n = dk:change-event(self, &event, op);  sc(n);
+      }
+    }
+#endif
+#endif
+    return n;
+//  __failure:
+//  return -1;
+  }
+
+  method object-t loop(object-t self, const timespec* ts)
+  {
+    while(1)
+    {
+      for (object-t h in self.delayed-handlers)
+        dk:invoke(h, NULL);
+      dk:empty(self.delayed-handlers);      
+#if USE-SYSLOG
+#else
+      mom:syslog-flush();
+#endif
+
+#if HAVE-KQUEUE
+      int32-t events-count = kqueue-wait(self.kq,
+                                         self.events, self.events-size,
+                                         ts);
+#elif HAVE-EPOLL
+      int-t timeout = milliseconds-from-timespec(ts);
+      int32-t events-count = sys:epoll-wait(self.kq,
+                                            self.events, self.events-size/2,
+                                            timeout);
+#else
+#error
+#endif
+      //MOM-LOG-INFO("%i", self.events-sum);
+      if (-1 == events-count)
+      {
+        switch (errno)
+        {
+          case EINTR:
+            break;
+          default:
+            int-t num = errno;
+//             dk:flag-error(self, num);
+            MOM-LOG-ERROR-ERRNO(num);
+            //goto __failure;
+        }
+      }
+      else
+      {
+        if (0 == events-count) // timeout fired
+        {
+          MOM-LOG-INFO("timeout expired");
+        }
+        for (int32-t i = 0; i < events-count; i++)
+        {
+          event:slots-t e = self.events[i];
+          uint32-t ident = event:ident(&e);
+
+          if (mom:LOG-FD-FLAG & mom:log-flags)
+            fd:dump(ident);
+//           struct stat st;
+//           int-t n = fstat(ident, &st);  sc(n);
+//           switch (S-IFMT & st.st-mode)
+//           {
+//             case S-IFSOCK: MOM-LOG-FD("fd=%i IFSOCK", ident); break;
+//             case S-IFREG:  MOM-LOG-FD("fd=%i IFREG",  ident); break;
+//             case S-IFCHR:  MOM-LOG-FD("fd=%i IFCHR",  ident); break;
+//             case S-IFIFO:  MOM-LOG-FD("fd=%i IFIFO",  ident); break;
+//             default:       goto __failure;
+//           }
+#if HAVE-KQUEUE
+          object-t eh = cast(object-t)e.udata;
+          // we could NULL out e->udata
+          dk:invoke(eh, event:box(&e));
+#elif HAVE-EPOLL
+          {
+            if (EPOLLERR & e.events)
+            {
+              int-t optval;
+              xsocklen-t optlen = sizeof(optval);
+              int-t n = sys:getsockopt(ident, SOL-SOCKET, SO-ERROR, &optval, &optlen);  sc(n);
+              MOM-LOG-ERROR("error: fd=%i EPOLLERR errno=%i \"%s\"", ident, optval, sys:strerror(optval));
+              fd:dump(ident);
+            }
+            else
+            if ((EPOLLIN & e.events) && (EPOLLOUT & e.events))
+            {
+              event:slots-t re = e;
+              event:slots-t we = e;
+
+              re.events &= ~EPOLLOUT;
+              we.events &= ~EPOLLIN;
+
+              object-t reh = self.read-event-handler-for-ident[ident];
+              dk:invoke(reh, &re);
+
+              object-t weh = self.write-event-handler-for-ident[ident];
+              dk:invoke(weh, &we);
+            }
+            else
+            if ((EPOLLIN & e.events) || (EPOLLHUP & e.events))
+            {
+              object-t reh = self.read-event-handler-for-ident[ident];
+              dk:invoke(reh, &e);
+            }
+            else
+            if (EPOLLOUT & e.events)
+            {
+              object-t weh = self.write-event-handler-for-ident[ident];
+              dk:invoke(weh, &e);
+            }
+            else
+            {
+              sys:abort();
+            }
+          }
+#else
+#error
+#endif
+        }
+      }
+      self.loop-count++;
+    }
+    return self;
+  }
+}
+
+klass event-queue-klass
+{
+  superklass klass;
+
+  noexport object-t current-event-queue = NULL;
+
+  method object-t get-current(object-t self)
+  {
+    if (NULL == current-event-queue)
+    {
+      current-event-queue = make(event-queue:klass);
+    }
+    return current-event-queue;
+  }
+}

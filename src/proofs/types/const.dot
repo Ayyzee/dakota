@@ -1,0 +1,35 @@
+digraph "const"
+{
+  graph [ label = "\G", fontcolor = red ];
+  graph [ rankdir = LR ];
+  graph [ center = true ];
+  graph [ size = "7.5,10" ];
+  node [ shape = circle ];
+//   node [ label = "" ];
+
+  000 [ shape = doublecircle ];
+  999 [ shape = doublecircle ];
+
+  000 -> 010 [ label = "const" ];
+  000 -> 020 [ label = "qual-type-ident", fontcolor = blue ];
+  010 -> 030 [ label = "qual-type-ident", fontcolor = blue ];
+  010 -> 999 [ label = "qual-type-ident", fontcolor = blue ];
+  020 -> 030 [ label = "const" ];
+  020 -> 999 [ label = "const" ];
+  030 -> 030 [ label = "*" ];
+  030 -> 040 [ label = "*" ];
+  030 -> 999 [ label = "*" ];
+  040 -> 030 [ label = "const" ];
+  040 -> 999 [ label = "const" ];
+
+  100 [ label = "qual-type-ident", shape = plaintext, fontcolor = blue ];
+
+  100 -> 199 [ label = "type-ident" ];
+  100 -> 110 [ label = "struct\nunion\nenum" ];
+  100 -> 120 [ label = "ident" ];
+  110 -> 120 [ label = "ident" ];
+  110 -> 199 [ label = "type-ident" ];
+  120 -> 130 [ label = ":"];
+  130 -> 120 [ label = "ident" ];
+  130 -> 199 [ label = "type-ident" ];
+}

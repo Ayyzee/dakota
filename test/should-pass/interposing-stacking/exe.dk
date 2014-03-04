@@ -1,0 +1,29 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+include <string.h>;
+
+klass a1 { superklass object; }
+klass a2 {}
+klass a3 {}
+klass a4 { superklass a1; }
+
+// interpose a4, a3, a2;
+
+interpose a4, a3;
+interpose a3, a2;
+
+int-t main()
+{
+  const char8-t* expected = "/object/a1/a2/a3/a4";
+
+  printf("%s\n", expected);
+
+  char8-t chain[1024] = "";
+  dk-get-klass-chain(a4:klass, chain, sizeof(chain) - 1);
+  printf("%s\n", chain);
+
+  assert(0 == strcmp(expected, chain));
+
+  return 0;
+}

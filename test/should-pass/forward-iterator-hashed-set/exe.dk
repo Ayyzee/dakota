@@ -1,0 +1,50 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdio.h>;
+
+typedef object-t (*add-t)(object-t, object-t);
+
+static object-t create(object-t klass, add-t add, uint32-t len)
+{
+  object-t c = make(klass);
+  for (uint32-t i = 0; i < len; i++)
+  {
+    object-t e = uint32:box(i);
+    fprintf(stderr, "%p\n", (void*)e);
+    add(c, e);
+  }
+  fprintf(stderr, "==\n");
+  return c;
+}
+
+int-t main()
+{
+  object-t c = create(hashed-set:klass, dk:add, 3);
+//   object-t c = create(deque:klass, dk:add-first, 1);
+//   object-t perl-object-output-stream = make(perl-object-output-stream:klass);
+//   dk:write(perl-object-output-stream, c);
+
+  if (1)
+  {
+    for (object-t iter = dk:forward-iterator(c);
+         object-t e = dk:next(iter); )
+    {
+      fprintf(stderr, "%p\n", (void*)e);
+    }
+    fprintf(stderr, "--\n");
+  }
+
+  if (1)
+  {
+    for (object-t iter = dk:forward-iterator(c);
+         dk:next?(iter);
+         dk:next(iter))
+    {
+      object-t e = dk:element(iter);
+      fprintf(stderr, "%p\n", (void*)e);
+    }
+    fprintf(stderr, "\n");
+  }
+
+  return 0;
+}

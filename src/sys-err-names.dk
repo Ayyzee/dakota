@@ -1,0 +1,97 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cctype>;
+include <cerrno>;
+include <cstdio>;
+include <cstring>;
+
+STATIC const char8-t* gbl-sys-err-names[] =
+{
+     "0",    "1",    "2",    "3",    "4",    "5",    "6",    "7",    "8",    "9",
+
+    "10",   "11",   "12",   "13",   "14",   "15",   "16",   "17",   "18",   "19",
+    "20",   "21",   "22",   "23",   "24",   "25",   "26",   "27",   "28",   "29",
+    "30",   "31",   "32",   "33",   "34",   "35",   "36",   "37",   "38",   "39",
+    "40",   "41",   "42",   "43",   "44",   "45",   "46",   "47",   "48",   "49",
+    "50",   "51",   "52",   "53",   "54",   "55",   "56",   "57",   "58",   "59",
+    "60",   "61",   "62",   "63",   "64",   "65",   "66",   "67",   "68",   "69",
+    "70",   "71",   "72",   "73",   "74",   "75",   "76",   "77",   "78",   "79",
+    "80",   "81",   "82",   "83",   "84",   "85",   "86",   "87",   "88",   "89",
+    "90",   "91",   "92",   "93",   "94",   "95",   "96",   "97",   "98",   "99",
+
+   "100",  "101",  "102",  "103",  "104",  "105",  "106",  "107",  "108",  "109",
+   "110",  "111",  "112",  "113",  "114",  "115",  "116",  "117",  "118",  "119",
+   "120",  "121",  "122",  "123",  "124",  "125",  "126",  "127",  "128",  "129",
+   "130",  "131"
+};
+
+noexport void
+set-name(int-t errnum, const char8-t* name)
+{
+  assert(0 != errnum);
+  assert(NULL != name);
+  assert(NUL != name[0]);
+//   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);
+  assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
+  if (isdigit(gbl-sys-err-names[errnum][0]))
+    gbl-sys-err-names[errnum] = name;
+  else
+  {
+    const char8-t* delim = "|";
+    uint32-t len = cast(uint32-t)strlen(gbl-sys-err-names[errnum]) + cast(uint32-t)strlen(delim) + cast(uint32-t)strlen(name) + (1);
+    char8-t* buf = cast(char8-t*)malloc(sizeof(char8-t) * len); // leakleak
+    buf[0] = NUL;
+    strcat(buf, gbl-sys-err-names[errnum]);
+    strcat(buf, delim);
+    strcat(buf, name);
+    gbl-sys-err-names[errnum] = buf;
+//     fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, buf);
+  }
+  return;
+}
+
+noexport const char8-t*
+strerror-name(int-t errnum)
+{
+  assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
+  const char8-t* name = gbl-sys-err-names[errnum];
+  return name;
+}
+
+static void
+__initial()
+{
+#include "sys-err-names.tbl"
+  return;
+}
+
+static void
+__final()
+{
+  return;
+}
+
+namespace
+{
+  struct noexport __ddl-t
+  {
+     __ddl-t() { __initial(); }
+    ~__ddl-t() { __final(); }
+  };
+} // namespace
+static __ddl-t __ddl = __ddl-t();

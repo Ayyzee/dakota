@@ -1,0 +1,72 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <assert.h>;
+
+klass my-point
+{
+  superklass object;
+
+  slots
+  {
+    int32-t x;
+    int32-t y;
+  }
+
+  method object-t init(object-t self, int32-t x => 0, int32-t y => 0)
+  {
+    self = dk:init(super);
+    self.x = x;
+    self.y = y;
+    return self;
+  }
+
+  method object-t set(object-t self, int32-t x, int32-t y)
+  {
+    self.x = x;
+    self.y = y;
+    return self;
+  }
+
+  method int32-t x(object-t self)
+  { 
+    int32-t x = self.x;
+    return x;
+  }
+
+  method int32-t x=(object-t self, int32-t x)
+  {
+    self.x = x;
+    return x;
+  }
+
+  method int32-t y(object-t self)
+  { 
+    int32-t y = self.y;
+    return y;
+  }
+
+  method int32-t y=(object-t self, int32-t y)
+  {
+    self.y = y;
+    return y;
+  }
+
+  method object-t print(object-t self, object-t output-stream)
+  {
+    assert(NULL != output-stream);
+    if (null == output-stream)
+      output-stream = std-output;
+    dk:print-format(output-stream, "{ %i, %i }", self.x, self.y);
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t p = make(my-point:klass); // make(k, ...) is a cover for dk:init(dk:alloc(k), ...)
+  dk:println(p, null);
+  dk:set(p, 3, 5);
+  dk:println(p, std-output);
+  dk:release(p);
+  return 0;
+}

@@ -1,0 +1,20 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdint.h>;
+
+module test-1;
+
+klass bk
+{
+  slots int32-t;
+
+  method slots-t max(slots-t s, slots-t other-s)
+  {
+    slots-t result;
+    if (s >= other-s)
+      result = s;
+    else
+      result = other-s;
+    return result;
+  }
+}

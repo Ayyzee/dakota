@@ -1,0 +1,129 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cstring>;
+
+#ifndef __STDC-FORMAT-MACROS
+#define __STDC-FORMAT-MACROS
+#endif //__STDC-FORMAT-MACROS
+include <inttypes.h>;
+
+include "dakota-private.h";
+
+module dakota-util;
+
+// same code as in klass string (badbad)
+klass object-output-stream;
+
+klass cstring
+{
+  slots
+  {
+    char8-t* ptr;
+    uint32-t len;
+    uint32-t capacity;
+  }
+
+  method object-t init(object-t self, uint32-t capacity => 8)
+  {
+    self = dk:init(super);
+    self.ptr = cast(char8-t*)malloc(sizeof(char8-t) * capacity);
+    self.ptr[0] = NUL;
+    self.len = 0;
+    self.capacity = capacity;
+    return self;
+  }
+
+  method object-t dealloc(object-t self)
+  {
+    free(self.ptr);
+    object-t result = dk:dealloc(super);
+    return result;
+  }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+
+    dk:write-element(out, self.ptr, "ptr");
+    dk:write-element(out, self.len, "len");
+    dk:write-element(out, self.capacity, "capacity");
+
+    dk:write-slots-end(out);
+    return self;
+  }
+
+  method slots-t* dump(slots-t* s)
+  {
+  //dk:dump(super);
+    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%u, capacity=%u }\n",
+            cast(void*)NULL, cast(void*)(s), s->ptr, s->len, s->capacity);
+    return s;
+  }
+
+  method int-t compare(slots-t* s, slots-t* other-s)
+  {
+    int-t result = safe-strcmp(s->ptr, other-s->ptr);
+    result = normalize-compare-result(result);
+    return result;
+  }
+
+  noexport int-t compare(slots-t** s, slots-t** other-s)
+  {
+    int-t result = compare(*s, *other-s);
+    return result;
+  }
+
+  method int-t compare(object-t self, object-t other)
+  {
+    int-t result;
+
+    if (dk:instance?(other, klass))
+    {
+      slots-t* s1 = unbox(self);
+      slots-t* s2 = unbox(other);
+      result = compare(s1, s2);
+    }
+    else
+    {
+      result = dk:compare(super, other);
+    }
+    result = normalize-compare-result(result);
+    return result;
+  }
+
+  method uint32-t length(slots-t* s)
+  {
+    if (0    == s->len &&
+        NULL != s->ptr &&
+        NUL  != s->ptr[0])
+      s->len = cast(uint32-t)safe-strlen(s->ptr);
+    return s->len;
+  }
+
+  method slots-t* concat(slots-t* s, char8-t c)
+  {
+    assert(NUL != c);
+    assert(s->len + 1 != s->capacity);
+      
+    s->ptr[s->len] = c;
+    s->len++;
+    s->ptr[s->len] = NUL;
+    return s;
+  }
+}

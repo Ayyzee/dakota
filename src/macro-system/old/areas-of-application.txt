@@ -1,0 +1,73 @@
+domain specific languages (extensions)
+
+like AOP
+  join point
+  point cut
+profiling
+logging
+tracing
+validaty checking
+security checking
+read/write barriers
+weighed (number of calls) call graph (prolog/epilog)
+loop unrolling
+inlining
+removing/adding cache flushing, ...
+instrumentation & quantification
+compile & runtime assertion (pre-condition/post-condition) adding/removing
+before/after/around (on klasses/on methods/on generics)
+optimizations (monomorphic method dispatch)
+syntax extensions
+security audits/policy
+keyword driven macros
+
+program fragments
+source transformation
+syntax macros (syntax extensions)
+
+source-to-source transformations
+
+http://en.wikipedia.org/wiki/Stropping
+
+A program that translates between high-level languages is usually
+called a language translator, source to source translator, or language
+converter. A language rewriter is usually a program that translates
+the form of expressions without a change of language.
+
+namespace nn
+{
+} namespace
+
+klass kk
+{
+} klass
+
+trait tt
+{
+} trait
+
+switch ()
+{
+} switch
+
+if ()
+{
+} if
+else if
+{
+} if // not else if
+else
+{
+} else
+
+or even
+
+if ()
+{
+} if
+else-if ()
+{
+} else-if
+else
+{
+} else

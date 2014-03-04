@@ -1,0 +1,6 @@
+typedecl const char_t* symbol_t;
+symbol_t foo = dk-intern("foo");
+
+use symbols anywhere you would use strings except you can == compare them rather than strcmp().
+
+does "constant string" mean created at compile time (no malloc/free required)?

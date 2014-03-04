@@ -1,0 +1,25 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+int-t main()
+{
+  dk:dump(object:klass);
+  //dk:dump-methods(object:klass);
+  printf("---\n");
+  dk:dump(klass:klass);
+  //dk:dump-methods(klass:klass);
+  printf("---\n");
+  if (null)
+  {
+    dk:dump(null->klass);
+    //dk:dump-methods(null->klass);
+    printf("---\n");
+    dk:dump(null);
+  }
+  else
+  {
+    fprintf(stderr, "NULL\n");
+    printf("---\n");
+    fprintf(stderr, "NULL\n");
+  }
+  return 0;
+}

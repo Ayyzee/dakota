@@ -1,0 +1,143 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <assert.h>;
+include <stdlib.h>;
+include <unistd.h>;
+
+include "common.h";
+include "inet.h";
+include "recruiter-us.h";
+include "tags.h";
+include "volunteer-uc.h";
+
+klass callback;
+klass connection;
+klass cstring;
+klass event;
+klass event-queue;
+klass execution-context;
+klass execution-context-klass;
+klass fd;
+klass msg;
+klass msg-id;
+klass cstring;
+klass process;
+
+extern int32-t work-count;
+
+object-t uc-exit-value-rcv-msg(object-t process, object-t exit-value-msg)
+{
+  MOM-LOG-CALLBACK("pid=%i tag=0x%x %s:%s()", dk:id(process), dk:tag(exit-value-msg), __klass__, __func__);
+  match(exit-value, dk:tag(exit-value-msg));
+  work-count--;
+  //MOM-LOG-PROC("pid=%i rcv-msg: sys:exit-value=%s", dk:id(process), exit-value-msg->val);
+  object-t uc-connection = dk:connection-for(process);
+  dk:snd-msg(uc-connection, exit-value-msg); // sourcesource
+  return process;
+}
+
+object-t uc-proc-rcv-msg-callback(object-t process, object-t rcv-msg)
+{
+  MOM-LOG-CALLBACK("pid=%i tag=0x%x %s:%s()", dk:id(process), dk:tag(rcv-msg), __klass__, __func__);
+  switch (dk:tag(rcv-msg))
+  {
+    case exit-value:
+    {
+      dk:invoke(process, uc-exit-value-rcv-msg, rcv-msg);
+      break;
+    }
+    default:
+    {
+      MOM-LOG-ERROR("error: unknown tag=0x%x", dk:tag(rcv-msg));
+    }
+  }
+  return process;
+}
+
+object-t uc-exec-work-rcv-msg(object-t uc-connection, object-t exec-work-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(uc-connection), dk:tag(exec-work-msg), __klass__, __func__);
+  match(exec-work, dk:tag(exec-work-msg));
+
+  cstring-t exec-work-msg-str = dk:val(exec-work-msg);
+  const char8-t* cmd = exec-work-msg-str.ptr;
+  char8-t cnt[4 + 1];
+  char8-t cwd[1024] = "";
+  char8-t path[1024] = "";
+  char8-t* args[1024] = { NULL }; // hackhack
+  char8-t* vars[1024] = { NULL }; // hackhack
+  dk:deserialize(execution-context:klass,
+                 cmd,
+                 cnt,
+                 cwd,  sizeof(cwd), 
+                 path, sizeof(path),
+                 args, sizeof(args),
+                 vars, sizeof(vars));
+  int32-t n = sys:chdir(cwd);  sc(n);
+
+  object-t process = make(process:klass,
+                          connection => uc-connection,
+                          msg-id =>     dk:id(exec-work-msg));
+  pid-t pid = dk:fork(process);
+
+  if (0 == pid)
+  { // in child
+    dk:exec(process, path, args, vars);
+    sys:exit(EXIT-FAILURE);
+  }
+  else
+  if (0 < pid)
+  { // in parent
+    dk:rcv-msg-callback=(process, uc-proc-rcv-msg-callback);
+  }
+  else
+  {
+    MOM-LOG-ERROR-ERRNO(errno);
+  }
+  n = sys:chdir("/");  sc(n);
+  return uc-connection;
+}
+
+object-t uc-rcv-msg-callback(object-t uc-connection, object-t rcv-msg)
+{
+  MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(uc-connection), dk:tag(rcv-msg), __klass__, __func__);
+  switch (dk:tag(rcv-msg))
+  {
+    case exec-work:
+    {
+      dk:invoke(uc-connection, uc-exec-work-rcv-msg, rcv-msg);
+      break;
+    }
+    case ack:
+    {
+      uc-connection = dk:free(uc-connection);
+      break;
+    }
+    case no-work:
+    {
+      work-count--;
+      uc-connection = dk:free(uc-connection);
+      break;
+    }
+    default:
+    {
+      MOM-LOG-ERROR("error: unknown tag=0x%x", dk:tag(rcv-msg));
+    }
+  }
+  return uc-connection;
+}

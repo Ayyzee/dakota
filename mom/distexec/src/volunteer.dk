@@ -1,0 +1,59 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include "common.h";
+include "inet.h";
+include "recruiter-ls.h";
+include "recruiter-us.h";
+include "volunteer-ms.h";
+include "work-queue.h";
+
+klass connection;
+klass event;
+klass event-queue;
+klass fd;
+klass msg;
+klass msg-id;
+klass cstring;
+klass xin4-addr;
+klass xin-port;
+klass xsa-family;
+klass xsockaddr-in4;
+
+object-t init-volunteer-ms-ss(fd-t ms-fd)
+{
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "%s()", __func__);
+  // ms
+  MOM-LOG-FD("fd=%i #volunteer-ms-fd", ms-fd);
+#if 0
+  int32-t optval = 1;
+  int32-t n = sys:setsockopt(ms-fd, SOL-SOCKET, SO-DONTTRUNC, &optval, sizeof(optval)); sc(n);
+#endif
+  object-t ms-connection = make(connection:klass, callback => ms-rcv-msg-callback);
+  fd-t n = dk:establish(ms-connection, ms-fd, connection:k-read);  sc(n);
+  return ms-connection;
+}
+
+object-t init-volunteer-ms(xsockaddr-in4-t ms-sin)
+{
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "%s()", __func__);
+  // ms
+  xsockaddr-in4-t sin = xsockaddr-in4-create(xin4-addr:k-any, ms-sin.sin-port);
+  fd-t ms-fd = mcast-server(sin);
+  mcast-server-join-group(ms-fd, ms-sin.sin-addr);
+  object-t ms-connection = init-volunteer-ms-ss(ms-fd);
+  return ms-connection;
+}

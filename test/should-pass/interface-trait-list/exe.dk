@@ -1,0 +1,19 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+trait xx:i1
+{
+}
+
+trait yy:i2
+{
+}
+
+klass zz:k1
+{
+//  trait xx:i1, yy:i2;
+}
+
+int-t main()
+{
+  return 0;
+}

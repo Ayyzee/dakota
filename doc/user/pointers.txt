@@ -1,0 +1,37 @@
+int * foo
+* int foo
+
+struct {} foo;
+struct *{} foo;
+
+struct foo_t {};
+struct foo_t foo;
+foo_t foo;
+
+struct foo_t* foo;
+foo_t* foo;
+
+struct * foo_t foo;
+foo_t foo;
+
+
+foo_t[] foo = { a, b };
+
+foo_t*[] foo = {};
+
+
+int **foo[][] = {};
+
+**int[][] foo;
+
+int foo*[]*[]
+
+int *[]*[] foo;
+
+
+int foo[]; // C
+int[] foo; // Java
+
+void (*foo)(); // C
+void (*)() foo; // Dakota
+

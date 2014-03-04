@@ -1,0 +1,17 @@
+      switch (dk:hash(token))
+      {
+        case "superklass":
+          break;
+        case "klass":
+          break;
+        case "slots":
+          break;
+        case "trait":
+          break;
+        case "method":
+          break;
+        case "}":
+          break;
+        default:
+	  ;
+      }

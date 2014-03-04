@@ -1,0 +1,13 @@
+      switch (token)
+      {
+        case $klass:
+          break;
+        case $trait:
+          break;
+        case "<=":
+          break;
+        case "=>":
+          break;
+        default:
+	  ;
+      }

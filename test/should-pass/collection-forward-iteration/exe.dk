@@ -1,0 +1,71 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <stdio.h>;
+include <assert.h>;
+include <string.h>;
+
+enum collection-type-t
+{
+  NONE    = 0,
+  ORDERED = 1 << 0,
+  SORTED  = 1 << 1
+//MUMBLE  = 1 << 2,
+}
+
+static void check-collection(object-t klass, collection-type-t collection-type, int-t count)
+{
+  assert(0xff >= count); // 2 hex digits wide max
+  object-t collection = make(klass);
+  size-t width = (count * (1 + 2)) + (1);
+  char8-t* lhs = (char8-t*)malloc(sizeof(char8-t) * width);
+  char8-t* rhs = (char8-t*)malloc(sizeof(char8-t) * width);
+  lhs[0] = (char8-t)0;
+  rhs[0] = (char8-t)0;
+  int-t offset;
+
+  offset = 0;
+  for (int32-t i = 0; i < count; i++)
+  {
+    object-t e = int32:box(i);
+    offset += sprintf(lhs + offset, "/%x", *int32:unbox(e));
+    if (ORDERED & collection-type)
+      dk:add-last(collection, e);
+    else
+      dk:add(collection, e);
+//     uint32-t size = dk:size(collection);
+//     printf("1 + %i == %i\n", i, size);
+  }
+
+  offset = 0;
+  for (object-t e in collection)
+    offset += sprintf(rhs + offset, "/%x", *int32:unbox(e));
+
+  printf("\"%s\" == \"%s\"\n", lhs, rhs);
+  
+  if (ORDERED & collection-type || SORTED & collection-type)
+    assert(!strcmp(lhs, rhs));
+  else
+    assert(strlen(lhs) == strlen(rhs));
+  return;
+}
+
+static void check-collection(object-t klass, collection-type-t collection-type)
+{
+  for (int-t i = 1; i < 5; i++)
+    check-collection(klass, collection-type, i);
+  return;
+}
+
+int-t main()
+{
+  check-collection(vector:klass, ORDERED);
+  check-collection(deque:klass,  ORDERED);
+
+  check-collection(sorted-set:klass, SORTED);
+  check-collection(hashed-set:klass, NONE);
+
+//   check-collection(sorted-counted-set:klass, SORTED);
+//   check-collection(hashed-counted-set:klass, NONE);
+
+  return 0;
+}

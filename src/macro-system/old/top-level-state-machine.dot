@@ -1,0 +1,60 @@
+// Copyright (C) 2007, 2008 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "top-level-state-machine"
+{
+  label = "\G";
+  graph [ rankdir = "LR",
+        center = true,
+        size = "7.5,10",
+          ];
+  node [ style = rounded, shape = rect ];
+
+  subgraph "cluster-4"
+  {
+    graph [ label = "" ];
+    "export-40" -> "?dq-str-40" -> ";-40";
+    "export-41" -> "?aq-str-41" -> ";-41";
+  }
+  subgraph "cluster-3"
+  {
+    graph [ label = "" ];
+    "import-30" -> "?dq-str-30" -> ";-30";
+    "import-31" -> "?aq-str-31" -> ";-31";
+  }
+  subgraph "cluster-2"
+  {
+    graph [ label = "" ];
+    "import-20" -> "klass-20" -> "?qual-ident-20" -> ";-20";
+    "import-21" -> "trait-21" -> "?qual-ident-21" -> ";-21";
+  }
+  subgraph "cluster-1"
+  {
+    graph [ label = "" ];
+    { rank = same; "?qual-ident-10"; "?qual-ident-11"; "?qual-ident-12" }
+    
+    "export-10" -> "trait-10" -> "?qual-ident-10" -> "{-10";
+    "trait-11" -> "?qual-ident-11" -> "{-11";
+    "trait-12" -> "?qual-ident-12" -> ";-12";
+  }
+  subgraph "cluster-0"
+  {
+    graph [ label = "" ];
+    { rank = same; "?qual-ident-00"; "?qual-ident-01"; "?qual-ident-02" }
+    
+    "export-00" -> "klass-00" -> "?qual-ident-00" -> "{-00";
+    "klass-01" -> "?qual-ident-01" -> "{-01";
+    "klass-02" -> "?qual-ident-02" -> ";-02";
+  }
+}

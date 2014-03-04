@@ -1,0 +1,23 @@
+$[<vector:klass>]
+ =>
+object-t default-sequence-klass = vector:klass;
+
+$[a, b]
+ =>
+dk-add-all(make(vector:klass), a, b, NULL)
+
+${<hashed-table:klass>}
+ =>
+object-t default-table-klass = hashed-table:klass;
+
+${a => b, c => d}
+ =>
+dk-add-all(make(hashed-table:klass), association:box(a, b), association:box(c, d), NULL)
+
+${<deque:klass>}
+ =>
+object-t default-list-klass = deque:klass;
+
+$(a, b)
+ =>
+dk-add-all(make(deque:klass), a, b, NULL)

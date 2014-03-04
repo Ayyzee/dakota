@@ -1,0 +1,198 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <assert.h>;
+include <fcntl.h>;
+include <stdlib.h>;
+include <unistd.h>;
+
+include "hacks.h";
+include "inet.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass callback;
+klass cstring;
+klass event;
+klass event-queue;
+klass event-queue-klass;
+klass fd;
+klass cstring;
+
+klass unnamed-pipe
+{
+  export enum type-t { k-undef = -1, k-read = 0, k-write = 1 };
+
+  slots
+  {
+    fd-t[2] fds;
+    object-t[2] event-handler;
+
+    type-t type;
+    cstring-t buf;
+  }
+
+// must use BEFORE the fork()
+  method object-t init(object-t self)
+  {
+    self = dk:init(super);
+    int32-t n = sys:pipe(self.fds);  sc(n);
+    self.type = k-undef;
+
+    self.buf.capacity = 64 * 1024;
+    self.buf.len = 0;
+    self.buf.ptr = (char8-t*)malloc(sizeof(char8-t) * self.buf.capacity);
+
+    self.event-handler[k-read] = make(handler:klass,
+                                      object => self);
+    self.event-handler[k-write] = make(handler:klass,
+                                       object => self);
+    return self;
+  }
+
+  method fd-t fd(object-t self, unnamed-pipe:type-t type)
+  {
+    assert(type == k-read || type == k-write);
+    fd-t result = self.fds[type];
+    assert(-1 != result);
+    return result;
+  }
+
+  method cstring-t buf(object-t self)
+  {
+    cstring-t result = { self.buf.ptr, self.buf.len };
+    return result;
+  }
+
+  method int32-t close(object-t self)
+  {
+    MOM-LOG(mom:LOG-GENERIC-FLAG, "%i: %s:%s()", self.fds[self.type], __klass__, __func__);
+    int32-t n = sys:close(self.fds[self.type]);  sc(n);
+    self.fds[self.type] = -1;
+//     self.event-handler[self.type].callback = NULL;
+//     self.event-handler[self.type].self = NULL;
+//     self.event-handler[self.type].udata = NULL;
+    self.type = k-undef;
+    return n;
+  }
+
+  // must use AFTER the fork() in child
+  method object-t init-read(object-t self, fd-t fd)
+  {
+    int32-t n;
+    self.type = k-read;
+    n = sys:close(fd);  sc(n);
+    n = sys:dup2(self.fds[k-read], fd);  sc(n);
+    n = sys:close(self.fds[k-read]);  sc(n);
+    n = sys:close(self.fds[k-write]);  sc(n);
+    self.fds[k-read] =  -1;
+    self.fds[k-write] = -1;
+//     self.event-handler[k-write].callback = NULL;
+//     self.event-handler[k-write].self = NULL;
+//     self.event-handler[k-write].udata = NULL;
+    MOM-LOG-FD("fd=%i #child-read-fd", fd);
+    return self;
+  }
+
+  // must use AFTER the fork() in child
+  method object-t init-write(object-t self, fd-t fd)
+  {
+    int32-t n;
+    self.type = k-write;
+    n = sys:close(fd);  sc(n);
+    n = sys:dup2(self.fds[k-write], fd);  sc(n);
+    n = sys:close(self.fds[k-read]);  sc(n);
+    n = sys:close(self.fds[k-write]);  sc(n);
+    self.fds[k-read] =  -1;
+    self.fds[k-write] = -1;
+//     self.event-handler[k-read].callback = NULL;
+//     self.event-handler[k-read].self = NULL;
+//     self.event-handler[k-read].udata = NULL;
+    MOM-LOG-FD("fd=%i #child-write-fd", fd);
+    return self;
+  }
+
+  // child
+  method object-t read-event-callback(object-t self, object-t read-event)
+  {
+    MOM-LOG(mom:LOG-GENERIC-FLAG, "%i: %s:%s()", self.fds[k-read], __klass__, __func__);
+    int32-t n = sys:read(self.fds[k-read], self.buf.ptr, self.buf.capacity); nbsc(n);
+    if (-1 != n)
+      self.buf.len = n;
+    if (0 == n && dk:eof?(read-event))
+    {
+      MOM-LOG-EOF("fd=%i #EOF on read unnamed-pipe", self.fds[k-read]);
+      dk:close(self);
+    }
+    return self;
+  }
+
+  // parent
+  method object-t write-event-callback(object-t self, object-t write-event)
+  {
+    MOM-LOG(mom:LOG-GENERIC-FLAG, "%i: %s:%s()", self.fds[k-write], __klass__, __func__);
+    sys:abort();
+    return self;
+  }
+
+  method object-t read-event-handler(object-t self)
+  {
+    object-t result = self.event-handler[k-read];
+    return result;
+  }
+
+  method object-t write-event-handler(object-t self)
+  {
+    object-t result = self.event-handler[k-write];
+    return result;
+  }
+
+  // must use AFTER the fork() in parent
+  method object-t read-event-setup(object-t self, callback-t event-callback, object-t udata)
+  {
+    int32-t n;
+    self.type = k-read;
+    n = sys:close(self.fds[k-write]);  sc(n);
+    self.fds[k-write] = -1;
+    n = fd:add-nonblock(self.fds[k-read]); sc(n);
+    dk:callback=(self.event-handler[k-read], event-callback);
+//     assert(self == self.event-handler[k-read].self);
+    dk:udata=(self.event-handler[k-read], udata);
+    object-t eq = dk:get-current(event-queue:klass);
+    n = dk:add(eq, event:k-read, self.fds[k-read], self.event-handler[k-read]);  sc(n);
+    MOM-LOG-FD("fd=%i #parent-read-fd", self.fds[k-read]);
+    return self;
+  }
+
+  // must use AFTER the fork() in parent
+  method object-t write-event-setup(object-t self, callback-t event-callback, object-t udata)
+  {
+    int32-t n;
+    self.type = k-write;
+    n = sys:close(self.fds[k-read]);  sc(n);
+    self.fds[k-read] = -1;
+    n = fd:add-nonblock(self.fds[k-write]); sc(n);
+    dk:callback=(self.event-handler[k-write], event-callback);
+//     assert(self == self.event-handler[k-write].self);
+    dk:udata=(self.event-handler[k-write], udata);
+    object-t eq = dk:get-current(event-queue:klass);
+    n = dk:add(eq, event:k-write, self.fds[k-write], self.event-handler[k-write]);  sc(n);
+    MOM-LOG-FD("fd=%i #parent-write-fd", self.fds[k-write]);
+    return self;
+  }
+}

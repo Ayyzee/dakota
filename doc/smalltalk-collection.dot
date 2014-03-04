@@ -1,0 +1,71 @@
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "smalltalk-collection"
+{
+        graph [ label = "\G", fontcolor = red ];
+        graph [ rankdir = LR, page = "8.5,11", size = "7.5,9.75",
+                ratio = fill ];
+        node [ shape = record ];
+
+        "rnielsen" [ label = "<name>\N\
+           | add-at:\l\
+           | remove-at:\l\
+           | add-all-at:\l\
+           | remove-all-at:\l\
+           | replace-at:\l\
+           | replace-first:\l\
+           | replace-last:\l\
+           " ];
+
+        "collection" [ label = "<name>\N\
+           | add:\l\
+           | add-all:\l\
+           | remove:\l\
+           | remove-all:\l\
+           | is-empty:\l\
+           | empty:\l\
+           " ];
+
+        "sequenceable-collection" [ label = "<name>\N\
+           | first:\l\
+           | last:\l\
+           | find-first:\l\
+           | find-last:\l\
+           | reverse:\l\
+           | index-of:\l\
+           | at:\l\
+           " ];
+        
+        "ordered-collection" [ label = "<name>\N\
+           | after:\l\
+           | before:\l\
+           | add-after:\l\
+           | add-before:\l\
+           | add-all-first:\l\
+           | add-all-last:\l\
+           | add-first:\l\
+           | add-last:\l\
+           | remove-first:\l\
+           | remove-last:\l\
+           " ];
+
+        "sorted-collection" [ label = "<name>\N\
+           | sort:\l\
+           " ];
+//
+        "collection":name -> "sequenceable-collection":name [ dir = back ];
+        "sequenceable-collection":name -> "ordered-collection":name [ dir = back ];
+        "sequenceable-collection":name -> "sorted-collection":name [ dir = back ];
+}

@@ -1,0 +1,688 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <string.h>;
+include <assert.h>;
+
+klass token;
+klass tokenid;
+klass open-token;
+klass collection;
+klass vector;
+klass text-output-stream;
+klass features;
+
+using features:k-none;
+using features:k-indent;
+using features:k-leading-newline;
+using features:k-trailing-newline;
+using features:k-leading-ws;
+using features:k-trailing-ws;
+
+klass range
+{
+  slots
+  {
+    object-t parent;
+    uint32-t offset;
+    uint32-t length;
+  }
+}
+
+klass syntax-tree
+{
+  slots
+  {
+    const char8-t* filename;
+    object-t tokens;
+    uint32-t offset;
+
+    object-t root;
+  }
+
+  const boole-t echo? = false;
+
+  static uint32-t advance-count = 0;
+  static object-t std-output-text = NULL;
+
+  object-t initialize(object-t kls)
+  {
+    dk-klass-for-name(text-output-stream:__klass__); // hackhack
+    std-output-text = make(text-output-stream:klass);
+    return kls;
+  }
+
+  method object-t init(object-t self, const char8-t* filename => {})
+  {
+    self = dk:init(super);
+
+    self.filename = filename;
+    object-t l = make(lexer:klass, filename => self.filename);
+    self.tokens = dk:tokenize(l);
+    self.offset = 0;
+
+    object-t root = make(sorted-table:klass);
+    object-t klasses = make(sorted-table:klass);
+    dk:add(root, box($klasses), klasses);
+  //dk:dump(klasses);
+    object-t traits = make(sorted-table:klass);
+    dk:add(root, box($traits), traits);
+    self.root = root;
+
+    return self;
+  }
+
+  method uint32-t size(object-t self)
+  {
+    uint32-t result = dk:size(self.tokens);
+    return result;
+  }
+
+  method int32-t va:error(object-t self, const char8-t* format, va-list-t args)
+  {
+    object-t got = dk:current(self);
+    int32-t line = dk:line(got);
+    int32-t column = dk:column(got);
+    int32-t result = fprintf(stderr, "%s:%i:%i: ",
+                             self.filename, line, column);
+    result += vfprintf(stderr, format, args);
+    return result;
+  }
+
+  method int32-t va:expected(object-t self, va-list-t args)
+  {
+    object-t got = dk:current(self);
+    const char8-t* got-buffer = dk:buffer(got);
+    int32-t result = dk:error(self, "got '%s', but expected", got-buffer);
+    const char8-t* orstr = " ";
+    const char8-t* str;
+    while (NULL != (str = va-arg(args, const char8-t*)))
+    {
+      fprintf(stderr, "%s'%s'", orstr, str);
+      orstr = " or ";
+    }
+    fprintf(stderr, "\n");
+    // result NOT correct
+    return result;
+  }
+
+  method object-t dump(object-t self)
+  {
+    for (object-t token in self.tokens)
+    {
+      object-t leading-ws = dk:leading-ws(token);
+      if (NULL != leading-ws && !dk:empty?(leading-ws))
+        for (object-t leading-ws-token in leading-ws)
+          USE(leading-ws-token);
+          //         dk:dump-shallow(leading-ws-token)
+      dk:dump-shallow(token);
+    }
+    return self;
+  }
+
+  method object-t previous(object-t self)
+  {
+    object-t result = dk:at(self.tokens, self.offset - 1);
+    return result;
+  }
+
+  method object-t current(object-t self)
+  {
+    object-t result = dk:at(self.tokens, self.offset, null);
+    return result;
+  }
+
+  method object-t advance(object-t self)
+  {
+    advance-count++;
+    object-t current = dk:current(self);
+    self.offset++;
+    return current;
+  }
+
+  method object-t advance-statement(object-t self)
+  {
+    object-t current = dk:current(self);
+    advance-count++;
+
+      while (null != current)
+      {
+        const char8-t* str = dk:buffer(current);
+        strswitch (str)
+        {
+          case ";":
+          case "}":
+            self.offset++;
+            current = dk:current(self);
+            return current;
+          case "{":
+            current = dk:advance-balenced(self);
+            return current;
+          default:
+            self.offset++;
+            current = dk:current(self);
+        }
+      }
+    return current;
+  }
+
+  method object-t advance-balenced(object-t self)
+  {
+    object-t current = dk:current(self);
+    assert(dk:instance?(current, open-token:klass));
+    advance-count++;
+    object-t close-token = dk:close-token(current);
+
+    while ((current = dk:current(self)) != close-token)
+      self.offset++;
+    self.offset++;
+    return current;
+  }
+
+  method object-t va:match-until(object-t self, va-list-t args)
+  {
+    object-t end-tokens = make(vector:klass);
+    object-t result = make(vector:klass);
+    const char8-t* str;
+    while (NULL != (str = va-arg(args, const char8-t*)))
+      dk:add(end-tokens, str:box(str));
+    object-t current;
+    while (null != (current = dk:current(self)))
+    {
+      for (object-t end-token in end-tokens)
+      {
+        if (dk:equal?(current, end-token))
+        {
+          need-to-finish
+        }
+      }
+      dk:advance(self);
+    }
+    return result;
+  }
+
+  method object-t va:match-any(object-t self, va-list-t args)
+  {
+    object-t current = dk:current(self);
+    if (echo?)
+      dk:write(std-output-text, dk:buffer(current), k-leading-ws);
+    const char8-t* buffer = dk:buffer(current);
+    boole-t success? = false;
+    const char8-t* str;
+    while (NULL != (str = va-arg(args, const char8-t*)))
+    {
+      if (0 == strcmp(buffer, str))
+      {
+        success? = true;
+        break;
+      }
+    }
+    unless (success?)
+      dk:va:expected(self, args);
+
+    dk:advance(self);
+    return current;
+  }
+
+  method object-t match(object-t self, const char8-t* str)
+  {
+    object-t current = dk:match-any(self, str, NULL);
+    return current;
+  }
+
+  method symbol-t match-symbol(object-t self)
+  {
+    object-t current = dk:current(self);
+    const char8-t* buffer = dk:buffer(current);
+    symbol-t symbol = dk-intern(buffer);
+    if (echo?)
+      dk:write(std-output-text, symbol, k-leading-ws);
+    dk:advance(self);
+    return symbol;
+  }
+
+  method object-t match(object-t self)
+  {
+    object-t current = dk:current(self);
+    if (echo?)
+      dk:write(std-output-text, dk:buffer(current), k-leading-ws);
+    dk:advance(self);
+    return current;
+  }
+
+  method object-t match-identifier(object-t self)
+  {
+    object-t current = dk:current(self);
+    if (echo?)
+      dk:write(std-output-text, dk:buffer(current), k-leading-ws);
+    // need to check here
+    dk:advance(self);
+    return current;
+  }
+
+  method object-t match-qualified-identifier(object-t self)
+  {
+    object-t token1;
+    while (1)
+    {
+      token1 = dk:match-identifier(self);
+      object-t token2 = dk:current(self);
+      const char8-t* str = dk:buffer(token2);
+      if (0 != strcmp(":", str))
+        break;
+      token2 = dk:match(self, str);
+    }
+    return token1; // hackhack
+  }
+
+  method object-t slots-scope(object-t self, symbol-t type)
+  {
+    object-t scope = make(sorted-table:klass);
+    uint32-t brace-count = 0;
+    object-t token;
+    while (null != (token = dk:current(self)))
+    {
+      const char8-t* str = dk:buffer(token);
+      strswitch (str)
+      {
+        case ";":
+          dk:match(self, str);
+          break;
+        case "}":
+          if (0 == brace-count)
+            return scope;
+          dk:advance(self);
+          brace-count--;
+          break;
+        case "{":
+          dk:advance(self);
+          brace-count++;
+          break;
+        default:
+          dk:match(self);
+      }
+    }
+    return scope;
+  }
+
+  // slots <type> ;
+  // slots typedef <type> slots-t ;
+  //
+  // slots [struct] [slots-t] { [struct-union-body] }
+  // slots  union   [slots-t] { [struct-union-body] }
+  // slots  enum    [slots-t] { [enum-body]         }
+  method object-t slots-intro(object-t self)
+  {
+    dk:match(self, "slots");
+    object-t token = dk:current(self);
+    const char8-t* str = dk:buffer(token);
+    strswitch (str)
+    {
+      case "struct":
+        dk:slots-s1(self, $struct);
+        break;
+      case "union":
+        dk:slots-s1(self, $union);
+        break;
+      case "enum":
+        //
+        break;
+      case "typedef":
+        //
+        break;
+      case "slots-t": // assume 'struct'
+        //
+        break;
+      case "{": // assume 'struct'
+        dk:slots-s3(self);
+        break;
+      default: // must be a <type>
+        //
+        ;
+    }
+    return self;
+  }
+
+  method object-t slots-s1(object-t self, symbol-t type)
+  {
+    dk:match-any(self, $struct, $union, NULL);
+    object-t token = dk:current(self);
+    const char8-t* str = dk:buffer(token);
+    strswitch (str)
+    {
+      case "{":
+        dk:slots-s3(self);
+        break;
+      case "slots-t":
+        dk:slots-s2(self);
+        break;
+    }
+    return self;
+  }
+
+  method object-t slots-s2(object-t self)
+  {
+    dk:match(self, "slots-t");
+    object-t token = dk:current(self);
+    const char8-t* str = dk:buffer(token);
+    strswitch (str)
+    {
+      case "{":
+        dk:slots-s3(self);
+        break;
+      default:
+        dk:expected(self, "{", NULL);
+    }
+    return self;
+  }
+
+  method object-t slots-s3(object-t self)
+  {
+    dk:match(self, "{");
+    object-t token = dk:current(self);
+    const char8-t* str = dk:buffer(token);
+    strswitch (str)
+    {
+      case "}": // empty slots
+        break;
+      default:
+        dk:slots-s4(self);
+    }
+    return self;
+  }
+
+  method object-t slots-s4(object-t self)
+  {
+    object-t type = dk:match-until(self, ";", NULL);
+    dk:match(self, ";");
+    object-t name = dk:remove-last(type);
+    object-t token = dk:current(self);
+    const char8-t* str = dk:buffer(token);
+    strswitch (str)
+    {
+      case "}":
+        break;
+      default:
+        dk:slots-s4(self);
+    }
+    return self;
+  }
+
+  method object-t method-scope(object-t self)
+  {
+    object-t token;
+    while (null != (token = dk:current(self)))
+    {
+      const char8-t* str = dk:buffer(token);
+      strswitch (str)
+      {
+        case "}":
+          return self;
+        default:
+          dk:advance-statement(self);
+      }
+    }
+    return self;
+  }
+
+  method object-t method-intro(object-t self)
+  {
+    object-t token = dk:match(self, "method");
+    boole-t open-paren? = false;
+    until (open-paren?)
+    {
+      token = dk:current(self);
+      const char8-t* str = dk:buffer(token);
+      strswitch (str)
+      {
+        case "alias":
+          dk:match(self, str);
+          dk:match(self, "(");
+          dk:match-identifier(self);
+          dk:match(self, ")");
+          break;
+        case "(":
+          dk:match(self, str);
+          open-paren? = true;
+          break;
+        default:
+          dk:match(self);
+      }
+    }
+    uint32-t paren-count = 0;
+    boole-t close-paren? = false;
+    until (close-paren?)
+    {
+      token = dk:current(self);
+      const char8-t* str = dk:buffer(token);
+      strswitch (str)
+      {
+        case ")":
+          dk:match(self, str);
+          if (0 == paren-count)
+            close-paren? = true;
+          else
+            paren-count--;
+          break;
+        case "(":
+          dk:match(self, str);
+          paren-count++;
+          break;
+        default:
+          dk:match(self);
+      }
+    }
+    token = dk:current(self);
+    const char8-t* str = dk:buffer(token);
+    strswitch (str)
+    {
+      case ";":
+        dk:match(self, str);
+        return self;
+      case "{":
+        dk:match(self, "{"); // could use str, but prefer the symmetry of the braces
+        dk:method-scope(self);
+        dk:match(self, "}");
+        return self;
+      default:
+        dk:expected(self, ";", "{", NULL);
+    }
+    return self;
+  }
+
+  method object-t klass-scope(object-t self, symbol-t type)
+  {
+    object-t scope = make(sorted-table:klass);
+    object-t token;
+    while (null != (token = dk:current(self)))
+    {
+      const char8-t* str = dk:buffer(token);
+      strswitch (str)
+      {
+        case "superklass":
+          if ($klass == type)
+          {
+            dk:match(self, str);
+            object-t superklass-name = dk:match-qualified-identifier(self);
+            dk:match(self, ";");
+            dk:add(scope, box($superklass), superklass-name);
+          }
+          else if ($trait == type)
+          {
+            dk:error(self, "trait may not have superklass\n");
+            dk:advance-statement(self);
+          }
+          else
+            abort();
+          break;
+        case "klass":
+          if ($klass == type)
+          {
+            dk:match(self, str);
+            object-t klass-name = dk:match-qualified-identifier(self);
+            dk:match(self, ";");
+            dk:add(scope, box($klass), klass-name);
+          }
+          else if ($trait == type)
+          {
+            dk:error(self, "trait may not have klass\n");
+            dk:advance-statement(self);
+          }
+          else
+            abort();
+          break;
+        case "slots":
+          if ($klass == type)
+          {
+            dk:slots-intro(self);
+          }
+          else if ($trait == type)
+          {
+            dk:error(self, "trait may not have slots\n");
+            dk:advance-statement(self);
+          }
+          else
+            abort();
+          break;
+        case "trait":
+        {
+          dk:match(self, str);
+          object-t trait-name = dk:match-qualified-identifier(self);
+          dk:match(self, ";");
+          object-t traits = dk:at(scope, box($traits), NULL);
+          if (NULL == traits)
+          {
+            traits = make(vector:klass);
+            dk:add(scope, box($traits), traits);
+          }
+          dk:add(traits, trait-name);
+          break;
+        }
+        case "method":
+          dk:method-intro(self);
+          break;
+        case "}":
+          return scope;
+        default:
+          dk:advance-statement(self);
+      }
+    }
+    return scope;
+  }
+
+  method object-t construct-intro(object-t self, symbol-t type)
+  {
+    object-t table;
+    strswitch (type)
+    {
+      case $klass:
+        table = dk:at(self.root, box($klasses));
+        break;
+      case $trait:
+        table = dk:at(self.root, box($traits));
+        break;
+      default:
+        abort();
+    }
+    object-t name = dk:match-qualified-identifier(self);
+    object-t token = dk:current(self);
+    const char8-t* str = dk:buffer(token);
+    strswitch (str)
+    {
+      case ";":
+        dk:match(self, str);
+        // do NOT replace a defn with a decl
+        if (NULL == dk:assoc-at(table, name, NULL))
+          dk:add(table, name, NULL);
+        assert(NULL != dk:assoc-at(table, name, NULL));
+        break;
+      case "{":
+      {
+        dk:match(self, "{"); // could use str, but prefer the symmetry of the braces
+        object-t scope = dk:klass-scope(self, type);
+        dk:match(self, "}");
+        // do replace a decl with a defn
+        if (NULL == dk:at(table, name, NULL))
+          dk:add(table, name, scope);
+        assert(NULL != dk:assoc-at(table, name, NULL));
+        break;
+      }
+      default:
+        dk:expected(self, ";", "{", NULL);
+    }
+    return self;
+  }
+
+  method object-t klass-intro(object-t self)
+  {
+    symbol-t type = dk:match-symbol(self);
+    dk:construct-intro(self, type);
+    return self;
+  }
+
+  method object-t include(object-t self)
+  {
+    object-t token;
+    while (null != (token = dk:current(self)))
+    {
+      const char8-t* str = dk:buffer(token);
+      strswitch (str)
+      {
+        case ";":
+          dk:match(self, str);
+          return self; // returnreturn
+        default:
+          dk:match(self);
+      }
+    }
+    return self;
+  }
+
+  method object-t writeln-lite(object-t self, object-t out)
+  {
+    dk:writeln-lite(self.root, out);
+    return self;
+  }
+
+  method object-t write-lite(object-t self, object-t out)
+  {
+    dk:write-lite(self.root, out);
+    return self;
+  }
+
+  method object-t intro(object-t self)
+  {
+    object-t token;
+    while (null != (token = dk:current(self)))
+    {
+      const char8-t* str = dk:buffer(token);
+      strswitch (str)
+      {
+        case "include":
+          dk:include(self);
+          break;
+        case "klass":
+        case "trait":
+          dk:klass-intro(self);
+          break;
+        default:
+          dk:advance-statement(self);
+        //printf("++%s++\n", dk:buffer(dk:current(self)));
+      }
+    }
+    return self;
+  }
+}

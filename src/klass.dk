@@ -1,0 +1,884 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+include <cstdio>;
+include <cstring>;
+
+#ifndef __STDC-FORMAT-MACROS
+#define __STDC-FORMAT-MACROS
+#endif //__STDC-FORMAT-MACROS
+include <inttypes.h>;
+
+#if HAVE-CONFIG-H
+include "config.h";
+#endif
+
+include "dakota-private.h";
+include "dakota-log.h";
+include "sorted-array.h";
+include "dl.h"; // symbol-name-from-address()
+
+#define DK-SET-METHOD-FOR-SELECTOR(methods, selector, method) (methods)->addrs[(selector)] = (method)
+#define DK-METHOD-FOR-SELECTOR(methods, selector) (methods)->addrs[(selector)]
+
+module dakota;
+
+klass assoc-node;
+klass bit-vector;
+klass method-alias;
+klass sorted-array;
+klass named-info-node;
+klass object-output-stream;
+klass property;
+klass std-compare;
+klass symbol;
+
+#if DKT-WORKAROUND
+namespace selector-node  { noexport int-t compare(slots-t**, slots-t**); }
+namespace object        { noexport object-t dump(object-t); }
+namespace klass
+{
+  DK-VISIBILITY symbol-t name(object-t);
+}
+#endif
+
+#if !defined DEBUG
+export void dkt-null-method(object-t object, ...)
+{
+  throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object));
+}
+#endif
+
+klass selector-pair
+{
+  slots
+  {
+    const signature-t* key;
+    selector-node-t*   element;
+  }
+  method int-t compare(slots-t* s, slots-t* other-s)
+  {
+    assert(NULL != s);
+    assert(NULL != other-s);
+    //printf("%s(): %s ?= %s\n", __func__, s, other-s);
+    int-t result = signature:compare(const-cast<signature-t*>(s->key), const-cast<signature-t*>(other-s->key)); // hackhack
+    result = normalize-compare-result(result);
+    return result;
+  }
+}
+
+STATIC const uint32-t gbl-num-generics = 512;
+STATIC selector-pair-t[gbl-num-generics] gbl-selectors;
+noexport sorted-array-t   gbl-selectors-table = { gbl-selectors,
+                                                                0,
+                                                                DK-ARRAY-LENGTH(gbl-selectors),
+                                                                cast(uint32-t)sizeof(gbl-selectors[0]),
+                                                                cast(std-compare-t)cast(int-t (*)(selector-pair-t*, selector-pair-t*))selector-pair:compare };
+
+//   noexport void dump-selectors()
+//   {
+//     for (uint32-t index = 0; index < gbl-selectors-table.count; index++)
+//     {
+//       symbol-t   selector =  gbl-selectors[index]->name;
+//       uint32-t selector =  *gbl-selectors[index]->ptr;
+//       char8-t[1024] buffer; buffer[0] = NUL;
+
+//       printf("pair[%03u]: selector = %03u, selector = %s\n",
+//              index, selector, selector);
+//     }
+//     return;
+//   }
+
+noexport symbol-t default-klass-name();
+
+noexport symbol-t
+default-superklass-name()
+{
+  return object:__klass__;
+}
+noexport object-t
+default-superklass()
+{
+  return object:klass;
+}
+noexport symbol-t interposer-name-for-klass-name(symbol-t klass-name);
+noexport void add-interpose-prop(symbol-t key, symbol-t element);
+
+noexport selector-t
+selector-for-signature(const signature-t* signature)
+{
+  selector-pair-t pair = { signature, NULL };
+  selector-pair-t* found-pair =
+    cast(selector-pair-t*)sorted-array:bsearch(&gbl-selectors-table, &pair);
+  selector-t selector = *(found-pair->element->key);
+  return selector;
+}
+
+noexport method-t
+method-for-signature(methods:slots-t* methods, const signature-t* signature)
+{
+  selector-t selector = selector-for-signature(signature);
+  assert(selector < methods->count);
+  method-t m = DK-METHOD-FOR-SELECTOR(methods, selector);
+  return m;
+}
+
+noexport void
+import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
+{
+  uint32-t i = 0;
+  while (1)
+  {
+    signature-t*     signature =     signatures[i];
+    selector-node-t* selector-node = &selector-nodes[i];
+    i++;
+
+    assert((NULL == signature && NULL == selector-node->key) ||
+           (NULL != signature && NULL != selector-node->key));
+    if (NULL == signature)
+      break;
+    selector-pair-t pair = { signature, selector-node };
+    selector-pair-t* found-pair =
+      cast(selector-pair-t*)sorted-array:bsearch(&gbl-selectors-table, &pair);
+    if (NULL == found-pair)
+    {
+      *(pair.element->key) = cast(selector-t)(gbl-selectors-table.count);
+      pair.element->next = NULL;
+      sorted-array:add(&gbl-selectors-table, &pair);
+    }
+    else
+    {
+      *(selector-node->key) = *(found-pair->element->key);
+      selector-node->next = found-pair->element;
+      found-pair->element->next = selector-node;
+    }
+  }
+  return;
+}
+
+noexport const void*
+ptr-from-info(named-info-node-t* info, symbol-t key)
+{
+  named-info-node-t* current-info = info;
+  const void* previous-element = NULL;
+  const void* element = NULL;
+  do
+  {
+    element = cast(const void*)named-info-node:at(current-info, key);
+    assert((NULL == previous-element && NULL != element) ||
+           (NULL != previous-element && NULL == element) ||
+           (previous-element == element));
+    if (NULL == element && NULL != previous-element)
+      element = previous-element;
+  } while (NULL != (current-info = current-info->next));
+
+  return element;
+}
+
+noexport uint32-t
+uint32-from-info(named-info-node-t* info, symbol-t key)
+{
+  named-info-node-t* current-info = info;
+  uint32-t previous-element = 0;
+  uint32-t element = 0;
+  do
+  {
+    element = cast(uint32-t)named-info-node:at(current-info, key);
+    assert((0 == previous-element && 0 != element) ||
+           (0 != previous-element && 0 == element) ||
+           (previous-element ==  element));
+    if (0 == element && 0 != previous-element)
+      element = previous-element;
+  } while (NULL != (current-info = current-info->next));
+
+  return element;
+}
+
+noexport uint32-t
+size-from-info(named-info-node-t* info)
+{
+  uint32-t size = uint32-from-info(info, $size);
+  return size;
+}
+
+noexport object-t
+superklass-from-info(named-info-node-t* info)
+{
+  object-t superklass = cast(object-t)ptr-from-info(info, $superklass);
+  return superklass;
+}
+
+noexport object-t
+superklass-from-info(named-info-node-t* info, symbol-t name)
+{
+  object-t superklass = superklass-from-info(info);
+  USE(name);
+  return superklass;
+}
+
+noexport symbol-t
+superklass-name-from-info(named-info-node-t* info)
+{
+  symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, $superklass-name);
+
+  if (NULL == superklass-name && $object != name-from-info(info))
+    superklass-name = default-superklass-name();
+  return superklass-name;
+}
+
+noexport symbol-t
+superklass-name-from-info(named-info-node-t* info, symbol-t name)
+{
+  symbol-t superklass-name = superklass-name-from-info(info);
+  if (NULL == superklass-name)
+  {
+    object-t superklass = superklass-from-info(info, name);
+    if (NULL != superklass && null != superklass)
+      superklass-name = klass:name(superklass);
+  }
+  if (NULL != name)
+  {
+    symbol-t interposer-name = interposer-name-for-klass-name(name);
+    if (NULL != interposer-name)
+    {
+//       fprintf(stderr, "{ name: %s, interposer-name: %s },\n", name, interposer-name);
+      if (NULL != superklass-name && interposer-name != superklass-name)
+      {
+//         fprintf(stderr, "{ interposer-name: %s, superklass-name: %s },\n", interposer-name, superklass-name);
+        add-interpose-prop(interposer-name, superklass-name);
+        superklass-name = interposer-name;
+      }
+    }
+  }
+  return superklass-name;
+}
+
+noexport symbol-t
+name-from-info(named-info-node-t* info)
+{
+  symbol-t name = cast(symbol-t)ptr-from-info(info, $name);
+  return name;
+}
+
+noexport symbol-t
+klass-name-from-info(named-info-node-t* info)
+{
+  symbol-t klass-name = cast(symbol-t)ptr-from-info(info, $klass-name);
+
+  if (NULL == klass-name)
+    klass-name = default-klass-name();
+  return klass-name;
+}
+
+/*noexport*/ const uint32-t k-alignment = 8;
+
+noexport uint32-t
+round-alignment(uint32-t n)
+{
+  uint32-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
+  return result;
+}
+
+// offset is 'offset() of superklass' + 'size of superklass'
+noexport uint32-t
+offset-from-info(named-info-node-t* info)
+{
+  uint32-t result;
+
+  symbol-t name = name-from-info(info);
+  if (0 == symbol:compare(object:__klass__, name))
+  { // klass is "object"
+    result = 0;
+  }
+  else
+  {
+    symbol-t superklass-name = superklass-name-from-info(info, name);
+    if (NULL == superklass-name)
+      superklass-name = default-superklass-name();
+    named-info-node-t* superklass-info = info-for-name(superklass-name);
+    uint32-t superklass-offset = offset-from-info(superklass-info); // recursive
+    uint32-t superklass-size =   size-from-info(superklass-info);
+    result = superklass-offset + superklass-size;
+  }
+  result = round-alignment(result);
+  return result;
+}
+
+noexport void
+load-traits(const symbol-t* traits)
+{
+  if (NULL != traits)
+  {
+    uint32-t index = 0;
+    while (NULL != traits[index])
+    {
+      named-info-node-t* info = info-for-name(traits[index]);
+      load-traits(cast(const symbol-t*)named-info-node:at(info, $traits));
+      index++;
+    }
+  }
+  return;
+}
+
+klass resource-usage
+{
+  slots
+  {
+    uint32-t memory;
+    uint32-t instances;
+    uint32-t method-memory;
+    uint32-t method-count;
+  }
+  method slots-t* add-alloc(slots-t* s, uint32-t size)
+  {
+    s->instances++;
+    s->memory += size;
+    return s;
+  }
+  method slots-t* log-alloc(slots-t* s, object-t o)
+  {
+    printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"\n",
+           s->instances,
+           klass:unbox(o)->offset + klass:unbox(o)->size,
+           s->memory,
+           klass:unbox(o)->name);
+    return s;
+  }
+  method slots-t* log-alloc(slots-t* s, uint32-t size, symbol-t name)
+  {
+    printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"~\n",
+           s->instances, size, s->memory, name);
+    return s;
+  }
+  method slots-t* log-method-alloc(slots-t* s)
+  {
+    printf("method-count=%u, method-memory=%i\n", s->method-count, s->method-memory);
+    return s;
+  }
+}
+#if defined DKT-DUMP-MEM-FOOTPRINT
+noexport resource-usage:slots-t gbl-ru = { 0, 0, 0, 0 };
+#endif
+
+klass methods
+{
+  slots
+  {
+    method-t* addrs; // first so its offset is 0
+    uint32-t  count;
+  }
+}
+
+
+klass klass
+{
+  //     klass klass;
+
+  slots
+  {
+    methods:slots-t          methods; // first so its offset is 0
+    uint32-t                 size;
+    uint32-t                 offset;
+    object-t                 superklass;
+    symbol-t                 name; // redundant but convenient
+    named-info-node:slots-t* info-slots;
+    object-t behavior; // bit-vector
+  }
+
+  method object-t alloc(object-t self, const char8-t* file, uint32-t line)
+  {
+    DKT-LOG-OBJECT-ALLOC("'file'=>'%s','line'=>'%i','func'=>'%s','args'=>['%s']",
+                         file, line, __signature__->name, self.name);
+    object-t instance = dk:alloc(self);
+    return instance;
+  }
+
+  method object-t alloc(object-t self)
+  {
+    uint32-t size = self.offset + self.size;
+
+#if defined DKT-DUMP-MEM-FOOTPRINT
+    resource-usage:add-alloc(&gbl-ru, size);
+    resource-usage:log-alloc(&gbl-ru, self);
+#endif
+    object-t instance = cast(object-t)malloc(size);
+#if 0
+    memset(instance, 0, size);
+#endif
+    instance->klass = self;
+    instance->retain-count = 1;
+    return instance;
+  }
+
+  method symbol-t name(object-t self)
+  {
+    symbol-t name = self.name;
+    return name;
+  }
+
+  noexport object-t alloc-methods(object-t self, uint32-t methods-count)
+  {
+    self.methods.count = methods-count;
+    self.methods.addrs = cast(method-t*)malloc(sizeof(method-t) * self.methods.count);
+
+#if defined DKT-DUMP-MEM-FOOTPRINT
+    gbl-ru.method-count =  self.methods.count;
+    gbl-ru.method-memory += gbl-ru.method-count * sizeof(method-t);
+    resource-usage:log-method-alloc(&gbl-ru);
+#endif    
+
+    for (uint32-t index = 0; index < self.methods.count; index++)
+      self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
+    return self;
+  }
+
+  noexport object-t init-methods(object-t self)
+  {
+    if (NULL != self.superklass && null != self.superklass)
+    {
+      memcpy(self.methods.addrs, unbox(self.superklass)->methods.addrs,
+             sizeof(method-t) * unbox(self.superklass)->methods.count);
+    }
+    return self;
+  }
+
+  //      method va-method-t va-method-for-selector(object-t self, selector-t selector)
+  //      {
+  //        throw make(exception:klass, message => "not yet implemented");
+  //        // return NULL
+  //      }
+
+  method method-t method-for-selector(object-t self, selector-t selector)
+  {
+    assert(selector < self.methods.count);
+    method-t m = DK-METHOD-FOR-SELECTOR(&self.methods, selector);
+    return m;
+  }
+
+  method method-t remove-method-for-selector(object-t self, selector-t selector)
+  {
+    assert(selector < self.methods.count);
+    method-t m = DK-METHOD-FOR-SELECTOR(&self.methods, selector);
+    DK-SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
+    if (NULL != self.behavior)
+      dk:bit=(self.behavior, cast(uint32-t)selector, false);
+    return m;
+  }
+
+  method method-t add-method-for-selector(object-t self, selector-t selector, method-t m)
+  {
+    assert(selector < self.methods.count);
+    DK-SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
+    if (NULL != self.behavior)
+      dk:bit=(self.behavior, cast(uint32-t)selector, true);
+    return m;
+  }
+
+  method object-t dump(object-t self)
+  {
+    object:dump(self);
+    fprintf(stderr, "%p:%p {", cast(void*)(self), cast(void*)unbox(self));
+
+    // name
+    if (NULL != self.name)
+      fprintf(stderr, " name=%p $%s", cast(void*)(self.name), self.name);
+    else
+      fprintf(stderr, " name=%s", $NULL);
+
+    // superklass
+    if (NULL != self.superklass)
+    {
+      symbol-t superklass-name;
+
+      if (null == self.superklass)
+      {
+        superklass-name = "-null-";
+        fprintf(stderr, ", superklass=%p %s", cast(void*)(self.superklass), superklass-name);
+      }
+      else
+      {
+        if (NULL == (superklass-name = name(self.superklass)))
+          superklass-name = $NULL;
+
+        fprintf(stderr, ", superklass=%p <%s>", cast(void*)(self.superklass), superklass-name);
+      }
+    }
+    else
+    {
+      fprintf(stderr, ", superklass=%s", $NULL);
+    }
+
+    // size
+    fprintf(stderr, ", size=%i", self.size);
+    // offset
+    fprintf(stderr, ", offset=%i", self.offset);
+
+    fprintf(stderr, " }\n");
+
+    if (NULL != self.superklass)
+    {
+//       if (null == self.superklass)
+//         dk:dump(dk-klass(null));
+      dk:dump(self.superklass);
+    }
+
+    return self;
+  }
+
+  method slots-t* dump-methods(slots-t* s)
+  {
+    if (NULL != s->behavior)
+      dk:dump(s->behavior);
+    selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
+    uint32-t max-width = 0;
+
+    if (1)
+    {
+      for (uint32-t index = 0; index < s->methods.count; index++)
+      {
+        const signature-t* signature = cast(const signature-t*)selectors[index].key;
+        method-t m = method-for-signature(&s->methods, signature);
+        if (NULL != m)
+        {
+          uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 + cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
+          if (width > max-width)
+            max-width = width;
+        }
+      }
+    }
+    file-t out = stdout;
+    
+    fprintf(out, "{\n");
+    for (uint32-t index = 0; index < s->methods.count; index++)
+    {
+      const signature-t* signature =  cast(const signature-t*)selectors[index].key;
+      method-t m = method-for-signature(&s->methods, signature);
+
+      if (NULL != m)
+      {
+        fprintf(out, "  '%s(%s)'", signature->name, signature->parameter-types);
+        uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 + cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
+        while (width < max-width)
+        {
+          fprintf(out, " ");
+          width++;
+        }
+        const char8-t* symbol-name = symbol-name-from-address(cast(void*)cast(uintptr-t)(m));
+
+        if (NULL != symbol-name)
+        {
+          // should demangle here
+          fprintf(out, " => '%s',", symbol-name);
+        }
+        else
+        {
+          fprintf(out, " => undef,");
+        }
+        fprintf(out, "\n");
+      }
+    }
+    fprintf(out, "},\n");
+    return s;
+  }
+
+  // use for both klasses (and klass-x) and traits (and trait-x)
+  noexport void add-methods(object-t self, named-info-node-t* info,
+                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses)
+  {
+    named-info-node-t* current-info = info;
+    do
+    {
+      signature-t** method-signatures = cast(signature-t**)named-info-node:at(current-info, symbol-method-signatures);
+      method-t*    method-addresses = cast(method-t*)named-info-node:at(current-info, symbol-method-addresses);
+      assert((NULL != method-signatures && NULL != method-addresses) ||
+             (NULL == method-signatures && NULL == method-addresses));
+      if (NULL != method-signatures)
+      {
+        uint32-t index = 0;
+        signature-t* signature;
+        method-t   address;
+        while (NULL != (signature = method-signatures[index]))
+        {
+          if (NULL != (address = method-addresses[index]))
+          {
+            // can NOT dynamicly dispatch
+            selector-t selector = selector-for-signature(signature);
+            add-method-for-selector(self, selector, address);
+
+            if (NULL != self.behavior)
+            {
+              dk:bit=(self.behavior, cast(uint32-t)selector, true);
+            }
+          }
+          else
+          {
+            // ???
+          }
+          index++;
+        }
+      }
+    } while (NULL != (current-info = current-info->next));
+    return;
+  }
+
+  noexport void add-traits(object-t self, const symbol-t* traits)
+  {
+    if (NULL != traits)
+    {
+      uint32-t length = 0;
+      while (NULL != traits[length])
+        length++;
+
+      uint32-t pos = length;
+      while (pos)
+      {
+        named-info-node-t* info = info-for-name(traits[pos - 1]);
+        const symbol-t* used-traits = cast(const symbol-t*)named-info-node:at(info, $traits);
+        add-traits(self, used-traits);
+        add-methods(self, info, $method-signatures, $method-addresses);
+        add-methods(self, info, $exported-method-signatures, $exported-method-addresses);
+        pos--;
+      }
+    }
+    return;
+  }
+
+  noexport object-t traits-initialize(object-t self, const symbol-t* traits)
+  {
+    if (NULL != traits)
+    {
+      uint32-t i = 0;
+      symbol-t trait-name;
+      while (NULL != (trait-name = traits[i]))
+      {
+        named-info-node-t* info = info-for-name(trait-name);
+
+        if (NULL != info)
+        {
+          method-t trait-initialize = cast(method-t)named-info-node:at(info, $initialize);
+          if (NULL != trait-initialize)
+          {
+            symbol-t klass-name = cast(symbol-t)named-info-node:at(self.info-slots, $name);
+            symbol-t file =       cast(symbol-t)named-info-node:at(self.info-slots, $file);
+            DKT-LOG-INITIAL-FINAL("'action'=>'%s','args'=>['%s:%s'],'klass'=>'%s','file'=>'%s'",
+                                  "initialize", trait-name, "klass", klass-name, file);
+            self = trait-initialize(self);
+          }
+        }
+        i++;
+      }
+    }
+    return self;
+  }
+
+  method boole-t behavior?(object-t self, object-t kls)
+  {
+    assert((NULL != self.behavior) || (NULL != unbox(kls)->behavior));
+    boole-t state = dk:bit-and?(self.behavior, unbox(kls)->behavior);
+    return state;
+  }
+
+  method object-t behavior(object-t self)
+  {
+    if (NULL == self.behavior)
+    {
+      self.behavior = make(bit-vector:klass, initial-capacity => self.methods.count);
+
+      for (uint32-t index = 0; index < self.methods.count; index++)
+        if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
+          dk:bit=(self.behavior, index, true);
+    }
+    return self.behavior;
+  }
+
+  STATIC named-info-node:slots-t gbl-default-info-slots = { NULL, 0, NULL };
+
+  noexport object-t init(object-t self, named-info-node:slots-t* info-slots);
+
+  method object-t init(object-t self,
+                       named-info-node:slots-t* info-slots => NULL,
+                       object-t                 info =>      NULL)
+  {
+    self = dk:init(super);
+    assert(!(NULL != info-slots &&
+             NULL != info));
+    named-info-node:slots-t* tmp-info-slots;
+    if (NULL == info)
+      tmp-info-slots = info-slots;
+    else
+      tmp-info-slots = named-info-node:unbox(info);
+    object-t result = init(self, tmp-info-slots);
+    return result;
+  }
+
+  method object-t dealloc(object-t self)
+  {
+    free(self.methods.addrs);
+    object-t result = dk:dealloc(super);
+    return result;
+  }
+
+  noexport object-t init(object-t self, named-info-node:slots-t* info-slots)
+  {
+    if (NULL == info-slots)
+      info-slots = &gbl-default-info-slots;
+    named-info-node:sort(info-slots);
+    self.info-slots = info-slots;
+    symbol-t name = name-from-info(self.info-slots);
+    assert($trait != cast(symbol-t)named-info-node:at(self.info-slots, $type));
+    self.name = name;
+//     fprintf(stderr, "%p: { name=%s }\n", cast(void*)(self), self.name);
+    uint32-t size = size-from-info(self.info-slots);
+    self.size = size;
+    object-t superklass = superklass-from-info(self.info-slots, self.name);
+    self.superklass = superklass;
+
+    if (NULL == self.superklass)
+    {
+      symbol-t superklass-name = superklass-name-from-info(self.info-slots, self.name);
+
+      if (NULL != superklass-name)
+        self.superklass = dk-klass-for-name(superklass-name);
+      else // NULL == superklass && NULL == superklass-name
+        self.superklass = default-superklass();
+    }
+    self.behavior = NULL; // hackhack
+    const symbol-t* traits = cast(const symbol-t*)named-info-node:at(self.info-slots, $traits);
+
+    if (NULL != traits)
+      load-traits(traits);
+    uint32-t offset = offset-from-info(self.info-slots);
+    self.offset = offset;
+    alloc-methods(self, gbl-selectors-table.count);
+    init-methods(self);
+    add-traits(self, traits);
+    add-methods(self, self.info-slots, $method-signatures, $method-addresses);
+    add-methods(self, self.info-slots, $exported-method-signatures, $exported-method-addresses);
+
+    if (NULL != name)
+    {
+      assoc-node-t* imported-klasses = imported-klasses-for-klass(name);
+      assoc-node-t* current-imported-klass = imported-klasses; // to ease debugging
+
+      while (NULL != current-imported-klass)
+      {
+        *(cast(object-t*)(current-imported-klass->element)) = self;
+        current-imported-klass = current-imported-klass->next;
+      }
+    }
+    else
+      dk-log(DK-LOG-WARNING, "NULL klass name");
+    if (NULL != traits)
+      self = traits-initialize(self, traits);
+    method-alias-t* method-aliases = cast(method-alias-t*)named-info-node:at(self.info-slots, $method-aliases);
+    if (NULL != method-aliases)
+    {
+      uint32-t i = 0;
+      const signature-t* method-signature;
+      while (NULL != (method-signature = method-aliases[i].method-signature))
+      {
+        const signature-t* alias-signature = method-aliases[i].alias-signature;
+        selector-t alias-selector =  selector-for-signature(alias-signature);
+        selector-t method-selector = selector-for-signature(method-signature);
+        add-method-for-selector(self,
+                                method-selector,
+                                DK-METHOD-FOR-SELECTOR(&self.methods, alias-selector));
+        i++;
+      }
+    }
+    method-t klass-initialize = cast(method-t)named-info-node:at(self.info-slots, $initialize);
+    symbol-t file =             cast(symbol-t)named-info-node:at(self.info-slots, $file);
+    if (NULL != klass-initialize)
+    {
+      DKT-LOG-INITIAL-FINAL("'action'=>'%s','args'=>['%s'],'klass'=>'%s','file'=>'%s'",
+                            "initialize", "klass", name, file);
+      self = klass-initialize(self);
+    }
+    if (NULL == bit-vector:klass)
+      self.behavior = NULL;
+#if !defined DKT-OMIT-BEHAVIOR
+    else
+      self.behavior = behavior(self);
+#else
+    else
+      self.behavior = NULL;
+#endif
+    return self;
+  } // init(object-t self, named-info-node:slots-t*)
+
+  method object-t superklass(object-t self)
+  {
+    object-t superklass = self.superklass;
+    return superklass;
+  }
+
+  method boole-t subklass?(object-t self, object-t kls)
+  {
+    boole-t state = false;
+    object-t tmp-kls = self;
+
+    while (null != (tmp-kls = dkt-superklass(tmp-kls)))
+    {
+      if (tmp-kls == kls)
+      {
+        state = true;
+        break;
+      }
+    }
+    return state;
+  }
+
+  method const char8-t* utf8-from(object-t self)
+  {
+    symbol-t name = self.name;
+    uint32-t name-len = cast(uint32-t)safe-strlen(name);
+    char8-t* buffer = cast(char8-t*)malloc(sizeof(char8-t) * (name-len + (1)));
+    snprintf(buffer, name-len + (1), "%s", name);
+    return buffer;
+  }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+
+    dk:write-element(out, self.name,   "name");
+    dk:write-element(out, self.size,   "size");
+    dk:write-element(out, self.offset, "offset");
+    dk:write-element-idref(out, self.superklass, "superklass");
+
+    dk:write-slots-end(out);
+    return self;
+  }
+}
+
+#if defined DEBUG
+export void
+dk-dump-methods(klass:slots-t* s)
+{
+  klass:dump-methods(s);
+  return;
+}
+
+export void
+dk-dump-methods(object-t kls)
+{
+  klass:slots-t* kls-s = unbox(kls);
+  dk-dump-methods(kls-s);
+  return;
+}
+#endif

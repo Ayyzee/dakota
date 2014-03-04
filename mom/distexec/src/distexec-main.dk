@@ -1,0 +1,129 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <stdio.h>;
+include <stdlib.h>;
+include <string.h>;
+include <sys/param.h>;
+include <sys/stat.h>;
+include <sys/types.h>;
+include <unistd.h>;
+
+include "common.h";
+include "config.h";
+include "inet.h";
+include "proxy-lc.h";
+include "sys.h";
+include "tags.h";
+include "util.h";
+
+klass callback;
+klass connection;
+klass event;
+klass event-queue;
+klass event-queue-klass;
+klass execution-context;
+klass fd;
+klass msg-id;
+klass cstring;
+klass deque;
+klass xin4-addr;
+klass xsa-family;
+klass xsockaddr-in4;
+
+noexport char8-t cmd[1024 * 1024];
+
+static void __attribute__((destructor)) initializer()
+{
+  // should put openlog() here but getprogname() return "" pre-main()
+  return;
+}
+
+static void __attribute__((destructor)) finalizer()
+{
+#if USE-SYSLOG
+  sys:closelog();
+#else
+  mom:closelog();
+#endif
+  return;
+}
+
+int-t main(int-t argc, char** argv, char** envp)
+{
+#ifndef HAVE-GETPROGNAME
+  sys:setprogname(argv[0]);
+#endif
+#if USE-SYSLOG
+  sys:openlog(sys:getprogname(), LOG-PID | LOG-NDELAY | LOG-PERROR, LOG-USER);
+#else
+  mom:openlog(sys:getprogname(), LOG-PID | LOG-NDELAY | LOG-PERROR, LOG-USER);
+#endif
+  if (NULL != argv[1])
+  {
+  char8-t cnt[4 + (1)] = "0001"; // hackhack
+  char8-t cwd[MAXPATHLEN] = ""; // offoff
+  char8-t* p = sys:getcwd(cwd, sizeof(cwd)); nulleqen(p); // offoff
+  argv[0] = cwd;
+  char8-t path[MAXPATHLEN] = ""; // offoff
+
+  // must not start with
+  // "/", "./", "../"
+  if (strncmp(argv[1], "/", 1) && strncmp(argv[1], "./", 2) && strncmp(argv[1], "../", 3))
+  {
+    resolve-path(path, sizeof(path), argv[1]);
+  }
+  else
+  {
+    sys:strcpy(path, argv[1]);
+  }
+  char8-t** args = &argv[1];
+  char8-t** vars = envp;
+
+  cstring-t cmd-cstr = { cmd, 0, sizeof(cmd) };
+
+  object-t cntx;
+  dk:serialize(cntx, cmd-cstr.ptr, cmd-cstr.capacity, cnt, cwd, path, args, vars);
+  object-t exec-work-msg = make(msg:klass,
+                                tag => exec-work,
+                                val => cmd-cstr);
+  xsockaddr-in4-t lc-sin = xsockaddr-in4-create(xin4-addr:k-any, 0);
+
+  //const char8-t* loopback-port-str = sys:getenv("DE_RECRUITER_LOOPBACK_PORT");
+  // should be lc-connection = init-proxy(addr, port);
+  lc-sin.sin-addr = addr-getenv("DE_RECRUITER_LOOPBACK_ADDR", RECRUITER-LOOPBACK-ADDR);
+  lc-sin.sin-port = port-getenv("DE_RECRUITER_LOOPBACK_PORT", RECRUITER-LOOPBACK-PORT);
+  object-t lc-connection = make(connection:klass, callback => lc-rcv-msg-callback);
+  fd-t n = dk:establish(lc-connection, lc-sin, connection:k-client);  sc(n);
+  //fd-t lc-fd = dk:fd(lc-connection);
+  dk:snd-msg(lc-connection, exec-work-msg);
+
+  timespec* tsp;
+  int32-t wait-forever = 1;
+  
+  if (!wait-forever)
+  {
+    timespec ts = { 10, 0 };
+    tsp = &ts;
+  }
+  else
+  {
+    tsp = NULL;
+  }
+  dk:loop(dk:get-current(event-queue:klass), tsp);
+  }
+  sys:exit(EXIT-FAILURE);
+}

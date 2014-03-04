@@ -1,0 +1,11 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass text-output-stream;
+klass features; // hackhack
+
+int-t main()
+{
+  object-t stream = make(text-output-stream:klass);
+  dk:write(stream, "", features:k-trailing-newline);
+  return 0;
+}

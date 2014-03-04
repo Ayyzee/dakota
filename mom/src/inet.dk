@@ -1,0 +1,304 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <arpa/inet.h>;
+include <fcntl.h>;
+include <netinet/in.h>;
+include <netinet/tcp.h>;
+
+include "endian.h";
+include "inet.h";
+include "log.h";
+include "sys.h";
+
+module dakota-mom;
+
+klass fd;
+klass xin-port;
+klass xin4-addr;
+klass xsa-family;
+klass xsockaddr-in4;
+klass xsocket;
+klass xsocket-type;
+klass xsocklen;
+
+export xin4-addr-t xin4-addr-create(uint8-t a, uint8-t b, uint8-t c, uint8-t d)
+{
+     xin4-addr-t result = { a << 24 | b << 16 | c << 8 | d };
+     return result;
+}
+
+noexport const char8-t* strsocktype(int-t socktype)
+{
+  const char8-t* str = NULL;
+
+  switch (socktype)
+  {
+    case xsocket-type:k-stream:
+      str = "k-stream";
+      break;
+    case xsocket-type:k-dgram:
+      str = "k-dgram";
+      break;
+    default:
+      errno = EINVAL;
+  }
+  return str;
+}
+
+export xsockaddr-in4-t xsockaddr-in4-create(xin4-addr-t addr, xin-port-t port)
+{
+  xsockaddr-in4-t sin = {0};
+  sin.sin-family = xsa-family:k-in4;
+  sin.sin-addr =   addr;
+  sin.sin-port =   port;
+  return sin;
+}
+
+noexport xin4-addr-t sin4-addr-ntoh(xin4-addr-t sin-addr)
+{
+  xin4-addr-t result = sin-addr;
+  result.s-addr = ntoh32(result.s-addr); //endend
+  return result;
+}
+
+noexport xin4-addr-t sin4-addr-hton(xin4-addr-t sin-addr)
+{
+  xin4-addr-t result = sin-addr;
+  result.s-addr = hton32(result.s-addr); //endend
+  return result;
+}
+
+noexport xsockaddr-in4-t* sin4-ntoh(xsockaddr-in4-t* sin)
+{
+  sin->sin-addr.s-addr = ntoh32(sin->sin-addr.s-addr); //endend
+  sin->sin-port =        ntoh16(sin->sin-port); //endend
+  return sin;
+}
+
+noexport xsockaddr-in4-t* sin4-hton(xsockaddr-in4-t* sin)
+{
+  sin->sin-addr.s-addr = hton32(sin->sin-addr.s-addr); //endend
+  sin->sin-port =        hton16(sin->sin-port); //endend
+  return sin;
+}
+
+noexport xsockaddr-in4-t sin4-statestr(xsockaddr-in4-t sin, char8-t* buf, size-t buflen)
+{
+  char8-t addrstr[INET-ADDRSTRLEN];
+  in4-ntop(sin.sin-addr, addrstr, sizeof(addrstr) - (1));
+  sys:snprintf(buf, buflen, "%s:%i", addrstr, sin.sin-port);
+  return sin;
+}
+
+export int-t in4-getsockname(fd-t fd, xsockaddr-in4-t* sin)
+{
+  xsocklen-t sinsiz = sizeof(*sin);
+  int-t n = sys:getsockname(fd, cast(struct sockaddr*)sin, &sinsiz);
+  if (-1 != n)
+  {
+    sin4-ntoh(sin);
+  }
+//   else
+//   {
+//     MOM-LOG-ERROR("error: getsockname(fd=%i, ...): errno=%i \"%s\"", fd, errno, strerror(errno));
+//   }
+  return n;
+}
+
+noexport int-t in4-getpeername(fd-t fd, xsockaddr-in4-t* sin)
+{
+  xsocklen-t sinsiz = sizeof(*sin);
+  int-t n = sys:getpeername(fd, cast(struct sockaddr*)sin, &sinsiz);
+  if (-1 != n)
+  {
+    sin4-ntoh(sin);
+  }
+//   else
+//   {
+//     MOM-LOG-ERROR("error: getpeername(fd=%i, ...): errno=%i \"%s\"", fd, errno, strerror(errno));
+//   }
+  return n;
+}
+
+export const char8-t* in4-ntop(xin4-addr-t addr, char8-t* dst, xsocklen-t dstlen)
+{
+  const char8-t* result;
+  //addr = sin4-addr-hton(addr);
+  xin4-addr-t s = addr;
+  s.s-addr = hton32(s.s-addr); //endend
+  result = sys:inet-ntop(xsa-family:k-in4, &s, dst, dstlen);
+  return result;
+}
+
+noexport int32-t in4-bind(fd-t fd, xsockaddr-in4-t sin)
+{
+  xsockaddr-in4-t no-sin = sin;
+  sin4-hton(&no-sin);
+  int32-t n = sys:bind(fd, cast(sockaddr const*)&no-sin, cast(socklen-t)sizeof(no-sin));
+  if (-1 == n)
+  {
+    sin4-dump(sin);
+  }
+  return n;
+}
+
+noexport int32-t in-listen(fd-t fd, int32-t backlog)
+{
+  //note-to-self: check out tcp-max-syn-backlog sysctl()
+  int32-t n = sys:listen(fd, backlog);
+  return n;
+}
+
+noexport int32-t in4-connect(fd-t fd, xsockaddr-in4-t sin)
+{
+  xsockaddr-in4-t no-sin = sin;
+  sin4-hton(&no-sin);
+  int32-t n = sys:connect(fd, cast(sockaddr const*)&no-sin, cast(socklen-t)sizeof(no-sin));
+  return n;
+}
+
+noexport fd-t in4-accept(fd-t fd, xsockaddr-in4-t* sin)
+{
+  xsocklen-t sinsiz = sizeof(*sin);
+  fd-t n = sys:accept(fd, cast(sockaddr*)sin, &sinsiz);
+  if (-1 != n)
+  {
+    sin4-ntoh(sin);
+  }
+  return n;
+}
+
+noexport ssize-t in4-recvfrom(fd-t fd, void* buf, size-t len, int-t flags, xsockaddr-in4-t* sin)
+{
+  ssize-t n;
+  xsocklen-t sinsiz = sizeof(*sin);
+  n = sys:recvfrom(fd, buf, len, flags, cast(sockaddr*)sin, &sinsiz);
+  if (-1 != n)
+  {
+    sin4-ntoh(sin);
+  }
+  return n;
+}
+
+noexport fd-t in4-stream-socket()
+{
+  int32-t domain, type, protocol;
+  fd-t fd = sys:socket(domain =   xsa-family:k-in4,
+                      type =     xsocket-type:k-stream,
+                      protocol = IPPROTO-TCP);
+
+#if 0
+  int32-t n;
+  int32-t optval;
+  xsocklen-t optlen = sizeof(optval);
+  n = sys:getsockopt(fd, SOL-SOCKET, SO-SNDBUF, &optval, &optlen);
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "send: %i", optval);
+  n = sys:getsockopt(fd, SOL-SOCKET, SO-RCVBUF, &optval, &optlen);
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "recv: %i", optval);
+#endif
+  return fd;
+}
+
+noexport fd-t ucast-client(xsockaddr-in4-t sin)
+{
+  fd-t fd = in4-stream-socket();
+  fd:add-nonblock(fd);
+  return fd;
+}
+
+export fd-t ucast-server(xsockaddr-in4-t sin, int32-t backlog)
+{
+  int32-t n;
+  fd-t fd = in4-stream-socket();
+  fd:add-nonblock(fd);
+  int32-t optval = 1;
+  n = sys:setsockopt(fd, SOL-SOCKET, SO-REUSEADDR, &optval, sizeof(optval));
+#if 0
+  n = sys:setsockopt(fd, IPPROTO-TCP, TCP-NODELAY, &optval, sizeof(optval));
+#endif
+  in4-bind(fd, sin);
+  in-listen(fd, backlog);
+  return fd;
+}
+
+noexport fd-t in4-dgram-socket()
+{
+  int32-t domain, type, protocol;
+  fd-t fd = sys:socket(domain =   xsa-family:k-in4,
+                       type =     xsocket-type:k-dgram,
+                       protocol = IPPROTO-UDP);
+#if 0
+  int32-t n;
+  int32-t optval;
+  xsocklen-t optlen = sizeof(optval);
+  n = sys:getsockopt(fd, SOL-SOCKET, SO-SNDBUF, &optval, &optlen);
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "send: %i", optval);
+  n = sys:getsockopt(fd, SOL-SOCKET, SO-RCVBUF, &optval, &optlen);
+  MOM-LOG(mom:LOG-GENERIC-FLAG, "recv: %i", optval);
+#endif
+  return fd;
+}
+
+noexport fd-t mcast-client(xsockaddr-in4-t sin)
+{
+  fd-t fd = in4-dgram-socket();
+  return fd;
+}
+
+export fd-t mcast-server(xsockaddr-in4-t sin)
+{
+  int32-t n;
+  fd-t fd = in4-dgram-socket();
+  fd:add-nonblock(fd);
+  int32-t optval = 1;
+  n = sys:setsockopt(fd, SOL-SOCKET, SO-REUSEADDR, &optval, sizeof(optval)); // SO-REUSEPORT
+  in4-bind(fd, sin);
+  return fd;
+}
+
+noexport ip-mreq membership-request(xin4-addr-t addr)
+{
+  ip-mreq imr = {{0}};
+  imr.imr-multiaddr.s-addr = hton32(addr.s-addr); //endend
+  imr.imr-interface = xin4-addr:k-any;
+  return imr;
+}
+
+export int32-t mcast-server-join-group(fd-t fd, xin4-addr-t addr)
+{
+  ip-mreq imr = membership-request(addr);
+  // ipv6 uses MCAST-JOIN-GROUP
+  int32-t n = sys:setsockopt(fd, IPPROTO-IP, IP-ADD-MEMBERSHIP, &imr, sizeof(imr));
+  return n;
+}
+
+export int32-t mcast-server-leave-group(fd-t fd, xin4-addr-t addr)
+{
+  ip-mreq imr = membership-request(addr);
+  // ipv6 uses MCAST-LEAVE-GROUP
+  int32-t n = sys:setsockopt(fd, IPPROTO-IP, IP-DROP-MEMBERSHIP, &imr, sizeof(imr));
+  return n;
+}
+
+#undef sin4-dump
+export xsockaddr-in4-t sin4-dump(xsockaddr-in4-t sin, const char8-t* file, int-t line)
+{
+  char8-t statestr[INET-ADDRSTRLEN + 1 + 5 + (1)];
+  sin4-statestr(sin, statestr, sizeof(statestr) - (1));
+  MOM-LOG-INFO("%s:%i: info: sin=%s", file, line, statestr);
+  return sin;
+}

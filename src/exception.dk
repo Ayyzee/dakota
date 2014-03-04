@@ -1,0 +1,233 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cerrno>;
+include <cstdio>;
+include <cstring>;
+include <exception>;
+include <unistd.h>; // getpid()
+
+#if HAVE-CONFIG-H
+include "config.h";
+#endif
+
+module dakota;
+
+klass output-stream;
+
+noexport object-t* dkt-current-exception()
+{
+  static object-t object;
+  return &object;
+}
+
+noexport const char8-t** dkt-current-exception-str()
+{
+  static const char8-t* str;
+  return &str;
+}
+
+export void dkt-throw(object-t exception)
+{
+  *dkt-current-exception() = exception;
+  THROW exception; // this will not be rewritten
+}
+
+export void dkt-throw(const char8-t* exception-str)
+{
+  *dkt-current-exception-str() = exception-str;
+  THROW exception-str; // this will not be rewritten
+}
+
+#ifndef HAVE-GETPROGNAME
+#ifdef HAVE-PROCFS
+STATIC char8-t[1024] gbl-buf;
+const char8-t*
+getprogname()
+{
+  int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
+  if (-1 == n)
+    throw make(system-exception:klass, errnum => errno);
+  gbl-buf[n] = NUL;
+  const char8-t* progname = strrchr(gbl-buf, '/');
+  if (NULL != progname)
+    progname++;
+  else
+    progname = gbl-buf;
+  return progname;
+}
+#endif
+#endif
+
+noexport format-va-printf(2) int-t
+va-log(uint32-t priority, const char8-t* format, va-list-t args)
+{
+  file-t log-file = stderr;
+
+  if (0)
+  {
+    fprintf(log-file, "%s[%i]: ", getprogname(), getpid());
+
+    switch (priority)
+    {
+      case DK-LOG-ERROR:
+        fprintf(log-file, "error: ");
+        break;
+      case DK-LOG-WARNING:
+        fprintf(log-file, "warning: ");
+        break;
+      case DK-LOG-INFO:
+        fprintf(log-file, "info: ");
+        break;
+      case DK-LOG-DEBUG:
+        fprintf(log-file, "debug: ");
+        break;
+      default:
+        abort();
+    }
+  }
+  fprintf(log-file, "{");
+  int-t result = vfprintf(log-file, format, args);
+  fprintf(log-file, "},\n");
+  // bugbug: need to adjust result
+  return result;
+}
+
+export format-va-printf(2) int-t
+dk-va-log(uint32-t priority, const char8-t* format, va-list-t args)
+{
+  int-t result = va-log(priority, format, args);
+  return result;
+}
+
+export format-printf(2) int-t
+dk-log(uint32-t priority, const char8-t* format, ...)
+{
+  va-list-t args;
+  va-start(args, format);
+  int-t result = dk-va-log(priority, format, args);
+  va-end(args);
+  return result;
+}
+
+noexport void pre-runtime-verbose-terminate();
+noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
+noexport void
+pre-runtime-verbose-terminate()
+{
+//   dk-log(DK-LOG-INFO, "%s()", __func__);
+
+  const char8-t* current-exception-string = *dkt-current-exception-str();
+  dk-log(DK-LOG-ERROR, "uncaught exception");
+
+  if (NULL != current-exception-string)
+    fprintf(stderr, ": \"%s\"\n", current-exception-string);
+  else
+    fprintf(stderr, "\n");
+
+  previous-terminate();
+}
+
+noexport void
+verbose-terminate()
+{
+//   dk-log(DK-LOG-INFO, "%s()", __func__);
+
+  const char8-t* current-exception-string = *dkt-current-exception-str();
+  object-t current-exception = *dkt-current-exception();
+
+  if (NULL != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
+    if (NULL != current-exception)
+      dk:dump(current-exception);
+
+  dk:print-format(std-error, "%s[%i]: uncaught exception", getprogname(), getpid());
+
+  if (NULL != current-exception)
+    dk:println(current-exception, std-error);
+  else-if (NULL != current-exception-string)
+    dk:println-format(std-error, ": \"%s\"", current-exception-string);
+  else
+    dk:println(std-error, "");
+
+  previous-terminate();
+}
+
+noexport void pre-runtime-verbose-unexpected();
+noexport void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
+noexport void
+pre-runtime-verbose-unexpected()
+{
+//   dk-log(DK-LOG-INFO, "%s()", __func__);
+
+  const char8-t* current-exception-string = *dkt-current-exception-str();
+  dk-log(DK-LOG-ERROR, "unexpected exception");
+
+  if (NULL != current-exception-string)
+    fprintf(stderr, ": \"%s\"\n", current-exception-string);
+  else
+    fprintf(stderr, "\n");
+
+  previous-unexpected();
+}
+
+noexport void
+verbose-unexpected()
+{
+//   dk-log(DK-LOG-INFO, "%s()", __func__);
+
+  const char8-t* current-exception-string = *dkt-current-exception-str();
+  object-t current-exception = *dkt-current-exception();
+
+  if (NULL != (getenv("DK_DUMP_UNEXPECTED_EXCEPTION")))
+    if (NULL != current-exception)
+      dk:dump(current-exception);
+
+  dk:print-format(std-error, "%s[%i]: unexpected exception", getprogname(), getpid());
+
+  if (NULL != current-exception)
+    dk:println(current-exception, std-error);
+  else-if (NULL != current-exception-string)
+    dk:println-format(std-error, ": \"%s\"", current-exception-string);
+  else
+    dk:println(std-error, "");
+
+  previous-unexpected();
+}
+
+klass exception
+{
+  superklass object;
+
+  slots
+  {
+    const char8-t* message;
+  }
+
+  method object-t init(object-t self, const char8-t* message => dkt-name(dkt-klass(self)))
+  {
+    self = dk:init(super);
+    self.message = message;
+    return self;
+  }
+
+  method object-t print(object-t self, object-t out)
+  {
+    if (null == out)
+      out = std-error;
+    dk:print-format(out, ": <%s>", self.message);
+    return self;
+  }
+}

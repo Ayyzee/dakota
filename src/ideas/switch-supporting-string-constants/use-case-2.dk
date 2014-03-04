@@ -1,0 +1,13 @@
+  switch (dk:tokenid(current))
+  {
+    case "<=":
+      break;
+    case "<":
+      break;
+    case "=":
+      break;
+    case "0":
+      break;
+    default:
+      ;
+  }

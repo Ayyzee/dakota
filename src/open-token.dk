@@ -1,0 +1,63 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+include <cassert>;
+
+module dakota-util;
+
+klass object-output-stream;
+klass output-stream;
+
+klass open-token
+{
+  superklass token;
+
+  slots
+  {
+    object-t close-token;
+  }
+
+ method object-t va:init(object-t self, va-list-t args)
+  {
+    self = dk:va:init(super, args);
+    self.close-token = null;
+    return self;
+  }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk:write-slots(super, out);
+    dk:write-slots-start(out, klass);
+
+    dk:write-element-idref(out, self.close-token, "close-token");
+
+    dk:write-slots-end(out);
+    return self;
+  }
+
+  method object-t close-token=(object-t self, object-t close-token)
+  {
+    assert(null == self.close-token);
+    self.close-token = close-token;
+    return self;
+  }
+
+  method object-t close-token(object-t self)
+  {
+    assert(null != self.close-token);
+    return self.close-token;
+  }
+}

@@ -1,0 +1,32 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+int-t main()
+{
+  int-t value = 0;
+
+  try
+  {
+    const char8-t* klass =   dk-intern("klass");
+    const char8-t* zebra =   dk-intern("zebra");
+    const char8-t* apple =   dk-intern("apple");
+    const char8-t* napster = dk-intern("napster");
+
+    const char8-t* dakota1 = dk-intern("dakota");
+    const char8-t* dakota2 = dk-intern("dakota");
+
+    USE(klass);
+    USE(zebra);
+    USE(apple);
+    USE(napster);
+
+    USE(dakota1);
+    USE(dakota2);
+  }
+  catch(...)
+  {
+    fprintf(stderr, "ERROR: uncaught exception\n");
+    value = 1;
+  }
+
+  return value;
+}

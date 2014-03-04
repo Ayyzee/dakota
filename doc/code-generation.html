@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>code generation</title>
+</head>
+<body>
+
+<table border="2" rules="all" cellpadding="5%" rules="groups">
+<caption><en>code generation</en></caption>
+
+<tr>
+  <th align="center" colspan="1" scope="colgroup">user</th>
+  <th align="center" colspan="2" scope="colgroup">dakota</th>
+</tr>
+<tr><th>method</th><th>methods</th><th>selector/offset</th></tr>
+
+<tr>
+  <th align="left" rowspan="3" scope="rowgroup">k_f</th>
+    <td align="center">+</td>    <td align="center">-</td>
+</tr>
+<tr>
+    <td>k_va_f</td>              <td>s_va_f</td>
+</tr>
+<tr>
+    <td align="center">-</td>    <td>s_f</td>
+</tr>
+
+<tr>
+  <th align="left" rowspan="3" scope="rowgroup">k_f (ka)</th>
+    <td>k_f___</td>              <td align="center">-</td>
+</tr>
+<tr>
+    <td>k_va_f</td>              <td>s_va_f</td>
+</tr>
+<tr>
+    <td align="center">-</td> <td align="center">NULL</td>
+</tr>
+
+<tr>
+  <th align="left" rowspan="3" scope="rowgroup">k_va_f</th>
+    <td>k_f___</td>              <td align="center">-</td>
+</tr>
+<tr>
+    <td align="center">+</td>    <td>s_va_f</td>
+</tr>
+<tr>
+    <td align="center">-</td> <td align="center">NULL</td>
+</tr>
+
+</table>
+<pre>
+
+struct method-info-t
+{
+  selector-t (*s_va_f)(object-t, va-list-t);
+  object-t   (*k_va_f)(object-t, va-list-t);
+  object-t   (*k_f___)(object-t, ...);
+
+  selector-t (*s_f)(object-t);
+  object-t   (*k_f)(object-t);
+};
+
+Only two legal combinations are:
+
+{ 1, 1, 1,  1, 1 }
+
+{ 1, 1, 1,  0, 0 }
+
+</pre>
+</body>
+</html>

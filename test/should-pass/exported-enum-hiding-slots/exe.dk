@@ -1,0 +1,31 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass k1
+{
+  export enum
+  {
+    k-e0 = 0,
+    k-e1 = 1,
+    k-e2 = 2
+  }
+
+  slots
+  {
+    uint32-t value;
+  }
+
+  method object-t init(object-t self)
+  {
+    printf("%s:%s()\n", __klass__, __func__);
+    self = dk:init(super);
+    self.value = k-e0;
+    return self;
+  }
+}
+
+int-t main()
+{
+  object-t i = make(k1:klass);
+  USE(i);
+  return 0;
+}

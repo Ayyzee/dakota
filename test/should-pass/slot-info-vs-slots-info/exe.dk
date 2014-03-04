@@ -1,0 +1,19 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass w-slot
+{
+  slots cstring:slots-t * (*)(cstring:slots-t *, cstring:slots-t *);
+}
+
+// klass w_slots
+// {
+//   slots
+//   {
+//     const char8-t * (*callback)(const char8-t *, const char8-t *);
+//   }
+// }
+
+int-t main()
+{
+  return 0;
+}

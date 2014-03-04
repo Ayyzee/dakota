@@ -1,0 +1,22 @@
+// outstanding issues:
+//   cstring/cstring-ident
+//   symbol/symbol-ident
+//   klass|trait
+
+
+// predefined patterns:
+//   qual-ident
+//   cstring
+//   symbol
+//   visability
+//   type
+//   ident
+//   block
+//   list
+//   seq
+//   method-name
+//   params
+
+we need a way to comment out a sequence of tokens
+
+we need a way to convert a sequence of tokens to a cxx-ident
