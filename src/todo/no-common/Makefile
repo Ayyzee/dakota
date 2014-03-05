@@ -1,13 +1,13 @@
 all: no-common common
 
 no-common:
-	g++ -o $@ -Wall -fno-common *.cc
+	g++ --all-warnings -fno-common --output $@ *.cc
 
 common:
-	g++ -o $@ -Wall *.cc
+	g++ --all-warnings --output $@ *.cc
 
 common-libs:
-	g++ -dynamiclib -o 
+	g++ -dynamiclib --output 
 
 clean:
 	rm -rf no-common common *~

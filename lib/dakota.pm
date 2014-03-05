@@ -61,8 +61,8 @@ my $dk_construct = undef;
 
 my $cxx_compile_flags = '--compile -fPIC';
 my $cxx_output_flags = '--output';
-my $cxx_shared_flags = '--shared -fPIC'; # default
-my $cxx_dynamic_flags = '--dynamic -fPIC'; # default
+my $cxx_shared_flags = '--shared'; # default
+my $cxx_dynamic_flags = '--dynamic'; # default
 
 if (defined $ENV{'CXX_SHARED_FLAGS'}) {
     $cxx_shared_flags = $ENV{'CXX_SHARED_FLAGS'};

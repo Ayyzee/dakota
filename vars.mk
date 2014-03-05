@@ -39,7 +39,7 @@ CXXFLAGS ?= --no-warnings
 export CXXFLAGS
 export EXTRA_CXXFLAGS
 
-CXX_SHARED_FLAGS ?= --shared -fPIC
-CXX_DYNAMIC_FLAGS ?= --dynamic -fPIC
+CXX_SHARED_FLAGS ?= --shared
+CXX_DYNAMIC_FLAGS ?= --dynamic
 CXX_OUTPUT_FLAG := --output
 LD_PRELOAD ?= LD_PRELOAD
