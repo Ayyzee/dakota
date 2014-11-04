@@ -26,7 +26,6 @@ our @EXPORT= qw(
 		);
 
 use dakota_util;
-use dakota_rewrite;
 use dakota_parse;
 use dakota_generate;
 

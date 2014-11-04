@@ -1,9 +1,22 @@
 #!/usr/bin/perl -w
 
+# Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 my $prefix;
-my $SO_EXT;
-my $macros;
 my $kw_arg_generics;
+my $macros;
 
 BEGIN
 {
@@ -13,26 +26,23 @@ BEGIN
 
     unshift @INC, "$prefix/lib";
 
-    $SO_EXT = 'so';
-    if ($ENV{'SO_EXT'})
-    { $SO_EXT = $ENV{'SO_EXT'}; }
+    if ($ENV{'DK_KA_GENERICS'})
+    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'}; }
+    else
+    { $kw_arg_generics = do "$prefix/src/ka-generics.pl"; }
 
     if ($ENV{'DK_MACROS_PATH'})
     { $macros = do $ENV{'DK_MACROS_PATH'}; }
     else
-    { $macros = do "$prefix/src/bin/macros.pl"; }
-
-    if ($ENV{'DK_KA_GENERICS'})
-    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'}; }
-    else
-    { $kw_arg_generics = do "ka-generics.pl"; }
+    { $macros = do "$prefix/src/macros.pl"; }
 };
+
+package dakota;
 
 use strict;
 use warnings;
 
-use dakota_util;
-use dakota_parse;
+use dakota_sst;
 use dakota;
 
 use Data::Dumper;
@@ -41,6 +51,11 @@ $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1; # default = 2
+
+our @ISA = qw(Exporter);
+our @EXPORT= qw(
+		macro_expand
+		);
 
 my $k  = qr/[_A-Za-z0-9-]/;
 my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]/;
@@ -66,22 +81,6 @@ my $constraints =
     '?ka-ident' =>    \&ka_ident,
 };
 
-foreach my $arg (@ARGV)
-{
-    undef $/;
-    my $filestr = &dakota::filestr_from_file($arg);
-    my $sst = &sst::make($filestr, $arg);
-    &macro_expand($sst);
-
-    if (1) {
-	print &sst_fragment::filestr($$sst{'tokens'});
-    }
-    #print Dumper $sst;
-    #print $filestr;
-    #my $filestr1 = &sst::filestr($sst);
-    #print $filestr1;
-}
-
 sub arg_term
 {
     my ($sst, $index) = @_;
@@ -90,9 +89,7 @@ sub arg_term
 
     if (',' eq $tkn ||
 	')' eq $tkn)
-    {
-	$result = $index;
-    }
+    { $result = $index; }
     return $result;
 }
 
@@ -278,18 +275,19 @@ sub macro_expand_recursive
 	    #print "depend-macro-name = $depend_macro_name\n";
 	}
     }
-    &rewrite($sst, $$info{'lhs'}, $$info{'rhs'}, $macro_name); # $macro_name is optional
+    &sst_rewrite($sst, $$info{'lhs'}, $$info{'rhs'}, $macro_name); # $macro_name is optional
 }
 
 sub macro_expand
 {
-    my ($sst) = @_;
+    my ($sst, $macros) = @_;
     my $expanded_macro_names = {};
 
     foreach my $macro_name (sort keys %$macros) {
 	&macro_expand_recursive($sst, $macros, $macro_name, $expanded_macro_names);
     }
 }
+
 sub sst_dump
 {
     my ($sst, $begin_index, $end_index) = @_;
@@ -307,7 +305,7 @@ sub sst_dump
     }
 }
 
-sub rewrite
+sub sst_rewrite
 {
     my ($sst, $lhs, $rhs, $name) = @_; # $name is optional
 
@@ -373,3 +371,21 @@ sub rewrite
 	}
     }
 }
+
+sub __main__
+{
+    foreach my $arg (@ARGV)
+    {
+	undef $/;
+	my $filestr = &dakota::filestr_from_file($arg);
+
+	my $sst = &sst::make($filestr, $arg);
+	&macro_expand($sst, $macros);
+	print &sst_fragment::filestr($$sst{'tokens'});
+    }
+    return 0;
+}
+
+unless (caller) { exit &__main__(); }
+
+1;

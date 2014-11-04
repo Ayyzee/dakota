@@ -22,6 +22,7 @@ use Cwd;
 package dakota;
 
 use dakota_include;
+use dakota_rewrite;
 
 require Exporter;
 our @ISA = qw(Exporter);

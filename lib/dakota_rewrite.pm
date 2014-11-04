@@ -14,10 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+my $prefix;
+
+BEGIN
+{
+    $prefix = '/usr/local';
+    if ($ENV{'DK_PREFIX'})
+    { $prefix = $ENV{'DK_PREFIX'}; }
+
+    unshift @INC, "$prefix/lib";
+};
+
+package dakota;
+
 use strict;
 use warnings;
 
-package dakota;
+use dakota;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -1272,5 +1285,26 @@ sub rewrite_multi_char_consts
     $$filestr_ref =~ s/'([^'\\])([^'\\])([^'\\])'/'$1$2$3$c'/g;
     $$filestr_ref =~ s/'([^'\\])([^'\\])'/'$1$2$c$c'/g;
 }
+
+sub __main__
+{
+    my $kw_arg_generics;
+    if ($ENV{'DK_KA_GENERICS'})
+    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'}; }
+    else
+    { $kw_arg_generics = do "$prefix/src/ka-generics.pl"; }
+
+    foreach my $arg (@ARGV)
+    {
+	undef $/;
+	my $filestr = &dakota::filestr_from_file($arg);
+
+	&convert_dk_to_cxx(\$filestr, $kw_arg_generics);
+	print $filestr;
+    }
+    return 0;
+}
+
+unless (caller) { exit &__main__(); }
 
 1;
