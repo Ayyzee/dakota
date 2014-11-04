@@ -3,6 +3,7 @@
 my $prefix;
 my $SO_EXT;
 my $macros;
+my $kw_arg_generics;
 
 BEGIN
 {
@@ -20,6 +21,11 @@ BEGIN
     { $macros = do $ENV{'DK_MACROS_PATH'}; }
     else
     { $macros = do "$prefix/src/bin/macros.pl"; }
+
+    if ($ENV{'DK_KA_GENERICS'})
+    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'}; }
+    else
+    { $kw_arg_generics = do "ka-generics.pl"; }
 };
 
 use strict;
@@ -57,6 +63,7 @@ my $constraints =
     '?type' =>        \&type,
     '?visibility' =>  \&visibility,
     '?arg' =>         \&arg,
+    '?ka-ident' =>    \&ka_ident,
 };
 
 foreach my $arg (@ARGV)
@@ -126,9 +133,7 @@ sub visibility
     if ('export'   eq $tkn ||
 	'import'   eq $tkn ||
 	'noexport' eq $tkn)
-    {
-	$result = $index;
-    }
+    { $result = $index; }
     return $result;
 }
 
@@ -140,9 +145,7 @@ sub ident
 
     if ($tkn =~ /^$k+$/ &&
 	!($tkn =~ /^$zt$/))
-    {
-	$result = $index;
-    }
+    { $result = $index; }
     return $result;
 }
 
@@ -153,9 +156,18 @@ sub type_ident
     my $result = -1;
 
     if ($tkn =~ /^$zt$/)
-    {
-	$result = $index;
-    }
+    { $result = $index; }
+    return $result;
+}
+
+sub ka_ident
+{
+    my ($sst, $index) = @_;
+    my $tkn = &sst::at($sst, $index);
+    my $result = -1;
+
+    if (exists $$kw_arg_generics{$tkn})
+    { $result = $index; }
     return $result;
 }
 

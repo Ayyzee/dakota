@@ -15,11 +15,15 @@ $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1; # default = 2
 
-undef $/;
-my $filestr = <STDIN>;
-my $kw_arg_generics = &kw_arg_generics();
-&convert_dk_to_cxx(\$filestr, $kw_arg_generics);
-print $filestr;
+sub main
+{
+    undef $/;
+    my $filestr = <STDIN>;
+    my $kw_arg_generics = &kw_arg_generics();
+    &convert_dk_to_cxx(\$filestr, $kw_arg_generics);
+    print $filestr;
+    return 0;
+}
 
 sub convert_dk_to_cxx
 {
@@ -31,3 +35,5 @@ sub convert_dk_to_cxx
 
     return $filestr_ref;
 }
+
+unless (caller) { return &main(\@ARGV); }

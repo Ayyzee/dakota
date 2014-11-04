@@ -1,5 +1,5 @@
 {
-    # include ?dquote-str ;
+    # include  ?dquote-str ;
     # =>
     # #include ?dquote-str
     'include-stmt' => {
@@ -10,7 +10,7 @@
 
     # how about include <...> ;
 
-    # klass ?ident ;
+    # klass     ?ident ;
     # =>
     # namespace ?ident {}
     'klass-decl' => {
@@ -19,7 +19,7 @@
 	'rhs' => [ 'namespace', '?ident', '{', '}' ]
     },
 
-    # klass ?ident {
+    # klass     ?ident {
     # =>
     # namespace ?ident {
     'klass-defn' => {
@@ -58,14 +58,14 @@
          'rhs' => [ '?type', '?ident',               '?arg-term' ]  # we can drop the last one
     },
 
-    # dk:     ?ident ( $args ,  ?ident => ?arg       )
+    # dk:     ?ka-ident ( $list-in       )
     # =>
-    # dk: va: ?ident ( $args , $?ident ,  ?arg, NULL )
-    #'keyword-args-use-last' => {
-    #    'dependencies' => [ 'keyword-args-defn' ],
-    #     'lhs' => [ 'dk', ':',            '?ident[1]', '(', '?args', ',',  '?ident[2]', '=>', '?arg',         ')' ],
-    #     'rhs' => [ 'dk', ':', 'va', ':', '?ident[1]', '(', '?args', ',', '$?ident[2]', ',',  '?arg', 'NULL', ')' ]
-    #},
+    # dk: va: ?ka-ident ( $list-in, NULL )
+    'keyword-args-wrap' => {
+        'dependencies' => [ 'keyword-args-defn' ],
+         'lhs' => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
+         'rhs' => [ 'dk', ':', 'va', ':', '?ka-ident', '(', '?list-in', ',', 'NULL', ')' ]
+    },
 
     #  ?ident => ?arg
     # =>
@@ -144,7 +144,7 @@
     # ?ident:box({ ... })
     # =>
     # ?ident:box(?ident:construct(...))
-    'box-arg-implicit-construction' => { # there is a better name for this but I don't remember what this is called in the c++ standard
+    'box-arg-compound-literal' => {
         'dependencies' => [],
         'lhs' => [ '?ident', ':', 'box', '(',                             '{', '?block-in', '}', ')' ],
         'rhs' => [ '?ident', ':', 'box', '(', '?ident', ':', 'construct', '(', '?block-in', ')', ')' ]
