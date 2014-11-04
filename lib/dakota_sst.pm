@@ -84,7 +84,9 @@ sub sst::open_token_for_close_token
     #my $__sub__ = (caller(0))[3];
     #&log_sub_name($__sub__);
     die if (!&sst::is_close_token($close_token));
-    my $open_for_close = { ')' => '(', '}' => '{', ']' => '[' };
+    my $open_for_close = { ')' => '(',
+			   '}' => '{',
+			   ']' => '[' };
     my $open_token = $$open_for_close{$close_token};
     #die if (!&sst::is_open_token($open_token));
     return $open_token;
@@ -96,7 +98,9 @@ sub sst::close_token_for_open_token
     #my $__sub__ = (caller(0))[3];
     #&log_sub_name($__sub__);
     die if (!&sst::is_open_token($open_token));
-    my $close_for_open = { '(' => ')', '{' => '}', '[' => ']' };
+    my $close_for_open = { '(' => ')',
+			   '{' => '}',
+			   '[' => ']' };
     my $close_token = $$close_for_open{$open_token};
     #die if (!&sst::is_open_token($open_token));
     return $close_token;

@@ -2,6 +2,7 @@
 
 my $prefix;
 my $SO_EXT;
+my $macros;
 
 BEGIN
 {
@@ -14,6 +15,11 @@ BEGIN
     $SO_EXT = 'so';
     if ($ENV{'SO_EXT'})
     { $SO_EXT = $ENV{'SO_EXT'}; }
+
+    if ($ENV{'DK_MACROS_PATH'})
+    { $macros = do $ENV{'DK_MACROS_PATH'}; }
+    else
+    { $macros = do "$prefix/src/bin/macros.pl"; }
 };
 
 use strict;
@@ -47,10 +53,10 @@ my $constraints =
     '?block-in' =>    \&block_in,
     '?list' =>        \&list,
     '?list-in' =>     \&list_in,
-    '?param-term' =>  \&param_term,
+    '?arg-term' =>    \&arg_term,
     '?type' =>        \&type,
-    '?visibility' => \&visibility,
-    '?ka-default' => \&ka_default,
+    '?visibility' =>  \&visibility,
+    '?arg' =>         \&arg,
 };
 
 foreach my $arg (@ARGV)
@@ -69,7 +75,7 @@ foreach my $arg (@ARGV)
     #print $filestr1;
 }
 
-sub param_term
+sub arg_term
 {
     my ($sst, $index) = @_;
     my $tkn = &sst::at($sst, $index);
@@ -83,27 +89,32 @@ sub param_term
     return $result;
 }
 
-sub ka_default
+sub arg
 {
     my ($sst, $index) = @_;
-    my $tkn;
-    my $result = -1;
-    my $o = 0;
+    my $tkn = &sst::at($sst, $index);
+    die if (',' eq $tkn || ')' eq $tkn);
+    my $o = 1;
+    my $is_framed = 0;
+    my $num_tokens = scalar @{$$sst{'tokens'}};
 
-    # does not deal correctly with , within framing
-    while (',' ne ($tkn = &sst::at($sst, $index + $o)) &&
-	   ')' ne ($tkn = &sst::at($sst, $index + $o)))
-    {
-	$result = $index + $o;
-	$o++;
+    while ($num_tokens > $index + $o) {
+	$tkn = &sst::at($sst, $index + $o);
 
-	if (scalar @{$$sst{'tokens'}} == $index + $o)
-	{
-	    $result = -1;
-	    last;
+	if (!$is_framed) {
+	    if (',' eq $tkn || ')' eq $tkn) {
+		return $index + $o - 1;
+	    }
 	}
+	if ('(' eq $tkn) {
+	    $is_framed++;
+	}
+	elsif (')' eq $tkn && $is_framed) {
+	    $is_framed--;
+	}
+	$o++;
     }
-    return $result;
+    return -1;
 }
 
 sub visibility
@@ -242,133 +253,31 @@ sub balenced_in
     return $result;
 }
 
-sub macro_klass_decl
+sub macro_expand_recursive
 {
-    #
-    my $lhs = [ 'klass',     '?ident', '{', '?klass-body-in', '}' ];
-    my $rhs = [ 'namespace', '?ident',   '{', '?klass-body-in', '}' ];
+    my ($sst, $macros, $macro_name, $expanded_macro_names) = @_;
+    my $info = $$macros{$macro_name};
+
+    foreach my $depend_macro_name (@{$$info{'dependencies'}}) {
+	#print "depend-macro-name = $depend_macro_name\n";
+	if (!exists($$expanded_macro_names{$depend_macro_name})) {
+	    &macro_expand_recursive($sst, $macros, $depend_macro_name, $expanded_macro_names);
+	    $$expanded_macro_names{$depend_macro_name} = 1;
+	    #print "depend-macro-name = $depend_macro_name\n";
+	}
+    }
+    &rewrite($sst, $$info{'lhs'}, $$info{'rhs'}, $macro_name); # $macro_name is optional
 }
 
 sub macro_expand
 {
     my ($sst) = @_;
-    my ($lhs, $rhs);
+    my $expanded_macro_names = {};
 
-    # import ?dquote-str ;
-    # =>
-    # #include ?dquote-str
-    $lhs = [ 'import', '?dquote-str', ';' ];
-    $rhs = [ '#', 'include', '?dquote-str' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # superklass ?ident ;
-    # =>
-    # /* ... */
-    $lhs = [ 'superklass', '?ident', ';' ];
-    $rhs = [ ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # slots { ... }
-    # =>
-    # struct slots-t { ... } ;
-    $lhs = [ 'slots', '?block' ];
-    $rhs = [ 'struct', 'slots-t', '?block', ';' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # ?type => ?ka-default ,|)
-    # =>
-    # ?type ,|)
-    $lhs = [ '?type', '?ident', '=>', '?ka-default', '?param-term' ];
-    $rhs = [ '?type', '?ident', '?param-term' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # ?visibility method ?type va : ?ident ?list ?block
-    # =>
-    # namespace va { ?visibility method ?type ?ident ?list ?block }
-    $lhs = [ '?visibility', 'method', '?type', 'va', ':', '?ident', '?list', '?block' ];
-    $rhs = [ 'namespace', 'va', '{', '?visibility', 'method', '?type', '?ident', '?list', '?block', '}' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # method ?type ?ident (
-    # =>
-    # ?type ?ident (
-    $lhs = [ 'method', '?type', '?ident', '?list' ];
-    $rhs = [            '?type', '?ident', '?list' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # dk:init(super)
-    # =>
-    # dk:init(super:construct(self,klass))
-    $lhs = [ 'dk', ':', '?ident', '(', 'super', ')' ];
-    $rhs = [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', ')' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # dk:init(super,
-    # =>
-    # dk:init(super:construct(self,klass),
-    $lhs = [ 'dk', ':', '?ident', '(', 'super', ',' ];
-    $rhs = [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', ',' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # self.ident
-    # =>
-    # unbox(self)->ident
-    $lhs = [ 'self', '.', '?ident' ];
-    $rhs = [ 'unbox', '(', 'self', ')', '->', '?ident' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # throw make
-    # =>
-    # throw dk-current-exception = make
-    $lhs = [ 'throw', 'make' ];
-    $rhs = [ 'throw', 'dk-current-exception', '=', 'make' ];
-    &rewrite($sst, $lhs, $rhs);
-    
-    # ident:box({...})
-    # =>
-    # ident:box(ident:construct(...))
-    $lhs = [ '?ident', ':', 'box', '(', '{', '?block-in', '}', ')' ];
-    $rhs = [ '?ident', ':', 'box', '(', 'ident', ':', 'construct', '(', '?block-in', ')', ')' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # make ( ... )
-    # =>
-    # dk:init(dk:alloc( ... ))
-    $lhs = [ 'make', '(', '?list-in', ')' ];
-    $rhs = [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?list-in', ')', ')' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # export enum ?type-ident ?block
-    # =>
-    # /* ... */
-    $lhs = [ 'export', 'enum', '?type-ident', '?block' ];
-    $rhs = [ ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # method alias(...)
-    # =>
-    # method /* alias(...) */
-    $lhs = [ 'method', 'alias', '?list' ];
-    $rhs = [ 'method' ];
-    &rewrite($sst, $lhs, $rhs);
-
-    # foo:slots-t* slt = unbox(bar)
-    # becomes
-    # foo:slots-t* slt = foo:unbox(bar)
-
-    # foo:slots-t& slt = *unbox(bar)
-    # becomes
-    # foo:slots-t& slt = *foo:unbox(bar)
-
-    # foo-t* slt = unbox(bar)
-    # becomes
-    # foo-t* slt = foo:unbox(bar)
-
-    # foo-t& slt = *unbox(bar)
-    # becomes
-    # foo-t& slt = *foo:unbox(bar)
+    foreach my $macro_name (sort keys %$macros) {
+	&macro_expand_recursive($sst, $macros, $macro_name, $expanded_macro_names);
+    }
 }
-
 sub sst_dump
 {
     my ($sst, $begin_index, $end_index) = @_;
@@ -388,15 +297,23 @@ sub sst_dump
 
 sub rewrite
 {
-    my ($sst, $lhs, $rhs) = @_;
+    my ($sst, $lhs, $rhs, $name) = @_; # $name is optional
+
+    if (0) {
+	my $indent = $Data::Dumper::Indent;
+	$Data::Dumper::Indent = 0;
+	print "'$name':\n";
+	print "  ", &Dumper($lhs), "\n";
+	print "  ", &Dumper($rhs), "\n";
+	$Data::Dumper::Indent = $indent;
+    }
 
     # input index
     for (my $i = 0; $i < (@{$$sst{'tokens'}} - @$lhs); $i++) {
 	my $did_match = 1;
 	my $replacement = [];
 	my $rhs_for_lhs = {};
-	my ($first_index, $last_index);
-	$first_index = $i;
+	my ($first_index, $last_index) = ($i, $i);
 	# lhs index
 	for (my $j = 0; $j < @$lhs; $j++) {
 #	    print "  $i, $j\n";
@@ -409,7 +326,7 @@ sub rewrite
 		#&sst_dump($sst, $i + $j, $last_index);
 #		print "  $last_index = constraint(sst, $i + $j)\n";
 		if (-1 eq $last_index)
-		{ $did_match = 0; last; }
+		{ $did_match = 0; $last_index = $first_index; last; }
 		else {
 #		    print "*\n";
 		    $$rhs_for_lhs{$label} = [@{$$sst{'tokens'}}[$i + $j..$last_index]];

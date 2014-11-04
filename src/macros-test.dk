@@ -1,0 +1,5 @@
+copy()
+{
+  throw make();
+  free();
+}
