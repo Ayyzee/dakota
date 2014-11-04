@@ -181,7 +181,7 @@ sub subcmd_name_setter
 sub rep_from_file
 {
     my ($file) = @_;
-    my $rep = do $file;
+    my $rep = do $file or die;
     return $rep;
 }
 sub rep_to_file

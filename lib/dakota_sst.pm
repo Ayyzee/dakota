@@ -997,7 +997,7 @@ sub sst_cursor::warning
     my $line = &sst::line($sst, $token_index);
 
     printf STDERR "%s:%i: did not expect \'%s\'\n",
-    $$sst{'file'},
+    $$sst{'file'} ||= "<unknown>",
     $line,
     &sst::at($sst, $token_index);
     return;

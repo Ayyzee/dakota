@@ -1190,7 +1190,7 @@ sub rewrite_export_method
 
 sub convert_dk_to_cxx
 {
-    my ($filestr_ref, $kw_arg_generics) = @_;
+    my ($filestr_ref, $kw_arg_generics, $arg) = @_;
     #&encode($filestr_ref);
 
     &encode_comments($filestr_ref);
@@ -1286,25 +1286,28 @@ sub rewrite_multi_char_consts
     $$filestr_ref =~ s/'([^'\\])([^'\\])'/'$1$2$c$c'/g;
 }
 
-sub __main__
-{
+sub dakota_lang_user_data_old {
     my $kw_arg_generics;
     if ($ENV{'DK_KA_GENERICS'})
-    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'}; }
+    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'} or die }
     else
-    { $kw_arg_generics = do "$prefix/src/ka-generics.pl"; }
+    { $kw_arg_generics = do "$prefix/src/ka-generics.pl" or die }
+
+    my $user_data = { 'ka-generics' => $kw_arg_generics };
+    return $user_data;
+}
+
+unless (caller) {
+    my $user_data = &dakota_lang_user_data_old();
 
     foreach my $arg (@ARGV)
     {
-	undef $/;
+	#undef $/;
 	my $filestr = &dakota::filestr_from_file($arg);
 
-	&convert_dk_to_cxx(\$filestr, $kw_arg_generics);
+	&convert_dk_to_cxx(\$filestr, $$user_data{'ka-generics'}, $arg);
 	print $filestr;
     }
-    return 0;
 }
-
-unless (caller) { exit &__main__(); }
 
 1;

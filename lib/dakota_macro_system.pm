@@ -15,8 +15,6 @@
 # limitations under the License.
 
 my $prefix;
-my $kw_arg_generics;
-my $macros;
 
 BEGIN
 {
@@ -25,16 +23,6 @@ BEGIN
     { $prefix = $ENV{'DK_PREFIX'}; }
 
     unshift @INC, "$prefix/lib";
-
-    if ($ENV{'DK_KA_GENERICS'})
-    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'}; }
-    else
-    { $kw_arg_generics = do "$prefix/src/ka-generics.pl"; }
-
-    if ($ENV{'DK_MACROS_PATH'})
-    { $macros = do $ENV{'DK_MACROS_PATH'}; }
-    else
-    { $macros = do "$prefix/src/macros.pl"; }
 };
 
 package dakota;
@@ -81,9 +69,10 @@ my $constraints =
     '?ka-ident' =>    \&ka_ident,
 };
 
+### start of constraint variable defnss
 sub arg_term
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -95,7 +84,7 @@ sub arg_term
 
 sub arg
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     die if (',' eq $tkn || ')' eq $tkn);
     my $o = 1;
@@ -123,7 +112,7 @@ sub arg
 
 sub visibility
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -136,7 +125,7 @@ sub visibility
 
 sub ident
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -148,29 +137,30 @@ sub ident
 
 sub type_ident
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if ($tkn =~ /^$zt$/)
+    if ($tkn =~ /^$zt$/) # bugbug: requires ab-t at a min (won't allow single char before -t)
     { $result = $index; }
     return $result;
 }
 
 sub ka_ident
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
+
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if (exists $$kw_arg_generics{$tkn})
+    if (exists $$user_data{'ka-generics'}{$tkn})
     { $result = $index; }
     return $result;
 }
 
 sub type
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -188,7 +178,7 @@ sub type
 
 sub dquote_str
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -201,29 +191,30 @@ sub dquote_str
 
 sub block
 {
-    my ($sst, $open_token_index) = @_;
+    my ($sst, $open_token_index, $user_data) = @_;
     return &balenced($sst, $open_token_index);
 }
+
 sub list
 {
-    my ($sst, $open_token_index) = @_;
+    my ($sst, $open_token_index, $user_data) = @_;
     return &balenced($sst, $open_token_index);
 }
 
 sub block_in
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     return &balenced_in($sst, $index);
 }
 
 sub list_in
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
     return &balenced_in($sst, $index);
 }
 sub balenced
 {
-    my ($sst, $open_token_index) = @_;
+    my ($sst, $open_token_index, $user_data) = @_;
     my $close_token_index = $open_token_index;
     my $opens = [];
     my $result = -1;
@@ -253,7 +244,7 @@ sub balenced
 }
 sub balenced_in
 {
-    my ($sst, $index) = @_;
+    my ($sst, $index, $user_data) = @_;
 
     my $result = &balenced($sst, $index - 1);
     if (-1 != $result)
@@ -261,53 +252,37 @@ sub balenced_in
 
     return $result;
 }
+### end of constraint variable defnss
 
 sub macro_expand_recursive
 {
-    my ($sst, $macros, $macro_name, $expanded_macro_names) = @_;
-    my $info = $$macros{$macro_name};
+    my ($sst, $macros, $user_data, $macro_name, $expanded_macro_names) = @_;
+    my $macro = $$macros{$macro_name};
 
-    foreach my $depend_macro_name (@{$$info{'dependencies'}}) {
+    foreach my $depend_macro_name (@{$$macro{'dependencies'}}) {
 	#print "depend-macro-name = $depend_macro_name\n";
 	if (!exists($$expanded_macro_names{$depend_macro_name})) {
-	    &macro_expand_recursive($sst, $macros, $depend_macro_name, $expanded_macro_names);
+	    &macro_expand_recursive($sst, $macros, $user_data, $depend_macro_name, $expanded_macro_names);
 	    $$expanded_macro_names{$depend_macro_name} = 1;
 	    #print "depend-macro-name = $depend_macro_name\n";
 	}
     }
-    &sst_rewrite($sst, $$info{'lhs'}, $$info{'rhs'}, $macro_name); # $macro_name is optional
+    &sst_rewrite($sst, $$macro{'lhs'}, $$macro{'rhs'}, $user_data, $macro_name); # $macro_name is optional
 }
 
 sub macro_expand
 {
-    my ($sst, $macros) = @_;
+    my ($sst, $macros, $user_data) = @_;
     my $expanded_macro_names = {};
 
     foreach my $macro_name (sort keys %$macros) {
-	&macro_expand_recursive($sst, $macros, $macro_name, $expanded_macro_names);
-    }
-}
-
-sub sst_dump
-{
-    my ($sst, $begin_index, $end_index) = @_;
-
-    my $str = '';
-
-    for (my $i = $begin_index; $i <= $end_index; $i++)
-    {
-	$str .= ' ';
-	$str .= &sst::at($sst, $i);
-    }
-    if ($str =~ m/\S/)
-    {
-	print STDERR "$str\n";
+	&macro_expand_recursive($sst, $macros, $user_data, $macro_name, $expanded_macro_names);
     }
 }
 
 sub sst_rewrite
 {
-    my ($sst, $lhs, $rhs, $name) = @_; # $name is optional
+    my ($sst, $lhs, $rhs, $user_data, $name) = @_; # $name is optional
 
     if (0) {
 	my $indent = $Data::Dumper::Indent;
@@ -332,8 +307,8 @@ sub sst_rewrite
 		my $cname = "?$1";
 		my $label = "?$1";
 		my $constraint = $$constraints{$cname};
-		$last_index = &$constraint($sst, $i + $j);
-		#&sst_dump($sst, $i + $j, $last_index);
+		$last_index = &$constraint($sst, $i + $j, $user_data);
+		#&sst::dump($sst, $i + $j, $last_index);
 #		print "  $last_index = constraint(sst, $i + $j)\n";
 		if (-1 eq $last_index)
 		{ $did_match = 0; $last_index = $first_index; last; }
@@ -372,20 +347,36 @@ sub sst_rewrite
     }
 }
 
-sub __main__
-{
+sub dakota_lang_user_data {
+    my $kw_arg_generics;
+    if ($ENV{'DK_KA_GENERICS'})
+    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'} or die }
+    else
+    { $kw_arg_generics = do "$prefix/src/ka-generics.pl" or die }
+
+    my $user_data = { 'ka-generics' => $kw_arg_generics };
+    return $user_data;
+}
+
+unless (caller) {
+    my $user_data = &dakota_lang_user_data();
+
+    my $macros;
+    if ($ENV{'DK_MACROS_PATH'})
+    { $macros = do $ENV{'DK_MACROS_PATH'} or die }
+    else
+    { $macros = do "$prefix/src/macros.pl" or die }
+
     foreach my $arg (@ARGV)
     {
 	undef $/;
 	my $filestr = &dakota::filestr_from_file($arg);
 
 	my $sst = &sst::make($filestr, $arg);
-	&macro_expand($sst, $macros);
+
+	&macro_expand($sst, $macros, $user_data);
 	print &sst_fragment::filestr($$sst{'tokens'});
     }
-    return 0;
-}
-
-unless (caller) { exit &__main__(); }
+};
 
 1;

@@ -16,6 +16,18 @@
 
 use strict;
 use warnings;
+
+my $prefix;
+
+BEGIN
+{
+    $prefix = '/usr/local';
+    if ($ENV{'DK_PREFIX'})
+    { $prefix = $ENV{'DK_PREFIX'}; }
+
+    unshift @INC, "$prefix/lib";
+};
+
 use integer;
 use Cwd;
 
@@ -35,8 +47,6 @@ our @EXPORT= qw(
 		global_scratch_str_ref
 		set_global_scratch_str_ref
 		function::overloadsig
-		write_to_file_strings
-		write_to_file_converted_strings
 		should_use_include
                 make_ident_symbol_scalar
 		);
@@ -201,19 +211,42 @@ sub write_to_file_strings
     }
     close PATH;
 }
+my $gbl_macros;
 
 sub write_to_file_converted_strings
 {
-    my ($path, $strings) = @_;
+    my ($path, $strings, $in_path) = @_;
+
+    if (!defined $gbl_macros) {
+	if ($ENV{'DK_MACROS_PATH'})
+	{ $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die }
+	else
+	{ $gbl_macros = do "$prefix/src/macros.pl" or die }
+    }
     my $kw_arg_generics = &kw_arg_generics();
-    open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
+    if (defined $path) {
+	open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
+    } else {
+	*PATH = *STDOUT;
+    }
     foreach my $string (@$strings)
     {
-	my $string_ref = \$string;
-	$string_ref = &convert_dk_to_cxx($string_ref, $kw_arg_generics);
-	print PATH $$string_ref;
+	my $converted_string;
+	if ($ENV{'DK_MACRO_SYSTEM'}) {
+	    my $sst = &sst::make($string, undef);
+	    &macro_expand($sst, $gbl_macros, $kw_arg_generics);
+	    my $str = &sst_fragment::filestr($$sst{'tokens'});
+	    $converted_string = $str;
+	}
+	else {
+	    &convert_dk_to_cxx(\$string, $kw_arg_generics, $in_path);
+	    $converted_string = $string;
+	}
+	print PATH $converted_string;
     }
-    close PATH;
+    if (defined $path) {
+	close PATH;
+    }
 }
 
 sub generate_nrt_decl
@@ -292,7 +325,7 @@ sub generate_nrt
 
        &write_to_file_strings("$path/$nrt_defn.$dk_ext",            [ $nrt_cxx_str ]);
 ###
-	&write_to_file_converted_strings("$path/$nrt_defn.$cxx_ext", [ $nrt_cxx_str ]);
+	&write_to_file_converted_strings("$path/$nrt_defn.$cxx_ext", [ $nrt_cxx_str ], undef);
 
 	$$result{'nrt-cxx'} = [ $nrt_cxx_str ];
     }
@@ -573,7 +606,7 @@ sub generate_rt
 
 	&write_to_file_strings("$path/$rt_defn.$dk_ext",            [ $rt_cxx_str ]);
 ###
-	&write_to_file_converted_strings("$path/$rt_defn.$cxx_ext", [ $rt_cxx_str ]);
+	&write_to_file_converted_strings("$path/$rt_defn.$cxx_ext", [ $rt_cxx_str ], undef);
 
 	#$$result{'rt-cxx'} =        [ $rt_cxx_str ];
 	$$result{'symbols-cxx'} =   [ $symbols_cxx_str, $strings_cxx_str ];
@@ -5137,20 +5170,29 @@ sub dk::generate_dk_cxx
     #print STDERR "$name.$dk_ext.$cxx_ext\n";
     if (exists $ENV{'DK_NO_LINE'})
     {
-	&write_to_file_converted_strings("$path$name.$cxx_ext", [ $filestr ]);
+	&write_to_file_converted_strings("$path$name.$cxx_ext", [ $filestr ], "$file_basename.$dk_ext");
     }
     else
     {
 	if (exists $ENV{'DK_ABS_PATH'})
 	{
 	    my $cwd = getcwd;
-	    &write_to_file_converted_strings("$path$name.$cxx_ext", [ "#line 1 \"$cwd/$file_basename.$dk_ext\"\n", $filestr ]);
+	    &write_to_file_converted_strings("$path$name.$cxx_ext", [ "#line 1 \"$cwd/$file_basename.$dk_ext\"\n", $filestr ], "$cwd/$file_basename.$dk_ext");
 	}
 	else
 	{
-	    &write_to_file_converted_strings("$path$name.$cxx_ext", [ "#line 1 \"$file_basename.$dk_ext\"\n", $filestr ]);
+	    &write_to_file_converted_strings("$path$name.$cxx_ext", [ "#line 1 \"$file_basename.$dk_ext\"\n", $filestr ], "$file_basename.$dk_ext");
 	}
     }
 }
 
+unless (caller) {
+    foreach my $in_path (@ARGV) {
+	my $filestr = &dakota::filestr_from_file($in_path);
+	my $out_path; # = "$in_path.cxx"
+	&write_to_file_converted_strings($out_path = undef, [ $filestr ], $in_path);
+    }
+}
+
 1;
+

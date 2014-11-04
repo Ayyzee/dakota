@@ -17,6 +17,13 @@
 use strict;
 use warnings;
 
+my $kw_arg_generics_tbl;
+
+BEGIN
+{
+    $kw_arg_generics_tbl = { 'init' => undef };
+};
+
 package dakota;
 
 require Exporter;
@@ -36,8 +43,6 @@ our @EXPORT= qw(
 		);
 
 use Fcntl qw(:DEFAULT :flock);
-
-my $kw_arg_generics_tbl = { 'init' => undef };
 
 sub kw_arg_generics_add
 {

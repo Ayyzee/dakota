@@ -20,7 +20,8 @@ sub main
     undef $/;
     my $filestr = <STDIN>;
     my $kw_arg_generics = &kw_arg_generics();
-    &convert_dk_to_cxx(\$filestr, $kw_arg_generics);
+    my $name;
+    &convert_dk_to_cxx(\$filestr, $kw_arg_generics, $name = undef);
     print $filestr;
     return 0;
 }

@@ -694,7 +694,7 @@ sub exec_cmd
     if ($ENV{'DK_DIR'})
     {
 	#print STDERR "DK_DIR=$ENV{'DK_DIR'}\n";
-	open (STDERR, "|dk-fixup-stderr.pl");
+	open (STDERR, "|dk-fixup-stderr.pl") or die;
     }
 
         my $exit_val = system($cmd_str);
