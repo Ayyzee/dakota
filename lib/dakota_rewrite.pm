@@ -1302,7 +1302,6 @@ unless (caller) {
 
     foreach my $arg (@ARGV)
     {
-	#undef $/;
 	my $filestr = &dakota::filestr_from_file($arg);
 
 	&convert_dk_to_cxx(\$filestr, $$user_data{'ka-generics'}, $arg);

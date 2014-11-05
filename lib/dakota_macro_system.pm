@@ -53,24 +53,24 @@ my $dqstr = qr/(?<!\\)".*?(?<!\\)"/;
 
 my $constraints =
 {
-    '?ident' =>       \&ident,
-    '?type-ident' =>  \&type_ident,
-    '?dquote-str' =>  \&dquote_str,
-    '?balenced' =>    \&balenced,
-    '?balenced-in' => \&balenced_in,
-    '?block' =>       \&block,
-    '?block-in' =>    \&block_in,
-    '?list' =>        \&list,
-    '?list-in' =>     \&list_in,
-    '?arg-term' =>    \&arg_term,
-    '?type' =>        \&type,
-    '?visibility' =>  \&visibility,
-    '?arg' =>         \&arg,
-    '?ka-ident' =>    \&ka_ident,
+    '?balenced' =>         \&balenced,
+    '?balenced-in' =>      \&balenced_in,
+    '?block' =>            \&block,
+    '?block-in' =>         \&block_in,
+    '?dquote-str' =>       \&dquote_str,
+    '?ident' =>            \&ident,
+    '?ka-ident' =>         \&ka_ident,
+    '?list' =>             \&list,
+    '?list-in' =>          \&list_in,
+    '?list-member-term' => \&list_member_term,
+    '?list-member' =>      \&list_member,
+    '?type' =>             \&type,
+    '?type-ident' =>       \&type_ident,
+    '?visibility' =>       \&visibility,
 };
 
 ### start of constraint variable defnss
-sub arg_term
+sub list_member_term
 {
     my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
@@ -82,7 +82,7 @@ sub arg_term
     return $result;
 }
 
-sub arg
+sub list_member
 {
     my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
@@ -307,6 +307,7 @@ sub sst_rewrite
 		my $cname = "?$1";
 		my $label = "?$1";
 		my $constraint = $$constraints{$cname};
+		if (!defined $constraint) { die "Could not find implementation for constraint $cname"; }
 		$last_index = &$constraint($sst, $i + $j, $user_data);
 		#&sst::dump($sst, $i + $j, $last_index);
 #		print "  $last_index = constraint(sst, $i + $j)\n";
@@ -369,7 +370,6 @@ unless (caller) {
 
     foreach my $arg (@ARGV)
     {
-	undef $/;
 	my $filestr = &dakota::filestr_from_file($arg);
 
 	my $sst = &sst::make($filestr, $arg);

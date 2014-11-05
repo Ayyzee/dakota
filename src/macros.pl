@@ -49,13 +49,13 @@
         'rhs' => [ 'struct', 'slots-t', '?block', ';' ]
     },
 
-    # ?type => ?arg ,|)
+    # ?type => ?list-member ,|)
     # =>
     # ?type         ,|)
     'keyword-args-defn' => {
         'dependencies' => [],
-         'lhs' => [ '?type', '?ident', '=>', '?arg', '?arg-term' ], # we can drop the last one
-         'rhs' => [ '?type', '?ident',               '?arg-term' ]  # we can drop the last one
+         'lhs' => [ '?type', '?ident', '=>', '?list-member', '?list-member-term' ], # we can drop the last one
+         'rhs' => [ '?type', '?ident',                       '?list-member-term' ]  # we can drop the last one
     },
 
     # dk:     ?ka-ident ( $list-in       )
@@ -67,13 +67,13 @@
          'rhs' => [ 'dk', ':', 'va', ':', '?ka-ident', '(', '?list-in', ',', 'NULL', ')' ]
     },
 
-    #  ?ident => ?arg
+    #  ?ident => ?list-member
     # =>
-    # $?ident ,  ?arg
+    # $?ident ,  ?list-member
     #'keyword-args-use' => {
     #    'dependencies' => [ 'keyword-args-defn' ],
-    #     'lhs' => [  '?ident', '=>', '?arg' ], # we can drop the last one
-    #     'rhs' => [ '$?ident', ',',  '?arg' ]  # we can drop the last one
+    #     'lhs' => [  '?ident', '=>', '?list-member' ], # we can drop the last one
+    #     'rhs' => [ '$?ident', ',',  '?list-member' ]  # we can drop the last one
     #},
 
     # method alias (...)
@@ -119,8 +119,8 @@
     # dk:?ident(super:construct(self,klass) ,|)
     'super' => {
         'dependencies' => [],
-        'lhs' => [ 'dk', ':', '?ident', '(', 'super',                                                   '?arg-term' ], # we can drop the last one
-        'rhs' => [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?arg-term' ]  # we can drop the last one
+        'lhs' => [ 'dk', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
+        'rhs' => [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
     },
 
     # dk:va:?ident(super ,|)
@@ -128,8 +128,8 @@
     # dk:va:?ident(super:construct(self,klass) ,|)
     'va-super' => {
         'dependencies' => [],
-        'lhs' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                                   '?arg-term' ], # we can drop the last one
-        'rhs' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?arg-term' ]  # we can drop the last one
+        'lhs' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
+        'rhs' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
     },
 
     # self.?ident
@@ -155,8 +155,8 @@
     # dk:init ( dk:alloc ( ?ident ) ,|)
     'make' => {
         'dependencies' => [], #'throw-capture-exception'],
-        'lhs' => [ 'make',                                     '(', '?ident',      '?arg-term' ], # we can drop the last one
-        'rhs' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?ident', ')', '?arg-term' ]  # we can drop the last one
+        'lhs' => [ 'make',                                     '(', '?ident',      '?list-member-term' ], # we can drop the last one
+        'rhs' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?ident', ')', '?list-member-term' ]  # we can drop the last one
     },
 
     # export enum ?type-ident { ... }
