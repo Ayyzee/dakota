@@ -17,11 +17,11 @@
 use strict;
 use warnings;
 
-my $kw_arg_generics_tbl;
+my $ka_generics_tbl;
 
 BEGIN
 {
-    $kw_arg_generics_tbl = { 'init' => undef };
+    $ka_generics_tbl = { 'init' => undef };
 };
 
 package dakota;
@@ -36,23 +36,23 @@ our @EXPORT= qw(
 		_remove_first
 		_remove_last 
 		deep_copy
-		kw_arg_generics
-		kw_arg_generics_add
+		ka_generics
+		ka_generics_add
 		filestr_from_file
 		scalar_from_file
 		);
 
 use Fcntl qw(:DEFAULT :flock);
 
-sub kw_arg_generics_add
+sub ka_generics_add
 {
     my ($generic) = @_;
-    $$kw_arg_generics_tbl{$generic} = undef;
+    $$ka_generics_tbl{$generic} = undef;
 }
 
-sub kw_arg_generics
+sub ka_generics
 {
-    return $kw_arg_generics_tbl;
+    return $ka_generics_tbl;
 }
 
 sub deep_copy

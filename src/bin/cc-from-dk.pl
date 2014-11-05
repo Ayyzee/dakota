@@ -19,9 +19,9 @@ sub main
 {
     undef $/;
     my $filestr = <STDIN>;
-    my $kw_arg_generics = &kw_arg_generics();
+    my $ka_generics = &ka_generics();
     my $name;
-    &convert_dk_to_cxx(\$filestr, $kw_arg_generics, $name = undef);
+    &convert_dk_to_cxx(\$filestr, $ka_generics, $name = undef);
     print $filestr;
     return 0;
 }

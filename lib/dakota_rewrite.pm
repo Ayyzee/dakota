@@ -543,7 +543,7 @@ sub rewrite_syntax
 
 sub vars_from_defn
 {
-    my ($defn, $name, $params, $kw_arg_generics) = @_;
+    my ($defn, $name, $params, $ka_generics) = @_;
     my $result = '';
     $result .= $defn;
 
@@ -552,7 +552,7 @@ sub vars_from_defn
     if (0)
     { $result .= "//"; }
 
-    if (!exists $$kw_arg_generics{$name}) # hackhack
+    if (!exists $$ka_generics{$name}) # hackhack
     {
         $result .= " unused /*static*/ const signature-t* __signature__ = signature($name,($params));";
     }
@@ -584,14 +584,14 @@ sub rewrite_functions
 
 sub rewrite_methods
 {
-    my ($filestr_ref, $kw_arg_generics) = @_;
+    my ($filestr_ref, $ka_generics) = @_;
 
     $$filestr_ref =~ s|(method\s+)(alias\($k+\))|$1/*$2*/|gs; #hackhack
 
     $$filestr_ref =~ s/klass method/klass_method/gs; #hackhack
     $$filestr_ref =~ s/namespace method/namespace_method/gs; #hackhack
 
-    $$filestr_ref =~ s|(method\s+[^(]*?($rk)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_arg_generics)|ges;
+    $$filestr_ref =~ s|(method\s+[^(]*?($rk)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $ka_generics)|ges;
     $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1DK-VISIBILITY /*$2*/$3|gm;
     $$filestr_ref =~ s|export(\s)(method)(\s+)|export$1/\*$2\*/$3|gs;
 
@@ -1083,8 +1083,8 @@ sub rewrite_keyword_syntax_use
 
 sub rewrite_keyword_syntax
 {
-    my ($filestr_ref, $kw_arg_generics) = @_;
-    foreach my $name (keys %$kw_arg_generics)
+    my ($filestr_ref, $ka_generics) = @_;
+    foreach my $name (keys %$ka_generics)
     {
 	$$filestr_ref =~ s/(method.*?)($name)($main::list)/&rewrite_keyword_syntax_list($1, $2, $3)/ge;
 	$$filestr_ref =~ s/(dk:+$name)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
@@ -1190,7 +1190,7 @@ sub rewrite_export_method
 
 sub convert_dk_to_cxx
 {
-    my ($filestr_ref, $kw_arg_generics, $arg) = @_;
+    my ($filestr_ref, $ka_generics, $arg) = @_;
     #&encode($filestr_ref);
 
     &encode_comments($filestr_ref);
@@ -1247,9 +1247,9 @@ sub convert_dk_to_cxx
     &rewrite_signatures($filestr_ref);
     &rewrite_selectors($filestr_ref);
     &rewrite_method_names_special($filestr_ref);
-    &rewrite_keyword_syntax($filestr_ref, $kw_arg_generics);
+    &rewrite_keyword_syntax($filestr_ref, $ka_generics);
     &rewrite_array_types($filestr_ref);
-    &rewrite_methods($filestr_ref, $kw_arg_generics);
+    &rewrite_methods($filestr_ref, $ka_generics);
     &rewrite_functions($filestr_ref);
     &rewrite_for_each($filestr_ref);
     &rewrite_unboxes($filestr_ref);
@@ -1287,13 +1287,13 @@ sub rewrite_multi_char_consts
 }
 
 sub dakota_lang_user_data_old {
-    my $kw_arg_generics;
+    my $ka_generics;
     if ($ENV{'DK_KA_GENERICS'})
-    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'} or die }
+    { $ka_generics = do $ENV{'DK_KA_GENERICS'} or die }
     else
-    { $kw_arg_generics = do "$prefix/src/ka-generics.pl" or die }
+    { $ka_generics = do "$prefix/src/ka-generics.pl" or die }
 
-    my $user_data = { 'ka-generics' => $kw_arg_generics };
+    my $user_data = { 'ka-generics' => $ka_generics };
     return $user_data;
 }
 

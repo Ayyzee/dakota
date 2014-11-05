@@ -237,8 +237,8 @@ sub ka_translate
                     else
                     {
 			my $name = &path::string($$method{'name'});
-			my $kw_arg_generics = &kw_arg_generics();
-                        if (exists $$kw_arg_generics{$name})
+			my $ka_generics = &ka_generics();
+                        if (exists $$ka_generics{$name})
                         {
                             if (!&is_va($method))
                             {
@@ -1868,7 +1868,7 @@ sub method
     $$method{'parameter-types'} = $ka_parameter_types;
 
     if ($ka_names)
-    { &kw_arg_generics_add("@{$$method{name}}"); }
+    { &ka_generics_add("@{$$method{name}}"); }
 
     if ($ka_names)
     { $$method{'ka-names'} = $ka_names; }

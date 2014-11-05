@@ -203,7 +203,7 @@ sub is_rt_defn
 sub write_to_file_strings
 {
     my ($path, $strings) = @_;
-    my $kw_arg_generics = &kw_arg_generics();
+    my $ka_generics = &ka_generics();
     open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
     foreach my $string (@$strings)
     {
@@ -223,7 +223,7 @@ sub write_to_file_converted_strings
 	else
 	{ $gbl_macros = do "$prefix/src/macros.pl" or die }
     }
-    my $kw_arg_generics = &kw_arg_generics();
+    my $ka_generics = &ka_generics();
     if (defined $path) {
 	open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
     } else {
@@ -234,12 +234,12 @@ sub write_to_file_converted_strings
 	my $converted_string;
 	if ($ENV{'DK_MACRO_SYSTEM'}) {
 	    my $sst = &sst::make($string, undef);
-	    &macro_expand($sst, $gbl_macros, $kw_arg_generics);
+	    &macro_expand($sst, $gbl_macros, $ka_generics);
 	    my $str = &sst_fragment::filestr($$sst{'tokens'});
 	    $converted_string = $str;
 	}
 	else {
-	    &convert_dk_to_cxx(\$string, $kw_arg_generics, $in_path);
+	    &convert_dk_to_cxx(\$string, $ka_generics, $in_path);
 	    $converted_string = $string;
 	}
 	print PATH $converted_string;
@@ -285,7 +285,7 @@ sub generate_nrt
     my $signatures_include = "$name--signatures";
     my $hashes_include =  "$name--hashes";
 
-    my $kw_arg_generics = &kw_arg_generics();
+    my $ka_generics = &ka_generics();
 
     if (&is_nrt_defn() || &is_rt_defn())
     {
@@ -415,7 +415,7 @@ sub generate_rt
     my $signatures_include = "$name--signatures";
     my $hashes_include =  "$name--hashes";
 
-    my $kw_arg_generics = &kw_arg_generics();
+    my $ka_generics = &ka_generics();
 
     if (&is_nrt_defn() || &is_rt_defn())
     {
@@ -1155,8 +1155,8 @@ sub method::generate_va_method_defn
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
 
     $$scratch_str_ref .= &dk::print_in_col_string($col,  "namespace @$scope { ");
-    my $kw_arg_generics = &kw_arg_generics();
-    if (exists $$kw_arg_generics{$va_method_name})
+    my $ka_generics = &ka_generics();
+    if (exists $$ka_generics{$va_method_name})
     {
         $$scratch_str_ref .= &dk::print("sentinel ");
     }

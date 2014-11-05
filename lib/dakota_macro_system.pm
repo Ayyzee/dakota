@@ -349,13 +349,13 @@ sub sst_rewrite
 }
 
 sub dakota_lang_user_data {
-    my $kw_arg_generics;
+    my $ka_generics;
     if ($ENV{'DK_KA_GENERICS'})
-    { $kw_arg_generics = do $ENV{'DK_KA_GENERICS'} or die }
+    { $ka_generics = do $ENV{'DK_KA_GENERICS'} or die }
     else
-    { $kw_arg_generics = do "$prefix/src/ka-generics.pl" or die }
+    { $ka_generics = do "$prefix/src/ka-generics.pl" or die }
 
-    my $user_data = { 'ka-generics' => $kw_arg_generics };
+    my $user_data = { 'ka-generics' => $ka_generics };
     return $user_data;
 }
 
