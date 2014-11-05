@@ -1,0 +1,10 @@
+move whitespace off obviously removed tokens
+
+rhs:
+  add comment out
+  add support for function calls taking matches as args
+    i.e. ?symbol() for ?symbol(?ident)
+
+support extranious , before )
+support extranious ; before )
+support extranious ; before }

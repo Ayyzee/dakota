@@ -58,9 +58,9 @@
          'rhs' => [ '?type', '?ident',                       '?list-member-term' ]  # we can drop the last one
     },
 
-    # dk:     ?ka-ident ( $list-in       )
+    # dk:     ?ka-ident ( ?list-in       )
     # =>
-    # dk: va: ?ka-ident ( $list-in, NULL )
+    # dk: va: ?ka-ident ( ?list-in, NULL )
     'keyword-args-wrap' => {
         'dependencies' => [ 'keyword-args-defn' ],
          'lhs' => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],

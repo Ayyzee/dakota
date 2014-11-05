@@ -69,6 +69,9 @@ my $constraints =
     '?visibility' =>       \&visibility,
 };
 
+my $list_member_term_set = { ',' => 1,
+			     ')' => 1  };
+
 ### start of constraint variable defnss
 sub list_member_term
 {
@@ -76,9 +79,9 @@ sub list_member_term
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if (',' eq $tkn ||
-	')' eq $tkn)
-    { $result = $index; }
+    if ($$list_member_term_set{$tkn}) {
+	$result = $index;
+    }
     return $result;
 }
 
@@ -86,7 +89,7 @@ sub list_member
 {
     my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
-    die if (',' eq $tkn || ')' eq $tkn);
+    die if $$list_member_term_set{$tkn};
     my $o = 1;
     my $is_framed = 0;
     my $num_tokens = scalar @{$$sst{'tokens'}};
@@ -95,7 +98,7 @@ sub list_member
 	$tkn = &sst::at($sst, $index + $o);
 
 	if (!$is_framed) {
-	    if (',' eq $tkn || ')' eq $tkn) {
+	    if ($$list_member_term_set{$tkn}) {
 		return $index + $o - 1;
 	    }
 	}
@@ -212,6 +215,7 @@ sub list_in
     my ($sst, $index, $user_data) = @_;
     return &balenced_in($sst, $index);
 }
+
 sub balenced
 {
     my ($sst, $open_token_index, $user_data) = @_;
@@ -242,6 +246,7 @@ sub balenced
     }
     return $result;
 }
+
 sub balenced_in
 {
     my ($sst, $index, $user_data) = @_;
