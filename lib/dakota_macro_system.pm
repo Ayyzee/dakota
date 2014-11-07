@@ -266,100 +266,86 @@ sub macro_expand_recursive
     my $macro = $$macros{$macro_name};
 
     foreach my $depend_macro_name (@{$$macro{'dependencies'}}) {
-	#print "depend-macro-name = $depend_macro_name\n";
 	if (!exists($$expanded_macro_names{$depend_macro_name})) {
 	    &macro_expand_recursive($sst, $i, $macros, $user_data, $depend_macro_name, $expanded_macro_names);
 	    $$expanded_macro_names{$depend_macro_name} = 1;
-	    #print "depend-macro-name = $depend_macro_name\n";
 	}
     }
     my $num_tokens = scalar @{$$sst{'tokens'}};
     foreach my $rule (@{$$macro{'rules'}}) {
 	last if $i > $num_tokens - @{$$rule{'lhs'}};
-	my $result = &sst_rewrite($sst, $i, $$rule{'lhs'}, $$rule{'rhs'}, $user_data, $macro_name); # $macro_name is optional
-	last if -1 != $result;
+
+	my ($last_index, $rhs_for_lhs)
+	    = &rule_match($sst, $i, $$rule{'lhs'}, $user_data, $macro_name);
+
+	if (-1 != $last_index) {
+	    &rule_replace($sst, $i, $last_index, $$rule{'rhs'}, $rhs_for_lhs, $macro_name);
+	    last;
+	}
     }
 }
 
 sub macro_expand
 {
     my ($sst, $macros, $user_data) = @_;
-    my $expanded_macro_names = {};
 
-    # input index
     for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
+	my $expanded_macro_names = {};
 	foreach my $macro_name (sort keys %$macros) {
 	    &macro_expand_recursive($sst, $i, $macros, $user_data, $macro_name, $expanded_macro_names);
 	}
     }
 }
 
-sub sst_rewrite
+sub rule_match
 {
-    my ($sst, $i, $lhs, $rhs, $user_data, $name) = @_; # $name is optional
-    my $result = -1;
+    my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
 
-    if (0) {
-	my $indent = $Data::Dumper::Indent;
-	$Data::Dumper::Indent = 0;
-	print "'$name':\n";
-	print "  ", &Dumper($lhs), "\n";
-	print "  ", &Dumper($rhs), "\n";
-	$Data::Dumper::Indent = $indent;
-    }
+    my $last_index = $i;
+    my $rhs_for_lhs = {};
 
-	my $did_match = 1;
-	my $replacement = [];
-	my $rhs_for_lhs = {};
-	my ($first_index, $last_index) = ($i, $i);
-	# lhs index
-	for (my $j = 0; $j < @$lhs; $j++) {
-#	    print "  $i, $j\n";
-#	    print "  $$lhs[$j] <=> $$sst{'tokens'}[$i + $j]{'str'}\n";	    
-	    if ($$lhs[$j] =~ m/^\?($k+)$/) { # make this re a variable
-		my $cname = "?$1";
-		my $label = "?$1";
-		my $constraint = $$constraints{$cname};
-		if (!defined $constraint) { die "Could not find implementation for constraint $cname"; }
-		$last_index = &$constraint($sst, $i + $j, $user_data);
-		#&sst::dump($sst, $i + $j, $last_index);
-#		print "  $last_index = constraint(sst, $i + $j)\n";
-		if (-1 eq $last_index)
-		{ $did_match = 0; $last_index = $first_index; last; }
-		else {
-#		    print "*\n";
-		    $$rhs_for_lhs{$label} = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
-#		    print Dumper $rhs_for_lhs;
-		    $i += $last_index - ($i + $j);
-		}
-	    }
+    for (my $j = 0; $j < @$lhs; $j++) {
+	if ($$lhs[$j] =~ m/^(\?$k+)$/) { # make this re a variable
+	    my $label = $1;
+	    my $constraint = $$constraints{$label};
+	    if (!defined $constraint) { die "Could not find implementation for constraint $label"; }
+	    $last_index = &$constraint($sst, $i + $j, $user_data);
+
+	    if (-1 eq $last_index)
+	    { $last_index = -1; last; }
 	    else {
-		if ($$lhs[$j] ne $$sst{'tokens'}[$i + $j]{'str'})
-		{ $did_match = 0; last;	}
-		else {
-#		    print "*\n";
-		    $last_index++;
-		}
+		$$rhs_for_lhs{$label} = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
 	    }
 	}
-	if ($did_match)	{
-	    foreach my $rhstkn (@$rhs) {
-		if ($rhstkn =~ m/^\?($k+)$/) { # user variable here
-		    my $label = "?$1";
-		    if ($$rhs_for_lhs{$label}) {
-			push @$replacement, @{$$rhs_for_lhs{$label}};
-		    }
-		}
-		else {
-		    push @$replacement, { 'str' => $rhstkn };
-		}
+	else {
+	    if ($$lhs[$j] ne $$sst{'tokens'}[$i + $j]{'str'})
+	    { $last_index = -1; last; }
+	    else {
+		$last_index++;
 	    }
-	    &sst::shift_leading_ws($sst, $first_index);
-	    splice (@{$$sst{'tokens'}}, $first_index, $last_index - $first_index + 1, @$replacement);
-	    $i = 0; ###
-	    $result = 0;
 	}
-    return $result;
+    }
+    return ($last_index, $rhs_for_lhs);
+}
+
+sub rule_replace
+{
+    my ($sst, $i, $last_index, $rhs, $rhs_for_lhs, $name) = @_; # $name is optional
+
+    my $replacement = [];
+    foreach my $rhstkn (@$rhs) {
+	if ($rhstkn =~ m/^(\?$k+)$/) { # make this re a variable
+	    my $label = $1;
+	    if ($$rhs_for_lhs{$label}) {
+		push @$replacement, @{$$rhs_for_lhs{$label}};
+	    }
+	}
+	else {
+	    push @$replacement, { 'str' => $rhstkn };
+	}
+    }
+    &sst::shift_leading_ws($sst, $i);
+    splice (@{$$sst{'tokens'}}, $i, $last_index - $i + 1, @$replacement);
 }
 
 sub dakota_lang_user_data {

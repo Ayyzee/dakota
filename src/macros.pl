@@ -63,8 +63,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'slots',             '?block'      ],
-		'rhs' => [ 'struct', 'slots-t', '?block', ';' ]
+		'lhs' => [ 'slots',             '{', '?block-in', '}' ],
+		'rhs' => [ 'struct', 'slots-t', '{', '?block-in', '}' ]
 	    }
 	],
     },
