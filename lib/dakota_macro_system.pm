@@ -273,7 +273,9 @@ sub macro_expand_recursive
 	    #print "depend-macro-name = $depend_macro_name\n";
 	}
     }
-    &sst_rewrite($sst, $$macro{'lhs'}, $$macro{'rhs'}, $user_data, $macro_name); # $macro_name is optional
+    foreach my $rule (@{$$macro{'rules'}}) {
+	&sst_rewrite($sst, $$rule{'lhs'}, $$rule{'rhs'}, $user_data, $macro_name); # $macro_name is optional
+    }
 }
 
 sub macro_expand
