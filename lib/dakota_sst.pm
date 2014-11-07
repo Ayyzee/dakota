@@ -428,17 +428,17 @@ sub sst::dump
     #my $__sub__ = (caller(0))[3];
     #&log_sub_name($__sub__);
 
+    my $delim = '';
     my $str = '';
 
     for (my $i = $begin_index; $i <= $end_index; $i++)
     {
-	$str .= ' ';
-	$str .= &sst::at($sst, $i);
+	my $tkn .= &sst::at($sst, $i);
+	$str .= $delim;
+	$str .= "'$tkn'";
+	$delim = ',';
     }
-    if ($str =~ m/\S/)
-    {
-	print STDERR "$str\n";
-    }
+    return "\[$str\]";
 }
 
 sub sst::splice

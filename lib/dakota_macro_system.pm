@@ -38,7 +38,7 @@ $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
-$Data::Dumper::Indent    = 1; # default = 2
+$Data::Dumper::Indent    = 0; # default = 2
 
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
@@ -82,6 +82,8 @@ my $close_for_open = {
     '[' => ']',
     '{' => '}',
 };
+
+my $debug = 0; # 0 or 1 or 2
 
 ### start of constraint variable defns
 sub list_member_term # move to a language specific macro
@@ -171,6 +173,7 @@ sub ka_ident
     return $result;
 }
 
+# this is very incomplete
 sub type
 {
     my ($sst, $index, $user_data) = @_;
@@ -298,20 +301,25 @@ sub macro_expand
 {
     my ($sst, $macros, $user_data) = @_;
 
+    if ($debug) {
+	print STDERR "[", "\n";
+    }
+
     for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
 	my $expanded_macro_names = {};
 	foreach my $macro_name (sort keys %$macros) {
 	    &macro_expand_recursive($sst, $i, $macros, $macro_name, $user_data, $expanded_macro_names);
 	}
     }
+    if ($debug) {
+	print STDERR "]", ",\n";
+    }
 }
 
 sub rule_match
 {
     my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
-    if (0) {
-	print STDERR "<MACRO, INDEX>:      <\?$name, $i>\n";
-    }
+    my $debugstr = '';
 
     my $last_index = $i;
     my $rhs_for_lhs = {};
@@ -321,37 +329,90 @@ sub rule_match
 	    my $label = $1;
 	    my $constraint = $$constraints{$label};
 	    if (!defined $constraint) { die "Could not find implementation for constraint $label"; }
-	    if (0) {
-		print STDERR "<CONSTRAINT, INDEX>: <$label, $i>\n";
-	    }
 	    $last_index = &$constraint($sst, $i + $j, $user_data);
 
 	    if (-1 eq $last_index)
 	    { $last_index = -1; last; }
 	    else {
-		$$rhs_for_lhs{$label} = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
+		# match by constraint
+		my $match = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
+
+		$$rhs_for_lhs{$label} = $match;
+		if (2 <= $debug) {
+		    $debugstr .= "   {";
+		    $debugstr .= "\n";
+		    $debugstr .= "    'constraint' =>  '$label'";
+		    $debugstr .= ",\n";
+
+		    my $match_tokens = [];
+		    foreach my $m (@$match) { push @$match_tokens, $$m{'str'}; }
+
+		    $debugstr .= "    'match' =>       ";
+		    $debugstr .= &Dumper($match_tokens);
+		    $debugstr .= ",\n";
+		    $debugstr .= "   }";
+		    $debugstr .= ",\n";
+		}
 	    }
 	}
 	else {
 	    if ($$lhs[$j] ne $$sst{'tokens'}[$i + $j]{'str'})
 	    { $last_index = -1; last; }
 	    else {
-		$last_index++;
+		# match by literal
+		$last_index++; ### really???
+
+		if (2 <= $debug) {
+		    $debugstr .= "   {";
+		    $debugstr .= "\n";
+		    $debugstr .= "    'literal' =>     ";
+		    $debugstr .= "'$$lhs[$j]'";
+		    $debugstr .= ",\n";
+		    $debugstr .= "   }";
+		    $debugstr .= "\n";
+
+		    #$debugstr .= "    'match' =>       ";
+		    #$debugstr .= "'$$lhs[$j]'";
+		    #$debugstr .= ",\n";
+		}
 	    }
 	}
     }
-    if (0) {
+    if ($debug) {
 	if (-1 != $last_index) {
 	    my $indent = $Data::Dumper::Indent;
 	    $Data::Dumper::Indent = 0;
-	    print STDERR "<RANGE>:             <$i, $last_index>\n";
-	    print STDERR "<PATTERN>:           ", &Dumper($lhs), "\n";
-	    print STDERR "<MATCH>:             "; &sst::dump($sst, $i, $last_index);
-	    print STDERR "---\n";
+	    print STDERR " {\n";
+	    print STDERR "  'macro' =>        '\?$name'", ",\n";
+
+	    if (2 <= $debug) {
+		print STDERR "  'details' =>", "\n";
+		print STDERR "  \[", "\n";
+		print STDERR $debugstr;
+		print STDERR "  \]", ",\n";
+	    }
+
+	    print STDERR "  'range' =>         ", &Dumper([$i, $last_index]), ",\n";
+	    print STDERR "  'pattern' =>       ", &Dumper($lhs), ",\n";
+	    print STDERR "  'lhs' =>           ", &sst::dump($sst, $i, $last_index), ",\n";
 	    $Data::Dumper::Indent = $indent;
 	}
     }
     return ($last_index, $rhs_for_lhs);
+}
+
+sub rhs_dump
+{
+    my ($seq) = @_;
+    my $delim = '';
+    my $str = '';
+
+    foreach my $tkn (@$seq) {
+	$str .= $delim;
+	$str .= "'$$tkn{'str'}'";
+	$delim = ',';
+    }
+    return "\[$str\]";
 }
 
 sub rule_replace
@@ -371,14 +432,16 @@ sub rule_replace
 	}
     }
     &sst::shift_leading_ws($sst, $i);
+    my $lhs_num_tokens = $last_index - $i + 1;
 
-    if (0) {
-	my $lhs_num_tokens = $last_index - $i + 1;
+    if ($debug) {
+	print STDERR "  'rhs' =>           ", &rhs_dump($replacement), ",\n";
 	my $rhs_num_tokens = scalar @$replacement;
-	print STDERR "lhs-num-tokens = $lhs_num_tokens\n";
-	print STDERR "rhs-num-tokens = $rhs_num_tokens\n";
+	print STDERR "  'lhs-num-tokens' => '$lhs_num_tokens'", ",\n";
+	print STDERR "  'rhs-num-tokens' => '$rhs_num_tokens'", ",\n";
+	print STDERR " }", ",\n";
     }
-    splice (@{$$sst{'tokens'}}, $i, $last_index - $i + 1, @$replacement);
+    splice (@{$$sst{'tokens'}}, $i, $lhs_num_tokens, @$replacement);
 }
 
 sub dk_lang_user_data {
