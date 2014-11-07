@@ -262,12 +262,12 @@ sub balenced_in
 
 sub macro_expand_recursive
 {
-    my ($sst, $i, $macros, $user_data, $macro_name, $expanded_macro_names) = @_;
+    my ($sst, $i, $macros, $macro_name, $user_data, $expanded_macro_names) = @_;
     my $macro = $$macros{$macro_name};
 
     foreach my $depend_macro_name (@{$$macro{'dependencies'}}) {
 	if (!exists($$expanded_macro_names{$depend_macro_name})) {
-	    &macro_expand_recursive($sst, $i, $macros, $user_data, $depend_macro_name, $expanded_macro_names);
+	    &macro_expand_recursive($sst, $i, $macros, $depend_macro_name, $user_data, $expanded_macro_names);
 	    $$expanded_macro_names{$depend_macro_name} = 1;
 	}
     }
@@ -292,7 +292,7 @@ sub macro_expand
     for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
 	my $expanded_macro_names = {};
 	foreach my $macro_name (sort keys %$macros) {
-	    &macro_expand_recursive($sst, $i, $macros, $user_data, $macro_name, $expanded_macro_names);
+	    &macro_expand_recursive($sst, $i, $macros, $macro_name, $user_data, $expanded_macro_names);
 	}
     }
 }
