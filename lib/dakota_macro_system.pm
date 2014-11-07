@@ -262,19 +262,22 @@ sub balenced_in
 
 sub macro_expand_recursive
 {
-    my ($sst, $macros, $user_data, $macro_name, $expanded_macro_names) = @_;
+    my ($sst, $i, $macros, $user_data, $macro_name, $expanded_macro_names) = @_;
     my $macro = $$macros{$macro_name};
 
     foreach my $depend_macro_name (@{$$macro{'dependencies'}}) {
 	#print "depend-macro-name = $depend_macro_name\n";
 	if (!exists($$expanded_macro_names{$depend_macro_name})) {
-	    &macro_expand_recursive($sst, $macros, $user_data, $depend_macro_name, $expanded_macro_names);
+	    &macro_expand_recursive($sst, $i, $macros, $user_data, $depend_macro_name, $expanded_macro_names);
 	    $$expanded_macro_names{$depend_macro_name} = 1;
 	    #print "depend-macro-name = $depend_macro_name\n";
 	}
     }
+    my $num_tokens = scalar @{$$sst{'tokens'}};
     foreach my $rule (@{$$macro{'rules'}}) {
-	&sst_rewrite($sst, $$rule{'lhs'}, $$rule{'rhs'}, $user_data, $macro_name); # $macro_name is optional
+	last if $i > $num_tokens - @{$$rule{'lhs'}};
+	my $result = &sst_rewrite($sst, $i, $$rule{'lhs'}, $$rule{'rhs'}, $user_data, $macro_name); # $macro_name is optional
+	last if -1 != $result;
     }
 }
 
@@ -283,14 +286,18 @@ sub macro_expand
     my ($sst, $macros, $user_data) = @_;
     my $expanded_macro_names = {};
 
-    foreach my $macro_name (sort keys %$macros) {
-	&macro_expand_recursive($sst, $macros, $user_data, $macro_name, $expanded_macro_names);
+    # input index
+    for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
+	foreach my $macro_name (sort keys %$macros) {
+	    &macro_expand_recursive($sst, $i, $macros, $user_data, $macro_name, $expanded_macro_names);
+	}
     }
 }
 
 sub sst_rewrite
 {
-    my ($sst, $lhs, $rhs, $user_data, $name) = @_; # $name is optional
+    my ($sst, $i, $lhs, $rhs, $user_data, $name) = @_; # $name is optional
+    my $result = -1;
 
     if (0) {
 	my $indent = $Data::Dumper::Indent;
@@ -301,8 +308,6 @@ sub sst_rewrite
 	$Data::Dumper::Indent = $indent;
     }
 
-    # input index
-    for (my $i = 0; $i < (@{$$sst{'tokens'}} - @$lhs); $i++) {
 	my $did_match = 1;
 	my $replacement = [];
 	my $rhs_for_lhs = {};
@@ -351,9 +356,10 @@ sub sst_rewrite
 	    }
 	    &sst::shift_leading_ws($sst, $first_index);
 	    splice (@{$$sst{'tokens'}}, $first_index, $last_index - $first_index + 1, @$replacement);
-	    $i = 0;
+	    $i = 0; ###
+	    $result = 0;
 	}
-    }
+    return $result;
 }
 
 sub dakota_lang_user_data {
