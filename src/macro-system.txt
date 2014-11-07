@@ -1,10 +1,16 @@
-move whitespace off obviously removed tokens
+support extranious , or  before ) or } or ] or >
 
-rhs:
-  add comment out
-  add support for function calls taking matches as args
-    i.e. ?symbol() for ?symbol(?ident)
+, ;
 
-support extranious , before )
-support extranious ; before )
-support extranious ; before }
+( ,)  param-list/arg-list
+( ;)  for-loop
+{ ,}  arrays-init/compound-literal/struct-enum-init
+{ ;}  block-of-stmts
+[ ,]  
+[ ;]  
+< ,>  
+< ;>  
+
+examples:
+  enum { FALSE = 0, TRUE = 1 };
+  template<class Lhs, class Rhs>

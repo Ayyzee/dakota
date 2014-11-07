@@ -62,7 +62,7 @@ my $constraints =
     '?ka-ident' =>         \&ka_ident,
     '?list' =>             \&list,
     '?list-in' =>          \&list_in,
-    '?list-member-term' => \&list_member_term,
+    '?list-member-term' => \&list_member_term, # move to a language specific macro
     '?list-member' =>      \&list_member,
     '?type' =>             \&type,
     '?type-ident' =>       \&type_ident,
@@ -73,7 +73,7 @@ my $list_member_term_set = { ',' => 1,
 			     ')' => 1  };
 
 ### start of constraint variable defnss
-sub list_member_term
+sub list_member_term # move to a language specific macro
 {
     my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
@@ -89,7 +89,8 @@ sub list_member
 {
     my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
-    die if $$list_member_term_set{$tkn};
+    #die if $$list_member_term_set{$tkn};
+    return -1 if $$list_member_term_set{$tkn};
     my $o = 1;
     my $is_framed = 0;
     my $num_tokens = scalar @{$$sst{'tokens'}};
@@ -113,7 +114,7 @@ sub list_member
     return -1;
 }
 
-sub visibility
+sub visibility # move to a language specific macro
 {
     my ($sst, $index, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
@@ -192,25 +193,25 @@ sub dquote_str
     return $result;
 }
 
-sub block
+sub block # body is optional since it uses balenced()
 {
     my ($sst, $open_token_index, $user_data) = @_;
     return &balenced($sst, $open_token_index);
 }
 
-sub list
+sub list # body is optional since it uses balenced()
 {
     my ($sst, $open_token_index, $user_data) = @_;
     return &balenced($sst, $open_token_index);
 }
 
-sub block_in
+sub block_in # body is optional since it uses balenced_in() which uses balenced()
 {
     my ($sst, $index, $user_data) = @_;
     return &balenced_in($sst, $index);
 }
 
-sub list_in
+sub list_in # body is optional since it uses balenced_in() which uses balenced()
 {
     my ($sst, $index, $user_data) = @_;
     return &balenced_in($sst, $index);
@@ -250,14 +251,14 @@ sub balenced
 sub balenced_in
 {
     my ($sst, $index, $user_data) = @_;
-
+    die if 0 == $index;
     my $result = &balenced($sst, $index - 1);
     if (-1 != $result)
     { $result--; }
 
     return $result;
 }
-### end of constraint variable defnss
+### end of constraint variable defns
 
 sub macro_expand_recursive
 {
@@ -308,7 +309,7 @@ sub sst_rewrite
 	for (my $j = 0; $j < @$lhs; $j++) {
 #	    print "  $i, $j\n";
 #	    print "  $$lhs[$j] <=> $$sst{'tokens'}[$i + $j]{'str'}\n";	    
-	    if ($$lhs[$j] =~ m/\?($k+)/) {
+	    if ($$lhs[$j] =~ m/^\?($k+)$/) { # make this re a variable
 		my $cname = "?$1";
 		my $label = "?$1";
 		my $constraint = $$constraints{$cname};
@@ -336,7 +337,7 @@ sub sst_rewrite
 	}
 	if ($did_match)	{
 	    foreach my $rhstkn (@$rhs) {
-		if ($rhstkn =~ m/\?($k+)/) {
+		if ($rhstkn =~ m/^\?($k+)$/) { # user variable here
 		    my $label = "?$1";
 		    if ($$rhs_for_lhs{$label}) {
 			push @$replacement, @{$$rhs_for_lhs{$label}};
@@ -356,9 +357,9 @@ sub sst_rewrite
 sub dakota_lang_user_data {
     my $ka_generics;
     if ($ENV{'DK_KA_GENERICS'})
-    { $ka_generics = do $ENV{'DK_KA_GENERICS'} or die }
+    { my $path = $ENV{'DK_KA_GENERICS'};       $ka_generics = do $path or die "Can not find $path." }
     else
-    { $ka_generics = do "$prefix/src/ka-generics.pl" or die }
+    { my $path = "$prefix/src/ka-generics.pl"; $ka_generics = do $path or die "Can not find $path." }
 
     my $user_data = { 'ka-generics' => $ka_generics };
     return $user_data;
@@ -369,9 +370,9 @@ unless (caller) {
 
     my $macros;
     if ($ENV{'DK_MACROS_PATH'})
-    { $macros = do $ENV{'DK_MACROS_PATH'} or die }
+    { my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "Can not find $path." }
     else
-    { $macros = do "$prefix/src/macros.pl" or die }
+    { my $path = "$prefix/src/macros.pl"; $macros = do $path or die "Can not find $path." }
 
     foreach my $arg (@ARGV)
     {

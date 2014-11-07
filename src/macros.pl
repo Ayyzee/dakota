@@ -51,7 +51,7 @@
 
     # ?type => ?list-member ,|)
     # =>
-    # ?type         ,|)
+    # ?type                 ,|)
     'keyword-args-defn' => {
         'dependencies' => [],
          'lhs' => [ '?type', '?ident', '=>', '?list-member', '?list-member-term' ], # we can drop the last one
@@ -62,19 +62,19 @@
     # =>
     # dk: va: ?ka-ident ( ?list-in, NULL )
     'keyword-args-wrap' => {
-        'dependencies' => [ 'keyword-args-defn' ],
+        'dependencies' => [ 'keyword-args-defn', 'super' ],
          'lhs' => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
          'rhs' => [ 'dk', ':', 'va', ':', '?ka-ident', '(', '?list-in', ',', 'NULL', ')' ]
     },
 
-    #  ?ident => ?list-member
+    #       ?ident => ?list-member
     # =>
-    # $?ident ,  ?list-member
-    #'keyword-args-use' => {
-    #    'dependencies' => [ 'keyword-args-defn' ],
-    #     'lhs' => [  '?ident', '=>', '?list-member' ], # we can drop the last one
-    #     'rhs' => [ '$?ident', ',',  '?list-member' ]  # we can drop the last one
-    #},
+    #  $ ## ?ident ,  ?list-member
+    'keyword-args-use' => {
+        'dependencies' => [ 'keyword-args-defn' ],
+         'lhs' => [            '?ident', '=>', '?list-member' ], # we can drop the last one
+         'rhs' => [ '$', '##', '?ident', ',',  '?list-member' ]  # we can drop the last one
+    },
 
     # method alias (...)
     # =>
@@ -96,7 +96,7 @@
 
     # export method ?type ?ident(...)
     # =>
-    # extern ?type ?ident(...)
+    # extern        ?type ?ident(...)
     'export-method' => {
         'dependencies' => [ 'method-alias', 'va-method' ],
         'lhs' => [ 'export', 'method', '?type', '?ident', '?list' ],
@@ -123,6 +123,7 @@
         'rhs' => [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
     },
 
+    # for the very rare case that a user calls the dk:va: generic
     # dk:va:?ident(super ,|)
     # =>
     # dk:va:?ident(super:construct(self,klass) ,|)
@@ -150,13 +151,22 @@
         'rhs' => [ '?ident', ':', 'box', '(', '?ident', ':', 'construct', '(', '?block-in', ')', ')' ]
     },
 
+    # throw                        make (
+    # =>
+    # throw dk-current-exception = make (
+    'throw-capture-exception' => {
+        'dependencies' => [],
+        'lhs' => [ 'throw',                              'make', '(', '?list-in', ')' ], # we can drop the last two
+        'rhs' => [ 'throw', 'dk-current-exception', '=', 'make', '(', '?list-in', ')' ], # we can drop the last two
+    },
+
     # make    (            ?ident   ,|)
     # =>
     # dk:init ( dk:alloc ( ?ident ) ,|)
     'make' => {
-        'dependencies' => [], #'throw-capture-exception'],
-        'lhs' => [ 'make',                                     '(', '?ident',      '?list-member-term' ], # we can drop the last one
-        'rhs' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?ident', ')', '?list-member-term' ]  # we can drop the last one
+        'dependencies' => [ 'throw-capture-exception' ],
+        'lhs' => [ 'make',                                     '(', '?list-member',      '?list-member-term' ], # we can drop the last one
+        'rhs' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?list-member', ')', '?list-member-term' ]  # we can drop the last one
     },
 
     # export enum ?type-ident { ... }
