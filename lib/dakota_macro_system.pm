@@ -66,13 +66,24 @@ my $constraints =
     '?list-member' =>      \&list_member,
     '?type' =>             \&type,
     '?type-ident' =>       \&type_ident,
-    '?visibility' =>       \&visibility,
+    '?visibility' =>       \&visibility, # move to a language specific macro
 };
 
 my $list_member_term_set = { ',' => 1,
 			     ')' => 1  };
 
-### start of constraint variable defnss
+my $open_for_close = {
+    ')' => '(',
+    ']' => '[',
+    '}' => '{',
+};
+my $close_for_open = {
+    '(' => ')',
+    '[' => ']',
+    '{' => '}',
+};
+
+### start of constraint variable defns
 sub list_member_term # move to a language specific macro
 {
     my ($sst, $index, $user_data) = @_;
@@ -120,9 +131,7 @@ sub visibility # move to a language specific macro
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if ('export'   eq $tkn ||
-	'import'   eq $tkn ||
-	'noexport' eq $tkn)
+    if ($$user_data{'visibilities'}{$tkn})
     { $result = $index; }
     return $result;
 }
@@ -157,7 +166,7 @@ sub ka_ident
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if (exists $$user_data{'ka-generics'}{$tkn})
+    if ($$user_data{'ka-generics'}{$tkn})
     { $result = $index; }
     return $result;
 }
@@ -300,6 +309,9 @@ sub macro_expand
 sub rule_match
 {
     my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
+    if (0) {
+	print STDERR "<MACRO, INDEX>:      <\?$name, $i>\n";
+    }
 
     my $last_index = $i;
     my $rhs_for_lhs = {};
@@ -309,6 +321,9 @@ sub rule_match
 	    my $label = $1;
 	    my $constraint = $$constraints{$label};
 	    if (!defined $constraint) { die "Could not find implementation for constraint $label"; }
+	    if (0) {
+		print STDERR "<CONSTRAINT, INDEX>: <$label, $i>\n";
+	    }
 	    $last_index = &$constraint($sst, $i + $j, $user_data);
 
 	    if (-1 eq $last_index)
@@ -323,6 +338,17 @@ sub rule_match
 	    else {
 		$last_index++;
 	    }
+	}
+    }
+    if (0) {
+	if (-1 != $last_index) {
+	    my $indent = $Data::Dumper::Indent;
+	    $Data::Dumper::Indent = 0;
+	    print STDERR "<RANGE>:             <$i, $last_index>\n";
+	    print STDERR "<PATTERN>:           ", &Dumper($lhs), "\n";
+	    print STDERR "<MATCH>:             "; &sst::dump($sst, $i, $last_index);
+	    print STDERR "---\n";
+	    $Data::Dumper::Indent = $indent;
 	}
     }
     return ($last_index, $rhs_for_lhs);
@@ -345,22 +371,30 @@ sub rule_replace
 	}
     }
     &sst::shift_leading_ws($sst, $i);
+
+    if (0) {
+	my $lhs_num_tokens = $last_index - $i + 1;
+	my $rhs_num_tokens = scalar @$replacement;
+	print STDERR "lhs-num-tokens = $lhs_num_tokens\n";
+	print STDERR "rhs-num-tokens = $rhs_num_tokens\n";
+    }
     splice (@{$$sst{'tokens'}}, $i, $last_index - $i + 1, @$replacement);
 }
 
-sub dakota_lang_user_data {
-    my $ka_generics;
-    if ($ENV{'DK_KA_GENERICS'})
-    { my $path = $ENV{'DK_KA_GENERICS'};       $ka_generics = do $path or die "Can not find $path." }
+sub dk_lang_user_data {
+    my $user_data;
+    if ($ENV{'DK_LANG_USER_DATA'})
+    { my $path = $ENV{'DK_LANG_USER_DATA'};
+      $user_data = do $path or die "Can not find $path." }
     else
-    { my $path = "$prefix/src/ka-generics.pl"; $ka_generics = do $path or die "Can not find $path." }
+    { my $path = "$prefix/src/dk-lang-user-data.pl";
+      $user_data = do $path or die "Can not find $path." }
 
-    my $user_data = { 'ka-generics' => $ka_generics };
     return $user_data;
 }
 
 unless (caller) {
-    my $user_data = &dakota_lang_user_data();
+    my $user_data = &dk_lang_user_data();
 
     my $macros;
     if ($ENV{'DK_MACROS_PATH'})
