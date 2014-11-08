@@ -180,11 +180,9 @@ sub type
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if ($tkn =~ /^$zt$/)
-    {
+    if ($tkn =~ /^$zt$/) {
 	my $o = 0;
-	while ('*' eq &sst::at($sst, $index + $o + 1))
-	{
+	while ('*' eq &sst::at($sst, $index + $o + 1)) {
 	    $o++;
 	}
 	$result = $index + $o;
@@ -198,8 +196,7 @@ sub dquote_str
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if ($tkn =~ /^$dqstr$/)
-    {
+    if ($tkn =~ /^$dqstr$/) {
 	$result = $index;
     }
     return $result;
@@ -240,18 +237,15 @@ sub balenced
     {
 	my $open_token;
 	my $close_token;
-        if (&sst::is_open_token($open_token = &sst::at($sst, $close_token_index)))
-        {
+        if (&sst::is_open_token($open_token = &sst::at($sst, $close_token_index))) {
 	    push @$opens, $open_token;
         }
-        elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index)))
-        {
+        elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index))) {
             $open_token = pop @$opens;
 	    
 	    die if $open_token ne &sst::open_token_for_close_token($close_token);
         }
-        if (0 == @$opens)
-        {
+        if (0 == @$opens) {
 	    $result = $close_token_index;
             last;
         }
@@ -301,9 +295,7 @@ sub macro_expand
 {
     my ($sst, $macros, $user_data) = @_;
 
-    if ($debug) {
-	print STDERR "[", "\n";
-    }
+    if ($debug) { print STDERR "[", "\n"; }
 
     for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
 	my $expanded_macro_names = {};
@@ -311,8 +303,104 @@ sub macro_expand
 	    &macro_expand_recursive($sst, $i, $macros, $macro_name, $user_data, $expanded_macro_names);
 	}
     }
+    if ($debug) { print STDERR "]", ",\n"; }
+}
+
+sub rhs_dump
+{
+    my ($seq) = @_;
+    my $delim = '';
+    my $str = '';
+
+    foreach my $tkn (@$seq) {
+	$str .= $delim;
+	$str .= "'$$tkn{'str'}'";
+	$delim = ',';
+    }
+    return "\[$str\]";
+}
+
+sub debug_str_literal
+{
+    my ($literal) = @_;
+    my $str = '';
+    if (2 <= $debug) {
+	$str .= "   {";
+	$str .= "\n";
+	$str .= "    'literal' =>     ";
+	$str .= "'$literal'";
+	$str .= ",\n";
+	$str .= "   }";
+	$str .= "\n";
+    }
+    return $str;
+}
+
+sub debug_str_constraint
+{
+    my ($label, $i, $j, $last_index, $match) = @_;
+    my $str = '';
+    if (2 <= $debug) {
+	$str .= "   {";
+	$str .= ",\n";
+	
+	$str .= "    'constraint' =>  '$label'";
+	$str .= ",\n";
+	
+	$str .= "    'i' =>           '$i'";
+	$str .= ",\n";
+	
+	$str .= "    'j' =>           '$j'";
+	$str .= ",\n";
+	
+	$str .= "    'last-index' =>  '$last_index'";
+	$str .= ",\n";
+	
+	my $match_tokens = [];
+	foreach my $m (@$match) { push @$match_tokens, $$m{'str'}; }
+	
+	$str .= "    'match' =>       ";
+	$str .= &Dumper($match_tokens);
+	$str .= ",\n";
+	$str .= "   }";
+	$str .= ",\n";
+    }
+    return $str;
+}
+
+sub debug_print_match
+{
+    my ($name, $str, $i, $last_index, $lhs, $sst) = @_;
     if ($debug) {
-	print STDERR "]", ",\n";
+	my $indent = $Data::Dumper::Indent;
+	$Data::Dumper::Indent = 0;
+	print STDERR " {\n";
+	print STDERR "  'macro' =>        '\?$name'", ",\n";
+	    
+	if (2 <= $debug) {
+	    print STDERR "  'details' =>", "\n";
+	    print STDERR "  \[", "\n";
+	    print STDERR $str;
+	    print STDERR "  \]", ",\n";
+	}
+	    
+	print STDERR "  'range' =>         ", &Dumper([$i, $last_index]), ",\n";
+	print STDERR "  'pattern' =>       ", &Dumper($lhs), ",\n";
+	print STDERR "  'lhs' =>           ", &sst::dump($sst, $i, $last_index), ",\n";
+	$Data::Dumper::Indent = $indent;
+    }
+}
+
+sub debug_print_replace
+{
+    my ($rhs, $replacement, $lhs_num_tokens) = @_;
+    if ($debug) {
+	print STDERR "  'template' =>      ", &Dumper($rhs), ",\n";
+	print STDERR "  'rhs' =>           ", &rhs_dump($replacement), ",\n";
+	my $rhs_num_tokens = scalar @$replacement;
+	print STDERR "  'lhs-num-tokens' => '$lhs_num_tokens'", ",\n";
+	print STDERR "  'rhs-num-tokens' => '$rhs_num_tokens'", ",\n";
+	print STDERR " }", ",\n";
     }
 }
 
@@ -336,33 +424,8 @@ sub rule_match
 	    else {
 		# match by constraint
 		my $match = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
-
 		$$rhs_for_lhs{$label} = $match;
-		if (2 <= $debug) {
-		    $debugstr .= "   {";
-		    $debugstr .= ",\n";
-
-		    $debugstr .= "    'constraint' =>  '$label'";
-		    $debugstr .= ",\n";
-
-		    $debugstr .= "    'i' =>           '$i'";
-		    $debugstr .= ",\n";
-
-		    $debugstr .= "    'j' =>           '$j'";
-		    $debugstr .= ",\n";
-
-		    $debugstr .= "    'last-index' =>  '$last_index'";
-		    $debugstr .= ",\n";
-
-		    my $match_tokens = [];
-		    foreach my $m (@$match) { push @$match_tokens, $$m{'str'}; }
-
-		    $debugstr .= "    'match' =>       ";
-		    $debugstr .= &Dumper($match_tokens);
-		    $debugstr .= ",\n";
-		    $debugstr .= "   }";
-		    $debugstr .= ",\n";
-		}
+		if ($debug) { $debugstr .= &debug_str_constraint($label, $i, $j, $last_index, $match); }
 	    }
 	}
 	else {
@@ -370,55 +433,14 @@ sub rule_match
 	    { $last_index = -1; last; }
 	    else {
 		# match by literal
+		my $match = $$lhs[$j];
 		$last_index++;
-
-		if (2 <= $debug) {
-		    $debugstr .= "   {";
-		    $debugstr .= "\n";
-		    $debugstr .= "    'literal' =>     ";
-		    $debugstr .= "'$$lhs[$j]'";
-		    $debugstr .= ",\n";
-		    $debugstr .= "   }";
-		    $debugstr .= "\n";
-		}
+		if ($debug) { $debugstr .= &debug_str_literal($match); }
 	    }
 	}
     }
-    if ($debug) {
-	if (-1 != $last_index) {
-	    my $indent = $Data::Dumper::Indent;
-	    $Data::Dumper::Indent = 0;
-	    print STDERR " {\n";
-	    print STDERR "  'macro' =>        '\?$name'", ",\n";
-
-	    if (2 <= $debug) {
-		print STDERR "  'details' =>", "\n";
-		print STDERR "  \[", "\n";
-		print STDERR $debugstr;
-		print STDERR "  \]", ",\n";
-	    }
-
-	    print STDERR "  'range' =>         ", &Dumper([$i, $last_index]), ",\n";
-	    print STDERR "  'pattern' =>       ", &Dumper($lhs), ",\n";
-	    print STDERR "  'lhs' =>           ", &sst::dump($sst, $i, $last_index), ",\n";
-	    $Data::Dumper::Indent = $indent;
-	}
-    }
+    if (-1 != $last_index) { &debug_print_match($name, $debugstr, $i, $last_index, $lhs, $sst); }
     return ($last_index, $rhs_for_lhs);
-}
-
-sub rhs_dump
-{
-    my ($seq) = @_;
-    my $delim = '';
-    my $str = '';
-
-    foreach my $tkn (@$seq) {
-	$str .= $delim;
-	$str .= "'$$tkn{'str'}'";
-	$delim = ',';
-    }
-    return "\[$str\]";
 }
 
 sub rule_replace
@@ -439,15 +461,7 @@ sub rule_replace
     }
     &sst::shift_leading_ws($sst, $i);
     my $lhs_num_tokens = $last_index - $i + 1;
-
-    if ($debug) {
-	print STDERR "  'template' =>      ", &Dumper($rhs), ",\n";
-	print STDERR "  'rhs' =>           ", &rhs_dump($replacement), ",\n";
-	my $rhs_num_tokens = scalar @$replacement;
-	print STDERR "  'lhs-num-tokens' => '$lhs_num_tokens'", ",\n";
-	print STDERR "  'rhs-num-tokens' => '$rhs_num_tokens'", ",\n";
-	print STDERR " }", ",\n";
-    }
+    &debug_print_replace($rhs, $replacement, $lhs_num_tokens);
     splice (@{$$sst{'tokens'}}, $i, $lhs_num_tokens, @$replacement);
 }
 
