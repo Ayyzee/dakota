@@ -339,10 +339,6 @@ sub debug_str_match
 	$str .= "    'match' =>       ";
 	$str .= &Dumper($match_tokens);
 	$str .= ",\n";
-
-	$str .= "   }";
-	$str .= ",\n";
-
 	$str .= "    'i' =>           '$i'";
 	$str .= ",\n";
 	
@@ -350,6 +346,9 @@ sub debug_str_match
 	$str .= ",\n";
 	
 	$str .= "    'last-index' =>  '$last_index'";
+	$str .= ",\n";
+
+	$str .= "   }";
 	$str .= ",\n";
     }
     return $str;
@@ -408,34 +407,28 @@ sub rule_match
     my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
     my $debug_str = '';
 
+    my $prev_last_index = $i;
     my $last_index = $i;
     my $rhs_for_lhs = {};
 
     for (my $j = 0; $j < @$lhs; $j++) {
+	my $constraint_name = $$lhs[$j];
 	if ($$lhs[$j] =~ m/^\?$k+$/) { # match by constraint
 	    my $constraint = $$constraints{$$lhs[$j]};
 	    if (!defined $constraint) { die "Could not find implementation for constraint $$lhs[$j]"; }
-
-	    $last_index = &$constraint($sst, $i + $j, $$lhs[$j], $user_data);
-
-	    if (-1 == $last_index) { last; }
-	    else {
-		my $match = [@{$$sst{'tokens'}}[($i + $j)..$last_index]];
-		$$rhs_for_lhs{$$lhs[$j]} = $match;
-		if ($debug) { $debug_str .= &debug_str_match($i, $j, $last_index, $match, $$lhs[$j]); }
-		$j += (@$match - 1);
-	    }
+	    $last_index = &$constraint($sst, $prev_last_index, $$lhs[$j], $user_data);
 	}
 	else { # match by literal
-	    $last_index = &literal($sst, $i + $j, $$lhs[$j]);
+	    $last_index = &literal($sst, $prev_last_index, $$lhs[$j]);
+	    $constraint_name = undef;
+	}
 
-	    if (-1 == $last_index) { last; }
-	    else {
-		my $match = [@{$$sst{'tokens'}}[($i + $j)..$last_index]];
-		$$rhs_for_lhs{$$lhs[$j]} = $match;
-		if ($debug) { $debug_str .= &debug_str_match($i, $j, $last_index, $match, undef); }
-		$j += (@$match - 1);
-	    }
+	if (-1 == $last_index) { last; }
+	else {
+	    my $match = [@{$$sst{'tokens'}}[$prev_last_index..$last_index]];
+	    $$rhs_for_lhs{$$lhs[$j]} = $match;
+	    if ($debug) { $debug_str .= &debug_str_match($i, $j, $last_index, $match, $constraint_name); }
+	    $prev_last_index = $last_index + 1;
 	}
     }
     if (-1 != $last_index) { &debug_print_match($name, $debug_str, $i, $last_index, $lhs, $sst); }
@@ -449,19 +442,18 @@ sub rule_replace
     my $replacement = [];
     foreach my $rhstkn (@$rhs) {
 	my $tkns = $$rhs_for_lhs{$rhstkn};
-	if ($tkns) {
-	    push @$replacement, @$tkns;
+	if (!$tkns) { # these are tokens that exists only in the rhs and not in the lhs
+	    $tkns = [{ 'str'         => $rhstkn,
+		       'leading-ws'  => '',
+		       'trailing-ws' => '' }];
 	}
-	else { # these are tokens that exists only in the rhs and not in the lhs
-	    push @$replacement, ({'str'=>"$rhstkn",
-				  'leading-ws'=>'',
-				  'trailing-ws'=>''});
-	}
+	push @$replacement, @$tkns;
     }
     &sst::shift_leading_ws($sst, $i);
     my $lhs_num_tokens = $last_index - $i + 1;
     &debug_print_replace($rhs, $replacement, $lhs_num_tokens);
     splice (@{$$sst{'tokens'}}, $i, $lhs_num_tokens, @$replacement);
+    #&sst::splice($sst, $i, $lhs_num_tokens, $replacement);
 }
 
 sub dk_lang_user_data {
