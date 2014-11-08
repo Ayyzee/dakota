@@ -208,7 +208,7 @@ sub dquote_str
 sub block # body is optional since it uses balenced()
 {
     my ($sst, $open_token_index, $user_data) = @_;
-    return &balenced($sst, $open_token_index);
+    return &balenced($sst, $open_token_index, $user_data);
 }
 
 sub list # body is optional since it uses balenced()
@@ -220,13 +220,13 @@ sub list # body is optional since it uses balenced()
 sub block_in # body is optional since it uses balenced_in() which uses balenced()
 {
     my ($sst, $index, $user_data) = @_;
-    return &balenced_in($sst, $index);
+    return &balenced_in($sst, $index, $user_data);
 }
 
 sub list_in # body is optional since it uses balenced_in() which uses balenced()
 {
     my ($sst, $index, $user_data) = @_;
-    return &balenced_in($sst, $index);
+    return &balenced_in($sst, $index, $user_data);
 }
 
 sub balenced
@@ -264,7 +264,7 @@ sub balenced_in
 {
     my ($sst, $index, $user_data) = @_;
     die if 0 == $index;
-    my $result = &balenced($sst, $index - 1);
+    my $result = &balenced($sst, $index - 1, $user_data);
     if (-1 != $result)
     { $result--; }
 
@@ -340,8 +340,18 @@ sub rule_match
 		$$rhs_for_lhs{$label} = $match;
 		if (2 <= $debug) {
 		    $debugstr .= "   {";
-		    $debugstr .= "\n";
+		    $debugstr .= ",\n";
+
 		    $debugstr .= "    'constraint' =>  '$label'";
+		    $debugstr .= ",\n";
+
+		    $debugstr .= "    'i' =>           '$i'";
+		    $debugstr .= ",\n";
+
+		    $debugstr .= "    'j' =>           '$j'";
+		    $debugstr .= ",\n";
+
+		    $debugstr .= "    'last-index' =>  '$last_index'";
 		    $debugstr .= ",\n";
 
 		    my $match_tokens = [];
@@ -360,7 +370,7 @@ sub rule_match
 	    { $last_index = -1; last; }
 	    else {
 		# match by literal
-		$last_index++; ### really???
+		$last_index++;
 
 		if (2 <= $debug) {
 		    $debugstr .= "   {";
@@ -370,10 +380,6 @@ sub rule_match
 		    $debugstr .= ",\n";
 		    $debugstr .= "   }";
 		    $debugstr .= "\n";
-
-		    #$debugstr .= "    'match' =>       ";
-		    #$debugstr .= "'$$lhs[$j]'";
-		    #$debugstr .= ",\n";
 		}
 	    }
 	}
@@ -435,6 +441,7 @@ sub rule_replace
     my $lhs_num_tokens = $last_index - $i + 1;
 
     if ($debug) {
+	print STDERR "  'template' =>      ", &Dumper($rhs), ",\n";
 	print STDERR "  'rhs' =>           ", &rhs_dump($replacement), ",\n";
 	my $rhs_num_tokens = scalar @$replacement;
 	print STDERR "  'lhs-num-tokens' => '$lhs_num_tokens'", ",\n";
