@@ -83,7 +83,7 @@ my $close_for_open = {
     '{' => '}',
 };
 
-my $debug = 0; # 0 or 1 or 2
+my $debug = 1; # 0 or 1 or 2 or 3
 
 ### start of constraint variable defns
 sub list_member_term # move to a language specific macro
@@ -356,17 +356,21 @@ sub debug_str_match
 
 sub debug_print_match
 {
-    my ($name, $str, $i, $last_index, $lhs, $sst) = @_;
-    if ($debug) {
+    my ($name, $str2, $str3, $i, $last_index, $lhs, $sst) = @_;
+
+    if ($debug >= 2 || $last_index != -1 && $debug >= 1) {
 	my $indent = $Data::Dumper::Indent;
 	$Data::Dumper::Indent = 0;
 	print STDERR " {\n";
 	print STDERR "  'macro' =>        '\?$name'", ",\n";
 	    
-	if (2 <= $debug) {
+	if (2 <= $debug && ('' ne $str2 || '' ne $str3)) {
 	    print STDERR "  'details' =>", "\n";
 	    print STDERR "  \[", "\n";
-	    print STDERR $str;
+	    print STDERR $str2;
+	    if (3 <= $debug) {
+		print STDERR $str3;
+	    }
 	    print STDERR "  \]", ",\n";
 	}
 	    
@@ -374,6 +378,10 @@ sub debug_print_match
 	print STDERR "  'pattern' =>       ", &Dumper($lhs), ",\n";
 	print STDERR "  'lhs' =>           ", &sst::dump($sst, $i, $last_index), ",\n";
 	$Data::Dumper::Indent = $indent;
+
+	if (-1 == $last_index) {
+	    print STDERR " },\n";
+	}
     }
 }
 
@@ -405,33 +413,42 @@ sub literal
 sub rule_match
 {
     my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
-    my $debug_str = '';
+    my $debug2_str = '';
+    my $debug3_str = '';
 
     my $prev_last_index = $i;
     my $last_index = $i;
     my $rhs_for_lhs = {};
 
     for (my $j = 0; $j < @$lhs; $j++) {
-	my $constraint_name = $$lhs[$j];
-	if ($$lhs[$j] =~ m/^\?$k+$/) { # match by constraint
+	my $constraint_name;
+	if ($$lhs[$j] =~ m/^\?$k+$/) {
 	    my $constraint = $$constraints{$$lhs[$j]};
 	    if (!defined $constraint) { die "Could not find implementation for constraint $$lhs[$j]"; }
+	    # match by constraint
 	    $last_index = &$constraint($sst, $prev_last_index, $$lhs[$j], $user_data);
+	    $constraint_name = $$lhs[$j]
 	}
-	else { # match by literal
+	else {
+	    # match by literal
 	    $last_index = &literal($sst, $prev_last_index, $$lhs[$j]);
 	    $constraint_name = undef;
 	}
 
-	if (-1 == $last_index) { last; }
-	else {
+	if (-1 != $last_index) {
 	    my $match = [@{$$sst{'tokens'}}[$prev_last_index..$last_index]];
 	    $$rhs_for_lhs{$$lhs[$j]} = $match;
-	    if ($debug) { $debug_str .= &debug_str_match($i, $j, $last_index, $match, $constraint_name); }
+	    if (2 <= $debug) { $debug2_str .= &debug_str_match($i, $j, $last_index,
+							       $match, $constraint_name); }
 	    $prev_last_index = $last_index + 1;
 	}
+	else {
+	    if (3 <= $debug) { $debug3_str .= &debug_str_match($i, $j, $last_index, 
+							       undef, $constraint_name); }
+	    last;
+	}
     }
-    if (-1 != $last_index) { &debug_print_match($name, $debug_str, $i, $last_index, $lhs, $sst); }
+    &debug_print_match($name, $debug2_str, $debug3_str, $i, $last_index, $lhs, $sst);
     return ($last_index, $rhs_for_lhs);
 }
 
