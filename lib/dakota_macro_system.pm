@@ -88,7 +88,7 @@ my $debug = 0; # 0 or 1 or 2
 ### start of constraint variable defns
 sub list_member_term # move to a language specific macro
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -100,7 +100,7 @@ sub list_member_term # move to a language specific macro
 
 sub list_member
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     #die if $$list_member_term_set{$tkn};
     return -1 if $$list_member_term_set{$tkn};
@@ -129,7 +129,7 @@ sub list_member
 
 sub visibility # move to a language specific macro
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -140,7 +140,7 @@ sub visibility # move to a language specific macro
 
 sub ident
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -152,7 +152,7 @@ sub ident
 
 sub type_ident
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -163,7 +163,7 @@ sub type_ident
 
 sub ka_ident
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
 
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
@@ -176,7 +176,7 @@ sub ka_ident
 # this is very incomplete
 sub type
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -192,7 +192,7 @@ sub type
 
 sub dquote_str
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
@@ -204,26 +204,26 @@ sub dquote_str
 
 sub block # body is optional since it uses balenced()
 {
-    my ($sst, $open_token_index, $user_data) = @_;
-    return &balenced($sst, $open_token_index, $user_data);
+    my ($sst, $open_token_index, $constraint, $user_data) = @_;
+    return &balenced($sst, $open_token_index, $constraint, $user_data);
 }
 
 sub list # body is optional since it uses balenced()
 {
-    my ($sst, $open_token_index, $user_data) = @_;
-    return &balenced($sst, $open_token_index, $user_data);
+    my ($sst, $open_token_index, $constraint, $user_data) = @_;
+    return &balenced($sst, $open_token_index, $constraint, $user_data);
 }
 
 sub block_in # body is optional since it uses balenced_in() which uses balenced()
 {
-    my ($sst, $index, $user_data) = @_;
-    return &balenced_in($sst, $index, $user_data);
+    my ($sst, $index, $constraint, $user_data) = @_;
+    return &balenced_in($sst, $index, $constraint, $user_data);
 }
 
 sub list_in # body is optional since it uses balenced_in() which uses balenced()
 {
-    my ($sst, $index, $user_data) = @_;
-    return &balenced_in($sst, $index, $user_data);
+    my ($sst, $index, $constraint, $user_data) = @_;
+    return &balenced_in($sst, $index, $constraint, $user_data);
 }
 
 sub balenced
@@ -256,9 +256,9 @@ sub balenced
 
 sub balenced_in
 {
-    my ($sst, $index, $user_data) = @_;
+    my ($sst, $index, $constraint, $user_data) = @_;
     die if 0 == $index;
-    my $result = &balenced($sst, $index - 1, $user_data);
+    my $result = &balenced($sst, $index - 1, $constraint, $user_data);
     if (-1 != $result)
     { $result--; }
 
@@ -320,33 +320,29 @@ sub rhs_dump
     return "\[$str\]";
 }
 
-sub debug_str_literal
-{
-    my ($literal) = @_;
-    my $str = '';
-    if (2 <= $debug) {
-	$str .= "   {";
-	$str .= "\n";
-	$str .= "    'literal' =>     ";
-	$str .= "'$literal'";
-	$str .= ",\n";
-	$str .= "   }";
-	$str .= "\n";
-    }
-    return $str;
-}
-
 sub debug_str_constraint
 {
-    my ($label, $i, $j, $last_index, $match) = @_;
+    my ($i, $j, $last_index, $match, $constraint) = @_;
     my $str = '';
     if (2 <= $debug) {
 	$str .= "   {";
-	$str .= ",\n";
+	$str .= "\n";
 	
-	$str .= "    'constraint' =>  '$label'";
-	$str .= ",\n";
+	if ($constraint) {
+	    $str .= "    'constraint' =>  '$constraint'";
+	    $str .= ",\n";
+	}
 	
+	my $match_tokens = [];
+	foreach my $m (@$match) { push @$match_tokens, $$m{'str'}; }
+
+	$str .= "    'match' =>       ";
+	$str .= &Dumper($match_tokens);
+	$str .= ",\n";
+
+	$str .= "   }";
+	$str .= ",\n";
+
 	$str .= "    'i' =>           '$i'";
 	$str .= ",\n";
 	
@@ -354,15 +350,6 @@ sub debug_str_constraint
 	$str .= ",\n";
 	
 	$str .= "    'last-index' =>  '$last_index'";
-	$str .= ",\n";
-	
-	my $match_tokens = [];
-	foreach my $m (@$match) { push @$match_tokens, $$m{'str'}; }
-	
-	$str .= "    'match' =>       ";
-	$str .= &Dumper($match_tokens);
-	$str .= ",\n";
-	$str .= "   }";
 	$str .= ",\n";
     }
     return $str;
@@ -404,6 +391,16 @@ sub debug_print_replace
     }
 }
 
+sub literal
+{
+    my ($sst, $k, $str) = @_;
+    my $result = -1;
+    if ($str eq $$sst{'tokens'}[$k]{'str'}) {
+	$result = $k;
+    }
+    return $result;
+}
+
 sub rule_match
 {
     my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
@@ -413,29 +410,33 @@ sub rule_match
     my $rhs_for_lhs = {};
 
     for (my $j = 0; $j < @$lhs; $j++) {
-	if ($$lhs[$j] =~ m/^(\?$k+)$/) { # make this re a variable
-	    my $label = $1;
-	    my $constraint = $$constraints{$label};
-	    if (!defined $constraint) { die "Could not find implementation for constraint $label"; }
-	    $last_index = &$constraint($sst, $i + $j, $user_data);
+	if ($$lhs[$j] =~ m/^\?$k+$/) { # make this re a variable
+	    #my $constraint_name = $$lhs[$j];
+	    my $constraint = $$constraints{$$lhs[$j]};
+	    if (!defined $constraint) { die "Could not find implementation for constraint $$lhs[$j]"; }
 
-	    if (-1 eq $last_index)
-	    { $last_index = -1; last; }
-	    else {
-		# match by constraint
+	    $last_index = &$constraint($sst, $i + $j, $$lhs[$j], $user_data);
+
+	    if (-1 == $last_index) { last; }
+	    else { # match by constraint
 		my $match = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
-		$$rhs_for_lhs{$label} = $match;
-		if ($debug) { $debugstr .= &debug_str_constraint($label, $i, $j, $last_index, $match); }
+		$$rhs_for_lhs{$$lhs[$j]} = $match;
+		if ($debug) { $debugstr .= &debug_str_constraint($i, $j, $last_index, $match, $$lhs[$j]); }
+		$j += @$match - 1;
 	    }
 	}
 	else {
-	    if ($$lhs[$j] ne $$sst{'tokens'}[$i + $j]{'str'})
-	    { $last_index = -1; last; }
-	    else {
-		# match by literal
-		my $match = $$lhs[$j];
-		$last_index++;
-		if ($debug) { $debugstr .= &debug_str_literal($match); }
+	    $last_index = &literal($sst, $i + $j, $$lhs[$j]);
+
+	    if (-1 == $last_index) { last; }
+	    else { # match by literal
+		die if $i + $j != $last_index;
+		my $match = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
+		die if 1 != @$match;
+
+		$$rhs_for_lhs{$$lhs[$j]} = $match;
+		if ($debug) { $debugstr .= &debug_str_constraint($i, $j, $last_index, $match, undef); }
+		$j += @$match - 1;
 	    }
 	}
     }
@@ -450,9 +451,9 @@ sub rule_replace
     my $replacement = [];
     foreach my $rhstkn (@$rhs) {
 	if ($rhstkn =~ m/^(\?$k+)$/) { # make this re a variable
-	    my $label = $1;
-	    if ($$rhs_for_lhs{$label}) {
-		push @$replacement, @{$$rhs_for_lhs{$label}};
+	    my $constraint = $1;
+	    if ($$rhs_for_lhs{$constraint}) {
+		push @$replacement, @{$$rhs_for_lhs{$constraint}};
 	    }
 	}
 	else {
