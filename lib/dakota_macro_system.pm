@@ -320,7 +320,7 @@ sub rhs_dump
     return "\[$str\]";
 }
 
-sub debug_str_constraint
+sub debug_str_match
 {
     my ($i, $j, $last_index, $match, $constraint) = @_;
     my $str = '';
@@ -393,10 +393,12 @@ sub debug_print_replace
 
 sub literal
 {
-    my ($sst, $k, $str) = @_;
+    my ($sst, $index, $literal) = @_;
+    my $tkn = &sst::at($sst, $index);
     my $result = -1;
-    if ($str eq $$sst{'tokens'}[$k]{'str'}) {
-	$result = $k;
+
+    if ($tkn eq $literal) {
+	$result = $index;
     }
     return $result;
 }
@@ -404,43 +406,39 @@ sub literal
 sub rule_match
 {
     my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
-    my $debugstr = '';
+    my $debug_str = '';
 
     my $last_index = $i;
     my $rhs_for_lhs = {};
 
     for (my $j = 0; $j < @$lhs; $j++) {
-	if ($$lhs[$j] =~ m/^\?$k+$/) { # make this re a variable
-	    #my $constraint_name = $$lhs[$j];
+	if ($$lhs[$j] =~ m/^\?$k+$/) { # match by constraint
 	    my $constraint = $$constraints{$$lhs[$j]};
 	    if (!defined $constraint) { die "Could not find implementation for constraint $$lhs[$j]"; }
 
 	    $last_index = &$constraint($sst, $i + $j, $$lhs[$j], $user_data);
 
 	    if (-1 == $last_index) { last; }
-	    else { # match by constraint
-		my $match = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
+	    else {
+		my $match = [@{$$sst{'tokens'}}[($i + $j)..$last_index]];
 		$$rhs_for_lhs{$$lhs[$j]} = $match;
-		if ($debug) { $debugstr .= &debug_str_constraint($i, $j, $last_index, $match, $$lhs[$j]); }
-		$j += @$match - 1;
+		if ($debug) { $debug_str .= &debug_str_match($i, $j, $last_index, $match, $$lhs[$j]); }
+		$j += (@$match - 1);
 	    }
 	}
-	else {
+	else { # match by literal
 	    $last_index = &literal($sst, $i + $j, $$lhs[$j]);
 
 	    if (-1 == $last_index) { last; }
-	    else { # match by literal
-		die if $i + $j != $last_index;
-		my $match = [@{$$sst{'tokens'}}[$i + $j..$last_index]];
-		die if 1 != @$match;
-
+	    else {
+		my $match = [@{$$sst{'tokens'}}[($i + $j)..$last_index]];
 		$$rhs_for_lhs{$$lhs[$j]} = $match;
-		if ($debug) { $debugstr .= &debug_str_constraint($i, $j, $last_index, $match, undef); }
-		$j += @$match - 1;
+		if ($debug) { $debug_str .= &debug_str_match($i, $j, $last_index, $match, undef); }
+		$j += (@$match - 1);
 	    }
 	}
     }
-    if (-1 != $last_index) { &debug_print_match($name, $debugstr, $i, $last_index, $lhs, $sst); }
+    if (-1 != $last_index) { &debug_print_match($name, $debug_str, $i, $last_index, $lhs, $sst); }
     return ($last_index, $rhs_for_lhs);
 }
 
@@ -450,14 +448,14 @@ sub rule_replace
 
     my $replacement = [];
     foreach my $rhstkn (@$rhs) {
-	if ($rhstkn =~ m/^(\?$k+)$/) { # make this re a variable
-	    my $constraint = $1;
-	    if ($$rhs_for_lhs{$constraint}) {
-		push @$replacement, @{$$rhs_for_lhs{$constraint}};
-	    }
+	my $tkns = $$rhs_for_lhs{$rhstkn};
+	if ($tkns) {
+	    push @$replacement, @$tkns;
 	}
-	else {
-	    push @$replacement, { 'str' => $rhstkn };
+	else { # these are tokens that exists only in the rhs and not in the lhs
+	    push @$replacement, ({'str'=>"$rhstkn",
+				  'leading-ws'=>'',
+				  'trailing-ws'=>''});
 	}
     }
     &sst::shift_leading_ws($sst, $i);
