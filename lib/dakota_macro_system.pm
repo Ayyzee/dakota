@@ -211,7 +211,7 @@ sub block # body is optional since it uses balenced()
 sub list # body is optional since it uses balenced()
 {
     my ($sst, $open_token_index, $user_data) = @_;
-    return &balenced($sst, $open_token_index);
+    return &balenced($sst, $open_token_index, $user_data);
 }
 
 sub block_in # body is optional since it uses balenced_in() which uses balenced()
