@@ -69,21 +69,7 @@ my $constraints =
     '?visibility' =>       \&visibility, # move to a language specific macro
 };
 
-my $list_member_term_set = { ',' => 1,
-			     ')' => 1  };
-
-my $open_for_close = {
-    ')' => '(',
-    ']' => '[',
-    '}' => '{',
-};
-my $close_for_open = {
-    '(' => ')',
-    '[' => ']',
-    '{' => '}',
-};
-
-my $debug = 1; # 0 or 1 or 2 or 3
+my $debug = 0; # 0 or 1 or 2 or 3
 
 ### start of constraint variable defns
 sub list_member_term # move to a language specific macro
@@ -92,7 +78,7 @@ sub list_member_term # move to a language specific macro
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if ($$list_member_term_set{$tkn}) {
+    if ($$user_data{'list'}{'member'}{'term'}{$tkn}) {
 	$result = $index;
     }
     return $result;
@@ -102,8 +88,8 @@ sub list_member
 {
     my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
-    #die if $$list_member_term_set{$tkn};
-    return -1 if $$list_member_term_set{$tkn};
+    #die if $$user_data{'list'}{'member'}{'term'}{$tkn};
+    return -1 if $$user_data{'list'}{'member'}{'term'}{$tkn};
     my $o = 1;
     my $is_framed = 0;
     my $num_tokens = scalar @{$$sst{'tokens'}};
@@ -112,14 +98,14 @@ sub list_member
 	$tkn = &sst::at($sst, $index + $o);
 
 	if (!$is_framed) {
-	    if ($$list_member_term_set{$tkn}) {
+	    if ($$user_data{'list'}{'member'}{'term'}{$tkn}) {
 		return $index + $o - 1;
 	    }
 	}
-	if ('(' eq $tkn) {
+	if ($$user_data{'list'}{'open'} eq $tkn) {
 	    $is_framed++;
 	}
-	elsif (')' eq $tkn && $is_framed) {
+	elsif ($$user_data{'list'}{'close'} eq $tkn && $is_framed) {
 	    $is_framed--;
 	}
 	$o++;
@@ -145,7 +131,7 @@ sub ident
     my $result = -1;
 
     if ($tkn =~ /^$k+$/ &&
-	!($tkn =~ /^$zt$/))
+	(-1 == &type_ident($sst, $index, $constraint, $user_data)))
     { $result = $index; }
     return $result;
 }
