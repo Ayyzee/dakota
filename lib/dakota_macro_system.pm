@@ -281,7 +281,7 @@ sub macro_expand_recursive
     return $change_count;
 }
 
-sub macro_expand
+sub macros_expand_index
 {
     my ($sst, $i, $macros, $user_data) = @_;
     my $change_count = 0;
@@ -292,6 +292,19 @@ sub macro_expand
 	{ last; }
     }
     return $change_count;
+}
+
+sub macros_expand
+{
+    my ($sst, $macros, $user_data) = @_;
+
+    if ($debug) { print STDERR "[", "\n"; }
+
+    for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
+	while (&macros_expand_index($sst, $i, $macros, $user_data))
+	{}
+    }
+    if ($debug) { print STDERR "]", ",\n"; }
 }
 
 sub rhs_dump
@@ -486,15 +499,7 @@ unless (caller) {
     {
 	my $filestr = &dakota::filestr_from_file($arg);
 	my $sst = &sst::make($filestr, $arg);
-
-	if ($debug) { print STDERR "[", "\n"; }
-
-	for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
-	    while (&macro_expand($sst, $i, $macros, $user_data))
-	    {}
-	}
-	if ($debug) { print STDERR "]", ",\n"; }
-
+	&macros_expand($sst, $macros, $user_data);
 	print &sst_fragment::filestr($$sst{'tokens'});
     }
 };
