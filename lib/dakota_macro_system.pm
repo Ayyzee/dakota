@@ -254,12 +254,14 @@ sub balenced_in
 
 sub macro_expand_recursive
 {
-    my ($sst, $i, $macros, $macro_name, $user_data, $expanded_macro_names) = @_;
+    my ($sst, $i, $macros, $macro_name, $expanded_macro_names, $user_data) = @_;
     my $macro = $$macros{$macro_name};
+    my $change_count = 0;
 
     foreach my $depend_macro_name (@{$$macro{'dependencies'}}) {
 	if (!exists($$expanded_macro_names{$depend_macro_name})) {
-	    &macro_expand_recursive($sst, $i, $macros, $depend_macro_name, $user_data, $expanded_macro_names);
+	    $change_count += &macro_expand_recursive($sst, $i, $macros, $depend_macro_name,
+						     $expanded_macro_names, $user_data);
 	    $$expanded_macro_names{$depend_macro_name} = 1;
 	}
     }
@@ -272,24 +274,24 @@ sub macro_expand_recursive
 
 	if (-1 != $last_index) {
 	    &rule_replace($sst, $i, $last_index, $$rule{'rhs'}, $rhs_for_lhs, $macro_name);
+	    $change_count++;
 	    last;
 	}
     }
+    return $change_count;
 }
 
 sub macro_expand
 {
-    my ($sst, $macros, $user_data) = @_;
+    my ($sst, $i, $macros, $user_data) = @_;
+    my $change_count = 0;
 
-    if ($debug) { print STDERR "[", "\n"; }
-
-    for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
-	my $expanded_macro_names = {};
-	foreach my $macro_name (sort keys %$macros) {
-	    &macro_expand_recursive($sst, $i, $macros, $macro_name, $user_data, $expanded_macro_names);
-	}
+    foreach my $macro_name (sort keys %$macros) {
+	if ($change_count = &macro_expand_recursive($sst, $i, $macros, $macro_name,
+						    {}, $user_data))
+	{ last; }
     }
-    if ($debug) { print STDERR "]", ",\n"; }
+    return $change_count;
 }
 
 sub rhs_dump
@@ -483,10 +485,16 @@ unless (caller) {
     foreach my $arg (@ARGV)
     {
 	my $filestr = &dakota::filestr_from_file($arg);
-
 	my $sst = &sst::make($filestr, $arg);
 
-	&macro_expand($sst, $macros, $user_data);
+	if ($debug) { print STDERR "[", "\n"; }
+
+	for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
+	    while (&macro_expand($sst, $i, $macros, $user_data))
+	    {}
+	}
+	if ($debug) { print STDERR "]", ",\n"; }
+
 	print &sst_fragment::filestr($$sst{'tokens'});
     }
 };
