@@ -119,7 +119,7 @@ sub visibility # move to a language specific macro
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if ($$user_data{'visibilities'}{$tkn})
+    if ($$user_data{'visibility'}{$tkn})
     { $result = $index; }
     return $result;
 }
@@ -131,7 +131,7 @@ sub ident
     my $result = -1;
 
     if ($tkn =~ /^$k+$/ &&
-	(-1 == &type_ident($sst, $index, $constraint, $user_data)))
+	(-1 == &type_ident($sst, $index, $constraint, $user_data))) # should be removed
     { $result = $index; }
     return $result;
 }
@@ -154,7 +154,7 @@ sub ka_ident
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
 
-    if ($$user_data{'ka-generics'}{$tkn})
+    if ($$user_data{'ka-ident'}{$tkn})
     { $result = $index; }
     return $result;
 }
