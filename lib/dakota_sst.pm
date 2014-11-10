@@ -441,22 +441,36 @@ sub sst::dump
     return "\[$str\]";
 }
 
-sub sst::splice
+sub sst::_process_ws_first
 {
     my ($sst, $index, $length, $seq) = @_;
 
-    if (0) {
-	print STDERR "sst::splice(..., $index, $length, ...)\n";
+    my $empty_rhs_ws = '';
+    if (0 == scalar @$seq) {
 	for (my $i = $index; $i < $index + $length; $i++) {
-	    my $str = $$sst{'tokens'}[$i]{'str'};
-	    print STDERR " $str";
+	    $empty_rhs_ws .= $$sst{'tokens'}[$i]{'leading-ws'}  ||= '';
+	    $empty_rhs_ws .= $$sst{'tokens'}[$i]{'trailing-ws'} ||= '';
 	}
-	print STDERR "\n";
-	foreach my $str (@$seq) {
-	    print STDERR " $str";
-	}
-	print STDERR "\n";
     }
+    return $empty_rhs_ws;
+}
+
+sub sst::_process_ws_last
+{
+    my ($sst, $index, $length, $seq, $empty_rhs_ws) = @_;
+
+    if (0 == scalar @$seq) {
+	if ($index < scalar @{$$sst{'tokens'}}) {
+	    my $leading_ws = $$sst{'tokens'}[$index]{'leading-ws'};
+	    $$sst{'tokens'}[$index]{'leading-ws'} = $empty_rhs_ws . $leading_ws;
+	}
+	else {die;}
+    }
+}
+
+sub sst::_process_ws
+{
+    my ($sst, $index, $length, $seq) = @_;
 
     # [ tkn1 tkn2 tkn3 ] => [                     ] # empty rhs
     # [ tkn1 tkn2 tkn3 ] => [ tkn3 tkn2 tkn1      ] # lhs == rhs
@@ -466,14 +480,6 @@ sub sst::splice
     # [ tkn1 tkn2 tkn3 ] => [ tkn1 tkn2      ]
     # [ tkn1 tkn2 tkn3 ] => [      tkn2 tkn3 ]
     # [ tkn1 tkn2 tkn3 ] => [ tkn1      tkn3 ]
-
-    my $empty_rhs_ws = '';
-    if (0 == scalar @$seq) {
-	for (my $i = $index; $i < $index + $length; $i++) {
-	    $empty_rhs_ws .= $$sst{'tokens'}[$i]{'leading-ws'}  ||= '';
-	    $empty_rhs_ws .= $$sst{'tokens'}[$i]{'trailing-ws'} ||= '';
-	}
-    }
 
     my $new_seq = [];
     for (my $i = 0; $i < @$seq; $i++) {
@@ -487,14 +493,16 @@ sub sst::splice
 	$$lhs_token{'str'} = $$seq[$i]{'str'};
 	&_add_last($new_seq, $lhs_token);
     }
+    return $new_seq;
+}
+
+sub sst::splice
+{
+    my ($sst, $index, $length, $seq) = @_;
+    my $empty_rhs_ws = &sst::_process_ws_first($sst, $index, $length, $seq);
+    my $new_seq = &sst::_process_ws($sst, $index, $length, $seq);
     splice @{$$sst{'tokens'}}, $index, $length, @$new_seq;
-    if (0 == scalar @$seq) {
-	if ($index < scalar @{$$sst{'tokens'}}) {
-	    my $leading_ws = $$sst{'tokens'}[$index]{'leading-ws'};
-	    $$sst{'tokens'}[$index]{'leading-ws'} = $empty_rhs_ws . $leading_ws;
-	}
-	else {die;}
-    }
+    &sst::_process_ws_last($sst, $index, $length, $seq, $empty_rhs_ws);
 }
 
 sub sst_fragment::filestr
