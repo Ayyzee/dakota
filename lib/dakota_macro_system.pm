@@ -462,16 +462,14 @@ sub rule_replace
 	my $tkns = $$rhs_for_lhs{$rhstkn};
 	if (!$tkns) { # these are tokens that exists only in the rhs and not in the lhs
 	    $tkns = [{ 'str'         => $rhstkn,
-		       'leading-ws'  => '',
-		       'trailing-ws' => '' }];
+		       'leading-ws'  => '' }];
 	}
 	push @$replacement, @$tkns;
     }
     &sst::shift_leading_ws($sst, $i);
     my $lhs_num_tokens = $last_index - $i + 1;
     &debug_print_replace($rhs, $replacement, $lhs_num_tokens);
-    splice (@{$$sst{'tokens'}}, $i, $lhs_num_tokens, @$replacement);
-    #&sst::splice($sst, $i, $lhs_num_tokens, $replacement);
+    &sst::splice($sst, $i, $lhs_num_tokens, $replacement);
 }
 
 sub dk_lang_user_data {

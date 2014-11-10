@@ -444,7 +444,6 @@ sub sst::dump
 sub sst::splice
 {
     my ($sst, $index, $length, $seq) = @_;
-    my $new_seq = [];
 
     if (0) {
 	print STDERR "sst::splice(..., $index, $length, ...)\n";
@@ -458,20 +457,44 @@ sub sst::splice
 	}
 	print STDERR "\n";
     }
-    
+
+    # [ tkn1 tkn2 tkn3 ] => [                     ] # empty rhs
+    # [ tkn1 tkn2 tkn3 ] => [ tkn3 tkn2 tkn1      ] # lhs == rhs
+    # [ tkn1 tkn2 tkn3 ] => [ tkn1 tkn2 tkn3 tkn4 ] # lhs < rhs
+    # [ tkn1 tkn2 tkn3 ] => [ tkn1 tkn2           ] # lhs > rhs
+
+    # [ tkn1 tkn2 tkn3 ] => [ tkn1 tkn2      ]
+    # [ tkn1 tkn2 tkn3 ] => [      tkn2 tkn3 ]
+    # [ tkn1 tkn2 tkn3 ] => [ tkn1      tkn3 ]
+
+    my $empty_rhs_ws = '';
+    if (0 == scalar @$seq) {
+	for (my $i = $index; $i < $index + $length; $i++) {
+	    $empty_rhs_ws .= $$sst{'tokens'}[$i]{'leading-ws'}  ||= '';
+	    $empty_rhs_ws .= $$sst{'tokens'}[$i]{'trailing-ws'} ||= '';
+	}
+    }
+
+    my $new_seq = [];
     for (my $i = 0; $i < @$seq; $i++) {
-	my $str = $$seq[$i];
-	my %lhs_token;
+	my $lhs_token;
 	if ($i < $length) {
-	    %lhs_token = %{$$sst{'tokens'}[$index + $i]};
+	    %$lhs_token = %{$$sst{'tokens'}[$index + $i]}; # copy
 	}
 	else {
-	    %lhs_token = ( 'str' => '' );
+	    $lhs_token = { 'str' => undef };
 	}
-	$lhs_token{'str'} = $str;
-	&_add_last($new_seq, \%lhs_token);
+	$$lhs_token{'str'} = $$seq[$i]{'str'};
+	&_add_last($new_seq, $lhs_token);
     }
     splice @{$$sst{'tokens'}}, $index, $length, @$new_seq;
+    if (0 == scalar @$seq) {
+	if ($index < scalar @{$$sst{'tokens'}}) {
+	    my $leading_ws = $$sst{'tokens'}[$index]{'leading-ws'};
+	    $$sst{'tokens'}[$index]{'leading-ws'} = $empty_rhs_ws . $leading_ws;
+	}
+	else {die;}
+    }
 }
 
 sub sst_fragment::filestr
