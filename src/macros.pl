@@ -254,32 +254,27 @@
 	],
     },
 
+    # if (?ident in? keys ?list-member)
+    # becomes
+    # if (dk:in?(?ident, dk:keys(?list-member)))
+    #
     # if (?ident in? ?list-member)
     # becomes
     # if (dk:in?(?ident, ?list-member))
     'set-membership-testing' => {
-	'dependencies' => [ 'table-keys-membership-testing' ],
-	'rules' => [
-	    {
-		'lhs' => [ 'if', '(',                        '?ident', 'in?', '?list-member',      ')' ],
-		'rhs' => [ 'if', '(', 'dk', ':', 'in?', '(', '?ident',  ',',  '?list-member', ')', ')' ]
-	    }
-	],
-    },
-
-    # if (?ident in? keys ?list-member)
-    # becomes
-    # if (dk:in?(?ident, dk:keys(?list-member)))
-    'table-keys-membership-testing' => {
 	'dependencies' => [],
 	'rules' => [
 	    {
 		'lhs' => [ 'if', '(',                                                '?ident', 'in?', 'keys', '?list-member', ')'      ],
 		'rhs' => [ 'if', '(', 'dk', ':', 'in?', '(', 'dk', ':', 'keys', '(', '?ident', ',',           '?list-member', ')', ')' ]
+	    },
+	    {
+		'lhs' => [ 'if', '(',                                                '?ident', 'in?',         '?list-member', ')'      ],
+		'rhs' => [ 'if', '(', 'dk', ':', 'in?', '(',                         '?ident', ',',           '?list-member', ')', ')' ]
 	    }
 	],
     },
-    
+
     # foo:slots-t* slt = unbox(bar)
     # becomes
     # foo:slots-t* slt = foo:unbox(bar)
