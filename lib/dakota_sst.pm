@@ -53,6 +53,14 @@ our @EXPORT= qw(
                 sst_cursor::balenced
                );
 
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Sortkeys =  0;
+$Data::Dumper::Indent    = 1; # default = 2
+
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;
 my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]?/;
@@ -501,6 +509,8 @@ sub sst::splice
     my ($sst, $index, $length, $seq) = @_;
     my $empty_rhs_ws = &sst::_process_ws_first($sst, $index, $length, $seq);
     my $new_seq = &sst::_process_ws($sst, $index, $length, $seq);
+    #my $new_seq = $seq;
+    #print STDERR &Dumper($seq), "\n";
     splice @{$$sst{'tokens'}}, $index, $length, @$new_seq;
     &sst::_process_ws_last($sst, $index, $length, $seq, $empty_rhs_ws);
 }
@@ -534,6 +544,10 @@ sub sst_fragment::filestr
 	{
 	    $prev_was_ident = $is_ident;
 	}
+    }
+    if ("\n" ne substr $filestr, -1) { # add trailing newline if missing
+	print STDERR "Warning: Adding missing final newline\n";
+	$filestr .= "\n";
     }
     return $filestr;
 }

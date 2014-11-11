@@ -254,26 +254,58 @@
 	],
     },
 
-    # if (?ident in? keys ?list-member)
-    # becomes
-    # if (dk:in?(?ident, dk:keys(?list-member)))
-    #
-    # if (?ident in? ?list-member)
-    # becomes
-    # if (dk:in?(?ident, ?list-member))
-    'set-membership-testing' => {
+    # ?ident in      keys|elements   ?expr   )
+    # =>
+    # ?ident in dk : keys|elements ( ?expr ) )
+    'in-keys-or-elements-testing' => {
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'if', '(',                                                '?ident', 'in?', 'keys', '?list-member', ')'      ],
-		'rhs' => [ 'if', '(', 'dk', ':', 'in?', '(', 'dk', ':', 'keys', '(', '?ident', ',',           '?list-member', ')', ')' ]
+		'lhs' => [ '?/if|while/', '(', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
+		'rhs' => [ '?/if|while/', '(', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
 	    },
 	    {
-		'lhs' => [ 'if', '(',                                                '?ident', 'in?',         '?list-member', ')'      ],
-		'rhs' => [ 'if', '(', 'dk', ':', 'in?', '(',                         '?ident', ',',           '?list-member', ')', ')' ]
+		'lhs' => [ 'for', '(', 'object-t', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
+		'rhs' => [ 'for', '(', 'object-t', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
+	    },
+	],
+    },
+
+    # if (      ?ident in  keys ?list-member)
+    # becomes
+    # if (dk:in(?ident, dk:keys(?list-member)))
+    #
+    # if (?ident in         ?list-member)
+    # becomes
+    # if (    dk:in(?ident, ?list-member))
+    'if-while-set-membership-testing' => {
+	'dependencies' => [ 'in-keys-or-elements-testing' ],
+	'rules' => [
+	    {
+		'lhs' => [ '?/if|while/', '(',                       '?ident', 'in', '?list-member',      ')' ],
+		'rhs' => [ '?/if|while/', '(', 'dk', ':', 'in', '(', '?ident', ',',  '?list-member', ')', ')' ]
 	    }
 	],
     },
+
+    # for (object-t ?ident in                        ?list-member)
+    # =>
+    # for (object_t _iterator_ = dk:forward_iterator(?list-member); object_t ?ident = dk:next(_iterator_); )
+    'for-forward-iterator' => {
+	'dependencies' => [ 'in-keys-or-elements-testing' ],
+	'rules' => [
+	    {
+		'lhs' => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],
+		'rhs' => [ 'for', '(', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
+			   'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', ')' ]
+	    },
+	],
+    },
+
+    # $()   tuple
+    # $[]   vector
+    # ${}   set
+    # ${=>} table
 
     # foo:slots-t* slt = unbox(bar)
     # becomes

@@ -37,7 +37,7 @@ use Data::Dumper;
 $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
-$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Useqq     = 1;
 $Data::Dumper::Indent    = 0; # default = 2
 
 our @ISA = qw(Exporter);
@@ -69,7 +69,7 @@ my $constraints =
     '?visibility' =>       \&visibility, # move to a language specific macro
 };
 
-my $debug = 0; # 0 or 1 or 2 or 3
+my $debug;
 
 ### start of constraint variable defns
 sub list_member_term # move to a language specific macro
@@ -270,7 +270,7 @@ sub macro_expand_recursive
 	last if $i > $num_tokens - @{$$rule{'lhs'}};
 
 	my ($last_index, $rhs_for_lhs)
-	    = &rule_match($sst, $i, $$rule{'lhs'}, $user_data, $macro_name);
+	    = &rule_match($sst, $i, $$rule{'lhs'}, $user_data, $macros, $macro_name);
 
 	if (-1 != $last_index) {
 	    &rule_replace($sst, $i, $last_index, $$rule{'rhs'}, $rhs_for_lhs, $macro_name);
@@ -411,9 +411,31 @@ sub literal
     return $result;
 }
 
+sub regex
+{
+    my ($sst, $index, $regex) = @_;
+    my $tkn = &sst::at($sst, $index);
+    my $result = -1;
+    my $re_match;
+
+    if ($tkn =~ $regex) {
+	$result = $index;
+	$re_match = $1;
+    }
+    return ($result, $re_match);
+}
+
+sub regex_from_str
+{
+    my ($str) = @_;
+    $str =~ s|^\?(.+)$|$1|; # strip off leading ? if present
+    $str =~ s|^/(.+)/$|$1|; # strip off leading and trailing / if present
+    return qr/($str)/;
+}
+
 sub rule_match
 {
-    my ($sst, $i, $lhs, $user_data, $name) = @_; # $name is optional
+    my ($sst, $i, $lhs, $user_data, $macros, $name) = @_;
     my $debug2_str = '';
     my $debug3_str = '';
 
@@ -422,22 +444,44 @@ sub rule_match
     my $rhs_for_lhs = {};
 
     for (my $j = 0; $j < @$lhs; $j++) {
+	my $match;
 	my $constraint_name;
-	if ($$lhs[$j] =~ m/^\?$k+$/) {
-	    my $constraint = $$constraints{$$lhs[$j]};
-	    if (!defined $constraint) { die "Could not find implementation for constraint $$lhs[$j]"; }
-	    # match by constraint
-	    $last_index = &$constraint($sst, $prev_last_index, $$lhs[$j], $user_data);
-	    $constraint_name = $$lhs[$j]
-	}
-	else {
-	    # match by literal
-	    $last_index = &literal($sst, $prev_last_index, $$lhs[$j]);
-	    $constraint_name = undef;
-	}
 
+      SWITCH: {
+	  ($$lhs[$j] =~ /^\?\/(.+)\//) && do {
+	      my $part = $1;
+	      # match by regex
+	      my $regex = qr/$part/; my $re_match;
+	      ($last_index, $re_match) = &regex($sst, $prev_last_index, &regex_from_str($$lhs[$j]));
+	      $match = [ { 'str' => $re_match } ];
+	      last SWITCH;
+	  };
+	  ($$lhs[$j] =~ /^\?($k+)$/) && do {
+	      my $part = $1;
+	      # 1: look for other macro with name
+	      my $macro = $$macros{$name};
+	      # match by other macro rhs
+
+	      # 2: look for constraint
+	      my $constraint = $$constraints{$$lhs[$j]};
+	      if (!defined $constraint) { die "Could not find implementation for constraint $$lhs[$j]"; }
+	      # match by constraint
+	      $last_index = &$constraint($sst, $prev_last_index, $$lhs[$j], $user_data);
+	      $match = [ @{$$sst{'tokens'}}[$prev_last_index..$last_index] ];
+	      $constraint_name = $$lhs[$j];
+	      last SWITCH;
+	  };
+	  ($$lhs[$j] =~ /^([^?].*)$/) && do {
+	      # match by literal
+	      $last_index = &literal($sst, $prev_last_index, $$lhs[$j]);
+	      $match = [ { 'str' => "$$sst{'tokens'}[$last_index]{'str'}" } ];
+	      $constraint_name = undef;
+	      last SWITCH;
+	  };
+	  #else
+	  die "unexpected pattern $$lhs[$j]\n";
+	}
 	if (-1 != $last_index) {
-	    my $match = [@{$$sst{'tokens'}}[$prev_last_index..$last_index]];
 	    $$rhs_for_lhs{$$lhs[$j]} = $match;
 	    if (2 <= $debug) { $debug2_str .= &debug_str_match($i, $j, $last_index,
 							       $match, $constraint_name); }
@@ -455,7 +499,7 @@ sub rule_match
 
 sub rule_replace
 {
-    my ($sst, $i, $last_index, $rhs, $rhs_for_lhs, $name) = @_; # $name is optional
+    my ($sst, $i, $last_index, $rhs, $rhs_for_lhs, $name) = @_;
 
     my $replacement = [];
     foreach my $rhstkn (@$rhs) {
@@ -492,6 +536,10 @@ unless (caller) {
     { my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "Can not find $path." }
     else
     { my $path = "$prefix/src/macros.pl"; $macros = do $path or die "Can not find $path." }
+
+    $debug = 0;
+    if ($ENV{'DK_MACROS_DEBUG'}) # 0 or 1 or 2 or 3
+    { $debug = $ENV{'DK_MACROS_DEBUG'}; }
 
     foreach my $arg (@ARGV)
     {

@@ -30,7 +30,7 @@ klass open-token
     object-t close-token;
   }
 
-  // prevents generated dk:va:init() generic from being generated
+  // prevents (normally) generated dk:va:init() generic from being generated
   // because dk:init() is a keyword argument function (normally)
   method object-t va:init(object-t self, va-list-t args)
   {
