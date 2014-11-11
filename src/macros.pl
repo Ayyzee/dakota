@@ -6,8 +6,8 @@
         'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [      'include', '?dquote-str', ';' ],
-		'rhs' => [ '#', 'include', '?dquote-str'      ]
+		'pattern'  => [      'include', '?dquote-str', ';' ],
+		'template' => [ '#', 'include', '?dquote-str'      ]
 	    }
 	],
     },
@@ -21,8 +21,8 @@
         'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'klass',     '?ident', ';'      ],
-		'rhs' => [ 'namespace', '?ident', '{', '}' ]
+		'pattern'  => [ 'klass',     '?ident', ';'      ],
+		'template' => [ 'namespace', '?ident', '{', '}' ]
 	    }
 	],
     },
@@ -34,8 +34,8 @@
         'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'klass',     '?ident', '{' ],
-		'rhs' => [ 'namespace', '?ident', '{' ]
+		'pattern'  => [ 'klass',     '?ident', '{' ],
+		'template' => [ 'namespace', '?ident', '{' ]
 	    }
 	],
     },
@@ -47,8 +47,8 @@
         'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'superklass', '?ident', ';' ],
-		'rhs' => []
+		'pattern'  => [ 'superklass', '?ident', ';' ],
+		'template' => []
 	    },
 	],
     },
@@ -63,8 +63,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'slots',             '?block',     ],
-		'rhs' => [ 'struct', 'slots-t', '?block', ';' ]
+		'pattern'  => [ 'slots',             '?block',     ],
+		'template' => [ 'struct', 'slots-t', '?block', ';' ]
 	    }
 	],
     },
@@ -76,8 +76,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ '?type', '?ident', '=>', '?list-member', '?list-member-term' ], # we can drop the last one
-		'rhs' => [ '?type', '?ident',                       '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ '?type', '?ident', '=>', '?list-member', '?list-member-term' ], # we can drop the last one
+		'template' => [ '?type', '?ident',                       '?list-member-term' ]  # we can drop the last one
 	    }
 	],
     },
@@ -89,8 +89,8 @@
 	'dependencies' => [ 'keyword-args-defn', 'super' ],
 	'rules' => [
 	    {
-		'lhs' => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
-		'rhs' => [ 'dk', ':', 'va', ':', '?ka-ident', '(', '?list-in', ',', 'NULL', ')' ]
+		'pattern'  => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
+		'template' => [ 'dk', ':', 'va', ':', '?ka-ident', '(', '?list-in', ',', 'NULL', ')' ]
 	    }
 	],
     },
@@ -102,8 +102,8 @@
 	'dependencies' => [ 'keyword-args-defn' ],
 	'rules' => [
 	    {
-		'lhs' => [            '?ident', '=>', '?list-member' ], # we can drop the last one
-		'rhs' => [ '$', '##', '?ident', ',',  '?list-member' ]  # we can drop the last one
+		'pattern'  => [            '?ident', '=>', '?list-member' ], # we can drop the last one
+		'template' => [ '$', '##', '?ident', ',',  '?list-member' ]  # we can drop the last one
 	    }
 	],
     },
@@ -115,8 +115,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'method', 'alias', '?list' ],
-		'rhs' => [ 'method'                   ]
+		'pattern'  => [ 'method', 'alias', '?list' ],
+		'template' => [ 'method'                   ]
 	    }
 	],
     },
@@ -128,8 +128,8 @@
 	'dependencies' => [ 'method-alias' ],
 	'rules' => [
 	    {
-		'lhs' => [                         '?visibility', 'method', '?type', 'va', ':', '?ident', '?list', '?block'      ],
-		'rhs' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',            '?ident', '?list', '?block', '}' ]
+		'pattern'  => [                         '?visibility', 'method', '?type', 'va', ':', '?ident', '?list', '?block'      ],
+		'template' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',            '?ident', '?list', '?block', '}' ]
 	    }
 	],
     },
@@ -141,8 +141,8 @@
 	'dependencies' => [ 'method-alias', 'va-method' ],
 	'rules' => [
 	    {
-		'lhs' => [ 'export', 'method', '?type', '?ident', '?list' ],
-		'rhs' => [ 'extern',           '?type', '?ident', '?list' ]
+		'pattern'  => [ 'export', 'method', '?type', '?ident', '?list' ],
+		'template' => [ 'extern',           '?type', '?ident', '?list' ]
 	    }
 	],
     },
@@ -154,8 +154,8 @@
 	'dependencies' => [ 'export-method', 'method-alias', 'va-method' ],
 	'rules' => [
 	    {
-		'lhs' => [ 'method', '?type', '?ident', '?list' ],
-		'rhs' => [ 'static', '?type', '?ident', '?list' ]
+		'pattern'  => [ 'method', '?type', '?ident', '?list' ],
+		'template' => [ 'static', '?type', '?ident', '?list' ]
 	    }
 	],
     },
@@ -169,8 +169,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'dk', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
-		'rhs' => [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ 'dk', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
+		'template' => [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
 	    }
 	],
     },
@@ -183,8 +183,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
-		'rhs' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
+		'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
 	    }
 	],
     },
@@ -196,8 +196,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [               'self',      '.',  '?ident' ],
-		'rhs' => [ 'unbox', '(', 'self', ')', '->', '?ident' ]
+		'pattern'  => [               'self',      '.',  '?ident' ],
+		'template' => [ 'unbox', '(', 'self', ')', '->', '?ident' ]
 	    }
 	],
     },
@@ -209,8 +209,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ '?ident', ':', 'box', '(',                             '{', '?block-in', '}', ')' ],
-		'rhs' => [ '?ident', ':', 'box', '(', '?ident', ':', 'construct', '(', '?block-in', ')', ')' ]
+		'pattern'  => [ '?ident', ':', 'box', '(',                             '{', '?block-in', '}', ')' ],
+		'template' => [ '?ident', ':', 'box', '(', '?ident', ':', 'construct', '(', '?block-in', ')', ')' ]
 	    }
 	],
     },
@@ -222,8 +222,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'throw',                              'make', '(', '?list-in', ')' ], # we can drop the last two
-		'rhs' => [ 'throw', 'dk-current-exception', '=', 'make', '(', '?list-in', ')' ], # we can drop the last two
+		'pattern'  => [ 'throw',                              'make', '(', '?list-in', ')' ], # we can drop the last two
+		'template' => [ 'throw', 'dk-current-exception', '=', 'make', '(', '?list-in', ')' ], # we can drop the last two
 	    }
 	],
     },
@@ -235,8 +235,8 @@
 	'dependencies' => [ 'throw-capture-exception' ],
 	'rules' => [
 	    {
-		'lhs' => [ 'make',                                     '(', '?list-member',      '?list-member-term' ], # we can drop the last one
-		'rhs' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?list-member', ')', '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ 'make',                                     '(', '?list-member',      '?list-member-term' ], # we can drop the last one
+		'template' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?list-member', ')', '?list-member-term' ]  # we can drop the last one
 	    }
 	],
     },
@@ -248,8 +248,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ 'export', 'enum', '?type-ident', '?block' ],
-		'rhs' => []
+		'pattern'  => [ 'export', 'enum', '?type-ident', '?block' ],
+		'template' => []
 	    }
 	],
     },
@@ -261,12 +261,12 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'lhs' => [ '?/if|while/', '(', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
-		'rhs' => [ '?/if|while/', '(', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
+		'pattern'  => [ '?/if|while/', '(', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
+		'template' => [ '?/if|while/', '(', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
 	    },
 	    {
-		'lhs' => [ 'for', '(', 'object-t', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
-		'rhs' => [ 'for', '(', 'object-t', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
+		'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
+		'template' => [ 'for', '(', 'object-t', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
 	    },
 	],
     },
@@ -282,8 +282,8 @@
 	'dependencies' => [ 'in-keys-or-elements-testing' ],
 	'rules' => [
 	    {
-		'lhs' => [ '?/if|while/', '(',                       '?ident', 'in', '?list-member',      ')' ],
-		'rhs' => [ '?/if|while/', '(', 'dk', ':', 'in', '(', '?ident', ',',  '?list-member', ')', ')' ]
+		'pattern'  => [ '?/if|while/', '(',                       '?ident', 'in', '?list-member',      ')' ],
+		'template' => [ '?/if|while/', '(', 'dk', ':', 'in', '(', '?ident', ',',  '?list-member', ')', ')' ]
 	    }
 	],
     },
@@ -295,8 +295,8 @@
 	'dependencies' => [ 'in-keys-or-elements-testing' ],
 	'rules' => [
 	    {
-		'lhs' => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],
-		'rhs' => [ 'for', '(', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
+		'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],
+		'template' => [ 'for', '(', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
 			   'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', ')' ]
 	    },
 	],

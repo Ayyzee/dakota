@@ -267,13 +267,13 @@ sub macro_expand_recursive
     }
     my $num_tokens = scalar @{$$sst{'tokens'}};
     foreach my $rule (@{$$macro{'rules'}}) {
-	last if $i > $num_tokens - @{$$rule{'lhs'}};
+	last if $i > $num_tokens - @{$$rule{'pattern'}};
 
-	my ($last_index, $rhs_for_lhs)
-	    = &rule_match($sst, $i, $$rule{'lhs'}, $user_data, $macros, $macro_name);
+	my ($last_index, $rhs_for_pattern)
+	    = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name);
 
 	if (-1 != $last_index) {
-	    &rule_replace($sst, $i, $last_index, $$rule{'rhs'}, $rhs_for_lhs, $macro_name);
+	    &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $macro_name);
 	    $change_count++;
 	    last;
 	}
@@ -435,54 +435,54 @@ sub regex_from_str
 
 sub rule_match
 {
-    my ($sst, $i, $lhs, $user_data, $macros, $name) = @_;
+    my ($sst, $i, $pattern, $user_data, $macros, $name) = @_;
     my $debug2_str = '';
     my $debug3_str = '';
 
     my $prev_last_index = $i;
     my $last_index = $i;
-    my $rhs_for_lhs = {};
+    my $rhs_for_pattern = {};
 
-    for (my $j = 0; $j < @$lhs; $j++) {
+    for (my $j = 0; $j < @$pattern; $j++) {
 	my $match;
 	my $constraint_name;
 
       SWITCH: {
-	  ($$lhs[$j] =~ /^\?\/(.+)\//) && do {
+	  ($$pattern[$j] =~ /^\?\/(.+)\//) && do {
 	      my $part = $1;
 	      # match by regex
 	      my $regex = qr/$part/; my $re_match;
-	      ($last_index, $re_match) = &regex($sst, $prev_last_index, &regex_from_str($$lhs[$j]));
+	      ($last_index, $re_match) = &regex($sst, $prev_last_index, &regex_from_str($$pattern[$j]));
 	      $match = [ { 'str' => $re_match } ];
 	      last SWITCH;
 	  };
-	  ($$lhs[$j] =~ /^\?($k+)$/) && do {
+	  ($$pattern[$j] =~ /^\?($k+)$/) && do {
 	      my $part = $1;
 	      # 1: look for other macro with name
 	      my $macro = $$macros{$name};
 	      # match by other macro rhs
 
 	      # 2: look for constraint
-	      my $constraint = $$constraints{$$lhs[$j]};
-	      if (!defined $constraint) { die "Could not find implementation for constraint $$lhs[$j]"; }
+	      my $constraint = $$constraints{$$pattern[$j]};
+	      if (!defined $constraint) { die "Could not find implementation for constraint $$pattern[$j]"; }
 	      # match by constraint
-	      $last_index = &$constraint($sst, $prev_last_index, $$lhs[$j], $user_data);
+	      $last_index = &$constraint($sst, $prev_last_index, $$pattern[$j], $user_data);
 	      $match = [ @{$$sst{'tokens'}}[$prev_last_index..$last_index] ];
-	      $constraint_name = $$lhs[$j];
+	      $constraint_name = $$pattern[$j];
 	      last SWITCH;
 	  };
-	  ($$lhs[$j] =~ /^([^?].*)$/) && do {
+	  ($$pattern[$j] =~ /^([^?].*)$/) && do {
 	      # match by literal
-	      $last_index = &literal($sst, $prev_last_index, $$lhs[$j]);
+	      $last_index = &literal($sst, $prev_last_index, $$pattern[$j]);
 	      $match = [ { 'str' => "$$sst{'tokens'}[$last_index]{'str'}" } ];
 	      $constraint_name = undef;
 	      last SWITCH;
 	  };
 	  #else
-	  die "unexpected pattern $$lhs[$j]\n";
+	  die "unexpected pattern $$pattern[$j]\n";
 	}
 	if (-1 != $last_index) {
-	    $$rhs_for_lhs{$$lhs[$j]} = $match;
+	    $$rhs_for_pattern{$$pattern[$j]} = $match;
 	    if (2 <= $debug) { $debug2_str .= &debug_str_match($i, $j, $last_index,
 							       $match, $constraint_name); }
 	    $prev_last_index = $last_index + 1;
@@ -493,26 +493,25 @@ sub rule_match
 	    last;
 	}
     }
-    &debug_print_match($name, $debug2_str, $debug3_str, $i, $last_index, $lhs, $sst);
-    return ($last_index, $rhs_for_lhs);
+    &debug_print_match($name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst);
+    return ($last_index, $rhs_for_pattern);
 }
 
 sub rule_replace
 {
-    my ($sst, $i, $last_index, $rhs, $rhs_for_lhs, $name) = @_;
+    my ($sst, $i, $last_index, $template, $rhs_for_pattern, $name) = @_;
 
     my $replacement = [];
-    foreach my $rhstkn (@$rhs) {
-	my $tkns = $$rhs_for_lhs{$rhstkn};
-	if (!$tkns) { # these are tokens that exists only in the rhs and not in the lhs
-	    $tkns = [{ 'str'         => $rhstkn,
-		       'leading-ws'  => '' }];
+    foreach my $tkn (@$template) {
+	my $tkns = $$rhs_for_pattern{$tkn};
+	if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
+	    $tkns = [ { 'str' => $tkn } ];
 	}
 	push @$replacement, @$tkns;
     }
     &sst::shift_leading_ws($sst, $i);
     my $lhs_num_tokens = $last_index - $i + 1;
-    &debug_print_replace($rhs, $replacement, $lhs_num_tokens);
+    &debug_print_replace($template, $replacement, $lhs_num_tokens);
     &sst::splice($sst, $i, $lhs_num_tokens, $replacement);
 }
 
