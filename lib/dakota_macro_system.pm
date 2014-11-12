@@ -520,7 +520,6 @@ sub rule_replace
 		$tkns = [ { 'str' => $tkn } ];
 	    }
 	}
-	die if !scalar @$tkns;
 	push @$rhs, @$tkns;
     }
     &sst::shift_leading_ws($sst, $i);
