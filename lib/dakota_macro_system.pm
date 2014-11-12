@@ -269,11 +269,12 @@ sub macro_expand_recursive
     foreach my $rule (@{$$macro{'rules'}}) {
 	last if $i > $num_tokens - @{$$rule{'pattern'}};
 
-	my ($last_index, $rhs_for_pattern)
+	my ($last_index, $rhs_for_pattern, $lhs)
 	    = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name);
 
 	if (-1 != $last_index) {
-	    &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $macro_name);
+	    #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
+	    &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
 	    $change_count++;
 	    last;
 	}
@@ -442,13 +443,14 @@ sub rule_match
     my $prev_last_index = $i;
     my $last_index = $i;
     my $rhs_for_pattern = {};
+    my $lhs = [];
 
     for (my $j = 0; $j < @$pattern; $j++) {
 	my $match;
 	my $constraint_name;
 
       SWITCH: {
-	  ($$pattern[$j] =~ /^\?\/(.+)\//) && do {
+	  ($$pattern[$j] =~ /^\?\/(.+)\//) && do { # ?/some-regex/
 	      my $part = $1;
 	      # match by regex
 	      my $regex = qr/$part/; my $re_match;
@@ -456,7 +458,7 @@ sub rule_match
 	      $match = [ { 'str' => $re_match } ];
 	      last SWITCH;
 	  };
-	  ($$pattern[$j] =~ /^\?($k+)$/) && do {
+	  ($$pattern[$j] =~ /^\?($k+)$/) && do { # ?some-ident
 	      my $part = $1;
 	      # 1: look for other macro with name
 	      my $macro = $$macros{$name};
@@ -471,7 +473,7 @@ sub rule_match
 	      $constraint_name = $$pattern[$j];
 	      last SWITCH;
 	  };
-	  ($$pattern[$j] =~ /^([^?].*)$/) && do {
+	  ($$pattern[$j] =~ /^([^?].*)$/) && do { # anything not begining with ?
 	      # match by literal
 	      $last_index = &literal($sst, $prev_last_index, $$pattern[$j]);
 	      $match = [ { 'str' => "$$sst{'tokens'}[$last_index]{'str'}" } ];
@@ -483,6 +485,7 @@ sub rule_match
 	}
 	if (-1 != $last_index) {
 	    $$rhs_for_pattern{$$pattern[$j]} = $match;
+	    push @$lhs, $match;
 	    if (2 <= $debug) { $debug2_str .= &debug_str_match($i, $j, $last_index,
 							       $match, $constraint_name); }
 	    $prev_last_index = $last_index + 1;
@@ -494,19 +497,30 @@ sub rule_match
 	}
     }
     &debug_print_match($name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst);
-    return ($last_index, $rhs_for_pattern);
+    return ($last_index, $rhs_for_pattern, $lhs);
 }
 
 sub rule_replace
 {
-    my ($sst, $i, $last_index, $template, $rhs_for_pattern, $name) = @_;
+    my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $name) = @_;
 
     my $rhs = [];
     foreach my $tkn (@$template) {
-	my $tkns = $$rhs_for_pattern{$tkn};
-	if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
-	    $tkns = [ { 'str' => $tkn } ];
+	die if !$tkn;
+	my $tkns;
+
+	if ($tkn =~ /^\?(\d+)$/) {
+	    die if 0 == $1;
+	      my $j = $1 - 1;
+	      $tkns = $$lhs[$j];
 	}
+	else {
+	    $tkns = $$rhs_for_pattern{$tkn};
+	    if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
+		$tkns = [ { 'str' => $tkn } ];
+	    }
+	}
+	die if !scalar @$tkns;
 	push @$rhs, @$tkns;
     }
     &sst::shift_leading_ws($sst, $i);
@@ -542,6 +556,7 @@ unless (caller) {
 
     foreach my $arg (@ARGV)
     {
+	print STDERR "$arg\n";
 	my $filestr = &dakota::filestr_from_file($arg);
 	my $sst = &sst::make($filestr, $arg);
 	&macros_expand($sst, $macros, $user_data);

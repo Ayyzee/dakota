@@ -209,8 +209,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ '?ident', ':', 'box', '(',                             '{', '?block-in', '}', ')' ],
-		'template' => [ '?ident', ':', 'box', '(', '?ident', ':', 'construct', '(', '?block-in', ')', ')' ]
+		'pattern'  => [ '?ident', ':', 'box', '(',                              '{', '?block-in', '}', ')' ],
+		'template' => [ '?ident', ':', 'box', '?4', '?ident', ':', 'construct', '(', '?block-in', ')', '?8' ]
 	    }
 	],
     },
@@ -235,8 +235,8 @@
 	'dependencies' => [ 'throw-capture-exception' ],
 	'rules' => [
 	    {
-		'pattern'  => [ 'make',                                     '(', '?list-member',      '?list-member-term' ], # we can drop the last one
-		'template' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '(', '?list-member', ')', '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ 'make',                                     '(',  '?list-member',      '?list-member-term' ], # we can drop the last one
+		'template' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '?2', '?list-member', ')', '?list-member-term' ]  # we can drop the last one
 	    }
 	],
     },
@@ -261,12 +261,12 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ '?/if|while/', '(', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
-		'template' => [ '?/if|while/', '(', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
+		'pattern'  => [ '?/if|while/', '(',  '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
+		'template' => [ '?/if|while/', '?2', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
 	    },
 	    {
-		'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')' ],
-		'template' => [ 'for', '(', 'object-t', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', ')' ]
+		'pattern'  => [ 'for', '(',  'object-t', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
+		'template' => [ 'for', '?2', 'object-t', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', '?8' ]
 	    },
 	],
     },
@@ -282,8 +282,8 @@
 	'dependencies' => [ 'in-keys-or-elements-testing' ],
 	'rules' => [
 	    {
-		'pattern'  => [ '?/if|while/', '(',                       '?ident', 'in', '?list-member',      ')' ],
-		'template' => [ '?/if|while/', '(', 'dk', ':', 'in', '(', '?ident', ',',  '?list-member', ')', ')' ]
+		'pattern'  => [ '?/if|while/', '(',                        '?ident', 'in', '?list-member',      ')' ],
+		'template' => [ '?/if|while/', '?2', 'dk', ':', 'in', '(', '?ident', ',',  '?list-member', ')', '?6' ]
 	    }
 	],
     },
@@ -296,8 +296,8 @@
 	'rules' => [
 	    {
 		'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],
-		'template' => [ 'for', '(', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
-			   'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', ')' ]
+		'template' => [ 'for', '$2', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
+			   'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', '?7' ]
 	    },
 	],
     },
