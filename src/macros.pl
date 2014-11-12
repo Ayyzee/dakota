@@ -1,3 +1,7 @@
+# default values
+# optional sequence of tokens (more than one)
+# resolve concatenation and stringification
+
 {
     # include  ?dquote-str ;
     # =>
@@ -17,25 +21,20 @@
     # klass     ?ident ;
     # =>
     # namespace ?ident {}
-    'klass-decl' => {
-        'dependencies' => [],
-	'rules' => [
-	    {
-		'pattern'  => [ 'klass',     '?ident', ';'      ],
-		'template' => [ 'namespace', '?ident', '{', '}' ]
-	    }
-	],
-    },
-
+    #
     # klass     ?ident {
     # =>
     # namespace ?ident {
-    'klass-defn' => {
+    'klass-trait-decl-defn' => {
         'dependencies' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'klass',     '?ident', '{' ],
-		'template' => [ 'namespace', '?ident', '{' ]
+		'pattern'  => [ '?/klass|trait/', '?ident', ';'      ],
+		'template' => [ 'namespace',      '?ident', '{', '}' ]
+	    },
+	    {
+		'pattern'  => [ '?/klass|trait/', '?ident', '{' ],
+		'template' => [ 'namespace',      '?ident', '{' ]
 	    }
 	],
     },
@@ -72,12 +71,20 @@
     # ?type => ?list-member ,|)
     # =>
     # ?type                 ,|)
+    #
+    #       ?ident => ?list-member
+    # =>
+    #  $ ## ?ident ,  ?list-member
     'keyword-args-defn' => {
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ '?type', '?ident', '=>', '?list-member', '?list-member-term' ], # we can drop the last one
-		'template' => [ '?type', '?ident',                       '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ '?type',   '?ident', '=>', '?list-member', ],
+		'template' => [ '?type',   '?ident',                       ]
+	    },
+	    {
+		'pattern'  => [            '?ident', '=>',  ],
+		'template' => [ '$', '##', '?ident', ',',   ]
 	    }
 	],
     },
@@ -91,19 +98,6 @@
 	    {
 		'pattern'  => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
 		'template' => [ 'dk', ':', 'va', ':', '?ka-ident', '(', '?list-in', ',', 'NULL', ')' ]
-	    }
-	],
-    },
-
-    #       ?ident => ?list-member
-    # =>
-    #  $ ## ?ident ,  ?list-member
-    'keyword-args-use' => {
-	'dependencies' => [ 'keyword-args-defn' ],
-	'rules' => [
-	    {
-		'pattern'  => [            '?ident', '=>', '?list-member' ], # we can drop the last one
-		'template' => [ '$', '##', '?ident', ',',  '?list-member' ]  # we can drop the last one
 	    }
 	],
     },
@@ -165,26 +159,20 @@
     # dk:?ident(super ,|)
     # =>
     # dk:?ident(super:construct(self,klass) ,|)
-    'super' => {
-	'dependencies' => [],
-	'rules' => [
-	    {
-		'pattern'  => [ 'dk', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
-		'template' => [ 'dk', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
-	    }
-	],
-    },
-
-    # for the very rare case that a user calls the dk:va: generic
+    #
     # dk:va:?ident(super ,|)
     # =>
     # dk:va:?ident(super:construct(self,klass) ,|)
-    'va-super' => {
+    'super' => {
 	'dependencies' => [],
-	'rules' => [
+	'rules' => [ # the last term is there to prevent infinite recursion
 	    {
-		'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                                   '?list-member-term' ], # we can drop the last one
-		'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ 'dk', ':',            '?ident', '(', 'super',                                                   '?list-member-term' ],
+		'template' => [ 'dk', ':',            '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]
+	    },
+	    {   # for the very rare case that a user calls the dk:va: generic
+		'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                                   '?list-member-term' ],
+		'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]
 	    }
 	],
     },
@@ -222,8 +210,8 @@
 	'dependencies' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'throw',                              'make', '(', '?list-in', ')' ], # we can drop the last two
-		'template' => [ 'throw', 'dk-current-exception', '=', 'make', '(', '?list-in', ')' ], # we can drop the last two
+		'pattern'  => [ 'throw',                              'make', '(', ],
+		'template' => [ 'throw', 'dk-current-exception', '=', 'make', '(', ]
 	    }
 	],
     },
@@ -235,8 +223,8 @@
 	'dependencies' => [ 'throw-capture-exception' ],
 	'rules' => [
 	    {
-		'pattern'  => [ 'make',                                     '(',  '?list-member',      '?list-member-term' ], # we can drop the last one
-		'template' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '?2', '?list-member', ')', '?list-member-term' ]  # we can drop the last one
+		'pattern'  => [ 'make',                                     '(',  '?list-member'      ],
+		'template' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '?2', '?list-member', ')' ]
 	    }
 	],
     },
@@ -296,7 +284,7 @@
 	'rules' => [
 	    {
 		'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],
-		'template' => [ 'for', '$2', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
+		'template' => [ 'for', '?2', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
 			   'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', '?7' ]
 	    },
 	],
