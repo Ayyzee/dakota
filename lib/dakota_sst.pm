@@ -443,7 +443,7 @@ sub sst::dump
     {
 	my $tkn .= &sst::at($sst, $i);
 	$str .= $delim;
-	$str .= "'$tkn'";
+	$str .= "\"$tkn\"";
 	$delim = ',';
     }
     return "\[$str\]";

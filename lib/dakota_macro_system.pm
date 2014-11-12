@@ -309,13 +309,13 @@ sub macros_expand
 
 sub rhs_dump
 {
-    my ($seq) = @_;
+    my ($rhs) = @_;
     my $delim = '';
     my $str = '';
 
-    foreach my $tkn (@$seq) {
+    foreach my $tkn (@$rhs) {
 	$str .= $delim;
-	$str .= "'$$tkn{'str'}'";
+	$str .= "\"$$tkn{'str'}\"";
 	$delim = ',';
     }
     return "\[$str\]";
@@ -357,13 +357,13 @@ sub debug_str_match
 
 sub debug_print_match
 {
-    my ($name, $str2, $str3, $i, $last_index, $lhs, $sst) = @_;
+    my ($name, $str2, $str3, $i, $last_index, $pattern, $sst) = @_;
 
     if ($debug >= 2 || $last_index != -1 && $debug >= 1) {
 	my $indent = $Data::Dumper::Indent;
 	$Data::Dumper::Indent = 0;
 	print STDERR " {\n";
-	print STDERR "  'macro' =>        '\?$name'", ",\n";
+	print STDERR "  'macro' =>          \"$name\"", ",\n";
 	    
 	if (2 <= $debug && ('' ne $str2 || '' ne $str3)) {
 	    print STDERR "  'details' =>", "\n";
@@ -375,9 +375,9 @@ sub debug_print_match
 	    print STDERR "  \]", ",\n";
 	}
 	    
-	print STDERR "  'range' =>         ", &Dumper([$i, $last_index]), ",\n";
-	print STDERR "  'pattern' =>       ", &Dumper($lhs), ",\n";
-	print STDERR "  'lhs' =>           ", &sst::dump($sst, $i, $last_index), ",\n";
+	print STDERR "  'range' =>          ", &Dumper([$i, $last_index]), ",\n";
+	print STDERR "  'pattern' =>        ", &Dumper($pattern), ",\n";
+	print STDERR "  'lhs' =>            ", &sst::dump($sst, $i, $last_index), ",\n";
 	$Data::Dumper::Indent = $indent;
 
 	if (-1 == $last_index) {
@@ -388,13 +388,13 @@ sub debug_print_match
 
 sub debug_print_replace
 {
-    my ($rhs, $replacement, $lhs_num_tokens) = @_;
+    my ($template, $rhs, $lhs_num_tokens) = @_;
     if ($debug) {
-	print STDERR "  'template' =>      ", &Dumper($rhs), ",\n";
-	print STDERR "  'rhs' =>           ", &rhs_dump($replacement), ",\n";
-	my $rhs_num_tokens = scalar @$replacement;
-	print STDERR "  'lhs-num-tokens' => '$lhs_num_tokens'", ",\n";
-	print STDERR "  'rhs-num-tokens' => '$rhs_num_tokens'", ",\n";
+	print STDERR "  'template' =>       ", &Dumper($template), ",\n";
+	print STDERR "  'rhs' =>            ", &rhs_dump($rhs), ",\n";
+	my $rhs_num_tokens = scalar @$rhs;
+	print STDERR "  'lhs-num-tokens' => $lhs_num_tokens", ",\n";
+	print STDERR "  'rhs-num-tokens' => $rhs_num_tokens", ",\n";
 	print STDERR " }", ",\n";
     }
 }
@@ -501,18 +501,18 @@ sub rule_replace
 {
     my ($sst, $i, $last_index, $template, $rhs_for_pattern, $name) = @_;
 
-    my $replacement = [];
+    my $rhs = [];
     foreach my $tkn (@$template) {
 	my $tkns = $$rhs_for_pattern{$tkn};
 	if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
 	    $tkns = [ { 'str' => $tkn } ];
 	}
-	push @$replacement, @$tkns;
+	push @$rhs, @$tkns;
     }
     &sst::shift_leading_ws($sst, $i);
     my $lhs_num_tokens = $last_index - $i + 1;
-    &debug_print_replace($template, $replacement, $lhs_num_tokens);
-    &sst::splice($sst, $i, $lhs_num_tokens, $replacement);
+    &debug_print_replace($template, $rhs, $lhs_num_tokens);
+    &sst::splice($sst, $i, $lhs_num_tokens, $rhs);
 }
 
 sub dk_lang_user_data {
