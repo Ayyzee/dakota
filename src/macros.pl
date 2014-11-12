@@ -1,6 +1,7 @@
 # default values
 # optional sequence of tokens (more than one)
 # resolve concatenation and stringification
+# comments
 
 {
     # include  ?dquote-str ;
@@ -18,19 +19,19 @@
 
     # how about include <...> ;
 
-    # klass     ?ident ;
+    # klass|trait ?ident ;
     # =>
-    # namespace ?ident {}
     #
-    # klass     ?ident {
+    #
+    # klass|trait ?ident {
     # =>
-    # namespace ?ident {
-    'klass-trait-decl-defn' => {
+    # namespace   ?ident {
+    'klass-trait-decl+defn' => {
         'dependencies' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ '?/klass|trait/', '?ident', ';'      ],
-		'template' => [ 'namespace',      '?ident', '{', '}' ]
+		'pattern'  => [ '?/klass|trait/', '?ident', ';' ],
+		'template' => []
 	    },
 	    {
 		'pattern'  => [ '?/klass|trait/', '?ident', '{' ],
@@ -75,7 +76,7 @@
     #       ?ident => ?list-member
     # =>
     #  $ ## ?ident ,  ?list-member
-    'keyword-args-defn' => {
+    'keyword-args-defn+use' => {
 	'dependencies' => [],
 	'rules' => [
 	    {
@@ -93,7 +94,7 @@
     # =>
     # dk: va: ?ka-ident ( ?list-in, NULL )
     'keyword-args-wrap' => {
-	'dependencies' => [ 'keyword-args-defn', 'super' ],
+	'dependencies' => [ 'keyword-args-defn+use', 'super' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
@@ -118,7 +119,7 @@
     #                ?visibility method ?type va : ?ident(...) { ... }
     # =>
     # namespace va { ?visibility method ?type      ?ident(...) { ... } }
-    'va-method' => {
+    'va-method-defn' => {
 	'dependencies' => [ 'method-alias' ],
 	'rules' => [
 	    {
@@ -132,7 +133,7 @@
     # =>
     # extern        ?type ?ident(...)
     'export-method' => {
-	'dependencies' => [ 'method-alias', 'va-method' ],
+	'dependencies' => [ 'method-alias', 'va-method-defn' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'export', 'method', '?type', '?ident', '?list' ],
@@ -145,7 +146,7 @@
     # =>
     # static ?type ?ident(...)
     'method' => {
-	'dependencies' => [ 'export-method', 'method-alias', 'va-method' ],
+	'dependencies' => [ 'export-method', 'method-alias', 'va-method-defn' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'method', '?type', '?ident', '?list' ],
@@ -154,25 +155,25 @@
 	],
     },
 
-    # try to merge super and va-super (make the va: optional)
+    # try to merge both super rules (make the va: optional)
 
     # dk:?ident(super ,|)
     # =>
-    # dk:?ident(super:construct(self,klass) ,|)
+    # dk:?ident(super-t(self,klass) ,|)
     #
     # dk:va:?ident(super ,|)
     # =>
-    # dk:va:?ident(super:construct(self,klass) ,|)
+    # dk:va:?ident(super-t(self,klass) ,|)
     'super' => {
 	'dependencies' => [],
-	'rules' => [ # the last term is there to prevent infinite recursion
+	'rules' => [
 	    {
-		'pattern'  => [ 'dk', ':',            '?ident', '(', 'super',                                                   '?list-member-term' ],
-		'template' => [ 'dk', ':',            '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]
+		'pattern'  => [ 'dk', ':',            '?ident', '(', 'super'                                   ],
+		'template' => [ 'dk', ':',            '?ident', '(', 'super-t', '(', 'self', ',', 'klass', ')' ]
 	    },
 	    {   # for the very rare case that a user calls the dk:va: generic
-		'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                                   '?list-member-term' ],
-		'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', ':', 'construct', '(', 'self', ',', 'klass', ')', '?list-member-term' ]
+		'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super'                                   ],
+		'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super-t', '(', 'self', ',', 'klass', ')' ]
 	    }
 	],
     },
@@ -260,11 +261,11 @@
     },
 
     # if (      ?ident in  keys ?list-member)
-    # becomes
+    # =>
     # if (dk:in(?ident, dk:keys(?list-member)))
     #
     # if (?ident in         ?list-member)
-    # becomes
+    # =>
     # if (    dk:in(?ident, ?list-member))
     'if-while-set-membership-testing' => {
 	'dependencies' => [ 'in-keys-or-elements-testing' ],
@@ -296,18 +297,18 @@
     # ${=>} table
 
     # foo:slots-t* slt = unbox(bar)
-    # becomes
+    # =>
     # foo:slots-t* slt = foo:unbox(bar)
 
     # foo:slots-t& slt = *unbox(bar)
-    # becomes
+    # =>
     # foo:slots-t& slt = *foo:unbox(bar)
 
     # foo-t* slt = unbox(bar)
-    # becomes
+    # =>
     # foo-t* slt = foo:unbox(bar)
 
     # foo-t& slt = *unbox(bar)
-    # becomes
+    # =>
     # foo-t& slt = *foo:unbox(bar)
 }
