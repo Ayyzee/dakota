@@ -8,7 +8,7 @@
     # =>
     # #include ?dquote-str
     'include-stmt' => {
-        'dependencies' => [],
+        'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [      'include', '?dquote-str', ';' ],
@@ -27,7 +27,7 @@
     # =>
     # namespace   ?ident {
     'klass-trait-decl+defn' => {
-        'dependencies' => [],
+        'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ '?/klass|trait/', '?ident', ';' ],
@@ -44,7 +44,7 @@
     # =>
     # 
     'superklass-decl' => {
-        'dependencies' => [],
+        'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ 'superklass', '?ident', ';' ],
@@ -60,7 +60,7 @@
     # =>
     # struct slots-t { ... } ;
     'slots-defn' => {
-	'dependencies' => [],
+	'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ 'slots',             '?block',     ],
@@ -77,7 +77,7 @@
     # =>
     #  $ ## ?ident ,  ?list-member
     'keyword-args-defn+use' => {
-	'dependencies' => [],
+	'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ '?type',   '?ident', '=>', '?list-member', ],
@@ -94,7 +94,7 @@
     # =>
     # dk: va: ?ka-ident ( ?list-in, NULL )
     'keyword-args-wrap' => {
-	'dependencies' => [ 'keyword-args-defn+use', 'super' ],
+	'before' => [ 'keyword-args-defn+use', 'super' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
@@ -107,7 +107,7 @@
     # =>
     # method
     'method-alias' => {
-	'dependencies' => [],
+	'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ 'method', 'alias', '?list' ],
@@ -120,7 +120,7 @@
     # =>
     # namespace va { ?visibility method ?type      ?ident(...) { ... } }
     'va-method-defn' => {
-	'dependencies' => [ 'method-alias' ],
+	'before' => [ 'method-alias' ],
 	'rules' => [
 	    {
 		'pattern'  => [                         '?visibility', 'method', '?type', 'va', ':', '?ident', '?list', '?block'      ],
@@ -133,7 +133,7 @@
     # =>
     # extern        ?type ?ident(...)
     'export-method' => {
-	'dependencies' => [ 'method-alias', 'va-method-defn' ],
+	'before' => [ 'method-alias', 'va-method-defn' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'export', 'method', '?type', '?ident', '?list' ],
@@ -146,7 +146,7 @@
     # =>
     # static ?type ?ident(...)
     'method' => {
-	'dependencies' => [ 'export-method', 'method-alias', 'va-method-defn' ],
+	'before' => [ 'export-method', 'method-alias', 'va-method-defn' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'method', '?type', '?ident', '?list' ],
@@ -165,15 +165,16 @@
     # =>
     # dk:va:?ident(super-t(self,klass) ,|)
     'super' => {
-	'dependencies' => [],
+	'before' => [],
+	'after' => [ 'construct-klass-slots-literal' ],
 	'rules' => [
 	    {
-		'pattern'  => [ 'dk', ':',            '?ident', '(', 'super'                                   ],
-		'template' => [ 'dk', ':',            '?ident', '(', 'super-t', '(', 'self', ',', 'klass', ')' ]
+		'pattern'  => [ 'dk', ':',            '?ident', '(', 'super',                                           '?list-member-term' ],
+		'template' => [ 'dk', ':',            '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
 	    },
 	    {   # for the very rare case that a user calls the dk:va: generic
-		'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super'                                   ],
-		'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super-t', '(', 'self', ',', 'klass', ')' ]
+		'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                           '?list-member-term' ],
+		'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
 	    }
 	],
     },
@@ -182,7 +183,7 @@
     # =>
     # unbox(self)->?ident
     'slot-access' => {
-	'dependencies' => [],
+	'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [               'self',      '.',  '?ident' ],
@@ -191,15 +192,39 @@
 	],
     },
 
+    # ?{ident}-t ?ident = box({ ... })
+    # =>
+    # ?{ident}-t ?ident = ?{ident}:box({ ... })
+    # or
+    # ?type ?ident = box({ ... })
+    # =>
+    # ?type ?ident = box(cast(?type){ ... })
+
     # ?ident:box({ ... })
     # =>
-    # ?ident:box(?ident:construct(...))
-    'box-arg-compound-literal' => {
-	'dependencies' => [],
+    # ?ident:box(?ident({ ... }))
+    'explicit-box-literal' => {
+	'before' => [],
+	'after' => [ 'construct-klass-slots-literal' ],
 	'rules' => [
 	    {
-		'pattern'  => [ '?ident', ':', 'box', '(',                              '{', '?block-in', '}', ')' ],
-		'template' => [ '?ident', ':', 'box', '?4', '?ident', ':', 'construct', '(', '?block-in', ')', '?8' ]
+		'pattern'  => [ '?ident', ':', 'box', '(',                 '{', '?block-in', '}',      ')'  ],
+		'template' => [ '?ident', ':', 'box', '?4', '?ident', '(', '{', '?block-in', '}', ')', '?8' ]
+	    }
+	],
+    },
+
+    # ?ident({ ... })
+    # =>
+    # ?ident:construct(...)
+    'construct-klass-slots-literal' => {
+	'before' => [],
+	'rules' => [
+	    {   # ?ident is a klass-name
+		'pattern'  => [ '?ident',                       '(', '{', '?block-in', '}', ')' ],
+		'template' => [ '?ident',     ':', 'construct', '(',      '?block-in',      ')' ]
+	       #'template' => [ 'cast', '(', '?{ident}-t', ')',      '{', '?block-in', '}'      ]
+	       #'template' => [ '?{ident}-t',                   '(',      '?block-in',      ')' ]
 	    }
 	],
     },
@@ -208,7 +233,7 @@
     # =>
     # throw dk-current-exception = make (
     'throw-capture-exception' => {
-	'dependencies' => [],
+	'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ 'throw',                              'make', '(', ],
@@ -221,7 +246,7 @@
     # =>
     # dk:init ( dk:alloc ( ?ident ) ,|)
     'make' => {
-	'dependencies' => [ 'throw-capture-exception' ],
+	'before' => [ 'throw-capture-exception' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'make',                                     '(',  '?list-member'      ],
@@ -234,7 +259,7 @@
     # =>
     # 
     'export-enum' => {
-	'dependencies' => [],
+	'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ 'export', 'enum', '?type-ident', '?block' ],
@@ -247,7 +272,7 @@
     # =>
     # ?ident in dk : keys|elements ( ?expr ) )
     'in-keys-or-elements-testing' => {
-	'dependencies' => [],
+	'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ '?/if|while/', '(',  '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
@@ -268,7 +293,7 @@
     # =>
     # if (    dk:in(?ident, ?list-member))
     'if-while-set-membership-testing' => {
-	'dependencies' => [ 'in-keys-or-elements-testing' ],
+	'before' => [ 'in-keys-or-elements-testing' ],
 	'rules' => [
 	    {
 		'pattern'  => [ '?/if|while/', '(',                        '?ident', 'in', '?list-member',      ')' ],
@@ -281,7 +306,7 @@
     # =>
     # for (object_t _iterator_ = dk:forward_iterator(?list-member); object_t ?ident = dk:next(_iterator_); )
     'for-forward-iterator' => {
-	'dependencies' => [ 'in-keys-or-elements-testing' ],
+	'before' => [ 'in-keys-or-elements-testing' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],

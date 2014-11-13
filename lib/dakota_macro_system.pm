@@ -258,7 +258,7 @@ sub macro_expand_recursive
     my $macro = $$macros{$macro_name};
     my $change_count = 0;
 
-    foreach my $depend_macro_name (@{$$macro{'dependencies'}}) {
+    foreach my $depend_macro_name (@{$$macro{'before'}}) {
 	if (!exists($$expanded_macro_names{$depend_macro_name})) {
 	    $change_count += &macro_expand_recursive($sst, $i, $macros, $depend_macro_name,
 						     $expanded_macro_names, $user_data);
@@ -298,6 +298,13 @@ sub macros_expand_index
 sub macros_expand
 {
     my ($sst, $macros, $user_data) = @_;
+
+    foreach my $macro_name (sort keys %$macros) {
+	foreach my $after (@{$$macros{$macro_name}{'after'} ||= [] }) {
+	    push @{$$macros{$after}{'before'}}, $macro_name;
+	}
+	delete $$macros{$macro_name}{'after'};
+    }
 
     if ($debug) { print STDERR "[", "\n"; }
 
@@ -441,9 +448,7 @@ sub rule_match
     my $debug3_str = '';
 
     my $prev_last_index = $i;
-    my $last_index = $i;
-    my $rhs_for_pattern = {};
-    my $lhs = [];
+    my ($last_index, $rhs_for_pattern, $lhs) = ($i, {}, []);
 
     for (my $j = 0; $j < @$pattern; $j++) {
 	my $match;
