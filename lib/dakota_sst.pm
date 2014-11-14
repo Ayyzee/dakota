@@ -22,6 +22,7 @@ package dakota;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
+		sst::changes
 		sst::is_open_token
 		sst::is_close_token
 		sst::make
@@ -159,7 +160,8 @@ sub sst::make
 	'line' => 1,
 	'tokens' => [],
 	'tokens-count' => 0,
-	'leading-ws' => ''
+	'leading-ws' => '',
+	'changes' => {},
     };
     if (defined $file)
     {
@@ -210,6 +212,12 @@ sub sst::make
     delete $$sst{'prev-line'};
     #print STDERR &Dumper($sst);
     return $sst;
+}
+
+sub sst::changes
+{
+    my ($sst) = @_;
+    return $$sst{'changes'};
 }
 
 sub sst::line

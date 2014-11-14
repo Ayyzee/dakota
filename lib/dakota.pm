@@ -34,7 +34,7 @@ $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Useqq     = 1;
-$Data::Dumper::Sortkeys =  0;
+$Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Indent    = 1; # default = 2
 
 use File::Basename;

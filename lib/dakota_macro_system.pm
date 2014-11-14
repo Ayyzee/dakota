@@ -38,7 +38,8 @@ $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Useqq     = 1;
-$Data::Dumper::Indent    = 0; # default = 2
+$Data::Dumper::Sortkeys  = 1;
+$Data::Dumper::Indent    = 1; # default = 2
 
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
@@ -266,7 +267,8 @@ sub macro_expand_recursive
 	}
     }
     my $num_tokens = scalar @{$$sst{'tokens'}};
-    foreach my $rule (@{$$macro{'rules'}}) {
+    for (my $r = 0; $r < scalar @{$$macro{'rules'}}; $r++) {
+	my $rule = $$macro{'rules'}[$r];
 	last if $i > $num_tokens - @{$$rule{'pattern'}};
 
 	my ($last_index, $rhs_for_pattern, $lhs)
@@ -275,7 +277,11 @@ sub macro_expand_recursive
 	if (-1 != $last_index) {
 	    #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
 	    &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
-	    $change_count++;
+
+	    if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r})
+	    { $$sst{'changes'}{'macros'}{$macro_name}{$r} = 0; }
+	    
+	    $$sst{'changes'}{'macros'}{$macro_name}{$r}++;
 	    last;
 	}
     }
@@ -557,15 +563,51 @@ unless (caller) {
     $debug = 0;
     if ($ENV{'DK_MACROS_DEBUG'}) # 0 or 1 or 2 or 3
     { $debug = $ENV{'DK_MACROS_DEBUG'}; }
+    my $changes = { 'files' => {} };
 
-    foreach my $arg (@ARGV)
+    my $output_dir = 'junk';
+    mkdir $output_dir;
+
+    foreach my $file (@ARGV)
     {
-	print STDERR "$arg\n";
-	my $filestr = &dakota::filestr_from_file($arg);
-	my $sst = &sst::make($filestr, $arg);
+	print "$file\n";
+	my $filestr = &dakota::filestr_from_file($file);
+	my $sst = &sst::make($filestr, $file);
 	&macros_expand($sst, $macros, $user_data);
-	print &sst_fragment::filestr($$sst{'tokens'});
+	#$$changes{'file'}{$file} = &sst::change_report($sst);
+	$$changes{'files'}{$file} = $$sst{'changes'};
+	
+	my $path = "$output_dir/$file.cc";
+	open(my $out, ">", $path) or die "cannot open > $path: $!";
+	print $out &sst_fragment::filestr($$sst{'tokens'});
+	close($out);
     }
+    my $path = "$output_dir/changes.pl";
+    open(my $out, ">", $path) or die "cannot open > $path: $!";
+    print $out &Dumper($changes);
+    close($out);
+
+    my $summary = { 'num-changes' => 0,
+		    'num-files'   => scalar keys %{$$changes{'files'}}};
+    my $lines = [];
+    while (my ($file, $file_info) = each (%{$$changes{'files'}})) {
+	while (my ($macro, $macro_info) = each (%{$$file_info{'macros'}})) {
+	    if (!$$summary{$macro}) { $$summary{$macro}{'0'} = 0; }
+	    while (my ($rule, $count) = each (%$macro_info)) {
+		$$summary{$macro}{$rule} += $count;
+		$$summary{'num-changes'} += $count;
+		push @$lines, "$file : $macro : $rule : $count\n";
+	    }
+	}
+    }
+    $path = "$output_dir/summary.pl";
+    open($out, ">", $path) or die "cannot open > $path: $!";
+    print $out &Dumper($summary);
+    close($out);
+
+    print STDERR sort @$lines;
+    print STDERR "num-files=$$summary{'num-files'}\n";
+    print STDERR "num-changes-total=$$summary{'num-changes'}\n";
 };
 
 1;
