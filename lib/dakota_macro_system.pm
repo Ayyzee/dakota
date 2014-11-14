@@ -277,11 +277,12 @@ sub macro_expand_recursive
 	if (-1 != $last_index) {
 	    #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
 	    &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
+	    $change_count++;
 
 	    if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r})
 	    { $$sst{'changes'}{'macros'}{$macro_name}{$r} = 0; }
-	    
 	    $$sst{'changes'}{'macros'}{$macro_name}{$r}++;
+
 	    last;
 	}
     }
