@@ -698,9 +698,9 @@ sub exec_cmd
     }
 
         my $exit_val = system($cmd_str);
-        if (0 != $exit_val)
+        if (0 != $exit_val >> 8)
         {
-	    my $tmp_exit_status = 0xff & $exit_val;
+	    my $tmp_exit_status = $exit_val >> 8;
 	    if ($exit_status < $tmp_exit_status) # similiar to behavior of gnu make
 	    {
 		$exit_status = $tmp_exit_status;
@@ -711,6 +711,7 @@ sub exec_cmd
 		{
 		    print STDERR "  $cmd_str\n";
 		}
+		die "exit value from system() was $exit_val\n" if $exit_status == 0;
 		exit $exit_status;
 	    }
         }

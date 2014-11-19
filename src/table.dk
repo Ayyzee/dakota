@@ -23,6 +23,12 @@ trait table
   //provides dk:set;
   require collection;
 
+  method alias(at) object-t in(object-t self, object-t key);
+  method object-t at(object-t self, object-t key)
+  {
+    return dk:at(self, key, NULL);
+  }
+
   DK-VISIBILITY object-t at(object-t self, object-t key, object-t default-result)
   {
     object-t result = default-result;
@@ -45,9 +51,10 @@ trait table
 
   method object-t keys(object-t self)
   {
-    object-t result = make(vector:klass, size => dk:size(self));
+    object-t set-kls = dk:superklass(dk:klass(self));
+    object-t result = make(set-kls);
     for (assoc-t* assoc in self)
-      dk:add-last(result, assoc->key);
+      dk:add(result, assoc->key);
     return result;
   }
 

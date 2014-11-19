@@ -14,9 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota-util;
+
 int-t main()
 {
-  object-t o = make(object:klass);
-  USE(o);
+  object-t o = make(hashed-table:klass);
+  dk:dump(o);
+  dk:println(o, std-output);
+  printf("klass=%s\n", dk:utf8-from(dk:klass(o)));
+  printf("superklass=%s\n", dk:utf8-from(dk:superklass(dk:klass(o))));
+  dk:dump(dk:superklass(dk:klass(o)));
   return 0;
 }

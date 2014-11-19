@@ -51,6 +51,7 @@ my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]/;
 my $zt = qr/$z-t/;
 # not-escaped " .*? not-escaped "
 my $dqstr = qr/(?<!\\)".*?(?<!\\)"/;
+#my $dqstr = qr/"(?:[^"\\]++|\\.)*+"/; # from the web
 
 my $constraints =
 {
