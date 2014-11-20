@@ -4515,19 +4515,30 @@ sub generate_ka_method_defn
         &_add_last($$method{'parameter-types'}, $param1);
     }
     $$scratch_str_ref .= &dk::print_in_col_string($col, "static $method_type_decl = $qualified_klass_name:$method_name; /*qualqual*/\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* __ka-signature__ = ka-signature(va:$method_name($$list_types));\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* _ka-signature_ = ka-signature(va:$method_name($$list_types));\n");
 
-    foreach my $kw_arg (@{$$method{'keyword-types'}})
-    {
-        my $kw_arg_name = $$kw_arg{'name'};
-        my $kw_arg_type = &arg::type($$kw_arg{'type'});
-        my $statment = "$kw_arg_type $kw_arg_name = {0};";
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "$statment\n");
-    }
-    foreach my $kw_arg (@{$$method{'keyword-types'}})
-    {
-        my $kw_arg_name = $$kw_arg{'name'};
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "boole-t state-$kw_arg_name = false;\n");
+    if (scalar @{$$method{'keyword-types'}}) {
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "");
+	my $delim = '';
+	foreach my $kw_arg (@{$$method{'keyword-types'}})
+	{
+	    my $kw_arg_name = $$kw_arg{'name'};
+	    my $kw_arg_type = &arg::type($$kw_arg{'type'});
+	    $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name;";
+	    $delim = ' ';
+	}
+	$$scratch_str_ref .= "\n";
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "struct {");
+	my $initializer = '';
+	$delim = '';
+	foreach my $kw_arg (@{$$method{'keyword-types'}})
+	{
+	    my $kw_arg_name = $$kw_arg{'name'};
+	    $$scratch_str_ref .= " boole-t $kw_arg_name;";
+	    $initializer .= "${delim}false";
+	    $delim = ', ';
+	}
+	$$scratch_str_ref .= " } state = { $initializer };\n";
     }
     #$$scratch_str_ref .= &dk::print_in_col_string($col, "if (NULL != $$new_arg_names[-1])\n");
     #$$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
@@ -4558,7 +4569,7 @@ sub generate_ka_method_defn
             # should do this for other types (char=>int, float=>double, ... ???
 
             $$scratch_str_ref .= &dk::print_in_col_string($col, "$kw_arg_name = va-arg($$new_arg_names[-1], $kw_type);\n");
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "state-$kw_arg_name = true;\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "state.$kw_arg_name = true;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "break;\n");
             $col--;
 #            $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
@@ -4570,7 +4581,7 @@ sub generate_ka_method_defn
 
         $$scratch_str_ref .= &dk::print_in_col_string($col, "throw make(no-such-keyword-exception:klass,\n");
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "           object =>    self,\n");
-	$$scratch_str_ref .= &dk::print_in_col_string($col, "           signature => __ka-signature__,\n");
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "           signature => _ka-signature_,\n");
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "           symbol =>    _keyword_->symbol);\n");
         $col--;
 #        $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
@@ -4582,7 +4593,7 @@ sub generate_ka_method_defn
     foreach my $kw_arg (@{$$method{'keyword-types'}})
     {
         my $kw_arg_name    = $$kw_arg{'name'};
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "unless (state-$kw_arg_name)\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "unless (state.$kw_arg_name)\n");
         $col++;
         if (defined $$kw_arg{'default'})
         {
