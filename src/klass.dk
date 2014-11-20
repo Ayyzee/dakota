@@ -46,6 +46,7 @@ klass object-output-stream;
 klass property;
 klass std-compare;
 klass symbol;
+klass vector;
 
 #if DKT-WORKAROUND
 namespace selector-node  { noexport int-t compare(slots-t**, slots-t**); }
@@ -323,12 +324,12 @@ load-traits(const symbol-t* traits)
 {
   if (NULL != traits)
   {
-    uint32-t index = 0;
-    while (NULL != traits[index])
+    uint32-t i = 0;
+    symbol-t trait-name;
+    while (NULL != (trait-name = traits[i++]))
     {
-      named-info-node-t* info = info-for-name(traits[index]);
+      named-info-node-t* info = info-for-name(trait-name);
       load-traits(cast(const symbol-t*)named-info-node:at(info, $traits));
-      index++;
     }
   }
   return;
@@ -527,6 +528,26 @@ klass klass
     // offset
     fprintf(stderr, ", offset=%i", self.offset);
 
+    // traits
+    fprintf(stderr, ", traits=[");
+    {
+      const symbol-t* traits = cast(const symbol-t*)named-info-node:at(self.info-slots, $traits);
+      if (NULL != traits)
+      {
+        fprintf(stderr, " ");
+        const char8-t* delim = "";
+        uint32-t i = 0;
+        symbol-t trait-name;
+        while (NULL != (trait-name = traits[i++]))
+        {
+          fprintf(stderr, "%s$%s", delim, trait-name);
+          delim = ", ";
+        }
+        fprintf(stderr, " ");
+      }
+    }
+    fprintf(stderr, "],");
+
     fprintf(stderr, " }\n");
 
     if (NULL != self.superklass)
@@ -537,6 +558,23 @@ klass klass
     }
 
     return self;
+  }
+
+  method object-t traits(object-t self)
+  {
+    object-t seq = make(vector:klass);
+    const symbol-t* traits = cast(const symbol-t*)named-info-node:at(self.info-slots, $traits);
+    
+    if (NULL != traits)
+    {
+      uint32-t i = 0;
+      symbol-t trait-name;
+      while (NULL != (trait-name = traits[i++]))
+      {
+        dk:add-last(seq, symbol:box(trait-name));
+      }
+    }
+    return seq;
   }
 
   method slots-t* dump-methods(slots-t* s)
@@ -663,7 +701,7 @@ klass klass
     {
       uint32-t i = 0;
       symbol-t trait-name;
-      while (NULL != (trait-name = traits[i]))
+      while (NULL != (trait-name = traits[i++]))
       {
         named-info-node-t* info = info-for-name(trait-name);
 
@@ -679,7 +717,6 @@ klass klass
             self = trait-initialize(self);
           }
         }
-        i++;
       }
     }
     return self;
