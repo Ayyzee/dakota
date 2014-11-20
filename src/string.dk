@@ -25,29 +25,10 @@ include <inttypes.h>;
 
 include "dakota-private.h";
 
-// Daniel J. Bernstein
-noexport uint32-t
-hashdjb-v2(const char8-t* str)
-{
-  uint32-t h = 5381;
-  uint32-t c;
-
-  while ((c = cast(uint32-t)*str++))
-    h = ((h << 5) + h) ^ c;
-  return h;
-}
-
 // 2^32 - 5 = 4294967291 or 0xfffffffb
 const uintptr-t max-prime32 = 0xfffffffb;
 
 module dakota;
-
-export uintmax-t
-dk-hash(const char8-t* str)
-{
-    uintmax-t value = cast(uintmax-t)hashdjb(str);
-    return value;
-}
 
 klass object-output-stream;
 

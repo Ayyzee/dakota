@@ -26,9 +26,9 @@ import symbol_t dk_intern(const char8_t*);
 
 typedef unsigned char uchar8_t; // move this somewhere else???
 
-constexpr uint32_t hashdjb(const char8_t* str, uint32_t h = 0)
-{
-  return !str[h] ? 5381 : ( hashdjb(str, h + 1) * 33 ) ^ (uchar8_t)(str[h]);
+constexpr uintmax_t dk_hash(const char8_t* str, uintmax_t h = 0)
+{ // Daniel J. Bernstein
+  return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ (uchar8_t)(str[h]);
 }
 
-#endif
+#endif // __dakota_before_klasses_h__

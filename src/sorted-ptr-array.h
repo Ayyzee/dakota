@@ -14,6 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if !defined __sorted_ptr_array_h__
+#define      __sorted_ptr_array_h__
+
 #include <dakota.h>
 
 namespace sorted_ptr_array
@@ -31,3 +34,5 @@ namespace sorted_ptr_array
   noexport const void* remove_at(slots_t* t, const void* key, uint32_t offset);
   noexport slots_t*    add_at(slots_t* t, const void* key, uint32_t offset);
 }
+
+#endif // __sorted_ptr_array_h__

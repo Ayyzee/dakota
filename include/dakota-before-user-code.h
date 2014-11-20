@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef dakota_object_hxx
-#define dakota_object_hxx
+#if !defined __dakota_before_user_code_h__
+#define      __dakota_before_user_code_h__
 
 extern import object_t null;
 extern import object_t std_input;
@@ -51,12 +51,11 @@ import void dk_dump_methods(object_t);
 import void dk_dump_methods(klass::slots_t*);
 #endif
 
-import uintmax_t dk_hash(const char8_t*);
-import void     dk_export_klass(  named_info_node_t* klass_info);
-import void     dk_export_klasses(named_info_node_t* klass_info);
+import void dk_export_klass(  named_info_node_t* klass_info);
+import void dk_export_klasses(named_info_node_t* klass_info);
 
 sentinel import object_t           dk_add_all(object_t self, ...);
 sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
 sentinel import object_t           dk_make_named_info(symbol_t name, ...);
 
-#endif // dakota_object_hxx
+#endif // __dakota_before_user_code_h__

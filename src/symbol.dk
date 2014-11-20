@@ -20,9 +20,6 @@ include "dakota-private.h";
 
 module dakota;
 
-import uintmax-t
-dk-hash(const char8-t*);
-
 klass symbol
 {
   slots const char8-t*;

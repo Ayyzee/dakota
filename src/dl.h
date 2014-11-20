@@ -14,5 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if !defined __dl_h__
+#define      __dl_h__
+
 noexport const char8_t* symbol_name_from_address(void*);
 noexport void load_library(const char8_t*);
+
+#endif // __dl_h__

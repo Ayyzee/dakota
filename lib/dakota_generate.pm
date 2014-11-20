@@ -4546,7 +4546,7 @@ sub generate_ka_method_defn
         foreach my $kw_arg (@{$$method{'keyword-types'}})
         {
             $kw_arg_name = $$kw_arg{'name'};
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "case hashdjb(\"$kw_arg_name\"):\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "case dk-hash(\"$kw_arg_name\"):\n");
 #            $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
             $col++;
             my $kw_type = &arg::type($$kw_arg{'type'});
@@ -4877,7 +4877,7 @@ sub linkage_unit::generate_symbols
         else
         {
             $symbol =~ s|"|\\"|g;
-	    $scratch_str .= &dk::print_in_col_string3($col, "namespace __symbol { noexport symbol-t $cxx_ident = ", $pad, "dk-intern(\"$symbol\"); }\n");
+	    $scratch_str .= &dk::print_in_col_string3($col, "namespace __symbol { noexport symbol-t $cxx_ident = ", $pad, "dk-intern(\"$symbol\"); $pad}\n");
         }
     }
     return $scratch_str;
@@ -4900,7 +4900,7 @@ sub linkage_unit::generate_hashes
 	    { $max_width = $width; }
 	}
     my $scratch_str = "";
-    if (&is_nrt_decl() || &is_rt_decl())
+    if (&is_rt_defn())
     {
         $scratch_str .= &dk::annotate($col, __FILE__, __LINE__);
 
@@ -4909,7 +4909,7 @@ sub linkage_unit::generate_hashes
 	    my $cxx_ident = $$file{'hashes'}{$symbol};
 	    my $width = length($cxx_ident);
 	    my $pad = ' ' x ($max_width - $width);
-            $scratch_str .= &dk::print_in_col_string3($col, "namespace __hash { /*static*/ constexpr uint32-t $cxx_ident = ", $pad, "hashdjb(\"$symbol\"); }\n");
+            $scratch_str .= &dk::print_in_col_string3($col, "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = ", $pad, "dk-hash(\"$symbol\"); $pad}\n");
         }
     }
     return $scratch_str;

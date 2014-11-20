@@ -14,6 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if !defined __dakota_before_rt_code_h__
+#define      __dakota_before_rt_code_h__
+
 import void dk_register_info(  named_info_node_t* registration_info);
 import void dk_deregister_info(named_info_node_t* registration_info);
 
@@ -21,3 +24,5 @@ import method_t dk_method_for_selector(object_t object, selector_t selector);
 import method_t dk_method_for_selector(super_t  arg0,   selector_t selector);
 
 import void dk_unbox_check(object_t object, object_t kls);
+
+#endif // __dakota_before_rt_code_h__

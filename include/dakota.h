@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dakota_hxx
-#define dakota_hxx
+#if !defined __dakota_h__
+#define      __dakota_h__
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -71,9 +71,9 @@
 
 //#define DUMP_MEM_FOOTPRINT
 
-#ifndef USE
-#  define USE(v) (void)v
-#endif
+#if !defined USE
+#define      USE(v) (void)v
+#endif // USE
 
 //static_cast<double>(4)
 //       cast(double)(4)
@@ -103,13 +103,9 @@
 // boole-t is promoted to int-t when used in va_arg() macro
 #define DK_VA_ARG_BOOLE_T int_t
 
-#ifndef nil
-#define nil (0)
-#endif
-
-#ifndef NUL
-#define NUL cast(char)0
-#endif
+#if !defined NUL
+#define      NUL cast(char)0
+#endif // NUL
 
 typedef int int_t;
 typedef unsigned int uint_t;
@@ -147,4 +143,4 @@ typedef va_list va_list_t;
 
 import void dk_init_runtime();
 
-#endif // dakota_hxx
+#endif // __dakota_h__

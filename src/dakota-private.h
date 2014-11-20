@@ -14,19 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef dakota_private_hxx
-#define dakota_private_hxx
+#if !defined __dakota_private_h__
+#define      __dakota_private_h__
 
 noexport named_info_node_t* info_for_name(symbol_t) throw(object_t);
 noexport assoc_node_t* imported_klasses_for_klass(symbol_t);
 
-extern "C"
-{
-  export int_t    safe_strcmp(const char8_t* s1, const char8_t* s2);
-  export int_t    safe_strptrcmp(const char8_t* const* sp1, const char8_t* const* sp2);
-  export int_t    safe_strncmp(const char8_t* s1, const char8_t* s2, size_t n);
-  export size_t   safe_strlen(const char8_t* s);
-} // extern "C"
+export extern "C" int_t  safe_strcmp(const char8_t* s1, const char8_t* s2);
+export extern "C" int_t  safe_strptrcmp(const char8_t* const* sp1, const char8_t* const* sp2);
+export extern "C" int_t  safe_strncmp(const char8_t* s1, const char8_t* s2, size_t n);
+export extern "C" size_t safe_strlen(const char8_t* s);
 
 noexport uint32_t size_from_info(named_info_node_t* info);
 noexport uint32_t offset_from_info(named_info_node_t* info);
@@ -37,4 +34,4 @@ noexport symbol_t superklass_name_from_info(named_info_node_t* info, symbol_t na
 
 noexport const char8_t* strerror_name(int_t errnum);
 
-#endif // dakota_private_hxx
+#endif // __dakota_private_h__
