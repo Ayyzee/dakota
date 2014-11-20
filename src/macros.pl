@@ -1,12 +1,4 @@
-# default values
-# optional sequence of tokens (more than one)
-# resolve concatenation and stringification
-# comments
-
 {
-    # include  ?dquote-str ;
-    # =>
-    # #include ?dquote-str
     'include-stmt' => {
         'before' => [],
 	'rules' => [
@@ -16,33 +8,24 @@
 	    }
 	],
     },
-
-    # how about include <...> ;
-
-    # klass|trait ?ident ;
-    # =>
-    #
-    #
-    # klass|trait ?ident {
-    # =>
-    # namespace   ?ident {
-    'klass-trait-decl+defn' => {
+    'klass-or-trait-decl' => {
         'before' => [],
 	'rules' => [
 	    {
 		'pattern'  => [ '?/klass|trait/', '?ident', ';' ],
 		'template' => []
 	    },
+	],
+    },
+    'klass-or-trait-defn' => {
+        'before' => [],
+	'rules' => [
 	    {
 		'pattern'  => [ '?/klass|trait/', '?ident', '{' ],
 		'template' => [ 'namespace',      '?ident', '{' ]
 	    }
 	],
     },
-
-    # superklass ?ident ;
-    # =>
-    # 
     'superklass-decl' => {
         'before' => [],
 	'rules' => [
@@ -52,13 +35,6 @@
 	    },
 	],
     },
-
-    # how about klass ?ident ;
-    # how about trait ?list-in ;
-
-    # slots          { ... }
-    # =>
-    # struct slots-t { ... } ;
     'slots-defn' => {
 	'before' => [],
 	'rules' => [
@@ -68,44 +44,41 @@
 	    }
 	],
     },
-
-    # ?type => ?list-member ,|)
-    # =>
-    # ?type                 ,|)
-    #
-    #       ?ident => ?list-member
-    # =>
-    #  $ ## ?ident ,  ?list-member
-    'keyword-args-defn+use' => {
+    'keyword-args-defn' => {
 	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ '?type',   '?ident', '=>', '?list-member', ],
-		'template' => [ '?type',   '?ident',                       ]
+		'pattern'  => [ '?type', '?ident', '=>', '?list-member', ],
+		'template' => [ '?type', '?ident',                       ]
 	    },
-	    {
-		'pattern'  => [            '?ident', '=>',  ],
-		'template' => [ '$', '##', '?ident', ',',   ]
-	    }
 	],
     },
-
-    # dk:     ?ka-ident ( ?list-in       )
-    # =>
-    # dk: va: ?ka-ident ( ?list-in, NULL )
-    'keyword-args-wrap' => {
-	'before' => [ 'keyword-args-defn+use', 'super' ],
+    'keyword-args-use' => {
+	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'dk', ':',            '?ka-ident', '(', '?list-in',              ')' ],
-		'template' => [ 'dk', ':', 'va', ':', '?ka-ident', '(', '?list-in', ',', 'NULL', ')' ]
+		'pattern'  => [ 'NULL-KEYWORD', ',', '?ident', '=>', '?list-member'                       ],
+		'template' => [           '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+	    },
+	    {
+		'pattern'  => [                 ',', '?ident', '=>', '?list-member'                       ],
+		'template' => [      ',', '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
 	    }
 	],
     },
-
-    # method alias (...)
-    # =>
-    # method
+    'keyword-args-wrap' => {
+	'before' => [ 'keyword-args-use', 'super' ],
+	'rules' => [
+	    {
+		'pattern'  => [ 'dk', ':', '?ka-ident-1', '(', '?list-member',                      ')' ],
+		'template' => [ 'dk', ':', '?ka-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+	    },
+	    {
+		'pattern'  => [ 'dk', ':', '?ka-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
+		'template' => [ 'dk', ':', '?ka-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+	    }
+	],
+    },
     'method-alias' => {
 	'before' => [],
 	'rules' => [
@@ -115,10 +88,6 @@
 	    }
 	],
     },
-
-    #                ?visibility method ?type va : ?ident(...) { ... }
-    # =>
-    # namespace va { ?visibility method ?type      ?ident(...) { ... } }
     'va-method-defn' => {
 	'before' => [ 'method-alias' ],
 	'rules' => [
@@ -128,10 +97,6 @@
 	    }
 	],
     },
-
-    # export method ?type ?ident(...)
-    # =>
-    # extern        ?type ?ident(...)
     'export-method' => {
 	'before' => [ 'method-alias', 'va-method-defn' ],
 	'rules' => [
@@ -141,10 +106,6 @@
 	    }
 	],
     },
-
-    # method ?type ?ident(...)
-    # =>
-    # static ?type ?ident(...)
     'method' => {
 	'before' => [ 'export-method', 'method-alias', 'va-method-defn' ],
 	'rules' => [
@@ -154,20 +115,10 @@
 	    }
 	],
     },
-
-    # try to merge both super rules (make the va: optional)
-
-    # dk:?ident(super ,|)
-    # =>
-    # dk:?ident(super-t(self,klass) ,|)
-    #
-    # dk:va:?ident(super ,|)
-    # =>
-    # dk:va:?ident(super-t(self,klass) ,|)
     'super' => {
 	'before' => [],
 	'after' => [ 'construct-klass-slots-literal' ],
-	'rules' => [
+	'rules' => [ # try to merge both super rules (make the va: optional)
 	    {
 		'pattern'  => [ 'dk', ':',            '?ident', '(', 'super',                                           '?list-member-term' ],
 		'template' => [ 'dk', ':',            '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
@@ -178,10 +129,6 @@
 	    }
 	],
     },
-
-    # self.?ident
-    # =>
-    # unbox(self)->?ident
     'slot-access' => {
 	'before' => [],
 	'rules' => [
@@ -191,18 +138,6 @@
 	    }
 	],
     },
-
-    # ?{ident}-t ?ident = box({ ... })
-    # =>
-    # ?{ident}-t ?ident = ?{ident}:box({ ... })
-    # or
-    # ?type ?ident = box({ ... })
-    # =>
-    # ?type ?ident = box(cast(?type){ ... })
-
-    # ?ident:box({ ... })
-    # =>
-    # ?ident:box(?ident({ ... }))
     'explicit-box-literal' => {
 	'before' => [],
 	'after' => [ 'construct-klass-slots-literal' ],
@@ -213,10 +148,6 @@
 	    }
 	],
     },
-
-    # ?ident({ ... })
-    # =>
-    # ?ident:construct(...)
     'construct-klass-slots-literal' => {
 	'before' => [],
 	'rules' => [
@@ -228,25 +159,36 @@
 	    }
 	],
     },
-
-    # throw                        make (
-    # =>
-    # throw dk-current-exception = make (
-    'throw-capture-exception' => {
+    # throw "..."
+    # throw $foo
+    # throw $"..." ;
+    # throw $[...] ;
+    # throw ${...} ;
+    # throw box(...) ;
+    # throw foo:box(...) ;
+    # throw make(...) ;
+    # throw klass ;
+    # throw self ;
+    'throw-make-or-box' => {
 	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'throw',                              'make', '(', ],
-		'template' => [ 'throw', 'dk-current-exception', '=', 'make', '(', ]
+		'pattern'  => [ 'throw',          '?/make|box/', '(',  '?list-in', ')'       ],
+		'template' => [ 'dkt-throw', '(', '?/make|box/', '?3', '?list-in', '?5', ')' ]
 	    }
 	],
     },
-
-    # make    (            ?ident   ,|)
-    # =>
-    # dk:init ( dk:alloc ( ?ident ) ,|)
+    'throw-make-or-box-parens' => {
+	'before' => [],
+	'rules' => [
+	    {
+		'pattern'  => [ 'throw',     '(',  '?/make|box/', '(',  '?list-in', ')',  ')'  ],
+		'template' => [ 'dkt-throw', '?2', '?/make|box/', '?4', '?list-in', '?6', '?7' ]
+	    }
+	],
+    },
     'make' => {
-	'before' => [ 'throw-capture-exception' ],
+	'before' => [ 'throw-make-or-box', 'throw-make-or-box-parens' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'make',                                     '(',  '?list-member'      ],
@@ -254,10 +196,6 @@
 	    }
 	],
     },
-
-    # export enum ?type-ident { ... }
-    # =>
-    # 
     'export-enum' => {
 	'before' => [],
 	'rules' => [
@@ -268,58 +206,73 @@
 	],
     },
 
-    # ?ident in      keys|elements   ?expr   )
-    # =>
-    # ?ident in dk : keys|elements ( ?expr ) )
-    'in-keys-or-elements-testing' => {
+    # ?(optional ?[ keys elements ] )
+    # ?(optional not )
+    # ?(optional va : )
+    # ?(not ?look-ahead xx yy )
+    # ?(not ?look-behind xx yy )
+
+    # if|while (e [not] in [keys|elements] tbl)
+    'if-or-while-in-keys-or-elements-iterable' => { # optional 'not' and optional 'keys|elements'
 	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ '?/if|while/', '(',  '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
-		'template' => [ '?/if|while/', '?2', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
+		'pattern'  => [ '?/if/while/', '(',  '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
+		'template' => [ '?/if/while/', '?2', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
 	    },
+	],
+    },
+    # if|while (e [not] in tbl)
+    'if-or-while-in-iterable' => { # optional 'not'
+	'before' => [ 'if-or-while-in-keys-or-elements-iterable' ],
+	'rules' => [
+	    {
+		'pattern'  => [ '?/if/while/', '(',  '?ident',            'in',      '?list-member',                ')'  ],
+		'template' => [ '?/if/while/', '?2',           'dk', ':', 'in', '(', '?list-member', '?ident', ')', '?6' ]
+	    },
+	],
+    },
+    # for (object-t e [not] in [keys|elements] tbl)
+    'for-in-iterable-with-keys-or-elements' => {
+	'before' => [],
+	'rules' => [
 	    {
 		'pattern'  => [ 'for', '(',  'object-t', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
 		'template' => [ 'for', '?2', 'object-t', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', '?8' ]
 	    },
 	],
     },
-
-    # if (      ?ident in  keys ?list-member)
-    # =>
-    # if (dk:in(?ident, dk:keys(?list-member)))
-    #
-    # if (?ident in         ?list-member)
-    # =>
-    # if (    dk:in(?ident, ?list-member))
-    'if-while-set-membership-testing' => {
-	'before' => [ 'in-keys-or-elements-testing' ],
-	'rules' => [
-	    {
-		'pattern'  => [ '?/if|while/', '(',                        '?ident', 'in', '?list-member',      ')' ],
-		'template' => [ '?/if|while/', '?2', 'dk', ':', 'in', '(', '?ident', ',',  '?list-member', ')', '?6' ]
-	    }
-	],
-    },
-
-    # for (object-t ?ident in                        ?list-member)
-    # =>
-    # for (object_t _iterator_ = dk:forward_iterator(?list-member); object_t ?ident = dk:next(_iterator_); )
-    'for-forward-iterator' => {
-	'before' => [ 'in-keys-or-elements-testing' ],
+    # for (object-t e [not] in seq)
+    'for-in-iterable' => {
+	'before' => [ 'for-in-iterable-with-keys-or-elements' ],
 	'rules' => [
 	    {
 		'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],
 		'template' => [ 'for', '?2', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
-			   'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', '?7' ]
+				'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', '?7' ]
 	    },
 	],
     },
+
+    # default values
+    # optional sequence of tokens (more than one)
+    # resolve concatenation and stringification
+    # comments
+    # how about include <...> ;
+    # how about trait ?list-in ;
 
     # $()   tuple
     # $[]   vector
     # ${}   set
     # ${=>} table
+
+    # ?{ident}-t ?ident = box({ ... })
+    # =>
+    # ?{ident}-t ?ident = ?{ident}:box({ ... })
+    # or
+    # ?type ?ident = box({ ... })
+    # =>
+    # ?type ?ident = box(cast(?type){ ... })
 
     # foo:slots-t* slt = unbox(bar)
     # =>

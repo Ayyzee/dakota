@@ -1,6 +1,7 @@
 {
     'ka-ident' => { # variable per project (lib or exe)
-	'init' => 1,
+	'init'   => 1, # rhs = num-fixed args
+	'append' => 2  # rhs = num-fixed args
     },
     'visibility' => { # constant for a language
 	'export'   => 1,
