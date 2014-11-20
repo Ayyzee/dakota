@@ -4546,7 +4546,7 @@ sub generate_ka_method_defn
         foreach my $kw_arg (@{$$method{'keyword-types'}})
         {
             $kw_arg_name = $$kw_arg{'name'};
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "case \$'$kw_arg_name':\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "case hashdjb(\"$kw_arg_name\"):\n");
 #            $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
             $col++;
             my $kw_type = &arg::type($$kw_arg{'type'});
@@ -4883,16 +4883,6 @@ sub linkage_unit::generate_symbols
     return $scratch_str;
 }
 
-sub hashdjb
-{
-    my $h = 5381;
-
-    for (split //, shift) {
-        $h = (($h << 5) + $h) + ord($_); # h * 33 + c
-    }
-    return $h;
-}
-
 sub linkage_unit::generate_hashes
 {
     my ($file, $generics, $symbols) = @_;
@@ -4919,9 +4909,7 @@ sub linkage_unit::generate_hashes
 	    my $cxx_ident = $$file{'hashes'}{$symbol};
 	    my $width = length($cxx_ident);
 	    my $pad = ' ' x ($max_width - $width);
-            my $value = &hashdjb($symbol);
-            my $hex_value = sprintf("0x%08x", $value);
-            $scratch_str .= &dk::print_in_col_string3($col, "namespace __hash { /*static*/ const uintmax-t $cxx_ident = ", $pad, "$hex_value; } // $symbol\n");
+            $scratch_str .= &dk::print_in_col_string3($col, "namespace __hash { /*static*/ constexpr uint32-t $cxx_ident = ", $pad, "hashdjb(\"$symbol\"); }\n");
         }
     }
     return $scratch_str;

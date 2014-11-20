@@ -37,17 +37,6 @@ hashdjb-v2(const char8-t* str)
   return h;
 }
 
-noexport uint32-t
-hashdjb(const char8-t* str)
-{
-  uint32-t h = 5381;
-  uint32-t c;
-
-  while ((c = cast(uint32-t)*str++))
-    h = ((h << 5) + h) + c; // h * 33 + c
-  return h;
-}
-
 // 2^32 - 5 = 4294967291 or 0xfffffffb
 const uintptr-t max-prime32 = 0xfffffffb;
 

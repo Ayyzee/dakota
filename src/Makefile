@@ -4,6 +4,7 @@ include $(rootdir)/config.mk
 include $(rootdir)/common.mk
 
 EXTRA_CXXFLAGS +=\
+ -std=c++11\
  --include-directory=$(srcdir)/.\
  --include-directory=../include\
  --include-directory=$(includedir)\

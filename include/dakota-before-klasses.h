@@ -14,9 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if !defined __dakota_before_klasses_h__
+#define      __dakota_before_klasses_h__
+
 typedef boole_t (*type_predicate_t)(int_t);
 typedef boole_t   (*equal_predicate_t)(object_t, object_t); //hackhack
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef uintmax_t (*hash_t)(object_t);
 
 import symbol_t dk_intern(const char8_t*);
+
+typedef unsigned char uchar8_t; // move this somewhere else???
+
+constexpr uint32_t hashdjb(const char8_t* str, uint32_t h = 0)
+{
+  return !str[h] ? 5381 : ( hashdjb(str, h + 1) * 33 ) ^ (uchar8_t)(str[h]);
+}
+
+#endif
