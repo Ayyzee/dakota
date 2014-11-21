@@ -317,7 +317,7 @@ sub generate_nrt
 	    {
 		$nrt_cxx_str .= &dk::print("include \"../$name.$cxx_ext\";\n");
 	    }
-	    $nrt_cxx_str .= &dakota_before_rt_code_h();
+	    $nrt_cxx_str .= &dakota_after_user_code_h();
 	    $nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-cxx'}[0]);
 	}
 
@@ -465,14 +465,14 @@ sub generate_rt
 
 	{
 	    $rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
-	    $rt_cxx_str .= &dakota_before_klasses_h();
+	    $rt_cxx_str .= &dakota_before_h();
 	    $rt_cxx_str .= &dk::print($$symbols_cxx[0]);
 	    $rt_cxx_str .= &dk::print($$symbols_cxx[1]);
 	    $rt_cxx_str .= &dk::print($$defn_tbl{'hashes-hxx'}[0]);
 	    $rt_cxx_str .= &dk::print($$hashes_cxx[0]);
 	    $rt_cxx_str .= &dk::print($$keywords_cxx[0]);
 	    $rt_cxx_str .= &dakota_before_user_code_h();
-	    $rt_cxx_str .= &dakota_before_rt_code_h();
+	    $rt_cxx_str .= &dakota_after_user_code_h();
 	    $rt_cxx_str .= &dk::print($$selectors_cxx[0]);
 	    $rt_cxx_str .= &dk::print($$selectors_cxx[1]);
 	    $rt_cxx_str .= &dk::print($$signatures_cxx[0]);
@@ -3323,7 +3323,7 @@ sub linkage_unit::generate_klasses_types
             }
         }
     }
-    $$scratch_str_ref .= &dakota_before_klasses_h();
+    $$scratch_str_ref .= &dakota_before_h();
     foreach my $klass_name (@$klass_names) {
         my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 	my $is_exported;
@@ -4557,7 +4557,7 @@ sub generate_ka_method_defn
         foreach my $kw_arg (@{$$method{'keyword-types'}})
         {
             $kw_arg_name = $$kw_arg{'name'};
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "case dk-hash(\"$kw_arg_name\"):\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "case dk-hash(\"$kw_arg_name\"): // constexpr: compile-time evaluation\n");
 #            $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
             $col++;
             my $kw_type = &arg::type($$kw_arg{'type'});

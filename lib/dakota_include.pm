@@ -23,46 +23,18 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
 		dakota_h
-		dakota_before_klasses_h
+		dakota_before_h
 		dakota_before_user_code_h
-		dakota_before_rt_code_h
+		dakota_after_user_code_h
 		dakota_method_for_selector_h
 		);
 
-my $dakota_h =
-'
-';
-sub dakota_h
-{
-    return "include <dakota.h>;\n";
-    #return $dakota_h;
-}
+sub dakota_h { return "include <dakota.h>;\n"; }
 
-my $dakota_before_klasses_h =
-'
-';
-sub dakota_before_klasses_h
-{
-    return "include <dakota-before-klasses.h>;\n";
-    #return $dakota_before_klasses_h;
-}
+sub dakota_before_h { return "include <dakota-before.h>;\n"; }
 
-my $dakota_before_user_code_h =
-'
-';
-sub dakota_before_user_code_h
-{
-    return "include <dakota-before-user-code.h>;\n";
-    #return $dakota_before_user_code_h;
-}
+sub dakota_before_user_code_h { return "include <dakota-before-user-code.h>;\n"; }
 
-my $dakota_before_rt_code_h =
-'
-';
-sub dakota_before_rt_code_h
-{
-    return "include <dakota-before-rt-code.h>;\n";
-    #return $dakota_before_rt_code_h;
-}
+sub dakota_after_user_code_h { return "include <dakota-after-user-code.h>;\n"; }
 
 1;
