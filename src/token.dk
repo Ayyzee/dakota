@@ -63,7 +63,7 @@ klass token
                        uint32-t       line =>    0,
                        uint32-t       column =>  0,
                        tokenid-t      tokenid => 0,
-                       const char8-t* buffer =>  NULL)
+                       const char8-t* buffer =>  nullptr)
   {
     self = dk:init(super);
 #if 0
@@ -79,11 +79,11 @@ klass token
     self.line =    line;
     self.column =  column;
     self.tokenid = tokenid;
-    if (NULL == buffer)
+    if (nullptr == buffer)
       self.buffer[0] = NUL;
     else
       strcpy(self.buffer, buffer);
-    self.leading-ws = NULL;
+    self.leading-ws = nullptr;
     return self;
   }
 
@@ -153,7 +153,7 @@ klass token
 
   method object-t leading-ws=(object-t self, object-t leading-ws)
   {
-    assert(NULL == self.leading-ws);
+    assert(nullptr == self.leading-ws);
     self.leading-ws = leading-ws;
     return self;
   }
@@ -161,7 +161,7 @@ klass token
   method boole-t leading-ws?(object-t self)
   {
     boole-t result;
-    if (NULL == self.leading-ws)
+    if (nullptr == self.leading-ws)
       result = false;
     else
       result = true;
@@ -251,7 +251,7 @@ klass token
   // should be in superklass string??
   method object-t append(object-t self, uint32-t c)
   {
-    assert(NULL != self.buffer);
+    assert(nullptr != self.buffer);
     uint32-t len = cast(uint32-t)safe-strlen(self.buffer);
     self.buffer[len] =     cast(char8-t)(c);
     self.buffer[len + 1] = NUL;

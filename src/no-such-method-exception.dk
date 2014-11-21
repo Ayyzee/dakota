@@ -33,18 +33,18 @@ klass no-such-method-exception
 
   method object-t init(object-t self,
                        object-t     object =>    {},
-                       object-t     superkls =>  NULL,
-                       object-t     kls =>       NULL,
-                       signature-t* signature => NULL)
+                       object-t     superkls =>  nullptr,
+                       object-t     kls =>       nullptr,
+                       signature-t* signature => nullptr)
   {
     self = dk:init(super);
-    assert(!(NULL != superkls &&
-             NULL != kls));
+    assert(!(nullptr != superkls &&
+             nullptr != kls));
     self.object = object;
     self.signature = signature;
-    if (NULL != superkls)
+    if (nullptr != superkls)
       self.kls = superkls;
-    else-if (NULL != kls)
+    else-if (nullptr != kls)
       self.kls = kls;
     else
       self.kls = dk:klass(object); // notenote: could be a trait method!!!
@@ -56,7 +56,7 @@ klass no-such-method-exception
     dk:print(super, out);
     object-t object-klass = dk:klass(self.object);
 
-    if (NULL == self.signature)
+    if (nullptr == self.signature)
     {
       if (dk:instance?(self.object, klass:klass))
       {

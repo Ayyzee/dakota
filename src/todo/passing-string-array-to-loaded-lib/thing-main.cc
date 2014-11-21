@@ -10,7 +10,7 @@ int main(int argc, const char* const* argv)
   setenv("DK_DUMP_KLSES", buf, overwrite = 1);
 
   void* handle = dlopen(argv[1], RTLD_NOW | RTLD_LOCAL);
-  if (NULL == handle)
+  if (nullptr == handle)
     fprintf(stderr, "ERROR: %s: \"%s\"\n", argv[1], dlerror());
   return 0;
 }

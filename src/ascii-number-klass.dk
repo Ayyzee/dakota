@@ -36,7 +36,7 @@ klass ascii-number-klass
   {
     gbl-base2-ascii-number-klass-info = dk-make-named-info($base2-ascii-number-klass,
                                                            $superklass-name, cast(uintptr-t)ascii-number:__klass__,
-                                                           NULL);
+                                                           nullptr);
     return kls;
   }
 
@@ -50,7 +50,7 @@ klass ascii-number-klass
                        const char8-t* digits => "01")
   {
     self = dk:init(super, info => info);
-    assert(NULL != digits);
+    assert(nullptr != digits);
     self.digits = digits;
     // should confirm the digits are unique
     return self;

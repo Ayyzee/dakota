@@ -38,7 +38,7 @@ macro ka-method-use
 
   { ?lhs:ident => ?rhs:ident }
   =>
-  { ?lhs , ?rhs , NULL }
+  { ?lhs , ?rhs , nullptr }
 
   { ?:ident , ... }
   =>

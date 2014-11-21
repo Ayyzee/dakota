@@ -64,11 +64,11 @@ klass assoc
     object-t key = self;
     if (dk:instance?(key, klass))
       key = unbox(key)->key;
-    assert(NULL != key);
+    assert(nullptr != key);
     object-t other-key = other;
     if (dk:instance?(other-key, klass))
       other-key = unbox(other-key)->key;
-    assert(NULL != other-key);
+    assert(nullptr != other-key);
     result = dk:equal?(key, other-key);
     return result;
   }
@@ -79,11 +79,11 @@ klass assoc
     object-t key = self;
     if (dk:instance?(key, klass))
       key = unbox(key)->key;
-    assert(NULL != key);
+    assert(nullptr != key);
     object-t other-key = other;
     if (dk:instance?(other-key, klass))
       other-key = unbox(other-key)->key;
-    assert(NULL != other-key);
+    assert(nullptr != other-key);
     result = dk:compare(key, other-key);
     return result;
   }
@@ -94,7 +94,7 @@ klass assoc
     object-t key = self;
     if (dk:instance?(key, klass))
       key = unbox(key)->key;
-    assert(NULL != key);
+    assert(nullptr != key);
     result = dk:hash(key);
     return result;
   }

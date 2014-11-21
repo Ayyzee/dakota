@@ -9,7 +9,7 @@ export klass handler-context
     exception-handler:slots-t handler;
     slots-t*                  next;
   }
-  slots-t* current = NULL;
+  slots-t* current = nullptr;
 
   method slots-t* add(slots-t* s, slots-t* o)
   {
@@ -30,7 +30,7 @@ export klass handler-context
 void dkt-handler-context-add(handler-context-t* hc, exception-handler-t handler)
 {
   hc->handler = handler;
-  hc->next =    NULL;
+  hc->next =    nullptr;
   handler-context:add(handler-context:current, hc);
   return;
 }
@@ -42,7 +42,7 @@ void dkt-handler-context-remove(handler-context-t* hc)
 void dkt-throw-object(object-t exception)
 {
   printf("%s(<%s>)\n", __func__, dk:name(dk:klass(exception)));
-  if (NULL == handler-context:current || !handler-context:current->handler(exception))
+  if (nullptr == handler-context:current || !handler-context:current->handler(exception))
     throw exception;
   printf("%s(<%s>) exception-handled\n", __func__, dk:name(dk:klass(exception)));
 }

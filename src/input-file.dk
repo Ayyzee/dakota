@@ -44,22 +44,22 @@ klass input-file
   }
 
   method object-t init(object-t self,
-                       file-t         file =>     NULL,
-                       const char8-t* filename => NULL)
+                       file-t         file =>     nullptr,
+                       const char8-t* filename => nullptr)
   {
     self = dk:init(super);
-    assert(!(NULL != file && NULL != filename)); // these are mutually exclusive
+    assert(!(nullptr != file && nullptr != filename)); // these are mutually exclusive
     assert(stdout != file);
     assert(stderr != file);
 
-    if (NULL == file && NULL == filename)
+    if (nullptr == file && nullptr == filename)
       file = stdin; // default
 
-    if (NULL != filename)
+    if (nullptr != filename)
     {
       file = fopen(filename, "r");
 
-      if (NULL == file)
+      if (nullptr == file)
         throw make(system-exception:klass, errnum => errno);
     }
     self.filename = filename; // copycopy: should make a copy?
@@ -74,7 +74,7 @@ klass input-file
 
     // check for embedded NUL?
 
-    if (NULL != filename)
+    if (nullptr != filename)
       fclose(file);
     else
       fsetpos(file, &fpos);
@@ -138,7 +138,7 @@ klass input-file
   {
     object-t result = make(vector:klass);
 
-    if (NULL == type?)
+    if (nullptr == type?)
       type? = space?;
     
     char8-t c;

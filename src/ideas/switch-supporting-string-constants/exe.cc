@@ -39,7 +39,7 @@ int main(int argc, char** argv)
   const mph_t* mph = &rn::mph_00;
 
   struct timeval initial_tv = {0};
-  gettimeofday(&initial_tv, NULL);
+  gettimeofday(&initial_tv, nullptr);
 
   const size_t width = 32;
   char str[width] = "";
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
     }
   }
   struct timeval final_tv = {0};
-  gettimeofday(&final_tv, NULL);
+  gettimeofday(&final_tv, nullptr);
 
   float dur = duration(initial_tv, final_tv);
 

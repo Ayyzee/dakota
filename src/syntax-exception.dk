@@ -39,7 +39,7 @@ klass syntax-exception
                        const char8-t* message =>  __klass__)
   {
     self = dk:init(super);
-    assert(NULL != token &&
+    assert(nullptr != token &&
            null != token);
     self.token = token;
     self.filename = filename;
@@ -49,7 +49,7 @@ klass syntax-exception
 
   method object-t print-shallow(object-t self, object-t out)
   {
-    assert(NULL != out);
+    assert(nullptr != out);
     if (null == out)
       out = std-error;
     dk:print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
@@ -59,7 +59,7 @@ klass syntax-exception
 
   method object-t print(object-t self, object-t out)
   {
-    assert(NULL != out);
+    assert(nullptr != out);
     if (null == out)
       out = std-error;
     dk:print(super, out);

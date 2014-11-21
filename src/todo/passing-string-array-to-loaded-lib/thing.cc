@@ -7,7 +7,7 @@ static __attribute__((constructor)) void init()
   const char* const* klses;
   sscanf(klses_str, "%p", &klses);
   const char* kls;
-  while (NULL != (kls = *klses++))
+  while (nullptr != (kls = *klses++))
     printf("%s\n", kls);
   return;
 }

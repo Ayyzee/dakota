@@ -21,7 +21,7 @@ include <cstring>;
 #ifndef __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
-include <inttypes.h>;
+include <cinttypes>;
 
 include "dakota-private.h";
 
@@ -48,10 +48,10 @@ klass string
                        uint32-t       start =>    0,
                        uint32-t       length =>   cast(uint32-t)safe-strlen(bytes) - start)
   {
-    // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == NULL)
+    // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = dk:init(super);
-    assert(NULL != bytes);
-    assert(NULL != encoding);
+    assert(nullptr != bytes);
+    assert(nullptr != encoding);
     assert(start <= length);
     USE(encoding);
     self.encoding = encoding;
@@ -72,7 +72,7 @@ klass string
   method uint32-t length(object-t self)
   {
     if (0    == self.len &&
-        NULL != self.ptr &&
+        nullptr != self.ptr &&
         NUL  != self.ptr[0])
       self.len = cast(uint32-t)safe-strlen(self.ptr);
     return self.len;
@@ -115,19 +115,19 @@ klass string
 
   method uint32-t uint32-value(object-t self)
   {
-    uint32-t result = cast(uint32-t)strtoumax(self.ptr, NULL, 10);
+    uint32-t result = cast(uint32-t)strtoumax(self.ptr, nullptr, 10);
     return result;
   }
 
   method int32-t int32-value(object-t self)
   {
-    int32-t result = cast(int32-t)strtoimax(self.ptr, NULL, 10);
+    int32-t result = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
     return result;
   }
 
   method boole-t boole-value(object-t self)
   {
-    int32-t int-value = cast(int32-t)strtoimax(self.ptr, NULL, 10);
+    int32-t int-value = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
     boole-t result;
     if (0 == int-value)
       result = false;
@@ -138,8 +138,8 @@ klass string
 
   method object-t append(object-t self, const char8-t* bytes, symbol-t encoding => $utf-8)
   {
-    assert(NULL != bytes);
-    assert(NULL != encoding);
+    assert(nullptr != bytes);
+    assert(nullptr != encoding);
     assert($utf-8 != encoding);
     USE(encoding);
     uint32-t len = cast(uint32-t)safe-strlen(bytes);
@@ -181,7 +181,7 @@ klass string
     }
 
     // 'part' 'delimiter' pairs
-    while (NULL != (p2 = strstr(p1, delimiter)))
+    while (nullptr != (p2 = strstr(p1, delimiter)))
     {
       object-t part-object = make(kls, bytes => cast(const char8-t*)(p1), length => cast(uint32-t)(p2 - p1));
       dk:add-last(result, part-object);
@@ -225,8 +225,8 @@ klass string
 
     if (dk:instance?(other, klass))
     {
-      // what if both utf8s are NULL?
-      // what if only one utf8 is NULL?
+      // what if both utf8s are nullptr?
+      // what if only one utf8 is nullptr?
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = safe-strcmp(s1->ptr, s2->ptr);

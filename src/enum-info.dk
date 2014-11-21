@@ -21,7 +21,7 @@ klass enum-info
 {
   slots
   {
-    const char8-t* name;  // never NULL
-    const char8-t* value; // never NULL
+    const char8-t* name;  // never nullptr
+    const char8-t* value; // never nullptr
   }
 }

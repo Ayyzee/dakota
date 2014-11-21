@@ -20,7 +20,7 @@ klass result
 {
   slots
   {
-    const void* element; // NULL when not found
+    const void* element; // nullptr when not found
     uint32-t    offset;  // either offset of found element, or offset to insert element
   }
 }

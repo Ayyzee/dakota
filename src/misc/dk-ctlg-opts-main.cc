@@ -59,43 +59,43 @@ enum
   };
 static struct option longopts[] =
   {
-    { "opt-00", no_argument, NULL, opt_00 },
-    { "opt-01", no_argument, NULL, opt_01 },
-    { "opt-02", no_argument, NULL, opt_02 },
-    { "opt-03", no_argument, NULL, opt_03 },
-    { "opt-04", no_argument, NULL, opt_04 },
-    { "opt-05", no_argument, NULL, opt_05 },
-    { "opt-06", no_argument, NULL, opt_06 },
-    { "opt-07", no_argument, NULL, opt_07 },
-    { "opt-08", no_argument, NULL, opt_08 },
-    { "opt-09", no_argument, NULL, opt_09 },
+    { "opt-00", no_argument, nullptr, opt_00 },
+    { "opt-01", no_argument, nullptr, opt_01 },
+    { "opt-02", no_argument, nullptr, opt_02 },
+    { "opt-03", no_argument, nullptr, opt_03 },
+    { "opt-04", no_argument, nullptr, opt_04 },
+    { "opt-05", no_argument, nullptr, opt_05 },
+    { "opt-06", no_argument, nullptr, opt_06 },
+    { "opt-07", no_argument, nullptr, opt_07 },
+    { "opt-08", no_argument, nullptr, opt_08 },
+    { "opt-09", no_argument, nullptr, opt_09 },
 
-    { "opt-10", no_argument, NULL, opt_10 },
-    { "opt-11", no_argument, NULL, opt_11 },
-    { "opt-12", no_argument, NULL, opt_12 },
-    { "opt-13", no_argument, NULL, opt_13 },
-    { "opt-14", no_argument, NULL, opt_14 },
-    { "opt-15", no_argument, NULL, opt_15 },
-    { "opt-16", no_argument, NULL, opt_16 },
-    { "opt-17", no_argument, NULL, opt_17 },
-    { "opt-18", no_argument, NULL, opt_18 },
-    { "opt-19", no_argument, NULL, opt_19 },
+    { "opt-10", no_argument, nullptr, opt_10 },
+    { "opt-11", no_argument, nullptr, opt_11 },
+    { "opt-12", no_argument, nullptr, opt_12 },
+    { "opt-13", no_argument, nullptr, opt_13 },
+    { "opt-14", no_argument, nullptr, opt_14 },
+    { "opt-15", no_argument, nullptr, opt_15 },
+    { "opt-16", no_argument, nullptr, opt_16 },
+    { "opt-17", no_argument, nullptr, opt_17 },
+    { "opt-18", no_argument, nullptr, opt_18 },
+    { "opt-19", no_argument, nullptr, opt_19 },
 
-    { "opt-20", no_argument, NULL, opt_20 },
-    { "opt-21", no_argument, NULL, opt_21 },
-    { "opt-22", no_argument, NULL, opt_22 },
-    { "opt-23", no_argument, NULL, opt_23 },
-    { "opt-24", no_argument, NULL, opt_24 },
-    { "opt-25", no_argument, NULL, opt_25 },
-    { "opt-26", no_argument, NULL, opt_26 },
-    { "opt-27", no_argument, NULL, opt_27 },
-    { "opt-28", no_argument, NULL, opt_28 },
-    { "opt-29", no_argument, NULL, opt_29 },
+    { "opt-20", no_argument, nullptr, opt_20 },
+    { "opt-21", no_argument, nullptr, opt_21 },
+    { "opt-22", no_argument, nullptr, opt_22 },
+    { "opt-23", no_argument, nullptr, opt_23 },
+    { "opt-24", no_argument, nullptr, opt_24 },
+    { "opt-25", no_argument, nullptr, opt_25 },
+    { "opt-26", no_argument, nullptr, opt_26 },
+    { "opt-27", no_argument, nullptr, opt_27 },
+    { "opt-28", no_argument, nullptr, opt_28 },
+    { "opt-29", no_argument, nullptr, opt_29 },
 
-    { "opt-30", no_argument, NULL, opt_30 },
-    { "opt-31", no_argument, NULL, opt_31 },
+    { "opt-30", no_argument, nullptr, opt_30 },
+    { "opt-31", no_argument, nullptr, opt_31 },
 
-    { NULL, 0, NULL, 0 }
+    { nullptr, 0, nullptr, 0 }
   };
 
 static uint32_t
@@ -105,7 +105,7 @@ handle_opts(struct option* longopts, int* argc, char*** argv)
   int unrecognized_opt_cnt = 0;
   int opt;
 
-  while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, NULL)))
+  while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, nullptr)))
   {
     switch (opt)
     {

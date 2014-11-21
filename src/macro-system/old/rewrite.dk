@@ -4,12 +4,12 @@
 // =>
 // dk-add-all(make(DEFAULT_TABLE-KLASS),
 //                 assoc:box({box(key1), box(element1)}),
-//                 assoc:box({box(key2), box(element2)}), NULL)
+//                 assoc:box({box(key2), box(element2)}), nullptr)
 macro table-literal
 {
   { $ { ?table-pairs } }
   =>
-  { dk-add-all(make(DEFAULT-TABLE-KLASS) ?table-pairs, NULL) }
+  { dk-add-all(make(DEFAULT-TABLE-KLASS) ?table-pairs, nullptr) }
 
   table-pairs
   {

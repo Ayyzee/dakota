@@ -44,7 +44,7 @@ noexport void
 set-name(int-t errnum, const char8-t* name)
 {
   assert(0 != errnum);
-  assert(NULL != name);
+  assert(nullptr != name);
   assert(NUL != name[0]);
 //   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);
   assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));

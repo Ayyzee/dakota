@@ -83,7 +83,7 @@ klass xml-object-output-stream
   method object-t write-element(object-t self, const char8-t* element, const char8-t* key)
   {
     char8-t[128] buffer;
-    if (NULL != key)
+    if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s\"%s\"%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "\"%s\"%s", element, self.element-delim);
@@ -94,7 +94,7 @@ klass xml-object-output-stream
   method object-t write-element(object-t self, int32-t element, const char8-t* key)
   {
     char8-t[128] buffer;
-    if (NULL != key)
+    if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%i%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "%i%s", element, self.element-delim);
@@ -105,7 +105,7 @@ klass xml-object-output-stream
   method object-t write-element(object-t self, uint32-t element, const char8-t* key)
   {
     char8-t[128] buffer;
-    if (NULL != key)
+    if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%u%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "%u%s", element, self.element-delim);
@@ -116,7 +116,7 @@ klass xml-object-output-stream
   method object-t write-table-start(object-t self, const char8-t* key)
   {
     char8-t[128] buffer;
-    if (NULL != key)
+    if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-tbl-delim);
     else
       snprintf(buffer, sizeof(buffer), "%s", self.start-tbl-delim);
@@ -137,7 +137,7 @@ klass xml-object-output-stream
   method object-t write-sequence-start(object-t self, const char8-t* key)
   {
     char8-t[128] buffer;
-    if (NULL != key)
+    if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-seq-delim);
     else
       snprintf(buffer, sizeof(buffer), "%s", self.start-seq-delim);

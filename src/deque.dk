@@ -20,15 +20,15 @@ include <cstdlib>;
 #ifndef __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
-include <inttypes.h>;
+include <cinttypes>;
 
 klass node
 {
   slots
   {
-    object-t element; // may NOT be NULL, may be null
-    slots-t* prev;    // NULL (not null) for first
-    slots-t* next;    // NULL (not null) for last
+    object-t element; // may NOT be nullptr, may be null
+    slots-t* prev;    // nullptr (not null) for first
+    slots-t* next;    // nullptr (not null) for last
   }
 
   noexport slots-t* create(slots-t* prev, object-t element, slots-t* next)
@@ -42,7 +42,7 @@ klass node
 
   noexport void dump-prev(slots-t* s, uint32-t iterator-state)
   {
-    if (NULL != s)
+    if (nullptr != s)
     {
 //       fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
 //               "<tr><td port=\"element\">element</td></tr>"
@@ -52,21 +52,21 @@ klass node
 //       fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk:name(dk:klass(s->element)));
 //       fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(void*)(s), iterator-state, cast(void*)(s->element), iterator-state);
 
-      if (NULL != s->prev)
+      if (nullptr != s->prev)
         fprintf(stderr, "    \"%p-%i\" -> \"%p-%i\":prev [ dir = back ];\n", cast(void*)(s->prev), iterator-state, cast(void*)(s), iterator-state);
       else
       {
-        fprintf(stderr, "    \"%p-%i-prev-NULL\" [ label = \"NULL\" ];\n", cast(void*)(s), iterator-state);
-        fprintf(stderr, "    \"%p-%i-prev-NULL\" -> \"%p-%i\":prev [ dir = back ];\n", cast(void*)(s), iterator-state, cast(void*)(s), iterator-state);
+        fprintf(stderr, "    \"%p-%i-prev-nullptr\" [ label = \"nullptr\" ];\n", cast(void*)(s), iterator-state);
+        fprintf(stderr, "    \"%p-%i-prev-nullptr\" -> \"%p-%i\":prev [ dir = back ];\n", cast(void*)(s), iterator-state, cast(void*)(s), iterator-state);
       }
-      if (NULL != s->prev)
+      if (nullptr != s->prev)
         dump-prev(s->prev, iterator-state);
     }
     return;
   }
   noexport void dump-next(slots-t* s, uint32-t iterator-state)
   {
-    if (NULL != s)
+    if (nullptr != s)
     {
       fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"
@@ -76,14 +76,14 @@ klass node
       fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk:name(dk:klass(s->element)));
       fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(void*)(s), iterator-state, cast(void*)(s->element), iterator-state);
 
-      if (NULL != s->next)
+      if (nullptr != s->next)
         fprintf(stderr, "    \"%p-%i\":next -> \"%p-%i\";\n", cast(void*)(s), iterator-state, cast(void*)(s->next), iterator-state);
       else
       {
-        fprintf(stderr, "    \"%p-%i-next-NULL\" [ label = \"NULL\" ];\n", cast(void*)(s), iterator-state);
-        fprintf(stderr, "    \"%p-%i\":next -> \"%p-%i-next-NULL\";\n", cast(void*)(s), iterator-state, cast(void*)(s), iterator-state);
+        fprintf(stderr, "    \"%p-%i-next-nullptr\" [ label = \"nullptr\" ];\n", cast(void*)(s), iterator-state);
+        fprintf(stderr, "    \"%p-%i\":next -> \"%p-%i-next-nullptr\";\n", cast(void*)(s), iterator-state, cast(void*)(s), iterator-state);
       }
-      if (NULL != s->next)
+      if (nullptr != s->next)
         dump-next(s->next, iterator-state);
     }
     return;
@@ -99,8 +99,8 @@ klass deque
 
   slots
   {
-    node:slots-t* first; // if (NULL != first)  first->prev = NULL;
-    node:slots-t* last;  // if (NULL != last)   last->next =  NULL;
+    node:slots-t* first; // if (nullptr != first)  first->prev = nullptr;
+    node:slots-t* last;  // if (nullptr != last)   last->next =  nullptr;
     uint32-t      size;
 
     uint32-t iterator-state;
@@ -109,7 +109,7 @@ klass deque
   method object-t test-dump(object-t self)
   {
     slots-t* s = unbox(self);
-    if (NULL != s)
+    if (nullptr != s)
     {
       fprintf(stderr, "  subgraph \"cluster-%p-%i\"\n", cast(void*)(s), s->iterator-state);
       fprintf(stderr, "  {\n");
@@ -123,11 +123,11 @@ klass deque
               "<tr><td port=\"last\">last</td></tr>"
               "<tr><td port=\"size\">size=%i</td></tr>"
               "</table> > ];\n", cast(void*)(s), s->iterator-state, s->size);
-      if (NULL == s->first && NULL == s->last)
+      if (nullptr == s->first && nullptr == s->last)
       {
-        fprintf(stderr, "    \"%p-%i-NULL\" [ label = \"NULL\" ];\n", cast(void*)(s), s->iterator-state);
-        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i-NULL\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s), s->iterator-state);
-        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i-NULL\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s), s->iterator-state);
+        fprintf(stderr, "    \"%p-%i-nullptr\" [ label = \"nullptr\" ];\n", cast(void*)(s), s->iterator-state);
+        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i-nullptr\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s), s->iterator-state);
+        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i-nullptr\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s), s->iterator-state);
       }
       else
       {
@@ -145,21 +145,21 @@ klass deque
     return self;
   }
 
-  method object-t init(object-t self, object-t element => NULL)
+  method object-t init(object-t self, object-t element => nullptr)
   {
     self = dk:init(super);
 
-    if (NULL == element)
+    if (nullptr == element)
     {
-      self.first = NULL;
-      self.last =  NULL;
+      self.first = nullptr;
+      self.last =  nullptr;
       self.size =  0;
     }
     else
     {
-      node:slots-t* node = node:create(NULL, element, NULL);
-      //        node->prev = NULL;
-      //        node->next = NULL;
+      node:slots-t* node = node:create(nullptr, element, nullptr);
+      //        node->prev = nullptr;
+      //        node->next = nullptr;
       self.first = node;
       self.last =  node;
       self.size =  1;
@@ -170,9 +170,9 @@ klass deque
 
   noexport object-t string-from-node(object-t self, node:slots-t* mn, char8-t* buf, uint32-t buf-len)
   {
-    if (self.first == mn && self.first != NULL)
+    if (self.first == mn && self.first != nullptr)
       snprintf(buf, buf-len, "%s", "first     ");
-    else-if (self.last == mn && self.last != NULL)
+    else-if (self.last == mn && self.last != nullptr)
       snprintf(buf, buf-len, "%s", "last      ");
     else
       snprintf(buf, buf-len, "0x%0*" PRIxPTR,
@@ -195,7 +195,7 @@ klass deque
     node:slots-t* last =  self.last;
     char8-t[16] buf = "";
 
-    if (NULL == first)
+    if (nullptr == first)
     {
       fprintf(stdout, " 0x%0*" PRIxPTR "\n",
               PRIxPTR-WIDTH, cast(uintptr-t)(first));
@@ -211,7 +211,7 @@ klass deque
       fprintf(stdout, "\n");
     }
 
-    if (NULL == last)
+    if (nullptr == last)
     {
       fprintf(stdout, " 0x%0*" PRIxPTR "\n",
               PRIxPTR-WIDTH, cast(uintptr-t)(last));
@@ -266,9 +266,9 @@ klass deque
 
   method object-t add-first(object-t self, object-t element)
   {
-    assert(NULL != element);
-    node:slots-t* node = node:create(NULL, element, self.first); // self.first may be NULL
-    //        node->prev = NULL;
+    assert(nullptr != element);
+    node:slots-t* node = node:create(nullptr, element, self.first); // self.first may be nullptr
+    //        node->prev = nullptr;
     //        node->next = self.first;
     self.first = node;
     self.size++;
@@ -280,14 +280,14 @@ klass deque
   method alias(add-last) object-t push(object-t self, object-t element);
   method object-t add-last(object-t self, object-t element)
   {
-    assert(NULL != element);
-    node:slots-t* node = node:create(self.last, element, NULL); // self.last may be NULL
-    if (NULL != self.last)
+    assert(nullptr != element);
+    node:slots-t* node = node:create(self.last, element, nullptr); // self.last may be nullptr
+    if (nullptr != self.last)
       self.last->next = node;
 
     self.last = node;
 
-    if (NULL == self.first)
+    if (nullptr == self.first)
       self.first = self.last;
 
     self.size++;
@@ -299,9 +299,9 @@ klass deque
   method object-t first(object-t self)
   {
     assert(0 != self.size);
-    //assert(NULL != self.first);
-    object-t element = NULL;
-    if (NULL != self.first)
+    //assert(nullptr != self.first);
+    object-t element = nullptr;
+    if (nullptr != self.first)
       element = self.first->element;
     return element;
   }
@@ -310,9 +310,9 @@ klass deque
   method object-t last(object-t self)
   {
     assert(0 != self.size);
-    //assert(NULL != self.last);
-    object-t element = NULL;
-    if (NULL != self.last)
+    //assert(nullptr != self.last);
+    object-t element = nullptr;
+    if (nullptr != self.last)
       element = self.last->element;
     return element;
   }
@@ -320,25 +320,25 @@ klass deque
   method object-t remove-first(object-t self)
   {
     assert(0 != self.size);
-    assert(NULL != self.first);
-    object-t element = NULL;
+    assert(nullptr != self.first);
+    object-t element = nullptr;
 
     if (self.last == self.first)
     {
-      self.last = NULL;
+      self.last = nullptr;
     }
-    //if (NULL != self.first)
+    //if (nullptr != self.first)
     {
       node:slots-t* node = self.first;
       self.first = self.first->next;
 
-      if (NULL != self.first)
-        self.first->prev = NULL;
+      if (nullptr != self.first)
+        self.first->prev = nullptr;
 #if 0
       else
       {
-        //node->prev = NULL;
-        node->next = NULL;
+        //node->prev = nullptr;
+        node->next = nullptr;
       }
 #endif
       element = node->element;
@@ -352,15 +352,15 @@ klass deque
   method object-t remove-last(object-t self)
   {
     assert(0 != self.size);
-    //assert(NULL != self.last);
+    //assert(nullptr != self.last);
     node:slots-t* node = self.last;
     self.last = self.last->prev;
 
-    if (NULL != self.last)
-      self.last->next = NULL;
+    if (nullptr != self.last)
+      self.last->next = nullptr;
 
-    node->prev = NULL;
-    //node->next = NULL;
+    node->prev = nullptr;
+    //node->next = nullptr;
     self.size--;
     self.iterator-state++;
     return node->element;
@@ -399,7 +399,7 @@ klass deque
   //          do
   //          {
   //            dk:write-element-idref(out, node->element);
-  //          } while (NULL != (node = node->next));
+  //          } while (nullptr != (node = node->next));
   //        }
   //        dk:decrement-column(out);
   //        snprintf(buffer, sizeof(buffer), "</sequence>");
@@ -444,15 +444,15 @@ klass deque-forward-iterator
   method object-t remove(object-t self)
   {
     check-iterator-state(self);
-    //assert(NULL != self.node);
+    //assert(nullptr != self.node);
     node:slots-t* node = self.node;
 
-    if (NULL != self.node->prev)
+    if (nullptr != self.node->prev)
       self.node->prev->next = self.node->next;
-    if (NULL != self.node->next)
+    if (nullptr != self.node->next)
       self.node->next->prev = self.node->prev;
-    node->prev = NULL; // gc help
-    node->next = NULL; // gc help
+    node->prev = nullptr; // gc help
+    node->next = nullptr; // gc help
 
     self.iterator-state++;
     deque:unbox(self.deque)->iterator-state++;
@@ -479,7 +479,7 @@ klass deque-forward-iterator
   {
     check-iterator-state(self);
     boole-t result;
-    if (NULL != self.node)
+    if (nullptr != self.node)
       result = true;
     else
       result = false;
@@ -489,7 +489,7 @@ klass deque-forward-iterator
   method object-t next(object-t self)
   {
     check-iterator-state(self);
-    object-t element = NULL;
+    object-t element = nullptr;
     if (dk:next?(self))
     {
       element = dk:element(self);
@@ -503,12 +503,12 @@ klass deque-forward-iterator
   method object-t element(object-t self)
   {
     check-iterator-state(self);
-    object-t element = NULL;
+    object-t element = nullptr;
     if (dk:next?(self))
     {
       element = self.node->element;
-      assert(NULL != element);
+      assert(nullptr != element);
     }
-    return element; // returns NULL on error
+    return element; // returns nullptr on error
   }
 }

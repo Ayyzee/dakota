@@ -18,11 +18,11 @@ include <dlfcn.h>; // struct Dl-info, dladdr()
 
 include "dl.h";
 
-// returns NULL if no exact match
+// returns nullptr if no exact match
 noexport const char8-t*
 symbol-name-from-address(void* saddr)
 {
-  const char8-t* result = NULL;
+  const char8-t* result = nullptr;
 #if defined WIN32
 #error "not yet implemented on win32"
 #else
@@ -40,18 +40,18 @@ load-library(const char8-t* name)
   //fprintf(stdout, "LoadLibrary(\"%s\")\n", name);
   HINSTANCE h-dll = LoadLibrary(name);
 
-  if (NULL == h-dll)
+  if (nullptr == h-dll)
   {
 //     DWORD last-error = GetLastError();
 //     LPVOID last-error-msg-buf;
 //     FormatMessage(FORMAT-MESSAGE-ALLOCATE-BUFFER | FORMAT-MESSAGE-FROM-SYSTEM,
-//                   NULL,
+//                   nullptr,
 //                   last-error,
 //                   MAKELANGID(LANG-NEUTRAL, SUBLANG-DEFAULT), // Default language
 //                   (LPTSTR) &last-error-msg-buf,
 //                   0,
-//                   NULL);
-//     MessageBox(NULL, (LPTSTR)last-error-msg-buf, "GetLastError", MB-OK | MB-ICONINFORMATION);
+//                   nullptr);
+//     MessageBox(nullptr, (LPTSTR)last-error-msg-buf, "GetLastError", MB-OK | MB-ICONINFORMATION);
 //     LocalFree(last-error-msg-buf);
 
     fprintf(stderr, "%s:%i: ERROR: LoadLibrary(\"%s\").\n",
@@ -62,7 +62,7 @@ load-library(const char8-t* name)
   //fprintf(stdout, "//dlopen(\"%s\", RTLD-NOW)\n", name);
   void* dl-handle = dlopen(name, RTLD-NOW);
 
-  if (NULL == dl-handle)
+  if (nullptr == dl-handle)
   {
     const char8-t* error = dlerror();
     fprintf(stderr, "%s:%i: ERROR: dlopen(\"%s\", RTLD-NOW): %s\n",

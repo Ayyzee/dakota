@@ -27,7 +27,7 @@ klass uint32
     dk:write-slots(super, out);
     dk:write-slots-start(out, klass);
 
-    dk:write-element(out, *unbox(self), NULL);
+    dk:write-element(out, *unbox(self), nullptr);
 
     dk:write-slots-end(out);
     return self;

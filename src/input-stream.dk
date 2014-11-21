@@ -30,23 +30,23 @@ klass input-stream
   }
 
   method object-t init(object-t self,
-                       file-t         file =>     NULL,
-                       const char8-t* filename => NULL)
+                       file-t         file =>     nullptr,
+                       const char8-t* filename => nullptr)
   {
     self = dk:init(super);
-    assert(!(NULL != file &&
-             NULL != filename)); // these are mutually exclusive
+    assert(!(nullptr != file &&
+             nullptr != filename)); // these are mutually exclusive
     assert(stdout != file);
     assert(stderr != file);
 
-    if (NULL == file && NULL == filename)
+    if (nullptr == file && nullptr == filename)
       self.file = stdin; // default
 
-    if (NULL != filename)
+    if (nullptr != filename)
     {
       self.file = fopen(filename, "r");
 
-      if (NULL == self.file)
+      if (nullptr == self.file)
         throw make(system-exception:klass, errnum => errno);
     }
     self.filename = filename;

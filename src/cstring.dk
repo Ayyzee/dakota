@@ -20,7 +20,7 @@ include <cstring>;
 #ifndef __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
-include <inttypes.h>;
+include <cinttypes>;
 
 include "dakota-private.h";
 
@@ -72,7 +72,7 @@ klass cstring
   {
   //dk:dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%u, capacity=%u }\n",
-            cast(void*)NULL, cast(void*)(s), s->ptr, s->len, s->capacity);
+            cast(void*)nullptr, cast(void*)(s), s->ptr, s->len, s->capacity);
     return s;
   }
 
@@ -110,7 +110,7 @@ klass cstring
   method uint32-t length(slots-t* s)
   {
     if (0    == s->len &&
-        NULL != s->ptr &&
+        nullptr != s->ptr &&
         NUL  != s->ptr[0])
       s->len = cast(uint32-t)safe-strlen(s->ptr);
     return s->len;

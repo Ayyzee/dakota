@@ -5,7 +5,7 @@
 #endif //__STDC_FORMAT_MACROS
 #include <inttypes.h>
 
-const int ptr_width =  snprintf(NULL, 0, "0x%" PRIxPTR, (uintptr_t)~0);
+const int ptr_width =  snprintf(nullptr, 0, "0x%" PRIxPTR, (uintptr_t)~0);
 
 int main()
 {

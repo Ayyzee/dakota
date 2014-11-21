@@ -38,7 +38,7 @@ klass sorted-ptr-array
   {
     assert(0 != capacity);
     assert(0 != size);
-    assert(NULL != compare);
+    assert(nullptr != compare);
     slots-t* result = cast(slots-t*)malloc(sizeof(slots-t));
     result->elements = cast(void**)malloc(size * capacity);
     result->count =    0;
@@ -57,9 +57,9 @@ klass sorted-ptr-array
   //(-(insertion point) - 1)
   noexport result-t search(slots-t* t, const void* key)
   {
-    assert(NULL != key);
+    assert(nullptr != key);
 
-    result-t result = { NULL, UINT32-MAX };
+    result-t result = { nullptr, UINT32-MAX };
     int-t comparison;
     boole-t should-increment = false;
 
@@ -89,7 +89,7 @@ klass sorted-ptr-array
         break;
       }
     }
-    if (NULL == result.element && should-increment)
+    if (nullptr == result.element && should-increment)
       i++;
     result.offset = i;
     return result;
@@ -97,7 +97,7 @@ klass sorted-ptr-array
 
   noexport slots-t* add-at(slots-t* t, const void* key, uint32-t offset)
   {
-    assert(NULL != key);
+    assert(nullptr != key);
     assert(offset <= t->count);
 
     memmove(cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
@@ -127,7 +127,7 @@ klass sorted-ptr-array
     memmove(cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
             cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
             (t->count - offset - 1) * t->size); // this arg may be zero
-    if (NULL != key)
+    if (nullptr != key)
       assert(0 == t->compare(key, element));
     memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, t->size);
     t->count--;
@@ -136,21 +136,21 @@ klass sorted-ptr-array
 
   noexport slots-t* add(slots-t* t, const void* key)
   {
-    assert(NULL != key);
+    assert(nullptr != key);
 
     result-t result = search(t, key);
-    if (NULL == result.element)
+    if (nullptr == result.element)
       add-at(t, key, result.offset);
     return t;
   }
 
   noexport const void* intern(slots-t* t, const void* key)
   {
-    assert(NULL != key);
+    assert(nullptr != key);
     const void* element = key;
     result-t result = search(t, key);
 
-    if (NULL != result.element)
+    if (nullptr != result.element)
       element = result.element;
     else
       add-at(t, key, result.offset);
@@ -170,14 +170,14 @@ klass sorted-ptr-array
     }
     else
     {
-      element = NULL;
+      element = nullptr;
     }
     return element;
   }
 
   noexport const void* bsearch(slots-t* t, const void* key)
   {
-    assert(NULL != key);
+    assert(nullptr != key);
  
     result-t result = search(t, key);
     return result.element;

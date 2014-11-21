@@ -43,17 +43,17 @@ klass vector
   STATIC const uint32-t gbl-default-initial-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
-  // 'items' is a NULL terminated array (of objects)
+  // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk:init(o, items => (object-t[]){ o1, o2, NULL });
+  // dk:init(o, items => (object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t  self,
                        uint32-t  initial-capacity => gbl-default-initial-capacity,
                        object-t  fill =>             gbl-default-fill,
-                       object-t  elements =>         NULL,
-                       object-t* items =>            NULL)
+                       object-t  elements =>         nullptr,
+                       object-t* items =>            nullptr)
   {
-    // it IS legal to have the 'fill' value be NULL
+    // it IS legal to have the 'fill' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);
 
@@ -69,10 +69,10 @@ klass vector
     for (uint32-t index = 0; index < self.capacity; index++)
       self.elements[index] = self.fill;
 
-    if (NULL != elements)
+    if (nullptr != elements)
       dk:add-all(self, elements);
 
-    if (NULL != items)
+    if (nullptr != items)
       dk:add-items(self, items);
     return self;
   }
@@ -236,8 +236,8 @@ klass vector
     if (self.count > index)
     {
       element = self.elements[index];
-      if (NULL != default-result)
-        assert(NULL != element);
+      if (nullptr != default-result)
+        assert(nullptr != element);
     }
     return element;
   }
@@ -253,8 +253,8 @@ klass vector
   // throw (object-t)
   method object-t at(object-t self, uint32-t index)
   {
-    object-t element = dk:at(self, index, NULL);
-    if (NULL == element)
+    object-t element = dk:at(self, index, nullptr);
+    if (nullptr == element)
       throw make(exception:klass, message => "oops");
     return element;
   }
@@ -288,7 +288,7 @@ klass vector
 
   method object-t add-first(object-t self, object-t element)
   {
-    assert(NULL != element);
+    assert(nullptr != element);
 
     if (self.count == self.capacity)
     {
@@ -309,7 +309,7 @@ klass vector
   method alias(add-last) object-t push(object-t self, object-t element);
   method object-t add-last(object-t self, object-t element)
   {
-    assert(NULL != element);
+    assert(nullptr != element);
 
     if (self.count == self.capacity)
     {
@@ -350,7 +350,7 @@ klass vector
     dk:write-sequence-start(out, "elements");
 
     for (uint32-t index = 0; index < self.count; index++)
-      dk:write-element-idref(out, self.elements[index], NULL);
+      dk:write-element-idref(out, self.elements[index], nullptr);
     dk:write-sequence-end(out);
 
     dk:write-slots-end(out);
@@ -363,7 +363,7 @@ klass vector
     uint32-t result = index;
     if (result < self.count)
     {
-      while (NULL == self.elements[result])
+      while (nullptr == self.elements[result])
       {
         result++;
         if (result == self.count)
@@ -438,7 +438,7 @@ klass vector-forward-iterator
   {
     check-iterator-state(self);
     boole-t result;
-    if (NULL != dk:at(self.vector, self.index, NULL))
+    if (nullptr != dk:at(self.vector, self.index, nullptr))
       result = true;
     else
       result = false;
@@ -448,7 +448,7 @@ klass vector-forward-iterator
   method object-t next(object-t self)
   {
     check-iterator-state(self);
-    object-t element = NULL;
+    object-t element = nullptr;
     if (dk:next?(self))
     {
       element = dk:element(self);
@@ -462,12 +462,12 @@ klass vector-forward-iterator
   method object-t element(object-t self)
   {
     check-iterator-state(self);
-    object-t element = NULL;
+    object-t element = nullptr;
     if (dk:next?(self))
     {
       element = dk:at(self.vector, self.index);
-      assert(NULL != element);
+      assert(nullptr != element);
     }
-    return element; // returns NULL on error
+    return element; // returns nullptr on error
   }
 }

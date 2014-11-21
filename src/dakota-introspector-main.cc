@@ -51,14 +51,14 @@ static int
 usage(const char* progname, option* options)
 {
   const char* tmp_progname = strrchr(progname, '/');
-  if (NULL != tmp_progname)
+  if (nullptr != tmp_progname)
     tmp_progname++;
   else
     tmp_progname = progname;
   fprintf(stdout, "usage: %s", tmp_progname);
   int result = 0;
 
-  while (NULL != options->name)
+  while (nullptr != options->name)
   {
     switch (options->has_arg)
     {
@@ -88,17 +88,17 @@ handle_opts(int* argc, char*** argv)
   // options descriptor
   static struct option longopts[] =
   {
-    { "help",             no_argument,       NULL, DK_INTROSPECTOR_HELP },
-    { "output",           required_argument, NULL, DK_INTROSPECTOR_OUTPUT },
-    { "output-directory", required_argument, NULL, DK_INTROSPECTOR_OUTPUT_DIRECTORY },
-    { "directory",        required_argument, NULL, DK_INTROSPECTOR_DIRECTORY },
-    { "only",             required_argument, NULL, DK_INTROSPECTOR_ONLY },
-    { "recursive",        no_argument,       NULL, DK_INTROSPECTOR_RECURSIVE },
-    { NULL, 0, NULL, 0 }
+    { "help",             no_argument,       nullptr, DK_INTROSPECTOR_HELP },
+    { "output",           required_argument, nullptr, DK_INTROSPECTOR_OUTPUT },
+    { "output-directory", required_argument, nullptr, DK_INTROSPECTOR_OUTPUT_DIRECTORY },
+    { "directory",        required_argument, nullptr, DK_INTROSPECTOR_DIRECTORY },
+    { "only",             required_argument, nullptr, DK_INTROSPECTOR_ONLY },
+    { "recursive",        no_argument,       nullptr, DK_INTROSPECTOR_RECURSIVE },
+    { nullptr, 0, nullptr, 0 }
   };
   int opt;
 
-  while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, NULL)))
+  while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, nullptr)))
   {
     switch (opt)
     {
@@ -178,13 +178,13 @@ main(int argc, char** argv, char**)
   handle_opts(&argc, &argv);
   char output_pid[MAXPATHLEN] = "";
 
-  if (NULL != opts.directory)
+  if (nullptr != opts.directory)
   {
     int n = chdir(opts.directory);
     if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
   }
 
-  if (NULL != opts.output)
+  if (nullptr != opts.output)
   {
     pid_t pid = getpid();
     snprintf(output_pid, sizeof(output_pid), "%s-%i", opts.output, pid);
@@ -198,15 +198,15 @@ main(int argc, char** argv, char**)
   int overwrite;
   setenv("DK_INTROSPECTOR_OUTPUT", output_pid, overwrite = 1);
 
-  if (NULL != opts.output_directory)
+  if (nullptr != opts.output_directory)
     setenv("DK_INTROSPECTOR_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
-  if (NULL != opts.only)
+  if (nullptr != opts.only)
     setenv("DK_INTROSPECTOR_ONLY", opts.only, overwrite = 1);
   if (opts.recursive)
     setenv_boole("DK_INTROSPECTOR_RECURSIVE", opts.recursive, overwrite = 1);
   int i = 0;
-  const char* arg = NULL;
-  while (NULL != (arg = argv[i++]))
+  const char* arg = nullptr;
+  while (nullptr != (arg = argv[i++]))
   {
     setenv("DK_NO_INIT_RUNTIME",  "", overwrite = 1);
     setenv("DK_EXIT_BEFORE_MAIN", "", overwrite = 1);
@@ -219,7 +219,7 @@ main(int argc, char** argv, char**)
       unsetenv("DK_NO_INIT_RUNTIME");
       unsetenv("DK_EXIT_BEFORE_MAIN");
       setenv("DK_INTROSPECTOR_ARG_TYPE", "lib", overwrite = 1); // not currently used
-      if (NULL == strchr(arg, '/'))
+      if (nullptr == strchr(arg, '/'))
       { // not required on darwin (required on linux)
         char arg_path[MAXPATHLEN] = "";
         strcat(arg_path, "./");
@@ -227,11 +227,11 @@ main(int argc, char** argv, char**)
         arg = arg_path;
       }
       void* handle = dlopen(arg, RTLD_NOW | RTLD_LOCAL);
-      if ((NULL == handle) || (0 != dlclose(handle)))
+      if ((nullptr == handle) || (0 != dlclose(handle)))
         abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
     }
   }
-  if (NULL != opts.output)
+  if (nullptr != opts.output)
   {
     int n = rename(output_pid, opts.output);
     if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));

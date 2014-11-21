@@ -26,7 +26,7 @@ klass node
 
   slots
   {
-    const char8-t* name;  // may NOT be NULL
+    const char8-t* name;  // may NOT be nullptr
     object-t       attrs; // <table>
   }
 
@@ -45,8 +45,8 @@ klass edge
 
   slots
   {
-    const char8-t* lhs-name; // may NOT be NULL
-    const char8-t* rhs-name; // may NOT be NULL
+    const char8-t* lhs-name; // may NOT be nullptr
+    const char8-t* rhs-name; // may NOT be nullptr
     object-t       attrs;    // <table>
   }
 
@@ -79,13 +79,13 @@ klass graph
   slots
   {
     symbol-t       type;  // $graph xor $digraph
-    const char8-t* name;  // may be NULL
+    const char8-t* name;  // may be nullptr
     object-t       stmts; // <sequence>
   }
 
   method object-t init(object-t self,
                        symbol-t       type =>  $graph,
-                       const char8-t* name =>  NULL,
+                       const char8-t* name =>  nullptr,
                        object-t       attrs => null)
   {
     self = dk:init(super);

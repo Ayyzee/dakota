@@ -190,7 +190,7 @@ sub gen_mph_func
     &append_col(\$result, $col, "static PURE unsigned $int $$names{'hash'}(const char* str) {\n");
     $col++;
 
-    &append_col(\$result, $col, "if (NULL != str) {\n");
+    &append_col(\$result, $col, "if (nullptr != str) {\n");
     $col++;
     my $i = 0;
     &append_col(\$result, $col, "switch (str[$i]) {\n");

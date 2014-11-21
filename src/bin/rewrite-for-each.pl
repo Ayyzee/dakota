@@ -30,6 +30,6 @@ else
 sub convert
 {
     my ($str) = @_;
-    $str =~ s|(for\s*\(\s*object-t\s+($k))\s*\:\s*($k)\s*\)|$1, _iterator_ = dk:forward-iterator($3); NULL != ($2 = dk:next-element(_iterator_); )|gs;
+    $str =~ s|(for\s*\(\s*object-t\s+($k))\s*\:\s*($k)\s*\)|$1, _iterator_ = dk:forward-iterator($3); nullptr != ($2 = dk:next-element(_iterator_); )|gs;
     return $str;
 }

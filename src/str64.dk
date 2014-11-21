@@ -21,7 +21,7 @@ include "dakota-private.h";
 #ifndef __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
-include <inttypes.h>;
+include <cinttypes>;
 
 module dakota;
 
@@ -34,7 +34,7 @@ klass str64
   method slots-t* dump(slots-t* s)
   {
   //dk:dump(super);
-    fprintf(stderr, "%p:%p { \"%s\" }\n", cast(void*)NULL, cast(void*)(s), *s);
+    fprintf(stderr, "%p:%p { \"%s\" }\n", cast(void*)nullptr, cast(void*)(s), *s);
     return s;
   }
 

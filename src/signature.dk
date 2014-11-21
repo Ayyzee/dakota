@@ -39,8 +39,8 @@ klass signature
 
   method int-t compare(slots-t* s, slots-t* other-s)
   {
-    assert(NULL != s);
-    assert(NULL != other-s);
+    assert(nullptr != s);
+    assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
     int-t result = safe-strcmp(s->name, other-s->name);
     if (0 == result)
@@ -52,8 +52,8 @@ klass signature
   // return type and selector is specified by qsort()
   noexport int-t compare(slots-t** s, slots-t** other-s)
   {
-    assert(NULL != s);
-    assert(NULL != other-s);
+    assert(nullptr != s);
+    assert(nullptr != other-s);
     int-t result = compare(*s, *other-s);
     return result;
   }

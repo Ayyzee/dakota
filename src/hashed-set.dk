@@ -61,33 +61,33 @@ klass hashed-set
   }
 
   // 'elements' is a collection (of objects)
-  // 'items' is a NULL terminated array (of objects)
+  // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk:init(o, items => (object-t[]){ o1, o2, NULL });
+  // dk:init(o, items => (object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t self,
                        hash-t            hash =>     dk:hash,
                        equal-predicate-t equal? =>   dk:equal?,
-                       object-t          elements => NULL,
-                       object-t*         items =>    NULL)
+                       object-t          elements => nullptr,
+                       object-t*         items =>    nullptr)
   {
-    assert(NULL != hash);
-    assert(NULL != equal?);
+    assert(nullptr != hash);
+    assert(nullptr != equal?);
     assert(null != elements);
 
     self = dk:init(super);
     self.num-buckets = gbl-prime;
-    self.buckets = make(vector:klass, initial-capacity => self.num-buckets, fill => NULL);
+    self.buckets = make(vector:klass, initial-capacity => self.num-buckets, fill => nullptr);
     self.size = 0;
     self.equal? = equal?;
     self.hash = hash;
 
     self.iterator-state = 0;
 
-    if (NULL != elements)
+    if (nullptr != elements)
       dk:add-all(self, elements);
 
-    if (NULL != items)
+    if (nullptr != items)
       dk:add-items(self, items);
     return self;
   }
@@ -101,9 +101,9 @@ klass hashed-set
       cast(uint32-t)
 #endif
       self.hash(object1) % self.num-buckets;
-    object-t deque = dk:at(self.buckets, index, NULL);
+    object-t deque = dk:at(self.buckets, index, nullptr);
 
-    if (NULL == deque)
+    if (nullptr == deque)
     {
       deque = make(deque:klass);
       dk:add-first(deque, object1);
@@ -113,7 +113,7 @@ klass hashed-set
     }
     else
     {
-      object-t element = NULL;
+      object-t element = nullptr;
 
       for (object-t object2 in deque)
       {
@@ -124,10 +124,10 @@ klass hashed-set
         }
       }
 
-//       if (should-throw && NULL != element)
+//       if (should-throw && nullptr != element)
 //         throw "oops";
 
-      if (NULL != element)
+      if (nullptr != element)
       {
         dk:add-first(deque, object1);
         self.size++; // bugbug - could wrap
@@ -151,10 +151,10 @@ klass hashed-set
       cast(uint32-t)
 #endif
       self.hash(object1) % self.num-buckets;
-    object-t deque = dk:at(self.buckets, index, NULL);
+    object-t deque = dk:at(self.buckets, index, nullptr);
     object-t result = default-value;
 
-    if (NULL != deque)
+    if (nullptr != deque)
     {
       for (object-t object2 in deque)
       {
@@ -172,7 +172,7 @@ klass hashed-set
   {
     boole-t state;
 
-    if (NULL == dk:at(self, key, NULL))
+    if (nullptr == dk:at(self, key, nullptr))
       state = false;
     else
       state = true;
@@ -200,9 +200,9 @@ klass hashed-set
       cast(uint32-t)
 #endif
       self.hash(element) % self.num-buckets;
-    object-t deque = dk:at(self.buckets, index, NULL);
+    object-t deque = dk:at(self.buckets, index, nullptr);
 
-    if (NULL != deque)
+    if (nullptr != deque)
     {
       for (object-t forward-iterator = dk:forward-iterator(deque);
            object-t element2 = dk:next(forward-iterator); )
@@ -264,7 +264,7 @@ klass hashed-set
     dk:write-sequence-start(out, "elements");
 
     for (object-t element in self)
-      dk:write-element-idref(out, element, NULL);
+      dk:write-element-idref(out, element, nullptr);
     dk:write-sequence-end(out);
 
     dk:write-slots-end(out);
@@ -302,9 +302,9 @@ klass hashed-set-forward-iterator
     self.hashed-set = hashed-set;
     self.vector-iter = dk:forward-iterator(hs->buckets);
     self.iterator-state = hs->iterator-state;
-    self.deque-iter = NULL;
+    self.deque-iter = nullptr;
     object-t deque = dk:next(self.vector-iter);
-    if (NULL != deque)
+    if (nullptr != deque)
     {
       assert(0 != dk:size(deque));
       self.deque-iter = dk:forward-iterator(deque);
@@ -316,7 +316,7 @@ klass hashed-set-forward-iterator
   {
     check-iterator-state(self);
     boole-t result = false;
-    if (NULL != self.deque-iter)
+    if (nullptr != self.deque-iter)
       result = dk:next?(self.deque-iter);
     return result;
   }
@@ -324,8 +324,8 @@ klass hashed-set-forward-iterator
   noexport object-t next-deque-iterator(object-t vector-iter)
   {
     object-t deque = dk:next(vector-iter);
-    object-t deque-iter = NULL;
-    if (NULL != deque)
+    object-t deque-iter = nullptr;
+    if (nullptr != deque)
     {
       assert(0 != dk:size(deque));
       deque-iter = dk:forward-iterator(deque);
@@ -336,20 +336,20 @@ klass hashed-set-forward-iterator
   method object-t next(object-t self)
   {
     check-iterator-state(self);
-    object-t element = NULL;
+    object-t element = nullptr;
     if (dk:next?(self))
     {
       element = dk:next(self.deque-iter);
-      if (NULL == element)
+      if (nullptr == element)
       {
         self.deque-iter = next-deque-iterator(self.vector-iter);
-        if (NULL != self.deque-iter)
-          element = dk:next(self.deque-iter); // may return NULL
+        if (nullptr != self.deque-iter)
+          element = dk:next(self.deque-iter); // may return nullptr
       }
-      if (NULL != element)
-        if (NULL != self.deque-iter)
+      if (nullptr != element)
+        if (nullptr != self.deque-iter)
           unless (dk:next?(self.deque-iter))
-            self.deque-iter = next-deque-iterator(self.vector-iter); // may return NULL
+            self.deque-iter = next-deque-iterator(self.vector-iter); // may return nullptr
     }
     return element;
   }
@@ -357,12 +357,12 @@ klass hashed-set-forward-iterator
   method object-t element(object-t self)
   {
     check-iterator-state(self);
-    object-t element = NULL;
+    object-t element = nullptr;
     if (dk:next?(self))
     {
       element = dk:element(self.deque-iter);
-      assert(NULL != element);
+      assert(nullptr != element);
     }
-    return element; // returns NULL on error
+    return element; // returns nullptr on error
   }
 }

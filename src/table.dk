@@ -26,15 +26,15 @@ trait table
   method alias(at) object-t in(object-t self, object-t key);
   method object-t at(object-t self, object-t key)
   {
-    return dk:at(self, key, NULL);
+    return dk:at(self, key, nullptr);
   }
 
   DK-VISIBILITY object-t at(object-t self, object-t key, object-t default-result)
   {
     object-t result = default-result;
-    object-t assoc = dk:assoc-at(self, key, NULL);
+    object-t assoc = dk:assoc-at(self, key, nullptr);
 
-    if (NULL != assoc)
+    if (nullptr != assoc)
     {
       assoc-t* assoc-content = assoc:unbox(assoc);
       result = assoc-content->element;
@@ -93,7 +93,7 @@ trait table
       dk:write(out, delim);
       dk:write-lite(assoc->key, out); // must be primitive type
       dk:write(out, "=>");
-      if (NULL == assoc->element || null == assoc->element)
+      if (nullptr == assoc->element || null == assoc->element)
         dk:write(out, "undef");
       else
         dk:write-lite(assoc->element, out);

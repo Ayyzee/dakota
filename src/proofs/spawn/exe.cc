@@ -46,8 +46,8 @@ spawn(const char* arg)
   
   if (0 == pid)
   { // child
-    char* args[] = { (char*)arg, NULL };
-    execve(args[0], args, NULL);
+    char* args[] = { (char*)arg, nullptr };
+    execve(args[0], args, nullptr);
     fprintf(stderr, "ERROR: errno=%i, \"%s\"\n", errno, strerror(errno));
     exit(EXIT_FAILURE);
     //return -1;

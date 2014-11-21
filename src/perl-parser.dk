@@ -50,18 +50,18 @@ klass perl-parser
     
   method object-t init(object-t self,
                        file-t         file =>     stdin,
-                       const char8-t* filename => NULL)
+                       const char8-t* filename => nullptr)
   {
     self = dk:init(super);
     assert(!(stdin != file &&
-             NULL  != filename)); // these are mutually exclusive
+             nullptr  != filename)); // these are mutually exclusive
 
-    if (NULL != filename)
+    if (nullptr != filename)
     {
       self.filename = filename;
       self.in =       fopen(self.filename, "r");
   
-      if (NULL == self.in)
+      if (nullptr == self.in)
       {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
@@ -71,7 +71,7 @@ klass perl-parser
     }
     else
     {
-      self.filename = NULL;
+      self.filename = nullptr;
       self.in =       file;
     }
     self.line =     1;
@@ -365,13 +365,13 @@ klass perl-parser
   {
     object-t key = perl-parser:key(self);
     if (null == key)
-      return NULL;
+      return nullptr;
     object-t corresponds-to = perl-parser:get-corresponds-to(self);
     if (null == corresponds-to)
-      return NULL;
+      return nullptr;
     object-t value = perl-parser:get-value(self);
     if (null == value)
-      return NULL;
+      return nullptr;
     return assoc:box({key, value});
   }
 
@@ -413,7 +413,7 @@ klass perl-parser
     do
     {
       object-t table-pair = perl-parser:get-table-pair(self);
-      if (NULL == table-pair)
+      if (nullptr == table-pair)
         return table;
 
       // add 'table-pair' to 'table'

@@ -24,9 +24,9 @@ trait counted-set
   DK-VISIBILITY object-t at(object-t self, object-t key, object-t default-result)
   {
     object-t result = default-result;
-    object-t assoc = dk:assoc-at(self, key, NULL);
+    object-t assoc = dk:assoc-at(self, key, nullptr);
 
-    if (NULL != assoc)
+    if (nullptr != assoc)
     {
       assoc-t* assoc-content = assoc:unbox(assoc);
       result = assoc-content->element;
@@ -36,9 +36,9 @@ trait counted-set
 
   noexport object-t add(object-t self, object-t element)
   {
-    object-t assoc = dk:assoc-at(self, element, NULL);
+    object-t assoc = dk:assoc-at(self, element, nullptr);
 
-    if (NULL != assoc)
+    if (nullptr != assoc)
     {
       assoc-t* assoc-content = assoc:unbox(assoc);
       object-t count = assoc-content->element;
@@ -73,9 +73,9 @@ trait counted-set
   method uint32-t count-at(object-t self, object-t element, uint32-t default-count)
   {
     uint32-t count-content = default-count;
-    object-t assoc = dk:assoc-at(self, element, NULL);
+    object-t assoc = dk:assoc-at(self, element, nullptr);
 
-    if (NULL != assoc)
+    if (nullptr != assoc)
     {
       assoc-t* assoc-content = assoc:unbox(assoc);
       object-t count = assoc-content->element;

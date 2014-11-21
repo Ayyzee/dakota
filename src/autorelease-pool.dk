@@ -44,8 +44,8 @@ klass autorelease-pool-klass
   }
 
   method object-t init(object-t self,
-                       named-info-node:slots-t* info-slots => NULL,
-                       object-t                 info =>      NULL)
+                       named-info-node:slots-t* info-slots => nullptr,
+                       object-t                 info =>      nullptr)
   {
     self = dk:init(super, info-slots => info-slots, info => info);
     self.pools = make(deque:klass);

@@ -37,7 +37,7 @@ klass property
 
   method int32-t check(slots-t* s)
   {
-    if (NULL == s->key)
+    if (nullptr == s->key)
       abort();
     return 0;
   }

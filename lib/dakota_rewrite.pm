@@ -178,11 +178,11 @@ sub rewrite_compound_literal_cstring_null
 
     if ($use_compound_literals)
     {
-	$$filestr_ref =~ s|($name)-null|cast($1:slots-t)\{NULL, 0\}|g;
+	$$filestr_ref =~ s|($name)-null|cast($1:slots-t)\{nullptr, 0\}|g;
     }
     else
     {
-	$$filestr_ref =~ s|($name)-null|$1:construct(NULL, 0)|g;
+	$$filestr_ref =~ s|($name)-null|$1:construct(nullptr, 0)|g;
     }
 }
 
@@ -714,7 +714,7 @@ sub rewrite_table_literal_replacement
 	else
 	{ $result .= "box($element)}), "; }
       }
-      $result .= "NULL }";
+      $result .= "nullptr }";
     }
     $result .= ")";
     return $result;
@@ -740,7 +740,7 @@ sub rewrite_list_literal_replacement
       foreach my $assoc (@$assocs) {
 	$result .= "box($assoc), ";
       }
-      $result .= "NULL }";
+      $result .= "nullptr }";
     }
 
     $result .= ")";
@@ -1034,7 +1034,7 @@ sub remove_exported_enum
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;
 
 # dk:init(...,        $arg1  =     ...,         $arg2  =     ...)
-# dk:init(..., SYMBOL(_arg1) , ARG(...), SYMBOL(_arg2) , ARG(...), NULL)
+# dk:init(..., SYMBOL(_arg1) , ARG(...), SYMBOL(_arg2) , ARG(...), nullptr)
 
 sub rewrite_keyword_syntax_list
 {
@@ -1076,7 +1076,7 @@ sub rewrite_keyword_syntax_use
     #print STDERR "$arg1$list\n";
     $list =~ s/($m)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
     $list =~ s/($z)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
-    $list =~ s/\)$/, NULL\)/g;
+    $list =~ s/\)$/, nullptr\)/g;
     #print STDERR "$arg1$list\n";
     return "$arg1$list";
 }

@@ -63,7 +63,7 @@ getprogname()
     throw make(system-exception:klass, errnum => errno);
   gbl-buf[n] = NUL;
   const char8-t* progname = strrchr(gbl-buf, '/');
-  if (NULL != progname)
+  if (nullptr != progname)
     progname++;
   else
     progname = gbl-buf;
@@ -133,7 +133,7 @@ pre-runtime-verbose-terminate()
   const char8-t* current-exception-string = *dkt-current-exception-str();
   dk-log(DK-LOG-ERROR, "uncaught exception");
 
-  if (NULL != current-exception-string)
+  if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
   else
     fprintf(stderr, "\n");
@@ -149,15 +149,15 @@ verbose-terminate()
   const char8-t* current-exception-string = *dkt-current-exception-str();
   object-t current-exception = *dkt-current-exception();
 
-  if (NULL != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
-    if (NULL != current-exception)
+  if (nullptr != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
+    if (nullptr != current-exception)
       dk:dump(current-exception);
 
   dk:print-format(std-error, "%s[%i]: uncaught exception", getprogname(), getpid());
 
-  if (NULL != current-exception)
+  if (nullptr != current-exception)
     dk:println(current-exception, std-error);
-  else-if (NULL != current-exception-string)
+  else-if (nullptr != current-exception-string)
     dk:println-format(std-error, ": \"%s\"", current-exception-string);
   else
     dk:println(std-error, "");
@@ -175,7 +175,7 @@ pre-runtime-verbose-unexpected()
   const char8-t* current-exception-string = *dkt-current-exception-str();
   dk-log(DK-LOG-ERROR, "unexpected exception");
 
-  if (NULL != current-exception-string)
+  if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
   else
     fprintf(stderr, "\n");
@@ -191,15 +191,15 @@ verbose-unexpected()
   const char8-t* current-exception-string = *dkt-current-exception-str();
   object-t current-exception = *dkt-current-exception();
 
-  if (NULL != (getenv("DK_DUMP_UNEXPECTED_EXCEPTION")))
-    if (NULL != current-exception)
+  if (nullptr != (getenv("DK_DUMP_UNEXPECTED_EXCEPTION")))
+    if (nullptr != current-exception)
       dk:dump(current-exception);
 
   dk:print-format(std-error, "%s[%i]: unexpected exception", getprogname(), getpid());
 
-  if (NULL != current-exception)
+  if (nullptr != current-exception)
     dk:println(current-exception, std-error);
-  else-if (NULL != current-exception-string)
+  else-if (nullptr != current-exception-string)
     dk:println-format(std-error, ": \"%s\"", current-exception-string);
   else
     dk:println(std-error, "");

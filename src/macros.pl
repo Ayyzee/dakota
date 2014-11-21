@@ -57,12 +57,12 @@
 	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'NULL-KEYWORD', ',', '?ident', '=>', '?list-member'                       ],
-		'template' => [           '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+		'pattern'  => [ 'nullptr-KEYWORD', ',', '?ident', '=>', '?list-member'                       ],
+		'template' => [           '$', '##', '?ident', ',',  '?list-member', ',', 'nullptr-KEYWORD'  ]
 	    },
 	    {
 		'pattern'  => [                 ',', '?ident', '=>', '?list-member'                       ],
-		'template' => [      ',', '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+		'template' => [      ',', '$', '##', '?ident', ',',  '?list-member', ',', 'nullptr-KEYWORD'  ]
 	    }
 	],
     },
@@ -71,11 +71,11 @@
 	'rules' => [
 	    {
 		'pattern'  => [ 'dk', ':', '?ka-ident-1', '(', '?list-member',                      ')' ],
-		'template' => [ 'dk', ':', '?ka-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+		'template' => [ 'dk', ':', '?ka-ident-1', '(', '?list-member', ',', 'nullptr-KEYWORD', ')' ]
 	    },
 	    {
 		'pattern'  => [ 'dk', ':', '?ka-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
-		'template' => [ 'dk', ':', '?ka-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+		'template' => [ 'dk', ':', '?ka-ident-2', '(', '?list-member', ',', '?list-member', ',', 'nullptr-KEYWORD', ')' ]
 	    }
 	],
     },

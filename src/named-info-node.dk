@@ -20,7 +20,7 @@ include <cstring>;
 #ifndef __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
-include <inttypes.h>;
+include <cinttypes>;
 
 include "dakota-private.h";
 
@@ -72,7 +72,7 @@ klass named-info-node
   {
     uintptr-t element = 0;
     property:slots-t* property = search(s, key);
-    if (NULL != property)
+    if (nullptr != property)
       element = property->element;
     return element;
   }
@@ -80,7 +80,7 @@ klass named-info-node
   method uintptr-t at(slots-t* s, symbol-t key, uintptr-t default-element)
   {
     uintptr-t element = at(s, key);
-    if (0 == element) // aka: if (NULL == element)
+    if (0 == element) // aka: if (nullptr == element)
       element = default-element;
     return element;
   }
@@ -143,7 +143,7 @@ klass named-info-node
 export named-info-node-t*
 dk-va-make-named-info(symbol-t name, va-list-t args)
 {
-//   assert(NULL != name);
+//   assert(nullptr != name);
   symbol-t key;
   uintptr-t element;
 
@@ -155,7 +155,7 @@ dk-va-make-named-info(symbol-t name, va-list-t args)
   props[count].element = cast(uintptr-t)(name);
   count++;
 
-  while (NULL != (key = va-arg(args, symbol-t)))
+  while (nullptr != (key = va-arg(args, symbol-t)))
   {
     element = va-arg(args, uintptr-t);
     if (props-capacity == count + 1)
@@ -171,7 +171,7 @@ dk-va-make-named-info(symbol-t name, va-list-t args)
   named-info-node-t* info = cast(named-info-node-t*)malloc(sizeof(named-info-node-t));
   info->elements = props;
   info->count = count;
-  info->next = NULL;
+  info->next = nullptr;
   sort(info);
   return info;
 }

@@ -15,11 +15,11 @@ static unsigned int time_test(const mph_t* mph, const char* str)
   struct timeval tv2 = {0};
   uint32_t iters = 64 * 1024 * 1024;
 
-  gettimeofday(&tv1, NULL);
+  gettimeofday(&tv1, nullptr);
   for (uint32_t j = 0; j < iters; j++) {
     result = mph->hash(str);
   }
-  gettimeofday(&tv2, NULL);
+  gettimeofday(&tv2, nullptr);
 
   float dur = duration(tv1, tv2);
   const char* result_str = mph::str(mph, result);
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 {
   const mph_t* mph = &rn::mph_00;
 
-  time_test(mph, NULL);
+  time_test(mph, nullptr);
   time_test(mph, "");
 
   for (unsigned int i = 0; i < mph->strs_len; i++) {

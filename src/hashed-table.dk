@@ -35,8 +35,8 @@ klass hashed-table
   method object-t init(object-t self,
                        equal-predicate-t equal? => cast(equal-predicate-t)dk:method-for-selector(assoc:klass, selector(equal?(object-t, object-t))),
                        hash-t            hash =>   cast(hash-t           )dk:method-for-selector(assoc:klass, selector(hash(object-t))),
-                       object-t          elements => NULL,
-                       object-t*         items =>    NULL)
+                       object-t          elements => nullptr,
+                       object-t*         items =>    nullptr)
   {
     self = dk:init(super, equal? => equal?, hash => hash, elements => elements, items => items);
     return self;

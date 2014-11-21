@@ -24,7 +24,7 @@ spawn(const char* arg)
   if (0 == pid)
   { // child
     close(errno_pipe[0]); // close read side of pipe
-    char* args[] = { const_cast<char*>(arg), NULL };
+    char* args[] = { const_cast<char*>(arg), nullptr };
     execv(args[0], args);
     // execv() return ONLY on failure, so ...
     ssize_t n;

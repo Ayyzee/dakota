@@ -4,14 +4,14 @@ klass string-klass
 
   // user authored
 
-  method object-t init(object-t self, named-info-node:slots-t* info-slots => NULL)
+  method object-t init(object-t self, named-info-node:slots-t* info-slots => nullptr)
   {
     ...
   }
 
   // implies
 
-  method object-t init(object-t self, named-info-node:slots-t* info-slots => NULL, object-t info => NULL)
+  method object-t init(object-t self, named-info-node:slots-t* info-slots => nullptr, object-t info => nullptr)
   {
     ...
   }

@@ -55,15 +55,15 @@ klass lexer
 
   method object-t init(object-t self,
                        file-t         file =>     stdin,
-                       const char8-t* filename => NULL)
+                       const char8-t* filename => nullptr)
   {
     self = dk:init(super);
 
-    if (NULL != filename)
+    if (nullptr != filename)
     {
       self.filename = filename;
       file = fopen(self.filename, "r");
-      if (NULL == file)
+      if (nullptr == file)
       {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
@@ -82,7 +82,7 @@ klass lexer
     }
     else
     {
-      self.filename = NULL;
+      self.filename = nullptr;
       fpos-t fpos;
       fgetpos(file, &fpos);
       fseeko(file, 0L, SEEK-END);
@@ -180,7 +180,7 @@ klass lexer
     object-t token;
     object-t leading-ws = make(vector:klass);
 
-    while (NULL != (token = dk:lex(self)))
+    while (nullptr != (token = dk:lex(self)))
     {
       if (0 == dk:tokenid(token))
       {
@@ -1015,7 +1015,7 @@ klass lexer
         default:
         {
           if (NUL == c1)
-            return NULL;
+            return nullptr;
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           cstring:concat(&buf, c1);
           object-t token = make(token:klass, tokenid => 'undf', buffer => buf.ptr,

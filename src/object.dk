@@ -19,7 +19,7 @@ include <cstdlib>;
 #ifndef __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
-include <inttypes.h>;
+include <cinttypes>;
 
 module dakota;
 
@@ -108,14 +108,14 @@ klass object
   {
     USE(self);
     throw make(exception:klass, message => "not yet implemented");
-    return NULL;
+    return nullptr;
   }
 
   method object-t dealloc(object-t self)
   {
     dk:release(dkt-klass(self));
     free(self);
-    return NULL;
+    return nullptr;
   }
 
   method object-t retain(object-t self)
@@ -152,17 +152,17 @@ klass object
 
   method object-t dump(object-t self)
   {
-    symbol-t klass-name = $NULL;
+    symbol-t klass-name = $nullptr;
 
     // klass
-    if (NULL != dkt-klass(self) && NULL != dkt-name(dkt-klass(self)))
+    if (nullptr != dkt-klass(self) && nullptr != dkt-name(dkt-klass(self)))
       klass-name = dkt-name(dkt-klass(self));
-    if (NULL != dkt-klass(self))
+    if (nullptr != dkt-klass(self))
       fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(void*)(self), cast(void*)(self), cast(void*)dkt-klass(self), klass-name);
     else
-      fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), $NULL);
+      fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), $nullptr);
 
-//     if (NULL != dk-klass(self) && self != dk-klass(self))
+//     if (nullptr != dk-klass(self) && self != dk-klass(self))
 //       dk:dump(dk-klass(self));
 
     return self;

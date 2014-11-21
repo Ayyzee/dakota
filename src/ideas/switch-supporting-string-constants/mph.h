@@ -38,7 +38,7 @@ inline PURE const char* mph_str(const mph_t* mph, unsigned int val)
   if (val == mph->fail ||
       val <  mph->base ||
       val >  mph->base + mph->strs_len)
-    return NULL;
+    return nullptr;
   return mph->strs[val - mph->base];
 }
 #ifdef __cplusplus

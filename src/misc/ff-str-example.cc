@@ -15,7 +15,7 @@ uint16_t ff_strlen(const char* str)
 		     *(str - (4 - 2)),
 		     *(str - (4 - 3)),
 		     0 };
-  uint16_t ff_len = (uint16_t)strtoumax(ff, NULL, 16);
+  uint16_t ff_len = (uint16_t)strtoumax(ff, nullptr, 16);
   assert(ff_len == len);
   return ff_len;
 }

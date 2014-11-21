@@ -493,8 +493,8 @@ sub generate_rt
 	$rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
         if (0 == $keys_count)
         {
-            $rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t* imported-klasses = NULL;\n");
-            $rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t* imported-klasses-names = NULL;\n");
+            $rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t* imported-klasses = nullptr;\n");
+            $rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t* imported-klasses-names = nullptr;\n");
         }
         else
         {
@@ -509,7 +509,7 @@ sub generate_rt
                 my $cxx_klass_name = $key;
                 $rt_cxx_str .= &dk::print_in_col_string($col, "$key:__klass__,\n");
             }
-	    $rt_cxx_str .= &dk::print_in_col_string($col, "NULL\n");
+	    $rt_cxx_str .= &dk::print_in_col_string($col, "nullptr\n");
             $col--;
             $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
 ###
@@ -522,9 +522,9 @@ sub generate_rt
                 $val = $$file{'klasses'}{$key};
                 my $RT = ''; # because the klass klass won't compile
                 my $cxx_klass_name = $key;
-                $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)&$RT$cxx_klass_name:klass, NULL },\n");
+                $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)&$RT$cxx_klass_name:klass, nullptr },\n");
             }
-	    $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)NULL, NULL }\n");
+	    $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)nullptr, nullptr }\n");
             $col--;
             $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
         }
@@ -554,7 +554,7 @@ sub generate_rt
 	my $exports = &exports($file);
 	my $num_exports = scalar keys %$exports;
 	if (0 == $num_exports) {
-	    $$info_tbl{"\$exports"} = 'exports'; # NULL
+	    $$info_tbl{"\$exports"} = 'exports';
 	}
 	else {
 	    $$info_tbl{"\$exports"} = '&exports';
@@ -1321,7 +1321,7 @@ sub common::print_signature
         }
         my $parameter_types_str = $$new_arg_type_list;
 
-        $scratch_str .= &dk::print_in_col_string($col, "static const signature-t $var_name = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", NULL };\n");
+        $scratch_str .= &dk::print_in_col_string($col, "static const signature-t $var_name = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", nullptr };\n");
         $scratch_str .= &dk::print_in_col_string($col, "return &$var_name;\n");
         $col--;
 
@@ -1539,7 +1539,7 @@ sub generics::generate_signature_seq
 
     if (0 == @$va_generics)
     {
-        $scratch_str .= "static const signature-t* const* signatures-va = NULL;\n";
+        $scratch_str .= "static const signature-t* const* signatures-va = nullptr;\n";
     }
     else
     {
@@ -1562,13 +1562,13 @@ sub generics::generate_signature_seq
 	    $scratch_str .= &dk::print_in_col_string3($col + 1,
 						      "(cast(dkt-signature-function-t)cast($method_type) ", $pad, "__signature:va:$name)(),\n");
         }
-	$scratch_str .= "  NULL,\n";
+	$scratch_str .= "  nullptr,\n";
         $scratch_str .= "};\n";
     }
     $scratch_str .= &dk::annotate($col, __FILE__, __LINE__);
     if (0 == @$fa_generics)
     {
-        $scratch_str .= "static const signature-t* const* signatures = NULL;\n";
+        $scratch_str .= "static const signature-t* const* signatures = nullptr;\n";
     }
     else
     {
@@ -1593,7 +1593,7 @@ sub generics::generate_signature_seq
 							  "(cast(dkt-signature-function-t)cast($method_type) ", $pad, "__signature:$name)(),\n");
 	    }
         }
-	$scratch_str .= "  NULL,\n";
+	$scratch_str .= "  nullptr,\n";
         $scratch_str .= "};\n";
     }
     return $scratch_str;
@@ -1612,7 +1612,7 @@ sub generics::generate_selector_seq
 
     if (0 == @$va_generics)
     {
-        $scratch_str .= "static selector-node-t* selectors-va = NULL;\n";
+        $scratch_str .= "static selector-node-t* selectors-va = nullptr;\n";
     }
     else
     {
@@ -1642,15 +1642,15 @@ sub generics::generate_selector_seq
 	    my $name_pad = ' ' x ($max_name_width - $name_width);
 	    $scratch_str .= &dk::print_in_col_string3($col + 1, "{ (cast(dkt-selector-function-t)(cast($method_type) ", $pad, "__selector:va:$name");
 	    $scratch_str .= $name_pad;
-	    $scratch_str .= "))(), NULL },\n";
+	    $scratch_str .= "))(), nullptr },\n";
         }
-	$scratch_str .= "  { NULL, NULL },\n";
+	$scratch_str .= "  { nullptr, nullptr },\n";
         $scratch_str .= "};\n";
     }
     $scratch_str .= &dk::annotate($col, __FILE__, __LINE__);
     if (0 == @$fa_generics)
     {
-        $scratch_str .= "static selector-node-t* selectors = NULL;\n";
+        $scratch_str .= "static selector-node-t* selectors = nullptr;\n";
     }
     else
     {
@@ -1681,10 +1681,10 @@ sub generics::generate_selector_seq
 		my $name_pad = ' ' x ($max_name_width - $name_width);
 		$scratch_str .= &dk::print_in_col_string3($col + 1, "{ (cast(dkt-selector-function-t)(cast($method_type) ", $pad, "__selector:$name");
 		$scratch_str .= $name_pad;
-		$scratch_str .= "))(), NULL },\n";
+		$scratch_str .= "))(), nullptr },\n";
 	    }
         }
-	$scratch_str .= "  { NULL, NULL },\n";
+	$scratch_str .= "  { nullptr, nullptr },\n";
         $scratch_str .= "};\n";
     }
     return $scratch_str;
@@ -2293,7 +2293,7 @@ sub linkage_unit::generate_klasses_body
         }
         elsif (&is_rt_decl() || &is_rt_defn())
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t klass = NULL; }\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t klass = nullptr; }\n");
         }
 	if (!&is_rt_defn())
 	{
@@ -2407,8 +2407,8 @@ sub linkage_unit::generate_klasses_body
                 {
                     $$scratch_str_ref .= &dk::print(" // special-case\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = NULL;\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "if (NULL != object) // needed for interator implementation\n");
+                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = nullptr;\n");
+                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "if (nullptr != object) // needed for interator implementation\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "{\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "s = (slots-t*)((uint8-t*)object + sizeof(object::slots-t));\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "}\n");
@@ -2430,8 +2430,8 @@ sub linkage_unit::generate_klasses_body
                     {
                         $$scratch_str_ref .= &dk::print("\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = NULL;\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "if (NULL != object) // needed for interator implementation\n");
+                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = nullptr;\n");
+                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "if (nullptr != object) // needed for interator implementation\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "{\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "dk-unbox-check(object, klass); // optional\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "s = cast(slots-t*)(cast(uint8-t*)object + klass:unbox(klass)->offset);\n");
@@ -3507,7 +3507,7 @@ sub raw_signature_body
 	}
 	$method_num++;
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
 }
 sub signature_body
 {
@@ -3548,7 +3548,7 @@ sub signature_body
 	}
 	$method_num++;
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
 }
 sub address_body
 {
@@ -3588,7 +3588,7 @@ sub address_body
             
             if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'})
             {
-                $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL,\n");
+                $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr,\n");
             }
             else
             {
@@ -3604,7 +3604,7 @@ sub address_body
             }
             $method_num++;
         }
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
 }
 sub alias_body
 {
@@ -3631,7 +3631,7 @@ sub alias_body
 	}
 	$method_num++;
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ NULL, NULL }\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr }\n");
 }
 
 sub export_pair
@@ -3791,7 +3791,7 @@ sub dk::generate_cxx_footer_klass
             }
             $va_method_num++;
         }
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL,\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr,\n");
         $col--;
         $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
@@ -3850,7 +3850,7 @@ sub dk::generate_cxx_footer_klass
             }
             $va_method_num++;
         }
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL,\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr,\n");
         $col--;
         $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
@@ -3890,7 +3890,7 @@ sub dk::generate_cxx_footer_klass
         }
 	#$$scratch_str_ref .= &dk::print_in_col_string($col, "\#endif\n");
 
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
         $col--;
         $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
@@ -3976,7 +3976,7 @@ sub dk::generate_cxx_footer_klass
             my $path = "$$klass_scope{'traits'}[$trait_num]";
             $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "$path:__klass__,\n");
         }
-        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "NULL\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "nullptr\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
     my $num_requires = @{( $$klass_scope{'requires'} ||= [] )}; # how to get around 'strict'
@@ -3993,7 +3993,7 @@ sub dk::generate_cxx_footer_klass
             my $path = "$$klass_scope{'requires'}[$require_num]";
             $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "$path:__klass__,\n");
         }
-        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "NULL\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "nullptr\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
     my $num_provides = @{( $$klass_scope{'provides'} ||= [] )}; # how to get around 'strict'
@@ -4010,7 +4010,7 @@ sub dk::generate_cxx_footer_klass
             my $path = "$$klass_scope{'provides'}[$provide_num]";
             $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "$path:__klass__,\n");
         }
-        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "NULL\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "nullptr\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
     while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}}))
@@ -4039,7 +4039,7 @@ sub dk::generate_cxx_footer_klass
         {
             $$scratch_str_ref .= &dk::print_in_col_string($col, "$key:__klass__,\n");
         }
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "NULL\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
         $col--;
         $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
@@ -4061,7 +4061,7 @@ sub dk::generate_cxx_footer_klass
             {
 #               $$scratch_str_ref .= &dk::print("\"$gbl_token\", ");
             }
-#           $$scratch_str_ref .= &dk::print("NULL }; ");
+#           $$scratch_str_ref .= &dk::print("nullptr }; ");
         }
     }
 
@@ -4102,7 +4102,7 @@ sub dk::generate_cxx_footer_klass
 		if ('struct' eq $$klass_scope{'slots'}{'cat'}) {
 		    $$tbl{'$offset'} = "offsetof(slots-t, $slot_name)";
 		}
-		$$tbl{'$size'} = "sizeof((cast(slots-t*)NULL)->$slot_name)";
+		$$tbl{'$size'} = "sizeof((cast(slots-t*)nullptr)->$slot_name)";
 		$$tbl{'$type'} = "\"$slot_type\"";
 		
 		my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
@@ -4134,7 +4134,7 @@ sub dk::generate_cxx_footer_klass
 		my ($name, $value) = %$pair;
 		$$scratch_str_ref .= &dk::print_in_col_string($col, "{ \$$name, \"$value\" },\n");
 	    }
-	    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ NULL, NULL }\n");
+	    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr }\n");
 	    $col--;
 	    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
 
@@ -4154,11 +4154,11 @@ sub dk::generate_cxx_footer_klass
 	    }
 	    else
 	    {
-		$$scratch_str_ref .= &dk::print_in_col_string($col, "{ NULL, __enum-info-$num },\n");
+		$$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, __enum-info-$num },\n");
 	    }
 	    $num++;
 	}
-	$$scratch_str_ref .= &dk::print_in_col_string($col, "{ NULL, NULL }\n");
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr }\n");
 	$col--;
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
@@ -4179,7 +4179,7 @@ sub dk::generate_cxx_footer_klass
 	    $value =~ s/"/\\"/g;
 	    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ \$$$const{'name'}, \"$$const{'type'}\", \"$value\" },\n");
         }
-	$$scratch_str_ref .= &dk::print_in_col_string($col, "{ NULL, NULL, NULL }\n");
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr, nullptr }\n");
 	$col--;
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
     }
@@ -4393,7 +4393,7 @@ sub generate_ka_method_signature_defn
 
     my $kw_arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
     $kw_arg_list .= &method::kw_list_types($method);
-    $kw_arg_list .= "\", NULL };";
+    $kw_arg_list .= "\", nullptr };";
     $$scratch_str_ref .= &dk::print_in_col_string($col, "$kw_arg_list\n");
     $$scratch_str_ref .= &dk::print_in_col_string($col, "return &result;\n");
     $col--;
@@ -4424,7 +4424,7 @@ sub generate_raw_method_signature_defn
 
     my $arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
     $arg_list .= &method::list_types($method);
-    $arg_list .= "\", NULL };";
+    $arg_list .= "\", nullptr };";
     $$scratch_str_ref .= &dk::print_in_col_string($col, "$arg_list\n");
     $$scratch_str_ref .= &dk::print_in_col_string($col, "return &result;\n");
     $col--;
@@ -4540,13 +4540,13 @@ sub generate_ka_method_defn
 	}
 	$$scratch_str_ref .= " } state = { $initializer };\n";
     }
-    #$$scratch_str_ref .= &dk::print_in_col_string($col, "if (NULL != $$new_arg_names[-1])\n");
+    #$$scratch_str_ref .= &dk::print_in_col_string($col, "if (nullptr != $$new_arg_names[-1])\n");
     #$$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
     #$col++;
     my $is_first;
 
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "keyword-t* _keyword_;\n");
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "while (NULL != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "while (nullptr != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
         $col++;
         $$scratch_str_ref .= &dk::print_in_col_string($col, "switch (_keyword_->hash)\n");
@@ -4664,7 +4664,7 @@ sub dk::generate_cxx_footer
         my $num_klasses = scalar @$global_klass_defns;
         if (0 == $num_klasses)
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "static named-info-node-t* klass-defns = NULL;\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "static named-info-node-t* klass-defns = nullptr;\n");
         }
         else
         {
@@ -4674,7 +4674,7 @@ sub dk::generate_cxx_footer
         my $num_exports = scalar keys %$exports;
         if (0 == $num_exports)
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "static named-info-node-t* exports = NULL;\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "static named-info-node-t* exports = nullptr;\n");
         }
         else
         {
@@ -4682,7 +4682,7 @@ sub dk::generate_cxx_footer
         }
         if (0 == keys %{$$scope{'interposers'}})
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "static property-t* interposers = NULL;\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "static property-t* interposers = nullptr;\n");
         }
         else
         {
@@ -4700,7 +4700,7 @@ sub dk::generate_cxx_footer
                 $val = $$interposers{$key};
                 $$scratch_str_ref .= &dk::print_in_col_string($col, "{ $key:__klass__, cast(uintptr-t)$val:__klass__ },\n");
             }
-	    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ NULL, cast(uintptr-t)NULL }\n");
+	    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, cast(uintptr-t)nullptr }\n");
             $col--;
             $$scratch_str_ref .= &dk::print_in_col_string($col, "};\n");
         }
@@ -5024,7 +5024,7 @@ sub generate_property_tbl
 	    $num++;
 	}
 	elsif (!defined $element)
-	{ $element = "NULL"; }
+	{ $element = "nullptr"; }
         my $key_width = length($key);
 	if ($key_width > $max_key_width)
 	{ $max_key_width = $key_width; }
@@ -5046,7 +5046,7 @@ sub generate_property_tbl
 	    $num++;
 	}
 	elsif (!defined $element)
-	{ $element = "NULL"; }
+	{ $element = "nullptr"; }
         my $key_width = length($key);
 	my $key_pad = ' ' x ($max_key_width - $key_width);
 
@@ -5066,7 +5066,7 @@ sub generate_info
 {
     my ($name, $tbl, $col, $scope) = @_;
     my $result = &generate_property_tbl("$name-props", $tbl, $col, $scope);
-    $result .= &dk::print_in_col_string($col, "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), NULL };\n");
+    $result .= &dk::print_in_col_string($col, "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };\n");
     return $result;
 }
 
@@ -5093,9 +5093,9 @@ sub generate_info_seq
 	$result .= $pad;
 	$result .= &dk::print("DK-ARRAY-LENGTH($element), ");
 	$result .= $pad;
-	$result .= &dk::print("NULL },\n");
+	$result .= &dk::print("nullptr },\n");
     }
-    $result .= &dk::print_in_col_string($col + 1, "{ NULL, 0, NULL }\n");
+    $result .= &dk::print_in_col_string($col + 1, "{ nullptr, 0, nullptr }\n");
     $result .= &dk::print_in_col_string($col, "};\n");
     return $result;
 }

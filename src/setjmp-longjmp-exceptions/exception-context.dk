@@ -13,7 +13,7 @@ export klass exception-context
     slots-t*  next;
     xjmp-buf:slots-t state;
   }
-  slots-t* current = NULL;
+  slots-t* current = nullptr;
 
   noexport noreturn void default-handler(object-t exception)
   {
@@ -54,7 +54,7 @@ export klass exception-context
 
 noreturn boole-t default-top-level-exception-handler(object-t exception)
 {
-  if (NULL != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
+  if (nullptr != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
     dk:dump(exception);
 
   const char8-t* progname = getprogname();
@@ -71,7 +71,7 @@ boole-t (*top-level-exception-handler)(object-t exception) = default-top-level-e
 boole-t handle(object-t exception)
 {
   boole-t result = false;
-  if (NULL != exception-context:current)
+  if (nullptr != exception-context:current)
     result = exception-context:handle(exception-context:current, make(exception:klass));
   else
     result = top-level-exception-handler(exception);
@@ -81,8 +81,8 @@ boole-t handle(object-t exception)
 void exception-context-add(exception-context-t* ec, exception-handler-t handler)
 {
   ec->handler =   handler;
-  ec->exception = NULL;
-  ec->next =      NULL;
+  ec->exception = nullptr;
+  ec->next =      nullptr;
   exception-context:add(exception-context:current, ec);
   return;
 }
