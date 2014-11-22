@@ -294,7 +294,6 @@ sub generate_nrt
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[0]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[1]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'generics-hxx'}[0]);
-	$nrt_cxx_str .= &dakota_before_user_code_h();
 	$nrt_cxx_str .= &user_code_cxx($name);
 	$nrt_cxx_str .= &dakota_after_user_code_h();
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-cxx'}[0]);
@@ -401,14 +400,13 @@ sub generate_rt
 	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[1]);
 	$rt_cxx_str .= &dk::print($$result{'hashes-cxx'}[0]);
 	$rt_cxx_str .= &dk::print($$result{'keywords-cxx'}[0]);
-	$rt_cxx_str .= &dakota_before_user_code_h();
-	## other: user_code_cxx
-	$rt_cxx_str .= &dakota_after_user_code_h();
 	$rt_cxx_str .= &dk::print($$result{'selectors-cxx'}[0]);
 	$rt_cxx_str .= &dk::print($$result{'selectors-cxx'}[1]);
 	$rt_cxx_str .= &dk::print($$result{'signatures-cxx'}[0]);
 	$rt_cxx_str .= &dk::print($$result{'signatures-cxx'}[1]);
 	$rt_cxx_str .= &dk::print($$result{'generics-cxx'}[0]);
+	## other: user_code_cxx
+	$rt_cxx_str .= &dakota_after_user_code_h();
 	$rt_cxx_str .= &dk::print($$result{'klasses-cxx'}[0]);
 	$rt_cxx_str .= &dk::print("\n");
 
@@ -3232,6 +3230,7 @@ sub linkage_unit::generate_klasses
     &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
     if (&is_nrt_decl() || &is_rt_decl()) {
 	$$scratch_str_ref .= &dakota_before_h();
+	$$scratch_str_ref .= &dakota_before_user_code_h();
     }
     &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
     
