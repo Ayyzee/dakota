@@ -339,7 +339,6 @@ sub init_rep_from_dk_vars
     $$gbl_root{'types'}  = {};
     $$gbl_root{'generics'}{'instance?'} = undef;
     $$gbl_root{'generics'}{'forward-iterator'} = undef;
-    $$gbl_root{'generics'}{'element?'} = undef;
     $$gbl_root{'generics'}{'next'} = undef;
 
     $gbl_current_scope = $gbl_root;
@@ -2468,51 +2467,61 @@ sub rep_tree_from_dk_path
     }
     pos $_ = 0;
     
-    &add_symbol([ 'cat' ]);
-    &add_symbol([ 'struct' ]);
-    &add_symbol([ 'union' ]);
-    &add_symbol([ 'enum' ]);
-    &add_symbol([ 'value' ]);
+    my $symbols = { # hardcoded
+	'cat' => 1,
+	'enum' => 1,
+	'struct' => 1,
+	'union' => 1,
+	'value' => 1,
+    };
+    foreach my $symbol (sort keys %$symbols) {
+	&add_symbol([ $symbol ]);
+    }
 
     my $plfilename = &rep_path_from_dk_path($gbl_filename);
     
-    &add_keyword('object'); #hackhack
-    &add_keyword('kls'); #hackhack
-    &add_keyword('superkls'); #hackhack
-    &add_keyword('signature'); #hackhack
-    &add_keyword('message'); #hackhack
-    &add_keyword('symbol'); #hackhack
-    &add_keyword('keyword'); #hackhack
-    &add_keyword('items'); #hackhack
+    my $keywords = { # hardcoded
+	'items' => 1,
+	'keyword' => 1,
+	'kls' => 1,
+	'message' => 1,
+	'object' => 1,
+	'signature' => 1,
+	'superkls' => 1,
+	'symbol' => 1,
+    };
+    foreach my $keyword (sort keys %$keywords) {
+	&add_keyword($keyword);
+    }
 
-    &add_klass_decl('uchar8');
-    &add_klass_decl('char8');
-    &add_klass_decl('input-stream'); # std-input
-    &add_klass_decl('output-stream'); # std-output, std-error
-
-    &add_klass_decl('no-such-method-exception');
-    &add_klass_decl('super');
-    &add_klass_decl('object');
-    &add_klass_decl('klass');
-    &add_klass_decl('str');
-    #if (&is_rt_decl() || &is_rt_defn())
-    #{
-    &add_klass_decl('assoc-node');
-    &add_klass_decl('selector-node');
-    #}
-    &add_klass_decl('property');
-    &add_klass_decl('named-info-node');
-    &add_klass_decl('method');
-    &add_klass_decl('va-method');
-    &add_klass_decl('signature');
-    &add_klass_decl('selector');
-    &add_klass_decl('file');
-    &add_klass_decl('symbol');
-    &add_klass_decl('boole');
-    &add_klass_decl('keyword');
-    &add_klass_decl('no-such-keyword-exception');
-    &add_klass_decl('method-alias');
- 
+    my $klass_decls = { # hardcoded
+	'assoc-node' => 1,
+	'boole' => 1,
+	'char8' => 1,
+	'file' => 1,
+	'input-stream' => 1, # std-input
+	'keyword' => 1,
+	'klass' => 1,
+	'method' => 1,
+	'method-alias' => 1,
+	'named-info-node' => 1,
+	'no-such-keyword-exception' => 1,
+	'no-such-method-exception' => 1,
+	'object' => 1,
+	'output-stream' => 1, # std-output, std-error
+	'property' => 1,
+	'selector' => 1,
+	'selector-node' => 1,
+	'signature' => 1,
+	'str' => 1,
+	'super' => 1,
+	'symbol' => 1,
+	'uchar8' => 1,
+	'va-method' => 1,
+    };
+    foreach my $klass_decl (sort keys %$klass_decls) {
+	&add_klass_decl($klass_decl);
+    }
     $gbl_sst = &sst::make($_, $gbl_filename);
     $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
     #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
