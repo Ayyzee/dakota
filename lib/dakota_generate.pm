@@ -275,101 +275,40 @@ sub generate_nrt
     my ($generics, $symbols) = &generics::parse($parse_tree);
 
     my $col = 0;
-
-    #my $generics_cp = &deep_copy($generics);
-    my $symbols_cp = &deep_copy($symbols);
-
-    my $symbols_include =   "$name--symbols";
-    my $klasses_include =   "$name--klasses";
-    my $generics_include =  "$name--generics";
-    my $signatures_include = "$name--signatures";
-    my $hashes_include =  "$name--hashes";
-
     my $ka_generics = &ka_generics();
 
     if (&is_nrt_defn() || &is_rt_defn())
     {
-	#print STDERR "$name.$cxx_ext***\n";
+	#rnielsen1
 	my $nrt_cxx_str = "// --nrt-cxx--\n";
-        $nrt_cxx_str .= &dakota_h();
-        $nrt_cxx_str .= &dk::print("\n");
-
-	{
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[0]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[1]);
-
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[0]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[1]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'selectors-hxx'}[0]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'selectors-hxx'}[1]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'generics-hxx'}[0]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'hashes-hxx'}[0]);
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'keywords-hxx'}[0]);
-	    $nrt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
-	    $nrt_cxx_str .= &dakota_before_user_code_h();
-	    if (exists $ENV{'DK_ABS_PATH'})
-	    {
-		my $cwd = getcwd;
-		$nrt_cxx_str .= &dk::print("include \"$cwd/obj/$name.$cxx_ext\";\n");
-	    }
-	    else
-	    {
-		$nrt_cxx_str .= &dk::print("include \"../$name.$cxx_ext\";\n");
-	    }
-	    $nrt_cxx_str .= &dakota_after_user_code_h();
-	    $nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-cxx'}[0]);
-	}
+	$nrt_cxx_str .= &dakota_h();
+	$nrt_cxx_str .= &dk::print("\n");
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-exported-headers-hxx'}[0]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
+	## other: dakota_before_h
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[0]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[1]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'hashes-hxx'}[0]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'keywords-hxx'}[0]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'selectors-hxx'}[0]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'selectors-hxx'}[1]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[0]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[1]);
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'generics-hxx'}[0]);
+	$nrt_cxx_str .= &dakota_before_user_code_h();
+	$nrt_cxx_str .= &user_code_cxx($name);
+	$nrt_cxx_str .= &dakota_after_user_code_h();
+	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-cxx'}[0]);
+	$nrt_cxx_str .= &dk::print("\n");
 
 	my $nrt_defn = "$name";
 
-       &write_to_file_strings("$path/$nrt_defn.$dk_ext",            [ $nrt_cxx_str ]);
-###
+	&write_to_file_strings("$path/$nrt_defn.$dk_ext",            [ $nrt_cxx_str ]);
 	&write_to_file_converted_strings("$path/$nrt_defn.$cxx_ext", [ $nrt_cxx_str ], undef);
-
-	$$result{'nrt-cxx'} = [ $nrt_cxx_str ];
     }
     else
     {
-        my $symbols_hxx_str =  "// --symbols-hxx--\n";
-        my $strings_hxx_str = "// --strings-hxx--\n";
-	my $hashes_hxx_str = "// --hashes-hxx--\n";
-	my $keywords_hxx_str = "// --keywords-hxx--\n";
-	my $selectors_hxx_str = "// --selectors-hxx--\n";
-	my $selectors_seq_hxx_str = "// --selectors-seq-hxx--\n";
-	my $signatures_hxx_str = "// --signatures-hxx--\n";
-	my $signatures_seq_hxx_str = "// --signatures-seq-hxx--\n";
-	my $klasses_hxx_str = "// --klasses-hxx--\n";
-	my $generics_hxx_str = "// --generics-hxx--\n";
-
-        &set_global_scratch_str_ref(\$klasses_hxx_str);
-	#print STDERR __FILE__, ":", __LINE__, ":\n";
-	#print STDERR &Dumper($$file{'klasses'}{'callback'});
-        $klasses_hxx_str = &linkage_unit::generate_klasses($file, $col, []);
-
-        &set_global_scratch_str_ref(\$generics_hxx_str);
-        $generics_hxx_str = &linkage_unit::generate_generics($file, $generics);
-
-	&set_global_scratch_str_ref(undef);
-
-	# here
-
-        $selectors_hxx_str .= &linkage_unit::generate_selectors($file, $generics);
-        $selectors_seq_hxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
-        $signatures_hxx_str .= &linkage_unit::generate_signatures($file, $generics);
-        $signatures_seq_hxx_str .= &linkage_unit::generate_signatures_seq($file, $generics);
-       #$strings_hxx_str .= &linkage_unit::generate_strings($file, $generics, $$file{'strings'});
-        $symbols_hxx_str .=  &linkage_unit::generate_symbols($file, $generics, $symbols);
-        $hashes_hxx_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
-        $keywords_hxx_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
-
-	$$result{'selectors-hxx'} = [ $selectors_hxx_str, $selectors_seq_hxx_str ];
-	$$result{'signatures-hxx'} = [ $signatures_hxx_str, $signatures_seq_hxx_str ];
-	$$result{'generics-hxx'} =  [ $generics_hxx_str ];
-	$$result{'klasses-hxx'} =   [ $klasses_hxx_str ];
-	$$result{'symbols-hxx'} =   [ $symbols_hxx_str, $strings_hxx_str ];
-	$$result{'hashes-hxx'} =  [ $hashes_hxx_str ];
-	$$result{'keywords-hxx'} =  [ $keywords_hxx_str ];
+	&generate_decl($file, $generics, $symbols, $result);
     }
     return $result;
 } # sub generate_nrt
@@ -405,16 +344,6 @@ sub generate_rt
     my ($generics, $symbols) = &generics::parse($file);
 
     my $col = 0;
-
-    #my $generics_cp = &deep_copy($generics);
-    my $symbols_cp = &deep_copy($symbols);
-
-    my $symbols_include =   "$name--symbols";
-    my $klasses_include =   "$name--klasses";
-    my $generics_include =  "$name--generics";
-    my $signatures_include = "$name--signatures";
-    my $hashes_include =  "$name--hashes";
-
     my $ka_generics = &ka_generics();
 
     if (&is_nrt_defn() || &is_rt_defn())
@@ -427,12 +356,14 @@ sub generate_rt
 	my $selectors_seq_cxx_str = "// --selectors-seq-cxx--\n";
 	my $signatures_cxx_str = "// --signatures-cxx--\n";
 	my $signatures_seq_cxx_str = "// --signatures-seq-cxx--\n";
+	my $klasses_exported_headers_hxx_str = "// --klasses-exported-headers-hxx--\n";
 	my $klasses_cxx_str = "// --klasses-cxx--\n";
 	my $generics_cxx_str = "// --generics-cxx--\n";
 
         &set_global_scratch_str_ref(\$klasses_cxx_str);
 	#print STDERR __FILE__, ":", __LINE__, ":\n";
 	#print STDERR &Dumper($$file{'klasses'}{'callback'});
+	$klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
         $klasses_cxx_str = &linkage_unit::generate_klasses($file, $col, []);
 
         &set_global_scratch_str_ref(\$generics_cxx_str);
@@ -440,7 +371,7 @@ sub generate_rt
 
 	&set_global_scratch_str_ref(undef);
 
-	# here
+	#rnielsen2
 
         $selectors_cxx_str .= &linkage_unit::generate_selectors($file, $generics);
         $selectors_seq_cxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
@@ -451,35 +382,36 @@ sub generate_rt
 	$hashes_cxx_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
 	$keywords_cxx_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
 
-	my $symbols_cxx =   [ $symbols_cxx_str, $strings_cxx_str ];
-	my $selectors_cxx = [ $selectors_cxx_str, $selectors_seq_cxx_str ];
-	my $signatures_cxx = [ $signatures_cxx_str, $signatures_seq_cxx_str ];
-	my $klasses_cxx = [ $klasses_cxx_str ];
-	my $generics_cxx = [ $generics_cxx_str ];
-	my $hashes_cxx = [ $hashes_cxx_str ];
-	my $keywords_cxx = [ $keywords_cxx_str ];
+	$$result{'klasses-exported-headers-hxx'} =  [ $klasses_exported_headers_hxx_str ];
+	#$$result{'klasses-hxx'} =   [ $klasses_hxx_str ];
+	$$result{'symbols-cxx'} =   [ $symbols_cxx_str, $strings_cxx_str ];
+	$$result{'hashes-cxx'} =  [ $hashes_cxx_str ];
+	$$result{'keywords-cxx'} =  [ $keywords_cxx_str ];
+	$$result{'selectors-cxx'} = [ $selectors_cxx_str, $selectors_seq_cxx_str ];
+	$$result{'signatures-cxx'} = [ $signatures_cxx_str, $signatures_seq_cxx_str ];
+	$$result{'generics-cxx'} =  [ $generics_cxx_str ];
+	$$result{'klasses-cxx'} =   [ $klasses_cxx_str ];
 
+	#rnielsen1
 	my $rt_cxx_str = "// --rt-cxx--\n";
-        $rt_cxx_str .= &dakota_h();
-        $rt_cxx_str .= &dk::print("\n");
-
-	{
-	    $rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
-	    $rt_cxx_str .= &dakota_before_h();
-	    $rt_cxx_str .= &dk::print($$symbols_cxx[0]);
-	    $rt_cxx_str .= &dk::print($$symbols_cxx[1]);
-	    $rt_cxx_str .= &dk::print($$defn_tbl{'hashes-hxx'}[0]);
-	    $rt_cxx_str .= &dk::print($$hashes_cxx[0]);
-	    $rt_cxx_str .= &dk::print($$keywords_cxx[0]);
-	    $rt_cxx_str .= &dakota_before_user_code_h();
-	    $rt_cxx_str .= &dakota_after_user_code_h();
-	    $rt_cxx_str .= &dk::print($$selectors_cxx[0]);
-	    $rt_cxx_str .= &dk::print($$selectors_cxx[1]);
-	    $rt_cxx_str .= &dk::print($$signatures_cxx[0]);
-	    $rt_cxx_str .= &dk::print($$signatures_cxx[1]);
-	    $rt_cxx_str .= &dk::print($$generics_cxx[0]);
-	    $rt_cxx_str .= &dk::print($$klasses_cxx[0]);
-	}
+	$rt_cxx_str .= &dakota_h();
+	$rt_cxx_str .= &dk::print("\n");
+	$rt_cxx_str .= &dk::print($$result{'klasses-exported-headers-hxx'}[0]);###
+	$rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
+	#$rt_cxx_str .= &dakota_before_h();
+	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[0]);
+	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[1]);
+	$rt_cxx_str .= &dk::print($$result{'hashes-cxx'}[0]);
+	$rt_cxx_str .= &dk::print($$result{'keywords-cxx'}[0]);
+	$rt_cxx_str .= &dakota_before_user_code_h();
+	## other: user_code_cxx
+	$rt_cxx_str .= &dakota_after_user_code_h();
+	$rt_cxx_str .= &dk::print($$result{'selectors-cxx'}[0]);
+	$rt_cxx_str .= &dk::print($$result{'selectors-cxx'}[1]);
+	$rt_cxx_str .= &dk::print($$result{'signatures-cxx'}[0]);
+	$rt_cxx_str .= &dk::print($$result{'signatures-cxx'}[1]);
+	$rt_cxx_str .= &dk::print($$result{'generics-cxx'}[0]);
+	$rt_cxx_str .= &dk::print($$result{'klasses-cxx'}[0]);
 	$rt_cxx_str .= &dk::print("\n");
 
         my $stack = [];
@@ -605,60 +537,63 @@ sub generate_rt
 	my $rt_defn = "$name";
 
 	&write_to_file_strings("$path/$rt_defn.$dk_ext",            [ $rt_cxx_str ]);
-###
 	&write_to_file_converted_strings("$path/$rt_defn.$cxx_ext", [ $rt_cxx_str ], undef);
-
-	#$$result{'rt-cxx'} =        [ $rt_cxx_str ];
-	$$result{'symbols-cxx'} =   [ $symbols_cxx_str, $strings_cxx_str ];
-	$$result{'selectors-cxx'} = [ $selectors_cxx_str, $selectors_seq_cxx_str ];
-	$$result{'signatures-cxx'} = [ $signatures_cxx_str, $signatures_seq_cxx_str ];
-	$$result{'generics-cxx'} =  [ $generics_cxx_str ];
-	$$result{'klasses-cxx'} =   [ $klasses_cxx_str ];
     }
     else
     {
-        my $symbols_hxx_str =  "// --symbols-hxx--\n";
-        my $strings_hxx_str = "// --strings-hxx--\n";
-	my $hashes_hxx_str = "// --hashes-hxx--\n";
-	my $keywords_hxx_str = "// --keywords-hxx--\n";
-	my $selectors_hxx_str = "// --selectors-hxx--\n";
-	my $selectors_seq_hxx_str = "// --selectors-seq-hxx--\n";
-	my $signatures_hxx_str = "// --signatures-hxx--\n";
-	my $signatures_seq_hxx_str = "// --signatures-seq-hxx--\n";
-	my $klasses_hxx_str = "// --klasses-hxx--\n";
-	my $generics_hxx_str = "// --generics-hxx--\n";
-
-        &set_global_scratch_str_ref(\$klasses_hxx_str);
-	#print STDERR __FILE__, ":", __LINE__, ":\n";
-	#print STDERR &Dumper($$file{'klasses'}{'callback'});
-        $klasses_hxx_str = &linkage_unit::generate_klasses($file, $col, []);
-
-        &set_global_scratch_str_ref(\$generics_hxx_str);
-        $generics_hxx_str = &linkage_unit::generate_generics($file, $generics);
-
-	&set_global_scratch_str_ref(undef);
-
-	# here
-
-        $selectors_hxx_str .= &linkage_unit::generate_selectors($file, $generics);
-        $selectors_seq_hxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
-	$signatures_hxx_str .= &linkage_unit::generate_signatures($file, $generics);
-        $signatures_seq_hxx_str .= &linkage_unit::generate_signatures_seq($file, $generics);
-       #$strings_hxx_str .= &linkage_unit::generate_strings($file, $generics, $$file{'strings'});
-	$symbols_hxx_str .=  &linkage_unit::generate_symbols($file, $generics, $symbols);
-	$hashes_hxx_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
-	$keywords_hxx_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
-
-	$$result{'symbols-hxx'} =   [ $symbols_hxx_str, $strings_hxx_str ];
-	$$result{'selectors-hxx'} = [ $selectors_hxx_str, $selectors_seq_hxx_str ];
-	$$result{'signatures-hxx'} = [ $signatures_hxx_str, $signatures_seq_hxx_str ];
-	$$result{'generics-hxx'} =  [ $generics_hxx_str ];
-	$$result{'klasses-hxx'} =   [ $klasses_hxx_str ];
-	$$result{'hashes-hxx'} =  [ $hashes_hxx_str ];
-	$$result{'keywords-hxx'} =  [ $keywords_hxx_str ];
+	&generate_decl($file, $generics, $symbols, $result);
     }
     return $result;
 } # sub generate_rt
+
+sub generate_decl
+{
+    my ($file, $generics, $symbols, $result) = @_;
+
+    my $col = 0;
+    my $symbols_hxx_str =  "// --symbols-hxx--\n";
+    my $strings_hxx_str = "// --strings-hxx--\n";
+    my $hashes_hxx_str = "// --hashes-hxx--\n";
+    my $keywords_hxx_str = "// --keywords-hxx--\n";
+    my $selectors_hxx_str = "// --selectors-hxx--\n";
+    my $selectors_seq_hxx_str = "// --selectors-seq-hxx--\n";
+    my $signatures_hxx_str = "// --signatures-hxx--\n";
+    my $signatures_seq_hxx_str = "// --signatures-seq-hxx--\n";
+    my $klasses_exported_headers_hxx_str = "// --klasses-exported-headers-hxx--\n";
+    my $klasses_hxx_str = "// --klasses-hxx--\n";
+    my $generics_hxx_str = "// --generics-hxx--\n";
+
+    &set_global_scratch_str_ref(\$klasses_hxx_str);
+    #print STDERR __FILE__, ":", __LINE__, ":\n";
+    #print STDERR &Dumper($$file{'klasses'}{'callback'});
+    $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
+    $klasses_hxx_str = &linkage_unit::generate_klasses($file, $col, []);
+
+    &set_global_scratch_str_ref(\$generics_hxx_str);
+    $generics_hxx_str = &linkage_unit::generate_generics($file, $generics);
+
+    &set_global_scratch_str_ref(undef);
+
+    #rnielsen2
+
+    $selectors_hxx_str .= &linkage_unit::generate_selectors($file, $generics);
+    $selectors_seq_hxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
+    $signatures_hxx_str .= &linkage_unit::generate_signatures($file, $generics);
+    $signatures_seq_hxx_str .= &linkage_unit::generate_signatures_seq($file, $generics);
+    #$strings_hxx_str .= &linkage_unit::generate_strings($file, $generics, $$file{'strings'});
+    $symbols_hxx_str .=  &linkage_unit::generate_symbols($file, $generics, $symbols);
+    $hashes_hxx_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
+    $keywords_hxx_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
+
+    $$result{'symbols-hxx'} =   [ $symbols_hxx_str, $strings_hxx_str ];
+    $$result{'selectors-hxx'} = [ $selectors_hxx_str, $selectors_seq_hxx_str ];
+    $$result{'signatures-hxx'} = [ $signatures_hxx_str, $signatures_seq_hxx_str ];
+    $$result{'generics-hxx'} =  [ $generics_hxx_str ];
+    $$result{'klasses-exported-headers-hxx'} =  [ $klasses_exported_headers_hxx_str ];
+    $$result{'klasses-hxx'} =   [ $klasses_hxx_str ];
+    $$result{'hashes-hxx'} =  [ $hashes_hxx_str ];
+    $$result{'keywords-hxx'} =  [ $keywords_hxx_str ];
+}
 
 sub path::add_last
 {
@@ -1968,7 +1903,7 @@ sub generics::generate_generic_defns
     my $generic;
     #$$scratch_str_ref .= &dk::print("#if defined DK-VA-GENERICS\n");
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// VA OBJECT-T\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-va-object-t--\n");
     foreach $generic (@$generics)
     {
         if (&is_va($generic))
@@ -1978,7 +1913,7 @@ sub generics::generate_generic_defns
 	    }
         }
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// VA SUPER-T\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-va-super-t--\n");
     foreach $generic (@$generics)
     {
         if (&is_va($generic))
@@ -1992,7 +1927,7 @@ sub generics::generate_generic_defns
     #if (!&is_raw($generic)) {
 	&generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
     #}
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// OBJECT-T\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-object-t--\n");
     foreach $generic (@$generics)
     {
         if (!&is_va($generic))
@@ -2002,7 +1937,7 @@ sub generics::generate_generic_defns
 	    }
         }
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// SUPER-T\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-super-t--\n");
     foreach $generic (@$generics)
     {
         if (!&is_va($generic))
@@ -2994,16 +2929,17 @@ sub generate_exported_slots_decls
 
 sub linkage_unit::generate_klasses_exported_headers
 {
-    my ($klass_names) = @_;
+    my ($scope) = @_;
+    my $klass_names = &order_klasses($scope);
+    my $exported_headers = {};
     my $result = '';
     
-    if (&is_rt_decl()) {
-        $result .= "include <cstring>; // memcpy()\n";
-        $result .= "include <cassert>; // assert()\n";
+    if (&is_rt_decl() || &is_rt_defn()) {
+	$$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
+	$$exported_headers{'<cassert>'}{'hardcoded-by-rnielsen'} = undef; # assert()
     }
 
     if (&is_nrt_decl() || &is_rt_decl()) {
-	my $exported_headers = {};
 	foreach my $klass_name (@$klass_names) {
 	    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 	    
@@ -3011,13 +2947,12 @@ sub linkage_unit::generate_klasses_exported_headers
 		$$exported_headers{$header}{$klass_name} = undef;
 	    }
 	}
-	my $headers_names = [sort keys %$exported_headers];
-	foreach my $header_name (@$headers_names) {
-	    $result .= "include $header_name;\n";
-	}
-	if ('' ne $result) {
-	    $result .= "\n";
-	}
+    }
+    foreach my $header_name (sort keys %$exported_headers) {
+	$result .= "include $header_name;\n";
+    }
+    if ('' ne $result) {
+	$result .= "\n";
     }
     $result .= "include <dakota-log.h>;\n\n";
     return $result;
@@ -3296,8 +3231,9 @@ sub linkage_unit::generate_klasses
 
     my $klass_names = &order_klasses($scope);
     my $scratch_str_ref = &global_scratch_str_ref();
-    $$scratch_str_ref .= &linkage_unit::generate_klasses_exported_headers($klass_names);
-    &linkage_unit::generate_klasses_types($scope, $col, $klass_path);
+    &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
+    $$scratch_str_ref .= &dakota_before_h();
+    &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
     
     foreach my $klass_name (@$klass_names) {
         &linkage_unit::generate_klasses_klass($scope, $col, $klass_path, $klass_name);
@@ -3305,7 +3241,7 @@ sub linkage_unit::generate_klasses
     return $$scratch_str_ref;
 }
 
-sub linkage_unit::generate_klasses_types
+sub linkage_unit::generate_klasses_types_before
 {
     my ($scope, $col, $klass_path) = @_;
 
@@ -3323,7 +3259,14 @@ sub linkage_unit::generate_klasses_types
             }
         }
     }
-    $$scratch_str_ref .= &dakota_before_h();
+}
+
+sub linkage_unit::generate_klasses_types_after
+{
+    my ($scope, $col, $klass_path) = @_;
+
+    my $klass_names = &order_klasses($scope);
+    my $scratch_str_ref = &global_scratch_str_ref();
     foreach my $klass_name (@$klass_names) {
         my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 	my $is_exported;
@@ -5119,7 +5062,7 @@ sub dk::annotate
 {
     my ($col_num, $file, $line) = @_;
     my $string = '';
-    if (1)
+    if (0)
     {
 	$string = &pad($col_num);
         $string .= '//';

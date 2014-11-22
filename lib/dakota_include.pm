@@ -27,7 +27,9 @@ our @EXPORT= qw(
 		dakota_before_user_code_h
 		dakota_after_user_code_h
 		dakota_method_for_selector_h
+		user_code_cxx
 		);
+my $cxx_ext = 'cc';
 
 sub dakota_h { return "include <dakota.h>;\n"; }
 
@@ -36,5 +38,18 @@ sub dakota_before_h { return "include <dakota-before.h>;\n"; }
 sub dakota_before_user_code_h { return "include <dakota-before-user-code.h>;\n"; }
 
 sub dakota_after_user_code_h { return "include <dakota-after-user-code.h>;\n"; }
+
+sub user_code_cxx
+{
+    my ($name) = @_;
+    if (exists $ENV{'DK_ABS_PATH'}) {
+	my $cwd = getcwd;
+	return "include \"$cwd/obj/$name.$cxx_ext\";\n";
+    }
+    else {
+	# should not be hardcoded
+	return "include \"../$name.$cxx_ext\";\n";
+    }
+}
 
 1;
