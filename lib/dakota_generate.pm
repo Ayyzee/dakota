@@ -285,7 +285,6 @@ sub generate_nrt
 	$nrt_cxx_str .= &dk::print("\n");
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-exported-headers-hxx'}[0]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
-	## other: dakota_before_h
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[0]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[1]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'hashes-hxx'}[0]);
@@ -398,7 +397,6 @@ sub generate_rt
 	$rt_cxx_str .= &dk::print("\n");
 	$rt_cxx_str .= &dk::print($$result{'klasses-exported-headers-hxx'}[0]);###
 	$rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
-	#$rt_cxx_str .= &dakota_before_h();
 	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[0]);
 	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[1]);
 	$rt_cxx_str .= &dk::print($$result{'hashes-cxx'}[0]);
