@@ -395,8 +395,8 @@ sub generate_rt
 	my $rt_cxx_str = "// --rt-cxx--\n";
 	$rt_cxx_str .= &dakota_h();
 	$rt_cxx_str .= &dk::print("\n");
-	$rt_cxx_str .= &dk::print($$result{'klasses-exported-headers-hxx'}[0]);###
-	$rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
+	$rt_cxx_str .= &dk::print($$result{'klasses-exported-headers-hxx'}[0]);
+	$rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);###
 	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[0]);
 	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[1]);
 	$rt_cxx_str .= &dk::print($$result{'hashes-cxx'}[0]);
@@ -3230,7 +3230,9 @@ sub linkage_unit::generate_klasses
     my $klass_names = &order_klasses($scope);
     my $scratch_str_ref = &global_scratch_str_ref();
     &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
-    $$scratch_str_ref .= &dakota_before_h();
+    if (&is_nrt_decl() || &is_rt_decl()) {
+	$$scratch_str_ref .= &dakota_before_h();
+    }
     &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
     
     foreach my $klass_name (@$klass_names) {
@@ -3245,8 +3247,8 @@ sub linkage_unit::generate_klasses_types_before
 
     my $klass_names = &order_klasses($scope);
     my $scratch_str_ref = &global_scratch_str_ref();
-    foreach my $klass_name (@$klass_names) {
-	if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_nrt_decl() || &is_rt_decl()) {
+	foreach my $klass_name (@$klass_names) {
 	    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
 	    if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
