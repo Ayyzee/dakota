@@ -2485,6 +2485,7 @@ sub rep_tree_from_dk_path
     &add_keyword('keyword'); #hackhack
     &add_keyword('items'); #hackhack
 
+    &add_klass_decl('uchar8');
     &add_klass_decl('char8');
     &add_klass_decl('input-stream'); # std-input
     &add_klass_decl('output-stream'); # std-output, std-error

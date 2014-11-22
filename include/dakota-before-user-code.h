@@ -21,13 +21,25 @@ extern import object_t null;
 extern import object_t std_input;
 extern import object_t std_output;
 extern import object_t std_error;
+
+typedef boole_t (*type_predicate_t)(int_t);
+typedef boole_t   (*equal_predicate_t)(object_t, object_t); //hackhack
+typedef int_t  (*compare_t)(object_t, object_t); // comparitor
+typedef uintmax_t (*hash_t)(object_t);
+
+constexpr uintmax_t dk_hash(const char8_t* str, uintmax_t h = 0)
+{ // Daniel J. Bernstein
+  return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ (uchar8_t)(str[h]);
+}
+
+import symbol_t dk_intern(const char8_t*);
 import void dkt_throw(object_t exception);
 import void dkt_throw(const char8_t* exception_str);
 
 import object_t             dk_klass_for_name(symbol_t);
 
 #if defined DEBUG
-#define DKT_NULL_METHOD NULL
+#define DKT_NULL_METHOD nullptr
 #else
 import void dkt_null_method(object_t object, ...);
 #define DKT_NULL_METHOD dkt_null_method

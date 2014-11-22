@@ -3229,7 +3229,6 @@ sub linkage_unit::generate_klasses
     my $scratch_str_ref = &global_scratch_str_ref();
     &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
     if (&is_nrt_decl() || &is_rt_decl()) {
-	$$scratch_str_ref .= &dakota_before_h();
 	$$scratch_str_ref .= &dakota_before_user_code_h();
     }
     &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
