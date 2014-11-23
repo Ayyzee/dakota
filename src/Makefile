@@ -3,7 +3,7 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/common.mk
 
-EXTRA_CXXFLAGS +=\
+EXTRA_CXXFLAGS :=\
  -std=c++11\
  --include-directory=$(srcdir)/.\
  --include-directory=../include\
@@ -100,9 +100,8 @@ dakota_util_name := $(shell $(DK_PREFIX)/bin/dk name --var SO_EXT=$(SO_EXT) --re
 dakota_name :=      $(shell $(DK_PREFIX)/bin/dk name --var SO_EXT=$(SO_EXT) --repository dakota.rep)
 
 INCLUDE_FILES :=\
- $(DESTDIR)$(includedir)/dakota-before-klasses.$(hxx_ext)\
- $(DESTDIR)$(includedir)/dakota-before-rt-code.$(hxx_ext)\
  $(DESTDIR)$(includedir)/dakota-before-user-code.$(hxx_ext)\
+ $(DESTDIR)$(includedir)/dakota-after-user-code.$(hxx_ext)\
  $(DESTDIR)$(includedir)/dakota-log.$(hxx_ext)\
  $(DESTDIR)$(includedir)/dakota.$(hxx_ext)\
 
