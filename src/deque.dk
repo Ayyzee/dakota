@@ -17,9 +17,6 @@
 include <cassert>;
 include <cstdlib>;
 
-#ifndef __STDC-FORMAT-MACROS
-#define __STDC-FORMAT-MACROS
-#endif //__STDC-FORMAT-MACROS
 include <cinttypes>;
 
 klass node

@@ -23,9 +23,6 @@ include <sys/stat.h>; // struct stat, stat()
 
 include "dl.h"; // load-library()
 
-#ifndef __STDC-FORMAT-MACROS
-#define __STDC-FORMAT-MACROS
-#endif //__STDC-FORMAT-MACROS
 include <cinttypes>;
 
 #if defined WIN32

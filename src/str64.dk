@@ -18,9 +18,6 @@ include <cstring>;
 
 include "dakota-private.h";
 
-#ifndef __STDC-FORMAT-MACROS
-#define __STDC-FORMAT-MACROS
-#endif //__STDC-FORMAT-MACROS
 include <cinttypes>;
 
 module dakota;
