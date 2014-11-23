@@ -81,7 +81,7 @@ my $gbl_symbol_to_header =
   'INADDR-ANY' => '<netinet/in.h>',
   'INADDR-LOOPBACK' => '<netinet/in.h>',
   'INADDR-NONE' => '<netinet/in.h>',
-  'nullptr' => '<cstddef>',
+  'NULL' => '<cstddef>',
   'SOCK-DGRAM' => '<sys/socket.h>',
   'SOCK-RAW' => '<sys/socket.h>',
   'SOCK-STREAM' => '<sys/socket.h>',
@@ -99,6 +99,7 @@ my $gbl_symbol_to_header =
   'ip-mreq' => '<netinet/in.h>',
   'ipv6-mreq' => '<netinet/in.h>',
   'jmp-buf' => '<setjmp.h>',
+  'nullptr' => '<cstddef>',
   'option' => '<getopt.h>',
   'sa-family-t' => '<netinet/in.h>',
   'sigaction' => '<signal.h>',
@@ -2478,8 +2479,6 @@ sub rep_tree_from_dk_path
 	&add_symbol([ $symbol ]);
     }
 
-    my $plfilename = &rep_path_from_dk_path($gbl_filename);
-    
     my $keywords = { # hardcoded
 	'items' => 1,
 	'keyword' => 1,
