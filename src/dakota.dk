@@ -49,6 +49,7 @@ include "sorted-ptr-array.h";
 module dakota;
 
 klass const-info;
+klass construct;
 klass enum-info;
 klass sorted-array;
 klass sorted-ptr-array;
@@ -1315,14 +1316,14 @@ dk-register-info(named-info-node-t* registration-info)
         dump-module-description(ofl, registration-info);
     }
   }
-  uint32-t construct = cast(uint32-t)named-info-node:at(registration-info, $construct);
+  construct-t construct = cast(construct-t)named-info-node:at(registration-info, $construct);
 
   switch (construct)
   {
-    case DK-CONSTRUCT-LIBRARY:
+    case construct:k-library:
       add-registration-info(registration-info);
       break;
-    case DK-CONSTRUCT-EXECUTABLE:
+    case construct:k-executable:
       add-registration-info(registration-info);
       if (nullptr != getenv("DK_PERL_DUMP_KLASSES"))
         perl-dump-klass-defns(gbl-klass-defns-table);
@@ -1333,6 +1334,7 @@ dk-register-info(named-info-node-t* registration-info)
       if (nullptr != getenv("DK_EXIT_BEFORE_MAIN"))
         exit(0);
       break;
+    case construct:k-unknown:
     default:
       abort();
   }

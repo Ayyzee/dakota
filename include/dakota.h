@@ -64,11 +64,6 @@
 #define THROW  throw
 #define STATIC static
 
-#define DK_CONSTRUCT_UNKNOWN    0
-#define DK_CONSTRUCT_EXECUTABLE 1
-#define DK_CONSTRUCT_LIBRARY    2
-#define DK_CONSTRUCT_OBJECT     3
-
 //#define DUMP_MEM_FOOTPRINT
 
 #if !defined USE

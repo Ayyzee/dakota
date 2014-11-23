@@ -2498,6 +2498,7 @@ sub rep_tree_from_dk_path
 	'assoc-node' => 1,
 	'boole' => 1,
 	'char8' => 1,
+	'construct' => 1,
 	'file' => 1,
 	'input-stream' => 1, # std-input
 	'keyword' => 1,

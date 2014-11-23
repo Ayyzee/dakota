@@ -329,7 +329,7 @@ sub start
 
     if ($$cmd_info{'opts'}{'compile'})
     {
-        $dk_construct = 'DK_CONSTRUCT_OBJECT';
+        $dk_construct = undef;
     }
     elsif ($$cmd_info{'opts'}{'shared'})
     {
@@ -337,7 +337,7 @@ sub start
 	{
 	    $cxx_shared_flags .= " --for-linker $ld_name_flag --for-linker $$cmd_info{'opts'}{'name'}";
 	}
-        $dk_construct = 'DK_CONSTRUCT_LIBRARY';
+        $dk_construct = 'construct::k_library';
     }
     elsif ($$cmd_info{'opts'}{'dynamic'})
     {
@@ -345,13 +345,13 @@ sub start
 	{
 	    $cxx_dynamic_flags .= " --for-linker $ld_name_flag --for-linker $$cmd_info{'opts'}{'name'}";
 	}
-        $dk_construct = 'DK_CONSTRUCT_LIBRARY';
+        $dk_construct = 'construct::k_library';
     }
     elsif (!$$cmd_info{'opts'}{'compile'}
         && !$$cmd_info{'opts'}{'shared'}
         && !$$cmd_info{'opts'}{'dynamic'})
     {
-        $dk_construct = 'DK_CONSTRUCT_EXECUTABLE';
+        $dk_construct = 'construct::k_executable';
     }
     else
     { die __FILE__, ":", __LINE__, ": error:\n"; }
@@ -487,7 +487,9 @@ sub gen_rt_obj
 
     $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
     my $flags = $$cmd_info{'opts'}{'compiler-flags'};
-    $flags .= " --define-macro DK_CONSTRUCT=$dk_construct";
+    if ($dk_construct) {
+	$flags .= " --define-macro DK_CONSTRUCT=$dk_construct";
+    }
     if ($$cmd_info{'opts'}{'name'})
     {
 	$flags .= " --define-macro DK_NAME=\\\"$$cmd_info{'opts'}{'name'}\\\"";
