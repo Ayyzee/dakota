@@ -68,7 +68,7 @@ klass input-file
     fseeko(file, 0L, SEEK-END);
     self.length = ftello(file); // this might be longer than needed
     fsetpos(file, &fpos);
-    self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (self.length + 1));
+    self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
     fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
     self.buffer[self.length] = NUL;
 

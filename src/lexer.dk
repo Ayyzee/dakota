@@ -73,7 +73,7 @@ klass lexer
       fseeko(file, 0L, SEEK-END);
       self.length = ftello(file);
       rewind(file);
-      self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (self.length + 1));
+      self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
       fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
       // check for embedded NUL?
       self.buffer[self.length] = NUL;
@@ -88,7 +88,7 @@ klass lexer
       fseeko(file, 0L, SEEK-END);
       self.length = ftello(file);
       fsetpos(file, &fpos);
-      self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (self.length + 1));
+      self.buffer = cast(char8-t*)malloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
       fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
       // check for embedded NUL?
       self.buffer[self.length] = NUL;
