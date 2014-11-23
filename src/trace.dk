@@ -104,7 +104,7 @@ dk-trace-before(const signature-t* signature, method-t m, super-t context, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (nullptr != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dk-va-trace-before(signature, m, context, args);
   va-end(args);
   return result;
@@ -116,7 +116,7 @@ dk-trace-before(const signature-t* signature, method-t m, object-t object, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (nullptr != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dk-va-trace-before(signature, m, object, args);
   va-end(args);
   return result;
@@ -128,7 +128,7 @@ dk-trace-after(const signature-t* signature, method-t m, super-t context, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (nullptr != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dk-va-trace-after(signature, m, context, args);
   va-end(args);
   return result;
@@ -140,7 +140,7 @@ dk-trace-after(const signature-t* signature, method-t m, object-t object, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (nullptr != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dk-va-trace-after(signature, m, object, args);
   va-end(args);
   return result;
@@ -151,7 +151,7 @@ dk-va-trace-before-init(object-t kls, va-list-t args)
 {
   gbl-trace-column++;
   int-t result = 0;
-  if (nullptr != getenv("DK_MAKE_TRACE"))
+  if (NULL != getenv("DK_MAKE_TRACE"))
     result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
                            cast(void*)(kls), dkt-name(kls), cast(void*)(args));
   return result;
@@ -162,7 +162,7 @@ dk-va-trace-after-init(object-t kls, va-list-t args)
 {
   gbl-trace-column--;
   int-t result = 0;
-  if (nullptr != getenv("DK_MAKE_TRACE"))
+  if (NULL != getenv("DK_MAKE_TRACE"))
     result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
                            cast(void*)(kls), dkt-name(kls), cast(void*)(args));
   return result;

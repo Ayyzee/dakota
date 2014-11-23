@@ -857,7 +857,7 @@ dump-klass-defns(ofile-t ofl, named-info-node-t* registration-info, const char8-
   {
     uint32-t i = 0;
       
-    if (nullptr != output-dir)
+    if (NULL != output-dir)
     {
       int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
@@ -1263,7 +1263,7 @@ getenv-boole(const char8-t* name, boole-t default-value)
   boole-t value = default-value;
   const char8-t* value-str = getenv(name);
 
-  if (nullptr != value-str)
+  if (NULL != value-str)
   {
     if (0 != safe-strcmp("0", value-str))
       value = true;
@@ -1286,7 +1286,7 @@ dk-register-info(named-info-node-t* registration-info)
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
   const char8-t* output-path = getenv("DK_INTROSPECTOR_OUTPUT");
-  if (nullptr != output-path)
+  if (NULL != output-path)
   {
     if (NUL == output-path[0]) // empty-string ("") means use default-value
       ctlg-output = stdout;
@@ -1312,7 +1312,7 @@ dk-register-info(named-info-node-t* registration-info)
     {
       dump-klass-defns(ofl, registration-info, ctlg-only);
       dump-interposers(ofl, registration-info);
-      if (!ctlg-only)
+      if (NULL == ctlg-only)
         dump-module-description(ofl, registration-info);
     }
   }
@@ -1325,13 +1325,13 @@ dk-register-info(named-info-node-t* registration-info)
       break;
     case construct:k-executable:
       add-registration-info(registration-info);
-      if (nullptr != getenv("DK_PERL_DUMP_KLASSES"))
+      if (NULL != getenv("DK_PERL_DUMP_KLASSES"))
         perl-dump-klass-defns(gbl-klass-defns-table);
       if (0)
         perl-dump-resource-info(gbl-klass-defns-table);
-      if (nullptr == getenv("DK_NO_INIT_RUNTIME"))
+      if (NULL == getenv("DK_NO_INIT_RUNTIME"))
         dk-init-runtime();
-      if (nullptr != getenv("DK_EXIT_BEFORE_MAIN"))
+      if (NULL != getenv("DK_EXIT_BEFORE_MAIN"))
         exit(0);
       break;
     case construct:k-unknown:
@@ -1346,8 +1346,8 @@ export void
 dk-deregister-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
-  if (nullptr != getenv("DK_INTROSPECTOR_OUTPUT") ||
-      nullptr != getenv("DK_NO_INIT_RUNTIME"))
+  if (NULL != getenv("DK_INTROSPECTOR_OUTPUT") ||
+      NULL != getenv("DK_NO_INIT_RUNTIME"))
     return;
   named-info-node:sort(registration-info);
   named-info-node-t* klass-defns = cast(named-info-node-t*)named-info-node:at(registration-info, $klass-defns);
@@ -1451,7 +1451,7 @@ info-for-name(symbol-t klass-name) throw(object-t)
   {
     const char8-t* klasspath = getenv("KLASSPATH");
 
-    if (nullptr == klasspath)
+    if (NULL == klasspath)
     {
       fprintf(stderr, "%s:%i: ERROR: klass '%s' not found and KLASSPATH not set.\n", __FILE__, __LINE__, klass-name);
       throw "bummer";

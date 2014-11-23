@@ -149,7 +149,7 @@ verbose-terminate()
   const char8-t* current-exception-string = *dkt-current-exception-str();
   object-t current-exception = *dkt-current-exception();
 
-  if (nullptr != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
+  if (NULL != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
       dk:dump(current-exception);
 
@@ -191,7 +191,7 @@ verbose-unexpected()
   const char8-t* current-exception-string = *dkt-current-exception-str();
   object-t current-exception = *dkt-current-exception();
 
-  if (nullptr != (getenv("DK_DUMP_UNEXPECTED_EXCEPTION")))
+  if (NULL != (getenv("DK_DUMP_UNEXPECTED_EXCEPTION")))
     if (nullptr != current-exception)
       dk:dump(current-exception);
 
