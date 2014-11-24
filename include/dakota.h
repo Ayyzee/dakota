@@ -17,13 +17,12 @@
 #if !defined __dakota_h__
 #define      __dakota_h__
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstddef>
+#include <cstdlib>
+#include <cstdio>
 
-#include <stdarg.h> // va_list
-#define __STDC_LIMIT_MACROS
-#include <stdint.h>
+#include <cstdarg> // va_list
+#include <cstdint>
 
 #define DKT_WORKAROUND 1
 
@@ -74,7 +73,7 @@
 //       cast(double)(4)
 //       cast(double)4
 #define cast(t) (t)
-#define DK_ARRAY_LENGTH(array) (cast(uint32_t)(sizeof((array))/sizeof((array)[0])))
+#define DK_ARRAY_LENGTH(array) (sizeof((array))/sizeof((array)[0]))
 
 #define dkt_klass(object)   (object)->klass
 #define dkt_superklass(kls) klass::unbox(kls)->superklass
@@ -102,11 +101,9 @@
 #define      NUL cast(char)0
 #endif // NUL
 
-typedef int int_t;
-typedef unsigned int uint_t;
 typedef va_list va_list_t;
 
-#define compile_assert(v) typedef int_t compile_assert_failed[(v) ? 1 : -1]
+#define compile_assert(v) typedef void* compile_assert_failed[(v) ? 1 : -1]
 
 #if defined DEBUG
 #  define DK_TRACE(statement) statement

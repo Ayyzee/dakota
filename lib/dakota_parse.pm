@@ -547,10 +547,10 @@ sub add_symbol
 
 sub add_type
 {
-    my ($symbol) = @_;
-    my $ident = &path::string($symbol);
+    my ($seq) = @_;
+    &maybe_add_exported_header_for_symbol_seq($seq);
+    my $ident = &path::string($seq);
     $$gbl_root{'types'}{$ident} = undef;
-    &maybe_add_exported_header_for_symbol($ident);
 }
 
 sub add_hash_ident
@@ -791,6 +791,7 @@ sub slots_seq
             my $key = &_remove_last($type);
 	    &add_symbol([$key]); # slot var name
             &_add_last($seq, {$key => &arg::type($type)});
+	    &maybe_add_exported_header_for_symbol_seq($type);
             $type = [];
         }
         else
@@ -878,8 +879,8 @@ sub slots
     }
     if (@$type)
     {
+        &add_type($type);
         $$gbl_current_scope{'slots'}{'type'} = &arg::type($type);
-        &add_type([$$gbl_current_scope{'slots'}{'type'}]);
     }
     else
     {
@@ -981,8 +982,8 @@ sub enum
     }
     if (@$type)
     {
+        &add_type($type);
         $$enum{'type'} = &arg::type($type);
-        &add_type([$$enum{'type'}]);
     }
     for (&sst_cursor::current_token($gbl_sst_cursor))
     {

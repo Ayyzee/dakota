@@ -33,7 +33,6 @@ use Cwd;
 
 package dakota;
 
-use dakota_include;
 use dakota_rewrite;
 
 require Exporter;
@@ -87,6 +86,19 @@ my $long_suffix =
     '?' => '3f',
     '!' => '21'
 };
+
+sub user_code_cxx
+{
+    my ($name) = @_;
+    if (exists $ENV{'DK_ABS_PATH'}) {
+	my $cwd = getcwd;
+	return "include \"$cwd/obj/$name.$cxx_ext\";\n";
+    }
+    else {
+	# should not be hardcoded
+	return "include \"../$name.$cxx_ext\";\n";
+    }
+}
 
 sub make_ident_symbol_scalar
 {
@@ -281,9 +293,9 @@ sub generate_nrt
     {
 	#rnielsen1
 	my $nrt_cxx_str = "// --nrt-cxx--\n";
-	$nrt_cxx_str .= &dakota_h();
 	$nrt_cxx_str .= &dk::print("\n");
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-exported-headers-hxx'}[0]);
+	$nrt_cxx_str .= &hardcoded_typedefs();
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[0]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[1]);
@@ -295,7 +307,6 @@ sub generate_nrt
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[1]);
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'generics-hxx'}[0]);
 	$nrt_cxx_str .= &user_code_cxx($name);
-	$nrt_cxx_str .= &dakota_after_user_code_h();
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-cxx'}[0]);
 	$nrt_cxx_str .= &dk::print("\n");
 
@@ -392,9 +403,9 @@ sub generate_rt
 
 	#rnielsen1
 	my $rt_cxx_str = "// --rt-cxx--\n";
-	$rt_cxx_str .= &dakota_h();
 	$rt_cxx_str .= &dk::print("\n");
 	$rt_cxx_str .= &dk::print($$result{'klasses-exported-headers-hxx'}[0]);
+	$rt_cxx_str .= &hardcoded_typedefs();
 	$rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);###
 	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[0]);
 	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[1]);
@@ -406,7 +417,6 @@ sub generate_rt
 	$rt_cxx_str .= &dk::print($$result{'signatures-cxx'}[1]);
 	$rt_cxx_str .= &dk::print($$result{'generics-cxx'}[0]);
 	## other: user_code_cxx
-	$rt_cxx_str .= &dakota_after_user_code_h();
 	$rt_cxx_str .= &dk::print($$result{'klasses-cxx'}[0]);
 	$rt_cxx_str .= &dk::print("\n");
 
@@ -2923,19 +2933,26 @@ sub generate_exported_slots_decls
     }
 }
 
+sub hardcoded_typedefs
+{
+    my $result = "\n";
+    $result .= "typedef int int-t;\n";
+    $result .= "typedef unsigned int uint-t;\n";
+    $result .= "\n";
+    return $result;
+}
+
 sub linkage_unit::generate_klasses_exported_headers
 {
     my ($scope) = @_;
     my $klass_names = &order_klasses($scope);
-    my $exported_headers = {};
     my $result = '';
     
-    if (&is_rt_decl() || &is_rt_defn()) {
-	$$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
+    if (&is_nrt_decl() || &is_rt_decl() || &is_rt_defn()) { # not sure if this is right
+	my $exported_headers = {};
 	$$exported_headers{'<cassert>'}{'hardcoded-by-rnielsen'} = undef; # assert()
-    }
+	$$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
 
-    if (&is_nrt_decl() || &is_rt_decl()) {
 	foreach my $klass_name (@$klass_names) {
 	    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 	    
@@ -2943,14 +2960,10 @@ sub linkage_unit::generate_klasses_exported_headers
 		$$exported_headers{$header}{$klass_name} = undef;
 	    }
 	}
+	foreach my $header_name (sort keys %$exported_headers) {
+	    $result .= "include $header_name;\n";
+	}
     }
-    foreach my $header_name (sort keys %$exported_headers) {
-	$result .= "include $header_name;\n";
-    }
-    if ('' ne $result) {
-	$result .= "\n";
-    }
-    $result .= "include <dakota-log.h>;\n\n";
     return $result;
 }
 
@@ -3229,7 +3242,11 @@ sub linkage_unit::generate_klasses
     my $scratch_str_ref = &global_scratch_str_ref();
     &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
     if (&is_nrt_decl() || &is_rt_decl()) {
-	$$scratch_str_ref .= &dakota_before_user_code_h();
+	$$scratch_str_ref .= "\n";
+	$$scratch_str_ref .= "include <dakota.h>;\n";
+	$$scratch_str_ref .= "include <dakota-before-user-code.h>;\n";
+	$$scratch_str_ref .= "include <dakota-log.h>;\n";
+	$$scratch_str_ref .= "\n";
     }
     &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
     
