@@ -23,6 +23,7 @@
     'text-output-stream.dk',
     'token.dk',
     'tokenid.dk',
+    'type-predicate.dk',
     'xml-object-output-stream.dk'
   ],
   'name' => 'dakota-util.$SO_EXT',

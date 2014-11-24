@@ -29,6 +29,7 @@ space?(int-t c)
 module dakota-util;
 
 klass str128;
+klass type-predicate;
 
 klass input-file
 {
