@@ -135,4 +135,65 @@ typedef va_list va_list_t;
 
 import void dk_init_runtime();
 
+extern import object_t null;
+extern import object_t std_input;
+extern import object_t std_output;
+extern import object_t std_error;
+
+typedef boole_t (*type_predicate_t)(int_t);
+typedef boole_t   (*equal_predicate_t)(object_t, object_t); //hackhack
+typedef int_t  (*compare_t)(object_t, object_t); // comparitor
+typedef uintmax_t (*hash_t)(object_t);
+
+constexpr uintmax_t dk_hash(const char8_t* str, uintmax_t h = 0)
+{ // Daniel J. Bernstein
+  return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ (uchar8_t)(str[h]);
+}
+
+import symbol_t dk_intern(const char8_t*);
+import void dkt_throw(object_t exception);
+import void dkt_throw(const char8_t* exception_str);
+
+import object_t             dk_klass_for_name(symbol_t);
+
+#if defined DEBUG
+#define DKT_NULL_METHOD nullptr
+#else
+import void dkt_null_method(object_t object, ...);
+#define DKT_NULL_METHOD dkt_null_method
+#endif
+
+typedef const signature_t* (*dkt_signature_function_t)();
+typedef selector_t* (*dkt_selector_function_t)();
+
+#if defined DEBUG
+import int_t dk_trace_before(const signature_t* signature, method_t method, super_t context, ...);
+import int_t dk_trace_before(const signature_t* signature, method_t method, object_t object, ...);
+import int_t dk_trace_after( const signature_t* signature, method_t method, super_t context, ...);
+import int_t dk_trace_after( const signature_t* signature, method_t method, object_t object, ...);
+
+import int_t dk_va_trace_before_init(object_t kls, va_list_t);
+import int_t dk_va_trace_after_init( object_t kls, va_list_t);
+
+import char8_t* dk_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
+
+import void dk_dump_methods(object_t);
+import void dk_dump_methods(klass::slots_t*);
+#endif
+
+import void dk_export_klass(  named_info_node_t* klass_info);
+import void dk_export_klasses(named_info_node_t* klass_info);
+
+sentinel import object_t           dk_add_all(object_t self, ...);
+sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
+sentinel import object_t           dk_make_named_info(symbol_t name, ...);
+
+import void dk_register_info(  named_info_node_t* registration_info);
+import void dk_deregister_info(named_info_node_t* registration_info);
+
+import method_t dk_method_for_selector(object_t object, selector_t selector);
+import method_t dk_method_for_selector(super_t  arg0,   selector_t selector);
+
+import void dk_unbox_check(object_t object, object_t kls);
+
 #endif // __dakota_h__

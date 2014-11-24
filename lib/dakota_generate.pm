@@ -3244,7 +3244,6 @@ sub linkage_unit::generate_klasses
     if (&is_nrt_decl() || &is_rt_decl()) {
 	$$scratch_str_ref .= "\n";
 	$$scratch_str_ref .= "include <dakota.h>;\n";
-	$$scratch_str_ref .= "include <dakota-before-user-code.h>;\n";
 	$$scratch_str_ref .= "include <dakota-log.h>;\n";
 	$$scratch_str_ref .= "\n";
     }

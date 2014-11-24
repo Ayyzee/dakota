@@ -22,7 +22,7 @@ module dakota;
 
 klass symbol
 {
-  slots const char8-t*;
+  slots const char*;
 
   method uint32-t length(slots-t s)
   {
