@@ -15,6 +15,7 @@
     'deque.dk',
     'dl.dk',
     'enum-info.dk',
+    'equal-predicate.dk',
     'exception.dk',
     'file.dk',
     'forward-iterator.dk',

@@ -16,6 +16,8 @@
 
 module dakota-util;
 
+klass equal-predicate;
+
 klass hashed-counted-set
 {
   superklass hashed-set;

@@ -33,6 +33,7 @@ klass sorted-ptr-array;
 klass object-output-stream;
 klass result;
 klass std-compare;
+klass equal-predicate;
 
 klass sorted-set
 {

@@ -140,7 +140,6 @@ extern import object_t std_input;
 extern import object_t std_output;
 extern import object_t std_error;
 
-typedef boole_t   (*equal_predicate_t)(object_t, object_t); //hackhack
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef uintmax_t (*hash_t)(object_t);
 

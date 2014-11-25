@@ -16,19 +16,9 @@
 
 module dakota;
 
-klass std-compare;
-klass equal-predicate;
-
-klass sorted-counted-set
+klass equal-predicate
 {
-  superklass sorted-set;
-  trait      counted-set;
-
-  method object-t init(object-t self,
-                       equal-predicate-t equal? =>  cast(equal-predicate-t)dk:method-for-selector(assoc:klass, selector(equal?(object-t, object-t))),
-                       compare-t         compare => cast(compare-t        )dk:method-for-selector(assoc:klass, selector(compare(object-t, object-t))))
-  {
-    self = dk:init(super, equal? => equal?, compare => compare);
-    return self;
-  }
+  slots boole-t (*)(object-t, object-t);
+  // or
+  // boole-t (*slots-t)(object-t, object-t);
 }
