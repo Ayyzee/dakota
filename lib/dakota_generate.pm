@@ -3207,8 +3207,10 @@ sub linkage_unit::generate_klasses
 	$$scratch_str_ref .= "include <dakota-log.h>;\n";
 	$$scratch_str_ref .= "\n";
     }
+    $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
     &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
     
+    $$scratch_str_ref .= &labeled_src_str(undef, "klass-defns");
     foreach my $klass_name (@$klass_names) {
         &linkage_unit::generate_klasses_klass($scope, $col, $klass_path, $klass_name);
     }
@@ -3221,6 +3223,7 @@ sub linkage_unit::generate_klasses_types_before
 
     my $klass_names = &order_klasses($scope);
     my $scratch_str_ref = &global_scratch_str_ref();
+    $$scratch_str_ref .= &labeled_src_str(undef, "klass-decls");
     if (&is_nrt_decl() || &is_rt_decl()) {
 	foreach my $klass_name (@$klass_names) {
 	    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
