@@ -294,20 +294,20 @@ sub generate_nrt
 
 	my $str = "// --nrt-cxx--\n";
 	$str .= &dk::print("\n");
-	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"}[0]);
+	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"});
 	$str .= &hardcoded_typedefs();
-	$str .= &dk::print($$defn_tbl{"klasses-hxx"}[0]);
-	$str .= &dk::print($$defn_tbl{"symbols-$suffix"}[0]);
-	$str .= &dk::print($$defn_tbl{"symbols-$suffix"}[1]);
-	$str .= &dk::print($$defn_tbl{"hashes-$suffix"}[0]);
-	$str .= &dk::print($$defn_tbl{"keywords-$suffix"}[0]);
-	$str .= &dk::print($$defn_tbl{"selectors-$suffix"}[0]);
-	$str .= &dk::print($$defn_tbl{"selectors-$suffix"}[1]);
-	$str .= &dk::print($$defn_tbl{"signatures-$suffix"}[0]);
-	$str .= &dk::print($$defn_tbl{"signatures-$suffix"}[1]);
-	$str .= &dk::print($$defn_tbl{"generics-$suffix"}[0]);
+	$str .= &dk::print($$defn_tbl{"klasses-hxx"});
+	$str .= &dk::print($$defn_tbl{"symbols-$suffix"});
+	$str .= &dk::print($$defn_tbl{"strings-$suffix"});
+	$str .= &dk::print($$defn_tbl{"hashes-$suffix"});
+	$str .= &dk::print($$defn_tbl{"keywords-$suffix"});
+	$str .= &dk::print($$defn_tbl{"selectors-$suffix"});
+	$str .= &dk::print($$defn_tbl{"selectors-seq-$suffix"});
+	$str .= &dk::print($$defn_tbl{"signatures-$suffix"});
+	$str .= &dk::print($$defn_tbl{"signatures-seq-$suffix"});
+	$str .= &dk::print($$defn_tbl{"generics-$suffix"});
 	$str .= &user_code_cxx($name);
-	$str .= &dk::print($$defn_tbl{"klasses-cxx"}[0]);
+	$str .= &dk::print($$defn_tbl{"klasses-cxx"});
 	$str .= &dk::print("\n");
 
 	&write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
@@ -350,20 +350,20 @@ sub generate_rt
 
 	my $str = "// --rt-cxx--\n";
 	$str .= &dk::print("\n");
-	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"}[0]);###
+	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"});###
 	$str .= &hardcoded_typedefs();
-	$str .= &dk::print($$defn_tbl{"klasses-hxx"}[0]);###
-	$str .= &dk::print($$result{"symbols-$suffix"}[0]);
-	$str .= &dk::print($$result{"symbols-$suffix"}[1]);
-	$str .= &dk::print($$result{"hashes-$suffix"}[0]);
-	$str .= &dk::print($$result{"keywords-$suffix"}[0]);
-	$str .= &dk::print($$result{"selectors-$suffix"}[0]);
-	$str .= &dk::print($$result{"selectors-$suffix"}[1]);
-	$str .= &dk::print($$result{"signatures-$suffix"}[0]);
-	$str .= &dk::print($$result{"signatures-$suffix"}[1]);
-	$str .= &dk::print($$result{"generics-$suffix"}[0]);
+	$str .= &dk::print($$defn_tbl{"klasses-hxx"});###
+	$str .= &dk::print($$result{"symbols-$suffix"});
+	$str .= &dk::print($$result{"strings-$suffix"});
+	$str .= &dk::print($$result{"hashes-$suffix"});
+	$str .= &dk::print($$result{"keywords-$suffix"});
+	$str .= &dk::print($$result{"selectors-$suffix"});
+	$str .= &dk::print($$result{"selectors-seq-$suffix"});
+	$str .= &dk::print($$result{"signatures-$suffix"});
+	$str .= &dk::print($$result{"signatures-seq-$suffix"});
+	$str .= &dk::print($$result{"generics-$suffix"});
 	## other: user_code_cxx
-	$str .= &dk::print($$result{"klasses-cxx"}[0]);
+	$str .= &dk::print($$result{"klasses-cxx"});
 	$str .= &dk::print("\n");
 
 	$str .= &generate_defn_footer($file);
@@ -409,14 +409,17 @@ sub generate_decl_defn
     $signatures_str .= &linkage_unit::generate_signatures($file, $generics);
     $signatures_seq_str .= &linkage_unit::generate_signatures_seq($file, $generics);
 
-    $$result{"klasses-exported-headers-hxx"} =  [ $klasses_exported_headers_hxx_str ];
-    $$result{"symbols-$suffix"} =   [ $symbols_str, $strings_str ];
-    $$result{"hashes-$suffix"} =  [ $hashes_str ];
-    $$result{"keywords-$suffix"} =  [ $keywords_str ];
-    $$result{"selectors-$suffix"} = [ $selectors_str, $selectors_seq_str ];
-    $$result{"signatures-$suffix"} = [ $signatures_str, $signatures_seq_str ];
-    $$result{"generics-$suffix"} =  [ $generics_str ];
-    $$result{"klasses-$suffix"} =   [ $klasses_str ];
+    $$result{"klasses-exported-headers-hxx"} = $klasses_exported_headers_hxx_str;
+    $$result{"symbols-$suffix"} =              $symbols_str;
+    $$result{"strings-$suffix"} =              $strings_str;
+    $$result{"hashes-$suffix"} =               $hashes_str;
+    $$result{"keywords-$suffix"} =             $keywords_str;
+    $$result{"selectors-$suffix"} =            $selectors_str;
+    $$result{"selectors-seq-$suffix"} =        $selectors_seq_str;
+    $$result{"signatures-$suffix"} =           $signatures_str;
+    $$result{"signatures-seq-$suffix"} =       $signatures_seq_str;
+    $$result{"generics-$suffix"} =             $generics_str;
+    $$result{"klasses-$suffix"} =              $klasses_str;
     return $result;
 } # generate_decl_defn
 

@@ -294,7 +294,7 @@ sub loop_cxx_from_dk
 
         my $path = $cxx_path;
 	#print STDERR "$klasses_include.$dk_ext\n";
-	$$defn_tbl{'klasses-cxx'} = [ $klasses_cxx_str ];
+	$$defn_tbl{'klasses-cxx'} = $klasses_cxx_str;
         &generate_nrt_defn($cxx_path, $file_basename, $file, $defn_tbl);
     }
 } # loop_cxx_from_dk
