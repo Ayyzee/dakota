@@ -287,15 +287,10 @@ sub loop_cxx_from_dk
         $cxx_path =~ s|/$||;
         my $defn_tbl = &generate_nrt_decl($cxx_path, $file_basename, $file);
 
-        my $name = $file_basename;
-        $name =~ s|.*/||; # strip off directory part
-        $name =~ s|\.$k+$||;
-        my $klasses_include = "$name--klasses";
-
-        my $stack = []; my $col;
+        my $stack; my $col;
 	my $klasses_cxx_str = "// --klasses-cxx--\n";
 	&set_global_scratch_str_ref(\$klasses_cxx_str);
-        $klasses_cxx_str = &dk::generate_cxx_footer($file, $stack, $col = 0);
+        $klasses_cxx_str = &dk::generate_cxx_footer($file, $stack = [], $col = 0);
 
         my $path = $cxx_path;
 	#print STDERR "$klasses_include.$dk_ext\n";
