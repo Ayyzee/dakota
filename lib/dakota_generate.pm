@@ -287,7 +287,7 @@ sub generate_nrt
 
     if (&is_nrt_decl())
     {
-	&generate_decl($file, $generics, $symbols, $result);
+	&generate_decl($file, $generics, $symbols, $result, 'hxx');
     }
     else
     {
@@ -344,12 +344,12 @@ sub generate_rt
 
     if (&is_rt_decl())
     {
-	&generate_decl($file, $generics, $symbols, $result);
+	&generate_decl($file, $generics, $symbols, $result, 'hxx');
     }
     else
     {
 	print "  generating $path/$name.$cxx_ext\n";
-	&generate_defn($file, $generics, $symbols, $result);
+	&generate_defn($file, $generics, $symbols, $result, 'cxx');
 
 	my $rt_cxx_str = "// --rt-cxx--\n";
 	$rt_cxx_str .= &dk::print("\n");
@@ -380,96 +380,93 @@ sub generate_rt
 
 sub generate_decl
 {
-    my ($file, $generics, $symbols, $result) = @_;
+    my ($file, $generics, $symbols, $result, $suffix) = @_;
 
     my $col = 0;
-    my $symbols_hxx_str =  "// --symbols-hxx--\n";
-    my $strings_hxx_str = "// --strings-hxx--\n";
-    my $hashes_hxx_str = "// --hashes-hxx--\n";
-    my $keywords_hxx_str = "// --keywords-hxx--\n";
-    my $selectors_hxx_str = "// --selectors-hxx--\n";
-    my $selectors_seq_hxx_str = "// --selectors-seq-hxx--\n";
-    my $signatures_hxx_str = "// --signatures-hxx--\n";
-    my $signatures_seq_hxx_str = "// --signatures-seq-hxx--\n";
+    my $symbols_str =  "// --symbols-$suffix--\n";
+    my $strings_str = "// --strings-$suffix--\n";
+    my $hashes_str = "// --hashes-$suffix--\n";
+    my $keywords_str = "// --keywords-$suffix--\n";
+    my $selectors_str = "// --selectors-$suffix--\n";
+    my $selectors_seq_str = "// --selectors-seq-$suffix--\n";
+    my $signatures_str = "// --signatures-$suffix--\n";
+    my $signatures_seq_str = "// --signatures-seq-$suffix--\n";
     my $klasses_exported_headers_hxx_str = "// --klasses-exported-headers-hxx--\n";
-    my $klasses_hxx_str = "// --klasses-hxx--\n";
-    my $generics_hxx_str = "// --generics-hxx--\n";
+    my $klasses_str = "// --klasses-$suffix--\n";
+    my $generics_str = "// --generics-$suffix--\n";
 
-    &set_global_scratch_str_ref(\$klasses_hxx_str);
+    &set_global_scratch_str_ref(\$klasses_str);
     $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
-    $klasses_hxx_str = &linkage_unit::generate_klasses($file, $col, []);
+    $klasses_str = &linkage_unit::generate_klasses($file, $col, []);
 
-    &set_global_scratch_str_ref(\$generics_hxx_str);
-    $generics_hxx_str = &linkage_unit::generate_generics($file, $generics);
+    &set_global_scratch_str_ref(\$generics_str);
+    $generics_str = &linkage_unit::generate_generics($file, $generics);
 
     &set_global_scratch_str_ref(undef);
 
-    $selectors_hxx_str .= &linkage_unit::generate_selectors($file, $generics);
-    $selectors_seq_hxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
-    $signatures_hxx_str .= &linkage_unit::generate_signatures($file, $generics);
-    $signatures_seq_hxx_str .= &linkage_unit::generate_signatures_seq($file, $generics);
-    #$strings_hxx_str .= &linkage_unit::generate_strings($file, $generics, $$file{'strings'});
-    $symbols_hxx_str .=  &linkage_unit::generate_symbols($file, $generics, $symbols);
-    $hashes_hxx_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
-    $keywords_hxx_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
+    $selectors_str .= &linkage_unit::generate_selectors($file, $generics);
+    $selectors_seq_str .= &linkage_unit::generate_selectors_seq($file, $generics);
+    $signatures_str .= &linkage_unit::generate_signatures($file, $generics);
+    $signatures_seq_str .= &linkage_unit::generate_signatures_seq($file, $generics);
+    #$strings_str .= &linkage_unit::generate_strings($file, $generics, $$file{'strings'});
+    $symbols_str .=  &linkage_unit::generate_symbols($file, $generics, $symbols);
+    $hashes_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
+    $keywords_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
 
-    # klasses-exported-headers-hxx
-    # klasses-hxx
-    $$result{'symbols-hxx'} =   [ $symbols_hxx_str, $strings_hxx_str ];
-    $$result{'selectors-hxx'} = [ $selectors_hxx_str, $selectors_seq_hxx_str ];
-    $$result{'signatures-hxx'} = [ $signatures_hxx_str, $signatures_seq_hxx_str ];
-    $$result{'generics-hxx'} =  [ $generics_hxx_str ];
-    $$result{'klasses-exported-headers-hxx'} =  [ $klasses_exported_headers_hxx_str ];
-    $$result{'klasses-hxx'} =   [ $klasses_hxx_str ];
-    $$result{'hashes-hxx'} =  [ $hashes_hxx_str ];
-    $$result{'keywords-hxx'} =  [ $keywords_hxx_str ];
+    $$result{"klasses-exported-headers-hxx"} =  [ $klasses_exported_headers_hxx_str ];
+    $$result{"klasses-$suffix"} =   [ $klasses_str ];
+    $$result{"generics-$suffix"} =  [ $generics_str ];
+    $$result{"selectors-$suffix"} = [ $selectors_str, $selectors_seq_str ];
+    $$result{"signatures-$suffix"} = [ $signatures_str, $signatures_seq_str ];
+    $$result{"symbols-$suffix"} =   [ $symbols_str, $strings_str ];
+    $$result{"hashes-$suffix"} =  [ $hashes_str ];
+    $$result{"keywords-$suffix"} =  [ $keywords_str ];
     return $result;
 } # generate_decl
 
 sub generate_defn
 {
-    my ($file, $generics, $symbols, $result) = @_;
+    my ($file, $generics, $symbols, $result, $suffix) = @_;
 
     my $col = 0;
-    my $symbols_cxx_str =  "// --symbols-cxx--\n";
-    my $strings_cxx_str = "// --strings-cxx--\n";
-    my $hashes_cxx_str = "// --hashes-cxx--\n";
-    my $keywords_cxx_str = "// --keywords-cxx--\n";
-    my $selectors_cxx_str = "// --selectors-cxx--\n";
-    my $selectors_seq_cxx_str = "// --selectors-seq-cxx--\n";
-    my $signatures_cxx_str = "// --signatures-cxx--\n";
-    my $signatures_seq_cxx_str = "// --signatures-seq-cxx--\n";
+    my $symbols_str =  "// --symbols-$suffix--\n";
+    my $strings_str = "// --strings-$suffix--\n";
+    my $hashes_str = "// --hashes-$suffix--\n";
+    my $keywords_str = "// --keywords-$suffix--\n";
+    my $selectors_str = "// --selectors-$suffix--\n";
+    my $selectors_seq_str = "// --selectors-seq-$suffix--\n";
+    my $signatures_str = "// --signatures-$suffix--\n";
+    my $signatures_seq_str = "// --signatures-seq-$suffix--\n";
     my $klasses_exported_headers_hxx_str = "// --klasses-exported-headers-hxx--\n";
-    my $klasses_cxx_str = "// --klasses-cxx--\n";
-    my $generics_cxx_str = "// --generics-cxx--\n";
+    my $klasses_str = "// --klasses-$suffix--\n";
+    my $generics_str = "// --generics-$suffix--\n";
 
-    &set_global_scratch_str_ref(\$klasses_cxx_str);
+    &set_global_scratch_str_ref(\$klasses_str);
     $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
-    $klasses_cxx_str = &linkage_unit::generate_klasses($file, $col, []);
+    $klasses_str = &linkage_unit::generate_klasses($file, $col, []);
 
-    &set_global_scratch_str_ref(\$generics_cxx_str);
-    $generics_cxx_str = &linkage_unit::generate_generics($file, $generics);
+    &set_global_scratch_str_ref(\$generics_str);
+    $generics_str = &linkage_unit::generate_generics($file, $generics);
 
     &set_global_scratch_str_ref(undef);
 
-    $selectors_cxx_str .= &linkage_unit::generate_selectors($file, $generics);
-    $selectors_seq_cxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
-    $signatures_cxx_str .= &linkage_unit::generate_signatures($file, $generics);
-    $signatures_seq_cxx_str .= &linkage_unit::generate_signatures_seq($file, $generics);
-    #$strings_cxx_str .= &linkage_unit::generate_strings($file, $generics, $$file{'strings'});
-    $symbols_cxx_str .=  &linkage_unit::generate_symbols($file, $generics, $symbols);
-    $hashes_cxx_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
-    $keywords_cxx_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
+    $selectors_str .= &linkage_unit::generate_selectors($file, $generics);
+    $selectors_seq_str .= &linkage_unit::generate_selectors_seq($file, $generics);
+    $signatures_str .= &linkage_unit::generate_signatures($file, $generics);
+    $signatures_seq_str .= &linkage_unit::generate_signatures_seq($file, $generics);
+    #$strings_str .= &linkage_unit::generate_strings($file, $generics, $$file{'strings'});
+    $symbols_str .=  &linkage_unit::generate_symbols($file, $generics, $symbols);
+    $hashes_str .= &linkage_unit::generate_hashes($file, $generics, $symbols);
+    $keywords_str .= &linkage_unit::generate_keywords($file, $generics, $symbols);
 
-    $$result{'klasses-exported-headers-hxx'} =  [ $klasses_exported_headers_hxx_str ];
-    #$$result{'klasses-hxx'} =   [ $klasses_hxx_str ];
-    $$result{'symbols-cxx'} =   [ $symbols_cxx_str, $strings_cxx_str ];
-    $$result{'hashes-cxx'} =  [ $hashes_cxx_str ];
-    $$result{'keywords-cxx'} =  [ $keywords_cxx_str ];
-    $$result{'selectors-cxx'} = [ $selectors_cxx_str, $selectors_seq_cxx_str ];
-    $$result{'signatures-cxx'} = [ $signatures_cxx_str, $signatures_seq_cxx_str ];
-    $$result{'generics-cxx'} =  [ $generics_cxx_str ];
-    $$result{'klasses-cxx'} =   [ $klasses_cxx_str ];
+    $$result{"klasses-exported-headers-hxx"} =  [ $klasses_exported_headers_hxx_str ];
+    $$result{"klasses-$suffix"} =   [ $klasses_str ];
+    $$result{"generics-$suffix"} =  [ $generics_str ];
+    $$result{"selectors-$suffix"} = [ $selectors_str, $selectors_seq_str ];
+    $$result{"signatures-$suffix"} = [ $signatures_str, $signatures_seq_str ];
+    $$result{"symbols-$suffix"} =   [ $symbols_str, $strings_str ];
+    $$result{"hashes-$suffix"} =  [ $hashes_str ];
+    $$result{"keywords-$suffix"} =  [ $keywords_str ];
     return $result;
 } # generate_defn
 
