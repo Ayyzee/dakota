@@ -2189,24 +2189,6 @@ sub generics::_parse # no longer recursive
         }
     }
 }
-sub generics::pre_parse
-{
-    my ($file_basename) = @_;
-    my $parse_tree;
-    my $rep_path;
-
-    if ( -e "$file_basename.$dk_ext")
-    {
-        $rep_path = &rep_path_from_dk_path("$file_basename.$dk_ext");
-    }
-    else
-    {
-        $rep_path = &rep_path_from_any_path($file_basename);
-    }
-    $parse_tree = &scalar_from_file($rep_path);
-    $parse_tree = &ka_translate($parse_tree);
-    return $parse_tree;
-}
 
 sub add_direct_constructs
 {

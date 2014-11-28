@@ -283,19 +283,16 @@ sub generate_nrt
     $name =~ s|\.$k+$||;    
 
     my $scratch_str_ref = &global_scratch_str_ref();
-    my $parse_tree = &generics::pre_parse($file_basename);
-    my ($generics, $symbols) = &generics::parse($parse_tree);
+    my ($generics, $symbols) = &generics::parse($file);
 
-    my $col = 0;
-    my $ka_generics = &ka_generics();
-
-    if (&is_nrt_decl() || &is_rt_decl())
+    if (&is_nrt_decl())
     {
 	&generate_decl($file, $generics, $symbols, $result);
     }
     else
     {
-	#rnielsen1
+	#print "  generating $path/$name.$cxx_ext\n";
+
 	my $nrt_cxx_str = "// --nrt-cxx--\n";
 	$nrt_cxx_str .= &dk::print("\n");
 	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-exported-headers-hxx'}[0]);
@@ -315,7 +312,6 @@ sub generate_nrt
 	$nrt_cxx_str .= &dk::print("\n");
 
 	my $nrt_defn = "$name";
-
 	&write_to_file_strings("$path/$nrt_defn.$dk_ext",            [ $nrt_cxx_str ]);
 	&write_to_file_converted_strings("$path/$nrt_defn.$cxx_ext", [ $nrt_cxx_str ], undef);
     }
@@ -338,32 +334,23 @@ sub generate_rt
 {
     my ($path, $file_basename, $file, $defn_tbl) = @_;
     $gbl_nrt_file = undef;
-    #print STDERR &Dumper($defn_tbl);
     my $result = {};
     my $name = $file_basename;
     $name =~ s|.*/||; # strip off directory part
-    if (&is_rt_defn())
-    {
-	print "  generating $path/$name\n";
-    }
     $name =~ s|\.$k+$||;    
 
     my $scratch_str_ref = &global_scratch_str_ref();
-
     my ($generics, $symbols) = &generics::parse($file);
 
-    my $col = 0;
-    my $ka_generics = &ka_generics();
-
-    if (&is_nrt_decl() || &is_rt_decl())
+    if (&is_rt_decl())
     {
 	&generate_decl($file, $generics, $symbols, $result);
     }
     else
     {
+	print "  generating $path/$name.$cxx_ext\n";
 	&generate_defn($file, $generics, $symbols, $result);
 
-	#rnielsen1
 	my $rt_cxx_str = "// --rt-cxx--\n";
 	$rt_cxx_str .= &dk::print("\n");
 	$rt_cxx_str .= &dk::print($$result{'klasses-exported-headers-hxx'}[0]);
@@ -382,128 +369,9 @@ sub generate_rt
 	$rt_cxx_str .= &dk::print($$result{'klasses-cxx'}[0]);
 	$rt_cxx_str .= &dk::print("\n");
 
-        my $stack = [];
-        my $tbl = {
-            'imported-klasses' => {},
-            'klasses' =>          {},
-        };
-        &dk::generate_imported_klasses_info($file, $stack, $tbl);
-        my $keys_count;
-        $keys_count = keys %{$$file{'klasses'}};
-	$rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
-        if (0 == $keys_count)
-        {
-            $rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t* imported-klasses = nullptr;\n");
-            $rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t* imported-klasses-names = nullptr;\n");
-        }
-        else
-        {
-            $rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t imported-klasses-names[] = //ro-data\n");
-            $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-            $col++;
-            my ($key, $val);
-            my $num_klasses = scalar keys %{$$file{'klasses'}};
-            foreach $key (sort keys %{$$file{'klasses'}})
-            {
-                $val = $$file{'klasses'}{$key};
-                my $cxx_klass_name = $key;
-                $rt_cxx_str .= &dk::print_in_col_string($col, "$key:__klass__,\n");
-            }
-	    $rt_cxx_str .= &dk::print_in_col_string($col, "nullptr\n");
-            $col--;
-            $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
-###
-            $rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t imported-klasses[] = //rw-data\n");
-            $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-            $col++;
-	    $num_klasses = scalar keys %{$$file{'klasses'}};
-            foreach $key (sort keys %{$$file{'klasses'}})
-            {
-                $val = $$file{'klasses'}{$key};
-                my $RT = ''; # because the klass klass won't compile
-                my $cxx_klass_name = $key;
-                $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)&$RT$cxx_klass_name:klass, nullptr },\n");
-            }
-	    $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)nullptr, nullptr }\n");
-            $col--;
-            $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
-        }
-	my $scratch_str = '';
-	&set_global_scratch_str_ref(\$scratch_str);
-        $rt_cxx_str .= &dk::generate_cxx_footer($file, $stack, $col);
-        #$rt_cxx_str .= &dk::print_in_col_string($col, "extern \"C\"\n");
-        #$rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-        #$col++;
-
-        my $info_tbl =
-        {
-            "\$signatures-va" => 'signatures-va',
-            "\$signatures" => 'signatures',
-            "\$selectors-va" => 'selectors-va',
-            "\$selectors" => 'selectors',
-            "\$imported-klasses-names" => 'imported-klasses-names',
-            "\$imported-klasses" => 'imported-klasses',
-            "\$klass-defns" => 'klass-defns',
-            "\$interposers" => 'interposers',
-            "\$date" => '__DATE__',
-            "\$time" => '__TIME__',
-            "\$file" => '__FILE__',
-            "\$construct" => 'DK-CONSTRUCT',
-            "\$name" => 'DK-NAME',
-        };
-	my $exports = &exports($file);
-	my $num_exports = scalar keys %$exports;
-	if (0 == $num_exports) {
-	    $$info_tbl{"\$exports"} = 'exports';
-	}
-	else {
-	    $$info_tbl{"\$exports"} = '&exports';
-	}
-        $rt_cxx_str .= &dk::print("\n");
-	my $col;
-        $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col = 0);
-
-        $rt_cxx_str .= &dk::print("\n");
-	$rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
-        $rt_cxx_str .= &dk::print_in_col_string($col, "static void __initial()\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-        $col++;
-        $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DK-NAME);\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "dk-register-info(&registration-info);\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DK-NAME);\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
-        $col--;
-        $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
-	$rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
-        $rt_cxx_str .= &dk::print_in_col_string($col, "static void __final()\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-        $col++;
-        $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DK-NAME);\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "dk-deregister-info(&registration-info);\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DK-NAME);\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
-        $col--;
-        $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
-        #$col--;
-        #$rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
-
-        $rt_cxx_str .= &dk::print_in_col_string($col, "namespace\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-        $col++;
-        $rt_cxx_str .= &dk::print_in_col_string($col, "struct noexport __ddl_t\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-        $col++;
-        $rt_cxx_str .= &dk::print_in_col_string($col, " __ddl_t() { __initial(); }\n");
-        $rt_cxx_str .= &dk::print_in_col_string($col, "~__ddl_t() { __final(); }\n");
-        $col--;
-        $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
-        $col--;
-        $rt_cxx_str .= &dk::print_in_col_string3_comment($col, "}", " // namespace", "\n");
-
-        $rt_cxx_str .= &dk::print_in_col_string($col, "static __ddl_t __ddl = __ddl_t();\n");
+	$rt_cxx_str .= &generate_defn_footer($file);
 
 	my $rt_defn = "$name";
-
 	&write_to_file_strings("$path/$rt_defn.$dk_ext",            [ $rt_cxx_str ]);
 	&write_to_file_converted_strings("$path/$rt_defn.$cxx_ext", [ $rt_cxx_str ], undef);
     }
@@ -528,8 +396,6 @@ sub generate_decl
     my $generics_hxx_str = "// --generics-hxx--\n";
 
     &set_global_scratch_str_ref(\$klasses_hxx_str);
-    #print STDERR __FILE__, ":", __LINE__, ":\n";
-    #print STDERR &Dumper($$file{'klasses'}{'callback'});
     $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
     $klasses_hxx_str = &linkage_unit::generate_klasses($file, $col, []);
 
@@ -537,8 +403,6 @@ sub generate_decl
     $generics_hxx_str = &linkage_unit::generate_generics($file, $generics);
 
     &set_global_scratch_str_ref(undef);
-
-    #rnielsen2
 
     $selectors_hxx_str .= &linkage_unit::generate_selectors($file, $generics);
     $selectors_seq_hxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
@@ -560,7 +424,7 @@ sub generate_decl
     $$result{'hashes-hxx'} =  [ $hashes_hxx_str ];
     $$result{'keywords-hxx'} =  [ $keywords_hxx_str ];
     return $result;
-}
+} # generate_decl
 
 sub generate_defn
 {
@@ -580,8 +444,6 @@ sub generate_defn
     my $generics_cxx_str = "// --generics-cxx--\n";
 
     &set_global_scratch_str_ref(\$klasses_cxx_str);
-    #print STDERR __FILE__, ":", __LINE__, ":\n";
-    #print STDERR &Dumper($$file{'klasses'}{'callback'});
     $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
     $klasses_cxx_str = &linkage_unit::generate_klasses($file, $col, []);
 
@@ -589,8 +451,6 @@ sub generate_defn
     $generics_cxx_str = &linkage_unit::generate_generics($file, $generics);
 
     &set_global_scratch_str_ref(undef);
-
-    #rnielsen2
 
     $selectors_cxx_str .= &linkage_unit::generate_selectors($file, $generics);
     $selectors_seq_cxx_str .= &linkage_unit::generate_selectors_seq($file, $generics);
@@ -611,6 +471,134 @@ sub generate_defn
     $$result{'generics-cxx'} =  [ $generics_cxx_str ];
     $$result{'klasses-cxx'} =   [ $klasses_cxx_str ];
     return $result;
+} # generate_defn
+
+sub generate_defn_footer
+{
+    my ($file) = @_;
+    my $rt_cxx_str = '';
+    my $col = 0;
+    my $stack = [];
+    my $tbl = {
+	'imported-klasses' => {},
+	'klasses' =>          {},
+    };
+    &dk::generate_imported_klasses_info($file, $stack, $tbl);
+    my $keys_count;
+    $keys_count = keys %{$$file{'klasses'}};
+    $rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
+    if (0 == $keys_count)
+    {
+	$rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t* imported-klasses = nullptr;\n");
+	$rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t* imported-klasses-names = nullptr;\n");
+    }
+    else
+    {
+	$rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t imported-klasses-names[] = //ro-data\n");
+	$rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+	$col++;
+	my ($key, $val);
+	my $num_klasses = scalar keys %{$$file{'klasses'}};
+	foreach $key (sort keys %{$$file{'klasses'}})
+	{
+	    $val = $$file{'klasses'}{$key};
+	    my $cxx_klass_name = $key;
+	    $rt_cxx_str .= &dk::print_in_col_string($col, "$key:__klass__,\n");
+	}
+	$rt_cxx_str .= &dk::print_in_col_string($col, "nullptr\n");
+	$col--;
+	$rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
+###
+	$rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t imported-klasses[] = //rw-data\n");
+	$rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+	$col++;
+	$num_klasses = scalar keys %{$$file{'klasses'}};
+	foreach $key (sort keys %{$$file{'klasses'}})
+	{
+	    $val = $$file{'klasses'}{$key};
+	    my $RT = ''; # because the klass klass won't compile
+	    my $cxx_klass_name = $key;
+	    $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)&$RT$cxx_klass_name:klass, nullptr },\n");
+	}
+	$rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)nullptr, nullptr }\n");
+	$col--;
+	$rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
+    }
+    my $scratch_str = '';
+    &set_global_scratch_str_ref(\$scratch_str);
+    $rt_cxx_str .= &dk::generate_cxx_footer($file, $stack, $col);
+    #$rt_cxx_str .= &dk::print_in_col_string($col, "extern \"C\"\n");
+    #$rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+    #$col++;
+
+    my $info_tbl =
+    {
+	"\$signatures-va" => 'signatures-va',
+	"\$signatures" => 'signatures',
+	"\$selectors-va" => 'selectors-va',
+	"\$selectors" => 'selectors',
+	"\$imported-klasses-names" => 'imported-klasses-names',
+	"\$imported-klasses" => 'imported-klasses',
+	"\$klass-defns" => 'klass-defns',
+	"\$interposers" => 'interposers',
+	"\$date" => '__DATE__',
+	"\$time" => '__TIME__',
+	"\$file" => '__FILE__',
+	"\$construct" => 'DK-CONSTRUCT',
+	"\$name" => 'DK-NAME',
+    };
+    my $exports = &exports($file);
+    my $num_exports = scalar keys %$exports;
+    if (0 == $num_exports) {
+	$$info_tbl{"\$exports"} = 'exports';
+    }
+    else {
+	$$info_tbl{"\$exports"} = '&exports';
+    }
+    $rt_cxx_str .= &dk::print("\n");
+    #my $col;
+    $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col);
+
+    $rt_cxx_str .= &dk::print("\n");
+    $rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
+    $rt_cxx_str .= &dk::print_in_col_string($col, "static void __initial()\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+    $col++;
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DK-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dk-register-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DK-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
+    $col--;
+    $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
+    $rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
+    $rt_cxx_str .= &dk::print_in_col_string($col, "static void __final()\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+    $col++;
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DK-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dk-deregister-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DK-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
+    $col--;
+    $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
+    #$col--;
+    #$rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
+
+    $rt_cxx_str .= &dk::print_in_col_string($col, "namespace\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+    $col++;
+    $rt_cxx_str .= &dk::print_in_col_string($col, "struct noexport __ddl_t\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+    $col++;
+    $rt_cxx_str .= &dk::print_in_col_string($col, " __ddl_t() { __initial(); }\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "~__ddl_t() { __final(); }\n");
+    $col--;
+    $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
+    $col--;
+    $rt_cxx_str .= &dk::print_in_col_string3_comment($col, "}", " // namespace", "\n");
+
+    $rt_cxx_str .= &dk::print_in_col_string($col, "static __ddl_t __ddl = __ddl_t();\n");
+
+    return $rt_cxx_str;
 }
 
 sub path::add_last
