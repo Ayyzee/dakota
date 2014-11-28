@@ -292,22 +292,22 @@ sub generate_nrt
 	#print "  generating $path/$name.$cxx_ext\n";
 	my $suffix = 'hxx';
 
-	my $str = "// --nrt-cxx--\n";
+	my $str = &labeled_src_str(undef, "nrt-cxx");
 	$str .= &dk::print("\n");
-	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"});
+	$str .= &labeled_src_str($defn_tbl, "klasses-exported-headers-hxx");
 	$str .= &hardcoded_typedefs();
-	$str .= &dk::print($$defn_tbl{"klasses-hxx"});
-	$str .= &dk::print($$defn_tbl{"symbols-$suffix"});
-	$str .= &dk::print($$defn_tbl{"strings-$suffix"});
-	$str .= &dk::print($$defn_tbl{"hashes-$suffix"});
-	$str .= &dk::print($$defn_tbl{"keywords-$suffix"});
-	$str .= &dk::print($$defn_tbl{"selectors-$suffix"});
-	$str .= &dk::print($$defn_tbl{"selectors-seq-$suffix"});
-	$str .= &dk::print($$defn_tbl{"signatures-$suffix"});
-	$str .= &dk::print($$defn_tbl{"signatures-seq-$suffix"});
-	$str .= &dk::print($$defn_tbl{"generics-$suffix"});
+	$str .= &labeled_src_str($defn_tbl, "klasses-hxx");
+	$str .= &labeled_src_str($defn_tbl, "symbols-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "strings-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "hashes-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "keywords-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "selectors-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "selectors-seq-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "signatures-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "signatures-seq-$suffix");
+	$str .= &labeled_src_str($defn_tbl, "generics-$suffix");
 	$str .= &user_code_cxx($name);
-	$str .= &dk::print($$defn_tbl{"klasses-cxx"});
+	$str .= &labeled_src_str($defn_tbl, "klasses-cxx");
 	$str .= &dk::print("\n");
 
 	&write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
@@ -348,22 +348,22 @@ sub generate_rt
 	my $suffix = 'cxx';
 	&generate_decl_defn($file, $generics, $symbols, $suffix, $result);
 
-	my $str = "// --rt-cxx--\n";
+	my $str = &labeled_src_str(undef, "rt-cxx");
 	$str .= &dk::print("\n");
-	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"});###
+	$str .= &labeled_src_str($defn_tbl, "klasses-exported-headers-hxx");###
 	$str .= &hardcoded_typedefs();
-	$str .= &dk::print($$defn_tbl{"klasses-hxx"});###
-	$str .= &dk::print($$result{"symbols-$suffix"});
-	$str .= &dk::print($$result{"strings-$suffix"});
-	$str .= &dk::print($$result{"hashes-$suffix"});
-	$str .= &dk::print($$result{"keywords-$suffix"});
-	$str .= &dk::print($$result{"selectors-$suffix"});
-	$str .= &dk::print($$result{"selectors-seq-$suffix"});
-	$str .= &dk::print($$result{"signatures-$suffix"});
-	$str .= &dk::print($$result{"signatures-seq-$suffix"});
-	$str .= &dk::print($$result{"generics-$suffix"});
+	$str .= &labeled_src_str($defn_tbl, "klasses-hxx");###
+	$str .= &labeled_src_str($result, "symbols-$suffix");
+	$str .= &labeled_src_str($result, "strings-$suffix");
+	$str .= &labeled_src_str($result, "hashes-$suffix");
+	$str .= &labeled_src_str($result, "keywords-$suffix");
+	$str .= &labeled_src_str($result, "selectors-$suffix");
+	$str .= &labeled_src_str($result, "selectors-seq-$suffix");
+	$str .= &labeled_src_str($result, "signatures-$suffix");
+	$str .= &labeled_src_str($result, "signatures-seq-$suffix");
+	$str .= &labeled_src_str($result, "generics-$suffix");
 	## other: user_code_cxx
-	$str .= &dk::print($$result{"klasses-cxx"});
+	$str .= &labeled_src_str($result, "klasses-cxx");
 	$str .= &dk::print("\n");
 
 	$str .= &generate_defn_footer($file);
@@ -374,22 +374,32 @@ sub generate_rt
     return $result;
 } # sub generate_rt
 
+sub labeled_src_str
+{
+    my ($tbl, $key) = @_;
+    my $str = "//--$key--\n";
+    if ($tbl) {
+	$str .= $$tbl{$key};
+    }
+    return $str;
+}
+
 sub generate_decl_defn
 {
     my ($file, $generics, $symbols, $suffix, $result) = @_;
 
     my $col = 0;
-    my $klasses_exported_headers_hxx_str = "// --klasses-exported-headers-hxx--\n";
-    my $klasses_str = "// --klasses-$suffix--\n";
-    my $symbols_str = "// --symbols-$suffix--\n";
-    my $strings_str = "// --strings-$suffix--\n";
-    my $hashes_str = "// --hashes-$suffix--\n";
-    my $keywords_str = "// --keywords-$suffix--\n";
-    my $selectors_str = "// --selectors-$suffix--\n";
-    my $selectors_seq_str = "// --selectors-seq-$suffix--\n";
-    my $signatures_str = "// --signatures-$suffix--\n";
-    my $signatures_seq_str = "// --signatures-seq-$suffix--\n";
-    my $generics_str = "// --generics-$suffix--\n";
+    my $klasses_exported_headers_hxx_str = ''; 
+    my $klasses_str = ''; 
+    my $symbols_str = ''; 
+    my $strings_str = ''; 
+    my $hashes_str = ''; 
+    my $keywords_str = ''; 
+    my $selectors_str = ''; 
+    my $selectors_seq_str = ''; 
+    my $signatures_str = ''; 
+    my $signatures_seq_str = ''; 
+    my $generics_str = ''; 
 
     &set_global_scratch_str_ref(\$klasses_str);
     $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
@@ -1859,7 +1869,7 @@ sub generics::generate_generic_defns
     my $generic;
     #$$scratch_str_ref .= &dk::print("#if defined DK-VA-GENERICS\n");
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-va-object-t--\n");
+    $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
     foreach $generic (@$generics)
     {
         if (&is_va($generic))
@@ -1869,7 +1879,7 @@ sub generics::generate_generic_defns
 	    }
         }
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-va-super-t--\n");
+    $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-super-t");
     foreach $generic (@$generics)
     {
         if (&is_va($generic))
@@ -1883,7 +1893,7 @@ sub generics::generate_generic_defns
     #if (!&is_raw($generic)) {
 	&generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
     #}
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-object-t--\n");
+    $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t");
     foreach $generic (@$generics)
     {
         if (!&is_va($generic))
@@ -1893,7 +1903,7 @@ sub generics::generate_generic_defns
 	    }
         }
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "// --generics-super-t--\n");
+    $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t");
     foreach $generic (@$generics)
     {
         if (!&is_va($generic))

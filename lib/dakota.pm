@@ -288,7 +288,7 @@ sub loop_cxx_from_dk
         my $defn_tbl = &generate_nrt_decl($cxx_path, $file_basename, $file);
 
         my $stack; my $col;
-	my $klasses_cxx_str = "// --klasses-cxx--\n";
+	my $klasses_cxx_str = '';
 	&set_global_scratch_str_ref(\$klasses_cxx_str);
         $klasses_cxx_str = &dk::generate_cxx_footer($file, $stack = [], $col = 0);
 
