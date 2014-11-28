@@ -286,7 +286,7 @@ sub generate_nrt
     my ($generics, $symbols) = &generics::parse($file);
 
     if (&is_nrt_decl()) {
-	&generate_decl_defn($file, $generics, $symbols, $result, 'hxx');
+	&generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
     }
     else {
 	#print "  generating $path/$name.$cxx_ext\n";
@@ -341,16 +341,16 @@ sub generate_rt
     my ($generics, $symbols) = &generics::parse($file);
 
     if (&is_rt_decl()) {
-	&generate_decl_defn($file, $generics, $symbols, $result, 'hxx');
+	&generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
     }
     else {
 	print "  generating $path/$name.$cxx_ext\n";
 	my $suffix = 'cxx';
-	&generate_decl_defn($file, $generics, $symbols, $result, $suffix);
+	&generate_decl_defn($file, $generics, $symbols, $suffix, $result);
 
 	my $str = "// --rt-cxx--\n";
 	$str .= &dk::print("\n");
-	$str .= &dk::print($$result{"klasses-exported-headers-hxx"}[0]);
+	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"}[0]);###
 	$str .= &hardcoded_typedefs();
 	$str .= &dk::print($$defn_tbl{"klasses-hxx"}[0]);###
 	$str .= &dk::print($$result{"symbols-$suffix"}[0]);
@@ -376,7 +376,7 @@ sub generate_rt
 
 sub generate_decl_defn
 {
-    my ($file, $generics, $symbols, $result, $suffix) = @_;
+    my ($file, $generics, $symbols, $suffix, $result) = @_;
 
     my $col = 0;
     my $klasses_exported_headers_hxx_str = "// --klasses-exported-headers-hxx--\n";
