@@ -410,14 +410,13 @@ sub generate_decl
     $signatures_seq_str .= &linkage_unit::generate_signatures_seq($file, $generics);
 
     $$result{"klasses-exported-headers-hxx"} =  [ $klasses_exported_headers_hxx_str ];
-    $$result{"klasses-$suffix"} =   [ $klasses_str ];
     $$result{"symbols-$suffix"} =   [ $symbols_str, $strings_str ];
     $$result{"hashes-$suffix"} =  [ $hashes_str ];
     $$result{"keywords-$suffix"} =  [ $keywords_str ];
     $$result{"selectors-$suffix"} = [ $selectors_str, $selectors_seq_str ];
     $$result{"signatures-$suffix"} = [ $signatures_str, $signatures_seq_str ];
     $$result{"generics-$suffix"} =  [ $generics_str ];
-    # other: klasses-cxx
+    $$result{"klasses-$suffix"} =   [ $klasses_str ];
     return $result;
 } # generate_decl
 
@@ -457,7 +456,6 @@ sub generate_defn
     $signatures_seq_str .= &linkage_unit::generate_signatures_seq($file, $generics);
 
     $$result{"klasses-exported-headers-hxx"} =  [ $klasses_exported_headers_hxx_str ];
-    # other: klasses-hxx
     $$result{"symbols-$suffix"} =   [ $symbols_str, $strings_str ];
     $$result{"hashes-$suffix"} =  [ $hashes_str ];
     $$result{"keywords-$suffix"} =  [ $keywords_str ];
