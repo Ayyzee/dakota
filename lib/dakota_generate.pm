@@ -285,35 +285,33 @@ sub generate_nrt
     my $scratch_str_ref = &global_scratch_str_ref();
     my ($generics, $symbols) = &generics::parse($file);
 
-    if (&is_nrt_decl())
-    {
+    if (&is_nrt_decl()) {
 	&generate_decl($file, $generics, $symbols, $result, 'hxx');
     }
-    else
-    {
+    else {
 	#print "  generating $path/$name.$cxx_ext\n";
+	my $suffix = 'hxx';
 
-	my $nrt_cxx_str = "// --nrt-cxx--\n";
-	$nrt_cxx_str .= &dk::print("\n");
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-exported-headers-hxx'}[0]);
-	$nrt_cxx_str .= &hardcoded_typedefs();
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[0]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'symbols-hxx'}[1]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'hashes-hxx'}[0]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'keywords-hxx'}[0]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'selectors-hxx'}[0]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'selectors-hxx'}[1]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[0]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'signatures-hxx'}[1]);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'generics-hxx'}[0]);
-	$nrt_cxx_str .= &user_code_cxx($name);
-	$nrt_cxx_str .= &dk::print($$defn_tbl{'klasses-cxx'}[0]);
-	$nrt_cxx_str .= &dk::print("\n");
+	my $str = "// --nrt-cxx--\n";
+	$str .= &dk::print("\n");
+	$str .= &dk::print($$defn_tbl{"klasses-exported-headers-hxx"}[0]);
+	$str .= &hardcoded_typedefs();
+	$str .= &dk::print($$defn_tbl{"klasses-hxx"}[0]);
+	$str .= &dk::print($$defn_tbl{"symbols-$suffix"}[0]);
+	$str .= &dk::print($$defn_tbl{"symbols-$suffix"}[1]);
+	$str .= &dk::print($$defn_tbl{"hashes-$suffix"}[0]);
+	$str .= &dk::print($$defn_tbl{"keywords-$suffix"}[0]);
+	$str .= &dk::print($$defn_tbl{"selectors-$suffix"}[0]);
+	$str .= &dk::print($$defn_tbl{"selectors-$suffix"}[1]);
+	$str .= &dk::print($$defn_tbl{"signatures-$suffix"}[0]);
+	$str .= &dk::print($$defn_tbl{"signatures-$suffix"}[1]);
+	$str .= &dk::print($$defn_tbl{"generics-$suffix"}[0]);
+	$str .= &user_code_cxx($name);
+	$str .= &dk::print($$defn_tbl{"klasses-cxx"}[0]);
+	$str .= &dk::print("\n");
 
-	my $nrt_defn = "$name";
-	&write_to_file_strings("$path/$nrt_defn.$dk_ext",            [ $nrt_cxx_str ]);
-	&write_to_file_converted_strings("$path/$nrt_defn.$cxx_ext", [ $nrt_cxx_str ], undef);
+	&write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
+	&write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str ], undef);
     }
     return $result;
 } # sub generate_nrt
@@ -342,38 +340,36 @@ sub generate_rt
     my $scratch_str_ref = &global_scratch_str_ref();
     my ($generics, $symbols) = &generics::parse($file);
 
-    if (&is_rt_decl())
-    {
+    if (&is_rt_decl()) {
 	&generate_decl($file, $generics, $symbols, $result, 'hxx');
     }
-    else
-    {
+    else {
 	print "  generating $path/$name.$cxx_ext\n";
-	&generate_defn($file, $generics, $symbols, $result, 'cxx');
+	my $suffix = 'cxx';
+	&generate_defn($file, $generics, $symbols, $result, $suffix);
 
-	my $rt_cxx_str = "// --rt-cxx--\n";
-	$rt_cxx_str .= &dk::print("\n");
-	$rt_cxx_str .= &dk::print($$result{'klasses-exported-headers-hxx'}[0]);
-	$rt_cxx_str .= &hardcoded_typedefs();
-	$rt_cxx_str .= &dk::print($$defn_tbl{'klasses-hxx'}[0]);###
-	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[0]);
-	$rt_cxx_str .= &dk::print($$result{'symbols-cxx'}[1]);
-	$rt_cxx_str .= &dk::print($$result{'hashes-cxx'}[0]);
-	$rt_cxx_str .= &dk::print($$result{'keywords-cxx'}[0]);
-	$rt_cxx_str .= &dk::print($$result{'selectors-cxx'}[0]);
-	$rt_cxx_str .= &dk::print($$result{'selectors-cxx'}[1]);
-	$rt_cxx_str .= &dk::print($$result{'signatures-cxx'}[0]);
-	$rt_cxx_str .= &dk::print($$result{'signatures-cxx'}[1]);
-	$rt_cxx_str .= &dk::print($$result{'generics-cxx'}[0]);
+	my $str = "// --rt-cxx--\n";
+	$str .= &dk::print("\n");
+	$str .= &dk::print($$result{"klasses-exported-headers-hxx"}[0]);
+	$str .= &hardcoded_typedefs();
+	$str .= &dk::print($$defn_tbl{"klasses-hxx"}[0]);###
+	$str .= &dk::print($$result{"symbols-$suffix"}[0]);
+	$str .= &dk::print($$result{"symbols-$suffix"}[1]);
+	$str .= &dk::print($$result{"hashes-$suffix"}[0]);
+	$str .= &dk::print($$result{"keywords-$suffix"}[0]);
+	$str .= &dk::print($$result{"selectors-$suffix"}[0]);
+	$str .= &dk::print($$result{"selectors-$suffix"}[1]);
+	$str .= &dk::print($$result{"signatures-$suffix"}[0]);
+	$str .= &dk::print($$result{"signatures-$suffix"}[1]);
+	$str .= &dk::print($$result{"generics-$suffix"}[0]);
 	## other: user_code_cxx
-	$rt_cxx_str .= &dk::print($$result{'klasses-cxx'}[0]);
-	$rt_cxx_str .= &dk::print("\n");
+	$str .= &dk::print($$result{"klasses-cxx"}[0]);
+	$str .= &dk::print("\n");
 
-	$rt_cxx_str .= &generate_defn_footer($file);
+	$str .= &generate_defn_footer($file);
 
-	my $rt_defn = "$name";
-	&write_to_file_strings("$path/$rt_defn.$dk_ext",            [ $rt_cxx_str ]);
-	&write_to_file_converted_strings("$path/$rt_defn.$cxx_ext", [ $rt_cxx_str ], undef);
+	&write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
+	&write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str ], undef);
     }
     return $result;
 } # sub generate_rt
