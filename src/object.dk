@@ -70,7 +70,7 @@ klass object
     return state;
   }
 
-  export method boole-t instance?(object-t self, object-t kls)
+  method boole-t instance?(object-t self, object-t kls)
   {
     boole-t state = false;
     object-t tmp-kls = dkt-klass(self);

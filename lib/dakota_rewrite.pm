@@ -592,7 +592,7 @@ sub rewrite_methods
     $$filestr_ref =~ s/namespace method/namespace_method/gs; #hackhack
 
     $$filestr_ref =~ s|(method\s+[^(]*?($rk)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $ka_generics)|ges;
-    $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1DK-VISIBILITY /*$2*/$3|gm;
+    $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1 /*$2*/$3|gm;
     $$filestr_ref =~ s|export(\s)(method)(\s+)|export$1/\*$2\*/$3|gs;
 
     $$filestr_ref =~ s/klass_method/klass method/gs; #hackhack

@@ -4392,7 +4392,7 @@ sub generate_ka_method_defn
     }
     else
     {
-        $$scratch_str_ref .= &dk::print("DK-VISIBILITY ");
+        $$scratch_str_ref .= &dk::print("noexport ");
     }
     #if ($$method{'is-inline'})
     #{

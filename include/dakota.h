@@ -52,14 +52,6 @@
 #  define noexport __attribute__((__visibility__("hidden")))
 #endif
 
-#if !defined DK_VISIBILITY
-#if 0
-#  define DK_VISIBILITY export
-#else
-#  define DK_VISIBILITY noexport
-#endif
-#endif
-
 #define THROW  throw
 #define STATIC static
 
@@ -143,10 +135,19 @@ extern import object_t std_error;
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef uintmax_t (*hash_t)(object_t);
 
-constexpr uintmax_t dk_hash(const char8_t* str, uintmax_t h = 0)
-{ // Daniel J. Bernstein
-  return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ (uchar8_t)(str[h]);
+constexpr uintmax_t dkt_hash_recursive(uintmax_t hash, const char8_t* str)
+{
+  return (!*str ? hash : dkt_hash_recursive(((hash << 5) + hash) ^ cast(uchar8_t)*str, str + 1));
 }
+constexpr uintmax_t dk_hash(const char8_t* str)
+{ // Daniel J. Bernstein
+  return (!str ? 0 : dkt_hash_recursive(5381, str));
+}
+
+// constexpr uintmax_t dk_hash(const char8_t* str, uintmax_t h = 0)
+// { // Daniel J. Bernstein
+//   return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ cast(uchar8_t)(str[h]);
+// }
 
 import symbol_t dk_intern(const char8_t*);
 import void dkt_throw(object_t exception);

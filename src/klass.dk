@@ -50,7 +50,7 @@ namespace selector-node  { noexport int-t compare(slots-t**, slots-t**); }
 namespace object        { noexport object-t dump(object-t); }
 namespace klass
 {
-  DK-VISIBILITY symbol-t name(object-t);
+  noexport symbol-t name(object-t);
 }
 #endif
 

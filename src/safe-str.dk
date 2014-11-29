@@ -19,9 +19,7 @@ include <cstring>;
 
 module dakota;
 
-extern "C"
-{
-  export int-t safe-strcmp(const char8-t* s1, const char8-t* s2)
+export extern "C" int-t safe-strcmp(const char8-t* s1, const char8-t* s2)
   {
     int-t value = 0;
 
@@ -41,7 +39,7 @@ extern "C"
     return value;
   }
 
-  export int-t safe-strptrcmp(const char8-t* const* sp1, const char8-t* const* sp2)
+noexport extern "C" int-t safe-strptrcmp(const char8-t* const* sp1, const char8-t* const* sp2)
   {
     const char8-t* s1;
     if (nullptr == sp1)
@@ -56,7 +54,7 @@ extern "C"
     return safe-strcmp(s1, s2);
   }
 
-  export int-t safe-strncmp(const char8-t* s1, const char8-t* s2, size-t n)
+noexport extern "C" int-t safe-strncmp(const char8-t* s1, const char8-t* s2, size-t n)
   {
     int-t value = 0;
 
@@ -76,7 +74,7 @@ extern "C"
     return value;
   }
 
-  export size-t safe-strlen(const char8-t* str)
+export extern "C" size-t safe-strlen(const char8-t* str)
   {
     size-t len;
 
@@ -86,4 +84,3 @@ extern "C"
       len = strlen(str);
     return len;
   }
-} // extern "C"

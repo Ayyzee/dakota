@@ -29,7 +29,7 @@ trait table
     return dk:at(self, key, nullptr);
   }
 
-  DK-VISIBILITY object-t at(object-t self, object-t key, object-t default-result)
+  method object-t at(object-t self, object-t key, object-t default-result)
   {
     object-t result = default-result;
     object-t assoc = dk:assoc-at(self, key, nullptr);
@@ -105,5 +105,4 @@ trait table
   }
 
   method /*alias(at)*/ object-t assoc-at(object-t self, object-t key, object-t default-assoc);
-  method object-t at(object-t self, object-t key, object-t default-element); // hackhack
 }
