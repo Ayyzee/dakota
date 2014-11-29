@@ -20,6 +20,7 @@ module dakota-util;
 
 klass object-output-stream;
 klass output-stream;
+klass tokenid; // hackhack
 
 klass open-token
 {

@@ -190,3 +190,25 @@ klass object
     return self;
   }
 }
+
+export void
+dk-unbox-check(object-t object, object-t kls)
+{
+  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p','%s:klass']",
+                        __func__, cast(void*)(object), dk:name(kls));
+  unless (object:instance?(object, kls))
+  {
+    const char8-t* object-kls-name = dkt-name(dkt-klass(object));
+    const char8-t* kls-name = dkt-name(kls);
+
+    if (object:instance?(object, klass:klass))
+      dk-log(DK-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
+             kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name, dkt-name(object));
+    else
+      dk-log(DK-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s'})",
+             kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name);
+
+    abort();
+  }
+  return;
+}

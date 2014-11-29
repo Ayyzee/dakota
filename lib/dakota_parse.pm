@@ -2395,10 +2395,6 @@ sub rep_tree_from_dk_path
     #print STDERR &sst::filestr($gbl_sst);
     local $_ = &filestr_from_file($gbl_filename);
 
-    # this is a hack to remove 'export' on methods
-    # before the parser sees the code
-    $_ =~ s/\bexport(\s+method)\b/$1/gs;
-
     #my $__sub__ = (caller(0))[3];
     #&log_sub_name($__sub__);
     #print STDERR $_;
@@ -2481,6 +2477,7 @@ sub rep_tree_from_dk_path
 	'boole' => 1,
 	'char8' => 1,
 	'construct' => 1,
+	'equal-predicate' => 1, # hackhack
 	'file' => 1,
 	'input-stream' => 1, # std-input
 	'keyword' => 1,

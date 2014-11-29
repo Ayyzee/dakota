@@ -454,7 +454,7 @@ sub generate_defn_footer
     }
     else
     {
-	$rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t imported-klasses-names[] = //ro-data\n");
+	$rt_cxx_str .= &dk::print_in_col_string($col, "static symbol-t imported-klasses-names[] = //ro-data\n");
 	$rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
 	$col++;
 	my ($key, $val);
@@ -956,7 +956,7 @@ sub function::decl
     }
     else
     {
-        $function_decl .= "noexport method"; # gratuitous
+        $function_decl .= "noexport method";
     }
     if ($$function{'is-inline'})
     { $function_decl .= " INLINE"; } # 'inline' || ''
@@ -2168,13 +2168,13 @@ sub linkage_unit::generate_klasses_body
     
     if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
     {
-	#$$scratch_str_ref .= &dk::print_in_col_string($col, "extern noexport const symbol-t __type__;\n");
-	$$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { extern noexport const symbol-t __klass__; }\n");
+	#$$scratch_str_ref .= &dk::print_in_col_string($col, "extern noexport symbol-t __type__;\n");
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n");
     }
     elsif (&is_rt_decl() || &is_rt_defn())
     {
-	#$$scratch_str_ref .= &dk::print_in_col_string($col, "noexport const symbol-t __type__ = \$$klass_type;\n");
-	$$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { /*noexport*/ const symbol-t __klass__ = dk-intern(\"@$klass_path\"); }\n");
+	#$$scratch_str_ref .= &dk::print_in_col_string($col, "noexport symbol-t __type__ = \$$klass_type;\n");
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { /*noexport*/ symbol-t __klass__ = dk-intern(\"@$klass_path\"); }\n");
     }
 
     if ('trait' eq $klass_type)
@@ -2570,11 +2570,11 @@ sub linkage_unit::generate_klasses_body
     {
         foreach $method (@$va_list_methods)
         {
-            if (&is_nrt_defn() || &is_rt_defn() || &is_exported($method))
+	    if (1)
             {
                 my $va_method = &deep_copy($method);
                 #$$va_method{'is-inline'} = 1;
-                if (&is_nrt_decl() || &is_rt_decl())
+                if (&is_nrt_decl() || &is_rt_decl() || &is_same_file($klass_scope)) #rn1
                 {
                     if (defined $$method{'keyword-types'})
                     {
@@ -2586,7 +2586,7 @@ sub linkage_unit::generate_klasses_body
                         {
                             my $last = &_remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
                             my $method_decl_ref = &function::decl($va_method, $klass_path);
-                            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref }\n");
+                            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref } /*rn1*/\n");
                             &_add_last($$va_method{'parameter-types'}, $last);
                         }
                     }
@@ -2595,7 +2595,7 @@ sub linkage_unit::generate_klasses_body
                 {
                     &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
                 }
-                if (&is_nrt_decl() || &is_rt_decl())
+                if (&is_nrt_decl() || &is_rt_decl() || &is_same_file($klass_scope)) #rn2
                 {
                     if (defined $$method{'keyword-types'})
                     {
@@ -2604,21 +2604,21 @@ sub linkage_unit::generate_klasses_body
                             my $other_method_decl = &ka_method::type_decl($method);
                             
                             my $scope = &path::string($klass_path);
-                            $other_method_decl =~ s/\(\*($k+)\)/\/*$scope:*\/$1/;
+                            $other_method_decl =~ s|\(\*($k+)\)| $1|;
                             
                             if (&is_exported($method))
                             {
-                                $$scratch_str_ref .= &dk::print_in_col_string($col, "export method");
+                                $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $scope { export method");
                             }
                             else
                             {
-                                $$scratch_str_ref .= &dk::print_in_col_string($col, "noexport method"); # gratuitous
+                                $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $scope { noexport method");
                             }
                             if ($$method{'is-inline'})
                             {
                                 #$$scratch_str_ref .= &dk::print(" INLINE");
                             }
-                            $$scratch_str_ref .= &dk::print(" $other_method_decl;\n");
+                            $$scratch_str_ref .= &dk::print(" $other_method_decl; } /*rn2*/\n");
                         }
                     }
                 }
@@ -2629,12 +2629,12 @@ sub linkage_unit::generate_klasses_body
    #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
     foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'raw-methods'}})
     {
-        if (&is_nrt_defn() || &is_rt_defn() || &is_exported($method))
+        if (&is_nrt_decl() || &is_rt_decl() || &is_exported($method) || &is_same_file($klass_scope)) #rn3
         {
             if (!&is_va($method))
             {
                 my $method_decl_ref = &function::decl($method, $klass_path);
-                $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref }\n");
+                $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref } /*rn3*/\n");
             }
         }
     }
@@ -2669,7 +2669,7 @@ sub generate_object_method_defn
     }
     else
     {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_path { noexport method"); # gratuitous
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_path { noexport method");
     }
     my $method_name = "@{$$method{'name'}}";
     $$scratch_str_ref .= &dk::print(" $return_type $method_name($$new_arg_list)");
@@ -4434,9 +4434,6 @@ sub generate_ka_method_defn
         #&_add_last($$method{'parameter-types'}, $param2);
         &_add_last($$method{'parameter-types'}, $param1);
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "static $method_type_decl = $qualified_klass_name:$method_name; /*qualqual*/\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* _ka-signature_ = ka-signature(va:$method_name($$list_types));\n");
-
     if (scalar @{$$method{'keyword-types'}}) {
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "");
 	my $delim = '';
@@ -4469,7 +4466,7 @@ sub generate_ka_method_defn
         $$scratch_str_ref .= &dk::print_in_col_string($col, "while (nullptr != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
         $col++;
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "switch (_keyword_->hash)\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "switch (_keyword_->hash) // hash is a constexpr. its compile-time evaluated.\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
         $col++;
         my $kw_arg_name;
@@ -4477,7 +4474,7 @@ sub generate_ka_method_defn
         foreach my $kw_arg (@{$$method{'keyword-types'}})
         {
             $kw_arg_name = $$kw_arg{'name'};
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "case dk-hash(\"$kw_arg_name\"): // constexpr: compile-time evaluation\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "case dk-hash(\"$kw_arg_name\"): // dk-hash() is a constexpr. its compile-time evaluated.\n");
 #            $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
             $col++;
             my $kw_type = &arg::type($$kw_arg{'type'});
@@ -4499,6 +4496,7 @@ sub generate_ka_method_defn
 #        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
         $col++;
 
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* _ka-signature_ = ka-signature(va:$method_name($$list_types));\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "throw make(no-such-keyword-exception:klass,\n");
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "           object =>    self,\n");
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "           signature => _ka-signature_,\n");
@@ -4527,6 +4525,7 @@ sub generate_ka_method_defn
         $col--;
     }
 
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "static $method_type_decl = $qualified_klass_name:$method_name; /*qualqual*/\n");
     $$scratch_str_ref .= &dk::print_in_col_string($col, "");
     my $var_name = '_result_';
     if ($$method{'return-type'})

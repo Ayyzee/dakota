@@ -38,6 +38,11 @@
 #  define import   __declspec(dllimport)
 #  define export   __declspec(dllexport)
 #  define noexport
+#  define artificial
+#  define leaf
+#  define nothrow
+#  define hot
+#  define designated_init
 #else
 #  define format_va_printf(fmtarg) __attribute__((__format__(__printf__, fmtarg, 0)))
 #  define format_va_scanf(fmtarg)  __attribute__((__format__(__scanf__,  fmtarg, 0)))
@@ -50,6 +55,11 @@
 #  define import
 #  define export   __attribute__((__visibility__("default")))
 #  define noexport __attribute__((__visibility__("hidden")))
+#  define artificial __attribute__((__artificial__))
+#  define leaf       __attribute__((__leaf__))
+#  define nothrow    __attribute__((__nothrow__))
+#  define hot        __attribute__((__hot__))
+#  define designated_init __attribute__((__designated_init__))
 #endif
 
 #define THROW  throw
