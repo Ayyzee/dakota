@@ -2,7 +2,7 @@
 
 use strict;
 
-my $dir = $ENV{'DK_DIR'};
+my $dir = $ENV{'DKT_DIR'};
 die if !$dir;
 
 while (<>)

@@ -29,8 +29,8 @@ include "dakota-log.h";
 include "sorted-array.h";
 include "dl.h"; // symbol-name-from-address()
 
-#define DK-SET-METHOD-FOR-SELECTOR(methods, selector, method) (methods)->addrs[(selector)] = (method)
-#define DK-METHOD-FOR-SELECTOR(methods, selector) (methods)->addrs[(selector)]
+#define DKT-SET-METHOD-FOR-SELECTOR(methods, selector, method) (methods)->addrs[(selector)] = (method)
+#define DKT-METHOD-FOR-SELECTOR(methods, selector) (methods)->addrs[(selector)]
 
 module dakota;
 
@@ -54,12 +54,10 @@ namespace klass
 }
 #endif
 
-#if !defined DEBUG
-export void dkt-null-method(object-t object, ...)
+noexport void null-method(object-t object, ...)
 {
   throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object));
 }
-#endif
 
 klass selector-pair
 {
@@ -83,7 +81,7 @@ STATIC const uint32-t gbl-num-generics = 512;
 STATIC selector-pair-t[gbl-num-generics] gbl-selectors;
 noexport sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                                 0,
-                                                                DK-ARRAY-LENGTH(gbl-selectors),
+                                                                DKT-ARRAY-LENGTH(gbl-selectors),
                                                                 cast(uint32-t)sizeof(gbl-selectors[0]),
                                                                 cast(std-compare-t)cast(int-t (*)(selector-pair-t*, selector-pair-t*))selector-pair:compare };
 
@@ -131,7 +129,7 @@ method-for-signature(methods:slots-t* methods, const signature-t* signature)
 {
   selector-t selector = selector-for-signature(signature);
   assert(selector < methods->count);
-  method-t m = DK-METHOD-FOR-SELECTOR(methods, selector);
+  method-t m = DKT-METHOD-FOR-SELECTOR(methods, selector);
   return m;
 }
 
@@ -381,6 +379,11 @@ klass methods
   }
 }
 
+#if defined DEBUG
+  #define NULL-METHOD nullptr
+#else
+  #define NULL-METHOD null-method
+#endif
 
 klass klass
 {
@@ -440,7 +443,7 @@ klass klass
 #endif    
 
     for (uint32-t index = 0; index < self.methods.count; index++)
-      self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
+      self.methods.addrs[index] = cast(method-t)NULL-METHOD;
     return self;
   }
 
@@ -463,15 +466,15 @@ klass klass
   method method-t method-for-selector(object-t self, selector-t selector)
   {
     assert(selector < self.methods.count);
-    method-t m = DK-METHOD-FOR-SELECTOR(&self.methods, selector);
+    method-t m = DKT-METHOD-FOR-SELECTOR(&self.methods, selector);
     return m;
   }
 
   method method-t remove-method-for-selector(object-t self, selector-t selector)
   {
     assert(selector < self.methods.count);
-    method-t m = DK-METHOD-FOR-SELECTOR(&self.methods, selector);
-    DK-SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
+    method-t m = DKT-METHOD-FOR-SELECTOR(&self.methods, selector);
+    DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
       dk:bit=(self.behavior, cast(uint32-t)selector, false);
     return m;
@@ -480,7 +483,7 @@ klass klass
   method method-t add-method-for-selector(object-t self, selector-t selector, method-t m)
   {
     assert(selector < self.methods.count);
-    DK-SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
+    DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
       dk:bit=(self.behavior, cast(uint32-t)selector, true);
     return m;
@@ -550,7 +553,7 @@ klass klass
     if (nullptr != self.superklass)
     {
 //       if (null == self.superklass)
-//         dk:dump(dk-klass(null));
+//         dk:dump(dkt-klass(null));
       dk:dump(self.superklass);
     }
 
@@ -733,7 +736,7 @@ klass klass
       self.behavior = make(bit-vector:klass, initial-capacity => self.methods.count);
 
       for (uint32-t index = 0; index < self.methods.count; index++)
-        if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
+        if (cast(method-t)NULL-METHOD != self.methods.addrs[index])
           dk:bit=(self.behavior, index, true);
     }
     return self.behavior;
@@ -815,7 +818,7 @@ klass klass
       }
     }
     else
-      dk-log(DK-LOG-WARNING, "nullptr klass name");
+      dkt-log(DKT-LOG-WARNING, "nullptr klass name");
     if (nullptr != traits)
       self = traits-initialize(self, traits);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info-node:at(self.info-slots, $method-aliases);
@@ -830,7 +833,7 @@ klass klass
         selector-t method-selector = selector-for-signature(method-signature);
         add-method-for-selector(self,
                                 method-selector,
-                                DK-METHOD-FOR-SELECTOR(&self.methods, alias-selector));
+                                DKT-METHOD-FOR-SELECTOR(&self.methods, alias-selector));
         i++;
       }
     }
@@ -902,17 +905,17 @@ klass klass
 
 #if defined DEBUG
 export void
-dk-dump-methods(klass:slots-t* s)
+dkt-dump-methods(klass:slots-t* s)
 {
   klass:dump-methods(s);
   return;
 }
 
 export void
-dk-dump-methods(object-t kls)
+dkt-dump-methods(object-t kls)
 {
   klass:slots-t* kls-s = unbox(kls);
-  dk-dump-methods(kls-s);
+  dkt-dump-methods(kls-s);
   return;
 }
 #endif

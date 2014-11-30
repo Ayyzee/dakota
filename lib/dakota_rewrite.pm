@@ -137,7 +137,7 @@ my $rewrite_compound_literal_names =
     'vector' => undef,
 };
 
-my $use_compound_literals = $ENV{'DK_USE_COMPOUND_LITERALS'};
+my $use_compound_literals = $ENV{'DKT_USE_COMPOUND_LITERALS'};
 
 sub rewrite_compound_literal
 {
@@ -1199,7 +1199,7 @@ sub convert_dk_to_cxx
     &rewrite_case_with_string($filestr_ref);
 
     &rewrite_keywords($filestr_ref);
-    #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DK-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
+    #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
     &rewrite_symbols($filestr_ref);
     &rewrite_strings($filestr_ref);
 
@@ -1226,8 +1226,8 @@ sub convert_dk_to_cxx
     &rewrite_sequence_literal($filestr_ref);
 
     &rewrite_throws($filestr_ref);
-    #&wrapped_rewrite($filestr_ref, [ 'throw', 'make' ], [ 'throw', '*', 'dk-current-exception', '(', ')', '=', 'make' ]);
-    #&wrapped_rewrite($filestr_ref, [ 'throw', '?literal-cstring' ], [ 'throw', '*', 'dk-current-exception-cstring', '(', ')', '=', '?literal-cstring' ]);
+    #&wrapped_rewrite($filestr_ref, [ 'throw', 'make' ], [ 'throw', '*', 'dkt-current-exception', '(', ')', '=', 'make' ]);
+    #&wrapped_rewrite($filestr_ref, [ 'throw', '?literal-cstring' ], [ 'throw', '*', 'dkt-current-exception-cstring', '(', ')', '=', '?literal-cstring' ]);
 
     if ($$filestr_ref =~ m/finally/g)
     {
@@ -1288,8 +1288,8 @@ sub rewrite_multi_char_consts
 
 sub dakota_lang_user_data_old {
     my $ka_generics;
-    if ($ENV{'DK_KA_GENERICS'})
-    { $ka_generics = do $ENV{'DK_KA_GENERICS'} or die }
+    if ($ENV{'DKT_KA_GENERICS'})
+    { $ka_generics = do $ENV{'DKT_KA_GENERICS'} or die }
     else
     { $ka_generics = do "$prefix/src/ka-generics.pl" or die }
 

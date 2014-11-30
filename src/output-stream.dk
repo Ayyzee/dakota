@@ -47,9 +47,9 @@ klass output-stream
   {
 #if defined DEBUG
     if (stdout == self.out)
-      dk-log(DK-LOG-WARNING, "closing 'stdout'");
+      dkt-log(DKT-LOG-WARNING, "closing 'stdout'");
     else-if (stderr == self.out)
-      dk-log(DK-LOG-WARNING, "closing 'stderr'");
+      dkt-log(DKT-LOG-WARNING, "closing 'stderr'");
 #endif // DEBUG
     int rtn = fclose(self.out);
 

@@ -138,7 +138,7 @@ klass named-info-node
 }
 
 export named-info-node-t*
-dk-va-make-named-info(symbol-t name, va-list-t args)
+dk-va-make-named-info-slots(symbol-t name, va-list-t args)
 {
 //   assert(nullptr != name);
   symbol-t key;
@@ -172,13 +172,20 @@ dk-va-make-named-info(symbol-t name, va-list-t args)
   sort(info);
   return info;
 }
+export object-t
+dk-va-make-named-info(symbol-t name, va-list-t args)
+{
+  named-info-node-t* info-slots = dk-va-make-named-info-slots(name, args);
+  object-t info = box(info-slots);
+  return info;
+}
 
 export sentinel named-info-node-t*
 dk-make-named-info-slots(symbol-t name, ...)
 {
   va-list-t args;
   va-start(args, name);
-  named-info-node-t* info-slots = dk-va-make-named-info(name, args);
+  named-info-node-t* info-slots = dk-va-make-named-info-slots(name, args);
   va-end(args);
   return info-slots;
 }
@@ -188,14 +195,15 @@ dk-make-named-info(symbol-t name, ...)
 {
   va-list-t args;
   va-start(args, name);
-  named-info-node-t* info-slots = dk-va-make-named-info(name, args);
+  object-t info = dk-va-make-named-info(name, args);
   va-end(args);
-  object-t info = box(info-slots);
   return info;
 }
 
+#if defined DEBUG
 export named-info-node-t*
-dk-dump-info(named-info-node-t* info)
+dkt-dump-info(named-info-node-t* info)
 {
   return named-info-node:dump(info);
 }
+#endif

@@ -53,12 +53,12 @@ declare_klass_type_struct(named_info_node);
 
 enum
   {
-    DK_INTROSPECTOR_HELP = 256,
-    DK_INTROSPECTOR_OUTPUT,
-    DK_INTROSPECTOR_OUTPUT_DIRECTORY,
-    DK_INTROSPECTOR_DIRECTORY,
-    DK_INTROSPECTOR_ONLY,
-    DK_INTROSPECTOR_RECURSIVE
+    DKT_INTROSPECTOR_HELP = 256,
+    DKT_INTROSPECTOR_OUTPUT,
+    DKT_INTROSPECTOR_OUTPUT_DIRECTORY,
+    DKT_INTROSPECTOR_DIRECTORY,
+    DKT_INTROSPECTOR_ONLY,
+    DKT_INTROSPECTOR_RECURSIVE
   };
 
 struct opts_t
@@ -112,12 +112,12 @@ handle_opts(int* argc, char*** argv)
   // options descriptor
   static struct option longopts[] =
   {
-    { "help",             no_argument,       nullptr, DK_INTROSPECTOR_HELP },
-    { "output",           required_argument, nullptr, DK_INTROSPECTOR_OUTPUT },
-    { "output-directory", required_argument, nullptr, DK_INTROSPECTOR_OUTPUT_DIRECTORY },
-    { "directory",        required_argument, nullptr, DK_INTROSPECTOR_DIRECTORY },
-    { "only",             required_argument, nullptr, DK_INTROSPECTOR_ONLY },
-    { "recursive",        no_argument,       nullptr, DK_INTROSPECTOR_RECURSIVE },
+    { "help",             no_argument,       nullptr, DKT_INTROSPECTOR_HELP },
+    { "output",           required_argument, nullptr, DKT_INTROSPECTOR_OUTPUT },
+    { "output-directory", required_argument, nullptr, DKT_INTROSPECTOR_OUTPUT_DIRECTORY },
+    { "directory",        required_argument, nullptr, DKT_INTROSPECTOR_DIRECTORY },
+    { "only",             required_argument, nullptr, DKT_INTROSPECTOR_ONLY },
+    { "recursive",        no_argument,       nullptr, DKT_INTROSPECTOR_RECURSIVE },
     { nullptr, 0, nullptr, 0 }
   };
   int opt;
@@ -126,23 +126,23 @@ handle_opts(int* argc, char*** argv)
   {
     switch (opt)
     {
-      case DK_INTROSPECTOR_HELP:
+      case DKT_INTROSPECTOR_HELP:
         usage(progname, longopts);
         exit(EXIT_SUCCESS);
         break;
-      case DK_INTROSPECTOR_OUTPUT:
+      case DKT_INTROSPECTOR_OUTPUT:
         opts.output = optarg;
         break;
-      case DK_INTROSPECTOR_OUTPUT_DIRECTORY:
+      case DKT_INTROSPECTOR_OUTPUT_DIRECTORY:
         opts.output_directory = optarg;
         break;
-      case DK_INTROSPECTOR_DIRECTORY:
+      case DKT_INTROSPECTOR_DIRECTORY:
         opts.directory = optarg;
         break;
-      case DK_INTROSPECTOR_ONLY:
+      case DKT_INTROSPECTOR_ONLY:
         opts.only = optarg;
         break;
-      case DK_INTROSPECTOR_RECURSIVE:
+      case DKT_INTROSPECTOR_RECURSIVE:
         opts.recursive = true;
         break;
       default:
@@ -220,29 +220,29 @@ main(int argc, char** argv, char**)
     if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
   }
   int overwrite;
-  setenv("DK_INTROSPECTOR_OUTPUT", output_pid, overwrite = 1);
+  setenv("DKT_INTROSPECTOR_OUTPUT", output_pid, overwrite = 1);
 
   if (nullptr != opts.output_directory)
-    setenv("DK_INTROSPECTOR_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
+    setenv("DKT_INTROSPECTOR_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
   if (nullptr != opts.only)
-    setenv("DK_INTROSPECTOR_ONLY", opts.only, overwrite = 1);
+    setenv("DKT_INTROSPECTOR_ONLY", opts.only, overwrite = 1);
   if (opts.recursive)
-    setenv_boole("DK_INTROSPECTOR_RECURSIVE", opts.recursive, overwrite = 1);
+    setenv_boole("DKT_INTROSPECTOR_RECURSIVE", opts.recursive, overwrite = 1);
   int i = 0;
   const char* arg = nullptr;
   while (nullptr != (arg = argv[i++]))
   {
-    setenv("DK_NO_INIT_RUNTIME",  "", overwrite = 1);
-    setenv("DK_EXIT_BEFORE_MAIN", "", overwrite = 1);
-    setenv("DK_INTROSPECTOR_ARG", arg, overwrite = 1);
-    setenv("DK_INTROSPECTOR_ARG_TYPE", "exe", overwrite = 1); // not currently used
+    setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
+    setenv("DKT_EXIT_BEFORE_MAIN", "", overwrite = 1);
+    setenv("DKT_INTROSPECTOR_ARG", arg, overwrite = 1);
+    setenv("DKT_INTROSPECTOR_ARG_TYPE", "exe", overwrite = 1); // not currently used
     int status = spawn(arg);
     if (-1 == status)
     {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
-      unsetenv("DK_NO_INIT_RUNTIME");
-      unsetenv("DK_EXIT_BEFORE_MAIN");
-      setenv("DK_INTROSPECTOR_ARG_TYPE", "lib", overwrite = 1); // not currently used
+      unsetenv("DKT_NO_INIT_RUNTIME");
+      unsetenv("DKT_EXIT_BEFORE_MAIN");
+      setenv("DKT_INTROSPECTOR_ARG_TYPE", "lib", overwrite = 1); // not currently used
       if (nullptr == strchr(arg, '/'))
       { // not required on darwin (required on linux)
         char arg_path[MAXPATHLEN] = "";

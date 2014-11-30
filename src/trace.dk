@@ -44,7 +44,7 @@ trace-fprintf(file-t file, const char8-t* format, ...)
 }
 
 noexport int-t
-dk-va-trace-before(const signature-t* signature, method-t m, super-t context, va-list-t args)
+dkt-va-trace-before(const signature-t* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
   gbl-trace-column++;
@@ -58,7 +58,7 @@ dk-va-trace-before(const signature-t* signature, method-t m, super-t context, va
 }
 
 noexport int-t
-dk-va-trace-before(const signature-t* signature, method-t m, object-t object, va-list-t args)
+dkt-va-trace-before(const signature-t* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
   gbl-trace-column++;
@@ -71,7 +71,7 @@ dk-va-trace-before(const signature-t* signature, method-t m, object-t object, va
 }
 
 noexport int-t
-dk-va-trace-after(const signature-t* signature, method-t m, super-t context, va-list-t args)
+dkt-va-trace-after(const signature-t* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
   gbl-trace-column--;
@@ -85,7 +85,7 @@ dk-va-trace-after(const signature-t* signature, method-t m, super-t context, va-
 }
 
 noexport int-t
-dk-va-trace-after(const signature-t* signature, method-t m, object-t object, va-list-t args)
+dkt-va-trace-after(const signature-t* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
   gbl-trace-column--;
@@ -99,70 +99,70 @@ dk-va-trace-after(const signature-t* signature, method-t m, object-t object, va-
 
 #if defined DEBUG
 export int-t
-dk-trace-before(const signature-t* signature, method-t m, super-t context, ...)
+dkt-trace-before(const signature-t* signature, method-t m, super-t context, ...)
 {
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (NULL != getenv("DK_TRACE"))
-    result = dk-va-trace-before(signature, m, context, args);
+  if (NULL != getenv("DKT_TRACE"))
+    result = dkt-va-trace-before(signature, m, context, args);
   va-end(args);
   return result;
 }
 
 export int-t
-dk-trace-before(const signature-t* signature, method-t m, object-t object, ...)
+dkt-trace-before(const signature-t* signature, method-t m, object-t object, ...)
 {
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (NULL != getenv("DK_TRACE"))
-    result = dk-va-trace-before(signature, m, object, args);
+  if (NULL != getenv("DKT_TRACE"))
+    result = dkt-va-trace-before(signature, m, object, args);
   va-end(args);
   return result;
 }
 
 export int-t
-dk-trace-after(const signature-t* signature, method-t m, super-t context, ...)
+dkt-trace-after(const signature-t* signature, method-t m, super-t context, ...)
 {
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (NULL != getenv("DK_TRACE"))
-    result = dk-va-trace-after(signature, m, context, args);
+  if (NULL != getenv("DKT_TRACE"))
+    result = dkt-va-trace-after(signature, m, context, args);
   va-end(args);
   return result;
 }
 
 export int-t
-dk-trace-after(const signature-t* signature, method-t m, object-t object, ...)
+dkt-trace-after(const signature-t* signature, method-t m, object-t object, ...)
 {
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (NULL != getenv("DK_TRACE"))
-    result = dk-va-trace-after(signature, m, object, args);
+  if (NULL != getenv("DKT_TRACE"))
+    result = dkt-va-trace-after(signature, m, object, args);
   va-end(args);
   return result;
 }
 
 export int-t
-dk-va-trace-before-init(object-t kls, va-list-t args)
+dkt-va-trace-before-init(object-t kls, va-list-t args)
 {
   gbl-trace-column++;
   int-t result = 0;
-  if (NULL != getenv("DK_MAKE_TRACE"))
+  if (NULL != getenv("DKT_MAKE_TRACE"))
     result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
                            cast(void*)(kls), dkt-name(kls), cast(void*)(args));
   return result;
 }
 
 export int-t
-dk-va-trace-after-init(object-t kls, va-list-t args)
+dkt-va-trace-after-init(object-t kls, va-list-t args)
 {
   gbl-trace-column--;
   int-t result = 0;
-  if (NULL != getenv("DK_MAKE_TRACE"))
+  if (NULL != getenv("DKT_MAKE_TRACE"))
     result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
                            cast(void*)(kls), dkt-name(kls), cast(void*)(args));
   return result;

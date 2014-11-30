@@ -64,7 +64,7 @@ my $mx = qr/\!|\?|\=/;
 my $m  = qr/$z$mx?/;
 my $h  = qr|[/._A-Za-z0-9-]|;
 
-$ENV{'DK-DEBUG'} = 0;
+$ENV{'DKT-DEBUG'} = 0;
 
 my $gbl_symbol_to_header =
 {
@@ -399,7 +399,7 @@ sub rel_path_canon
 	$result = $path2;
 	$result =~ s|^$adj_common_prefix/||;
 
-	if ($ENV{'DK-DEBUG'})
+	if ($ENV{'DKT-DEBUG'})
 	{
 	    print "$path1 = arg\n";
 	    print "$cwd = cwd\n";

@@ -485,6 +485,7 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
 STATIC named-info-node-t* gbl-registration-info-list;
 
 noexport void register-info(named-info-node-t* registration-info);
+noexport void export-klass(named-info-node-t* klass-info);
 
 // object klass' superklass is null instance
 // klass klass'  superklass is object klass
@@ -494,7 +495,7 @@ noexport void register-info(named-info-node-t* registration-info);
 // klass klass'  klass is klass klass
 // null klass'   klass is klass klass
 export void
-dk-init-runtime()
+dkt-init-runtime()
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
   if (nullptr == object:klass)
@@ -539,8 +540,8 @@ dk-init-runtime()
 
     // export
     STATIC property-t[] gbl-exported-null-klass-props = { { $name, cast(uintptr-t)$null } };
-    STATIC named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DK-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
-    dk-export-klass(&gbl-exported-null-klass);
+    STATIC named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DKT-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
+    export-klass(&gbl-exported-null-klass);
 
     gbl-null-klass = dk-klass-for-name($null); // null:__klass__ does not exist
     null = make(gbl-null-klass);
@@ -657,7 +658,7 @@ interposer-name-for-klass-name(symbol-t klass-name)
 noexport void
 add-interpose-prop(symbol-t key, symbol-t element)
 {
-//   dk-log(DK-LOG-INFO, "%s(%s, %s)", __func__, key, element);
+//   dkt-log(DKT-LOG-INFO, "%s(%s, %s)", __func__, key, element);
   property-t prop = { key, cast(uintptr-t)element };
   sorted-array:add(gbl-interposers-table, &prop);
   return;
@@ -680,8 +681,8 @@ add-interposers(property-t* interposers)
   return;
 }
 
-export void
-dk-export-klass(named-info-node-t* klass-info)
+noexport void
+export-klass(named-info-node-t* klass-info)
 {
   named-info-node:sort(klass-info);
   symbol-t name = name-from-info(klass-info);
@@ -719,7 +720,7 @@ export-klasses(named-info-node-t* klass-info)
     named-info-node-t* var-klass-info = &klass-info[i++];
     if (nullptr == var-klass-info->elements)
       break;
-    dk-export-klass(var-klass-info);
+    export-klass(var-klass-info);
   }
   return;
 }
@@ -847,7 +848,7 @@ dump-klass-defns(ofile-t ofl, named-info-node-t* registration-info, const char8-
   assert(8 > ofl.col);
   assert(nullptr != registration-info);
 
-  const char8-t* output-dir = getenv("DK_INTROSPECTOR_OUTPUT_DIRECTORY");
+  const char8-t* output-dir = getenv("DKT_INTROSPECTOR_OUTPUT_DIRECTORY");
   named-info-node-t* klass-defns = cast(named-info-node-t*)named-info-node:at(registration-info, $klass-defns);
 
   if (nullptr != klass-defns)
@@ -1278,11 +1279,11 @@ add-registration-info(named-info-node-t* registration-info)
 }
 
 export void
-dk-register-info(named-info-node-t* registration-info)
+dkt-register-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
-  const char8-t* output-path = getenv("DK_INTROSPECTOR_OUTPUT");
+  const char8-t* output-path = getenv("DKT_INTROSPECTOR_OUTPUT");
   if (NULL != output-path)
   {
     if (NUL == output-path[0]) // empty-string ("") means use default-value
@@ -1293,9 +1294,9 @@ dk-register-info(named-info-node-t* registration-info)
 
   if (nullptr != ctlg-output)
   {
-    boole-t        ctlg-recursive = getenv-boole("DK_INTROSPECTOR_RECURSIVE", false);
-    const char8-t* ctlg-only =      getenv("DK_INTROSPECTOR_ONLY");
-    const char8-t* ctlg-arg =       getenv("DK_INTROSPECTOR_ARG");
+    boole-t        ctlg-recursive = getenv-boole("DKT_INTROSPECTOR_RECURSIVE", false);
+    const char8-t* ctlg-only =      getenv("DKT_INTROSPECTOR_ONLY");
+    const char8-t* ctlg-arg =       getenv("DKT_INTROSPECTOR_ARG");
     ofile-t ofl = {ctlg-output, 0};
 
     symbol-t name = name-from-info(registration-info);
@@ -1322,13 +1323,13 @@ dk-register-info(named-info-node-t* registration-info)
       break;
     case construct:k-executable:
       add-registration-info(registration-info);
-      if (NULL != getenv("DK_PERL_DUMP_KLASSES"))
+      if (NULL != getenv("DKT_PERL_DUMP_KLASSES"))
         perl-dump-klass-defns(gbl-klass-defns-table);
       if (0)
         perl-dump-resource-info(gbl-klass-defns-table);
-      if (NULL == getenv("DK_NO_INIT_RUNTIME"))
-        dk-init-runtime();
-      if (NULL != getenv("DK_EXIT_BEFORE_MAIN"))
+      if (NULL == getenv("DKT_NO_INIT_RUNTIME"))
+        dkt-init-runtime();
+      if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(0);
       break;
     case construct:k-unknown:
@@ -1340,11 +1341,11 @@ dk-register-info(named-info-node-t* registration-info)
   return;
 }
 export void
-dk-deregister-info(named-info-node-t* registration-info)
+dkt-deregister-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
-  if (NULL != getenv("DK_INTROSPECTOR_OUTPUT") ||
-      NULL != getenv("DK_NO_INIT_RUNTIME"))
+  if (NULL != getenv("DKT_INTROSPECTOR_OUTPUT") ||
+      NULL != getenv("DKT_NO_INIT_RUNTIME"))
     return;
   named-info-node:sort(registration-info);
   named-info-node-t* klass-defns = cast(named-info-node-t*)named-info-node:at(registration-info, $klass-defns);
@@ -1440,7 +1441,7 @@ info-for-name(symbol-t klass-name) throw(object-t)
 {
   assert(nullptr != klass-name);
   property-t[] properties = { { $name, cast(uintptr-t)klass-name } };
-  named-info-node-t info = { properties, DK-ARRAY-LENGTH(properties), nullptr };
+  named-info-node-t info = { properties, DKT-ARRAY-LENGTH(properties), nullptr };
   named-info-node-t* info-ptr = &info;
   named-info-node-t** klass-info-ptr = cast(named-info-node-t**)sorted-array:bsearch(gbl-klass-defns-table, &info-ptr);
 
@@ -1500,7 +1501,7 @@ dk-intern(const char8-t* key)
   symbol-t val = cast(symbol-t)sorted-ptr-array:intern(intern-array, cast(const void*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 #endif
-  //dk-log(DK-LOG-INFO, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
+  //dkt-log(DKT-LOG-INFO, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
   return val;
 }
 
@@ -1517,7 +1518,7 @@ get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
   return buf;
 }
 export char8-t*
-dk-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
+dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
 {
   buf[0] = NUL;
   return get-klass-chain(klass, buf, buf-len);

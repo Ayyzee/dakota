@@ -83,16 +83,16 @@ va-log(uint32-t priority, const char8-t* format, va-list-t args)
 
     switch (priority)
     {
-      case DK-LOG-ERROR:
+      case DKT-LOG-ERROR:
         fprintf(log-file, "error: ");
         break;
-      case DK-LOG-WARNING:
+      case DKT-LOG-WARNING:
         fprintf(log-file, "warning: ");
         break;
-      case DK-LOG-INFO:
+      case DKT-LOG-INFO:
         fprintf(log-file, "info: ");
         break;
-      case DK-LOG-DEBUG:
+      case DKT-LOG-DEBUG:
         fprintf(log-file, "debug: ");
         break;
       default:
@@ -106,19 +106,19 @@ va-log(uint32-t priority, const char8-t* format, va-list-t args)
   return result;
 }
 
-export format-va-printf(2) int-t
-dk-va-log(uint32-t priority, const char8-t* format, va-list-t args)
+noexport format-va-printf(2) int-t
+dkt-va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {
   int-t result = va-log(priority, format, args);
   return result;
 }
 
-export format-printf(2) int-t
-dk-log(uint32-t priority, const char8-t* format, ...)
+noexport format-printf(2) int-t
+dkt-log(uint32-t priority, const char8-t* format, ...)
 {
   va-list-t args;
   va-start(args, format);
-  int-t result = dk-va-log(priority, format, args);
+  int-t result = dkt-va-log(priority, format, args);
   va-end(args);
   return result;
 }
@@ -128,10 +128,10 @@ noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-t
 noexport void
 pre-runtime-verbose-terminate()
 {
-//   dk-log(DK-LOG-INFO, "%s()", __func__);
+//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
   const char8-t* current-exception-string = *dkt-current-exception-str();
-  dk-log(DK-LOG-ERROR, "uncaught exception");
+  dkt-log(DKT-LOG-ERROR, "uncaught exception");
 
   if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
@@ -144,12 +144,12 @@ pre-runtime-verbose-terminate()
 noexport void
 verbose-terminate()
 {
-//   dk-log(DK-LOG-INFO, "%s()", __func__);
+//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
   const char8-t* current-exception-string = *dkt-current-exception-str();
   object-t current-exception = *dkt-current-exception();
 
-  if (NULL != (getenv("DK_DUMP_UNHANDLED_EXCEPTION")))
+  if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
       dk:dump(current-exception);
 
@@ -170,10 +170,10 @@ noexport void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose
 noexport void
 pre-runtime-verbose-unexpected()
 {
-//   dk-log(DK-LOG-INFO, "%s()", __func__);
+//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
   const char8-t* current-exception-string = *dkt-current-exception-str();
-  dk-log(DK-LOG-ERROR, "unexpected exception");
+  dkt-log(DKT-LOG-ERROR, "unexpected exception");
 
   if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
@@ -186,12 +186,12 @@ pre-runtime-verbose-unexpected()
 noexport void
 verbose-unexpected()
 {
-//   dk-log(DK-LOG-INFO, "%s()", __func__);
+//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
   const char8-t* current-exception-string = *dkt-current-exception-str();
   object-t current-exception = *dkt-current-exception();
 
-  if (NULL != (getenv("DK_DUMP_UNEXPECTED_EXCEPTION")))
+  if (NULL != (getenv("DKT_DUMP_UNEXPECTED_EXCEPTION")))
     if (nullptr != current-exception)
       dk:dump(current-exception);
 

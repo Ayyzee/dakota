@@ -186,7 +186,7 @@ klass deque
   method object-t write-slots(object-t self, object-t out)
   {
     dk:write-slots(super, out);
-//     dk-log(stdout, "deque: %s(0x%0*" PRIxPTR ", ...)\n",
+//     dkt-log(stdout, "deque: %s(0x%0*" PRIxPTR ", ...)\n",
 //            __func__, PRIxPTR-WIDTH, cast(uintptr-t)(deque));
     node:slots-t* first = self.first;
     node:slots-t* last =  self.last;

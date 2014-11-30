@@ -90,7 +90,7 @@ my $long_suffix =
 sub user_code_cxx
 {
     my ($name) = @_;
-    if (exists $ENV{'DK_ABS_PATH'}) {
+    if (exists $ENV{'DKT_ABS_PATH'}) {
 	my $cwd = getcwd;
 	return "include \"$cwd/obj/$name.$cxx_ext\";\n";
     }
@@ -258,8 +258,8 @@ sub write_to_file_converted_strings
     my ($path, $strings, $in_path) = @_;
 
     if (!defined $gbl_macros) {
-	if ($ENV{'DK_MACROS_PATH'})
-	{ $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die }
+	if ($ENV{'DKT_MACROS_PATH'})
+	{ $gbl_macros = do $ENV{'DKT_MACROS_PATH'} or die }
 	else
 	{ $gbl_macros = do "$prefix/src/macros.pl" or die }
     }
@@ -272,7 +272,7 @@ sub write_to_file_converted_strings
     foreach my $string (@$strings)
     {
 	my $converted_string;
-	if ($ENV{'DK_MACRO_SYSTEM'}) {
+	if ($ENV{'DKT_MACRO_SYSTEM'}) {
 	    my $sst = &sst::make($string, undef);
 	    &macro_expand($sst, $gbl_macros, $ka_generics);
 	    my $str = &sst_fragment::filestr($$sst{'tokens'});
@@ -532,8 +532,8 @@ sub generate_defn_footer
 	"\$date" => '__DATE__',
 	"\$time" => '__TIME__',
 	"\$file" => '__FILE__',
-	"\$construct" => 'DK-CONSTRUCT',
-	"\$name" => 'DK-NAME',
+	"\$construct" => 'DKT-CONSTRUCT',
+	"\$name" => 'DKT-NAME',
     };
     my $exports = &exports($file);
     my $num_exports = scalar keys %$exports;
@@ -552,9 +552,9 @@ sub generate_defn_footer
     $rt_cxx_str .= &dk::print_in_col_string($col, "static void __initial()\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
     $col++;
-    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DK-NAME);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "dk-register-info(&registration-info);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DK-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-register-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
     $col--;
     $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
@@ -562,9 +562,9 @@ sub generate_defn_footer
     $rt_cxx_str .= &dk::print_in_col_string($col, "static void __final()\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
     $col++;
-    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DK-NAME);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "dk-deregister-info(&registration-info);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DK-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-deregister-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
     $col--;
     $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
@@ -1700,7 +1700,7 @@ sub generics::generate_generic_defn
         $col++;
         if (&is_va($generic))
         {
-	    $$scratch_str_ref .= &dk::print("#if DEBUG\n");
+	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list));\n");
 	    $$scratch_str_ref .= &dk::print("#endif\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
@@ -1709,22 +1709,22 @@ sub generics::generate_generic_defn
         }
         else
         {
-	    $$scratch_str_ref .= &dk::print("#if DEBUG\n");
+	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature($generic_name($$new_arg_type_list));\n");
 	    $$scratch_str_ref .= &dk::print("#endif\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = object->klass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
-	$$scratch_str_ref .= &dk::print("#if DEBUG\n");
+	$$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object), signature => signature);\n");
 	$$scratch_str_ref .= &dk::print("#endif\n");
         my $arg_names = &deep_copy(&arg_type::names(&deep_copy($$generic{'parameter-types'})));
         my $arg_names_list = &arg_type::list_names($arg_names);
         
-	if ($ENV{'DK_TRACE_MACROS'}) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "DK-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n");
+	if ($ENV{'DKT_TRACE_MACROS'}) {
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n");
 	}
         
         my $var_name = 'result';
@@ -1744,8 +1744,8 @@ sub generics::generate_generic_defn
         my $new_arg_names_list = &arg_type::list_names($new_arg_names);
         
         $$scratch_str_ref .= &dk::print("(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n");
-	if ($ENV{'DK_TRACE_MACROS'}) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "DK-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n");
+	if ($ENV{'DKT_TRACE_MACROS'}) {
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n");
 	}
 
         if (defined $$generic{'return-type'})
@@ -1823,7 +1823,7 @@ sub generics::generate_super_generic_defn
         $col++;
         if (&is_va($generic))
         {
-	    $$scratch_str_ref .= &dk::print("#if DEBUG\n");
+	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list));\n");
 	    $$scratch_str_ref .= &dk::print("#endif\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
@@ -1832,22 +1832,22 @@ sub generics::generate_super_generic_defn
         }
         else
         {
-	    $$scratch_str_ref .= &dk::print("#if DEBUG\n");
+	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature($generic_name($$new_arg_type_list));\n");
 	    $$scratch_str_ref .= &dk::print("#endif\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = klass:unbox(arg0.klass)->superklass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
-	$$scratch_str_ref .= &dk::print("#if DEBUG\n");
+	$$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => arg0.self, superkls => dkt-superklass(arg0.klass), signature => signature);\n");
 	$$scratch_str_ref .= &dk::print("#endif\n");
         my $arg_names = &deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
         my $arg_names_list = &arg_type::list_names($arg_names);
         
-	if ($ENV{'DK_TRACE_MACROS'}) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "DK-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n");
+	if ($ENV{'DKT_TRACE_MACROS'}) {
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n");
 	}
         
         my $var_name = 'result';
@@ -1867,8 +1867,8 @@ sub generics::generate_super_generic_defn
         my $new_arg_names_list = &arg_type::list_names($new_arg_names);
         
         $$scratch_str_ref .= &dk::print("(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n");
-	if ($ENV{'DK_TRACE_MACROS'}) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "DK-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n");
+	if ($ENV{'DKT_TRACE_MACROS'}) {
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n");
 	}
         
         if (defined $$generic{'return-type'})
@@ -1895,7 +1895,7 @@ sub generics::generate_generic_defns
     my $scratch_str_ref = &global_scratch_str_ref();
     #$$scratch_str_ref .= &dk::print_in_col_string($col, "// generate_generic_defns()\n");
     my $generic;
-    #$$scratch_str_ref .= &dk::print("#if defined DK-VA-GENERICS\n");
+    #$$scratch_str_ref .= &dk::print("#if defined DKT-VA-GENERICS\n");
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
     $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
     foreach $generic (@$generics)
@@ -1917,7 +1917,7 @@ sub generics::generate_generic_defns
 	    }
         }
     }
-    #$$scratch_str_ref .= &dk::print("#endif // defined DK-VA-GENERICS\n");
+    #$$scratch_str_ref .= &dk::print("#endif // defined DKT-VA-GENERICS\n");
     #if (!&is_raw($generic)) {
 	&generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
     #}
@@ -2005,7 +2005,7 @@ sub linkage_unit::generate_generics
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { namespace va { noexport /*generic*/ object-t init(object-t, va-list-t); } }\n");
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { noexport /*generic*/ object-t alloc(object-t); }\n");
         $$scratch_str_ref .= &dk::print("\n");
-	$$scratch_str_ref .= &dk::print_in_col_string($col, "#if !defined DK-USE-MAKE-MACRO\n");
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "#if !defined DKT-USE-MAKE-MACRO\n");
         &generics::generate_va_make_defn($scope, $is_inline = 1, $col);
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "#endif\n");
     }
@@ -2041,12 +2041,12 @@ sub generics::generate_va_make_defn
         $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t object = alloc(klass);\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "va-list-t args;\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "va-start(args, klass);\n");
-	if ($ENV{'DK_TRACE_MACROS'}) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "DK-VA-TRACE-BEFORE-INIT(klass, args);\n");
+	if ($ENV{'DKT_TRACE_MACROS'}) {
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-VA-TRACE-BEFORE-INIT(klass, args);\n");
 	}
         $$scratch_str_ref .= &dk::print_in_col_string($col, "object = _func_(object, args);\n");
-	if ($ENV{'DK_TRACE_MACROS'}) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "DK-VA-TRACE-AFTER-INIT(klass, args);\n");
+	if ($ENV{'DKT_TRACE_MACROS'}) {
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-VA-TRACE-AFTER-INIT(klass, args);\n");
 	}
         $$scratch_str_ref .= &dk::print_in_col_string($col, "va-end(args);\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "return object;\n");
@@ -2362,7 +2362,9 @@ sub linkage_unit::generate_klasses_body
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = nullptr;\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "if (nullptr != object) // needed for interator implementation\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "{\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "dk-unbox-check(object, klass); // optional\n");
+                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "#if defined DEBUG\n");
+                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "dkt-unbox-check(object, klass); // optional\n");
+                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "#endif\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "s = cast(slots-t*)(cast(uint8-t*)object + klass:unbox(klass)->offset);\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "}\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "return s;\n");
@@ -2479,7 +2481,7 @@ sub linkage_unit::generate_klasses_body
                 ### construct
                 if ($$klass_scope{'slots'}{'cat'} &&
 		    'struct' eq $$klass_scope{'slots'}{'cat'}) {
-                if (!$ENV{'DK_USE_COMPOUND_LITERALS'}) {
+                if (!$ENV{'DKT_USE_COMPOUND_LITERALS'}) {
                 if (&has_slots_info($klass_scope))
                 {
                     my ($pairs, $names) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
@@ -4524,7 +4526,7 @@ sub generate_ka_method_defn
 
             if ('boole-t' eq $kw_type)
             {
-                $kw_type = 'DK-VA-ARG-BOOLE-T'; # bools are promoted to ints
+                $kw_type = 'dkt-va-arg-boole-t'; # bools are promoted to ints
             }
             # should do this for other types (char=>int, float=>double, ... ???
 
@@ -5028,7 +5030,7 @@ sub generate_info
 {
     my ($name, $tbl, $col, $scope) = @_;
     my $result = &generate_property_tbl("$name-props", $tbl, $col, $scope);
-    $result .= &dk::print_in_col_string($col, "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };\n");
+    $result .= &dk::print_in_col_string($col, "static named-info-node-t $name = { $name-props, DKT-ARRAY-LENGTH($name-props), nullptr };\n");
     return $result;
 }
 
@@ -5053,7 +5055,7 @@ sub generate_info_seq
 	my $pad = ' ' x ($max_width - $width);
 	$result .= &dk::print_in_col_string($col + 1, "{ $element, ");
 	$result .= $pad;
-	$result .= &dk::print("DK-ARRAY-LENGTH($element), ");
+	$result .= &dk::print("DKT-ARRAY-LENGTH($element), ");
 	$result .= $pad;
 	$result .= &dk::print("nullptr },\n");
     }
@@ -5129,13 +5131,13 @@ sub dk::generate_dk_cxx
     print "  generating $tmp_out\n";
 
     #print STDERR "$name.$dk_ext.$cxx_ext\n";
-    if (exists $ENV{'DK_NO_LINE'})
+    if (exists $ENV{'DKT_NO_LINE'})
     {
 	&write_to_file_converted_strings("$path$name.$cxx_ext", [ $filestr ], "$file_basename.$dk_ext");
     }
     else
     {
-	if (exists $ENV{'DK_ABS_PATH'})
+	if (exists $ENV{'DKT_ABS_PATH'})
 	{
 	    my $cwd = getcwd;
 	    &write_to_file_converted_strings("$path$name.$cxx_ext", [ "#line 1 \"$cwd/$file_basename.$dk_ext\"\n", $filestr ], "$cwd/$file_basename.$dk_ext");

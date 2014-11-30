@@ -22,20 +22,20 @@
 
 enum
   {
-    DK_LOG_ERROR =   3, // same as syslog.h LOG_ERR
-    DK_LOG_WARNING = 4, // same as syslog.h LOG_WARNING
-    DK_LOG_INFO =    6, // same as syslog.h LOG_INFO
-    DK_LOG_DEBUG =   7  // same as syslog.h LOG_DEBUG
+    DKT_LOG_ERROR =   3, // same as syslog.h LOG_ERR
+    DKT_LOG_WARNING = 4, // same as syslog.h LOG_WARNING
+    DKT_LOG_INFO =    6, // same as syslog.h LOG_INFO
+    DKT_LOG_DEBUG =   7  // same as syslog.h LOG_DEBUG
   };
 
 typedef char char8_t; // hackhack
 
-import format_va_printf(2) int_t dk_va_log(uint32_t priority, const char8_t* format, va_list_t args);
-import format_printf(   2) int_t dk_log(   uint32_t priority, const char8_t* format, ...);
+import format_va_printf(2) int_t dkt_va_log(uint32_t priority, const char8_t* format, va_list_t args);
+import format_printf(   2) int_t dkt_log(   uint32_t priority, const char8_t* format, ...);
 
-#define log_method()     dk_log(DK_LOG_DEBUG, "'klass'=>'%s','method'=>'%s','params'=>'%s'", __klass__, __signature__->name, __signature__->parameter_types)
-#define log_klass_func() dk_log(DK_LOG_DEBUG, "'klass'=>'%s','func'=>'%s'",   __klass__, __func__)
-#define log_func()       dk_log(DK_LOG_DEBUG, "'func'=>'%s'",      __func__)
+#define log_method()     dkt_log(DKT_LOG_DEBUG, "'klass'=>'%s','method'=>'%s','params'=>'%s'", __klass__, __signature__->name, __signature__->parameter_types)
+#define log_klass_func() dkt_log(DKT_LOG_DEBUG, "'klass'=>'%s','func'=>'%s'",   __klass__, __func__)
+#define log_func()       dkt_log(DKT_LOG_DEBUG, "'func'=>'%s'",      __func__)
 
 namespace dkt
 {
@@ -60,10 +60,10 @@ namespace dkt
 // #define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { syslog(LOG_ERROR  |LOG_DAEMON, __VA_ARGS__); }
 // #define DKT_LOG_DEBUG(flags, ...)   if (flags & dkt::log_flags) { syslog(LOG_DEBUG  |LOG_DAEMON, __VA_ARGS__); }
 
-#define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { dk_log(DK_LOG_INFO,    __VA_ARGS__); }
-#define DKT_LOG_WARNING(flags, ...) if (flags & dkt::log_flags) { dk_log(DK_LOG_WARNING, __VA_ARGS__); }
-#define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { dk_log(DK_LOG_ERROR,   __VA_ARGS__); }
-#define DKT_LOG_DEBUG(flags, ...)   if (flags & dkt::log_flags) { dk_log(DK_LOG_DEBUG,   __VA_ARGS__); }
+#define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { dkt_log(DKT_LOG_INFO,    __VA_ARGS__); }
+#define DKT_LOG_WARNING(flags, ...) if (flags & dkt::log_flags) { dkt_log(DKT_LOG_WARNING, __VA_ARGS__); }
+#define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { dkt_log(DKT_LOG_ERROR,   __VA_ARGS__); }
+#define DKT_LOG_DEBUG(flags, ...)   if (flags & dkt::log_flags) { dkt_log(DKT_LOG_DEBUG,   __VA_ARGS__); }
 
 #define DKT_LOG_MEM_FOOTPRINT(...) DKT_LOG_INFO(dkt::LOG_MEM_FOOTPRINT, __VA_ARGS__)
 #define DKT_LOG_OBJECT_ALLOC(...)  DKT_LOG_INFO(dkt::LOG_OBJECT_ALLOC,  __VA_ARGS__)

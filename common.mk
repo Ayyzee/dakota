@@ -41,4 +41,3 @@ INSTALL := install
 INSTALLFLAGS :=
 OWNER := root
 GROUP := wheel
-

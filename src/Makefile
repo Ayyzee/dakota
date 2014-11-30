@@ -11,9 +11,9 @@ EXTRA_CXXFLAGS :=\
 
 ifndef MIN_EXTRA_CXXFLAGS
  # optional
-EXTRA_CXXFLAGS += --define-macro DEBUG
-#EXTRA_CXXFLAGS += --define-macro DUMP_MEM_FOOTPRINT
-#EXTRA_CXXFLAGS += --define-macro DK_USE_MAKE_MACRO
+#EXTRA_CXXFLAGS += --define-macro DEBUG
+#EXTRA_CXXFLAGS += --define-macro DKT-DUMP_MEM_FOOTPRINT
+#EXTRA_CXXFLAGS += --define-macro DKT_USE_MAKE_MACRO
 
  EXTRA_CXXFLAGS +=\
  --define-macro HAVE_CONFIG_H\
@@ -60,11 +60,11 @@ EXTRA_CXXFLAGS += --define-macro DEBUG
 
 endif
 
-ifndef DK_USE_COMPOUND_LITERALS
+ifndef DKT_USE_COMPOUND_LITERALS
   EXTRA_CXXFLAGS += --pedantic
 endif
 
-ifdef DK_PROFILE
+ifdef DKT_PROFILE
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS +=  -pg
 endif

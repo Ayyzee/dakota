@@ -62,7 +62,7 @@ klass object
 
   method boole-t equal?(object-t self, object-t other)
   {
-    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dk-klass(other)));
+    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
     boole-t state = false;
 
     if (0 == compare(self, other))
@@ -138,7 +138,7 @@ klass object
 
 //   method object-t klass(object-t self)
 //   {
-//     object-t kls = dk-klass(self);
+//     object-t kls = dkt-klass(self);
 //     return kls;
 //   }
 
@@ -159,8 +159,8 @@ klass object
     else
       fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), $nullptr);
 
-//     if (nullptr != dk-klass(self) && self != dk-klass(self))
-//       dk:dump(dk-klass(self));
+//     if (nullptr != dkt-klass(self) && self != dkt-klass(self))
+//       dk:dump(dkt-klass(self));
 
     return self;
   }
@@ -191,8 +191,9 @@ klass object
   }
 }
 
+#if defined DEBUG
 export void
-dk-unbox-check(object-t object, object-t kls)
+dkt-unbox-check(object-t object, object-t kls)
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p','%s:klass']",
                         __func__, cast(void*)(object), dk:name(kls));
@@ -202,13 +203,14 @@ dk-unbox-check(object-t object, object-t kls)
     const char8-t* kls-name = dkt-name(kls);
 
     if (object:instance?(object, klass:klass))
-      dk-log(DK-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
+      dkt-log(DKT-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name, dkt-name(object));
     else
-      dk-log(DK-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s'})",
+      dkt-log(DKT-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name);
 
     abort();
   }
   return;
 }
+#endif

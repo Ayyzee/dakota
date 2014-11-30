@@ -571,11 +571,11 @@ sub rule_replace
 
 sub dk_lang_user_data {
     my $user_data;
-    if ($ENV{'DK_LANG_USER_DATA'})
-    { my $path = $ENV{'DK_LANG_USER_DATA'};
+    if ($ENV{'DKT_LANG_USER_DATA'})
+    { my $path = $ENV{'DKT_LANG_USER_DATA'};
       $user_data = do $path or die "Can not find $path." }
     else
-    { my $path = "$prefix/src/dk-lang-user-data.pl";
+    { my $path = "$prefix/src/dkt-lang-user-data.pl";
       $user_data = do $path or die "Can not find $path." }
 
     return $user_data;
@@ -585,14 +585,14 @@ unless (caller) {
     my $user_data = &dk_lang_user_data();
 
     my $macros;
-    if ($ENV{'DK_MACROS_PATH'})
-    { my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "Can not find $path." }
+    if ($ENV{'DKT_MACROS_PATH'})
+    { my $path = $ENV{'DKT_MACROS_PATH'};  $macros = do $path or die "Can not find $path." }
     else
     { my $path = "$prefix/src/macros.pl"; $macros = do $path or die "Can not find $path." }
 
     $debug = 0;
-    if ($ENV{'DK_MACROS_DEBUG'}) # 0 or 1 or 2 or 3
-    { $debug = $ENV{'DK_MACROS_DEBUG'}; }
+    if ($ENV{'DKT_MACROS_DEBUG'}) # 0 or 1 or 2 or 3
+    { $debug = $ENV{'DKT_MACROS_DEBUG'}; }
     my $changes = { 'files' => {} };
 
     my $output_dir = 'junk';

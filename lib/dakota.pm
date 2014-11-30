@@ -483,15 +483,15 @@ sub gen_rt_obj
     $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
     my $flags = $$cmd_info{'opts'}{'compiler-flags'};
     if ($dk_construct) {
-	$flags .= " --define-macro DK_CONSTRUCT=$dk_construct";
+	$flags .= " --define-macro DKT_CONSTRUCT=$dk_construct";
     }
     if ($$cmd_info{'opts'}{'name'})
     {
-	$flags .= " --define-macro DK_NAME=\\\"$$cmd_info{'opts'}{'name'}\\\"";
+	$flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'opts'}{'name'}\\\"";
     }
     else
     {
-	$flags .= " --define-macro DK_NAME=\\\"$$cmd_info{'output'}\\\"";
+	$flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'output'}\\\"";
     }
     $$cmd_info{'opts'}{'compiler-flags'} = $flags;
     &rt_obj_from_rep($cmd_info);
@@ -685,13 +685,13 @@ sub exec_cmd
 	$$root_cmd{'opts'}{'directory'} ne '.' &&
 	$$root_cmd{'opts'}{'directory'} ne './')
     {
-	$ENV{'DK_DIR'} = "$$root_cmd{'opts'}{'directory'}";
+	$ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
     }
 
-    if ($ENV{'DK_DIR'})
+    if ($ENV{'DKT_DIR'})
     {
-	#print STDERR "DK_DIR=$ENV{'DK_DIR'}\n";
-	open (STDERR, "|dk-fixup-stderr.pl") or die;
+	#print STDERR "DKT_DIR=$ENV{'DKT_DIR'}\n";
+	open (STDERR, "|dkt-fixup-stderr.pl") or die;
     }
 
         my $exit_val = system($cmd_str);
@@ -749,7 +749,7 @@ sub outfile_from_infiles
 {
     my ($cmd_info, $should_echo) = @_;
     my $outfile = $$cmd_info{'output'};
-    &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DK_DEPENDS_OUTPUT_FILE");
+    &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DKT_DEPENDS_OUTPUT_FILE");
     my $file_db = {};
     my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'});
     foreach my $infile (@{$$cmd_info{'inputs'}})
