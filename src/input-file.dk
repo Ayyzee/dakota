@@ -30,7 +30,6 @@ module dakota-util;
 
 klass str128;
 klass type-predicate;
-klass tokenid; // hackhack
 
 klass input-file
 {

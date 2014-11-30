@@ -22,7 +22,6 @@ klass assoc;
 klass deque;
 trait stack;
 klass named-info-node;
-klass equal-predicate; // hackhack
 
 klass autorelease-pool-klass
 {

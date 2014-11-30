@@ -21,7 +21,6 @@ module dakota-util;
 
 klass output-stream;
 klass token;
-klass tokenid; // hackhack
 
 klass syntax-exception
 {

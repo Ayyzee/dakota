@@ -211,6 +211,34 @@ sub is_rt_defn
     else
     { return 0; }
 }
+sub is_nrt
+{
+    if (!$global_is_rt)
+    { return 1; }
+    else
+    { return 0; }
+}
+sub is_rt
+{
+    if ($global_is_rt)
+    { return 1; }
+    else
+    { return 0; }
+}
+sub is_decl
+{
+    if (!$global_is_defn)
+    { return 1; }
+    else
+    { return 0; }
+}
+sub is_defn
+{
+    if ($global_is_defn)
+    { return 1; }
+    else
+    { return 0; }
+}
 
 sub write_to_file_strings
 {
@@ -2554,7 +2582,7 @@ sub linkage_unit::generate_klasses_body
 	&generate_raw_method_signature_decls($$klass_scope{'raw-methods'}, [ $klass_name ], $col, $klass_type);
         &path::remove_last($klass_path);
     }
-    if (@$va_list_methods)
+    if (@$va_list_methods) #rn0
     {
 	#print STDERR Dumper($va_list_methods);
         &path::add_last($klass_path, 'va');
@@ -2562,7 +2590,7 @@ sub linkage_unit::generate_klasses_body
         foreach $method (@$va_list_methods)
         {
             my $method_decl_ref = &function::decl($method, $klass_path);
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { namespace va { $$method_decl_ref } }\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { namespace va { $$method_decl_ref } } /*rn0*/\n");
         }
         &path::remove_last($klass_path);
     }
@@ -2574,7 +2602,8 @@ sub linkage_unit::generate_klasses_body
             {
                 my $va_method = &deep_copy($method);
                 #$$va_method{'is-inline'} = 1;
-                if (&is_nrt_decl() || &is_rt_decl() || &is_same_file($klass_scope)) #rn1
+                #if (&is_decl() || &is_same_file($klass_scope)) #rn1
+		if (&is_same_src_file($klass_scope) || &is_decl()) #rn1
                 {
                     if (defined $$method{'keyword-types'})
                     {
@@ -2595,7 +2624,7 @@ sub linkage_unit::generate_klasses_body
                 {
                     &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
                 }
-                if (&is_nrt_decl() || &is_rt_decl() || &is_same_file($klass_scope)) #rn2
+		if (&is_same_src_file($klass_scope) || &is_rt()) #rn2
                 {
                     if (defined $$method{'keyword-types'})
                     {
@@ -2603,16 +2632,16 @@ sub linkage_unit::generate_klasses_body
                         {
                             my $other_method_decl = &ka_method::type_decl($method);
                             
-                            my $scope = &path::string($klass_path);
+                            #my $scope = &path::string($klass_path);
                             $other_method_decl =~ s|\(\*($k+)\)| $1|;
                             
                             if (&is_exported($method))
                             {
-                                $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $scope { export method");
+                                $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { export method");
                             }
                             else
                             {
-                                $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $scope { noexport method");
+                                $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport method");
                             }
                             if ($$method{'is-inline'})
                             {
@@ -2629,7 +2658,7 @@ sub linkage_unit::generate_klasses_body
    #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
     foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'raw-methods'}})
     {
-        if (&is_nrt_decl() || &is_rt_decl() || &is_exported($method) || &is_same_file($klass_scope)) #rn3
+	if (&is_same_src_file($klass_scope) || &is_rt()) #rn3
         {
             if (!&is_va($method))
             {
@@ -2908,7 +2937,7 @@ sub linkage_unit::generate_klasses_exported_headers
     my $klass_names = &order_klasses($scope);
     my $result = '';
     
-    if (&is_nrt_decl() || &is_rt_decl() || &is_rt_defn()) { # not sure if this is right
+    if (&is_decl() || &is_rt_defn()) { # not sure if this is right
 	my $exported_headers = {};
 	$$exported_headers{'<cassert>'}{'hardcoded-by-rnielsen'} = undef; # assert()
 	$$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
@@ -2932,6 +2961,20 @@ sub is_same_file
     my ($klass_scope) = @_;
 
     if ($gbl_nrt_file && $$klass_scope{'slots'} && $$klass_scope{'slots'}{'file'} && ($gbl_nrt_file eq $$klass_scope{'slots'}{'file'}))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+sub is_same_src_file
+{
+    my ($klass_scope) = @_;
+
+    if ($gbl_nrt_file && ($gbl_nrt_file eq $$klass_scope{'file'}))
     {
         return 1;
     }
@@ -3201,7 +3244,7 @@ sub linkage_unit::generate_klasses
     my $klass_names = &order_klasses($scope);
     my $scratch_str_ref = &global_scratch_str_ref();
     &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
-    if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_decl()) {
 	$$scratch_str_ref .= "\n";
 	$$scratch_str_ref .= "include <dakota.h>;\n";
 	$$scratch_str_ref .= "include <dakota-log.h>;\n";
@@ -3224,7 +3267,7 @@ sub linkage_unit::generate_klasses_types_before
     my $klass_names = &order_klasses($scope);
     my $scratch_str_ref = &global_scratch_str_ref();
     $$scratch_str_ref .= &labeled_src_str(undef, "klass-decls");
-    if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_decl()) {
 	foreach my $klass_name (@$klass_names) {
 	    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
@@ -3249,7 +3292,7 @@ sub linkage_unit::generate_klasses_types_after
 	my $is_exported;
 	my $is_slots;
 
-	if (&is_nrt_decl() || &is_rt_decl()) {
+	if (&is_decl()) {
 	    if (&has_enums($klass_scope)) {
 		foreach my $enum (@{$$klass_scope{'enum'} ||= []}) {
 		    if (&is_exported($enum)) {
@@ -3262,7 +3305,7 @@ sub linkage_unit::generate_klasses_types_after
 	    }
 	}
         if (&has_slots_info($klass_scope)) {
-            if (&is_nrt_decl() || &is_rt_decl()) {
+            if (&is_decl()) {
                 if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
 		    $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
                     $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { ");
@@ -4800,7 +4843,7 @@ sub linkage_unit::generate_symbols
         my $cxx_ident = $$symbols{$symbol};
         my $width = length($cxx_ident);
 	my $pad = ' ' x ($max_width - $width);
-        if (&is_nrt_decl() || &is_rt_decl())
+        if (&is_decl())
         {
             $scratch_str .= &dk::print_in_col_string3($col, "namespace __symbol { extern noexport symbol-t $cxx_ident; ", $pad, "} // $symbol\n");
         }
@@ -4872,7 +4915,7 @@ sub linkage_unit::generate_keywords
 	my $pad = ' ' x ($max_width - $width);
 	if (defined $cxx_ident)
 	{
-        if (&is_nrt_decl() || &is_rt_decl())
+        if (&is_decl())
         {
             $scratch_str .= &dk::print_in_col_string3($col, "namespace __keyword { extern noexport keyword-t $cxx_ident; ", $pad, "} // $symbol\n");
         }
@@ -4909,7 +4952,7 @@ sub linkage_unit::generate_strings
     while (my ($string, $dummy) = each(%{$$file{'strings'}}))
     {
         my $string_ident = &make_ident_symbol_scalar($string);
-        if (&is_nrt_decl() || &is_rt_decl())
+        if (&is_decl())
         {
             $scratch_str .= &dk::print_in_col_string($col, "//extern noexport object-t $string_ident;\n");
         }

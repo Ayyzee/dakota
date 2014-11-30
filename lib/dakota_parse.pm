@@ -701,6 +701,7 @@ sub trait
     $gbl_current_scope = $$gbl_current_scope{'traits'}{$construct_name};
     $$gbl_current_scope{'module'} = $gbl_current_module;
     $$gbl_current_scope{'exported-headers'} = &deep_copy($$gbl_root{'exported-headers'});
+    $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
     while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'}))
     {
@@ -1263,6 +1264,7 @@ sub klass
     $gbl_current_scope = $$gbl_current_scope{'klasses'}{$construct_name};
     $$gbl_current_scope{'module'} = $gbl_current_module;
     $$gbl_current_scope{'exported-headers'} = &deep_copy($$gbl_root{'exported-headers'});
+    $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
     while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'}))
     {
@@ -2477,7 +2479,6 @@ sub rep_tree_from_dk_path
 	'boole' => 1,
 	'char8' => 1,
 	'construct' => 1,
-	'equal-predicate' => 1, # hackhack
 	'file' => 1,
 	'input-stream' => 1, # std-input
 	'keyword' => 1,
