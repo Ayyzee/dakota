@@ -30,7 +30,7 @@ klass ascii-number-klass
   {
     const char8-t* digits;
   }
-  STATIC object-t gbl-base2-ascii-number-klass-info;
+  static object-t gbl-base2-ascii-number-klass-info;
 
   object-t initialize(object-t kls)
   {

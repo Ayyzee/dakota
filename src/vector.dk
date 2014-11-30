@@ -38,9 +38,9 @@ klass vector
     uint32-t  iterator-state;
   }
 
-  STATIC const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
-  STATIC const object-t gbl-default-fill = null;
-  STATIC const uint32-t gbl-default-initial-capacity = 64; // shall never be 0
+  static const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
+  static const object-t gbl-default-fill = null;
+  static const uint32-t gbl-default-initial-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)

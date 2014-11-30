@@ -29,7 +29,7 @@ klass str128;
 
 klass output-stream
 {
-  STATIC const char8-t* gbl-endl = "\n";
+  static const char8-t* gbl-endl = "\n";
 
   slots
   {

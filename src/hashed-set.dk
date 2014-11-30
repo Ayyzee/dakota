@@ -23,7 +23,7 @@ include <cassert>;
 //  512: 509
 // 1024: 1021
 
-STATIC const uint32-t gbl-prime = 127;
+static const uint32-t gbl-prime = 127;
 
 // when the user submits a non-prime number, decrement until a prime is found
 

@@ -553,7 +553,7 @@ sub generate_defn_footer
     $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
     $col++;
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-register-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-tbl.register-info(&registration-info);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
     $col--;
@@ -563,7 +563,7 @@ sub generate_defn_footer
     $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
     $col++;
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-deregister-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-tbl.deregister-info(&registration-info);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
     $col--;

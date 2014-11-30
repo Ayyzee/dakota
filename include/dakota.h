@@ -62,14 +62,15 @@
   #define designated_init __attribute__((__designated_init__))
 #endif
 
-#define THROW  throw
-#define STATIC static
+#if !defined HAVE_STRERROR_NAME
+  export const char8_t* strerror_name(int_t errno);
+#endif
 
-//#define DUMP_MEM_FOOTPRINT
+//#define DKT_DUMP_MEM_FOOTPRINT
 
 #if !defined USE
-#define      USE(v) (void)v
-#endif // USE
+  #define    USE(v) (void)v
+#endif
 
 //static_cast<double>(4)
 //       cast(double)(4)
@@ -161,20 +162,19 @@ constexpr uintmax_t dk_hash(const char8_t* str)
 import symbol_t dk_intern(const char8_t*);
 import object_t dk_klass_for_name(symbol_t);
 
-import void dkt_throw(object_t exception);
-import void dkt_throw(const char8_t* exception_str);
-import void dkt_init_runtime();
+#if defined DEBUG
+  import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
+  import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
+#endif
 
-// sentinel import object_t           dk_va_add_all(object_t self, va_list_t);
-// sentinel import object_t           dk_add_all(object_t self, ...);
-
-import named_info_node_t*          dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-import object_t                    dk_va_make_named_info(symbol_t name, va_list_t args);
 sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
 sentinel import object_t           dk_make_named_info(symbol_t name, ...);
 
-import void dkt_register_info(  named_info_node_t* registration_info);
-import void dkt_deregister_info(named_info_node_t* registration_info);
+import void dkt_throw(object_t exception);
+import void dkt_throw(const char8_t* exception_str);
+
+// import object_t dk_va_add_all(object_t self, va_list_t);
+// sentinel import object_t dk_add_all(object_t self, ...);
 
 #if defined DEBUG
   import int_t dkt_trace_before(const signature_t* signature, method_t method, super_t context, ...);
@@ -194,5 +194,11 @@ import void dkt_deregister_info(named_info_node_t* registration_info);
 #if defined DEBUG
   import void dkt_unbox_check(object_t object, object_t kls);
 #endif
+
+struct dkt_tbl_t {
+  void (*register_info)(named_info_node_t*);
+  void (*deregister_info)(named_info_node_t*);
+};
+import extern dkt_tbl_t& dkt_tbl;
 
 #endif // __dakota_h__

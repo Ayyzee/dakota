@@ -83,9 +83,9 @@ klass bit-vector
   //uint32-t  size; // 1 bit
   }
   
-  STATIC const uint32-t gbl-element-width = cast(uint32-t)(sizeof((cast(slots-t*)0)->elements[0]) * 8);
-  STATIC const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
-  STATIC const uint32-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
+  static const uint32-t gbl-element-width = cast(uint32-t)(sizeof((cast(slots-t*)0)->elements[0]) * 8);
+  static const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
+  static const uint32-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
 
   method object-t init(object-t self, uint32-t initial-capacity => gbl-default-initial-capacity)
   {

@@ -32,6 +32,4 @@ noexport symbol_t klass_name_from_info(named_info_node_t* info);
 noexport symbol_t superklass_name_from_info(named_info_node_t* info);
 noexport symbol_t superklass_name_from_info(named_info_node_t* info, symbol_t name);
 
-noexport const char8_t* strerror_name(int_t errnum);
-
 #endif // __dakota_private_h__

@@ -77,8 +77,8 @@ klass selector-pair
   }
 }
 
-STATIC const uint32-t gbl-num-generics = 512;
-STATIC selector-pair-t[gbl-num-generics] gbl-selectors;
+static const uint32-t gbl-num-generics = 512;
+static selector-pair-t[gbl-num-generics] gbl-selectors;
 noexport sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                                 0,
                                                                 DKT-ARRAY-LENGTH(gbl-selectors),
@@ -742,7 +742,7 @@ klass klass
     return self.behavior;
   }
 
-  STATIC named-info-node:slots-t gbl-default-info-slots = { nullptr, 0, nullptr };
+  static named-info-node:slots-t gbl-default-info-slots = { nullptr, 0, nullptr };
 
   noexport object-t init(object-t self, named-info-node:slots-t* info-slots);
 

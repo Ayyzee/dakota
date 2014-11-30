@@ -75,8 +75,8 @@ namespace klass
 }
 #endif
 
-STATIC const char8-t gbl-delimiter = '/'; // unix path delimiter
-STATIC const char8-t* gbl-current-module = "";
+static const char8-t gbl-delimiter = '/'; // unix path delimiter
+static const char8-t* gbl-current-module = "";
 
 klass assoc-node
 {
@@ -117,10 +117,10 @@ klass named-assoc-node
 //   }
 }
 
-STATIC sorted-array-t* gbl-imported-klasses-table;
-STATIC sorted-array-t* gbl-klass-defns-table;
-STATIC sorted-array-t* gbl-interposers-table;
-STATIC sorted-array-t* gbl-imported-klasses-file-table;
+static sorted-array-t* gbl-imported-klasses-table;
+static sorted-array-t* gbl-klass-defns-table;
+static sorted-array-t* gbl-interposers-table;
+static sorted-array-t* gbl-imported-klasses-file-table;
 
 noexport void
 init-runtime-ds()
@@ -482,7 +482,7 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
   ofile:printf(ofl, "},\n");
   return;
 }
-STATIC named-info-node-t* gbl-registration-info-list;
+static named-info-node-t* gbl-registration-info-list;
 
 noexport void register-info(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
@@ -494,8 +494,8 @@ noexport void export-klass(named-info-node-t* klass-info);
 // object klass' klass is klass klass
 // klass klass'  klass is klass klass
 // null klass'   klass is klass klass
-export void
-dkt-init-runtime()
+noexport void
+init-runtime()
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
   if (nullptr == object:klass)
@@ -534,13 +534,13 @@ dkt-init-runtime()
 #endif
 #if 1
     // import
-    STATIC object-t gbl-null-klass = nullptr;
-    STATIC assoc-node-t gbl-imported-null-klass = { cast(uintptr-t)&gbl-null-klass, nullptr };
+    static object-t gbl-null-klass = nullptr;
+    static assoc-node-t gbl-imported-null-klass = { cast(uintptr-t)&gbl-null-klass, nullptr };
     import-klass($null, &gbl-imported-null-klass);
 
     // export
-    STATIC property-t[] gbl-exported-null-klass-props = { { $name, cast(uintptr-t)$null } };
-    STATIC named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DKT-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
+    static property-t[] gbl-exported-null-klass-props = { { $name, cast(uintptr-t)$null } };
+    static named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DKT-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
     export-klass(&gbl-exported-null-klass);
 
     gbl-null-klass = dk-klass-for-name($null); // null:__klass__ does not exist
@@ -1278,8 +1278,8 @@ add-registration-info(named-info-node-t* registration-info)
   return;
 }
 
-export void
-dkt-register-info(named-info-node-t* registration-info)
+noexport void
+register-all(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
@@ -1328,7 +1328,7 @@ dkt-register-info(named-info-node-t* registration-info)
       if (0)
         perl-dump-resource-info(gbl-klass-defns-table);
       if (NULL == getenv("DKT_NO_INIT_RUNTIME"))
-        dkt-init-runtime();
+        init-runtime();
       if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(0);
       break;
@@ -1340,8 +1340,8 @@ dkt-register-info(named-info-node-t* registration-info)
     fclose(ctlg-output);
   return;
 }
-export void
-dkt-deregister-info(named-info-node-t* registration-info)
+noexport void
+deregister-all(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   if (NULL != getenv("DKT_INTROSPECTOR_OUTPUT") ||
@@ -1524,3 +1524,9 @@ dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
   return get-klass-chain(klass, buf, buf-len);
 }
 #endif
+
+noexport dkt-tbl-t tbl = {
+  register-all,
+  deregister-all,
+};
+export dkt-tbl-t& dkt-tbl = tbl;

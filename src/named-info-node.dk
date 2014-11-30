@@ -137,7 +137,10 @@ klass named-info-node
   }
 }
 
-export named-info-node-t*
+#if !defined DEBUG
+  noexport
+#endif
+named-info-node-t*
 dk-va-make-named-info-slots(symbol-t name, va-list-t args)
 {
 //   assert(nullptr != name);
@@ -172,7 +175,10 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
   sort(info);
   return info;
 }
-export object-t
+#if !defined DEBUG
+  noexport
+#endif
+object-t
 dk-va-make-named-info(symbol-t name, va-list-t args)
 {
   named-info-node-t* info-slots = dk-va-make-named-info-slots(name, args);

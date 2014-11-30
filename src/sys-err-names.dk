@@ -20,7 +20,7 @@ include <cerrno>;
 include <cstdio>;
 include <cstring>;
 
-STATIC const char8-t* gbl-sys-err-names[] =
+static const char8-t* gbl-sys-err-names[] =
 {
      "0",    "1",    "2",    "3",    "4",    "5",    "6",    "7",    "8",    "9",
 
@@ -65,7 +65,7 @@ set-name(int-t errnum, const char8-t* name)
   return;
 }
 
-noexport const char8-t*
+const char8-t*
 strerror-name(int-t errnum)
 {
   assert(errnum <= cast(int-t)DKT-ARRAY-LENGTH(gbl-sys-err-names));

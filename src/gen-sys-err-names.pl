@@ -17,7 +17,7 @@ while (<>)
 my $key;
 foreach $key (keys %$err_set)
 {
-    print "\#ifdef $key\n";
+    print "\#if defined $key\n";
     print "  set_name($key, \"$key\");\n";
     print "\#endif\n";
 }
