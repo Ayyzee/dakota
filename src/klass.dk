@@ -54,7 +54,7 @@ namespace klass
 }
 #endif
 
-noexport void null-method(object-t object, ...)
+export void dkt-null-method(object-t object, ...)
 {
   throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object));
 }
@@ -379,12 +379,6 @@ klass methods
   }
 }
 
-#if defined DEBUG
-  #define NULL-METHOD nullptr
-#else
-  #define NULL-METHOD null-method
-#endif
-
 klass klass
 {
   //     klass klass;
@@ -443,7 +437,7 @@ klass klass
 #endif    
 
     for (uint32-t index = 0; index < self.methods.count; index++)
-      self.methods.addrs[index] = cast(method-t)NULL-METHOD;
+      self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
     return self;
   }
 
@@ -474,7 +468,7 @@ klass klass
   {
     assert(selector < self.methods.count);
     method-t m = DKT-METHOD-FOR-SELECTOR(&self.methods, selector);
-    DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)NULL-METHOD); // hackhack
+    DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
       dk:set-bit(self.behavior, cast(uint32-t)selector, false);
     return m;
@@ -736,7 +730,7 @@ klass klass
       self.behavior = make(bit-vector:klass, initial-capacity => self.methods.count);
 
       for (uint32-t index = 0; index < self.methods.count; index++)
-        if (cast(method-t)NULL-METHOD != self.methods.addrs[index])
+        if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
           dk:set-bit(self.behavior, index, true);
     }
     return self.behavior;

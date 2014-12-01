@@ -201,6 +201,14 @@ import void dkt_throw(const char8_t* exception_str);
   import void dkt_unbox_check(object_t object, object_t kls);
 #endif
 
+import void dkt_null_method(object_t object, ...);
+
+#if defined DEBUG
+  #define DKT_NULL_METHOD nullptr
+#else
+  #define DKT_NULL_METHOD dkt_null_method
+#endif
+
 struct dkt_tbl_t {
   void (*register_info)(named_info_node_t*);
   void (*deregister_info)(named_info_node_t*);
