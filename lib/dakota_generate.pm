@@ -82,9 +82,8 @@ my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 # same as in dakota_rewrite.pm
 my $long_suffix =
 {
-    '=' => '3d',
-    '?' => '3f',
-    '!' => '21'
+    '?' => 'p',
+    '!' => 'd'
 };
 
 sub user_code_cxx
@@ -104,7 +103,6 @@ sub make_ident_symbol_scalar
 {
     my ($symbol) = @_;
     $symbol =~ s/($z)\?/$1$$long_suffix{'?'}/g;
-    $symbol =~ s/($z)\=/$1$$long_suffix{'='}/g;
     $symbol =~ s/($z)\!/$1$$long_suffix{'!'}/g;
     my $has_word_char;
 
@@ -2339,7 +2337,7 @@ sub linkage_unit::generate_klasses_body
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = nullptr;\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "if (nullptr != object) // needed for interator implementation\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "{\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "s = (slots-t*)((uint8-t*)object + sizeof(object::slots-t));\n");
+                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1 + 1, "s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "}\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "return s;\n");
                     $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
@@ -2353,11 +2351,11 @@ sub linkage_unit::generate_klasses_body
                     $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport pure slots-t* unbox(object-t object)");
                     if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
                     {
-                        $$scratch_str_ref .= &dk::print("; }\n");
+                        $$scratch_str_ref .= &dk::print("; } // general-case\n");
                     }
                     elsif (&is_rt_decl() || &is_rt_defn())
                     {
-                        $$scratch_str_ref .= &dk::print("\n");
+			$$scratch_str_ref .= &dk::print(" // general-case\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = nullptr;\n");
                         $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "if (nullptr != object) // needed for interator implementation\n");
@@ -4500,7 +4498,7 @@ sub generate_ka_method_defn
 	    $initializer .= "${delim}false";
 	    $delim = ', ';
 	}
-	$$scratch_str_ref .= " } state = { $initializer };\n";
+	$$scratch_str_ref .= " } _state_ = { $initializer };\n";
     }
     #$$scratch_str_ref .= &dk::print_in_col_string($col, "if (nullptr != $$new_arg_names[-1])\n");
     #$$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
@@ -4530,8 +4528,9 @@ sub generate_ka_method_defn
             }
             # should do this for other types (char=>int, float=>double, ... ???
 
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(if (_keyword_->symbol != \$$kw_arg_name) abort());\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "$kw_arg_name = va-arg($$new_arg_names[-1], $kw_type);\n");
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "state.$kw_arg_name = true;\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "_state_.$kw_arg_name = true;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "break;\n");
             $col--;
 #            $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
@@ -4556,7 +4555,7 @@ sub generate_ka_method_defn
     foreach my $kw_arg (@{$$method{'keyword-types'}})
     {
         my $kw_arg_name    = $$kw_arg{'name'};
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "unless (state.$kw_arg_name)\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "unless (_state_.$kw_arg_name)\n");
         $col++;
         if (defined $$kw_arg{'default'})
         {
@@ -4925,13 +4924,12 @@ sub linkage_unit::generate_keywords
         {
             $symbol =~ s|"|\\"|g;
 	    $symbol =~ s/\?$/$$long_suffix{'?'}/;
-	    $symbol =~ s/\=$/$$long_suffix{'='}/;
-	   #$symbol =~ s/\!$/$$long_suffix{'!'}/;
+	    $symbol =~ s/\!$/$$long_suffix{'!'}/;
 	    my $keyword_defn = "namespace __keyword { noexport keyword-t $cxx_ident = ";
 	    $keyword_defn .= $pad;
 	    $keyword_defn .= "{ \$$symbol, ";
 	    $keyword_defn .= $pad;
-	    $keyword_defn .= "\$'$symbol' ";
+	    $keyword_defn .= "__hash:$cxx_ident";
 	    $keyword_defn .= $pad;
 	    $keyword_defn .= "}; } // $symbol\n";
 

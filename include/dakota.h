@@ -24,6 +24,12 @@
 #include <cstdarg> // va_list
 #include <cstdint>
 
+#if defined DEBUG
+  #define DEBUG_STMT(stmt) stmt
+#else
+  #define DEBUG_STMT(stmt)
+#endif
+
 #define DKT_WORKAROUND 1
 
 #if defined WIN32

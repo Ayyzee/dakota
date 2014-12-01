@@ -139,7 +139,7 @@ klass token
     return result;
   }
 
-  method object-t tokenid=(object-t self, tokenid-t tokenid)
+  method object-t set-tokenid(object-t self, tokenid-t tokenid)
   {
     self.tokenid = tokenid;
     return self;
@@ -151,7 +151,7 @@ klass token
     return result;
   }
 
-  method object-t leading-ws=(object-t self, object-t leading-ws)
+  method object-t set-leading-ws(object-t self, object-t leading-ws)
   {
     assert(nullptr == self.leading-ws);
     self.leading-ws = leading-ws;

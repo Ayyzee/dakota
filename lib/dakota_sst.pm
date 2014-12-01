@@ -69,7 +69,7 @@ my $wk = qr/[_A-Za-z]$k*[_A-Za-z0-9]*/; # dakota identifier
 my $ak = qr/::?$z/;   # absolute scoped dakota identifier
 my $rk = qr/$z$ak*/;  # relative scoped dakota identifier
 my $d = qr/\d+/;
-my $mx = qr/\!|\?|\=/;
+my $mx = qr/\!|\?/;
 my $m  = qr/$z$mx?/;
 my $h  = qr|[/._A-Za-z0-9-]|;
 

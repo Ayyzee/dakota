@@ -125,7 +125,7 @@ klass vector
          dk:next?(forward-iterator);
          dk:next(forward-iterator))
     {
-      dk:element=(forward-iterator, self.fill);
+      dk:set-element(forward-iterator, self.fill);
     }
     self.iterator-state++;
     return self;
@@ -222,7 +222,7 @@ klass vector
          dk:next(forward-iterator))
     {
       if (dk:equal?(object1, dk:element(forward-iterator)))
-        dk:element=(forward-iterator, object2);
+        dk:set-element(forward-iterator, object2);
     }
     return object1;
   }
@@ -428,7 +428,7 @@ klass vector-forward-iterator
     return state;
   }
 
-  method object-t element=(object-t self, object-t element)
+  method object-t set-element(object-t self, object-t element)
   {
     dk:replace-at(self.vector, self.index, element);
     return self;

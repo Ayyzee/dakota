@@ -457,7 +457,7 @@ klass deque-forward-iterator
     return node->element;
   }
 
-  method object-t element=(object-t self, object-t element)
+  method object-t set-element(object-t self, object-t element)
   {
     check-iterator-state(self);
     self.node->element = element;

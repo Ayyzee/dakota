@@ -20,8 +20,7 @@ klass construct
 {
   slots enum
   {
-    k-unknown    = 0,
+    k-library    = 0,
     k-executable = 1,
-    k-library    = 2,
   }
 }

@@ -190,7 +190,7 @@ klass lexer
       {
         unless (dk:empty?(leading-ws))
         {
-          dk:leading-ws=(token, leading-ws);
+          dk:set-leading-ws(token, leading-ws);
           leading-ws = make(vector:klass);
         }
         dk:add-last(seq, token);
@@ -581,7 +581,7 @@ klass lexer
 
           if ('(' != dk:tokenid(open-token))
             throw make(syntax-exception:klass, token => token, filename => self.filename, message => "not balenced");
-          dk:close-token=(open-token, token);
+          dk:set-close-token(open-token, token);
           return token;
         }
         case '*':
@@ -878,7 +878,7 @@ klass lexer
           if ('<' != dk:tokenid(open-token))
             dk:push(self.open-tokens, open-token);
           else
-            dk:close-token=(open-token, token);
+            dk:set-close-token(open-token, token);
           return token;
         }
         case '?':
@@ -920,7 +920,7 @@ klass lexer
 
           if ('[' != dk:tokenid(open-token))
             throw make(syntax-exception:klass, token => token, filename => self.filename, message => "not balenced");
-          dk:close-token=(open-token, token);
+          dk:set-close-token(open-token, token);
           return token;
         }
         case '^':
@@ -1001,7 +1001,7 @@ klass lexer
 
           if ('{' != dk:tokenid(open-token))
             throw make(syntax-exception:klass, token => token, filename => self.filename, message => "not balenced");
-          dk:close-token=(open-token, token);
+          dk:set-close-token(open-token, token);
           return token;
         }
         case '~':

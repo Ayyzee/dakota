@@ -131,7 +131,7 @@ klass bit-vector
     return result;
   }
 
-  method object-t bit=(object-t self, uint32-t index, boole-t value)
+  method object-t set-bit(object-t self, uint32-t index, boole-t value)
   {
     uint32-t offset = index/gbl-element-width;
     uint32-t mask = 1 << (index % gbl-element-width);
@@ -147,12 +147,12 @@ klass bit-vector
 
 //   method object-t clr-bit(object-t self, uint32-t index)
 //   {
-//     return bit=(self, index, false);
+//     return set-bit(self, index, false);
 //   }
 
 //   method object-t set-bit(object-t self, uint32-t index)
 //   {
-//     return bit=(self, index, true);
+//     return set-bit(self, index, true);
 //   }
 
   method object-t dump(object-t self)

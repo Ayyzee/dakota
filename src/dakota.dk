@@ -1332,7 +1332,6 @@ register-all(named-info-node-t* registration-info)
       if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(0);
       break;
-    case construct:k-unknown:
     default:
       abort();
   }

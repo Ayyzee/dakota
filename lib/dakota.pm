@@ -78,7 +78,7 @@ my $wk = qr/[_A-Za-z]$k*[A-Za-z0-9_]*/; # dakota identifier
 my $ak = qr/::?$k+/;   # absolute scoped dakota identifier
 my $rk = qr/$k+$ak*/;  # relative scoped dakota identifier
 my $d = qr/\d+/;  # relative scoped dakota identifier
-my $mx = qr/\!|\?|\=/;
+my $mx = qr/\!|\?/;
 my $m  = qr/$z$mx?/;
 my $msig_type = qr/object-t|slots-t|slots-t\s*\*/;
 my $msig = qr/(va:)?$m(\($msig_type?\))?/;

@@ -101,7 +101,7 @@ my $wk = qr/[_A-Za-z]$k*[A-Za-z0-9_]/; # dakota identifier
 my $ak = qr/::?$k+/;   # absolute scoped dakota identifier
 my $rk = qr/$k+$ak*/;  # relative scoped dakota identifier
 my $d = qr/\d+/;  # relative scoped dakota identifier
-my $mx = qr/\!|\?|\=/;
+my $mx = qr/\!|\?/;
 my $m  = qr/$z$mx?/;
 my $msig_type = qr/object-t|slots-t|slots-t\s*\*/;
 my $msig = qr/(va:)?$m(\($msig_type?\))?/;
@@ -116,9 +116,8 @@ my $sqstr = qr/(?<!\\)'.*?(?<!\\)'/;
 # same as in dakota_generate.pm
 my $long_suffix =
 {
-    '=' => '3d',
-    '?' => '3f',
-    '!' => '21'
+    '?' => 'p',
+    '!' => 'd'
 };
 
 $main::list_body = qr{
@@ -374,15 +373,15 @@ sub rewrite_signatures
     my ($filestr_ref) = @_;
 
     $$filestr_ref =~ s/(?<!$k)(signature\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(signature\s*\(\s*$rk)(\!|\?|\=)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
     $$filestr_ref =~ s/(?<!$k)(signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 
     $$filestr_ref =~ s/(?<!$k)(ka-signature\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(ka-signature\s*\(\s*$rk)(\!|\?|\=)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(ka-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
     $$filestr_ref =~ s/(?<!$k)(ka-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 
     $$filestr_ref =~ s/(?<!$k)(raw-signature\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(raw-signature\s*\(\s*$rk)(\!|\?|\=)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(raw-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
     $$filestr_ref =~ s/(?<!$k)(raw-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 }
 
@@ -391,12 +390,12 @@ sub rewrite_selectors
     my ($filestr_ref) = @_;
 
     $$filestr_ref =~ s/(?<!$k)(selector\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(selector\s*\(\s*$rk)(\!|\?|\=)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(selector\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
 
     $$filestr_ref =~ s/(?<!$k)(selector\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 ###
     $$filestr_ref =~ s/(?<!$k)(__selector\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rk)(\!|\?|\=)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
 
     $$filestr_ref =~ s/(?<!$k)(__selector\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 }
@@ -413,7 +412,7 @@ sub rewrite_method_names_special
 {
     my ($filestr_ref) = @_;
 
-    $$filestr_ref =~ s/(:+$k+)(\!|\?|\=)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/ge;
+    $$filestr_ref =~ s/(:+$k+)(\!|\?)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/ge;
 }
 
 sub rewrite_includes
@@ -534,7 +533,6 @@ sub rewrite_syntax
     my ($filestr_ref) = @_;
 
     $$filestr_ref =~ s/($z)\?/$1$$long_suffix{'?'}/g;
-    $$filestr_ref =~ s/($z)\=/$1$$long_suffix{'='}/g;
     $$filestr_ref =~ s/($z)\!/$1$$long_suffix{'!'}/g;
 
     $$filestr_ref =~ s/([a-zA-Z0-9])(-+)(?=[a-zA-Z0-9])/&convert_dash_syntax($1, $2)/ge;
@@ -578,8 +576,8 @@ sub rewrite_functions_replacement
 sub rewrite_functions
 {
     my ($filestr_ref) = @_;
-    $$filestr_ref =~ s/(dk:$k+)(\!|\?|\=)/&rewrite_functions_replacement($1, $2, '')/ges;
-    $$filestr_ref =~ s/($k+)(\!|\?|\=)(\()/&rewrite_functions_replacement($1, $2, $3)/ges;
+    $$filestr_ref =~ s/(dk:$k+)(\!|\?)/&rewrite_functions_replacement($1, $2, '')/ges;
+    $$filestr_ref =~ s/($k+)(\!|\?)(\()/&rewrite_functions_replacement($1, $2, $3)/ges;
 }
 
 sub rewrite_methods
@@ -933,7 +931,6 @@ sub symbol
     $symbol =~ s|^\"||; # strip leading  double-quote (if any)
     $symbol =~ s|\"$||; # strip trailing double-quote (if any)
     $symbol =~ s/($z)\?/$1$$long_suffix{'?'}/g;
-    $symbol =~ s/($z)\=/$1$$long_suffix{'='}/g;
     $symbol =~ s/($z)\!/$1$$long_suffix{'!'}/g;
     my $cxx_ident = &make_ident_symbol_scalar($symbol);
     return "__symbol:${cxx_ident}";
@@ -951,7 +948,7 @@ sub hash
     $keyword =~ s|^\'||; # strip leading  single-quote
     $keyword =~ s|\'$||; # strip trailing single-quote
     my $cxx_ident = &make_ident_symbol_scalar($keyword);
-    return "__hash:${cxx_ident}";
+    return "__hash:$cxx_ident";
 }
 
 sub rewrite_case_with_string_rhs

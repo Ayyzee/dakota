@@ -99,13 +99,13 @@ klass assoc
     return result;
   }
 
-  method object-t key=(object-t self, object-t key)
+  method object-t set-key(object-t self, object-t key)
   {
     self.key = key;
     return self;
   }
 
-  method object-t element=(object-t self, object-t element)
+  method object-t set-element(object-t self, object-t element)
   {
     self.element = element;
     return self;

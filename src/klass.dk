@@ -476,7 +476,7 @@ klass klass
     method-t m = DKT-METHOD-FOR-SELECTOR(&self.methods, selector);
     DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
-      dk:bit=(self.behavior, cast(uint32-t)selector, false);
+      dk:set-bit(self.behavior, cast(uint32-t)selector, false);
     return m;
   }
 
@@ -485,7 +485,7 @@ klass klass
     assert(selector < self.methods.count);
     DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
-      dk:bit=(self.behavior, cast(uint32-t)selector, true);
+      dk:set-bit(self.behavior, cast(uint32-t)selector, true);
     return m;
   }
 
@@ -659,7 +659,7 @@ klass klass
 
             if (nullptr != self.behavior)
             {
-              dk:bit=(self.behavior, cast(uint32-t)selector, true);
+              dk:set-bit(self.behavior, cast(uint32-t)selector, true);
             }
           }
           else
@@ -737,7 +737,7 @@ klass klass
 
       for (uint32-t index = 0; index < self.methods.count; index++)
         if (cast(method-t)NULL-METHOD != self.methods.addrs[index])
-          dk:bit=(self.behavior, index, true);
+          dk:set-bit(self.behavior, index, true);
     }
     return self.behavior;
   }

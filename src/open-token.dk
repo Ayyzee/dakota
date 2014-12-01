@@ -50,7 +50,7 @@ klass open-token
     return self;
   }
 
-  method object-t close-token=(object-t self, object-t close-token)
+  method object-t set-close-token(object-t self, object-t close-token)
   {
     assert(null == self.close-token);
     self.close-token = close-token;
