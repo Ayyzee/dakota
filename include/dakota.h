@@ -68,6 +68,8 @@
   #define designated_init __attribute__((__designated_init__))
 #endif
 
+#define unbox_attrs pure hot nothrow
+
 #if !defined HAVE_STRERROR_NAME
   export const char8_t* strerror_name(int_t errno);
 #endif
@@ -82,7 +84,7 @@
 //       cast(double)(4)
 //       cast(double)4
 #define cast(t) (t)
-#define DKT_ARRAY_LENGTH(array) (sizeof((array))/sizeof((array)[0]))
+#define DK_ARRAY_LENGTH(array) (sizeof((array))/sizeof((array)[0]))
 
 #define dkt_klass(object)   (object)->klass
 #define dkt_superklass(kls) klass::unbox(kls)->superklass

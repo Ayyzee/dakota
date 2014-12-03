@@ -47,7 +47,7 @@ set-name(int-t errnum, const char8-t* name)
   assert(nullptr != name);
   assert(NUL != name[0]);
 //   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);
-  assert(errnum <= cast(int-t)DKT-ARRAY-LENGTH(gbl-sys-err-names));
+  assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
   if (isdigit(gbl-sys-err-names[errnum][0]))
     gbl-sys-err-names[errnum] = name;
   else
@@ -68,7 +68,7 @@ set-name(int-t errnum, const char8-t* name)
 const char8-t*
 strerror-name(int-t errnum)
 {
-  assert(errnum <= cast(int-t)DKT-ARRAY-LENGTH(gbl-sys-err-names));
+  assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
   const char8-t* name = gbl-sys-err-names[errnum];
   return name;
 }

@@ -571,8 +571,8 @@ sub rule_replace
 
 sub dk_lang_user_data {
     my $user_data;
-    if ($ENV{'DKT_LANG_USER_DATA'})
-    { my $path = $ENV{'DKT_LANG_USER_DATA'};
+    if ($ENV{'DK_LANG_USER_DATA_PATH'})
+    { my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
       $user_data = do $path or die "Can not find $path." }
     else
     { my $path = "$prefix/src/dkt-lang-user-data.pl";
@@ -585,8 +585,8 @@ unless (caller) {
     my $user_data = &dk_lang_user_data();
 
     my $macros;
-    if ($ENV{'DKT_MACROS_PATH'})
-    { my $path = $ENV{'DKT_MACROS_PATH'};  $macros = do $path or die "Can not find $path." }
+    if ($ENV{'DK_MACROS_PATH'})
+    { my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "Can not find $path." }
     else
     { my $path = "$prefix/src/macros.pl"; $macros = do $path or die "Can not find $path." }
 

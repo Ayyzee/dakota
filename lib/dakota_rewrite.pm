@@ -136,7 +136,7 @@ my $rewrite_compound_literal_names =
     'vector' => undef,
 };
 
-my $use_compound_literals = $ENV{'DKT_USE_COMPOUND_LITERALS'};
+my $use_compound_literals = $ENV{'DK_USE_COMPOUND_LITERALS'};
 
 sub rewrite_compound_literal
 {
@@ -890,23 +890,45 @@ sub rewrite_supers
 
 sub rewrite_for_each_replacement
 {
-    my ($type, $element, $sequence) = @_;
+    my ($type, $element, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
+    my $first_stmt = '';
     my $result = "for (object-t _iterator_ = dk:forward-iterator($sequence);";
     
     if ('object-t' eq $type)
     {
-        $result .= " $type $element = dk:next(_iterator_); )";
+        $result .= " object-t $element = dk:next(_iterator_);";
+	$result .= " /**/)";
+	if (!$open_brace) { # $ws2 will be undefined
+	    $first_stmt .= "$ws1$stmt$ws3";
+	} else {
+	    $first_stmt .= "$ws1\{$ws2$stmt$ws3";
+	}
     }
     elsif ('slots-t*' eq $type)
     {
-        $result .= " $type $element = unbox(dk:next(_iterator_)); )";
+        $result .= " object-t _element_ = dk:next(_iterator_);";
+	$result .= " /**/)";
+
+	if (!$open_brace) { # $ws2 will be undefined
+	    $first_stmt .= "$ws1\{ $type $element = unbox(_element_); $stmt \}$ws3";
+	} else {
+	    $first_stmt .= "$ws1\{$ws2$type $element = unbox(_element_); $stmt$ws3";
+	}
     }
     elsif ($type =~ m|($k+?)-t|)
     {
-        $result .= " $type $element = $1:unbox(dk:next(_iterator_)); )";
+        $result .= " object-t _element_ = dk:next(_iterator_);";
+	$result .= " /**/)";
+
+	if (!$open_brace) { # $ws2 will be undefined
+	    $first_stmt .= "$ws1\{ $type $element = $1:unbox(_element_); $stmt \}$ws3";
+	} else {
+	    $first_stmt .= "$ws1\{$ws2$type $element = $1:unbox(_element_); $stmt$ws3";
+	}
     }
     else
     { die __FILE__, ":", __LINE__, ": error:\n"; }
+    $result .= $first_stmt;
     return $result;
 }
 
@@ -914,7 +936,7 @@ sub rewrite_for_each
 {
     my ($filestr_ref) = @_;
     # for ( object-t xx : yy )
-    $$filestr_ref =~ s|for\s*\(\s*($k+\*?)\s*($k+)\s+in\s+(.*?)\s*\)|&rewrite_for_each_replacement($1, $2, $3)|gse;
+    $$filestr_ref =~ s|for\s*\(\s*($k+\*?)\s*($k+)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)|&rewrite_for_each_replacement($1, $2, $3, $4, $5, $6, $7, $8)|gse;
 }
 
 sub rewrite_slot_access

@@ -540,7 +540,7 @@ init-runtime()
 
     // export
     static property-t[] gbl-exported-null-klass-props = { { $name, cast(uintptr-t)$null } };
-    static named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DKT-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
+    static named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DK-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
     export-klass(&gbl-exported-null-klass);
 
     gbl-null-klass = dk-klass-for-name($null); // null:__klass__ does not exist
@@ -1440,7 +1440,7 @@ info-for-name(symbol-t klass-name) throw(object-t)
 {
   assert(nullptr != klass-name);
   property-t[] properties = { { $name, cast(uintptr-t)klass-name } };
-  named-info-node-t info = { properties, DKT-ARRAY-LENGTH(properties), nullptr };
+  named-info-node-t info = { properties, DK-ARRAY-LENGTH(properties), nullptr };
   named-info-node-t* info-ptr = &info;
   named-info-node-t** klass-info-ptr = cast(named-info-node-t**)sorted-array:bsearch(gbl-klass-defns-table, &info-ptr);
 

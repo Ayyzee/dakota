@@ -685,12 +685,12 @@ sub exec_cmd
 	$$root_cmd{'opts'}{'directory'} ne '.' &&
 	$$root_cmd{'opts'}{'directory'} ne './')
     {
-	$ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
+	$ENV{'DK_DIR'} = "$$root_cmd{'opts'}{'directory'}";
     }
 
-    if ($ENV{'DKT_DIR'})
+    if ($ENV{'DK_DIR'})
     {
-	#print STDERR "DKT_DIR=$ENV{'DKT_DIR'}\n";
+	#print STDERR "DK_DIR=$ENV{'DK_DIR'}\n";
 	open (STDERR, "|dkt-fixup-stderr.pl") or die;
     }
 
