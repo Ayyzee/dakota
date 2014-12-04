@@ -2497,52 +2497,6 @@ sub linkage_unit::generate_klasses_body
                 }
                 }
                 }
-                ### create()
-                if (0) {
-                $$scratch_str_ref .= &dk::print_in_col_string($col, "noexport slots-t* create(slots-t* arg)");
-                if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                {
-                    $$scratch_str_ref .= &dk::print(";\n");
-                }
-                elsif (&is_rt_decl() || &is_rt_defn())
-                {
-                    $$scratch_str_ref .= &dk::print("\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                    $col++;
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "slots-t* s = cast(slots-t*)malloc(sizeof(slots-t));\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "memset(s, 0, sizeof(slots-t));\n");
-
-                    if (&is_array_type($$klass_scope{'slots'}{'type'}))
-                    {
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "memcpy(s, arg, sizeof(slots-t)); // unfortunate\n");
-                    }
-                    else
-                    {
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "*s = *arg;\n");
-                    }
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "return s;\n");
-                    $col--;
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
-                }
-                if (!&is_array_type($$klass_scope{'slots'}{'type'}))
-                {
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "noexport slots-t* create(slots-t arg)");
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print(";\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-                        $$scratch_str_ref .= &dk::print("\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $col++;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "slots-t* s = create(&arg);\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "return s;\n");
-                        $col--;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
-                    }
-                }
-            }
             }
         }
     } # if ('klass' eq $klass_type)
