@@ -2168,7 +2168,7 @@ sub has_object_method_defn
     }
     return $result;
 }
-sub generate_unbox
+sub generate_klass_unbox
 {
     my ($klass_path, $is_klass_defn) = @_;
     my $result = &labeled_src_str(undef, 'klass-slots-unbox');
@@ -2354,7 +2354,7 @@ sub linkage_unit::generate_klasses_body
 	}
         if (&has_slots($klass_scope))
         {
-	    $$scratch_str_ref .= &generate_unbox($klass_path, $is_klass_defn);
+	    $$scratch_str_ref .= &generate_klass_unbox($klass_path, $is_klass_defn);
         } # if (&has_slots()
         if ('object' eq &path::string($klass_path))
         {
