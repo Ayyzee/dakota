@@ -2171,7 +2171,7 @@ sub has_object_method_defn
 sub generate_klass_unbox
 {
     my ($klass_path, $klass_name, $is_klass_defn) = @_;
-    my $result = &labeled_src_str(undef, 'klass-slots-unbox');
+    my $result = '';
     my $col = 0;
     if ($klass_name eq 'object')
     {
@@ -2202,11 +2202,11 @@ sub generate_klass_unbox
 	    $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)");
 	    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
 	    {
-		$result .= &dk::print("; } // general-case\n");
+		$result .= &dk::print("; }\n"); # general-case
 	    }
 	    elsif (&is_rt_decl() || &is_rt_defn())
 	    {
-		$result .= &dk::print(" // general-case\n");
+		$result .= &dk::print("\n"); # general-case
 		$result .= &dk::print_in_col_string($col, "{\n");
 		$result .= &dk::print_in_col_string($col + 1, "DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n");
 		$result .= &dk::print_in_col_string($col + 1, "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + klass:unbox(klass)->offset);\n");
@@ -2220,7 +2220,7 @@ sub generate_klass_unbox
 sub generate_klass_box
 {
     my ($klass_scope, $klass_path, $klass_name) = @_;
-    my $result = &labeled_src_str(undef, 'klass-slots-box');
+    my $result = '';
     my $col = 0;
 
     if ('object' eq &path::string($klass_path))
@@ -2329,12 +2329,16 @@ sub generate_klass_box
 	    }
 	}
     }
+    if (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope))
+    {
+	$result .= &dk::print_in_col_string($col, "using $klass_name:box;\n");
+    }
     return $result;
 }
 sub generate_klass_construct
 {
     my ($klass_scope, $klass_name) = @_;
-    my $result = &labeled_src_str(undef, 'klass-construct');
+    my $result = '';
     my $col = 0;
     if ($$klass_scope{'slots'}{'cat'} &&
 	'struct' eq $$klass_scope{'slots'}{'cat'}) {
@@ -3323,10 +3327,6 @@ sub linkage_unit::generate_klasses_klass
     {
         $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
         &linkage_unit::generate_klasses_body($klass_scope, $col, $klass_type, $klass_path, $klass_name);
-	if (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope))
-	{
-	    $$scratch_str_ref .= &dk::print_in_col_string($col, "using $cxx_klass_name:box;\n");
-	}
     }
     else
     #elsif (!&has_exported_slots($klass_scope) && !&is_exported($klass_scope))
