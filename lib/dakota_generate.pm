@@ -2331,6 +2331,45 @@ sub generate_klass_box
     }
     return $result;
 }
+sub generate_klass_construct
+{
+    my ($klass_scope, $klass_name) = @_;
+    my $result = &labeled_src_str(undef, 'klass-construct');
+    my $col = 0;
+    if ($$klass_scope{'slots'}{'cat'} &&
+	'struct' eq $$klass_scope{'slots'}{'cat'}) {
+	if (!$ENV{'DK_USE_COMPOUND_LITERALS'}) {
+	    if (&has_slots_info($klass_scope))
+	    {
+		my ($pairs, $names) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
+
+		if ($pairs =~ m/\[/g)
+		{}
+		else
+		{
+                    $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport slots-t construct($pairs)");
+
+                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+                    {
+                        $result .= &dk::print("; }\n");
+                    }
+                    elsif (&is_rt_decl() || &is_rt_defn())
+                    {
+                        my $var_name = 'result';
+                        $result .= &dk::print("\n");
+                        $result .= &dk::print_in_col_string($col, "{\n");
+                        $col++;
+                        $result .= &dk::print_in_col_string($col, "slots-t $var_name = { $names };\n");
+                        $result .= &dk::print_in_col_string($col, "return $var_name;\n");
+                        $col--;
+                        $result .= &dk::print_in_col_string($col, "} }\n");
+                    }
+		}
+	    }
+	}
+    }
+    return $result;
+}
 sub linkage_unit::generate_klasses_body
 {
     my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
@@ -2458,47 +2497,12 @@ sub linkage_unit::generate_klasses_body
         if (&has_slots($klass_scope))
         {
 	    $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
+	    $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
         } # if (&has_slots()
-	$$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
-        if ('object' ne &path::string($klass_path))
-        {
-            if (&has_exported_slots($klass_scope))
-            {
-                ### construct
-                if ($$klass_scope{'slots'}{'cat'} &&
-		    'struct' eq $$klass_scope{'slots'}{'cat'}) {
-                if (!$ENV{'DK_USE_COMPOUND_LITERALS'}) {
-                if (&has_slots_info($klass_scope))
-                {
-                    my ($pairs, $names) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
-
-		    if ($pairs =~ m/\[/g)
-		    {}
-		    else
-		    {
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport slots-t construct($pairs)");
-
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print("; }\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-                        my $var_name = 'result';
-                        $$scratch_str_ref .= &dk::print("\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $col++;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "slots-t $var_name = { $names };\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "return $var_name;\n");
-                        $col--;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                    }
-                    }
-                }
-                }
-                }
-            }
-        }
+	if (&has_exported_slots($klass_scope))
+	{
+	    $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
+	}
     } # if ('klass' eq $klass_type)
     if ($$klass_scope{'has-initialize'})
     {
