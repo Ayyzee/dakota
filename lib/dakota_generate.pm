@@ -2170,10 +2170,9 @@ sub has_object_method_defn
 }
 sub generate_klass_unbox
 {
-    my ($klass_path, $is_klass_defn) = @_;
+    my ($klass_path, $klass_name, $is_klass_defn) = @_;
     my $result = &labeled_src_str(undef, 'klass-slots-unbox');
     my $col = 0;
-    my $klass_name = &path::string($klass_path);
     if ($klass_name eq 'object')
     {
 	#$result .= &dk::print_in_col_string($col, "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n");
@@ -2241,16 +2240,7 @@ sub linkage_unit::generate_klasses_body
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { /*noexport*/ symbol-t __klass__ = dk-intern(\"@$klass_path\"); }\n");
     }
 
-    if ('trait' eq $klass_type)
-    {
-	#my $is_exported;
-	#if (exists $$klass_scope{'enum'})
-	#{
-        #    $$scratch_str_ref .= &dk::print_in_col_string($col, "//if\n");
-	#    &generate_enum_defn($col, $$klass_scope{'enum'}{'info'}, $is_exported = 1);
-	#}
-    }
-    elsif ('klass' eq $klass_type)
+    if ('klass' eq $klass_type)
     {
         if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
         {
@@ -2354,7 +2344,7 @@ sub linkage_unit::generate_klasses_body
 	}
         if (&has_slots($klass_scope))
         {
-	    $$scratch_str_ref .= &generate_klass_unbox($klass_path, $is_klass_defn);
+	    $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
         } # if (&has_slots()
         if ('object' eq &path::string($klass_path))
         {
