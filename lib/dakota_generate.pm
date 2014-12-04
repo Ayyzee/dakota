@@ -2217,7 +2217,120 @@ sub generate_klass_unbox
     }
     return $result;
 }
+sub generate_klass_box
+{
+    my ($klass_scope, $klass_path, $klass_name) = @_;
+    my $result = &labeled_src_str(undef, 'klass-slots-box');
+    my $col = 0;
 
+    if ('object' eq &path::string($klass_path))
+    {
+	### box() non-array-type
+	$result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t* arg)");
+	
+	if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+	{
+	    $result .= &dk::print("; }\n");
+	}
+	elsif (&is_rt_decl() || &is_rt_defn())
+	{
+	    $result .= &dk::print("\n");
+	    $result .= &dk::print_in_col_string($col, "{\n");
+	    $col++;
+	    $result .= &dk::print_in_col_string($col, "return arg;\n");
+	    $col--;
+	    $result .= &dk::print_in_col_string($col, "} }\n");
+	}
+    }
+    else
+    {
+	if (&has_exported_slots($klass_scope))
+	{
+	    ### box()
+	    if (&is_array_type($$klass_scope{'slots'}{'type'}))
+	    {
+		### box() array-type
+		$result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t arg)");
+                
+		if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+		{
+		    $result .= &dk::print("; }\n");
+		}
+		elsif (&is_rt_decl() || &is_rt_defn())
+		{
+		    $result .= &dk::print("\n");
+		    $result .= &dk::print_in_col_string($col, "{\n");
+		    $col++;
+		    $result .= &dk::print_in_col_string($col, "object-t object = make(klass);\n");
+		    $result .= &dk::print_in_col_string($col, "slots-t* s = unbox(object);\n");
+
+		    $result .= &dk::print_in_col_string($col, "memcpy(*s, arg, sizeof(slots-t)); // unfortunate\n");
+
+		    $result .= &dk::print_in_col_string($col, "return object;\n");
+		    $col--;
+		    $result .= &dk::print_in_col_string($col, "} }\n");
+		}
+		$result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t* arg)");
+		
+		if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+		{
+		    $result .= &dk::print("; }\n");
+		}
+		elsif (&is_rt_decl() || &is_rt_defn())
+		{
+		    $result .= &dk::print("\n");
+		    $result .= &dk::print_in_col_string($col, "{\n");
+		    $col++;
+		    $result .= &dk::print_in_col_string($col, "object-t object = box(*arg);\n");
+		    $result .= &dk::print_in_col_string($col, "return object;\n");
+		    $col--;
+		    $result .= &dk::print_in_col_string($col, "} }\n");
+		}
+	    }
+	    else # !&is_array_type()
+	    {
+		### box() non-array-type
+		$result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t* arg)");
+                
+		if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+		{
+		    $result .= &dk::print("; }\n");
+		}
+		elsif (&is_rt_decl() || &is_rt_defn())
+		{
+		    $result .= &dk::print("\n");
+		    $result .= &dk::print_in_col_string($col, "{\n");
+		    $col++;
+		    $result .= &dk::print_in_col_string($col, "object-t object = make(klass);\n");
+		    $result .= &dk::print_in_col_string($col, "slots-t* s = unbox(object);\n");
+
+		    $result .= &dk::print_in_col_string($col, "*s = *arg;\n");
+
+		    $result .= &dk::print_in_col_string($col, "return object;\n");
+		    $col--;
+		    $result .= &dk::print_in_col_string($col, "} }\n");
+		}
+		$result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t arg)");
+		
+		if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+		{
+		    $result .= &dk::print("; }\n");
+		}
+		elsif (&is_rt_decl() || &is_rt_defn())
+		{
+		    $result .= &dk::print("\n");
+		    $result .= &dk::print_in_col_string($col, "{\n");
+		    $col++;
+		    $result .= &dk::print_in_col_string($col, "object-t object = box(&arg);\n");
+		    $result .= &dk::print_in_col_string($col, "return object;\n");
+		    $col--;
+		    $result .= &dk::print_in_col_string($col, "} }\n");
+		}
+	    }
+	}
+    }
+    return $result;
+}
 sub linkage_unit::generate_klasses_body
 {
     my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
@@ -2346,111 +2459,11 @@ sub linkage_unit::generate_klasses_body
         {
 	    $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
         } # if (&has_slots()
-        if ('object' eq &path::string($klass_path))
+	$$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
+        if ('object' ne &path::string($klass_path))
         {
-                    ### box() non-array-type
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t box(slots-t* arg)");
-                
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print("; }\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-                        $$scratch_str_ref .= &dk::print("\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $col++;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "return arg;\n");
-                        $col--;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                    }
-	}
-	else
-	{
             if (&has_exported_slots($klass_scope))
             {
-                ### box()
-                if (&is_array_type($$klass_scope{'slots'}{'type'}))
-                {
-                    ### box() array-type
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t box(slots-t arg)");
-                
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print("; }\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-                        $$scratch_str_ref .= &dk::print("\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $col++;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t object = make(klass);\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "slots-t* s = unbox(object);\n");
-
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "memcpy(*s, arg, sizeof(slots-t)); // unfortunate\n");
-
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "return object;\n");
-                        $col--;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                    }
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t box(slots-t* arg)");
-                        
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print("; }\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-                        $$scratch_str_ref .= &dk::print("\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $col++;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t object = box(*arg);\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "return object;\n");
-                        $col--;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                    }
-                }
-                else # !&is_array_type()
-                {
-                    ### box() non-array-type
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t box(slots-t* arg)");
-                
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print("; }\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-                        $$scratch_str_ref .= &dk::print("\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $col++;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t object = make(klass);\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "slots-t* s = unbox(object);\n");
-
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "*s = *arg;\n");
-
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "return object;\n");
-                        $col--;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                    }
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t box(slots-t arg)");
-                        
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print("; }\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-                        $$scratch_str_ref .= &dk::print("\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $col++;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t object = box(&arg);\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "return object;\n");
-                        $col--;
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                    }
-                }
-
                 ### construct
                 if ($$klass_scope{'slots'}{'cat'} &&
 		    'struct' eq $$klass_scope{'slots'}{'cat'}) {
