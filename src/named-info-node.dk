@@ -108,7 +108,7 @@ klass named-info-node
     symbol-t other-name = cast(symbol-t)at(other-s, $name);
     //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
     int-t result = symbol:compare(s-name, other-name);
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 
@@ -132,7 +132,7 @@ klass named-info-node
     {
       result = dk:compare(super, other);
     }
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

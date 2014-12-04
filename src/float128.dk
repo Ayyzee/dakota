@@ -20,4 +20,4 @@ klass float128
 {
   slots long double;
 }
-compile-assert(16 == sizeof(float128-t));
+dkt-compile-assert(16 == sizeof(float128-t));

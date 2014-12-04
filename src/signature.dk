@@ -45,7 +45,7 @@ klass signature
     int-t result = safe-strcmp(s->name, other-s->name);
     if (0 == result)
       result = safe-strcmp(s->parameter-types, other-s->parameter-types);
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 
@@ -72,7 +72,7 @@ klass signature
     {
       result = dk:compare(super, other);
     }
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

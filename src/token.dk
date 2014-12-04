@@ -262,7 +262,7 @@ klass token
   {
   //fprintf(stderr, "%s <=> %s\n", unbox(self)->buffer, unbox(other)->buffer);
     int-t result = safe-strcmp(unbox(self)->buffer, unbox(other)->buffer);
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

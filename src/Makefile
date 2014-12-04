@@ -89,7 +89,7 @@ all:
 	$(MAKE) $(MFLAGS) dakota-util
 
 tst: tst-main.$(dk_ext)
-	CXXFLAGS="--debug=3" $(DAKOTA) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name) --output $@ $^
+	CXXFLAGS="${CXXFLAGS} --debug=3" $(DAKOTA) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 check: all install
 	$(rootdir)/bin/dakota-introspector$(exeext) $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name)

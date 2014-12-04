@@ -90,14 +90,14 @@
 #define dkt_superklass(kls) klass::unbox(kls)->superklass
 #define dkt_name(kls)       klass::unbox(kls)->name
 
-#define normalize_compare_result(n) ((n) < 0) ? -1 : ((n) > 0) ? 1 : 0
-#define else_if   else if
+#define dkt_normalize_compare_result(n) ((n) < 0) ? -1 : ((n) > 0) ? 1 : 0
+#define dkt_raw_signature(name,args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __raw_signature::name))()
+#define dkt_signature(name, args)    (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __signature::name))()
+#define dkt_ka_signature(name, args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __ka_signature::name))()
+
+#define selector(name, args)    *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
 #define unless(e) if (0 == (e))
 #define until(e)  while (0 == (e))
-#define raw_signature(name,args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __raw_signature::name))()
-#define signature(name, args)    (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __signature::name))()
-#define ka_signature(name, args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __ka_signature::name))()
-#define selector(name, args)    *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
 
 #define intstr(c1, c2, c3, c4) \
    ((((cast(int32_t)cast(char8_t) c1) << 24) & 0xff000000) | \
@@ -113,7 +113,7 @@
 typedef int_t dkt_va_arg_boole_t;
 typedef va_list va_list_t;
 
-#define compile_assert(v) typedef void* compile_assert_failed[(v) ? 1 : -1]
+#define dkt_compile_assert(v) typedef void* dkt_compile_assert_failed[(v) ? 1 : -1]
 
 #if defined DEBUG
   #define DKT_TRACE(statement) statement
@@ -170,6 +170,9 @@ constexpr uintmax_t dk_hash(const char8_t* str)
 import symbol_t dk_intern(const char8_t*);
 import object_t dk_klass_for_name(symbol_t);
 
+import void dkt_register_info(named_info_node_t*);
+import void dkt_deregister_info(named_info_node_t*);
+
 #if defined DEBUG
   import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
   import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
@@ -210,11 +213,4 @@ import void dkt_null_method(object_t object, ...);
 #else
   #define DKT_NULL_METHOD dkt_null_method
 #endif
-
-struct dkt_tbl_t {
-  void (*register_info)(named_info_node_t*);
-  void (*deregister_info)(named_info_node_t*);
-};
-import extern dkt_tbl_t& dkt_tbl;
-
 #endif // __dakota_h__

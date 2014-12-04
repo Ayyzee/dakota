@@ -20,4 +20,4 @@ klass float32
 {
   slots float;
 }
-compile-assert(4 == sizeof(float32-t));
+dkt-compile-assert(4 == sizeof(float32-t));

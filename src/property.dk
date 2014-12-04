@@ -31,7 +31,7 @@ klass property
   method int-t compare(slots-t* slots, slots-t* other-slots)
   {
     int-t result = symbol:compare(slots->key, other-slots->key);
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 
@@ -56,7 +56,7 @@ klass property
     {
       result = dk:compare(super, other);
     }
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

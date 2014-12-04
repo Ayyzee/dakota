@@ -37,7 +37,7 @@ klass symbol
       result = 0;
     else
       result = cast(int-t)safe-strcmp(s, other-s);
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
     return result;
   }
@@ -62,7 +62,7 @@ klass symbol
     {
       result = dk:compare(super, other);
     }
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 

@@ -100,7 +100,7 @@ klass named-assoc-node
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
     int-t result = symbol:compare(cast(symbol-t)(s->name), cast(symbol-t)(other-s->name)); // hackhack
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 
@@ -484,7 +484,7 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
 }
 static named-info-node-t* gbl-registration-info-list;
 
-noexport void register-info(named-info-node-t* registration-info);
+noexport void register-info_common(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
 
 // object klass' superklass is null instance
@@ -507,7 +507,7 @@ init-runtime()
     {
       gbl-registration-info-list = gbl-registration-info-list->next;
       registration-info->next = nullptr;
-      register-info(registration-info);
+      register-info_common(registration-info);
     }
     assert(nullptr == gbl-registration-info-list);
 
@@ -1225,7 +1225,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
 noexport void import-selectors(signature-t**, selector-node-t*); // hackhack
 
 noexport void
-register-info(named-info-node-t* registration-info)
+register-info_common(named-info-node-t* registration-info)
 {
   signature-t**      signatures-va =          cast(signature-t**)     named-info-node:at(registration-info, $signatures-va);
   signature-t**      signatures =             cast(signature-t**)     named-info-node:at(registration-info, $signatures);
@@ -1278,8 +1278,8 @@ add-registration-info(named-info-node-t* registration-info)
   return;
 }
 
-noexport void
-register-all(named-info-node-t* registration-info)
+export void
+dkt-register-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
@@ -1339,8 +1339,8 @@ register-all(named-info-node-t* registration-info)
     fclose(ctlg-output);
   return;
 }
-noexport void
-deregister-all(named-info-node-t* registration-info)
+export void
+dkt_deregister-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   if (NULL != getenv("DKT_INTROSPECTOR_OUTPUT") ||
@@ -1523,9 +1523,3 @@ dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
   return get-klass-chain(klass, buf, buf-len);
 }
 #endif
-
-noexport dkt-tbl-t tbl = {
-  register-all,
-  deregister-all,
-};
-export dkt-tbl-t& dkt-tbl = tbl;

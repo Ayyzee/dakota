@@ -551,7 +551,7 @@ sub generate_defn_footer
     $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
     $col++;
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-tbl.register-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-register-info(&registration-info);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
     $col--;
@@ -561,7 +561,7 @@ sub generate_defn_footer
     $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
     $col++;
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-tbl.deregister-info(&registration-info);\n");
+    $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-deregister-info(&registration-info);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
     $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
     $col--;
@@ -1698,14 +1698,14 @@ sub generics::generate_generic_defn
         $col++;
         if (&is_va($generic))
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list)));\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = object->klass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
         else
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature($generic_name($$new_arg_type_list)));\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = object->klass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
@@ -1815,14 +1815,14 @@ sub generics::generate_super_generic_defn
         $col++;
         if (&is_va($generic))
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list)));\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = klass:unbox(arg0.klass)->superklass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
         else
         {
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature($generic_name($$new_arg_type_list)));\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = klass:unbox(arg0.klass)->superklass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
@@ -3563,11 +3563,11 @@ sub alias_body
 	    my $alias_name = "@{$$method{'alias'}}";
 	    if (&is_va($method))
 	    {
-		$$scratch_str_ref .= &dk::print_in_col_string($col, "{ signature(va:$alias_name($$new_arg_type_list)), signature(va:$generic_name($$new_arg_type_list)) },\n");
+		$$scratch_str_ref .= &dk::print_in_col_string($col, "{ dkt-signature(va:$alias_name($$new_arg_type_list)), dkt-signature(va:$generic_name($$new_arg_type_list)) },\n");
 	    }
 	    else
 	    {
-		$$scratch_str_ref .= &dk::print_in_col_string($col, "{ signature($alias_name($$new_arg_type_list)), signature($generic_name($$new_arg_type_list)) },\n");
+		$$scratch_str_ref .= &dk::print_in_col_string($col, "{ dkt-signature($alias_name($$new_arg_type_list)), dkt-signature($generic_name($$new_arg_type_list)) },\n");
 	    }
 	}
 	$method_num++;
@@ -4519,7 +4519,7 @@ sub generate_ka_method_defn
 #        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
         $col++;
 
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* _ka-signature_ = ka-signature(va:$method_name($$list_types));\n");
+    $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* _ka-signature_ = dkt-ka-signature(va:$method_name($$list_types));\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "throw make(no-such-keyword-exception:klass,\n");
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "           object =>    self,\n");
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "           signature => _ka-signature_,\n");

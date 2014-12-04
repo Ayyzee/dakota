@@ -372,17 +372,17 @@ sub rewrite_signatures
 {
     my ($filestr_ref) = @_;
 
-    $$filestr_ref =~ s/(?<!$k)(signature\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-    $$filestr_ref =~ s/(?<!$k)(signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+    $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\(.*?)(\()/$1,$2/g;
+    $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 
-    $$filestr_ref =~ s/(?<!$k)(ka-signature\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(ka-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-    $$filestr_ref =~ s/(?<!$k)(ka-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+    $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\(.*?)(\()/$1,$2/g;
+    $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 
-    $$filestr_ref =~ s/(?<!$k)(raw-signature\s*\(.*?)(\()/$1,$2/g;
-    $$filestr_ref =~ s/(?<!$k)(raw-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-    $$filestr_ref =~ s/(?<!$k)(raw-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+    $$filestr_ref =~ s/(?<!$k)(dkt-raw-signature\s*\(.*?)(\()/$1,$2/g;
+    $$filestr_ref =~ s/(?<!$k)(dkt-raw-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+    $$filestr_ref =~ s/(?<!$k)(dkt-raw-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 }
 
 sub rewrite_selectors
@@ -552,14 +552,14 @@ sub vars_from_defn
 
     if (!exists $$ka_generics{$name}) # hackhack
     {
-        $result .= " unused /*static*/ const signature-t* __signature__ = signature($name,($params));";
+        $result .= " unused /*static*/ const signature-t* __signature__ = dkt-signature($name,($params));";
     }
     else
     {
         # replace keyword args with va-list-t
         $params =~ s|,[^,]+?/\*=>.*?\*/||g;
         $params .= ", va-list-t";
-        $result .= " unused /*static*/ const signature-t* __signature__ = ka-signature(va:$name,($params));";
+        $result .= " unused /*static*/ const signature-t* __signature__ = dkt-ka-signature(va:$name,($params));";
     }
     $result .= " unused /*static*/ const char8-t* __method__ = __signature__->name;";
     return $result;
@@ -1287,6 +1287,8 @@ sub convert_dk_to_cxx
     &rewrite_dk_klass($filestr_ref);
     &rewrite_syntax($filestr_ref);
     &rewrite_declarations($filestr_ref);
+
+    $$filestr_ref =~ s/else[_-]if/else if/gs;
 
     $$filestr_ref =~ s/,(\s*\})/$1/gs;
 

@@ -76,7 +76,7 @@ klass cstring
   method int-t compare(slots-t* s, slots-t* other-s)
   {
     int-t result = safe-strcmp(s->ptr, other-s->ptr);
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 
@@ -100,7 +100,7 @@ klass cstring
     {
       result = dk:compare(super, other);
     }
-    result = normalize-compare-result(result);
+    result = dkt-normalize-compare-result(result);
     return result;
   }
 
