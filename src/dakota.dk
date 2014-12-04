@@ -484,7 +484,7 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
 }
 static named-info-node-t* gbl-registration-info-list;
 
-noexport void register-info_common(named-info-node-t* registration-info);
+noexport void register-info-common(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
 
 // object klass' superklass is null instance
@@ -507,7 +507,7 @@ init-runtime()
     {
       gbl-registration-info-list = gbl-registration-info-list->next;
       registration-info->next = nullptr;
-      register-info_common(registration-info);
+      register-info-common(registration-info);
     }
     assert(nullptr == gbl-registration-info-list);
 
@@ -1225,7 +1225,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
 noexport void import-selectors(signature-t**, selector-node-t*); // hackhack
 
 noexport void
-register-info_common(named-info-node-t* registration-info)
+register-info-common(named-info-node-t* registration-info)
 {
   signature-t**      signatures-va =          cast(signature-t**)     named-info-node:at(registration-info, $signatures-va);
   signature-t**      signatures =             cast(signature-t**)     named-info-node:at(registration-info, $signatures);
