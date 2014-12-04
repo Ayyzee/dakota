@@ -2168,6 +2168,56 @@ sub has_object_method_defn
     }
     return $result;
 }
+sub generate_unbox
+{
+    my ($klass_path, $is_klass_defn) = @_;
+    my $result = &labeled_src_str(undef, 'klass-slots-unbox');
+    my $col = 0;
+    my $klass_name = &path::string($klass_path);
+    if ($klass_name eq 'object')
+    {
+	#$result .= &dk::print_in_col_string($col, "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n");
+    }
+    elsif ($klass_name eq 'klass')
+    {
+	$result .= &dk::print_in_col_string($col, "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)");
+
+	if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+	{
+	    $result .= &dk::print("; } // special-case\n");
+	}
+	elsif (&is_rt_decl() || &is_rt_defn())
+	{
+	    $result .= &dk::print(" // special-case\n");
+	    $result .= &dk::print_in_col_string($col, "{\n");
+	    $result .= &dk::print_in_col_string($col + 1, "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n");
+	    $result .= &dk::print_in_col_string($col + 1, "return s;\n");
+	    $result .= &dk::print_in_col_string($col, "} }\n");
+	}
+    }
+    else
+    {
+	### unbox() same for all types
+	if ($is_klass_defn || (&has_exported_slots() && &has_slots_info()))
+	{
+	    $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)");
+	    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
+	    {
+		$result .= &dk::print("; } // general-case\n");
+	    }
+	    elsif (&is_rt_decl() || &is_rt_defn())
+	    {
+		$result .= &dk::print(" // general-case\n");
+		$result .= &dk::print_in_col_string($col, "{\n");
+		$result .= &dk::print_in_col_string($col + 1, "DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n");
+		$result .= &dk::print_in_col_string($col + 1, "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + klass:unbox(klass)->offset);\n");
+		$result .= &dk::print_in_col_string($col + 1, "return s;\n");
+		$result .= &dk::print_in_col_string($col, "} }\n");
+	    }
+	}
+    }
+    return $result;
+}
 
 sub linkage_unit::generate_klasses_body
 {
@@ -2304,50 +2354,7 @@ sub linkage_unit::generate_klasses_body
 	}
         if (&has_slots($klass_scope))
         {
-            ### unbox()
-
-            if ('object' eq &path::string($klass_path))
-            {
-                $$scratch_str_ref .= &dk::print_in_col_string($col, "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n");
-            }
-            elsif ('klass' eq &path::string($klass_path))
-            {
-                $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)");
-
-                if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                {
-                    $$scratch_str_ref .= &dk::print("; } // special-case\n");
-                }
-                elsif (&is_rt_decl() || &is_rt_defn())
-                {
-                    $$scratch_str_ref .= &dk::print(" // special-case\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "return s;\n");
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                }
-            }
-            else
-            {
-                ### unbox() same for all types
-                if ($is_klass_defn || (&has_exported_slots() && &has_slots_info()))
-                {
-                    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)");
-                    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl())
-                    {
-                        $$scratch_str_ref .= &dk::print("; } // general-case\n");
-                    }
-                    elsif (&is_rt_decl() || &is_rt_defn())
-                    {
-			$$scratch_str_ref .= &dk::print(" // general-case\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + klass:unbox(klass)->offset);\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "return s;\n");
-                        $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
-                    }
-                }
-            }
+	    $$scratch_str_ref .= &generate_unbox($klass_path, $is_klass_defn);
         } # if (&has_slots()
         if ('object' eq &path::string($klass_path))
         {
