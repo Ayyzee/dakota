@@ -1,7 +1,7 @@
 rootdir := ../../..
 
 include $(rootdir)/config.mk
-include $(rootdir)/common.mk
+include $(rootdir)/vars.mk
 
 DAKOTA := dakota
 

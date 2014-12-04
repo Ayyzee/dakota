@@ -1,3 +1,4 @@
+include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
 #should_pass_dirs := $(dir $(wildcard should-pass/*/Makefile))

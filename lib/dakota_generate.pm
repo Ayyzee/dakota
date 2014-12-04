@@ -1698,26 +1698,20 @@ sub generics::generate_generic_defn
         $col++;
         if (&is_va($generic))
         {
-	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list));\n");
-	    $$scratch_str_ref .= &dk::print("#endif\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = object->klass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
         else
         {
-	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature($generic_name($$new_arg_type_list));\n");
-	    $$scratch_str_ref .= &dk::print("#endif\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature($generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = object->klass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
-	$$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
-        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object), signature => signature);\n");
-	$$scratch_str_ref .= &dk::print("#endif\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object), signature => signature));\n");
         my $arg_names = &deep_copy(&arg_type::names(&deep_copy($$generic{'parameter-types'})));
         my $arg_names_list = &arg_type::list_names($arg_names);
         
@@ -1821,26 +1815,20 @@ sub generics::generate_super_generic_defn
         $col++;
         if (&is_va($generic))
         {
-	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list));\n");
-	    $$scratch_str_ref .= &dk::print("#endif\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature(va:$generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = klass:unbox(arg0.klass)->superklass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
         else
         {
-	    $$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* signature = signature($generic_name($$new_arg_type_list));\n");
-	    $$scratch_str_ref .= &dk::print("#endif\n");
+            $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = signature($generic_name($$new_arg_type_list)));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = klass:unbox(arg0.klass)->superklass;\n");
             $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
         }
-	$$scratch_str_ref .= &dk::print("#if defined DEBUG\n");
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
-        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => arg0.self, superkls => dkt-superklass(arg0.klass), signature => signature);\n");
-	$$scratch_str_ref .= &dk::print("#endif\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => arg0.self, superkls => dkt-superklass(arg0.klass), signature => signature));\n");
         my $arg_names = &deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
         my $arg_names_list = &arg_type::list_names($arg_names);
         
@@ -4496,7 +4484,8 @@ sub generate_ka_method_defn
     my $is_first;
 
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "keyword-t* _keyword_;\n");
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "while (nullptr != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
+	$$scratch_str_ref .= &dk::print_in_col_string($col, "// use NULL (rather than nullptr) because va generic functions use gcc sentinel support (which is specified in terms of NULL).\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "while (NULL != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
         $col++;
         $$scratch_str_ref .= &dk::print_in_col_string($col, "switch (_keyword_->hash) // hash is a constexpr. its compile-time evaluated.\n");
@@ -5146,4 +5135,3 @@ unless (caller) {
 }
 
 1;
-
