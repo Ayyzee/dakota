@@ -270,7 +270,7 @@ noexport symbol-t default-superklass-name();
 noexport symbol-t
 default-klass-name()
 {
-  return klass:__klass__;
+  return klass:__name__;
 }
 noexport object-t
 default-klass()
@@ -512,12 +512,12 @@ init-runtime()
     assert(nullptr == gbl-registration-info-list);
 
     // alloc
-    klass:klass =  alloc-klass(klass:__klass__); // must be first
-    object:klass = alloc-klass(object:__klass__);
+    klass:klass =  alloc-klass(klass:__name__); // must be first
+    object:klass = alloc-klass(object:__name__);
 
     // init()
-    object:klass = init-klass(object:klass, object:__klass__); // must be first
-    klass:klass =  init-klass(klass:klass,  klass:__klass__);
+    object:klass = init-klass(object:klass, object:__name__); // must be first
+    klass:klass =  init-klass(klass:klass,  klass:__name__);
 
     klass:unbox(object:klass)->superklass = nullptr; // special
 
@@ -525,7 +525,7 @@ init-runtime()
     assert(klass:klass == dkt-klass(klass:klass)); // special
 
 #if !defined DKT-OMIT-BEHAVIOR
-    dk-klass-for-name(bit-vector:__klass__);
+    dk-klass-for-name(bit-vector:__name__);
 
     object-t behavior;
     behavior = dk:behavior(object:klass);
@@ -543,14 +543,14 @@ init-runtime()
     static named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DK-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
     export-klass(&gbl-exported-null-klass);
 
-    gbl-null-klass = dk-klass-for-name($null); // null:__klass__ does not exist
+    gbl-null-klass = dk-klass-for-name($null); // null:__name__ does not exist
     null = make(gbl-null-klass);
     klass:unbox(object:klass)->superklass = null; // special
 #endif
 
 #if 1
-    dk-klass-for-name(input-stream:__klass__);
-    dk-klass-for-name(output-stream:__klass__);
+    dk-klass-for-name(input-stream:__name__);
+    dk-klass-for-name(output-stream:__name__);
 
     std-input =  make(input-stream:klass,  file => stdin);
     std-output = make(output-stream:klass, file => stdout);

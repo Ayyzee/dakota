@@ -52,7 +52,7 @@ klass hashed-set
 
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name(vector:__klass__); // hackhack
+    dk-klass-for-name(vector:__name__); // hackhack
     return kls;
   }
 
