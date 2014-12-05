@@ -488,29 +488,40 @@ noexport void register-info-common(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
 
 noexport object-t
-make-simple-singleton(symbol-t name)
+make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
 {
-  // use default superklass (object)
-  // use default klass      (klass)
+  assert(name != nullptr);
+  uint32-t num-klass-props = 1;
+  if (superklass-name != nullptr)
+    num-klass-props++;
+  if (klass-name != nullptr)
+    num-klass-props++;
 
-  // import
-  object-t*     klass-ptr =   cast(object-t*)    malloc(sizeof(object-t));
-  assoc-node-t* klass-assoc = cast(assoc-node-t*)malloc(sizeof(assoc-node-t));
-
-  *klass-ptr = nullptr;
-  *klass-assoc = { cast(uintptr-t)klass-ptr, nullptr };
-  import-klass(name, klass-assoc);
-
-  // export
-  property-t*        klass-props = cast(property-t*)       malloc(sizeof(property-t));
+  property-t*        klass-props = cast(property-t*)       malloc(sizeof(property-t) * num-klass-props);
   named-info-node-t* klass-info =  cast(named-info-node-t*)malloc(sizeof(named-info-node-t));
 
-  *klass-props = { $name, cast(uintptr-t)name };
-  *klass-info = { klass-props, 1, nullptr };
+  // need to be sorted
+  uint_t i = 0;
+  if (klass-name != nullptr)
+    klass-props[i++] = { $klass-name,      cast(uintptr-t)klass-name      };
+
+  klass-props[i++] =   { $name,            cast(uintptr-t)name            };
+
+  if (superklass-name != nullptr)
+    klass-props[i++] = { $superklass-name, cast(uintptr-t)superklass-name };
+
+  *klass-info = { klass-props, num-klass-props, nullptr };
   export-klass(klass-info);
 
-  *klass-ptr = dk-klass-for-name(name); // <name>:__name__ does not exist
-  object-t instance = make(*klass-ptr);
+  object-t klass = dk-klass-for-name(name);
+  return klass;
+}
+
+noexport object-t
+make-simple-singleton(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
+{
+  object-t klass = make-simple-klass(name, superklass-name, klass-name);
+  object-t instance = make(klass);
   return instance;
 }
 
@@ -560,7 +571,7 @@ init-runtime()
     behavior = dk:behavior(bit-vector:klass);
 #endif
 #if 1
-    null = make-simple-singleton($null);
+    null = make-simple-singleton($null, $object, $klass);
     klass:unbox(object:klass)->superklass = null; // special
 #endif
 
