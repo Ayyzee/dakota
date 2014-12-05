@@ -487,6 +487,26 @@ static named-info-node-t* gbl-registration-info-list;
 noexport void register-info-common(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
 
+noexport object-t
+make-null-singleton()
+{
+    // import
+    static object-t gbl-null-klass = nullptr;
+    static assoc-node-t gbl-imported-null-klass = { cast(uintptr-t)&gbl-null-klass, nullptr };
+    import-klass($null, &gbl-imported-null-klass);
+
+    // export
+    static property-t[] gbl-exported-null-klass-props = { { $name, cast(uintptr-t)$null } };
+    static named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props,
+                                                         DK-ARRAY-LENGTH(gbl-exported-null-klass-props),
+                                                         nullptr };
+    export-klass(&gbl-exported-null-klass);
+
+    gbl-null-klass = dk-klass-for-name($null); // null:__name__ does not exist
+    object-t null = make(gbl-null-klass);
+    return null;
+}
+
 // object klass' superklass is null instance
 // klass klass'  superklass is object klass
 // null klass'   superklass is object klass
@@ -533,18 +553,7 @@ init-runtime()
     behavior = dk:behavior(bit-vector:klass);
 #endif
 #if 1
-    // import
-    static object-t gbl-null-klass = nullptr;
-    static assoc-node-t gbl-imported-null-klass = { cast(uintptr-t)&gbl-null-klass, nullptr };
-    import-klass($null, &gbl-imported-null-klass);
-
-    // export
-    static property-t[] gbl-exported-null-klass-props = { { $name, cast(uintptr-t)$null } };
-    static named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props, DK-ARRAY-LENGTH(gbl-exported-null-klass-props), nullptr };
-    export-klass(&gbl-exported-null-klass);
-
-    gbl-null-klass = dk-klass-for-name($null); // null:__name__ does not exist
-    null = make(gbl-null-klass);
+    null = make-null-singleton();
     klass:unbox(object:klass)->superklass = null; // special
 #endif
 

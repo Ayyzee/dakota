@@ -68,7 +68,7 @@ ifndef DKT_USE_COMPOUND_LITERALS
 endif
 
 ifndef MIN_EXTRA_CXXFLAGS
-  #EXTRA_CXXFLAGS += --define-macro DEBUG
+  EXTRA_CXXFLAGS += --define-macro DEBUG
   #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
   #EXTRA_CXXFLAGS += --define-macro DKT_USE_MAKE_MACRO
   #ifdef __LP64__

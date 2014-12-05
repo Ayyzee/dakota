@@ -24,5 +24,11 @@ int-t main()
   printf("klass=%s\n", dk:utf8-from(dk:klass(o)));
   printf("superklass=%s\n", dk:utf8-from(dk:superklass(dk:klass(o))));
   dk:dump(dk:superklass(dk:klass(o)));
+  char8-t buf[1024] = "";
+  printf("klass-chain=%s\n", dkt-get-klass-chain(dk:klass(o), buf, sizeof(buf)));
+
+  printf("klass-chain=%s\n", dkt-get-klass-chain(dk:klass(null), buf, sizeof(buf)));
+  dk:dump(null);
+  dk:dump(dk:klass(null));
   return 0;
 }
