@@ -488,23 +488,30 @@ noexport void register-info-common(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
 
 noexport object-t
-make-null-singleton()
+make-simple-singleton(symbol-t name)
 {
-    // import
-    static object-t gbl-null-klass = nullptr;
-    static assoc-node-t gbl-imported-null-klass = { cast(uintptr-t)&gbl-null-klass, nullptr };
-    import-klass($null, &gbl-imported-null-klass);
+  // use default superklass (object)
+  // use default klass      (klass)
 
-    // export
-    static property-t[] gbl-exported-null-klass-props = { { $name, cast(uintptr-t)$null } };
-    static named-info-node-t gbl-exported-null-klass = { gbl-exported-null-klass-props,
-                                                         DK-ARRAY-LENGTH(gbl-exported-null-klass-props),
-                                                         nullptr };
-    export-klass(&gbl-exported-null-klass);
+  // import
+  object-t*     klass-ptr =   cast(object-t*)    malloc(sizeof(object-t));
+  assoc-node-t* klass-assoc = cast(assoc-node-t*)malloc(sizeof(assoc-node-t));
 
-    gbl-null-klass = dk-klass-for-name($null); // null:__name__ does not exist
-    object-t null = make(gbl-null-klass);
-    return null;
+  *klass-ptr = nullptr;
+  *klass-assoc = { cast(uintptr-t)klass-ptr, nullptr };
+  import-klass(name, klass-assoc);
+
+  // export
+  property-t*        klass-props = cast(property-t*)       malloc(sizeof(property-t));
+  named-info-node-t* klass-info =  cast(named-info-node-t*)malloc(sizeof(named-info-node-t));
+
+  *klass-props = { $name, cast(uintptr-t)name };
+  *klass-info = { klass-props, 1, nullptr };
+  export-klass(klass-info);
+
+  *klass-ptr = dk-klass-for-name(name); // <name>:__name__ does not exist
+  object-t instance = make(*klass-ptr);
+  return instance;
 }
 
 // object klass' superklass is null instance
@@ -553,7 +560,7 @@ init-runtime()
     behavior = dk:behavior(bit-vector:klass);
 #endif
 #if 1
-    null = make-null-singleton();
+    null = make-simple-singleton($null);
     klass:unbox(object:klass)->superklass = null; // special
 #endif
 
