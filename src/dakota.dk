@@ -489,8 +489,8 @@ static named-info-node-t* gbl-registration-info-list;
 noexport void register-info-common(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
 
-noexport object-t
-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
+export object-t
+dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
 {
   assert(name != nullptr);
   uint32-t num-klass-props = 1;
@@ -554,7 +554,7 @@ init-runtime()
     klass:unbox(object:klass)->superklass = nullptr;
 #if 1
     dk-klass-for-name(singleton-klass:__name__);
-    null-klass = make-simple-klass($null, $object, $singleton-klass);
+    null-klass = dk-make-simple-klass($null, $object, $singleton-klass);
     null = make(null-klass);
     klass:unbox(object:klass)->superklass = null;
 #endif

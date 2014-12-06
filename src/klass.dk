@@ -763,6 +763,7 @@ klass klass
     return result;
   }
 
+  // called from init-klass() from dk-init-runtime()
   noexport object-t init(object-t self, named-info-node:slots-t* info-slots)
   {
     if (nullptr == info-slots)
