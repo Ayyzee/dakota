@@ -4452,8 +4452,7 @@ sub generate_ka_method_defn
     my $is_first;
 
 	$$scratch_str_ref .= &dk::print_in_col_string($col, "keyword-t* _keyword_;\n");
-	$$scratch_str_ref .= &dk::print_in_col_string($col, "// use NULL (rather than nullptr) because va generic functions use gcc sentinel support (which is specified in terms of NULL).\n");
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "while (NULL != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
+        $$scratch_str_ref .= &dk::print_in_col_string($col, "while (nullptr != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
         $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
         $col++;
         $$scratch_str_ref .= &dk::print_in_col_string($col, "switch (_keyword_->hash) // hash is a constexpr. its compile-time evaluated.\n");

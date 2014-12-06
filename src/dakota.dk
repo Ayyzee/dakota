@@ -58,6 +58,7 @@ klass std-compare;
 klass str128;
 klass super;
 klass symbol;
+klass singleton-klass;
 
 #if DKT-WORKAROUND
 namespace property
@@ -550,16 +551,18 @@ init-runtime()
     object:klass = init-klass(object:klass, object:__name__); // must be first
     klass:klass =  init-klass(klass:klass,  klass:__name__);
 
+    klass:unbox(object:klass)->superklass = nullptr;
 #if 1
-    null-klass = make-simple-klass($null, $object, $klass);
+    dk-klass-for-name(singleton-klass:__name__);
+    null-klass = make-simple-klass($null, $object, $singleton-klass);
     null = make(null-klass);
     klass:unbox(object:klass)->superklass = null;
-    //assert(null == dkt-superklass(object:klass));
-#else
-    klass:unbox(object:klass)->superklass = nullptr;
-    //assert(nullptr == dkt-superklass(object:klass));
 #endif
     assert(klass:klass == dkt-klass(klass:klass));
+
+    // core runtime klasses are setup
+    // klasses: object, klass, (optionally) singleton-klass
+    // and (optionally) null-klass and null singleton
 
 #if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(bit-vector:__name__);
@@ -596,7 +599,7 @@ init-runtime()
     dk:dump(object:klass);
     dk:dump(klass:klass);
     if (null) {
-      dk:dump(dkt-klass(null));
+      dk:dump(null-klass);
       dk:dump(null);
     }
 #endif

@@ -48,6 +48,7 @@
     'selector.dk',
     'sequence.dk',
     'set.dk',
+    'singleton-klass.dk',
     'signature.dk',
     'size.dk',
     'sorted-array.dk',

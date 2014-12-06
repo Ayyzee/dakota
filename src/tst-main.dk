@@ -29,8 +29,15 @@ int-t main()
 
   if (null) {
     printf("klass-chain=%s\n", dkt-get-klass-chain(dk:klass(null), buf, sizeof(buf)));
+    object-t null-klass = null->klass;
+    object-t second-null = make(null-klass);
     dk:dump(null);
+    printf("---\n");
+    dk:dump(second-null);
+    printf("---\n");
     dk:dump(dk:klass(null));
+    printf("---\n");
+    dk:dump(dk:klass(second-null));
   }
   return 0;
 }
