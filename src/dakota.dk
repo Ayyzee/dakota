@@ -153,6 +153,7 @@ extern noexport resource-usage:slots-t gbl-ru;
 typedef int32-t (*)(void*, void*) vcompare-t;
 
 export object-t null = nullptr;
+noexport object-t null-klass = nullptr;
 export object-t std-input = nullptr;
 export object-t std-output = nullptr;
 export object-t std-error = nullptr;
@@ -517,15 +518,7 @@ make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
   return klass;
 }
 
-noexport object-t
-make-simple-singleton(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
-{
-  object-t klass = make-simple-klass(name, superklass-name, klass-name);
-  object-t instance = make(klass);
-  return instance;
-}
-
-// object klass' superklass is null instance
+// object klass' superklass is null instance (singleton)
 // klass klass'  superklass is object klass
 // null klass'   superklass is object klass
 //
@@ -557,10 +550,16 @@ init-runtime()
     object:klass = init-klass(object:klass, object:__name__); // must be first
     klass:klass =  init-klass(klass:klass,  klass:__name__);
 
-    klass:unbox(object:klass)->superklass = nullptr; // special
-
-    assert(nullptr == dkt-superklass(object:klass)); // special
-    assert(klass:klass == dkt-klass(klass:klass)); // special
+#if 1
+    null-klass = make-simple-klass($null, $object, $klass);
+    null = make(null-klass);
+    klass:unbox(object:klass)->superklass = null;
+    //assert(null == dkt-superklass(object:klass));
+#else
+    klass:unbox(object:klass)->superklass = nullptr;
+    //assert(nullptr == dkt-superklass(object:klass));
+#endif
+    assert(klass:klass == dkt-klass(klass:klass));
 
 #if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(bit-vector:__name__);
@@ -569,12 +568,15 @@ init-runtime()
     behavior = dk:behavior(object:klass);
     behavior = dk:behavior(klass:klass);
     behavior = dk:behavior(bit-vector:klass);
+    if (null-klass)
+      behavior = dk:behavior(null-klass);
+#else
+    klass:unbox(object:klass)->behavior =     nullptr;
+    klass:unbox(klass:klass)->behavior =      nullptr;
+    klass:unbox(bit-vector:klass)->behavior = nullptr;
+    if (null-klass)
+      klass:unbox(null-klass)->behavior =     nullptr;
 #endif
-#if 1
-    null = make-simple-singleton($null, $object, $klass);
-    klass:unbox(object:klass)->superklass = null; // special
-#endif
-
 #if 1
     dk-klass-for-name(input-stream:__name__);
     dk-klass-for-name(output-stream:__name__);
@@ -591,10 +593,12 @@ init-runtime()
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 #if 0
-  dk:dump(object:klass);
-  dk:dump(klass:klass);
-  dk:dump(gbl-null-klass);
-  dk:dump(null);
+    dk:dump(object:klass);
+    dk:dump(klass:klass);
+    if (null) {
+      dk:dump(dkt-klass(null));
+      dk:dump(null);
+    }
 #endif
   }
   init-imported-klasses();

@@ -74,7 +74,6 @@ klass hashed-set
   {
     assert(nullptr != hash);
     assert(nullptr != equal?);
-    assert(null != elements);
 
     self = dk:init(super);
     self.num-buckets = gbl-prime;

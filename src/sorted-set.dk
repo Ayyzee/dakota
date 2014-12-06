@@ -64,7 +64,6 @@ klass sorted-set
     assert(0 != initial-capacity);
     assert(nullptr != compare);
     assert(nullptr != equal?); // bugbug: not used
-    assert(null != elements);
 
     self = dk:init(super);
     self.sa.compare = cast(std-compare-t)(compare);
