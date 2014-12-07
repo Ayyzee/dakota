@@ -1,4 +1,10 @@
 #!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
 
 # Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
 #
@@ -53,8 +59,7 @@ my $zt = qr/$z-t/;
 my $dqstr = qr/(?<!\\)".*?(?<!\\)"/;
 #my $dqstr = qr/"(?:[^"\\]++|\\.)*+"/; # from the web
 
-my $constraints =
-{
+my $constraints = {
     '?balenced' =>         \&balenced,
     '?balenced-in' =>      \&balenced_in,
     '?block' =>            \&block,
@@ -88,9 +93,7 @@ sub list_member_term # move to a language specific macro
     }
     return $result;
 }
-
-sub list_member
-{
+sub list_member {
     my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     #die if $$user_data{'list'}{'member'}{'term'}{$tkn};
@@ -109,8 +112,7 @@ sub list_member
 	}
 	if ($$user_data{'list'}{'open'} eq $tkn) {
 	    $is_framed++;
-	}
-	elsif ($$user_data{'list'}{'close'} eq $tkn && $is_framed) {
+	} elsif ($$user_data{'list'}{'close'} eq $tkn && $is_framed) {
 	    $is_framed--;
 	}
 	$o++;
@@ -128,9 +130,7 @@ sub visibility # move to a language specific macro
     { $result = $index; }
     return $result;
 }
-
-sub ident
-{
+sub ident {
     my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
@@ -140,9 +140,7 @@ sub ident
     { $result = $index; }
     return $result;
 }
-
-sub type_ident
-{
+sub type_ident {
     my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
@@ -151,35 +149,24 @@ sub type_ident
     { $result = $index; }
     return $result;
 }
-
-sub ka_ident_1
-{
+sub ka_ident_1 {
     my ($sst, $index, $constraint, $user_data) = @_;
     return &ka_ident_common($sst, $index, $constraint, $user_data, 1);
 }
-
-sub ka_ident_2
-{
+sub ka_ident_2 {
     my ($sst, $index, $constraint, $user_data) = @_;
     return &ka_ident_common($sst, $index, $constraint, $user_data, 2);
 }
-
-sub ka_ident_3
-{
+sub ka_ident_3 {
     my ($sst, $index, $constraint, $user_data) = @_;
     return &ka_ident_common($sst, $index, $constraint, $user_data, 3);
 }
-
-sub ka_ident_4
-{
+sub ka_ident_4 {
     my ($sst, $index, $constraint, $user_data) = @_;
     return &ka_ident_common($sst, $index, $constraint, $user_data, 4);
 }
-
-sub ka_ident_common
-{
+sub ka_ident_common {
     my ($sst, $index, $constraint, $user_data, $num_fixed_args) = @_;
-
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
     if (exists $$user_data{'ka-ident'}{$tkn}) {
@@ -190,8 +177,7 @@ sub ka_ident_common
 }
 
 # this is very incomplete
-sub type
-{
+sub type {
     my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
@@ -205,9 +191,7 @@ sub type
     }
     return $result;
 }
-
-sub dquote_str
-{
+sub dquote_str {
     my ($sst, $index, $constraint, $user_data) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
@@ -218,47 +202,39 @@ sub dquote_str
     return $result;
 }
 
-sub block # body is optional since it uses balenced()
-{
+sub block # body is optional since it uses balenced() {
     my ($sst, $open_token_index, $constraint, $user_data) = @_;
     return &balenced($sst, $open_token_index, $constraint, $user_data);
 }
 
-sub list # body is optional since it uses balenced()
-{
+sub list # body is optional since it uses balenced() {
     my ($sst, $open_token_index, $constraint, $user_data) = @_;
     return &balenced($sst, $open_token_index, $constraint, $user_data);
 }
 
-sub block_in # body is optional since it uses balenced_in() which uses balenced()
-{
+sub block_in # body is optional since it uses balenced_in() which uses balenced() {
     my ($sst, $index, $constraint, $user_data) = @_;
     return &balenced_in($sst, $index, $constraint, $user_data);
 }
 
-sub list_in # body is optional since it uses balenced_in() which uses balenced()
-{
+sub list_in # body is optional since it uses balenced_in() which uses balenced() {
     my ($sst, $index, $constraint, $user_data) = @_;
     return &balenced_in($sst, $index, $constraint, $user_data);
 }
-
-sub balenced
-{
+sub balenced {
     my ($sst, $open_token_index, $user_data) = @_;
     my $close_token_index = $open_token_index;
     my $opens = [];
     my $result = -1;
 
-    while (1)
-    {
+    while (1) {
 	my $open_token;
 	my $close_token;
         if (&sst::is_open_token($open_token = &sst::at($sst, $close_token_index))) {
 	    push @$opens, $open_token;
-        }
-        elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index))) {
+        } elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index))) {
             $open_token = pop @$opens;
-	    
+
 	    die if $open_token ne &sst::open_token_for_close_token($close_token);
         }
         if (0 == @$opens) {
@@ -269,21 +245,16 @@ sub balenced
     }
     return $result;
 }
-
-sub balenced_in
-{
+sub balenced_in {
     my ($sst, $index, $constraint, $user_data) = @_;
     die if 0 == $index;
     my $result = &balenced($sst, $index - 1, $constraint, $user_data);
     if (-1 != $result)
     { $result--; }
-
     return $result;
 }
 ### end of constraint variable defns
-
-sub macro_expand_recursive
-{
+sub macro_expand_recursive {
     my ($sst, $i, $macros, $macro_name, $expanded_macro_names, $user_data) = @_;
     my $macro = $$macros{$macro_name};
     my $change_count = 0;
@@ -317,9 +288,7 @@ sub macro_expand_recursive
     }
     return $change_count;
 }
-
-sub macros_expand_index
-{
+sub macros_expand_index {
     my ($sst, $i, $macros, $user_data) = @_;
     my $change_count = 0;
 
@@ -330,11 +299,8 @@ sub macros_expand_index
     }
     return $change_count;
 }
-
-sub macros_expand
-{
+sub macros_expand {
     my ($sst, $macros, $user_data) = @_;
-
     foreach my $macro_name (sort keys %$macros) {
 	foreach my $after (@{$$macros{$macro_name}{'after'} ||= [] }) {
 	    push @{$$macros{$after}{'before'}}, $macro_name;
@@ -350,9 +316,7 @@ sub macros_expand
     }
     if ($debug) { print STDERR "]", ",\n"; }
 }
-
-sub rhs_dump
-{
+sub rhs_dump {
     my ($rhs) = @_;
     my $delim = '';
     my $str = '';
@@ -364,20 +328,18 @@ sub rhs_dump
     }
     return "\[$str\]";
 }
-
-sub debug_str_match
-{
+sub debug_str_match {
     my ($i, $j, $last_index, $match, $constraint) = @_;
     my $str = '';
     if (2 <= $debug) {
 	$str .= "   {";
 	$str .= "\n";
-	
+
 	if ($constraint) {
 	    $str .= "    'constraint' =>  '$constraint'";
 	    $str .= ",\n";
 	}
-	
+
 	my $match_tokens = [];
 	foreach my $m (@$match) { push @$match_tokens, $$m{'str'}; }
 
@@ -386,10 +348,10 @@ sub debug_str_match
 	$str .= ",\n";
 	$str .= "    'i' =>           '$i'";
 	$str .= ",\n";
-	
+
 	$str .= "    'j' =>           '$j'";
 	$str .= ",\n";
-	
+
 	$str .= "    'last-index' =>  '$last_index'";
 	$str .= ",\n";
 
@@ -398,17 +360,14 @@ sub debug_str_match
     }
     return $str;
 }
-
-sub debug_print_match
-{
+sub debug_print_match {
     my ($name, $str2, $str3, $i, $last_index, $pattern, $sst) = @_;
-
     if ($debug >= 2 || $last_index != -1 && $debug >= 1) {
 	my $indent = $Data::Dumper::Indent;
 	$Data::Dumper::Indent = 0;
 	print STDERR " {\n";
 	print STDERR "  'macro' =>          \"$name\"", ",\n";
-	    
+
 	if (2 <= $debug && ('' ne $str2 || '' ne $str3)) {
 	    print STDERR "  'details' =>", "\n";
 	    print STDERR "  \[", "\n";
@@ -418,7 +377,7 @@ sub debug_print_match
 	    }
 	    print STDERR "  \]", ",\n";
 	}
-	    
+
 	print STDERR "  'range' =>          ", &Dumper([$i, $last_index]), ",\n";
 	print STDERR "  'pattern' =>        ", &Dumper($pattern), ",\n";
 	print STDERR "  'lhs' =>            ", &sst::dump($sst, $i, $last_index), ",\n";
@@ -429,9 +388,7 @@ sub debug_print_match
 	}
     }
 }
-
-sub debug_print_replace
-{
+sub debug_print_replace {
     my ($template, $rhs, $lhs_num_tokens) = @_;
     if ($debug) {
 	print STDERR "  'template' =>       ", &Dumper($template), ",\n";
@@ -442,9 +399,7 @@ sub debug_print_replace
 	print STDERR " }", ",\n";
     }
 }
-
-sub literal
-{
+sub literal {
     my ($sst, $index, $literal) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
@@ -454,9 +409,7 @@ sub literal
     }
     return $result;
 }
-
-sub regex
-{
+sub regex {
     my ($sst, $index, $regex) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
@@ -468,17 +421,13 @@ sub regex
     }
     return ($result, $re_match);
 }
-
-sub regex_from_str
-{
+sub regex_from_str {
     my ($str) = @_;
     $str =~ s|^\?(.+)$|$1|; # strip off leading ? if present
     $str =~ s|^/(.+)/$|$1|; # strip off leading and trailing / if present
     return qr/($str)/;
 }
-
-sub rule_match
-{
+sub rule_match {
     my ($sst, $i, $pattern, $user_data, $macros, $name) = @_;
     my $debug2_str = '';
     my $debug3_str = '';
@@ -530,8 +479,7 @@ sub rule_match
 	    if (2 <= $debug) { $debug2_str .= &debug_str_match($i, $j, $last_index,
 							       $match, $constraint_name); }
 	    $prev_last_index = $last_index + 1;
-	}
-	else {
+	} else {
 	    if (3 <= $debug) { $debug3_str .= &debug_str_match($i, $j, $last_index, 
 							       undef, $constraint_name); }
 	    last;
@@ -540,11 +488,8 @@ sub rule_match
     &debug_print_match($name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst);
     return ($last_index, $rhs_for_pattern, $lhs);
 }
-
-sub rule_replace
-{
+sub rule_replace {
     my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $name) = @_;
-
     my $rhs = [];
     foreach my $tkn (@$template) {
 	die if !$tkn;
@@ -554,8 +499,7 @@ sub rule_replace
 	    die if 0 == $1;
 	      my $j = $1 - 1;
 	      $tkns = $$lhs[$j];
-	}
-	else {
+	} else {
 	    $tkns = $$rhs_for_pattern{$tkn};
 	    if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
 		$tkns = [ { 'str' => $tkn } ];
@@ -568,7 +512,6 @@ sub rule_replace
     &debug_print_replace($template, $rhs, $lhs_num_tokens);
     &sst::splice($sst, $i, $lhs_num_tokens, $rhs);
 }
-
 sub dk_lang_user_data {
     my $user_data;
     if ($ENV{'DK_LANG_USER_DATA_PATH'})
@@ -577,7 +520,6 @@ sub dk_lang_user_data {
     else
     { my $path = "$prefix/src/dkt-lang-user-data.pl";
       $user_data = do $path or die "Can not find $path." }
-
     return $user_data;
 }
 
@@ -598,15 +540,14 @@ unless (caller) {
     my $output_dir = 'junk';
     mkdir $output_dir;
 
-    foreach my $file (@ARGV)
-    {
+    foreach my $file (@ARGV) {
 	print "$file\n";
 	my $filestr = &dakota::filestr_from_file($file);
 	my $sst = &sst::make($filestr, $file);
 	&macros_expand($sst, $macros, $user_data);
 	#$$changes{'file'}{$file} = &sst::change_report($sst);
 	$$changes{'files'}{$file} = $$sst{'changes'};
-	
+
 	my $path = "$output_dir/$file.cc";
 	open(my $out, ">", $path) or die "cannot open > $path: $!";
 	print $out &sst_fragment::filestr($$sst{'tokens'});

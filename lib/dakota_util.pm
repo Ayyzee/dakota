@@ -1,4 +1,10 @@
 #!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
 
 # Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
 #
@@ -19,9 +25,8 @@ use warnings;
 
 my $ka_generics_tbl;
 
-BEGIN
-{
-    $ka_generics_tbl = { 'init' => undef };
+BEGIN {
+  $ka_generics_tbl = { 'init' => undef };
 };
 
 package dakota;
@@ -29,88 +34,85 @@ package dakota;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-		_first
-		_last
-		_add_first
-		_add_last
-		_remove_first
-		_remove_last 
-		deep_copy
-		ka_generics
-		ka_generics_add
-		filestr_from_file
-		scalar_from_file
-		);
+                 _first
+                 _last
+                 _add_first
+                 _add_last
+                 _remove_first
+                 _remove_last 
+                 deep_copy
+                 ka_generics
+                 ka_generics_add
+                 filestr_from_file
+                 scalar_from_file
+              );
 
 use Fcntl qw(:DEFAULT :flock);
-
-sub ka_generics_add
-{
-    my ($generic) = @_;
-    $$ka_generics_tbl{$generic} = undef;
+sub ka_generics_add {
+  my ($generic) = @_;
+  $$ka_generics_tbl{$generic} = undef;
 }
-
-sub ka_generics
-{
-    return $ka_generics_tbl;
+sub ka_generics {
+  return $ka_generics_tbl;
 }
-
-sub deep_copy
-{
-    my ($ref) = @_;
-    return eval &Dumper($ref);
+sub deep_copy {
+  my ($ref) = @_;
+  return eval &Dumper($ref);
 }
-
-sub _add_first   { my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             unshift @$seq, $element; return;        }
-sub _add_last    { my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             push    @$seq, $element; return;        }
-sub _remove_first{ my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = shift   @$seq;           return $first; }
-sub _remove_last { my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = pop     @$seq;           return $last;  }
-
-sub _first{ my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = $$seq[0];  return $first; }
-sub _last { my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = $$seq[-1]; return $last;  }
-
-sub _replace_first
-{
-    my ($seq, $element) = @_;
-    if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }
-    my $old_first = &_remove_first($seq);
-    &_add_first($seq, $element);
-    return $old_first;
+sub _add_first {
+  my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             unshift @$seq, $element; return;
 }
-
-sub _replace_last
-{
-    my ($seq, $element) = @_;
-    if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }
-    my $old_last = &_remove_last($seq);
-    &_add_last($seq, $element);
-    return $old_last;
+sub _add_last {
+  my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             push    @$seq, $element; return;
 }
-
-sub scalar_from_file
-{
-    my ($file) = @_;
-    my $filestr = &filestr_from_file($file);
-    $filestr = eval $filestr;
-
-    if (!defined $filestr)
-    {
-        print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_from_file(\"$file\")\n";
-    }
-    return $filestr;
+sub _remove_first {
+  my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = shift   @$seq;           return $first;
 }
+sub _remove_last {
+  my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = pop     @$seq;           return $last;
+}
+sub _first {
+  my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = $$seq[0];  return $first;
+}
+sub _last {
+  my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = $$seq[-1]; return $last;
+}
+sub _replace_first {
+  my ($seq, $element) = @_;
+  if (!defined $seq) {
+    die __FILE__, ":", __LINE__, ": error:\n";
+  }
+  my $old_first = &_remove_first($seq);
+  &_add_first($seq, $element);
+  return $old_first;
+}
+sub _replace_last {
+  my ($seq, $element) = @_;
+  if (!defined $seq) {
+    die __FILE__, ":", __LINE__, ": error:\n";
+  }
+  my $old_last = &_remove_last($seq);
+  &_add_last($seq, $element);
+  return $old_last;
+}
+sub scalar_from_file {
+  my ($file) = @_;
+  my $filestr = &filestr_from_file($file);
+  $filestr = eval $filestr;
 
-sub filestr_from_file
-{
-    my ($file) = @_;
-
-    undef $/;  ## force files to be read in one slurp
-    open FILE, "<$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-    flock FILE, LOCK_SH;
-    my $filestr = <FILE>;
-    close FILE;
-    
-    return $filestr;
+  if (!defined $filestr) {
+    print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_from_file(\"$file\")\n";
+  }
+  return $filestr;
+}
+sub filestr_from_file {
+  my ($file) = @_;
+  undef $/; ## force files to be read in one slurp
+  open FILE, "<$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  flock FILE, LOCK_SH;
+  my $filestr = <FILE>;
+  close FILE;
+  return $filestr;
 }
 
 1;

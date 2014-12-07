@@ -1,4 +1,10 @@
 #!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
 
 # Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
 #
@@ -82,67 +88,51 @@ my $mx = qr/\!|\?/;
 my $m  = qr/$z$mx?/;
 my $msig_type = qr/object-t|slots-t|slots-t\s*\*/;
 my $msig = qr/(va:)?$m(\($msig_type?\))?/;
-
-sub loop_merged_rep_from_dk
-{
+sub loop_merged_rep_from_dk {
     my ($cmd_info, $should_echo) = @_; 
-    if ($should_echo)
-    {
+    if ($should_echo) {
         $" = ' ';
         print STDERR "  &loop_merged_rep_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
         $" = '';
     }
     &init_rep_from_dk_vars($cmd_info);
     my $rep_files = [];
-    if ($$cmd_info{'reps'})
-    {
+    if ($$cmd_info{'reps'}) {
         $rep_files = $$cmd_info{'reps'};
     }
-    foreach my $arg (@{$$cmd_info{'inputs'}})
-    {
+    foreach my $arg (@{$$cmd_info{'inputs'}}) {
         my $root;
         if ($arg =~ m|\.$dk_ext$| ||
-	    $arg =~ m|\.$ctlg_ext$|)
-        {
+	    $arg =~ m|\.$ctlg_ext$|) {
             $root = &rep_tree_from_dk_path($arg);
             &_add_last($rep_files, &rep_path_from_dk_path($arg));
-        }
-        elsif ($arg =~ m|\.$rep_ext$|)
-        {
+        } elsif ($arg =~ m|\.$rep_ext$|) {
             $root = &scalar_from_file($arg);
             &_add_last($rep_files, $arg);
         }
         else
         { die __FILE__, ":", __LINE__, ": ERROR\n"; }
-        if (1 == @{$$cmd_info{'inputs'}})
-        {
-            if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'})
-            {
+        if (1 == @{$$cmd_info{'inputs'}}) {
+            if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
                 &scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
             }
         }
     }
-    if (1 < @{$$cmd_info{'inputs'}})
-    {
-        if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'})
-        {
+    if (1 < @{$$cmd_info{'inputs'}}) {
+        if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
             my $rep = &rep_merge($rep_files);
             &scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
         }
     }
 } # loop_merged_rep_from_dk
-
-sub add_visibility_file
-{
+sub add_visibility_file {
     my ($arg) = @_;
     #print STDERR "&add_visibility_file(path=\"$arg\")\n";
     my $root = &scalar_from_file($arg);
     &add_visibility($root);
     &scalar_to_file($arg, $root);
 }
-
-sub add_visibility
-{
+sub add_visibility {
     my ($root) = @_;
     my $names = [keys %{$$root{'modules'}}];
     foreach my $name (@$names) {
@@ -160,8 +150,7 @@ sub add_visibility
 		{   $$root{'klasses'}{$klass_name}{'exported?'} = 22; }
 		if ($$root{'traits'}{$klass_name})
 		{   $$root{'traits'}{$klass_name}{'exported?'} = 22; }
-	    }
-	    elsif ($str =~ /^($z):(slots-t)$/) {
+	    } elsif ($str =~ /^($z):(slots-t)$/) {
 		my ($klass_name, $type_name) = ($1, $2);
 		# klass slots
 		#print STDERR "klass       slots:  $klass_name|$type_name\n";
@@ -169,8 +158,7 @@ sub add_visibility
 		    $$root{'klasses'}{$klass_name}{'slots'} &&
 		    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name)
 		{   $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = 33; }
-	    }
-	    elsif ($str =~ /^($z):($msig)$/) {
+	    } elsif ($str =~ /^($z):($msig)$/) {
 		my ($klass_name, $method_name) = ($1, $2);
 		# klass/trait method
 		#print STDERR "klass/trait method $klass_name:$method_name\n";
@@ -195,16 +183,13 @@ sub add_visibility
 			}
 		    }
 		}
-	    }
-	    else {
+	    } else {
 		print STDERR "error: not klass/trait/slots/method: $str\n";
 	    }
 	}
     }
 }
-
-sub sig1
-{
+sub sig1 {
     my ($scope) = @_;
     my $result = '';
     $result .= "@{$$scope{'name'}}";
@@ -213,27 +198,23 @@ sub sig1
     $result .= ')';
     return $result;
 }
-
-sub loop_cxx_from_dk
-{
+sub loop_cxx_from_dk {
     my ($cmd_info, $should_echo) = @_;
-    if ($should_echo)
-    {
+    if ($should_echo) {
         $" = ' ';
         print STDERR "  &loop_cxx_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
         $" = '';
     }
     &init_cxx_from_dk_vars($cmd_info);
-    
+
     my $inputs = [];
     my $rep;
     if ($$cmd_info{'reps'})
     { $rep = $$cmd_info{'reps'}; }
     else
     { $rep = []; }
-    
-    foreach my $input (@{$$cmd_info{'inputs'}})
-    {
+
+    foreach my $input (@{$$cmd_info{'inputs'}}) {
         if ($input =~ m|\.$rep_ext$|)
         { &_add_last($rep, $input); }
         else
@@ -241,19 +222,16 @@ sub loop_cxx_from_dk
     }
     $$cmd_info{'reps'} = $rep;
     $$cmd_info{'inputs'} = $inputs;
-    
-    if ($$cmd_info{'reps'})
-    {
+
+    if ($$cmd_info{'reps'}) {
         &init_global_rep($$cmd_info{'reps'});
     }
     my $argv_length = @{$$cmd_info{'inputs'}};
-    if (0 == $argv_length)
-    {
+    if (0 == $argv_length) {
         exit 1;
     }
     my $file_basenames = &dk::file_basenames($$cmd_info{'inputs'});
-    foreach my $file_basename (@$file_basenames)
-    {
+    foreach my $file_basename (@$file_basenames) {
         my $file = &dk::parse("$file_basename.$dk_ext");
         #print STDERR "$file_basename.$dk_ext\n";
 	#print STDERR &Dumper($$file{'klasses'});
@@ -262,18 +240,14 @@ sub loop_cxx_from_dk
         my ($dk_cxx_path, $cxx_path);
         my ($dk_cxx_ext, $cxx_ext1);
 
-        if (!$$cmd_info{'opts'}{'stdout'})
-        {
+        if (!$$cmd_info{'opts'}{'stdout'}) {
             my ($output_dk_cxx, $output_cxx);
 
-            if ($$cmd_info{'opts'}{'output'})
-            {
+            if ($$cmd_info{'opts'}{'output'}) {
                 $output_dk_cxx = "$$cmd_info{'opts'}{'output'}";
                 $output_dk_cxx =~ s/\.$k+/.$dk_ext.$cxx_ext/;
                 $output_cxx = "$$cmd_info{'opts'}{'output'}";
-            }
-            else
-            {
+            } else {
                 $output_dk_cxx = "$file_basename.$dk_ext.$cxx_ext"; ###
                 $output_cxx = "$file_basename.$cxx_ext"; ###
             }
@@ -300,9 +274,7 @@ sub loop_cxx_from_dk
 } # loop_cxx_from_dk
 
 my $root_cmd;
-
-sub start
-{
+sub start {
     my ($cmd_info) = @_;
     $root_cmd = $cmd_info;
 
@@ -312,8 +284,7 @@ sub start
     if (!$$cmd_info{'opts'}{'compiler-flags'})
     { $$cmd_info{'opts'}{'compiler-flags'} = "$ENV{'EXTRA_CXXFLAGS'} $ENV{'CXXFLAGS'}"; }
 
-    if ($ENV{'MAKEFLAGS'})
-    {
+    if ($ENV{'MAKEFLAGS'}) {
 	my $makeflags = $ENV{'MAKEFLAGS'};
 	#print "MAKEFLAGS: \"$makeflags\"\n";
     }
@@ -322,30 +293,21 @@ sub start
 	$ld_name_flag = $ENV{'LD_NAME_FLAG'};
     }
 
-    if ($$cmd_info{'opts'}{'compile'})
-    {
+    if ($$cmd_info{'opts'}{'compile'}) {
         $dk_construct = undef;
-    }
-    elsif ($$cmd_info{'opts'}{'shared'})
-    {
-	if ($$cmd_info{'opts'}{'name'})
-	{
+    } elsif ($$cmd_info{'opts'}{'shared'}) {
+	if ($$cmd_info{'opts'}{'name'}) {
 	    $cxx_shared_flags .= " --for-linker $ld_name_flag --for-linker $$cmd_info{'opts'}{'name'}";
 	}
         $dk_construct = 'construct::k_library';
-    }
-    elsif ($$cmd_info{'opts'}{'dynamic'})
-    {
-	if ($$cmd_info{'opts'}{'name'})
-	{
+    } elsif ($$cmd_info{'opts'}{'dynamic'}) {
+	if ($$cmd_info{'opts'}{'name'}) {
 	    $cxx_dynamic_flags .= " --for-linker $ld_name_flag --for-linker $$cmd_info{'opts'}{'name'}";
 	}
         $dk_construct = 'construct::k_library';
-    }
-    elsif (!$$cmd_info{'opts'}{'compile'}
+    } elsif (!$$cmd_info{'opts'}{'compile'}
         && !$$cmd_info{'opts'}{'shared'}
-        && !$$cmd_info{'opts'}{'dynamic'})
-    {
+        && !$$cmd_info{'opts'}{'dynamic'}) {
         $dk_construct = 'construct::k_executable';
     }
     else
@@ -355,76 +317,56 @@ sub start
     $cmd_info = &loop_rep_from_so($cmd_info);
     #if ($$cmd_info{'opts'}{'output'} =~ m/\.rep$/) # this is a real hackhack
     #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
-    if ($want_separate_rep_pass)
-    {
+    if ($want_separate_rep_pass) {
         $cmd_info = &loop_rep_from_dk($cmd_info);
     }
     if ($$cmd_info{'opts'}{'output'} =~ m/\.rep$/) # this is a real hackhack
     { &add_visibility_file($$cmd_info{'opts'}{'output'}); }
 
-    if (1)
-    {
+    if (1) {
 	$cmd_info = &loop_obj_from_dk($cmd_info);
 	if (!$$cmd_info{'opts'}{'compile'})
 	{ &gen_rt_obj($cmd_info); }
-    }
-    else
-    {
+    } else {
 	if (!$$cmd_info{'opts'}{'compile'})
 	{ &gen_rt_obj($cmd_info); }
 	$cmd_info = &loop_obj_from_dk($cmd_info);
     }
 
-    if ($$cmd_info{'opts'}{'compile'} && exists $$cmd_info{'output'})
-    {
+    if ($$cmd_info{'opts'}{'compile'} && exists $$cmd_info{'output'}) {
         my $last = &_last($$cmd_info{'inputs'});
         `mv $last $$cmd_info{'output'}`;
     }
-    if ($$cmd_info{'opts'}{'compile'})
-    {
-        if ($want_separate_precompile_pass)
-        {
+    if ($$cmd_info{'opts'}{'compile'}) {
+        if ($want_separate_precompile_pass) {
             $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
             &obj_from_cxx($cmd_info);
         }
-    }
-    else
-    {
+    } else {
 	$$cmd_info{'opts'}{'compiler-flags'} = " -ldl";
 
-	if ($$cmd_info{'opts'}{'shared'})
-	{
+	if ($$cmd_info{'opts'}{'shared'}) {
 	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
 	    &so_from_obj($cmd_info);
-	}
-	elsif ($$cmd_info{'opts'}{'dynamic'})
-	{
+	} elsif ($$cmd_info{'opts'}{'dynamic'}) {
 	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
 	    &dso_from_obj($cmd_info);
-	}
-	elsif (!$$cmd_info{'opts'}{'compile'}
+	} elsif (!$$cmd_info{'opts'}{'compile'}
 	       && !$$cmd_info{'opts'}{'shared'}
-	       && !$$cmd_info{'opts'}{'dynamic'})
-	{
+	       && !$$cmd_info{'opts'}{'dynamic'}) {
 	    &exe_from_obj($cmd_info);
-	}
-	else
-	{
+	} else {
 	    die __FILE__, ":", __LINE__, ": error:\n";
 	}
     }
     return $exit_status;
 }
-sub loop_rep_from_so
-{
+sub loop_rep_from_so {
     my ($cmd_info) = @_;
-    foreach my $arg (@{$$cmd_info{'inputs'}})
-    {
+    foreach my $arg (@{$$cmd_info{'inputs'}}) {
         if ($arg =~ m|\.$dk_ext$| ||
 	    $arg =~ m|\.$ctlg_ext$|)
-        {}
-	else
-	{
+        {} else {
             my $ctlg_path =     &ctlg_path_from_any_path($arg);
             my $ctlg_dir_path = &ctlg_dir_path_from_so_path($arg);
             my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -443,15 +385,12 @@ sub loop_rep_from_so
     }
     return $cmd_info;
 }
-sub loop_rep_from_dk
-{
+sub loop_rep_from_dk {
     my ($cmd_info) = @_;
     my $rep_files = [];
-    foreach my $arg (@{$$cmd_info{'inputs'}})
-    {
+    foreach my $arg (@{$$cmd_info{'inputs'}}) {
         if ($arg =~ m|\.$dk_ext$| ||
-	    $arg =~ m|\.$ctlg_ext$|)
-        {
+	    $arg =~ m|\.$ctlg_ext$|) {
             my $rep_path = &rep_path_from_dk_path($arg);
             my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
             $$rep_cmd{'output'} = $rep_path;
@@ -465,8 +404,7 @@ sub loop_rep_from_dk
         #    &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
         #}
     }
-    if (0 != @$rep_files)
-    {
+    if (0 != @$rep_files) {
         my $rep_path = &rep_path_from_any_path($$cmd_info{'output'});
         &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
         my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -476,37 +414,28 @@ sub loop_rep_from_dk
     }
     return $cmd_info;
 }
-sub gen_rt_obj
-{
+sub gen_rt_obj {
     my ($cmd_info) = @_;
-
     $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
     my $flags = $$cmd_info{'opts'}{'compiler-flags'};
     if ($dk_construct) {
 	$flags .= " --define-macro DKT_CONSTRUCT=$dk_construct";
     }
-    if ($$cmd_info{'opts'}{'name'})
-    {
+    if ($$cmd_info{'opts'}{'name'}) {
 	$flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'opts'}{'name'}\\\"";
-    }
-    else
-    {
+    } else {
 	$flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'output'}\\\"";
     }
     $$cmd_info{'opts'}{'compiler-flags'} = $flags;
     &rt_obj_from_rep($cmd_info);
 }
-sub loop_obj_from_dk
-{
+sub loop_obj_from_dk {
     my ($cmd_info) = @_;
     my $outfiles = [];
-    foreach my $arg (@{$$cmd_info{'inputs'}})
-    {
+    foreach my $arg (@{$$cmd_info{'inputs'}}) {
         if ($arg =~ m|\.$dk_ext$| ||
-	    $arg =~ m|\.$ctlg_ext$|)
-        {
-            if (!$want_separate_rep_pass)
-            {
+	    $arg =~ m|\.$ctlg_ext$|) {
+            if (!$want_separate_rep_pass) {
                 my $rep_path = &rep_path_from_dk_path($arg);
                 my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
                 $$rep_cmd{'inputs'} = [ $arg ];
@@ -529,9 +458,7 @@ sub loop_obj_from_dk
 	    { $$obj_cmd{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'}; }
             &obj_from_cxx($obj_cmd);
             &_add_last($outfiles, $obj_path);
-        }
-        else
-        {
+        } else {
             &_add_last($outfiles, $arg);
         }
     }
@@ -539,8 +466,7 @@ sub loop_obj_from_dk
     delete $$cmd_info{'opts'}{'output'}; # hackhack
     return $cmd_info;
 }
-sub cxx_from_dk
-{
+sub cxx_from_dk {
     my ($cmd_info) = @_;
     my $cxx_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$cxx_cmd{'cmd'} = '&loop_cxx_from_dk';
@@ -550,11 +476,9 @@ sub cxx_from_dk
     my $should_echo;
     &outfile_from_infiles($cxx_cmd, $should_echo = 0);
 }
-sub obj_from_cxx
-{
+sub obj_from_cxx {
     my ($cmd_info) = @_;
-    if (!$$cmd_info{'opts'}{'precompile'})
-    {
+    if (!$$cmd_info{'opts'}{'precompile'}) {
         my $obj_cmd = { 'opts' => $$cmd_info{'opts'} };
         $$obj_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
         $$obj_cmd{'cmd-major-mode-flags'} = $cxx_compile_flags;
@@ -571,9 +495,7 @@ sub obj_from_cxx
         &outfile_from_infiles($obj_cmd, $should_echo = 1);
     }
 }
-
-sub rt_obj_from_rep
-{
+sub rt_obj_from_rep {
     my ($cmd_info) = @_;
     my $so_path = $$cmd_info{'output'};
     my $rep_path = &rep_path_from_so_path($so_path);
@@ -584,8 +506,7 @@ sub rt_obj_from_rep
     $path =~ s|/[^/]*$||;
     $file_basename =~ s|^[^/]*/||; # strip of leading obj/
     $file_basename =~ s|-rt\.$cxx_ext$||; # strip of leading obj/
-    if ($$cmd_info{'reps'})
-    {
+    if ($$cmd_info{'reps'}) {
         &init_global_rep($$cmd_info{'reps'});
     }
     $file = &scalar_from_file($rep_path);
@@ -602,11 +523,9 @@ sub rt_obj_from_rep
     &obj_from_cxx($obj_info);
     &_add_first($$cmd_info{'inputs'}, $obj_path);
 }
-sub so_from_obj
-{
+sub so_from_obj {
     my ($cmd_info) = @_;
-    if (!$$cmd_info{'opts'}{'precompile'})
-    {
+    if (!$$cmd_info{'opts'}{'precompile'}) {
         my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
         $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
         $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
@@ -617,11 +536,9 @@ sub so_from_obj
         &outfile_from_infiles($so_cmd, $should_echo = 1);
     }
 }
-sub dso_from_obj
-{
+sub dso_from_obj {
     my ($cmd_info) = @_;
-    if (!$$cmd_info{'opts'}{'precompile'})
-    {
+    if (!$$cmd_info{'opts'}{'precompile'}) {
         my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
         $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
         $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
@@ -632,11 +549,9 @@ sub dso_from_obj
         &outfile_from_infiles($so_cmd, $should_echo = 1);
     }
 }
-sub exe_from_obj
-{
+sub exe_from_obj {
     my ($cmd_info) = @_;
-    if (!$$cmd_info{'opts'}{'precompile'})
-    {
+    if (!$$cmd_info{'opts'}{'precompile'}) {
         my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
         $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
         $$exe_cmd{'cmd-major-mode-flags'} = undef;
@@ -647,22 +562,18 @@ sub exe_from_obj
         &outfile_from_infiles($exe_cmd, $should_echo = 1);
     }
 }
-sub dir_part
-{
+sub dir_part {
     my ($path) = @_;
     my $parts = [split /\//, $path];
     &_remove_last($parts);
     my $dir = join '/', @$parts;
     return $dir;
 }
-sub make_dir
-{
+sub make_dir {
     my ($path) = @_;
     my $dir_part = &dir_part($path);
-    if ("" ne $dir_part)
-    {
-        if (! -e $dir_part)
-        {
+    if ("" ne $dir_part) {
+        if (! -e $dir_part) {
             my $cmd = { 'cmd' => 'mkdir', 'cmd-flags' => '-p', 'inputs' => [ $dir_part ] };
             #my $cmd_str = &str_from_cmd_info($cmd);
             #print "  $cmd_str\n";
@@ -671,41 +582,34 @@ sub make_dir
         }
     }
 }
-sub exec_cmd
-{
+sub exec_cmd {
     my ($cmd_info, $should_echo) = @_;
         my $cmd_str;
         $cmd_str = &str_from_cmd_info($cmd_info);
-        if ($global_should_echo || $should_echo)
-        {
+        if ($global_should_echo || $should_echo) {
             print STDERR "  $cmd_str\n";
         }
 
     if ($$root_cmd{'opts'}{'directory'} &&
 	$$root_cmd{'opts'}{'directory'} ne '.' &&
-	$$root_cmd{'opts'}{'directory'} ne './')
-    {
+	$$root_cmd{'opts'}{'directory'} ne './') {
 	$ENV{'DK_DIR'} = "$$root_cmd{'opts'}{'directory'}";
     }
 
-    if ($ENV{'DK_DIR'})
-    {
+    if ($ENV{'DK_DIR'}) {
 	#print STDERR "DK_DIR=$ENV{'DK_DIR'}\n";
 	open (STDERR, "|dkt-fixup-stderr.pl") or die;
     }
 
         my $exit_val = system($cmd_str);
-        if (0 != $exit_val >> 8)
-        {
+        if (0 != $exit_val >> 8) {
 	    my $tmp_exit_status = $exit_val >> 8;
 	    if ($exit_status < $tmp_exit_status) # similiar to behavior of gnu make
 	    {
 		$exit_status = $tmp_exit_status;
 	    }
-	    if (!$$root_cmd{'opts'}{'keep-going'})
-	    {
-		if (!($global_should_echo || $should_echo))
-		{
+	    if (!$$root_cmd{'opts'}{'keep-going'}) {
+		if (!($global_should_echo || $should_echo)) {
 		    print STDERR "  $cmd_str\n";
 		}
 		die "exit value from system() was $exit_val\n" if $exit_status == 0;
@@ -713,29 +617,23 @@ sub exec_cmd
 	    }
         }
 }
-sub path_stat
-{
+sub path_stat {
     my ($path_db, $path) = @_;
     my $stat;
-    if (exists $$path_db{$path})
-    {
+    if (exists $$path_db{$path}) {
 	$stat = $$path_db{$path};
-    }
-    else
-    {
+    } else {
 	if ($show_outfile_info)
 	{ print "STAT $path\n"; }
 	@$stat{qw(dev inode mode nlink uid gid rdev size atime mtime ctime blksize blocks)} = stat($path);
     }
     return $stat;
 }
-sub append_to_env_file
-{
+sub append_to_env_file {
     my ($key, $elements, $env_var) = @_;
     my $file = $ENV{$env_var};
 
-    if ($file)
-    {
+    if ($file) {
 	my $elements_str = '';
 	open FILE, ">>$ENV{$env_var}" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
 	foreach my $element (@$elements)
@@ -744,67 +642,54 @@ sub append_to_env_file
 	close FILE;
     }
 }
-
-sub outfile_from_infiles
-{
+sub outfile_from_infiles {
     my ($cmd_info, $should_echo) = @_;
     my $outfile = $$cmd_info{'output'};
     &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DKT_DEPENDS_OUTPUT_FILE");
     my $file_db = {};
     my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'});
-    foreach my $infile (@{$$cmd_info{'inputs'}})
-    {
+    foreach my $infile (@{$$cmd_info{'inputs'}}) {
         my $infile_stat = &path_stat($file_db, $infile);
         if (!$$infile_stat{'mtime'})
         { $$infile_stat{'mtime'} = 0; }
-        
-        if (! -e $outfile || $$outfile_stat{'mtime'} < $$infile_stat{'mtime'})
-        {
+
+        if (! -e $outfile || $$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
             &make_dir($$cmd_info{'output'});
             if ($show_outfile_info)
             { print "MK $$cmd_info{'output'}\n"; }
 	    my $output = $$cmd_info{'output'};
 
 	    if ($output !~ m|\.rep$| &&
-		$output !~ m|\.ctlg$|)
-	    {
+		$output !~ m|\.ctlg$|) {
 		$should_echo = 0;
 		print "  generating $output\n";
 	    }
 
-            if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'})
-            {
+            if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {
                 $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
                 delete $$cmd_info{'output'};
                 delete $$cmd_info{'cmd'};
                 delete $$cmd_info{'cmd-major-mode-flags'};
                 delete $$cmd_info{'cmd-flags'};
                 &loop_merged_rep_from_dk($cmd_info, $global_should_echo || $should_echo);
-            }
-            elsif ('&loop_cxx_from_dk' eq $$cmd_info{'cmd'})
-            {
+            } elsif ('&loop_cxx_from_dk' eq $$cmd_info{'cmd'}) {
                 $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
                 delete $$cmd_info{'output'};
                 delete $$cmd_info{'cmd'};
                 delete $$cmd_info{'cmd-major-mode-flags'};
                 delete $$cmd_info{'cmd-flags'};
                 &loop_cxx_from_dk($cmd_info, $global_should_echo || $should_echo);
-            }
-            else
-            {
+            } else {
                 &exec_cmd($cmd_info, $should_echo);
             }
             last;
-        }
-        else
-        {
+        } else {
             if ($show_outfile_info)
             { print "OK $$cmd_info{'output'}\n"; }
         }
     }
 }
-sub rep_from_dk
-{
+sub rep_from_dk {
     my ($cmd_info) = @_;
     my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$rep_cmd{'cmd'} = '&loop_merged_rep_from_dk';
@@ -813,8 +698,7 @@ sub rep_from_dk
     my $should_echo;
     &outfile_from_infiles($rep_cmd, $should_echo = 0);
 }
-sub ctlg_from_so
-{
+sub ctlg_from_so {
     my ($cmd_info) = @_;
     my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
 
@@ -829,13 +713,10 @@ sub ctlg_from_so
     my $should_echo;
     &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
 }
-sub ordered_set_add
-{
+sub ordered_set_add {
     my ($ordered_set, $element, $file, $line) = @_;
-    foreach my $member (@$ordered_set)
-    {
-        if ($element eq $member)
-        {
+    foreach my $member (@$ordered_set) {
+        if ($element eq $member) {
             #printf STDERR "%s:%i: warning: element \"$element\" already present\n", $file, $line;
             return;
         }

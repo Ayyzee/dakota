@@ -1,4 +1,10 @@
 #!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
 
 use strict;
 use Cwd;
@@ -8,7 +14,7 @@ $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
-$Data::Dumper::Indent    = 1; # default = 2
+$Data::Dumper::Indent    = 1;   # default = 2
 
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
@@ -24,171 +30,133 @@ my $opts = {};
 my $default_project_file = 'project.rep';
 
 &start(\@ARGV);
-
-sub start
-{
-    my ($args) = @_;
-    my $rep_file = $default_project_file;
-    if ($$opts{'repository'}) {
-	$rep_file = $$opts{'repository'};
-    }
-    if ($$opts{'directory'}) {
-	chdir $$opts{'directory'};
-    }
-    my $rep = &rep_from_file($rep_file);
-    $$rep{'self-file'} = $rep_file;
-    if (0 != @$args) {
-	&subcmd($rep, $args);
-    }
-    else {
-	print STDERR "missing subcommand\n";
-	die;
-    }
+sub start {
+  my ($args) = @_;
+  my $rep_file = $default_project_file;
+  if ($$opts{'repository'}) {
+    $rep_file = $$opts{'repository'};
+  }
+  if ($$opts{'directory'}) {
+    chdir $$opts{'directory'};
+  }
+  my $rep = &rep_from_file($rep_file);
+  $$rep{'self-file'} = $rep_file;
+  if (0 != @$args) {
+    &subcmd($rep, $args);
+  } else {
+    print STDERR "missing subcommand\n";
+    die;
+  }
 }
+sub subcmd {
+  my ($rep, $args) = @_;
+  my $subcmd = shift @$args;
 
-sub subcmd
-{
-    my ($rep, $args) = @_;
-    my $subcmd = shift @$args;
-
-    if ('init' eq $subcmd)
-    { &subcmd_init($rep, $args); }
-    elsif ('add' eq $subcmd)
-    { &subcmd_add($rep, $args); }
-    elsif ('remove' eq $subcmd)
-    { &subcmd_remove($rep, $args); }
-    elsif ('files' eq $subcmd)
-    { &subcmd_files($rep, $args); }
-    elsif ('name' eq $subcmd)
-    { &subcmd_name($rep, $args); }
-    elsif ('name=' eq $subcmd)
-    { &subcmd_name_setter($rep, $args); }
-    else
-    {
-	print STDERR "$subcmd\n";
-	die;
+  if (0) {}
+  elsif ('init'   eq $subcmd) { &subcmd_init($rep, $args);        }
+  elsif ('add'    eq $subcmd) { &subcmd_add($rep, $args);         }
+  elsif ('remove' eq $subcmd) { &subcmd_remove($rep, $args);      }
+  elsif ('files'  eq $subcmd) { &subcmd_files($rep, $args);       }
+  elsif ('name'   eq $subcmd) { &subcmd_name($rep, $args);        }
+  elsif ('name='  eq $subcmd) { &subcmd_name_setter($rep, $args); }
+  else {
+    print STDERR "$subcmd\n";
+    die;
+  }
+}
+sub subcmd_init {
+  my ($rep, $args) = @_;
+  $$rep{'self-file'} = $default_project_file;
+  $$rep{'name'} = shift @$args;
+  $$rep{'files'} = $args;
+  &rep_to_file($rep);
+}
+sub subcmd_add {
+  my ($rep, $args) = @_;
+  die if !defined $$rep{'files'};
+  my $tbl = {};
+  foreach my $file (@{$$rep{'files'}}) {
+    $$tbl{$file} = 1;
+  }
+  foreach my $arg (@$args) {
+    $$tbl{$arg} = 1;
+  }
+  $$rep{'files'} = [sort keys %$tbl];
+  &rep_to_file($rep);
+}
+sub subcmd_remove {
+  my ($rep, $args) = @_;
+  die if !defined $$rep{'files'};
+  my $tbl = {};
+  foreach my $file (@{$$rep{'files'}}) {
+    $$tbl{$file} = 1;
+  }
+  foreach my $arg (@$args) {
+    delete $$tbl{$arg};
+  }
+  $$rep{'files'} = [sort keys %$tbl];
+  &rep_to_file($rep);
+}
+sub subst {
+  my ($string, $var) = @_;
+  if ($var) {
+    #print STDERR "<$string\n";
+    $var =~ m|(\w+)=(.*)|;
+    my $key = $1;
+    my $element = $2;
+    $string =~ s|\$$key\b|$element|;
+    #print STDERR ">$string\n";
+  }
+  return $string
+}
+sub subcmd_files {
+  my ($rep, $args) = @_;
+  my $files = '';
+  if ($$rep{'files'}) {
+    my $cwd = '';
+    if ($$opts{'abs-path'}) {
+      $cwd = getcwd;
+      $cwd .= '/';
     }
-}
 
-sub subcmd_init
-{
-    my ($rep, $args) = @_;
-    $$rep{'self-file'} = $default_project_file;
-    $$rep{'name'} = shift @$args;
-    $$rep{'files'} = $args;
-    &rep_to_file($rep);
-}
-
-sub subcmd_add
-{
-    my ($rep, $args) = @_;
-    die if !defined $$rep{'files'};
-    my $tbl = {};
-    foreach my $file (@{$$rep{'files'}})
-    {
-	$$tbl{$file} = 1;
+    foreach my $file (@{$$rep{'files'}}) {
+      $file = &subst($file, $$opts{'var'});
+      if ($file !~ "^/") {
+        $files .= $cwd;
+      }
+      $files .= "$file\n";
     }
-    foreach my $arg (@$args)
-    {
-	$$tbl{$arg} = 1;
+  }
+  print $files;
+}
+sub subcmd_name {
+  my ($rep, $args) = @_;
+  my $name = '';
+  if ($$rep{'name'}) {
+    if ($$opts{'abs-path'}) {
+      $name = getcwd;
+      $name .= '/';
     }
-    $$rep{'files'} = [sort keys %$tbl];
-    &rep_to_file($rep);
+    $name .= $$rep{'name'};
+  }
+  $name = &subst($name, $$opts{'var'});
+  print "$name\n";
 }
-
-sub subcmd_remove
-{
-    my ($rep, $args) = @_;
-    die if !defined $$rep{'files'};
-    my $tbl = {};
-    foreach my $file (@{$$rep{'files'}})
-    {
-	$$tbl{$file} = 1;
-    }
-    foreach my $arg (@$args)
-    {
-	delete $$tbl{$arg};
-    }
-    $$rep{'files'} = [sort keys %$tbl];
-    &rep_to_file($rep);
+sub subcmd_name_setter {
+  my ($rep, $args) = @_;
+  die if !defined $$rep{'name'};
+  $$rep{'name'} = shift @$args;
+  &rep_to_file($rep);
 }
-sub subst
-{
-    my ($string, $var) = @_;
-
-    if ($var)
-    {
-	#print STDERR "<$string\n";
-	$var =~ m|(\w+)=(.*)|;
-	my $key = $1;
-	my $element = $2;
-	$string =~ s|\$$key\b|$element|;
-	#print STDERR ">$string\n";
-    }
-    return $string
+sub rep_from_file {
+  my ($file) = @_;
+  my $rep = do $file or die;
+  return $rep;
 }
-
-sub subcmd_files
-{
-    my ($rep, $args) = @_;
-    my $files = '';
-    if ($$rep{'files'})
-    {
-	my $cwd = '';
-	if ($$opts{'abs-path'})
-	{
-	    $cwd = getcwd;
-	    $cwd .= '/';
-	}
-
-	foreach my $file (@{$$rep{'files'}})
-	{
-	    $file = &subst($file, $$opts{'var'});
-	    if ($file !~ "^/") {
-		$files .= $cwd;
-	    }
-	    $files .= "$file\n";
-	}
-    }
-    print $files;
-}
-
-sub subcmd_name
-{
-    my ($rep, $args) = @_;
-    my $name = '';
-    if ($$rep{'name'})
-    {
-	if ($$opts{'abs-path'})
-	{
-	    $name = getcwd;
-	    $name .= '/';
-	}
-	$name .= $$rep{'name'};
-    }
-    $name = &subst($name, $$opts{'var'});
-    print "$name\n";
-}
-
-sub subcmd_name_setter
-{
-    my ($rep, $args) = @_;
-    die if !defined $$rep{'name'};
-    $$rep{'name'} = shift @$args;
-    &rep_to_file($rep);
-}
-
-sub rep_from_file
-{
-    my ($file) = @_;
-    my $rep = do $file or die;
-    return $rep;
-}
-sub rep_to_file
-{
-    my ($rep) = @_;
-    my $file = $$rep{'self-file'};
-    open FILE, ">$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-    print FILE &Dumper($rep);
-    close FILE;
+sub rep_to_file {
+  my ($rep) = @_;
+  my $file = $$rep{'self-file'};
+  open FILE, ">$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  print FILE &Dumper($rep);
+  close FILE;
 }
