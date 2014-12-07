@@ -1,4 +1,4 @@
-// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 static str64-t s1 = "mother";
 static str64-t s2 = "father";
