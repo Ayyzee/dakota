@@ -9,8 +9,7 @@ static object-t check(object-t klass)
 {
   object-t collection = make(klass);
 
-  for (uint32-t i = 1; i < 1 + 5; i++)
-  {
+  for (uint32-t i = 1; i < 1 + 5; i++) {
     object-t e = uint32:box(i);
     for (uint32-t j = 1; j <= i; j++)
       dk:add(collection, e);
@@ -18,8 +17,7 @@ static object-t check(object-t klass)
   printf("size=%i\n", dk:size(collection));
   uint32-t i1 = 1;
 
-  for (object-t e in collection)
-  {
+  for (object-t e in collection) {
     uint32-t ei = *uint32:unbox(e);
     object-t element = dk:at(collection, e, NULL);
     uint32-t i2 = *uint32:unbox(element);

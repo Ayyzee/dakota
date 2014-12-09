@@ -39,8 +39,7 @@ klass node
 
   noexport void dump-prev(slots-t* s, uint32-t iterator-state)
   {
-    if (nullptr != s)
-    {
+    if (nullptr != s) {
 //       fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
 //               "<tr><td port=\"element\">element</td></tr>"
 //               "<tr><td port=\"prev\">prev</td></tr>"
@@ -63,8 +62,7 @@ klass node
   }
   noexport void dump-next(slots-t* s, uint32-t iterator-state)
   {
-    if (nullptr != s)
-    {
+    if (nullptr != s) {
       fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"
               "<tr><td port=\"prev\">prev</td></tr>"
@@ -106,8 +104,7 @@ klass deque
   method object-t test-dump(object-t self)
   {
     slots-t* s = unbox(self);
-    if (nullptr != s)
-    {
+    if (nullptr != s) {
       fprintf(stderr, "  subgraph \"cluster-%p-%i\"\n", cast(void*)(s), s->iterator-state);
       fprintf(stderr, "  {\n");
 
@@ -120,14 +117,11 @@ klass deque
               "<tr><td port=\"last\">last</td></tr>"
               "<tr><td port=\"size\">size=%i</td></tr>"
               "</table> > ];\n", cast(void*)(s), s->iterator-state, s->size);
-      if (nullptr == s->first && nullptr == s->last)
-      {
+      if (nullptr == s->first && nullptr == s->last) {
         fprintf(stderr, "    \"%p-%i-nullptr\" [ label = \"nullptr\" ];\n", cast(void*)(s), s->iterator-state);
         fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i-nullptr\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s), s->iterator-state);
         fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i-nullptr\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s), s->iterator-state);
-      }
-      else
-      {
+      } else {
         fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s->first), s->iterator-state);
         fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i\";\n", cast(void*)(s), s->iterator-state, cast(void*)(s->last), s->iterator-state);
       }
@@ -146,14 +140,11 @@ klass deque
   {
     self = dk:init(super);
 
-    if (nullptr == element)
-    {
+    if (nullptr == element) {
       self.first = nullptr;
       self.last =  nullptr;
       self.size =  0;
-    }
-    else
-    {
+    } else {
       node:slots-t* node = node:create(nullptr, element, nullptr);
       //        node->prev = nullptr;
       //        node->next = nullptr;
@@ -192,13 +183,10 @@ klass deque
     node:slots-t* last =  self.last;
     char8-t[16] buf = "";
 
-    if (nullptr == first)
-    {
+    if (nullptr == first) {
       fprintf(stdout, " 0x%0*" PRIxPTR "\n",
               PRIxPTR-WIDTH, cast(uintptr-t)(first));
-    }
-    else
-    {
+    } else {
       deque:string-from-node(self, first->prev, buf, cast(uint32-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, " 0x%0*" PRIxPTR,
@@ -208,13 +196,10 @@ klass deque
       fprintf(stdout, "\n");
     }
 
-    if (nullptr == last)
-    {
+    if (nullptr == last) {
       fprintf(stdout, " 0x%0*" PRIxPTR "\n",
               PRIxPTR-WIDTH, cast(uintptr-t)(last));
-    }
-    else
-    {
+    } else {
       deque:string-from-node(self, last->prev, buf, cast(uint32-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, " 0x%0*" PRIxPTR,
@@ -320,8 +305,7 @@ klass deque
     assert(nullptr != self.first);
     object-t element = nullptr;
 
-    if (self.last == self.first)
-    {
+    if (self.last == self.first) {
       self.last = nullptr;
     }
     //if (nullptr != self.first)
@@ -487,8 +471,7 @@ klass deque-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       element = dk:element(self);
       self.node = self.node->next;
     }
@@ -501,8 +484,7 @@ klass deque-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       element = self.node->element;
       assert(nullptr != element);
     }

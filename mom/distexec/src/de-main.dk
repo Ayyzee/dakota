@@ -51,8 +51,7 @@ noexport int-t handle-opts(int-t argc, char8-t** argv)
   n = setenv(posixly-correct, "1", should-overwrite = 1);  sc(n);
   int-t opt;
 
-  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL)))
-  {
+  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL))) {
     switch (opt)
     {
       case DE-OPT-DAEMON: { break; }
@@ -63,12 +62,9 @@ noexport int-t handle-opts(int-t argc, char8-t** argv)
       default: { sys:fprintf(stdout, "error\n"); } // this should not happen because of POSIXLY-CORRECT
     }
   }
-  if (NULL == old-posixly-correct)
-  {
+  if (NULL == old-posixly-correct) {
     n = unsetenv(posixly-correct);  sc(n);
-  }
-  else
-  {
+  } else {
     n = setenv(posixly-correct, old-posixly-correct, should-overwrite = 1);  sc(n);
   }
   return optind;
@@ -79,8 +75,7 @@ noexport void dump-command(int-t argc, char8-t** argv)
   char8-t* delim = "";
   char8-t* arg;
   int-t i;
-  for (i = 0; i < argc; i++)
-  {
+  for (i = 0; i < argc; i++) {
     arg = argv[i];
     sys:fprintf(stdout, "%s%s", delim, arg);
     delim = " ";

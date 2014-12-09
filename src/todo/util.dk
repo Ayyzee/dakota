@@ -4,8 +4,7 @@ object-t set-from-collection(object-t klass, object-t collection)
 {
   object-t result = dk:make(klass);
 
-  for (object-t element : collection)
-  {
+  for (object-t element : collection) {
     dk:add(result, element);
   }
   return result;
@@ -15,8 +14,7 @@ object-t sequence-from-collection(object-t klass, object-t collection)
 {
   object-t result = dk:make(klass);
 
-  for (object-t element : collection)
-  {
+  for (object-t element : collection) {
     dk:add-last(result, element);
   }
   return result;

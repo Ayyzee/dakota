@@ -79,8 +79,7 @@ va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {
   file-t log-file = stderr;
 
-  if (0)
-  {
+  if (0) {
     fprintf(log-file, "%s[%i]: ", getprogname(), getpid());
 
     switch (priority)

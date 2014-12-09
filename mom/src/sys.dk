@@ -51,8 +51,7 @@ noexport const char8-t* __klass__ = "sys";
 int-t sys:pipe(int-t fds[2])
 {
   int-t n = ::pipe(fds);  sc(n);
-  if (-1 != n)
-  {
+  if (-1 != n) {
     MOM-LOG-FD("fd=%i %s::%s(fd=%i fd=%i)", fds[0], __klass__, __func__, fds[0], fds[1]);
     MOM-LOG-FD("fd=%i %s::%s(fd=%i fd=%i)", fds[1], __klass__, __func__, fds[0], fds[1]);
   }
@@ -65,8 +64,7 @@ int-t sys:close(int-t fd)
   object-t eq = dk:get-current(event-queue:klass);
   dk:will-close(eq, fd);
   n = ::close(fd);  sc(n);
-  if (-1 != n)
-  {
+  if (-1 != n) {
     dk:did-close(eq, fd);
     MOM-LOG-CLOSE("fd=%i %s::%s()", fd, __klass__, __func__);
   }
@@ -211,8 +209,7 @@ int-t sys:dup2(int-t fd, int-t newfd)
 {
   int-t n;
   n = ::dup2(fd, newfd);  sc(n);
-  if (-1 != n)
-  {
+  if (-1 != n) {
     MOM-LOG-FD("fd=%i %s::%s(fd=%i, fd=%i)", fd, __klass__, __func__, fd, newfd);
     MOM-LOG-FD("fd=%i %s::%s(fd=%i, fd=%i)", newfd, __klass__, __func__, fd, newfd);
   }
@@ -262,8 +259,7 @@ int-t sys:epoll-ctl(int-t epfd, int-t op, int-t fd, struct epoll-event* event)
   MOM-LOG-IOMUX("fd=%i %s::%s(fd=%i, op=%i, fd=%i, event={%s})",
                epfd, __klass__, __func__, epfd, op, fd, dk:statestr(event, buf, sizeof(buf) - (1)));
   n = ::epoll-ctl(epfd, op, fd, event);  sc(n);
-  if (-1 == n)
-  {
+  if (-1 == n) {
     int-t optval;
     socklen-t optlen = sizeof(optval);
     int-t n = sys:getsockopt(fd, SOL-SOCKET, SO-ERROR, &optval, &optlen);  sc(n);

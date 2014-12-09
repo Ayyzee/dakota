@@ -56,8 +56,7 @@ klass input-file
     if (nullptr == file && nullptr == filename)
       file = stdin; // default
 
-    if (nullptr != filename)
-    {
+    if (nullptr != filename) {
       file = fopen(filename, "r");
 
       if (nullptr == file)
@@ -105,13 +104,10 @@ klass input-file
     if (c != self.buffer[self.current-position - 1])
       throw "oops";
     self.current-position--;
-    if ('\n' == c)
-    {
+    if ('\n' == c) {
       self.line--;
       // where is column left?
-    }
-    else
-    {
+    } else {
       self.column--;
     }
     return null;
@@ -120,15 +116,11 @@ klass input-file
   method char8-t get-char8(object-t self)
   {
     char8-t c = self.buffer[self.current-position++];
-    if (0 != c)
-    {
-      if ('\n' == c)
-      {
+    if (0 != c) {
+      if ('\n' == c) {
         self.line++;
         self.column = 0;
-      }
-      else
-      {
+      } else {
         self.column++;
       }
     }
@@ -143,12 +135,10 @@ klass input-file
       type? = space?;
     
     char8-t c;
-    while (1)
-    {
+    while (1) {
       str128-t  ws-buf = "";
       uint32-t ws-buf-pos = 0;
-      while (type?(c = dk:get-char8(self)))
-      {
+      while (type?(c = dk:get-char8(self))) {
         ws-buf[ws-buf-pos] = c;
         ws-buf-pos++;
         ws-buf[ws-buf-pos] = NUL;

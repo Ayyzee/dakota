@@ -42,8 +42,7 @@ klass input-stream
     if (nullptr == file && nullptr == filename)
       self.file = stdin; // default
 
-    if (nullptr != filename)
-    {
+    if (nullptr != filename) {
       self.file = fopen(filename, "r");
 
       if (nullptr == self.file)

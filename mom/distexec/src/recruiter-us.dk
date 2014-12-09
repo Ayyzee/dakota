@@ -57,23 +57,19 @@ object-t us-need-work-rcv-msg(object-t us-connection,
   object-t work = dk:remove-first(work-queue);
   dk:rcv-msg-callback=(us-connection, us-rcv-msg-callback);
 
-  if (NULL != work)
-  {
+  if (NULL != work) {
 //     assert(0 != work->msg->id);
     match(exec-work, dk:tag(dk:msg(work)));
     connection-for-msg-id-add(dk:id(dk:msg(work)), dk:connection(work));
 
-    if(DE-LOG-WORK)
-    {
+    if (DE-LOG-WORK) {
       const char8-t* addrstr = dk:addrstr(us-connection);
       cstring-t msgstr = dk:val(dk:msg(work));
         MOM-LOG-INFO("start: id=%i, host=%s, cmd=\"%s\"",
                     dk:id(dk:msg(work)), addrstr, msgstr.ptr); // skip cnt
     }
     dk:snd-msg(us-connection, dk:msg(work));
-  }
-  else
-  {
+  } else {
     object-t no-work-msg = make(msg:klass, tag => no-work);
     dk:snd-msg(us-connection, no-work-msg);
   }
@@ -96,8 +92,7 @@ object-t us-bridge-rcv-msg(object-t us-connection,
 {
   MOM-LOG-CALLBACK("fd=%i tag=0x%x %s:%s()", dk:fd(us-connection), dk:tag(rcv-msg), __klass__, __func__);
   match(exit-value, dk:tag(rcv-msg));
-  if(DE-LOG-WORK)
-  {
+  if (DE-LOG-WORK) {
     cstring-t rcv-msg-str = dk:val(rcv-msg);
     int32-t value = int32-from-string(rcv-msg-str.ptr, EXIT-FAILURE);
     MOM-LOG-INFO("finish: id=%i, sys:exit=%i", dk:id(rcv-msg), value);

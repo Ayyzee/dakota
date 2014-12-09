@@ -61,8 +61,7 @@ int-t
 milliseconds-from-timespec(const timespec* timeout)
 {
   int-t val = -1; // forever
-  if (NULL != timeout)
-  {
+  if (NULL != timeout) {
     val = (timeout->tv-sec * 1000) + (timeout->tv-nsec / (1000 * 1000));
     // bugbug: can overflow
   }
@@ -120,12 +119,10 @@ klass event-queue
     int-t n = sys:sigprocmask(SIG-BLOCK, &allsigs, &oldmask);  sc(n);
     MOM-LOG-SIGINFO("%s() signo=%i, pid=%i, status=%i, code=%i",
                 __func__, si->si-signo, si->si-pid, si->si-status, si->si-code);
-    while (1)
-    {
+    while (1) {
       int-t len = sys:write(sigs[k-write], si, sizeof(*si));
 
-      if (-1 != len && sizeof(*si) != len)
-      {
+      if (-1 != len && sizeof(*si) != len) {
         n = sys:sigprocmask(SIG-SETMASK, &oldmask, NULL);  sc(n);
         goto __failure;
       }
@@ -173,8 +170,7 @@ klass event-queue
     int-t status;
     pid = sys:waitpid(si.si-pid, &status, WNOHANG);
 
-    if (0 < pid)
-    {
+    if (0 < pid) {
 //       MOM-LOG-INFO("waitpid() pid=%i status=%i", pid, status);
       object-t eh = event-handler-for-child-proc-exit[pid];
       event-handler-for-child-proc-exit[pid] = cast(object-t)0x3333;
@@ -185,13 +181,11 @@ klass event-queue
       return self;
     }
     else
-    if (0 == pid)
-    {
+    if (0 == pid) {
       MOM-LOG-ERROR("error: %s(): child not awaiting", __func__);
     }
     else
-    if (0 > pid)
-    {
+    if (0 > pid) {
       int-t num = errno;
 //       dk:flag-error(self, num);
       MOM-LOG-ERROR-ERRNO(num);
@@ -220,14 +214,12 @@ klass event-queue
     self.loop-count = 0;
     
 #if HAVE-EPOLL
-    for (uint32-t i = 0; i < 1024; i++) // hackhack
-    {
+    for (uint32-t i = 0; i < 1024; i++) { // hackhack
       self.events-for-ident[i] = -1;
       self.read-event-handler-for-ident[i] =  NULL;
       self.write-event-handler-for-ident[i] = NULL;
     }
-    for (uint32-t i = 0; i < sizeof(event-handler-for-child-proc-exit)/sizeof(event-handler-for-child-proc-exit[0]); i++)
-    {
+    for (uint32-t i = 0; i < sizeof(event-handler-for-child-proc-exit)/sizeof(event-handler-for-child-proc-exit[0]); i++) {
       event-handler-for-child-proc-exit[i] = NULL;
     }
 #endif
@@ -236,8 +228,7 @@ klass event-queue
     self.events-size = initial-event-size;
     self.events = cast(event:slots-t*)sys:malloc(sizeof(event:slots-t) * self.events-size);
     // bugbug
-    for (int32-t i = 0; i < self.events-size; i++)
-    {
+    for (int32-t i = 0; i < self.events-size; i++) {
       event:init(&self.events[i]);
     }
 
@@ -259,8 +250,7 @@ klass event-queue
                                    object => self);
 
     n = sys:pipe(sigs);  sc(n);
-    if (-1 != n)
-    {
+    if (-1 != n) {
       MOM-LOG-FD("fd=%i #event-queue-signal-pipe-read", sigs[k-read]);
       MOM-LOG-FD("fd=%i #event-queue-signal-pipe-write", sigs[k-write]);
       dk:add(self, event:k-read, sigs[k-read], sigs-read-event-handler);
@@ -312,8 +302,7 @@ klass event-queue
 #else
 #error
 #endif
-    if (-1 == events-count)
-    {
+    if (-1 == events-count) {
       switch (errno)
       {
         default:
@@ -359,44 +348,32 @@ klass event-queue
 #if USE-KQUEUE-SIGNAL-FILTER
     n = dk:change-event(self, &event, op = 0);  sc(n);
 #else
-    if (event:k-signal == filter)
-    {
+    if (event:k-signal == filter) {
       delivered-sigs-handler[ident] = eh;
     }
     else
-    if (event:k-proc == filter)
-    {
+    if (event:k-proc == filter) {
       event-handler-for-child-proc-exit[ident] = eh;
-    }
-    else
-    {
+    } else {
       n = dk:change-event(self, &event, op = 0);  sc(n);
     }
 #endif // USE-KQUEUE-SIGNAL-FILTER
 #else
 #if HAVE-EPOLL
-    if (event:k-signal == filter)
-    {
+    if (event:k-signal == filter) {
       delivered-sigs-handler[ident] = eh;
     }
     else
-    if (event:k-proc == filter)
-    {
+    if (event:k-proc == filter) {
       event-handler-for-child-proc-exit[ident] = eh;
-    }
-    else
-    {
-      if (event:k-read == filter)
-      {
+    } else {
+      if (event:k-read == filter) {
         self.read-event-handler-for-ident[ident] = eh;
       }
       else
-      if (event:k-write == filter)
-      {
+      if (event:k-write == filter) {
         self.write-event-handler-for-ident[ident] = eh;
-      }
-      else
-      {
+      } else {
         int-t num = EINVAL;
 //         dk:flag-error(self, num);
         MOM-LOG-ERROR-ERRNO(num);
@@ -405,14 +382,11 @@ klass event-queue
 //       uint32-t ev-before = self.events-for-ident[ident];
       //
 
-      if (-1 == self.events-for-ident[ident])
-      {
+      if (-1 == self.events-for-ident[ident]) {
         op = EPOLL-CTL-ADD;
         //
         self.events-sum++;
-      }
-      else
-      {
+      } else {
         op = EPOLL-CTL-MOD;
         event.events |= self.events-for-ident[ident];
       }
@@ -454,50 +428,35 @@ klass event-queue
 #if USE-KQUEUE-SIGNAL-FILTER
     n = dk:change-event(self, &event, op = 0);  sc(n);
 #else
-    if (event:k-signal == filter)
-    {
+    if (event:k-signal == filter) {
       delivered-sigs-handler[ident] = cast(object-t)0x5555;
     }
     else
-    if (event:k-proc == filter)
-    {
+    if (event:k-proc == filter) {
       event-handler-for-child-proc-exit[ident] = cast(object-t)0x7777;
-    }
-    else
-    {
+    } else {
       n = dk:change-event(self, &event, op = 0);  sc(n);
     }
 #endif // USE-KQUEUE-SIGNAL-FILTER
 #else
 #if HAVE-EPOLL
-    if (event:k-signal == filter)
-    {
+    if (event:k-signal == filter) {
       delivered-sigs-handler[ident] = cast(object-t)0x5555;
     }
     else
-    if (event:k-proc == filter)
-    {
+    if (event:k-proc == filter) {
       event-handler-for-child-proc-exit[ident] = cast(object-t)0x7777;
-    }
-    else
-    {
-      if (-1 == self.events-for-ident[ident])
-      {
+    } else {
+      if (-1 == self.events-for-ident[ident]) {
         //MOM-LOG-WARNING("warning: already removed");
-      }
-      else
-      {
-        if (event:k-read == filter)
-        {
+      } else {
+        if (event:k-read == filter) {
           self.read-event-handler-for-ident[ident] = cast(object-t)0x7777;
         }
         else
-        if (event:k-write == filter)
-        {
+        if (event:k-write == filter) {
           self.write-event-handler-for-ident[ident] = cast(object-t)0x9999;
-        }
-        else
-        {
+        } else {
           int-t num = EINVAL;
 //           dk:flag-error(self, num);
           MOM-LOG-ERROR-ERRNO(num);
@@ -506,14 +465,11 @@ klass event-queue
 //         uint32-t ev-before = self.events-for-ident[ident];
         self.events-for-ident[ident] &= ~event.events;
 
-        if (0 == self.events-for-ident[ident])
-        {
+        if (0 == self.events-for-ident[ident]) {
           op = EPOLL-CTL-DEL;
           self.events-for-ident[ident] = -1;
           self.events-sum--;
-        }
-        else
-        {
+        } else {
           op = EPOLL-CTL-MOD;
           event.events = self.events-for-ident[ident];
         }
@@ -532,8 +488,7 @@ klass event-queue
 
   method object-t loop(object-t self, const timespec* ts)
   {
-    while(1)
-    {
+    while (1) {
       for (object-t h in self.delayed-handlers)
         dk:invoke(h, NULL);
       dk:empty(self.delayed-handlers);      
@@ -555,8 +510,7 @@ klass event-queue
 #error
 #endif
       //MOM-LOG-INFO("%i", self.events-sum);
-      if (-1 == events-count)
-      {
+      if (-1 == events-count) {
         switch (errno)
         {
           case EINTR:
@@ -567,15 +521,11 @@ klass event-queue
             MOM-LOG-ERROR-ERRNO(num);
             //goto __failure;
         }
-      }
-      else
-      {
-        if (0 == events-count) // timeout fired
-        {
+      } else {
+        if (0 == events-count) { // timeout fired
           MOM-LOG-INFO("timeout expired");
         }
-        for (int32-t i = 0; i < events-count; i++)
-        {
+        for (int32-t i = 0; i < events-count; i++) {
           event:slots-t e = self.events[i];
           uint32-t ident = event:ident(&e);
 
@@ -597,8 +547,7 @@ klass event-queue
           dk:invoke(eh, event:box(&e));
 #elif HAVE-EPOLL
           {
-            if (EPOLLERR & e.events)
-            {
+            if (EPOLLERR & e.events) {
               int-t optval;
               xsocklen-t optlen = sizeof(optval);
               int-t n = sys:getsockopt(ident, SOL-SOCKET, SO-ERROR, &optval, &optlen);  sc(n);
@@ -606,8 +555,7 @@ klass event-queue
               fd:dump(ident);
             }
             else
-            if ((EPOLLIN & e.events) && (EPOLLOUT & e.events))
-            {
+            if ((EPOLLIN & e.events) && (EPOLLOUT & e.events)) {
               event:slots-t re = e;
               event:slots-t we = e;
 
@@ -621,19 +569,15 @@ klass event-queue
               dk:invoke(weh, &we);
             }
             else
-            if ((EPOLLIN & e.events) || (EPOLLHUP & e.events))
-            {
+            if ((EPOLLIN & e.events) || (EPOLLHUP & e.events)) {
               object-t reh = self.read-event-handler-for-ident[ident];
               dk:invoke(reh, &e);
             }
             else
-            if (EPOLLOUT & e.events)
-            {
+            if (EPOLLOUT & e.events) {
               object-t weh = self.write-event-handler-for-ident[ident];
               dk:invoke(weh, &e);
-            }
-            else
-            {
+            } else {
               sys:abort();
             }
           }
@@ -656,8 +600,7 @@ klass event-queue-klass
 
   method object-t get-current(object-t self)
   {
-    if (NULL == current-event-queue)
-    {
+    if (NULL == current-event-queue) {
       current-event-queue = make(event-queue:klass);
     }
     return current-event-queue;

@@ -171,15 +171,13 @@ klass string
     object-t delimiter-object = make(kls, bytes => delimiter);
 
     // leading 'delimiter'
-    if (0 == strncmp(self.ptr, delimiter, delimiter-length))
-    {
+    if (0 == strncmp(self.ptr, delimiter, delimiter-length)) {
       dk:add-last(result, delimiter-object);
       p1 += delimiter-length;
     }
 
     // 'part' 'delimiter' pairs
-    while (nullptr != (p2 = strstr(p1, delimiter)))
-    {
+    while (nullptr != (p2 = strstr(p1, delimiter))) {
       object-t part-object = make(kls, bytes => cast(const char8-t*)(p1), length => cast(uint32-t)(p2 - p1));
       dk:add-last(result, part-object);
       dk:add-last(result, delimiter-object);
@@ -187,8 +185,7 @@ klass string
     }
 
     // trailing 'part'
-    if (NUL != *p1)
-    {
+    if (NUL != *p1) {
       object-t part-object = make(kls, bytes => p1);
       dk:add-last(result, part-object);
     }
@@ -204,8 +201,7 @@ klass string
 
   method object-t append-sequence(object-t self, object-t sequence)
   {
-    for (object-t element in sequence)
-    {
+    for (object-t element in sequence) {
       const char8-t* utf8 = dk:utf8-from(element);
       uint32-t length = cast(uint32-t)safe-strlen(utf8);
       self.len += cast(uint32-t)(length);
@@ -220,17 +216,14 @@ klass string
     //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
     int-t result;
 
-    if (dk:instance?(other, klass))
-    {
+    if (dk:instance?(other, klass)) {
       // what if both utf8s are nullptr?
       // what if only one utf8 is nullptr?
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = safe-strcmp(s1->ptr, s2->ptr);
       result = dkt-normalize-compare-result(result);
-    }
-    else
-    {
+    } else {
       result = dk:compare(super, other);
     }
     result = dkt-normalize-compare-result(result);

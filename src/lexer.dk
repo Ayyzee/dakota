@@ -59,12 +59,10 @@ klass lexer
   {
     self = dk:init(super);
 
-    if (nullptr != filename)
-    {
+    if (nullptr != filename) {
       self.filename = filename;
       file = fopen(self.filename, "r");
-      if (nullptr == file)
-      {
+      if (nullptr == file) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s", buf);
@@ -79,9 +77,7 @@ klass lexer
       self.buffer[self.length] = NUL;
       fclose(file);
       self.current-position = 0;
-    }
-    else
-    {
+    } else {
       self.filename = nullptr;
       fpos-t fpos;
       fgetpos(file, &fpos);
@@ -131,20 +127,14 @@ klass lexer
     assert(0 != self.current-position);
     self.current-position--;
     char8-t c = current-char8(self);
-    if ('\n' == c)
-    {
+    if ('\n' == c) {
       self.line--;
       self.column = self.previous-column;
-    }
-    else
-    {
-      if (0 == self.column)
-      {
+    } else {
+      if (0 == self.column) {
         self.line--;
         self.column = self.previous-column;
-      }
-      else
-      {
+      } else {
         //
         self.column--;
       }
@@ -156,16 +146,12 @@ klass lexer
   {
     char8-t c = current-char8(self);
     self.current-position++;
-    if (NUL != c)
-    {
-      if ('\n' == c)
-      {
+    if (NUL != c) {
+      if ('\n' == c) {
         self.previous-column = self.column + 1;
         self.line++;
         self.column = 0;
-      }
-      else
-      {
+      } else {
         self.previous-column = self.column;
         //
         self.column++;
@@ -180,14 +166,10 @@ klass lexer
     object-t token;
     object-t leading-ws = make(vector:klass);
 
-    while (nullptr != (token = dk:lex(self)))
-    {
-      if (0 == dk:tokenid(token))
-      {
+    while (nullptr != (token = dk:lex(self))) {
+      if (0 == dk:tokenid(token)) {
         dk:add-last(leading-ws, token);
-      }
-      else
-      {
+      } else {
         unless (dk:empty?(leading-ws))
         {
           dk:set-leading-ws(token, leading-ws);
@@ -201,8 +183,7 @@ klass lexer
 
   method object-t lex(object-t self)
   {
-    while (1)
-    {
+    while (1) {
       char8-t c1 = get-char8(self);
       switch (c1)
       {
@@ -212,8 +193,7 @@ klass lexer
         {
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           cstring:concat(&buf, c1);
-          while (1)
-          {
+          while (1) {
             char8-t c2 = get-char8(self);
             switch (c2)
             {
@@ -238,8 +218,7 @@ klass lexer
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           cstring:concat(&buf, c1);
           boole-t escaped? = false;
-          while (1)
-          {
+          while (1) {
             char8-t c2 = get-char8(self);
             cstring:concat(&buf, c2);
             switch (c2)
@@ -248,12 +227,9 @@ klass lexer
                 escaped? = true;
                 break;
               case '\n':
-                if (escaped?)
-                {
+                if (escaped?) {
                   escaped? = false;
-                }
-                else
-                {
+                } else {
                   escaped? = false;
                   object-t token = make(token:klass, tokenid => 0, buffer => buf.ptr,
                                         line => -1, column => -1);
@@ -269,8 +245,7 @@ klass lexer
         {
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           cstring:concat(&buf, c1);
-          while (1)
-          {
+          while (1) {
             char8-t c2 = get-char8(self);
             switch (c2)
             {
@@ -278,8 +253,7 @@ klass lexer
               case '/':
               {
                 cstring:concat(&buf, c2);
-                while (1)
-                {
+                while (1) {
                   char8-t c3 = get-char8(self);
                   cstring:concat(&buf, c3);
                   switch (c3)
@@ -300,8 +274,7 @@ klass lexer
                 cstring:concat(&buf, c2);
                 char8-t c3;
                 char8-t c4 = get-char8(self);
-                while (1)
-                {
+                while (1) {
                   c3 = c4;
                   cstring:concat(&buf, c3);
                   c4 = get-char8(self);
@@ -330,8 +303,7 @@ klass lexer
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           cstring:concat(&buf, c1);
           boole-t escaped? = false;
-          while (1)
-          {
+          while (1) {
             char8-t c2 = get-char8(self);
             cstring:concat(&buf, c2);
             switch (c2)
@@ -340,12 +312,9 @@ klass lexer
                 escaped? = !escaped?;
                 break;
               case '\'':
-                if (escaped?)
-                {
+                if (escaped?) {
                   escaped? = false;
-                }
-                else
-                {
+                } else {
                   escaped? = false;
                   object-t token = make(token:klass, tokenid => 'sqst', buffer => buf.ptr,
                                         line => self.line, column => self.column - buf.len);
@@ -364,8 +333,7 @@ klass lexer
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           cstring:concat(&buf, c1);
           boole-t escaped? = false;
-          while (1)
-          {
+          while (1) {
             char8-t c2 = get-char8(self);
             cstring:concat(&buf, c2);
             switch (c2)
@@ -374,12 +342,9 @@ klass lexer
                 escaped? = !escaped?;
                 break;
               case '"':
-                if (escaped?)
-                {
+                if (escaped?) {
                   escaped? = false;
-                }
-                else
-                {
+                } else {
                   escaped? = false;
                   object-t token = make(token:klass, tokenid => 'dqst', buffer => buf.ptr,
                                         line => self.line, column => self.column - buf.len);
@@ -400,8 +365,7 @@ klass lexer
           {
             case 'x': case 'X':
             {
-              do
-              {
+              do {
                 cstring:concat(&buf, c2);
                 c2 = get-char8(self);
               }while (isxdigit(c2));
@@ -412,8 +376,7 @@ klass lexer
             }
             case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7':
             {
-              do
-              {
+              do {
                 cstring:concat(&buf, c2);
                 c2 = get-char8(self);
               }while (isdigit(c2) && '8' != c2 && '9' != c2);
@@ -432,8 +395,7 @@ klass lexer
         case '5': case '6': case '7': case '8': case '9':
         {
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
-          do
-          {
+          do {
             cstring:concat(&buf, c1);
             c1 = get-char8(self);
           }while (isdigit(c1));
@@ -457,14 +419,12 @@ klass lexer
         {
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           //cstring:concat(&buf, c1);
-          do
-          {
+          do {
             cstring:concat(&buf, c1);
             c1 = get-char8(self);
           }while (isalnum(c1) || '_' == c1 || '-' == c1);
           unget-char8(self);
-          while (!isalnum(previous-char8(self)) && '_' != previous-char8(self))
-          {
+          while (!isalnum(previous-char8(self)) && '_' != previous-char8(self)) {
             unget-char8(self);
             buf.ptr[buf.len - 1] = NUL;
             buf.len--;
@@ -574,8 +534,7 @@ klass lexer
           object-t token = make(token:klass, tokenid => ')', buffer => buf.ptr,
                                 line => self.line, column => self.column - buf.len);
           object-t open-token;
-          do
-          {
+          do {
             open-token = dk:pop(self.open-tokens);
           } while ('<' == dk:tokenid(open-token));
 
@@ -913,8 +872,7 @@ klass lexer
           object-t token = make(token:klass, tokenid => ']', buffer => buf.ptr,
                                 line => self.line, column => self.column - buf.len);
           object-t open-token;
-          do
-          {
+          do {
             open-token = dk:pop(self.open-tokens);
           } while ('<' == dk:tokenid(open-token));
 
@@ -994,8 +952,7 @@ klass lexer
           object-t token = make(token:klass, tokenid => '}', buffer => buf.ptr,
                                 line => self.line, column => self.column - buf.len);
           object-t open-token;
-          do
-          {
+          do {
             open-token = dk:pop(self.open-tokens);
           } while ('<' == dk:tokenid(open-token));
 

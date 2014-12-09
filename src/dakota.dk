@@ -180,23 +180,17 @@ file-name-from-klass-name(symbol-t klass-name)
 
   while (':' == klass-name[kn])
     kn++;
-  while (NUL != klass-name[kn])
-  {
-    if (':' == klass-name[kn])
-    {
-      do
-      {
+  while (NUL != klass-name[kn]) {
+    if (':' == klass-name[kn]) {
+      do {
         kn++;
       } while (':' == klass-name[kn]);
 
-      if (NUL != klass-name[kn])
-      {
+      if (NUL != klass-name[kn]) {
         file-name[fn] = gbl-delimiter;
         fn++;
       }
-    }
-    else
-    {
+    } else {
       file-name[fn] = klass-name[kn];
       kn++;
       fn++;
@@ -214,12 +208,9 @@ find-file(const char8-t* path, const char8-t* file-name, const char8-t* suffix)
   uint32-t j2 = 0;
   const char8-t* rtn = nullptr;
 
-  while (j1 <= safe-strlen(path))
-  {
-    if (NUL == path[j1] || ':' == path[j1])
-    {
-      if (0 != j2 && gbl-delimiter != file[j2 - 1])
-      {
+  while (j1 <= safe-strlen(path)) {
+    if (NUL == path[j1] || ':' == path[j1]) {
+      if (0 != j2 && gbl-delimiter != file[j2 - 1]) {
         file[j2] = gbl-delimiter;
         j2++;
       }
@@ -230,25 +221,18 @@ find-file(const char8-t* path, const char8-t* file-name, const char8-t* suffix)
       struct stat status;
       int-t err = stat(file, &status);
 
-      if (0 == err)
-      {
-        if (0 == S-ISREG(status.st-mode)) // NOT a regular file
-        {
+      if (0 == err) {
+        if (0 == S-ISREG(status.st-mode)) { // NOT a regular file
           fprintf(stderr, "%s:%i: ERROR: %s: not a regular file.\n", __FILE__, __LINE__, file);
         }
-        else-if (0 == (S-IRUSR & status.st-mode)) // user DOES NOT have read permission
-        {
+        else-if (0 == (S-IRUSR & status.st-mode)) { // user DOES NOT have read permission
           fprintf(stderr, "%s:%i: ERROR: %s: user does not have read permission.\n", __FILE__, __LINE__, file);
-        }
-        else
-        {
+        } else {
           //fprintf(stdout, "%s: IS a regular file AND user DOES have read permission\n", file);
           rtn = file;
           break;
         }
-      }
-      else
-      {
+      } else {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s:%i: INFO: %s: %s\n", __FILE__, __LINE__, file, buf);
@@ -256,9 +240,7 @@ find-file(const char8-t* path, const char8-t* file-name, const char8-t* suffix)
       }
       j1++;
       j2 = 0;
-    }
-    else
-    {
+    } else {
       file[j2] = path[j1];
       j1++;
       j2++;
@@ -386,25 +368,21 @@ perl-dump-resource-info(sorted-array-t* klass-defns-table)
 {
   uint32-t klasses-count = 0;
   uint32-t methods-count = 0;
-  for (uint32-t i = 0; i < klass-defns-table->count; i++)
-  {
+  for (uint32-t i = 0; i < klass-defns-table->count; i++) {
     named-info-node-t* klass-info = *cast(named-info-node-t**)sorted-array:at(klass-defns-table, i);
     named-info-node-t* current-info = klass-info;
 
-    do
-    {
+    do {
       symbol-t construct = cast(symbol-t)named-info-node:at(current-info, $construct);
       if (0 == symbol:compare($klass, construct))
         klasses-count++;
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info-node:at(current-info, $method-signatures);
 
-      if (nullptr != method-signatures)
-      {
+      if (nullptr != method-signatures) {
         const method-t* method-addresses = cast(const method-t*)named-info-node:at(current-info, $method-addresses);
         uint32-t j = 0;
         const signature-t* method-signature;
-        while (nullptr != (method-signature = method-signatures[j]))
-        {
+        while (nullptr != (method-signature = method-signatures[j])) {
           method-t method-address = method-addresses[j];
           if (nullptr != method-address)
             methods-count++;
@@ -427,13 +405,11 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
   ofile:printf(ofl, "{\n");
   ofl.col++;
 
-  for (uint32-t i = 0; i < klass-defns-table->count; i++)
-  {
+  for (uint32-t i = 0; i < klass-defns-table->count; i++) {
     named-info-node-t* klass-info = *cast(named-info-node-t**)sorted-array:at(klass-defns-table, i);
     named-info-node-t* current-info = klass-info;
 
-    do
-    {
+    do {
       symbol-t name =            name-from-info(current-info);
       symbol-t klass-name =      klass-name-from-info(current-info);
       symbol-t superklass-name = superklass-name-from-info(current-info);
@@ -448,8 +424,7 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
         ofile:printf(ofl, "'superklass' => '%s',\n", superklass-name);
       
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info-node:at(current-info, $method-signatures);
-      if (nullptr != method-signatures)
-      {
+      if (nullptr != method-signatures) {
         ofile:printf(ofl, "'methods' =>\n");
         ofile:printf(ofl, "{\n");
         ofl.col++;
@@ -457,8 +432,7 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
         uint32-t j = 0;
         const signature-t* method-signature;
         
-        while (nullptr != (method-signature = method-signatures[j]))
-        {
+        while (nullptr != (method-signature = method-signatures[j])) {
           method-t method-address = method-addresses[j];
           uint32-t defined;
           if (nullptr == method-address)
@@ -530,13 +504,11 @@ noexport void
 init-runtime()
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
-  if (nullptr == object:klass)
-  {
+  if (nullptr == object:klass) {
     init-runtime-ds();
 
     named-info-node-t* registration-info;
-    while (nullptr != (registration-info = gbl-registration-info-list))
-    {
+    while (nullptr != (registration-info = gbl-registration-info-list)) {
       gbl-registration-info-list = gbl-registration-info-list->next;
       registration-info->next = nullptr;
       register-info-common(registration-info);
@@ -629,14 +601,11 @@ import-klass(symbol-t klass-name, assoc-node-t* node)
   named-assoc-node-t named-node = { klass-name, node };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array:bsearch(gbl-imported-klasses-table, &named-node);
 
-  if (nullptr == found-named-node)
-  {
+  if (nullptr == found-named-node) {
     named-node.node->next = nullptr;
     sorted-array:add(gbl-imported-klasses-table, &named-node);
     sorted-array:add(gbl-imported-klasses-file-table, &klass-name);
-  }
-  else
-  {
+  } else {
     node->next = found-named-node->node;
     found-named-node->node = node;
 
@@ -655,8 +624,7 @@ import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc)
   assert((nullptr != klass-names) &&
          (nullptr != klass-assoc));
   uint32-t i = 0;
-  while (1)
-  {
+  while (1) {
     symbol-t name =        klass-names[i];
     assoc-node-t* assoc = &klass-assoc[i];
     i++;
@@ -674,12 +642,9 @@ interposer-name-for-klass-name(symbol-t klass-name)
   property-t* assoc-ptr = cast(property-t*)sorted-array:bsearch(gbl-interposers-table, &key);
   symbol-t result;
 
-  if (nullptr == assoc-ptr)
-  {
+  if (nullptr == assoc-ptr) {
     result = nullptr;
-  }
-  else
-  {
+  } else {
     property-t assoc = *assoc-ptr;
     result = cast(symbol-t)(assoc.element);
   }
@@ -703,8 +668,7 @@ add-interposers(property-t* interposers)
 {
 //assert(nullptr != interposers);
   uint32-t i = 0;
-  while (1)
-  {
+  while (1) {
     property-t* prop = &interposers[i++];
     if (nullptr == prop->key)
       break;
@@ -724,20 +688,16 @@ export-klass(named-info-node-t* klass-info)
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p'],'klass-name'=>'%s'", __func__, cast(void*)(klass-info), name);
 
   symbol-t interpose-name = cast(symbol-t)named-info-node:at(klass-info, $interpose-name);
-  if (nullptr != interpose-name)
-  {
+  if (nullptr != interpose-name) {
     symbol-t construct = cast(symbol-t)named-info-node:at(klass-info, $construct);
     assert(0 == symbol:compare($klass, construct));
     add-interpose-prop(interpose-name, name);
   }
 
   named-info-node-t** klass-info-ptr = cast(named-info-node-t**)sorted-array:bsearch(gbl-klass-defns-table, &klass-info);
-  if (nullptr == klass-info-ptr)
-  {
+  if (nullptr == klass-info-ptr) {
     sorted-array:add(gbl-klass-defns-table, &klass-info);
-  }
-  else
-  {
+  } else {
     klass-info->next = *klass-info-ptr;
     *klass-info-ptr = klass-info;
   }
@@ -749,8 +709,7 @@ export-klasses(named-info-node-t* klass-info)
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p']", __func__, cast(void*)(klass-info));
   uint32-t i = 0;
 
-  while (1)
-  {
+  while (1) {
     named-info-node-t* var-klass-info = &klass-info[i++];
     if (nullptr == var-klass-info->elements)
       break;
@@ -762,8 +721,7 @@ noexport void
 dump-interposers(ofile-t ofl, named-info-node-t* registration-info)
 {
   const property-t* interposers = cast(const property-t*)named-info-node:at(registration-info, $interposers);
-  if (nullptr != interposers)
-  {
+  if (nullptr != interposers) {
     for (uint32-t i = 0; nullptr != interposers[i].key; i++)
       ofile:printf(ofl, "interpose %s, %s;\n", interposers[i].key, (symbol-t)interposers[i].element);
   }
@@ -780,8 +738,7 @@ should-dump(named-info-node-t* klass-info, const char8-t* only)
 
   boole-t result = true;
   uint32-t only-len = cast(uint32-t)safe-strlen(only);
-  if ('-' == only[0])
-  {
+  if ('-' == only[0]) {
     uint32-t name-len = cast(uint32-t)safe-strlen(name);
     if (name-len < only-len)
       result = false;
@@ -789,13 +746,10 @@ should-dump(named-info-node-t* klass-info, const char8-t* only)
     if (0 != safe-strcmp(name + name-len - only-len, only))
       result = false;
   }
-  else-if ('-' == only[only-len - 1])
-  {
+  else-if ('-' == only[only-len - 1]) {
     if (0 != safe-strncmp(name, only, only-len))
       result = false;
-  }
-  else
-  {
+  } else {
     if (0 != safe-strcmp(name, only))
       result = false;
   }
@@ -845,11 +799,9 @@ dump-module-description(ofile-t ofl, named-info-node-t* registration-info)
 
   named-info-node-t* exports = cast(named-info-node-t*)named-info-node:at(registration-info, $exports);
 
-  if (nullptr != exports)
-  {
+  if (nullptr != exports) {
     //fprintf(ofl.output, "/*\n");
-    for (uint-t i = 0; i < exports->count; i++)
-    {
+    for (uint-t i = 0; i < exports->count; i++) {
       property-t modulee = exports->elements[i];
       const char8-t* module-name = modulee.key;
       named-info-node-t* module-exports = cast(named-info-node-t*)(modulee.element);
@@ -860,8 +812,7 @@ dump-module-description(ofile-t ofl, named-info-node-t* registration-info)
       uint32-t len = cast(uint32-t)safe-strlen(buf);
       pad(buf, cast(uint32-t)sizeof(buf), len);
       const char8-t* delim = "";
-      for (uint-t j = 0; j < module-exports->count; j++)
-      {
+      for (uint-t j = 0; j < module-exports->count; j++) {
         property-t symbol = module-exports->elements[j];
         const char8-t* symbol-name = symbol.key;
 
@@ -885,33 +836,27 @@ dump-klass-defns(ofile-t ofl, named-info-node-t* registration-info, const char8-
   const char8-t* output-dir = getenv("DKT_INTROSPECTOR_OUTPUT_DIRECTORY");
   named-info-node-t* klass-defns = cast(named-info-node-t*)named-info-node:at(registration-info, $klass-defns);
 
-  if (nullptr != klass-defns)
-  {
+  if (nullptr != klass-defns) {
     uint32-t i = 0;
       
-    if (NULL != output-dir)
-    {
+    if (NULL != output-dir) {
       int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
         abort();
     }
-    while (1)
-    {
+    while (1) {
       named-info-node-t* klass-info = &klass-defns[i++];
       if (nullptr == klass-info->elements)
         break;
-      if (nullptr == only || should-dump(klass-info, only))
-      {
+      if (nullptr == only || should-dump(klass-info, only)) {
         if (1)
           dump-klass(ofl, klass-info);
-        if (nullptr != output-dir)
-        {
+        if (nullptr != output-dir) {
           boole-t exported? =          cast(boole-t)named-info-node:at(klass-info, $exported?);
           boole-t state-exported? =    cast(boole-t)named-info-node:at(klass-info, $state-exported?);
           boole-t behavior-exported? = cast(boole-t)named-info-node:at(klass-info, $behavior-exported?);
 
-          if (exported? || state-exported? || behavior-exported?)
-          {
+          if (exported? || state-exported? || behavior-exported?) {
             // bugbug: klass and trait can have same name
             char8-t[255 + (1)] klass-file = "";
             symbol-t klass-name = name-from-info(klass-info);
@@ -934,8 +879,7 @@ max-enum-name-width(enum-info-t* enum-info)
   uint32-t result = 0;
   uint32-t i = 0;
   const char8-t* name;
-  while (nullptr != (name = enum-info[i++].name))
-  {
+  while (nullptr != (name = enum-info[i++].name)) {
     uint32-t width = cast(uint32-t)safe-strlen(name);
     if (width > result)
       result = width;
@@ -948,8 +892,7 @@ max-slot-type-width(named-info-node-t* slots-info)
 {
   uint32-t result = 0;
   uint32-t i = 0;
-  while (nullptr != slots-info[i].elements)
-  {
+  while (nullptr != slots-info[i].elements) {
     const char8-t* slot-type = cast(const char8-t*)named-info-node:at(&slots-info[i], $type);
     uint32-t width = cast(uint32-t)safe-strlen(slot-type);
     if (width > result)
@@ -964,8 +907,7 @@ max-slot-name-width(named-info-node-t* slots-info)
 {
   uint32-t result = 0;
   uint32-t i = 0;
-  while (nullptr != slots-info[i].elements)
-  {
+  while (nullptr != slots-info[i].elements) {
     const char8-t* slot-name = cast(const char8-t*)named-info-node:at(&slots-info[i], $name);
     uint32-t width = cast(uint32-t)safe-strlen(slot-name);
     if (width > result)
@@ -982,15 +924,12 @@ max-method-return-type-width(const signature-t* const* method-signatures, ...)
   va-list-t args;
   va-start(args, method-signatures);
   const signature-t* const* arg = method-signatures;
-  do
-  {
+  do {
     uint32-t index =  0;
 
-    if (nullptr != arg)
-    {
+    if (nullptr != arg) {
       const signature-t* info;
-      while (nullptr != (info = arg[index++]))
-      {
+      while (nullptr != (info = arg[index++])) {
         uint32-t width = cast(uint32-t)safe-strlen(info->return-type);
         if (width > result)
           result = width;
@@ -1059,28 +998,23 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
 
   boole-t verbose = 0;
 
-  if (verbose)
-  {
+  if (verbose) {
     if (nullptr == superklass-name)
       superklass-name = default-superklass-name();
     if (nullptr == klass-name)
       superklass-name = default-klass-name();
-  }
-  else
-  {
+  } else {
     if (0 == symbol:compare(default-superklass-name(), superklass-name))
       superklass-name = nullptr;
     if (0 == symbol:compare(default-klass-name(), klass-name))
       klass-name = nullptr;
   }
-  if (nullptr != modulee && 0 != safe-strcmp(gbl-current-module, modulee))
-  {
+  if (nullptr != modulee && 0 != safe-strcmp(gbl-current-module, modulee)) {
     ofile:printf(ofl, "module %s;\n\n", modulee);
     gbl-current-module = modulee;
   }
 
-  if (exported? || state-exported? || behavior-exported?)
-  {
+  if (exported? || state-exported? || behavior-exported?) {
     ofile:printf(ofl, "%s %s\n", construct, name);
     ofile:printf(ofl, "{\n");
     ofl.col++;
@@ -1091,41 +1025,33 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
       ofile:printf(ofl, "superklass %s;\n", superklass-name);
     if (nullptr != klass-name)
       ofile:printf(ofl, "klass %s;\n", klass-name);
-    if (nullptr != traits)
-    {
+    if (nullptr != traits) {
       uint32-t index = 0;
 
-      while (nullptr != traits[index])
-      {
+      while (nullptr != traits[index]) {
         ofile:printf(ofl, "trait %s;\n", traits[index]);
         index++;
       }
     }
-    if (nullptr != requires)
-    {
+    if (nullptr != requires) {
       uint32-t index = 0;
 
-      while (nullptr != requires[index])
-      {
+      while (nullptr != requires[index]) {
         ofile:printf(ofl, "require %s;\n", requires[index]);
         index++;
       }
     }
-    if (nullptr != provides)
-    {
+    if (nullptr != provides) {
       uint32-t index = 0;
 
-      while (nullptr != provides[index])
-      {
+      while (nullptr != provides[index]) {
         ofile:printf(ofl, "provides %s;\n", provides[index]);
         index++;
       }
     }
-    if (nullptr != enum-info)
-    {
+    if (nullptr != enum-info) {
       uint32-t i = 0;
-      while (nullptr != enum-info[i].info)
-      {
+      while (nullptr != enum-info[i].info) {
         ofile:printf(ofl, "export\n"); // hackhack
         if (nullptr != enum-info[i].name)
           ofile:printf(ofl, "enum %s\n", enum-info[i].name);
@@ -1135,8 +1061,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
         ofl.col++;
         uint32-t max-name-width = max-enum-name-width(enum-info[i].info);
         uint32-t j = 0;
-        while (nullptr != enum-info[i].info[j].name)
-        {
+        while (nullptr != enum-info[i].info[j].name) {
           ofile:printf(ofl, "%-*s = %s,\n",
                        max-name-width,
                        enum-info[i].info[j].name,
@@ -1148,37 +1073,30 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
         i++;
       }
     }
-    if (nullptr != const-info)
-    {
+    if (nullptr != const-info) {
       uint32-t i = 0;
-      while (nullptr != const-info[i].name)
-      {
+      while (nullptr != const-info[i].name) {
         ofile:printf(ofl, "export\n"); // hackhack
         ofile:printf(ofl, "const %s %s = %s;\n", const-info[i].type, const-info[i].name, const-info[i].value);
         i++;
       }
     }
 #define DKT-DEBUG-CODEGEN 0
-    if (DKT-DEBUG-CODEGEN || state-exported?)
-    {
-      if (nullptr != slots-type)
-      {
+    if (DKT-DEBUG-CODEGEN || state-exported?) {
+      if (nullptr != slots-type) {
         ofile:printf(ofl, "slots %s;\n", slots-type);
       }
-      else-if (nullptr != slots-info)
-      {
+      else-if (nullptr != slots-info) {
         if (nullptr == cat || $struct == cat)
           ofile:printf(ofl, "slots\n");
         else
           ofile:printf(ofl, "slots %s\n", cat);
         ofile:printf(ofl, "{\n");
         ofl.col++;
-        if ($enum == cat)
-        {
+        if ($enum == cat) {
           uint32-t max-type-width = max-slot-name-width(slots-info);
           uint32-t i = 0;
-          while (nullptr != slots-info[i].elements)
-          {
+          while (nullptr != slots-info[i].elements) {
             symbol-t       slot-name = name-from-info(&slots-info[i]);
             assert(nullptr != slot-name);
             const char8-t* slot-value = cast(const char8-t*)named-info-node:at(&slots-info[i], $value);
@@ -1187,13 +1105,10 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
             ofile:printf(ofl, "%-*s = %s,\n", max-type-width, slot-name, slot-value);
             i++;
           }
-        }
-        else
-        {
+        } else {
           uint32-t max-type-width = max-slot-type-width(slots-info);
           uint32-t i = 0;
-          while (nullptr != slots-info[i].elements)
-          {
+          while (nullptr != slots-info[i].elements) {
             const char8-t* slot-type = cast(const char8-t*)named-info-node:at(&slots-info[i], $type);
             assert(nullptr != slot-type);
             symbol-t       slot-name = name-from-info(&slots-info[i]);
@@ -1205,15 +1120,12 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
         }
         ofl.col--;
         ofile:printf(ofl, "}\n");
-      }
-      else
-      {
+      } else {
         fprintf(stderr, "%s:%i:error: exported slots without type or info\n", __FILE__, __LINE__);
       }
     } // if (state-exported?
     if ((nullptr != superklass-name || nullptr != klass-name || nullptr != traits || nullptr != requires || nullptr != provides)
-        && nullptr != method-signatures)
-    {
+        && nullptr != method-signatures) {
       ofile:printf(ofl, "\n");
     }
     const signature-t* info;
@@ -1228,8 +1140,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
 
     index = 0;
     if (nullptr != ka-method-signatures)
-      while (nullptr != (info = ka-method-signatures[index++]))
-      {
+      while (nullptr != (info = ka-method-signatures[index++])) {
         fprintf(ofl.output, "//");
         ofile-t ofl0 = {ofl.output, 0};
         dump-method(ofl0, info, max-return-type-width);
@@ -1295,8 +1206,7 @@ getenv-boole(const char8-t* name, boole-t default-value)
   boole-t value = default-value;
   const char8-t* value-str = getenv(name);
 
-  if (NULL != value-str)
-  {
+  if (NULL != value-str) {
     if (0 != safe-strcmp("0", value-str))
       value = true;
   }
@@ -1318,16 +1228,14 @@ dkt-register-info(named-info-node-t* registration-info)
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
   const char8-t* output-path = getenv("DKT_INTROSPECTOR_OUTPUT");
-  if (NULL != output-path)
-  {
+  if (NULL != output-path) {
     if (NUL == output-path[0]) // empty-string ("") means use default-value
       ctlg-output = stdout;
     else
       ctlg-output = fopen(output-path, "a");
   }
 
-  if (nullptr != ctlg-output)
-  {
+  if (nullptr != ctlg-output) {
     boole-t        ctlg-recursive = getenv-boole("DKT_INTROSPECTOR_RECURSIVE", false);
     const char8-t* ctlg-only =      getenv("DKT_INTROSPECTOR_ONLY");
     const char8-t* ctlg-arg =       getenv("DKT_INTROSPECTOR_ARG");
@@ -1340,8 +1248,7 @@ dkt-register-info(named-info-node-t* registration-info)
     const char8-t* arg-base =  remove-dir(ctlg-arg);
     const char8-t* name-base = remove-dir(name);
 
-    if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base)))
-    {
+    if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
       dump-klass-defns(ofl, registration-info, ctlg-only);
       dump-interposers(ofl, registration-info);
       if (NULL == ctlg-only)
@@ -1383,12 +1290,10 @@ dkt_deregister-info(named-info-node-t* registration-info)
   named-info-node:sort(registration-info);
   named-info-node-t* klass-defns = cast(named-info-node-t*)named-info-node:at(registration-info, $klass-defns);
 
-  if (nullptr != klass-defns)
-  {
+  if (nullptr != klass-defns) {
     uint32-t i = 0;
       
-    while (1)
-    {
+    while (1) {
       named-info-node-t* klass-info = &klass-defns[i++];
       assert(nullptr != klass-info);
       if (nullptr == klass-info->elements)
@@ -1396,12 +1301,10 @@ dkt_deregister-info(named-info-node-t* registration-info)
       symbol-t klass-name = name-from-info(klass-info);
       const char8-t* file = cast(symbol-t)named-info-node:at(klass-info, $file);
       method-t finalize =   cast(method-t)named-info-node:at(klass-info, $finalize);
-      if (nullptr != finalize)
-      {
+      if (nullptr != finalize) {
         named-assoc-node-t named-node = { klass-name, nullptr };
         named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array:bsearch(gbl-imported-klasses-table, &named-node);
-        if (nullptr != found-named-node)
-        {
+        if (nullptr != found-named-node) {
           object-t kls = cast(object-t)(found-named-node->node->element);
           DKT-LOG-INITIAL-FINAL("'action'=>'%s','args'=>['%s'],'klass'=>'%s','file'=>'%s'",
                                 "finalize", "klass", klass-name, file);
@@ -1437,13 +1340,11 @@ dk-klass-for-name(symbol-t klass-name)
   assoc-node-t* klass-assoc = imported-klasses-for-klass(klass-name);
   object-t klass = nullptr;
 
-  if (nullptr == klass-assoc || nullptr == (klass = *cast(object-t*)(klass-assoc->element)))
-  {
+  if (nullptr == klass-assoc || nullptr == (klass = *cast(object-t*)(klass-assoc->element))) {
     object-t klass-klass = nullptr;
     symbol-t name = klass-name-from-info(klass-info-slots);
 
-    if (nullptr == name)
-    {
+    if (nullptr == name) {
       symbol-t superklass-name = superklass-name-for-name(klass-name);
 
       if (nullptr == superklass-name)
@@ -1457,9 +1358,7 @@ dk-klass-for-name(symbol-t klass-name)
       else
         klass-klass = dk-klass-for-name(superklass-klass-name); // recursive
       assert(nullptr != klass-klass);
-    }
-    else
-    {
+    } else {
       klass-klass = dk-klass-for-name(name); // recursive
       assert(klass:klass == klass-klass || klass:subklass?(klass-klass, klass:klass));
       assert(nullptr != klass-klass);
@@ -1478,23 +1377,18 @@ info-for-name(symbol-t klass-name) throw(object-t)
   named-info-node-t* info-ptr = &info;
   named-info-node-t** klass-info-ptr = cast(named-info-node-t**)sorted-array:bsearch(gbl-klass-defns-table, &info-ptr);
 
-  if (nullptr == klass-info-ptr)
-  {
+  if (nullptr == klass-info-ptr) {
     const char8-t* klasspath = getenv("KLASSPATH");
 
-    if (NULL == klasspath)
-    {
+    if (NULL == klasspath) {
       fprintf(stderr, "%s:%i: ERROR: klass '%s' not found and KLASSPATH not set.\n", __FILE__, __LINE__, klass-name);
       throw "bummer";
-    }
-    else
-    {
+    } else {
       //fprintf(stdout, "KLASSPATH=%s\n", klasspath);
       const char8-t* file-name = file-name-from-klass-name(klass-name);
       const char8-t* file = find-file(klasspath, file-name, SO-EXT);
 
-      if (nullptr != file)
-      {
+      if (nullptr != file) {
         load-library(file);
 
         // aggregate klass here
@@ -1522,8 +1416,7 @@ dk-intern(const char8-t* key)
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s']", __func__, key);
   static sorted-ptr-array-t* intern-array = sorted-ptr-array:create(32, cast(uint32-t)sizeof(symbol-t), cast(std-compare-t)safe-strcmp);
 
-  if (intern-array->count == intern-array->capacity)
-  {
+  if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;
     intern-array->elements = cast(void**)realloc(intern-array->elements, intern-array->size * intern-array->capacity);
   }

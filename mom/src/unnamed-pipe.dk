@@ -134,8 +134,7 @@ klass unnamed-pipe
     int32-t n = sys:read(self.fds[k-read], self.buf.ptr, self.buf.capacity); nbsc(n);
     if (-1 != n)
       self.buf.len = n;
-    if (0 == n && dk:eof?(read-event))
-    {
+    if (0 == n && dk:eof?(read-event)) {
       MOM-LOG-EOF("fd=%i #EOF on read unnamed-pipe", self.fds[k-read]);
       dk:close(self);
     }

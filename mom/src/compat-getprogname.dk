@@ -28,8 +28,7 @@ const char8-t* getprogname()
 
 void setprogname(const char8-t* progname)
 {
-  if (NULL != progname)
-  {
+  if (NULL != progname) {
     char8-t* last-slash = sys:strrchr(progname, '/');
 
     if (NULL != last-slash)

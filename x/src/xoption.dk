@@ -29,8 +29,7 @@ klass xoption
     int-t result = 0;
     fprintf(stdout, "usage: %s", getprogname());
 
-    while (NULL != options->name)
-    {
+    while (NULL != options->name) {
       switch (options->has-arg)
       {
         case no-argument:

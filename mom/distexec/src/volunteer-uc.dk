@@ -104,9 +104,7 @@ object-t uc-exec-work-rcv-msg(object-t uc-connection, object-t exec-work-msg)
   if (0 < pid)
   { // in parent
     dk:rcv-msg-callback=(process, uc-proc-rcv-msg-callback);
-  }
-  else
-  {
+  } else {
     MOM-LOG-ERROR-ERRNO(errno);
   }
   n = sys:chdir("/");  sc(n);

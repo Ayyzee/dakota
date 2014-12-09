@@ -62,12 +62,9 @@ static void __attribute__((constructor)) initializer()
 {
   char8-t* hexstr = sys:getenv("DE_LOG_FLAGS");
 
-  if (NULL != hexstr)
-  {
+  if (NULL != hexstr) {
     mom:log-flags = sys:strtoumax(hexstr, (char8-t**)NULL, 16);  zeroneen(errno);
-  }
-  else
-  {
+  } else {
     mom:log-flags = mom:default-log-flags;
   }
   return;
@@ -104,15 +101,13 @@ export void mom:openlog(const char8-t* id, int-t logopt, int-t facility)
 {
   ident = id;
 
-  if (NULL == ident)
-  {
+  if (NULL == ident) {
     ident = sys:getprogname();
   }
   pid = sys:getpid();
   //sys:snprintf(logfile-name, sizeof(logfile-name) - (1), "%s.%i.log", ident, pid);
   logfile = sys:fopen(logfile-name, "a");
-  if (NULL == logfile)
-  {
+  if (NULL == logfile) {
     logfile = stderr; // hackhack
   }
   //mom:add-watch();

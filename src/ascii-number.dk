@@ -42,14 +42,11 @@ klass ascii-number
   {
     //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
     int-t result;
-    if (dk:instance?(other, klass))
-    {
+    if (dk:instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = s1->number - s2->number;
-    }
-    else
-    {
+    } else {
       result = dk:compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
@@ -60,8 +57,7 @@ klass ascii-number
   {
     boole-t state;
 
-    if (dk:instance?(other, klass))
-    {
+    if (dk:instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
 
@@ -69,9 +65,7 @@ klass ascii-number
         state = true;
       else
         state = false;
-    }
-    else
-    {
+    } else {
       state = false;
     }
     return state;
@@ -81,16 +75,12 @@ klass ascii-number
   {
     int32-t rtn;
 
-    if (0 == exp)
-    {
+    if (0 == exp) {
       rtn = 1;
-    }
-    else
-    {
+    } else {
       rtn = base;
 
-      while (1 != exp)
-      {
+      while (1 != exp) {
         rtn *= base;
         exp--;
       }
@@ -101,12 +91,10 @@ klass ascii-number
   // hackhack: similiar code in string.dk
   noexport void reverse(char8-t* buffer, uint32-t length)
   {
-    if (0 != length)
-    {
+    if (0 != length) {
       uint32-t head-offset = 0, tail-offset = length - 1;
 
-      while (head-offset < tail-offset)
-      {
+      while (head-offset < tail-offset) {
         char8-t head-char = buffer[head-offset];
         buffer[head-offset] = buffer[tail-offset];
         buffer[tail-offset] = head-char;
@@ -121,8 +109,7 @@ klass ascii-number
     int32-t  digit-num = 1;
     uint32-t offset =    0;
 
-    do
-    {
+    do {
       int32-t digit-pos = (num % power(base, digit-num))/(power(base, digit-num - 1));
       char8-t digit = digits[digit-pos];
       buffer[offset] = digit;

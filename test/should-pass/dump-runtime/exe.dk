@@ -8,15 +8,12 @@ int-t main()
   dk:dump(klass:klass);
   //dk:dump-methods(klass:klass);
   printf("---\n");
-  if (null)
-  {
+  if (null) {
     dk:dump(null->klass);
     //dk:dump-methods(null->klass);
     printf("---\n");
     dk:dump(null);
-  }
-  else
-  {
+  } else {
     fprintf(stderr, "NULL\n");
     printf("---\n");
     fprintf(stderr, "NULL\n");

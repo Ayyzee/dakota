@@ -13,8 +13,7 @@ int-t main()
 
   for (object-t element, iterator = dk:forward-iterator(sequence);
        dk:has-element(iterator);
-       element = dk:next-element(iterator))
-  {
+       element = dk:next-element(iterator)) {
     // use element
     // or
     // use get-element(), set-element()
@@ -22,16 +21,14 @@ int-t main()
 
   for (object-t element, iterator = dk:forward-iterator(sequence);
        (element = dk:next-element(iterator));
-      )
-  {
+      ) {
     // use element
     // or
     // use get-element(), set-element()
   }
 
   object-t element, iterator = dk:forward-iterator(sequence);
-  while ((element = dk:next-element(iterator)))
-  {
+  while ((element = dk:next-element(iterator))) {
     // use element
   }
 

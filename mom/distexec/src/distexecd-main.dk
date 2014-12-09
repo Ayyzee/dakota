@@ -110,8 +110,7 @@ noexport void handle-opts(int32-t argc, char8-t** argv)
   };
   int32-t opt;
 
-  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL)))
-  {
+  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL))) {
     switch (opt)
     {
       case DE-OPT-DAEMON:
@@ -221,12 +220,10 @@ noexport void handle-opts(int32-t argc, char8-t** argv)
   }
   argc -= optind;
   argv += optind;
-  if (unrecognized-opt-cnt)
-  {
+  if (unrecognized-opt-cnt) {
     sys:exit(EXIT-FAILURE);
   }
-  if (!opt-daemon)
-  {
+  if (!opt-daemon) {
     n = sys:chdir("/");  sc(n);
   }
   return;
@@ -304,8 +301,7 @@ int-t main(int-t argc, char** argv, char** envp)
   if (opt-recruiter-only && opt-volunteer-only)
     goto __failure;
 
-  if (!opt-volunteer-only)
-  {
+  if (!opt-volunteer-only) {
     if (opt-xinetd && opt-recruiter)
       init-recruiter-ls-ss(STDIN-FILENO);
     else
@@ -314,8 +310,7 @@ int-t main(int-t argc, char** argv, char** envp)
     sin4-dump(group-sin);
     mc-connection = init-recruiter-mc(group-sin); // not a server
   }
-  if (!opt-recruiter-only)
-  {
+  if (!opt-recruiter-only) {
     if (opt-xinetd && opt-volunteer)
       init-volunteer-ms-ss(STDIN-FILENO);
     else

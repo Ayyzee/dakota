@@ -29,8 +29,7 @@ noexport format-printf(4) int-t
 print-error(const char8-t* filename, uint32-t line, uint32-t column, const char8-t* format, ...)
 {
   int-t result = fprintf(stderr, "%s:%i:%i ", filename, line, column);
-  if (-1 != result)
-  {
+  if (-1 != result) {
     va-list-t args;
     va-start(args, format);
     result += vfprintf(stderr, format, args);
@@ -56,21 +55,17 @@ klass perl-parser
     assert(!(stdin != file &&
              nullptr  != filename)); // these are mutually exclusive
 
-    if (nullptr != filename)
-    {
+    if (nullptr != filename) {
       self.filename = filename;
       self.in =       fopen(self.filename, "r");
   
-      if (nullptr == self.in)
-      {
+      if (nullptr == self.in) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s: %s", filename, buf);
         throw make(exception:klass, message => "oops");
       }
-    }
-    else
-    {
+    } else {
       self.filename = nullptr;
       self.in =       file;
     }
@@ -103,15 +98,11 @@ klass perl-parser
   /* method */ noexport int32-t get(object-t self)
   {
     int32-t c = getc(self.in);
-    if (EOF != c)
-    {
-      if ('\n' == c)
-      {
+    if (EOF != c) {
+      if ('\n' == c) {
         self.line++;
         self.column = 0;
-      }
-      else
-      {
+      } else {
         self.column++;
       }
     }
@@ -123,10 +114,8 @@ klass perl-parser
   /* method */ noexport object-t lex(object-t self)
   {
     int32-t c;
-    while (1)
-    {
-      while (isspace(c = perl-parser:get(self)))
-      {
+    while (1) {
+      while (isspace(c = perl-parser:get(self))) {
       }
       if (EOF == c)
       { return null; }
@@ -146,8 +135,7 @@ klass perl-parser
                                 line => self.line, column => self.column - 1); }
         case '$':
         {
-          while ('\n' != (c = perl-parser:get(self)))
-          {
+          while ('\n' != (c = perl-parser:get(self))) {
             if (EOF == c)
               return null;
           }
@@ -156,13 +144,10 @@ klass perl-parser
         case '=':
         {
           c = perl-parser:get(self);
-          if (EOF == c || '>' != c)
-          {
+          if (EOF == c || '>' != c) {
             print-error(self.filename, self.line, self.column - 2, "unknown token '='\n");
             return null;
-          }
-          else
-          {
+          } else {
             return make(token:klass, tokenid => '=>', buffer => "=>",
                         line => self.line, column => self.column - 2);
           }
@@ -174,15 +159,13 @@ klass perl-parser
                                 line => self.line, column => self.column - 1);
           boole-t escaped?;
           c = perl-parser:get(self);
-          if (EOF == c)
-          {
+          if (EOF == c) {
             print-error(self.filename, self.line, self.column, "unterminated string\n");
             return null;
           }
           if (quote-type == c)
             return token; // empty string
-          do
-          {
+          do {
             dk:append(token, cast(uint32-t)c);
 
             if ('\\' == c)
@@ -191,8 +174,7 @@ klass perl-parser
               escaped? = false;
 
             c = perl-parser:get(self);
-            if (EOF == c)
-            {
+            if (EOF == c) {
               print-error(self.filename, self.line, self.column, "unterminated string\n");
               return null;
             }
@@ -221,8 +203,7 @@ klass perl-parser
         {
           object-t token = make(token:klass, tokenid => 'st',
                                 line => self.line, column => self.column - 1);
-          do
-          {
+          do {
             dk:append(token, cast(uint32-t)c);
             c = perl-parser:get(self);
           } while (isalnum(c) || '_' == c);
@@ -245,8 +226,7 @@ klass perl-parser
   /* method */ noexport object-t key(object-t self)
   {
     object-t token = perl-parser:lex(self);
-    if (null == token)
-    {
+    if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
@@ -274,13 +254,11 @@ klass perl-parser
   /* method */ noexport object-t get-corresponds-to(object-t self)
   {
     object-t token = perl-parser:lex(self);
-    if (null == token)
-    {
+    if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
-    if (dk:tokenid(token) != '=>')
-    {
+    if (dk:tokenid(token) != '=>') {
       print-error(self.filename, self.line, self.column, "expected '=>' but got '%s'\n", dk:buffer(token));
       return null;
     }
@@ -290,8 +268,7 @@ klass perl-parser
   /* method */ noexport object-t get-value(object-t self)
   { // get table value - value is NOT optional
     object-t token = perl-parser:lex(self);
-    if (null == token)
-    {
+    if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
@@ -326,8 +303,7 @@ klass perl-parser
   /* method */ noexport object-t element(object-t self)
   { // get vector element - element is optional
     object-t token = perl-parser:lex(self);
-    if (null == token)
-    {
+    if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
@@ -380,8 +356,7 @@ klass perl-parser
   {
     object-t vector = make(vector:klass);
     object-t token;
-    do
-    {
+    do {
       object-t value = perl-parser:element(self);
       if (null == value)
         return vector;
@@ -390,16 +365,14 @@ klass perl-parser
       dk:add-last(vector, value);
 
       token = perl-parser:lex(self);
-      if (null == token)
-      {
+      if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete vector\n");
         return null; // undef
       }
     } while (',' == dk:tokenid(token));
       
       
-    if (']' != dk:tokenid(token))
-    {
+    if (']' != dk:tokenid(token)) {
       print-error(self.filename, self.line, self.column, "expected ',' or ']' but got '%s'\n", dk:buffer(token));
       return null; // undef
     }
@@ -410,8 +383,7 @@ klass perl-parser
   {
     object-t table = make(hashed-table:klass);
     object-t token;
-    do
-    {
+    do {
       object-t table-pair = perl-parser:get-table-pair(self);
       if (nullptr == table-pair)
         return table;
@@ -420,15 +392,13 @@ klass perl-parser
       dk:add(table, table-pair);
 
       token = perl-parser:lex(self);
-      if (null == token)
-      {
+      if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete table\n");
         return null;
       }
     } while (',' == dk:tokenid(token));
       
-    if ('}' != dk:tokenid(token))
-    {
+    if ('}' != dk:tokenid(token)) {
       print-error(self.filename, self.line, self.column, "expected ',' or '}' but got '%s'\n", dk:buffer(token));
       return null; // undef
     }

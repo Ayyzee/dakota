@@ -56,54 +56,39 @@ klass no-such-method-exception
     dk:print(super, out);
     object-t object-klass = dk:klass(self.object);
 
-    if (nullptr == self.signature)
-    {
-      if (dk:instance?(self.object, klass:klass))
-      {
+    if (nullptr == self.signature) {
+      if (dk:instance?(self.object, klass:klass)) {
         dk:print-format(out, ": klass \"%s\"",
                         dk:utf8-from(self.object));
-      }
-      else
-      {
+      } else {
         dk:print-format(out, ": instance %s of klass \"%s\"",
                         dk:utf8-from(self.object),
                         dk:utf8-from(object-klass));
       }
-    }
-    else
-    {
+    } else {
       assert(self.kls == object-klass ||
              self.kls == dk:superklass(object-klass));
 
-      if (self.kls == dk:superklass(object-klass))
-      {
-        if (dk:instance?(self.object, klass:klass))
-        {
+      if (self.kls == dk:superklass(object-klass)) {
+        if (dk:instance?(self.object, klass:klass)) {
           dk:print-format(out, ": klass \"%s\" %s(%s)",
                           dk:utf8-from(self.object),
                           self.signature->name,
                           self.signature->parameter-types);
-        }
-        else
-        {
+        } else {
           dk:print-format(out, ": instance %s of klass \"%s\" %s(%s)",
                           dk:utf8-from(self.object),
                           dk:utf8-from(object-klass),
                           self.signature->name,
                           self.signature->parameter-types);
         }
-      }
-      else
-      {
-        if (dk:instance?(self.object, klass:klass))
-        {
+      } else {
+        if (dk:instance?(self.object, klass:klass)) {
           dk:print-format(out, ": klass \"%s\" %s(%s)",
                           dk:utf8-from(self.object),
                           self.signature->name,
                           self.signature->parameter-types);
-        }
-        else
-        {
+        } else {
           dk:print-format(out, ": instance %s of klass \"%s\" %s(%s)",
                           dk:utf8-from(self.object),
                           dk:utf8-from(object-klass),

@@ -52,11 +52,9 @@ reverse-32(uint32-t arg)
   return arg;
 #endif
   uint32-t result = 0;
-  for(uint32-t i = 0; i < (sizeof(arg) * 8); i++)
-  {
+  for (uint32-t i = 0; i < (sizeof(arg) * 8); i++) {
     uint32-t bit = arg & (1 << i);
-    if (bit)
-    {
+    if (bit) {
       uint32-t mask = 1 << (((sizeof(arg) * 8) - 1) - i);
       result |= mask;
     }
@@ -161,8 +159,7 @@ klass bit-vector
     file-t out = stderr;
     fprintf(out, "%p:%p { count=%i, capacity=%i, elements=\"",
             cast(void*)(self), cast(void*)(unbox(self)), self.count, self.capacity);
-    for (uint32-t i = 0; i < self.count * gbl-element-width; i++)
-    {
+    for (uint32-t i = 0; i < self.count * gbl-element-width; i++) {
       if (0 != i && 0 == (i % 8))
         fprintf(out, " ");
 
@@ -218,10 +215,8 @@ klass bit-vector
     slots-t* other-slots = unbox(other);
     assert(self-slots->capacity == other-slots->capacity);
     self-slots->count = max(self-slots->count, other-slots->count);
-    for (uint32-t offset = 0; offset < self-slots->count; offset++)
-    {
-      if (0 != (self-slots->elements[offset] = op(self-slots->elements[offset], other-slots->elements[offset])))
-      {
+    for (uint32-t offset = 0; offset < self-slots->count; offset++) {
+      if (0 != (self-slots->elements[offset] = op(self-slots->elements[offset], other-slots->elements[offset]))) {
         result = true;
         break;
       }
@@ -270,29 +265,23 @@ klass bit-vector
     //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
     int-t result = 0;
 
-    if (dk:instance?(other, klass))
-    {
+    if (dk:instance?(other, klass)) {
       slots-t* self-slots =  unbox(self);
       slots-t* other-slots = unbox(other);
       assert(self-slots->capacity == other-slots->capacity);
       self-slots->count = max(self-slots->count, other-slots->count);
-      for (uint32-t offset = 0; offset < self-slots->count; offset++)
-      {
+      for (uint32-t offset = 0; offset < self-slots->count; offset++) {
         uint32-t i = self-slots->count - 1 - offset;
-        if (self-slots->elements[i] > other-slots->elements[i])
-        {
+        if (self-slots->elements[i] > other-slots->elements[i]) {
           result = +1;
           break;
         }
-        else-if (self-slots->elements[i] < other-slots->elements[i])
-        {
+        else-if (self-slots->elements[i] < other-slots->elements[i]) {
           result = -1;
           break;
         }
       }
-    }
-    else
-    {
+    } else {
       result = dk:compare(super, other);
     }
     result = dkt-normalize-compare-result(result);

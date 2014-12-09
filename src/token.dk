@@ -67,8 +67,7 @@ klass token
   {
     self = dk:init(super);
 #if 0
-    if (0 != tokenid)
-    {
+    if (0 != tokenid) {
       char8-t[4 + (1)] tokenid-str = "";
       tokenid:str-from(tokenid, tokenid-str, sizeof(tokenid-str));
 
@@ -98,15 +97,12 @@ klass token
   {
     boole-t state;
 
-    if (dk:instance?(other, klass))
-    {
+    if (dk:instance?(other, klass)) {
       slots-t* t = unbox(other);
       object-t s-string = make(string:klass, bytes => cast(const char8-t*)(self.buffer));
       object-t t-string = make(string:klass, bytes => cast(const char8-t*)(t->buffer));
       state = dk:equal?(s-string, t-string);
-    }
-    else
-    {
+    } else {
       state = false;
     }
     return state;
@@ -211,8 +207,7 @@ klass token
 //     fprintf(stderr, "%p:%p { line=%i, buffer=\"",
 //             cast(void*)(self), cast(void*)unbox(self), self.line);
 
-    for (uint32-t i = 0; NUL != self.buffer[i]; i++)
-    {
+    for (uint32-t i = 0; NUL != self.buffer[i]; i++) {
       switch (self.buffer[i])
       {
         case '\n':

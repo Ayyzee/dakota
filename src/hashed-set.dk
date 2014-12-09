@@ -103,22 +103,17 @@ klass hashed-set
       self.hash(object1) % self.num-buckets;
     object-t deque = dk:at(self.buckets, index, nullptr);
 
-    if (nullptr == deque)
-    {
+    if (nullptr == deque) {
       deque = make(deque:klass);
       dk:add-first(deque, object1);
       self.size++; // bugbug - could wrap
       // why use replace-at?  should be add-at
       dk:replace-at(self.buckets, index, deque);
-    }
-    else
-    {
+    } else {
       object-t element = nullptr;
 
-      for (object-t object2 in deque)
-      {
-        if (self.equal?(object1, object2))
-        {
+      for (object-t object2 in deque) {
+        if (self.equal?(object1, object2)) {
           element = object2;
           break;
         }
@@ -127,8 +122,7 @@ klass hashed-set
 //       if (should-throw && nullptr != element)
 //         throw "oops";
 
-      if (nullptr != element)
-      {
+      if (nullptr != element) {
         dk:add-first(deque, object1);
         self.size++; // bugbug - could wrap
       }
@@ -154,12 +148,9 @@ klass hashed-set
     object-t deque = dk:at(self.buckets, index, nullptr);
     object-t result = default-value;
 
-    if (nullptr != deque)
-    {
-      for (object-t object2 in deque)
-      {
-        if (self.equal?(object1, object2))
-        {
+    if (nullptr != deque) {
+      for (object-t object2 in deque) {
+        if (self.equal?(object1, object2)) {
           result = object2;
           break;
         }
@@ -202,16 +193,13 @@ klass hashed-set
       self.hash(element) % self.num-buckets;
     object-t deque = dk:at(self.buckets, index, nullptr);
 
-    if (nullptr != deque)
-    {
+    if (nullptr != deque) {
       for (object-t forward-iterator = dk:forward-iterator(deque);
-           object-t element2 = dk:next(forward-iterator); )
-      {
+           object-t element2 = dk:next(forward-iterator); ) {
         //printf("element: %s\n", dk:name(element));
         //printf("element2: %s\n", dk:name(element2));
 
-        if (self.equal?(element, element2))
-        {
+        if (self.equal?(element, element2)) {
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           object = dk:remove(forward-iterator); //element2
@@ -304,8 +292,7 @@ klass hashed-set-forward-iterator
     self.iterator-state = hs->iterator-state;
     self.deque-iter = nullptr;
     object-t deque = dk:next(self.vector-iter);
-    if (nullptr != deque)
-    {
+    if (nullptr != deque) {
       assert(0 != dk:size(deque));
       self.deque-iter = dk:forward-iterator(deque);
     }
@@ -325,8 +312,7 @@ klass hashed-set-forward-iterator
   {
     object-t deque = dk:next(vector-iter);
     object-t deque-iter = nullptr;
-    if (nullptr != deque)
-    {
+    if (nullptr != deque) {
       assert(0 != dk:size(deque));
       deque-iter = dk:forward-iterator(deque);
     }
@@ -337,11 +323,9 @@ klass hashed-set-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       element = dk:next(self.deque-iter);
-      if (nullptr == element)
-      {
+      if (nullptr == element) {
         self.deque-iter = next-deque-iterator(self.vector-iter);
         if (nullptr != self.deque-iter)
           element = dk:next(self.deque-iter); // may return nullptr
@@ -358,8 +342,7 @@ klass hashed-set-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       element = dk:element(self.deque-iter);
       assert(nullptr != element);
     }

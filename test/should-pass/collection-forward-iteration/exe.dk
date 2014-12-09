@@ -24,8 +24,7 @@ static void check-collection(object-t klass, collection-type-t collection-type, 
   int-t offset;
 
   offset = 0;
-  for (int32-t i = 0; i < count; i++)
-  {
+  for (int32-t i = 0; i < count; i++) {
     object-t e = int32:box(i);
     offset += sprintf(lhs + offset, "/%x", *int32:unbox(e));
     if (ORDERED & collection-type)

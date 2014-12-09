@@ -51,8 +51,7 @@ noexport void handle-opts(int32-t argc, char8-t** argv)
   };
   int32-t opt;
 
-  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL)))
-  {
+  while (-1 != (opt = sys:getopt-long(argc, argv, "", longopts, NULL))) {
     switch (opt)
     {
       case DE-OPT-GROUP-ADDRESS:
@@ -74,8 +73,7 @@ noexport void handle-opts(int32-t argc, char8-t** argv)
   }
   argc -= optind;
   argv += optind;
-  if (unrecognized-opt-cnt || ((0 == mg-sin.sin-addr.s-addr) || (0 == mg-sin.sin-port)))
-  {
+  if (unrecognized-opt-cnt || ((0 == mg-sin.sin-addr.s-addr) || (0 == mg-sin.sin-port))) {
     sys:exit(EXIT-FAILURE);
   }
   return;

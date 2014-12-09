@@ -9,8 +9,7 @@ klass tokenid;
 
 int-t main(int argc, char** argv)
 {
-  for (uint32-t i = 1; nullptr != argv[i]; i++)
-  {
+  for (uint32-t i = 1; nullptr != argv[i]; i++) {
     const char8-t* filename = argv[i];
 //     printf("\n// %s\n", filename);
     try

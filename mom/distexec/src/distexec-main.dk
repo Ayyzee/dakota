@@ -72,8 +72,7 @@ int-t main(int-t argc, char** argv, char** envp)
 #else
   mom:openlog(sys:getprogname(), LOG-PID | LOG-NDELAY | LOG-PERROR, LOG-USER);
 #endif
-  if (NULL != argv[1])
-  {
+  if (NULL != argv[1]) {
   char8-t cnt[4 + (1)] = "0001"; // hackhack
   char8-t cwd[MAXPATHLEN] = ""; // offoff
   char8-t* p = sys:getcwd(cwd, sizeof(cwd)); nulleqen(p); // offoff
@@ -82,12 +81,9 @@ int-t main(int-t argc, char** argv, char** envp)
 
   // must not start with
   // "/", "./", "../"
-  if (strncmp(argv[1], "/", 1) && strncmp(argv[1], "./", 2) && strncmp(argv[1], "../", 3))
-  {
+  if (strncmp(argv[1], "/", 1) && strncmp(argv[1], "./", 2) && strncmp(argv[1], "../", 3)) {
     resolve-path(path, sizeof(path), argv[1]);
-  }
-  else
-  {
+  } else {
     sys:strcpy(path, argv[1]);
   }
   char8-t** args = &argv[1];
@@ -114,13 +110,10 @@ int-t main(int-t argc, char** argv, char** envp)
   timespec* tsp;
   int32-t wait-forever = 1;
   
-  if (!wait-forever)
-  {
+  if (!wait-forever) {
     timespec ts = { 10, 0 };
     tsp = &ts;
-  }
-  else
-  {
+  } else {
     tsp = NULL;
   }
   dk:loop(dk:get-current(event-queue:klass), tsp);

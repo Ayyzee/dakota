@@ -57,14 +57,11 @@ klass xml-object-output-stream
     self.start-tbl-delim = "<table>";
     self.end-tbl-delim = "</table>";
 
-    if (0 != self.indent-level)
-    {
+    if (0 != self.indent-level) {
       self.key-delim = "";
       self.element-delim = "";
 
-    }
-    else
-    {
+    } else {
       self.key-delim = "";
       self.element-delim = "";
     }

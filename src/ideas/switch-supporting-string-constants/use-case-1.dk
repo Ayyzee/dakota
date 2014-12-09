@@ -3,8 +3,7 @@
     object-t current = dk:current(self);
     advance-count++;
 
-      while (null != current)
-      {
+      while (null != current) {
         switch (dk:tokenid(current))
         {
           case "{":

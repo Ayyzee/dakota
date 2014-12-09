@@ -46,8 +46,7 @@ object-t init-recruiter-mc(xsockaddr-in4-t mc-sin)
   fd-t mc-fd = dk:fd(mc-connection);
   MOM-LOG-FD("fd=%i #recruiter-mc-fd", mc-fd);
   
-  if (!sys:getenv("DE_GROUP_LOOPBACK"))
-  {
+  if (!sys:getenv("DE_GROUP_LOOPBACK")) {
     u-char optval = 0;
     int32-t n = sys:setsockopt(mc-fd, IPPROTO-IP, IP-MULTICAST-LOOP, &optval, sizeof(optval)); sc(n);
   }

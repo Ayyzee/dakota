@@ -56,10 +56,8 @@ klass execution-context
     sys:strcat(cmd, path);
     sys:strcat(cmd, sdelim);
 
-    if (NULL != args)
-    {
-      while (NULL != *args)
-      {
+    if (NULL != args) {
+      while (NULL != *args) {
         sys:strcat(cmd, *args);
         sys:strcat(cmd, sdelim);
         args++;
@@ -67,10 +65,8 @@ klass execution-context
       sys:strcat(cmd, sdelim);
     }
   
-    if (NULL != vars)
-    {
-      while (NULL != *vars)
-      {
+    if (NULL != vars) {
+      while (NULL != *vars) {
         sys:strcat(cmd, *vars);
         sys:strcat(cmd, sdelim);
         vars++;
@@ -114,8 +110,7 @@ klass execution-context-klass
     sys:strncpy(path, d, pathlen);
 //     cmd = d;
 
-    for(size-t i = 0; i < argslen; i++)
-    {
+    for (size-t i = 0; i < argslen; i++) {
       args[i] = d;
       d = sys:strchr(d, cdelim);
       if (NULL == d)
@@ -125,8 +120,7 @@ klass execution-context-klass
 //         cmd = d;
 //         *cmd = (char8-t)0;
         d++;
-        if (cdelim == *d)
-        {
+        if (cdelim == *d) {
           args[i + 1] = NULL;
 //           cmd++;
           break;
@@ -134,8 +128,7 @@ klass execution-context-klass
       }
     }
 
-    for(size-t i = 0; i < varslen; i++)
-    {
+    for (size-t i = 0; i < varslen; i++) {
       vars[i] = d;
       d = sys:strchr(d, cdelim);
       if (NULL == d)
@@ -145,8 +138,7 @@ klass execution-context-klass
 //         cmd = d;
 //         *cmd = (char8-t)0;
         d++;
-        if (cdelim == *d)
-        {
+        if (cdelim == *d) {
           vars[i + 1] = NULL;
 //           cmd++;
           break;

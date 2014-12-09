@@ -28,8 +28,7 @@ klass sequence
     dk:write(out, "[");
     const char8-t* delim = "";
 
-    for (object-t element in self)
-    {
+    for (object-t element in self) {
       dk:write(out, delim);
       dk:write-lite(element, out);
       delim = ",";

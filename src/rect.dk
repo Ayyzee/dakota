@@ -31,13 +31,11 @@ klass rect
   {
     boole-t result = true;
 
-    if (slots != other-slots)
-    {
+    if (slots != other-slots) {
       if (slots->point.x != other-slots->point.x ||
           slots->point.y != other-slots->point.y ||
           slots->dimension.width  != other-slots->dimension.width ||
-          slots->dimension.height != other-slots->dimension.height)
-      {
+          slots->dimension.height != other-slots->dimension.height) {
         result = false;
       }
     }

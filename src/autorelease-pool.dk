@@ -93,11 +93,9 @@ klass autorelease-pool
 
   method object-t release(object-t self)
   {
-    for (assoc-t* assoc in self.counted-elements)
-    {
+    for (assoc-t* assoc in self.counted-elements) {
       uint32-t n = *uint32:unbox(assoc->element);
-      for (uint32-t i = 0; i < n; i++)
-      {
+      for (uint32-t i = 0; i < n; i++) {
         dk:release(assoc->key);
       }
     }

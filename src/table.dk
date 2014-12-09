@@ -34,8 +34,7 @@ trait table
     object-t result = default-result;
     object-t assoc = dk:assoc-at(self, key, nullptr);
 
-    if (nullptr != assoc)
-    {
+    if (nullptr != assoc) {
       assoc-t* assoc-content = assoc:unbox(assoc);
       result = assoc-content->element;
     }
@@ -88,8 +87,7 @@ trait table
     dk:write(out, "{");
     const char8-t* delim = "";
 
-    for (assoc-t* assoc in self)
-    {
+    for (assoc-t* assoc in self) {
       dk:write(out, delim);
       dk:write-lite(assoc->key, out); // must be primitive type
       dk:write(out, "=>");

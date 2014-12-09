@@ -27,16 +27,13 @@ klass str
     //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
     int-t result;
 
-    if (dk:instance?(other, klass))
-    {
+    if (dk:instance?(other, klass)) {
       // what if both utf8s are nullptr?
       // what if only one utf8 is nullptr?
       slots-t s1 = *unbox(self);
       slots-t s2 = *unbox(other);
       result = safe-strcmp(s1, s2);
-    }
-    else
-    {
+    } else {
       result = dk:compare(super, other);
     }
     result = dkt-normalize-compare-result(result);

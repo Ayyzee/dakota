@@ -23,17 +23,14 @@ export extern "C" int-t safe-strcmp(const char8-t* s1, const char8-t* s2)
   {
     int-t value = 0;
 
-    if (nullptr == s1 || nullptr == s2)
-    {
+    if (nullptr == s1 || nullptr == s2) {
       if (nullptr == s1 && nullptr == s2)
         value = 0;
       else-if (nullptr == s1)
         value = -1;
       else-if (nullptr == s2)
         value = 1;
-    }
-    else
-    {
+    } else {
       value = strcmp(s1, s2);
     }
     return value;
@@ -58,17 +55,14 @@ noexport extern "C" int-t safe-strncmp(const char8-t* s1, const char8-t* s2, siz
   {
     int-t value = 0;
 
-    if (nullptr == s1 || nullptr == s2)
-    {
+    if (nullptr == s1 || nullptr == s2) {
       if (nullptr == s1 && nullptr == s2)
         value = 0;
       else-if (nullptr == s1)
         value = -1;
       else-if (nullptr == s2)
         value = 1;
-    }
-    else
-    {
+    } else {
       value = strncmp(s1, s2, n);
     }
     return value;

@@ -57,14 +57,11 @@ klass perl-object-output-stream
     self.start-tbl-delim = "{";
     self.end-tbl-delim = "}";
 
-    if (0 != self.indent-level)
-    {
+    if (0 != self.indent-level) {
       self.key-delim = " => ";
       self.element-delim = ", ";
 
-    }
-    else
-    {
+    } else {
       self.key-delim = "=>";
       self.element-delim = ",";
     }

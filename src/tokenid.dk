@@ -25,15 +25,12 @@ klass tokenid
   method char8-t* str-from(slots-t s, char8-t* str, uint32-t len)
   {
     //#if LITTLE-ENDIAN
-    if (128 > s)
-    {
+    if (128 > s) {
       assert(1 <= len);
       str[0] = cast(char8-t)s;
       if (1 + (1) <= len)
         str[1] = NUL;
-    }
-    else
-    {
+    } else {
       assert(4 <= len);
       str[0] = cast(char8-t)((s >> 24) & 0x000000ff);
       str[1] = cast(char8-t)((s >> 16) & 0x000000ff);

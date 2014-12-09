@@ -7,8 +7,7 @@ typedef object-t (*add-t)(object-t, object-t);
 static object-t create(object-t klass, add-t add, uint32-t len)
 {
   object-t c = make(klass);
-  for (uint32-t i = 0; i < len; i++)
-  {
+  for (uint32-t i = 0; i < len; i++) {
     object-t e = uint32:box(i);
     fprintf(stderr, "%p\n", (void*)e);
     add(c, e);
@@ -24,22 +23,18 @@ int-t main()
 //   object-t perl-object-output-stream = make(perl-object-output-stream:klass);
 //   dk:write(perl-object-output-stream, c);
 
-  if (1)
-  {
+  if (1) {
     for (object-t iter = dk:forward-iterator(c);
-         object-t e = dk:next(iter); )
-    {
+         object-t e = dk:next(iter); ) {
       fprintf(stderr, "%p\n", (void*)e);
     }
     fprintf(stderr, "--\n");
   }
 
-  if (1)
-  {
+  if (1) {
     for (object-t iter = dk:forward-iterator(c);
          dk:next?(iter);
-         dk:next(iter))
-    {
+         dk:next(iter)) {
       object-t e = dk:element(iter);
       fprintf(stderr, "%p\n", (void*)e);
     }

@@ -61,12 +61,9 @@ klass msg
     // bugbug
     int32-t n;
     
-    if (0 == val.len) // hackhack
-    {
+    if (0 == val.len) { // hackhack
       n = sys:snprintf(self.buf.ptr, self.buf.len + 1, "%04x%04x%08x", tag, val.len, id); sc(n); // slowslow
-    }
-    else
-    {
+    } else {
       n = sys:snprintf(self.buf.ptr, self.buf.len + 1, "%04x%04x%08x%.*s", tag, val.len, id, val.len, val.ptr); sc(n); // slowslow
     }
     MOM-LOG-CREATE("%s:%s() = 0x%08x", __klass__, __func__, (uint32-t)self);
@@ -137,16 +134,13 @@ klass msg
     int32-t n;
     fd-t fd = STDERR-FILENO;
     
-    if (NULL == self)
-    {
+    if (NULL == self) {
       char8-t str[] = "NULL";
       size-t sizeof-buf = 1 + strlen(str) + 1 + 1;
       char8-t buf[sizeof-buf];
       n = sys:snprintf(buf, sizeof-buf, "{%s}", str); sc(n);
       n = sys:write(fd, buf, strlen(buf)); sc(n); //we can use n rather than strlen(), right?
-    }
-    else
-    {
+    } else {
       uint32-t tag = self.tag;
       msg-id-t id =  self.id;
       cstring-t val = dk:val(self);
@@ -194,8 +188,7 @@ klass msg
     decstr[buf-len] = (char8-t)0;
     errno = 0;
     intmax-t dec = sys:strtoimax(decstr, (char8-t**)NULL, 16);  zeroneen(errno);
-    if (0 == dec && 0 != errno)
-    {
+    if (0 == dec && 0 != errno) {
       MOM-LOG-ERROR-ERRNO(errno);
       goto __failure;
     }
@@ -216,14 +209,12 @@ klass msg-klass
       assert(0 <= *buf-lenp);
       object-t instance = NULL;
 
-      if (4 + 4 + 8 <= *buf-lenp)
-      {
+      if (4 + 4 + 8 <= *buf-lenp) {
         uint32-t tag = intmax-from-hexbuf(buf, 4);
         uint32-t len = intmax-from-hexbuf(buf + 4, 4);
         msg-id-t id =  intmax-from-hexbuf(buf + 4 + 4, 8);
         
-        if (4 + 4 + 8 + len <= *buf-lenp)
-        {
+        if (4 + 4 + 8 + len <= *buf-lenp) {
           instance = dk:alloc(msg:klass);
           // bugbug
           msg:unbox(instance)->buf.len = 4 + 4 + 8 + len;

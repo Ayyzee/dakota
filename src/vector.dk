@@ -123,8 +123,7 @@ klass vector
 
     for (object-t forward-iterator = dk:forward-iterator(self);
          dk:next?(forward-iterator);
-         dk:next(forward-iterator))
-    {
+         dk:next(forward-iterator)) {
       dk:set-element(forward-iterator, self.fill);
     }
     self.iterator-state++;
@@ -136,10 +135,8 @@ klass vector
   {
     boole-t state = false;
 
-    for (object-t element2 in self)
-    {
-      if (dk:equal?(element, element2))
-      {
+    for (object-t element2 in self) {
+      if (dk:equal?(element, element2)) {
         state = true;
         break;
       }
@@ -151,8 +148,7 @@ klass vector
   method object-t reverse(object-t self)
   {
     uint32-t head-offset = 0, tail-offset = self.count - 1;
-    while (head-offset < tail-offset)
-    {
+    while (head-offset < tail-offset) {
       object-t head-element = self.elements[head-offset];
       self.elements[head-offset] = self.elements[tail-offset];
       self.elements[tail-offset] = head-element;
@@ -182,10 +178,8 @@ klass vector
     // any/all elements could be null
     object-t object = null; // returns 'null' if element was not present
 
-    for (uint32-t index = 0; index < self.count; index++)
-    {
-      if (dk:equal?(element, self.elements[index]))
-      {
+    for (uint32-t index = 0; index < self.count; index++) {
+      if (dk:equal?(element, self.elements[index])) {
         remove-at(self, index);
         object = element;
       }
@@ -219,8 +213,7 @@ klass vector
   {
     for (object-t forward-iterator = dk:forward-iterator(self);
          dk:next?(forward-iterator);
-         dk:next(forward-iterator))
-    {
+         dk:next(forward-iterator)) {
       if (dk:equal?(object1, dk:element(forward-iterator)))
         dk:set-element(forward-iterator, object2);
     }
@@ -233,8 +226,7 @@ klass vector
   method object-t at(object-t self, uint32-t index, object-t default-result)
   {
     object-t element = default-result;
-    if (self.count > index)
-    {
+    if (self.count > index) {
       element = self.elements[index];
       if (nullptr != default-result)
         assert(nullptr != element);
@@ -290,8 +282,7 @@ klass vector
   {
     assert(nullptr != element);
 
-    if (self.count == self.capacity)
-    {
+    if (self.count == self.capacity) {
       self.capacity *= gbl-resize-factor;
       self.elements = cast(object-t*)realloc(self.elements, self.size * self.capacity);
     }
@@ -311,8 +302,7 @@ klass vector
   {
     assert(nullptr != element);
 
-    if (self.count == self.capacity)
-    {
+    if (self.count == self.capacity) {
       self.capacity *= gbl-resize-factor;
       self.elements = cast(object-t*)realloc(self.elements, self.size * self.capacity);
     }
@@ -361,10 +351,8 @@ klass vector
   {
     //assert(index <= self.count);
     uint32-t result = index;
-    if (result < self.count)
-    {
-      while (nullptr == self.elements[result])
-      {
+    if (result < self.count) {
+      while (nullptr == self.elements[result]) {
         result++;
         if (result == self.count)
           break;
@@ -449,8 +437,7 @@ klass vector-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       element = dk:element(self);
       self.index = vector:next-index(self.vector, self.index + 1);
     }
@@ -463,8 +450,7 @@ klass vector-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       element = dk:at(self.vector, self.index);
       assert(nullptr != element);
     }

@@ -30,9 +30,7 @@ void foo(boole-t v)
                                                                         else if (dk:instance?(_ec_.exception, exception:klass))
                                                                         {
                             object-t e2 = _ec_.exception;                 printf("catch (%s:""klass)\n", dk:name(dk:klass(e2)));
-                                                                        }
-                                                                        else
-                                                                        {
+                                                                        } else {
                                                                           printf("catch (...)\n");
                                                                         }
 }

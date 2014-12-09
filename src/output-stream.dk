@@ -53,8 +53,7 @@ klass output-stream
 #endif // DEBUG
     int rtn = fclose(self.out);
 
-    if (0 != rtn)
-    {
+    if (0 != rtn) {
       str128-t buf = "";
       strerror-r(errno, buf, sizeof(buf));
       fprintf(stderr, "%s", buf);

@@ -67,24 +67,19 @@ klass sorted-array
     uint32-t l = 0;
     uint32-t u = t->count;
 
-    while (l < u)
-    {
+    while (l < u) {
       i = l + ((u - l) / 2); // calc midpoint without overflowing
       const void* p = cast(const void*)(cast(uint8-t*)(t->elements) + (i * t->size));
       comparison = t->compare(key, p);
 
-      if (0 > comparison)
-      {
+      if (0 > comparison) {
         should-increment = false;
         u = i;
       }
-      else-if (0 < comparison)
-      {
+      else-if (0 < comparison) {
         should-increment = true;
         l = i + 1;
-      }
-      else
-      {
+      } else {
         result.element = p;
         break;
       }
@@ -162,14 +157,11 @@ klass sorted-array
   //assert(0 < t->count);
 
     const void* element;
-    if (0 != t->count)
-    {
+    if (0 != t->count) {
       element = at(t, t->count - 1);
       memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, t->size);
       t->count--;
-    }
-    else
-    {
+    } else {
       element = nullptr;
     }
     return element;

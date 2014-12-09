@@ -133,14 +133,12 @@ klass process
 #if SUPPORT-STDIN-PIPE
     self.child-pipe-in = make(unnamed-pipe:klass);
 #endif
-    if (!MOM-DISABLE-STDOUT)
-    {
+    if (!MOM-DISABLE-STDOUT) {
       self.child-pipe-out = make(unnamed-pipe:klass);
       MOM-LOG-FD("fd=%i #child-pipe-out-read", dk:fd(self.child-pipe-out, unnamed-pipe:k-read));
       MOM-LOG-FD("fd=%i #child-pipe-out-write", dk:fd(self.child-pipe-out, unnamed-pipe:k-write));
     }
-    if (!MOM-DISABLE-STDERR)
-    {
+    if (!MOM-DISABLE-STDERR) {
       self.child-pipe-err = make(unnamed-pipe:klass);
       MOM-LOG-FD("fd=%i #child-pipe-err-read", dk:fd(self.child-pipe-out, unnamed-pipe:k-read));
       MOM-LOG-FD("fd=%i #child-pipe-err-write", dk:fd(self.child-pipe-out, unnamed-pipe:k-write));
@@ -158,8 +156,7 @@ klass process
   method pid-t fork(object-t self)
   {
     self.id = sys:fork();  sc(self.id);
-    if (0 < self.id)
-    {
+    if (0 < self.id) {
       object-t eq = dk:get-current(event-queue:klass);
       int32-t n = dk:add(eq, event:k-proc, self.id, self.event-handler);  sc(n);
     }
@@ -191,8 +188,7 @@ klass process
     dk:write-event-callback(child-pipe, read-event);
     cstring-t child-pipe-buf = dk:buf(child-pipe);
 //     object-t write-event-handler = dk:write-event-handler(child-pipe); // ???
-    if (0)
-    {
+    if (0) {
     }
     return child-pipe;
   }
@@ -205,8 +201,7 @@ klass process
     dk:read-event-callback(child-pipe, write-event);
     cstring-t child-pipe-buf = dk:buf(child-pipe);
     object-t read-event-handler = dk:read-event-handler(child-pipe); // ???
-    if (0 != child-pipe-buf.len)
-    {
+    if (0 != child-pipe-buf.len) {
       object-t process = dk:udata(read-event-handler);
       slots-t* process-slots = unbox(process);
       object-t msg = make(msg:klass,
@@ -226,8 +221,7 @@ klass process
     dk:read-event-callback(child-pipe, write-event);
     cstring-t child-pipe-buf = dk:buf(child-pipe);
     object-t read-event-handler = dk:read-event-handler(child-pipe); // ???
-    if (0 != child-pipe-buf.len)
-    {
+    if (0 != child-pipe-buf.len) {
       object-t process = dk:udata(read-event-handler);
       slots-t* process-slots = unbox(process);
       object-t msg = make(msg:klass,

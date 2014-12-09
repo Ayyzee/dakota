@@ -22,8 +22,7 @@ noexport format-va-printf(2) int-t
 trace-vfprintf(file-t file, const char8-t* format, va-list-t args)
 {
   const char8-t* col = "  "; // two spaces per column :-) [my way]
-  for (uint32-t i = 0; i < gbl-trace-column; i++)
-  {
+  for (uint32-t i = 0; i < gbl-trace-column; i++) {
     if (0 == i)
       fprintf(file, "%s", col);
     else

@@ -109,8 +109,7 @@ klass syntax-tree
     int32-t result = dk:error(self, "got '%s', but expected", got-buffer);
     const char8-t* orstr = " ";
     const char8-t* str;
-    while (NULL != (str = va-arg(args, const char8-t*)))
-    {
+    while (NULL != (str = va-arg(args, const char8-t*))) {
       fprintf(stderr, "%s'%s'", orstr, str);
       orstr = " or ";
     }
@@ -121,8 +120,7 @@ klass syntax-tree
 
   method object-t dump(object-t self)
   {
-    for (object-t token in self.tokens)
-    {
+    for (object-t token in self.tokens) {
       object-t leading-ws = dk:leading-ws(token);
       if (NULL != leading-ws && !dk:empty?(leading-ws))
         for (object-t leading-ws-token in leading-ws)
@@ -158,8 +156,7 @@ klass syntax-tree
     object-t current = dk:current(self);
     advance-count++;
 
-      while (null != current)
-      {
+      while (null != current) {
         const char8-t* str = dk:buffer(current);
         strswitch (str)
         {
@@ -200,12 +197,9 @@ klass syntax-tree
     while (NULL != (str = va-arg(args, const char8-t*)))
       dk:add(end-tokens, str:box(str));
     object-t current;
-    while (null != (current = dk:current(self)))
-    {
-      for (object-t end-token in end-tokens)
-      {
-        if (dk:equal?(current, end-token))
-        {
+    while (null != (current = dk:current(self))) {
+      for (object-t end-token in end-tokens) {
+        if (dk:equal?(current, end-token)) {
           need-to-finish
         }
       }
@@ -222,10 +216,8 @@ klass syntax-tree
     const char8-t* buffer = dk:buffer(current);
     boole-t success? = false;
     const char8-t* str;
-    while (NULL != (str = va-arg(args, const char8-t*)))
-    {
-      if (0 == strcmp(buffer, str))
-      {
+    while (NULL != (str = va-arg(args, const char8-t*))) {
+      if (0 == strcmp(buffer, str)) {
         success? = true;
         break;
       }
@@ -276,8 +268,7 @@ klass syntax-tree
   method object-t match-qualified-identifier(object-t self)
   {
     object-t token1;
-    while (1)
-    {
+    while (1) {
       token1 = dk:match-identifier(self);
       object-t token2 = dk:current(self);
       const char8-t* str = dk:buffer(token2);
@@ -293,8 +284,7 @@ klass syntax-tree
     object-t scope = make(sorted-table:klass);
     uint32-t brace-count = 0;
     object-t token;
-    while (null != (token = dk:current(self)))
-    {
+    while (null != (token = dk:current(self))) {
       const char8-t* str = dk:buffer(token);
       strswitch (str)
       {
@@ -424,8 +414,7 @@ klass syntax-tree
   method object-t method-scope(object-t self)
   {
     object-t token;
-    while (null != (token = dk:current(self)))
-    {
+    while (null != (token = dk:current(self))) {
       const char8-t* str = dk:buffer(token);
       strswitch (str)
       {
@@ -507,14 +496,12 @@ klass syntax-tree
   {
     object-t scope = make(sorted-table:klass);
     object-t token;
-    while (null != (token = dk:current(self)))
-    {
+    while (null != (token = dk:current(self))) {
       const char8-t* str = dk:buffer(token);
       strswitch (str)
       {
         case "superklass":
-          if ($klass == type)
-          {
+          if ($klass == type) {
             dk:match(self, str);
             object-t superklass-name = dk:match-qualified-identifier(self);
             dk:match(self, ";");
@@ -529,8 +516,7 @@ klass syntax-tree
             abort();
           break;
         case "klass":
-          if ($klass == type)
-          {
+          if ($klass == type) {
             dk:match(self, str);
             object-t klass-name = dk:match-qualified-identifier(self);
             dk:match(self, ";");
@@ -545,8 +531,7 @@ klass syntax-tree
             abort();
           break;
         case "slots":
-          if ($klass == type)
-          {
+          if ($klass == type) {
             dk:slots-intro(self);
           }
           else if ($trait == type)
@@ -563,8 +548,7 @@ klass syntax-tree
           object-t trait-name = dk:match-qualified-identifier(self);
           dk:match(self, ";");
           object-t traits = dk:at(scope, box($traits), NULL);
-          if (NULL == traits)
-          {
+          if (NULL == traits) {
             traits = make(vector:klass);
             dk:add(scope, box($traits), traits);
           }
@@ -636,8 +620,7 @@ klass syntax-tree
   method object-t include(object-t self)
   {
     object-t token;
-    while (null != (token = dk:current(self)))
-    {
+    while (null != (token = dk:current(self))) {
       const char8-t* str = dk:buffer(token);
       strswitch (str)
       {
@@ -666,8 +649,7 @@ klass syntax-tree
   method object-t intro(object-t self)
   {
     object-t token;
-    while (null != (token = dk:current(self)))
-    {
+    while (null != (token = dk:current(self))) {
       const char8-t* str = dk:buffer(token);
       strswitch (str)
       {

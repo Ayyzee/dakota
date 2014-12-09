@@ -45,8 +45,7 @@ int32-t work-count-max = 3; // hackhack
 static void __attribute__((constructor)) initializer()
 {
 #if 0
-  if (0 == (work-count-max = int32-getenv("DE_WORK_COUNT_MAX", 0)))
-  {
+  if (0 == (work-count-max = int32-getenv("DE_WORK_COUNT_MAX", 0))) {
     int32-t cpu-count-max;
     size-t cpu-count-max-size = sizeof(cpu-count-max);
     int32-t n = sysctlbyname("hw.logicalcpu", &cpu-count-max, &cpu-count-max-size, NULL, 0); sc(n);
@@ -86,8 +85,7 @@ object-t ms-rcv-msg-callback(object-t ms-connection,
 
   // rnrn: convert to shared connection
 
-  if (work-count-max > work-count)
-  {
+  if (work-count-max > work-count) {
     work-count++;
     // ms => uc bridge
     uc-connection = make(connection:klass, callback => uc-rcv-msg-callback);

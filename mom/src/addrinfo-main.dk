@@ -46,8 +46,7 @@ int-t main(int-t argc, char8-t** argv)
   struct addrinfo* result = NULL;
   struct addrinfo hints = {0};
 
-  if (5 == argc)
-  {
+  if (5 == argc) {
     if (0 != strcmp("passive", argv[argc - 1]))
       error("expected 'passive' but found '%s'", argv[argc - 1]);
     hints.ai-flags |= AI-PASSIVE; // server
@@ -66,8 +65,7 @@ int-t main(int-t argc, char8-t** argv)
 
   struct addrinfo *ai;
 
-  for (ai = result; ai; ai = ai->ai-next)
-  {
+  for (ai = result; ai; ai = ai->ai-next) {
     printf("socket(%i, %i, %i)\n", ai->ai-family, ai->ai-socktype, ai->ai-protocol);
   }
   return 0;

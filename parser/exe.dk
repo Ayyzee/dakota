@@ -21,8 +21,7 @@ int-t main(int argc, char** argv)
 {
   uint32-t token-count = 0;
   
-  for (uint32-t i = 1; NULL != argv[i]; i++)
-  {
+  for (uint32-t i = 1; NULL != argv[i]; i++) {
     fprintf(stderr, "#file=%s\n", argv[i]);
     try
     {

@@ -83,8 +83,7 @@ klass no-such-keyword-exception
   {
     dk:print(super, out);
 
-    if (dk:instance?(self.object, klass:klass))
-    {
+    if (dk:instance?(self.object, klass:klass)) {
       symbol-t name;
       if (nullptr == (name = dk:name(self.object)))
         name = $nullptr;

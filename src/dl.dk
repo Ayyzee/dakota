@@ -40,8 +40,7 @@ load-library(const char8-t* name)
   //fprintf(stdout, "LoadLibrary(\"%s\")\n", name);
   HINSTANCE h-dll = LoadLibrary(name);
 
-  if (nullptr == h-dll)
-  {
+  if (nullptr == h-dll) {
 //     DWORD last-error = GetLastError();
 //     LPVOID last-error-msg-buf;
 //     FormatMessage(FORMAT-MESSAGE-ALLOCATE-BUFFER | FORMAT-MESSAGE-FROM-SYSTEM,
@@ -62,8 +61,7 @@ load-library(const char8-t* name)
   //fprintf(stdout, "//dlopen(\"%s\", RTLD-NOW)\n", name);
   void* dl-handle = dlopen(name, RTLD-NOW);
 
-  if (nullptr == dl-handle)
-  {
+  if (nullptr == dl-handle) {
     const char8-t* error = dlerror();
     fprintf(stderr, "%s:%i: ERROR: dlopen(\"%s\", RTLD-NOW): %s\n",
             __FILE__, __LINE__, name, error);

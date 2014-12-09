@@ -26,8 +26,7 @@ trait counted-set
     object-t result = default-result;
     object-t assoc = dk:assoc-at(self, key, nullptr);
 
-    if (nullptr != assoc)
-    {
+    if (nullptr != assoc) {
       assoc-t* assoc-content = assoc:unbox(assoc);
       result = assoc-content->element;
     }
@@ -38,15 +37,12 @@ trait counted-set
   {
     object-t assoc = dk:assoc-at(self, element, nullptr);
 
-    if (nullptr != assoc)
-    {
+    if (nullptr != assoc) {
       assoc-t* assoc-content = assoc:unbox(assoc);
       object-t count = assoc-content->element;
       uint32-t* count-content = uint32:unbox(count);
       (*count-content)++;
-    }
-    else
-    {
+    } else {
       object-t count = uint32:box(1);
       object-t assoc1 = assoc:box({element, count});
       dk:add-assoc(self, assoc1);
@@ -75,8 +71,7 @@ trait counted-set
     uint32-t count-content = default-count;
     object-t assoc = dk:assoc-at(self, element, nullptr);
 
-    if (nullptr != assoc)
-    {
+    if (nullptr != assoc) {
       assoc-t* assoc-content = assoc:unbox(assoc);
       object-t count = assoc-content->element;
       count-content = *uint32:unbox(count);

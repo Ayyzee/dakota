@@ -40,8 +40,7 @@ klass named-info-node
 
   method int32-t check(slots-t* s)
   {
-    for (uint32-t i = 0; i < s->count; i++)
-    {
+    for (uint32-t i = 0; i < s->count; i++) {
       // need to add test for $name (since its required)
 
       property-t element = s->elements[i];
@@ -85,8 +84,7 @@ klass named-info-node
   method slots-t* dump(slots-t* s)
   {
     printf("{\n");
-    for (uint32-t i = 0; i < s->count; i++)
-    {
+    for (uint32-t i = 0; i < s->count; i++) {
       symbol-t key = s->elements[i].key;
       uintptr-t element = s->elements[i].element;
       printf("  %s = 0x%0*" PRIxPTR,
@@ -122,14 +120,11 @@ klass named-info-node
   {
     int-t result;
 
-    if (dk:instance?(other, klass))
-    {
+    if (dk:instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
-    }
-    else
-    {
+    } else {
       result = dk:compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
@@ -155,11 +150,9 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
   props[count].element = cast(uintptr-t)(name);
   count++;
 
-  while (nullptr != (key = va-arg(args, symbol-t)))
-  {
+  while (nullptr != (key = va-arg(args, symbol-t))) {
     element = va-arg(args, uintptr-t);
-    if (props-capacity == count + 1)
-    {
+    if (props-capacity == count + 1) {
       props-capacity *= 2;
       props = cast(property-t*)realloc(props, sizeof(property-t) * props-capacity);
     }

@@ -10,8 +10,7 @@ static void check-for(object-t collection)
   char8-t* delim = "";
   for (object-t iter = dk:forward-iterator(collection);
        dk:next?(iter);
-       dk:next(iter))
-  {
+       dk:next(iter)) {
     object-t e = dk:element(iter);
     object-t key = e;
     if (dk:instance?(key, assoc:klass))
@@ -27,8 +26,7 @@ static void check-for-each(object-t collection)
 {
   printf("%i[", dk:size(collection));
   char8-t* delim = "";
-  for (object-t e in collection)
-  {
+  for (object-t e in collection) {
     object-t key = e;
     if (dk:instance?(key, assoc:klass))
       key = assoc:unbox(key)->key;
@@ -46,8 +44,7 @@ static void check(object-t klass, object-t (*add)(object-t, object-t), void (*ch
   object-t c = make(klass);
   char8-t* delim = "";
 
-  for (uint32-t i = 0; i < count; i++)
-  {
+  for (uint32-t i = 0; i < count; i++) {
     printf("%s", delim);
     delim = ", ";
     check-for-func(c);

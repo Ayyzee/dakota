@@ -90,8 +90,7 @@ klass object-output-stream
       dk:add(self.objects, object); // only grows, never shrinks
       object-t id = dk:at(self.id-from-object, object, nullptr);
 
-      if (nullptr == id)
-      {
+      if (nullptr == id) {
         id = uint32:box(self.id);
         dk:add(self.id-from-object, object, id);
         self.id++;
@@ -118,8 +117,7 @@ klass object-output-stream
     // bugbug: key == nullptr is valid
     object-t id = dk:at(self.id-from-object, object, nullptr);
     
-    if (nullptr == id)
-    {
+    if (nullptr == id) {
       id = uint32:box(self.id);
       dk:add(self.id-from-object, object, id);
       self.id++;

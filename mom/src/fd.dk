@@ -57,8 +57,7 @@ klass fd
   {
     int-t flags, n;
     flags = n = sys:fcntl(fd, F-GETFL, 0);
-    if (-1 != n)
-    {
+    if (-1 != n) {
       flags |= O-NONBLOCK;
       n = sys:fcntl(fd, F-SETFL, flags);
     }
@@ -72,13 +71,10 @@ klass fd
     const char8-t* s;
     n = sys:fstat(fd, &st);
   
-    if (-1 == n)
-    {
+    if (-1 == n) {
       // maybe a signal
       // maybe a pid
-    }
-    else
-    {
+    } else {
       const char8-t* typestr = fd-typestr(S-IFMT & st.st-mode);
       switch (S-IFMT & st.st-mode)
       {
@@ -90,29 +86,20 @@ klass fd
           const char8-t* socktypestr = strsocktype(socktype);
           xsockaddr-in4-t sockname = {0};
           n = in4-getsockname(fd, &sockname);
-          if (-1 == n)
-          {
+          if (-1 == n) {
             MOM-LOG-INFO("fd=%i %s/%s:", fd, typestr, socktypestr);
-          }
-          else
-          {
+          } else {
             char8-t sockname-addrstr[INET-ADDRSTRLEN];
             s = in4-ntop(sockname.sin-addr, sockname-addrstr, sizeof(sockname-addrstr) - (1));
-            if (-1 == n)
-            {
+            if (-1 == n) {
               MOM-LOG-ERROR("error: in4-ntop()");
-            }
-            else
-            {
+            } else {
               xsockaddr-in4-t peername = {0};
               n = in4-getpeername(fd, &peername);
-              if (-1 == n)
-              {
+              if (-1 == n) {
                 MOM-LOG-INFO("fd=%i %s/%s %s:%i", fd, typestr, socktypestr,
                             sockname-addrstr, sockname.sin-port);
-              }
-              else
-              {
+              } else {
                 char8-t peername-addrstr[INET-ADDRSTRLEN];
                 s = in4-ntop(peername.sin-addr, peername-addrstr, sizeof(peername-addrstr) - (1));
                 MOM-LOG-INFO("fd=%i %s/%s %s:%i > %s:%i", fd, typestr, socktypestr,

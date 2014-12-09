@@ -100,8 +100,7 @@ klass sorted-set
 
   //if (nullptr == result.element)
     {
-      if (self.sa.count == self.sa.capacity)
-      {
+      if (self.sa.count == self.sa.capacity) {
         self.sa.capacity *= 2; // the growth algorithm should be consumer setable
         self.sa.elements = cast(void**)realloc(self.sa.elements, self.sa.size * self.sa.capacity);
       }
@@ -162,8 +161,7 @@ klass sorted-set
     result-t result = sorted-ptr-array:search(&self.sa, element);
     object-t object = null;
 
-    if (nullptr != result.element)
-    {
+    if (nullptr != result.element) {
       self.iterator-state++;
       // element not required
       object = cast(object-t)sorted-ptr-array:remove-at(&self.sa, element, result.offset);
@@ -174,8 +172,7 @@ klass sorted-set
   method object-t remove-last(object-t self)
   {
     object-t object = nullptr;
-    if (0 != self.sa.count)
-    {
+    if (0 != self.sa.count) {
       self.iterator-state++;
       object = cast(object-t)sorted-ptr-array:remove-last(&self.sa);
     }
@@ -259,8 +256,7 @@ klass sorted-set-forward-iterator
   {
     sorted-set:slots-t* ss = sorted-set:unbox(self.sorted-set);
 
-    if (self.iterator-state != ss->iterator-state)
-    {
+    if (self.iterator-state != ss->iterator-state) {
       fprintf(stderr, "%i == %i\n", self.iterator-state, ss->iterator-state);
       throw make(exception:klass, message => "oops");
     }
@@ -283,8 +279,7 @@ klass sorted-set-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       element = dk:element(self);
       self.offset++;
     }
@@ -295,8 +290,7 @@ klass sorted-set-forward-iterator
   {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk:next?(self))
-    {
+    if (dk:next?(self)) {
       sorted-set:slots-t* ss = sorted-set:unbox(self.sorted-set);
       element = cast(object-t)sorted-ptr-array:at(&ss->sa, self.offset);
       assert(nullptr != element);

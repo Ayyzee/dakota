@@ -108,8 +108,7 @@ export int-t in4-getsockname(fd-t fd, xsockaddr-in4-t* sin)
 {
   xsocklen-t sinsiz = sizeof(*sin);
   int-t n = sys:getsockname(fd, cast(struct sockaddr*)sin, &sinsiz);
-  if (-1 != n)
-  {
+  if (-1 != n) {
     sin4-ntoh(sin);
   }
 //   else
@@ -123,8 +122,7 @@ noexport int-t in4-getpeername(fd-t fd, xsockaddr-in4-t* sin)
 {
   xsocklen-t sinsiz = sizeof(*sin);
   int-t n = sys:getpeername(fd, cast(struct sockaddr*)sin, &sinsiz);
-  if (-1 != n)
-  {
+  if (-1 != n) {
     sin4-ntoh(sin);
   }
 //   else
@@ -149,8 +147,7 @@ noexport int32-t in4-bind(fd-t fd, xsockaddr-in4-t sin)
   xsockaddr-in4-t no-sin = sin;
   sin4-hton(&no-sin);
   int32-t n = sys:bind(fd, cast(sockaddr const*)&no-sin, cast(socklen-t)sizeof(no-sin));
-  if (-1 == n)
-  {
+  if (-1 == n) {
     sin4-dump(sin);
   }
   return n;
@@ -175,8 +172,7 @@ noexport fd-t in4-accept(fd-t fd, xsockaddr-in4-t* sin)
 {
   xsocklen-t sinsiz = sizeof(*sin);
   fd-t n = sys:accept(fd, cast(sockaddr*)sin, &sinsiz);
-  if (-1 != n)
-  {
+  if (-1 != n) {
     sin4-ntoh(sin);
   }
   return n;
@@ -187,8 +183,7 @@ noexport ssize-t in4-recvfrom(fd-t fd, void* buf, size-t len, int-t flags, xsock
   ssize-t n;
   xsocklen-t sinsiz = sizeof(*sin);
   n = sys:recvfrom(fd, buf, len, flags, cast(sockaddr*)sin, &sinsiz);
-  if (-1 != n)
-  {
+  if (-1 != n) {
     sin4-ntoh(sin);
   }
   return n;
