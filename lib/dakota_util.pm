@@ -6,7 +6,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 
-# Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+# Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
