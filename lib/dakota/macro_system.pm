@@ -31,12 +31,12 @@ BEGIN
     unshift @INC, "$prefix/lib";
 };
 
-package dakota;
+package dakota::macro_system;
 
 use strict;
 use warnings;
 
-use dakota_sst;
+use dakota::sst;
 use dakota;
 
 use Data::Dumper;

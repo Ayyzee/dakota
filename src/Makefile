@@ -28,12 +28,12 @@ LIB_FILES :=\
  $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_name)\
  $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_util_name)\
  $(DESTDIR)$(libdir)/dakota.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota_include.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota_parse.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota_rewrite.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota_generate.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota_sst.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota_util.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/include.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/parse.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/rewrite.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/generate.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/sst.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/util.$(pm_ext)\
 
 HOME_FILES :=\
  $(HOME)/.dakota/.gdbinit\

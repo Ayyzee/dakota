@@ -20,10 +20,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package dakota;
+
 use strict;
 use warnings;
 
-package dakota;
+my $prefix;
+
+BEGIN {
+  $prefix = '/usr/local';
+  if ($ENV{'DK_PREFIX'}) {
+    $prefix = $ENV{'DK_PREFIX'};
+  }
+  unshift @INC, "$prefix/lib";
+};
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -31,9 +41,9 @@ our @EXPORT= qw(
 		loop_merged_rep_from_dk
 		);
 
-use dakota_util;
-use dakota_parse;
-use dakota_generate;
+use dakota::util;
+use dakota::parse;
+use dakota::generate;
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -95,7 +105,7 @@ sub loop_merged_rep_from_dk {
         print STDERR "  &loop_merged_rep_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
         $" = '';
     }
-    &init_rep_from_dk_vars($cmd_info);
+    &dakota::parse::init_rep_from_dk_vars($cmd_info);
     my $rep_files = [];
     if ($$cmd_info{'reps'}) {
         $rep_files = $$cmd_info{'reps'};
@@ -104,7 +114,7 @@ sub loop_merged_rep_from_dk {
         my $root;
         if ($arg =~ m|\.$dk_ext$| ||
 	    $arg =~ m|\.$ctlg_ext$|) {
-            $root = &rep_tree_from_dk_path($arg);
+            $root = &dakota::parse::rep_tree_from_dk_path($arg);
             &_add_last($rep_files, &rep_path_from_dk_path($arg));
         } elsif ($arg =~ m|\.$rep_ext$|) {
             $root = &scalar_from_file($arg);
@@ -114,14 +124,14 @@ sub loop_merged_rep_from_dk {
         { die __FILE__, ":", __LINE__, ": ERROR\n"; }
         if (1 == @{$$cmd_info{'inputs'}}) {
             if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
-                &scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
+                &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
             }
         }
     }
     if (1 < @{$$cmd_info{'inputs'}}) {
         if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
-            my $rep = &rep_merge($rep_files);
-            &scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
+            my $rep = &dakota::parse::rep_merge($rep_files);
+            &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
         }
     }
 } # loop_merged_rep_from_dk
@@ -130,7 +140,7 @@ sub add_visibility_file {
     #print STDERR "&add_visibility_file(path=\"$arg\")\n";
     my $root = &scalar_from_file($arg);
     &add_visibility($root);
-    &scalar_to_file($arg, $root);
+    &dakota::parse::scalar_to_file($arg, $root);
 }
 sub add_visibility {
     my ($root) = @_;
@@ -205,7 +215,7 @@ sub loop_cxx_from_dk {
         print STDERR "  &loop_cxx_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
         $" = '';
     }
-    &init_cxx_from_dk_vars($cmd_info);
+    &dakota::parse::init_cxx_from_dk_vars($cmd_info);
 
     my $inputs = [];
     my $rep;
@@ -255,11 +265,11 @@ sub loop_cxx_from_dk {
             ($dk_cxx_name, $dk_cxx_path, $dk_cxx_ext) = fileparse("$directory/$output_dk_cxx", "\.$dk_ext\.$cxx_ext");
             ($cxx_name, $cxx_path, $cxx_ext1) = fileparse("$directory/$output_cxx", "\.$k+");
         }
-        &empty_klass_defns();
+        &dakota::generate::empty_klass_defns();
         &dk::generate_dk_cxx($file_basename, $dk_cxx_path, $dk_cxx_name);
         $cxx_path =~ s|^\./||;
         $cxx_path =~ s|/$||;
-        my $defn_tbl = &generate_nrt_decl($cxx_path, $file_basename, $file);
+        my $defn_tbl = &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file);
 
         my $stack; my $col;
 	my $klasses_cxx_str = '';
@@ -368,7 +378,7 @@ sub loop_rep_from_so {
 	    $arg =~ m|\.$ctlg_ext$|)
         {} else {
             my $ctlg_path =     &ctlg_path_from_any_path($arg);
-            my $ctlg_dir_path = &ctlg_dir_path_from_so_path($arg);
+            my $ctlg_dir_path = &dakota::parse::ctlg_dir_path_from_so_path($arg);
             my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
             $$ctlg_cmd{'output'} = $ctlg_path;
             $$ctlg_cmd{'output-directory'} = $ctlg_dir_path;
@@ -565,7 +575,7 @@ sub exe_from_obj {
 sub dir_part {
     my ($path) = @_;
     my $parts = [split /\//, $path];
-    &_remove_last($parts);
+    &dakota::util::_remove_last($parts);
     my $dir = join '/', @$parts;
     return $dir;
 }

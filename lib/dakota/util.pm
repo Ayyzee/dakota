@@ -20,16 +20,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package dakota::util;
+
 use strict;
 use warnings;
+use Data::Dumper;
 
 my $ka_generics_tbl;
 
 BEGIN {
   $ka_generics_tbl = { 'init' => undef };
 };
-
-package dakota;
 
 require Exporter;
 our @ISA = qw(Exporter);

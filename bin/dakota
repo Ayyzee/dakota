@@ -20,10 +20,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package dakota;
+
 use strict;
 use warnings;
-
-package dakota;
 
 my $prefix;
 
@@ -32,9 +32,9 @@ BEGIN {
   if ($ENV{'DK_PREFIX'}) {
     $prefix = $ENV{'DK_PREFIX'};
   }
+  unshift @INC, "$prefix/lib/dakota";
   unshift @INC, "$prefix/lib";
-}
-;
+};
 
 use dakota;
 

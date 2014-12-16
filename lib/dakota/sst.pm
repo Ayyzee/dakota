@@ -20,10 +20,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package dakota::sst;
+
 use strict;
 use warnings;
-
-package dakota;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -674,8 +674,8 @@ sub sst_cursor::match_pattern_seq {
 	if ($result_lhs) {
 	  $range = $result_lhs;
 	  $$matches{$pattern_token} = $result_rhs;
-	  &_add_last($all_index, $$result_lhs[0]);
-	  &_add_last($all_index, $$result_lhs[1]);
+	  &dakota::util::_add_last($all_index, $$result_lhs[0]);
+	  &dakota::util::_add_last($all_index, $$result_lhs[1]);
 	} else {
 	  $all_index = [];
 	  $range = undef;
@@ -687,7 +687,7 @@ sub sst_cursor::match_pattern_seq {
 	  $range = [ $$sst_cursor{'first-token-index'} + $i,
 		     $$sst_cursor{'first-token-index'} + $i ];
 
-	  &_add_last($all_index, $$sst_cursor{'first-token-index'} + $i);
+	  &dakota::util::_add_last($all_index, $$sst_cursor{'first-token-index'} + $i);
 	} else {
 	  $all_index = [];
 	  $range = undef;
@@ -698,8 +698,8 @@ sub sst_cursor::match_pattern_seq {
     }
     if ($range && 0 != @$range) {
       my $sorted_all_index = [sort {$a <=> $b} @$all_index];
-      my $first_token_index = &_first($sorted_all_index);
-      my $last_token_index = &_last($sorted_all_index);
+      my $first_token_index = &dakota::util::_first($sorted_all_index);
+      my $last_token_index = &dakota::util::_last($sorted_all_index);
       my $from_index = 0;
       my $to_index = $from_index + $last_token_index - $first_token_index;
       $range = [ $from_index, $to_index ];

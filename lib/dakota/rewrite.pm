@@ -30,7 +30,7 @@ BEGIN {
   unshift @INC, "$prefix/lib";
 };
 
-package dakota;
+package dakota::rewrite;
 
 use strict;
 use warnings;
@@ -647,7 +647,7 @@ sub rewrite_symbols {
 # this leaks memory!!
 sub rewrite_strings_rhs {
   my ($string) = @_;
-  my $string_ident = &make_ident_symbol_scalar($string);
+  my $string_ident = &dakota::generate::make_ident_symbol_scalar($string);
   #my $result = "__string:$string_ident";
   my $result = "str:box(\"$string_ident\")";
   return $result;
@@ -779,7 +779,7 @@ sub symbol {
   $symbol =~ s|\"$||;   # strip trailing double-quote (if any)
   $symbol =~ s/($z)\?/$1$$long_suffix{'?'}/g;
   $symbol =~ s/($z)\!/$1$$long_suffix{'!'}/g;
-  my $cxx_ident = &make_ident_symbol_scalar($symbol);
+  my $cxx_ident = &dakota::generate::make_ident_symbol_scalar($symbol);
   return "__symbol:${cxx_ident}";
 }
 sub keyword {
@@ -790,7 +790,7 @@ sub hash {
   my ($keyword) = @_;
   $keyword =~ s|^\'||;  # strip leading  single-quote
   $keyword =~ s|\'$||;  # strip trailing single-quote
-  my $cxx_ident = &make_ident_symbol_scalar($keyword);
+  my $cxx_ident = &dakota::generate::make_ident_symbol_scalar($keyword);
   return "__hash:$cxx_ident";
 }
 sub rewrite_case_with_string_rhs {
@@ -874,7 +874,7 @@ sub rewrite_keyword_syntax_list {
 }
 sub rewrite_keyword_syntax_use_rhs {
   my ($arg1, $arg2) = @_;
-  my $arg1_ident = &make_ident_symbol_scalar($arg1);
+  my $arg1_ident = &dakota::generate::make_ident_symbol_scalar($arg1);
   return "&__keyword:$arg1_ident$arg2,";
 }
 sub rewrite_keyword_syntax_use {
