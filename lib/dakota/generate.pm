@@ -93,7 +93,7 @@ my $long_suffix = {
 sub user_code_cxx {
   my ($name) = @_;
   if (exists $ENV{'DK_ABS_PATH'}) {
-    my $cwd = getcwd;
+    my $cwd = &getcwd();
     return "include \"$cwd/obj/$name.$cxx_ext\";\n";
   } else {
     # should not be hardcoded
@@ -254,7 +254,7 @@ sub write_to_file_converted_strings {
       my $str = &sst_fragment::filestr($$sst{'tokens'});
       $converted_string = $str;
     } else {
-      &convert_dk_to_cxx(\$string, $ka_generics, $in_path);
+      &dakota::rewrite::convert_dk_to_cxx(\$string, $ka_generics, $in_path);
       $converted_string = $string;
     }
     print PATH $converted_string;
@@ -291,7 +291,7 @@ sub generate_nrt {
     my $suffix = 'hxx';
 
     my $str = &labeled_src_str(undef, "nrt-cxx");
-    $str .= &dk::print("\n");
+    $str .= "\n";
     $str .= &labeled_src_str($defn_tbl, "klasses-exported-headers-hxx");
     $str .= &hardcoded_typedefs();
     $str .= &labeled_src_str($defn_tbl, "klasses-hxx");
@@ -306,7 +306,7 @@ sub generate_nrt {
     $str .= &labeled_src_str($defn_tbl, "generics-$suffix");
     $str .= &user_code_cxx($name);
     $str .= &labeled_src_str($defn_tbl, "klasses-cxx");
-    $str .= &dk::print("\n");
+    $str .= "\n";
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str ], undef);
@@ -342,7 +342,7 @@ sub generate_rt {
     &generate_decl_defn($file, $generics, $symbols, $suffix, $result);
 
     my $str = &labeled_src_str(undef, "rt-cxx");
-    $str .= &dk::print("\n");
+    $str .= "\n";
     $str .= &labeled_src_str($defn_tbl, "klasses-exported-headers-hxx"); ###
     $str .= &hardcoded_typedefs();
     $str .= &labeled_src_str($defn_tbl, "klasses-hxx"); ###
@@ -357,7 +357,7 @@ sub generate_rt {
     $str .= &labeled_src_str($result, "generics-$suffix");
     ## other: user_code_cxx
     $str .= &labeled_src_str($result, "klasses-cxx");
-    $str .= &dk::print("\n");
+    $str .= "\n";
 
     $str .= &generate_defn_footer($file);
 
@@ -434,42 +434,42 @@ sub generate_defn_footer {
   $keys_count = keys %{$$file{'klasses'}};
   $rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
   if (0 == $keys_count) {
-    $rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t* imported-klasses = nullptr;\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "static const symbol-t* imported-klasses-names = nullptr;\n");
+    $rt_cxx_str .= "static assoc-node-t* imported-klasses = nullptr;\n";
+    $rt_cxx_str .= "static const symbol-t* imported-klasses-names = nullptr;\n";
   } else {
-    $rt_cxx_str .= &dk::print_in_col_string($col, "static symbol-t imported-klasses-names[] = //ro-data\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+    $rt_cxx_str .= "static symbol-t imported-klasses-names[] = //ro-data\n";
+    $rt_cxx_str .= "{\n";
     $col++;
     my ($key, $val);
     my $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach $key (sort keys %{$$file{'klasses'}}) {
       $val = $$file{'klasses'}{$key};
       my $cxx_klass_name = $key;
-      $rt_cxx_str .= &dk::print_in_col_string($col, "$key:__name__,\n");
+      $rt_cxx_str .= "  $key:__name__,\n";
     }
-    $rt_cxx_str .= &dk::print_in_col_string($col, "nullptr\n");
+    $rt_cxx_str .= "  nullptr\n";
     $col--;
-    $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
+    $rt_cxx_str .= "};\n";
     ###
-    $rt_cxx_str .= &dk::print_in_col_string($col, "static assoc-node-t imported-klasses[] = //rw-data\n");
-    $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+    $rt_cxx_str .= "static assoc-node-t imported-klasses[] = //rw-data\n";
+    $rt_cxx_str .= "{\n";
     $col++;
     $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach $key (sort keys %{$$file{'klasses'}}) {
       $val = $$file{'klasses'}{$key};
       my $RT = '';             # because the klass klass won't compile
       my $cxx_klass_name = $key;
-      $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)&$RT$cxx_klass_name:klass, nullptr },\n");
+      $rt_cxx_str .= "  { cast(uintptr-t)&$RT$cxx_klass_name:klass, nullptr },\n";
     }
-    $rt_cxx_str .= &dk::print_in_col_string($col, "{ cast(uintptr-t)nullptr, nullptr }\n");
+    $rt_cxx_str .= "  { cast(uintptr-t)nullptr, nullptr }\n";
     $col--;
-    $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
+    $rt_cxx_str .= "};\n";
   }
   my $scratch_str = '';
   &set_global_scratch_str_ref(\$scratch_str);
   $rt_cxx_str .= &dk::generate_cxx_footer($file, $stack, $col);
-  #$rt_cxx_str .= &dk::print_in_col_string($col, "extern \"C\"\n");
-  #$rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+  #$rt_cxx_str .= "extern \"C\"\n";
+  #$rt_cxx_str .= "{\n";
   #$col++;
 
   my $info_tbl = {
@@ -494,48 +494,39 @@ sub generate_defn_footer {
   } else {
     $$info_tbl{"\$exports"} = '&exports';
   }
-  $rt_cxx_str .= &dk::print("\n");
+  $rt_cxx_str .= "\n";
   #my $col;
   $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col);
 
-  $rt_cxx_str .= &dk::print("\n");
+  $rt_cxx_str .= "\n";
   $rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
-  $rt_cxx_str .= &dk::print_in_col_string($col, "static void __initial()\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+  $rt_cxx_str .= "static void __initial()\n";
+  $rt_cxx_str .= "{\n";
   $col++;
-  $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-register-info(&registration-info);\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
+  $rt_cxx_str .= "  DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n";
+  $rt_cxx_str .= "  dkt-register-info(&registration-info);\n";
+  $rt_cxx_str .= "  DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n";
+  $rt_cxx_str .= "  return;\n";
   $col--;
-  $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
+  $rt_cxx_str .= "}\n";
   $rt_cxx_str .= &dk::annotate($col, __FILE__, __LINE__);
-  $rt_cxx_str .= &dk::print_in_col_string($col, "static void __final()\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
+  $rt_cxx_str .= "static void __final()\n";
+  $rt_cxx_str .= "{\n";
   $col++;
-  $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "dkt-deregister-info(&registration-info);\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "return;\n");
+  $rt_cxx_str .= "  DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n";
+  $rt_cxx_str .= "  dkt-deregister-info(&registration-info);\n";
+  $rt_cxx_str .= "  DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n";
+  $rt_cxx_str .= "  return;\n";
   $col--;
-  $rt_cxx_str .= &dk::print_in_col_string($col, "}\n");
+  $rt_cxx_str .= "}\n";
   #$col--;
-  #$rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
+  #$rt_cxx_str .= "};\n";
 
-  $rt_cxx_str .= &dk::print_in_col_string($col, "namespace\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-  $col++;
-  $rt_cxx_str .= &dk::print_in_col_string($col, "struct noexport __ddl_t\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "{\n");
-  $col++;
-  $rt_cxx_str .= &dk::print_in_col_string($col, " __ddl_t() { __initial(); }\n");
-  $rt_cxx_str .= &dk::print_in_col_string($col, "~__ddl_t() { __final(); }\n");
-  $col--;
-  $rt_cxx_str .= &dk::print_in_col_string($col, "};\n");
-  $col--;
-  $rt_cxx_str .= &dk::print_in_col_string3_comment($col, "}", " // namespace", "\n");
-
-  $rt_cxx_str .= &dk::print_in_col_string($col, "static __ddl_t __ddl = __ddl_t();\n");
+  $rt_cxx_str .= "namespace { struct noexport __ddl_t {\n";
+  $rt_cxx_str .= "  __ddl_t()  { __initial(); }\n";
+  $rt_cxx_str .= "  ~__ddl_t() { __final();   }\n";
+  $rt_cxx_str .= "}; }\n";
+  $rt_cxx_str .= "static __ddl_t __ddl = __ddl_t();\n";
   return $rt_cxx_str;
 }
 sub path::add_last {
@@ -912,64 +903,63 @@ sub method::generate_va_method_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
 
-  $$scratch_str_ref .= &dk::print_in_col_string($col,  "namespace @$scope { ");
+  $$scratch_str_ref .=  "namespace @$scope { ";
   my $ka_generics = &dakota::util::ka_generics();
   if (exists $$ka_generics{$va_method_name}) {
-    $$scratch_str_ref .= &dk::print("sentinel ");
+    $$scratch_str_ref .= "sentinel ";
   }
   if (&is_exported($va_method)) {
-    $$scratch_str_ref .= &dk::print("export ");
+    $$scratch_str_ref .= "export ";
   } else {
-    $$scratch_str_ref .= &dk::print("noexport ");
+    $$scratch_str_ref .= "noexport ";
   }
   if ($is_inline) {
-    $$scratch_str_ref .= &dk::print("INLINE ");
+    $$scratch_str_ref .= "INLINE ";
   }
-  $$scratch_str_ref .= &dk::print("$return_type ");
+  $$scratch_str_ref .= "$return_type ";
   my $scope_va = &dakota::util::deep_copy($scope);
   &dakota::util::_add_last($scope_va, ':');
   &dakota::util::_add_last($scope_va, 'va');
-  $$scratch_str_ref .= &dk::print("$va_method_name($$new_arg_list_va_ref)");
+  $$scratch_str_ref .= "$va_method_name($$new_arg_list_va_ref)";
 
   if ($$va_method{'exception-types'}) {
     my $throw_arg_type = &arg_type::list_types($$va_method{'exception-types'});
-    $$scratch_str_ref .= &dk::print(" throw($$throw_arg_type)");
+    $$scratch_str_ref .= " throw($$throw_arg_type)";
   }
 
   if (!$$va_method{'defined?'} || &is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-    $$scratch_str_ref .= &dk::print("; }\n");
+    $$scratch_str_ref .= "; }\n";
   } elsif ($$va_method{'defined?'} && (&is_rt_decl() || &is_rt_defn())) {
     my $var_name = 'result';
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     my $name = &dakota::util::_last($$va_method{'name'});
     my $va_name = "_func_";
     &dakota::util::_replace_last($$va_method{'name'}, $va_name);
     my $method_type_decl = &method::type_decl($va_method);
     &dakota::util::_replace_last($$va_method{'name'}, $name);
     my $cxx_scope = &path::string($scope);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "{\n";
     $col++;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "static $method_type_decl = $cxx_scope:va:$va_method_name;\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "va-list-t args;\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "");
+    $$scratch_str_ref .= "  static $method_type_decl = $cxx_scope:va:$va_method_name;\n";
+    $$scratch_str_ref .= "  va-list-t args;\n";
+    $$scratch_str_ref .= "  va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
     if (defined $$va_method{'return-type'}) {
       my $return_type = &arg::type($$va_method{'return-type'});
       my $return_type_pair = "$return_type $var_name";
-      $$scratch_str_ref .= &dk::print("$return_type_pair = ");
+      $$scratch_str_ref .= "  $return_type_pair = ";
     }
 
-    $$scratch_str_ref .= &dk::print("$va_name($$new_arg_names_list_ref);\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "va-end(args);\n");
+    $$scratch_str_ref .= "  $va_name($$new_arg_names_list_ref);\n";
+    $$scratch_str_ref .= "  va-end(args);\n";
 
     if (defined $$va_method{'return-type'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return $var_name;\n");
+      $$scratch_str_ref .= "  return $var_name;\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return;\n");
+      $$scratch_str_ref .= "  return;\n";
     }
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
+    $$scratch_str_ref .= "} }\n";
   }
 }
 sub method::compare {
@@ -1008,27 +998,27 @@ sub common::print_signature {
 
   my $scratch_str = "";
   if (&is_va($generic)) {
-    $scratch_str .= &dk::print_in_col_string($col, "namespace __signature { namespace va { ");
+    $scratch_str .= "namespace __signature { namespace va { ";
   } else {
-    $scratch_str .= &dk::print_in_col_string($col, "namespace __signature { ");
+    $scratch_str .= "namespace __signature { ";
   }
   if (&is_exported($generic)) {
-    $scratch_str .= &dk::print("export ");
+    $scratch_str .= "export ";
   } else {
-    $scratch_str .= &dk::print("noexport ");
+    $scratch_str .= "noexport ";
   }
   my $generic_name = "@{$$generic{'name'}}";
-  $scratch_str .= &dk::print("const signature-t* $generic_name($$new_arg_type_list)");
+  $scratch_str .= "const signature-t* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $scratch_str .= &dk::print("; } }\n");
+      $scratch_str .= "; } }\n";
     } else {
-      $scratch_str .= &dk::print("; }\n");
+      $scratch_str .= "; }\n";
     }
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     my $var_name = 'result';
-    $scratch_str .= &dk::print("\n");
-    $scratch_str .= &dk::print_in_col_string($col, "{\n");
+    $scratch_str .= "\n";
+    $scratch_str .= "{\n";
     $col++;
 
     my $return_type_str = &arg::type($$generic{'return-type'});
@@ -1041,14 +1031,14 @@ sub common::print_signature {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= &dk::print_in_col_string($col, "static const signature-t $var_name = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", nullptr };\n");
-    $scratch_str .= &dk::print_in_col_string($col, "return &$var_name;\n");
+    $scratch_str .= "  static const signature-t $var_name = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", nullptr };\n";
+    $scratch_str .= "  return &$var_name;\n";
     $col--;
 
     if (&is_va($generic)) {
-      $scratch_str .= &dk::print("} } }\n");
+      $scratch_str .= "} } }\n";
     } else {
-      $scratch_str .= &dk::print("} }\n");
+      $scratch_str .= "} }\n";
     }
   }
   return $scratch_str;
@@ -1056,7 +1046,7 @@ sub common::print_signature {
 sub common::generate_signature_defns {
   my ($generics, $col) = @_;
   my $scratch_str = "";
-  #$scratch_str .= &dk::print_in_col_string($col, "// generate_signature_defns()\n");
+  #$scratch_str .= "// generate_signature_defns()\n";
 
   $scratch_str .= &dk::annotate($col, __FILE__, __LINE__);
   foreach my $generic (@$generics) {
@@ -1070,7 +1060,7 @@ sub common::generate_signature_defns {
   }
 
   if (1) {
-    $scratch_str .= &dk::print("#if 0\n");
+    $scratch_str .= "#if 0\n";
     foreach my $generic (@$generics) {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
@@ -1081,7 +1071,7 @@ sub common::generate_signature_defns {
         $$varargs_generic{'keyword-types'} = $keyword_types;
       }
     }
-    $scratch_str .= &dk::print("#endif\n");
+    $scratch_str .= "#endif\n";
   }                             # if ()
   foreach my $generic (@$generics) {
     if (!&is_va($generic)) {
@@ -1102,27 +1092,27 @@ sub common::print_selector {
 
   my $scratch_str = "";
   if (&is_va($generic)) {
-    $scratch_str .= &dk::print_in_col_string($col, "namespace __selector { namespace va { ");
+    $scratch_str .= "namespace __selector { namespace va { ";
   } else {
-    $scratch_str .= &dk::print_in_col_string($col, "namespace __selector { ");
+    $scratch_str .= "namespace __selector { ";
   }
   if (&is_exported($generic)) {
-    $scratch_str .= &dk::print("export ");
+    $scratch_str .= "export ";
   } else {
-    $scratch_str .= &dk::print("noexport ");
+    $scratch_str .= "noexport ";
   }
   my $generic_name = "@{$$generic{'name'}}";
-  $scratch_str .= &dk::print("selector-t* $generic_name($$new_arg_type_list)");
+  $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $scratch_str .= &dk::print("; } }\n");
+      $scratch_str .= "; } }\n";
     } else {
-      $scratch_str .= &dk::print("; }\n");
+      $scratch_str .= "; }\n";
     }
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     my $var_name = 'result';
-    $scratch_str .= &dk::print("\n");
-    $scratch_str .= &dk::print_in_col_string($col, "{\n");
+    $scratch_str .= "\n";
+    $scratch_str .= "{\n";
     $col++;
 
     my $return_type_str = &arg::type($$generic{'return-type'});
@@ -1135,13 +1125,13 @@ sub common::print_selector {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= &dk::print_in_col_string($col, "static selector-t $var_name = {0};\n");
-    $scratch_str .= &dk::print_in_col_string($col, "return &$var_name;\n");
+    $scratch_str .= "static selector-t $var_name = {0};\n";
+    $scratch_str .= "return &$var_name;\n";
     $col--;
     if (&is_va($generic)) {
-      $scratch_str .= &dk::print_in_col_string($col, "} } }\n");
+      $scratch_str .= "} } }\n";
     } else {
-      $scratch_str .= &dk::print_in_col_string($col, "} }\n");
+      $scratch_str .= "} }\n";
     }
   }
   return $scratch_str;
@@ -1149,7 +1139,7 @@ sub common::print_selector {
 sub common::generate_selector_defns {
   my ($generics, $col) = @_;
   my $scratch_str = "";
-  #$scratch_str .= &dk::print_in_col_string($col, "// generate_selector_defns()\n");
+  #$scratch_str .= "// generate_selector_defns()\n";
 
   $scratch_str .= &dk::annotate($col, __FILE__, __LINE__);
   foreach my $generic (@$generics) {
@@ -1163,7 +1153,7 @@ sub common::generate_selector_defns {
   }
 
   if (1) {
-    $scratch_str .= &dk::print("#if 0\n");
+    $scratch_str .= "#if 0\n";
     foreach my $generic (@$generics) {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
@@ -1174,7 +1164,7 @@ sub common::generate_selector_defns {
         $$varargs_generic{'keyword-types'} = $keyword_types;
       }
     }
-    $scratch_str .= &dk::print("#endif\n");
+    $scratch_str .= "#endif\n";
   }                             # if ()
   foreach my $generic (@$generics) {
     if (!&is_va($generic)) {
@@ -1208,7 +1198,7 @@ sub generics::generate_signature_seq {
   my ($generics, $is_inline, $col) = @_;
   my ($va_generics, $fa_generics) = &va_generics($generics, undef);
   my $scratch_str = "";
-  #$scratch_str .= &dk::print_in_col_string($col, "// generate_signature_seq()\n");
+  #$scratch_str .= "// generate_signature_seq()\n";
   my $generic;
   my $i;
   my $return_type = 'const signature-t*';
@@ -1232,8 +1222,7 @@ sub generics::generate_signature_seq {
       my $width = length($method_type);
       my $pad = ' ' x ($max_width - $width);
       my $name = "@{$$generic{'name'}}";
-      $scratch_str .= &dk::print_in_col_string3($col + 1,
-                                                "(cast(dkt-signature-function-t)cast($method_type) ", $pad, "__signature:va:$name)(),\n");
+      $scratch_str .= "(cast(dkt-signature-function-t)cast($method_type) " . $pad . "__signature:va:$name)(),\n";
     }
     $scratch_str .= "  nullptr,\n";
     $scratch_str .= "};\n";
@@ -1258,8 +1247,7 @@ sub generics::generate_signature_seq {
         my $width = length($method_type);
         my $pad = ' ' x ($max_width - $width);
         my $name = "@{$$generic{'name'}}";
-        $scratch_str .= &dk::print_in_col_string3($col + 1,
-                                                  "(cast(dkt-signature-function-t)cast($method_type) ", $pad, "__signature:$name)(),\n");
+        $scratch_str .= "(cast(dkt-signature-function-t)cast($method_type) " . $pad . "__signature:$name)(),\n";
       }
     }
     $scratch_str .= "  nullptr,\n";
@@ -1271,7 +1259,7 @@ sub generics::generate_selector_seq {
   my ($generics, $is_inline, $col) = @_;
   my ($va_generics, $fa_generics) = &va_generics($generics, undef);
   my $scratch_str = "";
-  #$scratch_str .= &dk::print_in_col_string($col, "// generate_selector_seq()\n");
+  #$scratch_str .= "// generate_selector_seq()\n";
   my $generic;
   my $i;
   my $return_type = "selector-t*";
@@ -1304,7 +1292,7 @@ sub generics::generate_selector_seq {
       my $name = "@{$$generic{'name'}}";
       my $name_width = length($name);
       my $name_pad = ' ' x ($max_name_width - $name_width);
-      $scratch_str .= &dk::print_in_col_string3($col + 1, "{ (cast(dkt-selector-function-t)(cast($method_type) ", $pad, "__selector:va:$name");
+      $scratch_str .= "{ (cast(dkt-selector-function-t)(cast($method_type) " . $pad . "__selector:va:$name";
       $scratch_str .= $name_pad;
       $scratch_str .= "))(), nullptr },\n";
     }
@@ -1340,7 +1328,7 @@ sub generics::generate_selector_seq {
         my $name = "@{$$generic{'name'}}";
         my $name_width = length($name);
         my $name_pad = ' ' x ($max_name_width - $name_width);
-        $scratch_str .= &dk::print_in_col_string3($col + 1, "{ (cast(dkt-selector-function-t)(cast($method_type) ", $pad, "__selector:$name");
+        $scratch_str .= "{ (cast(dkt-selector-function-t)(cast($method_type) " . $pad . "__selector:$name";
         $scratch_str .= $name_pad;
         $scratch_str .= "))(), nullptr },\n";
       }
@@ -1380,85 +1368,83 @@ sub generics::generate_generic_defn {
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_va($generic)) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { namespace va { ");
+    $$scratch_str_ref .= "namespace dk { namespace va { ";
   } else {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { ");
+    $$scratch_str_ref .= "namespace dk { ";
   }
   if (&is_exported($generic)) {
-    $$scratch_str_ref .= &dk::print("export");
+    $$scratch_str_ref .= "export";
   } else {
-    $$scratch_str_ref .= &dk::print("noexport");
+    $$scratch_str_ref .= "noexport";
   }
   if ($is_inline) {
-    $$scratch_str_ref .= &dk::print(" INLINE");
+    $$scratch_str_ref .= " INLINE";
   }
-  $$scratch_str_ref .= &dk::print(" /*generic*/");
+  $$scratch_str_ref .= " /*generic*/";
   my $generic_name = "@{$$generic{'name'}}";
 
-  $$scratch_str_ref .= &dk::print(" $return_type $generic_name($$new_arg_list)");
+  $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
 
   if ($$generic{'exception-types'}) {
     my $throw_arg_type = &arg_type::list_types($$generic{'exception-types'});
-    $$scratch_str_ref .= &dk::print(" throw($$throw_arg_type)");
+    $$scratch_str_ref .= " throw($$throw_arg_type)";
   }
 
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $$scratch_str_ref .= &dk::print("; } }\n");
+      $$scratch_str_ref .= "; } }\n";
     } else {
-      $$scratch_str_ref .= &dk::print("; }\n");
+      $$scratch_str_ref .= "; }\n";
     }
   } elsif (&is_rt_decl() || &is_rt_defn()) {
-    $$scratch_str_ref .= &dk::print("\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
     if (&is_va($generic)) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = object->klass;\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
+      $$scratch_str_ref .= "  DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n";
+      $$scratch_str_ref .= "  static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n";
+      $$scratch_str_ref .= "  object-t klass = object->klass;\n";
+      $$scratch_str_ref .= "  method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = object->klass;\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
+      $$scratch_str_ref .= "  DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n";
+      $$scratch_str_ref .= "  static selector-t selector = selector($generic_name($$new_arg_type_list));\n";
+      $$scratch_str_ref .= "  object-t klass = object->klass;\n";
+      $$scratch_str_ref .= "  method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object), signature => signature));\n");
+    $$scratch_str_ref .= "  DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
+    $$scratch_str_ref .= "  throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object), signature => signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n");
+      $$scratch_str_ref .= "  DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n";
     }
 
     my $var_name = 'result';
 
     if (defined $$generic{'return-type'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$return_type $var_name = ");
-    } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "");
+      $$scratch_str_ref .= "  $return_type $var_name = ";
     }
 
     $new_arg_names = &arg_type::names($new_arg_type);
 
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
-    $$scratch_str_ref .= &dk::print("(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n");
+    $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n");
+      $$scratch_str_ref .= "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n";
     }
 
     if (defined $$generic{'return-type'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return $var_name;\n");
+      $$scratch_str_ref .= "  return $var_name;\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return;\n");
+      $$scratch_str_ref .= "  return;\n";
     }
     $col--;
     if (&is_va($generic)) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "} } }\n");
+      $$scratch_str_ref .= "} } }\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
+      $$scratch_str_ref .= "} }\n";
     }
   }
 }
@@ -1473,64 +1459,62 @@ sub generics::generate_super_generic_defn {
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();    
   if (&is_va($generic)) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { namespace va { ");
+    $$scratch_str_ref .= "namespace dk { namespace va { ";
   } else {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { ");
+    $$scratch_str_ref .= "namespace dk { ";
   }
   if (&is_exported($generic)) {
-    $$scratch_str_ref .= &dk::print("export");
+    $$scratch_str_ref .= "export";
   } else {
-    $$scratch_str_ref .= &dk::print("noexport");
+    $$scratch_str_ref .= "noexport";
   }
   if ($is_inline) {
-    $$scratch_str_ref .= &dk::print(" INLINE");
+    $$scratch_str_ref .= " INLINE";
   }
-  $$scratch_str_ref .= &dk::print(" /*generic*/");
+  $$scratch_str_ref .= " /*generic*/";
   my $generic_name = "@{$$generic{'name'}}";
 
-  $$scratch_str_ref .= &dk::print(" $return_type $generic_name($$new_arg_list)");
+  $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
 
   if ($$generic{'exception-types'}) {
     my $throw_arg_type = &arg_type::list_types($$generic{'exception-types'});
-    $$scratch_str_ref .= &dk::print(" throw($$throw_arg_type)");
+    $$scratch_str_ref .= " throw($$throw_arg_type)";
   }
 
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $$scratch_str_ref .= &dk::print("; } }\n");
+      $$scratch_str_ref .= "; } }\n";
     } else {
-      $$scratch_str_ref .= &dk::print("; }\n");
+      $$scratch_str_ref .= "; }\n";
     }
   } elsif (&is_rt_decl() || &is_rt_defn()) {
-    $$scratch_str_ref .= &dk::print("\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
     if (&is_va($generic)) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = klass:unbox(arg0.klass)->superklass;\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
+      $$scratch_str_ref .= "  DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n";
+      $$scratch_str_ref .= "  static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n";
+      $$scratch_str_ref .= "  object-t klass = klass:unbox(arg0.klass)->superklass;\n";
+      $$scratch_str_ref .= "  method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static selector-t selector = selector($generic_name($$new_arg_type_list));\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t klass = klass:unbox(arg0.klass)->superklass;\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n");
+      $$scratch_str_ref .= "  DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n";
+      $$scratch_str_ref .= "  static selector-t selector = selector($generic_name($$new_arg_type_list));\n";
+      $$scratch_str_ref .= "  object-t klass = klass:unbox(arg0.klass)->superklass;\n";
+      $$scratch_str_ref .= "  method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "throw make(no-such-method-exception:klass, object => arg0.self, superkls => dkt-superklass(arg0.klass), signature => signature));\n");
+    $$scratch_str_ref .= "  DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
+    $$scratch_str_ref .= "    throw make(no-such-method-exception:klass, object => arg0.self, superkls => dkt-superklass(arg0.klass), signature => signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n");
+      $$scratch_str_ref .= "  DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n";
     }
 
     my $var_name = 'result';
 
     if (defined $$generic{'return-type'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$return_type $var_name = ");
-    } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "");
+      $$scratch_str_ref .= "  $return_type $var_name = ";
     }
 
     $new_arg_type = &arg_type::super($new_arg_type);
@@ -1538,30 +1522,30 @@ sub generics::generate_super_generic_defn {
     &dakota::util::_replace_first($new_arg_names, "arg0.self");
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
-    $$scratch_str_ref .= &dk::print("(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n");
+    $$scratch_str_ref .= "  (cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n");
+      $$scratch_str_ref .= "  DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n";
     }
 
     if (defined $$generic{'return-type'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return $var_name;\n");
+      $$scratch_str_ref .= "  return $var_name;\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return;\n");
+      $$scratch_str_ref .= "  return;\n";
     }
     $col--;
     if (&is_va($generic)) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "} } }\n");
+      $$scratch_str_ref .= "} } }\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
+      $$scratch_str_ref .= "} }\n";
     }
   }
 }
 sub generics::generate_generic_defns {
   my ($generics, $is_inline, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "// generate_generic_defns()\n");
+  #$$scratch_str_ref .= "// generate_generic_defns()\n";
   my $generic;
-  #$$scratch_str_ref .= &dk::print("#if defined DKT-VA-GENERICS\n");
+  #$$scratch_str_ref .= "#if defined DKT-VA-GENERICS\n";
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
   foreach $generic (@$generics) {
@@ -1579,7 +1563,7 @@ sub generics::generate_generic_defns {
       }
     }
   }
-  #$$scratch_str_ref .= &dk::print("#endif // defined DKT-VA-GENERICS\n");
+  #$$scratch_str_ref .= "#endif // defined DKT-VA-GENERICS\n";
   #if (!&is_raw($generic)) {
   &generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
   #}
@@ -1646,13 +1630,13 @@ sub linkage_unit::generate_generics {
   my $is_inline;
 
   if ($$file{'should-generate-make'}) {
-    $$scratch_str_ref .= &dk::print("\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { namespace va { noexport /*generic*/ object-t init(object-t, va-list-t); } }\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "namespace dk { noexport /*generic*/ object-t alloc(object-t); }\n");
-    $$scratch_str_ref .= &dk::print("\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "#if !defined DK-USE-MAKE-MACRO\n");
+    $$scratch_str_ref .= "\n";
+    $$scratch_str_ref .= "namespace dk { namespace va { noexport /*generic*/ object-t init(object-t, va-list-t); } }\n";
+    $$scratch_str_ref .= "namespace dk { noexport /*generic*/ object-t alloc(object-t); }\n";
+    $$scratch_str_ref .= "\n";
+    $$scratch_str_ref .= "#if !defined DK-USE-MAKE-MACRO\n";
     &generics::generate_va_make_defn($scope, $is_inline = 1, $col);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "#endif\n");
+    $$scratch_str_ref .= "#endif\n";
   }
   &generics::generate_generic_defns($scope, $is_inline = 0, $col);
   return $$scratch_str_ref;
@@ -1661,37 +1645,37 @@ sub generics::generate_va_make_defn {
   my ($generics, $is_inline, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "// generate_va_make_defn()\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "sentinel noexport object-t make(object-t klass, ...)");
+  #$$scratch_str_ref .= "// generate_va_make_defn()\n";
+  $$scratch_str_ref .= "sentinel noexport object-t make(object-t klass, ...)";
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-    $$scratch_str_ref .= &dk::print(";\n");
+    $$scratch_str_ref .= ";\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     my $var_name = 'result';
-    $$scratch_str_ref .= &dk::print("\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
     my $method_type_decl;
 
-    $method_type_decl = "object-t (*_func_)(object-t, va-list-t)"; ### should use method::type_decl
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "static $method_type_decl = dk:va:init;\n");
+    $method_type_decl = "  object-t (*_func_)(object-t, va-list-t)"; ### should use method::type_decl
+    $$scratch_str_ref .= "  static $method_type_decl = dk:va:init;\n";
 
-    $method_type_decl = "object-t (*alloc)(object-t)"; ### should use method::type_decl
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "static $method_type_decl = dk:alloc;\n");
+    $method_type_decl = "  object-t (*alloc)(object-t)"; ### should use method::type_decl
+    $$scratch_str_ref .= "  static $method_type_decl = dk:alloc;\n";
 
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "object-t object = alloc(klass);\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "va-list-t args;\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "va-start(args, klass);\n");
+    $$scratch_str_ref .= "  object-t object = alloc(klass);\n";
+    $$scratch_str_ref .= "  va-list-t args;\n";
+    $$scratch_str_ref .= "  va-start(args, klass);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-VA-TRACE-BEFORE-INIT(klass, args);\n");
+      $$scratch_str_ref .= "  DKT-VA-TRACE-BEFORE-INIT(klass, args);\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "object = _func_(object, args);\n");
+    $$scratch_str_ref .= "  object = _func_(object, args);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "DKT-VA-TRACE-AFTER-INIT(klass, args);\n");
+      $$scratch_str_ref .= "DKT-VA-TRACE-AFTER-INIT(klass, args);\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "va-end(args);\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "return object;\n");
+    $$scratch_str_ref .= "  va-end(args);\n";
+    $$scratch_str_ref .= "  return object;\n";
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+    $$scratch_str_ref .= "}\n";
   }
 }
 sub path::string {
@@ -1715,12 +1699,12 @@ sub generate_struct_or_union_defn {
 
   if ('struct' eq $$slots_scope{'cat'} ||
       'union'  eq $$slots_scope{'cat'}) {
-    $$scratch_str_ref .= &dk::print("$$slots_scope{'cat'} slots-t\n");
+    $$scratch_str_ref .= "$$slots_scope{'cat'} slots-t\n";
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
 
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "{\n";
   my $max_width = 0;
   foreach my $slot_info (@$slots_info) {
     my ($slot_name, $slot_type) = %$slot_info;
@@ -1733,9 +1717,9 @@ sub generate_struct_or_union_defn {
     my ($slot_name, $slot_type) = %$slot_info;
     my $width = length($slot_type);
     my $pad = ' ' x ($max_width - $width);
-    $$scratch_str_ref .= &dk::print_in_col_string3($col + 1, "$slot_type ", $pad, "$slot_name;\n");
+    $$scratch_str_ref .= "$slot_type " . $pad . "$slot_name;\n";
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "}; ");
+  $$scratch_str_ref .= "}; ";
 }
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
@@ -1744,16 +1728,16 @@ sub generate_enum_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($is_slots) {
-    $$scratch_str_ref .= &dk::print("enum slots-t");
+    $$scratch_str_ref .= "enum slots-t";
   } else {
-    $$scratch_str_ref .= &dk::print("enum");
+    $$scratch_str_ref .= "enum";
     if ($$enum{'type'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, " @{$$enum{'type'}}");
+      $$scratch_str_ref .= " @{$$enum{'type'}}";
     }
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "\n");
+  $$scratch_str_ref .= "\n";
 
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "{\n";
   my $max_width = 0;
   foreach my $pair (@$info) {
     my ($name, $value) = %$pair;
@@ -1766,9 +1750,9 @@ sub generate_enum_defn {
     my ($name, $value) = %$pair;
     my $width = length($name);
     my $pad = ' ' x ($max_width - $width);
-    $$scratch_str_ref .= &dk::print_in_col_string3($col + 1, "$name = ", $pad, "$value,\n");
+    $$scratch_str_ref .= "$name = " . $pad . "$value,\n";
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "}; ");
+  $$scratch_str_ref .= "}; ";
 }
 sub parameter_list_from_slots_info {
   my ($slots_info) = @_;
@@ -1808,32 +1792,32 @@ sub generate_klass_unbox {
   my $result = '';
   my $col = 0;
   if ($klass_name eq 'object') {
-    #$result .= &dk::print_in_col_string($col, "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n");
+    #$result .= "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n";
   } elsif ($klass_name eq 'klass') {
-    $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)");
+    $result .= "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
 
     if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-      $result .= &dk::print("; } // special-case\n");
+      $result .= "; } // special-case\n";
     } elsif (&is_rt_decl() || &is_rt_defn()) {
-      $result .= &dk::print(" // special-case\n");
-      $result .= &dk::print_in_col_string($col, "{\n");
-      $result .= &dk::print_in_col_string($col + 1, "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n");
-      $result .= &dk::print_in_col_string($col + 1, "return s;\n");
-      $result .= &dk::print_in_col_string($col, "} }\n");
+      $result .= " // special-case\n";
+      $result .= "{\n";
+      $result .= "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n";
+      $result .= "return s;\n";
+      $result .= "} }\n";
     }
   } else {
     ### unbox() same for all types
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
-      $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)");
+      $result .= "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
       if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-        $result .= &dk::print("; }\n"); # general-case
+        $result .= "; }\n"; # general-case
       } elsif (&is_rt_decl() || &is_rt_defn()) {
-        $result .= &dk::print("\n"); # general-case
-        $result .= &dk::print_in_col_string($col, "{\n");
-        $result .= &dk::print_in_col_string($col + 1, "DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n");
-        $result .= &dk::print_in_col_string($col + 1, "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + klass:unbox(klass)->offset);\n");
-        $result .= &dk::print_in_col_string($col + 1, "return s;\n");
-        $result .= &dk::print_in_col_string($col, "} }\n");
+        $result .= "\n"; # general-case
+        $result .= "{\n";
+        $result .= "DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n";
+        $result .= "slots-t* s = cast(slots-t*)(cast(uint8-t*)object + klass:unbox(klass)->offset);\n";
+        $result .= "return s;\n";
+        $result .= "} }\n";
       }
     }
   }
@@ -1846,90 +1830,90 @@ sub generate_klass_box {
 
   if ('object' eq &path::string($klass_path)) {
     ### box() non-array-type
-    $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t* arg)");
+    $result .= "klass $klass_name { noexport object-t box(slots-t* arg)";
 
     if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-      $result .= &dk::print("; }\n");
+      $result .= "; }\n";
     } elsif (&is_rt_decl() || &is_rt_defn()) {
-      $result .= &dk::print("\n");
-      $result .= &dk::print_in_col_string($col, "{\n");
+      $result .= "\n";
+      $result .= "{\n";
       $col++;
-      $result .= &dk::print_in_col_string($col, "return arg;\n");
+      $result .= "return arg;\n";
       $col--;
-      $result .= &dk::print_in_col_string($col, "} }\n");
+      $result .= "} }\n";
     }
   } else {
     if (&has_exported_slots($klass_scope)) {
       ### box()
       if (&is_array_type($$klass_scope{'slots'}{'type'})) {
         ### box() array-type
-        $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t arg)");
+        $result .= "klass $klass_name { noexport object-t box(slots-t arg)";
 
         if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-          $result .= &dk::print("; }\n");
+          $result .= "; }\n";
         } elsif (&is_rt_decl() || &is_rt_defn()) {
-          $result .= &dk::print("\n");
-          $result .= &dk::print_in_col_string($col, "{\n");
+          $result .= "\n";
+          $result .= "{\n";
           $col++;
-          $result .= &dk::print_in_col_string($col, "object-t object = make(klass);\n");
-          $result .= &dk::print_in_col_string($col, "slots-t* s = unbox(object);\n");
+          $result .= "object-t object = make(klass);\n";
+          $result .= "slots-t* s = unbox(object);\n";
 
-          $result .= &dk::print_in_col_string($col, "memcpy(*s, arg, sizeof(slots-t)); // unfortunate\n");
+          $result .= "memcpy(*s, arg, sizeof(slots-t)); // unfortunate\n";
 
-          $result .= &dk::print_in_col_string($col, "return object;\n");
+          $result .= "return object;\n";
           $col--;
-          $result .= &dk::print_in_col_string($col, "} }\n");
+          $result .= "} }\n";
         }
-        $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t* arg)");
+        $result .= "klass $klass_name { noexport object-t box(slots-t* arg)";
 
         if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-          $result .= &dk::print("; }\n");
+          $result .= "; }\n";
         } elsif (&is_rt_decl() || &is_rt_defn()) {
-          $result .= &dk::print("\n");
-          $result .= &dk::print_in_col_string($col, "{\n");
+          $result .= "\n";
+          $result .= "{\n";
           $col++;
-          $result .= &dk::print_in_col_string($col, "object-t object = box(*arg);\n");
-          $result .= &dk::print_in_col_string($col, "return object;\n");
+          $result .= "object-t object = box(*arg);\n";
+          $result .= "return object;\n";
           $col--;
-          $result .= &dk::print_in_col_string($col, "} }\n");
+          $result .= "} }\n";
         }
       } else {                  # !&is_array_type()
         ### box() non-array-type
-        $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t* arg)");
+        $result .= "klass $klass_name { noexport object-t box(slots-t* arg)";
 
         if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-          $result .= &dk::print("; }\n");
+          $result .= "; }\n";
         } elsif (&is_rt_decl() || &is_rt_defn()) {
-          $result .= &dk::print("\n");
-          $result .= &dk::print_in_col_string($col, "{\n");
+          $result .= "\n";
+          $result .= "{\n";
           $col++;
-          $result .= &dk::print_in_col_string($col, "object-t object = make(klass);\n");
-          $result .= &dk::print_in_col_string($col, "slots-t* s = unbox(object);\n");
+          $result .= "object-t object = make(klass);\n";
+          $result .= "slots-t* s = unbox(object);\n";
 
-          $result .= &dk::print_in_col_string($col, "*s = *arg;\n");
+          $result .= "*s = *arg;\n";
 
-          $result .= &dk::print_in_col_string($col, "return object;\n");
+          $result .= "return object;\n";
           $col--;
-          $result .= &dk::print_in_col_string($col, "} }\n");
+          $result .= "} }\n";
         }
-        $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport object-t box(slots-t arg)");
+        $result .= "klass $klass_name { noexport object-t box(slots-t arg)";
 
         if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-          $result .= &dk::print("; }\n");
+          $result .= "; }\n";
         } elsif (&is_rt_decl() || &is_rt_defn()) {
-          $result .= &dk::print("\n");
-          $result .= &dk::print_in_col_string($col, "{\n");
+          $result .= "\n";
+          $result .= "{\n";
           $col++;
-          $result .= &dk::print_in_col_string($col, "object-t object = box(&arg);\n");
-          $result .= &dk::print_in_col_string($col, "return object;\n");
+          $result .= "object-t object = box(&arg);\n";
+          $result .= "return object;\n";
           $col--;
-          $result .= &dk::print_in_col_string($col, "} }\n");
+          $result .= "} }\n";
         }
       }
     }
   }
   if (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
-    $result .= &dk::print_in_col_string($col, "using $klass_name:box;\n");
+    $result .= "using $klass_name:box;\n";
   }
   return $result;
 }
@@ -1945,19 +1929,19 @@ sub generate_klass_construct {
 
         if ($pairs =~ m/\[/g) {
         } else {
-          $result .= &dk::print_in_col_string($col, "klass $klass_name { noexport slots-t construct($pairs)");
+          $result .= "klass $klass_name { noexport slots-t construct($pairs)";
 
           if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-            $result .= &dk::print("; }\n");
+            $result .= "; }\n";
           } elsif (&is_rt_decl() || &is_rt_defn()) {
             my $var_name = 'result';
-            $result .= &dk::print("\n");
-            $result .= &dk::print_in_col_string($col, "{\n");
+            $result .= "\n";
+            $result .= "{\n";
             $col++;
-            $result .= &dk::print_in_col_string($col, "slots-t $var_name = { $names };\n");
-            $result .= &dk::print_in_col_string($col, "return $var_name;\n");
+            $result .= "slots-t $var_name = { $names };\n";
+            $result .= "return $var_name;\n";
             $col--;
-            $result .= &dk::print_in_col_string($col, "} }\n");
+            $result .= "} }\n";
           }
         }
       }
@@ -1976,24 +1960,24 @@ sub linkage_unit::generate_klasses_body {
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
 
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-    #$$scratch_str_ref .= &dk::print_in_col_string($col, "extern noexport symbol-t __type__;\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { extern noexport symbol-t __name__; }\n");
+    #$$scratch_str_ref .= "extern noexport symbol-t __type__;\n";
+    $$scratch_str_ref .= "$klass_type $klass_name { extern noexport symbol-t __name__; }\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
-    #$$scratch_str_ref .= &dk::print_in_col_string($col, "noexport symbol-t __type__ = \$$klass_type;\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { /*noexport*/ symbol-t __name__ = dk-intern(\"@$klass_path\"); }\n");
+    #$$scratch_str_ref .= "noexport symbol-t __type__ = \$$klass_type;\n";
+    $$scratch_str_ref .= "$klass_type $klass_name { /*noexport*/ symbol-t __name__ = dk-intern(\"@$klass_path\"); }\n";
   }
 
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { extern noexport object-t klass; }\n");
+      $$scratch_str_ref .= "$klass_type $klass_name { extern noexport object-t klass; }\n";
     } elsif (&is_rt_decl() || &is_rt_defn()) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t klass = nullptr; }\n");
+      $$scratch_str_ref .= "$klass_type $klass_name { noexport object-t klass = nullptr; }\n";
     }
     if (!&is_rt_defn()) {
       my $is_exported;
       if (exists $$klass_scope{'const'}) {
         foreach my $const (@{$$klass_scope{'const'}}) {
-          $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { extern const $$const{'type'} $$const{'name'}; }\n");
+          $$scratch_str_ref .= "$klass_type $klass_name { extern const $$const{'type'} $$const{'name'}; }\n";
         }
       }
     }
@@ -2005,7 +1989,7 @@ sub linkage_unit::generate_klasses_body {
           if (&is_box_type($$method{'parameter-types'}[0])) {
             my $method_decl_ref = &function::decl($method, $klass_path);
             $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref }\n");
+            $$scratch_str_ref .= "$klass_type $klass_name { $$method_decl_ref }\n";
             if (!&has_object_method_defn($klass_scope, $method)) {
               my $object_method = &convert_to_object_method($method);
               my $sig = &function::overloadsig($object_method, []);
@@ -2020,7 +2004,7 @@ sub linkage_unit::generate_klasses_body {
         if (!&is_va($method)) {
           my $method_decl_ref = &function::decl($method, $klass_path);
           $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-          $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref }\n");
+          $$scratch_str_ref .= "$klass_type $klass_name { $$method_decl_ref }\n";
           my $object_method = &convert_to_object_method($method);
           my $sig = &function::overloadsig($object_method, []);
           if (!$$object_method_defns{$sig}) {
@@ -2037,7 +2021,7 @@ sub linkage_unit::generate_klasses_body {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
             my $method_decl_ref = &function::decl($method, $klass_path);
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref }\n");
+            $$scratch_str_ref .= "$klass_type $klass_name { $$method_decl_ref }\n";
             if (!&has_object_method_defn($klass_scope, $method)) {
               my $object_method = &convert_to_object_method($method);
               my $sig = &function::overloadsig($object_method, []);
@@ -2071,10 +2055,10 @@ sub linkage_unit::generate_klasses_body {
     }
   }                             # if ('klass' eq $klass_type)
   if ($$klass_scope{'has-initialize'}) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t initialize(object-t kls); }\n");
+    $$scratch_str_ref .= "$klass_type $klass_name { noexport object-t initialize(object-t kls); }\n";
   }
   if ($$klass_scope{'has-finalize'}) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport object-t finalize(object-t kls); }\n");
+    $$scratch_str_ref .= "$klass_type $klass_name { noexport object-t finalize(object-t kls); }\n";
   }
   if (1 || @$ka_methods) {
     #print STDERR Dumper($va_list_methods);
@@ -2097,7 +2081,7 @@ sub linkage_unit::generate_klasses_body {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
       foreach $method (@$va_list_methods) {
         my $method_decl_ref = &function::decl($method, $klass_path);
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { namespace va { $$method_decl_ref } } /*rn0*/\n");
+        $$scratch_str_ref .= "$klass_type $klass_name { namespace va { $$method_decl_ref } } /*rn0*/\n";
       }
       &path::remove_last($klass_path);
     }
@@ -2115,7 +2099,7 @@ sub linkage_unit::generate_klasses_body {
               } else {
                 my $last = &dakota::util::_remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
                 my $method_decl_ref = &function::decl($va_method, $klass_path);
-                $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref } /*rn1*/\n");
+                $$scratch_str_ref .= "$klass_type $klass_name { $$method_decl_ref } /*rn1*/\n";
                 &dakota::util::_add_last($$va_method{'parameter-types'}, $last);
               }
             }
@@ -2132,14 +2116,14 @@ sub linkage_unit::generate_klasses_body {
                 $other_method_decl =~ s|\(\*($k+)\)| $1|;
 
                 if (&is_exported($method)) {
-                  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { export method");
+                  $$scratch_str_ref .= "$klass_type $klass_name { export method";
                 } else {
-                  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { noexport method");
+                  $$scratch_str_ref .= "$klass_type $klass_name { noexport method";
                 }
                 if ($$method{'is-inline'}) {
-                                #$$scratch_str_ref .= &dk::print(" INLINE");
+                                #$$scratch_str_ref .= " INLINE";
                 }
-                $$scratch_str_ref .= &dk::print(" $other_method_decl; } /*rn2*/\n");
+                $$scratch_str_ref .= " $other_method_decl; } /*rn2*/\n";
               }
             }
           }
@@ -2153,7 +2137,7 @@ sub linkage_unit::generate_klasses_body {
       {
         if (!&is_va($method)) {
           my $method_decl_ref = &function::decl($method, $klass_path);
-          $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type $klass_name { $$method_decl_ref } /*rn3*/\n");
+          $$scratch_str_ref .= "$klass_type $klass_name { $$method_decl_ref } /*rn3*/\n";
         }
       }
   }
@@ -2163,7 +2147,7 @@ sub generate_object_method_decl {
   my $scratch_str_ref = &global_scratch_str_ref();
   my $object_method = &convert_to_object_method($non_object_method);
   my $method_decl_ref = &function::decl($object_method, $klass_path);
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_path { $$method_decl_ref }\n");
+  $$scratch_str_ref .= "$klass_type @$klass_path { $$method_decl_ref }\n";
 }
 sub generate_object_method_defn {
   my ($non_object_method, $klass_path, $col, $klass_type) = @_;
@@ -2178,45 +2162,45 @@ sub generate_object_method_defn {
   my $return_type = &arg::type($$method{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();    
   if (&is_exported($method)) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_path { export method");
+    $$scratch_str_ref .= "$klass_type @$klass_path { export method";
   } else {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_path { noexport method");
+    $$scratch_str_ref .= "$klass_type @$klass_path { noexport method";
   }
   my $method_name = "@{$$method{'name'}}";
-  $$scratch_str_ref .= &dk::print(" $return_type $method_name($$new_arg_list)");
+  $$scratch_str_ref .= " $return_type $method_name($$new_arg_list)";
 
   my $new_unboxed_arg_names = &arg_type::names_unboxed($$non_object_method{'parameter-types'});
   my $new_unboxed_arg_names_list = &arg_type::list_names($new_unboxed_arg_names);
 
   if ($$method{'exception-types'}) {
     my $throw_arg_type = &arg_type::list_types($$method{'exception-types'});
-    $$scratch_str_ref .= &dk::print(" throw($$throw_arg_type)");
+    $$scratch_str_ref .= " throw($$throw_arg_type)";
   }
 
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
-    $$scratch_str_ref .= &dk::print("; }\n");
+    $$scratch_str_ref .= "; }\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
-    $$scratch_str_ref .= &dk::print("\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
 
     my $var_name = 'result';
 
     if (defined $$method{'return-type'}) {
       if ($non_object_return_type ne $return_type) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "$return_type $var_name = box($method_name($$new_unboxed_arg_names_list));\n");
+        $$scratch_str_ref .= "$return_type $var_name = box($method_name($$new_unboxed_arg_names_list));\n";
       } else {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "$return_type $var_name = $method_name($$new_unboxed_arg_names_list);\n");
+        $$scratch_str_ref .= "$return_type $var_name = $method_name($$new_unboxed_arg_names_list);\n";
       }
     }
 
     if (defined $$method{'return-type'}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return $var_name;\n");
+      $$scratch_str_ref .= "return $var_name;\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "return;\n");
+      $$scratch_str_ref .= "return;\n";
     }
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "} }\n");
+    $$scratch_str_ref .= "} }\n";
   }
 }
 sub convert_to_object_type {
@@ -2248,26 +2232,26 @@ sub generate_slots_decls {
   if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "//typedef $klass_name:slots-t $klass_name-t;\n");
+    $$scratch_str_ref .= "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }\n";
+    $$scratch_str_ref .= "//typedef $klass_name:slots-t $klass_name-t;\n";
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n");
+      $$scratch_str_ref .= "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+      $$scratch_str_ref .= "klass $klass_name\n";
+      $$scratch_str_ref .= "{\n";
       my $is_exported;
       my $is_slots;
       &generate_enum_defn($col, $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+      $$scratch_str_ref .= "}\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "//typedef $klass_name:slots-t $klass_name-t;\n");
+    $$scratch_str_ref .= "//typedef $klass_name:slots-t $klass_name-t;\n";
   }
 }
 sub is_array_type {
@@ -2309,42 +2293,42 @@ sub generate_exported_slots_decls {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n");
+      $$scratch_str_ref .= "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "//klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n");
+      $$scratch_str_ref .= "//klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "typedef $klass_name:slots-t* $klass_name-t; // special-case\n");
+    $$scratch_str_ref .= "typedef $klass_name:slots-t* $klass_name-t; // special-case\n";
   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }\n");
+    $$scratch_str_ref .= "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
                          };
     if (!exists $$excluded_types{"$klass_name-t"}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "typedef $klass_name:slots-t $klass_name-t;\n");
+      $$scratch_str_ref .= "typedef $klass_name:slots-t $klass_name-t;\n";
     }
   } elsif (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n");
+      $$scratch_str_ref .= "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { ");
+      $$scratch_str_ref .= "klass $klass_name { ";
       my $is_exported;
       my $is_slots;
       &generate_enum_defn($col, $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+      $$scratch_str_ref .= "}\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "typedef $klass_name:slots-t $klass_name-t;\n");
+    $$scratch_str_ref .= "typedef $klass_name:slots-t $klass_name-t;\n";
   } else {
     #errdump($klass_name);
     #errdump($klass_scope);
@@ -2659,9 +2643,9 @@ sub linkage_unit::generate_klasses_types_after {
         foreach my $enum (@{$$klass_scope{'enum'} ||= []}) {
           if (&is_exported($enum)) {
             $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { ");
+            $$scratch_str_ref .= "klass $klass_name { ";
             &generate_enum_defn($col, $enum, $is_exported = 1, $is_slots = 0);
-            $$scratch_str_ref .= &dk::print_in_col_string3_comment($col, "}", " // klass $klass_name", "\n");
+            $$scratch_str_ref .= "} // klass $klass_name\n";
           }
         }
       }
@@ -2670,23 +2654,23 @@ sub linkage_unit::generate_klasses_types_after {
       if (&is_decl()) {
         if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
           $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-          $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { ");
+          $$scratch_str_ref .= "klass $klass_name { ";
           if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
               'union'  eq $$klass_scope{'slots'}{'cat'}) {
             &generate_struct_or_union_defn($col, $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
           } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-            $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "// enum slots-t { ... }\n");
+            $$scratch_str_ref .= "// enum slots-t { ... }\n";
           } else {
             print STDERR &Dumper($$klass_scope{'slots'});
             die __FILE__, ":", __LINE__, ": error:\n";
           }
-          $$scratch_str_ref .= &dk::print_in_col_string3_comment($col, "}", " // klass $klass_name", "\n");
+          $$scratch_str_ref .= "} // klass $klass_name\n";
         }
       } elsif (&is_nrt_defn() || &is_rt_defn()) {
         if (!&has_exported_slots($klass_scope)) {
           if (&is_exported($klass_scope)) {
             $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { ");
+            $$scratch_str_ref .= "klass $klass_name { ";
             if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
                 'union'  eq $$klass_scope{'slots'}{'cat'}) {
               &generate_struct_or_union_defn($col, $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
@@ -2696,26 +2680,26 @@ sub linkage_unit::generate_klasses_types_after {
               print STDERR &Dumper($$klass_scope{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
-            $$scratch_str_ref .= &dk::print_in_col_string3_comment($col, "}", " // klass $klass_name", "\n");
+            $$scratch_str_ref .= "} // klass $klass_name\n";
           } else {
             $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-            $$scratch_str_ref .= &dk::print_in_col_string($col, "klass $klass_name { ");
+            $$scratch_str_ref .= "klass $klass_name { ";
             if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
                 'union'  eq $$klass_scope{'slots'}{'cat'}) {
               &generate_struct_or_union_defn($col, $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
             } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-              $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "// enum slots-t { ... }\n");
+              $$scratch_str_ref .= "// enum slots-t { ... }\n";
             } else {
               print STDERR &Dumper($$klass_scope{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
-            $$scratch_str_ref .= &dk::print_in_col_string3_comment($col, "}", " // klass $klass_name", "\n");
+            $$scratch_str_ref .= "} // klass $klass_name\n";
           }
         }
       }
     }
   }
-  $$scratch_str_ref .= &dk::print("\n");
+  $$scratch_str_ref .= "\n";
 }
 sub linkage_unit::generate_klasses_klass {
   my ($scope, $col, $klass_path, $klass_name) = @_;
@@ -2788,9 +2772,9 @@ sub raw_signature_body {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
       if (&is_va($method)) {
-        $$scratch_str_ref .= &dk::print_in_col_string3($col, "(cast(dkt-signature-function-t)cast($method_type)", $pad, "__raw-signature:va:$generic_name)(),\n");
+        $$scratch_str_ref .= "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:va:$generic_name)(),\n";
       } else {
-        $$scratch_str_ref .= &dk::print_in_col_string3($col, "(cast(dkt-signature-function-t)cast($method_type)", $pad, "__raw-signature:$generic_name)(),\n");
+        $$scratch_str_ref .= "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:$generic_name)(),\n";
       }
       my $method_name;
 
@@ -2802,7 +2786,7 @@ sub raw_signature_body {
     }
     $method_num++;
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
+  $$scratch_str_ref .= "nullptr\n";
 }
 sub signature_body {
   my ($klass_name, $methods, $col) = @_;
@@ -2827,9 +2811,9 @@ sub signature_body {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
       if (&is_va($method)) {
-        $$scratch_str_ref .= &dk::print_in_col_string3($col, "(cast(dkt-signature-function-t)cast($method_type)", $pad, "__signature:va:$generic_name)(),\n");
+        $$scratch_str_ref .= "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature:va:$generic_name)(),\n";
       } else {
-        $$scratch_str_ref .= &dk::print_in_col_string3($col, "(cast(dkt-signature-function-t)cast($method_type)", $pad, "__signature:$generic_name)(),\n");
+        $$scratch_str_ref .= "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature:$generic_name)(),\n";
       }
       my $method_name;
 
@@ -2841,7 +2825,7 @@ sub signature_body {
     }
     $method_num++;
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
+  $$scratch_str_ref .= "nullptr\n";
 }
 sub address_body {
   my ($klass_name, $methods, $col) = @_;
@@ -2874,18 +2858,18 @@ sub address_body {
       #my $method_name = "@{$$method{'name'}}";
 
       if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr,\n");
+        $$scratch_str_ref .= "nullptr,\n";
       } else {
         if (&is_va($method)) {
-          $$scratch_str_ref .= &dk::print_in_col_string3($col, "cast(method-t)cast($method_type)", $pad, "va:$method_name,\n");
+          $$scratch_str_ref .= "cast(method-t)cast($method_type)" . $pad . "va:$method_name,\n";
         } else {
-          $$scratch_str_ref .= &dk::print_in_col_string3($col, "cast(method-t)cast($method_type)", $pad, "$method_name,\n");
+          $$scratch_str_ref .= "cast(method-t)cast($method_type)" . $pad . "$method_name,\n";
         }
       }
     }
     $method_num++;
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
+  $$scratch_str_ref .= "nullptr\n";
 }
 sub alias_body {
   my ($klass_name, $methods, $col) = @_;
@@ -2899,14 +2883,14 @@ sub alias_body {
       my $generic_name = "@{$$method{'name'}}";
       my $alias_name = "@{$$method{'alias'}}";
       if (&is_va($method)) {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "{ dkt-signature(va:$alias_name($$new_arg_type_list)), dkt-signature(va:$generic_name($$new_arg_type_list)) },\n");
+        $$scratch_str_ref .= "{ dkt-signature(va:$alias_name($$new_arg_type_list)), dkt-signature(va:$generic_name($$new_arg_type_list)) },\n";
       } else {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "{ dkt-signature($alias_name($$new_arg_type_list)), dkt-signature($generic_name($$new_arg_type_list)) },\n");
+        $$scratch_str_ref .= "{ dkt-signature($alias_name($$new_arg_type_list)), dkt-signature($generic_name($$new_arg_type_list)) },\n";
       }
     }
     $method_num++;
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr }\n");
+  $$scratch_str_ref .= "{ nullptr, nullptr }\n";
 }
 sub export_pair {
   my ($symbol, $element) = @_;
@@ -2977,7 +2961,7 @@ sub exports {
 sub dk::generate_cxx_footer_klass {
   my ($klass_scope, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "// generate_cxx_footer_klass()\n");
+  #$$scratch_str_ref .= "// generate_cxx_footer_klass()\n";
 
   my $token_registry = {};
 
@@ -2993,13 +2977,13 @@ sub dk::generate_cxx_footer_klass {
 
   #if (@$va_list_methods)
   #{
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "namespace va\n");
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  #$$scratch_str_ref .= "namespace va\n";
+  #$$scratch_str_ref .= "{\n";
   #$col++;
   ###        
   if (@$va_list_methods) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static const signature-t* const __va-method-signatures[] = // redundant\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static const signature-t* const __va-method-signatures[] = // redundant\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
 
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
@@ -3024,7 +3008,7 @@ sub dk::generate_cxx_footer_klass {
 
         my $generic_name = "@{$$va_method{'name'}}";
 
-        $$scratch_str_ref .= &dk::print_in_col_string3($col, "(cast(dkt-signature-function-t)cast($va_method_type)", $pad, "__signature:va:$generic_name)(),\n");
+        $$scratch_str_ref .= "(cast(dkt-signature-function-t)cast($va_method_type)" . $pad . "__signature:va:$generic_name)(),\n";
         my $method_name;
 
         if ($$va_method{'alias'}) {
@@ -3040,20 +3024,20 @@ sub dk::generate_cxx_footer_klass {
 
         my $return_type = &arg::type($$va_method{'return-type'});
         my $va_method_name = $method_name;
-        #$$scratch_str_ref .= &dk::print_in_col_string($col, "(va-method-t)(($method_type)$va_method_name),\n");
+        #$$scratch_str_ref .= "(va-method-t)(($method_type)$va_method_name),\n";
       }
       $va_method_num++;
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr,\n");
+    $$scratch_str_ref .= "nullptr,\n";
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
   ###
   ###
   if (@$va_list_methods) {
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static va-method-t __va-method-addresses[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static va-method-t __va-method-addresses[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
 
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
@@ -3093,26 +3077,26 @@ sub dk::generate_cxx_footer_klass {
 
         my $return_type = &arg::type($$va_method{'return-type'});
         my $va_method_name = $method_name;
-        $$scratch_str_ref .= &dk::print_in_col_string3($col, "cast(va-method-t)cast($method_type)", $pad, "$va_method_name,\n");
+        $$scratch_str_ref .= "cast(va-method-t)cast($method_type)" . $pad . "$va_method_name,\n";
       }
       $va_method_num++;
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr,\n");
+    $$scratch_str_ref .= "nullptr,\n";
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
   ###
   #$col--;
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+  #$$scratch_str_ref .= "}\n";
   #}
   ###
   if (@$ka_methods) {
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static const signature-t* const __ka-method-signatures[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static const signature-t* const __ka-method-signatures[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
 
-    #$$scratch_str_ref .= &dk::print_in_col_string($col, "\#if 0\n");
+    #$$scratch_str_ref .= "\#if 0\n";
     my $max_width = 0;
     foreach my $ka_method (@$ka_methods) {
       $ka_method = &dakota::util::deep_copy($ka_method);
@@ -3131,121 +3115,121 @@ sub dk::generate_cxx_footer_klass {
       my $method_name = "@{$$ka_method{'name'}}";
       my $list_types = &arg_type::list_types($$ka_method{'parameter-types'});
       my $kw_list_types = &method::kw_list_types($ka_method);
-      $$scratch_str_ref .= &dk::print_in_col_string3($col, "(cast(dkt-signature-function-t)cast(const signature-t*(*)($$list_types))", $pad, "__ka-signature:va:$method_name)(),\n");
+      $$scratch_str_ref .= "(cast(dkt-signature-function-t)cast(const signature-t*(*)($$list_types))" . $pad . "__ka-signature:va:$method_name)(),\n";
     }
-    #$$scratch_str_ref .= &dk::print_in_col_string($col, "\#endif\n");
+    #$$scratch_str_ref .= "\#endif\n";
 
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
+    $$scratch_str_ref .= "nullptr\n";
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     &signature_body($klass_name, $$klass_scope{'methods'}, $col + 1);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static method-t __method-addresses[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static method-t __method-addresses[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     &address_body($klass_name, $$klass_scope{'methods'}, $col + 1);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
 
   my $num_method_aliases = scalar(@$method_aliases);
   if ($num_method_aliases) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static method-alias-t __method-aliases[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static method-alias-t __method-aliases[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     &alias_body($klass_name, $$klass_scope{'methods'}, $col + 1);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
 
   my $exported_methods =     &exported_methods($klass_scope);
   my $exported_raw_methods = &exported_raw_methods($klass_scope);
 
   if (values %{$exported_methods ||= []}) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static const signature-t* const __exported-method-signatures[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static const signature-t* const __exported-method-signatures[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     &signature_body($klass_name, $exported_methods, $col + 1);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
 
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static method-t __exported-method-addresses[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static method-t __exported-method-addresses[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     &address_body($klass_name, $exported_methods, $col + 1);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
   if (values %{$exported_raw_methods ||= []}) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static const signature-t* const __exported-raw-method-signatures[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static const signature-t* const __exported-raw-method-signatures[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     &raw_signature_body($klass_name, $exported_raw_methods, $col + 1);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
 
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static method-t __exported-raw-method-addresses[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static method-t __exported-raw-method-addresses[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     &address_body($klass_name, $exported_raw_methods, $col + 1);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
   ###
   ###
   ###
-  #$$scratch_str_ref .= &dk::print("\n");
+  #$$scratch_str_ref .= "\n";
 
   my $num_traits = @{( $$klass_scope{'traits'} ||= [] )}; # how to get around 'strict'
   if ($num_traits > 0) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static symbol-t __traits[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static symbol-t __traits[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
 
     my $trait_num = 0;
     for ($trait_num = 0; $trait_num < $num_traits; $trait_num++) {
       my $path = "$$klass_scope{'traits'}[$trait_num]";
-      $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "$path:__name__,\n");
+      $$scratch_str_ref .= "$path:__name__,\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "nullptr\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "nullptr\n";
+    $$scratch_str_ref .= "}; }\n";
   }
   my $num_requires = @{( $$klass_scope{'requires'} ||= [] )}; # how to get around 'strict'
   if ($num_requires > 0) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static symbol-t __requires[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static symbol-t __requires[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
 
     my $require_num = 0;
     for ($require_num = 0; $require_num < $num_requires; $require_num++) {
       my $path = "$$klass_scope{'requires'}[$require_num]";
-      $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "$path:__name__,\n");
+      $$scratch_str_ref .= "$path:__name__,\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "nullptr\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "nullptr\n";
+    $$scratch_str_ref .= "}; }\n";
   }
   my $num_provides = @{( $$klass_scope{'provides'} ||= [] )}; # how to get around 'strict'
   if ($num_provides > 0) {
-    $$scratch_str_ref .= &dk::print("\n");
+    $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static symbol-t __provides[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static symbol-t __provides[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
 
     my $provide_num = 0;
     for ($provide_num = 0; $provide_num < $num_provides; $provide_num++) {
       my $path = "$$klass_scope{'provides'}[$provide_num]";
-      $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "$path:__name__,\n");
+      $$scratch_str_ref .= "$path:__name__,\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col + 1, "nullptr\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "nullptr\n";
+    $$scratch_str_ref .= "}; }\n";
   }
   while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}})) {
     my $token;
@@ -3262,15 +3246,15 @@ sub dk::generate_cxx_footer_klass {
   my $num_bound = keys %{$$klass_scope{'imported-klasses'}};
   if ($num_bound) {
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
     while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}})) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$key:__name__,\n");
+      $$scratch_str_ref .= "$key:__name__,\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "nullptr\n");
+    $$scratch_str_ref .= "nullptr\n";
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
   my $lines = [];
   my $tbbl = {};
@@ -3285,9 +3269,9 @@ sub dk::generate_cxx_footer_klass {
       $$token_registry{$path} = 1;
 
       foreach $token (@$klass_name) {
-        #               $$scratch_str_ref .= &dk::print("\"$gbl_token\", ");
+        #               $$scratch_str_ref .= "\"$gbl_token\", ";
       }
-      #           $$scratch_str_ref .= &dk::print("nullptr }; ");
+      #           $$scratch_str_ref .= "nullptr }; ";
     }
   }
 
@@ -3304,15 +3288,15 @@ sub dk::generate_cxx_footer_klass {
           $$tbl{'$value'} = "\"$slot_value\"";
         }
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { ");
+        $$scratch_str_ref .= "$klass_type @$klass_name { ";
         $$scratch_str_ref .= &generate_property_tbl($prop_name, $tbl, $col + 1, $klass_scope);
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "} // $klass_type @$klass_name\n");
+        $$scratch_str_ref .= "} // $klass_type @$klass_name\n";
         &dakota::util::_add_last($seq, "$prop_name");
         $prop_num++;
       }
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { ");
+      $$scratch_str_ref .= "$klass_type @$klass_name { ";
       $$scratch_str_ref .= &generate_info_seq($root_name, $seq, $col + 1);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "} // $klass_type @$klass_name\n");
+      $$scratch_str_ref .= "} // $klass_type @$klass_name\n";
     } else {
       my $seq = [];
       my $prop_num = 0;
@@ -3328,15 +3312,15 @@ sub dk::generate_cxx_footer_klass {
         $$tbl{'$type'} = "\"$slot_type\"";
 
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { ");
+        $$scratch_str_ref .= "$klass_type @$klass_name { ";
         $$scratch_str_ref .= &generate_property_tbl($prop_name, $tbl, $col + 1);
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "} // $klass_type @$klass_name\n");
+        $$scratch_str_ref .= "} // $klass_type @$klass_name\n";
         &dakota::util::_add_last($seq, "$prop_name");
         $prop_num++;
       }
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { ");
+      $$scratch_str_ref .= "$klass_type @$klass_name { ";
       $$scratch_str_ref .= &generate_info_seq($root_name, $seq, $col + 1);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "} // $klass_type @$klass_name\n");
+      $$scratch_str_ref .= "} // $klass_type @$klass_name\n";
     }
   }
 
@@ -3344,44 +3328,44 @@ sub dk::generate_cxx_footer_klass {
     my $num = 0;
     foreach my $enum (@{$$klass_scope{'enum'}}) {
       $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static enum-info-t __enum-info-$num\[] = //ro-data\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+      $$scratch_str_ref .= "$klass_type @$klass_name { static enum-info-t __enum-info-$num\[] = //ro-data\n";
+      $$scratch_str_ref .= "{\n";
       $col++;
 
       my $info = $$enum{'info'};
       foreach my $pair (@$info) {
         my ($name, $value) = %$pair;
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "{ \$$name, \"$value\" },\n");
+        $$scratch_str_ref .= "{ \$$name, \"$value\" },\n";
       }
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr }\n");
+      $$scratch_str_ref .= "{ nullptr, nullptr }\n";
       $col--;
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+      $$scratch_str_ref .= "}; }\n";
 
       $num++;
     }
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static named-enum-info-t __enum-info[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static named-enum-info-t __enum-info[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
     $num = 0;
     foreach my $enum (@{$$klass_scope{'enum'}}) {
       if ($$enum{'type'}) {
         my $type = "@{$$enum{'type'}}";
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "{ \"$type\", __enum-info-$num },\n");
+        $$scratch_str_ref .= "{ \"$type\", __enum-info-$num },\n";
       } else {
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, __enum-info-$num },\n");
+        $$scratch_str_ref .= "{ nullptr, __enum-info-$num },\n";
       }
       $num++;
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr }\n");
+    $$scratch_str_ref .= "{ nullptr, nullptr }\n";
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
 
   if (&has_const_info($klass_scope)) {
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { static const-info-t __const-info\[] = //ro-data\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "$klass_type @$klass_name { static const-info-t __const-info\[] = //ro-data\n";
+    $$scratch_str_ref .= "{\n";
     $col++;
 
     foreach my $const (@{$$klass_scope{'const'}}) {
@@ -3390,11 +3374,11 @@ sub dk::generate_cxx_footer_klass {
       my $value = "@{$$const{'rhs'}}";
       $" = $delim;
       $value =~ s/"/\\"/g;
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "{ \$$$const{'name'}, \"$$const{'type'}\", \"$value\" },\n");
+      $$scratch_str_ref .= "{ \$$$const{'name'}, \"$$const{'type'}\", \"$value\" },\n";
     }
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, nullptr, nullptr }\n");
+    $$scratch_str_ref .= "{ nullptr, nullptr, nullptr }\n";
     $col--;
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "}; }\n");
+    $$scratch_str_ref .= "}; }\n";
   }
 
   my $symbol = &path::string($klass_name);
@@ -3485,9 +3469,9 @@ sub dk::generate_cxx_footer_klass {
     $$tbbl{'$module'} = "\"$$klass_scope{'module'}\"";
   }
   $$tbbl{'$file'} = '__FILE__';
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { ");
+  $$scratch_str_ref .= "$klass_type @$klass_name { ";
   $$scratch_str_ref .= &generate_property_tbl('__klass-props', $tbbl, $col + 1);
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "} // $klass_type @$klass_name\n");
+  $$scratch_str_ref .= "} // $klass_type @$klass_name\n";
   my $RT = '';                 # because the klass klass won't compile
   &dakota::util::_add_last($global_klass_defns, "$RT$symbol:__klass-props");
   return $$scratch_str_ref;
@@ -3528,7 +3512,7 @@ sub generate_ka_method_signature_decl {
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $kw_list_types = &method::kw_list_types($method);
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { namespace __ka-signature { namespace va { noexport const signature-t* $method_name($$list_types); } } }\n");
+  $$scratch_str_ref .= "$klass_type @$klass_name { namespace __ka-signature { namespace va { noexport const signature-t* $method_name($$list_types); } } }\n";
 }
 sub generate_ka_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3537,17 +3521,17 @@ sub generate_ka_method_signature_defn {
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { namespace __ka-signature { namespace va { noexport const signature-t* $method_name($$list_types)\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "$klass_type @$klass_name { namespace __ka-signature { namespace va { noexport const signature-t* $method_name($$list_types)\n";
+  $$scratch_str_ref .= "{\n";
   $col++;
 
   my $kw_arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $kw_arg_list .= &method::kw_list_types($method);
   $kw_arg_list .= "\", nullptr };";
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$kw_arg_list\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "return &result;\n");
+  $$scratch_str_ref .= "$kw_arg_list\n";
+  $$scratch_str_ref .= "return &result;\n";
   $col--;
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "} } } }\n");
+  $$scratch_str_ref .= "} } } }\n";
 }
 sub generate_raw_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3555,7 +3539,7 @@ sub generate_raw_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { namespace __raw-signature { noexport const signature-t* $method_name($$list_types); } }\n");
+  $$scratch_str_ref .= "$klass_type @$klass_name { namespace __raw-signature { noexport const signature-t* $method_name($$list_types); } }\n";
 }
 sub generate_raw_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3563,17 +3547,17 @@ sub generate_raw_method_signature_defn {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { namespace __raw-signature { noexport const signature-t* $method_name($$list_types)\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "$klass_type @$klass_name { namespace __raw-signature { noexport const signature-t* $method_name($$list_types)\n";
+  $$scratch_str_ref .= "{\n";
   $col++;
 
   my $arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $arg_list .= &method::list_types($method);
   $arg_list .= "\", nullptr };";
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$arg_list\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "return &result;\n");
+  $$scratch_str_ref .= "$arg_list\n";
+  $$scratch_str_ref .= "return &result;\n";
   $col--;
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "} } }\n");
+  $$scratch_str_ref .= "} } }\n";
 }
 sub generate_ka_method_defns {
   my ($methods, $klass_name, $col, $klass_type) = @_;
@@ -3586,7 +3570,7 @@ sub generate_ka_method_defns {
 sub generate_ka_method_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "// generate_ka_method_defn()\n");
+  #$$scratch_str_ref .= "// generate_ka_method_defn()\n";
 
   my $qualified_klass_name = &path::string($klass_name);
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
@@ -3602,26 +3586,26 @@ sub generate_ka_method_defn {
 
   my $return_type = &arg::type($$method{'return-type'});
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "$klass_type @$klass_name { namespace va { ");
+  $$scratch_str_ref .= "$klass_type @$klass_name { namespace va { ";
 
   if (&is_exported($method)) {
-    $$scratch_str_ref .= &dk::print("export ");
+    $$scratch_str_ref .= "export ";
   } else {
-    $$scratch_str_ref .= &dk::print("noexport ");
+    $$scratch_str_ref .= "noexport ";
   }
   #if ($$method{'is-inline'})
   #{
-  #    $$scratch_str_ref .= &dk::print("INLINE ");
+  #    $$scratch_str_ref .= "INLINE ";
   #}
   my $method_name = "@{$$method{'name'}}";
-  $$scratch_str_ref .= &dk::print("$return_type $method_name($$new_arg_list)");
+  $$scratch_str_ref .= "$return_type $method_name($$new_arg_list)";
 
   if ($$method{'exception-types'}) {
     my $throw_arg_type = &arg_type::list_types($$method{'exception-types'});
-    $$scratch_str_ref .= &dk::print(" throw($$throw_arg_type)");
+    $$scratch_str_ref .= " throw($$throw_arg_type)";
   }
-  $$scratch_str_ref .= &dk::print("\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "\n";
+  $$scratch_str_ref .= "{\n";
   $col++;
   my $method_type_decl;
   $$method{'name'} = [ '_func_' ];
@@ -3646,7 +3630,7 @@ sub generate_ka_method_defn {
     &dakota::util::_add_last($$method{'parameter-types'}, $param1);
   }
   if (scalar @{$$method{'keyword-types'}}) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "");
+    $$scratch_str_ref .= "";
     my $delim = '';
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
@@ -3655,7 +3639,7 @@ sub generate_ka_method_defn {
       $delim = ' ';
     }
     $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "struct {");
+    $$scratch_str_ref .= "struct {";
     my $initializer = '';
     $delim = '';
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
@@ -3666,24 +3650,24 @@ sub generate_ka_method_defn {
     }
     $$scratch_str_ref .= " } _state_ = { $initializer };\n";
   }
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "if (nullptr != $$new_arg_names[-1])\n");
-  #$$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  #$$scratch_str_ref .= "if (nullptr != $$new_arg_names[-1])\n";
+  #$$scratch_str_ref .= "{\n";
   #$col++;
   my $is_first;
 
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "keyword-t* _keyword_;\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "while (nullptr != (_keyword_ = va-arg(_args_, keyword-t*)))\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "keyword-t* _keyword_;\n";
+  $$scratch_str_ref .= "while (nullptr != (_keyword_ = va-arg(_args_, keyword-t*)))\n";
+  $$scratch_str_ref .= "{\n";
   $col++;
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "switch (_keyword_->hash) // hash is a constexpr. its compile-time evaluated.\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "switch (_keyword_->hash) // hash is a constexpr. its compile-time evaluated.\n";
+  $$scratch_str_ref .= "{\n";
   $col++;
   my $kw_arg_name;
 
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     $kw_arg_name = $$kw_arg{'name'};
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "case dk-hash(\"$kw_arg_name\"): // dk-hash() is a constexpr. its compile-time evaluated.\n");
-    #            $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+    $$scratch_str_ref .= "case dk-hash(\"$kw_arg_name\"): // dk-hash() is a constexpr. its compile-time evaluated.\n";
+    #            $$scratch_str_ref .= "{\n";
     $col++;
     my $kw_type = &arg::type($$kw_arg{'type'});
 
@@ -3692,74 +3676,74 @@ sub generate_ka_method_defn {
     }
     # should do this for other types (char=>int, float=>double, ... ???
 
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "DEBUG-STMT(if (_keyword_->symbol != \$$kw_arg_name) abort());\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "$kw_arg_name = va-arg($$new_arg_names[-1], $kw_type);\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "_state_.$kw_arg_name = true;\n");
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "break;\n");
+    $$scratch_str_ref .= "DEBUG-STMT(if (_keyword_->symbol != \$$kw_arg_name) abort());\n";
+    $$scratch_str_ref .= "$kw_arg_name = va-arg($$new_arg_names[-1], $kw_type);\n";
+    $$scratch_str_ref .= "_state_.$kw_arg_name = true;\n";
+    $$scratch_str_ref .= "break;\n";
     $col--;
-    #            $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+    #            $$scratch_str_ref .= "}\n";
     $is_first = 0;
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "default:\n");
-  #        $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+  $$scratch_str_ref .= "default:\n";
+  #        $$scratch_str_ref .= "{\n";
   $col++;
 
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "static const signature-t* _ka-signature_ = dkt-ka-signature(va:$method_name($$list_types));\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "throw make(no-such-keyword-exception:klass,\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "           object =>    self,\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "           signature => _ka-signature_,\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "           symbol =>    _keyword_->symbol);\n");
+  $$scratch_str_ref .= "static const signature-t* _ka-signature_ = dkt-ka-signature(va:$method_name($$list_types));\n";
+  $$scratch_str_ref .= "throw make(no-such-keyword-exception:klass,\n";
+  $$scratch_str_ref .= "           object =>    self,\n";
+  $$scratch_str_ref .= "           signature => _ka-signature_,\n";
+  $$scratch_str_ref .= "           symbol =>    _keyword_->symbol);\n";
   $col--;
-  #        $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+  #        $$scratch_str_ref .= "}\n";
   $col--;
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+  $$scratch_str_ref .= "}\n";
   $col--;
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "}\n");
+  $$scratch_str_ref .= "}\n";
 
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     my $kw_arg_name    = $$kw_arg{'name'};
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "unless (_state_.$kw_arg_name)\n");
+    $$scratch_str_ref .= "unless (_state_.$kw_arg_name)\n";
     $col++;
     if (defined $$kw_arg{'default'}) {
       my $kw_arg_default = $$kw_arg{'default'};
-      $$scratch_str_ref .= &dk::print_in_col_string($col,"$kw_arg_name = $kw_arg_default;\n");
+      $$scratch_str_ref .= "$kw_arg_name = $kw_arg_default;\n";
     } else {
-      $$scratch_str_ref .= &dk::print_in_col_string($col,"throw \"missing required keyword argument\";\n");
+      $$scratch_str_ref .= "throw \"missing required keyword argument\";\n";
     }
     $col--;
   }
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "static $method_type_decl = $qualified_klass_name:$method_name; /*qualqual*/\n");
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "");
+  $$scratch_str_ref .= "static $method_type_decl = $qualified_klass_name:$method_name; /*qualqual*/\n";
+  $$scratch_str_ref .= "";
   my $var_name = '_result_';
   if ($$method{'return-type'}) {
-    $$scratch_str_ref .= &dk::print("$return_type $var_name = ");
+    $$scratch_str_ref .= "$return_type $var_name = ";
   }
-  $$scratch_str_ref .= &dk::print("$func_name(");
+  $$scratch_str_ref .= "$func_name(";
   $is_first = 1;
   #my $last_arg_name = &dakota::util::_remove_last($new_arg_names); # remove name associated with uintptr-t type
 
   for (my $i = 0; $i < @$new_arg_names - 1; $i++) {
     if ($is_first) {
-      $$scratch_str_ref .= &dk::print("$$new_arg_names[$i]");
+      $$scratch_str_ref .= "$$new_arg_names[$i]";
     } else {
-      $$scratch_str_ref .= &dk::print(", $$new_arg_names[$i]");
+      $$scratch_str_ref .= ", $$new_arg_names[$i]";
     }
     $is_first = 0;
   }
   #&dakota::util::_add_last($new_arg_names, $last_arg_name); # add name associated with uintptr-t type
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
-    $$scratch_str_ref .= &dk::print(", $kw_arg_name");
+    $$scratch_str_ref .= ", $kw_arg_name";
   }
-  $$scratch_str_ref .= &dk::print(");\n");
+  $$scratch_str_ref .= ");\n";
   if ($$method{'return-type'}) {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "return $var_name;\n");
+    $$scratch_str_ref .= "return $var_name;\n";
   } else {
-    $$scratch_str_ref .= &dk::print_in_col_string($col, "return;\n");
+    $$scratch_str_ref .= "return;\n";
   }
 
   $col--;
-  $$scratch_str_ref .= &dk::print_in_col_string($col, "} } }\n");
+  $$scratch_str_ref .= "} } }\n";
   $col--;
   #&path::remove_last($klass_name);
 }
@@ -3772,36 +3756,36 @@ sub dk::generate_cxx_footer {
   if (&is_rt_decl() || &is_rt_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
     if (0 == $num_klasses) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static named-info-node-t* klass-defns = nullptr;\n");
+      $$scratch_str_ref .= "static named-info-node-t* klass-defns = nullptr;\n";
     } else {
       $$scratch_str_ref .= &generate_info_seq('klass-defns', [sort @$global_klass_defns], $col);
     }
     my $exports = &exports($scope);
     my $num_exports = scalar keys %$exports;
     if (0 == $num_exports) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static named-info-node-t* exports = nullptr;\n");
+      $$scratch_str_ref .= "static named-info-node-t* exports = nullptr;\n";
     } else {
       $$scratch_str_ref .= &generate_info('exports', $exports, $col);
     }
     if (0 == keys %{$$scope{'interposers'}}) {
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static property-t* interposers = nullptr;\n");
+      $$scratch_str_ref .= "static property-t* interposers = nullptr;\n";
     } else {
       #print STDERR Dumper $$scope{'interposers'};
       my $interposers = &many_1_to_1_from_1_to_many($$scope{'interposers'});
       #print STDERR Dumper $interposers;
 
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "static property-t interposers[] = //ro-data\n");
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "{\n");
+      $$scratch_str_ref .= "static property-t interposers[] = //ro-data\n";
+      $$scratch_str_ref .= "{\n";
       $col++;
       my ($key, $val);
       my $num_klasses = scalar keys %$interposers;
       foreach $key (sort keys %$interposers) {
         $val = $$interposers{$key};
-        $$scratch_str_ref .= &dk::print_in_col_string($col, "{ $key:__name__, cast(uintptr-t)$val:__name__ },\n");
+        $$scratch_str_ref .= "{ $key:__name__, cast(uintptr-t)$val:__name__ },\n";
       }
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "{ nullptr, cast(uintptr-t)nullptr }\n");
+      $$scratch_str_ref .= "{ nullptr, cast(uintptr-t)nullptr }\n";
       $col--;
-      $$scratch_str_ref .= &dk::print_in_col_string($col, "};\n");
+      $$scratch_str_ref .= "};\n";
     }
   }
   return $$scratch_str_ref;
@@ -3954,10 +3938,10 @@ sub linkage_unit::generate_symbols {
     my $width = length($cxx_ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_decl()) {
-      $scratch_str .= &dk::print_in_col_string3($col, "namespace __symbol { extern noexport symbol-t $cxx_ident; ", $pad, "} // $symbol\n");
+      $scratch_str .= "namespace __symbol { extern noexport symbol-t $cxx_ident; " . $pad . "} // $symbol\n";
     } else {
       $symbol =~ s|"|\\"|g;
-      $scratch_str .= &dk::print_in_col_string3($col, "namespace __symbol { noexport symbol-t $cxx_ident = ", $pad, "dk-intern(\"$symbol\"); $pad}\n");
+      $scratch_str .= "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); $pad}\n";
     }
   }
   return $scratch_str;
@@ -3985,7 +3969,7 @@ sub linkage_unit::generate_hashes {
       my $cxx_ident = $$file{'hashes'}{$symbol};
       my $width = length($cxx_ident);
       my $pad = ' ' x ($max_width - $width);
-      $scratch_str .= &dk::print_in_col_string3($col, "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = ", $pad, "dk-hash(\"$symbol\"); $pad}\n");
+      $scratch_str .= "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = " . $pad . "dk-hash(\"$symbol\"); $pad}\n";
     }
   }
   return $scratch_str;
@@ -4014,7 +3998,7 @@ sub linkage_unit::generate_keywords {
     my $pad = ' ' x ($max_width - $width);
     if (defined $cxx_ident) {
       if (&is_decl()) {
-        $scratch_str .= &dk::print_in_col_string3($col, "namespace __keyword { extern noexport keyword-t $cxx_ident; ", $pad, "} // $symbol\n");
+        $scratch_str .= "namespace __keyword { extern noexport keyword-t $cxx_ident; " . $pad . "} // $symbol\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
@@ -4027,7 +4011,7 @@ sub linkage_unit::generate_keywords {
         $keyword_defn .= $pad;
         $keyword_defn .= "}; } // $symbol\n";
 
-        $scratch_str .= &dk::print_in_col_string($col, $keyword_defn);
+        $scratch_str .= $keyword_defn;
       }
     }
   }
@@ -4038,19 +4022,19 @@ sub linkage_unit::generate_strings {
   my $scratch_str = "";
   my $col = 0;
   $scratch_str .= &dk::annotate($col, __FILE__, __LINE__);
-  $scratch_str .= &dk::print_in_col_string($col, "namespace __string\n");
-  $scratch_str .= &dk::print_in_col_string($col, "{\n");
+  $scratch_str .= "namespace __string\n";
+  $scratch_str .= "{\n";
   $col++;
   while (my ($string, $dummy) = each(%{$$file{'strings'}})) {
     my $string_ident = &make_ident_symbol_scalar($string);
     if (&is_decl()) {
-      $scratch_str .= &dk::print_in_col_string($col, "//extern noexport object-t $string_ident;\n");
+      $scratch_str .= "//extern noexport object-t $string_ident;\n";
     } else {
-      $scratch_str .= &dk::print_in_col_string($col, "//noexport object-t $string_ident = make(string:klass, bytes => \"$string\");\n");
+      $scratch_str .= "//noexport object-t $string_ident = make(string:klass, bytes => \"$string\");\n";
     }
   }
   $col--;
-  $scratch_str .= &dk::print_in_col_string($col, "}\n");
+  $scratch_str .= "}\n";
   return $scratch_str;
 }
 sub generate_property_tbl {
@@ -4081,8 +4065,8 @@ sub generate_property_tbl {
       $max_element_width = $element_width;
     }
   }
-  $result .= &dk::print("static property-t $name\[] = //ro-data\n");
-  $result .= &dk::print_in_col_string($col, "{\n");
+  $result .= "static property-t $name\[] = //ro-data\n";
+  $result .= "{\n";
   $num = 1;
   foreach my $key (@$sorted_keys) {
     my $element = $$tbl{$key};
@@ -4099,27 +4083,27 @@ sub generate_property_tbl {
     my $element_width = length($element);
     my $element_pad = ' ' x ($max_element_width - $element_width);
 
-    $result .= &dk::print_in_col_string($col + 1, "{ $key, ");
+    $result .= "{ $key, ";
     $result .= $key_pad;
     $result .= "cast(uintptr-t)$element";
     $result .= $element_pad;
     $result .= " },\n";
   }
-  $result .= &dk::print_in_col_string($col, "};\n");
+  $result .= "};\n";
   return $result;
 }
 sub generate_info {
   my ($name, $tbl, $col, $scope) = @_;
   my $result = &generate_property_tbl("$name-props", $tbl, $col, $scope);
-  $result .= &dk::print_in_col_string($col, "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };\n");
+  $result .= "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };\n";
   return $result;
 }
 sub generate_info_seq {
   my ($name, $seq, $col) = @_;
   my $result = '';
 
-  $result .= &dk::print("static named-info-node-t $name\[] = //ro-data\n");
-  $result .= &dk::print_in_col_string($col, "{\n");
+  $result .= "static named-info-node-t $name\[] = //ro-data\n";
+  $result .= "{\n";
 
   my $max_width = 0;
   foreach my $element (@$seq) {
@@ -4131,19 +4115,15 @@ sub generate_info_seq {
   foreach my $element (@$seq) {
     my $width = length($element);
     my $pad = ' ' x ($max_width - $width);
-    $result .= &dk::print_in_col_string($col + 1, "{ $element, ");
+    $result .= "{ $element, ";
     $result .= $pad;
-    $result .= &dk::print("DK-ARRAY-LENGTH($element), ");
+    $result .= "DK-ARRAY-LENGTH($element), ";
     $result .= $pad;
-    $result .= &dk::print("nullptr },\n");
+    $result .= "nullptr },\n";
   }
-  $result .= &dk::print_in_col_string($col + 1, "{ nullptr, 0, nullptr }\n");
-  $result .= &dk::print_in_col_string($col, "};\n");
+  $result .= "{ nullptr, 0, nullptr }\n";
+  $result .= "};\n";
   return $result;
-}
-sub dk::print {
-  my ($string) = @_;
-  return $string;
 }
 sub pad {
   my ($col_num) = @_;
@@ -4164,27 +4144,6 @@ sub dk::annotate {
     $string .= "\n";
   }
   return $string;
-}
-sub dk::print_in_col_string {
-  my ($col_num, $string) = @_;
-  my $result_str = &pad($col_num);
-  $result_str .= $string;
-  return &dk::print("$result_str");
-}
-sub dk::print_in_col_string3 {
-  my ($col_num, $string1, $string2, $string3) = @_;
-  my $result_str = &pad($col_num);
-  $result_str .= $string1;
-  $result_str .= $string2;
-  $result_str .= $string3;
-  return &dk::print("$result_str");
-}
-sub dk::print_in_col_string3_comment {
-  my ($col_num, $string1, $string2, $string3) = @_;
-  if (1) {
-    $string2 = '';
-  }
-  return &dk::print_in_col_string3($col_num, $string1, $string2, $string3);
 }
 sub dk::generate_dk_cxx {
   my ($file_basename, $path, $name) = @_;
