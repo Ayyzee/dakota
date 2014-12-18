@@ -53,6 +53,8 @@ our @EXPORT= qw(
                  rep_path_from_dk_path
                  rep_path_from_so_path
                  str_from_cmd_info
+                 colin
+                 colout
               );
 
 use dakota::sst;
@@ -1733,28 +1735,28 @@ sub _add_indirect_klasses { # recursive
     $$klass_names_set{'klasses'}{$$klass_scope{'klass'}} = undef;
 
     if ('klass' ne $$klass_scope{'klass'}) {
-      &_add_indirect_klasses($klass_names_set, $$klass_scope{'klass'}, $col + 1);
+      &_add_indirect_klasses($klass_names_set, $$klass_scope{'klass'}, &dakota::generate::colin($col));
     }
   }
   if (defined $$klass_scope{'interpose'}) {
     $$klass_names_set{'klasses'}{$$klass_scope{'interpose'}} = undef;
 
     if ('object' ne $$klass_scope{'interpose'}) {
-      &_add_indirect_klasses($klass_names_set, $$klass_scope{'interpose'}, $col + 1);
+      &_add_indirect_klasses($klass_names_set, $$klass_scope{'interpose'}, &dakota::generate::colin($col));
     }
   }
   if (defined $$klass_scope{'superklass'}) {
     $$klass_names_set{'klasses'}{$$klass_scope{'superklass'}} = undef;
 
     if ('object' ne $$klass_scope{'superklass'}) {
-      &_add_indirect_klasses($klass_names_set, $$klass_scope{'superklass'}, $col + 1);
+      &_add_indirect_klasses($klass_names_set, $$klass_scope{'superklass'}, &dakota::generate::colin($col));
     }
   }
   if (defined $$klass_scope{'traits'}) {
     foreach my $trait (@{$$klass_scope{'traits'}}) {
       $$klass_names_set{'traits'}{$trait} = undef;
       if ($klass_name ne $trait) {
-	&_add_indirect_klasses($klass_names_set, $trait, $col + 1);
+	&_add_indirect_klasses($klass_names_set, $trait, &dakota::generate::colin($col));
       }
     }
   }
@@ -1762,7 +1764,7 @@ sub _add_indirect_klasses { # recursive
     foreach my $reqr (@{$$klass_scope{'requires'}}) {
       $$klass_names_set{'requires'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
-	&_add_indirect_klasses($klass_names_set, $reqr, $col + 1);
+	&_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
       }
     }
   }
@@ -1770,7 +1772,7 @@ sub _add_indirect_klasses { # recursive
     foreach my $reqr (@{$$klass_scope{'provides'}}) {
       $$klass_names_set{'provides'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
-	&_add_indirect_klasses($klass_names_set, $reqr, $col + 1);
+	&_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
       }
     }
   }
@@ -1780,7 +1782,7 @@ sub add_indirect_klasses {
   foreach my $construct ('klasses', 'traits') {
     foreach my $klass_name (keys %{$$klass_names_set{$construct}}) {
       my $col;
-      &_add_indirect_klasses($klass_names_set, $klass_name, $col = 1);
+      &_add_indirect_klasses($klass_names_set, $klass_name, $col = '  ');
     }
   }
 }

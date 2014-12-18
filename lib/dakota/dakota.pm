@@ -280,7 +280,7 @@ sub loop_cxx_from_dk {
     my $stack; my $col;
     my $klasses_cxx_str = '';
     &set_global_scratch_str_ref(\$klasses_cxx_str);
-    $klasses_cxx_str = &dk::generate_cxx_footer($file, $stack = [], $col = 0);
+    $klasses_cxx_str = &dk::generate_cxx_footer($file, $stack = [], $col = '');
 
     my $path = $cxx_path;
     #print STDERR "$klasses_include.$dk_ext\n";
