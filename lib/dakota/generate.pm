@@ -737,7 +737,7 @@ sub method::kw_list_types {
 
     if ('va-list-t' ne $arg_type) {
       $result .= $delim . $arg_type;
-      $delim = ',';
+      $delim = ', ';
     }
   }
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
@@ -761,7 +761,7 @@ sub method::list_types {
 
     if ('va-list-t' ne $arg_type) {
       $result .= $delim . $arg_type;
-      $delim = ',';
+      $delim = ', ';
     }
   }
   return $result;
