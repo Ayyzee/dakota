@@ -27,8 +27,7 @@ BIN_FILES :=\
 LIB_FILES :=\
  $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_name)\
  $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_util_name)\
- $(DESTDIR)$(libdir)/dakota.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota/include.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/dakota.$(pm_ext)\
  $(DESTDIR)$(libdir)/dakota/parse.$(pm_ext)\
  $(DESTDIR)$(libdir)/dakota/rewrite.$(pm_ext)\
  $(DESTDIR)$(libdir)/dakota/generate.$(pm_ext)\
@@ -74,7 +73,7 @@ $(DESTDIR)$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)
 $(DESTDIR)$(libdir)/$(lib_prefix)%.$(SO_EXT): $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(DESTDIR)$(libdir)/%.$(pm_ext): $(rootdir)/lib/%.$(pm_ext)
+$(DESTDIR)$(libdir)/dakota/%.$(pm_ext): $(rootdir)/lib/dakota/%.$(pm_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
 $(DESTDIR)$(bindir)/%$(exeext): $(rootdir)/bin/%$(exeext)
