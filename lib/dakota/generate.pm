@@ -1664,12 +1664,12 @@ sub generics::generate_va_make_defn {
       $col . "static $init_type_decl = dk:va:init;\n" .
       $col . "va-list-t args;\n" .
       $col . "va-start(args, kls);\n" .
-      $col . "object-t object = alloc(kls);\n" .
+      $col . "object-t result = alloc(kls);\n" .
       $col . "DKT-VA-TRACE-BEFORE-INIT(kls, args);\n" .
-      $col . "object = _func_(object, args); // init()\n" .
+      $col . "result = _func_(result, args); // init()\n" .
       $col . "DKT-VA-TRACE-AFTER-INIT(kls, args);\n" .
       $col . "va-end(args);\n" .
-      $col . "return object;\n";
+      $col . "return result;\n";
     $col = &colout($col);
     $result .= $col . "}\n";
   }
@@ -1849,10 +1849,10 @@ sub generate_klass_box {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
-            $col . "object-t object = make(klass);\n" .
-            $col . "slots-t* s = unbox(object);\n" .
+            $col . "object-t result = make(klass);\n" .
+            $col . "slots-t* s = unbox(result);\n" .
             $col . "memcpy(*s, arg, sizeof(slots-t)); // unfortunate\n" .
-            $col . "return object;\n";
+            $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
@@ -1864,8 +1864,8 @@ sub generate_klass_box {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
-            $col . "object-t object = box(*arg);\n" .
-            $col . "return object;\n";
+            $col . "object-t result = box(*arg);\n" .
+            $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
@@ -1879,9 +1879,9 @@ sub generate_klass_box {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
-            $col . "object-t object = make(klass);\n" .
-            $col . "*unbox(object) = *arg;\n" .
-            $col . "return object;\n";
+            $col . "object-t result = make(klass);\n" .
+            $col . "*unbox(result) = *arg;\n" .
+            $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
@@ -1893,8 +1893,8 @@ sub generate_klass_box {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
-            $col . "object-t object = box(&arg);\n" .
-            $col . "return object;\n";
+            $col . "object-t result = box(&arg);\n" .
+            $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
