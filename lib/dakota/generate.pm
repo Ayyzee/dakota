@@ -945,7 +945,6 @@ sub method::generate_va_method_defn {
   if (!$$va_method{'defined?'} || &is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     $$scratch_str_ref .= "; }\n";
   } elsif ($$va_method{'defined?'} && (&is_rt_decl() || &is_rt_defn())) {
-    my $var_name = 'result';
     my $name = &dakota::util::_last($$va_method{'name'});
     my $va_name = "_func_";
     &dakota::util::_replace_last($$va_method{'name'}, $va_name);
@@ -954,23 +953,22 @@ sub method::generate_va_method_defn {
     my $cxx_scope = &path::string($scope);
     $$scratch_str_ref .= " {\n";
     $col = &colin($col);
-    $$scratch_str_ref .= "  static $method_type_decl = $cxx_scope:va:$va_method_name;\n";
-    $$scratch_str_ref .= "  va-list-t args;\n";
-    $$scratch_str_ref .= "  va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
+    $$scratch_str_ref .= "static $method_type_decl = $cxx_scope:va:$va_method_name;\n";
+    $$scratch_str_ref .= "va-list-t args;\n";
+    $$scratch_str_ref .= "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
     if (defined $$va_method{'return-type'}) {
       my $return_type = &arg::type($$va_method{'return-type'});
-      my $return_type_pair = "$return_type $var_name";
-      $$scratch_str_ref .= "  $return_type_pair = ";
+      $$scratch_str_ref .= "$return_type result = ";
     }
 
-    $$scratch_str_ref .= "  $va_name($$new_arg_names_list_ref);\n";
-    $$scratch_str_ref .= "  va-end(args);\n";
+    $$scratch_str_ref .= "$va_name($$new_arg_names_list_ref);\n";
+    $$scratch_str_ref .= "va-end(args);\n";
 
     if (defined $$va_method{'return-type'}) {
-      $$scratch_str_ref .= "  return result;\n";
+      $$scratch_str_ref .= "return result;\n";
     } else {
-      $$scratch_str_ref .= "  return;\n";
+      $$scratch_str_ref .= "return;\n";
     }
     $col = &colout($col);
     $$scratch_str_ref .= "}}\n";
@@ -1030,7 +1028,6 @@ sub common::print_signature {
       $scratch_str .= "; }\n";
     }
   } elsif (&is_rt_decl() || &is_rt_defn()) {
-    my $var_name = 'result';
     $scratch_str .= " {\n";
     $col = &colin($col);
 
@@ -1044,7 +1041,7 @@ sub common::print_signature {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= $col . "static const signature-t $var_name = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", nullptr };\n";
+    $scratch_str .= $col . "static const signature-t result = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", nullptr };\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
 
@@ -1123,7 +1120,6 @@ sub common::print_selector {
       $scratch_str .= "; }\n";
     }
   } elsif (&is_rt_decl() || &is_rt_defn()) {
-    my $var_name = 'result';
     $scratch_str .= " {\n";
     $col = &colin($col);
 
@@ -1430,11 +1426,8 @@ sub generics::generate_generic_defn {
     if ($ENV{'DK_TRACE_MACROS'}) {
       $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n";
     }
-
-    my $var_name = 'result';
-
     if (defined $$generic{'return-type'}) {
-      $$scratch_str_ref .= $col . "$return_type $var_name = ";
+      $$scratch_str_ref .= $col . "$return_type result = ";
     }
 
     $new_arg_names = &arg_type::names($new_arg_type);
@@ -1443,7 +1436,7 @@ sub generics::generate_generic_defn {
 
     $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n";
+      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, result);\n";
     }
 
     if (defined $$generic{'return-type'}) {
@@ -1520,11 +1513,8 @@ sub generics::generate_super_generic_defn {
     if ($ENV{'DK_TRACE_MACROS'}) {
       $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n";
     }
-
-    my $var_name = 'result';
-
     if (defined $$generic{'return-type'}) {
-      $$scratch_str_ref .= $col . "$return_type $var_name = ";
+      $$scratch_str_ref .= $col . "$return_type result = ";
     }
 
     $new_arg_type = &arg_type::super($new_arg_type);
@@ -1534,7 +1524,7 @@ sub generics::generate_super_generic_defn {
 
     $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, $var_name);\n";
+      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, result);\n";
     }
 
     if (defined $$generic{'return-type'}) {
@@ -1660,7 +1650,6 @@ sub generics::generate_va_make_defn {
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     $$scratch_str_ref .= ";\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
-    my $var_name = 'result';
     $$scratch_str_ref .= " {\n";
     $col = &colin($col);
     my $method_type_decl;
@@ -2182,13 +2171,11 @@ sub generate_object_method_defn {
     $$scratch_str_ref .= " {\n";
     $col = &colin($col);
 
-    my $var_name = 'result';
-
     if (defined $$method{'return-type'}) {
       if ($non_object_return_type ne $return_type) {
-        $$scratch_str_ref .= $col . "$return_type $var_name = box($method_name($$new_unboxed_arg_names_list));\n";
+        $$scratch_str_ref .= $col . "$return_type result = box($method_name($$new_unboxed_arg_names_list));\n";
       } else {
-        $$scratch_str_ref .= $col . "$return_type $var_name = $method_name($$new_unboxed_arg_names_list);\n";
+        $$scratch_str_ref .= $col . "$return_type result = $method_name($$new_unboxed_arg_names_list);\n";
       }
     }
 
