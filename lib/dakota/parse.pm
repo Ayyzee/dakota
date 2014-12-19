@@ -1782,7 +1782,7 @@ sub add_indirect_klasses {
   foreach my $construct ('klasses', 'traits') {
     foreach my $klass_name (keys %{$$klass_names_set{$construct}}) {
       my $col;
-      &_add_indirect_klasses($klass_names_set, $klass_name, $col = '  ');
+      &_add_indirect_klasses($klass_names_set, $klass_name, $col = '');
     }
   }
 }
