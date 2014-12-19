@@ -1410,14 +1410,14 @@ sub generics::generate_generic_defn {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n" .
-        $col . "object-t klass = object->klass;\n" .
-        $col . "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
+        $col . "object-t kls = object->klass;\n" .
+        $col . "method-t _func_ = klass:unbox(kls)->methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = selector($generic_name($$new_arg_type_list));\n" .
-        $col . "object-t klass = object->klass;\n" .
-        $col . "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
+        $col . "object-t kls = object->klass;\n" .
+        $col . "method-t _func_ = klass:unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object), signature => signature));\n";
@@ -1499,14 +1499,14 @@ sub generics::generate_super_generic_defn {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = dkt-signature(va:$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = selector(va:$generic_name($$new_arg_type_list));\n" .
-        $col . "object-t klass = klass:unbox(arg0.klass)->superklass;\n" .
-        $col . "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
+        $col . "object-t kls = klass:unbox(arg0.klass)->superklass;\n" .
+        $col . "method-t _func_ = klass:unbox(kls)->methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = dkt-signature($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = selector($generic_name($$new_arg_type_list));\n" .
-        $col . "object-t klass = klass:unbox(arg0.klass)->superklass;\n" .
-        $col . "method-t _func_ = klass:unbox(klass)->methods.addrs[selector];\n";
+        $col . "object-t kls = klass:unbox(arg0.klass)->superklass;\n" .
+        $col . "method-t _func_ = klass:unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception:klass, object => arg0.self, superkls => dkt-superklass(arg0.klass), signature => signature));\n";
@@ -1650,12 +1650,12 @@ sub generics::generate_va_make_defn {
   my $result = '';
   $result .= &dk::annotate($col, __FILE__, __LINE__);
   #$result .= $col . "// generate_va_make_defn()\n";
-  $result .= $col . "sentinel noexport object-t make(object-t klass, ...)";
+  $result .= $col . "sentinel noexport object-t make(object-t kls, ...)";
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     $result .= ";\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     my $alloc_type_decl = "object-t (*alloc)(object-t)"; ### should use method::type_decl
-    my $init_type_decl =  "object-t (*init)(object-t, va-list-t)"; ### should use method::type_decl
+    my $init_type_decl =  "object-t (*_func_)(object-t, va-list-t)"; ### should use method::type_decl
 
     $result .= " {\n";
     $col = &colin($col);
@@ -1663,11 +1663,11 @@ sub generics::generate_va_make_defn {
       $col . "static $alloc_type_decl = dk:alloc;\n" .
       $col . "static $init_type_decl = dk:va:init;\n" .
       $col . "va-list-t args;\n" .
-      $col . "va-start(args, klass);\n" .
-      $col . "object-t object = alloc(klass);\n" .
-      $col . "DKT-VA-TRACE-BEFORE-INIT(klass, args);\n" .
-      $col . "object = init(object, args);\n" .
-      $col . "DKT-VA-TRACE-AFTER-INIT(klass, args);\n" .
+      $col . "va-start(args, kls);\n" .
+      $col . "object-t object = alloc(kls);\n" .
+      $col . "DKT-VA-TRACE-BEFORE-INIT(kls, args);\n" .
+      $col . "object = _func_(object, args); // init()\n" .
+      $col . "DKT-VA-TRACE-AFTER-INIT(kls, args);\n" .
       $col . "va-end(args);\n" .
       $col . "return object;\n";
     $col = &colout($col);
@@ -2043,10 +2043,10 @@ sub linkage_unit::generate_klasses_body {
     }
   } # if ('klass' eq $klass_type)
   if ($$klass_scope{'has-initialize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport object-t initialize(object-t kls); }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t initialize(object-t kls); }\n";
   }
   if ($$klass_scope{'has-finalize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport object-t finalize(object-t kls); }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }\n";
   }
   if (1 || @$ka_methods) {
     #print STDERR Dumper($va_list_methods);
