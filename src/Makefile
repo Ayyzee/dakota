@@ -5,6 +5,8 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
+DAKOTA_ENV_VARS += DK_PREFIX=$(rootdir)
+
 dakota_util_files := $(shell $(rootdir)/bin/dk files --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
 dakota_files :=      $(shell $(rootdir)/bin/dk files --var SO_EXT=$(SO_EXT) --repository dakota.rep)
 
@@ -12,8 +14,6 @@ dakota_util_name := $(shell $(rootdir)/bin/dk name --var SO_EXT=$(SO_EXT) --repo
 dakota_name :=      $(shell $(rootdir)/bin/dk name --var SO_EXT=$(SO_EXT) --repository dakota.rep)
 
 INCLUDE_FILES :=\
- $(DESTDIR)$(includedir)/dakota-before-user-code.$(hxx_ext)\
- $(DESTDIR)$(includedir)/dakota-after-user-code.$(hxx_ext)\
  $(DESTDIR)$(includedir)/dakota-log.$(hxx_ext)\
  $(DESTDIR)$(includedir)/dakota.$(hxx_ext)\
 
@@ -33,12 +33,13 @@ LIB_FILES :=\
  $(DESTDIR)$(libdir)/dakota/generate.$(pm_ext)\
  $(DESTDIR)$(libdir)/dakota/sst.$(pm_ext)\
  $(DESTDIR)$(libdir)/dakota/util.$(pm_ext)\
+ $(DESTDIR)$(libdir)/dakota/macros.$(pl_ext)\
 
 HOME_FILES :=\
  $(HOME)/.dakota/.gdbinit\
  $(HOME)/.dakota/.bashrc\
- $(HOME)/.dakota/.emacs\
- $(HOME)/.dakota/dakota-mode.el\
+ $(HOME)/.dakota/emacs/init.el\
+ $(HOME)/.dakota/emacs/dakota-mode.el\
 
 .PHONY:\
  all\
@@ -74,6 +75,9 @@ $(DESTDIR)$(libdir)/$(lib_prefix)%.$(SO_EXT): $(rootdir)/lib/$(lib_prefix)%.$(SO
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
 $(DESTDIR)$(libdir)/dakota/%.$(pm_ext): $(rootdir)/lib/dakota/%.$(pm_ext)
+	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
+
+$(DESTDIR)$(libdir)/dakota/%.$(pl_ext): $(rootdir)/lib/dakota/%.$(pl_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
 $(DESTDIR)$(bindir)/%$(exeext): $(rootdir)/bin/%$(exeext)
@@ -112,9 +116,9 @@ precompile:
 
 $(DESTDIR)$(includedir) \
 $(DESTDIR)$(bindir) \
-$(DESTDIR)$(libdir) \
-$(HOME)/.dakota:
-	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 -d $@
+$(DESTDIR)$(libdir)/dakota \
+$(HOME)/.dakota/emacs:
+	sudo $(INSTALL) $(INSTALLFLAGS) -d -m 0755 $@
 
 install-include: $(DESTDIR)$(includedir) $(INCLUDE_FILES)
 
@@ -126,12 +130,12 @@ install-bin: $(DESTDIR)$(bindir) $(BIN_FILES)
 uninstall-bin:
 	sudo $(RM) $(RMFLAGS) $(BIN_FILES)
 
-install-lib: $(DESTDIR)$(libdir) $(LIB_FILES)
+install-lib: $(DESTDIR)$(libdir)/dakota $(LIB_FILES)
 
 uninstall-lib:
-	sudo $(RM) $(RMFLAGS) $(LIB_FILES)
+	sudo $(RM) $(RMFLAGS) $(LIB_FILES) $(DESTDIR)$(libdir)/dakota
 
-install-home: $(HOME)/.dakota $(HOME_FILES)
+install-home: $(HOME)/.dakota/emacs $(HOME_FILES)
 
 uninstall-home:
 	sudo $(RM) $(RMFLAGS) $(HOME_FILES)

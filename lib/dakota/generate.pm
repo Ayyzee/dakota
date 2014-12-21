@@ -238,7 +238,7 @@ sub write_to_file_converted_strings {
     if ($ENV{'DK_MACROS_PATH'}) {
       $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die;
     } else {
-      $gbl_macros = do "$prefix/src/macros.pl" or die;
+      $gbl_macros = do "$prefix/lib/dakota/macros.pl" or die;
     }
   }
   my $ka_generics = &dakota::util::ka_generics();

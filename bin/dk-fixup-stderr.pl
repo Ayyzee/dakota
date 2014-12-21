@@ -8,10 +8,10 @@
 
 use strict;
 
-my $dir = $ENV{'DKT_DIR'};
+my $dir = $ARGV[0];
 die if !$dir;
 
-while (<>) {
+while (<STDIN>) {
   if ($_ =~ m/^(.*?):/) {
     my $path = $1;
 

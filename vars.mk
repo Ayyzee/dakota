@@ -13,7 +13,8 @@ includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
-DAKOTA_ENV_VARS += DK_PREFIX=$(rootdir)
+
+DAKOTA_ENV_VARS :=
 DAKOTA_ENV_VARS += CXX=$(CXX)
 DAKOTA_ENV_VARS += SO_EXT=$(SO_EXT)
 

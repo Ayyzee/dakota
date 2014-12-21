@@ -618,12 +618,11 @@ sub exec_cmd {
   if ($$root_cmd{'opts'}{'directory'} &&
         $$root_cmd{'opts'}{'directory'} ne '.' &&
         $$root_cmd{'opts'}{'directory'} ne './') {
-    $ENV{'DK_DIR'} = "$$root_cmd{'opts'}{'directory'}";
+    $ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
   }
-
-  if ($ENV{'DK_DIR'}) {
-    #print STDERR "DK_DIR=$ENV{'DK_DIR'}\n";
-    open (STDERR, "|dkt-fixup-stderr.pl") or die;
+  if ($ENV{'DKT_DIR'}) {
+    #print STDERR "DKT_DIR=$ENV{'DKT_DIR'}\n";
+    open (STDERR, "|dk-fixup-stderr.pl $ENV{'DKT_DIR'}") or die;
   }
 
   my $exit_val = system($cmd_str);

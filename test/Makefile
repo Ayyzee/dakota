@@ -2,7 +2,6 @@ rootdir := ..
 
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
-include vars.mk
 
 fail_exe_files := fail-exe-files.mk
 
