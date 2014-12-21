@@ -2,15 +2,15 @@
 	$(DOT) -Tpng -o $@ $<
 
 %:
-	$(DAKOTA) --output $@ $^
+	$(DK) --output $@ $^
 
 bin/%:
-	$(DAKOTA) --output $@ $^
+	$(DK) --output $@ $^
 
 %.$(SO_EXT):
-	$(DAKOTA) --shared --output $@ $^
+	$(DK) --shared --output $@ $^
 
 lib/%.$(SO_EXT):
-	$(DAKOTA) --shared --output $@ $^
+	$(DK) --shared --output $@ $^
 
 .PHONY: all check fs images clean

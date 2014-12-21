@@ -40,10 +40,7 @@ use dakota;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 convert_dash_syntax
                  convert_dk_to_cxx
-                 decode
-                 encode
               );
 
 my $ENCODED_COMMENT_BEGIN = '__ENCODED_COMMENT_BEGIN__';
@@ -994,12 +991,8 @@ sub convert_dk_to_cxx {
   &rewrite_symbols($filestr_ref);
   &rewrite_strings($filestr_ref);
 
-  &encode_strings_dq($filestr_ref);
+  &encode_strings($filestr_ref);
   &rewrite_multi_char_consts($filestr_ref);
-  &decode_strings($filestr_ref);
-  &encode_strings($filestr_ref);
-  &decode_strings($filestr_ref);
-  &encode_strings($filestr_ref);
   &rewrite_module_statement($filestr_ref);
 
   &rewrite_klass_decl($filestr_ref);
@@ -1060,11 +1053,11 @@ sub convert_dk_to_cxx {
 
   $$filestr_ref =~ s/else[_-]if/else if/gs;
 
-  $$filestr_ref =~ s/,(\s*\})/$1/gs;
+  $$filestr_ref =~ s/,(\s*\})/$1/gs; # remove harmless trailing comma
 
   &rewrite_includes($filestr_ref);
-  &decode_comments($filestr_ref);
   &decode_strings($filestr_ref);
+  &decode_comments($filestr_ref);
   $$filestr_ref =~ s|;;|;|g;
   return $filestr_ref;
 }
