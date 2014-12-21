@@ -732,9 +732,9 @@ sub ctlg_from_so {
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
 
   if ($ENV{'DK_PREFIX'}) {
-    $$ctlg_cmd{'cmd'} = "$ENV{'DK_PREFIX'}/bin/dakota-introspector";
+    $$ctlg_cmd{'cmd'} = "$ENV{'DK_PREFIX'}/bin/dk-info";
   } else {
-    $$ctlg_cmd{'cmd'} = 'dakota-introspector';
+    $$ctlg_cmd{'cmd'} = 'dk-info';
   }
 
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};

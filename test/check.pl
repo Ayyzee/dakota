@@ -17,8 +17,8 @@ my $failed_run = [];
 my $dir;
 foreach $dir (@ARGV)
 {
-    #print "dk --directory $dir name\n";
-    my $name = `dk --directory $dir name`;
+    #print "dk-project --directory $dir name\n";
+    my $name = `dk-project --directory $dir name`;
     chomp $name;
     my $exe = "$dir/$name";
     if (! -e $exe)

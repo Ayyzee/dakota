@@ -7,22 +7,22 @@ include $(rootdir)/vars.mk
 
 DAKOTA_ENV_VARS += DK_PREFIX=$(rootdir)
 
-dakota_util_files := $(shell $(rootdir)/bin/dk files --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
-dakota_files :=      $(shell $(rootdir)/bin/dk files --var SO_EXT=$(SO_EXT) --repository dakota.rep)
+dakota_util_files := $(shell $(rootdir)/bin/dk-project files --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
+dakota_files :=      $(shell $(rootdir)/bin/dk-project files --var SO_EXT=$(SO_EXT) --repository dakota.rep)
 
-dakota_util_name := $(shell $(rootdir)/bin/dk name --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
-dakota_name :=      $(shell $(rootdir)/bin/dk name --var SO_EXT=$(SO_EXT) --repository dakota.rep)
+dakota_util_name := $(shell $(rootdir)/bin/dk-project name --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
+dakota_name :=      $(shell $(rootdir)/bin/dk-project name --var SO_EXT=$(SO_EXT) --repository dakota.rep)
 
 INCLUDE_FILES :=\
  $(DESTDIR)$(includedir)/dakota-log.$(hxx_ext)\
  $(DESTDIR)$(includedir)/dakota.$(hxx_ext)\
 
 BIN_FILES :=\
- $(DESTDIR)$(bindir)/dakota-introspector$(exeext)\
+ $(DESTDIR)$(bindir)/dk-info$(exeext)\
  $(DESTDIR)$(bindir)/dakota$(exeext)\
  $(DESTDIR)$(bindir)/dk-fixup-stderr.$(pl_ext)\
  $(DESTDIR)$(bindir)/dk-rootdir.$(pl_ext)\
- $(DESTDIR)$(bindir)/dk\
+ $(DESTDIR)$(bindir)/dk-project\
 
 LIB_FILES :=\
  $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_name)\
@@ -87,7 +87,7 @@ $(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0644 $< $(@D)
 
 all:
-	$(MAKE) $(rootdir)/bin/dakota-introspector$(exeext)
+	$(MAKE) $(rootdir)/bin/dk-info$(exeext)
 	$(MAKE) $(MFLAGS) dakota
 	$(MAKE) $(MFLAGS) dakota-util
 
@@ -95,7 +95,7 @@ tst: tst-main.$(dk_ext)
 	CXXFLAGS="${CXXFLAGS} --debug=3" $(DAKOTA) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 check: all install
-	$(rootdir)/bin/dakota-introspector$(exeext) $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name)
+	$(rootdir)/bin/dk-info$(exeext) $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name)
 	$(MAKE) tst
 	./tst
 
@@ -107,7 +107,7 @@ dakota-util: $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 dakota: $(rootdir)/lib/$(lib_prefix)$(dakota_name)
 
-$(rootdir)/bin/dakota-introspector$(exeext): $(srcdir)/dakota-introspector-main.$(cxx_ext)
+$(rootdir)/bin/dk-info$(exeext): $(srcdir)/dk-info-main.$(cxx_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
 	$(CXX) $(EXTRA_CXXFLAGS) $(CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
@@ -167,8 +167,8 @@ clean: clean-rt
 	$(RM) $(RMFLAGS) $(srcdir)/obj tst
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
-	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-introspector$(exeext)
-	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-introspector$(exeext).dSYM
+	$(RM) $(RMFLAGS) $(rootdir)/bin/dk-info$(exeext)
+	$(RM) $(RMFLAGS) $(rootdir)/bin/dk-info$(exeext).dSYM
 	$(RM) $(RMFLAGS) sys-err-names.tbl .gdb_history *~ .*~ 
 	$(MAKE) --directory proofs clean
 	$(MAKE) --directory macro-system clean
