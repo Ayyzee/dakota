@@ -371,9 +371,9 @@ klass klass
 
   slots
   {
-    methods:slots-t          methods; // first so its offset is 0
+    uint32-t                 offset; // first so its offset is 0
+    methods:slots-t          methods;
     uint32-t                 size;
-    uint32-t                 offset;
     object-t                 superklass;
     symbol-t                 name; // redundant but convenient
     named-info-node:slots-t* info-slots;

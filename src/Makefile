@@ -5,7 +5,7 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-DAKOTA_ENV_VARS += DK_PREFIX=$(rootdir)
+DK_ENV_VARS += DK_PREFIX=$(rootdir)
 
 dakota_util_files := $(shell $(rootdir)/bin/dk-project files --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
 dakota_files :=      $(shell $(rootdir)/bin/dk-project files --var SO_EXT=$(SO_EXT) --repository dakota.rep)
@@ -19,10 +19,10 @@ INCLUDE_FILES :=\
 
 BIN_FILES :=\
  $(DESTDIR)$(bindir)/dk-info$(exeext)\
- $(DESTDIR)$(bindir)/dakota$(exeext)\
+ $(DESTDIR)$(bindir)/dk$(exeext)\
  $(DESTDIR)$(bindir)/dk-fixup-stderr.$(pl_ext)\
  $(DESTDIR)$(bindir)/dk-rootdir.$(pl_ext)\
- $(DESTDIR)$(bindir)/dk-project\
+ $(DESTDIR)$(bindir)/dk-project$(exeext)\
 
 LIB_FILES :=\
  $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_name)\
@@ -59,13 +59,13 @@ HOME_FILES :=\
 # the use of $^ should be $?
 
 $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT):
-	$(DAKOTA) --shared --name $(libdir)/$(@F) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DK) --shared --name $(libdir)/$(@F) $(EXTRA_DKFLAGS) $(DKFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/lib/%.$(SO_EXT):
-	$(DAKOTA) --dynamic --name $(libdir)/$(@F) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DK) --dynamic --name $(libdir)/$(@F) $(EXTRA_DKFLAGS) $(DKFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/bin/%$(exeext): $(srcdir)/%-main.$(dk_ext)
-	$(DAKOTA) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DK) $(EXTRA_DKFLAGS) $(DKFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 # installed files
 $(DESTDIR)$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)
@@ -92,7 +92,7 @@ all:
 	$(MAKE) $(MFLAGS) dakota-util
 
 tst: tst-main.$(dk_ext)
-	CXXFLAGS="${CXXFLAGS} --debug=3" $(DAKOTA) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
+	CXXFLAGS="${CXXFLAGS} --debug=3" $(DK) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 check: all install
 	$(rootdir)/bin/dk-info$(exeext) $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name)
@@ -112,7 +112,7 @@ $(rootdir)/bin/dk-info$(exeext): $(srcdir)/dk-info-main.$(cxx_ext)
 	$(CXX) $(EXTRA_CXXFLAGS) $(CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 precompile:
-	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
+	$(MAKE) --always-make --keep-going DKFLAGS=--$@ all
 
 $(DESTDIR)$(includedir) \
 $(DESTDIR)$(bindir) \

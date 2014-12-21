@@ -1850,8 +1850,7 @@ sub generate_klass_box {
           $col = &colin($col);
           $result .=
             $col . "object-t result = make(klass);\n" .
-            $col . "slots-t* s = unbox(result);\n" .
-            $col . "memcpy(*s, arg, sizeof(slots-t)); // unfortunate\n" .
+            $col . "memcpy(*unbox(result), arg, sizeof(slots-t)); // unfortunate\n" .
             $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";
