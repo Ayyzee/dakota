@@ -167,87 +167,43 @@ sub rewrite_compound_literal_cstring_null {
     $$filestr_ref =~ s|($name)-null|$1:construct(nullptr, 0)|g;
   }
 }
-sub concat1 {
-  my ($result_ref, $str) = @_;
-  $$result_ref .= $str;
-}
 sub concat3 {
-  my ($result_ref, $s1, $s2, $s3) = @_;
-  &concat1($result_ref, "$s1$s2$s3");
+  my ($s1, $s2, $s3) = @_;
+  return "$s1$s2$s3";
 }
 sub concat5 {
-  my ($result_ref, $s1, $s2, $s3, $s4, $s5) = @_;
-  &concat1($result_ref, "$s1$s2$s3$s4$s5");
+  my ($s1, $s2, $s3, $s4, $s5) = @_;
+  return "$s1$s2$s3$s4$s5";
 }
-sub encode_str5 {
-  my ($result_ref, $s1, $s2, $s3, $s4, $s5) = @_;
-  &concat5($result_ref, $s1, $s2, unpack('H*', $s3), $s4, $s5);
+sub encode_strings5 {
+  my ($s1, $s2, $s3, $s4, $s5) = @_;
+  return &concat5($s1, $s2, unpack('H*', $s3), $s4, $s5);
 }
 sub encode_comments3 {
-  my ($result_ref, $s1, $s2, $s3) = @_;
-  &concat5($result_ref, $s1, $ENCODED_COMMENT_BEGIN, unpack('H*', $s2), $ENCODED_COMMENT_END, $s3);
-}
-sub encode_str1 {
-  my ($result_ref, $s) = @_;
-  $s =~ m/^(.)(.*?)(.)$/;
-  my ($s1, $s2, $s3) = ($1, $2, $3);
-  &encode_str3($result_ref, $s1, $s2, $s3);
+  my ($s1, $s2, $s3) = @_;
+  return &concat5($s1, $ENCODED_COMMENT_BEGIN, unpack('H*', $s2), $ENCODED_COMMENT_END, $s3);
 }
 sub encode_strings1 {
-  my ($result_ref, $s) = @_;
+  my ($s) = @_;
   $s =~ m/^(.)(.*?)(.)$/;
   my ($s1, $s2, $s3) = ($1, $2, $3);
-  &encode_str5($result_ref, $s1, $ENCODED_STRING_BEGIN, $s2, $ENCODED_STRING_END, $s3);
+  return &encode_strings5($s1, $ENCODED_STRING_BEGIN, $s2, $ENCODED_STRING_END, $s3);
 }
 sub encode {
   my ($filestr_ref) = @_;
-  &encode_comments($filestr_ref);
   &encode_strings($filestr_ref);
+  &encode_comments($filestr_ref);
 }
 sub encode_comments {
   my ($filestr_ref) = @_;
-  my $result = '';
-  while (1) {
-    if (0) {}
-    elsif ($$filestr_ref =~ m|\G(//)(.*?)(\n)|gcs)   { &encode_comments3(\$result, $1, $2, $3); }
-    elsif ($$filestr_ref =~ m|\G(/\*)(.*?)(\*/)|gcs) { &encode_comments3(\$result, $1, $2, $3); }
-    elsif ($$filestr_ref =~ m|\G($dqstr)|gc)         { &concat1(\$result, $1);                  }
-    elsif ($$filestr_ref =~ m|\G(.)|gcs)             { &concat1(\$result, $1);                  }
-    else                                             { last; }
-  }
-  $$filestr_ref =  $result;
-}
-sub encode_strings_dq {
-  my ($filestr_ref) = @_;
-  my $result = '';
-  while (1) {
-    if (0) {}
-    elsif ($$filestr_ref =~ m|\G(//)(.*?)(\n)|gcs)   { &concat3(\$result, $1, $2, $3); }
-    elsif ($$filestr_ref =~ m|\G(/\*)(.*?)(\*/)|gcs) { &concat3(\$result, $1, $2, $3); }
-    elsif ($$filestr_ref =~ m|\G(<$h+>)|gc)          { &encode_strings1(\$result, $1); }
-    elsif ($$filestr_ref =~ m|\G($dqstr)|gc)         { &encode_strings1(\$result, $1); }
-    elsif ($$filestr_ref =~ m|\G(.)|gcs)             { &concat1(\$result, $1);         }
-    else                                             { last; }
-  }
-  $$filestr_ref =  $result;
-}
-sub encode_strings_sq {
-  my ($filestr_ref) = @_;
-  my $result = '';
-  while (1) {
-    if (0) {}
-    elsif ($$filestr_ref =~ m|\G(//)(.*?)(\n)|gcs)   { &concat3(\$result, $1, $2, $3); }
-    elsif ($$filestr_ref =~ m|\G(/\*)(.*?)(\*/)|gcs) { &concat3(\$result, $1, $2, $3); }
-    elsif ($$filestr_ref =~ m|\G($sqstr)|gc)         { &encode_strings1(\$result, $1); }
-    elsif ($$filestr_ref =~ m|\G(.)|gcs)             { &concat1(\$result, $1);         }
-    else                                             { last; }
-  }
-  $$filestr_ref =  $result;
+    $$filestr_ref =~ s|(//)(.*?)(\n)|&encode_comments3($1, $2, $3)|egs;
+    $$filestr_ref =~ s|(/\*)(.*?)(\*/)|&encode_comments3($1, $2, $3)|egs;
 }
 sub encode_strings {
   my ($filestr_ref) = @_;
-  &encode_strings_dq($filestr_ref);
-  &encode_strings_sq($filestr_ref);
+  $$filestr_ref =~ s|($dqstr)|&encode_strings1($1)|eg;
+  $$filestr_ref =~ s|(<$h+>)|&encode_strings1($1)|eg;
+  $$filestr_ref =~ s|($sqstr)|&encode_strings1($1)|eg;
 }
 sub decode {
   my ($filestr_ref) = @_;
@@ -979,9 +935,7 @@ sub rewrite_export_method {
 }
 sub convert_dk_to_cxx {
   my ($filestr_ref, $ka_generics, $arg) = @_;
-  #&encode($filestr_ref);
-
-  &encode_comments($filestr_ref);
+  &encode($filestr_ref);
 
   &rewrite_strswitch($filestr_ref);
   &rewrite_case_with_string($filestr_ref);
@@ -991,7 +945,6 @@ sub convert_dk_to_cxx {
   &rewrite_symbols($filestr_ref);
   &rewrite_strings($filestr_ref);
 
-  &encode_strings($filestr_ref);
   &rewrite_multi_char_consts($filestr_ref);
   &rewrite_module_statement($filestr_ref);
 
@@ -1054,11 +1007,10 @@ sub convert_dk_to_cxx {
   $$filestr_ref =~ s/else[_-]if/else if/gs;
 
   $$filestr_ref =~ s/,(\s*\})/$1/gs; # remove harmless trailing comma
+  $$filestr_ref =~ s|;;|;|g;
 
   &rewrite_includes($filestr_ref);
-  &decode_strings($filestr_ref);
-  &decode_comments($filestr_ref);
-  $$filestr_ref =~ s|;;|;|g;
+  &decode($filestr_ref);
   return $filestr_ref;
 }
 sub rewrite_multi_char_consts {
