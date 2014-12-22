@@ -524,7 +524,7 @@ sub generate_defn_footer {
   $col = &colin($col);
   $rt_cxx_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n" .
-    $col . "dkt-register-info(&registration-info);\n" .
+    $col . "dk-register-info(&registration-info);\n" .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);
@@ -534,7 +534,7 @@ sub generate_defn_footer {
   $col = &colin($col);
   $rt_cxx_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"{\", DKT-NAME);\n" .
-    $col . "dkt-deregister-info(&registration-info);\n" .
+    $col . "dk-deregister-info(&registration-info);\n" .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"}\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);

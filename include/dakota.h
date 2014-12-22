@@ -170,8 +170,8 @@ constexpr uintmax_t dk_hash(const char8_t* str)
 import symbol_t dk_intern(const char8_t*);
 import object_t dk_klass_for_name(symbol_t);
 
-import void dkt_register_info(named_info_node_t*);
-import void dkt_deregister_info(named_info_node_t*);
+import void dk_register_info(named_info_node_t*);
+import void dk_deregister_info(named_info_node_t*);
 
 #if defined DEBUG
   import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);

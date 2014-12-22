@@ -1223,7 +1223,7 @@ add-registration-info(named-info-node-t* registration-info)
 }
 
 export void
-dkt-register-info(named-info-node-t* registration-info)
+dk-register-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
@@ -1281,7 +1281,7 @@ dkt-register-info(named-info-node-t* registration-info)
   return;
 }
 export void
-dkt_deregister-info(named-info-node-t* registration-info)
+dk-deregister-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   if (NULL != getenv("DKT_INTROSPECTOR_OUTPUT") ||
