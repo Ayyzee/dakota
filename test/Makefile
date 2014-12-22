@@ -3,6 +3,8 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
+DKFLAGS += --include-directory .
+
 fail_exe_files := fail-exe-files.mk
 
 %/exe: %/exe.dk
