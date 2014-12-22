@@ -353,7 +353,7 @@ sub longest_common_prefix {
   }
   return $prefix;
 }
-sub rel_path_canon {
+sub rel_path_canon { # should merge with canon_path()
   my ($path1, $cwd) = @_;
   my $result = $path1;
 

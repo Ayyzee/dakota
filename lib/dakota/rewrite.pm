@@ -966,10 +966,10 @@ sub convert_dk_to_cxx {
   #&wrapped_rewrite($filestr_ref, [ 'throw', 'make' ], [ 'throw', '*', 'dkt-current-exception', '(', ')', '=', 'make' ]);
   #&wrapped_rewrite($filestr_ref, [ 'throw', '?literal-cstring' ], [ 'throw', '*', 'dkt-current-exception-cstring', '(', ')', '=', '?literal-cstring' ]);
 
-  if ($$filestr_ref =~ m/finally/g) {
+  if ($$filestr_ref =~ m/\Wfinally\W/g) {
     $filestr_ref = &rewrite_finally($filestr_ref);
   }
-  if ($$filestr_ref =~ m/catch/g) {
+  if ($$filestr_ref =~ m/\Wcatch\W/g) {
     $filestr_ref = &rewrite_exceptions($filestr_ref);
   }
   &nest_namespaces($filestr_ref);

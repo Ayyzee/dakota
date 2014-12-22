@@ -288,7 +288,8 @@ sub generate_nrt {
   if (&is_nrt_decl()) {
     &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
   } else {
-    #print "  generating $path/$name.$cxx_ext\n";
+    #my $directory = $ENV{'DKT_DIR'} ||= '.';
+    #print "  generating $directory/$path/$name.$cxx_ext\n";
     my $suffix = 'hxx';
 
     my $str = &labeled_src_str(undef, "nrt-cxx");
@@ -339,7 +340,8 @@ sub generate_rt {
   if (&is_rt_decl()) {
     &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
   } else {
-    print "  generating $path/$name.$cxx_ext\n";
+    my $directory = $ENV{'DKT_DIR'} ||= '.';
+    print "  generating $directory/$path/$name.$cxx_ext\n";
     my $suffix = 'cxx';
     &generate_decl_defn($file, $generics, $symbols, $suffix, $result);
 
@@ -4098,7 +4100,8 @@ sub dk::generate_dk_cxx {
   my $filestr = &dakota::util::filestr_from_file("$file_basename.$dk_ext");
   my $tmp_out = "$path$name.$cxx_ext";
   $tmp_out =~ s|^\./||;
-  print "  generating $tmp_out\n";
+  my $directory = $ENV{'DKT_DIR'} ||= '.';
+  print "  generating $directory/$tmp_out\n";
 
   #print STDERR "$name.$dk_ext.$cxx_ext\n";
   if (exists $ENV{'DK_NO_LINE'}) {

@@ -46,6 +46,7 @@ our @EXPORT= qw(
                  ka_generics_add
                  filestr_from_file
                  scalar_from_file
+                 canon_path
               );
 
 use Fcntl qw(:DEFAULT :flock);
@@ -55,6 +56,13 @@ sub ka_generics_add {
 }
 sub ka_generics {
   return $ka_generics_tbl;
+}
+sub canon_path { # should merge with rel_path_canon()
+  my ($path) = @_;
+  $path =~ s|//+|/|g; # replace multiple /s with single /s
+  $path =~ s|/+./+|/|g; # replace /./s with single /
+  $path =~ s|/+$||g; # remove trailing /s
+  return $path;
 }
 sub deep_copy {
   my ($ref) = @_;

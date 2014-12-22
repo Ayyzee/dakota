@@ -24,6 +24,7 @@ package dakota;
 
 use strict;
 use warnings;
+use Cwd;
 
 my $prefix;
 
@@ -622,7 +623,8 @@ sub exec_cmd {
   }
   if ($ENV{'DKT_DIR'}) {
     #print STDERR "DKT_DIR=$ENV{'DKT_DIR'}\n";
-    open (STDERR, "|dk-fixup-stderr.pl $ENV{'DKT_DIR'}") or die;
+    my $cwd = &getcwd();
+    open (STDERR, "|dk-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
   }
 
   my $exit_val = system($cmd_str);
@@ -690,7 +692,8 @@ sub outfile_from_infiles {
 	    if ($output !~ m|\.rep$| &&
             $output !~ m|\.ctlg$|) {
         $should_echo = 0;
-        print "  generating $output\n";
+        my $directory = $ENV{'DKT_DIR'} ||= '.';
+        print "  generating $directory/$output\n";
 	    }
 
       if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {
