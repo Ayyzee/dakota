@@ -4,8 +4,5 @@ int-t main()
 {
   object-t o2 = box($foo);
   object-t o3 = symbol:box($foo);
-
-  object-t o4 = box($'foo');
-  object-t o5 = uintmax:box($'foo');
   return 0;
 }

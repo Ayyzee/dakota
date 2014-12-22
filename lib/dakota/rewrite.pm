@@ -614,10 +614,6 @@ sub rewrite_boxes {
   # <non-colon>box($foo)  =>  symbol:box($foo)
   $$filestr_ref =~ s/(?<!:)(box\s*\(\s*\$$k+\))/symbol:$1/g;
   $$filestr_ref =~ s/(?<!:)(box\s*\(\s*__symbol:.+?\))/symbol:$1/g;
-
-  # <non-colon>box($'foo')  =>  uintmax:box($'foo')
-  $$filestr_ref =~ s/(?<!:)(box\s*\(\s*\$\'.+?\'\s*\))/uintmax:$1/g;
-  $$filestr_ref =~ s/(?<!:)(box\s*\(\s*__hash:.+?\))/uintmax:$1/g;
 }
 sub rewrite_unless {
   my ($filestr_ref) = @_;
@@ -735,7 +731,7 @@ sub hash {
   $keyword =~ s|^\'||;  # strip leading  single-quote
   $keyword =~ s|\'$||;  # strip trailing single-quote
   my $cxx_ident = &dakota::generate::make_ident_symbol_scalar($keyword);
-  return "__hash:$cxx_ident";
+  return "dk-hash(\"$keyword\")";
 }
 sub rewrite_case_with_string_rhs {
   my ($ws1, $str, $ws2) = @_;
@@ -749,7 +745,10 @@ sub rewrite_case_with_string {
 }
 sub rewrite_strswitch {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|strswitch(\s*)\((.*?)\)|switch$1(dk-hash($2))|gs;
+  $$filestr_ref =~ s|strswitch(\s*)\((\s*)($z)(\s*)\)|switch$1(dk-hash($2$3$4))|gs;
+  $$filestr_ref =~ s|switch(\s*)\((\s*)\$(.*?)(\s*)\)|switch$1(dk-hash($2"$3"$4))|gs;
+  $$filestr_ref =~ s|switch(\s*)\((\s*)"(.*?)"(\s*)\)|switch$1(dk-hash($2"$3"$4))|gs;
+  $$filestr_ref =~ s|switch(\s*)\((\s*)'(.*?)'(\s*)\)|switch$1(dk-hash($2'$3'$4))|gs;
 }
 sub remove_non_newlines {
   my ($str) = @_;

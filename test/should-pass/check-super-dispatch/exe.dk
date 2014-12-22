@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
- klass k1
+klass k1
 {
   method object-t init(object-t self)
   {
@@ -10,7 +10,7 @@
   }
 }
 
- klass k2
+klass k2
 {
   superklass k1;
 
@@ -22,7 +22,7 @@
   }
 }
 
- klass k3
+klass k3
 {
   superklass k2;
 
@@ -39,7 +39,7 @@ int-t main()
   object-t o = make(k3:klass);
 
   char8-t chain[1024] = "";
-  dk-get-klass-chain(o->klass, chain, sizeof(chain) - 1);
+  dkt-get-klass-chain(o->klass, chain, sizeof(chain) - 1);
   printf("%s\n", chain);
 
   return 0;

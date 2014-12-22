@@ -2,13 +2,38 @@
 
 int-t main()
 {
-  uint32-t hash-value = dk-hash($default-initial-capacity);
-  switch(hash-value)
+  symbol-t default-initial-capacity = $default-initial-capacity;
+  strswitch(default-initial-capacity)
   {
-    case $'default-initial-capacity':
+    case $default-initial-capacity:
       break;
     default:
-      fprintf(stderr, "%x\n", hash-value);
+      fprintf(stderr, "%s\n", default-initial-capacity);
+      abort();
+  }
+  switch($default-initial-capacity) // silly but legal
+  {
+    case $default-initial-capacity:
+      break;
+    default:
+      fprintf(stderr, "%s\n", $default-initial-capacity);
+      abort();
+  }
+  switch("default-initial-capacity") // silly but legal
+  {
+    case "default-initial-capacity": // should intern?
+      break;
+    default:
+      fprintf(stderr, "\"%s\"\n", "default-initial-capacity");
+      abort();
+  }
+  uintmax-t hash-value = dk-hash($default-initial-capacity);
+  switch(hash-value)
+  {
+    case $default-initial-capacity:
+      break;
+    default:
+      fprintf(stderr, "%jx\n", hash-value);
       abort();
   }
   return 0;

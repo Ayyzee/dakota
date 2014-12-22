@@ -107,14 +107,15 @@ va-log(uint32-t priority, const char8-t* format, va-list-t args)
   return result;
 }
 
-noexport format-va-printf(2) int-t
+#if defined DEBUG
+export format-va-printf(2) int-t
 dkt-va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {
   int-t result = va-log(priority, format, args);
   return result;
 }
 
-noexport format-printf(2) int-t
+export format-printf(2) int-t
 dkt-log(uint32-t priority, const char8-t* format, ...)
 {
   va-list-t args;
@@ -123,6 +124,7 @@ dkt-log(uint32-t priority, const char8-t* format, ...)
   va-end(args);
   return result;
 }
+#endif
 
 noexport void pre-runtime-verbose-terminate();
 noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
