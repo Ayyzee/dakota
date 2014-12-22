@@ -8,13 +8,13 @@ int-t main()
 //   dk:dump(o1);
 
   for (uint32-t i = 10; i < 46; i++)
-    dk:bit=(o1, i, true);
+    dk:set-bit(o1, i, true);
   dk:dump(o1);
 
   object-t o2 = make(bit-vector:klass);
 
   for (uint32-t i = 18; i < 54; i++)
-    dk:bit=(o2, i, true);
+    dk:set-bit(o2, i, true);
   dk:dump(o2);
 
   object-t o3;
@@ -43,13 +43,13 @@ int-t main()
 
 //   for (uint32-t i = 0; i <= 63; i++)
 //   {
-//     dk:bit=(o, 63 - i, true);
+//     dk:set-bit(o, 63 - i, true);
 //     dk:dump(o);
 //   }
 
 //   for (uint32-t i = 0; i <= 63; i++)
 //   {
-//     dk:bit=(o, 63 - i, false);
+//     dk:set-bit(o, 63 - i, false);
 //     dk:dump(o);
 //   }
 
