@@ -467,7 +467,7 @@ sub generate_defn_footer {
     foreach $key (sort keys %{$$file{'klasses'}}) {
       $val = $$file{'klasses'}{$key};
       my $cxx_klass_name = $key;
-      $rt_cxx_str .= $col . "$key:__name__,\n";
+      $rt_cxx_str .= $col . "$key:__klass__,\n";
     }
     $rt_cxx_str .= $col . "nullptr\n";
     $col = &colout($col);
@@ -1950,10 +1950,10 @@ sub linkage_unit::generate_klasses_body {
 
   if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
     #$$scratch_str_ref .= $col . "extern noexport symbol-t __type__;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __name__; }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { /*noexport*/ symbol-t __name__ = dk-intern(\"@$klass_path\"); }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { /*noexport*/ symbol-t __klass__ = dk-intern(\"@$klass_path\"); }\n";
   }
 
   if ('klass' eq $klass_type) {
@@ -3166,7 +3166,7 @@ sub dk::generate_cxx_footer_klass {
     my $trait_num = 0;
     for ($trait_num = 0; $trait_num < $num_traits; $trait_num++) {
       my $path = "$$klass_scope{'traits'}[$trait_num]";
-      $$scratch_str_ref .= $col . "  $path:__name__,\n";
+      $$scratch_str_ref .= $col . "  $path:__klass__,\n";
     }
     $$scratch_str_ref .= $col . "  nullptr\n";
     $$scratch_str_ref .= $col . "}; }\n";
@@ -3180,7 +3180,7 @@ sub dk::generate_cxx_footer_klass {
     my $require_num = 0;
     for ($require_num = 0; $require_num < $num_requires; $require_num++) {
       my $path = "$$klass_scope{'requires'}[$require_num]";
-      $$scratch_str_ref .= $col . "  $path:__name__,\n";
+      $$scratch_str_ref .= $col . "  $path:__klass__,\n";
     }
     $$scratch_str_ref .= $col . "  nullptr\n";
     $$scratch_str_ref .= $col . "}; }\n";
@@ -3194,7 +3194,7 @@ sub dk::generate_cxx_footer_klass {
     my $provide_num = 0;
     for ($provide_num = 0; $provide_num < $num_provides; $provide_num++) {
       my $path = "$$klass_scope{'provides'}[$provide_num]";
-      $$scratch_str_ref .= $col . "  $path:__name__,\n";
+      $$scratch_str_ref .= $col . "  $path:__klass__,\n";
     }
     $$scratch_str_ref .= $col . "  nullptr\n";
     $$scratch_str_ref .= $col . "}; }\n";
@@ -3217,7 +3217,7 @@ sub dk::generate_cxx_footer_klass {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = { //ro-data\n";
     $col = &colin($col);
     while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}})) {
-      $$scratch_str_ref .= $col . "  $key:__name__,\n";
+      $$scratch_str_ref .= $col . "  $key:__klass__,\n";
     }
     $$scratch_str_ref .= $col . "  nullptr\n";
     $col = &colout($col);
@@ -3346,7 +3346,7 @@ sub dk::generate_cxx_footer_klass {
   }
 
   my $symbol = &path::string($klass_name);
-  $$tbbl{'$name'} = '__name__';
+  $$tbbl{'$name'} = '__klass__';
 
   $$tbbl{'$construct'} = "\$$klass_type";
 
@@ -3393,17 +3393,17 @@ sub dk::generate_cxx_footer_klass {
   $token_seq = $$klass_scope{'interpose'};
   if ($token_seq) {
     my $path = $$klass_scope{'interpose'};
-    $$tbbl{'$interpose-name'} = "$path:__name__";
+    $$tbbl{'$interpose-name'} = "$path:__klass__";
   }
   $token_seq = $$klass_scope{'superklass'};
   if ($token_seq) {
     my $path = $$klass_scope{'superklass'};
-    $$tbbl{'$superklass-name'} = "$path:__name__";
+    $$tbbl{'$superklass-name'} = "$path:__klass__";
   }
   $token_seq = $$klass_scope{'klass'};
   if ($token_seq) {
     my $path = $$klass_scope{'klass'};
-    $$tbbl{'$klass-name'} = "$path:__name__";
+    $$tbbl{'$klass-name'} = "$path:__klass__";
   }
   if ($num_traits > 0) {
     $$tbbl{'$traits'} = '__traits';
@@ -3734,7 +3734,7 @@ sub dk::generate_cxx_footer {
       my $num_klasses = scalar keys %$interposers;
       foreach $key (sort keys %$interposers) {
         $val = $$interposers{$key};
-        $$scratch_str_ref .= $col . "{ $key:__name__, cast(uintptr-t)$val:__name__ },\n";
+        $$scratch_str_ref .= $col . "{ $key:__klass__, cast(uintptr-t)$val:__klass__ },\n";
       }
       $$scratch_str_ref .= $col . "{ nullptr, cast(uintptr-t)nullptr }\n";
       $col = &colout($col);

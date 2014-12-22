@@ -36,7 +36,7 @@ klass syntax-exception
   method object-t init(object-t self,
                        object-t       token =>    {},
                        const char8-t* filename => {},
-                       const char8-t* message =>  __name__)
+                       const char8-t* message =>  __klass__)
   {
     self = dk:init(super);
     assert(nullptr != token &&
