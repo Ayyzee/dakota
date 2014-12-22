@@ -383,7 +383,7 @@ klass klass
   method object-t alloc(object-t self, const char8-t* file, uint32-t line)
   {
     DKT-LOG-OBJECT-ALLOC("'file'=>'%s','line'=>'%i','func'=>'%s','args'=>['%s']",
-                         file, line, __signature__->name, self.name);
+                         file, line, __method__->name, self.name);
     object-t instance = dk:alloc(self);
     return instance;
   }

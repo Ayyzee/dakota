@@ -398,14 +398,13 @@ sub vars_from_defn {
   }
 
   if (!exists $$ka_generics{$name}) { # hackhack
-    $result .= " unused /*static*/ const signature-t* __signature__ = dkt-signature($name,($params));";
+    $result .= " unused static const signature-t* __method__ = dkt-signature($name,($params));";
   } else {
     # replace keyword args with va-list-t
     $params =~ s|,[^,]+?/\*=>.*?\*/||g;
     $params .= ", va-list-t";
-    $result .= " unused /*static*/ const signature-t* __signature__ = dkt-ka-signature(va:$name,($params));";
+    $result .= " unused static const signature-t* __method__ = dkt-ka-signature(va:$name,($params));";
   }
-  $result .= " unused /*static*/ const char8-t* __method__ = __signature__->name;";
   return $result;
 }
 sub rewrite_functions_replacement {
