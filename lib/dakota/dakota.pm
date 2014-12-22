@@ -616,11 +616,6 @@ sub exec_cmd {
     print STDERR "  $cmd_str\n";
   }
 
-  if ($$root_cmd{'opts'}{'directory'} &&
-        $$root_cmd{'opts'}{'directory'} ne '.' &&
-        $$root_cmd{'opts'}{'directory'} ne './') {
-    $ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
-  }
   if ($ENV{'DKT_DIR'}) {
     #print STDERR "DKT_DIR=$ENV{'DKT_DIR'}\n";
     my $cwd = &getcwd();

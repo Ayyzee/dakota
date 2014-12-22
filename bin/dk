@@ -141,8 +141,11 @@ if ($$root_cmd{'opts'}{'define-macro'}) {
   }
   $ENV{'EXTRA_CXXFLAGS'} .= $flags;
 }
-if ($$root_cmd{'opts'}{'directory'}) {
+if ($$root_cmd{'opts'}{'directory'} &&
+      $$root_cmd{'opts'}{'directory'} ne '.' &&
+      $$root_cmd{'opts'}{'directory'} ne './') {
   chdir $$root_cmd{'opts'}{'directory'};
+  $ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
 }
 my $result = &start($root_cmd);
 exit $result;
