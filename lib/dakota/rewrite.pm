@@ -193,6 +193,11 @@ sub encode {
   my ($filestr_ref) = @_;
   &encode_strings($filestr_ref);
   &encode_comments($filestr_ref);
+  # encode include directive strings
+  #$$filestr_ref =~ s|(?<=include\s)(\")(.*?)(\")|&encode_strings5($1, $ENCODED_STRING_BEGIN, $2, $ENCODED_STRING_END, $3)|eg;
+  #$$filestr_ref =~ s|(?<=include\s)(<)(.*?)(>)|&encode_strings5($1, $ENCODED_STRING_BEGIN, $2, $ENCODED_STRING_END, $3)|eg;
+  # remove all (single and double quoted) string contents, and remove all comments
+  #$filestr_ref =~ s{((//)(.*?)(\n))|((/\*)(.*?)(\*/))|(?<!\\)(")(.*?)(?<!\\)(")|(?<!\\)(')(.*?)(?<!\\)(')}{$1$3}gms;
 }
 sub encode_comments {
   my ($filestr_ref) = @_;
@@ -366,21 +371,7 @@ sub rewrite_catch_object {
 }
 sub rewrite_exceptions {
   my ($filestr_ref) = @_;
-  local $_ = $$filestr_ref;
-  my $filestr = '';             # should call $filestr/$filestr_ref
-
-  while (1) {
-    if (m/\G($catch_object)/gc) {
-      $filestr .= &rewrite_catch_object($1);
-    } elsif (m/\G(.)/gc) {
-      $filestr .= $1;
-    } elsif (m/\G(\n)/gc) {
-      $filestr .= $1;
-    } else {
-      last;
-    }
-  }
-  return \$filestr;
+  $$filestr_ref =~ s/($catch_object)/&rewrite_catch_object($1)/eg;
 }
 sub convert_dash_syntax {
   my ($str1, $str2) = @_;
@@ -970,7 +961,7 @@ sub convert_dk_to_cxx {
     $filestr_ref = &rewrite_finally($filestr_ref);
   }
   if ($$filestr_ref =~ m/\Wcatch\W/g) {
-    $filestr_ref = &rewrite_exceptions($filestr_ref);
+    &rewrite_exceptions($filestr_ref);
   }
   &nest_namespaces($filestr_ref);
   #&nest_generics($filestr_ref);
