@@ -688,7 +688,7 @@ sub outfile_from_infiles {
             $output !~ m|\.ctlg$|) {
         $should_echo = 0;
         my $directory = $ENV{'DKT_DIR'} ||= '.';
-        print "  generating $directory/$output\n";
+        print "  generating $directory/$output # output\n";
 	    }
 
       if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {
