@@ -27,6 +27,7 @@ use warnings;
 use Cwd;
 use File::Basename;
 use Data::Dumper;
+use Carp;
 
 my $prefix;
 
@@ -363,7 +364,7 @@ sub rel_path_canon { # should merge with canon_path()
     }
 
     my $path2 = &Cwd::abs_path($path1);
-    die("cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
+    confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
     my $common_prefix = &longest_common_prefix($cwd, $path2);
     my $adj_common_prefix = $common_prefix;
     $adj_common_prefix =~ s|/[^/]+/$||g;
@@ -827,7 +828,7 @@ sub const {
   }
   my $rhs = [];
   if ("@$type" =~ m/=/) {
-    while ('=' ne &_last($type)) {
+    while ('=' ne &dakota::util::_last($type)) {
       &dakota::util::_add_first($rhs, &dakota::util::_remove_last($type));
     }
     &dakota::util::_remove_last($type); # '='

@@ -4,7 +4,7 @@ MAKEFLAGS ?=\
  --no-print-directory\
  --warn-undefined-variables\
 
-rootdir := ..
+# rootdir is set before including this file
 srcdir := $(rootdir)/src
 local_includedir := $(rootdir)/include
 
@@ -13,17 +13,16 @@ includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
-
-DAKOTA_VARS :=
+DAKOTA_VARS =
 DAKOTA_VARS += CXX=$(CXX)
 DAKOTA_VARS += SO_EXT=$(SO_EXT)
 
 DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota
 #DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota-profile
 DAKOTAFLAGS ?=
-EXTRA_DAKOTAFLAGS :=\
- --include-directory=$(local_includedir)\
+EXTRA_DAKOTAFLAGS =\
  --include-directory=$(srcdir)\
+ --include-directory=$(rootdir)/include\
 
 SO_EXT ?= so
 

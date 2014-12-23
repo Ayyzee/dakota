@@ -3,7 +3,7 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-DAKOTAFLAGS += --include-directory .
+EXTRA_DAKOTAFLAGS += --include-directory .
 
 fail_exe_files := fail-exe-files.mk
 
