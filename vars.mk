@@ -14,14 +14,14 @@ libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
 
-DK_ENV_VARS :=
-DK_ENV_VARS += CXX=$(CXX)
-DK_ENV_VARS += SO_EXT=$(SO_EXT)
+DAKOTA_VARS :=
+DAKOTA_VARS += CXX=$(CXX)
+DAKOTA_VARS += SO_EXT=$(SO_EXT)
 
-DK ?= $(DK_ENV_VARS) $(rootdir)/bin/dk
-#DK ?= $(DK_ENV_VARS) $(rootdir)/bin/dk-profile
-DKFLAGS ?=
-EXTRA_DKFLAGS :=\
+DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota
+#DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota-profile
+DAKOTAFLAGS ?=
+EXTRA_DAKOTAFLAGS :=\
  --include-directory=$(local_includedir)\
  --include-directory=$(srcdir)\
 
@@ -119,8 +119,8 @@ export CXX
 export CXXFLAGS
 export EXTRA_CXXFLAGS
 
-export DK
-export DKFLAGS
-export EXTRA_DKFLAGS
+export DAKOTA
+export DAKOTAFLAGS
+export EXTRA_DAKOTAFLAGS
 
 export EXTRA_LDFLAGS

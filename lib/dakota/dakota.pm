@@ -619,16 +619,15 @@ sub exec_cmd {
   if ($ENV{'DKT_DIR'}) {
     #print STDERR "DKT_DIR=$ENV{'DKT_DIR'}\n";
     my $cwd = &getcwd();
-    open (STDERR, "|dk-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
+    open (STDERR, "|dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
   }
 
   my $exit_val = system($cmd_str);
   if (0 != $exit_val >> 8) {
     my $tmp_exit_status = $exit_val >> 8;
-    if ($exit_status < $tmp_exit_status) # similiar to behavior of gnu make
-	    {
-        $exit_status = $tmp_exit_status;
-	    }
+    if ($exit_status < $tmp_exit_status) { # similiar to behavior of gnu make
+      $exit_status = $tmp_exit_status;
+    }
     if (!$$root_cmd{'opts'}{'keep-going'}) {
       if (!($global_should_echo || $should_echo)) {
 		    print STDERR "  $cmd_str\n";
@@ -730,9 +729,9 @@ sub ctlg_from_so {
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
 
   if ($ENV{'DK_PREFIX'}) {
-    $$ctlg_cmd{'cmd'} = "$ENV{'DK_PREFIX'}/bin/dk-info";
+    $$ctlg_cmd{'cmd'} = "$ENV{'DK_PREFIX'}/bin/dakota-info";
   } else {
-    $$ctlg_cmd{'cmd'} = 'dk-info';
+    $$ctlg_cmd{'cmd'} = 'dakota-info';
   }
 
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};

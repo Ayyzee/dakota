@@ -9,5 +9,5 @@ include $(rootdir)/vars.mk
 #target := $(shell dk-project --var SO_EXT=$(SO_EXT) --abs-path name)
 #prereq := $(shell dk-project --var SO_EXT=$(SO_EXT) --abs-path files)
 
-target := $(shell dk-project --var SO_EXT=$(SO_EXT) name)
-prereq := $(shell dk-project --var SO_EXT=$(SO_EXT) files)
+target := $(shell dakota-project --var SO_EXT=$(SO_EXT) name)
+prereq := $(shell dakota-project --var SO_EXT=$(SO_EXT) files)

@@ -11,7 +11,7 @@ define dk-dump-methods
 end
 
 define dk-unbox
-  if 'object::instance_predicate'($arg0, klass)
+  if 'object::instancep'($arg0, klass)
     print *unbox($arg0)
   end
 end
@@ -74,5 +74,5 @@ end
 
 # print-signature
 define print-signature
-  printf "%s %s(%s)\n", __signature__->return_type, __signature__->name, __signature__->parameter_types
+  printf "%s %s(%s)\n", __method__->return_type, __method__->name, __method__->parameter_types
 end

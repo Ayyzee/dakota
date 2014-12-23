@@ -3,18 +3,18 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-DKFLAGS += --include-directory .
+DAKOTAFLAGS += --include-directory .
 
 fail_exe_files := fail-exe-files.mk
 
 %/exe: %/exe.dk
-	$(DK) --directory $(dir $@) --output $(notdir $@) $(EXTRA_DKFLAGS) $(DKFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
+	$(DAKOTA) --directory $(dir $@) --output $(notdir $@) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
 
 %/lib-1.$(SO_EXT): %/lib-1.dk %/module-lib-1.dk
-	$(DK) --shared --directory $(dir $@) --output $(notdir $@) $(EXTRA_DKFLAGS) $(DKFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
+	$(DAKOTA) --shared --directory $(dir $@) --output $(notdir $@) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
 
 %/lib-2.$(SO_EXT): %/lib-2.dk %/module-lib-2.dk
-	$(DK) --shared --directory $(dir $@) --output $(notdir $@) $(EXTRA_DKFLAGS) $(DKFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
+	$(DAKOTA) --shared --directory $(dir $@) --output $(notdir $@) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
 
 should_pass_file := should-pass.mk
 should_pass_exe_files := $(shell ./gen.pl should-pass $(should_pass_file))

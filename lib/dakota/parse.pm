@@ -315,7 +315,7 @@ sub init_rep_from_dk_vars {
 }
 sub str_from_cmd_info {
   my ($cmd_info) = @_;
-  #my $global_output_flags_tbl = { 'g++' => '--output', 'dk-info' => '--output' };
+  #my $global_output_flags_tbl = { 'g++' => '--output', 'dakota-info' => '--output' };
 
   my $str = '';
   if (defined $$cmd_info{'cmd'}) {
