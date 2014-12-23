@@ -333,6 +333,7 @@ sub start {
   }
 
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
+  print "creating $$cmd_info{'output'}\n";
   $cmd_info = &loop_rep_from_so($cmd_info);
   #if ($$cmd_info{'opts'}{'output'} =~ m/\.rep$/) # this is a real hackhack
   #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
@@ -344,11 +345,15 @@ sub start {
   }
 
   if (1) {
+     # generate user .o files first, then the single (but slow) runtime .o
     $cmd_info = &loop_obj_from_dk($cmd_info);
     if (!$$cmd_info{'opts'}{'compile'}) {
       &gen_rt_obj($cmd_info);
     }
   } else {
+    # generate the single (but slow) runtime .o, then the user .o files
+    # this might be useful for distributed building (initiating the building of the slowest first
+    # or for testing runtime code generation
     if (!$$cmd_info{'opts'}{'compile'}) {
       &gen_rt_obj($cmd_info);
     }
@@ -438,6 +443,7 @@ sub loop_rep_from_dk {
 }
 sub gen_rt_obj {
   my ($cmd_info) = @_;
+  print "  creating $$cmd_info{'output'}\n";
   $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   if ($dk_construct) {
@@ -457,6 +463,8 @@ sub loop_obj_from_dk {
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.$dk_ext$| ||
           $arg =~ m|\.$ctlg_ext$|) {
+      my $obj_path = &obj_path_from_dk_path($arg);
+      print "  creating $obj_path\n";
       if (!$want_separate_rep_pass) {
         my $rep_path = &rep_path_from_dk_path($arg);
         my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -471,7 +479,6 @@ sub loop_obj_from_dk {
       $$cxx_cmd{'output'} = $cxx_path;
       $$cxx_cmd{'reps'} = $$cmd_info{'reps'};
       &cxx_from_dk($cxx_cmd);
-      my $obj_path = &obj_path_from_dk_path($arg);
       my $obj_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$obj_cmd{'inputs'} = [ $cxx_path ];
       $$obj_cmd{'output'} = $obj_path;
@@ -684,10 +691,12 @@ sub outfile_from_infiles {
 	    my $output = $$cmd_info{'output'};
 
 	    if ($output !~ m|\.rep$| &&
-            $output !~ m|\.ctlg$|) {
+          $output !~ m|\.ctlg$|) {
         $should_echo = 0;
-        my $directory = $ENV{'DKT_DIR'} ||= '.';
-        print "  generating $directory/$output # output\n";
+        if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+          $output = $ENV{'DKT_DIR'} . '.' . $output
+        }
+        print "    creating $output\n"; # output
 	    }
 
       if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {

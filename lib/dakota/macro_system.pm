@@ -512,19 +512,19 @@ sub rule_replace {
     &debug_print_replace($template, $rhs, $lhs_num_tokens);
     &sst::splice($sst, $i, $lhs_num_tokens, $rhs);
 }
-sub dk_lang_user_data {
+sub lang_user_data {
     my $user_data;
     if ($ENV{'DK_LANG_USER_DATA_PATH'})
     { my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
       $user_data = do $path or die "Can not find $path." }
     else
-    { my $path = "$prefix/src/dkt-lang-user-data.pl";
+    { my $path = "$prefix/src/dakota-lang-user-data.pl";
       $user_data = do $path or die "Can not find $path." }
     return $user_data;
 }
 
 unless (caller) {
-    my $user_data = &dk_lang_user_data();
+    my $user_data = &lang_user_data();
 
     my $macros;
     if ($ENV{'DK_MACROS_PATH'})

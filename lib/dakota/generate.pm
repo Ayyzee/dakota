@@ -289,7 +289,7 @@ sub generate_nrt {
     &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
   } else {
     #my $directory = $ENV{'DKT_DIR'} ||= '.';
-    #print "  generating $directory/$path/$name.$cxx_ext # nrt-cxx\n";
+    #print "    creating $directory/$path/$name.$cxx_ext\n"; # nrt-cxx
     my $suffix = 'hxx';
 
     my $str = &labeled_src_str(undef, "nrt-cxx");
@@ -340,8 +340,11 @@ sub generate_rt {
   if (&is_rt_decl()) {
     &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
   } else {
-    my $directory = $ENV{'DKT_DIR'} ||= '.';
-    print "  generating $directory/$path/$name.$cxx_ext # rt-cxx\n";
+    my $output = "$path/$name.$cxx_ext";
+    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+      $output = $ENV{'DKT_DIR'} . '/' . $output
+    }
+    print "    creating $output\n"; # rt-cxx
     my $suffix = 'cxx';
     &generate_decl_defn($file, $generics, $symbols, $suffix, $result);
 
@@ -4097,10 +4100,13 @@ sub dk::annotate {
 sub dk::generate_dk_cxx {
   my ($file_basename, $path, $name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.$dk_ext");
-  my $user_dk_cxx = "$path$name.$cxx_ext";
-  $user_dk_cxx =~ s|^\./||;
+  my $output = "$path$name.$cxx_ext";
+  $output =~ s|^\./||;
   my $directory = $ENV{'DKT_DIR'} ||= '.';
-  print "  generating $directory/$user_dk_cxx # user-dk-cxx\n";
+  if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+    $output = $ENV{'DKT_DIR'} . '/' . $output
+  }
+  print "    creating $output\n"; # user-dk-cxx
 
   #print STDERR "$name.$dk_ext.$cxx_ext\n";
   if (exists $ENV{'DK_NO_LINE'}) {
