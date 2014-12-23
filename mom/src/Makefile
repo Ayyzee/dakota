@@ -17,8 +17,8 @@ export CXXFLAGS := --all-warnings --debug=3
 ../lib/$(lib_prefix)%.$(SO_EXT):
 	$(DAKOTA) --shared --output $@ --name $(libdir)/$(@F) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $^
 
-name :=  $(shell dk name  --var SO_EXT=$(SO_EXT))
-files := $(shell dk files --var SO_EXT=$(SO_EXT))
+name :=  $(shell dakota-project name  --var SO_EXT=$(SO_EXT))
+files := $(shell dakota-project files --var SO_EXT=$(SO_EXT))
 
 all: ../lib/$(name)
 
