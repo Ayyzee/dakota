@@ -3565,13 +3565,13 @@ sub generate_ka_method_defn {
     my $throw_arg_type = &arg_type::list_types($$method{'exception-types'});
     $$scratch_str_ref .= " throw($$throw_arg_type)";
   }
-  $$scratch_str_ref .= " {\n";
   $col = &colin($col);
   my $method_type_decl;
   $$method{'name'} = [ '_func_' ];
   my $func_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $list_names = &arg_type::list_names($$method{'parameter-types'});
+  $$scratch_str_ref .= " {\n" . $col . "static const signature-t* __method__ = dkt-ka-signature(va:$method_name($$list_types));\n";
 
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
@@ -3590,7 +3590,7 @@ sub generate_ka_method_defn {
     &dakota::util::_add_last($$method{'parameter-types'}, $param1);
   }
   if (scalar @{$$method{'keyword-types'}}) {
-    $$scratch_str_ref .= "";
+    $$scratch_str_ref .= $col;
     my $delim = '';
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
@@ -3645,10 +3645,9 @@ sub generate_ka_method_defn {
   #        $$scratch_str_ref .= $col . "{\n";
   $col = &colin($col);
 
-  $$scratch_str_ref .= $col . "static const signature-t* _ka-signature_ = dkt-ka-signature(va:$method_name($$list_types));\n";
   $$scratch_str_ref .= $col . "throw make(no-such-keyword-exception:klass,\n";
   $$scratch_str_ref .= $col . "           object =>    self,\n";
-  $$scratch_str_ref .= $col . "           signature => _ka-signature_,\n";
+  $$scratch_str_ref .= $col . "           signature => __method__,\n";
   $$scratch_str_ref .= $col . "           symbol =>    _keyword_->symbol);\n";
   $col = &colout($col);
   #        $$scratch_str_ref .= $col . "}\n";

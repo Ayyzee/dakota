@@ -35,7 +35,7 @@ int-t main()
 
   int-t overwrite;
   setenv("DK_DUMP_CTLG", "", overwrite = 1);
-  dkt-register-info(&k2-info);
+  dk-register-info(&k2-info);
   object-t k2-klass = dk-klass-for-name($k2);
   dk:dump(k2-klass);
 
