@@ -21,13 +21,12 @@ BEGIN {
 
 use dakota::util;
 
-my $gbl_cwd = $ARGV[0];
-my $gbl_parent = $ARGV[1];
-die if !$gbl_cwd || !$gbl_parent;
+my $gbl_cwd = $ARGV[0] ||= '\*\*NO-CWD\*\*';
+my $gbl_parent = $ARGV[1] ||= '\*\*NO-PARENT\*\*';
 
-my $name_re = qr|[\w.=+-]+|;
-my $rel_dir_re = qr|$name_re/+|;
-my $path_re = qr|/*$rel_dir_re*?$name_re/*|;
+my $name_re = qr{[\w.=+-]+};
+my $rel_dir_re = qr{$name_re/+};
+my $path_re = qr{/*$rel_dir_re*?$name_re/*};
 
 sub fixup {
   my ($cwd, $parent, $file, $line) = @_;
@@ -36,13 +35,17 @@ sub fixup {
   $cwd =~ s|/+$parent$||;
 
   if (-e "$cwd/$parent/$file") {
-    return "$parent/$file:$line:";
+    my $path = "$parent/$file";
+    $path = &dakota::util::canon_path($path);
+    return "$path:$line:";
   } else {
     return "$file:$line:";
   }
 }
 
 while (<STDIN>) {
-  $_ =~ s|($path_re):(\d+):|&fixup($gbl_cwd, $gbl_parent, $1, $2)|eg;
-  print $_;
+  my $line = $_;
+  $line =~ s|^\s*[Ii]n file included from.+?:\d+:\s*$||;
+  $line =~ s|($path_re):(\d+):|&fixup($gbl_cwd, $gbl_parent, $1, $2)|eg;
+  print $line;
 }

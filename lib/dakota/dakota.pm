@@ -624,9 +624,11 @@ sub exec_cmd {
   }
 
   if ($ENV{'DKT_DIR'}) {
-    #print STDERR "DKT_DIR=$ENV{'DKT_DIR'}\n";
     my $cwd = &getcwd();
     open (STDERR, "|dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
+  }
+  else {
+    open (STDERR, "|dakota-fixup-stderr.pl") or die;
   }
 
   my $exit_val = system($cmd_str);

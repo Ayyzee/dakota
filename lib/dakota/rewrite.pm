@@ -775,18 +775,12 @@ sub remove_exported_slots {
   $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5)=gse;
 }
 sub exported_enum_body {
-  my ($a, $b, $c, $d) = @_;
-  #my $d = &remove_non_newlines($c);
-
-  if ($b =~ m/$k+/) {
-    return "$a$b;$c/*$d*/";
-  } else {
-    return "/*$a$b$c$d*/";
-  }
+  my ($a, $b, $c, $d, $e) = @_;
+  return "/*$a$b$c$d$e*/";
 }
 sub remove_exported_enum {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(export\s+enum)(\s*$k*)(\s*)(\{.*?\})/&exported_enum_body($1, $2, $3, $4)/gse;
+  $$filestr_ref =~ s/(export)(\s+enum)(\s*$k*)(\s*)(\{.*?\}\s*;)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
 }
 # method init( ... , object-t $arg1, object-t $arg2 = ...) {|;
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;
