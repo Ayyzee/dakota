@@ -32,7 +32,7 @@ klass xsocket-type
     k-raw =    SOCK-RAW
   }
 
-  export method symbol-t name(slots-t s)
+  method symbol-t name(slots-t s)
   {
     symbol-t name = NULL;
 

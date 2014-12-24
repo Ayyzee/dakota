@@ -22,7 +22,7 @@ klass xpipe
 {
   slots int-t[2];
 
-  export method slots-t* init(slots-t* s)
+  method slots-t* init(slots-t* s)
   {
     int-t n = pipe(*s);
     if (-1 == n)

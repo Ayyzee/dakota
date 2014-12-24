@@ -24,7 +24,7 @@ klass xoption
 {
   slots struct option;
 
-  export method int-t usage(slots-t* options)
+  method int-t usage(slots-t* options)
   {
     int-t result = 0;
     fprintf(stdout, "usage: %s", getprogname());

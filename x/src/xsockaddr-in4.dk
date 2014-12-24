@@ -26,17 +26,17 @@ klass xsockaddr-in4
 
   slots struct sockaddr-in;
 
-  export method xsa-family-t family(slots-t* sin)
+  method xsa-family-t family(slots-t* sin)
   {
     xsa-family-t family = sin->sin-family;
     return family;
   }
-//   export method xin4-addr-t in4-addr(slots-t* sin)
+//   method xin4-addr-t in4-addr(slots-t* sin)
 //   {
 //     xin4-addr-t addr = sin->sin-addr;
 //     return addr;
 //   }
-  export method xin-port-t port(slots-t* sin)
+  method xin-port-t port(slots-t* sin)
   {
     xin-port-t port = sin->sin-port;
     return port;
