@@ -29,15 +29,17 @@ my $rel_dir_re = qr{$name_re/+};
 my $path_re = qr{/*$rel_dir_re*?$name_re/*};
 
 sub fixup {
-  my ($cwd, $parent, $file, $line) = @_;
+  my ($cwd, $parent, $file, $line_num) = @_;
+  $cwd = &dakota::util::canon_path($cwd);
+  $parent = &dakota::util::canon_path($parent);
   $cwd =~ s|/+$parent$||;
   my $path = "$parent/$file";
 
-  if (-e "$cwd/$path") {
+  if (-e "$cwd/$path" && '.' ne $parent) {
     $path = &dakota::util::canon_path($path);
-    return "$path:$line:";
+    return "$path:$line_num:";
   } else {
-    return "$file:$line:";
+    return "$file:$line_num:";
   }
 }
 
