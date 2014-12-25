@@ -20,7 +20,18 @@ klass xsa-family
 {
   slots sa-family-t;
 
-  export const slots-t k-in4 =   AF-INET;
-  export const slots-t k-in6 =   AF-INET6;
-  export const slots-t k-local = AF-LOCAL;
+  // http://pubs.opengroup.org/onlinepubs/009695399/basedefs/sys/socket.h.html
+  export const slots-t k-in4 =    AF-INET;
+  export const slots-t k-in6 =    AF-INET6;
+  export const slots-t k-unix =   AF-UNIX;
+  export const slots-t k-unspec = AF-UNSPEC;
+  // AF-COIP
+  // AF-IEEE80211
+  // AF-ISDN
+  // AF-NETBIOS
+  // AF-NDRV
+  // AF-PPP
+  // AF-ROUTE
+  // AF-SIP
+  // AF-SYSTEM
 }

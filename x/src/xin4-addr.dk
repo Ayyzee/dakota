@@ -20,7 +20,9 @@ klass xin4-addr
 {
   slots struct in-addr;
 
-  export const slots-t k-any =      { INADDR-ANY };
-  export const slots-t k-loopback = { INADDR-LOOPBACK };
-  export const slots-t k-none =     { INADDR-NONE };
+  // http://pubs.opengroup.org/onlinepubs/009695399/basedefs/netinet/in.h.html
+  export const slots-t k-any =       { INADDR-ANY }; // .s-addr =
+  export const slots-t k-broadcast = { INADDR-BROADCAST }; // .s-addr =
+  export const slots-t k-loopback =  { INADDR-LOOPBACK }; // .s-addr =
+  export const slots-t k-none =      { INADDR-NONE }; // .s-addr =
 }
