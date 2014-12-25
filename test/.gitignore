@@ -1,0 +1,7 @@
+*~
+should-pass/*/*~
+should-pass/*/obj
+should-pass/*/exe
+should-pass/*/lib-1.dylib
+should-pass/*/lib-2.dylib
+should-pass/*/lib-3.dylib
