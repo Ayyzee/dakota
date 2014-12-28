@@ -89,7 +89,7 @@ if (!exists $ENV{'EXTRA_LDFLAGS'}) {
   $ENV{'EXTRA_LDFLAGS'} = '';
 } # default EXTRA_LDFLAGS
 
-my $root_cmd = { 'opts' => { 'include-directory' => [], 'define-macro' => [] }, 'reps' => [] };
+my $root_cmd = { 'opts' => { 'include-directory' => [], 'define-macro' => [], 'var' => {} }, 'reps' => [] };
 
 &GetOptions($$root_cmd{'opts'},
             'precompile',          # gcc-ish (--compile)
@@ -103,7 +103,7 @@ my $root_cmd = { 'opts' => { 'include-directory' => [], 'define-macro' => [] }, 
             'directory=s',         # make-like
             'output=s',            # gcc-like
             'nodefaultlibs',       # gcc-like
-            'makeflags=s',         # similiar to env var MAKEFLAGS
+            'var=s',               # for env vars like MAKEFLAGS, etc.
             #'compiler=s',          # similiar to env var CXX
             #'compiler-flags=s',    # similiar to env vars EXTRA_CXXFLAGS & CXXFLAGS
             #'linker=s',            # similiar to env var LD
