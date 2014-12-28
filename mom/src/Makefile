@@ -12,7 +12,7 @@ EXTRA_DAKOTAFLAGS +=\
  --include-directory=../include\
 
 ../lib/$(lib_prefix)%.$(SO_EXT):
-	$(DAKOTA) --keep-going --shared --output $@ --name $(libdir)/$(@F) --var MAKEFLAGS="$(MAKEFLAGS)" $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $^
+	$(DAKOTA) --shared --output $@ --name $(libdir)/$(@F) --var MAKEFLAGS="$(MAKEFLAGS)" $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $^
 	echo $(MAKEFLAGS)
 
 name :=  $(shell $(rootdir)/bin/dakota-project name  --var SO_EXT=$(SO_EXT))
