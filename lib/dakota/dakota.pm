@@ -696,9 +696,10 @@ sub outfile_from_infiles {
           $output !~ m|\.ctlg$|) {
         $should_echo = 0;
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-          $output = $ENV{'DKT_DIR'} . '.' . $output
+          $output = $ENV{'DKT_DIR'} . '/' . $output
         }
         print "    creating $output\n"; # output
+        #print "    creating $output # output\n";
 	    }
 
       if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {

@@ -345,6 +345,7 @@ sub generate_rt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output\n"; # rt-cxx
+    #print "    creating $output # rt-cxx\n";
     my $suffix = 'cxx';
     &generate_decl_defn($file, $generics, $symbols, $suffix, $result);
 
@@ -4107,6 +4108,7 @@ sub dk::generate_dk_cxx {
     $output = $ENV{'DKT_DIR'} . '/' . $output
   }
   print "    creating $output\n"; # user-dk-cxx
+  #print "    creating $output # user-dk-cxx\n";
 
   #print STDERR "$name.$dk_ext.$cxx_ext\n";
   if (exists $ENV{'DK_NO_LINE'}) {
