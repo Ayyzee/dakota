@@ -37,7 +37,7 @@ klass xsocklen;
 
 export xin4-addr-t xin4-addr-create(uint8-t a, uint8-t b, uint8-t c, uint8-t d)
 {
-     xin4-addr-t result = { a << 24 | b << 16 | c << 8 | d };
+     xin4-addr-t result = cast(xin4-addr-t){ a << 24 | b << 16 | c << 8 | d };
      return result;
 }
 

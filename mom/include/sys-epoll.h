@@ -19,10 +19,10 @@
 
 #include "config.h"
 
-#if HAVE_EPOLL
+#if defined HAVE_EPOLL
 #include <sys/epoll.h>
 #else
-#if HAVE_POLL && USE_POLL
+#if defined HAVE_POLL && defined USE_POLL
 #include <stdint.h>
 
 enum EPOLL_EVENTS

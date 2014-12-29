@@ -28,7 +28,7 @@ include <sys/types.h>;
 include <sys/wait.h>;
 include <unistd.h>;
 
-#ifndef _GNU-SOURCE
+#if !defined _GNU-SOURCE
 #define _GNU-SOURCE
 #endif //_GNU-SOURCE
 include <getopt.h>;

@@ -29,7 +29,7 @@ include <sys/wait.h>;
 include <time.h>;
 include <unistd.h>;
 
-#ifndef __STDC-FORMAT-MACROS
+#if !defined __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
 include <inttypes.h>;
@@ -101,7 +101,7 @@ klass event-queue
 
 #define USE-KQUEUE-SIGNAL-FILTER 0
 
-#if HAVE-KQUEUE && USE-KQUEUE-SIGNAL-FILTER
+#if HAVE-KQUEUE && defined USE-KQUEUE-SIGNAL-FILTER
 #else
 
 //hackhack
@@ -176,7 +176,7 @@ klass event-queue
       event-handler-for-child-proc-exit[pid] = cast(object-t)0x3333;
       object-t e = make(event:klass);
       dk:set(e, /*filter*/ event:k-proc, /*ident*/ pid, eh);
-      dk:data=(e, status);
+      dk:set-data(e, status);
       dk:invoke(eh, e);
       return self;
     }

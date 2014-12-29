@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _GNU-SOURCE
+#if !defined _GNU-SOURCE
 #define _GNU-SOURCE
 #endif //_GNU-SOURCE
 include <dlfcn.h>;
@@ -57,7 +57,7 @@ klass handler
   method object-t log(object-t self, object-t object)
   {
     assert(NULL != self.callback);
-    __unused const char8-t* sname = "<unknown>";
+    unused const char8-t* sname = "<unknown>";
 #if USE-DLADDR
     Dl-info dli = {0};  int-t n = dladdr((const void*)self.callback, &dli);
     if (0 != n && dli.dli-saddr == self.callback)
@@ -97,19 +97,19 @@ klass handler
     return result;
   }
 
-  method object-t object=(object-t self, object-t object)
+  method object-t set-object(object-t self, object-t object)
   {
     self.self = object;
     return object;
   }
 
-  method object-t udata=(object-t self, object-t udata)
+  method object-t set-udata(object-t self, object-t udata)
   {
     self.udata = udata;
     return udata;
   }
 
-  method callback:slots-t callback=(object-t self, callback:slots-t callback)
+  method callback:slots-t set-callback(object-t self, callback:slots-t callback)
   {
     self.callback = callback;
     return callback;

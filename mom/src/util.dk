@@ -27,7 +27,7 @@ include <sys/types.h>;
 include <sys/types.h>;
 include <unistd.h>;
 
-#ifndef __STDC-FORMAT-MACROS
+#if !defined __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
 include <inttypes.h>;
@@ -53,9 +53,9 @@ klass xsocklen;
 
 export char8-t* resolve-path(char8-t* path, size-t pathlen, const char8-t* file)
 {
-  path[0] = (char8-t)0;
+  path[0] = cast(char8-t)0;
   char8-t* pathvar = sys:getenv("PATH");
-  char8-t* pathvarbuf = (char8-t*)sys:malloc(strlen(pathvar) + 1); // can be longer than MAXPATHLEN
+  char8-t* pathvarbuf = cast(char8-t*)sys:malloc(strlen(pathvar) + 1); // can be longer than MAXPATHLEN
   char8-t* iterator = pathvarbuf;
   char8-t* p;
   sys:strcpy(pathvarbuf, pathvar);
@@ -66,7 +66,7 @@ export char8-t* resolve-path(char8-t* path, size-t pathlen, const char8-t* file)
     int32-t n = sys:stat(path, &st);
     if (0 == n)
       break;
-    path[0] = (char8-t)0;
+    path[0] = cast(char8-t)0;
   }
   sys:free(pathvarbuf);
   return path;
@@ -75,7 +75,7 @@ export char8-t* resolve-path(char8-t* path, size-t pathlen, const char8-t* file)
 noexport int32-t int32-from-string-base(const char8-t* str, int32-t default-int32, int32-t base)
 {
   int32-t int32 = default-int32;
-  if (NULL != str && (char8-t)0 != str[0]) {
+  if (NULL != str && cast(char8-t)0 != str[0]) {
     errno = 0;
     int32 = sys:strtoimax(str, NULL, base);  zeroneen(errno);
   }
@@ -85,7 +85,7 @@ noexport int32-t int32-from-string-base(const char8-t* str, int32-t default-int3
 noexport uint32-t uint32-from-string-base(const char8-t* str, uint32-t default-uint32, int32-t base)
 {
   uint32-t uint32 = default-uint32;
-  if (NULL != str && (char8-t)0 != str[0]) {
+  if (NULL != str && cast(char8-t)0 != str[0]) {
     errno = 0;
     uint32 = sys:strtoimax(str, NULL, base);  zeroneen(errno);
   }
@@ -95,7 +95,7 @@ noexport uint32-t uint32-from-string-base(const char8-t* str, uint32-t default-u
 noexport int16-t int16-from-string-base(const char8-t* str, int16-t default-int16, int32-t base)
 {
   int16-t int16 = default-int16;
-  if (NULL != str && (char8-t)0 != str[0]) {
+  if (NULL != str && cast(char8-t)0 != str[0]) {
     errno = 0;
     int16 = sys:strtoimax(str, NULL, base);  zeroneen(errno);
   }
@@ -105,7 +105,7 @@ noexport int16-t int16-from-string-base(const char8-t* str, int16-t default-int1
 noexport uint16-t uint16-from-string-base(const char8-t* str, uint16-t default-uint16, int32-t base)
 {
   uint16-t uint16 = default-uint16;
-  if (NULL != str && (char8-t)0 != str[0]) {
+  if (NULL != str && cast(char8-t)0 != str[0]) {
     errno = 0;
     uint16 = sys:strtoumax(str, NULL, base);  zeroneen(errno);
   }
@@ -138,13 +138,13 @@ noexport uint16-t uint16-from-string(const char8-t* str, uint16-t default-uint16
 
 export xin-port-t port-from-string(const char8-t* port-str, xin-port-t default-port)
 {
-  xin-port-t port = (xin-port-t)uint16-from-string-base(port-str, default-port, 10);
+  xin-port-t port = cast(xin-port-t)uint16-from-string-base(port-str, default-port, 10);
   return port;
 }
 
 export xin-port-t port-from-hex-string(const char8-t* port-str, xin-port-t default-port)
 {
-  xin-port-t port = (xin-port-t)uint16-from-string-base(port-str, default-port, 16);
+  xin-port-t port = cast(xin-port-t)uint16-from-string-base(port-str, default-port, 16);
   return port;
 }
 
@@ -181,7 +181,7 @@ export xin-port-t port-getenv(const char8-t* key, xin-port-t default-port)
 export xin4-addr-t addr-from-string(const char8-t* addr-str, xin4-addr-t default-addr)
 {
   xin4-addr-t addr = default-addr;
-  if (NULL != addr-str && (char8-t)0 != addr-str[0]) {
+  if (NULL != addr-str && cast(char8-t)0 != addr-str[0]) {
     struct in-addr s = {0};
     int32-t n = sys:inet-pton(xsa-family:k-in4, addr-str, &s);
     s.s-addr = ntoh32(s.s-addr); //endend
@@ -213,7 +213,7 @@ noexport xsockaddr-in4-t* string-to-sockaddr-in(const char8-t* str, xsockaddr-in
     sys:strncpy(addr-str, str, sizeof(str) - (1));
 
     char8-t* port-str = sys:strchr(str, ':'); // nullnull
-    *port-str = (char8-t)0;
+    *port-str = cast(char8-t)0;
     port-str++;
 
     sinp->sin-addr = addr-from-string(str, xin4-addr:k-none);

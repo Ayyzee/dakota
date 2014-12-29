@@ -24,7 +24,7 @@ include <sys/types.h>;
 include <sys/uio.h>;
 include <unistd.h>;
 
-#ifndef __STDC-FORMAT-MACROS
+#if !defined __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
 include <inttypes.h>;
@@ -50,14 +50,15 @@ klass msg
     msg-id-t id;
     cstring-t buf;
   }
-  
+  export const slots-t k-null = {0, 0, 0};
+
   method object-t init(object-t self, uint32-t tag => {}, cstring-t val => {}, msg-id-t id => 0)
   {
     self = dk:init(super);
     self.tag = tag;
     self.id =  id;
     self.buf.len = 4 + 4 + 8 + val.len;
-    self.buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * (self.buf.len + 1));
+    self.buf.ptr = cast(char8-t*)sys:malloc(sizeof(char8-t) * (self.buf.len + 1));
     // bugbug
     int32-t n;
     
@@ -66,7 +67,7 @@ klass msg
     } else {
       n = sys:snprintf(self.buf.ptr, self.buf.len + 1, "%04x%04x%08x%.*s", tag, val.len, id, val.len, val.ptr); sc(n); // slowslow
     }
-    MOM-LOG-CREATE("%s:%s() = 0x%08x", __klass__, __func__, (uint32-t)self);
+    MOM-LOG-CREATE("%s:%s() = 0x%08x", __klass__, __func__, cast(uintptr-t)self);
     return self;
   }
 
@@ -91,11 +92,11 @@ klass msg
     return result;
   }
 
-  method msg-id-t id=(object-t self, msg-id-t id)
+  method msg-id-t set-id(object-t self, msg-id-t id)
   {
     //assert(0 != id);
     self.id = id;
-    char8-t idstr[8 + 1]; idstr[0] = (char8-t)0;
+    char8-t idstr[8 + 1]; idstr[0] = cast(char8-t)0;
     int32-t n = sys:snprintf(idstr, 8 + 1, "%08x", self.id); sc(n); // slowslow
     sys:strncpy(self.buf.ptr + 4 + 4, idstr, 8);
     return id;
@@ -117,7 +118,7 @@ klass msg
 
   method object-t free(object-t self)
   {
-    MOM-LOG-FREE("%s:%s(0x%08x)", __klass__, __func__, (uint32-t)self);
+    MOM-LOG-FREE("%s:%s(0x%08x)", __klass__, __func__, cast(uintptr-t)self);
     sys:free(self.buf.ptr); self.buf.ptr = NULL;
     sys:free(self); self = NULL;
     return NULL;
@@ -185,9 +186,9 @@ klass msg
   {
     char8-t decstr[buf-len + 1];
     sys:strncpy(decstr, buf, buf-len);
-    decstr[buf-len] = (char8-t)0;
+    decstr[buf-len] = cast(char8-t)0;
     errno = 0;
-    intmax-t dec = sys:strtoimax(decstr, (char8-t**)NULL, 16);  zeroneen(errno);
+    intmax-t dec = sys:strtoimax(decstr, cast(char8-t**)NULL, 16);  zeroneen(errno);
     if (0 == dec && 0 != errno) {
       MOM-LOG-ERROR-ERRNO(errno);
       goto __failure;
@@ -218,13 +219,13 @@ klass msg-klass
           instance = dk:alloc(msg:klass);
           // bugbug
           msg:unbox(instance)->buf.len = 4 + 4 + 8 + len;
-          msg:unbox(instance)->buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * (msg:unbox(instance)->buf.len + 1));
+          msg:unbox(instance)->buf.ptr = cast(char8-t*)sys:malloc(sizeof(char8-t) * (msg:unbox(instance)->buf.len + 1));
           // bugbug
           
           sys:memcpy(msg:unbox(instance)->buf.ptr, buf, msg:unbox(instance)->buf.len);
-          msg:unbox(instance)->buf.ptr[msg:unbox(instance)->buf.len] = (char8-t)0;
+          msg:unbox(instance)->buf.ptr[msg:unbox(instance)->buf.len] = cast(char8-t)0;
           sys:memmove(buf, buf + msg:unbox(instance)->buf.len, *buf-lenp - msg:unbox(instance)->buf.len);
-          buf[*buf-lenp - msg:unbox(instance)->buf.len] = (char8-t)0;
+          buf[*buf-lenp - msg:unbox(instance)->buf.len] = cast(char8-t)0;
           *buf-lenp -= msg:unbox(instance)->buf.len;
           
           msg:unbox(instance)->tag = tag;

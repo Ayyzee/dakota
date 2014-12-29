@@ -27,37 +27,37 @@ klass pstatus
 {
   slots int-t;
 
-  export method boole-t exited?(slots-t s)
+  method boole-t exited?(slots-t s)
   {
     boole-t result = WIFEXITED(s);
     return result;
   }
-  export method boole-t signaled?(slots-t s)
+  method boole-t signaled?(slots-t s)
   {
     boole-t result = WIFSIGNALED(s);
     return result;
   }
-  export method boole-t stopped?(slots-t s)
+  method boole-t stopped?(slots-t s)
   {
     boole-t result = WIFSTOPPED(s);
     return result;
   }
-  export method boole-t continued?(slots-t s)
+  method boole-t continued?(slots-t s)
   {
     boole-t result = WIFCONTINUED(s);
     return result;
   }
-  export method int-t exit-status(slots-t s)
+  method int-t exit-status(slots-t s)
   {
     int-t result = WEXITSTATUS(s);
     return result;
   }
-  export method xsignal-t term-signal(slots-t s)
+  method xsignal-t term-signal(slots-t s)
   {
     xsignal-t result = WTERMSIG(s);
     return result;
   }
-  export method xsignal-t stop-signal(slots-t s)
+  method xsignal-t stop-signal(slots-t s)
   {
     xsignal-t result = WSTOPSIG(s);
     return result;

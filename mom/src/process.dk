@@ -18,7 +18,7 @@ include <assert.h>;
 include <stdlib.h>;
 include <unistd.h>;
 
-#ifndef _GNU-SOURCE
+#if !defined _GNU-SOURCE
 #define _GNU-SOURCE
 #endif //_GNU-SOURCE
 
@@ -82,7 +82,7 @@ klass process
   }
 
     
-  export method object-t sigchld-read-event-callback(object-t self,
+  method object-t sigchld-read-event-callback(object-t self,
                                                      object-t sigchld-event)
   {
     MOM-LOG-CALLBACK("pid=%i %s:%s()", self.id, __klass__, __func__);
@@ -107,7 +107,7 @@ klass process
         object-t exit-value-msg = make(msg:klass,
                                        tag => exit-value,
                                        val => exit-value-slots);
-        dk:id=(exit-value-msg, self.msg-id);
+        dk:set-id(exit-value-msg, self.msg-id);
         dk:invoke(box(self.rcv-msg-handler), exit-value-msg);
     return self;
   }
@@ -143,7 +143,7 @@ klass process
       MOM-LOG-FD("fd=%i #child-pipe-err-read", dk:fd(self.child-pipe-out, unnamed-pipe:k-read));
       MOM-LOG-FD("fd=%i #child-pipe-err-write", dk:fd(self.child-pipe-out, unnamed-pipe:k-write));
     }
-    MOM-LOG-CREATE("%s:%s() = 0x%08x", __klass__, __func__, (uint32-t)self);
+    MOM-LOG-CREATE("%s:%s() = 0x%08x", __klass__, __func__, cast(uintptr-t)self);
     return self;
   }
 
@@ -176,7 +176,7 @@ klass process
                         path, args[0], args[1], vars[0]);
     int32-t n = sys:execve(path, args, vars);
     MOM-LOG-EXEC-CONTEXT("%s[%i]: %s(\"%s\", 0x%08x, 0x%08x): \"%s\"",
-                        sys:getprogname(), sys:getpid(), "sys:execve", path, (uint32-t)args, (uint32-t)vars, sys:strerror(errno));
+                        sys:getprogname(), sys:getpid(), "sys:execve", path, cast(uintptr-t)args, cast(uintptr-t)vars, sys:strerror(errno));
     return n;
   }
 
@@ -207,8 +207,8 @@ klass process
       object-t msg = make(msg:klass,
                           tag => child-stdout,
                           val => child-pipe-buf);
-//       child-pipe-buf.len = 0; child-pipe-buf.ptr[0] = (char8-t)0;
-      dk:id=(msg, process-slots->msg-id);
+//       child-pipe-buf.len = 0; child-pipe-buf.ptr[0] = cast(char8-t)0;
+      dk:set-id(msg, process-slots->msg-id);
       dk:snd-msg(process-slots->connection, msg);
     }
     return child-pipe;
@@ -227,16 +227,16 @@ klass process
       object-t msg = make(msg:klass,
                           tag => child-stderr,
                           val => child-pipe-buf);
-//       child-pipe-buf.len = 0; child-pipe-buf.ptr[0] = (char8-t)0;
-      dk:id=(msg, process-slots->msg-id);
+//       child-pipe-buf.len = 0; child-pipe-buf.ptr[0] = cast(char8-t)0;
+      dk:set-id(msg, process-slots->msg-id);
       dk:snd-msg(process-slots->connection, msg);
     }
     return child-pipe;
   }
 
-  method callback-t rcv-msg-callback=(object-t self, callback-t rcv-msg-callback)
+  method callback-t set-rcv-msg-callback(object-t self, callback-t rcv-msg-callback)
   {
-    dk:callback=(self.rcv-msg-handler, rcv-msg-callback); // bugbug: same as below
+    dk:set-callback(self.rcv-msg-handler, rcv-msg-callback); // bugbug: same as below
 //     assert(self == self.rcv-msg-handler.self);
 
 #if SUPPORT-STDIN-PIPE
@@ -247,11 +247,11 @@ klass process
     if (!MOM-DISABLE-STDERR)
       dk:read-event-setup(self.child-pipe-err, child-pipe-err-write-event-callback, self);
   
-    dk:callback=(self.event-handler, sigchld-read-event-callback);
-    dk:object=(self.event-handler, self);
+    dk:set-callback(self.event-handler, sigchld-read-event-callback);
+    dk:set-object(self.event-handler, self);
 
-    dk:callback=(self.rcv-msg-handler, rcv-msg-callback); // bugbug: same as above
-    dk:object=(self.rcv-msg-handler, self);
+    dk:set-callback(self.rcv-msg-handler, rcv-msg-callback); // bugbug: same as above
+    dk:set-object(self.rcv-msg-handler, self);
     return rcv-msg-callback;
   }
 
@@ -259,7 +259,7 @@ klass process
   {
     assert(NULL != msg-callback);
     assert(NULL != msg);
-    __unused const char8-t* sname = "<unknown>";
+    unused const char8-t* sname = "<unknown>";
 #if USE-DLADDR
     Dl-info dli = {0};  int-t n = dladdr((const void*)msg-callback, &dli);
     if (0 != n && dli.dli-saddr == msg-callback)

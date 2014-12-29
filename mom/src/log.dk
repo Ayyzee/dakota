@@ -23,7 +23,7 @@ include <sys/types.h>;
 include <time.h>;
 include <unistd.h>;
 
-#ifndef __STDC-FORMAT-MACROS
+#if !defined __STDC-FORMAT-MACROS
 #define __STDC-FORMAT-MACROS
 #endif //__STDC-FORMAT-MACROS
 include <inttypes.h>;
@@ -63,7 +63,7 @@ static void __attribute__((constructor)) initializer()
   char8-t* hexstr = sys:getenv("DE_LOG_FLAGS");
 
   if (NULL != hexstr) {
-    mom:log-flags = sys:strtoumax(hexstr, (char8-t**)NULL, 16);  zeroneen(errno);
+    mom:log-flags = sys:strtoumax(hexstr, cast(char8-t**)NULL, 16);  zeroneen(errno);
   } else {
     mom:log-flags = mom:default-log-flags;
   }

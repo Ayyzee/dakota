@@ -56,7 +56,7 @@ klass unnamed-pipe
 
     self.buf.capacity = 64 * 1024;
     self.buf.len = 0;
-    self.buf.ptr = (char8-t*)malloc(sizeof(char8-t) * self.buf.capacity);
+    self.buf.ptr = cast(char8-t*)malloc(sizeof(char8-t) * self.buf.capacity);
 
     self.event-handler[k-read] = make(handler:klass,
                                       object => self);
@@ -169,9 +169,9 @@ klass unnamed-pipe
     n = sys:close(self.fds[k-write]);  sc(n);
     self.fds[k-write] = -1;
     n = fd:add-nonblock(self.fds[k-read]); sc(n);
-    dk:callback=(self.event-handler[k-read], event-callback);
+    dk:set-callback(self.event-handler[k-read], event-callback);
 //     assert(self == self.event-handler[k-read].self);
-    dk:udata=(self.event-handler[k-read], udata);
+    dk:set-udata(self.event-handler[k-read], udata);
     object-t eq = dk:get-current(event-queue:klass);
     n = dk:add(eq, event:k-read, self.fds[k-read], self.event-handler[k-read]);  sc(n);
     MOM-LOG-FD("fd=%i #parent-read-fd", self.fds[k-read]);
@@ -186,9 +186,9 @@ klass unnamed-pipe
     n = sys:close(self.fds[k-read]);  sc(n);
     self.fds[k-read] = -1;
     n = fd:add-nonblock(self.fds[k-write]); sc(n);
-    dk:callback=(self.event-handler[k-write], event-callback);
+    dk:set-callback(self.event-handler[k-write], event-callback);
 //     assert(self == self.event-handler[k-write].self);
-    dk:udata=(self.event-handler[k-write], udata);
+    dk:set-udata(self.event-handler[k-write], udata);
     object-t eq = dk:get-current(event-queue:klass);
     n = dk:add(eq, event:k-write, self.fds[k-write], self.event-handler[k-write]);  sc(n);
     MOM-LOG-FD("fd=%i #parent-write-fd", self.fds[k-write]);

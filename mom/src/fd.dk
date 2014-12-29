@@ -53,7 +53,7 @@ klass fd
 {
   slots int-t;
 
-  export method int-t add-nonblock(slots-t fd)
+  method int-t add-nonblock(slots-t fd)
   {
     int-t flags, n;
     flags = n = sys:fcntl(fd, F-GETFL, 0);
@@ -64,7 +64,7 @@ klass fd
     return n;
   }
 
-  export method slots-t dump(slots-t fd)
+  method slots-t dump(slots-t fd)
   {
     struct stat st;
     int-t n;

@@ -74,9 +74,9 @@ klass event
     EV-SET(s, ~0, event:k-null, 0, 0, 0, NULL); // ident = -1, filter = 0, data = 0
 #else
 #if HAVE-EPOLL
-    dk:filter=(s, event:k-null);
-    dk:ident=(s, ~0);
-    dk:data=(s, 0);
+    dk:set-filter(s, event:k-null);
+    dk:set-ident(s, ~0);
+    dk:set-data(s, 0);
 #endif
 #endif
     return s;
@@ -89,7 +89,7 @@ klass event
     return self;
   }
 
-  method int16-t filter=(slots-t* s, int16-t filter)
+  method int16-t set-filter(slots-t* s, int16-t filter)
   {
 #if HAVE-KQUEUE
     s->filter = filter;
@@ -132,9 +132,9 @@ klass event
     EV-SET(s, ident, filter, 0, 0, 0, udata);
 #else
 #if HAVE-EPOLL
-    dk:filter=(s, filter);
-    dk:ident=(s, ident);
-    dk:data=(s, event:k-null);
+    dk:set-filter(s, filter);
+    dk:set-ident(s, ident);
+    dk:set-data(s, event:k-null);
 #endif
 #endif
     return s;
@@ -160,7 +160,7 @@ klass event
   {
 #if HAVE-KQUEUE
     MOM-LOG-INFO("ident=%u, filter=%i, flags=0x%x, fflags=0x%x, data=%u, udata=%p",
-            (uint-t)self.ident, self.filter, self.flags, self.fflags, (int)self.data, self.udata);
+            cast(uint-t)self.ident, self.filter, self.flags, self.fflags, cast(int-t)self.data, self.udata);
 #else
 #if HAVE-EPOLL
     char8-t buf[64];
@@ -198,7 +198,7 @@ klass event
     return result;
   }
   
-  method uint32-t ident=(slots-t* s, uint32-t ident)
+  method uint32-t set-ident(slots-t* s, uint32-t ident)
   {
 #if HAVE-KQUEUE
     s->ident = ident;
@@ -212,7 +212,7 @@ klass event
     return ident;
   }
   
-  method uint32-t data=(slots-t* s, uint32-t data)
+  method uint32-t set-data(slots-t* s, uint32-t data)
   {
 #if HAVE-KQUEUE
     s->data = data;

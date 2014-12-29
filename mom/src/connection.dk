@@ -141,10 +141,10 @@ klass connection
     return self;
   }
 
-  method callback-t rcv-msg-callback=(object-t self, callback-t rcv-msg-callback)
+  method callback-t set-rcv-msg-callback(object-t self, callback-t rcv-msg-callback)
   {
   //MOM-LOG(mom:LOG-GENERIC-FLAG, "  rcv-msg-callback=%p", rcv-msg-callback);
-    dk:callback=(self.rcv-msg-handler, rcv-msg-callback);
+    dk:set-callback(self.rcv-msg-handler, rcv-msg-callback);
     return rcv-msg-callback;
   }
 
@@ -172,19 +172,19 @@ klass connection
     return result;
   }
 
-  method callback-t read-event-callback=(object-t self, callback-t read-event-callback)
+  method callback-t set-read-event-callback(object-t self, callback-t read-event-callback)
   {
   //MOM-LOG(mom:LOG-GENERIC-FLAG, "  read-event-callback=%p", read-event-callback);
-    dk:callback=(self.read-event-handler, read-event-callback);
+    dk:set-callback(self.read-event-handler, read-event-callback);
     object-t eq = dk:get-current(event-queue:klass);
     dk:add(eq, event:k-read, self.fd, self.read-event-handler);
     return read-event-callback;
   }
 
-  method callback-t write-event-callback=(object-t self, callback-t write-event-callback)
+  method callback-t set-write-event-callback(object-t self, callback-t write-event-callback)
   {
   //MOM-LOG(mom:LOG-GENERIC-FLAG, "  write-event-callback=%p", write-event-callback);
-    dk:callback=(self.write-event-handler, write-event-callback);
+    dk:set-callback(self.write-event-handler, write-event-callback);
     return write-event-callback;
   }
 
@@ -192,10 +192,11 @@ klass connection
   {
     assert(NULL != msg-callback);
     assert(NULL != msg);
-    __unused const char8-t* sname = "<unknown>";
+    unused const char8-t* sname = "<unknown>";
 #if USE-DLADDR
-    Dl-info dli = {0};  int-t n = dladdr((const void*)msg-callback, &dli);
-    if (0 != n && dli.dli-saddr == msg-callback)
+    Dl-info dli = {nullptr, nullptr, nullptr, nullptr};
+    int-t n = dladdr(cast(const void*)msg-callback, &dli);
+    if (0 != n && dli.dli-saddr == cast(void*)msg-callback)
       sname = dli.dli-sname;
     else
       MOM-LOG-WARNING-DL();
@@ -216,7 +217,7 @@ klass connection
     return self;
   }
 
-  export method object-t write-event-callback(object-t self, object-t event)
+  method object-t write-event-callback(object-t self, object-t event)
   {
     MOM-LOG-CALLBACK("fd=%i %s:%s()", self.fd, __klass__, __func__);
     assert(true == self.write-is-enabled);
@@ -232,13 +233,13 @@ klass connection
         MOM-LOG-SND-MSG("fd=%i connection-snd-msg(\"%.*s\")", self.fd, dk:buf(msg).len, dk:buf(msg).ptr);
 #if 1
         cstring-t msg-buf = dk:buf(msg);
-        int32-t len = sys:write(self.fd, msg-buf.ptr, msg-buf.len); nbsc(len);
-        assert(-1 != len);
+        ssize-t len = sys:write(self.fd, msg-buf.ptr, msg-buf.len); nbsc(len);
+        assert(-1 < len);
         assert(msg-buf.len == cast(uint32-t)len);
 //         MOM-LOG-WRITE("%i: connection-write(\"%.*s\", %i) = %i",
 //                      self.fd, len, msg->buf.ptr, msg->buf.len, len);
 #else
-        int32-t len = sys:write(self.fd, self.write-buf.ptr, self.write-buf.len); nbsc(len);
+        ssize-t len = sys:write(self.fd, self.write-buf.ptr, self.write-buf.len); nbsc(len);
 //         MOM-LOG(mom:LOG-GENERIC-FLAG, "write(%i, \"%.*s\", %i) = %i",
 //                self.fd, len, self.write-buf, self.write-buf.len, len);
         self.write-buf.len -= len;
@@ -262,7 +263,7 @@ klass connection
     return self;
   }
 
-  export method object-t read-event-callback(object-t self, object-t event)
+  method object-t read-event-callback(object-t self, object-t event)
   {
     MOM-LOG-CALLBACK("fd=%i %s:%s()", self.fd, __klass__, __func__);
 //   MOM-LOG(mom:LOG-GENERIC-FLAG, "  event->data = %li", event->data);
@@ -272,7 +273,7 @@ klass connection
                              self.read-buf.capacity - self.read-buf.len); nbsc(len);
 #else
       int32-t flags;
-      int32-t len = in4-recvfrom(self.fd, self.read-buf.ptr + self.read-buf.len,
+      ssize-t len = in4-recvfrom(self.fd, self.read-buf.ptr + self.read-buf.len,
                                   self.read-buf.capacity - self.read-buf.len,
                                   flags = 0, &self.peer);  nbsc(len);
       //sin-ntoh(&self.peer);
@@ -291,8 +292,7 @@ klass connection
           read-error-count = 0;
         }
       }
-      else
-      if (0 == len) {
+      else if (0 == len) {
           MOM-LOG-EOF("fd=%i #EOF on read connection", self.fd);
           dk:delayed-free(self);
       } else {
@@ -300,7 +300,7 @@ klass connection
 //                     self.fd, len, self.read-buf.ptr + self.read-buf.len, len);
         self.read-buf.len += len;
         object-t rcv-msg;
-        while (NULL != (rcv-msg = dk:deserialize(msg:klass, self.read-buf.ptr, &self.read-buf.len))) {
+        while (NULL != (rcv-msg = dk:deserialize(msg:klass, self.read-buf.ptr, cast(size-t*)&self.read-buf.len))) {
           MOM-LOG-RCV-MSG("fd=%i connection-rcv-msg(\"%.*s\")",
                          self.fd, dk:buf(rcv-msg).len, dk:buf(rcv-msg).ptr);
           dk:invoke(self.rcv-msg-handler, rcv-msg);
@@ -323,13 +323,13 @@ klass connection
     int32-t n = in4-getpeername(self.fd, &self.peer);  sc(n);
     MOM-LOG-INFO("fd=%i connect() completed", self.fd);
     //fd:dump(self.fd);
-    dk:write-event-callback=(self, write-event-callback);
+    dk:set-write-event-callback(self, write-event-callback);
     if (false == self.write-is-enabled && NULL != dk:first(self.snd-msgs))
       dk:enable-write-event-handler(self);
     return self;
   }
 
-  export method object-t connect-write-event-callback(object-t self, object-t event)
+  method object-t connect-write-event-callback(object-t self, object-t event)
   {
     //assert(dk:ident(event) == self.fd);
     MOM-LOG-CALLBACK("fd=%i %s:%s()", self.fd, __klass__, __func__);
@@ -343,7 +343,7 @@ klass connection
     return self;
   }
 
-  export method object-t accept-read-event-callback(object-t self, object-t event)
+  method object-t accept-read-event-callback(object-t self, object-t event)
   {
     xsockaddr-in4-t sin = xsockaddr-in4-create(xin4-addr:k-any, 0);
 
@@ -377,12 +377,12 @@ klass connection
 
     self.write-buf.len = 0;
     self.write-buf.capacity = write-buf-capacity;
-    self.write-buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * self.write-buf.capacity);
+    self.write-buf.ptr = cast(char8-t*)sys:malloc(sizeof(char8-t) * self.write-buf.capacity);
     // bugbug
     
     self.read-buf.len = 0;
     self.read-buf.capacity = read-buf-capacity;
-    self.read-buf.ptr = (char8-t*)sys:malloc(sizeof(char8-t) * self.read-buf.capacity);
+    self.read-buf.ptr = cast(char8-t*)sys:malloc(sizeof(char8-t) * self.read-buf.capacity);
     // bugbug
     
     self.snd-msgs = make(deque:klass);
@@ -390,12 +390,12 @@ klass connection
     self.sin =  xsockaddr-in4-create(xin4-addr:k-none, 0);
     self.peer = xsockaddr-in4-create(xin4-addr:k-none, 0);
     
-    self.addrstr[0] = (char8-t)0;
+    self.addrstr[0] = cast(char8-t)0;
     
     self.write-is-enabled = false;
 
 //     self.error.num = 0;
-//     self.error.str[0] = (char8-t)0;
+//     self.error.str[0] = cast(char8-t)0;
 
     return self;
   }
@@ -408,7 +408,7 @@ klass connection
 //     if (NULL == str)
 //       str = "";
 //     sys:strncpy(self.error.str, str, sizeof(self.error.str));
-//     self.error.str[sizeof(self.error.str) - (1)] = (char8-t)0;
+//     self.error.str[sizeof(self.error.str) - (1)] = cast(char8-t)0;
 //     return -1;
 //   }
 
@@ -423,25 +423,25 @@ klass connection
     switch (state)
     {
       case connection:k-accept:
-        dk:read-event-callback=(self,  accept-read-event-callback);
-        dk:write-event-callback=(self, write-event-callback);
+        dk:set-read-event-callback(self,  accept-read-event-callback);
+        dk:set-write-event-callback(self, write-event-callback);
         break;
       case connection:k-connect:
-        dk:read-event-callback=(self,  read-event-callback);
-        dk:write-event-callback=(self, connect-write-event-callback);
+        dk:set-read-event-callback(self,  read-event-callback);
+        dk:set-write-event-callback(self, connect-write-event-callback);
         dk:enable-write-event-handler(self);
         break;
       case connection:k-read:
 //         peer-size = sizeof(self.peer);
 //         n = in4-getpeername(self.fd, &self.peer);  sc(n);
-        dk:read-event-callback=(self,  read-event-callback);
-        dk:write-event-callback=(self, write-event-callback);
+        dk:set-read-event-callback(self,  read-event-callback);
+        dk:set-write-event-callback(self, write-event-callback);
         break;
       case connection:k-write:
 //         peer-size = sizeof(self.peer);
 //         n = in4-getpeername(self.fd, &self.peer);  sc(n);
-        dk:read-event-callback=(self,  read-event-callback);
-        dk:write-event-callback=(self, write-event-callback);
+        dk:set-read-event-callback(self,  read-event-callback);
+        dk:set-write-event-callback(self, write-event-callback);
         break;
       default:
       {
@@ -449,7 +449,7 @@ klass connection
         goto __failure;
       }
     }
-    MOM-LOG-CREATE("fd=%i %s:%s() = 0x%08x", self.fd, __klass__, __func__, (uint32-t)self);
+    MOM-LOG-CREATE("fd=%i %s:%s() = 0x%08x", self.fd, __klass__, __func__, cast(uintptr-t)self);
     return fd;
     __failure:
     return -1;
@@ -547,7 +547,7 @@ klass connection
   {
     MOM-LOG(mom:LOG-GENERIC-FLAG, "fd=%i %s:%s()", self.fd, __klass__, __func__);
     MOM-LOG-CONN("fd=%i %s:%s()", self.fd, __klass__, __func__);
-    MOM-LOG-FREE("fd=%i %s:%s(0x%08x)", self.fd, __klass__, __func__, (uint32-t)self);
+    MOM-LOG-FREE("fd=%i %s:%s(0x%08x)", self.fd, __klass__, __func__, cast(uintptr-t)self);
     dk:close(self);
     self.snd-msgs = dk:free(self.snd-msgs);
 

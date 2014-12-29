@@ -33,7 +33,7 @@ klass pid
     k-untraced =  WUNTRACED
   }
 
-  export method pstatus:slots-t wait(slots-t s, pid:options-t options)
+  method pstatus:slots-t wait(slots-t s, pid:options-t options)
   {
     pstatus:slots-t status;
     slots-t result = waitpid(s, &status, options);

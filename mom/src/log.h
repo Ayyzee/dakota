@@ -86,9 +86,9 @@ namespace mom
 } // namespace mom
 
 #if USE_SYSLOG
-#define MOM_LOG_INFO(...)    SYS::syslog(LOG_INFO    | LOG_DAEMON, __VA_ARGS__)
-#define MOM_LOG_WARNING(...) SYS::syslog(LOG_WARNING | LOG_DAEMON, __VA_ARGS__)
-#define MOM_LOG_ERROR(...)   SYS::syslog(LOG_ERR     | LOG_DAEMON, __VA_ARGS__)
+#define MOM_LOG_INFO(...)    syslog(LOG_INFO    | LOG_DAEMON, __VA_ARGS__)
+#define MOM_LOG_WARNING(...) syslog(LOG_WARNING | LOG_DAEMON, __VA_ARGS__)
+#define MOM_LOG_ERROR(...)   syslog(LOG_ERR     | LOG_DAEMON, __VA_ARGS__)
 #else
 
 #define MOM_LOG_INFO(...)    mom::syslog(LOG_INFO    | LOG_DAEMON, __VA_ARGS__)

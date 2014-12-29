@@ -18,7 +18,7 @@ include <string.h>;
 
 include "config.h";
 
-#ifndef HAVE-GETPROGNAME
+#if !defined HAVE-GETPROGNAME
 extern const char8-t* __progname = "";
 
 const char8-t* getprogname()
