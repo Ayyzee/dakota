@@ -7,7 +7,7 @@ include $(rootdir)/vars.mk
 
 DAKOTA_VARS += DK_PREFIX=$(rootdir)
 
-EXTRA_DAKOTAFLAGS +=\
+EXTRA_DAKOTAFLAGS :=\
  --include-directory=.\
  --include-directory=../include\
 

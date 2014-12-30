@@ -780,7 +780,7 @@ sub exported_enum_body {
 }
 sub remove_exported_enum {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(export)(\s+enum)(\s*$k*)(\s*)(\{.*?\}\s*;)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
+  $$filestr_ref =~ s/(export)(\s+enum)(\s*$k*)(\s*)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
 }
 # method init( ... , object-t $arg1, object-t $arg2 = ...) {|;
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;

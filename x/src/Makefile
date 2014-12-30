@@ -7,8 +7,9 @@ include $(rootdir)/vars.mk
 
 DAKOTA_VARS += DK_PREFIX=$(rootdir)
 
-EXTRA_DAKOTAFLAGS +=\
+EXTRA_DAKOTAFLAGS :=\
  --include-directory=.\
+ --include-directory=../include\
 
 ../lib/$(lib_prefix)%.$(SO_EXT):
 	$(DAKOTA) --shared --output $@ --name $(libdir)/$(@F) --var MAKEFLAGS="$(MAKEFLAGS)" $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $^

@@ -1706,8 +1706,7 @@ sub generics::klass_type_from_klass_name {
     $klass_type = 'trait';
   } else {
     my $rep_path_var = [join ':', @{$$global_root_cmd{'reps'}}];
-    print STDERR __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
-    die __FILE__, ":", __LINE__, ": error:\n";
+    die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
   }
   return $klass_type;
 }
@@ -1722,8 +1721,7 @@ sub generics::klass_scope_from_klass_name {
     $klass_scope = $$global_rep{'traits'}{$klass_name};
   } else {
     my $rep_path_var = [join ':', @{$$global_root_cmd{'reps'}}];
-    print STDERR __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
-    die __FILE__, ":", __LINE__, ": error:\n";
+    die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
   }
   return $klass_scope;
 }

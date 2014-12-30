@@ -3,7 +3,7 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-EXTRA_DAKOTAFLAGS += --include-directory .
+EXTRA_DAKOTAFLAGS := --include-directory .
 
 fail_exe_files := fail-exe-files.mk
 
@@ -14,6 +14,9 @@ fail_exe_files := fail-exe-files.mk
 	$(DAKOTA) --shared --directory $(dir $@) --output $(notdir $@) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
 
 %/lib-2.$(SO_EXT): %/lib-2.dk %/module-lib-2.dk
+	$(DAKOTA) --shared --directory $(dir $@) --output $(notdir $@) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
+
+%/lib-3.$(SO_EXT): %/lib-3.dk %/module-lib-3.dk
 	$(DAKOTA) --shared --directory $(dir $@) --output $(notdir $@) $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $(notdir $^) /usr/local/lib/libdakota-util.$(SO_EXT)
 
 should_pass_file := should-pass.mk
