@@ -6,8 +6,8 @@ include $(rootdir)/vars.mk
 
 #export DK_ABS_PATH :=
 
-#target := $(shell dk-project --var SO_EXT=$(SO_EXT) --abs-path name)
-#prereq := $(shell dk-project --var SO_EXT=$(SO_EXT) --abs-path files)
+#target := $(shell dakota-project --var SO_EXT=$(SO_EXT) --abs-path name)
+#prereq := $(shell dakota-project --var SO_EXT=$(SO_EXT) --abs-path files)
 
 target := $(shell dakota-project --var SO_EXT=$(SO_EXT) name)
 prereq := $(shell dakota-project --var SO_EXT=$(SO_EXT) files)

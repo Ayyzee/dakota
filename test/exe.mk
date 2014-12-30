@@ -1,4 +1,4 @@
-rootdir := $(shell dk-rootdir.pl $(rootdir))
+rootdir := $(shell dakota-rootdir.pl $(rootdir))
 
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
@@ -18,7 +18,7 @@ all: $(target)
 $(target): $(prereq)
 
 check:
-	@if [ -e $@.sh ]; then ./$@.sh; else name=`dk-project name`; LD_LIBRARY_PATH=. ./$$name; fi
+	@if [ -e $@.sh ]; then ./$@.sh; else name=`dakota-project name`; LD_LIBRARY_PATH=. ./$$name; fi
 
 clean:
 	rm -rf obj exe lib-1.$(SO_EXT) lib-2.$(SO_EXT)

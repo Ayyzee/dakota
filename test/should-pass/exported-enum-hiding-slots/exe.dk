@@ -7,7 +7,7 @@ klass k1
     k-e0 = 0,
     k-e1 = 1,
     k-e2 = 2
-  }
+  };
 
   slots
   {

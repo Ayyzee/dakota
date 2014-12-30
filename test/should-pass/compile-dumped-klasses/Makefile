@@ -7,10 +7,10 @@ $(target): $(prereq) lib.dk
 	dakota --output $@ $^ $(libdir)/libdakota-util.$(SO_EXT)
 
 lib.dk:
-	dakota-introspector --output $@ $(libdir)/libdakota-util.$(SO_EXT)
+	dakota-info --output $@ $(libdir)/libdakota-util.$(SO_EXT)
 
 check:
-	dakota-introspector --output dumped-lib.dk $(target)
+	dakota-info --output dumped-lib.dk $(target)
 	diff --minimal lib.dk dumped-lib.dk; exit 0
 
 clean:
