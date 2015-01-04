@@ -833,7 +833,7 @@ dump-klass-defns(ofile-t ofl, named-info-node-t* registration-info, const char8-
   assert(8 > ofl.col);
   assert(nullptr != registration-info);
 
-  const char8-t* output-dir = getenv("DKT_INTROSPECTOR_OUTPUT_DIRECTORY");
+  const char8-t* output-dir = getenv("DKT_INFO_OUTPUT_DIRECTORY");
   named-info-node-t* klass-defns = cast(named-info-node-t*)named-info-node:at(registration-info, $klass-defns);
 
   if (nullptr != klass-defns) {
@@ -1227,7 +1227,7 @@ dk-register-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
-  const char8-t* output-path = getenv("DKT_INTROSPECTOR_OUTPUT");
+  const char8-t* output-path = getenv("DKT_INFO_OUTPUT");
   if (NULL != output-path) {
     if (NUL == output-path[0]) // empty-string ("") means use default-value
       ctlg-output = stdout;
@@ -1236,9 +1236,9 @@ dk-register-info(named-info-node-t* registration-info)
   }
 
   if (nullptr != ctlg-output) {
-    boole-t        ctlg-recursive = getenv-boole("DKT_INTROSPECTOR_RECURSIVE", false);
-    const char8-t* ctlg-only =      getenv("DKT_INTROSPECTOR_ONLY");
-    const char8-t* ctlg-arg =       getenv("DKT_INTROSPECTOR_ARG");
+    boole-t        ctlg-recursive = getenv-boole("DKT_INFO_RECURSIVE", false);
+    const char8-t* ctlg-only =      getenv("DKT_INFO_ONLY");
+    const char8-t* ctlg-arg =       getenv("DKT_INFO_ARG");
     ofile-t ofl = {ctlg-output, 0};
 
     symbol-t name = name-from-info(registration-info);
@@ -1284,7 +1284,7 @@ export void
 dk-deregister-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
-  if (NULL != getenv("DKT_INTROSPECTOR_OUTPUT") ||
+  if (NULL != getenv("DKT_INFO_OUTPUT") ||
       NULL != getenv("DKT_NO_INIT_RUNTIME"))
     return;
   named-info-node:sort(registration-info);
@@ -1335,6 +1335,7 @@ export object-t
 dk-klass-for-name(symbol-t klass-name)
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s']", __func__, klass-name);
+  assert(nullptr != klass-name);
   named-info-node-t* klass-info-slots = info-for-name(klass-name);
   assert($trait != cast(symbol-t)named-info-node:at(klass-info-slots, $construct));
   assoc-node-t* klass-assoc = imported-klasses-for-klass(klass-name);
