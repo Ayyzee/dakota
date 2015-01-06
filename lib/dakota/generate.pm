@@ -318,6 +318,9 @@ sub generate_nrt {
     #print "    creating $output\n"; # nrt-cxx
     $result = &generate_decl_defn($file, $generics, $symbols, 'cxx');
 
+    my $stack; my $col;
+    $$result{'klasses-cxx'} = &dk::generate_cxx_footer($file, $stack = [], $col = '');
+
     my $str_cxx = &labeled_src_str(undef, "nrt-cxx");
     $str_cxx .=
       "\n" .
@@ -325,7 +328,7 @@ sub generate_nrt {
       "\n" .
       &user_code_cxx($name) .
       "\n" .
-      &labeled_src_str($defn_tbl, "klasses-cxx"); ###
+      &labeled_src_str($result, "klasses-cxx"); ###
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
@@ -500,8 +503,6 @@ sub generate_defn_footer {
     $col = &colout($col);
     $rt_cxx_str .= $col . "};\n";
   }
-  my $scratch_str = '';
-  &set_global_scratch_str_ref(\$scratch_str);
   $rt_cxx_str .= &dk::generate_cxx_footer($file, $stack, $col);
   #$rt_cxx_str .= $col . "extern \"C\"\n";
   #$rt_cxx_str .= $col . "{\n";
@@ -3712,6 +3713,7 @@ sub generate_ka_method_defn {
 }
 sub dk::generate_cxx_footer {
   my ($scope, $stack, $col) = @_;
+  my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   &dk::generate_ka_method_defns($scope, $stack, 'trait', $col);
   &dk::generate_ka_method_defns($scope, $stack, 'klass', $col);
