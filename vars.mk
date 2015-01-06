@@ -52,7 +52,7 @@ DAKOTA_VARS =
 DAKOTA_VARS += CXX=$(CXX)
 DAKOTA_VARS += SO_EXT=$(SO_EXT)
 
-DAKOTA ?= $(DAKOTA_VARS) $(BINDIR)/dakota #--keep-going
+DAKOTA ?= $(DAKOTA_VARS) $(BINDIR)/dakota --keep-going
 #DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota-profile
 DAKOTAFLAGS ?=
 INCLUDE_DAKOTAFLAGS :=\

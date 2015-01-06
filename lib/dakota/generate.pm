@@ -292,11 +292,10 @@ sub generate_nrt {
     #print "    creating $directory/$path/$name.$cxx_ext\n"; # nrt-cxx
     my $suffix = 'hxx';
 
-    my $str = &labeled_src_str(undef, "nrt-cxx");
+    my $str = &labeled_src_str(undef, "nrt-hxx");
     $str .=
       "\n" .
       &labeled_src_str($defn_tbl, "headers-hxx") .
-      &labeled_src_str($defn_tbl, "klasses-exported-headers-hxx") .
       &hardcoded_typedefs() .
       &labeled_src_str($defn_tbl, "klasses-hxx") .
       &labeled_src_str($defn_tbl, "symbols-$suffix") .
@@ -307,10 +306,16 @@ sub generate_nrt {
       &labeled_src_str($defn_tbl, "selectors-seq-$suffix") .
       &labeled_src_str($defn_tbl, "signatures-$suffix") .
       &labeled_src_str($defn_tbl, "signatures-seq-$suffix") .
-      &labeled_src_str($defn_tbl, "generics-$suffix") .
+      &labeled_src_str($defn_tbl, "generics-$suffix");
+
+    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str ], undef);
+
+    $str = &labeled_src_str(undef, "nrt-cxx");
+    $str .=
+      "\n" .
+      "#include \"$name.$hxx_ext\"\n" .
       &user_code_cxx($name) .
-      &labeled_src_str($defn_tbl, "klasses-cxx") .
-      "\n";
+      &labeled_src_str($defn_tbl, "klasses-cxx");
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str ], undef);
@@ -353,7 +358,7 @@ sub generate_rt {
     my $str = &labeled_src_str(undef, "rt-cxx");
     $str .=
       "\n" .
-      &labeled_src_str($defn_tbl, "klasses-exported-headers-hxx") . ###
+      &labeled_src_str($defn_tbl, "headers-hxx") . ###
       &hardcoded_typedefs() .
       &labeled_src_str($defn_tbl, "klasses-hxx") . ###
       &labeled_src_str($result, "symbols-$suffix") .
@@ -406,7 +411,6 @@ sub generate_decl_defn {
   my ($file, $generics, $symbols, $suffix, $result) = @_;
   my $col = '';
   my $headers_hxx_str = '';
-  my $klasses_exported_headers_hxx_str = '';
   my $klasses_str = '';
   my $symbols_str = '';
   my $strings_str = '';
@@ -420,7 +424,6 @@ sub generate_decl_defn {
 
   &set_global_scratch_str_ref(\$klasses_str);
   $headers_hxx_str .= &linkage_unit::generate_headers($file);
-  $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
   $klasses_str = &linkage_unit::generate_klasses($file, $col, []);
 
   &set_global_scratch_str_ref(\$generics_str);
@@ -438,7 +441,6 @@ sub generate_decl_defn {
   $signatures_seq_str .= &linkage_unit::generate_signatures_seq($file, $generics);
 
   $$result{"headers-hxx"} =                  $headers_hxx_str;
-  $$result{"klasses-exported-headers-hxx"} = $klasses_exported_headers_hxx_str;
   $$result{"symbols-$suffix"} =              $symbols_str;
   $$result{"strings-$suffix"} =              $strings_str;
   $$result{"hashes-$suffix"} =               $hashes_str;
@@ -2332,17 +2334,6 @@ sub hardcoded_typedefs {
 }
 sub linkage_unit::generate_headers {
   my ($scope) = @_;
-  my $result = '';
-
-  if (&is_decl() || &is_rt_defn()) { # not sure if this is right
-    foreach my $header_name (sort keys %{$$scope{'headers'}}) {
-      $result .= "#include $header_name\n";
-    }
-  }
-  return $result;
-}
-sub linkage_unit::generate_klasses_exported_headers {
-  my ($scope) = @_;
   my $klass_names = &order_klasses($scope);
   my $result = '';
 
@@ -2358,7 +2349,15 @@ sub linkage_unit::generate_klasses_exported_headers {
         $$exported_headers{$header}{$klass_name} = undef;
       }
     }
-    foreach my $header_name (sort keys %$exported_headers) {
+    my $all_headers = {};
+    my $header_name;
+    foreach $header_name (keys %{$$scope{'headers'}}) {
+      $$all_headers{$header_name} = 1;
+    }
+    foreach $header_name (keys %$exported_headers) {
+      $$all_headers{$header_name} = 1;
+    }
+    foreach $header_name (sort keys %$all_headers) {
       $result .= "#include $header_name\n";
     }
   }
