@@ -95,10 +95,10 @@ sub user_code_cxx {
   my ($name) = @_;
   if (exists $ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
-    return "include \"$cwd/obj/$name.$cxx_ext\";\n";
+    return "\n#include \"$cwd/obj/$name.$cxx_ext\"\n\n";
   } else {
     # should not be hardcoded
-    return "include \"../$name.$cxx_ext\";\n";
+    return "\n#include \"../$name.$cxx_ext\"\n\n";
   }
 }
 sub make_ident_symbol_scalar {
@@ -295,6 +295,7 @@ sub generate_nrt {
     my $str = &labeled_src_str(undef, "nrt-cxx");
     $str .=
       "\n" .
+      &labeled_src_str($defn_tbl, "headers-hxx") .
       &labeled_src_str($defn_tbl, "klasses-exported-headers-hxx") .
       &hardcoded_typedefs() .
       &labeled_src_str($defn_tbl, "klasses-hxx") .
@@ -404,6 +405,7 @@ sub colout {
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $suffix, $result) = @_;
   my $col = '';
+  my $headers_hxx_str = '';
   my $klasses_exported_headers_hxx_str = '';
   my $klasses_str = '';
   my $symbols_str = '';
@@ -417,6 +419,7 @@ sub generate_decl_defn {
   my $generics_str = '';
 
   &set_global_scratch_str_ref(\$klasses_str);
+  $headers_hxx_str .= &linkage_unit::generate_headers($file);
   $klasses_exported_headers_hxx_str .= &linkage_unit::generate_klasses_exported_headers($file);
   $klasses_str = &linkage_unit::generate_klasses($file, $col, []);
 
@@ -434,6 +437,7 @@ sub generate_decl_defn {
   $signatures_str .= &linkage_unit::generate_signatures($file, $generics);
   $signatures_seq_str .= &linkage_unit::generate_signatures_seq($file, $generics);
 
+  $$result{"headers-hxx"} =                  $headers_hxx_str;
   $$result{"klasses-exported-headers-hxx"} = $klasses_exported_headers_hxx_str;
   $$result{"symbols-$suffix"} =              $symbols_str;
   $$result{"strings-$suffix"} =              $strings_str;
@@ -2326,6 +2330,17 @@ sub hardcoded_typedefs {
   $result .= "\n";
   return $result;
 }
+sub linkage_unit::generate_headers {
+  my ($scope) = @_;
+  my $result = '';
+
+  if (&is_decl() || &is_rt_defn()) { # not sure if this is right
+    foreach my $header_name (sort keys %{$$scope{'headers'}}) {
+      $result .= "#include $header_name\n";
+    }
+  }
+  return $result;
+}
 sub linkage_unit::generate_klasses_exported_headers {
   my ($scope) = @_;
   my $klass_names = &order_klasses($scope);
@@ -2344,7 +2359,7 @@ sub linkage_unit::generate_klasses_exported_headers {
       }
     }
     foreach my $header_name (sort keys %$exported_headers) {
-      $result .= "include $header_name;\n";
+      $result .= "#include $header_name\n";
     }
   }
   return $result;
@@ -2583,8 +2598,8 @@ sub linkage_unit::generate_klasses {
   &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
   if (&is_decl()) {
     $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "include <dakota.h>;\n";
-    $$scratch_str_ref .= $col . "include <dakota-log.h>;\n";
+    $$scratch_str_ref .= $col . "#include <dakota.h>\n";
+    $$scratch_str_ref .= $col . "#include <dakota-log.h>\n";
     $$scratch_str_ref .= "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");

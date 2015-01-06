@@ -582,6 +582,11 @@ sub add_exported_header {
   my ($tkn) = @_;
   $$gbl_root{'exported-headers'}{$tkn} = {};
 }
+sub header {
+  my $tkn = &match_any();
+  &match(__FILE__, __LINE__, ';');
+  $$gbl_root{'headers'}{$tkn} = 1;
+}
 sub exported_header {
   my $tkn = &match_any();
   &match(__FILE__, __LINE__, ';');
@@ -958,6 +963,22 @@ sub finalize {
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
   }
   return;
+}
+sub include {
+  &match(__FILE__, __LINE__, 'include');
+
+  for (&sst_cursor::current_token($gbl_sst_cursor)) {
+    if (m/^"$h+"$/) {
+      &header();
+      last;
+    }
+    if (m/^<$h+>$/) {
+      &header();
+      last;
+    }
+
+    $$gbl_sst_cursor{'current-token-index'}++;
+  }
 }
 sub export {
   &match(__FILE__, __LINE__, 'export');
@@ -1954,6 +1975,10 @@ sub parse_root {
   # root
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
+      if (m/^include$/) {
+        &include();
+        last;
+      }
       if (m/^module$/) {
         &module_statement();
         last;

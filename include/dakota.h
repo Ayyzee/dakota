@@ -20,9 +20,12 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstdio>
-
 #include <cstdarg> // va_list
 #include <cstdint>
+
+#if defined WIN32
+  #include <windows.h>
+#endif // WIN32
 
 #if defined DEBUG
   #define DEBUG_STMT(stmt) stmt
@@ -49,6 +52,7 @@
   #define nothrow
   #define hot
   #define designated_init
+  #define noreturn
 #else
   #define format_va_printf(fmtarg) __attribute__((__format__(__printf__, fmtarg, 0)))
   #define format_va_scanf(fmtarg)  __attribute__((__format__(__scanf__,  fmtarg, 0)))
@@ -66,6 +70,11 @@
   #define nothrow    __attribute__((__nothrow__))
   #define hot        __attribute__((__hot__))
   #define designated_init __attribute__((__designated_init__))
+  #if 0
+    #define noreturn  __attribute__((__noreturn__))
+  #else
+    #define noreturn [[noreturn]]
+  #endif
 #endif
 
 #define unbox_attrs pure hot nothrow
@@ -74,15 +83,10 @@
   export const char8_t* strerror_name(int_t errno);
 #endif
 
-//#define DKT_DUMP_MEM_FOOTPRINT
-
 #if !defined USE
   #define    USE(v) (void)v
 #endif
 
-//static_cast<double>(4)
-//       cast(double)(4)
-//       cast(double)4
 #define cast(t) (t)
 #define DK_ARRAY_LENGTH(array) (sizeof((array))/sizeof((array)[0]))
 
@@ -176,16 +180,11 @@ import object_t dk_klass_for_name(symbol_t);
 import void dk_register_info(named_info_node_t*);
 import void dk_deregister_info(named_info_node_t*);
 
-#if defined DEBUG
-  import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-  import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
-#endif
-
 sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
 sentinel import object_t           dk_make_named_info(symbol_t name, ...);
 
-[[noreturn]] import void dkt_throw(object_t exception);
-[[noreturn]] import void dkt_throw(const char8_t* exception_str);
+noreturn import void dkt_throw(object_t exception);
+noreturn import void dkt_throw(const char8_t* exception_str);
 
 // import object_t dk_va_add_all(object_t self, va_list_t);
 // sentinel import object_t dk_add_all(object_t self, ...);
@@ -194,7 +193,18 @@ import object_t*       dkt_current_exception();
 import const char8_t** dkt_current_exception_str();
 import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
+noreturn import void dkt_null_method(object_t object, ...);
+
 #if defined DEBUG
+  #define DKT_NULL_METHOD nullptr
+#else
+  #define DKT_NULL_METHOD dkt_null_method
+#endif
+
+#if defined DEBUG
+  import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
+  import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
+
   import int_t dkt_trace_before(const signature_t* signature, method_t method, super_t context, ...);
   import int_t dkt_trace_before(const signature_t* signature, method_t method, object_t object, ...);
   import int_t dkt_trace_after( const signature_t* signature, method_t method, super_t context, ...);
@@ -207,17 +217,8 @@ import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, sy
 
   import void dkt_dump_methods(object_t);
   import void dkt_dump_methods(klass::slots_t*);
-#endif
 
-#if defined DEBUG
   import void dkt_unbox_check(object_t object, object_t kls);
 #endif
 
-[[noreturn]] import void dkt_null_method(object_t object, ...);
-
-#if defined DEBUG
-  #define DKT_NULL_METHOD nullptr
-#else
-  #define DKT_NULL_METHOD dkt_null_method
-#endif
 #endif // __dakota_h__

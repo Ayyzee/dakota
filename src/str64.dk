@@ -15,10 +15,9 @@
 // limitations under the License.
 
 include <cstring>;
-
-include "dakota-private.h";
-
 include <cinttypes>;
+
+#include "dakota-private.h"
 
 module dakota;
 

@@ -12,5 +12,6 @@ export CXXFLAGS_WARNINGS_ALL :=\
  -Wno-global-constructors\
  -Wno-padded\
  -Wno-cast-align\
+ -Wno-disabled-macro-expansion\
 
 export LD_PRELOAD := DYLD_INSERT_LIBRARIES

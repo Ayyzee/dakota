@@ -294,8 +294,8 @@ sub rewrite_method_names_special {
 }
 sub rewrite_includes {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(?<!\#)( *include)(\s*\".*?\"\s*);|\#include$2|g;
-  $$filestr_ref =~ s|(?<!\#)( *include)(\s*<.*?>\s*);|\#include$2|g;
+  $$filestr_ref =~ s|(?<!\#)( *include)(\s*\".*?\"\s*);|/\*$1$2\*/|g;
+  $$filestr_ref =~ s|(?<!\#)( *include)(\s*<.*?>\s*);|/\*$1$2\*/|g;
 }
 sub rewrite_declarations {
   my ($filestr_ref) = @_;

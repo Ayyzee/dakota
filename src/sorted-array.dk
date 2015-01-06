@@ -17,7 +17,8 @@
 include <cassert>;
 include <cstdlib>;
 include <cstring>;
-include "sorted-array.h";
+
+#include "sorted-array.h"
 
 module dakota;
 

@@ -119,15 +119,16 @@ endif
  --warn-redundant-decls\
  --warn-switch-default\
 
-
 #diagnostics-format rhs = clang|msvc|vi
 
 EXTRA_CXXFLAGS += $(CXXFLAGS_WARNINGS_ALL)\
- --debug=3\
  --optimize=0\
- --define-macro DEBUG\
  --define-macro HAVE_CONFIG_H\
  --define-macro MOD_SIZE_CAST_HACK\
+
+EXTRA_CXXFLAGS += --debug=3 --define-macro DEBUG 
+
+#EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
 
 export CXX
 export CXXFLAGS

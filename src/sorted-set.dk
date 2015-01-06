@@ -18,7 +18,7 @@ include <cassert>;
 include <cstdlib>;
 include <cstring>;
 
-include "sorted-ptr-array.h";
+#include "sorted-ptr-array.h"
 
 #if DKT-WORKAROUND
 namespace sorted-ptr-array
@@ -252,7 +252,7 @@ klass sorted-set-forward-iterator
     return self;
   }
 
-  noexport void check-iterator-state(object-t self)
+  static void check-iterator-state(object-t self)
   {
     sorted-set:slots-t* ss = sorted-set:unbox(self.sorted-set);
 

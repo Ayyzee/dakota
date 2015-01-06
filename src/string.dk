@@ -17,10 +17,9 @@
 include <cassert>;
 include <cstdlib>;
 include <cstring>;
-
 include <cinttypes>;
 
-include "dakota-private.h";
+#include "dakota-private.h"
 
 // 2^32 - 5 = 4294967291 or 0xfffffffb
 const uintptr-t max-prime32 = 0xfffffffb;
@@ -36,8 +35,8 @@ klass string
     symbol-t encoding;
     char8-t* ptr;
     uint32-t len;
-  //uint32-t size; // sizeof(ptr[0])
   }
+  //uint32-t size; // sizeof(ptr[0])
 
   method object-t init(object-t self,
                        symbol-t       encoding => $utf-8,

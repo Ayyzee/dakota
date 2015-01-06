@@ -17,7 +17,7 @@
 include <cstdlib>;
 include <cstring>;
 
-include "dakota-private.h";
+#include "dakota-private.h"
 
 module dakota-util;
 

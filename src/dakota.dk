@@ -20,28 +20,21 @@ include <cstdio>;
 include <cstring>;
 include <exception>;
 include <sys/stat.h>; // struct stat, stat()
-
-include "dl.h"; // load-library()
-
 include <cinttypes>;
 
-#if defined WIN32
-include <windows.h>;
-#endif // WIN32
-
 #if HAVE-CONFIG-H
-include "config.h";
+  #include "config.h"
 #endif
+
+#include "dl.h" // load-library()
+#include "dakota-private.h"
+#include "dakota-log.h"
+#include "sorted-array.h"
+#include "sorted-ptr-array.h"
 
 #if !defined SO-EXT
 #define SO-EXT "so"
 #endif
-
-include "dakota-private.h";
-
-include "dakota-log.h";
-include "sorted-array.h";
-include "sorted-ptr-array.h";
 
 module dakota;
 

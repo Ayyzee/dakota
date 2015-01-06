@@ -17,6 +17,8 @@
 #if !defined __dakota_private_h__
 #define      __dakota_private_h__
 
+#include <dakota.h>
+
 noexport named_info_node_t* info_for_name(symbol_t);
 noexport assoc_node_t* imported_klasses_for_klass(symbol_t);
 

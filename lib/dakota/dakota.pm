@@ -623,12 +623,14 @@ sub exec_cmd {
     print STDERR "  $cmd_str\n";
   }
 
-  if ($ENV{'DKT_DIR'}) {
-    my $cwd = &getcwd();
-    open (STDERR, "|dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
-  }
-  else {
-    open (STDERR, "|dakota-fixup-stderr.pl") or die;
+  if (! $ENV{'DKT_NO_FIXUP_STDERR'}) {
+    if ($ENV{'DKT_DIR'}) {
+      my $cwd = &getcwd();
+      open (STDERR, "|dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
+    }
+    else {
+      open (STDERR, "|dakota-fixup-stderr.pl") or die;
+    }
   }
 
   my $exit_val = system($cmd_str);

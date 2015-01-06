@@ -20,13 +20,13 @@ include <cstring>;
 include <exception>;
 include <unistd.h>; // getpid()
 
-include "dakota-private.h";
+#if HAVE-CONFIG-H
+  #include "config.h"
+#endif
+
+#include "dakota-private.h"
 
 #define THROW throw // so the macro system won't rewrite
-
-#if HAVE-CONFIG-H
-include "config.h";
-#endif
 
 module dakota;
 
@@ -44,13 +44,13 @@ export const char8-t** dkt-current-exception-str()
   return &str;
 }
 
-[[noreturn]] export void dkt-throw(object-t exception)
+noreturn export void dkt-throw(object-t exception)
 {
   *dkt-current-exception() = exception;
   THROW exception; // this will not be rewritten
 }
 
-[[noreturn]] export void dkt-throw(const char8-t* exception-str)
+noreturn export void dkt-throw(const char8-t* exception-str)
 {
   *dkt-current-exception-str() = exception-str;
   THROW exception-str; // this will not be rewritten

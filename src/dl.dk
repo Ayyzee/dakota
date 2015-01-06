@@ -16,7 +16,7 @@
 
 include <dlfcn.h>; // struct Dl-info, dladdr()
 
-include "dl.h";
+#include "dl.h"
 
 // returns nullptr if no exact match
 noexport const char8-t*

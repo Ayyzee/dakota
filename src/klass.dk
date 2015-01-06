@@ -17,17 +17,16 @@
 include <cassert>;
 include <cstdio>;
 include <cstring>;
-
 include <cinttypes>;
 
 #if HAVE-CONFIG-H
-include "config.h";
+  #include "config.h"
 #endif
 
-include "dakota-private.h";
-include "dakota-log.h";
-include "sorted-array.h";
-include "dl.h"; // symbol-name-from-address()
+#include "dakota-private.h"
+#include "dakota-log.h"
+#include "sorted-array.h"
+#include "dl.h" // symbol-name-from-address()
 
 #define DKT-SET-METHOD-FOR-SELECTOR(methods, selector, method) (methods)->addrs[(selector)] = (method)
 #define DKT-METHOD-FOR-SELECTOR(methods, selector) (methods)->addrs[(selector)]
@@ -54,7 +53,7 @@ namespace klass
 }
 #endif
 
-[[noreturn]] export void dkt-null-method(object-t object, ...)
+noreturn export void dkt-null-method(object-t object, ...)
 {
   throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object));
 }
