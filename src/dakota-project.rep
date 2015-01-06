@@ -9,8 +9,8 @@
     'char8.dk',
     'collection.dk',
     'const-info.dk',
-    'counted-set.dk',
     'construct.dk',
+    'counted-set.dk',
     'dakota.dk',
     'deque.dk',
     'dl.dk',
@@ -26,10 +26,12 @@
     'int8.dk',
     'intmax.dk',
     'intptr.dk',
+    'keyword-exception.dk',
     'keyword.dk',
     'klass.dk',
     'method-alias.dk',
     'method.dk',
+    'missing-keyword-exception.dk',
     'module-dakota.dk',
     'named-enum-info.dk',
     'named-info-node.dk',
@@ -48,8 +50,8 @@
     'selector.dk',
     'sequence.dk',
     'set.dk',
-    'singleton-klass.dk',
     'signature.dk',
+    'singleton-klass.dk',
     'size.dk',
     'sorted-array.dk',
     'sorted-counted-set.dk',
@@ -80,6 +82,5 @@
     'uintptr.dk',
     'vector.dk'
   ],
-  'name' => 'dakota.$SO_EXT',
-  'self-file' => 'dakota.rep'
+  'name' => 'dakota.$SO_EXT'
 }

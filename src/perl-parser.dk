@@ -25,7 +25,7 @@ module dakota-util;
 klass str128;
 klass tokenid;
 
-noexport format-printf(4) int-t
+static format-printf(4) int-t
 print-error(const char8-t* filename, uint32-t line, uint32-t column, const char8-t* format, ...)
 {
   int-t result = fprintf(stderr, "%s:%i:%i ", filename, line, column);
@@ -84,7 +84,7 @@ klass perl-parser
     return num-elements-read;
   }
 
-  /* method */ noexport void putback(object-t self, int32-t c)
+  /* method */ static void putback(object-t self, int32-t c)
   {
     if ('\n' == c)
       self.line--;
@@ -95,7 +95,7 @@ klass perl-parser
     return;
   }
 
-  /* method */ noexport int32-t get(object-t self)
+  /* method */ static int32-t get(object-t self)
   {
     int32-t c = getc(self.in);
     if (EOF != c) {
@@ -111,7 +111,7 @@ klass perl-parser
 
   //void error-msg(char8-t* filename, uint32-t line, uint32-t column, const char8-t* msg0, ...); // one or more msg strings
 
-  /* method */ noexport object-t lex(object-t self)
+  /* method */ static object-t lex(object-t self)
   {
     int32-t c;
     while (1) {
@@ -223,7 +223,7 @@ klass perl-parser
   /* method */ noexport object-t get-table(object-t self);
   /* method */ noexport object-t get-vector(object-t self);
 
-  /* method */ noexport object-t key(object-t self)
+  /* method */ static object-t key(object-t self)
   {
     object-t token = perl-parser:lex(self);
     if (null == token) {
@@ -251,7 +251,7 @@ klass perl-parser
     return key;
   }
 
-  /* method */ noexport object-t get-corresponds-to(object-t self)
+  /* method */ static object-t get-corresponds-to(object-t self)
   {
     object-t token = perl-parser:lex(self);
     if (null == token) {
@@ -265,7 +265,7 @@ klass perl-parser
     return make(string:klass, bytes => dk:buffer(token));
   }
 
-  /* method */ noexport object-t get-value(object-t self)
+  /* method */ static object-t get-value(object-t self)
   { // get table value - value is NOT optional
     object-t token = perl-parser:lex(self);
     if (null == token) {
@@ -300,7 +300,7 @@ klass perl-parser
     return value;
   }
 
-  /* method */ noexport object-t element(object-t self)
+  /* method */ static object-t element(object-t self)
   { // get vector element - element is optional
     object-t token = perl-parser:lex(self);
     if (null == token) {
@@ -337,7 +337,7 @@ klass perl-parser
     return value;
   }
 
-  /* method */ noexport object-t get-table-pair(object-t self)
+  /* method */ static object-t get-table-pair(object-t self)
   {
     object-t key = perl-parser:key(self);
     if (null == key)

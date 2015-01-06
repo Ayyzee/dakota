@@ -54,7 +54,7 @@ namespace klass
 }
 #endif
 
-export void dkt-null-method(object-t object, ...)
+[[noreturn]] export void dkt-null-method(object-t object, ...)
 {
   throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object));
 }
@@ -79,7 +79,7 @@ klass selector-pair
 
 static const uint32-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
-noexport sorted-array-t   gbl-selectors-table = { gbl-selectors,
+static sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                                 0,
                                                                 DK-ARRAY-LENGTH(gbl-selectors),
                                                                 cast(uint32-t)sizeof(gbl-selectors[0]),
@@ -99,14 +99,12 @@ noexport sorted-array-t   gbl-selectors-table = { gbl-selectors,
 //     return;
 //   }
 
-noexport symbol-t default-klass-name();
-
 noexport symbol-t
 default-superklass-name()
 {
   return object:__klass__;
 }
-noexport object-t
+static object-t
 default-superklass()
 {
   return object:klass;
@@ -114,7 +112,7 @@ default-superklass()
 noexport symbol-t interposer-name-for-klass-name(symbol-t klass-name);
 noexport void add-interpose-prop(symbol-t key, symbol-t element);
 
-noexport selector-t
+static selector-t
 selector-for-signature(const signature-t* signature)
 {
   selector-pair-t pair = { signature, nullptr };
@@ -124,7 +122,7 @@ selector-for-signature(const signature-t* signature)
   return selector;
 }
 
-noexport method-t
+static method-t
 method-for-signature(methods:slots-t* methods, const signature-t* signature)
 {
   selector-t selector = selector-for-signature(signature);
@@ -133,7 +131,7 @@ method-for-signature(methods:slots-t* methods, const signature-t* signature)
   return m;
 }
 
-noexport void
+unused static void
 import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
 {
   uint32-t i = 0;
@@ -162,7 +160,7 @@ import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
   return;
 }
 
-noexport const void*
+static const void*
 ptr-from-info(named-info-node-t* info, symbol-t key)
 {
   named-info-node-t* current-info = info;
@@ -180,7 +178,7 @@ ptr-from-info(named-info-node-t* info, symbol-t key)
   return element;
 }
 
-noexport uint32-t
+static uint32-t
 uint32-from-info(named-info-node-t* info, symbol-t key)
 {
   named-info-node-t* current-info = info;
@@ -205,14 +203,14 @@ size-from-info(named-info-node-t* info)
   return size;
 }
 
-noexport object-t
+static object-t
 superklass-from-info(named-info-node-t* info)
 {
   object-t superklass = cast(object-t)ptr-from-info(info, $superklass);
   return superklass;
 }
 
-noexport object-t
+static object-t
 superklass-from-info(named-info-node-t* info, symbol-t name)
 {
   object-t superklass = superklass-from-info(info);
@@ -272,7 +270,9 @@ klass-name-from-info(named-info-node-t* info)
 
 /*noexport*/ const uint32-t k-alignment = 8;
 
-noexport uint32-t
+// consider using alignas(8) on the slots struct decl/defn
+
+noexport inline uint32-t
 round-alignment(uint32-t n)
 {
   uint32-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
@@ -302,7 +302,7 @@ offset-from-info(named-info-node-t* info)
   return result;
 }
 
-noexport void
+static void
 load-traits(const symbol-t* traits)
 {
   if (nullptr != traits) {
@@ -411,7 +411,7 @@ klass klass
     return name;
   }
 
-  noexport object-t alloc-methods(object-t self, uint32-t methods-count)
+  static object-t alloc-methods(object-t self, uint32-t methods-count)
   {
     self.methods.count = methods-count;
     self.methods.addrs = cast(method-t*)malloc(sizeof(method-t) * self.methods.count);
@@ -427,7 +427,7 @@ klass klass
     return self;
   }
 
-  noexport object-t init-methods(object-t self)
+  static object-t init-methods(object-t self)
   {
     if (nullptr != self.superklass && null != self.superklass) {
       memcpy(self.methods.addrs, unbox(self.superklass)->methods.addrs,
@@ -593,7 +593,7 @@ klass klass
   }
 
   // use for both klasses (and klass-x) and traits (and trait-x)
-  noexport void add-methods(object-t self, named-info-node-t* info,
+  static void add-methods(object-t self, named-info-node-t* info,
                           symbol-t symbol-method-signatures, symbol-t symbol-method-addresses)
   {
     named-info-node-t* current-info = info;
@@ -625,7 +625,7 @@ klass klass
     return;
   }
 
-  noexport void add-traits(object-t self, const symbol-t* traits)
+  static void add-traits(object-t self, const symbol-t* traits)
   {
     if (nullptr != traits) {
       uint32-t length = 0;
@@ -645,7 +645,7 @@ klass klass
     return;
   }
 
-  noexport object-t traits-initialize(object-t self, const symbol-t* traits)
+  static object-t traits-initialize(object-t self, const symbol-t* traits)
   {
     if (nullptr != traits) {
       uint32-t i = 0;

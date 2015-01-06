@@ -17,13 +17,11 @@
 #if !defined __dakota_private_h__
 #define      __dakota_private_h__
 
-noexport named_info_node_t* info_for_name(symbol_t) throw(object_t);
+noexport named_info_node_t* info_for_name(symbol_t);
 noexport assoc_node_t* imported_klasses_for_klass(symbol_t);
 
-export extern "C" int_t  safe_strcmp(const char8_t* s1, const char8_t* s2);
-export extern "C" int_t  safe_strptrcmp(const char8_t* const* sp1, const char8_t* const* sp2);
-export extern "C" int_t  safe_strncmp(const char8_t* s1, const char8_t* s2, size_t n);
-export extern "C" size_t safe_strlen(const char8_t* s);
+noexport int_t  safe_strptrcmp(const char8_t* const* sp1, const char8_t* const* sp2);
+noexport int_t  safe_strncmp(const char8_t* s1, const char8_t* s2, size_t n);
 
 noexport uint32_t size_from_info(named_info_node_t* info);
 noexport uint32_t offset_from_info(named_info_node_t* info);
@@ -31,5 +29,11 @@ noexport symbol_t name_from_info(named_info_node_t* info);
 noexport symbol_t klass_name_from_info(named_info_node_t* info);
 noexport symbol_t superklass_name_from_info(named_info_node_t* info);
 noexport symbol_t superklass_name_from_info(named_info_node_t* info, symbol_t name);
+
+noexport symbol_t default_superklass_name();
+noexport symbol_t default_klass_name();
+
+noexport void verbose_terminate();
+noexport void verbose_unexpected();
 
 #endif // __dakota_private_h__

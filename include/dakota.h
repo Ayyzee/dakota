@@ -167,6 +167,9 @@ constexpr uintmax_t dk_hash(const char8_t* str)
 //   return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ cast(uchar8_t)(str[h]);
 // }
 
+import int_t  safe_strcmp(const char8_t*, const char8_t*);
+import size_t safe_strlen(const char8_t*);
+
 import symbol_t dk_intern(const char8_t*);
 import object_t dk_klass_for_name(symbol_t);
 
@@ -181,11 +184,15 @@ import void dk_deregister_info(named_info_node_t*);
 sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
 sentinel import object_t           dk_make_named_info(symbol_t name, ...);
 
-import void dkt_throw(object_t exception);
-import void dkt_throw(const char8_t* exception_str);
+[[noreturn]] import void dkt_throw(object_t exception);
+[[noreturn]] import void dkt_throw(const char8_t* exception_str);
 
 // import object_t dk_va_add_all(object_t self, va_list_t);
 // sentinel import object_t dk_add_all(object_t self, ...);
+
+import object_t*       dkt_current_exception();
+import const char8_t** dkt_current_exception_str();
+import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
 #if defined DEBUG
   import int_t dkt_trace_before(const signature_t* signature, method_t method, super_t context, ...);
@@ -206,7 +213,7 @@ import void dkt_throw(const char8_t* exception_str);
   import void dkt_unbox_check(object_t object, object_t kls);
 #endif
 
-import void dkt_null_method(object_t object, ...);
+[[noreturn]] import void dkt_null_method(object_t object, ...);
 
 #if defined DEBUG
   #define DKT_NULL_METHOD nullptr

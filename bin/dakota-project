@@ -21,6 +21,15 @@ $Getopt::Long::ignorecase = 0;
 
 my $opts = {};
 
+my $subcmd_tbl = {
+  'init' =>     \&subcmd_init,
+  'add' =>      \&subcmd_add,
+  'remove' =>   \&subcmd_remove,
+  'files' =>    \&subcmd_files,
+  'name' =>     \&subcmd_name,
+  'set-name' => \&subcmd_set_name,
+};
+
 &GetOptions($opts,
             'repository=s',
             'var=s',
@@ -39,37 +48,35 @@ sub start {
   if ($$opts{'directory'}) {
     chdir $$opts{'directory'};
   }
+  if (!-e $rep_file) {
+    print STDERR "missing default project file $default_project_file\n";
+    exit 1;
+  }
   my $rep = &rep_from_file($rep_file);
-  $$rep{'self-file'} = $rep_file;
   if (0 != @$args) {
     &subcmd($rep, $args);
   } else {
-    print STDERR "missing subcommand\n";
-    die;
+    my $subcmds = [sort keys %$subcmd_tbl];
+    print STDERR "missing subcmd. subcmds are: @$subcmds\n";
+    exit 1;
   }
 }
 sub subcmd {
   my ($rep, $args) = @_;
-  my $subcmd = shift @$args;
-
-  if (0) {}
-  elsif ('init'   eq $subcmd) { &subcmd_init($rep, $args);        }
-  elsif ('add'    eq $subcmd) { &subcmd_add($rep, $args);         }
-  elsif ('remove' eq $subcmd) { &subcmd_remove($rep, $args);      }
-  elsif ('files'  eq $subcmd) { &subcmd_files($rep, $args);       }
-  elsif ('name'   eq $subcmd) { &subcmd_name($rep, $args);        }
-  elsif ('name='  eq $subcmd) { &subcmd_name_setter($rep, $args); }
-  else {
-    print STDERR "$subcmd\n";
-    die;
+  my $subcmd_name = shift @$args;
+  my $subcmd = $$subcmd_tbl{$subcmd_name};
+  if ($subcmd) {
+    &$subcmd($rep, $args);
+  } else {
+    print STDERR "not a subcmd: $subcmd_name\n";
+    exit 1;
   }
 }
 sub subcmd_init {
   my ($rep, $args) = @_;
-  $$rep{'self-file'} = $default_project_file;
   $$rep{'name'} = shift @$args;
   $$rep{'files'} = $args;
-  &rep_to_file($rep);
+  &rep_to_file($rep, $default_project_file);
 }
 sub subcmd_add {
   my ($rep, $args) = @_;
@@ -142,7 +149,7 @@ sub subcmd_name {
   $name = &subst($name, $$opts{'var'});
   print "$name\n";
 }
-sub subcmd_name_setter {
+sub subcmd_set_name {
   my ($rep, $args) = @_;
   die if !defined $$rep{'name'};
   $$rep{'name'} = shift @$args;
@@ -151,11 +158,15 @@ sub subcmd_name_setter {
 sub rep_from_file {
   my ($file) = @_;
   my $rep = do $file or die;
+  $$rep{'**file**'} = $file;
   return $rep;
 }
 sub rep_to_file {
-  my ($rep) = @_;
-  my $file = $$rep{'self-file'};
+  my ($rep, $file) = @_;
+  if (!$file) {
+    $file = $$rep{'**file**'};
+  }
+  delete $$rep{'**file**'};
   open FILE, ">$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   print FILE &Dumper($rep);
   close FILE;

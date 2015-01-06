@@ -3575,7 +3575,7 @@ sub generate_ka_method_defn {
   my $func_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $list_names = &arg_type::list_names($$method{'parameter-types'});
-  $$scratch_str_ref .= " {\n" . $col . "static const signature-t* __method__ = dkt-ka-signature(va:$method_name($$list_types));\n";
+  $$scratch_str_ref .= " {\n" . $col . "static const signature-t* __method__ = dkt-ka-signature(va:$method_name($$list_types)); USE(__method__);\n";
 
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);

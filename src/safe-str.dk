@@ -16,10 +16,11 @@
 
 include <cstdlib>;
 include <cstring>;
+include "dakota-private.h";
 
 module dakota;
 
-export extern "C" int-t safe-strcmp(const char8-t* s1, const char8-t* s2)
+export int-t safe-strcmp(const char8-t* s1, const char8-t* s2)
   {
     int-t value = 0;
 
@@ -36,7 +37,7 @@ export extern "C" int-t safe-strcmp(const char8-t* s1, const char8-t* s2)
     return value;
   }
 
-noexport extern "C" int-t safe-strptrcmp(const char8-t* const* sp1, const char8-t* const* sp2)
+noexport int-t safe-strptrcmp(const char8-t* const* sp1, const char8-t* const* sp2)
   {
     const char8-t* s1;
     if (nullptr == sp1)
@@ -51,7 +52,7 @@ noexport extern "C" int-t safe-strptrcmp(const char8-t* const* sp1, const char8-
     return safe-strcmp(s1, s2);
   }
 
-noexport extern "C" int-t safe-strncmp(const char8-t* s1, const char8-t* s2, size-t n)
+noexport int-t safe-strncmp(const char8-t* s1, const char8-t* s2, size-t n)
   {
     int-t value = 0;
 
@@ -68,7 +69,7 @@ noexport extern "C" int-t safe-strncmp(const char8-t* s1, const char8-t* s2, siz
     return value;
   }
 
-export extern "C" size-t safe-strlen(const char8-t* str)
+export size-t safe-strlen(const char8-t* str)
   {
     size-t len;
 

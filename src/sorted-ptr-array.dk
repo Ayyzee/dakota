@@ -17,6 +17,7 @@
 include <cassert>;
 include <cstdlib>;
 include <cstring>;
+include "sorted-ptr-array.h";
 
 module dakota;
 
@@ -55,7 +56,7 @@ klass sorted-ptr-array
   }
   
   //(-(insertion point) - 1)
-  noexport result-t search(slots-t* t, const void* key)
+  static result-t search(slots-t* t, const void* key)
   {
     assert(nullptr != key);
 

@@ -33,7 +33,7 @@ trait counted-set
     return result;
   }
 
-  noexport object-t add(object-t self, object-t element)
+  static object-t add(object-t self, object-t element)
   {
     object-t assoc = dk:assoc-at(self, element, nullptr);
 

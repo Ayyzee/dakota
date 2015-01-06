@@ -123,7 +123,7 @@ static sorted-array-t* gbl-klass-defns-table;
 static sorted-array-t* gbl-interposers-table;
 static sorted-array-t* gbl-imported-klasses-file-table;
 
-noexport void
+static void
 init-runtime-ds()
 {
   const uint32-t num-klasses = 256;
@@ -154,13 +154,13 @@ extern noexport resource-usage:slots-t gbl-ru;
 typedef int32-t (*)(void*, void*) vcompare-t;
 
 export object-t null = nullptr;
-noexport object-t null-klass = nullptr;
+static object-t null-klass = nullptr;
 export object-t std-input = nullptr;
 export object-t std-output = nullptr;
 export object-t std-error = nullptr;
 
 // this is quick and dirty!!!!!!!!!!!!!!!!
-noexport void
+static void
 init-imported-klasses()
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
@@ -170,7 +170,7 @@ init-imported-klasses()
   return;
 }
 
-noexport const char8-t*
+static const char8-t*
 file-name-from-klass-name(symbol-t klass-name)
 {
   char8-t* file-name = cast(char8-t*)malloc(sizeof(char8-t) * (symbol:length(klass-name) + 1));
@@ -199,7 +199,7 @@ file-name-from-klass-name(symbol-t klass-name)
   file-name[fn] = NUL;
   return file-name;
 }
-noexport const char8-t*
+static const char8-t*
 find-file(const char8-t* path, const char8-t* file-name, const char8-t* suffix)
 {
   char8-t* file = cast(char8-t*)malloc(sizeof(char8-t) * (FILENAME-MAX + 1));
@@ -249,20 +249,18 @@ find-file(const char8-t* path, const char8-t* file-name, const char8-t* suffix)
   return rtn;
 }
 
-noexport symbol-t default-superklass-name();
-
 noexport symbol-t
 default-klass-name()
 {
   return klass:__klass__;
 }
-noexport object-t
+static object-t
 default-klass()
 {
   return klass:klass;
 }
 
-noexport object-t
+static object-t
 alloc-klass(symbol-t name)
 {
   named-info-node-t* info = info-for-name(name);
@@ -289,7 +287,7 @@ alloc-klass(symbol-t name)
   return kls;
 }
 
-noexport object-t
+static object-t
 init-klass(object-t kls, symbol-t name)
 {
     named-info-node-t* info = info-for-name(name);
@@ -313,7 +311,7 @@ klass ofile
     uint32-t col;
   }
 
-  noexport slots-t
+  static slots-t
   pad(slots-t s)
   {
     for (uint32-t i = 0; i < s.col; i++)
@@ -321,7 +319,7 @@ klass ofile
     return s;
   }
 
-  noexport slots-t
+  static slots-t
   format-va-printf(2)
   va-printf(slots-t s, const char8-t* format, va-list-t args)
   {
@@ -330,7 +328,7 @@ klass ofile
     return s;
   }
 
-  noexport slots-t
+  static slots-t
   format-printf(2)
   printf(slots-t s, const char8-t* format, ...)
   {
@@ -341,7 +339,7 @@ klass ofile
     return s;
   }
 
-  noexport slots-t
+  static slots-t
   fopen(const char8-t* path)
   {
     slots-t s = { nullptr, 0 };
@@ -351,7 +349,7 @@ klass ofile
     return s;
   }
 
-  noexport slots-t
+  static slots-t
   fclose(slots-t s)
   {
     int n = ::fclose(s.output);
@@ -363,7 +361,7 @@ klass ofile
 
 #if 1
 extern noexport sorted-array-t gbl-selectors-table;
-noexport void
+static void
 perl-dump-resource-info(sorted-array-t* klass-defns-table)
 {
   uint32-t klasses-count = 0;
@@ -398,7 +396,7 @@ perl-dump-resource-info(sorted-array-t* klass-defns-table)
 }
 #endif
 
-noexport void
+static void
 perl-dump-klass-defns(sorted-array-t* klass-defns-table)
 {
   ofile-t ofl = { stdout, 0 };
@@ -500,7 +498,7 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
 // object klass' klass is klass klass
 // klass klass'  klass is klass klass
 // null klass'   klass is klass klass
-noexport void
+static void
 init-runtime()
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
@@ -575,6 +573,9 @@ init-runtime()
       dk:dump(null);
     }
 #endif
+
+    std::set-terminate(verbose-terminate);
+    std::set-unexpected(verbose-unexpected);
   }
   init-imported-klasses();
 
@@ -614,7 +615,7 @@ import-klass(symbol-t klass-name, assoc-node-t* node)
   }
   return;
 }
-noexport void
+static void
 import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc)
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p','%p']",
@@ -635,7 +636,7 @@ import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc)
   }
   return;
 }
-noexport symbol-t
+unused static symbol-t
 interposer-name-for-klass-name(symbol-t klass-name)
 {
   property-t key = { klass-name, cast(uintptr-t)nullptr };
@@ -654,7 +655,7 @@ interposer-name-for-klass-name(symbol-t klass-name)
   return result;
 }
 
-noexport void
+static void
 add-interpose-prop(symbol-t key, symbol-t element)
 {
 //   dkt-log(DKT-LOG-INFO, "%s(%s, %s)", __func__, key, element);
@@ -663,7 +664,7 @@ add-interpose-prop(symbol-t key, symbol-t element)
   return;
 }
 
-noexport void
+static void
 add-interposers(property-t* interposers)
 {
 //assert(nullptr != interposers);
@@ -703,7 +704,7 @@ export-klass(named-info-node-t* klass-info)
   }
   return;
 }
-noexport void
+static void
 export-klasses(named-info-node-t* klass-info)
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p']", __func__, cast(void*)(klass-info));
@@ -717,7 +718,7 @@ export-klasses(named-info-node-t* klass-info)
   }
   return;
 }
-noexport void
+static void
 dump-interposers(ofile-t ofl, named-info-node-t* registration-info)
 {
   const property-t* interposers = cast(const property-t*)named-info-node:at(registration-info, $interposers);
@@ -728,7 +729,7 @@ dump-interposers(ofile-t ofl, named-info-node-t* registration-info)
   return;
 }
 
-noexport boole-t
+static boole-t
 should-dump(named-info-node-t* klass-info, const char8-t* only)
 {
   assert(nullptr != klass-info);
@@ -758,7 +759,7 @@ should-dump(named-info-node-t* klass-info, const char8-t* only)
 
 noexport void dump-klass(ofile-t ofl, named-info-node-t* klass-info);
 
-noexport const char8-t*
+static const char8-t*
 remove-dir(const char8-t* path)
 {
   const char8-t* result = strrchr(path, '/');
@@ -770,7 +771,7 @@ remove-dir(const char8-t* path)
   return result;
 }
 
-noexport const char8-t*
+unused static const char8-t*
 remove-ext(const char8-t* path)
 {
   char8-t* dot = strrchr(path, '.');
@@ -780,7 +781,7 @@ remove-ext(const char8-t* path)
   return path;
 }
 
-noexport char8-t*
+static char8-t*
 pad(char8-t* buf, uint32-t buf-len, uint32-t len)
 {
   assert(buf-len >= len);
@@ -790,7 +791,7 @@ pad(char8-t* buf, uint32-t buf-len, uint32-t len)
   return buf;
 }
 
-noexport void
+static void
 dump-module-description(ofile-t ofl, named-info-node-t* registration-info)
 {
   assert(nullptr != ofl.output);
@@ -826,7 +827,7 @@ dump-module-description(ofile-t ofl, named-info-node-t* registration-info)
   return;
 }
 
-noexport void
+static void
 dump-klass-defns(ofile-t ofl, named-info-node-t* registration-info, const char8-t* only)
 {
   assert(nullptr != ofl.output);
@@ -873,7 +874,7 @@ dump-klass-defns(ofile-t ofl, named-info-node-t* registration-info, const char8-
   return;
 }
 
-noexport uint32-t
+static uint32-t
 max-enum-name-width(enum-info-t* enum-info)
 {
   uint32-t result = 0;
@@ -887,7 +888,7 @@ max-enum-name-width(enum-info-t* enum-info)
   return result;
 }
 
-noexport uint32-t
+static uint32-t
 max-slot-type-width(named-info-node-t* slots-info)
 {
   uint32-t result = 0;
@@ -902,7 +903,7 @@ max-slot-type-width(named-info-node-t* slots-info)
   return result;
 }
 
-noexport uint32-t
+static uint32-t
 max-slot-name-width(named-info-node-t* slots-info)
 {
   uint32-t result = 0;
@@ -917,7 +918,7 @@ max-slot-name-width(named-info-node-t* slots-info)
   return result;
 }
 
-noexport uint32-t
+static uint32-t
 max-method-return-type-width(const signature-t* const* method-signatures, ...)
 {
   uint32-t result = 0;
@@ -940,7 +941,7 @@ max-method-return-type-width(const signature-t* const* method-signatures, ...)
   return result;
 }
 
-noexport void
+static void
 dump-method(ofile-t ofl, const signature-t* info, uint32-t max-return-type-width)
 {
   if (nullptr != info->exception-types)
@@ -1200,7 +1201,7 @@ register-info-common(named-info-node-t* registration-info)
   return;
 }
 
-noexport boole-t
+static boole-t
 getenv-boole(const char8-t* name, boole-t default-value)
 {
   boole-t value = default-value;
@@ -1213,7 +1214,7 @@ getenv-boole(const char8-t* name, boole-t default-value)
   return value;
 }
 
-noexport void
+static void
 add-registration-info(named-info-node-t* registration-info)
 {
   assert(nullptr == registration-info->next);
@@ -1273,8 +1274,6 @@ dk-register-info(named-info-node-t* registration-info)
       if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(0);
       break;
-    default:
-      abort();
   }
   if (nullptr != output-path && NUL != output-path[0] && nullptr != ctlg-output)
     fclose(ctlg-output);
@@ -1320,9 +1319,7 @@ dk-deregister-info(named-info-node-t* registration-info)
   return;
 }
 
-noexport symbol-t default-superklass-name();
-
-noexport symbol-t
+static symbol-t
 superklass-name-for-name(symbol-t klass-name)
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s']", __func__, klass-name);
@@ -1370,7 +1367,7 @@ dk-klass-for-name(symbol-t klass-name)
   return klass;
 }
 noexport named-info-node-t*
-info-for-name(symbol-t klass-name) throw(object-t)
+info-for-name(symbol-t klass-name)
 {
   assert(nullptr != klass-name);
   property-t[] properties = { { $name, cast(uintptr-t)klass-name } };
@@ -1433,7 +1430,7 @@ dk-intern(const char8-t* key)
 }
 
 #if defined DEBUG
-noexport char8-t*
+static char8-t*
 get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
 {
   object-t superklass = dk:superklass(klass);

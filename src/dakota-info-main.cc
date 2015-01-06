@@ -26,8 +26,8 @@
 #include <sys/wait.h>
 
 #define declare_klass_type_struct(k)          namespace k { struct     slots_t; } typedef k::slots_t k##_t
-#define declare_klass_type_union(k)           namespace k { union      slots_t; } typedef k::slots_t k##_t
-#define declare_klass_type_enum_class(k)      namespace k { enum class slots_t; } typedef k::slots_t k##_t
+//#define declare_klass_type_union(k)           namespace k { union      slots_t; } typedef k::slots_t k##_t
+//#define declare_klass_type_enum(k)            namespace k { enum : int32_t slots_t; } typedef k::slots_t k##_t
 #define declare_klass_type_typedef(k, t)      namespace k { typedef t  slots_t; } typedef k::slots_t k##_t
 #define declare_klass_type_typedef_func(k, t) namespace k { typedef t;          } typedef k::slots_t k##_t
 
@@ -129,7 +129,6 @@ handle_opts(int* argc, char*** argv)
       case DKT_INFO_HELP:
         usage(progname, longopts);
         exit(EXIT_SUCCESS);
-        break;
       case DKT_INFO_OUTPUT:
         opts.output = optarg;
         break;
@@ -161,7 +160,7 @@ handle_opts(int* argc, char*** argv)
 
 namespace va
 {
-  format_va_printf(3) void abort_with_log(const char* file, int line, const char* format, va_list args)
+  [[noreturn]] format_va_printf(3) static void _abort_with_log(const char* file, int line, const char* format, va_list args)
   {
     fprintf(stderr, "%s:%i: ", file, line);
     vfprintf(stderr, format, args);
@@ -169,15 +168,15 @@ namespace va
   }
 }
 
-format_printf(3) void abort_with_log(const char* file, int line, const char* format, ...)
+[[noreturn]] format_printf(3) static void _abort_with_log(const char* file, int line, const char* format, ...)
 {
   va_list args;
   va_start(args, format);
-  va::abort_with_log(file, line, format, args);
+  va::_abort_with_log(file, line, format, args);
   va_end(args);
 }
 
-#define abort_with_log(...) abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
+#define abort_with_log(...) _abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
 
 #include "spawn.cc"
 

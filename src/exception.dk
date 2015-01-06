@@ -20,7 +20,9 @@ include <cstring>;
 include <exception>;
 include <unistd.h>; // getpid()
 
-#define THROW throw
+include "dakota-private.h";
+
+#define THROW throw // so the macro system won't rewrite
 
 #if HAVE-CONFIG-H
 include "config.h";
@@ -30,25 +32,25 @@ module dakota;
 
 klass output-stream;
 
-noexport object-t* dkt-current-exception()
+export object-t* dkt-current-exception()
 {
   static object-t object;
   return &object;
 }
 
-noexport const char8-t** dkt-current-exception-str()
+export const char8-t** dkt-current-exception-str()
 {
   static const char8-t* str;
   return &str;
 }
 
-export void dkt-throw(object-t exception)
+[[noreturn]] export void dkt-throw(object-t exception)
 {
   *dkt-current-exception() = exception;
   THROW exception; // this will not be rewritten
 }
 
-export void dkt-throw(const char8-t* exception-str)
+[[noreturn]] export void dkt-throw(const char8-t* exception-str)
 {
   *dkt-current-exception-str() = exception-str;
   THROW exception-str; // this will not be rewritten
@@ -74,7 +76,7 @@ getprogname()
 #endif
 #endif
 
-noexport format-va-printf(2) int-t
+static format-va-printf(2) int-t
 va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {
   file-t log-file = stderr;
@@ -126,9 +128,9 @@ dkt-log(uint32-t priority, const char8-t* format, ...)
 }
 #endif
 
-noexport void pre-runtime-verbose-terminate();
-noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
-noexport void
+static void pre-runtime-verbose-terminate();
+static void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
+static void
 pre-runtime-verbose-terminate()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
@@ -168,9 +170,9 @@ verbose-terminate()
   previous-terminate();
 }
 
-noexport void pre-runtime-verbose-unexpected();
-noexport void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
-noexport void
+static void pre-runtime-verbose-unexpected();
+static void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
+static void
 pre-runtime-verbose-unexpected()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);

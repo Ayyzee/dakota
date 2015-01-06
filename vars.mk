@@ -1,28 +1,22 @@
-MAKEFLAGS ?=\
+MAKE := gnumake
+MAKEFLAGS :=\
  --no-builtin-rules\
  --no-builtin-variables\
  --no-print-directory\
  --warn-undefined-variables\
 
+DESTDIR := /
+
 # rootdir is set before including this file
-srcdir := $(rootdir)/src
-local_includedir := $(rootdir)/include
+SRCDIR :=     $(rootdir)/src
+INCLUDEDIR := $(rootdir)/include
+LIBDIR :=     $(rootdir)/lib
+BINDIR :=     $(rootdir)/bin
 
 prefix ?= /usr/local
 includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
-
-DAKOTA_VARS =
-DAKOTA_VARS += CXX=$(CXX)
-DAKOTA_VARS += SO_EXT=$(SO_EXT)
-
-DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota
-#DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota-profile
-DAKOTAFLAGS ?=
-EXTRA_DAKOTAFLAGS =\
- --include-directory=$(srcdir)\
- --include-directory=$(rootdir)/include\
 
 SO_EXT ?= so
 
@@ -54,13 +48,22 @@ CXX_DYNAMIC_FLAGS ?= --dynamic
 CXX_OUTPUT_FLAG := --output
 LD_PRELOAD ?= LD_PRELOAD
 
-EXTRA_CXXFLAGS :=\
- --include-directory=$(local_includedir)\
- --include-directory=$(srcdir)\
+DAKOTA_VARS =
+DAKOTA_VARS += CXX=$(CXX)
+DAKOTA_VARS += SO_EXT=$(SO_EXT)
+
+DAKOTA ?= $(DAKOTA_VARS) $(BINDIR)/dakota #--keep-going
+#DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota-profile
+DAKOTAFLAGS ?=
+INCLUDE_DAKOTAFLAGS :=\
+ --include-directory $(SRCDIR)\
+ --include-directory $(INCLUDEDIR)\
+
+EXTRA_CXXFLAGS :=
 
 ifdef DKT_PROFILE
   EXTRA_CXXFLAGS += -pg
-  EXTRA_LDFLAGSx += -pg
+  EXTRA_LDFLAGS  += -pg
 endif
 
 ifndef DKT_USE_COMPOUND_LITERALS
@@ -86,14 +89,19 @@ endif
 #   --no-common
 #   --trapv
 #   --PIC
-EXTRA_CXXFLAGS +=\
- --define-macro HAVE_CONFIG_H\
- -fno-common\
+
+#-Wmultichar -Wno-multichar
+
+# -fshow-column\
+ -fshow-source-location\
+ -fcaret-diagnostics\
+ -fdiagnostics-format=clang\
+ -fdiagnostics-show-option\
+
+# --no-warnings
+
+# -fno-common\
  -ftrapv\
- --debug=3\
- --optimize=0\
- -Wno-multichar\
- -Wno-four-char-constants\
  --all-warnings\
  --warn-cast-qual\
  --warn-extra\
@@ -108,11 +116,18 @@ EXTRA_CXXFLAGS +=\
  --warn-unused\
  --warn-no-multichar\
  --warn-conversion\
- -DMOD_SIZE_CAST_HACK\
+ --warn-redundant-decls\
+ --warn-switch-default\
 
- # --warn-redundant-decls
- # --warn-switch-default
- # --no-warnings
+
+#diagnostics-format rhs = clang|msvc|vi
+
+EXTRA_CXXFLAGS += $(CXXFLAGS_WARNINGS_ALL)\
+ --debug=3\
+ --optimize=0\
+ --define-macro DEBUG\
+ --define-macro HAVE_CONFIG_H\
+ --define-macro MOD_SIZE_CAST_HACK\
 
 export CXX
 export CXXFLAGS
@@ -120,6 +135,6 @@ export EXTRA_CXXFLAGS
 
 export DAKOTA
 export DAKOTAFLAGS
-export EXTRA_DAKOTAFLAGS
+export INCLUDE_DAKOTAFLAGS
 
 export EXTRA_LDFLAGS

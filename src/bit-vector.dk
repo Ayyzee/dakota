@@ -17,21 +17,21 @@
 include <cassert>;
 include <cstring>;
 
-noexport uint32-t
+inline uint32-t
 min(uint32-t a, uint32-t b)
 {
   uint32-t r = a < b ? a : b;
   return r;
 }
 
-noexport uint32-t
+inline uint32-t
 max(uint32-t a, uint32-t b)
 {
   uint32-t r = a > b ? a : b;
   return r;
 }
 
-noexport uint32-t
+inline uint32-t
 host-to-little-32(uint32-t arg)
 {
 #if 0
@@ -45,7 +45,7 @@ host-to-little-32(uint32-t arg)
   return result;
 }
 
-noexport uint32-t
+unused static uint32-t
 reverse-32(uint32-t arg)
 {
 #if 0
@@ -62,7 +62,7 @@ reverse-32(uint32-t arg)
   return result;
 }
 
-noexport uint32-t
+static uint32-t
 ceiling-divide(uint32-t numerator, uint32-t denominator)
 {
   uint32-t result = (numerator + denominator - 1) / denominator;
@@ -174,17 +174,17 @@ klass bit-vector
     return self;
   }
 
-  noexport uint32-t op-bit-and(uint32-t i1, uint32-t i2)
+  static uint32-t op-bit-and(uint32-t i1, uint32-t i2)
   {
     return i1 & i2;
   }
 
-  noexport uint32-t op-bit-or(uint32-t i1, uint32-t i2)
+  static uint32-t op-bit-or(uint32-t i1, uint32-t i2)
   {
     return i1 | i2;
   }
 
-  noexport uint32-t op-bit-xor(uint32-t i1, uint32-t i2)
+  static uint32-t op-bit-xor(uint32-t i1, uint32-t i2)
   {
     return i1 ^ i2;
   }
@@ -197,7 +197,7 @@ klass bit-vector
     return self;
   }
 
-  noexport object-t op-common(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t))
+  static object-t op-common(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t))
   {
     slots-t* self-slots =  unbox(self);
     slots-t* other-slots = unbox(other);
@@ -208,7 +208,7 @@ klass bit-vector
     return self;
   }
 
-  noexport boole-t op-common?(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t))
+  static boole-t op-common?(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t))
   {
     boole-t result = false;
     slots-t* self-slots =  unbox(self);

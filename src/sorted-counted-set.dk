@@ -16,7 +16,6 @@
 
 module dakota;
 
-klass std-compare;
 klass equal-predicate;
 
 klass sorted-counted-set

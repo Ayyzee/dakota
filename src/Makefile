@@ -7,11 +7,11 @@ include $(rootdir)/vars.mk
 
 DAKOTA_VARS += DK_PREFIX=$(rootdir)
 
-dakota_util_files := $(shell $(rootdir)/bin/dakota-project files --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
-dakota_files :=      $(shell $(rootdir)/bin/dakota-project files --var SO_EXT=$(SO_EXT) --repository dakota.rep)
+dakota_util_files := $(shell $(rootdir)/bin/dakota-project files --var SO_EXT=$(SO_EXT) --repository dakota-util-project.rep)
+dakota_files :=      $(shell $(rootdir)/bin/dakota-project files --var SO_EXT=$(SO_EXT) --repository dakota-project.rep)
 
-dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --var SO_EXT=$(SO_EXT) --repository dakota-util.rep)
-dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --var SO_EXT=$(SO_EXT) --repository dakota.rep)
+dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --var SO_EXT=$(SO_EXT) --repository dakota-util-project.rep)
+dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --var SO_EXT=$(SO_EXT) --repository dakota-project.rep)
 
 INCLUDE_FILES :=\
  $(DESTDIR)$(includedir)/dakota-log.$(hxx_ext)\
@@ -59,13 +59,13 @@ HOME_FILES :=\
 # the use of $^ should be $?
 
 $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT):
-	$(DAKOTA) --shared --name $(libdir)/$(@F) --var MAKEFLAGS="$(MAKEFLAGS)" $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --shared $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --name $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/lib/%.$(SO_EXT):
-	$(DAKOTA) --dynamic --name $(libdir)/$(@F) --var MAKEFLAGS="$(MAKEFLAGS)" $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --dynamic  $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --name $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
-$(rootdir)/bin/%$(exeext): $(srcdir)/%-main.$(dk_ext)
-	$(DAKOTA) --var MAKEFLAGS="$(MAKEFLAGS)" $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+$(rootdir)/bin/%$(exeext): $(SRCDIR)/%-main.$(dk_ext)
+	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 # installed files
 $(DESTDIR)$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)
@@ -83,7 +83,7 @@ $(DESTDIR)$(libdir)/dakota/%.$(pl_ext): $(rootdir)/lib/dakota/%.$(pl_ext)
 $(DESTDIR)$(bindir)/%$(exeext): $(rootdir)/bin/%$(exeext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
+$(HOME)/.dakota/%: $(SRCDIR)/home/.dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0644 $< $(@D)
 
 all:
@@ -107,7 +107,7 @@ dakota-util: $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 dakota: $(rootdir)/lib/$(lib_prefix)$(dakota_name)
 
-$(rootdir)/bin/dakota-info$(exeext): $(srcdir)/dakota-info-main.$(cxx_ext)
+$(rootdir)/bin/dakota-info$(exeext): $(SRCDIR)/dakota-info-main.$(cxx_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
 	$(CXX) $(EXTRA_CXXFLAGS) $(CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
@@ -164,7 +164,7 @@ sys-err-names.tbl: gen-sys-err-names.sh
 	./$<
 
 clean: clean-rt
-	$(RM) $(RMFLAGS) $(srcdir)/obj tst
+	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info$(exeext)
