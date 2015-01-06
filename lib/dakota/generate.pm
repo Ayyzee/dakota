@@ -95,10 +95,10 @@ sub user_code_cxx {
   my ($name) = @_;
   if (exists $ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
-    return "\n#include \"$cwd/obj/$name.$cxx_ext\"\n\n";
+    return "#include \"$cwd/obj/$name.$cxx_ext\"\n";
   } else {
     # should not be hardcoded
-    return "\n#include \"../$name.$cxx_ext\"\n\n";
+    return "#include \"../$name.$cxx_ext\"\n";
   }
 }
 sub make_ident_symbol_scalar {
@@ -277,44 +277,57 @@ sub generate_nrt_defn {
 sub generate_nrt {
   my ($path, $file_basename, $file, $defn_tbl) = @_;
   $gbl_nrt_file = "$file_basename.dk";
-  my $result = {};
   my $name = $file_basename;
-  $name =~ s|.*/||;             # strip off directory part
+  $name =~ s|.*/||; # strip off directory part
   $name =~ s|\.$k+$||;
 
   my $scratch_str_ref = &global_scratch_str_ref();
   my ($generics, $symbols) = &generics::parse($file);
+  my $result;
 
   if (&is_nrt_decl()) {
+    my $output = "$path/$name.$hxx_ext";
+    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+      $output = $ENV{'DKT_DIR'} . '/' . $output
+    }
+    print "    creating $output\n"; # nrt-hxx
+    $result = {};
     &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
-  } else {
-    #my $directory = $ENV{'DKT_DIR'} ||= '.';
-    #print "    creating $directory/$path/$name.$cxx_ext\n"; # nrt-cxx
 
     my $str_hxx = &labeled_src_str(undef, "nrt-hxx");
     $str_hxx .=
       "\n" .
-      &labeled_src_str($defn_tbl, "headers-hxx") .
+      &labeled_src_str($result, "headers-hxx") .
       &hardcoded_typedefs() .
-      &labeled_src_str($defn_tbl, "klasses-hxx") .
-      &labeled_src_str($defn_tbl, "symbols-hxx") .
-      &labeled_src_str($defn_tbl, "strings-hxx") .
-      &labeled_src_str($defn_tbl, "hashes-hxx") .
-      &labeled_src_str($defn_tbl, "keywords-hxx") .
-      &labeled_src_str($defn_tbl, "selectors-hxx") .
-      &labeled_src_str($defn_tbl, "selectors-seq-hxx") .
-      &labeled_src_str($defn_tbl, "signatures-hxx") .
-      &labeled_src_str($defn_tbl, "signatures-seq-hxx") .
-      &labeled_src_str($defn_tbl, "generics-hxx");
+      &labeled_src_str($result, "klasses-hxx") .
+      &labeled_src_str($result, "symbols-hxx") .
+      &labeled_src_str($result, "strings-hxx") .
+      &labeled_src_str($result, "hashes-hxx") .
+      &labeled_src_str($result, "keywords-hxx") .
+      &labeled_src_str($result, "selectors-hxx") .
+      &labeled_src_str($result, "selectors-seq-hxx") .
+      &labeled_src_str($result, "signatures-hxx") .
+      &labeled_src_str($result, "signatures-seq-hxx") .
+      &labeled_src_str($result, "generics-hxx");
 
     &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
+  } else {
+    #my $output = "$path/$name.$cxx_ext";
+    #if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+    #  $output = $ENV{'DKT_DIR'} . '/' . $output
+    #}
+    #print "    creating $output\n"; # nrt-cxx
+    $result = {};
+    &generate_decl_defn($file, $generics, $symbols, 'cxx', $result);
 
     my $str_cxx = &labeled_src_str(undef, "nrt-cxx");
     $str_cxx .=
       "\n" .
       "#include \"$name.$hxx_ext\"\n" .
+      "\n" .
       &user_code_cxx($name) .
-      &labeled_src_str($defn_tbl, "klasses-cxx");
+      "\n" .
+      &labeled_src_str($defn_tbl, "klasses-cxx"); ###
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
@@ -337,8 +350,10 @@ sub generate_rt {
   my $name = $file_basename;
   $name =~ s|.*/||; # strip off directory part
   $name =~ s|\.$k+$||;
-  my $result;
+
+  #
   my ($generics, $symbols) = &generics::parse($file);
+  my $result;
 
   if (&is_rt_decl()) {
     my $output = "$path/$name.$hxx_ext";
@@ -363,8 +378,8 @@ sub generate_rt {
       &labeled_src_str($result, "selectors-seq-hxx") .
       &labeled_src_str($result, "signatures-hxx") .
       &labeled_src_str($result, "signatures-seq-hxx") .
-      &labeled_src_str($result, "generics-hxx") .
-      "\n";
+      &labeled_src_str($result, "generics-hxx");
+
     &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
   } else {
     my $output = "$path/$name.$cxx_ext";
@@ -389,9 +404,8 @@ sub generate_rt {
       &labeled_src_str($result, "signatures-cxx") .
       &labeled_src_str($result, "signatures-seq-cxx") .
       &labeled_src_str($result, "generics-cxx") .
-      ## other: user_code_cxx
-      &labeled_src_str($result, "klasses-cxx") .
-      "\n";
+
+      &labeled_src_str($result, "klasses-cxx");
 
     $str_cxx .= &generate_defn_footer($file);
 
@@ -2494,7 +2508,8 @@ sub order_klasses {
                     print STDERR "    $type\n      $type_klass_name\n";
                   }
                   if (!exists $$scope{'klasses'}{$type_klass_name}) {
-                    #$$scope{'klasses'}{$type_klass_name} = undef;
+                    #$$scope{$klass_type_plural}{$type_klass_name}
+                    #  = &generics::klass_scope_from_klass_name($type_klass_name);
                   }
                 }
               }
