@@ -91,14 +91,14 @@ my $long_suffix = {
                    '?' => 'p',
                    '!' => 'd'
                   };
-sub user_code_cxx {
-  my ($name) = @_;
+# not used. left over (converted) from old code gen model
+sub src_path {
+  my ($name, $ext) = @_;
   if (exists $ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
-    return "#include \"$cwd/obj/$name.$cxx_ext\"\n";
+    return "$cwd/obj/$name.$ext";
   } else {
-    # should not be hardcoded
-    return "#include \"../$name.$cxx_ext\"\n";
+    return "obj/$name.$ext";
   }
 }
 sub make_ident_symbol_scalar {
@@ -311,6 +311,7 @@ sub generate_nrt {
 
     &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
   } else {
+    my $col; my $stack;
     #my $output = "$path/$name.$cxx_ext";
     #if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     #  $output = $ENV{'DKT_DIR'} . '/' . $output
@@ -318,17 +319,15 @@ sub generate_nrt {
     #print "    creating $output\n"; # nrt-cxx
     $result = &generate_decl_defn($file, $generics, $symbols, 'cxx');
 
-    my $stack; my $col;
-    $$result{'klasses-cxx'} = &dk::generate_cxx_footer($file, $stack = [], $col = '');
-
     my $str_cxx = &labeled_src_str(undef, "nrt-cxx");
     $str_cxx .=
       "\n" .
       "#include \"$name.$hxx_ext\"\n" .
       "\n" .
-      &user_code_cxx($name) .
+      "#include \"../$name.$cxx_ext\"\n" . # user-code (converted from dk to cxx)
       "\n" .
-      &labeled_src_str($result, "klasses-cxx"); ###
+      #&labeled_src_str($result, "klasses-cxx") .
+      &dk::generate_cxx_footer($file, $stack = [], $col = '');
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
@@ -404,9 +403,8 @@ sub generate_rt {
       &labeled_src_str($result, "signatures-seq-cxx") .
       &labeled_src_str($result, "generics-cxx") .
 
-      &labeled_src_str($result, "klasses-cxx");
-
-    $str_cxx .= &generate_defn_footer($file);
+      &labeled_src_str($result, "klasses-cxx") .
+      &generate_defn_footer($file);
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
@@ -421,6 +419,9 @@ sub labeled_src_str {
   } else {
     $str = "//--$key--\n";
     $str .= $$tbl{$key};
+    if (!exists $$tbl{$key}) {
+      print STDERR "NO SUCH KEY $key\n";
+    }
     $str .= "//--$key-end--\n";
   }
   return $str;
@@ -457,8 +458,10 @@ sub generate_decl_defn {
   $$result{"signatures-$suffix"} =     &linkage_unit::generate_signatures(     $file, $generics);
   $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq( $file, $generics);
   $$result{"generics-$suffix"} =       &linkage_unit::generate_generics(       $file, $generics);
+
   my $col; my $klass_path;
   $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $col = '', $klass_path = []);
+
   return $result;
 } # generate_decl_defn
 sub generate_defn_footer {
