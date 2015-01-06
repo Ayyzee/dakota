@@ -291,8 +291,7 @@ sub generate_nrt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output\n"; # nrt-hxx
-    $result = {};
-    &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
+    $result = &generate_decl_defn($file, $generics, $symbols, 'hxx');
 
     my $str_hxx = &labeled_src_str(undef, "nrt-hxx");
     $str_hxx .=
@@ -301,7 +300,7 @@ sub generate_nrt {
       &hardcoded_typedefs() .
       &labeled_src_str($result, "klasses-hxx") .
       &labeled_src_str($result, "symbols-hxx") .
-      #&labeled_src_str($result, "strings-hxx") .
+      &labeled_src_str($result, "strings-hxx") .
       &labeled_src_str($result, "hashes-hxx") .
       &labeled_src_str($result, "keywords-hxx") .
       &labeled_src_str($result, "selectors-hxx") .
@@ -317,8 +316,7 @@ sub generate_nrt {
     #  $output = $ENV{'DKT_DIR'} . '/' . $output
     #}
     #print "    creating $output\n"; # nrt-cxx
-    $result = {};
-    &generate_decl_defn($file, $generics, $symbols, 'cxx', $result);
+    $result = &generate_decl_defn($file, $generics, $symbols, 'cxx');
 
     my $str_cxx = &labeled_src_str(undef, "nrt-cxx");
     $str_cxx .=
@@ -361,8 +359,7 @@ sub generate_rt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output\n"; # rt-hxx
-    $result = {};
-    &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
+    $result = &generate_decl_defn($file, $generics, $symbols, 'hxx');
 
     my $str_hxx = &labeled_src_str(undef, "rt-hxx");
     $str_hxx .=
@@ -371,7 +368,7 @@ sub generate_rt {
       &hardcoded_typedefs() .
       &labeled_src_str($result, "klasses-hxx") .
       &labeled_src_str($result, "symbols-hxx") .
-      #&labeled_src_str($result, "strings-hxx") .
+      &labeled_src_str($result, "strings-hxx") .
       &labeled_src_str($result, "hashes-hxx") .
       &labeled_src_str($result, "keywords-hxx") .
       &labeled_src_str($result, "selectors-hxx") .
@@ -387,8 +384,7 @@ sub generate_rt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output\n"; # rt-cxx
-    $result = {};
-    &generate_decl_defn($file, $generics, $symbols, 'cxx', $result);
+    $result = &generate_decl_defn($file, $generics, $symbols, 'cxx');
 
     my $str_cxx = &labeled_src_str(undef, "rt-cxx");
     $str_cxx .=
@@ -396,7 +392,7 @@ sub generate_rt {
       "#include \"$name.$hxx_ext\"\n" .
       "\n" .
       &labeled_src_str($result, "symbols-cxx") .
-      #&labeled_src_str($result, "strings-cxx") .
+      &labeled_src_str($result, "strings-cxx") .
       &labeled_src_str($result, "hashes-cxx") .
       &labeled_src_str($result, "keywords-cxx") .
       &labeled_src_str($result, "selectors-cxx") .
@@ -445,31 +441,21 @@ sub colout {
   return $result;
 }
 sub generate_decl_defn {
-  my ($file, $generics, $symbols, $suffix, $result) = @_;
+  my ($file, $generics, $symbols, $suffix) = @_;
+  my $result = {};
 
-  my $col = '';
-  my $klass_path = [];
-  my $klasses_str = '';
-  &set_global_scratch_str_ref(\$klasses_str);
-  $klasses_str = &linkage_unit::generate_klasses($file, $col, $klass_path);
-
-  my $generics_str = '';
-  &set_global_scratch_str_ref(\$generics_str);
-  $generics_str = &linkage_unit::generate_generics($file, $generics);
-
-  &set_global_scratch_str_ref(undef);
-
-  $$result{"headers-hxx"} =            &linkage_unit::generate_headers($file);
-  $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols($file, $generics, $symbols);
-  #$$result{"strings-$suffix"} =        &linkage_unit::generate_strings($file, $generics, $symbols);
-  $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes($file, $generics, $symbols);
-  $$result{"keywords-$suffix"} =       &linkage_unit::generate_keywords($file, $generics, $symbols);
-  $$result{"selectors-$suffix"} =      &linkage_unit::generate_selectors($file, $generics);
-  $$result{"selectors-seq-$suffix"} =  &linkage_unit::generate_selectors_seq($file, $generics);
-  $$result{"signatures-$suffix"} =     &linkage_unit::generate_signatures($file, $generics);
-  $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq($file, $generics);
-  $$result{"generics-$suffix"} =       $generics_str;
-  $$result{"klasses-$suffix"} =        $klasses_str;
+  $$result{"headers-hxx"} =            &linkage_unit::generate_headers(        $file);
+  $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $generics, $symbols);
+  $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, $generics, $symbols);
+  $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file, $generics, $symbols);
+  $$result{"keywords-$suffix"} =       &linkage_unit::generate_keywords(       $file, $generics, $symbols);
+  $$result{"selectors-$suffix"} =      &linkage_unit::generate_selectors(      $file, $generics);
+  $$result{"selectors-seq-$suffix"} =  &linkage_unit::generate_selectors_seq(  $file, $generics);
+  $$result{"signatures-$suffix"} =     &linkage_unit::generate_signatures(     $file, $generics);
+  $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq( $file, $generics);
+  $$result{"generics-$suffix"} =       &linkage_unit::generate_generics(       $file, $generics);
+  my $col; my $klass_path;
+  $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $col = '', $klass_path = []);
   return $result;
 } # generate_decl_defn
 sub generate_defn_footer {
@@ -1659,6 +1645,7 @@ sub linkage_unit::generate_selectors_seq {
 sub linkage_unit::generate_generics {
   my ($file, $scope) = @_;
   my $col = '';
+  my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
   my $is_inline;
@@ -2613,6 +2600,7 @@ sub klass_part {
 sub linkage_unit::generate_klasses {
   my ($scope, $col, $klass_path) = @_;
   my $klass_names = &order_klasses($scope);
+  my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
   if (&is_decl()) {
