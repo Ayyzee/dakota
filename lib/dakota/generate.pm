@@ -3594,32 +3594,18 @@ sub generate_ka_method_defn {
     &dakota::util::_add_last($$method{'parameter-types'}, $param1);
   }
   if (scalar @{$$method{'keyword-types'}}) {
-    $$scratch_str_ref .= $col;
-    my $delim = '';
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
       my $kw_arg_type = &arg::type($$kw_arg{'type'});
-      $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name;";
-      $delim = ' ';
+      $$scratch_str_ref .= $col . "struct { boole-t state; $kw_arg_type value; } $kw_arg_name = { false, cast(decltype($kw_arg_name.value))0 };\n";
     }
-    $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "struct {";
-    my $initializer = '';
-    $delim = '';
-    foreach my $kw_arg (@{$$method{'keyword-types'}}) {
-      my $kw_arg_name = $$kw_arg{'name'};
-      $$scratch_str_ref .= " boole-t $kw_arg_name;";
-      $initializer .= "${delim}false";
-      $delim = ', ';
-    }
-    $$scratch_str_ref .= " } _state_ = { $initializer };\n";
   }
   #$$scratch_str_ref .= $col . "if (nullptr != $$new_arg_names[-1]) {\n";
   #$col = &colin($col);
   my $is_first;
 
   $$scratch_str_ref .= $col . "keyword-t* _keyword_;\n";
-  $$scratch_str_ref .= $col . "while (nullptr != (_keyword_ = va-arg(_args_, keyword-t*))) {\n";
+  $$scratch_str_ref .= $col . "while (nullptr != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {\n";
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated.\n";
   $col = &colin($col);
@@ -3637,9 +3623,8 @@ sub generate_ka_method_defn {
     }
     # should do this for other types (char=>int, float=>double, ... ???
 
-    $$scratch_str_ref .= $col . "DEBUG-STMT(if (_keyword_->symbol != \$$kw_arg_name) abort());\n";
-    $$scratch_str_ref .= $col . "$kw_arg_name = va-arg($$new_arg_names[-1], $kw_type);\n";
-    $$scratch_str_ref .= $col . "_state_.$kw_arg_name = true;\n";
+    $$scratch_str_ref .= $col . "assert(_keyword_->symbol == \$$kw_arg_name);\n";
+    $$scratch_str_ref .= $col . "$kw_arg_name = { true, va-arg($$new_arg_names[-1], decltype($kw_arg_name.value)) };\n";
     $$scratch_str_ref .= $col . "break;\n";
     $col = &colout($col);
     #            $$scratch_str_ref .= $col . "}\n";
@@ -3650,9 +3635,7 @@ sub generate_ka_method_defn {
   $col = &colin($col);
 
   $$scratch_str_ref .= $col . "throw make(no-such-keyword-exception:klass,\n";
-  $$scratch_str_ref .= $col . "           object =>    self,\n";
-  $$scratch_str_ref .= $col . "           signature => __method__,\n";
-  $$scratch_str_ref .= $col . "           symbol =>    _keyword_->symbol);\n";
+  $$scratch_str_ref .= $col . "           object => self, signature => __method__, keyword => _keyword_->symbol);\n";
   $col = &colout($col);
   #        $$scratch_str_ref .= $col . "}\n";
   $col = &colout($col);
@@ -3662,13 +3645,14 @@ sub generate_ka_method_defn {
 
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     my $kw_arg_name    = $$kw_arg{'name'};
-    $$scratch_str_ref .= $col . "unless (_state_.$kw_arg_name)\n";
+    $$scratch_str_ref .= $col . "unless ($kw_arg_name.state)\n";
     $col = &colin($col);
     if (defined $$kw_arg{'default'}) {
       my $kw_arg_default = $$kw_arg{'default'};
-      $$scratch_str_ref .= $col . "$kw_arg_name = $kw_arg_default;\n";
+      $$scratch_str_ref .= $col . "$kw_arg_name = { true, $kw_arg_default };\n";
     } else {
-      $$scratch_str_ref .= $col . "throw \"missing required keyword argument\";\n";
+      $$scratch_str_ref .= $col . "throw make(missing-keyword-exception:klass,\n";
+      $$scratch_str_ref .= $col . "           object => self, signature => __method__, keyword => _keyword_->symbol);\n";
     }
     $col = &colout($col);
   }
@@ -3691,7 +3675,7 @@ sub generate_ka_method_defn {
   #&dakota::util::_add_last($new_arg_names, $last_arg_name); # add name associated with uintptr-t type
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
-    $$scratch_str_ref .= ", $kw_arg_name";
+    $$scratch_str_ref .= ", $kw_arg_name.value";
   }
   $$scratch_str_ref .= ");\n";
   if ($$method{'return-type'}) {

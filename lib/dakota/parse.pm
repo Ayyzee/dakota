@@ -2120,8 +2120,9 @@ sub rep_tree_from_dk_path {
                      'klass' => 1,
                      'method' => 1,
                      'method-alias' => 1,
+                     'missing-keyword-exception' => 1, # generated kw-args processing function
                      'named-info-node' => 1,
-                     'no-such-keyword-exception' => 1,
+                     'no-such-keyword-exception' => 1, # generated kw-args processing function
                      'no-such-method-exception' => 1,
                      'object' => 1,
                      'output-stream' => 1, # std-output, std-error
