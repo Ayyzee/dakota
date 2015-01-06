@@ -326,7 +326,6 @@ sub generate_nrt {
       "\n" .
       "#include \"../$name.$cxx_ext\"\n" . # user-code (converted from dk to cxx)
       "\n" .
-      #&labeled_src_str($result, "klasses-cxx") .
       &dk::generate_cxx_footer($file, $stack = [], $col = '');
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
