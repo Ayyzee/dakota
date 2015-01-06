@@ -290,35 +290,34 @@ sub generate_nrt {
   } else {
     #my $directory = $ENV{'DKT_DIR'} ||= '.';
     #print "    creating $directory/$path/$name.$cxx_ext\n"; # nrt-cxx
-    my $suffix = 'hxx';
 
-    my $str = &labeled_src_str(undef, "nrt-hxx");
-    $str .=
+    my $str_hxx = &labeled_src_str(undef, "nrt-hxx");
+    $str_hxx .=
       "\n" .
       &labeled_src_str($defn_tbl, "headers-hxx") .
       &hardcoded_typedefs() .
       &labeled_src_str($defn_tbl, "klasses-hxx") .
-      &labeled_src_str($defn_tbl, "symbols-$suffix") .
-      &labeled_src_str($defn_tbl, "strings-$suffix") .
-      &labeled_src_str($defn_tbl, "hashes-$suffix") .
-      &labeled_src_str($defn_tbl, "keywords-$suffix") .
-      &labeled_src_str($defn_tbl, "selectors-$suffix") .
-      &labeled_src_str($defn_tbl, "selectors-seq-$suffix") .
-      &labeled_src_str($defn_tbl, "signatures-$suffix") .
-      &labeled_src_str($defn_tbl, "signatures-seq-$suffix") .
-      &labeled_src_str($defn_tbl, "generics-$suffix");
+      &labeled_src_str($defn_tbl, "symbols-hxx") .
+      &labeled_src_str($defn_tbl, "strings-hxx") .
+      &labeled_src_str($defn_tbl, "hashes-hxx") .
+      &labeled_src_str($defn_tbl, "keywords-hxx") .
+      &labeled_src_str($defn_tbl, "selectors-hxx") .
+      &labeled_src_str($defn_tbl, "selectors-seq-hxx") .
+      &labeled_src_str($defn_tbl, "signatures-hxx") .
+      &labeled_src_str($defn_tbl, "signatures-seq-hxx") .
+      &labeled_src_str($defn_tbl, "generics-hxx");
 
-    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str ], undef);
+    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
 
-    $str = &labeled_src_str(undef, "nrt-cxx");
-    $str .=
+    my $str_cxx = &labeled_src_str(undef, "nrt-cxx");
+    $str_cxx .=
       "\n" .
       "#include \"$name.$hxx_ext\"\n" .
       &user_code_cxx($name) .
       &labeled_src_str($defn_tbl, "klasses-cxx");
 
-    &write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
-    &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str ], undef);
+    &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
+    &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
   }
   return $result;
 } # sub generate_nrt
@@ -335,57 +334,81 @@ sub generate_rt_defn {
 sub generate_rt {
   my ($path, $file_basename, $file, $defn_tbl) = @_;
   $gbl_nrt_file = undef;
-  my $result = {};
   my $name = $file_basename;
   $name =~ s|.*/||; # strip off directory part
   $name =~ s|\.$k+$||;
-
-  my $scratch_str_ref = &global_scratch_str_ref();
+  my $result;
   my ($generics, $symbols) = &generics::parse($file);
 
   if (&is_rt_decl()) {
+    my $output = "$path/$name.$hxx_ext";
+    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+      $output = $ENV{'DKT_DIR'} . '/' . $output
+    }
+    print "    creating $output\n"; # rt-hxx
+    $result = {};
     &generate_decl_defn($file, $generics, $symbols, 'hxx', $result);
+
+    my $str_hxx = &labeled_src_str(undef, "rt-hxx");
+    $str_hxx .=
+      "\n" .
+      &labeled_src_str($result, "headers-hxx") .
+      &hardcoded_typedefs() .
+      &labeled_src_str($result, "klasses-hxx") .
+      &labeled_src_str($result, "symbols-hxx") .
+      &labeled_src_str($result, "strings-hxx") .
+      &labeled_src_str($result, "hashes-hxx") .
+      &labeled_src_str($result, "keywords-hxx") .
+      &labeled_src_str($result, "selectors-hxx") .
+      &labeled_src_str($result, "selectors-seq-hxx") .
+      &labeled_src_str($result, "signatures-hxx") .
+      &labeled_src_str($result, "signatures-seq-hxx") .
+      &labeled_src_str($result, "generics-hxx") .
+      "\n";
+    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
   } else {
     my $output = "$path/$name.$cxx_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output\n"; # rt-cxx
-    #print "    creating $output # rt-cxx\n";
-    my $suffix = 'cxx';
-    &generate_decl_defn($file, $generics, $symbols, $suffix, $result);
+    $result = {};
+    &generate_decl_defn($file, $generics, $symbols, 'cxx', $result);
 
-    my $str = &labeled_src_str(undef, "rt-cxx");
-    $str .=
+    my $str_cxx = &labeled_src_str(undef, "rt-cxx");
+    $str_cxx .=
       "\n" .
-      &labeled_src_str($defn_tbl, "headers-hxx") . ###
-      &hardcoded_typedefs() .
-      &labeled_src_str($defn_tbl, "klasses-hxx") . ###
-      &labeled_src_str($result, "symbols-$suffix") .
-      &labeled_src_str($result, "strings-$suffix") .
-      &labeled_src_str($result, "hashes-$suffix") .
-      &labeled_src_str($result, "keywords-$suffix") .
-      &labeled_src_str($result, "selectors-$suffix") .
-      &labeled_src_str($result, "selectors-seq-$suffix") .
-      &labeled_src_str($result, "signatures-$suffix") .
-      &labeled_src_str($result, "signatures-seq-$suffix") .
-      &labeled_src_str($result, "generics-$suffix") .
+      "#include \"$name.$hxx_ext\"\n" .
+      "\n" .
+      &labeled_src_str($result, "symbols-cxx") .
+      &labeled_src_str($result, "strings-cxx") .
+      &labeled_src_str($result, "hashes-cxx") .
+      &labeled_src_str($result, "keywords-cxx") .
+      &labeled_src_str($result, "selectors-cxx") .
+      &labeled_src_str($result, "selectors-seq-cxx") .
+      &labeled_src_str($result, "signatures-cxx") .
+      &labeled_src_str($result, "signatures-seq-cxx") .
+      &labeled_src_str($result, "generics-cxx") .
       ## other: user_code_cxx
       &labeled_src_str($result, "klasses-cxx") .
       "\n";
 
-    $str .= &generate_defn_footer($file);
+    $str_cxx .= &generate_defn_footer($file);
 
-    &write_to_file_strings("$path/$name.$dk_ext",            [ $str ]);
-    &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str ], undef);
+    &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
+    &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
   }
   return $result;
 } # sub generate_rt
 sub labeled_src_str {
   my ($tbl, $key) = @_;
-  my $str = "//--$key--\n";
-  if ($tbl) {
+  my $str;
+  if (! $tbl) {
+    $str = "//==$key==\n";
+  } else {
+    $str = "//--$key--\n";
     $str .= $$tbl{$key};
+    $str .= "//--$key-end--\n";
   }
   return $str;
 }
