@@ -68,6 +68,7 @@
   #define artificial __attribute__((__artificial__))
   #define leaf       __attribute__((__leaf__))
   #define nothrow    __attribute__((__nothrow__))
+// don't forget about noexcept
   #define hot        __attribute__((__hot__))
   #define designated_init __attribute__((__designated_init__))
   #if 0
@@ -116,8 +117,6 @@
 // boole-t is promoted to int-t when used in va_arg() macro
 typedef int_t dkt_va_arg_boole_t;
 typedef va_list va_list_t;
-
-#define dkt_compile_assert(v) typedef void* dkt_compile_assert_failed[(v) ? 1 : -1]
 
 #if defined DEBUG
   #define DKT_TRACE(statement) statement

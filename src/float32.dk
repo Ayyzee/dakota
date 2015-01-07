@@ -20,4 +20,4 @@ klass float32
 {
   slots float;
 }
-dkt-compile-assert(4 == sizeof(float32-t));
+static-assert(4 == sizeof(float32-t), "The slots type of klass float32 must be 4 bytes in size");

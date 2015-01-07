@@ -20,4 +20,4 @@ klass float128
 {
   slots long double;
 }
-dkt-compile-assert(16 == sizeof(float128-t));
+static-assert(16 == sizeof(float128-t), "The slots type of klass float128 must be 16 bytes in size");
