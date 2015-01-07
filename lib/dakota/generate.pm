@@ -281,7 +281,6 @@ sub generate_nrt {
   $name =~ s|.*/||; # strip off directory part
   $name =~ s|\.$k+$||;
 
-  my $scratch_str_ref = &global_scratch_str_ref();
   my ($generics, $symbols) = &generics::parse($file);
   my $result;
 
@@ -351,7 +350,6 @@ sub generate_rt {
   $name =~ s|.*/||; # strip off directory part
   $name =~ s|\.$k+$||;
 
-  #
   my ($generics, $symbols) = &generics::parse($file);
   my $result;
 
