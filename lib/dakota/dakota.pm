@@ -276,7 +276,11 @@ sub loop_cxx_from_dk {
     &dk::generate_dk_cxx($file_basename, $dk_cxx_path, $dk_cxx_name);
     $cxx_path =~ s|^\./||;
     $cxx_path =~ s|/$||;
-    &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file);
+    if (0) {
+      #  for each translation unit create links to the linkage unit header file
+    } else {
+      &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file);
+    }
     &dakota::generate::generate_nrt_defn($cxx_path, $file_basename, $file);
   }
 } # loop_cxx_from_dk
