@@ -335,20 +335,22 @@ sub start {
     &add_visibility_file($$cmd_info{'opts'}{'output'});
   }
 
-  if (1) {
+  if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
+    # generate the single (but slow) runtime .o, then the user .o files
+    # this might be useful for distributed building (initiating the building of the slowest first
+    # or for testing runtime code generation
+    # also, this might be useful if the runtime .h file is being used rather than generating a
+    # translation unit specific .h file (like in the case of inline functions)
+    if (!$$cmd_info{'opts'}{'compile'}) {
+      &gen_rt_obj($cmd_info);
+    }
+    $cmd_info = &loop_obj_from_dk($cmd_info);
+  } else {
      # generate user .o files first, then the single (but slow) runtime .o
     $cmd_info = &loop_obj_from_dk($cmd_info);
     if (!$$cmd_info{'opts'}{'compile'}) {
       &gen_rt_obj($cmd_info);
     }
-  } else {
-    # generate the single (but slow) runtime .o, then the user .o files
-    # this might be useful for distributed building (initiating the building of the slowest first
-    # or for testing runtime code generation
-    if (!$$cmd_info{'opts'}{'compile'}) {
-      &gen_rt_obj($cmd_info);
-    }
-    $cmd_info = &loop_obj_from_dk($cmd_info);
   }
 
   if ($$cmd_info{'opts'}{'compile'} && exists $$cmd_info{'output'}) {
