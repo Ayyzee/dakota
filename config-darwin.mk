@@ -1,6 +1,7 @@
 export SO_EXT := dylib
 export LD_SONAME_FLAGS := -install_name
 export CXX := clang++
+export CXX_COMPILE_FLAGS := --compile
 export CXX_SHARED_FLAGS := -dynamiclib
 export CXX_DYNAMIC_FLAGS := -dynamiclib
 export CXX_OUTPUT_FLAGS := --output
