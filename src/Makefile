@@ -92,7 +92,7 @@ all:
 	$(MAKE) $(MFLAGS) dakota-util
 
 tst: tst-main.$(dk_ext)
-	CXXFLAGS="${CXXFLAGS} --debug=3" $(DAKOTA) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
+	CXXFLAGS="${CXXFLAGS} ${CXX_DEBUG_FLAGS}" $(DAKOTA) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 check: all install
 	$(rootdir)/bin/dakota-info$(exeext) $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name)
@@ -109,7 +109,7 @@ dakota: $(rootdir)/lib/$(lib_prefix)$(dakota_name)
 
 $(rootdir)/bin/dakota-info$(exeext): $(SRCDIR)/dakota-info-main.$(cxx_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
-	$(CXX) $(EXTRA_CXXFLAGS) $(CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all

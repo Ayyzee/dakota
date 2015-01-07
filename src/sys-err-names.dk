@@ -40,7 +40,7 @@ static const char8-t* gbl-sys-err-names[] =
    "130",  "131"
 };
 
-noexport void
+static void
 set-name(int-t errnum, const char8-t* name)
 {
   assert(0 != errnum);
@@ -65,7 +65,7 @@ set-name(int-t errnum, const char8-t* name)
   return;
 }
 
-const char8-t*
+export const char8-t*
 strerror-name(int-t errnum)
 {
   assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
@@ -73,25 +73,19 @@ strerror-name(int-t errnum)
   return name;
 }
 
-static void
-__initial()
+static void __initial()
 {
 #include "sys-err-names.tbl"
   return;
 }
 
-static void
-__final()
+static void __final()
 {
   return;
 }
 
-namespace
-{
-  struct noexport __ddl-t
-  {
-     __ddl-t() { __initial(); }
-    ~__ddl-t() { __final(); }
-  };
-} // namespace
+namespace { struct noexport __ddl-t {
+  __ddl-t()  { __initial(); }
+  ~__ddl-t() { __final();   }
+};}
 static __ddl-t __ddl = __ddl-t();

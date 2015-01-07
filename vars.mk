@@ -1,4 +1,4 @@
-MAKE := gnumake
+MAKE := make
 MAKEFLAGS :=\
  --no-builtin-rules\
  --no-builtin-variables\
@@ -61,17 +61,8 @@ INCLUDE_DAKOTAFLAGS :=\
 
 EXTRA_CXXFLAGS :=
 
-ifdef DKT_PROFILE
-  EXTRA_CXXFLAGS += -pg
-  EXTRA_LDFLAGS  += -pg
-endif
-
-ifndef DKT_USE_COMPOUND_LITERALS
-  EXTRA_CXXFLAGS += --pedantic
-endif
-
-ifndef MIN_EXTRA_CXXFLAGS
-  EXTRA_CXXFLAGS += --define-macro DEBUG
+#ifndef MIN_EXTRA_CXXFLAGS
+#  EXTRA_CXXFLAGS += --define-macro DEBUG
   #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
   #EXTRA_CXXFLAGS += --define-macro DKT_USE_MAKE_MACRO
   #ifdef __LP64__
@@ -83,7 +74,7 @@ ifndef MIN_EXTRA_CXXFLAGS
     #EXTRA_LDFLAGS += $(EXTRA_LDFLAGS_DARWIN_64)
   #endif
   #endif
-endif
+#endif
 
 # clang does not support
 #   --no-common
@@ -121,6 +112,10 @@ endif
 
 #diagnostics-format rhs = clang|msvc|vi
 
+#ifndef DKT_USE_COMPOUND_LITERALS
+#  EXTRA_CXXFLAGS += --pedantic
+#endif
+
 EXTRA_CXXFLAGS += $(CXX_WARNING_FLAGS)
 EXTRA_CXXFLAGS += --optimize=0
 
@@ -131,6 +126,11 @@ EXTRA_CXXFLAGS +=\
  --define-macro MOD_SIZE_CAST_HACK\
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
+
+ifdef DKT_PROFILE
+  EXTRA_CXXFLAGS += -pg
+  EXTRA_LDFLAGS  += -pg
+endif
 
 export CXX
 export CXXFLAGS
