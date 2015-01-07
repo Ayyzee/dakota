@@ -267,15 +267,15 @@ sub write_to_file_converted_strings {
 sub generate_nrt_decl {
   my ($path, $file_basename, $file) = @_;
   &set_nrt_decl();
-  return &generate_nrt($path, $file_basename, $file, undef);
+  return &generate_nrt($path, $file_basename, $file);
 }
 sub generate_nrt_defn {
-  my ($path, $file_basename, $file, $defn_tbl) = @_;
+  my ($path, $file_basename, $file) = @_;
   &set_nrt_defn();
-  return &generate_nrt($path, $file_basename, $file, $defn_tbl);
+  return &generate_nrt($path, $file_basename, $file);
 }
 sub generate_nrt {
-  my ($path, $file_basename, $file, $defn_tbl) = @_;
+  my ($path, $file_basename, $file) = @_;
   $gbl_nrt_file = "$file_basename.dk";
   my $name = $file_basename;
   $name =~ s|.*/||; # strip off directory part
@@ -310,13 +310,14 @@ sub generate_nrt {
       &labeled_src_str($result, "generics-hxx");
 
     &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
+    return "$path/$name.$hxx_ext";
   } else {
     my $col; my $stack;
-    #my $output = "$path/$name.$cxx_ext";
-    #if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-    #  $output = $ENV{'DKT_DIR'} . '/' . $output
-    #}
-    #print "    creating $output\n"; # nrt-cxx
+    my $output = "$path/$name.$cxx_ext";
+    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+      $output = $ENV{'DKT_DIR'} . '/' . $output
+    }
+    print "    creating $output\n"; # nrt-cxx
     $result = &generate_decl_defn($file, $generics, $symbols, 'cxx');
 
     my $str_cxx = &labeled_src_str(undef, "nrt-cxx");
@@ -330,21 +331,21 @@ sub generate_nrt {
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
+    return "$path/$name.$cxx_ext";
   }
-  return $result;
 } # sub generate_nrt
 sub generate_rt_decl {
   my ($path, $file_basename, $file) = @_;
   &set_rt_decl();
-  return &generate_rt($path, $file_basename, $file, undef);
+  return &generate_rt($path, $file_basename, $file);
 }
 sub generate_rt_defn {
-  my ($path, $file_basename, $file, $defn_tbl) = @_;
+  my ($path, $file_basename, $file) = @_;
   &set_rt_defn();
-  return &generate_rt($path, $file_basename, $file, $defn_tbl);
+  return &generate_rt($path, $file_basename, $file);
 }
 sub generate_rt {
-  my ($path, $file_basename, $file, $defn_tbl) = @_;
+  my ($path, $file_basename, $file) = @_;
   $gbl_nrt_file = undef;
   my $name = $file_basename;
   $name =~ s|.*/||; # strip off directory part
@@ -379,6 +380,7 @@ sub generate_rt {
       &labeled_src_str($result, "generics-hxx");
 
     &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
+    return "$path/$name.$hxx_ext";
   } else {
     my $output = "$path/$name.$cxx_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
@@ -407,8 +409,8 @@ sub generate_rt {
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
     &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
+    return "$path/$name.$cxx_ext";
   }
-  return $result;
 } # sub generate_rt
 sub labeled_src_str {
   my ($tbl, $key) = @_;
@@ -4137,9 +4139,7 @@ sub dk::generate_dk_cxx {
     $output = $ENV{'DKT_DIR'} . '/' . $output
   }
   print "    creating $output\n"; # user-dk-cxx
-  #print "    creating $output # user-dk-cxx\n";
 
-  #print STDERR "$name.$dk_ext.$cxx_ext\n";
   if (exists $ENV{'DK_NO_LINE'}) {
     &write_to_file_converted_strings("$path$name.$cxx_ext", [ $filestr ], "$file_basename.$dk_ext");
   } else {

@@ -276,10 +276,8 @@ sub loop_cxx_from_dk {
     &dk::generate_dk_cxx($file_basename, $dk_cxx_path, $dk_cxx_name);
     $cxx_path =~ s|^\./||;
     $cxx_path =~ s|/$||;
-    my $defn_tbl = &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file, undef);
-    #my $stack; my $col;
-    #$$defn_tbl{'klasses-cxx'} = &dk::generate_cxx_footer($file, $stack = [], $col = '');
-    &generate_nrt_defn($cxx_path, $file_basename, $file, $defn_tbl);
+    &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file);
+    &dakota::generate::generate_nrt_defn($cxx_path, $file_basename, $file);
   }
 } # loop_cxx_from_dk
 
@@ -535,8 +533,8 @@ sub rt_obj_from_rep {
   $file = &scalar_from_file($rep_path);
   $file = &ka_translate($file);
 
-  my $defn_tbl = &generate_rt_decl($path, $file_basename, $file);
-  &generate_rt_defn($path, $file_basename, $file, $defn_tbl);
+  &dakota::generate::generate_rt_decl($path, $file_basename, $file);
+  &dakota::generate::generate_rt_defn($path, $file_basename, $file);
 
   my $obj_info = {'opts' => {}, 'inputs' => [ $cxx_path ], 'output' => $obj_path };
   if ($$cmd_info{'opts'}{'precompile'}) {
@@ -695,7 +693,6 @@ sub outfile_from_infiles {
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
           $output = $ENV{'DKT_DIR'} . '/' . $output
         }
-        print "    creating $output\n"; # output
         #print "    creating $output # output\n";
 	    }
 
