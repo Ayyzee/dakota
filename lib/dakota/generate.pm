@@ -1710,6 +1710,18 @@ sub dk::parse {
   $file = &dakota::parse::ka_translate($file);
   return $file;
 }
+sub generate_struct_or_union_decl {
+  my ($col, $slots_scope, $is_exported, $is_slots) = @_;
+  my $scratch_str_ref = &global_scratch_str_ref();
+  my $slots_info = $$slots_scope{'info'};
+
+  if ('struct' eq $$slots_scope{'cat'} ||
+      'union'  eq $$slots_scope{'cat'}) {
+    $$scratch_str_ref .= " $$slots_scope{'cat'} slots-t; ";
+  } else {
+    die __FILE__, ":", __LINE__, ": error:\n";
+  }
+}
 sub generate_struct_or_union_defn {
   my ($col, $slots_scope, $is_exported, $is_slots) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -1739,6 +1751,22 @@ sub generate_struct_or_union_defn {
   $col = &colout($col);
   $$scratch_str_ref .= $col . "};";
 }
+sub generate_enum_decl {
+  my ($col, $enum, $is_exported, $is_slots) = @_;
+  #die if $$enum{'type'} && $is_slots;
+  my $info = $$enum{'info'};
+  my $scratch_str_ref = &global_scratch_str_ref();
+
+  if ($is_slots) {
+    $$scratch_str_ref .= " enum slots-t";
+  } else {
+    $$scratch_str_ref .= " enum";
+    if ($$enum{'type'}) {
+      $$scratch_str_ref .= " @{$$enum{'type'}}";
+    }
+  }
+  $$scratch_str_ref .= " : int-t;";
+}
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
   #die if $$enum{'type'} && $is_slots;
@@ -1753,6 +1781,7 @@ sub generate_enum_defn {
       $$scratch_str_ref .= " @{$$enum{'type'}}";
     }
   }
+  $$scratch_str_ref .= " : int-t";
   $$scratch_str_ref .= " {\n";
   my $max_width = 0;
   foreach my $pair (@$info) {
@@ -2245,7 +2274,7 @@ sub generate_slots_decls {
       my $is_exported;
       my $is_slots;
       &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
-      $$scratch_str_ref .= $col . "}\n";
+      $$scratch_str_ref .= $col . " }\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
@@ -2321,8 +2350,8 @@ sub generate_exported_slots_decls {
       $$scratch_str_ref .= $col . "klass $klass_name {";
       my $is_exported;
       my $is_slots;
-      &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
-      $$scratch_str_ref .= $col . "}\n";
+      &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
+      $$scratch_str_ref .= $col . " }\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
@@ -2654,7 +2683,7 @@ sub linkage_unit::generate_klasses_types_after {
             $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
             $$scratch_str_ref .= $col . "klass $klass_name {";
             &generate_enum_defn(&colin($col), $enum, $is_exported = 1, $is_slots = 0);
-            $$scratch_str_ref .= $col . "}\n";
+            $$scratch_str_ref .= $col . " }\n";
           }
         }
       }
@@ -2668,12 +2697,12 @@ sub linkage_unit::generate_klasses_types_after {
               'union'  eq $$klass_scope{'slots'}{'cat'}) {
             &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
           } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-            $$scratch_str_ref .= $col . " // enum slots-t { ... }\n";
+            &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
           } else {
             print STDERR &Dumper($$klass_scope{'slots'});
             die __FILE__, ":", __LINE__, ": error:\n";
           }
-          $$scratch_str_ref .= $col . "}\n";
+          $$scratch_str_ref .= $col . " }\n";
         }
       } elsif (&is_nrt_defn() || &is_rt_defn()) {
         if (!&has_exported_slots($klass_scope)) {
@@ -2689,7 +2718,7 @@ sub linkage_unit::generate_klasses_types_after {
               print STDERR &Dumper($$klass_scope{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
-            $$scratch_str_ref .= $col . "}\n";
+            $$scratch_str_ref .= $col . " }\n";
           } else {
             $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
             $$scratch_str_ref .= $col . "klass $klass_name {";
@@ -2697,12 +2726,12 @@ sub linkage_unit::generate_klasses_types_after {
                 'union'  eq $$klass_scope{'slots'}{'cat'}) {
               &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
             } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-              $$scratch_str_ref .= $col . " // enum slots-t { ... }\n";
+              &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
             } else {
               print STDERR &Dumper($$klass_scope{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
-            $$scratch_str_ref .= $col . "}\n";
+            $$scratch_str_ref .= $col . " }\n";
           }
         }
       }
