@@ -121,12 +121,14 @@ endif
 
 #diagnostics-format rhs = clang|msvc|vi
 
-EXTRA_CXXFLAGS += $(CXXFLAGS_WARNINGS_ALL)\
- --optimize=0\
+EXTRA_CXXFLAGS += $(CXX_WARNING_FLAGS)
+EXTRA_CXXFLAGS += --optimize=0
+
+EXTRA_CXXFLAGS += $(CXX_DEBUG_FLAGS)
+
+EXTRA_CXXFLAGS +=\
  --define-macro HAVE_CONFIG_H\
  --define-macro MOD_SIZE_CAST_HACK\
-
-EXTRA_CXXFLAGS += --debug=3 --define-macro DEBUG 
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
 

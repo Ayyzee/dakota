@@ -293,28 +293,28 @@ sub start {
   }
 
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
-    $$cmd_info{'opts'}{'compiler-flags'} = "$ENV{'EXTRA_CXXFLAGS'} $ENV{'CXXFLAGS'}";
+    $$cmd_info{'opts'}{'compiler-flags'} = "$ENV{'CXXFLAGS'} $ENV{'EXTRA_CXXFLAGS'}";
   }
 
   if ($ENV{'MAKEFLAGS'}) {
     my $makeflags = $ENV{'MAKEFLAGS'};
     #print "MAKEFLAGS: \"$makeflags\"\n";
   }
-  my $ld_name_flag = '-soname'; #default
-  if (defined $ENV{'LD_NAME_FLAG'}) {
-    $ld_name_flag = $ENV{'LD_NAME_FLAG'};
+  my $ld_soname_flags = '-soname'; #default
+  if (defined $ENV{'LD_SONAME_FLAGS'}) {
+    $ld_soname_flags = $ENV{'LD_SONAME_FLAGS'};
   }
 
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_construct = undef;
   } elsif ($$cmd_info{'opts'}{'shared'}) {
-    if ($$cmd_info{'opts'}{'name'}) {
-	    $cxx_shared_flags .= " --for-linker $ld_name_flag --for-linker $$cmd_info{'opts'}{'name'}";
+    if ($$cmd_info{'opts'}{'soname'}) {
+	    $cxx_shared_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
     }
     $dk_construct = 'construct::k_library';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
-    if ($$cmd_info{'opts'}{'name'}) {
-	    $cxx_dynamic_flags .= " --for-linker $ld_name_flag --for-linker $$cmd_info{'opts'}{'name'}";
+    if ($$cmd_info{'opts'}{'soname'}) {
+	    $cxx_dynamic_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
     }
     $dk_construct = 'construct::k_library';
   } elsif (!$$cmd_info{'opts'}{'compile'}
@@ -442,8 +442,8 @@ sub gen_rt_obj {
   if ($dk_construct) {
     $flags .= " --define-macro DKT_CONSTRUCT=$dk_construct";
   }
-  if ($$cmd_info{'opts'}{'name'}) {
-    $flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'opts'}{'name'}\\\"";
+  if ($$cmd_info{'opts'}{'soname'}) {
+    $flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'opts'}{'soname'}\\\"";
   } else {
     $flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'output'}\\\"";
   }

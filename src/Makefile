@@ -59,10 +59,10 @@ HOME_FILES :=\
 # the use of $^ should be $?
 
 $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT):
-	$(DAKOTA) --shared $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --name $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --shared $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/lib/%.$(SO_EXT):
-	$(DAKOTA) --dynamic  $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --name $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --dynamic  $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/bin/%$(exeext): $(SRCDIR)/%-main.$(dk_ext)
 	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)

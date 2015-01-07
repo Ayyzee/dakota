@@ -96,7 +96,7 @@ my $root_cmd = { 'opts' => { 'include-directory' => [], 'define-macro' => [], 'v
             'compile',             # gcc-like
             'shared',              # gcc-like
             'dynamic',             # gcc-like
-            'name=s',              # ld-sh (-soname <>)
+            'soname=s',            # ld-like (-soname <>)
             'keep-going',          # make-like
             'define-macro=s',      # gcc-like
             'include-directory=s', # gcc-like
