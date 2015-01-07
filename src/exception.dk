@@ -56,8 +56,8 @@ noreturn export void dkt-throw(const char8-t* exception-str)
   THROW exception-str; // this will not be rewritten
 }
 
-#ifndef HAVE-GETPROGNAME
-#ifdef HAVE-PROCFS
+#if !defined HAVE-GETPROGNAME
+#if defined HAVE-PROCFS
 static char8-t[1024] gbl-buf;
 const char8-t*
 getprogname()

@@ -276,10 +276,12 @@ sub loop_cxx_from_dk {
     &dk::generate_dk_cxx($file_basename, $dk_cxx_path, $dk_cxx_name);
     $cxx_path =~ s|^\./||;
     $cxx_path =~ s|/$||;
-    my $defn_tbl = &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file, undef);
-    #my $stack; my $col;
-    #$$defn_tbl{'klasses-cxx'} = &dk::generate_cxx_footer($file, $stack = [], $col = '');
-    &generate_nrt_defn($cxx_path, $file_basename, $file, $defn_tbl);
+    if (0) {
+      #  for each translation unit create links to the linkage unit header file
+    } else {
+      &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file);
+    }
+    &dakota::generate::generate_nrt_defn($cxx_path, $file_basename, $file);
   }
 } # loop_cxx_from_dk
 
@@ -337,20 +339,22 @@ sub start {
     &add_visibility_file($$cmd_info{'opts'}{'output'});
   }
 
-  if (1) {
+  if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
+    # generate the single (but slow) runtime .o, then the user .o files
+    # this might be useful for distributed building (initiating the building of the slowest first
+    # or for testing runtime code generation
+    # also, this might be useful if the runtime .h file is being used rather than generating a
+    # translation unit specific .h file (like in the case of inline functions)
+    if (!$$cmd_info{'opts'}{'compile'}) {
+      &gen_rt_obj($cmd_info);
+    }
+    $cmd_info = &loop_obj_from_dk($cmd_info);
+  } else {
      # generate user .o files first, then the single (but slow) runtime .o
     $cmd_info = &loop_obj_from_dk($cmd_info);
     if (!$$cmd_info{'opts'}{'compile'}) {
       &gen_rt_obj($cmd_info);
     }
-  } else {
-    # generate the single (but slow) runtime .o, then the user .o files
-    # this might be useful for distributed building (initiating the building of the slowest first
-    # or for testing runtime code generation
-    if (!$$cmd_info{'opts'}{'compile'}) {
-      &gen_rt_obj($cmd_info);
-    }
-    $cmd_info = &loop_obj_from_dk($cmd_info);
   }
 
   if ($$cmd_info{'opts'}{'compile'} && exists $$cmd_info{'output'}) {
@@ -535,8 +539,8 @@ sub rt_obj_from_rep {
   $file = &scalar_from_file($rep_path);
   $file = &ka_translate($file);
 
-  my $defn_tbl = &generate_rt_decl($path, $file_basename, $file);
-  &generate_rt_defn($path, $file_basename, $file, $defn_tbl);
+  &dakota::generate::generate_rt_decl($path, $file_basename, $file);
+  &dakota::generate::generate_rt_defn($path, $file_basename, $file);
 
   my $obj_info = {'opts' => {}, 'inputs' => [ $cxx_path ], 'output' => $obj_path };
   if ($$cmd_info{'opts'}{'precompile'}) {
@@ -618,7 +622,7 @@ sub exec_cmd {
     print STDERR "  $cmd_str\n";
   }
 
-  if (0 && ! $ENV{'DKT_NO_FIXUP_STDERR'}) {
+  if ($ENV{'DKT_NO_FIXUP_STDERR'}) {
     if ($ENV{'DKT_DIR'}) {
       my $cwd = &getcwd();
       open (STDERR, "|dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
@@ -695,7 +699,6 @@ sub outfile_from_infiles {
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
           $output = $ENV{'DKT_DIR'} . '/' . $output
         }
-        print "    creating $output\n"; # output
         #print "    creating $output # output\n";
 	    }
 
