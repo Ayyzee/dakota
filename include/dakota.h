@@ -80,7 +80,7 @@
 #define unbox_attrs pure hot nothrow
 
 #if !defined HAVE_STRERROR_NAME
-  export const char8_t* strerror_name(int_t errno);
+  import const char8_t* strerror_name(int_t);
 #endif
 
 #if !defined USE

@@ -40,7 +40,7 @@ static const char8-t* gbl-sys-err-names[] =
    "130",  "131"
 };
 
-noexport void
+static void
 set-name(int-t errnum, const char8-t* name)
 {
   assert(0 != errnum);
@@ -48,10 +48,10 @@ set-name(int-t errnum, const char8-t* name)
   assert(NUL != name[0]);
 //   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);
   assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
-  if (isdigit(gbl-sys-err-names[errnum][0]))
+  if (isdigit(gbl-sys-err-names[errnum][0])) {
     gbl-sys-err-names[errnum] = name;
-  else
-  {
+  }
+  else {
     const char8-t* delim = "|";
     uint32-t len = cast(uint32-t)strlen(gbl-sys-err-names[errnum]) + cast(uint32-t)strlen(delim) + cast(uint32-t)strlen(name) + (1);
     char8-t* buf = cast(char8-t*)malloc(sizeof(char8-t) * len); // leakleak
@@ -65,7 +65,7 @@ set-name(int-t errnum, const char8-t* name)
   return;
 }
 
-const char8-t*
+export const char8-t*
 strerror-name(int-t errnum)
 {
   assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
@@ -73,25 +73,19 @@ strerror-name(int-t errnum)
   return name;
 }
 
-static void
-__initial()
+static void __initial()
 {
 #include "sys-err-names.tbl"
   return;
 }
 
-static void
-__final()
+static void __final()
 {
   return;
 }
 
-namespace
-{
-  struct noexport __ddl-t
-  {
-     __ddl-t() { __initial(); }
-    ~__ddl-t() { __final(); }
-  };
-} // namespace
+namespace { struct noexport __ddl-t {
+  __ddl-t()  { __initial(); }
+  ~__ddl-t() { __final();   }
+};}
 static __ddl-t __ddl = __ddl-t();
