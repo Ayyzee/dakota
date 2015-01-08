@@ -204,6 +204,11 @@ noreturn import void dkt_null_method(object_t object, ...);
   import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
   import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
 
+  import int_t dkt_va_trace_before(const signature_t* signature, method_t m, object_t object, va_list_t args);
+  import int_t dkt_va_trace_before(const signature_t* signature, method_t m, super_t context, va_list_t args);
+  import int_t dkt_va_trace_after(const signature_t* signature, method_t m, object_t object, va_list_t args);
+  import int_t dkt_va_trace_after(const signature_t* signature, method_t m, super_t context, va_list_t args);
+
   import int_t dkt_trace_before(const signature_t* signature, method_t method, super_t context, ...);
   import int_t dkt_trace_before(const signature_t* signature, method_t method, object_t object, ...);
   import int_t dkt_trace_after( const signature_t* signature, method_t method, super_t context, ...);

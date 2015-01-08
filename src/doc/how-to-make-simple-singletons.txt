@@ -1,0 +1,8 @@
+object-t dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name);
+// name: required
+// superklass-name: may be nullptr (defaults to <object>)
+// klass-name: may be nullptr (defaults to <klass>)
+
+
+object-t my-name-klass = dk-make-simple-klass($my-name, $my-superklass-name, $singleton-klass);
+object-t my-name = make(my-name-klass);

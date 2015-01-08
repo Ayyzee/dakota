@@ -25,30 +25,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define declare_klass_type_struct(k)          namespace k { struct     slots_t; } typedef k::slots_t k##_t
-//#define declare_klass_type_union(k)           namespace k { union      slots_t; } typedef k::slots_t k##_t
-//#define declare_klass_type_enum(k)            namespace k { enum : int32_t slots_t; } typedef k::slots_t k##_t
-#define declare_klass_type_typedef(k, t)      namespace k { typedef t  slots_t; } typedef k::slots_t k##_t
-#define declare_klass_type_typedef_func(k, t) namespace k { typedef t;          } typedef k::slots_t k##_t
-
-typedef int int_t;
-typedef unsigned int uint_t;
-
-namespace object { struct slots_t; } typedef object::slots_t* object_t;
-
-declare_klass_type_typedef(boole, bool);
-declare_klass_type_typedef(char8, char);
-declare_klass_type_typedef(selector, uintptr_t);
-declare_klass_type_typedef(symbol, const char*);
-declare_klass_type_typedef(uchar8, unsigned char);
-
-declare_klass_type_typedef_func(method, object_t (*slots_t)());
-
-declare_klass_type_struct(super);
-declare_klass_type_struct(klass);
-declare_klass_type_struct(signature);
-declare_klass_type_struct(named_info_node);
-
+#include "dakota-dummy.h"
 #include <dakota.h> // format_printf(), format_va_printf()
 
 enum

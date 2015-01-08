@@ -94,10 +94,15 @@ all:
 tst: tst-main.$(dk_ext)
 	CXXFLAGS="${CXXFLAGS} ${CXX_DEBUG_FLAGS}" $(DAKOTA) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
+dummy: dummy-main.$(cxx_ext)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^
+
 check: all install
 	$(rootdir)/bin/dakota-info$(exeext) $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name)
 	$(MAKE) tst
 	./tst
+	$(MAKE) dummy
+	./dummy
 
 $(rootdir)/lib/$(lib_prefix)$(dakota_util_name): $(dakota_util_files)
 
@@ -164,7 +169,7 @@ sys-err-names.tbl: gen-sys-err-names.sh
 	./$<
 
 clean: clean-rt
-	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst
+	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst dummy
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info$(exeext)

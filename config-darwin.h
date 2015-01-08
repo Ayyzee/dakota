@@ -12,7 +12,7 @@
 
 #define SO_EXT "dylib"
 
-//#define USE_COMPOUND_LITERALS 1
-//#define USE_DESIGNATED_INITIALIZERS 1
+//#define ALLOW_COMPOUND_LITERALS 1
+//#define ALLOW_DESIGNATED_INITIALIZERS 1
 
 #endif // __config_h__
