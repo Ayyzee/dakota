@@ -33,8 +33,6 @@
   #define DEBUG_STMT(stmt)
 #endif
 
-#define DKT_WORKAROUND 1
-
 #if defined WIN32
   #define format_va_printf(fmtarg)
   #define format_va_scanf(fmtarg)
@@ -68,7 +66,7 @@
   #define artificial __attribute__((__artificial__))
   #define leaf       __attribute__((__leaf__))
   #define nothrow    __attribute__((__nothrow__))
-// don't forget about noexcept
+// don't forget about c++s' noexcept
   #define hot        __attribute__((__hot__))
   #define designated_init __attribute__((__designated_init__))
   #if 0
@@ -201,9 +199,6 @@ noreturn import void dkt_null_method(object_t object, ...);
 #endif
 
 #if defined DEBUG
-  import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-  import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
-
   import int_t dkt_va_trace_before(const signature_t* signature, method_t m, object_t object, va_list_t args);
   import int_t dkt_va_trace_before(const signature_t* signature, method_t m, super_t context, va_list_t args);
   import int_t dkt_va_trace_after(const signature_t* signature, method_t m, object_t object, va_list_t args);
@@ -216,6 +211,9 @@ noreturn import void dkt_null_method(object_t object, ...);
 
   import int_t dkt_va_trace_before_init(object_t kls, va_list_t);
   import int_t dkt_va_trace_after_init( object_t kls, va_list_t);
+
+  import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
+  import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
 
   import char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
 
