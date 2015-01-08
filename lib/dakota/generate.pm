@@ -2091,10 +2091,10 @@ sub linkage_unit::generate_klasses_body {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
-  if ($$klass_scope{'has-initialize'}) {
+  if (&is_decl() && $$klass_scope{'has-initialize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t initialize(object-t kls); }\n";
   }
-  if ($$klass_scope{'has-finalize'}) {
+  if (&is_decl() && $$klass_scope{'has-finalize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }\n";
   }
   if (&is_decl() && @$ka_methods) {
@@ -2104,7 +2104,7 @@ sub linkage_unit::generate_klasses_body {
     &generate_ka_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
-  if (&is_decl() && @$ka_methods) {
+  if (&is_decl() && defined $$klass_scope{'raw-methods'}) {
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
@@ -2130,6 +2130,12 @@ sub linkage_unit::generate_klasses_body {
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
           if (defined $$method{'keyword-types'}) {
             &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
+            if (0 == @{$$va_method{'keyword-types'}}) {
+              my $last = &dakota::util::_remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
+              my $method_decl_ref = &function::decl($va_method, $klass_path);
+              $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref } /*rn1*/\n";
+              &dakota::util::_add_last($$va_method{'parameter-types'}, $last);
+            }
           }
         } else {
           &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
@@ -3479,10 +3485,10 @@ sub dk::generate_cxx_footer_klass {
     $$tbbl{'$behavior-exported?'} = '1';
   }
   if ($$klass_scope{'has-initialize'}) {
-    $$tbbl{'$initialize'} = '(method-t)initialize';
+    $$tbbl{'$initialize'} = 'cast(method-t)initialize';
   }
   if ($$klass_scope{'has-finalize'}) {
-    $$tbbl{'$finalize'} = '(method-t)finalize';
+    $$tbbl{'$finalize'} = 'cast(method-t)finalize';
   }
   if ($$klass_scope{'module'}) {
     $$tbbl{'$module'} = "\"$$klass_scope{'module'}\"";
