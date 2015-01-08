@@ -969,23 +969,23 @@ sub method::generate_va_method_defn {
     $$scratch_str_ref .= " {\n";
     $col = &colin($col);
     $$scratch_str_ref .=
-      "static $method_type_decl = $cxx_scope:va:$va_method_name;\n" .
-      "va-list-t args;\n" .
-      "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
+      $col . "static $method_type_decl = $cxx_scope:va:$va_method_name;\n" .
+      $col . "va-list-t args;\n" .
+      $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
     if (defined $$va_method{'return-type'}) {
       my $return_type = &arg::type($$va_method{'return-type'});
-      $$scratch_str_ref .= "$return_type result = ";
+      $$scratch_str_ref .= $col . "$return_type result = ";
     }
 
     $$scratch_str_ref .=
-      "$va_name($$new_arg_names_list_ref);\n" .
-      "va-end(args);\n";
+      $col . "$va_name($$new_arg_names_list_ref);\n" .
+      $col . "va-end(args);\n";
 
     if (defined $$va_method{'return-type'}) {
-      $$scratch_str_ref .= "return result;\n";
+      $$scratch_str_ref .= $col . "return result;\n";
     } else {
-      $$scratch_str_ref .= "return;\n";
+      $$scratch_str_ref .= $col . "return;\n";
     }
     $col = &colout($col);
     $$scratch_str_ref .= "}}\n";
@@ -2001,7 +2001,7 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { /*noexport*/ symbol-t __klass__ = dk-intern(\"@$klass_path\"); }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); /*hackhack*/ }\n";
   }
 
   if ('klass' eq $klass_type) {
@@ -2129,14 +2129,7 @@ sub linkage_unit::generate_klasses_body {
         #if (&is_decl() || &is_same_file($klass_scope)) #rn1
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
           if (defined $$method{'keyword-types'}) {
-            if (0 < @{$$va_method{'keyword-types'}}) {
-              &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
-            } else {
-              my $last = &dakota::util::_remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
-              my $method_decl_ref = &function::decl($va_method, $klass_path);
-              $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref } /*rn1*/\n";
-              &dakota::util::_add_last($$va_method{'parameter-types'}, $last);
-            }
+            &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
           }
         } else {
           &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
