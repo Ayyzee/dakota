@@ -2,8 +2,9 @@ MAKE := make
 MAKEFLAGS :=\
  --no-builtin-rules\
  --no-builtin-variables\
- --no-print-directory\
  --warn-undefined-variables\
+
+# --no-print-directory\
 
 DESTDIR := /
 
@@ -52,8 +53,14 @@ DAKOTA_VARS =
 DAKOTA_VARS += CXX=$(CXX)
 DAKOTA_VARS += SO_EXT=$(SO_EXT)
 
-DAKOTA ?= $(DAKOTA_VARS) $(BINDIR)/dakota --keep-going
-#DAKOTA ?= $(DAKOTA_VARS) $(rootdir)/bin/dakota-profile
+ifdef DKT_PROFILE
+  DAKOTA ?= $(DAKOTA_VARS) $(BINDIR)/dakota-profile
+  EXTRA_CXXFLAGS += -pg
+  EXTRA_LDFLAGS  += -pg
+else
+  DAKOTA ?= $(DAKOTA_VARS) $(BINDIR)/dakota --keep-going
+endif
+
 DAKOTAFLAGS ?=
 INCLUDE_DAKOTAFLAGS :=\
  --include-directory $(SRCDIR)\
@@ -110,11 +117,15 @@ EXTRA_CXXFLAGS :=
  --warn-redundant-decls\
  --warn-switch-default\
 
-#diagnostics-format rhs = clang|msvc|vi
+# cast(some-type-t){...}
+ifdef DKT_ALLOW_COMPOUND_LITERALS
+  EXTRA_CXXFLAGS += -Wno-c99-extensions # too broad
+endif
 
-#ifndef DKT_USE_COMPOUND_LITERALS
-#  EXTRA_CXXFLAGS += --pedantic
-#endif
+# { .x = 0, .y = 0 }
+ifdef DKT_ALLOW_DESIGNATED_INITIALIZERS
+  EXTRA_CXXFLAGS += -Wno-c99-extensions # too broad
+endif
 
 EXTRA_CXXFLAGS += $(CXX_WARNING_FLAGS)
 EXTRA_CXXFLAGS += --optimize=0
@@ -126,11 +137,6 @@ EXTRA_CXXFLAGS +=\
  --define-macro MOD_SIZE_CAST_HACK\
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
-
-ifdef DKT_PROFILE
-  EXTRA_CXXFLAGS += -pg
-  EXTRA_LDFLAGS  += -pg
-endif
 
 export CXX
 export CXXFLAGS

@@ -76,6 +76,7 @@ getprogname()
 #endif
 #endif
 
+#if defined DEBUG
 static format-va-printf(2) int-t
 va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {
@@ -109,7 +110,6 @@ va-log(uint32-t priority, const char8-t* format, va-list-t args)
   return result;
 }
 
-#if defined DEBUG
 export format-va-printf(2) int-t
 dkt-va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {

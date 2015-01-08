@@ -347,7 +347,7 @@ klass vector
     return self;
   }
 
-  noexport uint32-t next-index(object-t self, uint32-t index)
+  static uint32-t next-index(object-t self, uint32-t index)
   {
     //assert(index <= self.count);
     uint32-t result = index;
@@ -362,7 +362,7 @@ klass vector
     return result;
   }
 
-  noexport uint32-t first-index(object-t self)
+  static uint32-t first-index(object-t self)
   {
     uint32-t index = 0;
     uint32-t result = index;
@@ -385,7 +385,7 @@ klass vector-forward-iterator
     uint32-t iterator-state;
   }
 
-  noexport void check-iterator-state(object-t self)
+  static void check-iterator-state(object-t self)
   {
     vector:slots-t* d = vector:unbox(self.vector);
 

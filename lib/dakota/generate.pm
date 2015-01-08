@@ -969,23 +969,23 @@ sub method::generate_va_method_defn {
     $$scratch_str_ref .= " {\n";
     $col = &colin($col);
     $$scratch_str_ref .=
-      "static $method_type_decl = $cxx_scope:va:$va_method_name;\n" .
-      "va-list-t args;\n" .
-      "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
+      $col . "static $method_type_decl = $cxx_scope:va:$va_method_name;\n" .
+      $col . "va-list-t args;\n" .
+      $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
     if (defined $$va_method{'return-type'}) {
       my $return_type = &arg::type($$va_method{'return-type'});
-      $$scratch_str_ref .= "$return_type result = ";
+      $$scratch_str_ref .= $col . "$return_type result = ";
     }
 
     $$scratch_str_ref .=
-      "$va_name($$new_arg_names_list_ref);\n" .
-      "va-end(args);\n";
+      $col . "$va_name($$new_arg_names_list_ref);\n" .
+      $col . "va-end(args);\n";
 
     if (defined $$va_method{'return-type'}) {
-      $$scratch_str_ref .= "return result;\n";
+      $$scratch_str_ref .= $col . "return result;\n";
     } else {
-      $$scratch_str_ref .= "return;\n";
+      $$scratch_str_ref .= $col . "return;\n";
     }
     $col = &colout($col);
     $$scratch_str_ref .= "}}\n";
@@ -2001,7 +2001,7 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { /*noexport*/ symbol-t __klass__ = dk-intern(\"@$klass_path\"); }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); /*hackhack*/ }\n";
   }
 
   if ('klass' eq $klass_type) {
@@ -2091,27 +2091,27 @@ sub linkage_unit::generate_klasses_body {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
-  if ($$klass_scope{'has-initialize'}) {
+  if (&is_decl() && $$klass_scope{'has-initialize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t initialize(object-t kls); }\n";
   }
-  if ($$klass_scope{'has-finalize'}) {
+  if (&is_decl() && $$klass_scope{'has-finalize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }\n";
   }
-  if (1 || @$ka_methods) {
+  if (&is_decl() && @$ka_methods) {
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
     &generate_ka_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
-  if (1 || @$ka_methods) {
+  if (&is_decl() && defined $$klass_scope{'raw-methods'}) {
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
     &generate_raw_method_signature_decls($$klass_scope{'raw-methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
-  if (@$va_list_methods) { #rn0
+  if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
@@ -2129,9 +2129,8 @@ sub linkage_unit::generate_klasses_body {
         #if (&is_decl() || &is_same_file($klass_scope)) #rn1
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
           if (defined $$method{'keyword-types'}) {
-            if (0 < @{$$va_method{'keyword-types'}}) {
-              &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
-            } else {
+            &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
+            if (0 == @{$$va_method{'keyword-types'}}) {
               my $last = &dakota::util::_remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
               my $method_decl_ref = &function::decl($va_method, $klass_path);
               $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref } /*rn1*/\n";
@@ -2141,6 +2140,7 @@ sub linkage_unit::generate_klasses_body {
         } else {
           &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
         }
+        if (&is_decl) {
         if (&is_same_src_file($klass_scope) || &is_rt()) { #rn2
           if (defined $$method{'keyword-types'}) {
             if (0 != @{$$method{'keyword-types'}}) {
@@ -2162,16 +2162,19 @@ sub linkage_unit::generate_klasses_body {
           }
         }
       }
+      }
     }
   }
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'raw-methods'}}) {
+    if (&is_decl) {
     if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
       if (!&is_va($method)) {
         my $method_decl_ref = &function::decl($method, $klass_path);
         $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref } /*rn3*/\n";
       }
+    }
     }
   }
 }
@@ -3482,10 +3485,10 @@ sub dk::generate_cxx_footer_klass {
     $$tbbl{'$behavior-exported?'} = '1';
   }
   if ($$klass_scope{'has-initialize'}) {
-    $$tbbl{'$initialize'} = '(method-t)initialize';
+    $$tbbl{'$initialize'} = 'cast(method-t)initialize';
   }
   if ($$klass_scope{'has-finalize'}) {
-    $$tbbl{'$finalize'} = '(method-t)finalize';
+    $$tbbl{'$finalize'} = 'cast(method-t)finalize';
   }
   if ($$klass_scope{'module'}) {
     $$tbbl{'$module'} = "\"$$klass_scope{'module'}\"";
@@ -3653,7 +3656,7 @@ sub generate_ka_method_defn {
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
       my $kw_arg_type = &arg::type($$kw_arg{'type'});
-      $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name = cast(decltype($kw_arg_name))0;";
+      $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name = {};";
       $delim = ' ';
     }
     $$scratch_str_ref .= "\n";

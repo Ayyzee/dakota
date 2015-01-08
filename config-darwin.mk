@@ -19,7 +19,9 @@ export CXX_WARNING_FLAGS :=\
  -Wno-padded\
  -Wno-cast-align\
  -Wno-disabled-macro-expansion\
+ -Wno-deprecated\
+ -Wno-exit-time-destructors\
 
- #--no-warnings\
+#--no-warnings\
 
 export LD_PRELOAD := DYLD_INSERT_LIBRARIES

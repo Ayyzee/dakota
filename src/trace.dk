@@ -16,9 +16,10 @@
 
 module dakota;
 
+#if defined DEBUG
 static uint32-t gbl-trace-column = 0;
 
-noexport format-va-printf(2) int-t
+static format-va-printf(2) int-t
 trace-vfprintf(file-t file, const char8-t* format, va-list-t args)
 {
   const char8-t* col = "  "; // two spaces per column :-) [my way]
@@ -32,7 +33,7 @@ trace-vfprintf(file-t file, const char8-t* format, va-list-t args)
   // bugbug: need to adjust result
   return result;
 }
-noexport format-printf(2) int-t
+static format-printf(2) int-t
 trace-fprintf(file-t file, const char8-t* format, ...)
 {
   va-list-t args;
@@ -96,7 +97,6 @@ dkt-va-trace-after(const signature-t* signature, method-t m, object-t object, va
   return result;
 }
 
-#if defined DEBUG
 export int-t
 dkt-trace-before(const signature-t* signature, method-t m, super-t context, ...)
 {
