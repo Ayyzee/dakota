@@ -2097,21 +2097,21 @@ sub linkage_unit::generate_klasses_body {
   if ($$klass_scope{'has-finalize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }\n";
   }
-  if (1 || @$ka_methods) {
+  if (&is_decl() && @$ka_methods) {
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
     &generate_ka_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
-  if (1 || @$ka_methods) {
+  if (&is_decl() && @$ka_methods) {
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
     &generate_raw_method_signature_decls($$klass_scope{'raw-methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
-  if (@$va_list_methods) { #rn0
+  if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
@@ -2134,6 +2134,7 @@ sub linkage_unit::generate_klasses_body {
         } else {
           &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
         }
+        if (&is_decl) {
         if (&is_same_src_file($klass_scope) || &is_rt()) { #rn2
           if (defined $$method{'keyword-types'}) {
             if (0 != @{$$method{'keyword-types'}}) {
@@ -2155,16 +2156,19 @@ sub linkage_unit::generate_klasses_body {
           }
         }
       }
+      }
     }
   }
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'raw-methods'}}) {
+    if (&is_decl) {
     if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
       if (!&is_va($method)) {
         my $method_decl_ref = &function::decl($method, $klass_path);
         $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref } /*rn3*/\n";
       }
+    }
     }
   }
 }
