@@ -2137,6 +2137,9 @@ sub linkage_unit::generate_klasses_body {
               &dakota::util::_add_last($$va_method{'parameter-types'}, $last);
             }
           }
+          else {
+            &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
+          }
         } else {
           &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type);
         }

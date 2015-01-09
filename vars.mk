@@ -135,6 +135,7 @@ EXTRA_CXXFLAGS += $(CXX_DEBUG_FLAGS)
 EXTRA_CXXFLAGS +=\
  --define-macro HAVE_CONFIG_H\
  --define-macro MOD_SIZE_CAST_HACK\
+ --define-macro DKT_WORKAROUND\
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
 
