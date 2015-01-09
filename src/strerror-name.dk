@@ -81,7 +81,7 @@ strerror-name(int-t errnum)
 
 static int-t __initial()
 {
-#include "sys-err-names.tbl"
+#include "strerror-name.tbl"
   return 0;
 }
 static int-t _zero_ = __initial();
