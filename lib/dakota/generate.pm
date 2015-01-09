@@ -2001,7 +2001,7 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); /*hackhack*/ }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); } /*hackhack*/\n";
   }
 
   if ('klass' eq $klass_type) {
@@ -3958,10 +3958,10 @@ sub linkage_unit::generate_symbols {
     my $width = length($cxx_ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_decl()) {
-      $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; " . $pad . "} // $symbol\n";
+      $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; } // $symbol\n";
     } else {
       $symbol =~ s|"|\\"|g;
-      $scratch_str .= $col . "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); $pad}\n";
+      $scratch_str .= $col . "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); }\n";
     }
   }
   return $scratch_str;
@@ -3989,7 +3989,7 @@ sub linkage_unit::generate_hashes {
       my $cxx_ident = $$file{'hashes'}{$symbol};
       my $width = length($cxx_ident);
       my $pad = ' ' x ($max_width - $width);
-      $scratch_str .= $col . "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = " . $pad . "dk-hash(\"$symbol\"); $pad}\n";
+      $scratch_str .= $col . "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = " . $pad . "dk-hash(\"$symbol\"); }\n";
     }
   }
   return $scratch_str;
@@ -4018,20 +4018,13 @@ sub linkage_unit::generate_keywords {
     my $pad = ' ' x ($max_width - $width);
     if (defined $cxx_ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "namespace __keyword { extern noexport keyword-t $cxx_ident; " . $pad . "} // $symbol\n";
+        $scratch_str .= $col . "namespace __keyword { extern noexport keyword-t $cxx_ident; } // $symbol\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
-        my $keyword_defn = "namespace __keyword { noexport keyword-t $cxx_ident = ";
-        $keyword_defn .= $pad;
-        $keyword_defn .= "{ \$$symbol, ";
-        $keyword_defn .= $pad;
-        $keyword_defn .= "__hash:$cxx_ident";
-        $keyword_defn .= $pad;
-        $keyword_defn .= "}; } // $symbol\n";
-
-        $scratch_str .= $keyword_defn;
+        # keyword-defn
+        $scratch_str .= "namespace __keyword { noexport keyword-t $cxx_ident = " . $pad . "{ \$$symbol, " . $pad . "__hash:$cxx_ident }; } // $symbol\n";
       }
     }
   }
@@ -4062,7 +4055,6 @@ sub generate_property_tbl {
   my $num;
   my $result = '';
   my $max_key_width = 0;
-  my $max_element_width = 0;
   $num = 1;
   foreach my $key (@$sorted_keys) {
     my $element = $$tbl{$key};
@@ -4078,11 +4070,6 @@ sub generate_property_tbl {
     if ($key_width > $max_key_width) {
       $max_key_width = $key_width;
     }
-
-    my $element_width = length($element);
-    if ($element_width > $max_element_width) {
-      $max_element_width = $element_width;
-    }
   }
   $result .= "static property-t $name\[] = { //ro-data\n";
   $col = &colin($col);
@@ -4097,16 +4084,12 @@ sub generate_property_tbl {
       $element = "nullptr";
     }
     my $key_width = length($key);
-    my $key_pad = ' ' x ($max_key_width - $key_width);
+    my $pad = ' ' x ($max_key_width - $key_width);
 
-    my $element_width = length($element);
-    my $element_pad = ' ' x ($max_element_width - $element_width);
-
-    $result .= $col . "{ $key, ";
-    $result .= $key_pad;
-    $result .= "cast(uintptr-t)$element";
-    $result .= $element_pad;
-    $result .= " },\n";
+    if ($element =~ /^".*"$/) {
+      $element = "dk-intern($element) /*hackhack*/";
+    }
+    $result .= $col . "{ $key, " . $pad . "cast(uintptr-t)$element },\n";
   }
   $col = &colout($col);
   $result .= $col . "};\n";
