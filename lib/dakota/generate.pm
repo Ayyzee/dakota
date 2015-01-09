@@ -2878,15 +2878,19 @@ sub address_body {
   my $method_num  = 0;
   my $max_width = 0;
   foreach my $method (@$sorted_methods) {
+    if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
+      # skip because its declared but not defined and should not be considered for padding
+    } else {
     my $method_type = &method::type($method);
-    my $width = length($method_type);
+    my $width = length("cast($method_type)");
     if ($width > $max_width) {
       $max_width = $width;
+    }
     }
   }
   foreach my $method (@$sorted_methods) {
     my $method_type = &method::type($method);
-    my $width = length($method_type);
+    my $width = length("cast($method_type)");
     my $pad = ' ' x ($max_width - $width);
 
     if (!$$method{'alias'}) {
@@ -2902,7 +2906,8 @@ sub address_body {
       #my $method_name = "@{$$method{'name'}}";
 
       if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
-        $$scratch_str_ref .= $col . "nullptr,\n";
+        $pad = ' ' x $max_width;
+        $$scratch_str_ref .=   $col . "cast(method-t)"                   . $pad . "dkt-null-method, /*$method_name()*/\n";
       } else {
         if (&is_va($method)) {
           $$scratch_str_ref .= $col . "cast(method-t)cast($method_type)" . $pad . "va:$method_name,\n";
@@ -3080,7 +3085,7 @@ sub dk::generate_cxx_footer_klass {
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static va-method-t __va-method-addresses[] = { //ro-data\n";
     $col = &colin($col);
-
+    ### todo: this looks like it might merge with address_body(). see die below
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
 
     $va_method_num = 0;
@@ -3110,6 +3115,7 @@ sub dk::generate_cxx_footer_klass {
         } else {
           $method_name = "@{$$va_method{'name'}}";
         }
+        die if (!$$va_method{'defined?'} && !$$va_method{'alias'} && !$$va_method{'is-generated'});
 
         my $old_parameter_types = $$va_method{'parameter-types'};
         $$va_method{'parameter-types'} = &arg_type::va($$va_method{'parameter-types'});

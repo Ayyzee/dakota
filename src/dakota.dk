@@ -375,7 +375,7 @@ perl-dump-resource-info(sorted-array-t* klass-defns-table)
         const signature-t* method-signature;
         while (nullptr != (method-signature = method-signatures[j])) {
           method-t method-address = method-addresses[j];
-          if (nullptr != method-address)
+          if (nullptr != method-address && cast(method-t)dkt-null-method != method-address)
             methods-count++;
           j++;
         }
