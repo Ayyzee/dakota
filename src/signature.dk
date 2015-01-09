@@ -28,7 +28,6 @@ klass signature
     const char8-t* return-type; // not considered in compare()
     const char8-t* name;
     const char8-t* parameter-types;
-    const char8-t* exception-types; // not considered in compare()
   }
 
   method slots-t* dump(slots-t* s)

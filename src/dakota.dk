@@ -937,19 +937,11 @@ max-method-return-type-width(const signature-t* const* method-signatures, ...)
 static void
 dump-method(ofile-t ofl, const signature-t* info, uint32-t max-return-type-width)
 {
-  if (nullptr != info->exception-types)
-    ofile:printf(ofl, "method %-*s %s(%s) throw(%s);\n",
-                 max-return-type-width,
-                 info->return-type,
-                 info->name,
-                 info->parameter-types,
-                 info->exception-types);
-  else
-    ofile:printf(ofl, "method %-*s %s(%s);\n",
-                 max-return-type-width,
-                 info->return-type,
-                 info->name,
-                 info->parameter-types);
+ ofile:printf(ofl, "method %-*s %s(%s);\n",
+              max-return-type-width,
+              info->return-type,
+              info->name,
+              info->parameter-types);
   return;
 }
 

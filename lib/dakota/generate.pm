@@ -1058,7 +1058,7 @@ sub common::print_signature {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= $col . "static const signature-t result = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", nullptr };\n";
+    $scratch_str .= $col . "static const signature-t result = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\" };\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
 
@@ -3559,7 +3559,7 @@ sub generate_ka_method_signature_defn {
 
   my $kw_arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $kw_arg_list .= &method::kw_list_types($method);
-  $kw_arg_list .= "\", nullptr };";
+  $kw_arg_list .= "\" };";
   $$scratch_str_ref .= $col . "$kw_arg_list\n";
   $$scratch_str_ref .= $col . "return &result;\n";
   $col = &colout($col);
@@ -3584,7 +3584,7 @@ sub generate_raw_method_signature_defn {
 
   my $arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $arg_list .= &method::list_types($method);
-  $arg_list .= "\", nullptr };";
+  $arg_list .= "\" };";
   $$scratch_str_ref .= $col . "$arg_list\n";
   $$scratch_str_ref .= $col . "return &result;\n";
   $col = &colout($col);
