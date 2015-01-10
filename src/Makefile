@@ -163,9 +163,9 @@ diff:
 rt: clean-rt
 	$(MAKE) all
 
-sys-err-names.$(dk_ext): sys-err-names.tbl
+strerror-name.$(dk_ext): strerror-name.tbl
 
-sys-err-names.tbl: gen-sys-err-names.sh
+strerror-name.tbl: gen-strerror-name.sh
 	./$<
 
 clean: clean-rt
@@ -174,7 +174,7 @@ clean: clean-rt
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info$(exeext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info$(exeext).dSYM
-	$(RM) $(RMFLAGS) sys-err-names.tbl .gdb_history *~ .*~ 
+	$(RM) $(RMFLAGS) strerror-name.tbl .gdb_history *~ .*~ 
 	$(MAKE) --directory proofs clean
 	$(MAKE) --directory macro-system clean
 

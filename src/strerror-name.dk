@@ -20,6 +20,10 @@ include <cerrno>;
 include <cstdio>;
 include <cstring>;
 
+#if HAVE-CONFIG-H
+  #include "config.h"
+#endif
+
 static const char8-t* gbl-sys-err-names[] =
 {
      "0",    "1",    "2",    "3",    "4",    "5",    "6",    "7",    "8",    "9",
@@ -65,6 +69,7 @@ set-name(int-t errnum, const char8-t* name)
   return;
 }
 
+#if !defined HAVE-STRERROR-NAME
 export const char8-t*
 strerror-name(int-t errnum)
 {
@@ -72,20 +77,11 @@ strerror-name(int-t errnum)
   const char8-t* name = gbl-sys-err-names[errnum];
   return name;
 }
+#endif
 
-static void __initial()
+static int-t __initial()
 {
-#include "sys-err-names.tbl"
-  return;
+#include "strerror-name.tbl"
+  return 0;
 }
-
-static void __final()
-{
-  return;
-}
-
-namespace { struct noexport __ddl-t {
-  __ddl-t()  { __initial(); }
-  ~__ddl-t() { __final();   }
-};}
-static __ddl-t __ddl = __ddl-t();
+static int-t _zero_ = __initial();

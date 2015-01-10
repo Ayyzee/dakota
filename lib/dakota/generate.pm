@@ -303,10 +303,10 @@ sub generate_nrt {
       &labeled_src_str($result, "hashes-hxx") .
       &labeled_src_str($result, "keywords-hxx") .
       &labeled_src_str($result, "selectors-hxx") .
-      &labeled_src_str($result, "selectors-seq-hxx") .
       &labeled_src_str($result, "signatures-hxx") .
-      &labeled_src_str($result, "signatures-seq-hxx") .
       &labeled_src_str($result, "generics-hxx");
+      #&labeled_src_str($result, "selectors-seq-hxx") .
+      #&labeled_src_str($result, "signatures-seq-hxx") .
 
     &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
     return "$path/$name.$hxx_ext";
@@ -372,10 +372,10 @@ sub generate_rt {
       &labeled_src_str($result, "hashes-hxx") .
       &labeled_src_str($result, "keywords-hxx") .
       &labeled_src_str($result, "selectors-hxx") .
-      &labeled_src_str($result, "selectors-seq-hxx") .
       &labeled_src_str($result, "signatures-hxx") .
-      &labeled_src_str($result, "signatures-seq-hxx") .
       &labeled_src_str($result, "generics-hxx");
+      #&labeled_src_str($result, "selectors-seq-hxx") .
+      #&labeled_src_str($result, "signatures-seq-hxx") .
 
     &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
     return "$path/$name.$hxx_ext";
@@ -397,10 +397,10 @@ sub generate_rt {
       &labeled_src_str($result, "hashes-cxx") .
       &labeled_src_str($result, "keywords-cxx") .
       &labeled_src_str($result, "selectors-cxx") .
-      &labeled_src_str($result, "selectors-seq-cxx") .
       &labeled_src_str($result, "signatures-cxx") .
-      &labeled_src_str($result, "signatures-seq-cxx") .
       &labeled_src_str($result, "generics-cxx") .
+      &labeled_src_str($result, "selectors-seq-cxx") .
+      &labeled_src_str($result, "signatures-seq-cxx") .
 
       &labeled_src_str($result, "klasses-cxx") .
       &generate_defn_footer($file);
@@ -453,10 +453,10 @@ sub generate_decl_defn {
   $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file, $generics, $symbols);
   $$result{"keywords-$suffix"} =       &linkage_unit::generate_keywords(       $file, $generics, $symbols);
   $$result{"selectors-$suffix"} =      &linkage_unit::generate_selectors(      $file, $generics);
-  $$result{"selectors-seq-$suffix"} =  &linkage_unit::generate_selectors_seq(  $file, $generics);
   $$result{"signatures-$suffix"} =     &linkage_unit::generate_signatures(     $file, $generics);
-  $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq( $file, $generics);
   $$result{"generics-$suffix"} =       &linkage_unit::generate_generics(       $file, $generics);
+  $$result{"selectors-seq-$suffix"} =  &linkage_unit::generate_selectors_seq(  $file, $generics);
+  $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq( $file, $generics);
 
   my $col; my $klass_path;
   $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $col = '', $klass_path = []);
@@ -1058,7 +1058,7 @@ sub common::print_signature {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= $col . "static const signature-t result = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\", nullptr };\n";
+    $scratch_str .= $col . "static const signature-t result = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\" };\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
 
@@ -2001,7 +2001,7 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n";
   } elsif (&is_rt_decl() || &is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); /*hackhack*/ }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); } /*hackhack*/\n";
   }
 
   if ('klass' eq $klass_type) {
@@ -2878,15 +2878,19 @@ sub address_body {
   my $method_num  = 0;
   my $max_width = 0;
   foreach my $method (@$sorted_methods) {
+    if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
+      # skip because its declared but not defined and should not be considered for padding
+    } else {
     my $method_type = &method::type($method);
-    my $width = length($method_type);
+    my $width = length("cast($method_type)");
     if ($width > $max_width) {
       $max_width = $width;
+    }
     }
   }
   foreach my $method (@$sorted_methods) {
     my $method_type = &method::type($method);
-    my $width = length($method_type);
+    my $width = length("cast($method_type)");
     my $pad = ' ' x ($max_width - $width);
 
     if (!$$method{'alias'}) {
@@ -2902,7 +2906,8 @@ sub address_body {
       #my $method_name = "@{$$method{'name'}}";
 
       if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
-        $$scratch_str_ref .= $col . "nullptr,\n";
+        $pad = ' ' x $max_width;
+        $$scratch_str_ref .=   $col . "cast(method-t)"                   . $pad . "dkt-null-method, /*$method_name()*/\n";
       } else {
         if (&is_va($method)) {
           $$scratch_str_ref .= $col . "cast(method-t)cast($method_type)" . $pad . "va:$method_name,\n";
@@ -3080,7 +3085,7 @@ sub dk::generate_cxx_footer_klass {
     $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static va-method-t __va-method-addresses[] = { //ro-data\n";
     $col = &colin($col);
-
+    ### todo: this looks like it might merge with address_body(). see die below
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
 
     $va_method_num = 0;
@@ -3110,6 +3115,7 @@ sub dk::generate_cxx_footer_klass {
         } else {
           $method_name = "@{$$va_method{'name'}}";
         }
+        die if (!$$va_method{'defined?'} && !$$va_method{'alias'} && !$$va_method{'is-generated'});
 
         my $old_parameter_types = $$va_method{'parameter-types'};
         $$va_method{'parameter-types'} = &arg_type::va($$va_method{'parameter-types'});
@@ -3553,7 +3559,7 @@ sub generate_ka_method_signature_defn {
 
   my $kw_arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $kw_arg_list .= &method::kw_list_types($method);
-  $kw_arg_list .= "\", nullptr };";
+  $kw_arg_list .= "\" };";
   $$scratch_str_ref .= $col . "$kw_arg_list\n";
   $$scratch_str_ref .= $col . "return &result;\n";
   $col = &colout($col);
@@ -3578,7 +3584,7 @@ sub generate_raw_method_signature_defn {
 
   my $arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $arg_list .= &method::list_types($method);
-  $arg_list .= "\", nullptr };";
+  $arg_list .= "\" };";
   $$scratch_str_ref .= $col . "$arg_list\n";
   $$scratch_str_ref .= $col . "return &result;\n";
   $col = &colout($col);
@@ -3958,10 +3964,10 @@ sub linkage_unit::generate_symbols {
     my $width = length($cxx_ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_decl()) {
-      $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; " . $pad . "} // $symbol\n";
+      $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; } // $symbol\n";
     } else {
       $symbol =~ s|"|\\"|g;
-      $scratch_str .= $col . "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); $pad}\n";
+      $scratch_str .= $col . "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); }\n";
     }
   }
   return $scratch_str;
@@ -3989,7 +3995,7 @@ sub linkage_unit::generate_hashes {
       my $cxx_ident = $$file{'hashes'}{$symbol};
       my $width = length($cxx_ident);
       my $pad = ' ' x ($max_width - $width);
-      $scratch_str .= $col . "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = " . $pad . "dk-hash(\"$symbol\"); $pad}\n";
+      $scratch_str .= $col . "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = " . $pad . "dk-hash(\"$symbol\"); }\n";
     }
   }
   return $scratch_str;
@@ -4018,20 +4024,13 @@ sub linkage_unit::generate_keywords {
     my $pad = ' ' x ($max_width - $width);
     if (defined $cxx_ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "namespace __keyword { extern noexport keyword-t $cxx_ident; " . $pad . "} // $symbol\n";
+        $scratch_str .= $col . "namespace __keyword { extern noexport keyword-t $cxx_ident; } // $symbol\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
-        my $keyword_defn = "namespace __keyword { noexport keyword-t $cxx_ident = ";
-        $keyword_defn .= $pad;
-        $keyword_defn .= "{ \$$symbol, ";
-        $keyword_defn .= $pad;
-        $keyword_defn .= "__hash:$cxx_ident";
-        $keyword_defn .= $pad;
-        $keyword_defn .= "}; } // $symbol\n";
-
-        $scratch_str .= $keyword_defn;
+        # keyword-defn
+        $scratch_str .= "namespace __keyword { noexport keyword-t $cxx_ident = " . $pad . "{ \$$symbol, " . $pad . "__hash:$cxx_ident }; } // $symbol\n";
       }
     }
   }
@@ -4062,7 +4061,6 @@ sub generate_property_tbl {
   my $num;
   my $result = '';
   my $max_key_width = 0;
-  my $max_element_width = 0;
   $num = 1;
   foreach my $key (@$sorted_keys) {
     my $element = $$tbl{$key};
@@ -4078,11 +4076,6 @@ sub generate_property_tbl {
     if ($key_width > $max_key_width) {
       $max_key_width = $key_width;
     }
-
-    my $element_width = length($element);
-    if ($element_width > $max_element_width) {
-      $max_element_width = $element_width;
-    }
   }
   $result .= "static property-t $name\[] = { //ro-data\n";
   $col = &colin($col);
@@ -4097,16 +4090,12 @@ sub generate_property_tbl {
       $element = "nullptr";
     }
     my $key_width = length($key);
-    my $key_pad = ' ' x ($max_key_width - $key_width);
+    my $pad = ' ' x ($max_key_width - $key_width);
 
-    my $element_width = length($element);
-    my $element_pad = ' ' x ($max_element_width - $element_width);
-
-    $result .= $col . "{ $key, ";
-    $result .= $key_pad;
-    $result .= "cast(uintptr-t)$element";
-    $result .= $element_pad;
-    $result .= " },\n";
+    if ($element =~ /^".*"$/) {
+      $element = "dk-intern($element) /*hackhack*/";
+    }
+    $result .= $col . "{ $key, " . $pad . "cast(uintptr-t)$element },\n";
   }
   $col = &colout($col);
   $result .= $col . "};\n";
