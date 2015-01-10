@@ -933,7 +933,13 @@ sub method::generate_va_method_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= &dk::annotate($col, __FILE__, __LINE__);
 
-  $$scratch_str_ref .= $col . "namespace @$scope { ";
+  if ($klass_type) {
+    $$scratch_str_ref .= $col . "/*$klass_type*/ ";
+  }
+  else {
+    $$scratch_str_ref .= $col . "";
+  }
+  $$scratch_str_ref .= "namespace @$scope { ";
   my $ka_generics = &dakota::util::ka_generics();
   if (exists $$ka_generics{$va_method_name}) {
     $$scratch_str_ref .= "sentinel ";

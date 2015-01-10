@@ -244,7 +244,7 @@ sub rewrite_klass_finalize {
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/\b(klass|trait)(\s+$k+\s*\{)/namespace$2/g;
+  $$filestr_ref =~ s^\b(klass|trait)(\s+$k+\s*\{)^/\*$1\*/ namespace$2^g;
 }
 sub rewrite_dk_klass {
   my ($filestr_ref) = @_;
