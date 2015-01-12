@@ -837,31 +837,38 @@ sub klass::method_aliases {
 # routine that knows what can/can-not be immediatly adjacent.
 sub function::decl {
   my ($function, $scope) = @_;
-  my $function_decl = '';
 
-  if (&is_exported($function)) {
-    $function_decl .= "export method";
-  } else {
-    $function_decl .= "noexport method";
-  }
+  my $function_decl;
   if ($$function{'is-inline'}) {
-    $function_decl .= " INLINE";
-  } # 'inline' || ''
+    $function_decl .= 'INLINE ';
+  } else {
+    $function_decl .= '';
+  }
 
+  my $visibility;
+  if (&is_exported($function)) {
+    $visibility .= "export";
+  } else {
+    $visibility .= "noexport";
+  }
   my $return_type = &arg::type($$function{'return-type'});
-  $function_decl .= " $return_type";
-  my $function_overloadsig = &function::overloadsig($function, $scope);
-  $function_decl .= " $function_overloadsig;";
+  my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
+  $function_decl .= "$visibility method $return_type $name($parameter_types);";
   return \$function_decl;
 }
-sub function::overloadsig {
+sub function::overloadsig_parts {
   my ($function, $scope) = @_;
   my $last_element = $$function{'parameter-types'}[-1];
   my $last_type = &arg::type($last_element);
   my $name = "@{$$function{'name'} ||= []}"; # rnielsenrnielsen hackhack
   #if ($name eq '') { return undef; }
   my $parameter_types = &arg_type::list_types($$function{'parameter-types'});
-  my $function_overloadsig = "$name($$parameter_types)";
+  return ($name, $$parameter_types);
+}
+sub function::overloadsig {
+  my ($function, $scope) = @_;
+  my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
+  my $function_overloadsig = "$name($parameter_types)";
   return $function_overloadsig;
 }
 # should test for 'va', ':' AND va-list-t
