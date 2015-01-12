@@ -2582,10 +2582,11 @@ sub linkage_unit::generate_klasses {
   my $scratch_str_ref = &global_scratch_str_ref();
   &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
   if (&is_decl()) {
-    $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "#include <dakota.h>\n";
-    $$scratch_str_ref .= $col . "#include <dakota-log.h>\n";
-    $$scratch_str_ref .= "\n";
+    $$scratch_str_ref .=
+      "\n" .
+      $col . "#include <dakota.h>\n" .
+      $col . "#include <dakota-log.h>\n" .
+      "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
   &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
@@ -3106,7 +3107,7 @@ sub dk::generate_cxx_footer_klass {
   if (values %{$$klass_scope{'methods'} ||= []}) {
     $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = { //ro-data\n";
-    &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col));
+    &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col)); #herehere
     $$scratch_str_ref .= $col . "}; }\n";
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
@@ -3246,15 +3247,15 @@ sub dk::generate_cxx_footer_klass {
           $$tbl{'$value'} = "\"$slot_value\"";
         }
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
-        $$scratch_str_ref .= $col . "$klass_type @$klass_name {";
-        $$scratch_str_ref .= &generate_property_tbl($prop_name, $tbl, &colin($col), $klass_scope);
-        $$scratch_str_ref .= $col . "}\n";
+        $$scratch_str_ref .=
+          $col . "$klass_type @$klass_name {" . &generate_property_tbl($prop_name, $tbl, &colin($col), $klass_scope) .
+          $col . "}\n";
         &dakota::util::_add_last($seq, "$prop_name");
         $prop_num++;
       }
-      $$scratch_str_ref .= $col . "$klass_type @$klass_name {";
-      $$scratch_str_ref .= &generate_info_seq($root_name, $seq, &colin($col));
-      $$scratch_str_ref .= $col . "}\n";
+      $$scratch_str_ref .=
+        $col . "$klass_type @$klass_name {" . &generate_info_seq($root_name, $seq, &colin($col)) .
+        $col . "}\n";
     } else {
       my $seq = [];
       my $prop_num = 0;
@@ -3270,15 +3271,15 @@ sub dk::generate_cxx_footer_klass {
         $$tbl{'$type'} = "\"$slot_type\"";
 
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
-        $$scratch_str_ref .= $col . "$klass_type @$klass_name { ";
-        $$scratch_str_ref .= &generate_property_tbl($prop_name, $tbl, &colin($col));
-        $$scratch_str_ref .= $col . "}\n";
+        $$scratch_str_ref .=
+          $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, &colin($col)) .
+          $col . "}\n";
         &dakota::util::_add_last($seq, "$prop_name");
         $prop_num++;
       }
-      $$scratch_str_ref .= $col . "$klass_type @$klass_name { ";
-      $$scratch_str_ref .= &generate_info_seq($root_name, $seq, &colin($col));
-      $$scratch_str_ref .= $col . "}\n";
+      $$scratch_str_ref .=
+        $col . "$klass_type @$klass_name { " . &generate_info_seq($root_name, $seq, &colin($col)) .
+        $col . "}\n";
     }
   }
 
@@ -3421,9 +3422,9 @@ sub dk::generate_cxx_footer_klass {
     $$tbbl{'$module'} = "\"$$klass_scope{'module'}\"";
   }
   $$tbbl{'$file'} = '__FILE__';
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { ";
-  $$scratch_str_ref .= &generate_property_tbl('__klass-props', $tbbl, &colin($col));
-  $$scratch_str_ref .= $col . "}\n";
+  $$scratch_str_ref .=
+    $col . "$klass_type @$klass_name { " . &generate_property_tbl('__klass-props', $tbbl, &colin($col)) .
+    $col . "}\n";
   &dakota::util::_add_last($global_klass_defns, "$symbol:__klass-props");
   return $$scratch_str_ref;
 }
@@ -3476,8 +3477,9 @@ sub generate_ka_method_signature_defn {
   my $kw_arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $kw_arg_list .= &method::kw_list_types($method);
   $kw_arg_list .= "\" };";
-  $$scratch_str_ref .= $col . "$kw_arg_list\n";
-  $$scratch_str_ref .= $col . "return &result;\n";
+  $$scratch_str_ref .=
+    $col . "$kw_arg_list\n" .
+    $col . "return &result;\n";
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}}\n";
 }
@@ -3501,8 +3503,9 @@ sub generate_raw_method_signature_defn {
   my $arg_list = "static const signature-t result = { \"$return_type\", \"$method_name\", \"";
   $arg_list .= &method::list_types($method);
   $arg_list .= "\" };";
-  $$scratch_str_ref .= $col . "$arg_list\n";
-  $$scratch_str_ref .= $col . "return &result;\n";
+  $$scratch_str_ref .=
+    $col . "$arg_list\n" .
+    $col . "return &result;\n";
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}\n";
 }
@@ -3531,26 +3534,29 @@ sub generate_ka_method_defn {
   my $new_arg_list  = &arg_type::list_pair($new_arg_type, $new_arg_names);
 
   my $return_type = &arg::type($$method{'return-type'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace va { ";
+  my $visibility;
 
   if (&is_exported($method)) {
-    $$scratch_str_ref .= "export ";
+    $visibility = "export";
   } else {
-    $$scratch_str_ref .= "noexport ";
+    $visibility = "noexport";
   }
   #if ($$method{'is-inline'})
   #{
   #    $$scratch_str_ref .= "INLINE ";
   #}
   my $method_name = "@{$$method{'name'}}";
-  $$scratch_str_ref .= "$return_type $method_name($$new_arg_list)";
-  $col = &colin($col);
   my $method_type_decl;
   $$method{'name'} = [ '_func_' ];
   my $func_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $list_names = &arg_type::list_names($$method{'parameter-types'});
-  $$scratch_str_ref .= " {\n" . $col . "static const signature-t* __method__ = dkt-ka-signature(va:$method_name($$list_types)); USE(__method__);\n";
+
+  $$scratch_str_ref .=
+    "$klass_type @$klass_name { namespace va { $visibility $return_type $method_name($$new_arg_list) {" . &ann(__LINE__) . "\n";
+  $col = &colin($col);
+  $$scratch_str_ref .=
+    $col . "static const signature-t* __method__ = dkt-ka-signature(va:$method_name($$list_types)); USE(__method__);\n";
 
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
@@ -3591,10 +3597,10 @@ sub generate_ka_method_defn {
   }
   #$$scratch_str_ref .= $col . "if (nullptr != $$new_arg_names[-1]) {\n";
   #$col = &colin($col);
-  my $is_first;
 
-  $$scratch_str_ref .= $col . "keyword-t* _keyword_;\n";
-  $$scratch_str_ref .= $col . "while (nullptr != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {\n";
+  $$scratch_str_ref .=
+    $col . "keyword-t* _keyword_;\n" .
+    $col . "while (nullptr != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {\n";
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated.\n";
   $col = &colin($col);
@@ -3612,22 +3618,23 @@ sub generate_ka_method_defn {
     }
     # should do this for other types (char=>int, float=>double, ... ???
 
-    $$scratch_str_ref .= $col . "assert(_keyword_->symbol == \$$kw_arg_name);\n";
-    $$scratch_str_ref .= $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));\n";
-    $$scratch_str_ref .= $col . "_state_.$kw_arg_name = true;\n";
-    $$scratch_str_ref .= $col . "break;\n";
+    $$scratch_str_ref .=
+      $col . "assert(_keyword_->symbol == \$$kw_arg_name);\n" .
+      $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));\n" .
+      $col . "_state_.$kw_arg_name = true;\n" .
+      $col . "break;\n";
     $col = &colout($col);
     #            $$scratch_str_ref .= $col . "}\n";
-    $is_first = 0;
   }
   $$scratch_str_ref .= $col . "default:\n";
   #        $$scratch_str_ref .= $col . "{\n";
   $col = &colin($col);
 
-  $$scratch_str_ref .= $col . "throw make(no-such-keyword-exception:klass,\n";
-  $$scratch_str_ref .= $col . "           object =>    self,\n";
-  $$scratch_str_ref .= $col . "           signature => __method__,\n";
-  $$scratch_str_ref .= $col . "           keyword =>    _keyword_->symbol);\n";
+  $$scratch_str_ref .=
+    $col . "throw make(no-such-keyword-exception:klass,\n" .
+    $col . "           object =>    self,\n" .
+    $col . "           signature => __method__,\n" .
+    $col . "           keyword =>    _keyword_->symbol);\n";
   $col = &colout($col);
   #        $$scratch_str_ref .= $col . "}\n";
   $col = &colout($col);
@@ -3643,41 +3650,37 @@ sub generate_ka_method_defn {
       my $kw_arg_default = $$kw_arg{'default'};
       $$scratch_str_ref .= $col . "$kw_arg_name = $kw_arg_default;\n";
     } else {
-      $$scratch_str_ref .= $col . "throw make(missing-keyword-exception:klass,\n";
-      $$scratch_str_ref .= $col . "           object =>    self,\n";
-      $$scratch_str_ref .= $col . "           signature => __method__,\n";
-      $$scratch_str_ref .= $col . "           keyword =>    _keyword_->symbol);\n";
+      $$scratch_str_ref .=
+        $col . "throw make(missing-keyword-exception:klass,\n" .
+        $col . "           object =>    self,\n" .
+        $col . "           signature => __method__,\n" .
+        $col . "           keyword =>    _keyword_->symbol);\n";
     }
     $col = &colout($col);
   }
-  $$scratch_str_ref .= $col . "static $method_type_decl = $qualified_klass_name:$method_name; /*qualqual*/\n";
-  if ($$method{'return-type'}) {
-    $$scratch_str_ref .= $col . "$return_type _result_ = ";
-  }
-  $$scratch_str_ref .= "$func_name(";
-  $is_first = 1;
+  my $delim = '';
   #my $last_arg_name = &dakota::util::_remove_last($new_arg_names); # remove name associated with uintptr-t type
+  my $args = '';
 
   for (my $i = 0; $i < @$new_arg_names - 1; $i++) {
-    if ($is_first) {
-      $$scratch_str_ref .= "$$new_arg_names[$i]";
-    } else {
-      $$scratch_str_ref .= ", $$new_arg_names[$i]";
-    }
-    $is_first = 0;
+    $args .= "$delim$$new_arg_names[$i]";
+    $delim = ', ';
   }
   #&dakota::util::_add_last($new_arg_names, $last_arg_name); # add name associated with uintptr-t type
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
-    $$scratch_str_ref .= ", $kw_arg_name";
+    $args .= ", $kw_arg_name";
   }
-  $$scratch_str_ref .= ");\n";
+  $$scratch_str_ref .= $col . "static $method_type_decl = $qualified_klass_name:$method_name; /*qualqual*/\n";
   if ($$method{'return-type'}) {
-    $$scratch_str_ref .= $col . "return _result_;\n";
+    $$scratch_str_ref .=
+      $col . "$return_type _result_ = $func_name($args);\n" .
+      $col . "return _result_;\n";
   } else {
-    $$scratch_str_ref .= $col . "return;\n";
+    $$scratch_str_ref .=
+      $col . "$func_name($args);\n" .
+      $col . "return;\n";
   }
-
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}\n";
   #&path::remove_last($klass_name);
@@ -3841,7 +3844,7 @@ sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
   my $col = '';
 
-  if (&is_rt_decl() || &is_rt_defn()) {
+  if (&is_rt_decl() || &is_rt_defn()) { # why is_rt_decl()?
     &add_extra_symbols($file);
   }
   while (my ($symbol, $symbol_seq) = each(%$symbols)) {
