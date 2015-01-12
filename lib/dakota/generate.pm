@@ -215,13 +215,6 @@ sub is_decl {
     return 0;
   }
 }
-sub is_defn {
-  if ($global_is_defn) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
 sub write_to_file_strings {
   my ($path, $strings) = @_;
   my $ka_generics = &dakota::util::ka_generics();
@@ -948,9 +941,9 @@ sub method::generate_va_method_defn {
   &dakota::util::_add_last($scope_va, 'va');
   $$scratch_str_ref .= "$va_method_name($$new_arg_list_va_ref)";
 
-  if (!$$va_method{'defined?'} || &is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (!$$va_method{'defined?'} || &is_nrt_decl() || &is_rt_decl()) {
     $$scratch_str_ref .= "; }" . &ann($line) . "\n";
-  } elsif ($$va_method{'defined?'} && (&is_rt_decl() || &is_rt_defn())) {
+  } elsif ($$va_method{'defined?'} && (&is_rt_defn())) {
     my $name = &dakota::util::_last($$va_method{'name'});
     my $va_name = "_func_";
     &dakota::util::_replace_last($$va_method{'name'}, $va_name);
@@ -1029,13 +1022,13 @@ sub common::print_signature {
   }
   my $generic_name = "@{$$generic{'name'}}";
   $scratch_str .= "const signature-t* $generic_name($$new_arg_type_list)";
-  if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= "; }}\n";
     } else {
       $scratch_str .= "; }\n";
     }
-  } elsif (&is_rt_decl() || &is_rt_defn()) {
+  } elsif (&is_rt_defn()) {
     $scratch_str .= " {\n";
     $col = &colin($col);
 
@@ -1120,13 +1113,13 @@ sub common::print_selector {
   }
   my $generic_name = "@{$$generic{'name'}}";
   $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
-  if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= "; }}\n";
     } else {
       $scratch_str .= "; }\n";
     }
-  } elsif (&is_rt_decl() || &is_rt_defn()) {
+  } elsif (&is_rt_defn()) {
     $scratch_str .= " {\n";
     $col = &colin($col);
 
@@ -1397,13 +1390,13 @@ sub generics::generate_generic_defn {
 
   $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
 
-  if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $$scratch_str_ref .= "; }}\n";
     } else {
       $$scratch_str_ref .= "; }\n";
     }
-  } elsif (&is_rt_decl() || &is_rt_defn()) {
+  } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {\n";
     $col = &colin($col);
     if (&is_va($generic)) {
@@ -1481,13 +1474,13 @@ sub generics::generate_super_generic_defn {
 
   $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
 
-  if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $$scratch_str_ref .= "; }}\n";
     } else {
       $$scratch_str_ref .= "; }\n";
     }
-  } elsif (&is_rt_decl() || &is_rt_defn()) {
+  } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {\n";
     $col = &colin($col);
     if (&is_va($generic)) {
@@ -1640,9 +1633,9 @@ sub generics::generate_va_make_defn {
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()\n";
   $result .= $col . "sentinel noexport object-t make(object-t kls, ...)";
-  if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (&is_nrt_decl() || &is_rt_decl()) {
     $result .= ";\n";
-  } elsif (&is_rt_decl() || &is_rt_defn()) {
+  } elsif (&is_rt_defn()) {
     my $alloc_type_decl = "object-t (*alloc)(object-t)"; ### should use method::type_decl
     my $init_type_decl =  "object-t (*_func_)(object-t, va-list-t)"; ### should use method::type_decl
 
@@ -1810,9 +1803,9 @@ sub generate_klass_unbox {
   } elsif ($klass_name eq 'klass') {
     $result .= $col . "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
 
-    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+    if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; } // special-case\n";
-    } elsif (&is_rt_decl() || &is_rt_defn()) {
+    } elsif (&is_rt_defn()) {
       $result .=
         " { // special-case\n" .
         $col . "  slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n" .
@@ -1823,9 +1816,9 @@ sub generate_klass_unbox {
     ### unbox() same for all types
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
       $result .= $col . "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
-      if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+      if (&is_nrt_decl() || &is_rt_decl()) {
         $result .= "; }\n"; # general-case
-      } elsif (&is_rt_decl() || &is_rt_defn()) {
+      } elsif (&is_rt_defn()) {
         $result .=
           " {\n" .
           $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n" .
@@ -1846,9 +1839,9 @@ sub generate_klass_box {
     ### box() non-array-type
     $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
 
-    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+    if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; }\n";
-    } elsif (&is_rt_decl() || &is_rt_defn()) {
+    } elsif (&is_rt_defn()) {
       $result .=
         " {\n" .
         $col . "  return arg;\n" .
@@ -1861,9 +1854,9 @@ sub generate_klass_box {
         ### box() array-type
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t arg)";
 
-        if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+        if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }\n";
-        } elsif (&is_rt_decl() || &is_rt_defn()) {
+        } elsif (&is_rt_defn()) {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
@@ -1875,9 +1868,9 @@ sub generate_klass_box {
         }
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
 
-        if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+        if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }\n";
-        } elsif (&is_rt_decl() || &is_rt_defn()) {
+        } elsif (&is_rt_defn()) {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
@@ -1890,9 +1883,9 @@ sub generate_klass_box {
         ### box() non-array-type
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
 
-        if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+        if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }\n";
-        } elsif (&is_rt_decl() || &is_rt_defn()) {
+        } elsif (&is_rt_defn()) {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
@@ -1904,9 +1897,9 @@ sub generate_klass_box {
         }
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t arg)";
 
-        if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+        if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }\n";
-        } elsif (&is_rt_decl() || &is_rt_defn()) {
+        } elsif (&is_rt_defn()) {
           $result .= " {\n";
           $col = &colin($col);
           $result .=
@@ -1937,9 +1930,9 @@ sub generate_klass_construct {
         } else {
           $result .= $col . "klass $klass_name { noexport slots-t construct($pairs)";
 
-          if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+          if (&is_nrt_decl() || &is_rt_decl()) {
             $result .= "; }\n";
-          } elsif (&is_rt_decl() || &is_rt_defn()) {
+          } elsif (&is_rt_defn()) {
             $result .= $col . " {\n";
             $col = &colin($col);
             $result .=
@@ -1963,18 +1956,18 @@ sub linkage_unit::generate_klasses_body {
 
   my $scratch_str_ref = &global_scratch_str_ref();
 
-  if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (&is_nrt_decl() || &is_rt_decl()) {
     #$$scratch_str_ref .= $col . "extern noexport symbol-t __type__;\n";
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n";
-  } elsif (&is_rt_decl() || &is_rt_defn()) {
+  } elsif (&is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
     $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); } /*hackhack*/\n";
   }
 
   if ('klass' eq $klass_type) {
-    if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+    if (&is_nrt_decl() || &is_rt_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport object-t klass; }\n";
-    } elsif (&is_rt_decl() || &is_rt_defn()) {
+    } elsif (&is_rt_defn()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport object-t klass = nullptr; }\n";
     }
     if (!&is_rt_defn()) {
@@ -2171,9 +2164,9 @@ sub generate_object_method_defn {
   my $new_unboxed_arg_names = &arg_type::names_unboxed($$non_object_method{'parameter-types'});
   my $new_unboxed_arg_names_list = &arg_type::list_names($new_unboxed_arg_names);
 
-  if (&is_nrt_decl() || &is_nrt_defn() || &is_rt_decl()) {
+  if (&is_nrt_decl() || &is_rt_decl()) {
     $$scratch_str_ref .= ";" . &ann($line) . " }\n";
-  } elsif (&is_rt_decl() || &is_rt_defn()) {
+  } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {" . &ann($line) . "\n";
     $col = &colin($col);
 
@@ -3696,7 +3689,7 @@ sub dk::generate_cxx_footer {
   &dk::generate_ka_method_defns($scope, $stack, 'trait', $col);
   &dk::generate_ka_method_defns($scope, $stack, 'klass', $col);
 
-  if (&is_rt_decl() || &is_rt_defn()) {
+  if (&is_rt_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
     if (0 == $num_klasses) {
       $$scratch_str_ref .= $col . "static named-info-node-t* klass-defns = nullptr;\n";
@@ -3739,7 +3732,7 @@ sub dk::generate_ka_method_defns {
     if ($klass_scope) {
       my $cxx_klass_name = $klass_name;
       &path::add_last($stack, $klass_name);
-      if (&is_rt_decl() || &is_rt_defn()) {
+      if (&is_rt_defn()) {
         &dk::generate_cxx_footer_klass($klass_scope, $stack, $col, $klass_type);
       } else {
         if (1 || $$klass_scope{'raw-methods'}) {
@@ -3799,61 +3792,61 @@ sub dk::generate_imported_klasses_info {
 }
 sub add_extra_symbols {
   my ($file) = @_;
+  $$file{'symbols'}{'behavior-exported?'} = undef;
   $$file{'symbols'}{'construct'} = undef;
-  $$file{'symbols'}{'exported-raw-method-addresses'} = undef;
-  $$file{'symbols'}{'exported-raw-method-signatures'} = undef;
+  $$file{'symbols'}{'date'} = undef;
+  $$file{'symbols'}{'executable'} = undef;
   $$file{'symbols'}{'exported-method-addresses'} = undef;
   $$file{'symbols'}{'exported-method-signatures'} = undef;
-  $$file{'symbols'}{'behavior-exported?'} = undef;
-  $$file{'symbols'}{'state-exported?'} = undef;
+  $$file{'symbols'}{'exported-raw-method-addresses'} = undef;
+  $$file{'symbols'}{'exported-raw-method-signatures'} = undef;
   $$file{'symbols'}{'exported?'} = undef;
   $$file{'symbols'}{'exports'} = undef;
   $$file{'symbols'}{'file'} = undef;
-  $$file{'symbols'}{'interposers'} = undef;
+  $$file{'symbols'}{'imported-klasses'} = undef;
+  $$file{'symbols'}{'imported-klasses-names'} = undef;
   $$file{'symbols'}{'interpose-name'} = undef;
+  $$file{'symbols'}{'interposers'} = undef;
   $$file{'symbols'}{'ka-method-signatures'} = undef;
   $$file{'symbols'}{'klass'} = undef;
+  $$file{'symbols'}{'klass-defns'} = undef;
   $$file{'symbols'}{'klass-name'} = undef;
+  $$file{'symbols'}{'library'} = undef;
   $$file{'symbols'}{'method'} = undef;
   $$file{'symbols'}{'method-addresses'} = undef;
   $$file{'symbols'}{'method-aliases'} = undef;
   $$file{'symbols'}{'method-signatures'} = undef;
+  $$file{'symbols'}{'module'} = undef;
   $$file{'symbols'}{'name'} = undef;
   $$file{'symbols'}{'offset'} = undef;
   $$file{'symbols'}{'requires'} = undef;
+  $$file{'symbols'}{'selectors'} = undef;
+  $$file{'symbols'}{'selectors-va'} = undef;
+  $$file{'symbols'}{'signatures'} = undef;
+  $$file{'symbols'}{'signatures-va'} = undef;
   $$file{'symbols'}{'size'} = undef;
   $$file{'symbols'}{'slots-info'} = undef;
   $$file{'symbols'}{'slots-type'} = undef;
+  $$file{'symbols'}{'state-exported?'} = undef;
   $$file{'symbols'}{'superklass-name'} = undef;
+  $$file{'symbols'}{'time'} = undef;
   $$file{'symbols'}{'trait'} = undef;
   $$file{'symbols'}{'traits'} = undef;
   $$file{'symbols'}{'type'} = undef;
   $$file{'symbols'}{'va-method'} = undef;
   $$file{'symbols'}{'va-method-addresses'} = undef;
   $$file{'symbols'}{'va-method-signatures'} = undef;
-  $$file{'symbols'}{'klass-defns'} = undef;
-  $$file{'symbols'}{'module'} = undef;
-  $$file{'symbols'}{'imported-klasses-names'} = undef;
-  $$file{'symbols'}{'imported-klasses'} = undef;
-  $$file{'symbols'}{'signatures'} = undef;
-  $$file{'symbols'}{'signatures-va'} = undef;
-  $$file{'symbols'}{'selectors'} = undef;
-  $$file{'symbols'}{'selectors-va'} = undef;
-  $$file{'symbols'}{'library'} = undef;
-  $$file{'symbols'}{'executable'} = undef;
-  $$file{'symbols'}{'time'} = undef;
-  $$file{'symbols'}{'date'} = undef;
 }
 sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
   my $col = '';
 
+  if (&is_rt_decl() || &is_rt_defn()) {
+    &add_extra_symbols($file);
+  }
   while (my ($symbol, $symbol_seq) = each(%$symbols)) {
     my $ident_symbol = &make_ident_symbol($symbol_seq);
     $$symbols{$symbol} = $ident_symbol;
-  }
-  if (&is_rt_decl() || &is_rt_defn()) {
-    &add_extra_symbols($file);
   }
   while (my ($symbol, $symbol_seq) = each(%{$$file{'symbols'}})) {
     my $ident_symbol = &make_ident_symbol_scalar($symbol);
@@ -3874,9 +3867,9 @@ sub linkage_unit::generate_symbols {
     my $cxx_ident = $$symbols{$symbol};
     my $width = length($cxx_ident);
     my $pad = ' ' x ($max_width - $width);
-    if (&is_decl()) {
+    if (&is_nrt_decl() || &is_rt_decl()) {
       $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; } // $symbol\n";
-    } else {
+    } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
       $scratch_str .= $col . "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); }\n";
     }
