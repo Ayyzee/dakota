@@ -10,7 +10,7 @@ export CXX_DEBUG_FLAGS :=\
  --debug=3\
  --define-macro DEBUG\
 
-CXX_NO_WARNINGS := 0
+CXX_NO_WARNINGS ?= 0
 
 ifneq ($(CXX_NO_WARNINGS), 0)
 	export CXX_WARNING_FLAGS := --no-warnings

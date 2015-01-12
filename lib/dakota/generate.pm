@@ -1991,7 +1991,7 @@ sub linkage_unit::generate_klasses_body {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
             my $method_decl_ref = &function::decl($method, $klass_path);
-            $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "REMOVE") . "\n";
+            #$$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "REMOVE") . "\n";
             if (!&has_object_method_defn($klass_scope, $method)) {
               my $object_method = &convert_to_object_method($method);
               my $sig = &function::overloadsig($object_method, []);
@@ -2005,7 +2005,7 @@ sub linkage_unit::generate_klasses_body {
       } else {
         if (!&is_va($method)) {
           my $method_decl_ref = &function::decl($method, $klass_path);
-          $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "REMOVE") . "\n";
+          $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "DUPLICATE") . "\n";
           my $object_method = &convert_to_object_method($method);
           my $sig = &function::overloadsig($object_method, []);
           if (!$$object_method_defns{$sig}) {
@@ -2078,7 +2078,7 @@ sub linkage_unit::generate_klasses_body {
     &path::add_last($klass_path, 'va');
     foreach $method (@$va_list_methods) {
       my $method_decl_ref = &function::decl($method, $klass_path);
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { $$method_decl_ref }}" . &ann(__LINE__, "tkn-1") . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { $$method_decl_ref }}" . &ann(__LINE__, "stmt1") . "\n";
     }
     &path::remove_last($klass_path);
   }
@@ -2094,7 +2094,7 @@ sub linkage_unit::generate_klasses_body {
             if (0 == @{$$va_method{'keyword-types'}}) {
               my $last = &dakota::util::_remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
               my $method_decl_ref = &function::decl($va_method, $klass_path);
-              $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "tkn-2") . "\n";
+              $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "stmt2") . "\n";
               &dakota::util::_add_last($$va_method{'parameter-types'}, $last);
             }
           }
@@ -2121,7 +2121,7 @@ sub linkage_unit::generate_klasses_body {
               if ($$method{'is-inline'}) {
                 #$$scratch_str_ref .= " INLINE";
               }
-              $$scratch_str_ref .= " $other_method_decl; }" . &ann(__LINE__, "tkn-3") . "\n";
+              $$scratch_str_ref .= " $other_method_decl; }" . &ann(__LINE__, "stmt3") . "\n";
             }
           }
         }
@@ -2135,7 +2135,7 @@ sub linkage_unit::generate_klasses_body {
     if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
       if (!&is_va($method)) {
         my $method_decl_ref = &function::decl($method, $klass_path);
-        $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "tkn-4") . "\n";
+        $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "DUPLICATE") . "\n";
       }
     }
     }
