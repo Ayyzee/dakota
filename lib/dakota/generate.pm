@@ -2731,7 +2731,7 @@ sub ka_method::type_decl {
 sub raw_signature_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
-  my $scratch_str_ref = &global_scratch_str_ref();
+  my $result = '';
   my $method_num  = 0;
   my $max_width = 0;
   my $return_type = 'const signature-t*';
@@ -2751,9 +2751,9 @@ sub raw_signature_body {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
       if (&is_va($method)) {
-        $$scratch_str_ref .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:va:$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:va:$generic_name)(),\n";
       } else {
-        $$scratch_str_ref .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:$generic_name)(),\n";
       }
       my $method_name;
 
@@ -2765,12 +2765,13 @@ sub raw_signature_body {
     }
     $method_num++;
   }
-  $$scratch_str_ref .= $col . "nullptr\n";
+  $result .= $col . "nullptr\n";
+  return $result;
 }
 sub signature_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
-  my $scratch_str_ref = &global_scratch_str_ref();
+  my $result = '';
   my $method_num  = 0;
   my $max_width = 0;
   my $return_type = 'const signature-t*';
@@ -2790,9 +2791,9 @@ sub signature_body {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
       if (&is_va($method)) {
-        $$scratch_str_ref .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature:va:$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature:va:$generic_name)(),\n";
       } else {
-        $$scratch_str_ref .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature:$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature:$generic_name)(),\n";
       }
       my $method_name;
 
@@ -2804,12 +2805,13 @@ sub signature_body {
     }
     $method_num++;
   }
-  $$scratch_str_ref .= $col . "nullptr\n";
+  $result .= $col . "nullptr\n";
+  return $result;
 }
 sub address_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
-  my $scratch_str_ref = &global_scratch_str_ref();
+  my $result = '';
   my $method_num  = 0;
   my $max_width = 0;
   foreach my $method (@$sorted_methods) {
@@ -2842,24 +2844,24 @@ sub address_body {
 
       if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
         $pad = ' ' x $max_width;
-        $$scratch_str_ref .=   $col . "cast(method-t)"                   . $pad . "dkt-null-method, /*$method_name()*/\n";
+        $result .=   $col . "cast(method-t)"                   . $pad . "dkt-null-method, /*$method_name()*/\n";
       } else {
         if (&is_va($method)) {
-          $$scratch_str_ref .= $col . "cast(method-t)cast($method_type)" . $pad . "va:$method_name,\n";
+          $result .= $col . "cast(method-t)cast($method_type)" . $pad . "va:$method_name,\n";
         } else {
-          $$scratch_str_ref .= $col . "cast(method-t)cast($method_type)" . $pad . "$method_name,\n";
+          $result .= $col . "cast(method-t)cast($method_type)" . $pad . "$method_name,\n";
         }
       }
     }
     $method_num++;
   }
-  $$scratch_str_ref .= $col . "nullptr\n";
+  $result .= $col . "nullptr\n";
+  return $result;
 }
 sub alias_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
-  my $scratch_str_ref = &global_scratch_str_ref();
-
+  my $result = '';
   my $method_num  = 0;
   foreach my $method (@$sorted_methods) {
     if ($$method{'alias'}) {
@@ -2867,14 +2869,15 @@ sub alias_body {
       my $generic_name = "@{$$method{'name'}}";
       my $alias_name = "@{$$method{'alias'}}";
       if (&is_va($method)) {
-        $$scratch_str_ref .= $col . "{ dkt-signature(va:$alias_name($$new_arg_type_list)), dkt-signature(va:$generic_name($$new_arg_type_list)) },\n";
+        $result .= $col . "{ dkt-signature(va:$alias_name($$new_arg_type_list)), dkt-signature(va:$generic_name($$new_arg_type_list)) },\n";
       } else {
-        $$scratch_str_ref .= $col . "{ dkt-signature($alias_name($$new_arg_type_list)), dkt-signature($generic_name($$new_arg_type_list)) },\n";
+        $result .= $col . "{ dkt-signature($alias_name($$new_arg_type_list)), dkt-signature($generic_name($$new_arg_type_list)) },\n";
       }
     }
     $method_num++;
   }
-  $$scratch_str_ref .= $col . "{ nullptr, nullptr }\n";
+  $result .= $col . "{ nullptr, nullptr }\n";
+  return $result;
 }
 sub export_pair {
   my ($symbol, $element) = @_;
@@ -3105,48 +3108,51 @@ sub dk::generate_cxx_footer_klass {
     $$scratch_str_ref .= $col . "}; }\n";
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
-    $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = { //ro-data\n";
-    &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col)); #herehere
-    $$scratch_str_ref .= $col . "}; }\n";
+    $$scratch_str_ref .=
+      "\n" .
+      $col . "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = { //ro-data\n" .
+      $col . &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
+      $col . "}; }\n";
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
-    $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static method-t __method-addresses[] = { //ro-data\n";
-    &address_body($klass_name, $$klass_scope{'methods'}, &colin($col));
-    $$scratch_str_ref .= $col . "}; }\n";
+    $$scratch_str_ref .=
+      "\n" .
+      $col . "$klass_type @$klass_name { static method-t __method-addresses[] = { //ro-data\n" .
+      $col . &address_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
+      $col . "}; }\n";
   }
 
   my $num_method_aliases = scalar(@$method_aliases);
   if ($num_method_aliases) {
-    $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static method-alias-t __method-aliases[] = { //ro-data\n";
-    &alias_body($klass_name, $$klass_scope{'methods'}, &colin($col));
-    $$scratch_str_ref .= $col . "}; }\n";
+    $$scratch_str_ref .=
+      "\n" .
+      $col . "$klass_type @$klass_name { static method-alias-t __method-aliases[] = { //ro-data\n" .
+      $col . &alias_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
+      $col . "}; }\n";
   }
 
   my $exported_methods =     &exported_methods($klass_scope);
   my $exported_raw_methods = &exported_raw_methods($klass_scope);
 
   if (values %{$exported_methods ||= []}) {
-    $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __exported-method-signatures[] = { //ro-data\n";
-    &signature_body($klass_name, $exported_methods, &colin($col));
-    $$scratch_str_ref .= $col . "}; }\n";
-
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static method-t __exported-method-addresses[] = { //ro-data\n";
-    &address_body($klass_name, $exported_methods, &colin($col));
-    $$scratch_str_ref .= $col . "}; }\n";
+    $$scratch_str_ref .=
+      "\n" .
+      $col . "$klass_type @$klass_name { static const signature-t* const __exported-method-signatures[] = { //ro-data\n" .
+      $col . &signature_body($klass_name, $exported_methods, &colin($col)) .
+      $col . "}; }\n" .
+      $col . "$klass_type @$klass_name { static method-t __exported-method-addresses[] = { //ro-data\n" .
+      $col . &address_body($klass_name, $exported_methods, &colin($col)) .
+      $col . "}; }\n";
   }
   if (values %{$exported_raw_methods ||= []}) {
-    $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __exported-raw-method-signatures[] = { //ro-data\n";
-    &raw_signature_body($klass_name, $exported_raw_methods, &colin($col));
-    $$scratch_str_ref .= $col . "}; }\n";
-
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static method-t __exported-raw-method-addresses[] = { //ro-data\n";
-    &address_body($klass_name, $exported_raw_methods, &colin($col));
-    $$scratch_str_ref .= $col . "}; }\n";
+    $$scratch_str_ref .=
+      "\n" .
+      $col . "$klass_type @$klass_name { static const signature-t* const __exported-raw-method-signatures[] = { //ro-data\n" .
+      $col . &raw_signature_body($klass_name, $exported_raw_methods, &colin($col)) .
+      $col . "}; }\n" .
+      $col . "$klass_type @$klass_name { static method-t __exported-raw-method-addresses[] = { //ro-data\n" .
+      $col . &address_body($klass_name, $exported_raw_methods, &colin($col)) .
+      $col . "}; }\n";
   }
   ###
   ###
