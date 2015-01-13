@@ -2118,17 +2118,6 @@ sub rep_tree_from_dk_path {
   while (m/\$($m)/g) {
     &add_symbol($gbl_root, [$1]);
   }
-  pos $_ = 0;
-  my $symbols = { # hardcoded
-                 'cat' => 1,
-                 'enum' => 1,
-                 'struct' => 1,
-                 'union' => 1,
-                 'value' => 1,
-                };
-  foreach my $symbol (sort keys %$symbols) {
-    &add_symbol($gbl_root, [ $symbol ]);
-  }
   my $keywords = { # hardcoded
                   'items' => 1,
                   'keyword' => 1,
