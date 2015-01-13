@@ -56,6 +56,14 @@ our @EXPORT= qw(
                  str_from_cmd_info
                  colin
                  colout
+                 add_klass_decl
+                 add_trait_decl
+                 add_symbol_ident
+                 add_symbol
+                 add_hash_ident
+                 add_hash
+                 add_keyword
+                 add_string
               );
 
 use dakota::sst;
@@ -472,27 +480,27 @@ sub ctlg_dir_path_from_so_path {
   return $path;
 }
 sub add_klass_decl {
-  my ($klass_name) = @_;
+  my ($file, $klass_name) = @_;
   if ('dk' ne $klass_name) {
-    if (!$$gbl_root{'klasses'}{$klass_name}) {
-      $$gbl_root{'klasses'}{$klass_name} = undef;
+    if (!$$file{'klasses'}{$klass_name}) {
+      $$file{'klasses'}{$klass_name} = undef;
     }
   }
 }
 sub add_trait_decl {
-  my ($klass_name) = @_;
-  if (!$$gbl_root{'traits'}{$klass_name}) {
-    $$gbl_root{'traits'}{$klass_name} = undef;
+  my ($file, $klass_name) = @_;
+  if (!$$file{'traits'}{$klass_name}) {
+    $$file{'traits'}{$klass_name} = undef;
   }
 }
 sub add_symbol_ident {
-  my ($ident) = @_;
-  $$gbl_root{'symbols'}{$ident} = undef;
+  my ($file, $ident) = @_;
+  $$file{'symbols'}{$ident} = undef;
 }
 sub add_symbol {
-  my ($symbol) = @_;
+  my ($file, $symbol) = @_;
   my $ident = &path::string($symbol);
-  &add_symbol_ident($ident);
+  &add_symbol_ident($file, $ident);
 }
 sub add_type {
   my ($seq) = @_;
@@ -501,24 +509,24 @@ sub add_type {
   $$gbl_root{'types'}{$ident} = undef;
 }
 sub add_hash_ident {
-  my ($ident) = @_;
-  $$gbl_root{'hashes'}{$ident} = undef;
+  my ($file, $ident) = @_;
+  $$file{'hashes'}{$ident} = undef;
 }
 sub add_hash {
-  my ($hash) = @_;
+  my ($file, $hash) = @_;
   my $ident = &path::string([$hash]);
-  &add_hash_ident($ident);
+  &add_hash_ident($file, $ident);
 }
 sub add_keyword {
-  my ($keyword) = @_;
+  my ($file, $keyword) = @_;
   my $ident = &path::string([$keyword]);
-  &add_hash_ident($ident);
-  &add_symbol_ident($ident);
-  $$gbl_root{'keywords'}{$ident} = undef;
+  &add_hash_ident($file, $ident);
+  &add_symbol_ident($file, $ident);
+  $$file{'keywords'}{$ident} = undef;
 }
 sub add_string {
-  my ($string) = @_;
-  $$gbl_root{'strings'}{$string} = undef;
+  my ($file, $string) = @_;
+  $$file{'strings'}{$string} = undef;
 }
 sub token_seq::simple_seq {
   my ($tokens) = @_;
@@ -705,7 +713,7 @@ sub slots_seq {
   foreach $tkn (@$tkns) {
     if (';' eq $$tkn{'str'}) {
       my $key = &dakota::util::_remove_last($type);
-      &add_symbol([$key]);      # slot var name
+      &add_symbol($gbl_root, [$key]);      # slot var name
       &dakota::util::_add_last($seq, {$key => &arg::type($type)});
       &maybe_add_exported_header_for_symbol_seq($type);
       $type = [];
@@ -722,7 +730,7 @@ sub enum_seq {
   foreach $tkn (@$tkns) {
     if (',' eq $$tkn{'str'}) {
       my $key = &dakota::util::_remove_first($type);
-      &add_symbol([ $key ]);    # enum var name
+      &add_symbol($gbl_root, [ $key ]);    # enum var name
       if ('=' ne &dakota::util::_remove_first($type)) {
         die __FILE__, ":", __LINE__, ": error:\n";
       }
@@ -769,12 +777,12 @@ sub slots {
         'union' eq  &dakota::util::_first($type) ||
         'enum' eq   &dakota::util::_first($type)) {
       if ('enum' eq &dakota::util::_first($type)) {
-        &add_symbol(['enum-info']);
-        &add_symbol(['const-info']);
+        &add_symbol($gbl_root, ['enum-info']);
+        &add_symbol($gbl_root, ['const-info']);
 
-        &add_klass_decl('enum-info');
-        &add_klass_decl('named-enum-info');
-        &add_klass_decl('const-info');
+        &add_klass_decl($gbl_root, 'enum-info');
+        &add_klass_decl($gbl_root, 'named-enum-info');
+        &add_klass_decl($gbl_root, 'const-info');
       }
       $cat = &dakota::util::_remove_first($type);
       $$gbl_current_scope{'slots'}{'cat'} = $cat;
@@ -807,7 +815,7 @@ sub slots {
         }
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      &add_symbol(['size']);
+      &add_symbol($gbl_root, ['size']);
       return;
     }
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
@@ -839,7 +847,7 @@ sub const {
     &dakota::util::_remove_last($type); # '='
   }
   my $name = &dakota::util::_remove_last($type);
-  &add_symbol([ $name ]); # const var name
+  &add_symbol($gbl_root, [ $name ]); # const var name
   if (@$type) {
     $$const{'type'} = &arg::type($type);
     $$const{'name'} = $name;
@@ -888,12 +896,12 @@ sub enum {
         &enum_seq($enum_defs, $$enum{'info'});
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      &add_symbol(['enum-info']);
-      &add_symbol(['const-info']);
+      &add_symbol($gbl_root, ['enum-info']);
+      &add_symbol($gbl_root, ['const-info']);
 
-      &add_klass_decl('enum-info');
-      &add_klass_decl('named-enum-info');
-      &add_klass_decl('const-info');
+      &add_klass_decl($gbl_root, 'enum-info');
+      &add_klass_decl($gbl_root, 'named-enum-info');
+      &add_klass_decl($gbl_root, 'const-info');
       &dakota::util::_add_last($$gbl_current_scope{'enum'}, $enum);
       return;
     }
@@ -919,7 +927,7 @@ sub initialize {
   &match(__FILE__, __LINE__, ')');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
-      &add_symbol(['initialize']);
+      &add_symbol($gbl_root, ['initialize']);
       $$gbl_current_scope{'has-initialize'} = 1;
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
@@ -950,7 +958,7 @@ sub finalize {
   &match(__FILE__, __LINE__, ')');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
-      &add_symbol(['finalize']);
+      &add_symbol($gbl_root, ['finalize']);
       $$gbl_current_scope{'has-finalize'} = 1;
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
@@ -1201,7 +1209,7 @@ sub klass {
           $$gbl_current_scope{'traits'} = [];
         }
         foreach my $trait (@$seq) {
-          &add_trait_decl($trait);
+          &add_trait_decl($gbl_root, $trait);
           &dakota::util::_add_last($$gbl_current_scope{'traits'}, $trait);
         }
         last;
@@ -1214,7 +1222,7 @@ sub klass {
         }
         my $path = &path::string($seq);
         &dakota::util::_add_last($$gbl_current_scope{'requires'}, $path);
-        &add_klass_decl($path);
+        &add_klass_decl($gbl_root, $path);
         last;
       }
       if (m/^provide$/) {
@@ -1225,7 +1233,7 @@ sub klass {
         }
         my $path = &path::string($seq);
         &dakota::util::_add_last($$gbl_current_scope{'provides'}, $path);
-        &add_klass_decl($path);
+        &add_klass_decl($gbl_root, $path);
         last;
       }
       if (m/^interpose$/) {
@@ -1233,7 +1241,7 @@ sub klass {
         &match(__FILE__, __LINE__, ';');
         my $name = &path::string($seq);
         $$gbl_current_scope{'interpose'} = $name;
-        &add_klass_decl($name);
+        &add_klass_decl($gbl_root, $name);
 
         if (!$$gbl_root{'interposers'}{$name} &&
             !$$gbl_root{'interposers-unordered'}{$name}) {
@@ -1257,7 +1265,7 @@ sub klass {
               &match(__FILE__, __LINE__, ';');
               my $path = &path::string($seq);
               $$gbl_current_scope{'superklass'} = $path;
-              &add_klass_decl($path);
+              &add_klass_decl($gbl_root, $path);
               last;
             }
           }
@@ -1273,7 +1281,7 @@ sub klass {
               &match(__FILE__, __LINE__, ';');
               my $path = &path::string($seq);
               $$gbl_current_scope{'klass'} = $path;
-              &add_klass_decl($path);
+              &add_klass_decl($gbl_root, $path);
               last;
             }
           }
@@ -1491,7 +1499,7 @@ sub add_klasses_used {
       my ($range, $matches) = &sst_cursor::match_pattern_seq($new_sst_cursor, $$args{'pattern'});
       if ($range) {
         my $name = &sst_cursor::str($new_sst_cursor, [0,0]);
-        &add_klass_decl($name);
+        &add_klass_decl($gbl_root, $name);
       }
     }
   }
@@ -2080,35 +2088,35 @@ sub rep_tree_from_dk_path {
   #print STDERR $_;
 
   while (m/($z)\s*=>/g) {
-    &add_keyword($1);
+    &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/($m)\s*=>/g) {
-    &add_keyword($1);
+    &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/\$\'(.*?)\'\s*=>/g) {
-    &add_keyword($1);
+    &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/\$\'(.*?)\'/g) {
-    &add_hash($1);
+    &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/case\s*"(.*)"\s*:/g) {
-    &add_hash($1);
+    &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/case\s*\$(.*)\s*:/g) {
-    &add_hash($1);
+    &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/\$\"(.*?)\"/g) {
-    &add_string($1);
+    &add_string($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/\$($m)/g) {
-    &add_symbol([$1]);
+    &add_symbol($gbl_root, [$1]);
   }
   pos $_ = 0;
   my $symbols = { # hardcoded
@@ -2119,7 +2127,7 @@ sub rep_tree_from_dk_path {
                  'value' => 1,
                 };
   foreach my $symbol (sort keys %$symbols) {
-    &add_symbol([ $symbol ]);
+    &add_symbol($gbl_root, [ $symbol ]);
   }
   my $keywords = { # hardcoded
                   'items' => 1,
@@ -2132,7 +2140,7 @@ sub rep_tree_from_dk_path {
                   'symbol' => 1,
                  };
   foreach my $keyword (sort keys %$keywords) {
-    &add_keyword($keyword);
+    &add_keyword($gbl_root, $keyword);
   }
   my $klass_decls = { # hardcoded
                      'assoc-node' => 1,
@@ -2162,7 +2170,7 @@ sub rep_tree_from_dk_path {
                      'va-method' => 1,
                     };
   foreach my $klass_decl (sort keys %$klass_decls) {
-    &add_klass_decl($klass_decl);
+    &add_klass_decl($gbl_root, $klass_decl);
   }
   $gbl_sst = &sst::make($_, $gbl_filename);
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);

@@ -26,6 +26,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 my $prefix;
 
@@ -41,6 +42,7 @@ use integer;
 use Cwd;
 
 use dakota::rewrite;
+use dakota::parse;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -3808,50 +3810,60 @@ sub dk::generate_imported_klasses_info {
 }
 sub add_extra_symbols {
   my ($file) = @_;
-  $$file{'symbols'}{'behavior-exported?'} = undef;
-  $$file{'symbols'}{'construct'} = undef;
-  $$file{'symbols'}{'date'} = undef;
-  $$file{'symbols'}{'executable'} = undef;
-  $$file{'symbols'}{'exported-method-addresses'} = undef;
-  $$file{'symbols'}{'exported-method-signatures'} = undef;
-  $$file{'symbols'}{'exported-raw-method-addresses'} = undef;
-  $$file{'symbols'}{'exported-raw-method-signatures'} = undef;
-  $$file{'symbols'}{'exported?'} = undef;
-  $$file{'symbols'}{'exports'} = undef;
-  $$file{'symbols'}{'file'} = undef;
-  $$file{'symbols'}{'imported-klasses'} = undef;
-  $$file{'symbols'}{'imported-klasses-names'} = undef;
-  $$file{'symbols'}{'interpose-name'} = undef;
-  $$file{'symbols'}{'interposers'} = undef;
-  $$file{'symbols'}{'ka-method-signatures'} = undef;
-  $$file{'symbols'}{'klass'} = undef;
-  $$file{'symbols'}{'klass-defns'} = undef;
-  $$file{'symbols'}{'klass-name'} = undef;
-  $$file{'symbols'}{'library'} = undef;
-  $$file{'symbols'}{'method'} = undef;
-  $$file{'symbols'}{'method-addresses'} = undef;
-  $$file{'symbols'}{'method-aliases'} = undef;
-  $$file{'symbols'}{'method-signatures'} = undef;
-  $$file{'symbols'}{'module'} = undef;
-  $$file{'symbols'}{'name'} = undef;
-  $$file{'symbols'}{'offset'} = undef;
-  $$file{'symbols'}{'requires'} = undef;
-  $$file{'symbols'}{'selectors'} = undef;
-  $$file{'symbols'}{'selectors-va'} = undef;
-  $$file{'symbols'}{'signatures'} = undef;
-  $$file{'symbols'}{'signatures-va'} = undef;
-  $$file{'symbols'}{'size'} = undef;
-  $$file{'symbols'}{'slots-info'} = undef;
-  $$file{'symbols'}{'slots-type'} = undef;
-  $$file{'symbols'}{'state-exported?'} = undef;
-  $$file{'symbols'}{'superklass-name'} = undef;
-  $$file{'symbols'}{'time'} = undef;
-  $$file{'symbols'}{'trait'} = undef;
-  $$file{'symbols'}{'traits'} = undef;
-  $$file{'symbols'}{'type'} = undef;
-  $$file{'symbols'}{'va-method'} = undef;
-  $$file{'symbols'}{'va-method-addresses'} = undef;
-  $$file{'symbols'}{'va-method-signatures'} = undef;
+  my $symbols = {
+    'behavior-exported?' => undef,
+    'cat' => undef,
+    'construct' => undef,
+    'date' => undef,
+    'enum' => undef,
+    'executable' => undef,
+    'exported-method-addresses' => undef,
+    'exported-method-signatures' => undef,
+    'exported-raw-method-addresses' => undef,
+    'exported-raw-method-signatures' => undef,
+    'exported?' => undef,
+    'exports' => undef,
+    'file' => undef,
+    'imported-klasses' => undef,
+    'imported-klasses-names' => undef,
+    'interpose-name' => undef,
+    'interposers' => undef,
+    'ka-method-signatures' => undef,
+    'klass' => undef,
+    'klass-defns' => undef,
+    'klass-name' => undef,
+    'library' => undef,
+    'method' => undef,
+    'method-addresses' => undef,
+    'method-aliases' => undef,
+    'method-signatures' => undef,
+    'module' => undef,
+    'name' => undef,
+    'offset' => undef,
+    'requires' => undef,
+    'selectors' => undef,
+    'selectors-va' => undef,
+    'signatures' => undef,
+    'signatures-va' => undef,
+    'size' => undef,
+    'slots-info' => undef,
+    'slots-type' => undef,
+    'state-exported?' => undef,
+    'struct' => undef,
+    'superklass-name' => undef,
+    'time' => undef,
+    'trait' => undef,
+    'traits' => undef,
+    'type' => undef,
+    'union' => undef,
+    'va-method' => undef,
+    'va-method-addresses' => undef,
+    'va-method-signatures' => undef,
+    'value' => undef,
+  };
+  foreach my $symbol (sort keys %$symbols) {
+    &dakota::parse::add_symbol($file, [ $symbol ]);
+  }
 }
 sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
