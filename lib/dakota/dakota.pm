@@ -55,6 +55,9 @@ $Data::Dumper::Useqq     = 1;
 $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+
 use File::Basename;
 use File::Copy;
 
@@ -204,6 +207,133 @@ sub add_visibility {
     }
   }
 }
+sub nrt::add_extra_keywords {
+  my ($file) = @_;
+  my $keywords = { # hardcoded
+    'keyword' => undef,   # kw-args processing funcs (throw)
+    'object' => undef,    # kw-args processing funcs (throw)
+    'signature' => undef, # kw-args processing funcs (throw)
+  };
+  foreach my $keyword (sort keys %$keywords) {
+    &add_keyword($file, $keyword);
+  }
+}
+sub rt::add_extra_keywords {
+  my ($file) = @_;
+  my $keywords = { # hardcoded
+    'items' => undef,
+    'kls' => undef,
+    'message' => undef,
+    'superkls' => undef,
+    'symbol' => undef,
+  };
+  foreach my $keyword (sort keys %$keywords) {
+    &add_keyword($file, $keyword);
+  }
+}
+###
+sub nrt::add_extra_klass_decls {
+  my ($file) = @_;
+  my $klass_decls = { # hardcoded
+    'boole' => undef,
+    'char8' => undef,
+    'file' => undef,
+    'input-stream' => undef, # std-input
+    'keyword' => undef,
+    'klass' => undef,
+    'method' => undef,
+    'missing-keyword-exception' => undef, # kw-args processing funcs (throw)
+    'named-info-node' => undef,
+    'no-such-keyword-exception' => undef, # kw-args processing funcs (throw)
+    'object' => undef,
+    'output-stream' => undef, # std-output, std-error
+    'property' => undef,
+    'selector' => undef,
+    'signature' => undef,
+    'symbol' => undef,
+    'super' => undef,
+    'uchar8' => undef,
+  };
+  foreach my $klass_decl (sort keys %$klass_decls) {
+    &add_klass_decl($file, $klass_decl);
+  }
+}
+sub rt::add_extra_klass_decls {
+  my ($file) = @_;
+  my $klass_decls = { # hardcoded
+    # NONE
+  };
+  foreach my $klass_decl (sort keys %$klass_decls) {
+    &add_klass_decl($file, $klass_decl);
+  }
+}
+###
+sub nrt::add_extra_symbols {
+  my ($file) = @_;
+  my $symbols = { # hardcoded
+    # NONE
+  };
+  foreach my $symbol (sort keys %$symbols) {
+    &dakota::parse::add_symbol($file, [ $symbol ]);
+  }
+}
+sub rt::add_extra_symbols {
+  my ($file) = @_;
+  my $symbols = { # hardcoded
+    'behavior-exported?' => undef,
+    'cat' => undef,
+    'construct' => undef,
+    'date' => undef,
+    'enum' => undef,
+    'executable' => undef,
+    'exported-method-addresses' => undef,
+    'exported-method-signatures' => undef,
+    'exported-raw-method-addresses' => undef,
+    'exported-raw-method-signatures' => undef,
+    'exported?' => undef,
+    'exports' => undef,
+    'file' => undef,
+    'imported-klasses' => undef,
+    'imported-klasses-names' => undef,
+    'interpose-name' => undef,
+    'interposers' => undef,
+    'ka-method-signatures' => undef,
+    'klass' => undef,
+    'klass-defns' => undef,
+    'klass-name' => undef,
+    'library' => undef,
+    'method' => undef,
+    'method-addresses' => undef,
+    'method-aliases' => undef,
+    'method-signatures' => undef,
+    'module' => undef,
+    'name' => undef,
+    'offset' => undef,
+    'requires' => undef,
+    'selectors' => undef,
+    'selectors-va' => undef,
+    'signatures' => undef,
+    'signatures-va' => undef,
+    'size' => undef,
+    'slots-info' => undef,
+    'slots-type' => undef,
+    'state-exported?' => undef,
+    'struct' => undef,
+    'superklass-name' => undef,
+    'time' => undef,
+    'trait' => undef,
+    'traits' => undef,
+    'type' => undef,
+    'union' => undef,
+    'va-method' => undef,
+    'va-method-addresses' => undef,
+    'va-method-signatures' => undef,
+    'value' => undef,
+  };
+  foreach my $symbol (sort keys %$symbols) {
+    &dakota::parse::add_symbol($file, [ $symbol ]);
+  }
+}
 sub sig1 {
   my ($scope) = @_;
   my $result = '';
@@ -276,6 +406,10 @@ sub loop_cxx_from_dk {
     &dk::generate_dk_cxx($file_basename, $dk_cxx_path, $dk_cxx_name);
     $cxx_path =~ s|^\./||;
     $cxx_path =~ s|/$||;
+    &nrt::add_extra_symbols($file);
+    &nrt::add_extra_klass_decls($file);
+    &nrt::add_extra_keywords($file);
+
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
@@ -538,6 +672,9 @@ sub rt_obj_from_rep {
   }
   $file = &scalar_from_file($rep_path);
   $file = &ka_translate($file);
+  &rt::add_extra_symbols($file);
+  &rt::add_extra_klass_decls($file);
+  &rt::add_extra_keywords($file);
 
   &dakota::generate::generate_rt_decl($path, $file_basename, $file);
   &dakota::generate::generate_rt_defn($path, $file_basename, $file);

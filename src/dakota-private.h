@@ -19,8 +19,9 @@
 
 #include <dakota.h>
 
+#include "dakota-declare-klass-type.h"
+
 noexport named_info_node_t* info_for_name(symbol_t);
-noexport assoc_node_t* imported_klasses_for_klass(symbol_t);
 
 noexport int_t  safe_strptrcmp(const char8_t* const* sp1, const char8_t* const* sp2);
 noexport int_t  safe_strncmp(const char8_t* s1, const char8_t* s2, size_t n);

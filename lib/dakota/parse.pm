@@ -2118,49 +2118,6 @@ sub rep_tree_from_dk_path {
   while (m/\$($m)/g) {
     &add_symbol($gbl_root, [$1]);
   }
-  my $keywords = { # hardcoded
-                  'items' => 1,
-                  'keyword' => 1,
-                  'kls' => 1,
-                  'message' => 1,
-                  'object' => 1,
-                  'signature' => 1,
-                  'superkls' => 1,
-                  'symbol' => 1,
-                 };
-  foreach my $keyword (sort keys %$keywords) {
-    &add_keyword($gbl_root, $keyword);
-  }
-  my $klass_decls = { # hardcoded
-                     'assoc-node' => 1,
-                     'boole' => 1,
-                     'char8' => 1,
-                     'construct' => 1,
-                     'file' => 1,
-                     'input-stream' => 1, # std-input
-                     'keyword' => 1,
-                     'klass' => 1,
-                     'method' => 1,
-                     'method-alias' => 1,
-                     'missing-keyword-exception' => 1, # kw-args processing funcs
-                     'named-info-node' => 1,
-                     'no-such-keyword-exception' => 1, # kw-args processing funcs
-                     'no-such-method-exception' => 1,
-                     'object' => 1,
-                     'output-stream' => 1, # std-output, std-error
-                     'property' => 1,
-                     'selector' => 1,
-                     'selector-node' => 1,
-                     'signature' => 1,
-                     'str' => 1,
-                     'super' => 1,
-                     'symbol' => 1,
-                     'uchar8' => 1,
-                     'va-method' => 1,
-                    };
-  foreach my $klass_decl (sort keys %$klass_decls) {
-    &add_klass_decl($gbl_root, $klass_decl);
-  }
   $gbl_sst = &sst::make($_, $gbl_filename);
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});

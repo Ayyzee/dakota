@@ -24,6 +24,7 @@ include <cinttypes>;
 #endif
 
 #include "dakota-private.h"
+#include "dakota-rt-private.h"
 #include "dakota-log.h"
 #include "sorted-array.h"
 #include "dl.h" // symbol-name-from-address()
@@ -43,6 +44,7 @@ klass property;
 klass std-compare;
 klass symbol;
 klass vector;
+klass selector-node;
 
 #if DKT-WORKAROUND
 namespace selector-node  { noexport int-t compare(slots-t**, slots-t**); }

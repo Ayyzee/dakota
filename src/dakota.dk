@@ -28,6 +28,7 @@ include <cinttypes>;
 
 #include "dl.h" // load-library()
 #include "dakota-private.h"
+#include "dakota-rt-private.h"
 #include "dakota-log.h"
 #include "sorted-array.h"
 #include "sorted-ptr-array.h"
@@ -52,6 +53,7 @@ klass str128;
 klass super;
 klass symbol;
 klass singleton-klass;
+klass selector-node;
 
 #if DKT-WORKAROUND
 namespace property

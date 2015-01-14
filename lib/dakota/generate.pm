@@ -25,6 +25,7 @@ package dakota::generate;
 use strict;
 use warnings;
 use Data::Dumper;
+
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -42,7 +43,6 @@ use integer;
 use Cwd;
 
 use dakota::rewrite;
-use dakota::parse;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -3808,70 +3808,10 @@ sub dk::generate_imported_klasses_info {
     }
   }
 }
-sub add_extra_symbols {
-  my ($file) = @_;
-  my $symbols = {
-    'behavior-exported?' => undef,
-    'cat' => undef,
-    'construct' => undef,
-    'date' => undef,
-    'enum' => undef,
-    'executable' => undef,
-    'exported-method-addresses' => undef,
-    'exported-method-signatures' => undef,
-    'exported-raw-method-addresses' => undef,
-    'exported-raw-method-signatures' => undef,
-    'exported?' => undef,
-    'exports' => undef,
-    'file' => undef,
-    'imported-klasses' => undef,
-    'imported-klasses-names' => undef,
-    'interpose-name' => undef,
-    'interposers' => undef,
-    'ka-method-signatures' => undef,
-    'klass' => undef,
-    'klass-defns' => undef,
-    'klass-name' => undef,
-    'library' => undef,
-    'method' => undef,
-    'method-addresses' => undef,
-    'method-aliases' => undef,
-    'method-signatures' => undef,
-    'module' => undef,
-    'name' => undef,
-    'offset' => undef,
-    'requires' => undef,
-    'selectors' => undef,
-    'selectors-va' => undef,
-    'signatures' => undef,
-    'signatures-va' => undef,
-    'size' => undef,
-    'slots-info' => undef,
-    'slots-type' => undef,
-    'state-exported?' => undef,
-    'struct' => undef,
-    'superklass-name' => undef,
-    'time' => undef,
-    'trait' => undef,
-    'traits' => undef,
-    'type' => undef,
-    'union' => undef,
-    'va-method' => undef,
-    'va-method-addresses' => undef,
-    'va-method-signatures' => undef,
-    'value' => undef,
-  };
-  foreach my $symbol (sort keys %$symbols) {
-    &dakota::parse::add_symbol($file, [ $symbol ]);
-  }
-}
 sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
   my $col = '';
 
-  if (&is_rt_decl() || &is_rt_defn()) { # why is_rt_decl()?
-    &add_extra_symbols($file);
-  }
   while (my ($symbol, $symbol_seq) = each(%$symbols)) {
     my $ident_symbol = &make_ident_symbol($symbol_seq);
     $$symbols{$symbol} = $ident_symbol;
