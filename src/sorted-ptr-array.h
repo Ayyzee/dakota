@@ -25,6 +25,8 @@ namespace sorted_ptr_array
 
   noexport slots_t* create(uint32_t capacity, uint32_t size, std_compare_t compare);
 
+  noexport result_t search(slots_t* t, const void* key);
+
   noexport const void* intern(slots_t* t, const void* key);
   noexport const void* at(slots_t* t, uint32_t offset);
   noexport const void* remove_last(slots_t* t);

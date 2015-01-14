@@ -10,10 +10,11 @@ export CXX_DEBUG_FLAGS :=\
  --debug=3\
  --define-macro DEBUG\
 
+CXX_NO_WARNINGS_FLAGS := --no-warnings
 CXX_NO_WARNINGS ?= 0
 
 ifneq ($(CXX_NO_WARNINGS), 0)
-	export CXX_WARNING_FLAGS := --no-warnings
+	export CXX_WARNING_FLAGS := $(CXX_NO_WARNINGS_FLAGS)
 else
   export CXX_WARNING_FLAGS :=\
  -Weverything\

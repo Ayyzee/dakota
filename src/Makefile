@@ -104,6 +104,9 @@ check: all install
 	$(MAKE) dummy
 	./dummy
 
+check-headers:
+	$(CXX) $(CXXFLAGS) $(CXX_COMPILE_FLAGS) $(CXX_NO_WARNINGS_FLAGS) $(INCLUDE_DAKOTAFLAGS) dakota-private.h
+
 $(rootdir)/lib/$(lib_prefix)$(dakota_util_name): $(dakota_util_files)
 
 $(rootdir)/lib/$(lib_prefix)$(dakota_name): $(dakota_files)

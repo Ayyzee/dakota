@@ -19,6 +19,7 @@ include <cstring>;
 include <cinttypes>;
 
 #include "dakota-private.h"
+#include "named-info-node.h"
 
 module dakota;
 
@@ -109,7 +110,7 @@ klass named-info-node
     return result;
   }
 
-  unused static int-t compare(slots-t** s, slots-t** other-s)
+  noexport int-t compare(slots-t** s, slots-t** other-s)
   {
     int-t result = compare(*s, *other-s);
     return result;

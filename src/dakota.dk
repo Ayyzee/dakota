@@ -54,6 +54,7 @@ klass super;
 klass symbol;
 klass singleton-klass;
 klass selector-node;
+klass result;
 
 #if DKT-WORKAROUND
 namespace property
@@ -554,10 +555,10 @@ init-runtime()
     std-error =  make(output-stream:klass, file => stderr);
 #endif
 
-    void (*previous-terminate)() = std::set-terminate(verbose-terminate);
+    previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
 
-    void (*previous-unexpected)() = std::set-unexpected(verbose-unexpected);
+    previous-unexpected = std::set-unexpected(verbose-unexpected);
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 #if 0
@@ -568,9 +569,6 @@ init-runtime()
       dk:dump(null);
     }
 #endif
-
-    std::set-terminate(verbose-terminate);
-    std::set-unexpected(verbose-unexpected);
   }
   init-imported-klasses();
 
@@ -631,7 +629,7 @@ import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc)
   }
   return;
 }
-unused static symbol-t
+noexport symbol-t
 interposer-name-for-klass-name(symbol-t klass-name)
 {
   property-t key = { klass-name, cast(uintptr-t)nullptr };
@@ -650,7 +648,7 @@ interposer-name-for-klass-name(symbol-t klass-name)
   return result;
 }
 
-static void
+noexport void
 add-interpose-prop(symbol-t key, symbol-t element)
 {
 //   dkt-log(DKT-LOG-INFO, "%s(%s, %s)", __func__, key, element);

@@ -128,9 +128,9 @@ dkt-log(uint32-t priority, const char8-t* format, ...)
 }
 #endif
 
-static void pre-runtime-verbose-terminate();
-static void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
-static void
+noexport void pre-runtime-verbose-terminate();
+noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
+noexport void
 pre-runtime-verbose-terminate()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
@@ -170,9 +170,9 @@ verbose-terminate()
   previous-terminate();
 }
 
-static void pre-runtime-verbose-unexpected();
-static void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
-static void
+noexport void pre-runtime-verbose-unexpected();
+noexport void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
+noexport void
 pre-runtime-verbose-unexpected()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);

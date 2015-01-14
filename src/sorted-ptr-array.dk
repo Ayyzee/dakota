@@ -57,7 +57,7 @@ klass sorted-ptr-array
   }
   
   //(-(insertion point) - 1)
-  static result-t search(slots-t* t, const void* key)
+  noexport result-t search(slots-t* t, const void* key)
   {
     assert(nullptr != key);
 

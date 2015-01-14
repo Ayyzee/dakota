@@ -17,9 +17,19 @@
 #if !defined __dakota_private_h__
 #define      __dakota_private_h__
 
+#include "dakota-dummy.h"
 #include <dakota.h>
 
-#include "dakota-declare-klass-type.h"
+dkt_declare_klass_type_struct(selector_node);
+//dkt_declare_klass_type_struct(signature);
+
+extern noexport void (*previous_terminate)();
+extern noexport void (*previous_unexpected)();
+
+noexport void import_selectors(signature_t** signatures, selector_node_t* selector_nodes);
+
+noexport symbol_t interposer_name_for_klass_name(symbol_t klass_name);
+noexport void add_interpose_prop(symbol_t key, symbol_t element);
 
 noexport named_info_node_t* info_for_name(symbol_t);
 

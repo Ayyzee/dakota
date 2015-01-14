@@ -132,7 +132,7 @@ method-for-signature(methods:slots-t* methods, const signature-t* signature)
   return m;
 }
 
-unused static void
+noexport void
 import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
 {
   uint32-t i = 0;

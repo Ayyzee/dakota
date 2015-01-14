@@ -17,6 +17,7 @@
 module dakota;
 
 klass equal-predicate;
+klass std-compare; // hackhack
 
 klass sorted-counted-set
 {
