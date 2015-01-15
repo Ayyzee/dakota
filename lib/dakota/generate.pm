@@ -1735,7 +1735,7 @@ sub generate_enum_decl {
       $$scratch_str_ref .= " @{$$enum{'type'}}";
     }
   }
-  $$scratch_str_ref .= " : int-t;";
+  $$scratch_str_ref .= " : $$enum{'enum-int-type'};";
 }
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
@@ -1751,7 +1751,7 @@ sub generate_enum_defn {
       $$scratch_str_ref .= " @{$$enum{'type'}}";
     }
   }
-  $$scratch_str_ref .= " : int-t";
+  $$scratch_str_ref .= " : $$enum{'enum-int-type'}";
   $$scratch_str_ref .= " {\n";
   my $max_width = 0;
   foreach my $pair (@$info) {

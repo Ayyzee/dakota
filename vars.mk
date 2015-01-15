@@ -68,35 +68,10 @@ INCLUDE_DAKOTAFLAGS :=\
 
 EXTRA_CXXFLAGS :=
 
-#ifndef MIN_EXTRA_CXXFLAGS
-#  EXTRA_CXXFLAGS += --define-macro DEBUG
-  #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
-  #EXTRA_CXXFLAGS += --define-macro DKT_USE_MAKE_MACRO
-  #ifdef __LP64__
-#if defined(__APPLE__) && defined(__MACH__)
-  #if SO_EXT eq "dylib"
-    #EXTRA_CXXFLAGS_DARWIN_64 := -arch x86_64 -mmacosx-version-min=10.5 -Wshorten-64-to-32
-    #EXTRA_CXXFLAGS += $(EXTRA_CXXFLAGS_DARWIN_64)
-    #EXTRA_LDFLAGS_DARWIN_64 += -arch x86_64
-    #EXTRA_LDFLAGS += $(EXTRA_LDFLAGS_DARWIN_64)
-  #endif
-  #endif
-#endif
-
 # clang does not support
 #   --no-common
 #   --trapv
 #   --PIC
-
-#-Wmultichar -Wno-multichar
-
-# -fshow-column\
- -fshow-source-location\
- -fcaret-diagnostics\
- -fdiagnostics-format=clang\
- -fdiagnostics-show-option\
-
-# --no-warnings
 
 # -fno-common\
  -ftrapv\
@@ -116,6 +91,8 @@ EXTRA_CXXFLAGS :=
  --warn-conversion\
  --warn-redundant-decls\
  --warn-switch-default\
+
+# --no-warnings
 
 # cast(some-type-t){...}
 ifdef DKT_ALLOW_COMPOUND_LITERALS

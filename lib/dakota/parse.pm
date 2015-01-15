@@ -578,11 +578,12 @@ sub match_re {
   if (&sst_cursor::current_token($gbl_sst_cursor) =~ /$match_token/) {
     $$gbl_sst_cursor{'current-token-index'}++;
   } else {
-    printf STDERR "%s:%i: expected \'%s\'\n",
+    printf STDERR "%s:%i: expected '%s', but got '%s'\n",
       $file,
-        $line,
-          $match_token;
-    &error($file, $line, $$gbl_sst_cursor{'current-token-index'});
+      $line,
+      $match_token,
+      &sst_cursor::current_token($gbl_sst_cursor);
+    &error($file, $line, &sst_cursor::current_token($gbl_sst_cursor));
   }
   return &sst::at($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'} - 1);
 }
@@ -725,6 +726,7 @@ sub slots_seq {
 }
 sub enum_seq {
   my ($tkns, $seq) = @_;
+
   my $tkn;
   my $type = [];
   foreach $tkn (@$tkns) {
@@ -741,9 +743,9 @@ sub enum_seq {
       &dakota::util::_add_last($type, $$tkn{'str'});
     }
   }
-  if (@$type) {
+  if (@$type && 0 != @$type) {
     my $key = &dakota::util::_remove_first($type);
-    &add_symbol([ $key ]);      # enum var name
+    &add_symbol($gbl_root, [ $key ]);      # enum var name
     if ('=' ne &dakota::util::_remove_first($type)) {
       die __FILE__, ":", __LINE__, ": error:\n";
     }
@@ -772,6 +774,15 @@ sub slots {
     &dakota::util::_add_last($type, $tkn);
   }
   my $cat = 'struct';
+  if (@$type && 3 == @$type) {
+    if ('enum' eq &dakota::util::_first($type)) {
+      my $int_type = &dakota::util::_remove_last($type);
+      my $colon =    &dakota::util::_remove_last($type);
+      die if ':' ne $colon;
+      $$gbl_current_scope{'slots'}{'enum-int-type'} = $int_type;
+      #print STDERR &Dumper($$gbl_current_scope{'slots'});
+    }
+  }
   if (@$type && 1 == @$type) {
     if ('struct' eq &dakota::util::_first($type) ||
         'union' eq  &dakota::util::_first($type) ||

@@ -477,9 +477,11 @@ sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union|enum)(\s*$main::block)/$2$1slots-t$3;/gs;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union|enum)(\s*;)/$2$1slots-t$3/gs;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+$t+?)(\s*;)/typedef$1 slots-t$2/gs;
+  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union)(\s*$main::block)/$2$1slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union)(\s*);/$2$1slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$k+\s*$main::block)/$2$1slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$k+\s*);/$2$1slots-t$3;/gs; # forward decl
+  $$filestr_ref =~ s/(?<!\$)\bslots(\s+$t+?)(\s*);/typedef$1 slots-t$2;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -772,7 +774,7 @@ sub add_implied_slots_struct {
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s=(export)(\s+slots\s+)=/*$1*/$2=gs;
-  $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5)=gse;
+  $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(.*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5)=gse;
 }
 sub exported_enum_body {
   my ($a, $b, $c, $d, $e) = @_;
@@ -780,7 +782,7 @@ sub exported_enum_body {
 }
 sub remove_exported_enum {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(export)(\s+enum)(\s*$k*)(\s*)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
+  $$filestr_ref =~ s/(export)(\s+enum)(\s*$k*)(.*?)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
 }
 # method init( ... , object-t $arg1, object-t $arg2 = ...) {|;
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;
@@ -955,6 +957,11 @@ sub convert_dk_to_cxx {
   if ($$filestr_ref =~ m/\Wcatch\W/g) {
     &rewrite_exceptions($filestr_ref);
   }
+  # [?klass-type is 'klass' xor 'trait']
+  # using ?klass-type ?qual-ident;
+  # ?klass-type ?ident = ?qual-ident;
+  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1namespace/g;
+
   &nest_namespaces($filestr_ref);
   #&nest_generics($filestr_ref);
   &rewrite_slots($filestr_ref);
