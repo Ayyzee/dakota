@@ -15,9 +15,9 @@
 // limitations under the License.
 
 include <cassert>;
+include <cinttypes>;
 include <cstdlib>;
 include <cstring>;
-include <cinttypes>;
 
 #include "dakota-private.h"
 

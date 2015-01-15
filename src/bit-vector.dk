@@ -17,6 +17,8 @@
 include <cassert>;
 include <cstring>;
 
+module dakota;
+
 inline uint32-t
 min(uint32-t a, uint32-t b)
 {
@@ -68,8 +70,6 @@ ceiling-divide(uint32-t numerator, uint32-t denominator)
   uint32-t result = (numerator + denominator - 1) / denominator;
   return result;
 }
-
-module dakota;
 
 klass bit-vector
 {

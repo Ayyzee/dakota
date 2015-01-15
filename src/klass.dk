@@ -15,19 +15,19 @@
 // limitations under the License.
 
 include <cassert>;
+include <cinttypes>;
 include <cstdio>;
 include <cstring>;
-include <cinttypes>;
 
 #if HAVE-CONFIG-H
   #include "config.h"
 #endif
 
+#include "dakota-log.h"
 #include "dakota-private.h"
 #include "dakota-rt-private.h"
-#include "dakota-log.h"
-#include "sorted-array.h"
 #include "dl.h" // symbol-name-from-address()
+#include "sorted-array.h"
 
 #define DKT-SET-METHOD-FOR-SELECTOR(methods, selector, method) (methods)->addrs[(selector)] = (method)
 #define DKT-METHOD-FOR-SELECTOR(methods, selector) (methods)->addrs[(selector)]
@@ -37,14 +37,14 @@ module dakota;
 klass assoc-node;
 klass bit-vector;
 klass method-alias;
-klass sorted-array;
 klass named-info-node;
 klass object-output-stream;
 klass property;
+klass selector-node;
+klass sorted-array;
 klass std-compare;
 klass symbol;
 klass vector;
-klass selector-node;
 
 #if DKT-WORKAROUND
 namespace selector-node  { noexport int-t compare(slots-t**, slots-t**); }

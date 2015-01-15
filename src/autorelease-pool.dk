@@ -20,8 +20,8 @@ module dakota;
 
 klass assoc;
 klass deque;
-trait stack;
 klass named-info-node;
+trait stack;
 
 klass autorelease-pool-klass
 {

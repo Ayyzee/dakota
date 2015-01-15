@@ -16,20 +16,20 @@
 
 include <cassert>;
 include <cerrno>;
+include <cinttypes>;
 include <cstdio>;
 include <cstring>;
 include <exception>;
 include <sys/stat.h>; // struct stat, stat()
-include <cinttypes>;
 
 #if HAVE-CONFIG-H
   #include "config.h"
 #endif
 
-#include "dl.h" // load-library()
+#include "dakota-log.h"
 #include "dakota-private.h"
 #include "dakota-rt-private.h"
-#include "dakota-log.h"
+#include "dl.h" // load-library()
 #include "sorted-array.h"
 #include "sorted-ptr-array.h"
 
@@ -42,19 +42,19 @@ module dakota;
 klass const-info;
 klass construct;
 klass enum-info;
-klass sorted-array;
-klass sorted-ptr-array;
 klass named-enum-info;
 klass named-info-node;
 klass property;
 klass resource-usage;
+klass result;
+klass selector-node;
+klass singleton-klass;
+klass sorted-array;
+klass sorted-ptr-array;
 klass std-compare;
 klass str128;
 klass super;
 klass symbol;
-klass singleton-klass;
-klass selector-node;
-klass result;
 
 #if DKT-WORKAROUND
 namespace property
@@ -457,6 +457,14 @@ static named-info-node-t* gbl-registration-info-list;
 noexport void register-info-common(named-info-node-t* registration-info);
 noexport void export-klass(named-info-node-t* klass-info);
 
+// export object-t
+// dk-make-simple-singleton(symbol-t name, symbol-t superklass-name)
+// {
+//   object-t kls = dk-make-simple-klass(name, superklass-name, $singleton-klass);
+//   object-t singleton = make(kls);
+//   return singleton;
+// }
+
 export object-t
 dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
 {
@@ -537,6 +545,7 @@ init-runtime()
     behavior = dk:behavior(object:klass);
     behavior = dk:behavior(klass:klass);
     behavior = dk:behavior(bit-vector:klass);
+
     if (null-klass)
       behavior = dk:behavior(null-klass);
 #else

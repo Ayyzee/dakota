@@ -17,8 +17,8 @@
 include <cassert>;
 include <cctype>;
 include <cerrno>;
-include <cstring>;
 include <cstdio>;
+include <cstring>;
 
 module dakota-util;
 

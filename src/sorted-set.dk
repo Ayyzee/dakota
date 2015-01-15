@@ -20,6 +20,8 @@ include <cstring>;
 
 #include "sorted-ptr-array.h"
 
+module dakota;
+
 #if DKT-WORKAROUND
 namespace sorted-ptr-array
 {
@@ -27,13 +29,11 @@ namespace sorted-ptr-array
 }
 #endif
 
-module dakota;
-
-klass sorted-ptr-array;
+klass equal-predicate;
 klass object-output-stream;
 klass result;
+klass sorted-ptr-array;
 klass std-compare;
-klass equal-predicate;
 
 klass sorted-set
 {

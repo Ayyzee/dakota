@@ -17,8 +17,8 @@
 include <cassert>;
 include <cctype>;
 include <cerrno>;
-include <cstring>;
 include <cstdio>;
+include <cstring>;
 
 noexport boole-t
 space?(int-t c)
@@ -28,8 +28,8 @@ space?(int-t c)
 
 module dakota-util;
 
-klass str128;
 klass type-predicate;
+klass str128;
 
 klass input-file
 {

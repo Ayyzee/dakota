@@ -20,7 +20,7 @@ module dakota-util;
 
 klass features
 {
-  slots enum
+  slots enum : uint32-t
   {
     k-none =             0,
     k-indent =           1 << 0,

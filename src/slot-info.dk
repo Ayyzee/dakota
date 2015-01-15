@@ -21,7 +21,7 @@ klass slot-info
 {
   slots
   {
-    symbol-t        type;   // never nullptr
-    uint32-t        size;   // never 0
+    symbol-t type;   // never nullptr
+    uint32-t size;   // never 0
   }
 }

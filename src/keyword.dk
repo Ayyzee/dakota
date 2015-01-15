@@ -23,7 +23,7 @@ klass keyword
 {
   slots
   {
-    symbol-t  symbol; // MUST BE FIRST!!  offsetof() must return 0 for 'symbol'
+    symbol-t  symbol; // should be first! offsetof() should return 0 for 'symbol' for best performance
     uintmax-t hash;
   }
 }

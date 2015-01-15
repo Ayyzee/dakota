@@ -20,7 +20,10 @@ klass singleton-klass
 {
   superklass klass;
 
-  slots { object-t instance; }
+  slots
+  {
+    object-t instance;
+  }
 
   method object-t alloc(object-t self)
   {

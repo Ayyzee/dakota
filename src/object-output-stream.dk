@@ -133,8 +133,8 @@ klass object-output-stream
   method object-t write-element(object-t self, const char8-t* t, const char8-t* key);
   method object-t write-element(object-t self, int32-t t, const char8-t* key);
   method object-t write-element(object-t self, uint32-t t, const char8-t* key);
-  method object-t write-table-start(object-t self, const char8-t* key);
-  method object-t write-table-end(object-t self);
   method object-t write-sequence-start(object-t self, const char8-t* key);
   method object-t write-sequence-end(object-t self);
+  method object-t write-table-start(object-t self, const char8-t* key);
+  method object-t write-table-end(object-t self);
 }

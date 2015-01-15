@@ -16,9 +16,9 @@
 
 module dakota;
 
-klass klass;
 klass collection; // add()
 trait forward-iterator;
+klass klass;
 
 trait set
 {

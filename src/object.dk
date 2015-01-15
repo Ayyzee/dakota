@@ -14,15 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-include <cstdlib>;
-
 include <cinttypes>;
+include <cstdlib>;
 
 module dakota;
 
+klass resource-usage;
 klass object-output-stream;
 klass output-stream;
-klass resource-usage;
 
 klass object
 {
