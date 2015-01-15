@@ -14,38 +14,39 @@
 
 digraph "grammar-enum"
 {
-  graph [ label = "\G", fontcolor = red ];
+  graph [ label = "\G", fontcolor = red, fontname = "bold", fontsize = 24 ];
   graph [ rankdir = LR, center = true ];
   graph [ page = "8.5,11", size = "7.5,10" ];
-
+  edge [ fontcolor = blue, fontname = "Courier-Bold", fontsize = 24 ];
   node [ shape = circle ];
-  node [ label = "", width = 0.25 ];
-  //node [ label = "" ];
 
-  000 [ shape = doublecircle ];
-  100 [ shape = doublecircle ];
+  // comment out this line if you want node numbers shown
+  node [ label = "" ];
 
-  000 -> 010 [ label = "enum" ];
-  010 -> 020 [ label = "?ident", fontcolor = blue ];
-  010 -> 035 [ label = ":" ];
-  010 -> 050 [ label = "{" ];
-  020 -> 030 [ label = ":" ];
-  020 -> 050 [ label = "{" ];
-  030 -> 040 [ label = "?int-type", fontcolor = blue ];
-  035 -> 045 [ label = "?int-type", fontcolor = blue ];
-  040 -> 050 [ label = "{" ];
-  040 -> 100 [ label = ";" ];
-  045 -> 050 [ label = "{" ];
-  050 -> 060 [ label = "?ident", fontcolor = blue ];
-  050 -> 090 [ label = "}" ];
-  060 -> 050 [ label = ",", color = green ];
-  060 -> 070 [ label = "=" ];
-  060 -> 090 [ label = "}" ];
-  070 -> 080 [ label = "?tkns", fontcolor = blue ];
-  080 -> 050 [ label = ",", color = green ];
-  080 -> 090 [ label = "}" ];
-  090 -> 100 [ label = ";" ];
+  00 [ shape = doublecircle ];
+  60 [ shape = doublecircle ];
 
-  //{ rank = same; 030; 035 }
-  //{ rank = same; 040; 045 }
+  00 -> 05 [ label = "enum" ];
+  05 -> 10 [ label = "?ident", fontcolor = limegreen ];
+  05 -> 20 [ label = ":" ];
+  05 -> 35 [ label = "{" ];
+  10 -> 15 [ label = ":" ];
+  10 -> 35 [ label = "{" ];
+  15 -> 25 [ label = "?int-type", fontcolor = limegreen ];
+  20 -> 30 [ label = "?int-type", fontcolor = limegreen ];
+  25 -> 35 [ label = "{" ];
+  25 -> 60 [ label = ";" ];
+  30 -> 35 [ label = "{" ];
+  35 -> 40 [ label = "?ident", fontcolor = limegreen ];
+  35 -> 55 [ label = "}" ];
+  40 -> 35 [ label = ",", style = bold, color = hotpink ];
+  40 -> 45 [ label = "=" ];
+  40 -> 55 [ label = "}" ];
+  45 -> 50 [ label = "?expr", fontcolor = limegreen ];
+  50 -> 35 [ label = ",", style = bold, color = hotpink ];
+  50 -> 55 [ label = "}" ];
+  55 -> 60 [ label = ";" ];
+
+  { rank = same; 15; 20 }
+  { rank = same; 25; 30 }
 }
