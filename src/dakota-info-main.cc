@@ -28,16 +28,14 @@
 #include "dakota-dummy.h"
 #include <dakota.h> // format_printf(), format_va_printf()
 
-enum
-  {
-    DKT_INFO_HELP = 256,
-    DKT_INFO_OUTPUT,
-    DKT_INFO_OUTPUT_DIRECTORY,
-    DKT_INFO_DIRECTORY,
-    DKT_INFO_ONLY,
-    DKT_INFO_RECURSIVE
-  };
-
+enum {
+  DKT_INFO_HELP = 256,
+  DKT_INFO_OUTPUT,
+  DKT_INFO_OUTPUT_DIRECTORY,
+  DKT_INFO_DIRECTORY,
+  DKT_INFO_ONLY,
+  DKT_INFO_RECURSIVE
+};
 struct opts_t
 {
   char* only; // full or partial (prefix) klass name
@@ -59,10 +57,8 @@ usage(const char* progname, option* options)
   fprintf(stdout, "usage: %s", tmp_progname);
   int result = 0;
 
-  while (nullptr != options->name)
-  {
-    switch (options->has_arg)
-    {
+  while (nullptr != options->name) {
+    switch (options->has_arg) {
       case no_argument:
         fprintf(stdout, " [--%s]", options->name);
         break;
@@ -87,8 +83,7 @@ handle_opts(int* argc, char*** argv)
   const char* progname = *argv[0];
   int unrecognized_opt_cnt = 0;
   // options descriptor
-  static struct option longopts[] =
-  {
+  static struct option longopts[] = {
     { "help",             no_argument,       nullptr, DKT_INFO_HELP },
     { "output",           required_argument, nullptr, DKT_INFO_OUTPUT },
     { "output-directory", required_argument, nullptr, DKT_INFO_OUTPUT_DIRECTORY },
@@ -99,10 +94,8 @@ handle_opts(int* argc, char*** argv)
   };
   int opt;
 
-  while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, nullptr)))
-  {
-    switch (opt)
-    {
+  while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, nullptr))) {
+    switch (opt) {
       case DKT_INFO_HELP:
         usage(progname, longopts);
         exit(EXIT_SUCCESS);
@@ -125,8 +118,7 @@ handle_opts(int* argc, char*** argv)
         unrecognized_opt_cnt++;
     }
   }
-  if (0 != unrecognized_opt_cnt || (1 == optind && 1 == *argc))
-  {
+  if (0 != unrecognized_opt_cnt || (1 == optind && 1 == *argc)) {
     usage(progname, longopts);
     exit(EXIT_FAILURE);
   }
@@ -178,17 +170,13 @@ main(int argc, char** argv, char**)
   handle_opts(&argc, &argv);
   char output_pid[MAXPATHLEN] = "";
 
-  if (nullptr != opts.directory)
-  {
+  if (nullptr != opts.directory) {
     int n = chdir(opts.directory);
     if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
   }
-
-  if (nullptr != opts.output)
-  {
+  if (nullptr != opts.output) {
     pid_t pid = getpid();
     snprintf(output_pid, sizeof(output_pid), "%s-%i", opts.output, pid);
-
     // create an empty file
     int fd = open(output_pid, O_CREAT | O_TRUNC, 0644);
     if (-1 == fd) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
@@ -206,21 +194,18 @@ main(int argc, char** argv, char**)
     setenv_boole("DKT_INFO_RECURSIVE", opts.recursive, overwrite = 1);
   int i = 0;
   const char* arg = nullptr;
-  while (nullptr != (arg = argv[i++]))
-  {
+  while (nullptr != (arg = argv[i++])) {
     setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
     setenv("DKT_EXIT_BEFORE_MAIN", "", overwrite = 1);
     setenv("DKT_INFO_ARG", arg, overwrite = 1);
     setenv("DKT_INFO_ARG_TYPE", "exe", overwrite = 1); // not currently used
     int status = spawn(arg);
-    if (-1 == status)
-    {
+    if (-1 == status) {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
       unsetenv("DKT_NO_INIT_RUNTIME");
       unsetenv("DKT_EXIT_BEFORE_MAIN");
       setenv("DKT_INFO_ARG_TYPE", "lib", overwrite = 1); // not currently used
-      if (nullptr == strchr(arg, '/'))
-      { // not required on darwin (required on linux)
+      if (nullptr == strchr(arg, '/')) { // not required on darwin (required on linux)
         char arg_path[MAXPATHLEN] = "";
         strcat(arg_path, "./");
         strcat(arg_path, arg);
@@ -231,8 +216,7 @@ main(int argc, char** argv, char**)
         abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
     }
   }
-  if (nullptr != opts.output)
-  {
+  if (nullptr != opts.output) {
     int n = rename(output_pid, opts.output);
     if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));
   }
