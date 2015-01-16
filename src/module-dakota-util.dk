@@ -17,8 +17,8 @@
 module dakota-util import module dakota
   input-stream,
   object-input-stream,
-  object-output-stream;
-  output-stream,
+  object-output-stream,
+  output-stream;
 
 module dakota-util export
   ascii-number,
