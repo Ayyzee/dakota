@@ -982,6 +982,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
   const named-enum-info-t*  enum-info =                      cast(const named-enum-info-t*) named-info-node:at(klass-info, $enum-info);
   const const-info-t*       const-info =                     cast(const const-info-t*)      named-info-node:at(klass-info, $const-info);
   const char8-t*            slots-type =                     cast(const char8-t*)           named-info-node:at(klass-info, $slots-type);
+  const char8-t*            enum-base =                      cast(const char8-t*)           named-info-node:at(klass-info, $enum-base);
   named-info-node-t*        slots-info =                     cast(named-info-node-t*)       named-info-node:at(klass-info, $slots-info);
 //     method-t const* method-addresses = cast(method-t*)named-info-node:at(klass-info, $method-addresses);
 //     method-t const* exported-method-addresses = cast(method-t*)named-info-node:at(klass-info, $exported-method-addresses);
@@ -1084,6 +1085,8 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
       else-if (nullptr != slots-info) {
         if (nullptr == cat || $struct == cat)
           ofile:printf(ofl, "slots\n");
+        else-if (enum-base)
+          ofile:printf(ofl, "slots %s : %s\n", cat, enum-base);
         else
           ofile:printf(ofl, "slots %s\n", cat);
         ofile:printf(ofl, "{\n");

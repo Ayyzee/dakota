@@ -1735,7 +1735,7 @@ sub generate_enum_decl {
       $$scratch_str_ref .= " @{$$enum{'type'}}";
     }
   }
-  $$scratch_str_ref .= " : $$enum{'enum-int-type'};";
+  $$scratch_str_ref .= " : $$enum{'enum-base'};";
 }
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
@@ -1751,7 +1751,7 @@ sub generate_enum_defn {
       $$scratch_str_ref .= " @{$$enum{'type'}}";
     }
   }
-  $$scratch_str_ref .= " : $$enum{'enum-int-type'}";
+  $$scratch_str_ref .= " : $$enum{'enum-base'}";
   $$scratch_str_ref .= " {\n";
   my $max_width = 0;
   foreach my $pair (@$info) {
@@ -3362,6 +3362,9 @@ sub dk::generate_cxx_footer_klass {
     my $cat = $$klass_scope{'slots'}{'cat'};
     $$tbbl{'$cat'} = "\$$cat";
     $$tbbl{'$slots-info'} = '__slots-info';
+  }
+  if ($$klass_scope{'slots'}{'enum-base'}) {
+    $$tbbl{'$enum-base'} = "\"$$klass_scope{'slots'}{'enum-base'}\"";
   }
   if (&has_slots_type($klass_scope) || &has_slots_info($klass_scope)) {
     $$tbbl{'$size'} = 'sizeof(slots-t)';

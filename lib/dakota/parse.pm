@@ -776,10 +776,10 @@ sub slots {
   my $cat = 'struct';
   if (@$type && 3 == @$type) {
     if ('enum' eq &dakota::util::_first($type)) {
-      my $int_type = &dakota::util::_remove_last($type);
+      my $enum_base = &dakota::util::_remove_last($type);
       my $colon =    &dakota::util::_remove_last($type);
       die if ':' ne $colon;
-      $$gbl_current_scope{'slots'}{'enum-int-type'} = $int_type;
+      $$gbl_current_scope{'slots'}{'enum-base'} = $enum_base;
       #print STDERR &Dumper($$gbl_current_scope{'slots'});
     }
   }

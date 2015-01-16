@@ -261,6 +261,11 @@ sub nrt::add_extra_klass_decls {
 sub rt::add_extra_klass_decls {
   my ($file) = @_;
   my $klass_decls = { # hardcoded
+    'no-such-method-exception' => undef, # generic funcs (throw)
+    'selector-node' => undef,
+    'assoc-node' => undef,
+    'va-method' => undef,
+    'construct' => undef,
     # NONE
   };
   foreach my $klass_decl (sort keys %$klass_decls) {
@@ -285,6 +290,7 @@ sub rt::add_extra_symbols {
     'construct' => undef,
     'date' => undef,
     'enum' => undef,
+    'enum-base' => undef,
     'executable' => undef,
     'exported-method-addresses' => undef,
     'exported-method-signatures' => undef,
@@ -675,6 +681,9 @@ sub rt_obj_from_rep {
   &rt::add_extra_symbols($file);
   &rt::add_extra_klass_decls($file);
   &rt::add_extra_keywords($file);
+  &nrt::add_extra_symbols($file);
+  &nrt::add_extra_klass_decls($file);
+  &nrt::add_extra_keywords($file);
 
   &dakota::generate::generate_rt_decl($path, $file_basename, $file);
   &dakota::generate::generate_rt_defn($path, $file_basename, $file);
