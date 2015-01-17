@@ -32,13 +32,13 @@ module dakota;
 
 klass output-stream;
 
-export object-t* dkt-current-exception()
+static object-t* dkt-current-exception()
 {
   static object-t object;
   return &object;
 }
 
-export const char8-t** dkt-current-exception-str()
+static const char8-t** dkt-current-exception-str()
 {
   static const char8-t* str;
   return &str;
@@ -109,14 +109,14 @@ va-log(uint32-t priority, const char8-t* format, va-list-t args)
   return result;
 }
 
-export format-va-printf(2) int-t
+DEBUG-EXPORT format-va-printf(2) int-t
 dkt-va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {
   int-t result = va-log(priority, format, args);
   return result;
 }
 
-export format-printf(2) int-t
+DEBUG-EXPORT format-printf(2) int-t
 dkt-log(uint32-t priority, const char8-t* format, ...)
 {
   va-list-t args;

@@ -1219,7 +1219,7 @@ add-registration-info(named-info-node-t* registration-info)
 }
 
 export void
-dk-register-info(named-info-node-t* registration-info)
+dkt-register-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
@@ -1275,7 +1275,7 @@ dk-register-info(named-info-node-t* registration-info)
   return;
 }
 export void
-dk-deregister-info(named-info-node-t* registration-info)
+dkt-deregister-info(named-info-node-t* registration-info)
 {
   assert(nullptr != registration-info);
   if (NULL != getenv("DKT_INFO_OUTPUT") ||
@@ -1435,9 +1435,12 @@ get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
   strcat(buf, klass-name);
   return buf;
 }
+
+#if defined DEBUG
 export char8-t*
 dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
 {
   buf[0] = NUL;
   return get-klass-chain(klass, buf, buf-len);
 }
+#endif

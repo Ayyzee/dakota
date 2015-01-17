@@ -188,6 +188,7 @@ klass object
   }
 }
 
+#if defined DEBUG
 export void
 dkt-unbox-check(object-t object, object-t kls)
 {
@@ -209,3 +210,4 @@ dkt-unbox-check(object-t object, object-t kls)
   }
   return;
 }
+#endif

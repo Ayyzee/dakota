@@ -165,7 +165,7 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
   sort(info);
   return info;
 }
-noexport object-t
+DEBUG-EXPORT object-t
 dk-va-make-named-info(symbol-t name, va-list-t args)
 {
   named-info-node-t* info-slots = dk-va-make-named-info-slots(name, args);
@@ -173,7 +173,6 @@ dk-va-make-named-info(symbol-t name, va-list-t args)
   return info;
 }
 
-#if defined DEBUG
 export sentinel named-info-node-t*
 dk-make-named-info-slots(symbol-t name, ...)
 {
@@ -183,7 +182,6 @@ dk-make-named-info-slots(symbol-t name, ...)
   va-end(args);
   return info-slots;
 }
-#endif
 
 export sentinel object-t
 dk-make-named-info(symbol-t name, ...)

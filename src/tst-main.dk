@@ -25,10 +25,14 @@ int-t main()
   printf("superklass=%s\n", dk:utf8-from(dk:superklass(dk:klass(o))));
   dk:dump(dk:superklass(dk:klass(o)));
   char8-t buf[1024] = "";
+  #if defined DEBUG
   printf("klass-chain=%s\n", dkt-get-klass-chain(dk:klass(o), buf, sizeof(buf)));
+  #endif
 
   if (null) {
+    #if defined DEBUG
     printf("klass-chain=%s\n", dkt-get-klass-chain(dk:klass(null), buf, sizeof(buf)));
+    #endif
     object-t null-klass = null->klass;
     object-t second-null = make(null-klass);
     dk:dump(null);

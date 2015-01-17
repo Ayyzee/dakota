@@ -96,7 +96,7 @@ dkt-va-trace-after(const signature-t* signature, method-t m, object-t object, va
   return result;
 }
 
-export int-t
+DEBUG-EXPORT int-t
 dkt-trace-before(const signature-t* signature, method-t m, super-t context, ...)
 {
   int-t result = 0;
@@ -108,7 +108,7 @@ dkt-trace-before(const signature-t* signature, method-t m, super-t context, ...)
   return result;
 }
 
-export int-t
+DEBUG-EXPORT int-t
 dkt-trace-before(const signature-t* signature, method-t m, object-t object, ...)
 {
   int-t result = 0;
@@ -120,7 +120,7 @@ dkt-trace-before(const signature-t* signature, method-t m, object-t object, ...)
   return result;
 }
 
-export int-t
+DEBUG-EXPORT int-t
 dkt-trace-after(const signature-t* signature, method-t m, super-t context, ...)
 {
   int-t result = 0;
@@ -132,7 +132,7 @@ dkt-trace-after(const signature-t* signature, method-t m, super-t context, ...)
   return result;
 }
 
-export int-t
+DEBUG-EXPORT int-t
 dkt-trace-after(const signature-t* signature, method-t m, object-t object, ...)
 {
   int-t result = 0;
@@ -144,7 +144,7 @@ dkt-trace-after(const signature-t* signature, method-t m, object-t object, ...)
   return result;
 }
 
-export int-t
+DEBUG-EXPORT int-t
 dkt-va-trace-before-init(object-t kls, va-list-t args)
 {
   gbl-trace-column++;
@@ -155,7 +155,7 @@ dkt-va-trace-before-init(object-t kls, va-list-t args)
   return result;
 }
 
-export int-t
+DEBUG-EXPORT int-t
 dkt-va-trace-after-init(object-t kls, va-list-t args)
 {
   gbl-trace-column--;
