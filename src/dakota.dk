@@ -812,14 +812,12 @@ dump-module-description(ofile-t ofl, named-info-node-t* registration-info)
       char8-t[64] buf;
       snprintf(buf, sizeof(buf), "module %s export", module-name);
       fprintf(ofl.output, "%s", buf);
-      uint32-t len = cast(uint32-t)safe-strlen(buf);
-      pad(buf, cast(uint32-t)sizeof(buf), len);
       const char8-t* delim = "";
       for (uint-t j = 0; j < module-exports->count; j++) {
         property-t symbol = module-exports->elements[j];
         const char8-t* symbol-name = symbol.key;
 
-        fprintf(ofl.output, "%s\n%s %s", delim, buf, symbol-name);
+        fprintf(ofl.output, "%s\n%s%s", delim, "  ", symbol-name);
         delim = ",";
       }
       fprintf(ofl.output, ";\n");
