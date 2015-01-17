@@ -186,13 +186,13 @@ import void dkt_deregister_info(named_info_node_t*);
 sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
 sentinel import object_t           dk_make_named_info(symbol_t name, ...);
 
-noreturn import void dkt_throw(object_t exception);
-noreturn import void dkt_throw(const char8_t* exception_str);
-
 // import object_t dk_va_add_all(object_t self, va_list_t);
 // sentinel import object_t dk_add_all(object_t self, ...);
 
 import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
+
+import object_t*       dkt_current_exception(object_t arg);
+import const char8_t** dkt_current_exception(const char8_t* arg);
 
 noreturn import void dkt_null_method(object_t object, ...);
 

@@ -444,34 +444,11 @@ sub rewrite_throws {
   # throw make(...) ;
   # throw klass ;
   # throw self ;
-  #
-  # not in parens
-  $$filestr_ref =~ s/\bthrow(\s*\$\")/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\$\[)/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\$\{)/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s+)(box\s*\()/$1dkt-throw$2/gs;
-  $$filestr_ref =~ s/\bthrow(\s+)(make\s*\()/$1dkt-throw$2/gs;
-  $$filestr_ref =~ s/\bthrow(\s+)(klass\s*;)/$1dkt-throw$2/gs;
-  $$filestr_ref =~ s/\bthrow(\s+)(self\s*;)/$1dkt-throw$2/gs;
-  # in parens
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*\$\")/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*\$\[)/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*\$\{)/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*box\s*\()/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*make\s*\()/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*klass\s*\)\s*;)/dkt-throw$1/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*self\s*\)\s*;)/dkt-throw$1/gs;
 
-  # throw "...";
-  # throw("...");
-  # throw $foo-bar;
-  # throw($foo-bar);
-  $$filestr_ref =~ s/\bthrow(\s*)(".*?"\s*);/$1dkt-throw$2;/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*".*?"\s*\)\s*);/dkt-throw$1;/gs;
-  $$filestr_ref =~ s/\bthrow(\s*)(\$$z\s*);/$1dkt-throw$2;/gs;
-  $$filestr_ref =~ s/\bthrow(\s*\(\s*\$$z\s*\)\s*);/dkt-throw$1;/gs;
-  # add parens if absent
-  $$filestr_ref =~ s/\bdkt-throw(\s*)(?!\()(.+?);/dkt-throw$1($2);/gs;
+  # in parens
+  $$filestr_ref =~ s/\bthrow(\s*)\((.+?)\)(\s*);/throw$1*dkt-current-exception($2)$3;/gs;
+  # not in parens
+  $$filestr_ref =~ s/\bthrow(\s*)(.+?)(\s*);/throw$1*dkt-current-exception($2)$3;/gs;
 }
 sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
