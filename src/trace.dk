@@ -16,7 +16,6 @@
 
 module dakota;
 
-#if defined DEBUG
 static uint32-t gbl-trace-column = 0;
 
 static format-va-printf(2) int-t
@@ -166,4 +165,3 @@ dkt-va-trace-after-init(object-t kls, va-list-t args)
                            cast(void*)(kls), dkt-name(kls), cast(void*)(args));
   return result;
 }
-#endif

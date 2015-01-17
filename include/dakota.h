@@ -192,6 +192,9 @@ import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, sy
 
 noreturn import void dkt_null_method(object_t object, ...);
 
+import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
+import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
+
 #if defined DEBUG
   #define DKT_NULL_METHOD nullptr
 #else
@@ -211,9 +214,6 @@ noreturn import void dkt_null_method(object_t object, ...);
 
   import int_t dkt_va_trace_before_init(object_t kls, va_list_t);
   import int_t dkt_va_trace_after_init( object_t kls, va_list_t);
-
-  import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-  import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
 
   import char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
 

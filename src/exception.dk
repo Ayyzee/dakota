@@ -76,7 +76,6 @@ getprogname()
 #endif
 #endif
 
-#if defined DEBUG
 static format-va-printf(2) int-t
 va-log(uint32-t priority, const char8-t* format, va-list-t args)
 {
@@ -126,7 +125,6 @@ dkt-log(uint32-t priority, const char8-t* format, ...)
   va-end(args);
   return result;
 }
-#endif
 
 noexport void pre-runtime-verbose-terminate();
 noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
