@@ -1623,18 +1623,15 @@ sub linkage_unit::generate_generics {
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   my $is_inline;
+  &generics::generate_generic_defns($scope, $is_inline = 0, $col);
 
   if ($$file{'should-generate-make'}) {
     $$scratch_str_ref .=
-      "\n" .
-      $col . "namespace dk { namespace va { noexport /*generic*/ object-t init(object-t, va-list-t); }}\n" .
-      $col . "namespace dk { noexport /*generic*/ object-t alloc(object-t); }\n" .
       "\n" .
       "#if !defined DK-USE-MAKE-MACRO\n" .
       &generics::generate_va_make_defn($scope, $is_inline = 1, $col) .
       "#endif\n";
   }
-  &generics::generate_generic_defns($scope, $is_inline = 0, $col);
   return $$scratch_str_ref;
 }
 sub generics::generate_va_make_defn {
@@ -1656,9 +1653,9 @@ sub generics::generate_va_make_defn {
       $col . "va-list-t args;\n" .
       $col . "va-start(args, kls);\n" .
       $col . "object-t result = alloc(kls);\n" .
-      $col . "DKT-VA-TRACE-BEFORE-INIT(kls, args);\n" .
+      $col . "DKT-VA-TRACE-BEFORE(dkt-va-signature(init, (object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "result = _func_(result, args); // init()\n" .
-      $col . "DKT-VA-TRACE-AFTER-INIT(kls, args);\n" .
+      $col . "DKT-VA-TRACE-AFTER( dkt-va-signature(init, (object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "va-end(args);\n" .
       $col . "return result;\n";
     $col = &colout($col);

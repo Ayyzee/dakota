@@ -42,7 +42,7 @@ trace-fprintf(file-t file, const char8-t* format, ...)
   return result;
 }
 
-noexport int-t
+DEBUG-EXPORT int-t
 dkt-va-trace-before(const signature-t* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
@@ -56,7 +56,7 @@ dkt-va-trace-before(const signature-t* signature, method-t m, super-t context, v
   return result;
 }
 
-noexport int-t
+DEBUG-EXPORT int-t
 dkt-va-trace-before(const signature-t* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
@@ -69,7 +69,7 @@ dkt-va-trace-before(const signature-t* signature, method-t m, object-t object, v
   return result;
 }
 
-noexport int-t
+DEBUG-EXPORT int-t
 dkt-va-trace-after(const signature-t* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
@@ -83,7 +83,7 @@ dkt-va-trace-after(const signature-t* signature, method-t m, super-t context, va
   return result;
 }
 
-noexport int-t
+DEBUG-EXPORT int-t
 dkt-va-trace-after(const signature-t* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
@@ -141,27 +141,5 @@ dkt-trace-after(const signature-t* signature, method-t m, object-t object, ...)
   if (NULL != getenv("DKT_TRACE"))
     result = dkt-va-trace-after(signature, m, object, args);
   va-end(args);
-  return result;
-}
-
-DEBUG-EXPORT int-t
-dkt-va-trace-before-init(object-t kls, va-list-t args)
-{
-  gbl-trace-column++;
-  int-t result = 0;
-  if (NULL != getenv("DKT_MAKE_TRACE"))
-    result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
-                           cast(void*)(kls), dkt-name(kls), cast(void*)(args));
-  return result;
-}
-
-DEBUG-EXPORT int-t
-dkt-va-trace-after-init(object-t kls, va-list-t args)
-{
-  gbl-trace-column--;
-  int-t result = 0;
-  if (NULL != getenv("DKT_MAKE_TRACE"))
-    result = trace-fprintf(stderr, "make(object-t, ...) (%p '%s', %p)\n",
-                           cast(void*)(kls), dkt-name(kls), cast(void*)(args));
   return result;
 }

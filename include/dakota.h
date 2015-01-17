@@ -100,8 +100,10 @@
 #define dkt_name(kls)       klass::unbox(kls)->name
 
 #define dkt_normalize_compare_result(n) ((n) < 0) ? -1 : ((n) > 0) ? 1 : 0
+
 #define dkt_raw_signature(name,args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __raw_signature::name))()
 #define dkt_signature(name, args)    (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __signature::name))()
+#define dkt_va_signature(name, args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __signature::va::name))()
 #define dkt_ka_signature(name, args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __ka_signature::name))()
 
 #define selector(name, args)    *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
@@ -123,21 +125,17 @@ typedef int_t dkt_va_arg_boole_t;
 typedef va_list va_list_t;
 
 #if defined DEBUG
+  #define DKT_VA_TRACE_BEFORE(signature, method, object, args) dkt_va_trace_before(signature, method, object, args)
+  #define DKT_VA_TRACE_AFTER( signature, method, object, args) dkt_va_trace_after( signature, method, object, args)
+  #define DKT_TRACE_BEFORE(signature, method, object, ...)     dkt_trace_before(   signature, method, object, __VA_ARGS__)
+  #define DKT_TRACE_AFTER( signature, method, object, ...)     dkt_trace_after(    signature, method, object, __VA_ARGS__)
   #define DKT_TRACE(statement) statement
-  #define DKT_TRACE_BEFORE(signature, method, ...) dkt_trace_before(signature, method, __VA_ARGS__)
-  #define DKT_TRACE_AFTER( signature, method, ...) dkt_trace_after( signature, method, __VA_ARGS__)
 #else
+  #define DKT_VA_TRACE_BEFORE(signature, method, object, args)
+  #define DKT_VA_TRACE_AFTER( signature, method, object, args)
+  #define DKT_TRACE_BEFORE(signature, method, object, ...)
+  #define DKT_TRACE_AFTER( signature, method, object, ...)
   #define DKT_TRACE(statement)
-  #define DKT_TRACE_BEFORE(signature, method, ...)
-  #define DKT_TRACE_AFTER( signature, method, ...)
-#endif
-
-#if defined DEBUG
-  #define DKT_VA_TRACE_BEFORE_INIT(kls, args) dkt_va_trace_before_init(kls, args)
-  #define DKT_VA_TRACE_AFTER_INIT( kls, args) dkt_va_trace_after_init(kls, args)
-#else
-  #define DKT_VA_TRACE_BEFORE_INIT(kls, args)
-  #define DKT_VA_TRACE_AFTER_INIT( kls, args)
 #endif
 
 #if defined DKT_USE_MAKE_MACRO
@@ -183,9 +181,6 @@ import object_t dk_klass_for_name(symbol_t);
 import void dkt_register_info(named_info_node_t*);
 import void dkt_deregister_info(named_info_node_t*);
 
-sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
-sentinel import object_t           dk_make_named_info(symbol_t name, ...);
-
 // import object_t dk_va_add_all(object_t self, va_list_t);
 // sentinel import object_t dk_add_all(object_t self, ...);
 
@@ -197,7 +192,10 @@ import const char8_t** dkt_capture_current_exception(const char8_t* arg);
 noreturn import void dkt_null_method(object_t object, ...);
 
 import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
+import object_t           dk_va_make_named_info(      symbol_t name, va_list_t args);
+
+sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
+sentinel import object_t           dk_make_named_info(      symbol_t name, ...);
 
 #if defined DEBUG
   #define DKT_NULL_METHOD nullptr
@@ -206,18 +204,15 @@ import object_t           dk_va_make_named_info(symbol_t name, va_list_t args);
 #endif
 
 #if defined DEBUG
-  import int_t dkt_va_trace_before(const signature_t* signature, method_t m, object_t object, va_list_t args);
-  import int_t dkt_va_trace_before(const signature_t* signature, method_t m, super_t context, va_list_t args);
-  import int_t dkt_va_trace_after(const signature_t* signature, method_t m, object_t object, va_list_t args);
-  import int_t dkt_va_trace_after(const signature_t* signature, method_t m, super_t context, va_list_t args);
+  import int_t dkt_va_trace_before(const signature_t* signature, method_t method, object_t object,  va_list_t args);
+  import int_t dkt_va_trace_before(const signature_t* signature, method_t method, super_t  context, va_list_t args);
+  import int_t dkt_va_trace_after( const signature_t* signature, method_t method, object_t object,  va_list_t args);
+  import int_t dkt_va_trace_after( const signature_t* signature, method_t method, super_t  context, va_list_t args);
 
-  import int_t dkt_trace_before(const signature_t* signature, method_t method, super_t context, ...);
-  import int_t dkt_trace_before(const signature_t* signature, method_t method, object_t object, ...);
-  import int_t dkt_trace_after( const signature_t* signature, method_t method, super_t context, ...);
-  import int_t dkt_trace_after( const signature_t* signature, method_t method, object_t object, ...);
-
-  import int_t dkt_va_trace_before_init(object_t kls, va_list_t);
-  import int_t dkt_va_trace_after_init( object_t kls, va_list_t);
+  import int_t dkt_trace_before(const signature_t* signature, method_t method, super_t  context, ...);
+  import int_t dkt_trace_before(const signature_t* signature, method_t method, object_t object,  ...);
+  import int_t dkt_trace_after( const signature_t* signature, method_t method, super_t  context, ...);
+  import int_t dkt_trace_after( const signature_t* signature, method_t method, object_t object,  ...);
 
   import char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
 
