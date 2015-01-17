@@ -32,7 +32,7 @@ klass system-exception
   slots
   {
     int-t          errnum;
-    const char8-t* name;
+    char8-t const* name;
     str128-t       strerror;
   }
 

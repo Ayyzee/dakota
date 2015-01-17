@@ -38,23 +38,23 @@ export object-t* dkt-capture-current-exception(object-t arg)
   return &result;
 }
 
-export const char8-t** dkt-capture-current-exception(const char8-t* arg)
+export char8-t const** dkt-capture-current-exception(char8-t const* arg)
 {
-  static const char8-t* result = arg;
+  static char8-t const* result = arg;
   return &result;
 }
 
 #if !defined HAVE-GETPROGNAME
 #if defined HAVE-PROCFS
 static char8-t[1024] gbl-buf;
-const char8-t*
+char8-t const*
 getprogname()
 {
   int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
     throw make(system-exception:klass, errnum => errno);
   gbl-buf[n] = NUL;
-  const char8-t* progname = strrchr(gbl-buf, '/');
+  char8-t const* progname = strrchr(gbl-buf, '/');
   if (nullptr != progname)
     progname++;
   else
@@ -65,7 +65,7 @@ getprogname()
 #endif
 
 static format-va-printf(2) int-t
-va-log(uint32-t priority, const char8-t* format, va-list-t args)
+va-log(uint32-t priority, char8-t const* format, va-list-t args)
 {
   file-t log-file = stderr;
 
@@ -98,14 +98,14 @@ va-log(uint32-t priority, const char8-t* format, va-list-t args)
 }
 
 DEBUG-EXPORT format-va-printf(2) int-t
-dkt-va-log(uint32-t priority, const char8-t* format, va-list-t args)
+dkt-va-log(uint32-t priority, char8-t const* format, va-list-t args)
 {
   int-t result = va-log(priority, format, args);
   return result;
 }
 
 DEBUG-EXPORT format-printf(2) int-t
-dkt-log(uint32-t priority, const char8-t* format, ...)
+dkt-log(uint32-t priority, char8-t const* format, ...)
 {
   va-list-t args;
   va-start(args, format);
@@ -121,7 +121,7 @@ pre-runtime-verbose-terminate()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
+  char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
   dkt-log(DKT-LOG-ERROR, "uncaught exception");
 
   if (nullptr != current-exception-string)
@@ -137,7 +137,7 @@ verbose-terminate()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
+  char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
   object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
@@ -163,7 +163,7 @@ pre-runtime-verbose-unexpected()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
+  char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
   dkt-log(DKT-LOG-ERROR, "unexpected exception");
 
   if (nullptr != current-exception-string)
@@ -179,7 +179,7 @@ verbose-unexpected()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
+  char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
   object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNEXPECTED_EXCEPTION")))
@@ -204,10 +204,10 @@ klass exception
 
   slots
   {
-    const char8-t* message;
+    char8-t const* message;
   }
 
-  method object-t init(object-t self, const char8-t* message => dkt-name(dkt-klass(self)))
+  method object-t init(object-t self, char8-t const* message => dkt-name(dkt-klass(self)))
   {
     self = dk:init(super);
     self.message = message;

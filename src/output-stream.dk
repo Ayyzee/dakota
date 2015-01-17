@@ -29,7 +29,7 @@ klass str128;
 
 klass output-stream
 {
-  static const char8-t* gbl-endl = "\n";
+  static char8-t const* gbl-endl = "\n";
 
   slots
   {
@@ -63,14 +63,14 @@ klass output-stream
   }
 
   // hackhack?  use print below?
-  method object-t write(object-t self, const char8-t* string)
+  method object-t write(object-t self, char8-t const* string)
   {
     uint32-t len = cast(uint32-t)safe-strlen(string);
     fwrite(string, sizeof(char8-t), len, self.out);
     return self;
   }
 
-  method object-t print(object-t self, const char8-t* string)
+  method object-t print(object-t self, char8-t const* string)
   {
     uint32-t len = cast(uint32-t)safe-strlen(string);
     fwrite(string, sizeof(char8-t), len, self.out);
@@ -84,19 +84,19 @@ klass output-stream
     return self;
   }
 
-  method format-va-printf(2) object-t va:print-format(object-t self, const char8-t* format, va-list-t args)
+  method format-va-printf(2) object-t va:print-format(object-t self, char8-t const* format, va-list-t args)
   {
     char8-t[128] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
-    dk:print(self, cast(const char8-t*)(buffer));
+    dk:print(self, cast(char8-t const*)(buffer));
     return self;
   }
 
-  method format-va-printf(2) object-t va:println-format(object-t self, const char8-t* format, va-list-t args)
+  method format-va-printf(2) object-t va:println-format(object-t self, char8-t const* format, va-list-t args)
   {
     char8-t[128] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
-    dk:println(self, cast(const char8-t*)(buffer));
+    dk:println(self, cast(char8-t const*)(buffer));
     return self;
   }
 
@@ -112,7 +112,7 @@ klass output-stream
     return self;
   }
 
-  method object-t println(object-t self, const char8-t* string)
+  method object-t println(object-t self, char8-t const* string)
   {
     dk:print(self, string);
     dk:print(self, output-stream:gbl-endl);
@@ -133,7 +133,7 @@ klass output-stream
     return self;
   }
 
-  method object-t print-in-col(object-t self, const char8-t* string, uint32-t col)
+  method object-t print-in-col(object-t self, char8-t const* string, uint32-t col)
   {
     pad-to-col(self, col);
     dk:print(self, string);
@@ -147,7 +147,7 @@ klass output-stream
     return self;
   }
 
-  method object-t println-in-col(object-t self, const char8-t* string, uint32-t col)
+  method object-t println-in-col(object-t self, char8-t const* string, uint32-t col)
   {
     dk:print-in-col(self, string, col);
     dk:print(self, "\n");

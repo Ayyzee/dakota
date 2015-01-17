@@ -60,7 +60,7 @@ klass collection
     return self;
   }
 
-//   method object-t add-all(object-t self, const char8-t* const* strings, symbol-t encoding => $utf-8)
+//   method object-t add-all(object-t self, char8-t const* const* strings, symbol-t encoding => $utf-8)
 //   {
 //     assert(nullptr != strings);
 //     assert(nullptr != encoding);

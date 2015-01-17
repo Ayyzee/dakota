@@ -64,7 +64,7 @@ klass selector-pair
 {
   slots
   {
-    const signature-t* key;
+    signature-t const* key;
     selector-node-t*   element;
   }
   method int-t compare(slots-t* s, slots-t* other-s)
@@ -114,7 +114,7 @@ noexport symbol-t interposer-name-for-klass-name(symbol-t klass-name);
 noexport void add-interpose-prop(symbol-t key, symbol-t element);
 
 static selector-t
-selector-for-signature(const signature-t* signature)
+selector-for-signature(signature-t const* signature)
 {
   selector-pair-t pair = { signature, nullptr };
   selector-pair-t* found-pair =
@@ -124,7 +124,7 @@ selector-for-signature(const signature-t* signature)
 }
 
 static method-t
-method-for-signature(methods:slots-t* methods, const signature-t* signature)
+method-for-signature(methods:slots-t* methods, signature-t const* signature)
 {
   selector-t selector = selector-for-signature(signature);
   assert(selector < methods->count);
@@ -161,14 +161,14 @@ import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
   return;
 }
 
-static const void*
+static void const*
 ptr-from-info(named-info-node-t* info, symbol-t key)
 {
   named-info-node-t* current-info = info;
-  const void* previous-element = nullptr;
-  const void* element = nullptr;
+  void const* previous-element = nullptr;
+  void const* element = nullptr;
   do {
-    element = cast(const void*)named-info-node:at(current-info, key);
+    element = cast(void const*)named-info-node:at(current-info, key);
     assert((nullptr == previous-element && nullptr != element) ||
            (nullptr != previous-element && nullptr == element) ||
            (previous-element == element));
@@ -304,14 +304,14 @@ offset-from-info(named-info-node-t* info)
 }
 
 static void
-load-traits(const symbol-t* traits)
+load-traits(symbol-t const* traits)
 {
   if (nullptr != traits) {
     uint32-t i = 0;
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-node-t* info = info-for-name(trait-name);
-      load-traits(cast(const symbol-t*)named-info-node:at(info, $traits));
+      load-traits(cast(symbol-t const*)named-info-node:at(info, $traits));
     }
   }
   return;
@@ -381,7 +381,7 @@ klass klass
     object-t behavior; // bit-vector
   }
 
-  method object-t alloc(object-t self, const char8-t* file, uint32-t line)
+  method object-t alloc(object-t self, char8-t const* file, uint32-t line)
   {
     DKT-LOG-OBJECT-ALLOC("'file'=>'%s','line'=>'%i','func'=>'%s','args'=>['%s']",
                          file, line, __method__->name, self.name);
@@ -505,10 +505,10 @@ klass klass
     // traits
     fprintf(stderr, ", traits=[");
     {
-      const symbol-t* traits = cast(const symbol-t*)named-info-node:at(self.info-slots, $traits);
+      symbol-t const* traits = cast(symbol-t const*)named-info-node:at(self.info-slots, $traits);
       if (nullptr != traits) {
         fprintf(stderr, " ");
-        const char8-t* delim = "";
+        char8-t const* delim = "";
         uint32-t i = 0;
         symbol-t trait-name;
         while (nullptr != (trait-name = traits[i++])) {
@@ -534,7 +534,7 @@ klass klass
   method object-t traits(object-t self)
   {
     object-t seq = make(vector:klass);
-    const symbol-t* traits = cast(const symbol-t*)named-info-node:at(self.info-slots, $traits);
+    symbol-t const* traits = cast(symbol-t const*)named-info-node:at(self.info-slots, $traits);
     
     if (nullptr != traits) {
       uint32-t i = 0;
@@ -555,7 +555,7 @@ klass klass
 
     if (1) {
       for (uint32-t index = 0; index < s->methods.count; index++) {
-        const signature-t* signature = cast(const signature-t*)selectors[index].key;
+        signature-t const* signature = cast(signature-t const*)selectors[index].key;
         method-t m = method-for-signature(&s->methods, signature);
         if (nullptr != m) {
           uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 + cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
@@ -568,7 +568,7 @@ klass klass
     
     fprintf(out, "{\n");
     for (uint32-t index = 0; index < s->methods.count; index++) {
-      const signature-t* signature =  cast(const signature-t*)selectors[index].key;
+      signature-t const* signature =  cast(signature-t const*)selectors[index].key;
       method-t m = method-for-signature(&s->methods, signature);
 
       if (nullptr != m) {
@@ -578,7 +578,7 @@ klass klass
           fprintf(out, " ");
           width++;
         }
-        const char8-t* symbol-name = symbol-name-from-address(cast(void*)cast(uintptr-t)(m));
+        char8-t const* symbol-name = symbol-name-from-address(cast(void*)cast(uintptr-t)(m));
 
         if (nullptr != symbol-name) {
           // should demangle here
@@ -626,7 +626,7 @@ klass klass
     return;
   }
 
-  static void add-traits(object-t self, const symbol-t* traits)
+  static void add-traits(object-t self, symbol-t const* traits)
   {
     if (nullptr != traits) {
       uint32-t length = 0;
@@ -636,7 +636,7 @@ klass klass
       uint32-t pos = length;
       while (pos) {
         named-info-node-t* info = info-for-name(traits[pos - 1]);
-        const symbol-t* used-traits = cast(const symbol-t*)named-info-node:at(info, $traits);
+        symbol-t const* used-traits = cast(symbol-t const*)named-info-node:at(info, $traits);
         add-traits(self, used-traits);
         add-methods(self, info, $method-signatures, $method-addresses);
         add-methods(self, info, $exported-method-signatures, $exported-method-addresses);
@@ -646,7 +646,7 @@ klass klass
     return;
   }
 
-  static object-t traits-initialize(object-t self, const symbol-t* traits)
+  static object-t traits-initialize(object-t self, symbol-t const* traits)
   {
     if (nullptr != traits) {
       uint32-t i = 0;
@@ -740,7 +740,7 @@ klass klass
         self.superklass = default-superklass();
     }
     self.behavior = nullptr; // hackhack
-    const symbol-t* traits = cast(const symbol-t*)named-info-node:at(self.info-slots, $traits);
+    symbol-t const* traits = cast(symbol-t const*)named-info-node:at(self.info-slots, $traits);
 
     if (nullptr != traits)
       load-traits(traits);
@@ -768,9 +768,9 @@ klass klass
     method-alias-t* method-aliases = cast(method-alias-t*)named-info-node:at(self.info-slots, $method-aliases);
     if (nullptr != method-aliases) {
       uint32-t i = 0;
-      const signature-t* method-signature;
+      signature-t const* method-signature;
       while (nullptr != (method-signature = method-aliases[i].method-signature)) {
-        const signature-t* alias-signature = method-aliases[i].alias-signature;
+        signature-t const* alias-signature = method-aliases[i].alias-signature;
         selector-t alias-selector =  selector-for-signature(alias-signature);
         selector-t method-selector = selector-for-signature(method-signature);
         add-method-for-selector(self,
@@ -818,7 +818,7 @@ klass klass
     return state;
   }
 
-  method const char8-t* utf8-from(object-t self)
+  method char8-t const* utf8-from(object-t self)
   {
     symbol-t name = self.name;
     uint32-t name-len = cast(uint32-t)safe-strlen(name);

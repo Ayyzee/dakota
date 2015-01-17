@@ -85,7 +85,7 @@
 #endif
 
 #if !defined HAVE_STRERROR_NAME
-  import const char8_t* strerror_name(int_t);
+  import char8_t const* strerror_name(int_t);
 #endif
 
 #if !defined USE
@@ -101,10 +101,10 @@
 
 #define dkt_normalize_compare_result(n) ((n) < 0) ? -1 : ((n) > 0) ? 1 : 0
 
-#define dkt_raw_signature(name,args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __raw_signature::name))()
-#define dkt_signature(name, args)    (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __signature::name))()
-#define dkt_va_signature(name, args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __signature::va::name))()
-#define dkt_ka_signature(name, args) (cast(dkt_signature_function_t)(cast(const signature_t* (*)args) __ka_signature::name))()
+#define dkt_raw_signature(name,args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __raw_signature::name))()
+#define dkt_signature(name, args)    (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __signature::name))()
+#define dkt_va_signature(name, args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __signature::va::name))()
+#define dkt_ka_signature(name, args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __ka_signature::name))()
 
 #define selector(name, args)    *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
 #define unless(e) if (0 == (e))
@@ -155,27 +155,27 @@ extern import object_t std_error;
 
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef uintmax_t (*hash_t)(object_t);
-typedef const signature_t* (*dkt_signature_function_t)();
+typedef signature_t const* (*dkt_signature_function_t)();
 typedef selector_t* (*dkt_selector_function_t)();
 
-constexpr uintmax_t dkt_hash_recursive(uintmax_t hash, const char8_t* str)
+constexpr uintmax_t dkt_hash_recursive(uintmax_t hash, char8_t const* str)
 {
   return (!*str ? hash : dkt_hash_recursive(((hash << 5) + hash) ^ cast(uchar8_t)*str, str + 1));
 }
-constexpr uintmax_t dk_hash(const char8_t* str)
+constexpr uintmax_t dk_hash(char8_t const* str)
 { // Daniel J. Bernstein
   return (!str ? 0 : dkt_hash_recursive(5381, str));
 }
 
-// constexpr uintmax_t dk_hash(const char8_t* str, uintmax_t h = 0)
+// constexpr uintmax_t dk_hash(char8_t const* str, uintmax_t h = 0)
 // { // Daniel J. Bernstein
 //   return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ cast(uchar8_t)(str[h]);
 // }
 
-import int_t  safe_strcmp(const char8_t*, const char8_t*);
-import size_t safe_strlen(const char8_t*);
+import int_t  safe_strcmp(char8_t const*, char8_t const*);
+import size_t safe_strlen(char8_t const*);
 
-import symbol_t dk_intern(const char8_t*);
+import symbol_t dk_intern(char8_t const*);
 import object_t dk_klass_for_name(symbol_t);
 
 import void dkt_register_info(named_info_node_t*);
@@ -187,7 +187,7 @@ import void dkt_deregister_info(named_info_node_t*);
 import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
 import object_t*       dkt_capture_current_exception(object_t arg);
-import const char8_t** dkt_capture_current_exception(const char8_t* arg);
+import char8_t const** dkt_capture_current_exception(char8_t const* arg);
 
 noreturn import void dkt_null_method(object_t object, ...);
 
@@ -204,15 +204,15 @@ sentinel import object_t           dk_make_named_info(      symbol_t name, ...);
 #endif
 
 #if defined DEBUG
-  import int_t dkt_va_trace_before(const signature_t* signature, method_t method, object_t object,  va_list_t args);
-  import int_t dkt_va_trace_before(const signature_t* signature, method_t method, super_t  context, va_list_t args);
-  import int_t dkt_va_trace_after( const signature_t* signature, method_t method, object_t object,  va_list_t args);
-  import int_t dkt_va_trace_after( const signature_t* signature, method_t method, super_t  context, va_list_t args);
+  import int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
+  import int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);
+  import int_t dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args);
+  import int_t dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args);
 
-  import int_t dkt_trace_before(const signature_t* signature, method_t method, super_t  context, ...);
-  import int_t dkt_trace_before(const signature_t* signature, method_t method, object_t object,  ...);
-  import int_t dkt_trace_after( const signature_t* signature, method_t method, super_t  context, ...);
-  import int_t dkt_trace_after( const signature_t* signature, method_t method, object_t object,  ...);
+  import int_t dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...);
+  import int_t dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...);
+  import int_t dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...);
+  import int_t dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...);
 
   import char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
 

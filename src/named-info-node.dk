@@ -91,7 +91,7 @@ klass named-info-node
              key, PRIxPTR-WIDTH, element);
 
       if (0 == symbol:compare($file, key))
-        printf("  \"%s\"", cast(const char8-t*)(element));
+        printf("  \"%s\"", cast(char8-t const*)(element));
       else-if (0 == symbol:compare($name, key))
         printf("  \"%s\"", cast(symbol-t)(element));
       printf("\n");

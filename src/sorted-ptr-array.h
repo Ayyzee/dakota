@@ -25,16 +25,16 @@ namespace sorted_ptr_array
 
   noexport slots_t* create(uint32_t capacity, uint32_t size, std_compare_t compare);
 
-  noexport result_t search(slots_t* t, const void* key);
+  noexport result_t search(slots_t* t, void const* key);
 
-  noexport const void* intern(slots_t* t, const void* key);
-  noexport const void* at(slots_t* t, uint32_t offset);
-  noexport const void* remove_last(slots_t* t);
+  noexport void const* intern(slots_t* t, void const* key);
+  noexport void const* at(slots_t* t, uint32_t offset);
+  noexport void const* remove_last(slots_t* t);
 
-  noexport slots_t*    add(slots_t* t, const void* key);
-  noexport const void* bsearch(slots_t* t, const void* key);
-  noexport const void* remove_at(slots_t* t, const void* key, uint32_t offset);
-  noexport slots_t*    add_at(slots_t* t, const void* key, uint32_t offset);
+  noexport slots_t*    add(slots_t* t, void const* key);
+  noexport void const* bsearch(slots_t* t, void const* key);
+  noexport void const* remove_at(slots_t* t, void const* key, uint32_t offset);
+  noexport slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
 
 #endif // __sorted_ptr_array_h__

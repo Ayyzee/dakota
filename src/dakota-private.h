@@ -33,8 +33,8 @@ noexport void add_interpose_prop(symbol_t key, symbol_t element);
 
 noexport named_info_node_t* info_for_name(symbol_t);
 
-noexport int_t  safe_strptrcmp(const char8_t* const* sp1, const char8_t* const* sp2);
-noexport int_t  safe_strncmp(const char8_t* s1, const char8_t* s2, size_t n);
+noexport int_t  safe_strptrcmp(char8_t const* const* sp1, char8_t const* const* sp2);
+noexport int_t  safe_strncmp(char8_t const* s1, char8_t const* s2, size_t n);
 
 noexport uint32_t size_from_info(named_info_node_t* info);
 noexport uint32_t offset_from_info(named_info_node_t* info);

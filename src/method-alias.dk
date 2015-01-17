@@ -22,7 +22,7 @@ klass method-alias
 {
   slots
   {
-    const signature-t* alias-signature;
-    const signature-t* method-signature;
+    signature-t const* alias-signature;
+    signature-t const* method-signature;
   }
 }

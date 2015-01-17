@@ -85,7 +85,7 @@ trait table
   method object-t write-lite(object-t self, object-t out)
   {
     dk:write(out, "{");
-    const char8-t* delim = "";
+    char8-t const* delim = "";
 
     for (assoc-t* assoc in self) {
       dk:write(out, delim);

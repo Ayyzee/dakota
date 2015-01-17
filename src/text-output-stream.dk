@@ -70,7 +70,7 @@ klass text-output-stream
     return self;
   }
 
-  method object-t write(object-t self, const char8-t* string, features-t features)
+  method object-t write(object-t self, char8-t const* string, features-t features)
   {
     assert(!((features & k-indent) &&
              (features & k-leading-ws)));

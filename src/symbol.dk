@@ -77,15 +77,15 @@ klass symbol
     return value;
   }
 
-  method const char8-t* utf8-from(object-t self)
+  method char8-t const* utf8-from(object-t self)
   {
-    const char8-t* utf8 = *unbox(self);
+    char8-t const* utf8 = *unbox(self);
     return utf8;
   }
 
   method object-t write-lite(object-t self, object-t out)
   {
-    const char8-t* utf8 = dk:utf8-from(self);
+    char8-t const* utf8 = dk:utf8-from(self);
     dk:write(out, "\"");
     dk:write(out, utf8);
     dk:write(out, "\"");

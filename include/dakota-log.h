@@ -30,8 +30,8 @@ enum
 
 typedef char char8_t; // hackhack
 
-import format_va_printf(2) int_t dkt_va_log(uint32_t priority, const char8_t* format, va_list_t args);
-import format_printf(   2) int_t dkt_log(   uint32_t priority, const char8_t* format, ...);
+import format_va_printf(2) int_t dkt_va_log(uint32_t priority, char8_t const* format, va_list_t args);
+import format_printf(   2) int_t dkt_log(   uint32_t priority, char8_t const* format, ...);
 
 #define log_method()     dkt_log(DKT_LOG_DEBUG, "'klass'=>'%s','method'=>'%s','params'=>'%s'", __klass__, __method__->name, __method__->parameter_types)
 #define log_klass_func() dkt_log(DKT_LOG_DEBUG, "'klass'=>'%s','func'=>'%s'",   __klass__, __func__)

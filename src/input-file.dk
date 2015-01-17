@@ -39,14 +39,14 @@ klass input-file
     off-t          current-position;
     char8-t*       buffer;
 
-    const char8-t* filename;
+    char8-t const* filename;
     int32-t        line;
     int32-t        column;
   }
 
   method object-t init(object-t self,
                        file-t         file =>     nullptr,
-                       const char8-t* filename => nullptr)
+                       char8-t const* filename => nullptr)
   {
     self = dk:init(super);
     assert(!(nullptr != file && nullptr != filename)); // these are mutually exclusive
@@ -92,9 +92,9 @@ klass input-file
     return result;
   }
 
-  method const char8-t* filename(object-t self)
+  method char8-t const* filename(object-t self)
   {
-    return cast(const char8-t*)(self.filename);
+    return cast(char8-t const*)(self.filename);
   }
   
   method object-t put-char8(object-t self, char8-t c)

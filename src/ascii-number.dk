@@ -104,7 +104,7 @@ klass ascii-number
     return;
   }
 
-  noexport void convert(int32-t num, int32-t base, const char8-t* digits, char8-t* buffer)
+  noexport void convert(int32-t num, int32-t base, char8-t const* digits, char8-t* buffer)
   {
     int32-t  digit-num = 1;
     uint32-t offset =    0;
@@ -127,7 +127,7 @@ klass ascii-number
     self.number = number;
     self.ascii-string = cast(char8-t*)malloc(sizeof(char8-t) * (32 + 1));
     object-t kls = dk:klass(self);
-    const char8-t* digits = dk:digits(kls);
+    char8-t const* digits = dk:digits(kls);
     uint32-t base = cast(uint32-t)safe-strlen(digits);
     convert(number, cast(int32-t)(base), digits, self.ascii-string);
     return self;
@@ -140,7 +140,7 @@ klass ascii-number
     return result;
   }
 
-  method const char8-t* ascii-string(object-t self)
+  method char8-t const* ascii-string(object-t self)
   {
     return self.ascii-string;
   }
