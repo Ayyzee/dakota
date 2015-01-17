@@ -191,8 +191,8 @@ sentinel import object_t           dk_make_named_info(symbol_t name, ...);
 
 import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
-import object_t*       dkt_current_exception(object_t arg);
-import const char8_t** dkt_current_exception(const char8_t* arg);
+import object_t*       dkt_capture_current_exception(object_t arg);
+import const char8_t** dkt_capture_current_exception(const char8_t* arg);
 
 noreturn import void dkt_null_method(object_t object, ...);
 

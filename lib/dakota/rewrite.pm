@@ -446,9 +446,9 @@ sub rewrite_throws {
   # throw self ;
 
   # in parens
-  $$filestr_ref =~ s/\bthrow(\s*)\((.+?)\)(\s*);/throw$1*dkt-current-exception($2)$3;/gs;
+  $$filestr_ref =~ s/\bthrow(\s*)\((.+?)\)(\s*);/throw$1*dkt-capture-current-exception($2)$3;/gs;
   # not in parens
-  $$filestr_ref =~ s/\bthrow(\s*)(.+?)(\s*);/throw$1*dkt-current-exception($2)$3;/gs;
+  $$filestr_ref =~ s/\bthrow(\s*)(.+?)(\s*);/throw$1*dkt-capture-current-exception($2)$3;/gs;
 }
 sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }

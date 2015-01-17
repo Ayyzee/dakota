@@ -32,17 +32,13 @@ module dakota;
 
 klass output-stream;
 
-// throw make(exception:klass, msg => "...")
-// =>
-// throw *dkt-current-exception() = make(exception:klass, msg => "...")
-
-export object-t* dkt-current-exception(object-t arg)
+export object-t* dkt-capture-current-exception(object-t arg)
 {
   static object-t result = arg;
   return &result;
 }
 
-export const char8-t** dkt-current-exception(const char8-t* arg)
+export const char8-t** dkt-capture-current-exception(const char8-t* arg)
 {
   static const char8-t* result = arg;
   return &result;
@@ -125,7 +121,7 @@ pre-runtime-verbose-terminate()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-current-exception(cast(const char8-t*)0);
+  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
   dkt-log(DKT-LOG-ERROR, "uncaught exception");
 
   if (nullptr != current-exception-string)
@@ -141,8 +137,8 @@ verbose-terminate()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-current-exception(cast(const char8-t*)0);
-  object-t current-exception = *dkt-current-exception(cast(object-t)0);
+  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
+  object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
@@ -167,7 +163,7 @@ pre-runtime-verbose-unexpected()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-current-exception(cast(const char8-t*)0);
+  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
   dkt-log(DKT-LOG-ERROR, "unexpected exception");
 
   if (nullptr != current-exception-string)
@@ -183,8 +179,8 @@ verbose-unexpected()
 {
 //   dkt-log(DKT-LOG-INFO, "%s()", __func__);
 
-  const char8-t* current-exception-string = *dkt-current-exception(cast(const char8-t*)0);
-  object-t current-exception = *dkt-current-exception(cast(object-t)0);
+  const char8-t* current-exception-string = *dkt-capture-current-exception(cast(const char8-t*)0);
+  object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNEXPECTED_EXCEPTION")))
     if (nullptr != current-exception)
