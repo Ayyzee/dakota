@@ -55,9 +55,9 @@ namespace dkt
     k_log_all = (log_element_t)~0
   };
   const uint32_t log_flags =
-  //k_log_null;
+  k_log_null;
   //k_log_mem_footprint | k_log_object_alloc | k_log_initial_final | k_log_trace_runtime;
-    k_log_trace_runtime;
+  //k_log_trace_runtime;
 }
 
 // #define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { syslog(LOG_INFO   |LOG_DAEMON, __VA_ARGS__); }

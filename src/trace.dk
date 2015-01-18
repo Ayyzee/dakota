@@ -46,13 +46,13 @@ DEBUG-EXPORT int-t
 dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
-  gbl-trace-column++;
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
                          signature->name, signature->parameter-types + sizeof("object-t") - 1,
                          cast(void*)(context.self), dkt-name(dkt-klass(context.self)),
                          cast(void*)(context.klass), dkt-name(context.klass),
                          cast(void*)cast(uintptr-t)(m));
+  gbl-trace-column++;
   return result;
 }
 
@@ -60,12 +60,12 @@ DEBUG-EXPORT int-t
 dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
-  gbl-trace-column++;
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
                          signature->name, signature->parameter-types,
                          cast(void*)(object), dkt-name(dkt-klass(object)),
                          cast(void*)cast(uintptr-t)(m));
+  gbl-trace-column++;
   return result;
 }
 
