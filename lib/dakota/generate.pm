@@ -3981,7 +3981,7 @@ sub generate_info_seq {
   my ($name, $seq, $col, $line) = @_;
   my $result = '';
 
-  $result .= $col . "static named-info-node-t $name\[] = {" . &ann($line) . " //ro-data\n";
+  $result .= "static named-info-node-t $name\[] = {" . &ann($line) . " //ro-data\n";
   $col = &colin($col);
 
   my $max_width = 0;
