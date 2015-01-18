@@ -62,7 +62,7 @@ our @EXPORT= qw(
 my $objdir = 'obj';
 my $rep_ext = 'rep';
 my $ctlg_ext = 'ctlg';
-my $hxx_ext = 'h';
+my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
 my $obj_ext = 'o';
@@ -228,7 +228,7 @@ sub write_to_file_strings {
 }
 my $gbl_macros;
 sub write_to_file_converted_strings {
-  my ($path, $strings, $in_path) = @_;
+  my ($path, $strings) = @_;
   if (!defined $gbl_macros) {
     if ($ENV{'DK_MACROS_PATH'}) {
       $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die;
@@ -250,7 +250,7 @@ sub write_to_file_converted_strings {
       my $str = &sst_fragment::filestr($$sst{'tokens'});
       $converted_string = $str;
     } else {
-      &dakota::rewrite::convert_dk_to_cxx(\$string, $ka_generics, $in_path);
+      &dakota::rewrite::convert_dk_to_cxx(\$string, $ka_generics);
       $converted_string = $string;
     }
     print PATH $converted_string;
@@ -303,10 +303,11 @@ sub generate_nrt {
       #&labeled_src_str($result, "selectors-seq-hxx") .
       #&labeled_src_str($result, "signatures-seq-hxx") .
 
-    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
+    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ]);
     return "$path/$name.$hxx_ext";
   } else {
     my $col; my $stack;
+    my $pre_output = "$path/$name.$dk_ext";
     my $output = "$path/$name.$cxx_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
@@ -319,13 +320,15 @@ sub generate_nrt {
       "\n" .
       "#include \"$name.$hxx_ext\"\n" .
       "\n" .
-      "#include \"../$name.$cxx_ext\"\n" . # user-code (converted from dk to cxx)
+      "#include \"../$name.$dk_ext.$cxx_ext\"\n" . # user-code (converted from dk to cxx)
       "\n" .
       &dk::generate_cxx_footer($file, $stack = [], $col = '');
 
-    &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
-    &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
-    return "$path/$name.$cxx_ext";
+    if (1) { #$ENV{'DKT_DEBUG'}
+      &write_to_file_strings($pre_output, [ $str_cxx ]);
+    }
+    &write_to_file_converted_strings($output, [ $str_cxx ]);
+    return $output;
   }
 } # sub generate_nrt
 sub generate_rt_decl {
@@ -372,9 +375,10 @@ sub generate_rt {
       #&labeled_src_str($result, "selectors-seq-hxx") .
       #&labeled_src_str($result, "signatures-seq-hxx") .
 
-    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ], undef);
+    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ]);
     return "$path/$name.$hxx_ext";
   } else {
+    my $pre_output = "$path/$name.$dk_ext";
     my $output = "$path/$name.$cxx_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
@@ -401,9 +405,11 @@ sub generate_rt {
 
       &generate_defn_footer($file);
 
-    &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
-    &write_to_file_converted_strings("$path/$name.$cxx_ext", [ $str_cxx ], undef);
-    return "$path/$name.$cxx_ext";
+    if (1) { #$ENV{'DKT_DEBUG'}
+      &write_to_file_strings($pre_output, [ $str_cxx ]);
+    }
+    &write_to_file_converted_strings($output, [ $str_cxx ]);
+    return $output;
   }
 } # sub generate_rt
 sub labeled_src_str {
@@ -4020,9 +4026,9 @@ sub ann {
   return $string;
 }
 sub dk::generate_dk_cxx {
-  my ($file_basename, $path, $name) = @_;
+  my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.$dk_ext");
-  my $output = "$path$name.$cxx_ext";
+  my $output = "$path_name.$dk_ext.$cxx_ext";
   $output =~ s|^\./||;
   my $directory = $ENV{'DKT_DIR'} ||= '.';
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
@@ -4031,13 +4037,13 @@ sub dk::generate_dk_cxx {
   print "    creating $output\n"; # user-dk-cxx
 
   if (exists $ENV{'DK_NO_LINE'}) {
-    &write_to_file_converted_strings("$path$name.$cxx_ext", [ $filestr ], "$file_basename.$dk_ext");
+    &write_to_file_converted_strings("$output", [ $filestr ]);
   } else {
     if (exists $ENV{'DK_ABS_PATH'}) {
       my $cwd = getcwd;
-      &write_to_file_converted_strings("$path$name.$cxx_ext", [ "#line 1 \"$cwd/$file_basename.$dk_ext\"\n", $filestr ], "$cwd/$file_basename.$dk_ext");
+      &write_to_file_converted_strings("$output", [ "#line 1 \"$cwd/$file_basename.$dk_ext\"\n", $filestr ]);
     } else {
-      &write_to_file_converted_strings("$path$name.$cxx_ext", [ "#line 1 \"$file_basename.$dk_ext\"\n", $filestr ], "$file_basename.$dk_ext");
+      &write_to_file_converted_strings("$output", [ "#line 1 \"$file_basename.$dk_ext\"\n", $filestr ]);
     }
   }
 }
@@ -4045,8 +4051,8 @@ sub dk::generate_dk_cxx {
 unless (caller) {
   foreach my $in_path (@ARGV) {
     my $filestr = &dakota::util::filestr_from_file($in_path);
-    my $out_path;               # = "$in_path.cxx"
-    &write_to_file_converted_strings($out_path = undef, [ $filestr ], $in_path);
+    my $path;
+    &write_to_file_converted_strings($path = undef, [ $filestr ]);
   }
 }
 

@@ -72,7 +72,7 @@ use dakota::generate;
 my $objdir = 'obj';
 my $rep_ext = 'rep';
 my $ctlg_ext = 'ctlg';
-my $hxx_ext = 'h';
+my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
 my $obj_ext = 'o';

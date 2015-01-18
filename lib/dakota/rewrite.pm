@@ -886,7 +886,7 @@ sub rewrite_export_method {
   }
 }
 sub convert_dk_to_cxx {
-  my ($filestr_ref, $ka_generics, $arg) = @_;
+  my ($filestr_ref, $ka_generics) = @_;
   &encode($filestr_ref);
 
   &rewrite_strswitch($filestr_ref);
@@ -993,7 +993,7 @@ unless (caller) {
   foreach my $arg (@ARGV) {
     my $filestr = &dakota::filestr_from_file($arg);
 
-    &convert_dk_to_cxx(\$filestr, $$user_data{'ka-generics'}, $arg);
+    &convert_dk_to_cxx(\$filestr, $$user_data{'ka-generics'});
     print $filestr;
   }
 }

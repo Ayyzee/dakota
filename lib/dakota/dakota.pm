@@ -67,7 +67,7 @@ $" = '';
 my $objdir = 'obj';
 my $rep_ext = 'rep';
 my $ctlg_ext = 'ctlg';
-my $hxx_ext = 'h';
+my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
 my $obj_ext = 'o';
@@ -397,19 +397,19 @@ sub loop_cxx_from_dk {
       my ($output_dk_cxx, $output_cxx);
 
       if ($$cmd_info{'opts'}{'output'}) {
+        $output_cxx =    "$$cmd_info{'opts'}{'output'}";
         $output_dk_cxx = "$$cmd_info{'opts'}{'output'}";
-        $output_dk_cxx =~ s/\.$k+/.$dk_ext.$cxx_ext/;
-        $output_cxx = "$$cmd_info{'opts'}{'output'}";
+        $output_dk_cxx =~ s|\.$cxx_ext$|\.$dk_ext\.$cxx_ext|g;
       } else {
+        $output_cxx =    "$file_basename.$cxx_ext";         ###
         $output_dk_cxx = "$file_basename.$dk_ext.$cxx_ext"; ###
-        $output_cxx = "$file_basename.$cxx_ext";            ###
       }
       $output_dk_cxx =~ s|/nrt/|/|g;
       ($dk_cxx_name, $dk_cxx_path, $dk_cxx_ext) = fileparse("$directory/$output_dk_cxx", "\.$dk_ext\.$cxx_ext");
       ($cxx_name, $cxx_path, $cxx_ext1) = fileparse("$directory/$output_cxx", "\.$k+");
     }
     &dakota::generate::empty_klass_defns();
-    &dk::generate_dk_cxx($file_basename, $dk_cxx_path, $dk_cxx_name);
+    &dk::generate_dk_cxx($file_basename, "$dk_cxx_path$dk_cxx_name");
     $cxx_path =~ s|^\./||;
     $cxx_path =~ s|/$||;
     &nrt::add_extra_symbols($file);
