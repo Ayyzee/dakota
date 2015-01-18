@@ -1034,9 +1034,9 @@ sub common::print_signature {
   $scratch_str .= "signature-t const* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $scratch_str .= "; }}\n";
+      $scratch_str .= "; }}" . &ann(__LINE__) . "\n";
     } else {
-      $scratch_str .= "; }\n";
+      $scratch_str .= "; }" . &ann(__LINE__) . "\n";
     }
   } elsif (&is_rt_defn()) {
     $scratch_str .= " {" . &ann(__LINE__) . "\n";
@@ -1125,9 +1125,9 @@ sub common::print_selector {
   $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $scratch_str .= "; }}\n";
+      $scratch_str .= "; }}" . &ann(__LINE__) . "\n";
     } else {
-      $scratch_str .= "; }\n";
+      $scratch_str .= "; }" . &ann(__LINE__) . "\n";
     }
   } elsif (&is_rt_defn()) {
     $scratch_str .= " {" . &ann(__LINE__) . "\n";
@@ -1402,9 +1402,9 @@ sub generics::generate_generic_defn {
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $$scratch_str_ref .= "; }}\n";
+      $$scratch_str_ref .= "; }}" . &ann(__LINE__) . "\n";
     } else {
-      $$scratch_str_ref .= "; }\n";
+      $$scratch_str_ref .= "; }" . &ann(__LINE__) . "\n";
     }
   } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {" . &ann(__LINE__) . "\n";
@@ -1486,9 +1486,9 @@ sub generics::generate_super_generic_defn {
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $$scratch_str_ref .= "; }}\n";
+      $$scratch_str_ref .= "; }}" . &ann(__LINE__) . "\n";
     } else {
-      $$scratch_str_ref .= "; }\n";
+      $$scratch_str_ref .= "; }" . &ann(__LINE__) . "\n";
     }
   } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {" . &ann(__LINE__) . "\n";
@@ -1811,10 +1811,10 @@ sub generate_klass_unbox {
     $result .= $col . "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $result .= "; } // special-case\n";
+      $result .= "; }" . &ann(__LINE__) . " // special-case\n";
     } elsif (&is_rt_defn()) {
       $result .=
-        " { // special-case\n" .
+        " {" . &ann(__LINE__) . " // special-case\n" .
         $col . "  slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n" .
         $col . "  return s;\n" .
         $col . "}}\n";
@@ -1824,7 +1824,7 @@ sub generate_klass_unbox {
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
       $result .= $col . "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
       if (&is_nrt_decl() || &is_rt_decl()) {
-        $result .= "; }\n"; # general-case
+        $result .= "; }" . &ann(__LINE__) . "\n"; # general-case
       } elsif (&is_rt_defn()) {
         $result .=
           " {" . &ann(__LINE__) . "\n" .
@@ -1847,7 +1847,7 @@ sub generate_klass_box {
     $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $result .= "; }\n";
+      $result .= "; }" . &ann(__LINE__) . "\n";
     } elsif (&is_rt_defn()) {
       $result .=
         " {" . &ann(__LINE__) . "\n" .
@@ -1862,7 +1862,7 @@ sub generate_klass_box {
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
-          $result .= "; }\n";
+          $result .= "; }" . &ann(__LINE__) . "\n";
         } elsif (&is_rt_defn()) {
           $result .= " {" . &ann(__LINE__) . "\n";
           $col = &colin($col);
@@ -1876,7 +1876,7 @@ sub generate_klass_box {
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
-          $result .= "; }\n";
+          $result .= "; }" . &ann(__LINE__) . "\n";
         } elsif (&is_rt_defn()) {
           $result .= " {" . &ann(__LINE__) . "\n";
           $col = &colin($col);
@@ -1891,7 +1891,7 @@ sub generate_klass_box {
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
-          $result .= "; }\n";
+          $result .= "; }" . &ann(__LINE__) . "\n";
         } elsif (&is_rt_defn()) {
           $result .= " {" . &ann(__LINE__) . "\n";
           $col = &colin($col);
@@ -1905,7 +1905,7 @@ sub generate_klass_box {
         $result .= $col . "klass $klass_name { noexport object-t box(slots-t arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
-          $result .= "; }\n";
+          $result .= "; }" . &ann(__LINE__) . "\n";
         } elsif (&is_rt_defn()) {
           $result .= " {" . &ann(__LINE__) . "\n";
           $col = &colin($col);
@@ -1919,7 +1919,7 @@ sub generate_klass_box {
     }
   }
   if (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
-    $result .= $col . "using $klass_name:box;\n";
+    $result .= $col . "using $klass_name:box;" . &ann(__LINE__) . "\n";
   }
   return $result;
 }
@@ -1938,7 +1938,7 @@ sub generate_klass_construct {
           $result .= $col . "klass $klass_name { noexport slots-t construct($pairs)";
 
           if (&is_nrt_decl() || &is_rt_decl()) {
-            $result .= "; }\n";
+            $result .= "; }" . &ann(__LINE__) . "\n";
           } elsif (&is_rt_defn()) {
             $result .= $col . " {" . &ann(__LINE__) . "\n";
             $col = &colin($col);
@@ -1965,17 +1965,17 @@ sub linkage_unit::generate_klasses_body {
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     #$$scratch_str_ref .= $col . "extern noexport symbol-t __type__;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }" . &ann(__LINE__) . "\n";
   } elsif (&is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); } /*hackhack*/\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); }" . &ann(__LINE__) . " /*hackhack*/\n";
   }
 
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport object-t klass; }\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport object-t klass; }" . &ann(__LINE__) . "\n";
     } elsif (&is_rt_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport object-t klass = nullptr; }\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport object-t klass = nullptr; }" . &ann(__LINE__) . "\n";
     }
     if (!&is_rt_defn()) {
       my $is_exported;
@@ -2022,7 +2022,7 @@ sub linkage_unit::generate_klasses_body {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
             my $method_decl_ref = &function::decl($method, $klass_path);
-            $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }\n";
+            $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__) . "\n";
             if (!&has_object_method_defn($klass_scope, $method)) {
               my $object_method = &convert_to_object_method($method);
               my $sig = &function::overloadsig($object_method, []);
@@ -2056,10 +2056,10 @@ sub linkage_unit::generate_klasses_body {
     }
   } # if ('klass' eq $klass_type)
   if (&is_decl() && $$klass_scope{'has-initialize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t initialize(object-t kls); }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t initialize(object-t kls); }" . &ann(__LINE__) . "\n";
   }
   if (&is_decl() && $$klass_scope{'has-finalize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }" . &ann(__LINE__) . "\n";
   }
   if (&is_decl() && @$ka_methods) {
     #print STDERR Dumper($va_list_methods);
@@ -2221,12 +2221,12 @@ sub generate_slots_decls {
   my $scratch_str_ref = &global_scratch_str_ref();
   if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
-    $$scratch_str_ref .= $col . "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }\n";
+    $$scratch_str_ref .= $col . "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }" . &ann(__LINE__) . "\n";
     $$scratch_str_ref .= $col . "//typedef $klass_name:slots-t $klass_name-t;\n";
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
+      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__LINE__) . "\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= $col . "klass $klass_name {";
       my $is_exported;
@@ -2278,17 +2278,17 @@ sub generate_exported_slots_decls {
   if ('object' eq "$klass_name") {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
+      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__LINE__) . "\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "//klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
+      $$scratch_str_ref .= $col . "//klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__LINE__) . "\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . "typedef $klass_name:slots-t* $klass_name-t; // special-case\n";
+    $$scratch_str_ref .= $col . "typedef $klass_name:slots-t* $klass_name-t;" . &ann(__LINE__) . " // special-case\n";
   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
-    $$scratch_str_ref .= $col . "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }\n";
+    $$scratch_str_ref .= $col . "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }" . &ann(__LINE__) . "\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
                          };
@@ -2298,7 +2298,7 @@ sub generate_exported_slots_decls {
   } elsif (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }\n";
+      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__LINE__) . "\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
       $$scratch_str_ref .= $col . "klass $klass_name {";
       my $is_exported;
@@ -3506,7 +3506,7 @@ sub generate_raw_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __raw-signature { noexport signature-t const* $method_name($$list_types); }}\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __raw-signature { noexport signature-t const* $method_name($$list_types); }}" . &ann(__LINE__) . "\n";
 }
 sub generate_raw_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
