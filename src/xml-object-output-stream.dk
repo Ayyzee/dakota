@@ -69,7 +69,7 @@ klass xml-object-output-stream
     return self;
   }
 
-  noexport features-t features(object-t self, int-t flags)
+  static features-t features(object-t self, int-t flags)
   {
     if (0 != self.indent-level)
       return cast(features-t)(flags);

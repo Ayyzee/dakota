@@ -783,7 +783,7 @@ remove-ext(char8-t const* path)
   return path;
 }
 
-static char8-t*
+unused static char8-t*
 pad(char8-t* buf, uint32-t buf-len, uint32-t len)
 {
   assert(buf-len >= len);

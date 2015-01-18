@@ -71,7 +71,7 @@ klass ascii-number
     return state;
   }
 
-  noexport int32-t power(int32-t base, int32-t exp)
+  static int32-t power(int32-t base, int32-t exp)
   {
     int32-t rtn;
 
@@ -89,7 +89,7 @@ klass ascii-number
   }
 
   // hackhack: similiar code in string.dk
-  noexport void reverse(char8-t* buffer, uint32-t length)
+  static void reverse(char8-t* buffer, uint32-t length)
   {
     if (0 != length) {
       uint32-t head-offset = 0, tail-offset = length - 1;
@@ -104,7 +104,7 @@ klass ascii-number
     return;
   }
 
-  noexport void convert(int32-t num, int32-t base, char8-t const* digits, char8-t* buffer)
+  static void convert(int32-t num, int32-t base, char8-t const* digits, char8-t* buffer)
   {
     int32-t  digit-num = 1;
     uint32-t offset =    0;

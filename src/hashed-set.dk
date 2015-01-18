@@ -273,7 +273,7 @@ klass hashed-set-forward-iterator
     uint32-t  iterator-state;
   }
 
-  noexport void check-iterator-state(object-t self)
+  static void check-iterator-state(object-t self)
   {
     hashed-set:slots-t* hs = hashed-set:unbox(self.hashed-set);
 
@@ -308,7 +308,7 @@ klass hashed-set-forward-iterator
     return result;
   }
 
-  noexport object-t next-deque-iterator(object-t vector-iter)
+  static object-t next-deque-iterator(object-t vector-iter)
   {
     object-t deque = dk:next(vector-iter);
     object-t deque-iter = nullptr;

@@ -20,7 +20,7 @@ include <cerrno>;
 include <cstdio>;
 include <cstring>;
 
-noexport boole-t
+static boole-t
 space?(int-t c)
 {
   return isspace(c);

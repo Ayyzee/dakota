@@ -79,7 +79,7 @@ klass cstring
     return result;
   }
 
-  noexport int-t compare(slots-t** s, slots-t** other-s)
+  unused static int-t compare(slots-t** s, slots-t** other-s)
   {
     int-t result = compare(*s, *other-s);
     return result;
