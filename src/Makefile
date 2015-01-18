@@ -92,7 +92,7 @@ all:
 	$(MAKE) $(MFLAGS) dakota-util
 
 tst: tst-main.$(dk_ext)
-	CXXFLAGS="$(CXXFLAGS)" EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) --output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
+	CXXFLAGS="$(CXXFLAGS)" EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS)--output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 dummy: dummy-main.$(cxx_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^

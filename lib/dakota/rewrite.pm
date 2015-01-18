@@ -332,21 +332,11 @@ sub rewrite_catch_block {
 }
 sub rewrite_finally {
   my ($filestr_ref) = @_;
-  local $_ = $$filestr_ref;
-  my $filestr = ''; # should call $filestr/$filestr_ref
+  # hackhack: added extra single space in case $1 is empty
+  #$$filestr_ref =~ s/finally(\s*)($main::block);?/finally$1 __finally([&] $2);/gs;
 
-  while (1) {
-    if (m/\G(\s*)(try.*?\s*)finally(\s*)($main::block)/gsc) {
-      $filestr .= "$1\{ $2struct finally_t { ~finally_t()$3$4} unused finally; }";
-    } elsif (m/\G(.)/gc) {
-      $filestr .= $1;
-    } elsif (m/\G(\n)/gc) {
-      $filestr .= $1;
-    } else {
-      last;
-    }
-  }
-  return \$filestr;
+  $$filestr_ref =~ s/finally(\s*)($main::block);?/FINALLY$1($2);/gs;
+  return $filestr_ref
 }
 sub rewrite_catch_object {
   my ($str_in) = @_;
@@ -928,9 +918,8 @@ sub convert_dk_to_cxx {
   #&wrapped_rewrite($filestr_ref, [ 'throw', 'make' ], [ 'throw', '*', 'dkt-current-exception', '(', ')', '=', 'make' ]);
   #&wrapped_rewrite($filestr_ref, [ 'throw', '?literal-cstring' ], [ 'throw', '*', 'dkt-current-exception-cstring', '(', ')', '=', '?literal-cstring' ]);
 
-  if ($$filestr_ref =~ m/\Wfinally\W/g) {
-    $filestr_ref = &rewrite_finally($filestr_ref);
-  }
+  &rewrite_finally($filestr_ref);
+
   if ($$filestr_ref =~ m/\Wcatch\W/g) {
     &rewrite_exceptions($filestr_ref);
   }

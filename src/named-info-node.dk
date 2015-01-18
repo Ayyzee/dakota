@@ -193,12 +193,8 @@ dk-make-named-info(symbol-t name, ...)
   return info;
 }
 
-#if 0
-#if defined DEBUG
-export named-info-node-t*
-dkt-dump-info(named-info-node-t* info)
+DEBUG-EXPORT named-info-node-t*
+dkt-dump-named-info(named-info-node-t* info)
 {
   return named-info-node:dump(info);
 }
-#endif
-#endif

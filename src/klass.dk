@@ -842,19 +842,17 @@ klass klass
   }
 }
 
-#if defined DEBUG
-export void
+DEBUG-EXPORT void
 dkt-dump-methods(klass:slots-t* s)
 {
   klass:dump-methods(s);
   return;
 }
 
-export void
+DEBUG-EXPORT void
 dkt-dump-methods(object-t kls)
 {
   klass:slots-t* kls-s = unbox(kls);
   dkt-dump-methods(kls-s);
   return;
 }
-#endif

@@ -80,8 +80,10 @@
 
 #if defined DEBUG
   #define DEBUG_EXPORT export
+  #define DEBUG_IMPORT import
 #else
   #define DEBUG_EXPORT noexport
+  #define DEBUG_IMPORT noexport
 #endif
 
 #if !defined HAVE_STRERROR_NAME
@@ -189,13 +191,13 @@ import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, sy
 import object_t*       dkt_capture_current_exception(object_t arg);
 import char8_t const** dkt_capture_current_exception(char8_t const* arg);
 
-noreturn import void dkt_null_method(object_t object, ...);
-
 import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
 import object_t           dk_va_make_named_info(      symbol_t name, va_list_t args);
 
 sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
 sentinel import object_t           dk_make_named_info(      symbol_t name, ...);
+
+DEBUG_IMPORT named_info_node_t* dkt_dump_named_info(named_info_node_t* info);
 
 #if defined DEBUG
   #define DKT_NULL_METHOD nullptr
@@ -203,23 +205,23 @@ sentinel import object_t           dk_make_named_info(      symbol_t name, ...);
   #define DKT_NULL_METHOD dkt_null_method
 #endif
 
-#if defined DEBUG
-  import int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
-  import int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);
-  import int_t dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args);
-  import int_t dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args);
+noreturn import void dkt_null_method(object_t object, ...);
 
-  import int_t dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...);
-  import int_t dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...);
-  import int_t dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...);
-  import int_t dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...);
+DEBUG_IMPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
+DEBUG_IMPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);
+DEBUG_IMPORT int_t dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args);
+DEBUG_IMPORT int_t dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args);
 
-  import char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
+DEBUG_IMPORT int_t dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...);
+DEBUG_IMPORT int_t dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...);
+DEBUG_IMPORT int_t dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...);
+DEBUG_IMPORT int_t dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...);
 
-  import void dkt_dump_methods(object_t);
-  import void dkt_dump_methods(klass::slots_t*);
+DEBUG_IMPORT char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
 
-  import void dkt_unbox_check(object_t object, object_t kls);
-#endif
+DEBUG_IMPORT void dkt_dump_methods(object_t);
+DEBUG_IMPORT void dkt_dump_methods(klass::slots_t*);
+
+DEBUG_IMPORT void dkt_unbox_check(object_t object, object_t kls);
 
 #endif // __dakota_h__

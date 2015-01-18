@@ -14,9 +14,9 @@ CXX_NO_WARNINGS_FLAGS := --no-warnings
 CXX_NO_WARNINGS ?= 0
 
 ifneq ($(CXX_NO_WARNINGS), 0)
-	export CXX_WARNING_FLAGS := $(CXX_NO_WARNINGS_FLAGS)
+	export CXX_WARNINGS_FLAGS := $(CXX_NO_WARNINGS_FLAGS)
 else
-  export CXX_WARNING_FLAGS :=\
+  export CXX_WARNINGS_FLAGS :=\
  -Weverything\
  -Wno-c++98-compat\
  -Wno-c++98-compat-pedantic\

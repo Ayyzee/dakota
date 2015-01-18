@@ -1436,11 +1436,9 @@ get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
   return buf;
 }
 
-#if defined DEBUG
-export char8-t*
+DEBUG-EXPORT char8-t*
 dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
 {
   buf[0] = NUL;
   return get-klass-chain(klass, buf, buf-len);
 }
-#endif
