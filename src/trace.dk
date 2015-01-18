@@ -18,6 +18,18 @@ module dakota;
 
 static uint32-t gbl-trace-column = 0;
 
+static void
+trace-column-in()
+{
+  gbl-trace-column++;
+}
+static void
+trace-column-out()
+{
+  if (0 != gbl-trace-column)
+    gbl-trace-column--;
+}
+
 static format-va-printf(2) int-t
 trace-vfprintf(file-t file, char8-t const* format, va-list-t args)
 {
@@ -52,7 +64,7 @@ dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, v
                          cast(void*)(context.self), dkt-name(dkt-klass(context.self)),
                          cast(void*)(context.klass), dkt-name(context.klass),
                          cast(void*)cast(uintptr-t)(m));
-  gbl-trace-column++;
+  trace-column-in();
   return result;
 }
 
@@ -65,7 +77,7 @@ dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, v
                          signature->name, signature->parameter-types,
                          cast(void*)(object), dkt-name(dkt-klass(object)),
                          cast(void*)cast(uintptr-t)(m));
-  gbl-trace-column++;
+  trace-column-in();
   return result;
 }
 
@@ -73,7 +85,7 @@ DEBUG-EXPORT int-t
 dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
-  gbl-trace-column--;
+  trace-column-out();
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
                          signature->name, signature->parameter-types + sizeof("object-t") - 1,
@@ -87,7 +99,7 @@ DEBUG-EXPORT int-t
 dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
-  gbl-trace-column--;
+  trace-column-out();
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
                          signature->name, signature->parameter-types,
