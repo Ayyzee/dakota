@@ -660,7 +660,7 @@ interposer-name-for-klass-name(symbol-t klass-name)
 noexport void
 add-interpose-prop(symbol-t key, symbol-t element)
 {
-//   dkt-log(DKT-LOG-INFO, "%s(%s, %s)", __func__, key, element);
+//   dkt-log(dkt::k-log-info, "%s(%s, %s)", __func__, key, element);
   property-t prop = { key, cast(uintptr-t)element };
   sorted-array:add(gbl-interposers-table, &prop);
   return;
@@ -1420,7 +1420,7 @@ dk-intern(char8-t const* key)
   symbol-t val = cast(symbol-t)sorted-ptr-array:intern(intern-array, cast(void const*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 #endif
-  //dkt-log(DKT-LOG-INFO, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
+  //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
   return val;
 }
 

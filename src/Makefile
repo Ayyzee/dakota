@@ -54,7 +54,6 @@ HOME_FILES :=\
  uninstall-bin\
  uninstall-lib\
  uninstall\
- tst\
 
 # the use of $^ should be $?
 
@@ -66,6 +65,9 @@ $(rootdir)/lib/%.$(SO_EXT):
 
 $(rootdir)/bin/%$(exeext): $(SRCDIR)/%-main.$(dk_ext)
 	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+
+%: %-main.$(dk_ext)
+	CXXFLAGS="$(CXXFLAGS)" EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
 
 # installed files
 $(DESTDIR)$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)
@@ -91,8 +93,9 @@ all:
 	$(MAKE) $(MFLAGS) dakota
 	$(MAKE) $(MFLAGS) dakota-util
 
-tst: tst-main.$(dk_ext)
-	CXXFLAGS="$(CXXFLAGS)" EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS)--output $@ $^ $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
+tst: tst-main.$(dk_ext) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
+
+min: min-main.$(dk_ext)
 
 dummy: dummy-main.$(cxx_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^
@@ -172,7 +175,7 @@ strerror-name.tbl: gen-strerror-name.sh
 	./$<
 
 clean: clean-rt
-	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst dummy
+	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst dummy min
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info$(exeext)

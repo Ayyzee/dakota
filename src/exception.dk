@@ -74,16 +74,16 @@ va-log(uint32-t priority, char8-t const* format, va-list-t args)
 
     switch (priority)
     {
-      case DKT-LOG-ERROR:
+      case dkt::k-log-error:
         fprintf(log-file, "error: ");
         break;
-      case DKT-LOG-WARNING:
+      case dkt::k-log-warning:
         fprintf(log-file, "warning: ");
         break;
-      case DKT-LOG-INFO:
+      case dkt::k-log-info:
         fprintf(log-file, "info: ");
         break;
-      case DKT-LOG-DEBUG:
+      case dkt::k-log-debug:
         fprintf(log-file, "debug: ");
         break;
       default:
@@ -119,10 +119,10 @@ noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-t
 noexport void
 pre-runtime-verbose-terminate()
 {
-//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
-  dkt-log(DKT-LOG-ERROR, "uncaught exception");
+  dkt-log(dkt::k-log-error, "uncaught exception");
 
   if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
@@ -135,7 +135,7 @@ pre-runtime-verbose-terminate()
 noexport void
 verbose-terminate()
 {
-//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
   object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);
@@ -161,10 +161,10 @@ noexport void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose
 noexport void
 pre-runtime-verbose-unexpected()
 {
-//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
-  dkt-log(DKT-LOG-ERROR, "unexpected exception");
+  dkt-log(dkt::k-log-error, "unexpected exception");
 
   if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
@@ -177,7 +177,7 @@ pre-runtime-verbose-unexpected()
 noexport void
 verbose-unexpected()
 {
-//   dkt-log(DKT-LOG-INFO, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   char8-t const* current-exception-string = *dkt-capture-current-exception(cast(char8-t const*)0);
   object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);

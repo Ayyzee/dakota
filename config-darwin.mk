@@ -18,16 +18,17 @@ ifneq ($(CXX_NO_WARNINGS), 0)
 else
   export CXX_WARNINGS_FLAGS :=\
  -Weverything\
- -Wno-c++98-compat\
  -Wno-c++98-compat-pedantic\
+ -Wno-c++98-compat\
+ -Wno-cast-align\
+ -Wno-deprecated\
+ -Wno-disabled-macro-expansion\
+ -Wno-exit-time-destructors\
+ -Wno-four-char-constants\
+ -Wno-global-constructors\
  -Wno-multichar\
  -Wno-old-style-cast\
- -Wno-global-constructors\
  -Wno-padded\
- -Wno-cast-align\
- -Wno-disabled-macro-expansion\
- -Wno-deprecated\
- -Wno-exit-time-destructors\
  # do not remove this (blank) line
 endif
 

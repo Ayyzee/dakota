@@ -199,10 +199,10 @@ dkt-unbox-check(object-t object, object-t kls)
     char8-t const* kls-name = dkt-name(kls);
 
     if (object:instance?(object, klass:klass))
-      dkt-log(DKT-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
+      dkt-log(dkt::k-log-error, "%s:unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name, dkt-name(object));
     else
-      dkt-log(DKT-LOG-ERROR, "%s:unbox(0x%0*" PRIxPTR " {klass='%s'})",
+      dkt-log(dkt::k-log-error, "%s:unbox(0x%0*" PRIxPTR " {klass='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name);
 
     abort();
