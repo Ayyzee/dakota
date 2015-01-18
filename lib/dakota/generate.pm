@@ -391,13 +391,14 @@ sub generate_rt {
       &labeled_src_str($result, "strings-cxx") .
       &labeled_src_str($result, "hashes-cxx") .
       &labeled_src_str($result, "keywords-cxx") .
+      &labeled_src_str($result, "klasses-cxx") .
       &labeled_src_str($result, "selectors-cxx") .
       &labeled_src_str($result, "signatures-cxx") .
       &labeled_src_str($result, "generics-cxx") .
+
       &labeled_src_str($result, "selectors-seq-cxx") .
       &labeled_src_str($result, "signatures-seq-cxx") .
 
-      &labeled_src_str($result, "klasses-cxx") .
       &generate_defn_footer($file);
 
     &write_to_file_strings("$path/$name.$dk_ext",            [ $str_cxx ]);
@@ -474,7 +475,7 @@ sub generate_defn_footer {
     $rt_cxx_str .= $col . "static assoc-node-t* imported-klasses = nullptr;\n";
     $rt_cxx_str .= $col . "static symbol-t const* imported-klasses-names = nullptr;\n";
   } else {
-    $rt_cxx_str .= $col . "static symbol-t imported-klasses-names[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $rt_cxx_str .= $col . "static symbol-t imported-klasses-names[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
     my ($key, $val);
     my $num_klasses = scalar keys %{$$file{'klasses'}};
@@ -487,7 +488,7 @@ sub generate_defn_footer {
     $col = &colout($col);
     $rt_cxx_str .= $col . "};\n";
     ###
-    $rt_cxx_str .= $col . "static assoc-node-t imported-klasses[] = {" . &ann(__LINE__) . "//rw-data\n";
+    $rt_cxx_str .= $col . "static assoc-node-t imported-klasses[] = {" . &ann(__LINE__) . " //rw-data\n";
     $col = &colin($col);
     $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach $key (sort keys %{$$file{'klasses'}}) {
@@ -531,7 +532,7 @@ sub generate_defn_footer {
   $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col);
 
   $rt_cxx_str .= "\n";
-  $rt_cxx_str .= $col . "static void __initial() {\n";
+  $rt_cxx_str .= $col . "static void __initial() {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
   $rt_cxx_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"before\", DKT-NAME);\n" .
@@ -540,7 +541,7 @@ sub generate_defn_footer {
     $col . "return;\n";
   $col = &colout($col);
   $rt_cxx_str .= $col . "}\n";
-  $rt_cxx_str .= $col . "static void __final() {\n";
+  $rt_cxx_str .= $col . "static void __final() {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
   $rt_cxx_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"before\", DKT-NAME);\n" .
@@ -553,10 +554,10 @@ sub generate_defn_footer {
   #$rt_cxx_str .= $col . "};\n";
 
   $rt_cxx_str .=
-    $col . "namespace { struct noexport __ddl_t {\n" .
+    $col . "namespace { struct noexport __ddl_t {" . &ann(__LINE__) . "\n" .
     $col . "  __ddl_t()  { __initial(); }\n" .
     $col . "  ~__ddl_t() { __final();   }\n" .
-    $col . "};}\n" .
+    $col . "}; }\n" .
     $col . "static __ddl_t __ddl = __ddl_t();\n";
   return $rt_cxx_str;
 }
@@ -1222,7 +1223,7 @@ sub generics::generate_signature_seq {
   if (0 == @$va_generics) {
     $scratch_str .= $col . "static signature-t const* const* signatures-va = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static signature-t const* const signatures-va[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $scratch_str .= $col . "static signature-t const* const signatures-va[] = {" . &ann(__LINE__) . " //ro-data\n";
     my $max_width = 0;
     foreach $generic (@$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
@@ -1245,7 +1246,7 @@ sub generics::generate_signature_seq {
   if (0 == @$fa_generics) {
     $scratch_str .= $col . "static signature-t const* const* signatures = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static signature-t const* const signatures[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $scratch_str .= $col . "static signature-t const* const signatures[] = {" . &ann(__LINE__) . " //ro-data\n";
     my $max_width = 0;
     foreach $generic (@$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
@@ -1281,7 +1282,7 @@ sub generics::generate_selector_seq {
   if (0 == @$va_generics) {
     $scratch_str .= $col . "static selector-node-t* selectors-va = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static selector-node-t selectors-va[] = {" . &ann(__LINE__) . "//rw-data\n";
+    $scratch_str .= $col . "static selector-node-t selectors-va[] = {" . &ann(__LINE__) . " //rw-data\n";
     $col = &colin($col);
     my $max_width = 0;
     my $max_name_width = 0;
@@ -1316,7 +1317,7 @@ sub generics::generate_selector_seq {
   if (0 == @$fa_generics) {
     $scratch_str .= $col . "static selector-node-t* selectors = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static selector-node-t selectors[] = {" . &ann(__LINE__) . "//rw-data\n";
+    $scratch_str .= $col . "static selector-node-t selectors[] = {" . &ann(__LINE__) . " //rw-data\n";
     $col = &colin($col);
     my $max_width = 0;
     my $max_name_width = 0;
@@ -3027,7 +3028,7 @@ sub dk::generate_cxx_footer_klass {
   ###
   ###
   if (@$va_list_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static va-method-t __va-method-addresses[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static va-method-t __va-method-addresses[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
     ### todo: this looks like it might merge with address_body(). see die below
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
@@ -3082,7 +3083,7 @@ sub dk::generate_cxx_footer_klass {
   #}
   ###
   if (@$ka_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static signature-t const* const __ka-method-signatures[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static signature-t const* const __ka-method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
 
     #$$scratch_str_ref .= "\#if 0\n";
@@ -3117,14 +3118,14 @@ sub dk::generate_cxx_footer_klass {
   if (values %{$$klass_scope{'methods'} ||= []}) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "$klass_type @$klass_name { static signature-t const* const __method-signatures[] = {" . &ann(__LINE__) . "//ro-data\n" .
+      $col . "$klass_type @$klass_name { static signature-t const* const __method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n" .
       $col . &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
       $col . "}; }\n";
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "$klass_type @$klass_name { static method-t __method-addresses[] = {" . &ann(__LINE__) . "//ro-data\n" .
+      $col . "$klass_type @$klass_name { static method-t __method-addresses[] = {" . &ann(__LINE__) . " //ro-data\n" .
       $col . &address_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
       $col . "}; }\n";
   }
@@ -3133,7 +3134,7 @@ sub dk::generate_cxx_footer_klass {
   if ($num_method_aliases) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "$klass_type @$klass_name { static method-alias-t __method-aliases[] = {" . &ann(__LINE__) . "//ro-data\n" .
+      $col . "$klass_type @$klass_name { static method-alias-t __method-aliases[] = {" . &ann(__LINE__) . " //ro-data\n" .
       $col . &alias_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
       $col . "}; }\n";
   }
@@ -3144,20 +3145,20 @@ sub dk::generate_cxx_footer_klass {
   if (values %{$exported_methods ||= []}) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "$klass_type @$klass_name { static signature-t const* const __exported-method-signatures[] = {" . &ann(__LINE__) . "//ro-data\n" .
+      $col . "$klass_type @$klass_name { static signature-t const* const __exported-method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n" .
       $col . &signature_body($klass_name, $exported_methods, &colin($col)) .
       $col . "}; }\n" .
-      $col . "$klass_type @$klass_name { static method-t __exported-method-addresses[] = {" . &ann(__LINE__) . "//ro-data\n" .
+      $col . "$klass_type @$klass_name { static method-t __exported-method-addresses[] = {" . &ann(__LINE__) . " //ro-data\n" .
       $col . &address_body($klass_name, $exported_methods, &colin($col)) .
       $col . "}; }\n";
   }
   if (values %{$exported_raw_methods ||= []}) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "$klass_type @$klass_name { static signature-t const* const __exported-raw-method-signatures[] = {" . &ann(__LINE__) . "//ro-data\n" .
+      $col . "$klass_type @$klass_name { static signature-t const* const __exported-raw-method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n" .
       $col . &raw_signature_body($klass_name, $exported_raw_methods, &colin($col)) .
       $col . "}; }\n" .
-      $col . "$klass_type @$klass_name { static method-t __exported-raw-method-addresses[] = {" . &ann(__LINE__) . "//ro-data\n" .
+      $col . "$klass_type @$klass_name { static method-t __exported-raw-method-addresses[] = {" . &ann(__LINE__) . " //ro-data\n" .
       $col . &address_body($klass_name, $exported_raw_methods, &colin($col)) .
       $col . "}; }\n";
   }
@@ -3169,7 +3170,7 @@ sub dk::generate_cxx_footer_klass {
   my $num_traits = @{( $$klass_scope{'traits'} ||= [] )}; # how to get around 'strict'
   if ($num_traits > 0) {
     $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __traits[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __traits[] = {" . &ann(__LINE__) . " //ro-data\n";
 
     my $trait_num = 0;
     for ($trait_num = 0; $trait_num < $num_traits; $trait_num++) {
@@ -3182,7 +3183,7 @@ sub dk::generate_cxx_footer_klass {
   my $num_requires = @{( $$klass_scope{'requires'} ||= [] )}; # how to get around 'strict'
   if ($num_requires > 0) {
     $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __requires[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __requires[] = {" . &ann(__LINE__) . " //ro-data\n";
 
     my $require_num = 0;
     for ($require_num = 0; $require_num < $num_requires; $require_num++) {
@@ -3195,7 +3196,7 @@ sub dk::generate_cxx_footer_klass {
   my $num_provides = @{( $$klass_scope{'provides'} ||= [] )}; # how to get around 'strict'
   if ($num_provides > 0) {
     $$scratch_str_ref .= "\n";
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __provides[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __provides[] = {" . &ann(__LINE__) . " //ro-data\n";
 
     my $provide_num = 0;
     for ($provide_num = 0; $provide_num < $num_provides; $provide_num++) {
@@ -3219,7 +3220,7 @@ sub dk::generate_cxx_footer_klass {
 
   my $num_bound = keys %{$$klass_scope{'imported-klasses'}};
   if ($num_bound) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
     while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}})) {
       $$scratch_str_ref .= $col . "  $key:__klass__,\n";
@@ -3299,7 +3300,7 @@ sub dk::generate_cxx_footer_klass {
   if (&has_enum_info($klass_scope)) {
     my $num = 0;
     foreach my $enum (@{$$klass_scope{'enum'}}) {
-      $$scratch_str_ref .= $col . "$klass_type @$klass_name { static enum-info-t __enum-info-$num\[] = {" . &ann(__LINE__) . "//ro-data\n";
+      $$scratch_str_ref .= $col . "$klass_type @$klass_name { static enum-info-t __enum-info-$num\[] = {" . &ann(__LINE__) . " //ro-data\n";
       $col = &colin($col);
 
       my $info = $$enum{'info'};
@@ -3313,7 +3314,7 @@ sub dk::generate_cxx_footer_klass {
 
       $num++;
     }
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static named-enum-info-t __enum-info[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static named-enum-info-t __enum-info[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
     $num = 0;
     foreach my $enum (@{$$klass_scope{'enum'}}) {
@@ -3331,7 +3332,7 @@ sub dk::generate_cxx_footer_klass {
   }
 
   if (&has_const_info($klass_scope)) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const-info-t __const-info\[] = {" . &ann(__LINE__) . "//ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const-info-t __const-info\[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
 
     foreach my $const (@{$$klass_scope{'const'}}) {
@@ -3723,13 +3724,13 @@ sub dk::generate_cxx_footer {
       $$scratch_str_ref .= &generate_info('exports', $exports, $col);
     }
     if (0 == keys %{$$scope{'interposers'}}) {
-      $$scratch_str_ref .= $col . "static property-t* interposers = nullptr;\n";
+      $$scratch_str_ref .= $col . "static property-t* interposers = nullptr;" . &ann(__LINE__) . "\n";
     } else {
       #print STDERR Dumper $$scope{'interposers'};
       my $interposers = &many_1_to_1_from_1_to_many($$scope{'interposers'});
       #print STDERR Dumper $interposers;
 
-      $$scratch_str_ref .= $col . "static property-t interposers[] = {" . &ann(__LINE__) . "//ro-data\n";
+      $$scratch_str_ref .= $col . "static property-t interposers[] = {" . &ann(__LINE__) . " //ro-data\n";
       $col = &colin($col);
       my ($key, $val);
       my $num_klasses = scalar keys %$interposers;
@@ -3837,7 +3838,7 @@ sub linkage_unit::generate_symbols {
     my $width = length($cxx_ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; }" . &ann(__LINE__) . "// $symbol\n";
+      $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; }" . &ann(__LINE__) . " // $symbol\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
       $scratch_str .= $col . "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__LINE__) . "\n";
@@ -3894,13 +3895,13 @@ sub linkage_unit::generate_keywords {
     my $pad = ' ' x ($max_width - $width);
     if (defined $cxx_ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "namespace __keyword { extern noexport keyword-t $cxx_ident; }" . &ann(__LINE__) . "// $symbol\n";
+        $scratch_str .= $col . "namespace __keyword { extern noexport keyword-t $cxx_ident; }" . &ann(__LINE__) . " // $symbol\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
         # keyword-defn
-        $scratch_str .= "namespace __keyword { noexport keyword-t $cxx_ident = " . $pad . "{ \$$symbol, " . $pad . "__hash:$cxx_ident }; }" . &ann(__LINE__) . "// $symbol\n";
+        $scratch_str .= "namespace __keyword { noexport keyword-t $cxx_ident = " . $pad . "{ \$$symbol, " . $pad . "__hash:$cxx_ident }; }" . &ann(__LINE__) . " // $symbol\n";
       }
     }
   }
@@ -3946,7 +3947,7 @@ sub generate_property_tbl {
       $max_key_width = $key_width;
     }
   }
-  $result .= "static property-t $name\[] = {" . &ann($line) . "//ro-data\n";
+  $result .= "static property-t $name\[] = {" . &ann($line) . " //ro-data\n";
   $col = &colin($col);
   $num = 1;
   foreach my $key (@$sorted_keys) {
@@ -3973,14 +3974,14 @@ sub generate_property_tbl {
 sub generate_info {
   my ($name, $tbl, $col, $scope) = @_;
   my $result = &generate_property_tbl("$name-props", $tbl, $col, __LINE__);
-  $result .= "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };\n";
+  $result .= "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };" . &ann(__LINE__) . "\n";
   return $result;
 }
 sub generate_info_seq {
   my ($name, $seq, $col, $line) = @_;
   my $result = '';
 
-  $result .= $col . "static named-info-node-t $name\[] = {" . &ann($line) . "//ro-data\n";
+  $result .= $col . "static named-info-node-t $name\[] = {" . &ann($line) . " //ro-data\n";
   $col = &colin($col);
 
   my $max_width = 0;
@@ -4009,14 +4010,12 @@ sub pad {
 }
 sub ann {
   my ($line, $tkn) = @_;
-  my $string;
+  my $string = '';
   if (1) {
-    $string = " /*$line*/ ";
+    $string .= " /*$line*/";
     if ($tkn) {
-      $string .= "/*$tkn*/ ";
+      $string .= " /*$tkn*/";
     }
-  } else {
-    $string = ' ';
   }
   return $string;
 }
