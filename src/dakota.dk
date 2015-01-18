@@ -952,6 +952,16 @@ dump-method(ofile-t ofl, signature-t const* info, uint32-t max-return-type-width
   return;
 }
 
+static void
+dump-generic(ofile-t ofl, signature-t const* info)
+{
+ ofile:printf(ofl, "generic %s dk:%s(%s);\n",
+              info->return-type,
+              info->name,
+              info->parameter-types);
+  return;
+}
+
 noexport void
 dump-klass(ofile-t ofl, named-info-node-t* klass-info)
 {
@@ -1009,6 +1019,15 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
   }
 
   if (exported? || state-exported? || behavior-exported?) {
+    if (nullptr != ka-method-signatures) {
+      uint32-t index = 0;
+      signature-t const* info;
+      while (nullptr != (info = ka-method-signatures[index++])) {
+        dump-generic(ofl, info);
+      }
+      ofile:printf(ofl, "\n");
+    }
+
     ofile:printf(ofl, "%s %s\n", construct, name);
     ofile:printf(ofl, "{\n");
     ofl.col++;
