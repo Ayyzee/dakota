@@ -363,7 +363,7 @@ klass deque
     return forward-iterator;
   }
 
-  //      method object-t write-element(object-t self, object-t out, char8-t const* name)
+  //      method object-t write-element(object-t self, object-t out, str-t name)
   //      {
   //        if (null == out)
   //          { out = std-output; } // wrong! should be system:object-out

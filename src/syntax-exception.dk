@@ -28,15 +28,15 @@ klass syntax-exception
 
   slots
   {
-    object-t       token;
-    char8-t const* filename;
-    char8-t const* message;
+    object-t token;
+    str-t    filename;
+    str-t    message;
   }
 
   method object-t init(object-t self,
-                       object-t       token =>    {},
-                       char8-t const* filename => {},
-                       char8-t const* message =>  __klass__)
+                       object-t token =>    {},
+                       str-t    filename => {},
+                       str-t    message =>  __klass__)
   {
     self = dk:init(super);
     assert(nullptr != token &&

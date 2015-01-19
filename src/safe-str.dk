@@ -21,7 +21,7 @@ include <cstring>;
 
 module dakota;
 
-export int-t safe-strcmp(char8-t const* s1, char8-t const* s2)
+export int-t safe-strcmp(str-t s1, str-t s2)
   {
     int-t value = 0;
 
@@ -38,14 +38,14 @@ export int-t safe-strcmp(char8-t const* s1, char8-t const* s2)
     return value;
   }
 
-noexport int-t safe-strptrcmp(char8-t const* const* sp1, char8-t const* const* sp2)
+noexport int-t safe-strptrcmp(str-t const* sp1, str-t const* sp2)
   {
-    char8-t const* s1;
+    str-t s1;
     if (nullptr == sp1)
       s1 = nullptr;
     else
       s1 = *sp1;
-    char8-t const* s2;
+    str-t s2;
     if (nullptr == sp2)
       s2 = nullptr;
     else
@@ -53,7 +53,7 @@ noexport int-t safe-strptrcmp(char8-t const* const* sp1, char8-t const* const* s
     return safe-strcmp(s1, s2);
   }
 
-noexport int-t safe-strncmp(char8-t const* s1, char8-t const* s2, size-t n)
+noexport int-t safe-strncmp(str-t s1, str-t s2, size-t n)
   {
     int-t value = 0;
 
@@ -70,7 +70,7 @@ noexport int-t safe-strncmp(char8-t const* s1, char8-t const* s2, size-t n)
     return value;
   }
 
-export size-t safe-strlen(char8-t const* str)
+export size-t safe-strlen(str-t str)
   {
     size-t len;
 

@@ -21,8 +21,8 @@ klass const-info
 {
   slots
   {
-    char8-t const* name;  // never nullptr
-    char8-t const* type;  // never nullptr
-    char8-t const* value; // never nullptr
+    str-t name;  // never nullptr
+    str-t type;  // never nullptr
+    str-t value; // never nullptr
   }
 }

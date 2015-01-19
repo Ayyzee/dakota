@@ -31,9 +31,9 @@ trace-column-out()
 }
 
 static format-va-printf(2) int-t
-trace-vfprintf(file-t file, char8-t const* format, va-list-t args)
+trace-vfprintf(file-t file, str-t format, va-list-t args)
 {
-  char8-t const* col = "  "; // two spaces per column :-) [my way]
+  str-t col = "  "; // two spaces per column :-) [my way]
   for (uint32-t i = 0; i < gbl-trace-column; i++) {
     if (0 == i)
       fprintf(file, "%s", col);
@@ -45,7 +45,7 @@ trace-vfprintf(file-t file, char8-t const* format, va-list-t args)
   return result;
 }
 static format-printf(2) int-t
-trace-fprintf(file-t file, char8-t const* format, ...)
+trace-fprintf(file-t file, str-t format, ...)
 {
   va-list-t args;
   va-start(args, format);

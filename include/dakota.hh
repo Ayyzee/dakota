@@ -87,7 +87,7 @@
 #endif
 
 #if !defined HAVE_STRERROR_NAME
-  import char8_t const* strerror_name(int_t);
+  import str_t strerror_name(int_t);
 #endif
 
 #if !defined USE
@@ -159,24 +159,24 @@ typedef uintmax_t (*hash_t)(object_t);
 typedef signature_t const* (*dkt_signature_function_t)();
 typedef selector_t* (*dkt_selector_function_t)();
 
-constexpr uintmax_t dkt_hash_recursive(uintmax_t hash, char8_t const* str)
+constexpr uintmax_t dkt_hash_recursive(uintmax_t hash, str_t str)
 {
   return (!*str ? hash : dkt_hash_recursive(((hash << 5) + hash) ^ cast(uchar8_t)*str, str + 1));
 }
-constexpr uintmax_t dk_hash(char8_t const* str)
+constexpr uintmax_t dk_hash(str_t str)
 { // Daniel J. Bernstein
   return (!str ? 0 : dkt_hash_recursive(5381, str));
 }
 
-// constexpr uintmax_t dk_hash(char8_t const* str, uintmax_t h = 0)
+// constexpr uintmax_t dk_hash(str_t str, uintmax_t h = 0)
 // { // Daniel J. Bernstein
 //   return !str[h] ? 5381 : ( dk_hash(str, h + 1) * 33 ) ^ cast(uchar8_t)(str[h]);
 // }
 
-import int_t  safe_strcmp(char8_t const*, char8_t const*);
-import size_t safe_strlen(char8_t const*);
+import int_t  safe_strcmp(str_t, str_t);
+import size_t safe_strlen(str_t);
 
-import symbol_t dk_intern(char8_t const*);
+import symbol_t dk_intern(str_t);
 import object_t dk_klass_for_name(symbol_t);
 
 import void dkt_register_info(named_info_node_t*);
@@ -188,7 +188,7 @@ import void dkt_deregister_info(named_info_node_t*);
 import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
 import object_t*       dkt_capture_current_exception(object_t arg);
-import char8_t const** dkt_capture_current_exception(char8_t const* arg);
+import str_t* dkt_capture_current_exception(str_t arg);
 
 import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
 import object_t           dk_va_make_named_info(      symbol_t name, va_list_t args);

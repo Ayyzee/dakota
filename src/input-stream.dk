@@ -26,12 +26,12 @@ klass input-stream
   slots
   {
     file-t         file;
-    char8-t const* filename;
+    str-t filename;
   }
 
   method object-t init(object-t self,
                        file-t         file =>     nullptr,
-                       char8-t const* filename => nullptr)
+                       str-t filename => nullptr)
   {
     self = dk:init(super);
     assert(!(nullptr != file &&

@@ -17,7 +17,7 @@
 #if !defined __dl_hh__
 #define      __dl_hh__
 
-noexport char8_t const* symbol_name_from_address(void*);
-noexport void load_library(char8_t const*);
+noexport str_t symbol_name_from_address(void*);
+noexport void load_library(str_t);
 
 #endif // __dl_hh__

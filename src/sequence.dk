@@ -26,7 +26,7 @@ klass sequence
   method object-t write-lite(object-t self, object-t out)
   {
     dk:write(out, "[");
-    char8-t const* delim = "";
+    str-t delim = "";
 
     for (object-t element in self) {
       dk:write(out, delim);

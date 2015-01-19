@@ -79,7 +79,7 @@ klass keyword-exception
     return self;
   }
 
-  method object-t print(object-t self, object-t out, char8-t const* msg)
+  method object-t print(object-t self, object-t out, str-t msg)
   {
     dk:print(super, out);
 

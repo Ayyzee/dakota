@@ -28,7 +28,7 @@ klass ascii-number-klass
 
   slots
   {
-    char8-t const* digits;
+    str-t digits;
   }
   static object-t gbl-base2-ascii-number-klass-info;
 
@@ -47,7 +47,7 @@ klass ascii-number-klass
 
   method object-t init(object-t self,
                        object-t       info =>   gbl-base2-ascii-number-klass-info,
-                       char8-t const* digits => "01")
+                       str-t digits => "01")
   {
     self = dk:init(super, info => info);
     assert(nullptr != digits);
@@ -56,9 +56,9 @@ klass ascii-number-klass
     return self;
   }
 
-  method char8-t const* digits(object-t self)
+  method str-t digits(object-t self)
   {
-    char8-t const* digits = self.digits;
+    str-t digits = self.digits;
     return digits;
   }
 }

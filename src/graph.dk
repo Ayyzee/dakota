@@ -26,13 +26,13 @@ klass node
 
   slots
   {
-    char8-t const* name;  // may NOT be nullptr
-    object-t       attrs; // <table>
+    str-t    name;  // may NOT be nullptr
+    object-t attrs; // <table>
   }
 
   method object-t init(object-t self,
-                       char8-t const* name =>  {},
-                       object-t       attrs => null)
+                       str-t    name =>  {},
+                       object-t attrs => null)
   {
     self = dk:init(super);
     return self;
@@ -45,17 +45,20 @@ klass edge
 
   slots
   {
-    char8-t const* lhs-name; // may NOT be nullptr
-    char8-t const* rhs-name; // may NOT be nullptr
-    object-t       attrs;    // <table>
+    str-t    lhs-name; // may NOT be nullptr
+    str-t    rhs-name; // may NOT be nullptr
+    object-t attrs;    // <table>
   }
 
   method object-t init(object-t self,
-                       char8-t const* lhs-name => {},
-                       char8-t const* rhs-name => {},
-                       object-t       attrs =>    null)
+                       str-t    lhs-name => {},
+                       str-t    rhs-name => {},
+                       object-t attrs =>    null)
   {
     self = dk:init(super);
+    self.lhs-name = lhs-name;
+    self.rhs-name = rhs-name;
+    self.attr =     attr;
     return self;
   }
 }
@@ -64,7 +67,8 @@ klass attrs
 {
   slots object-t;
 
-  method object-t init(object-t self, object-t attrs => {})
+  method object-t init(object-t self,
+                       object-t attrs => {})
   {
     self = dk:init(super);
     *unbox(self) = attrs;
@@ -78,17 +82,20 @@ klass graph
 
   slots
   {
-    symbol-t       type;  // $graph xor $digraph
-    char8-t const* name;  // may be nullptr
-    object-t       stmts; // <sequence>
+    symbol-t type;  // $graph xor $digraph
+    str-t    name;  // may be nullptr
+    object-t stmts; // <sequence>
   }
 
   method object-t init(object-t self,
-                       symbol-t       type =>  $graph,
-                       char8-t const* name =>  nullptr,
-                       object-t       attrs => null)
+                       symbol-t type =>  $graph,
+                       str-t    name =>  nullptr,
+                       object-t attrs => null)
   {
     self = dk:init(super);
+    self.type = type;
+    self.name = name;
+    // what should I do with attrs?
     return self;
   }
 

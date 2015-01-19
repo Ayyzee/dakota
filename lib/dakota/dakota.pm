@@ -252,6 +252,7 @@ sub nrt::add_extra_klass_decls {
     'signature' => undef,
     'symbol' => undef,
     'super' => undef,
+    'str' => undef,
     'uchar8' => undef,
   };
   foreach my $klass_decl (sort keys %$klass_decls) {

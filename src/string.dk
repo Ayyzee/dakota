@@ -40,7 +40,7 @@ klass string
 
   method object-t init(object-t self,
                        symbol-t       encoding => $utf-8,
-                       char8-t const* bytes =>    "",
+                       str-t bytes =>    "",
                        uint32-t       start =>    0,
                        uint32-t       length =>   cast(uint32-t)safe-strlen(bytes) - start)
   {
@@ -82,7 +82,7 @@ klass string
 
   method object-t write-lite(object-t self, object-t out)
   {
-    char8-t const* utf8 = dk:utf8-from(self);
+    str-t utf8 = dk:utf8-from(self);
     dk:write(out, "\"");
     dk:write(out, utf8);
     dk:write(out, "\"");
@@ -132,7 +132,7 @@ klass string
     return result;
   }
 
-  method object-t append(object-t self, char8-t const* bytes, symbol-t encoding => $utf-8)
+  method object-t append(object-t self, str-t bytes, symbol-t encoding => $utf-8)
   {
     assert(nullptr != bytes);
     assert(nullptr != encoding);
@@ -145,7 +145,7 @@ klass string
     return self;
   }
 
-  method char8-t const* utf8-from(object-t self)
+  method str-t utf8-from(object-t self)
   {
     return self.ptr;
   }
@@ -159,12 +159,12 @@ klass string
     return result;
   }
 
-  method object-t tokenize(object-t self, char8-t const* delimiter)
+  method object-t tokenize(object-t self, str-t delimiter)
   {
     object-t result = make(vector:klass);
     uint32-t delimiter-length = cast(uint32-t)safe-strlen(delimiter);
-    char8-t const* p1 = self.ptr;
-    char8-t const* p2;
+    str-t p1 = self.ptr;
+    str-t p2;
 
     object-t kls = dk:klass(self);
     object-t delimiter-object = make(kls, bytes => delimiter);
@@ -177,7 +177,7 @@ klass string
 
     // 'part' 'delimiter' pairs
     while (nullptr != (p2 = strstr(p1, delimiter))) {
-      object-t part-object = make(kls, bytes => cast(char8-t const*)(p1), length => cast(uint32-t)(p2 - p1));
+      object-t part-object = make(kls, bytes => cast(str-t)(p1), length => cast(uint32-t)(p2 - p1));
       dk:add-last(result, part-object);
       dk:add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
@@ -201,7 +201,7 @@ klass string
   method object-t append-sequence(object-t self, object-t sequence)
   {
     for (object-t element in sequence) {
-      char8-t const* utf8 = dk:utf8-from(element);
+      str-t utf8 = dk:utf8-from(element);
       uint32-t length = cast(uint32-t)safe-strlen(utf8);
       self.len += cast(uint32-t)(length);
       self.ptr = cast(char8-t*)realloc(self.ptr, (self.len + 1 * sizeof(char8-t)));

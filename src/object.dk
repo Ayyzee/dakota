@@ -162,19 +162,19 @@ klass object
     return self;
   }
 
-  method char8-t const* utf8-from(object-t self)
+  method str-t utf8-from(object-t self)
   {
     char8-t* buffer = cast(char8-t*)malloc(2 + PRIxPTR-WIDTH + (1));
     snprintf(buffer, 2 + PRIxPTR-WIDTH + (1), "0x%0*" PRIxPTR,
              PRIxPTR-WIDTH, cast(uintptr-t)(self));
-    return cast(char8-t const*)(buffer);
+    return cast(str-t)(buffer);
   }
 
   method object-t print(object-t self, object-t out)
   {
     if (null == out)
       out = std-output;
-    char8-t const* utf8 = dk:utf8-from(self);
+    str-t utf8 = dk:utf8-from(self);
     dk:print(out, utf8);
     return self;
   }
@@ -195,8 +195,8 @@ dkt-unbox-check(object-t object, object-t kls)
                         __func__, cast(void*)(object), dk:name(kls));
   unless (object:instance?(object, kls))
   {
-    char8-t const* object-kls-name = dkt-name(dkt-klass(object));
-    char8-t const* kls-name = dkt-name(kls);
+    str-t object-kls-name = dkt-name(dkt-klass(object));
+    str-t kls-name = dkt-name(kls);
 
     if (object:instance?(object, klass:klass))
       dkt-log(dkt::k-log-error, "%s:unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",

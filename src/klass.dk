@@ -381,7 +381,7 @@ klass klass
     object-t behavior; // bit-vector
   }
 
-  method object-t alloc(object-t self, char8-t const* file, uint32-t line)
+  method object-t alloc(object-t self, str-t file, uint32-t line)
   {
     DKT-LOG-OBJECT-ALLOC("'file'=>'%s','line'=>'%i','func'=>'%s','args'=>['%s']",
                          file, line, __method__->name, self.name);
@@ -508,7 +508,7 @@ klass klass
       symbol-t const* traits = cast(symbol-t const*)named-info-node:at(self.info-slots, $traits);
       if (nullptr != traits) {
         fprintf(stderr, " ");
-        char8-t const* delim = "";
+        str-t delim = "";
         uint32-t i = 0;
         symbol-t trait-name;
         while (nullptr != (trait-name = traits[i++])) {
@@ -578,7 +578,7 @@ klass klass
           fprintf(out, " ");
           width++;
         }
-        char8-t const* symbol-name = symbol-name-from-address(cast(void*)cast(uintptr-t)(m));
+        str-t symbol-name = symbol-name-from-address(cast(void*)cast(uintptr-t)(m));
 
         if (nullptr != symbol-name) {
           // should demangle here
@@ -818,7 +818,7 @@ klass klass
     return state;
   }
 
-  method char8-t const* utf8-from(object-t self)
+  method str-t utf8-from(object-t self)
   {
     symbol-t name = self.name;
     uint32-t name-len = cast(uint32-t)safe-strlen(name);

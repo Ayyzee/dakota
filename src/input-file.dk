@@ -35,18 +35,18 @@ klass input-file
 {
   slots
   {
-    off-t          length;
-    off-t          current-position;
-    char8-t*       buffer;
+    off-t    length;
+    off-t    current-position;
+    char8-t* buffer;
 
-    char8-t const* filename;
-    int32-t        line;
-    int32-t        column;
+    str-t    filename;
+    int32-t  line;
+    int32-t  column;
   }
 
   method object-t init(object-t self,
-                       file-t         file =>     nullptr,
-                       char8-t const* filename => nullptr)
+                       file-t   file =>     nullptr,
+                       str-t    filename => nullptr)
   {
     self = dk:init(super);
     assert(!(nullptr != file && nullptr != filename)); // these are mutually exclusive
@@ -92,9 +92,9 @@ klass input-file
     return result;
   }
 
-  method char8-t const* filename(object-t self)
+  method str-t filename(object-t self)
   {
-    return cast(char8-t const*)(self.filename);
+    return cast(str-t)(self.filename);
   }
   
   method object-t put-char8(object-t self, char8-t c)

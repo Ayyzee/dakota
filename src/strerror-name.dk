@@ -24,7 +24,7 @@ include <cstring>;
   #include "config.hh"
 #endif
 
-static char8-t const* gbl-sys-err-names[] =
+static str-t gbl-sys-err-names[] =
 {
      "0",    "1",    "2",    "3",    "4",    "5",    "6",    "7",    "8",    "9",
 
@@ -45,7 +45,7 @@ static char8-t const* gbl-sys-err-names[] =
 };
 
 static void
-set-name(int-t errnum, char8-t const* name)
+set-name(int-t errnum, str-t name)
 {
   assert(0 != errnum);
   assert(nullptr != name);
@@ -56,7 +56,7 @@ set-name(int-t errnum, char8-t const* name)
     gbl-sys-err-names[errnum] = name;
   }
   else {
-    char8-t const* delim = "|";
+    str-t delim = "|";
     uint32-t len = cast(uint32-t)strlen(gbl-sys-err-names[errnum]) + cast(uint32-t)strlen(delim) + cast(uint32-t)strlen(name) + (1);
     char8-t* buf = cast(char8-t*)malloc(sizeof(char8-t) * len); // leakleak
     buf[0] = NUL;
@@ -70,11 +70,11 @@ set-name(int-t errnum, char8-t const* name)
 }
 
 #if !defined HAVE-STRERROR-NAME
-export char8-t const*
+export str-t
 strerror-name(int-t errnum)
 {
   assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
-  char8-t const* name = gbl-sys-err-names[errnum];
+  str-t name = gbl-sys-err-names[errnum];
   return name;
 }
 #endif

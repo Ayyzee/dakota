@@ -22,7 +22,7 @@ klass named-enum-info
 {
   slots
   {
-    char8-t const* name; // really the type, not the name
-    enum-info-t*  info;
+    str-t        name; // really the type, not the name
+    enum-info-t* info;
   }
 }

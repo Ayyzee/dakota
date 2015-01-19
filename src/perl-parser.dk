@@ -26,7 +26,7 @@ klass str128;
 klass tokenid;
 
 static format-printf(4) int-t
-print-error(char8-t const* filename, uint32-t line, uint32-t column, char8-t const* format, ...)
+print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...)
 {
   int-t result = fprintf(stderr, "%s:%i:%i ", filename, line, column);
   if (-1 != result) {
@@ -41,15 +41,15 @@ klass perl-parser
 {  
   slots
   {
-    file-t         in;
-    char8-t const* filename;
-    uint32-t       line;
-    uint32-t       column;
+    file-t   in;
+    str-t    filename;
+    uint32-t line;
+    uint32-t column;
   }
     
   method object-t init(object-t self,
-                       file-t         file =>     stdin,
-                       char8-t const* filename => nullptr)
+                       file-t   file =>     stdin,
+                       str-t    filename => nullptr)
   {
     self = dk:init(super);
     assert(!(stdin != file &&
@@ -109,7 +109,7 @@ klass perl-parser
     return c;
   }
 
-  //void error-msg(char8-t* filename, uint32-t line, uint32-t column, char8-t const* msg0, ...); // one or more msg strings
+  //void error-msg(char8-t* filename, uint32-t line, uint32-t column, str-t msg0, ...); // one or more msg strings
 
   /* method */ static object-t lex(object-t self)
   {

@@ -36,14 +36,14 @@ klass perl-object-output-stream
   {
     uint32-t indent-level;
 
-    char8-t const* key-delim;
-    char8-t const* element-delim;
+    str-t key-delim;
+    str-t element-delim;
 
-    char8-t const* start-seq-delim;
-    char8-t const* end-seq-delim;
+    str-t start-seq-delim;
+    str-t end-seq-delim;
 
-    char8-t const* start-tbl-delim;
-    char8-t const* end-tbl-delim;
+    str-t start-tbl-delim;
+    str-t end-tbl-delim;
   }
 
   method object-t init(object-t self, file-t file => stdout)
@@ -77,7 +77,7 @@ klass perl-object-output-stream
       return k-none;
   }
 
-  method object-t write-element(object-t self, char8-t const* element, char8-t const* key)
+  method object-t write-element(object-t self, str-t element, str-t key)
   {
     char8-t[128] buffer;
     if (nullptr != key)
@@ -88,7 +88,7 @@ klass perl-object-output-stream
     return self;
   }
 
-  method object-t write-element(object-t self, int32-t element, char8-t const* key)
+  method object-t write-element(object-t self, int32-t element, str-t key)
   {
     char8-t[128] buffer;
     if (nullptr != key)
@@ -99,7 +99,7 @@ klass perl-object-output-stream
     return self;
   }
 
-  method object-t write-element(object-t self, uint32-t element, char8-t const* key)
+  method object-t write-element(object-t self, uint32-t element, str-t key)
   {
     char8-t[128] buffer;
     if (nullptr != key)
@@ -110,7 +110,7 @@ klass perl-object-output-stream
     return self;
   }
 
-  method object-t write-table-start(object-t self, char8-t const* key)
+  method object-t write-table-start(object-t self, str-t key)
   {
     char8-t[128] buffer;
     if (nullptr != key)
@@ -131,7 +131,7 @@ klass perl-object-output-stream
     return self;
   }
 
-  method object-t write-sequence-start(object-t self, char8-t const* key)
+  method object-t write-sequence-start(object-t self, str-t key)
   {
     char8-t[128] buffer;
     if (nullptr != key)

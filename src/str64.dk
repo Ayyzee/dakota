@@ -47,7 +47,7 @@ klass str64
 
   method int-t compare(slots-t* s, slots-t* other-s)
   {
-    int-t result = cast(int-t)safe-strncmp(cast(char8-t const*)(s), cast(char8-t const*)(other-s), sizeof(slots-t));
+    int-t result = cast(int-t)safe-strncmp(cast(str-t)(s), cast(str-t)(other-s), sizeof(slots-t));
     result = dkt-normalize-compare-result(result);
     return result;
   }

@@ -63,7 +63,7 @@ klass token
                        uint32-t       line =>    0,
                        uint32-t       column =>  0,
                        tokenid-t      tokenid => 0,
-                       char8-t const* buffer =>  nullptr)
+                       str-t buffer =>  nullptr)
   {
     self = dk:init(super);
 #if 0
@@ -88,7 +88,7 @@ klass token
 
   method uintmax-t hash(object-t self)
   {
-    object-t string = make(string:klass, bytes => cast(char8-t const*)(self.buffer));
+    object-t string = make(string:klass, bytes => cast(str-t)(self.buffer));
     uintmax-t hash = dk:hash(string);
     return hash;
   }
@@ -99,8 +99,8 @@ klass token
 
     if (dk:instance?(other, klass)) {
       slots-t* t = unbox(other);
-      object-t s-string = make(string:klass, bytes => cast(char8-t const*)(self.buffer));
-      object-t t-string = make(string:klass, bytes => cast(char8-t const*)(t->buffer));
+      object-t s-string = make(string:klass, bytes => cast(str-t)(self.buffer));
+      object-t t-string = make(string:klass, bytes => cast(str-t)(t->buffer));
       state = dk:equal?(s-string, t-string);
     } else {
       state = false;
@@ -179,9 +179,9 @@ klass token
     return self.column;
   }
 
-  method char8-t const* buffer(object-t self)
+  method str-t buffer(object-t self)
   {
-    return cast(char8-t const*)(self.buffer);
+    return cast(str-t)(self.buffer);
   }
 
   method char8-t first-char8(object-t self)
@@ -191,9 +191,9 @@ klass token
   }
 
   // this should be merged with buffer - this is a hackhack
-  method char8-t const* utf8-from(object-t self)
+  method str-t utf8-from(object-t self)
   {
-    char8-t const* buffer = dk:buffer(self);
+    str-t buffer = dk:buffer(self);
     return buffer;
   }
 

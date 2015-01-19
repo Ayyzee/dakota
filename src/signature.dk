@@ -25,9 +25,9 @@ klass signature
 {
   slots
   {
-    char8-t const* return-type; // not considered in compare()
-    char8-t const* name;
-    char8-t const* parameter-types;
+    str-t return-type; // not considered in compare()
+    str-t name;
+    str-t parameter-types;
   }
 
   method slots-t* dump(slots-t* s)

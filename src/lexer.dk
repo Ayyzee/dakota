@@ -41,21 +41,21 @@ klass lexer
 {
   slots
   {
-    off-t          length;
-    off-t          current-position;
-    char8-t*       buffer;
+    off-t    length;
+    off-t    current-position;
+    char8-t* buffer;
 
-    char8-t const* filename;
-    uint32-t       line;
-    uint32-t       previous-column;
-    uint32-t       column;
+    str-t    filename;
+    uint32-t line;
+    uint32-t previous-column;
+    uint32-t column;
 
-    object-t       open-tokens;
+    object-t open-tokens;
   }
 
   method object-t init(object-t self,
-                       file-t         file =>     stdin,
-                       char8-t const* filename => nullptr)
+                       file-t   file =>     stdin,
+                       str-t    filename => nullptr)
   {
     self = dk:init(super);
 
@@ -106,9 +106,9 @@ klass lexer
     return result;
   }
 
-  method char8-t const* filename(object-t self)
+  method str-t filename(object-t self)
   {
-    return cast(char8-t const*)(self.filename);
+    return cast(str-t)(self.filename);
   }
     
   /* method */ noexport inline char8-t previous-char8(object-t self)
