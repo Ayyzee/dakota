@@ -14,18 +14,13 @@ if (0) {
 } else {
   $dk_files = [ "object.dk",
                 "klass.dk",
-                "exception.dk",
                 "table.dk",
-                "set.dk",
-                "string.dk",
-                "sequence.dk",
-                "file.dk" ];
+                "set.dk" ];
 }
 
 my $nrt_rep_files = {};
 my $o_files = [];
 my $edges = [];
-my $gen_src_nodes = [];
 
 my $bname = $name; $bname =~ s/\.$SO_EXT$//;
 my $rt_rep_file = "obj/rt/lib$bname.rep";
@@ -52,11 +47,9 @@ foreach my $dk_file (@$dk_files) {
   $$nrt_rep_files{$nrt_rep_file} = 1;
   push @$o_files, $nrt_o_file;
 
-  push @$gen_src_nodes, ($nrt_hxx_file,
-                         $nrt_cxx_file);
-  push @$edges, [ $dk_cxx_file,  $nrt_rep_file ];
+  push @$edges, [ $dk_cxx_file,  $rt_rep_file ];
   push @$edges, [ $dk_cxx_file,  $dk_file ];
-  push @$edges, [ $rt_rep_file,  $dk_file ];
+  #push @$edges, [ $rt_rep_file,  $dk_file ];
   push @$edges, [ $nrt_o_file,   $dk_cxx_file ];
 
   push @$edges, [ $nrt_rep_file, $dk_file ];
@@ -65,9 +58,10 @@ foreach my $dk_file (@$dk_files) {
   push @$edges, [ $nrt_cxx_file, $nrt_rep_file ];
   push @$edges, [ $nrt_o_file,   $nrt_hxx_file ];
   push @$edges, [ $nrt_o_file,   $nrt_cxx_file ];
+
+  push @$edges, [ $nrt_hxx_file, $rt_rep_file ];
+  push @$edges, [ $nrt_cxx_file, $rt_rep_file ];
 }
-push @$gen_src_nodes, ($rt_hxx_file,
-                       $rt_cxx_file);
 push @$edges, [ $rt_hxx_file, $rt_rep_file ];
 push @$edges, [ $rt_cxx_file, $rt_rep_file ];
 push @$edges, [ $rt_o_file,   $rt_hxx_file ];
@@ -79,7 +73,7 @@ foreach my $o_file (@$o_files) {
 push @$edges, [ $rt_so_file, $rt_o_file ];
 
 foreach my $nrt_rep_file (sort keys %$nrt_rep_files) {
-  push @$edges, [ $nrt_rep_file, $rt_rep_file ];
+  push @$edges, [ $rt_rep_file, $nrt_rep_file ];
 }
 print
   "digraph {\n" .
@@ -97,15 +91,4 @@ foreach my $edge (@$edges) {
   }
   print ";\n"
 }
-print
-  "\n" .
-  "  { rank = same";
-foreach my $gen_src_node (@$gen_src_nodes) {
-  print
-    ";\n" .
-    "    \"$gen_src_node\"";
-}
-print
-  ";\n" .
-  "  }\n" .
-  "}\n";
+print "}\n";
