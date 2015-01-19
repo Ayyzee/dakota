@@ -1,0 +1,29 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass system-exception;
+
+int-t main()
+{
+  try
+  {
+  }
+  catch (str-t e1)
+  { USE(e1);
+  }
+  catch (system-exception:klass e2)
+  { USE(e2);
+  }
+  catch (exception:klass e3)
+  { USE(e3);
+  }
+  catch (int-t e4)
+  { USE(e4);
+  }
+  catch (...)
+  {
+  }
+  finally
+  {
+  }
+  return 0;
+}

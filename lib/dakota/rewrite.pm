@@ -307,6 +307,7 @@ sub rewrite_declarations {
   $$filestr_ref =~ s|(?<!$k)(\s+)(require\s+$rk\s*;)|$1/*$2*/|gs;
 }
 
+my $use_catch_macros = 1;
 my $catch_block  = qr/catch\s*\(\s*$rk?:klass\s*$k*\s*\)\s*($main::block)/;
 my $catch_object = qr/\}(\s*$catch_block)+/;
 sub rewrite_catch_block {
@@ -315,7 +316,11 @@ sub rewrite_catch_block {
 
   while (1) {
     if ($str_in =~ m/\Gcatch\s*\(\s*($rk?:klass)\s*($k*)\s*\)(\s*)\{/gc) {
-      $str_out .= "else-if (dk:instance?(_e, $1))$3\{ object-t $2 = _e;";
+      if ($use_catch_macros) {
+        $str_out .= "DKT-CATCH($1, _e_)$3\{ object-t $2 = _e_;";
+      } else {
+        $str_out .= "else-if (dk:instance?(_e_, $1))$3\{ object-t $2 = _e_;";
+      }
     } elsif ($str_in =~ m/\G(.)/gc) {
       $str_out .= $1;
     } elsif ($str_in =~ m/\G(\n)/gc) {
@@ -331,7 +336,7 @@ sub rewrite_finally {
   # hackhack: added extra single space in case $1 is empty
   #$$filestr_ref =~ s/finally(\s*)($main::block);?/finally$1 __finally([&] $2);/gs;
 
-  $$filestr_ref =~ s/finally(\s*)($main::block);?/FINALLY$1($2);/gs;
+  $$filestr_ref =~ s/finally(\s*)($main::block);?/DKT-FINALLY$1($2);/gs;
   return $filestr_ref
 }
 sub rewrite_catch_object {
@@ -349,8 +354,13 @@ sub rewrite_catch_object {
       last;
     }
   }
-  $str_out =~ s/^\}/\} catch (object-t _e) { if (0) {}/;
-  $str_out =~ s/\}$/\} else { throw; } }/;
+  if ($use_catch_macros) {
+    $str_out =~ s/^\}/\} DKT-CATCH-BEGIN(_e_)/;
+    $str_out =~ s/\}$/\} DKT-CATCH-END(_e_)/;
+  } else {
+    $str_out =~ s/^\}/\} catch (object-t _e_) { if (0) {}/;
+    $str_out =~ s/\}$/\} else { throw _e_; } }/;
+  }
   return $str_out;
 }
 sub rewrite_exceptions {
