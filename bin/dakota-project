@@ -19,7 +19,7 @@ $Data::Dumper::Indent    = 1;   # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-my $opts = {};
+my $opts = { 'var' => {} };
 
 my $subcmd_tbl = {
   'init' =>     \&subcmd_init,
@@ -28,6 +28,8 @@ my $subcmd_tbl = {
   'files' =>    \&subcmd_files,
   'name' =>     \&subcmd_name,
   'set-name' => \&subcmd_set_name,
+  'soname' =>     \&subcmd_soname,
+  'set-soname' => \&subcmd_set_soname,
 };
 
 &GetOptions($opts,
@@ -106,11 +108,9 @@ sub subcmd_remove {
 }
 sub subst {
   my ($string, $var) = @_;
-  if ($var) {
+  my ($key, $element);
+  while (($key, $element) = each %$var) {
     #print STDERR "<$string\n";
-    $var =~ m|(\w+)=(.*)|;
-    my $key = $1;
-    my $element = $2;
     $string =~ s|\$$key\b|$element|;
     #print STDERR ">$string\n";
   }
@@ -146,13 +146,35 @@ sub subcmd_name {
     }
     $name .= $$rep{'name'};
   }
-  $name = &subst($name, $$opts{'var'});
+  if ($$opts{'var'}) {
+    $name = &subst($name, $$opts{'var'});
+  }
   print "$name\n";
 }
 sub subcmd_set_name {
   my ($rep, $args) = @_;
   die if !defined $$rep{'name'};
   $$rep{'name'} = shift @$args;
+  &rep_to_file($rep);
+}
+sub subcmd_soname {
+  my ($rep, $args) = @_;
+  my $name;
+  if ($$rep{'soname'}) {
+    $name = $$rep{'soname'};
+  } else {
+    die if !$$rep{'name'};
+    $name = $$rep{'name'};
+  }
+  if ($$opts{'var'}) {
+    $name = &subst($name, $$opts{'var'});
+  }
+  print "$name\n";
+}
+sub subcmd_set_soname {
+  my ($rep, $args) = @_;
+  # info msg if changing existing soname?
+  $$rep{'soname'} = shift @$args;
   &rep_to_file($rep);
 }
 sub rep_from_file {

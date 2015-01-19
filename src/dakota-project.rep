@@ -1,4 +1,5 @@
 {
+  'soname' => '$prefix/lib/libdakota.$SO_EXT',
   'files' => [
     'assoc.dk',
     'autorelease-pool.dk',

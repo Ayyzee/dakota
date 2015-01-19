@@ -7,11 +7,11 @@ include $(rootdir)/vars.mk
 
 DAKOTA_VARS += DK_PREFIX=$(rootdir)
 
-dakota_util_files := $(shell $(rootdir)/bin/dakota-project files --var SO_EXT=$(SO_EXT) --repository dakota-util-project.rep)
-dakota_files :=      $(shell $(rootdir)/bin/dakota-project files --var SO_EXT=$(SO_EXT) --repository dakota-project.rep)
+dakota_util_files := $(shell $(rootdir)/bin/dakota-project files --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
+dakota_files :=      $(shell $(rootdir)/bin/dakota-project files --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
 
-dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --var SO_EXT=$(SO_EXT) --repository dakota-util-project.rep)
-dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --var SO_EXT=$(SO_EXT) --repository dakota-project.rep)
+dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
+dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
 
 INCLUDE_FILES :=\
  $(DESTDIR)$(includedir)/dakota-log.$(hxx_ext)\
@@ -56,13 +56,15 @@ HOME_FILES :=\
  uninstall-lib\
  uninstall\
 
+soname = $(shell $(rootdir)/bin/dakota-project soname --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT))
+
 # the use of $^ should be $?
 
 $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT):
-	$(DAKOTA) --shared $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --shared $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/lib/%.$(SO_EXT):
-	$(DAKOTA) --dynamic  $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(libdir)/$(@F) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --dynamic  $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/bin/%$(exeext): $(SRCDIR)/%-main.$(dk_ext)
 	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)

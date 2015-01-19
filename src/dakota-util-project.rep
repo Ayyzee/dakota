@@ -1,4 +1,5 @@
 {
+  'soname' => '$prefix/lib/libdakota-util.$SO_EXT',
   'files' => [
     'ascii-number-klass.dk',
     'ascii-number.dk',
@@ -26,5 +27,5 @@
     'type-predicate.dk',
     'xml-object-output-stream.dk'
   ],
-  'name' => 'dakota-util.$SO_EXT',
+  'name' => 'dakota-util.$SO_EXT'
 }
