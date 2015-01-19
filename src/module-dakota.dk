@@ -160,6 +160,8 @@ module dakota export
   sorted-ptr-array:slots-t,
   sorted-set,
   sorted-table,
+  ssize,
+  ssize:slots-t,
   stack,
   std-compare,
   std-compare:slots-t,

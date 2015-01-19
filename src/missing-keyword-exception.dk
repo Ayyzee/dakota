@@ -14,14 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+include <cassert>;
+
 module dakota;
 
-klass size
+klass missing-keyword-exception
 {
-  slots size-t;
-}
+  superklass keyword-exception;
 
-klass ssize
-{
-  slots ssize-t;
+  method object-t print(object-t self, object-t out)
+  {
+    dk:print(super, out, "missing keyword");
+    return self;
+  }
 }
