@@ -3,25 +3,22 @@
 use strict;
 use warnings;
 
+die "Too many args." if @ARGV > 1;
+
+my $project_file = 'dummy-project.rep';
+
+if (@ARGV == 1) {
+  $project_file = $ARGV[0];
+}
+
 my $SO_EXT = 'dylib';
 
-my $name = `../bin/dakota-project --repository dakota-project.rep --var SO_EXT=$SO_EXT name`;
+my $name = `../bin/dakota-project name --repository $project_file --var SO_EXT=$SO_EXT`;
 chomp $name;
 
-my $so_files;
-my $dk_files;
+my $so_files = [split("\n", `../bin/dakota-project libs  --repository $project_file --var SO_EXT=$SO_EXT`)];
+my $dk_files = [split("\n", `../bin/dakota-project files --repository $project_file`)];
 
-if (0) {
-  $so_files = [];
-  $dk_files = [split("\n", `../bin/dakota-project --repository dakota-project.rep files`)];
-} else {
-  $so_files = [ "libthis.$SO_EXT",
-                "libthat.$SO_EXT" ];
-  $dk_files = [ "object.dk",
-                "klass.dk",
-                "table.dk",
-                "set.dk" ];
-}
 my $input_files = [ @$so_files, @$dk_files ];
 
 my $nrt_rep_files = {};

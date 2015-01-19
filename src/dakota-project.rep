@@ -72,5 +72,6 @@
     'uchar8.dk',
     'vector.dk'
   ],
-  'name' => 'dakota.$SO_EXT'
+  'name' => 'dakota.$SO_EXT',
+  'libs' => []
 }

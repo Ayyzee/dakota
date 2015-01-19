@@ -1,0 +1,14 @@
+{
+  'soname' => '$prefix/lib/libresult.$SO_EXT',
+  'files' => [
+    'object.dk',
+    'klass.dk',
+    'table.dk',
+    'set.dk'
+  ],
+  'name' => 'result.$SO_EXT',
+  'libs' => [
+    'libthis.$SO_EXT',
+    'libthat.$SO_EXT'
+  ]
+}
