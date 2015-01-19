@@ -5,8 +5,8 @@ use warnings;
 
 my $name = `../bin/dakota-project --repository dakota-project.rep --var SO_EXT=dylib name`;
 chomp $name;
-my $dk_files = [split("\n", `../bin/dakota-project --repository dakota-project.rep files`)];
-#my $dk_files = [ "object.dk", "klass.dk", "exception.dk", "table.dk", "set.dk" ];
+#my $dk_files = [split("\n", `../bin/dakota-project --repository dakota-project.rep files`)];
+my $dk_files = [ "object.dk", "klass.dk", "exception.dk", "table.dk", "set.dk", "string.dk", "sequence.dk", "file.dk" ];
 
 my $rt_nodes = [];
 my $nrt_rep_files = {};
@@ -75,14 +75,14 @@ push @$edges, [ $rt_so_file,  $rt_o_file ];
 
 print "digraph {\n";
 print "  graph [ rankdir = RL, center = true, page = \"8.5,11\", size = \"7.5,10\" ];";
-print "  node  [ shape = rect, style = rounded ];\n";
+print "  node  [ shape = rect, style = rounded, height = 0.25 ];\n";
 foreach my $rt_node (@$rt_nodes) {
   print "  \"$rt_node\" [ color = blue ];\n";
 }
 foreach my $edge (@$edges) {
   print "  \"$$edge[0]\" -> \"$$edge[1]\"";
   if ($$nrt_rep_files{$$edge[0]} && $rt_rep_file eq $$edge[1]) {
-    print " [ style = dotted ]";
+    print " [ dir = both, style = dotted ]";
   }
   print ";\n"
 }
