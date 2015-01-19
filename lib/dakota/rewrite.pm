@@ -310,16 +310,12 @@ sub rewrite_declarations {
 my $catch_block  = qr/catch\s*\(\s*$rk?:klass\s*$k*\s*\)\s*($main::block)/;
 my $catch_object = qr/\}(\s*$catch_block)+/;
 sub rewrite_catch_block {
-  my ($cond, $str_in) = @_;
+  my ($str_in) = @_;
   my $str_out = '';
 
   while (1) {
     if ($str_in =~ m/\Gcatch\s*\(\s*($rk?:klass)\s*($k*)\s*\)(\s*)\{/gc) {
-      if (0 != length $2) {
-        $str_out .= "$cond(dk:instance?(_e, $1))$3\{ object-t $2 = _e;";
-      } else {
-        $str_out .= "$cond(dk:instance?(_e, $1))$3\{";
-      }
+      $str_out .= "else-if (dk:instance?(_e, $1))$3\{ object-t $2 = _e;";
     } elsif ($str_in =~ m/\G(.)/gc) {
       $str_out .= $1;
     } elsif ($str_in =~ m/\G(\n)/gc) {
@@ -341,12 +337,10 @@ sub rewrite_finally {
 sub rewrite_catch_object {
   my ($str_in) = @_;
   my $str_out = '';
-  my $cond = 'if';
 
   while (1) {
     if ($str_in =~ m/\G($catch_block)/gc) {
-      $str_out .= &rewrite_catch_block($cond, $1);
-      $cond = 'else if';
+      $str_out .= &rewrite_catch_block($1);
     } elsif ($str_in =~ m/\G(.)/gc) {
       $str_out .= $1;
     } elsif ($str_in =~ m/\G(\n)/gc) {
@@ -355,7 +349,7 @@ sub rewrite_catch_object {
       last;
     }
   }
-  $str_out =~ s/^\}/\} catch(object-t _e) {/;
+  $str_out =~ s/^\}/\} catch (object-t _e) { if (0) {}/;
   $str_out =~ s/\}$/\} else { throw; } }/;
   return $str_out;
 }
