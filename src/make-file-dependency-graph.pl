@@ -27,8 +27,7 @@ push @$gen_src_nodes, ($rt_hxx_file,
 push @$rt_nodes, ($rt_rep_file,
                   $rt_hxx_file,
                   $rt_cxx_file,
-                  $rt_o_file,
-                  $rt_so_file);
+                  $rt_o_file);
 
 foreach my $dk_file (@$dk_files) {
   chomp $dk_file;
