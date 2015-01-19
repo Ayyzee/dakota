@@ -35,7 +35,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use dakota;
+use dakota::dakota;
 
 require Exporter;
 our @ISA = qw(Exporter);

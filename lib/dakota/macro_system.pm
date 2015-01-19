@@ -37,7 +37,7 @@ use strict;
 use warnings;
 
 use dakota::sst;
-use dakota;
+use dakota::dakota;
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
