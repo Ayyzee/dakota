@@ -15,6 +15,7 @@ dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --var SO_EXT=$(SO
 
 INCLUDE_FILES :=\
  $(DESTDIR)$(includedir)/dakota-log.$(hxx_ext)\
+ $(DESTDIR)$(includedir)/dakota-finally.$(hxx_ext)\
  $(DESTDIR)$(includedir)/dakota.$(hxx_ext)\
 
 BIN_FILES :=\
@@ -108,7 +109,7 @@ check: all install
 	./dummy
 
 check-headers:
-	$(CXX) $(CXXFLAGS) $(CXX_COMPILE_FLAGS) $(CXX_NO_WARNINGS_FLAGS) $(INCLUDE_DAKOTAFLAGS) dakota-private.h
+	$(CXX) $(CXXFLAGS) $(CXX_COMPILE_FLAGS) $(CXX_NO_WARNINGS_FLAGS) $(INCLUDE_DAKOTAFLAGS) dakota-private.hh
 
 $(rootdir)/lib/$(lib_prefix)$(dakota_util_name): $(dakota_util_files)
 
@@ -118,9 +119,10 @@ dakota-util: $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 dakota: $(rootdir)/lib/$(lib_prefix)$(dakota_name)
 
+# INCLUDE_DAKOTAFLAGS is a dakota variable, not a g++/clang++ variable, but they share the same syntax
 $(rootdir)/bin/dakota-info$(exeext): $(SRCDIR)/dakota-info-main.$(cxx_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(INCLUDE_DAKOTAFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all

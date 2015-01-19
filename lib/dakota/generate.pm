@@ -2597,9 +2597,9 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "#include <dakota-finally.h> /* should be before dakota.h */\n" .
-      $col . "#include <dakota.h>\n" .
-      $col . "#include <dakota-log.h>\n" .
+      $col . "#include <dakota-finally.$hxx_ext> /* hackhack: should be before dakota.$hxx_ext */\n" .
+      $col . "#include <dakota.$hxx_ext>\n" .
+      $col . "#include <dakota-log.$hxx_ext>\n" .
       "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");

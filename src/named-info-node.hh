@@ -1,6 +1,6 @@
-// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-                                        
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __dakota_finally_h__
-#define      __dakota_finally_h__
+#if !defined __named_info_node_hh__
+#define      __named_info_node_hh__
 
-// http://www.codeproject.com/Tips/476970/finally-clause-in-Cplusplus
+#include "dakota.hh"
 
-#include <functional>
-
-class finally
+namespace named_info_node
 {
-    std::function<void(void)> functor;
-  public:
-    finally(const std::function<void(void)> &ftor) : functor(ftor) {}
-    ~finally() { functor(); }
-};
-
-#define FINALLY(block) finally __finally([&] block)
+  noexport /*method*/ int_t compare(slots_t* s, slots_t* other_s);
+  noexport int_t compare(slots_t** s, slots_t** other_s);
+  noexport /*method*/ int_t compare(object_t self, object_t other);
+}
 
 #endif

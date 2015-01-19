@@ -1,9 +1,9 @@
-#if !defined __dakota_dummy_h__
-#define      __dakota_dummy_h__
+#if !defined __dakota_dummy_hh__
+#define      __dakota_dummy_hh__
 
 #include <cstdint> // uintptr_t
 
-#include "dakota-declare-klass-type.h"
+#include "dakota-declare-klass-type.hh"
 
 typedef int int_t;
 typedef unsigned int uint_t;

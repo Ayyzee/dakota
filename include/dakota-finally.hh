@@ -1,4 +1,4 @@
-// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-                                        
 
 // Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
 //
@@ -14,10 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __dl_h__
-#define      __dl_h__
+#if !defined __dakota_finally_hh__
+#define      __dakota_finally_hh__
 
-noexport char8_t const* symbol_name_from_address(void*);
-noexport void load_library(char8_t const*);
+// http://www.codeproject.com/Tips/476970/finally-clause-in-Cplusplus
 
-#endif // __dl_h__
+#include <functional>
+
+class finally
+{
+    std::function<void(void)> functor;
+  public:
+    finally(const std::function<void(void)> &ftor) : functor(ftor) {}
+    ~finally() { functor(); }
+};
+
+#define FINALLY(block) finally __finally([&] block)
+
+#endif

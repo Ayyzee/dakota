@@ -2,7 +2,7 @@
 
 sysname=darwin
 
-cp config-$sysname.h include/config.h
+cp config-$sysname.hh include/config.hh
 cp config-$sysname.mk config.mk
 cp config-$sysname.sh config.sh
 cp .gdbinit-$sysname src/.gdbinit

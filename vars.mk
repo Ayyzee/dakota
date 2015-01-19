@@ -22,7 +22,7 @@ bindir :=     $(prefix)/bin
 SO_EXT ?= so
 
 dk_ext := dk
-hxx_ext := h
+hxx_ext := hh
 cxx_ext := cc
 ctlg_ext := ctlg
 lib_prefix := lib

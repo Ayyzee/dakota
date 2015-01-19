@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __dakota_private_h__
-#define      __dakota_private_h__
+#if !defined __dakota_private_hh__
+#define      __dakota_private_hh__
 
-#include "dakota-dummy.h"
-#include <dakota.h>
+#include "dakota-dummy.hh"
+#include "dakota.hh"
 
 dkt_declare_klass_type_struct(selector_node);
 //dkt_declare_klass_type_struct(signature);
@@ -49,4 +49,4 @@ noexport symbol_t default_klass_name();
 noexport void verbose_terminate();
 noexport void verbose_unexpected();
 
-#endif // __dakota_private_h__
+#endif // __dakota_private_hh__

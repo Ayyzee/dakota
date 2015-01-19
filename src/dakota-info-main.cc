@@ -25,8 +25,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "dakota-dummy.h"
-#include <dakota.h> // format_printf(), format_va_printf()
+#include "dakota-dummy.hh"
+#include "dakota.hh" // format_printf(), format_va_printf()
 
 enum {
   DKT_INFO_HELP = 256,

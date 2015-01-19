@@ -16,7 +16,7 @@
 
 include <cstring>;
 
-#include "dakota-private.h"
+#include "dakota-private.hh"
 
 module dakota;
 

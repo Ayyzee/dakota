@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __dakota_h__
-#define      __dakota_h__
+#if !defined __dakota_hh__
+#define      __dakota_hh__
 
 #include <cstddef>
 #include <cstdlib>
@@ -223,4 +223,4 @@ DEBUG_IMPORT void dkt_dump_methods(klass::slots_t*);
 
 DEBUG_IMPORT void dkt_unbox_check(object_t object, object_t kls);
 
-#endif // __dakota_h__
+#endif // __dakota_hh__

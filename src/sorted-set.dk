@@ -18,7 +18,7 @@ include <cassert>;
 include <cstdlib>;
 include <cstring>;
 
-#include "sorted-ptr-array.h"
+#include "sorted-ptr-array.hh"
 
 module dakota;
 

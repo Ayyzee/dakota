@@ -23,15 +23,15 @@ include <exception>;
 include <sys/stat.h>; // struct stat, stat()
 
 #if HAVE-CONFIG-H
-  #include "config.h"
+  #include "config.hh"
 #endif
 
-#include "dakota-log.h"
-#include "dakota-private.h"
-#include "dakota-rt-private.h"
-#include "dl.h" // load-library()
-#include "sorted-array.h"
-#include "sorted-ptr-array.h"
+#include "dakota-log.hh"
+#include "dakota-private.hh"
+#include "dakota-rt-private.hh"
+#include "dl.hh" // load-library()
+#include "sorted-array.hh"
+#include "sorted-ptr-array.hh"
 
 #if !defined SO-EXT
 #define SO-EXT "so"

@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __sorted_array_h__
-#define      __sorted_array_h__
+#if !defined __sorted_array_hh__
+#define      __sorted_array_hh__
 
-#include <dakota.h>
+#include "dakota.hh"
 
 namespace sorted_array
 {
@@ -35,4 +35,4 @@ namespace sorted_array
   noexport slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
 
-#endif // __sorted_array_h__
+#endif // __sorted_array_hh__

@@ -21,7 +21,7 @@ include <cstdio>;
 include <cstring>;
 
 #if HAVE-CONFIG-H
-  #include "config.h"
+  #include "config.hh"
 #endif
 
 static char8-t const* gbl-sys-err-names[] =

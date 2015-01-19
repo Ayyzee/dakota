@@ -18,8 +18,8 @@ include <cinttypes>;
 include <cstdlib>;
 include <cstring>;
 
-#include "dakota-private.h"
-#include "named-info-node.h"
+#include "dakota-private.hh"
+#include "named-info-node.hh"
 
 module dakota;
 

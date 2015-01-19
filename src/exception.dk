@@ -21,10 +21,10 @@ include <exception>;
 include <unistd.h>; // getpid()
 
 #if HAVE-CONFIG-H
-  #include "config.h"
+  #include "config.hh"
 #endif
 
-#include "dakota-private.h"
+#include "dakota-private.hh"
 
 #define THROW throw // so the macro system won't rewrite
 

@@ -18,10 +18,10 @@ include <cerrno>;
 include <cstring>;
 
 #if HAVE-CONFIG-H
-  #include "config.h"
+  #include "config.hh"
 #endif
 
-#include "dakota-private.h"
+#include "dakota-private.hh"
 
 module dakota;
 
