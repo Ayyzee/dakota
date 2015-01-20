@@ -23,6 +23,7 @@ sub rdir_name_ext {
 
 my $SO_EXT = 'dylib';
 my $colorscheme = 'dark26'; # needs to have 5 or more colors
+my $show_headers = 0;
 
 my $result = `../bin/dakota-project name --repository $project_file --var SO_EXT=$SO_EXT`;
 chomp $result;
@@ -46,8 +47,13 @@ my $rt_hh_file =  "$obj/rt/$name.hh";
 my $rt_cc_file =  "$obj/rt/$name.cc";
 my $rt_o_file =   "$obj/rt/$name.o";
 
-my $rt_files = { $rt_hh_file => undef,
-                 $rt_cc_file => undef };
+my $rt_files = {};
+
+if ($show_headers) {
+    $$rt_files{$rt_hh_file} = undef;
+}
+$$rt_files{$rt_cc_file} = undef;
+
 foreach my $so_file (@$so_files) {
   my ($rdir, $name, $ext) = &rdir_name_ext($so_file);
   my $ctlg_file = "$obj/$rdir/$name.ctlg";
@@ -68,7 +74,9 @@ foreach my $dk_file (@$dk_files) {
   $$dk_cc_files{$dk_cc_file} = undef;
 
   $$nrt_src_files{$dk_cc_file} = undef;
-  $$nrt_src_files{$nrt_hh_file} = undef;
+  if ($show_headers) {
+    $$nrt_src_files{$nrt_hh_file} = undef;
+  }
   $$nrt_src_files{$nrt_cc_file} = undef;
 
   $$nrt_rep_files{$nrt_rep_file} = undef;
@@ -79,20 +87,26 @@ foreach my $dk_file (@$dk_files) {
   push @$edges, [ $dk_cc_file,  $rt_rep_file, 0 ]; # gray, dashed
   push @$edges, [ $nrt_o_file,   $dk_cc_file, 5 ];
 
-  push @$edges, [ $nrt_hh_file, $rt_rep_file, 0 ]; # gray, dashed
+  if ($show_headers) {
+    push @$edges, [ $nrt_hh_file, $rt_rep_file, 0 ]; # gray, dashed
+    push @$edges, [ $nrt_hh_file, $nrt_rep_file, 4 ];
+    push @$edges, [ $nrt_o_file,   $nrt_hh_file, 5 ];
+  }
+
   push @$edges, [ $nrt_cc_file, $rt_rep_file, 0 ]; # gray, dashed
 
-  push @$edges, [ $nrt_hh_file, $nrt_rep_file, 4 ];
   push @$edges, [ $nrt_cc_file, $nrt_rep_file, 4 ];
-  push @$edges, [ $nrt_o_file,   $nrt_hh_file, 5 ];
   push @$edges, [ $nrt_o_file,   $nrt_cc_file, 5 ];
 }
 foreach my $nrt_rep_file (sort keys %$nrt_rep_files) {
   push @$edges, [ $rt_rep_file, $nrt_rep_file, 3 ];
 }
-push @$edges, [ $rt_hh_file, $rt_rep_file, 4 ];
+if ($show_headers) {
+    push @$edges, [ $rt_hh_file, $rt_rep_file, 4 ];
+    push @$edges, [ $rt_o_file,   $rt_hh_file, 5 ];
+}
+
 push @$edges, [ $rt_cc_file, $rt_rep_file, 4 ];
-push @$edges, [ $rt_o_file,   $rt_hh_file, 5 ];
 push @$edges, [ $rt_o_file,   $rt_cc_file, 5 ];
 
 foreach my $o_file (sort keys %$o_files) {
@@ -106,10 +120,12 @@ print
   "  node  [ shape = rect, style = rounded, height = 0.25 ];\n" .
   "\n" .
   "  \"$result\" [ style = none ];\n" .
-  "\n" .
-  "  \"$rt_hh_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
-  "  \"$rt_cc_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
   "\n";
+if ($show_headers) {
+  print "  \"$rt_hh_file\" [ colorscheme = $colorscheme, color = 4 ];\n";
+}
+print "  \"$rt_cc_file\" [ colorscheme = $colorscheme, color = 4 ];\n";
+print "\n";
 
 foreach my $so_file (sort @$so_files) {
   print "  \"$so_file\" [ style = none ];\n";
@@ -128,9 +144,13 @@ foreach my $edge (sort @$edges) {
   }
   print ";\n"
 }
-print "  { rank = same";
+print
+  "\n" .
+  "  subgraph {\n" .
+  "    rank = same;\n" .
+  "\n";
 foreach my $input_file (sort @$input_files) {
-  print "; \"$input_file\"";
+  print "    \"$input_file\";\n";
 }
-print "; }\n";
+print "  }\n";
 print "}\n";
