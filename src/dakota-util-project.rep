@@ -1,6 +1,6 @@
 {
   'soname' => '$prefix/lib/libdakota-util.$SO_EXT',
-  'files' => [
+  'srcs' => [
     'ascii-number-klass.dk',
     'ascii-number.dk',
     'cstring.dk',

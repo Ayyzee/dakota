@@ -7,8 +7,8 @@ include $(rootdir)/vars.mk
 
 DAKOTA_VARS += DK_PREFIX=$(rootdir)
 
-dakota_util_files := $(shell $(rootdir)/bin/dakota-project files --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
-dakota_files :=      $(shell $(rootdir)/bin/dakota-project files --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
+dakota_util_files := $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
+dakota_files :=      $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
 
 dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
 dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))

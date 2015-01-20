@@ -16,8 +16,8 @@ my $SO_EXT = 'dylib';
 my $name = `../bin/dakota-project name --repository $project_file --var SO_EXT=$SO_EXT`;
 chomp $name;
 
-my $so_files = [split("\n", `../bin/dakota-project libs  --repository $project_file --var SO_EXT=$SO_EXT`)];
-my $dk_files = [split("\n", `../bin/dakota-project files --repository $project_file`)];
+my $so_files = [split("\n", `../bin/dakota-project libs --repository $project_file --var SO_EXT=$SO_EXT`)];
+my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $project_file`)];
 
 my $input_files = [ @$so_files, @$dk_files ];
 

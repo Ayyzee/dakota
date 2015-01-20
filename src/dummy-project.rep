@@ -1,6 +1,6 @@
 {
   'soname' => '$prefix/lib/libresult.$SO_EXT',
-  'files' => [
+  'srcs' => [
     'object.dk',
     'klass.dk',
     'table.dk',

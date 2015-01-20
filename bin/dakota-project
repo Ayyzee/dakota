@@ -25,7 +25,7 @@ my $subcmd_tbl = {
   'init' =>     \&subcmd_init,
   'add' =>      \&subcmd_add,
   'remove' =>   \&subcmd_remove,
-  'files' =>    \&subcmd_files,
+  'srcs' =>     \&subcmd_srcs,
   'libs' =>     \&subcmd_libs,
   'name' =>     \&subcmd_name,
   'set-name' => \&subcmd_set_name,
@@ -82,29 +82,29 @@ sub subcmd {
 sub subcmd_init {
   my ($rep, $args) = @_;
   $$rep{'name'} = shift @$args;
-  $$rep{'files'} = [];
+  $$rep{'srcs'} = [];
   $$rep{'libs'} = [];
   &subcmd_add($rep, $args);
   &rep_to_file($rep, $default_project_file);
 }
-sub subcmd_add_files {
+sub subcmd_add_srcs {
   my ($rep, $args) = @_;
-  die if !defined $$rep{'files'};
+  die if !defined $$rep{'srcs'};
   my $tbl = {};
-  foreach my $file (@{$$rep{'files'}}) {
-    $$tbl{$file} = 1;
+  foreach my $src (@{$$rep{'srcs'}}) {
+    $$tbl{$src} = 1;
   }
   foreach my $arg (@$args) {
     $$tbl{$arg} = 1;
   }
-  $$rep{'files'} = [sort keys %$tbl];
+  $$rep{'srcs'} = [sort keys %$tbl];
 }
 sub subcmd_add_libs {
   my ($rep, $args) = @_;
   die if !defined $$rep{'libs'};
   push @{$$rep{'libs'}}, @$args; # must maintain input order!
 }
-sub is_file {
+sub is_src {
   my ($arg) = @_;
   if ($arg =~ /\.(dk|c|cc|cxx|c\+\+)$/) {
     return 1;
@@ -114,16 +114,16 @@ sub is_file {
 }
 sub subcmd_add {
   my ($rep, $args) = @_;
-  my $files = [];
+  my $srcs = [];
   my $libs = [];
   foreach my $arg (@$args) {
-    if (&is_file($arg)) {
-      push @$files, $arg;
+    if (&is_src($arg)) {
+      push @$srcs, $arg;
     } else {
       push @$libs, $arg; # must maintain input order!
     }
   }
-  &subcmd_add_files($rep, $files);
+  &subcmd_add_srcs($rep, $srcs);
   &subcmd_add_libs($rep, $libs);
   &rep_to_file($rep);
 }
@@ -140,23 +140,23 @@ sub remove_from_seq {
 }
 sub subcmd_remove {
   my ($rep, $args) = @_;
-  die if !defined $$rep{'files'};
+  die if !defined $$rep{'srcs'};
   die if !defined $$rep{'libs'};
   my $tbl = {};
-  foreach my $file (@{$$rep{'files'}}) {
-    my $sfile = &subst($file, $$opts{'var'});
-    $$tbl{$sfile} = $file;
+  foreach my $src (@{$$rep{'srcs'}}) {
+    my $ssrc = &subst($src, $$opts{'var'});
+    $$tbl{$ssrc} = $src;
   }
   foreach my $arg (@$args) {
     my $sarg = &subst($arg, $$opts{'var'});
 
-    if (&is_file($sarg)) {
+    if (&is_src($sarg)) {
       delete $$tbl{$sarg};
     } else {
       &remove_from_seq($$rep{'libs'}, $arg);
     }
   }
-  $$rep{'files'} = [sort values %$tbl];
+  $$rep{'srcs'} = [sort values %$tbl];
   &rep_to_file($rep);
 }
 sub subst {
@@ -169,25 +169,25 @@ sub subst {
   }
   return $string
 }
-sub subcmd_files {
+sub subcmd_srcs {
   my ($rep, $args) = @_;
-  my $files = '';
-  if ($$rep{'files'}) {
+  my $srcs = '';
+  if ($$rep{'srcs'}) {
     my $cwd = '';
     if ($$opts{'abs-path'}) {
       $cwd = getcwd;
       $cwd .= '/';
     }
 
-    foreach my $file (@{$$rep{'files'}}) {
-      $file = &subst($file, $$opts{'var'});
-      if ($file !~ "^/") {
-        $files .= $cwd;
+    foreach my $src (@{$$rep{'srcs'}}) {
+      $src = &subst($src, $$opts{'var'});
+      if ($src !~ "^/") {
+        $srcs .= $cwd;
       }
-      $files .= "$file\n";
+      $srcs .= "$src\n";
     }
   }
-  print $files;
+  print $srcs;
 }
 sub subcmd_libs {
   my ($rep, $args) = @_;
