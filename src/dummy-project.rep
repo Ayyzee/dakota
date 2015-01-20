@@ -6,9 +6,9 @@
     'table.dk',
     'set.dk'
   ],
-  'name' => 'result.$SO_EXT',
+  'name' => 'lib/libresult.$SO_EXT',
   'libs' => [
-    'libthis.$SO_EXT',
-    'libthat.$SO_EXT'
+    '/usr/lib/libthis.$SO_EXT',
+    '/usr/lib/libthat.$SO_EXT'
   ]
 }

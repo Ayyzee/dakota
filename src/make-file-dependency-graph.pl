@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Data::Dumper;
+
 die "Too many args." if @ARGV > 1;
 
 my $project_file = 'dummy-project.rep';
@@ -11,11 +13,19 @@ if (@ARGV == 1) {
   $project_file = $ARGV[0];
 }
 
-my $SO_EXT = 'dylib';
-my $colorscheme = 'dark26'; # needs to have 6 or more colors
+sub rdir_name_ext {
+  my ($path) = @_;
+  $path =~ m|^/?((.+)/)?(.*?)\.(.*)$|;
+  my ($rdir, $name, $ext) = ($2, $3, $4);
+  die "Error parsing path '$path'" if !$name;
+  return ($rdir ||= '', $name, $ext ||= '');
+}
 
-my $name = `../bin/dakota-project name --repository $project_file --var SO_EXT=$SO_EXT`;
-chomp $name;
+my $SO_EXT = 'dylib';
+my $colorscheme = 'dark26'; # needs to have 5 or more colors
+
+my $so_file = `../bin/dakota-project name --repository $project_file --var SO_EXT=$SO_EXT`;
+chomp $so_file;
 
 my $so_files = [split("\n", `../bin/dakota-project libs --repository $project_file --var SO_EXT=$SO_EXT`)];
 my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $project_file`)];
@@ -26,86 +36,87 @@ my $nrt_rep_files = {};
 my $o_files = {};
 my $edges = [];
 my $nrt_src_files = {};
-my $dk_cxx_files = {};
+my $dk_cc_files = {};
 
-my $bname = $name; $bname =~ s/\.$SO_EXT$//;
-my $rt_rep_file = "rt/lib$bname.rep";
-my $rt_hxx_file = "rt/lib$bname.hh";
-my $rt_cxx_file = "rt/lib$bname.cc";
-my $rt_o_file =   "rt/lib$bname.o";
-my $rt_so_file =  "rt/lib$bname.$SO_EXT";
+my $obj = 'obj';
 
-my $rt_files = { $rt_hxx_file => undef,
-                 $rt_cxx_file => undef };
+my ($rdir, $name, $ext) = &rdir_name_ext($so_file);
+my $rt_rep_file = "$obj/rt/$name.rep";
+my $rt_hh_file =  "$obj/rt/$name.hh";
+my $rt_cc_file =  "$obj/rt/$name.cc";
+my $rt_o_file =   "$obj/rt/$name.o";
+
+my $rt_files = { $rt_hh_file => undef,
+                 $rt_cc_file => undef };
 foreach my $so_file (@$so_files) {
-  my $ctlg_file = "$so_file.ctlg";
-  my $rep_file = "$ctlg_file.rep";
+  my ($rdir, $name, $ext) = &rdir_name_ext($so_file);
+  my $ctlg_file = "$obj/$rdir/$name.ctlg";
+  my $rep_file =  "$obj/$rdir/$name.rep";
 
   push @$edges, [ $ctlg_file,   $so_file,   1 ];
   push @$edges, [ $rep_file,    $ctlg_file, 2 ];
   push @$edges, [ $rt_rep_file, $rep_file,  3 ];
 }
 foreach my $dk_file (@$dk_files) {
-  my $bfile = $dk_file; $bfile =~ s/\.dk$//;
+  my ($rdir, $name, $ext) = &rdir_name_ext($dk_file);
+  my $nrt_rep_file = "$obj/$rdir/$name.rep";
+  my $dk_cc_file =   "$obj/$rdir/$name.cc";
+  my $nrt_hh_file =  "$obj/nrt/$rdir/$name.hh";
+  my $nrt_cc_file =  "$obj/nrt/$rdir/$name.cc";
+  my $nrt_o_file =   "$obj/nrt/$rdir/$name.o";
 
-  my $nrt_rep_file = "$dk_file.rep";
-  my $dk_cxx_file =  "$dk_file.cc";
-  my $nrt_hxx_file = "nrt/$bfile.hh";
-  my $nrt_cxx_file = "nrt/$bfile.cc";
-  my $nrt_o_file =   "nrt/$bfile.o";
+  $$dk_cc_files{$dk_cc_file} = undef;
 
-  $$dk_cxx_files{$dk_cxx_file} = undef;
-
-  $$nrt_src_files{$dk_cxx_file} = undef;
-  $$nrt_src_files{$nrt_hxx_file} = undef;
-  $$nrt_src_files{$nrt_cxx_file} = undef;
+  $$nrt_src_files{$dk_cc_file} = undef;
+  $$nrt_src_files{$nrt_hh_file} = undef;
+  $$nrt_src_files{$nrt_cc_file} = undef;
 
   $$nrt_rep_files{$nrt_rep_file} = undef;
   $$o_files{$nrt_o_file} = undef;
 
-  push @$edges, [ $nrt_rep_file, $dk_file,     1 ];
-  push @$edges, [ $dk_cxx_file,  $dk_file,     4 ];
-  push @$edges, [ $dk_cxx_file,  $rt_rep_file, 0 ]; # black, dashed
-  push @$edges, [ $nrt_o_file,   $dk_cxx_file, 5 ];
+  push @$edges, [ $nrt_rep_file, $dk_file,    1 ];
+  push @$edges, [ $dk_cc_file,  $dk_file,     4 ];
+  push @$edges, [ $dk_cc_file,  $rt_rep_file, 0 ]; # gray, dashed
+  push @$edges, [ $nrt_o_file,   $dk_cc_file, 5 ];
 
-  push @$edges, [ $nrt_hxx_file, $rt_rep_file, 0 ]; # black, dashed
-  push @$edges, [ $nrt_cxx_file, $rt_rep_file, 0 ]; # black, dashed
+  push @$edges, [ $nrt_hh_file, $rt_rep_file, 0 ]; # gray, dashed
+  push @$edges, [ $nrt_cc_file, $rt_rep_file, 0 ]; # gray, dashed
 
-  push @$edges, [ $nrt_hxx_file, $nrt_rep_file, 4 ];
-  push @$edges, [ $nrt_cxx_file, $nrt_rep_file, 4 ];
-  push @$edges, [ $nrt_o_file,   $nrt_hxx_file, 5 ];
-  push @$edges, [ $nrt_o_file,   $nrt_cxx_file, 5 ];
+  push @$edges, [ $nrt_hh_file, $nrt_rep_file, 4 ];
+  push @$edges, [ $nrt_cc_file, $nrt_rep_file, 4 ];
+  push @$edges, [ $nrt_o_file,   $nrt_hh_file, 5 ];
+  push @$edges, [ $nrt_o_file,   $nrt_cc_file, 5 ];
 }
 foreach my $nrt_rep_file (sort keys %$nrt_rep_files) {
   push @$edges, [ $rt_rep_file, $nrt_rep_file, 3 ];
 }
-push @$edges, [ $rt_hxx_file, $rt_rep_file, 4 ];
-push @$edges, [ $rt_cxx_file, $rt_rep_file, 4 ];
-push @$edges, [ $rt_o_file,   $rt_hxx_file, 5 ];
-push @$edges, [ $rt_o_file,   $rt_cxx_file, 5 ];
+push @$edges, [ $rt_hh_file, $rt_rep_file, 4 ];
+push @$edges, [ $rt_cc_file, $rt_rep_file, 4 ];
+push @$edges, [ $rt_o_file,   $rt_hh_file, 5 ];
+push @$edges, [ $rt_o_file,   $rt_cc_file, 5 ];
 
 foreach my $o_file (sort keys %$o_files) {
-  push @$edges, [ $rt_so_file, $o_file, 6 ];
+  push @$edges, [ $so_file, $o_file, 0 ]; # black indicates no concurrency (linking)
 }
-push @$edges, [ $rt_so_file, $rt_o_file, 6 ];
+push @$edges, [ $so_file, $rt_o_file, 0 ]; # black indicates no concurrency (linking)
 print
   "digraph {\n" .
   "  graph [ rankdir = RL, center = true, page = \"8.5,11\", size = \"7.5,10\" ];\n" .
   "  edge  [ ];\n" .
   "  node  [ shape = rect, style = rounded, height = 0.25 ];\n" .
   "\n" .
-  "  \"$rt_so_file\" [ style = none ];\n" .
+  "  \"$so_file\" [ style = none ];\n" .
   "\n" .
-  "  \"$rt_hxx_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
-  "  \"$rt_cxx_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
+  "  \"$rt_hh_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
+  "  \"$rt_cc_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
   "\n";
 
 foreach my $so_file (sort @$so_files) {
   print "  \"$so_file\" [ style = none ];\n";
 }
 print "\n";
-foreach my $dk_cxx_file (sort keys %$dk_cxx_files) {
-  print "  \"$dk_cxx_file\" [ style = \"rounded,bold\" ];\n";
+foreach my $dk_cc_file (sort keys %$dk_cc_files) {
+  print "  \"$dk_cc_file\" [ style = \"rounded,bold\" ];\n";
 }
 print "\n";
 foreach my $edge (sort @$edges) {
