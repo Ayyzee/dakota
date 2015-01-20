@@ -24,8 +24,8 @@ sub rdir_name_ext {
 my $SO_EXT = 'dylib';
 my $colorscheme = 'dark26'; # needs to have 5 or more colors
 
-my $so_file = `../bin/dakota-project name --repository $project_file --var SO_EXT=$SO_EXT`;
-chomp $so_file;
+my $result = `../bin/dakota-project name --repository $project_file --var SO_EXT=$SO_EXT`;
+chomp $result;
 
 my $so_files = [split("\n", `../bin/dakota-project libs --repository $project_file --var SO_EXT=$SO_EXT`)];
 my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $project_file`)];
@@ -40,7 +40,7 @@ my $dk_cc_files = {};
 
 my $obj = 'obj';
 
-my ($rdir, $name, $ext) = &rdir_name_ext($so_file);
+my ($rdir, $name, $ext) = &rdir_name_ext($result);
 my $rt_rep_file = "$obj/rt/$name.rep";
 my $rt_hh_file =  "$obj/rt/$name.hh";
 my $rt_cc_file =  "$obj/rt/$name.cc";
@@ -96,16 +96,16 @@ push @$edges, [ $rt_o_file,   $rt_hh_file, 5 ];
 push @$edges, [ $rt_o_file,   $rt_cc_file, 5 ];
 
 foreach my $o_file (sort keys %$o_files) {
-  push @$edges, [ $so_file, $o_file, 0 ]; # black indicates no concurrency (linking)
+  push @$edges, [ $result, $o_file, 0 ]; # black indicates no concurrency (linking)
 }
-push @$edges, [ $so_file, $rt_o_file, 0 ]; # black indicates no concurrency (linking)
+push @$edges, [ $result, $rt_o_file, 0 ]; # black indicates no concurrency (linking)
 print
   "digraph {\n" .
   "  graph [ rankdir = RL, center = true, page = \"8.5,11\", size = \"7.5,10\" ];\n" .
   "  edge  [ ];\n" .
   "  node  [ shape = rect, style = rounded, height = 0.25 ];\n" .
   "\n" .
-  "  \"$so_file\" [ style = none ];\n" .
+  "  \"$result\" [ style = none ];\n" .
   "\n" .
   "  \"$rt_hh_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
   "  \"$rt_cc_file\" [ colorscheme = $colorscheme, color = 4 ];\n" .
