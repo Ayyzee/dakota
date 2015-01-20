@@ -128,10 +128,13 @@ sub subcmd_add {
   &rep_to_file($rep);
 }
 sub remove_from_seq {
-  my ($seq, $arg) = @_;
+  my ($seq, $sarg) = @_;
   for (my $i = @$seq - 1; $i >= 0; $i--) {
-    if ($$seq[$i] eq $arg) {
-      delete $$seq[$i];
+    my $element = $$seq[$i];
+    my $selement = &subst($element, $$opts{'var'});
+
+    if ($selement eq $sarg) {
+      splice(@$seq, $i ,1)
     }
   }
 }
@@ -141,16 +144,19 @@ sub subcmd_remove {
   die if !defined $$rep{'libs'};
   my $tbl = {};
   foreach my $file (@{$$rep{'files'}}) {
-    $$tbl{$file} = 1;
+    my $sfile = &subst($file, $$opts{'var'});
+    $$tbl{$sfile} = $file;
   }
   foreach my $arg (@$args) {
-    if (&is_file($arg)) {
-      delete $$tbl{$arg};
+    my $sarg = &subst($arg, $$opts{'var'});
+
+    if (&is_file($sarg)) {
+      delete $$tbl{$sarg};
     } else {
       &remove_from_seq($$rep{'libs'}, $arg);
     }
   }
-  $$rep{'files'} = [sort keys %$tbl];
+  $$rep{'files'} = [sort values %$tbl];
   &rep_to_file($rep);
 }
 sub subst {
@@ -192,9 +198,9 @@ sub subcmd_libs {
       $cwd = getcwd;
       $cwd .= '/';
     }
-
     foreach my $lib (@{$$rep{'libs'}}) {
       $lib = &subst($lib, $$opts{'var'});
+
       if ($lib !~ "^/") {
         $libs .= $cwd;
       }
