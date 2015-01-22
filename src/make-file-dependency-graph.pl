@@ -10,6 +10,10 @@ use strict;
 use warnings;
 
 use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Indent    = 1;   # default = 2
 
 die "Too many args." if @ARGV > 1;
 
@@ -24,9 +28,8 @@ sub rdir_name_ext {
   $path =~ m|^/?((.+)/)?(.*?)\.(.*)$|;
   my ($rdir, $name, $ext) = ($2, $3, $4);
   die "Error parsing path '$path'" if !$name;
-  return ($rdir ||= '', $name, $ext ||= '');
+  return ($rdir ||= '.', $name, $ext ||= '');
 }
-
 my $SO_EXT = 'dylib';
 my $colorscheme = 'dark26'; # needs to have 5 or more colors
 my $show_headers = 0;
@@ -69,7 +72,7 @@ my $rt_o_file =   "$obj/rt/$rdir/$name.o";
 my $rt_files = {};
 
 if ($show_headers) {
-    $$rt_files{$rt_hh_file} = undef;
+  $$rt_files{$rt_hh_file} = undef;
 }
 $$rt_files{$rt_cc_file} = undef;
 
@@ -122,8 +125,8 @@ foreach my $nrt_rep_file (sort keys %$nrt_rep_files) {
   &add_edge($edges, $rt_rep_file, $nrt_rep_file, 3);
 }
 if ($show_headers) {
-    &add_edge($edges, $rt_hh_file, $rt_rep_file, 4);
-    &add_edge($edges, $rt_o_file,   $rt_hh_file, 5);
+  &add_edge($edges, $rt_hh_file, $rt_rep_file, 4);
+  &add_edge($edges, $rt_o_file,   $rt_hh_file, 5);
 }
 
 &add_edge($edges, $rt_cc_file, $rt_rep_file, 4);
@@ -178,3 +181,18 @@ foreach my $input_file (sort @$input_files) {
 }
 print "  }\n";
 print "}\n";
+
+my ($rdir, $name, $ext) = &rdir_name_ext($project_file);
+my $make_targets = "$rdir/$name.mk";
+
+open FILE, ">$make_targets" or die __FILE__, ":", __LINE__, ": ERROR: $make_targets: $!\n";
+foreach my $e1 (sort keys %$edges) {
+  print FILE "$e1:\\\n";
+  my ($e2, $attr);
+  foreach my $e2 (sort keys %{$$edges{$e1}}) {
+    #my $attr = $$edges{$e1}{$e2};
+    print FILE " $e2\\\n";
+  }
+  print FILE "#\n"
+}
+close FILE;
