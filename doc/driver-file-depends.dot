@@ -15,11 +15,14 @@
 digraph "driver-file-depends"
 {
   graph [ label = "\G", fontcolor = red ];
-  graph [ rankdir = TB, rotate = 0, center = true,
+  graph [ rankdir = LR, rotate = 0, center = true,
         page = "8.5,11", size = "7.5,10" ];
   edge [ dir = back ];
   node [ shape = box, style = rounded, width = "1.25" ];
 
+  "x1.cc" [ style = "rounded,bold" ];
+  "x2.cc" [ style = "rounded,bold" ];
+  
   subgraph "cluster-detail"
   {
     graph [ label = "" ];
@@ -33,7 +36,7 @@ digraph "driver-file-depends"
     "x1.dk.rep" -> "z.rep";
     "x2.dk.rep" -> "z.rep";
 
-    "z.rep" [ color = green ];
+    "rt/z.cc" [ color = purple ];
 
     {
       rank = same;
@@ -54,6 +57,8 @@ digraph "driver-file-depends"
 
   "x1.dk" -> "x1.cc";
   "x2.dk" -> "x2.cc";
+  "z.rep" -> "x1.cc";
+  "z.rep" -> "x2.cc";
 
   "x1.cc" -> "nrt/x1.cc";
   "x2.cc" -> "nrt/x2.cc";
@@ -76,12 +81,12 @@ digraph "driver-file-depends"
   "nrt/x2.o" -> "z.so";
   "rt/z.o" ->  "z.so";
 
-  "x1.dk" [ color = blue ];
-  "x2.dk" [ color = blue ];
+  "x1.dk";
+  "x2.dk";
 
-  "y1.so" [ color = yellow ];
-  "y2.so" [ color = yellow ];
-  "z.so"  [ color = yellow ];
+  "y1.so" [ style = none ];
+  "y2.so" [ style = none ];
+  "z.so"  [ style = none ];
 
   {
     rank = same;

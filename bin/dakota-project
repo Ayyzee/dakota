@@ -7,6 +7,7 @@
 # -*- cperl-tab-always-indent: t -*-
 
 use strict;
+use warnings;
 use Cwd;
 
 use Data::Dumper;
