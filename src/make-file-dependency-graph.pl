@@ -35,6 +35,16 @@ sub rdir_name_ext {
   die "Error parsing path '$path'" if !$name || !$ext;;
   return ($rdir ||= '.', $name, $ext);
 }
+sub add_edge {
+  my ($tbl, $e1, $e2, $attr) = @_;
+
+  if (!exists $$tbl{$e1}) {
+    $$tbl{$e1} = {};
+  }
+  if (!exists $$tbl{$e1}{$e2}) {
+    $$tbl{$e1}{$e2} = $attr;
+  }
+}
 sub start {
   my ($opts, $repository) = @_;
 
@@ -49,18 +59,6 @@ sub start {
   my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $repository`)];
 
   my $input_files = [ @$so_files, @$dk_files ];
-
-  sub add_edge
-    {
-      my ($tbl, $e1, $e2, $attr) = @_;
-
-      if (!exists $$tbl{$e1}) {
-        $$tbl{$e1} = {};
-      }
-      if (!exists $$tbl{$e1}{$e2}) {
-        $$tbl{$e1}{$e2} = $attr;
-      }
-    }
 
   my $edges = {};
 
@@ -147,72 +145,71 @@ sub start {
   $filestr .=
       "digraph \"$graph_name\" {\n" .
       "  graph [ label = \"\\G\", fontcolor = red ];\n" .
-      "  graph [ page = \"8.5,11\", size = \"7.5,10\" ];\n" .
+     #"  graph [ page = \"8.5,11\", size = \"7.5,10\", center = true ];\n" .
       "  graph [ rankdir = RL ];\n" .
-      "  edge  [ ];\n" .
+      "  edge  [ colorscheme = $colorscheme ];\n" .
       "  node  [ shape = rect, style = rounded, height = 0.25 ];\n" .
       "\n" .
       "  \"$result\" [ style = none ];\n" .
       "\n";
-if ($show_headers) {
-  $filestr .= "  \"$rt_hh_file\" [ colorscheme = $colorscheme, color = 4 ];\n";
-}
-$filestr .= "  \"$rt_cc_file\" [ colorscheme = $colorscheme, color = 4 ];\n";
-$filestr .= "\n";
+  if ($show_headers) {
+    $filestr .= "  \"$rt_hh_file\" [ colorscheme = $colorscheme, color = 4 ];\n";
+  }
+  $filestr .= "  \"$rt_cc_file\" [ colorscheme = $colorscheme, color = 4 ];\n";
+  $filestr .= "\n";
 
-foreach my $so_file (sort @$so_files) {
-  $filestr .= "  \"$so_file\" [ style = none ];\n";
-}
-$filestr .= "\n";
-foreach my $dk_cc_file (sort keys %$dk_cc_files) {
-  $filestr .= "  \"$dk_cc_file\" [ style = \"rounded,bold\" ];\n";
-}
-$filestr .= "\n";
-foreach my $e1 (sort keys %$edges) {
-  my ($e2, $attr);
-  while (($e2, $attr) = each %{$$edges{$e1}}) {
-    $filestr .= "  \"$e1\" -> \"$e2\"";
-    if (exists $$nrt_src_files{$e1} && $rt_rep_file eq $e2) {
-      $filestr .= " [ style = dashed, color = gray ]";
-    } elsif ($attr) {
-      $filestr .= " [ colorscheme = $colorscheme, color = $attr ]";
+  foreach my $so_file (sort @$so_files) {
+    $filestr .= "  \"$so_file\" [ style = none ];\n";
+  }
+  $filestr .= "\n";
+  foreach my $dk_cc_file (sort keys %$dk_cc_files) {
+    $filestr .= "  \"$dk_cc_file\" [ style = \"rounded,bold\" ];\n";
+  }
+  $filestr .= "\n";
+  foreach my $e1 (sort keys %$edges) {
+    my ($e2, $attr);
+    while (($e2, $attr) = each %{$$edges{$e1}}) {
+      $filestr .= "  \"$e1\" -> \"$e2\"";
+      if (exists $$nrt_src_files{$e1} && $rt_rep_file eq $e2) {
+        $filestr .= " [ style = dashed, color = gray ]";
+      } elsif ($attr) {
+        $filestr .= " [ color = $attr ]";
+      }
+      $filestr .= ";\n"
     }
-    $filestr .= ";\n"
   }
-}
-$filestr .=
-  "\n" .
-  "  subgraph {\n" .
-  "    rank = same;\n" .
-  "\n";
-foreach my $input_file (sort @$input_files) {
-  $filestr .= "    \"$input_file\";\n";
-}
-$filestr .= "  }\n";
-$filestr .= "}\n";
-
-if ($$opts{'output'}) {
-  open OUTPUT, ">$$opts{'output'}" or die __FILE__, ":", __LINE__, ": ERROR: $$opts{'output'}: $!\n";
-  print OUTPUT $filestr;
-  close OUTPUT;
-} else {
-  print $filestr;
-}
-
-($rdir, $name, $ext) = &rdir_name_ext($repository);
-my $make_targets = "$rdir/$name.mk";
-
-open FILE, ">$make_targets" or die __FILE__, ":", __LINE__, ": ERROR: $make_targets: $!\n";
-foreach my $e1 (sort keys %$edges) {
-  print FILE "$e1:\\\n";
-  my ($e2, $attr);
-  foreach my $e2 (sort keys %{$$edges{$e1}}) {
-    #my $attr = $$edges{$e1}{$e2};
-    print FILE " $e2\\\n";
+  $filestr .=
+      "\n" .
+      "  subgraph {\n" .
+      "    rank = same;\n" .
+      "\n";
+  foreach my $input_file (sort @$input_files) {
+    $filestr .= "    \"$input_file\";\n";
   }
-  print FILE "#\n"
-}
-close FILE;
+  $filestr .= "  }\n";
+  $filestr .= "}\n";
+
+  if ($$opts{'output'}) {
+    open OUTPUT, ">$$opts{'output'}" or die __FILE__, ":", __LINE__, ": ERROR: $$opts{'output'}: $!\n";
+    print OUTPUT $filestr;
+    close OUTPUT;
+  } else {
+    print $filestr;
+  }
+  ($rdir, $name, $ext) = &rdir_name_ext($repository);
+  my $make_targets = "$rdir/$name.mk";
+
+  open FILE, ">$make_targets" or die __FILE__, ":", __LINE__, ": ERROR: $make_targets: $!\n";
+  foreach my $e1 (sort keys %$edges) {
+    print FILE "$e1:\\\n";
+    my ($e2, $attr);
+    foreach my $e2 (sort keys %{$$edges{$e1}}) {
+      #my $attr = $$edges{$e1}{$e2};
+      print FILE " $e2\\\n";
+    }
+    print FILE "#\n"
+  }
+  close FILE;
 }
 
 unless (caller) {
