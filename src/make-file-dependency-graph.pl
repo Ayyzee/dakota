@@ -35,6 +35,10 @@ sub rdir_name_ext {
   die "Error parsing path '$path'" if !$name || !$ext;;
   return ($rdir ||= '.', $name, $ext);
 }
+sub add_node {
+  my ($tbl, $n, $attrs) = @_;
+  
+}
 sub add_edge {
   my ($tbl, $e1, $e2, $attr) = @_;
 
@@ -60,7 +64,10 @@ sub start {
 
   my $input_files = [ @$so_files, @$dk_files ];
 
-  my $edges = {};
+  my $graph = { 'nodes' => {}, 'edges' => {}, 'subgraphs' => {} };
+  my $nodes = $$graph{'nodes'}; # tmp
+  my $edges = $$graph{'edges'}; # tmp
+  my $subgraphs = $$graph{'subgraphs'}; # tmp
 
   ($rdir, $name, $ext) = &rdir_name_ext($result);
   my $rt_rep_file = &path("$obj/rt/$rdir/$name.rep");
@@ -72,13 +79,18 @@ sub start {
 
   if ($show_headers) {
     $$rt_files{$rt_hh_file} = undef;
+    $$graph{'nodes'}{$rt_hh_file}{'colorscheme'} = $colorscheme;
+    $$graph{'nodes'}{$rt_hh_file}{'color'} = 4;
   }
   $$rt_files{$rt_cc_file} = undef;
+  $$graph{'nodes'}{$rt_cc_file}{'colorscheme'} = $colorscheme;
+  $$graph{'nodes'}{$rt_cc_file}{'color'} = 4;
 
   foreach my $so_file (@$so_files) {
     my ($rdir, $name, $ext) = &rdir_name_ext($so_file);
     my $ctlg_file = &path("$obj/$rdir/$name.ctlg");
     my $rep_file =  &path("$obj/$rdir/$name.rep");
+    &add_node($nodes, $so_file, { 'style' => 'none' });
 
     &add_edge($edges, $ctlg_file,   $so_file,   { 'color' => 1 });
     &add_edge($edges, $rep_file,    $ctlg_file, { 'color' => 2 });
@@ -96,6 +108,8 @@ sub start {
     my $nrt_hh_file =  &path("$obj/nrt/$rdir/$name.hh");
     my $nrt_cc_file =  &path("$obj/nrt/$rdir/$name.cc");
     my $nrt_o_file =   &path("$obj/nrt/$rdir/$name.o");
+
+    &add_node($nodes, $dk_cc_file, { 'style' => "rounded,bold" });;
 
     $$dk_cc_files{$dk_cc_file} = undef;
 
@@ -140,7 +154,7 @@ sub start {
     &add_edge($edges, $result, $o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
   }
   &add_edge($edges, $result, $rt_o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
-
+  ########################
   my $filestr = '';
   $filestr .=
       "digraph \"$graph_name\" {\n" .
@@ -185,7 +199,7 @@ sub start {
   $filestr .=
       "\n" .
       "  subgraph {\n" .
-      "    rank = same;\n" .
+      "    graph  [ rank = same ];\n" .
       "\n";
   foreach my $input_file (sort @$input_files) {
     $filestr .= "    \"$input_file\";\n";
@@ -200,10 +214,11 @@ sub start {
   } else {
     print $filestr;
   }
+
   ($rdir, $name, $ext) = &rdir_name_ext($repository);
   my $make_targets = "$rdir/$name.mk";
-
   open FILE, ">$make_targets" or die __FILE__, ":", __LINE__, ": ERROR: $make_targets: $!\n";
+
   foreach my $e1 (sort keys %$edges) {
     print FILE "$e1:\\\n";
     my ($e2, $attr);
@@ -214,6 +229,12 @@ sub start {
     print FILE "#\n"
   }
   close FILE;
+
+  ($rdir, $name, $ext) = &rdir_name_ext($repository);
+  my $data = "$rdir/$name.data";
+  open DATA, ">$data" or die __FILE__, ":", __LINE__, ": ERROR: $data: $!\n";
+  print DATA &Dumper($graph);
+  close DATA;
 }
 
 unless (caller) {
