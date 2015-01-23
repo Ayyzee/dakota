@@ -15,101 +15,86 @@
 digraph "driver-file-depends"
 {
   graph [ label = "\G", fontcolor = red ];
-  graph [ rankdir = LR, rotate = 0, center = true,
-        page = "8.5,11", size = "7.5,10" ];
+  graph [ rankdir = LR ];
   edge [ dir = back ];
-  node [ shape = box, style = rounded, width = "1.25" ];
+  node [ shape = rect, style = rounded ];
 
-  "x1.cc" [ style = "rounded,bold" ];
-  "x2.cc" [ style = "rounded,bold" ];
+  "x.cc" [ style = "rounded,bold" ];
+  "y.cc" [ style = "rounded,bold" ];
   
   subgraph "cluster-detail"
   {
     graph [ label = "" ];
 
-    "y1.so.ctlg" -> "y1.so.ctlg.rep";
-    "y2.so.ctlg" -> "y2.so.ctlg.rep";
+    "a.ctlg" -> "a.rep";
+    "b.ctlg" -> "b.rep";
 
-    "y1.so.ctlg.rep" -> "z.rep";
-    "y2.so.ctlg.rep" -> "z.rep";
+    "a.rep" -> "z.rep";
+    "b.rep" -> "z.rep";
 
-    "x1.dk.rep" -> "z.rep";
-    "x2.dk.rep" -> "z.rep";
+    "x.rep" -> "z.rep";
+    "y.rep" -> "z.rep";
 
     "rt/z.cc" [ color = purple ];
-
+    subgraph
     {
       rank = same;
-      "y1.so.ctlg";
-      "y2.so.ctlg";
-    }
-    {
-      rank = same;
-      "x1.dk.rep";
-      "x2.dk.rep";
-      "y1.so.ctlg.rep";
-      "y2.so.ctlg.rep";
+      "x.rep";
+      "y.rep";
+      "a.rep";
+      "b.rep";
     }
   }
 
-  "x1.dk" -> "x1.dk.rep" [ weight = 2 ];
-  "x2.dk" -> "x2.dk.rep" [ weight = 2 ];
+  "x.dk" -> "x.rep" [ weight = 2 ];
+  "y.dk" -> "y.rep" [ weight = 2 ];
 
-  "x1.dk" -> "x1.cc";
-  "x2.dk" -> "x2.cc";
-  "z.rep" -> "x1.cc";
-  "z.rep" -> "x2.cc";
+  "x.dk" -> "x.cc";
+  "y.dk" -> "y.cc";
+  "z.rep" -> "x.cc";
+  "z.rep" -> "y.cc";
 
-  "x1.cc" -> "nrt/x1.cc";
-  "x2.cc" -> "nrt/x2.cc";
+  "x.cc" -> "nrt/x.cc";
+  "y.cc" -> "nrt/y.cc";
 
-  "y1.so" -> "y1.so.ctlg"
-  "y2.so" -> "y2.so.ctlg"
+  "a.so" -> "a.ctlg"
+  "b.so" -> "b.ctlg"
 
-  "z.rep" -> "nrt/x1.cc";
-  "z.rep" -> "nrt/x2.cc";
+  "z.rep" -> "nrt/x.cc";
+  "z.rep" -> "nrt/y.cc";
   "z.rep" -> "rt/z.cc";
 
-  "x1.dk.rep" -> "nrt/x1.cc" [ weight = 2 ];
-  "x2.dk.rep" -> "nrt/x2.cc" [ weight = 2 ];
+  "x.rep" -> "nrt/x.cc" [ weight = 2 ];
+  "y.rep" -> "nrt/y.cc" [ weight = 2 ];
 
-  "nrt/x1.cc" -> "nrt/x1.o" [ weight = 2 ];
-  "nrt/x2.cc" -> "nrt/x2.o" [ weight = 2 ];
+  "nrt/x.cc" -> "nrt/x.o" [ weight = 2 ];
+  "nrt/y.cc" -> "nrt/y.o" [ weight = 2 ];
   "rt/z.cc" -> "rt/z.o";
 
-  "nrt/x1.o" -> "z.so";
-  "nrt/x2.o" -> "z.so";
+  "nrt/x.o" -> "z.so";
+  "nrt/y.o" -> "z.so";
   "rt/z.o" ->  "z.so";
 
-  "x1.dk";
-  "x2.dk";
+  "x.dk";
+  "y.dk";
 
-  "y1.so" [ style = none ];
-  "y2.so" [ style = none ];
+  "a.so" [ style = none ];
+  "b.so" [ style = none ];
   "z.so"  [ style = none ];
 
+  subgraph
   {
     rank = same;
-    "x1.cc";
-    "x2.cc";
+    "x.dk";
+    "y.dk";
+    "a.so";
+    "b.so";
   }
+  subgraph
   {
     rank = same;
-    "x1.dk";
-    "x2.dk";
-    "y1.so";
-    "y2.so";
-  }
-  {
-    rank = same;
-    "nrt/x1.cc";
-    "nrt/x2.cc";
+    "nrt/x.cc";
+    "nrt/y.cc";
     "rt/z.cc";
-  }
-  {
-    rank = same;
-    "nrt/x1.o";
-    "nrt/x2.o";
-    "rt/z.o";
   }
 }
