@@ -80,9 +80,9 @@ sub start {
     my $ctlg_file = &path("$obj/$rdir/$name.ctlg");
     my $rep_file =  &path("$obj/$rdir/$name.rep");
 
-    &add_edge($edges, $ctlg_file,   $so_file,   1);
-    &add_edge($edges, $rep_file,    $ctlg_file, 2);
-    &add_edge($edges, $rt_rep_file, $rep_file,  3);
+    &add_edge($edges, $ctlg_file,   $so_file,   { 'color' => 1 });
+    &add_edge($edges, $rep_file,    $ctlg_file, { 'color' => 2 });
+    &add_edge($edges, $rt_rep_file, $rep_file,  { 'color' => 3 });
   }
   my $dk_cc_files = {};
   my $nrt_rep_files = {};
@@ -108,38 +108,38 @@ sub start {
     $$nrt_rep_files{$nrt_rep_file} = undef;
     $$o_files{$nrt_o_file} = undef;
 
-    &add_edge($edges, $nrt_rep_file, $dk_file,     1);
-    &add_edge($edges, $dk_cc_file,   $dk_file,     4);
+    &add_edge($edges, $nrt_rep_file, $dk_file,     { 'color' => 1 });
+    &add_edge($edges, $dk_cc_file,   $dk_file,     { 'color' => 4 });
     if (1) {
-      &add_edge($edges, $dk_cc_file,   $rt_rep_file, 0); # gray, dashed
-      &add_edge($edges, $nrt_cc_file,  $rt_rep_file, 0); # gray, dashed
+      &add_edge($edges, $dk_cc_file,   $rt_rep_file, { 'color' => 0 }); # gray, dashed
+      &add_edge($edges, $nrt_cc_file,  $rt_rep_file, { 'color' => 0 }); # gray, dashed
     }
-    &add_edge($edges, $nrt_o_file,   $dk_cc_file,  5);
+    &add_edge($edges, $nrt_o_file,   $dk_cc_file,  { 'color' => 5 });
 
     if ($show_headers) {
-      &add_edge($edges, $nrt_hh_file, $rt_rep_file,  0); # gray, dashed
-      &add_edge($edges, $nrt_hh_file, $nrt_rep_file, 4);
-      &add_edge($edges, $nrt_o_file,  $nrt_hh_file,  5);
+      &add_edge($edges, $nrt_hh_file, $rt_rep_file,  { 'color' => 0 }); # gray, dashed
+      &add_edge($edges, $nrt_hh_file, $nrt_rep_file, { 'color' => 4 });
+      &add_edge($edges, $nrt_o_file,  $nrt_hh_file,  { 'color' => 5 });
     }
 
-    &add_edge($edges, $nrt_cc_file,  $nrt_rep_file, 4);
-    &add_edge($edges, $nrt_o_file,   $nrt_cc_file,  5);
+    &add_edge($edges, $nrt_cc_file,  $nrt_rep_file, { 'color' => 4 });
+    &add_edge($edges, $nrt_o_file,   $nrt_cc_file,  { 'color' => 5 });
   }
   foreach my $nrt_rep_file (sort keys %$nrt_rep_files) {
-    &add_edge($edges, $rt_rep_file, $nrt_rep_file, 3);
+    &add_edge($edges, $rt_rep_file, $nrt_rep_file, { 'color' => 3 });
   }
   if ($show_headers) {
-    &add_edge($edges, $rt_hh_file, $rt_rep_file, 4);
-    &add_edge($edges, $rt_o_file,  $rt_hh_file, 5);
+    &add_edge($edges, $rt_hh_file, $rt_rep_file, { 'color' => 4 });
+    &add_edge($edges, $rt_o_file,  $rt_hh_file, { 'color' => 5 });
   }
 
-  &add_edge($edges, $rt_cc_file, $rt_rep_file, 4);
-  &add_edge($edges, $rt_o_file,  $rt_cc_file, 5);
+  &add_edge($edges, $rt_cc_file, $rt_rep_file, { 'color' => 4 });
+  &add_edge($edges, $rt_o_file,  $rt_cc_file, { 'color' => 5 });
 
   foreach my $o_file (sort keys %$o_files) {
-    &add_edge($edges, $result, $o_file, 0); # black indicates no concurrency (linking)
+    &add_edge($edges, $result, $o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
   }
-  &add_edge($edges, $result, $rt_o_file, 0); # black indicates no concurrency (linking)
+  &add_edge($edges, $result, $rt_o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
 
   my $filestr = '';
   $filestr .=
@@ -171,11 +171,15 @@ sub start {
     while (($e2, $attr) = each %{$$edges{$e1}}) {
       $filestr .= "  \"$e1\" -> \"$e2\"";
       if (exists $$nrt_src_files{$e1} && $rt_rep_file eq $e2) {
-        $filestr .= " [ style = dashed, color = gray ]";
+        $filestr .= " [ style = dashed, color = gray ];\n";
       } elsif ($attr) {
-        $filestr .= " [ color = $attr ]";
+        $filestr .= " [";
+        my ($key, $val);
+        while (($key, $val) = each (%$attr)) {
+          $filestr .= " $key = $val,";
+        }
+        $filestr .= " ];\n";
       }
-      $filestr .= ";\n"
     }
   }
   $filestr .=
