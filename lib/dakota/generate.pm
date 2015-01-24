@@ -3442,7 +3442,7 @@ sub dk::generate_cxx_footer_klass {
     $$tbbl{'$finalize'} = 'cast(method-t)finalize';
   }
   if ($$klass_scope{'module'}) {
-    $$tbbl{'$module'} = "\"$$klass_scope{'module'}\"";
+    $$tbbl{'$module'} = "\$$$klass_scope{'module'}";
   }
   $$tbbl{'$file'} = '__FILE__';
   $$scratch_str_ref .=
@@ -3816,6 +3816,14 @@ sub dk::generate_imported_klasses_info {
     }
   }
 }
+sub add_symbol_to_ident_symbol {
+  my ($file, $symbols, $symbol) = @_;
+  if ($symbol) {
+    my $ident_symbol = &make_ident_symbol_scalar($symbol);
+    $$file{$symbol} = $ident_symbol;
+    $$symbols{$symbol} = $ident_symbol;
+  }
+}
 sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
   my $col = '';
@@ -3825,15 +3833,15 @@ sub linkage_unit::generate_symbols {
     $$symbols{$symbol} = $ident_symbol;
   }
   while (my ($symbol, $symbol_seq) = each(%{$$file{'symbols'}})) {
-    my $ident_symbol = &make_ident_symbol_scalar($symbol);
-    $$file{'symbols'}{$symbol} = $ident_symbol;
-    $$symbols{$symbol} = $ident_symbol;
+    &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol)
   }
-  foreach my $symbol (keys %{$$file{'klasses'}}, keys %{$$file{'traits'}}) {
-    if (!exists $$symbols{$symbol}) {
-      my $ident_symbol = &make_ident_symbol_scalar($symbol);
-      $$file{'symbols'}{$symbol} = $ident_symbol;
-      $$symbols{$symbol} = $ident_symbol;
+  foreach my $klass_type ('klasses', 'traits') {
+    foreach my $symbol (keys %{$$file{$klass_type}}) {
+      &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $$file{$klass_type}{$symbol}{'module'});
+
+      if (!exists $$symbols{$symbol}) {
+        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol)
+      }
     }
   }
   my $symbol_keys = [sort symbol::compare keys %$symbols];
