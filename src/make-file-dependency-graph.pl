@@ -100,24 +100,31 @@ sub dump_attrs {
   return $str;
 }
 sub dump_node {
+  my ($node) = @_;
+  my $str;
+  if ($node) {
+    if ($node =~ /^(\d|\w)+$/) {
+      $str = "$node";
+    } else {
+      $str = "\"$node\"";
+    }
+  }
+  return $str;
+}
+sub dump_node_ln {
   my ($node, $attrs, $col) = @_;
   my $str = '';
   if ($node) {
-    #if ($$keyword{$node}) {
-    if ($node =~ /^(\d|\w)+$/) {
-      $str .= $col . "$node";
-    } else {
-      $str .= $col . "\"$node\"";
-    }
+    $str .= $col . &dump_node($node);
     $str .= &dump_attrs($attrs);
     $str .= ";\n";
   }
   return $str;
 }
-sub dump_edge {
+sub dump_edge_ln {
   my ($n1, $n2, $attrs, $col) = @_;
   my $str = '';
-  $str .= $col . "\"$n1\" -> \"$n2\"";
+  $str .= $col . &dump_node($n1) . " -> " . &dump_node($n2);
   $str .= &dump_attrs($attrs);
   $str .= ";\n";
   return $str;
@@ -131,7 +138,7 @@ sub dump_graph {
 
   foreach my $node (keys %$keyword) {
     if ($$scope{$name}{'nodes'}{$node}) {
-      $str .= &dump_node($node, $$scope{$name}{'nodes'}{$node}, $col);
+      $str .= &dump_node_ln($node, $$scope{$name}{'nodes'}{$node}, $col);
     }
     #delete $$scope{'nodes'}{$node};
   }
@@ -144,14 +151,14 @@ sub dump_graph {
   my ($n_name, $n_attrs);
   while (($n_name, $n_attrs) = each (%{$$scope{$name}{'nodes'}})) {
     if (!$$keyword{$n_name}) {
-      $str .= &dump_node($n_name, $n_attrs, $col);
+      $str .= &dump_node_ln($n_name, $n_attrs, $col);
     }
   }
   my ($n1_name, $info);
   while (($n1_name, $info) = each (%{$$scope{$name}{'edges'}})) {
     my ($n2_name, $edge_attrs);
     while (($n2_name, $edge_attrs) = each (%$info)) {
-      $str .= &dump_edge($n1_name, $n2_name, $edge_attrs, $col);
+      $str .= &dump_edge_ln($n1_name, $n2_name, $edge_attrs, $col);
     }
   }
   $col = &colout($col);
@@ -177,9 +184,9 @@ sub start {
 
   &add_node($$graph{$graph_name}{'nodes'}, 'graph', { 'label' => '\G',
                                'fontcolor' => 'red',
-                               'page' => '8.5,11',
-                               'size' => '7.5,10',
-                               'center' => 'true',
+                               #'page' => '8.5,11',
+                               #'size' => '7.5,10',
+                               #'center' => 'true',
                                'rankdir' => 'RL' });
   &add_node($$graph{$graph_name}{'nodes'}, 'edge', { 'colorscheme' => $colorscheme });
   &add_node($$graph{$graph_name}{'nodes'}, 'node', { 'shape' => 'rect',
