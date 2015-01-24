@@ -20,6 +20,24 @@ my $SO_EXT = 'dylib';
 my $colorscheme = 'dark26';     # needs to have 5 or more colors
 my $show_headers = 0;
 
+my $gbl_col_width = '  ';
+sub colin {
+  my ($col) = @_;
+  my $len = length($col)/length($gbl_col_width);
+  #print STDERR "$len" . "++\n";
+  $len++;
+  my $result = $gbl_col_width x $len;
+  return $result;
+}
+sub colout {
+  my ($col) = @_;
+  my $len = length($col)/length($gbl_col_width);
+  #print STDERR "$len" . "--\n";
+  die "Aborted because of &colout(0)" if '' eq $col;
+  $len--;
+  my $result = $gbl_col_width x $len;
+  return $result;
+}
 sub path {
   my ($path) = @_;
   $path =~ s|//|/|g;
@@ -37,18 +55,94 @@ sub rdir_name_ext {
 }
 sub add_node {
   my ($tbl, $n, $attrs) = @_;
-  
+  if (!exists $$tbl{$n}) {
+    $$tbl{$n} = $attrs;
+  } else {
+    die;
+  }
 }
 sub add_edge {
-  my ($tbl, $e1, $e2, $attr) = @_;
+  my ($tbl, $e1, $e2, $attrs) = @_;
 
   if (!exists $$tbl{$e1}) {
-    $$tbl{$e1} = {};
+    $$tbl{$e1} = undef;
   }
   if (!exists $$tbl{$e1}{$e2}) {
-    $$tbl{$e1}{$e2} = $attr;
+    $$tbl{$e1}{$e2} = $attrs;
+  } else {
+    die;
   }
 }
+sub dump_attrs {
+  my ($attrs) = @_;
+  my $str = '';
+  if ($attrs) {
+    $str .= " \[ ";
+    my ($key, $val);
+    while (($key, $val) = each (%$attrs)) {
+      $str .= " $key = \"$val\",";
+    }
+    $str .= " ]";
+  }
+  return $str;
+}
+sub dump_node {
+  my ($node, $attrs, $col) = @_;
+  my $keyword = { 'graph', => 1, 'edge' => 1, 'node' => 1 };
+  my $str = '';
+  if ($node) {
+    if ($$keyword{$node}) {
+      $str .= $col . "$node";
+    } else {
+      $str .= $col . "\"$node\"";
+    }
+    $str .= &dump_attrs($attrs);
+    $str .= ";\n";
+  }
+  return $str;
+}
+sub dump_edge {
+  my ($n1, $n2, $attrs, $col) = @_;
+  my $str = '';
+  $str .= $col . "\"$n1\" -> \"$n2\"";
+  $str .= &dump_attrs($attrs);
+  $str .= ";\n";
+  return $str;
+}
+sub dump_graph {
+  my ($scope, $type, $name, $col) = @_;
+  my $str = '';
+  $str .= $col . "$type \"$name\" {\n";
+  $col = &colin($col);
+
+  foreach my $node ('graph', 'edge', 'node') {
+    if ($$scope{'nodes'}{$node}) {
+      $str .= $col . &dump_node($node, $$scope{'nodes'}{$node}, $col);
+    }
+    delete $$scope{'nodes'}{$node};
+  }
+  my ($subname, $subscope);
+  while (($subname, $subscope) = each (%{$$scope{'subgraphs'}})) {
+    if ($subscope) {
+      #$str .= &dump_graph($subscope,'subgraph', '', $col);
+    }
+  }
+  my ($n_name, $n_attrs);
+  while (($n_name, $n_attrs) = each (%{$$scope{'nodes'}})) {
+    $str .= &dump_node($n_name, $n_attrs, $col);
+  }
+  my ($n1_name, $info);
+  while (($n1_name, $info) = each (%{$$scope{'edges'}})) {
+    my ($n2_name, $edge_attrs);
+    while (($n2_name, $edge_attrs) = each (%$info)) {
+      $str .= &dump_edge($n1_name, $n2_name, $edge_attrs, $col);
+    }
+  }
+  $col = &colout($col);
+  $str .= $col . "}\n";
+  return $str;
+}
+
 sub start {
   my ($opts, $repository) = @_;
 
@@ -62,12 +156,27 @@ sub start {
   my $so_files = [split("\n", `../bin/dakota-project libs --repository $repository --var SO_EXT=$SO_EXT`)];
   my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $repository`)];
 
-  my $input_files = [ @$so_files, @$dk_files ];
-
-  my $graph = { 'nodes' => {}, 'edges' => {}, 'subgraphs' => {} };
+  my $graph = { 'nodes' => {}, 'edges' => {}, 'subgraphs' => { 'nodes' => {}, 'edges' => {} } };
   my $nodes = $$graph{'nodes'}; # tmp
   my $edges = $$graph{'edges'}; # tmp
   my $subgraphs = $$graph{'subgraphs'}; # tmp
+
+  &add_node($nodes, 'graph', { 'label' => '\G',
+                               'fontcolor' => 'red',
+                               'page' => '8.5,11',
+                               'size' => '7.5,10',
+                               'center' => 'true',
+                               'rankdir' => 'RL' });
+  &add_node($nodes, 'edge', { 'colorscheme' => $colorscheme });
+  &add_node($nodes, 'node', { 'shape' => 'rect',
+                              'style' => 'rounded',
+                              'height' => 0.25 });
+
+  my $input_files = [ @$so_files, @$dk_files ];
+  &add_node($$subgraphs{'nodes'}, 'graph', { 'rank' => 'same' });
+  foreach my $input_file (@$so_files, @$dk_files) {
+    &add_node($$subgraphs{'nodes'}, $input_file, undef);
+  }
 
   ($rdir, $name, $ext) = &rdir_name_ext($result);
   my $rt_rep_file = &path("$obj/rt/$rdir/$name.rep");
@@ -154,6 +263,12 @@ sub start {
     &add_edge($edges, $result, $o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
   }
   &add_edge($edges, $result, $rt_o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
+
+
+  print &dump_graph($graph, 'digraph', "$graph_name", '');
+  exit;
+
+
   ########################
   my $filestr = '';
   $filestr .=
