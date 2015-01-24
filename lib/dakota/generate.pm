@@ -448,8 +448,9 @@ sub colout {
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $suffix) = @_;
   my $result = {};
+  my $klass_names = &order_klasses($file);
 
-  $$result{"headers-hxx"} =            &linkage_unit::generate_headers(        $file);
+  $$result{"headers-hxx"} =            &linkage_unit::generate_headers(        $file, $klass_names);
   $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $generics, $symbols);
   $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, $generics, $symbols);
   $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file, $generics, $symbols);
@@ -461,7 +462,7 @@ sub generate_decl_defn {
   $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq( $file, $generics);
 
   my $col; my $klass_path;
-  $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $col = '', $klass_path = []);
+  $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $col = '', $klass_path = [], $klass_names);
 
   return $result;
 } # generate_decl_defn
@@ -2330,8 +2331,7 @@ sub hardcoded_typedefs {
   return $result;
 }
 sub linkage_unit::generate_headers {
-  my ($scope) = @_;
-  my $klass_names = &order_klasses($scope);
+  my ($scope, $klass_names) = @_;
   my $result = '';
 
   if (&is_decl() || &is_rt_defn()) { # not sure if this is right
@@ -2539,10 +2539,10 @@ sub order_klasses {
   }
   my $result = &order_depends($depends);
   if ($verbose) {
-    print STDERR &Dumper($result);
+    print STDERR &Dumper($$result{'seq'});
   }
   return $$result{'seq'};
-}
+} # order_klasses
 sub add_last {
   my ($seq, $str) = @_;
   push @$seq, $str;
@@ -2589,11 +2589,10 @@ sub klass_part {
   }
 }
 sub linkage_unit::generate_klasses {
-  my ($scope, $col, $klass_path) = @_;
-  my $klass_names = &order_klasses($scope);
+  my ($scope, $col, $klass_path, $klass_names) = @_;
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path);
+  &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path, $klass_names);
   if (&is_decl()) {
     $$scratch_str_ref .=
       "\n" .
@@ -2603,7 +2602,7 @@ sub linkage_unit::generate_klasses {
       "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
-  &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path);
+  &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $klass_names);
 
   $$scratch_str_ref .= &labeled_src_str(undef, "klass-defns");
   foreach my $klass_name (@$klass_names) {
@@ -2612,8 +2611,7 @@ sub linkage_unit::generate_klasses {
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses_types_before {
-  my ($scope, $col, $klass_path) = @_;
-  my $klass_names = &order_klasses($scope);
+  my ($scope, $col, $klass_path, $klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= &labeled_src_str(undef, "klass-decls");
   if (&is_decl()) {
@@ -2629,8 +2627,7 @@ sub linkage_unit::generate_klasses_types_before {
   }
 }
 sub linkage_unit::generate_klasses_types_after {
-  my ($scope, $col, $klass_path) = @_;
-  my $klass_names = &order_klasses($scope);
+  my ($scope, $col, $klass_path, $klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   foreach my $klass_name (@$klass_names) {
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
