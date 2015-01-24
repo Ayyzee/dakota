@@ -233,7 +233,7 @@ sub start {
 
     &add_edge($graph, $ctlg_file,   $so_file,   { 'color' => 1 });
     &add_edge($graph, $rep_file,    $ctlg_file, { 'color' => 2 });
-    &add_edge($graph, $rt_rep_file, $rep_file,  { 'color' => 3, 'weight' => 4 });
+    &add_edge($graph, $rt_rep_file, $rep_file,  { 'color' => 3 });
   }
   my $nrt_rep_files = {};
   my $o_files = {};
@@ -254,13 +254,13 @@ sub start {
     &add_node($graph, $dk_cc_file, { 'style' => "rounded,bold" });;
 
     &add_edge($graph, $nrt_rep_file, $dk_file,     { 'color' => 1 });
-    &add_edge($graph, $dk_cc_file,   $dk_file,     { 'color' => 4, 'weight' => 4 });
+    &add_edge($graph, $dk_cc_file,   $dk_file,     { 'color' => 4 });
 
     if (1) {
       &add_edge($graph, $dk_cc_file,   $rt_rep_file, { 'color' => 0, 'style' => 'dashed' });
       &add_edge($graph, $nrt_cc_file,  $rt_rep_file, { 'color' => 0, 'style' => 'dashed' });
     }
-    &add_edge($graph, $nrt_o_file,   $nrt_cc_file,  { 'color' => 5, 'weight' => 4 });
+    &add_edge($graph, $nrt_o_file,   $nrt_cc_file,  { 'color' => 5 });
 
     if ($show_headers) {
       &add_edge($graph, $nrt_hh_file, $rt_rep_file,  { 'color' => 0, 'style' => 'dashed' });
@@ -268,7 +268,7 @@ sub start {
       &add_edge($graph, $nrt_o_file,  $nrt_hh_file,  { 'color' => 5 });
     }
 
-    &add_edge($graph, $nrt_cc_file,  $nrt_rep_file, { 'color' => 4, 'weight' => 4 });
+    &add_edge($graph, $nrt_cc_file,  $nrt_rep_file, { 'color' => 4 });
     &add_edge($graph, $nrt_o_file,   $nrt_cc_file,  { 'color' => 5 });
   }
   foreach my $nrt_rep_file (sort keys %$nrt_rep_files) {
@@ -276,12 +276,12 @@ sub start {
   }
   if ($show_headers) {
     &add_edge($graph, $rt_hh_file, $rt_rep_file, { 'color' => 4 });
-    &add_edge($graph, $rt_o_file,  $rt_hh_file, { 'color' => 5 });
+    &add_edge($graph, $rt_o_file,  $rt_hh_file,  { 'color' => 5 });
   }
 
-  &add_edge($graph, $rt_cc_file, $rt_rep_file, { 'color' => 4, 'weight' => 2 });
-  &add_edge($graph, $rt_o_file,  $rt_cc_file, { 'color' => 5, 'weight' => 2 });
-  &add_edge($graph, $result, $rt_o_file, { 'color' => 0, 'weight' => 2 }); # black indicates no concurrency (linking)
+  &add_edge($graph, $rt_cc_file, $rt_rep_file, { 'color' => 4 });
+  &add_edge($graph, $rt_o_file,  $rt_cc_file,  { 'color' => 5 });
+  &add_edge($graph, $result,     $rt_o_file,   { 'color' => 0 }); # black indicates no concurrency (linking)
 
   foreach my $o_file (sort keys %$o_files) {
     &add_edge($graph, $result, $o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
