@@ -242,6 +242,7 @@ sub nrt::add_extra_klass_decls {
     'keyword' => undef,
     'klass' => undef,
     'method' => undef,
+    'methods' => undef,
     'missing-keyword-exception' => undef, # kw-args processing funcs (throw)
     'named-info-node' => undef,
     'no-such-keyword-exception' => undef, # kw-args processing funcs (throw)
@@ -262,7 +263,6 @@ sub nrt::add_extra_klass_decls {
 sub rt::add_extra_klass_decls {
   my ($file) = @_;
   my $klass_decls = { # hardcoded
-    'methods' => undef,
     'no-such-method-exception' => undef, # generic funcs (throw)
     'selector-node' => undef,
     'assoc-node' => undef,
