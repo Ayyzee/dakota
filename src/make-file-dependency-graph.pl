@@ -242,13 +242,13 @@ sub start {
     &add_edge($$graph{$graph_name}{'edges'}, $nrt_rep_file, $dk_file,     { 'color' => 1 });
     &add_edge($$graph{$graph_name}{'edges'}, $dk_cc_file,   $dk_file,     { 'color' => 4 });
     if (1) {
-      &add_edge($$graph{$graph_name}{'edges'}, $dk_cc_file,   $rt_rep_file, { 'color' => 0 }); # gray, dashed
-      &add_edge($$graph{$graph_name}{'edges'}, $nrt_cc_file,  $rt_rep_file, { 'color' => 0 }); # gray, dashed
+      &add_edge($$graph{$graph_name}{'edges'}, $dk_cc_file,   $rt_rep_file, { 'color' => 0, 'style' => 'dashed' }); # gray, dashed
+      &add_edge($$graph{$graph_name}{'edges'}, $nrt_cc_file,  $rt_rep_file, { 'color' => 0, 'style' => 'dashed' }); # gray, dashed
     }
-    &add_edge($$graph{$graph_name}{'edges'}, $nrt_o_file,   $dk_cc_file,  { 'color' => 5 });
+    &add_edge($$graph{$graph_name}{'edges'}, $nrt_o_file,   $dk_cc_file,  { 'color' => 5, 'style' => 'dashed' });
 
     if ($show_headers) {
-      &add_edge($$graph{$graph_name}{'edges'}, $nrt_hh_file, $rt_rep_file,  { 'color' => 0 }); # gray, dashed
+      &add_edge($$graph{$graph_name}{'edges'}, $nrt_hh_file, $rt_rep_file,  { 'color' => 0, 'style' => 'dashed' }); # gray, dashed
       &add_edge($$graph{$graph_name}{'edges'}, $nrt_hh_file, $nrt_rep_file, { 'color' => 4 });
       &add_edge($$graph{$graph_name}{'edges'}, $nrt_o_file,  $nrt_hh_file,  { 'color' => 5 });
     }
