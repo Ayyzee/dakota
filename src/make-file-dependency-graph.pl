@@ -58,19 +58,25 @@ sub add_node {
   if (!exists $$tbl{$n}) {
     $$tbl{$n} = $attrs;
   } else {
-    die;
+    my ($key, $val);
+    while (($key, $val) = each (%$attrs)) {
+      $$tbl{$n}{$key} = $val;
+    }
   }
 }
 sub add_edge {
-  my ($tbl, $e1, $e2, $attrs) = @_;
+  my ($tbl, $n1, $n2, $attrs) = @_;
 
-  if (!exists $$tbl{$e1}) {
-    $$tbl{$e1} = undef;
+  if (!exists $$tbl{$n1}) {
+    $$tbl{$n1} = undef;
   }
-  if (!exists $$tbl{$e1}{$e2}) {
-    $$tbl{$e1}{$e2} = $attrs;
+  if (!exists $$tbl{$n1}{$n2}) {
+    $$tbl{$n1}{$n2} = $attrs;
   } else {
-    die;
+    my ($key, $val);
+    while (($key, $val) = each (%$attrs)) {
+      $$tbl{$n1}{$n2}{$key} = $val;
+    }
   }
 }
 sub add_subgraph {
@@ -122,6 +128,7 @@ sub strln4node {
 }
 sub strln4edge {
   my ($n1, $n2, $attrs, $col) = @_;
+  die if !$n1 || !$n2;
   my $str = '';
   $str .= $col . &str4node($n1) . " -> " . &str4node($n2);
   $str .= &str4attrs($attrs);
@@ -278,12 +285,12 @@ sub start {
   my $make_targets = "$rdir/$name.mk";
   open FILE, ">$make_targets" or die __FILE__, ":", __LINE__, ": ERROR: $make_targets: $!\n";
 
-  foreach my $e1 (sort keys %{$$graph{$graph_name}{'edges'}}) {
-    print FILE "$e1:\\\n";
-    my ($e2, $attr);
-    foreach my $e2 (sort keys %{$$graph{$graph_name}{'edges'}{$e1}}) {
-      #my $attr = $$edges{$e1}{$e2};
-      print FILE " $e2\\\n";
+  foreach my $n1 (sort keys %{$$graph{$graph_name}{'edges'}}) {
+    print FILE "$n1:\\\n";
+    my ($n2, $attr);
+    foreach my $n2 (sort keys %{$$graph{$graph_name}{'edges'}{$n1}}) {
+      #my $attr = $$edges{$n1}{$n2};
+      print FILE " $n2\\\n";
     }
     print FILE "#\n"
   }
