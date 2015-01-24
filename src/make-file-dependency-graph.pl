@@ -177,7 +177,7 @@ sub str4graph {
 }
 sub empty_graph {
   my ($type) = @_;
-  my $graph = eval "{ 'type' => '$type', 'label' => '', 'nodes' => {}, 'edges' => {}, 'subgraphs' => [] }";
+  my $graph = eval "{ 'type' => '$type', 'label' => undef, 'nodes' => {}, 'edges' => {}, 'subgraphs' => [] }";
   return $graph;
 }
 
@@ -193,6 +193,7 @@ sub start {
   my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $repository`)];
 
   my $graph = &empty_graph('digraph');
+  $$graph{'label'} = &path($result);
   &add_node($graph, 'graph', {
     'rankdir' => 'RL',
     'label' => '\G',
