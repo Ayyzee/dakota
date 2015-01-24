@@ -217,6 +217,7 @@ sub start {
   $$graph{$graph_name}{'nodes'}{$rt_cc_file}{'colorscheme'} = $colorscheme;
   $$graph{$graph_name}{'nodes'}{$rt_cc_file}{'color'} = 4;
 
+  &add_node($$graph{$graph_name}{'nodes'}, $result, { 'style' => 'none' });
   foreach my $so_file (@$so_files) {
     my ($rdir, $name, $ext) = &rdir_name_ext($so_file);
     my $ctlg_file = &path("$obj/$rdir/$name.ctlg");
