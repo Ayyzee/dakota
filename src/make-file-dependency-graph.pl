@@ -93,8 +93,8 @@ sub str4attrs {
   if ($attrs) {
     my $d = '';
     $str .= " \[";
-    my ($key, $val);
-    while (($key, $val) = each (%$attrs)) {
+    foreach my $key (sort keys %$attrs) {
+      my $val = $$attrs{$key};
       if ($val =~ /^(\d|\w)+$/) {
         $str .= "$d $key = $val";
       } else {
@@ -149,25 +149,28 @@ sub str4graph {
   }
   $col = &colin($col);
 
-  foreach my $node (keys %$keyword) {
+  foreach my $node (sort keys %$keyword) {
     if ($$scope{'nodes'}{$node}) {
       $str .= &strln4node($node, $$scope{'nodes'}{$node}, $col);
     }
     delete $$scope{'nodes'}{$node};
   }
+  $str .= "\n";
   foreach my $subgraph (@{$$scope{'subgraphs'}}) {
     if ($subgraph) {
       $str .= &str4graph($subgraph, $col);
     }
   }
-  my ($n_name, $n_attrs);
-  while (($n_name, $n_attrs) = each (%{$$scope{'nodes'}})) {
+  foreach my $n_name (sort keys %{$$scope{'nodes'}}) {
+    my $n_attrs = $$scope{'nodes'}{$n_name};
     $str .= &strln4node($n_name, $n_attrs, $col);
   }
-  my ($n1_name, $info);
-  while (($n1_name, $info) = each (%{$$scope{'edges'}})) {
+  $str .= "\n" if 0 < keys %{$$scope{'edges'}};
+  foreach my $n1_name (sort keys %{$$scope{'edges'}}) {
+    my $info = $$scope{'edges'}{$n1_name};
     my ($n2_name, $edge_attrs);
-    while (($n2_name, $edge_attrs) = each (%$info)) {
+    foreach my $n2_name (sort keys %$info) {
+      my $edge_attrs = $$info{$n2_name};
       $str .= &strln4edge($n1_name, $n2_name, $edge_attrs, $col);
     }
   }
