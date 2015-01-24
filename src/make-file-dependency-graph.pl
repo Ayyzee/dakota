@@ -33,7 +33,6 @@ sub colin {
 sub colout {
   my ($col) = @_;
   my $len = length($col)/length($gbl_col_width);
-  #print STDERR "$len" . "--\n";
   die "Aborted because of &colout(0)" if '' eq $col;
   $len--;
   my $result = $gbl_col_width x $len;
@@ -80,7 +79,7 @@ sub add_subgraph {
     $$tbl{$name} = {};
   }
 }
-sub dump_attrs {
+sub str4attrs {
   my ($attrs) = @_;
   my $str = '';
   if ($attrs) {
@@ -99,7 +98,7 @@ sub dump_attrs {
   }
   return $str;
 }
-sub dump_node {
+sub str4node {
   my ($node) = @_;
   my $str;
   if ($node) {
@@ -111,25 +110,25 @@ sub dump_node {
   }
   return $str;
 }
-sub dump_node_ln {
+sub strln4node {
   my ($node, $attrs, $col) = @_;
   my $str = '';
   if ($node) {
-    $str .= $col . &dump_node($node);
-    $str .= &dump_attrs($attrs);
+    $str .= $col . &str4node($node);
+    $str .= &str4attrs($attrs);
     $str .= ";\n";
   }
   return $str;
 }
-sub dump_edge_ln {
+sub strln4edge {
   my ($n1, $n2, $attrs, $col) = @_;
   my $str = '';
-  $str .= $col . &dump_node($n1) . " -> " . &dump_node($n2);
-  $str .= &dump_attrs($attrs);
+  $str .= $col . &str4node($n1) . " -> " . &str4node($n2);
+  $str .= &str4attrs($attrs);
   $str .= ";\n";
   return $str;
 }
-sub dump_graph {
+sub str4graph {
   my ($scope, $type, $name, $col) = @_;
   my $str = '';
 
@@ -138,27 +137,27 @@ sub dump_graph {
 
   foreach my $node (keys %$keyword) {
     if ($$scope{$name}{'nodes'}{$node}) {
-      $str .= &dump_node_ln($node, $$scope{$name}{'nodes'}{$node}, $col);
+      $str .= &strln4node($node, $$scope{$name}{'nodes'}{$node}, $col);
     }
     #delete $$scope{'nodes'}{$node};
   }
   my ($subname, $subscope);
   while (($subname, $subscope) = each (%{$$scope{$name}{'subgraphs'}})) {
     if ($subscope) {
-      $str .= &dump_graph($$scope{$name}{'subgraphs'}, 'subgraph', $subname, $col);
+      $str .= &str4graph($$scope{$name}{'subgraphs'}, 'subgraph', $subname, $col);
     }
   }
   my ($n_name, $n_attrs);
   while (($n_name, $n_attrs) = each (%{$$scope{$name}{'nodes'}})) {
     if (!$$keyword{$n_name}) {
-      $str .= &dump_node_ln($n_name, $n_attrs, $col);
+      $str .= &strln4node($n_name, $n_attrs, $col);
     }
   }
   my ($n1_name, $info);
   while (($n1_name, $info) = each (%{$$scope{$name}{'edges'}})) {
     my ($n2_name, $edge_attrs);
     while (($n2_name, $edge_attrs) = each (%$info)) {
-      $str .= &dump_edge_ln($n1_name, $n2_name, $edge_attrs, $col);
+      $str .= &strln4edge($n1_name, $n2_name, $edge_attrs, $col);
     }
   }
   $col = &colout($col);
@@ -206,14 +205,10 @@ sub start {
   my $rt_cc_file =  &path("$obj/rt/$rdir/$name.cc");
   my $rt_o_file =   &path("$obj/rt/$rdir/$name.o");
 
-  my $rt_files = {};
-
   if ($show_headers) {
-    $$rt_files{$rt_hh_file} = undef;
     $$graph{$graph_name}{'nodes'}{$rt_hh_file}{'colorscheme'} = $colorscheme;
     $$graph{$graph_name}{'nodes'}{$rt_hh_file}{'color'} = 4;
   }
-  $$rt_files{$rt_cc_file} = undef;
   $$graph{$graph_name}{'nodes'}{$rt_cc_file}{'colorscheme'} = $colorscheme;
   $$graph{$graph_name}{'nodes'}{$rt_cc_file}{'color'} = 4;
 
@@ -228,9 +223,7 @@ sub start {
     &add_edge($$graph{$graph_name}{'edges'}, $rep_file,    $ctlg_file, { 'color' => 2 });
     &add_edge($$graph{$graph_name}{'edges'}, $rt_rep_file, $rep_file,  { 'color' => 3 });
   }
-  my $dk_cc_files = {};
   my $nrt_rep_files = {};
-  my $nrt_src_files = {};
   my $o_files = {};
 
   foreach my $dk_file (@$dk_files) {
@@ -242,14 +235,6 @@ sub start {
     my $nrt_o_file =   &path("$obj/nrt/$rdir/$name.o");
 
     &add_node($$graph{$graph_name}{'nodes'}, $dk_cc_file, { 'style' => "rounded,bold" });;
-
-    $$dk_cc_files{$dk_cc_file} = undef;
-
-    $$nrt_src_files{$dk_cc_file} = undef;
-    if ($show_headers) {
-      $$nrt_src_files{$nrt_hh_file} = undef;
-    }
-    $$nrt_src_files{$nrt_cc_file} = undef;
 
     $$nrt_rep_files{$nrt_rep_file} = undef;
     $$o_files{$nrt_o_file} = undef;
@@ -287,7 +272,7 @@ sub start {
   }
   &add_edge($$graph{$graph_name}{'edges'}, $result, $rt_o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
 
-  print &dump_graph($graph, 'digraph', $graph_name, '');
+  print &str4graph($graph, 'digraph', $graph_name, '');
 
   ($rdir, $name, $ext) = &rdir_name_ext($repository);
   my $make_targets = "$rdir/$name.mk";
