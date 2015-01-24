@@ -262,6 +262,7 @@ sub nrt::add_extra_klass_decls {
 sub rt::add_extra_klass_decls {
   my ($file) = @_;
   my $klass_decls = { # hardcoded
+    'methods' => undef,
     'no-such-method-exception' => undef, # generic funcs (throw)
     'selector-node' => undef,
     'assoc-node' => undef,

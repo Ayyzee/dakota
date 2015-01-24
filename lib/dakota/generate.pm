@@ -1974,7 +1974,7 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }" . &ann(__LINE__) . "\n";
   } elsif (&is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = dk-intern(\"@$klass_path\"); }" . &ann(__LINE__) . " /*hackhack*/\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = \$@$klass_path; }" . &ann(__LINE__) . "\n";
   }
 
   if ('klass' eq $klass_type) {
@@ -3828,6 +3828,13 @@ sub linkage_unit::generate_symbols {
     my $ident_symbol = &make_ident_symbol_scalar($symbol);
     $$file{'symbols'}{$symbol} = $ident_symbol;
     $$symbols{$symbol} = $ident_symbol;
+  }
+  foreach my $symbol (keys %{$$file{'klasses'}}, keys %{$$file{'traits'}}) {
+    if (!exists $$symbols{$symbol}) {
+      my $ident_symbol = &make_ident_symbol_scalar($symbol);
+      $$file{'symbols'}{$symbol} = $ident_symbol;
+      $$symbols{$symbol} = $ident_symbol;
+    }
   }
   my $symbol_keys = [sort symbol::compare keys %$symbols];
   my $scratch_str = "";
