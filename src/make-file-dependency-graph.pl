@@ -146,7 +146,7 @@ sub str4graph {
     if ($$scope{$name}{'nodes'}{$node}) {
       $str .= &strln4node($node, $$scope{$name}{'nodes'}{$node}, $col);
     }
-    #delete $$scope{'nodes'}{$node};
+    delete $$scope{$name}{'nodes'}{$node};
   }
   my ($subname, $subscope);
   while (($subname, $subscope) = each (%{$$scope{$name}{'subgraphs'}})) {
@@ -156,9 +156,7 @@ sub str4graph {
   }
   my ($n_name, $n_attrs);
   while (($n_name, $n_attrs) = each (%{$$scope{$name}{'nodes'}})) {
-    if (!$$keyword{$n_name}) {
-      $str .= &strln4node($n_name, $n_attrs, $col);
-    }
+    $str .= &strln4node($n_name, $n_attrs, $col);
   }
   my ($n1_name, $info);
   while (($n1_name, $info) = each (%{$$scope{$name}{'edges'}})) {
