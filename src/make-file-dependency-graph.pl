@@ -176,7 +176,8 @@ sub start {
   $repository = &path($repository);
   my ($rdir, $name, $ext) = &rdir_name_ext($repository);
   my $graph_name = &path("$rdir/$name");
-  my $subgraph_name = 'input-files';
+  my $input_files_name = 'input-files';
+  my $cc_files_name = 'cc-files';
 
   my $result = `../bin/dakota-project name --repository $repository --var SO_EXT=$SO_EXT`;
   chomp $result;
@@ -184,31 +185,42 @@ sub start {
   my $so_files = [split("\n", `../bin/dakota-project libs --repository $repository --var SO_EXT=$SO_EXT`)];
   my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $repository`)];
 
-  my $graph = { $graph_name => { 'nodes' => {}, 'edges' => {}, 'subgraphs' => { $subgraph_name => { 'nodes' => {}, 'edges' => {} }}}};
+  my $graph = { $graph_name =>       { 'nodes' => {}, 'edges' => {}, 'subgraphs' => {
+    $input_files_name => { 'nodes' => {}, 'edges' => {} },
+    $cc_files_name =>    { 'nodes' => {}, 'edges' => {} },
+  }}};
 
-  &add_node($$graph{$graph_name}{'nodes'}, 'graph', { 'label' => '\G',
-                               'fontcolor' => 'red',
-                               #'page' => '8.5,11',
-                               #'size' => '7.5,10',
-                               #'center' => 'true',
-                               'rankdir' => 'RL' });
+  &add_node($$graph{$graph_name}{'nodes'}, 'graph', {
+    'rankdir' => 'RL',
+    'label' => '\G',
+    'fontcolor' => 'red',
+    #'page' => '8.5,11',
+    #'size' => '7.5,10',
+    #'center' => 'true',
+    });
   &add_node($$graph{$graph_name}{'nodes'}, 'edge', { 'colorscheme' => $colorscheme });
-  &add_node($$graph{$graph_name}{'nodes'}, 'node', { 'shape' => 'rect',
+  &add_node($$graph{$graph_name}{'nodes'}, 'node', { 'shape' => 'rect', 'width' => 1.5,
                               'style' => 'rounded',
                               'height' => 0.25 });
 
   my $input_files = [ @$so_files, @$dk_files ];
-  &add_subgraph($$graph{$graph_name}{'subgraphs'}, $subgraph_name);
-  &add_node($$graph{$graph_name}{'subgraphs'}{$subgraph_name}{'nodes'}, 'graph', { 'rank' => 'same' });
-  foreach my $input_file (@$so_files, @$dk_files) {
-    &add_node($$graph{$graph_name}{'subgraphs'}{$subgraph_name}{'nodes'}, $input_file, undef);
+###
+  &add_subgraph($$graph{$graph_name}{'subgraphs'}, $input_files_name);
+  &add_node($$graph{$graph_name}{'subgraphs'}{$input_files_name}{'nodes'},
+            'graph', { 'rank' => 'same' });
+  foreach my $input_file (@$input_files) {
+    &add_node($$graph{$graph_name}{'subgraphs'}{$input_files_name}{'nodes'},
+              $input_file, undef);
   }
-
+###
   ($rdir, $name, $ext) = &rdir_name_ext($result);
   my $rt_rep_file = &path("$obj/rt/$rdir/$name.rep");
   my $rt_hh_file =  &path("$obj/rt/$rdir/$name.hh");
   my $rt_cc_file =  &path("$obj/rt/$rdir/$name.cc");
   my $rt_o_file =   &path("$obj/rt/$rdir/$name.o");
+
+  my $cc_files = {};
+  $$cc_files{$rt_cc_file} = undef;
 
   if ($show_headers) {
     $$graph{$graph_name}{'nodes'}{$rt_hh_file}{'colorscheme'} = $colorscheme;
@@ -226,15 +238,15 @@ sub start {
 
     &add_edge($$graph{$graph_name}{'edges'}, $ctlg_file,   $so_file,   { 'color' => 1 });
     &add_edge($$graph{$graph_name}{'edges'}, $rep_file,    $ctlg_file, { 'color' => 2 });
-    &add_edge($$graph{$graph_name}{'edges'}, $rt_rep_file, $rep_file,  { 'color' => 3 });
+    &add_edge($$graph{$graph_name}{'edges'}, $rt_rep_file, $rep_file,  { 'color' => 3, 'weight' => 4 });
   }
   my $nrt_rep_files = {};
   my $o_files = {};
 
   foreach my $dk_file (@$dk_files) {
     my ($rdir, $name, $ext) = &rdir_name_ext($dk_file);
-    my $nrt_rep_file = &path("$obj/$rdir/$name.rep");
     my $dk_cc_file =   &path("$obj/$rdir/$name.cc");
+    my $nrt_rep_file = &path("$obj/nrt/$rdir/$name.rep");
     my $nrt_hh_file =  &path("$obj/nrt/$rdir/$name.hh");
     my $nrt_cc_file =  &path("$obj/nrt/$rdir/$name.cc");
     my $nrt_o_file =   &path("$obj/nrt/$rdir/$name.o");
@@ -243,22 +255,25 @@ sub start {
 
     $$nrt_rep_files{$nrt_rep_file} = undef;
     $$o_files{$nrt_o_file} = undef;
+    $$cc_files{$nrt_cc_file} = undef;
+    $$cc_files{$dk_cc_file} = undef;
 
     &add_edge($$graph{$graph_name}{'edges'}, $nrt_rep_file, $dk_file,     { 'color' => 1 });
-    &add_edge($$graph{$graph_name}{'edges'}, $dk_cc_file,   $dk_file,     { 'color' => 4 });
+    &add_edge($$graph{$graph_name}{'edges'}, $dk_cc_file,   $dk_file,     { 'color' => 4, 'weight' => 4 });
+
     if (1) {
-      &add_edge($$graph{$graph_name}{'edges'}, $dk_cc_file,   $rt_rep_file, { 'color' => 0, 'style' => 'dashed' }); # gray, dashed
-      &add_edge($$graph{$graph_name}{'edges'}, $nrt_cc_file,  $rt_rep_file, { 'color' => 0, 'style' => 'dashed' }); # gray, dashed
+      &add_edge($$graph{$graph_name}{'edges'}, $dk_cc_file,   $rt_rep_file, { 'color' => 0, 'style' => 'dashed' });
+      &add_edge($$graph{$graph_name}{'edges'}, $nrt_cc_file,  $rt_rep_file, { 'color' => 0, 'style' => 'dashed' });
     }
-    &add_edge($$graph{$graph_name}{'edges'}, $nrt_o_file,   $dk_cc_file,  { 'color' => 5, 'style' => 'dashed' });
+    &add_edge($$graph{$graph_name}{'edges'}, $nrt_o_file,   $nrt_cc_file,  { 'color' => 5, 'weight' => 4 });
 
     if ($show_headers) {
-      &add_edge($$graph{$graph_name}{'edges'}, $nrt_hh_file, $rt_rep_file,  { 'color' => 0, 'style' => 'dashed' }); # gray, dashed
+      &add_edge($$graph{$graph_name}{'edges'}, $nrt_hh_file, $rt_rep_file,  { 'color' => 0, 'style' => 'dashed' });
       &add_edge($$graph{$graph_name}{'edges'}, $nrt_hh_file, $nrt_rep_file, { 'color' => 4 });
       &add_edge($$graph{$graph_name}{'edges'}, $nrt_o_file,  $nrt_hh_file,  { 'color' => 5 });
     }
 
-    &add_edge($$graph{$graph_name}{'edges'}, $nrt_cc_file,  $nrt_rep_file, { 'color' => 4 });
+    &add_edge($$graph{$graph_name}{'edges'}, $nrt_cc_file,  $nrt_rep_file, { 'color' => 4, 'weight' => 4 });
     &add_edge($$graph{$graph_name}{'edges'}, $nrt_o_file,   $nrt_cc_file,  { 'color' => 5 });
   }
   foreach my $nrt_rep_file (sort keys %$nrt_rep_files) {
@@ -269,14 +284,22 @@ sub start {
     &add_edge($$graph{$graph_name}{'edges'}, $rt_o_file,  $rt_hh_file, { 'color' => 5 });
   }
 
-  &add_edge($$graph{$graph_name}{'edges'}, $rt_cc_file, $rt_rep_file, { 'color' => 4 });
-  &add_edge($$graph{$graph_name}{'edges'}, $rt_o_file,  $rt_cc_file, { 'color' => 5 });
+  &add_edge($$graph{$graph_name}{'edges'}, $rt_cc_file, $rt_rep_file, { 'color' => 4, 'weight' => 2 });
+  &add_edge($$graph{$graph_name}{'edges'}, $rt_o_file,  $rt_cc_file, { 'color' => 5, 'weight' => 2 });
+  &add_edge($$graph{$graph_name}{'edges'}, $result, $rt_o_file, { 'color' => 0, 'weight' => 2 }); # black indicates no concurrency (linking)
 
   foreach my $o_file (sort keys %$o_files) {
     &add_edge($$graph{$graph_name}{'edges'}, $result, $o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
   }
-  &add_edge($$graph{$graph_name}{'edges'}, $result, $rt_o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
-
+###
+  &add_subgraph($$graph{$graph_name}{'subgraphs'}, $cc_files_name);
+  &add_node($$graph{$graph_name}{'subgraphs'}{$cc_files_name}{'nodes'},
+            'graph', { 'rank' => 'same' });
+  foreach my $cc_file (keys %$cc_files) {
+    &add_node($$graph{$graph_name}{'subgraphs'}{$cc_files_name}{'nodes'},
+              $cc_file, undef);
+  }
+###
   print &str4graph($graph, 'digraph', $graph_name, '');
 
   ($rdir, $name, $ext) = &rdir_name_ext($repository);
