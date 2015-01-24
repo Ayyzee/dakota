@@ -209,18 +209,6 @@ sub start {
   &add_node($graph, 'node', { 'shape' => 'rect', 'width' => 1.5,
                               'style' => 'rounded',
                               'height' => 0.25 });
-
-###
-  my $input_files = [ @$so_files, @$dk_files ];
-  my $subgraph = &empty_graph('subgraph');
-  &add_node($subgraph,
-            'graph', { 'rank' => 'same' });
-  foreach my $input_file (@$input_files) {
-    &add_node($subgraph,
-              $input_file, undef);
-  }
-  &add_subgraph($graph, $subgraph);
-###
   ($rdir, $name, $ext) = &rdir_name_ext($result);
   my $rt_rep_file = &path("$obj/rt/$rdir/$name.rep");
   my $rt_hh_file =  &path("$obj/rt/$rdir/$name.hh");
@@ -235,10 +223,12 @@ sub start {
   }
   &add_node($graph, $rt_cc_file, { 'colorscheme' => $colorscheme, 'color' => 4 });
   &add_node($graph, $result, { 'style' => 'none' });
+
   foreach my $so_file (@$so_files) {
     my ($rdir, $name, $ext) = &rdir_name_ext($so_file);
     my $ctlg_file = &path("$obj/$rdir/$name.ctlg");
     my $rep_file =  &path("$obj/$rdir/$name.rep");
+
     &add_node($graph, $so_file, { 'style' => 'none' });
 
     &add_edge($graph, $ctlg_file,   $so_file,   { 'color' => 1 });
@@ -256,12 +246,12 @@ sub start {
     my $nrt_cc_file =  &path("$obj/nrt/$rdir/$name.cc");
     my $nrt_o_file =   &path("$obj/nrt/$rdir/$name.o");
 
-    &add_node($graph, $dk_cc_file, { 'style' => "rounded,bold" });;
-
     $$nrt_rep_files{$nrt_rep_file} = undef;
     $$o_files{$nrt_o_file} = undef;
     $$cc_files{$nrt_cc_file} = undef;
     $$cc_files{$dk_cc_file} = undef;
+
+    &add_node($graph, $dk_cc_file, { 'style' => "rounded,bold" });;
 
     &add_edge($graph, $nrt_rep_file, $dk_file,     { 'color' => 1 });
     &add_edge($graph, $dk_cc_file,   $dk_file,     { 'color' => 4, 'weight' => 4 });
@@ -296,16 +286,24 @@ sub start {
   foreach my $o_file (sort keys %$o_files) {
     &add_edge($graph, $result, $o_file, { 'color' => 0 }); # black indicates no concurrency (linking)
   }
+
   ###
-  $subgraph = &empty_graph('subgraph');
-  &add_node($subgraph,
-            'graph', { 'rank' => 'same' });
-  foreach my $cc_file (keys %$cc_files) {
-    &add_node($subgraph,
-              $cc_file, undef);
+  my $subgraph = &empty_graph('subgraph');
+  &add_node($subgraph, 'graph', { 'rank' => 'same' });
+  foreach my $input_file (@$so_files, @$dk_files) {
+    &add_node($subgraph, $input_file, undef);
   }
   &add_subgraph($graph, $subgraph);
-###
+  ###
+  ###
+  $subgraph = &empty_graph('subgraph');
+  &add_node($subgraph, 'graph', { 'rank' => 'same' });
+  foreach my $cc_file (keys %$cc_files) {
+    &add_node($subgraph, $cc_file, undef);
+  }
+  &add_subgraph($graph, $subgraph);
+  ###
+
   print &str4graph($graph, '');
 
   ($rdir, $name, $ext) = &rdir_name_ext($repository);
