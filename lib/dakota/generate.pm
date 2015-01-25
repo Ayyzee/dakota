@@ -57,6 +57,7 @@ our @EXPORT= qw(
                  function::overloadsig
                  should_use_include
                  make_ident_symbol_scalar
+                 symbol_parts
               );
 
 my $objdir = 'obj';
@@ -115,7 +116,8 @@ sub make_ident_symbol_scalar {
     $has_word_char = 0;
   }
 
-  my $ident_symbol = [ '_' ];
+  my $ident_symbol = [];
+  &dakota::util::_add_first($ident_symbol, '_');
 
   my $chars = [split //, $symbol];
 
@@ -134,6 +136,7 @@ sub make_ident_symbol_scalar {
     }
     &dakota::util::_add_last($ident_symbol, $part);
   }
+  &dakota::util::_add_last($ident_symbol, '_');
   my $value = &path::string($ident_symbol);
   return $value;
 }
@@ -536,7 +539,7 @@ sub generate_defn_footer {
   }
   $rt_cxx_str .= "\n";
   #my $col;
-  $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col);
+  $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col, __LINE__);
 
   $rt_cxx_str .= "\n";
   $rt_cxx_str .= $col . "static void __initial() {" . &ann(__LINE__) . "\n";
@@ -2942,13 +2945,13 @@ sub exports {
       }
 
       if (&is_exported($klass_scope)) {
-        my $lhs = "\"$klass_name\"";
+        my $lhs = "\$$klass_name";
         my $rhs = 1;
         $$exports{"\"$$klass_scope{'module'}\""}{$lhs} = $rhs;
       }
 
       if (&has_exported_slots($klass_scope)) {
-        my $lhs = "\"$klass_name:slots-t\"";
+        my $lhs = "\$$klass_name:slots-t";
         my $rhs = 1;
         $$exports{"\"$$klass_scope{'module'}\""}{$lhs} = $rhs;
       }
@@ -3724,7 +3727,7 @@ sub dk::generate_cxx_footer {
     if (0 == $num_exports) {
       $$scratch_str_ref .= $col . "static named-info-node-t* exports = nullptr;\n";
     } else {
-      $$scratch_str_ref .= &generate_info('exports', $exports, $col);
+      $$scratch_str_ref .= &generate_info('exports', $exports, $col, __LINE__);
     }
     if (0 == keys %{$$scope{'interposers'}}) {
       $$scratch_str_ref .= $col . "static property-t* interposers = nullptr;" . &ann(__LINE__) . "\n";
@@ -3821,6 +3824,14 @@ sub add_symbol_to_ident_symbol {
     $$symbols{$symbol} = $ident_symbol;
   }
 }
+sub symbol_parts {
+  my ($symbol) = @_;
+  my ($ns, $cxx_ident) = ('', undef);
+  $symbol =~ m|^(:*(.+):+)?(.+)$|;
+  $ns .= ":$2" if defined $2;
+  $cxx_ident = &dakota::generate::make_ident_symbol_scalar($3);
+  return ($ns, $cxx_ident);
+}
 sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
   my $col = '';
@@ -3830,14 +3841,19 @@ sub linkage_unit::generate_symbols {
     $$symbols{$symbol} = $ident_symbol;
   }
   while (my ($symbol, $symbol_seq) = each(%{$$file{'symbols'}})) {
-    &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol)
+    &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol);
   }
   foreach my $klass_type ('klasses', 'traits') {
     foreach my $symbol (keys %{$$file{$klass_type}}) {
       &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $$file{$klass_type}{$symbol}{'module'});
 
       if (!exists $$symbols{$symbol}) {
-        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol)
+        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol);
+      }
+      my $slots = "$symbol:slots-t";
+
+      if (!exists $$symbols{$slots}) {
+        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $slots);
       }
     }
   }
@@ -3852,14 +3868,14 @@ sub linkage_unit::generate_symbols {
     }
   }
   foreach my $symbol (@$symbol_keys) {
-    my $cxx_ident = $$symbols{$symbol};
+    my ($ns, $cxx_ident) = &symbol_parts($symbol);
     my $width = length($cxx_ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "namespace __symbol { extern noexport symbol-t $cxx_ident; }" . &ann(__LINE__) . " // $symbol\n";
+      $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t $cxx_ident; }" . &ann(__LINE__) . " // $symbol\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
-      $scratch_str .= $col . "namespace __symbol { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__LINE__) . "\n";
+      $scratch_str .= $col . "namespace __symbol$ns { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__LINE__) . "\n";
     }
   }
   return $scratch_str;
@@ -3954,7 +3970,7 @@ sub generate_property_tbl {
     my $element = $$tbl{$key};
 
     if ('HASH' eq ref $element) {
-      $result .= &generate_info("$name-$num", $element, $col);
+      $result .= &generate_info("$name-$num", $element, $col, __LINE__);
       $element = "&$name-$num";
       $num++;
     } elsif (!defined $element) {
@@ -3990,9 +4006,9 @@ sub generate_property_tbl {
   return $result;
 }
 sub generate_info {
-  my ($name, $tbl, $col, $scope) = @_;
+  my ($name, $tbl, $col, $line) = @_;
   my $result = &generate_property_tbl("$name-props", $tbl, $col, __LINE__);
-  $result .= "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };" . &ann(__LINE__) . "\n";
+  $result .= "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };" . &ann($line) . "\n";
   return $result;
 }
 sub generate_info_seq {

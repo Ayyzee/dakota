@@ -554,10 +554,8 @@ sub rewrite_array_types {
 }
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
-  #$$filestr_ref =~ s/\$($k+)\s*=>\s*($k+)/keyword($1), __arg($2)/g;
   &rewrite_keywords($filestr_ref);
-  $$filestr_ref =~ s/(?<!\\)\$($m)/&symbol($1)/ge;
-  $$filestr_ref =~ s/(?<!\\)\$($z)/&symbol($1)/ge;
+  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?)/&symbol($1)/ge;
 }
 
 # this leaks memory!!
@@ -687,12 +685,8 @@ sub rewrite_slot_access {
 }
 sub symbol {
   my ($symbol) = @_;
-  $symbol =~ s|^\"||;   # strip leading  double-quote (if any)
-  $symbol =~ s|\"$||;   # strip trailing double-quote (if any)
-  $symbol =~ s/($z)\?/$1$$long_suffix{'?'}/g;
-  $symbol =~ s/($z)\!/$1$$long_suffix{'!'}/g;
-  my $cxx_ident = &dakota::generate::make_ident_symbol_scalar($symbol);
-  return "__symbol:${cxx_ident}";
+  my ($ns, $cxx_ident) = &dakota::generate::symbol_parts($symbol);
+  return "__symbol$ns:$cxx_ident";
 }
 sub keyword {
   my ($keyword) = @_;
