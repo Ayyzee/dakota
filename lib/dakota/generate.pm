@@ -2937,23 +2937,23 @@ sub exports {
 
       while (my ($key, $element) = each (%$exported_methods)) {
         my ($lhs, $rhs) = &export_pair($klass_name, $element);
-        $$exports{"\"$$klass_scope{'module'}\""}{$lhs} = $rhs;
+        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
       while (my ($key, $element) = each (%$exported_raw_methods)) {
         my ($lhs, $rhs) = &export_pair($klass_name, $element);
-        $$exports{"\"$$klass_scope{'module'}\""}{$lhs} = $rhs;
+        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
 
       if (&is_exported($klass_scope)) {
         my $lhs = "\$$klass_name";
         my $rhs = 1;
-        $$exports{"\"$$klass_scope{'module'}\""}{$lhs} = $rhs;
+        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
 
       if (&has_exported_slots($klass_scope)) {
         my $lhs = "\$$klass_name:slots-t";
         my $rhs = 1;
-        $$exports{"\"$$klass_scope{'module'}\""}{$lhs} = $rhs;
+        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
     }
   }
