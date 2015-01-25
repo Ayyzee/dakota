@@ -29,8 +29,28 @@ include <cstring>;
 #include "dl.hh" // symbol-name-from-address()
 #include "sorted-array.hh"
 
-#define DKT-SET-METHOD-FOR-SELECTOR(methods, selector, method) (methods)->addrs[(selector)] = (method)
-#define DKT-METHOD-FOR-SELECTOR(methods, selector) (methods)->addrs[(selector)]
+#if 0
+
+#define SET-METHOD-FOR-SELECTOR( methods, selector, method) (methods)->addrs[(selector)] = (method)
+#define METHOD-FOR-SELECTOR(     methods, selector)         (methods)->addrs[(selector)]
+
+#else
+
+inline void
+SET-METHOD-FOR-SELECTOR(methods:slots-t* methods,
+                        selector-t       selector,
+                        method-t         method)
+{
+  methods->addrs[selector] = method;
+}
+inline method-t
+METHOD-FOR-SELECTOR(methods:slots-t* methods,
+                    selector-t       selector)
+{
+  return methods->addrs[selector];
+}
+
+#endif
 
 module dakota;
 
@@ -128,7 +148,7 @@ method-for-signature(methods:slots-t* methods, signature-t const* signature)
 {
   selector-t selector = selector-for-signature(signature);
   assert(selector < methods->count);
-  method-t m = DKT-METHOD-FOR-SELECTOR(methods, selector);
+  method-t m = METHOD-FOR-SELECTOR(methods, selector);
   return m;
 }
 
@@ -446,15 +466,15 @@ klass klass
   method method-t method-for-selector(object-t self, selector-t selector)
   {
     assert(selector < self.methods.count);
-    method-t m = DKT-METHOD-FOR-SELECTOR(&self.methods, selector);
+    method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     return m;
   }
 
   method method-t remove-method-for-selector(object-t self, selector-t selector)
   {
     assert(selector < self.methods.count);
-    method-t m = DKT-METHOD-FOR-SELECTOR(&self.methods, selector);
-    DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
+    method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
+    SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
       dk:set-bit(self.behavior, cast(uint32-t)selector, false);
     return m;
@@ -463,7 +483,7 @@ klass klass
   method method-t add-method-for-selector(object-t self, selector-t selector, method-t m)
   {
     assert(selector < self.methods.count);
-    DKT-SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
+    SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
       dk:set-bit(self.behavior, cast(uint32-t)selector, true);
     return m;
@@ -775,7 +795,7 @@ klass klass
         selector-t method-selector = selector-for-signature(method-signature);
         add-method-for-selector(self,
                                 method-selector,
-                                DKT-METHOD-FOR-SELECTOR(&self.methods, alias-selector));
+                                METHOD-FOR-SELECTOR(&self.methods, alias-selector));
         i++;
       }
     }
