@@ -539,7 +539,7 @@ sub generate_defn_footer {
   }
   $rt_cxx_str .= "\n";
   #my $col;
-  $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col, __LINE__);
+  $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 
   $rt_cxx_str .= "\n";
   $rt_cxx_str .= $col . "static void __initial() {" . &ann(__LINE__) . "\n";
@@ -2960,7 +2960,7 @@ sub exports {
   return $exports;
 }
 sub dk::generate_cxx_footer_klass {
-  my ($klass_scope, $klass_name, $col, $klass_type) = @_;
+  my ($klass_scope, $klass_name, $col, $klass_type, $symbols) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_cxx_footer_klass()\n";
 
@@ -3268,7 +3268,7 @@ sub dk::generate_cxx_footer_klass {
         }
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
         $$scratch_str_ref .=
-          $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, &colin($col), __LINE__) .
+          $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, &colin($col), $symbols, __LINE__) .
           $col . "}\n";
         &dakota::util::_add_last($seq, "$prop_name");
         $prop_num++;
@@ -3292,7 +3292,7 @@ sub dk::generate_cxx_footer_klass {
 
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
         $$scratch_str_ref .=
-          $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, &colin($col), __LINE__) .
+          $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, &colin($col), $symbols, __LINE__) .
           $col . "}\n";
         &dakota::util::_add_last($seq, "$prop_name");
         $prop_num++;
@@ -3446,7 +3446,7 @@ sub dk::generate_cxx_footer_klass {
   }
   $$tbbl{'$file'} = '__FILE__';
   $$scratch_str_ref .=
-    $col . "$klass_type @$klass_name { " . &generate_property_tbl('__klass-props', $tbbl, &colin($col), __LINE__) .
+    $col . "$klass_type @$klass_name { " . &generate_property_tbl('__klass-props', $tbbl, &colin($col), $symbols, __LINE__) .
     $col . "}\n";
   &dakota::util::_add_last($global_klass_defns, "$symbol:__klass-props");
   return $$scratch_str_ref;
@@ -3727,7 +3727,7 @@ sub dk::generate_cxx_footer {
     if (0 == $num_exports) {
       $$scratch_str_ref .= $col . "static named-info-node-t* exports = nullptr;\n";
     } else {
-      $$scratch_str_ref .= &generate_info('exports', $exports, $col, __LINE__);
+      $$scratch_str_ref .= &generate_info('exports', $exports, $col, $$scope{'symbols'}, __LINE__);
     }
     if (0 == keys %{$$scope{'interposers'}}) {
       $$scratch_str_ref .= $col . "static property-t* interposers = nullptr;" . &ann(__LINE__) . "\n";
@@ -3759,7 +3759,7 @@ sub dk::generate_ka_method_defns {
       my $cxx_klass_name = $klass_name;
       &path::add_last($stack, $klass_name);
       if (&is_rt_defn()) {
-        &dk::generate_cxx_footer_klass($klass_scope, $stack, $col, $klass_type);
+        &dk::generate_cxx_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
         if (1 || $$klass_scope{'raw-methods'}) {
           # currently no support for va: methods
@@ -3854,6 +3854,11 @@ sub linkage_unit::generate_symbols {
 
       if (!exists $$symbols{$slots}) {
         &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $slots);
+      }
+      my $klass_typedef = "$symbol-t";
+
+      if (!exists $$symbols{$klass_typedef}) {
+        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $klass_typedef);
       }
     }
   }
@@ -3960,7 +3965,7 @@ sub linkage_unit::generate_strings {
   return $scratch_str;
 }
 sub generate_property_tbl {
-  my ($name, $tbl, $col, $line) = @_;
+  my ($name, $tbl, $col, $symbols, $line) = @_;
   my $sorted_keys = [sort keys %$tbl];
   my $num;
   my $result = '';
@@ -3970,7 +3975,7 @@ sub generate_property_tbl {
     my $element = $$tbl{$key};
 
     if ('HASH' eq ref $element) {
-      $result .= &generate_info("$name-$num", $element, $col, __LINE__);
+      $result .= &generate_info("$name-$num", $element, $col, $symbols, __LINE__);
       $element = "&$name-$num";
       $num++;
     } elsif (!defined $element) {
@@ -3996,8 +4001,13 @@ sub generate_property_tbl {
     my $key_width = length($key);
     my $pad = ' ' x ($max_key_width - $key_width);
 
-    if ($element =~ /^".*"$/) {
-      $element = "dk-intern($element) /*hackhack*/";
+    if ($element =~ /^"(.*)"$/) {
+      my $element_in = $1;
+      if ($$symbols{$element_in}) {
+        $element = "\$$element_in /*coolcool*/";
+      } else {
+        $element = "dk-intern($element) /*hackhack*/";
+      }
     }
     $result .= $col . "{ $key, " . $pad . "cast(uintptr-t)$element },\n";
   }
@@ -4006,8 +4016,8 @@ sub generate_property_tbl {
   return $result;
 }
 sub generate_info {
-  my ($name, $tbl, $col, $line) = @_;
-  my $result = &generate_property_tbl("$name-props", $tbl, $col, __LINE__);
+  my ($name, $tbl, $col, $symbols, $line) = @_;
+  my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, __LINE__);
   $result .= "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };" . &ann($line) . "\n";
   return $result;
 }
