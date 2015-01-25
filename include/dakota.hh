@@ -185,6 +185,7 @@ import void dkt_deregister_info(named_info_node_t*);
 // import object_t dk_va_add_all(object_t self, va_list_t);
 // sentinel import object_t dk_add_all(object_t self, ...);
 
+import void dk_init_runtime();
 import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
 import object_t*       dkt_capture_current_exception(object_t arg);

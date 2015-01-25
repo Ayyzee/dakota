@@ -502,8 +502,8 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
 // object klass' klass is klass klass
 // klass klass'  klass is klass klass
 // null klass'   klass is klass klass
-static void
-init-runtime()
+export void
+dk-init-runtime()
 {
   DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
   if (nullptr == object:klass) {
@@ -1284,7 +1284,7 @@ dkt-register-info(named-info-node-t* registration-info)
       if (0)
         perl-dump-resource-info(gbl-klass-defns-table);
       if (NULL == getenv("DKT_NO_INIT_RUNTIME"))
-        init-runtime();
+        dk-init-runtime();
       if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(0);
       break;
