@@ -136,7 +136,6 @@ sub make_ident_symbol_scalar {
     }
     &dakota::util::_add_last($ident_symbol, $part);
   }
-  &dakota::util::_add_last($ident_symbol, '_');
   my $value = &path::string($ident_symbol);
   return $value;
 }
@@ -3819,20 +3818,20 @@ sub dk::generate_imported_klasses_info {
   }
 }
 sub add_symbol_to_ident_symbol {
-  my ($file, $symbols, $symbol) = @_;
+  my ($file_symbols, $symbols, $symbol) = @_;
   if ($symbol) {
     my $ident_symbol = &make_ident_symbol_scalar($symbol);
-    $$file{$symbol} = $ident_symbol;
+    $$file_symbols{$symbol} = $ident_symbol;
     $$symbols{$symbol} = $ident_symbol;
   }
 }
 sub symbol_parts {
   my ($symbol) = @_;
-  my ($ns, $cxx_ident) = ('', undef);
+  my ($ns, $ident) = ('', undef);
   $symbol =~ m|^(:*(.+):+)?(.+)$|;
   $ns .= ":$2" if defined $2;
-  $cxx_ident = &dakota::generate::make_ident_symbol_scalar($3);
-  return ($ns, $cxx_ident);
+  $ident = $3;
+  return ($ns, $ident);
 }
 sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
@@ -3875,14 +3874,15 @@ sub linkage_unit::generate_symbols {
     }
   }
   foreach my $symbol (@$symbol_keys) {
-    my ($ns, $cxx_ident) = &symbol_parts($symbol);
+    my ($ns, $ident) = &symbol_parts($symbol);
+    my $cxx_ident = &dakota::generate::make_ident_symbol_scalar($ident);
     my $width = length($cxx_ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t $cxx_ident; }" . &ann(__LINE__) . " // $symbol\n";
+      $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t _$ident; }" . &ann(__LINE__) . " // $symbol\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
-      $scratch_str .= $col . "namespace __symbol$ns { noexport symbol-t $cxx_ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__LINE__) . "\n";
+      $scratch_str .= $col . "namespace __symbol$ns { noexport symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__LINE__) . "\n";
     }
   }
   return $scratch_str;
