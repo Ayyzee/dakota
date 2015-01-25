@@ -980,10 +980,12 @@ sub method::generate_va_method_defn {
     if (defined $$va_method{'return-type'}) {
       my $return_type = &arg::type($$va_method{'return-type'});
       $$scratch_str_ref .= $col . "$return_type result = ";
+    } else {
+      $$scratch_str_ref .= $col . "";
     }
 
     $$scratch_str_ref .=
-      $col . "$va_name($$new_arg_names_list_ref);\n" .
+      "$va_name($$new_arg_names_list_ref);\n" .
       $col . "va-end(args);\n";
 
     if (defined $$va_method{'return-type'}) {
