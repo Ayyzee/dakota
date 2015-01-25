@@ -25,7 +25,7 @@ klass hashed-table
 
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name(assoc:__klass__); // hackhack
+    dk-klass-for-name($assoc); // hackhack
     return kls;
   }
 

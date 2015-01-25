@@ -248,7 +248,7 @@ find-file(str-t path, str-t file-name, str-t suffix)
 noexport symbol-t
 default-klass-name()
 {
-  return klass:__klass__;
+  return $klass;
 }
 static object-t
 default-klass()
@@ -518,16 +518,16 @@ dk-init-runtime()
     assert(nullptr == gbl-registration-info-list);
 
     // alloc
-    klass:klass =  alloc-klass(klass:__klass__); // must be first
-    object:klass = alloc-klass(object:__klass__);
+    klass:klass =  alloc-klass($klass); // must be first
+    object:klass = alloc-klass($object);
 
     // init()
-    object:klass = init-klass(object:klass, object:__klass__); // must be first
-    klass:klass =  init-klass(klass:klass,  klass:__klass__);
+    object:klass = init-klass(object:klass, $object); // must be first
+    klass:klass =  init-klass(klass:klass,  $klass);
 
     klass:unbox(object:klass)->superklass = nullptr;
 #if 1
-    dk-klass-for-name(singleton-klass:__klass__);
+    dk-klass-for-name($singleton-klass);
     null-klass = dk-make-simple-klass($null, $object, $singleton-klass);
     null = make(null-klass);
     klass:unbox(object:klass)->superklass = null;
@@ -539,7 +539,7 @@ dk-init-runtime()
     // and (optionally) null-klass and null singleton
 
 #if !defined DKT-OMIT-BEHAVIOR
-    dk-klass-for-name(bit-vector:__klass__);
+    dk-klass-for-name($bit-vector);
 
     object-t behavior;
     behavior = dk:behavior(object:klass);
@@ -556,8 +556,8 @@ dk-init-runtime()
       klass:unbox(null-klass)->behavior =     nullptr;
 #endif
 #if 1
-    dk-klass-for-name(input-stream:__klass__);
-    dk-klass-for-name(output-stream:__klass__);
+    dk-klass-for-name($input-stream);
+    dk-klass-for-name($output-stream);
 
     std-input =  make(input-stream:klass,  file => stdin);
     std-output = make(output-stream:klass, file => stdout);

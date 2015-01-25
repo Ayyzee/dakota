@@ -36,8 +36,8 @@ klass object-output-stream
 
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name(sorted-set:__klass__); // hackhack
-    dk-klass-for-name(sorted-table:__klass__); // hackhack
+    dk-klass-for-name($sorted-set); // hackhack
+    dk-klass-for-name($sorted-table); // hackhack
     return kls;
   }
 

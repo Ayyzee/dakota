@@ -103,7 +103,7 @@ static sorted-array-t   gbl-selectors-table = { gbl-selectors,
 noexport symbol-t
 default-superklass-name()
 {
-  return object:__klass__;
+  return $object;
 }
 static object-t
 default-superklass()
@@ -287,7 +287,7 @@ offset-from-info(named-info-node-t* info)
   uint32-t result;
 
   symbol-t name = name-from-info(info);
-  if (0 == symbol:compare(object:__klass__, name))
+  if (0 == symbol:compare($object, name))
   { // klass is "object"
     result = 0;
   } else {

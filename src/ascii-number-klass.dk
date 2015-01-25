@@ -35,7 +35,7 @@ klass ascii-number-klass
   object-t initialize(object-t kls)
   {
     gbl-base2-ascii-number-klass-info = dk-make-named-info($base2-ascii-number-klass,
-                                                           $superklass-name, cast(uintptr-t)ascii-number:__klass__,
+                                                           $superklass-name, cast(uintptr-t)$ascii-number,
                                                            nullptr);
     return kls;
   }

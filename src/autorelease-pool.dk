@@ -34,7 +34,7 @@ klass autorelease-pool-klass
 
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name(deque:__klass__); // hackhack
+    dk-klass-for-name($deque); // hackhack
     return kls;
   }
 
