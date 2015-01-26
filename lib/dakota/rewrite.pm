@@ -246,10 +246,6 @@ sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s^\b(klass|trait)(\s+$k+\s*\{)^/\*$1\*/ namespace$2^g;
 }
-sub rewrite_dk_klass {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|dk:+klass\(|dkt-klass(|g;
-}
 sub rewrite_selsig_replacement {
   my ($aa, $bb) = @_;
   my $cxx_ident = $$long_suffix{$bb};
@@ -954,7 +950,6 @@ sub convert_dk_to_cxx {
   &rewrite_compound_literal_cstring($filestr_ref);
   &rewrite_compound_literal($filestr_ref);
   &rewrite_klass_defn($filestr_ref);
-  &rewrite_dk_klass($filestr_ref);
   &rewrite_syntax($filestr_ref);
   &rewrite_declarations($filestr_ref);
 

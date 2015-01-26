@@ -79,7 +79,7 @@ klass autorelease-pool
   {
     self = dk:init(super);
     self.counted-elements = make(sorted-counted-set:klass);
-    object-t kls = dk:klass(self);
+    object-t kls = dkt-klass(self);
     object-t pools = dk:pools(kls);
     dk:push(pools, self);
     return self;
@@ -99,7 +99,7 @@ klass autorelease-pool
         dk:release(assoc->key);
       }
     }
-    object-t kls = dk:klass(self);
+    object-t kls = dkt-klass(self);
     object-t pools = dk:pools(kls);
     object-t pool = dk:pop(pools);
     assert(self == pool);

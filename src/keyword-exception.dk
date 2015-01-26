@@ -94,7 +94,7 @@ klass keyword-exception
     else
       dk:print-format(out, ": %s", nullptr);
 
-    object-t object-klass = dk:klass(self.object);
+    object-t object-klass = dkt-klass(self.object);
     dk:print-format(out, " of <%s> %s(%s): %s '%s'",
                     dk:name(object-klass),
                     self.signature->name,

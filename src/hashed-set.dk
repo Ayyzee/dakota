@@ -213,7 +213,7 @@ klass hashed-set
 
   method object-t copy-shallow(object-t self)
   {
-    object-t kls = dk:klass(self);
+    object-t kls = dkt-klass(self);
     object-t copy = make(kls);
     slots-t* s1 = unbox(self);
     slots-t* s2 = unbox(copy);

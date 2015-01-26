@@ -126,7 +126,7 @@ klass ascii-number
     self = dk:init(super);
     self.number = number;
     self.ascii-string = cast(char8-t*)malloc(sizeof(char8-t) * (32 + 1));
-    object-t kls = dk:klass(self);
+    object-t kls = dkt-klass(self);
     str-t digits = dk:digits(kls);
     uint32-t base = cast(uint32-t)safe-strlen(digits);
     convert(number, cast(int32-t)(base), digits, self.ascii-string);

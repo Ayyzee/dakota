@@ -50,7 +50,7 @@ trait table
 
   method object-t keys(object-t self)
   {
-    object-t set-kls = dk:superklass(dk:klass(self));
+    object-t set-kls = dk:superklass(dkt-klass(self));
     object-t result = make(set-kls);
     for (assoc-t* assoc in self)
       dk:add(result, assoc->key);

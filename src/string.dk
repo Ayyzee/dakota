@@ -166,7 +166,7 @@ klass string
     str-t p1 = self.ptr;
     str-t p2;
 
-    object-t kls = dk:klass(self);
+    object-t kls = dkt-klass(self);
     object-t delimiter-object = make(kls, bytes => delimiter);
 
     // leading 'delimiter'
