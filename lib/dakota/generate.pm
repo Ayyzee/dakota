@@ -3868,14 +3868,14 @@ sub linkage_unit::generate_symbols {
   my $max_width = 0;
   foreach my $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = 1 + length($ident);
+    my $width = length($symbol);
     if ($width > $max_width) {
       $max_width = $width;
     }
   }
   foreach my $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = 1 + length($ident);
+    my $width = length($symbol);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
       $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t _$ident; }" . &ann(__LINE__) . " // $symbol\n";
@@ -3895,7 +3895,7 @@ sub linkage_unit::generate_hashes {
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = 1 + length($ident);
+    my $width = length($symbol);
     if ($width > $max_width) {
       $max_width = $width;
     }
@@ -3904,7 +3904,7 @@ sub linkage_unit::generate_hashes {
   if (&is_rt_defn()) {
     foreach $symbol (@$symbol_keys) {
       my ($ns, $ident) = &symbol_parts($symbol);
-      my $width = 1 + length($ident);
+      my $width = length($symbol);
       my $pad = ' ' x ($max_width - $width);
       $scratch_str .= $col . "namespace __hash$ns { /*static*/ constexpr uintmax-t _$ident = " . $pad . "dk-hash(\"$symbol\"); }" . &ann(__LINE__) . "\n";
     }
@@ -3920,7 +3920,7 @@ sub linkage_unit::generate_keywords {
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = 1 + length($ident);
+    my $width = length($symbol);
     if ($width > $max_width) {
       $max_width = $width;
     }
@@ -3929,7 +3929,7 @@ sub linkage_unit::generate_keywords {
 
   foreach $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = 1 + length($ident);
+    my $width = length($symbol);
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
       if (&is_decl()) {
