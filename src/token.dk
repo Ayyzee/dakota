@@ -88,7 +88,7 @@ klass token
 
   method uintmax-t hash(object-t self)
   {
-    object-t string = make(string:klass, bytes => cast(str-t)(self.buffer));
+    object-t string = make(string:klass, $bytes => cast(str-t)(self.buffer));
     uintmax-t hash = dk:hash(string);
     return hash;
   }
@@ -99,8 +99,8 @@ klass token
 
     if (dk:instance?(other, klass)) {
       slots-t* t = unbox(other);
-      object-t s-string = make(string:klass, bytes => cast(str-t)(self.buffer));
-      object-t t-string = make(string:klass, bytes => cast(str-t)(t->buffer));
+      object-t s-string = make(string:klass, $bytes => cast(str-t)(self.buffer));
+      object-t t-string = make(string:klass, $bytes => cast(str-t)(t->buffer));
       state = dk:equal?(s-string, t-string);
     } else {
       state = false;

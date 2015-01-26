@@ -213,7 +213,7 @@ klass deque
   method object-t copy-shallow(object-t self)
   {
     USE(self);
-    throw make(exception:klass, message => "not yet implemented");
+    throw make(exception:klass, $message => "not yet implemented");
     return null;
   }
 
@@ -241,7 +241,7 @@ klass deque
   method object-t empty(object-t self)
   {
     USE(self);
-    throw make(exception:klass, message => "not yet implemented");
+    throw make(exception:klass, $message => "not yet implemented");
     return null;
   }
 
@@ -353,13 +353,13 @@ klass deque
   method object-t reverse(object-t self)
   {
     USE(self);
-    throw make(exception:klass, message => "not yet implemented");
+    throw make(exception:klass, $message => "not yet implemented");
     return null;
   }
 
   method object-t forward-iterator(object-t self)
   {
-    object-t forward-iterator = make(deque-forward-iterator:klass, deque => self);
+    object-t forward-iterator = make(deque-forward-iterator:klass, $deque => self);
     return forward-iterator;
   }
 
@@ -405,7 +405,7 @@ klass deque-forward-iterator
     deque:slots-t* d = deque:unbox(self.deque);
 
     if (self.iterator-state != d->iterator-state)
-      throw make(exception:klass, message => "oops");
+      throw make(exception:klass, $message => "oops");
     return;
   }
 

@@ -63,7 +63,7 @@ klass perl-parser
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s: %s", filename, buf);
-        throw make(exception:klass, message => "oops");
+        throw make(exception:klass, $message => "oops");
       }
     } else {
       self.filename = nullptr;
@@ -123,16 +123,16 @@ klass perl-parser
       switch (c)
       {
         // self.column needs to be adjusted by the length of the token
-        case '[': { return make(token:klass, tokenid => '[', buffer => "[",
-                                line => self.line, column => self.column - 1); }
-        case ']': { return make(token:klass, tokenid => ']', buffer => "]",
-                                line => self.line, column => self.column - 1); }
-        case '{': { return make(token:klass, tokenid => '{', buffer => "{",
-                                line => self.line, column => self.column - 1); }
-        case '}': { return make(token:klass, tokenid => '}', buffer => "}",
-                                line => self.line, column => self.column - 1); }
-        case ',': { return make(token:klass, tokenid => ',', buffer => ",",
-                                line => self.line, column => self.column - 1); }
+        case '[': { return make(token:klass, $tokenid => '[', $buffer => "[",
+                                $line => self.line, $column => self.column - 1); }
+        case ']': { return make(token:klass, $tokenid => ']', $buffer => "]",
+                                $line => self.line, $column => self.column - 1); }
+        case '{': { return make(token:klass, $tokenid => '{', $buffer => "{",
+                                $line => self.line, $column => self.column - 1); }
+        case '}': { return make(token:klass, $tokenid => '}', $buffer => "}",
+                                $line => self.line, $column => self.column - 1); }
+        case ',': { return make(token:klass, $tokenid => ',', $buffer => ",",
+                                $line => self.line, $column => self.column - 1); }
         case '$':
         {
           while ('\n' != (c = perl-parser:get(self))) {
@@ -148,15 +148,15 @@ klass perl-parser
             print-error(self.filename, self.line, self.column - 2, "unknown token '='\n");
             return null;
           } else {
-            return make(token:klass, tokenid => '=>', buffer => "=>",
-                        line => self.line, column => self.column - 2);
+            return make(token:klass, $tokenid => '=>', $buffer => "=>",
+                        $line => self.line, $column => self.column - 2);
           }
         }
         case '\'':
         {
           int32-t quote-type = '\'';
-          object-t token = make(token:klass, tokenid => 'sqst',
-                                line => self.line, column => self.column - 1);
+          object-t token = make(token:klass, $tokenid => 'sqst',
+                                $line => self.line, $column => self.column - 1);
           boole-t escaped?;
           c = perl-parser:get(self);
           if (EOF == c) {
@@ -201,8 +201,8 @@ klass perl-parser
             
         case '_':
         {
-          object-t token = make(token:klass, tokenid => 'st',
-                                line => self.line, column => self.column - 1);
+          object-t token = make(token:klass, $tokenid => 'st',
+                                $line => self.line, $column => self.column - 1);
           do {
             dk:append(token, cast(uint32-t)c);
             c = perl-parser:get(self);
@@ -234,13 +234,13 @@ klass perl-parser
     switch (dk:tokenid(token))
     {
       case 'sqst':
-        key = make(string:klass, bytes => dk:buffer(token));
+        key = make(string:klass, $bytes => dk:buffer(token));
         break;
       case 'dqst':
-        key = make(string:klass, bytes => dk:buffer(token));
+        key = make(string:klass, $bytes => dk:buffer(token));
         break;
       case 'st':
-        key = make(string:klass, bytes => dk:buffer(token));
+        key = make(string:klass, $bytes => dk:buffer(token));
         break;
       case '}':
         return null;
@@ -262,7 +262,7 @@ klass perl-parser
       print-error(self.filename, self.line, self.column, "expected '=>' but got '%s'\n", dk:buffer(token));
       return null;
     }
-    return make(string:klass, bytes => dk:buffer(token));
+    return make(string:klass, $bytes => dk:buffer(token));
   }
 
   /* method */ static object-t get-value(object-t self)
@@ -279,13 +279,13 @@ klass perl-parser
         value = null; // undef
         break;
       case 'sqst':
-        value = make(string:klass, bytes => dk:buffer(token));
+        value = make(string:klass, $bytes => dk:buffer(token));
         break;
       case 'dqst':
-        value = make(string:klass, bytes => dk:buffer(token));
+        value = make(string:klass, $bytes => dk:buffer(token));
         break;
       case 'st':
-        value = make(string:klass, bytes => dk:buffer(token));
+        value = make(string:klass, $bytes => dk:buffer(token));
         break;
       case '{':
         value = perl-parser:get-table(self);
@@ -314,13 +314,13 @@ klass perl-parser
         value = null; // undef
         break;
       case 'sqst':
-        value = make(string:klass, bytes => dk:buffer(token));
+        value = make(string:klass, $bytes => dk:buffer(token));
         break;
       case 'dqst':
-        value = make(string:klass, bytes => dk:buffer(token));
+        value = make(string:klass, $bytes => dk:buffer(token));
         break;
       case 'st':
-        value = make(string:klass, bytes => dk:buffer(token));
+        value = make(string:klass, $bytes => dk:buffer(token));
         break;
       case '{':
         value = perl-parser:get-table(self);
@@ -425,11 +425,11 @@ klass perl-parser
       case 'undf':
         return null; // undef
       case 'sqst':
-        return make(string:klass, bytes => dk:buffer(token));
+        return make(string:klass, $bytes => dk:buffer(token));
       case 'dqst':
-        return make(string:klass, bytes => dk:buffer(token));
+        return make(string:klass, $bytes => dk:buffer(token));
       case 'st':
-        return make(string:klass, bytes => dk:buffer(token));
+        return make(string:klass, $bytes => dk:buffer(token));
       case '{':
         return perl-parser:get-table(self);
       case '[':

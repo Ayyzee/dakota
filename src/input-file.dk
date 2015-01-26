@@ -60,7 +60,7 @@ klass input-file
       file = fopen(filename, "r");
 
       if (nullptr == file)
-        throw make(system-exception:klass, errnum => errno);
+        throw make(system-exception:klass, $errnum => errno);
     }
     self.filename = filename; // copycopy: should make a copy?
     fpos-t fpos;
@@ -155,7 +155,7 @@ klass input-file
         buf-pos++;
         buf[buf-pos] = NUL;
       }
-      object-t t = make(token:klass, line => self.line, column => self.column, buffer => buf);
+      object-t t = make(token:klass, $line => self.line, $column => self.column, $buffer => buf);
       dk:add-last(result, t);
 
       if (NUL == c)

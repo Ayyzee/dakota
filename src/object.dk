@@ -101,7 +101,7 @@ klass object
   method object-t copy(object-t self)
   {
     USE(self);
-    throw make(exception:klass, message => "not yet implemented");
+    throw make(exception:klass, $message => "not yet implemented");
     return nullptr;
   }
 

@@ -559,9 +559,9 @@ dk-init-runtime()
     dk-klass-for-name($input-stream);
     dk-klass-for-name($output-stream);
 
-    std-input =  make(input-stream:klass,  file => stdin);
-    std-output = make(output-stream:klass, file => stdout);
-    std-error =  make(output-stream:klass, file => stderr);
+    std-input =  make(input-stream:klass,  $file => stdin);
+    std-output = make(output-stream:klass, $file => stdout);
+    std-error =  make(output-stream:klass, $file => stderr);
 #endif
 
     previous-terminate = std::set-terminate(verbose-terminate);
@@ -1374,7 +1374,7 @@ dk-klass-for-name(symbol-t klass-name)
       assert(klass:klass == klass-klass || klass:subklass?(klass-klass, klass:klass));
       assert(nullptr != klass-klass);
     }
-    klass = make(klass-klass, info-slots => klass-info-slots);
+    klass = make(klass-klass, $info-slots => klass-info-slots);
   }
   assert(nullptr != klass);
   return klass;

@@ -77,7 +77,7 @@ namespace klass
 
 noreturn export void dkt-null-method(object-t object, ...)
 {
-  throw make(no-such-method-exception:klass, object => object, kls => dkt-klass(object));
+  throw make(no-such-method-exception:klass, $object => object, $kls => dkt-klass(object));
 }
 
 klass selector-pair
@@ -459,7 +459,7 @@ klass klass
 
   //      method va-method-t va-method-for-selector(object-t self, selector-t selector)
   //      {
-  //        throw make(exception:klass, message => "not yet implemented");
+  //        throw make(exception:klass, $message => "not yet implemented");
   //        // return nullptr
   //      }
 
@@ -699,7 +699,7 @@ klass klass
   method object-t behavior(object-t self)
   {
     if (nullptr == self.behavior) {
-      self.behavior = make(bit-vector:klass, initial-capacity => self.methods.count);
+      self.behavior = make(bit-vector:klass, $initial-capacity => self.methods.count);
 
       for (uint32-t index = 0; index < self.methods.count; index++)
         if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])

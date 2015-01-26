@@ -886,6 +886,7 @@ sub convert_dk_to_cxx {
   &rewrite_strswitch($filestr_ref);
   &rewrite_case_with_string($filestr_ref);
 
+  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?\s+=>)/$1/g; # just remove leading $
   &rewrite_keywords($filestr_ref);
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);
