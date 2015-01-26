@@ -4003,9 +4003,9 @@ sub generate_property_tbl {
     if ($element =~ /^"(.*)"$/) {
       my $element_in = $1;
       if ($$symbols{$element_in}) {
-        $element = "\$$element_in /*coolcool*/";
+        $element = "\$$element_in";
       } else {
-        $element = "dk-intern($element) /*hackhack*/";
+        $element = "dk-intern($element)";
       }
     }
     $result .= $col . "{ $key, " . $pad . "cast(uintptr-t)$element },\n";
