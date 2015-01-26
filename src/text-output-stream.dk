@@ -51,7 +51,7 @@ klass text-output-stream
 
   method object-t init(object-t self, file-t file => stdout)
   {
-    self = dk:init(super, file => file);
+    self = dk:init(super, $file => file);
     self.column = 0;
     self.previous-features = k-trailing-newline;
     return self;

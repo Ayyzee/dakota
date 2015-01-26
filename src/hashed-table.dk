@@ -40,7 +40,7 @@ klass hashed-table
                        object-t          elements => nullptr,
                        object-t*         items =>    nullptr)
   {
-    self = dk:init(super, equal? => equal?, hash => hash, elements => elements, items => items);
+    self = dk:init(super, $equal? => equal?, $hash => hash, $elements => elements, $items => items);
     return self;
   }
 }

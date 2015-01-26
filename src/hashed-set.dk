@@ -64,7 +64,7 @@ klass hashed-set
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk:init(o, items => (object-t[]){ o1, o2, nullptr });
+  // dk:init(o, $items => (object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t self,
                        hash-t            hash =>     dk:hash,

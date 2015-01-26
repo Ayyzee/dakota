@@ -48,7 +48,7 @@ klass object-output-stream
 
   method object-t init(object-t self, file-t file => stdout)
   {
-    self = dk:init(super, file => file);
+    self = dk:init(super, $file => file);
     assert(nullptr != file);
 //     equal-predicate-t equal? = cast(equal-predicate-t)dk:method-for-selector(object:klass,
 //                                                                                        selector(equal?(object-t, object-t));
