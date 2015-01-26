@@ -3867,16 +3867,15 @@ sub linkage_unit::generate_symbols {
   my $scratch_str = "";
   my $max_width = 0;
   foreach my $symbol (@$symbol_keys) {
-    my $cxx_ident = $$symbols{$symbol};
-    my $width = length($cxx_ident);
+    my ($ns, $ident) = &symbol_parts($symbol);
+    my $width = 1 + length($ident);
     if ($width > $max_width) {
       $max_width = $width;
     }
   }
   foreach my $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
-    my $cxx_ident = &dakota::generate::make_ident_symbol_scalar($ident);
-    my $width = length($cxx_ident);
+    my $width = 1 + length($ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
       $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t _$ident; }" . &ann(__LINE__) . " // $symbol\n";
@@ -3895,9 +3894,8 @@ sub linkage_unit::generate_hashes {
   my $symbol_keys = [sort symbol::compare keys %{$$file{'hashes'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
-    my $cxx_ident = &make_ident_symbol_scalar($symbol);
-    $$file{'hashes'}{$symbol} = $cxx_ident;
-    my $width = length($cxx_ident);
+    my ($ns, $ident) = &symbol_parts($symbol);
+    my $width = 1 + length($ident);
     if ($width > $max_width) {
       $max_width = $width;
     }
@@ -3905,10 +3903,10 @@ sub linkage_unit::generate_hashes {
   my $scratch_str = "";
   if (&is_rt_defn()) {
     foreach $symbol (@$symbol_keys) {
-      my $cxx_ident = $$file{'hashes'}{$symbol};
-      my $width = length($cxx_ident);
+      my ($ns, $ident) = &symbol_parts($symbol);
+      my $width = 1 + length($ident);
       my $pad = ' ' x ($max_width - $width);
-      $scratch_str .= $col . "namespace __hash { /*static*/ constexpr uintmax-t $cxx_ident = " . $pad . "dk-hash(\"$symbol\"); }" . &ann(__LINE__) . "\n";
+      $scratch_str .= $col . "namespace __hash$ns { /*static*/ constexpr uintmax-t _$ident = " . $pad . "dk-hash(\"$symbol\"); }" . &ann(__LINE__) . "\n";
     }
   }
   return $scratch_str;
@@ -3921,9 +3919,8 @@ sub linkage_unit::generate_keywords {
   my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
-    my $cxx_ident = &make_ident_symbol_scalar($symbol);
-    $$file{'keywords'}{$symbol} = $cxx_ident;
-    my $width = length($cxx_ident);
+    my ($ns, $ident) = &symbol_parts($symbol);
+    my $width = 1 + length($ident);
     if ($width > $max_width) {
       $max_width = $width;
     }
@@ -3931,18 +3928,18 @@ sub linkage_unit::generate_keywords {
   my $scratch_str = "";
 
   foreach $symbol (@$symbol_keys) {
-    my $cxx_ident = $$file{'keywords'}{$symbol};
-    my $width = length($cxx_ident);
+    my ($ns, $ident) = &symbol_parts($symbol);
+    my $width = 1 + length($ident);
     my $pad = ' ' x ($max_width - $width);
-    if (defined $cxx_ident) {
+    if (defined $ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "namespace __keyword { extern noexport keyword-t $cxx_ident; }" . &ann(__LINE__) . " // $symbol\n";
+        $scratch_str .= $col . "namespace __keyword$ns { extern noexport keyword-t _$ident; }" . &ann(__LINE__) . " // $symbol\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
         # keyword-defn
-        $scratch_str .= "namespace __keyword { noexport keyword-t $cxx_ident = " . $pad . "{ \$$symbol, " . $pad . "__hash:$cxx_ident }; }" . &ann(__LINE__) . " // $symbol\n";
+        $scratch_str .= "namespace __keyword$ns { noexport keyword-t _$ident = " . $pad . "{ __symbol$ns:_$ident, " . $pad . "__hash$ns:_$ident }; }" . &ann(__LINE__) . " // $symbol\n";
       }
     }
   }
