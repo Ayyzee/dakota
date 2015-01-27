@@ -83,20 +83,26 @@ klass named-info-node
 
   method slots-t* dump(slots-t* s)
   {
-    printf("{\n");
-    for (uint32-t i = 0; i < s->count; i++) {
-      symbol-t key = s->elements[i].key;
-      uintptr-t element = s->elements[i].element;
-      printf("  %s = 0x%0*" PRIxPTR,
-             key, PRIxPTR-WIDTH, element);
+    slots-t* current = s;
+    while (nullptr != current) {
+      printf("{\n");
+      for (uint32-t i = 0; i < current->count; i++) {
+        symbol-t key = current->elements[i].key;
+        uintptr-t element = current->elements[i].element;
+        printf("  $%s => 0x%0*" PRIxPTR,
+               key, PRIxPTR-WIDTH, element);
 
-      if (0 == symbol:compare($file, key))
-        printf("  \"%s\"", cast(str-t)(element));
-      else-if (0 == symbol:compare($name, key))
-        printf("  \"%s\"", cast(symbol-t)(element));
-      printf("\n");
+        if (0) {}
+        else-if (0 == symbol:compare($file, key))
+              printf("  \"%s\",", cast(str-t)(element));
+        else-if (0 == symbol:compare($name,      key) ||
+                 0 == symbol:compare($construct, key))
+              printf("  $%s,",    cast(symbol-t)(element));
+        printf("\n");
+      }
+      printf("},\n");
+      current = current->next;
     }
-    printf("}\n");
     return s;
   }
 
