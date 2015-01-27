@@ -103,11 +103,11 @@
 
 inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 
-#define dkt_raw_signature(name,args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __raw_signature::name))()
-#define dkt_signature(name, args)    (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __signature::name))()
-#define dkt_ka_signature(name, args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __ka_signature::name))()
+#define dkt_slots_signature(name,args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __slots_signature::name))()
+#define dkt_signature(name, args)      (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __signature::name))()
+#define dkt_ka_signature(name, args)   (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __ka_signature::name))()
 
-#define selector(name, args)    *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
+#define selector(name, args)          *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
 #define unless(e) if (0 == (e))
 #define until(e)  while (0 == (e))
 

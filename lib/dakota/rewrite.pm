@@ -262,9 +262,9 @@ sub rewrite_signatures {
   $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
   $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 
-  $$filestr_ref =~ s/(?<!$k)(dkt-raw-signature\s*\(.*?)(\()/$1,$2/g;
-  $$filestr_ref =~ s/(?<!$k)(dkt-raw-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-  $$filestr_ref =~ s/(?<!$k)(dkt-raw-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\(.*?)(\()/$1,$2/g;
+  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 }
 sub rewrite_selectors {
   my ($filestr_ref) = @_;

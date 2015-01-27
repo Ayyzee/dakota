@@ -275,7 +275,7 @@ sub _rep_merge { # recursive
 	} elsif ('klasses' eq $name || 'traits' eq $name) {
 	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'methods'}, $$subscope{'methods'});
 	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'va-methods'}, $$subscope{'va-methods'});
-	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'raw-methods'}, $$subscope{'raw-methods'});
+	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'slots-methods'}, $$subscope{'slots-methods'});
 
 	  # need to merge 'slots' and bunch-o-stuff
 	}
@@ -1559,11 +1559,11 @@ sub add_generics_used {
 
 # 'methods'
 # 'va-methods'
-# 'raw-methods'
+# 'slots-methods'
 
 # exported or not, raw or not, va or not
 
-# exported-va-raw-methods
+# exported-va-slots-methods
 sub method {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'method');
@@ -1707,22 +1707,22 @@ sub method {
   my $signature = &function::overloadsig($method, undef);
 
   if (0) {}
-  elsif (&dakota::generate::is_raw($method) && &dakota::generate::is_va($method)) { # 11
-    if (!defined $$gbl_current_scope{'raw-methods'}) {
-      $$gbl_current_scope{'raw-methods'} = {};
+  elsif (&dakota::generate::is_slots($method) && &dakota::generate::is_va($method)) { # 11
+    if (!defined $$gbl_current_scope{'slots-methods'}) {
+      $$gbl_current_scope{'slots-methods'} = {};
     }
-    $$gbl_current_scope{'raw-methods'}{$signature} = $method;
-  } elsif (&dakota::generate::is_raw($method) && !&dakota::generate::is_va($method)) { # 10
-    if (!defined $$gbl_current_scope{'raw-methods'}) {
-      $$gbl_current_scope{'raw-methods'} = {};
+    $$gbl_current_scope{'slots-methods'}{$signature} = $method;
+  } elsif (&dakota::generate::is_slots($method) && !&dakota::generate::is_va($method)) { # 10
+    if (!defined $$gbl_current_scope{'slots-methods'}) {
+      $$gbl_current_scope{'slots-methods'} = {};
     }
-    $$gbl_current_scope{'raw-methods'}{$signature} = $method;
-  } elsif (!&dakota::generate::is_raw($method) && &dakota::generate::is_va($method)) { # 01
+    $$gbl_current_scope{'slots-methods'}{$signature} = $method;
+  } elsif (!&dakota::generate::is_slots($method) && &dakota::generate::is_va($method)) { # 01
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }
     $$gbl_current_scope{'methods'}{$signature} = $method;
-  } elsif (!&dakota::generate::is_raw($method) && !&dakota::generate::is_va($method)) { # 00
+  } elsif (!&dakota::generate::is_slots($method) && !&dakota::generate::is_va($method)) { # 00
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }
@@ -2060,10 +2060,10 @@ sub parse_root {
   return $gbl_root;
 }
 sub add_object_methods_decls_to_klass {
-  my ($klass_scope, $methods_key, $raw_methods_key) = @_;
-  while (my ($raw_method_sig, $raw_method_info) = each (%{$$klass_scope{$raw_methods_key}})) {
-    if ($$raw_method_info{'defined?'}) {
-      my $object_method_info = &dakota::generate::convert_to_object_method($raw_method_info);
+  my ($klass_scope, $methods_key, $slots_methods_key) = @_;
+  while (my ($slots_method_sig, $slots_method_info) = each (%{$$klass_scope{$slots_methods_key}})) {
+    if ($$slots_method_info{'defined?'}) {
+      my $object_method_info = &dakota::generate::convert_to_object_method($slots_method_info);
       my $object_method_signature = &function::overloadsig($object_method_info, undef);
 
       if (($$klass_scope{'methods'}{$object_method_signature} &&
@@ -2084,7 +2084,7 @@ sub add_object_methods_decls {
 
   foreach my $construct ('klasses', 'traits') {
     while (my ($klass_name, $klass_scope) = each (%{$$root{$construct}})) {
-      &add_object_methods_decls_to_klass($klass_scope, 'methods', 'raw-methods');
+      &add_object_methods_decls_to_klass($klass_scope, 'methods', 'slots-methods');
     }
   }
 }

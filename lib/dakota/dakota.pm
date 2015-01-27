@@ -183,7 +183,7 @@ sub add_visibility {
         foreach my $constructs ('klasses', 'traits') {
           if ($$root{$constructs}{$klass_name} &&
                 $$root{$constructs}{$klass_name}{'module'} eq $name) {
-            foreach my $method_type ('raw-methods', 'methods') {
+            foreach my $method_type ('slots-methods', 'methods') {
               #print STDERR &Dumper($$root{$constructs}{$klass_name});
               while (my ($sig, $scope) = each (%{$$root{$constructs}{$klass_name}{$method_type}})) {
                 my $sig_min = &sig1($scope);
@@ -296,8 +296,8 @@ sub rt::add_extra_symbols {
     'executable' => undef,
     'exported-method-addresses' => undef,
     'exported-method-signatures' => undef,
-    'exported-raw-method-addresses' => undef,
-    'exported-raw-method-signatures' => undef,
+    'exported-slots-method-addresses' => undef,
+    'exported-slots-method-signatures' => undef,
     'exported?' => undef,
     'exports' => undef,
     'file' => undef,

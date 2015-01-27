@@ -986,7 +986,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
   signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info-node:at(klass-info, $method-signatures);
   signature-t const* const* ka-method-signatures =           cast(signature-t const* const*)named-info-node:at(klass-info, $ka-method-signatures);
   signature-t const* const* exported-method-signatures =     cast(signature-t const* const*)named-info-node:at(klass-info, $exported-method-signatures);
-  signature-t const* const* exported-raw-method-signatures = cast(signature-t const* const*)named-info-node:at(klass-info, $exported-raw-method-signatures);
+  signature-t const* const* exported-slots-method-signatures = cast(signature-t const* const*)named-info-node:at(klass-info, $exported-slots-method-signatures);
   named-enum-info-t const*  enum-info =                      cast(named-enum-info-t const*) named-info-node:at(klass-info, $enum-info);
   const-info-t const*       const-info =                     cast(const-info-t const*)      named-info-node:at(klass-info, $const-info);
   str-t                     slots-type =                     cast(str-t)                    named-info-node:at(klass-info, $slots-type);
@@ -994,7 +994,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
   named-info-node-t*        slots-info =                     cast(named-info-node-t*)       named-info-node:at(klass-info, $slots-info);
 //     method-t const* method-addresses = cast(method-t*)named-info-node:at(klass-info, $method-addresses);
 //     method-t const* exported-method-addresses = cast(method-t*)named-info-node:at(klass-info, $exported-method-addresses);
-//     method-t const* exported-raw-method-addresses = cast(method-t*)named-info-node:at(klass-info, $exported-raw-method-addresses);
+//     method-t const* exported-slots-method-addresses = cast(method-t*)named-info-node:at(klass-info, $exported-slots-method-addresses);
 
   assert(nullptr != construct);
   assert(nullptr != name);
@@ -1150,7 +1150,7 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
   //max-return-type-width = max-method-return-type-width(ka-method-signatures, nullptr);
     max-return-type-width = max-method-return-type-width(method-signatures,
                                                          exported-method-signatures,
-                                                         exported-raw-method-signatures,
+                                                         exported-slots-method-signatures,
                                                          nullptr);
 
     index = 0;
@@ -1172,8 +1172,8 @@ dump-klass(ofile-t ofl, named-info-node-t* klass-info)
         dump-method(ofl, info, max-return-type-width);
 
     index = 0;
-    if (nullptr != exported-raw-method-signatures)
-      while (nullptr != (info = exported-raw-method-signatures[index++]))
+    if (nullptr != exported-slots-method-signatures)
+      while (nullptr != (info = exported-slots-method-signatures[index++]))
         dump-method(ofl, info, max-return-type-width);
 
     ofl.col--;

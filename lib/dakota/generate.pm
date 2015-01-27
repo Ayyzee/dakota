@@ -657,7 +657,7 @@ sub is_exported {
     return 0;
   }
 }
-sub is_raw {
+sub is_slots {
   my ($method) = @_;
   if ('object-t' ne $$method{'parameter-types'}[0][0]) {
     return 1;
@@ -813,7 +813,7 @@ sub klass::va_list_methods {
   my $va_methods_seq = [];
 
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'raw-methods'}}) {
+  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if (&is_va($method)) {
       &dakota::util::_add_last($va_methods_seq, $method);
     }
@@ -838,7 +838,7 @@ sub klass::method_aliases {
   my $method_aliases_seq = [];
 
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'raw-methods'}}) {
+  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if ($$method{'alias'}) {
       &dakota::util::_add_last($method_aliases_seq, $method);
     }
@@ -1083,7 +1083,7 @@ sub common::generate_signature_defns {
   foreach my $generic (@$generics) {
     if (&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         $scratch_str .= &common::print_signature($generic, $col, ['signature', ':', 'va']);
       }
       $$generic{'keyword-types'} = $keyword_types;
@@ -1096,7 +1096,7 @@ sub common::generate_signature_defns {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
         my $keyword_types = $$varargs_generic{'keyword-types'} ||= undef;
-        #if (!&is_raw($varargs_generic)) {
+        #if (!&is_slots($varargs_generic)) {
         $scratch_str .= &common::print_signature($varargs_generic, $col, ['signature']);
         #}
         $$varargs_generic{'keyword-types'} = $keyword_types;
@@ -1107,7 +1107,7 @@ sub common::generate_signature_defns {
   foreach my $generic (@$generics) {
     if (!&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         $scratch_str .= &common::print_signature($generic, $col, ['signature']);
       }
       $$generic{'keyword-types'} = $keyword_types;
@@ -1173,7 +1173,7 @@ sub common::generate_selector_defns {
   foreach my $generic (@$generics) {
     if (&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         $scratch_str .= &common::print_selector($generic, $col, ['selector', ':', 'va']);
       }
       $$generic{'keyword-types'} = $keyword_types;
@@ -1186,7 +1186,7 @@ sub common::generate_selector_defns {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
         my $keyword_types = $$varargs_generic{'keyword-types'} ||= undef;
-        if (!&is_raw($generic)) {
+        if (!&is_slots($generic)) {
           $scratch_str .= &common::print_selector($varargs_generic, $col, ['selector']);
         }
         $$varargs_generic{'keyword-types'} = $keyword_types;
@@ -1197,7 +1197,7 @@ sub common::generate_selector_defns {
   foreach my $generic (@$generics) {
     if (!&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         $scratch_str .= &common::print_selector($generic, $col, ['selector']);
       }
       $$generic{'keyword-types'} = $keyword_types;
@@ -1267,7 +1267,7 @@ sub generics::generate_signature_seq {
       }
     }
     foreach $generic (@$fa_generics) {
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         my $method_type = &method::type($generic, [ $return_type ]);
         my $width = length($method_type);
         my $pad = ' ' x ($max_width - $width);
@@ -1346,7 +1346,7 @@ sub generics::generate_selector_seq {
       }
     }
     foreach $generic (@$fa_generics) {
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         my $method_type = &method::type($generic, [ $return_type ]);
         my $width = length($method_type);
         my $pad = ' ' x ($max_width - $width);
@@ -1561,7 +1561,7 @@ sub generics::generate_generic_defns {
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
   foreach $generic (@$generics) {
     if (&is_va($generic)) {
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         &generics::generate_generic_defn($generic, $is_inline, $col);
       }
     }
@@ -1569,19 +1569,19 @@ sub generics::generate_generic_defns {
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-super-t");
   foreach $generic (@$generics) {
     if (&is_va($generic)) {
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         &generics::generate_super_generic_defn($generic, $is_inline, $col);
       }
     }
   }
   #$$scratch_str_ref .= "#endif // defined DKT-VA-GENERICS\n";
-  #if (!&is_raw($generic)) {
+  #if (!&is_slots($generic)) {
   &generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
   #}
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t");
   foreach $generic (@$generics) {
     if (!&is_va($generic)) {
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         &generics::generate_generic_defn($generic, $is_inline, $col);
       }
     }
@@ -1589,7 +1589,7 @@ sub generics::generate_generic_defns {
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t");
   foreach $generic (@$generics) {
     if (!&is_va($generic)) {
-      if (!&is_raw($generic)) {
+      if (!&is_slots($generic)) {
         &generics::generate_super_generic_defn($generic, $is_inline, $col);
       }
     }
@@ -1800,10 +1800,10 @@ sub parameter_list_from_slots_info {
   return ($pairs, $names);
 }
 sub has_object_method_defn {
-  my ($klass_scope, $raw_method_info) = @_;
+  my ($klass_scope, $slots_method_info) = @_;
   my $result = 0;
 
-  my $object_method_info = &convert_to_object_method($raw_method_info);
+  my $object_method_info = &convert_to_object_method($slots_method_info);
   my $object_method_sig = &function::overloadsig($object_method_info, []);
 
   if ($$klass_scope{'methods'}{$object_method_sig} &&
@@ -1997,7 +1997,7 @@ sub linkage_unit::generate_klasses_body {
       }
     }
     my $object_method_defns = {};
-    foreach $method (sort method::compare values %{$$klass_scope{'raw-methods'}}) {
+    foreach $method (sort method::compare values %{$$klass_scope{'slots-methods'}}) {
       if (&is_nrt_defn() || &is_rt_defn() || &is_exported($method)) {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
@@ -2026,8 +2026,8 @@ sub linkage_unit::generate_klasses_body {
         }
       }
     }
-    my $exported_raw_methods = &exported_raw_methods($klass_scope);
-    foreach $method (sort method::compare values %$exported_raw_methods) {
+    my $exported_slots_methods = &exported_slots_methods($klass_scope);
+    foreach $method (sort method::compare values %$exported_slots_methods) {
       die if !&is_exported($method);
       if (&is_nrt_defn() || &is_rt_defn()) {
         if (!&is_va($method)) {
@@ -2078,10 +2078,10 @@ sub linkage_unit::generate_klasses_body {
     &generate_ka_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
-  if (&is_decl() && defined $$klass_scope{'raw-methods'}) {
+  if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
-    &generate_raw_method_signature_decls($$klass_scope{'raw-methods'}, [ $klass_name ], $col, $klass_type);
+    &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
   if (&is_decl() && @$va_list_methods) { #rn0
@@ -2141,7 +2141,7 @@ sub linkage_unit::generate_klasses_body {
     }
   }
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'raw-methods'}}) {
+  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if (&is_decl) {
     if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
       if (!&is_va($method)) {
@@ -2743,7 +2743,7 @@ sub ka_method::type_decl {
   my $name = &dakota::util::_last($$method{'name'});
   return "$return_type(*$name)($$arg_type_list)";
 }
-sub raw_signature_body {
+sub slots_signature_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
   my $result = '';
@@ -2766,9 +2766,9 @@ sub raw_signature_body {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
       if (&is_va($method)) {
-        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:va:$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__slots-signature:va:$generic_name)(),\n";
       } else {
-        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__raw-signature:$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__slots-signature:$generic_name)(),\n";
       }
       my $method_name;
 
@@ -2915,17 +2915,17 @@ sub exported_methods {
   }
   return $exported_methods;
 }
-sub exported_raw_methods {
+sub exported_slots_methods {
   my ($klass_scope) = @_;
-  my $exported_raw_methods = {};
+  my $exported_slots_methods = {};
   {
-    while (my ($key, $val) = each (%{$$klass_scope{'raw-methods'}})) {
+    while (my ($key, $val) = each (%{$$klass_scope{'slots-methods'}})) {
       if (&is_exported($val)) {
-        $$exported_raw_methods{$key} = $val;
+        $$exported_slots_methods{$key} = $val;
       }
     }
   }
-  return $exported_raw_methods;
+  return $exported_slots_methods;
 }
 sub exports {
   my ($scope) = @_;
@@ -2934,13 +2934,13 @@ sub exports {
   foreach my $klass_type ('klass', 'trait') {
     while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
       my $exported_methods = &exported_methods($klass_scope);
-      my $exported_raw_methods = &exported_raw_methods($klass_scope);
+      my $exported_slots_methods = &exported_slots_methods($klass_scope);
 
       while (my ($key, $element) = each (%$exported_methods)) {
         my ($lhs, $rhs) = &export_pair($klass_name, $element);
         $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
-      while (my ($key, $element) = each (%$exported_raw_methods)) {
+      while (my ($key, $element) = each (%$exported_slots_methods)) {
         my ($lhs, $rhs) = &export_pair($klass_name, $element);
         $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
@@ -3147,7 +3147,7 @@ sub dk::generate_cxx_footer_klass {
   }
 
   my $exported_methods =     &exported_methods($klass_scope);
-  my $exported_raw_methods = &exported_raw_methods($klass_scope);
+  my $exported_slots_methods = &exported_slots_methods($klass_scope);
 
   if (values %{$exported_methods ||= []}) {
     $$scratch_str_ref .=
@@ -3159,14 +3159,14 @@ sub dk::generate_cxx_footer_klass {
       $col . &address_body($klass_name, $exported_methods, &colin($col)) .
       $col . "}; }\n";
   }
-  if (values %{$exported_raw_methods ||= []}) {
+  if (values %{$exported_slots_methods ||= []}) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "$klass_type @$klass_name { static signature-t const* const __exported-raw-method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n" .
-      $col . &raw_signature_body($klass_name, $exported_raw_methods, &colin($col)) .
+      $col . "$klass_type @$klass_name { static signature-t const* const __exported-slots-method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n" .
+      $col . &slots_signature_body($klass_name, $exported_slots_methods, &colin($col)) .
       $col . "}; }\n" .
-      $col . "$klass_type @$klass_name { static method-t __exported-raw-method-addresses[] = {" . &ann(__LINE__) . " //ro-data\n" .
-      $col . &address_body($klass_name, $exported_raw_methods, &colin($col)) .
+      $col . "$klass_type @$klass_name { static method-t __exported-slots-method-addresses[] = {" . &ann(__LINE__) . " //ro-data\n" .
+      $col . &address_body($klass_name, $exported_slots_methods, &colin($col)) .
       $col . "}; }\n";
   }
   ###
@@ -3395,9 +3395,9 @@ sub dk::generate_cxx_footer_klass {
     $$tbbl{'$exported-method-signatures'} = '__exported-method-signatures';
     $$tbbl{'$exported-method-addresses'}  = '__exported-method-addresses';
   }
-  if (values %{$exported_raw_methods ||= []}) {
-    $$tbbl{'$exported-raw-method-signatures'} = '__exported-raw-method-signatures';
-    $$tbbl{'$exported-raw-method-addresses'}  = '__exported-raw-method-addresses';
+  if (values %{$exported_slots_methods ||= []}) {
+    $$tbbl{'$exported-slots-method-signatures'} = '__exported-slots-method-signatures';
+    $$tbbl{'$exported-slots-method-addresses'}  = '__exported-slots-method-addresses';
   }
   if (@$va_list_methods) {
     $$tbbl{'$va-method-signatures'} = '__va-method-signatures';
@@ -3468,16 +3468,16 @@ sub generate_ka_method_signature_defns {
     }
   }
 }
-sub generate_raw_method_signature_decls {
+sub generate_slots_method_signature_decls {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    &generate_raw_method_signature_decl($method, $klass_name, $col, $klass_type);
+    &generate_slots_method_signature_decl($method, $klass_name, $col, $klass_type);
   }
 }
-sub generate_raw_method_signature_defns {
+sub generate_slots_method_signature_defns {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    &generate_raw_method_signature_defn($method, $klass_name, $col, $klass_type);
+    &generate_slots_method_signature_defn($method, $klass_name, $col, $klass_type);
   }
 }
 sub generate_ka_method_signature_decl {
@@ -3507,21 +3507,21 @@ sub generate_ka_method_signature_defn {
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}}\n";
 }
-sub generate_raw_method_signature_decl {
+sub generate_slots_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __raw-signature { noexport signature-t const* $method_name($$list_types); }}" . &ann(__LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-signature { noexport signature-t const* $method_name($$list_types); }}" . &ann(__LINE__) . "\n";
 }
-sub generate_raw_method_signature_defn {
+sub generate_slots_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __raw-signature { noexport signature-t const* $method_name($$list_types) {" . &ann(__LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-signature { noexport signature-t const* $method_name($$list_types) {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
 
   my $arg_list = "static signature-t const result = { \"$return_type\", \"$method_name\", \"";
@@ -3762,10 +3762,10 @@ sub dk::generate_ka_method_defns {
       if (&is_rt_defn()) {
         &dk::generate_cxx_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
-        if (1 || $$klass_scope{'raw-methods'}) {
+        if (1 || $$klass_scope{'slots-methods'}) {
           # currently no support for va: methods
 
-          &generate_raw_method_signature_defns($$klass_scope{'raw-methods'}, [ $klass_name ], $col, $klass_type);
+          &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
         }
         #&generate_ka_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], &colin($col));
 
