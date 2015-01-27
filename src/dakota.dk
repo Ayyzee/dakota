@@ -1078,7 +1078,7 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
           ofile:printf(ofl, "%-*s = %s,\n",
                        max-name-width,
                        enum-info[i].info[j].name,
-                       enum-info[i].info[j].value);
+                       enum-info[i].info[j].expr);
           j++;
         }
         ofl.col--;
@@ -1114,10 +1114,10 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
           while (nullptr != slots-info[i].elements) {
             symbol-t       slot-name = name-from-info(&slots-info[i]);
             assert(nullptr != slot-name);
-            str-t slot-value = cast(str-t)named-info:at(&slots-info[i], $value);
-            assert(nullptr != slot-value);
+            str-t slot-expr = cast(str-t)named-info:at(&slots-info[i], $expr);
+            assert(nullptr != slot-expr);
             
-            ofile:printf(ofl, "%-*s = %s,\n", max-type-width, slot-name, slot-value);
+            ofile:printf(ofl, "%-*s = %s,\n", max-type-width, slot-name, slot-expr);
             i++;
           }
         } else {

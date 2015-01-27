@@ -20,4 +20,4 @@ klass float64
 {
   slots double;
 }
-static-assert(8 == sizeof(float64-t), "The slots type of klass float64 must be 8 bytes in size");
+static-assert(64/8 == sizeof(float64-t), "The slots type of klass float64 must be 8 bytes in size");

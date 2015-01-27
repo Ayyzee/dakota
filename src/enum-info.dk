@@ -22,6 +22,6 @@ klass enum-info
   slots
   {
     str-t name;  // never nullptr
-    str-t value; // never nullptr
+    str-t expr;  // never nullptr
   }
 }

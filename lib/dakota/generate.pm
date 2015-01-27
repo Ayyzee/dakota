@@ -3269,7 +3269,7 @@ sub dk::generate_cxx_footer_klass {
         my $tbl = {};
         $$tbl{'$name'} = "\$$slot_name";
         if (defined $slot_value) {
-          $$tbl{'$value'} = "\"$slot_value\"";
+          $$tbl{'$expr'} = "\"$slot_value\"";
         }
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
         $$scratch_str_ref .=

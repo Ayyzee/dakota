@@ -300,6 +300,7 @@ sub rt::add_extra_symbols {
     'exported-slots-method-signatures' => undef,
     'exported?' => undef,
     'exports' => undef,
+    'expr' => undef,
     'file' => undef,
     'imported-klasses' => undef,
     'imported-klasses-names' => undef,
@@ -338,7 +339,6 @@ sub rt::add_extra_symbols {
     'va-method' => undef,
     'va-method-addresses' => undef,
     'va-method-signatures' => undef,
-    'value' => undef,
   };
   foreach my $symbol (sort keys %$symbols) {
     &dakota::parse::add_symbol($file, [ $symbol ]);
