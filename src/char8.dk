@@ -18,5 +18,13 @@ module dakota;
 
 klass char8
 {
-  slots char;
+  slots char-t;
+}
+klass uchar8
+{
+  slots uchar-t;
+}
+klass schar8
+{
+  slots schar-t;
 }

@@ -2329,8 +2329,11 @@ sub generate_exported_slots_decls {
 }
 sub hardcoded_typedefs {
   my $result = "\n";
-  $result .= "typedef int int-t;\n";
-  $result .= "typedef unsigned int uint-t;\n";
+  $result .= "typedef signed char   schar-t;\n";
+  $result .= "typedef char          char-t;\n";
+  $result .= "typedef unsigned char uchar-t;\n";
+  $result .= "typedef int           int-t;\n";
+  $result .= "typedef unsigned int  uint-t;\n";
   $result .= "\n";
   return $result;
 }

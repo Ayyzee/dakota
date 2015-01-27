@@ -40,7 +40,6 @@
     'ptr.dk',
     'result.dk',
     'safe-str.dk',
-    'schar8.dk',
     'selector-node.dk',
     'selector.dk',
     'sequence.dk',
@@ -69,7 +68,6 @@
     'system-exception.dk',
     'table.dk',
     'trace.dk',
-    'uchar8.dk',
     'vector.dk'
   ],
   'name' => 'dakota.$SO_EXT',
