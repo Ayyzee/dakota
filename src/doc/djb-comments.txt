@@ -1,0 +1,9 @@
+december 1990
+
+https://groups.google.com/forum/#!msg/comp.lang.c/VByoIO8GySs/2XN9iGTpgmsJ
+
+"These days I start from h = 5381, and set h = h << 5 + h + c mod any
+power of 2 for each new character c. Apparently Chris Torek prefers a
+multiplier of 31: h << 5 - h + c. These are reliable and extremely
+fast. You can make them even faster if you want to hash an entire
+string at once: just precompute powers of 31 or 33, etc."
