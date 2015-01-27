@@ -18,5 +18,5 @@ module dakota;
 
 klass boole
 {
-  slots bool;
+  slots bool-t;
 }
