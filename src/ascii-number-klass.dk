@@ -20,7 +20,7 @@ include <cstring>;
 module dakota-util;
 
 klass ascii-number;
-klass named-info-node;
+klass named-info;
 
 klass ascii-number-klass
 {

@@ -20,7 +20,7 @@ module dakota;
 
 klass assoc;
 klass deque;
-klass named-info-node;
+klass named-info;
 trait stack;
 
 klass autorelease-pool-klass
@@ -44,7 +44,7 @@ klass autorelease-pool-klass
   }
 
   method object-t init(object-t self,
-                       named-info-node:slots-t* info-slots => nullptr,
+                       named-info:slots-t* info-slots => nullptr,
                        object-t                 info =>      nullptr)
   {
     self = dk:init(super, $info-slots => info-slots, $info => info);

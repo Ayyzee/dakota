@@ -179,8 +179,8 @@ import size_t safe_strlen(str_t);
 import symbol_t dk_intern(str_t);
 import object_t dk_klass_for_name(symbol_t);
 
-import void dkt_register_info(named_info_node_t*);
-import void dkt_deregister_info(named_info_node_t*);
+import void dkt_register_info(named_info_t*);
+import void dkt_deregister_info(named_info_t*);
 
 // import object_t dk_va_add_all(object_t self, va_list_t);
 // sentinel import object_t dk_add_all(object_t self, ...);
@@ -191,13 +191,13 @@ import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, sy
 import object_t*       dkt_capture_current_exception(object_t arg);
 import str_t* dkt_capture_current_exception(str_t arg);
 
-import named_info_node_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
+import named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
 import object_t           dk_va_make_named_info(      symbol_t name, va_list_t args);
 
-sentinel import named_info_node_t* dk_make_named_info_slots(symbol_t name, ...);
+sentinel import named_info_t* dk_make_named_info_slots(symbol_t name, ...);
 sentinel import object_t           dk_make_named_info(      symbol_t name, ...);
 
-DEBUG_IMPORT named_info_node_t* dkt_dump_named_info(named_info_node_t* info);
+DEBUG_IMPORT named_info_t* dkt_dump_named_info(named_info_t* info);
 
 #if defined DEBUG
   #define DKT_NULL_METHOD nullptr

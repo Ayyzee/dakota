@@ -3719,14 +3719,14 @@ sub dk::generate_cxx_footer {
   if (&is_rt_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
     if (0 == $num_klasses) {
-      $$scratch_str_ref .= $col . "static named-info-node-t* klass-defns = nullptr;\n";
+      $$scratch_str_ref .= $col . "static named-info-t* klass-defns = nullptr;\n";
     } else {
       $$scratch_str_ref .= &generate_info_seq('klass-defns', [sort @$global_klass_defns], $col, __LINE__);
     }
     my $exports = &exports($scope);
     my $num_exports = scalar keys %$exports;
     if (0 == $num_exports) {
-      $$scratch_str_ref .= $col . "static named-info-node-t* exports = nullptr;\n";
+      $$scratch_str_ref .= $col . "static named-info-t* exports = nullptr;\n";
     } else {
       $$scratch_str_ref .= &generate_info('exports', $exports, $col, $$scope{'symbols'}, __LINE__);
     }
@@ -4017,14 +4017,14 @@ sub generate_property_tbl {
 sub generate_info {
   my ($name, $tbl, $col, $symbols, $line) = @_;
   my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, __LINE__);
-  $result .= "static named-info-node-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };" . &ann($line) . "\n";
+  $result .= "static named-info-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };" . &ann($line) . "\n";
   return $result;
 }
 sub generate_info_seq {
   my ($name, $seq, $col, $line) = @_;
   my $result = '';
 
-  $result .= "static named-info-node-t $name\[] = {" . &ann($line) . " //ro-data\n";
+  $result .= "static named-info-t $name\[] = {" . &ann($line) . " //ro-data\n";
   $col = &colin($col);
 
   my $max_width = 0;

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __named_info_node_hh__
-#define      __named_info_node_hh__
+#if !defined __named_info_hh__
+#define      __named_info_hh__
 
 #include "dakota.hh"
 
-namespace named_info_node
+namespace named_info
 {
   noexport /*method*/ int_t compare(slots_t* s, slots_t* other_s);
   noexport int_t compare(slots_t** s, slots_t** other_s);

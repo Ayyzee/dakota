@@ -18,7 +18,7 @@ dkt_declare_klass_type_typedef(uchar8,   unsigned char);
 dkt_declare_klass_type_structptr(object);
 
 dkt_declare_klass_type_struct(klass);
-dkt_declare_klass_type_struct(named_info_node);
+dkt_declare_klass_type_struct(named_info);
 dkt_declare_klass_type_struct(signature);
 dkt_declare_klass_type_struct(super);
 

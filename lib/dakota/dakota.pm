@@ -244,7 +244,7 @@ sub nrt::add_extra_klass_decls {
     'method' => undef,
     'methods' => undef,
     'missing-keyword-exception' => undef, # kw-args processing funcs (throw)
-    'named-info-node' => undef,
+    'named-info' => undef,
     'no-such-keyword-exception' => undef, # kw-args processing funcs (throw)
     'object' => undef,
     'output-stream' => undef, # std-output, std-error

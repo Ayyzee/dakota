@@ -27,7 +27,7 @@ klass property;
 klass std-compare;
 klass symbol;
 
-klass named-info-node
+klass named-info
 {
   slots
   {
@@ -138,7 +138,7 @@ klass named-info-node
   }
 }
 
-noexport named-info-node-t*
+noexport named-info-t*
 dk-va-make-named-info-slots(symbol-t name, va-list-t args)
 {
 //   assert(nullptr != name);
@@ -164,7 +164,7 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
     count++;
   }
   // hackhack: should be allocated in previous (initial) malloc()
-  named-info-node-t* info = cast(named-info-node-t*)malloc(sizeof(named-info-node-t));
+  named-info-t* info = cast(named-info-t*)malloc(sizeof(named-info-t));
   info->elements = props;
   info->count = count;
   info->next = nullptr;
@@ -174,17 +174,17 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
 DEBUG-EXPORT object-t
 dk-va-make-named-info(symbol-t name, va-list-t args)
 {
-  named-info-node-t* info-slots = dk-va-make-named-info-slots(name, args);
+  named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   object-t info = box(info-slots);
   return info;
 }
 
-export sentinel named-info-node-t*
+export sentinel named-info-t*
 dk-make-named-info-slots(symbol-t name, ...)
 {
   va-list-t args;
   va-start(args, name);
-  named-info-node-t* info-slots = dk-va-make-named-info-slots(name, args);
+  named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   va-end(args);
   return info-slots;
 }
@@ -199,8 +199,8 @@ dk-make-named-info(symbol-t name, ...)
   return info;
 }
 
-DEBUG-EXPORT named-info-node-t*
-dkt-dump-named-info(named-info-node-t* info)
+DEBUG-EXPORT named-info-t*
+dkt-dump-named-info(named-info-t* info)
 {
-  return named-info-node:dump(info);
+  return named-info:dump(info);
 }
