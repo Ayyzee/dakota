@@ -984,7 +984,7 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
   symbol-t const*           requires =                       cast(symbol-t const*)          named-info:at(klass-info, $requires);
   symbol-t const*           provides =                       cast(symbol-t const*)          named-info:at(klass-info, $provides);
   signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info:at(klass-info, $method-signatures);
-  signature-t const* const* ka-method-signatures =           cast(signature-t const* const*)named-info:at(klass-info, $ka-method-signatures);
+  signature-t const* const* kw-args-method-signatures =           cast(signature-t const* const*)named-info:at(klass-info, $kw-args-method-signatures);
   signature-t const* const* exported-method-signatures =     cast(signature-t const* const*)named-info:at(klass-info, $exported-method-signatures);
   signature-t const* const* exported-slots-method-signatures = cast(signature-t const* const*)named-info:at(klass-info, $exported-slots-method-signatures);
   named-enum-info-t const*  enum-info =                      cast(named-enum-info-t const*) named-info:at(klass-info, $enum-info);
@@ -1019,10 +1019,10 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
   }
 
   if (exported? || state-exported? || behavior-exported?) {
-    if (nullptr != ka-method-signatures) {
+    if (nullptr != kw-args-method-signatures) {
       uint32-t index = 0;
       signature-t const* info;
-      while (nullptr != (info = ka-method-signatures[index++])) {
+      while (nullptr != (info = kw-args-method-signatures[index++])) {
         dump-generic(ofl, info);
       }
       ofile:printf(ofl, "\n");
@@ -1147,15 +1147,15 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
     uint32-t index;
     uint32-t max-return-type-width;
 
-  //max-return-type-width = max-method-return-type-width(ka-method-signatures, nullptr);
+  //max-return-type-width = max-method-return-type-width(kw-args-method-signatures, nullptr);
     max-return-type-width = max-method-return-type-width(method-signatures,
                                                          exported-method-signatures,
                                                          exported-slots-method-signatures,
                                                          nullptr);
 
     index = 0;
-    if (nullptr != ka-method-signatures)
-      while (nullptr != (info = ka-method-signatures[index++])) {
+    if (nullptr != kw-args-method-signatures)
+      while (nullptr != (info = kw-args-method-signatures[index++])) {
         fprintf(ofl.output, "//");
         ofile-t ofl0 = {ofl.output, 0};
         dump-method(ofl0, info, max-return-type-width);

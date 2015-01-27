@@ -66,10 +66,10 @@ my $constraints = {
     '?block-in' =>         \&block_in,
     '?dquote-str' =>       \&dquote_str,
     '?ident' =>            \&ident,
-    '?ka-ident-1' =>       \&ka_ident_1,
-    '?ka-ident-2' =>       \&ka_ident_2,
-    '?ka-ident-3' =>       \&ka_ident_3,
-    '?ka-ident-4' =>       \&ka_ident_4,
+    '?kw-args-ident-1' =>       \&kw_args_ident_1,
+    '?kw-args-ident-2' =>       \&kw_args_ident_2,
+    '?kw-args-ident-3' =>       \&kw_args_ident_3,
+    '?kw-args-ident-4' =>       \&kw_args_ident_4,
     '?list' =>             \&list,
     '?list-in' =>          \&list_in,
     '?list-member-term' => \&list_member_term, # move to a language specific macro
@@ -149,28 +149,28 @@ sub type_ident {
     { $result = $index; }
     return $result;
 }
-sub ka_ident_1 {
+sub kw_args_ident_1 {
     my ($sst, $index, $constraint, $user_data) = @_;
-    return &ka_ident_common($sst, $index, $constraint, $user_data, 1);
+    return &kw_args_ident_common($sst, $index, $constraint, $user_data, 1);
 }
-sub ka_ident_2 {
+sub kw_args_ident_2 {
     my ($sst, $index, $constraint, $user_data) = @_;
-    return &ka_ident_common($sst, $index, $constraint, $user_data, 2);
+    return &kw_args_ident_common($sst, $index, $constraint, $user_data, 2);
 }
-sub ka_ident_3 {
+sub kw_args_ident_3 {
     my ($sst, $index, $constraint, $user_data) = @_;
-    return &ka_ident_common($sst, $index, $constraint, $user_data, 3);
+    return &kw_args_ident_common($sst, $index, $constraint, $user_data, 3);
 }
-sub ka_ident_4 {
+sub kw_args_ident_4 {
     my ($sst, $index, $constraint, $user_data) = @_;
-    return &ka_ident_common($sst, $index, $constraint, $user_data, 4);
+    return &kw_args_ident_common($sst, $index, $constraint, $user_data, 4);
 }
-sub ka_ident_common {
+sub kw_args_ident_common {
     my ($sst, $index, $constraint, $user_data, $num_fixed_args) = @_;
     my $tkn = &sst::at($sst, $index);
     my $result = -1;
-    if (exists $$user_data{'ka-ident'}{$tkn}) {
-	if ($$user_data{'ka-ident'}{$tkn} == $num_fixed_args)
+    if (exists $$user_data{'kw-args-ident'}{$tkn}) {
+	if ($$user_data{'kw-args-ident'}{$tkn} == $num_fixed_args)
 	{ $result = $index; }
     }
     return $result;

@@ -258,9 +258,9 @@ sub rewrite_signatures {
   $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
   $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 
-  $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\(.*?)(\()/$1,$2/g;
-  $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-  $$filestr_ref =~ s/(?<!$k)(dkt-ka-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(.*?)(\()/$1,$2/g;
+  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
 
   $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\(.*?)(\()/$1,$2/g;
   $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
@@ -377,7 +377,7 @@ sub rewrite_syntax {
   $$filestr_ref =~ s/([^:]):(?=[_a-zA-Z])/$1::/g;
 }
 sub vars_from_defn {
-  my ($defn, $name, $params, $ka_generics) = @_;
+  my ($defn, $name, $params, $kw_args_generics) = @_;
   my $result = '';
   $result .= $defn;
 
@@ -387,13 +387,13 @@ sub vars_from_defn {
     $result .= "//";
   }
 
-  if (!exists $$ka_generics{$name}) { # hackhack
+  if (!exists $$kw_args_generics{$name}) { # hackhack
     $result .= " static signature-t const* __method__ = dkt-signature($name,($params)); USE(__method__);";
   } else {
     # replace keyword args with va-list-t
     $params =~ s|,[^,]+?/\*=>.*?\*/||g;
     $params .= ", va-list-t";
-    $result .= " static signature-t const* __method__ = dkt-ka-signature(va:$name,($params)); USE(__method__);";
+    $result .= " static signature-t const* __method__ = dkt-kw-args-signature(va:$name,($params)); USE(__method__);";
   }
   return $result;
 }
@@ -409,13 +409,13 @@ sub rewrite_functions {
   $$filestr_ref =~ s/($k+)(\!|\?)(\()/&rewrite_functions_replacement($1, $2, $3)/ges;
 }
 sub rewrite_methods {
-  my ($filestr_ref, $ka_generics) = @_;
+  my ($filestr_ref, $kw_args_generics) = @_;
   $$filestr_ref =~ s|(method\s+)(alias\($k+\))|$1/*$2*/|gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
-  $$filestr_ref =~ s|(method\s+[^(]*?($rk)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $ka_generics)|ges;
+  $$filestr_ref =~ s|(method\s+[^(]*?($rk)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
   $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1 /*$2*/$3|gm;
   $$filestr_ref =~ s|export(\s)(method)(\s+)|export$1/\*$2\*/$3|gs;
 
@@ -788,8 +788,8 @@ sub rewrite_keyword_syntax_use {
   return "$arg1$list";
 }
 sub rewrite_keyword_syntax {
-  my ($filestr_ref, $ka_generics) = @_;
-  foreach my $name (keys %$ka_generics) {
+  my ($filestr_ref, $kw_args_generics) = @_;
+  foreach my $name (keys %$kw_args_generics) {
     $$filestr_ref =~ s/(method.*?)($name)($main::list)/&rewrite_keyword_syntax_list($1, $2, $3)/ge;
     $$filestr_ref =~ s/(dk:+$name)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
   }
@@ -880,7 +880,7 @@ sub rewrite_export_method {
   }
 }
 sub convert_dk_to_cxx {
-  my ($filestr_ref, $ka_generics) = @_;
+  my ($filestr_ref, $kw_args_generics) = @_;
   &encode($filestr_ref);
 
   &rewrite_strswitch($filestr_ref);
@@ -933,9 +933,9 @@ sub convert_dk_to_cxx {
   &rewrite_signatures($filestr_ref);
   &rewrite_selectors($filestr_ref);
   &rewrite_method_names_special($filestr_ref);
-  &rewrite_keyword_syntax($filestr_ref, $ka_generics);
+  &rewrite_keyword_syntax($filestr_ref, $kw_args_generics);
   &rewrite_array_types($filestr_ref);
-  &rewrite_methods($filestr_ref, $ka_generics);
+  &rewrite_methods($filestr_ref, $kw_args_generics);
   &rewrite_functions($filestr_ref);
   &rewrite_for_each($filestr_ref);
   &rewrite_unboxes($filestr_ref);
@@ -970,14 +970,14 @@ sub rewrite_multi_char_consts {
   $$filestr_ref =~ s/'([^'\\])([^'\\])'/'$1$2$c$c'/g;
 }
 sub dakota_lang_user_data_old {
-  my $ka_generics;
+  my $kw_args_generics;
   if ($ENV{'DKT_KA_GENERICS'}) {
-    $ka_generics = do $ENV{'DKT_KA_GENERICS'} or die;
+    $kw_args_generics = do $ENV{'DKT_KA_GENERICS'} or die;
   } else {
-    $ka_generics = do "$prefix/src/ka-generics.pl" or die;
+    $kw_args_generics = do "$prefix/src/kw-args-generics.pl" or die;
   }
 
-  my $user_data = { 'ka-generics' => $ka_generics };
+  my $user_data = { 'kw-args-generics' => $kw_args_generics };
   return $user_data;
 }
 
@@ -987,7 +987,7 @@ unless (caller) {
   foreach my $arg (@ARGV) {
     my $filestr = &dakota::filestr_from_file($arg);
 
-    &convert_dk_to_cxx(\$filestr, $$user_data{'ka-generics'});
+    &convert_dk_to_cxx(\$filestr, $$user_data{'kw-args-generics'});
     print $filestr;
   }
 }

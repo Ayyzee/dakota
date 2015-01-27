@@ -46,7 +46,7 @@ our @EXPORT= qw(
                  cxx_path_from_dk_path
                  cxx_path_from_so_path
                  init_global_rep
-                 ka_translate
+                 kw_args_translate
                  obj_path_from_cxx_path
                  obj_path_from_dk_path
                  rep_path_from_any_path
@@ -181,7 +181,7 @@ sub scalar_to_file {
   print FILE $refstr;
   close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
 }
-sub ka_translate {
+sub kw_args_translate {
   my ($parse_tree) = @_;
   while (my ($generic, $discarded) = each(%{$$parse_tree{'generics'}})) {
     my $va_generic = $generic;
@@ -204,43 +204,43 @@ sub ka_translate {
             $discarded = &dakota::util::_remove_first($$method{'name'}); # lose ':'
           }
 
-          if ($$method{'ka-names'}) {
-            my $ka_types = [];
-            my $ka_name;        # not used
-            foreach $ka_name (@{$$method{'ka-names'}}) {
-              my $ka_type = &dakota::util::_remove_last($$method{'parameter-types'});
-              &dakota::util::_add_last($ka_types, $ka_type);
+          if ($$method{'kw-args-names'}) {
+            my $kw_args_types = [];
+            my $kw_args_name;        # not used
+            foreach $kw_args_name (@{$$method{'kw-args-names'}}) {
+              my $kw_args_type = &dakota::util::_remove_last($$method{'parameter-types'});
+              &dakota::util::_add_last($kw_args_types, $kw_args_type);
             }
             &dakota::util::_add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
-            my $ka_defaults = [];
-            my $ka_default;
-            if (exists $$method{'ka-defaults'} && defined $$method{'ka-defaults'}) {
-              while ($ka_default = &dakota::util::_remove_last($$method{'ka-defaults'})) {
-                my $val = "@$ka_default";
-                &dakota::util::_add_last($ka_defaults, $val);
+            my $kw_args_defaults = [];
+            my $kw_args_default;
+            if (exists $$method{'kw-args-defaults'} && defined $$method{'kw-args-defaults'}) {
+              while ($kw_args_default = &dakota::util::_remove_last($$method{'kw-args-defaults'})) {
+                my $val = "@$kw_args_default";
+                &dakota::util::_add_last($kw_args_defaults, $val);
               }
             }                   # if
-            my $no_default = @$ka_types - @$ka_defaults;
+            my $no_default = @$kw_args_types - @$kw_args_defaults;
             while ($no_default) {
               $no_default--;
-              &dakota::util::_add_last($ka_defaults, undef);
+              &dakota::util::_add_last($kw_args_defaults, undef);
             }
             $$method{'keyword-types'} = [];
-            my $ka_type;
-            while (scalar @$ka_types) {
+            my $kw_args_type;
+            while (scalar @$kw_args_types) {
               my $keyword_type = {
-                                  type => &dakota::util::_remove_last($ka_types),
-                                  default => &dakota::util::_remove_last($ka_defaults),
-                                  name => &dakota::util::_remove_first($$method{'ka-names'}) };
+                                  type => &dakota::util::_remove_last($kw_args_types),
+                                  default => &dakota::util::_remove_last($kw_args_defaults),
+                                  name => &dakota::util::_remove_first($$method{'kw-args-names'}) };
 
               &dakota::util::_add_last($$method{'keyword-types'}, $keyword_type);
             }
-            delete $$method{'ka-names'};
-            delete $$method{'ka-defaults'};
+            delete $$method{'kw-args-names'};
+            delete $$method{'kw-args-defaults'};
           } else {
             my $name = &path::string($$method{'name'});
-            my $ka_generics = &dakota::util::ka_generics();
-            if (exists $$ka_generics{$name}) {
+            my $kw_args_generics = &dakota::util::kw_args_generics();
+            if (exists $$kw_args_generics{$name}) {
               if (!&dakota::generate::is_va($method)) {
                 &dakota::util::_add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
                 $$method{'keyword-types'} = [];
@@ -1400,7 +1400,7 @@ sub types {
   }
   return $result;
 }
-sub ka_offsets {
+sub kw_args_offsets {
   my ($seq, $gbl_token) = @_;
   my $equalarrow = undef;
   my $i;
@@ -1452,26 +1452,26 @@ sub parameter_list {
   }
   #print STDERR Dumper $params;
   my $types = [];
-  my $ka_names = [];
-  my $ka_defaults = [];
+  my $kw_args_names = [];
+  my $kw_args_defaults = [];
   foreach my $type (@$params) {
-    my ($equalarrow) = &ka_offsets($type);
+    my ($equalarrow) = &kw_args_offsets($type);
 
     if ($equalarrow) {
-      my $ka_name = $equalarrow - 1;
-      my $ka_default = [splice(@$type, $equalarrow)];
-      my $equalarrow_tkn = &dakota::util::_remove_first($ka_default);
-      if (2 == @$ka_default) {
-        if ('{' ne $$ka_default[0] && '}' ne $$ka_default[1]) {
-          &dakota::util::_add_last($ka_defaults, $ka_default);
+      my $kw_args_name = $equalarrow - 1;
+      my $kw_args_default = [splice(@$type, $equalarrow)];
+      my $equalarrow_tkn = &dakota::util::_remove_first($kw_args_default);
+      if (2 == @$kw_args_default) {
+        if ('{' ne $$kw_args_default[0] && '}' ne $$kw_args_default[1]) {
+          &dakota::util::_add_last($kw_args_defaults, $kw_args_default);
         }
       } else {
-        &dakota::util::_add_last($ka_defaults, $ka_default);
+        &dakota::util::_add_last($kw_args_defaults, $kw_args_default);
       }
-      my $ka_name_seq = [splice(@$type, $ka_name)];
-      #print STDERR Dumper $ka_name_seq;
+      my $kw_args_name_seq = [splice(@$type, $kw_args_name)];
+      #print STDERR Dumper $kw_args_name_seq;
       #print STDERR Dumper $type;
-      &dakota::util::_add_last($ka_names, &dakota::util::_remove_last($ka_name_seq));
+      &dakota::util::_add_last($kw_args_names, &dakota::util::_remove_last($kw_args_name_seq));
     } else {
       my $ident = &dakota::util::_remove_last($type);
       if ($ident =~ m/\-t$/) {
@@ -1483,14 +1483,14 @@ sub parameter_list {
     &dakota::util::_add_last($types, $type);
   }
 
-  if (0 == @$ka_names) {
-    $ka_names = undef;
+  if (0 == @$kw_args_names) {
+    $kw_args_names = undef;
   }
 
-  if (0 == @$ka_defaults) {
-    $ka_defaults = undef;
+  if (0 == @$kw_args_defaults) {
+    $kw_args_defaults = undef;
   }
-  return ($types, $ka_names, $ka_defaults);
+  return ($types, $kw_args_names, $kw_args_defaults);
 }
 sub add_klasses_used {
   my ($scope, $gbl_sst_cursor) = @_;
@@ -1662,17 +1662,17 @@ sub method {
   }
   my $parameter_types = &sst::token_seq($gbl_sst, $open_paren_index + 1, $close_paren_index - 1);
   $parameter_types = &token_seq::simple_seq($parameter_types);
-  my ($ka_parameter_types, $ka_names, $ka_defaults) = &parameter_list($parameter_types);
-  $$method{'parameter-types'} = $ka_parameter_types;
+  my ($kw_args_parameter_types, $kw_args_names, $kw_args_defaults) = &parameter_list($parameter_types);
+  $$method{'parameter-types'} = $kw_args_parameter_types;
 
-  if ($ka_names) {
-    &dakota::util::ka_generics_add("@{$$method{name}}");
+  if ($kw_args_names) {
+    &dakota::util::kw_args_generics_add("@{$$method{name}}");
   }
-  if ($ka_names) {
-    $$method{'ka-names'} = $ka_names;
+  if ($kw_args_names) {
+    $$method{'kw-args-names'} = $kw_args_names;
   }
-  if ($ka_defaults) {
-    $$method{'ka-defaults'} = $ka_defaults;
+  if ($kw_args_defaults) {
+    $$method{'kw-args-defaults'} = $kw_args_defaults;
   }
   $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
 
@@ -1980,7 +1980,7 @@ sub init_global_rep {
   #if ($global_rep) { $reinit = 1; }
   #if ($reinit) { print STDERR &Dumper([keys %{$$global_rep{'klasses'}}]); }
   $global_rep = &rep_merge($reps);
-  $global_rep = &ka_translate($global_rep);
+  $global_rep = &kw_args_translate($global_rep);
   #if ($reinit) { print STDERR &Dumper([keys %{$$global_rep{'klasses'}}]); }
   return $global_rep;
 }

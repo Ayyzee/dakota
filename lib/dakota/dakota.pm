@@ -306,7 +306,7 @@ sub rt::add_extra_symbols {
     'int-t' => undef,
     'interpose-name' => undef,
     'interposers' => undef,
-    'ka-method-signatures' => undef,
+    'kw-args-method-signatures' => undef,
     'klass' => undef,
     'klass-defns' => undef,
     'klass-name' => undef,
@@ -681,7 +681,7 @@ sub rt_obj_from_rep {
     &init_global_rep($$cmd_info{'reps'});
   }
   $file = &scalar_from_file($rep_path);
-  $file = &ka_translate($file);
+  $file = &kw_args_translate($file);
   &rt::add_extra_symbols($file);
   &rt::add_extra_klass_decls($file);
   &rt::add_extra_keywords($file);

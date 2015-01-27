@@ -221,7 +221,7 @@ sub is_decl {
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
-  my $ka_generics = &dakota::util::ka_generics();
+  my $kw_args_generics = &dakota::util::kw_args_generics();
   open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
   foreach my $string (@$strings) {
     print PATH $string;
@@ -238,7 +238,7 @@ sub write_to_file_converted_strings {
       $gbl_macros = do "$prefix/lib/dakota/macros.pl" or die;
     }
   }
-  my $ka_generics = &dakota::util::ka_generics();
+  my $kw_args_generics = &dakota::util::kw_args_generics();
   if (defined $path) {
     open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
   } else {
@@ -248,11 +248,11 @@ sub write_to_file_converted_strings {
     my $converted_string;
     if ($ENV{'DKT_MACRO_SYSTEM'}) {
       my $sst = &sst::make($string, undef);
-      &macro_expand($sst, $gbl_macros, $ka_generics);
+      &macro_expand($sst, $gbl_macros, $kw_args_generics);
       my $str = &sst_fragment::filestr($$sst{'tokens'});
       $converted_string = $str;
     } else {
-      &dakota::rewrite::convert_dk_to_cxx(\$string, $ka_generics);
+      &dakota::rewrite::convert_dk_to_cxx(\$string, $kw_args_generics);
       $converted_string = $string;
     }
     print PATH $converted_string;
@@ -820,17 +820,17 @@ sub klass::va_list_methods {
   }
   return $va_methods_seq;
 }
-sub klass::ka_methods {
+sub klass::kw_args_methods {
   my ($klass_scope) = @_;
   my $method;
-  my $ka_methods_seq = [];
+  my $kw_args_methods_seq = [];
 
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}) {
     if ($$method{'keyword-types'}) {
-      &dakota::util::_add_last($ka_methods_seq, $method);
+      &dakota::util::_add_last($kw_args_methods_seq, $method);
     }
   }
-  return $ka_methods_seq;
+  return $kw_args_methods_seq;
 }
 sub klass::method_aliases {
   my ($klass_scope) = @_;
@@ -942,8 +942,8 @@ sub method::generate_va_method_defn {
     $$scratch_str_ref .= $col . "";
   }
   $$scratch_str_ref .= "namespace @$scope { ";
-  my $ka_generics = &dakota::util::ka_generics();
-  if (exists $$ka_generics{$va_method_name}) {
+  my $kw_args_generics = &dakota::util::kw_args_generics();
+  if (exists $$kw_args_generics{$va_method_name}) {
     $$scratch_str_ref .= "sentinel ";
   }
   if (&is_exported($va_method)) {
@@ -1686,7 +1686,7 @@ sub dk::parse {
   my ($dkfile) = @_;            # string.dk
   my $plfile = &dakota::parse::rep_path_from_dk_path($dkfile);
   my $file = &dakota::util::scalar_from_file($plfile);
-  $file = &dakota::parse::ka_translate($file);
+  $file = &dakota::parse::kw_args_translate($file);
   return $file;
 }
 sub generate_struct_or_union_decl {
@@ -1969,7 +1969,7 @@ sub linkage_unit::generate_klasses_body {
   my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
   my $is_klass_defn = scalar keys %$klass_scope;
   my $va_list_methods = &klass::va_list_methods($klass_scope);
-  my $ka_methods = &klass::ka_methods($klass_scope);
+  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
   my $method;
 
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -2072,10 +2072,10 @@ sub linkage_unit::generate_klasses_body {
   if (&is_decl() && $$klass_scope{'has-finalize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }" . &ann(__LINE__) . "\n";
   }
-  if (&is_decl() && @$ka_methods) {
+  if (&is_decl() && @$kw_args_methods) {
     #print STDERR Dumper($va_list_methods);
     &path::add_last($klass_path, 'va');
-    &generate_ka_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+    &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
     &path::remove_last($klass_path);
   }
   if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
@@ -2119,7 +2119,7 @@ sub linkage_unit::generate_klasses_body {
         if (&is_same_src_file($klass_scope) || &is_rt()) { #rn2
           if (defined $$method{'keyword-types'}) {
             if (0 != @{$$method{'keyword-types'}}) {
-              my $other_method_decl = &ka_method::type_decl($method);
+              my $other_method_decl = &kw_args_method::type_decl($method);
 
               #my $scope = &path::string($klass_path);
               $other_method_decl =~ s|\(\*($k+)\)| $1|;
@@ -2734,13 +2734,13 @@ sub method::type_decl {
   my $name = &dakota::util::_last($$method{'name'});
   return "$return_type(*$name)($$arg_type_list)";
 }
-sub ka_method::type {
+sub kw_args_method::type {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
   return "$return_type(*)($$arg_type_list)";
 }
-sub ka_method::type_decl {
+sub kw_args_method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
@@ -2976,7 +2976,7 @@ sub dk::generate_cxx_footer_klass {
 
   my $method_aliases = &klass::method_aliases($klass_scope);
   my $va_list_methods = &klass::va_list_methods($klass_scope);
-  my $ka_methods = &klass::ka_methods($klass_scope);
+  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
 
   my $va_method_num = 0;
   #my $num_va_methods = @$va_list_methods;
@@ -3093,32 +3093,32 @@ sub dk::generate_cxx_footer_klass {
   #$$scratch_str_ref .= $col . "}\n";
   #}
   ###
-  if (@$ka_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static signature-t const* const __ka-method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n";
+  if (@$kw_args_methods) {
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static signature-t const* const __kw-args-method-signatures[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
 
     #$$scratch_str_ref .= "\#if 0\n";
     my $max_width = 0;
-    foreach my $ka_method (@$ka_methods) {
-      $ka_method = &dakota::util::deep_copy($ka_method);
-      my $ka_method_type = &ka_method::type($ka_method);
-      my $width = length($ka_method_type);
+    foreach my $kw_args_method (@$kw_args_methods) {
+      $kw_args_method = &dakota::util::deep_copy($kw_args_method);
+      my $kw_args_method_type = &kw_args_method::type($kw_args_method);
+      my $width = length($kw_args_method_type);
       if ($width > $max_width) {
         $max_width = $width;
       }
     }
-    foreach my $ka_method (@$ka_methods) {
-      $ka_method = &dakota::util::deep_copy($ka_method);
-      my $ka_method_type = &ka_method::type($ka_method);
-      my $width = length($ka_method_type);
+    foreach my $kw_args_method (@$kw_args_methods) {
+      $kw_args_method = &dakota::util::deep_copy($kw_args_method);
+      my $kw_args_method_type = &kw_args_method::type($kw_args_method);
+      my $width = length($kw_args_method_type);
       my $pad = ' ' x ($max_width - $width);
 
-      my $method_name = "@{$$ka_method{'name'}}";
-      my $list_types = &arg_type::list_types($$ka_method{'parameter-types'});
-      my $kw_list_types = &method::kw_list_types($ka_method);
+      my $method_name = "@{$$kw_args_method{'name'}}";
+      my $list_types = &arg_type::list_types($$kw_args_method{'parameter-types'});
+      my $kw_list_types = &method::kw_list_types($kw_args_method);
       $$scratch_str_ref .=
         $col . "  (cast(dkt-signature-function-t)cast(signature-t const*(*)($$list_types))" .
-        $pad . "__ka-signature:va:$method_name)(),\n";
+        $pad . "__kw-args-signature:va:$method_name)(),\n";
     }
     #$$scratch_str_ref .= "\#endif\n";
 
@@ -3385,8 +3385,8 @@ sub dk::generate_cxx_footer_klass {
   if (&has_const_info($klass_scope)) {
     $$tbbl{'$const-info'} = '__const-info';
   }
-  if (@$ka_methods) {
-    $$tbbl{'$ka-method-signatures'} = '__ka-method-signatures';
+  if (@$kw_args_methods) {
+    $$tbbl{'$kw-args-method-signatures'} = '__kw-args-method-signatures';
   }
   if (values %{$$klass_scope{'methods'}}) {
     $$tbbl{'$method-signatures'} = '__method-signatures';
@@ -3456,19 +3456,19 @@ sub dk::generate_cxx_footer_klass {
   &dakota::util::_add_last($global_klass_defns, "$symbol:__klass-props");
   return $$scratch_str_ref;
 }
-sub generate_ka_method_signature_decls {
+sub generate_kw_args_method_signature_decls {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
     if ($$method{'keyword-types'}) {
-      &generate_ka_method_signature_decl($method, $klass_name, $col, $klass_type);
+      &generate_kw_args_method_signature_decl($method, $klass_name, $col, $klass_type);
     }
   }
 }
-sub generate_ka_method_signature_defns {
+sub generate_kw_args_method_signature_defns {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
     if ($$method{'keyword-types'}) {
-      &generate_ka_method_signature_defn($method, $klass_name, $col, $klass_type);
+      &generate_kw_args_method_signature_defn($method, $klass_name, $col, $klass_type);
     }
   }
 }
@@ -3484,22 +3484,22 @@ sub generate_slots_method_signature_defns {
     &generate_slots_method_signature_defn($method, $klass_name, $col, $klass_type);
   }
 }
-sub generate_ka_method_signature_decl {
+sub generate_kw_args_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   my $return_type = &arg::type($$method{'return-type'});
   my $method_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $kw_list_types = &method::kw_list_types($method);
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __ka-signature { namespace va { noexport signature-t const* $method_name($$list_types); }}}" . &ann(__LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-signature { namespace va { noexport signature-t const* $method_name($$list_types); }}}" . &ann(__LINE__) . "\n";
 }
-sub generate_ka_method_signature_defn {
+sub generate_kw_args_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __ka-signature { namespace va { noexport signature-t const* $method_name($$list_types) {" . &ann(__LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-signature { namespace va { noexport signature-t const* $method_name($$list_types) {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
 
   my $kw_arg_list = "static signature-t const result = { \"$return_type\", \"$method_name\", \"";
@@ -3537,18 +3537,18 @@ sub generate_slots_method_signature_defn {
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}\n";
 }
-sub generate_ka_method_defns {
+sub generate_kw_args_method_defns {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
     if ($$method{'keyword-types'}) {
-      &generate_ka_method_defn($method, $klass_name, $col, $klass_type);
+      &generate_kw_args_method_defn($method, $klass_name, $col, $klass_type);
     }
   }
 }
-sub generate_ka_method_defn {
+sub generate_kw_args_method_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  #$$scratch_str_ref .= $col . "// generate_ka_method_defn()\n";
+  #$$scratch_str_ref .= $col . "// generate_kw_args_method_defn()\n";
 
   my $qualified_klass_name = &path::string($klass_name);
 
@@ -3584,14 +3584,14 @@ sub generate_ka_method_defn {
     "$klass_type @$klass_name { namespace va { $visibility $return_type $method_name($$new_arg_list) {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
   $$scratch_str_ref .=
-    $col . "static signature-t const* __method__ = dkt-ka-signature(va:$method_name($$list_types)); USE(__method__);\n";
+    $col . "static signature-t const* __method__ = dkt-kw-args-signature(va:$method_name($$list_types)); USE(__method__);\n";
 
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
 
   if (0 < @{$$method{'keyword-types'}}) {
     #my $param = &dakota::util::_remove_last($$method{'parameter-types'}); # remove uintptr-t type
-    $method_type_decl = &ka_method::type_decl($method);
+    $method_type_decl = &kw_args_method::type_decl($method);
     #&dakota::util::_add_last($$method{'parameter-types'}, $param);
   } else {
     my $param1 = &dakota::util::_remove_last($$method{'parameter-types'}); # remove va-list-t type
@@ -3717,8 +3717,8 @@ sub dk::generate_cxx_footer {
   my ($scope, $stack, $col) = @_;
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &dk::generate_ka_method_defns($scope, $stack, 'trait', $col);
-  &dk::generate_ka_method_defns($scope, $stack, 'klass', $col);
+  &dk::generate_kw_args_method_defns($scope, $stack, 'trait', $col);
+  &dk::generate_kw_args_method_defns($scope, $stack, 'klass', $col);
 
   if (&is_rt_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
@@ -3756,7 +3756,7 @@ sub dk::generate_cxx_footer {
   }
   return $$scratch_str_ref;
 }
-sub dk::generate_ka_method_defns {
+sub dk::generate_kw_args_method_defns {
   my ($scope, $stack, $klass_type, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
@@ -3771,11 +3771,11 @@ sub dk::generate_ka_method_defns {
 
           &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
         }
-        #&generate_ka_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], &colin($col));
+        #&generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], &colin($col));
 
-        &generate_ka_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+        &generate_kw_args_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
 
-        &generate_ka_method_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+        &generate_kw_args_method_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
       }
       &path::remove_last($stack);
     }

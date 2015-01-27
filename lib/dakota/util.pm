@@ -26,10 +26,10 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-my $ka_generics_tbl;
+my $kw_args_generics_tbl;
 
 BEGIN {
-  $ka_generics_tbl = { 'init' => undef };
+  $kw_args_generics_tbl = { 'init' => undef };
 };
 
 require Exporter;
@@ -42,20 +42,20 @@ our @EXPORT= qw(
                  _remove_first
                  _remove_last 
                  deep_copy
-                 ka_generics
-                 ka_generics_add
+                 kw_args_generics
+                 kw_args_generics_add
                  filestr_from_file
                  scalar_from_file
                  canon_path
               );
 
 use Fcntl qw(:DEFAULT :flock);
-sub ka_generics_add {
+sub kw_args_generics_add {
   my ($generic) = @_;
-  $$ka_generics_tbl{$generic} = undef;
+  $$kw_args_generics_tbl{$generic} = undef;
 }
-sub ka_generics {
-  return $ka_generics_tbl;
+sub kw_args_generics {
+  return $kw_args_generics_tbl;
 }
 sub canon_path { # should merge with rel_path_canon()
   my ($path) = @_;
