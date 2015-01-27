@@ -19,7 +19,7 @@ include <cstdlib>;
 include <cstring>;
 
 #include "dakota-private.hh"
-#include "named-info-node.hh"
+#include "named-info.hh"
 
 module dakota;
 
