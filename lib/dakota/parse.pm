@@ -313,10 +313,10 @@ my $gbl_filename = undef;
 sub init_rep_from_dk_vars {
   my ($cmd_info) = @_;
   $gbl_root = {};
-  $$gbl_root{'hashes'} = {};
-  $$gbl_root{'keywords'} = {};
-  $$gbl_root{'symbols'}  = {};
-  $$gbl_root{'types'}  = {};
+  #$$gbl_root{'hashes'} = {};
+  #$$gbl_root{'keywords'} = {};
+  #$$gbl_root{'symbols'}  = {};
+  #$$gbl_root{'types'}  = {};
 
   $gbl_current_scope = $gbl_root;
   $gbl_filename = undef;
@@ -1989,9 +1989,9 @@ sub init_global_rep {
 sub parse_root {
   my ($gbl_sst_cursor) = @_;
   $gbl_current_scope = $gbl_root;
-  $$gbl_root{'exported-headers'} = {};
-  $$gbl_root{'exported-klass-decls'} = {};
-  $$gbl_root{'exported-trait-decls'} = {};
+  #$$gbl_root{'exported-headers'} = {};
+  #$$gbl_root{'exported-klass-decls'} = {};
+  #$$gbl_root{'exported-trait-decls'} = {};
 
   # root
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
