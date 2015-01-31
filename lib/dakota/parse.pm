@@ -631,7 +631,10 @@ sub trait {
   }
   $gbl_current_scope = $$gbl_current_scope{'traits'}{$construct_name};
   $$gbl_current_scope{'module'} = $gbl_current_module;
-  $$gbl_current_scope{'exported-headers'} = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
+  my $exported_headers = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
+  if ($exported_headers) {
+    $$gbl_current_scope{'exported-headers'} = $exported_headers;
+  }
   $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -664,7 +667,7 @@ sub trait {
       if (m/^trait$/) {
         my $seq = &dkdecl_list('trait');
         &match(__FILE__, __LINE__, ';');
-        if (!defined $$gbl_current_scope{'traits'}) {
+        if (!exists $$gbl_current_scope{'traits'}) {
           $$gbl_current_scope{'traits'} = [];
         }
         foreach my $trait (@$seq) {
@@ -847,7 +850,6 @@ sub const {
   if ($$args{'exported?'}) {
     $$const{'exported?'} = 1;
   }
-
   my $type = [];
   while (';' ne &sst_cursor::current_token($gbl_sst_cursor)) {
     my $tkn = &match_any();
@@ -1219,7 +1221,7 @@ sub klass {
       if (m/^trait$/) {
         my $seq = &dkdecl_list('trait');
         &match(__FILE__, __LINE__, ';');
-        if (!defined $$gbl_current_scope{'traits'}) {
+        if (!exists $$gbl_current_scope{'traits'}) {
           $$gbl_current_scope{'traits'} = [];
         }
         foreach my $trait (@$seq) {
@@ -1742,9 +1744,10 @@ sub generics::klass_type_from_klass_name {
   my ($klass_name) = @_;
   my $klass_type;
 
-  if (exists $$global_rep{'klasses'}{$klass_name}) {
+  if (0) {
+  } elsif ($$global_rep{'klasses'}{$klass_name}) {
     $klass_type = 'klass';
-  } elsif (exists $$global_rep{'traits'}{$klass_name}) {
+  } elsif ($$global_rep{'traits'}{$klass_name}) {
     $klass_type = 'trait';
   } else {
     my $rep_path_var = [join ':', @{$$global_root_cmd{'reps'}}];
@@ -1757,7 +1760,8 @@ sub generics::klass_scope_from_klass_name {
   my $klass_scope;
 
   # should use $type
-  if ($$global_rep{'klasses'}{$klass_name}) {
+  if (0) {
+  } elsif ($$global_rep{'klasses'}{$klass_name}) {
     $klass_scope = $$global_rep{'klasses'}{$klass_name};
   } elsif ($$global_rep{'traits'}{$klass_name}) {
     $klass_scope = $$global_rep{'traits'}{$klass_name};
@@ -1821,9 +1825,11 @@ sub _add_indirect_klasses { # recursive
 sub add_indirect_klasses {
   my ($klass_names_set) = @_;
   foreach my $construct ('klasses', 'traits') {
+    if (exists $$klass_names_set{$construct}) {
     foreach my $klass_name (keys %{$$klass_names_set{$construct}}) {
       my $col;
       &_add_indirect_klasses($klass_names_set, $klass_name, $col = '');
+    }
     }
   }
 }
@@ -1932,7 +1938,7 @@ sub generics::_parse { # no longer recursive
 }
 sub add_direct_constructs {
   my ($klasses, $scope, $construct_type) = @_;
-  if (defined $$scope{$construct_type}) {
+  if (exists $$scope{$construct_type}) {
     foreach my $construct (@{$$scope{$construct_type}}) {
       $$klasses{$construct} = undef;
     }
@@ -1958,11 +1964,13 @@ sub dk::klass_names_from_file {
       &add_direct_constructs($klass_names_set, $klass_scope, 'traits');
     }
   }
+  if (exists $$file{'traits'}) {
   while (my ($klass_name, $klass_scope) = each(%{$$file{'traits'}})) {
     $$klass_names_set{'traits'}{$klass_name} = undef;
     if (defined $klass_scope) {
       &add_direct_constructs($klass_names_set, $klass_scope, 'traits');
     }
+  }
   }
   return $klass_names_set;
 }
@@ -2036,6 +2044,7 @@ sub parse_root {
     }
   }
   foreach my $exported_mumble ('exported-headers', 'exported-klass-decls', 'exported-trait-decls') {
+    if (exists $$gbl_root{$exported_mumble}) {
     if ($$gbl_root{$exported_mumble}) {
       my $klasses = {};
       while (my ($klass, $info) = each(%{$$gbl_root{'klasses'}})) {
@@ -2052,15 +2061,17 @@ sub parse_root {
         }
       }
     }
+    }
   }
-  #if (exists $$gbl_root{'generics'}{'make'}) {
-  delete $$gbl_root{'generics'}{'make'};
-  $$gbl_root{'should-generate-make'} = 1;
-  #}
+  if (exists $$gbl_root{'generics'}) {
+    delete $$gbl_root{'generics'}{'make'};
+    $$gbl_root{'should-generate-make'} = 1;
+  }
   return $gbl_root;
 }
 sub add_object_methods_decls_to_klass {
   my ($klass_scope, $methods_key, $slots_methods_key) = @_;
+  if (exists $$klass_scope{$slots_methods_key}) {
   while (my ($slots_method_sig, $slots_method_info) = each (%{$$klass_scope{$slots_methods_key}})) {
     if ($$slots_method_info{'defined?'}) {
       my $object_method_info = &dakota::generate::convert_to_object_method($slots_method_info);
@@ -2077,14 +2088,17 @@ sub add_object_methods_decls_to_klass {
       }
     }
   }
+  }
 }
 sub add_object_methods_decls {
   my ($root) = @_;
   #print STDERR &Dumper($root);
 
   foreach my $construct ('klasses', 'traits') {
+    if (exists $$root{$construct}) {
     while (my ($klass_name, $klass_scope) = each (%{$$root{$construct}})) {
       &add_object_methods_decls_to_klass($klass_scope, 'methods', 'slots-methods');
+    }
     }
   }
 }
