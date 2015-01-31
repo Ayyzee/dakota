@@ -3746,7 +3746,7 @@ sub dk::generate_kw_args_method_defns {
   my ($scope, $stack, $klass_type, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
-    if ($klass_scope) {
+    if ($klass_scope && 0 < keys(%$klass_scope)) { #print STDERR &Dumper($klass_scope);
       my $cxx_klass_name = $klass_name;
       &path::add_last($stack, $klass_name);
       if (&is_rt_defn()) {
