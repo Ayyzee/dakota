@@ -3844,7 +3844,7 @@ sub linkage_unit::generate_symbols {
       my $slots = "$symbol:slots-t";
 
       if (!exists $$symbols{$slots}) {
-        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $slots);
+        #&add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $slots);
       }
       my $klass_typedef = "$symbol-t";
 
