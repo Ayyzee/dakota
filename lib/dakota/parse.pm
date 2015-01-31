@@ -274,8 +274,9 @@ sub _rep_merge { # recursive
 	  $$root_ref{$name}{$subscope_name} = &dakota::util::deep_copy($subscope);
 	} elsif ('klasses' eq $name || 'traits' eq $name) {
 	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'methods'}, $$subscope{'methods'});
-	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'va-methods'}, $$subscope{'va-methods'});
+	  #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-methods'}, $$subscope{'va-methods'});
 	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'slots-methods'}, $$subscope{'slots-methods'});
+	  #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-slots-methods'}, $$subscope{'va-slots-methods'});
 
 	  # need to merge 'slots' and bunch-o-stuff
 	}
@@ -1558,10 +1559,9 @@ sub add_generics_used {
 }
 
 # 'methods'
-# 'va-methods'
 # 'slots-methods'
 
-# exported or not, raw or not, va or not
+# exported or not, slots or not, va or not
 
 # exported-va-slots-methods
 sub method {
@@ -1706,8 +1706,8 @@ sub method {
   }
   my $signature = &function::overloadsig($method, undef);
 
-  if (0) {}
-  elsif (&dakota::generate::is_slots($method) && &dakota::generate::is_va($method)) { # 11
+  if (0) {
+  } elsif (&dakota::generate::is_slots($method) && &dakota::generate::is_va($method)) { # 11
     if (!defined $$gbl_current_scope{'slots-methods'}) {
       $$gbl_current_scope{'slots-methods'} = {};
     }

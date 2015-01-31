@@ -28,7 +28,3 @@ klass schar8
 {
   slots schar-t;
 }
-klass wchar
-{
-  slots wchar-t;
-}

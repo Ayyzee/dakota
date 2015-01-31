@@ -792,6 +792,17 @@ pad(char8-t* buf, uint32-t buf-len, uint32-t len)
     strcat(buf, " ");
   return buf;
 }
+static size-t
+first-parameter-type-len(str-t params)
+{
+  size-t i;
+  for (i = 0; i < strlen(params); i++) {
+    char8-t c = params[i];
+    if (c == ',')
+      break;
+  }
+  return i;
+} 
 
 static void
 dump-module-description(ofile-t ofl, named-info-t* registration-info)
@@ -800,29 +811,73 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
   assert(8 > ofl.col);
   assert(nullptr != registration-info);
 
-  named-info-t* exports = cast(named-info-t*)named-info:at(registration-info, $exports);
+  named-info-t* klass-defns = cast(named-info-t*)named-info:at(registration-info, $klass-defns);
 
-  if (nullptr != exports) {
-    //fprintf(ofl.output, "/*\n");
-    for (uint-t i = 0; i < exports->count; i++) {
-      property-t modulee = exports->elements[i];
-      str-t module-name = modulee.key;
-      named-info-t* module-exports = cast(named-info-t*)(modulee.element);
-    
-      char8-t[64] buf;
-      snprintf(buf, sizeof(buf), "module %s export", module-name);
-      fprintf(ofl.output, "%s", buf);
-      str-t delim = "";
-      for (uint-t j = 0; j < module-exports->count; j++) {
-        property-t symbol = module-exports->elements[j];
-        str-t symbol-name = symbol.key;
+  if (nullptr != klass-defns) {
+    uint32-t i = 0;
+    symbol-t module-name = nullptr;
+    str-t c = "";
 
-        fprintf(ofl.output, "%s\n%s%s", delim, "  ", symbol-name);
-        delim = ",";
+    while (1) {
+      named-info-t* klass-info = &klass-defns[i++];
+      assert(nullptr != klass-info);
+      if (nullptr == klass-info->elements)
+        break;
+      // klass-name,
+      // klass-name:slots-t,
+      // klass-name:method-name(slots-t),
+      // klass-name:method-name(object-t), // maybe generated
+      // klass-name:va:method-name(slots-t),
+      // klass-name:va:method-name(object-t), // maybe generated
+      // klass-name:kw-args-method-name(slots-t), ???
+      // klass-name:kw-args-method-name(object-t), // maybe generated
+      symbol-t name = name-from-info(klass-info);
+
+      str-t                     modulee =                        cast(str-t)                    named-info:at(klass-info, $module);
+
+      //boole-t                   exported? =                      cast(boole-t)                  named-info:at(klass-info, $exported?);
+      //boole-t                   state-exported? =                cast(boole-t)                  named-info:at(klass-info, $state-exported?);
+      //boole-t                   behavior-exported? =             cast(boole-t)                  named-info:at(klass-info, $behavior-exported?);
+      
+      //symbol-t                  interpose-name =                 cast(symbol-t)                 named-info:at(klass-info, $interpose-name);
+
+      named-info-t*             slots-info =                     cast(named-info-t*)            named-info:at(klass-info, $slots-info);
+      symbol-t                  slots-type =                     cast(symbol-t)                 named-info:at(klass-info, $slots-type);
+
+      signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info:at(klass-info, $method-signatures);
+      //signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info:at(klass-info, $va-method-signatures);
+      //signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info:at(klass-info, $slots-method-signatures);
+      //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info:at(klass-info, $va-slots-method-signatures);
+      //signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info:at(klass-info, $kw-args-method-signatures);
+
+      if (nullptr == modulee) { // HACKHACK
+        str-t file = cast(str-t) named-info:at(registration-info, $file);
+        fprintf(stdout, "ERROR: __FILE__ = %s, klass-info missing $module element\n", file); // to stdout just like dkt-dump-named-info()
+        dkt-dump-named-info(klass-info);
+      } else {
+        if (module-name != modulee)
+          ofile:printf(ofl, "%s %s %s", "module", modulee, "export");
+        module-name = modulee;
+        ofile:printf(ofl, "%s\n  %s", c, name);
+        c = ",";
+        if (nullptr != slots-info || nullptr != slots-type)
+          ofile:printf(ofl, ",\n  %s:%s", name, "slots-t");
+        if (nullptr != method-signatures) {
+          uint32-t index = 0;
+          signature-t const* info;
+
+        while (nullptr != (info = method-signatures[index++])) {
+          char8-t first-parameter-type[15 + (1)] = "";
+          size-t len = first-parameter-type-len(info->parameter-types);
+          assert(len < DK-ARRAY-LENGTH(first-parameter-type) - 1);
+          strncpy(first-parameter-type, info->parameter-types, len);
+          first-parameter-type[len] = cast(char8-t)0;
+          //ofile:printf(ofl, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
+        }
       }
-      fprintf(ofl.output, ";\n");
+      } // HACKHACK
     }
-    //fprintf(ofl.output, "*/\n");
+    ofile:printf(ofl, ";\n");
   }
   return;
 }
@@ -847,6 +902,7 @@ dump-klass-defns(ofile-t ofl, named-info-t* registration-info, str-t only)
     }
     while (1) {
       named-info-t* klass-info = &klass-defns[i++];
+      assert(nullptr != klass-info);
       if (nullptr == klass-info->elements)
         break;
       if (nullptr == only || should-dump(klass-info, only)) {
@@ -987,14 +1043,18 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
   signature-t const* const* kw-args-method-signatures =           cast(signature-t const* const*)named-info:at(klass-info, $kw-args-method-signatures);
   signature-t const* const* exported-method-signatures =     cast(signature-t const* const*)named-info:at(klass-info, $exported-method-signatures);
   signature-t const* const* exported-slots-method-signatures = cast(signature-t const* const*)named-info:at(klass-info, $exported-slots-method-signatures);
+  signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info:at(klass-info, $slots-method-signatures);
+  //signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info:at(klass-info, $va-method-signatures);
+  //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info:at(klass-info, $va-slots-method-signatures);
   named-enum-info-t const*  enum-info =                      cast(named-enum-info-t const*) named-info:at(klass-info, $enum-info);
   const-info-t const*       const-info =                     cast(const-info-t const*)      named-info:at(klass-info, $const-info);
   str-t                     slots-type =                     cast(str-t)                    named-info:at(klass-info, $slots-type);
   str-t                     enum-base =                      cast(str-t)                    named-info:at(klass-info, $enum-base);
   named-info-t*        slots-info =                     cast(named-info-t*)       named-info:at(klass-info, $slots-info);
-//     method-t const* method-addresses = cast(method-t*)named-info:at(klass-info, $method-addresses);
-//     method-t const* exported-method-addresses = cast(method-t*)named-info:at(klass-info, $exported-method-addresses);
-//     method-t const* exported-slots-method-addresses = cast(method-t*)named-info:at(klass-info, $exported-slots-method-addresses);
+//     method-t const* method-addresses =          cast(method-t*)named-info:at(klass-info, $method-addresses);
+//     method-t const* va-method-addresses =       cast(method-t*)named-info:at(klass-info, $va-method-addresses);
+//     method-t const* slots-method-addresses =    cast(method-t*)named-info:at(klass-info, $slots-method-addresses);
+//     method-t const* va-slots-method-addresses = cast(method-t*)named-info:at(klass-info, $va-slots-method-addresses);
 
   assert(nullptr != construct);
   assert(nullptr != name);
@@ -1149,6 +1209,7 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
 
   //max-return-type-width = max-method-return-type-width(kw-args-method-signatures, nullptr);
     max-return-type-width = max-method-return-type-width(method-signatures,
+                                                         slots-method-signatures,
                                                          exported-method-signatures,
                                                          exported-slots-method-signatures,
                                                          nullptr);
@@ -1164,6 +1225,11 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
     index = 0;
     if (nullptr != method-signatures)
       while (nullptr != (info = method-signatures[index++]))
+        dump-method(ofl, info, max-return-type-width);
+
+    index = 0;
+    if (nullptr != slots-method-signatures)
+      while (nullptr != (info = slots-method-signatures[index++]))
         dump-method(ofl, info, max-return-type-width);
 
     index = 0;

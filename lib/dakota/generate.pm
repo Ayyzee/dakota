@@ -529,13 +529,6 @@ sub generate_defn_footer {
                   "\$construct" => 'DKT-CONSTRUCT',
                   "\$name" => 'DKT-NAME',
                  };
-  my $exports = &exports($file);
-  my $num_exports = scalar keys %$exports;
-  if (0 == $num_exports) {
-    $$info_tbl{"\$exports"} = 'exports';
-  } else {
-    $$info_tbl{"\$exports"} = '&exports';
-  }
   $rt_cxx_str .= "\n";
   #my $col;
   $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
@@ -3726,13 +3719,6 @@ sub dk::generate_cxx_footer {
       $$scratch_str_ref .= $col . "static named-info-t* klass-defns = nullptr;\n";
     } else {
       $$scratch_str_ref .= &generate_info_seq('klass-defns', [sort @$global_klass_defns], $col, __LINE__);
-    }
-    my $exports = &exports($scope);
-    my $num_exports = scalar keys %$exports;
-    if (0 == $num_exports) {
-      $$scratch_str_ref .= $col . "static named-info-t* exports = nullptr;\n";
-    } else {
-      $$scratch_str_ref .= &generate_info('exports', $exports, $col, $$scope{'symbols'}, __LINE__);
     }
     if (0 == keys %{$$scope{'interposers'}}) {
       $$scratch_str_ref .= $col . "static property-t* interposers = nullptr;" . &ann(__LINE__) . "\n";
