@@ -850,20 +850,18 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
       //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info:at(klass-info, $va-slots-method-signatures);
       //signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info:at(klass-info, $kw-args-method-signatures);
 
-      if (nullptr == modulee) { // HACKHACK
-        fprintf(stdout, "ERROR: klass-info missing $module element\n"); // to stdout just like dkt-dump-named-info()
-        dkt-dump-named-info(klass-info);
-      } else {
-        if (module-name != modulee)
-          ofile:printf(ofl, "%s %s %s", "module", modulee, "export");
-        module-name = modulee;
-        ofile:printf(ofl, "%s\n  %s", c, name);
-        c = ",";
-        if (nullptr != slots-info || nullptr != slots-type)
-          ofile:printf(ofl, ",\n  %s:%s", name, "slots-t");
-        if (nullptr != method-signatures) {
-          uint32-t index = 0;
-          signature-t const* info;
+      if (nullptr == modulee)
+        abort();
+      if (module-name != modulee)
+        ofile:printf(ofl, "%s %s %s", "module", modulee, "export");
+      module-name = modulee;
+      ofile:printf(ofl, "%s\n  %s", c, name);
+      c = ",";
+      if (nullptr != slots-info || nullptr != slots-type)
+        ofile:printf(ofl, ",\n  %s:%s", name, "slots-t");
+      if (nullptr != method-signatures) {
+        uint32-t index = 0;
+        signature-t const* info;
 
         while (nullptr != (info = method-signatures[index++])) {
           char8-t first-parameter-type[15 + (1)] = "";
@@ -874,7 +872,6 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
           //ofile:printf(ofl, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
         }
       }
-      } // HACKHACK
     }
     ofile:printf(ofl, ";\n");
   }
