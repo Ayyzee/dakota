@@ -851,8 +851,7 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
       //signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info:at(klass-info, $kw-args-method-signatures);
 
       if (nullptr == modulee) { // HACKHACK
-        str-t file = cast(str-t) named-info:at(registration-info, $file);
-        fprintf(stdout, "ERROR: __FILE__ = %s, klass-info missing $module element\n", file); // to stdout just like dkt-dump-named-info()
+        fprintf(stdout, "ERROR: klass-info missing $module element\n"); // to stdout just like dkt-dump-named-info()
         dkt-dump-named-info(klass-info);
       } else {
         if (module-name != modulee)
