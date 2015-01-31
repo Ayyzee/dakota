@@ -701,6 +701,8 @@ sub rt_obj_from_rep {
   }
   $file = &scalar_from_file($rep_path);
   $file = &kw_args_translate($file);
+  $$file{'should-generate-make'} = 1;
+
 
   &rt::add_extra_symbols($file);
   &rt::add_extra_klass_decls($file);
