@@ -64,6 +64,7 @@ our @EXPORT= qw(
                  add_hash
                  add_keyword
                  add_string
+                 add_generic
               );
 
 use dakota::sst;
@@ -316,9 +317,6 @@ sub init_rep_from_dk_vars {
   $$gbl_root{'keywords'} = {};
   $$gbl_root{'symbols'}  = {};
   $$gbl_root{'types'}  = {};
-  $$gbl_root{'generics'}{'instance?'} = undef;
-  $$gbl_root{'generics'}{'forward-iterator'} = undef;
-  $$gbl_root{'generics'}{'next'} = undef;
 
   $gbl_current_scope = $gbl_root;
   $gbl_filename = undef;
@@ -493,6 +491,10 @@ sub add_trait_decl {
   if (!$$file{'traits'}{$klass_name}) {
     $$file{'traits'}{$klass_name} = undef;
   }
+}
+sub add_generic {
+  my ($file, $generic) = @_;
+  $$file{'generics'}{$generic} = undef;
 }
 sub add_symbol_ident {
   my ($file, $ident) = @_;
@@ -1655,7 +1657,7 @@ sub method {
   }
   $$method{'name'} = &sst::token_seq($gbl_sst, $last_type_token + 1, $last_name_token);
   $$method{'name'} = &token_seq::simple_seq($$method{'name'});
-  $$gbl_root{'generics'}{"@{$$method{'name'}}"} = undef;
+  &add_generic($gbl_root, "@{$$method{'name'}}");
 
   if ($open_paren_index + 1 == $close_paren_index) {
     &error(__FILE__, __LINE__, $close_paren_index);
@@ -2053,8 +2055,6 @@ sub parse_root {
   }
   #if (exists $$gbl_root{'generics'}{'make'}) {
   delete $$gbl_root{'generics'}{'make'};
-  $$gbl_root{'generics'}{'init'} = undef;        # for make()
-  $$gbl_root{'generics'}{'alloc'} = undef;       # for make()
   $$gbl_root{'should-generate-make'} = 1;
   #}
   return $gbl_root;

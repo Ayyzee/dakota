@@ -207,6 +207,19 @@ sub add_visibility {
     }
   }
 }
+sub nrt::add_extra_generics {
+  my ($file) = @_;
+  my $generics = { # hardcoded
+    'alloc' => undef,
+    'forward-iterator' => undef,
+    'init' => undef,
+    'instance?' => undef,
+    'next' => undef,
+  };
+  foreach my $generic (sort keys %$generics) {
+    &add_generic($file, $generic);
+  }
+}
 sub nrt::add_extra_keywords {
   my ($file) = @_;
   my $keywords = { # hardcoded
@@ -416,9 +429,11 @@ sub loop_cxx_from_dk {
     &dk::generate_dk_cxx($file_basename, "$dk_cxx_path$dk_cxx_name");
     $cxx_path =~ s|^\./||;
     $cxx_path =~ s|/$||;
+
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
+    &nrt::add_extra_generics($file);
 
     if (0) {
       #  for each translation unit create links to the linkage unit header file
@@ -682,12 +697,15 @@ sub rt_obj_from_rep {
   }
   $file = &scalar_from_file($rep_path);
   $file = &kw_args_translate($file);
+
   &rt::add_extra_symbols($file);
   &rt::add_extra_klass_decls($file);
   &rt::add_extra_keywords($file);
+
   &nrt::add_extra_symbols($file);
   &nrt::add_extra_klass_decls($file);
   &nrt::add_extra_keywords($file);
+  &nrt::add_extra_generics($file);
 
   &dakota::generate::generate_rt_decl($path, $file_basename, $file);
   &dakota::generate::generate_rt_defn($path, $file_basename, $file);
