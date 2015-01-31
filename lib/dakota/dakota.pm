@@ -301,7 +301,9 @@ sub rt::add_extra_symbols {
   my ($file) = @_;
   my $symbols = { # hardcoded
     'behavior-exported?' => undef,
+    'bool-t' => undef, # hardcode typedef
     'cat' => undef,
+    'char-t' => undef, # hardcode typedef
     'construct' => undef,
     'date' => undef,
     'enum' => undef,
@@ -317,7 +319,7 @@ sub rt::add_extra_symbols {
     'file' => undef,
     'imported-klasses' => undef,
     'imported-klasses-names' => undef,
-    'int-t' => undef,
+    'int-t' => undef, # hardcode typedef
     'interpose-name' => undef,
     'interposers' => undef,
     'kw-args-method-signatures' => undef,
@@ -333,6 +335,7 @@ sub rt::add_extra_symbols {
     'name' => undef,
     'offset' => undef,
     'requires' => undef,
+    'schar-t' => undef, # hardcode typedef
     'selectors' => undef,
     'selectors-va' => undef,
     'signatures' => undef,
@@ -347,7 +350,8 @@ sub rt::add_extra_symbols {
     'trait' => undef,
     'traits' => undef,
     'type' => undef,
-    'uint-t' => undef,
+    'uchar-t' => undef, # hardcode typedef
+    'uint-t' => undef, # hardcode typedef
     'union' => undef,
     'va-method' => undef,
     'va-method-addresses' => undef,
