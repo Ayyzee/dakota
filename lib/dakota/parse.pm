@@ -631,9 +631,8 @@ sub trait {
   }
   $gbl_current_scope = $$gbl_current_scope{'traits'}{$construct_name};
   $$gbl_current_scope{'module'} = $gbl_current_module;
-  my $exported_headers = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
-  if ($exported_headers) {
-    $$gbl_current_scope{'exported-headers'} = $exported_headers;
+  if (exists $$gbl_root{'exported-headers'} && defined $$gbl_root{'exported-headers'}) {
+    $$gbl_current_scope{'exported-headers'} = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
   }
   $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
@@ -1160,7 +1159,9 @@ sub klass {
   }
   $gbl_current_scope = $$gbl_current_scope{'klasses'}{$construct_name};
   $$gbl_current_scope{'module'} = $gbl_current_module;
-  $$gbl_current_scope{'exported-headers'} = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
+  if (exists $$gbl_root{'exported-headers'} && defined $$gbl_root{'exported-headers'}) {
+    $$gbl_current_scope{'exported-headers'} = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
+  }
   $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -2044,10 +2045,9 @@ sub parse_root {
     }
   }
   foreach my $exported_mumble ('exported-headers', 'exported-klass-decls', 'exported-trait-decls') {
-    if (exists $$gbl_root{$exported_mumble}) {
-    if ($$gbl_root{$exported_mumble}) {
+    if (exists $$gbl_root{$exported_mumble} && defined $$gbl_root{$exported_mumble}) {
       my $klasses = {};
-      while (my ($klass, $info) = each(%{$$gbl_root{'klasses'}})) {
+      while (my ($klass, $info) = each(%{$$gbl_root{'klasses'}})) { # how about traits
         if ($info) {
           $$klasses{$klass} = undef;
         }
@@ -2055,12 +2055,11 @@ sub parse_root {
       while (my ($path, $dummy) = each(%{$$gbl_root{$exported_mumble}})) {
         $$gbl_root{$exported_mumble}{$path} = $klasses;
       }
-      while (my ($klass, $info) = each(%{$$gbl_root{'klasses'}})) {
+      while (my ($klass, $info) = each(%{$$gbl_root{'klasses'}})) { # how about traits
         if ($info) {
           $$info{$exported_mumble} = $$gbl_root{$exported_mumble};
         }
       }
-    }
     }
   }
   if (exists $$gbl_root{'generics'}) {

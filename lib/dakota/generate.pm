@@ -2343,8 +2343,10 @@ sub linkage_unit::generate_headers {
     foreach my $klass_name (@$klass_names) {
       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
+      if (exists $$klass_scope{'exported-headers'} && defined $$klass_scope{'exported-headers'}) {
       while (my ($header, $klasses) = each (%{$$klass_scope{'exported-headers'}})) {
         $$exported_headers{$header}{$klass_name} = undef;
+      }
       }
     }
     my $all_headers = {};
