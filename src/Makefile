@@ -179,7 +179,7 @@ strerror-name.tbl: gen-strerror-name.sh
 	./$<
 
 clean: clean-rt
-	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst dummy min
+	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst dummy min empty-klass-x
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info$(exeext)
