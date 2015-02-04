@@ -7,8 +7,8 @@ include $(rootdir)/vars.mk
 
 DAKOTA_VARS += DK_PREFIX=$(rootdir)
 
-dakota_util_files := $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
-dakota_files :=      $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
+dakota_util_srcs := $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
+dakota_srcs :=      $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
 
 dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
 dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
@@ -60,17 +60,18 @@ soname = $(shell $(rootdir)/bin/dakota-project soname --repository $*-project.re
 
 # the use of $^ should be $?
 
+# EXTRA_DAKOTAFLAGS is a dakota variable, not a g++/clang++ variable, but they share the same syntax
 $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT):
-	$(DAKOTA) --shared $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/lib/%.$(SO_EXT):
-	$(DAKOTA) --dynamic  $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) --dynamic  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(rootdir)/bin/%$(exeext): $(SRCDIR)/%-main.$(dk_ext)
-	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 %: %-main.$(dk_ext)
-	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
 
 # installed files
 $(DESTDIR)$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)
@@ -100,9 +101,6 @@ tst: tst-main.$(dk_ext) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 min: min-main.$(dk_ext)
 
-dummy: dummy-main.$(cxx_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^
-
 check: all install
 	$(rootdir)/bin/dakota-info$(exeext) $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name)
 	$(MAKE) tst
@@ -110,21 +108,20 @@ check: all install
 	$(MAKE) dummy
 	./dummy
 
-check-headers:
-	$(CXX) $(CXXFLAGS) $(CXX_COMPILE_FLAGS) $(CXX_NO_WARNINGS_FLAGS) $(INCLUDE_DAKOTAFLAGS) dakota-private.hh
+$(rootdir)/lib/$(lib_prefix)$(dakota_util_name): $(dakota_util_srcs)
 
-$(rootdir)/lib/$(lib_prefix)$(dakota_util_name): $(dakota_util_files)
-
-$(rootdir)/lib/$(lib_prefix)$(dakota_name): $(dakota_files)
+$(rootdir)/lib/$(lib_prefix)$(dakota_name): $(dakota_srcs)
 
 dakota-util: $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 dakota: $(rootdir)/lib/$(lib_prefix)$(dakota_name)
 
-# INCLUDE_DAKOTAFLAGS is a dakota variable, not a g++/clang++ variable, but they share the same syntax
 $(rootdir)/bin/dakota-info$(exeext): $(SRCDIR)/dakota-info-main.$(cxx_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(INCLUDE_DAKOTAFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^ /usr/lib/libdl.$(SO_EXT)
+
+dummy: dummy-main.$(cxx_ext)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAG) $@ $^
 
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all

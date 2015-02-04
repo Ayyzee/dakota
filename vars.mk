@@ -70,7 +70,7 @@ else
 endif
 
 DAKOTAFLAGS ?=
-INCLUDE_DAKOTAFLAGS :=\
+EXTRA_DAKOTAFLAGS :=\
  --include-directory $(SRCDIR)\
  --include-directory $(INCLUDEDIR)\
 
@@ -103,6 +103,6 @@ export EXTRA_CXXFLAGS
 
 export DAKOTA
 export DAKOTAFLAGS
-export INCLUDE_DAKOTAFLAGS
+export EXTRA_DAKOTAFLAGS
 
 export EXTRA_LDFLAGS
