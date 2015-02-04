@@ -45,12 +45,6 @@ my $vars = {
   'CXX_SHARED_FLAGS' =>      '--shared',
   'CXX_DYNAMIC_FLAGS' =>     '--dynamic',
   'CXX_OUTPUT_FLAGS' =>      '--output',
-  'CXX_OPTIMIZE_FLAGS' =>    '--optimize=0',
-
-  'CXX_DEBUG_FLAGS' =>       "\
- --debug=3\
- --define-macro DEBUG\
-",
 
   'CXX_WARNINGS_FLAGS' =>    "\
  --no-common\

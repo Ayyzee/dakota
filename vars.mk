@@ -45,8 +45,7 @@ CXX_WARNINGS_FLAGS ?= --warnings-all
 CXX_NO_WARNINGS ?= 0
 CXXFLAGS := -std=c++11
 
-CXX_OPTIMIZE_FLAGS ?= --optimize=0
-CXX_DEBUG_FLAGS ?= --debug=3 --define-macro DEBUG
+CXX_DEBUG_FLAGS ?= --optimize=0 --debug=3 --define-macro DEBUG
 CXX_SHARED_FLAGS ?= --shared
 CXX_DYNAMIC_FLAGS ?= --dynamic
 CXX_OUTPUT_FLAG := --output

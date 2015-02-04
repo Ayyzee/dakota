@@ -454,14 +454,6 @@ sub start {
       ' ' . $ENV{'EXTRA_CXXFLAGS'} .
       ' ' . &dakota::compiler::var('CXX_WARNINGS_FLAGS', '--warnings-all');
   }
-  if (exists $ENV{'DEBUG'}) {
-    my $cxx_debug_flags = &dakota::compiler::var('CXX_DEBUG_FLAGS', '--debug=3 --define-macro DEBUG');
-    $$cmd_info{'opts'}{'compiler-flags'} .= ' ' . $cxx_debug_flags;
-  }
-  if (exists $ENV{'MAKEFLAGS'}) {
-    my $makeflags = $ENV{'MAKEFLAGS'};
-    #print "MAKEFLAGS: \"$makeflags\"\n";
-  }
   my $ld_soname_flags = &dakota::compiler::var('LD_SONAME_FLAGS', '-soname');
 
   if ($$cmd_info{'opts'}{'compile'}) {
