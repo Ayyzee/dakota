@@ -66,7 +66,6 @@ my $ctlg_ext = 'ctlg';
 my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
-my $obj_ext = 'o';
 
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;

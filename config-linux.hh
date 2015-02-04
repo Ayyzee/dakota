@@ -1,6 +1,6 @@
 // -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
-#ifndef __config_h__
-#define __config_h__
+#if !defined dkt_config_hh
+#define      dkt_config_hh
 
 #define HAVE_EPOLL 1
 #define HAVE_POLL 1
@@ -19,4 +19,4 @@ const char8_t* getprogname();
 #endif // HAVE_GETPROGNAME
 __END_DECLS
 
-#endif // __config_h__
+#endif

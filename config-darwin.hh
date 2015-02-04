@@ -1,6 +1,6 @@
 // -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
-#if !defined __config_hh__
-#define      __config_hh__
+#if !defined dkt_config_hh
+#define      dkt_config_hh
 
 #define HAVE_KQUEUE 1
 #define HAVE_GETPROGNAME 1
@@ -13,4 +13,4 @@
 //#define ALLOW_COMPOUND_LITERALS 1
 //#define ALLOW_DESIGNATED_INITIALIZERS 1
 
-#endif // __config_hh__
+#endif

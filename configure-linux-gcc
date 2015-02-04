@@ -1,8 +1,10 @@
 #!/bin/sh -u
 
 sysname=linux
+compiler=gcc
 
 cp config-$sysname.hh include/config.hh
-cp config-$sysname.mk config.mk
+cp config-$sysname-$compiler.mk config.mk
+cp lib/dakota/compiler-$sysname-$compiler.pm lib/dakota/compiler.pm
 cp config-$sysname.sh config.sh
 cp .gdbinit-$sysname src/.gdbinit

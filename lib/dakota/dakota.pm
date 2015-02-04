@@ -46,6 +46,7 @@ our @EXPORT= qw(
 use dakota::util;
 use dakota::parse;
 use dakota::generate;
+use dakota::compiler;
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -70,7 +71,6 @@ my $ctlg_ext = 'ctlg';
 my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
-my $obj_ext = 'o';
 
 my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
@@ -79,18 +79,10 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_flags = '--compile -fPIC';
-my $cxx_output_flags = '--output';
-my $cxx_shared_flags = '--shared';   # default
-my $cxx_dynamic_flags = '--dynamic'; # default
-
-if (defined $ENV{'CXX_SHARED_FLAGS'}) {
-  $cxx_shared_flags = $ENV{'CXX_SHARED_FLAGS'};
-}
-
-if (defined $ENV{'CXX_DYNAMIC_FLAGS'}) {
-  $cxx_dynamic_flags = $ENV{'CXX_DYNAMIC_FLAGS'};
-}
+my $cxx_compile_flags = &dakota::compiler::var('CXX_COMPILE_FLAGS', '--compile --PIC');
+my $cxx_output_flags =  &dakota::compiler::var('CXX_OUTPUT_FLAGS',  '--output');
+my $cxx_shared_flags =  &dakota::compiler::var('CXX_SHARED_FLAGS',  '--shared');
+my $cxx_dynamic_flags = &dakota::compiler::var('CXX_DYNAMIC_FLAGS', '--dynamic');
 
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;
@@ -465,10 +457,7 @@ sub start {
     my $makeflags = $ENV{'MAKEFLAGS'};
     #print "MAKEFLAGS: \"$makeflags\"\n";
   }
-  my $ld_soname_flags = '-soname'; #default
-  if (defined $ENV{'LD_SONAME_FLAGS'}) {
-    $ld_soname_flags = $ENV{'LD_SONAME_FLAGS'};
-  }
+  my $ld_soname_flags = &dakota::compiler::var('LD_SONAME_FLAGS', '-soname');
 
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_construct = undef;

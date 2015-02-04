@@ -44,9 +44,17 @@ GROUP := wheel
 CXX ?= g++
 CXXFLAGS := -std=c++11
 
+CXX_OPTIMIZE_FLAGS ?= --optimize=0
+CXX_DEBUG_FLAGS ?= --debug=3 --define-macro DEBUG
 CXX_SHARED_FLAGS ?= --shared
 CXX_DYNAMIC_FLAGS ?= --dynamic
 CXX_OUTPUT_FLAG := --output
+CXX_NO_WARNINGS_FLAGS := --no-warnings
+
+ifneq ($(CXX_NO_WARNINGS), 0)
+	CXX_WARNINGS_FLAGS += $(CXX_NO_WARNING_FLAGS)
+endif
+
 LD_PRELOAD ?= LD_PRELOAD
 
 DAKOTA_VARS =
@@ -67,32 +75,6 @@ INCLUDE_DAKOTAFLAGS :=\
  --include-directory $(INCLUDEDIR)\
 
 EXTRA_CXXFLAGS :=
-
-# clang does not support
-#   --no-common
-#   --trapv
-#   --PIC
-
-# -fno-common\
- -ftrapv\
- --all-warnings\
- --warn-cast-qual\
- --warn-extra\
- --warn-format=2\
- --warn-missing-format-attribute\
- --warn-missing-include-dirs\
- --warn-no-variadic-macros\
- --warn-pointer-arith\
- --warn-shadow\
- --warn-switch-enum\
- --warn-undef\
- --warn-unused\
- --warn-no-multichar\
- --warn-conversion\
- --warn-redundant-decls\
- --warn-switch-default\
-
-# --no-warnings
 
 # cast(some-type-t){...}
 ifdef DKT_ALLOW_COMPOUND_LITERALS

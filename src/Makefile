@@ -70,7 +70,7 @@ $(rootdir)/bin/%$(exeext): $(SRCDIR)/%-main.$(dk_ext)
 	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 %: %-main.$(dk_ext)
-	CXXFLAGS="$(CXXFLAGS)" EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
+	$(DAKOTA) $(INCLUDE_DAKOTAFLAGS) $(DAKOTAFLAGS) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
 
 # installed files
 $(DESTDIR)$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)

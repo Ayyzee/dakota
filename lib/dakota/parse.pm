@@ -69,6 +69,7 @@ our @EXPORT= qw(
 
 use dakota::sst;
 use dakota::generate;
+use dakota::compiler;
 
 my $objdir = 'obj';
 my $rep_ext = 'rep';
@@ -76,13 +77,8 @@ my $ctlg_ext = 'ctlg';
 my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
-my $obj_ext = 'o';
-
-my $SO_EXT = undef;
-if (!$ENV{'SO_EXT'}) {
-  $ENV{'SO_EXT'} = 'so';
-}                               # default SO_EXT
-$SO_EXT = $ENV{'SO_EXT'};
+my $O_EXT =  &dakota::compiler::var('O_EXT', 'o');
+my $SO_EXT = &dakota::compiler::var('SO_EXT', 'so');
 
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;
@@ -443,7 +439,7 @@ sub obj_path_from_dk_path {
   my ($path) = @_;
   $path =~ s/\.$dk_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$obj_ext";
+  $path = "$objdir/nrt/$canon_path.$O_EXT";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -451,7 +447,7 @@ sub obj_path_from_cxx_path {
   my ($path) = @_;
   $path =~ s/\.$cxx_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.$obj_ext";
+  $path = "$canon_path.$O_EXT";
   $path =~ s|//|/|g;
   return $path;
 }
