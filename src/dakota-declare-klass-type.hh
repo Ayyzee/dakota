@@ -1,5 +1,5 @@
-#if !defined __dakota_declare_klass_type_hh__
-#define      __dakota_declare_klass_type_hh__
+#if !defined dkt_dakota_declare_klass_type_hh
+#define      dkt_dakota_declare_klass_type_hh
 
 #define dkt_declare_klass_type_typedef(k, t) namespace k { typedef t slots_t;     } typedef k::slots_t  k##_t
 #define dkt_declare_klass_type_structptr(k)  namespace k { struct    slots_t;     } typedef k::slots_t* k##_t

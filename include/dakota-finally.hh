@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __dakota_finally_hh__
-#define      __dakota_finally_hh__
+#if !defined dkt_dakota_finally_hh
+#define      dkt_dakota_finally_hh
 
 // http://www.codeproject.com/Tips/476970/finally-clause-in-Cplusplus
 

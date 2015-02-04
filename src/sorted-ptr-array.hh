@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __sorted_ptr_array_hh__
-#define      __sorted_ptr_array_hh__
+#if !defined dkt_sorted_ptr_array_hh
+#define      dkt_sorted_ptr_array_hh
 
 #include "dakota.hh"
 
@@ -37,4 +37,4 @@ namespace sorted_ptr_array
   noexport slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
 
-#endif // __sorted_ptr_array_hh__
+#endif // dkt_sorted_ptr_array_hh

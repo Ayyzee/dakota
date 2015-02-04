@@ -1,5 +1,5 @@
-#if !defined __dakota_dummy_hh__
-#define      __dakota_dummy_hh__
+#if !defined dkt_dakota_dummy_hh
+#define      dkt_dakota_dummy_hh
 
 #include <cstdint> // uintptr_t
 

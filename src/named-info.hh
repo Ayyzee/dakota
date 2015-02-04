@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __named_info_hh__
-#define      __named_info_hh__
+#if !defined dkt_named_info_hh
+#define      dkt_named_info_hh
 
 #include "dakota.hh"
 

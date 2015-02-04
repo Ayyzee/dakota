@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined __dakota_private_hh__
-#define      __dakota_private_hh__
+#if !defined dkt_dakota_private_hh
+#define      dkt_dakota_private_hh
 
 #include "dakota-dummy.hh"
 #include "dakota.hh"
@@ -49,4 +49,4 @@ noexport symbol_t default_klass_name();
 noexport void verbose_terminate();
 noexport void verbose_unexpected();
 
-#endif // __dakota_private_hh__
+#endif // dkt_dakota_private_hh
