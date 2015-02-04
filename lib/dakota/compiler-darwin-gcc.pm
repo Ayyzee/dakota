@@ -37,10 +37,6 @@ my $vars = {
 
   'CXX' =>            'g++',
   'CXXFLAGS' =>       '-std=c++11',
-  'EXTRA_CXXFLAGS' => '\
- --include-directory .\
- --include-directory ../include\
-',
 
   'LD_SONAME_FLAGS' => '-install_name', # unique to darwin
 
@@ -51,14 +47,14 @@ my $vars = {
   'CXX_OUTPUT_FLAGS' =>      '--output',
   'CXX_OPTIMIZE_FLAGS' =>    '--optimize=0',
 
-  'CXX_DEBUG_FLAGS' =>       '\
+  'CXX_DEBUG_FLAGS' =>       "\
  --debug=3\
  --define-macro DEBUG\
-',
+",
 
-  'CXX_WARNINGS_FLAGS' =>    '\
- -fno-common\
- -ftrapv\
+  'CXX_WARNINGS_FLAGS' =>    "\
+ --no-common\
+ --trapv\
  --all-warnings\
  --warn-cast-qual\
  --warn-extra\
@@ -75,7 +71,7 @@ my $vars = {
  --warn-conversion\
  --warn-redundant-decls\
  --warn-switch-default\
-'
+"
 };
 
 sub var {
@@ -87,6 +83,8 @@ sub var {
     $result = $$vars{$lhs};
   }
   $result = $default_rhs if !defined $result;
+  $result =~ s/\n/ /g;
+  $result =~ s/\s+/ /g;
   return $result;
 }
 

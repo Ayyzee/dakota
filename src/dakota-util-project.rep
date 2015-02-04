@@ -28,5 +28,14 @@
     'xml-object-output-stream.dk'
   ],
   'name' => 'dakota-util.$SO_EXT',
-  'libs' => []
+  'libs' => [],
+  'include-dirs' => [ '../src', '../include' ],
+  'macros' => {
+    'HAVE_CONFIG_HH' => undef,
+    'MOD_SIZE_CAST_HACK' => undef,
+    'DKT_WORKAROUND' => undef,
+  },
+  'vars' => {
+    'SO_EXT' => 'dylib',
+  }
 }

@@ -20,7 +20,7 @@ include <cstring>;
 include <exception>;
 include <unistd.h>; // getpid()
 
-#if HAVE-CONFIG-H
+#if HAVE-CONFIG-HH
   #include "config.hh"
 #endif
 

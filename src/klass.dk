@@ -19,7 +19,7 @@ include <cinttypes>;
 include <cstdio>;
 include <cstring>;
 
-#if HAVE-CONFIG-H
+#if HAVE-CONFIG-HH
   #include "config.hh"
 #endif
 

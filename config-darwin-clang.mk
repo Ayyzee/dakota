@@ -16,7 +16,7 @@ CXX_WARNINGS_FLAGS :=\
  -Wno-padded\
  # do not remove this (blank) line
 
-CXX_NO_WARNINGS ?= 0
+CXX_NO_WARNINGS := 0
 
 # clang does not support
 #   --no-common

@@ -34,8 +34,7 @@ BEGIN {
     $prefix = $ENV{'DK_PREFIX'};
   }
   unshift @INC, "$prefix/lib";
-}
-;
+};
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -443,17 +442,23 @@ sub loop_cxx_from_dk {
 my $root_cmd;
 sub start {
   my ($cmd_info) = @_;
+  #print STDERR &Dumper($cmd_info);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
-    $$cmd_info{'opts'}{'compiler'} = $ENV{'CXX'};
+    $$cmd_info{'opts'}{'compiler'} = &dakota::compiler::var('CXX', 'g++');
   }
-
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
-    $$cmd_info{'opts'}{'compiler-flags'} = "$ENV{'CXXFLAGS'} $ENV{'EXTRA_CXXFLAGS'}";
+    $$cmd_info{'opts'}{'compiler-flags'} =
+      &dakota::compiler::var('CXXFLAGS', '-std=c++11') .
+      ' ' . $ENV{'EXTRA_CXXFLAGS'} .
+      ' ' . &dakota::compiler::var('CXX_WARNINGS_FLAGS', '--warnings-all');
   }
-
-  if ($ENV{'MAKEFLAGS'}) {
+  if (exists $ENV{'DEBUG'}) {
+    my $cxx_debug_flags = &dakota::compiler::var('CXX_DEBUG_FLAGS', '--debug=3 --define-macro DEBUG');
+    $$cmd_info{'opts'}{'compiler-flags'} .= ' ' . $cxx_debug_flags;
+  }
+  if (exists $ENV{'MAKEFLAGS'}) {
     my $makeflags = $ENV{'MAKEFLAGS'};
     #print "MAKEFLAGS: \"$makeflags\"\n";
   }

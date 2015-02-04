@@ -31,6 +31,8 @@ my $subcmd_tbl = {
   'set-name' => \&subcmd_set_name,
   'soname' =>     \&subcmd_soname,
   'set-soname' => \&subcmd_set_soname,
+  'macros' =>     \&subcmd_macros,
+  'include-dirs' => \&subcmd_include_dirs,
 };
 
 &GetOptions($opts,
@@ -223,6 +225,31 @@ sub subcmd_name {
     $name = &subst($name, $$opts{'var'});
   }
   print "$name\n";
+}
+sub subcmd_macros {
+  my ($rep) = @_;
+  my $result = '';
+  my $s = '';
+  my ($macro_key, $macro_val);
+  while (($macro_key, $macro_val) = each %{$$rep{'macros'}}) {
+    if ($macro_val) {
+      $result .= $s . "--define-macro $macro_key=$macro_val";
+    } else {
+      $result .= $s . "--define-macro $macro_key";
+    }
+    $s = ' ';
+  }
+  print "$result\n";
+}
+sub subcmd_include_dirs {
+  my ($rep) = @_;
+  my $result = '';
+  my $s = '';
+  foreach my $dir (@{$$rep{'include-dirs'}}) {
+    $result .= $s . "--include-directory $dir";
+    $s = ' ';
+  }
+  print "$result\n";
 }
 sub subcmd_set_name {
   my ($rep, $args) = @_;
