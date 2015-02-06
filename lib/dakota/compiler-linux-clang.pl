@@ -1,10 +1,7 @@
 {
-  'O_EXT' =>  [ 'bc' ],
-
-  'CXX' =>            [ 'clang++' ],
-  'CXX_COMPILE_PIC_FLAGS' =>     [ '--compile', '-emit-llvm', '-fPIC' ],
-  'CXX_COMPILE_FLAGS' =>         [ '--compile', '-emit-llvm' ],
-
+  'CXX' => [ 'clang++' ],
+  'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
+  'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ], # clang does not understand --PIC
   'CXX_WARNINGS_FLAGS' =>    [
       '-Wno-c++98-compat-pedantic',
       '-Wno-c++98-compat',
@@ -17,5 +14,6 @@
       '-Wno-multichar',
       '-Wno-old-style-cast',
       '-Wno-padded',
-      ]
+      ],
+  'O_EXT' =>  [ 'bc' ],
 }

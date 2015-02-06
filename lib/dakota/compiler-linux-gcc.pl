@@ -1,6 +1,7 @@
 {
   'CXX' => [ 'g++' ],
   'CXXFLAGS' => [ '-std=c++11' ],
+  'CXX_COMPILE_FLAGS' =>     [ '--compile' ],
   'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC' ],
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
   'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
