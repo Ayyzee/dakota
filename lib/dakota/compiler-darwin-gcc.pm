@@ -32,40 +32,8 @@ our @EXPORT= qw(
   );
 
 my $vars = {
-  'O_EXT' =>  'o',
   'SO_EXT' => 'dylib', # unique to darwin
-
-  'CXX' =>            'g++',
-  'CXXFLAGS' =>       '-std=c++11',
-
   'LD_SONAME_FLAGS' => '-install_name', # unique to darwin
-
-  'CXX_NO_WARNINGS_FLAGS' => '--no-warnings',
-  'CXX_COMPILE_FLAGS' =>     '--compile --PIC',
-  'CXX_SHARED_FLAGS' =>      '--shared',
-  'CXX_DYNAMIC_FLAGS' =>     '--dynamic',
-  'CXX_OUTPUT_FLAGS' =>      '--output',
-
-  'CXX_WARNINGS_FLAGS' =>    "\
- --no-common\
- --trapv\
- --all-warnings\
- --warn-cast-qual\
- --warn-extra\
- --warn-format=2\
- --warn-missing-format-attribute\
- --warn-missing-include-dirs\
- --warn-no-variadic-macros\
- --warn-pointer-arith\
- --warn-shadow\
- --warn-switch-enum\
- --warn-undef\
- --warn-unused\
- --warn-no-multichar\
- --warn-conversion\
- --warn-redundant-decls\
- --warn-switch-default\
-"
 };
 
 sub var {

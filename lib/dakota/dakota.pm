@@ -78,7 +78,7 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_flags = &dakota::compiler::var('CXX_COMPILE_FLAGS', '--compile --PIC');
+my $cxx_compile_pic_flags = &dakota::compiler::var('CXX_COMPILE_PIC_FLAGS', '--compile --PIC');
 my $cxx_output_flags =  &dakota::compiler::var('CXX_OUTPUT_FLAGS',  '--output');
 my $cxx_shared_flags =  &dakota::compiler::var('CXX_SHARED_FLAGS',  '--shared');
 my $cxx_dynamic_flags = &dakota::compiler::var('CXX_DYNAMIC_FLAGS', '--dynamic');
@@ -452,7 +452,7 @@ sub start {
     $$cmd_info{'opts'}{'compiler-flags'} =
       &dakota::compiler::var('CXXFLAGS', '-std=c++11') .
       ' ' . $ENV{'EXTRA_CXXFLAGS'} .
-      ' ' . &dakota::compiler::var('CXX_WARNINGS_FLAGS', '--warnings-all');
+      ' ' . &dakota::compiler::var('CXX_WARNINGS_FLAGS', '');
   }
   my $ld_soname_flags = &dakota::compiler::var('LD_SONAME_FLAGS', '-soname');
 
@@ -512,7 +512,7 @@ sub start {
   }
   if ($$cmd_info{'opts'}{'compile'}) {
     if ($want_separate_precompile_pass) {
-      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
+      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
       &obj_from_cxx($cmd_info);
     }
   } else {
@@ -657,7 +657,7 @@ sub obj_from_cxx {
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $obj_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$obj_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$obj_cmd{'cmd-major-mode-flags'} = $cxx_compile_flags;
+    $$obj_cmd{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
     $$obj_cmd{'cmd-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
     $$obj_cmd{'output'} = $$cmd_info{'output'};
     $$obj_cmd{'inputs'} = $$cmd_info{'inputs'};

@@ -34,20 +34,13 @@ our @EXPORT= qw(
 my $vars = {
   'O_EXT' =>  'bc',
   'SO_EXT' => 'dylib', # unique to darwin
-
-  'CXX' =>            'clang++',
-  'CXXFLAGS' =>       '-std=c++11',
-
   'LD_SONAME_FLAGS' => '-install_name', # unique to darwin
 
-  'CXX_NO_WARNINGS_FLAGS' => '--no-warnings',
-  'CXX_COMPILE_FLAGS' =>     '--compile -fPIC -emit-llvm',
-  'CXX_SHARED_FLAGS' =>      '--shared',
-  'CXX_DYNAMIC_FLAGS' =>     '--dynamic',
-  'CXX_OUTPUT_FLAGS' =>      '--output',
+  'CXX' =>            'clang++',
+  'CXX_COMPILE_PIC_FLAGS' =>     '--compile -fPIC -emit-llvm',
+  'CXX_COMPILE_FLAGS' =>         '--compile -emit-llvm',
 
   'CXX_WARNINGS_FLAGS' =>    "\
- -Weverything\
  -Wno-c++98-compat-pedantic\
  -Wno-c++98-compat\
  -Wno-cast-align\
