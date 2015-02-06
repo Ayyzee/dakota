@@ -30,6 +30,7 @@ use Data::Dumper;
 use Carp;
 
 my $prefix;
+my $compiler;
 
 BEGIN {
   $prefix = '/usr/local';
@@ -37,6 +38,7 @@ BEGIN {
     $prefix = $ENV{'DK_PREFIX'};
   }
   unshift @INC, "$prefix/lib";
+  $compiler = do "$prefix/lib/dakota/compiler.pl" or die;
 };
 
 require Exporter;
@@ -65,11 +67,11 @@ our @EXPORT= qw(
                  add_keyword
                  add_string
                  add_generic
+                 var
               );
 
 use dakota::sst;
 use dakota::generate;
-use dakota::compiler;
 
 my $objdir = 'obj';
 my $rep_ext = 'rep';
@@ -77,8 +79,8 @@ my $ctlg_ext = 'ctlg';
 my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
-my $O_EXT =  &dakota::compiler::var('O_EXT', 'o');
-my $SO_EXT = &dakota::compiler::var('SO_EXT', 'so');
+my $O_EXT =  &var($compiler, 'O_EXT', 'o');
+my $SO_EXT = &var($compiler, 'SO_EXT', 'so');
 
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;
@@ -153,6 +155,21 @@ my $gbl_symbol_to_header = {
                             'uintmax-t' => '<cstdint>',
                             'uintptr-t' => '<cstdint>'
                            };
+
+sub var {
+  my ($compiler, $lhs, $default_rhs) = @_;
+  my $result;
+  if (defined $ENV{$lhs}) {
+    $result = $ENV{$lhs};
+  } else {
+    $result = $$compiler{$lhs};
+  }
+  $result = $default_rhs if !defined $result;
+  $result =~ s/\n/ /g;
+  $result =~ s/\s+/ /g;
+  return $result;
+}
+
 sub maybe_add_exported_header_for_symbol {
   my ($symbol) = @_;
   if ($$gbl_symbol_to_header{$symbol}) {
