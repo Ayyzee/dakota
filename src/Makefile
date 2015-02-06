@@ -34,6 +34,10 @@ LIB_FILES :=\
  $(DESTDIR)$(libdir)/dakota/sst.$(pm_ext)\
  $(DESTDIR)$(libdir)/dakota/util.$(pm_ext)\
  $(DESTDIR)$(libdir)/dakota/macros.$(pl_ext)\
+ $(DESTDIR)$(libdir)/dakota/compiler-darwin-gcc.$(pl_ext)\
+ $(DESTDIR)$(libdir)/dakota/compiler-darwin-clang.$(pl_ext)\
+ $(DESTDIR)$(libdir)/dakota/compiler-linux-gcc.$(pl_ext)\
+ $(DESTDIR)$(libdir)/dakota/compiler-linux-clang.$(pl_ext)\
 
 HOME_FILES :=\
  $(HOME)/.dakota/.gdbinit\
