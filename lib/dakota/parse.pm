@@ -31,6 +31,7 @@ use Carp;
 
 my $prefix;
 my $compiler;
+my $compiler_default;
 
 BEGIN {
   $prefix = '/usr/local';
@@ -38,7 +39,8 @@ BEGIN {
     $prefix = $ENV{'DK_PREFIX'};
   }
   unshift @INC, "$prefix/lib";
-  $compiler = do "$prefix/lib/dakota/compiler.pl" or die;
+  $compiler =         do "$prefix/lib/dakota/compiler.pl" or die;
+  $compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die;
 };
 
 require Exporter;
@@ -79,8 +81,8 @@ my $ctlg_ext = 'ctlg';
 my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
-my $O_EXT =  &var($compiler, 'O_EXT', 'o');
-my $SO_EXT = &var($compiler, 'SO_EXT', 'so');
+my $O_EXT =  &var($compiler, 'O_EXT', $compiler_default);
+my $SO_EXT = &var($compiler, 'SO_EXT', $compiler_default);
 
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;
@@ -160,14 +162,14 @@ sub var {
   my ($compiler, $lhs, $default_rhs) = @_;
   my $result;
   if (defined $ENV{$lhs}) {
-    $result = $ENV{$lhs};
-  } else {
+    $result = [ $ENV{$lhs} ];
+  } elsif ($$compiler{$lhs}) {
     $result = $$compiler{$lhs};
+  } else {
+    $result = $$default_rhs{$lhs}
   }
-  $result = $default_rhs if !defined $result;
-  $result =~ s/\n/ /g;
-  $result =~ s/\s+/ /g;
-  return $result;
+  die if !defined $result;
+  return join(' ', @$result);
 }
 
 sub maybe_add_exported_header_for_symbol {

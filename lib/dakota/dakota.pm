@@ -28,6 +28,7 @@ use Cwd;
 
 my $prefix;
 my $compiler;
+my $compiler_default;
 
 BEGIN {
   $prefix = '/usr/local';
@@ -36,6 +37,7 @@ BEGIN {
   }
   unshift @INC, "$prefix/lib";
   $compiler = do "$prefix/lib/dakota/compiler.pl" or die;
+  $compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die;
 };
 
 require Exporter;
@@ -79,10 +81,10 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_pic_flags = &dakota::parse::var($compiler, 'CXX_COMPILE_PIC_FLAGS', '--compile --PIC');
-my $cxx_output_flags =  &dakota::parse::var($compiler, 'CXX_OUTPUT_FLAGS',  '--output');
-my $cxx_shared_flags =  &dakota::parse::var($compiler, 'CXX_SHARED_FLAGS',  '--shared');
-my $cxx_dynamic_flags = &dakota::parse::var($compiler, 'CXX_DYNAMIC_FLAGS', '--dynamic');
+my $cxx_compile_pic_flags = &dakota::parse::var($compiler, 'CXX_COMPILE_PIC_FLAGS', $compiler_default);
+my $cxx_output_flags =  &dakota::parse::var($compiler, 'CXX_OUTPUT_FLAGS',  $compiler_default);
+my $cxx_shared_flags =  &dakota::parse::var($compiler, 'CXX_SHARED_FLAGS',  $compiler_default);
+my $cxx_dynamic_flags = &dakota::parse::var($compiler, 'CXX_DYNAMIC_FLAGS', $compiler_default);
 
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;
@@ -447,15 +449,15 @@ sub start {
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
-    $$cmd_info{'opts'}{'compiler'} = &dakota::parse::var($compiler, 'CXX', 'g++');
+    $$cmd_info{'opts'}{'compiler'} = &dakota::parse::var($compiler, 'CXX', $compiler_default);
   }
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
     $$cmd_info{'opts'}{'compiler-flags'} =
-      &dakota::parse::var($compiler, 'CXXFLAGS', '-std=c++11') .
+      &dakota::parse::var($compiler, 'CXXFLAGS', $compiler_default) .
       ' ' . $ENV{'EXTRA_CXXFLAGS'} .
-      ' ' . &dakota::parse::var($compiler, 'CXX_WARNINGS_FLAGS', '');
+      ' ' . &dakota::parse::var($compiler, 'CXX_WARNINGS_FLAGS', $compiler_default);
   }
-  my $ld_soname_flags = &dakota::parse::var($compiler, 'LD_SONAME_FLAGS', '-soname');
+  my $ld_soname_flags = &dakota::parse::var($compiler, 'LD_SONAME_FLAGS', $compiler_default);
 
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_construct = undef;
