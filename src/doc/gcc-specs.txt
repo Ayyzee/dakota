@@ -1,0 +1,6 @@
+The dakota driver (dakota) should use the gcc specs syntax/file to
+support subprocess description like gcc.
+
+Start with this:
+
+gcc -dumpspecs > specs
