@@ -32,16 +32,16 @@ module dakota;
 
 klass output-stream;
 
-export object-t* dkt-capture-current-exception(object-t arg)
+export object-t dkt-capture-current-exception(object-t arg)
 {
   static object-t result = arg;
-  return &result;
+  return result;
 }
 
-export str-t* dkt-capture-current-exception(str-t arg)
+export str-t dkt-capture-current-exception(str-t arg)
 {
   static str-t result = arg;
-  return &result;
+  return result;
 }
 
 #if !defined HAVE-GETPROGNAME

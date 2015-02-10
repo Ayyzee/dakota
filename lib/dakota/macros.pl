@@ -144,15 +144,15 @@
   'throw-make-or-box' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'throw'                      ,          '?/make|box/', '(',  '?list-in', ')'  ],
-      'template' => [ 'throw', 'dkt-current-exception', '= ', '?/make|box/', '?3', '?list-in', '?5' ]
+      'pattern'  => [ 'throw',                                       '?/make|box/', '(',  '?list-in', ')'       ],
+      'template' => [ 'throw', 'dkt-capture-current-exception', '(', '?/make|box/', '?3', '?list-in', '?5', ')' ]
     } ],
   },
   'throw-make-or-box-parens' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'throw', '(',                                '?/make|box/', '(',  '?list-in', ')',  ')'  ],
-      'template' => [ 'throw', '?2', 'dkt-current-exception', '=', '?/make|box/', '?4', '?list-in', '?6', '?7' ]
+      'pattern'  => [ 'throw', '(',                                        '?/make|box/', '(',  '?list-in', ')',  ')'       ],
+      'template' => [ 'throw', '?2', 'dkt-capture-current-exception', '(', '?/make|box/', '?4', '?list-in', '?6', '?7', ')' ]
     } ],
   },
   'make' => {

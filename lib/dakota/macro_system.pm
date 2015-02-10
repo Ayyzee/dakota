@@ -537,11 +537,10 @@ unless (caller) {
     { $debug = $ENV{'DKT_MACROS_DEBUG'}; }
     my $changes = { 'files' => {} };
 
-    my $output_dir = 'obj-macro-system';
+    my $output_dir = 'macro-system-test-output';
     mkdir $output_dir;
 
     foreach my $file (@ARGV) {
-	print "$file\n";
 	my $filestr = &dakota::filestr_from_file($file);
 	my $sst = &sst::make($filestr, $file);
 	&macros_expand($sst, $macros, $user_data);

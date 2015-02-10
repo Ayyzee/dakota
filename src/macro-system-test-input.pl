@@ -11,9 +11,8 @@
         'after' =>  [],
 
         'rules' => [ {
-            'pattern' =>  [ 'throw',                               '?/make|box/' ],
-            'template' => [ 'throw', 'dkt-current-exception', '=', '?/make|box/' ],
-                     }
-            ],
+          'pattern'  => [ 'throw',                                       '?/make|box/', '(',  '?list-in', ')'       ],
+          'template' => [ 'throw', 'dkt-capture-current-exception', '(', '?/make|box/', '?3', '?list-in', '?5', ')' ]
+                     } ],
     }
 }
