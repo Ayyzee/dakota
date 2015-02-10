@@ -1,5 +1,5 @@
 {
-    'ka-ident' => { # variable per project (lib or exe)
+    'kw-args-ident' => { # variable per project (lib or exe)
 	'init'   => 1, # rhs = num-fixed args
 	'append' => 2  # rhs = num-fixed args
     },

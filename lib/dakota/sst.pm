@@ -25,6 +25,8 @@ package dakota::sst;
 use strict;
 use warnings;
 
+use dakota::util;
+
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(

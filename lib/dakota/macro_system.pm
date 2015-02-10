@@ -202,22 +202,22 @@ sub dquote_str {
     return $result;
 }
 
-sub block # body is optional since it uses balenced() {
+sub block { # body is optional since it uses balenced()
     my ($sst, $open_token_index, $constraint, $user_data) = @_;
     return &balenced($sst, $open_token_index, $constraint, $user_data);
 }
 
-sub list # body is optional since it uses balenced() {
+sub list { # body is optional since it uses balenced()
     my ($sst, $open_token_index, $constraint, $user_data) = @_;
     return &balenced($sst, $open_token_index, $constraint, $user_data);
 }
 
-sub block_in # body is optional since it uses balenced_in() which uses balenced() {
+sub block_in { # body is optional since it uses balenced_in() which uses balenced()
     my ($sst, $index, $constraint, $user_data) = @_;
     return &balenced_in($sst, $index, $constraint, $user_data);
 }
 
-sub list_in # body is optional since it uses balenced_in() which uses balenced() {
+sub list_in { # body is optional since it uses balenced_in() which uses balenced()
     my ($sst, $index, $constraint, $user_data) = @_;
     return &balenced_in($sst, $index, $constraint, $user_data);
 }
@@ -530,14 +530,14 @@ unless (caller) {
     if ($ENV{'DK_MACROS_PATH'})
     { my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "Can not find $path." }
     else
-    { my $path = "$prefix/src/macros.pl"; $macros = do $path or die "Can not find $path." }
+    { my $path = "$prefix/lib/dakota/macros.pl"; $macros = do $path or die "Can not find $path." }
 
     $debug = 0;
     if ($ENV{'DKT_MACROS_DEBUG'}) # 0 or 1 or 2 or 3
     { $debug = $ENV{'DKT_MACROS_DEBUG'}; }
     my $changes = { 'files' => {} };
 
-    my $output_dir = 'junk';
+    my $output_dir = 'obj-macro-system';
     mkdir $output_dir;
 
     foreach my $file (@ARGV) {

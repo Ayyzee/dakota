@@ -36,8 +36,8 @@ BEGIN
     { $SO_EXT = $ENV{'SO_EXT'}; }
 };
 
-use dakota_util;
-use dakota_sst;
+use dakota::util;
+use dakota::sst;
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;

@@ -2,10 +2,10 @@
 
 for path in $@; do
     name=$(basename $path)
-    DK_PREFIX=.. bin/sst-dk-to-cxx.pl $path > /tmp/$name
-    echo "diff $path /tmp/$name"
-    diff $path /tmp/$name
-    echo "wc -l $path /tmp/$name"
-    wc -l $path /tmp/$name
+    DK_PREFIX=.. ../lib/dakota/macro_system.pm $path
+    echo "diff $path obj-macro-system/$name"
+    diff $path obj-macro-system/$name.cc
+    echo "wc -l $path obj-macro-system/$name"
+    wc -l $path obj-macro-system/$name.cc
     /bin/echo "---"
 done

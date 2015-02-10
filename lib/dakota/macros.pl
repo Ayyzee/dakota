@@ -1,3 +1,10 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
 {
     'include-stmt' => {
         'before' => [],
@@ -57,12 +64,12 @@
 	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'nullptr-KEYWORD', ',', '?ident', '=>', '?list-member'                       ],
-		'template' => [           '$', '##', '?ident', ',',  '?list-member', ',', 'nullptr-KEYWORD'  ]
+		'pattern'  => [ 'NULL-KEYWORD', ',', '?ident', '=>', '?list-member'                       ],
+		'template' => [           '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
 	    },
 	    {
 		'pattern'  => [                 ',', '?ident', '=>', '?list-member'                       ],
-		'template' => [      ',', '$', '##', '?ident', ',',  '?list-member', ',', 'nullptr-KEYWORD'  ]
+		'template' => [      ',', '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
 	    }
 	],
     },
@@ -70,12 +77,12 @@
 	'before' => [ 'keyword-args-use', 'super' ],
 	'rules' => [
 	    {
-		'pattern'  => [ 'dk', ':', '?ka-ident-1', '(', '?list-member',                      ')' ],
-		'template' => [ 'dk', ':', '?ka-ident-1', '(', '?list-member', ',', 'nullptr-KEYWORD', ')' ]
+		'pattern'  => [ 'dk', ':', '?kw-args-ident-1', '(', '?list-member',                      ')' ],
+		'template' => [ 'dk', ':', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
 	    },
 	    {
-		'pattern'  => [ 'dk', ':', '?ka-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
-		'template' => [ 'dk', ':', '?ka-ident-2', '(', '?list-member', ',', '?list-member', ',', 'nullptr-KEYWORD', ')' ]
+		'pattern'  => [ 'dk', ':', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
+		'template' => [ 'dk', ':', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
 	    }
 	],
     },
@@ -173,8 +180,8 @@
 	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'throw',          '?/make|box/', '(',  '?list-in', ')'       ],
-		'template' => [ 'dkt-throw', '(', '?/make|box/', '?3', '?list-in', '?5', ')' ]
+		'pattern'  => [ 'throw'                      ,          '?/make|box/', '(',  '?list-in', ')'  ],
+		'template' => [ 'throw', 'dkt-current-exception', '= ', '?/make|box/', '?3', '?list-in', '?5' ]
 	    }
 	],
     },
@@ -182,8 +189,8 @@
 	'before' => [],
 	'rules' => [
 	    {
-		'pattern'  => [ 'throw',     '(',  '?/make|box/', '(',  '?list-in', ')',  ')'  ],
-		'template' => [ 'dkt-throw', '?2', '?/make|box/', '?4', '?list-in', '?6', '?7' ]
+		'pattern'  => [ 'throw', '(',                                '?/make|box/', '(',  '?list-in', ')',  ')'  ],
+		'template' => [ 'throw', '?2', 'dkt-current-exception', '=', '?/make|box/', '?4', '?list-in', '?6', '?7' ]
 	    }
 	],
     },
