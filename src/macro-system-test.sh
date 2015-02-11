@@ -12,9 +12,13 @@ DK_MACROS_PATH=macro-system-test-input.pl DK_PREFIX=.. ../lib/dakota/macro_syste
 
 for path in $paths; do
     name=$(basename $path)
-    /bin/echo "---"
-    echo "diff $path macro-system-test-output/$name"
-    diff $path macro-system-test-output/$name.cc || true
-    echo "wc -l $path macro-system-test-output/$name"
-    wc -l $path macro-system-test-output/$name.cc
+
+    if ! diff $path macro-system-test-output/$name.cc; then
+        /bin/echo "---"
+        echo "diff $path macro-system-test-output/$name.cc"
+        diff $path macro-system-test-output/$name.cc || true
+        echo "wc -l $path macro-system-test-output/$name.cc"
+        wc -l $path
+        wc -l macro-system-test-output/$name.cc
+    fi
 done
