@@ -26,7 +26,7 @@ klass point
     self = dk:init(super);
     self = dk:init(super, other-arg);
     make(klass);
-    make(klass, name => fred, length => 4)
+    make(klass, $name => fred, $length => 4)
     self.x
     self.y
     throw "hello world"
