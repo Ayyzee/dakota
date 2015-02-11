@@ -51,21 +51,21 @@
   'keyword-args-use' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'NULL-KEYWORD', ',', '?ident', '=>', '?list-member'                       ],
-      'template' => [           '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+      'pattern'  => [ 'NULL-KEYWORD', ',',                    '?symbol', '=>', '?list-member'                       ],
+      'template' => [                      '__keyword', '::', '?symbol', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
     }, {
-      'pattern'  => [                 ',', '?ident', '=>', '?list-member'                       ],
-      'template' => [      ',', '$', '##', '?ident', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+      'pattern'  => [                 ',',                    '?symbol', '=>', '?list-member'                       ],
+      'template' => [                 ',', '__keyword', '::', '?symbol', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
     } ],
   },
   'keyword-args-wrap' => {
     'before' => [ 'keyword-args-use', 'super' ],
     'rules' => [ {
-      'pattern'  => [ 'dk', ':', '?kw-args-ident-1', '(', '?list-member',                      ')' ],
-      'template' => [ 'dk', ':', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+      'pattern'  => [ 'dk', '::', '?kw-args-ident-1', '(', '?list-member',                      ')' ],
+      'template' => [ 'dk', '::', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
     }, {
-      'pattern'  => [ 'dk', ':', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
-      'template' => [ 'dk', ':', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+      'pattern'  => [ 'dk', '::', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
+      'template' => [ 'dk', '::', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
     } ],
   },
   'method-alias' => {
@@ -78,8 +78,8 @@
   'va-method-defn' => {
     'before' => [ 'method-alias' ],
     'rules' => [ {
-      'pattern'  => [                         '?visibility', 'method', '?type', 'va', ':', '?ident', '?list', '?block'      ],
-      'template' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',            '?ident', '?list', '?block', '}' ]
+      'pattern'  => [                         '?visibility', 'method', '?type', 'va', '::', '?ident', '?list', '?block'      ],
+      'template' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',             '?ident', '?list', '?block', '}' ]
     } ],
   },
   'export-method' => {
@@ -100,11 +100,11 @@
     'before' => [],
     'after' => [ 'construct-klass-slots-literal' ],
     'rules' => [ { # try to merge both super rules (make the va: optional)
-      'pattern'  => [ 'dk', ':',            '?ident', '(', 'super',                                           '?list-member-term' ],
-      'template' => [ 'dk', ':',            '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
+      'pattern'  => [ 'dk', '::',             '?ident', '(', 'super',                                           '?list-member-term' ],
+      'template' => [ 'dk', '::',             '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
     }, {   # for the very rare case that a user calls the dk:va: generic
-      'pattern'  => [ 'dk', ':', 'va', ':', '?ident', '(', 'super',                                           '?list-member-term' ],
-      'template' => [ 'dk', ':', 'va', ':', '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
+      'pattern'  => [ 'dk', '::', 'va', '::', '?ident', '(', 'super',                                           '?list-member-term' ],
+      'template' => [ 'dk', '::', 'va', '::', '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
     } ],
   },
   'slot-access' => {
@@ -118,15 +118,15 @@
     'before' => [],
     'after' => [ 'construct-klass-slots-literal' ],
     'rules' => [ {
-      'pattern'  => [ '?ident', ':', 'box', '(',                 '{', '?block-in', '}',      ')'  ],
-      'template' => [ '?ident', ':', 'box', '?4', '?ident', '(', '{', '?block-in', '}', ')', '?8' ]
+      'pattern'  => [ '?ident', '::', 'box', '(',                 '{', '?block-in', '}',      ')'  ],
+      'template' => [ '?ident', '::', 'box', '?4', '?ident', '(', '{', '?block-in', '}', ')', '?8' ]
     } ],
   },
   'construct-klass-slots-literal' => {
     'before' => [],
     'rules' => [ { # ?ident is a klass-name
-      'pattern'  => [ '?ident',                       '(', '{', '?block-in', '}', ')' ],
-      'template' => [ '?ident',     ':', 'construct', '(',      '?block-in',      ')' ]
+      'pattern'  => [ '?ident',                        '(', '{', '?block-in', '}', ')' ],
+      'template' => [ '?ident',     '::', 'construct', '(',      '?block-in',      ')' ]
         #'template' => [ 'cast', '(', '?{ident}-t', ')',      '{', '?block-in', '}'      ]
         #'template' => [ '?{ident}-t',                   '(',      '?block-in',      ')' ]
       } ],
@@ -158,8 +158,8 @@
   'make' => {
     'before' => [ 'throw-make-or-box', 'throw-make-or-box-parens' ],
     'rules' => [ {
-      'pattern'  => [ 'make',                                     '(',  '?list-member'      ],
-      'template' => [ 'dk', ':', 'init', '(', 'dk', ':', 'alloc', '?2', '?list-member', ')' ]
+      'pattern'  => [ 'make',                                       '(',  '?list-member'      ],
+      'template' => [ 'dk', '::', 'init', '(', 'dk', '::', 'alloc', '?2', '?list-member', ')' ]
     } ],
   },
   'export-enum' => {
@@ -180,24 +180,24 @@
   'if-or-while-in-keys-or-elements-iterable' => { # optional 'not' and optional 'keys|elements'
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ '?/if/while/', '(',  '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
-      'template' => [ '?/if/while/', '?2', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
+      'pattern'  => [ '?/if/while/', '(',  '?ident', 'in',             '?/keys|elements/',      '?list-member',      ')'  ],
+      'template' => [ '?/if/while/', '?2', '?ident', 'in', 'dk', '::', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
     } ],
   },
   # if|while (e [not] in tbl)
   'if-or-while-in-iterable' => { # optional 'not'
     'before' => [ 'if-or-while-in-keys-or-elements-iterable' ],
     'rules' => [ {
-      'pattern'  => [ '?/if/while/', '(',  '?ident',            'in',      '?list-member',                ')'  ],
-      'template' => [ '?/if/while/', '?2',           'dk', ':', 'in', '(', '?list-member', '?ident', ')', '?6' ]
+      'pattern'  => [ '?/if/while/', '(',  '?ident',             'in',      '?list-member',                ')'  ],
+      'template' => [ '?/if/while/', '?2',           'dk', '::', 'in', '(', '?list-member', '?ident', ')', '?6' ]
     } ],
   },
   # for (object-t e [not] in [keys|elements] tbl)
   'for-in-iterable-with-keys-or-elements' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'for', '(',  'object-t', '?ident', 'in',            '?/keys|elements/',      '?list-member',      ')'  ],
-      'template' => [ 'for', '?2', 'object-t', '?ident', 'in', 'dk', ':', '?/keys|elements/', '(', '?list-member', ')', '?8' ]
+      'pattern'  => [ 'for', '(',  'object-t', '?ident', 'in',             '?/keys|elements/',      '?list-member',      ')'  ],
+      'template' => [ 'for', '?2', 'object-t', '?ident', 'in', 'dk', '::', '?/keys|elements/', '(', '?list-member', ')', '?8' ]
     } ],
   },
   # for (object-t e [not] in seq)
@@ -205,8 +205,8 @@
     'before' => [ 'for-in-iterable-with-keys-or-elements' ],
     'rules' => [ {
       'pattern'  => [ 'for', '(', 'object-t', '?ident', 'in', '?list-member', ')' ],
-      'template' => [ 'for', '?2', 'object-t', '_iterator_', '=', 'dk', ':', 'forward-iterator', '(', '?list-member', ')', ';',
-                      'object-t', '?ident', '=', 'dk', ':', 'next', '(', '_iterator_', ')', ';', '?7' ]
+      'template' => [ 'for', '?2', 'object-t', '_iterator_', '=', 'dk', '::', 'forward-iterator', '(', '?list-member', ')', ';',
+                      'object-t', '?ident', '=', 'dk', '::', 'next', '(', '_iterator_', ')', ';', '?7' ]
     } ],
   },
 

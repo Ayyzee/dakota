@@ -8,12 +8,16 @@ else
     paths="$@"    
 fi
 
-DK_MACROS_PATH=macro-system-test-input.pl DK_PREFIX=.. ../lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt 2>&1
+rootdir=..
+DK_PREFIX=$rootdir
+default_macros_path=$DK_PREFIX/lib/dakota/macros.pl
+
+DK_MACROS_PATH=${DK_MACROS_PATH=$default_macros_path} DK_PREFIX=$DK_PREFIX $DK_PREFIX/lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt 2>&1
 
 for path in $paths; do
     name=$(basename $path)
 
-    if ! diff $path macro-system-test-output/$name.cc > /dev/null; then
+    if ! diff --brief $path macro-system-test-output/$name.cc > /dev/null; then
         echo "diff $path macro-system-test-output/$name.cc"
         diff $path macro-system-test-output/$name.cc || true
         echo "wc -l $path macro-system-test-output/$name.cc"

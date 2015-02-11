@@ -73,6 +73,7 @@ my $constraints = {
   '?list-in' =>          \&list_in,
   '?list-member-term' => \&list_member_term, # move to a language specific macro
   '?list-member' =>      \&list_member,
+  '?symbol' =>           \&symbol,
   '?type' =>             \&type,
   '?type-ident' =>       \&type_ident,
   '?visibility' =>       \&visibility, # move to a language specific macro
@@ -188,6 +189,16 @@ sub type {
       $o++;
     }
     $result = $index + $o;
+  }
+  return $result;
+}
+sub symbol {
+  my ($sst, $index, $constraint, $user_data) = @_;
+  my $tkn = &sst::at($sst, $index);
+  my $result = -1;
+
+  if ($tkn =~ /^\$$z(\!|\?)?$/) { # bugbug: requires ab at a min (won't allow single char)
+    $result = $index;
   }
   return $result;
 }
