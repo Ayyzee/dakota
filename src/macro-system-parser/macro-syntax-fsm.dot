@@ -27,7 +27,13 @@ digraph "macro-syntax-fsm"
   00 [ shape = doublecircle ];
   50 [ shape = doublecircle ];
 
-  00 -> 10 [ label = "macro ident {" ];
+  00 -> 02 [ label = "macro" ];
+  02 -> 04 [ label = "ident" ];
+  04 -> 06 [ label = "[" ];
+  04 -> 10 [ label = "{" ];
+  06 -> 06 [ label = "ident" ];
+  06 -> 08 [ label = "]" ];
+  08 -> 10 [ label = "{" ];
 
   10 -> 15 [ label = "pattern-var" ];
   10 -> 15 [ label = "=> pattern-var", color = blue, dir = back ];

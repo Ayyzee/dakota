@@ -5,7 +5,7 @@
 // should also handle more complex lhs and rhs
 // ?type-ident should be ?type
 // ?token should be something more complex
-macro ka-arg
+macro kw-arg
 {
   { ?type-ident ?ident => ?token }
   =>
@@ -123,12 +123,12 @@ macro typedef-array
       { typedef ?type slots-t [ ?wildcard ] }
 }
 
-macro for-in
+macro for-in []
 {
   ?element => ?ident
   ?collection => ?ident
 
-  { for (object-t ?element in ?collection) }
+  { for ( object-t ?element in ?collection ) }
   =>
-    { for (object-t _iterator_ = dk:forward-iterator(?collection); object-t ?element = dk:next(_iterator_); ) }
+    { for ( object-t _iterator_ = dk :: forward-iterator ( ?collection ) ; object-t ?element = dk :: next ( _iterator_ ) ; ) }
 }
