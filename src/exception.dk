@@ -27,6 +27,7 @@ include <unistd.h>; // getpid()
 #include "dakota-private.hh"
 
 #define THROW throw // so the macro system won't rewrite
+#define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwin
 
 module dakota;
 
@@ -34,13 +35,15 @@ klass output-stream;
 
 export object-t dkt-capture-current-exception(object-t arg)
 {
-  static object-t result = arg;
+  static THREAD_LOCAL object-t result;
+  if (arg) result = arg;
   return result;
 }
 
 export str-t dkt-capture-current-exception(str-t arg)
 {
-  static str-t result = arg;
+  static THREAD_LOCAL str-t result;
+  if (arg) result = arg;
   return result;
 }
 
