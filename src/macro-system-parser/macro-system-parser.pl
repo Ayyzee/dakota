@@ -80,6 +80,9 @@ sub _00
   if (&sst_cursor::current_token_p($sst_cursor)) {
     &sst_cursor::match($sst_cursor, "macro");
     my $macro_name = &sst_cursor::match_re($sst_cursor, $z);
+
+    # optionally match 'before' macro sequence: [ ident* ]
+
     &sst_cursor::match($sst_cursor, "{");
     $$result{$macro_name} =
       { 'rules' => [], 'sub-rules' => {}, 'aliases' => {} };

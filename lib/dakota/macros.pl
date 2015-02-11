@@ -98,7 +98,6 @@
   },
   'super' => {
     'before' => [],
-    'after' => [ 'construct-klass-slots-literal' ],
     'rules' => [ { # try to merge both super rules (make the va: optional)
       'pattern'  => [ 'dk', '::',             '?ident', '(', 'super',                                           '?list-member-term' ],
       'template' => [ 'dk', '::',             '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
@@ -116,14 +115,13 @@
   },
   'explicit-box-literal' => {
     'before' => [],
-    'after' => [ 'construct-klass-slots-literal' ],
     'rules' => [ {
       'pattern'  => [ '?ident', '::', 'box', '(',                 '{', '?block-in', '}',      ')'  ],
       'template' => [ '?ident', '::', 'box', '?4', '?ident', '(', '{', '?block-in', '}', ')', '?8' ]
     } ],
   },
   'construct-klass-slots-literal' => {
-    'before' => [],
+    'before' => [ 'super', 'explicit-box-literal' ],
     'rules' => [ { # ?ident is a klass-name
       'pattern'  => [ '?ident',                        '(', '{', '?block-in', '}', ')' ],
       'template' => [ '?ident',     '::', 'construct', '(',      '?block-in',      ')' ]

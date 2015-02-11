@@ -8,7 +8,6 @@
 {
     'throw-make-or-box' => {
         'before' => [],
-        'after' =>  [],
 
         'rules' => [ {
           'pattern'  => [ 'throw',                                       '?/make|box/', '(',  '?list-in', ')'       ],
