@@ -188,8 +188,8 @@ import void dkt_deregister_info(named_info_t*);
 import void dk_init_runtime();
 import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
-import object_t*       dkt_capture_current_exception(object_t arg);
-import str_t* dkt_capture_current_exception(str_t arg);
+import object_t dkt_capture_current_exception(object_t arg);
+import str_t    dkt_capture_current_exception(str_t arg);
 
 import named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
 import object_t           dk_va_make_named_info(      symbol_t name, va_list_t args);

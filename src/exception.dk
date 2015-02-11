@@ -121,7 +121,7 @@ pre-runtime-verbose-terminate()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = *dkt-capture-current-exception(cast(str-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
   dkt-log(dkt::k-log-error, "uncaught exception");
 
   if (nullptr != current-exception-string)
@@ -137,8 +137,8 @@ verbose-terminate()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = *dkt-capture-current-exception(cast(str-t)0);
-  object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
+  object-t current-exception = dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
@@ -163,7 +163,7 @@ pre-runtime-verbose-unexpected()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = *dkt-capture-current-exception(cast(str-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
   dkt-log(dkt::k-log-error, "unexpected exception");
 
   if (nullptr != current-exception-string)
@@ -179,8 +179,8 @@ verbose-unexpected()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = *dkt-capture-current-exception(cast(str-t)0);
-  object-t current-exception = *dkt-capture-current-exception(cast(object-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
+  object-t current-exception = dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNEXPECTED_EXCEPTION")))
     if (nullptr != current-exception)
