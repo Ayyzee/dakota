@@ -5,9 +5,9 @@ include $(rootdir)/vars.mk
 CXX_INLINE_FLAGS := -Winline --define-macro should_inline
 
 all:
-	$(CXX) $(CXXFLAGS) $(CXX_WARNING_FLAGS) -O3 -S inline-unbox.cc
+	$(CXX) $(CXXFLAGS) $(CXX_WARNINGS_FLAGS) -O3 -S inline-unbox.cc
 	mv inline-unbox.s inline-unbox-noattrs.s
-	$(CXX) $(CXXFLAGS) $(CXX_WARNING_FLAGS) $(CXX_INLINE_FLAGS) -O3 -S inline-unbox.cc
+	$(CXX) $(CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_INLINE_FLAGS) -O3 -S inline-unbox.cc
 	mv inline-unbox.s inline-unbox-attrs.s
 
 diff: all

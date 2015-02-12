@@ -1,0 +1,5 @@
+finally { $body }
+=>
+finally __finally([&] { $body } );
+
+FINALLY(block) finally __finally([&] block)
