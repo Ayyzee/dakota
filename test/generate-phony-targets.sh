@@ -1,13 +1,10 @@
 #!/bin/bash
 
-cat /dev/null > /tmp/phony-targets.mk
-echo "all check clean:" >> /tmp/phony-targets.mk
+echo $@:
 
 exe_src_paths=$(echo should-pass/*/exe.dk)
 
 for exe_src_path in $exe_src_paths; do
     dir=$(dirname $exe_src_path);
-    printf "\t\$(MAKE) --directory \$(dir $dir/exe) \$@\n" >> /tmp/phony-targets.mk
+    printf "\t\$(MAKE) --directory \$(dir $dir/exe) \$@\n"
 done
-
-mv /tmp/phony-targets.mk phony-targets.mk

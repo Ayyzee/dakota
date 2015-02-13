@@ -7,6 +7,6 @@ include $(rootdir)/vars.mk
 
 .PHONY: all check clean
 
-$(shell ./generate-phony-targets.sh)
+$(shell ./generate-phony-targets.sh all check clean > phony-target.mk)
 
 include phony-targets.mk
