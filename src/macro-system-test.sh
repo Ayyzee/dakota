@@ -8,11 +8,10 @@ else
     paths="$@"    
 fi
 
-rootdir=..
-DK_PREFIX=$rootdir
-default_macros_path=$DK_PREFIX/lib/dakota/macros.pl
+prefix=..
+default_macros_path=$prefix/lib/dakota/macros.pl
 
-DK_MACROS_PATH=${DK_MACROS_PATH=$default_macros_path} DK_PREFIX=$DK_PREFIX $DK_PREFIX/lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt 2>&1
+DK_MACROS_PATH=${DK_MACROS_PATH=$default_macros_path} $prefix/lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt 2>&1
 
 for path in $paths; do
     name=$(basename $path)

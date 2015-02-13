@@ -32,10 +32,11 @@ $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 my $prefix;
 
 BEGIN {
-  $prefix = '/usr/local';
-  if ($ENV{'DK_PREFIX'}) {
-    $prefix = $ENV{'DK_PREFIX'};
-  }
+  my $dir = `dirname $0`; chomp $dir;
+  $prefix = `dirname $dir`; chomp $prefix;
+
+  if ( ! -d $prefix )
+    { die "Could not determine \$prefix from executable $0: $!\n"; }
   unshift @INC, "$prefix/lib";
 };
 

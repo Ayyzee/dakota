@@ -34,13 +34,14 @@ my $compiler;
 my $compiler_default;
 
 BEGIN {
-  $prefix = '/usr/local';
-  if ($ENV{'DK_PREFIX'}) {
-    $prefix = $ENV{'DK_PREFIX'};
-  }
+  my $dir = `dirname $0`; chomp $dir;
+  $prefix = `dirname $dir`; chomp $prefix;
+
+  if ( ! -d $prefix )
+    { die "Could not determine \$prefix from executable $0: $!\n"; }
   unshift @INC, "$prefix/lib";
-  $compiler =         do "$prefix/lib/dakota/compiler.pl" or die;
-  $compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die;
+  $compiler = do "$prefix/lib/dakota/compiler.pl" or die "$prefix/lib/dakota/compiler.pl: $!\n";
+  $compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "$prefix/lib/dakota/compiler-linux-gcc.pl: $!\n";
 };
 
 require Exporter;

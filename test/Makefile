@@ -5,8 +5,11 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-.PHONY: all check clean
+%: %.dk
+	$(MAKE) --directory $(dir $@) $(notdir $@)
 
-$(shell ./generate-phony-targets.sh all check clean > phony-target.mk)
-
-include phony-targets.mk
+phony := all check clean
+.PHONY: $(phony)
+phony_targets := phony-targets.mk
+$(shell ./generate-phony-targets.sh $(phony) > $(phony_targets))
+include $(phony_targets)

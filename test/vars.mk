@@ -14,4 +14,4 @@ target := $(shell dakota-project --var SO_EXT=$(SO_EXT) name)
 prereq := $(shell dakota-project --var SO_EXT=$(SO_EXT) srcs)
 prereq += $(shell dakota-project --var SO_EXT=$(SO_EXT) libs)
 
-DAKOTA := DKT_FIXUP_STDERR=1 DK_PREFIX=../../.. ../../../bin/dakota
+DAKOTA := DKT_FIXUP_STDERR=1 ../../../bin/dakota
