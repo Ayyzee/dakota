@@ -15,3 +15,5 @@ prereq := $(shell dakota-project --var SO_EXT=$(SO_EXT) srcs)
 prereq += $(shell dakota-project --var SO_EXT=$(SO_EXT) libs)
 
 DAKOTA := DK_PREFIX=../../.. ../../../bin/dakota
+
+EXTRA_DAKOTAFLAGS := --include-directory .
