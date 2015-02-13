@@ -56,11 +56,11 @@ ifneq ($(CXX_NO_WARNINGS), 0)
 endif
 
 ifdef DKT_PROFILE
-  DAKOTA ?= $(BINDIR)/dakota-profile
+  DAKOTA ?= DK_PREFIX=$(rootdir) $(BINDIR)/dakota-profile
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= $(BINDIR)/dakota #--keep-going
+  DAKOTA ?= DK_PREFIX=$(rootdir) $(BINDIR)/dakota #--keep-going
 endif
 
 DAKOTAFLAGS ?=
