@@ -9,13 +9,19 @@
 use strict;
 use warnings;
 
-my $prefix;
+sub prefix {
+  my ($path) = @_;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
 
 BEGIN {
-  $prefix = '/usr/local';
-  if ($ENV{'DK_PREFIX'}) {
-    $prefix = $ENV{'DK_PREFIX'};
-  }
+  my $prefix = &prefix($0);
   unshift @INC, "$prefix/lib";
 };
 
