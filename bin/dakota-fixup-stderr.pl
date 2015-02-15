@@ -15,23 +15,31 @@ my $name_re = qr{[\w.=+-]+};
 my $rel_dir_re = qr{$name_re/+};
 my $path_re = qr{/*$rel_dir_re*?$name_re/*};
 
+sub canon {
+  my ($path) = @_;
+  $path =~ s|/+[^/]+/+\.\./+|/|g;
+  $path =~ s|[^/]+/+\.\./+||g;
+  return $path;
+}
+
 sub fixup {
   my ($initial_workdir, $file, $line_num) = @_;
-  $initial_workdir = File::Spec->canonpath($initial_workdir);
-  my $current_workdir = &getcwd();
-  my $reldir = File::Spec->abs2rel($current_workdir, $initial_workdir);
-  if (0) {
-    print STDERR
-      "INITIAL_WORKDIR: $initial_workdir\n" .
-      "CURRENT_WORKDIR: $current_workdir\n" .
-      "RELDIR:          $reldir\n" .
-      "RELDIR/FILE:     $reldir/$file\n";
+  if (! -e "$initial_workdir/$file") {
+    $initial_workdir = File::Spec->canonpath($initial_workdir);
+    my $current_workdir = &getcwd();
+    my $reldir = File::Spec->abs2rel($current_workdir, $initial_workdir);
+    if (0) {
+      print STDERR
+        "INITIAL_WORKDIR: $initial_workdir\n" .
+        "CURRENT_WORKDIR: $current_workdir\n" .
+        "RELDIR:          $reldir\n" .
+        "RELDIR/FILE:     $reldir/$file\n";
+    }
+    if (-e "$initial_workdir/$reldir/$file") {
+      return &canon("$reldir/$file") . ":$line_num:";
+    }
   }
-  if (-e "$initial_workdir/$reldir/$file") {
-    return "$reldir/$file:$line_num:";
-  } else {
-    return "$file:$line_num:";
-  }
+  return "$file" . ":$line_num:";
 }
 
 my $initial_workdir = $ARGV[0] ||= undef;

@@ -16,7 +16,7 @@ all: $(target)
 $(target): $(prereq)
 
 check:
-	@if [ -e $@.sh ]; then ./$@.sh; else name=`$$rootdir/bin/dakota-project name`; LD_LIBRARY_PATH=. ./$$name; fi
+	@if [ -e $@.sh ]; then ./$@.sh; else name=`$(prefix)/bin/dakota-project name`; LD_LIBRARY_PATH=. ./$$name; fi
 
 clean:
 	rm -rf obj exe lib-1.$(SO_EXT) lib-2.$(SO_EXT)
