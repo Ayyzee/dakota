@@ -796,10 +796,10 @@ sub exec_cmd {
   if ($ENV{'DKT_FIXUP_STDERR'}) {
     if ($ENV{'DKT_DIR'}) {
       my $cwd = &getcwd();
-      open (STDERR, "|dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
+      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
     }
     else {
-      open (STDERR, "|dakota-fixup-stderr.pl") or die;
+      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl") or die;
     }
   }
 
