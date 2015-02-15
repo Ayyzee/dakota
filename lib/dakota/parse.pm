@@ -29,16 +29,23 @@ use File::Basename;
 use Data::Dumper;
 use Carp;
 
-my $prefix;
 my $compiler;
 my $compiler_default;
+my $prefix;
+
+sub prefix {
+  my ($path) = @_;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
 
 BEGIN {
-  my $dir = `dirname $0`; chomp $dir;
-  $prefix = `dirname $dir`; chomp $prefix;
-
-  if ( ! -d $prefix )
-    { die "Could not determine \$prefix from executable $0: $!\n"; }
+  $prefix = &prefix($0);
   unshift @INC, "$prefix/lib";
   $compiler = do "$prefix/lib/dakota/compiler.pl" or die "$prefix/lib/dakota/compiler.pl: $!\n";
   $compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "$prefix/lib/dakota/compiler-linux-gcc.pl: $!\n";

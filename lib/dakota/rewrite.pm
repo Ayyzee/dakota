@@ -24,12 +24,19 @@ package dakota::rewrite;
 
 my $prefix;
 
-BEGIN {
-  my $dir = `dirname $0`; chomp $dir;
-  $prefix = `dirname $dir`; chomp $prefix;
+sub prefix {
+  my ($path) = @_;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
 
-  if ( ! -d $prefix )
-    { die "Could not determine \$prefix from executable $0: $!\n"; }
+BEGIN {
+  $prefix = &prefix($0);
   unshift @INC, "$prefix/lib";
 };
 

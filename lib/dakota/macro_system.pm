@@ -20,18 +20,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package dakota::macro_system;
+
 my $prefix;
 
-BEGIN {
-  my $dir = `dirname $0`; chomp $dir;
-  $prefix = `dirname $dir`; chomp $prefix;
+sub prefix {
+  my ($path) = @_;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
 
-  if ( ! -d $prefix )
-    { die "Could not determine \$prefix from executable $0: $!\n"; }
+BEGIN {
+  $prefix = &prefix($0);
   unshift @INC, "$prefix/lib";
 };
-
-package dakota::macro_system;
 
 use strict;
 use warnings;
@@ -46,6 +53,9 @@ $Data::Dumper::Purity    = 1;
 $Data::Dumper::Useqq     = 1;
 $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
@@ -547,9 +557,9 @@ unless (caller) {
 
   my $macros;
   if ($ENV{'DK_MACROS_PATH'}) {
-    my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "Can not find $path.";
+    my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "do $path failed: $!\n";
   } else {
-    my $path = "$prefix/lib/dakota/macros.pl"; $macros = do $path or die "Can not find $path.";
+    my $path = "$prefix/lib/dakota/macros.pl"; $macros = do $path or die "do $path failed: $!\n";
   }
 
   $debug = 0;
@@ -562,6 +572,7 @@ unless (caller) {
   mkdir $output_dir;
 
   foreach my $file (@ARGV) {
+    print STDERR $file, "\n";
     my $filestr = &dakota::filestr_from_file($file);
     my $sst = &sst::make($filestr, $file);
     &macros_expand($sst, $macros, $user_data);
@@ -598,9 +609,9 @@ unless (caller) {
   print $out &Dumper($summary);
   close($out);
 
-  print STDERR sort @$lines;
-  print STDERR "num-files=$$summary{'num-files'}\n";
-  print STDERR "num-changes-total=$$summary{'num-changes'}\n";
+  print sort @$lines;
+  print "num-files=$$summary{'num-files'}\n";
+  print "num-changes-total=$$summary{'num-changes'}\n";
 };
 
 1;
