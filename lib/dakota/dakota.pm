@@ -24,7 +24,6 @@ package dakota;
 
 use strict;
 use warnings;
-use Cwd;
 
 my $gbl_compiler;
 my $gbl_compiler_default;
@@ -794,9 +793,8 @@ sub exec_cmd {
   }
 
   if ($ENV{'DKT_FIXUP_STDERR'}) {
-    if ($ENV{'DKT_DIR'}) {
-      my $cwd = &getcwd();
-      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl $cwd $ENV{'DKT_DIR'}") or die;
+    if ($ENV{'DKT_INITIAL_WORKDIR'}) {
+      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl $ENV{'DKT_INITIAL_WORKDIR'}") or die;
     }
     else {
       open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl") or die;

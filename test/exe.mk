@@ -1,5 +1,3 @@
-rootdir := $(shell dakota-rootdir.pl $(rootdir))
-
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 

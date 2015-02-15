@@ -21,7 +21,6 @@ BIN_FILES :=\
  $(DESTDIR)$(bindir)/dakota-info\
  $(DESTDIR)$(bindir)/dakota\
  $(DESTDIR)$(bindir)/dakota-fixup-stderr.$(pl_ext)\
- $(DESTDIR)$(bindir)/dakota-rootdir.$(pl_ext)\
  $(DESTDIR)$(bindir)/dakota-project\
 
 LIB_FILES :=\
