@@ -21,4 +21,4 @@ include $(all)
 include $(check)
 
 clean:
-	rm -rf should-pass/*/{exe,obj,lib-{1,2,3}.$(SO_EXT)}
+	rm -rf $(all) $(check) should-pass/*/{exe,obj,lib-{1,2,3}.$(SO_EXT)}
