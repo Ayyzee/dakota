@@ -25,23 +25,30 @@ use warnings;
 
 package dakota;
 
-my $prefix;
-my $SO_EXT;
+my $gbl_compiler;
+my $gbl_compiler_default;
 
-BEGIN
-{
-    $prefix = '/usr/local';
-    if ($ENV{'DK_PREFIX'})
-    { $prefix = $ENV{'DK_PREFIX'}; }
+sub prefix {
+  my ($path) = @_;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
 
-    unshift @INC, "$prefix/lib";
-    unshift @INC, "../../lib";
+BEGIN {
+  my $prefix = &prefix($0);
+  unshift @INC, "$prefix/lib";
 
-    $SO_EXT = 'so';
-    if ($ENV{'SO_EXT'})
-    { $SO_EXT = $ENV{'SO_EXT'}; }
+  $gbl_compiler =         do "$prefix/lib/dakota/compiler.pl"           or die "do $prefix/lib/dakota/compiler.pl failed: $!\n";
+  $gbl_compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "do $prefix/lib/dakota/compiler-linux-gcc.pl failed: $!\n";
 };
+my $SO_EXT = &dakota::parse::var($gbl_compiler, 'SO_EXT', $gbl_compiler_default);
 
+use dakota::parse;
 use dakota::util;
 use dakota::sst;
 

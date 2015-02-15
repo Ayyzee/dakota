@@ -1,13 +1,15 @@
 rootdir := ../..
-DK_PREFIX := ../..
 
 %.pl: %.dk
-	./macro-system-parser.pl $< > $@
+	$(rootdir)/bin/macro-system-parser.pl $< > $@
 
 .PHONY: all clean
 
 all: all-macros.pl
-	DK_PREFIX=$(DK_PREFIX) MACROS=$< $(rootdir)/lib/dakota/macro_system.pm all.dk
+	path=$$PWD/all-macros.pl
+	DK_MACROS_PATH=$$path $(rootdir)/lib/dakota/macro_system.pm all.dk
+
+all-macros.pl: all-macros.dk
 
 clean:
-	rm -fr all-macros.pl obj-macro-system
+	rm -fr all-macros.pl macro-system-test-output
