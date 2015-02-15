@@ -22,7 +22,7 @@
 
 package dakota::rewrite;
 
-my $prefix;
+my $gbl_prefix;
 
 sub prefix {
   my ($path) = @_;
@@ -36,8 +36,8 @@ sub prefix {
 }
 
 BEGIN {
-  $prefix = &prefix($0);
-  unshift @INC, "$prefix/lib";
+  $gbl_prefix = &prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
 };
 
 use strict;
@@ -979,10 +979,12 @@ sub rewrite_multi_char_consts {
 }
 sub dakota_lang_user_data_old {
   my $kw_args_generics;
-  if ($ENV{'DKT_KA_GENERICS'}) {
-    $kw_args_generics = do $ENV{'DKT_KA_GENERICS'} or die;
+  if ($ENV{'DKT_KW_ARGS_GENERICS'}) {
+    $kw_args_generics = do $ENV{'DKT_KW_ARGS_GENERICS'} or die "do $ENV{'DKT_KW_ARGS_GENERICS'} failed: $!\n";
+  } elsif ($gbl_prefix) {
+    $kw_args_generics = do "$gbl_prefix/src/kw-args-generics.pl" or die "do $gbl_prefix/src/kw-args-generics.pl failed: $!\n";
   } else {
-    $kw_args_generics = do "$prefix/src/kw-args-generics.pl" or die;
+    die;
   }
 
   my $user_data = { 'kw-args-generics' => $kw_args_generics };

@@ -29,9 +29,8 @@ use File::Basename;
 use Data::Dumper;
 use Carp;
 
-my $compiler;
-my $compiler_default;
-my $prefix;
+my $gbl_compiler;
+my $gbl_compiler_default;
 
 sub prefix {
   my ($path) = @_;
@@ -45,10 +44,10 @@ sub prefix {
 }
 
 BEGIN {
-  $prefix = &prefix($0);
+  my $prefix = &prefix($0);
   unshift @INC, "$prefix/lib";
-  $compiler = do "$prefix/lib/dakota/compiler.pl" or die "$prefix/lib/dakota/compiler.pl: $!\n";
-  $compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "$prefix/lib/dakota/compiler-linux-gcc.pl: $!\n";
+  $gbl_compiler =         do "$prefix/lib/dakota/compiler.pl"           or die "do $prefix/lib/dakota/compiler.pl failed: $!\n";
+  $gbl_compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "do $prefix/lib/dakota/compiler-linux-gcc.pl failed: $!\n";
 };
 
 require Exporter;
@@ -89,8 +88,8 @@ my $ctlg_ext = 'ctlg';
 my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
-my $O_EXT =  &var($compiler, 'O_EXT', $compiler_default);
-my $SO_EXT = &var($compiler, 'SO_EXT', $compiler_default);
+my $O_EXT =  &var($gbl_compiler, 'O_EXT',  $gbl_compiler_default);
+my $SO_EXT = &var($gbl_compiler, 'SO_EXT', $gbl_compiler_default);
 
 # same code in dakota.pl and parser.pl
 my $k  = qr/[_A-Za-z0-9-]/;
@@ -378,11 +377,11 @@ sub str_from_cmd_info {
 }
 # found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
 sub longest_common_prefix {
-  my $prefix = shift;
+  my $path_prefix = shift;
   for (@_) {
-    chop $prefix while (! /^$prefix/);
+    chop $path_prefix while (! /^$path_prefix/);
   }
-  return $prefix;
+  return $path_prefix;
 }
 sub rel_path_canon { # should merge with canon_path()
   my ($path1, $cwd) = @_;

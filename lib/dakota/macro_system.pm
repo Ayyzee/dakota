@@ -22,7 +22,7 @@
 
 package dakota::macro_system;
 
-my $prefix;
+my $gbl_prefix;
 
 sub prefix {
   my ($path) = @_;
@@ -36,8 +36,8 @@ sub prefix {
 }
 
 BEGIN {
-  $prefix = &prefix($0);
-  unshift @INC, "$prefix/lib";
+  $gbl_prefix = &prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
 };
 
 use strict;
@@ -544,10 +544,12 @@ sub lang_user_data {
   my $user_data;
   if ($ENV{'DK_LANG_USER_DATA_PATH'}) {
     my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
-    $user_data = do $path or die "Can not find $path.";
+    $user_data = do $path or die "do $path failed: $!\n";
+  } elsif ($gbl_prefix) {
+    my $path = "$gbl_prefix/src/dakota-lang-user-data.pl";
+    $user_data = do $path or die "do $path failed: $!\n";
   } else {
-    my $path = "$prefix/src/dakota-lang-user-data.pl";
-    $user_data = do $path or die "Can not find $path.";
+    die;
   }
   return $user_data;
 }
@@ -558,8 +560,10 @@ unless (caller) {
   my $macros;
   if ($ENV{'DK_MACROS_PATH'}) {
     my $path = $ENV{'DK_MACROS_PATH'};  $macros = do $path or die "do $path failed: $!\n";
+  } elsif ($gbl_prefix) {
+    my $path = "$gbl_prefix/lib/dakota/macros.pl"; $macros = do $path or die "do $path failed: $!\n";
   } else {
-    my $path = "$prefix/lib/dakota/macros.pl"; $macros = do $path or die "do $path failed: $!\n";
+    die;
   }
 
   $debug = 0;

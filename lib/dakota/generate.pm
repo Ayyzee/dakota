@@ -29,7 +29,7 @@ use Data::Dumper;
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
-my $prefix;
+my $gbl_prefix;
 
 sub prefix {
   my ($path) = @_;
@@ -43,8 +43,8 @@ sub prefix {
 }
 
 BEGIN {
-  $prefix = &prefix($0);
-  unshift @INC, "$prefix/lib";
+  $gbl_prefix = &prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
 };
 
 use integer;
@@ -240,9 +240,11 @@ sub write_to_file_converted_strings {
   my ($path, $strings) = @_;
   if (!defined $gbl_macros) {
     if ($ENV{'DK_MACROS_PATH'}) {
-      $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die;
+      $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die "do $ENV{'DK_MACROS_PATH'} failed: $!\n";
+    } elsif ($gbl_prefix) {
+      $gbl_macros = do "$gbl_prefix/lib/dakota/macros.pl" or die "do $gbl_prefix/lib/dakota/macros.pl failed: $!\n";
     } else {
-      $gbl_macros = do "$prefix/lib/dakota/macros.pl" or die;
+      die;
     }
   }
   my $kw_args_generics = &dakota::util::kw_args_generics();

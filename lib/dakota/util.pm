@@ -52,7 +52,8 @@ our @EXPORT= qw(
 use Fcntl qw(:DEFAULT :flock);
 sub kw_args_generics_add {
   my ($generic) = @_;
-  $$kw_args_generics_tbl{$generic} = undef;
+  my $tbl = &kw_args_generics();
+  $$tbl{$generic} = undef;
 }
 sub kw_args_generics {
   return $kw_args_generics_tbl;
