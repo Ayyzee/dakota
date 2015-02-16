@@ -1,9 +1,10 @@
 {
-  'files' => [
-    '/usr/local/lib/libdakota-util.$SO_EXT',
+  'srcs' => [
     'exe.dk',
-    'lib.$SO_EXT'
+  ],
+  'libs' => [
+    '/usr/local/lib/libdakota-util.$SO_EXT',
+    'lib.$SO_EXT',
   ],
   'name' => 'exe',
-  'self-file' => 'project.rep'
 }

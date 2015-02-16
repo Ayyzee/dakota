@@ -1,7 +1,8 @@
 {
-  'files' => [
-    'exe.cc'
+  'srcs' => [
+    'exe.cc',
+  ],
+  'libs' => [
   ],
   'name' => 'exe',
-  'self-file' => 'project.rep'
 }
