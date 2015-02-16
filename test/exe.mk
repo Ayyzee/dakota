@@ -3,7 +3,7 @@ include $(rootdir)/vars.mk
 
 include $(rootdir)/test/vars.mk
 
-%: %.dk
+exe: exe.dk
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
 lib-%.$(SO_EXT): lib-%.dk module-lib-%.dk

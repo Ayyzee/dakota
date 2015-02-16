@@ -1,3 +1,5 @@
+SHELL := /bin/sh -u
+
 rootdir := ..
 
 include $(rootdir)/config.mk

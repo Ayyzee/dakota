@@ -5,7 +5,7 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-%: %.dk
+%/exe: %/exe.dk
 	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) --directory $(dir $@) $(notdir $@)
 
 .PHONY: all check clean
@@ -25,4 +25,4 @@ check: check-should-pass
 include $(check_should_pass)
 
 clean:
-	rm -rf $(all_should_pass) $(check_should_pass) should-pass/*/{exe,obj,lib-{1,2,3}.$(SO_EXT)}
+	rm -rf $(all_should_pass) $(check_should_pass) should-{pass,fail}/*/{exe,obj,lib-{1,2,3}.$(SO_EXT)}
