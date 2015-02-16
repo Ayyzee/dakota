@@ -1,0 +1,14 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+include <netinet/in.h>;
+
+klass k1
+{
+  // slots int-t (*)(int-t, int-t);
+  // or
+  int-t (*slots-t)(int-t, int-t);
+}
+
+int-t main() {
+  return 0;
+}
