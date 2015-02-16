@@ -1,10 +1,11 @@
 {
-  'files' => [
+  'srcs' => [
     'exe.dk',
+  ],
+  'libs' => [
     'lib-1.$SO_EXT',
     'lib-2.$SO_EXT',
-    'lib-3.$SO_EXT'
+    'lib-3.$SO_EXT',
   ],
   'name' => 'exe',
-  'self-file' => 'project.rep'
 }

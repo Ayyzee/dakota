@@ -10,15 +10,19 @@ include $(rootdir)/vars.mk
 
 .PHONY: all check clean
 
-all   := all.mk
-check := check.mk
+all_should_pass   := all-should-pass.mk
+check_should_pass := check-should-pass.mk
 
-$(shell ./generate-phony-targets-1.sh all   > $(all))
-$(shell ./generate-phony-targets-2.sh check > $(check))
+$(shell ./generate-phony-targets-1.sh all-should-pass   should-pass > $(all_should_pass))
+$(shell ./generate-phony-targets-2.sh check-should-pass should-pass > $(check_should_pass))
 
-include $(all)
+all: all-should-pass
 
-include $(check)
+include $(all_should_pass)
+
+check: check-should-pass
+
+include $(check_should_pass)
 
 clean:
-	rm -rf $(all) $(check) should-pass/*/{exe,obj,lib-{1,2,3}.$(SO_EXT)}
+	rm -rf $(all_should_pass) $(check_should_pass) should-pass/*/{exe,obj,lib-{1,2,3}.$(SO_EXT)}
