@@ -8,6 +8,9 @@ include $(rootdir)/vars.mk
 %/exe: %/exe.dk
 	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
 
+%/exe: %/exe.cc
+	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
+
 .PHONY: all check clean
 
 all_should_pass   := all-should-pass.mk
@@ -21,4 +24,4 @@ include $(all_should_pass)
 include $(check_should_pass)
 
 clean:
-	rm -rf $(all_should_pass) $(check_should_pass) should-{pass,fail}/*/{exe,obj,failed-{build,execute},lib-{1,2,3}.$(SO_EXT)}
+	rm -rf $(all_should_pass) $(check_should_pass) should-{pass,fail}/*/{exe,obj,failed-{build,check},lib-{1,2,3}.$(SO_EXT)}

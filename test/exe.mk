@@ -16,8 +16,8 @@ all: $(target)
 $(target): $(prereq)
 
 check:
-	@if [ -e $@.sh ]; then ./$@.sh; else LD_LIBRARY_PATH=. ./$(target) || touch failed-execute; fi
+	@if [ -e $@.sh ]; then ./$@.sh; else LD_LIBRARY_PATH=. ./$(target) || touch failed-check; fi
 
 clean:
-	rm -rf obj exe lib-1.$(SO_EXT) lib-2.$(SO_EXT) failed-{build,execute}
+	rm -rf obj exe lib-1.$(SO_EXT) lib-2.$(SO_EXT) failed-{build,check}
 	@if [ -e $@.sh ]; then ./$@.sh; fi
