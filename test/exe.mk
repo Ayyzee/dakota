@@ -1,6 +1,3 @@
-include $(rootdir)/config.mk
-include $(rootdir)/vars.mk
-
 include $(rootdir)/test/vars.mk
 
 exe: exe.dk
