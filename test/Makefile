@@ -16,8 +16,8 @@ include $(rootdir)/vars.mk
 all_should_pass   := all-should-pass.mk
 check_should_pass := check-should-pass.mk
 
-$(shell ./generate-phony-targets-1.sh all   should-pass > $(all_should_pass))
-$(shell ./generate-phony-targets-2.sh check should-pass > $(check_should_pass))
+$(shell ./bin/generate-phony-targets-1.sh all   should-pass > $(all_should_pass))
+$(shell ./bin/generate-phony-targets-2.sh check should-pass > $(check_should_pass))
 
 include $(all_should_pass)
 
