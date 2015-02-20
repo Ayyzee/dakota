@@ -1,0 +1,2 @@
+?ident =~ m/.../      =>  std::regex_search()
+?ident =~ s/.../.../  =>  std::regex_replace()
