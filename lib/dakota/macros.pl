@@ -178,16 +178,16 @@
   'if-or-while-in-keys-or-elements-iterable' => { # optional 'not' and optional 'keys|elements'
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ '?/if/while/', '(',  '?ident', 'in',             '?/keys|elements/',      '?list-member',      ')'  ],
-      'template' => [ '?/if/while/', '?2', '?ident', 'in', 'dk', '::', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
+      'pattern'  => [ '?/if|while/', '(',  '?ident', 'in',             '?/keys|elements/',      '?list-member',      ')'  ],
+      'template' => [ '?/if|while/', '?2', '?ident', 'in', 'dk', '::', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
     } ],
   },
   # if|while (e [not] in tbl)
   'if-or-while-in-iterable' => { # optional 'not'
     'before' => [ 'if-or-while-in-keys-or-elements-iterable' ],
     'rules' => [ {
-      'pattern'  => [ '?/if/while/', '(',  '?ident',             'in',      '?list-member',                ')'  ],
-      'template' => [ '?/if/while/', '?2',           'dk', '::', 'in', '(', '?list-member', '?ident', ')', '?6' ]
+      'pattern'  => [ '?/if|while/', '(',  '?ident',             'in',      '?list-member',                ')'  ],
+      'template' => [ '?/if|while/', '?2',           'dk', '::', 'in', '(', '?list-member', '?ident', ')', '?6' ]
     } ],
   },
   # for (object-t e [not] in [keys|elements] tbl)
