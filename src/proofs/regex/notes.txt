@@ -1,2 +1,26 @@
-?ident =~ m/.../      =>  std::regex_search()
-?ident =~ s/.../.../  =>  std::regex_replace()
+?ident =~ m/.../g       =>  std::regex_search()
+?ident =~ s/.../.../ge  =>  std::regex_replace()
+
+while (str !~|=~ m/.../g) {
+}
+
+while (str !~|=~ m/.../g)
+  stmt;
+
+if (str !~|=~ m/.../) {
+}
+
+if (str !~|=~ m/.../)
+  stmt;
+
+if (str !~|=~ s/.../.../g) {
+}
+
+if (str !~|=~ s/.../.../g)
+  stmt;
+
+//int count = str =~ s/.../.../g;
+// not a good idea (now) since I can not easily get the number of replacements
+
+ident =~ /.../                // search
+ident =~ /.../.../first-only  // replacement (default is globally)
