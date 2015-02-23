@@ -16,36 +16,46 @@ digraph "macro-syntax-fsm"
 {
   graph [ label = "\G", fontcolor = red ];
   graph [ rankdir = "LR",
-        center = true,
-        size = "7.5,10",
+          center = true,
+          //size = "7.5,10",
+          //fontname = "courier",
+          //concentrate = true,
           ];
 
   //node [ shape = circle, label = "", width = 0.25 ];
   // OR
   node [ shape = circle ];
 
-  00 [ shape = doublecircle ];
-  50 [ shape = doublecircle ];
+  edge [ fontname = "courier-italic" ];
 
-  00 -> 02 [ label = "macro" ];
-  02 -> 04 [ label = "ident" ];
-  04 -> 06 [ label = "[" ];
-  04 -> 10 [ label = "{" ];
-  06 -> 06 [ label = "ident" ];
-  06 -> 08 [ label = "]" ];
-  08 -> 10 [ label = "{" ];
+  000 [ style = invis ];
+  110 [ shape = doublecircle ];
 
-  10 -> 15 [ label = "pattern-var" ];
-  10 -> 15 [ label = "=> pattern-var", color = blue, dir = back ];
-  10 -> 20 [ label = "ident" ];
-  10 -> 50 [ label = "}" ];
+  000 -> 010;
+  010 -> 020 [ label = "macro", fontname = "courier-bold" ];
+  020 -> 030 [ label = "ident" ];
+  030 -> 040 [ label = "[", fontname = "courier-bold" ];
+  030 -> 060 [ label = "{", fontname = "courier-bold" ];
+  040 -> 040 [ label = "ident" ];
+  040 -> 050 [ label = "]", fontname = "courier-bold" ];
+  050 -> 060 [ label = "{", fontname = "courier-bold" ];
 
-  10 -> 30 [ label = "{" ];
-  20 -> 30 [ label = "{" ];
-  20 -> 40 [ label = "ident", color = blue, dir = back ];
+  060 -> 080 [ label = "ident" ];
+  060 -> 110 [ label = "}", fontname = "courier-bold" ];
+  060 -> 090 [ label = "{", fontname = "courier-bold" ];
+  080 -> 090 [ label = "{", fontname = "courier-bold", style = dashed ];
+  080 -> 082 [ label = "=>", fontname = "courier-bold", fontcolor = green, color = green  ];
+  082 -> 060 [ label = "pattern-var | token", color = blue, weight = 0.0 ]; // back
+  082 -> 084 [ label = "{", fontname = "courier-bold" ];
+  084 -> 086 [ label = "...", fontname = "courier-bold" ];
+  086 -> 060 [ label = "}", color = blue, fontname = "courier-bold", weight = 0.0 ]; // back
+  090 -> 091 [ label = "...", fontname = "courier-bold" ];
+  091 -> 092 [ label = "}", fontname = "courier-bold" ];
+  092 -> 093 [ label = "=>", fontname = "courier-bold", fontcolor = green, color = green  ];
+  091 -> 060 [ label = "}", color = blue, fontname = "courier-bold", weight = 0.0 ]; // back
+  093 -> 094 [ label = "{", fontname = "courier-bold" ];
+  094 -> 095 [ label = "...", fontname = "courier-bold" ];
+  095 -> 060 [ label = "}", color = blue, fontname = "courier-bold", weight = 0.0 ]; // back
 
-  30 -> 40 [ label = "... } => { ... }" ];
-  30 -> 40 [ label = "{", color = blue, dir = back ];
-  15 -> 40 [ label = "pattern-var", color = blue, dir = back ];
-  40 -> 50 [ label = "}" ];
+  subgraph { graph [ rank = same ]; 084; 090; }
 }
