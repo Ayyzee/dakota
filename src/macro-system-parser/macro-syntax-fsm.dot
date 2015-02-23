@@ -1,4 +1,4 @@
-// Copyright (C) 2007, 2008 Robert Nielsen <robert@dakota.org>
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,44 +18,46 @@ digraph "macro-syntax-fsm"
   graph [ rankdir = "LR",
           center = true,
           //size = "7.5,10",
-          //fontname = "courier",
-          //concentrate = true,
           ];
 
   //node [ shape = circle, label = "", width = 0.25 ];
   // OR
   node [ shape = circle ];
 
-  edge [ fontname = "courier-italic" ];
+  edge [ fontname = "courier" ];
 
   000 [ style = invis ];
-  110 [ shape = doublecircle ];
+  170 [ shape = doublecircle ];
 
   000 -> 010;
   010 -> 020 [ label = "macro", fontname = "courier-bold" ];
-  020 -> 030 [ label = "ident" ];
+  020 -> 030 [ label = "ident", fontname = "courier-italic" ];
   030 -> 040 [ label = "[", fontname = "courier-bold" ];
   030 -> 060 [ label = "{", fontname = "courier-bold" ];
-  040 -> 040 [ label = "ident" ];
+  040 -> 040 [ label = "ident", fontname = "courier-italic" ];
   040 -> 050 [ label = "]", fontname = "courier-bold" ];
   050 -> 060 [ label = "{", fontname = "courier-bold" ];
 
-  060 -> 080 [ label = "ident" ];
-  060 -> 110 [ label = "}", fontname = "courier-bold" ];
-  060 -> 090 [ label = "{", fontname = "courier-bold" ];
-  080 -> 090 [ label = "{", fontname = "courier-bold", style = dashed ];
-  080 -> 082 [ label = "=>", fontname = "courier-bold", fontcolor = green, color = green  ];
-  082 -> 060 [ label = "pattern-var | token", color = blue, weight = 0.0 ]; // back
-  082 -> 084 [ label = "{", fontname = "courier-bold" ];
-  084 -> 086 [ label = "...", fontname = "courier-bold" ];
-  086 -> 060 [ label = "}", color = blue, fontname = "courier-bold", weight = 0.0 ]; // back
-  090 -> 091 [ label = "...", fontname = "courier-bold" ];
-  091 -> 092 [ label = "}", fontname = "courier-bold" ];
-  092 -> 093 [ label = "=>", fontname = "courier-bold", fontcolor = green, color = green  ];
-  091 -> 060 [ label = "}", color = blue, fontname = "courier-bold", weight = 0.0 ]; // back
-  093 -> 094 [ label = "{", fontname = "courier-bold" ];
-  094 -> 095 [ label = "...", fontname = "courier-bold" ];
-  095 -> 060 [ label = "}", color = blue, fontname = "courier-bold", weight = 0.0 ]; // back
+  060 -> 070 [ label = "ident", fontname = "courier-italic" ];
+  060 -> 110 [ label = "{", fontname = "courier-bold" ];
+  060 -> 170 [ label = "}", fontname = "courier-bold" ];
+  070 -> 080 [ label = "=>", fontname = "courier-bold", fontcolor = red ];
+  070 -> 110 [ label = "{", fontname = "courier-bold", style = dashed ];
+  080 -> 060 [ label = "token | pattern-var", fontname = "courier-italic", color = blue, weight = 0.0 ]; // back
 
-  subgraph { graph [ rank = same ]; 084; 090; }
+  080 -> 090 [ label = "{", fontname = "courier-bold" ];
+  090 -> 100 [ label = "...", fontname = "courier-bold" ];
+  100 -> 060 [ label = "}", fontname = "courier-bold", color = blue, weight = 0.0 ]; // back
+  
+  110 -> 120 [ label = "...", fontname = "courier-bold" ];
+  120 -> 130 [ label = "}", fontname = "courier-bold" ];
+  120 -> 060 [ label = "}", fontname = "courier-bold", color = blue, weight = 0.0 ]; // back
+  
+  130 -> 140 [ label = "=>", fontname = "courier-bold", fontcolor = red ];
+  140 -> 150 [ label = "{", fontname = "courier-bold" ];
+  150 -> 160 [ label = "...", fontname = "courier-bold" ];
+  160 -> 060 [ label = "}", fontname = "courier-bold", color = blue, weight = 0.0 ]; // back
+
+  subgraph { graph [ rank = same ]; 060; 170; }
+  subgraph { graph [ rank = same ]; 090; 110; }
 }
