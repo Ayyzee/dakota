@@ -782,7 +782,7 @@ klass klass
       }
     }
     else
-      dkt-log(dkt::k-log-warning, "nullptr klass name");
+      dkt-log(dkt:k-log-warning, "nullptr klass name");
     if (nullptr != traits)
       self = traits-initialize(self, traits);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info:at(self.info-slots, $method-aliases);
