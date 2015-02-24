@@ -35,29 +35,29 @@ digraph "macro-syntax-fsm"
   01 -> 02 [ label = "macro" ];
   02 -> 03 [ label = "ident", fontname = "courier-italic" ];
   03 -> 04 [ label = "[", weight = 5.0 ];
-  03 -> 06 [ label = "{", weight = 1.0, tailport = n, headport = n ];
+  03 -> 06 [ label = "{", tailport = n, headport = n ];
   04 -> 04 [ label = "ident", fontname = "courier-italic" tailport = s, headport = s, dir = back, color = blue ];
   04 -> 05 [ label = "]", weight = 5.0 ];
   05 -> 06 [ label = "{", weight = 5.0 ];
 
-  06 -> 07 [ label = "ident", fontname = "courier-italic", weight = 5.0 ];
-  06 -> 08 [ label = "{", weight = 1.0, tailport = n, headport = n ];
+  06 -> 07 [ label = "ident", weight = 5.0, fontname = "courier-italic" ];
+  06 -> 08 [ label = "{", tailport = n, headport = n ];
   07 -> 08 [ label = "{", weight = 5.0 ];
-  08 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
+  08 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
   
-  08 -> 09 [ label = "pattern", fontname = "courier-italic", weight = 5.0 ];
-  08 -> 10 [ label = "}", weight = 1.0, tailport = n, headport = n ];
-  09 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
+  08 -> 09 [ label = "pattern", weight = 5.0, fontname = "courier-italic" ];
+  08 -> 10 [ label = "}", tailport = n, headport = n ];
+  09 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
 
   09 -> 10 [ label = "}", weight = 5.0 ];
   10 -> 11 [ label = "=>", weight = 5.0 ];
   11 -> 12 [ label = "{", weight = 5.0 ];
-  12 -> 13 [ label = "template", fontname = "courier-italic", weight = 5.0 ];
-  12 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
-  13 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
+  12 -> 13 [ label = "template", weight = 5.0, fontname = "courier-italic" ];
+  12 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
+  13 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
 
-  14 -> 06 [ label = "}", dir = back ]; //tailport = n, headport = s ];
-  subgraph { graph [ rank = same ]; 14; 06; }
+  14 -> 06 [ label = "}", dir = back ]; //tailport = n, headport = s ]; // instead of dir = back
+  subgraph { graph [ rank = same ]; 06; 14; }
 }
 // auxiliary pattern-set(s)  (macro m { p1 {}       {}       p2 {}       {}       ... })
 // main      pattern-set     (macro m {    {}       {}          {}       {}           })
@@ -66,10 +66,12 @@ digraph "macro-syntax-fsm"
 
 // one and only one main rule-set or main pattern-set (either serves as the macro entry point)
 
+// a pattern-set is the same as a rule-set where the template simply echos the pattern
+
 // macro m              { klass-or-trait { klass }              { trait }          ... }
 // macro klass-or-trait {                { klass }              { trait }              }
 // macro klass-or-trait {                { klass } => { klass } { trait } => { trait } }
 
 // use ?klass-or-trait
 // or
-// use ?/klass|trait/
+// use ?/(klass|trait)/
