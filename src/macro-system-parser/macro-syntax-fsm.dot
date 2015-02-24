@@ -17,53 +17,59 @@ digraph "macro-syntax-fsm"
   graph [ label = "\G", fontcolor = red ];
   graph [ rankdir = "LR",
           center = true,
+          //ratio = compress,
           //size = "7.5,10",
+          //concentrate = true,
           ];
 
   //node [ shape = circle, label = "", width = 0.25 ];
   // OR
   node [ shape = circle ];
 
-  edge [ fontname = "courier" ];
+  edge [ fontname = "courier-bold", minlen = 2, fontsize = 16 ];
 
   00 [ style = invis ];
   14 [ shape = doublecircle ];
 
   00 -> 01;
-  01 -> 02 [ label = "macro", fontname = "courier-bold" ];
+  01 -> 02 [ label = "macro" ];
   02 -> 03 [ label = "ident", fontname = "courier-italic" ];
-  03 -> 04 [ label = "[", fontname = "courier-bold" ];
-  03 -> 06 [ label = "{", fontname = "courier-bold", weight = 4.0 ];
-  04 -> 04 [ label = "ident", fontname = "courier-italic" ];
-  04 -> 05 [ label = "]", fontname = "courier-bold" ];
-  05 -> 06 [ label = "{", fontname = "courier-bold" ];
+  03 -> 04 [ label = "[", weight = 5.0 ];
+  03 -> 06 [ label = "{", weight = 1.0, tailport = n, headport = n ];
+  04 -> 04 [ label = "ident", fontname = "courier-italic" tailport = s, headport = s, dir = back, color = blue ];
+  04 -> 05 [ label = "]", weight = 5.0 ];
+  05 -> 06 [ label = "{", weight = 5.0 ];
 
-  06 -> 07 [ label = "ident", fontname = "courier-italic" ];
-  06 -> 08 [ label = "{", fontname = "courier-bold", weight = 4.0 ];
-  06 -> 14 [ label = "}", fontname = "courier-bold" ];
-  07 -> 08 [ label = "{", fontname = "courier-bold" ];
-  08 -> 06 [ label = "}", fontname = "courier-bold", color = blue, weight = 1.0 ]; // back
+  06 -> 07 [ label = "ident", fontname = "courier-italic", weight = 5.0 ];
+  06 -> 08 [ label = "{", weight = 1.0, tailport = n, headport = n ];
+  07 -> 08 [ label = "{", weight = 5.0 ];
+  08 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
   
-  08 -> 09 [ label = "pattern", fontname = "courier-italic" ];
-  08 -> 10 [ label = "}", fontname = "courier-bold", weight = 4.0 ];
-  09 -> 06 [ label = "}", fontname = "courier-bold", color = blue, weight = 1.0 ]; // back
+  08 -> 09 [ label = "pattern", fontname = "courier-italic", weight = 5.0 ];
+  08 -> 10 [ label = "}", weight = 1.0, tailport = n, headport = n ];
+  09 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
 
-  09 -> 10 [ label = "}", fontname = "courier-bold" ];
-  10 -> 11 [ label = "=>", fontname = "courier-bold", weight = 4.0 ];
-  11 -> 12 [ label = "{", fontname = "courier-bold", weight = 4.0 ];
-  12 -> 13 [ label = "template", fontname = "courier-italic", weight = 4.0 ];
-  12 -> 06 [ label = "}", fontname = "courier-bold", color = blue, weight = 1.0 ]; // back
-  13 -> 06 [ label = "}", fontname = "courier-bold", color = blue, weight = 1.0 ]; // back
+  09 -> 10 [ label = "}", weight = 5.0 ];
+  10 -> 11 [ label = "=>", weight = 5.0 ];
+  11 -> 12 [ label = "{", weight = 5.0 ];
+  12 -> 13 [ label = "template", fontname = "courier-italic", weight = 5.0 ];
+  12 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
+  13 -> 06 [ label = "}", color = blue, weight = 1.0, headport = s, tailport = s ]; // back
 
-  subgraph { graph [ rank = same ]; 06; 14; }
+  14 -> 06 [ label = "}", dir = back ]; //tailport = n, headport = s ];
+  subgraph { graph [ rank = same ]; 14; 06; }
 }
-// named   pattern(s)  (macro m { p1 {}       {}       p2 {}       {}       ... })
-// unnamed pattern     (macro m {    {}       {}          {}       {}           })
-// named   rule set(s) (macro m { r1 {} => {} {} => {} r2 {} => {} {} => {} ... })
-// unnamed rule set    (macro m {    {} => {} {} => {}    {} => {} {} => {}     })
+// auxiliary pattern-set(s)  (macro m { p1 {}       {}       p2 {}       {}       ... })
+// main      pattern-set     (macro m {    {}       {}          {}       {}           })
+// auxiliary rule-set(s)     (macro m { r1 {} => {} {} => {} r2 {} => {} {} => {} ... })
+// main      rule-set        (macro m {    {} => {} {} => {}    {} => {} {} => {}     })
 
-// one and only one unnamed rule set xor unnamed pattern (which is the macro entry point)
+// one and only one main rule-set or main pattern-set (either serves as the macro entry point)
 
 // macro m              { klass-or-trait { klass }              { trait }          ... }
 // macro klass-or-trait {                { klass }              { trait }              }
 // macro klass-or-trait {                { klass } => { klass } { trait } => { trait } }
+
+// use ?klass-or-trait
+// or
+// use ?/klass|trait/
