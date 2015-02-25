@@ -13,21 +13,27 @@ macro kw-arg
 
   { ?ident => ?token }
   =>
-    { &__keyword:?ident, ?token }
+    { &__keyword::?ident, ?token }
+}
+
+macro sro
+{
+  { :  } => { :: }
+  { :: } => { :: }
 }
 
 macro super
 {
-  { dk : ?ident ( super ?wildcard ) }
+  { dk ?sro ?ident ( super ?wildcard ) }
   =>
-    { dk:?ident((super-t){self, klass} ?wildcard) }
+    { dk ?sro ?ident((super-t){self, klass} ?wildcard) }
 }
 
 macro va-super
 {
-  { dk : va : ?ident ( super ?wildcard ) }
+  { dk ?sro va ?sro ?ident ( super ?wildcard ) }
   =>
-    { dk:va:?ident((super-t){self, klass} ?wildcard) }
+    { dk $sro va $sro ?ident((super-t){self, klass} ?wildcard) }
 }
 
 macro method
@@ -39,9 +45,9 @@ macro method
 
 macro va-method
 {
-  { method ?type-ident va : ?ident ( object-t self ?wildcard ) }
+  { method ?type-ident va ?sro ?ident ( object-t self ?wildcard ) }
   =>
-    { noexport ?type-ident va : ?ident ( object-t self ?wildcard ) }
+    { noexport ?type-ident va ?sro ?ident ( object-t self ?wildcard ) }
 }
 
 macro slots-use
@@ -107,7 +113,7 @@ macro slots
 // typedef int (*)(int, int) slots-t;
 macro typedef-function-ptr
 {
-  ?return-type => ?wildcard
+  return-type { ?wildcard }
 
   { typedef ?return-type ( * ) ( ?wildcard ) ?ident }
   =>
@@ -116,19 +122,21 @@ macro typedef-function-ptr
 
 macro typedef-array
 {
-  ?type => ?wildcard
+  type { ?wildcard }
 
   { typedef ?type [ ?wildcard ] slots-t }
   =>
-      { typedef ?type slots-t [ ?wildcard ] }
+    { typedef ?type slots-t [ ?wildcard ] }
 }
 
 macro for-in
 {
-  ?element => ?ident
-  ?collection => ?ident
+  for-open   { ( }
+  for-close  { ) }
+  element    { ?ident }
+  collection { ?ident }
 
-  { for ( object-t ?element in ?collection ) }
+  { for ?for-open object-t ?element in ?collection ?for-close }
   =>
-    { for ( object-t _iterator_ = dk :: forward-iterator ( ?collection ) ; object-t ?element = dk :: next ( _iterator_ ) ; ) }
+    { for ?for-open object-t _iterator_ = dk :: forward-iterator ( ?collection ) ; object-t ?element = dk :: next ( _iterator_ ) ; ?for-close }
 }

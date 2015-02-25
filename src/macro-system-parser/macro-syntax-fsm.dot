@@ -14,64 +14,46 @@
 
 digraph "macro-syntax-fsm"
 {
-  graph [ label = "\G", fontcolor = red ];
+  graph [ label = "\G", fontcolor = red, fontsize = 16 ];
   graph [ rankdir = "LR",
           center = true,
-          //ratio = compress,
           //size = "7.5,10",
-          //concentrate = true,
+          //page = "8.5,11",
           ];
 
-  //node [ shape = circle, label = "", width = 0.25 ];
-  // OR
-  node [ shape = circle ];
+  node [ shape = circle, width = 0.5, fontsize = 16 ];
+  //node [ label = "" ]; // comment out this line if you want the node names displayed
 
-  edge [ fontname = "courier-bold", minlen = 2, fontsize = 16 ];
+  edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16 ];
 
   00 [ style = invis ];
   14 [ shape = doublecircle ];
 
   00 -> 01;
   01 -> 02 [ label = "macro" ];
-  02 -> 03 [ label = "ident", fontname = "courier-italic" ];
+  02 -> 03 [ label = "ident", fontname = "Courier-Oblique" ];
   03 -> 04 [ label = "[", weight = 5.0 ];
   03 -> 06 [ label = "{", tailport = n, headport = n ];
-  04 -> 04 [ label = "ident", fontname = "courier-italic" tailport = s, headport = s, dir = back, color = blue ];
+  04 -> 04 [ label = "ident", fontname = "Courier-Oblique" tailport = s, headport = s, dir = back, color = blue ];
   04 -> 05 [ label = "]", weight = 5.0 ];
   05 -> 06 [ label = "{", weight = 5.0 ];
 
-  06 -> 07 [ label = "ident", weight = 5.0, fontname = "courier-italic" ];
+  06 -> 07 [ label = "ident", weight = 5.0, fontname = "Courier-Oblique" ];
   06 -> 08 [ label = "{", tailport = n, headport = n ];
   07 -> 08 [ label = "{", weight = 5.0 ];
   08 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
   
-  08 -> 09 [ label = "pattern", weight = 5.0, fontname = "courier-italic" ];
+  08 -> 09 [ label = "pattern", weight = 5.0, fontname = "Courier-Oblique" ];
   08 -> 10 [ label = "}", tailport = n, headport = n ];
   09 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
 
   09 -> 10 [ label = "}", weight = 5.0 ];
   10 -> 11 [ label = "=>", weight = 5.0 ];
   11 -> 12 [ label = "{", weight = 5.0 ];
-  12 -> 13 [ label = "template", weight = 5.0, fontname = "courier-italic" ];
+  12 -> 13 [ label = "template", weight = 5.0, fontname = "Courier-Oblique" ];
   12 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
   13 -> 06 [ label = "}", weight = 1.0, headport = s, tailport = s, color = blue ]; // back
 
   14 -> 06 [ label = "}", dir = back ]; //tailport = n, headport = s ]; // instead of dir = back
   subgraph { graph [ rank = same ]; 06; 14; }
 }
-// auxiliary pattern-set(s)  (macro m { p1 {}       {}       p2 {}       {}       ... })
-// main      pattern-set     (macro m {    {}       {}          {}       {}           })
-// auxiliary rule-set(s)     (macro m { r1 {} => {} {} => {} r2 {} => {} {} => {} ... })
-// main      rule-set        (macro m {    {} => {} {} => {}    {} => {} {} => {}     })
-
-// one and only one main rule-set or main pattern-set (either serves as the macro entry point)
-
-// a pattern-set is the same as a rule-set where the template simply echos the pattern
-
-// macro m              { klass-or-trait { klass }              { trait }          ... }
-// macro klass-or-trait {                { klass }              { trait }              }
-// macro klass-or-trait {                { klass } => { klass } { trait } => { trait } }
-
-// use ?klass-or-trait
-// or
-// use ?/(klass|trait)/

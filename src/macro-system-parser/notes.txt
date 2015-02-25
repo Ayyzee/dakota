@@ -1,0 +1,16 @@
+auxiliary pattern-set(s)  (macro m { p1 {}       {}       p2 {}       {}       ... })
+main      pattern-set     (macro m {    {}       {}          {}       {}           })
+auxiliary rule-set(s)     (macro m { r1 {} => {} {} => {} r2 {} => {} {} => {} ... })
+main      rule-set        (macro m {    {} => {} {} => {}    {} => {} {} => {}     })
+
+one and only one main rule-set or main pattern-set (either serves as the macro entry point)
+
+a pattern-set is the same as a rule-set where the template simply echos the pattern
+
+macro m              { klass-or-trait { klass }              { trait }          ... }
+macro klass-or-trait {                { klass }              { trait }              }
+macro klass-or-trait {                { klass } => { klass } { trait } => { trait } }
+
+use ?klass-or-trait
+or
+use ?/(klass|trait)/
