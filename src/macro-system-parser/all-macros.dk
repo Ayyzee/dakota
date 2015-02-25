@@ -13,27 +13,21 @@ macro kw-arg
 
   { ?ident => ?token }
   =>
-    { &__keyword::?ident, ?token }
-}
-
-macro sro
-{
-  { :  } => { :: }
-  { :: } => { :: }
+    { &__keyword:?ident, ?token }
 }
 
 macro super
 {
-  { dk ?sro ?ident ( super ?wildcard ) }
+  { dk : ?ident ( super ?wildcard ) }
   =>
-    { dk ?sro ?ident((super-t){self, klass} ?wildcard) }
+    { dk : ?ident((super-t){self, klass} ?wildcard) }
 }
 
 macro va-super
 {
-  { dk ?sro va ?sro ?ident ( super ?wildcard ) }
+  { dk : va : ?ident ( super ?wildcard ) }
   =>
-    { dk $sro va $sro ?ident((super-t){self, klass} ?wildcard) }
+    { dk : va : ?ident((super-t){self, klass} ?wildcard) }
 }
 
 macro method
@@ -45,9 +39,9 @@ macro method
 
 macro va-method
 {
-  { method ?type-ident va ?sro ?ident ( object-t self ?wildcard ) }
+  { method ?type-ident va : ?ident ( object-t self ?wildcard ) }
   =>
-    { noexport ?type-ident va ?sro ?ident ( object-t self ?wildcard ) }
+    { noexport ?type-ident va : ?ident ( object-t self ?wildcard ) }
 }
 
 macro slots-use

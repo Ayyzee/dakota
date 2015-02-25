@@ -14,3 +14,9 @@ macro klass-or-trait {                { klass } => { klass } { trait } => { trai
 use ?klass-or-trait
 or
 use ?/(klass|trait)/
+
+// macros defn may mix/match rules and patterns (rules without explicit templates)
+macro m { {} => {}
+          {}
+          {}
+}
