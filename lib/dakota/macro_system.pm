@@ -449,6 +449,7 @@ sub regex_from_str {
   my ($str) = @_;
   $str =~ s|^\?(.+)$|$1|; # strip off leading ? if present
   $str =~ s|^/(.+)/$|$1|; # strip off leading and trailing / if present
+  $str =~ s|^\((.+)\)$|$1|; # strip off leading ( and trailing ) if present
   return qr/($str)/;
 }
 sub rule_match {
@@ -464,16 +465,16 @@ sub rule_match {
     my $constraint_name;
 
   SWITCH: {
-      ($$pattern[$j] =~ /^\?\/(.+)\//) && do { # ?/some-regex/
-        my $part = $1;
+      ($$pattern[$j] =~ /^\?\/.+\/$/) && do { # ?/some-regex/
         # match by regex
-        my $regex = qr/$part/; my $re_match;
+        my $re_match;
         ($last_index, $re_match) = &regex($sst, $prev_last_index, &regex_from_str($$pattern[$j]));
         $match = [ { 'str' => $re_match } ];
         last SWITCH;
       };
-      ($$pattern[$j] =~ /^\?($k+)$/) && do { # ?some-ident
-        my $part = $1;
+      ($$pattern[$j] =~ /^\?$k+$/) && do { # ?some-ident
+        # 0: look for aux-rule pattern
+
         # 1: look for other macro with name
         my $macro = $$macros{$name};
         # match by other macro rhs
@@ -489,7 +490,7 @@ sub rule_match {
         $constraint_name = $$pattern[$j];
         last SWITCH;
       };
-      ($$pattern[$j] =~ /^([^?].*)$/) && do { # anything not begining with ?
+      ($$pattern[$j] =~ /^[^?]+$/) && do { # anything not begining with ?
         # match by literal
         $last_index = &literal($sst, $prev_last_index, $$pattern[$j]);
         $match = [ { 'str' => "$$sst{'tokens'}[$last_index]{'str'}" } ];
