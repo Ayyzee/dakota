@@ -16,5 +16,7 @@ all: all-macros.pl
 
 all-macros.pl: all-macros.dk
 
+macro-syntax-fsm.ps: macro-syntax-fsm.dot
+
 clean:
 	rm -fr all-macros.pl macro-system-test-output
