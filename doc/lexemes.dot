@@ -45,6 +45,6 @@ digraph "lexems"
   start -> s13 [ label = "\"" ];
   start -> s14 [ label = "\'" ];
 
-  start -> s15 [ label = "\\" ];
-  s15 -> s16 [ label = "\\" ];
+  start -> s15 [ label = "\\"" ];
+  s15   -> s16 [ label = "\\"" ];
 }
