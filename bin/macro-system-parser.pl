@@ -92,7 +92,7 @@ sub _00
 
     &sst_cursor::match($sst_cursor, "{");
     $$result{$macro_name} =
-      { 'rules' => [], 'sub-rules' => {}, 'aliases' => {} };
+      { 'rules' => [], 'aux-rules' => {} };
     &_10($sst_cursor, $result, $macro_name);
   }
   return $result;
@@ -102,7 +102,7 @@ sub _10
   my ($sst_cursor, $result, $macro_name) = @_;
 
   for(&sst_cursor::current_token($sst_cursor)) {
-    if (m/$z/) { # sub-rule or alias
+    if (m/$z/) { # aux-rule
       my $name = &sst_cursor::match_re($sst_cursor, $z);
       &_20($sst_cursor, $result, $macro_name, $name);
       last;
@@ -125,16 +125,9 @@ sub _20
   my ($sst_cursor, $result, $macro_name, $name) = @_;
 
   for(&sst_cursor::current_token($sst_cursor)) {
-    if (m/{/) { # sub-rule
+    if (m/{/) { # aux-rule
       #&sst_cursor::match($sst_cursor, "{");
       &_30($sst_cursor, $result, $macro_name, $name);
-      last;
-    }
-    if (m/=>/) { # alias
-      &sst_cursor::match($sst_cursor, "=>");
-      my $rhs = &sst_cursor::match_re($sst_cursor, $z);
-      $$result{$macro_name}{'aliases'}{$name} = $rhs;
-      &_10($sst_cursor, $result, $macro_name);
       last;
     }
     die;
@@ -153,8 +146,8 @@ sub _30
   $$rule{'rhs'} = &body($sst_cursor);
   #&sst_cursor::match($sst_cursor, "}");
 
-  if ($name) { # sub-rule
-    $$result{$macro_name}{'sub-rules'}{$name} = $rule;
+  if ($name) { # aux-rule
+    $$result{$macro_name}{'aux-rules'}{$name} = $rule;
   } else { # rule
     push @{$$result{$macro_name}{'rules'}}, $rule;
   }
