@@ -11,7 +11,7 @@ fi
 prefix=..
 default_macros_path=$prefix/lib/dakota/macros.pl
 
-DK_MACROS_PATH=${DK_MACROS_PATH=$default_macros_path} $prefix/lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt
+DKT_MACROS_DEBUG=0 DK_MACROS_PATH=${DK_MACROS_PATH=$default_macros_path} $prefix/lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt
 
 for path in $paths; do
     name=$(basename $path)
