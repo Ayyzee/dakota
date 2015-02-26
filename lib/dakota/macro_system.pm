@@ -91,6 +91,7 @@ my $constraints = {
 };
 
 my $debug;
+my $gbl_match_count = 0;
 
 ### start of constraint variable defns
 sub list_member_term  { # move to a language specific macro
@@ -294,7 +295,14 @@ sub macro_expand_recursive {
 
     if (-1 != $last_index) {
       #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
-      &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
+      my $lhs_num_tokens = $last_index - $i + 1;
+      my ($length_common, $length_rhs) = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
+      if ($lhs_num_tokens == $length_common && $length_common == $length_rhs) {
+        die "INFINITE (with no change)\n";
+      }
+      elsif ($lhs_num_tokens == $length_common) {
+        die "INFINITE (with change - increased length)\n";
+      }
       $change_count++;
 
       if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r}) {
@@ -450,6 +458,7 @@ sub regex_from_str {
 }
 sub rule_match {
   my ($sst, $i, $pattern, $user_data, $macros, $name) = @_;
+  $gbl_match_count++;
   my $debug2_str = '';
   my $debug3_str = '';
 
@@ -535,7 +544,9 @@ sub rule_replace {
   &sst::shift_leading_ws($sst, $i);
   my $lhs_num_tokens = $last_index - $i + 1;
   &debug_print_replace($template, $rhs, $lhs_num_tokens);
-  &sst::splice($sst, $i, $lhs_num_tokens, $rhs);
+  my $length_common = &sst::splice($sst, $i, $lhs_num_tokens, $rhs); # returns number of sequential tokens identical (from 0) in both lhs and rhs
+  my $length_rhs = 0 + @$rhs;
+  return ($length_common, $length_rhs);
 }
 sub lang_user_data {
   my $user_data;
@@ -572,11 +583,14 @@ unless (caller) {
   my $output_dir = 'macro-system-test-output';
   mkdir $output_dir;
   $Data::Dumper::Indent = 0; # redundant, but added for clarity
+  my $num_macros = scalar keys %$macros;
+  my $num_tkns = 0;
 
   foreach my $file (@ARGV) {
     print STDERR $file, "\n";
     my $filestr = &dakota::filestr_from_file($file);
     my $sst = &sst::make($filestr, $file);
+    $num_tkns += @{$$sst{'tokens'}};
     &macros_expand($sst, $macros, $user_data);
     #$$changes{'file'}{$file} = &sst::change_report($sst);
     $$changes{'files'}{$file} = $$sst{'changes'};
@@ -615,6 +629,10 @@ unless (caller) {
   print sort @$lines;
   print "num-files=$$summary{'num-files'}\n";
   print "num-changes-total=$$summary{'num-changes'}\n";
+  print "num-macros=$num_macros\n";
+  print "num-tkns=$num_tkns\n";
+  print "num-macros * num-tkns=" . $num_macros * $num_tkns . "\n";
+  print "match-count=$gbl_match_count\n";
 };
 
 1;

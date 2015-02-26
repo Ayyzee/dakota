@@ -182,12 +182,26 @@
       'template' => [ '?/if|while/', '?2', '?ident', 'in', 'dk', '::', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
     } ],
   },
+  'if-or-while' => { # this could just have patterns (a missing template implies echoing the pattern match)
+    'before' => [],
+    'rules' => [ {
+      'pattern'  => [ 'if' ],
+      'template' => [ 'if' ],
+    }, {
+      'pattern'  => [ 'while' ],
+      'template' => [ 'while' ],
+    } ],
+  },
   # if|while (e [not] in tbl)
   'if-or-while-in-iterable' => { # optional 'not'
     'before' => [ 'if-or-while-in-keys-or-elements-iterable' ],
+    'aux-rules' => { # this could just have patterns (a missing template implies echoing the pattern match)
+      '?cond-open' =>  [ { 'pattern' => [ '(' ], 'template' => [ '(' ] } ],
+      '?cond-close' => [ { 'pattern' => [ ')' ], 'template' => [ ')' ] } ],
+    },
     'rules' => [ {
-      'pattern'  => [ '?/if|while/', '(',  '?ident',             'in',      '?list-member',                ')'  ],
-      'template' => [ '?/if|while/', '?2',           'dk', '::', 'in', '(', '?list-member', '?ident', ')', '?6' ]
+      'pattern'  => [ '?/if|while/', '(',  '?ident',             'in',      '?list-member',                     ')'  ],
+      'template' => [ '?/if|while/', '?2',           'dk', '::', 'in', '(', '?list-member', ',', '?ident', ')', '?6' ]
     } ],
   },
   # for (object-t e [not] in [keys|elements] tbl)
@@ -214,6 +228,8 @@
   # comments
   # how about include <...> ;
   # how about trait ?list-in ;
+
+  # only in template: ?(my-fuction some-pattern-var) to do some textual transformation (also passes in macro or macro/sub-macro name and rule number)
 
   # $()   tuple
   # $[]   vector
