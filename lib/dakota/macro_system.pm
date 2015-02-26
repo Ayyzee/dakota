@@ -320,12 +320,7 @@ sub macros_expand_index {
 }
 sub macros_expand {
   my ($sst, $macros, $user_data) = @_;
-  foreach my $macro_name (sort keys %$macros) {
-    foreach my $after (@{$$macros{$macro_name}{'after'} ||= [] }) {
-      push @{$$macros{$after}{'before'}}, $macro_name;
-    }
-    delete $$macros{$macro_name}{'after'};
-  }
+
   if ($debug) {
     print STDERR "[\n";
   }
