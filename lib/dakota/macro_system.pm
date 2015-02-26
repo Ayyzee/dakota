@@ -50,9 +50,9 @@ use Data::Dumper;
 $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
-$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Useqq     = 0;
 $Data::Dumper::Sortkeys  = 1;
-$Data::Dumper::Indent    = 1;   # default = 2
+$Data::Dumper::Indent    = 0;   # default = 2
 
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
@@ -345,7 +345,7 @@ sub rhs_dump {
 
   foreach my $tkn (@$rhs) {
     $str .= $delim;
-    $str .= "\"$$tkn{'str'}\"";
+    $str .= "'$$tkn{'str'}'";
     $delim = ',';
   }
   return "\[$str\]";
@@ -388,10 +388,8 @@ sub debug_str_match {
 sub debug_print_match {
   my ($name, $str2, $str3, $i, $last_index, $pattern, $sst) = @_;
   if ($debug >= 2 || $last_index != -1 && $debug >= 1) {
-    my $indent = $Data::Dumper::Indent;
-    $Data::Dumper::Indent = 0;
     print STDERR " {\n";
-    print STDERR "  'macro' =>          \"$name\"", ",\n";
+    print STDERR "  'macro' =>          '$name'", ",\n";
 
     if (2 <= $debug && ('' ne $str2 || '' ne $str3)) {
       print STDERR "  'details' =>", "\n";
@@ -405,7 +403,6 @@ sub debug_print_match {
     print STDERR "  'range' =>          ", &Dumper([$i, $last_index]), ",\n";
     print STDERR "  'pattern' =>        ", &Dumper($pattern), ",\n";
     print STDERR "  'lhs' =>            ", &sst::dump($sst, $i, $last_index), ",\n";
-    $Data::Dumper::Indent = $indent;
 
     if (-1 == $last_index) {
       print STDERR " },\n";
@@ -575,6 +572,7 @@ unless (caller) {
 
   my $output_dir = 'macro-system-test-output';
   mkdir $output_dir;
+  $Data::Dumper::Indent = 0; # redundant, but added for clarity
 
   foreach my $file (@ARGV) {
     print STDERR $file, "\n";
@@ -589,6 +587,7 @@ unless (caller) {
     print $out &sst_fragment::filestr($$sst{'tokens'});
     close($out);
   }
+  $Data::Dumper::Indent = 1;
   my $path = "$output_dir/changes.pl";
   open(my $out, ">", $path) or die "cannot open > $path: $!";
   print $out &Dumper($changes);

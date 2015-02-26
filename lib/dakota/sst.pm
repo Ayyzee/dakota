@@ -391,7 +391,7 @@ sub sst::dump {
   for (my $i = $begin_index; $i <= $end_index; $i++) {
     my $tkn .= &sst::at($sst, $i);
     $str .= $delim;
-    $str .= "\"$tkn\"";
+    $str .= "'$tkn'";
     $delim = ',';
   }
   return "\[$str\]";
