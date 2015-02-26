@@ -442,14 +442,24 @@ sub sst::_process_ws {
   }
   return $new_seq;
 }
+sub min { my ($x, $y) = @_; return $x <= $y ? $x : $y; }
+sub max { my ($x, $y) = @_; return $x >= $y ? $x : $y; }
 sub sst::splice {
   my ($sst, $index, $length, $seq) = @_;
   my $empty_rhs_ws = &sst::_process_ws_first($sst, $index, $length, $seq);
   my $new_seq = &sst::_process_ws($sst, $index, $length, $seq);
   #my $new_seq = $seq;
   #print STDERR &Dumper($seq), "\n";
+  my $length_common = 0;
+  my $length_min = &min($length, 0 + @$new_seq);
+  for (my $i = 0; $i < $length_min; $i++) {
+    if ($$sst{'tokens'}[$index + $i]{'str'} eq $$new_seq[$i]{'str'}) {
+      $length_common++;
+    }
+  }
   splice @{$$sst{'tokens'}}, $index, $length, @$new_seq;
   &sst::_process_ws_last($sst, $index, $length, $seq, $empty_rhs_ws);
+  return $length_common;
 }
 sub sst_fragment::filestr {
   my ($sst_fragment) = @_;
