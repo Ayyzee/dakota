@@ -327,7 +327,7 @@ sub macros_expand {
     delete $$macros{$macro_name}{'after'};
   }
   if ($debug) {
-    print STDERR "[", "\n";
+    print STDERR "[\n";
   }
   for (my $i = 0; $i < @{$$sst{'tokens'}}; $i++) {
     while (&macros_expand_index($sst, $i, $macros, $user_data)) {
@@ -335,7 +335,7 @@ sub macros_expand {
     }
   }
   if ($debug) {
-    print STDERR "]", ",\n";
+    print STDERR "],\n";
   }
 }
 sub rhs_dump {
@@ -388,21 +388,24 @@ sub debug_str_match {
 sub debug_print_match {
   my ($name, $str2, $str3, $i, $last_index, $pattern, $sst) = @_;
   if ($debug >= 2 || $last_index != -1 && $debug >= 1) {
-    print STDERR " {\n";
-    print STDERR "  'macro' =>          '$name'", ",\n";
+    print STDERR
+      " {\n" .
+      "  'macro' =>          '$name',\n";
 
     if (2 <= $debug && ('' ne $str2 || '' ne $str3)) {
-      print STDERR "  'details' =>", "\n";
-      print STDERR "  \[", "\n";
-      print STDERR $str2;
+      print STDERR
+        "  'details' =>\n" .
+        "  \[\n" .
+        $str2;
       if (3 <= $debug) {
         print STDERR $str3;
       }
-      print STDERR "  \]", ",\n";
+      print STDERR "  \],\n";
     }
-    print STDERR "  'range' =>          ", &Dumper([$i, $last_index]), ",\n";
-    print STDERR "  'pattern' =>        ", &Dumper($pattern), ",\n";
-    print STDERR "  'lhs' =>            ", &sst::dump($sst, $i, $last_index), ",\n";
+    print STDERR
+      "  'range' =>          " . &Dumper([$i, $last_index]) . ",\n" .
+      "  'pattern' =>        " . &Dumper($pattern) . ",\n" .
+      "  'lhs' =>            " . &sst::dump($sst, $i, $last_index) . ",\n";
 
     if (-1 == $last_index) {
       print STDERR " },\n";
@@ -412,12 +415,13 @@ sub debug_print_match {
 sub debug_print_replace {
   my ($template, $rhs, $lhs_num_tokens) = @_;
   if ($debug) {
-    print STDERR "  'template' =>       ", &Dumper($template), ",\n";
-    print STDERR "  'rhs' =>            ", &rhs_dump($rhs), ",\n";
     my $rhs_num_tokens = scalar @$rhs;
-    print STDERR "  'lhs-num-tokens' => $lhs_num_tokens", ",\n";
-    print STDERR "  'rhs-num-tokens' => $rhs_num_tokens", ",\n";
-    print STDERR " }", ",\n";
+    print STDERR
+      "  'template' =>       " . &Dumper($template) . ",\n" .
+      "  'rhs' =>            " . &rhs_dump($rhs) . ",\n" .
+      "  'lhs-num-tokens' => $lhs_num_tokens" . ",\n" .
+      "  'rhs-num-tokens' => $rhs_num_tokens" . ",\n" .
+      " },\n";
   }
 }
 sub literal {
