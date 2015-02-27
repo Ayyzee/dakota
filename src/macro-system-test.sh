@@ -13,6 +13,7 @@ default_macros_path=$prefix/lib/dakota/macros.pl
 
 DKT_MACROS_DEBUG=0 DK_MACROS_PATH=${DK_MACROS_PATH=$default_macros_path} $prefix/lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt
 
+if false; then
 for path in $paths; do
     name=$(basename $path)
 
@@ -25,6 +26,7 @@ for path in $paths; do
         /bin/echo "***"
     fi
 done
+fi
 
 cat /tmp/summary-$$.txt
 rm /tmp/summary-$$.txt

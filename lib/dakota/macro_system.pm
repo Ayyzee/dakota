@@ -297,20 +297,20 @@ sub macro_expand_recursive {
       #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
       my $lhs_num_tokens = $last_index - $i + 1;
       my ($length_common, $length_rhs) = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
-      if ($lhs_num_tokens == $length_common && $length_common == $length_rhs) {
-        die "INFINITE (with no change)\n";
-      }
-      elsif ($lhs_num_tokens == $length_common) {
-        die "INFINITE (with change - increased length)\n";
-      }
-      $change_count++;
 
-      if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r}) {
-        $$sst{'changes'}{'macros'}{$macro_name}{$r} = 0;
+      if ($lhs_num_tokens == $length_common && $length_common != $length_rhs) {
+        die "ERROR: infinite loop: macro $macro_name/rule[$r]\n";
       }
-      $$sst{'changes'}{'macros'}{$macro_name}{$r}++;
 
-      last;
+      if ($lhs_num_tokens > $length_common) {
+        if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r}) {
+          $$sst{'changes'}{'macros'}{$macro_name}{$r} = 0;
+        }
+        $$sst{'changes'}{'macros'}{$macro_name}{$r}++;
+
+        $change_count++;
+        last;
+      }
     }
   }
   return $change_count;
