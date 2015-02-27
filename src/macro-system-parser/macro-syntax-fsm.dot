@@ -24,16 +24,15 @@ digraph "macro-syntax-fsm"
   node [ shape = circle, width = 0.6, fontsize = 16 ];
   node [ label = "" ]; // comment out this line if you want the node names displayed
 
+  // on OS X/darwin it wants Courier-Bold and Courier-Oblique
   edge [ fontname = "Courier-Bold", minlen = 2.0, fontsize = 16 ];
 
-  st [ style = invis ];
+  00 [ style = invis ];
   14 [ shape = doublecircle ];
 
-  st -> 00;
-  00 -> 01 [ label = "main", weight = 5.0 ];
-  00 -> 02 [ label = "macro", tailport = n, headport = n ];
+  00 -> 01 [ weight = 5.0 ];
   01 -> 02 [ label = "macro", weight = 5.0 ];
-  03 -> 01 [ label = "macro", tailport = s, headport = s, style = dashed, dir = back ];
+  01 -> 03 [ label = "macro", tailport = n, headport = n ];
   02 -> 03 [ label = "ident", weight = 5.0, fontname = "Courier-Oblique" ];
   03 -> 04 [ label = "[", weight = 5.0 ];
   03 -> 06 [ label = "{", tailport = n, headport = n ];
