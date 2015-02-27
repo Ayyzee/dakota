@@ -26,12 +26,15 @@ digraph "macro-syntax-fsm"
 
   edge [ fontname = "Courier-Bold", minlen = 2.0, fontsize = 16 ];
 
-  00 [ style = invis ];
+  st [ style = invis ];
   14 [ shape = doublecircle ];
 
-  00 -> 01;
-  01 -> 02 [ label = "macro" ];
-  02 -> 03 [ label = "ident", fontname = "Courier-Oblique" ];
+  st -> 00;
+  00 -> 01 [ label = "main", weight = 5.0 ];
+  00 -> 02 [ label = "macro", tailport = n, headport = n ];
+  01 -> 02 [ label = "macro", weight = 5.0 ];
+  03 -> 01 [ label = "macro", tailport = s, headport = s, style = dashed, dir = back ];
+  02 -> 03 [ label = "ident", weight = 5.0, fontname = "Courier-Oblique" ];
   03 -> 04 [ label = "[", weight = 5.0 ];
   03 -> 06 [ label = "{", tailport = n, headport = n ];
   04 -> 04 [ label = "ident", fontname = "Courier-Oblique" tailport = s, headport = s, dir = back, color = blue ];
