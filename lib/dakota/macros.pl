@@ -51,11 +51,11 @@
   'keyword-args-use' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'NULL-KEYWORD', ',',                    '?symbol', '=>', '?list-member'                       ],
-      'template' => [                      '__keyword', '::', '?symbol', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+      'pattern'  => [ 'NULL-KEYWORD', ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
+      'template' => [                      '__keyword', '::', '_', '##', '?3',                   ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
     }, {
-      'pattern'  => [                 ',',                    '?symbol', '=>', '?list-member'                       ],
-      'template' => [                 ',', '__keyword', '::', '?symbol', ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+      'pattern'  => [                 ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
+      'template' => [                 ',', '__keyword', '::', '_', '##', '?2',                   ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
     } ],
   },
   'keyword-args-wrap' => {
@@ -65,7 +65,7 @@
       'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
     }, {
       'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
-      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?5',           ',', '?list-member', ',', 'NULL-KEYWORD', ')' ] # hackhack
+      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?5',           ',', '?7',           ',', 'NULL-KEYWORD', ')' ] # hackhack
     } ],
   },
   'method-alias' => {
@@ -79,7 +79,7 @@
     'before' => [ 'method-alias' ],
     'rules' => [ {
       'pattern'  => [                         '?visibility', 'method', '?type', 'va', '?/(::?)/', '?ident', '?list', '?block'      ],
-      'template' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',             '?ident', '?list', '?block', '}' ]
+      'template' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',                   '?ident', '?list', '?block', '}' ]
     } ],
   },
   'export-method' => {
@@ -99,8 +99,8 @@
   'super' => {
     'before' => [],
     'rules' => [ { # try to merge both super rules (make the va: optional)
-      'pattern'  => [ 'dk', '?/(::?)/',             '?ident', '(', 'super',                                           '?list-member-term' ],
-      'template' => [ 'dk', '?/(::?)/',             '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
+      'pattern'  => [ 'dk', '?/(::?)/',                   '?ident', '(', 'super',                                           '?list-member-term' ],
+      'template' => [ 'dk', '?/(::?)/',                   '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
     }, {   # for the very rare case that a user calls the dk:va: generic
       'pattern'  => [ 'dk', '?/(::?)/', 'va', '?/(::?)/', '?ident', '(', 'super',                                           '?list-member-term' ],
       'template' => [ 'dk', '?/(::?)/', 'va', '?4',       '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
