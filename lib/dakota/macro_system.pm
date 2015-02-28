@@ -274,13 +274,12 @@ sub balenced_in {
 }
 ### end of constraint variable defns
 sub macro_expand_recursive {
-  my ($sst, $i, $macros, $macro_name, $expanded_macro_names, $user_data) = @_;
-  my $macro = $$macros{$macro_name};
+  my ($sst, $i, $macros, $macro_name, $macro, $expanded_macro_names, $user_data) = @_;
   my $change_count = 0;
 
   foreach my $depend_macro_name (@{$$macro{'before'}}) {
     if (!exists($$expanded_macro_names{$depend_macro_name})) {
-      $change_count += &macro_expand_recursive($sst, $i, $macros, $depend_macro_name,
+      $change_count += &macro_expand_recursive($sst, $i, $macros, $depend_macro_name, $$macros{$depend_macro_name},
                                                $expanded_macro_names, $user_data);
       $$expanded_macro_names{$depend_macro_name} = 1;
     }
@@ -320,7 +319,7 @@ sub macros_expand_index {
   my $change_count = 0;
 
   foreach my $macro_name (sort keys %$macros) {
-    if ($change_count = &macro_expand_recursive($sst, $i, $macros, $macro_name, {}, $user_data)) {
+    if ($change_count = &macro_expand_recursive($sst, $i, $macros, $macro_name, $$macros{$macro_name}, {}, $user_data)) {
       last;
     }
   }
