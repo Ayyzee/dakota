@@ -455,6 +455,8 @@ sub sst::splice {
   for (my $i = 0; $i < $length_min; $i++) {
     if ($$sst{'tokens'}[$index + $i]{'str'} eq $$new_seq[$i]{'str'}) {
       $common_num_tokens++;
+    } else {
+      break;
     }
   }
   splice @{$$sst{'tokens'}}, $index, $length, @$new_seq;
