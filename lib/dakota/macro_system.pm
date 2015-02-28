@@ -70,24 +70,24 @@ my $dqstr = qr/(?<!\\)".*?(?<!\\)"/;
 #my $dqstr = qr/"(?:[^"\\]++|\\.)*+"/; # from the web
 
 my $constraints = {
-  '?balenced' =>         \&balenced,
-  '?balenced-in' =>      \&balenced_in,
-  '?block' =>            \&block,
-  '?block-in' =>         \&block_in,
-  '?dquote-str' =>       \&dquote_str,
-  '?ident' =>            \&ident,
-  '?kw-args-ident-1' =>       \&kw_args_ident_1,
-  '?kw-args-ident-2' =>       \&kw_args_ident_2,
-  '?kw-args-ident-3' =>       \&kw_args_ident_3,
-  '?kw-args-ident-4' =>       \&kw_args_ident_4,
-  '?list' =>             \&list,
-  '?list-in' =>          \&list_in,
-  '?list-member-term' => \&list_member_term, # move to a language specific macro
-  '?list-member' =>      \&list_member,
-  '?symbol' =>           \&symbol,
-  '?type' =>             \&type,
-  '?type-ident' =>       \&type_ident,
-  '?visibility' =>       \&visibility, # move to a language specific macro
+  'balenced' =>         \&balenced,
+  'balenced-in' =>      \&balenced_in,
+  'block' =>            \&block,
+  'block-in' =>         \&block_in,
+  'dquote-str' =>       \&dquote_str,
+  'ident' =>            \&ident,
+  'kw-args-ident-1' =>       \&kw_args_ident_1,
+  'kw-args-ident-2' =>       \&kw_args_ident_2,
+  'kw-args-ident-3' =>       \&kw_args_ident_3,
+  'kw-args-ident-4' =>       \&kw_args_ident_4,
+  'list' =>             \&list,
+  'list-in' =>          \&list_in,
+  'list-member-term' => \&list_member_term, # move to a language specific macro
+  'list-member' =>      \&list_member,
+  'symbol' =>           \&symbol,
+  'type' =>             \&type,
+  'type-ident' =>       \&type_ident,
+  'visibility' =>       \&visibility, # move to a language specific macro
 };
 
 my $debug;
@@ -290,7 +290,7 @@ sub macro_expand_recursive {
     last if $i > $num_tokens - @{$$rule{'pattern'}};
 
     my ($last_index, $rhs_for_pattern, $lhs)
-      = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name);
+      = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name, $macro);
 
     if (-1 != $last_index) {
       #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
@@ -388,11 +388,11 @@ sub debug_str_match {
   return $str;
 }
 sub debug_print_match {
-  my ($name, $str2, $str3, $i, $last_index, $pattern, $sst) = @_;
+  my ($macro_name, $str2, $str3, $i, $last_index, $pattern, $sst) = @_;
   if ($debug >= 2 || $last_index != -1 && $debug >= 1) {
     print STDERR
       " {\n" .
-      "  'macro' =>          '$name',\n";
+      "  'macro' =>          '$macro_name',\n";
 
     if (2 <= $debug && ('' ne $str2 || '' ne $str3)) {
       print STDERR
@@ -426,7 +426,7 @@ sub debug_print_replace {
       " },\n";
   }
 }
-sub literal {
+sub literal { # not a constraint
   my ($sst, $index, $literal) = @_;
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
@@ -436,7 +436,7 @@ sub literal {
   }
   return $result;
 }
-sub regex {
+sub regex { # not a constraint
   my ($sst, $index, $regex) = @_;
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
@@ -448,15 +448,8 @@ sub regex {
   }
   return ($result, $re_match);
 }
-sub regex_from_str {
-  my ($str) = @_;
-  $str =~ s|^\?(.+)$|$1|; # strip off leading ? if present
-  $str =~ s|^/(.+)/$|$1|; # strip off leading and trailing / if present
-  $str =~ s|^\((.+)\)$|$1|; # strip off leading ( and trailing ) if present
-  return qr/($str)/;
-}
 sub rule_match {
-  my ($sst, $i, $pattern, $user_data, $macros, $name) = @_;
+  my ($sst, $i, $pattern, $user_data, $macros, $macro_name, $macro) = @_;
   $gbl_match_count++;
   my $debug2_str = '';
   my $debug3_str = '';
@@ -469,34 +462,38 @@ sub rule_match {
     my $constraint_name;
 
   SWITCH: {
-      ($$pattern[$j] =~ /^\?\/.+\/$/) && do { # ?/some-regex/
+      ($$pattern[$j] =~ /^\?\/(.+)\/$/) && do { # ?/some-regex/
+        my $re_str = $1;
         # match by regex
         my $re_match;
-        ($last_index, $re_match) = &regex($sst, $prev_last_index, &regex_from_str($$pattern[$j]));
+        #($last_index, $re_match) = &regex($sst, $prev_last_index, &regex_from_str($re_str)); # regex() is not a constraint
+        ($last_index, $re_match) = &regex($sst, $prev_last_index, qr/$re_str/); # regex() is not a constraint
         $match = [ { 'str' => $re_match } ];
         last SWITCH;
       };
-      ($$pattern[$j] =~ /^\?$k+$/) && do { # ?some-ident
+      ($$pattern[$j] =~ /^\?($k+)$/) && do { # ?some-ident
+        my $pattern_name = $1;
         # 0: look for aux-rule pattern
+        my $aux_rule = $$macro{'aux-rules'}{$pattern_name};
 
         # 1: look for other macro with name
-        my $macro = $$macros{$name};
+        my $macro = $$macros{$pattern_name};
         # match by other macro rhs
 
         # 2: look for constraint
-        my $constraint = $$constraints{$$pattern[$j]};
+        my $constraint = $$constraints{$pattern_name};
         if (!defined $constraint) {
-          die "Could not find implementation for constraint $$pattern[$j]";
+          die "Could not find implementation for constraint $pattern_name";
         }
         # match by constraint
-        $last_index = &$constraint($sst, $prev_last_index, $$pattern[$j], $user_data);
+        $last_index = &$constraint($sst, $prev_last_index, $pattern_name, $user_data);
         $match = [ @{$$sst{'tokens'}}[$prev_last_index..$last_index] ];
-        $constraint_name = $$pattern[$j];
+        $constraint_name = $pattern_name;
         last SWITCH;
       };
-      ($$pattern[$j] =~ /^[^?]+$/) && do { # anything not begining with ?
+      ($$pattern[$j] =~ /^[^?].*$/) && do { # anything not begining with ?
         # match by literal
-        $last_index = &literal($sst, $prev_last_index, $$pattern[$j]);
+        $last_index = &literal($sst, $prev_last_index, $$pattern[$j]); # literal() is not a constraint
         $match = [ { 'str' => "$$sst{'tokens'}[$last_index]{'str'}" } ];
         $constraint_name = undef;
         last SWITCH;
@@ -518,11 +515,11 @@ sub rule_match {
       last;
     }
   }
-  &debug_print_match($name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst);
+  &debug_print_match($macro_name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst);
   return ($last_index, $rhs_for_pattern, $lhs);
 }
 sub rule_replace {
-  my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $name) = @_;
+  my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $macro_name) = @_;
   my $rhs = [];
   foreach my $tkn (@$template) {
     die if !$tkn;

@@ -16,14 +16,14 @@
   'klass-or-trait-decl' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ '?/klass|trait/', '?ident', ';' ],
+      'pattern'  => [ '?/(klass|trait)/', '?ident', ';' ],
       'template' => []
     } ],
   },
   'klass-or-trait-defn' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ '?/klass|trait/', '?ident', '{' ],
+      'pattern'  => [ '?/(klass|trait)/', '?ident', '{' ],
       'template' => [ 'namespace',      '?ident', '{' ]
     } ],
   },
@@ -142,15 +142,15 @@
   'throw-make-or-box' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'throw',                                       '?/make|box/', '(',  '?list-in', ')'       ],
-      'template' => [ 'throw', 'dkt-capture-current-exception', '(', '?/make|box/', '?3', '?list-in', '?5', ')' ]
+      'pattern'  => [ 'throw',                                       '?/(make|box)/', '(',  '?list-in', ')'       ],
+      'template' => [ 'throw', 'dkt-capture-current-exception', '(', '?/(make|box)/', '?3', '?list-in', '?5', ')' ]
     } ],
   },
   'throw-make-or-box-parens' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'throw', '(',                                        '?/make|box/', '(',  '?list-in', ')',  ')'       ],
-      'template' => [ 'throw', '?2', 'dkt-capture-current-exception', '(', '?/make|box/', '?4', '?list-in', '?6', '?7', ')' ]
+      'pattern'  => [ 'throw', '(',                                        '?/(make|box)/', '(',  '?list-in', ')',  ')'       ],
+      'template' => [ 'throw', '?2', 'dkt-capture-current-exception', '(', '?/(make|box)/', '?4', '?list-in', '?6', '?7', ')' ]
     } ],
   },
   'make' => {
@@ -178,8 +178,8 @@
   'if-or-while-in-keys-or-elements-iterable' => { # optional 'not' and optional 'keys|elements'
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ '?/if|while/', '(',  '?ident', 'in',             '?/keys|elements/',      '?list-member',      ')'  ],
-      'template' => [ '?/if|while/', '?2', '?ident', 'in', 'dk', '::', '?/keys|elements/', '(', '?list-member', ')', '?7' ]
+      'pattern'  => [ '?/(if|while)/', '(',  '?ident', 'in',             '?/(keys|elements)/',      '?list-member',      ')'  ],
+      'template' => [ '?/(if|while)/', '?2', '?ident', 'in', 'dk', '::', '?/(keys|elements)/', '(', '?list-member', ')', '?7' ]
     } ],
   },
   'if-or-while' => { # this could just have patterns (a missing template implies echoing the pattern match)
@@ -200,16 +200,16 @@
       '?cond-close' => [ { 'pattern' => [ ')' ], 'template' => [ ')' ] } ],
     },
     'rules' => [ {
-      'pattern'  => [ '?/if|while/', '(',  '?ident',             'in',      '?list-member',                     ')'  ],
-      'template' => [ '?/if|while/', '?2',           'dk', '::', 'in', '(', '?list-member', ',', '?ident', ')', '?6' ]
+      'pattern'  => [ '?/(if|while)/', '(',  '?ident',             'in',      '?list-member',                     ')'  ],
+      'template' => [ '?/(if|while)/', '?2',           'dk', '::', 'in', '(', '?list-member', ',', '?ident', ')', '?6' ]
     } ],
   },
   # for (object-t e [not] in [keys|elements] tbl)
   'for-in-iterable-with-keys-or-elements' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'for', '(',  'object-t', '?ident', 'in',             '?/keys|elements/',      '?list-member',      ')'  ],
-      'template' => [ 'for', '?2', 'object-t', '?ident', 'in', 'dk', '::', '?/keys|elements/', '(', '?list-member', ')', '?8' ]
+      'pattern'  => [ 'for', '(',  'object-t', '?ident', 'in',             '?/(keys|elements)/',      '?list-member',      ')'  ],
+      'template' => [ 'for', '?2', 'object-t', '?ident', 'in', 'dk', '::', '?/(keys|elements)/', '(', '?list-member', ')', '?8' ]
     } ],
   },
   # for (object-t e [not] in seq)
