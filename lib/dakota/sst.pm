@@ -448,6 +448,7 @@ sub max { my ($x, $y) = @_; return $x >= $y ? $x : $y; }
 sub sst::splice {
   my ($sst, $index, $lhs_num_tokens, $rhs) = @_;
 
+  $rhs = &dakota::util::flatten($rhs);
   my $common_num_tokens = 0;
   my $rhs_num_tokens = scalar @$rhs;
   my $min_num_tokens = &min($lhs_num_tokens, $rhs_num_tokens);

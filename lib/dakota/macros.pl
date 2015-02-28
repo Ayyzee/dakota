@@ -61,11 +61,11 @@
   'keyword-args-wrap' => {
     'before' => [ 'keyword-args-use', 'super' ],
     'rules' => [ {
-      'pattern'  => [ 'dk', '::', '?kw-args-ident-1', '(', '?list-member',                      ')' ],
-      'template' => [ 'dk', '::', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+      'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member',                      ')' ],
+      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
     }, {
-      'pattern'  => [ 'dk', '::', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
-      'template' => [ 'dk', '::', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+      'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
+      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?5',           ',', '?list-member', ',', 'NULL-KEYWORD', ')' ] # hackhack
     } ],
   },
   'method-alias' => {
@@ -78,7 +78,7 @@
   'va-method-defn' => {
     'before' => [ 'method-alias' ],
     'rules' => [ {
-      'pattern'  => [                         '?visibility', 'method', '?type', 'va', '::', '?ident', '?list', '?block'      ],
+      'pattern'  => [                         '?visibility', 'method', '?type', 'va', '?/(::?)/', '?ident', '?list', '?block'      ],
       'template' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',             '?ident', '?list', '?block', '}' ]
     } ],
   },
@@ -99,11 +99,11 @@
   'super' => {
     'before' => [],
     'rules' => [ { # try to merge both super rules (make the va: optional)
-      'pattern'  => [ 'dk', '::',             '?ident', '(', 'super',                                           '?list-member-term' ],
-      'template' => [ 'dk', '::',             '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
+      'pattern'  => [ 'dk', '?/(::?)/',             '?ident', '(', 'super',                                           '?list-member-term' ],
+      'template' => [ 'dk', '?/(::?)/',             '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
     }, {   # for the very rare case that a user calls the dk:va: generic
-      'pattern'  => [ 'dk', '::', 'va', '::', '?ident', '(', 'super',                                           '?list-member-term' ],
-      'template' => [ 'dk', '::', 'va', '::', '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
+      'pattern'  => [ 'dk', '?/(::?)/', 'va', '?/(::?)/', '?ident', '(', 'super',                                           '?list-member-term' ],
+      'template' => [ 'dk', '?/(::?)/', 'va', '?4',       '?ident', '(', 'super', '(', '{', 'self', ',', 'klass', '}', ')', '?list-member-term' ]
     } ],
   },
   'slot-access' => {
@@ -116,8 +116,8 @@
   'explicit-box-literal' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ '?ident', '::', 'box', '(',                 '{', '?block-in', '}',      ')'  ],
-      'template' => [ '?ident', '::', 'box', '?4', '?ident', '(', '{', '?block-in', '}', ')', '?8' ]
+      'pattern'  => [ '?ident', '?/(::?)/', 'box', '(',                 '{', '?block-in', '}',      ')'  ],
+      'template' => [ '?ident', '?/(::?)/', 'box', '?4', '?ident', '(', '{', '?block-in', '}', ')', '?8' ]
     } ],
   },
   'construct-klass-slots-literal' => {

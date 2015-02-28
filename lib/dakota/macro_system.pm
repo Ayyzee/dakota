@@ -45,6 +45,7 @@ use warnings;
 
 use dakota::sst;
 use dakota::dakota;
+use dakota::util;
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -295,7 +296,7 @@ sub macro_expand_recursive {
     if (-1 != $last_index) {
       #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
       my $lhs_num_tokens = $last_index - $i + 1;
-      my ($common_num_tokens, $rhs_num_tokens) = &rule_replace($sst, $i, $last_index, $$rule{'pattern'}, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
+      my ($common_num_tokens, $rhs_num_tokens) = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
 
       if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens != $rhs_num_tokens) {
         die "ERROR: infinite loop: macro $macro_name/rule[$r]\n";
@@ -340,17 +341,25 @@ sub macros_expand {
     print STDERR "],\n";
   }
 }
-sub rhs_dump {
+sub xhs_dump {
   my ($rhs) = @_;
-  my $delim = '';
+  my $delim1 = '';
+  my $delim2 = '';
   my $str = '';
+  $str .= '[';
 
-  foreach my $tkn (@$rhs) {
-    $str .= $delim;
-    $str .= "'$$tkn{'str'}'";
-    $delim = ',';
+  foreach my $seq (@$rhs) {
+    $delim2 = '';
+    $str .= $delim1 . '[';
+    $delim1 = ',';
+    foreach my $tkn (@$seq) {
+      $str .= $delim2 . "'" . $$tkn{'str'} . "'";
+      $delim2 = ',';
+    }
+    $str .= ']';
   }
-  return "\[$str\]";
+  $str .= ']';
+  return $str;
 }
 sub debug_str_match {
   my ($i, $j, $last_index, $match, $constraint) = @_;
@@ -388,7 +397,7 @@ sub debug_str_match {
   return $str;
 }
 sub debug_print_match {
-  my ($macro_name, $str2, $str3, $i, $last_index, $pattern, $sst) = @_;
+  my ($macro_name, $str2, $str3, $i, $last_index, $pattern, $sst, $lhs) = @_;
   if ($debug >= 2 || $last_index != -1 && $debug >= 1) {
     print STDERR
       " {\n" .
@@ -407,7 +416,7 @@ sub debug_print_match {
     print STDERR
       "  'range' =>          " . &Dumper([$i, $last_index]) . ",\n" .
       "  'pattern' =>        " . &Dumper($pattern) . ",\n" .
-      "  'lhs' =>            " . &sst::dump($sst, $i, $last_index) . ",\n";
+      "  'lhs' =>            " . &xhs_dump($lhs) . ",\n";
 
     if (-1 == $last_index) {
       print STDERR " },\n";
@@ -420,7 +429,7 @@ sub debug_print_replace {
     my $rhs_num_tokens = scalar @$rhs;
     print STDERR
       "  'template' =>       " . &Dumper($template) . ",\n" .
-      "  'rhs' =>            " . &rhs_dump($rhs) . ",\n" .
+      "  'rhs' =>            " . &xhs_dump($rhs) . ",\n" .
       "  'lhs-num-tokens' => $lhs_num_tokens" . ",\n" .
       "  'rhs-num-tokens' => $rhs_num_tokens" . ",\n" .
       " },\n";
@@ -502,7 +511,7 @@ sub rule_match {
     }
     if (-1 != $last_index) {
       $$rhs_for_pattern{$$pattern[$j]} = $match;
-      push @$lhs, @$match;
+      push @$lhs, $match;
       if (2 <= $debug) {
         $debug2_str .= &debug_str_match($i, $j, $last_index, $match, $constraint_name);
       }
@@ -514,29 +523,36 @@ sub rule_match {
       last;
     }
   }
-  &debug_print_match($macro_name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst);
+  &debug_print_match($macro_name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst, $lhs);
   return ($last_index, $rhs_for_pattern, $lhs);
 }
 sub rule_replace {
-  my ($sst, $i, $last_index, $pattern, $template, $rhs_for_pattern, $lhs, $macro_name) = @_;
+  my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $macro_name) = @_;
   my $rhs = [];
   foreach my $tkn (@$template) {
     die if !$tkn;
     my $tkns;
 
     if ($tkn =~ /^\?(\d+)$/) {
-      die if 0 == $1;
+      die if 0 == $1; # ?0 should return entire match
       my $j = $1 - 1;
-      $tkns = [ { 'str' => $$pattern[$j] } ]; # not quite right (only works for literal tokens)
+      $tkns = $$lhs[$j];
     } else {
       $tkns = $$rhs_for_pattern{$tkn};
       if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
         $tkns = [ { 'str' => $tkn } ];
       }
     }
-    push @$rhs, @$tkns;
+    push @$rhs, $tkns;
   }
   &sst::shift_leading_ws($sst, $i);
+  if (0) {
+    print STDERR "LHS: " . &Dumper($lhs) . "\n";
+    print STDERR "RHS: " . &Dumper($rhs) . "\n";
+    print STDERR "lhs: " . &Dumper(&flatten($lhs)) . "\n";
+    print STDERR "rhs: " . &Dumper(&flatten($rhs)) . "\n";
+  }
+  $lhs = &dakota::util::flatten($lhs);
   my $lhs_num_tokens = $last_index - $i + 1;
   &debug_print_replace($template, $rhs, $lhs_num_tokens);
   my $common_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $rhs); # returns number of sequential tokens identical (from 0) in both lhs and rhs

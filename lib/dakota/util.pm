@@ -47,6 +47,7 @@ our @EXPORT= qw(
                  filestr_from_file
                  scalar_from_file
                  canon_path
+                 flatten
               );
 
 use Fcntl qw(:DEFAULT :flock);
@@ -57,6 +58,11 @@ sub kw_args_generics_add {
 }
 sub kw_args_generics {
   return $kw_args_generics_tbl;
+}
+sub flatten {
+    my ($a_of_a) = @_;
+    my $a = [map {@$_} @$a_of_a];
+    return $a;
 }
 sub canon_path { # should merge with rel_path_canon()
   my ($path) = @_;
