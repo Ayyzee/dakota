@@ -295,7 +295,7 @@ sub macro_expand_recursive {
     if (-1 != $last_index) {
       #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
       my $lhs_num_tokens = $last_index - $i + 1;
-      my ($common_num_tokens, $rhs_num_tokens) = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
+      my ($common_num_tokens, $rhs_num_tokens) = &rule_replace($sst, $i, $last_index, $$rule{'pattern'}, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
 
       if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens != $rhs_num_tokens) {
         die "ERROR: infinite loop: macro $macro_name/rule[$r]\n";
@@ -466,7 +466,6 @@ sub rule_match {
         my $re_str = $1;
         # match by regex
         my $re_match;
-        #($last_index, $re_match) = &regex($sst, $prev_last_index, &regex_from_str($re_str)); # regex() is not a constraint
         ($last_index, $re_match) = &regex($sst, $prev_last_index, qr/$re_str/); # regex() is not a constraint
         $match = [ { 'str' => $re_match } ];
         last SWITCH;
@@ -503,7 +502,7 @@ sub rule_match {
     }
     if (-1 != $last_index) {
       $$rhs_for_pattern{$$pattern[$j]} = $match;
-      push @$lhs, $match;
+      push @$lhs, @$match;
       if (2 <= $debug) {
         $debug2_str .= &debug_str_match($i, $j, $last_index, $match, $constraint_name);
       }
@@ -519,7 +518,7 @@ sub rule_match {
   return ($last_index, $rhs_for_pattern, $lhs);
 }
 sub rule_replace {
-  my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $macro_name) = @_;
+  my ($sst, $i, $last_index, $pattern, $template, $rhs_for_pattern, $lhs, $macro_name) = @_;
   my $rhs = [];
   foreach my $tkn (@$template) {
     die if !$tkn;
@@ -528,7 +527,7 @@ sub rule_replace {
     if ($tkn =~ /^\?(\d+)$/) {
       die if 0 == $1;
       my $j = $1 - 1;
-      $tkns = $$lhs[$j];
+      $tkns = [ { 'str' => $$pattern[$j] } ]; # not quite right (only works for literal tokens)
     } else {
       $tkns = $$rhs_for_pattern{$tkn};
       if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
