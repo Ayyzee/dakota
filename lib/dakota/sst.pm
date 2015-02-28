@@ -445,22 +445,28 @@ sub sst::_process_ws {
 sub min { my ($x, $y) = @_; return $x <= $y ? $x : $y; }
 sub max { my ($x, $y) = @_; return $x >= $y ? $x : $y; }
 sub sst::splice {
-  my ($sst, $index, $length, $seq) = @_;
-  my $empty_rhs_ws = &sst::_process_ws_first($sst, $index, $length, $seq);
-  my $new_seq = &sst::_process_ws($sst, $index, $length, $seq);
-  #my $new_seq = $seq;
-  #print STDERR &Dumper($seq), "\n";
+  my ($sst, $index, $lhs_num_tokens, $rhs_tokens) = @_;
+
   my $common_num_tokens = 0;
-  my $length_min = &min($length, scalar @$new_seq);
-  for (my $i = 0; $i < $length_min; $i++) {
-    if ($$sst{'tokens'}[$index + $i]{'str'} eq $$new_seq[$i]{'str'}) {
+  my $rhs_num_tokens = scalar @$rhs_tokens;
+  my $min_num_tokens = &min($lhs_num_tokens, $rhs_num_tokens);
+  for (my $i = 0; $i < $min_num_tokens; $i++) {
+    if ($$sst{'tokens'}[$index + $i]{'str'} eq $$rhs_tokens[$i]{'str'}) {
       $common_num_tokens++;
     } else {
-      break;
+      last;
     }
   }
-  splice @{$$sst{'tokens'}}, $index, $length, @$new_seq;
-  &sst::_process_ws_last($sst, $index, $length, $seq, $empty_rhs_ws);
+  if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens == $rhs_num_tokens) {
+    return $common_num_tokens;
+  }
+  if (0 < $common_num_tokens ) {
+    # adjust the slice smaller here
+  }
+  my $empty_rhs_ws = &sst::_process_ws_first($sst, $index, $lhs_num_tokens, $rhs_tokens);
+  my $new_rhs_tokens = &sst::_process_ws($sst, $index, $lhs_num_tokens, $rhs_tokens);
+  splice @{$$sst{'tokens'}}, $index, $lhs_num_tokens, @$new_rhs_tokens;
+  &sst::_process_ws_last($sst, $index, $lhs_num_tokens, $rhs_tokens, $empty_rhs_ws);
   return $common_num_tokens;
 }
 sub sst_fragment::filestr {
