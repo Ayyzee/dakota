@@ -450,16 +450,16 @@ sub sst::splice {
   my $new_seq = &sst::_process_ws($sst, $index, $length, $seq);
   #my $new_seq = $seq;
   #print STDERR &Dumper($seq), "\n";
-  my $length_common = 0;
-  my $length_min = &min($length, 0 + @$new_seq);
+  my $common_num_tokens = 0;
+  my $length_min = &min($length, scalar @$new_seq);
   for (my $i = 0; $i < $length_min; $i++) {
     if ($$sst{'tokens'}[$index + $i]{'str'} eq $$new_seq[$i]{'str'}) {
-      $length_common++;
+      $common_num_tokens++;
     }
   }
   splice @{$$sst{'tokens'}}, $index, $length, @$new_seq;
   &sst::_process_ws_last($sst, $index, $length, $seq, $empty_rhs_ws);
-  return $length_common;
+  return $common_num_tokens;
 }
 sub sst_fragment::filestr {
   my ($sst_fragment) = @_;
