@@ -11,6 +11,5 @@ for path in $@; do
         echo "wc -l $path macro-system-test-output/$name.cc"
         wc -l $path
         wc -l macro-system-test-output/$name.cc
-        /bin/echo "***"
     fi
 done
