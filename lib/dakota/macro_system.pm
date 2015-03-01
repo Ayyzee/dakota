@@ -468,7 +468,7 @@ sub rhs_from_template {
       my $j = $1 - 1;
       $tkns = $$lhs[$j];
     } else {
-      $tkns = $$rhs_for_pattern{$tkn};
+      $tkns = $$rhs_for_pattern{$tkn}[0];
       if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
         $tkns = [ { 'str' => $tkn } ];
       }
@@ -530,7 +530,10 @@ sub rule_match {
       die "unexpected pattern $$pattern[$j]\n";
     }
     if (-1 != $last_index) {
-      $$rhs_for_pattern{$$pattern[$j]} = $match;
+      if (!exists $$rhs_for_pattern{$$pattern[$j]}) {
+        $$rhs_for_pattern{$$pattern[$j]} = [];
+      }
+      push @{$$rhs_for_pattern{$$pattern[$j]}}, $match;
       push @$lhs, $match;
       if (2 <= $debug) {
         $debug2_str .= &debug_str_match($i, $j, $last_index, $match, $constraint_name);
@@ -573,7 +576,7 @@ sub rule_replace {
   }
   if (1) {
   if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens < $_rhs_num_tokens) {
-    die "ERROR: infinite loop: macro $macro_name\n";
+    print STDERR "warning: possible infinite loop: macro $macro_name\n";
   }
   if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens == $_rhs_num_tokens) {
     # the pattern and the template yeild are exactly the same
