@@ -456,9 +456,23 @@ sub regex { # not a constraint
   }
   return ($result, $re_match);
 }
+sub rhs_for_pattern {
+  my ($rhs_for_pattern, $index_from_tkn, $tkn) = @_;
+  my $rhs = $$rhs_for_pattern{$tkn};
+  if (!exists $$index_from_tkn{$tkn}) {
+    $$index_from_tkn{$tkn} = 0;
+  } else {
+    if ($$index_from_tkn{$tkn} + 1 < scalar @{$$rhs_for_pattern{$tkn}}) {
+      $$index_from_tkn{$tkn}++;
+    }
+  }
+  my $result = $$rhs_for_pattern{$tkn}[$$index_from_tkn{$tkn}];
+  return $result;
+}
 sub rhs_from_template {
   my ($template, $lhs, $rhs_for_pattern) = @_;
   my $rhs = [];
+  my $index_from_tkn = {};
   foreach my $tkn (@$template) {
     die if !$tkn;
     my $tkns;
@@ -468,7 +482,8 @@ sub rhs_from_template {
       my $j = $1 - 1;
       $tkns = $$lhs[$j];
     } else {
-      $tkns = $$rhs_for_pattern{$tkn}[0];
+      $tkns = &rhs_for_pattern($rhs_for_pattern, $index_from_tkn, $tkn);
+
       if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
         $tkns = [ { 'str' => $tkn } ];
       }

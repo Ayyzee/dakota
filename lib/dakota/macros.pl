@@ -65,7 +65,7 @@
       'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
     }, {
       'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
-      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?5',           ',', '?7',           ',', 'NULL-KEYWORD', ')' ] # hackhack
+      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
     } ],
   },
   'method-alias' => {
