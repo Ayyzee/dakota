@@ -273,6 +273,10 @@ sub balenced_in {
   }
   return $result;
 }
+sub assert {
+  my ($result) = @_;
+  die if $result != 0;
+}
 ### end of constraint variable defns
 sub macro_expand_recursive {
   my ($sst, $i, $macros, $macro_name, $macro, $expanded_macro_names, $user_data) = @_;
@@ -290,17 +294,12 @@ sub macro_expand_recursive {
     my $rule = $$macro{'rules'}[$r];
     last if $i > $num_tokens - @{$$rule{'pattern'}};
 
-    my ($last_index, $rhs_for_pattern, $lhs)
+    my ($last_index, $lhs, $rhs_for_pattern)
       = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name, $macro);
 
     if (-1 != $last_index) {
-      #$Data::Dumper::Indent = 1; print STDERR &Dumper($lhs);
-      my $lhs_num_tokens = $last_index - $i + 1;
-      my ($common_num_tokens, $rhs_num_tokens) = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
-
-      if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens != $rhs_num_tokens) {
-        die "ERROR: infinite loop: macro $macro_name/rule[$r]\n";
-      }
+      my ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens)
+        = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
 
       if ($lhs_num_tokens > $common_num_tokens) {
         if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r}) {
@@ -457,6 +456,27 @@ sub regex { # not a constraint
   }
   return ($result, $re_match);
 }
+sub rhs_from_template {
+  my ($template, $lhs, $rhs_for_pattern) = @_;
+  my $rhs = [];
+  foreach my $tkn (@$template) {
+    die if !$tkn;
+    my $tkns;
+
+    if ($tkn =~ /^\?(\d+)$/) {
+      die if 0 == $1; # ?0 should return entire match
+      my $j = $1 - 1;
+      $tkns = $$lhs[$j];
+    } else {
+      $tkns = $$rhs_for_pattern{$tkn};
+      if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
+        $tkns = [ { 'str' => $tkn } ];
+      }
+    }
+    push @$rhs, $tkns;
+  }
+  return $rhs
+}
 sub rule_match {
   my ($sst, $i, $pattern, $user_data, $macros, $macro_name, $macro) = @_;
   $gbl_match_count++;
@@ -470,7 +490,7 @@ sub rule_match {
     my $match;
     my $constraint_name;
 
-  SWITCH: {
+    SWITCH: {
       ($$pattern[$j] =~ /^\?\/(.+)\/$/) && do { # ?/some-regex/
         my $re_str = $1;
         # match by regex
@@ -485,7 +505,7 @@ sub rule_match {
         my $aux_rule = $$macro{'aux-rules'}{$pattern_name};
 
         # 1: look for other macro with name
-        my $macro = $$macros{$pattern_name};
+        my $m = $$macros{$pattern_name};
         # match by other macro rhs
 
         # 2: look for constraint
@@ -524,27 +544,11 @@ sub rule_match {
     }
   }
   &debug_print_match($macro_name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst, $lhs);
-  return ($last_index, $rhs_for_pattern, $lhs);
+  return ($last_index, $lhs, $rhs_for_pattern);
 }
 sub rule_replace {
   my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $macro_name) = @_;
-  my $rhs = [];
-  foreach my $tkn (@$template) {
-    die if !$tkn;
-    my $tkns;
-
-    if ($tkn =~ /^\?(\d+)$/) {
-      die if 0 == $1; # ?0 should return entire match
-      my $j = $1 - 1;
-      $tkns = $$lhs[$j];
-    } else {
-      $tkns = $$rhs_for_pattern{$tkn};
-      if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
-        $tkns = [ { 'str' => $tkn } ];
-      }
-    }
-    push @$rhs, $tkns;
-  }
+  my $rhs = &rhs_from_template($template, $lhs, $rhs_for_pattern);
   &sst::shift_leading_ws($sst, $i);
   if (0) {
     print STDERR "LHS: " . &Dumper($lhs) . "\n";
@@ -552,12 +556,36 @@ sub rule_replace {
     print STDERR "lhs: " . &Dumper(&flatten($lhs)) . "\n";
     print STDERR "rhs: " . &Dumper(&flatten($rhs)) . "\n";
   }
-  $lhs = &dakota::util::flatten($lhs);
   my $lhs_num_tokens = $last_index - $i + 1;
+  &assert($lhs_num_tokens - scalar @{&flatten($lhs)});
   &debug_print_replace($template, $rhs, $lhs_num_tokens);
-  my $common_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $rhs); # returns number of sequential tokens identical (from 0) in both lhs and rhs
-  my $rhs_num_tokens = scalar @$rhs;
-  return ($common_num_tokens, $rhs_num_tokens);
+  my $flat_rhs = &dakota::util::flatten($rhs);
+  my $_rhs_num_tokens = scalar @$flat_rhs;
+  my $common_num_tokens = 0;
+  my $min_num_tokens = &dakota::util::min($lhs_num_tokens, $_rhs_num_tokens);
+
+  for (my $k = 0; $k < $min_num_tokens; $k++) {
+    ## if $$lhs[$k] eq $$rhs[$k]
+    if ($$sst{'tokens'}[$i + $k]{'str'} eq $$flat_rhs[$k]{'str'}) {
+      $common_num_tokens++;
+    } else {
+      last;
+    }
+  }
+  if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens < $_rhs_num_tokens) {
+    die "ERROR: infinite loop: macro $macro_name\n";
+  }
+  if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens == $_rhs_num_tokens) {
+    # the pattern and the template yeild are exactly the same
+    # it would create an infinite loop
+    return ($common_num_tokens, $lhs_num_tokens, $_rhs_num_tokens);
+  }
+  if (0 < $common_num_tokens ) {
+    # adjust the slice smaller here
+  }
+  my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs); # returns number of sequential tokens identical (from 0) in both lhs and rhs
+  assert($_rhs_num_tokens - $rhs_num_tokens);
+  return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
 }
 sub lang_user_data {
   my $user_data;

@@ -15,7 +15,7 @@ default_macros_path=$prefix/lib/dakota/macros.pl
 
 DKT_MACROS_DEBUG=0 DK_MACROS_PATH=${DK_MACROS_PATH=$default_macros_path} $prefix/lib/dakota/macro_system.pm $paths > /tmp/summary-$$.txt
 
-verbose=true
+verbose=false
 
 if $verbose; then
     ./diff.sh $paths > macro-system-test-output/diff.txt

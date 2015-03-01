@@ -48,6 +48,8 @@ our @EXPORT= qw(
                  scalar_from_file
                  canon_path
                  flatten
+                 min
+                 max
               );
 
 use Fcntl qw(:DEFAULT :flock);
@@ -59,6 +61,8 @@ sub kw_args_generics_add {
 sub kw_args_generics {
   return $kw_args_generics_tbl;
 }
+sub min { my ($x, $y) = @_; return $x <= $y ? $x : $y; }
+sub max { my ($x, $y) = @_; return $x >= $y ? $x : $y; }
 sub flatten {
     my ($a_of_a) = @_;
     my $a = [map {@$_} @$a_of_a];
