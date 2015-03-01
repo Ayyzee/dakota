@@ -20,3 +20,11 @@ macro m { {} => {}
           {}
           {}
 }
+
+non-width look-around (pattern) assertions (shall only be used at beginning or ending of a pattern)
+  ?((!|=) (token|pattern-var)+)
+  such as
+    ?(! , ?ident)
+    ?(= , ?ident)
+    ?(! , nullptr)
+    ?(= , nullptr)
