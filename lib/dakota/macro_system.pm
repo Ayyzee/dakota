@@ -565,7 +565,6 @@ sub rule_replace {
   my $min_num_tokens = &dakota::util::min($lhs_num_tokens, $_rhs_num_tokens);
 
   for (my $k = 0; $k < $min_num_tokens; $k++) {
-    ## if $$lhs[$k] eq $$rhs[$k]
     if ($$sst{'tokens'}[$i + $k]{'str'} eq $$flat_rhs[$k]{'str'}) {
       $common_num_tokens++;
     } else {
