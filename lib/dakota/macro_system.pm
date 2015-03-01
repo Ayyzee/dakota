@@ -585,7 +585,7 @@ sub rule_replace {
     # adjust the slice smaller here
   }
   }
-  my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs); # returns number of sequential tokens identical (from 0) in both lhs and rhs
+  my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs);
   assert($_rhs_num_tokens - $rhs_num_tokens);
   return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
 }
