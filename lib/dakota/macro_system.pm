@@ -557,7 +557,7 @@ sub rule_replace {
     print STDERR "rhs: " . &Dumper(&flatten($rhs)) . "\n";
   }
   my $lhs_num_tokens = $last_index - $i + 1;
-  &assert($lhs_num_tokens - scalar @{&flatten($lhs)});
+  &assert($lhs_num_tokens - scalar @{&dakota::util::flatten($lhs)});
   &debug_print_replace($template, $rhs, $lhs_num_tokens);
   my $flat_rhs = &dakota::util::flatten($rhs);
   my $_rhs_num_tokens = scalar @$flat_rhs;
@@ -572,6 +572,7 @@ sub rule_replace {
       last;
     }
   }
+  if (1) {
   if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens < $_rhs_num_tokens) {
     die "ERROR: infinite loop: macro $macro_name\n";
   }
@@ -582,6 +583,7 @@ sub rule_replace {
   }
   if (0 < $common_num_tokens ) {
     # adjust the slice smaller here
+  }
   }
   my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs); # returns number of sequential tokens identical (from 0) in both lhs and rhs
   assert($_rhs_num_tokens - $rhs_num_tokens);
