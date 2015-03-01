@@ -488,7 +488,7 @@ sub rhs_from_template {
         $tkns = [ { 'str' => $tkn } ];
         if ($tkn =~ /^(\?$z+)$/) {
           my $pattern_var = $1;
-          print STDERR "<file><line>: warning: pattern-var $pattern_var found in template but not in corresponding pattern.\n";
+          print STDERR "<file>:<line>: warning: pattern-var $pattern_var found in template but not in corresponding pattern.\n";
         }
       }
     }
@@ -595,7 +595,7 @@ sub rule_replace {
   }
   if (1) {
   if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens < $_rhs_num_tokens) {
-    print STDERR "<file><line>: warning: possible infinite loop: macro $macro_name.\n";
+    print STDERR "<file>:<line>: warning: possible infinite loop: macro $macro_name.\n";
   }
   if ($lhs_num_tokens == $common_num_tokens && $common_num_tokens == $_rhs_num_tokens) {
     # the pattern and the template yeild are exactly the same
