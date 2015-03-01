@@ -531,8 +531,8 @@ klass lexer
         {
           char8-t[512] chunk = ""; cstring-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
           cstring:concat(&buf, c1);
-          object-t token = make(token:klass, $tokenid => ')', buffer => buf.ptr,
-                                line => self.line, column => self.column - buf.len);
+          object-t token = make(token:klass, $tokenid => ')', $buffer => buf.ptr,
+                                $line => self.line, $column => self.column - buf.len);
           object-t open-token;
           do {
             open-token = dk:pop(self.open-tokens);
