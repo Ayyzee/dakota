@@ -86,6 +86,8 @@
   #define DEBUG_IMPORT noexport
 #endif
 
+#define NULLPTR nullptr
+
 #if !defined HAVE_STRERROR_NAME
   import str_t strerror_name(int_t);
 #endif

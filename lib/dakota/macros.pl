@@ -51,21 +51,21 @@
   'keyword-args-use' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'NULL-KEYWORD', ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
-      'template' => [                      '__keyword', '::', '_', '##', '?3',                   ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+      'pattern'  => [ 'NULLPTR', ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
+      'template' => [                      '__keyword', '::', '_', '##', '?3',                   ',',  '?list-member', ',', 'NULLPTR'  ]
     }, {
       'pattern'  => [                 ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
-      'template' => [                 ',', '__keyword', '::', '_', '##', '?2',                   ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+      'template' => [                 ',', '__keyword', '::', '_', '##', '?2',                   ',',  '?list-member', ',', 'NULLPTR'  ]
     } ],
   },
   'keyword-args-wrap' => {
     'before' => [ 'keyword-args-use', 'super' ],
     'rules' => [ {
       'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member',                      ')' ],
-      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member', ',', 'NULLPTR', ')' ]
     }, {
       'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
-      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULL-KEYWORD', ')' ]
+      'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULLPTR', ')' ]
     } ],
   },
   'method-alias' => {
