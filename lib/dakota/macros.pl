@@ -51,20 +51,20 @@
   'keyword-args-use' => {
     'before' => [],
     'rules' => [ {
-      'pattern'  => [ 'NULLPTR', ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
-      'template' => [                      '__keyword', '::', '_', '##', '?3',                   ',',  '?list-member', ',', 'NULLPTR'  ]
+      'pattern'  => [ 'NULLPTR', ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                  ],
+      'template' => [                 '__keyword', '::', '_', '##', '?3',                   ',',  '?list-member', ',', 'NULLPTR'  ]
     }, {
-      'pattern'  => [                 ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
-      'template' => [                 ',', '__keyword', '::', '_', '##', '?2',                   ',',  '?list-member', ',', 'NULLPTR'  ]
+      'pattern'  => [            ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                  ],
+      'template' => [            ',', '__keyword', '::', '_', '##', '?2',                   ',',  '?list-member', ',', 'NULLPTR'  ]
     } ],
   },
   'keyword-args-wrap' => {
     'before' => [ 'keyword-args-use', 'super' ],
     'rules' => [ {
-      'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member',                      ')' ],
+      'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member',                 ')' ],
       'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-1', '(', '?list-member', ',', 'NULLPTR', ')' ]
     }, {
-      'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                      ')' ],
+      'pattern'  => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member',                 ')' ],
       'template' => [ 'dk', '?/(::?)/', '?kw-args-ident-2', '(', '?list-member', ',', '?list-member', ',', 'NULLPTR', ')' ]
     } ],
   },
@@ -231,8 +231,8 @@
 
   # only in template: ?(my-fuction some-pattern-var) to do some textual transformation (also passes in macro or macro/sub-macro name and rule number)
 
-  # $()   tuple
-  # $[]   vector
+  # $()   assoc
+  # $[]   sequence
   # ${}   set
   # ${=>} table
 
