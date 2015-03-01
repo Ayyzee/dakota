@@ -24,7 +24,7 @@
     'before' => [],
     'rules' => [ {
       'pattern'  => [ '?/(klass|trait)/', '?ident', '{' ],
-      'template' => [ 'namespace',      '?ident', '{' ]
+      'template' => [ 'namespace',        '?ident', '{' ]
     } ],
   },
   'superklass-decl' => {
