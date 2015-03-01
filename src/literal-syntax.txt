@@ -1,0 +1,27 @@
+symbol:
+  $ident (no such literal "empty symbol")
+
+empty string:
+  $""
+
+empty assoc:
+  $()
+  $(=>)
+
+empty sequence:
+  $[]
+
+empty set:
+  ${}
+
+empty table:
+  ${=>}
+  ${$()}
+
+$"..."                      => make(LITERAL-STRING, $bytes => "...")
+$( a => z )                 => make(LITERAL-ASSOC, $key => a, $element => z)
+$[ a, b, c ]                => make(LITERAL-SEQUENCE, $items => cast(object-t[]){ a, b, c, nullptr })
+${ a, b, c }                => make(LITERAL-SET, $items => cast(object-t[]){ a, b, c, nullptr })
+${ a => z, b => y, c => x } => make(LITERAL-TABLE, $items => cast(object-t[]){ $( a => z ), $( b => y ), $( c => x ), nullptr })
+
+if all elements to a literal construct are literal, then the entire literal (of literals) will be constructed at runtime initialization

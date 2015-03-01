@@ -173,6 +173,7 @@ sub sst::make {
     elsif (m|\G(\?)($z)(:)($z)|gc)        { &sst::add_token($sst, "$1$2$3$4"); }
     elsif (m|\G(\?)(:)($z)|gc)            { &sst::add_token($sst, "$1$3$2$3"); } # hackhack
     elsif (m|\G(\?)($z)|gc)               { &sst::add_token($sst, "$1$2"); }
+    elsif (m/\G(\$(\(|\{|\[))/gc)         { &sst::add_token($sst, $1); }
     elsif (m|\G($z)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(\d+)|gc)                  { &sst::add_token($sst, $1); }
     elsif (m|\G(=>)|gc)                   { &sst::add_token($sst, $1); } # use: [ 128 ]
