@@ -289,29 +289,7 @@ sub macro_expand_recursive {
       $$expanded_macro_names{$depend_macro_name} = 1;
     }
   }
-  my $num_tokens = scalar @{$$sst{'tokens'}};
-  for (my $r = 0; $r < scalar @{$$macro{'rules'}}; $r++) {
-    my $rule = $$macro{'rules'}[$r];
-    last if $i > $num_tokens - @{$$rule{'pattern'}};
-
-    my ($last_index, $lhs, $rhs_for_pattern)
-      = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name, $macro);
-
-    if (-1 != $last_index) {
-      my ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens)
-        = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
-
-      if ($lhs_num_tokens > $common_num_tokens) {
-        if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r}) {
-          $$sst{'changes'}{'macros'}{$macro_name}{$r} = 0;
-        }
-        $$sst{'changes'}{'macros'}{$macro_name}{$r}++;
-
-        $change_count++;
-        last;
-      }
-    }
-  }
+  $change_count += &rule_match_and_replace($sst, $i, $macros, $macro_name, $macro, $$macro{'rules'}, $user_data);
   return $change_count;
 }
 sub macros_expand_index {
@@ -609,6 +587,34 @@ sub rule_replace {
   my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs);
   assert($_rhs_num_tokens - $rhs_num_tokens);
   return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
+}
+sub rule_match_and_replace {
+  my ($sst, $i, $macros, $name, $macro, $rules, $user_data) = @_;
+  my $change_count = 0;
+  my $num_tokens = scalar @{$$sst{'tokens'}};
+  for (my $r = 0; $r < scalar @$rules; $r++) {
+    my $rule = $$rules[$r];
+    last if $i > $num_tokens - @{$$rule{'pattern'}};
+
+    my ($last_index, $lhs, $rhs_for_pattern)
+      = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $name, $macro);
+
+    if (-1 != $last_index) {
+      my ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens)
+        = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $name);
+
+      if ($lhs_num_tokens > $common_num_tokens) {
+        if (!defined $$sst{'changes'}{'macros'}{$name}{$r}) {
+          $$sst{'changes'}{'macros'}{$name}{$r} = 0;
+        }
+        $$sst{'changes'}{'macros'}{$name}{$r}++;
+
+        $change_count++;
+        last;
+      }
+    }
+  }
+  return $change_count;
 }
 sub lang_user_data {
   my $user_data;
