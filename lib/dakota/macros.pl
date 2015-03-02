@@ -6,6 +6,13 @@
 # -*- cperl-tab-always-indent: t -*-
 
 {
+  'literal-assoc' => {
+    'before' => [],
+    'rules' => [ {
+      'pattern'  => [        '$(',                                     '?ident', '=>',                   '?list-member', ')' ],
+      'template' => [ 'make', '(', 'LITERAL-ASSOC', ',', '$key', '=>', '?ident', ',',  '$element', '=>', '?list-member', ')' ]
+    } ],
+  },
   'include-stmt' => {
     'before' => [],
     'rules' => [ {
