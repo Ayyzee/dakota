@@ -1,0 +1,138 @@
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// ?ident           // equivalent to ?{ident} ?
+// ?(!|=   pattern) // look-around assertion (only in pattern)
+// ?(ident pattern) // template call with arguments (only in template)
+// ?/regex/
+// ?{ ... }
+// ?[ ... ]
+// ?< ... >
+// ?0 (or ?& ?)
+// ?1 - ?n // (only in template)
+// ??ident
+// ?{identifier = token}    // constraint with default
+//   operators for ${}: (bash parameter expansion) :- := :? :+
+// ?' ... '
+// ?" ... "
+
+// how about ?SRC-FILE ?SRC-LINE ?SRC-SCOPE (function/namespace/klass/trait/...)
+//           ?FILE     ?LINE     ?MACRO    ?AUX-RULE ?AUX-RULE-NUM ?RULE-NUM
+
+digraph "pattern-var-syntax-fsm" {
+  graph [ label = "\G", fontcolor = red, fontsize = 16 ];
+  graph [ rankdir = "LR",
+          center = true,
+          //size = "7.5,10",
+          //page = "8.5,11",
+        ];
+
+  node [ shape = circle,
+         width = 0.6,
+         fontsize = 16,
+       ];
+  node [ label = "", width = 0.3 ]; // comment out this line if you want the node names displayed
+
+  // on OS X/darwin it wants Courier-Bold and Courier-Oblique
+  edge [ fontname = "Courier-Bold",
+         fontsize = 16,
+       ];
+
+  00 [ shape = none, style = invis ];
+  50 [ shape = doublecircle ];
+
+  00 -> 10 [ ]; // begin
+  20 -> 30 [ label = "!\l=",
+             color = green,
+             len = 0.5,
+           ];
+  30 -> 40 [ label = "pattern",
+             fontname = "Courier-Oblique",
+             color = green,
+             len = 0.5,
+           ];
+  40 -> 50 [ label = ")",
+             color = green,
+           ];
+  20 -> 31 [ label = "ident",
+             fontname = "Courier-Oblique",
+             color = blue,
+             len = 0.5,
+           ];
+  31 -> 41 [ label = "pattern",
+             fontname = "Courier-Oblique",
+             color = blue,
+             len = 0.5,
+           ];
+  41 -> 50 [ label = ")",
+             color = blue,
+           ];
+  23 -> 43 [ label = "...",
+             style = dashed,
+           ];
+  24 -> 44 [ label = "...",
+             style = dashed,
+           ];
+  25 -> 45 [ label = "...",
+             style = dashed,
+           ];
+  10 -> 50 [ label = "?ident",
+             minlen = 4.0,
+             fontname = "Courier-Oblique",
+           ];
+  10 -> 20 [ label = "?(",
+             minlen = 4.0,
+           ];
+  10 -> 23 [ label = "?[",
+             minlen = 4.0,
+           ];
+  10 -> 24 [ label = "?{",
+             minlen = 4.0,
+           ];
+  10 -> 25 [ label = "?<",
+             minlen = 4.0,
+           ];
+  10 -> 22 [ label = "?/",
+             minlen = 4.0,
+           ];
+  22 -> 42 [ label = "regex",
+             fontname = "Courier-Oblique",
+           ];
+  42 -> 50 [ label = "/",
+             minlen = 4.0,
+           ];
+  10 -> 50 [ label = "?& | ?0 .. ?n",
+             color = blue,
+           ];
+  43 -> 50 [ label = "]",
+             minlen = 4.0,
+           ];
+  44 -> 50 [ label = "}",
+             minlen = 4.0,
+           ];
+  45 -> 50 [ label = ">",
+             minlen = 4.0,
+           ];
+
+  subgraph { graph [ rank = same ]; 20;     22; 23; 24; 25; }
+  subgraph { graph [ rank = same ]; 40; 41; 42; 43; 44; 45; }
+
+  subgraph "cluster-legend" {
+    graph [ label = "legend", margin = "0,0" ];
+    node [ style = invis, shape = none ];
+    n4 -> n5 [ color = green,  label = "pattern only" ];
+    n2 -> n3 [ color = blue,   label = "template only" ];
+    n0 -> n1 [ style = dashed, label = "undefined" ];
+  }
+}
