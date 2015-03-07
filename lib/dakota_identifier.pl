@@ -3,13 +3,23 @@
 use strict;
 use warnings;
 
-my $alnum = qr/[A-Za-z0-9]/;
-my $ident =   qr/(_+|_+$alnum+|[A-Za-z]$alnum*)(-$alnum+)*_*[!?]?/;
-my $ident_t =    qr/(_+$alnum+|[A-Za-z]$alnum*)(-$alnum+)*?-t/;
+# 1    char idents: [_a-zA-Z]
+# 2,3+ char idents: [_a-zA-Z][_a-zA-Z0-9-]*[_a-zA-Z0-9]
+#
+# [_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9])?
+
+# dakota identifier
+my $ident =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9])?/;
+my $mident = qr/[_a-zA-Z][_a-zA-Z0-9-]*(?:\!|\?)?/;
+my $tident = qr/[_a-zA-Z][_a-zA-Z0-9-]*-t/;
+
+#print $ident . "\n";
 
 foreach my $tkn (@ARGV) {
   if (0) {
-  } elsif ($tkn =~ /^$ident_t$/) {
+  } elsif ($tkn =~ /^$mident$/) {
+    print "Y-m..$tkn\n";
+  } elsif ($tkn =~ /^$tident$/) {
     print "Y-t..$tkn\n";
   } elsif ($tkn =~ /^$ident$/) {
     print "Y....$tkn\n";
