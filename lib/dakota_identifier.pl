@@ -8,20 +8,23 @@ use warnings;
 #
 # [_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9])?
 
-# dakota identifier
-my $ident =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9])?/;
-my $mident = qr/[_a-zA-Z][_a-zA-Z0-9-]*(?:\!|\?)?/;
-my $tident = qr/[_a-zA-Z][_a-zA-Z0-9-]*-t/;
+# dakota identifier (allows underscore in interior)
+my $id =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9]              )?/x;
+my $mid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!])/x;
+my $bid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?]  )|(?:[\?]  )/x;
+my $tid = qr/[_a-zA-Z][_a-zA-Z0-9-]*-t/;
 
-#print $ident . "\n";
+#print $id . "\n";
 
 foreach my $tkn (@ARGV) {
   if (0) {
-  } elsif ($tkn =~ /^$mident$/) {
+  } elsif ($tkn =~ /^$bid$/) {
+    print "Y-b..$tkn\n";
+  } elsif ($tkn =~ /^$mid$/) {
     print "Y-m..$tkn\n";
-  } elsif ($tkn =~ /^$tident$/) {
+  } elsif ($tkn =~ /^$tid$/) {
     print "Y-t..$tkn\n";
-  } elsif ($tkn =~ /^$ident$/) {
+  } elsif ($tkn =~ /^$id$/) {
     print "Y....$tkn\n";
   } else {
     print "N....$tkn\n";
