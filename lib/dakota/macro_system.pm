@@ -185,6 +185,8 @@ sub kw_args_ident_common {
   if (exists $$user_data{'kw-args-ident'}{$tkn}) {
     if ($$user_data{'kw-args-ident'}{$tkn} == $num_fixed_args) {
       $result = $index;
+    } else {
+      print STDERR "wrong number of fixed arguments for kw-arg function $tkn()\n";
     }
   }
   return $result;
@@ -194,6 +196,11 @@ sub type {
   my ($sst, $index, $constraint, $user_data) = @_;
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
+
+  my $type_tkns = { '*' => 1,
+                    '&' => 1,
+                    'const' =>  1,
+                    'volatile' => 1 };
 
   if ($tkn =~ /^$zt$/) {
     my $o = 0;
@@ -498,8 +505,17 @@ sub rule_match {
       };
       ($$pattern[$j] =~ /^\?($k+)$/) && do { # ?some-ident
         my $pattern_name = $1;
-        # 0: look for aux-rule pattern
+        # 0: look for aux-rule pattern/template
         my $aux_rule = $$macro{'aux-rules'}{$pattern_name};
+        if ($aux_rule) {
+          #print STDERR "aux-rule: " . &Dumper($aux_rule) . "\n";
+          for (my $r = 0; $r < scalar @$aux_rule; $r++) {
+            my $aux_rule_pattern =  $$aux_rule[$r]{'pattern'};
+            my $aux_rule_template = $$aux_rule[$r]{'template'};
+            #print STDERR "aux-rule-set[$r]pattern:  " . &Dumper($aux_rule_pattern)  . "\n";
+            #print STDERR "aux-rule-set[$r]template: " . &Dumper($aux_rule_template) . "\n";
+          }
+        }
 
         # 1: look for other macro with name
         my $m = $$macros{$pattern_name};
@@ -589,7 +605,7 @@ sub rule_replace {
   return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
 }
 sub rule_match_and_replace {
-  my ($sst, $i, $macros, $name, $macro, $rules, $user_data) = @_;
+  my ($sst, $i, $macros, $macro_name, $macro, $rules, $user_data) = @_;
   my $change_count = 0;
   my $num_tokens = scalar @{$$sst{'tokens'}};
   for (my $r = 0; $r < scalar @$rules; $r++) {
@@ -597,17 +613,17 @@ sub rule_match_and_replace {
     last if $i > $num_tokens - @{$$rule{'pattern'}};
 
     my ($last_index, $lhs, $rhs_for_pattern)
-      = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $name, $macro);
+      = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name, $macro);
 
     if (-1 != $last_index) {
       my ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens)
-        = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $name);
+        = &rule_replace($sst, $i, $last_index, $$rule{'template'}, $rhs_for_pattern, $lhs, $macro_name);
 
       if ($lhs_num_tokens > $common_num_tokens) {
-        if (!defined $$sst{'changes'}{'macros'}{$name}{$r}) {
-          $$sst{'changes'}{'macros'}{$name}{$r} = 0;
+        if (!defined $$sst{'changes'}{'macros'}{$macro_name}{$r}) {
+          $$sst{'changes'}{'macros'}{$macro_name}{$r} = 0;
         }
-        $$sst{'changes'}{'macros'}{$name}{$r}++;
+        $$sst{'changes'}{'macros'}{$macro_name}{$r}++;
 
         $change_count++;
         last;
