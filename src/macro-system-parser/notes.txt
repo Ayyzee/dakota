@@ -1,3 +1,8 @@
+(?: ...) lower cost grouping
+(?(condition)yes-pattern|no-pattern)
+(?(condition)yes-pattern|no-pattern)
+(*VERB:ARG)
+
 auxiliary pattern-set(s)  (macro m { p1 {}       {}       p2 {}       {}       ... })
 main      pattern-set     (macro m {    {}       {}          {}       {}           })
 auxiliary rule-set(s)     (macro m { r1 {} => {} {} => {} r2 {} => {} {} => {} ... })

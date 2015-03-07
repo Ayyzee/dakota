@@ -14,6 +14,7 @@
 
 // ?ident           // equivalent to ?{ident} ?
 // ?(!|=   pattern) // look-around assertion (only in pattern)
+// ?(:     pattern) // grouping, but not for ?1, ?2, etc
 // ?(ident pattern) // template call with arguments (only in template)
 // ?/regex/
 // ?{ ... }
