@@ -51,6 +51,7 @@ use integer;
 use Cwd;
 
 use dakota::rewrite;
+use dakota::util;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -75,13 +76,9 @@ my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
 
-# same code in dakota.pl and parser.pl
-my $k  = qr/[_A-Za-z0-9-]/;
-my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]?/;
-my $wk = qr/[_A-Za-z]$k*[A-Za-z0-9_]*/; # dakota identifier
-my $ak = qr/::?$k+/;            # absolute scoped dakota identifier
-my $rk = qr/$k+$ak*/;           # relative scoped dakota identifier
-my $d = qr/\d+/;                # relative scoped dakota identifier
+my $k = qr/[\w-]/;
+my ($id,  $mid,  $bid,  $tid,
+    $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
 my $global_is_defn = undef;     # klass decl vs defn
 my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
@@ -96,11 +93,7 @@ my $global_klass_defns = [];
 
 my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 
-# same as in dakota_rewrite.pm
-my $long_suffix = {
-                   '?' => 'p',
-                   '!' => 'd'
-                  };
+my $long_suffix = &long_suffix();
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
@@ -113,8 +106,8 @@ sub src_path {
 }
 sub make_ident_symbol_scalar {
   my ($symbol) = @_;
-  $symbol =~ s/($z)\?/$1$$long_suffix{'?'}/g;
-  $symbol =~ s/($z)\!/$1$$long_suffix{'!'}/g;
+  $symbol =~ s/($id)\?/$1$$long_suffix{'?'}/g;
+  $symbol =~ s/($id)\!/$1$$long_suffix{'!'}/g;
   my $has_word_char;
 
   if ($symbol =~ m/\w/) {
@@ -285,7 +278,7 @@ sub generate_nrt {
   $gbl_nrt_file = "$file_basename.dk";
   my $name = $file_basename;
   $name =~ s|.*/||; # strip off directory part
-  $name =~ s|\.$k+$||;
+  $name =~ s|\.$id$||;
 
   my ($generics, $symbols) = &generics::parse($file);
   my $result;
@@ -357,7 +350,7 @@ sub generate_rt {
   $gbl_nrt_file = undef;
   my $name = $file_basename;
   $name =~ s|.*/||; # strip off directory part
-  $name =~ s|\.$k+$||;
+  $name =~ s|\.$id$||;
 
   my ($generics, $symbols) = &generics::parse($file);
   my $result;
@@ -2124,7 +2117,7 @@ sub linkage_unit::generate_klasses_body {
               my $other_method_decl = &kw_args_method::type_decl($method);
 
               #my $scope = &path::string($klass_path);
-              $other_method_decl =~ s|\(\*($k+)\)| $1|;
+              $other_method_decl =~ s|\(\*($id)\)| $1|;
 
               if (&is_exported($method)) {
                 $$scratch_str_ref .= $col . "$klass_type $klass_name { export method";
@@ -2585,12 +2578,12 @@ sub add_ordered {
 }
 sub klass_part {
   my ($type_aliases, $str, $result) = @_;
-  while ($str =~ m/($rk)/g) {
+  while ($str =~ m/($rid)/g) {
     my $ident = $1;
     if ($ident =~ m/-t$/) {
       my $klass_name = $ident;
       $klass_name =~ s/-t$//;
-      if ($klass_name =~ m/^($rk):slots$/) {
+      if ($klass_name =~ m/^($rid):slots$/) {
         $$result{$1} = undef;
       } else {
         if ($$type_aliases{$ident}) {

@@ -81,6 +81,7 @@ our @EXPORT= qw(
 
 use dakota::sst;
 use dakota::generate;
+use dakota::util;
 
 my $objdir = 'obj';
 my $rep_ext = 'rep';
@@ -91,16 +92,9 @@ my $dk_ext = 'dk';
 my $O_EXT =  &var($gbl_compiler, 'O_EXT',  $gbl_compiler_default);
 my $SO_EXT = &var($gbl_compiler, 'SO_EXT', $gbl_compiler_default);
 
-# same code in dakota.pl and parser.pl
-my $k  = qr/[_A-Za-z0-9-]/;
-my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]?/;
-my $wk = qr/[_A-Za-z]$k*[_A-Za-z0-9]*/; # dakota identifier
-my $ak = qr/::?$k+/;            # absolute scoped dakota identifier
-my $rk = qr/$k+$ak*/;           # relative scoped dakota identifier
-my $d = qr/\d+/;
-my $mx = qr/\!|\?/;
-my $m  = qr/$z$mx?/;
-my $h  = qr|[/._A-Za-z0-9-]|;
+my ($id,  $mid,  $bid,  $tid,
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+my $h  = &header_file_regex();
 
 $ENV{'DKT-DEBUG'} = 0;
 
@@ -957,7 +951,7 @@ sub initialize {
     return;
   }
   &match(__FILE__, __LINE__, 'object-t');
-  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$k+/) {
+  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$id/) {
     &match_any();
     #&match(__FILE__, __LINE__, 'klass');
   }
@@ -988,7 +982,7 @@ sub finalize {
     return;
   }
   &match(__FILE__, __LINE__, 'object-t');
-  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$k+/) {
+  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$id/) {
     &match_any();
     #&match(__FILE__, __LINE__, 'klass');
   }
@@ -1083,7 +1077,7 @@ sub module_import {
   my ($module_name) = @_;
   my $tbl = {};
   &match(__FILE__, __LINE__, 'module');
-  my $imported_module_name = &match_re(__FILE__, __LINE__, $z);
+  my $imported_module_name = &match_re(__FILE__, __LINE__, $id);
   while (1) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (0) {
@@ -1098,8 +1092,8 @@ sub module_import {
         $$gbl_root{'modules'}{$module_name}{'import'}{'module'}{$imported_module_name} = $tbl;
         $tbl = {};
         &module_import($module_name);
-      } elsif (m/^($z)$/) {
-        my $name = &match_re(__FILE__, __LINE__, $z);
+      } elsif (m/^($id)$/) {
+        my $name = &match_re(__FILE__, __LINE__, $id);
         $$tbl{$name} = 1;
       } else {
         die __FILE__, ":", __LINE__, ": error:\n";
@@ -1135,7 +1129,7 @@ sub module_export {
 }
 sub module_statement {
   &match(__FILE__, __LINE__, 'module');
-  my $module_name = &match_re(__FILE__, __LINE__, $z);
+  my $module_name = &match_re(__FILE__, __LINE__, $id);
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (0) {
     } elsif (m/^;$/) {
@@ -1299,7 +1293,7 @@ sub klass {
         if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$') {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
-            if ($next_token =~ m/$k+/) {
+            if ($next_token =~ m/$id/) {
               my ($body, $seq) = &dkdecl('superklass');
               &match(__FILE__, __LINE__, ';');
               my $path = &path::string($seq);
@@ -1315,7 +1309,7 @@ sub klass {
             &sst_cursor::previous_token($gbl_sst_cursor) ne ':') {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
-            if ($next_token =~ m/$k+/) {
+            if ($next_token =~ m/$id/) {
               my ($body, $seq) = &dkdecl('klass');
               &match(__FILE__, __LINE__, ';');
               my $path = &path::string($seq);
@@ -1394,7 +1388,7 @@ sub expand_type {
   }
 
   if (1 < @$type &&
-      $$type[@$type - 1] =~ /$k+/) {
+      $$type[@$type - 1] =~ /$id/) {
     &dakota::util::_remove_last($type);
   }
   foreach my $token (@$type) {
@@ -1504,7 +1498,7 @@ sub parameter_list {
       my $ident = &dakota::util::_remove_last($type);
       if ($ident =~ m/\-t$/) {
         &dakota::util::_add_last($type, $ident);
-      } elsif (!($ident =~ m/$k+/)) {
+      } elsif (!($ident =~ m/$id/)) {
         &dakota::util::_add_last($type, $ident);
       }
     }
@@ -1601,7 +1595,7 @@ sub method {
   if (&sst_cursor::current_token($gbl_sst_cursor) eq 'alias') {
     &match(__FILE__, __LINE__, 'alias');
     &match(__FILE__, __LINE__, '(');
-    my $alias = &match_re(__FILE__, __LINE__, "$k+");
+    my $alias = &match_re(__FILE__, __LINE__, $id);
     &match(__FILE__, __LINE__, ')');
     $$method{'alias'} = [ $alias ];
   }
@@ -2001,7 +1995,7 @@ sub dk::file_basenames {
   my ($files_ref) = @_;
   my $list = [];
   foreach my $file (@$files_ref) {
-    my ($name, $path, $suffix) = File::Basename::fileparse($file, "\.$k+");
+    my ($name, $path, $suffix) = File::Basename::fileparse($file, "\.$id");
     $path =~ s/^\.\///g;        # replace './' with ''
     &dakota::util::_add_last($list, "$path$name");
   }
@@ -2047,7 +2041,7 @@ sub parse_root {
         if (0 == $$gbl_sst_cursor{'current-token-index'} || &sst_cursor::previous_token($gbl_sst_cursor) ne ':') {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
-            if ($next_token =~ m/$k+/) {
+            if ($next_token =~ m/$id/) {
               &klass({'exported?' => 0});
               last;
             }
@@ -2057,7 +2051,7 @@ sub parse_root {
       if (m/^trait$/) {
         my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
         if ($next_token) {
-          if ($next_token =~ m/$k+/) {
+          if ($next_token =~ m/$id/) {
             &trait({'exported?' => 0});
             last;
           }
@@ -2133,11 +2127,11 @@ sub rep_tree_from_dk_path {
   #&log_sub_name($__sub__);
   #print STDERR $_;
 
-  while (m/($z)\s*=>/g) {
+  while (m/($id)\s*=>/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/($m)\s*=>/g) {
+  while (m/($mid)\s*=>/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
@@ -2161,7 +2155,7 @@ sub rep_tree_from_dk_path {
     &add_string($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\$($m)/g) {
+  while (m/\$($mid)/g) {
     &add_symbol($gbl_root, [$1]);
   }
   $gbl_sst = &sst::make($_, $gbl_filename);

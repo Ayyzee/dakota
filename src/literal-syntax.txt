@@ -1,3 +1,8 @@
+v = $( a => x )
+v = $[ a, b, c ]
+v = ${ a, b, c }
+v = ${ a => x, b => y, c => z }
+
 symbol:
   $ident (no such literal "empty symbol")
 

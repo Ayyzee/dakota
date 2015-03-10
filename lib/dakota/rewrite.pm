@@ -44,6 +44,7 @@ use strict;
 use warnings;
 
 use dakota::dakota;
+use dakota::util;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -103,32 +104,16 @@ $main::seq = qr{
                  \]
              }x;
 
-# same code in dakota.pl and parser.pl
-my $k  = qr/[_A-Za-z0-9-]/;
-my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]?/;
-my $t  = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
-my $wk = qr/[_A-Za-z]$k*[A-Za-z0-9_]/; # dakota identifier
-my $ak = qr/::?$k+/;            # absolute scoped dakota identifier
-my $rk = qr/$k+$ak*/;           # relative scoped dakota identifier
-my $d = qr/\d+/;                # relative scoped dakota identifier
-my $mx = qr/\!|\?/;
-my $m  = qr/$z$mx?/;
-my $msig_type = qr/object-t|slots-t|slots-t\s*\*/;
-my $msig = qr/(va:)?$m(\($msig_type?\))?/;
-my $h  = qr|[/._A-Za-z0-9-]|;
-
-# not-escaped " .*? not-escaped "
-my $dqstr = qr/(?<!\\)".*?(?<!\\)"/;
-
-# not-escaped ' .*? not-escaped '
-my $sqstr = qr/(?<!\\)'.*?(?<!\\)'/;
-
-# same as in dakota_generate.pm
-my $long_suffix = {
-                   '?' => 'p',
-                   '!' => 'd'
-                  };
-
+my $k = qr/[\w-]/;
+my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
+my ($id,  $mid,  $bid,  $tid,
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+my $msig_type = &method_sig_type_regex();
+my $msig = &method_sig_regex();
+my $h  = &header_file_regex();
+my $dqstr = &dqstr_regex();
+my $sqstr = &sqstr_regex();
+my $long_suffix = &long_suffix();
 $main::list_body = qr{
                        (?:
                          (?> [^()]+ )         # Non-parens without backtracking
@@ -234,13 +219,13 @@ sub decode_strings {
 sub nest_namespaces {
   my ($filestr_ref) = @_;
   foreach my $kind ('klass', 'trait', 'namespace') {
-    while ($$filestr_ref =~ s/$kind(\s+):?($k+):($rk)(\s*)($main::block)/namespace $2 { $kind$1$3$4$5 }/gs) {
+    while ($$filestr_ref =~ s/$kind(\s+):?($id):($rid)(\s*)($main::block)/namespace $2 { $kind$1$3$4$5 }/gs) {
     }
   }
 }
 sub rewrite_klass_decl {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=(\b(klass|trait)\s+$k+\s*;)=/*$1*/=g;
+  $$filestr_ref =~ s=(\b(klass|trait)\s+$id\s*;)=/*$1*/=g;
 }
 sub rewrite_klass_initialize {
   my ($filestr_ref) = @_;
@@ -252,7 +237,7 @@ sub rewrite_klass_finalize {
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s^\b(klass|trait)(\s+$k+\s*\{)^/\*$1\*/ namespace$2^g;
+  $$filestr_ref =~ s^\b(klass|trait)(\s+$id\s*\{)^/\*$1\*/ namespace$2^g;
 }
 sub rewrite_selsig_replacement {
   my ($aa, $bb) = @_;
@@ -263,28 +248,28 @@ sub rewrite_selsig_replacement {
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\(.*?)(\()/$1,$2/g;
-  $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-  $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\(\s*$rid)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+  $$filestr_ref =~ s/(?<!$k)(dkt-signature\s*\($rid)\s*,\s*,/$1,/g; # hackhack
 
   $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(.*?)(\()/$1,$2/g;
-  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(\s*$rid)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\($rid)\s*,\s*,/$1,/g; # hackhack
 
   $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\(.*?)(\()/$1,$2/g;
-  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
-  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\(\s*$rid)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature\s*\($rid)\s*,\s*,/$1,/g; # hackhack
 }
 sub rewrite_selectors {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(?<!$k)(selector\s*\(.*?)(\()/$1,$2/g;
-  $$filestr_ref =~ s/(?<!$k)(selector\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+  $$filestr_ref =~ s/(?<!$k)(selector\s*\(\s*$rid)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
 
-  $$filestr_ref =~ s/(?<!$k)(selector\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(selector\s*\($rid)\s*,\s*,/$1,/g; # hackhack
   ###
   $$filestr_ref =~ s/(?<!$k)(__selector\s*\(.*?)(\()/$1,$2/g;
-  $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rk)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
+  $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rid)(\!|\?)/&rewrite_selsig_replacement($1, $2)/ge;
 
-  $$filestr_ref =~ s/(?<!$k)(__selector\s*\($rk)\s*,\s*,/$1,/g; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(__selector\s*\($rid)\s*,\s*,/$1,/g; # hackhack
 }
 sub rewrite_method_names_special_replacement {
   my ($aa, $bb, $cc) = @_;
@@ -294,7 +279,7 @@ sub rewrite_method_names_special_replacement {
 }
 sub rewrite_method_names_special {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(:+$k+)(\!|\?)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/ge;
+  $$filestr_ref =~ s/(:+$id)(\!|\?)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/ge;
 }
 sub rewrite_includes {
   my ($filestr_ref) = @_;
@@ -304,22 +289,22 @@ sub rewrite_includes {
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|(?<!$k)(\s+)(interpose\s+[^%;]+\s*;)|$1/*$2*/|gs;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(superklass\s+$rk\s*;)|$1/*$2*/|gs;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(klass\s+$rk\s*;)|$1/*$2*/|gs;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(trait\s+$rk\s*;)|$1/*$2*/|gs;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(provide\s+$rk\s*;)|$1/*$2*/|gs;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(require\s+$rk\s*;)|$1/*$2*/|gs;
+  $$filestr_ref =~ s|(?<!$k)(\s+)(superklass\s+$rid\s*;)|$1/*$2*/|gs;
+  $$filestr_ref =~ s|(?<!$k)(\s+)(klass\s+$rid\s*;)|$1/*$2*/|gs;
+  $$filestr_ref =~ s|(?<!$k)(\s+)(trait\s+$rid\s*;)|$1/*$2*/|gs;
+  $$filestr_ref =~ s|(?<!$k)(\s+)(provide\s+$rid\s*;)|$1/*$2*/|gs;
+  $$filestr_ref =~ s|(?<!$k)(\s+)(require\s+$rid\s*;)|$1/*$2*/|gs;
 }
 
 my $use_catch_macros = 1;
-my $catch_block  = qr/catch\s*\(\s*$rk?:klass\s*$k*\s*\)\s*($main::block)/;
+my $catch_block  = qr/catch\s*\(\s*$rid?:klass\s*$k*\s*\)\s*($main::block)/;
 my $catch_object = qr/\}(\s*$catch_block)+/;
 sub rewrite_catch_block {
   my ($str_in) = @_;
   my $str_out = '';
 
   while (1) {
-    if ($str_in =~ m/\Gcatch\s*\(\s*($rk?:klass)\s*($k*)\s*\)(\s*)\{/gc) {
+    if ($str_in =~ m/\Gcatch\s*\(\s*($rid?:klass)\s*($k*)\s*\)(\s*)\{/gc) {
       if ($use_catch_macros) {
         $str_out .= "DKT-CATCH($1, _e_)$3\{ object-t $2 = _e_;";
       } else {
@@ -378,8 +363,8 @@ sub convert_dash_syntax {
 }
 sub rewrite_syntax {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/($z)\?/$1$$long_suffix{'?'}/g;
-  $$filestr_ref =~ s/($z)\!/$1$$long_suffix{'!'}/g;
+  $$filestr_ref =~ s/($id)\?/$1$$long_suffix{'?'}/g;
+  $$filestr_ref =~ s/($id)\!/$1$$long_suffix{'!'}/g;
 
   $$filestr_ref =~ s/([a-zA-Z0-9])(-+)(?=[a-zA-Z0-9])/&convert_dash_syntax($1, $2)/ge;
   $$filestr_ref =~ s/([^:]):(?=[_a-zA-Z])/$1::/g;
@@ -413,17 +398,17 @@ sub rewrite_functions_replacement {
 }
 sub rewrite_functions {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(dk:$k+)(\!|\?)/&rewrite_functions_replacement($1, $2, '')/ges;
-  $$filestr_ref =~ s/($k+)(\!|\?)(\()/&rewrite_functions_replacement($1, $2, $3)/ges;
+  $$filestr_ref =~ s/(dk:$id)(\!|\?)/&rewrite_functions_replacement($1, $2, '')/ges;
+  $$filestr_ref =~ s/($id)(\!|\?)(\()/&rewrite_functions_replacement($1, $2, $3)/ges;
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|(method\s+)(alias\($k+\))|$1/*$2*/|gs; #hackhack
+  $$filestr_ref =~ s|(method\s+)(alias\($id\))|$1/*$2*/|gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
-  $$filestr_ref =~ s|(method\s+[^(]*?($rk)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
+  $$filestr_ref =~ s|(method\s+[^(]*?($rid)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
   $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1 /*$2*/$3|gm;
   $$filestr_ref =~ s|export(\s)(method)(\s+)|export$1/\*$2\*/$3|gs;
 
@@ -454,8 +439,8 @@ sub rewrite_slots {
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
   $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union)(\s*$main::block)/$2$1slots-t$3;/gs;
   $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union)(\s*);/$2$1slots-t$3;/gs;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$k+\s*$main::block)/$2$1slots-t$3;/gs;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$k+\s*);/$2$1slots-t$3;/gs; # forward decl
+  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$id\s*);/$2$1slots-t$3;/gs; # forward decl
   $$filestr_ref =~ s/(?<!\$)\bslots(\s+$t+?)(\s*);/typedef$1 slots-t$2;/gs;
 }
 sub rewrite_set_literal {
@@ -541,7 +526,7 @@ sub rewrite_enums {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(?<!/\*)(import|export|noexport)(\s+)(enum[^\w-])}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<!slots)(\s+enum(\s+$k+)?\s*$main::block)/$1;/gs;
+  $$filestr_ref =~ s/(?<!slots)(\s+enum(\s+$id)?\s*$main::block)/$1;/gs;
 }
 sub rewrite_const {
   # does not deal with comments containing '{' or '}' between the { }
@@ -550,11 +535,11 @@ sub rewrite_const {
 }
 sub rewrite_function_typedef {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(typedef\s*[^;]+?\s*\(\s*\*)(\s*\)\(.*?\))(\s*$k+)(\s*;)|$1$3$2$4|gs;
+  $$filestr_ref =~ s|(typedef\s*[^;]+?\s*\(\s*\*)(\s*\)\(.*?\))(\s*$id)(\s*;)|$1$3$2$4|gs;
 }
 sub rewrite_array_types {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/($k+?\-t)(\s*)($main::seq)(\s*)($k+)/$1$2$4$5$3/gm;
+  $$filestr_ref =~ s/($tid)(\s*)($main::seq)(\s*)($id)/$1$2$4$5$3/gm;
 }
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
@@ -581,12 +566,12 @@ sub rewrite_keywords {
 sub rewrite_boxes {
   my ($filestr_ref) = @_;
   if ($use_compound_literals) {
-    $$filestr_ref =~ s/($k+):box\((\s*\{.*?\}\s*)\)/$1:box(cast($1:slots-t)$2)/g;
+    $$filestr_ref =~ s/($id):box\((\s*\{.*?\}\s*)\)/$1:box(cast($1:slots-t)$2)/g;
   } else {
-    $$filestr_ref =~ s/($k+):box\(\s*\{(.*?)\}\s*\)/$1:box($1:construct($2))/g;
+    $$filestr_ref =~ s/($id):box\(\s*\{(.*?)\}\s*\)/$1:box($1:construct($2))/g;
   }
   # <non-colon>box($foo)  =>  symbol:box($foo)
-  $$filestr_ref =~ s/(?<!:)(box\s*\(\s*\$$k+\))/symbol:$1/g;
+  $$filestr_ref =~ s/(?<!:)(box\s*\(\s*\$$id\))/symbol:$1/g;
   $$filestr_ref =~ s/(?<!:)(box\s*\(\s*__symbol:.+?\))/symbol:$1/g;
 }
 sub rewrite_unless {
@@ -607,31 +592,31 @@ sub rewrite_unboxes {
   # foo:slots-t* foo = unbox(bar)
   # becomes
   # foo:slots-t* foo = foo:unbox(bar)
-  $$filestr_ref =~ s/(($k+?)\:slots-t\s*\*?\s*$k+\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
+  $$filestr_ref =~ s/(($id)\:slots-t\s*\*?\s*$id\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
 
   # foo:slots-t& foo = *unbox(bar)
   # becomes
   # foo:slots-t& foo = *foo:unbox(bar)
-  $$filestr_ref =~ s/(($k+?)\:slots-t\s*\&?\s*$k+\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
+  $$filestr_ref =~ s/(($id)\:slots-t\s*\&?\s*$id\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
 
   # foo-t* foo = unbox(bar)
   # becomes
   # foo-t* foo = foo:unbox(bar)
-  #$$filestr_ref =~ s/(($k+?)-t\s*\*?\s*$k+\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
+  #$$filestr_ref =~ s/(($k+?)-t\s*\*?\s*$id\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
 
   # foo-t& foo = *unbox(bar)
   # becomes
   # foo-t& foo = *foo:unbox(bar)
-  #$$filestr_ref =~ s/(($k+?)-t\s*\&?\s*$k+\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
+  #$$filestr_ref =~ s/(($k+?)-t\s*\&?\s*$id\s*=\s*\*?)(unbox)(?=\()/&rewrite_unboxes_replacement($1, $2, $3)/ge;
 }
 sub rewrite_creates {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/($k+):create\((\s*\{.*?\}\s*)\)/$1:create(($1:slots-t)$2)/g;
+  $$filestr_ref =~ s/($id):create\((\s*\{.*?\}\s*)\)/$1:create(($1:slots-t)$2)/g;
 }
 sub rewrite_supers {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(dk:$k+\s*)\(\s*super\b/$1(super(self, klass)/g;
-  $$filestr_ref =~ s/(dk:va:$k+\s*)\(\s*super\b/$1(super(self, klass)/g;
+  $$filestr_ref =~ s/(dk:$id\s*)\(\s*super\b/$1(super(self, klass)/g;
+  $$filestr_ref =~ s/(dk:va:$id\s*)\(\s*super\b/$1(super(self, klass)/g;
 }
 #sub rewrite_makes
 #{
@@ -661,14 +646,16 @@ sub rewrite_for_each_replacement {
     } else {
       $first_stmt .= "$ws1\{$ws2$type $element = unbox(_element_); $stmt$ws3";
     }
-  } elsif ($type =~ m|($k+?)-t|) {
+  } elsif ($type =~ m|($tid)|) {
     $result .= " object-t _element_ = dk:next(_iterator_);";
     $result .= " /**/)";
+    my $klass_name = $1;
+    $klass_name =~ s/-t$//;
 
     if (!$open_brace) { # $ws2 will be undefined
-      $first_stmt .= "$ws1\{ $type $element = $1:unbox(_element_); $stmt \}$ws3";
+      $first_stmt .= "$ws1\{ $type $element = $klass_name:unbox(_element_); $stmt \}$ws3";
     } else {
-      $first_stmt .= "$ws1\{$ws2$type $element = $1:unbox(_element_); $stmt$ws3";
+      $first_stmt .= "$ws1\{$ws2$type $element = $klass_name:unbox(_element_); $stmt$ws3";
     }
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
@@ -679,7 +666,7 @@ sub rewrite_for_each_replacement {
 sub rewrite_for_each {
   my ($filestr_ref) = @_;
   # for ( object-t xx : yy )
-  $$filestr_ref =~ s|for\s*\(\s*($k+\*?)\s*($k+)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)|&rewrite_for_each_replacement($1, $2, $3, $4, $5, $6, $7, $8)|gse;
+  $$filestr_ref =~ s|for\s*\(\s*($id\*?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)|&rewrite_for_each_replacement($1, $2, $3, $4, $5, $6, $7, $8)|gse;
 }
 sub rewrite_slot_access {
   my ($filestr_ref) = @_;
@@ -715,7 +702,7 @@ sub rewrite_case_with_string {
 }
 sub rewrite_strswitch {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|strswitch(\s*)\((\s*)($z)(\s*)\)|switch$1(dk-hash($2$3$4))|gs;
+  $$filestr_ref =~ s|strswitch(\s*)\((\s*)($id)(\s*)\)|switch$1(dk-hash($2$3$4))|gs;
   $$filestr_ref =~ s|switch(\s*)\((\s*)\$(.*?)(\s*)\)|switch$1(dk-hash($2"$3"$4))|gs;
   $$filestr_ref =~ s|switch(\s*)\((\s*)"(.*?)"(\s*)\)|switch$1(dk-hash($2"$3"$4))|gs;
   $$filestr_ref =~ s|switch(\s*)\((\s*)'(.*?)'(\s*)\)|switch$1(dk-hash($2'$3'$4))|gs;
@@ -733,7 +720,7 @@ sub exported_slots_body {
 }
 sub rewrite_module_statement {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|\b(module\s+$z\s*.*?;)|/*$1*/|gs;
+  $$filestr_ref =~ s|\b(module\s+$id\s*.*?;)|/*$1*/|gs;
 }
 sub add_implied_slots_struct {
   my ($filestr_ref) = @_;
@@ -770,11 +757,11 @@ sub rewrite_keyword_syntax_list {
     # everything in between
     $list =~ s/^\(//;
     $list =~ s/\)$//;
-    $list =~ s/($rk*$main::list)/&remove_non_newlines($1)/ges;
+    $list =~ s/($rid*$main::list)/&remove_non_newlines($1)/ges;
     $list = "($list)";
 
-    $list =~ s{($m\s*)(=>\s*.*?)(\s*,|\))}{$1/*$2*/$3}g;
-    $list =~ s{($z\s*)(=>\s*.*?)(\s*,|\))}{$1/*$2*/$3}g;
+    $list =~ s{($mid\s*)(=>\s*.*?)(\s*,|\))}{$1/*$2*/$3}g;
+    $list =~ s{($id\s*)(=>\s*.*?)(\s*,|\))}{$1/*$2*/$3}g;
     #print STDERR "$arg1$arg2$list\n";
   }
   return "$arg1$arg2$list";
@@ -789,8 +776,8 @@ sub rewrite_keyword_syntax_use {
   my $list = $arg2;
 
   #print STDERR "$arg1$list\n";
-  $list =~ s/($m)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
-  $list =~ s/($z)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\$?($mid)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\$?($id)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
   $list =~ s/\)$/, nullptr\)/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";
@@ -875,7 +862,7 @@ sub rewrite_export_method {
   while (my ($module_name, $symbol_tbl) = each (%$exports)) {
     foreach my $symbol (sort keys %$symbol_tbl) {
       #print STDERR "$symbol\n";
-      if ($symbol =~ m/($z):($msig)/) {
+      if ($symbol =~ m/($id):($msig)/) {
         my $klass_name = $1;
         my $sig = $2;
         if ($sig !~ m/-t$/) {

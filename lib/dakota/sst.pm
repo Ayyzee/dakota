@@ -70,22 +70,11 @@ $Data::Dumper::Useqq     = 1;
 $Data::Dumper::Sortkeys =  0;
 $Data::Dumper::Indent    = 1;	# default = 2
 
-# same code in dakota.pl and parser.pl
-my $k  = qr/[_A-Za-z0-9-]/;
-my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]?/;
-my $wk = qr/[_A-Za-z]$k*[_A-Za-z0-9]*/; # dakota identifier
-my $ak = qr/::?$z/;		# absolute scoped dakota identifier
-my $rk = qr/$z$ak*/;		# relative scoped dakota identifier
-my $d = qr/\d+/;
-my $mx = qr/\!|\?/;
-my $m  = qr/$z$mx?/;
-my $h  = qr|[/._A-Za-z0-9-]|;
-
-# not-escaped " .*? not-escaped "
-my $dqstr = qr/(?<!\\)".*?(?<!\\)"/;
-
-# not-escaped ' .*? not-escaped '
-my $sqstr = qr/(?<!\\)'.*?(?<!\\)'/;
+my ($id,  $mid,  $bid,  $tid,
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+my $h  = &header_file_regex();
+my $dqstr = &dqstr_regex();
+my $sqstr = &sqstr_regex();
 
 my $sst_debug = 0;
 sub log_sub_name {
@@ -167,14 +156,14 @@ sub sst::make {
     elsif (m|\G(/\*.*?\*/)|gcs)           { &sst::add_comment($sst, $1); }
     elsif (m/\G(include)(\s*)(<$h+>)/gc)  { &sst::add_tokens3($sst, $1, $2, $3); }
     elsif (m/\G(include)(\s*)($dqstr)/gc) { &sst::add_tokens3($sst, $1, $2, $3); }
-    elsif (m|\G(\$)($z)($mx)|gc)          { &sst::add_token($sst, "$1$2$3"); }
-    elsif (m|\G(\$)($z)|gc)               { &sst::add_token($sst, "$1$2"); }
-    elsif (m|\G($z)($mx)|gc)              { &sst::add_token($sst, "$1$2"); }
-    elsif (m|\G(\?)($z)(:)($z)|gc)        { &sst::add_token($sst, "$1$2$3$4"); }
-    elsif (m|\G(\?)(:)($z)|gc)            { &sst::add_token($sst, "$1$3$2$3"); } # hackhack
-    elsif (m|\G(\?)($z)|gc)               { &sst::add_token($sst, "$1$2"); }
+    elsif (m|\G(\$)($mid)|gc)             { &sst::add_token($sst, "$1$2"); }
+    elsif (m|\G(\$)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
+    elsif (m|\G($mid)|gc)                 { &sst::add_token($sst, $1); }
+    elsif (m|\G(\?)($id)(:)($id)|gc)      { &sst::add_token($sst, "$1$2$3$4"); }
+    elsif (m|\G(\?)(:)($id)|gc)           { &sst::add_token($sst, "$1$3$2$3"); } # hackhack
+    elsif (m|\G(\?)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
     elsif (m/\G(\$(\(|\{|\[))/gc)         { &sst::add_token($sst, $1); }
-    elsif (m|\G($z)|gc)                   { &sst::add_token($sst, $1); }
+    elsif (m|\G($id)|gc)                  { &sst::add_token($sst, $1); }
     elsif (m|\G(\d+)|gc)                  { &sst::add_token($sst, $1); }
     elsif (m|\G(=>)|gc)                   { &sst::add_token($sst, $1); } # use: [ 128 ]
     elsif (m|\G(->)|gc)                   { &sst::add_token($sst, $1); }
@@ -287,7 +276,7 @@ sub sst::add_token {
     if (';' eq &sst::prev_token_str($sst) ||
 	'{' eq &sst::prev_token_str($sst) ||
 	'}' eq &sst::prev_token_str($sst)) {
-      if ($str =~ m|$z|) {
+      if ($str =~ m|$id|) {
 	if ($sst_debug) {
 	  print STDERR "$str\n";
 	}
@@ -461,7 +450,7 @@ sub sst_fragment::filestr {
   my $filestr = '';
   foreach my $token (@$sst_fragment) {
     my $is_ident = 0;
-    if ($$token{'str'} =~ m/^$z$/) {
+    if ($$token{'str'} =~ m/^$id$/) {
       $is_ident = 1;
     }
 
@@ -545,7 +534,7 @@ sub constraint_ident {
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
-  if ($token =~ m/$z/) {
+  if ($token =~ m/$id/) {
     $result_lhs = [ $$range[0], $$range[0] ];
     push @$result_rhs, $token;
   }
@@ -556,7 +545,7 @@ sub constraint_method_name {
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
-  if ($token =~ m/$m/) {
+  if ($token =~ m/$mid/) {
     $result_lhs = [ $$range[0], $$range[0] ];
     push @$result_rhs, $token;
   }

@@ -50,9 +50,54 @@ our @EXPORT= qw(
                  flatten
                  min
                  max
+                 long_suffix
+                 ident_regex
+                 header_file_regex
+                 dqstr_regex
+                 sqstr_regex
+                 method_sig_type_regex
+                 method_sig_regex
               );
 
 use Fcntl qw(:DEFAULT :flock);
+sub ident_regex {
+  my $id =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9]              )?/x;
+  my $mid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!])/x; # method ident
+  my $bid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?]  )|(?:[\?]  )/x; # bool   ident
+  my $tid = qr/[_a-zA-Z]   [_a-zA-Z0-9-]*?-t/x;                          # type   ident
+
+  my $rid =  qr/(?:$id\::?)*$id/;
+  my $rmid = qr/(?:$id\::?)*$mid/;
+  my $rbid = qr/(?:$id\::?)*$bid/;
+  my $rtid = qr/(?:$id\::?)*$tid/;
+
+  return ( $id,  $mid,  $bid,  $tid,
+          $rid, $rmid, $rbid, $rtid);
+}
+my ($id,  $mid,  $bid,  $tid,
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+sub header_file_regex {
+  return qr|[/._A-Za-z0-9-]|;
+}
+sub method_sig_type_regex {
+  return qr/object-t|slots-t|slots-t\s*\*/;
+}
+my $method_sig_type = &method_sig_type_regex();
+sub method_sig_regex {
+  return qr/(va:)?$mid(\($method_sig_type?\))?/;
+}
+sub long_suffix {
+  return { '?' => 'p',
+           '!' => 'd' };
+}
+sub dqstr_regex {
+  # not-escaped " .*? not-escaped "
+  return qr/(?<!\\)".*?(?<!\\)"/;
+}
+sub sqstr_regex {
+# not-escaped ' .*? not-escaped '
+  return qr/(?<!\\)'.*?(?<!\\)'/;
+}
 sub kw_args_generics_add {
   my ($generic) = @_;
   my $tbl = &kw_args_generics();

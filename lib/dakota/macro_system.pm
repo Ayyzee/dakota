@@ -63,12 +63,9 @@ our @EXPORT= qw(
                  macro_expand
              );
 
-my $k  = qr/[_A-Za-z0-9-]/;
-my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]/;
-my $zt = qr/$z-t/;
-# not-escaped " .*? not-escaped "
-my $dqstr = qr/(?<!\\)".*?(?<!\\)"/;
-#my $dqstr = qr/"(?:[^"\\]++|\\.)*+"/; # from the web
+my ($id,  $mid,  $bid,  $tid,
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+my $dqstr = &dqstr_regex();
 
 my $constraints = {
   'balenced' =>         \&balenced,
@@ -146,7 +143,7 @@ sub ident {
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
 
-  if ($tkn =~ /^$k+$/ && (-1 == &type_ident($sst, $index, $constraint, $user_data))) { # should be removed
+  if ($tkn =~ /^$id$/ && (-1 == &type_ident($sst, $index, $constraint, $user_data))) { # should be removed
     $result = $index;
   }
   return $result;
@@ -156,7 +153,7 @@ sub type_ident {
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
 
-  if ($tkn =~ /^$zt$/) { # bugbug: requires ab-t at a min (won't allow single char before -t)
+  if ($tkn =~ /^$tid$/) {
     $result = $index;
   }
   return $result;
@@ -185,8 +182,6 @@ sub kw_args_ident_common {
   if (exists $$user_data{'kw-args-ident'}{$tkn}) {
     if ($$user_data{'kw-args-ident'}{$tkn} == $num_fixed_args) {
       $result = $index;
-    } else {
-      print STDERR "wrong number of fixed arguments for kw-arg function $tkn()\n";
     }
   }
   return $result;
@@ -202,7 +197,7 @@ sub type {
                     'const' =>  1,
                     'volatile' => 1 };
 
-  if ($tkn =~ /^$zt$/) {
+  if ($tkn =~ /^$tid$/) {
     my $o = 0;
 
     while ('*' eq &sst::at($sst, $index + $o + 1)) {
@@ -217,7 +212,7 @@ sub symbol {
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
 
-  if ($tkn =~ /^\$$z(\!|\?)?$/) { # bugbug: requires ab at a min (won't allow single char)
+  if ($tkn =~ /^\$$mid$/) {
     $result = $index;
   }
   return $result;
@@ -471,7 +466,7 @@ sub rhs_from_template {
 
       if (!$tkns) { # these are tokens that exists only in the template/rhs and not in the pattern/lhs
         $tkns = [ { 'str' => $tkn } ];
-        if ($tkn =~ /^(\?$z+)$/) {
+        if ($tkn =~ /^(\?$id)$/) {
           my $pattern_var = $1;
           print STDERR "<file>:<line>: warning: pattern-var $pattern_var found in template but not in corresponding pattern.\n";
         }
@@ -503,7 +498,7 @@ sub rule_match {
         $match = [ { 'str' => $re_match } ];
         last SWITCH;
       };
-      ($$pattern[$j] =~ /^\?($k+)$/) && do { # ?some-ident
+      ($$pattern[$j] =~ /^\?($id)$/) && do { # ?some-ident
         my $pattern_name = $1;
         # 0: look for aux-rule pattern/template
         my $aux_rule = $$macro{'aux-rules'}{$pattern_name};

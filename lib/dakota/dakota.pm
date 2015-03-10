@@ -93,17 +93,10 @@ my $cxx_output_flags =  &dakota::parse::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  
 my $cxx_shared_flags =  &dakota::parse::var($gbl_compiler, 'CXX_SHARED_FLAGS',  $gbl_compiler_default);
 my $cxx_dynamic_flags = &dakota::parse::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', $gbl_compiler_default);
 
-# same code in dakota.pl and parser.pl
-my $k  = qr/[_A-Za-z0-9-]/;
-my $z  = qr/[_A-Za-z]$k*[_A-Za-z0-9]?/;
-my $wk = qr/[_A-Za-z]$k*[A-Za-z0-9_]*/; # dakota identifier
-my $ak = qr/::?$k+/;            # absolute scoped dakota identifier
-my $rk = qr/$k+$ak*/;           # relative scoped dakota identifier
-my $d = qr/\d+/;                # relative scoped dakota identifier
-my $mx = qr/\!|\?/;
-my $m  = qr/$z$mx?/;
-my $msig_type = qr/object-t|slots-t|slots-t\s*\*/;
-my $msig = qr/(va:)?$m(\($msig_type?\))?/;
+my ($id,  $mid,  $bid,  $tid,
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+my $msig_type = &method_sig_type_regex();
+my $msig = &method_sig_regex();
 sub loop_merged_rep_from_dk {
   my ($cmd_info, $should_echo) = @_; 
   if ($should_echo) {
@@ -157,7 +150,7 @@ sub add_visibility {
     foreach my $str (@$strs) {
 	    my $seq = $$tbl{$str};
 	    #print STDERR "export module $name $str;\n";
-	    if ($str =~ /^($z)$/) {
+	    if ($str =~ /^($id)$/) {
         my $klass_name = $1;
         # klass/trait
         #print STDERR "klass/trait:        $klass_name\n";
@@ -168,7 +161,7 @@ sub add_visibility {
         if ($$root{'traits'}{$klass_name}) {
           $$root{'traits'}{$klass_name}{'exported?'} = 22;
         }
-	    } elsif ($str =~ /^($z):(slots-t)$/) {
+	    } elsif ($str =~ /^($id):(slots-t)$/) {
         my ($klass_name, $type_name) = ($1, $2);
         # klass slots
         #print STDERR "klass       slots:  $klass_name|$type_name\n";
@@ -177,7 +170,7 @@ sub add_visibility {
 		    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = 33;
         }
-	    } elsif ($str =~ /^($z):($msig)$/) {
+	    } elsif ($str =~ /^($id):($msig)$/) {
         my ($klass_name, $method_name) = ($1, $2);
         # klass/trait method
         #print STDERR "klass/trait method $klass_name:$method_name\n";
@@ -428,7 +421,7 @@ sub loop_cxx_from_dk {
       }
       $output_dk_cxx =~ s|/nrt/|/|g;
       ($dk_cxx_name, $dk_cxx_path, $dk_cxx_ext) = fileparse("$directory/$output_dk_cxx", "\.$dk_ext\.$cxx_ext");
-      ($cxx_name, $cxx_path, $cxx_ext1) = fileparse("$directory/$output_cxx", "\.$k+");
+      ($cxx_name, $cxx_path, $cxx_ext1) = fileparse("$directory/$output_cxx", "\.$id");
     }
     &dakota::generate::empty_klass_defns();
     &dk::generate_dk_cxx($file_basename, "$dk_cxx_path$dk_cxx_name");
