@@ -776,8 +776,8 @@ sub rewrite_keyword_syntax_use {
   my $list = $arg2;
 
   #print STDERR "$arg1$list\n";
-  $list =~ s/\$?($mid)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
-  $list =~ s/\$?($id)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\$($mid)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\$($id)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
   $list =~ s/\)$/, nullptr\)/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";

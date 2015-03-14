@@ -119,9 +119,9 @@ sub list_member {
         return $index + $o - 1;
       }
     }
-    if ($$user_data{'list'}{'open'} eq $tkn) {
+    if (exists $$user_data{'list'}{'open'}{$tkn}) {
       $is_framed++;
-    } elsif ($$user_data{'list'}{'close'} eq $tkn && $is_framed) {
+    } elsif (exists $$user_data{'list'}{'close'}{$tkn} && $is_framed) {
       $is_framed--;
     }
     $o++;
@@ -256,10 +256,13 @@ sub balenced {
       push @$opens, $open_token;
     } elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index))) {
       $open_token = pop @$opens;
-      die if $open_token ne &sst::open_token_for_close_token($close_token);
+      my $open_tokens = &sst::open_tokens_for_close_token($close_token);
+      die if !exists $$open_tokens{$open_token};
     }
     if (0 == @$opens) {
-      $result = $close_token_index;
+      if ($open_token_index < $close_token_index ) {
+        $result = $close_token_index;
+      }
       last;
     }
     $close_token_index++;
@@ -605,7 +608,7 @@ sub rule_match_and_replace {
   my $num_tokens = scalar @{$$sst{'tokens'}};
   for (my $r = 0; $r < scalar @$rules; $r++) {
     my $rule = $$rules[$r];
-    last if $i > $num_tokens - @{$$rule{'pattern'}};
+    next if $i > $num_tokens - @{$$rule{'pattern'}};
 
     my ($last_index, $lhs, $rhs_for_pattern)
       = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name, $macro);

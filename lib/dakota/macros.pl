@@ -87,6 +87,9 @@
     'rules' => [ {
       'pattern'  => [                         '?visibility', 'method', '?type', 'va', '?/(::?)/', '?ident', '?list', '?block'      ],
       'template' => [ 'namespace', 'va', '{', '?visibility', 'method', '?type',                   '?ident', '?list', '?block', '}' ]
+    }, {
+      'pattern'  => [                                        'method', '?type', 'va', '?/(::?)/', '?ident', '?list', '?block'      ],
+      'template' => [ 'namespace', 'va', '{',                'method', '?type',                   '?ident', '?list', '?block', '}' ]
     } ],
   },
   'export-method' => {

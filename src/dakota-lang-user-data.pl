@@ -8,9 +8,9 @@
 	'import'   => 1,
 	'noexport' => 1
     },
-    'list' => { 'open'  => '(', # constant for a language
+    'list' => { 'open'  => { '(' => 1 }, # constant for a language
 		'sep'   => ',',
-		'close' => ')',
+		'close' => { ')' => 1 },
 		'member' => { 'term' => { ',' => 1,
 					  ')' => 1 }}},
 }

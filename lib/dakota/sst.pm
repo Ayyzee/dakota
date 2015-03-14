@@ -81,14 +81,14 @@ sub log_sub_name {
   my ($name) = @_;
   #print "$name\n";
 }
-sub sst::open_token_for_close_token {
+sub sst::open_tokens_for_close_token {
   my ($close_token) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
   die if (!&sst::is_close_token($close_token));
-  my $open_for_close = { ')' => '(',
-			 '}' => '{',
-			 ']' => '[' };
+  my $open_for_close = { ')' => { '(' => 1 },
+                         '}' => { '{' => 1 },
+                         ']' => { '[' => 1 } };
   my $open_token = $$open_for_close{$close_token};
   #die if (!&sst::is_open_token($open_token));
   return $open_token;
@@ -159,8 +159,6 @@ sub sst::make {
     elsif (m|\G(\$)($mid)|gc)             { &sst::add_token($sst, "$1$2"); }
     elsif (m|\G(\$)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
     elsif (m|\G($mid)|gc)                 { &sst::add_token($sst, $1); }
-    elsif (m|\G(\?)($id)(:)($id)|gc)      { &sst::add_token($sst, "$1$2$3$4"); }
-    elsif (m|\G(\?)(:)($id)|gc)           { &sst::add_token($sst, "$1$3$2$3"); } # hackhack
     elsif (m|\G(\?)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
     elsif (m/\G(\$(\(|\{|\[))/gc)         { &sst::add_token($sst, $1); }
     elsif (m|\G($id)|gc)                  { &sst::add_token($sst, $1); }
@@ -590,7 +588,8 @@ sub constraint_balenced {
 	  return undef;
 	}
 
-	die if $open_token ne &sst::open_token_for_close_token($token);
+  my $open_tokens = &sst::open_token_for_close_token($token);
+  die if ! exists $$open_tokens{$open_token}
       }
       push @$result_rhs, $token;
 
