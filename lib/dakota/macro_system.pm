@@ -599,7 +599,7 @@ sub rule_replace {
   }
   my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs);
   assert($_rhs_num_tokens - $rhs_num_tokens);
-  if (0) {
+  if ($ENV{'DK_MACROS_SINGLE_LINE'}) {
     print STDERR &sst_fragment::filestr($$sst{'tokens'});
   }
   return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
