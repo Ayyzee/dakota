@@ -19,4 +19,20 @@
     'initializer-list' => { 'open' =>  { '{' => 1 },
                             'sep' =>   { ',' => 1 },
                             'close' => { '}' => 1 } },
+
+    'literal-sequence' => { 'open'  => { '$[' => 1 },
+                            'sep' =>   { ',' =>  1 },
+                            'close' => { ']' =>  1 } },
+
+    'literal-assoc' =>    { 'open'  => { '$(' => 1 },
+                            'sep' =>   { '=>' => 1 },
+                            'close' => { ')' =>  1 } },
+
+    'literal-set' =>      { 'open'  => { '${' => 1 },
+                            'sep' =>   { ',' =>  1 },
+                            'close' => { '}' =>  1 } },
+
+    'literal-table' =>    { 'open'  => { '${' => 1 },
+                            'sep' =>   { '=>' => 1 },
+                            'close' => { '}' =>  1 } },
 }
