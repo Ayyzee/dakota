@@ -703,10 +703,16 @@ unless (caller) {
   my $num_tokens = 0;
 
   foreach my $file (@ARGV) {
-    if (! $ENV{'DK_MACROS_SINGLE_LINE'}) {
+    my $filestr = &dakota::filestr_from_file($file);
+
+    if ($ENV{'DK_MACROS_SINGLE_LINE'}) {
+      print STDERR $filestr;
+      if ($filestr !~ m/\n$/) {
+        print STDERR "\n";;
+      }
+    } else {
       print STDERR $file, "\n";
     }
-    my $filestr = &dakota::filestr_from_file($file);
     my $sst = &sst::make($filestr, $file);
     $num_tokens += @{$$sst{'tokens'}};
     &macros_expand($sst, $macros, $user_data);
