@@ -97,7 +97,7 @@ sub list_member_term  { # move to a language specific macro
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
 
-  if ($$user_data{'list'}{'member'}{'term'}{$tkn}) {
+  if ($$user_data{'list'}{'sep'}{$tkn} || $$user_data{'list'}{'close'}{$tkn}) {
     $result = $index;
   }
   return $result;
@@ -105,8 +105,7 @@ sub list_member_term  { # move to a language specific macro
 sub list_member {
   my ($sst, $index, $constraint, $user_data) = @_;
   my $tkn = &sst::at($sst, $index);
-  #die if $$user_data{'list'}{'member'}{'term'}{$tkn};
-  return -1 if $$user_data{'list'}{'member'}{'term'}{$tkn};
+  return -1 if $$user_data{'list'}{'sep'}{$tkn} || $$user_data{'list'}{'close'}{$tkn};
   my $o = 1;
   my $is_framed = 0;
   my $num_tokens = scalar @{$$sst{'tokens'}};
@@ -115,7 +114,7 @@ sub list_member {
     $tkn = &sst::at($sst, $index + $o);
 
     if (!$is_framed) {
-      if ($$user_data{'list'}{'member'}{'term'}{$tkn}) {
+      if ($$user_data{'list'}{'sep'}{$tkn} || $$user_data{'list'}{'close'}{$tkn}) {
         return $index + $o - 1;
       }
     }
@@ -244,7 +243,7 @@ sub list_in { # body is optional since it uses balenced_in() which uses balenced
   return &balenced_in($sst, $index, $constraint, $user_data);
 }
 sub balenced {
-  my ($sst, $open_token_index, $user_data) = @_;
+  my ($sst, $open_token_index, $constraint, $user_data) = @_;
   my $close_token_index = $open_token_index;
   my $opens = [];
   my $result = -1;
@@ -252,11 +251,11 @@ sub balenced {
   while (1) {
     my $open_token;
     my $close_token;
-    if (&sst::is_open_token($open_token = &sst::at($sst, $close_token_index))) {
+    if (&sst::is_open_token($open_token = &sst::at($sst, $close_token_index), $user_data)) {
       push @$opens, $open_token;
-    } elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index))) {
+    } elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index), $user_data)) {
       $open_token = pop @$opens;
-      my $open_tokens = &sst::open_tokens_for_close_token($close_token);
+      my $open_tokens = &sst::open_tokens_for_close_token($close_token, $user_data);
       die if !exists $$open_tokens{$open_token};
     }
     if (0 == @$opens) {
@@ -600,6 +599,9 @@ sub rule_replace {
   }
   my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs);
   assert($_rhs_num_tokens - $rhs_num_tokens);
+  if (0) {
+    print STDERR &sst_fragment::filestr($$sst{'tokens'});
+  }
   return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
 }
 sub rule_match_and_replace {
@@ -646,6 +648,23 @@ sub lang_user_data {
 
 unless (caller) {
   my $user_data = &lang_user_data();
+  $$user_data{'-sst-'}{'open-tokens'} = {};
+  $$user_data{'-sst-'}{'close-tokens'} = {};
+  $$user_data{'-sst-'}{'open-tokens-for-close-token'} = {};
+  $$user_data{'-sst-'}{'close-token-for-open-token'} = {};
+  my $keys = [keys %$user_data];
+  for my $key (@$keys) {
+    if ($$user_data{$key}{'open'} && $$user_data{$key}{'close'}) {
+      foreach my $close_token (keys %{$$user_data{$key}{'close'}}) {
+        foreach my $open_token (keys %{$$user_data{$key}{'open'}}) {
+          $$user_data{'-sst-'}{'open-tokens'}{$open_token} = 1;
+          $$user_data{'-sst-'}{'close-tokens'}{$close_token} = 1;
+          $$user_data{'-sst-'}{'open-tokens-for-close-token'}{$close_token}{$open_token} = 1;
+          $$user_data{'-sst-'}{'close-token-for-open-token'}{$open_token}{$close_token} = 1;
+        }
+      }
+    }
+  }
 
   my $macros;
   if ($ENV{'DK_MACROS_PATH'}) {

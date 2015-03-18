@@ -82,49 +82,43 @@ sub log_sub_name {
   #print "$name\n";
 }
 sub sst::open_tokens_for_close_token {
-  my ($close_token) = @_;
+  my ($close_token, $user_data) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
-  die if (!&sst::is_close_token($close_token));
-  my $open_for_close = { ')' => { '(' => 1 },
-                         '}' => { '{' => 1 },
-                         ']' => { '[' => 1 } };
+  die if (!&sst::is_close_token($close_token, $user_data));
+  my $open_for_close = $$user_data{'-sst-'}{'open-tokens-for-close-token'};
   my $open_token = $$open_for_close{$close_token};
-  #die if (!&sst::is_open_token($open_token));
+  #die if (!&sst::is_open_token($open_token, $user_data));
   return $open_token;
 }
 sub sst::close_token_for_open_token {
-  my ($open_token) = @_;
+  my ($open_token, $user_data) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
-  die if (!&sst::is_open_token($open_token));
-  my $close_for_open = { '(' => ')',
-			 '{' => '}',
-			 '[' => ']' };
+  die if (!&sst::is_open_token($open_token, $user_data));
+  my $close_for_open = $$user_data{'-sst-'}{'close-token-for-open-token'};
   my $close_token = $$close_for_open{$open_token};
-  #die if (!&sst::is_open_token($open_token));
+  #die if (!&sst::is_open_token($open_token, $user_data));
   return $close_token;
 }
 sub sst::is_open_token {
-  my ($str) = @_;
+  my ($str, $user_data) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
   my $result = 0;
-  if ('(' eq $str ||
-      '{' eq $str ||
-      '[' eq $str) {
+  my $open_tokens = $$user_data{'-sst-'}{'open-tokens'};
+  if ($$open_tokens{$str}) {
     $result = 1;
   }
   return $result;
 }
 sub sst::is_close_token {
-  my ($str) = @_;
+  my ($str, $user_data) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
   my $result = 0;
-  if (')' eq $str ||
-      '}' eq $str ||
-      ']' eq $str) {
+  my $close_tokens = $$user_data{'-sst-'}{'close-tokens'};
+  if ($$close_tokens{$str}) {
     $result = 1;
   }
   return $result;
@@ -506,7 +500,7 @@ sub sst_cursor::dump {
   return $sst_cursor;
 }
 sub constraint_literal_dquoted_cstring {
-  my ($sst, $range) = @_;
+  my ($sst, $range, $user_data) = @_;
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
@@ -517,7 +511,7 @@ sub constraint_literal_dquoted_cstring {
   return ($result_lhs, $result_rhs);
 }
 sub constraint_literal_squoted_cstring {
-  my ($sst, $range) = @_;
+  my ($sst, $range, $user_data) = @_;
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
@@ -528,7 +522,7 @@ sub constraint_literal_squoted_cstring {
   return ($result_lhs, $result_rhs);
 }
 sub constraint_ident {
-  my ($sst, $range) = @_;
+  my ($sst, $range, $user_data) = @_;
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
@@ -539,7 +533,7 @@ sub constraint_ident {
   return ($result_lhs, $result_rhs);
 }
 sub constraint_method_name {
-  my ($sst, $range) = @_;
+  my ($sst, $range, $user_data) = @_;
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
@@ -550,23 +544,23 @@ sub constraint_method_name {
   return ($result_lhs, $result_rhs);
 }
 sub constraint_block {
-  my ($sst, $range) = @_;
-  return &constraint_balenced($sst, $range);
+  my ($sst, $range, $user_data) = @_;
+  return &constraint_balenced($sst, $range, $user_data);
 }
 sub constraint_list {
-  my ($sst, $range) = @_;
-  return &constraint_balenced($sst, $range);
+  my ($sst, $range, $user_data) = @_;
+  return &constraint_balenced($sst, $range, $user_data);
 }
 sub constraint_block_in {
-  my ($sst, $range) = @_;
-  return &constraint_balenced_in($sst, $range);
+  my ($sst, $range, $user_data) = @_;
+  return &constraint_balenced_in($sst, $range, $user_data);
 }
 sub constraint_list_in {
-  my ($sst, $range) = @_;
-  return &constraint_balenced_in($sst, $range);
+  my ($sst, $range, $user_data) = @_;
+  return &constraint_balenced_in($sst, $range, $user_data);
 }
 sub constraint_balenced {
-  my ($sst, $range) = @_;
+  my ($sst, $range, $user_data) = @_;
   my $first_token = $$sst{'tokens'}[$$range[0]]{'str'};
   #print STDERR "first_token_index: $$range[0]\n";
   #print STDERR "first_token: $first_token\n";
@@ -575,20 +569,20 @@ sub constraint_balenced {
   my $close_token_index = $$range[0];
   my $opens = [];
 
-  if (&sst::is_open_token($first_token)) {
+  if (&sst::is_open_token($first_token, $user_data)) {
     while ($close_token_index <= $$range[1]) {
       my $token = &sst::at($sst, $close_token_index);
 
-      if (&sst::is_open_token($token)) {
+      if (&sst::is_open_token($token, $user_data)) {
 	push @$opens, $token;
-      } elsif (&sst::is_close_token($token)) {
+      } elsif (&sst::is_close_token($token, $user_data)) {
 	my $open_token = pop @$opens;
 
 	if (!defined $open_token) {
 	  return undef;
 	}
 
-  my $open_tokens = &sst::open_token_for_close_token($token);
+  my $open_tokens = &sst::open_tokens_for_close_token($token, $user_data);
   die if ! exists $$open_tokens{$open_token}
       }
       push @$result_rhs, $token;
@@ -603,11 +597,11 @@ sub constraint_balenced {
   return ($result_lhs, $result_rhs);
 }
 sub constraint_balenced_in {
-  my ($sst, $range) = @_;
+  my ($sst, $range, $user_data) = @_;
   my ($result_lhs, $result_rhs) = (undef, []);
 
   if (1 <= $$range[0]) {
-    ($result_lhs, $result_rhs) = &constraint_balenced($sst, [ $$range[0] - 1, $$range[1] ]);
+    ($result_lhs, $result_rhs) = &constraint_balenced($sst, [ $$range[0] - 1, $$range[1] ], $user_data);
 
     if ($result_lhs) {
       $$result_lhs[1]--;
@@ -781,12 +775,12 @@ sub sst_cursor::next_token {
   return &sst::at($$sst_cursor{'sst'}, $$sst_cursor{'current-token-index'} + 1);
 }
 sub sst_cursor::balenced {
-  my ($sst_cursor) = @_;
+  my ($sst_cursor, $user_data) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
 
   my $index = $$sst_cursor{'current-token-index'};
-  while (!&sst::is_open_token(&sst::at($$sst_cursor{'sst'}, $index))) {
+  while (!&sst::is_open_token(&sst::at($$sst_cursor{'sst'}, $index), $user_data)) {
     $index++;
   }
   my $stk = [];
@@ -794,10 +788,10 @@ sub sst_cursor::balenced {
        $i < &sst::size($$sst_cursor{'sst'});
        $i++) {
     my $token = &sst::at($$sst_cursor{'sst'}, $i);
-    if (&sst::is_open_token($token)) {
-      my $expected_close_token = &sst::close_token_for_open_token($token);
+    if (&sst::is_open_token($token, $user_data)) {
+      my $expected_close_token = &sst::close_token_for_open_token($token, $user_data);
       push @$stk, $expected_close_token;
-    } elsif (&sst::is_close_token($token)) {
+    } elsif (&sst::is_close_token($token, $user_data)) {
       my $expected_close_token = pop @$stk;
 
       if ($expected_close_token ne $token) {

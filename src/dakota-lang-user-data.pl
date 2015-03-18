@@ -8,9 +8,15 @@
 	'import'   => 1,
 	'noexport' => 1
     },
-    'list' => { 'open'  => { '(' => 1 }, # constant for a language
-		'sep'   => ',',
-		'close' => { ')' => 1 },
-		'member' => { 'term' => { ',' => 1,
-					  ')' => 1 }}},
+
+    'array' =>            { 'open'  => { '[' => 1 },
+                            'close' => { ']' => 1 } },
+
+    'list' =>             { 'open'  => { '(' => 1 },
+                            'sep'   => { ',' => 1 },
+                            'close' => { ')' => 1 } },
+
+    'initializer-list' => { 'open' =>  { '{' => 1 },
+                            'sep' =>   { ',' => 1 },
+                            'close' => { '}' => 1 } },
 }

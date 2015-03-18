@@ -21,6 +21,7 @@ verbose=false
 if $verbose; then
     ./diff.sh $paths > macro-system-test-output/diff.txt
     cat macro-system-test-output/diff.txt
+    rm macro-system-test-output/diff.txt
 fi
 
 cat /tmp/summary-$$.txt
