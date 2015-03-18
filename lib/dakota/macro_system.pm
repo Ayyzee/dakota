@@ -559,6 +559,16 @@ sub rule_match {
   &debug_print_match($macro_name, $debug2_str, $debug3_str, $i, $last_index, $pattern, $sst, $lhs);
   return ($last_index, $lhs, $rhs_for_pattern);
 }
+sub ident_concat {
+  my ($flat_rhs) = @_;
+  for (my $o = (scalar @$flat_rhs) - 1 - 1; $o > 0; $o--) {
+    if ($$flat_rhs[$o]{'str'} eq '##') {
+      $$flat_rhs[$o - 1]{'str'} .= $$flat_rhs[$o + 1]{'str'};
+      splice(@$flat_rhs, $o, 1 + 1);
+    }
+  }
+  return $flat_rhs;
+}
 sub rule_replace {
   my ($sst, $i, $last_index, $template, $rhs_for_pattern, $lhs, $macro_name) = @_;
   my $rhs = &rhs_from_template($template, $lhs, $rhs_for_pattern);
@@ -573,6 +583,7 @@ sub rule_replace {
   &assert($lhs_num_tokens - scalar @{&dakota::util::flatten($lhs)});
   &debug_print_replace($template, $rhs, $lhs_num_tokens);
   my $flat_rhs = &dakota::util::flatten($rhs);
+  $flat_rhs = &ident_concat($flat_rhs);
   my $_rhs_num_tokens = scalar @$flat_rhs;
   my $common_num_tokens = 0;
   my $min_num_tokens = &dakota::util::min($lhs_num_tokens, $_rhs_num_tokens);
