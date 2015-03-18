@@ -600,7 +600,11 @@ sub rule_replace {
   my $rhs_num_tokens = &sst::splice($sst, $i, $lhs_num_tokens, $flat_rhs);
   assert($_rhs_num_tokens - $rhs_num_tokens);
   if ($ENV{'DK_MACROS_SINGLE_LINE'}) {
-    print STDERR &sst_fragment::filestr($$sst{'tokens'});
+    my $filestr = &sst_fragment::filestr($$sst{'tokens'});
+    $filestr =~ s/\n+//g;
+    $filestr =~ s/\s*,/, /g;
+    $filestr =~ s/\s*, \s+/, /g;
+    print STDERR $filestr . "\n";
   }
   return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
 }
@@ -688,7 +692,9 @@ unless (caller) {
   my $num_tokens = 0;
 
   foreach my $file (@ARGV) {
-    print STDERR $file, "\n";
+    if (! $ENV{'DK_MACROS_SINGLE_LINE'}) {
+      print STDERR $file, "\n";
+    }
     my $filestr = &dakota::filestr_from_file($file);
     my $sst = &sst::make($filestr, $file);
     $num_tokens += @{$$sst{'tokens'}};
