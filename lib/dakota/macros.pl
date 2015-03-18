@@ -12,8 +12,20 @@
       'template' => [ 'make', '(', 'LITERAL-ASSOC-KLASS', ',', '$key', '=>', '?ident', ',',  '$element', '=>', '?list-member', ')' ]
     } ],
   },
-  'literal-table' => { # ${ lhs => expr , ... }
+  'literal-set' => { # ${ element, ... }
     'rules' => [ {
+      'pattern'  => [ '${', ',', '}'                        ],
+      'template' => [ 'make', '(', 'LITERAL-SET-KLASS', ')' ]
+    } ],
+  },
+  'literal-table' => { # ${ key => expr , ... }
+    'rules' => [ {
+      'pattern'  => [ '${', '}'                               ], # optimization (third ruleset correctly handles this)
+      'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ')' ]
+    }, {
+      'pattern'  => [ '${', '=>', '}'                         ],
+      'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ')' ]
+    }, {
       'pattern'  => [                                                                                                 '${',                    '?block-in', '}'      ],
       'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ',', '$items', '=>', 'cast', '(', 'object-t', '[', ']', ')', '{', 'NULL-ASSOC', ',', '?block-in', '}', ')' ]
     } ],
@@ -22,6 +34,9 @@
     'rules' => [ {
       'pattern'  => [ 'NULL-ASSOC', ',',       '?ident', '=>', '?list-member'                         ],
       'template' => [                    '$(', '?ident', '=>', '?list-member', ')', ',', 'NULL-ASSOC' ]
+    }, {
+      'pattern'  => [ 'NULL-ASSOC', ',', '}' ], # this should only happen when empty literal table is not special cased in macro literal-table
+      'template' => [ 'NULL-ASSOC',      '}' ]
     } ],
   },
   'include-stmt' => {
