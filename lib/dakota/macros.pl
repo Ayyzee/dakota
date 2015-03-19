@@ -77,20 +77,23 @@
   },
   'keyword-args-defn' => {
     'rules' => [ {
-      'pattern'  => [ '?type', '?ident', '=>', '?list-member', ],
-      'template' => [ '?type', '?ident',                       ]
+      'pattern'  => [ '?type', '?/([a-zA-Z0-9-]+\??)/', '=>', '?list-member', ],
+      'template' => [ '?type', '?2',                                          ]
     } ],
   },
   'keyword-args-use' => {
     'rules' => [ {
-      'pattern'  => [ 'NULL-KEYWORD', ',',                               '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
-      'template' => [                      '__keyword', '::', '_', '##', '?3',                   ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+      'pattern'  => [ 'NULL-KEYWORD', ',',                               '?/\$([a-zA-Z0-9-]+\??)/', '=>', '?list-member'                      ],
+      'template' => [                      '__keyword', '::', '_', '##', '?3',                      ',',  '?list-member', ',', 'NULL-KEYWORD' ]
     }, {
-      'pattern'  => [                                                    '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
-      'template' => [                      '__keyword', '::', '_', '##', '?1',                   ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
-    }, {
-      'pattern'  => [                                                    '?/\$([a-zA-Z0-9-]+)/'                                             ],
-      'template' => [                      '__symbol',  '::', '_', '##', '?1'                                                               ]
+      'pattern'  => [                 ',',                               '?/\$([a-zA-Z0-9-]+\??)/', '=>', '?list-member'                      ], # leading comma is required
+      'template' => [                 ',', '__keyword', '::', '_', '##', '?2',                      ',',  '?list-member', ',', 'NULL-KEYWORD' ]  # leading comma is required
+    } ],
+  },
+  'symbol' => {
+    'rules' => [ {
+      'pattern'  => [                               '?/\$([a-zA-Z0-9-]+\??)/' ],
+      'template' => [ '__symbol',  '::', '_', '##', '?1'                      ]
     } ],
   },
   'keyword-args-wrap' => {
