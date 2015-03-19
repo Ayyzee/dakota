@@ -106,7 +106,7 @@ sub list_member {
   my ($sst, $index, $constraint, $user_data) = @_;
   my $tkn = &sst::at($sst, $index);
   return -1 if $$user_data{'list'}{'sep'}{$tkn} || $$user_data{'list'}{'close'}{$tkn};
-  my $o = 1;
+  my $o = 0;
   my $is_framed = 0;
   my $num_tokens = scalar @{$$sst{'tokens'}};
 
@@ -118,9 +118,9 @@ sub list_member {
         return $index + $o - 1;
       }
     }
-    if (exists $$user_data{'list'}{'open'}{$tkn}) {
+    if (exists $$user_data{'-sst-'}{'open-tokens'}{$tkn}) {
       $is_framed++;
-    } elsif (exists $$user_data{'list'}{'close'}{$tkn} && $is_framed) {
+    } elsif (exists $$user_data{'-sst-'}{'close-tokens'}{$tkn} && $is_framed) {
       $is_framed--;
     }
     $o++;
