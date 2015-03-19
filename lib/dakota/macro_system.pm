@@ -68,11 +68,14 @@ my ($id,  $mid,  $bid,  $tid,
 my $dqstr = &dqstr_regex();
 
 my $constraints = {
+  'assoc-in' =>         \&assoc_in,
+  'assoc-in-list' =>    \&assoc_in_list,
   'balenced' =>         \&balenced,
   'balenced-in' =>      \&balenced_in,
   'block' =>            \&block,
   'block-in' =>         \&block_in,
   'dquote-str' =>       \&dquote_str,
+  'expr' =>             \&expr,
   'ident' =>            \&ident,
   'kw-args-ident-1' =>       \&kw_args_ident_1,
   'kw-args-ident-2' =>       \&kw_args_ident_2,
@@ -115,6 +118,56 @@ sub list_member {
 
     if (!$is_framed) {
       if ($$user_data{'list'}{'sep'}{$tkn} || $$user_data{'list'}{'close'}{$tkn}) {
+        return $index + $o - 1;
+      }
+    }
+    if (exists $$user_data{'-sst-'}{'open-tokens'}{$tkn}) {
+      $is_framed++;
+    } elsif (exists $$user_data{'-sst-'}{'close-tokens'}{$tkn} && $is_framed) {
+      $is_framed--;
+    }
+    $o++;
+  }
+  return -1;
+}
+sub assoc_in { # ?ident => member
+  my ($sst, $index, $constraint, $user_data) = @_;
+  my $num_tokens = scalar @{$$sst{'tokens'}};
+  return -1 if $num_tokens < $index + 3;
+  return -1 if -1 == &ident($sst, $index, 'ident', $user_data);
+  my $sep = &sst::at($sst, $index + 1);
+  return -1 if ! $$user_data{'literal-assoc'}{'sep'}{$sep};
+  return &expr($sst, $index + 2, 'expr', $user_data);
+}
+sub assoc_in_list {
+  my ($sst, $index, $constraint, $user_data) = @_;
+  my $result = -1;
+  my $sub_index = $index;
+  my $num_tokens = scalar @{$$sst{'tokens'}};
+
+  while ($num_tokens > $sub_index) {
+    $sub_index = &assoc_in($sst, $sub_index, 'assoc-in', $user_data);
+    return $result if -1 == $sub_index;
+    $result = $sub_index++;
+    my $sep = &sst::at($sst, $sub_index);
+    return $result if ! $$user_data{'literal-assoc-in-list'}{'sep'}{$sep};
+    $sub_index++;
+  }
+  return -1;
+}
+sub expr {
+  my ($sst, $index, $constraint, $user_data) = @_;
+  my $tkn = &sst::at($sst, $index);
+  return -1 if $$user_data{'sep'}{$tkn} || $$user_data{'-sst-'}{'close-tokens'}{$tkn};
+  my $o = 0;
+  my $is_framed = 0;
+  my $num_tokens = scalar @{$$sst{'tokens'}};
+
+  while ($num_tokens > $index + $o) {
+    $tkn = &sst::at($sst, $index + $o);
+
+    if (!$is_framed) {
+      if ($$user_data{'sep'}{$tkn} || $$user_data{'-sst-'}{'close-tokens'}{$tkn}) {
         return $index + $o - 1;
       }
     }
@@ -277,11 +330,11 @@ sub balenced_in {
   }
   return $result;
 }
+### end of constraint variable defns
 sub assert {
   my ($result) = @_;
   die if $result != 0;
 }
-### end of constraint variable defns
 sub macro_expand_recursive {
   my ($sst, $i, $macros, $macro_name, $macro, $expanded_macro_names, $user_data) = @_;
   my $change_count = 0;
@@ -622,10 +675,12 @@ sub rule_replace {
 sub rule_match_and_replace {
   my ($sst, $i, $macros, $macro_name, $macro, $rules, $user_data) = @_;
   my $change_count = 0;
+  return $change_count if $$macro{'disabled'};
   my $num_tokens = scalar @{$$sst{'tokens'}};
   for (my $r = 0; $r < scalar @$rules; $r++) {
     my $rule = $$rules[$r];
     next if $i > $num_tokens - @{$$rule{'pattern'}};
+    next if $$rule{'disabled'};
 
     my ($last_index, $lhs, $rhs_for_pattern)
       = &rule_match($sst, $i, $$rule{'pattern'}, $user_data, $macros, $macro_name, $macro);

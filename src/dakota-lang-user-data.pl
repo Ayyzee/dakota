@@ -15,6 +15,7 @@
     'import'   => 1,
     'noexport' => 1
   },
+  'sep' => { ',' => 1, ';' => 1 },
 
     'array' =>            { 'open'  => { '[' => 1 },
                             'close' => { ']' => 1 } },
@@ -31,6 +32,7 @@
                             'sep' =>   { ',' =>  1 },
                             'close' => { ']' =>  1 } },
 
+    'literal-assoc-in-list' => { 'sep' => { ',' => 1 } },
     'literal-assoc' =>    { 'open'  => { '$(' => 1 },
                             'sep' =>   { '=>' => 1 },
                             'close' => { ')' =>  1 } },
@@ -40,6 +42,6 @@
                             'close' => { '}' =>  1 } },
 
     'literal-table' =>    { 'open'  => { '${' => 1 },
-                            'sep' =>   { '=>' => 1 },
+                            'sep' =>   { ',' =>  1 }, # comma separated list of assoc-in
                             'close' => { '}' =>  1 } },
 }
