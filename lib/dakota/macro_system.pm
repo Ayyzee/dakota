@@ -713,11 +713,6 @@ sub lang_user_data {
   } else {
     die;
   }
-  return $user_data;
-}
-
-unless (caller) {
-  my $user_data = &lang_user_data();
   $$user_data{'-sst-'}{'open-tokens'} = {};
   $$user_data{'-sst-'}{'close-tokens'} = {};
   $$user_data{'-sst-'}{'open-tokens-for-close-token'} = {};
@@ -741,6 +736,11 @@ unless (caller) {
       }
     }
   }
+  return $user_data;
+}
+
+unless (caller) {
+  my $user_data = &lang_user_data();
 
   my $macros;
   if ($ENV{'DK_MACROS_PATH'}) {
