@@ -708,10 +708,10 @@ unless (caller) {
     if ($ENV{'DK_MACROS_SINGLE_LINE'}) {
       print STDERR $filestr;
       if ($filestr !~ m/\n$/) {
-        print STDERR "\n";;
+        print STDERR "\n";
       }
     } else {
-      print STDERR $file, "\n";
+      print STDERR $file . "\n";
     }
     my $sst = &sst::make($filestr, $file);
     $num_tokens += @{$$sst{'tokens'}};

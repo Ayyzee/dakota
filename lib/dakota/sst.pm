@@ -30,37 +30,37 @@ use dakota::util;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-		 sst::changes
-		 sst::is_open_token
-		 sst::is_close_token
-		 sst::make
-		 sst::token_seq
-		 sst::size
-		 sst::at
-		 sst::prev_token_str
-		 sst::add_token
-		 sst::add_comment
-		 sst::add_cpp_directive
-		 sst::add_leading_ws
-		 sst::filestr_no_comments
-		 sst::filestr
-		 sst::shift_leading_ws
-		 sst::dump
-		 sst::splice
-		 sst_fragment::filestr
-		 sst_cursor::make
-		 sst_cursor::dump
-		 sst_cursor::match_pattern_seq
-		 sst_cursor::at
-		 sst_cursor::str
-		 sst_cursor::size
-		 sst_cursor::previous_token
-		 sst_cursor::current_token
-		 sst_cursor::current_token_p
-		 sst_cursor::next_token
-		 sst_cursor::token_index
-		 sst_cursor::balenced
-	      );
+                 sst::changes
+                 sst::is_open_token
+                 sst::is_close_token
+                 sst::make
+                 sst::token_seq
+                 sst::size
+                 sst::at
+                 sst::prev_token_str
+                 sst::add_token
+                 sst::add_comment
+                 sst::add_cpp_directive
+                 sst::add_leading_ws
+                 sst::filestr_no_comments
+                 sst::filestr
+                 sst::shift_leading_ws
+                 sst::dump
+                 sst::splice
+                 sst_fragment::filestr
+                 sst_cursor::make
+                 sst_cursor::dump
+                 sst_cursor::match_pattern_seq
+                 sst_cursor::at
+                 sst_cursor::str
+                 sst_cursor::size
+                 sst_cursor::previous_token
+                 sst_cursor::current_token
+                 sst_cursor::current_token_p
+                 sst_cursor::next_token
+                 sst_cursor::token_index
+                 sst_cursor::balenced
+             );
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -68,7 +68,7 @@ $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Useqq     = 1;
 $Data::Dumper::Sortkeys =  0;
-$Data::Dumper::Indent    = 1;	# default = 2
+$Data::Dumper::Indent    = 1;  # default = 2
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &ident_regex();
@@ -131,14 +131,14 @@ sub sst::make {
   local $_ = $filestr;
 
   my $sst = {
-	     'prev-line' => 0,
-	     'file' => '',
-	     'line' => 1,
-	     'tokens' => [],
-	     'tokens-count' => 0,
-	     'leading-ws' => '',
-	     'changes' => {},
-	    };
+    'prev-line' => 0,
+    'file' => '',
+    'line' => 1,
+    'tokens' => [],
+    'tokens-count' => 0,
+    'leading-ws' => '',
+    'changes' => {},
+  };
   if (defined $file) {
     $$sst{'file'} = $file;
   }
@@ -226,7 +226,8 @@ sub sst::at {
   return $$sst{'tokens'}[$index]{'str'};
 }
 sub sst::prev_token_str {
-  my ($sst) = @_;		#my $__sub__ = (caller(0))[3];
+  my ($sst) = @_;
+  #my $__sub__ = (caller(0))[3];
   my $token = $$sst{'tokens'}[-1];
   return $$token{'str'};
 }
@@ -266,15 +267,15 @@ sub sst::add_token {
     $$token{'begin-word'} = 1;
   } else {
     if (';' eq &sst::prev_token_str($sst) ||
-	'{' eq &sst::prev_token_str($sst) ||
-	'}' eq &sst::prev_token_str($sst)) {
+        '{' eq &sst::prev_token_str($sst) ||
+        '}' eq &sst::prev_token_str($sst)) {
       if ($str =~ m|$id|) {
-	if ($sst_debug) {
-	  print STDERR "$str\n";
-	}
-	$$token{'begin-word'} = 1;
+        if ($sst_debug) {
+          print STDERR "$str\n";
+        }
+        $$token{'begin-word'} = 1;
       } elsif ($sst_debug) {
-	print STDERR "  $str\n";
+        print STDERR "  $str\n";
       }
     } elsif ($sst_debug) {
       print STDERR "  $str\n";
@@ -574,22 +575,22 @@ sub constraint_balenced {
       my $token = &sst::at($sst, $close_token_index);
 
       if (&sst::is_open_token($token, $user_data)) {
-	push @$opens, $token;
+        push @$opens, $token;
       } elsif (&sst::is_close_token($token, $user_data)) {
-	my $open_token = pop @$opens;
+        my $open_token = pop @$opens;
 
-	if (!defined $open_token) {
-	  return undef;
-	}
+        if (!defined $open_token) {
+          return undef;
+        }
 
-  my $open_tokens = &sst::open_tokens_for_close_token($token, $user_data);
-  die if ! exists $$open_tokens{$open_token}
+        my $open_tokens = &sst::open_tokens_for_close_token($token, $user_data);
+        die if ! exists $$open_tokens{$open_token}
       }
       push @$result_rhs, $token;
 
       if (0 == @$opens) {
-	$result_lhs = [ $$range[0], $close_token_index ];
-	last;
+        $result_lhs = [ $$range[0], $close_token_index ];
+        last;
       }
       $close_token_index++;
     }
@@ -608,8 +609,8 @@ sub constraint_balenced_in {
       die if 0 == $$result_lhs[1];
 
       for (my $i = $$result_lhs[0]; $i < $$result_lhs[1]; $i++) {
-	my $token = &sst::at($sst, $i);
-	push @$result_rhs, $token;
+        my $token = &sst::at($sst, $i);
+        push @$result_rhs, $token;
       }
     }
   }
@@ -618,12 +619,12 @@ sub constraint_balenced_in {
 sub constraint_for_name {
   my ($name) = @_;
   my $constraint_tbl = {
-			'?method-name' => \&constraint_method_name,
-			'?literal-dquoted-cstring' => \&constraint_literal_dquoted_cstring,
-			'?literal-squoted-cstring' => \&constraint_literal_squoted_cstring,
-			'?ident' => \&constraint_ident,
-			'?block' => \&constraint_block,
-		       };
+    '?method-name' => \&constraint_method_name,
+    '?literal-dquoted-cstring' => \&constraint_literal_dquoted_cstring,
+    '?literal-squoted-cstring' => \&constraint_literal_squoted_cstring,
+    '?ident' => \&constraint_ident,
+    '?block' => \&constraint_block,
+  };
   my $constraint = $$constraint_tbl{$name};
   return $constraint;
 }
@@ -646,40 +647,40 @@ sub sst_cursor::match_pattern_seq {
       my $pattern_token = $$pattern_seq[$i];
 
       if (!defined $input_token || !defined $pattern_token) {
-	$range = undef;
-	$matches = undef;
-	last;
+        $range = undef;
+        $matches = undef;
+        last;
       }
       #print STDERR "$input_token  <=>  $pattern_token\n";
 
       if ($pattern_token =~ m/^\?/) {
-	my $constraint = &constraint_for_name($pattern_token);
-	my ($result_lhs, $result_rhs) = &$constraint($$sst_cursor{'sst'},
-						     [ $$sst_cursor{'first-token-index'} + $i,
-						       @{$$sst_cursor{'sst'}{'tokens'}} - 1 ]);
-	if ($result_lhs) {
-	  $range = $result_lhs;
-	  $$matches{$pattern_token} = $result_rhs;
-	  &dakota::util::_add_last($all_index, $$result_lhs[0]);
-	  &dakota::util::_add_last($all_index, $$result_lhs[1]);
-	} else {
-	  $all_index = [];
-	  $range = undef;
-	  $matches = undef;
-	  last;
-	}
+        my $constraint = &constraint_for_name($pattern_token);
+        my ($result_lhs, $result_rhs) = &$constraint($$sst_cursor{'sst'},
+                                                     [ $$sst_cursor{'first-token-index'} + $i,
+                                                       @{$$sst_cursor{'sst'}{'tokens'}} - 1 ]);
+        if ($result_lhs) {
+          $range = $result_lhs;
+          $$matches{$pattern_token} = $result_rhs;
+          &dakota::util::_add_last($all_index, $$result_lhs[0]);
+          &dakota::util::_add_last($all_index, $$result_lhs[1]);
+        } else {
+          $all_index = [];
+          $range = undef;
+          $matches = undef;
+          last;
+        }
       } else {
-	if ($input_token eq $pattern_token) {
-	  $range = [ $$sst_cursor{'first-token-index'} + $i,
-		     $$sst_cursor{'first-token-index'} + $i ];
+        if ($input_token eq $pattern_token) {
+          $range = [ $$sst_cursor{'first-token-index'} + $i,
+                     $$sst_cursor{'first-token-index'} + $i ];
 
-	  &dakota::util::_add_last($all_index, $$sst_cursor{'first-token-index'} + $i);
-	} else {
-	  $all_index = [];
-	  $range = undef;
-	  $matches = undef;
-	  last;
-	}
+          &dakota::util::_add_last($all_index, $$sst_cursor{'first-token-index'} + $i);
+        } else {
+          $all_index = [];
+          $range = undef;
+          $matches = undef;
+          last;
+        }
       }
     }
     if ($range && 0 != @$range) {
@@ -795,11 +796,11 @@ sub sst_cursor::balenced {
       my $expected_close_token = pop @$stk;
 
       if ($expected_close_token ne $token) {
-	print STDERR "error: expected $expected_close_token but got $token\n"; die;
+        print STDERR "error: expected $expected_close_token but got $token\n"; die;
       }
 
       if (0 == @$stk) {
-	return ($index, $i);
+        return ($index, $i);
       }
     }
   }
@@ -869,8 +870,8 @@ sub sst_cursor::warning {
 
   printf STDERR "%s:%i: did not expect \'%s\'\n",
     $$sst{'file'} ||= "<unknown>",
-      $line,
-	&sst::at($sst, $token_index);
+    $line,
+    &sst::at($sst, $token_index);
   return;
 }
 sub sst_cursor::error {
