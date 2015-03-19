@@ -11,8 +11,8 @@
       'pattern'  => [        '$(',                        ')' ],
       'template' => [ 'make', '(', 'LITERAL-ASSOC-KLASS', ')' ]
     }, {
-      'pattern'  => [        '$(',                                           '?ident', '=>',                   '?expr', ')' ],
-      'template' => [ 'make', '(', 'LITERAL-ASSOC-KLASS', ',', '$key', '=>', '?ident', ',',  '$element', '=>', '?expr', ')' ]
+      'pattern'  => [        '$(',                                           '?symbol', '=>',                               '?expr',      ')' ],
+      'template' => [ 'make', '(', 'LITERAL-ASSOC-KLASS', ',', '$key', '=>', '?symbol', ',',  '$element', '=>', 'box', '(', '?expr', ')', ')' ]
     } ],
   },
   'literal-sequence' => { # $[ expr, ... ]
@@ -27,7 +27,7 @@
       'template' => [ 'make', '(',  'LITERAL-SET-KLASS', ')' ]
     } ],
   },
-  'literal-table' => { # ${ key => expr , ... }
+  'literal-table' => { # ${ ?symbol => ?expr , ... }
     'rules' => [ {
       'pattern'  => [ '${', '}'                               ],
       'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ')' ]
@@ -35,14 +35,14 @@
       'pattern'  => [ '${', '=>', '}'                         ],
       'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ')' ]
     }, {
-      'pattern'  => [                                                                                                 '${',                    '?assoc-in-list', '}'      ],
-      'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ',', '$items', '=>', 'cast', '(', 'object-t', '[', ']', ')', '{', 'NULL-ASSOC', ',', '?assoc-in-list', '}', ')' ]
+      'pattern'  => [                                                                                                 '${',                    '?literal-table-assoc-in-list', '}'      ],
+      'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ',', '$items', '=>', 'cast', '(', 'object-t', '[', ']', ')', '{', 'NULL-ASSOC', ',', '?literal-table-assoc-in-list', '}', ')' ]
     } ],
   },
   'literal-table-assoc' => {
     'rules' => [ {
-      'pattern'  => [ 'NULL-ASSOC', ',',       '?assoc-in'                         ],
-      'template' => [                    '$(', '?assoc-in', ')', ',', 'NULL-ASSOC' ]
+      'pattern'  => [ 'NULL-ASSOC', ',',       '?literal-assoc-in'                         ],
+      'template' => [                    '$(', '?literal-assoc-in', ')', ',', 'NULL-ASSOC' ]
     } ],
   },
   'include-stmt' => {
@@ -88,6 +88,9 @@
     }, {
       'pattern'  => [                                                    '?/\$([a-zA-Z0-9-]+)/', '=>', '?list-member'                       ],
       'template' => [                      '__keyword', '::', '_', '##', '?1',                   ',',  '?list-member', ',', 'NULL-KEYWORD'  ]
+    }, {
+      'pattern'  => [                                                    '?/\$([a-zA-Z0-9-]+)/'                                             ],
+      'template' => [                      '__symbol',  '::', '_', '##', '?1'                                                               ]
     } ],
   },
   'keyword-args-wrap' => {

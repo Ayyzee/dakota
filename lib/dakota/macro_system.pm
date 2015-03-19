@@ -68,8 +68,8 @@ my ($id,  $mid,  $bid,  $tid,
 my $dqstr = &dqstr_regex();
 
 my $constraints = {
-  'assoc-in' =>         \&assoc_in,
-  'assoc-in-list' =>    \&assoc_in_list,
+  'literal-assoc-in' =>         \&literal_assoc_in,
+  'literal-table-assoc-in-list' =>    \&literal_table_assoc_in_list,
   'balenced' =>         \&balenced,
   'balenced-in' =>      \&balenced_in,
   'block' =>            \&block,
@@ -117,7 +117,7 @@ sub list_member {
     $tkn = &sst::at($sst, $index + $o);
 
     if (!$is_framed) {
-      if ($$user_data{'list'}{'sep'}{$tkn} || $$user_data{'list'}{'close'}{$tkn}) {
+      if ($$user_data{'list'}{'sep'}{$tkn} || $$user_data{'-sst-'}{'close-tokens'}{$tkn}) {
         return $index + $o - 1;
       }
     }
@@ -130,27 +130,27 @@ sub list_member {
   }
   return -1;
 }
-sub assoc_in { # ?ident => member
+sub literal_assoc_in { # ?symbol => ?expr
   my ($sst, $index, $constraint, $user_data) = @_;
   my $num_tokens = scalar @{$$sst{'tokens'}};
   return -1 if $num_tokens < $index + 3;
-  return -1 if -1 == &ident($sst, $index, 'ident', $user_data);
-  my $sep = &sst::at($sst, $index + 1);
-  return -1 if ! $$user_data{'literal-assoc'}{'sep'}{$sep};
+  return -1 if -1 == &symbol($sst, $index, 'symbol', $user_data);
+  my $op = &sst::at($sst, $index + 1);
+  return -1 if ! $$user_data{'literal-assoc'}{'op'}{$op};
   return &expr($sst, $index + 2, 'expr', $user_data);
 }
-sub assoc_in_list {
+sub literal_table_assoc_in_list {
   my ($sst, $index, $constraint, $user_data) = @_;
   my $result = -1;
   my $sub_index = $index;
   my $num_tokens = scalar @{$$sst{'tokens'}};
 
   while ($num_tokens > $sub_index) {
-    $sub_index = &assoc_in($sst, $sub_index, 'assoc-in', $user_data);
+    $sub_index = &literal_assoc_in($sst, $sub_index, 'literal-assoc-in', $user_data);
     return $result if -1 == $sub_index;
     $result = $sub_index++;
     my $sep = &sst::at($sst, $sub_index);
-    return $result if ! $$user_data{'literal-assoc-in-list'}{'sep'}{$sep};
+    return $result if ! $$user_data{'literal-table'}{'sep'}{$sep};
     $sub_index++;
   }
   return -1;
@@ -167,7 +167,7 @@ sub expr {
     $tkn = &sst::at($sst, $index + $o);
 
     if (!$is_framed) {
-      if ($$user_data{'sep'}{$tkn} || $$user_data{'-sst-'}{'close-tokens'}{$tkn}) {
+      if ($$user_data{'-sst-'}{'sep'}{$tkn} || $$user_data{'-sst-'}{'close-tokens'}{$tkn}) {
         return $index + $o - 1;
       }
     }
@@ -264,7 +264,7 @@ sub symbol {
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
 
-  if ($tkn =~ /^\$$mid$/) {
+  if ($tkn =~ /^\$$id\??$/) {
     $result = $index;
   }
   return $result;
@@ -722,8 +722,14 @@ unless (caller) {
   $$user_data{'-sst-'}{'close-tokens'} = {};
   $$user_data{'-sst-'}{'open-tokens-for-close-token'} = {};
   $$user_data{'-sst-'}{'close-token-for-open-token'} = {};
+  $$user_data{'-sst-'}{'sep'} = {};
   my $keys = [keys %$user_data];
   for my $key (@$keys) {
+    if ($$user_data{$key}{'sep'}) {
+      foreach my $sep (keys %{$$user_data{$key}{'sep'}}) { # normally something like , and ;
+        $$user_data{'-sst-'}{'sep'}{$sep} = 1;
+      }
+    }
     if ($$user_data{$key}{'open'} && $$user_data{$key}{'close'}) {
       foreach my $close_token (keys %{$$user_data{$key}{'close'}}) {
         foreach my $open_token (keys %{$$user_data{$key}{'open'}}) {
