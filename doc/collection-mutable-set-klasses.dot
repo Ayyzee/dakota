@@ -16,11 +16,16 @@
 
 digraph "collection-mutable-set-klasses"
 {
-  graph [ label = "\G", fontcolor = red ];
-  graph [ rankdir = LR, center = true, page = "8.5,11", size = "7.5,10" ];
-//   graph [ ratio = fill ];
-  node [ shape = rect, width = 1.75 ];
-  edge [ dir = back ];
+	graph [ label = "\G",
+          fontcolor = red,
+          rankdir = LR,
+	];
+	node [ fontname = courier,
+         shape = rect,
+         width = 2.0,
+	];
+	edge [ dir = back, // its more natural to see: some-klass <- some-subklass
+	];
 
 //   subgraph "cluster-legend"
 //   {
@@ -35,19 +40,27 @@ digraph "collection-mutable-set-klasses"
   {
     graph [ label = "" ];
     // traits
-    "set" [ style = rounded ];
-    "table" [ style = rounded ];
-    "mutable-set" [ style = rounded ];
-    "mutable-table" [ style = rounded ];
+    "set" [ style = rounded, color = cyan ];
+    "table" [ style = rounded, color = cyan ];
+    "mutable-set" [ style = rounded, color = cyan ];
+    "mutable-table" [ style = rounded, color = cyan ];
+    "hashed-set" [ color = green ];
+    "sorted-set" [ color = blue ];
+    "hashed-table" [ color = green ];
+    "sorted-table" [ color = blue ];
+    "mutable-hashed-table" [ color = green ];
+    "mutable-sorted-table" [ color = blue ];
+    "mutable-hashed-set" [ color = green ];
+    "mutable-sorted-set" [ color = blue ];
 
     // klass-to-klass edges
     "mutable-collection" -> "mutable-sorted-set";
     "mutable-collection" -> "mutable-hashed-set";
     "collection" -> "sorted-set";
     "collection" -> "hashed-set";
-    "collection" -> "mutable-collection" [ color = "green" ];
-    "sorted-set" -> "mutable-sorted-set" [ color = "green" ];
-    "hashed-set" -> "mutable-hashed-set" [ color = "green" ];
+    "collection" -> "mutable-collection" [ color = red ];
+    "sorted-set" -> "mutable-sorted-set" [ color = red ];
+    "hashed-set" -> "mutable-hashed-set" [ color = red ];
     "sorted-set" -> "sorted-table";
     "hashed-set" -> "hashed-table";
 
@@ -71,8 +84,8 @@ digraph "collection-mutable-set-klasses"
     "mutable-sorted-set" -> "mutable-sorted-table";
     "mutable-hashed-set" -> "mutable-hashed-table";
 
-    "sorted-table" -> "mutable-sorted-table" [ color = "green" ];
-    "hashed-table" -> "mutable-hashed-table" [ color = "green" ];
+    "sorted-table" -> "mutable-sorted-table" [ color = red ];
+    "hashed-table" -> "mutable-hashed-table" [ color = red ];
 
     { rank = same; "sorted-set"; "set" };
     { rank = same; "hashed-set"; "set" };
@@ -93,5 +106,5 @@ digraph "collection-mutable-set-klasses"
   }
 
   // layout only
-  "mutable-collection" -> "set" [ style = "invis" ];
+  "mutable-collection" -> "set" [ style = invis ];
 }

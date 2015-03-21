@@ -1,4 +1,10 @@
 #!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
 
 use strict;
 use Data::Dumper;
@@ -6,29 +12,29 @@ $Data::Dumper::Terse    = 1;
 $Data::Dumper::Sortkeys = 1;
 
 $main::block = qr{
-                    \{
-                    (?:
-                       (?> [^{}]+ )         # Non-braces without backtracking
-                       |
-                       (??{ $main::block }) # Group with matching braces
-                    )*
-                    \}
-                 }x;
+                   \{
+                   (?:
+                     (?> [^{}]+ )         # Non-braces without backtracking
+                   |
+                     (??{ $main::block }) # Group with matching braces
+                   )*
+                   \}
+               }x;
 
 $main::list = qr{
-                    \(
-                    (?:
-                       (?> [^()]+ )         # Non-parens without backtracking
-                       |
-                       (??{ $main::list }) # Group with matching parens
-                    )*
-                    \)
-                 }x;
+                  \(
+                  (?:
+                    (?> [^()]+ )         # Non-parens without backtracking
+                  |
+                    (??{ $main::list }) # Group with matching parens
+                  )*
+                  \)
+              }x;
 
 # same code in Dakota.pm
-my $k  = qr/[a-z0-9-]+/; # dakota identifer
-my $ak = qr/:$k/;     # absolute scoped dakota identifier
-my $rk = qr/$k$ak*/;  # relative scoped dakota identifier
+my $k  = qr/[a-z0-9-]+/;        # dakota identifer
+my $ak = qr/:$k/;               # absolute scoped dakota identifier
+my $rk = qr/$k$ak*/;            # relative scoped dakota identifier
 undef $/;
 
 my $root = { 'klass' => {}, 'trait' => {} };
@@ -45,63 +51,54 @@ my $opts= {};
             'simple',
             'output=s',
             'directory=s',
-            );
+          );
 
-if($$opts{output})
-{
-    open(STDOUT, ">$$opts{output}") or die("$$opts{output}: $!\n");
+if ($$opts{output}) {
+  open(STDOUT, ">$$opts{output}") or die("$$opts{output}: $!\n");
 }
 
-while(<>)
-{
-    s/\/\/.*?$//gm;
-    s/\/\*.*?\*\///gs;
+while (<>) {
+  s/\/\/.*?$//gm;
+  s/\/\*.*?\*\///gs;
 
-    while(/(klass|trait)\s+($rk)\s*($main::block)/gc)
-    {
-	my $klass_type  = $1;
-	my $klass_name  = $2;
-	my $klass_block = $3;
+  while (/(klass|trait)\s+($rk)\s*($main::block)/gc) {
+    my $klass_type  = $1;
+    my $klass_name  = $2;
+    my $klass_block = $3;
 
-	$$root{$klass_type}{$klass_name} = undef;
+    $$root{$klass_type}{$klass_name} = undef;
 
-	if ('klass' eq $klass_type)
-	{
-	    $$klasses{$klass_name} = undef;
+    if ('klass' eq $klass_type) {
+      $$klasses{$klass_name} = undef;
 
-	    if ($klass_block =~ m/(superklass)\s+($rk)\s*;/)
-	    {
-		my $decl_type = $1;
-		my $decl_name = $2;
+      if ($klass_block =~ m/(superklass)\s+($rk)\s*;/) {
+        my $decl_type = $1;
+        my $decl_name = $2;
 
-		$$root{$klass_type}{$klass_name}{$decl_type} = $decl_name;
-	    }
-	    else
-	    {
-		$$root{$klass_type}{$klass_name}{'superklass'} = 'object';
-	    }
-	    $$klass_to_superklass{$klass_name} = $$root{$klass_type}{$klass_name}{'superklass'};
-	}
-	elsif ('trait' eq $klass_type)
-	{
-	    $$traits{$klass_name} = undef;
-	}
-	else
-	{ die; }
-
-	while($klass_block =~ m/\s*(trait)\s+($rk)\s*;/gc)
-	{
-	    my $decl_type = $1;
-	    my $decl_name = $2;
-
-	    if (!exists $$root{$klass_type}{$klass_name}{$decl_type})
-	    { $$root{$klass_type}{$klass_name}{$decl_type} = []; }
-	    push @{$$root{$klass_type}{$klass_name}{$decl_type}}, $decl_name;
-
-	    $$klass_to_traits{$klass_name}{$decl_name} = undef;
-	}
-	pos($klass_block) = 0;
+        $$root{$klass_type}{$klass_name}{$decl_type} = $decl_name;
+      } else {
+        $$root{$klass_type}{$klass_name}{'superklass'} = 'object';
+      }
+      $$klass_to_superklass{$klass_name} = $$root{$klass_type}{$klass_name}{'superklass'};
+    } elsif ('trait' eq $klass_type) {
+      $$traits{$klass_name} = undef;
+    } else {
+      die;
     }
+
+    while ($klass_block =~ m/\s*(trait)\s+($rk)\s*;/gc) {
+      my $decl_type = $1;
+      my $decl_name = $2;
+
+      if (!exists $$root{$klass_type}{$klass_name}{$decl_type}) {
+        $$root{$klass_type}{$klass_name}{$decl_type} = [];
+      }
+      push @{$$root{$klass_type}{$klass_name}{$decl_type}}, $decl_name;
+
+      $$klass_to_traits{$klass_name}{$decl_name} = undef;
+    }
+    pos($klass_block) = 0;
+  }
 }
 #print STDERR Dumper $root;
 
@@ -117,75 +114,51 @@ my $mutable_only = undef;
 my $nodes = '';
 my $edges = '';
 
-if (1)
-{
-    foreach my $klass_name (keys %$klasses)
-    {
-	if ($klass_name =~ m/sorted/)
-	{
-	    if ($klass_name =~ m/mutable/)
-	    {
-		$nodes .= "\t\"$klass_name\" \[ shape = rect, color = blue \];\n";
-	    }
-	    else
-	    {
-		$nodes .= "\t\"$klass_name\" \[ shape = rect, color = blue, fontcolor = red \];\n";
-	    }
-	}
-	elsif ($klass_name =~ m/hashed/)
-	{
-	    if ($klass_name =~ m/mutable/)
-	    {
-		$nodes .= "\t\"$klass_name\" \[ shape = rect, color = green \];\n";
-	    }
-	    else
-	    {
-		$nodes .= "\t\"$klass_name\" \[ shape = rect, color = green, fontcolor = red \];\n";
-	    }
-	}
-	else
-	{
-	    if ($klass_name =~ m/mutable/)
-	    {
-		$nodes .= "\t\"$klass_name\" \[ shape = rect \];\n";
-	    }
-	    else
-	    {
-		$nodes .= "\t\"$klass_name\" \[ shape = rect, fontcolor = red \];\n";
-	    }
-	}
+if (1) {
+  foreach my $klass_name (keys %$klasses) {
+    if ($klass_name =~ m/sorted/) {
+      if ($klass_name =~ m/mutable/) {
+        $nodes .= "\t\"$klass_name\" \[ shape = rect, color = blue \];\n";
+      } else {
+        $nodes .= "\t\"$klass_name\" \[ shape = rect, color = blue, fontcolor = red \];\n";
+      }
+    } elsif ($klass_name =~ m/hashed/) {
+      if ($klass_name =~ m/mutable/) {
+        $nodes .= "\t\"$klass_name\" \[ shape = rect, color = green \];\n";
+      } else {
+        $nodes .= "\t\"$klass_name\" \[ shape = rect, color = green, fontcolor = red \];\n";
+      }
+    } else {
+      if ($klass_name =~ m/mutable/) {
+        $nodes .= "\t\"$klass_name\" \[ shape = rect \];\n";
+      } else {
+        $nodes .= "\t\"$klass_name\" \[ shape = rect, fontcolor = red \];\n";
+      }
     }
-    foreach my $trait_name (keys %$traits)
-    {
-	if ($trait_name =~ m/mutable/)
-	{
-	    $nodes .= "\t\"$trait_name\" \[ shape = rect, color = cyan, style = rounded \];\n";
-	}
-	else
-	{
-	    $nodes .= "\t\"$trait_name\" \[ shape = rect, color = cyan, fontcolor = red, style = rounded \];\n";
-	}
+  }
+  foreach my $trait_name (keys %$traits) {
+    if ($trait_name =~ m/mutable/) {
+      $nodes .= "\t\"$trait_name\" \[ shape = rect, color = cyan, style = rounded \];\n";
+    } else {
+      $nodes .= "\t\"$trait_name\" \[ shape = rect, color = cyan, fontcolor = red, style = rounded \];\n";
     }
+  }
 
-    my $dummy;
-    my $klass_name;
-    my $superklass_name;
-    while(($klass_name, $superklass_name) = each %$klass_to_superklass)
-    {
-	if (keys %{$$root{'klass'}})
-	{
-	    $edges .= "\t\"$superklass_name\" -> \"$klass_name\" \[ dir = back \];\n";
-	}
+  my $dummy;
+  my $klass_name;
+  my $superklass_name;
+  while (($klass_name, $superklass_name) = each %$klass_to_superklass) {
+    if (keys %{$$root{'klass'}}) {
+      $edges .= "\t\"$superklass_name\" -> \"$klass_name\" \[ dir = back \];\n";
     }
-    my $traits;
-    while(($klass_name, $traits) = each %$klass_to_traits)
-    {
-	my $trait_name;
-	foreach $trait_name (sort keys %$traits)
-	{
-	    $edges .= "\t\"$trait_name\" -> \"$klass_name\" \[ dir = back, style = dashed \];\n";
-	}
+  }
+  my $traits;
+  while (($klass_name, $traits) = each %$klass_to_traits) {
+    my $trait_name;
+    foreach $trait_name (sort keys %$traits) {
+      $edges .= "\t\"$trait_name\" -> \"$klass_name\" \[ dir = back, style = dashed \];\n";
     }
+  }
 }
 
 my $page_width  =  8.5;
