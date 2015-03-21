@@ -82,6 +82,7 @@ our @EXPORT= qw(
 use dakota::sst;
 use dakota::generate;
 use dakota::util;
+use dakota::macro_system;
 
 my $objdir = 'obj';
 my $rep_ext = 'rep';
@@ -321,6 +322,7 @@ sub rep_merge {
 
 my $gbl_sst = undef;
 my $gbl_sst_cursor = undef;
+my $gbl_user_data = &lang_user_data();
 
 my $gbl_root = {};
 my $gbl_current_scope = $gbl_root;
@@ -837,7 +839,7 @@ sub slots {
       }
       $$gbl_current_scope{'slots'}{'info'} = [];
       $$gbl_current_scope{'slots'}{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor);
+      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $slots_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
         if ('enum' eq $cat) {
@@ -921,7 +923,7 @@ sub enum {
         $$enum{'type'} = $type;
       }
       $$enum{'info'} = [];
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor);
+      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $enum_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
         &enum_seq($enum_defs, $$enum{'info'});
@@ -960,7 +962,7 @@ sub initialize {
     if (m/^\{$/) {
       &add_symbol($gbl_root, ['initialize']);
       $$gbl_current_scope{'has-initialize'} = 1;
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor);
+      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
       last;
     }
@@ -991,7 +993,7 @@ sub finalize {
     if (m/^\{$/) {
       &add_symbol($gbl_root, ['finalize']);
       $$gbl_current_scope{'has-finalize'} = 1;
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor);
+      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
       last;
     }
@@ -1634,7 +1636,7 @@ sub method {
     $$method{'is-inline'} = 1;
   }
   my ($open_paren_index, $close_paren_index)
-    = &sst_cursor::balenced($gbl_sst_cursor);
+    = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
 
   if ('object-t' eq &sst::at($gbl_sst, $open_paren_index + 1)) {
     if (',' ne &sst::at($gbl_sst, $open_paren_index + 1 + 1) &&
@@ -1699,7 +1701,7 @@ sub method {
 
   if (&sst_cursor::current_token($gbl_sst_cursor) eq 'throw') {
     &match(__FILE__, __LINE__, 'throw');
-    my ($open_paren_index, $close_paren_index) = &sst_cursor::balenced($gbl_sst_cursor);
+    my ($open_paren_index, $close_paren_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
 
     if ($open_paren_index + 1 != $close_paren_index) {
       my $exception_types = &sst::token_seq($gbl_sst, $open_paren_index + 1, $close_paren_index - 1);
@@ -1712,7 +1714,7 @@ sub method {
     if (m/^\{$/) {
       $$method{'defined?'} = 1;
       $$method{'module'} = $gbl_current_module;
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor);
+      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       my $block_sst_cursor = &sst_cursor::make($gbl_sst, $open_curley_index, $close_curley_index);
       #&errdump($block_sst_cursor);
       &add_generics_used($method, $block_sst_cursor);

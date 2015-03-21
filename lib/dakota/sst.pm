@@ -26,6 +26,7 @@ use strict;
 use warnings;
 
 use dakota::util;
+use dakota::macro_system;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -75,6 +76,7 @@ my ($id,  $mid,  $bid,  $tid,
 my $h  = &header_file_regex();
 my $dqstr = &dqstr_regex();
 my $sqstr = &sqstr_regex();
+my $gbl_user_data = &lang_user_data();
 
 my $sst_debug = 0;
 sub log_sub_name {
@@ -99,7 +101,9 @@ sub sst::close_token_for_open_token {
   my $close_for_open = $$user_data{'-sst-'}{'close-token-for-open-token'};
   my $close_token = $$close_for_open{$open_token};
   #die if (!&sst::is_open_token($open_token, $user_data));
-  return $close_token;
+  my $close_token_seq = [keys %$close_token];
+  die if 1 < scalar @$close_token_seq;
+  return $$close_token_seq[0];
 }
 sub sst::is_open_token {
   my ($str, $user_data) = @_;
@@ -657,7 +661,8 @@ sub sst_cursor::match_pattern_seq {
         my $constraint = &constraint_for_name($pattern_token);
         my ($result_lhs, $result_rhs) = &$constraint($$sst_cursor{'sst'},
                                                      [ $$sst_cursor{'first-token-index'} + $i,
-                                                       @{$$sst_cursor{'sst'}{'tokens'}} - 1 ]);
+                                                       @{$$sst_cursor{'sst'}{'tokens'}} - 1 ],
+                                                   $gbl_user_data);
         if ($result_lhs) {
           $range = $result_lhs;
           $$matches{$pattern_token} = $result_rhs;
@@ -796,7 +801,7 @@ sub sst_cursor::balenced {
       my $expected_close_token = pop @$stk;
 
       if ($expected_close_token ne $token) {
-        print STDERR "error: expected $expected_close_token but got $token\n"; die;
+        die "error: expected $expected_close_token but got $token\n";
       }
 
       if (0 == @$stk) {
@@ -804,7 +809,7 @@ sub sst_cursor::balenced {
       }
     }
   }
-  print STDERR "error: unbalenced\n"; die;
+  die "error: unbalenced\n";
 }
 sub sst_cursor::logger {
   my ($sst_cursor, $file, $line) = @_;

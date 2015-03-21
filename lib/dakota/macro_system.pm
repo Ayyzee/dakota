@@ -61,6 +61,7 @@ $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  macro_expand
+                 lang_user_data
              );
 
 my ($id,  $mid,  $bid,  $tid,
@@ -702,7 +703,9 @@ sub rule_match_and_replace {
   }
   return $change_count;
 }
+my $gbl_user_data;
 sub lang_user_data {
+  return $gbl_user_data if $gbl_user_data;
   my $user_data;
   if ($ENV{'DK_LANG_USER_DATA_PATH'}) {
     my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
@@ -736,6 +739,7 @@ sub lang_user_data {
       }
     }
   }
+  $gbl_user_data = $user_data;
   return $user_data;
 }
 
