@@ -1,0 +1,105 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "collection-mutable-set-klasses"
+{
+	graph [ label = "\G",
+          fontcolor = red,
+          rankdir = LR,
+	];
+	node [ fontname = courier,
+         shape = rect,
+         width = 2.0,
+	];
+	edge [ dir = back, // its more natural to see: some-klass <- some-subklass
+	];
+
+//   subgraph "cluster-legend"
+//   {
+//     graph [ label = "legend" ];
+//     "klass w/o slots";
+//     "klass w/ slots" [ color = blue ];
+//     "union klass" [ color = green ];
+//     "trait" [ style = rounded ];
+//   }
+
+  subgraph "cluster-main"
+  {
+    graph [ label = "" ];
+    // traits
+    "set" [ style = rounded, color = cyan ];
+    "table" [ style = rounded, color = cyan ];
+    "mutable-set" [ style = rounded, color = cyan ];
+    "mutable-table" [ style = rounded, color = cyan ];
+    "hashed-set" [ color = green ];
+    "sorted-set" [ color = blue ];
+    "hashed-table" [ color = green ];
+    "sorted-table" [ color = blue ];
+    "mutable-hashed-table" [ color = green ];
+    "mutable-sorted-table" [ color = blue ];
+    "mutable-hashed-set" [ color = green ];
+    "mutable-sorted-set" [ color = blue ];
+
+    // klass-to-klass edges
+    "sorted-set" -> "mutable-sorted-set";
+    "hashed-set" -> "mutable-hashed-set";
+    "mutable-collection" -> "sorted-set";
+    "mutable-collection" -> "hashed-set";
+    "collection" -> "mutable-collection";
+    "mutable-sorted-set" -> "sorted-table";
+    "mutable-hashed-set" -> "hashed-table";
+
+    // trait-to-trait edges
+    "set" -> "mutable-set" [ style = dotted ];
+    "table" -> "mutable-table" [ style = dotted ];
+
+    // klass-to-trait edges
+    // to debug set color = red
+    "sorted-set" -> "set" [ style = dotted, dir = forward ];
+    "sorted-table" -> "table" [ style = dotted, dir = forward ];
+    "mutable-sorted-set" -> "mutable-set" [ style = dotted,  dir = forward ];
+    "mutable-sorted-table" -> "mutable-table" [ style = dotted,  dir = forward ];
+
+    // trait-to-klass edges
+    "set" -> "hashed-set" [ style = dotted ];
+    "table" -> "hashed-table" [ style = dotted ];
+    "mutable-set" -> "mutable-hashed-set" [ style = dotted ];
+    "mutable-table" -> "mutable-hashed-table" [ style = dotted ];
+
+    "sorted-table" -> "mutable-sorted-table";
+    "hashed-table" -> "mutable-hashed-table";
+
+    { rank = same; "sorted-set"; "set" };
+    { rank = same; "hashed-set"; "set" };
+
+    { rank = same; "mutable-sorted-set"; "mutable-set" };
+    { rank = same; "mutable-hashed-set"; "mutable-set" };
+
+    { rank = same; "mutable-sorted-table"; "mutable-table" };
+    { rank = same; "mutable-hashed-table"; "mutable-table" };
+
+    { rank = same; "sorted-table"; "table" };
+    { rank = same; "hashed-table"; "table" };
+
+    // layout hacks
+    // to debug set color = gray
+    "mutable-sorted-set" -> "table" [ style = invis ];
+    "mutable-hashed-set" -> "table" [ style = invis ];
+  }
+
+  // layout only
+  "mutable-collection" -> "set" [ style = invis ];
+}
