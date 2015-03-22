@@ -41,18 +41,37 @@ digraph "collection-mutable-set-klasses"
     graph [ label = "" ];
     // traits
     "set" [ style = rounded, color = cyan ];
+    "HASHED-counted-set" [ label = "counted-set", style = "rounded,dashed", color = cyan ];
+    "HASHED-mutable-counted-set" [ label = "mutable-counted-set", style = "rounded,dashed", color = cyan ];
+    "SORTED-counted-set" [ label = "counted-set", style = "rounded,dashed", color = cyan ];
+    "SORTED-mutable-counted-set" [ label = "mutable-counted-set", style = "rounded,dashed", color = cyan ];
     "table" [ style = rounded, color = cyan ];
     "mutable-set" [ style = rounded, color = cyan ];
     "mutable-table" [ style = rounded, color = cyan ];
     "hashed-set" [ color = green ];
     "sorted-set" [ color = blue ];
+    "sorted-counted-set" [ color = blue ];
+    "hashed-counted-set" [ color = green ];
     "hashed-table" [ color = green ];
     "sorted-table" [ color = blue ];
     "mutable-hashed-table" [ color = green ];
     "mutable-sorted-table" [ color = blue ];
     "mutable-hashed-set" [ color = green ];
     "mutable-sorted-set" [ color = blue ];
+    "mutable-hashed-counted-set" [ color = green ];
+    "mutable-sorted-counted-set" [ color = blue ];
 
+    "mutable-sorted-set" -> "sorted-counted-set";
+    "sorted-counted-set" -> "mutable-sorted-counted-set";
+    "mutable-hashed-set" -> "hashed-counted-set";
+    "hashed-counted-set" -> "mutable-hashed-counted-set";
+    "HASHED-counted-set" -> "hashed-counted-set" [ style = dotted ];
+    "HASHED-mutable-counted-set" -> "mutable-hashed-counted-set" [ style = dotted ];
+    "HASHED-counted-set" -> "HASHED-mutable-counted-set" [ style = dotted ];
+    "sorted-counted-set" -> "SORTED-counted-set" [ style = dotted, dir = forward ];
+    "mutable-sorted-counted-set" -> "SORTED-mutable-counted-set" [ style = dotted, dir = forward ];
+    "SORTED-counted-set" -> "SORTED-mutable-counted-set" [ style = dotted ];
+    
     // klass-to-klass edges
     "sorted-set" -> "mutable-sorted-set";
     "hashed-set" -> "mutable-hashed-set";
@@ -93,6 +112,18 @@ digraph "collection-mutable-set-klasses"
 
     { rank = same; "sorted-table"; "table" };
     { rank = same; "hashed-table"; "table" };
+    
+    { rank = same; "hashed-counted-set"; "HASHED-counted-set" };
+    { rank = same; "sorted-counted-set"; "HASHED-counted-set" };
+
+    { rank = same; "mutable-hashed-counted-set"; "HASHED-mutable-counted-set" };
+    { rank = same; "mutable-sorted-counted-set"; "HASHED-mutable-counted-set" };
+
+    { rank = same; "hashed-counted-set"; "SORTED-counted-set" };
+    { rank = same; "sorted-counted-set"; "SORTED-counted-set" };
+
+    { rank = same; "mutable-hashed-counted-set"; "SORTED-mutable-counted-set" };
+    { rank = same; "mutable-sorted-counted-set"; "SORTED-mutable-counted-set" };
 
     // layout hacks
     // to debug set color = gray
