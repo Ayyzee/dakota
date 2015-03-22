@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-digraph "collection-mutable-set-klasses"
+digraph "collection-mutable-set-klasses-new"
 {
 	graph [ label = "\G",
           fontcolor = red,
@@ -124,13 +124,5 @@ digraph "collection-mutable-set-klasses"
 
     { rank = same; "mutable-hashed-counted-set"; "SORTED-mutable-counted-set" };
     { rank = same; "mutable-sorted-counted-set"; "SORTED-mutable-counted-set" };
-
-    // layout hacks
-    // to debug set color = gray
-    "mutable-sorted-set" -> "table" [ style = invis ];
-    "mutable-hashed-set" -> "table" [ style = invis ];
   }
-
-  // layout only
-  "mutable-collection" -> "set" [ style = invis ];
 }
