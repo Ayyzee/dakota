@@ -20,12 +20,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package dakota::dakota;
-
 use strict;
 use warnings;
 
-my $prefix;
+my $gbl_prefix;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -39,11 +37,12 @@ sub dk_prefix {
 }
 
 BEGIN {
-  $prefix = &dk_prefix($0);
-  unshift @INC, "$prefix/lib";
+  $gbl_prefix = &dk_prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
 };
 
 use dakota::dakota;
+use dakota::util;
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -76,7 +75,7 @@ if (defined $ENV{'SO_EXT'}) {
 }
 
 #if (!exists $ENV{'SO_EXT'}) {
-$ENV{'SO_EXT'} = $SO_EXT;
+  $ENV{'SO_EXT'} = $SO_EXT;
 #}
 
 #if (!exists $ENV{'CXX'}) {
@@ -129,7 +128,7 @@ if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
 }
 
 if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
-  my $libdakota = "$prefix/lib/libdakota.$ENV{'SO_EXT'}";
+  my $libdakota = "$gbl_prefix/lib/libdakota.$ENV{'SO_EXT'}";
   if ($$root_cmd{'opts'}{'output'} ne $libdakota) {
     &_add_last($$root_cmd{'inputs'}, $libdakota);
   }
@@ -154,5 +153,5 @@ if ($$root_cmd{'opts'}{'directory'} &&
   chdir $$root_cmd{'opts'}{'directory'};
   $ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
 }
-my $result = &start($root_cmd);
+my $result = &dakota::dakota::start($root_cmd);
 exit $result;
