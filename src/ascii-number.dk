@@ -42,12 +42,12 @@ klass ascii-number
   {
     //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
     int-t result;
-    if (dk:instance?(other, klass)) {
+    if (dk::instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = s1->number - s2->number;
     } else {
-      result = dk:compare(super, other);
+      result = dk::compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;
@@ -57,7 +57,7 @@ klass ascii-number
   {
     boole-t state;
 
-    if (dk:instance?(other, klass)) {
+    if (dk::instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
 
@@ -123,11 +123,11 @@ klass ascii-number
 
   method object-t init(object-t self, int32-t number => 0)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     self.number = number;
     self.ascii-string = cast(char8-t*)malloc(sizeof(char8-t) * (32 + 1));
     object-t kls = dkt-klass(self);
-    str-t digits = dk:digits(kls);
+    str-t digits = dk::digits(kls);
     uint32-t base = cast(uint32-t)safe-strlen(digits);
     convert(number, cast(int32-t)(base), digits, self.ascii-string);
     return self;
@@ -136,7 +136,7 @@ klass ascii-number
   method object-t dealloc(object-t self)
   {
     free(self.ascii-string);
-    object-t result = dk:dealloc(super);
+    object-t result = dk::dealloc(super);
     return result;
   }
 

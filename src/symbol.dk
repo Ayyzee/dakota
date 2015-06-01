@@ -52,12 +52,12 @@ klass symbol
   {
     int-t result;
 
-    if (dk:instance?(other, klass)) {
+    if (dk::instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
     } else {
-      result = dk:compare(super, other);
+      result = dk::compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;
@@ -65,9 +65,9 @@ klass symbol
 
   method object-t dump(object-t self)
   {
-    dk:dump(super);
+    dk::dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n",
-            cast(void*)(self), cast(void*)unbox(self), dk:utf8-from(self));
+            cast(void*)(self), cast(void*)unbox(self), dk::utf8-from(self));
     return self;
   }
 
@@ -85,10 +85,10 @@ klass symbol
 
   method object-t write-lite(object-t self, object-t out)
   {
-    str-t utf8 = dk:utf8-from(self);
-    dk:write(out, "\"");
-    dk:write(out, utf8);
-    dk:write(out, "\"");
+    str-t utf8 = dk::utf8-from(self);
+    dk::write(out, "\"");
+    dk::write(out, utf8);
+    dk::write(out, "\"");
     return self;
   }
 }

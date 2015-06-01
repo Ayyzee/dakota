@@ -31,12 +31,12 @@ klass features
   }
 }
 
-using features:k-none;
-using features:k-indent;
-using features:k-leading-newline;
-using features:k-trailing-newline;
-using features:k-leading-ws;
-using features:k-trailing-ws;
+using features::k-none;
+using features::k-indent;
+using features::k-leading-newline;
+using features::k-trailing-newline;
+using features::k-leading-ws;
+using features::k-trailing-ws;
 
 klass text-output-stream
 {
@@ -51,7 +51,7 @@ klass text-output-stream
 
   method object-t init(object-t self, file-t file => stdout)
   {
-    self = dk:init(super, $file => file);
+    self = dk::init(super, $file => file);
     self.column = 0;
     self.previous-features = k-trailing-newline;
     return self;
@@ -77,23 +77,23 @@ klass text-output-stream
 
     if (0 != (features & k-indent))
       for (uint32-t i = 0; i < self.column; i++)
-        dk:write(self, "  "); // two spaces per column :-) [my way]
+        dk::write(self, "  "); // two spaces per column :-) [my way]
 
     if (0 != (features & k-leading-ws))
       if (0 == (self.previous-features & k-trailing-newline))
-        dk:write(self, " ");
+        dk::write(self, " ");
 
     if (0 != (features & k-leading-newline))
       if (0 == (self.previous-features & k-trailing-newline))
-        dk:write(self, "\n");
+        dk::write(self, "\n");
 
-    dk:write(self, string);
+    dk::write(self, string);
 
     if (0 != (features & k-trailing-ws))
-      dk:write(self, " ");
+      dk::write(self, " ");
 
     if (0 != (features & k-trailing-newline))
-      dk:write(self, "\n");
+      dk::write(self, "\n");
 
     self.previous-features = features;
     return self;

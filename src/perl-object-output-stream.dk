@@ -21,12 +21,12 @@ module dakota-util;
 klass features;
 klass text-output-stream;
 
-using features:k-none;
-using features:k-indent;
-using features:k-leading-newline;
-using features:k-trailing-newline;
-using features:k-leading-ws;
-using features:k-trailing-ws;
+using features::k-none;
+using features::k-indent;
+using features::k-leading-newline;
+using features::k-trailing-newline;
+using features::k-leading-ws;
+using features::k-trailing-ws;
 
 klass perl-object-output-stream
 {
@@ -48,7 +48,7 @@ klass perl-object-output-stream
 
   method object-t init(object-t self, file-t file => stdout)
   {
-    self = dk:init(super, $file => file);
+    self = dk::init(super, $file => file);
     self.indent-level = 1; // set to zero for maximum compactness
 
     self.start-seq-delim = "[";
@@ -84,7 +84,7 @@ klass perl-object-output-stream
       snprintf(buffer, sizeof(buffer), "\"%s\"%s\"%s\"%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "\"%s\"%s", element, self.element-delim);
-    dk:write(self, buffer, features(self, k-indent | k-trailing-newline));
+    dk::write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
 
@@ -95,7 +95,7 @@ klass perl-object-output-stream
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%i%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "%i%s", element, self.element-delim);
-    dk:write(self, buffer, features(self, k-indent | k-trailing-newline));
+    dk::write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
 
@@ -106,7 +106,7 @@ klass perl-object-output-stream
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%u%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "%u%s", element, self.element-delim);
-    dk:write(self, buffer, features(self, k-indent | k-trailing-newline));
+    dk::write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
 
@@ -117,8 +117,8 @@ klass perl-object-output-stream
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-tbl-delim);
     else
       snprintf(buffer, sizeof(buffer), "%s", self.start-tbl-delim);
-    dk:write(self, buffer, features(self, k-indent | k-trailing-newline));
-    dk:column-incr(self);
+    dk::write(self, buffer, features(self, k-indent | k-trailing-newline));
+    dk::column-incr(self);
     return self;
   }
 
@@ -126,8 +126,8 @@ klass perl-object-output-stream
   {
     char8-t[128] buffer;
     snprintf(buffer, sizeof(buffer), "%s%s", self.end-tbl-delim, self.element-delim);
-    dk:column-decr(self);
-    dk:write(self, buffer, features(self, k-indent | k-trailing-newline));
+    dk::column-decr(self);
+    dk::write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
 
@@ -138,8 +138,8 @@ klass perl-object-output-stream
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-seq-delim);
     else
       snprintf(buffer, sizeof(buffer), "%s", self.start-seq-delim);
-    dk:write(self, buffer, features(self, k-indent | k-trailing-newline));
-    dk:column-incr(self);
+    dk::write(self, buffer, features(self, k-indent | k-trailing-newline));
+    dk::column-incr(self);
     return self;
   }
 
@@ -147,8 +147,8 @@ klass perl-object-output-stream
   {
     char8-t[128] buffer;
     snprintf(buffer, sizeof(buffer), "%s%s", self.end-seq-delim, self.element-delim);
-    dk:column-decr(self);
-    dk:write(self, buffer, features(self, k-indent | k-trailing-newline));
+    dk::column-decr(self);
+    dk::write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
 }

@@ -34,7 +34,7 @@ sub dk_prefix {
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
-    &dk_prefix($path);
+    return &dk_prefix($path);
   } else {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
@@ -161,7 +161,7 @@ sub add_visibility {
         if ($$root{'traits'}{$klass_name}) {
           $$root{'traits'}{$klass_name}{'exported?'} = 22;
         }
-	    } elsif ($str =~ /^($id):(slots-t)$/) {
+	    } elsif ($str =~ /^($id)::(slots-t)$/) {
         my ($klass_name, $type_name) = ($1, $2);
         # klass slots
         #print STDERR "klass       slots:  $klass_name|$type_name\n";
@@ -170,7 +170,7 @@ sub add_visibility {
 		    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = 33;
         }
-	    } elsif ($str =~ /^($id):($msig)$/) {
+	    } elsif ($str =~ /^($id)::($msig)$/) {
         my ($klass_name, $method_name) = ($1, $2);
         # klass/trait method
         #print STDERR "klass/trait method $klass_name:$method_name\n";

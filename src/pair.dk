@@ -28,7 +28,7 @@ klass pair
                        object-t first => {},
                        object-t last =>  {})
   {
-    self = dk:init(super);
+    self = dk::init(super);
     self.first = first;
     self.last =  last;
     return self;

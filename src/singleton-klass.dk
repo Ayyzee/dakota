@@ -28,13 +28,13 @@ klass singleton-klass
   method object-t alloc(object-t self)
   {
     if (self.instance == nullptr)
-      self.instance = dk:alloc(super);
+      self.instance = dk::alloc(super);
     return self.instance;
   }
 
-  method object-t va:init(object-t self, va-list-t args)
+  method object-t va::init(object-t self, va-list-t args)
   {
-    self = dk:va:init(super, args);
+    self = dk::va::init(super, args);
     self.instance = nullptr;
     return self;
   }

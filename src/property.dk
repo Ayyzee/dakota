@@ -30,7 +30,7 @@ klass property
 
   method int-t compare(slots-t* slots, slots-t* other-slots)
   {
-    int-t result = symbol:compare(slots->key, other-slots->key);
+    int-t result = symbol::compare(slots->key, other-slots->key);
     result = dkt-normalize-compare-result(result);
     return result;
   }
@@ -46,12 +46,12 @@ klass property
   {
     int-t result;
 
-    if (dk:instance?(other, klass)) {
+    if (dk::instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
     } else {
-      result = dk:compare(super, other);
+      result = dk::compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;

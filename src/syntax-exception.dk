@@ -38,7 +38,7 @@ klass syntax-exception
                        str-t    filename => {},
                        str-t    message =>  __klass__)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     assert(nullptr != token &&
            null != token);
     self.token = token;
@@ -52,8 +52,8 @@ klass syntax-exception
     assert(nullptr != out);
     if (null == out)
       out = std-error;
-    dk:print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
-                    self.filename, dk:line(self.token), dk:column(self.token), dk:buffer(self.token), self.message);
+    dk::print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
+                    self.filename, dk::line(self.token), dk::column(self.token), dk::buffer(self.token), self.message);
     return self;
   }
 
@@ -62,8 +62,8 @@ klass syntax-exception
     assert(nullptr != out);
     if (null == out)
       out = std-error;
-    dk:print(super, out);
-    dk:print-shallow(self, out);
+    dk::print(super, out);
+    dk::print-shallow(self, out);
     return self;
   }
 }

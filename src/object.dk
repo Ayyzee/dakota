@@ -42,12 +42,12 @@ klass object
 
   method object-t write-slots(object-t self, object-t out)
   {
-  //dk:write-slots(super, out);
-    dk:write-slots-start(out, klass);
+  //dk::write-slots(super, out);
+    dk::write-slots-start(out, klass);
 
-    dk:write-element-idref(out, dkt-klass(self), "klass");
+    dk::write-element-idref(out, dkt-klass(self), "klass");
 
-    dk:write-slots-end(out);
+    dk::write-slots-end(out);
     return self;
   }
 
@@ -87,7 +87,7 @@ klass object
   method object-t perform-method-for-selector(object-t self, selector-t selector)
   {
     object-t kls = dkt-klass(self);
-    method-t m = dk:method-for-selector(kls, selector);
+    method-t m = dk::method-for-selector(kls, selector);
     object-t value = m(self);
     return value;
   }
@@ -101,13 +101,13 @@ klass object
   method object-t copy(object-t self)
   {
     USE(self);
-    throw make(exception:klass, $message => "not yet implemented");
+    throw make(exception::klass, $message => "not yet implemented");
     return nullptr;
   }
 
   method object-t dealloc(object-t self)
   {
-    dk:release(dkt-klass(self));
+    dk::release(dkt-klass(self));
     free(self);
     return nullptr;
   }
@@ -122,14 +122,14 @@ klass object
   {
     self->retain-count--;
     if (0 == self->retain-count)
-      self = dk:dealloc(self);
+      self = dk::dealloc(self);
     return self;
   }
 
   method object-t autorelease(object-t self)
   {
-    object-t current-pool = dk:current-pool(autorelease-pool:klass);
-    dk:add(current-pool, self);
+    object-t current-pool = dk::current-pool(autorelease-pool::klass);
+    dk::add(current-pool, self);
     return self;
   }
 
@@ -157,7 +157,7 @@ klass object
       fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), $nullptr);
 
 //     if (nullptr != dkt-klass(self) && self != dkt-klass(self))
-//       dk:dump(dkt-klass(self));
+//       dk::dump(dkt-klass(self));
 
     return self;
   }
@@ -174,16 +174,16 @@ klass object
   {
     if (null == out)
       out = std-output;
-    str-t utf8 = dk:utf8-from(self);
-    dk:print(out, utf8);
+    str-t utf8 = dk::utf8-from(self);
+    dk::print(out, utf8);
     return self;
   }
   method object-t println(object-t self, object-t out)
   {
     if (null == out)
       out = std-output;
-    dk:print(self, out);
-    dk:print(out, "\n");
+    dk::print(self, out);
+    dk::print(out, "\n");
     return self;
   }
 }
@@ -191,18 +191,18 @@ klass object
 DEBUG-EXPORT void
 dkt-unbox-check(object-t object, object-t kls)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p','%s:klass']",
-                        __func__, cast(void*)(object), dk:name(kls));
-  unless (object:instance?(object, kls))
+  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p','%s::klass']",
+                        __func__, cast(void*)(object), dk::name(kls));
+  unless (object::instance?(object, kls))
   {
     str-t object-kls-name = dkt-name(dkt-klass(object));
     str-t kls-name = dkt-name(kls);
 
-    if (object:instance?(object, klass:klass))
-      dkt-log(dkt:k-log-error, "%s:unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
+    if (object::instance?(object, klass::klass))
+      dkt-log(dkt::k-log-error, "%s::unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name, dkt-name(object));
     else
-      dkt-log(dkt:k-log-error, "%s:unbox(0x%0*" PRIxPTR " {klass='%s'})",
+      dkt-log(dkt::k-log-error, "%s::unbox(0x%0*" PRIxPTR " {klass='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name);
 
     abort();

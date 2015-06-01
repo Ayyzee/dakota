@@ -44,11 +44,11 @@ klass autorelease-pool-klass
   }
 
   method object-t init(object-t self,
-                       named-info:slots-t* info-slots => nullptr,
+                       named-info::slots-t* info-slots => nullptr,
                        object-t                 info =>      nullptr)
   {
-    self = dk:init(super, $info-slots => info-slots, $info => info);
-    self.pools = make(deque:klass);
+    self = dk::init(super, $info-slots => info-slots, $info => info);
+    self.pools = make(deque::klass);
     return self;
   }
 
@@ -60,8 +60,8 @@ klass autorelease-pool-klass
 
   method object-t current-pool(object-t self)
   {
-    assert(false == dk:empty?(self.pools));
-    object-t result = dk:top(self.pools);
+    assert(false == dk::empty?(self.pools));
+    object-t result = dk::top(self.pools);
     return result;
   }
 }
@@ -77,40 +77,40 @@ klass autorelease-pool
 
   method object-t init(object-t self)
   {
-    self = dk:init(super);
-    self.counted-elements = make(sorted-counted-set:klass);
+    self = dk::init(super);
+    self.counted-elements = make(sorted-counted-set::klass);
     object-t kls = dkt-klass(self);
-    object-t pools = dk:pools(kls);
-    dk:push(pools, self);
+    object-t pools = dk::pools(kls);
+    dk::push(pools, self);
     return self;
   }
 
   method object-t add(object-t self, object-t element)
   {
-    dk:add(self.counted-elements, element);
+    dk::add(self.counted-elements, element);
     return self;
   }
 
   method object-t release(object-t self)
   {
     for (assoc-t* assoc in self.counted-elements) {
-      uint32-t n = *uint32:unbox(assoc->element);
+      uint32-t n = *uint32::unbox(assoc->element);
       for (uint32-t i = 0; i < n; i++) {
-        dk:release(assoc->key);
+        dk::release(assoc->key);
       }
     }
     object-t kls = dkt-klass(self);
-    object-t pools = dk:pools(kls);
-    object-t pool = dk:pop(pools);
+    object-t pools = dk::pools(kls);
+    object-t pool = dk::pop(pools);
     assert(self == pool);
-    object-t result = dk:dealloc(self);
+    object-t result = dk::dealloc(self);
     return result;
   }
 
   method object-t dealloc(object-t self)
   {
-    dk:dealloc(self.counted-elements);
-    object-t result = dk:dealloc(super);
+    dk::dealloc(self.counted-elements);
+    object-t result = dk::dealloc(super);
     return result;
   }
 }

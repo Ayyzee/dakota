@@ -51,7 +51,7 @@ klass perl-parser
                        file-t   file =>     stdin,
                        str-t    filename => nullptr)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     assert(!(stdin != file &&
              nullptr  != filename)); // these are mutually exclusive
 
@@ -63,7 +63,7 @@ klass perl-parser
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s: %s", filename, buf);
-        throw make(exception:klass, $message => "oops");
+        throw make(exception::klass, $message => "oops");
       }
     } else {
       self.filename = nullptr;
@@ -115,7 +115,7 @@ klass perl-parser
   {
     int32-t c;
     while (1) {
-      while (isspace(c = perl-parser:get(self))) {
+      while (isspace(c = perl-parser::get(self))) {
       }
       if (EOF == c)
       { return null; }
@@ -123,19 +123,19 @@ klass perl-parser
       switch (c)
       {
         // self.column needs to be adjusted by the length of the token
-        case '[': { return make(token:klass, $tokenid => '[', $buffer => "[",
+        case '[': { return make(token::klass, $tokenid => '[', $buffer => "[",
                                 $line => self.line, $column => self.column - 1); }
-        case ']': { return make(token:klass, $tokenid => ']', $buffer => "]",
+        case ']': { return make(token::klass, $tokenid => ']', $buffer => "]",
                                 $line => self.line, $column => self.column - 1); }
-        case '{': { return make(token:klass, $tokenid => '{', $buffer => "{",
+        case '{': { return make(token::klass, $tokenid => '{', $buffer => "{",
                                 $line => self.line, $column => self.column - 1); }
-        case '}': { return make(token:klass, $tokenid => '}', $buffer => "}",
+        case '}': { return make(token::klass, $tokenid => '}', $buffer => "}",
                                 $line => self.line, $column => self.column - 1); }
-        case ',': { return make(token:klass, $tokenid => ',', $buffer => ",",
+        case ',': { return make(token::klass, $tokenid => ',', $buffer => ",",
                                 $line => self.line, $column => self.column - 1); }
         case '$':
         {
-          while ('\n' != (c = perl-parser:get(self))) {
+          while ('\n' != (c = perl-parser::get(self))) {
             if (EOF == c)
               return null;
           }
@@ -143,22 +143,22 @@ klass perl-parser
         }
         case '=':
         {
-          c = perl-parser:get(self);
+          c = perl-parser::get(self);
           if (EOF == c || '>' != c) {
             print-error(self.filename, self.line, self.column - 2, "unknown token '='\n");
             return null;
           } else {
-            return make(token:klass, $tokenid => '=>', $buffer => "=>",
+            return make(token::klass, $tokenid => '=>', $buffer => "=>",
                         $line => self.line, $column => self.column - 2);
           }
         }
         case '\'':
         {
           int32-t quote-type = '\'';
-          object-t token = make(token:klass, $tokenid => 'sqst',
+          object-t token = make(token::klass, $tokenid => 'sqst',
                                 $line => self.line, $column => self.column - 1);
           boole-t escaped?;
-          c = perl-parser:get(self);
+          c = perl-parser::get(self);
           if (EOF == c) {
             print-error(self.filename, self.line, self.column, "unterminated string\n");
             return null;
@@ -166,14 +166,14 @@ klass perl-parser
           if (quote-type == c)
             return token; // empty string
           do {
-            dk:append(token, cast(uint32-t)c);
+            dk::append(token, cast(uint32-t)c);
 
             if ('\\' == c)
               escaped? = true;
             else
               escaped? = false;
 
-            c = perl-parser:get(self);
+            c = perl-parser::get(self);
             if (EOF == c) {
               print-error(self.filename, self.line, self.column, "unterminated string\n");
               return null;
@@ -201,14 +201,14 @@ klass perl-parser
             
         case '_':
         {
-          object-t token = make(token:klass, $tokenid => 'st',
+          object-t token = make(token::klass, $tokenid => 'st',
                                 $line => self.line, $column => self.column - 1);
           do {
-            dk:append(token, cast(uint32-t)c);
-            c = perl-parser:get(self);
+            dk::append(token, cast(uint32-t)c);
+            c = perl-parser::get(self);
           } while (isalnum(c) || '_' == c);
           if (EOF != c)
-            perl-parser:putback(self, c);
+            perl-parser::putback(self, c);
           return token;
         }
         default:
@@ -225,27 +225,27 @@ klass perl-parser
 
   /* method */ static object-t key(object-t self)
   {
-    object-t token = perl-parser:lex(self);
+    object-t token = perl-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
     object-t key;
-    switch (dk:tokenid(token))
+    switch (dk::tokenid(token))
     {
       case 'sqst':
-        key = make(string:klass, $bytes => dk:buffer(token));
+        key = make(string::klass, $bytes => dk::buffer(token));
         break;
       case 'dqst':
-        key = make(string:klass, $bytes => dk:buffer(token));
+        key = make(string::klass, $bytes => dk::buffer(token));
         break;
       case 'st':
-        key = make(string:klass, $bytes => dk:buffer(token));
+        key = make(string::klass, $bytes => dk::buffer(token));
         break;
       case '}':
         return null;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or '}' but got '%s'\n", dk:buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or '}' but got '%s'\n", dk::buffer(token));
         return null;
     }
     return key;
@@ -253,48 +253,48 @@ klass perl-parser
 
   /* method */ static object-t get-corresponds-to(object-t self)
   {
-    object-t token = perl-parser:lex(self);
+    object-t token = perl-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
-    if (dk:tokenid(token) != '=>') {
-      print-error(self.filename, self.line, self.column, "expected '=>' but got '%s'\n", dk:buffer(token));
+    if (dk::tokenid(token) != '=>') {
+      print-error(self.filename, self.line, self.column, "expected '=>' but got '%s'\n", dk::buffer(token));
       return null;
     }
-    return make(string:klass, $bytes => dk:buffer(token));
+    return make(string::klass, $bytes => dk::buffer(token));
   }
 
   /* method */ static object-t get-value(object-t self)
   { // get table value - value is NOT optional
-    object-t token = perl-parser:lex(self);
+    object-t token = perl-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
     object-t value;
-    switch (dk:tokenid(token))
+    switch (dk::tokenid(token))
     {
       case 'undf':
         value = null; // undef
         break;
       case 'sqst':
-        value = make(string:klass, $bytes => dk:buffer(token));
+        value = make(string::klass, $bytes => dk::buffer(token));
         break;
       case 'dqst':
-        value = make(string:klass, $bytes => dk:buffer(token));
+        value = make(string::klass, $bytes => dk::buffer(token));
         break;
       case 'st':
-        value = make(string:klass, $bytes => dk:buffer(token));
+        value = make(string::klass, $bytes => dk::buffer(token));
         break;
       case '{':
-        value = perl-parser:get-table(self);
+        value = perl-parser::get-table(self);
         break;
       case '[':
-        value = perl-parser:get-vector(self);
+        value = perl-parser::get-vector(self);
         break;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk:buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk::buffer(token));
         return null;
     }
     return value;
@@ -302,36 +302,36 @@ klass perl-parser
 
   /* method */ static object-t element(object-t self)
   { // get vector element - element is optional
-    object-t token = perl-parser:lex(self);
+    object-t token = perl-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
     object-t value;
-    switch (dk:tokenid(token))
+    switch (dk::tokenid(token))
     {
       case 'undf':
         value = null; // undef
         break;
       case 'sqst':
-        value = make(string:klass, $bytes => dk:buffer(token));
+        value = make(string::klass, $bytes => dk::buffer(token));
         break;
       case 'dqst':
-        value = make(string:klass, $bytes => dk:buffer(token));
+        value = make(string::klass, $bytes => dk::buffer(token));
         break;
       case 'st':
-        value = make(string:klass, $bytes => dk:buffer(token));
+        value = make(string::klass, $bytes => dk::buffer(token));
         break;
       case '{':
-        value = perl-parser:get-table(self);
+        value = perl-parser::get-table(self);
         break;
       case '[':
-        value = perl-parser:get-vector(self);
+        value = perl-parser::get-vector(self);
         break;
       case ']': // only difference from get-value()
         return null;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' or ']' but got '%s'\n", dk:buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' or ']' but got '%s'\n", dk::buffer(token));
         return null;
     }
     return value;
@@ -339,41 +339,41 @@ klass perl-parser
 
   /* method */ static object-t get-table-pair(object-t self)
   {
-    object-t key = perl-parser:key(self);
+    object-t key = perl-parser::key(self);
     if (null == key)
       return nullptr;
-    object-t corresponds-to = perl-parser:get-corresponds-to(self);
+    object-t corresponds-to = perl-parser::get-corresponds-to(self);
     if (null == corresponds-to)
       return nullptr;
-    object-t value = perl-parser:get-value(self);
+    object-t value = perl-parser::get-value(self);
     if (null == value)
       return nullptr;
-    return assoc:box({key, value});
+    return assoc::box({key, value});
   }
 
   // hackhack - multiple return statements
   /* method */ noexport object-t get-vector(object-t self)
   {
-    object-t vector = make(vector:klass);
+    object-t vector = make(vector::klass);
     object-t token;
     do {
-      object-t value = perl-parser:element(self);
+      object-t value = perl-parser::element(self);
       if (null == value)
         return vector;
 
       // add 'value' to 'vector'
-      dk:add-last(vector, value);
+      dk::add-last(vector, value);
 
-      token = perl-parser:lex(self);
+      token = perl-parser::lex(self);
       if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete vector\n");
         return null; // undef
       }
-    } while (',' == dk:tokenid(token));
+    } while (',' == dk::tokenid(token));
       
       
-    if (']' != dk:tokenid(token)) {
-      print-error(self.filename, self.line, self.column, "expected ',' or ']' but got '%s'\n", dk:buffer(token));
+    if (']' != dk::tokenid(token)) {
+      print-error(self.filename, self.line, self.column, "expected ',' or ']' but got '%s'\n", dk::buffer(token));
       return null; // undef
     }
     return vector;
@@ -381,25 +381,25 @@ klass perl-parser
 
   /* method */ noexport object-t get-table(object-t self)
   {
-    object-t table = make(hashed-table:klass);
+    object-t table = make(hashed-table::klass);
     object-t token;
     do {
-      object-t table-pair = perl-parser:get-table-pair(self);
+      object-t table-pair = perl-parser::get-table-pair(self);
       if (nullptr == table-pair)
         return table;
 
       // add 'table-pair' to 'table'
-      dk:add(table, table-pair);
+      dk::add(table, table-pair);
 
-      token = perl-parser:lex(self);
+      token = perl-parser::lex(self);
       if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete table\n");
         return null;
       }
-    } while (',' == dk:tokenid(token));
+    } while (',' == dk::tokenid(token));
       
-    if ('}' != dk:tokenid(token)) {
-      print-error(self.filename, self.line, self.column, "expected ',' or '}' but got '%s'\n", dk:buffer(token));
+    if ('}' != dk::tokenid(token)) {
+      print-error(self.filename, self.line, self.column, "expected ',' or '}' but got '%s'\n", dk::buffer(token));
       return null; // undef
     }
     return table;
@@ -408,34 +408,34 @@ klass perl-parser
   //      method object-t _read-property-list(object-t self)
   //      {
   //        object-t token;
-  //        while (null != (token = perl-parser:lex(self)))
-  //          dk:token:print(token, stdout);
+  //        while (null != (token = perl-parser::lex(self)))
+  //          dk::token::print(token, stdout);
   //        return null;
   //      }
 
   method object-t read-property-list(object-t self)
   {
 
-    object-t token = perl-parser:lex(self);
+    object-t token = perl-parser::lex(self);
     if (null == token)
       return null; // undef
 
-    switch (dk:tokenid(token))
+    switch (dk::tokenid(token))
     {
       case 'undf':
         return null; // undef
       case 'sqst':
-        return make(string:klass, $bytes => dk:buffer(token));
+        return make(string::klass, $bytes => dk::buffer(token));
       case 'dqst':
-        return make(string:klass, $bytes => dk:buffer(token));
+        return make(string::klass, $bytes => dk::buffer(token));
       case 'st':
-        return make(string:klass, $bytes => dk:buffer(token));
+        return make(string::klass, $bytes => dk::buffer(token));
       case '{':
-        return perl-parser:get-table(self);
+        return perl-parser::get-table(self);
       case '[':
-        return perl-parser:get-vector(self);
+        return perl-parser::get-vector(self);
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk:buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk::buffer(token));
         return null; // undef
     }
   }

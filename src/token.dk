@@ -40,22 +40,22 @@ klass token
 
   method object-t write-lite(object-t self, object-t out)
   {
-    dk:write(out, "\"");
-    dk:write(out, self.buffer);
-    dk:write(out, "\"");
+    dk::write(out, "\"");
+    dk::write(out, self.buffer);
+    dk::write(out, "\"");
     return self;
   }
 
   method object-t write-slots(object-t self, object-t out)
   {
-    dk:write-slots(super, out);
-    dk:write-slots-start(out, klass);
+    dk::write-slots(super, out);
+    dk::write-slots-start(out, klass);
 
-    dk:write-element(out, self.line,   "line");
-    dk:write-element(out, self.column, "column");
-    dk:write-element(out, self.buffer, "buffer");
+    dk::write-element(out, self.line,   "line");
+    dk::write-element(out, self.column, "column");
+    dk::write-element(out, self.buffer, "buffer");
 
-    dk:write-slots-end(out);
+    dk::write-slots-end(out);
     return self;
   }
 
@@ -65,11 +65,11 @@ klass token
                        tokenid-t      tokenid => 0,
                        str-t buffer =>  nullptr)
   {
-    self = dk:init(super);
+    self = dk::init(super);
 #if 0
     if (0 != tokenid) {
       char8-t[4 + (1)] tokenid-str = "";
-      tokenid:str-from(tokenid, tokenid-str, sizeof(tokenid-str));
+      tokenid::str-from(tokenid, tokenid-str, sizeof(tokenid-str));
 
       printf("{ 'line'=>'%i', 'column'=>'%i', 'tokenid'=>'%s', 'buffer'=>'%s' },\n",
              line, column, tokenid-str, buffer);
@@ -88,8 +88,8 @@ klass token
 
   method uintmax-t hash(object-t self)
   {
-    object-t string = make(string:klass, $bytes => cast(str-t)(self.buffer));
-    uintmax-t hash = dk:hash(string);
+    object-t string = make(string::klass, $bytes => cast(str-t)(self.buffer));
+    uintmax-t hash = dk::hash(string);
     return hash;
   }
 
@@ -97,11 +97,11 @@ klass token
   {
     boole-t state;
 
-    if (dk:instance?(other, klass)) {
+    if (dk::instance?(other, klass)) {
       slots-t* t = unbox(other);
-      object-t s-string = make(string:klass, $bytes => cast(str-t)(self.buffer));
-      object-t t-string = make(string:klass, $bytes => cast(str-t)(t->buffer));
-      state = dk:equal?(s-string, t-string);
+      object-t s-string = make(string::klass, $bytes => cast(str-t)(self.buffer));
+      object-t t-string = make(string::klass, $bytes => cast(str-t)(t->buffer));
+      state = dk::equal?(s-string, t-string);
     } else {
       state = false;
     }
@@ -193,7 +193,7 @@ klass token
   // this should be merged with buffer - this is a hackhack
   method str-t utf8-from(object-t self)
   {
-    str-t buffer = dk:buffer(self);
+    str-t buffer = dk::buffer(self);
     return buffer;
   }
 
@@ -229,7 +229,7 @@ klass token
 
   method object-t dump(object-t self)
   {
-    dk:dump(super);
+    dk::dump(super);
     fprintf(stderr, "%p:%p { buffer=\"%s\" }\n",
             cast(void*)(self), cast(void*)unbox(self), self.buffer);
     return self;
@@ -239,7 +239,7 @@ klass token
   {
     if (null == out)
       out = std-output;
-    dk:print(out, dk:utf8-from(self));
+    dk::print(out, dk::utf8-from(self));
     return self;
   }
 

@@ -29,4 +29,4 @@ klass keyword
   //export slots-t null{};
 }
 
-static-assert(sizeof(keyword-t*) == sizeof(std:nullptr-t), "Keyword argument processing functions read (va-arg()) sizeof(keyword-t*) and then compare to nullptr.");
+static-assert(sizeof(keyword-t*) == sizeof(std::nullptr-t), "Keyword argument processing functions read (va-arg()) sizeof(keyword-t*) and then compare to nullptr.");

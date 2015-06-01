@@ -48,7 +48,7 @@ klass input-file
                        file-t   file =>     nullptr,
                        str-t    filename => nullptr)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     assert(!(nullptr != file && nullptr != filename)); // these are mutually exclusive
     assert(stdout != file);
     assert(stderr != file);
@@ -60,7 +60,7 @@ klass input-file
       file = fopen(filename, "r");
 
       if (nullptr == file)
-        throw make(system-exception:klass, $errnum => errno);
+        throw make(system-exception::klass, $errnum => errno);
     }
     self.filename = filename; // copycopy: should make a copy?
     fpos-t fpos;
@@ -88,7 +88,7 @@ klass input-file
   method object-t dealloc(object-t self)
   {
     free(self.buffer);
-    object-t result = dk:dealloc(super);
+    object-t result = dk::dealloc(super);
     return result;
   }
 
@@ -129,7 +129,7 @@ klass input-file
 
   method object-t split(object-t self, type-predicate-t type?)
   {
-    object-t result = make(vector:klass);
+    object-t result = make(vector::klass);
 
     if (nullptr == type?)
       type? = space?;
@@ -138,25 +138,25 @@ klass input-file
     while (1) {
       str128-t  ws-buf = "";
       uint32-t ws-buf-pos = 0;
-      while (type?(c = dk:get-char8(self))) {
+      while (type?(c = dk::get-char8(self))) {
         ws-buf[ws-buf-pos] = c;
         ws-buf-pos++;
         ws-buf[ws-buf-pos] = NUL;
       }
       if (NUL == c)
         return result;
-      dk:put-char8(self, c);
+      dk::put-char8(self, c);
 
       str128-t  buf = "";
       uint32-t buf-pos = 0;
-      until (type?(c = dk:get-char8(self)))
+      until (type?(c = dk::get-char8(self)))
       {
         buf[buf-pos] = c;
         buf-pos++;
         buf[buf-pos] = NUL;
       }
-      object-t t = make(token:klass, $line => self.line, $column => self.column, $buffer => buf);
-      dk:add-last(result, t);
+      object-t t = make(token::klass, $line => self.line, $column => self.column, $buffer => buf);
+      dk::add-last(result, t);
 
       if (NUL == c)
         return result;

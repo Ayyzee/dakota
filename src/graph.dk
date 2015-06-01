@@ -34,7 +34,7 @@ klass node
                        str-t    name =>  {},
                        object-t attrs => null)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }
@@ -55,7 +55,7 @@ klass edge
                        str-t    rhs-name => {},
                        object-t attrs =>    null)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     self.lhs-name = lhs-name;
     self.rhs-name = rhs-name;
     self.attr =     attr;
@@ -70,7 +70,7 @@ klass attrs
   method object-t init(object-t self,
                        object-t attrs => {})
   {
-    self = dk:init(super);
+    self = dk::init(super);
     *unbox(self) = attrs;
     return self;
   }
@@ -92,7 +92,7 @@ klass graph
                        str-t    name =>  nullptr,
                        object-t attrs => null)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     self.type = type;
     self.name = name;
     // what should I do with attrs?
@@ -101,7 +101,7 @@ klass graph
 
   method object-t add-stmt(object-t self, object-t stmt)
   {
-    dk:add-last(self.stmts, stmt);
+    dk::add-last(self.stmts, stmt);
     return self;
   }
 

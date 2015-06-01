@@ -26,7 +26,7 @@ trait set
   {
     USE(self);
     USE(collection);
-    throw make(exception:klass, $message => "not yet implemented");
+    throw make(exception::klass, $message => "not yet implemented");
     return false;
   }
 
@@ -34,7 +34,7 @@ trait set
   {
     USE(self);
     USE(collection);
-    throw make(exception:klass, $message => "not yet implemented");
+    throw make(exception::klass, $message => "not yet implemented");
     return false;
   }
 
@@ -43,7 +43,7 @@ trait set
   {
     USE(self);
     USE(collection);
-    throw make(exception:klass, $message => "not yet implemented");
+    throw make(exception::klass, $message => "not yet implemented");
     return null;
   }
 
@@ -52,22 +52,22 @@ trait set
   {
     USE(self);
     USE(collection);
-    throw make(exception:klass, $message => "not yet implemented");
+    throw make(exception::klass, $message => "not yet implemented");
     return null;
   }
 
   method object-t write-lite(object-t self, object-t out)
   {
-    dk:write(out, "{");
+    dk::write(out, "{");
     str-t delim = "";
 
     for (object-t element in self) {
-      dk:write(out, delim);
-      dk:write-lite(element, out); // must be primitive type
+      dk::write(out, delim);
+      dk::write-lite(element, out); // must be primitive type
       delim = ",";
     }
 
-    dk:write(out, "}");
+    dk::write(out, "}");
     return self;
   }
 

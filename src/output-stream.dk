@@ -38,7 +38,7 @@ klass output-stream
 
   method object-t init(object-t self, file-t file => stdout)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     self.out = file;
     return self;
   }
@@ -47,9 +47,9 @@ klass output-stream
   {
 #if defined DEBUG
     if (stdout == self.out)
-      dkt-log(dkt:k-log-warning, "closing 'stdout'");
+      dkt-log(dkt::k-log-warning, "closing 'stdout'");
     else-if (stderr == self.out)
-      dkt-log(dkt:k-log-warning, "closing 'stderr'");
+      dkt-log(dkt::k-log-warning, "closing 'stderr'");
 #endif // DEBUG
     int rtn = fclose(self.out);
 
@@ -57,7 +57,7 @@ klass output-stream
       str128-t buf = "";
       strerror-r(errno, buf, sizeof(buf));
       fprintf(stderr, "%s", buf);
-      throw make(exception:klass, $message => "oops");
+      throw make(exception::klass, $message => "oops");
     }
     return self;
   }
@@ -80,84 +80,84 @@ klass output-stream
   static object-t pad-to-col(object-t self, uint32-t col)
   {
     for (uint32-t i = 0; i < col; i++)
-      dk:print(self, "  "); // two spaces per column :-) [my way]
+      dk::print(self, "  "); // two spaces per column :-) [my way]
     return self;
   }
 
-  method format-va-printf(2) object-t va:print-format(object-t self, str-t format, va-list-t args)
+  method format-va-printf(2) object-t va::print-format(object-t self, str-t format, va-list-t args)
   {
     char8-t[128] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
-    dk:print(self, cast(str-t)(buffer));
+    dk::print(self, cast(str-t)(buffer));
     return self;
   }
 
-  method format-va-printf(2) object-t va:println-format(object-t self, str-t format, va-list-t args)
+  method format-va-printf(2) object-t va::println-format(object-t self, str-t format, va-list-t args)
   {
     char8-t[128] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
-    dk:println(self, cast(str-t)(buffer));
+    dk::println(self, cast(str-t)(buffer));
     return self;
   }
 
   method object-t print(object-t self, object-t object)
   {
-    dk:print(object, self);
+    dk::print(object, self);
     return self;
   }
 
   method object-t print-shallow(object-t self, object-t object)
   {
-    dk:print-shallow(object, self);
+    dk::print-shallow(object, self);
     return self;
   }
 
   method object-t println(object-t self, str-t string)
   {
-    dk:print(self, string);
-    dk:print(self, output-stream:gbl-endl);
+    dk::print(self, string);
+    dk::print(self, output-stream::gbl-endl);
     return self;
   }
 
   method object-t println(object-t self, object-t object)
   {
-    dk:print(self, object);
-    dk:print(self, output-stream:gbl-endl);
+    dk::print(self, object);
+    dk::print(self, output-stream::gbl-endl);
     return self;
   }
 
   method object-t println-shallow(object-t self, object-t object)
   {
-    dk:print-shallow(self, object);
-    dk:print(self, output-stream:gbl-endl);
+    dk::print-shallow(self, object);
+    dk::print(self, output-stream::gbl-endl);
     return self;
   }
 
   method object-t print-in-col(object-t self, str-t string, uint32-t col)
   {
     pad-to-col(self, col);
-    dk:print(self, string);
+    dk::print(self, string);
     return self;
   }
 
   method object-t print-in-col(object-t self, object-t object, uint32-t col)
   {
     pad-to-col(self, col);
-    dk:print(self, object);
+    dk::print(self, object);
     return self;
   }
 
   method object-t println-in-col(object-t self, str-t string, uint32-t col)
   {
-    dk:print-in-col(self, string, col);
-    dk:print(self, "\n");
+    dk::print-in-col(self, string, col);
+    dk::print(self, "\n");
     return self;
   }
 
   method object-t println-in-col(object-t self, object-t object, uint32-t col)
   {
-    dk:print-in-col(self, object, col);
-    dk:print(self, "\n");
+    dk::print-in-col(self, object, col);
+    dk::print(self, "\n");
     return self;
   }
 }

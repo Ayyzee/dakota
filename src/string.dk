@@ -45,7 +45,7 @@ klass string
                        uint32-t       length =>   cast(uint32-t)safe-strlen(bytes) - start)
   {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
-    self = dk:init(super);
+    self = dk::init(super);
     assert(nullptr != bytes);
     assert(nullptr != encoding);
     assert(start <= length);
@@ -61,7 +61,7 @@ klass string
   method object-t dealloc(object-t self)
   {
     free(self.ptr);
-    object-t result = dk:dealloc(super);
+    object-t result = dk::dealloc(super);
     return result;
   }
 
@@ -82,28 +82,28 @@ klass string
 
   method object-t write-lite(object-t self, object-t out)
   {
-    str-t utf8 = dk:utf8-from(self);
-    dk:write(out, "\"");
-    dk:write(out, utf8);
-    dk:write(out, "\"");
+    str-t utf8 = dk::utf8-from(self);
+    dk::write(out, "\"");
+    dk::write(out, utf8);
+    dk::write(out, "\"");
     return self;
   }
 
   method object-t write-slots(object-t self, object-t out)
   {
-    dk:write-slots(super, out);
-    dk:write-slots-start(out, klass);
+    dk::write-slots(super, out);
+    dk::write-slots-start(out, klass);
 
-    dk:write-element(out, self.ptr, "ptr");
-    dk:write-element(out, self.len, "len");
+    dk::write-element(out, self.ptr, "ptr");
+    dk::write-element(out, self.len, "len");
 
-    dk:write-slots-end(out);
+    dk::write-slots-end(out);
     return self;
   }
 
   method object-t dump(object-t self)
   {
-    dk:dump(super);
+    dk::dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%i }\n",
             cast(void*)(self), cast(void*)unbox(self), self.ptr, self.len);
     return self;
@@ -153,15 +153,15 @@ klass string
   // returns an vector of string objects
   method object-t tokenize(object-t self, object-t delimiter)
   {
-    assert(dk:instance?(delimiter, klass));
+    assert(dk::instance?(delimiter, klass));
     slots-t* d = unbox(delimiter);
-    object-t result = dk:tokenize(self, d->ptr);
+    object-t result = dk::tokenize(self, d->ptr);
     return result;
   }
 
   method object-t tokenize(object-t self, str-t delimiter)
   {
-    object-t result = make(vector:klass);
+    object-t result = make(vector::klass);
     uint32-t delimiter-length = cast(uint32-t)safe-strlen(delimiter);
     str-t p1 = self.ptr;
     str-t p2;
@@ -171,22 +171,22 @@ klass string
 
     // leading 'delimiter'
     if (0 == strncmp(self.ptr, delimiter, delimiter-length)) {
-      dk:add-last(result, delimiter-object);
+      dk::add-last(result, delimiter-object);
       p1 += delimiter-length;
     }
 
     // 'part' 'delimiter' pairs
     while (nullptr != (p2 = strstr(p1, delimiter))) {
       object-t part-object = make(kls, $bytes => cast(str-t)(p1), $length => cast(uint32-t)(p2 - p1));
-      dk:add-last(result, part-object);
-      dk:add-last(result, delimiter-object);
+      dk::add-last(result, part-object);
+      dk::add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
     }
 
     // trailing 'part'
     if (NUL != *p1) {
       object-t part-object = make(kls, $bytes => p1);
-      dk:add-last(result, part-object);
+      dk::add-last(result, part-object);
     }
 
     return result;
@@ -201,7 +201,7 @@ klass string
   method object-t append-sequence(object-t self, object-t sequence)
   {
     for (object-t element in sequence) {
-      str-t utf8 = dk:utf8-from(element);
+      str-t utf8 = dk::utf8-from(element);
       uint32-t length = cast(uint32-t)safe-strlen(utf8);
       self.len += cast(uint32-t)(length);
       self.ptr = cast(char8-t*)realloc(self.ptr, (self.len + 1 * sizeof(char8-t)));
@@ -215,7 +215,7 @@ klass string
     //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
     int-t result;
 
-    if (dk:instance?(other, klass)) {
+    if (dk::instance?(other, klass)) {
       // what if both utf8s are nullptr?
       // what if only one utf8 is nullptr?
       slots-t* s1 = unbox(self);
@@ -223,7 +223,7 @@ klass string
       result = safe-strcmp(s1->ptr, s2->ptr);
       result = dkt-normalize-compare-result(result);
     } else {
-      result = dk:compare(super, other);
+      result = dk::compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;
@@ -233,7 +233,7 @@ klass string
   {
     if (null == out)
       out = std-output;
-    dk:print(out, dk:utf8-from(self));
+    dk::print(out, dk::utf8-from(self));
     return self;
   }
 }

@@ -27,7 +27,7 @@ klass std-compare;
 // {
 //   object-t element;
 //   while (nullptr != (element = va-arg(args, object-t)))
-//     dk:add(self, element);
+//     dk::add(self, element);
 //   return self;
 // }
 
@@ -55,8 +55,8 @@ klass collection
 
   method object-t writeln-lite(object-t self, object-t out)
   {
-    dk:write-lite(self, out);
-    dk:write(out, "\n");
+    dk::write-lite(self, out);
+    dk::write(out, "\n");
     return self;
   }
 
@@ -66,9 +66,9 @@ klass collection
 //     assert(nullptr != encoding);
 //     while (nullptr != *strings) // rnielsen: modifying a parameter - bad practice?
 //     {
-//       object-t string = make(string:klass, $bytes => *strings, $encoding => encoding);
+//       object-t string = make(string::klass, $bytes => *strings, $encoding => encoding);
 //       strings++;
-//       dk:add(self, string);
+//       dk::add(self, string);
 //     }
 //     return null;
 //   }
@@ -76,7 +76,7 @@ klass collection
   method object-t add-all(object-t self, object-t collection)
   {
     for (object-t element in collection)
-      dk:add(self, element);
+      dk::add(self, element);
     return collection;
   }
 
@@ -86,7 +86,7 @@ klass collection
     object-t arg;
     object-t* args = items;
     while (nullptr != (arg = *args++))
-      dk:add(self, arg);
+      dk::add(self, arg);
     return self; // nullnull?
   }
 

@@ -30,23 +30,23 @@ klass open-token
     object-t close-token;
   }
 
-  // prevents (normally) generated dk:va:init() generic from being generated
-  // because dk:init() is a keyword argument function (normally)
-  method object-t va:init(object-t self, va-list-t args)
+  // prevents (normally) generated dk::va::init() generic from being generated
+  // because dk::init() is a keyword argument function (normally)
+  method object-t va::init(object-t self, va-list-t args)
   {
-    self = dk:va:init(super, args);
+    self = dk::va::init(super, args);
     self.close-token = null;
     return self;
   }
 
   method object-t write-slots(object-t self, object-t out)
   {
-    dk:write-slots(super, out);
-    dk:write-slots-start(out, klass);
+    dk::write-slots(super, out);
+    dk::write-slots-start(out, klass);
 
-    dk:write-element-idref(out, self.close-token, "close-token");
+    dk::write-element-idref(out, self.close-token, "close-token");
 
-    dk:write-slots-end(out);
+    dk::write-slots-end(out);
     return self;
   }
 

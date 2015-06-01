@@ -32,7 +32,7 @@ klass assoc
                        object-t key =>     null,
                        object-t element => null)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     self.key =     key;
     self.element = element;
     return self;
@@ -40,21 +40,21 @@ klass assoc
 
   method object-t dump(object-t self)
   {
-    dk:dump(super);
-    dk:dump(self.key);
-    dk:dump(self.element);
+    dk::dump(super);
+    dk::dump(self.key);
+    dk::dump(self.element);
     return self;
   }
 
   method object-t write-slots(object-t self, object-t out)
   {
-    dk:write-slots(super, out);
-    dk:write-slots-start(out, klass);
+    dk::write-slots(super, out);
+    dk::write-slots-start(out, klass);
 
-    dk:write-element-idref(out, self.key,     "key");
-    dk:write-element-idref(out, self.element, "element");
+    dk::write-element-idref(out, self.key,     "key");
+    dk::write-element-idref(out, self.element, "element");
 
-    dk:write-slots-end(out);
+    dk::write-slots-end(out);
     return self;
   }
 
@@ -62,14 +62,14 @@ klass assoc
   {
     boole-t result;
     object-t key = self;
-    if (dk:instance?(key, klass))
+    if (dk::instance?(key, klass))
       key = unbox(key)->key;
     assert(nullptr != key);
     object-t other-key = other;
-    if (dk:instance?(other-key, klass))
+    if (dk::instance?(other-key, klass))
       other-key = unbox(other-key)->key;
     assert(nullptr != other-key);
-    result = dk:equal?(key, other-key);
+    result = dk::equal?(key, other-key);
     return result;
   }
 
@@ -77,14 +77,14 @@ klass assoc
   {
     int-t result;
     object-t key = self;
-    if (dk:instance?(key, klass))
+    if (dk::instance?(key, klass))
       key = unbox(key)->key;
     assert(nullptr != key);
     object-t other-key = other;
-    if (dk:instance?(other-key, klass))
+    if (dk::instance?(other-key, klass))
       other-key = unbox(other-key)->key;
     assert(nullptr != other-key);
-    result = dk:compare(key, other-key);
+    result = dk::compare(key, other-key);
     return result;
   }
 
@@ -92,10 +92,10 @@ klass assoc
   {
     uintmax-t result;
     object-t key = self;
-    if (dk:instance?(key, klass))
+    if (dk::instance?(key, klass))
       key = unbox(key)->key;
     assert(nullptr != key);
-    result = dk:hash(key);
+    result = dk::hash(key);
     return result;
   }
 

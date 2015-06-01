@@ -49,7 +49,7 @@ klass ascii-number-klass
                        object-t       info =>   gbl-base2-ascii-number-klass-info,
                        str-t digits => "01")
   {
-    self = dk:init(super, $info => info);
+    self = dk::init(super, $info => info);
     assert(nullptr != digits);
     self.digits = digits;
     // should confirm the digits are unique

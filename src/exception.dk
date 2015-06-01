@@ -55,7 +55,7 @@ getprogname()
 {
   int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
-    throw make(system-exception:klass, $errnum => errno);
+    throw make(system-exception::klass, $errnum => errno);
   gbl-buf[n] = NUL;
   str-t progname = strrchr(gbl-buf, '/');
   if (nullptr != progname)
@@ -77,16 +77,16 @@ va-log(uint32-t priority, str-t format, va-list-t args)
 
     switch (priority)
     {
-      case dkt:k-log-error:
+      case dkt::k-log-error:
         fprintf(log-file, "error: ");
         break;
-      case dkt:k-log-warning:
+      case dkt::k-log-warning:
         fprintf(log-file, "warning: ");
         break;
-      case dkt:k-log-info:
+      case dkt::k-log-info:
         fprintf(log-file, "info: ");
         break;
-      case dkt:k-log-debug:
+      case dkt::k-log-debug:
         fprintf(log-file, "debug: ");
         break;
       default:
@@ -118,14 +118,14 @@ dkt-log(uint32-t priority, str-t format, ...)
 }
 
 noexport void pre-runtime-verbose-terminate();
-noexport void (*previous-terminate)() = std:set-terminate(pre-runtime-verbose-terminate);
+noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
 noexport void
 pre-runtime-verbose-terminate()
 {
-//   dkt-log(dkt:k-log-info, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
-  dkt-log(dkt:k-log-error, "uncaught exception");
+  dkt-log(dkt::k-log-error, "uncaught exception");
 
   if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
@@ -138,36 +138,36 @@ pre-runtime-verbose-terminate()
 noexport void
 verbose-terminate()
 {
-//   dkt-log(dkt:k-log-info, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
   object-t current-exception = dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
-      dk:dump(current-exception);
+      dk::dump(current-exception);
 
-  dk:print-format(std-error, "%s[%i]: uncaught exception", getprogname(), getpid());
+  dk::print-format(std-error, "%s[%i]: uncaught exception", getprogname(), getpid());
 
   if (nullptr != current-exception)
-    dk:println(current-exception, std-error);
+    dk::println(current-exception, std-error);
   else-if (nullptr != current-exception-string)
-    dk:println-format(std-error, ": \"%s\"", current-exception-string);
+    dk::println-format(std-error, ": \"%s\"", current-exception-string);
   else
-    dk:println(std-error, "");
+    dk::println(std-error, "");
 
   previous-terminate();
 }
 
 noexport void pre-runtime-verbose-unexpected();
-noexport void (*previous-unexpected)() = std:set-unexpected(pre-runtime-verbose-unexpected);
+noexport void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
 noexport void
 pre-runtime-verbose-unexpected()
 {
-//   dkt-log(dkt:k-log-info, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
-  dkt-log(dkt:k-log-error, "unexpected exception");
+  dkt-log(dkt::k-log-error, "unexpected exception");
 
   if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
@@ -180,23 +180,23 @@ pre-runtime-verbose-unexpected()
 noexport void
 verbose-unexpected()
 {
-//   dkt-log(dkt:k-log-info, "%s()", __func__);
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
   object-t current-exception = dkt-capture-current-exception(cast(object-t)0);
 
   if (NULL != (getenv("DKT_DUMP_UNEXPECTED_EXCEPTION")))
     if (nullptr != current-exception)
-      dk:dump(current-exception);
+      dk::dump(current-exception);
 
-  dk:print-format(std-error, "%s[%i]: unexpected exception", getprogname(), getpid());
+  dk::print-format(std-error, "%s[%i]: unexpected exception", getprogname(), getpid());
 
   if (nullptr != current-exception)
-    dk:println(current-exception, std-error);
+    dk::println(current-exception, std-error);
   else-if (nullptr != current-exception-string)
-    dk:println-format(std-error, ": \"%s\"", current-exception-string);
+    dk::println-format(std-error, ": \"%s\"", current-exception-string);
   else
-    dk:println(std-error, "");
+    dk::println(std-error, "");
 
   previous-unexpected();
 }
@@ -212,7 +212,7 @@ klass exception
 
   method object-t init(object-t self, str-t message => dkt-name(dkt-klass(self)))
   {
-    self = dk:init(super);
+    self = dk::init(super);
     self.message = message;
     return self;
   }
@@ -221,7 +221,7 @@ klass exception
   {
     if (null == out)
       out = std-error;
-    dk:print-format(out, ": <%s>", self.message);
+    dk::print-format(out, ": <%s>", self.message);
     return self;
   }
 }

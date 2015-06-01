@@ -33,8 +33,8 @@ klass named-info
   {
     property-t* elements; // property
     uint32-t    count;    // sizeof(property)/sizeof(property[0])
-  //            size = sizeof(property:slots-t)
-  //            compare = property:compare()
+  //            size = sizeof(property::slots-t)
+  //            compare = property::compare()
     slots-t*    next;
   }
 
@@ -44,7 +44,7 @@ klass named-info
       // need to add test for $name (since its required)
 
       property-t element = s->elements[i];
-      property:check(&element);
+      property::check(&element);
     }
     return 0;
   }
@@ -52,22 +52,22 @@ klass named-info
   method slots-t* sort(slots-t* s)
   {
     qsort(s->elements, s->count, sizeof(s->elements[0]),
-          cast(std-compare-t)cast(int-t(*)(property:slots-t*,property:slots-t*))property:compare);
+          cast(std-compare-t)cast(int-t(*)(property::slots-t*,property::slots-t*))property::compare);
     return s;
   }
 
   method property-t* search(slots-t* s, symbol-t key)
   {
-    property:slots-t property = { cast(symbol-t)(key), cast(uintptr-t)0 };
-    property:slots-t* result = cast(property:slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
-                                                              cast(std-compare-t)cast(int-t (*)(property:slots-t*,property:slots-t*))property:compare);
+    property::slots-t property = { cast(symbol-t)(key), cast(uintptr-t)0 };
+    property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
+                                                              cast(std-compare-t)cast(int-t (*)(property::slots-t*,property::slots-t*))property::compare);
     return result;
   }
 
   method uintptr-t at(slots-t* s, symbol-t key)
   {
     uintptr-t element = 0;
-    property:slots-t* property = search(s, key);
+    property::slots-t* property = search(s, key);
     if (nullptr != property)
       element = property->element;
     return element;
@@ -93,10 +93,10 @@ klass named-info
                key, PRIxPTR-WIDTH, element);
 
         if (0) {}
-        else-if (0 == symbol:compare($file, key))
+        else-if (0 == symbol::compare($file, key))
               printf("  \"%s\",", cast(str-t)(element));
-        else-if (0 == symbol:compare($name,      key) ||
-                 0 == symbol:compare($construct, key))
+        else-if (0 == symbol::compare($name,      key) ||
+                 0 == symbol::compare($construct, key))
               printf("  $%s,",    cast(symbol-t)(element));
         printf("\n");
       }
@@ -111,7 +111,7 @@ klass named-info
     symbol-t s-name = cast(symbol-t)at(s, $name);
     symbol-t other-name = cast(symbol-t)at(other-s, $name);
     //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
-    int-t result = symbol:compare(s-name, other-name);
+    int-t result = symbol::compare(s-name, other-name);
     result = dkt-normalize-compare-result(result);
     return result;
   }
@@ -126,12 +126,12 @@ klass named-info
   {
     int-t result;
 
-    if (dk:instance?(other, klass)) {
+    if (dk::instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
     } else {
-      result = dk:compare(super, other);
+      result = dk::compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;
@@ -202,5 +202,5 @@ dk-make-named-info(symbol-t name, ...)
 DEBUG-EXPORT named-info-t*
 dkt-dump-named-info(named-info-t* info)
 {
-  return named-info:dump(info);
+  return named-info::dump(info);
 }

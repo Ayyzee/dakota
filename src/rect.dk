@@ -23,8 +23,8 @@ klass rect
 {
   slots
   {
-    point:slots-t     point;
-    dimension:slots-t dimension;
+    point::slots-t     point;
+    dimension::slots-t dimension;
   }
 
   method boole-t equal?(slots-t* slots, slots-t* other-slots)

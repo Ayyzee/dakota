@@ -33,7 +33,7 @@ sub dk_prefix {
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
-    &dk_prefix($path);
+    return &dk_prefix($path);
   } else {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
@@ -212,7 +212,7 @@ sub kw_args_translate {
   while (my ($generic, $discarded) = each(%{$$parse_tree{'generics'}})) {
     my $va_generic = $generic;
 
-    if ($generic =~ s/^va://) {
+    if ($generic =~ s/^va:://) {
       delete $$parse_tree{'generics'}{$va_generic};
       $$parse_tree{'generics'}{$generic} = undef;
     }
@@ -227,7 +227,7 @@ sub kw_args_translate {
           if ('va' eq &dakota::util::_first($$method{'name'})) {
             my $discarded;
             $discarded = &dakota::util::_remove_first($$method{'name'}); # lose 'va'
-            $discarded = &dakota::util::_remove_first($$method{'name'}); # lose ':'
+            $discarded = &dakota::util::_remove_first($$method{'name'}); # lose '::'
           }
 
           if ($$method{'kw-args-names'}) {
@@ -1316,7 +1316,7 @@ sub klass {
       }
       if (m/^klass$/) {
         if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$' &&
-            &sst_cursor::previous_token($gbl_sst_cursor) ne ':') {
+            &sst_cursor::previous_token($gbl_sst_cursor) ne '::') {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
             if ($next_token =~ m/$id/) {
@@ -1361,9 +1361,9 @@ sub dkdecl {
     $$gbl_sst_cursor{'current-token-index'}++;
   }
 
-  #    if (':' ne $parts[0])
+  #    if ('::' ne $parts[0])
   #    {
-  #        &dakota::util::_add_first($parts, ':');
+  #        &dakota::util::_add_first($parts, '::');
   #    }
   my $body = &path::string($parts);
   return ($body, $parts);
@@ -1527,10 +1527,10 @@ sub parameter_list {
 sub add_klasses_used {
   my ($scope, $gbl_sst_cursor) = @_;
   my $seqs = [
-              { 'pattern' => [ '?ident', ':', 'klass'   ], },
-              { 'pattern' => [ '?ident', ':', 'box',    ], },
-              { 'pattern' => [ '?ident', ':', 'unbox',  ], },
-              { 'pattern' => [ '?ident', ':', 'slots-t' ], },
+              { 'pattern' => [ '?ident', '::', 'klass'   ], },
+              { 'pattern' => [ '?ident', '::', 'box',    ], },
+              { 'pattern' => [ '?ident', '::', 'unbox',  ], },
+              { 'pattern' => [ '?ident', '::', 'slots-t' ], },
              ];
   my $size = &sst_cursor::size($gbl_sst_cursor);
   for (my $i = 0; $i < $size - 2; $i++) {
@@ -1562,18 +1562,18 @@ sub add_generics_used {
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
   #&errdump($$gbl_sst_cursor{'sst'});
   my $seqs = [
-              { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'dk', ':',  'va', ':', '?method-name', '(', 'super' ], },
-              { 'name' => 'supers',   'range' => [2,2], 'pattern' => [ 'dk', ':',             '?method-name', '(', 'super' ], },
-              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'dk', ':',  'va', ':', '?method-name'               ], },
-              { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'dk', ':',             '?method-name'               ], },
+              { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name', '(', 'super' ], },
+              { 'name' => 'supers',   'range' => [2,2], 'pattern' => [ 'dk', '::',             '?method-name', '(', 'super' ], },
+              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name'               ], },
+              { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'dk', '::',             '?method-name'               ], },
 
-              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'selector', '(', 'va', ':', '?method-name', '('     ], },
+              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'selector', '(', 'va', '::', '?method-name', '('     ], },
               { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'selector', '(',            '?method-name', '('     ], },
 
-              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'signature', '(', 'va', ':', '?method-name', '('     ], },
+              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'signature', '(', 'va', '::', '?method-name', '('     ], },
               { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'signature', '(',            '?method-name', '('     ], },
 
-              { 'name' => 'generics', 'range' => [0,2], 'pattern' => [ 'va', ':',  'make', '('                 ], },
+              { 'name' => 'generics', 'range' => [0,2], 'pattern' => [ 'va', '::',  'make', '('                 ], },
               { 'name' => 'generics', 'range' => [0,0], 'pattern' => [             'make', '('                 ], },
              ];
   my $size = &sst_cursor::size($gbl_sst_cursor);
@@ -1664,8 +1664,8 @@ sub method {
   my $last_type_token = $last_name_token;
   $last_type_token--;
 
-  if (':' eq &sst::at($gbl_sst, $last_type_token) ||
-      ':' eq &sst::at($gbl_sst, $last_type_token)) { # huh?
+  if ('::' eq &sst::at($gbl_sst, $last_type_token) ||
+      '::' eq &sst::at($gbl_sst, $last_type_token)) { # huh?
     $last_type_token--;
 
     if ('va' eq &sst::at($gbl_sst, $last_type_token)) {
@@ -1777,7 +1777,7 @@ sub generics::klass_type_from_klass_name {
   } elsif ($$global_rep{'traits'}{$klass_name}) {
     $klass_type = 'trait';
   } else {
-    my $rep_path_var = [join ':', @{$$global_root_cmd{'reps'}}];
+    my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
     die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
   }
   return $klass_type;
@@ -1793,7 +1793,7 @@ sub generics::klass_scope_from_klass_name {
   } elsif ($$global_rep{'traits'}{$klass_name}) {
     $klass_scope = $$global_rep{'traits'}{$klass_name};
   } else {
-    my $rep_path_var = [join ':', @{$$global_root_cmd{'reps'}}];
+    my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
     die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
   }
   return $klass_scope;
@@ -2048,7 +2048,7 @@ sub parse_root {
         last;
       }
       if (m/^klass$/) {
-        if (0 == $$gbl_sst_cursor{'current-token-index'} || &sst_cursor::previous_token($gbl_sst_cursor) ne ':') {
+        if (0 == $$gbl_sst_cursor{'current-token-index'} || &sst_cursor::previous_token($gbl_sst_cursor) ne '::') {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
             if ($next_token =~ m/$id/) {
