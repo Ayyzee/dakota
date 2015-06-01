@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-digraph "collection-mutable-set-klasses-new"
+digraph "collection-mutable-set-klasses-idea-2"
 {
 	graph [ label = "\G",
           fontcolor = red,
@@ -27,52 +27,47 @@ digraph "collection-mutable-set-klasses-new"
 	edge [ dir = back, // its more natural to see: some-klass <- some-subklass
 	];
 
-//   subgraph "cluster-legend"
-//   {
-//     graph [ label = "legend" ];
-//     "klass w/o slots";
-//     "klass w/ slots" [ color = blue ];
-//     "union klass" [ color = green ];
-//     "trait" [ style = rounded ];
-//   }
+  // subgraph "cluster-legend"
+  // {
+  //   graph [ label = "legend" ];
+  //   "klass w/o slots";
+  //   "klass w/ slots" [ color = blue ];
+  //   "union klass" [ color = green ];
+  //   "trait" [ style = rounded ];
+  // }
 
   subgraph "cluster-main"
   {
     graph [ label = "" ];
-    // traits
-    "set" [ style = rounded, color = cyan ];
+
     "HASHED-counted-set" [ label = "counted-set", style = "rounded,dashed", color = cyan ];
     "HASHED-mutable-counted-set" [ label = "mutable-counted-set", style = "rounded,dashed", color = cyan ];
     "SORTED-counted-set" [ label = "counted-set", style = "rounded,dashed", color = cyan ];
     "SORTED-mutable-counted-set" [ label = "mutable-counted-set", style = "rounded,dashed", color = cyan ];
-    "table" [ style = rounded, color = cyan ];
-    "mutable-set" [ style = rounded, color = cyan ];
-    "mutable-table" [ style = rounded, color = cyan ];
-    "hashed-set" [ color = green ];
-    "sorted-set" [ color = blue ];
-    "sorted-counted-set" [ color = blue ];
     "hashed-counted-set" [ color = green ];
+    "hashed-set" [ color = green ];
     "hashed-table" [ color = green ];
-    "sorted-table" [ color = blue ];
-    "mutable-hashed-table" [ color = green ];
-    "mutable-sorted-table" [ color = blue ];
-    "mutable-hashed-set" [ color = green ];
-    "mutable-sorted-set" [ color = blue ];
     "mutable-hashed-counted-set" [ color = green ];
+    "mutable-hashed-set" [ color = green ];
+    "mutable-hashed-table" [ color = green ];
+    "mutable-set" [ style = rounded, color = cyan ];
     "mutable-sorted-counted-set" [ color = blue ];
+    "mutable-sorted-set" [ color = blue ];
+    "mutable-sorted-table" [ color = blue ];
+    "mutable-table" [ style = rounded, color = cyan ];
+    "set" [ style = rounded, color = cyan ];
+    "sorted-counted-set" [ color = blue ];
+    "sorted-set" [ color = blue ];
+    "sorted-table" [ color = blue ];
+    "table" [ style = rounded, color = cyan ];
 
     "mutable-sorted-set" -> "sorted-counted-set";
     "sorted-counted-set" -> "mutable-sorted-counted-set";
     "mutable-hashed-set" -> "hashed-counted-set";
     "hashed-counted-set" -> "mutable-hashed-counted-set";
-    "HASHED-counted-set" -> "hashed-counted-set" [ style = dotted ];
-    "HASHED-mutable-counted-set" -> "mutable-hashed-counted-set" [ style = dotted ];
-    "HASHED-counted-set" -> "HASHED-mutable-counted-set" [ style = dotted ];
-    "sorted-counted-set" -> "SORTED-counted-set" [ style = dotted, dir = forward ];
-    "mutable-sorted-counted-set" -> "SORTED-mutable-counted-set" [ style = dotted, dir = forward ];
-    "SORTED-counted-set" -> "SORTED-mutable-counted-set" [ style = dotted ];
-    
-    // klass-to-klass edges
+    "HASHED-counted-set" -> "HASHED-mutable-counted-set" [ style = dotted ]; // horizontal
+    "SORTED-counted-set" -> "SORTED-mutable-counted-set" [ style = dotted ]; // horizontal
+
     "sorted-set" -> "mutable-sorted-set";
     "hashed-set" -> "mutable-hashed-set";
     "mutable-collection" -> "sorted-set";
@@ -81,48 +76,71 @@ digraph "collection-mutable-set-klasses-new"
     "mutable-sorted-set" -> "sorted-table";
     "mutable-hashed-set" -> "hashed-table";
 
-    // trait-to-trait edges
     "set" -> "mutable-set" [ style = dotted ];
     "table" -> "mutable-table" [ style = dotted ];
 
-    // klass-to-trait edges
-    // to debug set color = red
-    "sorted-set" -> "set" [ style = dotted, dir = forward ];
-    "sorted-table" -> "table" [ style = dotted, dir = forward ];
-    "mutable-sorted-set" -> "mutable-set" [ style = dotted,  dir = forward ];
-    "mutable-sorted-table" -> "mutable-table" [ style = dotted,  dir = forward ];
+    "sorted-set" -> "set" [ style = dotted, dir = forward ]; // vertical
+    "set" -> "hashed-set" [ style = dotted ]; // vertical
 
-    // trait-to-klass edges
-    "set" -> "hashed-set" [ style = dotted ];
-    "table" -> "hashed-table" [ style = dotted ];
-    "mutable-set" -> "mutable-hashed-set" [ style = dotted ];
-    "mutable-table" -> "mutable-hashed-table" [ style = dotted ];
+    "mutable-sorted-set" -> "mutable-set" [ style = dotted,  dir = forward ]; // vertical
+    "mutable-set" -> "mutable-hashed-set" [ style = dotted ]; // vertical
 
+    "sorted-table" -> "table" [ style = dotted, dir = forward ]; // vertical
+    "table" -> "hashed-table" [ style = dotted ]; // vertical
+
+    "mutable-sorted-table" -> "mutable-table" [ style = dotted,  dir = forward ]; // vertical
+    "mutable-table" -> "mutable-hashed-table" [ style = dotted ]; // vertical
+
+    "sorted-counted-set" -> "SORTED-counted-set" [ style = dotted, dir = forward ]; // vertical
+    "mutable-sorted-counted-set" -> "SORTED-mutable-counted-set" [ style = dotted, dir = forward ]; // vertical
+
+    "HASHED-counted-set" -> "hashed-counted-set" [ style = dotted ]; // vertical
+    "HASHED-mutable-counted-set" -> "mutable-hashed-counted-set" [ style = dotted ]; // vertical
+
+
+    "sorted-table" -> "sorted-counted-set" [ style = invis, dir = forward ]; // vertical
+    "mutable-sorted-table" -> "mutable-sorted-counted-set" [ style = invis, dir = forward ]; // vertical
+
+    "hashed-counted-set" -> "hashed-table" [ style = invis, dir = forward ]; // vertical
+    "mutable-hashed-counted-set" -> "mutable-hashed-table" [ style = invis, dir = forward ]; // vertical
+
+    "mutable-hashed-set" -> "HASHED-counted-set" [ style = invis, dir = forward ];
+    "mutable-sorted-set" -> "SORTED-counted-set" [ style = invis, dir = forward ];
+
+    "sorted-table" -> "mutable-sorted-counted-set" [ style = invis, dir = forward ];
+    "hashed-table" -> "mutable-hashed-counted-set" [ style = invis, dir = forward ];
+
+    "mutable-hashed-set" -> "table" [ style = invis, dir = forward ];
+    "mutable-sorted-set" -> "table" [ style = invis, dir = forward ];
+    
+    "hashed-table" -> "mutable-table" [ style = invis, dir = forward ];
+    "sorted-table" -> "mutable-table" [ style = invis, dir = forward ];
+    
     "sorted-table" -> "mutable-sorted-table";
     "hashed-table" -> "mutable-hashed-table";
 
-    { rank = same; "sorted-set"; "set" };
-    { rank = same; "hashed-set"; "set" };
+    subgraph { graph [ rank = same ]; "sorted-set"; "set" };
+    subgraph { graph [ rank = same ]; "hashed-set"; "set" };
 
-    { rank = same; "mutable-sorted-set"; "mutable-set" };
-    { rank = same; "mutable-hashed-set"; "mutable-set" };
+    subgraph { graph [ rank = same ]; "mutable-sorted-set"; "mutable-set" };
+    subgraph { graph [ rank = same ]; "mutable-hashed-set"; "mutable-set" };
 
-    { rank = same; "mutable-sorted-table"; "mutable-table" };
-    { rank = same; "mutable-hashed-table"; "mutable-table" };
+    subgraph { graph [ rank = same ]; "mutable-sorted-table"; "mutable-table" };
+    subgraph { graph [ rank = same ]; "mutable-hashed-table"; "mutable-table" };
 
-    { rank = same; "sorted-table"; "table" };
-    { rank = same; "hashed-table"; "table" };
+    subgraph { graph [ rank = same ]; "sorted-table"; "table" };
+    subgraph { graph [ rank = same ]; "hashed-table"; "table" };
     
-    { rank = same; "hashed-counted-set"; "HASHED-counted-set" };
-    { rank = same; "sorted-counted-set"; "HASHED-counted-set" };
+    subgraph { graph [ rank = same ]; "hashed-counted-set"; "HASHED-counted-set"; "hashed-table" };
+    subgraph { graph [ rank = same ]; "sorted-counted-set"; "HASHED-counted-set"; "hashed-table" };
 
-    { rank = same; "mutable-hashed-counted-set"; "HASHED-mutable-counted-set" };
-    { rank = same; "mutable-sorted-counted-set"; "HASHED-mutable-counted-set" };
+    subgraph { graph [ rank = same ]; "mutable-hashed-counted-set"; "HASHED-mutable-counted-set"; "mutable-hashed-table" };
+    subgraph { graph [ rank = same ]; "mutable-sorted-counted-set"; "HASHED-mutable-counted-set"; "mutable-hashed-table" };
 
-    { rank = same; "hashed-counted-set"; "SORTED-counted-set" };
-    { rank = same; "sorted-counted-set"; "SORTED-counted-set" };
+    subgraph { graph [ rank = same ]; "hashed-counted-set"; "SORTED-counted-set" };
+    subgraph { graph [ rank = same ]; "sorted-counted-set"; "SORTED-counted-set" };
 
-    { rank = same; "mutable-hashed-counted-set"; "SORTED-mutable-counted-set" };
-    { rank = same; "mutable-sorted-counted-set"; "SORTED-mutable-counted-set" };
+    subgraph { graph [ rank = same ]; "mutable-hashed-counted-set"; "SORTED-mutable-counted-set" };
+    subgraph { graph [ rank = same ]; "mutable-sorted-counted-set"; "SORTED-mutable-counted-set" };
   }
 }

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-digraph "collection-mutable-set-klasses"
+digraph "collection-mutable-set-klasses-idea-1"
 {
 	graph [ label = "\G",
           fontcolor = red,
@@ -47,6 +47,8 @@ digraph "collection-mutable-set-klasses"
     "hashed-set" [ color = green ];
     "sorted-set" [ color = blue ];
     "hashed-table" [ color = green ];
+    // "hashed-counted-set" [ color = green ];
+    // "sorted-counted-set" [ color = green ];
     "sorted-table" [ color = blue ];
     "mutable-hashed-table" [ color = green ];
     "mutable-sorted-table" [ color = blue ];
@@ -62,7 +64,11 @@ digraph "collection-mutable-set-klasses"
     "sorted-set" -> "mutable-sorted-set" [ color = red ];
     "hashed-set" -> "mutable-hashed-set" [ color = red ];
     "sorted-set" -> "sorted-table";
+    "sorted-set" -> "sorted-counted-set";
     "hashed-set" -> "hashed-table";
+    "hashed-set" -> "hashed-counted-set";
+    "mutable-hashed-set" -> "mutable-hashed-counted-set";
+    "mutable-sorted-set" -> "mutable-sorted-counted-set";
 
     // trait-to-trait edges
     "set" -> "mutable-set" [ style = dotted ];
@@ -93,18 +99,20 @@ digraph "collection-mutable-set-klasses"
     { rank = same; "mutable-sorted-set"; "mutable-set" };
     { rank = same; "mutable-hashed-set"; "mutable-set" };
 
-    { rank = same; "mutable-sorted-table"; "mutable-table" };
-    { rank = same; "mutable-hashed-table"; "mutable-table" };
+    { rank = same; "mutable-sorted-table"; "mutable-table"; "mutable-sorted-counted-set" };
+    { rank = same; "mutable-hashed-table"; "mutable-table"; "mutable-hashed-counted-set" };
 
-    { rank = same; "sorted-table"; "table" };
-    { rank = same; "hashed-table"; "table" };
+    { rank = same; "sorted-table"; "table"; "sorted-counted-set" };
+    { rank = same; "hashed-table"; "table"; "hashed-counted-set" };
 
     // layout hacks
     // to debug set color = gray
-    "mutable-sorted-set" -> "table" [ style = invis ];
-    "mutable-hashed-set" -> "table" [ style = invis ];
-  }
+    "mutable-sorted-set" -> "table" [ color = orange ];
+    "mutable-hashed-set" -> "table" [ color = orange ];
+
+    "hashed-counted-set" -> "hashed-table" [ color = orange ]; // invis
 
   // layout only
-  "mutable-collection" -> "set" [ style = invis ];
+  "mutable-collection" -> "set" [ color = orange ];
+  }
 }
