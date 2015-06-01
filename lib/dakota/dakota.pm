@@ -20,7 +20,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package dakota;
+package dakota::dakota;
 
 use strict;
 use warnings;
@@ -29,33 +29,33 @@ my $gbl_compiler;
 my $gbl_compiler_default;
 my $gbl_prefix;
 
-sub prefix {
+sub dk_prefix {
   my ($path) = @_;
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
-    &prefix($path);
+    &dk_prefix($path);
   } else {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
 
 BEGIN {
-  $gbl_prefix = &prefix($0);
+  $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
   $gbl_compiler =         do "$gbl_prefix/lib/dakota/compiler.pl"           or die "do $gbl_prefix/lib/dakota/compiler.pl failed: $!\n";
   $gbl_compiler_default = do "$gbl_prefix/lib/dakota/compiler-linux-gcc.pl" or die "do $gbl_prefix/lib/dakota/compiler-linux-gcc.pl failed: $!\n";
 };
+
+use dakota::util;
+use dakota::parse;
+use dakota::generate;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  loop_merged_rep_from_dk
              );
-
-use dakota::util;
-use dakota::parse;
-use dakota::generate;
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -94,7 +94,7 @@ my $cxx_shared_flags =  &dakota::parse::var($gbl_compiler, 'CXX_SHARED_FLAGS',  
 my $cxx_dynamic_flags = &dakota::parse::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', $gbl_compiler_default);
 
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 sub loop_merged_rep_from_dk {

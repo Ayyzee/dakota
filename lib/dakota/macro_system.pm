@@ -22,30 +22,32 @@
 
 package dakota::macro_system;
 
+use strict;
+use warnings;
+
 my $gbl_prefix;
 
-sub prefix {
+sub dk_prefix {
   my ($path) = @_;
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
-    &prefix($path);
+    &dk_prefix($path);
   } else {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
 
 BEGIN {
-  $gbl_prefix = &prefix($0);
+  $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
 };
 
-use strict;
-use warnings;
-
-use dakota::sst;
-use dakota::dakota;
 use dakota::util;
+use dakota::sst;
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -55,18 +57,15 @@ $Data::Dumper::Useqq     = 0;
 $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Indent    = 0;   # default = 2
 
-use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
-
+require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  macro_expand
-                 lang_user_data
              );
 
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
-my $dqstr = &dqstr_regex();
+   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+my $dqstr = &dakota::util::dqstr_regex();
 
 my $constraints = {
   'literal-assoc-in' =>         \&literal_assoc_in,
@@ -703,48 +702,9 @@ sub rule_match_and_replace {
   }
   return $change_count;
 }
-my $gbl_user_data;
-sub lang_user_data {
-  return $gbl_user_data if $gbl_user_data;
-  my $user_data;
-  if ($ENV{'DK_LANG_USER_DATA_PATH'}) {
-    my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
-    $user_data = do $path or die "do $path failed: $!\n";
-  } elsif ($gbl_prefix) {
-    my $path = "$gbl_prefix/src/dakota-lang-user-data.pl";
-    $user_data = do $path or die "do $path failed: $!\n";
-  } else {
-    die;
-  }
-  $$user_data{'-sst-'}{'open-tokens'} = {};
-  $$user_data{'-sst-'}{'close-tokens'} = {};
-  $$user_data{'-sst-'}{'open-tokens-for-close-token'} = {};
-  $$user_data{'-sst-'}{'close-token-for-open-token'} = {};
-  $$user_data{'-sst-'}{'sep'} = {};
-  my $keys = [keys %$user_data];
-  for my $key (@$keys) {
-    if ($$user_data{$key}{'sep'}) {
-      foreach my $sep (keys %{$$user_data{$key}{'sep'}}) { # normally something like , and ;
-        $$user_data{'-sst-'}{'sep'}{$sep} = 1;
-      }
-    }
-    if ($$user_data{$key}{'open'} && $$user_data{$key}{'close'}) {
-      foreach my $close_token (keys %{$$user_data{$key}{'close'}}) {
-        foreach my $open_token (keys %{$$user_data{$key}{'open'}}) {
-          $$user_data{'-sst-'}{'open-tokens'}{$open_token} = 1;
-          $$user_data{'-sst-'}{'close-tokens'}{$close_token} = 1;
-          $$user_data{'-sst-'}{'open-tokens-for-close-token'}{$close_token}{$open_token} = 1;
-          $$user_data{'-sst-'}{'close-token-for-open-token'}{$open_token}{$close_token} = 1;
-        }
-      }
-    }
-  }
-  $gbl_user_data = $user_data;
-  return $user_data;
-}
 
 unless (caller) {
-  my $user_data = &lang_user_data();
+  my $user_data = &dakota::sst::lang_user_data();
 
   my $macros;
   if ($ENV{'DK_MACROS_PATH'}) {
@@ -768,7 +728,7 @@ unless (caller) {
   my $num_tokens = 0;
 
   foreach my $file (@ARGV) {
-    my $filestr = &dakota::filestr_from_file($file);
+    my $filestr = &dakota::util::filestr_from_file($file);
 
     if ($ENV{'DK_MACROS_SINGLE_LINE'}) {
       print STDERR $filestr;

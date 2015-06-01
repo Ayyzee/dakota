@@ -25,28 +25,55 @@ package dakota::sst;
 use strict;
 use warnings;
 
+sub dk_prefix {
+  my ($path) = @_;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &dk_prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
+my $gbl_prefix;
+
+BEGIN {
+  $gbl_prefix = &dk_prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
+};
+
 use dakota::util;
-use dakota::macro_system;
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Sortkeys =  0;
+$Data::Dumper::Indent    = 1;  # default = 2
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 sst::changes
-                 sst::is_open_token
-                 sst::is_close_token
-                 sst::make
-                 sst::token_seq
-                 sst::size
-                 sst::at
-                 sst::prev_token_str
-                 sst::add_token
-                 sst::add_comment
-                 sst::add_cpp_directive
-                 sst::add_leading_ws
-                 sst::filestr_no_comments
-                 sst::filestr
-                 sst::shift_leading_ws
-                 sst::dump
+                 changes
+                 is_open_token
+                 is_close_token
+                 make
+                 token_seq
+                 size
+                 at
+                 prev_token_str
+                 add_token
+                 add_comment
+                 add_cpp_directive
+                 add_leading_ws
+                 filestr_no_comments
+                 filestr
+                 shift_leading_ws
+                 dump
                  sst::splice
                  sst_fragment::filestr
                  sst_cursor::make
@@ -61,21 +88,15 @@ our @EXPORT= qw(
                  sst_cursor::next_token
                  sst_cursor::token_index
                  sst_cursor::balenced
+                 lang_user_data
              );
 
-use Data::Dumper;
-$Data::Dumper::Terse     = 1;
-$Data::Dumper::Deepcopy  = 1;
-$Data::Dumper::Purity    = 1;
-$Data::Dumper::Useqq     = 1;
-$Data::Dumper::Sortkeys =  0;
-$Data::Dumper::Indent    = 1;  # default = 2
-
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
-my $h  = &header_file_regex();
-my $dqstr = &dqstr_regex();
-my $sqstr = &sqstr_regex();
+   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+my $h  = &dakota::util::header_file_regex();
+my $dqstr = &dakota::util::dqstr_regex();
+my $sqstr = &dakota::util::sqstr_regex();
+
 my $gbl_user_data = &lang_user_data();
 
 my $sst_debug = 0;
@@ -885,6 +906,45 @@ sub sst_cursor::error {
   #&log_sub_name($__sub__);
   &sst_cursor::warning($sst_cursor, $token_index);
   exit 1;
+}
+my $__gbl_user_data;
+sub lang_user_data {
+  return $__gbl_user_data if $__gbl_user_data;
+  my $user_data;
+  if ($ENV{'DK_LANG_USER_DATA_PATH'}) {
+    my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
+    $user_data = do $path or die "do $path failed: $!\n";
+  } elsif ($gbl_prefix) {
+    my $path = "$gbl_prefix/src/dakota-lang-user-data.pl";
+    $user_data = do $path or die "do $path failed: $!\n";
+  } else {
+    die;
+  }
+  $$user_data{'-sst-'}{'open-tokens'} = {};
+  $$user_data{'-sst-'}{'close-tokens'} = {};
+  $$user_data{'-sst-'}{'open-tokens-for-close-token'} = {};
+  $$user_data{'-sst-'}{'close-token-for-open-token'} = {};
+  $$user_data{'-sst-'}{'sep'} = {};
+  my $keys = [keys %$user_data];
+  for my $key (@$keys) {
+    if ($$user_data{$key}{'sep'}) {
+      foreach my $sep (keys %{$$user_data{$key}{'sep'}}) { # normally something like , and ;
+        $$user_data{'-sst-'}{'sep'}{$sep} = 1;
+      }
+    }
+    if ($$user_data{$key}{'open'} && $$user_data{$key}{'close'}) {
+      foreach my $close_token (keys %{$$user_data{$key}{'close'}}) {
+        foreach my $open_token (keys %{$$user_data{$key}{'open'}}) {
+          $$user_data{'-sst-'}{'open-tokens'}{$open_token} = 1;
+          $$user_data{'-sst-'}{'close-tokens'}{$close_token} = 1;
+          $$user_data{'-sst-'}{'open-tokens-for-close-token'}{$close_token}{$open_token} = 1;
+          $$user_data{'-sst-'}{'close-token-for-open-token'}{$open_token}{$close_token} = 1;
+        }
+      }
+    }
+  }
+  $__gbl_user_data = $user_data;
+  return $user_data;
 }
 
 1;

@@ -20,6 +20,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+package dakota::dakota;
+
 use strict;
 use warnings;
 
@@ -40,8 +42,6 @@ BEGIN {
   $prefix = &prefix($0);
   unshift @INC, "$prefix/lib";
 };
-
-package dakota;
 
 use dakota::dakota;
 

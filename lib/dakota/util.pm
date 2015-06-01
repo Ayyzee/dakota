@@ -24,13 +24,23 @@ package dakota::util;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
 my $kw_args_generics_tbl;
 
 BEGIN {
   $kw_args_generics_tbl = { 'init' => undef };
 };
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Sortkeys =  0;
+$Data::Dumper::Indent    = 1;  # default = 2
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -60,6 +70,7 @@ our @EXPORT= qw(
               );
 
 use Fcntl qw(:DEFAULT :flock);
+
 sub ident_regex {
   my $id =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9]              )?/x;
   my $mid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!])/x; # method ident

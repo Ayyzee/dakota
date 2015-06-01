@@ -24,34 +24,34 @@ package dakota::generate;
 
 use strict;
 use warnings;
-use Data::Dumper;
-
-use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 my $gbl_prefix;
 
-sub prefix {
+sub dk_prefix {
   my ($path) = @_;
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
-    &prefix($path);
+    &dk_prefix($path);
   } else {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
 
 BEGIN {
-  $gbl_prefix = &prefix($0);
+  $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
 };
 
-use integer;
-use Cwd;
-
 use dakota::rewrite;
 use dakota::util;
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+
+use integer;
+use Cwd;
+use Data::Dumper;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -78,7 +78,7 @@ my $dk_ext = 'dk';
 
 my $k = qr/[\w-]/;
 my ($id,  $mid,  $bid,  $tid,
-    $rid, $rmid, $rbid, $rtid) = &ident_regex();
+    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 
 my $global_is_defn = undef;     # klass decl vs defn
 my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
@@ -93,7 +93,7 @@ my $global_klass_defns = [];
 
 my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 
-my $long_suffix = &long_suffix();
+my $long_suffix = &dakota::util::long_suffix();
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
@@ -442,9 +442,9 @@ sub colin {
 }
 sub colout {
   my ($col) = @_;
+  &confess("Aborted because of &colout(0)") if '' eq $col;
   my $len = length($col)/length($gbl_col_width);
   #print STDERR "$len" . "--\n";
-  confess "Aborted because of &colout(0)" if '' eq $col;
   $len--;
   my $result = $gbl_col_width x $len;
   return $result;
@@ -4071,7 +4071,7 @@ sub dk::generate_dk_cxx {
     &write_to_file_converted_strings("$output", [ $filestr ]);
   } else {
     if (exists $ENV{'DK_ABS_PATH'}) {
-      my $cwd = getcwd;
+      my $cwd = &getcwd();
       &write_to_file_converted_strings("$output", [ "#line 1 \"$cwd/$file_basename.$dk_ext\"\n", $filestr ]);
     } else {
       &write_to_file_converted_strings("$output", [ "#line 1 \"$file_basename.$dk_ext\"\n", $filestr ]);

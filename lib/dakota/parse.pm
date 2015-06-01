@@ -24,31 +24,44 @@ package dakota::parse;
 
 use strict;
 use warnings;
-use Cwd;
-use File::Basename;
-use Data::Dumper;
-use Carp;
 
 my $gbl_compiler;
 my $gbl_compiler_default;
 
-sub prefix {
+sub dk_prefix {
   my ($path) = @_;
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
-    &prefix($path);
+    &dk_prefix($path);
   } else {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
 
 BEGIN {
-  my $prefix = &prefix($0);
+  my $prefix = &dk_prefix($0);
   unshift @INC, "$prefix/lib";
   $gbl_compiler =         do "$prefix/lib/dakota/compiler.pl"           or die "do $prefix/lib/dakota/compiler.pl failed: $!\n";
   $gbl_compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "do $prefix/lib/dakota/compiler-linux-gcc.pl failed: $!\n";
 };
+
+use dakota::generate;
+use dakota::sst;
+use dakota::util;
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+
+use Cwd;
+use File::Basename;
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Sortkeys =  0;
+$Data::Dumper::Indent    = 1;  # default = 2
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -79,11 +92,6 @@ our @EXPORT= qw(
                  var
               );
 
-use dakota::sst;
-use dakota::generate;
-use dakota::util;
-use dakota::macro_system;
-
 my $objdir = 'obj';
 my $rep_ext = 'rep';
 my $ctlg_ext = 'ctlg';
@@ -94,8 +102,8 @@ my $O_EXT =  &var($gbl_compiler, 'O_EXT',  $gbl_compiler_default);
 my $SO_EXT = &var($gbl_compiler, 'SO_EXT', $gbl_compiler_default);
 
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
-my $h  = &header_file_regex();
+   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+my $h  = &dakota::util::header_file_regex();
 
 $ENV{'DKT-DEBUG'} = 0;
 
@@ -322,7 +330,7 @@ sub rep_merge {
 
 my $gbl_sst = undef;
 my $gbl_sst_cursor = undef;
-my $gbl_user_data = &lang_user_data();
+my $gbl_user_data = &dakota::sst::lang_user_data();
 
 my $gbl_root = {};
 my $gbl_current_scope = $gbl_root;

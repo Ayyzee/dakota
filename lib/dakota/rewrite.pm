@@ -22,29 +22,30 @@
 
 package dakota::rewrite;
 
-my $gbl_prefix;
+use strict;
+use warnings;
 
-sub prefix {
+sub dk_prefix {
   my ($path) = @_;
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
-    &prefix($path);
+    &dk_prefix($path);
   } else {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
+my $gbl_prefix;
 
 BEGIN {
-  $gbl_prefix = &prefix($0);
+  $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
 };
 
-use strict;
-use warnings;
-
-use dakota::dakota;
 use dakota::util;
+
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -107,7 +108,7 @@ $main::seq = qr{
 my $k = qr/[\w-]/;
 my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 my $h  = &header_file_regex();
