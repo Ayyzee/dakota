@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+$Data::Dumper::Useqq = 1;
+$Data::Dumper::Sortkeys = 1;
+
+my $json = do $ARGV[0];
+&main($json);
+
+sub main {
+  &process($json);
+}
+
+sub process {
+  my ($data) = @_;
+  $_ = ref($data);
+  SWITCH: {
+    /^HASH$/  and &process_tbl($data), last SWITCH;
+    /^ARRAY$/ and &process_seq($data), last SWITCH;
+    &process_scalar($data);
+  }
+}
+sub is_legal_name {
+  my ($name) = @_;
+  my $result = 0;
+  my $first_char = substr($name, 0, 1);
+
+  if ($first_char =~ m/[_a-zA-Z]/) {
+    $result = 1;
+  }
+  return $result;
+}
+sub process_tbl {
+  my ($data) = @_;
+  my ($name, $values);
+  while (($name, $values) = each (%$data)) {
+    if (!&is_legal_name($name)) {
+      return;
+    } else {
+      print "$name = ";
+      &process($values);
+    }
+  }
+  print "\n";
+}
+
+sub process_seq {
+  my ($data) = @_;
+  my $s = '';
+  foreach my $value (@$data) {
+    print $s;
+    &process($value);
+    $s = ' ';
+  }
+  print "\n";
+}
+
+sub process_scalar {
+  my ($data) = @_;
+  print "$data";
+}
