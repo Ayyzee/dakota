@@ -1,3 +1,9 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
 {
   'soname' => '$prefix/lib/libdakota.$SO_EXT',
   'srcs' => [
@@ -71,14 +77,19 @@
     'vector.dk'
   ],
   'name' => 'dakota.$SO_EXT',
-  'libs' => [],
-  'include-dirs' => [ '../src', '../include' ],
-  'macros' => {
-    'HAVE_CONFIG_HH' => undef,
-    'MOD_SIZE_CAST_HACK' => undef,
-    'DKT_WORKAROUND' => undef,
-  },
-  'vars' => {
+  'libs' => [
+  ],
+  'include-dirs' => [
+    '../src',
+    '../include',
+  ],
+  'macros' => [
+    'DKT_WORKAROUND',
+    'HAVE_CONFIG_HH',
+    'MOD_SIZE_CAST_HACK',
+  ],
+  '-var-defaults' => {
+    'prefix' => '/usr/local',
     'SO_EXT' => 'dylib',
   }
 }

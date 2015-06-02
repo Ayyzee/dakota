@@ -15,6 +15,7 @@ $Data::Dumper::Terse     = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
+#$Data::Dumper::Pair      = ' : '
 
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
@@ -228,27 +229,12 @@ sub subcmd_name {
 }
 sub subcmd_macros {
   my ($rep) = @_;
-  my $result = '';
-  my $s = '';
-  my ($macro_key, $macro_val);
-  while (($macro_key, $macro_val) = each %{$$rep{'macros'}}) {
-    if ($macro_val) {
-      $result .= $s . "--define-macro $macro_key=$macro_val";
-    } else {
-      $result .= $s . "--define-macro $macro_key";
-    }
-    $s = ' ';
-  }
+  my $result = join(' ', @{$$rep{'macros'}});
   print "$result\n";
 }
 sub subcmd_include_dirs {
   my ($rep) = @_;
-  my $result = '';
-  my $s = '';
-  foreach my $dir (@{$$rep{'include-dirs'}}) {
-    $result .= $s . "--include-directory $dir";
-    $s = ' ';
-  }
+  my $result = join(' ', @{$$rep{'include-dirs'}});
   print "$result\n";
 }
 sub subcmd_set_name {
@@ -283,6 +269,14 @@ sub rep_from_file {
   $$rep{'**file**'} = $file;
   return $rep;
 }
+my $rep_hdr = 
+  '# -*- mode: cperl -*-' .
+  '# -*- cperl-close-paren-offset: -2 -*-' .
+  '# -*- cperl-continued-statement-offset: 2 -*-' .
+  '# -*- cperl-indent-level: 2 -*-' .
+  '# -*- cperl-indent-parens-as-block: t -*-' .
+  '# -*- cperl-tab-always-indent: t -*-';
+
 sub rep_to_file {
   my ($rep, $file) = @_;
   if (!$file) {
@@ -290,6 +284,7 @@ sub rep_to_file {
   }
   delete $$rep{'**file**'};
   open FILE, ">$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-  print FILE &Dumper($rep);
+  my $repstr = $rep_hdr . "\n" . &Dumper($rep);
+  print FILE $repstr;
   close FILE;
 }

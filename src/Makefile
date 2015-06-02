@@ -58,9 +58,13 @@ HOME_FILES :=\
  uninstall-lib\
  uninstall\
 
-soname =       $(shell $(rootdir)/bin/dakota-project soname       --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT))
-macros =       $(shell $(rootdir)/bin/dakota-project macros       --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT))
-include_dirs = $(shell $(rootdir)/bin/dakota-project include-dirs --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT))
+soname =           $(shell $(rootdir)/bin/dakota-project soname       --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT))
+macros_raw =       $(shell $(rootdir)/bin/dakota-project macros       --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT))
+include_dirs_raw = $(shell $(rootdir)/bin/dakota-project include-dirs --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT))
+
+# soname needs no transformation
+macros =       $(patsubst %,--define-macro %,$(macros_raw))
+include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw))
 
 # the use of $^ should be $?
 
