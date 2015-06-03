@@ -1,9 +1,8 @@
 SHELL := /bin/sh -u
 
 rootdir := ..
-prefix := $(rootdir)
 
-$(shell $(prefix)/bin/dakota-json2mk $(prefix)/lib/dakota/compiler.pl > compiler.mk)
+$(shell $(rootdir)/bin/dakota-json2mk $(rootdir)/lib/dakota/compiler.pl > compiler.mk)
 include compiler.mk
 
 export CXX
@@ -19,30 +18,30 @@ dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --repository dako
 dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
 
 INCLUDE_FILES :=\
- $(DESTDIR)$(includedir)/dakota-log.$(hxx_ext)\
- $(DESTDIR)$(includedir)/dakota-finally.$(hxx_ext)\
- $(DESTDIR)$(includedir)/dakota.$(hxx_ext)\
+ $(includedir)/dakota-log.$(hxx_ext)\
+ $(includedir)/dakota-finally.$(hxx_ext)\
+ $(includedir)/dakota.$(hxx_ext)\
 
 BIN_FILES :=\
- $(DESTDIR)$(bindir)/dakota-info\
- $(DESTDIR)$(bindir)/dakota\
- $(DESTDIR)$(bindir)/dakota-fixup-stderr.$(pl_ext)\
- $(DESTDIR)$(bindir)/dakota-project\
+ $(bindir)/dakota-info\
+ $(bindir)/dakota\
+ $(bindir)/dakota-fixup-stderr.$(pl_ext)\
+ $(bindir)/dakota-project\
 
 LIB_FILES :=\
- $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_name)\
- $(DESTDIR)$(libdir)/$(lib_prefix)$(dakota_util_name)\
- $(DESTDIR)$(libdir)/dakota/dakota.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota/parse.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota/rewrite.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota/generate.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota/sst.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota/util.$(pm_ext)\
- $(DESTDIR)$(libdir)/dakota/macros.$(pl_ext)\
- $(DESTDIR)$(libdir)/dakota/compiler-darwin-gcc.$(pl_ext)\
- $(DESTDIR)$(libdir)/dakota/compiler-darwin-clang.$(pl_ext)\
- $(DESTDIR)$(libdir)/dakota/compiler-linux-gcc.$(pl_ext)\
- $(DESTDIR)$(libdir)/dakota/compiler-linux-clang.$(pl_ext)\
+ $(libdir)/$(lib_prefix)$(dakota_name)\
+ $(libdir)/$(lib_prefix)$(dakota_util_name)\
+ $(libdir)/dakota/dakota.$(pm_ext)\
+ $(libdir)/dakota/parse.$(pm_ext)\
+ $(libdir)/dakota/rewrite.$(pm_ext)\
+ $(libdir)/dakota/generate.$(pm_ext)\
+ $(libdir)/dakota/sst.$(pm_ext)\
+ $(libdir)/dakota/util.$(pm_ext)\
+ $(libdir)/dakota/macros.$(pl_ext)\
+ $(libdir)/dakota/compiler-darwin-gcc.$(pl_ext)\
+ $(libdir)/dakota/compiler-darwin-clang.$(pl_ext)\
+ $(libdir)/dakota/compiler-linux-gcc.$(pl_ext)\
+ $(libdir)/dakota/compiler-linux-clang.$(pl_ext)\
 
 HOME_FILES :=\
  $(HOME)/.dakota/.gdbinit\
@@ -80,29 +79,29 @@ $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT):
 $(rootdir)/lib/%.$(SO_EXT):
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) --dynamic  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
-$(rootdir)/bin/%: $(SRCDIR)/%-main.$(dk_ext)
+$(rootdir)/bin/%: $(srcdir)/%-main.$(dk_ext)
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 %: %-main.$(dk_ext)
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
 
 # installed files
-$(DESTDIR)$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)
+$(includedir)/%.$(hxx_ext): $(rootdir)/include/%.$(hxx_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0644 $< $(@D)
 
-$(DESTDIR)$(libdir)/$(lib_prefix)%.$(SO_EXT): $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT)
+$(libdir)/$(lib_prefix)%.$(SO_EXT): $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(DESTDIR)$(libdir)/dakota/%.$(pm_ext): $(rootdir)/lib/dakota/%.$(pm_ext)
+$(libdir)/dakota/%.$(pm_ext): $(rootdir)/lib/dakota/%.$(pm_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(DESTDIR)$(libdir)/dakota/%.$(pl_ext): $(rootdir)/lib/dakota/%.$(pl_ext)
+$(libdir)/dakota/%.$(pl_ext): $(rootdir)/lib/dakota/%.$(pl_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(DESTDIR)$(bindir)/%: $(rootdir)/bin/%
+$(bindir)/%: $(rootdir)/bin/%
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(HOME)/.dakota/%: $(SRCDIR)/home/.dakota/%
+$(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0644 $< $(@D)
 
 all:
@@ -129,8 +128,8 @@ dakota-util: $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
 dakota: $(rootdir)/lib/$(lib_prefix)$(dakota_name)
 
-$(rootdir)/bin/dakota-info: $(SRCDIR)/dakota-info-main.$(cxx_ext)
-	@$(MKDIR) $(MKDIRFLAGS) $(@D) # these warning flags should come from ../lib/dakota/compiler.pl
+$(rootdir)/bin/dakota-info: $(srcdir)/dakota-info-main.$(cxx_ext)
+	@$(MKDIR) $(MKDIRFLAGS) $(@D)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 dummy: dummy-main.$(cxx_ext)
@@ -139,26 +138,26 @@ dummy: dummy-main.$(cxx_ext)
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
 
-$(DESTDIR)$(includedir) \
-$(DESTDIR)$(bindir) \
-$(DESTDIR)$(libdir)/dakota \
+$(includedir) \
+$(bindir) \
+$(libdir)/dakota \
 $(HOME)/.dakota/emacs:
 	sudo $(INSTALL) $(INSTALLFLAGS) -d -m 0755 $@
 
-install-include: $(DESTDIR)$(includedir) $(INCLUDE_FILES)
+install-include: $(includedir) $(INCLUDE_FILES)
 
 uninstall-include:
 	sudo $(RM) $(RMFLAGS) $(INCLUDE_FILES)
 
-install-bin: $(DESTDIR)$(bindir) $(BIN_FILES)
+install-bin: $(bindir) $(BIN_FILES)
 
 uninstall-bin:
 	sudo $(RM) $(RMFLAGS) $(BIN_FILES)
 
-install-lib: $(DESTDIR)$(libdir)/dakota $(LIB_FILES)
+install-lib: $(libdir)/dakota $(LIB_FILES)
 
 uninstall-lib:
-	sudo $(RM) $(RMFLAGS) $(LIB_FILES) $(DESTDIR)$(libdir)/dakota
+	sudo $(RM) $(RMFLAGS) $(LIB_FILES) $(libdir)/dakota
 
 install-home: $(HOME)/.dakota/emacs $(HOME_FILES)
 
@@ -189,7 +188,7 @@ strerror-name.tbl: gen-strerror-name.sh
 	./$<
 
 clean: clean-rt
-	$(RM) $(RMFLAGS) $(SRCDIR)/obj tst dummy min empty-klass-x
+	$(RM) $(RMFLAGS) $(srcdir)/obj tst dummy min empty-klass-x
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info
