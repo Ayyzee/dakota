@@ -3,6 +3,12 @@ SHELL := /bin/sh -u
 rootdir := ..
 prefix := $(rootdir)
 
+$(shell $(prefix)/bin/dakota-json2mk $(prefix)/lib/dakota/compiler.pl > compiler.mk)
+include compiler.mk
+
+export CXX
+export CXXFLAGS
+
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
@@ -125,7 +131,7 @@ dakota: $(rootdir)/lib/$(lib_prefix)$(dakota_name)
 
 $(rootdir)/bin/dakota-info: $(SRCDIR)/dakota-info-main.$(cxx_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D) # these warning flags should come from ../lib/dakota/compiler.pl
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) -Wno-c++98-compat -Wno-c++98-compat-pedantic $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 dummy: dummy-main.$(cxx_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
@@ -188,7 +194,7 @@ clean: clean-rt
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info.dSYM
-	$(RM) $(RMFLAGS) strerror-name.tbl .gdb_history *~ .*~ 
+	$(RM) $(RMFLAGS) compiler.mk strerror-name.tbl .gdb_history *~ .*~ 
 	$(MAKE) --directory proofs clean
 	$(MAKE) --directory macro-system-parser clean
 

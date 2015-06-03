@@ -95,7 +95,10 @@ if (!exists $ENV{'EXTRA_LDFLAGS'}) {
   $ENV{'EXTRA_LDFLAGS'} = '';
 } # default EXTRA_LDFLAGS
 
-my $root_cmd = { 'opts' => { 'include-directory' => [], 'define-macro' => [], 'var' => {} }, 'reps' => [] };
+my $root_cmd = { 'reps' => [],
+                 'opts' => { 'include-directory' => [],
+                             'define-macro' => [],
+                             'var' => {} } };
 
 &GetOptions($$root_cmd{'opts'},
             'precompile',          # gcc-ish (--compile)

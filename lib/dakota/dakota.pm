@@ -26,7 +26,6 @@ use strict;
 use warnings;
 
 my $gbl_compiler;
-my $gbl_compiler_default;
 my $gbl_prefix;
 
 sub dk_prefix {
@@ -43,8 +42,7 @@ sub dk_prefix {
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
-  $gbl_compiler =         do "$gbl_prefix/lib/dakota/compiler.pl"           or die "do $gbl_prefix/lib/dakota/compiler.pl failed: $!\n";
-  $gbl_compiler_default = do "$gbl_prefix/lib/dakota/compiler-linux-gcc.pl" or die "do $gbl_prefix/lib/dakota/compiler-linux-gcc.pl failed: $!\n";
+  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.pl" or die "do $gbl_prefix/lib/dakota/compiler.pl failed: $!\n";
 };
 
 use dakota::util;
@@ -88,10 +86,10 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_pic_flags = &dakota::parse::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', $gbl_compiler_default);
-my $cxx_output_flags =  &dakota::parse::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  $gbl_compiler_default);
-my $cxx_shared_flags =  &dakota::parse::var($gbl_compiler, 'CXX_SHARED_FLAGS',  $gbl_compiler_default);
-my $cxx_dynamic_flags = &dakota::parse::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', $gbl_compiler_default);
+my $cxx_compile_pic_flags = &dakota::parse::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', undef);
+my $cxx_output_flags =  &dakota::parse::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  undef);
+my $cxx_shared_flags =  &dakota::parse::var($gbl_compiler, 'CXX_SHARED_FLAGS',  undef);
+my $cxx_dynamic_flags = &dakota::parse::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', undef);
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -449,15 +447,15 @@ sub start {
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
-    $$cmd_info{'opts'}{'compiler'} = &dakota::parse::var($gbl_compiler, 'CXX', $gbl_compiler_default);
+    $$cmd_info{'opts'}{'compiler'} = &dakota::parse::var($gbl_compiler, 'CXX', undef);
   }
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
     $$cmd_info{'opts'}{'compiler-flags'} =
-      &dakota::parse::var($gbl_compiler, 'CXXFLAGS', $gbl_compiler_default) .
+      &dakota::parse::var($gbl_compiler, 'CXXFLAGS', undef) .
       ' ' . $ENV{'EXTRA_CXXFLAGS'} .
-      ' ' . &dakota::parse::var($gbl_compiler, 'CXX_WARNINGS_FLAGS', $gbl_compiler_default);
+      ' ' . &dakota::parse::var($gbl_compiler, 'CXX_WARNINGS_FLAGS', undef);
   }
-  my $ld_soname_flags = &dakota::parse::var($gbl_compiler, 'LD_SONAME_FLAGS', $gbl_compiler_default);
+  my $ld_soname_flags = &dakota::parse::var($gbl_compiler, 'LD_SONAME_FLAGS', undef);
 
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_construct = undef;

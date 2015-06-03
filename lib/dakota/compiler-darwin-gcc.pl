@@ -1,4 +1,33 @@
 {
+  'CXX' => [ 'g++' ],
+  'CXXFLAGS' => [ '-std=c++11' ],
+  'CXX_COMPILE_FLAGS' =>     [ '--compile' ],
+  'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC' ],
+  'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
+  'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
+  'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
+  'CXX_SHARED_FLAGS' =>      [ '--shared'  ],
+  'CXX_WARNINGS_FLAGS' =>    [
+      '--all-warnings',
+      '--no-common',
+      '--trapv',
+      '--warn-cast-qual',
+      '--warn-conversion',
+      '--warn-extra',
+      '--warn-format=2',
+      '--warn-missing-format-attribute',
+      '--warn-missing-include-dirs',
+      '--warn-no-multichar',
+      '--warn-no-variadic-macros',
+      '--warn-pointer-arith',
+      '--warn-redundant-decls',
+      '--warn-shadow',
+      '--warn-switch-default',
+      '--warn-switch-enum',
+      '--warn-undef',
+      '--warn-unused',
+      ],
   'LD_SONAME_FLAGS' => [ '-install_name' ], # unique to darwin
-  'SO_EXT' => [ 'dylib' ], # unique to darwin
+  'O_EXT' =>  'o',
+  'SO_EXT' => 'dylib', # unique to darwin
 }

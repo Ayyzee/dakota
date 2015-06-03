@@ -172,14 +172,19 @@ sub var {
   my ($compiler, $lhs, $default_rhs) = @_;
   my $result;
   if (defined $ENV{$lhs}) {
-    $result = [ $ENV{$lhs} ];
+    $result = $ENV{$lhs};
   } elsif ($$compiler{$lhs}) {
     $result = $$compiler{$lhs};
   } else {
     $result = $$default_rhs{$lhs}
   }
   die if !defined $result;
-  return join(' ', @$result);
+  die if 'HASH' eq ref($result);
+
+  if ('ARRAY' eq ref($result)) {
+    $result = join(' ', @$result);
+  }
+  return $result;
 }
 
 sub maybe_add_exported_header_for_symbol {

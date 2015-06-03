@@ -40,16 +40,9 @@ GROUP := wheel
 
 SO_EXT ?= so
 LD_PRELOAD ?= LD_PRELOAD
-CXX ?= g++
-CXX_WARNINGS_FLAGS ?= --warnings-all
 CXX_NO_WARNINGS ?= 0
-CXXFLAGS := -std=c++11
 
 CXX_DEBUG_FLAGS ?= --optimize=0 --debug=3 --define-macro DEBUG
-CXX_SHARED_FLAGS ?= --shared
-CXX_DYNAMIC_FLAGS ?= --dynamic
-CXX_OUTPUT_FLAGS := --output
-CXX_NO_WARNINGS_FLAGS := --no-warnings
 
 ifneq ($(CXX_NO_WARNINGS), 0)
 	CXX_WARNINGS_FLAGS += $(CXX_NO_WARNINGS_FLAGS)
@@ -65,7 +58,6 @@ endif
 
 DAKOTAFLAGS ?=
 EXTRA_DAKOTAFLAGS :=
-EXTRA_CXXFLAGS := $(CXX_WARNINGS_FLAGS)
 
 # cast(some-type-t){...}
 ifdef DKT_ALLOW_COMPOUND_LITERALS
@@ -81,8 +73,6 @@ EXTRA_CXXFLAGS += $(CXX_DEBUG_FLAGS)
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
 
-export CXX
-export CXXFLAGS
 export EXTRA_CXXFLAGS
 
 export DAKOTA

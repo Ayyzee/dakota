@@ -229,12 +229,18 @@ sub subcmd_name {
 }
 sub subcmd_macros {
   my ($rep) = @_;
-  my $result = join(' ', @{$$rep{'macros'}});
+  my $result = '';
+  if (exists $$rep{'macros'}) {
+    $result = join(' ', @{$$rep{'macros'}});
+  }
   print "$result\n";
 }
 sub subcmd_include_dirs {
   my ($rep) = @_;
-  my $result = join(' ', @{$$rep{'include-dirs'}});
+  my $result = '';
+  if (exists $$rep{'include-dirs'}) {
+    $result = join(' ', @{$$rep{'include-dirs'}});
+  }
   print "$result\n";
 }
 sub subcmd_set_name {
