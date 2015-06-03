@@ -7,7 +7,7 @@ MAKEFLAGS :=\
 # --no-print-directory\
 
 # rootdir is set before including this file
-srcdir ?= $(rootdir)/src
+srcdir ?= .
 
 prefix ?= /usr/local
 includedir := $(prefix)/include

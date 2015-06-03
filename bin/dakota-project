@@ -166,10 +166,9 @@ sub subst {
   my ($string, $var) = @_;
   my ($key, $element);
   while (($key, $element) = each %$var) {
-    #print STDERR "<$string\n";
-    $string =~ s|\$$key\b|$element|;
-    $string =~ s|\$\($key\)|$element|;
-    #print STDERR ">$string\n";
+    $string =~ s|\$$key\b|$element|g;   # support $ident   style variable
+    $string =~ s|\$\($key\)|$element|g; # support $(ident) style variable
+   #$string =~ s|\$\{$key\}|$element|g; # support ${ident} style variable
   }
   return $string
 }
@@ -240,7 +239,8 @@ sub subcmd_include_dirs {
   my ($rep) = @_;
   my $result = '';
   if (exists $$rep{'include-dirs'}) {
-    $result = join(' ', @{$$rep{'include-dirs'}});
+    my @results = map { &subst($_, $$opts{'var'}) } @{$$rep{'include-dirs'}};
+    $result = join(' ', @results);
   }
   print "$result\n";
 }
