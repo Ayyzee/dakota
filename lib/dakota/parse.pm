@@ -176,7 +176,7 @@ sub var {
   } elsif ($$compiler{$lhs}) {
     $result = $$compiler{$lhs};
   } else {
-    $result = $$default_rhs{$lhs}
+    $result = $default_rhs;
   }
   die if !defined $result;
   die if 'HASH' eq ref($result);
