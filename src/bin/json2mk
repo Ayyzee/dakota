@@ -14,26 +14,44 @@ $Data::Dumper::Terse = 1;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Sortkeys = 1;
 
-my $json = do $ARGV[0];
-&main($json);
+&main(\@ARGV);
 
 sub main {
-  &process($json);
-}
+  my ($argv) = @_;
+  my $result = '';
 
+  foreach my $file (@$argv) {
+    my $data = do $file or die;
+    $result .= "# $file\n";
+    my $last_char = &last_char($result);
+    $result .= &process($last_char, $data);
+    $result .= $last_char = "\n" if ("\n" ne $last_char);
+  }
+  print $result;
+}
 sub process {
-  my ($data) = @_;
+  my ($last_char, $data) = @_;
+  my $result = '';
   $_ = ref($data);
   SWITCH: {
-    /^HASH$/  and &process_tbl($data), last SWITCH;
-    /^ARRAY$/ and &process_seq($data), last SWITCH;
-    &process_scalar($data);
+    /^HASH$/  and $result .= &process_tbl($last_char, $data), last SWITCH;
+    /^ARRAY$/ and $result .= &process_seq($last_char, $data), last SWITCH;
+    $result .= &process_scalar($last_char, $data);
   }
+  return $result;
+}
+sub first_char {
+  my ($str) = @_;
+  return substr($str, 0, 1);
+}
+sub last_char {
+  my ($str) = @_;
+  return substr($str, -1, 1);
 }
 sub is_legal_name {
   my ($name) = @_;
   my $result = 0;
-  my $first_char = substr($name, 0, 1);
+  my $first_char = &first_char($name);
 
   if ($first_char =~ m/[_a-zA-Z]/) {
     $result = 1;
@@ -41,31 +59,41 @@ sub is_legal_name {
   return $result;
 }
 sub process_tbl {
-  my ($data) = @_;
+  my ($last_char, $data) = @_;
+  my $result = '';
   my ($name, $values);
-  while (($name, $values) = each (%$data)) {
+
+  foreach my $name (sort keys %$data) {
     if (!&is_legal_name($name)) {
-      return;
+      next;
     } else {
-      print "$name = ";
-      &process($values);
+      my $legal_name = $name; $legal_name =~ s/-/_/g;
+      $result .= $last_char = "\n" if ("\n" ne $last_char);
+      $result .= "$legal_name =";
+      $last_char = &last_char($result);
+      $result .= &process($last_char, $$data{$name});
+      $last_char = &last_char($result);
+      $result .= $last_char = "\n" if ("\n" ne $last_char);
     }
   }
-  print "\n";
+  return $result;
 }
-
 sub process_seq {
-  my ($data) = @_;
-  my $s = '';
-  foreach my $value (@$data) {
-    print $s;
-    &process($value);
-    $s = ' ';
-  }
-  print "\n";
-}
+  my ($last_char, $data) = @_;
+  my $result = '';
 
+  foreach my $value (@$data) {
+    $result .= &process($last_char, $value);
+    $last_char = &last_char($result);
+  }
+  $result .= $last_char = "\n" if ("\n" ne $last_char);
+  return $result;
+}
 sub process_scalar {
-  my ($data) = @_;
-  print "$data";
+  my ($last_char, $data) = @_;
+  my $result = '';
+  #$data = $data ||= '';
+  $result .= $last_char = ' ' if (' ' ne $last_char);
+  $result .= $data;
+  return $result;
 }
