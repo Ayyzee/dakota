@@ -11,11 +11,16 @@ export CXXFLAGS
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-dakota_util_srcs := $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
-dakota_srcs :=      $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
+$(shell $(rootdir)/bin/dakota-json2mk --prefix dakota_      $(srcdir)/dakota-project.rep      > dakota-project.mk)
+$(shell $(rootdir)/bin/dakota-json2mk --prefix dakota_util_ $(srcdir)/dakota-util-project.rep > dakota-util-project.mk)
+include dakota-project.mk
+include dakota-util-project.mk
 
-dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
-dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
+#dakota_util_srcs := $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
+#dakota_srcs :=      $(shell $(rootdir)/bin/dakota-project srcs --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
+
+#dakota_util_name := $(shell $(rootdir)/bin/dakota-project name --repository dakota-util-project.rep --var SO_EXT=$(SO_EXT))
+#dakota_name :=      $(shell $(rootdir)/bin/dakota-project name --repository dakota-project.rep      --var SO_EXT=$(SO_EXT))
 
 INCLUDE_FILES :=\
  $(includedir)/dakota-log.$(hxx_ext)\

@@ -168,6 +168,7 @@ sub subst {
   while (($key, $element) = each %$var) {
     #print STDERR "<$string\n";
     $string =~ s|\$$key\b|$element|;
+    $string =~ s|\$\($key\)|$element|;
     #print STDERR ">$string\n";
   }
   return $string
