@@ -33,9 +33,9 @@ $Data::Dumper::Sortkeys = 1;
 my $data;
 
 if (1) {
-    $data = { 'seq' => [ 'a', 'b', 'c', { 'x' => 'X',
-                                          'y' => 'Y',
-                                          'z' => [ 8, 16, 32 ] }
+    $data = { 'my-seq' => [ 'a', 'b', 'c', { 'x' => 'X',
+                                            'y' => 'Y',
+                                            'z' => [ 8, 16, 32 ] }
                   ],
               'tbl' => { 'a' => 'A',
                          'b' => 'B',
@@ -48,4 +48,4 @@ if (1) {
 my $cmd1 = $ARGV[1];
 my $cmd2 = sprintf('$$data%s', $cmd1);
 my $result = eval $cmd2 or die;
-print $result . " # $cmd2\n";
+print $result . " # $cmd1\n";
