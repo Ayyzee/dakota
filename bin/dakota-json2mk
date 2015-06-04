@@ -21,6 +21,7 @@ unless (caller) {
   my $opts = {};
   &GetOptions($opts,
               'prefix=s',
+              'output=s',
             );
   &main(\@ARGV, $opts);
 }
@@ -35,7 +36,10 @@ sub main {
     $result .= &process($last_char, $data, $opts);
     #$result .= $last_char = "\n" if ("\n" ne $last_char);
   }
-  print $result;
+  open(my $fh, ">", $$opts{'output'})
+    or die "cannot open > $$opts{'output'}: $!";
+  print $fh $result;
+  close($fh);
 }
 sub process {
   my ($last_char, $data, $opts) = @_;

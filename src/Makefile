@@ -11,7 +11,7 @@ bindir :=     $(prefix)/bin
 json_ext := json
 mk_ext := mk
 
-$(shell $(srcdir)/../bin/dakota-json2mk	$(srcdir)/../lib/dakota/compiler.$(json_ext) >	$(dstdir)/../lib/dakota/compiler.$(mk_ext))
+$(shell $(srcdir)/../bin/dakota-json2mk --output $(dstdir)/../lib/dakota/compiler.$(mk_ext) $(srcdir)/../lib/dakota/compiler.$(json_ext))
 include $(dstdir)/../lib/dakota/compiler.$(mk_ext)
 
 export CXX
@@ -27,10 +27,10 @@ export EXTRA_DAKOTAFLAGS
 
 export EXTRA_LDFLAGS
 
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_      $(srcdir)/dakota-project.$(json_ext) >      $(dstdir)/dakota-project.$(mk_ext))
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_      --output $(dstdir)/dakota-project.$(mk_ext)      $(srcdir)/dakota-project.$(json_ext))
 include $(dstdir)/dakota-project.$(mk_ext)
 
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_util_ $(srcdir)/dakota-util-project.$(json_ext) > $(dstdir)/dakota-util-project.$(mk_ext))
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_util_ --output $(dstdir)/dakota-util-project.$(mk_ext) $(srcdir)/dakota-util-project.$(json_ext))
 include $(dstdir)/dakota-util-project.$(mk_ext)
 
 INCLUDE_FILES := $(dakota_INCLUDE_FILES)
