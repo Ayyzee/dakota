@@ -75,6 +75,9 @@ $(libdir)/$(lib_prefix)%.$(SO_EXT): $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT)
 $(libdir)/dakota/%.$(pm_ext): $(rootdir)/lib/dakota/%.$(pm_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
+$(libdir)/dakota/%.$(pl_ext): $(rootdir)/lib/dakota/%.$(pl_ext)
+	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
+
 $(libdir)/dakota/%.$(json_ext): $(rootdir)/lib/dakota/%.$(json_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
