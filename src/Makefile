@@ -21,6 +21,12 @@ export EXTRA_CXXFLAGS
 include $(srcdir)/../config.$(mk_ext)
 include $(srcdir)/../vars.$(mk_ext)
 
+export DAKOTA
+export DAKOTAFLAGS
+export EXTRA_DAKOTAFLAGS
+
+export EXTRA_LDFLAGS
+
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_      $(srcdir)/dakota-project.$(json_ext) >      $(dstdir)/dakota-project.$(mk_ext))
 include $(dstdir)/dakota-project.$(mk_ext)
 
@@ -52,9 +58,9 @@ HOME_FILES := $(dakota_HOME_FILES)
  uninstall-lib\
  uninstall\
 
-soname =           $(shell $(srcdir)/../bin/dakota-project soname       --repository $*-project.$(json_ext) --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir) --var libdir=$(libdir) --var lib_prefix=$(lib_prefix))
-macros_raw =       $(shell $(srcdir)/../bin/dakota-project macros       --repository $*-project.$(json_ext) --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
-include_dirs_raw = $(shell $(srcdir)/../bin/dakota-project include-dirs --repository $*-project.$(json_ext) --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
+soname =           $(shell $(srcdir)/../bin/dakota-project soname       --repository $*-project.$(json_ext) --var libdir=$(libdir) --var lib_prefix=$(lib_prefix) --var SO_EXT=$(SO_EXT))
+macros_raw =       $(shell $(srcdir)/../bin/dakota-project macros       --repository $*-project.$(json_ext))
+include_dirs_raw = $(shell $(srcdir)/../bin/dakota-project include-dirs --repository $*-project.$(json_ext) --var srcdir=$(srcdir))
 
 # soname needs no transformation
 macros =       $(patsubst %,--define-macro %,$(macros_raw))            # g++/clang++
@@ -63,15 +69,15 @@ include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw)) # g++/cla
 # the use of $^ should be $?
 
 $(dstdir)/../lib/$(lib_prefix)%.$(SO_EXT):
-	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) --shared   $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(dstdir)/../lib/%.$(SO_EXT):
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) --dynamic  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
 
 $(dstdir)/../bin/%: $(srcdir)/%-main.$(dk_ext)
-	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
 
-$(dstdir)/%: $(srcdir)/%-main.$(dk_ext)
+$(dstdir)/%:        $(srcdir)/%-main.$(dk_ext)
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
 
 # installed files
@@ -90,10 +96,10 @@ $(libdir)/dakota/%.$(pl_ext): $(srcdir)/../lib/dakota/%.$(pl_ext)
 $(libdir)/dakota/%.$(json_ext): $(srcdir)/../lib/dakota/%.$(json_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(bindir)/%: $(srcdir)/../bin/% # some bin/* are generated (so they will be in dstdir) and some are supplied (so they will be in srcdir)
+$(bindir)/%: $(srcdir)/../bin/% # some bin/* are supplied (so they will be in srcdir)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(bindir)/%: $(dstdir)/../bin/% # some bin/* are generated (so they will be in dstdir) and some are supplied (so they will be in srcdir)
+$(bindir)/%: $(dstdir)/../bin/% # some bin/* are generated (so they will be in dstdir)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
 $(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
@@ -127,10 +133,10 @@ check: all
 
 $(dstdir)/tst: $(srcdir)/tst-main.$(dk_ext) $(dstdir)/../lib/$(dakota_util_name)
 
-$(dstdir)/min: $(srcdir)/min-main.$(dk_ext)
+$(dstdir)/min: $(srcdir)/min-main.$(dk_ext) # $(dstdir)/../lib/$(dakota_name) is implied
 
 $(dstdir)/dummy: $(srcdir)/dummy-main.$(cxx_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
 
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
