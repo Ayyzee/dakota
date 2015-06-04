@@ -2,27 +2,24 @@ SHELL := /bin/sh -u
 
 rootdir := ..
 
-%.mk: %.json
-	$(rootdir)/bin/dakota-json2mk $(json2mk_flags) $< > $@
+json_ext := json
+mk_ext := mk
 
-json2mk_flags :=
-include $(rootdir)/lib/dakota/compiler.mk
-json2mk_flags := # better to undefine, but darwin default make does not support undefine
+$(shell $(rootdir)/bin/dakota-json2mk	$(rootdir)/lib/dakota/compiler.$(json_ext) >	$(rootdir)/lib/dakota/compiler.$(mk_ext))
+include $(rootdir)/lib/dakota/compiler.$(mk_ext)
 
 export CXX
 export CXXFLAGS
 export EXTRA_CXXFLAGS
 
-include $(rootdir)/config.mk
-include $(rootdir)/vars.mk
+include $(rootdir)/config.$(mk_ext)
+include $(rootdir)/vars.$(mk_ext)
 
-json2mk_flags = --prefix dakota_
-include $(srcdir)/dakota-project.mk
-json2mk_flags := # better to undefine, but darwin default make does not support undefine
+$(shell $(rootdir)/bin/dakota-json2mk --prefix dakota_      $(srcdir)/dakota-project.$(json_ext) >      $(srcdir)/dakota-project.$(mk_ext))
+include $(srcdir)/dakota-project.$(mk_ext)
 
-json2mk_flags = --prefix dakota_util_
-include $(srcdir)/dakota-util-project.mk
-json2mk_flags := # better to undefine, but darwin default make does not support undefine
+$(shell $(rootdir)/bin/dakota-json2mk --prefix dakota_util_ $(srcdir)/dakota-util-project.$(json_ext) > $(srcdir)/dakota-util-project.$(mk_ext))
+include $(srcdir)/dakota-util-project.$(mk_ext)
 
 INCLUDE_FILES := $(dakota_INCLUDE_FILES)
 
@@ -46,9 +43,9 @@ HOME_FILES := $(dakota_HOME_FILES)
  uninstall-lib\
  uninstall\
 
-soname =           $(shell $(rootdir)/bin/dakota-project soname       --repository $*-project.json --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
-macros_raw =       $(shell $(rootdir)/bin/dakota-project macros       --repository $*-project.json --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
-include_dirs_raw = $(shell $(rootdir)/bin/dakota-project include-dirs --repository $*-project.json --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
+soname =           $(shell $(rootdir)/bin/dakota-project soname       --repository $*-project.$(json_ext) --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
+macros_raw =       $(shell $(rootdir)/bin/dakota-project macros       --repository $*-project.$(json_ext) --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
+include_dirs_raw = $(shell $(rootdir)/bin/dakota-project include-dirs --repository $*-project.$(json_ext) --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
 
 # soname needs no transformation
 macros =       $(patsubst %,--define-macro %,$(macros_raw))            # g++/clang++
@@ -78,7 +75,7 @@ $(libdir)/$(lib_prefix)%.$(SO_EXT): $(rootdir)/lib/$(lib_prefix)%.$(SO_EXT)
 $(libdir)/dakota/%.$(pm_ext): $(rootdir)/lib/dakota/%.$(pm_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(libdir)/dakota/%.$(pl_ext): $(rootdir)/lib/dakota/%.$(pl_ext)
+$(libdir)/dakota/%.$(json_ext): $(rootdir)/lib/dakota/%.$(json_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
 $(bindir)/%: $(rootdir)/bin/%
@@ -176,10 +173,8 @@ clean: clean-rt
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name).$(ctlg_ext)
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info
 	$(RM) $(RMFLAGS) $(rootdir)/bin/dakota-info.dSYM
-	$(RM) $(RMFLAGS) compiler.mk strerror-name.tbl .gdb_history *~ .*~ 
-	$(MAKE) --directory proofs clean
-	$(MAKE) --directory macro-system-parser clean
-
+	$(RM) $(RMFLAGS) $(rootdir)/lib/dakota/compiler.$(mk_ext) $(rootdir)/lib/dakota/compiler-{darwin,linux}-{clang,gcc}.$(mk_ext)
+	$(RM) $(RMFLAGS) $(srcdir)/dakota-project.$(mk_ext) $(srcdir)/dakota-util-project.$(mk_ext)
 clean-util-rt:
 	$(RM) $(RMFLAGS) $(rootdir)/lib/$(lib_prefix)$(dakota_util_name)
 
