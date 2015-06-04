@@ -6,11 +6,6 @@ MAKEFLAGS :=\
 
 # --no-print-directory\
 
-prefix ?= /usr/local
-includedir := $(prefix)/include
-libdir :=     $(prefix)/lib
-bindir :=     $(prefix)/bin
-
 dk_ext := dk
 hxx_ext := hh
 cxx_ext := cc

@@ -5,7 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'soname' => '$(prefix)/lib/libdakota-util.$(SO_EXT)',
+  'soname' => '$(libdir)/$(lib_prefix)dakota-util.$(SO_EXT)',
   'srcs' => [
     '$(srcdir)/ascii-number-klass.$(dk_ext)',
     '$(srcdir)/ascii-number.$(dk_ext)',
@@ -33,7 +33,7 @@
     '$(srcdir)/type-predicate.$(dk_ext)',
     '$(srcdir)/xml-object-output-stream.$(dk_ext)'
   ],
-  'name' => 'dakota-util.$(SO_EXT)',
+  'name' => '$(lib_prefix)dakota-util.$(SO_EXT)',
   'libs' => [
   ],
   'include-dirs' => [
@@ -46,6 +46,6 @@
     'MOD_SIZE_CAST_HACK',
   ],
   'LIB_FILES' => [
-    '$(libdir)/$(lib_prefix)$(dakota_util_name)',
+    '$(libdir)/$(lib_prefix)dakota-util.$(SO_EXT)',
   ],
 }
