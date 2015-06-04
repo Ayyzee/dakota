@@ -16,37 +16,13 @@ $(shell $(rootdir)/bin/dakota-json2mk --prefix dakota_util_ $(srcdir)/dakota-uti
 include dakota-project.mk
 include dakota-util-project.mk
 
-INCLUDE_FILES :=\
- $(includedir)/dakota-log.$(hxx_ext)\
- $(includedir)/dakota-finally.$(hxx_ext)\
- $(includedir)/dakota.$(hxx_ext)\
+INCLUDE_FILES := $(dakota_INCLUDE_FILES)
 
-BIN_FILES :=\
- $(bindir)/dakota-info\
- $(bindir)/dakota\
- $(bindir)/dakota-fixup-stderr.$(pl_ext)\
- $(bindir)/dakota-project\
+BIN_FILES := $(dakota_BIN_FILES)
 
-LIB_FILES :=\
- $(libdir)/$(lib_prefix)$(dakota_name)\
- $(libdir)/$(lib_prefix)$(dakota_util_name)\
- $(libdir)/dakota/dakota.$(pm_ext)\
- $(libdir)/dakota/parse.$(pm_ext)\
- $(libdir)/dakota/rewrite.$(pm_ext)\
- $(libdir)/dakota/generate.$(pm_ext)\
- $(libdir)/dakota/sst.$(pm_ext)\
- $(libdir)/dakota/util.$(pm_ext)\
- $(libdir)/dakota/macros.$(pl_ext)\
- $(libdir)/dakota/compiler-darwin-gcc.$(pl_ext)\
- $(libdir)/dakota/compiler-darwin-clang.$(pl_ext)\
- $(libdir)/dakota/compiler-linux-gcc.$(pl_ext)\
- $(libdir)/dakota/compiler-linux-clang.$(pl_ext)\
+LIB_FILES := $(dakota_LIB_FILES) $(dakota_util_LIB_FILES)
 
-HOME_FILES :=\
- $(HOME)/.dakota/.gdbinit\
- $(HOME)/.dakota/.bashrc\
- $(HOME)/.dakota/emacs/init.el\
- $(HOME)/.dakota/emacs/dakota-mode.el\
+HOME_FILES := $(dakota_HOME_FILES)
 
 .PHONY:\
  all\
@@ -67,8 +43,8 @@ macros_raw =       $(shell $(rootdir)/bin/dakota-project macros       --reposito
 include_dirs_raw = $(shell $(rootdir)/bin/dakota-project include-dirs --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
 
 # soname needs no transformation
-macros =       $(patsubst %,--define-macro %,$(macros_raw))
-include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw))
+macros =       $(patsubst %,--define-macro %,$(macros_raw))            # g++/clang++
+include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw)) # g++/clang++
 
 # the use of $^ should be $?
 

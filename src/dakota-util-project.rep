@@ -45,4 +45,7 @@
     'HAVE_CONFIG_HH',
     'MOD_SIZE_CAST_HACK',
   ],
+  'LIB_FILES' => [
+    '$(libdir)/$(lib_prefix)$(dakota_util_name)',
+  ],
 }
