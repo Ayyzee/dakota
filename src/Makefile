@@ -32,6 +32,9 @@ HOME_FILES := $(dakota_HOME_FILES)
 
 .PHONY:\
  all\
+ dakota-info\
+ dakota\
+ dakota-util\
  check\
  clean\
  install-include\
@@ -92,32 +95,34 @@ $(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0644 $< $(@D)
 
 all:
-	$(MAKE) $(dstdir)/../bin/dakota-info
+	$(MAKE) $(MFLAGS) dakota-info
 	$(MAKE) $(MFLAGS) dakota
 	$(MAKE) $(MFLAGS) dakota-util
 
-tst: $(srcdir)/tst-main.$(dk_ext) $(dstdir)/../lib/$(lib_prefix)$(dakota_util_name)
-
-min: $(srcdir)/min-main.$(dk_ext)
-
-check: all install
-	$(dstdir)/../bin/dakota-info $(libdir)/$(lib_prefix)$(dakota_name) $(libdir)/$(lib_prefix)$(dakota_util_name) # fixfix
-	$(MAKE) $(dstdir)/tst
-	$(dstdir)/tst
-	$(MAKE) $(dstdir)/dummy
-	$(dstdir)/dummy
-
-$(dstdir)/../lib/$(lib_prefix)$(dakota_util_name): $(dakota_util_srcs)
-
-$(dstdir)/../lib/$(lib_prefix)$(dakota_name): $(dakota_srcs)
-
+dakota-info: $(dstdir)/../bin/dakota-info
+dakota:      $(dstdir)/../lib/$(lib_prefix)$(dakota_name)
 dakota-util: $(dstdir)/../lib/$(lib_prefix)$(dakota_util_name)
-
-dakota: $(dstdir)/../lib/$(lib_prefix)$(dakota_name)
 
 $(dstdir)/../bin/dakota-info: $(srcdir)/dakota-info-main.$(cxx_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(SO_EXT)
+
+$(dstdir)/../lib/$(lib_prefix)$(dakota_name): $(dakota_srcs)
+
+$(dstdir)/../lib/$(lib_prefix)$(dakota_util_name): $(dakota_util_srcs)
+
+check: all
+	$(dstdir)/../bin/dakota-info $(dstdir)/../lib/$(lib_prefix)$(dakota_name) $(dstdir)/../lib/$(lib_prefix)$(dakota_util_name) # fixfix
+	$(MAKE) $(dstdir)/tst
+	$(dstdir)/tst
+	$(MAKE) $(dstdir)/min
+	$(dstdir)/min
+	$(MAKE) $(dstdir)/dummy
+	$(dstdir)/dummy
+
+$(dstdir)/tst: $(srcdir)/tst-main.$(dk_ext) $(dstdir)/../lib/$(lib_prefix)$(dakota_util_name)
+
+$(dstdir)/min: $(srcdir)/min-main.$(dk_ext)
 
 $(dstdir)/dummy: $(srcdir)/dummy-main.$(cxx_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
