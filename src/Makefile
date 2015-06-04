@@ -81,7 +81,7 @@ $(dstdir)/%:        $(srcdir)/%-main.$(dk_ext)
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
 
 # installed files
-$(includedir)/%.$(hxx_ext): $(srcdir)/../include/%.$(hxx_ext)
+$(includedir)/%.$(hh_ext): $(srcdir)/../include/%.$(hh_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0644 $< $(@D)
 
 $(libdir)/$(lib_prefix)%.$(SO_EXT): $(dstdir)/../lib/$(lib_prefix)%.$(SO_EXT)
@@ -114,7 +114,7 @@ dakota-info: $(dstdir)/../bin/dakota-info
 dakota:      $(dstdir)/../lib/$(dakota_name)
 dakota-util: $(dstdir)/../lib/$(dakota_util_name)
 
-$(dstdir)/../bin/dakota-info: $(srcdir)/dakota-info-main.$(cxx_ext)
+$(dstdir)/../bin/dakota-info: $(srcdir)/dakota-info-main.$(cc_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(SO_EXT)
 
@@ -135,7 +135,7 @@ $(dstdir)/tst: $(srcdir)/tst-main.$(dk_ext) $(dstdir)/../lib/$(dakota_util_name)
 
 $(dstdir)/min: $(srcdir)/min-main.$(dk_ext) # $(dstdir)/../lib/$(dakota_name) is implied
 
-$(dstdir)/dummy: $(srcdir)/dummy-main.$(cxx_ext)
+$(dstdir)/dummy: $(srcdir)/dummy-main.$(cc_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
 
 precompile:

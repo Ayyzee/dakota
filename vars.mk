@@ -7,8 +7,8 @@ MAKEFLAGS :=\
 # --no-print-directory\
 
 dk_ext := dk
-hxx_ext := hh
-cxx_ext := cc
+hh_ext := hh
+cc_ext := cc
 ctlg_ext := ctlg
 lib_prefix := lib
 pl_ext := pl

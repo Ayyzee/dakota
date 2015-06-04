@@ -103,9 +103,9 @@
     '$(libdir)/dakota/compiler-linux-clang.$(json_ext)',
   ],
   'INCLUDE_FILES' => [
-    '$(includedir)/dakota-log.$(hxx_ext)',
-    '$(includedir)/dakota-finally.$(hxx_ext)',
-    '$(includedir)/dakota.$(hxx_ext)',
+    '$(includedir)/dakota-log.$(hh_ext)',
+    '$(includedir)/dakota-finally.$(hh_ext)',
+    '$(includedir)/dakota.$(hh_ext)',
   ],
   'BIN_FILES' => [
     '$(bindir)/dakota-info',

@@ -72,8 +72,8 @@ our @EXPORT= qw(
 my $objdir = 'obj';
 my $rep_ext = 'rep';
 my $ctlg_ext = 'ctlg';
-my $hxx_ext = 'hh';
-my $cxx_ext = 'cc';
+my $hh_ext = 'hh';
+my $cc_ext = 'cc';
 my $dk_ext = 'dk';
 
 my $k = qr/[\w-]/;
@@ -85,7 +85,7 @@ my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h
 
 my $gbl_nrt_file = undef;
 my $global_scratch_str_ref;
-#my $global_nrt_cxx_str;
+#my $global_nrt_cc_str;
 
 my $global_seq_super_t   = [ 'super-t' ]; # special (used in eq compare)
 my $global_seq_ellipsis  = [ '...' ];
@@ -254,7 +254,7 @@ sub write_to_file_converted_strings {
       my $str = &sst_fragment::filestr($$sst{'tokens'});
       $converted_string = $str;
     } else {
-      &dakota::rewrite::convert_dk_to_cxx(\$string, $kw_args_generics);
+      &dakota::rewrite::convert_dk_to_cc(\$string, $kw_args_generics);
       $converted_string = $string;
     }
     print PATH $converted_string;
@@ -284,54 +284,54 @@ sub generate_nrt {
   my $result;
 
   if (&is_nrt_decl()) {
-    my $output = "$path/$name.$hxx_ext";
+    my $output = "$path/$name.$hh_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # nrt-hxx
-    $result = &generate_decl_defn($file, $generics, $symbols, 'hxx');
+    print "    creating $output\n"; # nrt-hh
+    $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
 
-    my $str_hxx = &labeled_src_str(undef, "nrt-hxx");
-    $str_hxx .=
+    my $str_hh = &labeled_src_str(undef, "nrt-hh");
+    $str_hh .=
       "\n" .
-      &labeled_src_str($result, "headers-hxx") .
+      &labeled_src_str($result, "headers-hh") .
       &hardcoded_typedefs() .
-      &labeled_src_str($result, "klasses-hxx") .
-      &labeled_src_str($result, "symbols-hxx") .
-      &labeled_src_str($result, "strings-hxx") .
-      &labeled_src_str($result, "hashes-hxx") .
-      &labeled_src_str($result, "keywords-hxx") .
-      &labeled_src_str($result, "selectors-hxx") .
-      &labeled_src_str($result, "signatures-hxx") .
-      &labeled_src_str($result, "generics-hxx");
-      #&labeled_src_str($result, "selectors-seq-hxx") .
-      #&labeled_src_str($result, "signatures-seq-hxx") .
+      &labeled_src_str($result, "klasses-hh") .
+      &labeled_src_str($result, "symbols-hh") .
+      &labeled_src_str($result, "strings-hh") .
+      &labeled_src_str($result, "hashes-hh") .
+      &labeled_src_str($result, "keywords-hh") .
+      &labeled_src_str($result, "selectors-hh") .
+      &labeled_src_str($result, "signatures-hh") .
+      &labeled_src_str($result, "generics-hh");
+      #&labeled_src_str($result, "selectors-seq-hh") .
+      #&labeled_src_str($result, "signatures-seq-hh") .
 
-    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ]);
-    return "$path/$name.$hxx_ext";
+    &write_to_file_converted_strings("$path/$name.$hh_ext", [ $str_hh ]);
+    return "$path/$name.$hh_ext";
   } else {
     my $col; my $stack;
     my $pre_output = "$path/$name.$dk_ext";
-    my $output = "$path/$name.$cxx_ext";
+    my $output = "$path/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # nrt-cxx
-    $result = &generate_decl_defn($file, $generics, $symbols, 'cxx');
+    print "    creating $output\n"; # nrt-cc
+    $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
 
-    my $str_cxx = &labeled_src_str(undef, "nrt-cxx");
-    $str_cxx .=
+    my $str_cc = &labeled_src_str(undef, "nrt-cc");
+    $str_cc .=
       "\n" .
-      "#include \"$name.$hxx_ext\"\n" .
+      "#include \"$name.$hh_ext\"\n" .
       "\n" .
-      "#include \"../$name.$dk_ext.$cxx_ext\"\n" . # user-code (converted from dk to cxx)
+      "#include \"../$name.$dk_ext.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
-      &dk::generate_cxx_footer($file, $stack = [], $col = '');
+      &dk::generate_cc_footer($file, $stack = [], $col = '');
 
     if (1) { #$ENV{'DKT_DEBUG'}
-      &write_to_file_strings($pre_output, [ $str_cxx ]);
+      &write_to_file_strings($pre_output, [ $str_cc ]);
     }
-    &write_to_file_converted_strings($output, [ $str_cxx ]);
+    &write_to_file_converted_strings($output, [ $str_cc ]);
     return $output;
   }
 } # sub generate_nrt
@@ -356,63 +356,63 @@ sub generate_rt {
   my $result;
 
   if (&is_rt_decl()) {
-    my $output = "$path/$name.$hxx_ext";
+    my $output = "$path/$name.$hh_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # rt-hxx
-    $result = &generate_decl_defn($file, $generics, $symbols, 'hxx');
+    print "    creating $output\n"; # rt-hh
+    $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
 
-    my $str_hxx = &labeled_src_str(undef, "rt-hxx");
-    $str_hxx .=
+    my $str_hh = &labeled_src_str(undef, "rt-hh");
+    $str_hh .=
       "\n" .
-      &labeled_src_str($result, "headers-hxx") .
+      &labeled_src_str($result, "headers-hh") .
       &hardcoded_typedefs() .
-      &labeled_src_str($result, "klasses-hxx") .
-      &labeled_src_str($result, "symbols-hxx") .
-      &labeled_src_str($result, "strings-hxx") .
-      &labeled_src_str($result, "hashes-hxx") .
-      &labeled_src_str($result, "keywords-hxx") .
-      &labeled_src_str($result, "selectors-hxx") .
-      &labeled_src_str($result, "signatures-hxx") .
-      &labeled_src_str($result, "generics-hxx");
-      #&labeled_src_str($result, "selectors-seq-hxx") .
-      #&labeled_src_str($result, "signatures-seq-hxx") .
+      &labeled_src_str($result, "klasses-hh") .
+      &labeled_src_str($result, "symbols-hh") .
+      &labeled_src_str($result, "strings-hh") .
+      &labeled_src_str($result, "hashes-hh") .
+      &labeled_src_str($result, "keywords-hh") .
+      &labeled_src_str($result, "selectors-hh") .
+      &labeled_src_str($result, "signatures-hh") .
+      &labeled_src_str($result, "generics-hh");
+      #&labeled_src_str($result, "selectors-seq-hh") .
+      #&labeled_src_str($result, "signatures-seq-hh") .
 
-    &write_to_file_converted_strings("$path/$name.$hxx_ext", [ $str_hxx ]);
-    return "$path/$name.$hxx_ext";
+    &write_to_file_converted_strings("$path/$name.$hh_ext", [ $str_hh ]);
+    return "$path/$name.$hh_ext";
   } else {
     my $pre_output = "$path/$name.$dk_ext";
-    my $output = "$path/$name.$cxx_ext";
+    my $output = "$path/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # rt-cxx
-    $result = &generate_decl_defn($file, $generics, $symbols, 'cxx');
+    print "    creating $output\n"; # rt-cc
+    $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
 
-    my $str_cxx = &labeled_src_str(undef, "rt-cxx");
-    $str_cxx .=
+    my $str_cc = &labeled_src_str(undef, "rt-cc");
+    $str_cc .=
       "\n" .
-      "#include \"$name.$hxx_ext\"\n" .
+      "#include \"$name.$hh_ext\"\n" .
       "\n" .
-      &labeled_src_str($result, "symbols-cxx") .
-      &labeled_src_str($result, "strings-cxx") .
-      &labeled_src_str($result, "hashes-cxx") .
-      &labeled_src_str($result, "keywords-cxx") .
-      &labeled_src_str($result, "klasses-cxx") .
-      &labeled_src_str($result, "selectors-cxx") .
-      &labeled_src_str($result, "signatures-cxx") .
-      &labeled_src_str($result, "generics-cxx") .
+      &labeled_src_str($result, "symbols-cc") .
+      &labeled_src_str($result, "strings-cc") .
+      &labeled_src_str($result, "hashes-cc") .
+      &labeled_src_str($result, "keywords-cc") .
+      &labeled_src_str($result, "klasses-cc") .
+      &labeled_src_str($result, "selectors-cc") .
+      &labeled_src_str($result, "signatures-cc") .
+      &labeled_src_str($result, "generics-cc") .
 
-      &labeled_src_str($result, "selectors-seq-cxx") .
-      &labeled_src_str($result, "signatures-seq-cxx") .
+      &labeled_src_str($result, "selectors-seq-cc") .
+      &labeled_src_str($result, "signatures-seq-cc") .
 
       &generate_defn_footer($file);
 
     if (1) { #$ENV{'DKT_DEBUG'}
-      &write_to_file_strings($pre_output, [ $str_cxx ]);
+      &write_to_file_strings($pre_output, [ $str_cc ]);
     }
-    &write_to_file_converted_strings($output, [ $str_cxx ]);
+    &write_to_file_converted_strings($output, [ $str_cc ]);
     return $output;
   }
 } # sub generate_rt
@@ -454,7 +454,7 @@ sub generate_decl_defn {
   my $result = {};
   my $klass_names = &order_klasses($file);
 
-  $$result{"headers-hxx"} =            &linkage_unit::generate_headers(        $file, $klass_names);
+  $$result{"headers-hh"} =             &linkage_unit::generate_headers(        $file, $klass_names);
   $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $generics, $symbols);
   $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, $generics, $symbols);
   $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file, $generics, $symbols);
@@ -472,7 +472,7 @@ sub generate_decl_defn {
 } # generate_decl_defn
 sub generate_defn_footer {
   my ($file) = @_;
-  my $rt_cxx_str = '';
+  my $rt_cc_str = '';
   my $col = '';
   my $stack = [];
   my $tbl = {
@@ -483,37 +483,37 @@ sub generate_defn_footer {
   my $keys_count;
   $keys_count = keys %{$$file{'klasses'}};
   if (0 == $keys_count) {
-    $rt_cxx_str .= $col . "static assoc-node-t* imported-klasses = nullptr;\n";
-    $rt_cxx_str .= $col . "static symbol-t const* imported-klasses-names = nullptr;\n";
+    $rt_cc_str .= $col . "static assoc-node-t* imported-klasses = nullptr;\n";
+    $rt_cc_str .= $col . "static symbol-t const* imported-klasses-names = nullptr;\n";
   } else {
-    $rt_cxx_str .= $col . "static symbol-t imported-klasses-names[] = {" . &ann(__LINE__) . " //ro-data\n";
+    $rt_cc_str .= $col . "static symbol-t imported-klasses-names[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
     my ($key, $val);
     my $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach $key (sort keys %{$$file{'klasses'}}) {
       $val = $$file{'klasses'}{$key};
       my $cxx_klass_name = $key;
-      $rt_cxx_str .= $col . "$key\::__klass__,\n";
+      $rt_cc_str .= $col . "$key\::__klass__,\n";
     }
-    $rt_cxx_str .= $col . "nullptr\n";
+    $rt_cc_str .= $col . "nullptr\n";
     $col = &colout($col);
-    $rt_cxx_str .= $col . "};\n";
+    $rt_cc_str .= $col . "};\n";
     ###
-    $rt_cxx_str .= $col . "static assoc-node-t imported-klasses[] = {" . &ann(__LINE__) . " //rw-data\n";
+    $rt_cc_str .= $col . "static assoc-node-t imported-klasses[] = {" . &ann(__LINE__) . " //rw-data\n";
     $col = &colin($col);
     $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach $key (sort keys %{$$file{'klasses'}}) {
       $val = $$file{'klasses'}{$key};
       my $cxx_klass_name = $key;
-      $rt_cxx_str .= $col . "{ cast(uintptr-t)&$cxx_klass_name\::klass, nullptr },\n";
+      $rt_cc_str .= $col . "{ cast(uintptr-t)&$cxx_klass_name\::klass, nullptr },\n";
     }
-    $rt_cxx_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
+    $rt_cc_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
     $col = &colout($col);
-    $rt_cxx_str .= $col . "};\n";
+    $rt_cc_str .= $col . "};\n";
   }
-  $rt_cxx_str .= &dk::generate_cxx_footer($file, $stack, $col);
-  #$rt_cxx_str .= $col . "extern \"C\"\n";
-  #$rt_cxx_str .= $col . "{\n";
+  $rt_cc_str .= &dk::generate_cc_footer($file, $stack, $col);
+  #$rt_cc_str .= $col . "extern \"C\"\n";
+  #$rt_cc_str .= $col . "{\n";
   #$col = &colin($col);
 
   my $info_tbl = {
@@ -531,39 +531,39 @@ sub generate_defn_footer {
                   "\$construct" => 'DKT-CONSTRUCT',
                   "\$name" => 'DKT-NAME',
                  };
-  $rt_cxx_str .= "\n";
+  $rt_cc_str .= "\n";
   #my $col;
-  $rt_cxx_str .= &generate_info('registration-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
+  $rt_cc_str .= &generate_info('registration-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 
-  $rt_cxx_str .= "\n";
-  $rt_cxx_str .= $col . "static void __initial() {" . &ann(__LINE__) . "\n";
+  $rt_cc_str .= "\n";
+  $rt_cc_str .= $col . "static void __initial() {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
-  $rt_cxx_str .=
+  $rt_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"before\", DKT-NAME);\n" .
     $col . "dkt-register-info(&registration-info);\n" .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"after\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);
-  $rt_cxx_str .= $col . "}\n";
-  $rt_cxx_str .= $col . "static void __final() {" . &ann(__LINE__) . "\n";
+  $rt_cc_str .= $col . "}\n";
+  $rt_cc_str .= $col . "static void __final() {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
-  $rt_cxx_str .=
+  $rt_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"before\", DKT-NAME);\n" .
     $col . "dkt-deregister-info(&registration-info);\n" .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"after\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);
-  $rt_cxx_str .= $col . "}\n";
+  $rt_cc_str .= $col . "}\n";
   #$col = &colout($col);
-  #$rt_cxx_str .= $col . "};\n";
+  #$rt_cc_str .= $col . "};\n";
 
-  $rt_cxx_str .=
+  $rt_cc_str .=
     $col . "namespace { struct noexport __ddl_t {" . &ann(__LINE__) . "\n" .
     $col . "  __ddl_t()  { __initial(); }\n" .
     $col . "  ~__ddl_t() { __final();   }\n" .
     $col . "}; }\n" .
     $col . "static __ddl_t __ddl = __ddl_t();\n";
-  return $rt_cxx_str;
+  return $rt_cc_str;
 }
 sub path::add_last {
   my ($stack, $part) = @_;
@@ -2601,9 +2601,9 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "#include <dakota-finally.$hxx_ext> /* hackhack: should be before dakota.$hxx_ext */\n" .
-      $col . "#include <dakota.$hxx_ext>\n" .
-      $col . "#include <dakota-log.$hxx_ext>\n" .
+      $col . "#include <dakota-finally.$hh_ext> /* hackhack: should be before dakota.$hh_ext */\n" .
+      $col . "#include <dakota.$hh_ext>\n" .
+      $col . "#include <dakota-log.$hh_ext>\n" .
       "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
@@ -2961,10 +2961,10 @@ sub exports {
   }
   return $exports;
 }
-sub dk::generate_cxx_footer_klass {
+sub dk::generate_cc_footer_klass {
   my ($klass_scope, $klass_name, $col, $klass_type, $symbols) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  #$$scratch_str_ref .= $col . "// generate_cxx_footer_klass()\n";
+  #$$scratch_str_ref .= $col . "// generate_cc_footer_klass()\n";
 
   my $token_registry = {};
 
@@ -3710,7 +3710,7 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .= $col . "}}}\n";
   #&path::remove_last($klass_name);
 }
-sub dk::generate_cxx_footer {
+sub dk::generate_cc_footer {
   my ($scope, $stack, $col) = @_;
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -3754,7 +3754,7 @@ sub dk::generate_kw_args_method_defns {
       my $cxx_klass_name = $klass_name;
       &path::add_last($stack, $klass_name);
       if (&is_rt_defn()) {
-        &dk::generate_cxx_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
+        &dk::generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
         if (1 || $$klass_scope{'slots-methods'}) {
           # currently no support for va:: methods
@@ -4056,16 +4056,16 @@ sub ann {
   }
   return $string;
 }
-sub dk::generate_dk_cxx {
+sub dk::generate_dk_cc {
   my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.$dk_ext");
-  my $output = "$path_name.$dk_ext.$cxx_ext";
+  my $output = "$path_name.$dk_ext.$cc_ext";
   $output =~ s|^\./||;
   my $directory = $ENV{'DKT_DIR'} ||= '.';
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output
   }
-  print "    creating $output\n"; # user-dk-cxx
+  print "    creating $output\n"; # user-dk-cc
 
   if (exists $ENV{'DK_NO_LINE'}) {
     &write_to_file_converted_strings("$output", [ $filestr ]);

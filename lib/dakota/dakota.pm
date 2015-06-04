@@ -76,8 +76,8 @@ $" = '';
 my $objdir = 'obj';
 my $rep_ext = 'rep';
 my $ctlg_ext = 'ctlg';
-my $hxx_ext = 'hh';
-my $cxx_ext = 'cc';
+my $hh_ext = 'hh';
+my $cc_ext = 'cc';
 my $dk_ext = 'dk';
 
 my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
@@ -363,14 +363,14 @@ sub sig1 {
   $result .= ')';
   return $result;
 }
-sub loop_cxx_from_dk {
+sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
     $" = ' ';
-    print STDERR "  &loop_cxx_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
+    print STDERR "  &loop_cc_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
     $" = '';
   }
-  &dakota::parse::init_cxx_from_dk_vars($cmd_info);
+  &dakota::parse::init_cc_from_dk_vars($cmd_info);
 
   my $inputs = [];
   my $rep;
@@ -403,29 +403,29 @@ sub loop_cxx_from_dk {
     #print STDERR "$file_basename.$dk_ext\n";
     #print STDERR &Dumper($$file{'klasses'});
     my $directory = '.';
-    my ($dk_cxx_name, $cxx_name);
-    my ($dk_cxx_path, $cxx_path);
-    my ($dk_cxx_ext, $cxx_ext1);
+    my ($dk_cc_name, $cc_name);
+    my ($dk_cc_path, $cc_path);
+    my ($dk_cc_ext, $cc_ext1);
 
     if (!$$cmd_info{'opts'}{'stdout'}) {
-      my ($output_dk_cxx, $output_cxx);
+      my ($output_dk_cc, $output_cc);
 
       if ($$cmd_info{'opts'}{'output'}) {
-        $output_cxx =    "$$cmd_info{'opts'}{'output'}";
-        $output_dk_cxx = "$$cmd_info{'opts'}{'output'}";
-        $output_dk_cxx =~ s|\.$cxx_ext$|\.$dk_ext\.$cxx_ext|g;
+        $output_cc =    "$$cmd_info{'opts'}{'output'}";
+        $output_dk_cc = "$$cmd_info{'opts'}{'output'}";
+        $output_dk_cc =~ s|\.$cc_ext$|\.$dk_ext\.$cc_ext|g;
       } else {
-        $output_cxx =    "$file_basename.$cxx_ext";         ###
-        $output_dk_cxx = "$file_basename.$dk_ext.$cxx_ext"; ###
+        $output_cc =    "$file_basename.$cc_ext";         ###
+        $output_dk_cc = "$file_basename.$dk_ext.$cc_ext"; ###
       }
-      $output_dk_cxx =~ s|/nrt/|/|g;
-      ($dk_cxx_name, $dk_cxx_path, $dk_cxx_ext) = fileparse("$directory/$output_dk_cxx", "\.$dk_ext\.$cxx_ext");
-      ($cxx_name, $cxx_path, $cxx_ext1) = fileparse("$directory/$output_cxx", "\.$id");
+      $output_dk_cc =~ s|/nrt/|/|g;
+      ($dk_cc_name, $dk_cc_path, $dk_cc_ext) = fileparse("$directory/$output_dk_cc", "\.$dk_ext\.$cc_ext");
+      ($cc_name, $cc_path, $cc_ext1) = fileparse("$directory/$output_cc", "\.$id");
     }
     &dakota::generate::empty_klass_defns();
-    &dk::generate_dk_cxx($file_basename, "$dk_cxx_path$dk_cxx_name");
-    $cxx_path =~ s|^\./||;
-    $cxx_path =~ s|/$||;
+    &dk::generate_dk_cc($file_basename, "$dk_cc_path$dk_cc_name");
+    $cc_path =~ s|^\./||;
+    $cc_path =~ s|/$||;
 
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
@@ -435,11 +435,11 @@ sub loop_cxx_from_dk {
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
-      &dakota::generate::generate_nrt_decl($cxx_path, $file_basename, $file);
+      &dakota::generate::generate_nrt_decl($cc_path, $file_basename, $file);
     }
-    &dakota::generate::generate_nrt_defn($cxx_path, $file_basename, $file);
+    &dakota::generate::generate_nrt_defn($cc_path, $file_basename, $file);
   }
-} # loop_cxx_from_dk
+} # loop_cc_from_dk
 
 my $root_cmd;
 sub start {
@@ -515,7 +515,7 @@ sub start {
   if ($$cmd_info{'opts'}{'compile'}) {
     if ($want_separate_precompile_pass) {
       $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
-      &obj_from_cxx($cmd_info);
+      &obj_from_cc($cmd_info);
     }
   } else {
     $$cmd_info{'opts'}{'compiler-flags'} = " -ldl";
@@ -621,20 +621,20 @@ sub loop_obj_from_dk {
         &rep_from_dk($rep_cmd);
         &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
       }
-      my $cxx_path = &cxx_path_from_dk_path($arg);
-      my $cxx_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$cxx_cmd{'inputs'} = [ $arg ];
-      $$cxx_cmd{'output'} = $cxx_path;
-      $$cxx_cmd{'reps'} = $$cmd_info{'reps'};
-      &cxx_from_dk($cxx_cmd);
+      my $cc_path = &cc_path_from_dk_path($arg);
+      my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
+      $$cc_cmd{'inputs'} = [ $arg ];
+      $$cc_cmd{'output'} = $cc_path;
+      $$cc_cmd{'reps'} = $$cmd_info{'reps'};
+      &cc_from_dk($cc_cmd);
       my $obj_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$obj_cmd{'inputs'} = [ $cxx_path ];
+      $$obj_cmd{'inputs'} = [ $cc_path ];
       $$obj_cmd{'output'} = $obj_path;
       delete $$obj_cmd{'opts'}{'output'};
 	    if ($$cmd_info{'opts'}{'precompile'}) {
         $$obj_cmd{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
       }
-      &obj_from_cxx($obj_cmd);
+      &obj_from_cc($obj_cmd);
       &_add_last($outfiles, $obj_path);
     } else {
       &_add_last($outfiles, $arg);
@@ -644,17 +644,17 @@ sub loop_obj_from_dk {
   delete $$cmd_info{'opts'}{'output'}; # hackhack
   return $cmd_info;
 }
-sub cxx_from_dk {
+sub cc_from_dk {
   my ($cmd_info) = @_;
-  my $cxx_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$cxx_cmd{'cmd'} = '&loop_cxx_from_dk';
-  $$cxx_cmd{'reps'} = $$cmd_info{'reps'};
-  $$cxx_cmd{'output'} = $$cmd_info{'output'};
-  $$cxx_cmd{'inputs'} = $$cmd_info{'inputs'};
+  my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
+  $$cc_cmd{'cmd'} = '&loop_cc_from_dk';
+  $$cc_cmd{'reps'} = $$cmd_info{'reps'};
+  $$cc_cmd{'output'} = $$cmd_info{'output'};
+  $$cc_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
-  &outfile_from_infiles($cxx_cmd, $should_echo = 0);
+  &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
-sub obj_from_cxx {
+sub obj_from_cc {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $obj_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -677,13 +677,13 @@ sub rt_obj_from_rep {
   my ($cmd_info) = @_;
   my $so_path = $$cmd_info{'output'};
   my $rep_path = &rep_path_from_so_path($so_path);
-  my $cxx_path = &cxx_path_from_so_path($so_path);
-  my $obj_path = &obj_path_from_cxx_path($cxx_path);
-  &make_dir($cxx_path);
-  my ($path, $file_basename, $file) = ($cxx_path, $cxx_path, undef);
+  my $cc_path = &cc_path_from_so_path($so_path);
+  my $obj_path = &obj_path_from_cc_path($cc_path);
+  &make_dir($cc_path);
+  my ($path, $file_basename, $file) = ($cc_path, $cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;          # strip of leading obj/
-  $file_basename =~ s|-rt\.$cxx_ext$||;   # strip of leading obj/
+  $file_basename =~ s|-rt\.$cc_ext$||;   # strip of leading obj/
   if ($$cmd_info{'reps'}) {
     &init_global_rep($$cmd_info{'reps'});
   }
@@ -704,7 +704,7 @@ sub rt_obj_from_rep {
   &dakota::generate::generate_rt_decl($path, $file_basename, $file);
   &dakota::generate::generate_rt_defn($path, $file_basename, $file);
 
-  my $obj_info = {'opts' => {}, 'inputs' => [ $cxx_path ], 'output' => $obj_path };
+  my $obj_info = {'opts' => {}, 'inputs' => [ $cc_path ], 'output' => $obj_path };
   if ($$cmd_info{'opts'}{'precompile'}) {
     $$obj_info{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
   }
@@ -714,7 +714,7 @@ sub rt_obj_from_rep {
   if ($$cmd_info{'opts'}{'compiler-flags'}) {
     $$obj_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
-  &obj_from_cxx($obj_info);
+  &obj_from_cc($obj_info);
   &_add_first($$cmd_info{'inputs'}, $obj_path);
 }
 sub so_from_obj {
@@ -870,13 +870,13 @@ sub outfile_from_infiles {
         delete $$cmd_info{'cmd-major-mode-flags'};
         delete $$cmd_info{'cmd-flags'};
         &loop_merged_rep_from_dk($cmd_info, $global_should_echo || $should_echo);
-      } elsif ('&loop_cxx_from_dk' eq $$cmd_info{'cmd'}) {
+      } elsif ('&loop_cc_from_dk' eq $$cmd_info{'cmd'}) {
         $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
         delete $$cmd_info{'output'};
         delete $$cmd_info{'cmd'};
         delete $$cmd_info{'cmd-major-mode-flags'};
         delete $$cmd_info{'cmd-flags'};
-        &loop_cxx_from_dk($cmd_info, $global_should_echo || $should_echo);
+        &loop_cc_from_dk($cmd_info, $global_should_echo || $should_echo);
       } else {
         &exec_cmd($cmd_info, $should_echo);
       }

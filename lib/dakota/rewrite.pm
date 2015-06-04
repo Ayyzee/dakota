@@ -50,7 +50,7 @@ $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 convert_dk_to_cxx
+                 convert_dk_to_cc
               );
 
 my $ENCODED_COMMENT_BEGIN = '__ENCODED_COMMENT_BEGIN__';
@@ -874,7 +874,7 @@ sub rewrite_export_method {
     }
   }
 }
-sub convert_dk_to_cxx {
+sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics) = @_;
   &encode($filestr_ref);
 
@@ -984,7 +984,7 @@ unless (caller) {
   foreach my $arg (@ARGV) {
     my $filestr = &dakota::filestr_from_file($arg);
 
-    &convert_dk_to_cxx(\$filestr, $$user_data{'kw-args-generics'});
+    &convert_dk_to_cc(\$filestr, $$user_data{'kw-args-generics'});
     print $filestr;
   }
 }

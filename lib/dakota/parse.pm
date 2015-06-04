@@ -66,11 +66,11 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  ctlg_path_from_any_path
-                 cxx_path_from_dk_path
-                 cxx_path_from_so_path
+                 cc_path_from_dk_path
+                 cc_path_from_so_path
                  init_global_rep
                  kw_args_translate
-                 obj_path_from_cxx_path
+                 obj_path_from_cc_path
                  obj_path_from_dk_path
                  rep_path_from_any_path
                  rep_path_from_ctlg_path
@@ -94,8 +94,8 @@ our @EXPORT= qw(
 my $objdir = 'obj';
 my $rep_ext = 'rep';
 my $ctlg_ext = 'ctlg';
-my $hxx_ext = 'hh';
-my $cxx_ext = 'cc';
+my $hh_ext = 'hh';
+my $cc_ext = 'cc';
 my $dk_ext = 'dk';
 my $O_EXT =  &var($gbl_compiler, 'O_EXT',  undef);
 my $SO_EXT = &var($gbl_compiler, 'SO_EXT', undef);
@@ -428,12 +428,12 @@ sub rep_path_from_any_path {
   $path =~ s|//|/|g;
   return $path;
 }
-sub cxx_path_from_so_path {
+sub cc_path_from_so_path {
   my ($path) = @_;
   die if !defined $SO_EXT;
   $path =~ s/\.$SO_EXT$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/rt/$canon_path.$cxx_ext";
+  $path = "$objdir/rt/$canon_path.$cc_ext";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -461,11 +461,11 @@ sub rep_path_from_dk_path {
   $path =~ s|//|/|g;
   return $path;
 }
-sub cxx_path_from_dk_path {
+sub cc_path_from_dk_path {
   my ($path) = @_;
   $path =~ s/\.$dk_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$cxx_ext";
+  $path = "$objdir/nrt/$canon_path.$cc_ext";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -477,9 +477,9 @@ sub obj_path_from_dk_path {
   $path =~ s|//|/|g;
   return $path;
 }
-sub obj_path_from_cxx_path {
+sub obj_path_from_cc_path {
   my ($path) = @_;
-  $path =~ s/\.$cxx_ext$//;
+  $path =~ s/\.$cc_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$canon_path.$O_EXT";
   $path =~ s|//|/|g;
@@ -1767,7 +1767,7 @@ sub method {
 }
 my $global_root_cmd;
 my $global_rep;
-sub init_cxx_from_dk_vars {
+sub init_cc_from_dk_vars {
   my ($cmd_info) = @_;
   $global_root_cmd = $cmd_info;
 }
