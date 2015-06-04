@@ -488,12 +488,9 @@ sub generate_defn_footer {
   } else {
     $rt_cc_str .= $col . "static symbol-t imported-klasses-names[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
-    my ($key, $val);
     my $num_klasses = scalar keys %{$$file{'klasses'}};
-    foreach $key (sort keys %{$$file{'klasses'}}) {
-      $val = $$file{'klasses'}{$key};
-      my $cxx_klass_name = $key;
-      $rt_cc_str .= $col . "$key\::__klass__,\n";
+    foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
+      $rt_cc_str .= $col . "$klass_name\::__klass__,\n";
     }
     $rt_cc_str .= $col . "nullptr\n";
     $col = &colout($col);
@@ -502,10 +499,8 @@ sub generate_defn_footer {
     $rt_cc_str .= $col . "static assoc-node-t imported-klasses[] = {" . &ann(__LINE__) . " //rw-data\n";
     $col = &colin($col);
     $num_klasses = scalar keys %{$$file{'klasses'}};
-    foreach $key (sort keys %{$$file{'klasses'}}) {
-      $val = $$file{'klasses'}{$key};
-      my $cxx_klass_name = $key;
-      $rt_cc_str .= $col . "{ cast(uintptr-t)&$cxx_klass_name\::klass, nullptr },\n";
+    foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
+      $rt_cc_str .= $col . "{ cast(uintptr-t)&$klass_name\::klass, nullptr },\n";
     }
     $rt_cc_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
     $col = &colout($col);
@@ -963,11 +958,11 @@ sub method::generate_va_method_defn {
     &dakota::util::_replace_last($$va_method{'name'}, $va_name);
     my $method_type_decl = &method::type_decl($va_method);
     &dakota::util::_replace_last($$va_method{'name'}, $name);
-    my $cxx_scope = &path::string($scope);
+    my $scope_str = &path::string($scope);
     $$scratch_str_ref .= " {" . &ann($line) . "\n";
     $col = &colin($col);
     $$scratch_str_ref .=
-      $col . "static $method_type_decl = $cxx_scope\::va::$va_method_name;\n" .
+      $col . "static $method_type_decl = $scope_str\::va::$va_method_name;\n" .
       $col . "va-list-t args;\n" .
       $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
@@ -2701,7 +2696,6 @@ sub linkage_unit::generate_klasses_types_after {
 sub linkage_unit::generate_klasses_klass {
   my ($scope, $col, $klass_path, $klass_name) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
-  my $cxx_klass_name = $klass_name;
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -3751,7 +3745,6 @@ sub dk::generate_kw_args_method_defns {
   my $scratch_str_ref = &global_scratch_str_ref();
   while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
     if ($klass_scope && 0 < keys(%$klass_scope)) { #print STDERR &Dumper($klass_scope);
-      my $cxx_klass_name = $klass_name;
       &path::add_last($stack, $klass_name);
       if (&is_rt_defn()) {
         &dk::generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});

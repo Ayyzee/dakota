@@ -242,8 +242,8 @@ sub rewrite_klass_defn {
 }
 sub rewrite_selsig_replacement {
   my ($aa, $bb) = @_;
-  my $cxx_ident = $$long_suffix{$bb};
-  my $result = "$aa$cxx_ident";
+  my $ident = $$long_suffix{$bb};
+  my $result = "$aa$ident";
   return $result;
 }
 sub rewrite_signatures {
@@ -274,8 +274,8 @@ sub rewrite_selectors {
 }
 sub rewrite_method_names_special_replacement {
   my ($aa, $bb, $cc) = @_;
-  my $cxx_ident = $$long_suffix{$bb};
-  my $result = "$aa$cxx_ident$cc";
+  my $ident = $$long_suffix{$bb};
+  my $result = "$aa$ident$cc";
   return $result;
 }
 sub rewrite_method_names_special {
@@ -392,8 +392,8 @@ sub vars_from_defn {
 }
 sub rewrite_functions_replacement {
   my ($aa, $bb, $cc) = @_;
-  my $cxx_ident = $$long_suffix{$bb};
-  my $result = "$aa$cxx_ident$cc";
+  my $ident = $$long_suffix{$bb};
+  my $result = "$aa$ident$cc";
   return $result;
 }
 sub rewrite_functions {
@@ -687,7 +687,6 @@ sub hash {
   my ($keyword) = @_;
   $keyword =~ s|^\'||;  # strip leading  single-quote
   $keyword =~ s|\'$||;  # strip trailing single-quote
-  my $cxx_ident = &dakota::generate::make_ident_symbol_scalar($keyword);
   return "dk-hash(\"$keyword\")";
 }
 sub rewrite_case_with_string_rhs {
