@@ -6,9 +6,6 @@ MAKEFLAGS :=\
 
 # --no-print-directory\
 
-# rootdir is set before including this file
-srcdir ?= .
-
 prefix ?= /usr/local
 includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
@@ -44,11 +41,11 @@ ifneq ($(CXX_NO_WARNINGS), 0)
 endif
 
 ifdef DKT_PROFILE
-  DAKOTA ?= $(rootdir)/bin/dakota-profile
+  DAKOTA ?= ../bin/dakota-profile # fixfix: should use $(srcdir)/../bin
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= $(rootdir)/bin/dakota #--keep-going
+  DAKOTA ?= ../bin/dakota #--keep-going # fixfix: should use $(srcdir)/../bin
 endif
 
 DAKOTAFLAGS ?=
