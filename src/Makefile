@@ -2,19 +2,27 @@ SHELL := /bin/sh -u
 
 rootdir := ..
 
-$(shell $(rootdir)/bin/dakota-json2mk $(rootdir)/lib/dakota/compiler.pl > compiler.mk)
-include compiler.mk
+%.mk: %.pl
+	$(rootdir)/bin/dakota-json2mk $(json2mk_flags) $< > $@
+
+json2mk_flags :=
+include $(rootdir)/lib/dakota/compiler.mk
+undefine json2mk_flags
 
 export CXX
 export CXXFLAGS
+export EXTRA_CXXFLAGS
 
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-$(shell $(rootdir)/bin/dakota-json2mk --prefix dakota_      $(srcdir)/dakota-project.rep      > dakota-project.mk)
-$(shell $(rootdir)/bin/dakota-json2mk --prefix dakota_util_ $(srcdir)/dakota-util-project.rep > dakota-util-project.mk)
-include dakota-project.mk
-include dakota-util-project.mk
+json2mk_flags = --prefix dakota_
+include $(srcdir)/dakota-project.mk
+undefine json2mk_flags
+
+json2mk_flags = --prefix dakota_util_
+include $(srcdir)/dakota-util-project.mk
+undefine json2mk_flags
 
 INCLUDE_FILES := $(dakota_INCLUDE_FILES)
 
