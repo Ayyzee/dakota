@@ -1,6 +1,6 @@
 SHELL := /bin/sh -u
 
-srcdir := .
+srcdir ?= .
 dstdir := .
 
 json_ext := json
