@@ -42,7 +42,8 @@ sub dk_prefix {
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
-  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.pl" or die "do $gbl_prefix/lib/dakota/compiler.pl failed: $!\n";
+  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
+    or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
 };
 
 use dakota::util;

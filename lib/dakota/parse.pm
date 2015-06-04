@@ -26,7 +26,6 @@ use strict;
 use warnings;
 
 my $gbl_compiler;
-my $gbl_compiler_default;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -42,8 +41,8 @@ sub dk_prefix {
 BEGIN {
   my $prefix = &dk_prefix($0);
   unshift @INC, "$prefix/lib";
-  $gbl_compiler =         do "$prefix/lib/dakota/compiler.pl"           or die "do $prefix/lib/dakota/compiler.pl failed: $!\n";
-  $gbl_compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "do $prefix/lib/dakota/compiler-linux-gcc.pl failed: $!\n";
+  $gbl_compiler = do "$prefix/lib/dakota/compiler.json"
+    or die "do $prefix/lib/dakota/compiler.json failed: $!\n";
 };
 
 use dakota::generate;
@@ -98,8 +97,8 @@ my $ctlg_ext = 'ctlg';
 my $hxx_ext = 'hh';
 my $cxx_ext = 'cc';
 my $dk_ext = 'dk';
-my $O_EXT =  &var($gbl_compiler, 'O_EXT',  $gbl_compiler_default);
-my $SO_EXT = &var($gbl_compiler, 'SO_EXT', $gbl_compiler_default);
+my $O_EXT =  &var($gbl_compiler, 'O_EXT',  undef);
+my $SO_EXT = &var($gbl_compiler, 'SO_EXT', undef);
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();

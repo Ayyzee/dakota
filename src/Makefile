@@ -2,12 +2,12 @@ SHELL := /bin/sh -u
 
 rootdir := ..
 
-%.mk: %.pl
+%.mk: %.json
 	$(rootdir)/bin/dakota-json2mk $(json2mk_flags) $< > $@
 
 json2mk_flags :=
 include $(rootdir)/lib/dakota/compiler.mk
-undefine json2mk_flags
+json2mk_flags := # better to undefine, but darwin default make does not support undefine
 
 export CXX
 export CXXFLAGS
@@ -18,11 +18,11 @@ include $(rootdir)/vars.mk
 
 json2mk_flags = --prefix dakota_
 include $(srcdir)/dakota-project.mk
-undefine json2mk_flags
+json2mk_flags := # better to undefine, but darwin default make does not support undefine
 
 json2mk_flags = --prefix dakota_util_
 include $(srcdir)/dakota-util-project.mk
-undefine json2mk_flags
+json2mk_flags := # better to undefine, but darwin default make does not support undefine
 
 INCLUDE_FILES := $(dakota_INCLUDE_FILES)
 
@@ -46,9 +46,9 @@ HOME_FILES := $(dakota_HOME_FILES)
  uninstall-lib\
  uninstall\
 
-soname =           $(shell $(rootdir)/bin/dakota-project soname       --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
-macros_raw =       $(shell $(rootdir)/bin/dakota-project macros       --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
-include_dirs_raw = $(shell $(rootdir)/bin/dakota-project include-dirs --repository $*-project.rep --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
+soname =           $(shell $(rootdir)/bin/dakota-project soname       --repository $*-project.json --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
+macros_raw =       $(shell $(rootdir)/bin/dakota-project macros       --repository $*-project.json --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
+include_dirs_raw = $(shell $(rootdir)/bin/dakota-project include-dirs --repository $*-project.json --var prefix=$(prefix) --var SO_EXT=$(SO_EXT) --var srcdir=$(srcdir))
 
 # soname needs no transformation
 macros =       $(patsubst %,--define-macro %,$(macros_raw))            # g++/clang++
