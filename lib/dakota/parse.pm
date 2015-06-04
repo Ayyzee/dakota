@@ -92,11 +92,8 @@ our @EXPORT= qw(
               );
 
 my $objdir = 'obj';
-my $rep_ext = 'rep';
-my $ctlg_ext = 'ctlg';
 my $hh_ext = 'hh';
 my $cc_ext = 'cc';
-my $dk_ext = 'dk';
 my $O_EXT =  &var($gbl_compiler, 'O_EXT',  undef);
 my $SO_EXT = &var($gbl_compiler, 'SO_EXT', undef);
 
@@ -424,7 +421,7 @@ sub rep_path_from_any_path {
   die if !defined $SO_EXT;
   $path =~ s/\.$SO_EXT$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.$rep_ext";
+  $path = "$objdir/$canon_path.rep";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -442,7 +439,7 @@ sub rep_path_from_so_path {
   die if !defined $SO_EXT;
   $path =~ s/\.$SO_EXT$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.$rep_ext";
+  $path = "$objdir/$canon_path.rep";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -451,19 +448,19 @@ sub rep_path_from_so_path {
 #    my ($path) = @_;
 #    $path =~ s/\.$SO_EXT$//;
 #    my $canon_path = &rel_path_canon($path, undef);
-#    $path = "$repdir/$canon_path.$ctlg_ext.$rep_ext";
+#    $path = "$repdir/$canon_path.ctlg.rep";
 #    return $path;
 #}
 sub rep_path_from_dk_path {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.$rep_ext";
+  $path = "$objdir/$canon_path.rep";
   $path =~ s|//|/|g;
   return $path;
 }
 sub cc_path_from_dk_path {
   my ($path) = @_;
-  $path =~ s/\.$dk_ext$//;
+  $path =~ s/\.dk$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/nrt/$canon_path.$cc_ext";
   $path =~ s|//|/|g;
@@ -471,7 +468,7 @@ sub cc_path_from_dk_path {
 }
 sub obj_path_from_dk_path {
   my ($path) = @_;
-  $path =~ s/\.$dk_ext$//;
+  $path =~ s/\.dk$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/nrt/$canon_path.$O_EXT";
   $path =~ s|//|/|g;
@@ -488,14 +485,14 @@ sub obj_path_from_cc_path {
 sub rep_path_from_ctlg_path {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.$rep_ext"; # already has leading objdir
+  $path = "$canon_path.rep"; # already has leading objdir
   $path =~ s|//|/|g;
   return $path;
 }
 sub ctlg_path_from_any_path {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.$ctlg_ext";
+  $path = "$objdir/$canon_path.ctlg";
   $path =~ s|//|/|g;
   return $path;
 }

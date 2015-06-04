@@ -70,11 +70,8 @@ our @EXPORT= qw(
               );
 
 my $objdir = 'obj';
-my $rep_ext = 'rep';
-my $ctlg_ext = 'ctlg';
 my $hh_ext = 'hh';
 my $cc_ext = 'cc';
-my $dk_ext = 'dk';
 
 my $k = qr/[\w-]/;
 my ($id,  $mid,  $bid,  $tid,
@@ -311,7 +308,7 @@ sub generate_nrt {
     return "$path/$name.$hh_ext";
   } else {
     my $col; my $stack;
-    my $pre_output = "$path/$name.$dk_ext";
+    my $pre_output = "$path/$name.dk";
     my $output = "$path/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
@@ -324,7 +321,7 @@ sub generate_nrt {
       "\n" .
       "#include \"$name.$hh_ext\"\n" .
       "\n" .
-      "#include \"../$name.$dk_ext.$cc_ext\"\n" . # user-code (converted from dk to cc)
+      "#include \"../$name.dk.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk::generate_cc_footer($file, $stack = [], $col = '');
 
@@ -382,7 +379,7 @@ sub generate_rt {
     &write_to_file_converted_strings("$path/$name.$hh_ext", [ $str_hh ]);
     return "$path/$name.$hh_ext";
   } else {
-    my $pre_output = "$path/$name.$dk_ext";
+    my $pre_output = "$path/$name.dk";
     my $output = "$path/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
@@ -4051,8 +4048,8 @@ sub ann {
 }
 sub dk::generate_dk_cc {
   my ($file_basename, $path_name) = @_;
-  my $filestr = &dakota::util::filestr_from_file("$file_basename.$dk_ext");
-  my $output = "$path_name.$dk_ext.$cc_ext";
+  my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
+  my $output = "$path_name.dk.$cc_ext";
   $output =~ s|^\./||;
   my $directory = $ENV{'DKT_DIR'} ||= '.';
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
@@ -4065,9 +4062,9 @@ sub dk::generate_dk_cc {
   } else {
     if (exists $ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "#line 1 \"$cwd/$file_basename.$dk_ext\"\n", $filestr ]);
+      &write_to_file_converted_strings("$output", [ "#line 1 \"$cwd/$file_basename.dk\"\n", $filestr ]);
     } else {
-      &write_to_file_converted_strings("$output", [ "#line 1 \"$file_basename.$dk_ext\"\n", $filestr ]);
+      &write_to_file_converted_strings("$output", [ "#line 1 \"$file_basename.dk\"\n", $filestr ]);
     }
   }
 }

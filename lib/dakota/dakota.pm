@@ -74,11 +74,8 @@ undef $/;
 $" = '';
 
 my $objdir = 'obj';
-my $rep_ext = 'rep';
-my $ctlg_ext = 'ctlg';
 my $hh_ext = 'hh';
 my $cc_ext = 'cc';
-my $dk_ext = 'dk';
 
 my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
@@ -110,11 +107,11 @@ sub loop_merged_rep_from_dk {
   }
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     my $root;
-    if ($arg =~ m|\.$dk_ext$| ||
-          $arg =~ m|\.$ctlg_ext$|) {
+    if ($arg =~ m|\.dk$| ||
+          $arg =~ m|\.ctlg$|) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
       &_add_last($rep_files, &rep_path_from_dk_path($arg));
-    } elsif ($arg =~ m|\.$rep_ext$|) {
+    } elsif ($arg =~ m|\.rep$|) {
       $root = &scalar_from_file($arg);
       &_add_last($rep_files, $arg);
     } else {
@@ -381,7 +378,7 @@ sub loop_cc_from_dk {
   }
 
   foreach my $input (@{$$cmd_info{'inputs'}}) {
-    if ($input =~ m|\.$rep_ext$|) {
+    if ($input =~ m|\.rep$|) {
       &_add_last($rep, $input);
     } else {
       &_add_last($inputs, $input);
@@ -399,8 +396,8 @@ sub loop_cc_from_dk {
   }
   my $file_basenames = &dk::file_basenames($$cmd_info{'inputs'});
   foreach my $file_basename (@$file_basenames) {
-    my $file = &dk::parse("$file_basename.$dk_ext");
-    #print STDERR "$file_basename.$dk_ext\n";
+    my $file = &dk::parse("$file_basename.dk");
+    #print STDERR "$file_basename.dk\n";
     #print STDERR &Dumper($$file{'klasses'});
     my $directory = '.';
     my ($dk_cc_name, $cc_name);
@@ -413,13 +410,13 @@ sub loop_cc_from_dk {
       if ($$cmd_info{'opts'}{'output'}) {
         $output_cc =    "$$cmd_info{'opts'}{'output'}";
         $output_dk_cc = "$$cmd_info{'opts'}{'output'}";
-        $output_dk_cc =~ s|\.$cc_ext$|\.$dk_ext\.$cc_ext|g;
+        $output_dk_cc =~ s|\.$cc_ext$|\.dk\.$cc_ext|g;
       } else {
         $output_cc =    "$file_basename.$cc_ext";         ###
-        $output_dk_cc = "$file_basename.$dk_ext.$cc_ext"; ###
+        $output_dk_cc = "$file_basename.dk.$cc_ext"; ###
       }
       $output_dk_cc =~ s|/nrt/|/|g;
-      ($dk_cc_name, $dk_cc_path, $dk_cc_ext) = fileparse("$directory/$output_dk_cc", "\.$dk_ext\.$cc_ext");
+      ($dk_cc_name, $dk_cc_path, $dk_cc_ext) = fileparse("$directory/$output_dk_cc", "\.dk\.$cc_ext");
       ($cc_name, $cc_path, $cc_ext1) = fileparse("$directory/$output_cc", "\.$id");
     }
     &dakota::generate::empty_klass_defns();
@@ -539,8 +536,8 @@ sub start {
 sub loop_rep_from_so {
   my ($cmd_info) = @_;
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if ($arg =~ m|\.$dk_ext$| ||
-        $arg =~ m|\.$ctlg_ext$|) {
+    if ($arg =~ m|\.dk$| ||
+        $arg =~ m|\.ctlg$|) {
     } else {
       my $ctlg_path =     &ctlg_path_from_any_path($arg);
       my $ctlg_dir_path = &dakota::parse::ctlg_dir_path_from_so_path($arg);
@@ -564,8 +561,8 @@ sub loop_rep_from_dk {
   my ($cmd_info) = @_;
   my $rep_files = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if ($arg =~ m|\.$dk_ext$| ||
-        $arg =~ m|\.$ctlg_ext$|) {
+    if ($arg =~ m|\.dk$| ||
+        $arg =~ m|\.ctlg$|) {
       my $rep_path = &rep_path_from_dk_path($arg);
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$rep_cmd{'output'} = $rep_path;
@@ -609,8 +606,8 @@ sub loop_obj_from_dk {
   my ($cmd_info) = @_;
   my $outfiles = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if ($arg =~ m|\.$dk_ext$| ||
-          $arg =~ m|\.$ctlg_ext$|) {
+    if ($arg =~ m|\.dk$| ||
+          $arg =~ m|\.ctlg$|) {
       my $obj_path = &obj_path_from_dk_path($arg);
       print "  creating $obj_path\n";
       if (!$want_separate_rep_pass) {
