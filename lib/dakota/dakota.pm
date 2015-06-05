@@ -130,7 +130,7 @@ sub loop_merged_rep_from_dk {
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
     }
   }
-}                               # loop_merged_rep_from_dk
+} # loop_merged_rep_from_dk
 sub add_visibility_file {
   my ($arg) = @_;
   #print STDERR "&add_visibility_file(path=\"$arg\")\n";

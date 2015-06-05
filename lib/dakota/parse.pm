@@ -247,7 +247,7 @@ sub kw_args_translate {
                 my $val = "@$kw_args_default";
                 &dakota::util::_add_last($kw_args_defaults, $val);
               }
-            }                   # if
+            } # if
             my $no_default = @$kw_args_types - @$kw_args_defaults;
             while ($no_default) {
               $no_default--;
