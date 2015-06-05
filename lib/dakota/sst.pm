@@ -27,6 +27,7 @@ use warnings;
 
 sub dk_prefix {
   my ($path) = @_;
+  $path =~ s|^./||;
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {

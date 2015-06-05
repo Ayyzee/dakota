@@ -34,11 +34,11 @@ ifneq ($(CXX_NO_WARNINGS), 0)
 endif
 
 ifdef DKT_PROFILE
-  DAKOTA ?= ../bin/dakota-profile # fixfix: should use $(srcdir)/../bin
+  DAKOTA ?= $(srcdir)/../bin/dakota-profile
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= ../bin/dakota #--keep-going # fixfix: should use $(srcdir)/../bin
+  DAKOTA ?= $(srcdir)/../bin/dakota #--keep-going
 endif
 
 DAKOTAFLAGS ?=
