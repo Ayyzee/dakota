@@ -97,9 +97,9 @@ sub src_path {
   my ($name, $ext) = @_;
   if (exists $ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
-    return "$cwd/obj/$name.$ext";
+    return "$cwd/$objdir/$name.$ext";
   } else {
-    return "obj/$name.$ext";
+    return "$objdir/$name.$ext";
   }
 }
 sub make_ident_symbol_scalar {

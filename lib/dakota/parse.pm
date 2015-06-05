@@ -71,8 +71,8 @@ our @EXPORT= qw(
                  cc_path_from_so_path
                  init_global_rep
                  kw_args_translate
-                 obj_path_from_cc_path
-                 obj_path_from_dk_path
+                 o_path_from_cc_path
+                 o_path_from_dk_path
                  rep_path_from_any_path
                  rep_path_from_ctlg_path
                  rep_path_from_dk_path
@@ -467,7 +467,7 @@ sub cc_path_from_dk_path {
   $path =~ s|//|/|g;
   return $path;
 }
-sub obj_path_from_dk_path {
+sub o_path_from_dk_path {
   my ($path) = @_;
   $path =~ s/\.dk$//;
   my $canon_path = &rel_path_canon($path, undef);
@@ -475,7 +475,7 @@ sub obj_path_from_dk_path {
   $path =~ s|//|/|g;
   return $path;
 }
-sub obj_path_from_cc_path {
+sub o_path_from_cc_path {
   my ($path) = @_;
   $path =~ s/\.$cc_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
@@ -486,7 +486,7 @@ sub obj_path_from_cc_path {
 sub rep_path_from_ctlg_path {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.rep"; # already has leading objdir
+  $path = "$canon_path.rep"; # already has leading $objdir
   $path =~ s|//|/|g;
   return $path;
 }

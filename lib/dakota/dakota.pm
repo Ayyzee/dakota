@@ -495,14 +495,14 @@ sub start {
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline functions)
     if (!$$cmd_info{'opts'}{'compile'}) {
-      &gen_rt_obj($cmd_info);
+      &gen_rt_o($cmd_info);
     }
-    $cmd_info = &loop_obj_from_dk($cmd_info);
+    $cmd_info = &loop_o_from_dk($cmd_info);
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
-    $cmd_info = &loop_obj_from_dk($cmd_info);
+    $cmd_info = &loop_o_from_dk($cmd_info);
     if (!$$cmd_info{'opts'}{'compile'}) {
-      &gen_rt_obj($cmd_info);
+      &gen_rt_o($cmd_info);
     }
   }
 
@@ -513,21 +513,21 @@ sub start {
   if ($$cmd_info{'opts'}{'compile'}) {
     if ($want_separate_precompile_pass) {
       $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
-      &obj_from_cc($cmd_info);
+      &o_from_cc($cmd_info);
     }
   } else {
     $$cmd_info{'opts'}{'compiler-flags'} = " -ldl";
 
     if ($$cmd_info{'opts'}{'shared'}) {
 	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
-	    &so_from_obj($cmd_info);
+	    &so_from_o($cmd_info);
     } elsif ($$cmd_info{'opts'}{'dynamic'}) {
 	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
-	    &dso_from_obj($cmd_info);
+	    &dso_from_o($cmd_info);
     } elsif (!$$cmd_info{'opts'}{'compile'}
                && !$$cmd_info{'opts'}{'shared'}
                && !$$cmd_info{'opts'}{'dynamic'}) {
-	    &exe_from_obj($cmd_info);
+	    &exe_from_o($cmd_info);
     } else {
 	    die __FILE__, ":", __LINE__, ": error:\n";
     }
@@ -587,7 +587,7 @@ sub loop_rep_from_dk {
   }
   return $cmd_info;
 }
-sub gen_rt_obj {
+sub gen_rt_o {
   my ($cmd_info) = @_;
   print "  creating $$cmd_info{'output'}\n";
   $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
@@ -601,16 +601,16 @@ sub gen_rt_obj {
     $flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'output'}\\\"";
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
-  &rt_obj_from_rep($cmd_info);
+  &rt_o_from_rep($cmd_info);
 }
-sub loop_obj_from_dk {
+sub loop_o_from_dk {
   my ($cmd_info) = @_;
   my $outfiles = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
           $arg =~ m|\.ctlg$|) {
-      my $obj_path = &obj_path_from_dk_path($arg);
-      print "  creating $obj_path\n";
+      my $o_path = &o_path_from_dk_path($arg);
+      print "  creating $o_path\n";
       if (!$want_separate_rep_pass) {
         my $rep_path = &rep_path_from_dk_path($arg);
         my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -625,15 +625,15 @@ sub loop_obj_from_dk {
       $$cc_cmd{'output'} = $cc_path;
       $$cc_cmd{'reps'} = $$cmd_info{'reps'};
       &cc_from_dk($cc_cmd);
-      my $obj_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$obj_cmd{'inputs'} = [ $cc_path ];
-      $$obj_cmd{'output'} = $obj_path;
-      delete $$obj_cmd{'opts'}{'output'};
+      my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
+      $$o_cmd{'inputs'} = [ $cc_path ];
+      $$o_cmd{'output'} = $o_path;
+      delete $$o_cmd{'opts'}{'output'};
 	    if ($$cmd_info{'opts'}{'precompile'}) {
-        $$obj_cmd{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
+        $$o_cmd{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
       }
-      &obj_from_cc($obj_cmd);
-      &_add_last($outfiles, $obj_path);
+      &o_from_cc($o_cmd);
+      &_add_last($outfiles, $o_path);
     } else {
       &_add_last($outfiles, $arg);
     }
@@ -652,36 +652,36 @@ sub cc_from_dk {
   my $should_echo;
   &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
-sub obj_from_cc {
+sub o_from_cc {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
-    my $obj_cmd = { 'opts' => $$cmd_info{'opts'} };
-    $$obj_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$obj_cmd{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
-    $$obj_cmd{'cmd-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
-    $$obj_cmd{'output'} = $$cmd_info{'output'};
-    $$obj_cmd{'inputs'} = $$cmd_info{'inputs'};
+    my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
+    $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
+    $$o_cmd{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
+    $$o_cmd{'cmd-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
+    $$o_cmd{'output'} = $$cmd_info{'output'};
+    $$o_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo;
 
     if (0) {
-	    $$obj_cmd{'cmd-flags'} .= " -MMD";
-	    &outfile_from_infiles($obj_cmd, $should_echo = 1);
-	    $$obj_cmd{'cmd-flags'} =~ s/ -MMD//g;
+	    $$o_cmd{'cmd-flags'} .= " -MMD";
+	    &outfile_from_infiles($o_cmd, $should_echo = 1);
+	    $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
     }
-    &outfile_from_infiles($obj_cmd, $should_echo = 1);
+    &outfile_from_infiles($o_cmd, $should_echo = 1);
   }
 }
-sub rt_obj_from_rep {
+sub rt_o_from_rep {
   my ($cmd_info) = @_;
   my $so_path = $$cmd_info{'output'};
   my $rep_path = &rep_path_from_so_path($so_path);
   my $cc_path = &cc_path_from_so_path($so_path);
-  my $obj_path = &obj_path_from_cc_path($cc_path);
+  my $o_path = &o_path_from_cc_path($cc_path);
   &make_dir($cc_path);
   my ($path, $file_basename, $file) = ($cc_path, $cc_path, undef);
   $path =~ s|/[^/]*$||;
-  $file_basename =~ s|^[^/]*/||;          # strip of leading obj/
-  $file_basename =~ s|-rt\.$cc_ext$||;   # strip of leading obj/
+  $file_basename =~ s|^[^/]*/||;       # strip off leading $objdir/
+  $file_basename =~ s|-rt\.$cc_ext$||; # strip off trailing -rt.cc
   if ($$cmd_info{'reps'}) {
     &init_global_rep($$cmd_info{'reps'});
   }
@@ -702,20 +702,20 @@ sub rt_obj_from_rep {
   &dakota::generate::generate_rt_decl($path, $file_basename, $file);
   &dakota::generate::generate_rt_defn($path, $file_basename, $file);
 
-  my $obj_info = {'opts' => {}, 'inputs' => [ $cc_path ], 'output' => $obj_path };
+  my $o_info = {'opts' => {}, 'inputs' => [ $cc_path ], 'output' => $o_path };
   if ($$cmd_info{'opts'}{'precompile'}) {
-    $$obj_info{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
+    $$o_info{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
   }
   if ($$cmd_info{'opts'}{'compiler'}) {
-    $$obj_info{'opts'}{'compiler'} = $$cmd_info{'opts'}{'compiler'};
+    $$o_info{'opts'}{'compiler'} = $$cmd_info{'opts'}{'compiler'};
   }
   if ($$cmd_info{'opts'}{'compiler-flags'}) {
-    $$obj_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
+    $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
-  &obj_from_cc($obj_info);
-  &_add_first($$cmd_info{'inputs'}, $obj_path);
+  &o_from_cc($o_info);
+  &_add_first($$cmd_info{'inputs'}, $o_path);
 }
-sub so_from_obj {
+sub so_from_o {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -728,7 +728,7 @@ sub so_from_obj {
     &outfile_from_infiles($so_cmd, $should_echo = 1);
   }
 }
-sub dso_from_obj {
+sub dso_from_o {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -741,7 +741,7 @@ sub dso_from_obj {
     &outfile_from_infiles($so_cmd, $should_echo = 1);
   }
 }
-sub exe_from_obj {
+sub exe_from_o {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
