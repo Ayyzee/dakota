@@ -79,9 +79,15 @@ strerror-name(int-t errnum)
 }
 #endif
 
-static int-t __initial()
-{
+static void __initial() {
 #include "strerror-name.tbl"
-  return 0;
+  return;
 }
-static int-t _zero_ = __initial();
+static void __final() {
+  return;
+}
+namespace { struct noexport __ddl_t {
+  __ddl_t()  { __initial(); }
+  ~__ddl_t() { __final();   }
+}; }
+static __ddl_t __ddl = __ddl_t();

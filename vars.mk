@@ -6,13 +6,9 @@ MAKEFLAGS :=\
 
 # --no-print-directory\
 
-dk_ext := dk
 hh_ext := hh
 cc_ext := cc
-ctlg_ext := ctlg
 lib_prefix := lib
-pl_ext := pl
-pm_ext := pm
 
 RM := rm
 RMFLAGS := -rf
