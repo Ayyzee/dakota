@@ -13,5 +13,5 @@ images: $(png_files)
 
 clean:
 	rm -rf obj lib bin
-	rm -f exe *.$(SO_EXT) *.png *~
+	rm -f exe *.$(so_ext) *.png *~
 	rm -f $$DK_DEPENDS_OUTPUT_FILE

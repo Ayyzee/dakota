@@ -2,6 +2,6 @@
   'files' => [
     'lib.dk'
   ],
-  'name' => 'lib/lib.$SO_EXT',
+  'name' => 'lib/lib.$so_ext',
   'self-file' => 'project.rep'
 }

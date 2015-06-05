@@ -23,6 +23,6 @@
       '-Wno-padded',
       ],
   'LD_SONAME_FLAGS' => [ '-install_name' ], # unique to darwin
-  'O_EXT' =>  'bc',
-  'SO_EXT' => 'dylib', # unique to darwin
+  'o_ext' =>  'bc',
+  'so_ext' => 'dylib', # unique to darwin
 }

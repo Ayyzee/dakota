@@ -5,7 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'soname' => '$(lib_prefix)dakota.$(SO_EXT)',
+  'soname' => '$(lib_prefix)dakota.$(so_ext)',
   'srcs' => [
     '$(srcdir)/assoc.dk',
     '$(srcdir)/autorelease-pool.dk',
@@ -76,7 +76,7 @@
     '$(srcdir)/trace.dk',
     '$(srcdir)/vector.dk'
   ],
-  'name' => '$(lib_prefix)dakota.$(SO_EXT)',
+  'name' => '$(lib_prefix)dakota.$(so_ext)',
   'libs' => [
   ],
   'include-dirs' => [
@@ -89,7 +89,7 @@
     'MOD_SIZE_CAST_HACK',
   ],
   'LIB_FILES' => [
-    '$(libdir)/$(lib_prefix)dakota.$(SO_EXT)',
+    '$(libdir)/$(lib_prefix)dakota.$(so_ext)',
     '$(libdir)/dakota/dakota.pm',
     '$(libdir)/dakota/parse.pm',
     '$(libdir)/dakota/rewrite.pm',

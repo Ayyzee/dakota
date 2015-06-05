@@ -7,10 +7,10 @@
 bin/%:
 	$(DK) --output $@ $^
 
-%.$(SO_EXT):
+%.$(so_ext):
 	$(DK) --shared --output $@ $^
 
-lib/%.$(SO_EXT):
+lib/%.$(so_ext):
 	$(DK) --shared --output $@ $^
 
 .PHONY: all check fs images clean

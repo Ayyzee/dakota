@@ -16,7 +16,7 @@ $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
 my $obj = 'obj';
-my $SO_EXT = 'dylib';
+my $so_ext = 'dylib';
 my $colorscheme = 'dark26';     # needs to have 5 or more colors
 my $show_headers = 0;
 my $keyword = { 'graph' => 1, 'edge' => 1, 'node' => 1 };
@@ -189,10 +189,10 @@ sub start {
 
   $repository = &path($repository);
   my ($rdir, $name, $ext) = &rdir_name_ext($repository);
-  my $result = `../bin/dakota-project name --repository $repository --var SO_EXT=$SO_EXT`;
+  my $result = `../bin/dakota-project name --repository $repository --var so_ext=$so_ext`;
   chomp $result;
 
-  my $so_files = [split("\n", `../bin/dakota-project libs --repository $repository --var SO_EXT=$SO_EXT`)];
+  my $so_files = [split("\n", `../bin/dakota-project libs --repository $repository --var so_ext=$so_ext`)];
   my $dk_files = [split("\n", `../bin/dakota-project srcs --repository $repository`)];
 
   my $graph = &empty_graph('digraph');

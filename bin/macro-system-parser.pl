@@ -46,7 +46,7 @@ BEGIN {
   $gbl_compiler =         do "$prefix/lib/dakota/compiler.pl"           or die "do $prefix/lib/dakota/compiler.pl failed: $!\n";
   $gbl_compiler_default = do "$prefix/lib/dakota/compiler-linux-gcc.pl" or die "do $prefix/lib/dakota/compiler-linux-gcc.pl failed: $!\n";
 };
-my $SO_EXT = &dakota::parse::var($gbl_compiler, 'SO_EXT', $gbl_compiler_default);
+my $so_ext = &dakota::parse::var($gbl_compiler, 'so_ext', $gbl_compiler_default);
 
 use dakota::parse;
 use dakota::util;

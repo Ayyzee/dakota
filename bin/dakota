@@ -59,7 +59,7 @@ my $sysname = lc(`uname -s`);
 chop $sysname;
 
 my $CXX;
-my $SO_EXT;
+my $so_ext;
 
 if (defined $ENV{'CXX'}) {
   $CXX = $ENV{'CXX'};
@@ -67,16 +67,16 @@ if (defined $ENV{'CXX'}) {
   $CXX = 'g++'; #  default
 }
 
-if (defined $ENV{'SO_EXT'}) {
-  $SO_EXT = $ENV{'SO_EXT'};
+if (defined $ENV{'so_ext'}) {
+  $so_ext = $ENV{'so_ext'};
 } elsif ('darwin' eq $sysname) {
-  $SO_EXT = 'dylib'; # darwin default
+  $so_ext = 'dylib'; # darwin default
 } else {
-  $SO_EXT = 'so'; # non-darwin default
+  $so_ext = 'so'; # non-darwin default
 }
 
-#if (!exists $ENV{'SO_EXT'}) {
-  $ENV{'SO_EXT'} = $SO_EXT;
+#if (!exists $ENV{'so_ext'}) {
+  $ENV{'so_ext'} = $so_ext;
 #}
 
 #if (!exists $ENV{'CXX'}) {
@@ -132,7 +132,7 @@ if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
 }
 
 if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
-  my $libdakota = "$gbl_prefix/lib/libdakota.$ENV{'SO_EXT'}";
+  my $libdakota = "$gbl_prefix/lib/libdakota.$ENV{'so_ext'}";
   if ($$root_cmd{'opts'}{'output'} ne $libdakota) {
     &_add_last($$root_cmd{'inputs'}, $libdakota);
   }

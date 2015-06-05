@@ -3,11 +3,11 @@ include $(rootdir)/vars.mk
 
 all:
 	make --directory ../.. all install
-	DK_NO_LINE= dakota --shared --output lib-1.$(SO_EXT) lib-1.dk
+	DK_NO_LINE= dakota --shared --output lib-1.$(so_ext) lib-1.dk
 
 check:
-	dakota-introspector lib-1.$(SO_EXT)
+	dakota-introspector lib-1.$(so_ext)
 
 clean:
 	rm -rf obj
-	rm -f lib-1.$(SO_EXT) *~
+	rm -f lib-1.$(so_ext) *~

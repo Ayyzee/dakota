@@ -3,6 +3,6 @@
     'foo-1.dk',
     'foo-2.dk'
   ],
-  'name' => 'foo.$SO_EXT',
+  'name' => 'foo.$so_ext',
   'self-file' => 'project.rep'
 }

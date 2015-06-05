@@ -28,6 +28,6 @@
       '--warn-unused',
       ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
-  'O_EXT' =>  'o',
-  'SO_EXT' => 'so',
+  'o_ext' =>  'o',
+  'so_ext' => 'so',
 }

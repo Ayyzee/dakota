@@ -55,7 +55,7 @@ HOME_FILES := $(dakota_HOME_FILES)
  uninstall-lib\
  uninstall\
 
-soname =           $(shell $(srcdir)/../bin/dakota-project soname       --repository $*-project.json --var libdir=$(libdir) --var lib_prefix=$(lib_prefix) --var SO_EXT=$(SO_EXT))
+soname =           $(shell $(srcdir)/../bin/dakota-project soname       --repository $*-project.json --var libdir=$(libdir) --var lib_prefix=$(lib_prefix) --var so_ext=$(so_ext))
 macros_raw =       $(shell $(srcdir)/../bin/dakota-project macros       --repository $*-project.json)
 include_dirs_raw = $(shell $(srcdir)/../bin/dakota-project include-dirs --repository $*-project.json --var srcdir=$(srcdir))
 
@@ -65,11 +65,11 @@ include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw)) # g++/cla
 
 # the use of $^ should be $?
 
-$(dstdir)/../lib/$(lib_prefix)%.$(SO_EXT):
-	$(DAKOTA) --shared   $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+$(dstdir)/../lib/$(lib_prefix)%.$(so_ext):
+	$(DAKOTA) --shared   $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
 
-$(dstdir)/../lib/%.$(SO_EXT):
-	$(DAKOTA) --dynamic  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(SO_EXT)
+$(dstdir)/../lib/%.$(so_ext):
+	$(DAKOTA) --dynamic  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
 
 $(dstdir)/../bin/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
@@ -81,7 +81,7 @@ $(dstdir)/%:        $(srcdir)/%-main.dk
 $(includedir)/%.$(hh_ext): $(srcdir)/../include/%.$(hh_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0644 $< $(@D)
 
-$(libdir)/$(lib_prefix)%.$(SO_EXT): $(dstdir)/../lib/$(lib_prefix)%.$(SO_EXT)
+$(libdir)/$(lib_prefix)%.$(so_ext): $(dstdir)/../lib/$(lib_prefix)%.$(so_ext)
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
 $(libdir)/dakota/%.pm: $(srcdir)/../lib/dakota/%.pm
@@ -113,7 +113,7 @@ dakota-util: $(dstdir)/../lib/$(dakota_util_name)
 
 $(dstdir)/../bin/dakota-info: $(srcdir)/dakota-info-main.$(cc_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(SO_EXT)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(so_ext)
 
 $(dstdir)/../lib/$(dakota_name): $(dakota_srcs)
 

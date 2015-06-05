@@ -1,14 +1,14 @@
 {
-  'soname' => '$prefix/lib/libresult.$SO_EXT',
+  'soname' => '$prefix/lib/libresult.$so_ext',
   'srcs' => [
     'object.dk',
     'klass.dk',
     'table.dk',
     'set.dk'
   ],
-  'name' => 'lib/libresult.$SO_EXT',
+  'name' => 'lib/libresult.$so_ext',
   'libs' => [
-    '/usr/lib/libthis.$SO_EXT',
-    '/usr/lib/libthat.$SO_EXT'
+    '/usr/lib/libthis.$so_ext',
+    '/usr/lib/libthat.$so_ext'
   ]
 }

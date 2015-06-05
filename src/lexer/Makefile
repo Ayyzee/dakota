@@ -1,7 +1,7 @@
 include ../../config.mk
 
 bin/%: %.dk
-	dakota --directory . --output $@ $^ /usr/local/lib/libdakota-util.$(SO_EXT)
+	dakota --directory . --output $@ $^ /usr/local/lib/libdakota-util.$(so_ext)
 
 all: bin/exe
 

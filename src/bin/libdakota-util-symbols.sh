@@ -1,12 +1,12 @@
 #!/bin/sh -u
 
-SO_EXT=${DK_SO_EXT:-so}
+so_ext=${dk_so_ext:-so}
 
-if [ $SO_EXT = "dylib" ] ; then
+if [ $so_ext = "dylib" ] ; then
     # darwin
     opts="-g"
-    nm $opts ../lib/libdakota-util.$SO_EXT | c++filt | grep -v " U " | grep -v \.eh | grep -v "typeinfo " | sort -k 3
+    nm $opts ../lib/libdakota-util.$so_ext | c++filt | grep -v " U " | grep -v \.eh | grep -v "typeinfo " | sort -k 3
 else
     opts="--extern-only --demangle --line-numbers --defined-only"
-    nm $opts ../lib/libdakota-util.$SO_EXT | grep -v " _rest" | grep -v " _save" | grep -v "typeinfo "
+    nm $opts ../lib/libdakota-util.$so_ext | grep -v " _rest" | grep -v " _save" | grep -v "typeinfo "
 fi

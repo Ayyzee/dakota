@@ -571,7 +571,7 @@ sub loop_rep_from_dk {
       &rep_from_dk($rep_cmd);
       &ordered_set_add($rep_files, $rep_path, __FILE__, __LINE__);
     }
-    #if ($arg =~ m|((.*?)\.($SO_EXT))$|)
+    #if ($arg =~ m|((.*?)\.($so_ext))$|)
     #{
     #    my $rep_path = &ctlg_rep_path_from_so_path($arg);
     #    &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);

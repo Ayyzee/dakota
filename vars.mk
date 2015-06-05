@@ -21,7 +21,7 @@ INSTALLFLAGS :=
 OWNER := root
 GROUP := wheel
 
-SO_EXT ?= so
+so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
 CXX_NO_WARNINGS ?= 0
 

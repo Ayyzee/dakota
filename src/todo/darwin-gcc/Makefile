@@ -14,4 +14,4 @@ all:
 	@echo $(MAKEFLAGS)
 	@echo $(cxx_shared_flags)
 	@echo $(cxx_dynamic_flags)
-	@echo $(SO_EXT)
+	@echo $(so_ext)

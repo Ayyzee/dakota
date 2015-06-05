@@ -1,12 +1,12 @@
 include ../../../config.mk
 
-%.$(SO_EXT): %.dk
+%.$(so_ext): %.dk
 	dakota --shared --output $@ $^
 
-all: lib.$(SO_EXT)
+all: lib.$(so_ext)
 
 check:
-	otool -L lib.$(SO_EXT)
+	otool -L lib.$(so_ext)
 
 clean:
-	rm -rf lib.$(SO_EXT) obj *~
+	rm -rf lib.$(so_ext) obj *~

@@ -95,8 +95,8 @@ our @EXPORT= qw(
 my $objdir = 'obj';
 my $hh_ext = 'hh';
 my $cc_ext = 'cc';
-my $O_EXT =  &var($gbl_compiler, 'O_EXT',  undef);
-my $SO_EXT = &var($gbl_compiler, 'SO_EXT', undef);
+my $o_ext =  &var($gbl_compiler, 'o_ext',  undef);
+my $so_ext = &var($gbl_compiler, 'so_ext', undef);
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -419,8 +419,8 @@ sub rel_path_canon { # should merge with canon_path()
 }
 sub rep_path_from_any_path {
   my ($path) = @_;
-  die if !defined $SO_EXT;
-  $path =~ s/\.$SO_EXT$//;
+  die if !defined $so_ext;
+  $path =~ s/\.$so_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/$canon_path.rep";
   $path =~ s|//|/|g;
@@ -428,8 +428,8 @@ sub rep_path_from_any_path {
 }
 sub cc_path_from_so_path {
   my ($path) = @_;
-  die if !defined $SO_EXT;
-  $path =~ s/\.$SO_EXT$//;
+  die if !defined $so_ext;
+  $path =~ s/\.$so_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/rt/$canon_path.$cc_ext";
   $path =~ s|//|/|g;
@@ -437,8 +437,8 @@ sub cc_path_from_so_path {
 }
 sub rep_path_from_so_path {
   my ($path) = @_;
-  die if !defined $SO_EXT;
-  $path =~ s/\.$SO_EXT$//;
+  die if !defined $so_ext;
+  $path =~ s/\.$so_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/$canon_path.rep";
   $path =~ s|//|/|g;
@@ -447,7 +447,7 @@ sub rep_path_from_so_path {
 #sub ctlg_rep_path_from_so_path
 #{
 #    my ($path) = @_;
-#    $path =~ s/\.$SO_EXT$//;
+#    $path =~ s/\.$so_ext$//;
 #    my $canon_path = &rel_path_canon($path, undef);
 #    $path = "$repdir/$canon_path.ctlg.rep";
 #    return $path;
@@ -471,7 +471,7 @@ sub obj_path_from_dk_path {
   my ($path) = @_;
   $path =~ s/\.dk$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$O_EXT";
+  $path = "$objdir/nrt/$canon_path.$o_ext";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -479,7 +479,7 @@ sub obj_path_from_cc_path {
   my ($path) = @_;
   $path =~ s/\.$cc_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.$O_EXT";
+  $path = "$canon_path.$o_ext";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -499,8 +499,8 @@ sub ctlg_path_from_any_path {
 }
 sub ctlg_dir_path_from_so_path {
   my ($path) = @_;
-  die if !defined $SO_EXT;
-  $path =~ s/\.$SO_EXT$//;
+  die if !defined $so_ext;
+  $path =~ s/\.$so_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/$canon_path";
   $path =~ s|//|/|g;
