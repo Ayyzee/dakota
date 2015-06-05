@@ -24,10 +24,10 @@ export EXTRA_DAKOTAFLAGS
 
 export EXTRA_LDFLAGS
 
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_      --output $(dstdir)/dakota-project.mk      $(srcdir)/dakota-project.json)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_      --output $(dstdir)/dakota-project.mk      $(srcdir)/dakota-project.rep)
 include $(dstdir)/dakota-project.mk
 
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_util_ --output $(dstdir)/dakota-util-project.mk $(srcdir)/dakota-util-project.json)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_util_ --output $(dstdir)/dakota-util-project.mk $(srcdir)/dakota-util-project.rep)
 include $(dstdir)/dakota-util-project.mk
 
 INCLUDE_FILES := $(dakota_INCLUDE_FILES)
@@ -55,9 +55,9 @@ HOME_FILES := $(dakota_HOME_FILES)
  uninstall-lib\
  uninstall\
 
-soname =           $(shell $(srcdir)/../bin/dakota-project soname       --repository $*-project.json --var libdir=$(libdir) --var lib_prefix=$(lib_prefix) --var so_ext=$(so_ext))
-macros_raw =       $(shell $(srcdir)/../bin/dakota-project macros       --repository $*-project.json)
-include_dirs_raw = $(shell $(srcdir)/../bin/dakota-project include-dirs --repository $*-project.json --var srcdir=$(srcdir))
+soname =           $(shell $(srcdir)/../bin/dakota-project soname       --repository $*-project.rep --var libdir=$(libdir) --var lib_prefix=$(lib_prefix) --var so_ext=$(so_ext))
+macros_raw =       $(shell $(srcdir)/../bin/dakota-project macros       --repository $*-project.rep)
+include_dirs_raw = $(shell $(srcdir)/../bin/dakota-project include-dirs --repository $*-project.rep --var srcdir=$(srcdir))
 
 # soname needs no transformation
 macros =       $(patsubst %,--define-macro %,$(macros_raw))            # g++/clang++
