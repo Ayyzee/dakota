@@ -38,20 +38,23 @@ ifdef DKT_PROFILE
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= $(srcdir)/../bin/dakota #--keep-going
+  DAKOTA ?= $(srcdir)/../bin/dakota
+  # --keep-going
 endif
 
-DAKOTAFLAGS ?=
+DAKOTAFLAGS :=
 EXTRA_DAKOTAFLAGS :=
 
 # cast(some-type-t){...}
 ifdef DKT_ALLOW_COMPOUND_LITERALS
-  EXTRA_CXXFLAGS += $(CXX_ALLOW_COMPOUND_LITERALS_FLAGS) # too broad
+  # too broad
+  EXTRA_CXXFLAGS += $(CXX_ALLOW_COMPOUND_LITERALS_FLAGS)
 endif
 
 # { .x = 0, .y = 0 }
 ifdef DKT_ALLOW_DESIGNATED_INITIALIZERS
-  EXTRA_CXXFLAGS += $(CXX_ALLOW_DESIGNATED_INITIALIZERS_FLAGS) # too broad
+  # too broad
+  EXTRA_CXXFLAGS += $(CXX_ALLOW_DESIGNATED_INITIALIZERS_FLAGS)
 endif
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT

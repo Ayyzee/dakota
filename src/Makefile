@@ -60,16 +60,16 @@ macros_raw =       $(shell $(srcdir)/../bin/dakota-project macros       --reposi
 include_dirs_raw = $(shell $(srcdir)/../bin/dakota-project include-dirs --repository $*-project.rep --var srcdir=$(srcdir))
 
 # soname needs no transformation
-macros =       $(patsubst %,--define-macro %,$(macros_raw))            # g++/clang++
-include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw)) # g++/clang++
+macros =       $(patsubst %,--define-macro %,$(macros_raw))
+include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw))
 
 # the use of $^ should be $?
 
 $(dstdir)/../lib/$(lib_prefix)%.$(so_ext):
-	$(DAKOTA) --shared   $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
 
 $(dstdir)/../lib/%.$(so_ext):
-	$(DAKOTA) --dynamic  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
+	$(DAKOTA) --dynamic $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
 
 $(dstdir)/../bin/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
@@ -93,10 +93,12 @@ $(libdir)/dakota/%.pl: $(srcdir)/../lib/dakota/%.pl
 $(libdir)/dakota/%.json: $(srcdir)/../lib/dakota/%.json
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(bindir)/%: $(srcdir)/../bin/% # some bin/* are supplied (so they will be in srcdir)
+# some bin/* are supplied (so they will be in srcdir)
+$(bindir)/%: $(srcdir)/../bin/%
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
-$(bindir)/%: $(dstdir)/../bin/% # some bin/* are generated (so they will be in dstdir)
+# some bin/* are generated (so they will be in dstdir)
+$(bindir)/%: $(dstdir)/../bin/%
 	sudo $(INSTALL) $(INSTALLFLAGS) -m 0755 $< $(@D)
 
 $(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
@@ -130,7 +132,7 @@ check: all
 
 $(dstdir)/tst: $(srcdir)/tst-main.dk $(dstdir)/../lib/$(dakota_util_name)
 
-$(dstdir)/min: $(srcdir)/min-main.dk # $(dstdir)/../lib/$(dakota_name) is implied
+$(dstdir)/min: $(srcdir)/min-main.dk
 
 $(dstdir)/dummy: $(srcdir)/dummy-main.$(cc_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
