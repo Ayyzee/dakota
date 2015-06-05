@@ -24,6 +24,9 @@ export EXTRA_DAKOTAFLAGS
 
 export EXTRA_LDFLAGS
 
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_info_ --output $(dstdir)/dakota-info-project.mk $(srcdir)/dakota-info-project.rep)
+include $(dstdir)/dakota-info-project.mk
+
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota_      --output $(dstdir)/dakota-project.mk      $(srcdir)/dakota-project.rep)
 include $(dstdir)/dakota-project.mk
 
@@ -32,7 +35,7 @@ include $(dstdir)/dakota-util-project.mk
 
 INCLUDE_FILES := $(dakota_INCLUDE_FILES)
 
-BIN_FILES := $(dakota_BIN_FILES)
+BIN_FILES := $(dakota_info_BIN_FILES) $(dakota_BIN_FILES)
 
 LIB_FILES := $(dakota_LIB_FILES) $(dakota_util_LIB_FILES)
 
@@ -58,18 +61,20 @@ HOME_FILES := $(dakota_HOME_FILES)
 soname =           $(shell $(srcdir)/../bin/dakota-project soname       --repository $*-project.rep --var libdir=$(libdir) --var lib_prefix=$(lib_prefix) --var so_ext=$(so_ext))
 macros_raw =       $(shell $(srcdir)/../bin/dakota-project macros       --repository $*-project.rep)
 include_dirs_raw = $(shell $(srcdir)/../bin/dakota-project include-dirs --repository $*-project.rep --var srcdir=$(srcdir))
+libs =             $(shell $(srcdir)/../bin/dakota-project libs         --repository $*-project.rep --var so_ext=$(so_ext))
 
 # soname needs no transformation
 macros =       $(patsubst %,--define-macro %,$(macros_raw))
 include_dirs = $(patsubst %,--include-directory %,$(include_dirs_raw))
+# libs needs no transformation
 
 # the use of $^ should be $?
 
 $(dstdir)/../lib/$(lib_prefix)%.$(so_ext):
-	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ $(libs)
 
 $(dstdir)/../lib/%.$(so_ext):
-	$(DAKOTA) --dynamic $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ /usr/lib/libdl.$(so_ext)
+	$(DAKOTA) --dynamic $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --soname $(soname) --output $@ $^ $(libs)
 
 $(dstdir)/../bin/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --var MAKEFLAGS="$(MAKEFLAGS)" --output $@ $^
@@ -110,19 +115,19 @@ all:
 	$(MAKE) $(MFLAGS) dakota-util
 
 dakota-info: $(dstdir)/../bin/dakota-info
-dakota:      $(dstdir)/../lib/$(dakota_name)
-dakota-util: $(dstdir)/../lib/$(dakota_util_name)
+dakota:      $(dstdir)/../lib/$(lib_prefix)dakota.$(so_ext)
+dakota-util: $(dstdir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
 
 $(dstdir)/../bin/dakota-info: $(srcdir)/dakota-info-main.$(cc_ext)
 	@$(MKDIR) $(MKDIRFLAGS) $(@D)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ /usr/lib/libdl.$(so_ext)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^ $(dakota_info_libs)
 
-$(dstdir)/../lib/$(dakota_name): $(dakota_srcs)
+$(dstdir)/../lib/$(lib_prefix)dakota.$(so_ext): $(dakota_srcs)
 
-$(dstdir)/../lib/$(dakota_util_name): $(dakota_util_srcs)
+$(dstdir)/../lib/$(lib_prefix)dakota-util.$(so_ext): $(dakota_util_srcs)
 
 check: all
-	$(dstdir)/../bin/dakota-info $(dstdir)/../lib/$(dakota_name) $(dstdir)/../lib/$(dakota_util_name)
+	$(dstdir)/../bin/dakota-info $(dstdir)/../lib/$(lib_prefix)dakota.$(so_ext) $(dstdir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
 	$(MAKE) $(dstdir)/tst
 	$(dstdir)/tst
 	$(MAKE) $(dstdir)/min
@@ -130,7 +135,7 @@ check: all
 	$(MAKE) $(dstdir)/dummy
 	$(dstdir)/dummy
 
-$(dstdir)/tst: $(srcdir)/tst-main.dk $(dstdir)/../lib/$(dakota_util_name)
+$(dstdir)/tst: $(srcdir)/tst-main.dk $(dstdir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
 
 $(dstdir)/min: $(srcdir)/min-main.dk
 
@@ -191,14 +196,14 @@ $(dstdir)/strerror-name.tbl: $(srcdir)/gen-strerror-name.sh
 
 clean: clean-rt
 	$(RM) $(RMFLAGS) $(dstdir)/obj $(dstdir)/tst $(dstdir)/dummy $(dstdir)/min $(dstdir)/empty-klass-x
-	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(dakota_name).ctlg
-	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(dakota_util_name).ctlg
+	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(lib_prefix)dakota.$(so_ext).ctlg
+	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(lib_prefix)dakota-util.$(so_ext).ctlg
 	$(RM) $(RMFLAGS) $(dstdir)/../bin/dakota-info
 	$(RM) $(RMFLAGS) $(dstdir)/../bin/dakota-info.dSYM
 	$(RM) $(RMFLAGS) $(dstdir)/../lib/dakota/compiler.mk $(dstdir)/../lib/dakota/compiler-{darwin,linux}-{clang,gcc}.mk
-	$(RM) $(RMFLAGS) $(dstdir)/dakota-project.mk $(srcdir)/dakota-util-project.mk
+	$(RM) $(RMFLAGS) $(srcdir)/dakota-info-project.mk $(dstdir)/dakota-project.mk $(srcdir)/dakota-util-project.mk
 clean-util-rt:
-	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(dakota_util_name)
+	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
 
 clean-rt: clean-util-rt
-	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(dakota_name)
+	$(RM) $(RMFLAGS) $(dstdir)/../lib/$(lib_prefix)dakota.$(so_ext)

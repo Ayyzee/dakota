@@ -78,6 +78,7 @@
   ],
   'name' => '$(lib_prefix)dakota.$(so_ext)',
   'libs' => [
+    '/usr/lib/libdl.$(so_ext)',
   ],
   'include-dirs' => [
     '$(srcdir)',
@@ -108,7 +109,6 @@
     '$(includedir)/dakota.hh',
   ],
   'BIN_FILES' => [
-    '$(bindir)/dakota-info',
     '$(bindir)/dakota',
     '$(bindir)/dakota-fixup-stderr.pl',
     '$(bindir)/dakota-project',
