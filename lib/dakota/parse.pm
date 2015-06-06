@@ -175,7 +175,7 @@ sub var {
   } else {
     $result = $default_rhs;
   }
-  die if !defined $result;
+  die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace
   die if 'HASH' eq ref($result);
 
   if ('ARRAY' eq ref($result)) {
