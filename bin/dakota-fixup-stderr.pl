@@ -11,9 +11,9 @@ use warnings;
 use File::Spec;
 use Cwd;
 
-my $name_re = qr{[\w.=+-]+};
+my $name_re =    qr{[\w.=+-]+};
 my $rel_dir_re = qr{$name_re/+};
-my $path_re = qr{/*$rel_dir_re*?$name_re/*};
+my $path_re =    qr{/*$rel_dir_re*?$name_re/*};
 
 sub canon {
   my ($path) = @_;
@@ -21,7 +21,6 @@ sub canon {
   $path =~ s|[^/]+/+\.\./+||g;
   return $path;
 }
-
 sub fixup {
   my ($initial_workdir, $file, $line_num) = @_;
   if (! -e "$initial_workdir/$file") {
@@ -41,14 +40,20 @@ sub fixup {
   }
   return "$file" . ":$line_num:";
 }
+sub start {
+  my ($argv) = @_;
+  my $initial_workdir = $$argv[0] ||= undef;
 
-my $initial_workdir = $ARGV[0] ||= undef;
+  while (<STDIN>) {
+    my $line = $_;
+    $line =~ s|^\s*[Ii]n file included from.+?:\d+:\s*$||;
 
-while (<STDIN>) {
-  my $line = $_;
-  $line =~ s|^\s*[Ii]n file included from.+?:\d+:\s*$||;
-  if ($initial_workdir) {
-    $line =~ s|($path_re):(\d+):|&fixup($initial_workdir, $1, $2)|eg;
+    if ($initial_workdir) {
+      $line =~ s|($path_re):(\d+):|&fixup($initial_workdir, $1, $2)|eg;
+    }
+    print $line;
   }
-  print $line;
+}
+unless (caller) {
+  &start(\@ARGV);
 }

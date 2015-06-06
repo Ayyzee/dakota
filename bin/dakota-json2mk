@@ -9,26 +9,23 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
+$Getopt::Long::ignorecase = 0;
+
 use Data::Dumper;
-$Data::Dumper::Terse = 1;
-$Data::Dumper::Useqq = 1;
+$Data::Dumper::Terse =    1;
+$Data::Dumper::Useqq =    1;
 $Data::Dumper::Sortkeys = 1;
 
-unless (caller) {
-  use Getopt::Long;
-  $Getopt::Long::ignorecase = 0;
+sub start {
+  my ($argv) = @_;
+  my $result = '';
 
   my $opts = {};
   &GetOptions($opts,
-              'prefix=s',
               'output=s',
+              'prefix=s',
             );
-  &main(\@ARGV, $opts);
-}
-sub main {
-  my ($argv, $opts) = @_;
-  my $result = '';
-
   foreach my $file (@$argv) {
     my $data = do $file or die;
     $result .= "# $file\n";
@@ -36,8 +33,15 @@ sub main {
     $result .= &process($last_char, $data, $opts);
     #$result .= $last_char = "\n" if ("\n" ne $last_char);
   }
-  open(my $fh, ">", $$opts{'output'})
-    or die "cannot open > $$opts{'output'}: $!";
+  my $fh;
+
+  if ($$opts{'output'}) {
+    open($fh, ">", $$opts{'output'})
+      or die "cannot open > $$opts{'output'}: $!";
+  } else {
+    open($fh, '>&', \*STDOUT)
+      or die "cannot open >& STDOUT: $!";
+  }
   print $fh $result;
   close($fh);
 }
@@ -116,4 +120,7 @@ sub process_scalar {
   $result .= $last_char = ' ' if (' ' ne $last_char);
   $result .= $data;
   return $result;
+}
+unless (caller) {
+  &start(\@ARGV);
 }
