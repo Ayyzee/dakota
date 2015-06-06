@@ -704,7 +704,8 @@ sub rule_match_and_replace {
   return $change_count;
 }
 
-unless (caller) {
+sub main {
+  my ($argv) = @_;
   my $user_data = &dakota::sst::lang_user_data();
 
   my $macros;
@@ -728,7 +729,7 @@ unless (caller) {
   my $num_macros = scalar keys %$macros;
   my $num_tokens = 0;
 
-  foreach my $file (@ARGV) {
+  foreach my $file (@$argv) {
     my $filestr = &dakota::util::filestr_from_file($file);
 
     if ($ENV{'DK_MACROS_SINGLE_LINE'}) {
@@ -784,5 +785,7 @@ unless (caller) {
   print "num-macros * num-tokens=" . $num_macros * $num_tokens . "\n";
   print "match-count=$gbl_match_count\n";
 };
-
+unless (caller) {
+  &main(\@ARGV);
+}
 1;

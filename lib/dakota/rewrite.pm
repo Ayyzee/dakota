@@ -977,16 +977,18 @@ sub dakota_lang_user_data_old {
   my $user_data = { 'kw-args-generics' => $kw_args_generics };
   return $user_data;
 }
-
-unless (caller) {
+sub main {
+  my ($argv) = @_;
   my $user_data = &dakota_lang_user_data_old();
 
-  foreach my $arg (@ARGV) {
+  foreach my $arg (@$argv) {
     my $filestr = &dakota::filestr_from_file($arg);
 
     &convert_dk_to_cc(\$filestr, $$user_data{'kw-args-generics'});
     print $filestr;
   }
 }
-
+unless (caller) {
+  &main(\@ARGV);
+}
 1;

@@ -921,4 +921,11 @@ sub ordered_set_add {
   }
   &_add_last($ordered_set, $element);
 }
+sub main {
+  my ($argv) = @_;
+  # just in case ...
+}
+unless (caller) {
+  &main(\@ARGV);
+}
 1;

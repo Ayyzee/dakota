@@ -4069,13 +4069,15 @@ sub dk::generate_dk_cc {
     }
   }
 }
-
-unless (caller) {
-  foreach my $in_path (@ARGV) {
+sub main {
+  my ($argv) = @_;
+  foreach my $in_path (@$argv) {
     my $filestr = &dakota::util::filestr_from_file($in_path);
     my $path;
     &write_to_file_converted_strings($path = undef, [ $filestr ]);
   }
 }
-
+unless (caller) {
+  &main(\@ARGV);
+}
 1;

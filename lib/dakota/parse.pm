@@ -2182,5 +2182,11 @@ sub rep_tree_from_dk_path {
   #print STDERR &Dumper($result);
   return $result;
 }
-
+sub main {
+  my ($argv) = @_;
+  # just in case ...
+}
+unless (caller) {
+  &main(\@ARGV);
+}
 1;
