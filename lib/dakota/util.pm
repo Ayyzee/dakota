@@ -193,11 +193,11 @@ sub filestr_from_file {
   close FILE;
   return $filestr;
 }
-sub main {
+sub start {
   my ($argv) = @_;
   # just in case ...
 }
 unless (caller) {
-  &main(\@ARGV);
+  &start(\@ARGV);
 }
 1;

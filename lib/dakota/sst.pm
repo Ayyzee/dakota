@@ -947,11 +947,11 @@ sub lang_user_data {
   $__gbl_user_data = $user_data;
   return $user_data;
 }
-sub main {
+sub start {
   my ($argv) = @_;
   # just in case ...
 }
 unless (caller) {
-  &main(\@ARGV);
+  &start(\@ARGV);
 }
 1;

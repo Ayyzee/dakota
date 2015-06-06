@@ -2182,11 +2182,11 @@ sub rep_tree_from_dk_path {
   #print STDERR &Dumper($result);
   return $result;
 }
-sub main {
+sub start {
   my ($argv) = @_;
   # just in case ...
 }
 unless (caller) {
-  &main(\@ARGV);
+  &start(\@ARGV);
 }
 1;

@@ -4069,7 +4069,7 @@ sub dk::generate_dk_cc {
     }
   }
 }
-sub main {
+sub start {
   my ($argv) = @_;
   foreach my $in_path (@$argv) {
     my $filestr = &dakota::util::filestr_from_file($in_path);
@@ -4078,6 +4078,6 @@ sub main {
   }
 }
 unless (caller) {
-  &main(\@ARGV);
+  &start(\@ARGV);
 }
 1;

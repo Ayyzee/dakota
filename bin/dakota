@@ -157,5 +157,5 @@ if ($$root_cmd{'opts'}{'directory'} &&
   chdir $$root_cmd{'opts'}{'directory'};
   $ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
 }
-my $result = &dakota::dakota::start($root_cmd);
+my $result = &dakota::dakota::start_cmd($root_cmd);
 exit $result;

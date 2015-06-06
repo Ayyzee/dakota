@@ -977,7 +977,7 @@ sub dakota_lang_user_data_old {
   my $user_data = { 'kw-args-generics' => $kw_args_generics };
   return $user_data;
 }
-sub main {
+sub start {
   my ($argv) = @_;
   my $user_data = &dakota_lang_user_data_old();
 
@@ -989,6 +989,6 @@ sub main {
   }
 }
 unless (caller) {
-  &main(\@ARGV);
+  &start(\@ARGV);
 }
 1;

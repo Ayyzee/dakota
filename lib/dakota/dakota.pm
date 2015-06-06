@@ -440,7 +440,7 @@ sub loop_cc_from_dk {
 } # loop_cc_from_dk
 
 my $root_cmd;
-sub start {
+sub start_cmd {
   my ($cmd_info) = @_;
   #print STDERR &Dumper($cmd_info);
   $root_cmd = $cmd_info;
@@ -921,11 +921,11 @@ sub ordered_set_add {
   }
   &_add_last($ordered_set, $element);
 }
-sub main {
+sub start {
   my ($argv) = @_;
   # just in case ...
 }
 unless (caller) {
-  &main(\@ARGV);
+  &start(\@ARGV);
 }
 1;

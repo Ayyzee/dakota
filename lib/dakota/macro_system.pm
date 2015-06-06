@@ -704,7 +704,7 @@ sub rule_match_and_replace {
   return $change_count;
 }
 
-sub main {
+sub start {
   my ($argv) = @_;
   my $user_data = &dakota::sst::lang_user_data();
 
@@ -786,6 +786,6 @@ sub main {
   print "match-count=$gbl_match_count\n";
 };
 unless (caller) {
-  &main(\@ARGV);
+  &start(\@ARGV);
 }
 1;
