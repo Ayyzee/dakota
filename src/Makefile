@@ -68,18 +68,17 @@ dakota_util_install = $(dakota_util_install_bins) $(dakota_util_install_includes
 # precompile-dakota\
 # precompile-dakota-util\
 
-$(blddir)/../bin/%: $(srcdir)/%-main.dk
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
-
-$(blddir)/%:        $(srcdir)/%-main.dk
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
-
 install_file_mode :=    0644
 install_dir_mode :=     0755
 
 install_include_mode := $(install_file_mode)
 install_bin_mode :=     0755
 install_lib_mode :=     $(install_file_mode)
+
+$(blddir)/%.dk: $(blddir)/%.tbl
+
+$(blddir)/%.tbl: $(srcdir)/%.sh
+	./$<
 
 # installed files
 $(DESTDIR)$(includedir)/%: $(srcdir)/../include/%
@@ -122,17 +121,6 @@ $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext): $(dakota_util_srcs) $(dakot
 
 check: all
 	$(blddir)/../bin/dakota-info $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext) $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
-	$(MAKE) $(blddir)/tst
-	$(blddir)/tst
-	$(MAKE) $(blddir)/min
-	$(blddir)/min
-	$(MAKE) $(blddir)/dummy
-	$(blddir)/dummy
-
-$(blddir)/tst: $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
-
-$(blddir)/dummy: $(srcdir)/dummy-main.$(cc_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
 
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
@@ -176,11 +164,6 @@ diff:
 
 rt: clean-rt
 	$(MAKE) all
-
-$(blddir)/%.dk: $(blddir)/%.tbl
-
-$(blddir)/%.tbl: $(srcdir)/%.sh
-	./$<
 
 clean: clean-rt
 	$(RM) $(RMFLAGS) $(blddir)/../bin/dakota-info
