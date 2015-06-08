@@ -81,13 +81,15 @@ $(blddir)/%.tbl: $(srcdir)/%.sh
 	./$<
 
 ### installed files
-$(DESTDIR)$(includedir)/%: $(srcdir)/../include/%
+$(DESTDIR)$(includedir)/dakota/%: $(srcdir)/../include/dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_include_mode) $< $(@D)
 
-$(DESTDIR)$(libdir)/%: $(blddir)/../lib/%
+# some lib/dakota/* are supplied (so they will be in srcdir)
+$(DESTDIR)$(libdir)/dakota/%: $(srcdir)/../lib/dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_lib_mode) $< $(@D)
 
-$(DESTDIR)$(libdir)/dakota/%: $(srcdir)/../lib/dakota/%
+# some lib/dakota/* are generated (so they will be in blddir)
+$(DESTDIR)$(libdir)/dakota/%: $(blddir)/../lib/dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_lib_mode) $< $(@D)
 
 # some bin/* are supplied (so they will be in srcdir)
