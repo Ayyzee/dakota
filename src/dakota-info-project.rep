@@ -5,18 +5,31 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'srcs' => [
+  'srcs' => [ # cmd-line
     '$(srcdir)/dakota-info-main.$(cc_ext)',
   ],
-  'name' => 'dakota-info',
-  'libs' => [
+  'libs' => [ # cmd-line
     '/usr/lib/libdl.$(so_ext)',
   ],
-  'include-dirs' => [
+  'include-dirs' => [ # cmd-line
     '$(srcdir)',
     '$(srcdir)/../include',
   ],
-  'BIN_FILES' => [
-    '$(bindir)/dakota-info',
+  'macros' => [ # cmd-line
   ],
+  'output' => '$(blddir)/../bin/dakota-info', # cmd-line
+  'install' => {
+    '-rules' => {
+      '$(blddir)/../bin/%' => '$(DESTDIR)$(bindir)/%'
+    },
+    'bins' =>   [ # install.bins
+      '$(DESTDIR)$(bindir)/dakota-info', {
+        'mode' => '$(install_bins_mode)',
+      }
+    ],
+    'includes' => [ # install.includes
+    ],
+    'libs' => [ # install.libs
+    ],
+  }
 }

@@ -5,8 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'soname' => '$(lib_prefix)dakota-util.$(so_ext)',
-  'srcs' => [
+  'srcs' => [ # cmd-line
     '$(srcdir)/ascii-number-klass.dk',
     '$(srcdir)/ascii-number.dk',
     '$(srcdir)/cstring.dk',
@@ -33,19 +32,33 @@
     '$(srcdir)/type-predicate.dk',
     '$(srcdir)/xml-object-output-stream.dk'
   ],
-  'name' => '$(lib_prefix)dakota-util.$(so_ext)',
-  'libs' => [
+  'libs' => [ # cmd-line
   ],
-  'include-dirs' => [
+  'include-dirs' => [ # cmd-line
     '$(srcdir)',
     '$(srcdir)/../include',
   ],
-  'macros' => [
+  'macros' => [ # cmd-line
     'DKT_WORKAROUND',
     'HAVE_CONFIG_HH',
     'MOD_SIZE_CAST_HACK',
   ],
-  'LIB_FILES' => [
-    '$(libdir)/$(lib_prefix)dakota-util.$(so_ext)',
-  ],
+  'output' => '$(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)', # cmd-line
+  'compatibility-version' => '1.0.0', # cmd-line
+  'current-version' =>       '1.0.0', # cmd-line
+  'soname' => '$(lib_prefix)dakota-util.$(so_ext)', # cmd-line
+  'install' => {
+    '-rules' => {
+      '$(blddir)/../lib/%' => '$(DESTDIR)$(libdir)/%'
+    },
+    'bins' => [ # install.bins
+    ],
+    'includes' => [ # install.includes
+    ],
+    'libs' => [ # install.libs
+      '$(DESTDIR)$(libdir)/$(lib_prefix)dakota-util.$(so_ext)', {
+        'mode' => '$(install_libs_mode)'
+      },
+    ],
+  }
 }

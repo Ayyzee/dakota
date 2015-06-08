@@ -259,9 +259,6 @@ sub subcmd_soname {
   my $name;
   if ($$rep{'soname'}) {
     $name = $$rep{'soname'};
-  } else {
-    die if !$$rep{'name'};
-    $name = $$rep{'name'};
   }
   if ($$opts{'var'}) {
     $name = &subst($name, $$opts{'var'});

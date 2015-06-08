@@ -4,9 +4,9 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
+
 {
-  'soname' => '$(lib_prefix)dakota.$(so_ext)',
-  'srcs' => [
+  'srcs' => [ # cmd-line
     '$(srcdir)/assoc.dk',
     '$(srcdir)/autorelease-pool.dk',
     '$(srcdir)/bit-vector.dk',
@@ -76,47 +76,64 @@
     '$(srcdir)/trace.dk',
     '$(srcdir)/vector.dk'
   ],
-  'name' => '$(lib_prefix)dakota.$(so_ext)',
-  'libs' => [
+  'libs' => [ # cmd-line
     '/usr/lib/libdl.$(so_ext)',
   ],
-  'include-dirs' => [
+  'include-dirs' => [ # cmd-line
     '$(srcdir)',
     '$(srcdir)/../include',
   ],
-  'macros' => [
+  'macros' => [ # cmd-line
     'DKT_WORKAROUND',
     'HAVE_CONFIG_HH',
     'MOD_SIZE_CAST_HACK',
   ],
-  'LIB_FILES' => [
-    '$(libdir)/$(lib_prefix)dakota.$(so_ext)',
-    '$(libdir)/dakota/dakota.pm',
-    '$(libdir)/dakota/parse.pm',
-    '$(libdir)/dakota/rewrite.pm',
-    '$(libdir)/dakota/generate.pm',
-    '$(libdir)/dakota/sst.pm',
-    '$(libdir)/dakota/util.pm',
-    '$(libdir)/dakota/macros.pl',
-    '$(libdir)/dakota/compiler-darwin-gcc.json',
-    '$(libdir)/dakota/compiler-darwin-clang.json',
-    '$(libdir)/dakota/compiler-linux-gcc.json',
-    '$(libdir)/dakota/compiler-linux-clang.json',
-  ],
-  'INCLUDE_FILES' => [
-    '$(includedir)/dakota-log.hh',
-    '$(includedir)/dakota-finally.hh',
-    '$(includedir)/dakota.hh',
-  ],
-  'BIN_FILES' => [
-    '$(bindir)/dakota',
-    '$(bindir)/dakota-fixup-stderr.pl',
-    '$(bindir)/dakota-project',
-  ],
-  'HOME_FILES' => [
-    '$(HOME)/.dakota/.gdbinit',
-    '$(HOME)/.dakota/.bashrc',
-    '$(HOME)/.dakota/emacs/init.el',
-    '$(HOME)/.dakota/emacs/dakota-mode.el',
-  ],
+  'output' => '$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)', # cmd-line
+  'compatibility-version' => '1.0.0', # cmd-line
+  'current-version' =>       '1.0.0', # cmd-line
+  'soname' => '$(lib_prefix)dakota.$(so_ext)', # cmd-line
+  'install' => {
+    '-rules' => {
+      '$(blddir)/../bin/%' =>     '$(DESTDIR)$(bindir)/%',
+      '$(blddir)/../lib/%' =>     '$(DESTDIR)$(libdir)/%',
+      '$(blddir)/../include/%' => '$(DESTDIR)$(includedir)/%',
+
+      '$(srcdir)/../bin/%' =>     '$(DESTDIR)$(bindir)/%',
+      '$(srcdir)/../lib/%' =>     '$(DESTDIR)$(libdir)/%',
+      '$(srcdir)/../include/%' => '$(DESTDIR)$(includedir)/%',
+
+      '$(HOME)/%' => '$(srcdir)/home/%',
+    },
+    'libs' => [ # install.libs
+      '$(DESTDIR)$(libdir)/$(lib_prefix)dakota.$(so_ext)', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/dakota.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/parse.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/rewrite.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/generate.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/sst.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/util.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/macro_system.pm', { 'mode' => '$(install_bins_mode)' }, # also executable
+      '$(DESTDIR)$(libdir)/dakota/macros.pl', {},
+      '$(DESTDIR)$(libdir)/dakota/compiler-darwin-gcc.json',   {},
+      '$(DESTDIR)$(libdir)/dakota/compiler-darwin-clang.json', {},
+      '$(DESTDIR)$(libdir)/dakota/compiler-linux-gcc.json',    {},
+      '$(DESTDIR)$(libdir)/dakota/compiler-linux-clang.json',  {},
+    ],
+    'includes' => [ # install.includes
+      '$(DESTDIR)$(includedir)/dakota-finally.hh', {},
+      '$(DESTDIR)$(includedir)/dakota-log.hh', {},
+      '$(DESTDIR)$(includedir)/dakota.hh', {},
+    ],
+    'bins' => [ # install.bins
+      '$(DESTDIR)$(bindir)/dakota', { 'mode' => '$(install_bins_mode)' },
+      '$(DESTDIR)$(bindir)/dakota-fixup-stderr.pl', { 'mode' => '$(install_bins_mode)' },
+      '$(DESTDIR)$(bindir)/dakota-project', { 'mode' => '$(install_bins_mode)' },
+    ],
+    'home' => [ # install.home
+      '$(srcdir)/home/.dakota/.gdbinit', {},
+      '$(srcdir)/home/.dakota/.bashrc', {},
+      '$(srcdir)/home/.dakota/emacs/init.el', {},
+      '$(srcdir)/home/.dakota/emacs/dakota-mode.el', {},
+    ],
+  }
 }
