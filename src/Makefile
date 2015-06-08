@@ -128,6 +128,7 @@ precompile:
 
 $(bindir) \
 $(includedir) \
+$(libdir) \
 $(libdir)/dakota:
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_CREATE_DIRS_FLAG) $(INSTALL_MODE_FLAG) $(dir_mode) $@
 
@@ -152,23 +153,16 @@ uninstall:\
  uninstall-dakota\
  uninstall-dakota-util\
 
-rt: clean-rt
-	$(MAKE) all
-
-clean: clean-rt
+clean:
 	$(RM) $(RMFLAGS) $(blddir)/../bin/dakota-info
 	$(RM) $(RMFLAGS) $(blddir)/../bin/dakota-info.dSYM
-	$(RM) $(RMFLAGS) $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext).ctlg
+	$(RM) $(RMFLAGS) $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
 	$(RM) $(RMFLAGS) $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext).ctlg
+	$(RM) $(RMFLAGS) $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)
+	$(RM) $(RMFLAGS) $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext).ctlg
 	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler-{darwin,linux}-{clang,gcc}.mk
 	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler.mk
 	$(RM) $(RMFLAGS) $(blddir)/obj
 	$(RM) $(RMFLAGS) $(blddir)/sterror-name.tbl
 	$(RM) $(RMFLAGS) $(blddir)/{dakota-info,dakota,dakota-util}-project.mk
 	$(RM) $(RMFLAGS) $(blddir)/{dummy,empty-klass-x,min,tst}
-
-clean-util-rt:
-	$(RM) $(RMFLAGS) $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
-
-clean-rt: clean-util-rt
-	$(RM) $(RMFLAGS) $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)
