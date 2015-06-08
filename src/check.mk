@@ -20,7 +20,7 @@ export DAKOTAFLAGS
 export EXTRA_DAKOTAFLAGS
 
 $(blddir)/%: $(srcdir)/%-main.dk
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory ../include --output $@ $^
 
 all:
 	$(MAKE) --file check.mk $(blddir)/tst
@@ -33,4 +33,4 @@ all:
 $(blddir)/tst: $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
 
 $(blddir)/dummy: $(srcdir)/dummy-main.$(cc_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) --include-directory ../include $(CXX_OUTPUT_FLAGS) $@ $^

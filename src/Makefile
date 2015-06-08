@@ -114,7 +114,7 @@ dakota:      $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)
 dakota-util: $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
 
 $(blddir)/../bin/dakota-info: $(dakota_info_srcs) $(dakota_info_libs)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext): $(dakota_srcs) $(dakota_libs)
 	$(DAKOTA) --shared  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(dakota_macros) $(dakota_include_dirs) --soname $(dakota_soname) --output $@ $^
