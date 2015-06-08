@@ -1,14 +1,7 @@
 SHELL := /bin/sh -u
 
-DESTDIR ?=
-
 srcdir ?= .
 blddir := .
-
-prefix ?= /usr/local
-includedir := $(prefix)/include
-libdir :=     $(prefix)/lib
-bindir :=     $(prefix)/bin
 
 $(shell $(srcdir)/../bin/dakota-json2mk --output $(blddir)/../lib/dakota/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
 include $(blddir)/../lib/dakota/compiler.mk
@@ -26,18 +19,15 @@ export DAKOTA
 export DAKOTAFLAGS
 export EXTRA_DAKOTAFLAGS
 
-$(blddir)/../bin/%: $(srcdir)/%-main.dk
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
-
-$(blddir)/%:        $(srcdir)/%-main.dk
+$(blddir)/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
 all:
-	$(MAKE) $(blddir)/tst
+	$(MAKE) --file check.mk $(blddir)/tst
 	$(blddir)/tst
-	$(MAKE) $(blddir)/min
+	$(MAKE) --file check.mk $(blddir)/min
 	$(blddir)/min
-	$(MAKE) $(blddir)/dummy
+	$(MAKE) --file check.mk $(blddir)/dummy
 	$(blddir)/dummy
 
 $(blddir)/tst: $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
