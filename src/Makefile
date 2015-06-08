@@ -97,9 +97,6 @@ $(DESTDIR)$(bindir)/%: $(srcdir)/../bin/%
 # some bin/* are generated (so they will be in blddir)
 $(DESTDIR)$(bindir)/%: $(blddir)/../bin/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_bin_mode) $< $(@D)
-
-$(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_file_mode) $< $(@D)
 ### installed files
 
 all:
@@ -127,10 +124,9 @@ check: all
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
 
-$(includedir) \
 $(bindir) \
-$(libdir)/dakota \
-$(HOME)/.dakota/emacs:
+$(includedir) \
+$(libdir)/dakota:
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_CREATE_DIRS_FLAG) $(INSTALL_MODE_FLAG) $(dir_mode) $@
 
 install-dakota-info: $(dakota_info_install)
@@ -144,25 +140,15 @@ uninstall-dakota:
 uninstall-dakota-util:
 	sudo $(RM) $(RMFLAGS) $(dakota_util_install)
 
-install-dakota-home: $(HOME)/.dakota/emacs $(dakota_install_home)
-
-uninstall-dakota-home:
-	sudo $(RM) $(RMFLAGS) $(dakota_install_home)
-
 install:\
  install-dakota-info\
  install-dakota\
  install-dakota-util\
- install-home\
 
 uninstall:\
  uninstall-dakota-info\
  uninstall-dakota\
  uninstall-dakota-util\
- uninstall-home\
-
-diff:
-	git $@
 
 rt: clean-rt
 	$(MAKE) all
