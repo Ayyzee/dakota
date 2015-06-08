@@ -81,7 +81,7 @@
   ],
   'include-dirs' => [ # cmd-line
     '$(srcdir)',
-    '$(srcdir)/../include',
+    '$(srcdir)/../include/dakota',
   ],
   'macros' => [ # cmd-line
     'DKT_WORKAROUND',
@@ -94,13 +94,13 @@
   'soname' => '$(lib_prefix)dakota.$(so_ext)', # cmd-line
   'install' => {
     '-rules' => {
-      '$(blddir)/../bin/%' =>     '$(DESTDIR)$(bindir)/%',
-      '$(blddir)/../lib/%' =>     '$(DESTDIR)$(libdir)/%',
-      '$(blddir)/../include/%' => '$(DESTDIR)$(includedir)/%',
+      '$(blddir)/../bin/%' =>            '$(DESTDIR)$(bindir)/%',
+      '$(blddir)/../lib/dakota/%' =>     '$(DESTDIR)$(libdir)/dakota/%',
+      '$(blddir)/../include/dakota/%' => '$(DESTDIR)$(includedir)/dakota/%',
 
-      '$(srcdir)/../bin/%' =>     '$(DESTDIR)$(bindir)/%',
-      '$(srcdir)/../lib/%' =>     '$(DESTDIR)$(libdir)/%',
-      '$(srcdir)/../include/%' => '$(DESTDIR)$(includedir)/%',
+      '$(srcdir)/../bin/%' =>            '$(DESTDIR)$(bindir)/%',
+      '$(srcdir)/../lib/dakota/%' =>     '$(DESTDIR)$(libdir)/dakota/%',
+      '$(srcdir)/../include/dakota/%' => '$(DESTDIR)$(includedir)/dakota/%',
 
       '$(HOME)/%' => '$(srcdir)/home/%',
     },

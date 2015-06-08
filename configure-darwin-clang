@@ -3,7 +3,7 @@
 sysname=darwin
 compiler=clang
 
-cp config-$sysname.hh include/config.hh
+cp config-$sysname.hh include/dakota/config.hh
 cp config-$sysname-$compiler.mk config.mk
 cp lib/dakota/compiler-$sysname-$compiler.pm lib/dakota/compiler.pm
 cp config-$sysname.sh config.sh

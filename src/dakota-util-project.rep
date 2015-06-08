@@ -36,7 +36,7 @@
   ],
   'include-dirs' => [ # cmd-line
     '$(srcdir)',
-    '$(srcdir)/../include',
+    '$(srcdir)/../include/dakota',
   ],
   'macros' => [ # cmd-line
     'DKT_WORKAROUND',
