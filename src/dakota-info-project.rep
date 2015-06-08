@@ -13,7 +13,7 @@
   ],
   'include-dirs' => [ # cmd-line
     '$(srcdir)',
-    '$(srcdir)/../include/dakota',
+    '$(srcdir)/../include',
   ],
   'macros' => [ # cmd-line
   ],
