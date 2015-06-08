@@ -91,7 +91,7 @@
   'output' => '$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)', # cmd-line
   'compatibility-version' => '1.0.0', # cmd-line
   'current-version' =>       '1.0.0', # cmd-line
-  'soname' => '$(lib_prefix)dakota.$(so_ext)', # cmd-line
+  #'soname' => '$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)', # cmd-line
   'install' => {
     '-rules' => {
       '$(blddir)/../bin/%' =>            '$(DESTDIR)$(bindir)/%',

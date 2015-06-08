@@ -254,15 +254,27 @@ sub subcmd_set_name {
   $$rep{'name'} = shift @$args;
   &rep_to_file($rep);
 }
+sub var {
+  my ($rep, $name) = @_;
+  my $result = $$rep{$name} ||= '';
+  $result =~ s/(\s*)(.*?)(\s*)//g;
+
+  if ('' eq $result) {
+    $result = undef;
+  }
+  return $result;
+}
 sub subcmd_soname {
   my ($rep, $args) = @_;
-  my $name;
-  if ($$rep{'soname'}) {
-    $name = $$rep{'soname'};
+  my $name = &var($rep, 'soname');
+
+  if (!$name) {
+    $name = &var($$rep, 'output');
   }
-  if ($$opts{'var'}) {
+  if ($name && $$opts{'var'}) {
     $name = &subst($name, $$opts{'var'});
   }
+  $name = $name ||= '';
   print "$name\n";
 }
 sub subcmd_set_soname {
