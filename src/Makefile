@@ -80,7 +80,7 @@ $(blddir)/%.dk: $(blddir)/%.tbl
 $(blddir)/%.tbl: $(srcdir)/%.sh
 	./$<
 
-# installed files
+### installed files
 $(DESTDIR)$(includedir)/%: $(srcdir)/../include/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_include_mode) $< $(@D)
 
@@ -100,6 +100,7 @@ $(DESTDIR)$(bindir)/%: $(blddir)/../bin/%
 
 $(HOME)/.dakota/%: $(srcdir)/home/.dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_file_mode) $< $(@D)
+### installed files
 
 all:
 	$(MAKE) dakota-info

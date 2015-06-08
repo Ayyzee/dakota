@@ -43,7 +43,7 @@
     'HAVE_CONFIG_HH',
     'MOD_SIZE_CAST_HACK',
   ],
-  'output' => '$(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)', # cmd-line
+  'output' => '$(blddir)/../lib/dakota/$(lib_prefix)dakota-util.$(so_ext)', # cmd-line
   'compatibility-version' => '1.0.0', # cmd-line
   'current-version' =>       '1.0.0', # cmd-line
   'soname' => '$(lib_prefix)dakota-util.$(so_ext)', # cmd-line
@@ -56,7 +56,7 @@
     'includes' => [ # install.includes
     ],
     'libs' => [ # install.libs
-      '$(DESTDIR)$(libdir)/$(lib_prefix)dakota-util.$(so_ext)', {
+      '$(DESTDIR)$(libdir)/dakota/$(lib_prefix)dakota-util.$(so_ext)', {
         'mode' => '$(install_libs_mode)'
       },
     ],
