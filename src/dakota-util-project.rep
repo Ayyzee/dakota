@@ -56,7 +56,7 @@
     'includes' => [ # install.includes
     ],
     'libs' => [ # install.libs
-      '$(DESTDIR)$(libdir)/dakota/$(lib_prefix)dakota-util.$(so_ext)', {
+      '$(DESTDIR)$(libdir)/$(lib_prefix)dakota-util.$(so_ext)', {
         'mode' => '$(install_libs_mode)'
       },
     ],
