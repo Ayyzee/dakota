@@ -88,10 +88,10 @@
     'HAVE_CONFIG_HH',
     'MOD_SIZE_CAST_HACK',
   ],
-  'output' => '$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)', # cmd-line
+  'output' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
   'compatibility-version' => '1.0.0', # cmd-line
   'current-version' =>       '1.0.0', # cmd-line
-  #'soname' => '$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)', # cmd-line
+  #'soname' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
   'install' => {
     '-rules' => {
       '$(blddir)/../bin/%' =>            '$(DESTDIR)$(bindir)/%',
@@ -105,7 +105,7 @@
       '$(HOME)/%' => '$(srcdir)/home/%',
     },
     'libs' => [ # install.libs
-      '$(DESTDIR)$(libdir)/$(lib_prefix)dakota.$(so_ext)', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/libdakota.$(so_ext)', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/dakota.pm', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/parse.pm', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/rewrite.pm', { 'mode' => '$(install_libs_mode)' },

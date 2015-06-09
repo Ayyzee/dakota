@@ -8,7 +8,6 @@ MAKEFLAGS :=\
 
 hh_ext := hh
 cc_ext := cc
-lib_prefix := lib
 
 RM := rm
 RMFLAGS := -rf
