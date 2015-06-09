@@ -26,32 +26,32 @@ export DAKOTA
 export DAKOTAFLAGS
 export EXTRA_DAKOTAFLAGS
 
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info --output $(blddir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota      --output $(blddir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-util --output $(blddir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info    --output $(blddir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota      --output $(blddir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(blddir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
 
 include $(blddir)/dakota-info-project.mk
 include $(blddir)/libdakota-project.mk
 include $(blddir)/libdakota-util-project.mk
 
-#dakota_soname_pair :=      --soname $(dakota_soname)
-#dakota_util_soname_pair := --soname $(dakota_util_soname)
-dakota_soname_pair ?=
-dakota_util_soname_pair ?=
+#libdakota_soname_pair :=      --soname $(libdakota_soname)
+#libdakota_util_soname_pair := --soname $(libdakota_util_soname)
+libdakota_soname_pair ?=
+libdakota_util_soname_pair ?=
 
 # include-dirs
-dakota_info_include_dirs := $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
-dakota_include_dirs :=      $(patsubst %,--include-directory %,$(dakota_include_dirs))
-dakota_util_include_dirs := $(patsubst %,--include-directory %,$(dakota_util_include_dirs))
+dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
+libdakota_include_dirs :=      $(patsubst %,--include-directory %,$(libdakota_include_dirs))
+libdakota_util_include_dirs := $(patsubst %,--include-directory %,$(libdakota_util_include_dirs))
 
 # macros
-dakota_info_macros := $(patsubst %,--define-macro %,$(dakota_info_macros))
-dakota_macros :=      $(patsubst %,--define-macro %,$(dakota_macros))
-dakota_util_macros := $(patsubst %,--define-macro %,$(dakota_util_macros))
+dakota_info_macros :=    $(patsubst %,--define-macro %,$(dakota_info_macros))
+libdakota_macros :=      $(patsubst %,--define-macro %,$(libdakota_macros))
+libdakota_util_macros := $(patsubst %,--define-macro %,$(libdakota_util_macros))
 
-dakota_info_install = $(dakota_info_install_bins) $(dakota_info_install_includes) $(dakota_info_install_libs)
-dakota_install =      $(dakota_install_bins)      $(dakota_install_includes)      $(dakota_install_libs)
-dakota_util_install = $(dakota_util_install_bins) $(dakota_util_install_includes) $(dakota_util_install_libs)
+dakota_info_install =    $(dakota_info_install_bins)    $(dakota_info_install_includes)    $(dakota_info_install_libs)
+libdakota_install =      $(libdakota_install_bins)      $(libdakota_install_includes)      $(libdakota_install_libs)
+libdakota_util_install = $(libdakota_util_install_bins) $(libdakota_util_install_includes) $(libdakota_util_install_libs)
 
 .PHONY:\
  all\
@@ -128,15 +128,15 @@ libdakota-util: $(blddir)/../lib/libdakota-util.$(so_ext)
 $(blddir)/../bin/dakota-info: $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
-$(blddir)/../lib/libdakota.$(so_ext): $(dakota_srcs) $(dakota_libs)
-$(blddir)/../lib/libdakota.$(so_ext): macros =       $(dakota_macros)
-$(blddir)/../lib/libdakota.$(so_ext): include_dirs = $(dakota_include_dirs)
-$(blddir)/../lib/libdakota.$(so_ext): soname_pair =  $(dakota_soname_pair)
+$(blddir)/../lib/libdakota.$(so_ext): $(libdakota_srcs) $(libdakota_libs)
+$(blddir)/../lib/libdakota.$(so_ext): macros =       $(libdakota_macros)
+$(blddir)/../lib/libdakota.$(so_ext): include_dirs = $(libdakota_include_dirs)
+$(blddir)/../lib/libdakota.$(so_ext): soname_pair =  $(libdakota_soname_pair)
 
-$(blddir)/../lib/libdakota-util.$(so_ext): $(dakota_util_srcs) $(dakota_util_libs)
-$(blddir)/../lib/libdakota-util.$(so_ext): macros =       $(dakota_util_macros)
-$(blddir)/../lib/libdakota-util.$(so_ext): include_dirs = $(dakota_util_include_dirs)
-$(blddir)/../lib/libdakota-util.$(so_ext): soname_pair =  $(dakota_util_soname_pair)
+$(blddir)/../lib/libdakota-util.$(so_ext): $(libdakota_util_srcs) $(libdakota_util_libs)
+$(blddir)/../lib/libdakota-util.$(so_ext): macros =       $(libdakota_util_macros)
+$(blddir)/../lib/libdakota-util.$(so_ext): include_dirs = $(libdakota_util_include_dirs)
+$(blddir)/../lib/libdakota-util.$(so_ext): soname_pair =  $(libdakota_util_soname_pair)
 
 check: all
 	$(blddir)/../bin/dakota-info $(blddir)/../lib/libdakota.$(so_ext) $(blddir)/../lib/libdakota-util.$(so_ext)
@@ -152,15 +152,15 @@ $(libdir)/dakota:
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_CREATE_DIRS_FLAG) $(INSTALL_MODE_FLAG) $(dir_mode) $@
 
 install-dakota-info:    $(dakota_info_install)
-install-libdakota:      $(dakota_install)
-install-libdakota-util: $(dakota_util_install)
+install-libdakota:      $(libdakota_install)
+install-libdakota-util: $(libdakota_util_install)
 
 uninstall-dakota-info:
 	sudo $(RM) $(RMFLAGS) $(strip $(dakota_info_install))
 uninstall-libdakota:
-	sudo $(RM) $(RMFLAGS) $(strip $(dakota_install))
+	sudo $(RM) $(RMFLAGS) $(strip $(libdakota_install))
 uninstall-libdakota-util:
-	sudo $(RM) $(RMFLAGS) $(strip $(dakota_util_install))
+	sudo $(RM) $(RMFLAGS) $(strip $(libdakota_util_install))
 
 install:
 	$(MAKE) install-dakota-info
