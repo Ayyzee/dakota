@@ -85,6 +85,9 @@ $(blddir)/%.dk: $(blddir)/%.tbl
 $(blddir)/%.tbl: $(srcdir)/%.sh
 	./$<
 
+$(blddir)/../lib/$(lib_prefix)%.$(so_ext):
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) $(soname_pair) --output $@ $^
+
 ### installed files
 $(DESTDIR)$(includedir)/%: $(srcdir)/../include/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_include_mode) $< $(@D)
@@ -116,8 +119,7 @@ $(DESTDIR)$(bindir)/%: $(blddir)/../bin/%
 
 all:
 	$(MAKE) dakota-info
-	$(MAKE) dakota
-	$(MAKE) dakota-util
+	$(MAKE) dakota dakota-util
 
 dakota-info: $(blddir)/../bin/dakota-info
 dakota:      $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext)
@@ -127,10 +129,14 @@ $(blddir)/../bin/dakota-info: $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext): $(dakota_srcs) $(dakota_libs)
-	$(DAKOTA) --shared  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(dakota_macros) $(dakota_include_dirs) $(dakota_soname_pair) --output $@ $^
+$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext): macros =       $(dakota_macros)
+$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext): include_dirs = $(dakota_include_dirs)
+$(blddir)/../lib/$(lib_prefix)dakota.$(so_ext): soname_pair =  $(dakota_soname_pair)
 
 $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext): $(dakota_util_srcs) $(dakota_util_libs)
-	$(DAKOTA) --shared  $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(dakota_util_macros) $(dakota_util_include_dirs) $(dakota_util_soname_pair) --output $@ $^
+$(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext): macros =       $(dakota_util_macros)
+$(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext): include_dirs = $(dakota_util_include_dirs)
+$(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext): soname_pair =  $(dakota_util_soname_pair)
 
 check: all
 	$(blddir)/../bin/dakota-info $(blddir)/../lib/$(lib_prefix)dakota.$(so_ext) $(blddir)/../lib/$(lib_prefix)dakota-util.$(so_ext)
