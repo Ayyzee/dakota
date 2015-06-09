@@ -12,13 +12,13 @@ use warnings;
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-#use Data::Dumper;
-#$Data::Dumper::Terse =    1;
-#$Data::Dumper::Useqq =    1;
-#$Data::Dumper::Sortkeys = 1;
+use Data::Dumper;
+$Data::Dumper::Terse =    1;
+$Data::Dumper::Useqq =    1;
+$Data::Dumper::Sortkeys = 1;
 
 # gnu make variable assignment operators
-# = or := or ::= or ?= or !=
+# = or := or ::= or ?=
 my $EQ = '=';
 
 sub is_scalar {
@@ -99,8 +99,7 @@ sub is_valid {
   return $result;
 }
 sub process_tbl {
-  my ($data, $opts, $scopes) = @_;
-  my $result = '';
+  my ($data, $opts, $scopes, $out) = @_;
 
   foreach my $name (sort keys %$data) {
     if (&is_protected_name($name)) {
@@ -112,38 +111,51 @@ sub process_tbl {
       push @$scopes, $name;
       $_ = ref($$data{$name});
       SWITCH: {
-          /^HASH$/  and $result .= &process_tbl(        $$data{$name}, $opts, $scopes), last SWITCH;
-          /^ARRAY$/ and $result .= &process_seq_expr(   $$data{$name}, $opts, $scopes), last SWITCH;
-                        $result .= &process_scalar_expr($$data{$name}, $opts, $scopes);
+          /^HASH$/  and &process_tbl(        $$data{$name}, $opts, $scopes, $out), last SWITCH;
+          /^ARRAY$/ and &process_seq_expr(   $$data{$name}, $opts, $scopes, $out), last SWITCH;
+                        &process_scalar_expr($$data{$name}, $opts, $scopes, $out);
       }
       pop @$scopes;
     }
   }
-  return $result;
 }
 # scalar is member of rhs seq
 sub process_scalar {
-  my ($data, $opts) = @_;
-  my $result = ' ' . $data;
-  return $result;
+  my ($data, $opts, $lhs, $out) = @_;
+  push @{$$out{$lhs}}, $data;
 }
 # scalar is rhs of expr (lhs = rhs)
 sub process_scalar_expr {
-  my ($data, $opts, $scopes) = @_;
-  my $result = &lhs($scopes, $opts) . ' ' . $EQ . ' ' . $data . "\n"; # EOL
-  return $result;
+  my ($data, $opts, $scopes, $out) = @_;
+  $$out{&lhs($scopes, $opts)} = $data;
 }
 # seq is rhs of expr (lhs = rhs ...)
 sub process_seq_expr {
-  my ($data, $opts, $scopes) = @_;
-  my $result = &lhs($scopes, $opts) . ' ' . $EQ;
+  my ($data, $opts, $scopes, $out) = @_;
+  my $lhs = &lhs($scopes, $opts);
+  $$out{$lhs} = [];
 
   foreach my $element (@$data) {
     if (&is_scalar($element)) {
-      $result .= &process_scalar($element, $opts);
+      #push @{$$out{$lhs}}, $element;
+      &process_scalar($element, $opts, $lhs, $out);
     }
   }
-  $result .= "\n"; # EOL
+}
+sub mkstr {
+  my ($out, $opts) = @_;
+  my $result = '';
+  foreach my $lhs (sort keys %$out) {
+    my $rhs = $$out{$lhs};
+    $result .= $lhs . ' ' . $EQ;
+    if (&is_scalar($rhs)) {
+      $rhs = [ $rhs ];
+    }
+    foreach my $element (@$rhs) {
+      $result .= ' ' . $element;
+    }
+    $result .= "\n";
+  }
   return $result;
 }
 sub start {
@@ -166,10 +178,11 @@ sub start {
   foreach my $file (@$argv) {
     my $data = do $file or die;
     #print &Dumper($data);
-    my $result =
-      "# auto-generated from $file\n" .
-      &process_tbl($data, $opts, $scopes);
-    print $fh $result;
+    my $out = {};
+    &process_tbl($data, $opts, $scopes, $out);
+    print $fh
+      "# generated from $file\n" .
+      &mkstr($out);
   }
   close($fh);
 }
