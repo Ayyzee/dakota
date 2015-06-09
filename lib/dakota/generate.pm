@@ -58,15 +58,15 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  empty_klass_defns
+                 function::overloadsig
                  generate_nrt_decl
                  generate_nrt_defn
                  generate_rt_decl
                  generate_rt_defn
                  global_scratch_str_ref
-                 set_global_scratch_str_ref
-                 function::overloadsig
-                 should_use_include
                  make_ident_symbol_scalar
+                 set_global_scratch_str_ref
+                 should_use_include
                  symbol_parts
               );
 

@@ -59,37 +59,37 @@ $Data::Dumper::Indent    = 1;  # default = 2
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 changes
-                 is_open_token
-                 is_close_token
-                 make
-                 token_seq
-                 size
-                 at
-                 prev_token_str
-                 add_token
                  add_comment
                  add_cpp_directive
                  add_leading_ws
-                 filestr_no_comments
-                 filestr
-                 shift_leading_ws
+                 add_token
+                 at
+                 changes
                  dump
+                 filestr
+                 filestr_no_comments
+                 is_close_token
+                 is_open_token
+                 lang_user_data
+                 make
+                 prev_token_str
+                 shift_leading_ws
+                 size
                  sst::splice
-                 sst_fragment::filestr
-                 sst_cursor::make
-                 sst_cursor::dump
-                 sst_cursor::match_pattern_seq
                  sst_cursor::at
-                 sst_cursor::str
-                 sst_cursor::size
-                 sst_cursor::previous_token
+                 sst_cursor::balenced
                  sst_cursor::current_token
                  sst_cursor::current_token_p
+                 sst_cursor::dump
+                 sst_cursor::make
+                 sst_cursor::match_pattern_seq
                  sst_cursor::next_token
+                 sst_cursor::previous_token
+                 sst_cursor::size
+                 sst_cursor::str
                  sst_cursor::token_index
-                 sst_cursor::balenced
-                 lang_user_data
+                 sst_fragment::filestr
+                 token_seq
              );
 
 my ($id,  $mid,  $bid,  $tid,

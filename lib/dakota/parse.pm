@@ -66,9 +66,20 @@ $Data::Dumper::Indent    = 1;  # default = 2
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 ctlg_path_from_so_path
+                 add_generic
+                 add_hash
+                 add_hash_ident
+                 add_keyword
+                 add_klass_decl
+                 add_string
+                 add_symbol
+                 add_symbol_ident
+                 add_trait_decl
                  cc_path_from_dk_path
                  cc_path_from_so_path
+                 colin
+                 colout
+                 ctlg_path_from_so_path
                  init_global_rep
                  kw_args_translate
                  o_path_from_cc_path
@@ -77,17 +88,6 @@ our @EXPORT= qw(
                  rep_path_from_dk_path
                  rep_path_from_so_path
                  str_from_cmd_info
-                 colin
-                 colout
-                 add_klass_decl
-                 add_trait_decl
-                 add_symbol_ident
-                 add_symbol
-                 add_hash_ident
-                 add_hash
-                 add_keyword
-                 add_string
-                 add_generic
                  var
               );
 
