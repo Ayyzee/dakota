@@ -540,7 +540,7 @@ sub loop_rep_from_so {
     if ($arg =~ m|\.dk$| ||
         $arg =~ m|\.ctlg$|) {
     } else {
-      my $ctlg_path =     &ctlg_path_from_any_path($arg);
+      my $ctlg_path =     &ctlg_path_from_so_path($arg);
       my $ctlg_dir_path = &dakota::parse::ctlg_dir_path_from_so_path($arg);
       my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$ctlg_cmd{'output'} = $ctlg_path;
@@ -578,7 +578,7 @@ sub loop_rep_from_dk {
     #}
   }
   if (0 != @$rep_files) {
-    my $rep_path = &rep_path_from_any_path($$cmd_info{'output'});
+    my $rep_path = &rep_path_from_so_path($$cmd_info{'output'});
     &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
     my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$rep_cmd{'output'} = $rep_path;
@@ -590,7 +590,7 @@ sub loop_rep_from_dk {
 sub gen_rt_o {
   my ($cmd_info) = @_;
   print "  creating $$cmd_info{'output'}\n";
-  $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
+  $$cmd_info{'rep'} = &rep_path_from_so_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   if ($dk_construct) {
     $flags .= " --define-macro DKT_CONSTRUCT=$dk_construct";
