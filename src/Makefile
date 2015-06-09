@@ -26,15 +26,13 @@ export DAKOTA
 export DAKOTAFLAGS
 export EXTRA_DAKOTAFLAGS
 
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info --output $(blddir)/dakota-info-project.mk $(srcdir)/dakota-info-project.rep)
-#
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota      --output $(blddir)/dakota-project.mk      $(srcdir)/dakota-project.rep)
-#
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-util --output $(blddir)/dakota-util-project.mk $(srcdir)/dakota-util-project.rep)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info --output $(blddir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota      --output $(blddir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
+$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-util --output $(blddir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
 
 include $(blddir)/dakota-info-project.mk
-include $(blddir)/dakota-project.mk
-include $(blddir)/dakota-util-project.mk
+include $(blddir)/libdakota-project.mk
+include $(blddir)/libdakota-util-project.mk
 
 #dakota_soname_pair :=      --soname $(dakota_soname)
 #dakota_util_soname_pair := --soname $(dakota_util_soname)
