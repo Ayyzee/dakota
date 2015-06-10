@@ -102,24 +102,31 @@ my $root_cmd = { 'reps' => [],
                              'var' => {} } };
 
 &GetOptions($$root_cmd{'opts'},
-            'precompile',          # gcc-ish (--compile)
-            'compile',             # gcc-like
-            'shared',              # gcc-like
-            'dynamic',             # gcc-like
-            'soname=s',            # ld-like (-soname <>)
-            'keep-going',          # make-like
-            'define-macro=s',      # gcc-like
-            'include-directory=s', # gcc-like
-            'directory=s',         # make-like
-            'output=s',            # gcc-like
-            'nodefaultlibs',       # gcc-like
-            'var=s',               # for env vars like MAKEFLAGS, etc.
-            #'compiler=s',          # similiar to env var CXX
-            #'compiler-flags=s',    # similiar to env vars EXTRA_CXXFLAGS & CXXFLAGS
-            #'linker=s',            # similiar to env var LD
-            #'linker-flags=s',      # similiar to env vars EXTRA_LDFLAGS & LDFLAGS
+            'compile',              # gcc-like
+            'define-macro=s',       # gcc-like
+            'directory=s',          # make-like
+            'dynamic',              # gcc-like
+            'include-directory=s',  # gcc-like
+            'keep-going',           # make-like
+            'nodefaultlibs',        # gcc-like
+            'output=s',             # gcc-like
+            'precompile',           # gcc-ish (--compile)
+            'shared',               # gcc-like
+            'soname=s',             # ld-like (-soname <>)
+            'var=s',                # for env vars like MAKEFLAGS, etc.
+           #'compiler-flags=s',     # similiar to env vars CXXFLAGS & EXTRA_CXXFLAGS
+           #'compiler=s',           # similiar to env var CXX
+           #'environment-overrides' # make-like
+           #'for-compiler=s',       # gcc-like (--for-linker <>)
+           #'for-linker=s',         # gcc-like
+           #'jobs'                  # make-like
+           #'library-directory=s',  # gcc-like, ld-like (--library-path[=]; consider SEARCH_DIR)
+           #'library=s',            # gcc-like (-l<> or --library=<> ???)
+           #'linker-flags=s',       # similiar to env vars LDFLAGS & EXTRA_LDFLAGS
+           #'linker=s',             # similiar to env var LD
+           #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
+           #'touch'                 # make-like
            );
-# --jobs=
 # --quiet
 # --help
 # --verbose
