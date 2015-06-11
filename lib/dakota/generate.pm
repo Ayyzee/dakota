@@ -26,6 +26,10 @@ use strict;
 use warnings;
 
 my $gbl_prefix;
+my $gbl_compiler;
+my $objdir;
+my $hh_ext;
+my $cc_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -38,15 +42,17 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
+  use dakota::rewrite;
+  use dakota::util;
+  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
+    or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  $objdir = &dakota::util::objdir();
+  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
+  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
 };
-
-use dakota::rewrite;
-use dakota::util;
-
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -69,10 +75,6 @@ our @EXPORT= qw(
                  should_use_include
                  symbol_parts
               );
-
-my $objdir = 'obj';
-my $hh_ext = 'hh';
-my $cc_ext = 'cc';
 
 my $k = qr/[\w-]/;
 my ($id,  $mid,  $bid,  $tid,

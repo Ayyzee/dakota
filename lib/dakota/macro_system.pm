@@ -38,15 +38,12 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
+  use dakota::util;
+  use dakota::sst;
 };
-
-use dakota::util;
-use dakota::sst;
-
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 

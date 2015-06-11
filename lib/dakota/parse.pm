@@ -26,6 +26,11 @@ use strict;
 use warnings;
 
 my $gbl_compiler;
+my $objdir;
+my $hh_ext;
+my $cc_ext;
+my $o_ext;
+my $so_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -38,18 +43,20 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-
 BEGIN {
   my $prefix = &dk_prefix($0);
   unshift @INC, "$prefix/lib";
+  use dakota::generate;
+  use dakota::sst;
+  use dakota::util;
   $gbl_compiler = do "$prefix/lib/dakota/compiler.json"
     or die "do $prefix/lib/dakota/compiler.json failed: $!\n";
+  $objdir = &dakota::util::objdir();
+  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
+  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
+  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', undef);
+  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', undef);
 };
-
-use dakota::generate;
-use dakota::sst;
-use dakota::util;
-
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -88,14 +95,7 @@ our @EXPORT= qw(
                  rep_path_from_dk_path
                  rep_path_from_so_path
                  str_from_cmd_info
-                 var
               );
-
-my $objdir = 'obj';
-my $hh_ext = 'hh';
-my $cc_ext = 'cc';
-my $o_ext =  &var($gbl_compiler, 'o_ext',  undef);
-my $so_ext = &var($gbl_compiler, 'so_ext', undef);
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -163,25 +163,6 @@ my $gbl_symbol_to_header = {
                             'uintmax-t' => '<cstdint>',
                             'uintptr-t' => '<cstdint>'
                            };
-
-sub var {
-  my ($compiler, $lhs, $default_rhs) = @_;
-  my $result;
-  if (defined $ENV{$lhs}) {
-    $result = $ENV{$lhs};
-  } elsif ($$compiler{$lhs}) {
-    $result = $$compiler{$lhs};
-  } else {
-    $result = $default_rhs;
-  }
-  die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace
-  die if 'HASH' eq ref($result);
-
-  if ('ARRAY' eq ref($result)) {
-    $result = join(' ', @$result);
-  }
-  return $result;
-}
 
 sub maybe_add_exported_header_for_symbol {
   my ($symbol) = @_;

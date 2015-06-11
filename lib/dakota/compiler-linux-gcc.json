@@ -34,6 +34,8 @@
       '--warn-unused',
       ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
+  'hh_ext' => 'hh',
+  'cc_ext' => 'cc',
   'o_ext' =>  'o',
   'so_ext' => 'so',
 }

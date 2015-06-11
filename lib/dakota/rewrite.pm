@@ -25,6 +25,8 @@ package dakota::rewrite;
 use strict;
 use warnings;
 
+my $gbl_prefix;
+
 sub dk_prefix {
   my ($path) = @_;
   $path =~ s|^./||;
@@ -36,15 +38,11 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-my $gbl_prefix;
-
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
+  use dakota::util;
 };
-
-use dakota::util;
-
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 

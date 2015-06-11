@@ -30,7 +30,6 @@ my $kw_args_generics_tbl;
 BEGIN {
   $kw_args_generics_tbl = { 'init' => undef };
 };
-
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -67,6 +66,8 @@ our @EXPORT= qw(
                  sqstr_regex
                  method_sig_type_regex
                  method_sig_regex
+                 objdir
+                 var
               );
 
 use Fcntl qw(:DEFAULT :flock);
@@ -109,6 +110,29 @@ sub dqstr_regex {
 sub sqstr_regex {
 # not-escaped ' .*? not-escaped '
   return qr/(?<!\\)'.*?(?<!\\)'/;
+}
+my $build_vars = {
+  'objdir' => 'obj',
+};
+sub objdir { return $$build_vars{'objdir'}; }
+
+sub var {
+  my ($compiler, $lhs, $default_rhs) = @_;
+  my $result;
+  if (defined $ENV{$lhs}) {
+    $result = $ENV{$lhs};
+  } elsif ($$compiler{$lhs}) {
+    $result = $$compiler{$lhs};
+  } else {
+    $result = $default_rhs;
+  }
+  die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace
+  die if 'HASH' eq ref($result);
+
+  if ('ARRAY' eq ref($result)) {
+    $result = join(' ', @$result);
+  }
+  return $result;
 }
 sub kw_args_generics_add {
   my ($generic) = @_;

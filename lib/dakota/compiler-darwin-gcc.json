@@ -34,6 +34,8 @@
       '--warn-unused',
       ],
   'LD_SONAME_FLAGS' => [ '-install_name' ], # unique to darwin
+  'hh_ext' => 'hh',
+  'cc_ext' => 'cc',
   'o_ext' =>  'o',
   'so_ext' => 'dylib', # unique to darwin
 }

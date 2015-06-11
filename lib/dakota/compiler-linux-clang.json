@@ -29,6 +29,8 @@
       '-Wno-padded',
       ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
+  'hh_ext' => 'hh',
+  'cc_ext' => 'cc',
   'o_ext' =>  'bc',
   'so_ext' => 'so',
 }

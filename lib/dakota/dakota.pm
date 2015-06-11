@@ -27,6 +27,8 @@ use warnings;
 
 my $gbl_compiler;
 my $gbl_prefix;
+my $hh_ext;
+my $cc_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -39,17 +41,19 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
+  use dakota::util;
+  use dakota::parse;
+  use dakota::generate;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
     or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
+  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
 };
-
-use dakota::util;
-use dakota::parse;
-use dakota::generate;
+use Carp;
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -65,18 +69,11 @@ $Data::Dumper::Useqq     = 1;
 $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
-use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
-
 use File::Basename;
 use File::Copy;
 
 undef $/;
 $" = '';
-
-my $objdir = 'obj';
-my $hh_ext = 'hh';
-my $cc_ext = 'cc';
 
 my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
@@ -85,10 +82,10 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_pic_flags = &dakota::parse::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', undef);
-my $cxx_output_flags =  &dakota::parse::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  undef);
-my $cxx_shared_flags =  &dakota::parse::var($gbl_compiler, 'CXX_SHARED_FLAGS',  undef);
-my $cxx_dynamic_flags = &dakota::parse::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', undef);
+my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', undef);
+my $cxx_output_flags =  &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  undef);
+my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',  undef);
+my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', undef);
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -446,15 +443,15 @@ sub start_cmd {
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
-    $$cmd_info{'opts'}{'compiler'} = &dakota::parse::var($gbl_compiler, 'CXX', undef);
+    $$cmd_info{'opts'}{'compiler'} = &dakota::util::var($gbl_compiler, 'CXX', undef);
   }
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
     $$cmd_info{'opts'}{'compiler-flags'} =
-      &dakota::parse::var($gbl_compiler, 'CXXFLAGS', undef) .
+      &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef) .
       ' ' . $ENV{'EXTRA_CXXFLAGS'} .
-      ' ' . &dakota::parse::var($gbl_compiler, 'CXX_WARNINGS_FLAGS', undef);
+      ' ' . &dakota::util::var($gbl_compiler, 'CXX_WARNINGS_FLAGS', undef);
   }
-  my $ld_soname_flags = &dakota::parse::var($gbl_compiler, 'LD_SONAME_FLAGS', undef);
+  my $ld_soname_flags = &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', undef);
 
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_construct = undef;
