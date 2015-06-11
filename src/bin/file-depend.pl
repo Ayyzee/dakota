@@ -16,6 +16,11 @@ $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
+my $so_ext = 'so';
+my $cc_ext = 'cc';
+my $o_ext =  'o';
+my $objdir = 'obj';
+
 my $patterns = {
   'cc-path-from-dk-path' =>       '$(objdir)/nrt/%.$(cc_ext)  : %.dk',
   'cc-path-from-so-path' =>       '$(objdir)/rt/%.$(cc_ext)   : %.$(so_ext)',
@@ -34,15 +39,6 @@ sub expanded_patterns {
   }
   return $expanded_patterns;
 }
-
-my $so_ext = 'so';
-my $cc_ext = 'cc';
-my $o_ext =  'o';
-my $objdir = 'obj';
-
-BEGIN {
-};
-
 sub expand {
   my ($str) = @_;
   $str =~ s/(\$\w+)/$1/eeg;
@@ -69,15 +65,6 @@ sub rel_path_canon {
   ###
   return $result;
 }
-sub start {
-  my ($argv) = @_;
-  my $pattern_name = 'rep-path-from-so-path';
-  my $path_in = 'foo/bar.$(so_ext)';
-  print 'pattern-name: ' . $pattern_name . "\n";
-  print 'in:  ' . $path_in . "\n";
-  my $path_out = &out_path_from_in_path($pattern_name, $path_in);
-  print 'out: ' . $path_out . "\n";
-}
 sub var_perl_from_make { # convert variable syntax to perl from make
   my ($str) = @_;
   my $result = $str;
@@ -85,19 +72,15 @@ sub var_perl_from_make { # convert variable syntax to perl from make
   $result =~ s|\$\{(\w+)\}|\$$1|g;
   return $result;
 }
-sub rep_path_from_so_path {
-  my ($in_path) = @_;
-  return &out_path_from_in_path('rep-path-from-so-path', $in_path);
-}
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
   #my $pattern = $$patterns{$pattern_name} =~ s|\s*:\s*| : |r;
   #print 'pattern: ' . $pattern . "\n";
   $expanded_patterns = &expanded_patterns();
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*| : |r;
-  print 'pattern: ' . $pattern . "\n";
+  #print 'pattern: ' . $pattern . "\n";
   my $result = &expand(&var_perl_from_make($path_in));
-  print 'in:  ' . $result . "\n";
+  #print 'in:  ' . $result . "\n";
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
 
@@ -123,7 +106,19 @@ sub out_path_from_in_path {
   }
   return $result;
 }
-
+sub rep_path_from_so_path {
+  my ($in_path) = @_;
+  return &out_path_from_in_path('rep-path-from-so-path', $in_path);
+}
+sub start {
+  my ($argv) = @_;
+  my $pattern_name = 'rep-path-from-so-path';
+  my $path_in = 'foo/bar.$(so_ext)';
+  print 'pattern-name: ' . $pattern_name . "\n";
+  print 'in:  ' . $path_in . "\n";
+  my $path_out = &out_path_from_in_path($pattern_name, $path_in);
+  print 'out: ' . $path_out . "\n";
+}
 unless (caller) {
   &start(\@ARGV);
 }
