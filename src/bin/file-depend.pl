@@ -9,14 +9,37 @@
 use strict;
 use warnings;
 
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Indent    = 1;   # default = 2
+
 my $patterns = {
-  'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)', # var-lhs
-  #'rep-from-so' => '$(objdir)/%.rep : %.so',
-};
-my $expanded_patterns = {
+  'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)',
 };
 my $so_ext = 'so';
 my $objdir = 'obj';
+
+sub expand {
+  my ($str) = @_;
+  $str =~ s/(\$\w+)/$1/eeg;
+  return $str;
+}
+
+sub expand_tbl {
+  my ($tbl_in, $tbl_out) = @_;
+  my ($key, $val);
+
+  while (($key, $val) = each (%$tbl_in)) {
+    $val = &var_make_to_perl($val);
+    $val = &expand($val);
+    $$tbl_out{$key} = $val;
+  }
+  print &Dumper($tbl_out);
+  return $tbl_out;
+}
 
 sub canon_path {
   my ($path) = @_;
@@ -29,13 +52,12 @@ sub canon_path {
 # regex     s|  ^(.+?)\.$so_ext$  |  $objdir/$1\.rep |
 sub start {
   my ($argv) = @_;
-
-  my $pattern = $$patterns{'rep-from-so'};
-  my $path_in = 'foo/bar.$(so_ext)'; # var-lhs
-  #my $path_in = 'foo/bar.so';
+  my $ex_patterns = &expand_tbl($patterns, {});
+  my $pattern = $$ex_patterns{'rep-from-so'};
+  my $path_in = 'foo/bar.$(so_ext)';
   print 'pattern: ' . $pattern . "\n";
   print 'in:  ' . $path_in . "\n";
-  my $path_out = &path_out_from_path_in($pattern, $path_in);
+  my $path_out = &path_out_from_path_in($pattern, &expand(&var_make_to_perl($path_in)));
   print 'out: ' . $path_out . "\n";
 }
 
@@ -56,9 +78,7 @@ sub escape {
   return $result;
 }
 sub path_out_from_path_in {
-  my ($pattern_make, $path_in_make) = @_;
-  my $pattern = &var_make_to_perl($pattern_make);
-  my $path_in = &var_make_to_perl($path_in_make);
+  my ($pattern, $path_in) = @_;
 
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   my $tbl = {
@@ -75,8 +95,8 @@ sub path_out_from_path_in {
   #$pattern_template =     qr/$pattern_template/;
   #$pattern_replacement =  qr/$pattern_replacement/;
 
-  print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
-  print STDERR "DEBUG: $path_in\n";
+  #print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
+  #print STDERR "DEBUG: $path_in\n";
 
   my $result = $path_in;
 
