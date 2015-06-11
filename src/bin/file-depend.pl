@@ -17,7 +17,7 @@ $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
 my $patterns = {
-  'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)',
+  'rep-path-from-so-path' => '$(objdir)/%.rep : %.$(so_ext)',
 };
 my $expanded_patterns;
 my $so_ext = 'so';
@@ -54,11 +54,11 @@ sub canon_path {
 
 sub start {
   my ($argv) = @_;
-  my $pattern_name = 'rep-from-so';
+  my $pattern_name = 'rep-path-from-so-path';
   my $path_in = 'foo/bar.$(so_ext)';
   print 'pattern-name: ' . $pattern_name . "\n";
   print 'in:  ' . $path_in . "\n";
-  my $path_out = &path_out_from_path_in($pattern_name, $path_in);
+  my $path_out = &out_path_from_in_path($pattern_name, $path_in);
   print 'out: ' . $path_out . "\n";
 }
 sub var_perl_from_make { # convert variable syntax to perl from make
@@ -69,9 +69,10 @@ sub var_perl_from_make { # convert variable syntax to perl from make
   return $result;
 }
 sub rep_path_from_so_path {
-
+  my ($in_path) = @_;
+  return &out_path_from_in_path('rep-path-from-so-path', $in_path);
 }
-sub path_out_from_path_in {
+sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
   print 'pattern: ' . $$patterns{$pattern_name} . "\n";
   if (!$expanded_patterns) {
