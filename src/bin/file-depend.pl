@@ -19,8 +19,12 @@ $Data::Dumper::Indent    = 1;   # default = 2
 my $patterns = {
   'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)',
 };
+my $expanded_patterns;
 my $so_ext = 'so';
 my $objdir = 'obj';
+
+BEGIN {
+};
 
 sub expand {
   my ($str) = @_;
@@ -37,7 +41,7 @@ sub expand_tbl {
     $val = &expand($val);
     $$tbl_out{$key} = $val;
   }
-  print &Dumper($tbl_out);
+  #print &Dumper($tbl_out);
   return $tbl_out;
 }
 
@@ -48,17 +52,17 @@ sub canon_path {
   return $result;
 }
 
-# pattern       '$(objdir)/%.rep  :  %.$(so_ext)'
-# regex     s|  ^(.+?)\.$so_ext$  |  $objdir/$1\.rep |
 sub start {
   my ($argv) = @_;
-  my $ex_patterns = &expand_tbl($patterns, {});
-  my $pattern = $$ex_patterns{'rep-from-so'};
+  if (!$expanded_patterns) {
+    $expanded_patterns = &expand_tbl($patterns, {});
+  }
+  my $ex_pattern = $$expanded_patterns{'rep-from-so'};
   my $path_in = 'foo/bar.$(so_ext)';
   $path_in = &expand(&var_make_to_perl($path_in));
-  print 'pattern: ' . $pattern . "\n";
+  print 'pattern: ' . $ex_pattern . "\n";
   print 'in:  ' . $path_in . "\n";
-  my $path_out = &path_out_from_path_in($pattern, $path_in);
+  my $path_out = &path_out_from_path_in($ex_pattern, $path_in);
   print 'out: ' . $path_out . "\n";
 }
 
@@ -82,22 +86,21 @@ sub path_out_from_path_in {
   my ($pattern, $path_in) = @_;
 
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
-  my $tbl = {
-    '\.'=>     '\\.',
-    '\$' => '\\$', # omit var-lhs
-  };
-  $pattern_template =    &escape($pattern_template,    $tbl);
-  $pattern_template =~   s|\%|(\.+?)|;
-  #$pattern_replacement =~ s|\%|&canon_path(\$1)|;
+ #my $tbl = {
+ #  '\.'=>     '\\.',
+ #  '\$' => '\\$', # omit var-lhs
+ #};
+  $pattern_template =~ s|\%|(\.+?)|;
 
-  #$pattern_replacement =~ s|\%|\$1|;
+ #$pattern_replacement =~ s|\%|&canon_path(\$1)|;
+ #$pattern_replacement =~ s|\%|\$1|;
   $pattern_replacement =~ s|\%|\%s|;
 
-  #$pattern_template =     qr/$pattern_template/;
-  #$pattern_replacement =  qr/$pattern_replacement/;
+ #$pattern_template =     qr/$pattern_template/;
+ #$pattern_replacement =  qr/$pattern_replacement/;
 
-  #print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
-  #print STDERR "DEBUG: $path_in\n";
+ #print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
+ #print STDERR "DEBUG: $path_in\n";
 
   my $result = $path_in;
 
@@ -106,8 +109,8 @@ sub path_out_from_path_in {
       $result = sprintf($pattern_replacement, $1);
     }
   } else {
-    my $result0 = $path_in =~ s|^(.+?)\.$so_ext$|$objdir/$1.rep|r;
-    print "DEBUG: result0:  $result0\n";
+    #my $result0 = $path_in =~ s|^(.+?)\.so$|obj/$1.rep|r;
+    #print "DEBUG: result0:  $result0\n";
 
     $pattern_replacement =~ s|\%s|\$1|;
     $result = $path_in =~ s|^$pattern_template$|$pattern_replacement|r;
