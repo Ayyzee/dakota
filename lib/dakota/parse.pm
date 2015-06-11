@@ -463,9 +463,8 @@ sub o_path_from_dk_path {
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%.$(o_ext): $(objdir)/%.$(cc_ext)  1 of 2
-# makefile            %.$(o_ext):           %.$(cc_ext)  2 of 2
-sub o_path_from_cc_path {
+# makefile  $(objdir)/%.$(o_ext): $(objdir)/%.$(cc_ext)
+sub o_path_from_cc_path { # justs replaces .cc with .$(o_ext)
   my ($path) = @_;
   die if !defined $cc_ext;
   $path =~ s/\.$cc_ext$//;
@@ -474,9 +473,8 @@ sub o_path_from_cc_path {
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%.rep: $(objdir)/%.ctlg  1 of 2
-# makefile            %.rep:           %.ctlg  2 of 2
-sub rep_path_from_ctlg_path {
+# makefile  $(objdir)/%.ctlg.rep: $(objdir)/%.ctlg
+sub rep_path_from_ctlg_path { # justs appends .rep to .ctlg
   my ($path) = @_;
   # former *_any_path
   my $canon_path_ctlg = &rel_path_canon($path, undef);
@@ -484,8 +482,8 @@ sub rep_path_from_ctlg_path {
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%.ctlg: %.$(so_ext)
-sub ctlg_path_from_so_path {
+# makefile  $(objdir)/%.$(so_ext).ctlg: %.$(so_ext)
+sub ctlg_path_from_so_path { # justs appends .ctlg to .$so_ext
   my ($path) = @_;
   # former *_any_path
   my $canon_path_so = &rel_path_canon($path, undef);
