@@ -13,6 +13,8 @@ my $patterns = {
   'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)', # var-lhs
   #'rep-from-so' => '$(objdir)/%.rep : %.so',
 };
+my $expanded_patterns = {
+};
 my $so_ext = 'so';
 my $objdir = 'obj';
 
@@ -27,13 +29,14 @@ sub canon_path {
 # regex     s|  ^(.+?)\.$so_ext$  |  $objdir/$1\.rep |
 sub start {
   my ($argv) = @_;
+
   my $pattern = $$patterns{'rep-from-so'};
-  my $xx_path = 'foo/bar.$(so_ext)'; # var-lhs
-  #my $xx_path = 'foo/bar.so';
+  my $path_in = 'foo/bar.$(so_ext)'; # var-lhs
+  #my $path_in = 'foo/bar.so';
   print 'pattern: ' . $pattern . "\n";
-  print 'in:  ' . $xx_path . "\n";
-  my $yy_path = &yy_path_from_xx_path($pattern, $xx_path);
-  print 'out: ' . $yy_path . "\n";
+  print 'in:  ' . $path_in . "\n";
+  my $path_out = &path_out_from_path_in($pattern, $path_in);
+  print 'out: ' . $path_out . "\n";
 }
 
 sub var_make_to_perl { # convert variable syntax from make to perl
@@ -52,10 +55,10 @@ sub escape {
   }
   return $result;
 }
-sub yy_path_from_xx_path {
-  my ($pattern_make, $xx_path_make) = @_;
+sub path_out_from_path_in {
+  my ($pattern_make, $path_in_make) = @_;
   my $pattern = &var_make_to_perl($pattern_make);
-  my $xx_path = &var_make_to_perl($xx_path_make);
+  my $path_in = &var_make_to_perl($path_in_make);
 
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   my $tbl = {
@@ -63,7 +66,7 @@ sub yy_path_from_xx_path {
     '\$' => '\\$', # omit var-lhs
   };
   $pattern_template =    &escape($pattern_template,    $tbl);
-  $pattern_template =~    s|\%|(\.+?)|;
+  $pattern_template =~   s|\%|(\.+?)|;
   #$pattern_replacement =~ s|\%|&canon_path(\$1)|;
 
   #$pattern_replacement =~ s|\%|\$1|;
@@ -73,20 +76,20 @@ sub yy_path_from_xx_path {
   #$pattern_replacement =  qr/$pattern_replacement/;
 
   print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
-  print STDERR "DEBUG: $xx_path\n";
+  print STDERR "DEBUG: $path_in\n";
 
-  my $result = $xx_path;
+  my $result = $path_in;
 
   if (1) {
     if ($result =~ m|^$pattern_template$|) {
       $result = sprintf($pattern_replacement, $1);
     }
   } else {
-    #my $result0 = $xx_path =~ s|^(.+?)\.$so_ext$|$objdir/$1.rep|r;
-    #print "  result0:  $result0\n";
+    my $result0 = $path_in =~ s|^(.+?)\.$so_ext$|$objdir/$1.rep|r;
+    print "DEBUG: result0:  $result0\n";
 
-    $pattern_replacement =~ s|\%s|%|;
-    $result = $xx_path =~ s|^$pattern_template$|$pattern_replacement|r;
+    $pattern_replacement =~ s|\%s|\$1|;
+    $result = $path_in =~ s|^$pattern_template$|$pattern_replacement|r;
   }
   return $result;
 }
