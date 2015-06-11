@@ -32,9 +32,11 @@ sub expand {
   #$str =~ s/(\$\w+)/$1/eg;
   return $str;
 }
-
-sub expand_tbl {
+sub expand_tbl_values {
   my ($tbl_in, $tbl_out) = @_;
+  if (!$tbl_out) {
+    $tbl_out = {};
+  }
   my ($key, $val);
 
   while (($key, $val) = each (%$tbl_in)) {
@@ -44,14 +46,12 @@ sub expand_tbl {
   #print &Dumper($tbl_out);
   return $tbl_out;
 }
-
-sub canon_path {
+sub rel_path_canon {
   my ($path) = @_;
   my $result = $path;
   ###
   return $result;
 }
-
 sub start {
   my ($argv) = @_;
   my $pattern_name = 'rep-path-from-so-path';
@@ -76,7 +76,7 @@ sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
   print 'pattern: ' . $$patterns{$pattern_name} . "\n";
   if (!$expanded_patterns) {
-    $expanded_patterns = &expand_tbl($patterns, {});
+    $expanded_patterns = &expand_tbl_values($patterns, {});
   }
   my $pattern = $$expanded_patterns{$pattern_name};
   print 'pattern: ' . $pattern . "\n";
@@ -85,9 +85,9 @@ sub out_path_from_in_path {
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
 
- #$pattern_replacement =~ s|\%|&canon_path(\$1)|;
+ #$pattern_replacement =~ s|\%|&rel_path_canon(\$1)|;
  #$pattern_replacement =~ s|\%|\$1|;
- #$pattern_replacement =~ s|\%|&canon_path(\%s)|;
+ #$pattern_replacement =~ s|\%|&rel_path_canon(\%s)|;
   $pattern_replacement =~ s|\%|\%s|;
 
  #print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
@@ -95,7 +95,7 @@ sub out_path_from_in_path {
 
   if (1) {
     if ($result =~ m|^$pattern_template$|) {
-      $result = sprintf($pattern_replacement, &canon_path($1));
+      $result = sprintf($pattern_replacement, &rel_path_canon($1));
       $result = &expand($result);
     }
   } else {
