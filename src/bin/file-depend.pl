@@ -10,8 +10,8 @@ use strict;
 use warnings;
 
 my $patterns = {
-  #'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)',
-  'rep-from-so' => '$(objdir)/%.rep : %.so',
+  'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)',
+  #'rep-from-so' => '$(objdir)/%.rep : %.so',
 };
 my $so_ext = 'so';
 my $objdir = 'obj';
@@ -28,8 +28,8 @@ sub canon_path {
 sub start {
   my ($argv) = @_;
   my $pattern = $$patterns{'rep-from-so'};
-  #my $xx_path = 'foo/bar.$(so_ext)';
-  my $xx_path = 'foo/bar.so';
+  my $xx_path = 'foo/bar.$(so_ext)';
+  #my $xx_path = 'foo/bar.so';
   print 'pattern: ' . $pattern . "\n";
   print 'in:  ' . $xx_path . "\n";
   my $yy_path = &yy_path_from_xx_path($pattern, $xx_path);
