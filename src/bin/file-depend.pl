@@ -17,10 +17,27 @@ $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
 my $patterns = {
-  'rep-path-from-so-path' => '$(objdir)/%.rep: %.$(so_ext)',
+  'cc-path-from-dk-path' =>       '$(objdir)/nrt/%.$(cc_ext)  : %.dk',
+  'cc-path-from-so-path' =>       '$(objdir)/rt/%.$(cc_ext)   : %.$(so_ext)',
+  'ctlg-dir-path-from-so-path' => '$(objdir)/%                : %.$(so_ext)',
+  'ctlg-path-from-so-path' =>     '$(objdir)/%.$(so_ext).ctlg : %.$(so_ext)',
+  'o-path-from-cc-path' =>        '$(objdir)/%.$(o_ext)       : $(objdir)/%.$(cc_ext)',
+  'o-path-from-dk-path' =>        '$(objdir)/nrt/%.$(o_ext)   : %.dk',
+  'rep-path-from-ctlg-path' =>    '$(objdir)/%.ctlg.rep       : $(objdir)/%.ctlg',
+  'rep-path-from-dk-path' =>      '$(objdir)/%.dk.rep         : %.dk',
+  'rep-path-from-so-path' =>      '$(objdir)/%.rep            : %.$(so_ext)',
 };
 my $expanded_patterns;
+sub expanded_patterns {
+  if (!$expanded_patterns) {
+    $expanded_patterns = &expand_tbl_values($patterns, {});
+  }
+  return $expanded_patterns;
+}
+
 my $so_ext = 'so';
+my $cc_ext = 'cc';
+my $o_ext =  'o';
 my $objdir = 'obj';
 
 BEGIN {
@@ -74,11 +91,10 @@ sub rep_path_from_so_path {
 }
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
-  print 'pattern: ' . $$patterns{$pattern_name} . "\n";
-  if (!$expanded_patterns) {
-    $expanded_patterns = &expand_tbl_values($patterns, {});
-  }
-  my $pattern = $$expanded_patterns{$pattern_name};
+  #my $pattern = $$patterns{$pattern_name} =~ s|\s*:\s*| : |r;
+  #print 'pattern: ' . $pattern . "\n";
+  $expanded_patterns = &expanded_patterns();
+  my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*| : |r;
   print 'pattern: ' . $pattern . "\n";
   my $result = &expand(&var_perl_from_make($path_in));
   print 'in:  ' . $result . "\n";
