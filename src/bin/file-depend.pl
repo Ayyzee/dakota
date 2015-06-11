@@ -10,8 +10,8 @@ use strict;
 use warnings;
 
 my $patterns = {
-  #'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)',
-  'rep-from-so' => '$(objdir)/%.rep : %.so',
+  'rep-from-so' => '$(objdir)/%.rep : %.$(so_ext)', # var-lhs
+  #'rep-from-so' => '$(objdir)/%.rep : %.so',
 };
 my $so_ext = 'so';
 my $objdir = 'obj';
@@ -28,8 +28,8 @@ sub canon_path {
 sub start {
   my ($argv) = @_;
   my $pattern = $$patterns{'rep-from-so'};
-  #my $xx_path = 'foo/bar.$(so_ext)';
-  my $xx_path = 'foo/bar.so';
+  my $xx_path = 'foo/bar.$(so_ext)'; # var-lhs
+  #my $xx_path = 'foo/bar.so';
   print 'pattern: ' . $pattern . "\n";
   print 'in:  ' . $xx_path . "\n";
   my $yy_path = &yy_path_from_xx_path($pattern, $xx_path);
@@ -60,7 +60,7 @@ sub yy_path_from_xx_path {
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   my $tbl = {
     '\.'=>     '\\.',
-    #'\$' => '\\$',
+    '\$' => '\\$', # omit var-lhs
   };
   $pattern_template =    &escape($pattern_template,    $tbl);
   $pattern_template =~    s|\%|(\.+?)|;
@@ -71,6 +71,9 @@ sub yy_path_from_xx_path {
 
   #$pattern_template =     qr/$pattern_template/;
   #$pattern_replacement =  qr/$pattern_replacement/;
+
+  print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
+  print STDERR "DEBUG: $xx_path\n";
 
   my $result = $xx_path;
 
