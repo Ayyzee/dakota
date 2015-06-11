@@ -56,8 +56,8 @@ sub start {
   my ($argv) = @_;
   my $pattern_name = 'rep-from-so';
   my $path_in = 'foo/bar.$(so_ext)';
-  print 'pattern-name: ' . $pattern_name . "\n";
-  print 'in:  ' . $path_in . "\n";
+  #print 'pattern-name: ' . $pattern_name . "\n";
+  #print 'in:  ' . $path_in . "\n";
   my $path_out = &path_out_from_path_in($pattern_name, $path_in);
   print 'out: ' . $path_out . "\n";
 }
@@ -68,26 +68,16 @@ sub var_make_to_perl { # convert variable syntax from make to perl
   $result =~ s|\$\((\w+)\)|\$$1|g;
   return $result;
 }
-sub escape {
-  my ($str, $tbl) = @_;
-  my $result = $str;
-  my ($key, $val);
-
-  while (($key, $val) = each (%$tbl)) {
-    $result =~ s|$key|$val|g;
-  }
-  return $result;
-}
 sub path_out_from_path_in {
   my ($pattern_name, $path_in) = @_;
-  print 'pattern: ' . $$patterns{$pattern_name} . "\n";
+ #print 'pattern: ' . $$patterns{$pattern_name} . "\n";
   if (!$expanded_patterns) {
     $expanded_patterns = &expand_tbl($patterns, {});
   }
   my $pattern = $$expanded_patterns{$pattern_name};
-  print 'pattern: ' . $pattern . "\n";
+ #print 'pattern: ' . $pattern . "\n";
   my $result = &expand(&var_make_to_perl($path_in));
-  print 'in:  ' . $result . "\n";
+ #print 'in:  ' . $result . "\n";
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
 
