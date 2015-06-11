@@ -54,15 +54,11 @@ sub canon_path {
 
 sub start {
   my ($argv) = @_;
-  if (!$expanded_patterns) {
-    $expanded_patterns = &expand_tbl($patterns, {});
-  }
-  my $ex_pattern = $$expanded_patterns{'rep-from-so'};
+  my $pattern_name = 'rep-from-so';
   my $path_in = 'foo/bar.$(so_ext)';
-  $path_in = &expand(&var_make_to_perl($path_in));
-  print 'pattern: ' . $ex_pattern . "\n";
+  print 'pattern-name: ' . $pattern_name . "\n";
   print 'in:  ' . $path_in . "\n";
-  my $path_out = &path_out_from_path_in($ex_pattern, $path_in);
+  my $path_out = &path_out_from_path_in($pattern_name, $path_in);
   print 'out: ' . $path_out . "\n";
 }
 
@@ -83,26 +79,24 @@ sub escape {
   return $result;
 }
 sub path_out_from_path_in {
-  my ($pattern, $path_in) = @_;
-
+  my ($pattern_name, $path_in) = @_;
+  print 'pattern: ' . $$patterns{$pattern_name} . "\n";
+  if (!$expanded_patterns) {
+    $expanded_patterns = &expand_tbl($patterns, {});
+  }
+  my $pattern = $$expanded_patterns{$pattern_name};
+  print 'pattern: ' . $pattern . "\n";
+  my $result = &expand(&var_make_to_perl($path_in));
+  print 'in:  ' . $result . "\n";
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
- #my $tbl = {
- #  '\.'=>     '\\.',
- #  '\$' => '\\$', # omit var-lhs
- #};
   $pattern_template =~ s|\%|(\.+?)|;
 
  #$pattern_replacement =~ s|\%|&canon_path(\$1)|;
  #$pattern_replacement =~ s|\%|\$1|;
   $pattern_replacement =~ s|\%|\%s|;
 
- #$pattern_template =     qr/$pattern_template/;
- #$pattern_replacement =  qr/$pattern_replacement/;
-
  #print STDERR "DEBUG: $pattern_template  ->  $pattern_replacement\n";
  #print STDERR "DEBUG: $path_in\n";
-
-  my $result = $path_in;
 
   if (1) {
     if ($result =~ m|^$pattern_template$|) {
