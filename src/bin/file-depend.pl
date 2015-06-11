@@ -55,9 +55,10 @@ sub start {
   my $ex_patterns = &expand_tbl($patterns, {});
   my $pattern = $$ex_patterns{'rep-from-so'};
   my $path_in = 'foo/bar.$(so_ext)';
+  $path_in = &expand(&var_make_to_perl($path_in));
   print 'pattern: ' . $pattern . "\n";
   print 'in:  ' . $path_in . "\n";
-  my $path_out = &path_out_from_path_in($pattern, &expand(&var_make_to_perl($path_in)));
+  my $path_out = &path_out_from_path_in($pattern, $path_in);
   print 'out: ' . $path_out . "\n";
 }
 
