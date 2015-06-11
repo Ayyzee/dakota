@@ -17,7 +17,7 @@ $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
 my $patterns = {
-  'rep-path-from-so-path' => '$(objdir)/%.rep : %.$(so_ext)',
+  'rep-path-from-so-path' => '$(objdir)/%.rep: %.$(so_ext)',
 };
 my $expanded_patterns;
 my $so_ext = 'so';

@@ -436,19 +436,12 @@ sub cc_path_from_so_path {
   $path =~ s|//|/|g;
   return $path;
 }
-#sub ctlg_rep_path_from_so_path
-#{
-#    my ($path) = @_;
-#    $path =~ s/\.$so_ext$//;
-#    my $canon_path = &rel_path_canon($path, undef);
-#    $path = "$repdir/$canon_path.ctlg.rep";
-#    return $path;
-#}
 # makefile  $(objdir)/%.rep: %.dk
 sub rep_path_from_dk_path {
   my ($path) = @_;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.rep";
+  # former *_any_path
+  my $canon_path_dk = &rel_path_canon($path, undef);
+  $path = "$objdir/$canon_path_dk.rep";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -470,28 +463,33 @@ sub o_path_from_dk_path {
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%.$(o_ext): $(objdir)/%.$(cc_ext)
+# makefile  $(objdir)/%.$(o_ext): $(objdir)/%.$(cc_ext)  1 of 2
+# makefile            %.$(o_ext):           %.$(cc_ext)  2 of 2
 sub o_path_from_cc_path {
   my ($path) = @_;
+  die if !defined $cc_ext;
   $path =~ s/\.$cc_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.$o_ext";
+  $path = "$canon_path.$o_ext"; # already has leading $objdir
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%.rep: $(objdir)/%.ctlg
+# makefile  $(objdir)/%.rep: $(objdir)/%.ctlg  1 of 2
+# makefile            %.rep:           %.ctlg  2 of 2
 sub rep_path_from_ctlg_path {
   my ($path) = @_;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.rep"; # already has leading $objdir
+  # former *_any_path
+  my $canon_path_ctlg = &rel_path_canon($path, undef);
+  $path = "$canon_path_ctlg.rep"; # already has leading $objdir
   $path =~ s|//|/|g;
   return $path;
 }
 # makefile  $(objdir)/%.ctlg: %.$(so_ext)
 sub ctlg_path_from_so_path {
   my ($path) = @_;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.ctlg";
+  # former *_any_path
+  my $canon_path_so = &rel_path_canon($path, undef);
+  $path = "$objdir/$canon_path_so.ctlg";
   $path =~ s|//|/|g;
   return $path;
 }
