@@ -82,17 +82,17 @@ our @EXPORT= qw(
                  add_symbol
                  add_symbol_ident
                  add_trait_decl
-                 cc_path_from_dk_path
-                 cc_path_from_so_path
                  colin
                  colout
                  ctlg_path_from_any_path
                  init_global_rep
                  kw_args_translate
+                 nrt_cc_path_from_dk_path
+                 nrt_o_path_from_dk_path
                  o_path_from_cc_path
-                 o_path_from_dk_path
                  rep_path_from_any_path
                  rep_path_from_so_path
+                 rt_cc_path_from_so_path
                  str_from_cmd_info
               );
 
@@ -396,8 +396,16 @@ sub rel_path_canon { # should merge with canon_path()
   }
   return $result;
 }
+# makefile  $(objdir)/%.ctlg: %
+sub ctlg_path_from_any_path {
+  my ($path) = @_;
+  my $canon_path = &rel_path_canon($path, undef);
+  $path = "$objdir/$canon_path.ctlg";
+  $path =~ s|//|/|g;
+  return $path;
+}
 # makefile  $(objdir)/nrt/%.$(cc_ext): %.dk
-sub cc_path_from_dk_path {
+sub nrt_cc_path_from_dk_path {
   my ($path) = @_;
   $path =~ s/\.dk$//;
   my $canon_path = &rel_path_canon($path, undef);
@@ -405,21 +413,12 @@ sub cc_path_from_dk_path {
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/rt/%.$(cc_ext): %.$(so_ext)
-sub cc_path_from_so_path {
+# makefile  $(objdir)/nrt/%.$(o_ext): %.dk
+sub nrt_o_path_from_dk_path {
   my ($path) = @_;
-  die if !defined $so_ext;
-  $path =~ s/\.$so_ext$//;
+  $path =~ s/\.dk$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/rt/$canon_path.$cc_ext";
-  $path =~ s|//|/|g;
-  return $path;
-}
-# makefile  $(objdir)/%.ctlg: %
-sub ctlg_path_from_any_path {
-  my ($path) = @_;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.ctlg";
+  $path = "$objdir/nrt/$canon_path.$o_ext";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -430,15 +429,6 @@ sub o_path_from_cc_path { # justs replaces .cc with .$(o_ext)
   $path =~ s/\.$cc_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$canon_path.$o_ext"; # already has leading $objdir
-  $path =~ s|//|/|g;
-  return $path;
-}
-# makefile  $(objdir)/nrt/%.$(o_ext): %.dk
-sub o_path_from_dk_path {
-  my ($path) = @_;
-  $path =~ s/\.dk$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$o_ext";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -457,6 +447,16 @@ sub rep_path_from_so_path {
   $path =~ s/\.$so_ext$//;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/$canon_path.rep";
+  $path =~ s|//|/|g;
+  return $path;
+}
+# makefile  $(objdir)/rt/%.$(cc_ext): %.$(so_ext)
+sub rt_cc_path_from_so_path {
+  my ($path) = @_;
+  die if !defined $so_ext;
+  $path =~ s/\.$so_ext$//;
+  my $canon_path = &rel_path_canon($path, undef);
+  $path = "$objdir/rt/$canon_path.$cc_ext";
   $path =~ s|//|/|g;
   return $path;
 }

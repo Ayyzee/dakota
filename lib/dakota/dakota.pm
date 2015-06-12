@@ -606,7 +606,7 @@ sub loop_o_from_dk {
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
           $arg =~ m|\.ctlg$|) {
-      my $o_path = &o_path_from_dk_path($arg);
+      my $o_path = &nrt_o_path_from_dk_path($arg);
       print "  creating $o_path\n";
       if (!$want_separate_rep_pass) {
         my $rep_path = &rep_path_from_any_path($arg);
@@ -616,7 +616,7 @@ sub loop_o_from_dk {
         &rep_from_dk($rep_cmd);
         &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
       }
-      my $cc_path = &cc_path_from_dk_path($arg);
+      my $cc_path = &nrt_cc_path_from_dk_path($arg);
       my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$cc_cmd{'inputs'} = [ $arg ];
       $$cc_cmd{'output'} = $cc_path;
@@ -672,7 +672,7 @@ sub rt_o_from_rep {
   my ($cmd_info) = @_;
   my $so_path = $$cmd_info{'output'};
   my $rep_path = &rep_path_from_so_path($so_path);
-  my $cc_path = &cc_path_from_so_path($so_path);
+  my $cc_path = &rt_cc_path_from_so_path($so_path);
   my $o_path = &o_path_from_cc_path($cc_path);
   &make_dir($cc_path);
   my ($path, $file_basename, $file) = ($cc_path, $cc_path, undef);
