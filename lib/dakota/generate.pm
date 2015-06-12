@@ -60,6 +60,8 @@ use integer;
 use Cwd;
 use Data::Dumper;
 
+use File::Basename;
+
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
@@ -264,17 +266,19 @@ sub write_to_file_converted_strings {
   }
 }
 sub generate_nrt_decl {
-  my ($path, $file_basename, $file) = @_;
+  my ($dir, $file_basename, $file) = @_;
+  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $dir . ', ' . $file_basename . ', ' . $file . ')' . "\n";
   &set_nrt_decl();
-  return &generate_nrt($path, $file_basename, $file);
+  return &generate_nrt($dir, $file_basename, $file);
 }
 sub generate_nrt_defn {
-  my ($path, $file_basename, $file) = @_;
+  my ($dir, $file_basename, $file) = @_;
+  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $dir . ', ' . $file_basename . ', ' . $file . ')' . "\n";
   &set_nrt_defn();
-  return &generate_nrt($path, $file_basename, $file);
+  return &generate_nrt($dir, $file_basename, $file);
 }
 sub generate_nrt {
-  my ($path, $file_basename, $file) = @_;
+  my ($dir, $file_basename, $file) = @_;
   $gbl_nrt_file = "$file_basename.dk";
   my $name = $file_basename;
   $name =~ s|.*/||; # strip off directory part
@@ -284,7 +288,7 @@ sub generate_nrt {
   my $result;
 
   if (&is_nrt_decl()) {
-    my $output = "$path/$name.$hh_ext";
+    my $output = "$dir/$name.$hh_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
@@ -307,12 +311,12 @@ sub generate_nrt {
       #&labeled_src_str($result, "selectors-seq-hh") .
       #&labeled_src_str($result, "signatures-seq-hh") .
 
-    &write_to_file_converted_strings("$path/$name.$hh_ext", [ $str_hh ]);
-    return "$path/$name.$hh_ext";
+    &write_to_file_converted_strings("$dir/$name.$hh_ext", [ $str_hh ]);
+    return "$dir/$name.$hh_ext";
   } else {
     my $col; my $stack;
-    my $pre_output = "$path/$name.dk";
-    my $output = "$path/$name.$cc_ext";
+    my $pre_output = "$dir/$name.dk";
+    my $output = "$dir/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
@@ -336,27 +340,29 @@ sub generate_nrt {
   }
 } # sub generate_nrt
 sub generate_rt_decl {
-  my ($path, $file_basename, $file) = @_;
+  my ($path, $file) = @_;
+  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $path . ', ' . $file . ')' . "\n";
   &set_rt_decl();
-  return &generate_rt($path, $file_basename, $file);
+  return &generate_rt($path, $file);
 }
 sub generate_rt_defn {
-  my ($path, $file_basename, $file) = @_;
+  my ($path, $file) = @_;
+  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $path . ', ' . $file . ')' . "\n";
   &set_rt_defn();
-  return &generate_rt($path, $file_basename, $file);
+  return &generate_rt($path, $file);
 }
 sub generate_rt {
-  my ($path, $file_basename, $file) = @_;
+  my ($path, $file) = @_;
   $gbl_nrt_file = undef;
-  my $name = $file_basename;
-  $name =~ s|.*/||; # strip off directory part
-  $name =~ s|\.$id$||;
+  my ($name, $dir, $ext) = fileparse($path, "\.$id"); # only $cc_ext?
+  $dir = &canon_path($dir);
+  $ext =~ s|^\.||; # strip leadking dot
 
   my ($generics, $symbols) = &generics::parse($file);
   my $result;
 
   if (&is_rt_decl()) {
-    my $output = "$path/$name.$hh_ext";
+    my $output = "$dir/$name.$hh_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
@@ -379,11 +385,11 @@ sub generate_rt {
       #&labeled_src_str($result, "selectors-seq-hh") .
       #&labeled_src_str($result, "signatures-seq-hh") .
 
-    &write_to_file_converted_strings("$path/$name.$hh_ext", [ $str_hh ]);
-    return "$path/$name.$hh_ext";
+    &write_to_file_converted_strings("$dir/$name.$hh_ext", [ $str_hh ]);
+    return "$dir/$name.$hh_ext";
   } else {
-    my $pre_output = "$path/$name.dk";
-    my $output = "$path/$name.$cc_ext";
+    my $pre_output = "$dir/$name.dk";
+    my $output = "$dir/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }

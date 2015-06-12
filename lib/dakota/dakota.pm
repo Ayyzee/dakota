@@ -698,8 +698,8 @@ sub rt_o_from_rep {
   &nrt::add_extra_keywords($file);
   &nrt::add_extra_generics($file);
 
-  &dakota::generate::generate_rt_decl($path, $file_basename, $file);
-  &dakota::generate::generate_rt_defn($path, $file_basename, $file);
+  &dakota::generate::generate_rt_decl($cc_path, $file);
+  &dakota::generate::generate_rt_defn($cc_path, $file);
 
   my $o_info = {'opts' => {}, 'inputs' => [ $cc_path ], 'output' => $o_path };
   if ($$cmd_info{'opts'}{'precompile'}) {
