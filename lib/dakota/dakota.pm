@@ -108,7 +108,7 @@ sub loop_merged_rep_from_dk {
     if ($arg =~ m|\.dk$| ||
           $arg =~ m|\.ctlg$|) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
-      &_add_last($rep_files, &rep_path_from_dk_path($arg));
+      &_add_last($rep_files, &rep_path_from_any_path($arg));
     } elsif ($arg =~ m|\.rep$|) {
       $root = &scalar_from_file($arg);
       &_add_last($rep_files, $arg);
@@ -537,14 +537,14 @@ sub loop_rep_from_so {
     if ($arg =~ m|\.dk$| ||
         $arg =~ m|\.ctlg$|) {
     } else {
-      my $ctlg_path =     &ctlg_path_from_so_path($arg);
+      my $ctlg_path =     &ctlg_path_from_any_path($arg);
       my $ctlg_dir_path = &dakota::parse::ctlg_dir_path_from_so_path($arg);
       my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$ctlg_cmd{'output'} = $ctlg_path;
       $$ctlg_cmd{'output-directory'} = $ctlg_dir_path;
       $$ctlg_cmd{'inputs'} = [ $arg ];
       &ctlg_from_so($ctlg_cmd);
-      my $rep_path = &rep_path_from_ctlg_path($ctlg_path);
+      my $rep_path = &rep_path_from_any_path($ctlg_path);
       &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$rep_cmd{'output'} = $rep_path;
@@ -561,7 +561,7 @@ sub loop_rep_from_dk {
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
         $arg =~ m|\.ctlg$|) {
-      my $rep_path = &rep_path_from_dk_path($arg);
+      my $rep_path = &rep_path_from_any_path($arg);
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$rep_cmd{'output'} = $rep_path;
       $$rep_cmd{'inputs'} = [ $arg ];
@@ -609,7 +609,7 @@ sub loop_o_from_dk {
       my $o_path = &o_path_from_dk_path($arg);
       print "  creating $o_path\n";
       if (!$want_separate_rep_pass) {
-        my $rep_path = &rep_path_from_dk_path($arg);
+        my $rep_path = &rep_path_from_any_path($arg);
         my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
         $$rep_cmd{'inputs'} = [ $arg ];
         $$rep_cmd{'output'} = $rep_path;

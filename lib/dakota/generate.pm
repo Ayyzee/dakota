@@ -1674,7 +1674,7 @@ sub path::string {
 ## defined() (is the value (for this key) non-undef)
 sub dk::parse {
   my ($dkfile) = @_;            # string.dk
-  my $plfile = &dakota::parse::rep_path_from_dk_path($dkfile);
+  my $plfile = &dakota::parse::rep_path_from_any_path($dkfile);
   my $file = &dakota::util::scalar_from_file($plfile);
   $file = &dakota::parse::kw_args_translate($file);
   return $file;
