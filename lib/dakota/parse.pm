@@ -91,6 +91,7 @@ our @EXPORT= qw(
                  nrt_o_path_from_dk_path
                  o_path_from_cc_path
                  rep_path_from_any_path
+                 rep_path_from_ctlg_path
                  rep_path_from_so_path
                  rt_cc_path_from_so_path
                  str_from_cmd_info
@@ -437,6 +438,14 @@ sub rep_path_from_any_path {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$objdir/$canon_path.rep";
+  $path =~ s|//|/|g;
+  return $path;
+}
+# makefile  $(objdir)/%.ctlg.rep: $(objdir)/%.ctlg
+sub rep_path_from_ctlg_path {
+  my ($path) = @_;
+  my $canon_path = &rel_path_canon($path, undef);
+  $path = "$canon_path.rep";
   $path =~ s|//|/|g;
   return $path;
 }

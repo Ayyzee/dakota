@@ -26,6 +26,7 @@ use strict;
 use warnings;
 
 my $gbl_compiler;
+my $objdir;
 my $gbl_prefix;
 my $hh_ext;
 my $cc_ext;
@@ -49,6 +50,7 @@ BEGIN {
   use dakota::generate;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
     or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
 };
@@ -544,7 +546,7 @@ sub loop_rep_from_so {
       $$ctlg_cmd{'output-directory'} = $ctlg_dir_path;
       $$ctlg_cmd{'inputs'} = [ $arg ];
       &ctlg_from_so($ctlg_cmd);
-      my $rep_path = &rep_path_from_any_path($ctlg_path);
+      my $rep_path = &rep_path_from_ctlg_path($ctlg_path);
       &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$rep_cmd{'output'} = $rep_path;
@@ -554,7 +556,7 @@ sub loop_rep_from_so {
     }
   }
   return $cmd_info;
-}
+} # loop_rep_from_so
 sub loop_rep_from_dk {
   my ($cmd_info) = @_;
   my $rep_files = [];
@@ -804,13 +806,13 @@ sub exec_cmd {
   }
 }
   sub path_stat {
-    my ($path_db, $path) = @_;
+    my ($path_db, $path, $text) = @_;
     my $stat;
     if (exists $$path_db{$path}) {
       $stat = $$path_db{$path};
     } else {
       if ($show_outfile_info) {
-        print "STAT $path\n";
+        print "STAT $path, text=$text\n";
       }
       @$stat{qw(dev inode mode nlink uid gid rdev size atime mtime ctime blksize blocks)} = stat($path);
     }
@@ -833,11 +835,12 @@ sub append_to_env_file {
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
+  if ($outfile =~ m|^$objdir/$objdir/|) { die; } # likely a double $objdir prepend
   &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DKT_DEPENDS_OUTPUT_FILE");
   my $file_db = {};
-  my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'});
+  my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'}, '--output');
   foreach my $infile (@{$$cmd_info{'inputs'}}) {
-    my $infile_stat = &path_stat($file_db, $infile);
+    my $infile_stat = &path_stat($file_db, $infile, '--inputs');
     if (!$$infile_stat{'mtime'}) {
       $$infile_stat{'mtime'} = 0;
     }
