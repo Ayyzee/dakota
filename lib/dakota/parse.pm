@@ -396,13 +396,12 @@ sub rel_path_canon { # should merge with canon_path()
   }
   return $result;
 }
-# makefile  $(objdir)/%.rep: %.$(so_ext)
-sub rep_path_from_so_path {
+# makefile  $(objdir)/nrt/%.$(cc_ext): %.dk
+sub cc_path_from_dk_path {
   my ($path) = @_;
-  die if !defined $so_ext;
-  $path =~ s/\.$so_ext$//;
+  $path =~ s/\.dk$//;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.rep";
+  $path = "$objdir/nrt/$canon_path.$cc_ext";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -416,29 +415,11 @@ sub cc_path_from_so_path {
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%.rep: %
-sub rep_path_from_any_path {
+# makefile  $(objdir)/%.ctlg: %
+sub ctlg_path_from_any_path {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.rep";
-  $path =~ s|//|/|g;
-  return $path;
-}
-# makefile  $(objdir)/nrt/%.$(cc_ext): %.dk
-sub cc_path_from_dk_path {
-  my ($path) = @_;
-  $path =~ s/\.dk$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$cc_ext";
-  $path =~ s|//|/|g;
-  return $path;
-}
-# makefile  $(objdir)/nrt/%.$(o_ext): %.dk
-sub o_path_from_dk_path {
-  my ($path) = @_;
-  $path =~ s/\.dk$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$o_ext";
+  $path = "$objdir/$canon_path.ctlg";
   $path =~ s|//|/|g;
   return $path;
 }
@@ -452,11 +433,30 @@ sub o_path_from_cc_path { # justs replaces .cc with .$(o_ext)
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%.ctlg: %
-sub ctlg_path_from_any_path {
+# makefile  $(objdir)/nrt/%.$(o_ext): %.dk
+sub o_path_from_dk_path {
+  my ($path) = @_;
+  $path =~ s/\.dk$//;
+  my $canon_path = &rel_path_canon($path, undef);
+  $path = "$objdir/nrt/$canon_path.$o_ext";
+  $path =~ s|//|/|g;
+  return $path;
+}
+# makefile  $(objdir)/%.rep: %
+sub rep_path_from_any_path {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.ctlg";
+  $path = "$objdir/$canon_path.rep";
+  $path =~ s|//|/|g;
+  return $path;
+}
+# makefile  $(objdir)/%.rep: %.$(so_ext)
+sub rep_path_from_so_path {
+  my ($path) = @_;
+  die if !defined $so_ext;
+  $path =~ s/\.$so_ext$//;
+  my $canon_path = &rel_path_canon($path, undef);
+  $path = "$objdir/$canon_path.rep";
   $path =~ s|//|/|g;
   return $path;
 }
