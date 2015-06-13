@@ -140,8 +140,8 @@ $(blddir)/../lib/libdakota-util.$(so_ext): soname_pair =  $(libdakota_util_sonam
 
 check: all
 	$(blddir)/../bin/dakota-info $(blddir)/../lib/libdakota.$(so_ext) $(blddir)/../lib/libdakota-util.$(so_ext)
-	./$@.sh
 	$(MAKE) --file $@.mk
+	./$@.sh
 
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all

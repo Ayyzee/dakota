@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -o nounset -o errexit -o pipefail
+
+return_value=0
+for file in "$@"; do
+  #size=`stat -c%s $file 2>/dev/null` # linux
+  #if [[ $? -eq 0 ]]; then
+  #  printf "% 9i %s\n" $size $file
+  #else
+  #  return_value=1
+  #fi
+
+  eval $(stat -s $file) # darwin
+  if [[ $? -eq 0 ]]; then
+    printf "% 9i %s\n" $st_size $file
+  else
+    return_value=1
+  fi
+done
+exit $return_value
