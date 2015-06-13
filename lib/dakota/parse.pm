@@ -438,14 +438,7 @@ sub rep_path_from_ctlg_path {
   my ($path) = @_;
   return &out_path_from_in_path('rep_path_from_ctlg_path', $path);
 }
-# makefile  $(objdir)/%.ctlg.rep: $(objdir)/%.ctlg
-sub rep_path_from_ctlg_path_old {
-  my ($path) = @_;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.rep";
-  $path =~ s|//|/|g;
-  return $path;
-}
+
 sub rep_path_from_so_path_new {
   my ($path) = @_;
   return &out_path_from_in_path('rep_path_from_so_path', $path);
@@ -460,6 +453,7 @@ sub rep_path_from_so_path {
   $path =~ s|//|/|g;
   return $path;
 }
+
 sub rt_cc_path_from_so_path_new {
   my ($path) = @_;
   return &out_path_from_in_path('rt_cc_path_from_so_path', $path);
@@ -474,6 +468,7 @@ sub rt_cc_path_from_so_path {
   $path =~ s|//|/|g;
   return $path;
 }
+
 sub var_perl_from_make { # convert variable syntax to perl from make
   my ($str) = @_;
   my $result = $str;
