@@ -55,7 +55,6 @@ our @EXPORT= qw(
                  kw_args_generics_add
                  filestr_from_file
                  scalar_from_file
-                 canon_path
                  split_path
                  flatten
                  min
