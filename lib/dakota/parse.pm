@@ -1976,16 +1976,6 @@ sub dk::klass_names_from_file {
   }
   return $klass_names_set;
 }
-sub dk::file_basenames {
-  my ($files_ref) = @_;
-  my $list = [];
-  foreach my $file (@$files_ref) {
-    my ($name, $path, $suffix) = File::Basename::fileparse($file, "\.$id");
-    $path =~ s/^\.\///g;        # replace './' with ''
-    &dakota::util::_add_last($list, "$path$name");
-  }
-  return $list;
-}
 sub init_global_rep {
   my ($reps) = @_;
   #my $reinit = 0;

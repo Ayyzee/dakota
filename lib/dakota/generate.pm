@@ -266,23 +266,22 @@ sub write_to_file_converted_strings {
   }
 }
 sub generate_nrt_decl {
-  my ($dir, $file_basename, $file) = @_;
-  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $dir . ', ' . $file_basename . ', ' . $file . ')' . "\n";
+  my ($path, $file) = @_;
+  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $path . ', ' . $file . ')' . "\n";
   &set_nrt_decl();
-  return &generate_nrt($dir, $file_basename, $file);
+  return &generate_nrt($path, $file);
 }
 sub generate_nrt_defn {
-  my ($dir, $file_basename, $file) = @_;
-  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $dir . ', ' . $file_basename . ', ' . $file . ')' . "\n";
+  my ($path, $file) = @_;
+  #my $sub_name = (caller(0))[3]; print STDERR $sub_name . '(' . $path . ', ' . $file . ')' . "\n";
   &set_nrt_defn();
-  return &generate_nrt($dir, $file_basename, $file);
+  return &generate_nrt($path, $file);
 }
 sub generate_nrt {
-  my ($dir, $file_basename, $file) = @_;
-  $gbl_nrt_file = "$file_basename.dk";
-  my $name = $file_basename;
-  $name =~ s|.*/||; # strip off directory part
-  $name =~ s|\.$id$||;
+  my ($path, $file) = @_;
+  my ($name, $dir) = fileparse($path, "\.$id"); # only $cc_ext?
+  $dir = &canon_path($dir);
+  $gbl_nrt_file = "$name.dk";
 
   my ($generics, $symbols) = &generics::parse($file);
   my $result;
@@ -353,10 +352,9 @@ sub generate_rt_defn {
 }
 sub generate_rt {
   my ($path, $file) = @_;
-  $gbl_nrt_file = undef;
-  my ($name, $dir, $ext) = fileparse($path, "\.$id"); # only $cc_ext?
+  my ($name, $dir) = fileparse($path, "\.$id"); # only $cc_ext?
   $dir = &canon_path($dir);
-  $ext =~ s|^\.||; # strip leadking dot
+  $gbl_nrt_file = undef;
 
   my ($generics, $symbols) = &generics::parse($file);
   my $result;

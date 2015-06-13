@@ -394,33 +394,34 @@ sub loop_cc_from_dk {
   if (0 == $argv_length) {
     exit 1;
   }
-  my $file_basenames = &dk::file_basenames($$cmd_info{'inputs'});
-  foreach my $file_basename (@$file_basenames) {
-    my $file = &dk::parse("$file_basename.dk");
-    #print STDERR "$file_basename.dk\n";
+  foreach my $input (@{$$cmd_info{'inputs'}}) {
+    my ($name, $dir) = File::Basename::fileparse($input, "\.$id");
+    my $file = &dk::parse("$name.dk");
+    #print STDERR "$name.dk\n";
     #print STDERR &Dumper($$file{'klasses'});
     my $directory = '.';
     my ($dk_cc_name, $cc_name);
     my ($dk_cc_path, $cc_path);
     my ($dk_cc_ext, $cc_ext1);
+    my $output_cc;
 
     if (!$$cmd_info{'opts'}{'stdout'}) {
-      my ($output_dk_cc, $output_cc);
+      my $output_dk_cc;
 
       if ($$cmd_info{'opts'}{'output'}) {
         $output_cc =    "$$cmd_info{'opts'}{'output'}";
         $output_dk_cc = "$$cmd_info{'opts'}{'output'}";
         $output_dk_cc =~ s|\.$cc_ext$|\.dk\.$cc_ext|g;
       } else {
-        $output_cc =    "$file_basename.$cc_ext";         ###
-        $output_dk_cc = "$file_basename.dk.$cc_ext"; ###
+        $output_cc =    "$name.$cc_ext";    ###
+        $output_dk_cc = "$name.dk.$cc_ext"; ###
       }
       $output_dk_cc =~ s|/nrt/|/|g;
-      ($dk_cc_name, $dk_cc_path, $dk_cc_ext) = fileparse("$directory/$output_dk_cc", "\.dk\.$cc_ext");
-      ($cc_name, $cc_path, $cc_ext1) = fileparse("$directory/$output_cc", "\.$id");
+      ($dk_cc_name, $dk_cc_path) = fileparse("$directory/$output_dk_cc", "\.dk\.$cc_ext");
+      ($cc_name, $cc_path) = fileparse("$directory/$output_cc", "\.$id");
     }
     &dakota::generate::empty_klass_defns();
-    &dk::generate_dk_cc($file_basename, "$dk_cc_path$dk_cc_name");
+    &dk::generate_dk_cc($name, "$dk_cc_path$dk_cc_name");
     $cc_path =~ s|^\./||;
     $cc_path =~ s|/$||;
 
@@ -432,9 +433,9 @@ sub loop_cc_from_dk {
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
-      &dakota::generate::generate_nrt_decl($cc_path, $file_basename, $file);
+      &dakota::generate::generate_nrt_decl($output_cc, $file);
     }
-    &dakota::generate::generate_nrt_defn($cc_path, $file_basename, $file);
+    &dakota::generate::generate_nrt_defn($output_cc, $file);
   }
 } # loop_cc_from_dk
 
