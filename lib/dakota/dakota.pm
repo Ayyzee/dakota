@@ -73,9 +73,6 @@ $Data::Dumper::Useqq     = 1;
 $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
-use File::Basename;
-use File::Spec;
-
 undef $/;
 $" = '';
 
@@ -397,7 +394,7 @@ sub loop_cc_from_dk {
     exit 1;
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
-    my ($name, $dir) = File::Basename::fileparse($input, "\.$id");
+    my ($dir, $name) = &split_path($input, "\.$id");
     my $file = &dk::parse("$name.dk");
     #print STDERR "$name.dk\n";
     #print STDERR &Dumper($$file{'klasses'});
@@ -419,8 +416,8 @@ sub loop_cc_from_dk {
         $output_dk_cc = "$name.dk.$cc_ext"; ###
       }
       $output_dk_cc =~ s|/nrt/|/|g;
-      ($dk_cc_name, $dk_cc_path) = fileparse("$directory/$output_dk_cc", "\.dk\.$cc_ext");
-      ($cc_name, $cc_path) = fileparse("$directory/$output_cc", "\.$id");
+      ($dk_cc_path, $dk_cc_name) = &split_path("$directory/$output_dk_cc", "\.dk\.$cc_ext");
+      ($cc_path, $cc_name) = &split_path("$directory/$output_cc", "\.$id");
     }
     &dakota::generate::empty_klass_defns();
     &dk::generate_dk_cc($name, "$dk_cc_path$dk_cc_name");
@@ -543,7 +540,7 @@ sub loop_rep_from_so {
         $arg =~ m|\.ctlg$|) {
     } else {
       my $ctlg_path = &ctlg_path_from_any_path($arg);
-      my ($ctlg_vol, $ctlg_dir, $ctlg_file) = File::Spec->splitpath($arg); # better than File::Basename->fileparse
+      my ($ctlg_dir, $ctlg_file) = &split_path($arg);
       my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$ctlg_cmd{'output'} = $ctlg_path;
       $$ctlg_cmd{'output-directory'} = $ctlg_dir;

@@ -56,6 +56,7 @@ our @EXPORT= qw(
                  filestr_from_file
                  scalar_from_file
                  canon_path
+                 split_path
                  flatten
                  min
                  max
@@ -69,7 +70,7 @@ our @EXPORT= qw(
                  objdir
                  var
               );
-
+use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
 
 sub ident_regex {
@@ -157,6 +158,16 @@ sub canon_path { # should merge with rel_path_canon()
   $path =~ s|/\.$||g; # remove trailing /.
   $path =~ s|/+$||g; # remove trailing /s
   return $path;
+}
+sub split_path {
+  my ($path, $ext_re) = @_;
+  my ($vol, $dir, $name) = File::Spec->splitpath($path);
+  my $ext;
+  if ($ext_re) {
+    $ext = $name =~ s|^.+?($ext_re)$|$1|r;
+    $name =~ s|^(.+?)$ext_re$|$1|;
+  }
+  return ($dir, $name, $ext);
 }
 sub deep_copy {
   my ($ref) = @_;

@@ -60,8 +60,6 @@ use integer;
 use Cwd;
 use Data::Dumper;
 
-use File::Basename;
-
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
@@ -279,7 +277,7 @@ sub generate_nrt_defn {
 }
 sub generate_nrt {
   my ($path, $file) = @_;
-  my ($name, $dir) = fileparse($path, "\.$id"); # only $cc_ext?
+  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
   $dir = &canon_path($dir);
   $gbl_nrt_file = "$name.dk";
 
@@ -352,7 +350,7 @@ sub generate_rt_defn {
 }
 sub generate_rt {
   my ($path, $file) = @_;
-  my ($name, $dir) = fileparse($path, "\.$id"); # only $cc_ext?
+  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
   $dir = &canon_path($dir);
   $gbl_nrt_file = undef;
 

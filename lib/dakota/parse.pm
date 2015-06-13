@@ -79,7 +79,6 @@ use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Cwd;
-use File::Basename;
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
