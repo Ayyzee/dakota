@@ -401,21 +401,15 @@ sub loop_cc_from_dk {
     my $directory = '.';
     my ($dk_cc_name, $cc_name);
     my ($dk_cc_path, $cc_path);
-    my ($dk_cc_ext, $cc_ext1);
     my $output_cc;
 
     if (!$$cmd_info{'opts'}{'stdout'}) {
-      my $output_dk_cc;
-
       if ($$cmd_info{'opts'}{'output'}) {
-        $output_cc =    "$$cmd_info{'opts'}{'output'}";
-        $output_dk_cc = "$$cmd_info{'opts'}{'output'}";
-        $output_dk_cc =~ s|\.$cc_ext$|\.dk\.$cc_ext|g;
+        $output_cc = "$$cmd_info{'opts'}{'output'}";
       } else {
-        $output_cc =    "$name.$cc_ext";    ###
-        $output_dk_cc = "$name.dk.$cc_ext"; ###
+        $output_cc = "$name.$cc_ext";
       }
-      $output_dk_cc =~ s|/nrt/|/|g;
+      my $output_dk_cc = &dk_cc_path_from_nrt_cc_path($output_cc);
       ($dk_cc_path, $dk_cc_name) = &split_path("$directory/$output_dk_cc", "\.dk\.$cc_ext");
       ($cc_path, $cc_name) = &split_path("$directory/$output_cc", "\.$id");
     }
