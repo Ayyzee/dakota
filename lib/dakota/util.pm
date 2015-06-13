@@ -162,6 +162,7 @@ sub canon_path { # should merge with rel_path_canon()
 sub split_path {
   my ($path, $ext_re) = @_;
   my ($vol, $dir, $name) = File::Spec->splitpath($path);
+  $dir = &canon_path($dir);
   my $ext;
   if ($ext_re) {
     $ext = $name =~ s|^.+?($ext_re)$|$1|r;
