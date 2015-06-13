@@ -123,10 +123,10 @@ $main::list_body = qr{
                    }x;
 
 my $rewrite_compound_literal_names = {
-                                      'super' => undef,
-                                      'assoc' => undef,
+                                      'assoc' =>    undef,
                                       'sequence' => undef,
-                                      'vector' => undef,
+                                      'super' =>    undef,
+                                      'vector' =>   undef,
                                      };
 
 my $use_compound_literals = $ENV{'DK_USE_COMPOUND_LITERALS'};

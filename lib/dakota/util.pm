@@ -44,29 +44,29 @@ $Data::Dumper::Indent    = 1;  # default = 2
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 _first
-                 _last
                  _add_first
                  _add_last
+                 _first
+                 _last
                  _remove_first
-                 _remove_last 
+                 _remove_last
                  deep_copy
+                 dqstr_regex
+                 filestr_from_file
+                 flatten
+                 header_file_regex
+                 ident_regex
                  kw_args_generics
                  kw_args_generics_add
-                 filestr_from_file
+                 long_suffix
+                 max
+                 method_sig_regex
+                 method_sig_type_regex
+                 min
+                 objdir
                  scalar_from_file
                  split_path
-                 flatten
-                 min
-                 max
-                 long_suffix
-                 ident_regex
-                 header_file_regex
-                 dqstr_regex
                  sqstr_regex
-                 method_sig_type_regex
-                 method_sig_regex
-                 objdir
                  var
               );
 use File::Spec;
