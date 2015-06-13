@@ -72,7 +72,7 @@ $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Indent    = 1;   # default = 2
 
 use File::Basename;
-use File::Copy;
+use File::Spec;
 
 undef $/;
 $" = '';
@@ -540,11 +540,11 @@ sub loop_rep_from_so {
     if ($arg =~ m|\.dk$| ||
         $arg =~ m|\.ctlg$|) {
     } else {
-      my $ctlg_path =     &ctlg_path_from_any_path($arg);
-      my $ctlg_dir_path = &dakota::parse::ctlg_dir_path_from_so_path($arg);
+      my $ctlg_path = &ctlg_path_from_any_path($arg);
+      my ($ctlg_vol, $ctlg_dir, $ctlg_file) = File::Spec->splitpath($arg); # better than File::Basename->fileparse
       my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$ctlg_cmd{'output'} = $ctlg_path;
-      $$ctlg_cmd{'output-directory'} = $ctlg_dir_path;
+      $$ctlg_cmd{'output-directory'} = $ctlg_dir;
       $$ctlg_cmd{'inputs'} = [ $arg ];
       &ctlg_from_so($ctlg_cmd);
       my $rep_path = &rep_path_from_ctlg_path($ctlg_path);

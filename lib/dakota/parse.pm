@@ -43,6 +43,23 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
+my $patterns = {
+  'nrt_cc_path_from_dk_path' => '$(objdir)/nrt/%.$(cc_ext) : %.dk',
+  'nrt_o_path_from_dk_path' =>  '$(objdir)/nrt/%.$(o_ext)  : %.dk',
+
+  'o_path_from_cc_path' =>      '$(objdir)/%.$(o_ext)      : $(objdir)/%.$(cc_ext)',
+
+  'ctlg_path_from_any_path' =>  '$(objdir)/%.ctlg          : %',
+
+  'rep_path_from_any_path' =>   '$(objdir)/%.rep           : %',
+  'rep_path_from_ctlg_path' =>  '$(objdir)/%.ctlg.rep      : $(objdir)/%.ctlg',
+
+ #'rep_path_from_so_path' =>    '$(objdir)/%.rep           : %.$(so_ext)',
+ #'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)  : %.$(so_ext)',
+};
+my $expanded_patterns = &expand_tbl_values($patterns);
+#print STDERR &Dumper($expanded_patterns);
+
 BEGIN {
   my $prefix = &dk_prefix($0);
   unshift @INC, "$prefix/lib";
@@ -397,57 +414,41 @@ sub rel_path_canon { # should merge with canon_path()
   }
   return $result;
 }
-# makefile  $(objdir)/%.ctlg: %
 sub ctlg_path_from_any_path {
   my ($path) = @_;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.ctlg";
-  $path =~ s|//|/|g;
-  return $path;
+  return &out_path_from_in_path('ctlg_path_from_any_path', $path);
 }
-# makefile  $(objdir)/nrt/%.$(cc_ext): %.dk
 sub nrt_cc_path_from_dk_path {
   my ($path) = @_;
-  $path =~ s/\.dk$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$cc_ext";
-  $path =~ s|//|/|g;
-  return $path;
+  return &out_path_from_in_path('nrt_cc_path_from_dk_path', $path);
 }
-# makefile  $(objdir)/nrt/%.$(o_ext): %.dk
 sub nrt_o_path_from_dk_path {
   my ($path) = @_;
-  $path =~ s/\.dk$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/nrt/$canon_path.$o_ext";
-  $path =~ s|//|/|g;
-  return $path;
+  return &out_path_from_in_path('nrt_o_path_from_dk_path', $path);
 }
-# makefile  $(objdir)/%.$(o_ext): $(objdir)/%.$(cc_ext)
-sub o_path_from_cc_path { # justs replaces .cc with .$(o_ext)
+sub o_path_from_cc_path {
   my ($path) = @_;
-  die if !defined $cc_ext;
-  $path =~ s/\.$cc_ext$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$canon_path.$o_ext"; # already has leading $objdir
-  $path =~ s|//|/|g;
-  return $path;
+  return &out_path_from_in_path('o_path_from_cc_path', $path);
 }
-# makefile  $(objdir)/%.rep: %
 sub rep_path_from_any_path {
   my ($path) = @_;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.rep";
-  $path =~ s|//|/|g;
-  return $path;
+  return &out_path_from_in_path('rep_path_from_any_path', $path);
+}
+sub rep_path_from_ctlg_path {
+  my ($path) = @_;
+  return &out_path_from_in_path('rep_path_from_ctlg_path', $path);
 }
 # makefile  $(objdir)/%.ctlg.rep: $(objdir)/%.ctlg
-sub rep_path_from_ctlg_path {
+sub rep_path_from_ctlg_path_old {
   my ($path) = @_;
   my $canon_path = &rel_path_canon($path, undef);
   $path = "$canon_path.rep";
   $path =~ s|//|/|g;
   return $path;
+}
+sub rep_path_from_so_path_new {
+  my ($path) = @_;
+  return &out_path_from_in_path('rep_path_from_so_path', $path);
 }
 # makefile  $(objdir)/%.rep: %.$(so_ext)
 sub rep_path_from_so_path {
@@ -459,6 +460,10 @@ sub rep_path_from_so_path {
   $path =~ s|//|/|g;
   return $path;
 }
+sub rt_cc_path_from_so_path_new {
+  my ($path) = @_;
+  return &out_path_from_in_path('rt_cc_path_from_so_path', $path);
+}
 # makefile  $(objdir)/rt/%.$(cc_ext): %.$(so_ext)
 sub rt_cc_path_from_so_path {
   my ($path) = @_;
@@ -469,15 +474,44 @@ sub rt_cc_path_from_so_path {
   $path =~ s|//|/|g;
   return $path;
 }
-# makefile  $(objdir)/%: %.$(so_ext)
-sub ctlg_dir_path_from_so_path {
-  my ($path) = @_;
-  die if !defined $so_ext;
-  $path =~ s/\.$so_ext$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path";
-  $path =~ s|//|/|g;
-  return $path;
+sub var_perl_from_make { # convert variable syntax to perl from make
+  my ($str) = @_;
+  my $result = $str;
+  $result =~ s|\$\((\w+)\)|\$$1|g;
+  $result =~ s|\$\{(\w+)\}|\$$1|g;
+  return $result;
+}
+sub expand {
+  my ($str) = @_;
+  $str =~ s/(\$\w+)/$1/eeg;
+  return $str;
+}
+sub expand_tbl_values {
+  my ($tbl_in, $tbl_out) = @_;
+  if (!$tbl_out) { $tbl_out = {}; }
+  my ($key, $val); while (($key, $val) = each (%$tbl_in)) {
+    $val =~ s|\s*:\s*|:|; # just hygenic
+    $val = &expand(&var_perl_from_make($val));
+    $$tbl_out{$key} = $val;
+  }
+  return $tbl_out;
+}
+sub out_path_from_in_path {
+  my ($pattern_name, $path_in) = @_;
+  my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
+  my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
+  $pattern_template =~ s|\%|(\.+?)|;
+  $pattern_replacement =~ s|\%|\%s|;
+
+  my $result = &expand(&var_perl_from_make($path_in));
+  if ($result =~ m|^$pattern_template$|) {
+    $result = sprintf($pattern_replacement, &rel_path_canon($1));
+    $result = &expand($result);
+  } else {
+    print STDERR "warning: $pattern_name: $result !~ |^$pattern_template\$|\n";
+    die;
+  }
+  return $result;
 }
 sub add_klass_decl {
   my ($file, $klass_name) = @_;
