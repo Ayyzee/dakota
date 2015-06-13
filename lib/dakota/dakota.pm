@@ -27,6 +27,7 @@ use warnings;
 
 my $gbl_prefix;
 my $gbl_compiler;
+my $extra;
 my $objdir;
 my $hh_ext;
 my $cc_ext;
@@ -51,6 +52,8 @@ BEGIN {
   use dakota::generate;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
     or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  $extra = do "$gbl_prefix/lib/dakota/extra.json"
+    or die "do $gbl_prefix/lib/dakota/extra.json failed: $!\n";
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
@@ -198,37 +201,21 @@ sub add_visibility {
 }
 sub nrt::add_extra_generics {
   my ($file) = @_;
-  my $generics = { # hardcoded
-    'alloc' => undef,
-    'forward-iterator' => undef,
-    'init' => undef,
-    'instance?' => undef,
-    'next' => undef,
-  };
+  my $generics = $$extra{'nrt_extra_generics'};
   foreach my $generic (sort keys %$generics) {
     &add_generic($file, $generic);
   }
 }
 sub nrt::add_extra_keywords {
   my ($file) = @_;
-  my $keywords = { # hardcoded
-    'keyword' => undef,   # kw-args processing funcs (throw)
-    'object' => undef,    # kw-args processing funcs (throw)
-    'signature' => undef, # kw-args processing funcs (throw)
-  };
+  my $keywords = $$extra{'nrt_extra_keywords'};
   foreach my $keyword (sort keys %$keywords) {
     &add_keyword($file, $keyword);
   }
 }
 sub rt::add_extra_keywords {
   my ($file) = @_;
-  my $keywords = { # hardcoded
-    'items' => undef,
-    'kls' => undef,
-    'message' => undef,
-    'superkls' => undef,
-    'symbol' => undef,
-  };
+  my $keywords = $$extra{'rt_extra_keywords'};
   foreach my $keyword (sort keys %$keywords) {
     &add_keyword($file, $keyword);
   }
@@ -236,42 +223,14 @@ sub rt::add_extra_keywords {
 ###
 sub nrt::add_extra_klass_decls {
   my ($file) = @_;
-  my $klass_decls = { # hardcoded
-    'boole' => undef,
-    'char8' => undef,
-    'file' => undef,
-    'input-stream' => undef, # std-input
-    'keyword' => undef,
-    'klass' => undef,
-    'method' => undef,
-    'methods' => undef,
-    'missing-keyword-exception' => undef, # kw-args processing funcs (throw)
-    'named-info' => undef,
-    'no-such-keyword-exception' => undef, # kw-args processing funcs (throw)
-    'object' => undef,
-    'output-stream' => undef, # std-output, std-error
-    'property' => undef,
-    'selector' => undef,
-    'signature' => undef,
-    'symbol' => undef,
-    'super' => undef,
-    'str' => undef,
-    'uchar8' => undef,
-  };
+  my $klass_decls = $$extra{'nrt_extra_klass_decls'};
   foreach my $klass_decl (sort keys %$klass_decls) {
     &add_klass_decl($file, $klass_decl);
   }
 }
 sub rt::add_extra_klass_decls {
   my ($file) = @_;
-  my $klass_decls = { # hardcoded
-    'no-such-method-exception' => undef, # generic funcs (throw)
-    'selector-node' => undef,
-    'assoc-node' => undef,
-    'va-method' => undef,
-    'construct' => undef,
-    # NONE
-  };
+  my $klass_decls = $$extra{'rt_extra_klass_decls'};
   foreach my $klass_decl (sort keys %$klass_decls) {
     &add_klass_decl($file, $klass_decl);
   }
@@ -279,73 +238,14 @@ sub rt::add_extra_klass_decls {
 ###
 sub nrt::add_extra_symbols {
   my ($file) = @_;
-  my $symbols = { # hardcoded
-    # NONE
-  };
+  my $symbols = $$extra{'nrt_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
     &dakota::parse::add_symbol($file, [ $symbol ]);
   }
 }
 sub rt::add_extra_symbols {
   my ($file) = @_;
-  my $symbols = { # hardcoded
-    'behavior-exported?' => undef,
-    'bool-t' => undef, # hardcode typedef
-    'cat' => undef,
-    'char-t' => undef, # hardcode typedef
-    'construct' => undef,
-    'date' => undef,
-    'enum' => undef,
-    'enum-base' => undef,
-    'executable' => undef,
-    'exported-method-addresses' => undef,
-    'exported-method-signatures' => undef,
-    'exported-slots-method-addresses' => undef,
-    'exported-slots-method-signatures' => undef,
-    'exported?' => undef,
-    'exports' => undef,
-    'expr' => undef,
-    'file' => undef,
-    'imported-klasses' => undef,
-    'imported-klasses-names' => undef,
-    'int-t' => undef, # hardcode typedef
-    'interpose-name' => undef,
-    'interposers' => undef,
-    'kw-args-method-signatures' => undef,
-    'klass' => undef,
-    'klass-defns' => undef,
-    'klass-name' => undef,
-    'library' => undef,
-    'method' => undef,
-    'method-addresses' => undef,
-    'method-aliases' => undef,
-    'method-signatures' => undef,
-    'module' => undef,
-    'name' => undef,
-    'offset' => undef,
-    'requires' => undef,
-    'schar-t' => undef, # hardcode typedef
-    'selectors' => undef,
-    'selectors-va' => undef,
-    'signatures' => undef,
-    'signatures-va' => undef,
-    'size' => undef,
-    'slots-info' => undef,
-    'slots-type' => undef,
-    'state-exported?' => undef,
-    'struct' => undef,
-    'superklass-name' => undef,
-    'time' => undef,
-    'trait' => undef,
-    'traits' => undef,
-    'type' => undef,
-    'uchar-t' => undef, # hardcode typedef
-    'uint-t' => undef, # hardcode typedef
-    'union' => undef,
-    'va-method' => undef,
-    'va-method-addresses' => undef,
-    'va-method-signatures' => undef,
-  };
+  my $symbols = $$extra{'rt_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
     &dakota::parse::add_symbol($file, [ $symbol ]);
   }

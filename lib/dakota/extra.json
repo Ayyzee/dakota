@@ -1,0 +1,116 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+{
+ #'rt_extra_generics' => {},
+  'nrt_extra_generics' => {
+    'alloc' => undef,
+    'forward-iterator' => undef,
+    'init' => undef,
+    'instance?' => undef,
+    'next' => undef,
+  },
+  'nrt_extra_keywords' => {
+    'keyword' => undef,       # kw-args processing funcs (throw)
+    'object' => undef,        # kw-args processing funcs (throw)
+    'signature' => undef,     # kw-args processing funcs (throw)
+  },
+  'rt_extra_keywords' => {
+    'items' => undef,
+    'kls' => undef,
+    'message' => undef,
+    'superkls' => undef,
+    'symbol' => undef,
+  },
+  'nrt_extra_klass_decls' => {
+    'boole' => undef,
+    'char8' => undef,
+    'file' => undef,
+    'input-stream' => undef, # std-input
+    'keyword' => undef,
+    'klass' => undef,
+    'method' => undef,
+    'methods' => undef,
+    'missing-keyword-exception' => undef, # kw-args processing funcs (throw)
+    'named-info' => undef,
+    'no-such-keyword-exception' => undef, # kw-args processing funcs (throw)
+    'object' => undef,
+    'output-stream' => undef, # std-output, std-error
+    'property' => undef,
+    'selector' => undef,
+    'signature' => undef,
+    'symbol' => undef,
+    'super' => undef,
+    'str' => undef,
+    'uchar8' => undef,
+  },
+  'rt_extra_klass_decls' => {
+    'no-such-method-exception' => undef, # generic funcs (throw)
+    'selector-node' => undef,
+    'assoc-node' => undef,
+    'va-method' => undef,
+    'construct' => undef,
+  },
+  'nrt_extra_symbols' => {},
+  'rt_extra_symbols' => {
+    'behavior-exported?' => undef,
+    'bool-t' => undef, # hardcode typedef
+    'cat' => undef,
+    'char-t' => undef, # hardcode typedef
+    'construct' => undef,
+    'date' => undef,
+    'enum' => undef,
+    'enum-base' => undef,
+    'executable' => undef,
+    'exported-method-addresses' => undef,
+    'exported-method-signatures' => undef,
+    'exported-slots-method-addresses' => undef,
+    'exported-slots-method-signatures' => undef,
+    'exported?' => undef,
+    'exports' => undef,
+    'expr' => undef,
+    'file' => undef,
+    'imported-klasses' => undef,
+    'imported-klasses-names' => undef,
+    'int-t' => undef, # hardcode typedef
+    'interpose-name' => undef,
+    'interposers' => undef,
+    'kw-args-method-signatures' => undef,
+    'klass' => undef,
+    'klass-defns' => undef,
+    'klass-name' => undef,
+    'library' => undef,
+    'method' => undef,
+    'method-addresses' => undef,
+    'method-aliases' => undef,
+    'method-signatures' => undef,
+    'module' => undef,
+    'name' => undef,
+    'offset' => undef,
+    'requires' => undef,
+    'schar-t' => undef, # hardcode typedef
+    'selectors' => undef,
+    'selectors-va' => undef,
+    'signatures' => undef,
+    'signatures-va' => undef,
+    'size' => undef,
+    'slots-info' => undef,
+    'slots-type' => undef,
+    'state-exported?' => undef,
+    'struct' => undef,
+    'superklass-name' => undef,
+    'time' => undef,
+    'trait' => undef,
+    'traits' => undef,
+    'type' => undef,
+    'uchar-t' => undef, # hardcode typedef
+    'uint-t' => undef,  # hardcode typedef
+    'union' => undef,
+    'va-method' => undef,
+    'va-method-addresses' => undef,
+    'va-method-signatures' => undef,
+  }
+}
