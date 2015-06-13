@@ -817,7 +817,7 @@ sub rewrite {
       # why add_first()?  Because we want to iterate over the 
       # results in reverse order (so we don't have to adjust the range
       # after every splice
-      &_add_first($all_matches, [$range, $matches]);
+      &add_first($all_matches, [$range, $matches]);
     }
   }
   if (0 != @$all_matches) {
@@ -827,10 +827,10 @@ sub rewrite {
         if ($tkn =~ m/^\?/) {
           my $seq = $$match[1]{$tkn};
           foreach my $seq_tkn (@$seq) {
-            &_add_last($result, $seq_tkn);
+            &add_last($result, $seq_tkn);
           }
         } else {
-          &_add_last($result, $tkn);
+          &add_last($result, $tkn);
         }
       }
       my $index = $$match[0][0];

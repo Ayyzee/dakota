@@ -44,26 +44,26 @@ $Data::Dumper::Indent    = 1;  # default = 2
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 _add_first
-                 _add_last
-                 _first
-                 _last
-                 _remove_first
-                 _remove_last
+                 add_first
+                 add_last
                  deep_copy
                  dqstr_regex
                  filestr_from_file
+                 first
                  flatten
                  header_file_regex
                  ident_regex
                  kw_args_generics
                  kw_args_generics_add
+                 last
                  long_suffix
                  max
                  method_sig_regex
                  method_sig_type_regex
                  min
                  objdir
+                 remove_first
+                 remove_last
                  scalar_from_file
                  split_path
                  sqstr_regex
@@ -173,22 +173,22 @@ sub deep_copy {
   my ($ref) = @_;
   return eval &Dumper($ref);
 }
-sub _add_first {
+sub add_first {
   my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             unshift @$seq, $element; return;
 }
-sub _add_last {
+sub add_last {
   my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             push    @$seq, $element; return;
 }
-sub _remove_first {
+sub remove_first {
   my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = shift   @$seq;           return $first;
 }
-sub _remove_last {
+sub remove_last {
   my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = pop     @$seq;           return $last;
 }
-sub _first {
+sub first {
   my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = $$seq[0];  return $first;
 }
-sub _last {
+sub last {
   my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = $$seq[-1]; return $last;
 }
 sub _replace_first {
@@ -196,8 +196,8 @@ sub _replace_first {
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-  my $old_first = &_remove_first($seq);
-  &_add_first($seq, $element);
+  my $old_first = &remove_first($seq);
+  &add_first($seq, $element);
   return $old_first;
 }
 sub _replace_last {
@@ -205,8 +205,8 @@ sub _replace_last {
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-  my $old_last = &_remove_last($seq);
-  &_add_last($seq, $element);
+  my $old_last = &remove_last($seq);
+  &add_last($seq, $element);
   return $old_last;
 }
 sub scalar_from_file {

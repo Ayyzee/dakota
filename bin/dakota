@@ -141,7 +141,7 @@ if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
 if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
   my $libdakota = "$gbl_prefix/lib/libdakota.$ENV{'so_ext'}";
   if ($$root_cmd{'opts'}{'output'} ne $libdakota) {
-    &_add_last($$root_cmd{'inputs'}, $libdakota);
+    &add_last($$root_cmd{'inputs'}, $libdakota);
   }
 }
 if ($$root_cmd{'opts'}{'include-directory'}) {

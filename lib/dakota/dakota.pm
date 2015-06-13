@@ -109,10 +109,10 @@ sub loop_merged_rep_from_dk {
     if ($arg =~ m|\.dk$| ||
           $arg =~ m|\.ctlg$|) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
-      &_add_last($rep_files, &rep_path_from_any_path($arg));
+      &add_last($rep_files, &rep_path_from_any_path($arg));
     } elsif ($arg =~ m|\.rep$|) {
       $root = &scalar_from_file($arg);
-      &_add_last($rep_files, $arg);
+      &add_last($rep_files, $arg);
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
@@ -378,9 +378,9 @@ sub loop_cc_from_dk {
 
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if ($input =~ m|\.rep$|) {
-      &_add_last($rep, $input);
+      &add_last($rep, $input);
     } else {
-      &_add_last($inputs, $input);
+      &add_last($inputs, $input);
     }
   }
   $$cmd_info{'reps'} = $rep;
@@ -500,7 +500,7 @@ sub start_cmd {
   }
 
   if ($$cmd_info{'opts'}{'compile'} && exists $$cmd_info{'output'}) {
-    my $last = &_last($$cmd_info{'inputs'});
+    my $last = &last($$cmd_info{'inputs'});
     `mv $last $$cmd_info{'output'}`;
   }
   if ($$cmd_info{'opts'}{'compile'}) {
@@ -626,9 +626,9 @@ sub loop_o_from_dk {
         $$o_cmd{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
       }
       &o_from_cc($o_cmd);
-      &_add_last($outfiles, $o_path);
+      &add_last($outfiles, $o_path);
     } else {
-      &_add_last($outfiles, $arg);
+      &add_last($outfiles, $arg);
     }
   }
   $$cmd_info{'inputs'} = $outfiles;
@@ -712,7 +712,7 @@ sub rt_o_from_rep {
     $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
   &o_from_cc($o_info);
-  &_add_first($$cmd_info{'inputs'}, $o_path);
+  &add_first($$cmd_info{'inputs'}, $o_path);
 }
 sub so_from_o {
   my ($cmd_info) = @_;
@@ -756,7 +756,7 @@ sub exe_from_o {
 sub dir_part {
   my ($path) = @_;
   my $parts = [split /\//, $path];
-  &dakota::util::_remove_last($parts);
+  &dakota::util::remove_last($parts);
   my $dir = join '/', @$parts;
   return $dir;
 }
@@ -919,7 +919,7 @@ sub ordered_set_add {
       return;
     }
   }
-  &_add_last($ordered_set, $element);
+  &add_last($ordered_set, $element);
 }
 sub start {
   my ($argv) = @_;
