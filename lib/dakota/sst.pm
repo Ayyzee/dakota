@@ -309,7 +309,7 @@ sub sst::add_token {
     $$token{'leading-ws'} = $$sst{'leading-ws'};
     $$sst{'leading-ws'} = '';
   }
-  push @{$$sst{'tokens'}}, $token;
+  &add_last($$sst{'tokens'}, $token);
   $$sst{'tokens-count'} = scalar @{$$sst{'tokens'}};
 }
 sub sst::add_comment {
@@ -531,7 +531,7 @@ sub constraint_literal_dquoted_cstring {
 
   if ($token =~ m/\$$dqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    push @$result_rhs, $token;
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -542,7 +542,7 @@ sub constraint_literal_squoted_cstring {
 
   if ($token =~ m/\$$sqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    push @$result_rhs, $token;
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -553,7 +553,7 @@ sub constraint_ident {
 
   if ($token =~ m/$id/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    push @$result_rhs, $token;
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -564,7 +564,7 @@ sub constraint_method_name {
 
   if ($token =~ m/$mid/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    push @$result_rhs, $token;
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -599,9 +599,9 @@ sub constraint_balenced {
       my $token = &sst::at($sst, $close_token_index);
 
       if (&sst::is_open_token($token, $user_data)) {
-        push @$opens, $token;
+        &add_last($opens, $token);
       } elsif (&sst::is_close_token($token, $user_data)) {
-        my $open_token = pop @$opens;
+        my $open_token = &remove_last($opens);
 
         if (!defined $open_token) {
           return undef;
@@ -610,7 +610,7 @@ sub constraint_balenced {
         my $open_tokens = &sst::open_tokens_for_close_token($token, $user_data);
         die if ! exists $$open_tokens{$open_token}
       }
-      push @$result_rhs, $token;
+      &add_last($result_rhs, $token);
 
       if (0 == @$opens) {
         $result_lhs = [ $$range[0], $close_token_index ];
@@ -634,7 +634,7 @@ sub constraint_balenced_in {
 
       for (my $i = $$result_lhs[0]; $i < $$result_lhs[1]; $i++) {
         my $token = &sst::at($sst, $i);
-        push @$result_rhs, $token;
+        &add_last($result_rhs, $token);
       }
     }
   }
@@ -816,9 +816,9 @@ sub sst_cursor::balenced {
     my $token = &sst::at($$sst_cursor{'sst'}, $i);
     if (&sst::is_open_token($token, $user_data)) {
       my $expected_close_token = &sst::close_token_for_open_token($token, $user_data);
-      push @$stk, $expected_close_token;
+      &add_last($stk, $expected_close_token);
     } elsif (&sst::is_close_token($token, $user_data)) {
-      my $expected_close_token = pop @$stk;
+      my $expected_close_token = &remove_last($stk);
 
       if ($expected_close_token ne $token) {
         die "error: expected $expected_close_token but got $token\n";

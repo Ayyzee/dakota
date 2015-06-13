@@ -303,9 +303,9 @@ sub balenced {
     my $open_token;
     my $close_token;
     if (&sst::is_open_token($open_token = &sst::at($sst, $close_token_index), $user_data)) {
-      push @$opens, $open_token;
+      &add_last($opens, $open_token);
     } elsif (&sst::is_close_token($close_token = &sst::at($sst, $close_token_index), $user_data)) {
-      $open_token = pop @$opens;
+      $open_token = &remove_last($opens);
       my $open_tokens = &sst::open_tokens_for_close_token($close_token, $user_data);
       die if !exists $$open_tokens{$open_token};
     }
@@ -408,7 +408,7 @@ sub debug_str_match {
     my $match_tokens = [];
 
     foreach my $m (@$match) {
-      push @$match_tokens, $$m{'str'};
+      &add_last($match_tokens, $$m{'str'});
     }
 
     $str .= "    'match' =>       ";
@@ -525,7 +525,7 @@ sub rhs_from_template {
         }
       }
     }
-    push @$rhs, $tkns;
+    &add_last($rhs, $tkns);
   }
   return $rhs
 }
@@ -594,8 +594,8 @@ sub rule_match {
       if (!exists $$rhs_for_pattern{$$pattern[$j]}) {
         $$rhs_for_pattern{$$pattern[$j]} = [];
       }
-      push @{$$rhs_for_pattern{$$pattern[$j]}}, $match;
-      push @$lhs, $match;
+      &add_last($$rhs_for_pattern{$$pattern[$j]}, $match);
+      &add_last($lhs, $match);
       if (2 <= $debug) {
         $debug2_str .= &debug_str_match($i, $j, $last_index, $match, $constraint_name);
       }
@@ -765,7 +765,7 @@ sub start {
       while (my ($rule, $count) = each (%$macro_info)) {
         $$summary{$macro}{$rule} += $count;
         $$summary{'num-changes'} += $count;
-        push @$lines, "$file : $macro : $rule : $count\n";
+        &add_last($lines, "$file : $macro : $rule : $count\n");
       }
     }
   }

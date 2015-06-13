@@ -2558,7 +2558,7 @@ sub add_ordered {
   my ($ordered_klasses, $str) = @_;
   if (!$$ordered_klasses{'set'}{$str}) {
     $$ordered_klasses{'set'}{$str} = 1;
-    push @{$$ordered_klasses{'seq'}}, $str;
+    &add_last($$ordered_klasses{'seq'}, $str);
   } else {
     $$ordered_klasses{'set'}{$str}++;
   }
