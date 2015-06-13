@@ -1821,7 +1821,7 @@ sub _add_indirect_klasses { # recursive
     foreach my $trait (@{$$klass_scope{'traits'}}) {
       $$klass_names_set{'traits'}{$trait} = undef;
       if ($klass_name ne $trait) {
-	&_add_indirect_klasses($klass_names_set, $trait, &dakota::generate::colin($col));
+        &_add_indirect_klasses($klass_names_set, $trait, &dakota::generate::colin($col));
       }
     }
   }
@@ -1829,7 +1829,7 @@ sub _add_indirect_klasses { # recursive
     foreach my $reqr (@{$$klass_scope{'requires'}}) {
       $$klass_names_set{'requires'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
-	&_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
+        &_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
       }
     }
   }
@@ -1837,7 +1837,7 @@ sub _add_indirect_klasses { # recursive
     foreach my $reqr (@{$$klass_scope{'provides'}}) {
       $$klass_names_set{'provides'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
-	&_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
+        &_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
       }
     }
   }
@@ -1846,10 +1846,10 @@ sub add_indirect_klasses {
   my ($klass_names_set) = @_;
   foreach my $construct ('klasses', 'traits') {
     if (exists $$klass_names_set{$construct}) {
-    foreach my $klass_name (keys %{$$klass_names_set{$construct}}) {
-      my $col;
-      &_add_indirect_klasses($klass_names_set, $klass_name, $col = '');
-    }
+      foreach my $klass_name (keys %{$$klass_names_set{$construct}}) {
+        my $col;
+        &_add_indirect_klasses($klass_names_set, $klass_name, $col = '');
+      }
     }
   }
 }
@@ -1985,12 +1985,12 @@ sub dk::klass_names_from_file {
     }
   }
   if (exists $$file{'traits'}) {
-  while (my ($klass_name, $klass_scope) = each(%{$$file{'traits'}})) {
-    $$klass_names_set{'traits'}{$klass_name} = undef;
-    if (defined $klass_scope) {
-      &add_direct_constructs($klass_names_set, $klass_scope, 'traits');
+    while (my ($klass_name, $klass_scope) = each(%{$$file{'traits'}})) {
+      $$klass_names_set{'traits'}{$klass_name} = undef;
+      if (defined $klass_scope) {
+        &add_direct_constructs($klass_names_set, $klass_scope, 'traits');
+      }
     }
-  }
   }
   return $klass_names_set;
 }
@@ -2080,22 +2080,22 @@ sub parse_root {
 sub add_object_methods_decls_to_klass {
   my ($klass_scope, $methods_key, $slots_methods_key) = @_;
   if (exists $$klass_scope{$slots_methods_key}) {
-  while (my ($slots_method_sig, $slots_method_info) = each (%{$$klass_scope{$slots_methods_key}})) {
-    if ($$slots_method_info{'defined?'}) {
-      my $object_method_info = &dakota::generate::convert_to_object_method($slots_method_info);
-      my $object_method_signature = &function::overloadsig($object_method_info, undef);
+    while (my ($slots_method_sig, $slots_method_info) = each (%{$$klass_scope{$slots_methods_key}})) {
+      if ($$slots_method_info{'defined?'}) {
+        my $object_method_info = &dakota::generate::convert_to_object_method($slots_method_info);
+        my $object_method_signature = &function::overloadsig($object_method_info, undef);
 
-      if (($$klass_scope{'methods'}{$object_method_signature} &&
-           $$klass_scope{'methods'}{$object_method_signature}{'defined?'})) {
-      } else {
-        $$object_method_info{'defined?'} = 0;
-        $$object_method_info{'is-generated'} = 1;
-        #print STDERR "$object_method_signature\n";
-        #print STDERR &Dumper($object_method_info);
-        $$klass_scope{$methods_key}{$object_method_signature} = $object_method_info;
+        if (($$klass_scope{'methods'}{$object_method_signature} &&
+             $$klass_scope{'methods'}{$object_method_signature}{'defined?'})) {
+        } else {
+          $$object_method_info{'defined?'} = 0;
+          $$object_method_info{'is-generated'} = 1;
+          #print STDERR "$object_method_signature\n";
+          #print STDERR &Dumper($object_method_info);
+          $$klass_scope{$methods_key}{$object_method_signature} = $object_method_info;
+        }
       }
     }
-  }
   }
 }
 sub add_object_methods_decls {
@@ -2104,9 +2104,9 @@ sub add_object_methods_decls {
 
   foreach my $construct ('klasses', 'traits') {
     if (exists $$root{$construct}) {
-    while (my ($klass_name, $klass_scope) = each (%{$$root{$construct}})) {
-      &add_object_methods_decls_to_klass($klass_scope, 'methods', 'slots-methods');
-    }
+      while (my ($klass_name, $klass_scope) = each (%{$$root{$construct}})) {
+        &add_object_methods_decls_to_klass($klass_scope, 'methods', 'slots-methods');
+      }
     }
   }
 }
