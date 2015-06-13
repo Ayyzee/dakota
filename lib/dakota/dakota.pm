@@ -25,11 +25,12 @@ package dakota::dakota;
 use strict;
 use warnings;
 
+my $gbl_prefix;
 my $gbl_compiler;
 my $objdir;
-my $gbl_prefix;
 my $hh_ext;
 my $cc_ext;
+my $so_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -53,6 +54,7 @@ BEGIN {
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
+  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', undef);
 };
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
@@ -571,14 +573,14 @@ sub loop_rep_from_dk {
       &rep_from_dk($rep_cmd);
       &ordered_set_add($rep_files, $rep_path, __FILE__, __LINE__);
     }
-    #if ($arg =~ m|((.*?)\.($so_ext))$|)
-    #{
-    #    my $rep_path = &ctlg_rep_path_from_so_path($arg);
-    #    &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
-    #}
   }
   if (0 != @$rep_files) {
-    my $rep_path = &rep_path_from_so_path($$cmd_info{'output'});
+    my $rep_path;
+    if ($$cmd_info{'output'} =~ /\.$so_ext$/) {
+      $rep_path = &rep_path_from_so_path($$cmd_info{'output'});
+    } else {
+      $rep_path = &rep_path_from_any_path($$cmd_info{'output'});
+    }
     &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
     my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$rep_cmd{'output'} = $rep_path;
@@ -590,7 +592,7 @@ sub loop_rep_from_dk {
 sub gen_rt_o {
   my ($cmd_info) = @_;
   print "  creating $$cmd_info{'output'}\n";
-  $$cmd_info{'rep'} = &rep_path_from_so_path($$cmd_info{'output'});
+  $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   if ($dk_construct) {
     $flags .= " --define-macro DKT_CONSTRUCT=$dk_construct";
@@ -673,9 +675,15 @@ sub o_from_cc {
 }
 sub rt_o_from_rep {
   my ($cmd_info) = @_;
-  my $so_path = $$cmd_info{'output'};
-  my $rep_path = &rep_path_from_so_path($so_path);
-  my $cc_path = &rt_cc_path_from_so_path($so_path);
+  my $rep_path;
+  my $cc_path;
+  if ($$cmd_info{'output'} =~ /\.$so_ext$/) {
+    $rep_path = &rep_path_from_so_path($$cmd_info{'output'});
+    $cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
+  } else {
+    $rep_path = &rep_path_from_any_path($$cmd_info{'output'});
+    $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'});
+  }
   my $o_path = &o_path_from_cc_path($cc_path);
   &make_dir($cc_path);
   my ($path, $file_basename, $file) = ($cc_path, $cc_path, undef);

@@ -54,8 +54,9 @@ my $patterns = {
   'rep_path_from_any_path' =>   '$(objdir)/%.rep           : %',
   'rep_path_from_ctlg_path' =>  '$(objdir)/%.ctlg.rep      : $(objdir)/%.ctlg',
 
- #'rep_path_from_so_path' =>    '$(objdir)/%.rep           : %.$(so_ext)',
- #'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)  : %.$(so_ext)',
+  'rep_path_from_so_path' =>    '$(objdir)/%.rep           : %.$(so_ext)',
+  'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)  : %',
+  'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)  : %.$(so_ext)',
 };
 my $expanded_patterns = &expand_tbl_values($patterns);
 #print STDERR &Dumper($expanded_patterns);
@@ -110,6 +111,7 @@ our @EXPORT= qw(
                  rep_path_from_any_path
                  rep_path_from_ctlg_path
                  rep_path_from_so_path
+                 rt_cc_path_from_any_path
                  rt_cc_path_from_so_path
                  str_from_cmd_info
               );
@@ -438,37 +440,18 @@ sub rep_path_from_ctlg_path {
   my ($path) = @_;
   return &out_path_from_in_path('rep_path_from_ctlg_path', $path);
 }
-
-sub rep_path_from_so_path_new {
+sub rep_path_from_so_path {
   my ($path) = @_;
   return &out_path_from_in_path('rep_path_from_so_path', $path);
 }
-# makefile  $(objdir)/%.rep: %.$(so_ext)
-sub rep_path_from_so_path {
+sub rt_cc_path_from_any_path {
   my ($path) = @_;
-  die if !defined $so_ext;
-  $path =~ s/\.$so_ext$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/$canon_path.rep";
-  $path =~ s|//|/|g;
-  return $path;
+  return &out_path_from_in_path('rt_cc_path_from_any_path', $path);
 }
-
-sub rt_cc_path_from_so_path_new {
+sub rt_cc_path_from_so_path {
   my ($path) = @_;
   return &out_path_from_in_path('rt_cc_path_from_so_path', $path);
 }
-# makefile  $(objdir)/rt/%.$(cc_ext): %.$(so_ext)
-sub rt_cc_path_from_so_path {
-  my ($path) = @_;
-  die if !defined $so_ext;
-  $path =~ s/\.$so_ext$//;
-  my $canon_path = &rel_path_canon($path, undef);
-  $path = "$objdir/rt/$canon_path.$cc_ext";
-  $path =~ s|//|/|g;
-  return $path;
-}
-
 sub var_perl_from_make { # convert variable syntax to perl from make
   my ($str) = @_;
   my $result = $str;

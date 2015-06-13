@@ -27,10 +27,13 @@ $(blddir)/%: $(srcdir)/%-main.dk
 all:
 	$(MAKE) --file check.mk $(blddir)/tst
 	$(blddir)/tst
+	rm -f $(blddir)/tst obj/{nrt,rt,}/tst{-main,}.*
 	$(MAKE) --file check.mk $(blddir)/min
 	$(blddir)/min
+	rm -f $(blddir)/min obj/{nrt,rt,}/min{-main,}.*
 	$(MAKE) --file check.mk $(blddir)/dummy
 	$(blddir)/dummy
+	rm -f $(blddir)/dummy
 
 $(blddir)/tst: $(blddir)/../lib/libdakota-util.$(so_ext)
 
