@@ -149,7 +149,7 @@ sub flatten {
     my $a = [map {@$_} @$a_of_a];
     return $a;
 }
-sub canon_path { # should merge with rel_path_canon()
+sub canon_path {
   my ($path) = @_;
   $path =~ s|//+|/|g; # replace multiple /s with single /s
   $path =~ s|/+\./+|/|g; # replace /./s with single /
