@@ -2102,39 +2102,39 @@ sub linkage_unit::generate_klasses_body {
           &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
         }
         if (&is_decl) {
-        if (&is_same_src_file($klass_scope) || &is_rt()) { #rn2
-          if (defined $$method{'keyword-types'}) {
-            if (0 != @{$$method{'keyword-types'}}) {
-              my $other_method_decl = &kw_args_method::type_decl($method);
+          if (&is_same_src_file($klass_scope) || &is_rt()) { #rn2
+            if (defined $$method{'keyword-types'}) {
+              if (0 != @{$$method{'keyword-types'}}) {
+                my $other_method_decl = &kw_args_method::type_decl($method);
 
-              #my $scope = &path::string($klass_path);
-              $other_method_decl =~ s|\(\*($id)\)| $1|;
+                #my $scope = &path::string($klass_path);
+                $other_method_decl =~ s|\(\*($id)\)| $1|;
 
-              if (&is_exported($method)) {
-                $$scratch_str_ref .= $col . "$klass_type $klass_name { export method";
-              } else {
-                $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport method";
+                if (&is_exported($method)) {
+                  $$scratch_str_ref .= $col . "$klass_type $klass_name { export method";
+                } else {
+                  $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport method";
+                }
+                if ($$method{'is-inline'}) {
+                  #$$scratch_str_ref .= " INLINE";
+                }
+                $$scratch_str_ref .= " $other_method_decl; }" . &ann(__LINE__, "stmt3") . "\n";
               }
-              if ($$method{'is-inline'}) {
-                #$$scratch_str_ref .= " INLINE";
-              }
-              $$scratch_str_ref .= " $other_method_decl; }" . &ann(__LINE__, "stmt3") . "\n";
             }
           }
         }
-      }
       }
     }
   }
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if (&is_decl) {
-    if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
-      if (!&is_va($method)) {
-        my $method_decl_ref = &function::decl($method, $klass_path);
-        $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "DUPLICATE") . "\n";
+      if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
+        if (!&is_va($method)) {
+          my $method_decl_ref = &function::decl($method, $klass_path);
+          $$scratch_str_ref .= $col . "$klass_type $klass_name { $$method_decl_ref }" . &ann(__LINE__, "DUPLICATE") . "\n";
+        }
       }
-    }
     }
   }
 }
@@ -2202,7 +2202,6 @@ sub convert_to_object_type {
 sub convert_to_object_method {
   my ($non_object_method) = @_;
   my $method = &dakota::util::deep_copy($non_object_method);
-
   $$method{'return-type'} = &convert_to_object_type($$method{'return-type'});
 
   foreach my $parameter_type (@{$$method{'parameter-types'}}) {
@@ -2337,9 +2336,9 @@ sub linkage_unit::generate_headers {
       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
       if (exists $$klass_scope{'exported-headers'} && defined $$klass_scope{'exported-headers'}) {
-      while (my ($header, $klasses) = each (%{$$klass_scope{'exported-headers'}})) {
-        $$exported_headers{$header}{$klass_name} = undef;
-      }
+        while (my ($header, $klasses) = each (%{$$klass_scope{'exported-headers'}})) {
+          $$exported_headers{$header}{$klass_name} = undef;
+        }
       }
     }
     my $all_headers = {};
@@ -2820,11 +2819,11 @@ sub address_body {
     if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
       # skip because its declared but not defined and should not be considered for padding
     } else {
-    my $method_type = &method::type($method);
-    my $width = length("cast($method_type)");
-    if ($width > $max_width) {
-      $max_width = $width;
-    }
+      my $method_type = &method::type($method);
+      my $width = length("cast($method_type)");
+      if ($width > $max_width) {
+        $max_width = $width;
+      }
     }
   }
   foreach my $method (@$sorted_methods) {
@@ -3104,7 +3103,6 @@ sub dk::generate_cc_footer_klass {
         $pad . "__kw-args-signature::va::$method_name)(),\n";
     }
     #$$scratch_str_ref .= "\#endif\n";
-
     $$scratch_str_ref .= $col . "  nullptr\n";
     $col = &colout($col);
     $$scratch_str_ref .= $col . "}; }\n";
@@ -3123,7 +3121,6 @@ sub dk::generate_cc_footer_klass {
       $col . &address_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
       $col . "}; }\n";
   }
-
   my $num_method_aliases = scalar(@$method_aliases);
   if ($num_method_aliases) {
     $$scratch_str_ref .=
@@ -3132,7 +3129,6 @@ sub dk::generate_cc_footer_klass {
       $col . &alias_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
       $col . "}; }\n";
   }
-
   my $exported_methods =     &exported_methods($klass_scope);
   my $exported_slots_methods = &exported_slots_methods($klass_scope);
 
@@ -3165,7 +3161,6 @@ sub dk::generate_cc_footer_klass {
   if ($num_traits > 0) {
     $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __traits[] = {" . &ann(__LINE__) . " //ro-data\n";
-
     my $trait_num = 0;
     for ($trait_num = 0; $trait_num < $num_traits; $trait_num++) {
       my $path = "$$klass_scope{'traits'}[$trait_num]";
@@ -3178,7 +3173,6 @@ sub dk::generate_cc_footer_klass {
   if ($num_requires > 0) {
     $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __requires[] = {" . &ann(__LINE__) . " //ro-data\n";
-
     my $require_num = 0;
     for ($require_num = 0; $require_num < $num_requires; $require_num++) {
       my $path = "$$klass_scope{'requires'}[$require_num]";
@@ -3191,7 +3185,6 @@ sub dk::generate_cc_footer_klass {
   if ($num_provides > 0) {
     $$scratch_str_ref .= "\n";
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __provides[] = {" . &ann(__LINE__) . " //ro-data\n";
-
     my $provide_num = 0;
     for ($provide_num = 0; $provide_num < $num_provides; $provide_num++) {
       my $path = "$$klass_scope{'provides'}[$provide_num]";
@@ -3211,7 +3204,6 @@ sub dk::generate_cc_footer_klass {
       }
     }
   }
-
   my $num_bound = keys %{$$klass_scope{'imported-klasses'}};
   if ($num_bound) {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = {" . &ann(__LINE__) . " //ro-data\n";
@@ -3227,7 +3219,6 @@ sub dk::generate_cc_footer_klass {
   my $tbbl = {};
   my $token;
   my $token_seq;
-
   $token_seq = $klass_name;
   if (0 != @$token_seq) {
     my $path = $klass_name;
@@ -3241,7 +3232,6 @@ sub dk::generate_cc_footer_klass {
       #           $$scratch_str_ref .= "  nullptr }; ";
     }
   }
-
   if (&has_slots_info($klass_scope)) {
     my $root_name = '__slots-info';
     if ('enum' eq $$klass_scope{'slots'}{'cat'}) {
@@ -3290,7 +3280,6 @@ sub dk::generate_cc_footer_klass {
         $col . "}\n";
     }
   }
-
   if (&has_enum_info($klass_scope)) {
     my $num = 0;
     foreach my $enum (@{$$klass_scope{'enum'}}) {
@@ -3324,7 +3313,6 @@ sub dk::generate_cc_footer_klass {
     $col = &colout($col);
     $$scratch_str_ref .= $col . "}; }\n";
   }
-
   if (&has_const_info($klass_scope)) {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const-info-t __const-info\[] = {" . &ann(__LINE__) . " //ro-data\n";
     $col = &colin($col);
@@ -3341,10 +3329,8 @@ sub dk::generate_cc_footer_klass {
     $col = &colout($col);
     $$scratch_str_ref .= $col . "}; }\n";
   }
-
   my $symbol = &path::string($klass_name);
   $$tbbl{'$name'} = '__klass__';
-
   $$tbbl{'$construct'} = "\$$klass_type";
 
   if (&has_slots_type($klass_scope)) {
@@ -3608,7 +3594,6 @@ sub generate_kw_args_method_defn {
   }
   #$$scratch_str_ref .= $col . "if (NULLPTR != $$new_arg_names[-1]) {\n";
   #$col = &colin($col);
-
   $$scratch_str_ref .=
     $col . "keyword-t* _keyword_;\n" .
     $col . "while (NULLPTR != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {" . &ann(__LINE__) . "\n";
@@ -3628,7 +3613,6 @@ sub generate_kw_args_method_defn {
       $kw_type = 'dkt-va-arg-boole-t'; # bools are promoted to ints
     }
     # should do this for other types (char=>int, float=>double, ... ???
-
     $$scratch_str_ref .=
       $col . "assert(_keyword_->symbol == \$$kw_arg_name);\n" .
       $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));\n" .
@@ -3640,7 +3624,6 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .= $col . "default:\n";
   #        $$scratch_str_ref .= $col . "{\n";
   $col = &colin($col);
-
   $$scratch_str_ref .=
     $col . "throw make(no-such-keyword-exception::klass,\n" .
     $col . "           \$object =>    self,\n" .
@@ -3743,13 +3726,10 @@ sub dk::generate_kw_args_method_defns {
       } else {
         if (1 || $$klass_scope{'slots-methods'}) {
           # currently no support for va:: methods
-
           &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
         }
         #&generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], &colin($col));
-
         &generate_kw_args_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
-
         &generate_kw_args_method_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
       }
       &path::remove_last($stack);
@@ -3776,7 +3756,6 @@ sub dk::generate_imported_klasses_info {
       $$tbl{'imported-klasses'}{$import_string} = $seq;
     }
   }
-
   foreach my $construct ('traits', 'klasses') {
     while (my ($klass_name, $klass_scope) = each(%{$$scope{$construct}})) {
       &path::add_last($stack, $klass_name);
@@ -3786,7 +3765,6 @@ sub dk::generate_imported_klasses_info {
       if ($klass_scope) {
         $$tbl{'imported-klasses'}{$import_string} = &dakota::util::deep_copy($stack);
       }
-
       if (defined $$klass_scope{'imported-klasses'}) {
         while (my ($import_string, $seq) = each(%{$$klass_scope{'imported-klasses'}})) {
           $$tbl{'imported-klasses'}{$import_string} = $seq;
