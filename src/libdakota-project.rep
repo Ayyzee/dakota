@@ -74,7 +74,7 @@
     '$(srcdir)/system-exception.dk',
     '$(srcdir)/table.dk',
     '$(srcdir)/trace.dk',
-    '$(srcdir)/vector.dk'
+    '$(srcdir)/vector.dk',
   ],
   'libs' => [ # cmd-line
     '/usr/lib/libdl.$(so_ext)',
@@ -91,7 +91,7 @@
   'output' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
   'compatibility-version' => '1.0.0', # cmd-line
   'current-version' =>       '1.0.0', # cmd-line
-  #'soname' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
+ #'soname' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
   'install' => {
     '-rules' => {
       '$(blddir)/../bin/%' =>            '$(DESTDIR)$(bindir)/%',
@@ -105,22 +105,22 @@
       '$(HOME)/%' => '$(srcdir)/home/%',
     },
     'libs' => [ # install.libs
-      '$(DESTDIR)$(libdir)/libdakota.$(so_ext)', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/compiler-darwin-clang.json', {},
+      '$(DESTDIR)$(libdir)/dakota/compiler-darwin-gcc.json',   {},
+      '$(DESTDIR)$(libdir)/dakota/compiler-linux-clang.json',  {},
+      '$(DESTDIR)$(libdir)/dakota/compiler-linux-gcc.json',    {},
       '$(DESTDIR)$(libdir)/dakota/dakota.pm', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/extra.json', {},
-      '$(DESTDIR)$(libdir)/dakota/header-from-symbol.json', {},
-      '$(DESTDIR)$(libdir)/dakota/parse.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(libdir)/dakota/rewrite.pm', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/generate.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(libdir)/dakota/sst.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(libdir)/dakota/util.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/header-from-symbol.json', {},
       '$(DESTDIR)$(libdir)/dakota/macro_system.pm', { 'mode' => '$(install_bins_mode)' }, # also executable
       '$(DESTDIR)$(libdir)/dakota/macros.pl', {},
-      '$(DESTDIR)$(libdir)/dakota/compiler-darwin-gcc.json',   {},
-      '$(DESTDIR)$(libdir)/dakota/compiler-darwin-clang.json', {},
-      '$(DESTDIR)$(libdir)/dakota/compiler-linux-gcc.json',    {},
-      '$(DESTDIR)$(libdir)/dakota/compiler-linux-clang.json',  {},
+      '$(DESTDIR)$(libdir)/dakota/parse.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/rewrite.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/sst.pm', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/used.json', {},
+      '$(DESTDIR)$(libdir)/dakota/util.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/libdakota.$(so_ext)', { 'mode' => '$(install_libs_mode)' },
     ],
     'includes' => [ # install.includes
       '$(DESTDIR)$(includedir)/dakota-finally.hh', {},
@@ -133,10 +133,10 @@
       '$(DESTDIR)$(bindir)/dakota-project', { 'mode' => '$(install_bins_mode)' },
     ],
     'home' => [ # install.home
-      '$(srcdir)/home/.dakota/.gdbinit', {},
       '$(srcdir)/home/.dakota/.bashrc', {},
-      '$(srcdir)/home/.dakota/emacs/init.el', {},
+      '$(srcdir)/home/.dakota/.gdbinit', {},
       '$(srcdir)/home/.dakota/emacs/dakota-mode.el', {},
+      '$(srcdir)/home/.dakota/emacs/init.el', {},
     ],
   }
 }
