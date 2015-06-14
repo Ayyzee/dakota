@@ -25,13 +25,15 @@ $(blddir)/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory ../include --output $@ $^
 
 all:
-	$(MAKE) --file check.mk $(blddir)/tst
+	$(MAKE) --file check-exes.mk $(blddir)/tst
+	rm -f obj/{nrt,rt,}/tst{-main,}.*
 	$(blddir)/tst
-	rm -f $(blddir)/tst obj/{nrt,rt,}/tst{-main,}.*
-	$(MAKE) --file check.mk $(blddir)/min
+	rm -f $(blddir)/tst
+	$(MAKE) --file check-exes.mk $(blddir)/min
+	rm -f obj/{nrt,rt,}/min{-main,}.*
 	$(blddir)/min
-	rm -f $(blddir)/min obj/{nrt,rt,}/min{-main,}.*
-	$(MAKE) --file check.mk $(blddir)/dummy
+	rm -f $(blddir)/min
+	$(MAKE) --file check-exes.mk $(blddir)/dummy
 	$(blddir)/dummy
 	rm -f $(blddir)/dummy
 

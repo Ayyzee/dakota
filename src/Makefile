@@ -55,19 +55,21 @@ libdakota_util_install = $(libdakota_util_install_bins) $(libdakota_util_install
 
 .PHONY:\
  all\
- dakota-info\
+ check-exes\
+ check-libs\
  check\
  clean\
+ dakota-info\
  install-dakota-info\
- install-libdakota\
  install-libdakota-util\
+ install-libdakota\
  install\
- libdakota\
  libdakota-util\
+ libdakota\
  precompile\
  uninstall-dakota-info\
- uninstall-libdakota\
  uninstall-libdakota-util\
+ uninstall-libdakota\
  uninstall\
 
 # precompile-libdakota\
@@ -138,9 +140,15 @@ $(blddir)/../lib/libdakota-util.$(so_ext): macros =       $(libdakota_util_macro
 $(blddir)/../lib/libdakota-util.$(so_ext): include_dirs = $(libdakota_util_include_dirs)
 $(blddir)/../lib/libdakota-util.$(so_ext): soname_pair =  $(libdakota_util_soname_pair)
 
-check: all
+check-libs: all
 	$(blddir)/../bin/dakota-info $(blddir)/../lib/libdakota.$(so_ext) $(blddir)/../lib/libdakota-util.$(so_ext)
+
+check-exes: all
 	$(MAKE) --file $@.mk
+
+check: all
+	$(MAKE) check-libs
+	$(MAKE) check-exes
 	./$@.sh
 
 precompile:
