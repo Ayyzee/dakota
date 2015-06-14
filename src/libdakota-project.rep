@@ -107,6 +107,8 @@
     'libs' => [ # install.libs
       '$(DESTDIR)$(libdir)/libdakota.$(so_ext)', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/dakota.pm', { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(libdir)/dakota/extra.json', {},
+      '$(DESTDIR)$(libdir)/dakota/header-from-symbol.json', {},
       '$(DESTDIR)$(libdir)/dakota/parse.pm', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/rewrite.pm', { 'mode' => '$(install_libs_mode)' },
       '$(DESTDIR)$(libdir)/dakota/generate.pm', { 'mode' => '$(install_libs_mode)' },
@@ -118,6 +120,7 @@
       '$(DESTDIR)$(libdir)/dakota/compiler-darwin-clang.json', {},
       '$(DESTDIR)$(libdir)/dakota/compiler-linux-gcc.json',    {},
       '$(DESTDIR)$(libdir)/dakota/compiler-linux-clang.json',  {},
+      '$(DESTDIR)$(libdir)/dakota/used.json', {},
     ],
     'includes' => [ # install.includes
       '$(DESTDIR)$(includedir)/dakota-finally.hh', {},
