@@ -26,6 +26,7 @@ use strict;
 use warnings;
 
 my $gbl_compiler;
+my $gbl_header_from_symbol;
 my $objdir;
 my $hh_ext;
 my $cc_ext;
@@ -71,6 +72,8 @@ BEGIN {
   use dakota::util;
   $gbl_compiler = do "$prefix/lib/dakota/compiler.json"
     or die "do $prefix/lib/dakota/compiler.json failed: $!\n";
+  $gbl_header_from_symbol = do "$prefix/lib/dakota/header-from-symbol.json"
+    or die "do $prefix/lib/dakota/header-from-symbol.json failed: $!\n";
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
@@ -117,78 +120,16 @@ our @EXPORT= qw(
                  rt_cc_path_from_so_path
                  str_from_cmd_info
               );
-
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $h  = &dakota::util::header_file_regex();
 
 $ENV{'DKT-DEBUG'} = 0;
 
-my $gbl_symbol_to_header = {
-                            'AF-INET' => '<netinet/in.h>',
-                            'AF-INET6' => '<netinet/in.h>',
-                            'AF-LOCAL' => '<netinet/in.h>',
-
-                            'EVFILT-READ' => '<sys/event.h>',
-                            'EVFILT-WRITE' => '<sys/event.h>',
-                            'EVFILT-PROC' => '<sys/event.h>',
-                            'EVFILT-SIGNAL' => '<sys/event.h>',
-
-                            'FILE' => '<cstdio>',
-                            'INADDR-ANY' => '<netinet/in.h>',
-                            'INADDR-LOOPBACK' => '<netinet/in.h>',
-                            'INADDR-NONE' => '<netinet/in.h>',
-                            'NULL' => '<cstddef>',
-                            'SOCK-DGRAM' => '<sys/socket.h>',
-                            'SOCK-RAW' => '<sys/socket.h>',
-                            'SOCK-STREAM' => '<sys/socket.h>',
-                            'in-addr' => '<netinet/in.h>',
-                            'in-port-t' => '<netinet/in.h>',
-                            'in6-addr' => '<netinet/in.h>',
-                            'in6addr-any' => '<netinet/in.h>',
-                            'in6addr-loopback' => '<netinet/in.h>',
-                            'int8-t' => '<cstdint>',
-                            'int16-t' => '<cstdint>',
-                            'int32-t' => '<cstdint>',
-                            'int64-t' => '<cstdint>',
-                            'intmax-t' => '<cstdint>',
-                            'intptr-t' => '<cstdint>',
-                            'ip-mreq' => '<netinet/in.h>',
-                            'ipv6-mreq' => '<netinet/in.h>',
-                            'jmp-buf' => '<setjmp.h>',
-                            'nullptr' => '<cstddef>',
-                            'option' => '<getopt.h>',
-                            'sa-family-t' => '<netinet/in.h>',
-                            'sigaction' => '<signal.h>',
-                            'siginfo-t' => '<signal.h>',
-                            'size-t' => '<cstddef>',
-                            'sockaddr-in' => '<netinet/in.h>',
-                            'sockaddr-in6' => '<netinet/in.h>',
-                            'sockaddr-un' => '<sys/un.h>',
-                            'socklen-t' => '<sys/socket.h>',
-                            'stat' => '<sys/stat.h>',
-                            'struct in-addr' => '<netinet/in.h>',
-                            'struct in6-addr' => '<netinet/in.h>',
-                            'struct ip-mreq' => '<netinet/in.h>',
-                            'struct ipv6-mreq' => '<netinet/in.h>',
-                            'struct option' => '<getopt.h>',
-                            'struct sigaction' => '<signal.h>',
-                            'struct sockaddr-in' => '<netinet/in.h>',
-                            'struct sockaddr-in6' => '<netinet/in.h>',
-                            'struct sockaddr-un' => '<sys/un.h>',
-                            'struct stat' => '<sys/stat.h>',
-                            'uint8-t' => '<cstdint>',
-                            'uint16-t' => '<cstdint>',
-                            'uint32-t' => '<cstdint>',
-                            'uint64-t' => '<cstdint>',
-                            'uintmax-t' => '<cstdint>',
-                            'uintptr-t' => '<cstdint>'
-                           };
-
 sub maybe_add_exported_header_for_symbol {
   my ($symbol) = @_;
-  if ($$gbl_symbol_to_header{$symbol}) {
-    &add_exported_header($$gbl_symbol_to_header{$symbol});
+  if ($$gbl_header_from_symbol{$symbol}) {
+    &add_exported_header($$gbl_header_from_symbol{$symbol});
   }
 }
 sub maybe_add_exported_header_for_symbol_seq {
