@@ -27,6 +27,7 @@ use warnings;
 
 my $gbl_compiler;
 my $gbl_header_from_symbol;
+my $gbl_used;
 my $objdir;
 my $hh_ext;
 my $cc_ext;
@@ -74,6 +75,8 @@ BEGIN {
     or die "do $prefix/lib/dakota/compiler.json failed: $!\n";
   $gbl_header_from_symbol = do "$prefix/lib/dakota/header-from-symbol.json"
     or die "do $prefix/lib/dakota/header-from-symbol.json failed: $!\n";
+  $gbl_used = do "$prefix/lib/dakota/used.json"
+    or die "do $prefix/lib/dakota/used.json failed: $!\n";
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
@@ -1460,12 +1463,7 @@ sub parameter_list {
 }
 sub add_klasses_used {
   my ($scope, $gbl_sst_cursor) = @_;
-  my $seqs = [
-              { 'pattern' => [ '?ident', '::', 'klass'   ], },
-              { 'pattern' => [ '?ident', '::', 'box',    ], },
-              { 'pattern' => [ '?ident', '::', 'unbox',  ], },
-              { 'pattern' => [ '?ident', '::', 'slots-t' ], },
-             ];
+  my $seqs = $$gbl_used{'used-klasses'};
   my $size = &sst_cursor::size($gbl_sst_cursor);
   for (my $i = 0; $i < $size - 2; $i++) {
     my $first_index = $$gbl_sst_cursor{'first-token-index'} ||= 0;
@@ -1495,21 +1493,7 @@ sub add_generics_used {
   my ($scope, $gbl_sst_cursor) = @_;
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
   #&errdump($$gbl_sst_cursor{'sst'});
-  my $seqs = [
-              { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name', '(', 'super' ], },
-              { 'name' => 'supers',   'range' => [2,2], 'pattern' => [ 'dk', '::',             '?method-name', '(', 'super' ], },
-              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name'               ], },
-              { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'dk', '::',             '?method-name'               ], },
-
-              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'selector', '(', 'va', '::', '?method-name', '('     ], },
-              { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'selector', '(',            '?method-name', '('     ], },
-
-              { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'signature', '(', 'va', '::', '?method-name', '('     ], },
-              { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'signature', '(',            '?method-name', '('     ], },
-
-              { 'name' => 'generics', 'range' => [0,2], 'pattern' => [ 'va', '::',  'make', '('                 ], },
-              { 'name' => 'generics', 'range' => [0,0], 'pattern' => [             'make', '('                 ], },
-             ];
+  my $seqs = $$gbl_used{'used-generics'};
   my $size = &sst_cursor::size($gbl_sst_cursor);
   for (my $i = 0; $i < $size - 2; $i++) {
     my $first_index = $$gbl_sst_cursor{'first-token-index'} ||= 0;

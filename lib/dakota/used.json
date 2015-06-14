@@ -1,0 +1,30 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+{
+  'used-klasses' => [
+    { 'pattern' => [ '?ident', '::', 'klass'   ], },
+    { 'pattern' => [ '?ident', '::', 'box',    ], },
+    { 'pattern' => [ '?ident', '::', 'unbox',  ], },
+    { 'pattern' => [ '?ident', '::', 'slots-t' ], },
+  ],
+  'used-generics' => [
+    { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name', '(', 'super' ], },
+    { 'name' => 'supers',   'range' => [2,2], 'pattern' => [ 'dk', '::',              '?method-name', '(', 'super' ], },
+
+    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name'               ], },
+    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'dk', '::',              '?method-name'               ], },
+
+    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'selector',  '(', 'va', '::', '?method-name', '('     ], },
+    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'selector',  '(',             '?method-name', '('     ], },
+
+    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'signature', '(', 'va', '::', '?method-name', '('     ], },
+    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'signature', '(',             '?method-name', '('     ], },
+
+    { 'name' => 'generics', 'range' => [0,2], 'pattern' => [ 'va', '::', 'make', '(' ], },
+    { 'name' => 'generics', 'range' => [0,0], 'pattern' => [             'make', '(' ], },
+  ],
+}
