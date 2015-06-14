@@ -123,25 +123,25 @@ all:
 	$(MAKE) dakota-info
 	$(MAKE) libdakota libdakota-util
 
-dakota-info:    $(blddir)/../bin/dakota-info
-libdakota:      $(blddir)/../lib/libdakota.$(so_ext)
-libdakota-util: $(blddir)/../lib/libdakota-util.$(so_ext)
+dakota-info:    $(dakota_info_output)
+libdakota:      $(libdakota_output)
+libdakota-util: $(libdakota_util_output)
 
-$(blddir)/../bin/dakota-info: $(dakota_info_srcs) $(dakota_info_libs)
+$(dakota_info_output): $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
-$(blddir)/../lib/libdakota.$(so_ext): $(libdakota_srcs) $(libdakota_libs)
-$(blddir)/../lib/libdakota.$(so_ext): macros =       $(libdakota_macros)
-$(blddir)/../lib/libdakota.$(so_ext): include_dirs = $(libdakota_include_dirs)
-$(blddir)/../lib/libdakota.$(so_ext): soname_pair =  $(libdakota_soname_pair)
+$(libdakota_output): $(libdakota_srcs) $(libdakota_libs)
+$(libdakota_output): macros =       $(libdakota_macros)
+$(libdakota_output): include_dirs = $(libdakota_include_dirs)
+$(libdakota_output): soname_pair =  $(libdakota_soname_pair)
 
-$(blddir)/../lib/libdakota-util.$(so_ext): $(libdakota_util_srcs) $(libdakota_util_libs)
-$(blddir)/../lib/libdakota-util.$(so_ext): macros =       $(libdakota_util_macros)
-$(blddir)/../lib/libdakota-util.$(so_ext): include_dirs = $(libdakota_util_include_dirs)
-$(blddir)/../lib/libdakota-util.$(so_ext): soname_pair =  $(libdakota_util_soname_pair)
+$(libdakota_util_output): $(libdakota_util_srcs) $(libdakota_util_libs)
+$(libdakota_util_output): macros =       $(libdakota_util_macros)
+$(libdakota_util_output): include_dirs = $(libdakota_util_include_dirs)
+$(libdakota_util_output): soname_pair =  $(libdakota_util_soname_pair)
 
 check-libs: all
-	$(blddir)/../bin/dakota-info $(blddir)/../lib/libdakota.$(so_ext) $(blddir)/../lib/libdakota-util.$(so_ext)
+	$(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
 
 check-exes: all
 	$(MAKE) --file $@.mk
@@ -182,12 +182,12 @@ uninstall:
 	$(MAKE) uninstall-libdakota-util
 
 clean:
-	$(RM) $(RMFLAGS) $(blddir)/../bin/dakota-info
-	$(RM) $(RMFLAGS) $(blddir)/../bin/dakota-info.dSYM
-	$(RM) $(RMFLAGS) $(blddir)/../lib/libdakota-util.$(so_ext)
-	$(RM) $(RMFLAGS) $(blddir)/../lib/libdakota-util.$(so_ext).ctlg
-	$(RM) $(RMFLAGS) $(blddir)/../lib/libdakota.$(so_ext)
-	$(RM) $(RMFLAGS) $(blddir)/../lib/libdakota.$(so_ext).ctlg
+	$(RM) $(RMFLAGS) $(dakota_info_output)
+	$(RM) $(RMFLAGS) $(dakota_info_output).dSYM
+	$(RM) $(RMFLAGS) $(libdakota_util_output)
+	$(RM) $(RMFLAGS) $(libdakota_util_output).ctlg
+	$(RM) $(RMFLAGS) $(libdakota_output)
+	$(RM) $(RMFLAGS) $(libdakota_output).ctlg
 	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler-{darwin,linux}-{clang,gcc}.mk
 	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler.mk
 	$(RM) $(RMFLAGS) $(blddir)/obj
