@@ -85,17 +85,7 @@ $(blddir)/%.tbl: $(srcdir)/%.sh
 $(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
 
-$(DESTDIR)$(prefix)/include/%: $(srcdir)/../include/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(prefix)/lib/%: $(srcdir)/../lib/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(prefix)/lib/%: $(blddir)/../lib/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(prefix)/lib/dakota/%: $(srcdir)/../lib/dakota/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(prefix)/lib/dakota/%: $(blddir)/../lib/dakota/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(prefix)/bin/%: $(blddir)/../bin/%
+$(DESTDIR)$(prefix)/%: $(srcdir)/../%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 
 all:
@@ -126,10 +116,10 @@ check: all
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
 
-$(bindir) \
-$(includedir) \
-$(libdir) \
-$(libdir)/dakota:
+$(prefix)/bin \
+$(prefix)/include \
+$(prefix)/lib \
+$(prefix)/lib/dakota:
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_CREATE_DIRS_FLAG) $(INSTALL_MODE_FLAG) $(dir_mode) $@
 
 install-dakota-info:    $(dakota_info_install)
