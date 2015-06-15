@@ -99,7 +99,7 @@ libdakota-util: $(libdakota_util_output)
 $(dakota_info_output): $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
-$(libdakota_output): $(libdakota_srcs) $(libdakota_libs)
+$(libdakota_output):      $(libdakota_srcs)      $(libdakota_libs)
 $(libdakota_util_output): $(libdakota_util_srcs) $(libdakota_util_libs)
 
 check-libs: all
