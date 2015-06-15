@@ -213,7 +213,7 @@ sub target_specific_vars {
 
     foreach my $bname (sort keys %{$$target_specific_var_tbl{$prefix}}) {
       my $name = $$target_specific_var_tbl{$prefix}{$bname};
-      $result .= "\$($output)" . ' : ' . $bname . ' ' . $EQ . ' ' . $name . "\n";
+      $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
     }
   }
   #print STDERR $result;
