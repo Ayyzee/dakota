@@ -20,7 +20,6 @@ $Data::Dumper::Sortkeys = 1;
 # gnu make variable assignment operators
 # = or := or ::= or ?=
 my $EQ = '=';
-my $target_specific_var_tbl = {};
 
 sub is_scalar {
   my ($v) = @_;
@@ -126,10 +125,10 @@ sub process_tbl {
   }
 }
 sub target_specific_vars_set {
-  my ($opts, $scopes) = @_;
+  my ($opts, $scopes, $out) = @_;
   my $prefix = &prefix($opts);
   if ($prefix) {
-    $$target_specific_var_tbl{$prefix}{&lhs($scopes, undef)} = &lhs($scopes, $prefix);
+    $$out{'tsv'}{$prefix}{&lhs($scopes, undef)} = &lhs($scopes, $prefix);
   }
   my $lhs = &lhs($scopes, $prefix);
   return $lhs;
@@ -137,23 +136,23 @@ sub target_specific_vars_set {
 # scalar is member of rhs seq
 sub process_scalar {
   my ($data, $opts, $lhs, $out) = @_;
-  push @{$$out{$lhs}}, $data;
+  push @{$$out{'mk'}{$lhs}}, $data;
 }
 # scalar is rhs of expr (lhs = rhs)
 sub process_scalar_expr {
   my ($data, $opts, $scopes, $out) = @_;
-  my $lhs = &target_specific_vars_set($opts, $scopes);
-  $$out{$lhs} = $data;
+  my $lhs = &target_specific_vars_set($opts, $scopes, $out);
+  $$out{'mk'}{$lhs} = $data;
 }
 # seq is rhs of expr (lhs = rhs ...)
 sub process_seq_expr {
   my ($data, $opts, $scopes, $out) = @_;
-  my $lhs = &target_specific_vars_set($opts, $scopes);
-  $$out{$lhs} = [];
+  my $lhs = &target_specific_vars_set($opts, $scopes, $out);
+  $$out{'mk'}{$lhs} = [];
 
   foreach my $element (@$data) {
     if (&is_scalar($element)) {
-      #push @{$$out{$lhs}}, $element;
+      #push @{$$out{'mk'}{$lhs}}, $element;
       &process_scalar($element, $opts, $lhs, $out);
     }
   }
@@ -161,8 +160,8 @@ sub process_seq_expr {
 sub mkstr {
   my ($out, $opts) = @_;
   my $result = '';
-  foreach my $lhs (sort keys %$out) {
-    my $rhs = $$out{$lhs};
+  foreach my $lhs (sort keys %{$$out{'mk'}}) {
+    my $rhs = $$out{'mk'}{$lhs};
     $result .= $lhs . ' ' . $EQ;
     if (&is_scalar($rhs)) {
       $rhs = [ $rhs ];
@@ -194,8 +193,9 @@ sub start {
   foreach my $file (@$argv) {
     my $data = do $file or die;
     #print &Dumper($data);
-    my $out = {};
+    my $out = { 'mk' => {}, 'tsv' => {}, };
     &process_tbl($data, $opts, $scopes, $out);
+    #print &Dumper($out);
     print $fh
       "# generated from $file\n" .
       &mkstr($out);
@@ -211,8 +211,8 @@ sub target_specific_vars {
   if ($prefix) {
     my $output = &lhs(['output'], $prefix);
 
-    foreach my $bname (sort keys %{$$target_specific_var_tbl{$prefix}}) {
-      my $name = $$target_specific_var_tbl{$prefix}{$bname};
+    foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
+      my $name = $$out{'tsv'}{$prefix}{$bname};
       $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
     }
   }
