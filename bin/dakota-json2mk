@@ -125,6 +125,15 @@ sub process_tbl {
     }
   }
 }
+sub target_specific_vars_set {
+  my ($opts, $scopes) = @_;
+  my $prefix = &prefix($opts);
+  if ($prefix) {
+    $$target_specific_var_tbl{$prefix}{&lhs($scopes, undef)} = &lhs($scopes, $prefix);
+  }
+  my $lhs = &lhs($scopes, $prefix);
+  return $lhs;
+}
 # scalar is member of rhs seq
 sub process_scalar {
   my ($data, $opts, $lhs, $out) = @_;
@@ -133,22 +142,13 @@ sub process_scalar {
 # scalar is rhs of expr (lhs = rhs)
 sub process_scalar_expr {
   my ($data, $opts, $scopes, $out) = @_;
-  my $prefix = &prefix($opts);
-
-  if ($prefix) {
-    $$target_specific_var_tbl{$prefix}{&lhs($scopes, undef)} = &lhs($scopes, $prefix);
-  }
-  $$out{&lhs($scopes, $prefix)} = $data;
+  my $lhs = &target_specific_vars_set($opts, $scopes);
+  $$out{$lhs} = $data;
 }
 # seq is rhs of expr (lhs = rhs ...)
 sub process_seq_expr {
   my ($data, $opts, $scopes, $out) = @_;
-  my $prefix = &prefix($opts);
-
-  if ($prefix) {
-    $$target_specific_var_tbl{$prefix}{&lhs($scopes, undef)} = &lhs($scopes, $prefix);
-  }
-  my $lhs = &lhs($scopes, $prefix);
+  my $lhs = &target_specific_vars_set($opts, $scopes);
   $$out{$lhs} = [];
 
   foreach my $element (@$data) {
