@@ -235,6 +235,7 @@ sub target_specific_vars {
       my $name = $$out{'tsv'}{$prefix}{$bname};
       $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
     }
+    $result .= "\n";
     $result .= &tsv_install($data, 'includes', $prefix);
     $result .= &tsv_install($data, 'libs',     $prefix);
     $result .= &tsv_install($data, 'bins',     $prefix);
