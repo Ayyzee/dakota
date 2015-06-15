@@ -49,14 +49,14 @@
   'soname' => '$(blddir)/../lib/libdakota-util.$(so_ext)', # cmd-line
   'install' => {
     '-rules' => {
-      '$(blddir)/../lib/%' => '$(DESTDIR)$(libdir)/%'
+      '$(blddir)/../lib/%' => '$(DESTDIR)$(prefix)/lib/%'
     },
     'bins' => [ # install.bins
     ],
     'includes' => [ # install.includes
     ],
     'libs' => [ # install.libs
-      '$(DESTDIR)$(libdir)/libdakota-util.$(so_ext)', {
+      '$(DESTDIR)$(prefix)/lib/libdakota-util.$(so_ext)', {
         'mode' => '$(install_libs_mode)'
       },
     ],

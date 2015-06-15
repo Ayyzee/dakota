@@ -199,22 +199,45 @@ sub start {
     print $fh
       "# generated from $file\n" .
       &mkstr($out);
-    print $fh "\n" . &target_specific_vars($opts, $out);
+    print $fh "\n" . &target_specific_vars($data, $opts, $out);
   }
   close($fh);
 }
+sub tsv_install{
+  my ($data, $key, $prefix) = @_;
+  my $result = '';
+  #my $output = &lhs(['output'], $prefix);
+  my $install_libs = $$data{'install'}{$key};
+
+  for (my $i = 0; $i < @$install_libs; $i++) {
+    my $install_lib = $$install_libs[$i];
+    if (&is_scalar($install_lib)) {
+      my $info = $$install_libs[$i + 1];
+      if (&is_tbl($info)) {
+        my ($bname, $name); while (($bname, $name) = each (%$info)) {
+          $result .= $install_lib . ' : ' . $bname . ' = ' . $name . "\n";
+          $i++;
+        }
+      }
+    }
+  }
+  return $result;
+}
+
 sub target_specific_vars {
-  my ($opts, $out) = @_;
+  my ($data, $opts, $out) = @_;
   #print STDERR &Dumper($out);
   my $prefix = &prefix($opts);
   my $result = '';
   if ($prefix) {
     my $output = &lhs(['output'], $prefix);
-
     foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
       my $name = $$out{'tsv'}{$prefix}{$bname};
       $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
     }
+    $result .= &tsv_install($data, 'includes', $prefix);
+    $result .= &tsv_install($data, 'libs',     $prefix);
+    $result .= &tsv_install($data, 'bins',     $prefix);
   }
   #print STDERR $result;
   return $result;

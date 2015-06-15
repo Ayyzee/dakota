@@ -26,6 +26,13 @@ export DAKOTA
 export DAKOTAFLAGS
 export EXTRA_DAKOTAFLAGS
 
+install_file_mode :=    0644
+install_dir_mode :=     0755
+
+install_includes_mode := $(install_file_mode)
+install_bins_mode :=     0755
+install_libs_mode :=     $(install_file_mode)
+
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info    --output $(blddir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota      --output $(blddir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(blddir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
@@ -70,13 +77,6 @@ libdakota_util_install = $(libdakota_util_install_bins) $(libdakota_util_install
 # precompile-libdakota\
 # precompile-libdakota-util\
 
-install_file_mode :=    0644
-install_dir_mode :=     0755
-
-install_include_mode := $(install_file_mode)
-install_bin_mode :=     0755
-install_lib_mode :=     $(install_file_mode)
-
 $(blddir)/%.dk: $(blddir)/%.tbl
 
 $(blddir)/%.tbl: $(srcdir)/%.sh
@@ -85,34 +85,18 @@ $(blddir)/%.tbl: $(srcdir)/%.sh
 $(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
 
-### installed files
 $(DESTDIR)$(includedir)/%: $(srcdir)/../include/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_include_mode) $< $(@D)
-
-# some lib/* are supplied (so they will be in srcdir)
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 $(DESTDIR)$(libdir)/%: $(srcdir)/../lib/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_lib_mode) $< $(@D)
-
-# some lib/* are generated (so they will be in blddir)
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 $(DESTDIR)$(libdir)/%: $(blddir)/../lib/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_lib_mode) $< $(@D)
-
-# some lib/dakota/* are supplied (so they will be in srcdir)
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 $(DESTDIR)$(libdir)/dakota/%: $(srcdir)/../lib/dakota/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_lib_mode) $< $(@D)
-
-# some lib/dakota/* are generated (so they will be in blddir)
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 $(DESTDIR)$(libdir)/dakota/%: $(blddir)/../lib/dakota/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_lib_mode) $< $(@D)
-
-# some bin/* are supplied (so they will be in srcdir)
-$(DESTDIR)$(bindir)/%: $(srcdir)/../bin/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_bin_mode) $< $(@D)
-
-# some bin/* are generated (so they will be in blddir)
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 $(DESTDIR)$(bindir)/%: $(blddir)/../bin/%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(install_bin_mode) $< $(@D)
-### installed files
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 
 all:
 	$(MAKE) dakota-info
