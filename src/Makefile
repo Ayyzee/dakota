@@ -85,17 +85,17 @@ $(blddir)/%.tbl: $(srcdir)/%.sh
 $(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
 
-$(DESTDIR)$(includedir)/%: $(srcdir)/../include/%
+$(DESTDIR)$(prefix)/include/%: $(srcdir)/../include/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(libdir)/%: $(srcdir)/../lib/%
+$(DESTDIR)$(prefix)/lib/%: $(srcdir)/../lib/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(libdir)/%: $(blddir)/../lib/%
+$(DESTDIR)$(prefix)/lib/%: $(blddir)/../lib/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(libdir)/dakota/%: $(srcdir)/../lib/dakota/%
+$(DESTDIR)$(prefix)/lib/dakota/%: $(srcdir)/../lib/dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(libdir)/dakota/%: $(blddir)/../lib/dakota/%
+$(DESTDIR)$(prefix)/lib/dakota/%: $(blddir)/../lib/dakota/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
-$(DESTDIR)$(bindir)/%: $(blddir)/../bin/%
+$(DESTDIR)$(prefix)/bin/%: $(blddir)/../bin/%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 
 all:
