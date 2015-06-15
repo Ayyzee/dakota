@@ -34,11 +34,6 @@ include $(blddir)/dakota-info-project.mk
 include $(blddir)/libdakota-project.mk
 include $(blddir)/libdakota-util-project.mk
 
-#libdakota_soname_pair :=      --soname $(libdakota_soname)
-#libdakota_util_soname_pair := --soname $(libdakota_util_soname)
-libdakota_soname_pair ?=
-libdakota_util_soname_pair ?=
-
 # include-dirs
 dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
 libdakota_include_dirs :=      $(patsubst %,--include-directory %,$(libdakota_include_dirs))
@@ -88,7 +83,7 @@ $(blddir)/%.tbl: $(srcdir)/%.sh
 	./$<
 
 $(blddir)/../lib/%.$(so_ext):
-	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) $(soname_pair) --output $@ $^
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
 
 ### installed files
 $(DESTDIR)$(includedir)/%: $(srcdir)/../include/%
@@ -131,14 +126,7 @@ $(dakota_info_output): $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(libdakota_output): $(libdakota_srcs) $(libdakota_libs)
-$(libdakota_output): macros =       $(libdakota_macros)
-$(libdakota_output): include_dirs = $(libdakota_include_dirs)
-$(libdakota_output): soname_pair =  $(libdakota_soname_pair)
-
 $(libdakota_util_output): $(libdakota_util_srcs) $(libdakota_util_libs)
-$(libdakota_util_output): macros =       $(libdakota_util_macros)
-$(libdakota_util_output): include_dirs = $(libdakota_util_include_dirs)
-$(libdakota_util_output): soname_pair =  $(libdakota_util_soname_pair)
 
 check-libs: all
 	$(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
