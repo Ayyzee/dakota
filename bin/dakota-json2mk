@@ -87,10 +87,14 @@ sub convert {
   my ($str) = @_;
   my $result = $str;
   if (1) {
-    my $trans_tbl = { '\-' => '_',
-                      '\.' => '_', };
+    my $trans_tbl = {
+      '\-' => '_',
+      '\.' => '_',
+      '\/' => '_',
+      '\:' => '_',
+    };
     while (($a, $b) = each (%$trans_tbl)) {
-      $result =~ s/$a/$b/g;
+      $result =~ s|$a+|$b|g;
     }
   }
   return $result;

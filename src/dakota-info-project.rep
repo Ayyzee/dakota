@@ -19,11 +19,11 @@
   ],
   'output' => '$(blddir)/../bin/dakota-info', # cmd-line
   'install' => {
-    '-rules' => {
-      '$(blddir)/../bin/%' => '$(DESTDIR)$(bindir)/%'
-    },
+    '-rules' => [
+      '$(DESTDIR)$(prefix)/bin/%', '$(blddir)/../bin/%',
+    ],
     'bins' =>   [ # install.bins
-      '$(DESTDIR)$(bindir)/dakota-info', {
+      '$(DESTDIR)$(prefix)/bin/dakota-info', {
         'mode' => '$(install_bins_mode)',
       }
     ],

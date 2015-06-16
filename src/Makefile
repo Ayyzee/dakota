@@ -6,9 +6,9 @@ srcdir ?= .
 blddir := .
 
 prefix ?= /usr/local
-includedir := $(prefix)/include
-libdir :=     $(prefix)/lib
-bindir :=     $(prefix)/bin
+#includedir := $(prefix)/include
+#libdir :=     $(prefix)/lib
+#bindir :=     $(prefix)/bin
 
 $(shell $(srcdir)/../bin/dakota-json2mk --output $(blddir)/../lib/dakota/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
 include $(blddir)/../lib/dakota/compiler.mk

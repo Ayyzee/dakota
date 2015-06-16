@@ -48,9 +48,9 @@
   'current-version' =>       '1.0.0', # cmd-line
   'soname' => '$(blddir)/../lib/libdakota-util.$(so_ext)', # cmd-line
   'install' => {
-    '-rules' => {
-      '$(blddir)/../lib/%' => '$(DESTDIR)$(prefix)/lib/%'
-    },
+    '-rules' => [
+      '$(DESTDIR)$(prefix)/lib/%', '$(blddir)/../lib/%',
+    ],
     'bins' => [ # install.bins
     ],
     'includes' => [ # install.includes
