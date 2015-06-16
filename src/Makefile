@@ -87,6 +87,8 @@ $(blddir)/../lib/%.$(so_ext):
 
 $(DESTDIR)$(prefix)/%: $(srcdir)/../%
 	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
+$(DESTDIR)$(prefix)/%: $(blddir)/../%
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
 
 all:
 	$(MAKE) dakota-info
