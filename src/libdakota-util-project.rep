@@ -33,6 +33,7 @@
     '$(srcdir)/xml-object-output-stream.dk'
   ],
   'libs' => [ # cmd-line
+    '$(blddir)/../lib/libdakota.$(so_ext)',
   ],
   'include-dirs' => [ # cmd-line
     '$(srcdir)',

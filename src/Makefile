@@ -101,8 +101,7 @@ $(DESTDIR)$(prefix)/%: $(srcdir)/../%
 $(DESTDIR)$(prefix)/%: $(blddir)/../%
 	sudo $(INSTALL_DATA) $< $(@D)
 
-all:
-	$(MAKE) dakota-info
+all: dakota-info
 	$(MAKE) libdakota libdakota-util
 
 dakota-info:    $(dakota_info_output)
