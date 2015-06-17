@@ -86,10 +86,20 @@ $(blddir)/%.tbl: $(srcdir)/%.sh
 $(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
 
+$(DESTDIR)$(prefix)/bin/%: $(srcdir)/../bin/%
+	sudo $(INSTALL_PROGRAM) $< $(@D)
+$(DESTDIR)$(prefix)/bin/%: $(blddir)/../bin/%
+	sudo $(INSTALL_PROGRAM) $< $(@D)
+
+$(DESTDIR)$(prefix)/lib/%: $(srcdir)/../lib/%
+	sudo $(INSTALL_LIB) $< $(@D)
+$(DESTDIR)$(prefix)/lib/%: $(blddir)/../lib/%
+	sudo $(INSTALL_LIB) $< $(@D)
+
 $(DESTDIR)$(prefix)/%: $(srcdir)/../%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(mode) $< $(@D)
+	sudo $(INSTALL_DATA) $< $(@D)
 $(DESTDIR)$(prefix)/%: $(blddir)/../%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(mode) $< $(@D)
+	sudo $(INSTALL_DATA) $< $(@D)
 
 all:
 	$(MAKE) dakota-info
@@ -144,14 +154,10 @@ uninstall-libdakota-util:
 	sudo $(RM) $(RMFLAGS) $(strip $(libdakota_util_install))
 
 install: $(INSTALL_DIRS)
-	$(MAKE) install-dakota-info
-	$(MAKE) install-libdakota
-	$(MAKE) install-libdakota-util
+	$(MAKE) install-dakota-info install-libdakota install-libdakota-util
 
 uninstall:
-	$(MAKE) uninstall-dakota-info
-	$(MAKE) uninstall-libdakota
-	$(MAKE) uninstall-libdakota-util
+	$(MAKE) uninstall-dakota-info uninstall-libdakota uninstall-libdakota-util
 
 clean:
 	$(RM) $(RMFLAGS) $(dakota_info_output)

@@ -23,9 +23,7 @@
       '$(DESTDIR)$(prefix)/bin/%', '$(blddir)/../bin/%',
     ],
     'bins' =>   [ # install.bins
-      '$(DESTDIR)$(prefix)/bin/dakota-info', {
-        'mode' => '$(install_bins_mode)',
-      }
+      '$(DESTDIR)$(prefix)/bin/dakota-info',
     ],
     'includes' => [ # install.includes
     ],
