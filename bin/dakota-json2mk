@@ -240,17 +240,9 @@ sub target_specific_vars {
       $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
     }
     $result .= "\n";
-    my $srcs = &lhs(['srcs'], $prefix);
-    my $libs = &lhs(['libs'], $prefix);
-    $result .= "\$($output)" . " : " . "\$($srcs)" . ' ' . "\$($libs)" . "\n";
-
-    my ($includes_ln, $libs_ln, $bins_ln);
-    $includes_ln = &tsv_install($data, 'includes', $prefix);
-    $libs_ln =     &tsv_install($data, 'libs',     $prefix);
-    $bins_ln =     &tsv_install($data, 'bins',     $prefix);
-    if ('' ne $includes_ln || '' ne $libs_ln || '' ne $bins_ln) {
-      $result .= "\n" . $includes_ln . $libs_ln . $bins_ln;
-    }
+    $result .= &tsv_install($data, 'includes', $prefix);
+    $result .= &tsv_install($data, 'libs',     $prefix);
+    $result .= &tsv_install($data, 'bins',     $prefix);
   }
   #print STDERR $result;
   return $result;
