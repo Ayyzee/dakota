@@ -26,30 +26,26 @@ export DAKOTA
 export DAKOTAFLAGS
 export EXTRA_DAKOTAFLAGS
 
-install_file_mode :=    0644
-install_dir_mode :=     0755
-
-install_includes_mode := $(install_file_mode)
-install_bins_mode :=     0755
-install_libs_mode :=     $(install_file_mode)
-
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info    --output $(blddir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota      --output $(blddir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(blddir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
 
 __all__: all
 
+install_output :=
+
 include $(blddir)/dakota-info-project.mk
-dakota_info_install = $(dakota_info_install_includes) $(dakota_info_install_libs) $(dakota_info_install_bins)
+include $(blddir)/libdakota-project.mk
+include $(blddir)/libdakota-util-project.mk
+
+dakota_info_install := $(dakota_info_install_includes) $(dakota_info_install_libs) $(dakota_info_install_bins)
 install_output += $(dakota_info_install)
 
-include $(blddir)/libdakota-project.mk
-libdakota_install = $(libdakota_install_includes) $(libdakota_install_libs) $(libdakota_install_bins)
+libdakota_install := $(libdakota_install_includes) $(libdakota_install_libs) $(libdakota_install_bins)
 install_output += $(libdakota_install)
 
-include $(blddir)/libdakota-util-project.mk
-libdakota_util_install = $(libdakota_util_install_includes) $(libdakota_util_install_libs) $(libdakota_util_install_bins)
-install_output += $(libdakota_util_output)
+libdakota_util_install := $(libdakota_util_install_includes) $(libdakota_util_install_libs) $(libdakota_util_install_bins)
+install_output += $(libdakota_util_install)
 
 # include-dirs
 dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
@@ -101,9 +97,6 @@ all: $(dakota_info_output)
 $(dakota_info_output): $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
-$(libdakota_output):      $(libdakota_srcs)      $(libdakota_libs)
-$(libdakota_util_output): $(libdakota_util_srcs) $(libdakota_util_libs)
-
 check-libs: all
 	$(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
 
@@ -126,7 +119,7 @@ INSTALL_DIRS :=\
 #
 
 $(INSTALL_DIRS):
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_CREATE_DIRS_FLAGS) $(INSTALL_MODE_FLAGS) $(install_dir_mode) $@
+	sudo $(INSTALL_DIR) $@
 
 installdirs: $(INSTALL_DIRS)
 	$(MAKE) $^
@@ -135,7 +128,7 @@ install: $(INSTALL_DIRS)
 	$(MAKE) $(install_output)
 
 uninstall:
-	sudo rm -rf $(install_output)
+	sudo $(RM) $(RMFLAGS) $(install_output)
 
 clean:
 	$(RM) $(RMFLAGS) $(dakota_info_output){.dSYM,}

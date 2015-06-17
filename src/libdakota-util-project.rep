@@ -33,7 +33,7 @@
     '$(srcdir)/xml-object-output-stream.dk'
   ],
   'libs' => [ # cmd-line
-    '$(blddir)/../lib/libdakota.$(so_ext)',
+    #'$(blddir)/../lib/libdakota.$(so_ext)', # causes $(blddir)/../lib/*.ctlg files to be generated
   ],
   'include-dirs' => [ # cmd-line
     '$(srcdir)',
