@@ -30,12 +30,19 @@ $(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info    --output $(blddi
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota      --output $(blddir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
 $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(blddir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
 
-all: dakota-info
-	$(MAKE) libdakota libdakota-util
+__all__: all
 
 include $(blddir)/dakota-info-project.mk
+dakota_info_install = $(dakota_info_install_includes) $(dakota_info_install_libs) $(dakota_info_install_bins)
+install_output += $(dakota_info_install)
+
 include $(blddir)/libdakota-project.mk
+libdakota_install = $(libdakota_install_includes) $(libdakota_install_libs) $(libdakota_install_bins)
+install_output += $(libdakota_install)
+
 include $(blddir)/libdakota-util-project.mk
+libdakota_util_install = $(libdakota_util_install_includes) $(libdakota_util_install_libs) $(libdakota_util_install_bins)
+install_output += $(libdakota_util_output)
 
 # include-dirs
 dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
@@ -47,32 +54,16 @@ dakota_info_macros :=    $(patsubst %,--define-macro %,$(dakota_info_macros))
 libdakota_macros :=      $(patsubst %,--define-macro %,$(libdakota_macros))
 libdakota_util_macros := $(patsubst %,--define-macro %,$(libdakota_util_macros))
 
-dakota_info_install =    $(dakota_info_install_bins)    $(dakota_info_install_includes)    $(dakota_info_install_libs)
-libdakota_install =      $(libdakota_install_bins)      $(libdakota_install_includes)      $(libdakota_install_libs)
-libdakota_util_install = $(libdakota_util_install_bins) $(libdakota_util_install_includes) $(libdakota_util_install_libs)
-
 .PHONY:\
  all\
  check-exes\
  check-libs\
  check\
  clean\
- dakota-info\
- install-dakota-info\
- install-libdakota-util\
- install-libdakota\
  install\
  installdirs\
- libdakota-util\
- libdakota\
  precompile\
- uninstall-dakota-info\
- uninstall-libdakota-util\
- uninstall-libdakota\
  uninstall\
-
-# precompile-libdakota\
-# precompile-libdakota-util\
 
 $(blddir)/%.dk: $(blddir)/%.tbl
 
@@ -97,9 +88,8 @@ $(DESTDIR)$(prefix)/%: $(srcdir)/../%
 $(DESTDIR)$(prefix)/%: $(blddir)/../%
 	sudo $(INSTALL_DATA) $< $(@D)
 
-dakota-info:    $(dakota_info_output)
-libdakota:      $(libdakota_output)
-libdakota-util: $(libdakota_util_output)
+all: $(dakota_info_output)
+	$(MAKE) $(libdakota_output) $(libdakota_util_output)
 
 $(dakota_info_output): $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
@@ -131,30 +121,16 @@ $(INSTALL_DIRS):
 installdirs: $(INSTALL_DIRS)
 	$(MAKE) $^
 
-install-dakota-info:    $(dakota_info_install)
-install-libdakota:      $(libdakota_install)
-install-libdakota-util: $(libdakota_util_install)
-
-uninstall-dakota-info:
-	sudo $(RM) $(RMFLAGS) $(strip $(dakota_info_install))
-uninstall-libdakota:
-	sudo $(RM) $(RMFLAGS) $(strip $(libdakota_install))
-uninstall-libdakota-util:
-	sudo $(RM) $(RMFLAGS) $(strip $(libdakota_util_install))
-
 install: $(INSTALL_DIRS)
-	$(MAKE) install-dakota-info install-libdakota install-libdakota-util
+	$(MAKE) $(install_output)
 
 uninstall:
-	$(MAKE) uninstall-dakota-info uninstall-libdakota uninstall-libdakota-util
+	sudo rm -rf $(install_output)
 
 clean:
-	$(RM) $(RMFLAGS) $(dakota_info_output)
-	$(RM) $(RMFLAGS) $(dakota_info_output).dSYM
-	$(RM) $(RMFLAGS) $(libdakota_util_output)
-	$(RM) $(RMFLAGS) $(libdakota_util_output).ctlg
-	$(RM) $(RMFLAGS) $(libdakota_output)
-	$(RM) $(RMFLAGS) $(libdakota_output).ctlg
+	$(RM) $(RMFLAGS) $(dakota_info_output){.dSYM,}
+	$(RM) $(RMFLAGS) $(libdakota_util_output){.ctlg,}
+	$(RM) $(RMFLAGS) $(libdakota_output){.ctlg,}
 	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler-{darwin,linux}-{clang,gcc}.mk
 	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler.mk
 	$(RM) $(RMFLAGS) $(blddir)/obj
