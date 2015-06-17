@@ -434,10 +434,10 @@ sub loop_rep_from_so {
         $arg =~ m|\.ctlg$|) {
     } else {
       my $ctlg_path = &ctlg_path_from_any_path($arg);
-      my ($ctlg_dir, $ctlg_file) = &split_path($arg);
+      my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
       my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$ctlg_cmd{'output'} = $ctlg_path;
-      $$ctlg_cmd{'output-directory'} = $ctlg_dir;
+      $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
       $$ctlg_cmd{'inputs'} = [ $arg ];
       &ctlg_from_so($ctlg_cmd);
       my $rep_path = &rep_path_from_ctlg_path($ctlg_path);
