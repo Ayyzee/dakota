@@ -102,17 +102,20 @@
       '$(DESTDIR)$(prefix)/lib/dakota/compiler-darwin-gcc.json',   { 'mode' => '$(install_file_mode)' },
       '$(DESTDIR)$(prefix)/lib/dakota/compiler-linux-clang.json',  { 'mode' => '$(install_file_mode)' },
       '$(DESTDIR)$(prefix)/lib/dakota/compiler-linux-gcc.json',    { 'mode' => '$(install_file_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/dakota.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/extra.json', { 'mode' => '$(install_file_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/generate.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/header-from-symbol.json', { 'mode' => '$(install_file_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/macro_system.pm', { 'mode' => '$(install_bins_mode)' }, # also executable
+      '$(DESTDIR)$(prefix)/lib/dakota/extra.json',                 { 'mode' => '$(install_file_mode)' },
+      '$(DESTDIR)$(prefix)/lib/dakota/header-from-symbol.json',    { 'mode' => '$(install_file_mode)' },
+      '$(DESTDIR)$(prefix)/lib/dakota/used.json',                  { 'mode' => '$(install_file_mode)' },
+
       '$(DESTDIR)$(prefix)/lib/dakota/macros.pl', { 'mode' => '$(install_file_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/parse.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/rewrite.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/sst.pm', { 'mode' => '$(install_libs_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/used.json', { 'mode' => '$(install_file_mode)' },
-      '$(DESTDIR)$(prefix)/lib/dakota/util.pm', { 'mode' => '$(install_libs_mode)' },
+
+      '$(DESTDIR)$(prefix)/lib/dakota/dakota.pm',       { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(prefix)/lib/dakota/generate.pm',     { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(prefix)/lib/dakota/macro_system.pm', { 'mode' => '$(install_bins_mode)' }, # also executable
+      '$(DESTDIR)$(prefix)/lib/dakota/parse.pm',        { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(prefix)/lib/dakota/rewrite.pm',      { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(prefix)/lib/dakota/sst.pm',          { 'mode' => '$(install_libs_mode)' },
+      '$(DESTDIR)$(prefix)/lib/dakota/util.pm',         { 'mode' => '$(install_libs_mode)' },
+
       '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)', { 'mode' => '$(install_libs_mode)' },
     ],
     'includes' => [ # install.includes
