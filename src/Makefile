@@ -4,21 +4,24 @@ DESTDIR ?=
 
 srcdir ?= .
 blddir := .
+objdir := $(blddir)/obj
 
 prefix ?= /usr/local
 includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
-$(shell $(srcdir)/../bin/dakota-json2mk --output $(blddir)/../lib/dakota/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
-include $(blddir)/../lib/dakota/compiler.mk
-
-export CXX
-export CXXFLAGS
-export EXTRA_CXXFLAGS
+--all--: all
 
 include $(srcdir)/../config.mk
 include $(srcdir)/../vars.mk
+
+include $(shell $(srcdir)/../bin/dakota-json2mk --output $(objdir)/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
+cxx_debug_symbols_ext ?=
+
+include $(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info    --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
+include $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota      --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
+include $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
 
 export EXTRA_LDFLAGS
 
@@ -26,15 +29,9 @@ export DAKOTA
 export DAKOTAFLAGS
 export EXTRA_DAKOTAFLAGS
 
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info    --output $(blddir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota      --output $(blddir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
-$(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(blddir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
-
-__all__: all
-
-include $(blddir)/dakota-info-project.mk
-include $(blddir)/libdakota-project.mk
-include $(blddir)/libdakota-util-project.mk
+export CXX
+export CXXFLAGS
+export EXTRA_CXXFLAGS
 
 install_output := $(dakota_info_install) $(libdakota_install) $(libdakota_util_install)
 
@@ -49,9 +46,8 @@ libdakota_macros :=      $(patsubst %,--define-macro %,$(libdakota_macros))
 libdakota_util_macros := $(patsubst %,--define-macro %,$(libdakota_util_macros))
 
 .PHONY:\
+ --all--\
  all\
- check-exes\
- check-libs\
  check\
  clean\
  install\
@@ -59,9 +55,9 @@ libdakota_util_macros := $(patsubst %,--define-macro %,$(libdakota_util_macros))
  precompile\
  uninstall\
 
-$(blddir)/%.dk: $(blddir)/%.tbl
+$(blddir)/%.dk: $(objdir)/%.tbl
 
-$(blddir)/%.tbl: $(srcdir)/%.sh
+$(objdir)/%.tbl: $(srcdir)/%.sh
 	./$<
 
 $(blddir)/../lib/%.$(so_ext):
@@ -88,17 +84,6 @@ all: $(dakota_info_output)
 $(dakota_info_output): $(dakota_info_srcs) $(dakota_info_libs)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
-check-libs: all
-	$(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
-
-check-exes: all
-	$(MAKE) --file $@.mk
-
-check: all
-	$(MAKE) check-libs
-	$(MAKE) check-exes
-	./$@.sh
-
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
 
@@ -121,13 +106,12 @@ install: $(INSTALL_DIRS)
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install_output)
 
+check: all
+	$(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
+	$(MAKE) --file exes.mk $@
+	./$@.sh
+
 clean:
-	$(RM) $(RMFLAGS) $(dakota_info_output){.dSYM,}
-	$(RM) $(RMFLAGS) $(libdakota_util_output){.ctlg,}
-	$(RM) $(RMFLAGS) $(libdakota_output){.ctlg,}
-	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler-{darwin,linux}-{clang,gcc}.mk
-	$(RM) $(RMFLAGS) $(blddir)/../lib/dakota/compiler.mk
-	$(RM) $(RMFLAGS) $(blddir)/obj
-	$(RM) $(RMFLAGS) $(blddir)/sterror-name.tbl
-	$(RM) $(RMFLAGS) $(blddir)/{dakota-info,libdakota,libdakota-util}-project.mk
-	$(RM) $(RMFLAGS) $(blddir)/{dummy,empty-klass-x,min,tst}
+	$(RM) $(RMFLAGS) $(dakota_info_output){.$(cxx_debug_symbols_ext),} $(libdakota_output) $(libdakota_util_output)
+	$(RM) $(RMFLAGS) $(objdir)/*
+	$(MAKE) --file exes.mk $@

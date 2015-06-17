@@ -38,4 +38,5 @@
   'cc_ext' => 'cc',
   'o_ext' =>  'o',
   'so_ext' => 'dylib', # unique to darwin
+  'cxx_debug_symbols_ext' => 'dSYM', # unique to darwin
 }

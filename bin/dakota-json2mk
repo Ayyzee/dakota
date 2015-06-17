@@ -206,6 +206,9 @@ sub start {
     print $fh "\n" . &target_specific_vars($data, $opts, $out);
   }
   close($fh);
+  if ($$opts{'output'}) {
+    print $$opts{'output'} . "\n";
+  }
 }
 sub tsv_install{
   my ($data, $key, $prefix) = @_;

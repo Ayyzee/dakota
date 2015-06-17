@@ -2,9 +2,9 @@ SHELL := /bin/sh -u
 
 srcdir ?= .
 blddir := .
+objdir := $(blddir)/obj
 
-$(shell $(srcdir)/../bin/dakota-json2mk --output $(blddir)/../lib/dakota/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
-include $(blddir)/../lib/dakota/compiler.mk
+include $(shell $(srcdir)/../bin/dakota-json2mk --output /tmp/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
 
 export CXX
 export CXXFLAGS
@@ -24,17 +24,16 @@ include_dirs := --include-directory ../include
 $(blddir)/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory ../include --output $@ $^
 
-all:
-	$(MAKE) --file check-exes.mk $(blddir)/tst
-	rm -f obj/{nrt,rt,}/tst{-main,}.*
-	$(blddir)/tst
-	rm -f $(blddir)/tst
-	$(MAKE) --file check-exes.mk $(blddir)/min
-	rm -f obj/{nrt,rt,}/min{-main,}.*
-	$(blddir)/min
-	rm -f $(blddir)/min
-	$(MAKE) --file check-exes.mk $(blddir)/dummy
-	$(blddir)/dummy
+exes := $(blddir)/tst $(blddir)/min $(blddir)/dummy
+
+all: $(exes)
+
+check: all
+	for exe in $(exes); do echo $$exe; $$exe; done
+
+clean:
+	rm -f $(exes)
+	for exe in $(exes); do rm -fr $$exe.$(cxx_debug_symbols_ext); rm -fv $(objdir)/{nrt,rt,}/$$exe{-main,}.*; done
 	rm -f $(blddir)/dummy
 
 $(blddir)/tst: $(blddir)/../lib/libdakota-util.$(so_ext)
