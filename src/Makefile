@@ -6,9 +6,9 @@ srcdir ?= .
 blddir := .
 
 prefix ?= /usr/local
-#includedir := $(prefix)/include
-#libdir :=     $(prefix)/lib
-#bindir :=     $(prefix)/bin
+includedir := $(prefix)/include
+libdir :=     $(prefix)/lib
+bindir :=     $(prefix)/bin
 
 $(shell $(srcdir)/../bin/dakota-json2mk --output $(blddir)/../lib/dakota/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
 include $(blddir)/../lib/dakota/compiler.mk
@@ -66,6 +66,7 @@ libdakota_util_install = $(libdakota_util_install_bins) $(libdakota_util_install
  install-libdakota-util\
  install-libdakota\
  install\
+ installdirs\
  libdakota-util\
  libdakota\
  precompile\
@@ -86,9 +87,9 @@ $(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
 
 $(DESTDIR)$(prefix)/%: $(srcdir)/../%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(mode) $< $(@D)
 $(DESTDIR)$(prefix)/%: $(blddir)/../%
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAG) $(mode) $< $(@D)
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(mode) $< $(@D)
 
 all:
 	$(MAKE) dakota-info
@@ -118,11 +119,18 @@ check: all
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
 
-$(prefix)/bin \
-$(prefix)/include \
-$(prefix)/lib \
-$(prefix)/lib/dakota:
-	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_CREATE_DIRS_FLAG) $(INSTALL_MODE_FLAG) $(dir_mode) $@
+INSTALL_DIRS :=\
+ $(DESTDIR)$(prefix)/bin\
+ $(DESTDIR)$(prefix)/include\
+ $(DESTDIR)$(prefix)/lib\
+ $(DESTDIR)$(prefix)/lib/dakota\
+#
+
+$(INSTALL_DIRS):
+	sudo $(INSTALL) $(INSTALLFLAGS) $(INSTALL_CREATE_DIRS_FLAGS) $(INSTALL_MODE_FLAGS) $(install_dir_mode) $@
+
+installdirs: $(INSTALL_DIRS)
+	$(MAKE) $^
 
 install-dakota-info:    $(dakota_info_install)
 install-libdakota:      $(libdakota_install)
@@ -135,7 +143,7 @@ uninstall-libdakota:
 uninstall-libdakota-util:
 	sudo $(RM) $(RMFLAGS) $(strip $(libdakota_util_install))
 
-install:
+install: $(INSTALL_DIRS)
 	$(MAKE) install-dakota-info
 	$(MAKE) install-libdakota
 	$(MAKE) install-libdakota-util
