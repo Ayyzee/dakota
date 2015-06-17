@@ -234,15 +234,21 @@ sub target_specific_vars {
   my $prefix = &prefix($opts);
   my $result = '';
   if ($prefix) {
+    my $install =  &lhs(['install'], $prefix);
+    my $install_includes = &lhs(['install', 'includes'], $prefix);
+    my $install_libs = &lhs(['install', 'libs'], $prefix);
+    my $install_bins = &lhs(['install', 'bins'], $prefix);
+    $result .= "$install" . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
+    $result .= "\n";
     my $output = &lhs(['output'], $prefix);
+    my $libs = &lhs(['libs'], $prefix);
     foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
       my $name = $$out{'tsv'}{$prefix}{$bname};
       $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
     }
     $result .= "\n";
     my $srcs = &lhs(['srcs'], $prefix);
-    my $libs = &lhs(['libs'], $prefix);
-    $result .= "\$($output)" . " : " . "\$($srcs)" . ' ' . "\$($libs)" . "\n";
+    $result .= "\$($output)" . ' : ' . "\$($srcs)" . ' ' . "\$($libs)" . "\n";
 
     my ($includes_ln, $libs_ln, $bins_ln);
     $includes_ln = &tsv_install($data, 'includes', $prefix);

@@ -32,20 +32,11 @@ $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(blddi
 
 __all__: all
 
-install_output :=
-
 include $(blddir)/dakota-info-project.mk
 include $(blddir)/libdakota-project.mk
 include $(blddir)/libdakota-util-project.mk
 
-dakota_info_install := $(dakota_info_install_includes) $(dakota_info_install_libs) $(dakota_info_install_bins)
-install_output += $(dakota_info_install)
-
-libdakota_install := $(libdakota_install_includes) $(libdakota_install_libs) $(libdakota_install_bins)
-install_output += $(libdakota_install)
-
-libdakota_util_install := $(libdakota_util_install_includes) $(libdakota_util_install_libs) $(libdakota_util_install_bins)
-install_output += $(libdakota_util_install)
+install_output := $(dakota_info_install) $(libdakota_install) $(libdakota_util_install)
 
 # include-dirs
 dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
