@@ -12,6 +12,7 @@ export EXTRA_CXXFLAGS
 
 include $(srcdir)/../config.mk
 include $(srcdir)/../vars.mk
+include $(srcdir)/../rules.mk
 
 export EXTRA_LDFLAGS
 

@@ -71,3 +71,5 @@ ifdef DKT_ALLOW_DESIGNATED_INITIALIZERS
 endif
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
+
+cxx_debug_symbols_ext ?=
