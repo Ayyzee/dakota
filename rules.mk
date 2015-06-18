@@ -14,6 +14,8 @@ $(objdir)/%.tbl: $(srcdir)/%.sh
 
 CXX_INCLUDE_DIRECTORY_FLAGS := --include-directory
 
+$(blddir)/../bin/%: $(srcdir)/%-main.cc
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) ../include $(CXX_OUTPUT_FLAGS) $@ $^
 $(blddir)/%: $(srcdir)/%-main.cc
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) ../include $(CXX_OUTPUT_FLAGS) $@ $^
 
