@@ -6,6 +6,13 @@ MAKEFLAGS :=\
 
 # --no-print-directory\
 
+include $(shell $(srcdir)/../bin/dakota-json2mk --output $(objdir)/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
+
+CXX := $(DK_CXX)
+CXXFLAGS := $(DK_CXXFLAGS)
+CXX_WARNINGS_FLAGS := $(DK_CXX_WARNINGS_FLAGS)
+CXX_OUTPUT_FLAGS := $(DK_CXX_OUTPUT_FLAGS)
+
 hh_ext := hh
 cc_ext := cc
 

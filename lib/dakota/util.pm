@@ -119,11 +119,22 @@ sub objdir { return $$build_vars{'objdir'}; }
 sub var {
   my ($compiler, $lhs, $default_rhs) = @_;
   my $result;
-  if (defined $ENV{$lhs}) {
-    $result = $ENV{$lhs};
-  } elsif ($$compiler{$lhs}) {
-    $result = $$compiler{$lhs};
+  my $compiler_rhs = $$compiler{$lhs};
+  my $env_rhs = $ENV{$lhs};
+
+  if ($compiler_rhs) {
+    if ($env_rhs) {
+      print STDERR "info: $lhs: using environment over config file \"$env_rhs\" over \"$compiler_rhs\"\n";
+      $result = $env_rhs;
+    } else {
+      # using config file
+      $result = $compiler_rhs;
+    }
+  } elsif ($env_rhs) {
+    print STDERR "info: $lhs: using environment \"$env_rhs\"\n";
+    $result = $env_rhs;
   } else {
+    print STDERR "info: $lhs: using default \"$default_rhs\"\n";
     $result = $default_rhs;
   }
   die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace

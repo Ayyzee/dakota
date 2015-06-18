@@ -86,10 +86,10 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', undef);
-my $cxx_output_flags =  &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  undef);
-my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',  undef);
-my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', undef);
+my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'DK_CXX_COMPILE_PIC_FLAGS', undef);
+my $cxx_output_flags =  &dakota::util::var($gbl_compiler, 'DK_CXX_OUTPUT_FLAGS',  undef);
+my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'DK_CXX_SHARED_FLAGS',  undef);
+my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'DK_CXX_DYNAMIC_FLAGS', undef);
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -339,15 +339,17 @@ sub start_cmd {
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
-    $$cmd_info{'opts'}{'compiler'} = &dakota::util::var($gbl_compiler, 'CXX', undef);
+    my $cxx = &dakota::util::var($gbl_compiler, 'DK_CXX', $ENV{'CXX'});
+    $$cmd_info{'opts'}{'compiler'} = $cxx;
   }
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
+    my $cxxflags = &dakota::util::var($gbl_compiler, 'DK_CXXFLAGS', $ENV{'CXXFLAGS'});
+    my $extra_cxxflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_CXXFLAGS', $ENV{'EXTRA_CXXFLAGS'});
+    my $cxx_warning_flags = &dakota::util::var($gbl_compiler, 'DK_CXX_WARNINGS_FLAGS', undef);
     $$cmd_info{'opts'}{'compiler-flags'} =
-      &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef) .
-      ' ' . $ENV{'EXTRA_CXXFLAGS'} .
-      ' ' . &dakota::util::var($gbl_compiler, 'CXX_WARNINGS_FLAGS', undef);
+    $cxxflags . ' ' . $extra_cxxflags . ' ' . $cxx_warning_flags;
   }
-  my $ld_soname_flags = &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', undef);
+  my $ld_soname_flags = &dakota::util::var($gbl_compiler, 'DK_LD_SONAME_FLAGS', undef);
 
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_construct = undef;
@@ -618,9 +620,10 @@ sub so_from_o {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
+    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'});
     $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
-    $$so_cmd{'cmd-flags'} = "$ENV{'EXTRA_LDFLAGS'} $$cmd_info{'opts'}{'compiler-flags'}";
+    $$so_cmd{'cmd-flags'} = "$extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
     $$so_cmd{'output'} = $$cmd_info{'output'};
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo;
@@ -631,9 +634,10 @@ sub dso_from_o {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
+    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'});
     $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
-    $$so_cmd{'cmd-flags'} = "$ENV{'EXTRA_LDFLAGS'} $$cmd_info{'opts'}{'compiler-flags'}";
+    $$so_cmd{'cmd-flags'} = "$extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
     $$so_cmd{'output'} = $$cmd_info{'output'};
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo;
@@ -644,9 +648,10 @@ sub exe_from_o {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'precompile'}) {
     my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
+    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'});
     $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$exe_cmd{'cmd-major-mode-flags'} = undef;
-    $$exe_cmd{'cmd-flags'} = "$ENV{'EXTRA_LDFLAGS'} $$cmd_info{'opts'}{'compiler-flags'}";
+    $$exe_cmd{'cmd-flags'} = "$extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
     $$exe_cmd{'output'} = $$cmd_info{'output'};
     $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo;

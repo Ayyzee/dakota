@@ -1,13 +1,3 @@
-export EXTRA_LDFLAGS
-
-export DAKOTA
-export DAKOTAFLAGS
-export EXTRA_DAKOTAFLAGS
-
-export CXX
-export CXXFLAGS
-export EXTRA_CXXFLAGS
-
 $(blddir)/%.dk: $(objdir)/%.tbl
 $(objdir)/%.tbl: $(srcdir)/%.sh
 	./$<
