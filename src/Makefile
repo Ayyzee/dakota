@@ -87,10 +87,10 @@ all: $(dakota_info_output)
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
 
-$(install_dirs):
-	sudo $(INSTALL_DIR) $@
+installdirs: # to support --jobs these must be done serially
+	for dir in $(install_dirs); do sudo $(INSTALL_DIR) $$dir; done
 
-$(install_files): $(install_dirs)
+$(install_files): installdirs
 
 install: $(install_files)
 
