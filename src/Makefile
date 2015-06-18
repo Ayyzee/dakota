@@ -63,12 +63,12 @@ clean:
 	$(RM) $(RMFLAGS) $(objdir)/*
 	$(MAKE) --file exes.mk $@
 
+installdirs: # to support --jobs these must be done serially
+	for dir in $(install_dirs); do sudo $(INSTALL_DIR) $$dir; done
+
 $(install_files): installdirs
 
 install: $(install_files)
-
-installdirs: # to support --jobs these must be done serially
-	for dir in $(install_dirs); do sudo $(INSTALL_DIR) $$dir; done
 
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
