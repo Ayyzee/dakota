@@ -127,7 +127,7 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
 typedef int_t dkt_va_arg_boole_t;
 typedef va_list va_list_t;
 
-#if defined DEBUG
+#if defined DKT_ENABLE_TRACE_BEFORE_AND_AFTER
   #define DKT_VA_TRACE_BEFORE(signature, method, object, args) dkt_va_trace_before(signature, method, object, args)
   #define DKT_VA_TRACE_AFTER( signature, method, object, args) dkt_va_trace_after( signature, method, object, args)
   #define DKT_TRACE_BEFORE(signature, method, object, ...)     dkt_trace_before(   signature, method, object, __VA_ARGS__)

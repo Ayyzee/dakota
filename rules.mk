@@ -9,15 +9,25 @@ export CXXFLAGS
 export EXTRA_CXXFLAGS
 
 $(blddir)/%.dk: $(objdir)/%.tbl
-
 $(objdir)/%.tbl: $(srcdir)/%.sh
 	./$<
 
-$(blddir)/../bin/%: %-main.cc
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
+CXX_INCLUDE_DIRECTORY_FLAGS := --include-directory
+
+$(blddir)/../bin/%: $(srcdir)/%-main.cc
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) ../include $(CXX_OUTPUT_FLAGS) $@ $^
+$(blddir)/%: $(srcdir)/%-main.cc
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) ../include $(CXX_OUTPUT_FLAGS) $@ $^
+
+$(blddir)/../bin/%: $(srcdir)/%-main.dk
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --output $@ $^
+$(blddir)/%: $(srcdir)/%-main.dk
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory ../include --output $@ $^
 
 $(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
+$(blddir)/%.$(so_ext):
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory ../include --output $@ $^
 
 $(DESTDIR)$(prefix)/bin/%: $(srcdir)/../bin/%
 	sudo $(INSTALL_PROGRAM) $< $(@D)
