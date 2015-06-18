@@ -33,7 +33,8 @@ export CXX
 export CXXFLAGS
 export EXTRA_CXXFLAGS
 
-install_output := $(dakota_info_install) $(libdakota_install) $(libdakota_util_install)
+install_files := $(dakota_info_install) $(libdakota_install) $(libdakota_util_install)
+install_dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
 
 # include-dirs
 dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
@@ -51,7 +52,6 @@ libdakota_util_macros := $(patsubst %,--define-macro %,$(libdakota_util_macros))
  check\
  clean\
  install\
- installdirs\
  precompile\
  uninstall\
 
@@ -59,6 +59,9 @@ $(blddir)/%.dk: $(objdir)/%.tbl
 
 $(objdir)/%.tbl: $(srcdir)/%.sh
 	./$<
+
+$(blddir)/../bin/%: %-main.cc
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $^
@@ -81,30 +84,18 @@ $(DESTDIR)$(prefix)/%: $(blddir)/../%
 all: $(dakota_info_output)
 	$(MAKE) $(libdakota_output) $(libdakota_util_output)
 
-$(dakota_info_output): $(dakota_info_srcs) $(dakota_info_libs)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(dakota_info_include_dirs) $(CXX_OUTPUT_FLAGS) $@ $^
-
 precompile:
 	$(MAKE) --always-make --keep-going DAKOTAFLAGS=--$@ all
 
-INSTALL_DIRS :=\
- $(DESTDIR)$(prefix)/bin\
- $(DESTDIR)$(prefix)/include\
- $(DESTDIR)$(prefix)/lib\
- $(DESTDIR)$(prefix)/lib/dakota\
-#
-
-$(INSTALL_DIRS):
+$(install_dirs):
 	sudo $(INSTALL_DIR) $@
 
-installdirs: $(INSTALL_DIRS)
-	$(MAKE) $^
+$(install_files): $(install_dirs)
 
-install: $(INSTALL_DIRS)
-	$(MAKE) $(install_output)
+install: $(install_files)
 
 uninstall:
-	sudo $(RM) $(RMFLAGS) $(install_output)
+	sudo $(RM) $(RMFLAGS) $(install_files)
 
 check: all
 	$(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
