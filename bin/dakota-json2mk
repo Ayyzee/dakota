@@ -250,6 +250,10 @@ sub target_specific_vars {
       $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
     }
     $result .= "\n";
+    $result .= 'all' . ' : ' . "\$($output)" . "\n";
+    $result .= "\n";
+
+    $result .= "\n";
     my $srcs = &lhs(['srcs'], $prefix);
     $result .= "\$($output)" . ' : ' . "\$($libs)" . ' ' . "\$($srcs)" . "\n";
 

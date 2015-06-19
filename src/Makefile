@@ -11,8 +11,6 @@ includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
-all: start
-
 include $(srcdir)/../config.mk
 include $(srcdir)/../vars.mk
 
@@ -46,10 +44,7 @@ install_dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  install\
  installdirs\
  precompile\
- start\
  uninstall\
-
-start: $(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
 
 $(libdakota_output) $(libdakota_util_output): $(dakota_info_output)
 $(libdakota_util_output): $(libdakota_output)
