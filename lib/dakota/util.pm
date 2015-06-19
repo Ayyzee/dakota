@@ -46,6 +46,7 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  add_first
                  add_last
+                 canon_path
                  deep_copy
                  dqstr_regex
                  filestr_from_file
@@ -162,11 +163,13 @@ sub flatten {
 }
 sub canon_path {
   my ($path) = @_;
-  $path =~ s|//+|/|g; # replace multiple /s with single /s
-  $path =~ s|/+\./+|/|g; # replace /./s with single /
-  $path =~ s|^\./||g; # remove leading ./
-  $path =~ s|/\.$||g; # remove trailing /.
-  $path =~ s|/+$||g; # remove trailing /s
+  if ($path) {
+    $path =~ s|//+|/|g; # replace multiple /s with single /s
+    $path =~ s|/+\./+|/|g; # replace /./s with single /
+    $path =~ s|^\./||g; # remove leading ./
+    $path =~ s|/\.$||g; # remove trailing /.
+    $path =~ s|/+$||g; # remove trailing /s
+  }
   return $path;
 }
 sub split_path {

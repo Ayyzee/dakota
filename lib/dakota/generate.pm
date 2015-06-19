@@ -276,7 +276,7 @@ sub generate_nrt_defn {
 sub generate_nrt {
   my ($path, $file) = @_;
   my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
-  $gbl_nrt_file = "$name.dk";
+  $gbl_nrt_file = &canon_path("$name.dk");
 
   my ($generics, $symbols) = &generics::parse($file);
   my $result;
@@ -2357,7 +2357,8 @@ sub linkage_unit::generate_headers {
 }
 sub is_same_file {
   my ($klass_scope) = @_;
-  if ($gbl_nrt_file && $$klass_scope{'slots'} && $$klass_scope{'slots'}{'file'} && ($gbl_nrt_file eq $$klass_scope{'slots'}{'file'})) {
+  my $file = &canon_path($$klass_scope{'slots'}{'file'});
+  if ($gbl_nrt_file && $$klass_scope{'slots'} && $$klass_scope{'slots'}{'file'} && ($gbl_nrt_file eq $file)) {
     return 1;
   } else {
     return 0;
@@ -2365,7 +2366,8 @@ sub is_same_file {
 }
 sub is_same_src_file {
   my ($klass_scope) = @_;
-  if ($gbl_nrt_file && ($gbl_nrt_file eq $$klass_scope{'file'})) {
+  my $file = &canon_path($$klass_scope{'file'});
+  if ($gbl_nrt_file && ($gbl_nrt_file eq $file)) {
     return 1;
   } else {
     return 0;
