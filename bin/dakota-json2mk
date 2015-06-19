@@ -229,7 +229,6 @@ sub tsv_install{
   }
   return $result;
 }
-
 sub target_specific_vars {
   my ($data, $opts, $out) = @_;
   #print STDERR &Dumper($out);
@@ -241,9 +240,9 @@ sub target_specific_vars {
     my $install_includes = &lhs(['install', 'includes'], $prefix);
     my $install_libs = &lhs(['install', 'libs'], $prefix);
     my $install_bins = &lhs(['install', 'bins'], $prefix);
-    $result .= "$install" . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
+    $result .= $install . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
     $result .= "\n";
-    $result .= 'output_files' . ' += ' . "\$($output)" . "\n";
+    $result .= 'output_files'  . ' += ' . "\$($output)"  . "\n";
     $result .= 'install_files' . ' += ' . "\$($install)" . "\n";
     $result .= "\n";
     my $libs = &lhs(['libs'], $prefix);
