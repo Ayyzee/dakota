@@ -246,13 +246,27 @@ sub tsv {
   #print STDERR &Dumper($out);
   my $prefix = &prefix($opts);
   my $result = '';
+  my $output = &lhs(['output'], $prefix);
 
+  if ($$data{'output'}) {
+    $result .= "\n";
+    $result .= 'output_files' . ' += ' . "\$($output)"  . "\n";
+
+    if ($prefix) {
+      $result .= "\n";
+      foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
+        my $name = $$out{'tsv'}{$prefix}{$bname};
+        $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
+      }
+    }
+  }
   if ($$data{'install'}) {
     my $install =  &lhs(['install'], $prefix);
     my $install_includes = &lhs(['install', 'includes'], $prefix);
     my $install_libs = &lhs(['install', 'libs'], $prefix);
     my $install_bins = &lhs(['install', 'bins'], $prefix);
 
+    $result .= "\n";
     $result .= $install . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
     $result .= "\n";
     $result .= 'install_files' . ' += ' . "\$($install)" . "\n";
@@ -265,17 +279,7 @@ sub tsv {
   if ($$data{'output'}) {
     my $srcs = &lhs(['srcs'], $prefix);
     my $libs = &lhs(['libs'], $prefix);
-    my $output = &lhs(['output'], $prefix);
 
-    $result .= 'output_files' . ' += ' . "\$($output)"  . "\n";
-
-    if ($prefix) {
-      $result .= "\n";
-      foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
-        my $name = $$out{'tsv'}{$prefix}{$bname};
-        $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
-      }
-    }
     $result .= "\n";
     $result .= 'all' . ' : ' . "\$($output)" . "\n";
     $result .= "\n";
