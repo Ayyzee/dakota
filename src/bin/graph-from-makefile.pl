@@ -35,17 +35,8 @@ $Data::Dumper::Useqq     = 1;
 $Data::Dumper::Sortkeys =  0;
 $Data::Dumper::Indent    = 1;  # default = 2
 
-use strict;
-use warnings;
-
-# interesting:
-#   target : prereqs
-#   .PHONY : prereqs
-# not interesting:
-#   target : variable :=|= values
-#   variable :=|= values
-#
-# .anything : is special
+use Getopt::Long;
+$Getopt::Long::ignorecase = 0;
 
 sub add_dependency {
   my ($data, $target, $prereqs) = @_;
@@ -168,13 +159,27 @@ sub digraph {
 }
 sub start {
   my ($argv) = @_;
+  my $opts = {};
+  &GetOptions($opts,
+              'output=s',
+            );
+  my $fh;
+
+  if ($$opts{'output'}) {
+    open($fh, ">", $$opts{'output'})
+      or die "cannot open > $$opts{'output'}: $!";
+  } else {
+    open($fh, '>&', \*STDOUT)
+      or die "cannot open >& STDOUT: $!";
+  }
   my $db = &makefile_db({});
+
   if (0) {
     my $dbstr = &Dumper($db);
     $dbstr =~ s/\{\s*(".+?"\s*=>\s*\d+)\s*\}/\{ $1 \}/gs;
     print STDERR $dbstr;
   }
-  print &digraph($db);
+  print $fh &digraph($db);
 }
 unless (caller) {
   &start(\@ARGV);
