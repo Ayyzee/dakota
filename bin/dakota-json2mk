@@ -225,15 +225,15 @@ sub tsv_install{
   my ($data, $key, $prefix) = @_;
   my $result = '';
   #my $output = &lhs(['output'], $prefix);
-  my $install_libs = $$data{'install'}{$key}; # _lib is misleading
+  my $install_elements = $$data{'install'}{$key};
 
-  for (my $i = 0; $i < @$install_libs; $i++) {
-    my $install_lib = $$install_libs[$i];
-    if (&is_scalar($install_lib)) {
-      my $info = $$install_libs[$i + 1];
+  for (my $i = 0; $i < @$install_elements; $i++) {
+    my $install_element = $$install_elements[$i];
+    if (&is_scalar($install_element)) {
+      my $info = $$install_elements[$i + 1];
       if (&is_tbl($info)) {
         my ($bname, $name); while (($bname, $name) = each (%$info)) {
-          $result .= $install_lib . ' : ' . $bname . ' = ' . $name . "\n";
+          $result .= $install_element . ' : ' . $bname . ' = ' . $name . "\n";
           $i++;
         }
       }
@@ -261,29 +261,36 @@ sub tsv {
     }
   }
   if ($$data{'install'}) {
-    my $install =  &lhs(['install'], $prefix);
-    my $install_includes = &lhs(['install', 'includes'], $prefix);
-    my $install_libs = &lhs(['install', 'libs'], $prefix);
-    my $install_bins = &lhs(['install', 'bins'], $prefix);
+    my $install = &lhs(['install'], $prefix);
+    $result .=  "\n";
+    $result .= $install . ' =';
 
-    $result .= "\n";
-    $result .= $install . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
-    $result .= "\n";
+    for my $name (@{&install_bnames($data)}) {
+      my $var = &lhs(['install', $name], $prefix);
+      $result .= ' ' . "\$($var)";
+    }
+    $result .=  "\n";
+    $result .=  "\n";
     $result .= 'install_files' . ' += ' . "\$($install)" . "\n";
-    $result .= "\n";
-
-    foreach my $name (@{&install_bnames($data)}) {
-      $result .= &tsv_install($data, $name, $prefix);
+    my $bnames = &install_bnames($data);
+    if (0 < @$bnames) {
+      $result .= "\n";
+      foreach my $name (@$bnames) {
+        $result .= &tsv_install($data, $name, $prefix);
+      }
     }
   }
   if ($$data{'output'}) {
-    my $srcs = &lhs(['srcs'], $prefix);
-    my $libs = &lhs(['libs'], $prefix);
+    $result .= "\n";
+    $result .= 'all' . ' : ' . "\$($output)" . "\n"; # must be first target
+    $result .= "\n";
+    $result .= "\$($output)" . ' :';
 
-    $result .= "\n";
-    $result .= 'all' . ' : ' . "\$($output)" . "\n";
-    $result .= "\n";
-    $result .= "\$($output)" . ' : ' . "\$($libs)" . ' ' . "\$($srcs)" . "\n";
+    for my $name ('srcs', 'libs') {
+      my $var = &lhs([$name], $prefix);
+      $result .= ' ' . "\$($var)";
+    }
+    $result .=  "\n";
   }
   #print STDERR $result;
   return $result;

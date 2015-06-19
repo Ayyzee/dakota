@@ -15,8 +15,6 @@
     '$(srcdir)',
     '$(srcdir)/../include',
   ],
-  'macros' => [ # cmd-line
-  ],
   'output' => '$(blddir)/../bin/dakota-info', # cmd-line
   'install' => {
     '-rules' => [
@@ -24,10 +22,6 @@
     ],
     'bins' =>   [ # install.bins
       '$(DESTDIR)$(prefix)/bin/dakota-info',
-    ],
-    'includes' => [ # install.includes
-    ],
-    'libs' => [ # install.libs
     ],
   }
 }
