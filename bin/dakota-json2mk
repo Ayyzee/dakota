@@ -246,20 +246,22 @@ sub tsv {
   #print STDERR &Dumper($out);
   my $prefix = &prefix($opts);
   my $result = '';
-  my $srcs = &lhs(['srcs'], $prefix);
-  my $libs = &lhs(['libs'], $prefix);
-  my $output = &lhs(['output'], $prefix);
-  my $install =  &lhs(['install'], $prefix);
-  my $install_includes = &lhs(['install', 'includes'], $prefix);
-  my $install_libs = &lhs(['install', 'libs'], $prefix);
-  my $install_bins = &lhs(['install', 'bins'], $prefix);
+
   if ($$data{'install'}) {
+    my $install =  &lhs(['install'], $prefix);
+    my $install_includes = &lhs(['install', 'includes'], $prefix);
+    my $install_libs = &lhs(['install', 'libs'], $prefix);
+    my $install_bins = &lhs(['install', 'bins'], $prefix);
+
     $result .= $install . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
     $result .= "\n";
     $result .= 'install_files' . ' += ' . "\$($install)" . "\n";
   }
   if ($$data{'output'}) {
-    $result .= 'output_files'  . ' += ' . "\$($output)"  . "\n";
+    my $srcs = &lhs(['srcs'], $prefix);
+    my $libs = &lhs(['libs'], $prefix);
+    my $output = &lhs(['output'], $prefix);
+    $result .= 'output_files' . ' += ' . "\$($output)"  . "\n";
 
     if ($prefix) {
       $result .= "\n";
