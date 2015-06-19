@@ -28,8 +28,8 @@ int-t main()
   printf("klass=%s\n", dk::utf8-from(dkt-klass(o)));
   printf("superklass=%s\n", dk::utf8-from(dk::superklass(dkt-klass(o))));
   dk::dump(dk::superklass(dkt-klass(o)));
-  char8-t buf[1024] = "";
   #if defined DEBUG
+  char8-t buf[1024] = "";
   printf("klass-chain=%s\n", dkt-get-klass-chain(dkt-klass(o), buf, sizeof(buf)));
   #endif
 
