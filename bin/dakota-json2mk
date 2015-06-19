@@ -251,7 +251,7 @@ sub target_specific_vars {
     }
     $result .= "\n";
     my $srcs = &lhs(['srcs'], $prefix);
-    $result .= "\$($output)" . ' : ' . "\$($srcs)" . ' ' . "\$($libs)" . "\n";
+    $result .= "\$($output)" . ' : ' . "\$($libs)" . ' ' . "\$($srcs)" . "\n";
 
     my ($includes_ln, $libs_ln, $bins_ln);
     $includes_ln = &tsv_install($data, 'includes', $prefix);

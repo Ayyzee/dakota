@@ -11,7 +11,7 @@ includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
---all--: all
+all: start
 
 include $(srcdir)/../config.mk
 include $(srcdir)/../vars.mk
@@ -40,17 +40,19 @@ install_files := $(dakota_info_install) $(libdakota_install) $(libdakota_util_in
 install_dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
 
 .PHONY:\
- --all--\
  all\
  check\
  clean\
  install\
  installdirs\
  precompile\
+ start\
  uninstall\
 
-all: $(dakota_info_output)
-	$(MAKE) $(MAKEFLAGS) $(libdakota_output) $(libdakota_util_output)
+start: $(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
+
+$(libdakota_output) $(libdakota_util_output): $(dakota_info_output)
+$(libdakota_util_output): $(libdakota_output)
 
 check: all
 	$(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
