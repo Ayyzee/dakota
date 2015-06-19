@@ -19,7 +19,6 @@ $Data::Dumper::Sortkeys = 1;
 
 # gnu make variable assignment operators
 # = or := or ::= or ?=
-my $EQ = '=';
 
 sub is_scalar {
   my ($v) = @_;
@@ -166,7 +165,7 @@ sub mkstr {
   my $result = '';
   foreach my $lhs (sort keys %{$$out{'mk'}}) {
     my $rhs = $$out{'mk'}{$lhs};
-    $result .= $lhs . ' ' . $EQ;
+    $result .= $lhs . ' =';
     if (&is_scalar($rhs)) {
       $rhs = [ $rhs ];
     }
@@ -237,13 +236,16 @@ sub target_specific_vars {
   my $prefix = &prefix($opts);
   my $result = '';
   if ($prefix) {
+    my $output = &lhs(['output'], $prefix);
     my $install =  &lhs(['install'], $prefix);
     my $install_includes = &lhs(['install', 'includes'], $prefix);
     my $install_libs = &lhs(['install', 'libs'], $prefix);
     my $install_bins = &lhs(['install', 'bins'], $prefix);
     $result .= "$install" . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
     $result .= "\n";
-    my $output = &lhs(['output'], $prefix);
+    $result .= 'output_files' . ' += ' . "\$($output)" . "\n";
+    $result .= 'install_files' . ' += ' . "\$($install)" . "\n";
+    $result .= "\n";
     my $libs = &lhs(['libs'], $prefix);
     foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
       my $name = $$out{'tsv'}{$prefix}{$bname};
@@ -253,7 +255,6 @@ sub target_specific_vars {
     $result .= 'all' . ' : ' . "\$($output)" . "\n";
     $result .= "\n";
 
-    $result .= "\n";
     my $srcs = &lhs(['srcs'], $prefix);
     $result .= "\$($output)" . ' : ' . "\$($libs)" . ' ' . "\$($srcs)" . "\n";
 

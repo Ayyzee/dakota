@@ -31,10 +31,6 @@ libdakota_macros :=      $(patsubst %,--define-macro %,$(libdakota_macros))
 libdakota_util_macros := $(patsubst %,--define-macro %,$(libdakota_util_macros))
 
 # should be generated
-output_files := $(dakota_info_output) $(libdakota_output) $(libdakota_util_output)
-
-# should be generated
-install_files := $(dakota_info_install) $(libdakota_install) $(libdakota_util_install)
 install_dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
 
 .PHONY:\
