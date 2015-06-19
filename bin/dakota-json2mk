@@ -55,7 +55,7 @@ sub last_char {
 sub is_protected_name {
   my ($name) = @_;
   my $result = 0;
-  if ('-' eq &first_char($name)) {
+  if (&first_char($name) !~ /[_a-zA-Z]/) {
     $result = 1;
   }
   return $result;
@@ -127,7 +127,7 @@ sub process_tbl {
     }
   }
 }
-sub target_specific_vars_set {
+sub tsv_set {
   my ($opts, $scopes, $out) = @_;
   my $prefix = &prefix($opts);
   if ($prefix) {
@@ -144,13 +144,13 @@ sub process_scalar {
 # scalar is rhs of expr (lhs = rhs)
 sub process_scalar_expr {
   my ($data, $opts, $scopes, $out) = @_;
-  my $lhs = &target_specific_vars_set($opts, $scopes, $out);
+  my $lhs = &tsv_set($opts, $scopes, $out);
   $$out{'mk'}{$lhs} = $data;
 }
 # seq is rhs of expr (lhs = rhs ...)
 sub process_seq_expr {
   my ($data, $opts, $scopes, $out) = @_;
-  my $lhs = &target_specific_vars_set($opts, $scopes, $out);
+  my $lhs = &tsv_set($opts, $scopes, $out);
   $$out{'mk'}{$lhs} = [];
 
   foreach my $element (@$data) {
@@ -202,18 +202,30 @@ sub start {
     print $fh
       "# generated from $file\n" .
       &mkstr($out);
-    print $fh "\n" . &target_specific_vars($data, $opts, $out);
+    print $fh "\n" . &tsv($data, $opts, $out);
   }
   close($fh);
   if ($$opts{'output'}) {
     print $$opts{'output'} . "\n";
   }
 }
+sub install_bnames {
+  my ($data) = @_;
+  my $result = [];
+  foreach my $name (sort keys %{$$data{'install'} ||= {}}) {
+    if (!&is_protected_name($name)) {
+      if (0 < @{$$data{'install'}{$name}}) {
+        push @$result, $name;
+      }
+    }
+  }
+  return $result;
+}
 sub tsv_install{
   my ($data, $key, $prefix) = @_;
   my $result = '';
   #my $output = &lhs(['output'], $prefix);
-  my $install_libs = $$data{'install'}{$key};
+  my $install_libs = $$data{'install'}{$key}; # _lib is misleading
 
   for (my $i = 0; $i < @$install_libs; $i++) {
     my $install_lib = $$install_libs[$i];
@@ -229,41 +241,41 @@ sub tsv_install{
   }
   return $result;
 }
-sub target_specific_vars {
+sub tsv {
   my ($data, $opts, $out) = @_;
   #print STDERR &Dumper($out);
   my $prefix = &prefix($opts);
   my $result = '';
-  if ($prefix) {
-    my $output = &lhs(['output'], $prefix);
-    my $install =  &lhs(['install'], $prefix);
-    my $install_includes = &lhs(['install', 'includes'], $prefix);
-    my $install_libs = &lhs(['install', 'libs'], $prefix);
-    my $install_bins = &lhs(['install', 'bins'], $prefix);
+  my $srcs = &lhs(['srcs'], $prefix);
+  my $libs = &lhs(['libs'], $prefix);
+  my $output = &lhs(['output'], $prefix);
+  my $install =  &lhs(['install'], $prefix);
+  my $install_includes = &lhs(['install', 'includes'], $prefix);
+  my $install_libs = &lhs(['install', 'libs'], $prefix);
+  my $install_bins = &lhs(['install', 'bins'], $prefix);
+  if ($$data{'install'}) {
     $result .= $install . ' = ' . "\$($install_includes)" . ' ' . "\$($install_libs)" . ' ' . "\$($install_bins)" . "\n";
     $result .= "\n";
-    $result .= 'output_files'  . ' += ' . "\$($output)"  . "\n";
     $result .= 'install_files' . ' += ' . "\$($install)" . "\n";
-    $result .= "\n";
-    my $libs = &lhs(['libs'], $prefix);
-    foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
-      my $name = $$out{'tsv'}{$prefix}{$bname};
-      $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
+  }
+  if ($$data{'output'}) {
+    $result .= 'output_files'  . ' += ' . "\$($output)"  . "\n";
+
+    if ($prefix) {
+      $result .= "\n";
+      foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
+        my $name = $$out{'tsv'}{$prefix}{$bname};
+        $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
+      }
     }
     $result .= "\n";
     $result .= 'all' . ' : ' . "\$($output)" . "\n";
     $result .= "\n";
-
-    my $srcs = &lhs(['srcs'], $prefix);
     $result .= "\$($output)" . ' : ' . "\$($libs)" . ' ' . "\$($srcs)" . "\n";
-
-    my ($includes_ln, $libs_ln, $bins_ln);
-    $includes_ln = &tsv_install($data, 'includes', $prefix);
-    $libs_ln =     &tsv_install($data, 'libs',     $prefix);
-    $bins_ln =     &tsv_install($data, 'bins',     $prefix);
-    if ('' ne $includes_ln || '' ne $libs_ln || '' ne $bins_ln) {
-      $result .= "\n" . $includes_ln . $libs_ln . $bins_ln;
-    }
+    $result .= "\n";
+  }
+  foreach my $name (@{&install_bnames($data)}) {
+    $result .= &tsv_install($data, $name, $prefix);
   }
   #print STDERR $result;
   return $result;
