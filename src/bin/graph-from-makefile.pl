@@ -80,13 +80,12 @@ sub add_dependency {
     }
   }
 }
-sub move_phony_targets {
+sub phony_targets {
   my ($data) = @_;
 
   foreach my $target (keys %{$$data{'targets'}}) {
     if ($$data{'special-targets'}{'.PHONY'}{$target}) {
       $$data{'phony-targets'}{$target} = $$data{'targets'}{$target};
-      delete $$data{'targets'}{$target};
     }
   }
   return $data;
@@ -106,7 +105,7 @@ sub makefile_db {
   open(my $fh, '-|', 'make --silent --print-data-base') or die $!;
   while (<$fh>) {
     if (/=/) {
-      # not interested in any lin with an equal sign
+      # not interested in any line with an equal sign
       # not =
       # nor
       # not :=
@@ -114,17 +113,18 @@ sub makefile_db {
       if (0) {}
       elsif (m|^\s*(#.*?)$|s)               {} # eat comments
       elsif (m|^\s*(.*?)\s*:\s*(.*?)\s*$|s) { &add_dependency($data, $1, $2); }
+      # no currently supporting double colon rules
     }
   }
-  $data = &move_phony_targets($data);
+  $data = &phony_targets($data);
   delete $$data{'suffix-rules'};
   delete $$data{'special-targets'};
   &trim_empty_values($data, 'pattern-rules');
   return $data;
 }
 sub is_terminal {
-  my ($tbl) = @_;
-  return !scalar keys %$tbl;
+  my ($tbl, $key, $name) = @_;
+  return !scalar keys %{$$tbl{$key}{$name}};
 }
 sub is_phony {
   my ($tbl, $name) = @_;
@@ -143,26 +143,24 @@ sub digraph {
   foreach my $goal (keys %{$$db{'phony-targets'}{'all'}}) {
     $result .= "  \"$goal\" [ color = green ];\n";
   }
-  foreach my $KEY ('targets', 'phony-targets') {
-    my ($key, $vals);
+  my ($key, $vals);
 
-    while (($key, $vals) = each (%{$$db{$KEY}})) {
-      my $non_phony_count = 0;
-      my $edges = '';
+  while (($key, $vals) = each (%{$$db{'targets'}})) {
+    my $non_phony_count = 0;
+    my $edges = '';
 
-      foreach my $target (keys %$vals) {
-        if (!&is_phony($db, $target)) {
-          $non_phony_count++;
-        }
-        # omit edge if destination end point is phony and terminal
-        if (!&is_phony($db, $target) || !&is_terminal($$db{'phony-targets'}{$target})) {
-          $edges .= "  \"$key\" -> \"$target\";\n";
-        }
+    foreach my $target (keys %$vals) {
+      if (!&is_phony($db, $target)) {
+        $non_phony_count++;
       }
-      # omit edges if all end points are phony
-      if (0 != $non_phony_count || !&is_phony($db, $key)) {
-        $result .= $edges;
+      # omit edge if destination end point is phony and terminal
+      if (!&is_phony($db, $target) || !&is_terminal($db, 'phony-targets', $target)) {
+        $edges .= "  \"$key\" -> \"$target\";\n";
       }
+    }
+    # omit edges if all end points are phony
+    if (0 != $non_phony_count || !&is_phony($db, $key)) {
+      $result .= $edges;
     }
   }
   $result .= '}' . "\n";
@@ -171,7 +169,7 @@ sub digraph {
 sub start {
   my ($argv) = @_;
   my $db = &makefile_db({});
-  if (1) {
+  if (0) {
     my $dbstr = &Dumper($db);
     $dbstr =~ s/\{\s*(".+?"\s*=>\s*\d+)\s*\}/\{ $1 \}/gs;
     print STDERR $dbstr;
