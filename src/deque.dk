@@ -29,7 +29,7 @@ klass node
 
   static slots-t* create(slots-t* prev, object-t element, slots-t* next)
   {
-    slots-t* node = cast(slots-t*)malloc(sizeof(slots-t));
+    slots-t* node = cast(slots-t*)dkt::alloc(sizeof(slots-t));
     node->prev =    prev;
     node->element = element;
     node->next =    next;

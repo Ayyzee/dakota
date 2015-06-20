@@ -108,7 +108,7 @@ klass object
   method object-t dealloc(object-t self)
   {
     dk::release(dkt-klass(self));
-    free(self);
+    dkt::dealloc(self);
     return nullptr;
   }
 
@@ -164,7 +164,7 @@ klass object
 
   method str-t utf8-from(object-t self)
   {
-    char8-t* buffer = cast(char8-t*)malloc(2 + PRIxPTR-WIDTH + (1));
+    char8-t* buffer = cast(char8-t*)dkt::alloc(2 + PRIxPTR-WIDTH + (1));
     snprintf(buffer, 2 + PRIxPTR-WIDTH + (1), "0x%0*" PRIxPTR,
              PRIxPTR-WIDTH, cast(uintptr-t)(self));
     return cast(str-t)(buffer);

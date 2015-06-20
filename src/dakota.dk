@@ -169,7 +169,7 @@ init-imported-klasses()
 static str-t
 file-name-from-klass-name(symbol-t klass-name)
 {
-  char8-t* file-name = cast(char8-t*)malloc(sizeof(char8-t) * (symbol::length(klass-name) + 1));
+  char8-t* file-name = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (symbol::length(klass-name) + 1));
   file-name[0] = NUL;
   uint32-t kn = 0;
   uint32-t fn = 0;
@@ -198,7 +198,7 @@ file-name-from-klass-name(symbol-t klass-name)
 static str-t
 find-file(str-t path, str-t file-name, str-t suffix)
 {
-  char8-t* file = cast(char8-t*)malloc(sizeof(char8-t) * (FILENAME-MAX + 1));
+  char8-t* file = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (FILENAME-MAX + 1));
   file[0] = NUL;
   uint32-t j1 = 0;
   uint32-t j2 = 0;
@@ -274,7 +274,7 @@ alloc-klass(symbol-t name)
   resource-usage::log-alloc(&gbl-ru, offset + size, name);
 #endif
 
-  object-t kls = cast(object-t)malloc(offset + size);
+  object-t kls = cast(object-t)dkt::alloc(offset + size);
   if (nullptr != klass::klass)
     kls->klass = klass::klass;
   else
@@ -475,8 +475,8 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
   if (klass-name != nullptr)
     num-klass-props++;
 
-  property-t*        klass-props = cast(property-t*)       malloc(sizeof(property-t) * num-klass-props);
-  named-info-t* klass-info =  cast(named-info-t*)malloc(sizeof(named-info-t));
+  property-t*        klass-props = cast(property-t*)       dkt::alloc(sizeof(property-t) * num-klass-props);
+  named-info-t* klass-info =  cast(named-info-t*)dkt::alloc(sizeof(named-info-t));
 
   // need to be sorted
   uint_t i = 0;
@@ -1491,7 +1491,7 @@ dk-intern(str-t key)
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;
-    intern-array->elements = cast(void**)realloc(intern-array->elements, intern-array->size * intern-array->capacity);
+    intern-array->elements = cast(void**)dkt::alloc(intern-array->size * intern-array->capacity, intern-array->elements);
   }
 
 #if 0

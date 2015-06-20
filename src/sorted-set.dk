@@ -69,7 +69,7 @@ klass sorted-set
     self.sa.compare = cast(std-compare-t)(compare);
     self.sa.size =    cast(uint32-t)sizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
-    self.sa.elements = cast(void**)malloc(self.sa.size * self.sa.capacity);
+    self.sa.elements = cast(void**)dkt::alloc(self.sa.size * self.sa.capacity);
     self.sa.count = 0;
 
     self.iterator-state = 0;
@@ -84,7 +84,7 @@ klass sorted-set
 
   method object-t dealloc(object-t self)
   {
-    free(self.sa.elements);
+    dkt::dealloc(self.sa.elements);
     object-t result = dk::dealloc(super);
     return result;
   }
@@ -102,7 +102,7 @@ klass sorted-set
     {
       if (self.sa.count == self.sa.capacity) {
         self.sa.capacity *= 2; // the growth algorithm should be consumer setable
-        self.sa.elements = cast(void**)realloc(self.sa.elements, self.sa.size * self.sa.capacity);
+        self.sa.elements = cast(void**)dkt::alloc(self.sa.size * self.sa.capacity, self.sa.elements);
       }
       sorted-ptr-array::add-at(&self.sa, element, result.offset);
     }
@@ -186,7 +186,7 @@ klass sorted-set
     slots-t* s1 = unbox(self);
     slots-t* s2 = unbox(copy);
     *s2 = *s1;
-    s2->sa.elements = cast(void**)malloc(s2->sa.size * s2->sa.capacity);
+    s2->sa.elements = cast(void**)dkt::alloc(s2->sa.size * s2->sa.capacity);
     memcpy(s2->sa.elements, s1->sa.elements, s2->sa.size * s2->sa.capacity);
     s2->iterator-state = 0;
     return copy;

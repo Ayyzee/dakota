@@ -64,7 +64,7 @@ klass vector
     self.iterator-state = 0;
     self.capacity = initial-capacity;
     self.size = cast(uint32-t)sizeof(self.elements[0]);
-    self.elements = cast(object-t*)malloc(self.size * self.capacity); // want to be able to realloc()
+    self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity); // want to be able to realloc()
 
     for (uint32-t index = 0; index < self.capacity; index++)
       self.elements[index] = self.fill;
@@ -79,7 +79,7 @@ klass vector
 
   method object-t dealloc(object-t self)
   {
-    free(self.elements);
+    dkt::dealloc(self.elements);
     object-t result = dk::dealloc(super);
     return result;
   }
@@ -184,7 +184,7 @@ klass vector
         object = element;
       }
     }
-    self.elements = cast(object-t*)realloc(self.elements, self.size * self.capacity); // dumb
+    self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements); // dumb
     self.iterator-state++;
     return object;
   }
@@ -284,7 +284,7 @@ klass vector
 
     if (self.count == self.capacity) {
       self.capacity *= gbl-resize-factor;
-      self.elements = cast(object-t*)realloc(self.elements, self.size * self.capacity);
+      self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
 
     memmove(self.elements + 1, self.elements, self.size * self.count);
@@ -304,7 +304,7 @@ klass vector
 
     if (self.count == self.capacity) {
       self.capacity *= gbl-resize-factor;
-      self.elements = cast(object-t*)realloc(self.elements, self.size * self.capacity);
+      self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
 
     self.count++;

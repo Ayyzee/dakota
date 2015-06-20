@@ -125,7 +125,7 @@ klass ascii-number
   {
     self = dk::init(super);
     self.number = number;
-    self.ascii-string = cast(char8-t*)malloc(sizeof(char8-t) * (32 + 1));
+    self.ascii-string = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (32 + 1));
     object-t kls = dkt-klass(self);
     str-t digits = dk::digits(kls);
     uint32-t base = cast(uint32-t)safe-strlen(digits);
@@ -135,7 +135,7 @@ klass ascii-number
 
   method object-t dealloc(object-t self)
   {
-    free(self.ascii-string);
+    dkt::dealloc(self.ascii-string);
     object-t result = dk::dealloc(super);
     return result;
   }

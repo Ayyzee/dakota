@@ -93,14 +93,14 @@ klass bit-vector
     self.count = 0;
     uint32-t num-elements = ceiling-divide(initial-capacity, gbl-element-width);
     self.capacity = num-elements * gbl-element-width;
-    self.elements = cast(uint32-t*)(malloc(sizeof(self.elements[0]) * num-elements));
+    self.elements = cast(uint32-t*)(dkt::alloc(sizeof(self.elements[0]) * num-elements));
     memset(self.elements, 0, sizeof(self.elements[0]) * num-elements);
     return self;
   }
 
   method object-t dealloc(object-t self)
   {
-    free(self.elements);
+    dkt::dealloc(self.elements);
     object-t result = dk::dealloc(super);
     return result;
   }
@@ -113,7 +113,7 @@ klass bit-vector
     slots-t* s2 = unbox(copy);
     *s2 = *s1;
     uint32-t num-elements = ceiling-divide(self.capacity, cast(uint32-t)sizeof(self.elements[0]));
-    s2->elements = cast(uint32-t*)(malloc(sizeof(self.elements[0]) * num-elements));
+    s2->elements = cast(uint32-t*)(dkt::alloc(sizeof(self.elements[0]) * num-elements));
     memcpy(s2->elements, self.elements, sizeof(self.elements[0]) * num-elements);
     return copy;
   }

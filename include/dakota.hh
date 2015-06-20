@@ -22,6 +22,22 @@
 #include <cstdio>
 #include <cstdarg> // va_list
 #include <cstdint>
+#include <cstring> // memcpy()
+
+namespace dkt {
+  inline void dealloc(void* ptr) {
+    operator delete(ptr);
+  }
+  inline void* alloc(std::size_t size) {
+    return operator new(size);
+  }
+  inline void* alloc(std::size_t size, void* ptr) {
+    void* buf = dkt::alloc(size);
+    memcpy(buf, ptr, size);
+    dkt::dealloc(ptr);
+    return buf;
+  }
+}
 
 #if defined WIN32
   #include <windows.h>

@@ -417,7 +417,7 @@ klass klass
     resource-usage::add-alloc(&gbl-ru, size);
     resource-usage::log-alloc(&gbl-ru, self);
 #endif
-    object-t instance = cast(object-t)malloc(size);
+    object-t instance = cast(object-t)dkt::alloc(size);
 #if 0
     memset(instance, 0, size);
 #endif
@@ -435,7 +435,7 @@ klass klass
   static object-t alloc-methods(object-t self, uint32-t methods-count)
   {
     self.methods.count = methods-count;
-    self.methods.addrs = cast(method-t*)malloc(sizeof(method-t) * self.methods.count);
+    self.methods.addrs = cast(method-t*)dkt::alloc(sizeof(method-t) * self.methods.count);
 
 #if defined DKT-DUMP-MEM-FOOTPRINT
     gbl-ru.method-count =  self.methods.count;
@@ -730,7 +730,7 @@ klass klass
 
   method object-t dealloc(object-t self)
   {
-    free(self.methods.addrs);
+    dkt::dealloc(self.methods.addrs);
     object-t result = dk::dealloc(super);
     return result;
   }
@@ -842,7 +842,7 @@ klass klass
   {
     symbol-t name = self.name;
     uint32-t name-len = cast(uint32-t)safe-strlen(name);
-    char8-t* buffer = cast(char8-t*)malloc(sizeof(char8-t) * (name-len + (1)));
+    char8-t* buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (name-len + (1)));
     snprintf(buffer, name-len + (1), "%s", name);
     return buffer;
   }

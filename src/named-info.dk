@@ -146,7 +146,7 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
   uintptr-t element;
 
   uint32-t props-capacity = 4;
-  property-t* props = cast(property-t*)malloc(sizeof(property-t) * props-capacity);
+  property-t* props = cast(property-t*)dkt::alloc(sizeof(property-t) * props-capacity);
   uint32-t count = 0;
 
   props[count].key = $name;
@@ -157,14 +157,14 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
     element = va-arg(args, uintptr-t);
     if (props-capacity == count + 1) {
       props-capacity *= 2;
-      props = cast(property-t*)realloc(props, sizeof(property-t) * props-capacity);
+      props = cast(property-t*)dkt::alloc(sizeof(property-t) * props-capacity, props);
     }
     props[count].key =     key;
     props[count].element = element;
     count++;
   }
-  // hackhack: should be allocated in previous (initial) malloc()
-  named-info-t* info = cast(named-info-t*)malloc(sizeof(named-info-t));
+  // hackhack: should be allocated in previous (initial) dkt::alloc()
+  named-info-t* info = cast(named-info-t*)dkt::alloc(sizeof(named-info-t));
   info->elements = props;
   info->count = count;
   info->next = nullptr;

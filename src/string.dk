@@ -52,7 +52,7 @@ klass string
     USE(encoding);
     self.encoding = encoding;
     self.len = length;
-    self.ptr = cast(char8-t*)malloc(sizeof(char8-t) * (self.len + 1));
+    self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (self.len + 1));
     strncpy(self.ptr, bytes + start, self.len);
     self.ptr[self.len] = NUL;
     return self;
@@ -60,7 +60,7 @@ klass string
 
   method object-t dealloc(object-t self)
   {
-    free(self.ptr);
+    dkt::dealloc(self.ptr);
     object-t result = dk::dealloc(super);
     return result;
   }
@@ -140,7 +140,7 @@ klass string
     USE(encoding);
     uint32-t len = cast(uint32-t)safe-strlen(bytes);
     self.len += len;
-    self.ptr = cast(char8-t*)realloc(self.ptr, (self.len + 1 * sizeof(char8-t)));
+    self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * sizeof(char8-t)), self.ptr);
     strcat(self.ptr, bytes);
     return self;
   }
@@ -204,7 +204,7 @@ klass string
       str-t utf8 = dk::utf8-from(element);
       uint32-t length = cast(uint32-t)safe-strlen(utf8);
       self.len += cast(uint32-t)(length);
-      self.ptr = cast(char8-t*)realloc(self.ptr, (self.len + 1 * sizeof(char8-t)));
+      self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * sizeof(char8-t)), self.ptr);
       strcat(self.ptr, utf8);
     }
     return self;

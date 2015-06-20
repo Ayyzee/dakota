@@ -37,7 +37,7 @@ klass cstring
   method object-t init(object-t self, uint32-t capacity => 8)
   {
     self = dk::init(super);
-    self.ptr = cast(char8-t*)malloc(sizeof(char8-t) * capacity);
+    self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * capacity);
     self.ptr[0] = NUL;
     self.len = 0;
     self.capacity = capacity;
@@ -46,7 +46,7 @@ klass cstring
 
   method object-t dealloc(object-t self)
   {
-    free(self.ptr);
+    dkt::dealloc(self.ptr);
     object-t result = dk::dealloc(super);
     return result;
   }
