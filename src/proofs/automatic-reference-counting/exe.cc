@@ -5,12 +5,14 @@ namespace object { struct slots_t; }
 namespace object { struct slots_t { object::slots_t* klass; }; }
 //namespace dk { object::slots_t* dealloc(object::slots_t* self) { return nullptr; } }
 
-static std::shared_ptr<object::slots_t> bar(std::shared_ptr<object::slots_t> self) { return self; }
+typedef std::shared_ptr<object::slots_t> object_t;
+static object_t bar(object_t self) { return self; }
 
 int main() {
-  auto ptr = static_cast<object::slots_t*>(operator new(256));
-  auto deleter = [](object::slots_t* arg) { operator delete(arg); };
-  std::shared_ptr<object::slots_t> foo(ptr, deleter);
+  std::size_t size = 256;
+  auto ptr = static_cast<object::slots_t*>(operator new(size));
+  auto deleter = [](object::slots_t* arg) { operator delete(static_cast<void*>(arg)); };
+  object_t foo(ptr, deleter);
 
   printf("ptr=%p\n", ptr);
   printf("ptr->klass=%p\n", ptr->klass);
