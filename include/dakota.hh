@@ -23,18 +23,50 @@
 #include <cstdarg> // va_list
 #include <cstdint>
 #include <cstring> // memcpy()
+#include <new> // std::bad_alloc
+
+#define DKT_MEM_MGMT_MALLOC 0
+#define DKT_MEM_MGMT_NEW    1
+#define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
 
 namespace dkt {
   inline void dealloc(void* ptr) {
+#if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
     operator delete(ptr);
+#elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
+    free(ptr);
+#else
+    #error DK_MEM_MGMT
+#endif
   }
   inline void* alloc(std::size_t size) {
-    return operator new(size);
+    void* buf;
+#if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
+    buf = operator new(size);
+#elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
+    buf = malloc(size);
+
+    if (NULL == buf)
+      throw std::bad_alloc();
+#else
+    #error DK_MEM_MGMT
+#endif
+    return buf;
   }
   inline void* alloc(std::size_t size, void* ptr) {
-    void* buf = dkt::alloc(size);
+    void* buf;
+#if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
+    buf = dkt::alloc(size);
     memcpy(buf, ptr, size);
     dkt::dealloc(ptr);
+#elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
+    buf = realloc(ptr, size);
+
+    if (NULL == buf)
+      throw std::bad_alloc();
+#else
+    #error DK_MEM_MGMT
+#endif
     return buf;
   }
 }
