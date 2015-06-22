@@ -963,8 +963,7 @@ sub method::generate_va_method_defn {
       $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
     if (defined $$va_method{'return-type'}) {
-      my $return_type = &arg::type($$va_method{'return-type'});
-      $$scratch_str_ref .= $col . "$return_type result = ";
+      $$scratch_str_ref .= $col . "auto result = ";
     } else {
       $$scratch_str_ref .= $col . "";
     }
@@ -1650,7 +1649,7 @@ sub generics::generate_va_make_defn {
       $col . "static $init_type_decl = dk::va::init;\n" .
       $col . "va-list-t args;\n" .
       $col . "va-start(args, kls);\n" .
-      $col . "object-t result = alloc(kls);\n" .
+      $col . "auto result = alloc(kls);\n" .
       $col . "DKT-VA-TRACE-BEFORE(dkt-signature(va::init, (object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "result = _func_(result, args); // init()\n" .
       $col . "DKT-VA-TRACE-AFTER( dkt-signature(va::init, (object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
