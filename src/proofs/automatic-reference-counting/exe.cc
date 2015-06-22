@@ -14,6 +14,7 @@ typedef object_t va_arg_object_t  __attribute__ ((aligned (sizeof(object_t))));
 
 static object_t dummy(object_t self) { return self; }
 
+#if 1
 namespace va { object_t func(object_t self, va_list_t args); }
 
 object_t va::func(object_t /*self*/, va_list_t args) {
@@ -25,13 +26,13 @@ object_t func(object_t self, ...);
 object_t func(object_t self, ...) {
   va_list_t args;
   va_start(args, self);
-  object_t result = va::func(self, args);
+  auto result = va::func(self, args);
   va_end(args);
-  printf("%p\n", result); // debug
   return result;
 }
-object_t object_alloc(std::size_t size);
-object_t object_alloc(std::size_t size) {
+#endif
+object_t object_create(std::size_t size);
+object_t object_create(std::size_t size) {
   auto ptr = static_cast<object::slots_t*>( operator new(size)    );
   auto deleter = [](object::slots_t* arg) { operator delete(arg); };
   object_t instance(ptr, deleter);
@@ -40,7 +41,7 @@ object_t object_alloc(std::size_t size) {
 
 int main() {
   std::size_t size = 256;
-  object_t instance = object_alloc(size);
+  object_t instance = object_create(size);
 
   // printf("ptr=%p\n", ptr);
   // printf("ptr->klass=%p\n", ptr->klass);
