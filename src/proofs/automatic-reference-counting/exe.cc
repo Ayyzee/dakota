@@ -2,23 +2,21 @@
 #include <memory>
 #include <cstdarg>
 
+#define cast(t) (t)
+
 typedef va_list va_list_t;
 
 namespace object { struct slots_t; }
 namespace object { struct slots_t { object::slots_t* klass; }; }
-//namespace dk { object::slots_t* dealloc(object::slots_t* self) { return nullptr; } }
-
 typedef std::shared_ptr<object::slots_t> object_t;
 
-typedef object_t va_arg_object_t  __attribute__ ((aligned (sizeof(object_t))));
+#if 0
+struct pod_object_t { void* p1; void* p2; };
 
-static object_t dummy(object_t self) { return self; }
-
-#if 1
 namespace va { object_t func(object_t self, va_list_t args); }
 
 object_t va::func(object_t /*self*/, va_list_t args) {
-  object_t arg = va_arg(args, object_t);
+  object_t arg = cast(object_t)va_arg(args, pod_object_t);
   // ...
   return arg;
 }
@@ -38,25 +36,25 @@ object_t object_create(std::size_t size) {
   object_t instance(ptr, deleter);
   return instance;
 }
-
 int main() {
   std::size_t size = 256;
   object_t instance = object_create(size);
+  // object_t self = nullptr;
+  // object_t result = func(self, cast(pod_object_t)(instance);
 
-  // printf("ptr=%p\n", ptr);
-  // printf("ptr->klass=%p\n", ptr->klass);
   printf("sizeof(void*)=%lu, "
          "sizeof(uintptr_t)=%lu, "
+         "sizeof(object_t)=%lu, "
          "sizeof(instance)=%lu, "
-         "sizeof(object_t)=%lu\n",
+         // "sizeof(result)=%lu, "
+         "\n",
          sizeof(void*),
          sizeof(uintptr_t),
-         sizeof(instance),
-         sizeof(object_t));
+         sizeof(object_t),
+         sizeof(instance)
+         // sizeof(result),
+         );
   printf("(*instance).klass=%p\n", (*instance).klass);
   printf("instance->klass=%p\n", instance->klass);
-
-  dummy(instance);
-
   return 0;
 }
