@@ -1,0 +1,42 @@
+diff --git a/lib/dakota/generate.pm b/lib/dakota/generate.pm
+index 3d9604b..67c5cdc 100644
+--- a/lib/dakota/generate.pm
++++ b/lib/dakota/generate.pm
+@@ -2280,7 +2280,11 @@ sub generate_exported_slots_decls {
+       print STDERR &Dumper($$klass_scope{'slots'});
+       die __FILE__, ":", __LINE__, ": error:\n";
+     }
++    $$scratch_str_ref .= $col . "#if defined DKT-SMART-PTRS\n";
++    $$scratch_str_ref .= $col . "typedef std::shared-ptr<$klass_name\::slots-t*> $klass_name-t;" . &ann(__LINE__) . " // special-case\n";
++    $$scratch_str_ref .= $col . "#else\n";
+     $$scratch_str_ref .= $col . "typedef $klass_name\::slots-t* $klass_name-t;" . &ann(__LINE__) . " // special-case\n";
++    $$scratch_str_ref .= $col . "#endif\n";
+   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
+     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
+     $$scratch_str_ref .= $col . "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }" . &ann(__LINE__) . "\n";
+@@ -2330,6 +2334,7 @@ sub linkage_unit::generate_headers {
+     my $exported_headers = {};
+     $$exported_headers{'<cassert>'}{'hardcoded-by-rnielsen'} = undef; # assert()
+     $$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
++    $$exported_headers{'<memory>'}{'hardcoded-by-rnielsen'} = undef;  # template class shared-ptr
+ 
+     foreach my $klass_name (@$klass_names) {
+       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+diff --git a/src/klass.dk b/src/klass.dk
+index 1ed33cb..7f76fc8 100644
+--- a/src/klass.dk
++++ b/src/klass.dk
+@@ -417,7 +417,13 @@ klass klass
+     resource-usage::add-alloc(&gbl-ru, size);
+     resource-usage::log-alloc(&gbl-ru, self);
+ #endif
++#if defined DKT-SMART-PTRS
++    auto ptr = static-cast<object::slots-t*>( dkt::alloc(size)      );
++    auto deleter = [](object::slots-t* arg) { operator delete(arg); };
++    object-t instance(ptr, deleter);
++#else
+     object-t instance = cast(object-t)dkt::alloc(size);
++#endif
+ #if 0
+     memset(instance, 0, size);
+ #endif
