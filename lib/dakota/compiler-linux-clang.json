@@ -19,7 +19,6 @@
       '-Wno-c++98-compat-pedantic',
       '-Wno-c++98-compat',
       '-Wno-cast-align',
-      '-Wno-deprecated',
       '-Wno-disabled-macro-expansion',
       '-Wno-exit-time-destructors',
       '-Wno-four-char-constants',

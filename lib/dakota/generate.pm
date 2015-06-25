@@ -550,6 +550,7 @@ sub generate_defn_footer {
 
   $rt_cc_str .=
     $col . "namespace { struct noexport __ddl_t {" . &ann(__LINE__) . "\n" .
+    $col . "  __ddl_t(const __ddl_t&) = default;\n" .
     $col . "  __ddl_t()  { __initial(); }\n" .
     $col . "  ~__ddl_t() { __final();   }\n" .
     $col . "}; }\n" .
