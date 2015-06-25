@@ -2,6 +2,8 @@ SHELL := /bin/sh -u
 
 DESTDIR ?=
 
+rootdir := ..
+
 srcdir ?= .
 blddir := .
 objdir := $(blddir)/obj

@@ -2,6 +2,8 @@ SHELL := /bin/sh -u
 
 DESTDIR ?=
 
+rootdir := ..
+
 srcdir ?= .
 blddir := .
 objdir := $(blddir)/obj
@@ -11,14 +13,14 @@ includedir := $(prefix)/include
 libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
-include $(srcdir)/../config.mk
-include $(srcdir)/../vars.mk
+include $(rootdir)/config.mk
+include $(rootdir)/vars.mk
 
-include $(shell $(srcdir)/../bin/dakota-json2mk --prefix dakota-info    --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
-include $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota      --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
-include $(shell $(srcdir)/../bin/dakota-json2mk --prefix libdakota-util --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
+include $(shell $(rootdir)/bin/dakota-json2mk --prefix dakota-info    --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
+include $(shell $(rootdir)/bin/dakota-json2mk --prefix libdakota      --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
+include $(shell $(rootdir)/bin/dakota-json2mk --prefix libdakota-util --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
 
-include $(srcdir)/../rules.mk
+include $(rootdir)/rules.mk
 
 # include-dirs
 dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
