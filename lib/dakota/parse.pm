@@ -73,6 +73,12 @@ BEGIN {
   use dakota::util;
   $gbl_compiler = do "$prefix/lib/dakota/compiler.json"
     or die "do $prefix/lib/dakota/compiler.json failed: $!\n";
+  my $platform = do "$prefix/lib/dakota/platform.json"
+    or die "do $prefix/lib/dakota/platform.json failed: $!\n";
+  my ($key, $values);
+  while (($key, $values) = each (%$platform)) {
+    $$gbl_compiler{$key} = $values;
+  }
   $gbl_header_from_symbol = do "$prefix/lib/dakota/header-from-symbol.json"
     or die "do $prefix/lib/dakota/header-from-symbol.json failed: $!\n";
   $gbl_used = do "$prefix/lib/dakota/used.json"

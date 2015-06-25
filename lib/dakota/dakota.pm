@@ -52,6 +52,12 @@ BEGIN {
   use dakota::generate;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
     or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
+    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
+  my ($key, $values);
+  while (($key, $values) = each (%$platform)) {
+    $$gbl_compiler{$key} = $values;
+  }
   $extra = do "$gbl_prefix/lib/dakota/extra.json"
     or die "do $gbl_prefix/lib/dakota/extra.json failed: $!\n";
   $objdir = &dakota::util::objdir();

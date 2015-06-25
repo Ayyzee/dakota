@@ -49,6 +49,12 @@ BEGIN {
   use dakota::util;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
     or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
+    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
+  my ($key, $values);
+  while (($key, $values) = each (%$platform)) {
+    $$gbl_compiler{$key} = $values;
+  }
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
