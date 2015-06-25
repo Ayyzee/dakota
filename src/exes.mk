@@ -1,28 +1,15 @@
-SHELL := /bin/sh -u
-
-DESTDIR ?=
-
 rootdir := ..
 
-srcdir ?= .
-blddir := .
-objdir := $(blddir)/obj
-
-prefix ?= /usr/local
-includedir := $(prefix)/include
-libdir :=     $(prefix)/lib
-bindir :=     $(prefix)/bin
-
---all--: all
-
-include $(srcdir)/../config.mk
-include $(srcdir)/../vars.mk
-
-include $(shell $(srcdir)/../bin/dakota-json2mk --output /tmp/compiler.mk $(srcdir)/../lib/dakota/compiler.json)
-
-include $(srcdir)/../rules.mk
+include $(rootdir)/config.mk
+include $(rootdir)/vars.mk
+include $(rootdir)/rules.mk
 
 exes := $(blddir)/tst $(blddir)/min $(blddir)/dummy
+
+.PHONY:\
+ all\
+ check\
+ clean\
 
 all: $(exes)
 

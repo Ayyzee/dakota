@@ -1,3 +1,18 @@
+SHELL := /bin/sh -u
+
+DESTDIR ?=
+
+rootdir := ..
+
+srcdir ?= .
+blddir := .
+objdir ?= $(blddir)/obj
+
+prefix ?= /usr/local
+includedir := $(prefix)/include
+libdir :=     $(prefix)/lib
+bindir :=     $(prefix)/bin
+
 MAKE := make
 MAKEFLAGS :=\
  --no-builtin-rules\

@@ -1,26 +1,12 @@
-SHELL := /bin/sh -u
-
-DESTDIR ?=
-
 rootdir := ..
-
-srcdir ?= .
-blddir := .
-objdir := $(blddir)/obj
-
-prefix ?= /usr/local
-includedir := $(prefix)/include
-libdir :=     $(prefix)/lib
-bindir :=     $(prefix)/bin
 
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
+include $(rootdir)/rules.mk
 
 include $(shell $(rootdir)/bin/dakota-json2mk --prefix dakota-info    --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
 include $(shell $(rootdir)/bin/dakota-json2mk --prefix libdakota      --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
 include $(shell $(rootdir)/bin/dakota-json2mk --prefix libdakota-util --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
-
-include $(rootdir)/rules.mk
 
 # include-dirs
 dakota_info_include_dirs :=    $(patsubst %,--include-directory %,$(dakota_info_include_dirs))
@@ -28,7 +14,7 @@ libdakota_include_dirs :=      $(patsubst %,--include-directory %,$(libdakota_in
 libdakota_util_include_dirs := $(patsubst %,--include-directory %,$(libdakota_util_include_dirs))
 
 # macros
-dakota_info_macros :=    $(patsubst %,--define-macro %,$(dakota_info_macros))
+#dakota_info_macros :=
 libdakota_macros :=      $(patsubst %,--define-macro %,$(libdakota_macros))
 libdakota_util_macros := $(patsubst %,--define-macro %,$(libdakota_util_macros))
 
