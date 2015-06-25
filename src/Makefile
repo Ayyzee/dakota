@@ -1,8 +1,6 @@
 rootdir := ..
 
-include $(rootdir)/config.mk
-include $(rootdir)/vars.mk
-include $(rootdir)/rules.mk
+include $(rootdir)/dakota.mk
 
 include $(shell $(rootdir)/bin/dakota-json2mk --prefix dakota-info    --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
 include $(shell $(rootdir)/bin/dakota-json2mk --prefix libdakota      --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)

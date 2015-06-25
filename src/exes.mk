@@ -1,8 +1,6 @@
 rootdir := ..
 
-include $(rootdir)/config.mk
-include $(rootdir)/vars.mk
-include $(rootdir)/rules.mk
+include $(rootdir)/dakota.mk
 
 exes := $(blddir)/tst $(blddir)/min $(blddir)/dummy
 
