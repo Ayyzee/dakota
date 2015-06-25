@@ -4,8 +4,8 @@ include $(rootdir)/vars.mk
 #should_pass_dirs := $(dir $(wildcard should-pass/*/Makefile))
 #should_fail_dirs := $(dir $(wildcard should-fail/*/Makefile))
 
-target := $(shell $(prefix)/bin/dakota-project --var SO_EXT=$(SO_EXT) name)
-prereq := $(shell $(prefix)/bin/dakota-project --var SO_EXT=$(SO_EXT) srcs)
-prereq += $(shell $(prefix)/bin/dakota-project --var SO_EXT=$(SO_EXT) libs)
+target := $(shell $(rootdir)/bin/dakota-project --var so_ext=$(so_ext) name)
+prereq := $(shell $(rootdir)/bin/dakota-project --var so_ext=$(so_ext) srcs)
+prereq += $(shell $(rootdir)/bin/dakota-project --var so_ext=$(so_ext) libs)
 
 DAKOTA := DKT_FIXUP_STDERR=1 ../../../bin/dakota

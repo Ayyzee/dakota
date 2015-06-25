@@ -11,5 +11,5 @@ echo "$1:"
 
 for exe_src_path in $dk_paths $cc_paths; do
     dir=$(dirname $exe_src_path)
-    printf "\t\$(MAKE) --directory $dir \$@\n"
+    printf "\t\$(MAKE) \$(MAKEFLAGS) --directory $dir \$@\n"
 done
