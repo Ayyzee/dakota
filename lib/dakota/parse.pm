@@ -1588,8 +1588,7 @@ sub method {
   my $last_type_token = $last_name_token;
   $last_type_token--;
 
-  if ('::' eq &sst::at($gbl_sst, $last_type_token) ||
-      '::' eq &sst::at($gbl_sst, $last_type_token)) { # huh?
+  if ('::' eq &sst::at($gbl_sst, $last_type_token)) {
     $last_type_token--;
 
     if ('va' eq &sst::at($gbl_sst, $last_type_token)) {
@@ -1631,17 +1630,6 @@ sub method {
   }
   $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
 
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq 'throw') {
-    &match(__FILE__, __LINE__, 'throw');
-    my ($open_paren_index, $close_paren_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
-
-    if ($open_paren_index + 1 != $close_paren_index) {
-      my $exception_types = &sst::token_seq($gbl_sst, $open_paren_index + 1, $close_paren_index - 1);
-      $exception_types = &token_seq::simple_seq($exception_types);
-      $$method{'exception-types'} = &types($exception_types);
-    }
-    $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
-  }
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
       $$method{'defined?'} = 1;
