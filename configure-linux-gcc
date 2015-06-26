@@ -1,13 +1,24 @@
-#!/bin/sh -u
+#!/bin/bash
+
+set -o nounset -o errexit -o pipefail
 
 sysname=linux
 compiler=gcc
 
+rm -f src/.gdbinit
+rm -f config.mk
+rm -f config.sh
+rm -f include/config.hh
+rm -f lib/dakota/compiler.json
+rm -f lib/dakota/platform.json
+
 cp .gdbinit-$sysname src/.gdbinit
-cp config-$sysname.hh include/config.hh
 ln -s config-$sysname-$compiler.mk config.mk
 ln -s config-$sysname.sh config.sh
-pushd lib/dakota
+pushd include > /dev/null
+ln -s config-$sysname.hh config.hh
+popd > /dev/null
+pushd lib/dakota > /dev/null
 ln -s compiler-$compiler.json compiler.json
 ln -s platform-$sysname.json  platform.json
-popd
+popd > /dev/null
