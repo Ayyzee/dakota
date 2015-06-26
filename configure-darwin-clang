@@ -5,6 +5,7 @@ compiler=clang
 
 cp config-$sysname.hh include/dakota/config.hh
 cp config-$sysname-$compiler.mk config.mk
-cp lib/dakota/compiler-$sysname-$compiler.pm lib/dakota/compiler.pm
+cp lib/dakota/compiler-$compiler.json lib/dakota/compiler.json
+cp lib/dakota/platform-$sysname.json  lib/dakota/platform.json
 cp config-$sysname.sh config.sh
 cp .lldbinit-$sysname src/.lldbinit
