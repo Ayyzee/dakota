@@ -3,9 +3,11 @@
 sysname=darwin
 compiler=clang
 
-cp config-$sysname.hh include/dakota/config.hh
-cp config-$sysname-$compiler.mk config.mk
-cp lib/dakota/compiler-$compiler.json lib/dakota/compiler.json
-cp lib/dakota/platform-$sysname.json  lib/dakota/platform.json
-cp config-$sysname.sh config.sh
 cp .lldbinit-$sysname src/.lldbinit
+cp config-$sysname.hh include/config.hh
+ln -s config-$sysname-$compiler.mk config.mk
+ln -s config-$sysname.sh config.sh
+pushd lib/dakota
+ln -s compiler-$compiler.json compiler.json
+ln -s platform-$sysname.json  platform.json
+popd
