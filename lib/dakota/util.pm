@@ -56,6 +56,7 @@ our @EXPORT= qw(
                  ident_regex
                  kw_args_generics
                  kw_args_generics_add
+                 kw_args_placeholders
                  last
                  long_suffix
                  max
@@ -73,6 +74,9 @@ our @EXPORT= qw(
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
 
+sub kw_args_placeholders {
+  return { 'default' => '{}', 'nodefault' => '{~}' };
+}
 sub ident_regex {
   my $id =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9]              )?/x;
   my $mid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!])/x; # method ident

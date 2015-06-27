@@ -241,7 +241,7 @@ klass sorted-set-forward-iterator
     uint32-t  iterator-state;
   }
 
-  method object-t init(object-t self, object-t sorted-set => {})
+  method object-t init(object-t self, object-t sorted-set => {~})
   {
     self = dk::init(super);
     assert(dk::instance?(sorted-set, sorted-set::klass));

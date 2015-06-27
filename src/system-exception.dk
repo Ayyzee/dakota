@@ -36,7 +36,7 @@ klass system-exception
     str128-t       strerror;
   }
 
-  method object-t init(object-t self, int-t errnum => {})
+  method object-t init(object-t self, int-t errnum => {~})
   {
     self = dk::init(super);
     assert(0 != errnum);

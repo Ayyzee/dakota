@@ -129,6 +129,7 @@ our @EXPORT= qw(
                  rt_cc_path_from_so_path
                  str_from_cmd_info
               );
+my $kw_args_placeholders = &kw_args_placeholders();
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $h  = &dakota::util::header_file_regex();
@@ -1436,8 +1437,17 @@ sub parameter_list {
       my $kw_args_name = $equalarrow - 1;
       my $kw_args_default = [splice(@$type, $equalarrow)];
       my $equalarrow_tkn = &dakota::util::remove_first($kw_args_default);
-      if (2 == @$kw_args_default) {
-        if ('{' ne $$kw_args_default[0] && '}' ne $$kw_args_default[1]) {
+      my $kw_arg_nodefault_placeholder = $$kw_args_placeholders{'nodefault'};
+      my $kw_arg_nodefault_placeholder_tkns = [split('', $kw_arg_nodefault_placeholder)]; # assume no multi-character tokens (dangerous)
+      if (scalar @$kw_arg_nodefault_placeholder_tkns == scalar @$kw_args_default) {
+        my $is_default = 0;
+        for (my $i = 0; $i < @$kw_arg_nodefault_placeholder_tkns; $i++) {
+          if ($$kw_arg_nodefault_placeholder_tkns[$i] ne $$kw_args_default[$i]) {
+            $is_default = 1;
+            last;
+          }
+        }
+        if ($is_default) {
           &dakota::util::add_last($kw_args_defaults, $kw_args_default);
         }
       } else {

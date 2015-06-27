@@ -282,7 +282,7 @@ klass hashed-set-forward-iterator
     return;
   }
 
-  method object-t init(object-t self, object-t hashed-set => {})
+  method object-t init(object-t self, object-t hashed-set => {~})
   {
     self = dk::init(super);
     assert(null != hashed-set);

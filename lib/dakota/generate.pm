@@ -82,6 +82,7 @@ our @EXPORT= qw(
                  symbol_parts
               );
 
+my $kw_args_placeholders = &kw_args_placeholders();
 my $k = qr/[\w-]/;
 my ($id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -760,9 +761,11 @@ sub method::kw_list_types {
     my $kw_arg_type = &arg::type($$kw_arg{'type'});
 
     if (defined $$kw_arg{'default'}) {
-      $result .= ",$kw_arg_type $kw_arg_name=>{0}";
+      my $kw_arg_default_placeholder = $$kw_args_placeholders{'default'};
+      $result .= ",$kw_arg_type $kw_arg_name=>$kw_arg_default_placeholder";
     } else {
-      $result .= ",$kw_arg_type $kw_arg_name=>{}";
+      my $kw_arg_nodefault_placeholder = $$kw_args_placeholders{'nodefault'};
+      $result .= ",$kw_arg_type $kw_arg_name=>$kw_arg_nodefault_placeholder";
     }
   }
   return $result;
@@ -1145,8 +1148,9 @@ sub common::print_selector {
       $name_str = "$generic_name";
     }
     my $parameter_types_str = $$new_arg_type_list;
+    my $null_selector = 0;
 
-    $scratch_str .= $col . "static selector-t result = {0};\n";
+    $scratch_str .= $col . "static selector-t result = $null_selector;\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
     if (&is_va($generic)) {
@@ -3585,7 +3589,7 @@ sub generate_kw_args_method_defn {
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
       my $kw_arg_type = &arg::type($$kw_arg{'type'});
-      $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name = {};";
+      $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name \{}; /* default-initialization */";
       $delim = ' ';
     }
     $$scratch_str_ref .= "\n";

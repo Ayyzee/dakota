@@ -34,8 +34,8 @@ klass syntax-exception
   }
 
   method object-t init(object-t self,
-                       object-t token =>    {},
-                       str-t    filename => {},
+                       object-t token =>    {~},
+                       str-t    filename => {~},
                        str-t    message =>  __klass__)
   {
     self = dk::init(super);

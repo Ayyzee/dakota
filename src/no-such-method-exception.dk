@@ -32,7 +32,7 @@ klass no-such-method-exception
   }
 
   method object-t init(object-t self,
-                       object-t     object =>    {},
+                       object-t     object =>    {~},
                        object-t     superkls =>  nullptr,
                        object-t     kls =>       nullptr,
                        signature-t* signature => nullptr)

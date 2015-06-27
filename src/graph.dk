@@ -31,7 +31,7 @@ klass node
   }
 
   method object-t init(object-t self,
-                       str-t    name =>  {},
+                       str-t    name =>  {~},
                        object-t attrs => null)
   {
     self = dk::init(super);
@@ -51,8 +51,8 @@ klass edge
   }
 
   method object-t init(object-t self,
-                       str-t    lhs-name => {},
-                       str-t    rhs-name => {},
+                       str-t    lhs-name => {~},
+                       str-t    rhs-name => {~},
                        object-t attrs =>    null)
   {
     self = dk::init(super);
@@ -68,7 +68,7 @@ klass attrs
   slots object-t;
 
   method object-t init(object-t self,
-                       object-t attrs => {})
+                       object-t attrs => {~})
   {
     self = dk::init(super);
     *unbox(self) = attrs;

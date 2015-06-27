@@ -394,7 +394,7 @@ klass vector-forward-iterator
     return;
   }
 
-  method object-t init(object-t self, object-t vector => {})
+  method object-t init(object-t self, object-t vector => {~})
   {
     self = dk::init(super);
     assert(null != vector);

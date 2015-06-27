@@ -32,9 +32,9 @@ klass keyword-exception
   }
 
   method object-t init(object-t self,
-                       object-t     object =>    {},
-                       signature-t* signature => {},
-                       symbol-t     keyword =>   {})
+                       object-t     object =>    {~},
+                       signature-t* signature => {~},
+                       symbol-t     keyword =>   {~})
   {
     assert(nullptr != object);
     assert(nullptr != signature);

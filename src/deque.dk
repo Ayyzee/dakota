@@ -409,7 +409,7 @@ klass deque-forward-iterator
     return;
   }
 
-  method object-t init(object-t self, object-t deque => {})
+  method object-t init(object-t self, object-t deque => {~})
   {
     self = dk::init(super);
     assert(dk::instance?(deque, deque::klass));
