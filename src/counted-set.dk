@@ -21,31 +21,31 @@ trait counted-set
   //provides dk::set;
   require collection;
 
-  method object-t at(object-t self, object-t key, object-t default-result)
+  method object-t at(object-t self, object-t element, object-t default-result)
   {
     object-t result = default-result;
-    object-t assoc = dk::assoc-at(self, key, nullptr);
+    object-t pair = dk::pair-at(self, element, nullptr);
 
-    if (nullptr != assoc) {
-      assoc-t* assoc-content = assoc::unbox(assoc);
-      result = assoc-content->element;
+    if (nullptr != pair) {
+      pair-t* pair-content = pair::unbox(pair);
+      result = pair-content->last;
     }
     return result;
   }
 
   static object-t add(object-t self, object-t element)
   {
-    object-t assoc = dk::assoc-at(self, element, nullptr);
+    object-t pair = dk::pair-at(self, element, nullptr);
 
-    if (nullptr != assoc) {
-      assoc-t* assoc-content = assoc::unbox(assoc);
-      object-t count = assoc-content->element;
+    if (nullptr != pair) {
+      pair-t* pair-content = pair::unbox(pair);
+      object-t count = pair-content->last;
       uint32-t* count-content = uint32::unbox(count);
       (*count-content)++;
     } else {
       object-t count = uint32::box(1);
-      object-t assoc1 = assoc::box({element, count});
-      dk::add-assoc(self, assoc1);
+      object-t pair1 = pair::box({element, count});
+      dk::add-pair(self, pair1);
     }
     return element;
   }
@@ -53,27 +53,27 @@ trait counted-set
   method object-t elements(object-t self)
   {
     object-t result = make(vector::klass, $size : dk::size(self));
-    for (assoc-t* assoc in self)
-      dk::add-last(result, assoc->key);
+    for (pair-t* pair in self)
+      dk::add-last(result, pair->first);
     return result;
   }
 
   method object-t counts(object-t self)
   {
     object-t result = make(vector::klass, $size : dk::size(self));
-    for (assoc-t* assoc in self)
-      dk::add-last(result, assoc->element);
+    for (pair-t* pair in self)
+      dk::add-last(result, pair->last);
     return result;
   }
 
   method uint32-t count-at(object-t self, object-t element, uint32-t default-count)
   {
     uint32-t count-content = default-count;
-    object-t assoc = dk::assoc-at(self, element, nullptr);
+    object-t pair = dk::pair-at(self, element, nullptr);
 
-    if (nullptr != assoc) {
-      assoc-t* assoc-content = assoc::unbox(assoc);
-      object-t count = assoc-content->element;
+    if (nullptr != pair) {
+      pair-t* pair-content = pair::unbox(pair);
+      object-t count = pair-content->last;
       count-content = *uint32::unbox(count);
     }
     return count-content;
@@ -83,7 +83,7 @@ trait counted-set
   {
     typedef object-t (*)(object-t, object-t, object-t) at-t;
     dk::add-method-for-selector(kls,
-                               selector(assoc-at(object-t, object-t, object-t)),
+                               selector(pair-at(object-t, object-t, object-t)),
                                dk::method-for-selector(kls, selector(at(object-t, object-t, object-t))));
     dk::add-method-for-selector(kls,
                                selector(at(object-t, object-t, object-t)),
@@ -91,7 +91,7 @@ trait counted-set
 
     typedef object-t (*)(object-t, object-t) add-t;
     dk::add-method-for-selector(kls,
-                               selector(add-assoc(object-t, object-t)),
+                               selector(add-pair(object-t, object-t)),
                                dk::method-for-selector(kls, selector(add(object-t, object-t))));
     dk::add-method-for-selector(kls,
                                selector(add(object-t, object-t)),
@@ -104,6 +104,6 @@ trait counted-set
     return kls;
   }
 
-  method /*alias(at)*/ object-t assoc-at(object-t self, object-t key, object-t default-assoc);
-  method /*alias(add)*/ object-t add-assoc(object-t self, object-t assoc);
+  method /*alias(at)*/ object-t pair-at(object-t self, object-t first, object-t default-pair);
+  method /*alias(add)*/ object-t add-pair(object-t self, object-t pair);
 }

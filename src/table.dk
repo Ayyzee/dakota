@@ -32,19 +32,19 @@ trait table
   method object-t at(object-t self, object-t key, object-t default-result)
   {
     object-t result = default-result;
-    object-t assoc = dk::assoc-at(self, key, nullptr);
+    object-t pair = dk::pair-at(self, key, nullptr);
 
-    if (nullptr != assoc) {
-      assoc-t* assoc-content = assoc::unbox(assoc);
-      result = assoc-content->element;
+    if (nullptr != pair) {
+      pair-t* pair-content = pair::unbox(pair);
+      result = pair-content->last;
     }
     return result;
   }
 
   method object-t add(object-t self, object-t key, object-t element)
   {
-    object-t assoc = assoc::box({key, element});
-    dk::add(self, assoc);
+    object-t pair = pair::box({key, element});
+    dk::add(self, pair);
     return element;
   }
 
@@ -52,16 +52,16 @@ trait table
   {
     object-t set-kls = dk::superklass(dkt-klass(self));
     object-t result = make(set-kls);
-    for (assoc-t* assoc in self)
-      dk::add(result, assoc->key);
+    for (pair-t* pair in self)
+      dk::add(result, pair->first);
     return result;
   }
 
   method object-t elements(object-t self)
   {
     object-t result = make(vector::klass, $size : dk::size(self));
-    for (assoc-t* assoc in self)
-      dk::add-last(result, assoc->element);
+    for (pair-t* pair in self)
+      dk::add-last(result, pair->last);
     return result;
   }
 
@@ -69,7 +69,7 @@ trait table
   {
     typedef object-t (*)(object-t, object-t, object-t) at-t;
     dk::add-method-for-selector(kls,
-                               selector(assoc-at(object-t, object-t, object-t)),
+                               selector(pair-at(object-t, object-t, object-t)),
                                dk::method-for-selector(kls, selector(at(object-t, object-t, object-t))));
     dk::add-method-for-selector(kls,
                                selector(at(object-t, object-t, object-t)),
@@ -87,14 +87,14 @@ trait table
     dk::write(out, "{");
     str-t delim = "";
 
-    for (assoc-t* assoc in self) {
+    for (pair-t* pair in self) {
       dk::write(out, delim);
-      dk::write-lite(assoc->key, out); // must be primitive type
+      dk::write-lite(pair->first, out); // must be primitive type
       dk::write(out, ":");
-      if (nullptr == assoc->element || null == assoc->element)
+      if (nullptr == pair->last || null == pair->last)
         dk::write(out, "undef");
       else
-        dk::write-lite(assoc->element, out);
+        dk::write-lite(pair->last, out);
       delim = ",";
     }
 
@@ -102,5 +102,5 @@ trait table
     return self;
   }
 
-  method /*alias(at)*/ object-t assoc-at(object-t self, object-t key, object-t default-assoc);
+  method /*alias(at)*/ object-t pair-at(object-t self, object-t key, object-t default-pair);
 }

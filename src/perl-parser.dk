@@ -265,39 +265,39 @@ klass perl-parser
     return make(string::klass, $bytes : dk::buffer(token));
   }
 
-  /* method */ static object-t get-value(object-t self)
-  { // get table value - value is NOT optional
+  /* method */ static object-t get-element(object-t self)
+  { // get table element - element is NOT optional
     object-t token = perl-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
-    object-t value;
+    object-t element;
     switch (dk::tokenid(token))
     {
       case 'undf':
-        value = null; // undef
+        element = null; // undef
         break;
       case 'sqst':
-        value = make(string::klass, $bytes : dk::buffer(token));
+        element = make(string::klass, $bytes : dk::buffer(token));
         break;
       case 'dqst':
-        value = make(string::klass, $bytes : dk::buffer(token));
+        element = make(string::klass, $bytes : dk::buffer(token));
         break;
       case 'st':
-        value = make(string::klass, $bytes : dk::buffer(token));
+        element = make(string::klass, $bytes : dk::buffer(token));
         break;
       case '{':
-        value = perl-parser::get-table(self);
+        element = perl-parser::get-table(self);
         break;
       case '[':
-        value = perl-parser::get-vector(self);
+        element = perl-parser::get-vector(self);
         break;
       default:
         print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk::buffer(token));
         return null;
     }
-    return value;
+    return element;
   }
 
   /* method */ static object-t element(object-t self)
@@ -307,34 +307,34 @@ klass perl-parser
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
-    object-t value;
+    object-t element;
     switch (dk::tokenid(token))
     {
       case 'undf':
-        value = null; // undef
+        element = null; // undef
         break;
       case 'sqst':
-        value = make(string::klass, $bytes : dk::buffer(token));
+        element = make(string::klass, $bytes : dk::buffer(token));
         break;
       case 'dqst':
-        value = make(string::klass, $bytes : dk::buffer(token));
+        element = make(string::klass, $bytes : dk::buffer(token));
         break;
       case 'st':
-        value = make(string::klass, $bytes : dk::buffer(token));
+        element = make(string::klass, $bytes : dk::buffer(token));
         break;
       case '{':
-        value = perl-parser::get-table(self);
+        element = perl-parser::get-table(self);
         break;
       case '[':
-        value = perl-parser::get-vector(self);
+        element = perl-parser::get-vector(self);
         break;
-      case ']': // only difference from get-value()
+      case ']': // only difference from get-element()
         return null;
       default:
         print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' or ']' but got '%s'\n", dk::buffer(token));
         return null;
     }
-    return value;
+    return element;
   }
 
   /* method */ static object-t get-table-pair(object-t self)
@@ -345,10 +345,10 @@ klass perl-parser
     object-t corresponds-to = perl-parser::get-corresponds-to(self);
     if (null == corresponds-to)
       return nullptr;
-    object-t value = perl-parser::get-value(self);
-    if (null == value)
+    object-t element = perl-parser::get-element(self);
+    if (null == element)
       return nullptr;
-    return assoc::box({key, value});
+    return pair::box({key, element});
   }
 
   // hackhack - multiple return statements
@@ -357,12 +357,12 @@ klass perl-parser
     object-t vector = make(vector::klass);
     object-t token;
     do {
-      object-t value = perl-parser::element(self);
-      if (null == value)
+      object-t element = perl-parser::element(self);
+      if (null == element)
         return vector;
 
-      // add 'value' to 'vector'
-      dk::add-last(vector, value);
+      // add 'element' to 'vector'
+      dk::add-last(vector, element);
 
       token = perl-parser::lex(self);
       if (null == token) {

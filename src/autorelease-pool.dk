@@ -18,7 +18,7 @@ include <cassert>;
 
 module dakota;
 
-klass assoc;
+klass pair;
 klass deque;
 klass named-info;
 trait stack;
@@ -93,10 +93,10 @@ klass autorelease-pool
 
   method object-t release(object-t self)
   {
-    for (assoc-t* assoc in self.counted-elements) {
-      uint32-t n = *uint32::unbox(assoc->element);
+    for (pair-t* pair in self.counted-elements) {
+      uint32-t n = *uint32::unbox(pair->last);
       for (uint32-t i = 0; i < n; i++) {
-        dk::release(assoc->key);
+        dk::release(pair->first);
       }
     }
     object-t kls = dkt-klass(self);

@@ -7,7 +7,6 @@
 
 {
   'srcs' => [ # cmd-line
-    '$(srcdir)/assoc.dk',
     '$(srcdir)/autorelease-pool.dk',
     '$(srcdir)/bit-vector.dk',
     '$(srcdir)/boole.dk',
