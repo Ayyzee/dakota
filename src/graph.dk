@@ -31,8 +31,8 @@ klass node
   }
 
   method object-t init(object-t self,
-                       str-t    name =>  {~},
-                       object-t attrs => null)
+                       str-t    name :  {~},
+                       object-t attrs : null)
   {
     self = dk::init(super);
     return self;
@@ -51,9 +51,9 @@ klass edge
   }
 
   method object-t init(object-t self,
-                       str-t    lhs-name => {~},
-                       str-t    rhs-name => {~},
-                       object-t attrs =>    null)
+                       str-t    lhs-name : {~},
+                       str-t    rhs-name : {~},
+                       object-t attrs :    null)
   {
     self = dk::init(super);
     self.lhs-name = lhs-name;
@@ -68,7 +68,7 @@ klass attrs
   slots object-t;
 
   method object-t init(object-t self,
-                       object-t attrs => {~})
+                       object-t attrs : {~})
   {
     self = dk::init(super);
     *unbox(self) = attrs;
@@ -88,9 +88,9 @@ klass graph
   }
 
   method object-t init(object-t self,
-                       symbol-t type =>  $graph,
-                       str-t    name =>  nullptr,
-                       object-t attrs => null)
+                       symbol-t type :  $graph,
+                       str-t    name :  nullptr,
+                       object-t attrs : null)
   {
     self = dk::init(super);
     self.type = type;

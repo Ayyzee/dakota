@@ -102,7 +102,7 @@ sub method_sig_type_regex {
 }
 my $method_sig_type = &method_sig_type_regex();
 sub method_sig_regex {
-  return qr/(va:)?$mid(\($method_sig_type?\))?/;
+  return qr/(va::)?$mid(\($method_sig_type?\))?/;
 }
 sub long_suffix {
   return { '?' => 'p',

@@ -34,7 +34,7 @@ klass cstring
     uint32-t capacity;
   }
 
-  method object-t init(object-t self, uint32-t capacity => 8)
+  method object-t init(object-t self, uint32-t capacity : 8)
   {
     self = dk::init(super);
     self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * capacity);

@@ -44,10 +44,10 @@ klass autorelease-pool-klass
   }
 
   method object-t init(object-t self,
-                       named-info::slots-t* info-slots => nullptr,
-                       object-t                 info =>      nullptr)
+                       named-info::slots-t* info-slots : nullptr,
+                       object-t                 info :      nullptr)
   {
-    self = dk::init(super, $info-slots => info-slots, $info => info);
+    self = dk::init(super, $info-slots : info-slots, $info : info);
     self.pools = make(deque::klass);
     return self;
   }

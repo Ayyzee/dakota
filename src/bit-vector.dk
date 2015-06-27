@@ -85,7 +85,7 @@ klass bit-vector
   static const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const uint32-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
 
-  method object-t init(object-t self, uint32-t initial-capacity => gbl-default-initial-capacity)
+  method object-t init(object-t self, uint32-t initial-capacity : gbl-default-initial-capacity)
   {
     self = dk::init(super);
     if (0 == initial-capacity)

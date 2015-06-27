@@ -52,14 +52,14 @@ klass sorted-set
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk::init(o, $items => cast(object-t[]){ o1, o2, nullptr });
+  // dk::init(o, $items : cast(object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t self,
-                       uint32-t          initial-capacity => gbl-default-capacity,
-                       compare-t         compare =>          dk::compare,
-                       equal-predicate-t equal? =>           dk::equal?, // bugbug: not used
-                       object-t          elements =>         nullptr,
-                       object-t*         items =>            nullptr)
+                       uint32-t          initial-capacity : gbl-default-capacity,
+                       compare-t         compare :          dk::compare,
+                       equal-predicate-t equal? :           dk::equal?, /* bugbug: not used */
+                       object-t          elements :         nullptr,
+                       object-t*         items :            nullptr)
   {
     assert(0 != initial-capacity);
     assert(nullptr != compare);
@@ -130,7 +130,7 @@ klass sorted-set
   {
     object-t result = dk::at(self, object1, nullptr);
     if (nullptr == result)
-      throw make(exception::klass, $message => "oops");
+      throw make(exception::klass, $message : "oops");
     return result;
   }
 
@@ -199,7 +199,7 @@ klass sorted-set
 
   method object-t forward-iterator(object-t self)
   {
-    object-t forward-iterator = make(sorted-set-forward-iterator::klass, $sorted-set => self);
+    object-t forward-iterator = make(sorted-set-forward-iterator::klass, $sorted-set : self);
     return forward-iterator;
   }
 
@@ -241,7 +241,7 @@ klass sorted-set-forward-iterator
     uint32-t  iterator-state;
   }
 
-  method object-t init(object-t self, object-t sorted-set => {~})
+  method object-t init(object-t self, object-t sorted-set : {~})
   {
     self = dk::init(super);
     assert(dk::instance?(sorted-set, sorted-set::klass));
@@ -258,7 +258,7 @@ klass sorted-set-forward-iterator
 
     if (self.iterator-state != ss->iterator-state) {
       fprintf(stderr, "%i == %i\n", self.iterator-state, ss->iterator-state);
-      throw make(exception::klass, $message => "oops");
+      throw make(exception::klass, $message : "oops");
     }
     return;
   }

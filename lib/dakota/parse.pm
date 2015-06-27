@@ -129,6 +129,7 @@ our @EXPORT= qw(
                  rt_cc_path_from_so_path
                  str_from_cmd_info
               );
+my $colon = ':'; # key/element delim only
 my $kw_args_placeholders = &kw_args_placeholders();
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -752,8 +753,8 @@ sub slots {
   if (@$type && 3 == @$type) {
     if ('enum' eq &dakota::util::first($type)) {
       my $enum_base = &dakota::util::remove_last($type);
-      my $colon =    &dakota::util::remove_last($type);
-      die if ':' ne $colon;
+      my $tkn =    &dakota::util::remove_last($type);
+      die if ':' ne $tkn; # not key/element delim
       $$gbl_current_scope{'slots'}{'enum-base'} = $enum_base;
       #print STDERR &Dumper($$gbl_current_scope{'slots'});
     }
@@ -1378,14 +1379,14 @@ sub types {
 }
 sub kw_args_offsets {
   my ($seq, $gbl_token) = @_;
-  my $equalarrow = undef;
+  my $result;
   my $i;
   for ($i = 0; $i < @$seq; $i++) {
-    if ('=>' eq $$seq[$i]) {
-      $equalarrow = $i;
+    if ($colon eq $$seq[$i]) {
+      $result = $i;
     }
   }
-  return ( $equalarrow );
+  return ( $result );
 }
 sub parameter_list {
   my ($parameter_types) = @_;
@@ -1431,12 +1432,12 @@ sub parameter_list {
   my $kw_args_names = [];
   my $kw_args_defaults = [];
   foreach my $type (@$params) {
-    my ($equalarrow) = &kw_args_offsets($type);
+    my ($colon_offset) = &kw_args_offsets($type);
 
-    if ($equalarrow) {
-      my $kw_args_name = $equalarrow - 1;
-      my $kw_args_default = [splice(@$type, $equalarrow)];
-      my $equalarrow_tkn = &dakota::util::remove_first($kw_args_default);
+    if ($colon_offset) {
+      my $kw_args_name = $colon_offset - 1;
+      my $kw_args_default = [splice(@$type, $colon_offset)];
+      my $colon_tkn = &dakota::util::remove_first($kw_args_default);
       my $kw_arg_nodefault_placeholder = $$kw_args_placeholders{'nodefault'};
       my $kw_arg_nodefault_placeholder_tkns = [split('', $kw_arg_nodefault_placeholder)]; # assume no multi-character tokens (dangerous)
       if (scalar @$kw_arg_nodefault_placeholder_tkns == scalar @$kw_args_default) {
@@ -2049,15 +2050,15 @@ sub rep_tree_from_dk_path {
   #&log_sub_name($__sub__);
   #print STDERR $_;
 
-  while (m/($id)\s*=>/g) {
+  while (m/($id)\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/($mid)\s*=>/g) {
+  while (m/($mid)\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\$\'(.*?)\'\s*=>/g) {
+  while (m/\$\'(.*?)\'\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;

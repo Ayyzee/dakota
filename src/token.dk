@@ -60,10 +60,10 @@ klass token
   }
 
   method object-t init(object-t self,
-                       uint32-t       line =>    0,
-                       uint32-t       column =>  0,
-                       tokenid-t      tokenid => 0,
-                       str-t buffer =>  nullptr)
+                       uint32-t       line :    0,
+                       uint32-t       column :  0,
+                       tokenid-t      tokenid : 0,
+                       str-t buffer :  nullptr)
   {
     self = dk::init(super);
 #if 0
@@ -71,7 +71,7 @@ klass token
       char8-t[4 + (1)] tokenid-str = "";
       tokenid::str-from(tokenid, tokenid-str, sizeof(tokenid-str));
 
-      printf("{ 'line'=>'%i', 'column'=>'%i', 'tokenid'=>'%s', 'buffer'=>'%s' },\n",
+      printf("{ 'line':'%i', 'column':'%i', 'tokenid':'%s', 'buffer':'%s' },\n",
              line, column, tokenid-str, buffer);
     }
 #endif
@@ -88,7 +88,7 @@ klass token
 
   method uintmax-t hash(object-t self)
   {
-    object-t string = make(string::klass, $bytes => cast(str-t)(self.buffer));
+    object-t string = make(string::klass, $bytes : cast(str-t)(self.buffer));
     uintmax-t hash = dk::hash(string);
     return hash;
   }
@@ -99,8 +99,8 @@ klass token
 
     if (dk::instance?(other, klass)) {
       slots-t* t = unbox(other);
-      object-t s-string = make(string::klass, $bytes => cast(str-t)(self.buffer));
-      object-t t-string = make(string::klass, $bytes => cast(str-t)(t->buffer));
+      object-t s-string = make(string::klass, $bytes : cast(str-t)(self.buffer));
+      object-t t-string = make(string::klass, $bytes : cast(str-t)(t->buffer));
       state = dk::equal?(s-string, t-string);
     } else {
       state = false;
@@ -255,7 +255,7 @@ klass token
 
   method int-t compare(object-t self, object-t other)
   {
-  //fprintf(stderr, "%s <=> %s\n", unbox(self)->buffer, unbox(other)->buffer);
+  //fprintf(stderr, "%s <: %s\n", unbox(self)->buffer, unbox(other)->buffer);
     int-t result = safe-strcmp(unbox(self)->buffer, unbox(other)->buffer);
     result = dkt-normalize-compare-result(result);
     return result;

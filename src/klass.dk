@@ -77,7 +77,7 @@ namespace klass
 
 noreturn export void dkt-null-method(object-t object, ...)
 {
-  throw make(no-such-method-exception::klass, $object => object, $kls => dkt-klass(object));
+  throw make(no-such-method-exception::klass, $object : object, $kls : dkt-klass(object));
 }
 
 klass selector-pair
@@ -403,7 +403,7 @@ klass klass
 
   method object-t alloc(object-t self, str-t file, uint32-t line)
   {
-    DKT-LOG-OBJECT-ALLOC("'file'=>'%s','line'=>'%i','func'=>'%s','args'=>['%s']",
+    DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%i','func':'%s','args':['%s']",
                          file, line, __method__->name, self.name);
     object-t instance = dk::alloc(self);
     return instance;
@@ -459,7 +459,7 @@ klass klass
 
   //      method va-method-t va-method-for-selector(object-t self, selector-t selector)
   //      {
-  //        throw make(exception::klass, $message => "not yet implemented");
+  //        throw make(exception::klass, $message : "not yet implemented");
   //        // return nullptr
   //      }
 
@@ -602,9 +602,9 @@ klass klass
 
         if (nullptr != symbol-name) {
           // should demangle here
-          fprintf(out, " => '%s',", symbol-name);
+          fprintf(out, " : '%s',", symbol-name);
         } else {
-          fprintf(out, " => undef,");
+          fprintf(out, " : undef,");
         }
         fprintf(out, "\n");
       }
@@ -679,7 +679,7 @@ klass klass
           if (nullptr != trait-initialize) {
             symbol-t klass-name = cast(symbol-t)named-info::at(self.info-slots, $name);
             symbol-t file =       cast(symbol-t)named-info::at(self.info-slots, $file);
-            DKT-LOG-INITIAL-FINAL("'action'=>'%s','args'=>['%s:%s'],'klass'=>'%s','file'=>'%s'",
+            DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
                                   "initialize", trait-name, "klass", klass-name, file);
             self = trait-initialize(self);
           }
@@ -699,7 +699,7 @@ klass klass
   method object-t behavior(object-t self)
   {
     if (nullptr == self.behavior) {
-      self.behavior = make(bit-vector::klass, $initial-capacity => self.methods.count);
+      self.behavior = make(bit-vector::klass, $initial-capacity : self.methods.count);
 
       for (uint32-t index = 0; index < self.methods.count; index++)
         if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
@@ -713,8 +713,8 @@ klass klass
   noexport object-t init(object-t self, named-info::slots-t* info-slots);
 
   method object-t init(object-t self,
-                       named-info::slots-t* info-slots => nullptr,
-                       object-t                 info =>      nullptr)
+                       named-info::slots-t* info-slots : nullptr,
+                       object-t                 info :      nullptr)
   {
     self = dk::init(super);
     assert(!(nullptr != info-slots &&
@@ -802,7 +802,7 @@ klass klass
     method-t klass-initialize = cast(method-t)named-info::at(self.info-slots, $initialize);
     symbol-t file =             cast(symbol-t)named-info::at(self.info-slots, $file);
     if (nullptr != klass-initialize) {
-      DKT-LOG-INITIAL-FINAL("'action'=>'%s','args'=>['%s'],'klass'=>'%s','file'=>'%s'",
+      DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                             "initialize", "klass", name, file);
       self = klass-initialize(self);
     }

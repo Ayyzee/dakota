@@ -121,7 +121,7 @@ klass ascii-number
     return;
   }
 
-  method object-t init(object-t self, int32-t number => 0)
+  method object-t init(object-t self, int32-t number : 0)
   {
     self = dk::init(super);
     self.number = number;

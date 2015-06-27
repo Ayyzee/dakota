@@ -25,8 +25,8 @@ klass pair
   }
 
   method object-t init(object-t self,
-                       object-t first => {~},
-                       object-t last =>  {~})
+                       object-t first : {~},
+                       object-t last :  {~})
   {
     self = dk::init(super);
     self.first = first;

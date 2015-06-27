@@ -32,10 +32,10 @@ klass no-such-method-exception
   }
 
   method object-t init(object-t self,
-                       object-t     object =>    {~},
-                       object-t     superkls =>  nullptr,
-                       object-t     kls =>       nullptr,
-                       signature-t* signature => nullptr)
+                       object-t     object :    {~},
+                       object-t     superkls :  nullptr,
+                       object-t     kls :       nullptr,
+                       signature-t* signature : nullptr)
   {
     self = dk::init(super);
     assert(!(nullptr != superkls &&

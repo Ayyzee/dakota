@@ -29,8 +29,8 @@ klass assoc
   }
 
   method object-t init(object-t self,
-                       object-t key =>     null,
-                       object-t element => null)
+                       object-t key :     null,
+                       object-t element : null)
   {
     self = dk::init(super);
     self.key =     key;

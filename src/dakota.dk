@@ -159,7 +159,7 @@ export object-t std-error = nullptr;
 static void
 init-imported-klasses()
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   symbol-t* imported-klass-name-ptr;
   while (nullptr != (imported-klass-name-ptr = (symbol-t*)sorted-array::remove-last(gbl-imported-klasses-file-table)))
     dk-klass-for-name(*imported-klass-name-ptr);
@@ -386,7 +386,7 @@ perl-dump-resource-info(sorted-array-t* klass-defns-table)
     } while (nullptr != (current-info = current-info->next));
   }
   ofile-t ofl = {stdout, 0};
-  ofile::printf(ofl, "{ 'klasses' => '%i', 'selectors' => '%u' 'methods' => '%i' },\n",
+  ofile::printf(ofl, "{ 'klasses' : '%i', 'selectors' : '%u' 'methods' : '%i' },\n",
          klasses-count, gbl-selectors-table.count, methods-count);
   return;
 }
@@ -407,19 +407,19 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
       symbol-t name =            name-from-info(current-info);
       symbol-t klass-name =      klass-name-from-info(current-info);
       symbol-t superklass-name = superklass-name-from-info(current-info);
-      ofile::printf(ofl, "'%s' =>\n", name);
+      ofile::printf(ofl, "'%s' :\n", name);
       ofile::printf(ofl, "{\n");
       ofl.col++;
       symbol-t construct = cast(symbol-t)named-info::at(current-info, $construct);
-      ofile::printf(ofl, "'construct' => '%s',\n", construct);
+      ofile::printf(ofl, "'construct' : '%s',\n", construct);
       if (nullptr != klass-name)
-        ofile::printf(ofl, "'klass' => '%s',\n",      klass-name);
+        ofile::printf(ofl, "'klass' : '%s',\n",      klass-name);
       if (nullptr != superklass-name)
-        ofile::printf(ofl, "'superklass' => '%s',\n", superklass-name);
+        ofile::printf(ofl, "'superklass' : '%s',\n", superklass-name);
       
       signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, $method-signatures);
       if (nullptr != method-signatures) {
-        ofile::printf(ofl, "'methods' =>\n");
+        ofile::printf(ofl, "'methods' :\n");
         ofile::printf(ofl, "{\n");
         ofl.col++;
         method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, $method-addresses);
@@ -433,7 +433,7 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
             defined = 0;
           else
             defined = 1;
-          ofile::printf(ofl, "'%s(%s)' => { 'return-type' => '%s', 'name' => '%s', 'parameter-types' => '%s', 'defined?' => '%i' },\n",
+          ofile::printf(ofl, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%i' },\n",
                        method-signature->name, method-signature->parameter-types,
                        method-signature->return-type,
                        method-signature->name,
@@ -505,7 +505,7 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
 export void
 dk-init-runtime()
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>[]", __func__);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   if (nullptr == object::klass) {
     init-runtime-ds();
 
@@ -559,9 +559,9 @@ dk-init-runtime()
     dk-klass-for-name($input-stream);
     dk-klass-for-name($output-stream);
 
-    std-input =  make(input-stream::klass,  $file => stdin);
-    std-output = make(output-stream::klass, $file => stdout);
-    std-error =  make(output-stream::klass, $file => stderr);
+    std-input =  make(input-stream::klass,  $file : stdin);
+    std-output = make(output-stream::klass, $file : stdout);
+    std-error =  make(output-stream::klass, $file : stderr);
 #endif
 
     previous-terminate = std::set-terminate(verbose-terminate);
@@ -586,7 +586,7 @@ dk-init-runtime()
 noexport assoc-node-t*
 imported-klasses-for-klass(symbol-t klass-name)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s']", __func__, klass-name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   named-assoc-node-t named-node = { klass-name, nullptr };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node); // hackhack
   assoc-node-t* result;
@@ -600,7 +600,7 @@ imported-klasses-for-klass(symbol-t klass-name)
 noexport void
 import-klass(symbol-t klass-name, assoc-node-t* node)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s','%p']", __func__, klass-name, cast(void*)(node));
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(void*)(node));
   named-assoc-node-t named-node = { klass-name, node };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
 
@@ -620,7 +620,7 @@ import-klass(symbol-t klass-name, assoc-node-t* node)
 static void
 import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p','%p']",
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%p']",
                         __func__,
                         cast(void*)(klass-names),
                         cast(void*)(klass-assoc));
@@ -688,7 +688,7 @@ export-klass(named-info-t* klass-info)
   named-info::sort(klass-info);
   symbol-t name = name-from-info(klass-info);
   assert(nullptr != name);
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p'],'klass-name'=>'%s'", __func__, cast(void*)(klass-info), name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(void*)(klass-info), name);
 
   symbol-t interpose-name = cast(symbol-t)named-info::at(klass-info, $interpose-name);
   if (nullptr != interpose-name) {
@@ -709,7 +709,7 @@ export-klass(named-info-t* klass-info)
 static void
 export-klasses(named-info-t* klass-info)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p']", __func__, cast(void*)(klass-info));
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p']", __func__, cast(void*)(klass-info));
   uint32-t i = 0;
 
   while (1) {
@@ -1381,7 +1381,7 @@ dkt-deregister-info(named-info-t* registration-info)
         named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
         if (nullptr != found-named-node) {
           object-t kls = cast(object-t)(found-named-node->node->element);
-          DKT-LOG-INITIAL-FINAL("'action'=>'%s','args'=>['%s'],'klass'=>'%s','file'=>'%s'",
+          DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                                 "finalize", "klass", klass-name, file);
           kls = finalize(kls);
         }
@@ -1390,14 +1390,14 @@ dkt-deregister-info(named-info-t* registration-info)
   }
   symbol-t name = name-from-info(registration-info);
   assert(nullptr != name);
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p'],'klass-name'=>'%s'", __func__, cast(void*)(registration-info), name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(void*)(registration-info), name);
   return;
 }
 
 static symbol-t
 superklass-name-for-name(symbol-t klass-name)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s']", __func__, klass-name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   named-info-t* klass-info = info-for-name(klass-name);
   symbol-t superklass-name = superklass-name-from-info(klass-info, klass-name); // namename: ???
   return superklass-name;
@@ -1406,7 +1406,7 @@ superklass-name-for-name(symbol-t klass-name)
 export object-t
 dk-klass-for-name(symbol-t klass-name)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s']", __func__, klass-name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   assert(nullptr != klass-name);
   named-info-t* klass-info-slots = info-for-name(klass-name);
   assert($trait != cast(symbol-t)named-info::at(klass-info-slots, $construct));
@@ -1436,7 +1436,7 @@ dk-klass-for-name(symbol-t klass-name)
       assert(klass::klass == klass-klass || klass::subklass?(klass-klass, klass::klass));
       assert(nullptr != klass-klass);
     }
-    klass = make(klass-klass, $info-slots => klass-info-slots);
+    klass = make(klass-klass, $info-slots : klass-info-slots);
   }
   assert(nullptr != klass);
   return klass;
@@ -1486,7 +1486,7 @@ info-for-name(symbol-t klass-name)
 export symbol-t
 dk-intern(str-t key)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%s']", __func__, key);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   static sorted-ptr-array-t* intern-array = sorted-ptr-array::create(32, cast(uint32-t)sizeof(symbol-t), cast(std-compare-t)safe-strcmp);
 
   if (intern-array->count == intern-array->capacity) {

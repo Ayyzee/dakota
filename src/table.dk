@@ -59,7 +59,7 @@ trait table
 
   method object-t elements(object-t self)
   {
-    object-t result = make(vector::klass, $size => dk::size(self));
+    object-t result = make(vector::klass, $size : dk::size(self));
     for (assoc-t* assoc in self)
       dk::add-last(result, assoc->element);
     return result;
@@ -90,7 +90,7 @@ trait table
     for (assoc-t* assoc in self) {
       dk::write(out, delim);
       dk::write-lite(assoc->key, out); // must be primitive type
-      dk::write(out, "=>");
+      dk::write(out, ":");
       if (nullptr == assoc->element || null == assoc->element)
         dk::write(out, "undef");
       else

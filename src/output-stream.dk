@@ -36,7 +36,7 @@ klass output-stream
     file-t out;
   }
 
-  method object-t init(object-t self, file-t file => stdout)
+  method object-t init(object-t self, file-t file : stdout)
   {
     self = dk::init(super);
     self.out = file;
@@ -57,7 +57,7 @@ klass output-stream
       str128-t buf = "";
       strerror-r(errno, buf, sizeof(buf));
       fprintf(stderr, "%s", buf);
-      throw make(exception::klass, $message => "oops");
+      throw make(exception::klass, $message : "oops");
     }
     return self;
   }

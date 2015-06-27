@@ -104,6 +104,7 @@ $main::seq = qr{
                  \]
              }x;
 
+my $colon = ':'; # key/element delim only
 my $k = qr/[\w-]/;
 my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
 my ($id,  $mid,  $bid,  $tid,
@@ -219,7 +220,7 @@ sub decode_strings {
 sub nest_namespaces {
   my ($filestr_ref) = @_;
   foreach my $kind ('klass', 'trait', 'namespace') {
-    while ($$filestr_ref =~ s/$kind(\s+):?($id):($rid)(\s*)($main::block)/namespace $2 { $kind$1$3$4$5 }/gs) {
+    while ($$filestr_ref =~ s/$kind(\s+)(::)?($id)::($rid)(\s*)($main::block)/namespace $3 { $kind$1$4$5$6 }/gs) { # intentionally omitted $2
     }
   }
 }
@@ -279,7 +280,7 @@ sub rewrite_method_names_special_replacement {
 }
 sub rewrite_method_names_special {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(:+$id)(\!|\?)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/ge;
+  $$filestr_ref =~ s/(::$id)(\!|\?)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/ge; # rnielsen
 }
 sub rewrite_includes {
   my ($filestr_ref) = @_;
@@ -297,14 +298,14 @@ sub rewrite_declarations {
 }
 
 my $use_catch_macros = 1;
-my $catch_block  = qr/catch\s*\(\s*$rid?:klass\s*$k*\s*\)\s*($main::block)/;
+my $catch_block  = qr/catch\s*\(\s*$rid?::klass\s*$k*\s*\)\s*($main::block)/;
 my $catch_object = qr/\}(\s*$catch_block)+/;
 sub rewrite_catch_block {
   my ($str_in) = @_;
   my $str_out = '';
 
   while (1) {
-    if ($str_in =~ m/\Gcatch\s*\(\s*($rid?:klass)\s*($k*)\s*\)(\s*)\{/gc) {
+    if ($str_in =~ m/\Gcatch\s*\(\s*($rid?::klass)\s*($k*)\s*\)(\s*)\{/gc) {
       if ($use_catch_macros) {
         $str_out .= "DKT-CATCH($1, _e_)$3\{ object-t $2 = _e_;";
       } else {
@@ -383,7 +384,7 @@ sub vars_from_defn {
     $result .= " static signature-t const* __method__ = dkt-signature($name,($params)); USE(__method__);";
   } else {
     # replace keyword args with va-list-t
-    $params =~ s|,[^,]+?/\*=>.*?\*/||g;
+    $params =~ s|,[^,]+?/\*$colon.*?\*/||g;
     $params .= ", va-list-t";
     $result .= " static signature-t const* __method__ = dkt-kw-args-signature(va::$name,($params)); USE(__method__);";
   }
@@ -440,7 +441,7 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union)(\s*);/$2$1slots-t$3;/gs;
   $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gs;
   $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$id\s*);/$2$1slots-t$3;/gs; # forward decl
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+$t+?)(\s*);/typedef$1 slots-t$2;/gs;
+  $$filestr_ref =~ s/(?<![\$\w-])slots(\s+$t+?)(\s*);/typedef$1 slots-t$2;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -448,8 +449,7 @@ sub rewrite_set_literal {
 }
 sub rewrite_set_literal_both_replacement {
   my ($body) = @_;
-  if ($body =~ m|=>|) {
-    $body =~ s|^\s*=>\s*$||s;
+  if ($body =~ m|(?<!$colon)$colon(?!$colon)|) {
     return &rewrite_table_literal_replacement($body);
   } else {
     return &rewrite_list_literal_replacement($body, 'SET');
@@ -465,12 +465,12 @@ sub rewrite_table_literal_replacement {
   my ($body) = @_;
   my $result = '';
   $result .= "make(DEFAULT-TABLE-KLASS";
-
   my $assocs = [split /,/, $body];
+
   if (0 != @$assocs && '' ne $$assocs[0]) {
-    $result .= ", items => (object-t[]){ ";
+    $result .= ", items $colon (object-t[]){ ";
     foreach my $assoc (@$assocs) {
-      my ($key, $element) = split /=>/, $assoc;
+      my ($key, $element) = split /(?<!$colon)$colon(?!$colon)/, $assoc;
       $key = &trim($key);
       $element = &trim($element);
 
@@ -478,18 +478,18 @@ sub rewrite_table_literal_replacement {
 
       # key
       if ($key =~ m/^\$/ || $key =~ m/^__symbol::/) {
-        $result .= "assoc:box({symbol:box($key), ";
+        $result .= "assoc::box({symbol::box($key), ";
       } elsif ($key =~ m/^\"/) {
-        $result .= "assoc:box({str:box($key), ";
+        $result .= "assoc::box({str::box($key), ";
       } else {
-        $result .= "assoc:box({box($key), ";
+        $result .= "assoc::box({box($key), ";
       }
 
       # element
       if ($element =~ m/^\$/ || $element =~ m/^__symbol::/) {
-        $result .= "symbol:box($element)}), ";
+        $result .= "symbol::box($element)}), ";
       } elsif ($element =~ m/^\"/) {
-        $result .= "str:box($element)}), ";
+        $result .= "str::box($element)}), ";
       } else {
         $result .= "box($element)}), ";
       }
@@ -506,12 +506,12 @@ sub rewrite_sequence_literal {
 sub rewrite_list_literal_replacement {
   my ($body, $type) = @_;
   my $result = '';
+  $result .= "make(DEFAULT-$type-KLASS";
   my $assocs = [split /,/, $body];
   $assocs = [map {&trim($_)} @$assocs];
-  $result .= "make(DEFAULT-$type-KLASS";
 
   if (0 != @$assocs && '' ne $$assocs[0]) {
-    $result .= ", items => (object-t[]){ ";
+    $result .= ", items $colon (object-t[]){ ";
 
     foreach my $assoc (@$assocs) {
       $result .= "box($assoc), ";
@@ -543,7 +543,7 @@ sub rewrite_array_types {
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
   &rewrite_keywords($filestr_ref);
-  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?)/&symbol($1)/ge;
+  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?)/&symbol($1)/ge; # rnielsen
 }
 
 # this leaks memory!!
@@ -551,7 +551,7 @@ sub rewrite_strings_rhs {
   my ($string) = @_;
   my $string_ident = &dakota::generate::make_ident_symbol_scalar($string);
   #my $result = "__string::$string_ident";
-  my $result = "str:box(\"$string_ident\")";
+  my $result = "str::box(\"$string_ident\")";
   return $result;
 }
 sub rewrite_strings {
@@ -565,13 +565,13 @@ sub rewrite_keywords {
 sub rewrite_boxes {
   my ($filestr_ref) = @_;
   if ($use_compound_literals) {
-    $$filestr_ref =~ s/($id):box\((\s*\{.*?\}\s*)\)/$1::box(cast($1::slots-t)$2)/g;
+    $$filestr_ref =~ s/($id)::box\((\s*\{.*?\}\s*)\)/$1::box(cast($1::slots-t)$2)/g;
   } else {
-    $$filestr_ref =~ s/($id):box\(\s*\{(.*?)\}\s*\)/$1::box($1::construct($2))/g;
+    $$filestr_ref =~ s/($id)::box\(\s*\{(.*?)\}\s*\)/$1::box($1::construct($2))/g;
   }
   # <non-colon>box($foo)  =>  symbol::box($foo)
-  $$filestr_ref =~ s/(?<!:)(box\s*\(\s*\$$id\))/symbol::$1/g;
-  $$filestr_ref =~ s/(?<!:)(box\s*\(\s*__symbol::.+?\))/symbol::$1/g;
+  $$filestr_ref =~ s/(?<!::)(box\s*\(\s*\$$id\))/symbol::$1/g;
+  $$filestr_ref =~ s/(?<!::)(box\s*\(\s*__symbol::.+?\))/symbol::$1/g;
 }
 sub rewrite_unless {
   my ($filestr_ref) = @_;
@@ -646,9 +646,9 @@ sub rewrite_for_each_replacement {
       $first_stmt .= "$ws1\{$ws2$type $element = unbox(_element_); $stmt$ws3";
     }
   } elsif ($type =~ m|($tid)|) {
+    my $klass_name = $1;
     $result .= " object-t _element_ = dk::next(_iterator_);";
     $result .= " /**/)";
-    my $klass_name = $1;
     $klass_name =~ s/-t$//;
 
     if (!$open_brace) { # $ws2 will be undefined
@@ -657,7 +657,7 @@ sub rewrite_for_each_replacement {
       $first_stmt .= "$ws1\{$ws2$type $element = $klass_name\::unbox(_element_); $stmt$ws3";
     }
   } else {
-    die __FILE__, ":", __LINE__, ": error:\n";
+    die __FILE__, ":", __LINE__, ": error: type: $type\n";
   }
   $result .= $first_stmt;
   return $result;
@@ -747,7 +747,7 @@ sub rewrite_keyword_syntax_list {
   my ($arg1, $arg2, $arg3) = @_;
   my $list = $arg3;
 
-  if ($arg3 =~ m/=>/g) {
+  if ($arg3 =~ m/(?<!$colon)$colon(?!$colon)/g) {
     #print STDERR "$arg1$arg2$list\n";
 
     # remove the leading and trailing parens
@@ -758,8 +758,8 @@ sub rewrite_keyword_syntax_list {
     $list =~ s/($rid*$main::list)/&remove_non_newlines($1)/ges;
     $list = "($list)";
 
-    $list =~ s{($mid\s*)(=>\s*.*?)(\s*,|\))}{$1/*$2*/$3}g;
-    $list =~ s{($id\s*)(=>\s*.*?)(\s*,|\))}{$1/*$2*/$3}g;
+    $list =~ s{($mid\s*)((?<!$colon)$colon(?!$colon)\s*.*?)(,|\))}{$1/* $2 */$3}g;
+    $list =~ s{($id\s*)((?<!$colon)$colon(?!$colon)\s*.*?)(\s*,|\))}{$1/* $2 */$3}g;
     #print STDERR "$arg1$arg2$list\n";
   }
   return "$arg1$arg2$list";
@@ -774,8 +774,8 @@ sub rewrite_keyword_syntax_use {
   my $list = $arg2;
 
   #print STDERR "$arg1$list\n";
-  $list =~ s/\$?($mid)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
-  $list =~ s/\$?($id)(\s*)=>/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\$?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\$?($id)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
   $list =~ s/\)$/, nullptr\)/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";
@@ -784,7 +784,7 @@ sub rewrite_keyword_syntax {
   my ($filestr_ref, $kw_args_generics) = @_;
   foreach my $name (keys %$kw_args_generics) {
     $$filestr_ref =~ s/(method.*?)($name)($main::list)/&rewrite_keyword_syntax_list($1, $2, $3)/ge;
-    $$filestr_ref =~ s/(dk::+$name)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
+    $$filestr_ref =~ s/(dk::$name)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
   }
   $$filestr_ref =~ s|make(\([^\)]+?\.\.\.\))|__MAKE__$1|gs;
   $$filestr_ref =~ s/(make)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
@@ -860,7 +860,7 @@ sub rewrite_export_method {
   while (my ($module_name, $symbol_tbl) = each (%$exports)) {
     foreach my $symbol (sort keys %$symbol_tbl) {
       #print STDERR "$symbol\n";
-      if ($symbol =~ m/($id):($msig)/) {
+      if ($symbol =~ m/($id)::($msig)/) {
         my $klass_name = $1;
         my $sig = $2;
         if ($sig !~ m/-t$/) {
@@ -879,7 +879,7 @@ sub convert_dk_to_cc {
   &rewrite_strswitch($filestr_ref);
   &rewrite_case_with_string($filestr_ref);
 
-  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?\s+=>)/$1/g; # just remove leading $
+  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading $, rnielsen
   &rewrite_keywords($filestr_ref);
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);

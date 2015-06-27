@@ -55,7 +55,7 @@ getprogname()
 {
   int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
-    throw make(system-exception::klass, $errnum => errno);
+    throw make(system-exception::klass, $errnum : errno);
   gbl-buf[n] = NUL;
   str-t progname = strrchr(gbl-buf, '/');
   if (nullptr != progname)
@@ -210,7 +210,7 @@ klass exception
     str-t message;
   }
 
-  method object-t init(object-t self, str-t message => dkt-name(dkt-klass(self)))
+  method object-t init(object-t self, str-t message : dkt-name(dkt-klass(self)))
   {
     self = dk::init(super);
     self.message = message;

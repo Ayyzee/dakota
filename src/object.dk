@@ -101,7 +101,7 @@ klass object
   method object-t copy(object-t self)
   {
     USE(self);
-    throw make(exception::klass, $message => "not yet implemented");
+    throw make(exception::klass, $message : "not yet implemented");
     return nullptr;
   }
 
@@ -191,7 +191,7 @@ klass object
 DEBUG-EXPORT void
 dkt-unbox-check(object-t object, object-t kls)
 {
-  DKT-LOG-TRACE-RUNTIME("'func'=>'%s','args'=>['%p','%s::klass']",
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
                         __func__, cast(void*)(object), dk::name(kls));
   unless (object::instance?(object, kls))
   {

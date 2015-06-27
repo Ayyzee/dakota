@@ -82,6 +82,7 @@ our @EXPORT= qw(
                  symbol_parts
               );
 
+my $colon = ':'; # key/element delim only
 my $kw_args_placeholders = &kw_args_placeholders();
 my $k = qr/[\w-]/;
 my ($id,  $mid,  $bid,  $tid,
@@ -537,18 +538,18 @@ sub generate_defn_footer {
   $rt_cc_str .= $col . "static void __initial() {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
   $rt_cc_str .=
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"before\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
     $col . "dkt-register-info(&registration-info);\n" .
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"after\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"after\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);
   $rt_cc_str .= $col . "}\n";
   $rt_cc_str .= $col . "static void __final() {" . &ann(__LINE__) . "\n";
   $col = &colin($col);
   $rt_cc_str .=
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"before\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
     $col . "dkt-deregister-info(&registration-info);\n" .
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func'=>'%s','args'=>[],'context'=>'%s','name'=>'%s'\", __func__, \"after\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"after\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);
   $rt_cc_str .= $col . "}\n";
@@ -1050,7 +1051,6 @@ sub common::print_signature {
 
     my $return_type_str = &arg::type($$generic{'return-type'});
     my $name_str;
-    my $sro = '::';
     if (&is_va($generic)) {
       $name_str = "va::$generic_name";
     } else {
@@ -1141,7 +1141,6 @@ sub common::print_selector {
 
     my $return_type_str = &arg::type($$generic{'return-type'});
     my $name_str;
-    my $sro = '::';
     if (&is_va($generic)) {
       $name_str = "va::$generic_name";
     } else {
@@ -1170,7 +1169,7 @@ sub common::generate_selector_defns {
     if (&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
       if (!&is_slots($generic)) {
-        $scratch_str .= &common::print_selector($generic, $col, ['selector', ':', 'va']);
+        $scratch_str .= &common::print_selector($generic, $col, ['__selector', '::', 'va']);
       }
       $$generic{'keyword-types'} = $keyword_types;
     }
@@ -1183,7 +1182,7 @@ sub common::generate_selector_defns {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
         my $keyword_types = $$varargs_generic{'keyword-types'} ||= undef;
         if (!&is_slots($generic)) {
-          $scratch_str .= &common::print_selector($varargs_generic, $col, ['selector']);
+          $scratch_str .= &common::print_selector($varargs_generic, $col, ['__selector']);
         }
         $$varargs_generic{'keyword-types'} = $keyword_types;
       }
@@ -1194,7 +1193,7 @@ sub common::generate_selector_defns {
     if (!&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
       if (!&is_slots($generic)) {
-        $scratch_str .= &common::print_selector($generic, $col, ['selector']);
+        $scratch_str .= &common::print_selector($generic, $col, ['__selector']);
       }
       $$generic{'keyword-types'} = $keyword_types;
     }
@@ -1430,7 +1429,7 @@ sub generics::generate_generic_defn {
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
-    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \$object => object, \$kls => dkt-klass(object), \$signature => signature));\n";
+    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \$object $colon object, \$kls $colon dkt-klass(object), \$signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
@@ -1514,7 +1513,7 @@ sub generics::generate_super_generic_defn {
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
-    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \$object => arg0.self, \$superkls => dkt-superklass(arg0.klass), \$signature => signature));\n";
+    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \$object $colon arg0.self, \$superkls $colon dkt-superklass(arg0.klass), \$signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
@@ -3638,9 +3637,9 @@ sub generate_kw_args_method_defn {
   $col = &colin($col);
   $$scratch_str_ref .=
     $col . "throw make(no-such-keyword-exception::klass,\n" .
-    $col . "           \$object =>    self,\n" .
-    $col . "           \$signature => __method__,\n" .
-    $col . "           \$keyword =>   _keyword_->symbol);\n";
+    $col . "           \$object $colon    self,\n" .
+    $col . "           \$signature $colon __method__,\n" .
+    $col . "           \$keyword $colon   _keyword_->symbol);\n";
   $col = &colout($col);
   #        $$scratch_str_ref .= $col . "}\n";
   $col = &colout($col);
@@ -3658,9 +3657,9 @@ sub generate_kw_args_method_defn {
     } else {
       $$scratch_str_ref .=
         $col . "throw make(missing-keyword-exception::klass,\n" .
-        $col . "           \$object =>    self,\n" .
-        $col . "           \$signature => __method__,\n" .
-        $col . "           \$keyword =>   _keyword_->symbol);\n";
+        $col . "           \$object $colon    self,\n" .
+        $col . "           \$signature $colon __method__,\n" .
+        $col . "           \$keyword $colon   _keyword_->symbol);\n";
     }
     $col = &colout($col);
   }
@@ -3797,7 +3796,7 @@ sub add_symbol_to_ident_symbol {
 sub symbol_parts {
   my ($symbol) = @_;
   my ($ns, $ident) = ('', undef);
-  $symbol =~ m|^(:*(.+):+)?(.+)$|;
+  $symbol =~ m|^((.+)::)?(.+)$|;
   $ns .= "::$2" if defined $2;
   $ident = $3;
   return ($ns, $ident);
@@ -3925,7 +3924,7 @@ sub linkage_unit::generate_strings {
     if (&is_decl()) {
       $scratch_str .= $col . "//extern noexport object-t $string_ident;\n";
     } else {
-      $scratch_str .= $col . "//noexport object-t $string_ident = make(string::klass, bytes => \"$string\");\n";
+      $scratch_str .= $col . "//noexport object-t $string_ident = make(string::klass, bytes $colon \"$string\");\n";
     }
   }
   $col = &colout($col);

@@ -89,7 +89,7 @@ klass named-info
       for (uint32-t i = 0; i < current->count; i++) {
         symbol-t key = current->elements[i].key;
         uintptr-t element = current->elements[i].element;
-        printf("  $%s => 0x%0*" PRIxPTR,
+        printf("  $%s : 0x%0*" PRIxPTR,
                key, PRIxPTR-WIDTH, element);
 
         if (0) {}

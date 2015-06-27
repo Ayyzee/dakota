@@ -46,9 +46,9 @@ klass xml-object-output-stream
     str-t end-tbl-delim;
   }
 
-  method object-t init(object-t self, file-t file => stdout)
+  method object-t init(object-t self, file-t file : stdout)
   {
-    self = dk::init(super, $file => file);
+    self = dk::init(super, $file : file);
     self.indent-level = 1; // set to zero for maximum compactness
 
     self.start-seq-delim = "<sequence>";
