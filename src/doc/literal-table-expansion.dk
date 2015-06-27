@@ -1,0 +1,49 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#{ #name: "sophie", #age: 4 }
+
+#{ #(#name: "sophie"), #(#age: 4) }
+
+#{ #(box(#name): box("sophie")), #(box(#age): box(4)) }
+
+#{ make(pair::klass, #first: box(#name), #last: box("sophie")), make(pair::klass, #first: box(#age), #last: box(4)) }
+
+make(hashed-table::klass, #items: cast(object-t[]){ make(pair::klass, #first: box(#name), #last: box("sophie")), make(pair::klass, #first: box(#age), #last: box(4)), nullptr })
+
+---
+
+#{ ... } // comma delimitted pairs (if table) or items (if set)
+=>
+make(hashed-table::klass, #items: ..., nullptr) // make-hashed-table(...) ?
+make(hashed-set::klass,   #items: ..., nullptr) // make-hashed-set(...) ?
+
+#[ ... ] // comma delimitted items
+=>
+make(vector::klass, #items: ..., nullptr) // make-vector(...) ?
+
+#( ... : ... ) // colon delimitted elements
+=>
+make(pair::klass, #first: ..., #last: ...) // make-pair(..., ...) ?
+
+---
+
+empty set:    #{}
+empty table:  #{:}
+empty vector: #[]
+empty pair: no-such-entity
+
+// using compound literals 'items' can be used as follows:
+// dk::init(o, #items: cast(object-t[]){ o1, o2, nullptr });
+
+inline object-t make-pair(object-t first, object-t last) {
+  return make(pair::klass, #first: first, #last: last);
+}
+inline sentinel object-t make-vector(object-t[] items) // precompiler added trailing nullptr?
+  return make(vector::klass, #items: items);
+}
+inline sentinel object-t make-hashed-set(object-t[] items) // precompiler added trailing nullptr?
+  return make(hashed-set::klass, #items: items);
+}
+inline sentinel object-t make-hashed-table(object-t[] items) // precompiler added trailing nullptr?
+  return make(hashed-table::klass, #items: items);
+}
