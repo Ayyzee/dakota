@@ -131,6 +131,8 @@ module dakota export
   ofile,
   ofile::slots-t,
   output-stream,
+  pair,
+  pair::slots-t,
   property,
   property::slots-t,
   ptr,

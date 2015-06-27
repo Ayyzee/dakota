@@ -39,8 +39,6 @@ module dakota-util export
   input-file,
   lexer,
   open-token,
-  pair,
-  pair::slots-t,
   perl-object-output-stream,
   perl-parser,
   point,

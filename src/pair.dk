@@ -14,7 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-util;
+include <cassert>;
+
+module dakota;
+
+klass object-output-stream;
 
 klass pair
 {
@@ -25,13 +29,74 @@ klass pair
   }
 
   method object-t init(object-t self,
-                       object-t first : {~},
-                       object-t last :  {~})
+                       object-t first : null,
+                       object-t last :  null)
   {
     self = dk::init(super);
     self.first = first;
     self.last =  last;
     return self;
+  }
+
+  method object-t dump(object-t self)
+  {
+    dk::dump(super);
+    dk::dump(self.first);
+    dk::dump(self.last);
+    return self;
+  }
+
+  method object-t write-slots(object-t self, object-t out)
+  {
+    dk::write-slots(super, out);
+    dk::write-slots-start(out, klass);
+
+    dk::write-element-idref(out, self.first, "first");
+    dk::write-element-idref(out, self.last,  "last");
+
+    dk::write-slots-end(out);
+    return self;
+  }
+
+  method boole-t equal?(object-t self, object-t other)
+  {
+    boole-t result;
+    object-t first = self;
+    if (dk::instance?(first, klass))
+      first = unbox(first)->first;
+    assert(nullptr != first);
+    object-t other-first = other;
+    if (dk::instance?(other-first, klass))
+      other-first = unbox(other-first)->first;
+    assert(nullptr != other-first);
+    result = dk::equal?(first, other-first);
+    return result;
+  }
+
+  method int-t compare(object-t self, object-t other)
+  {
+    int-t result;
+    object-t first = self;
+    if (dk::instance?(first, klass))
+      first = unbox(first)->first;
+    assert(nullptr != first);
+    object-t other-first = other;
+    if (dk::instance?(other-first, klass))
+      other-first = unbox(other-first)->first;
+    assert(nullptr != other-first);
+    result = dk::compare(first, other-first);
+    return result;
+  }
+
+  method uintmax-t hash(object-t self)
+  {
+    uintmax-t result;
+    object-t first = self;
+    if (dk::instance?(first, klass))
+      first = unbox(first)->first;
+    assert(nullptr != first);
+    result = dk::hash(first);
+    return result;
   }
 
   method object-t first(slots-t* s)

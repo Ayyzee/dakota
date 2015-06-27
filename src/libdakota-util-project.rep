@@ -19,7 +19,6 @@
     '$(srcdir)/lexer.dk',
     '$(srcdir)/module-dakota-util.dk',
     '$(srcdir)/open-token.dk',
-    '$(srcdir)/pair.dk',
     '$(srcdir)/perl-object-output-stream.dk',
     '$(srcdir)/perl-parser.dk',
     '$(srcdir)/point.dk',

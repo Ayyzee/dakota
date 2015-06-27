@@ -42,6 +42,7 @@
     '$(srcdir)/object-output-stream.dk',
     '$(srcdir)/object.dk',
     '$(srcdir)/output-stream.dk',
+    '$(srcdir)/pair.dk',
     '$(srcdir)/property.dk',
     '$(srcdir)/ptr.dk',
     '$(srcdir)/result.dk',
