@@ -763,10 +763,10 @@ sub method::kw_list_types {
 
     if (defined $$kw_arg{'default'}) {
       my $kw_arg_default_placeholder = $$kw_args_placeholders{'default'};
-      $result .= ",$kw_arg_type $kw_arg_name=>$kw_arg_default_placeholder";
+      $result .= ",$kw_arg_type $kw_arg_name:$kw_arg_default_placeholder";
     } else {
       my $kw_arg_nodefault_placeholder = $$kw_args_placeholders{'nodefault'};
-      $result .= ",$kw_arg_type $kw_arg_name=>$kw_arg_nodefault_placeholder";
+      $result .= ",$kw_arg_type $kw_arg_name:$kw_arg_nodefault_placeholder";
     }
   }
   return $result;
