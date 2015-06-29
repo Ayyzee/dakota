@@ -29,12 +29,12 @@ klass hashed-table
                        object-t          elements : nullptr,
                        object-t*         items :    nullptr)
   {
-    self = dk::init(super, $equal? : equal?, $hash : hash, $elements : elements, $items : items);
+    self = dk::init(super, #equal? : equal?, #hash : hash, #elements : elements, #items : items);
     return self;
   }
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name($pair); // hackhack
+    dk-klass-for-name(#pair); // hackhack
     return kls;
   }
   object-t finalize(object-t kls)

@@ -45,7 +45,7 @@ klass vector
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk::init(o, $items : cast(object-t[]){ o1, o2, nullptr });
+  // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t  self,
                        uint32-t  initial-capacity : gbl-default-initial-capacity,
@@ -97,7 +97,7 @@ klass vector
   method object-t copy-shallow(object-t self)
   {
     object-t kls = dkt-klass(self);
-    object-t copy = make(kls, $capacity : self.capacity);
+    object-t copy = make(kls, #capacity : self.capacity);
     slots-t* s1 = unbox(self);
     slots-t* s2 = unbox(copy);
     *s2 = *s1;
@@ -247,7 +247,7 @@ klass vector
   {
     object-t element = dk::at(self, index, nullptr);
     if (nullptr == element)
-      throw make(exception::klass, $message : "oops");
+      throw make(exception::klass, #message : "oops");
     return element;
   }
 
@@ -263,7 +263,7 @@ klass vector
   method object-t replace-at(object-t self, uint32-t index, object-t object)
   {
     if (index >= self.capacity)
-      throw make(exception::klass, $message : "oops");
+      throw make(exception::klass, #message : "oops");
 
     object-t rtn = self.elements[index];
     self.elements[index] = object;
@@ -328,7 +328,7 @@ klass vector
 
   method object-t forward-iterator(object-t self)
   {
-    object-t forward-iterator = make(vector-forward-iterator::klass, $vector : self);
+    object-t forward-iterator = make(vector-forward-iterator::klass, #vector : self);
     return forward-iterator;
   }
 
@@ -390,7 +390,7 @@ klass vector-forward-iterator
     vector::slots-t* d = vector::unbox(self.vector);
 
     if (self.iterator-state != d->iterator-state)
-      throw make(exception::klass, $message : "oops");
+      throw make(exception::klass, #message : "oops");
     return;
   }
 

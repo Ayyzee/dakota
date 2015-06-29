@@ -52,7 +52,7 @@ klass hashed-set
 
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name($vector); // hackhack
+    dk-klass-for-name(#vector); // hackhack
     return kls;
   }
 
@@ -64,7 +64,7 @@ klass hashed-set
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk::init(o, $items : cast(object-t[]){ o1, o2, nullptr });
+  // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t self,
                        hash-t            hash :     dk::hash,
@@ -77,7 +77,7 @@ klass hashed-set
 
     self = dk::init(super);
     self.num-buckets = gbl-prime;
-    self.buckets = make(vector::klass, $initial-capacity : self.num-buckets, $fill : nullptr);
+    self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);
     self.size = 0;
     self.equal? = equal?;
     self.hash = hash;
@@ -230,7 +230,7 @@ klass hashed-set
 
   method object-t forward-iterator(object-t self)
   {
-    object-t forward-iterator = make(hashed-set-forward-iterator::klass, $hashed-set : self);
+    object-t forward-iterator = make(hashed-set-forward-iterator::klass, #hashed-set : self);
     return forward-iterator;
   }
 
@@ -278,7 +278,7 @@ klass hashed-set-forward-iterator
     hashed-set::slots-t* hs = hashed-set::unbox(self.hashed-set);
 
     if (self.iterator-state != hs->iterator-state)
-      throw make(exception::klass, $message : "oops");
+      throw make(exception::klass, #message : "oops");
     return;
   }
 

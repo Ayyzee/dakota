@@ -183,16 +183,6 @@ sub encode_strings1 {
   my ($s1, $s2, $s3) = ($1, $2, $3);
   return &encode_strings5($s1, $ENCODED_STRING_BEGIN, $s2, $ENCODED_STRING_END, $s3);
 }
-sub encode {
-  my ($filestr_ref) = @_;
-  &encode_strings($filestr_ref);
-  &encode_comments($filestr_ref);
-  # encode include directive strings
-  #$$filestr_ref =~ s|(?<=include\s)(\")(.*?)(\")|&encode_strings5($1, $ENCODED_STRING_BEGIN, $2, $ENCODED_STRING_END, $3)|eg;
-  #$$filestr_ref =~ s|(?<=include\s)(<)(.*?)(>)|&encode_strings5($1, $ENCODED_STRING_BEGIN, $2, $ENCODED_STRING_END, $3)|eg;
-  # remove all (single and double quoted) string contents, and remove all comments
-  #$filestr_ref =~ s{((//)(.*?)(\n))|((/\*)(.*?)(\*/))|(?<!\\)(")(.*?)(?<!\\)(")|(?<!\\)(')(.*?)(?<!\\)(')}{$1$3}gms;
-}
 sub encode_comments {
   my ($filestr_ref) = @_;
     $$filestr_ref =~ s|(//)(.*?)(\n)|&encode_comments3($1, $2, $3)|egs;
@@ -203,11 +193,6 @@ sub encode_strings {
   $$filestr_ref =~ s|($dqstr)|&encode_strings1($1)|eg;
   $$filestr_ref =~ s|(<$h+>)|&encode_strings1($1)|eg;
   $$filestr_ref =~ s|($sqstr)|&encode_strings1($1)|eg;
-}
-sub decode {
-  my ($filestr_ref) = @_;
-  &decode_comments($filestr_ref);
-  &decode_strings($filestr_ref);
 }
 sub decode_comments {
   my ($filestr_ref) = @_;
@@ -437,15 +422,15 @@ sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union)(\s*$main::block)/$2$1slots-t$3;/gs;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(struct|union)(\s*);/$2$1slots-t$3;/gs;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gs;
-  $$filestr_ref =~ s/(?<!\$)\bslots(\s+)(enum)(\s*:\s*$id\s*);/$2$1slots-t$3;/gs; # forward decl
-  $$filestr_ref =~ s/(?<![\$\w-])slots(\s+$t+?)(\s*);/typedef$1 slots-t$2;/gs;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*$main::block)/$2$1slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);/$2$1slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)(\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)(\s*:\s*$id\s*);/$2$1slots-t$3;/gs; # forward decl
+  $$filestr_ref =~ s/(?<![\#\w-])slots(\s+$t+?)(\s*);/typedef$1 slots-t$2;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/\$\{(.*?)\}/&rewrite_set_literal_both_replacement($1)/ge;
+  $$filestr_ref =~ s/\#\{(.*?)\}/&rewrite_set_literal_both_replacement($1)/ge;
 }
 sub rewrite_set_literal_both_replacement {
   my ($body) = @_;
@@ -477,7 +462,7 @@ sub rewrite_table_literal_replacement {
       #print STDERR "key=$key, element=$element\n";
 
       # key
-      if ($key =~ m/^\$/ || $key =~ m/^__symbol::/) {
+      if ($key =~ m/^\#/ || $key =~ m/^__symbol::/) {
         $result .= "assoc::box({symbol::box($key), ";
       } elsif ($key =~ m/^\"/) {
         $result .= "assoc::box({str::box($key), ";
@@ -486,7 +471,7 @@ sub rewrite_table_literal_replacement {
       }
 
       # element
-      if ($element =~ m/^\$/ || $element =~ m/^__symbol::/) {
+      if ($element =~ m/^\#/ || $element =~ m/^__symbol::/) {
         $result .= "symbol::box($element)}), ";
       } elsif ($element =~ m/^\"/) {
         $result .= "str::box($element)}), ";
@@ -501,7 +486,7 @@ sub rewrite_table_literal_replacement {
 }
 sub rewrite_sequence_literal {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/\$\[(.*?)\]/&rewrite_list_literal_replacement($1, 'SEQUENCE')/ge;
+  $$filestr_ref =~ s/\#\[(.*?)\]/&rewrite_list_literal_replacement($1, 'SEQUENCE')/ge;
 }
 sub rewrite_list_literal_replacement {
   my ($body, $type) = @_;
@@ -543,7 +528,7 @@ sub rewrite_array_types {
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
   &rewrite_keywords($filestr_ref);
-  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?)/&symbol($1)/ge; # rnielsen
+  $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?)/&symbol($1)/ge; # rnielsen
 }
 
 # this leaks memory!!
@@ -556,11 +541,11 @@ sub rewrite_strings_rhs {
 }
 sub rewrite_strings {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!\\)\$\"(.+?)\"/&rewrite_strings_rhs($1)/ge;
+  $$filestr_ref =~ s/(?<!\\)\#\"(.+?)\"/&rewrite_strings_rhs($1)/ge;
 }
 sub rewrite_keywords {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!\\)\$($sqstr)/&keyword($1)/ge;
+  $$filestr_ref =~ s/(?<!\\)\#($sqstr)/&keyword($1)/ge;
 }
 sub rewrite_boxes {
   my ($filestr_ref) = @_;
@@ -570,7 +555,7 @@ sub rewrite_boxes {
     $$filestr_ref =~ s/($id)::box\(\s*\{(.*?)\}\s*\)/$1::box($1::construct($2))/g;
   }
   # <non-colon>box($foo)  =>  symbol::box($foo)
-  $$filestr_ref =~ s/(?<!::)(box\s*\(\s*\$$id\))/symbol::$1/g;
+  $$filestr_ref =~ s/(?<!::)(box\s*\(\s*\#$id\))/symbol::$1/g;
   $$filestr_ref =~ s/(?<!::)(box\s*\(\s*__symbol::.+?\))/symbol::$1/g;
 }
 sub rewrite_unless {
@@ -696,12 +681,12 @@ sub rewrite_case_with_string_rhs {
 sub rewrite_case_with_string {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|(case)(\s*)"(.*?)"(\s*)(:)|&rewrite_case_with_string_rhs($2, $3, $4)|ges;
-  $$filestr_ref =~ s|(case)(\s*)\$(.*?)(\s*)(:)|&rewrite_case_with_string_rhs($2, $3, $4)|ges;
+  $$filestr_ref =~ s|(case)(\s*)\#(.*?)(\s*)(:)|&rewrite_case_with_string_rhs($2, $3, $4)|ges;
 }
 sub rewrite_strswitch {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|strswitch(\s*)\((\s*)($id)(\s*)\)|switch$1(dk-hash($2$3$4))|gs;
-  $$filestr_ref =~ s|switch(\s*)\((\s*)\$(.*?)(\s*)\)|switch$1(dk-hash($2"$3"$4))|gs;
+  $$filestr_ref =~ s|switch(\s*)\((\s*)\#(.*?)(\s*)\)|switch$1(dk-hash($2"$3"$4))|gs;
   $$filestr_ref =~ s|switch(\s*)\((\s*)"(.*?)"(\s*)\)|switch$1(dk-hash($2"$3"$4))|gs;
   $$filestr_ref =~ s|switch(\s*)\((\s*)'(.*?)'(\s*)\)|switch$1(dk-hash($2'$3'$4))|gs;
 }
@@ -774,8 +759,8 @@ sub rewrite_keyword_syntax_use {
   my $list = $arg2;
 
   #print STDERR "$arg1$list\n";
-  $list =~ s/\$?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
-  $list =~ s/\$?($id)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\#?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\#?($id)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
   $list =~ s/\)$/, nullptr\)/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";
@@ -874,12 +859,14 @@ sub rewrite_export_method {
 }
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics) = @_;
-  &encode($filestr_ref);
+  &encode_cpp($filestr_ref);
+  &encode_strings($filestr_ref);
+  &encode_comments($filestr_ref);
 
   &rewrite_strswitch($filestr_ref);
   &rewrite_case_with_string($filestr_ref);
 
-  $$filestr_ref =~ s/\$([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading $, rnielsen
+  $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading $, rnielsen
   &rewrite_keywords($filestr_ref);
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);
@@ -953,7 +940,9 @@ sub convert_dk_to_cc {
   $$filestr_ref =~ s|;;|;|g;
 
   &rewrite_includes($filestr_ref);
-  &decode($filestr_ref);
+  &decode_comments($filestr_ref);
+  &decode_strings($filestr_ref);
+  &decode_cpp($filestr_ref);
   return $filestr_ref;
 }
 sub rewrite_multi_char_consts {

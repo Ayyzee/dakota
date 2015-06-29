@@ -52,7 +52,7 @@ klass sorted-set
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk::init(o, $items : cast(object-t[]){ o1, o2, nullptr });
+  // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t self,
                        uint32-t          initial-capacity : gbl-default-capacity,
@@ -130,7 +130,7 @@ klass sorted-set
   {
     object-t result = dk::at(self, object1, nullptr);
     if (nullptr == result)
-      throw make(exception::klass, $message : "oops");
+      throw make(exception::klass, #message : "oops");
     return result;
   }
 
@@ -199,7 +199,7 @@ klass sorted-set
 
   method object-t forward-iterator(object-t self)
   {
-    object-t forward-iterator = make(sorted-set-forward-iterator::klass, $sorted-set : self);
+    object-t forward-iterator = make(sorted-set-forward-iterator::klass, #sorted-set : self);
     return forward-iterator;
   }
 
@@ -258,7 +258,7 @@ klass sorted-set-forward-iterator
 
     if (self.iterator-state != ss->iterator-state) {
       fprintf(stderr, "%i == %i\n", self.iterator-state, ss->iterator-state);
-      throw make(exception::klass, $message : "oops");
+      throw make(exception::klass, #message : "oops");
     }
     return;
   }

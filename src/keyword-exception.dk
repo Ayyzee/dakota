@@ -57,19 +57,19 @@ klass keyword-exception
     if (nullptr != self.object)
       fprintf(stderr, " object=%p", cast(void*)(self.object));
     else
-      fprintf(stderr, " object=%s", $nullptr);
+      fprintf(stderr, " object=%s", #nullptr);
 
     // signature
     if (nullptr != self.signature)
       fprintf(stderr, ", signature=%p \"%s(%s)\"", cast(void*)(self.signature), self.signature->name, self.signature->parameter-types);
     else
-      fprintf(stderr, ", signature=%s", $nullptr);
+      fprintf(stderr, ", signature=%s", #nullptr);
 
     // keyword
     if (nullptr != self.keyword)
-      fprintf(stderr, ", keyword=%p $%s", cast(void*)(self.keyword), self.keyword);
+      fprintf(stderr, ", keyword=%p #%s", cast(void*)(self.keyword), self.keyword);
     else
-      fprintf(stderr, ", keyword=%s", $nullptr);
+      fprintf(stderr, ", keyword=%s", #nullptr);
 
     fprintf(stderr, " }\n");
 
@@ -86,7 +86,7 @@ klass keyword-exception
     if (dk::instance?(self.object, klass::klass)) {
       symbol-t name;
       if (nullptr == (name = dk::name(self.object)))
-        name = $nullptr;
+        name = #nullptr;
       dk::print-format(out, ": %p <%s>", self.object, name);
     }
     else-if (nullptr != self.object)

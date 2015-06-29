@@ -26,7 +26,7 @@ klass sorted-table
 
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name($pair); // hackhack
+    dk-klass-for-name(#pair); // hackhack
     return kls;
   }
 
@@ -41,7 +41,7 @@ klass sorted-table
                        object-t          elements : nullptr,
                        object-t*         items :    nullptr)
   {
-    self = dk::init(super, $equal? : equal?, $compare : compare, $elements : elements, $items : items);
+    self = dk::init(super, #equal? : equal?, #compare : compare, #elements : elements, #items : items);
     return self;
   }
 }

@@ -57,7 +57,7 @@ klass output-stream
       str128-t buf = "";
       strerror-r(errno, buf, sizeof(buf));
       fprintf(stderr, "%s", buf);
-      throw make(exception::klass, $message : "oops");
+      throw make(exception::klass, #message : "oops");
     }
     return self;
   }

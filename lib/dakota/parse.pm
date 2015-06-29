@@ -2045,6 +2045,7 @@ sub rep_tree_from_dk_path {
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &dakota::util::filestr_from_file($gbl_filename);
+  &encode_cpp(\$_);
 
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
@@ -2058,11 +2059,11 @@ sub rep_tree_from_dk_path {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\$\'(.*?)\'\s*$colon/g) {
+  while (m/\#\'(.*?)\'\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\$\'(.*?)\'/g) {
+  while (m/\#\'(.*?)\'/g) {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
@@ -2070,15 +2071,15 @@ sub rep_tree_from_dk_path {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/case\s*\$(.*)\s*:/g) {
+  while (m/case\s*\#(.*)\s*:/g) {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\$\"(.*?)\"/g) {
+  while (m/\#\"(.*?)\"/g) {
     &add_string($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\$($mid)/g) {
+  while (m/\#($mid)/g) {
     &add_symbol($gbl_root, [$1]);
   }
   $gbl_sst = &sst::make($_, $gbl_filename);
@@ -2091,6 +2092,7 @@ sub rep_tree_from_dk_path {
   my $result = &parse_root($gbl_sst_cursor);
   &add_object_methods_decls($result);
   #print STDERR &Dumper($result);
+  &decode_cpp(\$_);
   return $result;
 }
 sub start {

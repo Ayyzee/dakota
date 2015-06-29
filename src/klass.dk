@@ -77,7 +77,7 @@ namespace klass
 
 noreturn export void dkt-null-method(object-t object, ...)
 {
-  throw make(no-such-method-exception::klass, $object : object, $kls : dkt-klass(object));
+  throw make(no-such-method-exception::klass, #object : object, #kls : dkt-klass(object));
 }
 
 klass selector-pair
@@ -123,7 +123,7 @@ static sorted-array-t   gbl-selectors-table = { gbl-selectors,
 noexport symbol-t
 default-superklass-name()
 {
-  return $object;
+  return #object;
 }
 static object-t
 default-superklass()
@@ -220,14 +220,14 @@ uint32-from-info(named-info-t* info, symbol-t key)
 noexport uint32-t
 size-from-info(named-info-t* info)
 {
-  uint32-t size = uint32-from-info(info, $size);
+  uint32-t size = uint32-from-info(info, #size);
   return size;
 }
 
 static object-t
 superklass-from-info(named-info-t* info)
 {
-  object-t superklass = cast(object-t)ptr-from-info(info, $superklass);
+  object-t superklass = cast(object-t)ptr-from-info(info, #superklass);
   return superklass;
 }
 
@@ -242,9 +242,9 @@ superklass-from-info(named-info-t* info, symbol-t name)
 noexport symbol-t
 superklass-name-from-info(named-info-t* info)
 {
-  symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, $superklass-name);
+  symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
 
-  if (nullptr == superklass-name && $object != name-from-info(info))
+  if (nullptr == superklass-name && #object != name-from-info(info))
     superklass-name = default-superklass-name();
   return superklass-name;
 }
@@ -275,14 +275,14 @@ superklass-name-from-info(named-info-t* info, symbol-t name)
 noexport symbol-t
 name-from-info(named-info-t* info)
 {
-  symbol-t name = cast(symbol-t)ptr-from-info(info, $name);
+  symbol-t name = cast(symbol-t)ptr-from-info(info, #name);
   return name;
 }
 
 noexport symbol-t
 klass-name-from-info(named-info-t* info)
 {
-  symbol-t klass-name = cast(symbol-t)ptr-from-info(info, $klass-name);
+  symbol-t klass-name = cast(symbol-t)ptr-from-info(info, #klass-name);
 
   if (nullptr == klass-name)
     klass-name = default-klass-name();
@@ -307,7 +307,7 @@ offset-from-info(named-info-t* info)
   uint32-t result;
 
   symbol-t name = name-from-info(info);
-  if (0 == symbol::compare($object, name))
+  if (0 == symbol::compare(#object, name))
   { // klass is "object"
     result = 0;
   } else {
@@ -331,7 +331,7 @@ load-traits(symbol-t const* traits)
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* info = info-for-name(trait-name);
-      load-traits(cast(symbol-t const*)named-info::at(info, $traits));
+      load-traits(cast(symbol-t const*)named-info::at(info, #traits));
     }
   }
   return;
@@ -459,7 +459,7 @@ klass klass
 
   //      method va-method-t va-method-for-selector(object-t self, selector-t selector)
   //      {
-  //        throw make(exception::klass, $message : "not yet implemented");
+  //        throw make(exception::klass, #message : "not yet implemented");
   //        // return nullptr
   //      }
 
@@ -496,9 +496,9 @@ klass klass
 
     // name
     if (nullptr != self.name)
-      fprintf(stderr, " name=%p $%s", cast(void*)(self.name), self.name);
+      fprintf(stderr, " name=%p #%s", cast(void*)(self.name), self.name);
     else
-      fprintf(stderr, " name=%s", $nullptr);
+      fprintf(stderr, " name=%s", #nullptr);
 
     // superklass
     if (nullptr != self.superklass) {
@@ -509,12 +509,12 @@ klass klass
         fprintf(stderr, ", superklass=%p %s", cast(void*)(self.superklass), superklass-name);
       } else {
         if (nullptr == (superklass-name = name(self.superklass)))
-          superklass-name = $nullptr;
+          superklass-name = #nullptr;
 
         fprintf(stderr, ", superklass=%p <%s>", cast(void*)(self.superklass), superklass-name);
       }
     } else {
-      fprintf(stderr, ", superklass=%s", $nullptr);
+      fprintf(stderr, ", superklass=%s", #nullptr);
     }
 
     // size
@@ -525,14 +525,14 @@ klass klass
     // traits
     fprintf(stderr, ", traits=[");
     {
-      symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, $traits);
+      symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, #traits);
       if (nullptr != traits) {
         fprintf(stderr, " ");
         str-t delim = "";
         uint32-t i = 0;
         symbol-t trait-name;
         while (nullptr != (trait-name = traits[i++])) {
-          fprintf(stderr, "%s$%s", delim, trait-name);
+          fprintf(stderr, "%s#%s", delim, trait-name);
           delim = ", ";
         }
         fprintf(stderr, " ");
@@ -554,7 +554,7 @@ klass klass
   method object-t traits(object-t self)
   {
     object-t seq = make(vector::klass);
-    symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, $traits);
+    symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, #traits);
     
     if (nullptr != traits) {
       uint32-t i = 0;
@@ -656,10 +656,10 @@ klass klass
       uint32-t pos = length;
       while (pos) {
         named-info-t* info = info-for-name(traits[pos - 1]);
-        symbol-t const* used-traits = cast(symbol-t const*)named-info::at(info, $traits);
+        symbol-t const* used-traits = cast(symbol-t const*)named-info::at(info, #traits);
         add-traits(self, used-traits);
-        add-methods(self, info, $method-signatures, $method-addresses);
-        add-methods(self, info, $exported-method-signatures, $exported-method-addresses);
+        add-methods(self, info, #method-signatures, #method-addresses);
+        add-methods(self, info, #exported-method-signatures, #exported-method-addresses);
         pos--;
       }
     }
@@ -675,10 +675,10 @@ klass klass
         named-info-t* info = info-for-name(trait-name);
 
         if (nullptr != info) {
-          method-t trait-initialize = cast(method-t)named-info::at(info, $initialize);
+          method-t trait-initialize = cast(method-t)named-info::at(info, #initialize);
           if (nullptr != trait-initialize) {
-            symbol-t klass-name = cast(symbol-t)named-info::at(self.info-slots, $name);
-            symbol-t file =       cast(symbol-t)named-info::at(self.info-slots, $file);
+            symbol-t klass-name = cast(symbol-t)named-info::at(self.info-slots, #name);
+            symbol-t file =       cast(symbol-t)named-info::at(self.info-slots, #file);
             DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
                                   "initialize", trait-name, "klass", klass-name, file);
             self = trait-initialize(self);
@@ -699,7 +699,7 @@ klass klass
   method object-t behavior(object-t self)
   {
     if (nullptr == self.behavior) {
-      self.behavior = make(bit-vector::klass, $initial-capacity : self.methods.count);
+      self.behavior = make(bit-vector::klass, #initial-capacity : self.methods.count);
 
       for (uint32-t index = 0; index < self.methods.count; index++)
         if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
@@ -743,7 +743,7 @@ klass klass
     named-info::sort(info-slots);
     self.info-slots = info-slots;
     symbol-t name = name-from-info(self.info-slots);
-    assert($trait != cast(symbol-t)named-info::at(self.info-slots, $type));
+    assert(#trait != cast(symbol-t)named-info::at(self.info-slots, #type));
     self.name = name;
 //     fprintf(stderr, "%p: { name=%s }\n", cast(void*)(self), self.name);
     uint32-t size = size-from-info(self.info-slots);
@@ -760,7 +760,7 @@ klass klass
         self.superklass = default-superklass();
     }
     self.behavior = nullptr; // hackhack
-    symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, $traits);
+    symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, #traits);
 
     if (nullptr != traits)
       load-traits(traits);
@@ -769,8 +769,8 @@ klass klass
     alloc-methods(self, gbl-selectors-table.count);
     init-methods(self);
     add-traits(self, traits);
-    add-methods(self, self.info-slots, $method-signatures, $method-addresses);
-    add-methods(self, self.info-slots, $exported-method-signatures, $exported-method-addresses);
+    add-methods(self, self.info-slots, #method-signatures, #method-addresses);
+    add-methods(self, self.info-slots, #exported-method-signatures, #exported-method-addresses);
 
     if (nullptr != name) {
       assoc-node-t* imported-klasses = imported-klasses-for-klass(name);
@@ -785,7 +785,7 @@ klass klass
       dkt-log(dkt::k-log-warning, "nullptr klass name");
     if (nullptr != traits)
       self = traits-initialize(self, traits);
-    method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info-slots, $method-aliases);
+    method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info-slots, #method-aliases);
     if (nullptr != method-aliases) {
       uint32-t i = 0;
       signature-t const* method-signature;
@@ -799,8 +799,8 @@ klass klass
         i++;
       }
     }
-    method-t klass-initialize = cast(method-t)named-info::at(self.info-slots, $initialize);
-    symbol-t file =             cast(symbol-t)named-info::at(self.info-slots, $file);
+    method-t klass-initialize = cast(method-t)named-info::at(self.info-slots, #initialize);
+    symbol-t file =             cast(symbol-t)named-info::at(self.info-slots, #file);
     if (nullptr != klass-initialize) {
       DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                             "initialize", "klass", name, file);

@@ -152,6 +152,7 @@ sub sst::make {
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
   #print STDERR $filestr;
+  &encode_cpp(\$filestr);
   local $_ = $filestr;
 
   my $sst = {
@@ -168,20 +169,19 @@ sub sst::make {
   }
   while (1) {
     if (0) {}
-    elsif (m|\G(^ *# *[a-z]+.*?\n)|gcm)   { &sst::add_cpp_directive($sst, $1); }
+    elsif (m|\G(\s*\@\@\@.*?\n)|gcs)      { } # eat encoded cpp directives
     elsif (m|\G(\s+)|gc)                  { &sst::add_comment($sst, $1); }
     elsif (m|\G(//.*?\n)|gcs)             { &sst::add_comment($sst, $1); }
     elsif (m|\G(/\*.*?\*/)|gcs)           { &sst::add_comment($sst, $1); }
     elsif (m/\G(include)(\s*)(<$h+>)/gc)  { &sst::add_tokens3($sst, $1, $2, $3); }
     elsif (m/\G(include)(\s*)($dqstr)/gc) { &sst::add_tokens3($sst, $1, $2, $3); }
-    elsif (m|\G(\$)($mid)|gc)             { &sst::add_token($sst, "$1$2"); }
-    elsif (m|\G(\$)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
+    elsif (m|\G(\#)($mid)|gc)             { &sst::add_token($sst, "$1$2"); } # same as rewrite_symbols() in rewrite.pm
+    elsif (m|\G(\#)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
     elsif (m|\G($mid)|gc)                 { &sst::add_token($sst, $1); }
     elsif (m|\G(\?)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
-    elsif (m/\G(\$(\(|\{|\[))/gc)         { &sst::add_token($sst, $1); }
+    elsif (m/\G(\#(\(|\{|\[))/gc)         { &sst::add_token($sst, $1); }
     elsif (m|\G($id)|gc)                  { &sst::add_token($sst, $1); }
     elsif (m|\G(\d+)|gc)                  { &sst::add_token($sst, $1); }
-    elsif (m|\G(=>)|gc)                   { &sst::add_token($sst, $1); } # use: [ 128 ]
     elsif (m|\G(->)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(<<)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(>>)|gc)                   { &sst::add_token($sst, $1); }
@@ -202,6 +202,7 @@ sub sst::make {
   delete $$sst{'line'};
   delete $$sst{'prev-line'};
   #print STDERR &Dumper($sst);
+  &decode_cpp(\$filestr);
   return $sst;
 }
 sub sst::changes {

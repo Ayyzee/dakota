@@ -101,7 +101,7 @@ klass object
   method object-t copy(object-t self)
   {
     USE(self);
-    throw make(exception::klass, $message : "not yet implemented");
+    throw make(exception::klass, #message : "not yet implemented");
     return nullptr;
   }
 
@@ -146,7 +146,7 @@ klass object
 
   method object-t dump(object-t self)
   {
-    symbol-t klass-name = $nullptr;
+    symbol-t klass-name = #nullptr;
 
     // klass
     if (nullptr != dkt-klass(self) && nullptr != dkt-name(dkt-klass(self)))
@@ -154,7 +154,7 @@ klass object
     if (nullptr != dkt-klass(self))
       fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(void*)(self), cast(void*)(self), cast(void*)dkt-klass(self), klass-name);
     else
-      fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), $nullptr);
+      fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), #nullptr);
 
 //     if (nullptr != dkt-klass(self) && self != dkt-klass(self))
 //       dk::dump(dkt-klass(self));

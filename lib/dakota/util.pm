@@ -47,8 +47,11 @@ our @EXPORT= qw(
                  add_first
                  add_last
                  canon_path
+                 cpp_directives
                  deep_copy
                  dqstr_regex
+                 encode_cpp
+                 decode_cpp
                  filestr_from_file
                  first
                  flatten
@@ -74,6 +77,43 @@ our @EXPORT= qw(
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
 
+my $directives = {
+  'define' => '\w+',
+  'elif' => '(\w+|\d+|!|\()',
+  'else' => undef,
+  'endif' => undef,
+  'error' => '".*?"',
+  'if' => '(\w+|\d+|!|\()',
+  'ifdef' => '\w+',
+  'ifndef' => '\w+',
+  'include' => '(".+?"|<.+?>)',,
+  'line' => '\d+',
+  'pragma' => undef,
+  'undef' => '\w+',
+  'warning' => '".*?"',
+};
+sub encode_cpp {
+  my ($filestr_ref) = @_;
+  foreach my $directive (keys %$directives) {
+    my $next_tkn_regex = $$directives{$directive};
+    if ($next_tkn_regex) {
+      $$filestr_ref =~ s/^(\s*)#(\s*$directive\s+$next_tkn_regex.*)$/$1\@\@\@$2/gm;
+    } else {
+      $$filestr_ref =~ s/^(\s*)#(\s*$directive\b.*)$/$1\@\@\@$2/gm;
+    }
+  }
+}
+sub decode_cpp {
+  my ($filestr_ref) = @_;
+  foreach my $directive (keys %$directives) {
+    my $next_tkn_regex = $$directives{$directive};
+    if ($next_tkn_regex) {
+      $$filestr_ref =~ s/^(\s*)\@\@\@(\s*$directive\s+$next_tkn_regex.*)$/$1#$2/gm;
+    } else {
+      $$filestr_ref =~ s/^(\s*)\@\@\@(\s*$directive\b.*)$/$1#$2/gm;
+    }
+  }
+}
 sub kw_args_placeholders {
   return { 'default' => '{}', 'nodefault' => '{~}' };
 }

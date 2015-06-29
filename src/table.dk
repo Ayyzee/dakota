@@ -59,7 +59,7 @@ trait table
 
   method object-t elements(object-t self)
   {
-    object-t result = make(vector::klass, $size : dk::size(self));
+    object-t result = make(vector::klass, #size : dk::size(self));
     for (pair-t* pair in self)
       dk::add-last(result, pair->last);
     return result;

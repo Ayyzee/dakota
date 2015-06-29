@@ -34,7 +34,7 @@ klass autorelease-pool-klass
 
   object-t initialize(object-t kls)
   {
-    dk-klass-for-name($deque); // hackhack
+    dk-klass-for-name(#deque); // hackhack
     return kls;
   }
 
@@ -47,7 +47,7 @@ klass autorelease-pool-klass
                        named-info::slots-t* info-slots : nullptr,
                        object-t                 info :      nullptr)
   {
-    self = dk::init(super, $info-slots : info-slots, $info : info);
+    self = dk::init(super, #info-slots : info-slots, #info : info);
     self.pools = make(deque::klass);
     return self;
   }

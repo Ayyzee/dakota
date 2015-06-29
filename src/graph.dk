@@ -82,13 +82,13 @@ klass graph
 
   slots
   {
-    symbol-t type;  // $graph xor $digraph
+    symbol-t type;  // #graph xor #digraph
     str-t    name;  // may be nullptr
     object-t stmts; // <sequence>
   }
 
   method object-t init(object-t self,
-                       symbol-t type :  $graph,
+                       symbol-t type :  #graph,
                        str-t    name :  nullptr,
                        object-t attrs : null)
   {

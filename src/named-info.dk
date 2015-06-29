@@ -41,7 +41,7 @@ klass named-info
   method int32-t check(slots-t* s)
   {
     for (uint32-t i = 0; i < s->count; i++) {
-      // need to add test for $name (since its required)
+      // need to add test for #name (since its required)
 
       property-t element = s->elements[i];
       property::check(&element);
@@ -89,15 +89,15 @@ klass named-info
       for (uint32-t i = 0; i < current->count; i++) {
         symbol-t key = current->elements[i].key;
         uintptr-t element = current->elements[i].element;
-        printf("  $%s : 0x%0*" PRIxPTR,
+        printf("  #%s : 0x%0*" PRIxPTR,
                key, PRIxPTR-WIDTH, element);
 
         if (0) {}
-        else-if (0 == symbol::compare($file, key))
+        else-if (0 == symbol::compare(#file, key))
               printf("  \"%s\",", cast(str-t)(element));
-        else-if (0 == symbol::compare($name,      key) ||
-                 0 == symbol::compare($construct, key))
-              printf("  $%s,",    cast(symbol-t)(element));
+        else-if (0 == symbol::compare(#name,      key) ||
+                 0 == symbol::compare(#construct, key))
+              printf("  #%s,",    cast(symbol-t)(element));
         printf("\n");
       }
       printf("},\n");
@@ -108,8 +108,8 @@ klass named-info
 
   method int-t compare(slots-t* s, slots-t* other-s)
   {
-    symbol-t s-name = cast(symbol-t)at(s, $name);
-    symbol-t other-name = cast(symbol-t)at(other-s, $name);
+    symbol-t s-name = cast(symbol-t)at(s, #name);
+    symbol-t other-name = cast(symbol-t)at(other-s, #name);
     //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
     int-t result = symbol::compare(s-name, other-name);
     result = dkt-normalize-compare-result(result);
@@ -149,7 +149,7 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
   property-t* props = cast(property-t*)dkt::alloc(sizeof(property-t) * props-capacity);
   uint32-t count = 0;
 
-  props[count].key = $name;
+  props[count].key = #name;
   props[count].element = cast(uintptr-t)(name);
   count++;
 

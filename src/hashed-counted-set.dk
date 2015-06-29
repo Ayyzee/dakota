@@ -27,7 +27,7 @@ klass hashed-counted-set
                        equal-predicate-t equal? : cast(equal-predicate-t)dk::method-for-selector(pair::klass, selector(equal?(object-t, object-t))),
                        hash-t            hash :   cast(hash-t           )dk::method-for-selector(pair::klass, selector(hash(object-t))))
   {
-    self = dk::init(super, $equal? : equal?, $hash : hash);
+    self = dk::init(super, #equal? : equal?, #hash : hash);
     return self;
   }
 }

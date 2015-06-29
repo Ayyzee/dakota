@@ -516,19 +516,19 @@ sub generate_defn_footer {
   #$col = &colin($col);
 
   my $info_tbl = {
-                  "\$signatures-va" => 'signatures-va',
-                  "\$signatures" => 'signatures',
-                  "\$selectors-va" => 'selectors-va',
-                  "\$selectors" => 'selectors',
-                  "\$imported-klasses-names" => 'imported-klasses-names',
-                  "\$imported-klasses" => 'imported-klasses',
-                  "\$klass-defns" => 'klass-defns',
-                  "\$interposers" => 'interposers',
-                  "\$date" => '__DATE__',
-                  "\$time" => '__TIME__',
-                  "\$file" => '__FILE__',
-                  "\$construct" => 'DKT-CONSTRUCT',
-                  "\$name" => 'DKT-NAME',
+                  "\#signatures-va" => 'signatures-va',
+                  "\#signatures" => 'signatures',
+                  "\#selectors-va" => 'selectors-va',
+                  "\#selectors" => 'selectors',
+                  "\#imported-klasses-names" => 'imported-klasses-names',
+                  "\#imported-klasses" => 'imported-klasses',
+                  "\#klass-defns" => 'klass-defns',
+                  "\#interposers" => 'interposers',
+                  "\#date" => '__DATE__',
+                  "\#time" => '__TIME__',
+                  "\#file" => '__FILE__',
+                  "\#construct" => 'DKT-CONSTRUCT',
+                  "\#name" => 'DKT-NAME',
                  };
   $rt_cc_str .= "\n";
   #my $col;
@@ -1429,7 +1429,7 @@ sub generics::generate_generic_defn {
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
-    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \$object $colon object, \$kls $colon dkt-klass(object), \$signature $colon signature));\n";
+    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon object, \#kls $colon dkt-klass(object), \#signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
@@ -1513,7 +1513,7 @@ sub generics::generate_super_generic_defn {
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
-    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \$object $colon arg0.self, \$superkls $colon dkt-superklass(arg0.klass), \$signature $colon signature));\n";
+    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon arg0.self, \#superkls $colon dkt-superklass(arg0.klass), \#signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
@@ -1974,7 +1974,7 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }" . &ann(__LINE__) . "\n";
   } elsif (&is_rt_defn()) {
     #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = \$@$klass_path; }" . &ann(__LINE__) . "\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = \#@$klass_path; }" . &ann(__LINE__) . "\n";
   }
 
   if ('klass' eq $klass_type) {
@@ -2935,23 +2935,23 @@ sub exports {
 
       while (my ($key, $element) = each (%$exported_methods)) {
         my ($lhs, $rhs) = &export_pair($klass_name, $element);
-        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
+        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
       while (my ($key, $element) = each (%$exported_slots_methods)) {
         my ($lhs, $rhs) = &export_pair($klass_name, $element);
-        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
+        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
 
       if (&is_exported($klass_scope)) {
-        my $lhs = "\$$klass_name";
+        my $lhs = "\#$klass_name";
         my $rhs = 1;
-        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
+        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
 
       if (&has_exported_slots($klass_scope)) {
-        my $lhs = "\$$klass_name\::slots-t";
+        my $lhs = "\#$klass_name\::slots-t";
         my $rhs = 1;
-        $$exports{"\$$$klass_scope{'module'}"}{$lhs} = $rhs;
+        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
       }
     }
   }
@@ -3251,9 +3251,9 @@ sub dk::generate_cc_footer_klass {
       foreach my $slot_info (@{$$klass_scope{'slots'}{'info'}}) {
         my ($slot_name, $slot_value) = %$slot_info;
         my $tbl = {};
-        $$tbl{'$name'} = "\$$slot_name";
+        $$tbl{'#name'} = "\#$slot_name";
         if (defined $slot_value) {
-          $$tbl{'$expr'} = "\"$slot_value\"";
+          $$tbl{'#expr'} = "\"$slot_value\"";
         }
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
         $$scratch_str_ref .=
@@ -3271,13 +3271,13 @@ sub dk::generate_cc_footer_klass {
       foreach my $slot_info (@{$$klass_scope{'slots'}{'info'}}) {
         my ($slot_name, $slot_type) = %$slot_info;
         my $tbl = {};
-        $$tbl{'$name'} = "\$$slot_name";
+        $$tbl{'#name'} = "\#$slot_name";
 
         if ('struct' eq $$klass_scope{'slots'}{'cat'}) {
-          $$tbl{'$offset'} = "offsetof(slots-t, $slot_name)";
+          $$tbl{'#offset'} = "offsetof(slots-t, $slot_name)";
         }
-        $$tbl{'$size'} = "sizeof((cast(slots-t*)nullptr)->$slot_name)";
-        $$tbl{'$type'} = "\"$slot_type\"";
+        $$tbl{'#size'} = "sizeof((cast(slots-t*)nullptr)->$slot_name)";
+        $$tbl{'#type'} = "\"$slot_type\"";
 
         my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
         $$scratch_str_ref .=
@@ -3300,7 +3300,7 @@ sub dk::generate_cc_footer_klass {
       my $info = $$enum{'info'};
       foreach my $pair (@$info) {
         my ($name, $value) = %$pair;
-        $$scratch_str_ref .= $col . "{ \$$name, \"$value\" },\n";
+        $$scratch_str_ref .= $col . "{ \#$name, \"$value\" },\n";
       }
       $$scratch_str_ref .= $col . "{ nullptr, nullptr }\n";
       $col = &colout($col);
@@ -3334,102 +3334,102 @@ sub dk::generate_cc_footer_klass {
       my $value = "@{$$const{'rhs'}}";
       $" = $delim;
       $value =~ s/"/\\"/g;
-      $$scratch_str_ref .= $col . "{ \$$$const{'name'}, \"$$const{'type'}\", \"$value\" },\n";
+      $$scratch_str_ref .= $col . "{ \#$$const{'name'}, \"$$const{'type'}\", \"$value\" },\n";
     }
     $$scratch_str_ref .= $col . "{ nullptr, nullptr, nullptr }\n";
     $col = &colout($col);
     $$scratch_str_ref .= $col . "}; }\n";
   }
   my $symbol = &path::string($klass_name);
-  $$tbbl{'$name'} = '__klass__';
-  $$tbbl{'$construct'} = "\$$klass_type";
+  $$tbbl{'#name'} = '__klass__';
+  $$tbbl{'#construct'} = "\#$klass_type";
 
   if (&has_slots_type($klass_scope)) {
     my $slots_type_ident = &make_ident_symbol_scalar($$klass_scope{'slots'}{'type'});
     my $type_symbol = $$klass_scope{'slots'}{'type'};
-    $$tbbl{'$slots-type'} = "\"$type_symbol\"";
+    $$tbbl{'#slots-type'} = "\"$type_symbol\"";
   } elsif (&has_slots_info($klass_scope)) {
     my $cat = $$klass_scope{'slots'}{'cat'};
-    $$tbbl{'$cat'} = "\$$cat";
-    $$tbbl{'$slots-info'} = '__slots-info';
+    $$tbbl{'#cat'} = "\#$cat";
+    $$tbbl{'#slots-info'} = '__slots-info';
   }
   if ($$klass_scope{'slots'}{'enum-base'}) {
-    $$tbbl{'$enum-base'} = "\"$$klass_scope{'slots'}{'enum-base'}\"";
+    $$tbbl{'#enum-base'} = "\"$$klass_scope{'slots'}{'enum-base'}\"";
   }
   if (&has_slots_type($klass_scope) || &has_slots_info($klass_scope)) {
-    $$tbbl{'$size'} = 'sizeof(slots-t)';
+    $$tbbl{'#size'} = 'sizeof(slots-t)';
   }
   if (&has_enum_info($klass_scope)) {
-    $$tbbl{'$enum-info'} = '__enum-info';
+    $$tbbl{'#enum-info'} = '__enum-info';
   }
   if (&has_const_info($klass_scope)) {
-    $$tbbl{'$const-info'} = '__const-info';
+    $$tbbl{'#const-info'} = '__const-info';
   }
   if (@$kw_args_methods) {
-    $$tbbl{'$kw-args-method-signatures'} = '__kw-args-method-signatures';
+    $$tbbl{'#kw-args-method-signatures'} = '__kw-args-method-signatures';
   }
   if (values %{$$klass_scope{'methods'}}) {
-    $$tbbl{'$method-signatures'} = '__method-signatures';
-    $$tbbl{'$method-addresses'}  = '__method-addresses';
+    $$tbbl{'#method-signatures'} = '__method-signatures';
+    $$tbbl{'#method-addresses'}  = '__method-addresses';
   }
   if ($num_method_aliases) {
-    $$tbbl{'$method-aliases'} = '&__method-aliases';
+    $$tbbl{'#method-aliases'} = '&__method-aliases';
   }
   if (values %{$exported_methods ||= []}) {
-    $$tbbl{'$exported-method-signatures'} = '__exported-method-signatures';
-    $$tbbl{'$exported-method-addresses'}  = '__exported-method-addresses';
+    $$tbbl{'#exported-method-signatures'} = '__exported-method-signatures';
+    $$tbbl{'#exported-method-addresses'}  = '__exported-method-addresses';
   }
   if (values %{$exported_slots_methods ||= []}) {
-    $$tbbl{'$exported-slots-method-signatures'} = '__exported-slots-method-signatures';
-    $$tbbl{'$exported-slots-method-addresses'}  = '__exported-slots-method-addresses';
+    $$tbbl{'#exported-slots-method-signatures'} = '__exported-slots-method-signatures';
+    $$tbbl{'#exported-slots-method-addresses'}  = '__exported-slots-method-addresses';
   }
   if (@$va_list_methods) {
-    $$tbbl{'$va-method-signatures'} = '__va-method-signatures';
-    $$tbbl{'$va-method-addresses'}  = '__va-method-addresses';
+    $$tbbl{'#va-method-signatures'} = '__va-method-signatures';
+    $$tbbl{'#va-method-addresses'}  = '__va-method-addresses';
   }
   $token_seq = $$klass_scope{'interpose'};
   if ($token_seq) {
     my $path = $$klass_scope{'interpose'};
-    $$tbbl{'$interpose-name'} = "$path\::__klass__";
+    $$tbbl{'#interpose-name'} = "$path\::__klass__";
   }
   $token_seq = $$klass_scope{'superklass'};
   if ($token_seq) {
     my $path = $$klass_scope{'superklass'};
-    $$tbbl{'$superklass-name'} = "$path\::__klass__";
+    $$tbbl{'#superklass-name'} = "$path\::__klass__";
   }
   $token_seq = $$klass_scope{'klass'};
   if ($token_seq) {
     my $path = $$klass_scope{'klass'};
-    $$tbbl{'$klass-name'} = "$path\::__klass__";
+    $$tbbl{'#klass-name'} = "$path\::__klass__";
   }
   if ($num_traits > 0) {
-    $$tbbl{'$traits'} = '__traits';
+    $$tbbl{'#traits'} = '__traits';
   }
   if ($num_requires > 0) {
-    $$tbbl{'$requires'} = '__requires';
+    $$tbbl{'#requires'} = '__requires';
   }
   if ($num_provides > 0) {
-    $$tbbl{'$provides'} = '__provides';
+    $$tbbl{'#provides'} = '__provides';
   }
   if (&is_exported($klass_scope)) {
-    $$tbbl{'$exported?'} = '1';
+    $$tbbl{'#exported?'} = '1';
   }
   if (&has_exported_slots($klass_scope)) {
-    $$tbbl{'$state-exported?'} = '1';
+    $$tbbl{'#state-exported?'} = '1';
   }
   if (&has_exported_methods($klass_scope)) {
-    $$tbbl{'$behavior-exported?'} = '1';
+    $$tbbl{'#behavior-exported?'} = '1';
   }
   if ($$klass_scope{'has-initialize'}) {
-    $$tbbl{'$initialize'} = 'cast(method-t)initialize';
+    $$tbbl{'#initialize'} = 'cast(method-t)initialize';
   }
   if ($$klass_scope{'has-finalize'}) {
-    $$tbbl{'$finalize'} = 'cast(method-t)finalize';
+    $$tbbl{'#finalize'} = 'cast(method-t)finalize';
   }
   if ($$klass_scope{'module'}) {
-    $$tbbl{'$module'} = "\$$$klass_scope{'module'}";
+    $$tbbl{'#module'} = "\#$$klass_scope{'module'}";
   }
-  $$tbbl{'$file'} = '__FILE__';
+  $$tbbl{'#file'} = '__FILE__';
   $$scratch_str_ref .=
     $col . "$klass_type @$klass_name { " . &generate_property_tbl('__klass-props', $tbbl, &colin($col), $symbols, __LINE__) .
     $col . "}\n";
@@ -3625,7 +3625,7 @@ sub generate_kw_args_method_defn {
     }
     # should do this for other types (char=>int, float=>double, ... ???
     $$scratch_str_ref .=
-      $col . "assert(_keyword_->symbol == \$$kw_arg_name);\n" .
+      $col . "assert(_keyword_->symbol == \#$kw_arg_name);\n" .
       $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));\n" .
       $col . "_state_.$kw_arg_name = true;\n" .
       $col . "break;\n";
@@ -3637,9 +3637,9 @@ sub generate_kw_args_method_defn {
   $col = &colin($col);
   $$scratch_str_ref .=
     $col . "throw make(no-such-keyword-exception::klass,\n" .
-    $col . "           \$object $colon    self,\n" .
-    $col . "           \$signature $colon __method__,\n" .
-    $col . "           \$keyword $colon   _keyword_->symbol);\n";
+    $col . "           \#object $colon    self,\n" .
+    $col . "           \#signature $colon __method__,\n" .
+    $col . "           \#keyword $colon   _keyword_->symbol);\n";
   $col = &colout($col);
   #        $$scratch_str_ref .= $col . "}\n";
   $col = &colout($col);
@@ -3657,9 +3657,9 @@ sub generate_kw_args_method_defn {
     } else {
       $$scratch_str_ref .=
         $col . "throw make(missing-keyword-exception::klass,\n" .
-        $col . "           \$object $colon    self,\n" .
-        $col . "           \$signature $colon __method__,\n" .
-        $col . "           \$keyword $colon   _keyword_->symbol);\n";
+        $col . "           \#object $colon    self,\n" .
+        $col . "           \#signature $colon __method__,\n" .
+        $col . "           \#keyword $colon   _keyword_->symbol);\n";
     }
     $col = &colout($col);
   }
@@ -3971,7 +3971,7 @@ sub generate_property_tbl {
     if ($element =~ /^"(.*)"$/) {
       my $element_in = $1;
       if ($$symbols{$element_in}) {
-        $element = "\$$element_in";
+        $element = "\#$element_in";
       } else {
         $element = "dk-intern($element)";
       }

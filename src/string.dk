@@ -39,7 +39,7 @@ klass string
   //uint32-t size; // sizeof(ptr[0])
 
   method object-t init(object-t self,
-                       symbol-t       encoding : $utf-8,
+                       symbol-t       encoding : #utf-8,
                        str-t bytes :    "",
                        uint32-t       start :    0,
                        uint32-t       length :   cast(uint32-t)safe-strlen(bytes) - start)
@@ -132,11 +132,11 @@ klass string
     return result;
   }
 
-  method object-t append(object-t self, str-t bytes, symbol-t encoding : $utf-8)
+  method object-t append(object-t self, str-t bytes, symbol-t encoding : #utf-8)
   {
     assert(nullptr != bytes);
     assert(nullptr != encoding);
-    assert($utf-8 != encoding);
+    assert(#utf-8 != encoding);
     USE(encoding);
     uint32-t len = cast(uint32-t)safe-strlen(bytes);
     self.len += len;
@@ -167,7 +167,7 @@ klass string
     str-t p2;
 
     object-t kls = dkt-klass(self);
-    object-t delimiter-object = make(kls, $bytes : delimiter);
+    object-t delimiter-object = make(kls, #bytes : delimiter);
 
     // leading 'delimiter'
     if (0 == strncmp(self.ptr, delimiter, delimiter-length)) {
@@ -177,7 +177,7 @@ klass string
 
     // 'part' 'delimiter' pairs
     while (nullptr != (p2 = strstr(p1, delimiter))) {
-      object-t part-object = make(kls, $bytes : cast(str-t)(p1), $length : cast(uint32-t)(p2 - p1));
+      object-t part-object = make(kls, #bytes : cast(str-t)(p1), #length : cast(uint32-t)(p2 - p1));
       dk::add-last(result, part-object);
       dk::add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
@@ -185,7 +185,7 @@ klass string
 
     // trailing 'part'
     if (NUL != *p1) {
-      object-t part-object = make(kls, $bytes : p1);
+      object-t part-object = make(kls, #bytes : p1);
       dk::add-last(result, part-object);
     }
 

@@ -28,7 +28,7 @@ klass sorted-counted-set
                        equal-predicate-t equal? :  cast(equal-predicate-t)dk::method-for-selector(pair::klass, selector(equal?(object-t, object-t))),
                        compare-t         compare : cast(compare-t        )dk::method-for-selector(pair::klass, selector(compare(object-t, object-t))))
   {
-    self = dk::init(super, $equal? : equal?, $compare : compare);
+    self = dk::init(super, #equal? : equal?, #compare : compare);
     return self;
   }
 }
