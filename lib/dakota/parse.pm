@@ -2046,6 +2046,8 @@ sub rep_tree_from_dk_path {
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &dakota::util::filestr_from_file($gbl_filename);
   &encode_cpp(\$_);
+  #&encode_strings(\$_);
+  &encode_comments(\$_);
 
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
@@ -2083,6 +2085,9 @@ sub rep_tree_from_dk_path {
     &add_symbol($gbl_root, [$1]);
   }
   $gbl_sst = &sst::make($_, $gbl_filename);
+  &decode_comments(\$_);
+  #&decode_strings(\$_);
+  &decode_cpp(\$_);
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
   my $scope = $gbl_root;
@@ -2092,7 +2097,6 @@ sub rep_tree_from_dk_path {
   my $result = &parse_root($gbl_sst_cursor);
   &add_object_methods_decls($result);
   #print STDERR &Dumper($result);
-  &decode_cpp(\$_);
   return $result;
 }
 sub start {

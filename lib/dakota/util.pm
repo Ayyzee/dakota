@@ -48,10 +48,14 @@ our @EXPORT= qw(
                  add_last
                  canon_path
                  cpp_directives
+                 decode_comments
+                 decode_cpp
+                 decode_strings
                  deep_copy
                  dqstr_regex
+                 encode_comments
                  encode_cpp
-                 decode_cpp
+                 encode_strings
                  filestr_from_file
                  first
                  flatten
@@ -77,6 +81,56 @@ our @EXPORT= qw(
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
 
+my $ENCODED_COMMENT_BEGIN = '__ENCODED_COMMENT_BEGIN__';
+my $ENCODED_COMMENT_END =   '__ENCODED_COMMENT_END__';
+
+my $ENCODED_STRING_BEGIN = '__ENCODED_STRING_BEGIN__';
+my $ENCODED_STRING_END =   '__ENCODED_STRING_END__';
+
+sub concat3 {
+  my ($s1, $s2, $s3) = @_;
+  return "$s1$s2$s3";
+}
+sub concat5 {
+  my ($s1, $s2, $s3, $s4, $s5) = @_;
+  return "$s1$s2$s3$s4$s5";
+}
+sub encode_strings5 {
+  my ($s1, $s2, $s3, $s4, $s5) = @_;
+  return &concat5($s1, $s2, unpack('H*', $s3), $s4, $s5);
+}
+sub encode_comments3 {
+  my ($s1, $s2, $s3) = @_;
+  return &concat5($s1, $ENCODED_COMMENT_BEGIN, unpack('H*', $s2), $ENCODED_COMMENT_END, $s3);
+}
+sub encode_strings1 {
+  my ($s) = @_;
+  $s =~ m/^(.)(.*?)(.)$/;
+  my ($s1, $s2, $s3) = ($1, $2, $3);
+  return &encode_strings5($s1, $ENCODED_STRING_BEGIN, $s2, $ENCODED_STRING_END, $s3);
+}
+sub encode_comments {
+  my ($filestr_ref) = @_;
+    $$filestr_ref =~ s|(//)(.*?)(\n)|&encode_comments3($1, $2, $3)|egs;
+    $$filestr_ref =~ s|(/\*)(.*?)(\*/)|&encode_comments3($1, $2, $3)|egs;
+}
+sub encode_strings {
+  my ($filestr_ref) = @_;
+  my $dqstr = &dqstr_regex();
+  my $h  = &header_file_regex();
+  my $sqstr = &sqstr_regex();
+  $$filestr_ref =~ s|($dqstr)|&encode_strings1($1)|eg;
+  $$filestr_ref =~ s|(<$h+>)|&encode_strings1($1)|eg;
+  $$filestr_ref =~ s|($sqstr)|&encode_strings1($1)|eg;
+}
+sub decode_comments {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s{$ENCODED_COMMENT_BEGIN([A-Za-z0-9]*)$ENCODED_COMMENT_END}{pack('H*',$1)}gseo;
+}
+sub decode_strings {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s{$ENCODED_STRING_BEGIN([A-Za-z0-9]*)$ENCODED_STRING_END}{pack('H*',$1)}gseo;
+}
 my $directives = {
   'define' => '\w+',
   'elif' => '(\w+|\d+|!|\()',

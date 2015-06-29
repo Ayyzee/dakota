@@ -152,8 +152,10 @@ sub sst::make {
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
   #print STDERR $filestr;
-  &encode_cpp(\$filestr);
   local $_ = $filestr;
+  #&encode_cpp(\$_);
+  #&encode_strings(\$_);
+  #&encode_comments(\$_);
 
   my $sst = {
     'prev-line' => 0,
@@ -202,7 +204,9 @@ sub sst::make {
   delete $$sst{'line'};
   delete $$sst{'prev-line'};
   #print STDERR &Dumper($sst);
-  &decode_cpp(\$filestr);
+  #&decode_comments(\$_);
+  #&decode_strings(\$_);
+  #&decode_cpp(\$_);
   return $sst;
 }
 sub sst::changes {

@@ -51,13 +51,6 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  convert_dk_to_cc
               );
-
-my $ENCODED_COMMENT_BEGIN = '__ENCODED_COMMENT_BEGIN__';
-my $ENCODED_COMMENT_END =   '__ENCODED_COMMENT_END__';
-
-my $ENCODED_STRING_BEGIN = '__ENCODED_STRING_BEGIN__';
-my $ENCODED_STRING_END =   '__ENCODED_STRING_END__';
-
 $main::block = qr{
                    \{
                    (?:
@@ -111,8 +104,6 @@ my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
-my $h  = &header_file_regex();
-my $dqstr = &dqstr_regex();
 my $sqstr = &sqstr_regex();
 my $long_suffix = &long_suffix();
 $main::list_body = qr{
@@ -160,47 +151,6 @@ sub rewrite_compound_literal_cstring_null {
   } else {
     $$filestr_ref =~ s|($name)-null|$1::construct(nullptr, 0)|g;
   }
-}
-sub concat3 {
-  my ($s1, $s2, $s3) = @_;
-  return "$s1$s2$s3";
-}
-sub concat5 {
-  my ($s1, $s2, $s3, $s4, $s5) = @_;
-  return "$s1$s2$s3$s4$s5";
-}
-sub encode_strings5 {
-  my ($s1, $s2, $s3, $s4, $s5) = @_;
-  return &concat5($s1, $s2, unpack('H*', $s3), $s4, $s5);
-}
-sub encode_comments3 {
-  my ($s1, $s2, $s3) = @_;
-  return &concat5($s1, $ENCODED_COMMENT_BEGIN, unpack('H*', $s2), $ENCODED_COMMENT_END, $s3);
-}
-sub encode_strings1 {
-  my ($s) = @_;
-  $s =~ m/^(.)(.*?)(.)$/;
-  my ($s1, $s2, $s3) = ($1, $2, $3);
-  return &encode_strings5($s1, $ENCODED_STRING_BEGIN, $s2, $ENCODED_STRING_END, $s3);
-}
-sub encode_comments {
-  my ($filestr_ref) = @_;
-    $$filestr_ref =~ s|(//)(.*?)(\n)|&encode_comments3($1, $2, $3)|egs;
-    $$filestr_ref =~ s|(/\*)(.*?)(\*/)|&encode_comments3($1, $2, $3)|egs;
-}
-sub encode_strings {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|($dqstr)|&encode_strings1($1)|eg;
-  $$filestr_ref =~ s|(<$h+>)|&encode_strings1($1)|eg;
-  $$filestr_ref =~ s|($sqstr)|&encode_strings1($1)|eg;
-}
-sub decode_comments {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s{$ENCODED_COMMENT_BEGIN([A-Za-z0-9]*)$ENCODED_COMMENT_END}{pack('H*',$1)}gseo;
-}
-sub decode_strings {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s{$ENCODED_STRING_BEGIN([A-Za-z0-9]*)$ENCODED_STRING_END}{pack('H*',$1)}gseo;
 }
 sub nest_namespaces {
   my ($filestr_ref) = @_;
