@@ -211,23 +211,9 @@ sub rewrite_functions_replacement {
   my $result = "$aa$ident$cc";
   return $result;
 }
-sub rewrite_method_names_special_replacement {
-  my ($aa, $bb, $cc) = @_;
-  my $ident = $$long_suffix{$bb};
-  my $result = "$aa$ident$cc";
-  return $result;
-}
 sub rewrite_functions {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(dk::va:: $id)(\?|\!)     /&rewrite_functions_replacement($1, $2, '')/gesx;
-  $$filestr_ref =~ s/(dk::     $id)(\?|\!)     /&rewrite_functions_replacement($1, $2, '')/gesx;
-  $$filestr_ref =~ s/     va::($id)(\?|\!)(\( )/&rewrite_functions_replacement($1, $2, $3)/gesx;
-}
-sub rewrite_method_names_special {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(dk::va:: $id)(\?|\!)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/gex;
-  $$filestr_ref =~ s/(dk::     $id)(\?|\!)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/gex;
-  $$filestr_ref =~ s/(    va:: $id)(\?|\!)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/gex;
+  $$filestr_ref =~ s/((dk::va|dk|va)::)(\?|\!)(\(|\))/&rewrite_functions_replacement($1, $3, $4)/gesx;
 }
 sub rewrite_includes {
   my ($filestr_ref) = @_;
@@ -863,7 +849,6 @@ sub convert_dk_to_cc {
 
   &rewrite_signatures($filestr_ref);
   &rewrite_selectors($filestr_ref);
-  &rewrite_method_names_special($filestr_ref);
   &rewrite_keyword_syntax($filestr_ref, $kw_args_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_args_generics);
