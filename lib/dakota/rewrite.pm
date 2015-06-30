@@ -175,12 +175,6 @@ sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s^\b(klass|trait)(\s+$id\s*\{)^/\*$1\*/ namespace$2^g;
 }
-sub rewrite_selsig_replacement {
-  my ($aa, $bb) = @_;
-  my $ident = $$long_suffix{$bb};
-  my $result = "$aa$ident";
-  return $result;
-}
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
@@ -205,15 +199,35 @@ sub rewrite_selectors {
   $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
   $$filestr_ref =~ s/(?<!$k)(__selector\s*\(.*?)(\()        /$1,$2/gx;
 }
+sub rewrite_selsig_replacement {
+  my ($aa, $bb) = @_;
+  my $ident = $$long_suffix{$bb};
+  my $result = "$aa$ident";
+  return $result;
+}
+sub rewrite_functions_replacement {
+  my ($aa, $bb, $cc) = @_;
+  my $ident = $$long_suffix{$bb};
+  my $result = "$aa$ident$cc";
+  return $result;
+}
 sub rewrite_method_names_special_replacement {
   my ($aa, $bb, $cc) = @_;
   my $ident = $$long_suffix{$bb};
   my $result = "$aa$ident$cc";
   return $result;
 }
+sub rewrite_functions {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/(dk::va:: $id)(\?|\!)     /&rewrite_functions_replacement($1, $2, '')/gesx;
+  $$filestr_ref =~ s/(dk::     $id)(\?|\!)     /&rewrite_functions_replacement($1, $2, '')/gesx;
+  $$filestr_ref =~ s/     va::($id)(\?|\!)(\( )/&rewrite_functions_replacement($1, $2, $3)/gesx;
+}
 sub rewrite_method_names_special {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(::$id)(\?|\!)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/ge; # rnielsen
+  $$filestr_ref =~ s/(dk::va:: $id)(\?|\!)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/gex;
+  $$filestr_ref =~ s/(dk::     $id)(\?|\!)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/gex;
+  $$filestr_ref =~ s/(    va:: $id)(\?|\!)(\),)/&rewrite_method_names_special_replacement($1, $2, $3)/gex;
 }
 sub rewrite_includes {
   my ($filestr_ref) = @_;
@@ -322,17 +336,6 @@ sub vars_from_defn {
     $result .= " static signature-t const* __method__ = dkt-kw-args-signature(va::$name,($params)); USE(__method__);";
   }
   return $result;
-}
-sub rewrite_functions_replacement {
-  my ($aa, $bb, $cc) = @_;
-  my $ident = $$long_suffix{$bb};
-  my $result = "$aa$ident$cc";
-  return $result;
-}
-sub rewrite_functions {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(dk::$id)(\?|\!)    /&rewrite_functions_replacement($1, $2, '')/gesx;
-  $$filestr_ref =~ s/    ($id)(\?|\!)(\()/&rewrite_functions_replacement($1, $2, $3)/gesx;
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
