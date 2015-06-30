@@ -1785,7 +1785,7 @@ sub add_indirect_klasses {
 }
 sub generics::parse {
   my ($parse_tree) = @_;
-  my $klass_names_set = &dk::klass_names_from_file($parse_tree);
+  my $klass_names_set = &dk_klass_names_from_file($parse_tree);
   my $klass_name;
   my $generics;
   my $symbols = {};
@@ -1894,7 +1894,7 @@ sub add_direct_constructs {
     }
   }
 }
-sub dk::klass_names_from_file {
+sub dk_klass_names_from_file {
   my ($file) = @_;
   my $klass_names_set = {};
   while (my ($klass_name, $klass_scope) = each(%{$$file{'klasses'}})) {

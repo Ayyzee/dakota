@@ -301,7 +301,7 @@ sub loop_cc_from_dk {
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my ($dir, $name) = &split_path($input, "\.$id");
-    my $file = &dk::parse("$name.dk");
+    my $file = &dakota::generate::dk_parse("$name.dk");
     #print STDERR "$name.dk\n";
     #print STDERR &Dumper($$file{'klasses'});
     my $directory = '.';
@@ -320,7 +320,7 @@ sub loop_cc_from_dk {
       ($cc_path, $cc_name) = &split_path("$directory/$output_cc", "\.$id");
     }
     &dakota::generate::empty_klass_defns();
-    &dk::generate_dk_cc($name, "$dk_cc_path/$dk_cc_name");
+    &dakota::generate::dk_generate_dk_cc($name, "$dk_cc_path/$dk_cc_name");
     $cc_path =~ s|^\./||;
     $cc_path =~ s|/$||;
 

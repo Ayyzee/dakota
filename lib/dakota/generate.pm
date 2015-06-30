@@ -332,7 +332,7 @@ sub generate_nrt {
       "\n" .
       "#include \"../$name.dk.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
-      &dk::generate_cc_footer($file, $stack = [], $col = '');
+      &dk_generate_cc_footer($file, $stack = [], $col = '');
 
     if (1) { #$ENV{'DKT_DEBUG'}
       &write_to_file_strings($pre_output, [ $str_cc ]);
@@ -483,7 +483,7 @@ sub generate_defn_footer {
              'imported-klasses' => {},
              'klasses' =>          {},
             };
-  &dk::generate_imported_klasses_info($file, $stack, $tbl);
+  &dk_generate_imported_klasses_info($file, $stack, $tbl);
   my $keys_count;
   $keys_count = keys %{$$file{'klasses'}};
   if (0 == $keys_count) {
@@ -510,7 +510,7 @@ sub generate_defn_footer {
     $col = &colout($col);
     $rt_cc_str .= $col . "};\n";
   }
-  $rt_cc_str .= &dk::generate_cc_footer($file, $stack, $col);
+  $rt_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
   #$rt_cc_str .= $col . "extern \"C\"\n";
   #$rt_cc_str .= $col . "{\n";
   #$col = &colin($col);
@@ -1677,7 +1677,7 @@ sub path::string {
 }
 ## exists()  (does this key exist)
 ## defined() (is the value (for this key) non-undef)
-sub dk::parse {
+sub dk_parse {
   my ($dkfile) = @_;            # string.dk
   my $plfile = &dakota::parse::rep_path_from_any_path($dkfile);
   my $file = &dakota::util::scalar_from_file($plfile);
@@ -2957,7 +2957,7 @@ sub exports {
   }
   return $exports;
 }
-sub dk::generate_cc_footer_klass {
+sub dk_generate_cc_footer_klass {
   my ($klass_scope, $klass_name, $col, $klass_type, $symbols) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_cc_footer_klass()\n";
@@ -3690,12 +3690,12 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .= $col . "}}}\n";
   #&path::remove_last($klass_name);
 }
-sub dk::generate_cc_footer {
+sub dk_generate_cc_footer {
   my ($scope, $stack, $col) = @_;
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &dk::generate_kw_args_method_defns($scope, $stack, 'trait', $col);
-  &dk::generate_kw_args_method_defns($scope, $stack, 'klass', $col);
+  &dk_generate_kw_args_method_defns($scope, $stack, 'trait', $col);
+  &dk_generate_kw_args_method_defns($scope, $stack, 'klass', $col);
 
   if (&is_rt_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
@@ -3726,14 +3726,14 @@ sub dk::generate_cc_footer {
   }
   return $$scratch_str_ref;
 }
-sub dk::generate_kw_args_method_defns {
+sub dk_generate_kw_args_method_defns {
   my ($scope, $stack, $klass_type, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
     if ($klass_scope && 0 < keys(%$klass_scope)) { #print STDERR &Dumper($klass_scope);
       &path::add_last($stack, $klass_name);
       if (&is_rt_defn()) {
-        &dk::generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
+        &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
         if (1 || $$klass_scope{'slots-methods'}) {
           # currently no support for va:: methods
@@ -3760,7 +3760,7 @@ sub many_1_to_1_from_1_to_many {
   }
   return $result;
 }
-sub dk::generate_imported_klasses_info {
+sub dk_generate_imported_klasses_info {
   my ($scope, $stack, $tbl) = @_;
   if (defined $$scope{'imported-klasses'}) {
     while (my ($import_string, $seq) = each(%{$$scope{'imported-klasses'}})) {
@@ -4030,7 +4030,7 @@ sub ann {
   }
   return $string;
 }
-sub dk::generate_dk_cc {
+sub dk_generate_dk_cc {
   my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
   my $output = "$path_name.dk.$cc_ext";
