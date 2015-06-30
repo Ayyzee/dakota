@@ -1648,7 +1648,7 @@ sub method {
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       my $block_sst_cursor = &sst_cursor::make($gbl_sst, $open_curley_index, $close_curley_index);
       #&errdump($block_sst_cursor);
-      &add_generics_used($method, $block_sst_cursor);
+     #&add_generics_used($method, $block_sst_cursor);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
       last;
     }
@@ -2088,12 +2088,13 @@ sub rep_tree_from_dk_path {
   &decode_comments(\$_);
   #&decode_strings(\$_);
   &decode_cpp(\$_);
+
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
-  #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
-  my $scope = $gbl_root;
-  &add_generics_used($scope, $gbl_sst_cursor);
-  &add_klasses_used($scope, $gbl_sst_cursor);
+  &add_klasses_used($gbl_root, $gbl_sst_cursor);
+
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
+  &add_generics_used($gbl_root, $gbl_sst_cursor);
+
   my $result = &parse_root($gbl_sst_cursor);
   &add_object_methods_decls($result);
   #print STDERR &Dumper($result);
