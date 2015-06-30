@@ -536,8 +536,7 @@ sub rewrite_creates {
 }
 sub rewrite_supers {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(dk::    $id\s*)\(\s*super\b/$1(super(self, klass)/gx;
-  $$filestr_ref =~ s/(dk::va::$id\s*)\(\s*super\b/$1(super(self, klass)/gx;
+  $$filestr_ref =~ s/((dk|dk::va)::$id\s*)\(\s*super\b/$1(super(self, klass)/gx;
 }
 #sub rewrite_makes
 #{
