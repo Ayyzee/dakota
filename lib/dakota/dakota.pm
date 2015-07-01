@@ -390,9 +390,9 @@ sub start_cmd {
     } else {
       $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'});
     }
-    print "creating $rt_cc" . &pann(__LINE__, __FILE__) . "\n";
+    print "creating $rt_cc" . &pann(__FILE__, __LINE__) . "\n";
   } else {
-    print "creating $$cmd_info{'output'}" . &pann(__LINE__, __FILE__) . "\n";
+    print "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   #if ($$cmd_info{'opts'}{'output'} =~ m/\.rep$/) # this is a real hackhack
@@ -505,9 +505,9 @@ sub gen_rt_o {
   my ($cmd_info) = @_;
   if ($ENV{'DKT_PRECOMPILE'}) {
     my $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
-    print "  creating $rt_cc_path" . &pann(__LINE__, __FILE__) . "\n";
+    print "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
   } else {
-    print "  creating $$cmd_info{'output'}" . &pann(__LINE__, __FILE__) . "\n";
+    print "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
   }
   $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
@@ -531,9 +531,9 @@ sub loop_o_from_dk {
       my $cc_path = &nrt_cc_path_from_dk_path($arg);
       my $o_path = &nrt_o_path_from_dk_path($arg);
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print "  creating $cc_path" . &pann(__LINE__, __FILE__) . "\n";
+        print "  creating $cc_path" . &pann(__FILE__, __LINE__) . "\n";
       } else {
-        print "  creating $o_path" . &pann(__LINE__, __FILE__) . "\n";
+        print "  creating $o_path" . &pann(__FILE__, __LINE__) . "\n";
       }
       if (!$want_separate_rep_pass) {
         my $rep_path = &rep_path_from_any_path($arg);
@@ -783,7 +783,7 @@ sub outfile_from_infiles {
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
           $output = $ENV{'DKT_DIR'} . '/' . $output
         }
-        #print "    creating $output # output" . &pann(__LINE__, __FILE__) . "\n";
+        #print "    creating $output # output" . &pann(__FILE__, __LINE__) . "\n";
 	    }
 
       if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {

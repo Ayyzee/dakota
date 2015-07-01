@@ -171,24 +171,23 @@ sub decode_cpp {
   }
 }
 sub ann {
-  my ($line, $tkn) = @_;
+  my ($file, $line, $msg) = @_;
   my $string = '';
-  if (0) {
-    $string .= " /*$line*/";
-    if ($tkn) {
-      $string .= " /*$tkn*/";
+  if (1) {
+    $file =~ s|^.*/(.+)|$1|;
+    $string = " /* $file:$line:";
+    if ($msg) {
+      $string .= " $msg";
     }
+    $string .= " */";
   }
   return $string;
 }
 sub pann {
-  my ($line, $tkn) = @_;
+  my ($file, $line, $msg) = @_;
   my $string = '';
-  if (0) {
-    $string .= " /*$line*/";
-    if ($tkn) {
-      $string .= " /*$tkn*/";
-    }
+  if (1) {
+    $string = &ann($file, $line, $msg);
   }
   return $string;
 }
