@@ -294,7 +294,7 @@ sub generate_nrt {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # nrt-hh
+    print "    creating $output" . &pann(__LINE__, __FILE__) . "\n"; # nrt-hh
     $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
 
     my $str_hh = &labeled_src_str(undef, "nrt-hh");
@@ -322,7 +322,7 @@ sub generate_nrt {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # nrt-cc
+    print "    creating $output" . &pann(__LINE__, __FILE__) . "\n"; # nrt-cc
     $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
 
     my $str_cc = &labeled_src_str(undef, "nrt-cc");
@@ -364,7 +364,7 @@ sub generate_rt {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # rt-hh
+    print "    creating $output" . &pann(__LINE__, __FILE__) . "\n"; # rt-hh
     $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
 
     my $str_hh = &labeled_src_str(undef, "rt-hh");
@@ -391,7 +391,7 @@ sub generate_rt {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
-    print "    creating $output\n"; # rt-cc
+    print "    creating $output" . &pann(__LINE__, __FILE__) . "\n"; # rt-cc
     $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
 
     my $str_cc = &labeled_src_str(undef, "rt-cc");
@@ -4019,17 +4019,6 @@ sub pad {
   $result_str .= ' ' x $col_num;
   return $result_str;
 }
-sub ann {
-  my ($line, $tkn) = @_;
-  my $string = '';
-  if (1) {
-    $string .= " /*$line*/";
-    if ($tkn) {
-      $string .= " /*$tkn*/";
-    }
-  }
-  return $string;
-}
 sub dk_generate_dk_cc {
   my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
@@ -4039,7 +4028,7 @@ sub dk_generate_dk_cc {
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output
   }
-  print "    creating $output\n"; # user-dk-cc
+  print "    creating $output" . &pann(__LINE__, __FILE__) . "\n"; # user-dk-cc
 
   if (exists $ENV{'DK_NO_LINE'}) {
     &write_to_file_converted_strings("$output", [ $filestr ]);

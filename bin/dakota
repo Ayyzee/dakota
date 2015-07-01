@@ -131,7 +131,7 @@ my $root_cmd = { 'reps' => [],
 # --help
 # --verbose
 
-$$root_cmd{'inputs'} = \@ARGV;
+$$root_cmd{'inputs'} = [map { &canon_path($_) } @ARGV];
 
 if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
   #`dakota --help`;
@@ -163,6 +163,9 @@ if ($$root_cmd{'opts'}{'directory'} &&
       $$root_cmd{'opts'}{'directory'} ne './') {
   chdir $$root_cmd{'opts'}{'directory'};
   $ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
+}
+if ($$root_cmd{'opts'}{'precompile'}) {
+  $ENV{'DKT_PRECOMPILE'} = 1;
 }
 my $result = &dakota::dakota::start_cmd($root_cmd);
 exit $result;

@@ -338,6 +338,11 @@ sub loop_cc_from_dk {
   }
 } # loop_cc_from_dk
 
+sub is_so {
+  my ($name) = @_;
+  my $result = $name =~ m/\.$so_ext$/;
+  return $result;
+}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
@@ -378,7 +383,17 @@ sub start_cmd {
   }
 
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
-  print "creating $$cmd_info{'output'}\n";
+  if ($ENV{'DKT_PRECOMPILE'}) {
+    my $rt_cc;
+    if (&is_so($$cmd_info{'output'})) {
+      $rt_cc = &rt_cc_path_from_so_path($$cmd_info{'output'});
+    } else {
+      $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'});
+    }
+    print "creating $rt_cc" . &pann(__LINE__, __FILE__) . "\n";
+  } else {
+    print "creating $$cmd_info{'output'}" . &pann(__LINE__, __FILE__) . "\n";
+  }
   $cmd_info = &loop_rep_from_so($cmd_info);
   #if ($$cmd_info{'opts'}{'output'} =~ m/\.rep$/) # this is a real hackhack
   #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
@@ -416,18 +431,16 @@ sub start_cmd {
       $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
       &o_from_cc($cmd_info);
     }
-  } else {
-    $$cmd_info{'opts'}{'compiler-flags'} = " -ldl";
-
+  } elsif (!$ENV{'DKT_PRECOMPILE'}) {
     if ($$cmd_info{'opts'}{'shared'}) {
 	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
 	    &so_from_o($cmd_info);
     } elsif ($$cmd_info{'opts'}{'dynamic'}) {
 	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
 	    &dso_from_o($cmd_info);
-    } elsif (!$$cmd_info{'opts'}{'compile'}
-               && !$$cmd_info{'opts'}{'shared'}
-               && !$$cmd_info{'opts'}{'dynamic'}) {
+    } elsif (!$$cmd_info{'opts'}{'compile'} &&
+             !$$cmd_info{'opts'}{'shared'}  &&
+             !$$cmd_info{'opts'}{'dynamic'}) {
 	    &exe_from_o($cmd_info);
     } else {
 	    die __FILE__, ":", __LINE__, ": error:\n";
@@ -475,7 +488,7 @@ sub loop_rep_from_dk {
   }
   if (0 != @$rep_files) {
     my $rep_path;
-    if ($$cmd_info{'output'} =~ /\.$so_ext$/) {
+    if (&is_so($$cmd_info{'output'})) {
       $rep_path = &rep_path_from_so_path($$cmd_info{'output'});
     } else {
       $rep_path = &rep_path_from_any_path($$cmd_info{'output'});
@@ -490,7 +503,12 @@ sub loop_rep_from_dk {
 }
 sub gen_rt_o {
   my ($cmd_info) = @_;
-  print "  creating $$cmd_info{'output'}\n";
+  if ($ENV{'DKT_PRECOMPILE'}) {
+    my $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
+    print "  creating $rt_cc_path" . &pann(__LINE__, __FILE__) . "\n";
+  } else {
+    print "  creating $$cmd_info{'output'}" . &pann(__LINE__, __FILE__) . "\n";
+  }
   $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   if ($dk_construct) {
@@ -510,8 +528,13 @@ sub loop_o_from_dk {
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
           $arg =~ m|\.ctlg$|) {
+      my $cc_path = &nrt_cc_path_from_dk_path($arg);
       my $o_path = &nrt_o_path_from_dk_path($arg);
-      print "  creating $o_path\n";
+      if ($ENV{'DKT_PRECOMPILE'}) {
+        print "  creating $cc_path" . &pann(__LINE__, __FILE__) . "\n";
+      } else {
+        print "  creating $o_path" . &pann(__LINE__, __FILE__) . "\n";
+      }
       if (!$want_separate_rep_pass) {
         my $rep_path = &rep_path_from_any_path($arg);
         my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -520,7 +543,6 @@ sub loop_o_from_dk {
         &rep_from_dk($rep_cmd);
         &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
       }
-      my $cc_path = &nrt_cc_path_from_dk_path($arg);
       my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$cc_cmd{'inputs'} = [ $arg ];
       $$cc_cmd{'output'} = $cc_path;
@@ -530,11 +552,10 @@ sub loop_o_from_dk {
       $$o_cmd{'inputs'} = [ $cc_path ];
       $$o_cmd{'output'} = $o_path;
       delete $$o_cmd{'opts'}{'output'};
-	    if ($$cmd_info{'opts'}{'precompile'}) {
-        $$o_cmd{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
+      if (!$ENV{'DKT_PRECOMPILE'}) {
+        &o_from_cc($o_cmd);
+        &add_last($outfiles, $o_path);
       }
-      &o_from_cc($o_cmd);
-      &add_last($outfiles, $o_path);
     } else {
       &add_last($outfiles, $arg);
     }
@@ -555,7 +576,6 @@ sub cc_from_dk {
 }
 sub o_from_cc {
   my ($cmd_info) = @_;
-  if (!$$cmd_info{'opts'}{'precompile'}) {
     my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$o_cmd{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
@@ -570,13 +590,12 @@ sub o_from_cc {
 	    $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
     }
     &outfile_from_infiles($o_cmd, $should_echo = 1);
-  }
 }
 sub rt_o_from_rep {
   my ($cmd_info) = @_;
   my $rep_path;
   my $cc_path;
-  if ($$cmd_info{'output'} =~ /\.$so_ext$/) {
+  if (&is_so($$cmd_info{'output'})) {
     $rep_path = &rep_path_from_so_path($$cmd_info{'output'});
     $cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
   } else {
@@ -619,12 +638,13 @@ sub rt_o_from_rep {
   if ($$cmd_info{'opts'}{'compiler-flags'}) {
     $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
-  &o_from_cc($o_info);
-  &add_first($$cmd_info{'inputs'}, $o_path);
+  if (!$ENV{'DKT_PRECOMPILE'}) {
+    &o_from_cc($o_info);
+    &add_first($$cmd_info{'inputs'}, $o_path);
+  }
 }
 sub so_from_o {
   my ($cmd_info) = @_;
-  if (!$$cmd_info{'opts'}{'precompile'}) {
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
     my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'});
     $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
@@ -634,11 +654,9 @@ sub so_from_o {
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo;
     &outfile_from_infiles($so_cmd, $should_echo = 1);
-  }
 }
 sub dso_from_o {
   my ($cmd_info) = @_;
-  if (!$$cmd_info{'opts'}{'precompile'}) {
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
     my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'});
     $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
@@ -648,11 +666,9 @@ sub dso_from_o {
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo;
     &outfile_from_infiles($so_cmd, $should_echo = 1);
-  }
 }
 sub exe_from_o {
   my ($cmd_info) = @_;
-  if (!$$cmd_info{'opts'}{'precompile'}) {
     my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
     my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'});
     $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
@@ -662,7 +678,6 @@ sub exe_from_o {
     $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo;
     &outfile_from_infiles($exe_cmd, $should_echo = 1);
-  }
 }
 sub dir_part {
   my ($path) = @_;
@@ -691,7 +706,6 @@ sub exec_cmd {
   if ($global_should_echo || $should_echo) {
     print STDERR "  $cmd_str\n";
   }
-
   if ($ENV{'DKT_FIXUP_STDERR'}) {
     if ($ENV{'DKT_INITIAL_WORKDIR'}) {
       open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl $ENV{'DKT_INITIAL_WORKDIR'}") or die;
@@ -769,7 +783,7 @@ sub outfile_from_infiles {
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
           $output = $ENV{'DKT_DIR'} . '/' . $output
         }
-        #print "    creating $output # output\n";
+        #print "    creating $output # output" . &pann(__LINE__, __FILE__) . "\n";
 	    }
 
       if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {
@@ -818,7 +832,20 @@ sub ctlg_from_so {
 
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
-  $$ctlg_cmd{'inputs'} = $$cmd_info{'inputs'};
+  if ($ENV{'DKT_PRECOMPILE'}) {
+    my $precompile_inputs = [];
+    foreach my $input (@{$$cmd_info{'inputs'}}) {
+      if (-e $input) {
+        &add_last($precompile_inputs, $input);
+      } else {
+        &add_last($precompile_inputs, "../lib/libempty.$so_ext");
+      }
+    }
+    $$ctlg_cmd{'inputs'} = $precompile_inputs;
+  } else {
+    $$ctlg_cmd{'inputs'} = $$cmd_info{'inputs'};
+  }
+  #print &Dumper($cmd_info);
   my $should_echo;
   &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
 }

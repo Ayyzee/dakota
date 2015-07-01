@@ -46,6 +46,7 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  add_first
                  add_last
+                 ann
                  canon_path
                  cpp_directives
                  decode_comments
@@ -71,6 +72,7 @@ our @EXPORT= qw(
                  method_sig_type_regex
                  min
                  objdir
+                 pann
                  remove_first
                  remove_last
                  scalar_from_file
@@ -167,6 +169,28 @@ sub decode_cpp {
       $$filestr_ref =~ s/^(\s*)\@\@\@(\s*$directive\b.*)$/$1#$2/gm;
     }
   }
+}
+sub ann {
+  my ($line, $tkn) = @_;
+  my $string = '';
+  if (0) {
+    $string .= " /*$line*/";
+    if ($tkn) {
+      $string .= " /*$tkn*/";
+    }
+  }
+  return $string;
+}
+sub pann {
+  my ($line, $tkn) = @_;
+  my $string = '';
+  if (0) {
+    $string .= " /*$line*/";
+    if ($tkn) {
+      $string .= " /*$tkn*/";
+    }
+  }
+  return $string;
 }
 sub kw_args_placeholders {
   return { 'default' => '{}', 'nodefault' => '{~}' };
