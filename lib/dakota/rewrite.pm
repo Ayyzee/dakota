@@ -161,7 +161,11 @@ sub nest_namespaces {
 }
 sub rewrite_klass_decl {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=(\b(klass|trait)\s+$id\s*;)=/*$1*/=g;
+  $$filestr_ref =~ s^\b((klass|trait)\s+$id\s*;)^/*$1*/^g;
+}
+sub rewrite_klass_defn {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s^\b(klass|trait)(\s+$id\s*\{)^uc($1) . $2^ge;
 }
 sub rewrite_klass_initialize {
   my ($filestr_ref) = @_;
@@ -170,10 +174,6 @@ sub rewrite_klass_initialize {
 sub rewrite_klass_finalize {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s=(object-t\s+finalize\s*\()=noexport $1=g;
-}
-sub rewrite_klass_defn {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s^\b(klass|trait)(\s+$id\s*\{)^/\*$1\*/ namespace$2^g;
 }
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
@@ -331,8 +331,8 @@ sub rewrite_methods {
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
   $$filestr_ref =~ s|(method\s+[^(]*?($rid)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1 /*$2*/$3|gm;
-  $$filestr_ref =~ s|export(\s)(method)(\s+)|export$1/\*$2\*/$3|gs;
+  $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1METHOD$3|gm;
+  $$filestr_ref =~ s|export(\s)(method)(\s+)|export$1METHOD$3|gs;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack
@@ -837,7 +837,7 @@ sub convert_dk_to_cc {
   # [?klass-type is 'klass' xor 'trait']
   # using ?klass-type ?qual-ident;
   # ?klass-type ?ident = ?qual-ident;
-  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1namespace/g;
+  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1 . uc($2)/g;
 
   &nest_namespaces($filestr_ref);
   #&nest_generics($filestr_ref);

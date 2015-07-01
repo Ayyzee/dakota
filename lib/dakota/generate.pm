@@ -301,6 +301,7 @@ sub generate_nrt {
     $str_hh .=
       "\n" .
       &labeled_src_str($result, "headers-hh") .
+      &readability_cpp_macros() .
       &hardcoded_typedefs() .
       &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
@@ -371,6 +372,7 @@ sub generate_rt {
     $str_hh .=
       "\n" .
       &labeled_src_str($result, "headers-hh") .
+      &readability_cpp_macros() .
       &hardcoded_typedefs() .
       &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
@@ -929,16 +931,14 @@ sub method::generate_va_method_defn {
   #else {
   $va_method_name = "@{$$va_method{'name'}}";
   #}
-
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($klass_type) {
-    $$scratch_str_ref .= $col . "/*$klass_type*/ ";
+    $$scratch_str_ref .= $col . uc($klass_type) . " @$scope { ";
   }
   else {
-    $$scratch_str_ref .= $col . "";
+    $$scratch_str_ref .= $col . "namespace" . " @$scope { ";
   }
-  $$scratch_str_ref .= "namespace @$scope { ";
   my $kw_args_generics = &dakota::util::kw_args_generics();
   if (exists $$kw_args_generics{$va_method_name}) {
     $$scratch_str_ref .= "sentinel ";
@@ -1401,7 +1401,7 @@ sub generics::generate_generic_defn {
   if ($is_inline) {
     $$scratch_str_ref .= " INLINE";
   }
-  $$scratch_str_ref .= " /*generic*/";
+  $$scratch_str_ref .= " GENERIC";
   my $generic_name = "@{$$generic{'name'}}";
 
   $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
@@ -1485,7 +1485,7 @@ sub generics::generate_super_generic_defn {
   if ($is_inline) {
     $$scratch_str_ref .= " INLINE";
   }
-  $$scratch_str_ref .= " /*generic*/";
+  $$scratch_str_ref .= " GENERIC";
   my $generic_name = "@{$$generic{'name'}}";
 
   $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
@@ -2321,6 +2321,14 @@ sub generate_exported_slots_decls {
     die __FILE__, ':', __LINE__, ": error: box klass \'$klass_name\' without slot or slots\n";
   }
 }
+sub readability_cpp_macros {
+  my $result = "\n";
+  $result .= "#define KLASS namespace\n";
+  $result .= "#define TRAIT namespace\n";
+  $result .= "#define METHOD\n";
+  $result .= "#define GENERIC\n";
+  return $result;
+}
 sub hardcoded_typedefs {
   my $result = "\n";
   $result .= "typedef bool          bool-t;\n";
@@ -2598,7 +2606,7 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "#include <dakota-finally.$hh_ext> /* hackhack: should be before dakota.$hh_ext */\n" .
+      $col . "#include <dakota-finally.$hh_ext> // hackhack: should be before dakota.$hh_ext\n" .
       $col . "#include <dakota.$hh_ext>\n" .
       $col . "#include <dakota-log.$hh_ext>\n" .
       "\n";

@@ -173,7 +173,7 @@ sub decode_cpp {
 sub ann {
   my ($file, $line, $msg) = @_;
   my $string = '';
-  if (1) {
+  if (0) {
     $file =~ s|^.*/(.+)|$1|;
     $string = " /* $file:$line:";
     if ($msg) {
@@ -186,7 +186,7 @@ sub ann {
 sub pann {
   my ($file, $line, $msg) = @_;
   my $string = '';
-  if (1) {
+  if (0) {
     $string = &ann($file, $line, $msg);
   }
   return $string;
