@@ -42,6 +42,9 @@ clean:
 	$(RM) $(RMFLAGS) $(objdir)/*
 	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
 
+goal-clean:
+	$(RM) $(RMFLAGS) $(output_files)
+
 installdirs: # to support --jobs these must be done serially
 	for dir in $(install_dirs); do sudo $(INSTALL_DIR) $$dir; done
 
