@@ -2,7 +2,11 @@
 
 set -o nounset -o errexit -o pipefail
 
-path=$1
+if [[ 0 == $# ]]; then
+    path=literal-syntax-single-line.dk
+else
+    path=$1 # ignore other command line args
+fi
 
 prefix=..
 default_macros_path=$prefix/lib/dakota/macros.pl

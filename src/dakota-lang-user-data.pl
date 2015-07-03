@@ -26,19 +26,19 @@
                             'sep' =>   { ',' => 1 },
                             'close' => { '}' => 1 } },
 
-    'literal-sequence' => { 'open'  => { '$[' => 1 },
+    'literal-sequence' => { 'open'  => { '#[' => 1 },
                             'sep' =>   { ',' =>  1 },
                             'close' => { ']' =>  1 } },
 
-    'literal-assoc' =>    { 'open'  => { '$(' => 1 },
-                            'op' =>    { '=>' => 1 },
+    'literal-assoc' =>    { 'open'  => { '#(' => 1 },
+                            'op' =>    { ':' => 1 },
                             'close' => { ')' =>  1 } },
 
-    'literal-set' =>      { 'open'  => { '${' => 1 },
+    'literal-set' =>      { 'open'  => { '#{' => 1 },
                             'sep' =>   { ',' =>  1 },
                             'close' => { '}' =>  1 } },
 
-    'literal-table' =>    { 'open'  => { '${' => 1 },
+    'literal-table' =>    { 'open'  => { '#{' => 1 },
                             'sep' =>   { ',' =>  1 }, # comma separated list of assoc-in
                             'close' => { '}' =>  1 } },
 }

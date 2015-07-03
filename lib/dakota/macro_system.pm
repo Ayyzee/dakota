@@ -263,7 +263,7 @@ sub symbol {
   my $tkn = &sst::at($sst, $index);
   my $result = -1;
 
-  if ($tkn =~ /^\$$id\??$/) {
+  if ($tkn =~ /^\#$id\??$/) {
     $result = $index;
   }
   return $result;

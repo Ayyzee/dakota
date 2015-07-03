@@ -295,9 +295,9 @@ sub sst::add_token {
     }
     $$token{'begin-word'} = 1;
   } else {
-    if (';' eq &sst::prev_token_str($sst) ||
-        '{' eq &sst::prev_token_str($sst) ||
-        '}' eq &sst::prev_token_str($sst)) {
+    if (';' eq &sst::prev_token_str($sst) || # dakota-lang-user-data.pl?
+        '{' eq &sst::prev_token_str($sst) || # dakota-lang-user-data.pl?
+        '}' eq &sst::prev_token_str($sst)) { # dakota-lang-user-data.pl?
       if ($str =~ m|$id|) {
         if ($sst_debug) {
           print STDERR "$str\n";
@@ -534,7 +534,7 @@ sub constraint_literal_dquoted_cstring {
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
-  if ($token =~ m/\$$dqstr/) {
+  if ($token =~ m/\#$dqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
     &add_last($result_rhs, $token);
   }
@@ -545,7 +545,7 @@ sub constraint_literal_squoted_cstring {
   my ($result_lhs, $result_rhs) = (undef, []);
   my $token = &sst::at($sst, $$range[0]);
 
-  if ($token =~ m/\$$sqstr/) {
+  if ($token =~ m/\#$sqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
     &add_last($result_rhs, $token);
   }

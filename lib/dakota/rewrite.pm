@@ -802,7 +802,7 @@ sub convert_dk_to_cc {
   &rewrite_strswitch($filestr_ref);
   &rewrite_case_with_string($filestr_ref);
 
-  $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading $, rnielsen
+  $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading #, rnielsen
   &rewrite_keywords($filestr_ref);
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);
