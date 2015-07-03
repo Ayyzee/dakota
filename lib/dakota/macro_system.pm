@@ -41,9 +41,10 @@ sub dk_prefix {
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
-  use dakota::util;
-  use dakota::sst;
 };
+use dakota::util;
+use dakota::sst;
+
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -663,10 +664,7 @@ sub rule_replace {
   assert($_rhs_num_tokens - $rhs_num_tokens);
   if ($ENV{'DK_MACROS_SINGLE_LINE'}) {
     my $filestr = &sst_fragment::filestr($$sst{'tokens'});
-    $filestr =~ s/\n+//g;
-    $filestr =~ s/\s*,/, /g;
-    $filestr =~ s/\s*, \s+/, /g;
-    print STDERR $filestr . "\n";
+    print STDERR &tighten($filestr) . "\n";
   }
   return ($common_num_tokens, $lhs_num_tokens, $rhs_num_tokens);
 }
@@ -699,6 +697,23 @@ sub rule_match_and_replace {
     }
   }
   return $change_count;
+}
+sub tighten {
+  my ($filestr) = @_;
+  $filestr =~ s/\s*::\s*/::/g;
+
+  $filestr =~ s/\s*\[\s*/[/g;
+  $filestr =~ s/\s*\]\s*/]/g;
+
+  $filestr =~ s/\s*\(\s*/(/g;
+  $filestr =~ s/\s*\)\s*/)/g;
+
+  $filestr =~ s/\s*,\s*/, /g;
+
+  $filestr =~ s/\s*{\s*/{ /g;
+  $filestr =~ s/\s*}\s*/ }/g;
+
+  return $filestr;
 }
 
 sub start {
@@ -745,7 +760,7 @@ sub start {
 
     my $path = "$output_dir/$file.cc";
     open(my $out, ">", $path) or die "cannot open > $path: $!";
-    print $out &sst_fragment::filestr($$sst{'tokens'});
+    print $out &tighten(&sst_fragment::filestr($$sst{'tokens'}));
     close($out);
   }
   $Data::Dumper::Indent = 1;
