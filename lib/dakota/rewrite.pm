@@ -161,11 +161,12 @@ sub nest_namespaces {
 }
 sub rewrite_klass_decl {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s^\b((klass|trait)\s+$id\s*;)^/*$1*/^g;
+  $$filestr_ref =~ s=^     (klass|trait)(\s+$id\s*);=uc($1) . "_NS" . $2 . " {}"=gemx;
+  $$filestr_ref =~ s=^(\s+)(klass|trait)(\s+$id\s*);=$1 . uc($2) . "($3);"=gemx;
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s^\b(klass|trait)(\s+$id\s*\{)^uc($1) . $2^ge;
+  $$filestr_ref =~ s=^     (klass|trait)(\s+$id\s*)(\{)=uc($1) . "_NS" . $2 . "{"=gemx;
 }
 sub rewrite_klass_initialize {
   my ($filestr_ref) = @_;
@@ -325,7 +326,7 @@ sub vars_from_defn {
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|(method\s+)(alias\($id\))|$1/*$2*/|gs; #hackhack
+  $$filestr_ref =~ s|(method)(\s+)(alias)\(($id)\)|uc($1) . $2 . uc($3) . "(" . $4 . ")" |gse; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
@@ -633,9 +634,9 @@ sub remove_non_newlines {
   return $result;
 }
 sub exported_slots_body {
-  my ($a, $b, $c, $d, $e) = @_;
+  my ($a, $b, $c, $d, $e, $f) = @_;
   #my $d = &remove_non_newlines($c);
-  return "/*$a$b$c$d$e*/";
+  return "/*$a$b$c;$d$e$f*/";
 }
 sub rewrite_module_statement {
   my ($filestr_ref) = @_;
@@ -649,7 +650,7 @@ sub add_implied_slots_struct {
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s=(export)(\s+slots\s+)=/*$1*/$2=gs;
-  $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(.*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5)=gse;
+  $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)(.*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5, $6)=gse;
 }
 sub exported_enum_body {
   my ($a, $b, $c, $d, $e) = @_;
@@ -837,7 +838,7 @@ sub convert_dk_to_cc {
   # [?klass-type is 'klass' xor 'trait']
   # using ?klass-type ?qual-ident;
   # ?klass-type ?ident = ?qual-ident;
-  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1 . uc($2)/g;
+  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1 . uc($2) . "_NS"/ge;
 
   &nest_namespaces($filestr_ref);
   #&nest_generics($filestr_ref);

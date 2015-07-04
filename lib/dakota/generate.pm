@@ -259,11 +259,10 @@ sub write_to_file_converted_strings {
     if ($ENV{'DKT_MACRO_SYSTEM'}) {
       my $sst = &sst::make($string, undef);
       &macro_expand($sst, $gbl_macros, $kw_args_generics);
-      my $str = &sst_fragment::filestr($$sst{'tokens'});
-      $converted_string = $str;
+      $converted_string = &sst_fragment::filestr($$sst{'tokens'});
     } else {
-      &dakota::rewrite::convert_dk_to_cc(\$string, $kw_args_generics);
       $converted_string = $string;
+      &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics);
     }
     print PATH $converted_string;
   }
@@ -934,7 +933,7 @@ sub method::generate_va_method_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($klass_type) {
-    $$scratch_str_ref .= $col . uc($klass_type) . " @$scope { ";
+    $$scratch_str_ref .= $col . uc($klass_type) . "_NS" . " @$scope { ";
   }
   else {
     $$scratch_str_ref .= $col . "namespace" . " @$scope { ";
@@ -2340,10 +2339,16 @@ sub generate_exported_slots_decls {
 }
 sub readability_cpp_macros {
   my $result = "\n";
-  $result .= "#define KLASS namespace\n";
-  $result .= "#define TRAIT namespace\n";
+  $result .= "#define KLASS_NS namespace\n";
+  $result .= "#define TRAIT_NS namespace\n";
   $result .= "#define METHOD\n";
   $result .= "#define GENERIC\n";
+  $result .= "#define ALIAS(m)\n";
+  $result .= "#define MODULE(n)\n";
+  $result .= "#define SUPERKLASS(k)\n";
+  $result .= "#define KLASS(k)\n";
+  $result .= "#define TRAIT(t)\n";
+  $result .= "#define TRAITS(t1, ...)\n";
   return $result;
 }
 sub hardcoded_typedefs {

@@ -25,11 +25,6 @@
 #include <cstring> // memcpy()
 #include <new> // std::bad_alloc
 
-#define KLASS namespace
-#define TRAIT namespace
-#define METHOD
-#define GENERIC
-
 #define DKT_MEM_MGMT_MALLOC 0
 #define DKT_MEM_MGMT_NEW    1
 #define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC

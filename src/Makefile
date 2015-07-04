@@ -37,6 +37,7 @@ check: all
 	./$@.sh
 
 clean:
+	$(RM) $(RMFLAGS) aaa.dk
 	$(RM) $(RMFLAGS) $(output_files)
 	$(RM) $(RMFLAGS) $(dakota_info_output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
