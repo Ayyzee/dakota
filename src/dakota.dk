@@ -850,8 +850,10 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
       //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #va-slots-method-signatures);
       //signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
 
-      if (nullptr == modulee)
+      if (nullptr == modulee) {
+        fprintf(stderr, "%s:%i: error: missing module declaration\n", __FILE__, __LINE__);
         abort();
+      }
       if (module-name != modulee)
         ofile::printf(ofl, "%s %s %s", "module", modulee, "export");
       module-name = modulee;

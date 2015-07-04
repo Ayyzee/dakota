@@ -2,6 +2,9 @@ $(blddir)/%.dk: $(objdir)/%.tbl
 $(objdir)/%.tbl: $(srcdir)/%.sh
 	./$<
 
+$(srcdir)/%.dk: $(srcdir)/%.pl
+	./$< > $@
+
 CXX_INCLUDE_DIRECTORY_FLAGS := --include-directory
 
 $(blddir)/../bin/%: $(srcdir)/%-main.cc

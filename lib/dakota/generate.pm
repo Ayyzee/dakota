@@ -1729,35 +1729,50 @@ sub generate_struct_or_union_defn {
 }
 sub generate_enum_decl {
   my ($col, $enum, $is_exported, $is_slots) = @_;
-  #die if $$enum{'type'} && $is_slots;
+  die if $$enum{'type'} && $is_slots;
   my $info = $$enum{'info'};
   my $scratch_str_ref = &global_scratch_str_ref();
-
-  if ($is_slots) {
-    $$scratch_str_ref .= " enum slots-t";
+  my $type;
+  if ($$enum{'type'}) {
+    $type = $$enum{'type'};
+  } elsif ($is_slots) {
+    $type = ['slots-t'];
+  }
+  if ($type) {
+    $$scratch_str_ref .= " enum @$type";
   } else {
     $$scratch_str_ref .= " enum";
-    if ($$enum{'type'}) {
-      $$scratch_str_ref .= " @{$$enum{'type'}}";
+  }
+  if ($type) {
+    if ($$enum{'enum-base'}) {
+      $$scratch_str_ref .= " : $$enum{'enum-base'};";
+    } else {
+      $$scratch_str_ref .= " : int-t;";
     }
   }
-  $$scratch_str_ref .= " : $$enum{'enum-base'};";
 }
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
-  #die if $$enum{'type'} && $is_slots;
+  die if $$enum{'type'} && $is_slots;
   my $info = $$enum{'info'};
   my $scratch_str_ref = &global_scratch_str_ref();
 
-  if ($is_slots) {
-    $$scratch_str_ref .= " enum slots-t";
+  my $type;
+  if ($$enum{'type'}) {
+    $type = $$enum{'type'};
+  } elsif ($is_slots) {
+    $type = ['slots-t'];
+  }
+  if ($type) {
+    $$scratch_str_ref .= " enum @$type";
   } else {
     $$scratch_str_ref .= " enum";
-    if ($$enum{'type'}) {
-      $$scratch_str_ref .= " @{$$enum{'type'}}";
-    }
   }
-  $$scratch_str_ref .= " : $$enum{'enum-base'}";
+  if ($$enum{'enum-base'}) {
+    $$scratch_str_ref .= " : $$enum{'enum-base'}";
+  } else {
+    $$scratch_str_ref .= " : int-t";
+  }
   $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . "\n";
   my $max_width = 0;
   foreach my $pair (@$info) {
