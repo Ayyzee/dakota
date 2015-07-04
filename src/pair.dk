@@ -28,6 +28,14 @@ klass pair
     object-t last;
   }
 
+  // other pairs:
+  //   { object-t, symbol-t }, { object-t, symbol-t, uint32-t }
+
+  //   klass symbol-object-pair { slots { symbol-t first; object-t last; } }
+  //   klass symbol-symbol-pair { slots { symbol-t first; symbol-t last; } }
+  //   klass symbol-uint32-pair { slots { symbol-t first; uint32-t last; } }
+  //   klass object-uint32-pair { slots { object-t first; uint32-t last; } }
+  
   method object-t init(object-t self,
                        object-t first : null,
                        object-t last :  null)
