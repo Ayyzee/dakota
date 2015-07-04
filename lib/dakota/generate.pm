@@ -338,7 +338,7 @@ sub generate_nrt {
       "\n" .
       &dk_generate_cc_footer($file, $stack = [], $col = '');
 
-    if (1) { #$ENV{'DKT_DEBUG'}
+    if (0) { #$ENV{'DKT_DEBUG'}
       &write_to_file_strings($pre_output, [ $str_cc ]);
     }
     &write_to_file_converted_strings($output, [ $str_cc ]);
@@ -418,7 +418,7 @@ sub generate_rt {
 
       &generate_defn_footer($file);
 
-    if (1) { #$ENV{'DKT_DEBUG'}
+    if (0) { #$ENV{'DKT_DEBUG'}
       &write_to_file_strings($pre_output, [ $str_cc ]);
     }
     &write_to_file_converted_strings($output, [ $str_cc ]);
