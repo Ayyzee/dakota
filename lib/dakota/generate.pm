@@ -45,8 +45,6 @@ sub dk_prefix {
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
-  use dakota::rewrite;
-  use dakota::util;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
     or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
   my $platform = do "$gbl_prefix/lib/dakota/platform.json"
@@ -59,6 +57,10 @@ BEGIN {
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
 };
+use dakota::rewrite;
+use dakota::macro_system;
+use dakota::util;
+
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -254,18 +256,20 @@ sub write_to_file_converted_strings {
   } else {
     *PATH = *STDOUT;
   }
+  my $filestr = '';
+
   foreach my $string (@$strings) {
-    my $converted_string;
-    if ($ENV{'DKT_MACRO_SYSTEM'}) {
-      my $sst = &sst::make($string, undef);
-      &macro_expand($sst, $gbl_macros, $kw_args_generics);
-      $converted_string = &sst_fragment::filestr($$sst{'tokens'});
-    } else {
-      $converted_string = $string;
-      &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics);
-    }
-    print PATH $converted_string;
+    $filestr .= $string;
   }
+  my $sst = &sst::make($filestr, ">$path");
+  if (0) {
+    &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_args_generics);
+  }
+  my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
+  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics);
+
+  print PATH $converted_string;
+
   if (defined $path) {
     close PATH;
   }
