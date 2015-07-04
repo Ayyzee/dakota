@@ -334,7 +334,7 @@ sub generate_nrt {
       "\n" .
       "#include \"$name.$hh_ext\"\n" .
       "\n" .
-      "#include \"../$name.dk.$cc_ext\"\n" . # user-code (converted from dk to cc)
+      "#include \"../$name.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk_generate_cc_footer($file, $stack = [], $col = '');
 
@@ -4052,10 +4052,10 @@ sub pad {
   $result_str .= ' ' x $col_num;
   return $result_str;
 }
-sub dk_generate_dk_cc {
+sub dk_generate_cc {
   my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
-  my $output = "$path_name.dk.$cc_ext";
+  my $output = "$path_name.$cc_ext";
   $output =~ s|^\./||;
   my $directory = $ENV{'DKT_DIR'} ||= '.';
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {

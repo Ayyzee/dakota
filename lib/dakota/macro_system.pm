@@ -362,7 +362,7 @@ sub macros_expand_index {
 sub macros_expand {
   my ($sst, $macros, $user_data) = @_;
   my $file = $$sst{'file'} if $$sst{'file'};
- #print "macros-expand(\"$file\")\n";
+  print "macros-expand(\"$file\")\n";
 
   $debug = 0;
   if ($ENV{'DKT_MACROS_DEBUG'}) { # 0 or 1 or 2 or 3

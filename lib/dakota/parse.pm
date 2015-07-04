@@ -46,7 +46,7 @@ sub dk_prefix {
   }
 }
 my $patterns = {
-  'dk_cc_path_from_nrt_cc_path' => '$(objdir)/%.dk.$(cc_ext) : $(objdir)/nrt/%.$(cc_ext)',
+  'cc_path_from_nrt_cc_path' => '$(objdir)/%.$(cc_ext)  : $(objdir)/nrt/%.$(cc_ext)',
 
   'nrt_cc_path_from_dk_path' => '$(objdir)/nrt/%.$(cc_ext) : %.dk',
   'nrt_o_path_from_dk_path' =>  '$(objdir)/nrt/%.$(o_ext)  : %.dk',
@@ -116,7 +116,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  ctlg_path_from_any_path
-                 dk_cc_path_from_nrt_cc_path
+                 cc_path_from_nrt_cc_path
                  init_global_rep
                  kw_args_translate
                  nrt_cc_path_from_dk_path
@@ -370,9 +370,9 @@ sub rel_path_canon {
   }
   return $result;
 }
-sub dk_cc_path_from_nrt_cc_path {
+sub cc_path_from_nrt_cc_path {
   my ($path) = @_;
-  return &out_path_from_in_path('dk_cc_path_from_nrt_cc_path', $path);
+  return &out_path_from_in_path('cc_path_from_nrt_cc_path', $path);
 }
 sub ctlg_path_from_any_path {
   my ($path) = @_;
