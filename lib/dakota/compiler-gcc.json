@@ -36,6 +36,8 @@
   'DK_LD_SONAME_FLAGS' => [ '-soname' ],
   'hh_ext' => 'hh',
   'cc_ext' => 'cc',
+  'dkhh_ext' => 'dkhh',
+  'dkcc_ext' => 'dkcc',
   'o_ext' =>  'o',
   'so_ext' => 'so',
 }

@@ -25,9 +25,13 @@ package dakota::generate;
 use strict;
 use warnings;
 
+my $should_write_pre_output = 1;
+
 my $gbl_prefix;
 my $gbl_compiler;
 my $objdir;
+my $dkhh_ext;
+my $dkcc_ext;
 my $hh_ext;
 my $cc_ext;
 
@@ -56,6 +60,8 @@ BEGIN {
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
+  $dkhh_ext = &dakota::util::var($gbl_compiler, 'dkhh_ext', undef);
+  $dkcc_ext = &dakota::util::var($gbl_compiler, 'dkcc_ext', undef);
 };
 use dakota::rewrite;
 use dakota::macro_system;
@@ -316,12 +322,17 @@ sub generate_nrt {
       &labeled_src_str($result, "generics-hh");
       #&labeled_src_str($result, "selectors-seq-hh") .
       #&labeled_src_str($result, "signatures-seq-hh") .
+    my $pre_output = "$dir/$name.$dkhh_ext";
+    my $output = "$dir/$name.$hh_ext";
 
-    &write_to_file_converted_strings("$dir/$name.$hh_ext", [ $str_hh ]);
+    if ($should_write_pre_output) {
+      &write_to_file_strings($pre_output, [ $str_hh ]); # generated $(objdir)/nrt/%.$dkhh_ext
+    }
+    &write_to_file_converted_strings($output, [ $str_hh ]);
     return "$dir/$name.$hh_ext";
   } else {
     my $col; my $stack;
-    my $pre_output = "$dir/$name.dk";
+    my $pre_output = "$dir/$name.$dkcc_ext";
     my $output = "$dir/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
@@ -338,8 +349,8 @@ sub generate_nrt {
       "\n" .
       &dk_generate_cc_footer($file, $stack = [], $col = '');
 
-    if (0) { #$ENV{'DKT_DEBUG'}
-      &write_to_file_strings($pre_output, [ $str_cc ]);
+    if ($should_write_pre_output) {
+      &write_to_file_strings($pre_output, [ $str_cc ]); # generated $(objdir)/nrt/%.$dkcc_ext
     }
     &write_to_file_converted_strings($output, [ $str_cc ]);
     return $output;
@@ -391,7 +402,7 @@ sub generate_rt {
     &write_to_file_converted_strings("$dir/$name.$hh_ext", [ $str_hh ]);
     return "$dir/$name.$hh_ext";
   } else {
-    my $pre_output = "$dir/$name.dk";
+    my $pre_output = "$dir/$name.$dkcc_ext";
     my $output = "$dir/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
@@ -418,8 +429,8 @@ sub generate_rt {
 
       &generate_defn_footer($file);
 
-    if (0) { #$ENV{'DKT_DEBUG'}
-      &write_to_file_strings($pre_output, [ $str_cc ]);
+    if ($should_write_pre_output) {
+      &write_to_file_strings($pre_output, [ $str_cc ]); # generated *.$dkcc_ext
     }
     &write_to_file_converted_strings($output, [ $str_cc ]);
     return $output;
