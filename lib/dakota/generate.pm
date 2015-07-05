@@ -299,7 +299,8 @@ sub generate_nrt {
   my $result;
 
   if (&is_nrt_decl()) {
-    my $output = "$dir/$name.$hh_ext";
+    my $pre_output = "$dir/$name.$dkhh_ext";
+    my $output =     "$dir/$name.$hh_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
@@ -322,18 +323,15 @@ sub generate_nrt {
       &labeled_src_str($result, "generics-hh");
       #&labeled_src_str($result, "selectors-seq-hh") .
       #&labeled_src_str($result, "signatures-seq-hh") .
-    my $pre_output = "$dir/$name.$dkhh_ext";
-    my $output = "$dir/$name.$hh_ext";
 
     if ($should_write_pre_output) {
-      &write_to_file_strings($pre_output, [ $str_hh ]); # generated $(objdir)/nrt/%.$dkhh_ext
+      &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/nrt/%.$dkhh_ext
     }
     &write_to_file_converted_strings($output, [ $str_hh ]);
     return "$dir/$name.$hh_ext";
   } else {
-    my $col; my $stack;
     my $pre_output = "$dir/$name.$dkcc_ext";
-    my $output = "$dir/$name.$cc_ext";
+    my $output =     "$dir/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
@@ -347,10 +345,10 @@ sub generate_nrt {
       "\n" .
       "#include \"../$name.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
-      &dk_generate_cc_footer($file, $stack = [], $col = '');
+      &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
 
     if ($should_write_pre_output) {
-      &write_to_file_strings($pre_output, [ $str_cc ]); # generated $(objdir)/nrt/%.$dkcc_ext
+      &write_to_file_strings($pre_output, [ $str_cc ]); # generated $objdir/nrt/%.$dkcc_ext
     }
     &write_to_file_converted_strings($output, [ $str_cc ]);
     return $output;
@@ -375,7 +373,8 @@ sub generate_rt {
   my $result;
 
   if (&is_rt_decl()) {
-    my $output = "$dir/$name.$hh_ext";
+    my $pre_output = "$dir/$name.$dkhh_ext";
+    my $output =     "$dir/$name.$hh_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
@@ -399,11 +398,14 @@ sub generate_rt {
       #&labeled_src_str($result, "selectors-seq-hh") .
       #&labeled_src_str($result, "signatures-seq-hh") .
 
-    &write_to_file_converted_strings("$dir/$name.$hh_ext", [ $str_hh ]);
+    if ($should_write_pre_output) {
+      &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/rt/%.$dkhh_ext
+    }
+    &write_to_file_converted_strings($output, [ $str_hh ]);
     return "$dir/$name.$hh_ext";
   } else {
     my $pre_output = "$dir/$name.$dkcc_ext";
-    my $output = "$dir/$name.$cc_ext";
+    my $output =     "$dir/$name.$cc_ext";
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
@@ -430,7 +432,7 @@ sub generate_rt {
       &generate_defn_footer($file);
 
     if ($should_write_pre_output) {
-      &write_to_file_strings($pre_output, [ $str_cc ]); # generated *.$dkcc_ext
+      &write_to_file_strings($pre_output, [ $str_cc ]); # generated $objdir/rt/%.$dkcc_ext
     }
     &write_to_file_converted_strings($output, [ $str_cc ]);
     return $output;
