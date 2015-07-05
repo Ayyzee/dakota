@@ -54,7 +54,7 @@ $(install_files): installdirs
 install: $(install_files)
 
 precompile:
-	$(MAKE) $(MAKEFLAGS) --always-make --keep-going DAKOTAFLAGS=--$@ all
+	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install_files)
