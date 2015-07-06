@@ -54,6 +54,7 @@ my $patterns = {
   'o_path_from_cc_path' =>      '$(objdir)/%.$(o_ext)      : $(objdir)/%.$(cc_ext)',
 
   'ctlg_path_from_any_path' =>  '$(objdir)/%.ctlg          : %',
+  'ctlg_path_from_so_path' =>   '$(objdir)/%.ctlg          : %.$(so_ext)',
 
   'rep_path_from_any_path' =>   '$(objdir)/%.rep           : %',
   'rep_path_from_ctlg_path' =>  '$(objdir)/%.ctlg.rep      : $(objdir)/%.ctlg',
@@ -116,6 +117,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  ctlg_path_from_any_path
+                 ctlg_path_from_so_path
                  cc_path_from_nrt_cc_path
                  init_global_rep
                  kw_args_translate
@@ -373,6 +375,10 @@ sub rel_path_canon {
 sub cc_path_from_nrt_cc_path {
   my ($path) = @_;
   return &out_path_from_in_path('cc_path_from_nrt_cc_path', $path);
+}
+sub ctlg_path_from_so_path {
+  my ($path) = @_;
+  return &out_path_from_in_path('ctlg_path_from_so_path', $path);
 }
 sub ctlg_path_from_any_path {
   my ($path) = @_;
