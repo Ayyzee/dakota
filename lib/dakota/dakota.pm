@@ -448,11 +448,21 @@ sub start_cmd {
 }
 sub rep_from_so {
   my ($cmd_info, $arg) = @_;
-  my $ctlg_path = &ctlg_path_from_any_path($arg);
+  if (!$arg) {
+    $arg = $$cmd_info{'input'};
+  }
+  my $ctlg_path;
+  if (&is_so($arg)) {
+    $ctlg_path = &ctlg_path_from_so_path($arg);
+  } else {
+    $ctlg_path = &ctlg_path_from_any_path($arg);
+  }
   my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'output'} = $ctlg_path;
-  $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
+  if (0) {
+    $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
+  }
   $$ctlg_cmd{'inputs'} = [ $arg ];
   &ctlg_from_so($ctlg_cmd);
   my $rep_path = &rep_path_from_ctlg_path($ctlg_path);
