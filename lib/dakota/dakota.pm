@@ -25,6 +25,8 @@ package dakota::dakota;
 use strict;
 use warnings;
 
+my $should_write_pre_output = 1;
+
 my $gbl_prefix;
 my $gbl_compiler;
 my $extra;
@@ -444,26 +446,30 @@ sub start_cmd {
   }
   return $exit_status;
 }
+sub rep_from_so {
+  my ($cmd_info, $arg) = @_;
+  my $ctlg_path = &ctlg_path_from_any_path($arg);
+  my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
+  my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
+  $$ctlg_cmd{'output'} = $ctlg_path;
+  $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
+  $$ctlg_cmd{'inputs'} = [ $arg ];
+  &ctlg_from_so($ctlg_cmd);
+  my $rep_path = &rep_path_from_ctlg_path($ctlg_path);
+  &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
+  my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
+  $$rep_cmd{'output'} = $rep_path;
+  $$rep_cmd{'inputs'} = [ $ctlg_path ];
+  &rep_from_dk($rep_cmd);
+  &add_visibility_file($$rep_cmd{'output'});
+}
 sub loop_rep_from_so {
   my ($cmd_info) = @_;
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
         $arg =~ m|\.ctlg$|) {
     } else {
-      my $ctlg_path = &ctlg_path_from_any_path($arg);
-      my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
-      my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$ctlg_cmd{'output'} = $ctlg_path;
-      $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
-      $$ctlg_cmd{'inputs'} = [ $arg ];
-      &ctlg_from_so($ctlg_cmd);
-      my $rep_path = &rep_path_from_ctlg_path($ctlg_path);
-      &ordered_set_add($$cmd_info{'reps'}, $rep_path, __FILE__, __LINE__);
-      my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$rep_cmd{'output'} = $rep_path;
-      $$rep_cmd{'inputs'} = [ $ctlg_path ];
-      &rep_from_dk($rep_cmd);
-      &add_visibility_file($$rep_cmd{'output'});
+      &rep_from_so($cmd_info, $arg);
     }
   }
   return $cmd_info;
