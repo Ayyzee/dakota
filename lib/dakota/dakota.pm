@@ -502,7 +502,7 @@ sub loop_rep_from_dk {
     &rep_from_dk($rep_cmd);
   }
   return $cmd_info;
-}
+} # loop_rep_from_dk
 sub gen_rt_o {
   my ($cmd_info) = @_;
   if ($ENV{'DKT_PRECOMPILE'}) {
@@ -565,7 +565,7 @@ sub loop_o_from_dk {
   $$cmd_info{'inputs'} = $outfiles;
   delete $$cmd_info{'opts'}{'output'}; # hackhack
   return $cmd_info;
-}
+} # loop_o_from_dk
 sub cc_from_dk {
   my ($cmd_info) = @_;
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
