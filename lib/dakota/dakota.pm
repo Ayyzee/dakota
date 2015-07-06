@@ -474,6 +474,15 @@ sub loop_rep_from_so {
   }
   return $cmd_info;
 } # loop_rep_from_so
+sub rep_from_dk {
+  my ($cmd_info) = @_;
+  my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
+  $$rep_cmd{'cmd'} = '&loop_merged_rep_from_dk';
+  $$rep_cmd{'output'} = $$cmd_info{'output'};
+  $$rep_cmd{'inputs'} = $$cmd_info{'inputs'};
+  my $should_echo;
+  &outfile_from_infiles($rep_cmd, $should_echo = 0);
+}
 sub loop_rep_from_dk {
   my ($cmd_info) = @_;
   my $rep_files = [];
@@ -812,15 +821,6 @@ sub outfile_from_infiles {
       }
     }
   }
-}
-sub rep_from_dk {
-  my ($cmd_info) = @_;
-  my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$rep_cmd{'cmd'} = '&loop_merged_rep_from_dk';
-  $$rep_cmd{'output'} = $$cmd_info{'output'};
-  $$rep_cmd{'inputs'} = $$cmd_info{'inputs'};
-  my $should_echo;
-  &outfile_from_infiles($rep_cmd, $should_echo = 0);
 }
 sub ctlg_from_so {
   my ($cmd_info) = @_;
