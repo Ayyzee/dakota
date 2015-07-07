@@ -471,6 +471,9 @@ sub rep_from_so {
   $$rep_cmd{'output'} = $rep_path;
   $$rep_cmd{'inputs'} = [ $ctlg_path ];
   &rep_from_dk($rep_cmd);
+  if (1) {
+    unlink $ctlg_path;
+  }
   &add_visibility_file($$rep_cmd{'output'});
 }
 sub loop_rep_from_so {
