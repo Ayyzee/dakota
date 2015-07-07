@@ -1009,7 +1009,7 @@ dump-method(ofile-t ofl, signature-t const* info, uint32-t max-return-type-width
 static void
 dump-generic(ofile-t ofl, signature-t const* info)
 {
- ofile::printf(ofl, "generic %s dk:%s(%s);\n",
+ ofile::printf(ofl, "generic %s dk::%s(%s);\n",
               info->return-type,
               info->name,
               info->parameter-types);
