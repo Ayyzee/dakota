@@ -57,7 +57,7 @@ my $patterns = {
   'ctlg_path_from_so_path' =>   '$(objdir)/%.ctlg          : %.$(so_ext)',
 
   'rep_path_from_any_path' =>   '$(objdir)/%.rep           : %',
-  'rep_path_from_ctlg_path' =>  '$(objdir)/%.ctlg.rep      : $(objdir)/%.ctlg',
+  'rep_path_from_ctlg_path' =>  '$(objdir)/%.$(so_ext).rep : $(objdir)/%.ctlg',
 
   'rep_path_from_so_path' =>    '$(objdir)/%.rep           : %.$(so_ext)',
   'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)  : %',
