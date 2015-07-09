@@ -106,8 +106,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  add_generic
-                 add_hash
-                 add_hash_ident
                  add_keyword
                  add_klass_decl
                  add_string
@@ -250,7 +248,7 @@ sub _rep_merge { # recursive
   my ($root_ref, $scope) = @_;
   my ($subscope_name, $subscope);
 
-  foreach my $name ('klasses', 'traits', 'generics', 'symbols', 'keywords', 'exported-headers', 'exported-klass-decls', 'exported-trait-decls', 'strings', 'hashes', 'modules') {
+  foreach my $name ('klasses', 'traits', 'generics', 'symbols', 'keywords', 'exported-headers', 'exported-klass-decls', 'exported-trait-decls', 'strings', 'modules') {
     while (($subscope_name, $subscope) = each(%{$$scope{$name}})) {
       if ($subscope) {
 	if (!defined $$root_ref{$name}{$subscope_name}) {
@@ -296,7 +294,6 @@ my $gbl_filename = undef;
 sub init_rep_from_dk_vars {
   my ($cmd_info) = @_;
   $gbl_root = {};
-  #$$gbl_root{'hashes'} = {};
   #$$gbl_root{'keywords'} = {};
   #$$gbl_root{'symbols'}  = {};
   #$$gbl_root{'types'}  = {};
@@ -488,19 +485,9 @@ sub add_type {
   my $ident = &path::string($seq);
   $$gbl_root{'types'}{$ident} = undef;
 }
-sub add_hash_ident {
-  my ($file, $ident) = @_;
-  $$file{'hashes'}{$ident} = undef;
-}
-sub add_hash {
-  my ($file, $hash) = @_;
-  my $ident = &path::string([$hash]);
-  &add_hash_ident($file, $ident);
-}
 sub add_keyword {
   my ($file, $keyword) = @_;
   my $ident = &path::string([$keyword]);
-  &add_hash_ident($file, $ident);
   &add_symbol_ident($file, $ident);
   $$file{'keywords'}{$ident} = undef;
 }

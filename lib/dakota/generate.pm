@@ -3904,7 +3904,7 @@ sub linkage_unit::generate_hashes {
   my $col = '';
 
   my ($symbol, $symbol_seq);
-  my $symbol_keys = [sort symbol::compare keys %{$$file{'hashes'}}];
+  my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
