@@ -25,6 +25,16 @@ package dakota::parse;
 use strict;
 use warnings;
 
+$main::seq = qr{
+                 \[
+                 (?:
+                   (?> [^\[\]]+ )     # Non-parens without backtracking
+                 |
+                   (??{ $main::seq }) # Group with matching parens
+                 )*
+                 \]
+             }x;
+
 my $gbl_compiler;
 my $gbl_header_from_symbol;
 my $gbl_used;
@@ -149,12 +159,19 @@ sub maybe_add_exported_header_for_symbol_seq {
     &maybe_add_exported_header_for_symbol($symbol);
   }
 }
+sub unwrap_seq {
+  my ($seq) = @_;
+  $seq =~ s/\s*\n+\s*/ /gms;
+  $seq =~ s/\s+/ /gs;
+  return $seq;
+}
 sub scalar_to_file {
   my ($file, $ref) = @_;
   if (!defined $ref) {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file($ref)\n";
   }
   my $refstr = &Dumper($ref);
+  $refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
 
   open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   flock FILE, 2; # LOCK_EX
