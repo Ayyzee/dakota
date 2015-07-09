@@ -2393,17 +2393,17 @@ sub linkage_unit::generate_headers {
 
       if (exists $$klass_scope{'exported-headers'} && defined $$klass_scope{'exported-headers'}) {
         while (my ($header, $klasses) = each (%{$$klass_scope{'exported-headers'}})) {
-          $$exported_headers{$header}{$klass_name} = undef;
+          $$exported_headers{$header} = undef;
         }
       }
     }
     my $all_headers = {};
     my $header_name;
     foreach $header_name (keys %{$$scope{'headers'}}) {
-      $$all_headers{$header_name} = 1;
+      $$all_headers{$header_name} = undef;
     }
     foreach $header_name (keys %$exported_headers) {
-      $$all_headers{$header_name} = 1;
+      $$all_headers{$header_name} = undef;
     }
     foreach $header_name (sort keys %$all_headers) {
       $result .= "#include $header_name\n";

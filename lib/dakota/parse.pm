@@ -265,7 +265,7 @@ sub _rep_merge { # recursive
   my ($root_ref, $scope) = @_;
   my ($subscope_name, $subscope);
 
-  foreach my $name ('klasses', 'traits', 'generics', 'symbols', 'keywords', 'exported-headers', 'exported-klass-decls', 'exported-trait-decls', 'strings', 'modules') {
+  foreach my $name ('klasses', 'traits', 'generics', 'symbols', 'keywords', 'strings', 'modules') {
     while (($subscope_name, $subscope) = each(%{$$scope{$name}})) {
       if ($subscope) {
 	if (!defined $$root_ref{$name}{$subscope_name}) {
@@ -573,12 +573,12 @@ sub match_re {
 }
 sub add_exported_header {
   my ($tkn) = @_;
-  $$gbl_root{'exported-headers'}{$tkn} = {};
+  $$gbl_root{'exported-headers'}{$tkn} = undef;
 }
 sub header {
   my $tkn = &match_any();
   &match(__FILE__, __LINE__, ';');
-  $$gbl_root{'headers'}{$tkn} = 1;
+  $$gbl_root{'headers'}{$tkn} = undef;
 }
 sub exported_header {
   my $tkn = &match_any();
@@ -612,9 +612,6 @@ sub trait {
   }
   $gbl_current_scope = $$gbl_current_scope{'traits'}{$construct_name};
   $$gbl_current_scope{'module'} = $gbl_current_module;
-  if (exists $$gbl_root{'exported-headers'} && defined $$gbl_root{'exported-headers'}) {
-    $$gbl_current_scope{'exported-headers'} = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
-  }
   $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -1140,9 +1137,6 @@ sub klass {
   }
   $gbl_current_scope = $$gbl_current_scope{'klasses'}{$construct_name};
   $$gbl_current_scope{'module'} = $gbl_current_module;
-  if (exists $$gbl_root{'exported-headers'} && defined $$gbl_root{'exported-headers'}) {
-    $$gbl_current_scope{'exported-headers'} = &dakota::util::deep_copy($$gbl_root{'exported-headers'});
-  }
   $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -1951,9 +1945,6 @@ sub init_global_rep {
 sub parse_root {
   my ($gbl_sst_cursor) = @_;
   $gbl_current_scope = $gbl_root;
-  #$$gbl_root{'exported-headers'} = {};
-  #$$gbl_root{'exported-klass-decls'} = {};
-  #$$gbl_root{'exported-trait-decls'} = {};
 
   # root
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -1997,20 +1988,20 @@ sub parse_root {
       $$gbl_sst_cursor{'current-token-index'}++;
     }
   }
-  foreach my $exported_mumble ('exported-headers', 'exported-klass-decls', 'exported-trait-decls') {
-    if (exists $$gbl_root{$exported_mumble} && defined $$gbl_root{$exported_mumble}) {
+  foreach my $klass_type ( 'klasses', 'traits' ) {
+    if (exists $$gbl_root{'exported-headers'} && defined $$gbl_root{'exported-headers'}) {
       my $klasses = {};
-      while (my ($klass, $info) = each(%{$$gbl_root{'klasses'}})) { # how about traits
+      while (my ($klass, $info) = each(%{$$gbl_root{$klass_type}})) {
         if ($info) {
           $$klasses{$klass} = undef;
         }
       }
-      while (my ($path, $dummy) = each(%{$$gbl_root{$exported_mumble}})) {
-        $$gbl_root{$exported_mumble}{$path} = $klasses;
+      while (my ($header, $dummy) = each(%{$$gbl_root{'exported-headers'}})) {
+        $$gbl_root{'exported-headers'}{$header} = undef;
       }
-      while (my ($klass, $info) = each(%{$$gbl_root{'klasses'}})) { # how about traits
+      while (my ($klass, $info) = each(%{$$gbl_root{$klass_type}})) {
         if ($info) {
-          $$info{$exported_mumble} = $$gbl_root{$exported_mumble};
+          $$info{'exported-headers'} = $$gbl_root{'exported-headers'};
         }
       }
     }
