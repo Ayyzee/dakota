@@ -2393,17 +2393,17 @@ sub linkage_unit::generate_headers {
 
       if (exists $$klass_scope{'exported-headers'} && defined $$klass_scope{'exported-headers'}) {
         while (my ($header, $klasses) = each (%{$$klass_scope{'exported-headers'}})) {
-          $$exported_headers{$header}{$klass_name} = undef;
+          $$exported_headers{$header} = undef;
         }
       }
     }
     my $all_headers = {};
     my $header_name;
     foreach $header_name (keys %{$$scope{'headers'}}) {
-      $$all_headers{$header_name} = 1;
+      $$all_headers{$header_name} = undef;
     }
     foreach $header_name (keys %$exported_headers) {
-      $$all_headers{$header_name} = 1;
+      $$all_headers{$header_name} = undef;
     }
     foreach $header_name (sort keys %$all_headers) {
       $result .= "#include $header_name\n";
@@ -3904,7 +3904,7 @@ sub linkage_unit::generate_hashes {
   my $col = '';
 
   my ($symbol, $symbol_seq);
-  my $symbol_keys = [sort symbol::compare keys %{$$file{'hashes'}}];
+  my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
