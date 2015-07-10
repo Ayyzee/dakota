@@ -313,7 +313,6 @@ sub init_rep_from_dk_vars {
   $gbl_root = {};
   #$$gbl_root{'keywords'} = {};
   #$$gbl_root{'symbols'}  = {};
-  #$$gbl_root{'types'}  = {};
 
   $gbl_current_scope = $gbl_root;
   $gbl_filename = undef;
@@ -499,8 +498,6 @@ sub add_symbol {
 sub add_type {
   my ($seq) = @_;
   &maybe_add_exported_header_for_symbol_seq($seq);
-  my $ident = &path::string($seq);
-  $$gbl_root{'types'}{$ident} = undef;
 }
 sub add_keyword {
   my ($file, $keyword) = @_;
@@ -1990,12 +1987,6 @@ sub parse_root {
   }
   foreach my $klass_type ( 'klasses', 'traits' ) {
     if (exists $$gbl_root{'exported-headers'} && defined $$gbl_root{'exported-headers'}) {
-      my $klasses = {};
-      while (my ($klass, $info) = each(%{$$gbl_root{$klass_type}})) {
-        if ($info) {
-          $$klasses{$klass} = undef;
-        }
-      }
       while (my ($header, $dummy) = each(%{$$gbl_root{'exported-headers'}})) {
         $$gbl_root{'exported-headers'}{$header} = undef;
       }
