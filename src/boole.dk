@@ -20,5 +20,5 @@ include <cstdbool>;
 
 klass boole
 {
-  slots bool-t;
+  slots boole-t;
 }
