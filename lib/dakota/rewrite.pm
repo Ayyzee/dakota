@@ -161,12 +161,12 @@ sub nest_namespaces {
 }
 sub rewrite_klass_decl {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=^     (klass|trait)(\s+$id\s*);=uc($1) . "_NS" . $2 . " {}"=gemx;
-  $$filestr_ref =~ s=^(\s+)(klass|trait)(\s+$id\s*);=$1 . uc($2) . "($3);"=gemx;
+  $$filestr_ref =~ s=^     (klass|trait)\s+($id)\s*;=uc($1) . "($2);"=gemx;
+  $$filestr_ref =~ s=^(\s+)(klass|trait)\s+($id)\s*;=$1 . uc($2) . "($3);"=gemx;
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=^     (klass|trait)(\s+$id\s*)(\{)=uc($1) . "_NS" . $2 . "{"=gemx;
+  $$filestr_ref =~ s=^     (klass|trait)(\s+$id\s*)(\{)=uc($1) . "-NS" . $2 . "{"=gemx;
 }
 sub rewrite_klass_initialize {
   my ($filestr_ref) = @_;
@@ -223,12 +223,13 @@ sub rewrite_includes {
 }
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(interpose \s+[^;]+\s*;)|$1/*$2*/|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(superklass\s+$rid \s*;)|$1/*$2*/|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(klass     \s+$rid \s*;)|$1/*$2*/|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(trait     \s+$rid \s*;)|$1/*$2*/|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(provide   \s+$rid \s*;)|$1/*$2*/|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)(require   \s+$rid \s*;)|$1/*$2*/|gsx;
+  $$filestr_ref =~ s|(?<!$k)(\s+)interpose \s+([^;])+\s*;|$1INTERPOSE($2);|gsx;
+  $$filestr_ref =~ s|(?<!$k)(\s+)superklass\s+($rid) \s*;|$1SUPERKLASS($2);|gsx;
+  $$filestr_ref =~ s|(?<!$k)(\s+)klass     \s+($rid) \s*;|$1KLASS($2);|gsx;
+  $$filestr_ref =~ s|(?<!$k)(\s+)trait     \s+($rid) \s*;|$1TRAIT($2);|gsx;
+  $$filestr_ref =~ s|(?<!$k)(\s+)traits    \s+($rid(\s*,\s*$rid)*)\s*;|$1TRAIT($2);|gsx;
+  $$filestr_ref =~ s|(?<!$k)(\s+)require   \s+($rid) \s*;|$1REQUIRE($2);|gsx;
+ #$$filestr_ref =~ s|(?<!$k)(\s+)provide   \s+($rid) \s*;|$1PROVIDE($2);|gsx;
 }
 
 my $use_catch_macros = 1;
@@ -326,7 +327,7 @@ sub vars_from_defn {
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|(method)(\s+)(alias)\(($id)\)|uc($1) . $2 . uc($3) . "(" . $4 . ")" |gse; #hackhack
+  $$filestr_ref =~ s|(\s+)method(\s+)alias\(($id)\)|$1METHOD$2ALIAS($3)|gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
@@ -351,10 +352,11 @@ sub rewrite_throws {
   # throw klass ;
   # throw self ;
 
+  # dont want to rewrite #define THROW throw
   # in parens
-  $$filestr_ref =~ s/\bthrow(\s*)\((.+?)\)(\s*);/throw$1*dkt-capture-current-exception($2)$3;/gsx;
+  $$filestr_ref =~ s/(?<!THROW\s)throw(\s*)\((.+?)\)(\s*);/throw$1*dkt-capture-current-exception($2)$3;/gsx;
   # not in parens
-  $$filestr_ref =~ s/\bthrow(\s*)  (.+?)  (\s*);/throw$1*dkt-capture-current-exception($2)$3;/gsx;
+  $$filestr_ref =~ s/(?<!THROW\s)throw(\s*)  (.+?)  (\s*);/throw$1*dkt-capture-current-exception($2)$3;/gsx;
 }
 sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
@@ -364,7 +366,7 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
-  $$filestr_ref =~ s/(?<![\#\w-])slots(\s+$t+?)(\s*);/typedef$1 slots-t$2;/gsx;
+  $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|/*slots*/ typedef$1 slots-t$2;|gsx;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -636,11 +638,16 @@ sub remove_non_newlines {
 sub exported_slots_body {
   my ($a, $b, $c, $d, $e, $f) = @_;
   #my $d = &remove_non_newlines($c);
-  return "/*$a$b$c;$d$e$f*/";
+  if ($e) {
+    $e =~ s/^\s*:\s*($id)\s*$/$1, /;
+  }
+  return "SLOTS($c,$d$e$f);";
 }
 sub rewrite_module_statement {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|\b(module\s+$id\s*.*?;)|/*$1*/|gs;
+  $$filestr_ref =~ s|\bmodule\s+($id)\s+import(\s*)module\s+($id)(.+?)\s*;|MODULE-IMPORT($1,$2$3,$4);|gs;
+  $$filestr_ref =~ s|\bmodule\s+($id)\s+export(\s*)(.+?)\s*;|MODULE-EXPORT($1,$2$3);|gs;
+  $$filestr_ref =~ s|\bmodule\s+($id)\s*;|MODULE($1);|gs;
 }
 sub add_implied_slots_struct {
   my ($filestr_ref) = @_;
@@ -838,7 +845,7 @@ sub convert_dk_to_cc {
   # [?klass-type is 'klass' xor 'trait']
   # using ?klass-type ?qual-ident;
   # ?klass-type ?ident = ?qual-ident;
-  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1 . uc($2) . "_NS"/ge;
+  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1 . uc($2) . "-NS"/ge;
 
   &nest_namespaces($filestr_ref);
   #&nest_generics($filestr_ref);
