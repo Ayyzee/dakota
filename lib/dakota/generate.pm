@@ -2361,12 +2361,14 @@ sub readability_cpp_macros {
   $result .= "#define METHOD\n";
   $result .= "#define GENERIC\n";
   $result .= "#define ALIAS(m)\n";
+  $result .= "#define INCLUDE(f)\n";
   $result .= "#define MODULE(n)\n";
   $result .= "#define MODULE-EXPORT(n, ...)\n";
   $result .= "#define MODULE-IMPORT(n1, n2, ...)\n";
   $result .= "#define PROVIDE(t)\n";
   $result .= "#define REQUIRE(t)\n";
   $result .= "#define SLOTS(t, ...)\n";
+  $result .= "#define SLOTS-TYPEDEF typedef\n";
   $result .= "#define SUPERKLASS(k)\n";
   $result .= "#define KLASS(k)\n";
   $result .= "#define TRAIT(t)\n";

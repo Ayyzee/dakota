@@ -218,8 +218,8 @@ sub rewrite_functions {
 }
 sub rewrite_includes {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(?<!\#)( *include)(\s*\".+?\"\s*);|/\*$1$2\*/|g;
-  $$filestr_ref =~ s|(?<!\#)( *include)(\s*<.+?>\s*);|/\*$1$2\*/|g;
+  $$filestr_ref =~ s|(?<!\#)( *include)\s*(\".+?\")\s*;|INCLUDE($2);|g;
+  $$filestr_ref =~ s|(?<!\#)( *include)\s*(<.+?>)\s*;|INCLUDE($2);|g;
 }
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
@@ -366,7 +366,7 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
-  $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|/*slots*/ typedef$1 slots-t$2;|gsx;
+  $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|SLOTS-TYPEDEF$1 slots-t$2;|gsx;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -459,7 +459,7 @@ sub rewrite_const {
 }
 sub rewrite_function_typedef {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(typedef\s*[^;]+?\s*\(\s*\*)(\s*\)\(.*?\))(\s*$id)(\s*;)|$1$3$2$4|gs;
+  $$filestr_ref =~ s/((SLOTS-TYPEDEF|typedef)\s*[^;]+?\s*\(\s*\*)(\s*\)\(.*?\))(\s*$id)(\s*;)/$1$4$3$5/gs;
 }
 sub rewrite_array_types {
   my ($filestr_ref) = @_;
