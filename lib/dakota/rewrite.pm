@@ -366,7 +366,7 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
-  $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|SLOTS-TD$1 slots-t$2;|gsx;
+  $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|typedef$1 slots-t$2;|gsx;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -459,7 +459,7 @@ sub rewrite_const {
 }
 sub rewrite_function_typedef {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/((SLOTS-TD|typedef)\s*[^;]+?\s*\(\s*\*)(\s*\)\(.*?\))(\s*$id)(\s*;)/$1$4$3$5/gs;
+  $$filestr_ref =~ s/((typedef)\s*[^;]+?\s*\(\s*\*)(\s*\)\(.*?\))(\s*$id)(\s*;)/$1$4$3$5/gs;
 }
 sub rewrite_array_types {
   my ($filestr_ref) = @_;
@@ -657,7 +657,7 @@ sub add_implied_slots_struct {
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s=(export)(\s+slots\s+)=/*$1*/$2=gs;
-  $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)(.*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5, $6)=gse;
+  $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)([^;]*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5, $6)=gse;
 }
 sub exported_enum_body {
   my ($a, $b, $c, $d, $e) = @_;
@@ -801,8 +801,15 @@ sub rewrite_export_method {
     }
   }
 }
+sub remove_system_includes {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s|^\s*\#\s*include\s*(<.+?>)|INCLUDE($1);|gm;
+}
 sub convert_dk_to_cc {
-  my ($filestr_ref, $kw_args_generics) = @_;
+  my ($filestr_ref, $kw_args_generics, $remove) = @_;
+  if ($remove) {
+    &remove_system_includes($filestr_ref);
+  }
   &encode_cpp($filestr_ref);
   &encode_strings($filestr_ref);
   &encode_comments($filestr_ref);
@@ -823,10 +830,14 @@ sub convert_dk_to_cc {
   &rewrite_klass_initialize($filestr_ref);
   &rewrite_klass_finalize($filestr_ref);
   &add_implied_slots_struct($filestr_ref);
-  &remove_exported_slots($filestr_ref);
+  if ($remove) {
+    &remove_exported_slots($filestr_ref);
+  }
   #&wrapped_rewrite($filestr_ref, [ 'export', 'slots', '?block' ], [ ]);
 
-  &remove_exported_enum($filestr_ref);
+  if ($remove) {
+    &remove_exported_enum($filestr_ref);
+  }
   #&wrapped_rewrite($filestr_ref, [ 'export', 'enum',           '?block' ], [ ]);
   #&wrapped_rewrite($filestr_ref, [ 'export', 'enum', '?ident', '?block' ], [ ]);
 

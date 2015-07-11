@@ -27,6 +27,8 @@ use warnings;
 
 my $should_write_pre_output = 1;
 
+my $emacs_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
+
 my $gbl_prefix;
 my $gbl_compiler;
 my $objdir;
@@ -246,7 +248,7 @@ sub write_to_file_strings {
 }
 my $gbl_macros;
 sub write_to_file_converted_strings {
-  my ($path, $strings) = @_;
+  my ($path, $strings, $remove) = @_;
   if (!defined $gbl_macros) {
     if ($ENV{'DK_MACROS_PATH'}) {
       $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die "do $ENV{'DK_MACROS_PATH'} failed: $!\n";
@@ -272,7 +274,7 @@ sub write_to_file_converted_strings {
     &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_args_generics);
   }
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
-  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics);
+  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics, $remove);
 
   print PATH $converted_string;
 
@@ -307,7 +309,8 @@ sub generate_nrt {
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # nrt-hh
     $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
 
-    my $str_hh = &labeled_src_str(undef, "nrt-hh");
+    my $str_hh = '// ' . $emacs_mode_file_variables  . "\n";
+    $str_hh .= &labeled_src_str(undef, "nrt-hh");
     $str_hh .=
       "\n" .
       &labeled_src_str($result, "headers-hh") .
@@ -338,7 +341,8 @@ sub generate_nrt {
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # nrt-cc
     $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
 
-    my $str_cc = &labeled_src_str(undef, "nrt-cc");
+    my $str_cc = '// ' . $emacs_mode_file_variables  . "\n";
+    $str_cc .= &labeled_src_str(undef, "nrt-cc");
     $str_cc .=
       "\n" .
       "#include \"$name.$hh_ext\"\n" .
@@ -381,7 +385,8 @@ sub generate_rt {
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # rt-hh
     $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
 
-    my $str_hh = &labeled_src_str(undef, "rt-hh");
+    my $str_hh = '// ' . $emacs_mode_file_variables  . "\n";
+    $str_hh .= &labeled_src_str(undef, "rt-hh");
     $str_hh .=
       "\n" .
       &labeled_src_str($result, "headers-hh") .
@@ -412,7 +417,8 @@ sub generate_rt {
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # rt-cc
     $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
 
-    my $str_cc = &labeled_src_str(undef, "rt-cc");
+    my $str_cc = '// ' . $emacs_mode_file_variables  . "\n";
+    $str_cc .= &labeled_src_str(undef, "rt-cc");
     $str_cc .=
       "\n" .
       "#include \"$name.$hh_ext\"\n" .
@@ -1702,6 +1708,25 @@ sub dk_parse {
   $file = &dakota::parse::kw_args_translate($file);
   return $file;
 }
+sub slots_decl {
+  my ($slots_scope) = @_;
+  my $result = 'slots';
+  if ($$slots_scope{'cat'}) {
+    if ('struct' ne $$slots_scope{'cat'}) {
+      $result .= ' ' . $$slots_scope{'cat'};
+    }
+    if ('enum' eq $$slots_scope{'cat'}) {
+      if ($$slots_scope{'enum-base'}) {
+        $result .= ' : ' . $$slots_scope{'enum-base'};
+      } else {
+        $result .= ' : ' . 'int-t';
+      }
+    }
+  } elsif ($$slots_scope{'type'}) {
+    $result .= ' ' . $$slots_scope{'type'};
+  }
+  return $result;
+}
 sub generate_struct_or_union_decl {
   my ($col, $slots_scope, $is_exported, $is_slots) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -1709,7 +1734,7 @@ sub generate_struct_or_union_decl {
 
   if ('struct' eq $$slots_scope{'cat'} ||
       'union'  eq $$slots_scope{'cat'}) {
-    $$scratch_str_ref .= " $$slots_scope{'cat'} slots-t; ";
+    $$scratch_str_ref .= ' ' . &slots_decl($slots_scope) . '; ';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
@@ -1721,7 +1746,7 @@ sub generate_struct_or_union_defn {
 
   if ('struct' eq $$slots_scope{'cat'} ||
       'union'  eq $$slots_scope{'cat'}) {
-    $$scratch_str_ref .= " $$slots_scope{'cat'} slots-t {" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= ' ' . &slots_decl($slots_scope) . ' {' . &ann(__FILE__, __LINE__) . "\n";
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
@@ -1741,30 +1766,26 @@ sub generate_struct_or_union_defn {
     $$scratch_str_ref .= $col . "$slot_type " . $pad . "$slot_name;\n";
   }
   $col = &colout($col);
-  $$scratch_str_ref .= $col . "};";
+  $$scratch_str_ref .= $col . '}';
 }
 sub generate_enum_decl {
   my ($col, $enum, $is_exported, $is_slots) = @_;
   die if $$enum{'type'} && $is_slots;
   my $info = $$enum{'info'};
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $type;
-  if ($$enum{'type'}) {
-    $type = $$enum{'type'};
-  } elsif ($is_slots) {
-    $type = ['slots-t'];
+
+  if ($is_slots) {
+    $$scratch_str_ref .= 'slots enum';
   }
-  if ($type) {
-    $$scratch_str_ref .= " enum @$type";
+  elsif ($$enum{'type'}) {
+    $$scratch_str_ref .= 'enum' . @{$$enum{'type'}};
   } else {
-    $$scratch_str_ref .= " enum";
+    $$scratch_str_ref .= 'enum';
   }
-  if ($type) {
-    if ($$enum{'enum-base'}) {
-      $$scratch_str_ref .= " : $$enum{'enum-base'};";
-    } else {
-      $$scratch_str_ref .= " : int-t;";
-    }
+  if ($$enum{'enum-base'}) {
+    $$scratch_str_ref .= ' : ' . $$enum{'enum-base'} . ';';
+  } else {
+    $$scratch_str_ref .= ' : int-t;';
   }
 }
 sub generate_enum_defn {
@@ -1773,21 +1794,18 @@ sub generate_enum_defn {
   my $info = $$enum{'info'};
   my $scratch_str_ref = &global_scratch_str_ref();
 
-  my $type;
-  if ($$enum{'type'}) {
-    $type = $$enum{'type'};
-  } elsif ($is_slots) {
-    $type = ['slots-t'];
+  if ($is_slots) {
+    $$scratch_str_ref .= 'slots enum';
   }
-  if ($type) {
-    $$scratch_str_ref .= " enum @$type";
+  elsif ($$enum{'type'}) {
+    $$scratch_str_ref .= 'enum' . @{$$enum{'type'}};
   } else {
-    $$scratch_str_ref .= " enum";
+    $$scratch_str_ref .= 'enum';
   }
   if ($$enum{'enum-base'}) {
-    $$scratch_str_ref .= " : $$enum{'enum-base'}";
+    $$scratch_str_ref .= ' : ' . $$enum{'enum-base'};
   } else {
-    $$scratch_str_ref .= " : int-t";
+    $$scratch_str_ref .= ' : int-t';
   }
   $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . "\n";
   my $max_width = 0;
@@ -1805,7 +1823,7 @@ sub generate_enum_defn {
     $$scratch_str_ref .= $col . "$name = " . $pad . "$value,\n";
   }
   $col = &colout($col);
-  $$scratch_str_ref .= $col . "};";
+  $$scratch_str_ref .= $col . '}';
 }
 sub parameter_list_from_slots_info {
   my ($slots_info) = @_;
@@ -2259,17 +2277,17 @@ sub generate_slots_decls {
   my $scratch_str_ref = &global_scratch_str_ref();
   if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
-    $$scratch_str_ref .= $col . "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     $$scratch_str_ref .= $col . "//typedef $klass_name\::slots-t $klass_name-t;\n";
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name {";
+      $$scratch_str_ref .= $col . "klass $klass_name { ";
       my $is_exported;
       my $is_slots;
-      &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
+      &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
       $$scratch_str_ref .= $col . " }\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
@@ -2316,9 +2334,9 @@ sub generate_exported_slots_decls {
   if ('object' eq "$klass_name") {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "//klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "//klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
@@ -2326,7 +2344,7 @@ sub generate_exported_slots_decls {
     $$scratch_str_ref .= $col . "typedef $klass_name\::slots-t* $klass_name-t;" . &ann(__FILE__, __LINE__) . " // special-case\n";
   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
-    $$scratch_str_ref .= $col . "klass $klass_name { SLOTS-TD $$klass_scope{'slots'}{'type'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
                          };
@@ -2336,9 +2354,9 @@ sub generate_exported_slots_decls {
   } elsif (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name { $$klass_scope{'slots'}{'cat'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     } elsif ('enum' eq $$klass_scope{'slots'}{'cat'}) {
-      $$scratch_str_ref .= $col . "klass $klass_name {";
+      $$scratch_str_ref .= $col . "klass $klass_name { ";
       my $is_exported;
       my $is_slots;
       &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
@@ -2368,7 +2386,6 @@ sub readability_cpp_macros {
   $result .= "#define PROVIDE(t)\n";
   $result .= "#define REQUIRE(t)\n";
   $result .= "#define SLOTS(t, ...)\n";
-  $result .= "#define SLOTS-TD typedef\n";
   $result .= "#define SUPERKLASS(k)\n";
   $result .= "#define KLASS(k)\n";
   $result .= "#define TRAIT(t)\n";
@@ -2697,7 +2714,7 @@ sub linkage_unit::generate_klasses_types_after {
       if (&has_enums($klass_scope)) {
         foreach my $enum (@{$$klass_scope{'enum'} ||= []}) {
           if (&is_exported($enum)) {
-            $$scratch_str_ref .= $col . "klass $klass_name {";
+            $$scratch_str_ref .= $col . "klass $klass_name { ";
             &generate_enum_defn(&colin($col), $enum, $is_exported = 1, $is_slots = 0);
             $$scratch_str_ref .= $col . " }\n";
           }
@@ -2707,7 +2724,7 @@ sub linkage_unit::generate_klasses_types_after {
     if (&has_slots_info($klass_scope)) {
       if (&is_decl()) {
         if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
-          $$scratch_str_ref .= $col . "klass $klass_name {";
+          $$scratch_str_ref .= $col . "klass $klass_name { ";
           if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
               'union'  eq $$klass_scope{'slots'}{'cat'}) {
             &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
@@ -2722,7 +2739,7 @@ sub linkage_unit::generate_klasses_types_after {
       } elsif (&is_nrt_defn() || &is_rt_defn()) {
         if (!&has_exported_slots($klass_scope)) {
           if (&is_exported($klass_scope)) {
-            $$scratch_str_ref .= $col . "klass $klass_name {";
+            $$scratch_str_ref .= $col . "klass $klass_name { ";
             if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
                 'union'  eq $$klass_scope{'slots'}{'cat'}) {
               &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
@@ -2734,7 +2751,7 @@ sub linkage_unit::generate_klasses_types_after {
             }
             $$scratch_str_ref .= $col . " }\n";
           } else {
-            $$scratch_str_ref .= $col . "klass $klass_name {";
+            $$scratch_str_ref .= $col . "klass $klass_name { ";
             if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
                 'union'  eq $$klass_scope{'slots'}{'cat'}) {
               &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
@@ -3901,7 +3918,7 @@ sub linkage_unit::generate_symbols {
     my $width = length($symbol);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t _$ident; }" . &ann(__FILE__, __LINE__) . " // $symbol\n";
+      $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t _$ident; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
       $scratch_str .= $col . "namespace __symbol$ns { noexport symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__FILE__, __LINE__) . "\n";
@@ -3956,13 +3973,13 @@ sub linkage_unit::generate_keywords {
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "namespace __keyword$ns { extern noexport keyword-t _$ident; }" . &ann(__FILE__, __LINE__) . " // $symbol\n";
+        $scratch_str .= $col . "namespace __keyword$ns { extern noexport keyword-t _$ident; }" . &ann(__FILE__, __LINE__) . "\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
         # keyword-defn
-        $scratch_str .= "namespace __keyword$ns { noexport keyword-t _$ident = " . $pad . "{ __symbol$ns\::_$ident, " . $pad . "__hash$ns\::_$ident }; }" . &ann(__FILE__, __LINE__) . " // $symbol\n";
+        $scratch_str .= "namespace __keyword$ns { noexport keyword-t _$ident = " . $pad . "{ __symbol$ns\::_$ident, " . $pad . "__hash$ns\::_$ident }; }" . &ann(__FILE__, __LINE__) . "\n";
       }
     }
   }
@@ -4075,17 +4092,9 @@ sub pad {
   $result_str .= ' ' x $col_num;
   return $result_str;
 }
-# the system includes (i.e. <blah>) are "moved" earlier to an outer enclosing
-# translation units so the dakota include come after (as they should)
-# and not before (as they would be if no move occured).
-sub rewrite_system_includes {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|^\s*\#\s*include\s*(<.+?>)|INCLUDE($1);|gm;
-}
 sub dk_generate_cc {
   my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
-  &rewrite_system_includes(\$filestr);
   my $output = "$path_name.$cc_ext";
   $output =~ s|^\./||;
   my $directory = $ENV{'DKT_DIR'} ||= '.';
@@ -4093,15 +4102,16 @@ sub dk_generate_cc {
     $output = $ENV{'DKT_DIR'} . '/' . $output
   }
   print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # user-dk-cc
+  my $remove;
 
   if (exists $ENV{'DK_NO_LINE'}) {
-    &write_to_file_converted_strings("$output", [ $filestr ]);
+    &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1);
   } else {
     if (exists $ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "#line 1 \"$cwd/$file_basename.dk\"\n", $filestr ]);
+      &write_to_file_converted_strings("$output", [ "#line 1 \"$cwd/$file_basename.dk\"\n", $filestr ], $remove = 1);
     } else {
-      &write_to_file_converted_strings("$output", [ "#line 1 \"$file_basename.dk\"\n", $filestr ]);
+      &write_to_file_converted_strings("$output", [ "#line 1 \"$file_basename.dk\"\n", $filestr ], $remove = 1);
     }
   }
 }
