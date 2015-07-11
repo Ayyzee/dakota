@@ -221,9 +221,11 @@ my $method_sig_type = &method_sig_type_regex();
 sub method_sig_regex {
   return qr/(va::)?$mid(\($method_sig_type?\))?/;
 }
+# used src/bin/least-common-last-char.pl to
+# evaluate best options in english
 sub long_suffix {
-  return { '?' => 'p',
-           '!' => 'd' };
+  return { '?' => 'P',
+           '!' => 'X' };
 }
 sub dqstr_regex {
   # not-escaped " .*? not-escaped "

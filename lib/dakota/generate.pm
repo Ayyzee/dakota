@@ -111,7 +111,7 @@ my $global_klass_defns = [];
 
 my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 
-my $long_suffix = &dakota::util::long_suffix();
+my $long_suffix = &long_suffix();
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
