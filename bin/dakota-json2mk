@@ -12,10 +12,18 @@ use warnings;
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
+my $pair_sep =    ' : ';
+my $assign_sep =  ' := ';
+my $rassign_sep = ' = ';
+
 use Data::Dumper;
-$Data::Dumper::Terse =    1;
-$Data::Dumper::Useqq =    1;
-$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Sortkeys =  1;
+$Data::Dumper::Indent =    0;
+$Data::Dumper::Pair = $pair_sep;
 
 # gnu make variable assignment operators
 # = or := or ::= or ?=
@@ -145,34 +153,40 @@ sub process_scalar {
 sub process_scalar_expr {
   my ($data, $opts, $scopes, $out) = @_;
   my $lhs = &tsv_set($opts, $scopes, $out);
-  $$out{'mk'}{$lhs} = $data;
+  my $style;
+  $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
 }
 # seq is rhs of expr (lhs = rhs ...)
 sub process_seq_expr {
   my ($data, $opts, $scopes, $out) = @_;
   my $lhs = &tsv_set($opts, $scopes, $out);
-  $$out{'mk'}{$lhs} = [];
-
-  foreach my $element (@$data) {
-    if (&is_scalar($element)) {
-      #push @{$$out{'mk'}{$lhs}}, $element;
-      &process_scalar($element, $opts, $lhs, $out);
-    }
-  }
+  my $style;
+  $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
 }
 sub mkstr {
-  my ($out, $opts) = @_;
+  my ($out, $sep) = @_;
   my $result = '';
   foreach my $lhs (sort keys %{$$out{'mk'}}) {
     my $rhs = $$out{'mk'}{$lhs};
-    $result .= $lhs . ' =';
-    if (&is_scalar($rhs)) {
-      $rhs = [ $rhs ];
-    }
-    foreach my $element (@$rhs) {
-      $result .= ' ' . $element;
-    }
-    $result .= "\n";
+    my $style;
+    $result .= $lhs . $sep . &mydump($rhs, $style = 'mk') . "\n";
+  }
+  return $result;
+}
+sub mydump {
+  my ($ref, $style) = @_;
+  my $result = '';
+  if (!$ref) {
+    $result = 'null';
+  } else {
+    $result = &Dumper($ref);
+  }
+  $result =~ s/\\"//g;
+  $result =~ s/"//g;
+  if ($style && 'mk' eq $style) {
+    $result =~ s/^\[(.*)\]$/$1/;
+    $result =~ s/\s*,\s*/ /g;
+    $result =~ s/\\(.)/$1/g;
   }
   return $result;
 }
@@ -193,6 +207,11 @@ sub start {
     open($fh, '>&', \*STDOUT)
       or die "cannot open >& STDOUT: $!";
   }
+  my $style = 'mk';
+  my $sep_from_style = {
+    'mk' =>   $rassign_sep,
+    'json' => $pair_sep,
+  };
   foreach my $file (@$argv) {
     my $data = do $file or die;
     #print &Dumper($data);
@@ -201,8 +220,10 @@ sub start {
     #print &Dumper($out);
     print $fh
       "# generated from $file\n" .
-      &mkstr($out);
-    print $fh &tsv($data, $opts, $out);
+      &mkstr($out, $$sep_from_style{$style});
+    if ('mk' eq $style) {
+      print $fh &tsv($data, $opts, $out);
+    }
   }
   close($fh);
   if ($$opts{'output'}) {
@@ -233,7 +254,7 @@ sub tsv_install{
       my $info = $$install_elements[$i + 1];
       if (&is_tbl($info)) {
         my ($bname, $name); while (($bname, $name) = each (%$info)) {
-          $result .= $install_element . ' : ' . $bname . ' = ' . $name . "\n";
+          $result .= $install_element . $pair_sep . $bname . ' = ' . $name . "\n";
           $i++;
         }
       }
@@ -256,7 +277,7 @@ sub tsv {
       $result .= "\n";
       foreach my $bname (sort keys %{$$out{'tsv'}{$prefix}}) {
         my $name = $$out{'tsv'}{$prefix}{$bname};
-        $result .= "\$($output)" . ' : ' . $bname . ' = ' . "\$($name)" . "\n";
+        $result .= "\$($output)" . $pair_sep . $bname . ' = ' . "\$($name)" . "\n";
       }
     }
   }
@@ -282,7 +303,7 @@ sub tsv {
   }
   if ($$data{'output'}) {
     $result .= "\n";
-    $result .= 'all' . ' : ' . "\$($output)" . "\n"; # must be first target
+    $result .= 'all' . $pair_sep . "\$($output)" . "\n"; # must be first target
     $result .= "\n";
     $result .= "\$($output)" . ' :';
 
