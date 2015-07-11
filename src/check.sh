@@ -10,5 +10,5 @@ so_ext=dylib # linux: so_ext=so, darwin: so_ext=dylib
 echo
 ./bin/lslt $objdir/dakota/lib/libdakota-util.$so_ext.rep\
            $objdir/dakota/lib/libdakota-util.rep
-
+echo
 bin/build-file-size-summary.pl

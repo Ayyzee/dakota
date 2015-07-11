@@ -13,7 +13,8 @@ for file in "$@"; do
 
   eval $(stat -s $file) # darwin
   if [[ $? -eq 0 ]]; then
-    printf "% 9i %s\n" $st_size $file
+    ((st_size_k = $st_size / 1000))
+    printf "% 6iK %s\n" $st_size_k $file
   else
     return_value=1
   fi

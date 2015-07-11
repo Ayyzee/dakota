@@ -22,7 +22,7 @@ sub summary {
   my $result = [];
   for my $pat (@$pats) {
     my $size = &size($pat);
-    push @$result, sprintf("% 6iK: %s", $size/1000, $pat);
+    push @$result, sprintf("% 6iK %s", $size/1000, $pat);
   }
   return $result;
 }
@@ -41,6 +41,6 @@ foreach my $pat (@$pats) {
   $compiled_size += &size($pat);
 }
 print "---\n";
-printf("% 6iK: %s\n", $authored_size/1000, 'authored-size');
-printf("% 6iK: %s (+%i%%)\n", $compiled_size/1000, 'compiled-size',
+printf("% 6iK %s\n", $authored_size/1000, 'authored-size');
+printf("% 6iK %s (+%i%%)\n", $compiled_size/1000, 'compiled-size',
        $compiled_size/$authored_size * 100);
