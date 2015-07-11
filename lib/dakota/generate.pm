@@ -956,7 +956,7 @@ sub method::generate_va_method_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($klass_type) {
-    $$scratch_str_ref .= $col . uc($klass_type) . "_NS" . " @$scope { ";
+    $$scratch_str_ref .= $col . $klass_type . " @$scope { ";
   }
   else {
     $$scratch_str_ref .= $col . "namespace" . " @$scope { ";
@@ -2724,7 +2724,7 @@ sub linkage_unit::generate_klasses_types_after {
     if (&has_slots_info($klass_scope)) {
       if (&is_decl()) {
         if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
-          $$scratch_str_ref .= $col . "klass $klass_name { ";
+          $$scratch_str_ref .= $col . "klass $klass_name {";
           if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
               'union'  eq $$klass_scope{'slots'}{'cat'}) {
             &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
@@ -2739,7 +2739,7 @@ sub linkage_unit::generate_klasses_types_after {
       } elsif (&is_nrt_defn() || &is_rt_defn()) {
         if (!&has_exported_slots($klass_scope)) {
           if (&is_exported($klass_scope)) {
-            $$scratch_str_ref .= $col . "klass $klass_name { ";
+            $$scratch_str_ref .= $col . "klass $klass_name {";
             if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
                 'union'  eq $$klass_scope{'slots'}{'cat'}) {
               &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
@@ -2751,7 +2751,7 @@ sub linkage_unit::generate_klasses_types_after {
             }
             $$scratch_str_ref .= $col . " }\n";
           } else {
-            $$scratch_str_ref .= $col . "klass $klass_name { ";
+            $$scratch_str_ref .= $col . "klass $klass_name {";
             if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
                 'union'  eq $$klass_scope{'slots'}{'cat'}) {
               &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
