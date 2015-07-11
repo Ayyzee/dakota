@@ -2326,7 +2326,7 @@ sub generate_exported_slots_decls {
     $$scratch_str_ref .= $col . "typedef $klass_name\::slots-t* $klass_name-t;" . &ann(__FILE__, __LINE__) . " // special-case\n";
   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
-    $$scratch_str_ref .= $col . "klass $klass_name { typedef $$klass_scope{'slots'}{'type'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= $col . "klass $klass_name { SLOTS-TD $$klass_scope{'slots'}{'type'} slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
                          };
@@ -2368,7 +2368,7 @@ sub readability_cpp_macros {
   $result .= "#define PROVIDE(t)\n";
   $result .= "#define REQUIRE(t)\n";
   $result .= "#define SLOTS(t, ...)\n";
-  $result .= "#define SLOTS-TYPEDEF typedef\n";
+  $result .= "#define SLOTS-TD typedef\n";
   $result .= "#define SUPERKLASS(k)\n";
   $result .= "#define KLASS(k)\n";
   $result .= "#define TRAIT(t)\n";
@@ -2406,6 +2406,9 @@ sub linkage_unit::generate_headers {
     }
     my $all_headers = {};
     my $header_name;
+    foreach $header_name (keys %{$$scope{'includes'}}) {
+      $$all_headers{$header_name} = undef;
+    }
     foreach $header_name (keys %{$$scope{'headers'}}) {
       $$all_headers{$header_name} = undef;
     }
@@ -4072,9 +4075,17 @@ sub pad {
   $result_str .= ' ' x $col_num;
   return $result_str;
 }
+# the system includes (i.e. <blah>) are "moved" earlier to an outer enclosing
+# translation units so the dakota include come after (as they should)
+# and not before (as they would be if no move occured).
+sub rewrite_system_includes {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s|^\s*\#\s*include\s*(<.+?>)|INCLUDE($1);|gm;
+}
 sub dk_generate_cc {
   my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
+  &rewrite_system_includes(\$filestr);
   my $output = "$path_name.$cc_ext";
   $output =~ s|^\./||;
   my $directory = $ENV{'DKT_DIR'} ||= '.';

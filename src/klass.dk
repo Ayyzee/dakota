@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-include <cassert>;
-include <cinttypes>;
-include <cstdio>;
-include <cstring>;
+#include <cassert>
+#include <cinttypes>
+#include <cstdio>
+#include <cstring>
 
 #if HAVE-CONFIG-HH
   #include "config.hh"

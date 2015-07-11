@@ -495,6 +495,10 @@ sub add_symbol {
   my $ident = &path::string($symbol);
   &add_symbol_ident($file, $ident);
 }
+sub add_system_include {
+  my ($file, $system_include) = @_;
+  $$file{'includes'}{$system_include} = undef;
+}
 sub add_type {
   my ($seq) = @_;
   &maybe_add_exported_header_for_symbol_seq($seq);
@@ -961,22 +965,6 @@ sub finalize {
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
   }
   return;
-}
-sub include {
-  &match(__FILE__, __LINE__, 'include');
-
-  for (&sst_cursor::current_token($gbl_sst_cursor)) {
-    if (m/^"$h+"$/) {
-      &header();
-      last;
-    }
-    if (m/^<$h+>$/) {
-      &header();
-      last;
-    }
-
-    $$gbl_sst_cursor{'current-token-index'}++;
-  }
 }
 sub export {
   &match(__FILE__, __LINE__, 'export');
@@ -1946,10 +1934,6 @@ sub parse_root {
   # root
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
-      if (m/^include$/) {
-        &include();
-        last;
-      }
       if (m/^module$/) {
         &module_statement();
         last;
@@ -2041,6 +2025,9 @@ sub rep_tree_from_dk_path {
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &dakota::util::filestr_from_file($gbl_filename);
+  while (m/^\s*\#\s*include\s+(<.*?>)/gm) {
+    &add_system_include($gbl_root, $1);
+  }
   &encode_cpp(\$_);
   #&encode_strings(\$_);
   &encode_comments(\$_);
@@ -2049,6 +2036,7 @@ sub rep_tree_from_dk_path {
   #&log_sub_name($__sub__);
   #print STDERR $_;
 
+  pos $_ = 0;
   while (m/($id)\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }

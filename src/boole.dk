@@ -16,7 +16,7 @@
 
 module dakota;
 
-include <cstdbool>;
+#include <cstdbool>
 
 klass boole
 {

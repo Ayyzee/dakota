@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-include <cassert>;
-include <cerrno>;
-include <cinttypes>;
-include <cstdio>;
-include <cstring>;
-include <exception>;
-include <sys/stat.h>; // struct stat, stat()
+#include <cassert>
+#include <cerrno>
+#include <cinttypes>
+#include <cstdio>
+#include <cstring>
+#include <exception>
+#include <sys/stat.h> // struct stat, stat()
 
 #if HAVE-CONFIG-HH
   #include "config.hh"

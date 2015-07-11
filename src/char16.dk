@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-include <cstring>; // wrongwrong: should be <cuchar> or <uchar.h>
+#include <cstring> // wrongwrong: should be <cuchar> or <uchar.h>
 
 module dakota;
 
