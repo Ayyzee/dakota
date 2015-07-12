@@ -57,7 +57,7 @@
   'nrt_extra_symbols' => {},
   'rt_extra_symbols' => {
     'behavior-exported?' => undef,
-    'bool-t' => undef, # hardcode typedef
+    'boole-t' => undef, # hardcode typedef
     'cat' => undef,
     'char-t' => undef, # hardcode typedef
     'construct' => undef,
