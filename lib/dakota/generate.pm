@@ -3918,10 +3918,10 @@ sub linkage_unit::generate_symbols {
     my $width = length($symbol);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "namespace __symbol$ns { extern noexport symbol-t _$ident; }" . &ann(__FILE__, __LINE__) . "\n";
+      $scratch_str .= $col . "namespace __symbol$ns { extern noexport const symbol-t _$ident; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
-      $scratch_str .= $col . "namespace __symbol$ns { noexport symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__FILE__, __LINE__) . "\n";
+      $scratch_str .= $col . "namespace __symbol$ns { noexport const symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__FILE__, __LINE__) . "\n";
     }
   }
   return $scratch_str;
