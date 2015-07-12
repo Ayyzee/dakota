@@ -27,7 +27,6 @@ foreach my $char (split(//, $lc_alphabet)) {
 }
 #print &Dumper($last_char_tbl);
 my $words_file = "/usr/share/dict/words";
-
 my $fh;
 open($fh, "<", $words_file)
   or die "cannot open > $words_file: $!";
@@ -35,26 +34,44 @@ open($fh, "<", $words_file)
 while (<$fh>) {
   chomp $_;
   my $word = lc($_);
+  next if 1 == length $word;
   $word =~ m/^\s*(.*)(.)\s*$/;
   my $base = $1;
   my $last_char = $2;
   $$words{$word} = [ $base, $last_char ];
- #print $word . " " . &Dumper($$words{$word}) , "\n";
+  #print $word . " " . &Dumper($$words{$word}) , "\n";
 
   if (!exists $$last_char_tbl{$last_char}) {
     print STDERR "warning: not in range a-z : $last_char\n";
   } else {
-    $$last_char_tbl{$last_char}{$word} = 1;
+    $$last_char_tbl{$last_char}{$word} = $base;
   }
 }
 close ($fh) or warn "could not close file handle to $words_file: $!";
 
 #print &Dumper($last_char_tbl);
 
-map { printf "% 6i  %s  %.4f%%\n",
-        scalar keys %{$$last_char_tbl{$_}},
-        uc($_),
-        (scalar keys %{$$last_char_tbl{$_}}) / (scalar keys %$words) * 100; } keys %$last_char_tbl;
+while (my ($char, $values) = each (%$last_char_tbl)) {
+  my $base_count = &base_count($words, $last_char_tbl, $char);
+  printf "% 6i  % 6i  %s  %.4f%%  %.4f%%\n",
+   scalar keys %{$$last_char_tbl{$char}},
+   $base_count,
+   uc($char),
+   (scalar keys %{$$last_char_tbl{$char}}) / (scalar keys %$words) * 100,
+   $base_count                             / (scalar keys %$words) * 100;
+}
 
 #print &Dumper($$last_char_tbl{'p'});
 #print &Dumper($$last_char_tbl{'x'});
+#print &Dumper($$last_char_tbl{'q'});
+
+sub base_count {
+  my ($words, $last_char_tbl, $char) = @_;
+  my $result = 0;
+  while (my ($word, $base) = each (%{$$last_char_tbl{$char}})) {
+    if ($$words{$base}) {
+      $result++;
+    }
+  }
+  return $result;
+}
