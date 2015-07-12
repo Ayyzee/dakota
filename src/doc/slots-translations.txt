@@ -1,0 +1,46 @@
+slots char8-t[64];
+  =>
+typedef char8-t[64] slots-t; // how typedef should work
+  =>
+typedef char8-t slots-t[64]; // how typedef does work
+
+
+slots void (*)(void);
+  =>
+typedef void (*)(void) slots-t; // how typedef should work
+  =>
+typedef void (*slots-t)(void); // how typedef does work
+
+
+slots {}
+  =>
+slots struct {}
+  =>
+struct slots-t {};
+
+
+slots union {}
+  =>
+union slots-t {};
+
+
+slots : base1-t, base2-t {}
+  =>
+slots struct : base1-t, base2-t {}
+  =>
+struct slots-t : base1-t, base2-t {};
+
+
+slots enum {}
+  =>
+slots enum : int-t {}
+  =>
+enum slots-t : int-t {};
+
+
+slots enum : base-t {}
+  =>
+enum slots-t : base-t {};
+
+
+

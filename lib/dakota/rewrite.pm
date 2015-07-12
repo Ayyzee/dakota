@@ -470,18 +470,9 @@ sub rewrite_symbols {
   &rewrite_keywords($filestr_ref);
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?)/&symbol($1)/ge; # rnielsen
 }
-
-# this leaks memory!!
-sub rewrite_strings_rhs {
-  my ($string) = @_;
-  my $string_ident = &dakota::generate::make_ident_symbol_scalar($string);
-  #my $result = "__string::$string_ident";
-  my $result = "str::box(\"$string_ident\")";
-  return $result;
-}
 sub rewrite_strings {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!\\)\#\"(.+?)\"/&rewrite_strings_rhs($1)/ge;
+  $$filestr_ref =~ s/(?<!\\)\#(\".+?\")/str::box($1)/g; # this leaks memory!!
 }
 sub rewrite_keywords {
   my ($filestr_ref) = @_;
