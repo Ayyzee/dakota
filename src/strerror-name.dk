@@ -51,7 +51,7 @@ set-name(int-t errnum, str-t name)
   assert(nullptr != name);
   assert(NUL != name[0]);
 //   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);
-  assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
+  assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));
   if (isdigit(gbl-sys-err-names[errnum][0])) {
     gbl-sys-err-names[errnum] = name;
   }
@@ -73,7 +73,7 @@ set-name(int-t errnum, str-t name)
 export str-t
 strerror-name(int-t errnum)
 {
-  assert(errnum <= cast(int-t)DK-ARRAY-LENGTH(gbl-sys-err-names));
+  assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));
   str-t name = gbl-sys-err-names[errnum];
   return name;
 }

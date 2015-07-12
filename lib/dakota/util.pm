@@ -225,7 +225,7 @@ sub method_sig_regex {
 # evaluate best options in english
 sub long_suffix {
   return { '?' => 'P',
-           '!' => 'X' };
+           '!' => 'Z' };
 }
 sub dqstr_regex {
   # not-escaped " .*? not-escaped "

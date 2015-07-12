@@ -4058,7 +4058,7 @@ sub generate_info {
   my ($name, $tbl, $col, $symbols, $line) = @_;
   my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, __LINE__);
   $result .= "\n";
-  $result .= $col . "static named-info-t $name = { $name-props, DK-ARRAY-LENGTH($name-props), nullptr };" . &ann(__FILE__, $line) . "\n";
+  $result .= $col . "static named-info-t $name = { $name-props, DK-COUNTOF($name-props), nullptr };" . &ann(__FILE__, $line) . "\n";
   return $result;
 }
 sub generate_info_seq {
@@ -4078,7 +4078,7 @@ sub generate_info_seq {
   foreach my $element (@$seq) {
     my $width = length($element);
     my $pad = ' ' x ($max_width - $width);
-    $result .= $col . "{ $element, " . $pad . "DK-ARRAY-LENGTH($element), " . $pad . "nullptr },\n";
+    $result .= $col . "{ $element, " . $pad . "DK-COUNTOF($element), " . $pad . "nullptr },\n";
   }
   $result .= $col . "{ nullptr, 0, nullptr }\n";
   $col = &colout($col);

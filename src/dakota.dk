@@ -868,7 +868,7 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
         while (nullptr != (info = method-signatures[index++])) {
           char8-t first-parameter-type[15 + (1)] = "";
           size-t len = first-parameter-type-len(info->parameter-types);
-          assert(len < DK-ARRAY-LENGTH(first-parameter-type) - 1);
+          assert(len < DK-COUNTOF(first-parameter-type) - 1);
           strncpy(first-parameter-type, info->parameter-types, len);
           first-parameter-type[len] = cast(char8-t)0;
           //ofile::printf(ofl, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
@@ -1448,7 +1448,7 @@ info-for-name(symbol-t klass-name)
 {
   assert(nullptr != klass-name);
   property-t[] properties = { { #name, cast(uintptr-t)klass-name } };
-  named-info-t info = { properties, DK-ARRAY-LENGTH(properties), nullptr };
+  named-info-t info = { properties, DK-COUNTOF(properties), nullptr };
   named-info-t* info-ptr = &info;
   named-info-t** klass-info-ptr = cast(named-info-t**)sorted-array::bsearch(gbl-klass-defns-table, &info-ptr);
 

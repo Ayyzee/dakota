@@ -145,7 +145,12 @@ namespace dkt {
 #endif
 
 #define cast(t) (t)
-#define DK_ARRAY_LENGTH(array) (sizeof((array))/sizeof((array)[0]))
+#define DK_COUNTOF(array) (sizeof((array))/sizeof((array)[0]))
+
+template <typename T, size_t N>
+constexpr size_t dk_countof(T(&)[N]) {
+  return N;
+}
 
 #define dkt_klass(object)   (object)->klass
 #define dkt_superklass(kls) klass::unbox(kls)->superklass

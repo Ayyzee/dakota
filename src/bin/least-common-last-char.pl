@@ -53,7 +53,7 @@ close ($fh) or warn "could not close file handle to $words_file: $!";
 
 map { printf "% 6i  %s  %.4f%%\n",
         scalar keys %{$$last_char_tbl{$_}},
-        $_,
+        uc($_),
         (scalar keys %{$$last_char_tbl{$_}}) / (scalar keys %$words) * 100; } keys %$last_char_tbl;
 
 #print &Dumper($$last_char_tbl{'p'});
