@@ -18,3 +18,6 @@ number=$(wc -l /usr/share/dict/words)
 ./numbers.sh $number > numbers.txt
 
 hash-all numbers.txt
+
+head -1 hashes-words-sorted-unique.txt ; tail -1 hashes-words-sorted-unique.txt
+head -1 hashes-numbers-sorted-unique.txt ; tail -1 hashes-numbers-sorted-unique.txt

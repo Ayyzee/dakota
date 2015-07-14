@@ -1,12 +1,10 @@
 // only C++11 and better
 
-#include "hash.h"
+#include "hash.hh"
 
-int main(int argc, const char* const* argv)
-{
+int main() {
   const char* str = "Value2";
-  switch (dk_hash(str))
-  {
+  switch (dk_hash(str)) {
     case dk_hash("Value1"):
       //
       break;
