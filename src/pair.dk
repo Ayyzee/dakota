@@ -96,9 +96,9 @@ klass pair
     return result;
   }
 
-  method uintmax-t hash(object-t self)
+  method uintptr-t hash(object-t self)
   {
-    uintmax-t result;
+    uintptr-t result;
     object-t first = self;
     if (dk::instance?(first, klass))
       first = unbox(first)->first;

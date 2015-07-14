@@ -192,10 +192,10 @@ klass string
     return result;
   }
 
-  method uintmax-t hash(object-t self)
+  method uintptr-t hash(object-t self)
   {
-    uintmax-t value = dk-hash(self.ptr);
-    return value;
+    uintptr-t result = dk-hash(self.ptr);
+    return result;
   }
 
   method object-t append-sequence(object-t self, object-t sequence)

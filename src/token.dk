@@ -86,11 +86,11 @@ klass token
     return self;
   }
 
-  method uintmax-t hash(object-t self)
+  method uintptr-t hash(object-t self)
   {
     object-t string = make(string::klass, #bytes : cast(str-t)(self.buffer));
-    uintmax-t hash = dk::hash(string);
-    return hash;
+    uintptr-t result = dk::hash(string);
+    return result;
   }
 
   method boole-t equal?(object-t self, object-t other)

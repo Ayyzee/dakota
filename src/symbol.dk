@@ -71,10 +71,10 @@ klass symbol
     return self;
   }
 
-  method uintmax-t hash(slots-t s)
+  method uintptr-t hash(slots-t s)
   {
-    uintmax-t value = dk-hash(s);
-    return value;
+    uintptr-t result = dk-hash(s);
+    return result;
   }
 
   method str-t utf8-from(object-t self)

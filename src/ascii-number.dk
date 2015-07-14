@@ -33,9 +33,10 @@ klass ascii-number
     int32-t  number;
   }
 
-  method uintmax-t hash(object-t self)
+  method uintptr-t hash(object-t self)
   {
-    return cast(uintmax-t)(self.number);
+    uintptr-t result = cast(uintptr-t)(self.number);
+    return result;
   }
 
   method int-t compare(object-t self, object-t other)

@@ -139,9 +139,10 @@ klass object
 //     return kls;
 //   }
 
-  method uintmax-t hash(object-t self)
+  method uintptr-t hash(object-t self)
   {
-    return cast(uintmax-t)(self);
+    uintptr-t result = cast(uintptr-t)self;
+    return result;
   }
 
   method object-t dump(object-t self)
