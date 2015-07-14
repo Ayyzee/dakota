@@ -2,11 +2,13 @@ SHELL := /bin/sh -u
 
 DESTDIR ?=
 
-rootdir := ..
+rootdir ?= ..
 
 srcdir ?= .
 blddir := .
 objdir ?= $(blddir)/obj
+
+$(shell mkdir -p $(objdir))
 
 prefix ?= /usr/local
 includedir := $(prefix)/include
