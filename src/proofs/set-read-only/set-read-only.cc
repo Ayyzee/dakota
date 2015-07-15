@@ -32,15 +32,16 @@ void dk_intern(symbol_t* const addrs[], char const* const strs[], size_t len) {
 // darwin: getsegmentata() and mprotect()
 // linux:  elf_getdata()   and mprotect()
 
-extern const struct mach_header_64 __dso_handle;
+extern void* __dso_handle;
 
 int set_read_only(char const* segment) {
   assert(NULL != segment);
   long pagesize = sysconf(_SC_PAGESIZE);
   assert(__pagesize == pagesize);
-
+  const struct mach_header_64* mhp = cast(const struct mach_header_64*)&__dso_handle; 
   unsigned long size = 0;
-  uint8_t* addr = getsegmentdata(&__dso_handle, segment, &size); // darwin-only
+  uint8_t* addr = getsegmentdata(mhp, segment, &size); // darwin-only
+  printf("%p\n", addr);
   int result = -1;
 
   if (NULL != addr) {
