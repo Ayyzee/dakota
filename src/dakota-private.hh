@@ -23,30 +23,30 @@
 dkt_declare_klass_type_struct(selector_node);
 //dkt_declare_klass_type_struct(signature);
 
-extern noexport void (*previous_terminate)();
-extern noexport void (*previous_unexpected)();
+extern void (*previous_terminate)();
+extern void (*previous_unexpected)();
 
-noexport void import_selectors(signature_t** signatures, selector_node_t* selector_nodes);
+void import_selectors(signature_t** signatures, selector_node_t* selector_nodes);
 
-noexport symbol_t interposer_name_for_klass_name(symbol_t klass_name);
-noexport void add_interpose_prop(symbol_t key, symbol_t element);
+symbol_t interposer_name_for_klass_name(symbol_t klass_name);
+void add_interpose_prop(symbol_t key, symbol_t element);
 
-noexport named_info_t* info_for_name(symbol_t);
+named_info_t* info_for_name(symbol_t);
 
-noexport int_t  safe_strptrcmp(str_t const* sp1, str_t const* sp2);
-noexport int_t  safe_strncmp(str_t s1, str_t s2, size_t n);
+int_t  safe_strptrcmp(str_t const* sp1, str_t const* sp2);
+int_t  safe_strncmp(str_t s1, str_t s2, size_t n);
 
-noexport uint32_t size_from_info(named_info_t* info);
-noexport uint32_t offset_from_info(named_info_t* info);
-noexport symbol_t name_from_info(named_info_t* info);
-noexport symbol_t klass_name_from_info(named_info_t* info);
-noexport symbol_t superklass_name_from_info(named_info_t* info);
-noexport symbol_t superklass_name_from_info(named_info_t* info, symbol_t name);
+uint32_t size_from_info(named_info_t* info);
+uint32_t offset_from_info(named_info_t* info);
+symbol_t name_from_info(named_info_t* info);
+symbol_t klass_name_from_info(named_info_t* info);
+symbol_t superklass_name_from_info(named_info_t* info);
+symbol_t superklass_name_from_info(named_info_t* info, symbol_t name);
 
-noexport symbol_t default_superklass_name();
-noexport symbol_t default_klass_name();
+symbol_t default_superklass_name();
+symbol_t default_klass_name();
 
-noexport void verbose_terminate();
-noexport void verbose_unexpected();
+void verbose_terminate();
+void verbose_unexpected();
 
 #endif // dkt_dakota_private_hh

@@ -22,6 +22,6 @@
 
 dkt_declare_klass_type_struct(assoc_node);
 
-noexport assoc_node_t* imported_klasses_for_klass(symbol_t);
+assoc_node_t* imported_klasses_for_klass(symbol_t);
 
 #endif

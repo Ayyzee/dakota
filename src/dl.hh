@@ -17,7 +17,7 @@
 #if !defined dkt_dl_hh
 #define      dkt_dl_hh
 
-noexport str_t symbol_name_from_address(void*);
-noexport void load_library(str_t);
+str_t symbol_name_from_address(void*);
+void load_library(str_t);
 
 #endif // dkt_dl_hh

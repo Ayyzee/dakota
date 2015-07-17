@@ -23,18 +23,18 @@ namespace sorted_ptr_array
 {
   struct slots_t;
 
-  noexport slots_t* create(uint32_t capacity, uint32_t size, std_compare_t compare);
+  slots_t* create(uint32_t capacity, uint32_t size, std_compare_t compare);
 
-  noexport result_t search(slots_t* t, void const* key);
+  result_t search(slots_t* t, void const* key);
 
-  noexport void const* intern(slots_t* t, void const* key);
-  noexport void const* at(slots_t* t, uint32_t offset);
-  noexport void const* remove_last(slots_t* t);
+  void const* intern(slots_t* t, void const* key);
+  void const* at(slots_t* t, uint32_t offset);
+  void const* remove_last(slots_t* t);
 
-  noexport slots_t*    add(slots_t* t, void const* key);
-  noexport void const* bsearch(slots_t* t, void const* key);
-  noexport void const* remove_at(slots_t* t, void const* key, uint32_t offset);
-  noexport slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
+  slots_t*    add(slots_t* t, void const* key);
+  void const* bsearch(slots_t* t, void const* key);
+  void const* remove_at(slots_t* t, void const* key, uint32_t offset);
+  slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
 
 #endif // dkt_sorted_ptr_array_hh

@@ -90,9 +90,6 @@ namespace dkt {
   #define pure
   #define sentinel
   #define unused
-  #define import   __declspec(dllimport)
-  #define export   __declspec(dllexport)
-  #define noexport
   #define artificial
   #define leaf
   #define nothrow
@@ -108,9 +105,6 @@ namespace dkt {
   #define pure     __attribute__((__pure__))
   #define sentinel __attribute__((__sentinel__))
   #define unused   __attribute__((__unused__))
-  #define import
-  #define export   __attribute__((__visibility__("default")))
-  #define noexport __attribute__((__visibility__("hidden")))
   #define artificial __attribute__((__artificial__))
   #define leaf       __attribute__((__leaf__))
   #define nothrow    __attribute__((__nothrow__))
@@ -130,8 +124,8 @@ namespace dkt {
   #define DEBUG_EXPORT export
   #define DEBUG_IMPORT import
 #else
-  #define DEBUG_EXPORT noexport
-  #define DEBUG_IMPORT noexport
+  #define DEBUG_EXPORT
+  #define DEBUG_IMPORT
 #endif
 
 #define NULLPTR nullptr

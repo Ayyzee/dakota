@@ -582,7 +582,7 @@ sub generate_defn_footer {
   #$rt_cc_str .= $col . "};\n";
 
   $rt_cc_str .=
-    $col . "namespace { struct noexport __ddl_t {" . &ann(__FILE__, __LINE__) . "\n" .
+    $col . "namespace { struct /* visibility(hidden) */ __ddl_t {" . &ann(__FILE__, __LINE__) . "\n" .
     $col . "  __ddl_t(const __ddl_t&) = default;\n" .
     $col . "  __ddl_t()  { __initial(); }\n" .
     $col . "  ~__ddl_t() { __final();   }\n" .
@@ -879,11 +879,9 @@ sub function::decl {
     $function_decl .= '';
   }
 
-  my $visibility;
+  my $visibility = '';
   if (&is_exported($function)) {
     $visibility .= "export";
-  } else {
-    $visibility .= "noexport";
   }
   my $return_type = &arg::type($$function{'return-type'});
   my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
@@ -968,8 +966,6 @@ sub method::generate_va_method_defn {
   }
   if (&is_exported($va_method)) {
     $$scratch_str_ref .= "export ";
-  } else {
-    $$scratch_str_ref .= "noexport ";
   }
   if ($is_inline) {
     $$scratch_str_ref .= "INLINE ";
@@ -1057,8 +1053,6 @@ sub common::print_signature {
   }
   if (&is_exported($generic)) {
     $scratch_str .= "export ";
-  } else {
-    $scratch_str .= "noexport ";
   }
   my $generic_name = "@{$$generic{'name'}}";
   $scratch_str .= "signature-t const* $generic_name($$new_arg_type_list)";
@@ -1159,8 +1153,6 @@ sub common::print_selector {
   }
   if (&is_exported($generic)) {
     $scratch_str .= "export ";
-  } else {
-    $scratch_str .= "noexport ";
   }
   my $generic_name = "@{$$generic{'name'}}";
   $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
@@ -1444,8 +1436,6 @@ sub generics::generate_generic_defn {
   }
   if (&is_exported($generic)) {
     $$scratch_str_ref .= "export";
-  } else {
-    $$scratch_str_ref .= "noexport";
   }
   if ($is_inline) {
     $$scratch_str_ref .= " INLINE";
@@ -1528,8 +1518,6 @@ sub generics::generate_super_generic_defn {
   }
   if (&is_exported($generic)) {
     $$scratch_str_ref .= "export";
-  } else {
-    $$scratch_str_ref .= "noexport";
   }
   if ($is_inline) {
     $$scratch_str_ref .= " INLINE";
@@ -1710,7 +1698,7 @@ sub generics::generate_va_make_defn {
   my ($generics, $is_inline, $col) = @_;
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()\n";
-  $result .= $col . "sentinel noexport object-t make(object-t kls, ...)";
+  $result .= $col . "sentinel object-t make(object-t kls, ...)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     $result .= ";\n";
   } elsif (&is_rt_defn()) {
@@ -1906,7 +1894,7 @@ sub generate_klass_unbox {
   if ($klass_name eq 'object') {
     #$result .= $col . "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n";
   } elsif ($klass_name eq 'klass') {
-    $result .= $col . "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
+    $result .= $col . "klass $klass_name { unbox-attrs slots-t* unbox(object-t object)";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . " // special-case\n";
@@ -1920,7 +1908,7 @@ sub generate_klass_unbox {
   } else {
     ### unbox() same for all types
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
-      $result .= $col . "klass $klass_name { noexport unbox-attrs slots-t* unbox(object-t object)";
+      $result .= $col . "klass $klass_name { unbox-attrs slots-t* unbox(object-t object)";
       if (&is_nrt_decl() || &is_rt_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . "\n"; # general-case
       } elsif (&is_rt_defn()) {
@@ -1942,7 +1930,7 @@ sub generate_klass_box {
 
   if ('object' eq &path::string($klass_path)) {
     ### box() non-array-type
-    $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
+    $result .= $col . "klass $klass_name { object-t box(slots-t* arg)";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -1957,7 +1945,7 @@ sub generate_klass_box {
       ### box()
       if (&is_array_type($$klass_scope{'slots'}{'type'})) {
         ### box() array-type
-        $result .= $col . "klass $klass_name { noexport object-t box(slots-t arg)";
+        $result .= $col . "klass $klass_name { object-t box(slots-t arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -1971,7 +1959,7 @@ sub generate_klass_box {
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
-        $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
+        $result .= $col . "klass $klass_name { object-t box(slots-t* arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -1986,7 +1974,7 @@ sub generate_klass_box {
         }
       } else { # !&is_array_type()
         ### box() non-array-type
-        $result .= $col . "klass $klass_name { noexport object-t box(slots-t* arg)";
+        $result .= $col . "klass $klass_name { object-t box(slots-t* arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -2000,7 +1988,7 @@ sub generate_klass_box {
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
-        $result .= $col . "klass $klass_name { noexport object-t box(slots-t arg)";
+        $result .= $col . "klass $klass_name { object-t box(slots-t arg)";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -2033,7 +2021,7 @@ sub generate_klass_construct {
 
         if ($pairs =~ m/\[/g) {
         } else {
-          $result .= $col . "klass $klass_name { noexport slots-t construct($pairs)";
+          $result .= $col . "klass $klass_name { slots-t construct($pairs)";
 
           if (&is_nrt_decl() || &is_rt_decl()) {
             $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -2062,18 +2050,18 @@ sub linkage_unit::generate_klasses_body {
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if (&is_nrt_decl() || &is_rt_decl()) {
-    #$$scratch_str_ref .= $col . "extern noexport symbol-t __type__;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport symbol-t __klass__; }" . &ann(__FILE__, __LINE__) . "\n";
+    #$$scratch_str_ref .= $col . "extern symbol-t __type__;\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern symbol-t __klass__; }" . &ann(__FILE__, __LINE__) . "\n";
   } elsif (&is_rt_defn()) {
-    #$$scratch_str_ref .= $col . "noexport symbol-t __type__ = \$$klass_type;\n";
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport symbol-t __klass__ = \#@$klass_path; }" . &ann(__FILE__, __LINE__) . "\n";
+    #$$scratch_str_ref .= $col . "symbol-t __type__ = \$$klass_type;\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = \#@$klass_path; }" . &ann(__FILE__, __LINE__) . "\n";
   }
 
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern noexport object-t klass; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
     }
     if (!&is_rt_defn()) {
       my $is_exported;
@@ -2214,7 +2202,7 @@ sub linkage_unit::generate_klasses_body {
                 if (&is_exported($method)) {
                   $$scratch_str_ref .= $col . "$klass_type $klass_name { export method";
                 } else {
-                  $$scratch_str_ref .= $col . "$klass_type $klass_name { noexport method";
+                  $$scratch_str_ref .= $col . "$klass_type $klass_name { method";
                 }
                 if ($$method{'is-inline'}) {
                   #$$scratch_str_ref .= " INLINE";
@@ -2261,7 +2249,7 @@ sub generate_object_method_defn {
   if (&is_exported($method)) {
     $$scratch_str_ref .= $col . "$klass_type @$klass_path { export method";
   } else {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_path { noexport method";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_path { method";
   }
   my $method_name = "@{$$method{'name'}}";
   $$scratch_str_ref .= " $return_type $method_name($$new_arg_list)";
@@ -2431,6 +2419,15 @@ sub readability_cpp_macros {
   $result .= "#define KLASS(k)\n";
   $result .= "#define TRAIT(t)\n";
   $result .= "#define TRAITS(t1, ...)\n";
+  $result .= "\n";
+  $result .= "#if defined WIN32\n";
+  $result .= "  #define import __declspec(dllimport)\n";
+  $result .= "  #define export __declspec(dllexport)\n";
+  $result .= "#else\n";
+  $result .= "  #define import\n";
+  $result .= "  #define export __attribute__((__visibility__(\"default\")))\n";
+  $result .= "#endif\n";
+
   return $result;
 }
 sub hardcoded_typedefs {
@@ -3582,7 +3579,7 @@ sub generate_kw_args_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $kw_list_types = &method::kw_list_types($method);
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-signature { namespace va { noexport signature-t const* $method_name($$list_types); }}}" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-signature { namespace va { signature-t const* $method_name($$list_types); }}}" . &ann(__FILE__, __LINE__) . "\n";
 }
 sub generate_kw_args_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3590,7 +3587,7 @@ sub generate_kw_args_method_signature_defn {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-signature { namespace va { noexport signature-t const* $method_name($$list_types) {" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-signature { namespace va { signature-t const* $method_name($$list_types) {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
   my $kw_arg_list = "static signature-t const result = { \"$return_type\", \"$method_name\", \"";
@@ -3608,7 +3605,7 @@ sub generate_slots_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-signature { noexport signature-t const* $method_name($$list_types); }}" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-signature { signature-t const* $method_name($$list_types); }}" . &ann(__FILE__, __LINE__) . "\n";
 }
 sub generate_slots_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3616,7 +3613,7 @@ sub generate_slots_method_signature_defn {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-signature { noexport signature-t const* $method_name($$list_types) {" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-signature { signature-t const* $method_name($$list_types) {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
   my $arg_list = "static signature-t const result = { \"$return_type\", \"$method_name\", \"";
@@ -3653,12 +3650,10 @@ sub generate_kw_args_method_defn {
   my $new_arg_list  = &arg_type::list_pair($new_arg_type, $new_arg_names);
 
   my $return_type = &arg::type($$method{'return-type'});
-  my $visibility;
+  my $visibility = '';
 
   if (&is_exported($method)) {
     $visibility = "export";
-  } else {
-    $visibility = "noexport";
   }
   #if ($$method{'is-inline'})
   #{
@@ -3977,13 +3972,13 @@ sub linkage_unit::generate_symbols {
     my $width = length($symbol);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "extern noexport symbol-t _$ident;" . "\n";
+      $scratch_str .= $col . "extern symbol-t _$ident;" . "\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
       if (&should_ann($ln, $num_lns)) {
-        $scratch_str .= $col . "noexport symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
+        $scratch_str .= $col . "symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
       } else {
-        $scratch_str .= $col . "noexport symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . "\n";
+        $scratch_str .= $col . "symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . "\n";
       }
     }
   }
@@ -4051,16 +4046,16 @@ sub linkage_unit::generate_keywords {
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "extern noexport keyword-t _$ident;" . "\n";
+        $scratch_str .= $col . "extern keyword-t _$ident;" . "\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
         # keyword-defn
         if (&should_ann($ln, $num_lns)) {
-          $scratch_str .= $col . "noexport keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . &ann(__FILE__, __LINE__) . "\n";
+          $scratch_str .= $col . "keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . &ann(__FILE__, __LINE__) . "\n";
         } else {
-          $scratch_str .= $col . "noexport keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . "\n";
+          $scratch_str .= $col . "keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . "\n";
         }
       }
     }
@@ -4078,9 +4073,9 @@ sub linkage_unit::generate_strings {
   while (my ($string, $dummy) = each(%{$$file{'strings'}})) {
     my $string_ident = &make_ident_symbol_scalar($string);
     if (&is_decl()) {
-      $scratch_str .= $col . "//extern noexport object-t $string_ident;\n";
+      $scratch_str .= $col . "//extern object-t $string_ident;\n";
     } else {
-      $scratch_str .= $col . "//noexport object-t $string_ident = make(string::klass, bytes $colon \"$string\");\n";
+      $scratch_str .= $col . "//object-t $string_ident = make(string::klass, #bytes $colon \"$string\");\n";
     }
   }
   $col = &colout($col);

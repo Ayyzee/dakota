@@ -220,8 +220,8 @@ klass perl-parser
     }
   }
     
-  /* method */ noexport object-t get-table(object-t self);
-  /* method */ noexport object-t get-vector(object-t self);
+  /* method */ object-t get-table(object-t self);
+  /* method */ object-t get-vector(object-t self);
 
   /* method */ static object-t key(object-t self)
   {
@@ -352,7 +352,7 @@ klass perl-parser
   }
 
   // hackhack - multiple return statements
-  /* method */ noexport object-t get-vector(object-t self)
+  /* method */ object-t get-vector(object-t self)
   {
     object-t vector = make(vector::klass);
     object-t token;
@@ -379,7 +379,7 @@ klass perl-parser
     return vector;
   }
 
-  /* method */ noexport object-t get-table(object-t self)
+  /* method */ object-t get-table(object-t self)
   {
     object-t table = make(hashed-table::klass);
     object-t token;

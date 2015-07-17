@@ -34,14 +34,14 @@ macro method
 {
   { method ?type-ident ?ident ( object-t self ?wildcard ) }
   =>
-    { noexport ?type-ident ?ident ( object-t self ?wildcard ) }
+    { METHOD ?type-ident ?ident ( object-t self ?wildcard ) }
 }
 
 macro va-method
 {
   { method ?type-ident va : ?ident ( object-t self ?wildcard ) }
   =>
-    { noexport ?type-ident va : ?ident ( object-t self ?wildcard ) }
+    { METHOD ?type-ident va : ?ident ( object-t self ?wildcard ) }
 }
 
 macro slots-use

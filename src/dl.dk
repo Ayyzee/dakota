@@ -19,7 +19,7 @@
 #include "dl.hh"
 
 // returns nullptr if no exact match
-noexport str-t
+str-t
 symbol-name-from-address(void* saddr)
 {
   str-t result = nullptr;
@@ -33,7 +33,7 @@ symbol-name-from-address(void* saddr)
   return result;
 }
 
-noexport void
+void
 load-library(str-t name)
 {
 #if defined WIN32

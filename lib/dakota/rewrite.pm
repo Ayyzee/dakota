@@ -168,14 +168,6 @@ sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s=^     (klass|trait)(\s+$id\s*)(\{)=uc($1) . "-NS" . $2 . "{"=gemx;
 }
-sub rewrite_klass_initialize {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=(object-t\s+initialize\s*\()=noexport $1=g;
-}
-sub rewrite_klass_finalize {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=(object-t\s+finalize\s*\()=noexport $1=g;
-}
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
@@ -362,8 +354,8 @@ sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(          \s*$main::block)/$2$1slots-t$3;/gsx;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1slots-t$3;/gsx;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(          \s*$main::block)/$2$1 export slots-t$3;/gsx;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1 export slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
   $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|typedef$1 slots-t$2;|gsx;
@@ -818,8 +810,6 @@ sub convert_dk_to_cc {
   &rewrite_module_statement($filestr_ref);
 
   &rewrite_klass_decl($filestr_ref);
-  &rewrite_klass_initialize($filestr_ref);
-  &rewrite_klass_finalize($filestr_ref);
   &add_implied_slots_struct($filestr_ref);
   if ($remove) {
     &remove_exported_slots($filestr_ref);

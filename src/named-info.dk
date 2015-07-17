@@ -116,7 +116,7 @@ klass named-info
     return result;
   }
 
-  noexport int-t compare(slots-t** s, slots-t** other-s)
+  int-t compare(slots-t** s, slots-t** other-s)
   {
     int-t result = compare(*s, *other-s);
     return result;
@@ -138,7 +138,7 @@ klass named-info
   }
 }
 
-noexport named-info-t*
+named-info-t*
 dk-va-make-named-info-slots(symbol-t name, va-list-t args)
 {
 //   assert(nullptr != name);

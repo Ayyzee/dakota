@@ -60,7 +60,7 @@
 (font-lock-add-keywords 'c++-mode '(("\\<\\(throw-object\\|finally\\|unless\\|until\\|else-if\\)\\>" . font-lock-keyword-face)))
 
 ;;; visiblity keywords
-(font-lock-add-keywords 'c++-mode '(("\\<\\(import\\|export\\|noexport\\)\\>" . font-lock-keyword-face)))
+(font-lock-add-keywords 'c++-mode '(("\\<\\(import\\|export\\)\\>" . font-lock-keyword-face)))
 
 ;;; keyword
 (font-lock-add-keywords 'c++-mode '(("\\<\\(generic\\|method\\)\\>" . font-lock-keyword-face)))

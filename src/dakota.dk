@@ -59,16 +59,16 @@ klass symbol;
 #if DKT-WORKAROUND
 namespace property
 {
-  noexport int-t compare(slots-t**, slots-t**);
+  int-t compare(slots-t**, slots-t**);
 }
 namespace named-info
 {
-  noexport int-t compare(slots-t**, slots-t**);
+  int-t compare(slots-t**, slots-t**);
 }
 namespace klass
 {
-  noexport object-t init(object-t, named-info-t*);
-  noexport boole-t subklass?(object-t, object-t);
+  object-t init(object-t, named-info-t*);
+  boole-t subklass?(object-t, object-t);
 }
 #endif
 
@@ -101,7 +101,7 @@ klass named-assoc-node
     return result;
   }
 
-//   noexport slots-t* dump(slots-t* s)
+//   slots-t* dump(slots-t* s)
 //   {
 //     printf("\"%s\"\n", s->name);
 //     assoc-node-t* node = s->node;
@@ -144,7 +144,7 @@ init-runtime-ds()
 }
 
 #if defined DKT-DUMP-MEM-FOOTPRINT
-extern noexport resource-usage::slots-t gbl-ru;
+extern resource-usage::slots-t gbl-ru;
 #endif
 
 typedef int32-t (*)(void*, void*) vcompare-t;
@@ -245,7 +245,7 @@ find-file(str-t path, str-t file-name, str-t suffix)
   return rtn;
 }
 
-noexport symbol-t
+symbol-t
 default-klass-name()
 {
   return #klass;
@@ -291,13 +291,13 @@ init-klass(object-t kls, symbol-t name)
     return kls;
 }
 
-noexport void import-klass(symbol-t name, assoc-node-t* klass-assoc);
+void import-klass(symbol-t name, assoc-node-t* klass-assoc);
 
-noexport void pre-runtime-verbose-terminate();
-noexport void verbose-terminate();
+void pre-runtime-verbose-terminate();
+void verbose-terminate();
 
-noexport void pre-runtime-verbose-unexpected();
-noexport void verbose-unexpected();
+void pre-runtime-verbose-unexpected();
+void verbose-unexpected();
 
 klass ofile
 {
@@ -356,7 +356,7 @@ klass ofile
 }
 
 #if 1
-extern noexport sorted-array-t gbl-selectors-table;
+extern sorted-array-t gbl-selectors-table;
 static void
 perl-dump-resource-info(sorted-array-t* klass-defns-table)
 {
@@ -454,8 +454,8 @@ perl-dump-klass-defns(sorted-array-t* klass-defns-table)
 }
 static named-info-t* gbl-registration-info-list;
 
-noexport void register-info-common(named-info-t* registration-info);
-noexport void export-klass(named-info-t* klass-info);
+void register-info-common(named-info-t* registration-info);
+void export-klass(named-info-t* klass-info);
 
 // export object-t
 // dk-make-simple-singleton(symbol-t name, symbol-t superklass-name)
@@ -583,7 +583,7 @@ dk-init-runtime()
 
   return;
 }
-noexport assoc-node-t*
+assoc-node-t*
 imported-klasses-for-klass(symbol-t klass-name)
 {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
@@ -597,7 +597,7 @@ imported-klasses-for-klass(symbol-t klass-name)
     result = found-named-node->node;
   return result;
 }
-noexport void
+void
 import-klass(symbol-t klass-name, assoc-node-t* node)
 {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(void*)(node));
@@ -638,7 +638,7 @@ import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc)
   }
   return;
 }
-noexport symbol-t
+symbol-t
 interposer-name-for-klass-name(symbol-t klass-name)
 {
   property-t key = { klass-name, cast(uintptr-t)nullptr };
@@ -657,7 +657,7 @@ interposer-name-for-klass-name(symbol-t klass-name)
   return result;
 }
 
-noexport void
+void
 add-interpose-prop(symbol-t key, symbol-t element)
 {
 //   dkt-log(dkt::k-log-info, "%s(%s, %s)", __func__, key, element);
@@ -682,7 +682,7 @@ add-interposers(property-t* interposers)
   return;
 }
 
-noexport void
+void
 export-klass(named-info-t* klass-info)
 {
   named-info::sort(klass-info);
@@ -759,7 +759,7 @@ should-dump(named-info-t* klass-info, str-t only)
   return result;
 }
 
-noexport void dump-klass(ofile-t ofl, named-info-t* klass-info);
+void dump-klass(ofile-t ofl, named-info-t* klass-info);
 
 static str-t
 remove-dir(str-t path)
@@ -1016,7 +1016,7 @@ dump-generic(ofile-t ofl, signature-t const* info)
   return;
 }
 
-noexport void
+void
 dump-klass(ofile-t ofl, named-info-t* klass-info)
 {
   assert(nullptr != ofl.output);
@@ -1246,9 +1246,9 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
   return;
 }
 
-noexport void import-selectors(signature-t**, selector-node-t*); // hackhack
+void import-selectors(signature-t**, selector-node-t*); // hackhack
 
-noexport void
+void
 register-info-common(named-info-t* registration-info)
 {
   signature-t**      signatures-va =          cast(signature-t**)     named-info::at(registration-info, #signatures-va);
@@ -1443,7 +1443,7 @@ dk-klass-for-name(symbol-t klass-name)
   assert(nullptr != klass);
   return klass;
 }
-noexport named-info-t*
+named-info-t*
 info-for-name(symbol-t klass-name)
 {
   assert(nullptr != klass-name);

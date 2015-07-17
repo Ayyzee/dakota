@@ -117,9 +117,9 @@ dkt-log(uint32-t priority, str-t format, ...)
   return result;
 }
 
-noexport void pre-runtime-verbose-terminate();
-noexport void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
-noexport void
+void pre-runtime-verbose-terminate();
+void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
+void
 pre-runtime-verbose-terminate()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
@@ -135,7 +135,7 @@ pre-runtime-verbose-terminate()
   previous-terminate();
 }
 
-noexport void
+void
 verbose-terminate()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
@@ -159,9 +159,9 @@ verbose-terminate()
   previous-terminate();
 }
 
-noexport void pre-runtime-verbose-unexpected();
-noexport void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
-noexport void
+void pre-runtime-verbose-unexpected();
+void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
+void
 pre-runtime-verbose-unexpected()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
@@ -177,7 +177,7 @@ pre-runtime-verbose-unexpected()
   previous-unexpected();
 }
 
-noexport void
+void
 verbose-unexpected()
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);

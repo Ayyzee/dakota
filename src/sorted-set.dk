@@ -25,7 +25,7 @@ module dakota;
 #if DKT-WORKAROUND
 namespace sorted-ptr-array
 {
-  noexport result-t search(slots-t*, void const*);
+  result-t search(slots-t*, void const*);
 }
 #endif
 

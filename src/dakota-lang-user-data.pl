@@ -13,7 +13,6 @@
   'visibility' => {             # constant for a language
     'export'   => 1,
     'import'   => 1,
-    'noexport' => 1
   },
     'array' =>            { 'open'  => { '[' => 1 },
                             'close' => { ']' => 1 } },

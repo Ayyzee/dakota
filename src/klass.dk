@@ -67,11 +67,11 @@ klass symbol;
 klass vector;
 
 #if DKT-WORKAROUND
-namespace selector-node  { noexport int-t compare(slots-t**, slots-t**); }
-namespace object        { noexport object-t dump(object-t); }
+namespace selector-node  { int-t compare(slots-t**, slots-t**); }
+namespace object        { object-t dump(object-t); }
 namespace klass
 {
-  noexport symbol-t name(object-t);
+  symbol-t name(object-t);
 }
 #endif
 
@@ -106,7 +106,7 @@ static sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                                 cast(uint32-t)sizeof(gbl-selectors[0]),
                                                                 cast(std-compare-t)cast(int-t (*)(selector-pair-t*, selector-pair-t*))selector-pair::compare };
 
-//   noexport void dump-selectors()
+//   void dump-selectors()
 //   {
 //     for (uint32-t index = 0; index < gbl-selectors-table.count; index++)
 //     {
@@ -120,7 +120,7 @@ static sorted-array-t   gbl-selectors-table = { gbl-selectors,
 //     return;
 //   }
 
-noexport symbol-t
+symbol-t
 default-superklass-name()
 {
   return #object;
@@ -130,8 +130,8 @@ default-superklass()
 {
   return object::klass;
 }
-noexport symbol-t interposer-name-for-klass-name(symbol-t klass-name);
-noexport void add-interpose-prop(symbol-t key, symbol-t element);
+symbol-t interposer-name-for-klass-name(symbol-t klass-name);
+void add-interpose-prop(symbol-t key, symbol-t element);
 
 static selector-t
 selector-for-signature(signature-t const* signature)
@@ -152,7 +152,7 @@ method-for-signature(methods::slots-t* methods, signature-t const* signature)
   return m;
 }
 
-noexport void
+void
 import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
 {
   uint32-t i = 0;
@@ -217,7 +217,7 @@ uint32-from-info(named-info-t* info, symbol-t key)
   return element;
 }
 
-noexport uint32-t
+uint32-t
 size-from-info(named-info-t* info)
 {
   uint32-t size = uint32-from-info(info, #size);
@@ -239,7 +239,7 @@ superklass-from-info(named-info-t* info, symbol-t name)
   return superklass;
 }
 
-noexport symbol-t
+symbol-t
 superklass-name-from-info(named-info-t* info)
 {
   symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
@@ -249,7 +249,7 @@ superklass-name-from-info(named-info-t* info)
   return superklass-name;
 }
 
-noexport symbol-t
+symbol-t
 superklass-name-from-info(named-info-t* info, symbol-t name)
 {
   symbol-t superklass-name = superklass-name-from-info(info);
@@ -272,14 +272,14 @@ superklass-name-from-info(named-info-t* info, symbol-t name)
   return superklass-name;
 }
 
-noexport symbol-t
+symbol-t
 name-from-info(named-info-t* info)
 {
   symbol-t name = cast(symbol-t)ptr-from-info(info, #name);
   return name;
 }
 
-noexport symbol-t
+symbol-t
 klass-name-from-info(named-info-t* info)
 {
   symbol-t klass-name = cast(symbol-t)ptr-from-info(info, #klass-name);
@@ -289,11 +289,11 @@ klass-name-from-info(named-info-t* info)
   return klass-name;
 }
 
-/*noexport*/ const uint32-t k-alignment = 8;
+const uint32-t k-alignment = 8;
 
 // consider using alignas(8) on the slots struct decl/defn
 
-noexport inline uint32-t
+inline uint32-t
 round-alignment(uint32-t n)
 {
   uint32-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
@@ -301,7 +301,7 @@ round-alignment(uint32-t n)
 }
 
 // offset is 'offset() of superklass' + 'size of superklass'
-noexport uint32-t
+uint32-t
 offset-from-info(named-info-t* info)
 {
   uint32-t result;
@@ -374,7 +374,7 @@ klass resource-usage
   }
 }
 #if defined DKT-DUMP-MEM-FOOTPRINT
-noexport resource-usage::slots-t gbl-ru = { 0, 0, 0, 0 };
+resource-usage::slots-t gbl-ru = { 0, 0, 0, 0 };
 #endif
 
 klass methods
@@ -710,7 +710,7 @@ klass klass
 
   static named-info::slots-t gbl-default-info-slots = { nullptr, 0, nullptr };
 
-  noexport object-t init(object-t self, named-info::slots-t* info-slots);
+  object-t init(object-t self, named-info::slots-t* info-slots);
 
   method object-t init(object-t self,
                        named-info::slots-t* info-slots : nullptr,
@@ -736,7 +736,7 @@ klass klass
   }
 
   // called from init-klass() from dk-init-runtime()
-  noexport object-t init(object-t self, named-info::slots-t* info-slots)
+  object-t init(object-t self, named-info::slots-t* info-slots)
   {
     if (nullptr == info-slots)
       info-slots = &gbl-default-info-slots;
