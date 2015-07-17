@@ -3,7 +3,8 @@
 #include "set-read-only.hh"
 
 namespace __symbol {
-  symbols_section symbol_t _first page_align;
+  page_align
+  symbols_section symbol_t _first;
   // ...
   symbols_section symbol_t _last;
 }
