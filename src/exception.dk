@@ -33,14 +33,14 @@ module dakota;
 
 klass output-stream;
 
-export object-t dkt-capture-current-exception(object-t arg)
+SO-EXPORT object-t dkt-capture-current-exception(object-t arg)
 {
   static THREAD_LOCAL object-t result;
   if (arg) result = arg;
   return result;
 }
 
-export str-t dkt-capture-current-exception(str-t arg)
+SO-EXPORT str-t dkt-capture-current-exception(str-t arg)
 {
   static THREAD_LOCAL str-t result;
   if (arg) result = arg;
@@ -100,14 +100,14 @@ va-log(uint32-t priority, str-t format, va-list-t args)
   return result;
 }
 
-DEBUG-EXPORT format-va-printf(2) int-t
+DEBUG-SO-EXPORT format-va-printf(2) int-t
 dkt-va-log(uint32-t priority, str-t format, va-list-t args)
 {
   int-t result = va-log(priority, format, args);
   return result;
 }
 
-DEBUG-EXPORT format-printf(2) int-t
+DEBUG-SO-EXPORT format-printf(2) int-t
 dkt-log(uint32-t priority, str-t format, ...)
 {
   va-list-t args;

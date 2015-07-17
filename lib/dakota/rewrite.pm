@@ -354,8 +354,8 @@ sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(          \s*$main::block)/$2$1 export slots-t$3;/gsx;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1 export slots-t$3;/gsx;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(          \s*$main::block)/$2$1 DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1 DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
   $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|typedef$1 slots-t$2;|gsx;
@@ -756,7 +756,7 @@ sub export_method_rhs {
   #$c =~ s/(\bnoexport\b)(\s+\bmethod\b.*?$sig_min\s*$main::list\s*;)/$1/gm;
   #$c =~ s/(\bnoexport\b)(\s+\bmethod\b.*?$sig_min\s*$main::list\s*$main::block)/$1/gm;
 
-  $c =~ s/(\bmethod\b.*?$sig_min\s*$main::list\s*(;|$main::block))/export $1/gm;
+  $c =~ s/(\bmethod\b.*?$sig_min\s*$main::list\s*(;|$main::block))/SO-EXPORT $1/gm;
 
   #print STDERR "$a$b\{ ... method ... $sig_min \( ... \) { ... } ... \}\n";
   #print STDERR "$c\n";

@@ -18,7 +18,7 @@ module dakota;
 
 klass std-compare;
 
-// export object-t
+// SO-EXPORT object-t
 // dk-va-add-all(object-t self, va-list-t args)
 // {
 //   object-t element;
@@ -27,7 +27,7 @@ klass std-compare;
 //   return self;
 // }
 
-// export sentinel object-t
+// SO-EXPORT sentinel object-t
 // dk-add-all(object-t self, ...)
 // {
 //   va-list-t args;

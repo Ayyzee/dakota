@@ -965,7 +965,7 @@ sub method::generate_va_method_defn {
     $$scratch_str_ref .= "sentinel ";
   }
   if (&is_exported($va_method)) {
-    $$scratch_str_ref .= "export ";
+    $$scratch_str_ref .= "SO-EXPORT ";
   }
   if ($is_inline) {
     $$scratch_str_ref .= "INLINE ";
@@ -1052,7 +1052,7 @@ sub common::print_signature {
     $scratch_str .= $col;
   }
   if (&is_exported($generic)) {
-    $scratch_str .= "export ";
+    $scratch_str .= "SO-EXPORT ";
   }
   my $generic_name = "@{$$generic{'name'}}";
   $scratch_str .= "signature-t const* $generic_name($$new_arg_type_list)";
@@ -1152,7 +1152,7 @@ sub common::print_selector {
     $scratch_str .= $col;
   }
   if (&is_exported($generic)) {
-    $scratch_str .= "export ";
+    $scratch_str .= "SO-EXPORT ";
   }
   my $generic_name = "@{$$generic{'name'}}";
   $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
@@ -2200,7 +2200,7 @@ sub linkage_unit::generate_klasses_body {
                 $other_method_decl =~ s|\(\*($id)\)| $1|;
 
                 if (&is_exported($method)) {
-                  $$scratch_str_ref .= $col . "$klass_type $klass_name { export method";
+                  $$scratch_str_ref .= $col . "$klass_type $klass_name { SO-EXPORT method";
                 } else {
                   $$scratch_str_ref .= $col . "$klass_type $klass_name { method";
                 }
@@ -2247,7 +2247,7 @@ sub generate_object_method_defn {
   my $return_type = &arg::type($$method{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_exported($method)) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_path { export method";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_path { SO-EXPORT method";
   } else {
     $$scratch_str_ref .= $col . "$klass_type @$klass_path { method";
   }
@@ -2421,12 +2421,14 @@ sub readability_cpp_macros {
   $result .= "#define TRAITS(t1, ...)\n";
   $result .= "\n";
   $result .= "#if defined WIN32\n";
-  $result .= "  #define import __declspec(dllimport)\n";
-  $result .= "  #define export __declspec(dllexport)\n";
+  $result .= "  #define SO-IMPORT __declspec(dllimport)\n";
+  $result .= "  #define SO-EXPORT __declspec(dllexport)\n";
   $result .= "#else\n";
-  $result .= "  #define import\n";
-  $result .= "  #define export __attribute__((__visibility__(\"default\")))\n";
+  $result .= "  #define SO-IMPORT\n";
+  $result .= "  #define SO-EXPORT __attribute__((__visibility__(\"default\")))\n";
   $result .= "#endif\n";
+  $result .= "\n";
+  $result .= "#define DKT-ENABLE-TYPEINFO SO-EXPORT\n";
 
   return $result;
 }

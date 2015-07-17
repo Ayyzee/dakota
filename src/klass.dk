@@ -75,7 +75,7 @@ namespace klass
 }
 #endif
 
-noreturn export void dkt-null-method(object-t object, ...)
+noreturn SO-EXPORT void dkt-null-method(object-t object, ...)
 {
   throw make(no-such-method-exception::klass, #object : object, #kls : dkt-klass(object));
 }
@@ -862,14 +862,14 @@ klass klass
   }
 }
 
-DEBUG-EXPORT void
+DEBUG-SO-EXPORT void
 dkt-dump-methods(klass::slots-t* s)
 {
   klass::dump-methods(s);
   return;
 }
 
-DEBUG-EXPORT void
+DEBUG-SO-EXPORT void
 dkt-dump-methods(object-t kls)
 {
   klass::slots-t* kls-s = unbox(kls);

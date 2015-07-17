@@ -121,17 +121,17 @@ namespace dkt {
 #define unbox_attrs pure hot nothrow
 
 #if defined DEBUG
-  #define DEBUG_EXPORT export
-  #define DEBUG_IMPORT import
+  #define DEBUG_SO_EXPORT SO_EXPORT
+  #define DEBUG_IMPORT SO_IMPORT
 #else
-  #define DEBUG_EXPORT
+  #define DEBUG_SO_EXPORT
   #define DEBUG_IMPORT
 #endif
 
 #define NULLPTR nullptr
 
 #if !defined HAVE_STRERROR_NAME
-  import str_t strerror_name(int_t);
+  SO_IMPORT str_t strerror_name(int_t);
 #endif
 
 #if !defined USE
@@ -198,10 +198,10 @@ typedef va_list va_list_t;
 
 #define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 
-extern import object_t null;
-extern import object_t std_input;
-extern import object_t std_output;
-extern import object_t std_error;
+extern SO_IMPORT object_t null;
+extern SO_IMPORT object_t std_input;
+extern SO_IMPORT object_t std_output;
+extern SO_IMPORT object_t std_error;
 
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef uintmax_t (*hash_t)(object_t);
@@ -212,29 +212,29 @@ constexpr uintptr_t dk_hash(str_t str, uintptr_t i = 0) { // Daniel J. Bernstein
   return !str[i] ? cast(uintptr_t)5381 : ( dk_hash(str, i + 1) * cast(uintptr_t)33 ) ^ cast(uchar8_t)(str[i]);
 }
 
-import int_t  safe_strcmp(str_t, str_t);
-import size_t safe_strlen(str_t);
+SO_IMPORT int_t  safe_strcmp(str_t, str_t);
+SO_IMPORT size_t safe_strlen(str_t);
 
-import symbol_t dk_intern(str_t);
-import object_t dk_klass_for_name(symbol_t);
+SO_IMPORT symbol_t dk_intern(str_t);
+SO_IMPORT object_t dk_klass_for_name(symbol_t);
 
-import void dkt_register_info(named_info_t*);
-import void dkt_deregister_info(named_info_t*);
+SO_IMPORT void dkt_register_info(named_info_t*);
+SO_IMPORT void dkt_deregister_info(named_info_t*);
 
-// import object_t dk_va_add_all(object_t self, va_list_t);
-// sentinel import object_t dk_add_all(object_t self, ...);
+// SO_IMPORT          object_t dk_va_add_all(object_t self, va_list_t);
+// SO_IMPORT sentinel object_t dk_add_all(object_t self, ...);
 
-import void dk_init_runtime();
-import object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
+SO_IMPORT void dk_init_runtime();
+SO_IMPORT object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
-import object_t dkt_capture_current_exception(object_t arg);
-import str_t    dkt_capture_current_exception(str_t arg);
+SO_IMPORT object_t dkt_capture_current_exception(object_t arg);
+SO_IMPORT str_t    dkt_capture_current_exception(str_t arg);
 
-import named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-import object_t           dk_va_make_named_info(      symbol_t name, va_list_t args);
+SO_IMPORT named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
+SO_IMPORT object_t      dk_va_make_named_info(      symbol_t name, va_list_t args);
 
-sentinel import named_info_t* dk_make_named_info_slots(symbol_t name, ...);
-sentinel import object_t           dk_make_named_info(      symbol_t name, ...);
+SO_IMPORT sentinel named_info_t* dk_make_named_info_slots(symbol_t name, ...);
+SO_IMPORT sentinel object_t      dk_make_named_info(      symbol_t name, ...);
 
 DEBUG_IMPORT named_info_t* dkt_dump_named_info(named_info_t* info);
 
@@ -244,7 +244,7 @@ DEBUG_IMPORT named_info_t* dkt_dump_named_info(named_info_t* info);
   #define DKT_NULL_METHOD dkt_null_method
 #endif
 
-noreturn import void dkt_null_method(object_t object, ...);
+SO_IMPORT noreturn void dkt_null_method(object_t object, ...);
 
 DEBUG_IMPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
 DEBUG_IMPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);

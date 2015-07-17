@@ -189,7 +189,7 @@ klass object
   }
 }
 
-DEBUG-EXPORT void
+DEBUG-SO-EXPORT void
 dkt-unbox-check(object-t object, object-t kls)
 {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",

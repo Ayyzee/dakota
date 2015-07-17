@@ -70,7 +70,7 @@ set-name(int-t errnum, str-t name)
 }
 
 #if !defined HAVE-STRERROR-NAME
-export str-t
+SO-EXPORT str-t
 strerror-name(int-t errnum)
 {
   assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));

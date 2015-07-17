@@ -149,11 +149,11 @@ extern resource-usage::slots-t gbl-ru;
 
 typedef int32-t (*)(void*, void*) vcompare-t;
 
-export object-t null = nullptr;
+SO-EXPORT object-t null = nullptr;
 static object-t null-klass = nullptr;
-export object-t std-input = nullptr;
-export object-t std-output = nullptr;
-export object-t std-error = nullptr;
+SO-EXPORT object-t std-input = nullptr;
+SO-EXPORT object-t std-output = nullptr;
+SO-EXPORT object-t std-error = nullptr;
 
 // this is quick and dirty!!!!!!!!!!!!!!!!
 static void
@@ -457,7 +457,7 @@ static named-info-t* gbl-registration-info-list;
 void register-info-common(named-info-t* registration-info);
 void export-klass(named-info-t* klass-info);
 
-// export object-t
+// SO-EXPORT object-t
 // dk-make-simple-singleton(symbol-t name, symbol-t superklass-name)
 // {
 //   object-t kls = dk-make-simple-klass(name, superklass-name, #singleton-klass);
@@ -465,7 +465,7 @@ void export-klass(named-info-t* klass-info);
 //   return singleton;
 // }
 
-export object-t
+SO-EXPORT object-t
 dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name)
 {
   assert(name != nullptr);
@@ -502,7 +502,7 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
 // object klass' klass is klass klass
 // klass klass'  klass is klass klass
 // null klass'   klass is klass klass
-export void
+SO-EXPORT void
 dk-init-runtime()
 {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
@@ -1301,7 +1301,7 @@ add-registration-info(named-info-t* registration-info)
   return;
 }
 
-export void
+SO-EXPORT void
 dkt-register-info(named-info-t* registration-info)
 {
   assert(nullptr != registration-info);
@@ -1357,7 +1357,7 @@ dkt-register-info(named-info-t* registration-info)
     fclose(ctlg-output);
   return;
 }
-export void
+SO-EXPORT void
 dkt-deregister-info(named-info-t* registration-info)
 {
   assert(nullptr != registration-info);
@@ -1405,7 +1405,7 @@ superklass-name-for-name(symbol-t klass-name)
   return superklass-name;
 }
 
-export object-t
+SO-EXPORT object-t
 dk-klass-for-name(symbol-t klass-name)
 {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
@@ -1485,7 +1485,7 @@ info-for-name(symbol-t klass-name)
   sequence.
  */
 
-export symbol-t
+SO-EXPORT symbol-t
 dk-intern(str-t key)
 {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
@@ -1518,7 +1518,7 @@ get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
   return buf;
 }
 
-DEBUG-EXPORT char8-t*
+DEBUG-SO-EXPORT char8-t*
 dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len)
 {
   buf[0] = NUL;

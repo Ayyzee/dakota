@@ -54,7 +54,7 @@ trace-fprintf(file-t file, str-t format, ...)
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
@@ -68,7 +68,7 @@ dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, v
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
@@ -81,7 +81,7 @@ dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, v
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va-list-t args)
 {
   USE(args);
@@ -95,7 +95,7 @@ dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va-list-t args)
 {
   USE(args);
@@ -108,7 +108,7 @@ dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...)
 {
   int-t result = 0;
@@ -120,7 +120,7 @@ dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...)
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...)
 {
   int-t result = 0;
@@ -132,7 +132,7 @@ dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...)
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...)
 {
   int-t result = 0;
@@ -144,7 +144,7 @@ dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...)
   return result;
 }
 
-DEBUG-EXPORT int-t
+DEBUG-SO-EXPORT int-t
 dkt-trace-after(signature-t const* signature, method-t m, object-t object, ...)
 {
   int-t result = 0;
