@@ -26,6 +26,7 @@ use strict;
 use warnings;
 
 my $should_write_pre_output = 1;
+my $gbl_ann_interval = 30;
 
 my $emacs_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
 
@@ -1050,9 +1051,9 @@ sub common::print_signature {
 
   my $scratch_str = "";
   if (&is_va($generic)) {
-    $scratch_str .= $col . "namespace __signature { namespace va { ";
+    $scratch_str .= $col . 'namespace va { ';
   } else {
-    $scratch_str .= $col . "namespace __signature { ";
+    $scratch_str .= $col;
   }
   if (&is_exported($generic)) {
     $scratch_str .= "export ";
@@ -1063,12 +1064,12 @@ sub common::print_signature {
   $scratch_str .= "signature-t const* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $scratch_str .= "; }}" . &ann(__FILE__, __LINE__) . "\n";
+      $scratch_str .= '; }' . "\n";
     } else {
-      $scratch_str .= "; }" . &ann(__FILE__, __LINE__) . "\n";
+      $scratch_str .= ';' . "\n";
     }
   } elsif (&is_rt_defn()) {
-    $scratch_str .= " {" . &ann(__FILE__, __LINE__) . "\n";
+    $scratch_str .= ' {' . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
 
     my $return_type_str = &arg::type($$generic{'return-type'});
@@ -1085,9 +1086,9 @@ sub common::print_signature {
     $col = &colout($col);
 
     if (&is_va($generic)) {
-      $scratch_str .= $col . "}}}\n";
+      $scratch_str .= $col . '}}' . "\n";
     } else {
-      $scratch_str .= $col . "}}\n";
+      $scratch_str .= $col . '}' . "\n";
     }
   }
   return $scratch_str;
@@ -1097,6 +1098,8 @@ sub common::generate_signature_defns {
   my $scratch_str = "";
   #$scratch_str .= $col . "// generate_signature_defns()\n";
 
+  $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach my $generic (@$generics) {
     if (&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
@@ -1106,9 +1109,13 @@ sub common::generate_signature_defns {
       $$generic{'keyword-types'} = $keyword_types;
     }
   }
+  $col = &colout($col);
+  $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
 
   if (1) {
     $scratch_str .= "#if 0\n";
+    $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
+    $col = &colin($col);
     foreach my $generic (@$generics) {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
@@ -1119,8 +1126,12 @@ sub common::generate_signature_defns {
         $$varargs_generic{'keyword-types'} = $keyword_types;
       }
     }
+    $col = &colout($col);
+    $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
     $scratch_str .= "#endif\n";
   } # if ()
+  $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach my $generic (@$generics) {
     if (!&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
@@ -1130,6 +1141,8 @@ sub common::generate_signature_defns {
       $$generic{'keyword-types'} = $keyword_types;
     }
   }
+  $col = &colout($col);
+  $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   return $scratch_str;
 }
 sub common::print_selector {
@@ -1140,9 +1153,9 @@ sub common::print_selector {
 
   my $scratch_str = "";
   if (&is_va($generic)) {
-    $scratch_str .= $col . "namespace __selector { namespace va { ";
+    $scratch_str .= $col . 'namespace va { ';
   } else {
-    $scratch_str .= $col . "namespace __selector { ";
+    $scratch_str .= $col;
   }
   if (&is_exported($generic)) {
     $scratch_str .= "export ";
@@ -1153,12 +1166,12 @@ sub common::print_selector {
   $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $scratch_str .= "; }}" . &ann(__FILE__, __LINE__) . "\n";
+      $scratch_str .= '; }' . "\n";
     } else {
-      $scratch_str .= "; }" . &ann(__FILE__, __LINE__) . "\n";
+      $scratch_str .= ';' . "\n";
     }
   } elsif (&is_rt_defn()) {
-    $scratch_str .= " {" . &ann(__FILE__, __LINE__) . "\n";
+    $scratch_str .= ' {' . "\n";
     $col = &colin($col);
 
     my $return_type_str = &arg::type($$generic{'return-type'});
@@ -1175,9 +1188,9 @@ sub common::print_selector {
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
     if (&is_va($generic)) {
-      $scratch_str .= $col . "}}}\n";
+      $scratch_str .= $col . '}}' . "\n";
     } else {
-      $scratch_str .= $col . "}}\n";
+      $scratch_str .= $col . '}' . "\n";
     }
   }
   return $scratch_str;
@@ -1187,6 +1200,8 @@ sub common::generate_selector_defns {
   my $scratch_str = "";
   #$scratch_str .= $col . "// generate_selector_defns()\n";
 
+  $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach my $generic (@$generics) {
     if (&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
@@ -1196,9 +1211,13 @@ sub common::generate_selector_defns {
       $$generic{'keyword-types'} = $keyword_types;
     }
   }
+  $col = &colout($col);
+  $scratch_str .= $col . '}' . "\n";
 
   if (1) {
     $scratch_str .= "#if 0\n";
+    $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
+    $col = &colin($col);
     foreach my $generic (@$generics) {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
@@ -1209,8 +1228,12 @@ sub common::generate_selector_defns {
         $$varargs_generic{'keyword-types'} = $keyword_types;
       }
     }
+    $col = &colout($col);
+    $scratch_str .= $col . '}' . "\n";
     $scratch_str .= "#endif\n";
   } # if ()
+  $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach my $generic (@$generics) {
     if (!&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
@@ -1220,6 +1243,8 @@ sub common::generate_selector_defns {
       $$generic{'keyword-types'} = $keyword_types;
     }
   }
+  $col = &colout($col);
+  $scratch_str .= $col . '}' . "\n";
   return $scratch_str;
 }
 
@@ -1413,9 +1438,9 @@ sub generics::generate_generic_defn {
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_va($generic)) {
-    $$scratch_str_ref .= $col . "namespace dk { namespace va { ";
+    $$scratch_str_ref .= $col . 'namespace va { ';
   } else {
-    $$scratch_str_ref .= $col . "namespace dk { ";
+    $$scratch_str_ref .= $col;
   }
   if (&is_exported($generic)) {
     $$scratch_str_ref .= "export";
@@ -1432,9 +1457,9 @@ sub generics::generate_generic_defn {
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $$scratch_str_ref .= "; }}" . &ann(__FILE__, __LINE__) . "\n";
-    } else {
       $$scratch_str_ref .= "; }" . &ann(__FILE__, __LINE__) . "\n";
+    } else {
+      $$scratch_str_ref .= ";" . &ann(__FILE__, __LINE__) . "\n";
     }
   } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . "\n";
@@ -1480,9 +1505,9 @@ sub generics::generate_generic_defn {
     }
     $col = &colout($col);
     if (&is_va($generic)) {
-      $$scratch_str_ref .= $col . "}}}\n";
+      $$scratch_str_ref .= $col . '}}' . "\n";
     } else {
-      $$scratch_str_ref .= $col . "}}\n";
+      $$scratch_str_ref .= $col . '}' . "\n";
     }
   }
 }
@@ -1497,9 +1522,9 @@ sub generics::generate_super_generic_defn {
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_va($generic)) {
-    $$scratch_str_ref .= $col . "namespace dk { namespace va { ";
+    $$scratch_str_ref .= $col . "namespace va { ";
   } else {
-    $$scratch_str_ref .= $col . "namespace dk { ";
+    $$scratch_str_ref .= $col;
   }
   if (&is_exported($generic)) {
     $$scratch_str_ref .= "export";
@@ -1516,12 +1541,12 @@ sub generics::generate_super_generic_defn {
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $$scratch_str_ref .= "; }}" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= "; }" . "\n";
     } else {
-      $$scratch_str_ref .= "; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= ";" . "\n";
     }
   } elsif (&is_rt_defn()) {
-    $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= " {" . "\n";
     $col = &colin($col);
     if (&is_va($generic)) {
       $$scratch_str_ref .=
@@ -1565,9 +1590,9 @@ sub generics::generate_super_generic_defn {
     }
     $col = &colout($col);
     if (&is_va($generic)) {
-      $$scratch_str_ref .= $col . "}}}\n";
+      $$scratch_str_ref .= $col . '}}' . "\n";
     } else {
-      $$scratch_str_ref .= $col . "}}\n";
+      $$scratch_str_ref .= $col . '}' . "\n";
     }
   }
 }
@@ -1578,6 +1603,8 @@ sub generics::generate_generic_defns {
   my $generic;
   #$$scratch_str_ref .= "#if defined DKT-VA-GENERICS\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
+  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach $generic (@$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
@@ -1585,7 +1612,11 @@ sub generics::generate_generic_defns {
       }
     }
   }
+  $col = &colout($col);
+  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-super-t");
+  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach $generic (@$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
@@ -1593,11 +1624,15 @@ sub generics::generate_generic_defns {
       }
     }
   }
+  $col = &colout($col);
+  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   #$$scratch_str_ref .= "#endif // defined DKT-VA-GENERICS\n";
   #if (!&is_slots($generic)) {
   &generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
   #}
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t");
+  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach $generic (@$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
@@ -1605,7 +1640,11 @@ sub generics::generate_generic_defns {
       }
     }
   }
+  $col = &colout($col);
+  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t");
+  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
   foreach $generic (@$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
@@ -1613,6 +1652,8 @@ sub generics::generate_generic_defns {
       }
     }
   }
+  $col = &colout($col);
+  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
 }
 sub linkage_unit::generate_signatures {
   my ($scope, $generics) = @_;
@@ -3873,6 +3914,21 @@ sub symbol_parts {
   $ident = $3;
   return ($ns, $ident);
 }
+sub should_ann {
+  my ($ln, $num_lns, $ann_interval) = @_;
+  my $result = 0;
+  if (!defined $ann_interval) {
+    $ann_interval = $gbl_ann_interval;
+  }
+  my $num_ann_lns = $num_lns / $ann_interval;
+  my $adjusted_ann_interval = ($num_lns / ($num_ann_lns + 1)) + 1;
+ #print "ann-interval: " . $ann_interval . "\n"; 
+ #print "num-ann-lns: " . $num_lns . ' / ' . $ann_interval . "\n";
+ #print "num-ann-lns: " . $num_ann_lns . "\n";
+ #print "adjusted-ann-interval: " . $adjusted_ann_interval . "\n";
+  $result = 1 if !(($ln + 1) % $adjusted_ann_interval);
+  return $result;
+}
 sub linkage_unit::generate_symbols {
   my ($file, $generics, $symbols) = @_;
   my $col = '';
@@ -3913,17 +3969,27 @@ sub linkage_unit::generate_symbols {
       $max_width = $width;
     }
   }
-  foreach my $symbol (@$symbol_keys) {
+  $scratch_str .= $col . 'namespace __symbol {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
+  my $num_lns = @$symbol_keys;
+  while (my ($ln, $symbol) = each @$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
     my $width = length($symbol);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "namespace __symbol$ns { extern noexport const symbol-t _$ident; }" . &ann(__FILE__, __LINE__) . "\n";
+      $scratch_str .= $col . "extern noexport symbol-t _$ident;" . "\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
-      $scratch_str .= $col . "namespace __symbol$ns { noexport const symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\"); }" . &ann(__FILE__, __LINE__) . "\n";
+      if (&should_ann($ln, $num_lns)) {
+        $scratch_str .= $col . "noexport symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
+      } else {
+        $scratch_str .= $col . "noexport symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . "\n";
+      }
     }
   }
+  $col = &colout($col);
+  $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
+  $scratch_str .= "\n";
   return $scratch_str;
 }
 sub linkage_unit::generate_hashes {
@@ -3942,12 +4008,21 @@ sub linkage_unit::generate_hashes {
   }
   my $scratch_str = "";
   if (&is_rt_defn()) {
-    foreach $symbol (@$symbol_keys) {
+    $scratch_str .= $col . 'namespace __hash {' . &ann(__FILE__, __LINE__) . "\n";
+    $col = &colin($col);
+    my $num_lns = @$symbol_keys;
+    while (my ($ln, $symbol) = each @$symbol_keys) {
       my ($ns, $ident) = &symbol_parts($symbol);
       my $width = length($symbol);
       my $pad = ' ' x ($max_width - $width);
-      $scratch_str .= $col . "namespace __hash$ns { /*static*/ constexpr uintmax-t _$ident = " . $pad . "dk-hash(\"$symbol\"); }" . &ann(__FILE__, __LINE__) . "\n";
+      if (&should_ann($ln, $num_lns)) {
+        $scratch_str .= $col . "constexpr uintptr-t _$ident = " . $pad . "dk-hash(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
+      } else {
+        $scratch_str .= $col . "constexpr uintptr-t _$ident = " . $pad . "dk-hash(\"$symbol\");" . "\n";
+      }
     }
+    $col = &colout($col);
+    $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   }
   return $scratch_str;
 }
@@ -3967,22 +4042,31 @@ sub linkage_unit::generate_keywords {
   }
   my $scratch_str = "";
 
-  foreach $symbol (@$symbol_keys) {
+  $scratch_str .= $col . 'namespace __keyword {' . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
+  my $num_lns = @$symbol_keys;
+  while (my ($ln, $symbol) = each @$symbol_keys) {
     my ($ns, $ident) = &symbol_parts($symbol);
     my $width = length($symbol);
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "namespace __keyword$ns { extern noexport keyword-t _$ident; }" . &ann(__FILE__, __LINE__) . "\n";
+        $scratch_str .= $col . "extern noexport keyword-t _$ident;" . "\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
         # keyword-defn
-        $scratch_str .= "namespace __keyword$ns { noexport keyword-t _$ident = " . $pad . "{ __symbol$ns\::_$ident, " . $pad . "__hash$ns\::_$ident }; }" . &ann(__FILE__, __LINE__) . "\n";
+        if (&should_ann($ln, $num_lns)) {
+          $scratch_str .= $col . "noexport keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . &ann(__FILE__, __LINE__) . "\n";
+        } else {
+          $scratch_str .= $col . "noexport keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . "\n";
+        }
       }
     }
   }
+  $col = &colout($col);
+  $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   return $scratch_str;
 }
 sub linkage_unit::generate_strings {
@@ -4014,7 +4098,7 @@ sub generate_property_tbl {
     my $element = $$tbl{$key};
 
     if ('HASH' eq ref $element) {
-      $result .= &generate_info("$name-$num", $element, $col, $symbols, __LINE__);
+      $result .= &generate_info("$name-$num", $element, $col, $symbols, $line);
       $element = "&$name-$num";
       $num++;
     } elsif (!defined $element) {
@@ -4056,7 +4140,7 @@ sub generate_property_tbl {
 }
 sub generate_info {
   my ($name, $tbl, $col, $symbols, $line) = @_;
-  my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, __LINE__);
+  my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, $line);
   $result .= "\n";
   $result .= $col . "static named-info-t $name = { $name-props, DK-COUNTOF($name-props), nullptr };" . &ann(__FILE__, $line) . "\n";
   return $result;

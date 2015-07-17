@@ -1709,7 +1709,7 @@ sub generics::klass_scope_from_klass_name {
   } elsif ($ENV{'DKT_PRECOMPILE'}) {
     $klass_scope = {};
   } else {
-    my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
+    my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'} ||= []}];
     die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
   }
   return $klass_scope;
