@@ -14,7 +14,7 @@ cat /dev/null > $tmp
 for lib in $libs; do
     if [[ -e $lib ]]; then
         lib_bname=$(basename $lib)
-        bin/nm.sh $lib | tee $lib_bname
+        bin/nm.pl $lib | tee $lib_bname
         echo -n "defined external symbols: " >> $tmp
         wc -l $lib_bname >> $tmp
         mv $lib_bname /tmp
