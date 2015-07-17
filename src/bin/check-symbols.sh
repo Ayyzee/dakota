@@ -8,17 +8,21 @@ libs="\
  ../lib/libdakota.$so_ext\
  ../lib/libdakota-util.$so_ext"
 
-tmp=/tmp/$(basename $0)-$$.txt
-cat /dev/null > $tmp
+mkdir -p check-history
+output=check-history/$(basename $0)-$$.txt
+rm -f $output
+touch $output
 
+{
 for lib in $libs; do
     if [[ -e $lib ]]; then
         lib_bname=$(basename $lib)
         bin/nm.pl $lib | tee $lib_bname
-        echo -n "defined external symbols: " >> $tmp
-        wc -l $lib_bname >> $tmp
+        echo -n "defined external symbols: "
+        wc -l $lib_bname
         mv $lib_bname /tmp
     fi
 done
+} > $output
 #echo "defined external symbols:"
-cat $tmp
+cat $output
