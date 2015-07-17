@@ -13,12 +13,12 @@ $(blddir)/%: $(srcdir)/%-main.cc
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(blddir)/../bin/%: $(srcdir)/%-main.dk
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --output $@ $(libs) $(srcs)
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs) $(srcs)
 $(blddir)/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory $(srcdir)/../include --output $@ $^
 
 $(blddir)/../lib/%.$(so_ext):
-	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include_dirs) --soname $(soname) --output $@ $(libs) $(srcs)
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --soname $(soname) --output $@ $(libs) $(srcs)
 
 $(DESTDIR)$(prefix)/bin/%: $(srcdir)/../bin/%
 	sudo $(INSTALL_PROGRAM) $< $(@D)

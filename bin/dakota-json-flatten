@@ -271,7 +271,7 @@ sub tsv {
 
   if ($$data{'output'}) {
     $result .= "\n";
-    $result .= 'output_files' . ' += ' . "\$($output)"  . "\n";
+    $result .= 'output-files' . ' += ' . "\$($output)"  . "\n";
 
     if ($prefix) {
       $result .= "\n";
@@ -292,7 +292,7 @@ sub tsv {
     }
     $result .=  "\n";
     $result .=  "\n";
-    $result .= 'install_files' . ' += ' . "\$($install)" . "\n";
+    $result .= 'install-files' . ' += ' . "\$($install)" . "\n";
     my $bnames = &install_bnames($data);
     if (0 < @$bnames) {
       $result .= "\n";
