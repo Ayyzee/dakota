@@ -15,7 +15,7 @@
 
 
 #define COUNTOF(a) (sizeof(a)/sizeof(a[0]))
-#define symbols_section __attribute__((__section__("__dk_readonly" ", " "__dk_readonly")))
+#define symbols_section __attribute__((__section__("__DK_RODATA" ", " "__dk_rodata")))
 #define page_align      __attribute__((__aligned__(__pagesize)))
 #define cast(t) (t)
 
