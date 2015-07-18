@@ -195,9 +195,11 @@ sub start {
   my $opts = {};
   my $scopes = [];
   &GetOptions($opts,
+              'key=s',
               'output=s',
               'prefix=s',
             );
+  die if $$opts{'key'} && $$opts{'prefix'}; # these are mutually exclusive
   my $fh;
 
   if ($$opts{'output'}) {
@@ -215,6 +217,11 @@ sub start {
   foreach my $file (@$argv) {
     my $data = do $file or die;
 
+    if ($$opts{'key'}) {
+      $data = $$data{$$opts{'key'}} or die;
+      $$opts{'prefix'} = $$opts{'key'};
+      delete $$opts{'key'};
+    }
     if (!$$opts{'prefix'}) {
       my $keys = [ keys %$data ];
 
