@@ -6,6 +6,7 @@ use warnings;
 my $type_sig_addr = {};
 my $sig_type_addr = {};
 my $platform = lc(`uname -s`);
+chomp $platform;
 
 foreach my $lib (@ARGV) {
     # -g|--extern-only
