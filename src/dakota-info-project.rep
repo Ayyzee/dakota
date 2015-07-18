@@ -4,26 +4,25 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
-{ 'dakota-info' =>
-{
-  'srcs' => [ # cmd-line
-    '$(srcdir)/dakota-info-main.$(cc_ext)',
-  ],
-  'libs' => [ # cmd-line
-    '/usr/lib/libdl.$(so_ext)',
-  ],
-  'include-dirs' => [ # cmd-line
-    '$(srcdir)',
-    '$(srcdir)/../include',
-  ],
-  'output' => '$(blddir)/../bin/dakota-info', # cmd-line
-  'install' => {
-    '-rules' => [
-      '$(DESTDIR)$(prefix)/bin/%', '$(blddir)/../bin/%',
+{ 'dakota-info' => {
+    'srcs' => [ # cmd-line
+      '$(srcdir)/dakota-info-main.$(cc_ext)',
     ],
-    'bins' =>   [ # install.bins
-      '$(DESTDIR)$(prefix)/bin/dakota-info',
+    'libs' => [ # cmd-line
+      '/usr/lib/libdl.$(so_ext)',
     ],
+    'include-dirs' => [ # cmd-line
+      '$(srcdir)',
+      '$(srcdir)/../include',
+    ],
+    'output' => '$(blddir)/../bin/dakota-info', # cmd-line
+    'install' => {
+      '-rules' => [
+        '$(DESTDIR)$(prefix)/bin/%', '$(blddir)/../bin/%',
+      ],
+      'bins' =>   [ # install.bins
+        '$(DESTDIR)$(prefix)/bin/dakota-info',
+      ],
+    }
   }
-}
 }
