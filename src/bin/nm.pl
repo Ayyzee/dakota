@@ -5,9 +5,9 @@ use warnings;
 
 my $type_sig_addr = {};
 my $sig_type_addr = {};
+my $platform = lc(`uname -s`);
 
 foreach my $lib (@ARGV) {
-    my $platform = 'darwin';
     # -g|--extern-only
     # -U|--defined-only
     # -o|-A|--print-file-name
