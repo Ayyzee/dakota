@@ -2,9 +2,9 @@ rootdir := ..
 
 include $(rootdir)/dakota.mk
 
-include $(shell $(rootdir)/bin/dakota-json2mk --prefix dakota-info    --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
-include $(shell $(rootdir)/bin/dakota-json2mk --prefix libdakota      --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
-include $(shell $(rootdir)/bin/dakota-json2mk --prefix libdakota-util --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
+include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.rep)
+include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.rep)
+include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.rep)
 
 # include-dirs
 dakota-info.include-dirs :=    $(patsubst %,--include-directory %,$(dakota-info.include-dirs))

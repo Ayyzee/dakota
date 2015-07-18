@@ -5,6 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 
+{ 'libdakota' =>
 {
   'srcs' => [ # cmd-line
     '$(srcdir)/aaa.dk',
@@ -136,4 +137,5 @@
       '$(srcdir)/home/.dakota/emacs/init.el',
     ],
   }
+}
 }

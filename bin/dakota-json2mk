@@ -214,6 +214,20 @@ sub start {
   };
   foreach my $file (@$argv) {
     my $data = do $file or die;
+
+    if (!$$opts{'prefix'}) {
+      my $keys = [ keys %$data ];
+
+      if (1 == scalar @$keys) {
+        my $prefix = $$keys[0];
+        my $subdata = $$data{$$keys[0]};
+
+        if ($$subdata{'srcs'} && $$subdata{'output'}) { # min requirements
+          $$opts{'prefix'} = $prefix;
+          $data = $subdata;
+        }
+      }
+    }
     #print &Dumper($data);
     my $out = { 'mk' => {}, 'tsv' => {}, };
     &process_tbl($data, $opts, $scopes, $out);

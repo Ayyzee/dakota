@@ -4,6 +4,7 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
+{ 'dakota-info' =>
 {
   'srcs' => [ # cmd-line
     '$(srcdir)/dakota-info-main.$(cc_ext)',
@@ -24,4 +25,5 @@
       '$(DESTDIR)$(prefix)/bin/dakota-info',
     ],
   }
+}
 }
