@@ -1,53 +1,73 @@
-#include <unistd.h>
+#include <errno.h>
 #include <signal.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <syslog.h>
+#include <unistd.h>
 
 #include "set-read-only.hh"
 
 #define handle_error(msg) \
   do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
-static struct sigaction prev_sa[NSIG];
+static char const* progname;
+
+typedef void (*sa_handler_t)(int, siginfo_t*, void*);
+typedef struct sigaction sigaction_t;
+
+struct sa_pair_t {
+  sa_handler_t handler;
+  sigaction_t  prev_sa;
+};
+static int8_t const index_from_sig[NSIG] = {
+  [SIGBUS] =  0,
+  [SIGSEGV] = 1,
+};
+static sa_pair_t sa_pairs[] = {
+  { .handler = nullptr, .prev_sa = {} },
+  { .handler = nullptr, .prev_sa = {} },
+};
 
 static void
-handler(int sig, siginfo_t *si, void *unused) {
-  printf("caught sig%s at %p\n",
+bus_segv_handler(int sig, siginfo_t *si, void *unused) {
+  syslog(LOG_ERR, "caught sig%s at %p\n",
          sys_signame[sig], si->si_addr);
-  if (nullptr == prev_sa[sig].sa_sigaction) {
-    exit(EXIT_FAILURE);
-  } else {
-    prev_sa[sig].sa_sigaction(sig, si, unused);
+  sa_handler_t prev_sa_handler = sa_pairs[index_from_sig[sig]].prev_sa.sa_sigaction;
+
+  if (prev_sa_handler &&
+      prev_sa_handler != cast(sa_handler_t)SIG_DFL &&
+      prev_sa_handler != cast(sa_handler_t)SIG_IGN) {
+    prev_sa_handler(sig, si, unused);
   }
   return;
 }
+static int
+sigaction_setup(int sig, sa_handler_t bus_segv_handler) {
+  int r = -1;
+  sigaction_t sa {};
+  sa.sa_flags = SA_SIGINFO | SA_RESETHAND;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_sigaction = bus_segv_handler;
+  
+  sa_pairs[index_from_sig[sig]].prev_sa.sa_sigaction = nullptr;
+  r = sigaction(sig,  &sa, &sa_pairs[index_from_sig[sig]].prev_sa);
+  if (-1 == r) handle_error("sigaction");
+  return r;
+}
 
 int
-main() {
+main(int, char const* const argv[]) {
+  progname = argv[0];
   dk_intern(symbol_addrs, symbol_strs, symbol_len);
 #if 1
   set_read_only("__DK_RODATA");
 #endif
-  int e;
-  struct sigaction sa {};
-
-  sa.sa_flags = SA_SIGINFO;
-  sigemptyset(&sa.sa_mask);
-  sa.sa_sigaction = handler;
-  
-  //for (int sig in { x, y })
-  //
-  //for ( ?type ?ident in { ?block-in } )
-  //=>
-  //for ( ?type ?ident : ( ?type [] ) { ?block-in } )
-
-  for (int sig : (int []){ SIGBUS, SIGSEGV }) {
-    prev_sa[sig].sa_sigaction = nullptr;
-    e = sigaction(sig,  &sa, &prev_sa[sig]); if (-1 == e) handle_error("sigaction");
-  }
+  openlog(progname, LOG_CONS | LOG_PID | LOG_PERROR, LOG_USER);
+  sigaction_setup(SIGBUS,  bus_segv_handler);
+  sigaction_setup(SIGSEGV, bus_segv_handler);
   __symbol::_first = ""; // causes SIGBUS or SIGSEGV
   return 0;
 }
