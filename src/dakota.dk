@@ -1415,13 +1415,11 @@ sigaction-setup(int-t sig, sa-handler-t bus-segv-handler) {
 }
   
 static int-t
-set-read-only(symbol-t name, char8-t const* segment, get-segment-data-t get-segment-data) {
+set-read-only(char8-t const* segment, get-segment-data-t get-segment-data) {
   assert(NULL != segment);
   void* addr = nullptr;
   size-t size = 0;
   get-segment-data(segment, &addr, &size); // code-generated in each dso
-  // fprintf(stderr, "name: \"%s\", segment: \"%s\": addr: %p, size: %zu\n",
-  //         name, segment, addr, size);
 
   int-t result = -1;
   if (NULL != addr) {
@@ -1440,10 +1438,8 @@ set-read-only-all(char8-t const* segment) {
   while (nullptr != ni) {
     registration-info-t ri {};
     named-info-to-registration-info(ni, &ri);
-    //printf("NAME: %s\n", ri.name);
-    int-t r = set-read-only(ri.name, segment, cast(get-segment-data-t)ri.get-segment-data);
+    int-t r = set-read-only(segment, cast(get-segment-data-t)ri.get-segment-data);
     if (0 != r) result = r;
-
     ni = ni->next;
   }
   return result;

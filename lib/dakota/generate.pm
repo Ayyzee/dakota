@@ -2715,9 +2715,14 @@ sub linkage_unit::generate_klasses {
       "\n" .
       $col . "#include <dakota-finally.$hh_ext> // hackhack: should be before dakota.$hh_ext\n" .
       $col . "#include <dakota.$hh_ext>\n" .
-      $col . "#include <dakota-log.$hh_ext>\n" .
-      $col . "#include <dakota-os.$hh_ext>\n" .
-      "\n";
+      $col . "#include <dakota-log.$hh_ext>\n";
+
+    if (&is_rt()) {
+      $$scratch_str_ref .=
+        "\n" .
+        $col . "#include <dakota-os.$hh_ext>\n";
+    }
+    "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
   &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $klass_names);
