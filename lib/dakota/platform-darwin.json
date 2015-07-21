@@ -5,6 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
+  'DK_HOST_OS' => [ '--define-macro' => 'DK_DARWIN' ],
   'DK_LD_SONAME_FLAGS' => [ '-install_name' ], # unique to darwin
   'so_ext' => 'dylib', # unique to darwin
   'cxx_debug_symbols_ext' => 'dSYM', # unique to darwin

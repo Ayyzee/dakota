@@ -83,7 +83,7 @@ else
 endif
 
 DAKOTAFLAGS :=
-EXTRA_DAKOTAFLAGS :=
+EXTRA_DAKOTAFLAGS := $(DK_HOST_OS)
 
 # cast(some-type-t){...}
 ifdef DKT_ALLOW_COMPOUND_LITERALS
