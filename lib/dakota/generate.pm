@@ -3702,7 +3702,7 @@ sub generate_kw_args_method_defn {
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
       my $kw_arg_type = &arg::type($$kw_arg{'type'});
-      $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name \{}; /* default-initialization */";
+      $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name \{};";
       $delim = ' ';
     }
     $$scratch_str_ref .= "\n";
