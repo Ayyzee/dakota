@@ -5,9 +5,6 @@
 
 #include "dakota-declare-klass-type.hh"
 
-typedef int int_t;
-typedef unsigned int uint_t;
-
 dkt_declare_klass_type_typedef(boole,    bool);
 dkt_declare_klass_type_typedef(char8,    char);
 dkt_declare_klass_type_typedef(selector, uintptr_t);

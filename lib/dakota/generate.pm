@@ -315,8 +315,7 @@ sub generate_nrt {
     $str_hh .=
       "\n" .
       &labeled_src_str($result, "headers-hh") .
-      &readability_cpp_macros() .
-      &hardcoded_typedefs() .
+      &include_dakota_decl_hh() .
       &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
       &labeled_src_str($result, "strings-hh") .
@@ -391,8 +390,7 @@ sub generate_rt {
     $str_hh .=
       "\n" .
       &labeled_src_str($result, "headers-hh") .
-      &readability_cpp_macros() .
-      &hardcoded_typedefs() .
+      &include_dakota_decl_hh() .
       &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
       &labeled_src_str($result, "strings-hh") .
@@ -2402,46 +2400,11 @@ sub generate_exported_slots_decls {
     die __FILE__, ':', __LINE__, ": error: box klass \'$klass_name\' without slot or slots\n";
   }
 }
-sub readability_cpp_macros {
-  my $result = "\n";
-  $result .= "#define KLASS-NS namespace\n";
-  $result .= "#define TRAIT-NS namespace\n";
-  $result .= "#define METHOD\n";
-  $result .= "#define GENERIC\n";
-  $result .= "#define ALIAS(m)\n";
-  $result .= "#define INCLUDE(f)\n";
-  $result .= "#define MODULE(n)\n";
-  $result .= "#define MODULE-EXPORT(n, ...)\n";
-  $result .= "#define MODULE-IMPORT(n1, n2, ...)\n";
-  $result .= "#define PROVIDE(t)\n";
-  $result .= "#define REQUIRE(t)\n";
-  $result .= "#define SLOTS(t, ...)\n";
-  $result .= "#define SUPERKLASS(k)\n";
-  $result .= "#define KLASS(k)\n";
-  $result .= "#define TRAIT(t)\n";
-  $result .= "#define TRAITS(t1, ...)\n";
-  $result .= "\n";
-  $result .= "#if defined WIN32\n";
-  $result .= "  #define SO-IMPORT __declspec(dllimport)\n";
-  $result .= "  #define SO-EXPORT __declspec(dllexport)\n";
-  $result .= "#else\n";
-  $result .= "  #define SO-IMPORT\n";
-  $result .= "  #define SO-EXPORT __attribute__((__visibility__(\"default\")))\n";
-  $result .= "#endif\n";
-  $result .= "\n";
-  $result .= "#define DKT-ENABLE-TYPEINFO SO-EXPORT\n";
-
-  return $result;
-}
-sub hardcoded_typedefs {
-  my $result = "\n";
-  $result .= "typedef bool          boole-t;\n";
-  $result .= "typedef signed char   schar-t;\n";
-  $result .= "typedef char          char-t;\n";
-  $result .= "typedef unsigned char uchar-t;\n";
-  $result .= "typedef int           int-t;\n";
-  $result .= "typedef unsigned int  uint-t;\n";
-  $result .= "\n";
+sub include_dakota_decl_hh {
+  my $result =
+    "\n" .
+    "#include <dakota-decl.hh>\n" .
+    "\n";
   return $result;
 }
 sub linkage_unit::generate_headers {

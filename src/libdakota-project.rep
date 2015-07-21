@@ -120,6 +120,7 @@
         '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)',
       ],
       'includes' => [ # install.includes
+        '$(DESTDIR)$(prefix)/include/dakota-decl.hh',
         '$(DESTDIR)$(prefix)/include/dakota-finally.hh',
         '$(DESTDIR)$(prefix)/include/dakota-log.hh',
         '$(DESTDIR)$(prefix)/include/dakota-os.hh',
