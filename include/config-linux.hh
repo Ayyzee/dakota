@@ -11,6 +11,8 @@
 #define USE_SYSLOG 0
 #define USE_SYS 1
 
+#define __linux__
+
 __BEGIN_DECLS
 #ifndef HAVE_GETPROGNAME
 #ifdef HAVE_PROCFS

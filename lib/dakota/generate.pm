@@ -554,6 +554,7 @@ sub generate_defn_footer {
                   "\#file" => '__FILE__',
                   "\#construct" => 'DKT-CONSTRUCT',
                   "\#name" => 'DKT-NAME',
+                  "\#get-segment-data" => 'get-segment-data',
                  };
   $rt_cc_str .= "\n";
   #my $col;
@@ -2059,9 +2060,9 @@ sub linkage_unit::generate_klasses_body {
 
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern DKT-RODATA-SECTION object-t klass; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { DKT-RODATA-SECTION object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
     }
     if (!&is_rt_defn()) {
       my $is_exported;
@@ -2715,6 +2716,7 @@ sub linkage_unit::generate_klasses {
       $col . "#include <dakota-finally.$hh_ext> // hackhack: should be before dakota.$hh_ext\n" .
       $col . "#include <dakota.$hh_ext>\n" .
       $col . "#include <dakota-log.$hh_ext>\n" .
+      $col . "#include <dakota-os.$hh_ext>\n" .
       "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");

@@ -17,14 +17,20 @@
 #include <cassert>
 #include <cerrno>
 #include <cinttypes>
+#include <csignal>
+#include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <exception>
-#include <sys/stat.h> // struct stat, stat()
 
-#if HAVE-CONFIG-HH
-  #include "config.hh"
-#endif
+#include <unistd.h>
+
+#include <sys/mman.h>
+#include <sys/stat.h> // struct stat, stat()
+#include <syslog.h>
+
+#include "config.hh"
 
 #include "dakota-log.hh"
 #include "dakota-private.hh"
@@ -149,11 +155,11 @@ extern resource-usage::slots-t gbl-ru;
 
 typedef int32-t (*)(void*, void*) vcompare-t;
 
-SO-EXPORT object-t null = nullptr;
 static object-t null-klass = nullptr;
-SO-EXPORT object-t std-input = nullptr;
-SO-EXPORT object-t std-output = nullptr;
-SO-EXPORT object-t std-error = nullptr;
+SO-EXPORT DKT-RODATA-SECTION object-t null =       nullptr;
+SO-EXPORT DKT-RODATA-SECTION object-t std-input =  nullptr;
+SO-EXPORT DKT-RODATA-SECTION object-t std-output = nullptr;
+SO-EXPORT DKT-RODATA-SECTION object-t std-error =  nullptr;
 
 // this is quick and dirty!!!!!!!!!!!!!!!!
 static void
@@ -510,12 +516,14 @@ dk-init-runtime()
     init-runtime-ds();
 
     named-info-t* registration-info;
-    while (nullptr != (registration-info = gbl-registration-info-list)) {
-      gbl-registration-info-list = gbl-registration-info-list->next;
+    named-info-t* registration-info-list = gbl-registration-info-list;
+    while (nullptr != (registration-info = registration-info-list)) {
+      registration-info-list = registration-info-list->next;
+      named-info-t* next = registration-info->next;
       registration-info->next = nullptr;
       register-info-common(registration-info);
+      registration-info->next = next;
     }
-    assert(nullptr == gbl-registration-info-list);
 
     // alloc
     klass::klass =  alloc-klass(#klass); // must be first
@@ -1248,33 +1256,57 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
 
 void import-selectors(signature-t**, selector-node-t*); // hackhack
 
+typedef void* (*get-segment-data-t)(char-t const*, void**, size-t*);
+
+struct registration-info-t {
+  signature-t**    signatures-va;
+  signature-t**    signatures;
+  selector-node-t* selectors-va;
+  selector-node-t* selectors;
+  symbol-t*        imported-klasses-names;
+  assoc-node-t*    imported-klasses;
+  named-info-t*    klass-defns;
+  property-t*      interposers;
+  symbol-t         name;
+  get-segment-data-t get-segment-data;
+};
+static void
+named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) {
+  *ri = {
+    .signatures-va =          cast(decltype(ri->signatures-va))          named-info::at(ni, #signatures-va),
+    .signatures =             cast(decltype(ri->signatures))             named-info::at(ni, #signatures),
+    .selectors-va =           cast(decltype(ri->selectors-va))           named-info::at(ni, #selectors-va),
+    .selectors =              cast(decltype(ri->selectors))              named-info::at(ni, #selectors),
+    .imported-klasses-names = cast(decltype(ri->imported-klasses-names)) named-info::at(ni, #imported-klasses-names),
+    .imported-klasses =       cast(decltype(ri->imported-klasses))       named-info::at(ni, #imported-klasses),
+    .klass-defns =            cast(decltype(ri->klass-defns))            named-info::at(ni, #klass-defns),
+    .interposers =            cast(decltype(ri->interposers))            named-info::at(ni, #interposers),
+    .name =                   cast(decltype(ri->name))                   named-info::at(ni, #name),
+    .get-segment-data =       cast(decltype(ri->get-segment-data))       named-info::at(ni, #get-segment-data),
+  };
+  return;
+}
+
 void
-register-info-common(named-info-t* registration-info)
-{
-  signature-t**      signatures-va =          cast(signature-t**)     named-info::at(registration-info, #signatures-va);
-  signature-t**      signatures =             cast(signature-t**)     named-info::at(registration-info, #signatures);
-  selector-node-t*   selectors-va =           cast(selector-node-t*)  named-info::at(registration-info, #selectors-va);
-  selector-node-t*   selectors =              cast(selector-node-t*)  named-info::at(registration-info, #selectors);
-  symbol-t*          imported-klasses-names = cast(symbol-t*)         named-info::at(registration-info, #imported-klasses-names);
-  assoc-node-t*      imported-klasses =       cast(assoc-node-t*)     named-info::at(registration-info, #imported-klasses);
-  named-info-t* klass-defns =            cast(named-info-t*)named-info::at(registration-info, #klass-defns);
-  property-t*        interposers =            cast(property-t*)       named-info::at(registration-info, #interposers);
+register-info-common(named-info-t* ni) {
+  registration-info-t ri {};
+  named-info-to-registration-info(ni, &ri);
 
-  assert((nullptr == signatures    && nullptr == selectors   ) ||
-         (nullptr != signatures    && nullptr != selectors   ));
-  assert((nullptr == signatures-va && nullptr == selectors-va) ||
-         (nullptr != signatures-va && nullptr != selectors-va));
+  assert((nullptr == ri.signatures    && nullptr == ri.selectors   ) ||
+         (nullptr != ri.signatures    && nullptr != ri.selectors   ));
+  assert((nullptr == ri.signatures-va && nullptr == ri.selectors-va) ||
+         (nullptr != ri.signatures-va && nullptr != ri.selectors-va));
 
-  if (nullptr != signatures-va)
-    import-selectors(signatures-va, selectors-va);
-  if (nullptr != signatures)
-    import-selectors(signatures, selectors);
-  if (nullptr != imported-klasses)
-    import-klasses(imported-klasses-names, imported-klasses);
-  if (nullptr != klass-defns)
-    export-klasses(klass-defns);
-  if (nullptr != interposers)
-    add-interposers(interposers);
+  if (nullptr != ri.signatures-va)
+    import-selectors(ri.signatures-va, ri.selectors-va);
+  if (nullptr != ri.signatures)
+    import-selectors(ri.signatures, ri.selectors);
+  if (nullptr != ri.imported-klasses)
+    import-klasses(ri.imported-klasses-names, ri.imported-klasses);
+  if (nullptr != ri.klass-defns)
+    export-klasses(ri.klass-defns);
+  if (nullptr != ri.interposers)
+    add-interposers(ri.interposers);
 
   return;
 }
@@ -1301,6 +1333,129 @@ add-registration-info(named-info-t* registration-info)
   return;
 }
 
+typedef void (*sa-handler-t)(int-t, siginfo-t*, void*);
+typedef struct sigaction sigaction-t;
+
+struct sa-pair-t {
+  sa-handler-t handler;
+  sigaction-t  prev-sa;
+};
+static int8-t const index-from-sig[NSIG] = {
+  [SIGBUS] =  0,
+  [SIGSEGV] = 1,
+};
+static sa-pair-t sa-pairs[] = {
+  { .handler = nullptr, .prev-sa = {} },
+  { .handler = nullptr, .prev-sa = {} },
+};
+struct name-from-address-t {
+  void**   addr;
+  symbol-t name;
+};
+static name-from-address-t others[] = {
+  { cast(void**)&null,       #null       },
+  { cast(void**)&std-input,  #std-input  },
+  { cast(void**)&std-output, #std-output },
+  { cast(void**)&std-error,  #std-error  },
+};
+static const char*
+name-from-address(void* _addr) { // slowslow
+  object-t* addr = cast(decltype(addr))_addr;
+  // others
+  for (size-t i = 0; i < DK-COUNTOF(others); i++) {
+    name-from-address-t other = others[i];
+    if (*other.addr == *cast(decltype(other.addr))addr) {
+      return other.name;
+    }
+  }
+  named-info-t* ni = gbl-registration-info-list;
+  while (nullptr != ni) {
+    registration-info-t ri {};
+    named-info-to-registration-info(ni, &ri);
+    //printf("name: \"%s\"\n", ri.name);
+
+    // imported-klasses
+    for (uint-t i = 0; nullptr != cast(object-t*)ri.imported-klasses[i].element; i++) {
+      if (*cast(object-t*)ri.imported-klasses[i].element == *cast(object-t*)addr) {
+        return ri.imported-klasses-names[i];
+      }
+    }
+    ni = ni->next;
+  }
+  return nullptr;
+}
+static void
+bus-segv-handler(int-t sig, siginfo-t *si, void *dummy) {
+  char8-t const *name = name-from-address(si->si-addr);
+  syslog(LOG-ERR, "caught sig%s at \"%s\" %p\n",
+         sys-signame[sig], name, si->si-addr);
+  sa-handler-t prev-sa-handler = sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;
+
+  if (prev-sa-handler &&
+      prev-sa-handler != cast(sa-handler-t)SIG-DFL &&
+      prev-sa-handler != cast(sa-handler-t)SIG-IGN) {
+    prev-sa-handler(sig, si, dummy);
+  }
+  return;
+}
+static int-t
+sigaction-setup(int-t sig, sa-handler-t bus-segv-handler) {
+  sigaction-t sa {};
+  sa.sa-flags = SA-SIGINFO | SA-RESETHAND | SA-RESTART;
+  sigemptyset(&sa.sa-mask);
+  sa.sa-sigaction = bus-segv-handler;
+  
+  sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction = nullptr;
+  int-t r = sigaction(sig,  &sa, &sa-pairs[index-from-sig[sig]].prev-sa);
+  if (-1 == r) {
+    perror("sigaction");
+    exit(EXIT-FAILURE);
+  }
+  return r;
+}
+  
+static int-t
+set-read-only(symbol-t name, char8-t const* segment, get-segment-data-t get-segment-data) {
+  assert(NULL != segment);
+  void* addr = nullptr;
+  size-t size = 0;
+  get-segment-data(segment, &addr, &size); // code-generated in each dso
+  // fprintf(stderr, "name: \"%s\", segment: \"%s\": addr: %p, size: %zu\n",
+  //         name, segment, addr, size);
+
+  int-t result = -1;
+  if (NULL != addr) {
+    result = mprotect(addr, size, PROT-READ);
+    if (-1 == result) {
+      perror("mprotect");
+      exit(EXIT-FAILURE);
+    }
+  }
+  return result;
+}
+static int-t
+set-read-only-all(char8-t const* segment) {
+  int-t result = 0;
+  named-info-t* ni = gbl-registration-info-list;
+  while (nullptr != ni) {
+    registration-info-t ri {};
+    named-info-to-registration-info(ni, &ri);
+    //printf("NAME: %s\n", ri.name);
+    int-t r = set-read-only(ri.name, segment, cast(get-segment-data-t)ri.get-segment-data);
+    if (0 != r) result = r;
+
+    ni = ni->next;
+  }
+  return result;
+}
+static void last-user-code-before-main() {
+  openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
+  sigaction-setup(SIGBUS,  bus-segv-handler);
+  sigaction-setup(SIGSEGV, bus-segv-handler);
+  int-t r = set-read-only-all("__DKT_RODATA"); // must match segment portion of macro DKT-RODATA-SECTION
+  if (-1 == r) abort();
+  return;
+}
 SO-EXPORT void
 dkt-register-info(named-info-t* registration-info)
 {
@@ -1349,6 +1504,7 @@ dkt-register-info(named-info-t* registration-info)
         perl-dump-resource-info(gbl-klass-defns-table);
       if (NULL == getenv("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
+      last-user-code-before-main();
       if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(0);
       break;

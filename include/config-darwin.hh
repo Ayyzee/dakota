@@ -8,7 +8,7 @@
 #define USE_DLADDR 1
 #define USE_SYSLOG 0
 
-#define so_ext "dylib"
+#define __darwin__
 
 //#define ALLOW_COMPOUND_LITERALS 1
 //#define ALLOW_DESIGNATED_INITIALIZERS 1

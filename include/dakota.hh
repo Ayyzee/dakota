@@ -82,6 +82,7 @@ namespace dkt {
 #endif
 
 #if defined WIN32
+  #define DKT_RODATA_SECTION
   #define format_va_printf(fmtarg)
   #define format_va_scanf(fmtarg)
   #define format_printf(fmtarg)
@@ -97,6 +98,7 @@ namespace dkt {
   #define designated_init
   #define noreturn
 #else
+  #define DKT_RODATA_SECTION __attribute__((__section__("__DKT_RODATA, __dkt_rodata")))
   #define format_va_printf(fmtarg) __attribute__((__format__(__printf__, fmtarg, 0)))
   #define format_va_scanf(fmtarg)  __attribute__((__format__(__scanf__,  fmtarg, 0)))
   #define format_printf(fmtarg)    __attribute__((__format__(__printf__, fmtarg, fmtarg + 1)))

@@ -73,6 +73,7 @@
     'exports' => undef,
     'expr' => undef,
     'file' => undef,
+    'get-segment-data' => undef,
     'imported-klasses' => undef,
     'imported-klasses-names' => undef,
     'int-t' => undef, # hardcode typedef
