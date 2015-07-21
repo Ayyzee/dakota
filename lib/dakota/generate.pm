@@ -780,7 +780,7 @@ sub method::kw_list_types {
 
     if ('va-list-t' ne $arg_type) {
       $result .= $delim . $arg_type;
-      $delim = ', ';
+      $delim = ',';
     }
   }
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
@@ -2722,7 +2722,7 @@ sub linkage_unit::generate_klasses {
         "\n" .
         $col . "#include <dakota-os.$hh_ext>\n";
     }
-    "\n";
+    $$scratch_str_ref .= "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
   &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $klass_names);
@@ -3575,12 +3575,6 @@ sub generate_slots_method_signature_decls {
     &generate_slots_method_signature_decl($method, $klass_name, $col, $klass_type);
   }
 }
-sub generate_slots_method_signature_defns {
-  my ($methods, $klass_name, $col, $klass_type) = @_;
-  foreach my $method (sort method::compare values %$methods) {
-    &generate_slots_method_signature_defn($method, $klass_name, $col, $klass_type);
-  }
-}
 sub generate_kw_args_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -3607,6 +3601,14 @@ sub generate_kw_args_method_signature_defn {
     $col . "return &result;\n";
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}}\n";
+}
+sub generate_kw_args_method_signature {
+  my ($method, $col) = @_;
+  my $scratch_str_ref = &global_scratch_str_ref();
+  my $return_type = &arg::type($$method{'return-type'});
+  my $method_name = "@{$$method{'name'}}";
+  my $kw_list_types = &method::kw_list_types($method);
+  return $col . "static signature-t const __method__ = { \"$return_type\", \"$method_name\", \"$kw_list_types\" };\n";
 }
 sub generate_slots_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3670,16 +3672,20 @@ sub generate_kw_args_method_defn {
   #}
   my $method_name = "@{$$method{'name'}}";
   my $method_type_decl;
-  $$method{'name'} = [ '_func_' ];
-  my $func_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $list_names = &arg_type::list_names($$method{'parameter-types'});
 
   $$scratch_str_ref .=
     "$klass_type @$klass_name { namespace va { $visibility $return_type $method_name($$new_arg_list) {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  $$scratch_str_ref .=
-    $col . "static signature-t const* __method__ = dkt-kw-args-signature(va::$method_name($$list_types)); USE(__method__);\n";
+
+  $$scratch_str_ref .= &generate_kw_args_method_signature($method, $col);
+
+  $$method{'name'} = [ '_func_' ];
+  my $func_name = "@{$$method{'name'}}";
+
+  #$$scratch_str_ref .=
+  #  $col . "static signature-t const* __method__ = dkt-kw-args-signature(va::$method_name($$list_types)); USE(__method__);\n";
 
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
@@ -3852,11 +3858,6 @@ sub dk_generate_kw_args_method_defns {
       if (&is_rt_defn()) {
         &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
-        if (1 || $$klass_scope{'slots-methods'}) {
-          # currently no support for va:: methods
-          &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
-        }
-        #&generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], &colin($col));
         &generate_kw_args_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
         &generate_kw_args_method_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
       }
