@@ -3602,14 +3602,6 @@ sub generate_kw_args_method_signature_defn {
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}}\n";
 }
-sub generate_kw_args_method_signature {
-  my ($method, $col) = @_;
-  my $scratch_str_ref = &global_scratch_str_ref();
-  my $return_type = &arg::type($$method{'return-type'});
-  my $method_name = "@{$$method{'name'}}";
-  my $kw_list_types = &method::kw_list_types($method);
-  return $col . "static signature-t const __method__ = { \"$return_type\", \"$method_name\", \"$kw_list_types\" };\n";
-}
 sub generate_slots_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -3679,7 +3671,8 @@ sub generate_kw_args_method_defn {
     "$klass_type @$klass_name { namespace va { $visibility $return_type $method_name($$new_arg_list) {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
-  $$scratch_str_ref .= &generate_kw_args_method_signature($method, $col);
+  $$scratch_str_ref .=
+    $col . "static signature-t const* __method__ = dkt-kw-args-signature(va::$method_name($$list_types)); USE(__method__);\n";
 
   $$method{'name'} = [ '_func_' ];
   my $func_name = "@{$$method{'name'}}";
@@ -3857,8 +3850,8 @@ sub dk_generate_kw_args_method_defns {
       &path::add_last($stack, $klass_name);
       if (&is_rt_defn()) {
         &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
-      } else {
         &generate_kw_args_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+      } else {
         &generate_kw_args_method_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
       }
       &path::remove_last($stack);
