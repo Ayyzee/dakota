@@ -99,10 +99,10 @@
         '$(DESTDIR)$(prefix)/%', '$(blddir)/../%',
       ],
       'libs' => [ # install.libs
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-darwin-clang.json',
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-darwin-gcc.json',
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-linux-clang.json',
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-linux-gcc.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/platform-darwin.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/platform-linux.json',
         '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
         '$(DESTDIR)$(prefix)/lib/dakota/header-from-symbol.json',
         '$(DESTDIR)$(prefix)/lib/dakota/used.json',
@@ -122,12 +122,14 @@
       'includes' => [ # install.includes
         '$(DESTDIR)$(prefix)/include/dakota-finally.hh',
         '$(DESTDIR)$(prefix)/include/dakota-log.hh',
+        '$(DESTDIR)$(prefix)/include/dakota-os.hh',
         '$(DESTDIR)$(prefix)/include/dakota.hh',
       ],
       'bins' => [ # install.bins
         '$(DESTDIR)$(prefix)/bin/dakota',
         '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr.pl',
         '$(DESTDIR)$(prefix)/bin/dakota-project',
+        '$(DESTDIR)$(prefix)/bin/dakota-json2mk',
       ],
       'home' => [ # install.home
         '$(srcdir)/home/.dakota/.bashrc',

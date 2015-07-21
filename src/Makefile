@@ -17,7 +17,7 @@ libdakota.macros :=      $(patsubst %,--define-macro %,$(libdakota.macros))
 libdakota-util.macros := $(patsubst %,--define-macro %,$(libdakota-util.macros))
 
 # should be generated
-install_dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
+install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
 
 .PHONY:\
  all\

@@ -15,10 +15,10 @@ rm -f lib/dakota/platform.json
 cp .lldbinit-$sysname src/.lldbinit
 ln -s config-$sysname-$compiler.mk config.mk
 ln -s config-$sysname.sh config.sh
-pushd include > /dev/null
+pushd src > /dev/null
 ln -s config-$sysname.hh config.hh
-popd > /dev/null
+popd > /dev/null # src
 pushd lib/dakota > /dev/null
 ln -s compiler-$compiler.json compiler.json
 ln -s platform-$sysname.json  platform.json
-popd > /dev/null
+popd > /dev/null # lib/dakota
