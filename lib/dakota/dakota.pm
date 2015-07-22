@@ -149,17 +149,18 @@ sub add_visibility_file {
 }
 sub add_visibility {
   my ($root) = @_;
+  my $debug = 1;
   my $names = [keys %{$$root{'modules'}}];
   foreach my $name (@$names) {
     my $tbl = $$root{'modules'}{$name}{'export'};
     my $strs = [sort keys %$tbl];
     foreach my $str (@$strs) {
 	    my $seq = $$tbl{$str};
-	    #print STDERR "export module $name $str;\n";
+	    if ($debug) { print STDERR "export module $name $str;\n"; }
 	    if ($str =~ /^($id)$/) {
         my $klass_name = $1;
         # klass/trait
-        #print STDERR "klass/trait:        $klass_name\n";
+        if ($debug) { print STDERR "klass/trait:        $klass_name\n"; }
         if ($$root{'klasses'}{$klass_name} &&
 		    $$root{'klasses'}{$klass_name}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'exported?'} = 22;
@@ -170,7 +171,7 @@ sub add_visibility {
 	    } elsif ($str =~ /^($id)::(slots-t)$/) {
         my ($klass_name, $type_name) = ($1, $2);
         # klass slots
-        #print STDERR "klass       slots:  $klass_name|$type_name\n";
+        if ($debug) { print STDERR "klass       slots:  $klass_name|$type_name\n"; }
         if ($$root{'klasses'}{$klass_name} &&
 		    $$root{'klasses'}{$klass_name}{'slots'} &&
 		    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
@@ -179,22 +180,22 @@ sub add_visibility {
 	    } elsif ($str =~ /^($id)::($msig)$/) {
         my ($klass_name, $method_name) = ($1, $2);
         # klass/trait method
-        #print STDERR "klass/trait method $klass_name:$method_name\n";
+        if ($debug) { print STDERR "klass/trait method $klass_name:$method_name\n"; }
         foreach my $constructs ('klasses', 'traits') {
           if ($$root{$constructs}{$klass_name} &&
                 $$root{$constructs}{$klass_name}{'module'} eq $name) {
             foreach my $method_type ('slots-methods', 'methods') {
-              #print STDERR &Dumper($$root{$constructs}{$klass_name});
+              if ($debug) { print STDERR &Dumper($$root{$constructs}{$klass_name}); }
               while (my ($sig, $scope) = each (%{$$root{$constructs}{$klass_name}{$method_type}})) {
                 my $sig_min = &sig1($scope);
                 if ($method_name =~ m/\(\)$/) {
                   $sig_min =~ s/\(.*?\)$/\(\)/;
                 }
-                #print STDERR "$sig == $method_name\n";
-                #print STDERR "$sig_min == $method_name\n";
+                if ($debug) { print STDERR "$sig == $method_name\n"; }
+                if ($debug) { print STDERR "$sig_min == $method_name\n"; }
                 if ($sig_min eq $method_name) {
-                  #print STDERR "$sig == $method_name\n";
-                  #print STDERR "$sig_min == $method_name\n";
+                  if ($debug) { print STDERR "$sig == $method_name\n"; }
+                  if ($debug) { print STDERR "$sig_min == $method_name\n"; }
                   $$scope{'exported?'} = 44;
                 }
               }
