@@ -154,19 +154,19 @@ sub rewrite_compound_literal_cstring_null {
 }
 sub nest_namespaces {
   my ($filestr_ref) = @_;
-  foreach my $kind ('klass', 'trait', 'namespace') {
+  foreach my $kind ('klass', 'trait', 'namespace', 'KLASS-NS', 'TRAIT-NS') {
     while ($$filestr_ref =~ s/$kind(\s+)(::)?($id)::($rid)(\s*)($main::block)/namespace $3 { $kind$1$4$5$6 }/gs) { # intentionally omitted $2
     }
   }
 }
 sub rewrite_klass_decl {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=^     (klass|trait)\s+($id)\s*;=uc($1) . "($2);"=gemx;
-  $$filestr_ref =~ s=^(\s+)(klass|trait)\s+($id)\s*;=$1 . uc($2) . "($3);"=gemx;
+  $$filestr_ref =~ s=^     (klass|trait)\s+($rid)\s*;=uc($1) . "($2);"=gemx;
+  $$filestr_ref =~ s=^(\s+)(klass|trait)\s+($rid)\s*;=$1 . uc($2) . "($3);"=gemx;
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=^     (klass|trait)(\s+$id\s*)(\{)=uc($1) . "-NS" . $2 . "{"=gemx;
+  $$filestr_ref =~ s=^     (klass|trait)(\s+$rid\s*)(\{)=uc($1) . "-NS" . $2 . "{"=gemx;
 }
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
@@ -207,11 +207,6 @@ sub rewrite_functions_replacement {
 sub rewrite_functions {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/((dk::va|dk|va)::)(\?|\!)(\(|\))/&rewrite_functions_replacement($1, $3, $4)/gesx;
-}
-sub rewrite_includes {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(?<!\#)( *include)\s*(\".+?\")\s*;|INCLUDE($2);|g;
-  $$filestr_ref =~ s|(?<!\#)( *include)\s*(<.+?>)\s*;|INCLUDE($2);|g;
 }
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
@@ -839,7 +834,6 @@ sub convert_dk_to_cc {
   # ?klass-type ?ident = ?qual-ident;
   $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1 . uc($2) . "-NS"/ge;
 
-  &nest_namespaces($filestr_ref);
   #&nest_generics($filestr_ref);
   &rewrite_slots($filestr_ref);
   &rewrite_enums($filestr_ref);
@@ -866,6 +860,7 @@ sub convert_dk_to_cc {
   &rewrite_compound_literal_cstring($filestr_ref);
   &rewrite_compound_literal($filestr_ref);
   &rewrite_klass_defn($filestr_ref);
+  &nest_namespaces($filestr_ref);
   &rewrite_syntax($filestr_ref);
   &rewrite_declarations($filestr_ref);
 
@@ -874,7 +869,6 @@ sub convert_dk_to_cc {
   $$filestr_ref =~ s/,(\s*\})/$1/gs; # remove harmless trailing comma
   $$filestr_ref =~ s|;;|;|g;
 
-  &rewrite_includes($filestr_ref);
   &decode_comments($filestr_ref);
   &decode_strings($filestr_ref);
   &decode_cpp($filestr_ref);

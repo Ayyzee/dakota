@@ -2297,6 +2297,16 @@ sub convert_to_object_method {
   }
   return $method;
 }
+sub typedef_slots_t {
+  my ($klass_name) = @_;
+  my $result;
+  if ('object' eq $klass_name) {
+    $result = "typedef $klass_name\::slots-t* $klass_name-t; /*special-case*/"; # special-case
+  } else {
+    $result = "typedef $klass_name\::slots-t $klass_name-t;";
+  }
+  return $result;
+}
 sub generate_slots_decls {
   my ($scope, $col, $klass_path, $klass_name, $klass_scope) = @_;
   if (!$klass_scope) {
@@ -2306,7 +2316,7 @@ sub generate_slots_decls {
   if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
-    $$scratch_str_ref .= $col . "//typedef $klass_name\::slots-t $klass_name-t;\n";
+    $$scratch_str_ref .= $col . '//' . &typedef_slots_t($klass_name) . "\n";
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
@@ -2321,7 +2331,7 @@ sub generate_slots_decls {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . "//typedef $klass_name\::slots-t $klass_name-t;\n";
+    $$scratch_str_ref .= $col . '//' . &typedef_slots_t($klass_name) . "\n";
   }
 }
 sub is_array_type {
@@ -2369,7 +2379,7 @@ sub generate_exported_slots_decls {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . "typedef $klass_name\::slots-t* $klass_name-t;" . &ann(__FILE__, __LINE__) . " // special-case\n";
+    $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . &ann(__FILE__, __LINE__) . " // special-case\n";
   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
@@ -2377,7 +2387,7 @@ sub generate_exported_slots_decls {
                            'char32-t' => '__STDC_UTF_32__',
                          };
     if (!exists $$excluded_types{"$klass_name-t"}) {
-      $$scratch_str_ref .= $col . "typedef $klass_name\::slots-t $klass_name-t;\n";
+      $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . "\n";
     }
   } elsif (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
@@ -2393,7 +2403,7 @@ sub generate_exported_slots_decls {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . "typedef $klass_name\::slots-t $klass_name-t;\n";
+    $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . "\n";
   } else {
     #errdump($klass_name);
     #errdump($klass_scope);
