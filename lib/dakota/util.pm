@@ -67,6 +67,8 @@ our @EXPORT= qw(
                  kw_args_placeholders
                  last
                  long_suffix
+                 make_ident_symbol
+                 make_ident_symbol_scalar
                  max
                  method_sig_regex
                  method_sig_type_regex
@@ -169,6 +171,50 @@ sub decode_cpp {
       $$filestr_ref =~ s/^(\s*)\@\@\@(\s*$directive\b.*)$/$1#$2/gm;
     }
   }
+}
+sub make_ident_symbol_scalar {
+  my ($symbol) = @_;
+  my ($id,  $mid,  $bid,  $tid,
+      $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+  my $k = qr/[\w-]/;
+  my $long_suffix = &long_suffix();
+  $symbol =~ s/($id)\?/$1$$long_suffix{'?'}/g;
+  $symbol =~ s/($id)\!/$1$$long_suffix{'!'}/g;
+  my $has_word_char;
+
+  if ($symbol =~ m/\w/) {
+    $has_word_char = 1;
+  } else {
+    $has_word_char = 0;
+  }
+
+  my $ident_symbol = [];
+  &dakota::util::add_first($ident_symbol, '_');
+
+  my $chars = [split //, $symbol];
+
+  foreach my $char (@$chars) {
+    my $part;
+    if ('-' eq $char) {
+      if ($has_word_char) {
+        $part = '_';
+      } else {
+        $part = sprintf("%02x", ord($char));
+      }
+    } elsif ($char =~ /$k/) {
+      $part = $char;
+    } else {
+      $part = sprintf("%02x", ord($char));
+    }
+    &dakota::util::add_last($ident_symbol, $part);
+  }
+  my $value = &path::string($ident_symbol);
+  return $value;
+}
+sub make_ident_symbol {
+  my ($seq) = @_;
+  my $ident_symbols = [map { &make_ident_symbol_scalar($_) } @$seq];
+  return &path::string($ident_symbols);
 }
 sub ann {
   my ($file, $line, $msg) = @_;

@@ -87,7 +87,6 @@ our @EXPORT= qw(
                  generate_rt_decl
                  generate_rt_defn
                  global_scratch_str_ref
-                 make_ident_symbol_scalar
                  set_global_scratch_str_ref
                  should_use_include
                  symbol_parts
@@ -95,7 +94,6 @@ our @EXPORT= qw(
 
 my $colon = ':'; # key/element delim only
 my $kw_args_placeholders = &kw_args_placeholders();
-my $k = qr/[\w-]/;
 my ($id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 
@@ -122,46 +120,6 @@ sub src_path {
   } else {
     return "$objdir/$name.$ext";
   }
-}
-sub make_ident_symbol_scalar {
-  my ($symbol) = @_;
-  $symbol =~ s/($id)\?/$1$$long_suffix{'?'}/g;
-  $symbol =~ s/($id)\!/$1$$long_suffix{'!'}/g;
-  my $has_word_char;
-
-  if ($symbol =~ m/\w/) {
-    $has_word_char = 1;
-  } else {
-    $has_word_char = 0;
-  }
-
-  my $ident_symbol = [];
-  &dakota::util::add_first($ident_symbol, '_');
-
-  my $chars = [split //, $symbol];
-
-  foreach my $char (@$chars) {
-    my $part;
-    if ('-' eq $char) {
-      if ($has_word_char) {
-        $part = '_';
-      } else {
-        $part = sprintf("%02x", ord($char));
-      }
-    } elsif ($char =~ /$k/) {
-      $part = $char;
-    } else {
-      $part = sprintf("%02x", ord($char));
-    }
-    &dakota::util::add_last($ident_symbol, $part);
-  }
-  my $value = &path::string($ident_symbol);
-  return $value;
-}
-sub make_ident_symbol {
-  my ($seq) = @_;
-  my $ident_symbols = [map { &make_ident_symbol_scalar($_) } @$seq];
-  return &path::string($ident_symbols);
 }
 sub empty_klass_defns {
   $global_klass_defns = [];
