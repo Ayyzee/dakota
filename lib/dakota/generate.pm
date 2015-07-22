@@ -89,7 +89,6 @@ our @EXPORT= qw(
                  global_scratch_str_ref
                  set_global_scratch_str_ref
                  should_use_include
-                 symbol_parts
               );
 
 my $colon = ':'; # key/element delim only
@@ -3842,14 +3841,6 @@ sub add_symbol_to_ident_symbol {
     $$symbols{$symbol} = $ident_symbol;
   }
 }
-sub symbol_parts {
-  my ($symbol) = @_;
-  my ($ns, $ident) = ('', undef);
-  $symbol =~ m|^((.+)::)?(.+)$|;
-  $ns .= "::$2" if defined $2;
-  $ident = $3;
-  return ($ns, $ident);
-}
 sub should_ann {
   my ($ln, $num_lns, $ann_interval) = @_;
   my $result = 0;
@@ -3899,8 +3890,8 @@ sub linkage_unit::generate_symbols {
   my $scratch_str = "";
   my $max_width = 0;
   foreach my $symbol (@$symbol_keys) {
-    my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = length($symbol);
+    my $ident = &make_ident_symbol_scalar($symbol);
+    my $width = length($ident);
     if ($width > $max_width) {
       $max_width = $width;
     }
@@ -3909,17 +3900,17 @@ sub linkage_unit::generate_symbols {
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
   while (my ($ln, $symbol) = each @$symbol_keys) {
-    my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = length($symbol);
+    my $ident = &make_ident_symbol_scalar($symbol);
+    my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "extern symbol-t _$ident;" . "\n";
+      $scratch_str .= $col . "extern symbol-t $ident;" . "\n";
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
       if (&should_ann($ln, $num_lns)) {
-        $scratch_str .= $col . "symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
+        $scratch_str .= $col . "symbol-t $ident = " . $pad . "dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
       } else {
-        $scratch_str .= $col . "symbol-t _$ident = " . $pad . "dk-intern(\"$symbol\");" . "\n";
+        $scratch_str .= $col . "symbol-t $ident = " . $pad . "dk-intern(\"$symbol\");" . "\n";
       }
     }
   }
@@ -3936,8 +3927,8 @@ sub linkage_unit::generate_hashes {
   my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
-    my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = length($symbol);
+    my $ident = &make_ident_symbol_scalar($symbol);
+    my $width = length($ident);
     if ($width > $max_width) {
       $max_width = $width;
     }
@@ -3948,13 +3939,13 @@ sub linkage_unit::generate_hashes {
     $col = &colin($col);
     my $num_lns = @$symbol_keys;
     while (my ($ln, $symbol) = each @$symbol_keys) {
-      my ($ns, $ident) = &symbol_parts($symbol);
-      my $width = length($symbol);
+      my $ident = &make_ident_symbol_scalar($symbol);
+      my $width = length($ident);
       my $pad = ' ' x ($max_width - $width);
       if (&should_ann($ln, $num_lns)) {
-        $scratch_str .= $col . "constexpr uintptr-t _$ident = " . $pad . "dk-hash(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
+        $scratch_str .= $col . "constexpr uintptr-t $ident = " . $pad . "dk-hash(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
       } else {
-        $scratch_str .= $col . "constexpr uintptr-t _$ident = " . $pad . "dk-hash(\"$symbol\");" . "\n";
+        $scratch_str .= $col . "constexpr uintptr-t $ident = " . $pad . "dk-hash(\"$symbol\");" . "\n";
       }
     }
     $col = &colout($col);
@@ -3970,8 +3961,8 @@ sub linkage_unit::generate_keywords {
   my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
-    my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = length($symbol);
+    my $ident = &make_ident_symbol_scalar($symbol);
+    my $width = length($ident);
     if ($width > $max_width) {
       $max_width = $width;
     }
@@ -3982,21 +3973,21 @@ sub linkage_unit::generate_keywords {
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
   while (my ($ln, $symbol) = each @$symbol_keys) {
-    my ($ns, $ident) = &symbol_parts($symbol);
-    my $width = length($symbol);
+    my $ident = &make_ident_symbol_scalar($symbol);
+    my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
       if (&is_decl()) {
-        $scratch_str .= $col . "extern keyword-t _$ident;" . "\n";
+        $scratch_str .= $col . "extern keyword-t $ident;" . "\n";
       } else {
         $symbol =~ s|"|\\"|g;
         $symbol =~ s/\?$/$$long_suffix{'?'}/;
         $symbol =~ s/\!$/$$long_suffix{'!'}/;
         # keyword-defn
         if (&should_ann($ln, $num_lns)) {
-          $scratch_str .= $col . "keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . &ann(__FILE__, __LINE__) . "\n";
+          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . &ann(__FILE__, __LINE__) . "\n";
         } else {
-          $scratch_str .= $col . "keyword-t _$ident = " . $pad . "{ #$symbol, " . $pad . "__hash::_$ident };" . "\n";
+          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . "\n";
         }
       }
     }

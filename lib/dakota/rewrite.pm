@@ -577,8 +577,8 @@ sub rewrite_slot_access {
 }
 sub symbol {
   my ($symbol) = @_;
-  my ($ns, $ident) = &dakota::generate::symbol_parts($symbol);
-  return "__symbol$ns\::_$ident";
+  my $ident = &make_ident_symbol_scalar($symbol);
+  return "__symbol\::$ident";
 }
 sub keyword {
   my ($keyword) = @_;
