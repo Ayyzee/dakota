@@ -1256,20 +1256,23 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
 
 void import-selectors(signature-t**, selector-node-t*); // hackhack
 
-typedef void* (*get-segment-data-t)(char-t const*, void**, size-t*);
-
-struct registration-info-t {
-  signature-t**    signatures-va;
-  signature-t**    signatures;
-  selector-node-t* selectors-va;
-  selector-node-t* selectors;
-  symbol-t*        imported-klasses-names;
-  assoc-node-t*    imported-klasses;
-  named-info-t*    klass-defns;
-  property-t*      interposers;
-  symbol-t         name;
-  get-segment-data-t get-segment-data;
-};
+klass get-segment-data {
+  slots void* (*)(char-t const*, void**, size-t*);
+}
+klass registration-info {
+  slots {
+    signature-t**      signatures-va;
+    signature-t**      signatures;
+    selector-node-t*   selectors-va;
+    selector-node-t*   selectors;
+    symbol-t*          imported-klasses-names;
+    assoc-node-t*      imported-klasses;
+    named-info-t*      klass-defns;
+    property-t*        interposers;
+    symbol-t           name;
+    get-segment-data-t get-segment-data;
+  }
+}
 static void
 named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) {
   *ri = {

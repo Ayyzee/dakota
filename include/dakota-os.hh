@@ -20,7 +20,7 @@
 #if defined DK_LINUX
   #include <libelf.h>
 
-  static inline void* get_segment_data(char8_t const* segment, void** addr_out, size_t* size_out) {
+  static inline void* dkt_get_segment_data(char8_t const* segment, void** addr_out, size_t* size_out) {
     needs work
   }
 #elif defined DK_DARWIN
@@ -28,7 +28,7 @@
 
   extern void* __dso_handle;
 
-  static inline void* get_segment_data(char8_t const* segment, void** addr_out, size_t* size_out) {
+  static inline void* dkt_get_segment_data(char8_t const* segment, void** addr_out, size_t* size_out) {
     *addr_out = cast(void*)getsegmentdata(cast(const struct mach_header_64*)&__dso_handle, segment, size_out);
     return *addr_out;
   }

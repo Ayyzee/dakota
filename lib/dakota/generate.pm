@@ -552,18 +552,18 @@ sub generate_defn_footer {
                   "\#file" => '__FILE__',
                   "\#construct" => 'DKT-CONSTRUCT',
                   "\#name" => 'DKT-NAME',
-                  "\#get-segment-data" => 'get-segment-data',
+                  "\#get-segment-data" => 'dkt-get-segment-data',
                  };
   $rt_cc_str .= "\n";
   #my $col;
-  $rt_cc_str .= &generate_info('registration-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
+  $rt_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 
   $rt_cc_str .= "\n";
   $rt_cc_str .= $col . "static void __initial() {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   $rt_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
-    $col . "dkt-register-info(&registration-info);\n" .
+    $col . "dkt-register-info(&reg-info);\n" .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"after\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);
@@ -572,7 +572,7 @@ sub generate_defn_footer {
   $col = &colin($col);
   $rt_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
-    $col . "dkt-deregister-info(&registration-info);\n" .
+    $col . "dkt-deregister-info(&reg-info);\n" .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"after\", DKT-NAME);\n" .
     $col . "return;\n";
   $col = &colout($col);
