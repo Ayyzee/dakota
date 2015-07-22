@@ -149,7 +149,7 @@ sub add_visibility_file {
 }
 sub add_visibility {
   my ($root) = @_;
-  my $debug = 1;
+  my $debug = 0;
   my $names = [keys %{$$root{'modules'}}];
   foreach my $name (@$names) {
     my $tbl = $$root{'modules'}{$name}{'export'};
