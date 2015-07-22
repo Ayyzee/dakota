@@ -2303,7 +2303,14 @@ sub typedef_slots_t {
   if ('object' eq $klass_name) {
     $result = "typedef $klass_name\::slots-t* $klass_name-t; /*special-case*/"; # special-case
   } else {
-    $result = "typedef $klass_name\::slots-t $klass_name-t;";
+    my $parts = [split(/::/, $klass_name)];
+    if (1 < scalar @$parts) {
+      my $basename = &remove_last($parts);
+      my $ns = join('::', @$parts);
+      $result = "namespace $ns { typedef $basename\::slots-t $basename-t; }";
+    } else {
+      $result = "typedef $klass_name\::slots-t $klass_name-t;";
+    }
   }
   return $result;
 }
