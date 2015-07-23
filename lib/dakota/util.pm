@@ -85,6 +85,9 @@ our @EXPORT= qw(
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
 
+my ($id,  $mid,  $bid,  $tid,
+   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+
 my $ENCODED_COMMENT_BEGIN = '__ENCODED_COMMENT_BEGIN__';
 my $ENCODED_COMMENT_END =   '__ENCODED_COMMENT_END__';
 
@@ -174,8 +177,6 @@ sub decode_cpp {
 }
 sub make_ident_symbol_scalar {
   my ($symbol) = @_;
-  my ($id,  $mid,  $bid,  $tid,
-      $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
   my $k = qr/[\w-]/;
   my $long_suffix = &long_suffix();
   $symbol =~ s/($id)\?/$1$$long_suffix{'?'}/g;
@@ -255,8 +256,6 @@ sub ident_regex {
   return ( $id,  $mid,  $bid,  $tid,
           $rid, $rmid, $rbid, $rtid);
 }
-my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
 sub header_file_regex {
   return qr|[/._A-Za-z0-9-]|;
 }
