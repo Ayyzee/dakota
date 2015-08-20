@@ -1,0 +1,59 @@
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+digraph "literal-syntax-grammar-fsm"
+{
+  graph [ label = "\G", fontcolor = red, fontsize = 16 ];
+  graph [ rankdir = "LR",
+          center = true,
+          //size = "7.5,10",
+          //page = "8.5,11",
+          ];
+
+  node [ shape = circle, width = 0.6, fontsize = 16 ];
+  //node [ label = "", width = 0.3 ]; // comment out this line if you want the node names displayed
+
+  // on OS X/darwin it wants Courier-Bold and Courier-Oblique
+  edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16 ];
+
+  st [ style = invis ];
+  99 [ shape = doublecircle ];
+
+  st -> 00;
+  00 -> 01 [ label = "#" ];
+  01 -> 05 [ label = "{", fontname = "Courier-Bold" ];
+  05 -> 15 [ label = "expr", fontname = "Courier-Oblique", weight = 2 ];
+  05 -> 19 [ label = ",", style = dashed, tailport = s, headport = w, constraint = false ];
+  05 -> 19 [ label = ":", style = dashed, tailport = s, headport = w, constraint = false ];
+  05 -> 99 [ label = "}", tailport = n, headport = n ];
+  15 -> 25 [ label = ":", weight = 2 ];
+  15 -> 28 [ label = ",", tailport = s, headport = w ];
+  15 -> 99 [ label = "}", tailport = n, headport = n ];
+  19 -> 99 [ label = "}", style = dashed, tailport = e, headport = s ];
+  25 -> 35 [ label = "expr", fontname = "Courier-Oblique", weight = 2 ];
+  28 -> 38 [ label = "expr", fontname = "Courier-Oblique", weight = 2 ];
+  28 -> 99 [ label = "}", style = dashed, tailport = n, headport = s ];
+  35 -> 45 [ label = ",", weight = 10 ];
+  35 -> 99 [ label = "}", tailport = n, headport = n ];
+  38 -> 28 [ label = ",", color = red, tailport = s, headport = s ];
+  38 -> 99 [ label = "}", tailport = e, headport = s ];
+  45 -> 55 [ label = "expr", fontname = "Courier-Oblique", weight = 10 ];
+  45 -> 99 [ label = "}", style = dashed, tailport = n, headport = n ];
+  55 -> 25 [ label = ":", color = red, tailport = s, headport = s ];
+
+  subgraph { graph [ rank = same ]; 15; 19; }
+
+  subgraph { graph [ rank = same ]; 25; 28; }
+  55 -> 99 [ color = blue, weight = 3, style = invis ]; // layout only edge
+}
