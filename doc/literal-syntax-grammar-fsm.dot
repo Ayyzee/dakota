@@ -17,8 +17,7 @@ digraph "literal-syntax-grammar-fsm"
   graph [ label = "\G", fontcolor = red, fontsize = 16 ];
   graph [ rankdir = "LR",
           center = true,
-          //size = "7.5,10",
-          //page = "8.5,11",
+          //size = "7.5,10", page = "8.5,11",
           ];
 
   node [ shape = circle, width = 0.6, fontsize = 16 ];
@@ -53,7 +52,7 @@ digraph "literal-syntax-grammar-fsm"
   55 -> 25 [ label = ":", color = red, tailport = s, headport = s ];
 
   subgraph { graph [ rank = same ]; 15; 19; }
-
   subgraph { graph [ rank = same ]; 25; 28; }
+
   55 -> 99 [ color = blue, weight = 3, style = invis ]; // layout only edge
 }
