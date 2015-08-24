@@ -1,34 +1,91 @@
-${ a => x, b => y, c => z }
+#{ a : x, b : y, c : z }
 
-v = $( a => x )
-v = $[ a, b, c ]
-v = ${ a, b, c }
-v = ${ a => x, b => y, c => z }
+set   (sorted-set, hashed-set)
+table (sorted-table, hashed-table)
+seq
+deque (array/list)
+binary tree
+heap tree
+
+ {:} table (hashed-table)
+ {,} set   (hashed-set)
+ [:] vector of pair (also sorted-table)
+ [,] vector (also sorted-set)
+ (:) pair OR list of pair [ list of one pair #(#(a: b)) ]
+ (,) list
+ <:> user-defined?
+ <,> user-defined?
+ |:|
+ |,|
+
+#<sorted-table>{ a: b, c: d}
+=>
+make(sorted-table::klass, a: b, c: d)
+
+v = #(  a :  x )
+v = #( #a :  x )
+v = #( #a : #x )
+
+// seq
+// set (sorted-set) ???
+v = #[  a,  b,  c ]
+v = #[ #a, #b, #c ]
+
+// table (sorted-table)
+v = #[  a :  x,  b :  y,  c :  z ]
+v = #[ #a : #x, #b : #y, #c : #z ]
+
+// set (hashed-set)
+v = #{  a,  b,  c }
+v = #{ #a, #b, #c }
+
+// table (hashed-table)
+v = #{  a :  x,  b :  y,  c :  z }
+v = #{ #a :  x, #b :  y, #c :  z }
+v = #{ #a : #x, #b : #y, #c : #z }
 
 symbol:
-  $ident (no such literal "empty symbol")
+  #ident (no such literal 'empty symbol')
 
 empty string:
-  $""
+  #""
 
-empty assoc:
-  $()
-  $(=>)
+empty pair: delim=:
+  #()
+  #(:) // zero or one delim allowed
 
-empty sequence:
-  $[]
+empty sequence: delim=,
+  #[] // zero or more delims allowed
 
-empty set:
-  ${}
+empty set: delim=,
+  #{} // zero or more delims allowed
 
-empty table:
-  ${=>}
-  ${$()}
+empty table: delim=:
+  #{:}
+  #{#()}
+  #{#(:)}
 
-$"..."                      => make(LITERAL-STRING, $bytes => "...")
-$( a => z )                 => make(LITERAL-ASSOC, $key => a, $element => z)
-$[ a, b, c ]                => make(LITERAL-SEQUENCE, $items => cast(object-t[]){ a, b, c, nullptr })
-${ a, b, c }                => make(LITERAL-SET, $items => cast(object-t[]){ a, b, c, nullptr })
-${ a => z, b => y, c => x } => make(LITERAL-TABLE, $items => cast(object-t[]){ $( a => z ), $( b => y ), $( c => x ), nullptr })
+#"..."                   => make(LITERAL-STRING, #bytes : "...")
+#(  a : z )              => make(LITERAL-PAIR, #key :  a, #element :  z)
+#( #a : z )              => make(LITERAL-PAIR, #key : #a, #element :  z)
+#( #a : #z )             => make(LITERAL-PAIR, #key : #a, #element : #z)
+#[ a, b, c ]             => make(LITERAL-SEQUENCE, #items : cast(object-t[]){ a, b, c, nullptr })
+#{ a, b, c }             => make(LITERAL-SET, #items : cast(object-t[]){ a, b, c, nullptr })
+#{  a : z,  b : y,  c : x } => make(LITERAL-TABLE, #items : cast(object-t[]){ #(  a : z ), #(  b : y ), #(  c : x ), nullptr })
+#{ #a : z, #b : y, #c : x } => make(LITERAL-TABLE, #items : cast(object-t[]){ #( #a : z ), #( #b : y ), #( #c : x ), nullptr })
 
 if all elements to a literal construct are literal, then the entire literal (of literals) will be constructed at runtime initialization
+
+
+THOUGHTS:
+
+also:
+  #--(...)
+  #--[...]
+  #--{...}
+
+where -- may be empty, or the qualified name of a klass
+
+v = #sorted-set{ a, b }
+=>
+LITERAL-SET=sorted-set; v = #{ a, b }
