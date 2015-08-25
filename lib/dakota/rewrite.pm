@@ -105,7 +105,6 @@ my ($id,  $mid,  $bid,  $tid,
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 my $sqstr = &sqstr_regex();
-my $long_suffix = &long_suffix();
 $main::list_body = qr{
                        (?:
                          (?> [^()]+ )         # Non-parens without backtracking
@@ -194,14 +193,12 @@ sub rewrite_selectors {
 }
 sub rewrite_selsig_replacement {
   my ($aa, $bb) = @_;
-  my $ident = $$long_suffix{$bb};
-  my $result = "$aa$ident";
+  my $result = $aa . &encode_char($bb);
   return $result;
 }
 sub rewrite_functions_replacement {
   my ($aa, $bb, $cc) = @_;
-  my $ident = $$long_suffix{$bb};
-  my $result = "$aa$ident$cc";
+  my $result = $aa . &encode_char($bb) . $cc;
   return $result;
 }
 sub rewrite_functions {
@@ -286,8 +283,8 @@ sub convert_dash_syntax {
 }
 sub rewrite_syntax {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/($id)\?/$1$$long_suffix{'?'}/g;
-  $$filestr_ref =~ s/($id)\!/$1$$long_suffix{'!'}/g;
+  $$filestr_ref =~ s/($id)(\?)/$1 . &encode_char($2)/ge;
+  $$filestr_ref =~ s/($id)(\!)/$1 . &encode_char($2)/ge;
 
   $$filestr_ref =~ s/([a-zA-Z0-9])(-+)(?=[a-zA-Z0-9])/&convert_dash_syntax($1, $2)/ge;
 }

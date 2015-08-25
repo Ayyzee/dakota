@@ -15,9 +15,10 @@
   'DK_CXX_SHARED_FLAGS' =>      [ '--shared'  ],
   'DK_CXX_WARNINGS_FLAGS' =>    [
       '-Weverything',
-      '-Wno-c99-extensions', # c99 designated initializers, c99 compound literals
-      '-Wno-c++98-compat-pedantic',
       '-Wno-c++98-compat',
+      '-Wno-c++98-compat-pedantic',
+      '-Wno-c99-compat', # c++11 unicode character encoding in identifiers using \u4 or \U8: i.e. \uxxxx and \Uxxxxxxxx
+      '-Wno-c99-extensions', # c99 designated initializers, c99 compound literals
       '-Wno-cast-align',
       '-Wno-disabled-macro-expansion',
       '-Wno-exit-time-destructors',

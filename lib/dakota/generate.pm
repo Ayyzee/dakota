@@ -109,7 +109,6 @@ my $global_klass_defns = [];
 
 my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 
-my $long_suffix = &long_suffix();
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
@@ -3981,8 +3980,6 @@ sub linkage_unit::generate_keywords {
         $scratch_str .= $col . "extern keyword-t $ident;" . "\n";
       } else {
         $symbol =~ s|"|\\"|g;
-        $symbol =~ s/\?$/$$long_suffix{'?'}/;
-        $symbol =~ s/\!$/$$long_suffix{'!'}/;
         # keyword-defn
         if (&should_ann($ln, $num_lns)) {
           $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . &ann(__FILE__, __LINE__) . "\n";

@@ -54,6 +54,7 @@ our @EXPORT= qw(
                  decode_strings
                  deep_copy
                  dqstr_regex
+                 encode_char
                  encode_comments
                  encode_cpp
                  encode_strings
@@ -66,7 +67,6 @@ our @EXPORT= qw(
                  kw_args_generics_add
                  kw_args_placeholders
                  last
-                 long_suffix
                  make_ident_symbol
                  make_ident_symbol_scalar
                  max
@@ -175,12 +175,10 @@ sub decode_cpp {
     }
   }
 }
+sub encode_char { my ($char) = @_; return sprintf("\\u10%02x", ord($char)); }
 sub make_ident_symbol_scalar {
   my ($symbol) = @_;
   my $k = qr/[\w-]/;
-  my $long_suffix = &long_suffix();
-  $symbol =~ s/($id)\?/$1$$long_suffix{'?'}/g;
-  $symbol =~ s/($id)\!/$1$$long_suffix{'!'}/g;
   my $has_word_char;
 
   if ($symbol =~ m/\w/) {
@@ -200,16 +198,18 @@ sub make_ident_symbol_scalar {
       if ($has_word_char) {
         $part = '_';
       } else {
-        $part = sprintf("%02x", ord($char));
+        $part = &encode_char($char);
       }
     } elsif ($char =~ /$k/) {
       $part = $char;
     } else {
-      $part = sprintf("%02x", ord($char));
+      $part = &encode_char($char);
     }
     &dakota::util::add_last($ident_symbol, $part);
   }
   my $value = &path::string($ident_symbol);
+  #$value =~ s/($id)(\?)/$1 . &encode_char($2)/ge;
+  #$value =~ s/($id)(\!)/$1 . &encode_char($2)/ge;
   return $value;
 }
 sub make_ident_symbol {
@@ -265,12 +265,6 @@ sub method_sig_type_regex {
 my $method_sig_type = &method_sig_type_regex();
 sub method_sig_regex {
   return qr/(va::)?$mid(\($method_sig_type?\))?/;
-}
-# used src/bin/least-common-last-char.pl to
-# evaluate best options in english
-sub long_suffix {
-  return { '?' => 'P',
-           '!' => 'Z' };
 }
 sub dqstr_regex {
   # not-escaped " .*? not-escaped "
