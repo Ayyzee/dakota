@@ -24,17 +24,29 @@ digraph "literal-syntax-grammar-fsm"
   //node [ label = "", width = 0.3 ]; // comment out this line if you want the node names displayed
 
   // on OS X/darwin it wants Courier-Bold and Courier-Oblique
-  edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16 ];
+  edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16, concentrate = true ];
 
   st [ style = invis ];
   99 [ shape = doublecircle ];
+  98 [ shape = doublecircle ];
 
   st -> 00;
   00 -> 01 [ label = "#" ];
+  01 -> 02 [ label = "symbol-ident", fontname = "Courier-Oblique", weight = 2 ];
+
+  01 -> 98 [ label = "\"...\"", fontname = "Courier-Oblique", tailport = n, headport = n ];
+  01 -> 98 [ label = "\'...\'", fontname = "Courier-Oblique", tailport = n, headport = n ];
+
+  01 -> 98 [ label = "number", fontname = "Courier-Oblique", tailport = e, headport = w ];
+
+  02 -> 98 [ label = "\"...\"", fontname = "Courier-Oblique", tailport = n, headport = s ];
+  02 -> 98 [ label = "\"...\"", fontname = "Courier-Oblique", tailport = n, headport = s ];
+  
+  02 -> 05 [ label = "{", fontname = "Courier-Bold", weight = 6 ];
   01 -> 05 [ label = "{", fontname = "Courier-Bold" ];
   05 -> 15 [ label = "expr", fontname = "Courier-Oblique", weight = 2 ];
-  05 -> 19 [ label = ",", style = dashed, tailport = s, headport = w, constraint = false ];
   05 -> 19 [ label = ":", style = dashed, tailport = s, headport = w, constraint = false ];
+  05 -> 19 [ label = ",", style = dashed, tailport = s, headport = w, constraint = false ];
   05 -> 99 [ label = "}", tailport = n, headport = n ];
   15 -> 25 [ label = ":", weight = 2 ];
   15 -> 28 [ label = ",", tailport = s, headport = w ];
