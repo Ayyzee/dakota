@@ -827,20 +827,19 @@ sub klass::method_aliases {
 sub function::decl {
   my ($function, $scope) = @_;
 
-  my $function_decl;
+  my $function_decl = '';
   if ($$function{'is-inline'}) {
     $function_decl .= 'INLINE ';
   } else {
     $function_decl .= '';
   }
 
-  my $visibility = '';
   if (&is_exported($function)) {
-    $visibility .= "export";
+    $$function_decl .= "export ";
   }
   my $return_type = &arg::type($$function{'return-type'});
   my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
-  $function_decl .= "$visibility method $return_type $name($parameter_types);";
+  $function_decl .= "method $return_type $name($parameter_types);";
   return \$function_decl;
 }
 sub function::overloadsig_parts {
@@ -1010,6 +1009,7 @@ sub common::print_signature {
     $scratch_str .= "SO-EXPORT ";
   }
   my $generic_name = "@{$$generic{'name'}}";
+  my $in = &ident_comment($generic_name);
   $scratch_str .= "signature-t const* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
@@ -1018,7 +1018,7 @@ sub common::print_signature {
       $scratch_str .= ';' . "\n";
     }
   } elsif (&is_rt_defn()) {
-    $scratch_str .= ' {' . &ann(__FILE__, __LINE__) . "\n";
+    $scratch_str .= ' {' . $in . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
 
     my $return_type_str = &arg::type($$generic{'return-type'});
@@ -1110,15 +1110,16 @@ sub common::print_selector {
     $scratch_str .= "SO-EXPORT ";
   }
   my $generic_name = "@{$$generic{'name'}}";
+  my $in = &ident_comment($generic_name);
   $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $scratch_str .= '; }' . "\n";
+      $scratch_str .= '; }' . $in . "\n";
     } else {
-      $scratch_str .= ';' . "\n";
+        $scratch_str .= ';' . $in . "\n";
     }
   } elsif (&is_rt_defn()) {
-    $scratch_str .= ' {' . "\n";
+    $scratch_str .= ' {' . $in . "\n";
     $col = &colin($col);
 
     my $return_type_str = &arg::type($$generic{'return-type'});
@@ -1263,7 +1264,8 @@ sub generics::generate_signature_seq {
         my $width = length($method_type);
         my $pad = ' ' x ($max_width - $width);
         my $name = "@{$$generic{'name'}}";
-        $scratch_str .= $col . "(cast(dkt-signature-function-t)cast($method_type) " . $pad . "__signature::$name)(),\n";
+        my $in = &ident_comment($name);
+        $scratch_str .= $col . "(cast(dkt-signature-function-t)cast($method_type) " . $pad . "__signature::$name)()," . $in . "\n";
       }
     }
     $scratch_str .= $col . "nullptr,\n";
@@ -1342,11 +1344,12 @@ sub generics::generate_selector_seq {
         my $width = length($method_type);
         my $pad = ' ' x ($max_width - $width);
         my $name = "@{$$generic{'name'}}";
+        my $in = &ident_comment($name);
         my $name_width = length($name);
         my $name_pad = ' ' x ($max_name_width - $name_width);
         $scratch_str .=
           $col . "{ (cast(dkt-selector-function-t)(cast($method_type) " .
-          $pad . "__selector::$name" . $name_pad . "))(), nullptr },\n";
+          $pad . "__selector::$name" . $name_pad . "))(), nullptr }," . $in . "\n";
       }
     }
     $scratch_str .= $col . "{ nullptr, nullptr },\n";
@@ -1397,6 +1400,7 @@ sub generics::generate_generic_defn {
   }
   $$scratch_str_ref .= " GENERIC";
   my $generic_name = "@{$$generic{'name'}}";
+  my $in = &ident_comment($generic_name);
 
   $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
 
@@ -1407,7 +1411,7 @@ sub generics::generate_generic_defn {
       $$scratch_str_ref .= ";" . &ann(__FILE__, __LINE__) . "\n";
     }
   } elsif (&is_rt_defn()) {
-    $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
     if (&is_va($generic)) {
       $$scratch_str_ref .=
@@ -1479,6 +1483,7 @@ sub generics::generate_super_generic_defn {
   }
   $$scratch_str_ref .= " GENERIC";
   my $generic_name = "@{$$generic{'name'}}";
+  my $in = &ident_comment($generic_name);
 
   $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
 
@@ -1486,10 +1491,10 @@ sub generics::generate_super_generic_defn {
     if (&is_va($generic)) {
       $$scratch_str_ref .= "; }" . "\n";
     } else {
-      $$scratch_str_ref .= ";" . "\n";
+      $$scratch_str_ref .= ";" . $in . "\n";
     }
   } elsif (&is_rt_defn()) {
-    $$scratch_str_ref .= " {" . "\n";
+    $$scratch_str_ref .= " {" . $in . "\n";
     $col = &colin($col);
     if (&is_va($generic)) {
       $$scratch_str_ref .=
@@ -2859,10 +2864,11 @@ sub signature_body {
     if (!$$method{'alias'}) {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
+      my $in = &ident_comment($generic_name);
       if (&is_va($method)) {
-        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature::va::$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature::va::$generic_name)()," . $in . "\n";
       } else {
-        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature::$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-function-t)cast($method_type)" . $pad . "__signature::$generic_name)()," . $in . "\n";
       }
       my $method_name;
 
@@ -2909,16 +2915,16 @@ sub address_body {
       } else {
         $method_name = "@{$$method{'name'}}";
       }
-      #my $method_name = "@{$$method{'name'}}";
+      my $in = &ident_comment($method_name);
 
       if (!$$method{'defined?'} && !$$method{'alias'} && !$$method{'is-generated'}) {
         $pad = ' ' x $max_width;
         $result .=   $col . "cast(method-t)"                   . $pad . "dkt-null-method, /*$method_name()*/\n";
       } else {
         if (&is_va($method)) {
-          $result .= $col . "cast(method-t)cast($method_type)" . $pad . "va::$method_name,\n";
+          $result .= $col . "cast(method-t)cast($method_type)" . $pad . "va::$method_name," . $in . "\n";
         } else {
-          $result .= $col . "cast(method-t)cast($method_type)" . $pad . "$method_name,\n";
+          $result .= $col . "cast(method-t)cast($method_type)" . $pad . "$method_name," . $in . "\n";
         }
       }
     }
@@ -3952,6 +3958,16 @@ sub linkage_unit::generate_hashes {
   }
   return $scratch_str;
 }
+sub ident_comment {
+  my ($ident, $only_if_symbol) = @_;
+  my $result = '';
+  if (!$only_if_symbol && &needs_hex_encoding($ident)) {
+    $result = ' /* ' . $ident . ' */';
+  } elsif ($only_if_symbol && $ident =~ m/^#/ && &needs_hex_encoding($ident)) {
+    $result = ' /* ' . $ident . ' */';
+  }
+  return $result;
+}
 sub linkage_unit::generate_keywords {
   my ($file, $generics, $symbols) = @_;
   my $col = '';
@@ -3979,12 +3995,12 @@ sub linkage_unit::generate_keywords {
       if (&is_decl()) {
         $scratch_str .= $col . "extern keyword-t $ident;" . "\n";
       } else {
-        $symbol =~ s|"|\\"|g;
+        my $in = &ident_comment($symbol);
         # keyword-defn
         if (&should_ann($ln, $num_lns)) {
-          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . &ann(__FILE__, __LINE__) . "\n";
+          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . $in . &ann(__FILE__, __LINE__) . "\n";
         } else {
-          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . "\n";
+          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . $in . "\n";
         }
       }
     }
@@ -4056,7 +4072,9 @@ sub generate_property_tbl {
         $element = "dk-intern($element)";
       }
     }
-    $result .= $col . "{ $key, " . $pad . "cast(uintptr-t)$element },\n";
+    my $in1 = &ident_comment($key, 1);
+    my $in2 = &ident_comment($element, 1);
+    $result .= $col . "{ $key, " . $pad . "cast(uintptr-t)$element }," . $in1 . $in2 . "\n";
   }
   $col = &colout($col);
   $result .= $col . "};";

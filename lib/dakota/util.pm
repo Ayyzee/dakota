@@ -73,6 +73,7 @@ our @EXPORT= qw(
                  method_sig_regex
                  method_sig_type_regex
                  min
+                 needs_hex_encoding
                  objdir
                  pann
                  remove_first
@@ -175,18 +176,29 @@ sub decode_cpp {
     }
   }
 }
-sub encode_char { my ($char) = @_; return sprintf("\\u10%02x", ord($char)); }
+# method-ident: allow end in ! or ?
+# symbol-ident: allow end in ! or ? and allow . or : never as first char
+
+# !  x21  \u0021  only as last char
+# .  x2e  \u002e  never as first char
+# :  x3a  \u003a  never as first char
+# ?  x3f  \u003f  only as last char
+
+sub needs_hex_encoding {
+  my ($str) = @_;
+  $str =~ s/^#//;
+  my $k = qr/[\w-]/;
+  foreach my $char (split(//, $str)) {
+    if ($char !~ m/$k/) {
+      return 1;
+    }
+  }
+  return 0;
+}
+sub encode_char { my ($char) = @_; return sprintf("x%02x", ord($char)); }
 sub make_ident_symbol_scalar {
   my ($symbol) = @_;
   my $k = qr/[\w-]/;
-  my $has_word_char;
-
-  if ($symbol =~ m/\w/) {
-    $has_word_char = 1;
-  } else {
-    $has_word_char = 0;
-  }
-
   my $ident_symbol = [];
   &dakota::util::add_first($ident_symbol, '_');
 
@@ -194,12 +206,8 @@ sub make_ident_symbol_scalar {
 
   foreach my $char (@$chars) {
     my $part;
-    if ('-' eq $char) {
-      if ($has_word_char) {
-        $part = '_';
-      } else {
-        $part = &encode_char($char);
-      }
+    if ($char eq '-') {
+      $part = '_';
     } elsif ($char =~ /$k/) {
       $part = $char;
     } else {
@@ -208,8 +216,6 @@ sub make_ident_symbol_scalar {
     &dakota::util::add_last($ident_symbol, $part);
   }
   my $value = &path::string($ident_symbol);
-  #$value =~ s/($id)(\?)/$1 . &encode_char($2)/ge;
-  #$value =~ s/($id)(\!)/$1 . &encode_char($2)/ge;
   return $value;
 }
 sub make_ident_symbol {

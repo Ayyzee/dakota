@@ -317,8 +317,8 @@ sub rewrite_methods {
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
   $$filestr_ref =~ s|(method\s+[^(]*?($rid)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<!export)(\s)(method)(\s+)|$1METHOD$3|gm;
-  $$filestr_ref =~ s|export(\s)(method)(\s+)|export$1METHOD$3|gs;
+  $$filestr_ref =~ s|(?<!export)(\s+)(method)(\s+)|$1METHOD$3|gm;
+  $$filestr_ref =~ s|export(\s+)(method)(\s+)|export$1METHOD$3|gs;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack
