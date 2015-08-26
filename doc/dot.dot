@@ -37,7 +37,7 @@ digraph "dot"
   04 -> 05 [ label = "<node>", weight = 6 ];
   04 -> 07 [ label = "<node>" ];
   04 -> 07 [ label = "graph|edge|node" ];
-  04 -> 99 [ label = "};" ];
+  04 -> 99 [ label = "}" ];
   05 -> 06 [ label = "--|->", weight = 6 ];
   06 -> 07 [ label = "<node>", weight = 6 ];
   07 -> 04 [ label = ";", color = red ];
@@ -47,6 +47,6 @@ digraph "dot"
   09 -> 08 [ label = ",", color = red ];
   09 -> 10 [ label = "]", weight = 6 ];
   10 -> 04 [ label = ";", color = red ];
-  10 -> 99 [ label = "};", weight = 6 ];
-  99 -> 99 [ label = "};", tailport = s, headport = s ];
+  10 -> 99 [ label = "}", weight = 6 ];
+  99 -> 99 [ label = "}", tailport = s, headport = s ];
 }
