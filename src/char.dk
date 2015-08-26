@@ -14,11 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cstring> // wrongwrong: should be <cuchar> or <uchar.h>
-
 module dakota;
 
+klass char8
+{
+  slots char-t;
+}
+klass uchar8
+{
+  slots uchar-t;
+}
+klass schar8
+{
+  slots schar-t;
+}
+klass wchar
+{
+  slots wchar-t;
+}
 klass char16
 {
   slots char16-t;
+}
+klass char32
+{
+  slots char32-t;
 }
