@@ -826,20 +826,19 @@ sub klass::method_aliases {
 # routine that knows what can/can-not be immediatly adjacent.
 sub function::decl {
   my ($function, $scope) = @_;
-
   my $function_decl = '';
-  if ($$function{'is-inline'}) {
-    $function_decl .= 'INLINE ';
-  } else {
-    $function_decl .= '';
-  }
 
+  my $visibility = '';
   if (&is_exported($function)) {
-    $$function_decl .= "export ";
+    $visibility = 'SO-EXPORT ';
+  }
+  my $func_spec = '';
+  if ($$function{'is-inline'}) {
+    $func_spec = 'INLINE ';
   }
   my $return_type = &arg::type($$function{'return-type'});
   my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
-  $function_decl .= "method $return_type $name($parameter_types);";
+  $function_decl .= $visibility . $func_spec . "METHOD $return_type $name($parameter_types);";
   return \$function_decl;
 }
 sub function::overloadsig_parts {
@@ -916,19 +915,20 @@ sub method::generate_va_method_defn {
   }
   my $kw_args_generics = &dakota::util::kw_args_generics();
   if (exists $$kw_args_generics{$va_method_name}) {
-    $$scratch_str_ref .= "sentinel ";
+    $$scratch_str_ref .= 'sentinel ';
   }
+  my $visibility = '';
   if (&is_exported($va_method)) {
-    $$scratch_str_ref .= "SO-EXPORT ";
+    $visibility = 'SO-EXPORT ';
   }
+  my $func_spec = '';
   if ($is_inline) {
-    $$scratch_str_ref .= "INLINE ";
+    $func_spec = 'INLINE ';
   }
-  $$scratch_str_ref .= "$return_type ";
   my $scope_va = &dakota::util::deep_copy($scope);
   &dakota::util::add_last($scope_va, '::');
   &dakota::util::add_last($scope_va, 'va');
-  $$scratch_str_ref .= "$va_method_name($$new_arg_list_va_ref)";
+  $$scratch_str_ref .= $visibility . $func_spec . "$return_type $va_method_name($$new_arg_list_va_ref)";
 
   if (!$$va_method{'defined?'} || &is_nrt_decl() || &is_rt_decl()) {
     $$scratch_str_ref .= "; }" . &ann(__FILE__, $line) . "\n";
@@ -1005,12 +1005,13 @@ sub common::print_signature {
   } else {
     $scratch_str .= $col;
   }
+  my $visibility = '';
   if (&is_exported($generic)) {
-    $scratch_str .= "SO-EXPORT ";
+    $visibility = 'SO-EXPORT ';
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
-  $scratch_str .= "signature-t const* $generic_name($$new_arg_type_list)";
+  $scratch_str .= $visibility . "signature-t const* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= '; }' . "\n";
@@ -1106,12 +1107,13 @@ sub common::print_selector {
   } else {
     $scratch_str .= $col;
   }
+  my $visibility = '';
   if (&is_exported($generic)) {
-    $scratch_str .= "SO-EXPORT ";
+    $visibility = 'SO-EXPORT ';
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
-  $scratch_str .= "selector-t* $generic_name($$new_arg_type_list)";
+  $scratch_str .= $visibility . "selector-t* $generic_name($$new_arg_type_list)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= '; }' . $in . "\n";
@@ -1392,17 +1394,18 @@ sub generics::generate_generic_defn {
   } else {
     $$scratch_str_ref .= $col;
   }
+  my $visibility = '';
   if (&is_exported($generic)) {
-    $$scratch_str_ref .= "export";
+    $visibility = 'SO-EXPORT ';
   }
+  my $func_spec = '';
   if ($is_inline) {
-    $$scratch_str_ref .= " INLINE";
+    $func_spec = 'INLINE ';
   }
-  $$scratch_str_ref .= " GENERIC";
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
 
-  $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
+  $$scratch_str_ref .= $visibility . $func_spec . "GENERIC $return_type $generic_name($$new_arg_list)";
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
@@ -1471,21 +1474,22 @@ sub generics::generate_super_generic_defn {
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_va($generic)) {
-    $$scratch_str_ref .= $col . "namespace va { ";
+    $$scratch_str_ref .= $col . 'namespace va { ';
   } else {
     $$scratch_str_ref .= $col;
   }
+  my $visibility = '';
   if (&is_exported($generic)) {
-    $$scratch_str_ref .= "export";
+    $visibility = 'SO-EXPORT ';
   }
+  my $func_spec = '';
   if ($is_inline) {
-    $$scratch_str_ref .= " INLINE";
+    $func_spec = 'INLINE ';
   }
-  $$scratch_str_ref .= " GENERIC";
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
 
-  $$scratch_str_ref .= " $return_type $generic_name($$new_arg_list)";
+  $$scratch_str_ref .= $visibility . $func_spec . "GENERIC $return_type $generic_name($$new_arg_list)";
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
@@ -2158,16 +2162,14 @@ sub linkage_unit::generate_klasses_body {
 
                 #my $scope = &path::string($klass_path);
                 $other_method_decl =~ s|\(\*($id)\)| $1|;
-
+                my $visibility = '';
                 if (&is_exported($method)) {
-                  $$scratch_str_ref .= $col . "$klass_type $klass_name { SO-EXPORT method";
-                } else {
-                  $$scratch_str_ref .= $col . "$klass_type $klass_name { method";
+                  $visibility = 'SO-EXPORT ';
                 }
                 if ($$method{'is-inline'}) {
-                  #$$scratch_str_ref .= " INLINE";
+                  #$$scratch_str_ref .= 'INLINE ';
                 }
-                $$scratch_str_ref .= " $other_method_decl; }" . &ann(__FILE__, __LINE__, "stmt3") . "\n";
+                $$scratch_str_ref .= $col . "$klass_type $klass_name { " . $visibility . "METHOD $other_method_decl; }" . &ann(__FILE__, __LINE__, "stmt3") . "\n";
               }
             }
           }
@@ -2206,13 +2208,12 @@ sub generate_object_method_defn {
   my $non_object_return_type = &arg::type($$non_object_method{'return-type'});
   my $return_type = &arg::type($$method{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
+  my $visibility = '';
   if (&is_exported($method)) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_path { SO-EXPORT method";
-  } else {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_path { method";
+    $visibility = 'SO-EXPORT ';
   }
   my $method_name = "@{$$method{'name'}}";
-  $$scratch_str_ref .= " $return_type $method_name($$new_arg_list)";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_path { " . $visibility . "METHOD $return_type $method_name($$new_arg_list)";
 
   my $new_unboxed_arg_names = &arg_type::names_unboxed($$non_object_method{'parameter-types'});
   my $new_unboxed_arg_names_list = &arg_type::list_names($new_unboxed_arg_names);
@@ -3593,16 +3594,15 @@ sub generate_kw_args_method_defn {
   &dakota::util::_replace_first($new_arg_names, 'self');
   &dakota::util::_replace_last($new_arg_names, '_args_');
   my $new_arg_list  = &arg_type::list_pair($new_arg_type, $new_arg_names);
-
   my $return_type = &arg::type($$method{'return-type'});
   my $visibility = '';
-
   if (&is_exported($method)) {
-    $visibility = "export";
+    $visibility = 'SO-EXPORT ';
   }
+  my $func_spec = '';
   #if ($$method{'is-inline'})
   #{
-  #    $$scratch_str_ref .= "INLINE ";
+  #    $func_spec = 'INLINE ';
   #}
   my $method_name = "@{$$method{'name'}}";
   my $method_type_decl;
@@ -3610,7 +3610,7 @@ sub generate_kw_args_method_defn {
   my $list_names = &arg_type::list_names($$method{'parameter-types'});
 
   $$scratch_str_ref .=
-    "$klass_type @$klass_name { namespace va { $visibility $return_type $method_name($$new_arg_list) {" . &ann(__FILE__, __LINE__) . "\n";
+    "$klass_type @$klass_name { namespace va { " . $visibility . $func_spec . "$return_type $method_name($$new_arg_list) {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
   $$scratch_str_ref .=

@@ -317,8 +317,7 @@ sub rewrite_methods {
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
   $$filestr_ref =~ s|(method\s+[^(]*?($rid)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<!export)(\s+)(method)(\s+)|$1METHOD$3|gm;
-  $$filestr_ref =~ s|export(\s+)(method)(\s+)|export$1METHOD$3|gs;
+  $$filestr_ref =~ s|(?<!SO-EXPORT)(\s+)(method)(\s+)|$1METHOD$3|gm;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack
@@ -346,8 +345,8 @@ sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(          \s*$main::block)/$2$1 DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1 DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(          \s*$main::block)/$2$1DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
+  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
   $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|typedef$1 slots-t$2;|gsx;
@@ -439,7 +438,7 @@ sub rewrite_enums {
 sub rewrite_const {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|\bexport(\s+const.*?;)|/*export*/$1|g;
+  $$filestr_ref =~ s|\bSO-EXPORT(\s+const.*?;)|/*SO-EXPORT*/$1|g;
 }
 sub rewrite_function_typedef {
   my ($filestr_ref) = @_;
@@ -631,7 +630,7 @@ sub add_implied_slots_struct {
 }
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=(export)(\s+slots\s+)=/*$1*/$2=gs;
+  $$filestr_ref =~ s=(SO-EXPORT)(\s+slots\s+)=/*$1*/$2=gs;
   $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)([^;]*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5, $6)=gse;
 }
 sub exported_enum_body {
@@ -640,7 +639,7 @@ sub exported_enum_body {
 }
 sub remove_exported_enum {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(export)(\s+enum)(\s*$k*)(.*?)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
+  $$filestr_ref =~ s/(SO-EXPORT)(\s+enum)(\s*$k*)(.*?)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
 }
 # method init( ... , object-t $arg1, object-t $arg2 = ...) {|;
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;
@@ -806,13 +805,13 @@ sub convert_dk_to_cc {
   if ($remove) {
     &remove_exported_slots($filestr_ref);
   }
-  #&wrapped_rewrite($filestr_ref, [ 'export', 'slots', '?block' ], [ ]);
+  #&wrapped_rewrite($filestr_ref, [ 'SO-EXPORT', 'slots', '?block' ], [ ]);
 
   if ($remove) {
     &remove_exported_enum($filestr_ref);
   }
-  #&wrapped_rewrite($filestr_ref, [ 'export', 'enum',           '?block' ], [ ]);
-  #&wrapped_rewrite($filestr_ref, [ 'export', 'enum', '?ident', '?block' ], [ ]);
+  #&wrapped_rewrite($filestr_ref, [ 'SO-EXPORT', 'enum',           '?block' ], [ ]);
+  #&wrapped_rewrite($filestr_ref, [ 'SO-EXPORT', 'enum', '?ident', '?block' ], [ ]);
 
   &rewrite_set_literal($filestr_ref);
   &rewrite_sequence_literal($filestr_ref);
