@@ -29,7 +29,7 @@ my $g = { '-type' => 'digraph',
                        'width' => '0.6',
                        'fontsize' => '16' },
           '-stmts' => [ [ [ 'st' ], { 'label' => '', 'style' => 'invis' } ],
-                        [ [ 'st', '01' ], { 'label' => '' } ],
+                        [ [ 'st', '01' ], { } ],
                         [ [ '01', '02' ], { 'label' => 'digraph|graph' } ],
                         [ [ '01', '03' ], { 'label' => 'digraph|graph' } ],
                         [ [ '02', '03' ], { 'label' => '"name"' } ],
@@ -74,24 +74,31 @@ sub dot_stmt {
   }
   return ($lhs, $rhs);
 }
-
 my $indent = '  ';
-my $output = '';
-$output .= $$g{'-type'} . ' ' . '"' . $$g{'-name'} . '"' . ' {' . "\n";
+
+sub add_stmt {
+  my ($stmts, $lhs, $rhs) = @_;
+  push @$stmts, [ $indent, $lhs, $rhs, ';', "\n" ];
+}
+my $stmts = [];
+my $output = $$g{'-type'} . ' ' . '"' . $$g{'-name'} . '"' . ' {' . "\n";
 
 my ($lhs, $rhs);
 ($lhs, $rhs) = &dot_stmt([ [ 'graph' ], $$g{'graph'} ], { 'no-quote-nodes' => 1 });
-$output .= $indent . $lhs . $rhs . ';' . "\n";
+&add_stmt($stmts, $lhs, $rhs);
 
 ($lhs, $rhs) = &dot_stmt([ [ 'edge' ], $$g{'edge'} ], { 'no-quote-nodes' => 1 });
-$output .= $indent . $lhs . $rhs . ';' . "\n";
+&add_stmt($stmts, $lhs, $rhs);
 
 ($lhs, $rhs) = &dot_stmt([ [ 'node' ], $$g{'node'} ], { 'no-quote-nodes' => 1 });
-$output .= $indent . $lhs . $rhs . ';' . "\n";
+&add_stmt($stmts, $lhs, $rhs);
 
 foreach my $pair (@{$$g{'-stmts'}}) {
   my ($lhs, $rhs) = &dot_stmt($pair);
-  $output .= $indent . $lhs . $rhs . ';' . "\n";
+  &add_stmt($stmts, $lhs, $rhs);
+}
+foreach my $stmt (@$stmts) {
+  $output .= join('', @$stmt);
 }
 $output .= '}' . "\n";
 
