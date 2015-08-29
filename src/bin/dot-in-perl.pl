@@ -15,90 +15,72 @@ $Data::Dumper::Useqq = 1;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Indent = 1;
 
-my $g = { '-type' => 'digraph',
-          '-name' => 'dot-grammar-fsm',
-          'graph' => { 'rankdir' => 'LR',
-                       'center' => 'true',
-                       'label' => '\G',
-                       'fontcolor' => 'red',
-                       'fontsize' => '16',
-          },
-          'edge'  => { 'fontname' => 'Courier',
-                       'fontsize' => '16' },
-          'node'  => { 'shape' => 'circle',
-                       'width' => '0.6',
-                       'fontsize' => '16' },
-          '-stmts' => [ [ [ 'st' ], { 'label' => '', 'style' => 'invis' } ],
-                        [ [ 'st', '01' ], { } ],
-                        [ [ '01', '02' ], { 'label' => 'digraph|graph' } ],
-                        [ [ '01', '03' ], { 'label' => 'digraph|graph' } ],
-                        [ [ '02', '03' ], { 'label' => '"name"' } ],
-                        [ [ '03', '04' ], { 'label' => '{' } ],
-                        [ [ '04' ], { 'shape' => 'doublecircle' } ],
-                        [ [ '04', '02' ], { 'label' => 'subgraph' } ],
-                        [ [ '04', '03' ], { 'label' => 'subgraph', 'style' => 'dashed' } ],
-                        [ [ '04', '04' ], { 'label' => '}' } ],
-                        [ [ '04', '05' ], { 'label' => '"node"' } ],
-                        [ [ '04', '06' ], { 'label' => 'graph|edge|node' } ],
-                        [ [ '05', '04' ], { 'label' => ';', 'style' => 'dashed' } ],
-                        [ [ '05', '05' ], { 'label' => '->|-- "node"' } ],
-                        [ [ '05', '07' ], { 'label' => '[' } ],
-                        [ [ '06', '07' ], { 'label' => '[' } ],
-                        [ [ '07', '08' ], { 'label' => '<attr> = "value"' } ],
-                        [ [ '07', '09' ], { 'label' => ']' } ],
-                        [ [ '08', '07' ], { 'label' => ',', 'style' => 'dashed' } ],
-                        [ [ '08', '09' ], { 'label' => ']' } ],
-                        [ [ '09', '04' ], { 'label' => ';', 'style' => 'dashed' } ],
-                      ]
-};
+my $g = do $ARGV[0];
 
 #print &Dumper($g);
 
+my $edge_type_from_graph_type = { 'digraph' => '->',
+                                  'graph' =>   '--' };
+sub dot_stmt_default {
+  my ($g, $ds) = @_;
+  my $stmts = [];
+  foreach my $d (@$ds) {
+    my $stmt = "$d \[";
+    my $delim = '';
+    my $keys = [sort keys %{$$g{$d}}];
+    if (scalar @$keys) {
+      my $first = shift @$keys;
+      $stmt .= " $first = \"$$g{$d}{$first}\"";
+      $delim = ', ';
+      foreach my $key (@$keys) {
+        $stmt .= "$delim\n"  . (' ' x length($d . " \[")) . " $key = \"$$g{$d}{$key}\"";
+      }
+    }
+    if (scalar @$keys) {
+      $stmt .= "\n" . "\]";
+    } else {
+      $stmt .= " \]";
+    }
+
+    push @$stmts, $stmt;
+  }
+  return $stmts;
+}
 sub dot_stmt {
-  my ($pair, $extra) = @_;
+  my ($graph_type, $pair, $extra) = @_;
   my $lhs;
+  my $edge_type = $$edge_type_from_graph_type{$graph_type};
   if ($extra && $$extra{'no-quote-nodes'}) {
-    $lhs = join(' -> ', @{$$pair[0]});
+    $lhs = join(" $edge_type ", @{$$pair[0]});
   } else {
-    $lhs = '"' . join('" -> "', @{$$pair[0]}) . '"';
+    $lhs = '"' . join("\" $edge_type \"", @{$$pair[0]}) . '"';
   }
   my $rhs = '';
   my $d = '';
   while (my ($key, $val) = each %{$$pair[1]}) {
+    #$val =~ s/\/\\\\/g;
     $val =~ s/"/\\"/g;
     $rhs .= $d . $key . ' = "' . $val . '"';
     $d = ', ';
   }
   if ($rhs) {
-    $rhs = ' [ ' . $rhs . ' ]';
+    $rhs = '[ ' . $rhs . ' ]';
   }
-  return ($lhs, $rhs);
+  return "$lhs $rhs";
 }
 my $indent = '  ';
 
-sub add_stmt {
-  my ($stmts, $lhs, $rhs) = @_;
-  push @$stmts, [ $indent, $lhs, $rhs, ';', "\n" ];
+my $output = $$g{'-type'} . " \"" . $$g{'-name'} . "\" {\n";
+
+my $stmts = &dot_stmt_default($g, [ 'graph', 'edge', 'node' ]);
+foreach my $stmt (@$stmts) {
+  $stmt =~ s/\n/"\n" . '  '/eg;
+  $output .= $indent . $stmt . ";\n";
 }
-my $stmts = [];
-my $output = $$g{'-type'} . ' ' . '"' . $$g{'-name'} . '"' . ' {' . "\n";
-
-my ($lhs, $rhs);
-($lhs, $rhs) = &dot_stmt([ [ 'graph' ], $$g{'graph'} ], { 'no-quote-nodes' => 1 });
-&add_stmt($stmts, $lhs, $rhs);
-
-($lhs, $rhs) = &dot_stmt([ [ 'edge' ], $$g{'edge'} ], { 'no-quote-nodes' => 1 });
-&add_stmt($stmts, $lhs, $rhs);
-
-($lhs, $rhs) = &dot_stmt([ [ 'node' ], $$g{'node'} ], { 'no-quote-nodes' => 1 });
-&add_stmt($stmts, $lhs, $rhs);
+$output .= "\n";
 
 foreach my $pair (@{$$g{'-stmts'}}) {
-  my ($lhs, $rhs) = &dot_stmt($pair);
-  &add_stmt($stmts, $lhs, $rhs);
-}
-foreach my $stmt (@$stmts) {
-  $output .= join('', @$stmt);
+  $output .= $indent . &dot_stmt($$g{'-type'}, $pair) . ";\n";
 }
 $output .= '}' . "\n";
 

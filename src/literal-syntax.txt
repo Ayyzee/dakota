@@ -9,14 +9,19 @@ heap tree
 
  {:} table (hashed-table)
  {,} set   (hashed-set)
+ {}  empty set
  [:] vector of pair (also sorted-table)
  [,] vector (also sorted-set)
+ []  empty vector
  (:) pair OR list of pair [ list of one pair #(#(a: b)) ]
  (,) list
+ ()  empty list
  <:> user-defined?
  <,> user-defined?
  |:|
  |,|
+ /:/
+ /./
 
 #<sorted-table>{ a: b, c: d}
 =>
@@ -65,6 +70,7 @@ empty table: delim=:
   #{#()}
   #{#(:)}
 
+#'...'                   same as symbol
 #"..."                   => make(LITERAL-STRING, #bytes : "...")
 #(  a : z )              => make(LITERAL-PAIR, #key :  a, #element :  z)
 #( #a : z )              => make(LITERAL-PAIR, #key : #a, #element :  z)
