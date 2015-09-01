@@ -14,33 +14,32 @@
 
 digraph "qual-x-ident"
 {
-  graph [ label = "\G", 
-          rankdir = "LR",
+  graph [ label = "\G", fontcolor = red, fontsize = 16,
+          rankdir = LR,
           center = true,
           //size = "7.5,10", page = "8.5,11",
-          fontcolor = red, fontsize = 16,
           ];
   node [ shape = circle, width = 0.6, fontsize = 16 ];
   //node [ label = "", width = 0.3 ]; // comment out this line if you want the node names displayed
 
   // on OS X/darwin it wants Courier-Bold and Courier-Oblique
-  edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16, concentrate = true ];
+  edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16 ];
 
   10 -> 11;
   10 [ label = "qual-ident", shape = none, fontcolor = green ];
-  11 -> 13 [ label = "::" , weight = 2 ];
+  11 -> 13 [ label = "::" , weight = 4 ];
   11 -> 19 [ label = "ident", tailport = n, headport = n ];
-  13 -> 19 [ label = "ident", weight = 2 ];
+  13 -> 19 [ label = "ident", weight = 4 ];
   19 -> 13 [ label = "::", tailport = s, headport = s ];
   19 [ shape = doublecircle ];
   20 -> 21;
   20 [ label = "qual-x-ident", shape = none, fontcolor = green ];
-  21 -> 22 [ label = "ident", weight = 2 ];
+  21 -> 22 [ label = "ident", weight = 4 ];
   21 -> 23 [ label = "::", tailport = s, headport = s ];
   21 -> 29 [ label = "x-ident", tailport = n, headport = n ];
-  22 -> 23 [ label = "::", weight = 2 ];
+  22 -> 23 [ label = "::", weight = 4 ];
   23 -> 22 [ label = "ident", tailport = n, headport = n ];
-  23 -> 29 [ label = "x-ident", weight = 2 ];
+  23 -> 29 [ label = "x-ident", weight = 4 ];
   29 [ shape = doublecircle ];
   
   subgraph { rank = same; 11; 21 }
