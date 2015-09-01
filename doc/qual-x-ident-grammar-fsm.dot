@@ -25,13 +25,6 @@ digraph "qual-x-ident"
   // on OS X/darwin it wants Courier-Bold and Courier-Oblique
   edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16 ];
 
-  10 -> 11;
-  10 [ label = "qual-ident", shape = none, fontcolor = green ];
-  11 -> 13 [ label = "::" , weight = 4 ];
-  11 -> 19 [ label = "ident", tailport = n, headport = n ];
-  13 -> 19 [ label = "ident", weight = 4 ];
-  19 -> 13 [ label = "::", tailport = s, headport = s ];
-  19 [ shape = doublecircle ];
   20 -> 21;
   20 [ label = "qual-x-ident", shape = none, fontcolor = green ];
   21 -> 22 [ label = "ident", weight = 4 ];
@@ -42,6 +35,14 @@ digraph "qual-x-ident"
   23 -> 29 [ label = "x-ident", weight = 4 ];
   29 [ shape = doublecircle ];
   
+  10 -> 11;
+  10 [ label = "qual-ident", shape = none, fontcolor = green ];
+  11 -> 13 [ label = "::" , weight = 4 ];
+  11 -> 19 [ label = "ident", tailport = n, headport = n ];
+  13 -> 19 [ label = "ident", weight = 4 ];
+  19 -> 13 [ label = "::", tailport = s, headport = s ];
+  19 [ shape = doublecircle ];
+
   subgraph { rank = same; 11; 21 }
   subgraph { rank = same; 19; 29 }
 
