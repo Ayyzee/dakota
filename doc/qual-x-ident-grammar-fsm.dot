@@ -14,33 +14,33 @@
 
 digraph "qual-x-ident-grammar-fsm"
 {
-  graph [ label = "\G", fontcolor = red, fontsize = 16,
+  graph [ label = "\G", fontname = "Courier", fontcolor = red, fontsize = 14,
           rankdir = LR,
           center = true,
           //size = "7.5,10", page = "8.5,11",
           ];
-  node [ shape = circle, width = 0.6, fontsize = 16 ];
-  //node [ label = "", width = 0.3 ]; // comment out this line if you want the node names displayed
+  node [ shape = circle, fontname = "Courier", fontsize = 14 ];
+  //node [ label = "" ]; // comment out this line if you want the node names displayed
 
   // on OS X/darwin it wants Courier-Bold and Courier-Oblique
-  edge [ fontname = "Courier-Bold", minlen = 2, fontsize = 16 ];
+  edge [ fontname = "Courier-Oblique", minlen = 2, fontsize = 14 ];
 
   20 -> 21;
-  20 [ label = "qual-x-ident", shape = none, fontcolor = green ];
+  20 [ label = "qual-x-ident", shape = none, fontcolor = blue ];
   21 -> 22 [ label = "ident", weight = 4 ];
-  21 -> 23 [ label = "::", tailport = n, headport = n ];
+  21 -> 23 [ label = "::", fontname = "Courier-Bold", tailport = n, headport = n ];
   21 -> 29 [ label = "x-ident", tailport = n, headport = n ];
-  22 -> 23 [ label = "::", weight = 4 ];
+  22 -> 23 [ label = "::", fontname = "Courier-Bold", weight = 4 ];
   23 -> 22 [ label = "ident", tailport = s, headport = s ];
   23 -> 29 [ label = "x-ident", weight = 4 ];
   29 [ shape = doublecircle ];
   
   10 -> 11;
-  10 [ label = "qual-ident", shape = none, fontcolor = green ];
-  11 -> 13 [ label = "::" , weight = 4 ];
+  10 [ label = "qual-ident", shape = none, fontcolor = blue ];
+  11 -> 13 [ label = "::", fontname = "Courier-Bold", weight = 4 ];
   11 -> 19 [ label = "ident", tailport = n, headport = n ];
   13 -> 19 [ label = "ident", weight = 4 ];
-  19 -> 13 [ label = "::", tailport = s, headport = s ];
+  19 -> 13 [ label = "::", fontname = "Courier-Bold", tailport = s, headport = s ];
   19 [ shape = doublecircle ];
 
   subgraph { rank = same; 11; 21 }
