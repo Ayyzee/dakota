@@ -95,7 +95,12 @@ foreach my $arg (@ARGV) {
             } else { die $arg . ": $pair\n"; }
           }
         }
-        push @{$$result{'-stmts'}}, [$nodes, $attrs];
+        my $special_nodes = { 'graph' => 1, 'edge' => 1, 'node' => 1 }; # don't handle subgraph yet!!!
+        if (1 == scalar @$nodes && $$special_nodes{$$nodes[0]}) {
+          $$result{$$nodes[0]} = $attrs;
+        } else {
+          push @{$$result{'-stmts'}}, [$nodes, $attrs];
+        }
 
       } else { die $arg . ": $stmt\n"; }
     }
