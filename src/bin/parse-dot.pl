@@ -105,14 +105,17 @@ foreach my $arg (@ARGV) {
       } else { die $arg . ": $stmt\n"; }
     }
   } else { die $arg . ": <filestr>\n"; }
-  if (1) {
-    my $outstr = &Dumper($result);
-    $outstr =~ s/(\[\s*.*?\s*\])/&single_line($1)/egs;
+
+  my $outstr = &Dumper($result);
+  $outstr =~ s/(\[\s*.*?\s*\])/&single_line($1)/egs;
+  $outstr =~ s/\{\s+/\{ /gs;
+
+  if (0) {
     print $outstr;
   }
   else {
     open($f, ">", $arg . '.pl');
-    print $f &Dumper($result);
+    print $f $outstr;
     close($f);
   }
 }
