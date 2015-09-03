@@ -47,6 +47,7 @@ sub decode_strs {
 }
 sub encode_str {
   my ($str) = @_;
+  $str =~ s/^"(.*)"$/$1/;
   return $ENCODED_STRING_BEGIN . unpack('H*', $str) . $ENCODED_STRING_END;
 }
 sub encode_strs {
