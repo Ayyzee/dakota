@@ -95,14 +95,14 @@ foreach my $arg (@ARGV) {
             } else { die $arg . ": $pair\n"; }
           }
         }
-        push @{$$result{'-stmts'}}, [[$nodes], $attrs];
+        push @{$$result{'-stmts'}}, [$nodes, $attrs];
 
       } else { die $arg . ": $stmt\n"; }
     }
   } else { die $arg . ": <filestr>\n"; }
   if (1) {
     my $outstr = &Dumper($result);
-    $outstr =~ s/(\[\s*\[\s*.*?\s*\]\s*\])/&single_line($1)/egs;
+    $outstr =~ s/(\[\s*.*?\s*\])/&single_line($1)/egs;
     print $outstr;
   }
   else {
