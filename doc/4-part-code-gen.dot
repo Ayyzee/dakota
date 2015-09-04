@@ -33,7 +33,7 @@ digraph "4-part-code-gen"
 
   subgraph "cluster-non-rt"
   {
-       label = "non-rt";
+       graph [ label = "non-rt" ];
        non_rt_decl;
        user_code;
        non_rt_defn;
@@ -41,7 +41,7 @@ digraph "4-part-code-gen"
 
   subgraph "cluster-rt"
   {
-       label = "rt";
+       graph [ label = "rt" ];
        rt_decl;
        dummy;
        rt_defn;

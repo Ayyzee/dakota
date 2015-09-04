@@ -20,7 +20,7 @@ digraph "interpose"
 
   subgraph cluster3
   {
-       label = "-> add\l<- remove\l";
+       graph [ label = "-> add\l<- remove\l" ];
 
        //
        // a_2_1, b_2_1
@@ -56,7 +56,7 @@ digraph "interpose"
   }
   subgraph cluster1
   {
-       label = "-> promote\l<- demote\l";
+       graph [ label = "-> promote\l<- demote\l" ];
 
        node [ style = invis]; edge [ style = invis ];
        // a_0_1, b_0_1
@@ -92,7 +92,7 @@ digraph "interpose"
   }
   subgraph cluster2
   {
-       label = "-> interpose\l<- depose\l";
+       graph [ label = "-> interpose\l<- depose\l" ];
 
        //
        // a_1_1, b_1_1
