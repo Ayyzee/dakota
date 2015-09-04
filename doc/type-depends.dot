@@ -51,8 +51,8 @@ digraph "type-depends"
   "typedef kk:slots-t kk-t 1;" [ label = "typedef kk:slots-t kk-t;" ];
   "typedef kk:slots-t kk-t 2;" [ label = "typedef kk:slots-t kk-t;" ];
 
-  {
-    rank = same;
+  subgraph {
+    graph [ rank = same ];
     "kk-t";
     "kk-t*";
     "kk:slots-t";
@@ -60,8 +60,8 @@ digraph "type-depends"
     "kk:xx-t";
   }
 
-  {
-    rank = same;
+  subgraph {
+    graph [ rank = same ];
     "ns kk { struct slots-t {...} }";
     "ns kk { struct slots-t {...} }";
     "ns kk { struct slots-t; }";

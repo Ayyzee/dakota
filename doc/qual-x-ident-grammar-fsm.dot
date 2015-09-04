@@ -43,12 +43,12 @@ digraph "qual-x-ident-grammar-fsm"
   19 -> 13 [ label = "::", fontname = "Courier-Bold", tailport = s, headport = s ];
   19 [ shape = doublecircle ];
 
-  subgraph { rank = same; 11; 21 }
-  subgraph { rank = same; 19; 29 }
+  subgraph { graph [ rank = same ]; 11; 21 }
+  subgraph { graph [ rank = same ]; 19; 29 }
 
-  subgraph { rank = source; 10; }
-  subgraph { rank = sink;   19; }
+  subgraph { graph [ rank = source ]; 10; }
+  subgraph { graph [ rank = sink   ]; 19; }
 
-  subgraph { rank = source; 20; }
-  subgraph { rank = sink;   29; }
+  subgraph { graph [ rank = source ]; 20; }
+  subgraph { graph [ rank = sink   ]; 29; }
 }

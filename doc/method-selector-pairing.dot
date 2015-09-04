@@ -49,8 +49,8 @@ digraph "method-selector-pairing"
   "dk:f1(object-t)"              -> "selector:f1(object-t)"      [constraint = false, style = dotted];
   "selector:f1(object-t)"      -> "foobar:f1(object-t)" [ style = dashed, label = "dk:method-for()" ];
 
-  {
-    rank = same;
+  subgraph {
+    graph [ rank = same ];
     "dk:f1(object-t)";
     "dk:f2(object-t, ...)";
     "dk:va:f2(object-t, va-list-t)";
@@ -58,13 +58,13 @@ digraph "method-selector-pairing"
     "dk:va:f3(object-t, va-list-t)";
   }
 
-  {
-    rank = same;
+  subgraph {
+    graph [ rank = same ];
     "selector:f1(object-t)";
     "selector:va:f2(object-t, va-list-t)";
     "selector:va:f3(object-t, va-list-t)";
   }
-  { rank = same; "foobar:f1(object-t)"; "foobar:f3(object-t, int32-t value => {})"; }
-  { rank = same; "foobar:va:f2(object-t, va-list-t)"; "foobar:va:f3(object-t, va-list-t)"; }
-  { rank = same; "foobar:f2(object-t, ...)"; "foobar:f3(object-t, ...)"; }
+  subgraph { graph [ rank = same ]; "foobar:f1(object-t)"; "foobar:f3(object-t, int32-t value => {})"; }
+  subgraph { graph [ rank = same ]; "foobar:va:f2(object-t, va-list-t)"; "foobar:va:f3(object-t, va-list-t)"; }
+  subgraph { graph [ rank = same ]; "foobar:f2(object-t, ...)"; "foobar:f3(object-t, ...)"; }
 }
