@@ -47,6 +47,6 @@ digraph "grammar-enum"
   50 -> 55 [ label = "}" ];
   55 -> 60 [ label = ";" ];
 
-  { rank = same; 15; 20 }
-  { rank = same; 25; 30 }
+  subgraph { graph [ rank = same ]; 15; 20 }
+  subgraph { graph [ rank = same ]; 25; 30 }
 }

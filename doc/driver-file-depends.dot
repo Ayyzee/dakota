@@ -38,7 +38,7 @@ digraph "driver-file-depends"
     "rt/z.cc" [ color = purple ];
     subgraph
     {
-      rank = same;
+      graph [ rank = same ];
       "x.rep";
       "y.rep";
       "a.rep";
@@ -84,7 +84,7 @@ digraph "driver-file-depends"
 
   subgraph
   {
-    rank = same;
+    graph [ rank = same ];
     "x.dk";
     "y.dk";
     "a.so";
@@ -92,7 +92,7 @@ digraph "driver-file-depends"
   }
   subgraph
   {
-    rank = same;
+    graph [ rank = same ];
     "nrt/x.cc";
     "nrt/y.cc";
     "rt/z.cc";

@@ -66,11 +66,11 @@ digraph "collection-auto-immutable"
   "mutable-set"   [ style = "rounded" ];
   "mutable-table" [ style = "rounded" ];
 
-  { rank = "same"; "mutable-set";   "mutable-hashed-set";   "mutable-sorted-set";   }
-  { rank = "same"; "mutable-table"; "mutable-hashed-table"; "mutable-sorted-table"; }
+  subgraph { graph [ rank = same ]; "mutable-set";   "mutable-hashed-set";   "mutable-sorted-set";   }
+  subgraph { graph [ rank = same ]; "mutable-table"; "mutable-hashed-table"; "mutable-sorted-table"; }
 
-  { rank = "same"; "set";   "hashed-set";   "sorted-set";   }
-  { rank = "same"; "table"; "hashed-table"; "sorted-table"; }
+  subgraph { graph [ rank = same ]; "set";   "hashed-set";   "sorted-set";   }
+  subgraph { graph [ rank = same ]; "table"; "hashed-table"; "sorted-table"; }
 
   // layout only
   "mutable-set"        -> "table" [ style = "invis" ];

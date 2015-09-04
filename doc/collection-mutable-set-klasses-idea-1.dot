@@ -93,17 +93,17 @@ digraph "collection-mutable-set-klasses-idea-1"
     "sorted-table" -> "mutable-sorted-table" [ color = red ];
     "hashed-table" -> "mutable-hashed-table" [ color = red ];
 
-    { rank = same; "sorted-set"; "set" };
-    { rank = same; "hashed-set"; "set" };
+    subgraph { graph [ rank = same ]; "sorted-set"; "set" };
+    subgraph { graph [ rank = same ]; "hashed-set"; "set" };
 
-    { rank = same; "mutable-sorted-set"; "mutable-set" };
-    { rank = same; "mutable-hashed-set"; "mutable-set" };
+    subgraph { graph [ rank = same ]; "mutable-sorted-set"; "mutable-set" };
+    subgraph { graph [ rank = same ]; "mutable-hashed-set"; "mutable-set" };
 
-    { rank = same; "mutable-sorted-table"; "mutable-table"; "mutable-sorted-counted-set" };
-    { rank = same; "mutable-hashed-table"; "mutable-table"; "mutable-hashed-counted-set" };
+    subgraph { graph [ rank = same ]; "mutable-sorted-table"; "mutable-table"; "mutable-sorted-counted-set" };
+    subgraph { graph [ rank = same ]; "mutable-hashed-table"; "mutable-table"; "mutable-hashed-counted-set" };
 
-    { rank = same; "sorted-table"; "table"; "sorted-counted-set" };
-    { rank = same; "hashed-table"; "table"; "hashed-counted-set" };
+    subgraph { graph [ rank = same ]; "sorted-table"; "table"; "sorted-counted-set" };
+    subgraph { graph [ rank = same ]; "hashed-table"; "table"; "hashed-counted-set" };
 
     // layout hacks
     // to debug set color = gray

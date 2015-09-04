@@ -42,14 +42,14 @@ digraph "autoconf"
 
 //--- formatting only below this line
 
-  { rank = same; "configure.ac"; "Makefile.am" };
+  subgraph { graph [ rank = same ]; "configure.ac"; "Makefile.am" };
 
   edge [ style = invis ];
   node [ style = invis ];
 
 //   autoheader -> autoconf -> automake;
-//   { rank = same; autoheader; autoconf; automake };
+//   subgraph { graph [ rank = same ]; autoheader; autoconf; automake };
 
   aclocal -> autoheader -> autoconf -> automake;
-  { rank = same; aclocal; autoheader; autoconf; automake };
+  subgraph { graph [ rank = same ]; aclocal; autoheader; autoconf; automake };
 }

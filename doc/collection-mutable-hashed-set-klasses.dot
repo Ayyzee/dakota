@@ -57,15 +57,15 @@ digraph "collection-mutable-hashed-set-klasses"
   "mutable-hashed-table" -> "mutable-table" [ dir = backward ];
   "table" -> "hashed-table";
 
-//   { rank = same; "sorted-set"; "set" };
-  { rank = same; "hashed-set"; "set" };
+//   subgraph { graph [ rank = same ]; "sorted-set"; "set" };
+  subgraph { graph [ rank = same ]; "hashed-set"; "set" };
 
-//   { rank = same; "mutable-sorted-set"; "mutable-set" };
-//   { rank = same; "mutable-hashed-set"; "mutable-set" };
+//   subgraph { graph [ rank = same ]; "mutable-sorted-set"; "mutable-set" };
+//   subgraph { graph [ rank = same ]; "mutable-hashed-set"; "mutable-set" };
 
-//   { rank = same; "sorted-table"; "table" };
-  { rank = same; "hashed-table"; "table" };
+//   subgraph { graph [ rank = same ]; "sorted-table"; "table" };
+  subgraph { graph [ rank = same ]; "hashed-table"; "table" };
 
-//   { rank = same; "mutable-sorted-table"; "mutable-table" };
-  { rank = same; "mutable-hashed-table"; "mutable-table" };
+//   subgraph { graph [ rank = same ]; "mutable-sorted-table"; "mutable-table" };
+  subgraph { graph [ rank = same ]; "mutable-hashed-table"; "mutable-table" };
 }

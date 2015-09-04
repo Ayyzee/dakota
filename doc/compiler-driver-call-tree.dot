@@ -76,5 +76,5 @@ digraph "compiler-driver-call-tree"
   "g++" [ style = rounded ];
   "dakota-introspector" [ style = rounded ];
 
-    { rank = same; "obj-from-cc"; "dso-from-obj"; "so-from-obj"; "exe-from-obj" };
+    subgraph { graph [ rank = same ]; "obj-from-cc"; "dso-from-obj"; "so-from-obj"; "exe-from-obj" };
 }

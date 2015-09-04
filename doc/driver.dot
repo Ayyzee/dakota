@@ -28,8 +28,8 @@ digraph "driver"
   "macro-rewriter-2" -> "compiler" [ color = gray ];
   "parser" -> "code-generator" [ color = gray ];
 
-  { rank = same; "macro-lexer-1\nmacro-parser-1"; "lexer" }
-  { rank = same; "macro-lexer-2\nmacro-parser-2"; "code-generator" }
+  subgraph { graph [ rank = same ]; "macro-lexer-1\nmacro-parser-1"; "lexer" }
+  subgraph { graph [ rank = same ]; "macro-lexer-2\nmacro-parser-2"; "code-generator" }
 
 //   "driver" -> "code-generator";
 //   "driver" -> "compiler";

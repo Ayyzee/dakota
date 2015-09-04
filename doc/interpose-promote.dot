@@ -50,9 +50,9 @@ digraph "interpose"
        a_2_2 -> a_2_3;
        node [ style = solid]; edge [ style = solid ];
 
-       { rank = same; a_2_1; a_2_2; a_2_3 };
-       { rank = same; b_2_1; b_2_2; b_2_3 };
-       { rank = same;        c_2_2; c_2_3 };
+       subgraph { graph [ rank = same ]; a_2_1; a_2_2; a_2_3 };
+       subgraph { graph [ rank = same ]; b_2_1; b_2_2; b_2_3 };
+       subgraph { graph [ rank = same ];        c_2_2; c_2_3 };
   }
   subgraph cluster1
   {
@@ -86,9 +86,9 @@ digraph "interpose"
        a_0_2 -> a_0_3;
        node [ style = solid]; edge [ style = solid ];
 
-       { rank = same; a_0_1; a_0_2; a_0_3 };
-       { rank = same; b_0_1; b_0_2; b_0_3 };
-       { rank = same;        c_0_2; c_0_3 };
+       subgraph { graph [ rank = same ]; a_0_1; a_0_2; a_0_3 };
+       subgraph { graph [ rank = same ]; b_0_1; b_0_2; b_0_3 };
+       subgraph { graph [ rank = same ];        c_0_2; c_0_3 };
   }
   subgraph cluster2
   {
@@ -122,8 +122,8 @@ digraph "interpose"
        a_1_2 -> a_1_3;
        node [ style = solid]; edge [ style = solid ];
 
-       { rank = same; a_1_1; a_1_2; a_1_3 };
-       { rank = same; b_1_1; b_1_2; b_1_3 };
-       { rank = same;        c_1_2; c_1_3 };
+       subgraph { graph [ rank = same ]; a_1_1; a_1_2; a_1_3 };
+       subgraph { graph [ rank = same ]; b_1_1; b_1_2; b_1_3 };
+       subgraph { graph [ rank = same ];        c_1_2; c_1_3 };
   }
 }

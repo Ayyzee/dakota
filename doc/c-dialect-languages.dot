@@ -44,5 +44,5 @@ digraph "c-dialect-languages"
   "Dylan" -> "Dakota";
   "CLOS" -> "Dakota";
   
-  { rank = same; "C++"; "Objective-C"; "CLOS" };
+  subgraph { graph [ rank = same ]; "C++"; "Objective-C"; "CLOS" };
 }

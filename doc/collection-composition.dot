@@ -30,15 +30,15 @@ digraph "collection-composition"
 
 	"set" -> "hashed-set" [ style = dashed ];
 	"sorted-set" -> "set" [ style = dashed, dir = forward ];
-        { rank = same; "hashed-set"; "set"; "sorted-set"};
+        subgraph { graph [ rank = same ]; "hashed-set"; "set"; "sorted-set"};
 
 	"counted-set" -> "sorted-counted-set" [ style = dashed ];
 	"hashed-counted-set" -> "counted-set" [ style = dashed, dir = forward  ];
-        { rank = same; "hashed-counted-set"; "counted-set"; "sorted-counted-set"};
+        subgraph { graph [ rank = same ]; "hashed-counted-set"; "counted-set"; "sorted-counted-set"};
 
 	"table" -> "sorted-table" [ style = dashed ];
 	"hashed-table" -> "table" [ style = dashed, dir = forward ];
-        { rank = same; "hashed-table"; "table"; "sorted-table"};
+        subgraph { graph [ rank = same ]; "hashed-table"; "table"; "sorted-table"};
 
         "collection" -> "hashed-set";
         "collection" -> "sorted-set";

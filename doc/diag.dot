@@ -32,6 +32,6 @@ digraph "diag"
   "set"   [ style = filled, color = grey ];
   "table" [ style = filled, color = grey ];
 
-  { rank = same; "set";   "hashed-set";   "sorted-set";   }
-  { rank = same; "table"; "hashed-table"; "sorted-table"; }
+  subgraph { graph [ rank = same ]; "set";   "hashed-set";   "sorted-set";   }
+  subgraph { graph [ rank = same ]; "table"; "hashed-table"; "sorted-table"; }
 }
