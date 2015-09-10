@@ -5,19 +5,19 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 
-{ '-type' => 'digraph',
-  '-name' => 'dot-grammar-fsm',
-  'graph' => { 'rankdir' => 'LR',
-               'center' => 'true',
-               'label' => '\G',
+{ 'graph' => { 'center' => 'true',
                'fontcolor' => 'red',
                'fontsize' => '16',
-  },
+               'label' => '\G',
+               'rankdir' => 'LR'
+             },
   'edge'  => { 'fontname' => 'Courier',
-               'fontsize' => '16' },
-  'node'  => { 'shape' => 'circle',
-               'width' => '0.6',
-               'fontsize' => '16' },
+               'fontsize' => '16'
+             },
+  'node'  => { 'fontsize' => '16',
+               'shape' => 'circle',
+               'width' => '0.6'
+             },
   '-stmts' => [ [ [ '00' ], { 'label' => '', 'style' => 'invis' } ],
                 [ [ '00', '01' ], { } ],
                 [ [ '01', '02' ], { 'label' => 'digraph|graph' } ],

@@ -10,15 +10,15 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-$Data::Dumper::Terse     = 1;
-$Data::Dumper::Purity    = 1;
-$Data::Dumper::Sortkeys  = \&order_keys;
-$Data::Dumper::Indent    = 2;   # default = 2
+$Data::Dumper::Terse    = 1;
+$Data::Dumper::Purity   = 1;
+$Data::Dumper::Sortkeys = \&order_keys;
+$Data::Dumper::Indent   = 2;   # default = 2
 
 sub order_keys {
   my ($tbl) = @_;
   my $result = [];
-  my $result_canon = [ '-type', '-name', 'graph', 'edge', 'node', '-stmts' ]; # must have '-stmts'
+  my $result_canon = [ '-type', '-name', '-stmts' ]; # must have '-stmts'
   if ($$tbl{'-stmts'}) {
     foreach my $key (@$result_canon) {
       if ($$tbl{$key}) {
@@ -96,13 +96,7 @@ foreach my $arg (@ARGV) {
             } else { die $arg . ": $pair\n"; }
           }
         }
-        my $special_nodes = { 'graph' => 1, 'edge' => 1, 'node' => 1 }; # don't handle subgraph yet!!!
-        if (1 == scalar @$nodes && $$special_nodes{$$nodes[0]}) {
-          $$result{$$nodes[0]} = $attrs;
-        } else {
-          push @{$$result{'-stmts'}}, [$nodes, $attrs];
-        }
-
+        push @{$$result{'-stmts'}}, [$nodes, $attrs];
       } else { die $arg . ": $stmt\n"; }
     }
   } else { die $arg . ": <filestr>\n"; }
