@@ -18,13 +18,13 @@ digraph "method-selector-pairing"
   graph [ rankdir = "LR", center = true, size = "10,7.5" ];
   node [ shape = "box", style = "rounded", width = "1.5" ];
 
-  "foobar:f3(object-t, int32-t value => {})" [ style = "" ];
+  "foobar:f3(object-t, int32-t value : {})" [ style = "" ];
   {
     "dk:f3(object-t, ...)";
     "foobar:f3(object-t, ...)";
   }
   -> "foobar:va:f3(object-t, va-list-t)"
-  -> "foobar:f3(object-t, int32-t value => {})";
+  -> "foobar:f3(object-t, int32-t value : {})";
 
   "dk:f3(object-t, ...)"         -> "selector:va:f3(object-t, va-list-t)" [constraint = false, style = dotted];
   "dk:va:f3(object-t, va-list-t)" -> "selector:va:f3(object-t, va-list-t)" [constraint = false, style = dotted];
@@ -64,7 +64,7 @@ digraph "method-selector-pairing"
     "selector:va:f2(object-t, va-list-t)";
     "selector:va:f3(object-t, va-list-t)";
   }
-  subgraph { graph [ rank = same ]; "foobar:f1(object-t)"; "foobar:f3(object-t, int32-t value => {})"; }
+  subgraph { graph [ rank = same ]; "foobar:f1(object-t)"; "foobar:f3(object-t, int32-t value : {})"; }
   subgraph { graph [ rank = same ]; "foobar:va:f2(object-t, va-list-t)"; "foobar:va:f3(object-t, va-list-t)"; }
   subgraph { graph [ rank = same ]; "foobar:f2(object-t, ...)"; "foobar:f3(object-t, ...)"; }
 }

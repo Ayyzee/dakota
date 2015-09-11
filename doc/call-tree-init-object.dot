@@ -22,7 +22,7 @@ digraph "call-tree-init-object"
   "range:va:init(object-t, va-list-t)"
     -> "range:init(object-t, ...)";
 
-  "range:init(object-t, int32-t max => {}, int32-t min => 0)"
+  "range:init(object-t, int32-t max : {}, int32-t min : 0)"
     -> "range:va:init(object-t, va-list-t)";
 
   "range:va:init(object-t, va-list-t)"

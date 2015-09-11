@@ -21,8 +21,8 @@
 
 // method object-t foo(object-t self,
 //                     int32-t  fa1, 
-//                     object-t ka1 => {},
-//                     int32-t  ka2 => {0});
+//                     object-t ka1 : {},
+//                     int32-t  ka2 : {0});
 
 // other method decorators: format-printf(), format-scanf(), format-va-printf(), format-va-scanf()
 
@@ -57,7 +57,7 @@ digraph "grammar-method"
   100 -> 110 [ label = "type", fontcolor = blue ];
   110 -> 120 [ label = "ident", fontcolor = blue ];
 
-  120 -> 130 [ label = "=>" ];
+  120 -> 130 [ label = ":" ];
   130 -> 140 [ label = "expr", fontcolor = blue ];
   140 -> 150 [ label = ")" ];
 
