@@ -45,6 +45,7 @@
 
 module dakota;
 
+klass bit-vector;
 klass const-info;
 klass construct;
 klass enum-info;

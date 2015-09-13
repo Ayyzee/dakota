@@ -29,6 +29,7 @@ namespace sorted-ptr-array
 }
 #endif
 
+klass exception;
 klass equal-predicate;
 klass object-output-stream;
 klass result;

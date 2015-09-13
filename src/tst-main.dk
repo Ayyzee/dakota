@@ -16,6 +16,8 @@
 
 module dakota-util;
 
+klass hashed-table;
+
 int-t main()
 {
   finally {

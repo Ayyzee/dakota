@@ -21,6 +21,8 @@
 
 module dakota;
 
+klass system-exception;
+
 klass input-stream
 {
   slots

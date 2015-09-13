@@ -18,6 +18,8 @@
 #include <cinttypes>
 #include <cstdlib>
 
+klass exception;
+
 klass node
 {
   slots

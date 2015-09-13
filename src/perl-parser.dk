@@ -22,8 +22,14 @@
 
 module dakota-util;
 
+klass exception;
+klass hashed-table;
+klass pair;
 klass str128;
+klass string;
+klass token;
 klass tokenid;
+klass vector;
 
 static format-printf(4) int-t
 print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...)

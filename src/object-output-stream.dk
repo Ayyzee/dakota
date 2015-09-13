@@ -18,6 +18,8 @@
 
 module dakota;
 
+klass sorted-set;
+klass sorted-table;
 klass std-compare;
 klass uint32;
 

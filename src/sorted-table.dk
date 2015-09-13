@@ -17,6 +17,7 @@
 module dakota;
 
 klass equal-predicate;
+klass pair;
 klass std-compare;
 
 klass sorted-table

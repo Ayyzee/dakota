@@ -16,6 +16,9 @@
 
 module dakota;
 
+klass pair;
+klass vector;
+
 trait forward-iterator;
 
 trait table

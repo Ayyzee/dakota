@@ -58,6 +58,7 @@ klass assoc-node;
 klass bit-vector;
 klass method-alias;
 klass named-info;
+klass no-such-method-exception;
 klass object-output-stream;
 klass property;
 klass selector-node;

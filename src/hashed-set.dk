@@ -29,8 +29,11 @@ static const uint32-t gbl-prime = 127;
 
 module dakota-util;
 
+klass deque;
 klass equal-predicate;
+klass exception;
 klass object-output-stream;
+klass vector;
 
 klass hashed-set
 {

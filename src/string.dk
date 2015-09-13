@@ -27,6 +27,7 @@ const uintptr-t max-prime32 = 0xfffffffb;
 module dakota;
 
 klass object-output-stream;
+klass vector;
 
 klass string
 {

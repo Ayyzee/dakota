@@ -16,9 +16,11 @@
 
 module dakota;
 
+klass exception;
 klass collection; // add()
-trait forward-iterator;
 klass klass;
+
+trait forward-iterator;
 
 trait set
 {

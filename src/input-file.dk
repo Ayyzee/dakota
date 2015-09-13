@@ -28,8 +28,11 @@ space?(int-t c)
 
 module dakota-util;
 
+klass token;
 klass type-predicate;
 klass str128;
+klass system-exception;
+klass vector;
 
 klass input-file
 {

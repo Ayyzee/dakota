@@ -24,6 +24,7 @@ module dakota-util;
 klass object-output-stream;
 klass output-stream;
 klass str512;
+klass string;
 klass tokenid;
 
 klass token

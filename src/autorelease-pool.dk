@@ -21,6 +21,8 @@ module dakota;
 klass pair;
 klass deque;
 klass named-info;
+klass sorted-counted-set;
+klass uint32;
 trait stack;
 
 klass autorelease-pool-klass

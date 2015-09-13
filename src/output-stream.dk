@@ -25,6 +25,7 @@
 
 module dakota;
 
+klass exception;
 klass str128;
 
 klass output-stream

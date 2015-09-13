@@ -23,8 +23,14 @@
 module dakota-util;
 
 klass cstring;
+klass deque;
+klass exception;
+klass open-token;
 klass str128;
+klass syntax-exception;
+klass token;
 klass tokenid;
+klass vector;
 
 static boole-t ident-type?(cstring-t buf)
 {

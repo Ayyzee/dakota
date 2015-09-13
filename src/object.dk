@@ -19,6 +19,8 @@
 
 module dakota;
 
+klass autorelease-pool;
+klass exception;
 klass resource-usage;
 klass object-output-stream;
 klass output-stream;
