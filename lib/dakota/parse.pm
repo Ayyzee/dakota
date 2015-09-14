@@ -1479,7 +1479,18 @@ sub add_klasses_used {
     foreach my $args (@$seqs) {
       my ($range, $matches) = &sst_cursor::match_pattern_seq($new_sst_cursor, $$args{'pattern'});
       if ($range) {
-        my $name = &sst_cursor::str($new_sst_cursor, [0,0]);
+        my $adjusted_range = [ $$range[0], $$range[1] - 2 ]; # remove :: tkn
+        my $name = &sst_cursor::str($new_sst_cursor, $adjusted_range);
+        if (0) {
+          my $prev_indent = $Data::Dumper::Indent;
+          $Data::Dumper::Indent = 0;
+
+          if ($$gbl_sst_cursor{'file'}) {
+            print "FILE: " . $$gbl_sst_cursor{'file'} . "\n";
+          }
+          print "RANGE: " . &Dumper($range) . ", MATCHES: " . &Dumper($matches) . ", NAME: " . $name . "\n";
+          $Data::Dumper::Indent = $prev_indent;
+        }
         &add_klass_decl($gbl_root, $name);
       }
     }

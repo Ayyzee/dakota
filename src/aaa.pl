@@ -44,7 +44,6 @@ sub start {
       $n++;
     }
   }
-  if (1) {
   print "\n";
   foreach my $slots_type (@$sample_primitive_or_typedef_types) {
     my $in = "slots " . $slots_type . ";";
@@ -52,7 +51,7 @@ sub start {
     print $klass_defn . "\n";
     $n++;
   }
-}
+  print "klass aa::bb::cc { slots {} }" . "\n";
 }
 sub pad {
   my ($max_len, $str) = @_;

@@ -562,6 +562,72 @@ sub constraint_ident {
   }
   return ($result_lhs, $result_rhs);
 }
+sub constraint_qual_scope {
+  my ($sst, $range, $user_data) = @_;
+  my ($result_lhs, $result_rhs) = &constraint_qual_ident($sst, $range, $user_data);
+  my $special_idents = { 'slots-t' => 1, 'klass' => 1, 'box' => 1, 'unbox' => 1 };
+  #print "result_lhs: " . &Dumper($result_lhs) . "\n";
+  #print "result_rhs: " . &Dumper($result_rhs) . "\n";
+
+  if (1) {
+  if (0 != @$result_rhs) {
+    if ($$special_idents{$$result_rhs[-1]}) {
+      $$result_lhs[1] -= 1;
+      remove_last($result_rhs);
+      if (0 != @$result_rhs) {
+        if ('::' eq $$result_rhs[-1]) {
+          $$result_lhs[1] -= 1;
+          remove_last($result_rhs);
+        }
+        if ($$result_lhs[0] > $$result_lhs[1]) {
+          ($result_lhs, $result_rhs) = (undef, []);
+        }
+      }
+    }
+  }
+  }
+  return ($result_lhs, $result_rhs);
+}
+sub constraint_qual_ident {
+  my ($sst, $range, $user_data) = @_;
+  #print 'qual-ident-input-range; ' . &Dumper($range);
+  my ($result_lhs, $result_rhs) = (undef, []);
+  my $i = $$range[0];
+  my $token = &sst::at($sst, $i);
+
+  # ::? $id (:: $id)* should be non-greedy
+
+  # missing code to match optional leading ::
+
+  if ($token =~ m/^$id$/) {
+    $result_lhs = [ $$range[0], $i ];
+    &add_last($result_rhs, $token);
+
+    while (1) {
+      $i++;
+      my $sro = &sst::at($sst, $i);
+      #print "SRO: " . '{' . $sro . '}' . "\n";
+      if ($sro eq '::') {
+        $i++;
+        $token = &sst::at($sst, $i);
+        #print "TKN: " . '{' . $token . '}' . "\n";
+        if ($token =~ m/^$id$/) {
+          $result_lhs = [ $$range[0], $i ];
+          &add_last($result_rhs, $sro);
+          &add_last($result_rhs, $token);
+        } else {
+          last;
+        }
+      } else {
+        last;
+      }
+    }
+  }
+  if ($result_lhs) {
+    #print 'qual-ident-result: ' . &Dumper([$result_lhs, $result_rhs]);
+  }
+  return ($result_lhs, $result_rhs);
+}
 sub constraint_method_name {
   my ($sst, $range, $user_data) = @_;
   my ($result_lhs, $result_rhs) = (undef, []);
@@ -648,6 +714,8 @@ sub constraint_balenced_in {
 sub constraint_for_name {
   my ($name) = @_;
   my $constraint_tbl = {
+    #'?qual-ident' => \&constraint_qual_ident,
+    #'?qual-scope' => \&constraint_qual_scope,
     '?method-name' => \&constraint_method_name,
     '?literal-dquoted-cstring' => \&constraint_literal_dquoted_cstring,
     '?literal-squoted-cstring' => \&constraint_literal_squoted_cstring,
@@ -693,6 +761,12 @@ sub sst_cursor::match_pattern_seq {
           $$matches{$pattern_token} = $result_rhs;
           &dakota::util::add_last($all_index, $$result_lhs[0]);
           &dakota::util::add_last($all_index, $$result_lhs[1]);
+          if ('?qual-scope' eq $pattern_token) {
+            my $prev_indent = $Data::Dumper::Indent;
+            $Data::Dumper::Indent = 0;
+            print "RANGE: " . &Dumper($range) . ", QUAL_IDENT: " . &Dumper($result_rhs) . "\n";
+            $Data::Dumper::Indent = $prev_indent;
+          }
         } else {
           $all_index = [];
           $range = undef;
@@ -705,6 +779,13 @@ sub sst_cursor::match_pattern_seq {
                      $$sst_cursor{'first-token-index'} + $i ];
 
           &dakota::util::add_last($all_index, $$sst_cursor{'first-token-index'} + $i);
+
+          if (0) {
+            my $prev_indent = $Data::Dumper::Indent;
+            $Data::Dumper::Indent = 0;
+            print "RANGE: " . &Dumper($range) . ", TOKEN: \"" . $input_token . "\"\n";
+            $Data::Dumper::Indent = $prev_indent;
+          }
         } else {
           $all_index = [];
           $range = undef;
@@ -720,6 +801,10 @@ sub sst_cursor::match_pattern_seq {
       my $from_index = 0;
       my $to_index = $from_index + $last_token_index - $first_token_index;
       $range = [ $from_index, $to_index ];
+    } else {
+      $all_index = [];
+      $range = undef;
+      $matches = undef;
     }
   }
   return ($range, $matches);

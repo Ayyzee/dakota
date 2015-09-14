@@ -6,10 +6,10 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'used-klasses' => [
-    { 'pattern' => [ '?ident', '::', 'klass'   ], },
-    { 'pattern' => [ '?ident', '::', 'box',    ], },
-    { 'pattern' => [ '?ident', '::', 'unbox',  ], },
-    { 'pattern' => [ '?ident', '::', 'slots-t' ], },
+    #{ 'pattern' => [ '?qual-scope', '::', 'klass'   ], },
+    #{ 'pattern' => [ '?qual-scope', '::', 'box',    ], },
+    #{ 'pattern' => [ '?qual-scope', '::', 'unbox',  ], },
+    #{ 'pattern' => [ '?qual-scope', '::', 'slots-t' ], },
   ],
   'used-generics' => [
     { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name', '(', 'super' ], },

@@ -158,7 +158,7 @@ sub add_visibility {
 	    my $seq = $$tbl{$str};
 	    if ($debug) { print STDERR "export module $name $str;\n"; }
 	    if (0) {
-	    } elsif ($str =~ /^($id)::(slots-t)$/) {
+	    } elsif ($str =~ /^($rid)::(slots-t)$/) {
         my ($klass_name, $type_name) = ($1, $2);
         # klass slots
         if ($debug) { print STDERR "klass       slots:  $klass_name|$type_name\n"; }
@@ -167,7 +167,7 @@ sub add_visibility {
 		    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = 33;
         }
-      } elsif ($str =~ /^($id)$/) {
+      } elsif ($str =~ /^($rid)$/) {
         my $klass_name = $1;
         # klass/trait
         if ($debug) { print STDERR "klass/trait:        $klass_name\n"; }
@@ -178,7 +178,7 @@ sub add_visibility {
         if ($$root{'traits'}{$klass_name}) {
           $$root{'traits'}{$klass_name}{'exported?'} = 22;
         }
-	    } elsif ($str =~ /^($id)::($msig)$/) {
+	    } elsif ($str =~ /^($rid)::($msig)$/) {
         my ($klass_name, $method_name) = ($1, $2);
         # klass/trait method
         if ($debug) { print STDERR "klass/trait method $klass_name:$method_name\n"; }

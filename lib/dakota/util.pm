@@ -253,11 +253,12 @@ sub ident_regex {
   my $bid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?]  )|(?:[\?]  )/x; # bool   ident
   my $tid = qr/[_a-zA-Z]   [_a-zA-Z0-9-]*?-t/x;                          # type   ident
 
-  my $sco = qr/::/x; # scope resolution operator
-  my $rid =  qr/(?:$id$sco?)*$id/;
-  my $rmid = qr/(?:$id$sco?)*$mid/;
-  my $rbid = qr/(?:$id$sco?)*$bid/;
-  my $rtid = qr/(?:$id$sco?)*$tid/;
+  my $sro =  qr/::/;
+  my $rid =  qr/(?:$id$sro)*$id/;
+  my $rmid = qr/(?:$id$sro)*$mid/;
+  my $rbid = qr/(?:$id$sro)*$bid/;
+  my $rtid = qr/(?:$id$sro)*$tid/;
+ #my $qtid = qr/(?:$sro?$tid)|(?:$id$sro(?:$id$sro)*$tid)/;
 
   return ( $id,  $mid,  $bid,  $tid,
           $rid, $rmid, $rbid, $rtid);
