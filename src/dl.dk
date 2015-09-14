@@ -18,6 +18,12 @@
 
 #include "dl.hh"
 
+module dakota;
+
+klass x::dl-info {
+  slots Dl-info;
+}
+
 // returns nullptr if no exact match
 str-t
 symbol-name-from-address(void* saddr)
@@ -26,7 +32,7 @@ symbol-name-from-address(void* saddr)
 #if defined WIN32
 #error "not yet implemented on win32"
 #else
-  Dl-info dli;
+  x::dl-info::slots-t dli;
   if (0 != dladdr(saddr, &dli) && (dli.dli-saddr == saddr))
     result = dli.dli-sname;
 #endif

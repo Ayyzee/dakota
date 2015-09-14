@@ -162,6 +162,10 @@ SO-EXPORT DKT-RODATA-SECTION object-t std-input =  nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t std-output = nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t std-error =  nullptr;
 
+klass x::stat {
+  slots struct stat;
+}
+
 // this is quick and dirty!!!!!!!!!!!!!!!!
 static void
 init-imported-klasses()
@@ -221,7 +225,7 @@ find-file(str-t path, str-t file-name, str-t suffix)
       strcat(file, file-name);
       strcat(file, ".");
       strcat(file, suffix);
-      struct stat status;
+      x::stat-t status;
       int-t err = stat(file, &status);
 
       if (0 == err) {
@@ -1336,27 +1340,36 @@ add-registration-info(named-info-t* registration-info)
   gbl-registration-info-list = registration-info;
   return;
 }
-
-typedef void (*sa-handler-t)(int-t, siginfo-t*, void*);
-typedef struct sigaction sigaction-t;
-
-struct sa-pair-t {
-  sa-handler-t handler;
-  sigaction-t  prev-sa;
-};
+klass x::siginfo {
+  slots siginfo-t;
+}
+klass x::sigaction-handler {
+  slots void (*)(int-t, x::siginfo-t*, void*);
+}
+klass x::sigaction {
+  slots struct sigaction;
+}
+klass x::sigaction-pair {
+  slots {
+    x::sigaction-handler-t handler;
+    x::sigaction-t         prev-sa;
+  }
+}
 static int8-t const index-from-sig[NSIG] = {
   [SIGBUS] =  0,
   [SIGSEGV] = 1,
 };
-static sa-pair-t sa-pairs[] = {
+static x::sigaction-pair-t sa-pairs[] = {
   { .handler = nullptr, .prev-sa = {} },
   { .handler = nullptr, .prev-sa = {} },
 };
-struct name-from-address-t {
-  void**   addr;
-  symbol-t name;
-};
-static name-from-address-t others[] = {
+klass addr2name-pair {
+  slots {
+    void**   addr;
+    symbol-t name;
+  }
+}
+static addr2name-pair-t others[] = {
   { cast(void**)&null,       #null       },
   { cast(void**)&std-input,  #std-input  },
   { cast(void**)&std-output, #std-output },
@@ -1367,7 +1380,7 @@ name-from-address(void* _addr) { // slowslow
   object-t* addr = cast(decltype(addr))_addr;
   // others
   for (size-t i = 0; i < DK-COUNTOF(others); i++) {
-    name-from-address-t other = others[i];
+    addr2name-pair-t other = others[i];
     if (*other.addr == *cast(decltype(other.addr))addr) {
       return other.name;
     }
@@ -1389,22 +1402,22 @@ name-from-address(void* _addr) { // slowslow
   return nullptr;
 }
 static void
-bus-segv-handler(int-t sig, siginfo-t *si, void *dummy) {
+bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) {
   char8-t const *name = name-from-address(si->si-addr);
   syslog(LOG-ERR, "caught sig%s at \"%s\" %p\n",
          sys-signame[sig], name, si->si-addr);
-  sa-handler-t prev-sa-handler = sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;
+  x::sigaction-handler-t prev-sa-handler = sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;
 
   if (prev-sa-handler &&
-      prev-sa-handler != cast(sa-handler-t)SIG-DFL &&
-      prev-sa-handler != cast(sa-handler-t)SIG-IGN) {
+      prev-sa-handler != cast(x::sigaction-handler-t)SIG-DFL &&
+      prev-sa-handler != cast(x::sigaction-handler-t)SIG-IGN) {
     prev-sa-handler(sig, si, dummy);
   }
   return;
 }
 static int-t
-sigaction-setup(int-t sig, sa-handler-t bus-segv-handler) {
-  sigaction-t sa {};
+sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) {
+  x::sigaction-t sa {};
   sa.sa-flags = SA-SIGINFO | SA-RESETHAND | SA-RESTART;
   sigemptyset(&sa.sa-mask);
   sa.sa-sigaction = bus-segv-handler;

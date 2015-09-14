@@ -17,6 +17,8 @@
 module dakota export
   aa::bb::cc,
   aa::bb::cc::slots-t,
+  addr2name-pair,
+  addr2name-pair::slots-t,
   assoc-node,
   assoc-node::slots-t,
   autorelease-pool,
@@ -236,4 +238,14 @@ module dakota export
   uintptr::slots-t,
   va-method,
   va-method::slots-t,
-  vector;
+  vector,
+  x::sigaction,
+  x::sigaction::slots-t,
+  x::sigaction-handler,
+  x::sigaction-handler::slots-t,
+  x::sigaction-pair,
+  x::sigaction-pair::slots-t,
+  x::siginfo,
+  x::siginfo::slots-t,
+  x::stat,
+  x::stat::slots-t;

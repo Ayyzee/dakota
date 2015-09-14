@@ -9,6 +9,7 @@
   'AF-INET6' => '<netinet/in.h>',
   'AF-LOCAL' => '<netinet/in.h>',
   'EVFILT-PROC' => '<sys/event.h>',
+  'Dl-info' => '<dlfcn.h>',
   'EVFILT-READ' => '<sys/event.h>',
   'EVFILT-SIGNAL' => '<sys/event.h>',
   'EVFILT-WRITE' => '<sys/event.h>',
