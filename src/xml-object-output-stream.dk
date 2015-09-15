@@ -28,12 +28,10 @@ using features::k-trailing-newline;
 using features::k-leading-ws;
 using features::k-trailing-ws;
 
-klass xml-object-output-stream
-{
+klass xml-object-output-stream {
   superklass text-output-stream;
 
-  slots
-  {
+  slots {
     uint32-t indent-level;
 
     str-t key-delim;

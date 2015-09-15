@@ -18,8 +18,7 @@
 
 module dakota;
 
-klass missing-keyword-exception
-{
+klass missing-keyword-exception {
   superklass keyword-exception;
 
   method object-t print(object-t self, object-t out)

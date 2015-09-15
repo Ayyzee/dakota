@@ -16,10 +16,8 @@
 
 module dakota-util;
 
-klass dimension
-{
-  slots
-  {
+klass dimension {
+  slots {
     int32-t width;
     int32-t height;
   }

@@ -22,12 +22,10 @@ module dakota-util;
 klass ascii-number;
 klass named-info;
 
-klass ascii-number-klass
-{
+klass ascii-number-klass {
   superklass klass;
 
-  slots
-  {
+  slots {
     str-t digits;
   }
   static object-t gbl-base2-ascii-number-klass-info;

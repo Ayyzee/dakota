@@ -23,13 +23,11 @@ klass sorted-table;
 klass std-compare;
 klass uint32;
 
-klass object-output-stream
-{
+klass object-output-stream {
   superklass output-stream;
   klass      klass;
 
-  slots
-  {
+  slots {
     object-t objects;    // sorted-set (ptr) <objects already written>
     object-t object-from-id; // sorted-table key=id, value=object <objects to be written>
     uint32-t id;

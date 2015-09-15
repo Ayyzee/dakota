@@ -17,10 +17,8 @@
 module dakota;
 
 // need to convert to info-t
-klass enum-info
-{
-  slots
-  {
+klass enum-info {
+  slots {
     str-t name;  // never nullptr
     str-t expr;  // never nullptr
   }

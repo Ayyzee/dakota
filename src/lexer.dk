@@ -43,10 +43,8 @@ static boole-t ident-type?(cstring-t buf)
   return result;
 }
 
-klass lexer
-{
-  slots
-  {
+klass lexer {
+  slots {
     off-t    length;
     off-t    current-position;
     char8-t* buffer;

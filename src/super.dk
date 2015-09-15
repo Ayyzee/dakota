@@ -16,10 +16,8 @@
 
 module dakota;
 
-klass super
-{
-  slots
-  {
+klass super {
+  slots {
     object-t self;
     object-t klass;
   }

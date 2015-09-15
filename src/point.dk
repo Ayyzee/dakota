@@ -16,10 +16,8 @@
 
 module dakota-util;
 
-klass point
-{
-  slots
-  {
+klass point {
+  slots {
     int32-t x;
     int32-t y;
   }

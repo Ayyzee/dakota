@@ -3,8 +3,7 @@
 
 module dakota;
 
-klass int8
-{
+klass int8 {
   slots int8-t;
 
   const slots-t min = INT8_MIN;
@@ -12,8 +11,7 @@ klass int8
 
   // INT8_C(v)
 }
-klass int16
-{
+klass int16 {
   slots int16-t;
 
   const slots-t min = INT16_MIN;
@@ -21,8 +19,7 @@ klass int16
 
   // INT16_C(v)
 }
-klass int32
-{
+klass int32 {
   slots int32-t;
 
   const slots-t min = INT32_MIN;
@@ -30,8 +27,7 @@ klass int32
 
   // INT32_C(v)
 }
-klass int64
-{
+klass int64 {
   slots int64-t;
 
   const slots-t min = INT64_MIN;
@@ -39,64 +35,55 @@ klass int64
 
   // INT64_C(v)
 }
-klass int-fast8
-{
+klass int-fast8 {
   slots int-fast8-t;
 
   const slots-t min = INT_FAST8_MIN;
   const slots-t max = INT_FAST8_MAX;
 }
-klass int-fast16
-{
+klass int-fast16 {
   slots int-fast16-t;
 
   const slots-t min = INT_FAST16_MIN;
   const slots-t max = INT_FAST16_MAX;
 }
-klass int-fast32
-{
+klass int-fast32 {
   slots int-fast32-t;
 
   const slots-t min = INT_FAST32_MIN;
   const slots-t max = INT_FAST32_MAX;
 }
-klass int-fast64
-{
+klass int-fast64 {
   slots int-fast64-t;
 
   const slots-t min = INT_FAST64_MIN;
   const slots-t max = INT_FAST64_MAX;
 }
-klass int-least8
-{
+klass int-least8 {
   slots int-least8-t;
 
   const slots-t min = INT_LEAST8_MIN;
   const slots-t max = INT_LEAST8_MAX;
 }
-klass int-least16
-{
+klass int-least16 {
   slots int-least16-t;
 
   const slots-t min = INT_LEAST16_MIN;
   const slots-t max = INT_LEAST16_MAX;
 }
-klass int-least32
-{
+klass int-least32 {
   slots int-least32-t;
 
   const slots-t min = INT_LEAST32_MIN;
   const slots-t max = INT_LEAST32_MAX;
 }
-klass int-least64
-{
+klass int-least64 {
   slots int-least64-t;
 
   const slots-t min = INT_LEAST64_MIN;
   const slots-t max = INT_LEAST64_MAX;
 }
-klass intmax
-{
+klass intmax {
   slots intmax-t;
 
   const slots-t min = INTMAX_MIN;
@@ -104,103 +91,88 @@ klass intmax
 
   // INTMAX_C(v)
 }
-klass intptr
-{
+klass intptr {
   slots intptr-t;
 
   const slots-t min = INTPTR_MIN;
   const slots-t max = INTPTR_MAX;
 }
-klass uint8
-{
+klass uint8 {
   slots uint8-t;
 
   const slots-t max = UINT8_MAX;
 
   // UINT8_C(v)
 }
-klass uint16
-{
+klass uint16 {
   slots uint16-t;
 
   const slots-t max = UINT16_MAX;
 
   // UINT16_C(v)
 }
-klass uint32
-{
+klass uint32 {
   slots uint32-t;
 
   const slots-t max = UINT32_MAX;
 
   // UINT32_C(v)
 }
-klass uint64
-{
+klass uint64 {
   slots uint64-t;
 
   const slots-t max = UINT64_MAX;
 
   // UINT64_C(v)
 }
-klass uint-fast8
-{
+klass uint-fast8 {
   slots uint-fast8-t;
 
   const slots-t max = UINT_FAST8_MAX;
 }
-klass uint-fast16
-{
+klass uint-fast16 {
   slots uint-fast16-t;
 
   const slots-t max = UINT_FAST16_MAX;
 }
-klass uint-fast32
-{
+klass uint-fast32 {
   slots uint-fast32-t;
 
   const slots-t max = UINT_FAST32_MAX;
 }
-klass uint-fast64
-{
+klass uint-fast64 {
   slots uint-fast64-t;
 
   const slots-t max = UINT_FAST64_MAX;
 }
-klass uint-least8
-{
+klass uint-least8 {
   slots uint-least8-t;
 
   const slots-t max = UINT_LEAST8_MAX;
 }
-klass uint-least16
-{
+klass uint-least16 {
   slots uint-least16-t;
 
   const slots-t max = UINT_LEAST16_MAX;
 }
-klass uint-least32
-{
+klass uint-least32 {
   slots uint-least32-t;
 
   const slots-t max = UINT_LEAST32_MAX;
 }
-klass uint-least64
-{
+klass uint-least64 {
   slots uint-least64-t;
 
   const slots-t max = UINT_LEAST64_MAX;
 }
-klass uintmax
-{
+klass uintmax {
   slots uintmax-t;
 
   const slots-t max = UINTMAX_MAX;
 
   // UINTMAX_C(v)
 }
-klass uintptr
-{
+klass uintptr {
   slots uintptr-t;
 
   const slots-t max = UINTPTR_MAX;

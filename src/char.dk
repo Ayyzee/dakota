@@ -16,27 +16,21 @@
 
 module dakota;
 
-klass char8
-{
+klass char8 {
   slots char-t;
 }
-klass uchar8
-{
+klass uchar8 {
   slots uchar-t;
 }
-klass schar8
-{
+klass schar8 {
   slots schar-t;
 }
-klass wchar
-{
+klass wchar {
   slots wchar-t;
 }
-klass char16
-{
+klass char16 {
   slots char16-t;
 }
-klass char32
-{
+klass char32 {
   slots char32-t;
 }

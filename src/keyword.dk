@@ -19,10 +19,8 @@ module dakota;
 klass symbol;
 klass uintmax;
 
-klass keyword
-{
-  slots
-  {
+klass keyword {
+  slots {
     symbol-t  symbol; // should be first! offsetof() should return 0 for 'symbol' for best performance
     uintptr-t hash;
   }

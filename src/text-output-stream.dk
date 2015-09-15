@@ -18,8 +18,7 @@
 
 module dakota-util;
 
-klass features
-{
+klass features {
   slots enum : uint32-t
   {
     k-none =             0,
@@ -38,13 +37,11 @@ using features::k-trailing-newline;
 using features::k-leading-ws;
 using features::k-trailing-ws;
 
-klass text-output-stream
-{
+klass text-output-stream {
   superklass object-output-stream;
   klass      klass;
 
-  slots
-  {
+  slots {
     uint32-t column;
     features-t previous-features;
   }

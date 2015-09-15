@@ -27,10 +27,8 @@ klass property;
 klass std-compare;
 klass symbol;
 
-klass named-info
-{
-  slots
-  {
+klass named-info {
+  slots {
     property-t* elements; // property
     uint32-t    count;    // sizeof(property)/sizeof(property[0])
   //            size = sizeof(property::slots-t)

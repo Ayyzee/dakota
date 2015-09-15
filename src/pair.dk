@@ -20,10 +20,8 @@ module dakota;
 
 klass object-output-stream;
 
-klass pair
-{
-  slots
-  {
+klass pair {
+  slots {
     object-t first;
     object-t last;
   }

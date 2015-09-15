@@ -16,7 +16,6 @@
 
 module dakota;
 
-klass str512
-{
+klass str512 {
   slots char8-t[512];
 }

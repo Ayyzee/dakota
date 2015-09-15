@@ -19,8 +19,7 @@ module dakota-util;
 klass equal-predicate;
 klass pair;
 
-klass hashed-counted-set
-{
+klass hashed-counted-set {
   superklass hashed-set;
   trait      counted-set;
 

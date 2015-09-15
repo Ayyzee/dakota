@@ -35,14 +35,12 @@ klass exception;
 klass object-output-stream;
 klass vector;
 
-klass hashed-set
-{
+klass hashed-set {
   superklass collection;
 
   trait set;
 
-  slots
-  {
+  slots {
     uint32-t num-buckets;
     object-t buckets; // a vector of deques
     uint32-t size;
@@ -263,12 +261,10 @@ klass hashed-set
   }
 }
 
-klass hashed-set-forward-iterator
-{
+klass hashed-set-forward-iterator {
   trait forward-iterator;
 
-  slots
-  {
+  slots {
     object-t hashed-set;
     object-t vector-iter; // set one time per instantiation
     object-t deque-iter;  // set many times per instantiation

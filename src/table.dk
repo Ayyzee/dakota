@@ -21,8 +21,7 @@ klass vector;
 
 trait forward-iterator;
 
-trait table
-{
+trait table {
   //provides dk::set;
   require collection;
 

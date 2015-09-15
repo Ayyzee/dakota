@@ -19,8 +19,7 @@ module dakota;
 trait forward-iterator;
 
 /// first, last, at, ...
-klass sequence
-{
+klass sequence {
   superklass collection;
 
   method object-t write-lite(object-t self, object-t out)

@@ -16,7 +16,6 @@
 
 module dakota;
 
-klass str32
-{
+klass str32 {
   slots char8-t[32];
 }

@@ -1,7 +1,6 @@
 //klass fstr?
 
-klass ffstr
-{
+klass ffstr {
   slots str-t;
 
   // the first two characters are interpreted as the string len (not including NUL)

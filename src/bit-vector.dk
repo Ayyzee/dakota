@@ -71,10 +71,8 @@ ceiling-divide(uint32-t numerator, uint32-t denominator)
   return result;
 }
 
-klass bit-vector
-{
-  slots
-  {
+klass bit-vector {
+  slots {
     uint32-t* elements;
     uint32-t  count; // number of elements
     uint32-t  capacity; // number of bits

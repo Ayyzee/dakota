@@ -37,8 +37,7 @@ klass std-compare;
 //   return result;
 // }
 
-klass collection
-{
+klass collection {
   superklass object;
 
   trait forward-iterator;

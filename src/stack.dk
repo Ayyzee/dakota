@@ -16,8 +16,7 @@
 
 module dakota;
 
-trait stack
-{
+trait stack {
   method object-t push(object-t self, object-t element);
   method object-t pop(object-t self);
   method object-t empty(object-t self);

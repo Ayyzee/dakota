@@ -20,8 +20,7 @@ klass pair;
 klass vector;
 klass uint32;
 
-trait counted-set
-{
+trait counted-set {
   //provides dk::set;
   require collection;
 

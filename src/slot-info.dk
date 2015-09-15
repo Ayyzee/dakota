@@ -17,10 +17,8 @@
 // need to convert to info-t
 module dakota-util;
 
-klass slot-info
-{
-  slots
-  {
+klass slot-info {
+  slots {
     symbol-t type;   // never nullptr
     uint32-t size;   // never 0
   }

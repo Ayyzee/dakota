@@ -24,13 +24,11 @@ klass exception;
 klass object-output-stream;
 klass uint32;
 
-klass vector
-{
+klass vector {
   superklass sequence;
   trait      stack;
 
-  slots
-  {
+  slots {
     object-t* elements;
     uint32-t  count;
     uint32-t  capacity;
@@ -374,12 +372,10 @@ klass vector
   }
 }
 
-klass vector-forward-iterator
-{
+klass vector-forward-iterator {
   trait forward-iterator;
 
-  slots
-  {
+  slots {
     object-t vector;
     uint32-t count;
     uint32-t index;

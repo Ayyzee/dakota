@@ -16,17 +16,14 @@
 
 module dakota;
 
-klass method
-{
+klass method {
   slots object-t (*)(object-t);
 }
 
-klass method1
-{
+klass method1 {
   slots object-t (*)(object-t, object-t);
 }
 
-klass va-method
-{
+klass va-method {
   slots object-t (*)(object-t, ...);
 }

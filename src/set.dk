@@ -22,8 +22,7 @@ klass klass;
 
 trait forward-iterator;
 
-trait set
-{
+trait set {
   method boole-t contains-all?(object-t self, object-t collection)
   {
     USE(self);

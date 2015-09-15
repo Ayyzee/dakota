@@ -16,10 +16,8 @@
 
 module dakota;
 
-klass result
-{
-  slots
-  {
+klass result {
+  slots {
     void const* element; // nullptr when not found
     uint32-t    offset;  // either offset of found element, or offset to insert element
   }

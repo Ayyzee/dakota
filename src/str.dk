@@ -18,8 +18,7 @@
 
 module dakota;
 
-klass str
-{
+klass str {
   slots char8-t const*;
 
   method int-t compare(object-t self, object-t other)

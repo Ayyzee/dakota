@@ -16,7 +16,6 @@
 
 module dakota;
 
-klass std-compare
-{
+klass std-compare {
   slots int-t (*)(void const*, void const*);
 }

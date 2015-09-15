@@ -36,14 +36,12 @@ klass result;
 klass sorted-ptr-array;
 klass std-compare;
 
-klass sorted-set
-{
+klass sorted-set {
   superklass collection;
 
   trait set;
 
-  slots
-  {
+  slots {
     sorted-ptr-array::slots-t sa;
     uint32-t                         iterator-state;
   }
@@ -230,12 +228,10 @@ klass sorted-set
   }
 }
 
-klass sorted-set-forward-iterator
-{
+klass sorted-set-forward-iterator {
   trait forward-iterator;
 
-  slots
-  {
+  slots {
     object-t sorted-set;
     uint32-t offset;
 

@@ -18,8 +18,7 @@
 
 module dakota-util;
 
-klass tokenid
-{
+klass tokenid {
   slots uint32-t;
 
   method char8-t* str-from(slots-t s, char8-t* str, uint32-t len)

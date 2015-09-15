@@ -16,12 +16,10 @@
 
 module dakota;
 
-klass size
-{
+klass size {
   slots size-t;
 }
 
-klass ssize
-{
+klass ssize {
   slots ssize-t;
 }

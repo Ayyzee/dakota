@@ -201,12 +201,10 @@ verbose-unexpected()
   previous-unexpected();
 }
 
-klass exception
-{
+klass exception {
   superklass object;
 
-  slots
-  {
+  slots {
     str-t message;
   }
 

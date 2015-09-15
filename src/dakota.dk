@@ -82,19 +82,15 @@ namespace klass
 static const char8-t gbl-delimiter = '/'; // unix path delimiter
 static str-t gbl-current-module = "";
 
-klass assoc-node
-{
-  slots
-  {
+klass assoc-node {
+  slots {
     uintptr-t element;
     slots-t*  next;
   }
 }
 
-klass named-assoc-node
-{
-  slots
-  {
+klass named-assoc-node {
+  slots {
     symbol-t name;
     assoc-node-t* node;
   }
@@ -310,10 +306,8 @@ void verbose-terminate();
 void pre-runtime-verbose-unexpected();
 void verbose-unexpected();
 
-klass ofile
-{
-  slots
-  {
+klass ofile {
+  slots {
     file-t   output;
     uint32-t col;
   }

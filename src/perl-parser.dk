@@ -43,10 +43,8 @@ print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...)
   }
   return result;
 }
-klass perl-parser
-{  
-  slots
-  {
+klass perl-parser {  
+  slots {
     file-t   in;
     str-t    filename;
     uint32-t line;

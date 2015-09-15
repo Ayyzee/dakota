@@ -27,10 +27,8 @@ klass str512;
 klass string;
 klass tokenid;
 
-klass token
-{
-  slots
-  {
+klass token {
+  slots {
     tokenid-t tokenid;
     uint32-t line;
     uint32-t column;

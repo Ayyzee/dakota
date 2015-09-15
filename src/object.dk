@@ -25,10 +25,8 @@ klass resource-usage;
 klass object-output-stream;
 klass output-stream;
 
-klass object
-{
-  slots
-  {
+klass object {
+  slots {
     object-t klass;
     uint32-t retain-count;
   }

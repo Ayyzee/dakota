@@ -21,10 +21,8 @@
 
 module dakota;
 
-klass signature
-{
-  slots
-  {
+klass signature {
+  slots {
     str-t return-type; // not considered in compare()
     str-t name;
     str-t parameter-types;

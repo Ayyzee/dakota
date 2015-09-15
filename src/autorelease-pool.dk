@@ -25,12 +25,10 @@ klass sorted-counted-set;
 klass uint32;
 trait stack;
 
-klass autorelease-pool-klass
-{
+klass autorelease-pool-klass {
   superklass klass;
 
-  slots
-  {
+  slots {
     object-t pools;
   }
 
@@ -68,12 +66,10 @@ klass autorelease-pool-klass
   }
 }
 
-klass autorelease-pool
-{
+klass autorelease-pool {
   klass autorelease-pool-klass;
 
-  slots
-  {
+  slots {
     object-t counted-elements;
   }
 

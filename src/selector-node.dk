@@ -20,10 +20,8 @@ module dakota;
 
 klass selector;
 
-klass selector-node
-{
-  slots
-  {
+klass selector-node {
+  slots {
     selector-t* key;
     slots-t*    next;
   }

@@ -22,12 +22,10 @@ module dakota-util;
 klass output-stream;
 klass token;
 
-klass syntax-exception
-{
+klass syntax-exception {
   superklass exception;
 
-  slots
-  {
+  slots {
     object-t token;
     str-t    filename;
     str-t    message;

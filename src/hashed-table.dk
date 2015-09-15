@@ -19,8 +19,7 @@ module dakota-util;
 klass equal-predicate;
 klass pair;
 
-klass hashed-table
-{
+klass hashed-table {
   superklass hashed-set;
   trait      table;
 

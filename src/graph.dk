@@ -16,16 +16,13 @@
 
 klass sequence;
 
-klass statement
-{
+klass statement {
 }
 
-klass node
-{
+klass node {
   superklass statement;
 
-  slots
-  {
+  slots {
     str-t    name;  // may NOT be nullptr
     object-t attrs; // <table>
   }
@@ -39,12 +36,10 @@ klass node
   }
 }
 
-klass edge
-{
+klass edge {
   superklass statement;
 
-  slots
-  {
+  slots {
     str-t    lhs-name; // may NOT be nullptr
     str-t    rhs-name; // may NOT be nullptr
     object-t attrs;    // <table>
@@ -63,8 +58,7 @@ klass edge
   }
 }
 
-klass attrs
-{
+klass attrs {
   slots object-t;
 
   method object-t init(object-t self,
@@ -76,12 +70,10 @@ klass attrs
   }
 }
 
-klass graph
-{
+klass graph {
   superklass statement;
 
-  slots
-  {
+  slots {
     symbol-t type;  // #graph xor #digraph
     str-t    name;  // may be nullptr
     object-t stmts; // <sequence>

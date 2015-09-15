@@ -19,10 +19,8 @@ module dakota-util;
 klass dimension;
 klass point;
 
-klass rect
-{
-  slots
-  {
+klass rect {
+  slots {
     point::slots-t     point;
     dimension::slots-t dimension;
   }

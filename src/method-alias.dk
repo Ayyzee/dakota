@@ -18,10 +18,8 @@ module dakota;
 
 klass signature;
 
-klass method-alias
-{
-  slots
-  {
+klass method-alias {
+  slots {
     signature-t const* alias-signature;
     signature-t const* method-signature;
   }

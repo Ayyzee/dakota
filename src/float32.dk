@@ -16,8 +16,7 @@
 
 module dakota-util;
 
-klass float32
-{
+klass float32 {
   slots float;
 }
 static-assert(32/8 == sizeof(float32-t), "The slots type of klass float32 must be 4 bytes in size");

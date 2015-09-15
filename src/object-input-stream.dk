@@ -16,8 +16,7 @@
 
 module dakota;
 
-klass object-input-stream
-{
+klass object-input-stream {
   superklass input-stream;
 }
 

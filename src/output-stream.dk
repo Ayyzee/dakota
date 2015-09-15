@@ -28,12 +28,10 @@ module dakota;
 klass exception;
 klass str128;
 
-klass output-stream
-{
+klass output-stream {
   static str-t gbl-endl = "\n";
 
-  slots
-  {
+  slots {
     file-t out;
   }
 

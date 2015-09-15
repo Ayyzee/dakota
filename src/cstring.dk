@@ -25,10 +25,8 @@ module dakota-util;
 // same code as in klass string (badbad)
 klass object-output-stream;
 
-klass cstring
-{
-  slots
-  {
+klass cstring {
+  slots {
     char8-t* ptr;
     uint32-t len;
     uint32-t capacity;

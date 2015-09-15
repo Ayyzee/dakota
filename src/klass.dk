@@ -81,10 +81,8 @@ noreturn SO-EXPORT void dkt-null-method(object-t object, ...)
   throw make(no-such-method-exception::klass, #object : object, #kls : dkt-klass(object));
 }
 
-klass selector-pair
-{
-  slots
-  {
+klass selector-pair {
+  slots {
     signature-t const* key;
     selector-node-t*   element;
   }
@@ -338,10 +336,8 @@ load-traits(symbol-t const* traits)
   return;
 }
 
-klass resource-usage
-{
-  slots
-  {
+klass resource-usage {
+  slots {
     uint32-t memory;
     uint32-t instances;
     uint32-t method-memory;
@@ -378,21 +374,17 @@ klass resource-usage
 resource-usage::slots-t gbl-ru = { 0, 0, 0, 0 };
 #endif
 
-klass methods
-{
-  slots
-  {
+klass methods {
+  slots {
     method-t* addrs; // first so its offset is 0
     uint32-t  count;
   }
 }
 
-klass klass
-{
+klass klass {
   //     klass klass;
 
-  slots
-  {
+  slots {
     uint32-t                 offset; // first so its offset is 0
     methods::slots-t          methods;
     uint32-t                 size;

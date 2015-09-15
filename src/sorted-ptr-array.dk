@@ -25,10 +25,8 @@ module dakota;
 klass result;
 klass std-compare;
 
-klass sorted-ptr-array
-{
-  slots
-  {
+klass sorted-ptr-array {
+  slots {
     void**        elements;
     uint32-t      count;
     uint32-t      capacity;

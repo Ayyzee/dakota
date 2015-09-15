@@ -17,10 +17,8 @@
 module dakota;
 
 // need to convert to info-t
-klass const-info
-{
-  slots
-  {
+klass const-info {
+  slots {
     str-t name;  // never nullptr
     str-t type;  // never nullptr
     str-t value; // never nullptr

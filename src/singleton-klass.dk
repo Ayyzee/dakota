@@ -16,12 +16,10 @@
 
 module dakota;
 
-klass singleton-klass
-{
+klass singleton-klass {
   superklass klass;
 
-  slots
-  {
+  slots {
     object-t instance;
   }
 

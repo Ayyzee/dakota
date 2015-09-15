@@ -23,10 +23,8 @@ module dakota;
 
 klass system-exception;
 
-klass input-stream
-{
-  slots
-  {
+klass input-stream {
+  slots {
     file-t         file;
     str-t filename;
   }

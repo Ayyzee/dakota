@@ -16,8 +16,7 @@
 
 module dakota;
 
-trait forward-iterator
-{
+trait forward-iterator {
   method object-t  next(object-t self); // returns nullptr on end
   method boole-t   next?(object-t self);
   method object-t  element(object-t self);

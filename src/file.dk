@@ -16,7 +16,6 @@
 
 module dakota;
 
-klass file
-{
+klass file {
   slots FILE*;
 }

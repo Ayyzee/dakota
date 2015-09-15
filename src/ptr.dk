@@ -16,7 +16,6 @@
 
 module dakota;
 
-klass ptr
-{
+klass ptr {
   slots void*;
 }

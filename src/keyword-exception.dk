@@ -20,12 +20,10 @@ module dakota;
 
 klass output-stream;
 
-klass keyword-exception
-{
+klass keyword-exception {
   superklass exception;
 
-  slots
-  {
+  slots {
     object-t     object;
     signature-t* signature;
     symbol-t     keyword;

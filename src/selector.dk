@@ -16,7 +16,6 @@
 
 module dakota;
 
-klass selector
-{
+klass selector {
   slots uintptr-t;
 }

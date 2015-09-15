@@ -34,10 +34,8 @@ klass str128;
 klass system-exception;
 klass vector;
 
-klass input-file
-{
-  slots
-  {
+klass input-file {
+  slots {
     off-t    length;
     off-t    current-position;
     char8-t* buffer;

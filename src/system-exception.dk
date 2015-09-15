@@ -25,12 +25,10 @@ module dakota;
 klass output-stream;
 klass str128;
 
-klass system-exception
-{
+klass system-exception {
   superklass exception;
 
-  slots
-  {
+  slots {
     int-t          errnum;
     str-t name;
     str128-t       strerror;

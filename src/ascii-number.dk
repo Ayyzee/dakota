@@ -23,12 +23,10 @@ module dakota-util;
 
 klass ascii-number-klass;
 
-klass ascii-number
-{
+klass ascii-number {
   klass klass;
 
-  slots
-  {
+  slots {
     char8-t* ascii-string;
     int32-t  number;
   }

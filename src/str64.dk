@@ -23,8 +23,7 @@ module dakota;
 
 klass object-output-stream;
 
-klass str64
-{
+klass str64 {
   slots char8-t[64];
 
   method slots-t* dump(slots-t* s)

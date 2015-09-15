@@ -20,10 +20,8 @@
 
 klass exception;
 
-klass node
-{
-  slots
-  {
+klass node {
+  slots {
     object-t element; // may NOT be nullptr, may be null
     slots-t* prev;    // nullptr (not null) for first
     slots-t* next;    // nullptr (not null) for last
@@ -88,13 +86,11 @@ klass node
 
 module dakota;
 
-klass deque
-{
+klass deque {
   superklass sequence;
   trait      stack;
 
-  slots
-  {
+  slots {
     node::slots-t* first; // if (nullptr != first)  first->prev = nullptr;
     node::slots-t* last;  // if (nullptr != last)   last->next =  nullptr;
     uint32-t      size;
@@ -390,12 +386,10 @@ klass deque
   //      }
 }
 
-klass deque-forward-iterator
-{
+klass deque-forward-iterator {
   trait forward-iterator;
 
-  slots
-  {
+  slots {
     object-t deque; // needed for iterator-state
     node::slots-t* node;
 

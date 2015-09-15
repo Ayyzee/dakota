@@ -20,8 +20,7 @@ klass equal-predicate;
 klass pair;
 klass std-compare;
 
-klass sorted-table
-{
+klass sorted-table {
   superklass sorted-set;
   trait      table;
 

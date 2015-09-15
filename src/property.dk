@@ -20,10 +20,8 @@
 
 module dakota;
 
-klass property
-{
-  slots
-  {
+klass property {
+  slots {
     symbol-t  key;
     uintptr-t element;
   }

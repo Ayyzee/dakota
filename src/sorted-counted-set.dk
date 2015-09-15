@@ -20,8 +20,7 @@ klass equal-predicate;
 klass pair;
 klass std-compare; // hackhack
 
-klass sorted-counted-set
-{
+klass sorted-counted-set {
   superklass sorted-set;
   trait      counted-set;
 

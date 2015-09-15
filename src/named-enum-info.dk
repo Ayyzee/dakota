@@ -18,10 +18,8 @@ module dakota;
 
 klass enum-info;
 
-klass named-enum-info
-{
-  slots
-  {
+klass named-enum-info {
+  slots {
     str-t        name; // really the type, not the name
     enum-info-t* info;
   }

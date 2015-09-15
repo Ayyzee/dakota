@@ -18,7 +18,6 @@ module dakota;
 
 #include <cstdbool>
 
-klass boole
-{
+klass boole {
   slots boole-t;
 }
