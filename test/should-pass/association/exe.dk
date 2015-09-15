@@ -5,17 +5,17 @@ int-t main()
   object-t e1 = make(object::klass);
   object-t e2 = make(object::klass);
 
-  assoc-t v1 = { e1, e2 };
+  pair-t v1 = { e1, e2 };
 
-  object-t       o1 = assoc::box(&v1);
-  assoc-t* i1 = assoc::unbox(o1);
+  object-t       o1 = pair::box(&v1);
+  pair-t* i1 = pair::unbox(o1);
 
   printf("%p:{%p, %p} == %p:{%p, %p}\n",
          (void*)&v1, (void*)v1.key, (void*)v1.element,
          (void*)&i1, (void*)i1->key, (void*)i1->element);
 
-  object-t       o2 = assoc::box({e1, e2});
-  assoc-t* i2 = assoc::unbox(o2);
+  object-t       o2 = pair::box({e1, e2});
+  pair-t* i2 = pair::unbox(o2);
 
   printf("%p:{%p, %p}\n",
          (void*)&i2, (void*)i2->key, (void*)i2->element);

@@ -4,7 +4,7 @@
 
 klass int32; // hackhack
 klass sorted-table; // hackhack
-klass assoc; // hackhack
+klass pair; // hackhack
 
 int-t main()
 {

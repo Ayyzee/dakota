@@ -1,7 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass sequence;
-klass assoc;
+klass pair;
 
 int-t main()
 {
@@ -21,13 +21,13 @@ int-t main()
   object-t table = make(sorted-table::klass);
   // ...
 
-  for (assoc-t* assoc in table)
-    printf("%p = %p\n", (void*)assoc->key, (void*)assoc->element);
+  for (pair-t* pair in table)
+    printf("%p = %p\n", (void*)pair->key, (void*)pair->element);
 
   // should rewrite to
 
-  for (object-t _iterator_ = dk::forward-iterator(table); assoc-t* assoc = assoc::unbox(dk::next(_iterator_)); )
-    printf("%p = %p\n", (void*)assoc->key, (void*)assoc->element);
+  for (object-t _iterator_ = dk::forward-iterator(table); pair-t* pair = pair::unbox(dk::next(_iterator_)); )
+    printf("%p = %p\n", (void*)pair->key, (void*)pair->element);
 
   return 0;
 }

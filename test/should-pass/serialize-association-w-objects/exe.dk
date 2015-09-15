@@ -7,12 +7,12 @@ int-t main()
   object-t key =     make(object::klass);
   object-t element = make(object::klass);
 
-  object-t assoc = make(assoc::klass,
+  object-t pair = make(pair::klass,
                         key :     key,
                         element : element);
 
   object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-  dk::write(perl-object-output-stream, assoc);
+  dk::write(perl-object-output-stream, pair);
 
   dk::close(perl-object-output-stream);
   return 0;

@@ -2,22 +2,22 @@
 
 int-t main()
 {
-  object-t element = make(assoc::klass);
+  object-t element = make(pair::klass);
   
-  assoc-t* assoc-1 =  assoc::unbox(element);
-  assoc-t  assoc-2 = *assoc::unbox(element);
-  assoc-t& assoc-3 = *assoc::unbox(element);
+  pair-t* pair-1 =  pair::unbox(element);
+  pair-t  pair-2 = *pair::unbox(element);
+  pair-t& pair-3 = *pair::unbox(element);
   
-  assoc::slots-t* assoc-4 =  assoc::unbox(element);
-  assoc::slots-t  assoc-5 = *assoc::unbox(element);
-  assoc::slots-t& assoc-6 = *assoc::unbox(element);
+  pair::slots-t* pair-4 =  pair::unbox(element);
+  pair::slots-t  pair-5 = *pair::unbox(element);
+  pair::slots-t& pair-6 = *pair::unbox(element);
 
-  USE(assoc-1);
-  USE(assoc-2);
-  USE(assoc-3);
-  USE(assoc-4);
-  USE(assoc-5);
-  USE(assoc-6);
+  USE(pair-1);
+  USE(pair-2);
+  USE(pair-3);
+  USE(pair-4);
+  USE(pair-5);
+  USE(pair-6);
 
   return 0;
 }

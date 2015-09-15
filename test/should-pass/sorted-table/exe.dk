@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass assoc;
+klass pair;
 
 int-t main()
 {
@@ -21,8 +21,8 @@ int-t main()
     object-t element = dk::at(table, string1-key, NULL);
     printf("%p == %p\n", (void*)string1-element, (void*)element);
 
-    object-t assoc = dk::assoc-at(table, string1-key, NULL);
-    printf("%p == %p\n", (void*)dk::element(assoc), (void*)element);
+    object-t pair = dk::pair-at(table, string1-key, NULL);
+    printf("%p == %p\n", (void*)dk::element(pair), (void*)element);
   }
   catch(...)
   {
