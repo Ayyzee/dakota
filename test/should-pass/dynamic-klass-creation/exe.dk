@@ -27,17 +27,17 @@ int-t main()
 {
   property-t k2-info-props[] =
   {
-    { $name,            (uintptr-t)$k2 },
-    { $exported?,       (uintptr-t)1   },
-    { $superklass-name, (uintptr-t)$k1 },
+    { #name,            (uintptr-t)#k2 },
+    { #exported?,       (uintptr-t)1   },
+    { #superklass-name, (uintptr-t)#k1 },
   };
   named-info-node-t k2-info = { k2-info-props, DK-ARRAY-LENGTH(k2-info-props), NULL };
 
   int-t overwrite;
   setenv("DK_DUMP_CTLG", "", overwrite = 1);
   dk-register-info(&k2-info);
-  object-t k2-klass = dk-klass-for-name($k2);
-  dk:dump(k2-klass);
+  object-t k2-klass = dk-klass-for-name(#k2);
+  dk::dump(k2-klass);
 
   return 0;
 }

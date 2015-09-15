@@ -26,22 +26,22 @@ klass k1
 
 int-t main()
 {
-  int-t e1-1 = k1:e1-1;
+  int-t e1-1 = k1::e1-1;
   USE(e1-1);
-  int-t e1-2 = k1:e1-2;
+  int-t e1-2 = k1::e1-2;
   USE(e1-2);
-  int-t e2-1 = k1:e2-1;
+  int-t e2-1 = k1::e2-1;
   USE(e2-1);
-  int-t e2-2 = k1:e2-2;
+  int-t e2-2 = k1::e2-2;
   USE(e2-2);
 
-  int-t e3-1 = k1:e3-1;
+  int-t e3-1 = k1::e3-1;
   USE(e3-1);
-  int-t e3-2 = k1:e3-2;
+  int-t e3-2 = k1::e3-2;
   USE(e3-2);
-  int-t e4-1 = k1:e4-1;
+  int-t e4-1 = k1::e4-1;
   USE(e4-1);
-  int-t e4-2 = k1:e4-2;
+  int-t e4-2 = k1::e4-2;
   USE(e4-2);
 
   return 0;

@@ -8,9 +8,9 @@ noexport const char8-t* arg2 = "so long and ...";
 
 klass k1
 {
-  method object-t init(object-t self, int32-t meaning-of-life => {}, const char8-t* message => {})
+  method object-t init(object-t self, int32-t meaning-of-life : {}, const char8-t* message : {})
   {
-    self = dk:init(super);
+    self = dk::init(super);
     assert(arg1 == meaning-of-life);
     assert(0 == strcmp(arg2, message));
     return self;
@@ -21,9 +21,9 @@ klass k2
 {
   superklass k1;
 
-  method object-t va:init(object-t self, va-list-t args)
+  method object-t va::init(object-t self, va-list-t args)
   {
-    self = dk:va:init(super, args);
+    self = dk::va:init(super, args);
     //
     return self;
   }
@@ -31,7 +31,7 @@ klass k2
 
 int-t main()
 {
-  object-t o = make(k2:klass, meaning-of-life => arg1, message => arg2);
+  object-t o = make(k2::klass, meaning-of-life : arg1, message : arg2);
   USE(o);
   return 0;
 }

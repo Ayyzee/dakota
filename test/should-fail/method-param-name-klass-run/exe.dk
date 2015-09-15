@@ -5,7 +5,7 @@ klass k1
   method object-t init(object-t self)
   {
     klass = null; // error
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }
@@ -16,13 +16,13 @@ klass k2
 
   method object-t init(object-t self)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }
 
 int-t main()
 {
-  make(k2:klass);
+  make(k2::klass);
   return 0;
 }

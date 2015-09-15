@@ -10,7 +10,7 @@ klass c
 {
   slots
   {
-    d:slots-t a1;
+    d::slots-t a1;
     d-t       a2;
   }
 }
@@ -18,9 +18,9 @@ klass b
 {
   slots
   {
-    c:slots-t  ai5;
+    c::slots-t  ai5;
     c-t        ai6;
-    c:slots-t* ai7;
+    c::slots-t* ai7;
     c-t*       ai8;
   }
 }
@@ -28,14 +28,14 @@ klass a
 {
   slots
   {
-    b:slots-t    ai1;
+    b::slots-t    ai1;
     b-t          ai2;
-    b:slots-t*   ai3;
+    b::slots-t*   ai3;
     b-t*         ai4;
 
-    c:slots-t  ai5;
+    c::slots-t  ai5;
     c-t        ai6;
-    c:slots-t* ai7;
+    c::slots-t* ai7;
     c-t*       ai8;
   }
 }

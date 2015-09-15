@@ -4,7 +4,7 @@ namespace string {}
 
 int-t main()
 {
-  object-t str = make(string:klass, bytes => "hello world!");
-  dk:println(str, std-output);
+  object-t str = make(string::klass, bytes : "hello world!");
+  dk::println(str, std-output);
   return 0;
 }

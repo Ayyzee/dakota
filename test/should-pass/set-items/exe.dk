@@ -7,17 +7,17 @@ int-t main()
   object-t[] items1 = { box(1), box(2), NULL };
   object-t[] items2 = { box(1), box(2), NULL };
 
-  object-t hs0 = dk:alloc(hashed-set:klass);
-  hs0 = dk:init(hs0, items => items1);
+  object-t hs0 = dk::alloc(hashed-set::klass);
+  hs0 = dk::init(hs0, items : items1);
 
-  object-t ss0 = dk:alloc(sorted-set:klass);
-  ss0 = dk:init(hs0, items => items1);
+  object-t ss0 = dk::alloc(sorted-set::klass);
+  ss0 = dk::init(hs0, items : items1);
 
-  object-t hs1 = make(hashed-set:klass, items => items1);
-  object-t ss1 = make(sorted-set:klass, items => items2);
+  object-t hs1 = make(hashed-set::klass, items : items1);
+  object-t ss1 = make(sorted-set::klass, items : items2);
 
-  object-t hs2 = make(hashed-set:klass, items => cast(object-t[]){ box(1), box(2), NULL });
-  object-t ss2 = make(sorted-set:klass, items => cast(object-t[]){ box(1), box(2), NULL });
+  object-t hs2 = make(hashed-set::klass, items : cast(object-t[]){ box(1), box(2), NULL });
+  object-t ss2 = make(sorted-set::klass, items : cast(object-t[]){ box(1), box(2), NULL });
 
   return 0;
 }

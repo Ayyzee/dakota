@@ -2,15 +2,15 @@
 
 int-t main()
 {
-  object-t element = make(assoc:klass);
+  object-t element = make(assoc::klass);
   
-  assoc-t* assoc-1 =  assoc:unbox(element);
-  assoc-t  assoc-2 = *assoc:unbox(element);
-  assoc-t& assoc-3 = *assoc:unbox(element);
+  assoc-t* assoc-1 =  assoc::unbox(element);
+  assoc-t  assoc-2 = *assoc::unbox(element);
+  assoc-t& assoc-3 = *assoc::unbox(element);
   
-  assoc:slots-t* assoc-4 =  assoc:unbox(element);
-  assoc:slots-t  assoc-5 = *assoc:unbox(element);
-  assoc:slots-t& assoc-6 = *assoc:unbox(element);
+  assoc::slots-t* assoc-4 =  assoc::unbox(element);
+  assoc::slots-t  assoc-5 = *assoc::unbox(element);
+  assoc::slots-t& assoc-6 = *assoc::unbox(element);
 
   USE(assoc-1);
   USE(assoc-2);

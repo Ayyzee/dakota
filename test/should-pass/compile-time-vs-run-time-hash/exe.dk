@@ -2,21 +2,21 @@
 
 int-t main()
 {
-  symbol-t default-initial-capacity = $default-initial-capacity;
+  symbol-t default-initial-capacity = #default-initial-capacity;
   strswitch(default-initial-capacity)
   {
-    case $default-initial-capacity:
+    case #default-initial-capacity:
       break;
     default:
       fprintf(stderr, "%s\n", default-initial-capacity);
       abort();
   }
-  switch($default-initial-capacity) // silly but legal
+  switch(#default-initial-capacity) // silly but legal
   {
-    case $default-initial-capacity:
+    case #default-initial-capacity:
       break;
     default:
-      fprintf(stderr, "%s\n", $default-initial-capacity);
+      fprintf(stderr, "%s\n", #default-initial-capacity);
       abort();
   }
   switch("default-initial-capacity") // silly but legal
@@ -27,10 +27,10 @@ int-t main()
       fprintf(stderr, "\"%s\"\n", "default-initial-capacity");
       abort();
   }
-  uintmax-t hash-value = dk-hash($default-initial-capacity);
+  uintmax-t hash-value = dk-hash(#default-initial-capacity);
   switch(hash-value)
   {
-    case $default-initial-capacity:
+    case #default-initial-capacity:
       break;
     default:
       fprintf(stderr, "%jx\n", hash-value);

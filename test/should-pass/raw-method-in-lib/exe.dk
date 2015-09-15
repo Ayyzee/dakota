@@ -6,17 +6,17 @@ klass k2
 {
   method object-t f2(object-t self, object-t o)
   {
-    dk:f1(o);
+    dk::f1(o);
     return self;
   }
 }
 
 int-t main()
 {
-  object-t i1 = make(k1:klass);
-  object-t i2 = make(k2:klass);
+  object-t i1 = make(k1::klass);
+  object-t i2 = make(k2::klass);
 
-  dk:f2(i2, i1);
+  dk::f2(i2, i1);
 
   return 0;
 }

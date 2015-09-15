@@ -20,7 +20,7 @@ int-t main()
   printf("%s\n", expected);
 
   char8-t chain[1024] = "";
-  dk-get-klass-chain(a4:klass, chain, sizeof(chain) - 1);
+  dk-get-klass-chain(a4::klass, chain, sizeof(chain) - 1);
   printf("%s\n", chain);
 
   assert(0 == strcmp(expected, chain));

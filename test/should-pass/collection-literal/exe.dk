@@ -6,37 +6,37 @@ klass hashed-table;
 
 klass int32; // hackhack
 
-#define DEFAULT-SEQUENCE-KLASS vector:klass
-#define DEFAULT-SET-KLASS      hashed-set:klass
-#define DEFAULT-TABLE-KLASS    hashed-table:klass
+#define DEFAULT-SEQUENCE-KLASS vector::klass
+#define DEFAULT-SET-KLASS      hashed-set::klass
+#define DEFAULT-TABLE-KLASS    hashed-table::klass
 
 int-t main()
 {
   int32-t a, b, c, d;
   //object-t a, b, c, d;
 
-//object-t x1 = $[a, b];
-  object-t x1 = $[a, b];
-  object-t x2 = make(DEFAULT-SEQUENCE-KLASS, items => (object-t[]){ box(a), box(b), NULL });
+//object-t x1 = #[a, b];
+  object-t x1 = #[a, b];
+  object-t x2 = make(DEFAULT-SEQUENCE-KLASS, items : (object-t[]){ box(a), box(b), NULL });
 
-//object-t y1 = ${a, b};
-  object-t y1 = ${a, b};
-  object-t y2 = make(DEFAULT-SET-KLASS, items => (object-t[]){ box(a), box(b), NULL });
+//object-t y1 = #{a, b};
+  object-t y1 = #{a, b};
+  object-t y2 = make(DEFAULT-SET-KLASS, items : (object-t[]){ box(a), box(b), NULL });
 
-//object-t z1 = ${a => b, c => d};
-  object-t z1 = ${a => b, c => d};
-  object-t z2 = make(DEFAULT-TABLE-KLASS, items => (object-t[]){ assoc:box({box(a), box(b)}), assoc:box({box(c), box(d)}), NULL });
+//object-t z1 = #{a : b, c : d};
+  object-t z1 = #{a : b, c : d};
+  object-t z2 = make(DEFAULT-TABLE-KLASS, items : (object-t[]){ assoc::box({box(a), box(b)}), assoc::box({box(c), box(d)}), NULL });
 
-//x1 = $[];
-  x1 = $[];
+//x1 = #[];
+  x1 = #[];
   x2 = make(DEFAULT-SEQUENCE-KLASS);
 
-//y1 = ${};
-  y1 = ${};
+//y1 = #{};
+  y1 = #{};
   y2 = make(DEFAULT-SET-KLASS);
 
-//z1 = ${=>};
-  z1 = ${=>};
+//z1 = #{:};
+  z1 = #{:};
   z2 = make(DEFAULT-TABLE-KLASS);
 
   USE(x1);

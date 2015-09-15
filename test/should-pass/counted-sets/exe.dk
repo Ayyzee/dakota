@@ -8,21 +8,21 @@ klass assoc;
 
 static object-t check(object-t klass)
 {
-  printf("klass-name=\"%s\"\n", dk:name(klass));
+  printf("klass-name=\"%s\"\n", dk::name(klass));
   object-t collection = make(klass);
 
   for (uint32-t i = 1; i < 1 + 5; i++) {
-    object-t e = uint32:box(i);
+    object-t e = uint32::box(i);
     for (uint32-t j = 1; j <= i; j++)
-      dk:add(collection, e);
+      dk::add(collection, e);
   }
-  printf("size=%i\n", dk:size(collection));
+  printf("size=%i\n", dk::size(collection));
   uint32-t i1 = 1;
 
   for (object-t e in collection) {
-    assoc-t* assoc = assoc:unbox(e);
-    uint32-t ei = *uint32:unbox(assoc->element);
-    uint32-t i2 = dk:count-at(collection, e, 0);
+    assoc-t* assoc = assoc::unbox(e);
+    uint32-t ei = *uint32::unbox(assoc->element);
+    uint32-t i2 = dk::count-at(collection, e, 0);
     printf("%i: %i == %i\n", i1, ei, i2);
     i1++;
   }
@@ -31,17 +31,17 @@ static object-t check(object-t klass)
 
 int-t main()
 {
-//object-t perl-object-output-stream = make(perl-object-output-stream:klass);
+//object-t perl-object-output-stream = make(perl-object-output-stream::klass);
 
-  object-t c1 = check(sorted-counted-set:klass);
+  object-t c1 = check(sorted-counted-set::klass);
   USE(c1);
-//dk:write(perl-object-output-stream, c1);
+//dk::write(perl-object-output-stream, c1);
 
-  object-t c2 = check(hashed-counted-set:klass);
+  object-t c2 = check(hashed-counted-set::klass);
   USE(c2);
-//dk:write(perl-object-output-stream, c2);
+//dk::write(perl-object-output-stream, c2);
 
-//dk:close(perl-object-output-stream);
+//dk::close(perl-object-output-stream);
 
   return 0;
 }

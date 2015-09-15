@@ -4,7 +4,7 @@ klass k1
 {
   slots int32-t;
 
-  export method slots-t* va:sum(slots-t* s, va-list-t args)
+  export method slots-t* va::sum(slots-t* s, va-list-t args)
   {
     USE(args);
     return s;

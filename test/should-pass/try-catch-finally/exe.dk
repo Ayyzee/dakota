@@ -10,10 +10,10 @@ int-t main()
   catch (str-t e1)
   { USE(e1);
   }
-  catch (system-exception:klass e2)
+  catch (system-exception::klass e2)
   { USE(e2);
   }
-  catch (exception:klass e3)
+  catch (exception::klass e3)
   { USE(e3);
   }
   catch (int-t e4)

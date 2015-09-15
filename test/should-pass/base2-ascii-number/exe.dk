@@ -2,9 +2,9 @@
 
 int-t main()
 {
-  object-t base2-ascii-number-klass = make(ascii-number-klass:klass);
-  dk:dump(base2-ascii-number-klass);
-  object-t base2-ascii-number = make(base2-ascii-number-klass, number => 42);
+  object-t base2-ascii-number-klass = make(ascii-number-klass::klass);
+  dk::dump(base2-ascii-number-klass);
+  object-t base2-ascii-number = make(base2-ascii-number-klass, number : 42);
   USE(base2-ascii-number);
   return 0;
 }

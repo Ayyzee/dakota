@@ -9,7 +9,7 @@ klass my-context
 {
   slots
   {
-    my-pipe:slots-t fds;
+    my-pipe::slots-t fds;
   }
 }
 

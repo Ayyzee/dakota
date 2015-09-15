@@ -7,7 +7,7 @@ klass fred
     return self;
   }
 
-  method object-t va:wilma(object-t self, va-list-t args)
+  method object-t va::wilma(object-t self, va-list-t args)
   {
     printf("%s()\n", __func__);
     return self;
@@ -16,10 +16,10 @@ klass fred
 
 int-t main()
 {
-  object-t o = make(fred:klass);
-  selector-t s = selector(va:wilma(object-t, va-list-t));
-  method-t m = dk:method-for-selector(dk:klass(o), s);
+  object-t o = make(fred::klass);
+  selector-t s = selector(va::wilma(object-t, va-list-t));
+  method-t m = dk::method-for-selector(dk::klass(o), s);
   USE(m);
-//   va-method-t vm = dk:va-method-for-selector(dk:klass(o));
+//   va-method-t vm = dk::va-method-for-selector(dk::klass(o));
   return 0;
 }

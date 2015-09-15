@@ -16,9 +16,9 @@ klass k1
 
 int-t main()
 {
-  int-t e1 = k1:e1;
+  int-t e1 = k1::e1;
   USE(e1);
-  int-t e2 = k1:e2;
+  int-t e2 = k1::e2;
   USE(e2);
   return 0;
 }

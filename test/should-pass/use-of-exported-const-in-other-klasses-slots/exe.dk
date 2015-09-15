@@ -9,7 +9,7 @@ klass k2
 {
   slots
   {
-    uint-t[k1:length] slot-0;
+    uint-t[k1::length] slot-0;
   }
 }
 

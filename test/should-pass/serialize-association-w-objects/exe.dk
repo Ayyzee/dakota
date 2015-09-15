@@ -4,16 +4,16 @@ klass features; // hackhack
 
 int-t main()
 {
-  object-t key =     make(object:klass);
-  object-t element = make(object:klass);
+  object-t key =     make(object::klass);
+  object-t element = make(object::klass);
 
-  object-t assoc = make(assoc:klass,
-                        key =>     key,
-                        element => element);
+  object-t assoc = make(assoc::klass,
+                        key :     key,
+                        element : element);
 
-  object-t perl-object-output-stream = make(perl-object-output-stream:klass);
-  dk:write(perl-object-output-stream, assoc);
+  object-t perl-object-output-stream = make(perl-object-output-stream::klass);
+  dk::write(perl-object-output-stream, assoc);
 
-  dk:close(perl-object-output-stream);
+  dk::close(perl-object-output-stream);
   return 0;
 }

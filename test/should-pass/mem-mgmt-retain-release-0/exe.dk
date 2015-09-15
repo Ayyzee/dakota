@@ -5,33 +5,33 @@ klass k1
   method object-t retain(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:retain(super);
+    return dk::retain(super);
   }
 
   method object-t release(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:release(super);
+    return dk::release(super);
   }
 
   method object-t dealloc(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:dealloc(super);
+    return dk::dealloc(super);
   }
 }
 
 int-t main()
 {
-  object-t s = make(k1:klass);
+  object-t s = make(k1::klass);
   uint32-t c = 2;
 
   for (uint32-t i = 0; i < c; i++)
-    dk:retain(s);
+    dk::retain(s);
   printf("---\n");
 
   for (uint32-t i = 0; i < c + 1; i++)
-    dk:release(s);
+    dk::release(s);
 
   return 0;
 }

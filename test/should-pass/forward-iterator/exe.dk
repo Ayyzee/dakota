@@ -5,17 +5,17 @@ include <assert.h>;
 
 static void check-for(object-t collection)
 {
-  uint32-t size = dk:size(collection);
+  uint32-t size = dk::size(collection);
   printf("%i[", size);
   char8-t* delim = "";
-  for (object-t iter = dk:forward-iterator(collection);
-       dk:next?(iter);
-       dk:next(iter)) {
-    object-t e = dk:element(iter);
+  for (object-t iter = dk::forward-iterator(collection);
+       dk::next?(iter);
+       dk::next(iter)) {
+    object-t e = dk::element(iter);
     object-t key = e;
-    if (dk:instance?(key, assoc:klass))
-      key = assoc:unbox(key)->key;
-    printf("%s%i", delim, *uint32:unbox(key));
+    if (dk::instance?(key, assoc::klass))
+      key = assoc::unbox(key)->key;
+    printf("%s%i", delim, *uint32::unbox(key));
     delim = ",";
   }
   printf("]");
@@ -24,13 +24,13 @@ static void check-for(object-t collection)
 
 static void check-for-each(object-t collection)
 {
-  printf("%i[", dk:size(collection));
+  printf("%i[", dk::size(collection));
   char8-t* delim = "";
   for (object-t e in collection) {
     object-t key = e;
-    if (dk:instance?(key, assoc:klass))
-      key = assoc:unbox(key)->key;
-    printf("%s%i", delim, *uint32:unbox(key));
+    if (dk::instance?(key, assoc::klass))
+      key = assoc::unbox(key)->key;
+    printf("%s%i", delim, *uint32::unbox(key));
     delim = ",";
   }
   printf("]");
@@ -48,7 +48,7 @@ static void check(object-t klass, object-t (*add)(object-t, object-t), void (*ch
     printf("%s", delim);
     delim = ", ";
     check-for-func(c);
-    add(c, uint32:box(i));
+    add(c, uint32::box(i));
     check-for-func(c);
   }
   printf("\n");
@@ -64,13 +64,13 @@ static void check(object-t klass, object-t (*add)(object-t, object-t))
 
 int-t main()
 {
-  check(vector:klass, dk:add-last);
-  check(deque:klass,  dk:add-last);
-  check(sorted-set:klass, dk:add);
-  check(hashed-set:klass, dk:add);
+  check(vector::klass, dk::add-last);
+  check(deque::klass,  dk::add-last);
+  check(sorted-set::klass, dk::add);
+  check(hashed-set::klass, dk::add);
 
-  check(sorted-counted-set:klass, dk:add);
-  check(hashed-counted-set:klass, dk:add);
+  check(sorted-counted-set::klass, dk::add);
+  check(hashed-counted-set::klass, dk::add);
 
   return 0;
 }

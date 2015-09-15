@@ -6,8 +6,8 @@ klass k1
 {
   object-t initialize(object-t kls)
   {
-    printf("%p\n", (void*)k2:klass);
-    assert(NULL != k2:klass);
+    printf("%p\n", (void*)k2::klass);
+    assert(NULL != k2::klass);
     return kls;
   }
 }
@@ -16,16 +16,16 @@ klass k2
 {
   object-t initialize(object-t kls)
   {
-    printf("%p\n", (void*)k1:klass);
-    assert(NULL != k1:klass);
+    printf("%p\n", (void*)k1::klass);
+    assert(NULL != k1::klass);
     return kls;
   }
 }
 
 int-t main()
 {
-  object-t k1 = make(k1:klass);
-  object-t k2 = make(k2:klass);
+  object-t k1 = make(k1::klass);
+  object-t k2 = make(k2::klass);
 
   USE(k1);
   USE(k2);

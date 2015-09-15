@@ -10,10 +10,10 @@ klass k1
 int-t main()
 {
   selector-t hash-selector = selector(hash(object-t));
-  method-t hash = dk:method-for-selector(k1:klass, hash-selector);
+  method-t hash = dk::method-for-selector(k1::klass, hash-selector);
   selector-t alias-hash-selector = selector(alias-hash(object-t));
-  method-t alias-hash = dk:method-for-selector(k1:klass, alias-hash-selector);
+  method-t alias-hash = dk::method-for-selector(k1::klass, alias-hash-selector);
   assert(hash == alias-hash);
-  dk-dump-methods(k1:klass);
+  dk-dump-methods(k1::klass);
   return 0;
 }

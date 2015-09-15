@@ -1,13 +1,13 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass flint:fred
+klass flint::fred
 {
   superklass object;
 }
 
-klass flint:wilma
+klass flint::wilma
 {
-  interpose flint:fred;
+  interpose flint::fred;
 }
 
 int-t main()

@@ -23,25 +23,25 @@ klass sequence; // hackhack: should be implied by use of for-each construct
 
 int-t main(int argc, char** argv)
 {
-  object-t l = make(lexer:klass, filename => argv[1]);
-  object-t seq = dk:tokenize(l);
+  object-t l = make(lexer::klass, filename : argv[1]);
+  object-t seq = dk::tokenize(l);
 
   printf("[\n");
   for (object-t token in seq) {
     // tokenid
-    tokenid-t tokenid = dk:tokenid(token);
-    printf("  { 'tokenid' => ");
+    tokenid-t tokenid = dk::tokenid(token);
+    printf("  { 'tokenid' : ");
     if (128 > tokenid) {
       printf("\'%c\'   ", tokenid);
     } else {
       char8-t[5] str = "";
-      tokenid:str-from(tokenid, str, sizeof(str) - 1);
+      tokenid::str-from(tokenid, str, sizeof(str) - 1);
       printf("'%c%c%c%c'", str[0], str[1], str[2], str[3]);
     }
 
     // buffer
-    const char8-t* buffer = dk:buffer(token);
-    printf(", 'buffer' => ");
+    const char8-t* buffer = dk::buffer(token);
+    printf(", 'buffer' : ");
     if ('\n' == buffer[0]) {
       uint-t i = 0;
       printf("'");

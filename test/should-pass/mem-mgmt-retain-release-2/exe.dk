@@ -7,13 +7,13 @@ klass my-autorelease-pool
   method object-t release(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:release(super);
+    return dk::release(super);
   }
 
   method object-t dealloc(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:dealloc(super);
+    return dk::dealloc(super);
   }
 }
 
@@ -22,38 +22,38 @@ klass my-object
   method object-t retain(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:retain(super);
+    return dk::retain(super);
   }
 
   method object-t release(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:release(super);
+    return dk::release(super);
   }
 
   method object-t dealloc(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk:dealloc(super);
+    return dk::dealloc(super);
   }
 }
 
 int-t main()
 {
-  object-t s = make(my-object:klass);
+  object-t s = make(my-object::klass);
   uint32-t c = 2;
 
-  object-t pool = make(my-autorelease-pool:klass);
+  object-t pool = make(my-autorelease-pool::klass);
 
   for (uint32-t i = 0; i < c; i++)
-    dk:retain(s);
+    dk::retain(s);
   printf("---\n");
 
   for (uint32-t i = 0; i < c + 1; i++)
-    dk:autorelease(s);
+    dk::autorelease(s);
   printf("---\n");
 
-  dk:release(pool);
+  dk::release(pool);
 
   return 0;
 }

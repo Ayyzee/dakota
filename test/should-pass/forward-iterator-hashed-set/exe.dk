@@ -8,7 +8,7 @@ static object-t create(object-t klass, add-t add, uint32-t len)
 {
   object-t c = make(klass);
   for (uint32-t i = 0; i < len; i++) {
-    object-t e = uint32:box(i);
+    object-t e = uint32::box(i);
     fprintf(stderr, "%p\n", (void*)e);
     add(c, e);
   }
@@ -18,24 +18,24 @@ static object-t create(object-t klass, add-t add, uint32-t len)
 
 int-t main()
 {
-  object-t c = create(hashed-set:klass, dk:add, 3);
-//   object-t c = create(deque:klass, dk:add-first, 1);
-//   object-t perl-object-output-stream = make(perl-object-output-stream:klass);
-//   dk:write(perl-object-output-stream, c);
+  object-t c = create(hashed-set::klass, dk::add, 3);
+//   object-t c = create(deque::klass, dk::add-first, 1);
+//   object-t perl-object-output-stream = make(perl-object-output-stream::klass);
+//   dk::write(perl-object-output-stream, c);
 
   if (1) {
-    for (object-t iter = dk:forward-iterator(c);
-         object-t e = dk:next(iter); ) {
+    for (object-t iter = dk::forward-iterator(c);
+         object-t e = dk::next(iter); ) {
       fprintf(stderr, "%p\n", (void*)e);
     }
     fprintf(stderr, "--\n");
   }
 
   if (1) {
-    for (object-t iter = dk:forward-iterator(c);
-         dk:next?(iter);
-         dk:next(iter)) {
-      object-t e = dk:element(iter);
+    for (object-t iter = dk::forward-iterator(c);
+         dk::next?(iter);
+         dk::next(iter)) {
+      object-t e = dk::element(iter);
       fprintf(stderr, "%p\n", (void*)e);
     }
     fprintf(stderr, "\n");

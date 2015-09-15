@@ -17,11 +17,11 @@ module test-1;
       //object-t rdn;
     }
 
-    method object-t init(object-t self, const char8-t* bytes => NULL, const char8-t* delimiter => default-delimiter)
+    method object-t init(object-t self, const char8-t* bytes : NULL, const char8-t* delimiter : default-delimiter)
     {
-      self = dk:init(super, bytes => bytes);
+      self = dk::init(super, bytes : bytes);
       self.delimiter = delimiter;
-      //self.rdn = make(string:klass, bytes => "Robert D. Nielsen");
+      //self.rdn = make(string::klass, bytes : "Robert D. Nielsen");
       return self;
     }
   } //

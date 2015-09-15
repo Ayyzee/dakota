@@ -2,11 +2,11 @@
 
 int-t main()
 {
-  printf("%s\n", $plusplus);
-  printf("%p\n", $"++");
-  printf("%i\n", $'++');
+  printf("%s\n", #plusplus);
+  printf("%p\n", #"++");
+  printf("%i\n", #'++');
 
-  printf("%s\n", $NULL);
+  printf("%s\n", #NULL);
 
   return 0;
 }

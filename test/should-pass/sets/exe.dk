@@ -10,17 +10,17 @@ static object-t check(object-t klass)
   object-t collection = make(klass);
 
   for (uint32-t i = 1; i < 1 + 5; i++) {
-    object-t e = uint32:box(i);
+    object-t e = uint32::box(i);
     for (uint32-t j = 1; j <= i; j++)
-      dk:add(collection, e);
+      dk::add(collection, e);
   }
-  printf("size=%i\n", dk:size(collection));
+  printf("size=%i\n", dk::size(collection));
   uint32-t i1 = 1;
 
   for (object-t e in collection) {
-    uint32-t ei = *uint32:unbox(e);
-    object-t element = dk:at(collection, e, NULL);
-    uint32-t i2 = *uint32:unbox(element);
+    uint32-t ei = *uint32::unbox(e);
+    object-t element = dk::at(collection, e, NULL);
+    uint32-t i2 = *uint32::unbox(element);
     printf("%i: %i == %i\n", i1, ei, i2);
     i1++;
   }
@@ -29,17 +29,17 @@ static object-t check(object-t klass)
 
 int-t main()
 {
-//object-t perl-object-output-stream = make(perl-object-output-stream:klass);
+//object-t perl-object-output-stream = make(perl-object-output-stream::klass);
 
-  object-t c1 = check(sorted-set:klass);
+  object-t c1 = check(sorted-set::klass);
   USE(c1);
-//dk:write(perl-object-output-stream, c1);
+//dk::write(perl-object-output-stream, c1);
 
-  object-t c2 = check(hashed-set:klass);
+  object-t c2 = check(hashed-set::klass);
   USE(c2);
-//dk:write(perl-object-output-stream, c2);
+//dk::write(perl-object-output-stream, c2);
 
-//dk:close(perl-object-output-stream);
+//dk::close(perl-object-output-stream);
 
   return 0;
 }

@@ -2,9 +2,9 @@
 
 klass k1
 {
-  method object-t init(object-t self, void* $arg1, void** arg2 => NULL)
+  method object-t init(object-t self, void* #arg1, void** arg2 : NULL)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }
@@ -12,14 +12,14 @@ klass k2
 {
   method object-t init(object-t self)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }
 
 int-t main()
 {
-  object-t o = make(k1:klass, bogus => 42);
+  object-t o = make(k1::klass, bogus : 42);
   USE(o);
   return 0;
 }

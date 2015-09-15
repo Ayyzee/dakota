@@ -14,7 +14,7 @@ klass test
     printf("%s:%s()\n", __klass__, __method__);
     return self;
   }
-  method object-t va:method-3(object-t self, va-list-t args)
+  method object-t va::method-3(object-t self, va-list-t args)
   {
     printf("%s:%s()\n", __klass__, __method__);
     return self;
@@ -23,9 +23,9 @@ klass test
 
 int-t main()
 {
-  dk:dump-methods(test:klass);
-  method-t m = dk:method-for-selector(test:klass, selector(method-1(object-t)));
+  dk::dump-methods(test::klass);
+  method-t m = dk::method-for-selector(test::klass, selector(method-1(object-t)));
   USE(m);
-//   va-method-t vm = dk:va-method-for-selector(test:klass, selector(va:method-3(object-t, va-list-t)));
+//   va-method-t vm = dk::va-method-for-selector(test::klass, selector(va::method-3(object-t, va-list-t)));
   return 0;
 }

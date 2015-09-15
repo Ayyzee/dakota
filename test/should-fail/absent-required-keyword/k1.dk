@@ -3,9 +3,9 @@ klass k1
   noexport void***** arg5-default = NULL;
   noexport void****** arg6-default = NULL;
 
-  method object-t init(object-t self, void* arg1, void** arg2, void*** $arg3, void**** $arg4, void***** arg5 => arg5-default, void****** arg6 => arg6-default)
+  method object-t init(object-t self, void* arg1, void** arg2, void*** #arg3, void**** #arg4, void***** arg5 : arg5-default, void****** arg6 : arg6-default)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }

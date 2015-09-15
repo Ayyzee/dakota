@@ -25,19 +25,19 @@ static void check-collection(object-t klass, collection-type-t collection-type, 
 
   offset = 0;
   for (int32-t i = 0; i < count; i++) {
-    object-t e = int32:box(i);
-    offset += sprintf(lhs + offset, "/%x", *int32:unbox(e));
+    object-t e = int32::box(i);
+    offset += sprintf(lhs + offset, "/%x", *int32::unbox(e));
     if (ORDERED & collection-type)
-      dk:add-last(collection, e);
+      dk::add-last(collection, e);
     else
-      dk:add(collection, e);
-//     uint32-t size = dk:size(collection);
+      dk::add(collection, e);
+//     uint32-t size = dk::size(collection);
 //     printf("1 + %i == %i\n", i, size);
   }
 
   offset = 0;
   for (object-t e in collection)
-    offset += sprintf(rhs + offset, "/%x", *int32:unbox(e));
+    offset += sprintf(rhs + offset, "/%x", *int32::unbox(e));
 
   printf("\"%s\" == \"%s\"\n", lhs, rhs);
   
@@ -57,14 +57,14 @@ static void check-collection(object-t klass, collection-type-t collection-type)
 
 int-t main()
 {
-  check-collection(vector:klass, ORDERED);
-  check-collection(deque:klass,  ORDERED);
+  check-collection(vector::klass, ORDERED);
+  check-collection(deque::klass,  ORDERED);
 
-  check-collection(sorted-set:klass, SORTED);
-  check-collection(hashed-set:klass, NONE);
+  check-collection(sorted-set::klass, SORTED);
+  check-collection(hashed-set::klass, NONE);
 
-//   check-collection(sorted-counted-set:klass, SORTED);
-//   check-collection(hashed-counted-set:klass, NONE);
+//   check-collection(sorted-counted-set::klass, SORTED);
+//   check-collection(hashed-counted-set::klass, NONE);
 
   return 0;
 }

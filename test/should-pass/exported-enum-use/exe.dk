@@ -5,7 +5,7 @@ klass features; // hackhack
 
 int-t main()
 {
-  int-t none = text-output-stream:k-none;
+  int-t none = text-output-stream::k-none;
   USE(none);
   return 0;
 }

@@ -2,7 +2,7 @@
 
 int-t main()
 {
-  object-t str = $"yet another string test";
-  dk:dump(str);
+  object-t str = #"yet another string test";
+  dk::dump(str);
   return 0;
 }

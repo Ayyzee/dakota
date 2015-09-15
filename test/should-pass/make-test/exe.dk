@@ -4,14 +4,14 @@ klass test
 {
   method object-t init(object-t self)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }
 
 int-t main()
 {
-  object-t s = make(test:klass);
+  object-t s = make(test::klass);
   USE(s);
   return 0;
 }

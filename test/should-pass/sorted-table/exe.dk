@@ -8,21 +8,21 @@ int-t main()
 
   try
   {
-    object-t table = make(sorted-table:klass);
+    object-t table = make(sorted-table::klass);
 
-    object-t string1-key = make(string:klass, bytes => "father");
-    object-t string1-element = make(string:klass, bytes => "FATHER");
-    dk:add(table, string1-key, string1-element);
+    object-t string1-key = make(string::klass, bytes : "father");
+    object-t string1-element = make(string::klass, bytes : "FATHER");
+    dk::add(table, string1-key, string1-element);
 
-//     object-t string2-key = make(string:klass, bytes => "mother");
-//     object-t string2-element = make(string:klass, bytes => "MOTHER");
-//     dk:add(table, string2-key, string2-element);
+//     object-t string2-key = make(string::klass, bytes : "mother");
+//     object-t string2-element = make(string::klass, bytes : "MOTHER");
+//     dk::add(table, string2-key, string2-element);
 
-    object-t element = dk:at(table, string1-key, NULL);
+    object-t element = dk::at(table, string1-key, NULL);
     printf("%p == %p\n", (void*)string1-element, (void*)element);
 
-    object-t assoc = dk:assoc-at(table, string1-key, NULL);
-    printf("%p == %p\n", (void*)dk:element(assoc), (void*)element);
+    object-t assoc = dk::assoc-at(table, string1-key, NULL);
+    printf("%p == %p\n", (void*)dk::element(assoc), (void*)element);
   }
   catch(...)
   {

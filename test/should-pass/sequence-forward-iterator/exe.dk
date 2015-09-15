@@ -5,13 +5,13 @@ include <assert.h>;
 
 static void check-for(object-t collection)
 {
-  printf("%i[", dk:size(collection));
+  printf("%i[", dk::size(collection));
   char8-t* delim = "";
-  for (object-t iter = dk:forward-iterator(collection);
-       dk:next?(iter);
-       dk:next(iter)) {
-    object-t e = dk:element(iter);
-    printf("%s%i", delim, *uint32:unbox(e));
+  for (object-t iter = dk::forward-iterator(collection);
+       dk::next?(iter);
+       dk::next(iter)) {
+    object-t e = dk::element(iter);
+    printf("%s%i", delim, *uint32::unbox(e));
     delim = ",";
   }
   printf("]");
@@ -20,10 +20,10 @@ static void check-for(object-t collection)
 
 static void check-for-each(object-t collection)
 {
-  printf("%i[", dk:size(collection));
+  printf("%i[", dk::size(collection));
   char8-t* delim = "";
   for (object-t e in collection) {
-    printf("%s%i", delim, *uint32:unbox(e));
+    printf("%s%i", delim, *uint32::unbox(e));
     delim = ",";
   }
   printf("]");
@@ -41,7 +41,7 @@ static void check(object-t klass, object-t (*add)(object-t, object-t), void (*ch
     printf("%s", delim);
     delim = ", ";
     check-for-func(c);
-    add(c, uint32:box(i));
+    add(c, uint32::box(i));
     check-for-func(c);
   }
   printf("\n");
@@ -57,8 +57,8 @@ static void check(object-t klass, object-t (*add)(object-t, object-t))
 
 int-t main()
 {
-  check(vector:klass, dk:add-last);
-  check(deque:klass,  dk:add-last);
+  check(vector::klass, dk::add-last);
+  check(deque::klass,  dk::add-last);
 
   return 0;
 }

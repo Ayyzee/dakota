@@ -7,47 +7,47 @@ void check(object-t klass)
 //   object-t seq = make(klass);
 //   for (uint32-t i = 0; i < 4; i++)
 //   {
-//     object-t o = make(object:klass);
-//     dk:add-last(seq, o);
-//     dk:test-dump(seq);
+//     object-t o = make(object::klass);
+//     dk::add-last(seq, o);
+//     dk::test-dump(seq);
 //   }
 
-  object-t o1 = make(object:klass);
-  object-t o2 = make(object:klass);
-  object-t o3 = make(object:klass);
-  object-t o4 = make(object:klass);
+  object-t o1 = make(object::klass);
+  object-t o2 = make(object::klass);
+  object-t o3 = make(object::klass);
+  object-t o4 = make(object::klass);
   object-t seq = make(klass);
-  assert(dk:empty?(seq));
-  dk:test-dump(seq);
-  dk:add-last(seq, o1);
-  dk:test-dump(seq);
-  dk:add-last(seq, o2);
-  dk:test-dump(seq);
-  dk:add-last(seq, o3);
-  dk:test-dump(seq);
-  dk:add-last(seq, o4);
-  dk:test-dump(seq);
-  assert(!dk:empty?(seq));
-  object-t first = dk:remove-first(seq);
-  dk:test-dump(seq);
-  object-t second = dk:remove-first(seq);
-  dk:test-dump(seq);
-  object-t third = dk:remove-first(seq);
-  dk:test-dump(seq);
-  object-t fourth = dk:remove-first(seq);
-  dk:test-dump(seq);
+  assert(dk::empty?(seq));
+  dk::test-dump(seq);
+  dk::add-last(seq, o1);
+  dk::test-dump(seq);
+  dk::add-last(seq, o2);
+  dk::test-dump(seq);
+  dk::add-last(seq, o3);
+  dk::test-dump(seq);
+  dk::add-last(seq, o4);
+  dk::test-dump(seq);
+  assert(!dk::empty?(seq));
+  object-t first = dk::remove-first(seq);
+  dk::test-dump(seq);
+  object-t second = dk::remove-first(seq);
+  dk::test-dump(seq);
+  object-t third = dk::remove-first(seq);
+  dk::test-dump(seq);
+  object-t fourth = dk::remove-first(seq);
+  dk::test-dump(seq);
   assert(o1 == first);
   assert(o2 == second);
   assert(o3 == third);
   assert(o4 == fourth);
-  assert(dk:empty?(seq));
+  assert(dk::empty?(seq));
   return;
 }
 
 int-t main()
 {
-//   check(vector:klass);
-  check(deque:klass);
+//   check(vector::klass);
+  check(deque::klass);
 
   return 0;
 }

@@ -2,7 +2,7 @@
 
 int-t main()
 {
-  object-t o = make(object:klass);
-  dk:autorelease(o);
+  object-t o = make(object::klass);
+  dk::autorelease(o);
   return 0;
 }

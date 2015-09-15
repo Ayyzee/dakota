@@ -4,29 +4,29 @@
 //name=/usr/local/lib/libdakota-util.dylib
 module dakota-util;
 
-generic object-t dk:init(object-t,object-t info=>{0},str-t digits=>{0});
+generic object-t dk::init(object-t,object-t info:{0},str-t digits:{0});
 
 klass ascii-number-klass
 {
   superklass klass;
   
-//method object-t init(object-t,object-t info=>{0},str-t digits=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,object-t info:{0},str-t digits:{0});
+  method object-t va::init(object-t,va-list-t);
   method str-t    digits(object-t);
 }
-generic object-t dk:init(object-t,int32-t number=>{0});
+generic object-t dk::init(object-t,int32-t number:{0});
 
 klass ascii-number
 {
-//method object-t  init(object-t,int32-t number=>{0});
-  method object-t  va:init(object-t,va-list-t);
+//method object-t  init(object-t,int32-t number:{0});
+  method object-t  va::init(object-t,va-list-t);
   method str-t     ascii-string(object-t);
   method int-t     compare(object-t,object-t);
   method object-t  dealloc(object-t);
   method boole-t   equal?(object-t,object-t);
   method uintmax-t hash(object-t);
 }
-generic object-t dk:init(object-t,uint32-t capacity=>{0});
+generic object-t dk::init(object-t,uint32-t capacity:{0});
 
 klass cstring
 {
@@ -36,8 +36,8 @@ klass cstring
     uint32-t len;
     uint32-t capacity;
   }
-//method object-t init(object-t,uint32-t capacity=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,uint32-t capacity:{0});
+  method object-t va::init(object-t,va-list-t);
   method int-t    compare(object-t,object-t);
   method object-t concat(object-t,char8-t);
   method object-t dealloc(object-t);
@@ -73,25 +73,25 @@ klass float64
 {
   slots double;
 }
-generic object-t dk:init(object-t,equal-predicate-t equal?=>{0},hash-t hash=>{0});
+generic object-t dk::init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0});
 
 klass hashed-counted-set
 {
   superklass hashed-set;
   trait counted-set;
   
-//method object-t init(object-t,equal-predicate-t equal?=>{0},hash-t hash=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0});
+  method object-t va::init(object-t,va-list-t);
 }
-generic object-t dk:init(object-t,hash-t hash=>{0},equal-predicate-t equal?=>{0},object-t elements=>{0},object-t* items=>{0});
+generic object-t dk::init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t* items:{0});
 
 klass hashed-set
 {
   superklass collection;
   trait set;
   
-//method object-t init(object-t,hash-t hash=>{0},equal-predicate-t equal?=>{0},object-t elements=>{0},object-t* items=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t* items:{0});
+  method object-t va::init(object-t,va-list-t);
   method object-t add(object-t,object-t);
   method object-t at(object-t,object-t,object-t);
   method boole-t  contains?(object-t,object-t);
@@ -104,34 +104,34 @@ klass hashed-set
   method uint32-t size(object-t);
   method object-t write-slots(object-t,object-t);
 }
-generic object-t dk:init(object-t,equal-predicate-t equal?=>{0},hash-t hash=>{0},object-t elements=>{0},object-t* items=>{0});
+generic object-t dk::init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0},object-t elements:{0},object-t* items:{0});
 
 klass hashed-table
 {
   superklass hashed-set;
   trait table;
   
-//method object-t init(object-t,equal-predicate-t equal?=>{0},hash-t hash=>{0},object-t elements=>{0},object-t* items=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0},object-t elements:{0},object-t* items:{0});
+  method object-t va::init(object-t,va-list-t);
 }
-generic object-t dk:init(object-t,file-t file=>{0},str-t filename=>{0});
+generic object-t dk::init(object-t,file-t file:{0},str-t filename:{0});
 
 klass input-file
 {
-//method object-t init(object-t,file-t file=>{0},str-t filename=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,file-t file:{0},str-t filename:{0});
+  method object-t va::init(object-t,va-list-t);
   method object-t dealloc(object-t);
   method str-t    filename(object-t);
   method char8-t  get-char8(object-t);
   method object-t put-char8(object-t,char8-t);
   method object-t split(object-t,type-predicate-t);
 }
-generic object-t dk:init(object-t,file-t file=>{0},str-t filename=>{0});
+generic object-t dk::init(object-t,file-t file:{0},str-t filename:{0});
 
 klass lexer
 {
-//method object-t init(object-t,file-t file=>{0},str-t filename=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,file-t file:{0},str-t filename:{0});
+  method object-t va::init(object-t,va-list-t);
   method object-t dealloc(object-t);
   method str-t    filename(object-t);
   method object-t lex(object-t);
@@ -141,12 +141,12 @@ klass open-token
 {
   superklass token;
   
-  method object-t va:init(object-t,va-list-t);
+  method object-t va::init(object-t,va-list-t);
   method object-t close-token(object-t);
   method object-t set-close-token(object-t,object-t);
   method object-t write-slots(object-t,object-t);
 }
-generic object-t dk:init(object-t,object-t first=>{},object-t last=>{});
+generic object-t dk::init(object-t,object-t first:{},object-t last:{});
 
 klass pair
 {
@@ -155,19 +155,19 @@ klass pair
     object-t first;
     object-t last;
   }
-//method object-t init(object-t,object-t first=>{},object-t last=>{});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,object-t first:{},object-t last:{});
+  method object-t va::init(object-t,va-list-t);
   method object-t first(object-t);
   method object-t last(object-t);
 }
-generic object-t dk:init(object-t,file-t file=>{0});
+generic object-t dk::init(object-t,file-t file:{0});
 
 klass perl-object-output-stream
 {
   superklass text-output-stream;
   
-//method object-t init(object-t,file-t file=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,file-t file:{0});
+  method object-t va::init(object-t,va-list-t);
   method object-t write-element(object-t,int32-t,str-t);
   method object-t write-element(object-t,str-t,str-t);
   method object-t write-element(object-t,uint32-t,str-t);
@@ -176,12 +176,12 @@ klass perl-object-output-stream
   method object-t write-table-end(object-t);
   method object-t write-table-start(object-t,str-t);
 }
-generic object-t dk:init(object-t,file-t file=>{0},str-t filename=>{0});
+generic object-t dk::init(object-t,file-t file:{0},str-t filename:{0});
 
 klass perl-parser
 {
-//method object-t init(object-t,file-t file=>{0},str-t filename=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,file-t file:{0},str-t filename:{0});
+  method object-t va::init(object-t,va-list-t);
   method uint32-t read(object-t,void*,uint32-t,uint32-t);
   method object-t read-property-list(object-t);
 }
@@ -197,8 +197,8 @@ klass rect
 {
   slots
   {
-    point:slots-t     point;
-    dimension:slots-t dimension;
+    point::slots-t     point;
+    dimension::slots-t dimension;
   }
   method boole-t equal?(object-t,object-t);
 }
@@ -210,35 +210,35 @@ klass slot-info
     uint32-t size;
   }
 }
-generic object-t dk:init(object-t,object-t token=>{},str-t filename=>{},str-t message=>{0});
+generic object-t dk::init(object-t,object-t token:{},str-t filename:{},str-t message:{0});
 
 klass syntax-exception
 {
   superklass exception;
   
-//method object-t init(object-t,object-t token=>{},str-t filename=>{},str-t message=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,object-t token:{},str-t filename:{},str-t message:{0});
+  method object-t va::init(object-t,va-list-t);
   method object-t print(object-t,object-t);
   method object-t print-shallow(object-t,object-t);
 }
-generic object-t dk:init(object-t,file-t file=>{0});
+generic object-t dk::init(object-t,file-t file:{0});
 
 klass text-output-stream
 {
   superklass object-output-stream;
   
-//method object-t init(object-t,file-t file=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,file-t file:{0});
+  method object-t va::init(object-t,va-list-t);
   method object-t column-decr(object-t);
   method object-t column-incr(object-t);
   method object-t write(object-t,str-t,features-t);
 }
-generic object-t dk:init(object-t,uint32-t line=>{0},uint32-t column=>{0},tokenid-t tokenid=>{0},str-t buffer=>{0});
+generic object-t dk::init(object-t,uint32-t line:{0},uint32-t column:{0},tokenid-t tokenid:{0},str-t buffer:{0});
 
 klass token
 {
-//method object-t  init(object-t,uint32-t line=>{0},uint32-t column=>{0},tokenid-t tokenid=>{0},str-t buffer=>{0});
-  method object-t  va:init(object-t,va-list-t);
+//method object-t  init(object-t,uint32-t line:{0},uint32-t column:{0},tokenid-t tokenid:{0},str-t buffer:{0});
+  method object-t  va::init(object-t,va-list-t);
   method object-t  append(object-t,uint32-t);
   method str-t     buffer(object-t);
   method uint32-t  column(object-t);
@@ -271,14 +271,14 @@ klass type-predicate
 {
   slots boole-t(*)(int-t);
 }
-generic object-t dk:init(object-t,file-t file=>{0});
+generic object-t dk::init(object-t,file-t file:{0});
 
 klass xml-object-output-stream
 {
   superklass text-output-stream;
   
-//method object-t init(object-t,file-t file=>{0});
-  method object-t va:init(object-t,va-list-t);
+//method object-t init(object-t,file-t file:{0});
+  method object-t va::init(object-t,va-list-t);
   method object-t write-element(object-t,int32-t,str-t);
   method object-t write-element(object-t,str-t,str-t);
   method object-t write-element(object-t,uint32-t,str-t);
@@ -289,52 +289,52 @@ klass xml-object-output-stream
 }
 module dakota-util export
   ascii-number-klass,
-  ascii-number-klass:slots-t,
+  ascii-number-klass::slots-t,
   ascii-number,
-  ascii-number:slots-t,
+  ascii-number::slots-t,
   cstring,
-  cstring:slots-t,
+  cstring::slots-t,
   dimension,
-  dimension:slots-t,
+  dimension::slots-t,
   features,
-  features:slots-t,
+  features::slots-t,
   float32,
-  float32:slots-t,
+  float32::slots-t,
   float64,
-  float64:slots-t,
+  float64::slots-t,
   hashed-counted-set,
   hashed-set-forward-iterator,
-  hashed-set-forward-iterator:slots-t,
+  hashed-set-forward-iterator::slots-t,
   hashed-set,
-  hashed-set:slots-t,
+  hashed-set::slots-t,
   hashed-table,
   input-file,
-  input-file:slots-t,
+  input-file::slots-t,
   lexer,
-  lexer:slots-t,
+  lexer::slots-t,
   open-token,
-  open-token:slots-t,
+  open-token::slots-t,
   pair,
-  pair:slots-t,
+  pair::slots-t,
   perl-object-output-stream,
-  perl-object-output-stream:slots-t,
+  perl-object-output-stream::slots-t,
   perl-parser,
-  perl-parser:slots-t,
+  perl-parser::slots-t,
   point,
-  point:slots-t,
+  point::slots-t,
   rect,
-  rect:slots-t,
+  rect::slots-t,
   slot-info,
-  slot-info:slots-t,
+  slot-info::slots-t,
   syntax-exception,
-  syntax-exception:slots-t,
+  syntax-exception::slots-t,
   text-output-stream,
-  text-output-stream:slots-t,
+  text-output-stream::slots-t,
   token,
-  token:slots-t,
+  token::slots-t,
   tokenid,
-  tokenid:slots-t,
+  tokenid::slots-t,
   type-predicate,
-  type-predicate:slots-t,
+  type-predicate::slots-t,
   xml-object-output-stream,
-  xml-object-output-stream:slots-t;
+  xml-object-output-stream::slots-t;

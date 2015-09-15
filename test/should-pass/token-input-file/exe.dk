@@ -15,9 +15,9 @@ int-t main(int-t argc, const char8-t* const* argv)
   const char8-t* filename;
 
   while (NULL != (filename = *filenames++)) {
-    object-t f = make(input-file:klass, filename => filename);
-    object-t t = dk:split(f, space?);
-    dk:dump(t);
+    object-t f = make(input-file::klass, filename : filename);
+    object-t t = dk::split(f, space?);
+    dk::dump(t);
   }
   return 0;
 }

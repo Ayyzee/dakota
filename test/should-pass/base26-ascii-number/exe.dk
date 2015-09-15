@@ -10,10 +10,10 @@ int-t main()
 
   try
   {
-    object-t info = dk-make-named-info($base26-ascii-number-klass, $superklass-name, $ascii-number, NULL);
-    object-t base26-ascii-number-klass = make(ascii-number-klass:klass, info => info, digits => "abcdefghijklmnopqrstuvwxyz");
-    dk:dump(base26-ascii-number-klass);
-    object-t base26-ascii-number = make(base26-ascii-number-klass, number => 42);
+    object-t info = dk-make-named-info(#base26-ascii-number-klass, #superklass-name, #ascii-number, NULL);
+    object-t base26-ascii-number-klass = make(ascii-number-klass::klass, info : info, digits : "abcdefghijklmnopqrstuvwxyz");
+    dk::dump(base26-ascii-number-klass);
+    object-t base26-ascii-number = make(base26-ascii-number-klass, number : 42);
     USE(base26-ascii-number);
   }
   catch(...)

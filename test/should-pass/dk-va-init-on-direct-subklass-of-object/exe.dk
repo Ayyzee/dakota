@@ -2,9 +2,9 @@
 
 klass k1
 {
-  method object-t va:init(object-t self, va-list-t args)
+  method object-t va::init(object-t self, va-list-t args)
   {
-    self = dk:va:init(super, args);
+    self = dk::va:init(super, args);
     //
     return self;
   }
@@ -12,7 +12,7 @@ klass k1
 
 int-t main()
 {
-  object-t o = make(k1:klass);
+  object-t o = make(k1::klass);
   USE(o);
   return 0;
 }

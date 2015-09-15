@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#define DEFAULT-TABLE-KLASS sorted-table:klass
+#define DEFAULT-TABLE-KLASS sorted-table::klass
 
 klass int32; // hackhack
 klass sorted-table; // hackhack
@@ -10,13 +10,13 @@ int-t main()
 {
   int32-t a = 11, b = 13, c = 17, d = 19;
 
-  object-t o = ${ $a => b, $c => d };
+  object-t o = #{ #a : b, #c : d };
 
-  dk:dump(o);
+  dk::dump(o);
 
-  object-t perl-object-output-stream = make(perl-object-output-stream:klass);
-  dk:write-slots(o, perl-object-output-stream);
-  dk:close(perl-object-output-stream);
+  object-t perl-object-output-stream = make(perl-object-output-stream::klass);
+  dk::write-slots(o, perl-object-output-stream);
+  dk::close(perl-object-output-stream);
 
   USE(a);
   USE(c);

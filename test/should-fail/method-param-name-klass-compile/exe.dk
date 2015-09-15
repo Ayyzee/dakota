@@ -3,15 +3,15 @@
 klass k1
 {
   // bug: parameter named 'klass'
-  method object-t init(object-t self, object-t klass => null)
+  method object-t init(object-t self, object-t klass : null)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     return self;
   }
 }
 
 int-t main()
 {
-  object-t o = make(k1:klass);
+  object-t o = make(k1::klass);
   return 0;
 }

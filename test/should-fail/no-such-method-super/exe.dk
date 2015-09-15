@@ -6,14 +6,14 @@ klass k1
 {
   method object-t foo(object-t self)
   {
-    dk:foo(super);
+    dk::foo(super);
     return self;
   }
 }
 
 int-t main()
 {
-  object-t o = make(k1:klass);
-  dk:foo(o);
+  object-t o = make(k1::klass);
+  dk::foo(o);
   return 0;
 }

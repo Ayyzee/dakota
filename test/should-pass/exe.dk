@@ -10,7 +10,7 @@ klass object
 
 int-t main()
 {
-  object-t o = make(string:klass);
-  dk:foobar(o);
+  object-t o = make(string::klass);
+  dk::foobar(o);
   return 0;
 }

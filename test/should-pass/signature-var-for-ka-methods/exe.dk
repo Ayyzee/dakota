@@ -2,7 +2,7 @@
 
 klass k1
 {
-  method object-t m1(object-t self, uint32-t depth, uint32-t width => {}, uint32-t length => 5)
+  method object-t m1(object-t self, uint32-t depth, uint32-t width : {}, uint32-t length : 5)
   {
     printf("%s(%s)\n", __signature__->name, __signature__->parameter-types);
     return self;
@@ -11,7 +11,7 @@ klass k1
 
 int-t main()
 {
-  object-t o = make(k1:klass);
-  dk:m1(o, 0, width => 0, length => 3);
+  object-t o = make(k1::klass);
+  dk::m1(o, 0, width : 0, length : 3);
   return 0;
 }

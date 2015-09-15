@@ -1,37 +1,37 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass xxx:output-character-counter
+klass xxx::output-character-counter
 {
   interpose perl-object-output-stream;
 }
 
-klass yyy:output-line-counter
+klass yyy::output-line-counter
 {
   interpose perl-object-output-stream;
 }
 
-klass xxx:input-character-counter
+klass xxx::input-character-counter
 {
   interpose object-input-stream;
 }
 
-klass yyy:input-line-counter
+klass yyy::input-line-counter
 {
   interpose object-input-stream;
 }
 
-klass special:string
+klass special::string
 {
 }
 
-klass zzz:character-counter
+klass zzz::character-counter
 {
-  interpose special:string;
+  interpose special::string;
 }
 
-interpose object-input-stream, yyy:input-line-counter, xxx:input-character-counter;
+interpose object-input-stream, yyy::input-line-counter, xxx::input-character-counter;
 
-interpose perl-object-output-stream, yyy:output-line-counter, xxx:output-character-counter;
+interpose perl-object-output-stream, yyy::output-line-counter, xxx::output-character-counter;
 
 int-t main()
 {

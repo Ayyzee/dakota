@@ -2,9 +2,9 @@
 
 klass k1
 {
-  method object-t init(object-t self, char8-t** args => {})
+  method object-t init(object-t self, char8-t** args : {})
   {
-    self = dk:init(super);
+    self = dk::init(super);
     //
     return self;
   }

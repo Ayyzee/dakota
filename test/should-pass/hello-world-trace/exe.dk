@@ -7,7 +7,7 @@ int-t main()
 //   int-t overwrite;
 //   setenv("DK_TRACE", "", overwrite = 1);
 
-  object-t str = make(string:klass, bytes => "hello world!");
-  dk:println(str, std-output);
+  object-t str = make(string::klass, bytes : "hello world!");
+  dk::println(str, std-output);
   return 0;
 }

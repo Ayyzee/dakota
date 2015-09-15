@@ -35,11 +35,11 @@ klass k1
 
 int-t main()
 {
-  object-t o = make(k1:klass);
+  object-t o = make(k1::klass);
 
-  symbol-t s1 = dk:f1(o);
-  symbol-t s2 = dk:f2(o);
-  symbol-t s3 = dk:f3(o);
+  symbol-t s1 = dk::f1(o);
+  symbol-t s2 = dk::f2(o);
+  symbol-t s3 = dk::f3(o);
 
   char buf[16] = "";
   snprintf(buf, sizeof(buf) - 1, "%s %s %s", s1, s2, s3);

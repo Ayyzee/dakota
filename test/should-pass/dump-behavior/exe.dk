@@ -4,41 +4,41 @@ klass bit-vector;
 
 int-t main()
 {
-//   object-t ss-behavior = dk:behavior(sorted-set:klass);
-//   dk:dump(ss-behavior);
-//   dk:dump-behavior(sorted-set:klass);
-  dk:dump-methods(sorted-set:klass);
+//   object-t ss-behavior = dk::behavior(sorted-set::klass);
+//   dk::dump(ss-behavior);
+//   dk::dump-behavior(sorted-set::klass);
+  dk::dump-methods(sorted-set::klass);
 
-//   object-t ss-behavior-copy = dk:copy-shallow(ss-behavior);
-//   dk:op-not(ss-behavior-copy);
-//   dk:dump(ss-behavior-copy);
+//   object-t ss-behavior-copy = dk::copy-shallow(ss-behavior);
+//   dk::op-not(ss-behavior-copy);
+//   dk::dump(ss-behavior-copy);
 
-//   object-t hs-behavior = dk:behavior(hashed-set:klass);
-//   dk:dump(hs-behavior);
-//   dk:dump-behavior(hashed-set:klass);
-//   dk:dump-methods(hashed-set:klass);
+//   object-t hs-behavior = dk::behavior(hashed-set::klass);
+//   dk::dump(hs-behavior);
+//   dk::dump-behavior(hashed-set::klass);
+//   dk::dump-methods(hashed-set::klass);
 
-//   object-t hs-behavior-copy = dk:copy-shallow(hs-behavior);
-//   dk:op-not(hs-behavior-copy);
-//   dk:dump(hs-behavior-copy);
+//   object-t hs-behavior-copy = dk::copy-shallow(hs-behavior);
+//   dk::op-not(hs-behavior-copy);
+//   dk::dump(hs-behavior-copy);
 
-//   boole-t s-sh = dk:behavior?(sorted-set:klass, hashed-set:klass);
-//   fprintf(stdout, "%i = dk:behavior?(sorted-set:klass, hashed-set:klass)\n", s-sh);
+//   boole-t s-sh = dk::behavior?(sorted-set::klass, hashed-set::klass);
+//   fprintf(stdout, "%i = dk::behavior?(sorted-set::klass, hashed-set::klass)\n", s-sh);
 
-//   boole-t s-hs = dk:behavior?(hashed-set:klass, sorted-set:klass);
-//   fprintf(stdout, "%i = dk:behavior?(hashed-set:klass, sorted-set:klass)\n", s-hs);
+//   boole-t s-hs = dk::behavior?(hashed-set::klass, sorted-set::klass);
+//   fprintf(stdout, "%i = dk::behavior?(hashed-set::klass, sorted-set::klass)\n", s-hs);
 
-//   object-t st-behavior = dk:behavior(sorted-table:klass);
-//   dk:dump(st-behavior);
+//   object-t st-behavior = dk::behavior(sorted-table::klass);
+//   dk::dump(st-behavior);
 
-//   object-t ht-behavior = dk:behavior(hashed-table:klass);
-//   dk:dump(ht-behavior);
+//   object-t ht-behavior = dk::behavior(hashed-table::klass);
+//   dk::dump(ht-behavior);
 
-//   boole-t t-sh = dk:behavior?(sorted-table:klass, hashed-table:klass);
-//   fprintf(stdout, "%i = dk:behavior?(sorted-table:klass, hashed-table:klass)\n", t-sh);
+//   boole-t t-sh = dk::behavior?(sorted-table::klass, hashed-table::klass);
+//   fprintf(stdout, "%i = dk::behavior?(sorted-table::klass, hashed-table::klass)\n", t-sh);
 
-//   boole-t t-hs = dk:behavior?(hashed-table:klass, sorted-table:klass);
-//   fprintf(stdout, "%i = dk:behavior?(hashed-table:klass, sorted-table:klass)\n", t-hs);
+//   boole-t t-hs = dk::behavior?(hashed-table::klass, sorted-table::klass);
+//   fprintf(stdout, "%i = dk::behavior?(hashed-table::klass, sorted-table::klass)\n", t-hs);
 
   return 0;
 }

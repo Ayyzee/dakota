@@ -18,8 +18,8 @@ klass o1
 
   method object-t foo(object-t self)
   {
-    object-t kls = dk:klass(self);
-    dk:bar(kls);
+    object-t kls = dk::klass(self);
+    dk::bar(kls);
     return self;
   }
 }
@@ -32,7 +32,7 @@ klass o2
 
 int-t main()
 {
-  object-t i2 = make(o2:klass);
-  dk:foo(i2);
+  object-t i2 = make(o2::klass);
+  dk::foo(i2);
   return 0;
 }

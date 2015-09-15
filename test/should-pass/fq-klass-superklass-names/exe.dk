@@ -1,18 +1,18 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass xx:k1
+klass xx::k1
 {
   superklass klass;
 }
 
-klass yy:k2
+klass yy::k2
 {
 }
 
-klass zz:k3
+klass zz::k3
 {
-  klass xx:k1;
-  superklass yy:k2;
+  klass xx::k1;
+  superklass yy::k2;
 }
 
 int-t main()

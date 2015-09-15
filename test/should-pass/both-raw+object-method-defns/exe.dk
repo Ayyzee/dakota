@@ -11,7 +11,7 @@ klass k1
 
   method object-t init(object-t self)
   {
-    self = dk:init(super);
+    self = dk::init(super);
     init(unbox(self));
     return self;
   }

@@ -11,25 +11,25 @@ int-t main()
     object-t stack;
     object-t element;
 
-    stack = make(vector:klass);
-    dk:push(stack, null);
-    element = dk:pop(stack);
+    stack = make(vector::klass);
+    dk::push(stack, null);
+    element = dk::pop(stack);
 
-    stack = make(deque:klass);
-    dk:push(stack, null);
-    element = dk:pop(stack);
+    stack = make(deque::klass);
+    dk::push(stack, null);
+    element = dk::pop(stack);
     }
   }
-  catch(no-such-method-exception:klass e)
+  catch(no-such-method-exception::klass e)
   {
     USE(e);
-    fprintf(stderr, "ERROR: catch-ed instance-of(no-such-method-exception:klass)\n");
+    fprintf(stderr, "ERROR: catch-ed instance-of(no-such-method-exception::klass)\n");
     rtn = 1;
   }
-  catch(exception:klass e)
+  catch(exception::klass e)
   {
     USE(e);
-    fprintf(stderr, "ERROR: catch-ed instance-of(exception:klass)\n");
+    fprintf(stderr, "ERROR: catch-ed instance-of(exception::klass)\n");
     rtn = 1;
   }
   catch(const char8-t* msg)
