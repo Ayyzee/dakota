@@ -3,7 +3,7 @@
     'exe.dk',
   ],
   'libs' => [
-    'lib-1.$SO_EXT',
+    'lib-1.$so_ext',
   ],
   'name' => 'exe',
 }

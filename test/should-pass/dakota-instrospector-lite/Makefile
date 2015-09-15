@@ -7,7 +7,7 @@ $(target): $(prereq)
 	g++ -Wall -g3 --output $@ -ldl $^
 
 check:
-	./$(target) $(libdir)/libdakota.$(SO_EXT) $(libdir)/libdakota-util.$(SO_EXT)
+	./$(target) $(libdir)/libdakota.$(so_ext) $(libdir)/libdakota-util.$(so_ext)
 
 clean:
 	rm -f ./$(target) *~

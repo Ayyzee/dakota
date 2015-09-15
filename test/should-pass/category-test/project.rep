@@ -3,9 +3,9 @@
     'exe.dk',
   ],
   'libs' => [
-    '/usr/local/lib/libdakota-util.$SO_EXT',
-    'lib-1.$SO_EXT',
-    'lib-2.$SO_EXT',
+    '/usr/local/lib/libdakota-util.$so_ext',
+    'lib-1.$so_ext',
+    'lib-2.$so_ext',
   ],
   'name' => 'exe',
 }

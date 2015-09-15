@@ -94,7 +94,7 @@ sub exe_path_from_src_path {
 sub so_path_from_src_path {
   my ($src_path) = @_;
   my $so_path = $src_path;
-  $so_path =~ s/lib-(\d)-\d\.(dk|cc)$/lib-$1.\$(SO_EXT)/;
-  $so_path =~ s/lib-(\d)\.(dk|cc)$/lib-$1.\$(SO_EXT)/;
+  $so_path =~ s/lib-(\d)-\d\.(dk|cc)$/lib-$1.\$(so_ext)/;
+  $so_path =~ s/lib-(\d)\.(dk|cc)$/lib-$1.\$(so_ext)/;
   return $so_path;
 }

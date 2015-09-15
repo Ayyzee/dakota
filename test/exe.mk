@@ -16,5 +16,5 @@ check:
 	@if [ -e $@.sh ]; then ./$@.sh; else LD_LIBRARY_PATH=. ./$(target) || touch failed-check; fi
 
 clean:
-	rm -rf obj exe lib-1.$(so_ext) lib-2.$(so_ext) failed-{build,check}
+	rm -rf obj exe exe.$(cxx_debug_symbols_ext) lib-1.$(so_ext) lib-2.$(so_ext) failed-{build,check}
 	@if [ -e $@.sh ]; then ./$@.sh; fi
