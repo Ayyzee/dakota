@@ -11,17 +11,15 @@ include $(rootdir)/vars.mk
 %/exe: %/exe.cc
 	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
 
-.PHONY: all check clean
+.PHONY: all clean
 
-all_should_pass   := all-should-pass.mk
-check_should_pass := check-should-pass.mk
+all-should-pass := $(shell ./bin/generate-phony-targets-1.sh should-pass)
+all-should-fail := $(shell ./bin/generate-phony-targets-1.sh should-fail)
 
-$(shell ./bin/generate-phony-targets-1.sh all   should-pass > $(all_should_pass))
-$(shell ./bin/generate-phony-targets-2.sh check should-pass > $(check_should_pass))
-
-include $(all_should_pass)
-
-include $(check_should_pass)
+all: $(all-should-pass) $(all-should-fail)
 
 clean:
-	rm -rf $(all_should_pass) $(check_should_pass) should-{pass,fail}/*/{exe,obj,failed-{build,check},lib-{1,2,3}.$(so_ext)}
+	rm -f  should-{pass,fail}/*/{exe,lib-{1,2,3}.$(so_ext)}
+	rm -fr should-{pass,fail}/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
+	rm -f  should-{pass,fail}/*/failed-build
+	rm -fr should-{pass,fail}/*/$(objdir)

@@ -4,12 +4,10 @@ set -o nounset -o errexit -o pipefail
 
 source bin/common.sh
 
-dk_paths=$(paths-from-pattern "$2/*/exe.dk")
-cc_paths=$(paths-from-pattern "$2/*/exe.cc")
-
-echo "$1: \\"
+dk_paths=$(paths-from-pattern "$1/*/exe.dk")
+cc_paths=$(paths-from-pattern "$1/*/exe.cc")
 
 for exe_src_path in $dk_paths $cc_paths; do
     dir=$(dirname $exe_src_path)
-    echo " $dir/exe \\"
+    echo "$dir/exe"
 done

@@ -6,15 +6,15 @@ exe: exe.dk
 lib-%.$(so_ext): lib-%.dk module-lib-%.dk
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
-.PHONY: all check clean
+.PHONY: all clean
 
 all: $(target)
 
 $(target): $(prereq)
 
-check:
-	@if [ -e $@.sh ]; then ./$@.sh; else LD_LIBRARY_PATH=. ./$(target) || touch failed-check; fi
-
 clean:
-	rm -rf obj exe exe.$(cxx_debug_symbols_ext) lib-1.$(so_ext) lib-2.$(so_ext) failed-{build,check}
+	rm -f  {exe,lib-{1,2,3}.$(so_ext)}
+	rm -fr {exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
+	rm -f  failed-build
+	rm -fr $(objdir)
 	@if [ -e $@.sh ]; then ./$@.sh; fi
