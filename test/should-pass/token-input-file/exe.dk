@@ -1,7 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-include <ctype.h>;
-include <assert.h>;
+#include <ctype.h>
+#include <assert.h>
 
 noexport boole-t space?(int-t c)
 {
