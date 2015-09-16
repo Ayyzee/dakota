@@ -114,7 +114,7 @@ $main::list_body = qr{
                    }x;
 
 my $rewrite_compound_literal_names = {
-                                      'assoc' =>    undef,
+                                      'pair' =>     undef,
                                       'sequence' => undef,
                                       'super' =>    undef,
                                       'vector' =>   undef,
@@ -373,33 +373,34 @@ sub rewrite_table_literal_replacement {
   my ($body) = @_;
   my $result = '';
   $result .= "make(DEFAULT-TABLE-KLASS";
-  my $assocs = [split /,/, $body];
+  my $pairs = [split /,/, $body];
 
-  if (0 != @$assocs && '' ne $$assocs[0]) {
+  if (0 != @$pairs && '' ne $$pairs[0]) {
     $result .= ", items $colon (object-t[]){ ";
-    foreach my $assoc (@$assocs) {
-      my ($key, $element) = split /(?<!$colon)$colon(?!$colon)/, $assoc;
-      $key = &trim($key);
-      $element = &trim($element);
+    foreach my $pair (@$pairs) {
+      my ($first, $last) = split /(?<!$colon)$colon(?!$colon)/, $pair;
+      $first = &trim($first);
+      $last = &trim($last);
+      if ($first && $last) {
+      #print STDERR "first=$first, last=$last\n";
 
-      #print STDERR "key=$key, element=$element\n";
-
-      # key
-      if ($key =~ m/^\#/ || $key =~ m/^__symbol::/) {
-        $result .= "assoc::box({symbol::box($key), ";
-      } elsif ($key =~ m/^\"/) {
-        $result .= "assoc::box({str::box($key), ";
+      # first
+      if ($first =~ m/^\#/ || $first =~ m/^__symbol::/) {
+        $result .= "pair::box({symbol::box($first), ";
+      } elsif ($first =~ m/^\"/) {
+        $result .= "pair::box({str::box($first), ";
       } else {
-        $result .= "assoc::box({box($key), ";
+        $result .= "pair::box({box($first), ";
       }
 
-      # element
-      if ($element =~ m/^\#/ || $element =~ m/^__symbol::/) {
-        $result .= "symbol::box($element)}), ";
-      } elsif ($element =~ m/^\"/) {
-        $result .= "str::box($element)}), ";
+      # last
+      if ($last =~ m/^\#/ || $last =~ m/^__symbol::/) {
+        $result .= "symbol::box($last)}), ";
+      } elsif ($last =~ m/^\"/) {
+        $result .= "str::box($last)}), ";
       } else {
-        $result .= "box($element)}), ";
+        $result .= "box($last)}), ";
+      }
       }
     }
     $result .= "nullptr }";
@@ -415,14 +416,14 @@ sub rewrite_list_literal_replacement {
   my ($body, $type) = @_;
   my $result = '';
   $result .= "make(DEFAULT-$type-KLASS";
-  my $assocs = [split /,/, $body];
-  $assocs = [map {&trim($_)} @$assocs];
+  my $pairs = [split /,/, $body];
+  $pairs = [map {&trim($_)} @$pairs];
 
-  if (0 != @$assocs && '' ne $$assocs[0]) {
+  if (0 != @$pairs && '' ne $$pairs[0]) {
     $result .= ", items $colon (object-t[]){ ";
 
-    foreach my $assoc (@$assocs) {
-      $result .= "box($assoc), ";
+    foreach my $pair (@$pairs) {
+      $result .= "box($pair), ";
     }
     $result .= "nullptr }";
   }
@@ -463,6 +464,12 @@ sub rewrite_keywords {
 }
 sub rewrite_boxes {
   my ($filestr_ref) = @_;
+  # #[   as(size)   3,   as(uint32)   5 ]
+  # or
+  # #[ cast(size-t) 3, cast(uint32-t) 5 ]
+
+  #$$filestr_ref =~ s/(?<!::)box\(\s*as\s*\(($rid)\)\s*(.+?)\s*\)/$1::box($1::construct($2))/g;
+
   if ($use_compound_literals) {
     $$filestr_ref =~ s/($id)::box\((\s*\{.*?\}\s*)\)/$1::box(cast($1::slots-t)$2)/g;
   } else {

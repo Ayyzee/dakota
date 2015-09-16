@@ -291,10 +291,6 @@ sub rep_merge {
   my $root_ref = {};
   foreach my $file (@$argv) {
     my $parse_tree = &dakota::util::scalar_from_file($file);
-    #if ($$parse_tree{'should-generate-make'})
-    {
-      $$root_ref{'should-generate-make'} = 1;
-    }
     &_rep_merge($root_ref, $parse_tree);
   }
   return $root_ref;
@@ -502,6 +498,12 @@ sub add_system_include {
 sub add_type {
   my ($seq) = @_;
   &maybe_add_exported_header_for_symbol_seq($seq);
+}
+sub add_hash {
+  my ($file, $str) = @_;
+  my $ident = &path::string([$str]);
+  &add_symbol_ident($file, $ident);
+  $$file{'hashes'}{$ident} = undef;
 }
 sub add_keyword {
   my ($file, $keyword) = @_;
@@ -1994,8 +1996,8 @@ sub parse_root {
   }
   if (exists $$gbl_root{'generics'}) {
     delete $$gbl_root{'generics'}{'make'};
-    $$gbl_root{'should-generate-make'} = 1;
   }
+  $$gbl_root{'should-generate-make'} = 1; # always generate make()
   return $gbl_root;
 }
 sub add_object_methods_decls_to_klass {

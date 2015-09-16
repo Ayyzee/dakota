@@ -6,43 +6,43 @@
 # -*- cperl-tab-always-indent: t -*-
 
 {
-  'literal-assoc' => { # $( key => expr )
+  'literal-pair' => { # $( key : expr )
     'rules' => [ {
-      'pattern'  => [        '$(',                        ')' ],
-      'template' => [ 'make', '(', 'LITERAL-ASSOC-KLASS', ')' ]
+      'pattern'  => [        '#(',                       ')' ],
+      'template' => [ 'make', '(', 'LITERAL-PAIR-KLASS', ')' ]
     }, {
-      'pattern'  => [        '$(',                                           '?symbol', '=>',                               '?expr',      ')' ],
-      'template' => [ 'make', '(', 'LITERAL-ASSOC-KLASS', ',', '$key', '=>', '?symbol', ',',  '$element', '=>', 'box', '(', '?expr', ')', ')' ]
+      'pattern'  => [        '#(',                                         '?symbol', ':',                               '?expr',      ')' ],
+      'template' => [ 'make', '(', 'LITERAL-PAIR-KLASS', ',', '#key', ':', '?symbol', ',',  '#element', ':', 'box', '(', '?expr', ')', ')' ]
     } ],
   },
   'literal-sequence' => { # $[ expr, ... ]
     'rules' => [ {
-      'pattern'  => [ '$[',   ']'                                ],
+      'pattern'  => [ '#[',   ']'                                ],
       'template' => [ 'make', '(', 'LITERAL-SEQUENCE-KLASS', ')' ]
     } ],
   },
   'literal-set' => { # ${ expr, ... }
     'rules' => [ {
-      'pattern'  => [ '${',    ',', '}'                      ],
+      'pattern'  => [ '#{',    ',', '}'                      ],
       'template' => [ 'make', '(',  'LITERAL-SET-KLASS', ')' ]
     } ],
   },
-  'literal-table' => { # ${ ?symbol => ?expr , ... }
+  'literal-table' => { # ${ ?symbol : ?expr , ... }
     'rules' => [ {
-      'pattern'  => [ '${', '}'                               ],
+      'pattern'  => [ '#{', '}'                               ],
       'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ')' ]
     }, {
-      'pattern'  => [ '${', '=>', '}'                         ],
+      'pattern'  => [ '#{', ':', '}'                         ],
       'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ')' ]
     }, {
-      'pattern'  => [                                                                                                 '${',                    '?literal-table-assoc-in-list', '}'      ],
-      'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ',', '$items', '=>', 'cast', '(', 'object-t', '[', ']', ')', '{', 'NULL-ASSOC', ',', '?literal-table-assoc-in-list', '}', ')' ]
+      'pattern'  => [                                                                                                '#{',                   '?literal-table-pair-in-list', '}'      ],
+      'template' => [ 'make', '(', 'LITERAL-TABLE-KLASS', ',', '#items', ':', 'cast', '(', 'object-t', '[', ']', ')', '{', 'NULL-PAIR', ',', '?literal-table-pair-in-list', '}', ')' ]
     } ],
   },
-  'literal-table-assoc' => {
+  'literal-table-pair' => {
     'rules' => [ {
-      'pattern'  => [ 'NULL-ASSOC', ',',       '?literal-assoc-in'                         ],
-      'template' => [                    '$(', '?literal-assoc-in', ')', ',', 'NULL-ASSOC' ]
+      'pattern'  => [ 'NULL-PAIR', ',',       '?literal-pair-in'                        ],
+      'template' => [                   '#(', '?literal-pair-in', ')', ',', 'NULL-PAIR' ]
     } ],
   },
   'include-stmt' => {
@@ -77,17 +77,17 @@
   },
   'keyword-args-defn' => {
     'rules' => [ {
-      'pattern'  => [ '?type', '?/([a-zA-Z0-9-]+\??)/', '=>', '?list-member', ],
-      'template' => [ '?type', '?2',                                          ]
+      'pattern'  => [ '?type', '?/([a-zA-Z0-9-]+\??)/', ':', '?list-member', ],
+      'template' => [ '?type', '?2',                                         ]
     } ],
   },
   'keyword-args-use' => {
     'rules' => [ {
-      'pattern'  => [ 'NULL-KEYWORD', ',',                               '?/\$([a-zA-Z0-9-]+\??)/', '=>', '?list-member'                      ],
-      'template' => [                      '__keyword', '::', '_', '##', '?3',                      ',',  '?list-member', ',', 'NULL-KEYWORD' ]
+      'pattern'  => [ 'NULL-KEYWORD', ',',                               '?/\$([a-zA-Z0-9-]+\??)/', ':', '?list-member'                      ],
+      'template' => [                      '__keyword', '::', '_', '##', '?3',                      ',', '?list-member', ',', 'NULL-KEYWORD' ]
     }, {
-      'pattern'  => [                 ',',                               '?/\$([a-zA-Z0-9-]+\??)/', '=>', '?list-member'                      ], # leading comma is required
-      'template' => [                 ',', '__keyword', '::', '_', '##', '?2',                      ',',  '?list-member', ',', 'NULL-KEYWORD' ]  # leading comma is required
+      'pattern'  => [                 ',',                               '?/\$([a-zA-Z0-9-]+\??)/', ':', '?list-member'                      ], # leading comma is required
+      'template' => [                 ',', '__keyword', '::', '_', '##', '?2',                      ',', '?list-member', ',', 'NULL-KEYWORD' ]  # leading comma is required
     } ],
   },
   'symbol' => {
@@ -245,10 +245,10 @@
 
   # only in template: ?(my-fuction some-pattern-var) to do some textual transformation (also passes in macro or macro/sub-macro name and rule number)
 
-  # $()   assoc
-  # $[]   sequence
+  # $()   pair/list
+  # $[]   vector
   # ${}   set
-  # ${=>} table
+  # ${:} table
 
   # ?{ident}-t ?ident = box({ ... })
   # =>

@@ -2,7 +2,7 @@
 
 klass object;
 klass klass;
-klass ascii-number;
+klass ascii-number-klass;
 
 int-t main()
 {

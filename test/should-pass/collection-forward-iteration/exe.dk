@@ -4,6 +4,12 @@
 #include <assert.h>
 #include <string.h>
 
+klass deque;
+klass hashed-set;
+klass size;
+klass sorted-set;
+klass vector;
+
 enum collection-type-t
 {
   NONE    = 0,
@@ -12,7 +18,7 @@ enum collection-type-t
 //MUMBLE  = 1 << 2,
 }
 
-static void check-collection(object-t klass, collection-type-t collection-type, int-t count)
+static void check-collection(object-t klass, collection-type-t collection-type, size-t count)
 {
   assert(0xff >= count); // 2 hex digits wide max
   object-t collection = make(klass);
@@ -24,20 +30,20 @@ static void check-collection(object-t klass, collection-type-t collection-type, 
   int-t offset;
 
   offset = 0;
-  for (int32-t i = 0; i < count; i++) {
-    object-t e = int32::box(i);
-    offset += sprintf(lhs + offset, "/%x", *int32::unbox(e));
+  for (size-t i = 0; i < count; i++) {
+    object-t e = size::box(i);
+    offset += sprintf(lhs + offset, "/%zx", *size::unbox(e));
     if (ORDERED & collection-type)
       dk::add-last(collection, e);
     else
       dk::add(collection, e);
-//     uint32-t size = dk::size(collection);
+//     size-t size = dk::size(collection);
 //     printf("1 + %i == %i\n", i, size);
   }
 
   offset = 0;
   for (object-t e in collection)
-    offset += sprintf(rhs + offset, "/%x", *int32::unbox(e));
+    offset += sprintf(rhs + offset, "/%zx", *size::unbox(e));
 
   printf("\"%s\" == \"%s\"\n", lhs, rhs);
   
@@ -50,7 +56,7 @@ static void check-collection(object-t klass, collection-type-t collection-type, 
 
 static void check-collection(object-t klass, collection-type-t collection-type)
 {
-  for (int-t i = 1; i < 5; i++)
+  for (size-t i = 1; i < 5; i++)
     check-collection(klass, collection-type, i);
   return;
 }

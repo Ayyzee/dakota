@@ -21,7 +21,7 @@ klass vector;
 klass uint32;
 
 trait counted-set {
-  //provides dk::set;
+  //provides set;
   require collection;
 
   method object-t at(object-t self, object-t element, object-t default-result)

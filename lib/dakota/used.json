@@ -6,7 +6,16 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'used-klasses' => [
-    #{ 'pattern' => [ '?qual-scope', '::', 'klass'   ], },
+    #{ 'pattern' => [ '#(', '?ident', ':'   ], 'result' => [ 'pair'                 ] },
+
+    #{ 'pattern' => [ '#[',           ','   ], 'result' => [ 'vector'               ] },
+    #{ 'pattern' => [ '#[', '?ident', ','   ], 'result' => [ 'vector'               ] },
+
+    #{ 'pattern' => [ '#{',           ','   ], 'result' => [ 'hashed-set'           ] },
+    #{ 'pattern' => [ '#{',           ':'   ], 'result' => [ 'hashed-table', 'pair' ] },
+    #{ 'pattern' => [ '#{', '?ident', ','   ], 'result' => [ 'hashed-set'           ] },
+    #{ 'pattern' => [ '#{', '?ident', ':'   ], 'result' => [ 'hashed-table', 'pair' ] },
+
     #{ 'pattern' => [ '?qual-scope', '::', 'box',    ], },
     #{ 'pattern' => [ '?qual-scope', '::', 'unbox',  ], },
     #{ 'pattern' => [ '?qual-scope', '::', 'slots-t' ], },

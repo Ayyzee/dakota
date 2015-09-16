@@ -1,5 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass pair;
+
 int-t main()
 {
   object-t e1 = make(object::klass);
@@ -11,14 +13,14 @@ int-t main()
   pair-t* i1 = pair::unbox(o1);
 
   printf("%p:{%p, %p} == %p:{%p, %p}\n",
-         (void*)&v1, (void*)v1.key, (void*)v1.element,
-         (void*)&i1, (void*)i1->key, (void*)i1->element);
+         (void*)&v1, (void*)v1.first, (void*)v1.last,
+         (void*)&i1, (void*)i1->first, (void*)i1->last);
 
   object-t       o2 = pair::box({e1, e2});
   pair-t* i2 = pair::unbox(o2);
 
   printf("%p:{%p, %p}\n",
-         (void*)&i2, (void*)i2->key, (void*)i2->element);
+         (void*)&i2, (void*)i2->first, (void*)i2->last);
 
   return 0;
 }

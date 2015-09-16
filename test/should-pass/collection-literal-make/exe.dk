@@ -26,14 +26,15 @@ klass k1
   {
     self = dk::init(super);
     //
+    USE(attributes);
     return self;
   }
 }
 
 int-t main()
 {
-//object-t o = make(k1::klass, attributes : #{ });
-  object-t o = make(k1::klass, attributes : #{ });
+//object-t o = make(k1::klass, #attributes : #{ });
+  object-t o = make(k1::klass, #attributes : #{ });
   USE(o);
   return 0;
 }

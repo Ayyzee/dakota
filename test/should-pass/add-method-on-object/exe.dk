@@ -1,5 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass string;
+
 klass object
 {
   method object-t foobar(object-t self)

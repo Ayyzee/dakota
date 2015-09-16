@@ -2,17 +2,19 @@
 
 set   (sorted-set, hashed-set)
 table (sorted-table, hashed-table)
-seq
+vector
+list (deque)
+
 deque (array/list)
 binary tree
 heap tree
 
  {:} table (hashed-table)
  {,} set   (hashed-set)
- {}  empty set
+ {}  empty table (hashed-table)
  [:] vector of pair (also sorted-table)
  [,] vector (also sorted-set)
- []  empty vector
+ []  empty sorted-table
  (:) pair OR list of pair [ list of one pair #(#(a: b)) ]
  (,) list
  ()  empty list
@@ -22,6 +24,9 @@ heap tree
  |,|
  /:/
  /./
+
+object-t f = as(sorted-set) #{ a, b, c };
+object-t f = #<sorted-set>{ a, b, c };
 
 #<sorted-table>{ a: b, c: d}
 =>

@@ -14,12 +14,12 @@
     'next' => undef,
   },
   'nrt_extra_keywords' => {
+    'items' => undef,         # implied when using some literal constructs
     'keyword' => undef,       # kw-args processing funcs (throw)
     'object' => undef,        # kw-args processing funcs (throw)
     'signature' => undef,     # kw-args processing funcs (throw)
   },
   'rt_extra_keywords' => {
-    'items' => undef,
     'kls' => undef,
     'message' => undef,
     'superkls' => undef,

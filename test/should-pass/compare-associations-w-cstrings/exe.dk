@@ -2,6 +2,8 @@
 
 #include <assert.h>
 
+klass pair;
+
 int-t main()
 {
   object-t pair1 = make(pair::klass,

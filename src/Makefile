@@ -52,6 +52,8 @@ installdirs: # to support --jobs these must be done serially
 $(install-files): installdirs
 
 install: $(install-files)
+	if [[ "Darwin" == `uname` ]]; then cd /usr/local/lib/dakota; sudo rm -f compiler.json; sudo ln -s compiler-clang.json  compiler.json; fi
+	if [[ "Darwin" == `uname` ]]; then cd /usr/local/lib/dakota; sudo rm -f platform.json; sudo ln -s platform-darwin.json platform.json; fi
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all

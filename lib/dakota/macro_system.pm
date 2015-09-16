@@ -82,8 +82,8 @@ my $constraints = {
   'list-in' =>          \&list_in,
   'list-member' =>      \&list_member,
   'list-member-term' => \&list_member_term, # move to a language specific macro
-  'literal-assoc-in' => \&literal_assoc_in,
-  'literal-table-assoc-in-list' => \&literal_table_assoc_in_list,
+  'literal-pair-in' => \&literal_pair_in,
+  'literal-table-pair-in-list' => \&literal_table_pair_in_list,
   'symbol' =>           \&symbol,
   'type' =>             \&type,
   'type-ident' =>       \&type_ident,
@@ -129,23 +129,23 @@ sub list_member {
   }
   return -1;
 }
-sub literal_assoc_in { # ?symbol => ?expr
+sub literal_pair_in { # ?symbol : ?expr
   my ($sst, $index, $constraint, $user_data) = @_;
   my $num_tokens = scalar @{$$sst{'tokens'}};
   return -1 if $num_tokens < $index + 3;
   return -1 if -1 == &symbol($sst, $index, 'symbol', $user_data);
   my $op = &sst::at($sst, $index + 1);
-  return -1 if ! $$user_data{'literal-assoc'}{'op'}{$op};
+  return -1 if ! $$user_data{'literal-pair'}{'op'}{$op};
   return &expr($sst, $index + 2, 'expr', $user_data);
 }
-sub literal_table_assoc_in_list {
+sub literal_table_pair_in_list {
   my ($sst, $index, $constraint, $user_data) = @_;
   my $result = -1;
   my $sub_index = $index;
   my $num_tokens = scalar @{$$sst{'tokens'}};
 
   while ($num_tokens > $sub_index) {
-    $sub_index = &literal_assoc_in($sst, $sub_index, 'literal-assoc-in', $user_data);
+    $sub_index = &literal_pair_in($sst, $sub_index, 'literal-pair-in', $user_data);
     return $result if -1 == $sub_index;
     $result = $sub_index++;
     my $sep = &sst::at($sst, $sub_index);
