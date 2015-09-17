@@ -295,9 +295,9 @@ sub sst::add_token {
     }
     $$token{'begin-word'} = 1;
   } else {
-    if (';' eq &sst::prev_token_str($sst) || # dakota-lang-user-data.pl?
-        '{' eq &sst::prev_token_str($sst) || # dakota-lang-user-data.pl?
-        '}' eq &sst::prev_token_str($sst)) { # dakota-lang-user-data.pl?
+    if (';' eq &sst::prev_token_str($sst) || # lang-user-data.pl?
+        '{' eq &sst::prev_token_str($sst) || # lang-user-data.pl?
+        '}' eq &sst::prev_token_str($sst)) { # lang-user-data.pl?
       if ($str =~ m|$id|) {
         if ($sst_debug) {
           print STDERR "$str\n";
@@ -1004,7 +1004,7 @@ sub lang_user_data {
     my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
     $user_data = do $path or die "do $path failed: $!\n";
   } elsif ($gbl_prefix) {
-    my $path = "$gbl_prefix/src/dakota-lang-user-data.pl";
+    my $path = "$gbl_prefix/lib/dakota/lang-user-data.json";
     $user_data = do $path or die "do $path failed: $!\n";
   } else {
     die;

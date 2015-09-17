@@ -99,10 +99,11 @@
       'libs' => [ # install.libs
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang.json',
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-darwin.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-linux.json',
-        '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
         '$(DESTDIR)$(prefix)/lib/dakota/header-from-symbol.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/lang-user-data.json',
         '$(DESTDIR)$(prefix)/lib/dakota/used.json',
 
         '$(DESTDIR)$(prefix)/lib/dakota/macros.pl',
