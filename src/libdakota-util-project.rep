@@ -51,7 +51,7 @@
       '-rules' => [
         '$(DESTDIR)$(prefix)/lib/%', '$(blddir)/../lib/%',
       ],
-      'libs' => [ # install.libs
+      'files' => [ # install.files
         '$(DESTDIR)$(prefix)/lib/libdakota-util.$(so_ext)',
       ],
     }

@@ -96,7 +96,7 @@
         '$(DESTDIR)$(prefix)/%', '$(srcdir)/../%',
         '$(DESTDIR)$(prefix)/%', '$(blddir)/../%',
       ],
-      'libs' => [ # install.libs
+      'files' => [ # install.files
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang.json',
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc.json',
         '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
@@ -117,21 +117,19 @@
         '$(DESTDIR)$(prefix)/lib/dakota/util.pm',
 
         '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)',
-      ],
-      'includes' => [ # install.includes
+
         '$(DESTDIR)$(prefix)/include/dakota-decl.hh',
         '$(DESTDIR)$(prefix)/include/dakota-finally.hh',
         '$(DESTDIR)$(prefix)/include/dakota-log.hh',
         '$(DESTDIR)$(prefix)/include/dakota-os.hh',
         '$(DESTDIR)$(prefix)/include/dakota.hh',
-      ],
-      'bins' => [ # install.bins
+
         '$(DESTDIR)$(prefix)/bin/dakota',
         '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr.pl',
         '$(DESTDIR)$(prefix)/bin/dakota-project',
         '$(DESTDIR)$(prefix)/bin/dakota-json2mk',
       ],
-      'home' => [ # install.home
+      '-home' => [ # install.home
         '$(srcdir)/home/.dakota/.bashrc',
         '$(srcdir)/home/.dakota/.gdbinit',
         '$(srcdir)/home/.dakota/emacs/dakota-mode.el',
