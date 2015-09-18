@@ -302,16 +302,8 @@ sub tsv {
       }
     }
   }
-  if ($$data{'install'}) {
-    my $install = &lhs(['install'], $prefix);
-    $result .=  "\n";
-    $result .= $install . ' =';
-
-    for my $name (@{&install_bnames($data)}) {
-      my $var = &lhs(['install', $name], $prefix);
-      $result .= ' ' . "\$($var)";
-    }
-    $result .=  "\n";
+  if ($$data{'install'}{'files'}) {
+    my $install = &lhs(['install', 'files'], $prefix);
     $result .=  "\n";
     $result .= 'install-files' . ' += ' . "\$($install)" . "\n";
     my $bnames = &install_bnames($data);
