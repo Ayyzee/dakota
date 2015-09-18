@@ -19,15 +19,15 @@ int-t main()
 
 //object-t x1 = #[a, b];
   object-t x1 = #[a, b];
-//object-t x2 = make(DEFAULT-SEQUENCE-KLASS, items : (object-t[]){ box(a), box(b), nullptr });
+//object-t x2 = make(DEFAULT-SEQUENCE-KLASS, #items : cast(object-t[]){ box(a), box(b), nullptr });
 
 //object-t y1 = #{a, b};
   object-t y1 = #{a, b};
-//object-t y2 = make(DEFAULT-SET-KLASS, items : (object-t[]){ box(a), box(b), nullptr });
+//object-t y2 = make(DEFAULT-SET-KLASS, #items : cast(object-t[]){ box(a), box(b), nullptr });
 
 //object-t z1 = #{a : b, c : d};
   object-t z1 = #{a : b, c : d};
-//object-t z2 = make(DEFAULT-TABLE-KLASS, items : (object-t[]){ pair::box({box(a), box(b)}), pair::box({box(c), box(d)}), nullptr });
+//object-t z2 = make(DEFAULT-TABLE-KLASS, #items : cast(object-t[]){ pair::box({box(a), box(b)}), pair::box({box(c), box(d)}), nullptr });
 
 //x1 = #[];
   x1 = #[];

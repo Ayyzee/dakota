@@ -83,14 +83,14 @@ klass hashed-counted-set
 //method object-t init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0});
   method object-t va::init(object-t,va-list-t);
 }
-generic object-t dk::init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t* items:{0});
+generic object-t dk::init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t[] items:{0});
 
 klass hashed-set
 {
   superklass collection;
   trait set;
   
-//method object-t init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t* items:{0});
+//method object-t init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t[] items:{0});
   method object-t va::init(object-t,va-list-t);
   method object-t add(object-t,object-t);
   method object-t at(object-t,object-t,object-t);

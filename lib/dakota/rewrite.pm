@@ -376,7 +376,7 @@ sub rewrite_table_literal_replacement {
   my $pairs = [split /,/, $body];
 
   if (0 != @$pairs && '' ne $$pairs[0]) {
-    $result .= ", items $colon (object-t[]){ ";
+    $result .= ", #items $colon cast(object-t[]){ ";
     foreach my $pair (@$pairs) {
       my ($first, $last) = split /(?<!$colon)$colon(?!$colon)/, $pair;
       $first = &trim($first);
@@ -420,7 +420,7 @@ sub rewrite_list_literal_replacement {
   $pairs = [map {&trim($_)} @$pairs];
 
   if (0 != @$pairs && '' ne $$pairs[0]) {
-    $result .= ", items $colon (object-t[]){ ";
+    $result .= ", #items $colon cast(object-t[]){ ";
 
     foreach my $pair (@$pairs) {
       $result .= "box($pair), ";
