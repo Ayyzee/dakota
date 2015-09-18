@@ -12,7 +12,7 @@ libdakota.include-dirs :=      $(patsubst %,--include-directory %,$(libdakota.in
 libdakota-util.include-dirs := $(patsubst %,--include-directory %,$(libdakota-util.include-dirs))
 
 # macros
-#dakota-info_macros :=
+#dakota-info.macros :=
 libdakota.macros :=      $(patsubst %,--define-macro %,$(libdakota.macros))
 libdakota-util.macros := $(patsubst %,--define-macro %,$(libdakota-util.macros))
 
@@ -23,8 +23,8 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  all\
  check\
  clean\
+ goal-clean\
  install\
- installdirs\
  precompile\
  uninstall\
 
@@ -34,29 +34,29 @@ $(libdakota-util.output): $(libdakota.output)
 check: all
 	$(dakota-info.output) $(libdakota.output) $(libdakota-util.output)
 	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
-	./$@.sh
+	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
-clean:
+clean: goal-clean
 	$(RM) $(RMFLAGS) aaa.dk
-	$(RM) $(RMFLAGS) $(output-files)
 	$(RM) $(RMFLAGS) $(dakota-info.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
 	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
+	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
 	$(RM) $(RMFLAGS) $(output-files)
 
-installdirs: # to support --jobs these must be done serially
-	for dir in $(install-dirs); do sudo $(INSTALL_DIR) $$dir; done
-
-$(install-files): installdirs
-
 install: $(install-files)
-	if [[ "Darwin" == `uname` ]]; then cd /usr/local/lib/dakota; sudo rm -f compiler.json; sudo ln -s compiler-clang.json  compiler.json; fi
-	if [[ "Darwin" == `uname` ]]; then cd /usr/local/lib/dakota; sudo rm -f platform.json; sudo ln -s platform-darwin.json platform.json; fi
+	if [[ "Darwin" == `uname` ]]; then \
+	  cd $(DESTDIR)$(prefix)/lib/dakota; \
+	  sudo rm -f compiler.json; sudo ln -s compiler-clang.json  compiler.json; \
+	  sudo rm -f platform.json; sudo ln -s platform-darwin.json platform.json; \
+  fi
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install-files)
+	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/{compiler,platform}.json
+	#if [[ -d $(DESTDIR)$(prefix)/lib/dakota ]]; then sudo rmdir $(DESTDIR)$(prefix)/lib/dakota; fi
