@@ -46,7 +46,7 @@ clean: goal-clean
 goal-clean:
 	$(RM) $(RMFLAGS) $(output-files)
 
-install: $(install-files)
+install: all $(install-files)
 	if [[ "Darwin" == `uname` ]]; then \
 	  cd $(DESTDIR)$(prefix)/lib/dakota; \
 	  sudo rm -f compiler.json; sudo ln -s compiler-clang.json  compiler.json; \
