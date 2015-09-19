@@ -732,14 +732,12 @@ sub exec_cmd {
   if ($global_should_echo || $should_echo) {
     print STDERR "  $cmd_str\n";
   }
-  if ($ENV{'DKT_FIXUP_STDERR'}) {
     if ($ENV{'DKT_INITIAL_WORKDIR'}) {
       open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl $ENV{'DKT_INITIAL_WORKDIR'}") or die;
     }
     else {
       open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl") or die;
     }
-  }
 
   my $exit_val = system($cmd_str);
   if (0 != $exit_val >> 8) {

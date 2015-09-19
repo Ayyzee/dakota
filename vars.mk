@@ -69,7 +69,6 @@ CXX_NO_WARNINGS ?= 0
 CXX_DEBUG_FLAGS ?= --optimize=0 --debug=3 --define-macro DEBUG
 
 EXTRA_CXXFLAGS := $(CXX_DEBUG_FLAGS)
-export EXTRA_CXXFLAGS
 
 ifneq ($(CXX_NO_WARNINGS), 0)
 	CXX_WARNINGS_FLAGS += $(CXX_NO_WARNINGS_FLAGS)
@@ -80,12 +79,12 @@ ifdef DKT_PROFILE
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= $(srcdir)/../bin/dakota
+  DAKOTA ?= $(srcdir)/../bin/dakota --define-macro $(DK_HOST_OS)
   # --keep-going
 endif
 
-DAKOTAFLAGS :=
-EXTRA_DAKOTAFLAGS := $(DK_HOST_OS)
+DAKOTAFLAGS ?=
+EXTRA_DAKOTAFLAGS ?=
 
 # cast(some-type-t){...}
 ifdef DKT_ALLOW_COMPOUND_LITERALS

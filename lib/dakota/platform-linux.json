@@ -5,5 +5,5 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'DK_HOST_OS' => [ '--define-macro' => 'DK_LINUX' ],
+  'DK_HOST_OS' => 'DK_LINUX',
 }

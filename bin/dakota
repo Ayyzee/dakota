@@ -22,6 +22,7 @@
 
 use strict;
 use warnings;
+use Cwd;
 
 my $gbl_prefix;
 
@@ -97,7 +98,8 @@ if (!exists $ENV{'EXTRA_LDFLAGS'}) {
 } # default EXTRA_LDFLAGS
 
 my $root_cmd = { 'reps' => [],
-                 'opts' => { 'include-directory' => [],
+                 'opts' => { 'directory' => [],
+                             'include-directory' => [],
                              'define-macro' => [],
                              'var' => {} } };
 
@@ -124,6 +126,7 @@ my $root_cmd = { 'reps' => [],
            #'library=s',            # gcc-like (-l<> or --library=<> ???)
            #'linker-flags=s',       # similiar to env vars LDFLAGS & EXTRA_LDFLAGS
            #'linker=s',             # similiar to env var LD
+           #'pie'                   # ld-like
            #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
            #'touch'                 # make-like
            );
@@ -158,11 +161,17 @@ if ($$root_cmd{'opts'}{'define-macro'}) {
   }
   $ENV{'EXTRA_CXXFLAGS'} .= $flags;
 }
-if ($$root_cmd{'opts'}{'directory'} &&
-      $$root_cmd{'opts'}{'directory'} ne '.' &&
-      $$root_cmd{'opts'}{'directory'} ne './') {
-  chdir $$root_cmd{'opts'}{'directory'};
-  $ENV{'DKT_DIR'} = "$$root_cmd{'opts'}{'directory'}";
+if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
+  my $initial_workdir = &getcwd();
+  foreach my $dir (@{$$root_cmd{'opts'}{'directory'}}) {
+    if ($dir ne '.' &&
+        $dir ne './') {
+      chdir $dir;
+      my $current_workdir = &getcwd();
+      my $reldir = File::Spec->abs2rel($current_workdir, $initial_workdir);
+      $ENV{'DKT_DIR'} = $reldir;
+    }
+  }
 }
 if ($$root_cmd{'opts'}{'precompile'}) {
   $ENV{'DKT_PRECOMPILE'} = 1;

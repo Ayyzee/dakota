@@ -22,7 +22,7 @@ sub canon {
   return $path;
 }
 sub fixup {
-  my ($initial_workdir, $file, $line_num) = @_;
+  my ($initial_workdir, $file) = @_;
   if (! -e "$initial_workdir/$file") {
     $initial_workdir = File::Spec->canonpath($initial_workdir);
     my $current_workdir = &getcwd();
@@ -35,10 +35,10 @@ sub fixup {
         "RELDIR/FILE:     $reldir/$file\n";
     }
     if (-e "$initial_workdir/$reldir/$file") {
-      return &canon("$reldir/$file") . ":$line_num:";
+      return &canon("$reldir/$file");
     }
   }
-  return "$file" . ":$line_num:";
+  return $file;
 }
 sub start {
   my ($argv) = @_;
@@ -46,10 +46,10 @@ sub start {
 
   while (<STDIN>) {
     my $line = $_;
-    $line =~ s|^\s*[Ii]n file included from.+?:\d+:\s*$||;
+    $line =~ s|^\s*[Ii]n file included from .+?:\d+:\s*$||;
 
     if ($initial_workdir) {
-      $line =~ s|($path_re):(\d+):|&fixup($initial_workdir, $1, $2)|eg;
+      $line =~ s|($path_re)(:\d+:)|&fixup($initial_workdir, $1) . $2|eg;
     }
     print $line;
   }

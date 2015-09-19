@@ -301,10 +301,10 @@ sub var {
       $result = $compiler_rhs;
     }
   } elsif ($env_rhs) {
-    print STDERR "info: $lhs: using environment \"$env_rhs\"\n";
+    print STDERR "info: $lhs unset: using environment \"$env_rhs\"\n";
     $result = $env_rhs;
   } else {
-    print STDERR "info: $lhs: using default \"$default_rhs\"\n";
+    print STDERR "info: $lhs unset: using default \"$default_rhs\"\n";
     $result = $default_rhs;
   }
   die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace
