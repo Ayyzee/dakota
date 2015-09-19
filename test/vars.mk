@@ -8,4 +8,4 @@ target := $(shell $(rootdir)/bin/dakota-project --var so_ext=$(so_ext) name)
 prereq := $(shell $(rootdir)/bin/dakota-project --var so_ext=$(so_ext) srcs)
 prereq += $(shell $(rootdir)/bin/dakota-project --var so_ext=$(so_ext) libs)
 
-DAKOTA := DKT_FIXUP_STDERR=1 ../../../bin/dakota
+DAKOTA := DKT_FIXUP_STDERR=1 $(prefix)/bin/dakota

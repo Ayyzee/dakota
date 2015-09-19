@@ -1,4 +1,4 @@
-rootdir := ../../../..
+rootdir := ../../..
 include $(rootdir)/test/vars.mk
 
 all: $(target)

@@ -1,4 +1,4 @@
-SHELL := /bin/sh -u
+SHELL := /bin/bash -e -u
 
 rootdir := ..
 
@@ -6,10 +6,10 @@ include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
 %/exe: %/exe.dk
-	DKT_FIXUP_STDERR=1 DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
+	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
 
 %/exe: %/exe.cc
-	DKT_FIXUP_STDERR=1 DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
+	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
 
 .PHONY: all clean
 
