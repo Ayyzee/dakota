@@ -4,10 +4,10 @@ include $(rootdir)/test/vars.mk
 all: $(target)
 
 $(target): $(prereq) lib.$(so_ext)
-	dakota --include-directory=. --output $@ $^
+	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory=. --output $@ $^
 
 lib.$(so_ext): file-1.dk file-2.dk module-lib.dk
-	dakota --shared --include-directory=. --output $@ $^
+	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory=. --output $@ $^
 
 check:
 	./$(target)
