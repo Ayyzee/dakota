@@ -211,6 +211,8 @@ uint32-from-info(named-info-t* info, symbol-t key)
            (previous-element ==  element));
     if (0 == element && 0 != previous-element)
       element = previous-element;
+    else
+      previous-element = element;
   } while (nullptr != (current-info = current-info->next));
 
   return element;
