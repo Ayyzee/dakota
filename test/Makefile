@@ -20,6 +20,7 @@ all-should-fail :=      $(shell ./bin/generate-phony-targets-1.sh should-fail)
 all: $(all-should-pass-pass) $(all-should-pass-fail) $(all-should-fail)
 
 clean:
+	rm -fr obj
 	rm -f  should-pass/{pass,fail}/*/failed-{build,run}
 	rm -fr should-pass/{pass,fail}/*/obj
 	rm -f  should-pass/{pass,fail}/*/{exe,lib-{1,2,3}.$(so_ext)}
