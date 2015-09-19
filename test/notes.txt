@@ -1,0 +1,5 @@
+# BUILD/RUN
+#
+# should-pass/pass
+# should-pass/fail
+# should-fail

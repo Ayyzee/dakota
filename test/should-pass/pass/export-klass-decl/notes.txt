@@ -1,0 +1,2 @@
+This should fail because a k2 method uses k1 slots in its
+signature. k2 is exported, but k1 is not.
