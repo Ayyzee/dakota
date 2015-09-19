@@ -4,13 +4,16 @@ include $(rootdir)/test/vars.mk
 all: $(target)
 
 $(target): $(prereq)
-	dakota --include-directory=. --output $@ exe.dk
 	cp exe.dk exe.cc
-	g++ --include-directory=. --output $@ exe.cc
-	rm exe.cc
+	$(CXX) --include-directory=. --output $@ exe.cc
+	$(DAKOTA) --include-directory=. --output $@ exe.dk
 
-check:
+check: all
 	./$(target)
+
 clean:
-	rm -f ./$(target) exe.cc *~
-	rm -rf obj
+	rm -f  $(target) exe.cc
+	rm -fr $(target).$(cxx_debug_symbols_ext)
+	rm -f  failed-{build,run}
+	rm -fr $(objdir)
+	if [[ -e $@.sh ]]; then ./$@.sh; fi
