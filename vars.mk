@@ -16,7 +16,7 @@ libdir :=     $(prefix)/lib
 bindir :=     $(prefix)/bin
 
 MAKE := make
-MAKEFLAGS :=\
+MAKEFLAGS +=\
  --no-builtin-rules\
  --no-builtin-variables\
  --warn-undefined-variables\
