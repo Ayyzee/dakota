@@ -1,5 +1,7 @@
 include $(rootdir)/test/vars.mk
 
+DAKOTA := $(prefix)/bin/dakota
+
 exe: exe.dk
 	EXTRA_CXXFLAGS="$(EXTRA_CXXFLAGS)" $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 

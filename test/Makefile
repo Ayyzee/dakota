@@ -13,13 +13,17 @@ include $(rootdir)/vars.mk
 
 .PHONY: all clean
 
-all-should-pass := $(shell ./bin/generate-phony-targets-1.sh should-pass)
-all-should-fail := $(shell ./bin/generate-phony-targets-1.sh should-fail)
+all-should-pass-pass := $(shell ./bin/generate-phony-targets-1.sh should-pass/pass)
+all-should-pass-fail := $(shell ./bin/generate-phony-targets-1.sh should-pass/fail)
+all-should-fail :=      $(shell ./bin/generate-phony-targets-1.sh should-fail)
 
-all: $(all-should-pass) $(all-should-fail)
+all: $(all-should-pass-pass) $(all-should-pass-fail) $(all-should-fail)
 
 clean:
-	rm -f  should-{pass,fail}/*/{exe,lib-{1,2,3}.$(so_ext)}
-	rm -fr should-{pass,fail}/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
-	rm -f  should-{pass,fail}/*/failed-build
-	rm -fr should-{pass,fail}/*/$(objdir)
+	rm -f  should-pass/{pass,fail}/*/failed-{build,run}
+	rm -f  should-pass/{pass,fail}/*/obj
+	rm -f  should-pass/{pass,fail}/*/{exe,lib-{1,2,3}.$(so_ext)}
+	rm -f  should-pass/{pass,fail}/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
+	rm -f  should-fail/*/{exe,lib-{1,2,3}.$(so_ext)}
+	rm -f  should-fail/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
+	rm -fr should-fail/*/obj
