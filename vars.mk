@@ -1,4 +1,4 @@
-SHELL := /bin/sh -u
+SHELL := /bin/bash -e -u
 
 DESTDIR ?=
 
