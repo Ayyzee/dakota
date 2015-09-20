@@ -294,17 +294,19 @@ sub var {
 
   if ($compiler_rhs) {
     if ($env_rhs) {
-      print STDERR "info: $lhs: using environment over config file \"$env_rhs\" over \"$compiler_rhs\"\n";
+      print STDERR "info: $lhs: using environment over config file: $lhs=\"$env_rhs\" over $lhs=\"$compiler_rhs\"\n";
       $result = $env_rhs;
     } else {
       # using config file
       $result = $compiler_rhs;
     }
   } elsif ($env_rhs) {
-    print STDERR "info: $lhs unset: using environment \"$env_rhs\"\n";
+    #print STDERR "info: using environment ($lhs unset in config file): $lhs=\"$env_rhs\"\n";
     $result = $env_rhs;
   } else {
-    print STDERR "info: $lhs unset: using default \"$default_rhs\"\n";
+    if ($default_rhs) {
+      print STDERR "info: $lhs unset in both config file and environment: using default $lhs=\"$default_rhs\"\n";
+    }
     $result = $default_rhs;
   }
   die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace

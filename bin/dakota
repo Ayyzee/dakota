@@ -51,51 +51,10 @@ $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
 $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
-$Data::Dumper::Indent    = 1;   # default = 2
+$Data::Dumper::Indent    = 1; # default = 2
 
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
-
-my $sysname = lc(`uname -s`);
-chop $sysname;
-
-my $CXX;
-my $so_ext;
-
-if (defined $ENV{'CXX'}) {
-  $CXX = $ENV{'CXX'};
-} else {
-  $CXX = 'g++'; #  default
-}
-
-if (defined $ENV{'so_ext'}) {
-  $so_ext = $ENV{'so_ext'};
-} elsif ('darwin' eq $sysname) {
-  $so_ext = 'dylib'; # darwin default
-} else {
-  $so_ext = 'so'; # non-darwin default
-}
-
-#if (!exists $ENV{'so_ext'}) {
-  $ENV{'so_ext'} = $so_ext;
-#}
-
-#if (!exists $ENV{'CXX'}) {
-  $ENV{'CXX'} = $CXX;
-#} # default CXX
-
-if (!exists $ENV{'CXXFLAGS'}) {
-  $ENV{'CXXFLAGS'} = '';
-} # default CXXFLAGS
-if (!exists $ENV{'EXTRA_CXXFLAGS'}) {
-  $ENV{'EXTRA_CXXFLAGS'} = '';
-} # default EXTRA_CXXFLAGS
-if (!exists $ENV{'LDFLAGS'}) {
-  $ENV{'LDFLAGS'} = '';
-} # default LDFLAGS
-if (!exists $ENV{'EXTRA_LDFLAGS'}) {
-  $ENV{'EXTRA_LDFLAGS'} = '';
-} # default EXTRA_LDFLAGS
 
 my $root_cmd = { 'reps' => [],
                  'opts' => { 'directory' => [],
@@ -141,8 +100,20 @@ if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
   exit 1;
 }
 
+my $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
+  or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+{
+  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
+    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
+  my ($key, $values);
+  while (($key, $values) = each (%$platform)) {
+    $$gbl_compiler{$key} = $values;
+  }
+}
+
 if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
-  my $libdakota = "$gbl_prefix/lib/libdakota.$ENV{'so_ext'}";
+  my $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+  my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
   if ($$root_cmd{'opts'}{'output'} ne $libdakota) {
     &add_last($$root_cmd{'inputs'}, $libdakota);
   }
@@ -152,14 +123,14 @@ if ($$root_cmd{'opts'}{'include-directory'}) {
   foreach my $dir (@{$$root_cmd{'opts'}{'include-directory'}}) {
     $flags .= " --include-directory $dir";
   }
-  $ENV{'EXTRA_CXXFLAGS'} .= $flags;
+  $ENV{'DK_EXTRA_CXXFLAGS'} .= $flags;
 }
 if ($$root_cmd{'opts'}{'define-macro'}) {
   my $flags = '';
   foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}}) {
     $flags .= " --define-macro $mcr";
   }
-  $ENV{'EXTRA_CXXFLAGS'} .= $flags;
+  $ENV{'DK_EXTRA_CXXFLAGS'} .= $flags;
 }
 if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
   my $initial_workdir = &getcwd();

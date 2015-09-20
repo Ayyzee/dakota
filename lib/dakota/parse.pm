@@ -98,7 +98,7 @@ BEGIN {
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
   $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', undef);
-  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', undef);
+  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
 };
 use Carp;
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
