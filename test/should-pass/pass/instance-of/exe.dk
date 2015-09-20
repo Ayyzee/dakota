@@ -17,7 +17,7 @@ klass k3
   superklass k2;
 }
 
-#define DUMP(val, cmd) printf("%i == %i = " #cmd "\n", val, cmd)
+#define DUMP(val, cmd) printf("%i == %i = " # cmd "\n", val, cmd)
 
 int
 main()
