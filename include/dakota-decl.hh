@@ -23,6 +23,7 @@
 #define GENERIC
 #define ALIAS(m)
 #define INCLUDE(f)
+#define INTERPOSE(k)
 #define MODULE(n)
 #define MODULE_EXPORT(n, ...)
 #define MODULE_IMPORT(n1, n2, ...)

@@ -23,7 +23,7 @@ klass str {
 
   method int-t compare(object-t self, object-t other)
   {
-    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 
     if (dk::instance?(other, klass)) {

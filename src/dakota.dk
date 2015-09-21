@@ -539,7 +539,7 @@ dk-init-runtime()
     null = make(null-klass);
     klass::unbox(object::klass)->superklass = null;
 #endif
-    assert(klass::klass == dkt-klass(klass::klass));
+    assert(klass::klass == klass-of(klass::klass));
 
     // core runtime klasses are setup
     // klasses: object, klass, (optionally) singleton-klass

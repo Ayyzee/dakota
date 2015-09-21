@@ -45,7 +45,7 @@ klass object {
   //dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
-    dk::write-element-idref(out, dkt-klass(self), "klass");
+    dk::write-element-idref(out, klass-of(self), "klass");
 
     dk::write-slots-end(out);
     return self;
@@ -53,7 +53,7 @@ klass object {
 
   method int-t compare(object-t self, object-t other)
   {
-    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     intptr-t result = cast(uint8-t*)self - cast(uint8-t*)(other);
     result = dkt-normalize-compare-result(result);
     return cast(int-t)(result);
@@ -61,7 +61,7 @@ klass object {
 
   method boole-t equal?(object-t self, object-t other)
   {
-    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     boole-t state = false;
 
     if (0 == compare(self, other))
@@ -72,21 +72,21 @@ klass object {
   method boole-t instance?(object-t self, object-t kls)
   {
     boole-t state = false;
-    object-t tmp-kls = dkt-klass(self);
+    object-t tmp-kls = klass-of(self);
 
     while (null != tmp-kls) {
       if (tmp-kls == kls) {
         state = true;
         break;
       }
-      tmp-kls = dkt-superklass(tmp-kls);
+      tmp-kls = superklass-of(tmp-kls);
     }
     return state;
   }
 
   method object-t perform-method-for-selector(object-t self, selector-t selector)
   {
-    object-t kls = dkt-klass(self);
+    object-t kls = klass-of(self);
     method-t m = dk::method-for-selector(kls, selector);
     object-t value = m(self);
     return value;
@@ -107,7 +107,7 @@ klass object {
 
   method object-t dealloc(object-t self)
   {
-    dk::release(dkt-klass(self));
+    dk::release(klass-of(self));
     dkt::dealloc(self);
     return nullptr;
   }
@@ -133,12 +133,6 @@ klass object {
     return self;
   }
 
-//   method object-t klass(object-t self)
-//   {
-//     object-t kls = dkt-klass(self);
-//     return kls;
-//   }
-
   method uintptr-t hash(object-t self)
   {
     uintptr-t result = cast(uintptr-t)self;
@@ -150,15 +144,15 @@ klass object {
     symbol-t klass-name = #nullptr;
 
     // klass
-    if (nullptr != dkt-klass(self) && nullptr != dkt-name(dkt-klass(self)))
-      klass-name = dkt-name(dkt-klass(self));
-    if (nullptr != dkt-klass(self))
-      fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(void*)(self), cast(void*)(self), cast(void*)dkt-klass(self), klass-name);
+    if (nullptr != klass-of(self) && nullptr != name-of(klass-of(self)))
+      klass-name = name-of(klass-of(self));
+    if (nullptr != klass-of(self))
+      fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(void*)(self), cast(void*)(self), cast(void*)klass-of(self), klass-name);
     else
       fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), #nullptr);
 
-//     if (nullptr != dkt-klass(self) && self != dkt-klass(self))
-//       dk::dump(dkt-klass(self));
+//     if (nullptr != klass-of(self) && self != klass-of(self))
+//       dk::dump(klass-of(self));
 
     return self;
   }
@@ -196,12 +190,12 @@ dkt-unbox-check(object-t object, object-t kls)
                         __func__, cast(void*)(object), dk::name(kls));
   unless (object::instance?(object, kls))
   {
-    str-t object-kls-name = dkt-name(dkt-klass(object));
-    str-t kls-name = dkt-name(kls);
+    str-t object-kls-name = name-of(klass-of(object));
+    str-t kls-name = name-of(kls);
 
     if (object::instance?(object, klass::klass))
       dkt-log(dkt::k-log-error, "%s::unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
-             kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name, dkt-name(object));
+             kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name, name-of(object));
     else
       dkt-log(dkt::k-log-error, "%s::unbox(0x%0*" PRIxPTR " {klass='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name);

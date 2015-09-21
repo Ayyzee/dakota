@@ -44,7 +44,7 @@ klass node {
 //               "<tr><td port=\"prev\">prev</td></tr>"
 //               "<tr><td port=\"next\">next</td></tr>"
 //               "</table> > ];\n", cast(void*)(s), iterator-state);
-//       fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk::name(dkt-klass(s->element)));
+//       fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk::name(klass-of(s->element)));
 //       fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(void*)(s), iterator-state, cast(void*)(s->element), iterator-state);
 
       if (nullptr != s->prev)
@@ -67,7 +67,7 @@ klass node {
               "<tr><td port=\"prev\">prev</td></tr>"
               "<tr><td port=\"next\">next</td></tr>"
               "</table> > ];\n", cast(void*)(s), iterator-state);
-      fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk::name(dkt-klass(s->element)));
+      fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk::name(klass-of(s->element)));
       fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(void*)(s), iterator-state, cast(void*)(s->element), iterator-state);
 
       if (nullptr != s->next)

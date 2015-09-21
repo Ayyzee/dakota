@@ -39,7 +39,7 @@ klass ascii-number {
 
   method int-t compare(object-t self, object-t other)
   {
-    //printf("%s('%s', '%s')\n", __method__, dkt-name(dkt-klass(self)), dkt-name(dkt-klass(other)));
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
     if (dk::instance?(other, klass)) {
       slots-t* s1 = unbox(self);
@@ -125,7 +125,7 @@ klass ascii-number {
     self = dk::init(super);
     self.number = number;
     self.ascii-string = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (32 + 1));
-    object-t kls = dkt-klass(self);
+    object-t kls = klass-of(self);
     str-t digits = dk::digits(kls);
     uint32-t base = cast(uint32-t)safe-strlen(digits);
     convert(number, cast(int32-t)(base), digits, self.ascii-string);

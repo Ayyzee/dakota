@@ -208,7 +208,7 @@ klass exception {
     str-t message;
   }
 
-  method object-t init(object-t self, str-t message : dkt-name(dkt-klass(self)))
+  method object-t init(object-t self, str-t message : name-of(klass-of(self)))
   {
     self = dk::init(super);
     self.message = message;

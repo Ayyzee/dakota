@@ -61,8 +61,8 @@ dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, v
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
                          signature->name, signature->parameter-types + sizeof("object-t") - 1,
-                         cast(void*)(context.self), dkt-name(dkt-klass(context.self)),
-                         cast(void*)(context.klass), dkt-name(context.klass),
+                         cast(void*)(context.self), name-of(klass-of(context.self)),
+                         cast(void*)(context.klass), name-of(context.klass),
                          cast(void*)cast(uintptr-t)(m));
   trace-column-in();
   return result;
@@ -75,7 +75,7 @@ dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, v
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
                          signature->name, signature->parameter-types,
-                         cast(void*)(object), dkt-name(dkt-klass(object)),
+                         cast(void*)(object), name-of(klass-of(object)),
                          cast(void*)cast(uintptr-t)(m));
   trace-column-in();
   return result;
@@ -89,8 +89,8 @@ dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
                          signature->name, signature->parameter-types + sizeof("object-t") - 1,
-                         cast(void*)(context.self), dkt-name(dkt-klass(context.self)),
-                         cast(void*)(context.klass), dkt-name(context.klass),
+                         cast(void*)(context.self), name-of(klass-of(context.self)),
+                         cast(void*)(context.klass), name-of(context.klass),
                          cast(void*)cast(uintptr-t)(m));
   return result;
 }
@@ -103,7 +103,7 @@ dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
                          signature->name, signature->parameter-types,
-                         cast(void*)(object), dkt-name(dkt-klass(object)),
+                         cast(void*)(object), name-of(klass-of(object)),
                          cast(void*)cast(uintptr-t)(m));
   return result;
 }

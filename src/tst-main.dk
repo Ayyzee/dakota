@@ -27,17 +27,17 @@ int-t main()
   object-t o = make(hashed-table::klass);
   dk::dump(o);
   dk::println(o, std-output);
-  printf("klass=%s\n", dk::utf8-from(dkt-klass(o)));
-  printf("superklass=%s\n", dk::utf8-from(dk::superklass(dkt-klass(o))));
-  dk::dump(dk::superklass(dkt-klass(o)));
+  printf("klass=%s\n", dk::utf8-from(klass-of(o)));
+  printf("superklass=%s\n", dk::utf8-from(dk::superklass(klass-of(o))));
+  dk::dump(dk::superklass(klass-of(o)));
   #if defined DEBUG
   char8-t buf[1024] = "";
-  printf("klass-chain=%s\n", dkt-get-klass-chain(dkt-klass(o), buf, sizeof(buf)));
+  printf("klass-chain=%s\n", dkt-get-klass-chain(klass-of(o), buf, sizeof(buf)));
   #endif
 
   if (null) {
     #if defined DEBUG
-    printf("klass-chain=%s\n", dkt-get-klass-chain(dkt-klass(null), buf, sizeof(buf)));
+    printf("klass-chain=%s\n", dkt-get-klass-chain(klass-of(null), buf, sizeof(buf)));
     #endif
     object-t null-klass = null->klass;
     object-t second-null = make(null-klass);
@@ -45,9 +45,9 @@ int-t main()
     printf("---\n");
     dk::dump(second-null);
     printf("---\n");
-    dk::dump(dkt-klass(null));
+    dk::dump(klass-of(null));
     printf("---\n");
-    dk::dump(dkt-klass(second-null));
+    dk::dump(klass-of(second-null));
   }
   return 0;
 }

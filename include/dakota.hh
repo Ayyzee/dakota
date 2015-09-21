@@ -148,9 +148,9 @@ constexpr size_t dk_countof(T(&)[N]) {
   return N;
 }
 
-#define dkt_klass(object)   (object)->klass
-#define dkt_superklass(kls) klass::unbox(kls)->superklass
-#define dkt_name(kls)       klass::unbox(kls)->name
+#define klass_of(object)   (object)->klass
+#define superklass_of(kls) klass::unbox(kls)->superklass
+#define name_of(kls)       klass::unbox(kls)->name
 
 inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 

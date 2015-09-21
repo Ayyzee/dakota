@@ -97,7 +97,7 @@ klass object-output-stream {
       }
       dk::remove(self.object-from-id, id); // remove if present
       dk::write-sequence-start(self, dk::utf8-from(id));
-//       object-t object-klass = dkt-klass(object);
+//       object-t object-klass = klass-of(object);
 //       dk::write-element(self, dk::name(object-klass), "-klass");
 
 //       if (dk::instance?(object, klass::klass))

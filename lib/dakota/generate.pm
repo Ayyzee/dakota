@@ -1430,7 +1430,7 @@ sub generics::generate_generic_defn {
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
-    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon object, \#kls $colon dkt-klass(object), \#signature $colon signature));\n";
+    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon object, \#kls $colon klass-of(object), \#signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
@@ -1514,7 +1514,7 @@ sub generics::generate_super_generic_defn {
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
-    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon arg0.self, \#superkls $colon dkt-superklass(arg0.klass), \#signature $colon signature));\n";
+    $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon arg0.self, \#superkls $colon superklass-of(arg0.klass), \#signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 

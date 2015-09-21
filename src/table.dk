@@ -52,7 +52,7 @@ trait table {
 
   method object-t keys(object-t self)
   {
-    object-t set-kls = dk::superklass(dkt-klass(self));
+    object-t set-kls = dk::superklass(klass-of(self));
     object-t result = make(set-kls);
     for (pair-t* pair in self)
       dk::add(result, pair->first);
