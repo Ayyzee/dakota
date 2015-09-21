@@ -4,7 +4,7 @@ klass k1
 {
   method object-t m1(object-t self)
   {
-    void (*f1)(int[)] = NULL; // error
+    void (*f1)(int[)] = nullptr; // error
     return self;
   }
 }

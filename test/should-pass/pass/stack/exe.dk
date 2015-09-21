@@ -1,5 +1,10 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass deque;
+klass exception;
+klass no-such-method-exception;
+klass vector;
+
 int-t main()
 {
 //   fprintf(stderr, "main()\n");

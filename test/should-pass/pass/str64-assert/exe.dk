@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <string.h>
 
+klass str64;
+
 static str64-t s1 = "mother";
 static str64-t s2 = "father";
 static str64-t s3 = "sister";

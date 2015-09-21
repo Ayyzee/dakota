@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+klass hashed-set;
+
 typedef object-t (*add-t)(object-t, object-t);
 
 static object-t create(object-t klass, add-t add, uint32-t len)

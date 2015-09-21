@@ -3,8 +3,9 @@
 #define DEFAULT-TABLE-KLASS sorted-table::klass
 
 klass int32; // hackhack
-klass sorted-table; // hackhack
 klass pair; // hackhack
+klass perl-object-output-stream;
+klass sorted-table; // hackhack
 
 int-t main()
 {

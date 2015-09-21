@@ -4,7 +4,7 @@
   ],
   'libs' => [
     '/usr/local/lib/libdakota-util.$so_ext',
-    'lib.$so_ext',
+    'lib-1.$so_ext',
   ],
   'name' => 'exe',
 }

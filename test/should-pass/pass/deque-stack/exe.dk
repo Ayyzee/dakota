@@ -1,5 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass deque;
+trait stack;
+
 int-t main()
 {
   int-t value = 0;

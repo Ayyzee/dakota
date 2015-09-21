@@ -39,7 +39,7 @@ klass other-thing
     return count;
   }
 
-  method object-t count=(object-t self, int32-t count)
+  method object-t set-count(object-t self, int32-t count)
   {
     self.count = count;
     return self;
@@ -61,7 +61,7 @@ int-t main()
 
   object-t o = make(other-thing::klass);
 
-  dk::count=(o, 7);
+  dk::set-count(o, 7);
 
   USE(t2);
   return 0;

@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define DUMP(val, cmd) printf("%i == %i = " #cmd "\n", val, cmd)
+#define DUMP(val, cmd) printf("%i == %i = " # cmd "\n", val, cmd)
 
 int
 main()

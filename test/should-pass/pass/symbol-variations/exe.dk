@@ -6,7 +6,7 @@ int-t main()
   printf("%p\n", #"++");
   printf("%i\n", #'++');
 
-  printf("%s\n", #NULL);
+  printf("%s\n", #null);
 
   return 0;
 }

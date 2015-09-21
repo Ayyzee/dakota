@@ -1,6 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass pair;
+klass sorted-table;
+klass string;
 
 int-t main()
 {
@@ -10,18 +12,18 @@ int-t main()
   {
     object-t table = make(sorted-table::klass);
 
-    object-t string1-key = make(string::klass, bytes : "father");
-    object-t string1-element = make(string::klass, bytes : "FATHER");
+    object-t string1-key = make(string::klass, #bytes : "father");
+    object-t string1-element = make(string::klass, #bytes : "FATHER");
     dk::add(table, string1-key, string1-element);
 
-//     object-t string2-key = make(string::klass, bytes : "mother");
-//     object-t string2-element = make(string::klass, bytes : "MOTHER");
+//     object-t string2-key = make(string::klass, #bytes : "mother");
+//     object-t string2-element = make(string::klass, #bytes : "MOTHER");
 //     dk::add(table, string2-key, string2-element);
 
-    object-t element = dk::at(table, string1-key, NULL);
+    object-t element = dk::at(table, string1-key, nullptr);
     printf("%p == %p\n", (void*)string1-element, (void*)element);
 
-    object-t pair = dk::pair-at(table, string1-key, NULL);
+    object-t pair = dk::pair-at(table, string1-key, nullptr);
     printf("%p == %p\n", (void*)dk::element(pair), (void*)element);
   }
   catch(...)

@@ -1,5 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass perl-parser;
+klass xml-object-output-stream;
+
 klass k1
 {
   superklass object;

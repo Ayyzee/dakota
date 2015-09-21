@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <assert.h>
 
-klass uint32;
+klass sorted-table;
+klass hashed-table;
 klass pair;
+klass uint32;
 
 static object-t check(object-t klass)
 {
@@ -20,8 +22,8 @@ static object-t check(object-t klass)
 
   for (object-t e in collection) {
     pair-t* pair = pair::unbox(e);
-    uint32-t ei = *uint32::unbox(pair->key);
-    object-t element = dk::at(collection, e, NULL);
+    uint32-t ei = *uint32::unbox(pair->first);
+    object-t element = dk::at(collection, e, nullptr);
     uint32-t i2 = *uint32::unbox(element);
     printf("%i: %i == %i\n", i1, ei, i2);
     i1++;

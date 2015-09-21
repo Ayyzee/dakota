@@ -17,7 +17,7 @@ klass k3
   superklass k2;
 }
 
-#define DUMP(val, cmd) printf("%i == %i = " #cmd "\n", val, cmd)
+#define DUMP(val, cmd) printf("%i == %i = " # cmd "\n", val, cmd)
 
 int
 main()
@@ -26,17 +26,17 @@ main()
   object-t o2 = make(k2::klass);
   object-t o3 = make(k3::klass);
 
-  DUMP(0, dk::subklass?(dk::klass(o1), k1::klass));
-  DUMP(1, dk::subklass?(dk::klass(o2), k1::klass));
-  DUMP(1, dk::subklass?(dk::klass(o3), k1::klass));
+  DUMP(0, dk::subklass?(klass-of(o1), k1::klass));
+  DUMP(1, dk::subklass?(klass-of(o2), k1::klass));
+  DUMP(1, dk::subklass?(klass-of(o3), k1::klass));
 
-  DUMP(0, dk::subklass?(dk::klass(o1), k2::klass));
-  DUMP(0, dk::subklass?(dk::klass(o2), k2::klass));
-  DUMP(1, dk::subklass?(dk::klass(o3), k2::klass));
+  DUMP(0, dk::subklass?(klass-of(o1), k2::klass));
+  DUMP(0, dk::subklass?(klass-of(o2), k2::klass));
+  DUMP(1, dk::subklass?(klass-of(o3), k2::klass));
 
-  DUMP(0, dk::subklass?(dk::klass(o1), k3::klass));
-  DUMP(0, dk::subklass?(dk::klass(o2), k3::klass));
-  DUMP(0, dk::subklass?(dk::klass(o3), k3::klass));
+  DUMP(0, dk::subklass?(klass-of(o1), k3::klass));
+  DUMP(0, dk::subklass?(klass-of(o2), k3::klass));
+  DUMP(0, dk::subklass?(klass-of(o3), k3::klass));
 
   return 0;
 }

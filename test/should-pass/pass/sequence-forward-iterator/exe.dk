@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <assert.h>
 
+klass deque;
+klass vector;
+
 static void check-for(object-t collection)
 {
   printf("%i[", dk::size(collection));
@@ -64,4 +67,3 @@ int-t main()
 }
 
 // can remove add-last() as argument
-

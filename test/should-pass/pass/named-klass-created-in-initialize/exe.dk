@@ -19,9 +19,9 @@ klass k1
   object-t initialize(object-t kls)
   {
     USE(kls);
-    object-t k2-klass-info = dk-make-named-info(#k2, NULL);
+    object-t k2-klass-info = dk-make-named-info(#k2, nullptr);
     object-t k2-klass-klass = dk-klass-for-name(#klass);
-    object-t k2-klass = make(k2-klass-klass, info : k2-klass-info);
+    object-t k2-klass = make(k2-klass-klass, #info : k2-klass-info);
     USE(k2-klass);
     return kls;
   }

@@ -8,7 +8,7 @@ int-t main(int-t argc, char8-t* argv[])
   
   symbol-t sname = dk-intern(name);
   object-t kls = dk-klass-for-name(sname);
-  dk-dump-methods(kls);
+  dkt-dump-methods(kls);
 
   return 0;
 }

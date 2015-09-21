@@ -1,5 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass str64;
+
 static str64-t s1 = "mother";
 static str64-t s2 = "father";
 static str64-t s3 = "sister";

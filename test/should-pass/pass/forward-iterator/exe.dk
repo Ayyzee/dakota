@@ -3,6 +3,15 @@
 #include <stdio.h>
 #include <assert.h>
 
+klass deque;
+klass hashed-counted-set;
+klass hashed-set;
+klass pair;
+klass sorted-counted-set;
+klass sorted-set;
+klass uint32;
+klass vector;
+
 static void check-for(object-t collection)
 {
   uint32-t size = dk::size(collection);
@@ -14,7 +23,7 @@ static void check-for(object-t collection)
     object-t e = dk::element(iter);
     object-t key = e;
     if (dk::instance?(key, pair::klass))
-      key = pair::unbox(key)->key;
+      key = pair::unbox(key)->first;
     printf("%s%i", delim, *uint32::unbox(key));
     delim = ",";
   }
@@ -29,7 +38,7 @@ static void check-for-each(object-t collection)
   for (object-t e in collection) {
     object-t key = e;
     if (dk::instance?(key, pair::klass))
-      key = pair::unbox(key)->key;
+      key = pair::unbox(key)->first;
     printf("%s%i", delim, *uint32::unbox(key));
     delim = ",";
   }

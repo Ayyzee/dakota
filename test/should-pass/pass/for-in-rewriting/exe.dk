@@ -1,10 +1,13 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass sequence;
 klass pair;
+klass sequence;
+klass sorted-table;
+klass vector;
 
 int-t main()
 {
+  xxx
   object-t sequence = make(vector::klass);
   // ...
 
@@ -22,12 +25,12 @@ int-t main()
   // ...
 
   for (pair-t* pair in table)
-    printf("%p = %p\n", (void*)pair->key, (void*)pair->element);
+    printf("%p = %p\n", (void*)pair->first, (void*)pair->last);
 
   // should rewrite to
 
   for (object-t _iterator_ = dk::forward-iterator(table); pair-t* pair = pair::unbox(dk::next(_iterator_)); )
-    printf("%p = %p\n", (void*)pair->key, (void*)pair->element);
+    printf("%p = %p\n", (void*)pair->first, (void*)pair->last);
 
   return 0;
 }

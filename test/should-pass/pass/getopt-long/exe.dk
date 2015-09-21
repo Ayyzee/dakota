@@ -7,10 +7,10 @@ const int-t opt-base = 256;
 
 static struct option longopts[] =
 {
-  { "help",  no-argument, NULL, opt-base + 0 },
-  { "set-priority", required-argument, NULL, opt-base + 1 },
+  { "help",  no-argument, nullptr, opt-base + 0 },
+  { "set-priority", required-argument, nullptr, opt-base + 1 },
 
-  { NULL, 0, NULL, 0 }
+  { nullptr, 0, nullptr, 0 }
 };
 
 static
@@ -19,7 +19,7 @@ handle-opts(int-t argc, char8-t** argv, struct option* longopts)
 {
   int-t opt;
 
-  while (-1 != (opt = getopt-long(argc, argv, "", longopts, NULL))) {
+  while (-1 != (opt = getopt-long(argc, argv, "", longopts, nullptr))) {
     if (opt-base > opt)
     { // errors
       if (':' == opt || '?' == opt) {
@@ -50,7 +50,7 @@ main(int-t argc, char8-t** argv, char8-t** envp)
     printf("argv[%i] = \"%s\"\n", i, argv[i]);
   }
   char8-t* v;
-  while (NULL != (v = *envp++)) {
+  while (nullptr != (v = *envp++)) {
     printf("%s\n", v);
   }
   return 0;

@@ -23,7 +23,7 @@ klass k2
 
   method object-t va::init(object-t self, va-list-t args)
   {
-    self = dk::va:init(super, args);
+    self = dk::va::init(super, args);
     //
     return self;
   }
@@ -31,7 +31,7 @@ klass k2
 
 int-t main()
 {
-  object-t o = make(k2::klass, meaning-of-life : arg1, message : arg2);
+  object-t o = make(k2::klass, #meaning-of-life : arg1, #message : arg2);
   USE(o);
   return 0;
 }

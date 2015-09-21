@@ -2,26 +2,24 @@
 
 module test-1;
 
-  klass path
+klass path {
+  //klass string; bugbug - causes two __dk__string tokens in generated cc file
+
+  superklass string;
+  //klass klass;
+
+  static const char8-t* default-delimiter = "/"; // NOT IN REFLECTION DATA!!
+
+  slots {
+    const char8-t* delimiter;
+    //object-t rdn;
+  }
+
+  method object-t init(object-t self, const char8-t* bytes : nullptr, const char8-t* delimiter : default-delimiter)
   {
-    //klass string; bugbug - causes two __dk__string tokens in generated cc file
-
-    superklass string;
-    //klass klass;
-
-    static const char8-t* default-delimiter = "/"; // NOT IN REFLECTION DATA!!
-
-    slots
-    {
-      const char8-t* delimiter;
-      //object-t rdn;
-    }
-
-    method object-t init(object-t self, const char8-t* bytes : NULL, const char8-t* delimiter : default-delimiter)
-    {
-      self = dk::init(super, bytes : bytes);
-      self.delimiter = delimiter;
-      //self.rdn = make(string::klass, bytes : "Robert D. Nielsen");
-      return self;
-    }
-  } //
+    self = dk::init(super, #bytes : bytes);
+    self.delimiter = delimiter;
+    //self.rdn = make(string::klass, #bytes : "Robert D. Nielsen");
+    return self;
+  }
+}

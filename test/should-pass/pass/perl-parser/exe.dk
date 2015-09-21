@@ -1,5 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass perl-object-output-stream;
+klass perl-parser;
+
 int-t main()
 {
   object-t parser = make(perl-parser::klass);

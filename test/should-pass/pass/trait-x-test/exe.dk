@@ -6,7 +6,7 @@ trait t1
 {
   method object-t f1(object-t self)
 	{
-    symbol-t klass-name = dk::name(dk::klass(self));
+    symbol-t klass-name = name-of(klass-of(self));
     dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
@@ -16,7 +16,7 @@ trait t1
 {
   method object-t f2(object-t self)
 	{
-    symbol-t klass-name = dk::name(dk::klass(self));
+    symbol-t klass-name = name-of(klass-of(self));
     dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
@@ -31,7 +31,7 @@ trait t2
 {
   method object-t f2(object-t self)
 	{
-    symbol-t klass-name = dk::name(dk::klass(self));
+    symbol-t klass-name = name-of(klass-of(self));
     dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
@@ -41,13 +41,13 @@ trait t3
 {
   method object-t f2(object-t self)
 	{
-    symbol-t klass-name = dk::name(dk::klass(self));
+    symbol-t klass-name = name-of(klass-of(self));
     dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
   method object-t f3(object-t self)
 	{
-    symbol-t klass-name = dk::name(dk::klass(self));
+    symbol-t klass-name = name-of(klass-of(self));
     dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }

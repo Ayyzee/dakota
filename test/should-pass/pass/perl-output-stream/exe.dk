@@ -1,6 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass features; // hackhack
+klass perl-object-output-stream;
 
 klass k1
 {

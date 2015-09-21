@@ -1,8 +1,10 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass string;
+
 int-t main()
 {
-  object-t s = make(string::klass, bytes : "hello world!");
+  object-t s = make(string::klass, #bytes : "hello world!");
   dk::println(s, std-output);
   return 0;
 }

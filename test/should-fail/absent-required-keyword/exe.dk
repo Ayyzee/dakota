@@ -1,8 +1,10 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass klass;
+
 klass k1
 {
-  method object-t init(object-t self, void* #arg1, void** arg2 : NULL)
+  method object-t init(object-t self, void* #arg1, void** arg2 : nullptr)
   {
     self = dk::init(super);
     return self;

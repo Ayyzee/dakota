@@ -4,10 +4,12 @@
 #include <assert.h>
 
 klass uint32;
+klass sorted-set;
+klass hashed-set;
 
 static object-t check(object-t kls)
 {
-  symbol-t name = dk::name(kls);
+  symbol-t name = name-of(kls);
   printf("%s\n", name);
   object-t i1 = uint32::box(cast(uint32-t)0);
   object-t collection = make(kls);
@@ -22,7 +24,7 @@ static object-t check(object-t kls)
 
 static object-t check-throw(object-t kls)
 {
-  symbol-t name = dk::name(kls);
+  symbol-t name = name-of(kls);
   printf("%s\n", name);
   object-t i1 = uint32::box(cast(uint32-t)0);
   object-t collection = make(kls);

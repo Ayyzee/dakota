@@ -14,9 +14,9 @@ int-t main()
     printf("---\n");
     dk::dump(null);
   } else {
-    fprintf(stderr, "NULL\n");
+    fprintf(stderr, "nullptr\n");
     printf("---\n");
-    fprintf(stderr, "NULL\n");
+    fprintf(stderr, "nullptr\n");
   }
   return 0;
 }

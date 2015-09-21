@@ -7,7 +7,7 @@ klass k1
   object-t initialize(object-t kls)
   {
     printf("%p\n", (void*)k2::klass);
-    assert(NULL != k2::klass);
+    assert(nullptr != k2::klass);
     return kls;
   }
 }
@@ -17,7 +17,7 @@ klass k2
   object-t initialize(object-t kls)
   {
     printf("%p\n", (void*)k1::klass);
-    assert(NULL != k1::klass);
+    assert(nullptr != k1::klass);
     return kls;
   }
 }

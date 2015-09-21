@@ -31,7 +31,7 @@ int-t main()
     { #exported?,       (uintptr-t)1   },
     { #superklass-name, (uintptr-t)#k1 },
   };
-  named-info-t k2-info = { k2-info-props, DK-COUNTOF(k2-info-props), NULL };
+  named-info-t k2-info = { k2-info-props, DK-COUNTOF(k2-info-props), nullptr };
 
   int-t overwrite;
   setenv("DK_DUMP_CTLG", "", overwrite = 1);

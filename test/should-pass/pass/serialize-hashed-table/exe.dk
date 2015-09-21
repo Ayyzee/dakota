@@ -1,6 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass features; // hackhack
+klass hashed-table;
+klass perl-object-output-stream;
 
 int-t main()
 {

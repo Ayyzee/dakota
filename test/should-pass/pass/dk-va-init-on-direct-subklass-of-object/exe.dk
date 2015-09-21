@@ -4,7 +4,7 @@ klass k1
 {
   method object-t va::init(object-t self, va-list-t args)
   {
-    self = dk::va:init(super, args);
+    self = dk::va::init(super, args);
     //
     return self;
   }

@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include <assert.h>
 
+klass input-file;
+
 noexport boole-t space?(int-t c)
 {
   return isspace(c);
@@ -11,11 +13,11 @@ noexport boole-t space?(int-t c)
 int-t main(int-t argc, const char8-t* const* argv)
 {
   const char8-t* const* filenames = &argv[1];
-  assert(NULL != *filenames);
+  assert(nullptr != *filenames);
   const char8-t* filename;
 
-  while (NULL != (filename = *filenames++)) {
-    object-t f = make(input-file::klass, filename : filename);
+  while (nullptr != (filename = *filenames++)) {
+    object-t f = make(input-file::klass, #filename : filename);
     object-t t = dk::split(f, space?);
     dk::dump(t);
   }

@@ -2,7 +2,9 @@
 
 #include <assert.h>
 
-void check(object-t klass)
+klass deque;
+
+static void check(object-t klass)
 {
 //   object-t seq = make(klass);
 //   for (uint32-t i = 0; i < 4; i++)

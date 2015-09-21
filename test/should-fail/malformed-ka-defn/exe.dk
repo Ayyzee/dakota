@@ -2,7 +2,7 @@
 
 klass k1
 {
-  method object-t init(object-t self, object-t #token, const char8-t* filename)
+  method object-t init(object-t self, object-t token : nullptr, const char8-t* filename : nullptr)
   {
     self = dk::init(super);
     return self;
@@ -11,7 +11,7 @@ klass k1
 
 int-t main()
 {
-  object-t o = make(k1::klass, token : null, filename : NULL);
+  object-t o = make(k1::klass, #token : null, #filename : nullptr);
   USE(o);
   return 0;
 }

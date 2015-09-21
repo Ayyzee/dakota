@@ -4,8 +4,8 @@ module test-1;
 
 klass test
 {
-#define arg5-default NULL
-#define arg6-default NULL
+#define arg5-default nullptr
+#define arg6-default nullptr
   method object-t init(object-t self, void* arg1, void** arg2, void*** arg3 : {}, void**** arg4 : {}, void***** arg5 : arg5-default, void****** arg6 : arg6-default)
   { return null; }
 

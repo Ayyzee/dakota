@@ -1,12 +1,14 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass features; // hackhack
+klass pair;
+klass perl-object-output-stream;
 
 int-t main()
 {
   object-t pair = make(pair::klass,
-                        key :     #"key0",
-                        element : #"element0");
+                       #first : #"key0",
+                       #last :  #"element0");
 
   object-t perl-object-output-stream = make(perl-object-output-stream::klass);
   dk::write(perl-object-output-stream, pair);

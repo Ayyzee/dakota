@@ -18,7 +18,7 @@ klass o1
 
   method object-t foo(object-t self)
   {
-    object-t kls = dk::klass(self);
+    object-t kls = klass-of(self);
     dk::bar(kls);
     return self;
   }

@@ -2,8 +2,9 @@
 
 #include <assert.h>
 
-klass point;
 klass dimension;
+klass point;
+klass rect;
 
 int-t main()
 {

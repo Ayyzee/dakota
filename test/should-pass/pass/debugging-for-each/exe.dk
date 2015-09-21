@@ -12,9 +12,9 @@ static void* next-element(int* i)
 {
   (*i)++;
   if (4 > *i)
-    return (void*)*i;
+    return cast(void*)*i;
   else
-    return NULL;
+    return nullptr;
 }
 
 int-t main()
