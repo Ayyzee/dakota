@@ -6,9 +6,9 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'DK_CXX' => [ 'clang++' ],
-  'DK_CXXFLAGS' => [ '-std=c++11' ],
-  'DK_CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm', '-fvisibility=hidden' ],
-  'DK_CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC', '-fvisibility=hidden' ], # clang does not understand --PIC or --visibility
+  'DK_CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden' ], # clang does not understand --visibility
+  'DK_CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
+  'DK_CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ], # clang does not understand --PIC
   'DK_CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
   'DK_CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
   'DK_CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
@@ -17,7 +17,6 @@
       '-Weverything',
       '-Wno-c++98-compat',
       '-Wno-c++98-compat-pedantic',
-      '-Wno-c99-compat', # c++11 unicode character encoding in identifiers using \u4 or \U8: i.e. \uxxxx and \Uxxxxxxxx
       '-Wno-c99-extensions', # c99 designated initializers, c99 compound literals
       '-Wno-cast-align',
       '-Wno-disabled-macro-expansion',

@@ -6,9 +6,9 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'DK_CXX' => [ 'g++' ],
-  'DK_CXXFLAGS' => [ '-std=c++11' ],
-  'DK_CXX_COMPILE_FLAGS' =>     [ '--compile', '--visibility=hidden' ],
-  'DK_CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC', '--visibility=hidden' ],
+  'DK_CXXFLAGS' => [ '-std=c++11', '--visibility=hidden' ],
+  'DK_CXX_COMPILE_FLAGS' =>     [ '--compile' ],
+  'DK_CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC' ],
   'DK_CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
   'DK_CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
   'DK_CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
