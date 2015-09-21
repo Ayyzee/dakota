@@ -43,8 +43,8 @@ BEGIN {
   unshift @INC, "$gbl_prefix/lib";
   use dakota::util;
 };
-use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#use Carp;
+#$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;

@@ -45,8 +45,8 @@ BEGIN {
 use dakota::util;
 use dakota::sst;
 
-use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#use Carp;
+#$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;

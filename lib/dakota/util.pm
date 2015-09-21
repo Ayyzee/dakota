@@ -30,8 +30,8 @@ my $kw_args_generics_tbl;
 BEGIN {
   $kw_args_generics_tbl = { 'init' => undef };
 };
-use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#use Carp;
+#$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
