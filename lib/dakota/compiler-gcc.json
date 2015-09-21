@@ -5,15 +5,16 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'DK_CXX' => [ 'g++' ],
-  'DK_CXXFLAGS' => [ '-std=c++11', '--visibility=hidden' ],
-  'DK_CXX_COMPILE_FLAGS' =>     [ '--compile' ],
-  'DK_CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC' ],
-  'DK_CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
-  'DK_CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
-  'DK_CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
-  'DK_CXX_SHARED_FLAGS' =>      [ '--shared'  ],
-  'DK_CXX_WARNINGS_FLAGS' =>    [
+  'CXX' => [ 'g++' ],
+  'CXXFLAGS' => [ '-std=c++11', '--visibility=hidden' ],
+  'CXX_COMPILE_FLAGS' =>     [ '--compile' ],
+  'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC' ],
+  'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
+  'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
+  'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
+  'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
+  'CXX_SHARED_FLAGS' =>      [ '--shared'  ],
+  'EXTRA_CXXFLAGS' =>        [
       '--all-warnings',
       '--no-common',
       '--trapv',
@@ -33,7 +34,7 @@
       '--warn-undef',
       '--warn-unused',
       ],
-  'DK_LD_SONAME_FLAGS' => [ '-soname' ],
+  'LD_SONAME_FLAGS' => [ '-soname' ],
   'hh_ext' => 'hh',
   'cc_ext' => 'cc',
   'dkhh_ext' => 'dkhh',

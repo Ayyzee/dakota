@@ -286,27 +286,22 @@ my $build_vars = {
 };
 sub objdir { return $$build_vars{'objdir'}; }
 
+# 1. cmd line
+# 2. environment
+# 3. config file
+# 4. compile-time default
+
 sub var {
   my ($compiler, $lhs, $default_rhs) = @_;
   my $result;
-  my $compiler_rhs = $$compiler{$lhs};
   my $env_rhs = $ENV{$lhs};
+  my $compiler_rhs = $$compiler{$lhs};
 
-  if ($compiler_rhs) {
-    if ($env_rhs) {
-      print STDERR "info: $lhs: using environment over config file: $lhs=\"$env_rhs\" over $lhs=\"$compiler_rhs\"\n";
-      $result = $env_rhs;
-    } else {
-      # using config file
-      $result = $compiler_rhs;
-    }
-  } elsif ($env_rhs) {
-    #print STDERR "info: using environment ($lhs unset in config file): $lhs=\"$env_rhs\"\n";
+  if ($env_rhs) {
     $result = $env_rhs;
+  } elsif ($compiler_rhs) {
+    $result = $compiler_rhs;
   } else {
-    if ($default_rhs) {
-      print STDERR "info: $lhs unset in both config file and environment: using default $lhs=\"$default_rhs\"\n";
-    }
     $result = $default_rhs;
   }
   die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace

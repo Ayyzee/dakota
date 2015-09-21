@@ -63,8 +63,8 @@ BEGIN {
   $extra = do "$gbl_prefix/lib/dakota/extra.json"
     or die "do $gbl_prefix/lib/dakota/extra.json failed: $!\n";
   $objdir = &dakota::util::objdir();
-  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
-  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
+  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', 'hh');
+  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', 'cc');
   $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
 };
 #use Carp;
@@ -94,10 +94,10 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'DK_CXX_COMPILE_PIC_FLAGS', undef);
-my $cxx_output_flags =  &dakota::util::var($gbl_compiler, 'DK_CXX_OUTPUT_FLAGS',  undef);
-my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'DK_CXX_SHARED_FLAGS',  undef);
-my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'DK_CXX_DYNAMIC_FLAGS', undef);
+my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', [ '--compile', '--PIC' ]);
+my $cxx_output_flags =      &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',      '--output');
+my $cxx_shared_flags =      &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',      '--shared');
+my $cxx_dynamic_flags =     &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS',     '--dynamic');
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -350,17 +350,15 @@ sub start_cmd {
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
-    my $cxx = &dakota::util::var($gbl_compiler, 'DK_CXX', $ENV{'CXX'} ||= 'g++'); # default compiler
+    my $cxx = &dakota::util::var($gbl_compiler, 'CXX', 'g++');
     $$cmd_info{'opts'}{'compiler'} = $cxx;
   }
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
-    my $cxxflags = &dakota::util::var($gbl_compiler, 'DK_CXXFLAGS', $ENV{'CXXFLAGS'} ||= '-std=c++11'); # default compiler flags
-    my $extra_cxxflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_CXXFLAGS', $ENV{'EXTRA_CXXFLAGS'} ||= '');
-    my $cxx_warning_flags = &dakota::util::var($gbl_compiler, 'DK_CXX_WARNINGS_FLAGS', undef);
-    $$cmd_info{'opts'}{'compiler-flags'} =
-    $cxxflags . ' ' . $extra_cxxflags . ' ' . $cxx_warning_flags;
+    my $cxxflags =       &dakota::util::var($gbl_compiler, 'CXXFLAGS', [ '-std=c++11', '--visibility=hidden' ]);
+    my $extra_cxxflags = &dakota::util::var($gbl_compiler, 'EXTRA_CXXFLAGS', '');
+    $$cmd_info{'opts'}{'compiler-flags'} = $cxxflags . ' ' . $extra_cxxflags;
   }
-  my $ld_soname_flags = &dakota::util::var($gbl_compiler, 'DK_LD_SONAME_FLAGS', undef);
+  my $ld_soname_flags = &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
 
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_construct = undef;
@@ -672,8 +670,8 @@ sub rt_o_from_rep {
 sub so_from_o {
   my ($cmd_info) = @_;
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
-    my $ldflags = &dakota::util::var($gbl_compiler, 'DK_LDFLAGS', $ENV{'LDFLAGS'} ||= '');
-    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'} ||= '');
+    my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
+    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
     $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
     $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
@@ -685,8 +683,8 @@ sub so_from_o {
 sub dso_from_o {
   my ($cmd_info) = @_;
     my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
-    my $ldflags = &dakota::util::var($gbl_compiler, 'DK_LDFLAGS', $ENV{'LDFLAGS'} ||= '');
-    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'} ||= '');
+    my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
+    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
     $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
     $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
@@ -698,8 +696,8 @@ sub dso_from_o {
 sub exe_from_o {
   my ($cmd_info) = @_;
     my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
-    my $ldflags = &dakota::util::var($gbl_compiler, 'DK_LDFLAGS', $ENV{'LDFLAGS'} ||= '');
-    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'DK_EXTRA_LDFLAGS', $ENV{'EXTRA_LDFLAGS'} ||= '');
+    my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
+    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
     $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$exe_cmd{'cmd-major-mode-flags'} = undef;
     $$exe_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";

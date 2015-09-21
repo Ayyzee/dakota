@@ -1,10 +1,10 @@
 include $(rootdir)/test/vars.mk
 
 exe: exe.dk
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
+	EXTRA_CXXFLAGS=$(CXX_NO_WARNINGS_FLAGS) $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
 lib-%.$(so_ext): lib-%.dk module-lib-%.dk
-	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
+	EXTRA_CXXFLAGS=$(CXX_NO_WARNINGS_FLAGS) $(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
 .PHONY: all check clean
 

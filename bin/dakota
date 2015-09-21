@@ -118,19 +118,21 @@ if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
     &add_last($$root_cmd{'inputs'}, $libdakota);
   }
 }
+$ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
+
 if ($$root_cmd{'opts'}{'include-directory'}) {
   my $flags = '';
   foreach my $dir (@{$$root_cmd{'opts'}{'include-directory'}}) {
     $flags .= " --include-directory $dir";
   }
-  $ENV{'DK_EXTRA_CXXFLAGS'} .= $flags;
+  $ENV{'CXXFLAGS'} .= $flags;
 }
 if ($$root_cmd{'opts'}{'define-macro'}) {
   my $flags = '';
   foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}}) {
     $flags .= " --define-macro $mcr";
   }
-  $ENV{'DK_EXTRA_CXXFLAGS'} .= $flags;
+  $ENV{'CXXFLAGS'} .= $flags;
 }
 if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
   my $initial_workdir = &getcwd();

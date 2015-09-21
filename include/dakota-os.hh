@@ -17,13 +17,13 @@
 #if !defined dkt_dakota_os_hh
 #define      dkt_dakota_os_hh
 
-#if defined DK_LINUX
+#if defined __linux__
   #include <libelf.h>
 
   static inline void* dkt_get_segment_data(char8_t const* segment, void** addr_out, size_t* size_out) {
     needs work
   }
-#elif defined DK_DARWIN
+#elif defined __darwin__
   #include <mach-o/getsect.h>
 
   extern void* __dso_handle;
@@ -33,7 +33,7 @@
     return *addr_out;
   }
 #else
-  #error "Neither DK_LINUX nor DK_DARWIN is defined."
+  #error "Neither __linux__ nor __darwin__ is defined."
 #endif
 
 #endif

@@ -11,9 +11,6 @@ objdir ?= $(blddir)/obj
 $(shell mkdir -p $(objdir))
 
 prefix ?= /usr/local
-includedir := $(prefix)/include
-libdir :=     $(prefix)/lib
-bindir :=     $(prefix)/bin
 
 MAKE := make
 MAKEFLAGS +=\
@@ -27,11 +24,6 @@ include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/compiler.mk\
  $(rootdir)/lib/dakota/compiler.json\
  $(rootdir)/lib/dakota/platform.json)\
 
-CXX := $(DK_CXX)
-CXXFLAGS := $(DK_CXXFLAGS)
-CXX_WARNINGS_FLAGS := $(DK_CXX_WARNINGS_FLAGS)
-CXX_OUTPUT_FLAGS := $(DK_CXX_OUTPUT_FLAGS)
-
 hh_ext := hh
 cc_ext := cc
 
@@ -44,7 +36,7 @@ RMFLAGS := -fr
 MKDIR := mkdir
 MKDIRFLAGS := -p
 
-INSTALL_CREATE_PARENT_DIR_FLAGS := #-D # linux only (absent on darwin)
+INSTALL_CREATE_PARENT_DIR_FLAGS := # -D # linux only (absent on darwin)
 INSTALL := install
 INSTALLFLAGS := $(INSTALL_CREATE_PARENT_DIR_FLAGS)
 INSTALL_MODE_FLAGS := -m
@@ -67,39 +59,20 @@ INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MO
 
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
-CXX_NO_WARNINGS ?= 0
 
-CXX_DEBUG_FLAGS ?= --optimize=0 --debug=3 --define-macro DEBUG
-
-EXTRA_CXXFLAGS := $(CXX_DEBUG_FLAGS)
-
-ifneq ($(CXX_NO_WARNINGS), 0)
-	CXX_WARNINGS_FLAGS += $(CXX_NO_WARNINGS_FLAGS)
-endif
+EXTRA_CXXFLAGS := --optimize=0 --debug=3 --define-macro DEBUG # debug flags
 
 ifdef DKT_PROFILE
   DAKOTA ?= $(srcdir)/../bin/dakota-profile
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= $(srcdir)/../bin/dakota --define-macro $(DK_HOST_OS)
+  DAKOTA ?= $(srcdir)/../bin/dakota --define-macro $(HOST_OS)
   # --keep-going
 endif
 
 DAKOTAFLAGS ?=
 EXTRA_DAKOTAFLAGS ?=
-
-# cast(some-type-t){...}
-ifdef DKT_ALLOW_COMPOUND_LITERALS
-  # too broad
-  EXTRA_CXXFLAGS += $(CXX_ALLOW_COMPOUND_LITERALS_FLAGS)
-endif
-
-# { .x = 0, .y = 0 }
-ifdef DKT_ALLOW_DESIGNATED_INITIALIZERS
-  # too broad
-  EXTRA_CXXFLAGS += $(CXX_ALLOW_DESIGNATED_INITIALIZERS_FLAGS)
-endif
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
 

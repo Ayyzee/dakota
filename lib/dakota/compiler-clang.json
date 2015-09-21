@@ -5,15 +5,16 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'DK_CXX' => [ 'clang++' ],
-  'DK_CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden' ], # clang does not understand --visibility
-  'DK_CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
-  'DK_CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ], # clang does not understand --PIC
-  'DK_CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
-  'DK_CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
-  'DK_CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
-  'DK_CXX_SHARED_FLAGS' =>      [ '--shared'  ],
-  'DK_CXX_WARNINGS_FLAGS' =>    [
+  'CXX' => [ 'clang++' ],
+  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden' ], # clang does not understand --visibility
+  'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
+  'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ], # clang does not understand --PIC
+  'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
+  'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
+  'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
+  'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
+  'CXX_SHARED_FLAGS' =>      [ '--shared'  ],
+  'EXTRA_CXXFLAGS' =>        [
       '-Weverything',
       '-Wno-c++98-compat',
       '-Wno-c++98-compat-pedantic',
@@ -27,7 +28,7 @@
       '-Wno-old-style-cast',
       '-Wno-padded',
       ],
-  'DK_LD_SONAME_FLAGS' => [ '-soname' ],
+  'LD_SONAME_FLAGS' => [ '-soname' ],
   'hh_ext' => 'hh',
   'cc_ext' => 'cc',
   'dkhh_ext' => 'dkhh',
