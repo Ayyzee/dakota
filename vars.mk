@@ -35,8 +35,11 @@ CXX_OUTPUT_FLAGS := $(DK_CXX_OUTPUT_FLAGS)
 hh_ext := hh
 cc_ext := cc
 
+CP := cp
+CPFLAGS := -pR
+
 RM := rm
-RMFLAGS := -rf
+RMFLAGS := -fr
 
 MKDIR := mkdir
 MKDIRFLAGS := -p
