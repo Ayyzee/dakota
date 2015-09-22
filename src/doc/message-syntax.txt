@@ -1,0 +1,23 @@
+# -*- mode: c++ -*-
+
+//consider(msg) {
+{
+  match ( msg{name} == nullptr ) { /* action */ }
+  match ( msg.name == "self" )  { /* action */ }
+}
+=>
+{
+       if ( msg.name == nullptr ) { /* action */ }
+  else if ( msg.name == "self" )  { /* action */ }
+}
+
+{ "..." : ... [, repeat] }
+{ ?ident : ... [, repeat] }
+
+${ "..." : ... [, repeat] }
+${ ?ident : ... [, repeat] }
+
+$json{ "..." : ... [, repeat] }
+$msg{ ?ident : ... [, repeat] }
+
+foo(self, $set{ ... })

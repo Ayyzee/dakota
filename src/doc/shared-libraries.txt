@@ -1,0 +1,38 @@
+  # lib versioning vs symbol versioning
+
+  # darwin 'compatibility_version' cmd line option
+  # darwin cd /usr/lib; ls -l libz.*
+  # dlvsym is linux-only, but could be easily implemented on darwin
+
+  # void* dlsym( void *handle, char const* symbol);
+  # void* dlvsym(void *handle, char      * symbol, char* version);
+
+  # linker map files (for symbol version .. introduced by Sun)
+
+  # __asm__(".symver old_foo,foo@@VERS_2.0"); // gnu/linux
+
+  # export maps (gnu/linux)
+  # clang -current_version <version_number>
+  # -compatibility_version
+
+  # To view a library’s current and compatibility versions, use the
+  # otool -L <library> command.
+
+  # darwin: libfoobar.x.y.z.dylib
+  # X[.Y[.Z]] where X is 0 - (2^16 - 1), and Y and Z are 0 - (2^8 - 1)
+
+ibm only: /lib/ld-linux.so.2 and its 64-bit cousin, /lib64/ld-linux-x86-64.so.2
+  use --list <shared-library> to determin
+
+linux: ldconfig generate symlinks based on internal version info
+
+linux:
+  linker-name: libfoo.so
+  soname:      libfoo.so.<x> (same as compatibility?)
+  real-name:   libfoo.so.<x>.<y>[.<z>]
+  #
+  ln -s libfoo.so.<x>.<y>[.<z>] libfoo.so.<x>
+  ln -s libfoo.so<x>            libfoo.so
+
+linux-gcc:-soname = darwin:-install_name
+

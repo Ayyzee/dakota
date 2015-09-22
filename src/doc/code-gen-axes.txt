@@ -1,0 +1,32 @@
+     | nrt |  rt |
+=====+=====+=====+
+decl |     |     |
+-----+-----+-----+
+defn |     |     |
+-----+-----+-----+
+
+nrt: translation-unit (create *.$o_ext)
+rt:  linkage-unit     (create *.so or exe)
+
+
+nrt-decl: aka=nrt-hxx but not, before user code
+nrt-defn: aka=nrt-cxx,         after user code
+rt-decl:  aka=rt-hxx but not,  optionally generate header for inclusion in all nrt sources in this linkage unit (inline generic functions)
+rt-defn:  aka=rt-cxx,          registration of all klass/trait/slots/methods/...
+
+===
+
+va
+raw (causes object-t method wrapper to be generated)
+ka  (causes ... method wrapper and va-list-t pre-method to be generated)
+...
+
+===
+
+exported:
+  klass|trait
+    state
+      slots
+    behavior
+      raw methods      (by name only, not signature)
+      [object] methods (by name only, not signature)

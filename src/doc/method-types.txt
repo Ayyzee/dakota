@@ -1,0 +1,29 @@
+// return void
+// return object-t
+// return object-t self
+// unary (parenthesis optional because of the macro system)
+// fixed argument only
+// keyword argument (required)
+// keyword argument (optional)
+// fixed, required, and optional arguments
+// ending in va-list-t
+// ending in ...
+
+
+// user authored
+
+method object-t my-klass:my-method(object-t);
+
+method object-t my-klass:my-method(object-t, object-t);
+
+method object-t my-klass:va:my-method(object-t, object-t, va-list-t);
+
+method object-t my-klass:my-method(object-t, object-t,
+                                   object-t my-key-1 => default-value,
+                                   object-t my-key-2 => default-value );
+
+method object-t my-klass:my-method(object-t, object-t,
+                                   object-t my-key-1 => {},
+                                   object-t my-key-2 => default-value );
+
+// generated

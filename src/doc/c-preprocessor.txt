@@ -1,0 +1,53 @@
+... ## ...
+
+#include <...>
+#include "..."
+
+#if defined expr
+#if ! defined expr
+#if ! ( ... )
+#if ( ... )
+#if expr
+#else
+#endif
+
+#ifdef ident
+#ifndef ident
+#elif
+#endif
+
+#define ident ...
+#define ident(...) ...
+
+#undef ident
+
+#line num "file"
+
+#warning "..."
+#error   "..."
+
+#pragma ...
+
+#define str(s) #s
+
+xxx(people,
+    #undef,
+    #include: "everyone")
+    
+{ #ifdef;
+  #ifndef;
+  #endif }
+
+symbols and keywords: context
+  #ident ,|;|:|)|}|]
+  = #ident
+  == #ident
+  != #ident
+  ( #ident
+  [ #ident
+  { #ident
+  , #ident
+  ; #ident
+  #ident ==
+  #ident !=
+  

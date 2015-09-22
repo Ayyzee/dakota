@@ -1,0 +1,7 @@
+It's specified in C++11 5.2.2/7:
+
+"Passing a potentially-evaluated argument of class type having a
+non-trivial copy constructor, a non-trivial move contructor, or a
+non-trivial destructor, with no corresponding parameter, is
+conditionally-supported with implementation-defined semantics."
+

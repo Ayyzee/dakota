@@ -1,0 +1,31 @@
+trait table
+trait set
+trait counted-set
+
+klass vector {}
+klass mutable-vector { superklass vector; }
+
+klass string {}
+klass mutable-string { superklass string; }
+
+klass hashed-set {}
+klass mutable-hashed-set { superklass hashed-set; }
+
+klass hashed-table {}
+klass mutable-hashed-table { superklass hashed-table; }
+
+klass hashed-counted-set {}
+klass mutable-hashed-set { superklass hashed-counted-set; }
+
+klass sorted-set {}
+klass mutable-sorted-set { superklass sorted-set; }
+
+klass sorted-table {}
+klass mutable-sorted-table { superklass sorted-table; }
+
+klass sorted-counted-set {}
+klass mutable-sorted-set { superklass sorted-counted-set; }
+
+assoc
+
+pair

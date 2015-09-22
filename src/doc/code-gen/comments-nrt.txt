@@ -1,0 +1,29 @@
+// --nrt-cxx--
+
+// --klasses-hxx--
+// --symbols-hxx--
+// --strings-hxx--
+
+// --signatures-hxx--
+// --signatures-seq-hxx--
+
+
+// --selectors-hxx--
+// --selectors-seq-hxx--
+
+
+
+
+// --generics-hxx--
+
+// VA OBJECT-T
+// VA SUPER-T
+// OBJECT-T
+// SUPER-T
+
+// --hashes-hxx--
+// --keywords-hxx--
+
+#include "../thing.dk.cc"
+
+// --klasses-cxx--

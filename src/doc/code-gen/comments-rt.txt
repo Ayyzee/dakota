@@ -1,0 +1,26 @@
+// --rt-cxx--
+
+// --klasses-hxx--
+// --symbols-cxx--
+// --strings-cxx--
+
+// --hashes-hxx--
+// --hashes-cxx--
+// --keywords-cxx--
+
+// --selectors-cxx--
+// --selectors-seq-cxx--
+
+// --signatures-cxx--
+// --signatures-seq-cxx--
+
+// --generics-cxx--
+
+// VA OBJECT-T
+// VA SUPER-T
+// OBJECT-T
+// SUPER-T
+
+
+
+// --klasses-cxx--
