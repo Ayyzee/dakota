@@ -1,0 +1,7 @@
+/Volumes/windows-7/cygwin64/usr/src/debug/libapr1-1.4.8-1/memory
+/Volumes/windows-7/cygwin64/usr/src/debug/libggi2-2.2.2-3/display/memory
+/Volumes/windows-7/cygwin64/usr/src/debug/net-snmp-5.7.2-1/agent/mibgroup/hardware/memory
+/Volumes/windows-7/cygwin64/usr/src/debug/nspr-4.10.3-1/nspr/pr/src/memory
+/Volumes/windows-7/cygwin64/usr/src/debug/openmpi-1.8.3-1/opal/mca/memory
+/Volumes/windows-7/cygwin64/usr/share/texmf-dist/tex/latex/memory
+/Volumes/windows-7/cygwin64/usr/share/texmf-dist/doc/latex/memory

@@ -1,0 +1,24 @@
+macro regex-search
+{
+  ?open => (
+  ?close => )
+
+  // while (?ident =~ /.../?re-options)
+  { while ?open        ?ident =~                                      / ?re-pattern /                ?re-options   ?close }
+  =>
+  { char const * _p_ = ?ident ; std :: cmatch _m_ ; std :: regex _e_ ( "?re-pattern" ) ;
+    while ?open std :: regex_search ( _p_ += ( _m_ . position ( ) + _m_ . length ( ) ) , _m_ , _e_ , ?re-options ) ?close }
+
+  // if (?ident =~ /.../?re-options)
+  {                                                          if ?open                       ?ident =~ / ?re-pattern / ?re-options   ?close }
+  =>
+  { std :: cmatch _m_ ; std :: regex _e_ ( "?re-pattern" ) ; if ?open std :: regex_search ( ?ident , _m_ , _e_ ,      ?re-options ) ?close }
+}
+
+macro regex-replace
+{
+  // ?ident =~ /.../.../?re-options
+  { ?ident =~ / ?re-pattern / ?re-template / $re-options }
+  =>
+  { std :: regex _e_ ( "?re-pattern" ) ; ?ident = std :: regex_replace ( ?ident , _e_ , "?re-template" ) . c_str ( ) ; }
+}
