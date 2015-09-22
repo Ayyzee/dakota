@@ -1,8 +1,0 @@
-include <setjmp.h>;
-
-export klass xsigjmp-buf
-{
-//   export const uint-t length = _JBLEN + 1;
-//   export slots int-t[length];
-  export slots int-t[_JBLEN + 1];
-}
