@@ -1,0 +1,4 @@
+“Programmable Syntax Macros” 
+	      by Weise and Crew and 
+“Growing Languages with Metamorphic Syntax Macros” 
+	 by Brabrand and Schwartzbach

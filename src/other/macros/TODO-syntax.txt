@@ -1,0 +1,37 @@
+object.$sort().$trim().$capture()
+=>
+$capture($trim($sort(object)))
+
+person.$name("Peter").$age(21).$introduce
+=>
+$introduce($age($name(person, "Peter"), 21))
+
+for (object-t o in seq[3:6])
+=>
+for (object-t o in subseq(seq, 3, 6))
+
+for (uint-t i in seq[3:6])
+=>
+for (uint-t i = 3; i < 6; i++)
+
+// range has one, two, or three args
+
+for (uint-t i in range(count))
+for (uint-t i in range(count))
+=>
+for (uint-t i = 0; i < count; i++)
+
+object-t val1 = $key1 at tbl;
+=>
+object-t val1 = dk:at(tbl, $key1);
+
+
+${ ... } $<set>{ ... } $<table>{ ... }
+$( ... )
+$[ ... ]
+$< ... >
+$/ ... /
+
+printf("hi\n") if foo != bar;
+=>
+if (foo != bar) printf("hi\n");

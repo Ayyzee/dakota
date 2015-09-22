@@ -1,0 +1,34 @@
+recursion from front
+
+   person.$name("Peter").$age(21).$introduce()
+1. $name(person, "Peter").$age(21).$introduce()
+2. $age($name(person, "Peter"), 21).$introduce()
+   $introduce($age($name(person, "Peter"), 21))
+
+OR
+
+recursion from back
+
+   person.$name("Peter").$age(21).$introduce()
+1. $introduce(person.$name("Peter").$age(21))
+2. $introduce($age(person.$name("Peter"), 21))
+   $introduce($age($name(person, "Peter"), 21))
+
+
+person could be:
+  any ident which is an object
+  any function (not just a generic function or method) that returns an object
+    dk-klass-for-name($foo).$alloc().init(...)
+  any boxable type (like #".pl".$ends-with(...)
+  ternary expression (? :) resulting in (likely different) objects in either case
+
+
+
+?expr.$f1(?args-in-opt)
+=>
+$f1(?expr, ?f1-args-in-opt)
+or
+$f1(?exprt)
+
+
+?ident.$f1(a).$f2(b).$f3(c)

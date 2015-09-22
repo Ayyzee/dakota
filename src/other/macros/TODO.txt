@@ -1,0 +1,93 @@
+add regex klass
+add ability to checksum a source file (remove all comments and normalize the input)
+
+from Ruby
+  %w(foo bar baz)
+  =>
+  ["foo", "bar", "baz"]
+
+  foo, bar, baz = 1, 2, 3;
+  expr if expr;
+  unless
+  until
+  expr `..' expr
+  expr `...' expr # range
+
+int count = 7
+
+macro recursion use case:
+  object.$sort.$trim.$capture()             => $capture($trim($sort(object)))
+  person.$name("Peter").$age(21).$introduce => $introduce($age($name(person, "Peter"), 21))
+
+support
+  ?{ident} same as ?ident
+  "?ident"
+  #?ident
+  $?ident
+  /*?ident*/
+  /*?0*/
+
+c++11:
+  attributes: [[attr1]]
+  nullptr => nullptr
+  anonymous functions
+  range-based loops: for (int &x : my_array)
+  uniform initialization: BasicStruct var1{5, 3.2};
+    super => (super-t){self,klass}
+  constexpr
+  64 bits could hold 64/4 = 16 chars of set [a-z?=!-]
+  so
+  128 bits could hold 32 chars. 01234567890123456789012345678901
+  string switch http://siliconkiwi.blogspot.com/2012/04/c11-string-switch.html
+
+substr
+
+add ability to use other macros (lhs') as constraints.
+
+deal with moving whitespace on empty replacement
+make lhs/rhs a list
+
+require a second pass before replacement
+  support # and ##
+  support uses cases like
+    // $0
+    /* $0 */
+
+check for lhs == rhs
+check for lhs empty and rhs non-empty
+  its illegal
+check for rhs empty
+check for both lhs and rhs empty
+  macro can not fail
+  warn if not last
+
+
+move whitespace off obviously removed tokens
+
+rhs:
+  add comment out
+  add support for function calls taking matches as args
+    i.e. ?symbol() for ?symbol(?ident)
+
+?type only handles ?type-ident followed by zero or more *
+need ?qual-type
+
+?va-qual?  means 0 or 1 (i.e. optional)
+
+
+?opt{}
+?or()    excluded in range of tokens
+?or[]    included in range of tokens
+?until()
+?until[]
+
+?or( , ) )
+
+---
+
+named pattern variables:
+  ?ident (aka: ?ident<ident>)
+  ?body-in
+  ?list
+  ?list-element
+  ?my-name<ident>

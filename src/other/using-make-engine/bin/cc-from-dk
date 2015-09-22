@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Indent    = 1;   # default = 2
+
+use Getopt::Long;
+$Getopt::Long::ignorecase = 0;
+
+my $opts = {};
+&GetOptions($opts,
+            'rt-rep=s',
+            'output=s');
+my $inputs = [@ARGV];
+
+open OUTPUT, ">$$opts{output}" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+print OUTPUT &Dumper($opts, $inputs);
+close OUTPUT;

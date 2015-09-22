@@ -1,0 +1,5 @@
+# -*- mode: cperl -*-
+{
+  'inputs' => {},
+  'output' => '',
+}
