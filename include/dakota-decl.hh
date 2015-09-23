@@ -21,6 +21,15 @@
 #define TRAIT_NS namespace
 #define METHOD
 #define GENERIC
+#define KW_ARGS_METHOD
+#define KW_ARGS_METHOD_SIGNATURE
+#define SELECTOR
+#define SIGNATURE
+#define SLOTS_SIGNATURE
+#define VA_GENERIC
+#define VA_METHOD
+#define VA_SELECTOR
+#define VA_SIGNATURE
 #define ALIAS(m)
 #define INCLUDE(f)
 #define INTERPOSE(k)
