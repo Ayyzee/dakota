@@ -840,7 +840,9 @@ sub ctlg_from_so {
   my ($cmd_info) = @_;
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
 
-  if ($gbl_prefix) {
+  if ($ENV{'DAKOTA_INFO'}) {
+    $$ctlg_cmd{'cmd'} = $ENV{'DAKOTA_INFO'};
+  } elsif ($gbl_prefix) {
     $$ctlg_cmd{'cmd'} = "$gbl_prefix/bin/dakota-info";
   } else {
     $$ctlg_cmd{'cmd'} = 'dakota-info';

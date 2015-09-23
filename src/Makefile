@@ -31,14 +31,21 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 $(libdakota.output) $(libdakota-util.output): $(dakota-info.output)
 $(libdakota-util.output): $(libdakota.output)
 
+$(libdakota.output): $(srcdir)/strerror-name.tbl # not ideal, but ...
+
 check: all
 	$(dakota-info.output) $(libdakota.output) $(libdakota-util.output)
 	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 clean: goal-clean
-	$(RM) $(RMFLAGS) aaa.dk
+	$(RM) $(RMFLAGS) $(srcdir)/aaa.dk $(srcdir)/strerror-name.tbl
+	$(RM) $(RMFLAGS) $(dakota-info.output)
 	$(RM) $(RMFLAGS) $(dakota-info.output).$(cxx_debug_symbols_ext)
+	$(RM) $(RMFLAGS) $(libdakota.output)
+	$(RM) $(RMFLAGS) $(libdakota.output).$(cxx_debug_symbols_ext)
+	$(RM) $(RMFLAGS) $(libdakota-util.output)
+	$(RM) $(RMFLAGS) $(libdakota-util.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
 	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
 	if [[ -e $@.sh ]]; then ./$@.sh; fi

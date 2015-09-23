@@ -1,6 +1,5 @@
-$(blddir)/%.dk: $(objdir)/%.tbl
-$(objdir)/%.tbl: $(srcdir)/%.sh
-	./$<
+$(blddir)/%.tbl: $(srcdir)/%.pl
+	./$< > $@
 
 $(srcdir)/%.dk: $(srcdir)/%.pl
 	./$< > $@

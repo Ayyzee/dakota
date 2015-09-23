@@ -60,10 +60,10 @@ INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MO
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
 
-EXTRA_CXXFLAGS := --optimize=0 --debug=3 --define-macro DEBUG # debug flags
+EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG # debug flags
 
 ifdef DKT_PROFILE
-  DAKOTA ?= $(srcdir)/../bin/dakota-profile
+  DAKOTA ?= $(srcdir)/../bin/dakota-profile --define-macro $(HOST_OS)
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
@@ -71,9 +71,13 @@ else
   # --keep-going
 endif
 
+DAKOTA_INFO ?= $(blddir)/../bin/dakota-info
+
 DAKOTAFLAGS ?=
 EXTRA_DAKOTAFLAGS ?=
 
 #EXTRA_CXXFLAGS += --define-macro DKT_DUMP_MEM_FOOTPRINT
 
 cxx_debug_symbols_ext ?=
+
+export EXTRA_CXXFLAGS

@@ -1,0 +1,83 @@
+; -*- mode: Emacs-Lisp -*-
+
+(setq c-basic-offset 2)
+(setq tab-width 2)
+(setq indent-tabs-mode nil)
+
+;(global-font-lock-mode t)
+
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(make\\|dk::?\\w+\\)\\>"
+;				     . font-lock-builtin-face)))
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(self\\|klass\\|super\\|null\\)\\>"
+;				     . font-lock-keyword-face)))
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(finally\\)\\>"
+;				     . font-lock-keyword-face)))
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(import\\|export\\)\\>"
+;				     . font-lock-keyword-face)))
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(generic\\|method\\)\\>"
+;				     . font-lock-keyword-face)))
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(selector\\|alias\\)\\>"
+;				     . font-lock-function-name-face)))
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(klass\\|trait\\)\\>"
+;				     . font-lock-keyword-face)))
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(superklass\\|klass\\|trait\\|require\\|provide\\|slots\\)\\>"
+;				     . font-lock-keyword-face)))
+
+;(setq dakota-mode-keywords 
+;      '("case" "break" "default" "do" "else" "for" "if" "else" "return" "while"))
+
+;(setq dakota-mode-keyword-regexp
+;      (regexp-opt dakota-mode-keywords 'words))
+
+;(defun pre-dakota-mode ()
+;  (setq c-extra-toplevel-key c-Dakota-extra-toplevel-key)
+;  (modify-syntax-entry ?- "w")
+;)
+;(add-hook 'c-mode-common-hook #'pre-dakota-mode)
+
+;;; Pre-Dakota mode setup for cc-mode
+
+;(defconst c-Dakota-extra-toplevel-key "\\(extern\\|namespace\\|klass\\|trait\\)")
+
+;(defun klc:pre-dakota-mode ()
+;  (modify-syntax-entry ?- "w")
+;  (setq c-extra-toplevel-key c-Dakota-extra-toplevel-key)
+;)
+;(add-hook 'c-mode-common-hook #'klc:pre-dakota-mode)
+
+;;; fully qualified types
+;(setq c++-font-lock-extra-types '("\\<\\(\\w+::?\\)*\\w+-t\\>"
+;				  "\\<\\(\\w+::?\\)*\\w+_t\\>"))
+
+; font-lock-builtin-face	   font-lock-comment-face
+; font-lock-constant-face	   font-lock-doc-face
+; font-lock-function-name-face	   font-lock-keyword-face
+; font-lock-string-face		   font-lock-type-face
+; font-lock-variable-name-face	   font-lock-warning-face
+
+;;; generic function use
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(box\\|make\\|dk::?\\w+\\)\\>" . font-lock-builtin-face)))
+
+;;; initialize(), make(), self, klass, super, null
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(self\\|klass\\|super\\|null\\)\\>" . font-lock-keyword-face)))
+
+;;; should be part of C++ :-(
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(throw-object\\|finally\\|unless\\|until\\|else-if\\)\\>" . font-lock-keyword-face)))
+
+;;; visiblity keywords
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(import\\|export\\)\\>" . font-lock-keyword-face)))
+
+;;; keyword
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(generic\\|method\\)\\>" . font-lock-keyword-face)))
+
+;;; macro()
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(selector\\|alias\\)\\>" . font-lock-function-name-face)))
+
+;; these two (below) have overlapping sets
+
+;;; could be (should be?) with ... -extra-toplevel-key
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(klass\\|trait\\)\\>" . font-lock-keyword-face)))
+
+;;; keyword in klass | trait scope
+;(font-lock-add-keywords 'c++-mode '(("\\<\\(superklass\\|klass\\|trait\\|require\\|provide\\|slots\\)\\>"
+;                                    . font-lock-keyword-face)))

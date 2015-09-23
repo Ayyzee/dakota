@@ -8,16 +8,15 @@ exes := $(blddir)/tst $(blddir)/min $(blddir)/dummy
  all\
  check\
  clean\
-
+#
 all: $(exes)
 
 check: all
 	for exe in $(exes); do echo $$exe; $$exe; done
 
 clean:
-	rm -f $(exes)
-	for exe in $(exes); do rm -fr $$exe.$(cxx_debug_symbols_ext); rm -fv $(objdir)/{nrt,rt,}/$$exe{-main,}.*; done
-	rm -f $(blddir)/dummy
+	$(RM) $(RMFLAGS) $(exes)
+	for exe in $(exes); do $(RM) $(RMFLAGS) $$exe $$exe.$(cxx_debug_symbols_ext); $(RM) $(RMFLAGS) $(objdir)/{nrt,rt,}/$$exe{-main,}.*; done
 
 $(blddir)/tst:   $(blddir)/../lib/libdakota-util.$(so_ext)
 
