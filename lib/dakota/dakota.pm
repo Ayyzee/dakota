@@ -94,7 +94,7 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_construct = undef;
 
-my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', [ '--compile', '--PIC' ]);
+my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
 my $cxx_output_flags =      &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',      '--output');
 my $cxx_shared_flags =      &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',      '--shared');
 my $cxx_dynamic_flags =     &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS',     '--dynamic');
