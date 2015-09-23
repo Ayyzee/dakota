@@ -2113,24 +2113,18 @@ sub linkage_unit::generate_klasses_body {
   }
   if (&is_decl() && @$kw_args_methods) {
     #print STDERR Dumper($va_list_methods);
-    &path::add_last($klass_path, 'va');
     &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
-    &path::remove_last($klass_path);
   }
   if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
     #print STDERR Dumper($va_list_methods);
-    &path::add_last($klass_path, 'va');
     &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
-    &path::remove_last($klass_path);
   }
   if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
-    &path::add_last($klass_path, 'va');
     foreach $method (@$va_list_methods) {
       my $method_decl_ref = &function::decl($method, $klass_path);
       $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { $$method_decl_ref }}" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
     }
-    &path::remove_last($klass_path);
   }
   if (@$va_list_methods) {
     foreach $method (@$va_list_methods) {
