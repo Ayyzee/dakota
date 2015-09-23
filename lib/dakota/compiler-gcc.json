@@ -6,7 +6,7 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'CXX' => [ 'g++' ],
-  'CXXFLAGS' => [ '-std=c++11', '--visibility=hidden' ],
+  'CXXFLAGS' => [ '-std=c++11', '--visibility=hidden', '--dollars-in-identifiers' ],
   'CXX_COMPILE_FLAGS' =>     [ '--compile' ],
   'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC' ],
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
@@ -35,10 +35,10 @@
       '--warn-unused',
       ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
-  'hh_ext' => 'hh',
   'cc_ext' => 'cc',
-  'dkhh_ext' => 'dkhh',
   'dkcc_ext' => 'dkcc',
+  'dkhh_ext' => 'dkhh',
+  'hh_ext' => 'hh',
   'o_ext' =>  'o',
   'so_ext' => 'so',
 }

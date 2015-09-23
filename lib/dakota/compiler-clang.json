@@ -6,9 +6,11 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'CXX' => [ 'clang++' ],
-  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden' ], # clang does not understand --visibility
+  # clang does not understand --visibility nor --dollars-in-identifiers
+  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fdollars-in-identifiers' ],
   'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
-  'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ], # clang does not understand --PIC
+  # clang does not understand --PIC
+  'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ],
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
   'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
   'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
@@ -29,10 +31,10 @@
       '-Wno-padded',
       ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
-  'hh_ext' => 'hh',
   'cc_ext' => 'cc',
-  'dkhh_ext' => 'dkhh',
   'dkcc_ext' => 'dkcc',
+  'dkhh_ext' => 'dkhh',
+  'hh_ext' => 'hh',
   'o_ext' =>  'bc',
   'so_ext' => 'so',
 }
