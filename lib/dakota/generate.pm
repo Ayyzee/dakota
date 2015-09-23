@@ -2119,6 +2119,9 @@ sub linkage_unit::generate_klasses_body {
     #print STDERR Dumper($va_list_methods);
     &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
   }
+  if (&is_rt() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
+    &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
+  }
   if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
     foreach $method (@$va_list_methods) {
@@ -3510,6 +3513,12 @@ sub generate_slots_method_signature_decls {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
     &generate_slots_method_signature_decl($method, $klass_name, $col, $klass_type);
+  }
+}
+sub generate_slots_method_signature_defns {
+  my ($methods, $klass_name, $col, $klass_type) = @_;
+  foreach my $method (sort method::compare values %$methods) {
+    &generate_slots_method_signature_defn($method, $klass_name, $col, $klass_type);
   }
 }
 sub generate_kw_args_method_signature_decl {
