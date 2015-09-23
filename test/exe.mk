@@ -13,11 +13,11 @@ all: $(target)
 $(target): $(prereq)
 
 check: all
-	if [[ -e $@.sh ]]; then ./$@.sh; else ./exe; fi
+	if [[ -e $@.sh ]]; then ./$@.sh && touch failed-run; else ./exe && touch failed-run; fi
 
 clean:
-	rm -f  {exe,lib-{1,2,3}.$(so_ext)}
-	rm -fr {exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
-	rm -f  failed-build
-	rm -fr $(objdir)
+	$(RM) $(RMFLAGS) $(objdir-name)
+	$(RM) $(RMFLAGS) failed-{build,run}
+	$(RM) $(RMFLAGS) {exe,lib-{1,2,3}.$(so_ext)}
+	$(RM) $(RMFLAGS) {exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
 	if [[ -e $@.sh ]]; then ./$@.sh; fi

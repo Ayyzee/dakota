@@ -38,6 +38,9 @@ check: all
 	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
+goal-clean:
+	$(RM) $(RMFLAGS) $(output-files)
+
 clean: goal-clean
 	$(RM) $(RMFLAGS) $(srcdir)/aaa.dk $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-info.output)
@@ -50,10 +53,7 @@ clean: goal-clean
 	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
-goal-clean:
-	$(RM) $(RMFLAGS) $(output-files)
-
-install: all $(install-files)
+install: $(install-files)
 	if [[ "Darwin" == `uname` ]]; then \
 	  cd $(DESTDIR)$(prefix)/lib/dakota; \
 	  sudo rm -f compiler.json; sudo ln -s compiler-clang.json  compiler.json; \

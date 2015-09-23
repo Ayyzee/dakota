@@ -3,21 +3,21 @@ rootdir := ../..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-%.$(SO_EXT): %.cc
+%.$(so_ext): %.cc
 	$(CXX) $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAG) $@ -DNAME=\"$@\" $^
 
 all: exe
 
-exe: lib-1.$(SO_EXT) lib-2.$(SO_EXT) rt.$(SO_EXT)
+exe: lib-1.$(so_ext) lib-2.$(so_ext) rt.$(so_ext)
 	$(CXX) $(CXX_OUTPUT_FLAG) $@ -DNAME=\"$@\" $@.cc $^
 
-lib-1.$(SO_EXT) lib-2.$(SO_EXT) ip-lib-a.$(SO_EXT) ip-lib-b.$(SO_EXT): rt.$(SO_EXT)
+lib-1.$(so_ext) lib-2.$(so_ext) ip-lib-a.$(so_ext) ip-lib-b.$(so_ext): rt.$(so_ext)
 
-check: all ip-lib-a.$(SO_EXT) ip-lib-b.$(SO_EXT)
-	$(LD_PRELOAD)="ip-lib-a.$(SO_EXT):ip-lib-b.$(SO_EXT)" ./exe
+check: all ip-lib-a.$(so_ext) ip-lib-b.$(so_ext)
+	$(LD_PRELOAD)="ip-lib-a.$(so_ext):ip-lib-b.$(so_ext)" ./exe
 
 clean:
-	rm -f exe *~ *.$(SO_EXT)
+	rm -f exe *~ *.$(so_ext)
 
 clone:
 	cp lib-1.cc lib-2.cc

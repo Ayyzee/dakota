@@ -25,6 +25,10 @@
 #include <cstring> // memcpy()
 #include <new> // std::bad_alloc
 
+#if defined WIN32
+  #include <windows.h>
+#endif // WIN32
+
 #define DKT_MEM_MGMT_MALLOC 0
 #define DKT_MEM_MGMT_NEW    1
 #define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
@@ -70,10 +74,6 @@ namespace dkt {
     return buf;
   }
 }
-
-#if defined WIN32
-  #include <windows.h>
-#endif // WIN32
 
 #if defined DEBUG
   #define DEBUG_STMT(stmt) stmt
@@ -124,7 +124,7 @@ namespace dkt {
 
 #if defined DEBUG
   #define DEBUG_SO_EXPORT SO_EXPORT
-  #define DEBUG_IMPORT SO_IMPORT
+  #define DEBUG_IMPORT    SO_IMPORT
 #else
   #define DEBUG_SO_EXPORT
   #define DEBUG_IMPORT
@@ -136,10 +136,6 @@ namespace dkt {
   SO_IMPORT str_t strerror_name(int_t);
 #endif
 
-#if !defined USE
-  #define    USE(v) (void)v
-#endif
-
 #define cast(t) (t)
 #define DK_COUNTOF(array) (sizeof((array))/sizeof((array)[0]))
 
@@ -148,17 +144,24 @@ constexpr size_t dk_countof(T(&)[N]) {
   return N;
 }
 
+#if !defined USE
+  #define    USE(v) cast(void)v
+#endif
+
 #define klass_of(object)   (object)->klass
 #define superklass_of(kls) klass::unbox(kls)->superklass
 #define name_of(kls)       klass::unbox(kls)->name
 
 inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 
-#define dkt_slots_signature(name,args)    (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __slots_signature::name))()
+// file scope
+#define selector(name, args)             *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
 #define dkt_signature(name, args)         (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __signature::name))()
+
+// klass/trait scope
+#define dkt_slots_signature(name,args)    (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __slots_signature::name))()
 #define dkt_kw_args_signature(name, args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __kw_args_signature::name))()
 
-#define selector(name, args)             *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
 #define unless(e) if (0 == (e))
 #define until(e)  while (0 == (e))
 
@@ -169,7 +172,7 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
     (((cast(int32_t)cast(char8_t) c4) <<  0) & 0x000000ff))
 
 #if !defined NUL
-  #define    NUL cast(char)0
+  #define    NUL cast(char_t)0
 #endif
 
 // boole-t is promoted to int-t when used in va_arg() macro

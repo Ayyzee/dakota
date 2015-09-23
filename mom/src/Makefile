@@ -11,19 +11,19 @@ EXTRA_DAKOTAFLAGS :=\
  --include-directory=.\
  --include-directory=../include\
 
-../lib/$(lib_prefix)%.$(SO_EXT):
+../lib/$(lib_prefix)%.$(so_ext):
 	$(DAKOTA) --shared --output $@ --name $(libdir)/$(@F) --var MAKEFLAGS="$(MAKEFLAGS)" $(EXTRA_DAKOTAFLAGS) $(DAKOTAFLAGS) $^
 	echo $(MAKEFLAGS)
 
-name :=  $(shell $(rootdir)/bin/dakota-project name  --var SO_EXT=$(SO_EXT))
-files := $(shell $(rootdir)/bin/dakota-project files --var SO_EXT=$(SO_EXT))
+name :=  $(shell $(rootdir)/bin/dakota-project name  --var so_ext=$(so_ext))
+files := $(shell $(rootdir)/bin/dakota-project files --var so_ext=$(so_ext))
 
 LIB := ../lib/$(name)
 
 all: $(LIB)
 
 check: all
-	$(rootdir)/bin/dakota-info$(exeext) $(LIB)
+	$(rootdir)/bin/dakota-info $(LIB)
 
 $(LIB): $(files)
 

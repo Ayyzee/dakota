@@ -13,12 +13,12 @@ DAKOTAFLAGS +=\
 
 export CXXFLAGS := --all-warnings --debug=3
 
-%$(exeext): %-main.dk
-	$(DAKOTA) --output $@ $(DAKOTAFLAGS) $^ $(libdir)/$(lib_prefix)dakota-util.$(SO_EXT) $(libdir)/$(lib_prefix)dakota-mom.$(SO_EXT)
+%: %-main.dk
+	$(DAKOTA) --output $@ $(DAKOTAFLAGS) $^ $(libdir)/$(lib_prefix)dakota-util.$(so_ext) $(libdir)/$(lib_prefix)dakota-mom.$(so_ext)
 
-all: echo-server$(exeext) echo-client$(exeext)
+all: echo-server echo-client
 clean:
-	rm -f echo-server$(exeext) echo-client$(exeext)
+	rm -f echo-server echo-client
 	rm -rf obj
 	rm -f *~
 install:

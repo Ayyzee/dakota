@@ -13,25 +13,25 @@ DAKOTAFLAGS +=\
 
 export CXXFLAGS := --all-warnings --debug=3
 
-%$(exeext): %-main.dk
-	$(DAKOTA) --output $@ $(DAKOTAFLAGS) $^ $(libdir)/$(lib_prefix)dakota-util.$(SO_EXT) $(libdir)/$(lib_prefix)dakota-mom.$(SO_EXT) $(libdir)/$(lib_prefix)dakota-x.$(SO_EXT)
+%: %-main.dk
+	$(DAKOTA) --output $@ $(DAKOTAFLAGS) $^ $(libdir)/$(lib_prefix)dakota-util.$(so_ext) $(libdir)/$(lib_prefix)dakota-mom.$(so_ext) $(libdir)/$(lib_prefix)dakota-x.$(so_ext)
 
 include libdakota-distexec-dk-files
 
-all: distexecd$(exeext) distexec$(exeext)
+all: distexecd distexec
 clean:
-	rm -f distexecd$(exeext) distexec$(exeext) $(lib_prefix)dakota-distexec.$(SO_EXT)
+	rm -f distexecd distexec $(lib_prefix)dakota-distexec.$(so_ext)
 	rm -rf obj
 	rm -f *~
 install:
 uninstall:
 
-check: $(lib_prefix)dakota-distexec.$(SO_EXT)
+check: $(lib_prefix)dakota-distexec.$(so_ext)
 	dakota-introspector $^
 
-$(lib_prefix)dakota-distexec.$(SO_EXT): $(libdakota_distexec_dk_files)
-	$(DAKOTA) --shared --output $@ $(DAKOTAFLAGS) $^ $(libdir)/$(lib_prefix)dakota-util.$(SO_EXT) $(libdir)/$(lib_prefix)dakota-mom.$(SO_EXT) $(libdir)/$(lib_prefix)dakota-x.$(SO_EXT)
+$(lib_prefix)dakota-distexec.$(so_ext): $(libdakota_distexec_dk_files)
+	$(DAKOTA) --shared --output $@ $(DAKOTAFLAGS) $^ $(libdir)/$(lib_prefix)dakota-util.$(so_ext) $(libdir)/$(lib_prefix)dakota-mom.$(so_ext) $(libdir)/$(lib_prefix)dakota-x.$(so_ext)
 
-distexecd: $(lib_prefix)dakota-distexec.$(SO_EXT)
+distexecd: $(lib_prefix)dakota-distexec.$(so_ext)
 
-distexec: $(lib_prefix)dakota-distexec.$(SO_EXT)
+distexec: $(lib_prefix)dakota-distexec.$(so_ext)

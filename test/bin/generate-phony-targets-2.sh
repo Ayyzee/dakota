@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o nounset -o errexit -o pipefail
+set -o errexit -o nounset -o pipefail
 
 source bin/common.sh
 

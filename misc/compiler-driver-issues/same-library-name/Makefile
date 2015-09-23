@@ -2,12 +2,12 @@ rootdir := ../../..
 
 include $(rootdir)/config.mk
 
-all: test.$(SO_EXT)
+all: test.$(so_ext)
 
-test.$(SO_EXT): test.dk
+test.$(so_ext): test.dk
 	dakota --shared --output $@ $^
 
-check: test.$(SO_EXT)
+check: test.$(so_ext)
 
 clean:
-	rm -rf obj lib test.$(SO_EXT) *~
+	rm -rf obj lib test.$(so_ext) *~

@@ -7,6 +7,7 @@ rootdir ?= ..
 srcdir ?= .
 blddir := .
 objdir ?= $(blddir)/obj
+objdir-name := $(notdir $(objdir))
 
 $(shell mkdir -p $(objdir))
 

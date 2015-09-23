@@ -120,17 +120,22 @@ if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
 }
 $ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
 
+my $gcc_from_dakota = {
+  '--include-directory' => '--include-directory', # yep, the same
+  '--define-macro' =>      '--define-macro',      # yep, the same
+};
+
 if ($$root_cmd{'opts'}{'include-directory'}) {
   my $flags = '';
   foreach my $dir (@{$$root_cmd{'opts'}{'include-directory'}}) {
-    $flags .= " --include-directory $dir";
+    $flags .= ' ' . $$gcc_from_dakota{'--include-directory'} . ' ' . $dir;
   }
   $ENV{'CXXFLAGS'} .= $flags;
 }
 if ($$root_cmd{'opts'}{'define-macro'}) {
   my $flags = '';
   foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}}) {
-    $flags .= " --define-macro $mcr";
+    $flags .= ' ' . $$gcc_from_dakota{'--define-macro'} . ' ' . $mcr;
   }
   $ENV{'CXXFLAGS'} .= $flags;
 }
