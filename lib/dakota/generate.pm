@@ -1746,17 +1746,19 @@ sub generate_struct_or_union_defn {
 
   my $max_width = 0;
   foreach my $slot_info (@$slots_info) {
-    my ($slot_name, $slot_type) = %$slot_info;
-    my $width = length($slot_type);
+    my $width = length($$slot_info{'type'});
     if ($width > $max_width) {
       $max_width = $width;
     }
   }
   foreach my $slot_info (@$slots_info) {
-    my ($slot_name, $slot_type) = %$slot_info;
-    my $width = length($slot_type);
+    my $width = length($$slot_info{'type'});
     my $pad = ' ' x ($max_width - $width);
-    $$scratch_str_ref .= $col . "$slot_type " . $pad . "$slot_name;\n";
+    if ($$slot_info{'expr'}) {
+      $$scratch_str_ref .= $col . "$$slot_info{'type'} " . $pad . "$$slot_info{'name'} = $$slot_info{'expr'};\n";
+    } else {
+      $$scratch_str_ref .= $col . "$$slot_info{'type'} " . $pad . "$$slot_info{'name'};\n";
+    }
   }
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}';
@@ -1784,7 +1786,7 @@ sub generate_enum_decl {
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
   die if $$enum{'type'} && $is_slots;
-  my $info = $$enum{'info'};
+  my $slots_info = $$enum{'info'};
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($is_slots) {
@@ -1802,18 +1804,20 @@ sub generate_enum_defn {
   }
   $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . "\n";
   my $max_width = 0;
-  foreach my $pair (@$info) {
-    my ($name, $value) = %$pair;
-    my $width = length($name);
+  foreach my $slot_info (@$slots_info) {
+    my $width = length($$slot_info{'name'});
     if ($width > $max_width) {
       $max_width = $width;
     }
   }
-  foreach my $pair (@$info) {
-    my ($name, $value) = %$pair;
-    my $width = length($name);
-    my $pad = ' ' x ($max_width - $width);
-    $$scratch_str_ref .= $col . "$name = " . $pad . "$value,\n";
+  foreach my $slot_info (@$slots_info) {
+    if ($$slot_info{'expr'}) {
+      my $width = length($$slot_info{'name'});
+      my $pad = ' ' x ($max_width - $width);
+      $$scratch_str_ref .= $col . "$$slot_info{'name'} = " . $pad . "$$slot_info{'expr'},\n";
+    } else {
+      $$scratch_str_ref .= $col . "$$slot_info{'name'},\n";
+    }
   }
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}';
@@ -1822,21 +1826,24 @@ sub parameter_list_from_slots_info {
   my ($slots_info) = @_;
   my $names = '';
   my $pairs = '';
+  my $pairs_w_expr = '';
   my $sep = '';
 
   foreach my $slot_info (@$slots_info) {
-    my $keys = [keys %$slot_info];
-    my $name = $$keys[0];
-    my $type = $$slot_info{$name};
-    if ('klass' eq $name) {
-      $name = 'kls';
-    }
-    $names .= "$sep$name";
-    $pairs .= "$sep$type $name";
-
+    my $type = $$slot_info{'type'};
+    my $name = $$slot_info{'name'};
+   #$names .=        "$sep/*.$name =*/ _$name";
+    $names .=        "$sep.$name = _$name";
+    $pairs .=        "$sep$type _$name";
+    $pairs_w_expr .= "$sep$type _$name";
     $sep = ', ';
+
+    if ($$slot_info{'expr'}) {
+     #$pairs_w_expr .= " /*= $$slot_info{'expr'}*/";
+      $pairs_w_expr .= " = $$slot_info{'expr'}";
+    }
   }
-  return ($pairs, $names);
+  return ($names, $pairs, $pairs_w_expr);
 }
 sub has_object_method_defn {
   my ($klass_scope, $slots_method_info) = @_;
@@ -1981,19 +1988,18 @@ sub generate_klass_construct {
       'struct' eq $$klass_scope{'slots'}{'cat'}) {
     if (!$ENV{'DK_USE_COMPOUND_LITERALS'}) {
       if (&has_slots_info($klass_scope)) {
-        my ($pairs, $names) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
+        my ($names, $pairs, $pairs_w_expr) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
+        #print "generate-klass-construct: " . &Dumper($$klass_scope{'slots'}{'info'});
 
         if ($pairs =~ m/\[/g) {
         } else {
-          $result .= $col . "klass $klass_name { slots-t construct($pairs)";
-
           if (&is_nrt_decl() || &is_rt_decl()) {
-            $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
+            $result .= $col . "klass $klass_name { slots-t construct($pairs_w_expr); }" . &ann(__FILE__, __LINE__) . "\n";
           } elsif (&is_rt_defn()) {
-            $result .= $col . " {" . &ann(__FILE__, __LINE__) . "\n";
+            $result .= $col . "klass $klass_name { slots-t construct($pairs) {" . &ann(__FILE__, __LINE__) . "\n";
             $col = &colin($col);
             $result .=
-              $col . "slots-t result = { $names };\n" .
+              $col . "slots-t result = cast(slots-t){ $names };\n" .
               $col . "return result;\n";
             $col = &colout($col);
             $result .= $col . "}}\n";
@@ -3310,13 +3316,13 @@ sub dk_generate_cc_footer_klass {
       my $seq = [];
       my $prop_num = 0;
       foreach my $slot_info (@{$$klass_scope{'slots'}{'info'}}) {
-        my ($slot_name, $slot_value) = %$slot_info;
         my $tbl = {};
-        $$tbl{'#name'} = "\#$slot_name";
-        if (defined $slot_value) {
-          $$tbl{'#expr'} = "\"$slot_value\"";
+        $$tbl{'#name'} = "\#$$slot_info{'name'}";
+        if (defined $$slot_info{'expr'}) {
+          $$tbl{'#expr'} = "\"$$slot_info{'expr'}\"";
+          $$tbl{'#expr-str'} = "\"$$slot_info{'expr'}\"";
         }
-        my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
+        my $prop_name = sprintf("%s-%s", $root_name, $$slot_info{'name'});
         $$scratch_str_ref .=
           $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }\n";
         &dakota::util::add_last($seq, "$prop_name");
@@ -3328,17 +3334,20 @@ sub dk_generate_cc_footer_klass {
       my $seq = [];
       my $prop_num = 0;
       foreach my $slot_info (@{$$klass_scope{'slots'}{'info'}}) {
-        my ($slot_name, $slot_type) = %$slot_info;
         my $tbl = {};
-        $$tbl{'#name'} = "\#$slot_name";
+        $$tbl{'#name'} = "\#$$slot_info{'name'}";
 
         if ('struct' eq $$klass_scope{'slots'}{'cat'}) {
-          $$tbl{'#offset'} = "offsetof(slots-t, $slot_name)";
+          $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
         }
-        $$tbl{'#size'} = "sizeof((cast(slots-t*)nullptr)->$slot_name)";
-        $$tbl{'#type'} = "\"$slot_type\"";
+        $$tbl{'#size'} = "sizeof((cast(slots-t*)nullptr)->$$slot_info{'name'})";
+        $$tbl{'#type'} = "\"$$slot_info{'type'}\"";
 
-        my $prop_name = sprintf("%s-%s", $root_name, $slot_name);
+        if ($$slot_info{'expr'}) {
+          $$tbl{'#expr'} = "($$slot_info{'expr'})";
+          $$tbl{'#expr-str'} = "\"$$slot_info{'expr'}\"";
+        }
+        my $prop_name = sprintf("%s-%s", $root_name, $$slot_info{'name'});
         $$scratch_str_ref .=
           $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }\n";
         &dakota::util::add_last($seq, "$prop_name");
@@ -3354,10 +3363,15 @@ sub dk_generate_cc_footer_klass {
       $$scratch_str_ref .= $col . "$klass_type @$klass_name { static enum-info-t __enum-info-$num\[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
       $col = &colin($col);
 
-      my $info = $$enum{'info'};
-      foreach my $pair (@$info) {
-        my ($name, $value) = %$pair;
-        $$scratch_str_ref .= $col . "{ \#$name, \"$value\" },\n";
+      my $slots_info = $$enum{'info'};
+      foreach my $slot_info (@$slots_info) {
+        my $name = $$slot_info{'name'};
+        if ($$slots_info{'expr'}) {
+          my $expr = $$slot_info{'expr'};
+          $$scratch_str_ref .= $col . "{ \#$name, $expr },\n";
+        } else {
+          $$scratch_str_ref .= $col . "{ \#$name, nullptr },\n";
+        }
       }
       $$scratch_str_ref .= $col . "{ nullptr, nullptr }\n";
       $col = &colout($col);
@@ -4032,6 +4046,7 @@ sub linkage_unit::generate_strings {
 }
 sub generate_property_tbl {
   my ($name, $tbl, $col, $symbols, $line) = @_;
+  #print STDERR &Dumper($tbl);
   my $sorted_keys = [sort keys %$tbl];
   my $num;
   my $result = '';

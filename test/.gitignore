@@ -4,3 +4,5 @@ exe
 lib-1.dylib
 lib-2.dylib
 lib-3.dylib
+failed-build
+failed-run

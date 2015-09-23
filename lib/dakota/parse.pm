@@ -695,49 +695,76 @@ sub trait {
 }
 sub slots_seq {
   my ($tkns, $seq) = @_;
-  my $tkn;
   my $type = [];
-  foreach $tkn (@$tkns) {
-    if (';' eq $$tkn{'str'}) {
-      my $key = &dakota::util::remove_last($type);
-      &add_symbol($gbl_root, [$key]);      # slot var name
-      &dakota::util::add_last($seq, {$key => &arg::type($type)});
-      &maybe_add_exported_header_for_symbol_seq($type);
-      $type = [];
+  my $has_expr = 0;
+  foreach my $tkn (@$tkns) {
+    if ('=' eq $$tkn{'str'}) {
+      $has_expr = 1;
+    }
+    if (';' ne $$tkn{'str'}) {
+      &add_last($type, $$tkn{'str'});
     } else {
-      &dakota::util::add_last($type, $$tkn{'str'});
+      my $expr = [];
+      if ($has_expr) {
+        while (scalar @$type) {
+          &add_first($expr, &remove_last($type));
+          if ('=' eq &last($type)) {
+            &remove_last($type);
+            last;
+          }
+        }
+      }
+      my $name = &remove_last($type);
+      &add_symbol($gbl_root, [ $name ]);
+      my $slot_info = { 'name' => $name,
+                        'type' => &arg::type($type) };
+      if (scalar @$expr) {
+        $$slot_info{'expr'} = join(' ', @$expr);
+      }
+      &add_last($seq, $slot_info);
+      &maybe_add_exported_header_for_symbol_seq($type);
+      $has_expr = 0;
+      $type = [];
     }
   }
+  #print 'slots_seq: ' . &Dumper($seq);
   return;
 }
 sub enum_seq {
   my ($tkns, $seq) = @_;
-
-  my $tkn;
-  my $type = [];
-  foreach $tkn (@$tkns) {
-    if (',' eq $$tkn{'str'}) {
-      my $key = &dakota::util::remove_first($type);
-      &add_symbol($gbl_root, [ $key ]);    # enum var name
-      if ('=' ne &dakota::util::remove_first($type)) {
+  my $expr = [];
+  foreach my $tkn (@$tkns) {
+    if (',' ne $$tkn{'str'}) {
+      &add_last($expr, $$tkn{'str'});
+    } else {
+      my $name = &remove_first($expr);
+      my $slot_info = { 'name' => $name };
+      &add_symbol($gbl_root, [ $name ]);
+      if (scalar @$expr) {
+        if ('=' ne &remove_first($expr)) {
+          die __FILE__, ":", __LINE__, ": error:\n";
+        }
+        $$slot_info{'expr'} = join(' ', @$expr);
+      }
+      &add_last($seq, $slot_info);
+      &maybe_add_exported_header_for_symbol_seq($expr);
+      $expr = [];
+    }
+  }
+  if (scalar @$expr) {
+    my $name = &remove_first($expr);
+    my $slot_info = { 'name' => $name };
+    &add_symbol($gbl_root, [ $name ]);
+    if (scalar @$expr) {
+      if ('=' ne &remove_first($expr)) {
         die __FILE__, ":", __LINE__, ": error:\n";
       }
-      &dakota::util::add_last($seq, { $key => "@$type" });
-      &maybe_add_exported_header_for_symbol_seq($type);
-      $type = [];
-    } else {
-      &dakota::util::add_last($type, $$tkn{'str'});
+      $$slot_info{'expr'} = join(' ', @$expr);
     }
+    &add_last($seq, $slot_info);
+    &maybe_add_exported_header_for_symbol_seq($expr);
   }
-  if (@$type && 0 != @$type) {
-    my $key = &dakota::util::remove_first($type);
-    &add_symbol($gbl_root, [ $key ]);      # enum var name
-    if ('=' ne &dakota::util::remove_first($type)) {
-      die __FILE__, ":", __LINE__, ": error:\n";
-    }
-    &dakota::util::add_last($seq, { $key => "@$type" });
-    &maybe_add_exported_header_for_symbol_seq($type);
-  }
+  #print 'enum_seq: ' . &Dumper($seq);
   return;
 }
 sub errdump {

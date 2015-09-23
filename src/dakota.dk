@@ -1177,12 +1177,12 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
           uint32-t max-type-width = max-slot-name-width(slots-info);
           uint32-t i = 0;
           while (nullptr != slots-info[i].elements) {
-            symbol-t       slot-name = name-from-info(&slots-info[i]);
+            symbol-t slot-name = name-from-info(&slots-info[i]);
             assert(nullptr != slot-name);
-            str-t slot-expr = cast(str-t)named-info::at(&slots-info[i], #expr);
-            assert(nullptr != slot-expr);
+            str-t slot-expr-str = cast(str-t)named-info::at(&slots-info[i], #expr-str);
+            assert(nullptr != slot-expr-str);
             
-            ofile::printf(ofl, "%-*s = %s,\n", max-type-width, slot-name, slot-expr);
+            ofile::printf(ofl, "%-*s = %s,\n", max-type-width, slot-name, slot-expr-str);
             i++;
           }
         } else {
@@ -1191,10 +1191,14 @@ dump-klass(ofile-t ofl, named-info-t* klass-info)
           while (nullptr != slots-info[i].elements) {
             str-t slot-type = cast(str-t)named-info::at(&slots-info[i], #type);
             assert(nullptr != slot-type);
-            symbol-t       slot-name = name-from-info(&slots-info[i]);
+            symbol-t slot-name = name-from-info(&slots-info[i]);
             assert(nullptr != slot-name);
+            str-t slot-expr-str = cast(str-t)named-info::at(&slots-info[i], #expr-str);
             
-            ofile::printf(ofl, "%-*s %s;\n", max-type-width, slot-type, slot-name);
+            if (nullptr != slot-expr-str)
+              ofile::printf(ofl, "%-*s %s = %s;\n", max-type-width, slot-type, slot-name, slot-expr-str);
+            else
+              ofile::printf(ofl, "%-*s %s;\n", max-type-width, slot-type, slot-name);
             i++;
           }
         }
