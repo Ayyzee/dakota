@@ -270,7 +270,7 @@ klass lexer {
                     }
                   }
                 }
-                abort();
+                std::_Exit(EXIT_FAILURE);
               }
               // /* comments
               case '*':

@@ -133,7 +133,7 @@ namespace va
   {
     fprintf(stderr, "%s:%i: ", file, line);
     vfprintf(stderr, format, args);
-    abort();
+    std::_Exit(EXIT_FAILURE);
   }
 }
 

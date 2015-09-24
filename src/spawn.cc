@@ -47,7 +47,7 @@ spawn(const char* arg)
       {
 	ssize_t n;
 	n = add_nonblock(errno_pipe[0]);
-	if (-1 == n) abort();
+	if (-1 == n) std::_Exit(EXIT_FAILURE);
 	n = read(errno_pipe[0], child_errno_str, sizeof(child_errno_str) - 1);
 	if (-1 != n)
 	{
@@ -60,10 +60,10 @@ spawn(const char* arg)
 	    return -1;
 	  }
 	  else // we expect exactly sizeof(child_errno_str) - 1 bytes
-	    abort();
+	    std::_Exit(EXIT_FAILURE);
 	}
 	else if (EAGAIN != errno)
-	  abort();
+	  std::_Exit(EXIT_FAILURE);
       }
       return exit_status;
     }
@@ -75,6 +75,6 @@ spawn(const char* arg)
       return -1;
     }
     else
-      abort();
+      std::_Exit(EXIT_FAILURE);
   }
 }

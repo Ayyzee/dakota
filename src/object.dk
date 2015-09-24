@@ -200,7 +200,7 @@ dkt-unbox-check(object-t object, object-t kls)
       dkt-log(dkt::k-log-error, "%s::unbox(0x%0*" PRIxPTR " {klass='%s'})",
              kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name);
 
-    abort();
+    std::_Exit(EXIT_FAILURE);
   }
   return;
 }

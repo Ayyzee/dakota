@@ -340,7 +340,7 @@ klass ofile {
     slots-t s = { nullptr, 0 };
     s.output = ::fopen(path, "w");
     if (nullptr == s.output)
-      abort();
+      std::_Exit(EXIT_FAILURE);
     return s;
   }
 
@@ -349,7 +349,7 @@ klass ofile {
   {
     int n = ::fclose(s.output);
     if (-1 == n)
-      abort();
+      std::_Exit(EXIT_FAILURE);
     return s;
   }
 }
@@ -853,7 +853,7 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
 
       if (nullptr == modulee) {
         fprintf(stderr, "%s:%i: error: missing module declaration\n", __FILE__, __LINE__);
-        abort();
+        std::_Exit(EXIT_FAILURE);
       }
       if (module-name != modulee)
         ofile::printf(ofl, "%s %s %s", "module", modulee, "export");
@@ -897,7 +897,7 @@ dump-klass-defns(ofile-t ofl, named-info-t* registration-info, str-t only)
     if (NULL != output-dir) {
       int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
-        abort();
+        std::_Exit(EXIT_FAILURE);
     }
     while (1) {
       named-info-t* klass-info = &klass-defns[i++];
@@ -1458,7 +1458,7 @@ static void last-user-code-before-main() {
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
   int-t r = set-read-only-all("__DKT_RODATA"); // must match segment portion of macro DKT-RODATA-SECTION
-  if (-1 == r) abort();
+  if (-1 == r) std::_Exit(EXIT_FAILURE);
   return;
 }
 SO-EXPORT void
