@@ -43,9 +43,9 @@ symbol_t superklass_name_from_info(named_info_t* info, symbol_t name);
 symbol_t default_superklass_name();
 symbol_t default_klass_name();
 
-[[noreturn]] void verbose_terminate()  noexcept;
-[[noreturn]] void verbose_unexpected() noexcept;
-[[noreturn]] void pre_runtime_verbose_terminate() noexcept;
-[[noreturn]] void pre_runtime_verbose_unexpected() noexcept;
+/*[[noreturn]]*/ void verbose_terminate()  noexcept;
+/*[[noreturn]]*/ void verbose_unexpected() noexcept;
+/*[[noreturn]]*/ void pre_runtime_verbose_terminate() noexcept;
+/*[[noreturn]]*/ void pre_runtime_verbose_unexpected() noexcept;
 
 #endif // dkt_dakota_private_hh

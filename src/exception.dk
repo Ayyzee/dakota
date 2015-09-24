@@ -118,23 +118,23 @@ dkt-log(uint32-t priority, str-t format, ...)
 static /*THREAD-LOCAL*/ void (*original-terminate)() =  std::set-terminate(pre-runtime-verbose-terminate);
 static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
 
-[[noreturn]] void
+/*[[noreturn]]*/ void
 pre-runtime-verbose-terminate() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
-  dkt-log(dkt::k-log-error, "uncaught exception");
+  dkt-log(dkt::k-log-error, "uncaught/unexpected exception");
 
   if (nullptr != current-exception-string)
     fprintf(stderr, ": \"%s\"\n", current-exception-string);
   else
     fprintf(stderr, "\n");
 
-  std::_Exit(EXIT_FAILURE);
+  original-terminate();
 }
 
-[[noreturn]] void
+/*[[noreturn]]*/ void
 verbose-terminate() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
@@ -146,7 +146,7 @@ verbose-terminate() noexcept
     if (nullptr != current-exception)
       dk::dump(current-exception);
 
-  dk::print-format(std-error, "%s[%i]: uncaught exception", getprogname(), getpid());
+  dk::print-format(std-error, "%s[%i]: uncaught/unexpected exception", getprogname(), getpid());
 
   if (nullptr != current-exception)
     dk::println(current-exception, std-error);
@@ -155,47 +155,23 @@ verbose-terminate() noexcept
   else
     dk::println(std-error, "");
 
-  std::_Exit(EXIT_FAILURE);
+  original-terminate();
 }
 
-[[noreturn]] void
+/*[[noreturn]]*/ void
 pre-runtime-verbose-unexpected() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
-  dkt-log(dkt::k-log-error, "unexpected exception");
-
-  if (nullptr != current-exception-string)
-    fprintf(stderr, ": \"%s\"\n", current-exception-string);
-  else
-    fprintf(stderr, "\n");
-
-  std::_Exit(EXIT_FAILURE);
+  pre-runtime-verbose-terminate();
 }
 
-[[noreturn]] void
+/*[[noreturn]]*/ void
 verbose-unexpected() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
-  object-t current-exception = dkt-capture-current-exception(cast(object-t)nullptr);
-
-  if (NULL != (getenv("DKT_DUMP_UNEXPECTED_EXCEPTION")))
-    if (nullptr != current-exception)
-      dk::dump(current-exception);
-
-  dk::print-format(std-error, "%s[%i]: unexpected exception", getprogname(), getpid());
-
-  if (nullptr != current-exception)
-    dk::println(current-exception, std-error);
-  else-if (nullptr != current-exception-string)
-    dk::println-format(std-error, ": \"%s\"", current-exception-string);
-  else
-    dk::println(std-error, "");
-
-  std::_Exit(EXIT_FAILURE);
+  verbose-terminate();
 }
 
 klass exception {
