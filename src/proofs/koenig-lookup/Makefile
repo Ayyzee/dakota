@@ -3,7 +3,7 @@ include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
 all:
-	$(CXX) $(CXXFLAGS) $(CXX_WARNINGS_FLAGS) $(CXX_DEBUG_FLAGS) $(CXX_OUTPUT_FLAGS) exe exe.cc
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_OUTPUT_FLAGS) exe exe.cc
 
 check: all
 	./exe
