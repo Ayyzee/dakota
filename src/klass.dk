@@ -76,7 +76,7 @@ namespace klass
 }
 #endif
 
-noreturn SO-EXPORT void dkt-null-method(object-t object, ...)
+[[noreturn]] SO-EXPORT void dkt-null-method(object-t object, ...)
 {
   throw make(no-such-method-exception::klass, #object : object, #kls : klass-of(object));
 }

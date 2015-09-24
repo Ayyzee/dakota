@@ -113,12 +113,14 @@ namespace dkt {
 // don't forget about c++s' noexcept
   #define hot        __attribute__((__hot__))
   #define designated_init __attribute__((__designated_init__))
-  #if 0
-    #define noreturn  __attribute__((__noreturn__))
-  #else
-    #define noreturn [[noreturn]]
-  #endif
+  // #if 0
+  //   #define noreturn  __attribute__((__noreturn__))
+  // #else
+  //   #define noreturn [[noreturn]]
+  // #endif
 #endif
+
+#define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwin
 
 #define unbox_attrs pure hot nothrow
 
@@ -243,13 +245,13 @@ SO_IMPORT sentinel object_t      dk_make_named_info(      symbol_t name, ...);
 
 DEBUG_IMPORT named_info_t* dkt_dump_named_info(named_info_t* info);
 
-#if defined DEBUG
-  #define DKT_NULL_METHOD nullptr
-#else
+// #if defined DEBUG
+//   #define DKT_NULL_METHOD nullptr
+// #else
   #define DKT_NULL_METHOD dkt_null_method
-#endif
+// #endif
 
-SO_IMPORT noreturn void dkt_null_method(object_t object, ...);
+SO_IMPORT [[noreturn]] void dkt_null_method(object_t object, ...);
 
 DEBUG_IMPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
 DEBUG_IMPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);

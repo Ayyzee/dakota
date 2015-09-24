@@ -23,9 +23,6 @@
 dkt_declare_klass_type_struct(selector_node);
 //dkt_declare_klass_type_struct(signature);
 
-extern void (*previous_terminate)();
-extern void (*previous_unexpected)();
-
 void import_selectors(signature_t** signatures, selector_node_t* selector_nodes);
 
 symbol_t interposer_name_for_klass_name(symbol_t klass_name);
@@ -46,7 +43,9 @@ symbol_t superklass_name_from_info(named_info_t* info, symbol_t name);
 symbol_t default_superklass_name();
 symbol_t default_klass_name();
 
-void verbose_terminate();
-void verbose_unexpected();
+[[noreturn]] void verbose_terminate()  noexcept;
+[[noreturn]] void verbose_unexpected() noexcept;
+[[noreturn]] void pre_runtime_verbose_terminate() noexcept;
+[[noreturn]] void pre_runtime_verbose_unexpected() noexcept;
 
 #endif // dkt_dakota_private_hh

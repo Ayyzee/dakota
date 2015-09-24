@@ -300,12 +300,6 @@ init-klass(object-t kls, symbol-t name)
 
 void import-klass(symbol-t name, assoc-node-t* klass-assoc);
 
-void pre-runtime-verbose-terminate();
-void verbose-terminate();
-
-void pre-runtime-verbose-unexpected();
-void verbose-unexpected();
-
 klass ofile {
   slots {
     file-t   output;
@@ -383,7 +377,7 @@ perl-dump-resource-info(sorted-array-t* klass-defns-table)
         signature-t const* method-signature;
         while (nullptr != (method-signature = method-signatures[j])) {
           method-t method-address = method-addresses[j];
-          if (nullptr != method-address && cast(method-t)dkt-null-method != method-address)
+          if (nullptr != method-address && cast(method-t)DKT-NULL-METHOD != method-address)
             methods-count++;
           j++;
         }
@@ -571,10 +565,10 @@ dk-init-runtime()
     std-error =  make(output-stream::klass, #file : stderr);
 #endif
 
-    previous-terminate = std::set-terminate(verbose-terminate);
+    auto previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
 
-    previous-unexpected = std::set-unexpected(verbose-unexpected);
+    auto previous-unexpected = std::set-unexpected(verbose-unexpected);
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 #if 0

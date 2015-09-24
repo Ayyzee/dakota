@@ -26,30 +26,28 @@
 
 #include "dakota-private.hh"
 
-#define THROW throw // so the macro system won't rewrite
-#define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwin
-
 module dakota;
 
 klass output-stream;
+klass system-exception;
 
 SO-EXPORT object-t dkt-capture-current-exception(object-t arg)
 {
   static THREAD_LOCAL object-t result;
-  if (arg) result = arg;
+  if (nullptr != arg) result = arg;
   return result;
 }
 
 SO-EXPORT str-t dkt-capture-current-exception(str-t arg)
 {
   static THREAD_LOCAL str-t result;
-  if (arg) result = arg;
+  if (nullptr != arg) result = arg;
   return result;
 }
 
 #if !defined HAVE-GETPROGNAME
 #if defined HAVE-PROCFS
-static char8-t[1024] gbl-buf;
+static char8-t[4 * 1024] gbl-buf;
 str-t
 getprogname()
 {
@@ -90,7 +88,7 @@ va-log(uint32-t priority, str-t format, va-list-t args)
         fprintf(log-file, "debug: ");
         break;
       default:
-        abort();
+        std::_Exit(EXIT_FAILURE);
     }
   }
   fprintf(log-file, "{");
@@ -117,14 +115,15 @@ dkt-log(uint32-t priority, str-t format, ...)
   return result;
 }
 
-void pre-runtime-verbose-terminate();
-void (*previous-terminate)() = std::set-terminate(pre-runtime-verbose-terminate);
-void
-pre-runtime-verbose-terminate()
+static /*THREAD-LOCAL*/ void (*original-terminate)() =  std::set-terminate(pre-runtime-verbose-terminate);
+static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
+
+[[noreturn]] void
+pre-runtime-verbose-terminate() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
   dkt-log(dkt::k-log-error, "uncaught exception");
 
   if (nullptr != current-exception-string)
@@ -132,16 +131,16 @@ pre-runtime-verbose-terminate()
   else
     fprintf(stderr, "\n");
 
-  previous-terminate();
+  std::_Exit(EXIT_FAILURE);
 }
 
-void
-verbose-terminate()
+[[noreturn]] void
+verbose-terminate() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
-  object-t current-exception = dkt-capture-current-exception(cast(object-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
+  object-t current-exception = dkt-capture-current-exception(cast(object-t)nullptr);
 
   if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
@@ -156,17 +155,15 @@ verbose-terminate()
   else
     dk::println(std-error, "");
 
-  previous-terminate();
+  std::_Exit(EXIT_FAILURE);
 }
 
-void pre-runtime-verbose-unexpected();
-void (*previous-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
-void
-pre-runtime-verbose-unexpected()
+[[noreturn]] void
+pre-runtime-verbose-unexpected() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
   dkt-log(dkt::k-log-error, "unexpected exception");
 
   if (nullptr != current-exception-string)
@@ -174,16 +171,16 @@ pre-runtime-verbose-unexpected()
   else
     fprintf(stderr, "\n");
 
-  previous-unexpected();
+  std::_Exit(EXIT_FAILURE);
 }
 
-void
-verbose-unexpected()
+[[noreturn]] void
+verbose-unexpected() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)0);
-  object-t current-exception = dkt-capture-current-exception(cast(object-t)0);
+  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
+  object-t current-exception = dkt-capture-current-exception(cast(object-t)nullptr);
 
   if (NULL != (getenv("DKT_DUMP_UNEXPECTED_EXCEPTION")))
     if (nullptr != current-exception)
@@ -198,7 +195,7 @@ verbose-unexpected()
   else
     dk::println(std-error, "");
 
-  previous-unexpected();
+  std::_Exit(EXIT_FAILURE);
 }
 
 klass exception {
