@@ -1369,12 +1369,11 @@ static addr2name-pair-t others[] = {
 };
 static const char*
 name-from-address(void* _addr) { // slowslow
-  return nullptr; // hackhack
   object-t* addr = cast(decltype(addr))_addr;
   // others
   for (size-t i = 0; i < DK-COUNTOF(others); i++) {
     addr2name-pair-t other = others[i];
-    if (*other.addr == *cast(decltype(other.addr))addr) {
+    if (other.addr == cast(decltype(other.addr))addr) {
       return other.name;
     }
   }
@@ -1386,7 +1385,7 @@ name-from-address(void* _addr) { // slowslow
 
     // imported-klasses
     for (uint-t i = 0; nullptr != cast(object-t*)ri.imported-klasses[i].element; i++) {
-      if (*cast(object-t*)ri.imported-klasses[i].element == *cast(object-t*)addr) {
+      if (cast(object-t*)ri.imported-klasses[i].element == cast(object-t*)addr) {
         return ri.imported-klasses-names[i];
       }
     }
