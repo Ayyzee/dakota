@@ -32,7 +32,7 @@ class finally
 #define DKT_FINALLY(block) finally __finally([&] block)
 
 #define DKT_CATCH_BEGIN(_e_) catch (object_t _e_) { if (0) {}
-#define DKT_CATCH(kls, v)    else if (dk::instancep(v, kls))
+#define DKT_CATCH(kls, v)    else if (dk::instancex3f(v, kls))
 #define DKT_CATCH_END(_e_)   else { throw _e_; } }
 
 #endif
