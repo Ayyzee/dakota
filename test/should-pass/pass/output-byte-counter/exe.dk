@@ -2,12 +2,12 @@
 
 klass xxx::output-character-counter
 {
-  interpose perl-object-output-stream;
+  interpose json-object-output-stream;
 }
 
 klass yyy::output-line-counter
 {
-  interpose perl-object-output-stream;
+  interpose json-object-output-stream;
 }
 
 klass xxx::input-character-counter
@@ -31,7 +31,7 @@ klass zzz::character-counter
 
 interpose object-input-stream, yyy::input-line-counter, xxx::input-character-counter;
 
-interpose perl-object-output-stream, yyy::output-line-counter, xxx::output-character-counter;
+interpose json-object-output-stream, yyy::output-line-counter, xxx::output-character-counter;
 
 int-t main()
 {

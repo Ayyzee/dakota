@@ -1,7 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass features; // hackhack
-klass perl-object-output-stream;
+klass json-object-output-stream;
 klass sorted-klass;
 
 int-t main()
@@ -11,9 +11,9 @@ int-t main()
   dk::add(ss, #"key1");
   dk::add(ss, #"key2");
 
-  object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-  dk::write(perl-object-output-stream, ss);
+  object-t json-object-output-stream = make(json-object-output-stream::klass);
+  dk::write(json-object-output-stream, ss);
 
-  dk::close(perl-object-output-stream);
+  dk::close(json-object-output-stream);
   return 0;
 }

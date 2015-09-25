@@ -1,14 +1,14 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass perl-object-output-stream;
-klass perl-parser;
+klass json-object-output-stream;
+klass json-parser;
 
 int-t main()
 {
-  object-t parser = make(perl-parser::klass);
+  object-t parser = make(json-parser::klass);
   object-t property-list = dk::read-property-list(parser);
   fprintf(stderr, "---\n");
-  object-t output-stream = make(perl-object-output-stream::klass);
+  object-t output-stream = make(json-object-output-stream::klass);
   dk::write(output-stream, property-list);
   dk::close(output-stream);
   fprintf(stderr, "---\n");

@@ -16,7 +16,7 @@ int-t main(int-t argc, char8-t**argv)
 
   dk::dump(ops);
 
-//   object-t obj-out = make(perl-object-output-stream::klass);
+//   object-t obj-out = make(json-object-output-stream::klass);
 //   dk::write(obj-out, ops);
 
   return 0;

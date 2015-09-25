@@ -2,15 +2,15 @@
 
 klass features; // hackhack
 klass pair;
-klass perl-object-output-stream;
+klass json-object-output-stream;
 
 int-t main()
 {
   object-t pair = make(pair::klass);
 
-  object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-  dk::write(perl-object-output-stream, pair);
+  object-t json-object-output-stream = make(json-object-output-stream::klass);
+  dk::write(json-object-output-stream, pair);
 
-  dk::close(perl-object-output-stream);
+  dk::close(json-object-output-stream);
   return 0;
 }

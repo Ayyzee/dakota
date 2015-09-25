@@ -162,7 +162,7 @@ klass pair
 }
 generic object-t dk::init(object-t,file-t file:{0});
 
-klass perl-object-output-stream
+klass json-object-output-stream
 {
   superklass text-output-stream;
   
@@ -178,7 +178,7 @@ klass perl-object-output-stream
 }
 generic object-t dk::init(object-t,file-t file:{0},str-t filename:{0});
 
-klass perl-parser
+klass json-parser
 {
 //method object-t init(object-t,file-t file:{0},str-t filename:{0});
   method object-t va::init(object-t,va-list-t);
@@ -316,10 +316,10 @@ module dakota-util export
   open-token::slots-t,
   pair,
   pair::slots-t,
-  perl-object-output-stream,
-  perl-object-output-stream::slots-t,
-  perl-parser,
-  perl-parser::slots-t,
+  json-object-output-stream,
+  json-object-output-stream::slots-t,
+  json-parser,
+  json-parser::slots-t,
   point,
   point::slots-t,
   rect,

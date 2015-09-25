@@ -31,17 +31,17 @@ static object-t check(object-t klass)
 
 int-t main()
 {
-//object-t perl-object-output-stream = make(perl-object-output-stream::klass);
+//object-t json-object-output-stream = make(json-object-output-stream::klass);
 
   object-t c1 = check(sorted-set::klass);
   USE(c1);
-//dk::write(perl-object-output-stream, c1);
+//dk::write(json-object-output-stream, c1);
 
   object-t c2 = check(hashed-set::klass);
   USE(c2);
-//dk::write(perl-object-output-stream, c2);
+//dk::write(json-object-output-stream, c2);
 
-//dk::close(perl-object-output-stream);
+//dk::close(json-object-output-stream);
 
   return 0;
 }

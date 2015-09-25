@@ -2,7 +2,7 @@
 
 klass features; // hackhack
 klass hashed-table;
-klass perl-object-output-stream;
+klass json-object-output-stream;
 
 int-t main()
 {
@@ -10,9 +10,9 @@ int-t main()
 
   dk::add(st, #"key0", #"element0");
 
-  object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-  dk::write(perl-object-output-stream, st);
+  object-t json-object-output-stream = make(json-object-output-stream::klass);
+  dk::write(json-object-output-stream, st);
 
-  dk::close(perl-object-output-stream);
+  dk::close(json-object-output-stream);
   return 0;
 }

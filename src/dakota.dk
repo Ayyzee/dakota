@@ -324,7 +324,7 @@ klass ofile {
 #if 1
 extern sorted-array-t gbl-selectors-table;
 static void
-perl-dump-resource-info(sorted-array-t* klass-defns-table) {
+json-dump-resource-info(sorted-array-t* klass-defns-table) {
   uint32-t klasses-count = 0;
   uint32-t methods-count = 0;
   for (uint32-t i = 0; i < klass-defns-table->count; i++) {
@@ -358,7 +358,7 @@ perl-dump-resource-info(sorted-array-t* klass-defns-table) {
 #endif
 
 static void
-perl-dump-klass-defns(sorted-array-t* klass-defns-table) {
+json-dump-klass-defns(sorted-array-t* klass-defns-table) {
   ofile-t ofl = { stdout, 0 };
   ofile::printf(ofl, "{\n");
   ofl.col++;
@@ -1415,10 +1415,10 @@ dkt-register-info(named-info-t* registration-info) {
       break;
     case construct::k-executable:
       add-registration-info(registration-info);
-      if (NULL != getenv("DKT_PERL_DUMP_KLASSES"))
-        perl-dump-klass-defns(gbl-klass-defns-table);
+      if (NULL != getenv("DKT_JSON_DUMP_KLASSES"))
+        json-dump-klass-defns(gbl-klass-defns-table);
       if (0)
-        perl-dump-resource-info(gbl-klass-defns-table);
+        json-dump-resource-info(gbl-klass-defns-table);
       if (NULL == getenv("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
       last-user-code-before-main();

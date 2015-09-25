@@ -1,7 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass features; // hackhack
-klass perl-object-output-stream;
+klass json-object-output-stream;
 klass string;
 klass vector;
 
@@ -22,9 +22,9 @@ int-t main()
   dk::add-last(vector, o2);
 
   {
-    object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-    dk::write(perl-object-output-stream, vector);
-    dk::close(perl-object-output-stream);
+    object-t json-object-output-stream = make(json-object-output-stream::klass);
+    dk::write(json-object-output-stream, vector);
+    dk::close(json-object-output-stream);
   }
 //   {
 //   object-t xml-object-output-stream = make(xml-object-output-stream::klass);

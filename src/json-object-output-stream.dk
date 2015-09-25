@@ -28,7 +28,7 @@ using features::k-trailing-newline;
 using features::k-leading-ws;
 using features::k-trailing-ws;
 
-klass perl-object-output-stream {
+klass json-object-output-stream {
   superklass text-output-stream;
 
   slots {

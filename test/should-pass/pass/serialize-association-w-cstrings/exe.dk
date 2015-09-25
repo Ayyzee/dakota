@@ -2,7 +2,7 @@
 
 klass features; // hackhack
 klass pair;
-klass perl-object-output-stream;
+klass json-object-output-stream;
 
 int-t main()
 {
@@ -10,9 +10,9 @@ int-t main()
                        #first : #"key0",
                        #last :  #"element0");
 
-  object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-  dk::write(perl-object-output-stream, pair);
-  dk::close(perl-object-output-stream);
+  object-t json-object-output-stream = make(json-object-output-stream::klass);
+  dk::write(json-object-output-stream, pair);
+  dk::close(json-object-output-stream);
 
   return 0;
 }

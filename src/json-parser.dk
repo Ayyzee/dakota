@@ -42,7 +42,7 @@ print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...) {
   }
   return result;
 }
-klass perl-parser {  
+klass json-parser {  
   slots {
     file-t   in;
     str-t    filename;
@@ -109,7 +109,7 @@ klass perl-parser {
   /* method */ static object-t lex(object-t self) {
     int32-t c;
     while (1) {
-      while (isspace(c = perl-parser::get(self))) {
+      while (isspace(c = json-parser::get(self))) {
       }
       if (EOF == c)
       { return null; }
@@ -126,14 +126,14 @@ klass perl-parser {
         case ',': { return make(token::klass, #tokenid : ',', #buffer : ",",
                                 #line : self.line, #column : self.column - 1); }
         case '#': {
-          while ('\n' != (c = perl-parser::get(self))) {
+          while ('\n' != (c = json-parser::get(self))) {
             if (EOF == c)
               return null;
           }
           break;
         }
         case '=': {
-          c = perl-parser::get(self);
+          c = json-parser::get(self);
           if (EOF == c || '>' != c) {
             print-error(self.filename, self.line, self.column - 2, "unknown token '='\n");
             return null;
@@ -147,7 +147,7 @@ klass perl-parser {
           object-t token = make(token::klass, #tokenid : 'sqst',
                                 #line : self.line, #column : self.column - 1);
           boole-t escaped?;
-          c = perl-parser::get(self);
+          c = json-parser::get(self);
           if (EOF == c) {
             print-error(self.filename, self.line, self.column, "unterminated string\n");
             return null;
@@ -162,7 +162,7 @@ klass perl-parser {
             else
               escaped? = false;
 
-            c = perl-parser::get(self);
+            c = json-parser::get(self);
             if (EOF == c) {
               print-error(self.filename, self.line, self.column, "unterminated string\n");
               return null;
@@ -192,10 +192,10 @@ klass perl-parser {
                                 #line : self.line, #column : self.column - 1);
           do {
             dk::append(token, cast(uint32-t)c);
-            c = perl-parser::get(self);
+            c = json-parser::get(self);
           } while (isalnum(c) || '_' == c);
           if (EOF != c)
-            perl-parser::putback(self, c);
+            json-parser::putback(self, c);
           return token;
         }
         default: {
@@ -210,7 +210,7 @@ klass perl-parser {
   /* method */ object-t get-vector(object-t self);
 
   /* method */ static object-t key(object-t self) {
-    object-t token = perl-parser::lex(self);
+    object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
@@ -235,7 +235,7 @@ klass perl-parser {
     return key;
   }
   /* method */ static object-t get-corresponds-to(object-t self) {
-    object-t token = perl-parser::lex(self);
+    object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
@@ -248,7 +248,7 @@ klass perl-parser {
   }
   /* method */ static object-t get-element(object-t self)
   { // get table element - element is NOT optional
-    object-t token = perl-parser::lex(self);
+    object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
@@ -268,10 +268,10 @@ klass perl-parser {
         element = make(string::klass, #bytes : dk::buffer(token));
         break;
       case '{':
-        element = perl-parser::get-table(self);
+        element = json-parser::get-table(self);
         break;
       case '[':
-        element = perl-parser::get-vector(self);
+        element = json-parser::get-vector(self);
         break;
       default:
         print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk::buffer(token));
@@ -281,7 +281,7 @@ klass perl-parser {
   }
   /* method */ static object-t element(object-t self)
   { // get vector element - element is optional
-    object-t token = perl-parser::lex(self);
+    object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
@@ -301,10 +301,10 @@ klass perl-parser {
         element = make(string::klass, #bytes : dk::buffer(token));
         break;
       case '{':
-        element = perl-parser::get-table(self);
+        element = json-parser::get-table(self);
         break;
       case '[':
-        element = perl-parser::get-vector(self);
+        element = json-parser::get-vector(self);
         break;
       case ']': // only difference from get-element()
         return null;
@@ -315,13 +315,13 @@ klass perl-parser {
     return element;
   }
   /* method */ static object-t get-table-pair(object-t self) {
-    object-t key = perl-parser::key(self);
+    object-t key = json-parser::key(self);
     if (null == key)
       return nullptr;
-    object-t corresponds-to = perl-parser::get-corresponds-to(self);
+    object-t corresponds-to = json-parser::get-corresponds-to(self);
     if (null == corresponds-to)
       return nullptr;
-    object-t element = perl-parser::get-element(self);
+    object-t element = json-parser::get-element(self);
     if (null == element)
       return nullptr;
     return pair::box({key, element});
@@ -331,14 +331,14 @@ klass perl-parser {
     object-t vector = make(vector::klass);
     object-t token;
     do {
-      object-t element = perl-parser::element(self);
+      object-t element = json-parser::element(self);
       if (null == element)
         return vector;
 
       // add 'element' to 'vector'
       dk::add-last(vector, element);
 
-      token = perl-parser::lex(self);
+      token = json-parser::lex(self);
       if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete vector\n");
         return null; // undef
@@ -356,14 +356,14 @@ klass perl-parser {
     object-t table = make(hashed-table::klass);
     object-t token;
     do {
-      object-t table-pair = perl-parser::get-table-pair(self);
+      object-t table-pair = json-parser::get-table-pair(self);
       if (nullptr == table-pair)
         return table;
 
       // add 'table-pair' to 'table'
       dk::add(table, table-pair);
 
-      token = perl-parser::lex(self);
+      token = json-parser::lex(self);
       if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete table\n");
         return null;
@@ -380,12 +380,12 @@ klass perl-parser {
   //      method object-t _read-property-list(object-t self)
   //      {
   //        object-t token;
-  //        while (null != (token = perl-parser::lex(self)))
+  //        while (null != (token = json-parser::lex(self)))
   //          dk::token::print(token, stdout);
   //        return null;
   //      }
   method object-t read-property-list(object-t self) {
-    object-t token = perl-parser::lex(self);
+    object-t token = json-parser::lex(self);
     if (null == token)
       return null; // undef
 
@@ -399,9 +399,9 @@ klass perl-parser {
       case 'st':
         return make(string::klass, #bytes : dk::buffer(token));
       case '{':
-        return perl-parser::get-table(self);
+        return json-parser::get-table(self);
       case '[':
-        return perl-parser::get-vector(self);
+        return json-parser::get-vector(self);
       default:
         print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk::buffer(token));
         return null; // undef

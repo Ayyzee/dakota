@@ -17,9 +17,9 @@ int-t main()
   intptr-t result = dk::compare(pair1, pair2);
   assert(0 == result);
 
-//   object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-//   dk::write(perl-object-output-stream, pair);
-//   dk::close(perl-object-output-stream);
+//   object-t json-object-output-stream = make(json-object-output-stream::klass);
+//   dk::write(json-object-output-stream, pair);
+//   dk::close(json-object-output-stream);
 
   return 0;
 }

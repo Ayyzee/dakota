@@ -4,7 +4,7 @@
 
 klass int32; // hackhack
 klass pair; // hackhack
-klass perl-object-output-stream;
+klass json-object-output-stream;
 klass sorted-table; // hackhack
 
 int-t main()
@@ -15,9 +15,9 @@ int-t main()
 
   dk::dump(o);
 
-  object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-  dk::write-slots(o, perl-object-output-stream);
-  dk::close(perl-object-output-stream);
+  object-t json-object-output-stream = make(json-object-output-stream::klass);
+  dk::write-slots(o, json-object-output-stream);
+  dk::close(json-object-output-stream);
 
   USE(a);
   USE(c);

@@ -2,7 +2,7 @@
 
 klass features; // hackhack
 klass hashed-table;
-klass perl-object-output-stream;
+klass json-object-output-stream;
 klass string;
 klass vector;
 
@@ -12,7 +12,7 @@ int-t main()
 
   try
   {
-    object-t perl-object-output-stream = make(perl-object-output-stream::klass, #file : stdout);
+    object-t json-object-output-stream = make(json-object-output-stream::klass, #file : stdout);
     object-t table =  make(hashed-table::klass);
     object-t vector =  make(vector::klass);
     object-t string1 = make(string::klass, #bytes : "hello father");
@@ -23,8 +23,8 @@ int-t main()
     dk::add-last(vector, null);
     dk::add(table, string2, vector);
 
-    dk::write(perl-object-output-stream, table);
-    dk::close(perl-object-output-stream);
+    dk::write(json-object-output-stream, table);
+    dk::close(json-object-output-stream);
   }
   catch(...)
   {

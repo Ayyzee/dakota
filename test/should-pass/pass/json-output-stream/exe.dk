@@ -1,7 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass features; // hackhack
-klass perl-object-output-stream;
+klass json-object-output-stream;
 
 klass k1
 {
@@ -75,7 +75,7 @@ int-t main()
 //   object-t ooutput-stream = make(xml-object-output-stream::klass);
 //   dk::write(ooutput-stream, i);
 
-  object-t poutput-stream = make(perl-object-output-stream::klass);
+  object-t poutput-stream = make(json-object-output-stream::klass);
   dk::write(poutput-stream, i);
   dk::close(poutput-stream);
   return 0;

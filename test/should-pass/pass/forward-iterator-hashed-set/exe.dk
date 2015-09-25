@@ -22,8 +22,8 @@ int-t main()
 {
   object-t c = create(hashed-set::klass, dk::add, 3);
 //   object-t c = create(deque::klass, dk::add-first, 1);
-//   object-t perl-object-output-stream = make(perl-object-output-stream::klass);
-//   dk::write(perl-object-output-stream, c);
+//   object-t json-object-output-stream = make(json-object-output-stream::klass);
+//   dk::write(json-object-output-stream, c);
 
   if (1) {
     for (object-t iter = dk::forward-iterator(c);

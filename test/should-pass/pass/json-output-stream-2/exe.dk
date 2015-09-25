@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass perl-parser;
+klass json-parser;
 klass xml-object-output-stream;
 
 klass k1
@@ -57,11 +57,11 @@ klass k3
 
 int-t main()
 {
-  object-t parser = make(perl-parser::klass);
+  object-t parser = make(json-parser::klass);
   object-t property-list = dk::read-property-list(parser);
 
 //   object-t i = make(k3::klass);
-//   object-t ooutput-stream = make(perl-object-output-stream::klass);
+//   object-t ooutput-stream = make(json-object-output-stream::klass);
 //   dk::write(ooutput-stream, i);
 
   object-t poutput-stream = make(xml-object-output-stream::klass);
