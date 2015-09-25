@@ -114,7 +114,7 @@ klass sorted-set {
     return object2;
   }
   method object-t at(object-t self, object-t object1) {
-    object-t result = dk::at(self, object1, nullptr);
+    object-t result = dk::at(self, object1, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #message : "oops");
     return result;
@@ -122,7 +122,7 @@ klass sorted-set {
   method boole-t contains?(object-t self, object-t key) {
     boole-t state;
 
-    if (nullptr == dk::at(self, key, nullptr))
+    if (nullptr == dk::at(self, key, cast(object-t)nullptr))
       state = false;
     else
       state = true;
@@ -189,7 +189,7 @@ klass sorted-set {
     dk::write-sequence-start(out, "elements");
 
     for (object-t element in self)
-      dk::write-element-idref(out, element, nullptr);
+      dk::write-element-idref(out, element, cast(str-t)nullptr);
     dk::write-sequence-end(out);
 
     dk::write-slots-end(out);

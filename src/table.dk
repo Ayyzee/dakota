@@ -27,11 +27,11 @@ trait table {
 
   method alias(at) object-t in(object-t self, object-t key);
   method object-t at(object-t self, object-t key) {
-    return dk::at(self, key, nullptr);
+    return dk::at(self, key, cast(object-t)nullptr);
   }
   method object-t at(object-t self, object-t key, object-t default-result) {
     object-t result = default-result;
-    object-t pair = dk::pair-at(self, key, nullptr);
+    object-t pair = dk::pair-at(self, key, cast(object-t)nullptr);
 
     if (nullptr != pair) {
       pair-t* pair-content = pair::unbox(pair);
