@@ -112,7 +112,7 @@ klass hashed-set {
         }
       }
 //       if (should-throw && nullptr != element)
-//         throw "oops";
+//         throw make(exception::klass, #message : "oops");
 
       if (nullptr != element) {
         dk::add-first(deque, object1);

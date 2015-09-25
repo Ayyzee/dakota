@@ -26,6 +26,7 @@ space?(int-t c) {
 }
 module dakota-util;
 
+klass exception;
 klass token;
 klass type-predicate;
 klass str128;
@@ -92,9 +93,9 @@ klass input-file {
   
   method object-t put-char8(object-t self, char8-t c) {
     if (0 == self.current-position)
-      throw "oops";
+      throw make(exception::klass, #message : "oops");
     if (c != self.buffer[self.current-position - 1])
-      throw "oops";
+      throw make(exception::klass, #message : "oops");
     self.current-position--;
     if ('\n' == c) {
       self.line--;

@@ -211,7 +211,6 @@ klass vector {
     object-t result = dk::at(self, index, default-result);
     return result;
   }
-  // throw (object-t)
   method object-t at(object-t self, uint32-t index) {
     object-t element = dk::at(self, index, nullptr);
     if (nullptr == element)
@@ -224,7 +223,6 @@ klass vector {
     object-t result = dk::at(self, index);
     return result;
   }
-  // throw (object-t)
   method object-t replace-at(object-t self, uint32-t index, object-t object) {
     if (index >= self.capacity)
       throw make(exception::klass, #message : "oops");
