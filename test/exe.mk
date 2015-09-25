@@ -1,10 +1,12 @@
 include $(rootdir)/test/vars.mk
 
+EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG --no-warnings
+
 exe: exe.dk
-	EXTRA_CXXFLAGS=$(CXX_NO_WARNINGS_FLAGS) $(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
 lib-%.$(so_ext): lib-%.dk module-lib-%.dk
-	EXTRA_CXXFLAGS=$(CXX_NO_WARNINGS_FLAGS) $(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
 .PHONY: all check clean
 
