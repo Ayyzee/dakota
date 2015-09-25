@@ -36,7 +36,7 @@ klass property {
   method int32-t check(slots-t* s)
   {
     if (nullptr == s->key)
-      std::_Exit(EXIT_FAILURE);
+      std::abort();
     return 0;
   }
 

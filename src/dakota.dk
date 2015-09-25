@@ -340,7 +340,7 @@ klass ofile {
     slots-t s = { nullptr, 0 };
     s.output = ::fopen(path, "w");
     if (nullptr == s.output)
-      std::_Exit(EXIT_FAILURE);
+      std::abort();
     return s;
   }
 
@@ -349,7 +349,7 @@ klass ofile {
   {
     int n = ::fclose(s.output);
     if (-1 == n)
-      std::_Exit(EXIT_FAILURE);
+      std::abort();
     return s;
   }
 }
@@ -853,7 +853,7 @@ dump-module-description(ofile-t ofl, named-info-t* registration-info)
 
       if (nullptr == modulee) {
         fprintf(stderr, "%s:%i: error: missing module declaration\n", __FILE__, __LINE__);
-        std::_Exit(EXIT_FAILURE);
+        std::abort();
       }
       if (module-name != modulee)
         ofile::printf(ofl, "%s %s %s", "module", modulee, "export");
@@ -897,7 +897,7 @@ dump-klass-defns(ofile-t ofl, named-info-t* registration-info, str-t only)
     if (NULL != output-dir) {
       int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
-        std::_Exit(EXIT_FAILURE);
+        std::abort();
     }
     while (1) {
       named-info-t* klass-info = &klass-defns[i++];
@@ -1369,6 +1369,7 @@ static addr2name-pair-t others[] = {
 };
 static const char*
 name-from-address(void* _addr) { // slowslow
+  return nullptr; // hackhack
   object-t* addr = cast(decltype(addr))_addr;
   // others
   for (size-t i = 0; i < DK-COUNTOF(others); i++) {
@@ -1393,19 +1394,22 @@ name-from-address(void* _addr) { // slowslow
   }
   return nullptr;
 }
-static void
-bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) {
+[[noreturn]] static void
+bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) noexcept {
   char8-t const *name = name-from-address(si->si-addr);
-  syslog(LOG-ERR, "caught sig%s at \"%s\" %p\n",
-         sys-signame[sig], name, si->si-addr);
-  x::sigaction-handler-t prev-sa-handler = sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;
+  if (nullptr != name) {
+    syslog(LOG-ERR, "caught sig%s at \"%s\" %p\n",
+           sys-signame[sig], name, si->si-addr);
+  }
+  x::sigaction-handler-t prev-sa-handler =
+    sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;
 
   if (prev-sa-handler &&
       prev-sa-handler != cast(x::sigaction-handler-t)SIG-DFL &&
       prev-sa-handler != cast(x::sigaction-handler-t)SIG-IGN) {
     prev-sa-handler(sig, si, dummy);
   }
-  return;
+  std::abort();
 }
 static int-t
 sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) {
@@ -1418,7 +1422,7 @@ sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) {
   int-t r = sigaction(sig,  &sa, &sa-pairs[index-from-sig[sig]].prev-sa);
   if (-1 == r) {
     perror("sigaction");
-    exit(EXIT-FAILURE);
+    std::abort();
   }
   return r;
 }
@@ -1435,7 +1439,7 @@ set-read-only(char8-t const* segment, get-segment-data-t get-segment-data) {
     result = mprotect(addr, size, PROT-READ);
     if (-1 == result) {
       perror("mprotect");
-      exit(EXIT-FAILURE);
+      std::abort();
     }
   }
   return result;
@@ -1458,7 +1462,7 @@ static void last-user-code-before-main() {
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
   int-t r = set-read-only-all("__DKT_RODATA"); // must match segment portion of macro DKT-RODATA-SECTION
-  if (-1 == r) std::_Exit(EXIT_FAILURE);
+  if (-1 == r) std::abort();
   return;
 }
 SO-EXPORT void
@@ -1511,7 +1515,7 @@ dkt-register-info(named-info-t* registration-info)
         dk-init-runtime();
       last-user-code-before-main();
       if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
-        exit(0);
+        exit(EXIT-SUCCESS);
       break;
   }
   if (nullptr != output-path && NUL != output-path[0] && nullptr != ctlg-output)

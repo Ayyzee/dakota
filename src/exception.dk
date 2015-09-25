@@ -88,7 +88,7 @@ va-log(uint32-t priority, str-t format, va-list-t args)
         fprintf(log-file, "debug: ");
         break;
       default:
-        std::_Exit(EXIT_FAILURE);
+        std::abort();
     }
   }
   fprintf(log-file, "{");
@@ -118,7 +118,7 @@ dkt-log(uint32-t priority, str-t format, ...)
 static /*THREAD-LOCAL*/ void (*original-terminate)() =  std::set-terminate(pre-runtime-verbose-terminate);
 static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
 
-/*[[noreturn]]*/ void
+[[noreturn]] void
 pre-runtime-verbose-terminate() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
@@ -131,10 +131,12 @@ pre-runtime-verbose-terminate() noexcept
   else
     fprintf(stderr, "\n");
 
-  original-terminate();
+  if (nullptr != original-terminate)
+    original-terminate();
+  std::abort(); // should never get called
 }
 
-/*[[noreturn]]*/ void
+[[noreturn]] void
 verbose-terminate() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
@@ -155,10 +157,12 @@ verbose-terminate() noexcept
   else
     dk::println(std-error, "");
 
-  original-terminate();
+  if (nullptr != original-terminate)
+    original-terminate();
+  std::abort(); // should never get called
 }
 
-/*[[noreturn]]*/ void
+[[noreturn]] void
 pre-runtime-verbose-unexpected() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
@@ -166,7 +170,7 @@ pre-runtime-verbose-unexpected() noexcept
   pre-runtime-verbose-terminate();
 }
 
-/*[[noreturn]]*/ void
+[[noreturn]] void
 verbose-unexpected() noexcept
 {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
