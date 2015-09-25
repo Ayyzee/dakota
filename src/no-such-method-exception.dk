@@ -56,10 +56,10 @@ klass no-such-method-exception {
 
     if (nullptr == self.signature) {
       if (dk::instance?(self.object, klass::klass)) {
-        dk::print-format(out, ": klass \"%s\"",
+        dk::print-format(out, ": klass %s",
                         dk::utf8-from(self.object));
       } else {
-        dk::print-format(out, ": instance %s of klass \"%s\"",
+        dk::print-format(out, ": instance %s of klass %s",
                         dk::utf8-from(self.object),
                         dk::utf8-from(object-klass));
       }
@@ -69,12 +69,12 @@ klass no-such-method-exception {
 
       if (self.kls == dk::superklass(object-klass)) {
         if (dk::instance?(self.object, klass::klass)) {
-          dk::print-format(out, ": klass \"%s\" %s(%s)",
+          dk::print-format(out, ": klass %s method %s(%s)",
                           dk::utf8-from(self.object),
                           self.signature->name,
                           self.signature->parameter-types);
         } else {
-          dk::print-format(out, ": instance %s of klass \"%s\" %s(%s)",
+          dk::print-format(out, ": instance %s of klass %s method %s(%s)",
                           dk::utf8-from(self.object),
                           dk::utf8-from(object-klass),
                           self.signature->name,
@@ -82,12 +82,12 @@ klass no-such-method-exception {
         }
       } else {
         if (dk::instance?(self.object, klass::klass)) {
-          dk::print-format(out, ": klass \"%s\" %s(%s)",
+          dk::print-format(out, ": klass %s method %s(%s)",
                           dk::utf8-from(self.object),
                           self.signature->name,
                           self.signature->parameter-types);
         } else {
-          dk::print-format(out, ": instance %s of klass \"%s\" %s(%s)",
+          dk::print-format(out, ": instance %s of klass %s method %s(%s)",
                           dk::utf8-from(self.object),
                           dk::utf8-from(object-klass),
                           self.signature->name,
