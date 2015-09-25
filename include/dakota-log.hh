@@ -29,10 +29,8 @@ SO_IMPORT format_printf(   2) int_t dkt_log(   uint32_t priority, str_t format, 
 #define log_klass_func() dkt_log(dkt::k_log_debug, "'klass'=>'%s','func'=>'%s'", __klass__, __func__)
 #define log_func()       dkt_log(dkt::k_log_debug, "'func'=>'%s'", __func__)
 
-namespace dkt
-{
-  enum log_priority_t : uint_t
-  {
+namespace dkt {
+  enum log_priority_t : uint_t {
     k_log_emergency = LOG_EMERG,
     k_log_alert =     LOG_ALERT,
     k_log_critical =  LOG_CRIT,
@@ -43,8 +41,7 @@ namespace dkt
     k_log_debug =     LOG_DEBUG,
   };
 
-  enum log_element_t : uint_t
-  {
+  enum log_element_t : uint_t {
     k_log_null =           0,
 
     k_log_mem_footprint =  1 <<  0,
@@ -59,7 +56,6 @@ namespace dkt
   //k_log_mem_footprint | k_log_object_alloc | k_log_initial_final | k_log_trace_runtime;
   //k_log_trace_runtime;
 }
-
 // #define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { syslog(LOG_INFO   |LOG_DAEMON, __VA_ARGS__); }
 // #define DKT_LOG_WARNING(flags, ...) if (flags & dkt::log_flags) { syslog(LOG_WARNING|LOG_DAEMON, __VA_ARGS__); }
 // #define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { syslog(LOG_ERROR  |LOG_DAEMON, __VA_ARGS__); }

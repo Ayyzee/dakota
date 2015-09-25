@@ -28,13 +28,11 @@ klass no-such-method-exception {
     object-t     kls;
     signature-t* signature;
   }
-
   method object-t init(object-t self,
                        object-t     object :    {~},
                        object-t     superkls :  nullptr,
                        object-t     kls :       nullptr,
-                       signature-t* signature : nullptr)
-  {
+                       signature-t* signature : nullptr) {
     self = dk::init(super);
     assert(!(nullptr != superkls &&
              nullptr != kls));
@@ -48,9 +46,7 @@ klass no-such-method-exception {
       self.kls = klass-of(object); // notenote: could be a trait method!!!
     return self;
   }
-
-  method object-t print(object-t self, object-t out)
-  {
+  method object-t print(object-t self, object-t out) {
     dk::print(super, out);
     object-t object-klass = klass-of(self.object);
 

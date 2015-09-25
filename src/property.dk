@@ -25,23 +25,17 @@ klass property {
     symbol-t  key;
     uintptr-t element;
   }
-
-  method int-t compare(slots-t* slots, slots-t* other-slots)
-  {
+  method int-t compare(slots-t* slots, slots-t* other-slots) {
     int-t result = symbol::compare(slots->key, other-slots->key);
     result = dkt-normalize-compare-result(result);
     return result;
   }
-
-  method int32-t check(slots-t* s)
-  {
+  method int32-t check(slots-t* s) {
     if (nullptr == s->key)
       std::abort();
     return 0;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     int-t result;
 
     if (dk::instance?(other, klass)) {

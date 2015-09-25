@@ -21,8 +21,7 @@
 
 module dakota;
 
-SO-EXPORT int-t safe-strcmp(str-t s1, str-t s2)
-  {
+SO-EXPORT int-t safe-strcmp(str-t s1, str-t s2) {
     int-t value = 0;
 
     if (nullptr == s1 || nullptr == s2) {
@@ -37,9 +36,7 @@ SO-EXPORT int-t safe-strcmp(str-t s1, str-t s2)
     }
     return value;
   }
-
-int-t safe-strptrcmp(str-t const* sp1, str-t const* sp2)
-  {
+int-t safe-strptrcmp(str-t const* sp1, str-t const* sp2) {
     str-t s1;
     if (nullptr == sp1)
       s1 = nullptr;
@@ -52,9 +49,7 @@ int-t safe-strptrcmp(str-t const* sp1, str-t const* sp2)
       s2 = *sp2;
     return safe-strcmp(s1, s2);
   }
-
-int-t safe-strncmp(str-t s1, str-t s2, size-t n)
-  {
+int-t safe-strncmp(str-t s1, str-t s2, size-t n) {
     int-t value = 0;
 
     if (nullptr == s1 || nullptr == s2) {
@@ -69,9 +64,7 @@ int-t safe-strncmp(str-t s1, str-t s2, size-t n)
     }
     return value;
   }
-
-SO-EXPORT size-t safe-strlen(str-t str)
-  {
+SO-EXPORT size-t safe-strlen(str-t str) {
     size-t len;
 
     if (nullptr == str)

@@ -30,12 +30,10 @@ klass syntax-exception {
     str-t    filename;
     str-t    message;
   }
-
   method object-t init(object-t self,
                        object-t token :    {~},
                        str-t    filename : {~},
-                       str-t    message :  __klass__)
-  {
+                       str-t    message :  __klass__) {
     self = dk::init(super);
     assert(nullptr != token &&
            null != token);
@@ -44,9 +42,7 @@ klass syntax-exception {
     self.message = message;
     return self;
   }
-
-  method object-t print-shallow(object-t self, object-t out)
-  {
+  method object-t print-shallow(object-t self, object-t out) {
     assert(nullptr != out);
     if (null == out)
       out = std-error;
@@ -54,9 +50,7 @@ klass syntax-exception {
                     self.filename, dk::line(self.token), dk::column(self.token), dk::buffer(self.token), self.message);
     return self;
   }
-
-  method object-t print(object-t self, object-t out)
-  {
+  method object-t print(object-t self, object-t out) {
     assert(nullptr != out);
     if (null == out)
       out = std-error;

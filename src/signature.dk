@@ -27,15 +27,11 @@ klass signature {
     str-t name;
     str-t parameter-types;
   }
-
-  method slots-t* dump(slots-t* s)
-  {
+  method slots-t* dump(slots-t* s) {
     printf("%s(%s)", s->name, s->parameter-types);
     return s;
   }
-
-  method int-t compare(slots-t* s, slots-t* other-s)
-  {
+  method int-t compare(slots-t* s, slots-t* other-s) {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
@@ -45,18 +41,14 @@ klass signature {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-
   // return type and selector is specified by qsort()
-  unused static int-t compare(slots-t** s, slots-t** other-s)
-  {
+  unused static int-t compare(slots-t** s, slots-t** other-s) {
     assert(nullptr != s);
     assert(nullptr != other-s);
     int-t result = compare(*s, *other-s);
     return result;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     int-t result;
 
     if (dk::instance?(other, klass)) {

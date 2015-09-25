@@ -23,8 +23,7 @@
 module dakota;
 
 #if DKT-WORKAROUND
-namespace sorted-ptr-array
-{
+namespace sorted-ptr-array {
   result-t search(slots-t*, void const*);
 }
 #endif
@@ -45,7 +44,6 @@ klass sorted-set {
     sorted-ptr-array::slots-t sa;
     uint32-t                         iterator-state;
   }
-
   static const uint32-t gbl-default-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
@@ -58,8 +56,7 @@ klass sorted-set {
                        compare-t         compare :          dk::compare,
                        equal-predicate-t equal? :           dk::equal?, /* bugbug: not used */
                        object-t          elements :         nullptr,
-                       object-t*         items :            nullptr)
-  {
+                       object-t*         items :            nullptr) {
     assert(0 != initial-capacity);
     assert(nullptr != compare);
     assert(nullptr != equal?); // bugbug: not used
@@ -80,16 +77,12 @@ klass sorted-set {
       dk::add-items(self, items);
     return self;
   }
-
-  method object-t dealloc(object-t self)
-  {
+  method object-t dealloc(object-t self) {
     dkt::dealloc(self.sa.elements);
     object-t result = dk::dealloc(super);
     return result;
   }
-
-  method object-t add(object-t self, object-t element)
-  {
+  method object-t add(object-t self, object-t element) {
     self.iterator-state++;
 
     result-t result = sorted-ptr-array::search(&self.sa, element);
@@ -107,16 +100,12 @@ klass sorted-set {
     }
     return element;
   }
-
-  method object-t empty(object-t self)
-  {
+  method object-t empty(object-t self) {
     self.iterator-state++;
     self.sa.count = 0; // hackhack
     return self;
   }
-
-  method object-t at(object-t self, object-t object1, object-t default-value)
-  {
+  method object-t at(object-t self, object-t object1, object-t default-value) {
     object-t object2 = default-value;
     result-t result = sorted-ptr-array::search(&self.sa, object1);
 
@@ -124,17 +113,13 @@ klass sorted-set {
       object2 = cast(object-t)sorted-ptr-array::at(&self.sa, result.offset);
     return object2;
   }
-
-  method object-t at(object-t self, object-t object1)
-  {
+  method object-t at(object-t self, object-t object1) {
     object-t result = dk::at(self, object1, nullptr);
     if (nullptr == result)
       throw make(exception::klass, #message : "oops");
     return result;
   }
-
-  method boole-t contains?(object-t self, object-t key)
-  {
+  method boole-t contains?(object-t self, object-t key) {
     boole-t state;
 
     if (nullptr == dk::at(self, key, nullptr))
@@ -143,9 +128,7 @@ klass sorted-set {
       state = true;
     return state;
   }
-
-  method boole-t empty?(object-t self)
-  {
+  method boole-t empty?(object-t self) {
     boole-t state;
 
     if (0 == self.sa.count)
@@ -154,9 +137,7 @@ klass sorted-set {
       state = false;
     return state;
   }
-
-  method object-t remove(object-t self, object-t element)
-  {
+  method object-t remove(object-t self, object-t element) {
     result-t result = sorted-ptr-array::search(&self.sa, element);
     object-t object = null;
 
@@ -167,9 +148,7 @@ klass sorted-set {
     }
     return object;
   }
-
-  method object-t remove-last(object-t self)
-  {
+  method object-t remove-last(object-t self) {
     object-t object = nullptr;
     if (0 != self.sa.count) {
       self.iterator-state++;
@@ -177,9 +156,7 @@ klass sorted-set {
     }
     return object; // returns nullptr on error
   }
-
-  method object-t copy-shallow(object-t self)
-  {
+  method object-t copy-shallow(object-t self) {
     object-t kls = klass-of(self);
     object-t copy = make(kls);
     slots-t* s1 = unbox(self);
@@ -190,20 +167,14 @@ klass sorted-set {
     s2->iterator-state = 0;
     return copy;
   }
-
-  method uint32-t size(object-t self)
-  {
+  method uint32-t size(object-t self) {
     return self.sa.count;
   }
-
-  method object-t forward-iterator(object-t self)
-  {
+  method object-t forward-iterator(object-t self) {
     object-t forward-iterator = make(sorted-set-forward-iterator::klass, #sorted-set : self);
     return forward-iterator;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     dk::dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
             cast(void*)(self), cast(void*)unbox(self), self.sa.count, self.sa.capacity);
@@ -211,9 +182,7 @@ klass sorted-set {
       dk::dump(element);
     return self;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -227,7 +196,6 @@ klass sorted-set {
     return self;
   }
 }
-
 klass sorted-set-forward-iterator {
   trait forward-iterator;
 
@@ -237,9 +205,7 @@ klass sorted-set-forward-iterator {
 
     uint32-t  iterator-state;
   }
-
-  method object-t init(object-t self, object-t sorted-set : {~})
-  {
+  method object-t init(object-t self, object-t sorted-set : {~}) {
     self = dk::init(super);
     assert(dk::instance?(sorted-set, sorted-set::klass));
     sorted-set::slots-t* ss = sorted-set::unbox(sorted-set);
@@ -248,9 +214,7 @@ klass sorted-set-forward-iterator {
     self.iterator-state = ss->iterator-state;
     return self;
   }
-
-  static void check-iterator-state(object-t self)
-  {
+  static void check-iterator-state(object-t self) {
     sorted-set::slots-t* ss = sorted-set::unbox(self.sorted-set);
 
     if (self.iterator-state != ss->iterator-state) {
@@ -259,9 +223,7 @@ klass sorted-set-forward-iterator {
     }
     return;
   }
-
-  method boole-t next?(object-t self)
-  {
+  method boole-t next?(object-t self) {
     check-iterator-state(self);
     sorted-set::slots-t* ss = sorted-set::unbox(self.sorted-set);
     boole-t result;
@@ -271,9 +233,7 @@ klass sorted-set-forward-iterator {
       result = false;
     return result;
   }
-
-  method object-t next(object-t self)
-  {
+  method object-t next(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
     if (dk::next?(self)) {
@@ -282,9 +242,7 @@ klass sorted-set-forward-iterator {
     }
     return element;
   }
-
-  method object-t element(object-t self)
-  {
+  method object-t element(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
     if (dk::next?(self)) {

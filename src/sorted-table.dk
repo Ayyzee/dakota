@@ -24,23 +24,18 @@ klass sorted-table {
   superklass sorted-set;
   trait      table;
 
-  object-t initialize(object-t kls)
-  {
+  object-t initialize(object-t kls) {
     dk-klass-for-name(#pair); // hackhack
     return kls;
   }
-
-  object-t finalize(object-t kls)
-  {
+  object-t finalize(object-t kls) {
     return kls;
   }
-
   method object-t init(object-t self,
                        equal-predicate-t equal? :  cast(equal-predicate-t)dk::method-for-selector(pair::klass, selector(equal?(object-t, object-t))),
                        compare-t         compare : cast(compare-t        )dk::method-for-selector(pair::klass, selector(compare(object-t, object-t))),
                        object-t          elements : nullptr,
-                       object-t*         items :    nullptr)
-  {
+                       object-t*         items :    nullptr) {
     self = dk::init(super, #equal? : equal?, #compare : compare, #elements : elements, #items : items);
     return self;
   }

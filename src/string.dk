@@ -41,8 +41,7 @@ klass string {
                        symbol-t       encoding : #utf-8,
                        str-t bytes :    "",
                        uint32-t       start :    0,
-                       uint32-t       length :   cast(uint32-t)safe-strlen(bytes) - start)
-  {
+                       uint32-t       length :   cast(uint32-t)safe-strlen(bytes) - start) {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = dk::init(super);
     assert(nullptr != bytes);
@@ -56,40 +55,30 @@ klass string {
     self.ptr[self.len] = NUL;
     return self;
   }
-
-  method object-t dealloc(object-t self)
-  {
+  method object-t dealloc(object-t self) {
     dkt::dealloc(self.ptr);
     object-t result = dk::dealloc(super);
     return result;
   }
-
-  method uint32-t length(object-t self)
-  {
+  method uint32-t length(object-t self) {
     if (0    == self.len &&
         nullptr != self.ptr &&
         NUL  != self.ptr[0])
       self.len = cast(uint32-t)safe-strlen(self.ptr);
     return self.len;
   }
-
-  method symbol-t intern(object-t self)
-  {
+  method symbol-t intern(object-t self) {
     symbol-t result = dk-intern(cast(symbol-t)(self.ptr));
     return result;
   }
-
-  method object-t write-lite(object-t self, object-t out)
-  {
+  method object-t write-lite(object-t self, object-t out) {
     str-t utf8 = dk::utf8-from(self);
     dk::write(out, "\"");
     dk::write(out, utf8);
     dk::write(out, "\"");
     return self;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -99,29 +88,21 @@ klass string {
     dk::write-slots-end(out);
     return self;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     dk::dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%i }\n",
             cast(void*)(self), cast(void*)unbox(self), self.ptr, self.len);
     return self;
   }
-
-  method uint32-t uint32-value(object-t self)
-  {
+  method uint32-t uint32-value(object-t self) {
     uint32-t result = cast(uint32-t)strtoumax(self.ptr, nullptr, 10);
     return result;
   }
-
-  method int32-t int32-value(object-t self)
-  {
+  method int32-t int32-value(object-t self) {
     int32-t result = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
     return result;
   }
-
-  method boole-t boole-value(object-t self)
-  {
+  method boole-t boole-value(object-t self) {
     int32-t int-value = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
     boole-t result;
     if (0 == int-value)
@@ -130,9 +111,7 @@ klass string {
       result = true;
     return result;
   }
-
-  method object-t append(object-t self, str-t bytes, symbol-t encoding : #utf-8)
-  {
+  method object-t append(object-t self, str-t bytes, symbol-t encoding : #utf-8) {
     assert(nullptr != bytes);
     assert(nullptr != encoding);
     assert(#utf-8 != encoding);
@@ -143,23 +122,17 @@ klass string {
     strcat(self.ptr, bytes);
     return self;
   }
-
-  method str-t utf8-from(object-t self)
-  {
+  method str-t utf8-from(object-t self) {
     return self.ptr;
   }
-
   // returns an vector of string objects
-  method object-t tokenize(object-t self, object-t delimiter)
-  {
+  method object-t tokenize(object-t self, object-t delimiter) {
     assert(dk::instance?(delimiter, klass));
     slots-t* d = unbox(delimiter);
     object-t result = dk::tokenize(self, d->ptr);
     return result;
   }
-
-  method object-t tokenize(object-t self, str-t delimiter)
-  {
+  method object-t tokenize(object-t self, str-t delimiter) {
     object-t result = make(vector::klass);
     uint32-t delimiter-length = cast(uint32-t)safe-strlen(delimiter);
     str-t p1 = self.ptr;
@@ -173,7 +146,6 @@ klass string {
       dk::add-last(result, delimiter-object);
       p1 += delimiter-length;
     }
-
     // 'part' 'delimiter' pairs
     while (nullptr != (p2 = strstr(p1, delimiter))) {
       object-t part-object = make(kls, #bytes : cast(str-t)(p1), #length : cast(uint32-t)(p2 - p1));
@@ -181,24 +153,18 @@ klass string {
       dk::add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
     }
-
     // trailing 'part'
     if (NUL != *p1) {
       object-t part-object = make(kls, #bytes : p1);
       dk::add-last(result, part-object);
     }
-
     return result;
   }
-
-  method uintptr-t hash(object-t self)
-  {
+  method uintptr-t hash(object-t self) {
     uintptr-t result = dk-hash(self.ptr);
     return result;
   }
-
-  method object-t append-sequence(object-t self, object-t sequence)
-  {
+  method object-t append-sequence(object-t self, object-t sequence) {
     for (object-t element in sequence) {
       str-t utf8 = dk::utf8-from(element);
       uint32-t length = cast(uint32-t)safe-strlen(utf8);
@@ -208,9 +174,7 @@ klass string {
     }
     return self;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 
@@ -227,9 +191,7 @@ klass string {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-
-  method object-t print(object-t self, object-t out)
-  {
+  method object-t print(object-t self, object-t out) {
     if (null == out)
       out = std-output;
     dk::print(out, dk::utf8-from(self));

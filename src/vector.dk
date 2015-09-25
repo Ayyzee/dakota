@@ -37,7 +37,6 @@ klass vector {
     object-t  fill;
     uint32-t  iterator-state;
   }
-
   static const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const object-t gbl-default-fill = null;
   static const uint32-t gbl-default-initial-capacity = 64; // shall never be 0
@@ -51,8 +50,7 @@ klass vector {
                        uint32-t  initial-capacity : gbl-default-initial-capacity,
                        object-t  fill :             gbl-default-fill,
                        object-t  elements :         nullptr,
-                       object-t* items :            nullptr)
-  {
+                       object-t* items :            nullptr) {
     // it IS legal to have the 'fill' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);
@@ -76,16 +74,12 @@ klass vector {
       dk::add-items(self, items);
     return self;
   }
-
-  method object-t dealloc(object-t self)
-  {
+  method object-t dealloc(object-t self) {
     dkt::dealloc(self.elements);
     object-t result = dk::dealloc(super);
     return result;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     dk::dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
             cast(void*)(self), cast(void*)unbox(self), self.count, self.capacity);
@@ -93,9 +87,7 @@ klass vector {
       dk::dump(element);
     return self;
   }
-
-  method object-t copy-shallow(object-t self)
-  {
+  method object-t copy-shallow(object-t self) {
     object-t kls = klass-of(self);
     object-t copy = make(kls, #capacity : self.capacity);
     slots-t* s1 = unbox(self);
@@ -105,9 +97,7 @@ klass vector {
     s2->iterator-state = 0;
     return copy;
   }
-
-  method boole-t empty?(object-t self)
-  {
+  method boole-t empty?(object-t self) {
     boole-t state;
 
     if (0 == self.count)
@@ -116,9 +106,7 @@ klass vector {
       state = false;
     return state;
   }
-
-  method object-t empty(object-t self)
-  {
+  method object-t empty(object-t self) {
     self.count = 0;
 
     for (object-t forward-iterator = dk::forward-iterator(self);
@@ -129,10 +117,8 @@ klass vector {
     self.iterator-state++;
     return self;
   }
-
   // maybe could return number present
-  method boole-t contains?(object-t self, object-t element)
-  {
+  method boole-t contains?(object-t self, object-t element) {
     boole-t state = false;
 
     for (object-t element2 in self) {
@@ -143,10 +129,8 @@ klass vector {
     }
     return state;
   }
-
   // reverse in place
-  method object-t reverse(object-t self)
-  {
+  method object-t reverse(object-t self) {
     uint32-t head-offset = 0, tail-offset = self.count - 1;
     while (head-offset < tail-offset) {
       object-t head-element = self.elements[head-offset];
@@ -157,9 +141,7 @@ klass vector {
     self.iterator-state++;
     return self;
   }
-
-  method object-t remove-at(object-t self, uint32-t index)
-  {
+  method object-t remove-at(object-t self, uint32-t index) {
     object-t element = self.elements[index];
 
     if (index + 1 < self.capacity)
@@ -170,10 +152,8 @@ klass vector {
     self.capacity--; // dumb
     return element;
   }
-
   // should also have remove-all
-  method object-t remove(object-t self, object-t element)
-  {
+  method object-t remove(object-t self, object-t element) {
     // element could be null
     // any/all elements could be null
     object-t object = null; // returns 'null' if element was not present
@@ -188,9 +168,7 @@ klass vector {
     self.iterator-state++;
     return object;
   }
-
-  method object-t remove-first(object-t self)
-  {
+  method object-t remove-first(object-t self) {
     assert(0 != self.count);
     object-t element = self.elements[0];
     memmove(self.elements, self.elements + 1, self.size * (self.count - 1));
@@ -198,19 +176,15 @@ klass vector {
     self.count--;
     return element;
   }
-
   method alias(remove-last) object-t pop(object-t self);
-  method object-t remove-last(object-t self)
-  {
+  method object-t remove-last(object-t self) {
     assert(0 != self.count);
     object-t element = self.elements[self.count - 1];
     self.elements[self.count - 1] = self.fill;
     self.count--;
     return element;
   }
-
-  method object-t replace(object-t self, object-t object1, object-t object2)
-  {
+  method object-t replace(object-t self, object-t object1, object-t object2) {
     for (object-t forward-iterator = dk::forward-iterator(self);
          dk::next?(forward-iterator);
          dk::next(forward-iterator)) {
@@ -219,12 +193,10 @@ klass vector {
     }
     return object1;
   }
-
   //     method object-t replace-first(object-t self, object-t element);
   //     method object-t replace-last(object-t self, object-t element);
 
-  method object-t at(object-t self, uint32-t index, object-t default-result)
-  {
+  method object-t at(object-t self, uint32-t index, object-t default-result) {
     object-t element = default-result;
     if (self.count > index) {
       element = self.elements[index];
@@ -233,35 +205,27 @@ klass vector {
     }
     return element;
   }
-
   // should be auto-generated!!!
-  method object-t at(object-t self, object-t boxed-index, object-t default-result)
-  {
+  method object-t at(object-t self, object-t boxed-index, object-t default-result) {
     uint32-t index = *uint32::unbox(boxed-index);
     object-t result = dk::at(self, index, default-result);
     return result;
   }
-
   // throw (object-t)
-  method object-t at(object-t self, uint32-t index)
-  {
+  method object-t at(object-t self, uint32-t index) {
     object-t element = dk::at(self, index, nullptr);
     if (nullptr == element)
       throw make(exception::klass, #message : "oops");
     return element;
   }
-
   // should be auto-generated!!!
-  method object-t at(object-t self, object-t boxed-index)
-  {
+  method object-t at(object-t self, object-t boxed-index) {
     uint32-t index = *uint32::unbox(boxed-index);
     object-t result = dk::at(self, index);
     return result;
   }
-
   // throw (object-t)
-  method object-t replace-at(object-t self, uint32-t index, object-t object)
-  {
+  method object-t replace-at(object-t self, uint32-t index, object-t object) {
     if (index >= self.capacity)
       throw make(exception::klass, #message : "oops");
 
@@ -272,68 +236,52 @@ klass vector {
       self.count = index + 1;
     return rtn;
   }
-
-  method uint32-t size(object-t self)
-  {
+  method uint32-t size(object-t self) {
     return self.count;
   }
-
-  method object-t add-first(object-t self, object-t element)
-  {
+  method object-t add-first(object-t self, object-t element) {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {
       self.capacity *= gbl-resize-factor;
       self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
-
     memmove(self.elements + 1, self.elements, self.size * self.count);
     self.count++;
     self.elements[0] = element;
     self.iterator-state++;
     return element;
   }
-
   //     method object-t add-at(object-t self, object-t element, uint32-t index);
 
   method alias(add-last) object-t add(object-t self, object-t element);
   method alias(add-last) object-t push(object-t self, object-t element);
-  method object-t add-last(object-t self, object-t element)
-  {
+  method object-t add-last(object-t self, object-t element) {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {
       self.capacity *= gbl-resize-factor;
       self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
-
     self.count++;
     self.elements[self.count - 1] = element;
     self.iterator-state++;
     return element;
   }
-
-  method object-t first(object-t self)
-  {
+  method object-t first(object-t self) {
     assert(0 != self.count);
     return self.elements[0];
   }
-
   method alias(last) object-t top(object-t self);
-  method object-t last(object-t self)
-  {
+  method object-t last(object-t self) {
     assert(0 != self.count);
     return self.elements[self.count - 1];
   }
-
-  method object-t forward-iterator(object-t self)
-  {
+  method object-t forward-iterator(object-t self) {
     object-t forward-iterator = make(vector-forward-iterator::klass, #vector : self);
     return forward-iterator;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -346,9 +294,7 @@ klass vector {
     dk::write-slots-end(out);
     return self;
   }
-
-  static uint32-t next-index(object-t self, uint32-t index)
-  {
+  static uint32-t next-index(object-t self, uint32-t index) {
     //assert(index <= self.count);
     uint32-t result = index;
     if (result < self.count) {
@@ -361,9 +307,7 @@ klass vector {
     //       printf("%s(%p, %i): %i/%i\n", __func__, self, index, result, self.count);
     return result;
   }
-
-  static uint32-t first-index(object-t self)
-  {
+  static uint32-t first-index(object-t self) {
     uint32-t index = 0;
     uint32-t result = index;
     result = next-index(self, index);
@@ -371,7 +315,6 @@ klass vector {
     return result;
   }
 }
-
 klass vector-forward-iterator {
   trait forward-iterator;
 
@@ -382,18 +325,14 @@ klass vector-forward-iterator {
 
     uint32-t iterator-state;
   }
-
-  static void check-iterator-state(object-t self)
-  {
+  static void check-iterator-state(object-t self) {
     vector::slots-t* d = vector::unbox(self.vector);
 
     if (self.iterator-state != d->iterator-state)
       throw make(exception::klass, #message : "oops");
     return;
   }
-
-  method object-t init(object-t self, object-t vector : {~})
-  {
+  method object-t init(object-t self, object-t vector : {~}) {
     self = dk::init(super);
     assert(null != vector);
     vector::slots-t* a = vector::unbox(vector);
@@ -403,9 +342,7 @@ klass vector-forward-iterator {
     self.iterator-state = a->iterator-state;
     return self;
   }
-
-  method boole-t first?(object-t self)
-  {
+  method boole-t first?(object-t self) {
     boole-t state;
     if (0 == self.index)
       state = true;
@@ -413,15 +350,11 @@ klass vector-forward-iterator {
       state = false;
     return state;
   }
-
-  method object-t set-element(object-t self, object-t element)
-  {
+  method object-t set-element(object-t self, object-t element) {
     dk::replace-at(self.vector, self.index, element);
     return self;
   }
-
-  method boole-t next?(object-t self)
-  {
+  method boole-t next?(object-t self) {
     check-iterator-state(self);
     boole-t result;
     if (nullptr != dk::at(self.vector, self.index, nullptr))
@@ -430,9 +363,7 @@ klass vector-forward-iterator {
       result = false;
     return result;
   }
-
-  method object-t next(object-t self)
-  {
+  method object-t next(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
     if (dk::next?(self)) {
@@ -443,9 +374,7 @@ klass vector-forward-iterator {
     //              "vector-forward-iterator", __func__, (void*)self, (void*)element);
     return element;
   }
-
-  method object-t element(object-t self)
-  {
+  method object-t element(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
     if (dk::next?(self)) {

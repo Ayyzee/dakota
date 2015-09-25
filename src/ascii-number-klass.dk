@@ -30,32 +30,25 @@ klass ascii-number-klass {
   }
   static object-t gbl-base2-ascii-number-klass-info;
 
-  object-t initialize(object-t kls)
-  {
+  object-t initialize(object-t kls) {
     gbl-base2-ascii-number-klass-info = dk-make-named-info(#base2-ascii-number-klass,
                                                            #superklass-name, cast(uintptr-t)#ascii-number,
                                                            nullptr);
     return kls;
   }
-
-  object-t finalize(object-t kls)
-  {
+  object-t finalize(object-t kls) {
     return kls;
   }
-
   method object-t init(object-t self,
                        object-t       info :   gbl-base2-ascii-number-klass-info,
-                       str-t digits : "01")
-  {
+                       str-t digits : "01") {
     self = dk::init(super, #info : info);
     assert(nullptr != digits);
     self.digits = digits;
     // should confirm the digits are unique
     return self;
   }
-
-  method str-t digits(object-t self)
-  {
+  method str-t digits(object-t self) {
     str-t digits = self.digits;
     return digits;
   }

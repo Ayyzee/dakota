@@ -26,7 +26,6 @@ klass std-compare;
 //     dk::add(self, element);
 //   return self;
 // }
-
 // SO-EXPORT sentinel object-t
 // dk-add-all(object-t self, ...)
 // {
@@ -36,25 +35,20 @@ klass std-compare;
 //   va-end(args);
 //   return result;
 // }
-
 klass collection {
   superklass object;
 
   trait forward-iterator;
 
-  method object-t write-lite(object-t self, object-t out)
-  {
+  method object-t write-lite(object-t self, object-t out) {
     USE(out);
     return self;
   }
-
-  method object-t writeln-lite(object-t self, object-t out)
-  {
+  method object-t writeln-lite(object-t self, object-t out) {
     dk::write-lite(self, out);
     dk::write(out, "\n");
     return self;
   }
-
 //   method object-t add-all(object-t self, str-t const* strings, symbol-t encoding : #utf-8)
 //   {
 //     assert(nullptr != strings);
@@ -67,24 +61,19 @@ klass collection {
 //     }
 //     return null;
 //   }
-
-  method object-t add-all(object-t self, object-t collection)
-  {
+  method object-t add-all(object-t self, object-t collection) {
     for (object-t element in collection)
       dk::add(self, element);
     return collection;
   }
-
   // items are nullptr terminated lists of objects
-  method object-t add-items(object-t self, object-t[] items)
-  {
+  method object-t add-items(object-t self, object-t[] items) {
     object-t arg;
     object-t* args = items;
     while (nullptr != (arg = *args++))
       dk::add(self, arg);
     return self; // nullnull?
   }
-
   method object-t add(object-t self, object-t element);
   method object-t forward-iterator(object-t self);
 

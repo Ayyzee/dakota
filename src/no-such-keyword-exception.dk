@@ -21,8 +21,7 @@ module dakota;
 klass no-such-keyword-exception {
   superklass keyword-exception;
 
-  method object-t print(object-t self, object-t out)
-  {
+  method object-t print(object-t self, object-t out) {
     dk::print(super, out, "no such keyword");
     return self;
   }

@@ -1,5 +1,4 @@
-copy()
-{
+copy() {
   throw make();
   dkt::dealloc();
 }

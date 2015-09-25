@@ -19,8 +19,7 @@
 
 #include "dakota.hh"
 
-namespace sorted_array
-{
+namespace sorted_array {
   struct slots_t;
 
   slots_t* create(uint32_t capacity, uint32_t size, std_compare_t compare);
@@ -34,5 +33,4 @@ namespace sorted_array
   void const* remove_at(slots_t* t, void const* key, uint32_t offset);
   slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
-
 #endif // dkt_sorted_array_hh

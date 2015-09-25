@@ -50,18 +50,13 @@ klass hashed-set {
 
     uint32-t iterator-state;
   }
-
-  object-t initialize(object-t kls)
-  {
+  object-t initialize(object-t kls) {
     dk-klass-for-name(#vector); // hackhack
     return kls;
   }
-
-  object-t finalize(object-t kls)
-  {
+  object-t finalize(object-t kls) {
     return kls;
   }
-
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
@@ -71,8 +66,7 @@ klass hashed-set {
                        hash-t            hash :     dk::hash,
                        equal-predicate-t equal? :   dk::equal?,
                        object-t          elements : nullptr,
-                       object-t*         items :    nullptr)
-  {
+                       object-t*         items :    nullptr) {
     assert(nullptr != hash);
     assert(nullptr != equal?);
 
@@ -92,9 +86,7 @@ klass hashed-set {
       dk::add-items(self, items);
     return self;
   }
-
-  method object-t add(object-t self, object-t object1)
-  {
+  method object-t add(object-t self, object-t object1) {
     self.iterator-state++;
 
     uint32-t index =
@@ -119,7 +111,6 @@ klass hashed-set {
           break;
         }
       }
-
 //       if (should-throw && nullptr != element)
 //         throw "oops";
 
@@ -130,17 +121,12 @@ klass hashed-set {
     }
     return object1;
   }
-
-  method object-t empty(object-t self)
-  {
+  method object-t empty(object-t self) {
     self.iterator-state++;
     dk::empty(self.buckets);
     return self;
   }
-
-  method object-t at(object-t self, object-t object1, object-t default-value)
-  {
-
+  method object-t at(object-t self, object-t object1, object-t default-value) {
     uint32-t index = 
 #if defined MOD-SIZE-CAST-HACK
       cast(uint32-t)
@@ -159,9 +145,7 @@ klass hashed-set {
     }
     return result;
   }
-
-  method boole-t contains?(object-t self, object-t key)
-  {
+  method boole-t contains?(object-t self, object-t key) {
     boole-t state;
 
     if (nullptr == dk::at(self, key, nullptr))
@@ -170,9 +154,7 @@ klass hashed-set {
       state = true;
     return state;
   }
-
-  method boole-t empty?(object-t self)
-  {
+  method boole-t empty?(object-t self) {
     boole-t state;
 
     if (0 == self.size)
@@ -181,9 +163,7 @@ klass hashed-set {
       state = false;
     return state;
   }
-
-  method object-t remove(object-t self, object-t element)
-  {
+  method object-t remove(object-t self, object-t element) {
     self.iterator-state++;
     object-t object = null;
 
@@ -211,9 +191,7 @@ klass hashed-set {
     }
     return object;
   }
-
-  method object-t copy-shallow(object-t self)
-  {
+  method object-t copy-shallow(object-t self) {
     object-t kls = klass-of(self);
     object-t copy = make(kls);
     slots-t* s1 = unbox(self);
@@ -223,20 +201,14 @@ klass hashed-set {
     s2->iterator-state = 0;
     return copy;
   }
-
-  method uint32-t size(object-t self)
-  {
+  method uint32-t size(object-t self) {
     return self.size;
   }
-
-  method object-t forward-iterator(object-t self)
-  {
+  method object-t forward-iterator(object-t self) {
     object-t forward-iterator = make(hashed-set-forward-iterator::klass, #hashed-set : self);
     return forward-iterator;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     dk::dump(super);
     fprintf(stderr, "%p:%p { size=%u, elements=[] }\n",
             cast(void*)(self), cast(void*)unbox(self), self.size);
@@ -244,9 +216,7 @@ klass hashed-set {
       dk::dump(element);
     return self;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -260,7 +230,6 @@ klass hashed-set {
     return self;
   }
 }
-
 klass hashed-set-forward-iterator {
   trait forward-iterator;
 
@@ -271,18 +240,14 @@ klass hashed-set-forward-iterator {
 
     uint32-t  iterator-state;
   }
-
-  static void check-iterator-state(object-t self)
-  {
+  static void check-iterator-state(object-t self) {
     hashed-set::slots-t* hs = hashed-set::unbox(self.hashed-set);
 
     if (self.iterator-state != hs->iterator-state)
       throw make(exception::klass, #message : "oops");
     return;
   }
-
-  method object-t init(object-t self, object-t hashed-set : {~})
-  {
+  method object-t init(object-t self, object-t hashed-set : {~}) {
     self = dk::init(super);
     assert(null != hashed-set);
     hashed-set::slots-t* hs = hashed-set::unbox(hashed-set);
@@ -297,18 +262,14 @@ klass hashed-set-forward-iterator {
     }
     return self;
   }
-
-  method boole-t next?(object-t self)
-  {
+  method boole-t next?(object-t self) {
     check-iterator-state(self);
     boole-t result = false;
     if (nullptr != self.deque-iter)
       result = dk::next?(self.deque-iter);
     return result;
   }
-
-  static object-t next-deque-iterator(object-t vector-iter)
-  {
+  static object-t next-deque-iterator(object-t vector-iter) {
     object-t deque = dk::next(vector-iter);
     object-t deque-iter = nullptr;
     if (nullptr != deque) {
@@ -317,9 +278,7 @@ klass hashed-set-forward-iterator {
     }
     return deque-iter;
   }
-
-  method object-t next(object-t self)
-  {
+  method object-t next(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
     if (dk::next?(self)) {
@@ -336,9 +295,7 @@ klass hashed-set-forward-iterator {
     }
     return element;
   }
-
-  method object-t element(object-t self)
-  {
+  method object-t element(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
     if (dk::next?(self)) {

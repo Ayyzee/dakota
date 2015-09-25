@@ -21,8 +21,7 @@
 
 #include <functional>
 
-class finally
-{
+class finally {
     std::function<void(void)> functor;
   public:
     finally(const std::function<void(void)> &ftor) : functor(ftor) {}
@@ -34,5 +33,4 @@ class finally
 #define DKT_CATCH_BEGIN(_e_) catch (object_t _e_) { if (0) {}
 #define DKT_CATCH(kls, v)    else if (dk::instancex3f(v, kls))
 #define DKT_CATCH_END(_e_)   else { throw _e_; } }
-
 #endif

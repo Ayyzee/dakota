@@ -30,7 +30,6 @@ klass object {
     object-t klass;
     uint32-t retain-count;
   }
-
   //     klass klass;
 
   // keep private, or koenig lookup will cause all
@@ -39,9 +38,7 @@ klass object {
   //     {
   //       return object;
   //     }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
   //dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -50,17 +47,13 @@ klass object {
     dk::write-slots-end(out);
     return self;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     intptr-t result = cast(uint8-t*)self - cast(uint8-t*)(other);
     result = dkt-normalize-compare-result(result);
     return cast(int-t)(result);
   }
-
-  method boole-t equal?(object-t self, object-t other)
-  {
+  method boole-t equal?(object-t self, object-t other) {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     boole-t state = false;
 
@@ -68,9 +61,7 @@ klass object {
       state = true;
     return state;
   }
-
-  method boole-t instance?(object-t self, object-t kls)
-  {
+  method boole-t instance?(object-t self, object-t kls) {
     boole-t state = false;
     object-t tmp-kls = klass-of(self);
 
@@ -83,64 +74,46 @@ klass object {
     }
     return state;
   }
-
-  method object-t perform-method-for-selector(object-t self, selector-t selector)
-  {
+  method object-t perform-method-for-selector(object-t self, selector-t selector) {
     object-t kls = klass-of(self);
     method-t m = dk::method-for-selector(kls, selector);
     object-t value = m(self);
     return value;
   }
-
   // documented to do nothing
-  method object-t init(object-t self)
-  {
+  method object-t init(object-t self) {
     return self;
   }
-
-  method object-t copy(object-t self)
-  {
+  method object-t copy(object-t self) {
     USE(self);
     throw make(exception::klass, #message : "not yet implemented");
     return nullptr;
   }
-
-  method object-t dealloc(object-t self)
-  {
+  method object-t dealloc(object-t self) {
     dk::release(klass-of(self));
     dkt::dealloc(self);
     return nullptr;
   }
-
-  method object-t retain(object-t self)
-  {
+  method object-t retain(object-t self) {
     self->retain-count++;
     return self;
   }
-
-  method object-t release(object-t self)
-  {
+  method object-t release(object-t self) {
     self->retain-count--;
     if (0 == self->retain-count)
       self = dk::dealloc(self);
     return self;
   }
-
-  method object-t autorelease(object-t self)
-  {
+  method object-t autorelease(object-t self) {
     object-t current-pool = dk::current-pool(autorelease-pool::klass);
     dk::add(current-pool, self);
     return self;
   }
-
-  method uintptr-t hash(object-t self)
-  {
+  method uintptr-t hash(object-t self) {
     uintptr-t result = cast(uintptr-t)self;
     return result;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     symbol-t klass-name = #nullptr;
 
     // klass
@@ -156,25 +129,20 @@ klass object {
 
     return self;
   }
-
-  method str-t utf8-from(object-t self)
-  {
+  method str-t utf8-from(object-t self) {
     char8-t* buffer = cast(char8-t*)dkt::alloc(2 + PRIxPTR-WIDTH + (1));
     snprintf(buffer, 2 + PRIxPTR-WIDTH + (1), "0x%0*" PRIxPTR,
              PRIxPTR-WIDTH, cast(uintptr-t)(self));
     return cast(str-t)(buffer);
   }
-
-  method object-t print(object-t self, object-t out)
-  {
+  method object-t print(object-t self, object-t out) {
     if (null == out)
       out = std-output;
     str-t utf8 = dk::utf8-from(self);
     dk::print(out, utf8);
     return self;
   }
-  method object-t println(object-t self, object-t out)
-  {
+  method object-t println(object-t self, object-t out) {
     if (null == out)
       out = std-output;
     dk::print(self, out);
@@ -182,14 +150,11 @@ klass object {
     return self;
   }
 }
-
 DEBUG-SO-EXPORT void
-dkt-unbox-check(object-t object, object-t kls)
-{
+dkt-unbox-check(object-t object, object-t kls) {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
                         __func__, cast(void*)(object), dk::name(kls));
-  unless (object::instance?(object, kls))
-  {
+  unless (object::instance?(object, kls)) {
     str-t object-kls-name = name-of(klass-of(object));
     str-t kls-name = name-of(kls);
 

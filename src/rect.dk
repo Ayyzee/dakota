@@ -24,9 +24,7 @@ klass rect {
     point::slots-t     point;
     dimension::slots-t dimension;
   }
-
-  method boole-t equal?(slots-t* slots, slots-t* other-slots)
-  {
+  method boole-t equal?(slots-t* slots, slots-t* other-slots) {
     boole-t result = true;
 
     if (slots != other-slots) {

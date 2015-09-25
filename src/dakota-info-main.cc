@@ -36,8 +36,7 @@ enum {
   DKT_INFO_ONLY,
   DKT_INFO_RECURSIVE
 };
-struct opts_t
-{
+struct opts_t {
   char* only; // full or partial (prefix) klass name
   char* output; // path or "" for stdout
   char* output_directory; // path or "" for .
@@ -47,8 +46,7 @@ struct opts_t
 static opts_t opts;
 
 static int
-usage(const char* progname, option* options)
-{
+usage(const char* progname, option* options) {
   const char* tmp_progname = strrchr(progname, '/');
   if (nullptr != tmp_progname)
     tmp_progname++;
@@ -76,10 +74,8 @@ usage(const char* progname, option* options)
   fprintf(stdout, " <> [...]\n");
   return result;
 }
-
 static void
-handle_opts(int* argc, char*** argv)
-{
+handle_opts(int* argc, char*** argv) {
   const char* progname = *argv[0];
   int unrecognized_opt_cnt = 0;
   // options descriptor
@@ -126,32 +122,25 @@ handle_opts(int* argc, char*** argv)
   *argv += optind;
   return;
 }
-
-namespace va
-{
-  [[noreturn]] format_va_printf(3) static void _abort_with_log(const char* file, int line, const char* format, va_list args)
-  {
+namespace va {
+  [[noreturn]] format_va_printf(3) static void _abort_with_log(const char* file, int line, const char* format, va_list args) {
     fprintf(stderr, "%s:%i: ", file, line);
     vfprintf(stderr, format, args);
     std::abort();
   }
 }
-
-[[noreturn]] format_printf(3) static void _abort_with_log(const char* file, int line, const char* format, ...)
-{
+[[noreturn]] format_printf(3) static void _abort_with_log(const char* file, int line, const char* format, ...) {
   va_list args;
   va_start(args, format);
   va::_abort_with_log(file, line, format, args);
   va_end(args);
 }
-
 #define abort_with_log(...) _abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
 
 #include "spawn.cc"
 
 static int
-setenv_boole(const char* name, bool value, int overwrite)
-{
+setenv_boole(const char* name, bool value, int overwrite) {
   int result = 0;
   if (value)
     result = setenv(name, "1", overwrite);
@@ -159,14 +148,12 @@ setenv_boole(const char* name, bool value, int overwrite)
     unsetenv(name);
   return result;
 }
-
 // 1: try to exec() path
 //    if that fails
 // 2: try to dlopen() path
 
 int
-main(int argc, char** argv, char**)
-{
+main(int argc, char** argv, char**) {
   handle_opts(&argc, &argv);
   char output_pid[MAXPATHLEN] = "";
 

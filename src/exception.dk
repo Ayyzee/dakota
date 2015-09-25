@@ -31,26 +31,21 @@ module dakota;
 klass output-stream;
 klass system-exception;
 
-SO-EXPORT object-t dkt-capture-current-exception(object-t arg)
-{
+SO-EXPORT object-t dkt-capture-current-exception(object-t arg) {
   static THREAD_LOCAL object-t result;
   if (nullptr != arg) result = arg;
   return result;
 }
-
-SO-EXPORT str-t dkt-capture-current-exception(str-t arg)
-{
+SO-EXPORT str-t dkt-capture-current-exception(str-t arg) {
   static THREAD_LOCAL str-t result;
   if (nullptr != arg) result = arg;
   return result;
 }
-
 #if !defined HAVE-GETPROGNAME
 #if defined HAVE-PROCFS
 static char8-t[4 * 1024] gbl-buf;
 str-t
-getprogname()
-{
+getprogname() {
   int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
     throw make(system-exception::klass, #errnum : errno);
@@ -66,15 +61,13 @@ getprogname()
 #endif
 
 static format-va-printf(2) int-t
-va-log(uint32-t priority, str-t format, va-list-t args)
-{
+va-log(uint32-t priority, str-t format, va-list-t args) {
   file-t log-file = stderr;
 
   if (0) {
     fprintf(log-file, "%s[%i]: ", getprogname(), getpid());
 
-    switch (priority)
-    {
+    switch (priority) {
       case dkt::k-log-error:
         fprintf(log-file, "error: ");
         break;
@@ -97,30 +90,24 @@ va-log(uint32-t priority, str-t format, va-list-t args)
   // bugbug: need to adjust result
   return result;
 }
-
 DEBUG-SO-EXPORT format-va-printf(2) int-t
-dkt-va-log(uint32-t priority, str-t format, va-list-t args)
-{
+dkt-va-log(uint32-t priority, str-t format, va-list-t args) {
   int-t result = va-log(priority, format, args);
   return result;
 }
-
 DEBUG-SO-EXPORT format-printf(2) int-t
-dkt-log(uint32-t priority, str-t format, ...)
-{
+dkt-log(uint32-t priority, str-t format, ...) {
   va-list-t args;
   va-start(args, format);
   int-t result = dkt-va-log(priority, format, args);
   va-end(args);
   return result;
 }
-
 static /*THREAD-LOCAL*/ void (*original-terminate)() =  std::set-terminate(pre-runtime-verbose-terminate);
 static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
 
 [[noreturn]] void
-pre-runtime-verbose-terminate() noexcept
-{
+pre-runtime-verbose-terminate() noexcept {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
@@ -135,10 +122,8 @@ pre-runtime-verbose-terminate() noexcept
     original-terminate();
   std::abort(); // should never get called
 }
-
 [[noreturn]] void
-verbose-terminate() noexcept
-{
+verbose-terminate() noexcept {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
@@ -161,39 +146,30 @@ verbose-terminate() noexcept
     original-terminate();
   std::abort(); // should never get called
 }
-
 [[noreturn]] void
-pre-runtime-verbose-unexpected() noexcept
-{
+pre-runtime-verbose-unexpected() noexcept {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   pre-runtime-verbose-terminate();
 }
-
 [[noreturn]] void
-verbose-unexpected() noexcept
-{
+verbose-unexpected() noexcept {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   verbose-terminate();
 }
-
 klass exception {
   superklass object;
 
   slots {
     str-t message;
   }
-
-  method object-t init(object-t self, str-t message : name-of(klass-of(self)))
-  {
+  method object-t init(object-t self, str-t message : name-of(klass-of(self))) {
     self = dk::init(super);
     self.message = message;
     return self;
   }
-
-  method object-t print(object-t self, object-t out)
-  {
+  method object-t print(object-t self, object-t out) {
     if (null == out)
       out = std-error;
     dk::print-format(out, ": <%s>", self.message);

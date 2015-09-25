@@ -33,21 +33,15 @@ klass object-output-stream {
     uint32-t id;
     object-t id-from-object;        // sorted-table (ptr) key=object, value=id
   }
-
-  object-t initialize(object-t kls)
-  {
+  object-t initialize(object-t kls) {
     dk-klass-for-name(#sorted-set); // hackhack
     dk-klass-for-name(#sorted-table); // hackhack
     return kls;
   }
-
-  object-t finalize(object-t kls)
-  {
+  object-t finalize(object-t kls) {
     return kls;
   }
-
-  method object-t init(object-t self, file-t file : stdout)
-  {
+  method object-t init(object-t self, file-t file : stdout) {
     self = dk::init(super, #file : file);
     assert(nullptr != file);
 //     equal-predicate-t equal? = cast(equal-predicate-t)dk::method-for-selector(object::klass,
@@ -60,33 +54,24 @@ klass object-output-stream {
     self.id =         0;
     return self;
   }
-
-  method object-t write-slots-start(object-t self, object-t kls)
-  {
+  method object-t write-slots-start(object-t self, object-t kls) {
     dk::write-table-start(self, nullptr);
     if (1)
       dk::write-element(self, dk::name(kls), "-slots"); //optional
     return self;
   }
-
-  method object-t write-slots-end(object-t self)
-  {
+  method object-t write-slots-end(object-t self) {
     dk::write-table-end(self);
     return self;
   }
-
-  method object-t write(object-t self, object-t object)
-  {
+  method object-t write(object-t self, object-t object) {
     dk::write-table-start(self, nullptr);
     dk::write-element-id(self, object);
     dk::write-table-end(self);
     return self;
   }
-
-  method object-t write-element-id(object-t self, object-t object)
-  {
-    unless (dk::contains?(self.objects, object))
-    {
+  method object-t write-element-id(object-t self, object-t object) {
+    unless (dk::contains?(self.objects, object)) {
       dk::add(self.objects, object); // only grows, never shrinks
       object-t id = dk::at(self.id-from-object, object, nullptr);
 
@@ -111,9 +96,7 @@ klass object-output-stream {
     }
     return self;
   }
-
-  method object-t write-element-idref(object-t self, object-t object, str-t key)
-  {
+  method object-t write-element-idref(object-t self, object-t object, str-t key) {
     // bugbug: key == nullptr is valid
     object-t id = dk::at(self.id-from-object, object, nullptr);
     

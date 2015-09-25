@@ -25,10 +25,8 @@ klass pair {
     object-t first;
     object-t last;
   }
-
   // other pairs:
   //   { object-t, symbol-t }, { object-t, symbol-t, uint32-t }
-
   //   klass symbol-object-pair { slots { symbol-t first; object-t last; } }
   //   klass symbol-symbol-pair { slots { symbol-t first; symbol-t last; } }
   //   klass symbol-uint32-pair { slots { symbol-t first; uint32-t last; } }
@@ -36,24 +34,19 @@ klass pair {
   
   method object-t init(object-t self,
                        object-t first : null,
-                       object-t last :  null)
-  {
+                       object-t last :  null) {
     self = dk::init(super);
     self.first = first;
     self.last =  last;
     return self;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     dk::dump(super);
     dk::dump(self.first);
     dk::dump(self.last);
     return self;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -63,9 +56,7 @@ klass pair {
     dk::write-slots-end(out);
     return self;
   }
-
-  method boole-t equal?(object-t self, object-t other)
-  {
+  method boole-t equal?(object-t self, object-t other) {
     boole-t result;
     object-t first = self;
     if (dk::instance?(first, klass))
@@ -78,9 +69,7 @@ klass pair {
     result = dk::equal?(first, other-first);
     return result;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     int-t result;
     object-t first = self;
     if (dk::instance?(first, klass))
@@ -93,9 +82,7 @@ klass pair {
     result = dk::compare(first, other-first);
     return result;
   }
-
-  method uintptr-t hash(object-t self)
-  {
+  method uintptr-t hash(object-t self) {
     uintptr-t result;
     object-t first = self;
     if (dk::instance?(first, klass))
@@ -104,15 +91,11 @@ klass pair {
     result = dk::hash(first);
     return result;
   }
-
-  method object-t first(slots-t* s)
-  {
+  method object-t first(slots-t* s) {
     object-t result = s->first;
     return result;
   }
-
-  method object-t last(slots-t* s)
-  {
+  method object-t last(slots-t* s) {
     object-t result = s->last;
     return result;
   }

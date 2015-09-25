@@ -26,15 +26,12 @@ klass object-output-stream;
 klass str64 {
   slots char8-t[64];
 
-  method slots-t* dump(slots-t* s)
-  {
+  method slots-t* dump(slots-t* s) {
   //dk::dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n", cast(void*)nullptr, cast(void*)(s), *s);
     return s;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -43,16 +40,12 @@ klass str64 {
     dk::write-slots-end(out);
     return self;
   }
-
-  method int-t compare(slots-t* s, slots-t* other-s)
-  {
+  method int-t compare(slots-t* s, slots-t* other-s) {
     int-t result = cast(int-t)safe-strncmp(cast(str-t)(s), cast(str-t)(other-s), sizeof(slots-t));
     result = dkt-normalize-compare-result(result);
     return result;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     int-t result;
 
     if (dk::instance?(other, klass)) {

@@ -35,9 +35,7 @@ klass named-info {
   //            compare = property::compare()
     slots-t*    next;
   }
-
-  method int32-t check(slots-t* s)
-  {
+  method int32-t check(slots-t* s) {
     for (uint32-t i = 0; i < s->count; i++) {
       // need to add test for #name (since its required)
 
@@ -46,41 +44,31 @@ klass named-info {
     }
     return 0;
   }
-
-  method slots-t* sort(slots-t* s)
-  {
+  method slots-t* sort(slots-t* s) {
     qsort(s->elements, s->count, sizeof(s->elements[0]),
           cast(std-compare-t)cast(int-t(*)(property::slots-t*,property::slots-t*))property::compare);
     return s;
   }
-
-  method property-t* search(slots-t* s, symbol-t key)
-  {
+  method property-t* search(slots-t* s, symbol-t key) {
     property::slots-t property = { cast(symbol-t)(key), cast(uintptr-t)0 };
     property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
                                                               cast(std-compare-t)cast(int-t (*)(property::slots-t*,property::slots-t*))property::compare);
     return result;
   }
-
-  method uintptr-t at(slots-t* s, symbol-t key)
-  {
+  method uintptr-t at(slots-t* s, symbol-t key) {
     uintptr-t element = 0;
     property::slots-t* property = search(s, key);
     if (nullptr != property)
       element = property->element;
     return element;
   }
-
-  method uintptr-t at(slots-t* s, symbol-t key, uintptr-t default-element)
-  {
+  method uintptr-t at(slots-t* s, symbol-t key, uintptr-t default-element) {
     uintptr-t element = at(s, key);
     if (0 == element) // aka: if (nullptr == element)
       element = default-element;
     return element;
   }
-
-  method slots-t* dump(slots-t* s)
-  {
+  method slots-t* dump(slots-t* s) {
     slots-t* current = s;
     while (nullptr != current) {
       printf("{\n");
@@ -103,9 +91,7 @@ klass named-info {
     }
     return s;
   }
-
-  method int-t compare(slots-t* s, slots-t* other-s)
-  {
+  method int-t compare(slots-t* s, slots-t* other-s) {
     symbol-t s-name = cast(symbol-t)at(s, #name);
     symbol-t other-name = cast(symbol-t)at(other-s, #name);
     //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
@@ -113,15 +99,11 @@ klass named-info {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-
-  int-t compare(slots-t** s, slots-t** other-s)
-  {
+  int-t compare(slots-t** s, slots-t** other-s) {
     int-t result = compare(*s, *other-s);
     return result;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     int-t result;
 
     if (dk::instance?(other, klass)) {
@@ -135,10 +117,8 @@ klass named-info {
     return result;
   }
 }
-
 named-info-t*
-dk-va-make-named-info-slots(symbol-t name, va-list-t args)
-{
+dk-va-make-named-info-slots(symbol-t name, va-list-t args) {
 //   assert(nullptr != name);
   symbol-t key;
   uintptr-t element;
@@ -170,35 +150,28 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args)
   return info;
 }
 DEBUG-SO-EXPORT object-t
-dk-va-make-named-info(symbol-t name, va-list-t args)
-{
+dk-va-make-named-info(symbol-t name, va-list-t args) {
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   object-t info = box(info-slots);
   return info;
 }
-
 SO-EXPORT sentinel named-info-t*
-dk-make-named-info-slots(symbol-t name, ...)
-{
+dk-make-named-info-slots(symbol-t name, ...) {
   va-list-t args;
   va-start(args, name);
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   va-end(args);
   return info-slots;
 }
-
 SO-EXPORT sentinel object-t
-dk-make-named-info(symbol-t name, ...)
-{
+dk-make-named-info(symbol-t name, ...) {
   va-list-t args;
   va-start(args, name);
   object-t info = dk-va-make-named-info(name, args);
   va-end(args);
   return info;
 }
-
 DEBUG-SO-EXPORT named-info-t*
-dkt-dump-named-info(named-info-t* info)
-{
+dkt-dump-named-info(named-info-t* info) {
   return named-info::dump(info);
 }

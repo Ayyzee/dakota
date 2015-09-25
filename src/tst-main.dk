@@ -18,12 +18,10 @@ module dakota-util;
 
 klass hashed-table;
 
-int-t main()
-{
+int-t main() {
   finally {
     printf("finally works\n");
   }
-
   object-t o = make(hashed-table::klass);
   dk::dump(o);
   dk::println(o, std-output);

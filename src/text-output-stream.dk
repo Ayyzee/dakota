@@ -19,8 +19,7 @@
 module dakota-util;
 
 klass features {
-  slots enum : uint32-t
-  {
+  slots enum : uint32-t {
     k-none =             0,
     k-indent =           1 << 0,
     k-leading-newline =  1 << 1,
@@ -29,7 +28,6 @@ klass features {
     k-trailing-ws =      1 << 4
   }
 }
-
 using features::k-none;
 using features::k-indent;
 using features::k-leading-newline;
@@ -45,30 +43,22 @@ klass text-output-stream {
     uint32-t column;
     features-t previous-features;
   }
-
-  method object-t init(object-t self, file-t file : stdout)
-  {
+  method object-t init(object-t self, file-t file : stdout) {
     self = dk::init(super, #file : file);
     self.column = 0;
     self.previous-features = k-trailing-newline;
     return self;
   }
-
-  method object-t column-incr(object-t self)
-  {
+  method object-t column-incr(object-t self) {
     self.column++;
     return self;
   }
-
-  method object-t column-decr(object-t self)
-  {
+  method object-t column-decr(object-t self) {
     if (0 != self.column)
       self.column--;
     return self;
   }
-
-  method object-t write(object-t self, str-t string, features-t features)
-  {
+  method object-t write(object-t self, str-t string, features-t features) {
     assert(!((features & k-indent) &&
              (features & k-leading-ws)));
 

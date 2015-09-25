@@ -39,17 +39,14 @@
 inline void
 SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
                         selector-t       selector,
-                        method-t         method)
-{
+                        method-t         method) {
   methods->addrs[selector] = method;
 }
 inline method-t
 METHOD-FOR-SELECTOR(methods::slots-t* methods,
-                    selector-t       selector)
-{
+                    selector-t       selector) {
   return methods->addrs[selector];
 }
-
 #endif
 
 module dakota;
@@ -70,24 +67,20 @@ klass vector;
 #if DKT-WORKAROUND
 namespace selector-node  { int-t compare(slots-t**, slots-t**); }
 namespace object        { object-t dump(object-t); }
-namespace klass
-{
+namespace klass {
   symbol-t name(object-t);
 }
 #endif
 
-[[noreturn]] SO-EXPORT void dkt-null-method(object-t object, ...)
-{
+[[noreturn]] SO-EXPORT void dkt-null-method(object-t object, ...) {
   throw make(no-such-method-exception::klass, #object : object, #kls : klass-of(object));
 }
-
 klass selector-pair {
   slots {
     signature-t const* key;
     selector-node-t*   element;
   }
-  method int-t compare(slots-t* s, slots-t* other-s)
-  {
+  method int-t compare(slots-t* s, slots-t* other-s) {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
@@ -96,7 +89,6 @@ klass selector-pair {
     return result;
   }
 }
-
 static const uint32-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
 static sorted-array-t   gbl-selectors-table = { gbl-selectors,
@@ -118,42 +110,34 @@ static sorted-array-t   gbl-selectors-table = { gbl-selectors,
 //     }
 //     return;
 //   }
-
 symbol-t
-default-superklass-name()
-{
+default-superklass-name() {
   return #object;
 }
 static object-t
-default-superklass()
-{
+default-superklass() {
   return object::klass;
 }
 symbol-t interposer-name-for-klass-name(symbol-t klass-name);
 void add-interpose-prop(symbol-t key, symbol-t element);
 
 static selector-t
-selector-for-signature(signature-t const* signature)
-{
+selector-for-signature(signature-t const* signature) {
   selector-pair-t pair = { signature, nullptr };
   selector-pair-t* found-pair =
     cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
   selector-t selector = *(found-pair->element->key);
   return selector;
 }
-
 static method-t
-method-for-signature(methods::slots-t* methods, signature-t const* signature)
-{
+method-for-signature(methods::slots-t* methods, signature-t const* signature) {
   selector-t selector = selector-for-signature(signature);
   assert(selector < methods->count);
   method-t m = METHOD-FOR-SELECTOR(methods, selector);
   return m;
 }
-
 void
-import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
-{
+import-selectors(signature-t** signatures, selector-node-t* selector-nodes) {
   uint32-t i = 0;
   while (1) {
     signature-t*     signature =     signatures[i];
@@ -179,10 +163,8 @@ import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
   }
   return;
 }
-
 static void const*
-ptr-from-info(named-info-t* info, symbol-t key)
-{
+ptr-from-info(named-info-t* info, symbol-t key) {
   named-info-t* current-info = info;
   void const* previous-element = nullptr;
   void const* element = nullptr;
@@ -197,10 +179,8 @@ ptr-from-info(named-info-t* info, symbol-t key)
 
   return element;
 }
-
 static uint32-t
-uint32-from-info(named-info-t* info, symbol-t key)
-{
+uint32-from-info(named-info-t* info, symbol-t key) {
   named-info-t* current-info = info;
   uint32-t previous-element = 0;
   uint32-t element = 0;
@@ -217,42 +197,32 @@ uint32-from-info(named-info-t* info, symbol-t key)
 
   return element;
 }
-
 uint32-t
-size-from-info(named-info-t* info)
-{
+size-from-info(named-info-t* info) {
   uint32-t size = uint32-from-info(info, #size);
   return size;
 }
-
 static object-t
-superklass-from-info(named-info-t* info)
-{
+superklass-from-info(named-info-t* info) {
   object-t superklass = cast(object-t)ptr-from-info(info, #superklass);
   return superklass;
 }
-
 static object-t
-superklass-from-info(named-info-t* info, symbol-t name)
-{
+superklass-from-info(named-info-t* info, symbol-t name) {
   object-t superklass = superklass-from-info(info);
   USE(name);
   return superklass;
 }
-
 symbol-t
-superklass-name-from-info(named-info-t* info)
-{
+superklass-name-from-info(named-info-t* info) {
   symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
 
   if (nullptr == superklass-name && #object != name-from-info(info))
     superklass-name = default-superklass-name();
   return superklass-name;
 }
-
 symbol-t
-superklass-name-from-info(named-info-t* info, symbol-t name)
-{
+superklass-name-from-info(named-info-t* info, symbol-t name) {
   symbol-t superklass-name = superklass-name-from-info(info);
   if (nullptr == superklass-name) {
     object-t superklass = superklass-from-info(info, name);
@@ -272,39 +242,31 @@ superklass-name-from-info(named-info-t* info, symbol-t name)
   }
   return superklass-name;
 }
-
 symbol-t
-name-from-info(named-info-t* info)
-{
+name-from-info(named-info-t* info) {
   symbol-t name = cast(symbol-t)ptr-from-info(info, #name);
   return name;
 }
-
 symbol-t
-klass-name-from-info(named-info-t* info)
-{
+klass-name-from-info(named-info-t* info) {
   symbol-t klass-name = cast(symbol-t)ptr-from-info(info, #klass-name);
 
   if (nullptr == klass-name)
     klass-name = default-klass-name();
   return klass-name;
 }
-
 const uint32-t k-alignment = 8;
 
 // consider using alignas(8) on the slots struct decl/defn
 
 inline uint32-t
-round-alignment(uint32-t n)
-{
+round-alignment(uint32-t n) {
   uint32-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
   return result;
 }
-
 // offset is 'offset() of superklass' + 'size of superklass'
 uint32-t
-offset-from-info(named-info-t* info)
-{
+offset-from-info(named-info-t* info) {
   uint32-t result;
 
   symbol-t name = name-from-info(info);
@@ -323,10 +285,8 @@ offset-from-info(named-info-t* info)
   result = round-alignment(result);
   return result;
 }
-
 static void
-load-traits(symbol-t const* traits)
-{
+load-traits(symbol-t const* traits) {
   if (nullptr != traits) {
     uint32-t i = 0;
     symbol-t trait-name;
@@ -337,7 +297,6 @@ load-traits(symbol-t const* traits)
   }
   return;
 }
-
 klass resource-usage {
   slots {
     uint32-t memory;
@@ -345,14 +304,12 @@ klass resource-usage {
     uint32-t method-memory;
     uint32-t method-count;
   }
-  method slots-t* add-alloc(slots-t* s, uint32-t size)
-  {
+  method slots-t* add-alloc(slots-t* s, uint32-t size) {
     s->instances++;
     s->memory += size;
     return s;
   }
-  method slots-t* log-alloc(slots-t* s, object-t o)
-  {
+  method slots-t* log-alloc(slots-t* s, object-t o) {
     printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"\n",
            s->instances,
            klass::unbox(o)->offset + klass::unbox(o)->size,
@@ -360,14 +317,12 @@ klass resource-usage {
            klass::unbox(o)->name);
     return s;
   }
-  method slots-t* log-alloc(slots-t* s, uint32-t size, symbol-t name)
-  {
+  method slots-t* log-alloc(slots-t* s, uint32-t size, symbol-t name) {
     printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"~\n",
            s->instances, size, s->memory, name);
     return s;
   }
-  method slots-t* log-method-alloc(slots-t* s)
-  {
+  method slots-t* log-method-alloc(slots-t* s) {
     printf("method-count=%u, method-memory=%i\n", s->method-count, s->method-memory);
     return s;
   }
@@ -382,7 +337,6 @@ klass methods {
     uint32-t  count;
   }
 }
-
 klass klass {
   //     klass klass;
 
@@ -395,17 +349,13 @@ klass klass {
     named-info::slots-t* info-slots;
     object-t behavior; // bit-vector
   }
-
-  method object-t alloc(object-t self, str-t file, uint32-t line)
-  {
+  method object-t alloc(object-t self, str-t file, uint32-t line) {
     DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%i','func':'%s','args':['%s']",
                          file, line, __method__->name, self.name);
     object-t instance = dk::alloc(self);
     return instance;
   }
-
-  method object-t alloc(object-t self)
-  {
+  method object-t alloc(object-t self) {
     uint32-t size = self.offset + self.size;
 
 #if defined DKT-DUMP-MEM-FOOTPRINT
@@ -420,15 +370,11 @@ klass klass {
     instance->retain-count = 1;
     return instance;
   }
-
-  method symbol-t name(object-t self)
-  {
+  method symbol-t name(object-t self) {
     symbol-t name = self.name;
     return name;
   }
-
-  static object-t alloc-methods(object-t self, uint32-t methods-count)
-  {
+  static object-t alloc-methods(object-t self, uint32-t methods-count) {
     self.methods.count = methods-count;
     self.methods.addrs = cast(method-t*)dkt::alloc(sizeof(method-t) * self.methods.count);
 
@@ -442,31 +388,24 @@ klass klass {
       self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
     return self;
   }
-
-  static object-t init-methods(object-t self)
-  {
+  static object-t init-methods(object-t self) {
     if (nullptr != self.superklass && null != self.superklass) {
       memcpy(self.methods.addrs, unbox(self.superklass)->methods.addrs,
              sizeof(method-t) * unbox(self.superklass)->methods.count);
     }
     return self;
   }
-
   //      method va-method-t va-method-for-selector(object-t self, selector-t selector)
   //      {
   //        throw make(exception::klass, #message : "not yet implemented");
   //        // return nullptr
   //      }
-
-  method method-t method-for-selector(object-t self, selector-t selector)
-  {
+  method method-t method-for-selector(object-t self, selector-t selector) {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     return m;
   }
-
-  method method-t remove-method-for-selector(object-t self, selector-t selector)
-  {
+  method method-t remove-method-for-selector(object-t self, selector-t selector) {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
@@ -474,18 +413,14 @@ klass klass {
       dk::set-bit(self.behavior, cast(uint32-t)selector, false);
     return m;
   }
-
-  method method-t add-method-for-selector(object-t self, selector-t selector, method-t m)
-  {
+  method method-t add-method-for-selector(object-t self, selector-t selector, method-t m) {
     assert(selector < self.methods.count);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
       dk::set-bit(self.behavior, cast(uint32-t)selector, true);
     return m;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     object::dump(self);
     fprintf(stderr, "%p:%p {", cast(void*)(self), cast(void*)unbox(self));
 
@@ -511,15 +446,13 @@ klass klass {
     } else {
       fprintf(stderr, ", superklass=%s", #nullptr);
     }
-
     // size
     fprintf(stderr, ", size=%i", self.size);
     // offset
     fprintf(stderr, ", offset=%i", self.offset);
 
     // traits
-    fprintf(stderr, ", traits=[");
-    {
+    fprintf(stderr, ", traits=["); {
       symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, #traits);
       if (nullptr != traits) {
         fprintf(stderr, " ");
@@ -542,12 +475,9 @@ klass klass {
 //         dk::dump(klass-of(null));
       dk::dump(self.superklass);
     }
-
     return self;
   }
-
-  method object-t traits(object-t self)
-  {
+  method object-t traits(object-t self) {
     object-t seq = make(vector::klass);
     symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, #traits);
     
@@ -560,9 +490,7 @@ klass klass {
     }
     return seq;
   }
-
-  method slots-t* dump-methods(slots-t* s)
-  {
+  method slots-t* dump-methods(slots-t* s) {
     if (nullptr != s->behavior)
       dk::dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
@@ -607,11 +535,9 @@ klass klass {
     fprintf(out, "},\n");
     return s;
   }
-
   // use for both klasses (and klass-x) and traits (and trait-x)
   static void add-methods(object-t self, named-info-t* info,
-                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses)
-  {
+                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses) {
     named-info-t* current-info = info;
     do {
       signature-t** method-signatures = cast(signature-t**)named-info::at(current-info, symbol-method-signatures);
@@ -640,9 +566,7 @@ klass klass {
     } while (nullptr != (current-info = current-info->next));
     return;
   }
-
-  static void add-traits(object-t self, symbol-t const* traits)
-  {
+  static void add-traits(object-t self, symbol-t const* traits) {
     if (nullptr != traits) {
       uint32-t length = 0;
       while (nullptr != traits[length])
@@ -660,9 +584,7 @@ klass klass {
     }
     return;
   }
-
-  static object-t traits-initialize(object-t self, symbol-t const* traits)
-  {
+  static object-t traits-initialize(object-t self, symbol-t const* traits) {
     if (nullptr != traits) {
       uint32-t i = 0;
       symbol-t trait-name;
@@ -683,16 +605,12 @@ klass klass {
     }
     return self;
   }
-
-  method boole-t behavior?(object-t self, object-t kls)
-  {
+  method boole-t behavior?(object-t self, object-t kls) {
     assert((nullptr != self.behavior) || (nullptr != unbox(kls)->behavior));
     boole-t state = dk::bit-and?(self.behavior, unbox(kls)->behavior);
     return state;
   }
-
-  method object-t behavior(object-t self)
-  {
+  method object-t behavior(object-t self) {
     if (nullptr == self.behavior) {
       self.behavior = make(bit-vector::klass, #initial-capacity : self.methods.count);
 
@@ -702,15 +620,13 @@ klass klass {
     }
     return self.behavior;
   }
-
   static named-info::slots-t gbl-default-info-slots = { nullptr, 0, nullptr };
 
   object-t init(object-t self, named-info::slots-t* info-slots);
 
   method object-t init(object-t self,
                        named-info::slots-t* info-slots : nullptr,
-                       object-t                 info :      nullptr)
-  {
+                       object-t                 info :      nullptr) {
     self = dk::init(super);
     assert(!(nullptr != info-slots &&
              nullptr != info));
@@ -722,17 +638,13 @@ klass klass {
     object-t result = init(self, tmp-info-slots);
     return result;
   }
-
-  method object-t dealloc(object-t self)
-  {
+  method object-t dealloc(object-t self) {
     dkt::dealloc(self.methods.addrs);
     object-t result = dk::dealloc(super);
     return result;
   }
-
   // called from init-klass() from dk-init-runtime()
-  object-t init(object-t self, named-info::slots-t* info-slots)
-  {
+  object-t init(object-t self, named-info::slots-t* info-slots) {
     if (nullptr == info-slots)
       info-slots = &gbl-default-info-slots;
     named-info::sort(info-slots);
@@ -813,14 +725,11 @@ klass klass {
     return self;
   } // init(object-t self, named-info::slots-t*)
 
-  method object-t superklass(object-t self)
-  {
+  method object-t superklass(object-t self) {
     object-t superklass = self.superklass;
     return superklass;
   }
-
-  method boole-t subklass?(object-t self, object-t kls)
-  {
+  method boole-t subklass?(object-t self, object-t kls) {
     boole-t state = false;
     object-t tmp-kls = self;
 
@@ -832,18 +741,14 @@ klass klass {
     }
     return state;
   }
-
-  method str-t utf8-from(object-t self)
-  {
+  method str-t utf8-from(object-t self) {
     symbol-t name = self.name;
     uint32-t name-len = cast(uint32-t)safe-strlen(name);
     char8-t* buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (name-len + (1)));
     snprintf(buffer, name-len + (1), "%s", name);
     return buffer;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -856,17 +761,13 @@ klass klass {
     return self;
   }
 }
-
 DEBUG-SO-EXPORT void
-dkt-dump-methods(klass::slots-t* s)
-{
+dkt-dump-methods(klass::slots-t* s) {
   klass::dump-methods(s);
   return;
 }
-
 DEBUG-SO-EXPORT void
-dkt-dump-methods(object-t kls)
-{
+dkt-dump-methods(object-t kls) {
   klass::slots-t* kls-s = unbox(kls);
   dkt-dump-methods(kls-s);
   return;

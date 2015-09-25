@@ -24,8 +24,7 @@ trait counted-set {
   //provides set;
   require collection;
 
-  method object-t at(object-t self, object-t element, object-t default-result)
-  {
+  method object-t at(object-t self, object-t element, object-t default-result) {
     object-t result = default-result;
     object-t pair = dk::pair-at(self, element, nullptr);
 
@@ -35,9 +34,7 @@ trait counted-set {
     }
     return result;
   }
-
-  static object-t add(object-t self, object-t element)
-  {
+  static object-t add(object-t self, object-t element) {
     object-t pair = dk::pair-at(self, element, nullptr);
 
     if (nullptr != pair) {
@@ -52,25 +49,19 @@ trait counted-set {
     }
     return element;
   }
-
-  method object-t elements(object-t self)
-  {
+  method object-t elements(object-t self) {
     object-t result = make(vector::klass, #size : dk::size(self));
     for (pair-t* pair in self)
       dk::add-last(result, pair->first);
     return result;
   }
-
-  method object-t counts(object-t self)
-  {
+  method object-t counts(object-t self) {
     object-t result = make(vector::klass, #size : dk::size(self));
     for (pair-t* pair in self)
       dk::add-last(result, pair->last);
     return result;
   }
-
-  method uint32-t count-at(object-t self, object-t element, uint32-t default-count)
-  {
+  method uint32-t count-at(object-t self, object-t element, uint32-t default-count) {
     uint32-t count-content = default-count;
     object-t pair = dk::pair-at(self, element, nullptr);
 
@@ -81,9 +72,7 @@ trait counted-set {
     }
     return count-content;
   }
-
-  object-t initialize(object-t kls)
-  {
+  object-t initialize(object-t kls) {
     typedef object-t (*)(object-t, object-t, object-t) at-t;
     dk::add-method-for-selector(kls,
                                selector(pair-at(object-t, object-t, object-t)),
@@ -101,12 +90,9 @@ trait counted-set {
                                cast(method-t)cast(add-t)(add));
     return kls;
   }
-
-  object-t finalize(object-t kls)
-  {
+  object-t finalize(object-t kls) {
     return kls;
   }
-
   method /*alias(at)*/ object-t pair-at(object-t self, object-t first, object-t default-pair);
   method /*alias(add)*/ object-t add-pair(object-t self, object-t pair);
 }

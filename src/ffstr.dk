@@ -7,7 +7,6 @@ klass ffstr {
   // expressed in hex (ff being the largest string 2^16 = 64K).
   // "0bHello World"
 }
-
 //klass ffffstr?
 
 // '0' - '9' (48 -  57)

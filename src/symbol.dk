@@ -23,14 +23,11 @@ module dakota;
 klass symbol {
   slots char8-t const*;
 
-  method uint32-t length(slots-t s)
-  {
+  method uint32-t length(slots-t s) {
     uint32-t result = cast(uint32-t)safe-strlen(s);
     return result;
   }
-
-  method int-t compare(slots-t s, slots-t other-s)
-  {
+  method int-t compare(slots-t s, slots-t other-s) {
     int-t result;
     if (s == other-s)
       result = 0;
@@ -40,15 +37,11 @@ klass symbol {
     //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
     return result;
   }
-
-  method int-t compare(slots-t* s, slots-t* other-s)
-  {
+  method int-t compare(slots-t* s, slots-t* other-s) {
     int-t result = compare(*s, *other-s);
     return result;
   }
-
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     int-t result;
 
     if (dk::instance?(other, klass)) {
@@ -61,29 +54,21 @@ klass symbol {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-
-  method object-t dump(object-t self)
-  {
+  method object-t dump(object-t self) {
     dk::dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n",
             cast(void*)(self), cast(void*)unbox(self), dk::utf8-from(self));
     return self;
   }
-
-  method uintptr-t hash(slots-t s)
-  {
+  method uintptr-t hash(slots-t s) {
     uintptr-t result = dk-hash(s);
     return result;
   }
-
-  method str-t utf8-from(object-t self)
-  {
+  method str-t utf8-from(object-t self) {
     str-t utf8 = *unbox(self);
     return utf8;
   }
-
-  method object-t write-lite(object-t self, object-t out)
-  {
+  method object-t write-lite(object-t self, object-t out) {
     str-t utf8 = dk::utf8-from(self);
     dk::write(out, "\"");
     dk::write(out, utf8);

@@ -17,8 +17,7 @@
 module dakota;
 
 klass construct {
-  slots enum : uint32-t
-  {
+  slots enum : uint32-t {
     k-library    = 0,
     k-executable = 1,
   }

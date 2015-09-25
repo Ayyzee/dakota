@@ -27,18 +27,15 @@ klass hashed-table {
                        equal-predicate-t equal? : cast(equal-predicate-t)dk::method-for-selector(pair::klass, selector(equal?(object-t, object-t))),
                        hash-t            hash :   cast(hash-t           )dk::method-for-selector(pair::klass, selector(hash(object-t))),
                        object-t          elements : nullptr,
-                       object-t*         items :    nullptr)
-  {
+                       object-t*         items :    nullptr) {
     self = dk::init(super, #equal? : equal?, #hash : hash, #elements : elements, #items : items);
     return self;
   }
-  object-t initialize(object-t kls)
-  {
+  object-t initialize(object-t kls) {
     dk-klass-for-name(#pair); // hackhack
     return kls;
   }
-  object-t finalize(object-t kls)
-  {
+  object-t finalize(object-t kls) {
     return kls;
   }
 }

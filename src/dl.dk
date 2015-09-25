@@ -23,11 +23,9 @@ module dakota;
 klass x::dl-info {
   slots Dl-info;
 }
-
 // returns nullptr if no exact match
 str-t
-symbol-name-from-address(void* saddr)
-{
+symbol-name-from-address(void* saddr) {
   str-t result = nullptr;
 #if defined WIN32
 #error "not yet implemented on win32"
@@ -38,10 +36,8 @@ symbol-name-from-address(void* saddr)
 #endif
   return result;
 }
-
 void
-load-library(str-t name)
-{
+load-library(str-t name) {
 #if defined WIN32
   //fprintf(stdout, "LoadLibrary(\"%s\")\n", name);
   HINSTANCE h-dll = LoadLibrary(name);

@@ -19,7 +19,6 @@ module dakota;
 klass size {
   slots size-t;
 }
-
 klass ssize {
   slots ssize-t;
 }

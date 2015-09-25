@@ -21,8 +21,7 @@ module dakota;
 klass str {
   slots char8-t const*;
 
-  method int-t compare(object-t self, object-t other)
-  {
+  method int-t compare(object-t self, object-t other) {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 

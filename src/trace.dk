@@ -19,20 +19,16 @@ module dakota;
 static uint32-t gbl-trace-column = 0;
 
 static void
-trace-column-in()
-{
+trace-column-in() {
   gbl-trace-column++;
 }
 static void
-trace-column-out()
-{
+trace-column-out() {
   if (0 != gbl-trace-column)
     gbl-trace-column--;
 }
-
 static format-va-printf(2) int-t
-trace-vfprintf(file-t file, str-t format, va-list-t args)
-{
+trace-vfprintf(file-t file, str-t format, va-list-t args) {
   str-t col = "  "; // two spaces per column :-) [my way]
   for (uint32-t i = 0; i < gbl-trace-column; i++) {
     if (0 == i)
@@ -45,18 +41,15 @@ trace-vfprintf(file-t file, str-t format, va-list-t args)
   return result;
 }
 static format-printf(2) int-t
-trace-fprintf(file-t file, str-t format, ...)
-{
+trace-fprintf(file-t file, str-t format, ...) {
   va-list-t args;
   va-start(args, format);
   int-t result = trace-vfprintf(file, format, args);
   va-end(args);
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, va-list-t args)
-{
+dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, va-list-t args) {
   USE(args);
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
@@ -67,10 +60,8 @@ dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, v
   trace-column-in();
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, va-list-t args)
-{
+dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, va-list-t args) {
   USE(args);
   int-t result;
   result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
@@ -80,10 +71,8 @@ dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, v
   trace-column-in();
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va-list-t args)
-{
+dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va-list-t args) {
   USE(args);
   trace-column-out();
   int-t result;
@@ -94,10 +83,8 @@ dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va
                          cast(void*)cast(uintptr-t)(m));
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va-list-t args)
-{
+dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va-list-t args) {
   USE(args);
   trace-column-out();
   int-t result;
@@ -107,10 +94,8 @@ dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va
                          cast(void*)cast(uintptr-t)(m));
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...)
-{
+dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...) {
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
@@ -119,10 +104,8 @@ dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...)
   va-end(args);
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...)
-{
+dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...) {
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
@@ -131,10 +114,8 @@ dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...)
   va-end(args);
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...)
-{
+dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...) {
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
@@ -143,10 +124,8 @@ dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...)
   va-end(args);
   return result;
 }
-
 DEBUG-SO-EXPORT int-t
-dkt-trace-after(signature-t const* signature, method-t m, object-t object, ...)
-{
+dkt-trace-after(signature-t const* signature, method-t m, object-t object, ...) {
   int-t result = 0;
   va-list-t args;
   va-start(args, object);

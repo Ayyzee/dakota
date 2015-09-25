@@ -74,7 +74,6 @@ namespace dkt {
     return buf;
   }
 }
-
 #if defined DEBUG
   #define DEBUG_STMT(stmt) stmt
 #else
@@ -145,7 +144,6 @@ template <typename T, size_t N>
 constexpr size_t dk_countof(T(&)[N]) {
   return N;
 }
-
 #if !defined USE
   #define    USE(v) cast(void)v
 #endif
@@ -155,7 +153,6 @@ constexpr size_t dk_countof(T(&)[N]) {
 #define name_of(kls)       klass::unbox(kls)->name
 
 inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
-
 // file scope
 #define selector(name, args)             *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
 #define dkt_signature(name, args)         (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __signature::name))()
@@ -218,7 +215,6 @@ typedef selector_t* (*dkt_selector_function_t)();
 constexpr uintptr_t dk_hash(str_t str, uintptr_t i = 0) { // Daniel J. Bernstein
   return !str[i] ? cast(uintptr_t)5381 : ( dk_hash(str, i + 1) * cast(uintptr_t)33 ) ^ cast(uchar8_t)(str[i]);
 }
-
 SO_IMPORT int_t  safe_strcmp(str_t, str_t);
 SO_IMPORT size_t safe_strlen(str_t);
 

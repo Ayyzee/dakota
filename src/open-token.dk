@@ -27,18 +27,14 @@ klass open-token {
   slots {
     object-t close-token;
   }
-
   // prevents (normally) generated dk::va::init() generic from being generated
   // because dk::init() is a keyword argument function (normally)
-  method object-t va::init(object-t self, va-list-t args)
-  {
+  method object-t va::init(object-t self, va-list-t args) {
     self = dk::va::init(super, args);
     self.close-token = null;
     return self;
   }
-
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
 
@@ -47,16 +43,12 @@ klass open-token {
     dk::write-slots-end(out);
     return self;
   }
-
-  method object-t set-close-token(object-t self, object-t close-token)
-  {
+  method object-t set-close-token(object-t self, object-t close-token) {
     assert(null == self.close-token);
     self.close-token = close-token;
     return self;
   }
-
-  method object-t close-token(object-t self)
-  {
+  method object-t close-token(object-t self) {
     assert(null != self.close-token);
     return self.close-token;
   }

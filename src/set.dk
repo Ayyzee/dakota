@@ -23,42 +23,33 @@ klass klass;
 trait forward-iterator;
 
 trait set {
-  method boole-t contains-all?(object-t self, object-t collection)
-  {
+  method boole-t contains-all?(object-t self, object-t collection) {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return false;
   }
-
-  method boole-t contains-any?(object-t self, object-t collection)
-  {
+  method boole-t contains-any?(object-t self, object-t collection) {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return false;
   }
-
   // complement (if collection is set)
-  method object-t remove-all(object-t self, object-t collection)
-  {
+  method object-t remove-all(object-t self, object-t collection) {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return null;
   }
-
   // intersection (if collection is set)
-  method object-t retain-all(object-t self, object-t collection)
-  {
+  method object-t retain-all(object-t self, object-t collection) {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return null;
   }
-
-  method object-t write-lite(object-t self, object-t out)
-  {
+  method object-t write-lite(object-t self, object-t out) {
     dk::write(out, "{");
     str-t delim = "";
 
@@ -67,10 +58,8 @@ trait set {
       dk::write-lite(element, out); // must be primitive type
       delim = ",";
     }
-
     dk::write(out, "}");
     return self;
   }
-
   method object-t forward-iterator(object-t); // hackhack
 }

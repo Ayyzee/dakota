@@ -21,11 +21,9 @@
 #include <cstring>
 
 static boole-t
-space?(int-t c)
-{
+space?(int-t c) {
   return isspace(c);
 }
-
 module dakota-util;
 
 klass token;
@@ -44,11 +42,9 @@ klass input-file {
     int32-t  line;
     int32-t  column;
   }
-
   method object-t init(object-t self,
                        file-t   file :     nullptr,
-                       str-t    filename : nullptr)
-  {
+                       str-t    filename : nullptr) {
     self = dk::init(super);
     assert(!(nullptr != file && nullptr != filename)); // these are mutually exclusive
     assert(stdout != file);
@@ -85,21 +81,16 @@ klass input-file {
     self.line = 1;
     return self;
   }
-
-  method object-t dealloc(object-t self)
-  {
+  method object-t dealloc(object-t self) {
     dkt::dealloc(self.buffer);
     object-t result = dk::dealloc(super);
     return result;
   }
-
-  method str-t filename(object-t self)
-  {
+  method str-t filename(object-t self) {
     return cast(str-t)(self.filename);
   }
   
-  method object-t put-char8(object-t self, char8-t c)
-  {
+  method object-t put-char8(object-t self, char8-t c) {
     if (0 == self.current-position)
       throw "oops";
     if (c != self.buffer[self.current-position - 1])
@@ -113,9 +104,7 @@ klass input-file {
     }
     return null;
   }
-
-  method char8-t get-char8(object-t self)
-  {
+  method char8-t get-char8(object-t self) {
     char8-t c = self.buffer[self.current-position++];
     if (0 != c) {
       if ('\n' == c) {
@@ -127,9 +116,7 @@ klass input-file {
     }
     return c;
   }
-
-  method object-t split(object-t self, type-predicate-t type?)
-  {
+  method object-t split(object-t self, type-predicate-t type?) {
     object-t result = make(vector::klass);
 
     if (nullptr == type?)
@@ -150,8 +137,7 @@ klass input-file {
 
       str128-t  buf = "";
       uint32-t buf-pos = 0;
-      until (type?(c = dk::get-char8(self)))
-      {
+      until (type?(c = dk::get-char8(self))) {
         buf[buf-pos] = c;
         buf-pos++;
         buf[buf-pos] = NUL;
