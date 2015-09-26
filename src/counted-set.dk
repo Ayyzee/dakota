@@ -24,7 +24,7 @@ trait counted-set {
   //provides set;
   require collection;
 
-  method object-t at(object-t self, object-t element, object-t default-result) {
+  static object-t at(object-t self, object-t element, object-t default-result) {
     object-t result = default-result;
     object-t pair = dk::pair-at(self, element, nullptr);
 
