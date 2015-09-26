@@ -1,0 +1,15 @@
+//arg=exe
+//name=./../lib/libdakota.dylib
+//arg=exe
+//name=exe
+module dakota;
+
+module dakota export
+  bar-w,
+  bar-w::slots-t,
+  bar-wo,
+  bar-wo::slots-t,
+  foo-w,
+  foo-w::slots-t,
+  foo-wo,
+  foo-wo::slots-t;

@@ -1,0 +1,9 @@
+{
+  'srcs' => [
+    'exe.dk',
+    'module-exe.dk',
+  ],
+  'libs' => [
+  ],
+  'name' => 'exe',
+}

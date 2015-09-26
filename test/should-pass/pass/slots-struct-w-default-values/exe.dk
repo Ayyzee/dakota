@@ -1,0 +1,33 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+module dakota;
+
+klass foo-w {
+  slots {
+    std::uint32-t width =  6 - 3;
+    std::uint32-t length = 9 - 3;
+  }
+}
+klass foo-wo {
+  slots {
+    std::uint32-t width;
+    std::uint32-t length;
+  }
+}
+klass bar-w {
+  slots enum {
+    x = 5 - 2,
+    y = 8 - 2
+  }
+}
+klass bar-wo {
+  slots enum {
+    x,
+    y
+  }
+}
+
+int-t main()
+{
+  return 0;
+}

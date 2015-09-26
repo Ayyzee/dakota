@@ -1,0 +1,7 @@
+# struct:  type name [= expr]
+# enum:         name [= expr]
+
+{ 'name' => '', # required
+  'type' => '', # required for struct
+  'expr' => '', # optional
+}
