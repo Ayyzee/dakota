@@ -18,6 +18,7 @@
 
 module dakota;
 
+klass pair;
 klass sorted-set;
 klass sorted-table;
 klass std-compare;
@@ -92,7 +93,7 @@ klass object-output-stream {
       dk::write-sequence-end(self);
   
       while (object-t o = dk::remove-last(self.object-from-id))
-        dk::write-element-id(self, dk::element(o)); // recursive
+        dk::write-element-id(self, dk::first(o)); // recursive
     }
     return self;
   }
