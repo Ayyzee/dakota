@@ -19,33 +19,12 @@ module dakota;
 klass pair;
 klass vector;
 
-trait forward-iterator;
-
 trait table {
-  //provides dk::set;
+  //provides set;
   require collection;
 
-  method alias(at) object-t in(object-t self, object-t key);
-  method object-t at(object-t self, object-t key) {
-    return dk::at(self, key, cast(object-t)nullptr);
-  }
-  static object-t at(object-t self, object-t key, object-t default-result) {
-    object-t result = default-result;
-    object-t pair = dk::pair-at(self, key, cast(object-t)nullptr);
-
-    if (nullptr != pair) {
-      pair-t* pair-content = pair::unbox(pair);
-      result = pair-content->last;
-    }
-    return result;
-  }
-  method object-t add(object-t self, object-t key, object-t element) {
-    object-t pair = pair::box({key, element});
-    dk::add(self, pair);
-    return element;
-  }
   method object-t keys(object-t self) {
-    object-t set-kls = dk::superklass(klass-of(self));
+    object-t set-kls = superklass-of(klass-of(self));
     object-t result = make(set-kls);
     for (pair-t* pair in self)
       dk::add(result, pair->first);
@@ -57,19 +36,6 @@ trait table {
       dk::add-last(result, pair->last);
     return result;
   }
-  object-t initialize(object-t kls) {
-    typedef object-t (*)(object-t, object-t, object-t) at-t;
-    dk::add-method-for-selector(kls,
-                               selector(pair-at(object-t, object-t, object-t)),
-                               dk::method-for-selector(kls, selector(at(object-t, object-t, object-t))));
-    dk::add-method-for-selector(kls,
-                               selector(at(object-t, object-t, object-t)),
-                               cast(method-t)cast(at-t)(at));
-    return kls;
-  }
-  object-t finalize(object-t kls) {
-    return kls;
-  }
   method object-t write-lite(object-t self, object-t out) {
     dk::write(out, "{");
     str-t delim = "";
@@ -79,7 +45,7 @@ trait table {
       dk::write-lite(pair->first, out); // must be primitive type
       dk::write(out, ":");
       if (nullptr == pair->last || null == pair->last)
-        dk::write(out, "undef");
+        dk::write(out, "null");
       else
         dk::write-lite(pair->last, out);
       delim = ",";
@@ -87,5 +53,33 @@ trait table {
     dk::write(out, "}");
     return self;
   }
-  method /*alias(at)*/ object-t pair-at(object-t self, object-t key, object-t default-pair);
+  method object-t add(object-t self, object-t first, object-t last) {
+    object-t pair = pair::box({first, last});
+    dk::add(self, pair);
+    return last;
+  }
+  static object-t at(object-t self, object-t first, object-t default-last) {
+    object-t result = default-last;
+    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
+
+    if (nullptr != pair) {
+      pair-t* pair-content = pair::unbox(pair);
+      result = pair-content->last;
+    }
+    return result;
+  }
+  object-t initialize(object-t kls) {
+    typedef object-t (*)(object-t, object-t, object-t) at-t;
+    dk::add-method-for-selector(kls,
+                               selector(pair-at(object-t, object-t, object-t)),
+                               dk::method-for-selector(kls, selector(at(object-t, object-t, object-t)))); // <klass-using-trait>::at(3)
+    dk::add-method-for-selector(kls,
+                               selector(at(object-t, object-t, object-t)),
+                               cast(method-t)cast(at-t)(at)); // at(3) [non-method]
+    return kls;
+  }
+  object-t finalize(object-t kls) {
+    return kls;
+  }
+  method /*alias(at)*/ object-t pair-at(object-t self, object-t first, object-t default-pair);
 }

@@ -17,42 +17,18 @@
 module dakota;
 
 klass pair;
-klass vector;
 klass uint32;
+klass vector;
 
 trait counted-set {
   //provides set;
   require collection;
 
-  static object-t at(object-t self, object-t element, object-t default-result) {
-    object-t result = default-result;
-    object-t pair = dk::pair-at(self, element, nullptr);
-
-    if (nullptr != pair) {
-      pair-t* pair-content = pair::unbox(pair);
-      result = pair-content->last;
-    }
-    return result;
-  }
-  static object-t add(object-t self, object-t element) {
-    object-t pair = dk::pair-at(self, element, nullptr);
-
-    if (nullptr != pair) {
-      pair-t* pair-content = pair::unbox(pair);
-      object-t count = pair-content->last;
-      uint32-t* count-content = uint32::unbox(count);
-      (*count-content)++;
-    } else {
-      object-t count = uint32::box(1);
-      object-t pair1 = pair::box({element, count});
-      dk::add-pair(self, pair1);
-    }
-    return element;
-  }
   method object-t elements(object-t self) {
-    object-t result = make(vector::klass, #size : dk::size(self));
+    object-t set-kls = superklass-of(klass-of(self));
+    object-t result = make(set-kls);
     for (pair-t* pair in self)
-      dk::add-last(result, pair->first);
+      dk::add(result, pair->first);
     return result;
   }
   method object-t counts(object-t self) {
@@ -61,33 +37,75 @@ trait counted-set {
       dk::add-last(result, pair->last);
     return result;
   }
-  method uint32-t count-at(object-t self, object-t element, uint32-t default-count) {
-    uint32-t count-content = default-count;
-    object-t pair = dk::pair-at(self, element, nullptr);
+  method uint32-t count-at(object-t self, object-t first, uint32-t default-last) {
+    uint32-t last-content = default-last;
+    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
 
     if (nullptr != pair) {
       pair-t* pair-content = pair::unbox(pair);
-      object-t count = pair-content->last;
-      count-content = *uint32::unbox(count);
+      object-t last = pair-content->last;
+      last-content = *uint32::unbox(last);
     }
-    return count-content;
+    return last-content;
+  }
+  method object-t write-lite(object-t self, object-t out) {
+    dk::write(out, "{");
+    str-t delim = "";
+
+    for (pair-t* pair in self) {
+      dk::write(out, delim);
+      dk::write-lite(pair->first, out); // must be primitive type
+      dk::write(out, ":");
+      if (nullptr == pair->last || null == pair->last)
+        dk::write(out, "null");
+      else
+        dk::write-lite(pair->last, out);
+      delim = ",";
+    }
+    dk::write(out, "}");
+    return self;
+  }
+  static object-t add(object-t self, object-t first) {
+    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
+
+    if (nullptr != pair) {
+      pair-t* pair-content = pair::unbox(pair);
+      object-t last = pair-content->last;
+      uint32-t* last-content = uint32::unbox(last);
+      (*last-content)++;
+    } else {
+      object-t last = uint32::box(1);
+      object-t pair1 = pair::box({first, last});
+      dk::add-pair(self, pair1);
+    }
+    return first;
+  }
+  static object-t at(object-t self, object-t first, object-t default-last) {
+    object-t result = default-last;
+    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
+
+    if (nullptr != pair) {
+      pair-t* pair-content = pair::unbox(pair);
+      result = pair-content->last;
+    }
+    return result;
   }
   object-t initialize(object-t kls) {
     typedef object-t (*)(object-t, object-t, object-t) at-t;
     dk::add-method-for-selector(kls,
                                selector(pair-at(object-t, object-t, object-t)),
-                               dk::method-for-selector(kls, selector(at(object-t, object-t, object-t))));
+                               dk::method-for-selector(kls, selector(at(object-t, object-t, object-t)))); // <klass-using-trait>::at(3)
     dk::add-method-for-selector(kls,
                                selector(at(object-t, object-t, object-t)),
-                               cast(method-t)cast(at-t)(at));
+                               cast(method-t)cast(at-t)(at)); // at(3) [non-method]
 
     typedef object-t (*)(object-t, object-t) add-t;
     dk::add-method-for-selector(kls,
                                selector(add-pair(object-t, object-t)),
-                               dk::method-for-selector(kls, selector(add(object-t, object-t))));
+                               dk::method-for-selector(kls, selector(add(object-t, object-t)))); // counted-{hashed,sorted}-set::add(2)
     dk::add-method-for-selector(kls,
                                selector(add(object-t, object-t)),
-                               cast(method-t)cast(add-t)(add));
+                               cast(method-t)cast(add-t)(add)); // add(2) [non-method]
     return kls;
   }
   object-t finalize(object-t kls) {
