@@ -1,25 +1,31 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass k1
+klass no-such-method-exception;
+klass missing-keyword-exception;
+klass exception;
+
+klass k1-klass
 {
   // default klass
   superklass klass;
 
   method object-t bar(object-t self)
   {
+    throw "oops!"; // this should never get called
     return self;
   }
 }
 
 klass o1
 {
-  klass k1;
+  klass k1-klass;
   // default superklass is 'object'
 
   method object-t foo(object-t self)
   {
-    object-t kls = klass-of(self);
-    dk::bar(kls);
+    // the klass klass, not the klass k1-klass
+    object-t kls = klass-of(klass-of(self));
+    dk::bar(kls); // this should fail
     return self;
   }
 }
@@ -32,7 +38,11 @@ klass o2
 
 int-t main()
 {
-  object-t i2 = make(o2::klass);
-  dk::foo(i2);
+  try {
+    object-t i2 = make(o2::klass);
+    dk::foo(i2);
+  } catch (no-such-method-exception::klass e) {
+    //
+  }
   return 0;
 }
