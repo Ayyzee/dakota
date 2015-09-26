@@ -337,9 +337,9 @@ sub rewrite_throws {
 
   # dont want to rewrite #define THROW throw
   # in parens
-  $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)\((.+?)\)(\s*);/throw$1*dkt-capture-current-exception($2)$3;/gsx;
+  $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)\((.+?)\)(\s*);/throw$1dkt-capture-current-exception($2)$3;/gsx;
   # not in parens
-  $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)  (.+?)  (\s*);/throw$1*dkt-capture-current-exception($2)$3;/gsx;
+  $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)  (.+?)  (\s*);/throw$1dkt-capture-current-exception($2)$3;/gsx;
 }
 sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
