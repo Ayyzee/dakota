@@ -51,6 +51,7 @@ klass hashed-set {
     uint32-t iterator-state;
   }
   object-t initialize(object-t kls) {
+    dk-klass-for-name(#deque); // hackhack
     dk-klass-for-name(#vector); // hackhack
     return kls;
   }
