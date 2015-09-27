@@ -1279,9 +1279,8 @@ static addr2name-pair-t others[] = {
   { cast(void**)&std-output, #std-output },
   { cast(void**)&std-error,  #std-error  },
 };
-static const char*
-name-from-address(void* _addr) { // slowslow
-  object-t* addr = cast(decltype(addr))_addr;
+static symbol-t
+name-from-address(object-t addr) { // slowslow
   // others
   for (size-t i = 0; i < DK-COUNTOF(others); i++) {
     addr2name-pair-t other = others[i];
@@ -1307,7 +1306,7 @@ name-from-address(void* _addr) { // slowslow
 }
 [[noreturn]] static void
 bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) noexcept {
-  char8-t const *name = name-from-address(si->si-addr);
+  symbol-t name = name-from-address(cast(object-t)si->si-addr);
   if (nullptr != name) {
     syslog(LOG-ERR, "caught sig%s at \"%s\" %p\n",
            sys-signame[sig], name, si->si-addr);
