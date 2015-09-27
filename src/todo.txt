@@ -1,0 +1,28 @@
+add trailig ! to more danerous version of methods
+add safer versions of ! metthods
+
+sort out mutable/immutable design
+
+fix emacs dakota-mode finding
+
+superklass-of() => dk::superklass()
+name-of() =>       dk::name()
+
+convert to use in() and in?() [formally contains?()]
+
+Added leading $ to generic functions and va prefixes
+  then using namespace dk brings them all in.
+  dk::add() =>      $add()
+  dk::va::init() => $va::init()
+
+undef => null
+
+trait sets-w-pairs
+
+come up with another 'method' alias-like qualifier that works for
+non-methods one traits like table::at(3) or counted-set::at(3) that
+need access to the host class at initialization.
+
+improve the output format of no-such-method-exception
+
+add to test/should-pass/fail is a test of attempting to write to a klass ptr
