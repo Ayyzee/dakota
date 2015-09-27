@@ -1,6 +1,6 @@
 include $(rootdir)/test/vars.mk
 
-EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG --no-warnings
+EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG
 
 exe: exe.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
