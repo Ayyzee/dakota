@@ -3,12 +3,12 @@
 #include <string.h>
 #include <assert.h>
 
-noexport int32-t arg1 = 42;
-noexport const char8-t* arg2 = "so long and ...";
+int32-t arg1 = 42;
+const char8-t* arg2 = "so long and ...";
 
 klass k1
 {
-  method object-t init(object-t self, int32-t meaning-of-life : {}, const char8-t* message : {})
+  method object-t init(object-t self, int32-t meaning-of-life : 0, const char8-t* message : nullptr)
   {
     self = dk::init(super);
     assert(arg1 == meaning-of-life);

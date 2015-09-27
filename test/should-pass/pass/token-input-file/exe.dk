@@ -5,7 +5,7 @@
 
 klass input-file;
 
-noexport boole-t space?(int-t c)
+boole-t space?(int-t c)
 {
   return isspace(c);
 }
