@@ -527,7 +527,7 @@ klass klass {
           // should demangle here
           fprintf(out, " : '%s',", symbol-name);
         } else {
-          fprintf(out, " : undef,");
+          fprintf(out, " : null,");
         }
         fprintf(out, "\n");
       }

@@ -255,8 +255,8 @@ klass json-parser {
     }
     object-t element;
     switch (dk::tokenid(token)) {
-      case 'undf':
-        element = null; // undef
+      case 'null':
+        element = null;
         break;
       case 'sqst':
         element = make(string::klass, #bytes : dk::buffer(token));
@@ -274,7 +274,7 @@ klass json-parser {
         element = json-parser::get-vector(self);
         break;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk::buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", dk::buffer(token));
         return null;
     }
     return element;
@@ -288,8 +288,8 @@ klass json-parser {
     }
     object-t element;
     switch (dk::tokenid(token)) {
-      case 'undf':
-        element = null; // undef
+      case 'null':
+        element = null;
         break;
       case 'sqst':
         element = make(string::klass, #bytes : dk::buffer(token));
@@ -309,7 +309,7 @@ klass json-parser {
       case ']': // only difference from get-element()
         return null;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' or ']' but got '%s'\n", dk::buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' or ']' but got '%s'\n", dk::buffer(token));
         return null;
     }
     return element;
@@ -341,14 +341,14 @@ klass json-parser {
       token = json-parser::lex(self);
       if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete vector\n");
-        return null; // undef
+        return null;
       }
     } while (',' == dk::tokenid(token));
       
       
     if (']' != dk::tokenid(token)) {
       print-error(self.filename, self.line, self.column, "expected ',' or ']' but got '%s'\n", dk::buffer(token));
-      return null; // undef
+      return null;
     }
     return vector;
   }
@@ -372,7 +372,7 @@ klass json-parser {
       
     if ('}' != dk::tokenid(token)) {
       print-error(self.filename, self.line, self.column, "expected ',' or '}' but got '%s'\n", dk::buffer(token));
-      return null; // undef
+      return null;
     }
     return table;
   }
@@ -387,11 +387,11 @@ klass json-parser {
   method object-t read-property-list(object-t self) {
     object-t token = json-parser::lex(self);
     if (null == token)
-      return null; // undef
+      return null;
 
     switch (dk::tokenid(token)) {
-      case 'undf':
-        return null; // undef
+      case 'null':
+        return null;
       case 'sqst':
         return make(string::klass, #bytes : dk::buffer(token));
       case 'dqst':
@@ -403,8 +403,8 @@ klass json-parser {
       case '[':
         return json-parser::get-vector(self);
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'undef' or '{' or '[' but got '%s'\n", dk::buffer(token));
-        return null; // undef
+        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", dk::buffer(token));
+        return null;
     }
   }
 }
