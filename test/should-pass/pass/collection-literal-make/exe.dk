@@ -22,7 +22,7 @@ klass sorted-set;
 
 klass k1
 {
-  method object-t init(object-t self, object-t attributes : {})
+  method object-t init(object-t self, object-t attributes : nullptr)
   {
     self = dk::init(super);
     //
