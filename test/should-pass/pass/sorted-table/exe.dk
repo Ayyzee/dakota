@@ -20,11 +20,11 @@ int-t main()
 //     object-t string2-element = make(string::klass, #bytes : "MOTHER");
 //     dk::add(table, string2-key, string2-element);
 
-    object-t element = dk::at(table, string1-key, nullptr);
-    printf("%p == %p\n", (void*)string1-element, (void*)element);
+    object-t element = dk::at(table, string1-key, cast(object-t)nullptr);
+    printf("%p == %p\n", cast(void*)string1-element, cast(void*)element);
 
-    object-t pair = dk::pair-at(table, string1-key, nullptr);
-    printf("%p == %p\n", (void*)dk::element(pair), (void*)element);
+    object-t pair = dk::pair-at(table, string1-key, cast(object-t)nullptr);
+    printf("%p == %p\n", cast(void*)dk::first(pair), cast(void*)element);
   }
   catch(...)
   {

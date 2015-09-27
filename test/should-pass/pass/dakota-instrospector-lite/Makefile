@@ -4,10 +4,10 @@ include $(rootdir)/test/vars.mk
 all: $(target)
 
 $(target): $(prereq)
-	g++ -Wall -g3 --output $@ -ldl $^
+	clang --all-warnings --debug=3 --output $@ -ldl $^
 
 check:
-	./$(target) $(libdir)/libdakota.$(so_ext) $(libdir)/libdakota-util.$(so_ext)
+	./$(target) $(prefix)/lib/libdakota.$(so_ext) $(prefix)/lib/libdakota-util.$(so_ext)
 
 clean:
-	rm -f ./$(target) *~
+	$(RM) $(RMFLAGS) ./$(target) *~
