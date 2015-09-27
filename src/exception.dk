@@ -133,14 +133,17 @@ verbose-terminate() noexcept {
     if (nullptr != current-exception)
       dk::dump(current-exception);
 
-  dk::print-format(std-error, "%s[%i]: uncaught/unexpected exception", getprogname(), getpid());
+  dk::print-format(std-error, "{ \"progname\": \"%s\", \"pid\": %i, \"root-msg\": \"uncaught/unexpected exception\"",
+                   getprogname(), getpid());
 
   if (nullptr != current-exception)
-    dk::println(current-exception, std-error);
+    dk::print(current-exception, std-error);
+    // dk::println-format(std-error, ", \"exception\": \"%s\"", current-exception);
   else-if (nullptr != current-exception-string)
-    dk::println-format(std-error, ": \"%s\"", current-exception-string);
+    dk::print-format(std-error, ", \"exception\": \"%s\"", current-exception-string);
   else
-    dk::println(std-error, "");
+    dk::print(std-error, "");
+  dk::println(std-error, " }");
 
   if (nullptr != original-terminate)
     original-terminate();
@@ -172,7 +175,7 @@ klass exception {
   method object-t print(object-t self, object-t out) {
     if (null == out)
       out = std-error;
-    dk::print-format(out, ": <%s>", self.message);
+    dk::print-format(out, ", \"%s\": \"%s\"", name-of(klass), self.message);
     return self;
   }
 }
