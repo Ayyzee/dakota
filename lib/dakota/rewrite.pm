@@ -405,7 +405,7 @@ sub rewrite_table_literal_replacement {
     }
     $result .= "nullptr }";
   }
-  $result .= ")";
+  $result .= ", nullptr)";
   return $result;
 }
 sub rewrite_sequence_literal {
@@ -427,7 +427,7 @@ sub rewrite_list_literal_replacement {
     }
     $result .= "nullptr }";
   }
-  $result .= ")";
+  $result .= ", nullptr)";
   return $result;
 }
 sub rewrite_enums {
