@@ -73,13 +73,13 @@ klass output-stream {
     return self;
   }
   method format-va-printf(2) object-t va::print-format(object-t self, str-t format, va-list-t args) {
-    char8-t[128] buffer = ""; // hackhack - magic number
+    char8-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     dk::print(self, cast(str-t)(buffer));
     return self;
   }
   method format-va-printf(2) object-t va::println-format(object-t self, str-t format, va-list-t args) {
-    char8-t[128] buffer = ""; // hackhack - magic number
+    char8-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     dk::println(self, cast(str-t)(buffer));
     return self;
