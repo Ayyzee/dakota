@@ -2,7 +2,7 @@
 
 klass features; // hackhack
 klass json-object-output-stream;
-klass sorted-klass;
+klass sorted-set;
 
 int-t main()
 {

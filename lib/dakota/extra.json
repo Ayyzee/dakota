@@ -48,11 +48,12 @@
     'uchar8' => undef,
   },
   'rt_extra_klass_decls' => {
+    'assoc-node' => undef,
+    'construct' => undef,
+    'method-alias' => undef,
     'no-such-method-exception' => undef, # generic funcs (throw)
     'selector-node' => undef,
-    'assoc-node' => undef,
     'va-method' => undef,
-    'construct' => undef,
   },
   'nrt_extra_symbols' => {},
   'rt_extra_symbols' => {
