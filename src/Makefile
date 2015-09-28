@@ -35,14 +35,13 @@ $(libdakota.output): $(srcdir)/strerror-name.tbl # not ideal, but ...
 
 check: all
 	$(dakota-info.output) $(libdakota.output) $(libdakota-util.output)
-	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
 	$(RM) $(RMFLAGS) $(output-files)
 
 clean: goal-clean
-	$(RM) $(RMFLAGS) $(srcdir)/aaa.dk $(srcdir)/strerror-name.tbl
+	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-info.output)
 	$(RM) $(RMFLAGS) $(dakota-info.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(libdakota.output)
@@ -50,14 +49,13 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(libdakota-util.output)
 	$(RM) $(RMFLAGS) $(libdakota-util.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
-	$(MAKE) $(MAKEFLAGS) --file exes.mk $@
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 install: $(install-files)
 	if [[ "Darwin" == `uname` ]]; then \
 	  cd $(DESTDIR)$(prefix)/lib/dakota; \
-	  sudo rm -f compiler.json; sudo ln -s compiler-clang.json  compiler.json; \
-	  sudo rm -f platform.json; sudo ln -s platform-darwin.json platform.json; \
+	  sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-clang.json  compiler.json; \
+	  sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-darwin.json platform.json; \
   fi
 
 precompile:

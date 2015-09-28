@@ -1,0 +1,9 @@
+{
+  'srcs' => [
+    'exe.dk',
+  ],
+  'libs' => [
+    'lib-1.$so_ext',
+  ],
+  'name' => 'exe',
+}

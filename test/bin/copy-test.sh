@@ -6,4 +6,4 @@ if [ 2 != $# ]; then
   echo "usage: $0 <0|1|2|3> <test-name>"
 fi
 
-cp -pr template/exe-$1 $2
+cp -pr templates/TEMPLATE-exe-$1 $2

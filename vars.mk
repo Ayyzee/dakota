@@ -34,6 +34,9 @@ CPFLAGS := -pR
 RM := rm
 RMFLAGS := -fr
 
+LN := ln
+LNFLAGS := -s
+
 MKDIR := mkdir
 MKDIRFLAGS := -p
 
