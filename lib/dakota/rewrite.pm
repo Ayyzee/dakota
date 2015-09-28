@@ -700,6 +700,27 @@ sub rewrite_keyword_syntax {
   $$filestr_ref =~ s/(make)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
   $$filestr_ref =~ s|__MAKE__|make|gs;
 }
+sub rewrite_sentinal_generic_uses_sub {
+  my ($name, $arg_list, $kw_args_generics) = @_;
+  &rewrite_sentinal_generic_uses(\$arg_list, $kw_args_generics);
+  if (1) {
+    $arg_list =~ s/$/, nullptr/g;
+    $arg_list =~ s/,\s*nullptr\s*,\s*nullptr\s*$/, nullptr/g;
+    $arg_list =~ s/^(\s*(object-t|super-t)\s*.*?),\s*nullptr\s*$/$1/g;
+  }
+  return "$name\($arg_list\)";
+}
+sub rewrite_sentinal_generic_uses {
+  my ($filestr_ref, $kw_args_generics) = @_;
+  $$kw_args_generics{'make'} = undef;
+  foreach my $name (sort keys %$kw_args_generics) {
+    if ('make' ne $name && $name !~ m/^dk::/) {
+      $name = "dk::$name";
+    }
+    $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinal_generic_uses_sub($1, $2, $kw_args_generics)/egms;
+  }
+  delete $$kw_args_generics{'make'};
+}
 sub wrapped_rewrite {
   my ($filestr_ref, $lhs, $rhs) = @_;
   my $sst = &sst::make($$filestr_ref, undef);
@@ -846,6 +867,7 @@ sub convert_dk_to_cc {
   &rewrite_signatures($filestr_ref);
   &rewrite_selectors($filestr_ref);
   &rewrite_keyword_syntax($filestr_ref, $kw_args_generics);
+  &rewrite_sentinal_generic_uses($filestr_ref, $kw_args_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_args_generics);
   &rewrite_functions($filestr_ref);

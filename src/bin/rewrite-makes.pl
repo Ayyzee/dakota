@@ -41,27 +41,32 @@ $main::list_in = qr{
                      )*
                  }x;
 
-my $kw_args_generics = { 'make' =>     undef,
-                         'dk::init' => undef };
+my $kw_args_generics = { 'init' => undef,
+                       };
 
 undef $/;
 my $filestr = <STDIN>;
-&rewrite_sentinals(\$filestr, $kw_args_generics);
+&rewrite_sentinal_generic_uses(\$filestr, $kw_args_generics);
 print $filestr;
 
-sub rewrite_sentinals_sub {
+sub rewrite_sentinal_generic_uses_sub {
   my ($name, $arg_list, $kw_args_generics) = @_;
-  &rewrite_sentinals(\$arg_list, $kw_args_generics);
+  &rewrite_sentinal_generic_uses(\$arg_list, $kw_args_generics);
   if (1) {
     $arg_list =~ s/$/, nullptr/g;
-    $arg_list =~ s/,\s*nullptr,\s*nullptr\s*$/, nullptr/g;
-    $arg_list =~ s/^(\s*object-t\s*.*?),\s*nullptr\s*$/$1/g;
+    $arg_list =~ s/,\s*nullptr\s*,\s*nullptr\s*$/, nullptr/g;
+    $arg_list =~ s/^(\s*(object-t|super-t)\s*.*?),\s*nullptr\s*$/$1/g;
   }
   return "$name\($arg_list\)";
 }
-sub rewrite_sentinals {
+sub rewrite_sentinal_generic_uses {
   my ($filestr_ref, $kw_args_generics) = @_;
+  $$kw_args_generics{'make'} = undef;
   foreach my $name (sort keys %$kw_args_generics) {
-    $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinals_sub($1, $2, $kw_args_generics)/egms;
+    if ('make' ne $name && $name !~ m/^dk::/) {
+      $name = "dk::$name";
+    }
+    $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinal_generic_uses_sub($1, $2, $kw_args_generics)/egms;
   }
+  delete $$kw_args_generics{'make'};
 }

@@ -18,14 +18,20 @@ klass k1
 {
   method object-t init(object-t self, object-t object : null)
   {
-    self = dk::init(super);
+    self = dk::init(super
+                   );
+    USE(self);
+    USE(object);
     return self;
   }
 }
 
 int-t main()
 {
-  object-t o = make(k1::klass, #object : make(object::klass));
+  object-t o = make(k1::klass,
+                    #object : make(object::klass
+                              )
+               );
   USE(o);
   return 0;
 }
