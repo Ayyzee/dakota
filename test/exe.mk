@@ -1,5 +1,11 @@
 include $(rootdir)/test/vars.mk
 
+%.dk: %.sh
+	./$< > $@
+
+%.dk: %.pl
+	./$< > $@
+
 EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG
 
 exe: exe.dk
