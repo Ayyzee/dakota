@@ -2,6 +2,7 @@
 
 klass json-object-output-stream;
 klass json-parser;
+klass features; // hackhack
 
 int-t main()
 {

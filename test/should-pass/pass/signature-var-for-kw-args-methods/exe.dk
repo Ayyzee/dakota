@@ -1,16 +1,15 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass k1
-{
-  method object-t m1(object-t self, uint32-t depth, uint32-t width : {~}, uint32-t length : 5)
-  {
-    printf("%s(%s)\n", __signature__->name, __signature__->parameter-types);
+klass k1 {
+  method object-t m1(object-t self, uint32-t depth, uint32-t width : {~}, uint32-t length : 5) {
+    USE(depth);
+    USE(width);
+    USE(length);
+    printf("%s(%s)\n", __method__->name, __method__->parameter-types);
     return self;
   }
 }
-
-int-t main()
-{
+int-t main() {
   object-t o = make(k1::klass);
   dk::m1(o, 0, #width : 0, #length : 3);
   return 0;

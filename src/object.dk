@@ -34,10 +34,9 @@ klass object {
 
   // keep private, or koenig lookup will cause all
   // hell to break loose :-)
-  //     slots-t* unbox(object-t object) // special-case
-  //     {
-  //       return object;
-  //     }
+  // slots-t* unbox(object-t object) { // special-case
+  //   return object;
+  // }
   method object-t write-slots(object-t self, object-t out) {
   //dk::write-slots(super, out);
     dk::write-slots-start(out, klass);
