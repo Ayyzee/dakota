@@ -5,11 +5,12 @@
 
 klass deque;
 klass vector;
+klass uint32;
 
 static void check-for(object-t collection)
 {
   printf("%i[", dk::size(collection));
-  char8-t* delim = "";
+  char8-t const* delim = "";
   for (object-t iter = dk::forward-iterator(collection);
        dk::next?(iter);
        dk::next(iter)) {
@@ -24,7 +25,7 @@ static void check-for(object-t collection)
 static void check-for-each(object-t collection)
 {
   printf("%i[", dk::size(collection));
-  char8-t* delim = "";
+  char8-t const* delim = "";
   for (object-t e in collection) {
     printf("%s%i", delim, *uint32::unbox(e));
     delim = ",";
@@ -38,7 +39,7 @@ static const uint32-t count = 9;
 static void check(object-t klass, object-t (*add)(object-t, object-t), void (*check-for-func)(object-t))
 {
   object-t c = make(klass);
-  char8-t* delim = "";
+  char8-t const* delim = "";
 
   for (uint32-t i = 2; i < count; i += 3) {
     printf("%s", delim);

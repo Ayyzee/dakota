@@ -206,6 +206,7 @@ klass token {
     return self;
   }
   method int-t compare(object-t self, object-t other) {
+    dk::dump(other);
   //fprintf(stderr, "%s <: %s\n", unbox(self)->buffer, unbox(other)->buffer);
     int-t result = safe-strcmp(unbox(self)->buffer, unbox(other)->buffer);
     result = dkt-normalize-compare-result(result);

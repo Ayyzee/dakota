@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 klass hashed-set;
+klass uint32;
 
 typedef object-t (*add-t)(object-t, object-t);
 
