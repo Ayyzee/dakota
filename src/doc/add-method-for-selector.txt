@@ -1,3 +1,3 @@
-    SHIFT-AND-ADD-FUNCTION-FOR-SELECTOR (kls, selector( pair-at(object-t, object-t, object-t)),
+    REASSOC-AND-ADD-METHOD-FOR-SELECTOR (kls, selector( pair-at(object-t, object-t, object-t)),
                                               selector(      at(object-t, object-t, object-t)),
                                               cast(object-t (*)(object-t, object-t, object-t))at);

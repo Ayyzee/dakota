@@ -46,7 +46,7 @@ my $kw_args_generics = { 'init' => undef,
 
 undef $/;
 my $filestr = <STDIN>;
-&rewrite_add_method_for_selector(\$filestr);
+&rewrite_reassoc_and_add_method_for_selector(\$filestr);
 print $filestr;
 
 sub remove_extra_whitespace {
@@ -56,13 +56,12 @@ sub remove_extra_whitespace {
   $str =~ s|__WHITESPACE__| |g;
   return $str;
 }
-sub rewrite_add_method_for_selector_sub {
+sub rewrite_reassoc_and_add_method_for_selector_sub {
   my ($ws1, $ws2, $arglist) = @_;
   my $members_info = &arglist_members($arglist);
   #my $offset = $$members_info[0];
   my ($kls, $selector1, $selector2, $function) = @{$$members_info[1]};
   my $result = '';
-  #$ws2 =~ s/  $//; # remove 2 spaces
   $result .= sprintf("%sdk::add-method-for-selector%s(%s,\n", $ws1, $ws2, $kls);
   $result .= sprintf("%s                           %s %s,\n", $ws1, $ws2, $selector1);
   $result .= sprintf("%s                           %s dk::method-for-selector(%s, %s));\n", $ws1, $ws2, $kls, &remove_extra_whitespace($selector2));
@@ -72,9 +71,9 @@ sub rewrite_add_method_for_selector_sub {
   $result .= sprintf("%s                           %s cast(method-t)%s);\n", $ws1, $ws2, $function);
   return $result;
 }
-sub rewrite_add_method_for_selector {
+sub rewrite_reassoc_and_add_method_for_selector {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/( *)SHIFT-AND-ADD-FUNCTION-FOR-SELECTOR( *)\(($main::list_in)\)\s*;/&rewrite_add_method_for_selector_sub($1, $2, $3)/egms;
+  $$filestr_ref =~ s/( *)REASSOC-AND-ADD-METHOD-FOR-SELECTOR( *)\(($main::list_in)\)\s*;/&rewrite_reassoc_and_add_method_for_selector_sub($1, $2, $3)/egms;
 }
 
 my $open =  { '(' => 1, '{' => 1, '[' => 1 };
