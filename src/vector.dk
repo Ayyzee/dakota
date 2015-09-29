@@ -212,7 +212,7 @@ klass vector {
     return result;
   }
   method object-t at(object-t self, uint32-t index) {
-    object-t element = dk::at(self, index, nullptr);
+    object-t element = dk::at(self, index, cast(object-t)nullptr);
     if (nullptr == element)
       throw make(exception::klass, #message : "oops");
     return element;
@@ -286,7 +286,7 @@ klass vector {
     dk::write-sequence-start(out, "elements");
 
     for (uint32-t index = 0; index < self.count; index++)
-      dk::write-element-idref(out, self.elements[index], nullptr);
+      dk::write-element-idref(out, self.elements[index], cast(str-t)nullptr);
     dk::write-sequence-end(out);
 
     dk::write-slots-end(out);
@@ -355,7 +355,7 @@ klass vector-forward-iterator {
   method boole-t next?(object-t self) {
     check-iterator-state(self);
     boole-t result;
-    if (nullptr != dk::at(self.vector, self.index, nullptr))
+    if (nullptr != dk::at(self.vector, self.index, cast(object-t)nullptr))
       result = true;
     else
       result = false;
