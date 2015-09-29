@@ -1,0 +1,8 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+int-t main()
+{
+  null = nullptr; // this should fail
+
+  return 0;
+}
