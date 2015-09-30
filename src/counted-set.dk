@@ -41,16 +41,6 @@ trait counted-set {
     }
     return result;
   }
-  method uint32-t count-at(object-t self, object-t first, uint32-t default-count) {
-    uint32-t count = default-count;
-    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
-
-    if (nullptr != pair) {
-      object-t last = pair::unbox(pair)->last;
-      count = *uint32::unbox(last);
-    }
-    return count;
-  }
   method object-t write-lite(object-t self, object-t out) {
     dk::write(out, "{");
     str-t delim = "";
@@ -102,6 +92,16 @@ trait counted-set {
     object-t pair = dk::pair-at(self, first);
     object-t last = dk::last(pair);
     uint32-t count = *uint32::unbox(last);
+    return count;
+  }
+  method uint32-t count-at(object-t self, object-t first, uint32-t default-count) {
+    uint32-t count = default-count;
+    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
+
+    if (nullptr != pair) {
+      object-t last = pair::unbox(pair)->last;
+      count = *uint32::unbox(last);
+    }
     return count;
   }
   object-t initialize(object-t kls) {
