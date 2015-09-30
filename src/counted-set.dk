@@ -91,26 +91,18 @@ trait counted-set {
     return result;
   }
   object-t initialize(object-t kls) {
-    typedef object-t (*)(object-t, object-t, object-t) at-t;
-    dk::add-method-for-selector(kls,
-                               selector(pair-at(object-t, object-t, object-t)),
-                               dk::method-for-selector(kls, selector(at(object-t, object-t, object-t)))); // <klass-using-trait>::at(3)
-    dk::add-method-for-selector(kls,
-                               selector(at(object-t, object-t, object-t)),
-                               cast(method-t)cast(at-t)(at)); // at(3) [non-method]
+    REASSOC-AND-ADD-METHOD-FOR-SELECTOR(kls, selector( pair-at(object-t, object-t, object-t)),
+                                             selector(      at(object-t, object-t, object-t)),
+                                             cast(object-t (*)(object-t, object-t, object-t))at);
 
-    typedef object-t (*)(object-t, object-t) add-t;
-    dk::add-method-for-selector(kls,
-                               selector(add-pair(object-t, object-t)),
-                               dk::method-for-selector(kls, selector(add(object-t, object-t)))); // counted-{hashed,sorted}-set::add(2)
-    dk::add-method-for-selector(kls,
-                               selector(add(object-t, object-t)),
-                               cast(method-t)cast(add-t)(add)); // add(2) [non-method]
+    REASSOC-AND-ADD-METHOD-FOR-SELECTOR(kls, selector(add-pair(object-t, object-t)),
+                                             selector(     add(object-t, object-t)),
+                                             cast(object-t (*)(object-t, object-t))add);
     return kls;
   }
   object-t finalize(object-t kls) {
     return kls;
   }
-  method /*alias(at)*/ object-t pair-at(object-t self, object-t first, object-t default-pair);
-  method /*alias(add)*/ object-t add-pair(object-t self, object-t pair);
+  method object-t pair-at(object-t self, object-t first, object-t default-pair);
+  method object-t add-pair(object-t self, object-t pair);
 }

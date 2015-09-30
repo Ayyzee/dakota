@@ -7,10 +7,12 @@
 {
  #'rt_extra_generics' => {},
   'nrt_extra_generics' => {
+    'add-method-for-selector' => undef, # REASSOC-AND-ADD-METHOD-FOR-SELECTOR()
     'alloc' => undef,
     'forward-iterator' => undef,
     'init' => undef,
     'instance?' => undef,
+    'method-for-selector' => undef, # REASSOC-AND-ADD-METHOD-FOR-SELECTOR()
     'next' => undef,
   },
   'nrt_extra_keywords' => {
