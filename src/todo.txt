@@ -19,13 +19,7 @@ undef => null
 
 trait sets-w-pairs
 
-come up with another 'method' alias-like qualifier that works for
-non-methods one traits like table::at(3) or counted-set::at(3) that
-need access to the host class at initialization.
-
 improve the output format of no-such-method-exception
-
-add to test/should-pass/fail is a test of attempting to write to a klass ptr
 
 add to table::keys()?
 add to counted-set::elements()?
@@ -34,3 +28,5 @@ add to counted-set::elements()?
 add to table::elements()?
 add to counted-set::counts()?
  // , object-t sequence-klass : vector::klass
+
+--define-macro DKT-NULL-METHOD=dkt-null-method (how should we convert lexical syntax of lhs vs rhs?)
