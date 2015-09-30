@@ -80,6 +80,11 @@ trait counted-set {
     }
     return first;
   }
+  static object-t at(object-t self, object-t first) {
+    object-t pair = dk::pair-at(self, first);
+    object-t last = pair::unbox(pair)->last;
+    return last;
+  }
   static object-t at(object-t self, object-t first, object-t default-last) {
     object-t result = default-last;
     object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
@@ -91,6 +96,10 @@ trait counted-set {
     return result;
   }
   object-t initialize(object-t kls) {
+    REASSOC-AND-ADD-METHOD-FOR-SELECTOR(kls, selector( pair-at(object-t, object-t)),
+                                             selector(      at(object-t, object-t)),
+                                             cast(object-t (*)(object-t, object-t))at);
+
     REASSOC-AND-ADD-METHOD-FOR-SELECTOR(kls, selector( pair-at(object-t, object-t, object-t)),
                                              selector(      at(object-t, object-t, object-t)),
                                              cast(object-t (*)(object-t, object-t, object-t))at);
@@ -103,6 +112,7 @@ trait counted-set {
   object-t finalize(object-t kls) {
     return kls;
   }
+  method object-t pair-at(object-t self, object-t first);
   method object-t pair-at(object-t self, object-t first, object-t default-pair);
   method object-t add-pair(object-t self, object-t pair);
 }

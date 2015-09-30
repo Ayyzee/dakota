@@ -56,6 +56,11 @@ trait table {
   method object-t add(object-t self, object-t first, object-t last) {
     object-t pair = pair::box({first, last});
     dk::add(self, pair);
+    return pair;
+  }
+  static object-t at(object-t self, object-t first) {
+    object-t pair = dk::pair-at(self, first);
+    object-t last = pair::unbox(pair)->last;
     return last;
   }
   static object-t at(object-t self, object-t first, object-t default-last) {
@@ -81,5 +86,6 @@ trait table {
   object-t finalize(object-t kls) {
     return kls;
   }
+  method object-t pair-at(object-t self, object-t first);
   method object-t pair-at(object-t self, object-t first, object-t default-pair);
 }
