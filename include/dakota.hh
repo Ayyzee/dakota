@@ -242,7 +242,7 @@ SO_IMPORT sentinel object_t      dk_make_named_info(      symbol_t name, ...);
 DEBUG_IMPORT named_info_t* dkt_dump_named_info(named_info_t* info);
 
 //#define DKT_NULL_METHOD nullptr
-#define DKT_NULL_METHOD dkt_null_method
+#define DKT_NULL_METHOD cast(method_t)dkt_null_method
 
 SO_IMPORT [[noreturn]] void dkt_null_method(object_t object, ...);
 
