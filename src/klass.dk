@@ -400,6 +400,15 @@ klass klass {
   //        throw make(exception::klass, #message : "not yet implemented");
   //        // return nullptr
   //      }
+  method boole-t method-for-selector?(object-t self, selector-t selector) {
+    assert(selector < self.methods.count);
+    boole-t result = false;
+    method-t m = dk::method-for-selector(self, selector);
+    if (DKT-NULL-METHOD != m) {
+      result = true;
+    }
+    return result;
+  }
   method method-t method-for-selector(object-t self, selector-t selector) {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
