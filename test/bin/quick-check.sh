@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o nounset -o errexit -o pipefail
+set -o nounset -o pipefail
 
 dirs="\
  should-pass/pass/add-method-on-object\
@@ -17,5 +17,3 @@ for dir in $dirs; do
   make $dir/exe
   make --directory $dir check
 done
-
-echo "### pass"
