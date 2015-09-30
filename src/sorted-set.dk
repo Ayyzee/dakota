@@ -42,10 +42,16 @@ klass sorted-set {
 
   slots {
     sorted-ptr-array::slots-t sa;
-    uint32-t                         iterator-state;
+    uint32-t                  iterator-state;
   }
   static const uint32-t gbl-default-capacity = 64; // shall never be 0
 
+  object-t initialize(object-t kls) {
+    return kls;
+  }
+  object-t finalize(object-t kls) {
+    return kls;
+  }
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
