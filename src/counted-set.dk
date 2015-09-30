@@ -27,39 +27,44 @@ trait counted-set {
   method object-t elements(object-t self) {
     object-t set-kls = superklass-of(klass-of(self));
     object-t result = make(set-kls);
-    for (pair-t* pair in self)
-      dk::add(result, pair->first);
+    for (pair-t* pair in self) {
+      object-t first = pair->first;
+      dk::add(result, first);
+    }
     return result;
   }
   method object-t counts(object-t self) {
     object-t result = make(vector::klass, #size : dk::size(self));
-    for (pair-t* pair in self)
-      dk::add-last(result, pair->last);
+    for (pair-t* pair in self) {
+      object-t last = pair->last;
+      dk::add-last(result, last);
+    }
     return result;
   }
-  method uint32-t count-at(object-t self, object-t first, uint32-t default-last) {
-    uint32-t last-content = default-last;
+  method uint32-t count-at(object-t self, object-t first, uint32-t default-count) {
+    uint32-t count = default-count;
     object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
 
     if (nullptr != pair) {
-      pair-t* pair-content = pair::unbox(pair);
-      object-t last = pair-content->last;
-      last-content = *uint32::unbox(last);
+      object-t last = pair::unbox(pair)->last;
+      count = *uint32::unbox(last);
     }
-    return last-content;
+    return count;
   }
   method object-t write-lite(object-t self, object-t out) {
     dk::write(out, "{");
     str-t delim = "";
 
     for (pair-t* pair in self) {
+      object-t first = pair->first;
+      object-t last =  pair->last;
       dk::write(out, delim);
-      dk::write-lite(pair->first, out); // must be primitive type
+      dk::write-lite(first, out); // must be primitive type
       dk::write(out, ":");
-      if (nullptr == pair->last || null == pair->last)
+      if (nullptr == last || null == last)
         dk::write(out, "null");
       else
-        dk::write-lite(pair->last, out);
+        dk::write-lite(last, out);
       delim = ",";
     }
     dk::write(out, "}");
@@ -69,16 +74,15 @@ trait counted-set {
     object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
 
     if (nullptr != pair) {
-      pair-t* pair-content = pair::unbox(pair);
-      object-t last = pair-content->last;
-      uint32-t* last-content = uint32::unbox(last);
-      (*last-content)++;
+      object-t last = pair::unbox(pair)->last;
+      uint32-t* count-ptr = uint32::unbox(last);
+      (*count-ptr)++;
     } else {
       object-t last = uint32::box(1);
-      object-t pair1 = pair::box({first, last});
-      dk::add-pair(self, pair1);
+      pair = pair::box({first, last});
+      dk::add-pair(self, pair);
     }
-    return first;
+    return pair;
   }
   static object-t at(object-t self, object-t first) {
     object-t pair = dk::pair-at(self, first);
@@ -86,14 +90,13 @@ trait counted-set {
     return last;
   }
   static object-t at(object-t self, object-t first, object-t default-last) {
-    object-t result = default-last;
+    object-t last = default-last;
     object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
 
     if (nullptr != pair) {
-      pair-t* pair-content = pair::unbox(pair);
-      result = pair-content->last;
+      last = pair::unbox(pair)->last;
     }
-    return result;
+    return last;
   }
   object-t initialize(object-t kls) {
     REASSOC-AND-ADD-METHOD-FOR-SELECTOR(kls, selector( pair-at(object-t, object-t)),
