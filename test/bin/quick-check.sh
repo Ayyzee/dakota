@@ -36,6 +36,9 @@ echo
 cat $basename-pass.txt
 echo
 cat $basename-fail.txt
+num_pass=$(cat $basename-pass.txt | wc -l)
+num_fail=$(cat $basename-fail.txt | wc -l)
+echo SUMMARY: PASS: $num_pass, FAIL: $num_fail
 #rm -f $basename-pass.txt
 #rm -f $basename-fail.txt
 exit $exit_val
