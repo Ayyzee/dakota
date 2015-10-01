@@ -4163,7 +4163,7 @@ sub dk_generate_cc {
   if (exists $ENV{'DK_NO_LINE'}) {
     &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1);
   } else {
-    my $num = 2;
+    my $num = 1;
     if (exists $ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
       &write_to_file_converted_strings("$output", [ "#line $num \"$cwd/$file_basename.dk\"\n", $filestr ], $remove = 1);

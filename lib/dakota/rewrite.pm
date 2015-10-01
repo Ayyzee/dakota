@@ -278,7 +278,9 @@ sub rewrite_exceptions {
 }
 sub convert_dash_syntax {
   my ($str1, $str2) = @_;
-  $str2 =~ s/-/_/g;
+  if (!$ENV{'DK_NO_CONVERT_DASH_SYNTAX'}) {
+    $str2 =~ s/-/_/g;
+  }
   return "$str1$str2";
 }
 sub rewrite_syntax {
@@ -864,7 +866,7 @@ sub rewrite_export_method {
 }
 sub remove_system_includes {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|^\s*\#\s*include\s*(<.+?>)|INCLUDE($1);|gm;
+  $$filestr_ref =~ s|^(\s*)\#(\s*)include(\s)*(<.+?>)|$1$2INCLUDE$3($4);|gm;
 }
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;

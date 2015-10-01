@@ -71,7 +71,7 @@ ifdef DKT_PROFILE
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= DK_TRACE_MACROS=1 $(srcdir)/../bin/dakota --define-macro DK_TRACE_MACROS=1 --define-macro $(HOST_OS)
+  DAKOTA ?= DK_NO_CONVERT_DASH_SYNTAX=0 DK_TRACE_MACROS=1 $(srcdir)/../bin/dakota --define-macro DK_TRACE_MACROS=1 --define-macro $(HOST_OS)
   # --keep-going
 endif
 
