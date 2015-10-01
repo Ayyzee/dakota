@@ -67,11 +67,11 @@ LD_PRELOAD ?= LD_PRELOAD
 EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG # debug flags
 
 ifdef DKT_PROFILE
-  DAKOTA ?= $(srcdir)/../bin/dakota-profile --define-macro $(HOST_OS)
+  DAKOTA ?= DK_TRACE_MACROS=1 $(srcdir)/../bin/dakota-profile --define-macro DK_TRACE_MACROS=1 --define-macro $(HOST_OS)
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= $(srcdir)/../bin/dakota --define-macro $(HOST_OS)
+  DAKOTA ?= DK_TRACE_MACROS=1 $(srcdir)/../bin/dakota --define-macro DK_TRACE_MACROS=1 --define-macro $(HOST_OS)
   # --keep-going
 endif
 
