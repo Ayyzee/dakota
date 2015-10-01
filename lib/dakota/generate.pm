@@ -1429,13 +1429,13 @@ sub generics::generate_generic_defn {
         $col . "object-t kls = object->klass;\n" .
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
-    $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
+    $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon object, \#signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n";
+      $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list, nullptr);\n";
     }
     if (defined $$generic{'return-type'}) {
       $$scratch_str_ref .= $col . "$return_type result = ";
@@ -1447,7 +1447,13 @@ sub generics::generate_generic_defn {
 
     $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, result);\n";
+      my $result = 'result';
+      if ($$arg_names_list =~ m/,/) {
+        $$arg_names_list =~ s/^(.+?),\s*(.*)$/$1, $result, $2/;
+      } else {
+        $$arg_names_list .= ", $result";
+      }
+      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, nullptr);\n";
     }
 
     if (defined $$generic{'return-type'}) {
@@ -1513,13 +1519,13 @@ sub generics::generate_super_generic_defn {
         $col . "object-t kls = klass::unbox(arg0.klass)->superklass;\n" .
         $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
     }
-    $$scratch_str_ref .= $col . "DEBUG-STMT(if (cast(method-t)DKT-NULL-METHOD == _func_)\n";
+    $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon arg0.self, \#superkls $colon superklass-of(arg0.klass), \#signature $colon signature));\n";
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list);\n";
+      $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list, nullptr);\n";
     }
     if (defined $$generic{'return-type'}) {
       $$scratch_str_ref .= $col . "$return_type result = ";
@@ -1532,7 +1538,13 @@ sub generics::generate_super_generic_defn {
 
     $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_TRACE_MACROS'}) {
-      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, result);\n";
+      my $result = 'result';
+      if ($$arg_names_list =~ m/,/) {
+        $$arg_names_list =~ s/^(.+?),\s*(.*)$/$1, $result, $2/;
+      } else {
+        $$arg_names_list .= ", $result";
+      }
+      $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, nullptr);\n";
     }
 
     if (defined $$generic{'return-type'}) {
@@ -1677,9 +1689,9 @@ sub generics::generate_va_make_defn {
       $col . "va-list-t args;\n" .
       $col . "va-start(args, kls);\n" .
       $col . "auto result = alloc(kls);\n" .
-      $col . "DKT-VA-TRACE-BEFORE(dkt-signature(va::init, (object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
+      $col . "DKT-VA-TRACE-BEFORE(dkt-signature(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "result = _func_(result, args); // init()\n" .
-      $col . "DKT-VA-TRACE-AFTER( dkt-signature(va::init, (object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
+      $col . "DKT-VA-TRACE-AFTER( dkt-signature(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "va-end(args);\n" .
       $col . "return result;\n";
     $col = &colout($col);

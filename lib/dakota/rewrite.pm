@@ -170,8 +170,8 @@ sub rewrite_klass_defn {
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
   $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(.*?)(\()          /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
 
   $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
   $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack

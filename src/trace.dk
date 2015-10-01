@@ -99,7 +99,7 @@ dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (NULL != getenv("DKT_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dkt-va-trace-before(signature, m, context, args);
   va-end(args);
   return result;
@@ -109,7 +109,7 @@ dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (NULL != getenv("DKT_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dkt-va-trace-before(signature, m, object, args);
   va-end(args);
   return result;
@@ -119,7 +119,7 @@ dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...) 
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (NULL != getenv("DKT_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dkt-va-trace-after(signature, m, context, args);
   va-end(args);
   return result;
@@ -129,7 +129,7 @@ dkt-trace-after(signature-t const* signature, method-t m, object-t object, ...) 
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (NULL != getenv("DKT_TRACE"))
+  if (NULL != getenv("DK_TRACE"))
     result = dkt-va-trace-after(signature, m, object, args);
   va-end(args);
   return result;

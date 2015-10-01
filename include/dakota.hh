@@ -178,17 +178,18 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
 typedef int_t dkt_va_arg_boole_t;
 typedef va_list va_list_t;
 
-#if defined DKT_ENABLE_TRACE_BEFORE_AND_AFTER
-  #define DKT_VA_TRACE_BEFORE(signature, method, object, args) dkt_va_trace_before(signature, method, object, args)
-  #define DKT_VA_TRACE_AFTER( signature, method, object, args) dkt_va_trace_after( signature, method, object, args)
-  #define DKT_TRACE_BEFORE(signature, method, object, ...)     dkt_trace_before(   signature, method, object, __VA_ARGS__)
-  #define DKT_TRACE_AFTER( signature, method, object, ...)     dkt_trace_after(    signature, method, object, __VA_ARGS__)
+
+#if defined DK_TRACE_MACROS
+  #define DKT_VA_TRACE_BEFORE(signature, method, object, args)               dkt_va_trace_before(signature, method, object, args)
+  #define DKT_VA_TRACE_AFTER( signature, method, object, /* result, */ args) dkt_va_trace_after( signature, method, object, args)
+  #define DKT_TRACE_BEFORE(signature, method, object, ...)                   dkt_trace_before(   signature, method, object, __VA_ARGS__)
+  #define DKT_TRACE_AFTER( signature, method, object, /* result, */ ...)     dkt_trace_after(    signature, method, object, __VA_ARGS__)
   #define DKT_TRACE(statement) statement
 #else
   #define DKT_VA_TRACE_BEFORE(signature, method, object, args)
-  #define DKT_VA_TRACE_AFTER( signature, method, object, args)
+  #define DKT_VA_TRACE_AFTER( signature, method, object, /* result, */ args)
   #define DKT_TRACE_BEFORE(signature, method, object, ...)
-  #define DKT_TRACE_AFTER( signature, method, object, ...)
+  #define DKT_TRACE_AFTER( signature, method, object, /* result, */ ...)
   #define DKT_TRACE(statement)
 #endif
 
