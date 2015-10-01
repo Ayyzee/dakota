@@ -95,7 +95,7 @@ klass hashed-set {
       cast(uint32-t)
 #endif
       self.hash(object1) % self.num-buckets;
-    object-t deque = dk::at(self.buckets, index, nullptr);
+    object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
       deque = make(deque::klass);
@@ -133,7 +133,7 @@ klass hashed-set {
       cast(uint32-t)
 #endif
       self.hash(object1) % self.num-buckets;
-    object-t deque = dk::at(self.buckets, index, nullptr);
+    object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
 
     if (nullptr != deque) {
@@ -149,7 +149,7 @@ klass hashed-set {
   method boole-t contains?(object-t self, object-t key) {
     boole-t state;
 
-    if (nullptr == dk::at(self, key, nullptr))
+    if (nullptr == dk::at(self, key, cast(object-t)nullptr))
       state = false;
     else
       state = true;
@@ -173,7 +173,7 @@ klass hashed-set {
       cast(uint32-t)
 #endif
       self.hash(element) % self.num-buckets;
-    object-t deque = dk::at(self.buckets, index, nullptr);
+    object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {
       for (object-t forward-iterator = dk::forward-iterator(deque);
@@ -224,7 +224,7 @@ klass hashed-set {
     dk::write-sequence-start(out, "elements");
 
     for (object-t element in self)
-      dk::write-element-idref(out, element, nullptr);
+      dk::write-element-idref(out, element, cast(str-t)nullptr);
     dk::write-sequence-end(out);
 
     dk::write-slots-end(out);
