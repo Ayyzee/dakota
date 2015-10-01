@@ -41,7 +41,6 @@
     'macros' => [ # cmd-line
       'DKT_WORKAROUND',
       'HAVE_CONFIG_HH',
-      'MOD_SIZE_CAST_HACK',
     ],
     'output' => '$(blddir)/../lib/libdakota-util.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line

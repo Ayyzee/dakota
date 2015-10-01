@@ -90,11 +90,7 @@ klass hashed-set {
   method object-t add(object-t self, object-t object1) {
     self.iterator-state++;
 
-    uint32-t index =
-#if defined MOD-SIZE-CAST-HACK
-      cast(uint32-t)
-#endif
-      self.hash(object1) % self.num-buckets;
+    uint32-t index = self.hash(object1) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
@@ -128,11 +124,7 @@ klass hashed-set {
     return self;
   }
   method object-t at(object-t self, object-t object1, object-t default-value) {
-    uint32-t index = 
-#if defined MOD-SIZE-CAST-HACK
-      cast(uint32-t)
-#endif
-      self.hash(object1) % self.num-buckets;
+    uint32-t index = self.hash(object1) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
 
@@ -168,11 +160,7 @@ klass hashed-set {
     self.iterator-state++;
     object-t object = null;
 
-    uint32-t index =
-#if defined MOD-SIZE-CAST-HACK
-      cast(uint32-t)
-#endif
-      self.hash(element) % self.num-buckets;
+    uint32-t index = self.hash(element) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {
