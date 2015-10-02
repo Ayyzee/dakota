@@ -62,11 +62,18 @@ klass pair {
     if (dk::instance?(first, klass))
       first = unbox(first)->first;
     assert(nullptr != first);
-    object-t other-first = other;
-    if (dk::instance?(other-first, klass))
-      other-first = unbox(other-first)->first;
+    object-t other-first;
+    if (klass == klass-of(other))
+      other-first = unbox(other)->first;
+    else-if (dk::method-for-selector?(klass-of(other), selector(first(object-t))))
+      other-first = dk::first(other);
+    else
+      other-first = other;
     assert(nullptr != other-first);
-    result = dk::equal?(first, other-first);
+    if (self == first && other == other-first)
+      result = dk::equal?(super, other-first);
+    else
+      result = dk::equal?(first, other-first);
     return result;
   }
   method int-t compare(object-t self, object-t other) {
@@ -75,11 +82,18 @@ klass pair {
     if (dk::instance?(first, klass))
       first = unbox(first)->first;
     assert(nullptr != first);
-    object-t other-first = other;
-    if (dk::instance?(other-first, klass))
-      other-first = unbox(other-first)->first;
+    object-t other-first;
+    if (klass == klass-of(other))
+      other-first = unbox(other)->first;
+    else-if (dk::method-for-selector?(klass-of(other), selector(first(object-t))))
+      other-first = dk::first(other);
+    else
+      other-first = other;
     assert(nullptr != other-first);
-    result = dk::compare(first, other-first);
+    if (self == first && other == other-first)
+      result = dk::compare(super, other-first);
+    else
+      result = dk::compare(first, other-first);
     return result;
   }
   method uintptr-t hash(object-t self) {
@@ -88,7 +102,10 @@ klass pair {
     if (dk::instance?(first, klass))
       first = unbox(first)->first;
     assert(nullptr != first);
-    result = dk::hash(first);
+    if (self == first)
+      result = dk::hash(super);
+    else
+      result = dk::hash(first);
     return result;
   }
   method object-t first(slots-t* s) {
