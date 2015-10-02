@@ -129,9 +129,9 @@ klass object {
     return self;
   }
   method str-t utf8-from(object-t self) {
-    char8-t* buffer = cast(char8-t*)dkt::alloc(2 + PRIxPTR-WIDTH + (1));
-    snprintf(buffer, 2 + PRIxPTR-WIDTH + (1), "0x%0*" PRIxPTR,
-             PRIxPTR-WIDTH, cast(uintptr-t)(self));
+    size-t len = 2 + PRIxPTR-WIDTH + (1);
+    char8-t* buffer = cast(char8-t*)dkt::alloc(len);
+    snprintf(buffer, len, "%p", cast(void*)self);
     return cast(str-t)(buffer);
   }
   method object-t print(object-t self, object-t out) {
