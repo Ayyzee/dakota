@@ -592,10 +592,10 @@ sub rewrite_supers {
 sub rewrite_for_each_replacement {
   my ($type, $element, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
   my $first_stmt = '';
-  my $result = "for (object-t _iterator_ = dk::forward-iterator($sequence);";
+  my $result = "for (iter-pair-t _iter-pair = dk::iter-pair($sequence);";
 
   if ('object-t' eq $type) {
-    $result .= " object-t $element = dk::next(_iterator_);";
+    $result .= " object-t $element = _iter-pair.next(_iter-pair.iter);";
     $result .= " /**/)";
     if (!$open_brace) { # $ws2 will be undefined
       $first_stmt .= "$ws1$stmt$ws3";
@@ -603,7 +603,7 @@ sub rewrite_for_each_replacement {
       $first_stmt .= "$ws1\{$ws2$stmt$ws3";
     }
   } elsif ('slots-t*' eq $type) {
-    $result .= " object-t _element_ = dk::next(_iterator_);";
+    $result .= " object-t $element = _iter-pair.next(_iter-pair.iter);";
     $result .= " /**/)";
 
     if (!$open_brace) { # $ws2 will be undefined
@@ -613,7 +613,7 @@ sub rewrite_for_each_replacement {
     }
   } elsif ($type =~ m|($tid)|) {
     my $klass_name = $1;
-    $result .= " object-t _element_ = dk::next(_iterator_);";
+    $result .= " object-t _element_ = _iter-pair.next(_iter-pair.iter);";
     $result .= " /**/)";
     $klass_name =~ s/-t$//;
 

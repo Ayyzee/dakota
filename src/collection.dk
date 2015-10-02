@@ -16,6 +16,7 @@
 
 module dakota;
 
+klass iter-pair;
 klass std-compare;
 
 // SO-EXPORT object-t
@@ -73,6 +74,11 @@ klass collection {
     while (nullptr != (arg = *args++))
       dk::add(self, arg);
     return self; // nullnull?
+  }
+  method iter-pair::slots-t iter-pair(object-t self) {
+    object-t iter = dk::forward-iterator(self);
+    method-t next = dk::method-for-selector(klass-of(iter), selector(next(object-t)));
+    return cast(iter-pair-t){ .iter = iter, .next = next };
   }
   method object-t add(object-t self, object-t element);
   method object-t forward-iterator(object-t self);

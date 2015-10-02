@@ -1,35 +1,46 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
+klass iter-pair;
 klass pair;
 klass sequence;
 klass sorted-table;
+klass string;
 klass vector;
 
 int-t main()
 {
   object-t sequence = make(vector::klass);
-  // ...
+  dk::add-last(sequence, #"mother");
+  dk::add-last(sequence, #"father");
+
+//for (object-t element in sequence)
+//  printf("%p\n", cast(void*)element);
 
   for (object-t element in sequence)
-    printf("%p\n", (void*)element);
+    printf("%p\n", cast(void*)element);
 
   // should rewrite to
 
-//for (object-t _iterator_ = dk::forward-iterator(sequence); object-t element = dk::next(_iterator_); /**/)
-//  printf("%p\n", (void*)element);
+//for (iter-pair::slots-t _pair = dk::iter-pair(sequence); object-t element = _pair.next(_pair.iter); /**/)
+//  printf("%p\n", cast(void*)element);
 
 //---
 
   object-t table = make(sorted-table::klass);
+  dk::add(table, #"mother", #"MOTHER");
+  dk::add(table, #"father", #"FATHER");
   // ...
 
+//for (pair-t* pair in table)
+//  printf("%p: %p\n", cast(void*)pair->first, cast(void*)pair->last);
+
   for (pair-t* pair in table)
-    printf("%p = %p\n", (void*)pair->first, (void*)pair->last);
+    printf("%p: %p\n", cast(void*)pair->first, cast(void*)pair->last);
 
   // should rewrite to
 
-//for (object-t _iterator_ = dk::forward-iterator(table); pair-t* pair = pair::unbox(dk::next(_iterator_)); /**/)
-//  printf("%p = %p\n", (void*)pair->first, (void*)pair->last);
+//for (iter_pair_t _iter_pair = dk::iter_pair(table); object_t _element_ = _iter_pair.next(_iter_pair.iter); /**/)
+//  { pair_t* pair = pair::unbox(_element_); printf("%p: %p\n", cast(void*)pair->first, cast(void*)pair->last); }
 
   return 0;
 }

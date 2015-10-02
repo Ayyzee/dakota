@@ -12,6 +12,7 @@
     'forward-iterator' => undef,
     'init' => undef,
     'instance?' => undef,
+    'iter-pair' => undef,
     'method-for-selector' => undef, # REASSOC-AND-ADD-METHOD-FOR-SELECTOR()
     'next' => undef,
   },
@@ -32,6 +33,7 @@
     'char8' => undef,
     'file' => undef,
     'input-stream' => undef, # std-input
+    'iter-pair' => undef,
     'keyword' => undef,
     'klass' => undef,
     'method' => undef,
@@ -52,6 +54,7 @@
   'rt_extra_klass_decls' => {
     'assoc-node' => undef,
     'construct' => undef,
+    'iter-pair' => undef,
     'method-alias' => undef,
     'no-such-method-exception' => undef, # generic funcs (throw)
     'selector-node' => undef,

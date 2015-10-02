@@ -106,6 +106,8 @@ module dakota export
   intptr::max,
   intptr::min,
   intptr::slots-t,
+  iter-pair,
+  iter-pair::slots-t,
   keyword,
   keyword-exception,
   keyword::slots-t,
