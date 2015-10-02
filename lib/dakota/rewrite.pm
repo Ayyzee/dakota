@@ -337,13 +337,13 @@ sub rewrite_reassoc_and_add_method_for_selector_sub {
   #my $offset = $$members_info[0];
   my ($kls, $selector1, $selector2, $function) = @{$$members_info[1]};
   my $result = '';
-  $result .= sprintf("%sdk::add-method-for-selector%s(%s,\n", $ws1, $ws2, $kls);
-  $result .= sprintf("%s                           %s %s,\n", $ws1, $ws2, $selector1);
-  $result .= sprintf("%s                           %s dk::method-for-selector(%s, %s));\n", $ws1, $ws2, $kls, &remove_extra_whitespace($selector2));
+  my $xws = ' ' x length("$kls");
+
+  $result .= sprintf("%s dk::add-method-for-selector%s(%s,                         %s,\n",   $ws1, $ws2, $kls,       $selector1);
+  $result .= sprintf("%s                            %s dk::method-for-selector(%s, %s));\n", $ws1, $ws2,       $kls, $selector2);
   #
-  $result .= sprintf("%sdk::add-method-for-selector%s(%s,\n", $ws1, $ws2, $kls);
-  $result .= sprintf("%s                           %s %s,\n", $ws1, $ws2, $selector2);
-  $result .= sprintf("%s                           %s cast(method-t)%s);\n", $ws1, $ws2, $function);
+  $result .= sprintf("%s dk::add-method-for-selector%s(%s,                         %s,\n",   $ws1, $ws2, $kls,       $selector2);
+  $result .= sprintf("%s                            %s cast(method-t)          %s  %s);",    $ws1, $ws2, $xws,       $function);
   return $result;
 }
 sub rewrite_reassoc_and_add_method_for_selector {
