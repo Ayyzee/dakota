@@ -60,12 +60,10 @@ klass sorted-set {
   method object-t init(object-t self,
                        uint32-t          initial-capacity : gbl-default-capacity,
                        compare-t         compare :          dk::compare,
-                       equal-predicate-t equal? :           dk::equal?, /* bugbug: not used */
                        object-t          elements :         nullptr,
                        object-t*         items :            nullptr) {
     assert(0 != initial-capacity);
     assert(nullptr != compare);
-    assert(nullptr != equal?); // bugbug: not used
 
     self = dk::init(super);
     self.sa.compare = cast(std-compare-t)(compare);

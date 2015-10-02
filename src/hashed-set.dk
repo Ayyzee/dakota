@@ -65,17 +65,14 @@ klass hashed-set {
 
   method object-t init(object-t self,
                        hash-t            hash :     dk::hash,
-                       equal-predicate-t equal? :   dk::equal?,
                        object-t          elements : nullptr,
                        object-t*         items :    nullptr) {
     assert(nullptr != hash);
-    assert(nullptr != equal?);
 
     self = dk::init(super);
     self.num-buckets = gbl-prime;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);
     self.size = 0;
-    self.equal? = equal?;
     self.hash = hash;
 
     self.iterator-state = 0;
@@ -103,7 +100,7 @@ klass hashed-set {
       object-t element = nullptr;
 
       for (object-t object2 in deque) {
-        if (self.equal?(object1, object2)) {
+        if (dk::equal?(object1, object2)) {
           element = object2;
           break;
         }
@@ -130,7 +127,7 @@ klass hashed-set {
 
     if (nullptr != deque) {
       for (object-t object2 in deque) {
-        if (self.equal?(object1, object2)) {
+        if (dk::equal?(object1, object2)) {
           result = object2;
           break;
         }
@@ -169,7 +166,7 @@ klass hashed-set {
         //printf("element: %s\n", dk::name(element));
         //printf("element2: %s\n", dk::name(element2));
 
-        if (self.equal?(element, element2)) {
+        if (dk::equal?(element, element2)) {
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           object = dk::remove(forward-iterator); //element2
