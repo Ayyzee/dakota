@@ -158,11 +158,11 @@ dkt-unbox-check(object-t object, object-t kls) {
     str-t kls-name = name-of(kls);
 
     if (object::instance?(object, klass::klass))
-      dkt-log(dkt::k-log-error, "%s::unbox(0x%0*" PRIxPTR " {klass='%s', name='%s'})",
-             kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name, name-of(object));
+      dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s', name='%s'})",
+              kls-name, cast(void*)object, object-kls-name, name-of(object));
     else
-      dkt-log(dkt::k-log-error, "%s::unbox(0x%0*" PRIxPTR " {klass='%s'})",
-             kls-name, PRIxPTR-WIDTH, cast(uintptr-t)(object), object-kls-name);
+      dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s'})",
+              kls-name, cast(void*)object, object-kls-name);
 
     throw make(exception::klass, #message : "oops");
   }

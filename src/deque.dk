@@ -145,8 +145,7 @@ klass deque {
     else-if (self.last == mn && self.last != nullptr)
       snprintf(buf, buf-len, "%s", "last      ");
     else
-      snprintf(buf, buf-len, "0x%0*" PRIxPTR,
-               PRIxPTR-WIDTH, cast(uintptr-t)(mn));
+      snprintf(buf, buf-len, "%p", cast(void*)mn);
     return self;
   }
   method object-t dump(object-t self) {
@@ -155,32 +154,29 @@ klass deque {
   }
   method object-t write-slots(object-t self, object-t out) {
     dk::write-slots(super, out);
-//     dkt-log(stdout, "deque: %s(0x%0*" PRIxPTR ", ...)\n",
-//            __func__, PRIxPTR-WIDTH, cast(uintptr-t)(deque));
+//     dkt-log(stdout, "deque: %s(%p, ...)\n",
+//            __func__, cast(void*)deque);
     node::slots-t* first = self.first;
     node::slots-t* last =  self.last;
     char8-t[16] buf = "";
 
     if (nullptr == first) {
-      fprintf(stdout, " 0x%0*" PRIxPTR "\n",
-              PRIxPTR-WIDTH, cast(uintptr-t)(first));
+      fprintf(stdout, " %p", cast(void*)first);
+      fprintf(stdout, "\n");
     } else {
       deque::string-from-node(self, first->prev, buf, cast(uint32-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
-      fprintf(stdout, " 0x%0*" PRIxPTR,
-              PRIxPTR-WIDTH, cast(uintptr-t)(first->element));
+      fprintf(stdout, " %p", cast(void*)first->element);
       deque::string-from-node(self, first->next, buf, cast(uint32-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, "\n");
     }
     if (nullptr == last) {
-      fprintf(stdout, " 0x%0*" PRIxPTR "\n",
-              PRIxPTR-WIDTH, cast(uintptr-t)(last));
+      fprintf(stdout, " %p\n", cast(void*)last);
     } else {
       deque::string-from-node(self, last->prev, buf, cast(uint32-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
-      fprintf(stdout, " 0x%0*" PRIxPTR,
-              PRIxPTR-WIDTH, cast(uintptr-t)(last->element));
+      fprintf(stdout, " %p", cast(void*)last->element);
       deque::string-from-node(self, last->next, buf, cast(uint32-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, "\n");
