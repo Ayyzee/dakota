@@ -42,9 +42,9 @@ klass output-stream {
   method object-t close(object-t self) {
 #if defined DEBUG
     if (stdout == self.out)
-      dkt-log(dkt::k-log-warning, "closing 'stdout'");
+      dkt-log(dkt::k-log-warning, "\"close\" : \"stdout\"");
     else-if (stderr == self.out)
-      dkt-log(dkt::k-log-warning, "closing 'stderr'");
+      dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
 #endif // DEBUG
     int rtn = fclose(self.out);
 

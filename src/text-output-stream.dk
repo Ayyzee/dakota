@@ -41,11 +41,26 @@ klass text-output-stream {
 
   slots {
     uint32-t column;
+    uint32-t   column-width;
     features-t previous-features;
   }
-  method object-t init(object-t self, file-t file : stdout) {
+  static char-t const* const ws[] = {
+    "",
+    " ",
+    "  ",
+    "   ",
+    "    ",
+    "     ",
+    "      ",
+    "       ",
+    "        ",
+  };
+  method object-t init(object-t self, file-t file : stdout, uint32-t column-width : 2) {
     self = dk::init(super, #file : file);
     self.column = 0;
+    if (column-width > DK-COUNTOF(ws))
+      column-width = DK-COUNTOF(ws);
+    self.column-width = column-width;
     self.previous-features = k-trailing-newline;
     return self;
   }
@@ -64,7 +79,7 @@ klass text-output-stream {
 
     if (0 != (features & k-indent))
       for (uint32-t i = 0; i < self.column; i++)
-        dk::write(self, "  "); // two spaces per column :-) [my way]
+        dk::write(self, ws[self.column-width]);
 
     if (0 != (features & k-leading-ws))
       if (0 == (self.previous-features & k-trailing-newline))
