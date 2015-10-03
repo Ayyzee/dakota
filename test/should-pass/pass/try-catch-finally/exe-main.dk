@@ -21,7 +21,7 @@ int-t main() {
     USE(e3);
   }
   catch (...) {
-    printf("catch\n");
+    printf("catch: %p\n", _exception_);
     throw;
   }
   finally {

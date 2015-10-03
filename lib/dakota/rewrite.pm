@@ -226,9 +226,9 @@ sub rewrite_catch_block {
   while (1) {
     if ($str_in =~ m/\Gcatch\s*\(\s*($rid?::klass)\s*($k*)\s*\)(\s*)\{/gc) {
       if ($use_catch_macros) {
-        $str_out .= "DKT-CATCH($1, _e_)$3\{ object-t $2 = _e_;";
+        $str_out .= "DKT-CATCH($1, _exception_)$3\{ object-t $2 = _exception_;";
       } else {
-        $str_out .= "else-if (dk::instance?(_e_, $1))$3\{ object-t $2 = _e_;";
+        $str_out .= "else-if (dk::instance?(_exception_, $1))$3\{ object-t $2 = _exception_;";
       }
     } elsif ($str_in =~ m/\G(.)/gc) {
       $str_out .= $1;
@@ -264,10 +264,10 @@ sub rewrite_catch_object {
     }
   }
   if ($use_catch_macros) {
-    $str_out =~ s/^\}/\} DKT-CATCH-BEGIN(_e_)/;
-    $str_out =~ s/\}$/\} DKT-CATCH-END(_e_)/;
+    $str_out =~ s/^\}/\} DKT-CATCH-BEGIN(_exception_)/;
+    $str_out =~ s/\}$/\} DKT-CATCH-END(_exception_)/;
   } else {
-    $str_out =~ s/^\}/\} catch (object-t _e_) { if (0) {}/;
+    $str_out =~ s/^\}/\} catch (object-t _exception_) { if (0) {}/;
     $str_out =~ s/\}$/\} else { throw; } }/;
   }
   return $str_out;
