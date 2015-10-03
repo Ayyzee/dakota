@@ -1,0 +1,20 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass features; // hackhack
+klass hashed-set;
+klass json-object-output-stream;
+klass string;
+
+int-t main() {
+  object-t set =  make(hashed-set::klass);
+  object-t string1 = make(string::klass, #bytes : "hello father");
+  object-t string2 = make(string::klass, #bytes : "hello mother");
+  dk::add(set, string1);
+  dk::add(set, string2);
+
+  object-t json-object-output-stream = make(json-object-output-stream::klass, #file : stdout);
+  dk::write(json-object-output-stream, set);
+  dk::close(json-object-output-stream);
+
+  return 0;
+}
