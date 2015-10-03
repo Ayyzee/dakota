@@ -179,7 +179,7 @@ typedef int_t dkt_va_arg_boole_t;
 typedef va_list va_list_t;
 
 
-#if defined DK_TRACE_MACROS
+#if defined DK_ENABLE_TRACE_MACROS
   #define DKT_VA_TRACE_BEFORE(signature, method, object, args)               dkt_va_trace_before(signature, method, object, args)
   #define DKT_VA_TRACE_AFTER( signature, method, object, /* result, */ args) dkt_va_trace_after( signature, method, object, args)
   #define DKT_TRACE_BEFORE(signature, method, object, ...)                   dkt_trace_before(   signature, method, object, __VA_ARGS__)

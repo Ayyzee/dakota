@@ -1434,7 +1434,7 @@ sub generics::generate_generic_defn {
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
-    if ($ENV{'DK_TRACE_MACROS'}) {
+    if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
       $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list, nullptr);\n";
     }
     if (defined $$generic{'return-type'}) {
@@ -1446,7 +1446,7 @@ sub generics::generate_generic_defn {
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
     $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
-    if ($ENV{'DK_TRACE_MACROS'}) {
+    if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
       my $result = 'result';
       if ($$arg_names_list =~ m/,/) {
         $$arg_names_list =~ s/^(.+?),\s*(.*)$/$1, $result, $2/;
@@ -1524,7 +1524,7 @@ sub generics::generate_super_generic_defn {
     my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
     my $arg_names_list = &arg_type::list_names($arg_names);
 
-    if ($ENV{'DK_TRACE_MACROS'}) {
+    if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
       $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list, nullptr);\n";
     }
     if (defined $$generic{'return-type'}) {
@@ -1537,7 +1537,7 @@ sub generics::generate_super_generic_defn {
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
     $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
-    if ($ENV{'DK_TRACE_MACROS'}) {
+    if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
       my $result = 'result';
       if ($$arg_names_list =~ m/,/) {
         $$arg_names_list =~ s/^(.+?),\s*(.*)$/$1, $result, $2/;

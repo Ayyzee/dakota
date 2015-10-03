@@ -2,4 +2,4 @@
 
 set -o nounset -o errexit -o pipefail
 
-DK_TRACE=1 ./exe
+DK_ENABLE_TRACE=1 ./exe

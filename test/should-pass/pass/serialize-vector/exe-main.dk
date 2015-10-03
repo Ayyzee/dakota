@@ -8,7 +8,7 @@ klass vector;
 int-t main()
 {
 //   int-t overwrite;
-//   setenv("DK_TRACE", "", overwrite = 1);
+//   setenv("DK_ENABLE_TRACE", "", overwrite = 1);
 
   object-t vector = make(vector::klass);
 

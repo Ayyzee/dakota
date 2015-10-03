@@ -52,7 +52,7 @@ DEBUG-SO-EXPORT int-t
 dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, va-list-t args) {
   USE(args);
   int-t result = 0;
-  if (NULL != getenv("DK_TRACE")) {
+  if (NULL != getenv("DK_ENABLE_TRACE")) {
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
                            signature->name, signature->parameter-types + sizeof("object-t") - 1,
                            cast(void*)(context.self), name-of(klass-of(context.self)),
@@ -66,7 +66,7 @@ DEBUG-SO-EXPORT int-t
 dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, va-list-t args) {
   USE(args);
   int-t result = 0;
-  if (NULL != getenv("DK_TRACE")) {
+  if (NULL != getenv("DK_ENABLE_TRACE")) {
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
                            signature->name, signature->parameter-types,
                            cast(void*)(object), name-of(klass-of(object)),
@@ -80,7 +80,7 @@ dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va
   USE(args);
   trace-column-out();
   int-t result = 0;
-  if (NULL != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_ENABLE_TRACE"))
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
                            signature->name, signature->parameter-types + sizeof("object-t") - 1,
                            cast(void*)(context.self), name-of(klass-of(context.self)),
@@ -93,7 +93,7 @@ dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va
   USE(args);
   trace-column-out();
   int-t result = 0;
-  if (NULL != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_ENABLE_TRACE"))
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
                            signature->name, signature->parameter-types,
                            cast(void*)(object), name-of(klass-of(object)),
@@ -105,7 +105,7 @@ dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (NULL != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_ENABLE_TRACE"))
     result = dkt-va-trace-before(signature, m, context, args);
   va-end(args);
   return result;
@@ -115,7 +115,7 @@ dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...)
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (NULL != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_ENABLE_TRACE"))
     result = dkt-va-trace-before(signature, m, object, args);
   va-end(args);
   return result;
@@ -125,7 +125,7 @@ dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...) 
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (NULL != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_ENABLE_TRACE"))
     result = dkt-va-trace-after(signature, m, context, args);
   va-end(args);
   return result;
@@ -135,7 +135,7 @@ dkt-trace-after(signature-t const* signature, method-t m, object-t object, ...) 
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (NULL != getenv("DK_TRACE"))
+  if (NULL != getenv("DK_ENABLE_TRACE"))
     result = dkt-va-trace-after(signature, m, object, args);
   va-end(args);
   return result;
