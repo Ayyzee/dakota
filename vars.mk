@@ -84,4 +84,5 @@ EXTRA_DAKOTAFLAGS ?=
 
 cxx_debug_symbols_ext ?=
 
+export DAKOTA_INFO
 export EXTRA_CXXFLAGS

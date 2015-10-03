@@ -1,8 +1,8 @@
 {
   'srcs' => [
-    'exe.dk',
+    'exe-main.cc',
   ],
   'libs' => [
   ],
-  'name' => 'exe',
+  'name' => 'exe-cc',
 }

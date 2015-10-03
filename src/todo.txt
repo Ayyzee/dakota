@@ -30,3 +30,6 @@ add to counted-set::counts()?
  // , object-t sequence-klass : vector::klass
 
 --define-macro DKT-NULL-METHOD=dkt-null-method (how should we convert lexical syntax of lhs vs rhs?)
+
+DK_TRACE_MACROS => DK_ENABLE_TRACE_MACROS
+DK_TRACE        => DK_ENABLE_TRACE

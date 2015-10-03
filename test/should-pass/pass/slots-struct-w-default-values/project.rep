@@ -1,7 +1,7 @@
 {
   'srcs' => [
-    'exe.dk',
-    'module-exe.dk',
+    'exe-main.dk',
+    'module-exe-main.dk',
   ],
   'libs' => [
   ],

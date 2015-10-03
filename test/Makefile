@@ -3,11 +3,11 @@ rootdir := ..
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
-%/exe: %/exe.dk
-	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
+%/exe: %/exe-main.dk
+	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@)
 
-%/exe: %/exe.$(cc_ext)
-	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@) || touch $(dir $@)/failed-build
+%/exe-$(cc_ext): %/exe-main.$(cc_ext)
+	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) --directory $(dir $@) $(notdir $@)
 
 .PHONY: \
  all\
@@ -34,21 +34,18 @@ clean: clean-should-pass-pass clean-should-pass-fail clean-should-fail
 	$(RM) $(RMFLAGS) $(objdir)
 
 clean-should-pass-pass:
-	$(RM) $(RMFLAGS) should-pass/pass/*/failed-{build,run}
 	$(RM) $(RMFLAGS) should-pass/pass/*/$(objdir-name)
 	$(RM) $(RMFLAGS) should-pass/pass/*/{exe,lib-{1,2,3}.$(so_ext)}
 	$(RM) $(RMFLAGS) should-pass/pass/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
 	bin/run-each-script-in-dir.sh should-pass/pass/*/clean.sh
 
 clean-should-pass-fail:
-	$(RM) $(RMFLAGS) should-pass/fail/*/failed-{build,run}
 	$(RM) $(RMFLAGS) should-pass/fail/*/$(objdir-name)
 	$(RM) $(RMFLAGS) should-pass/fail/*/{exe,lib-{1,2,3}.$(so_ext)}
 	$(RM) $(RMFLAGS) should-pass/fail/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
 	bin/run-each-script-in-dir.sh should-pass/fail/*/clean.sh
 
 clean-should-fail:
-	$(RM) $(RMFLAGS) should-fail/*/failed-{build,run}
 	$(RM) $(RMFLAGS) should-fail/*/$(objdir-name)
 	$(RM) $(RMFLAGS) should-fail/*/{exe,lib-{1,2,3}.$(so_ext)}
 	$(RM) $(RMFLAGS) should-fail/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
