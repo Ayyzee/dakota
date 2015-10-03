@@ -1,6 +1,7 @@
 .PHONY: all check clean
 
 all: $(target)
+	if [[ -e $@.sh ]]; then ./$@.sh $(target); fi
 
 $(target): $(prereq)
 

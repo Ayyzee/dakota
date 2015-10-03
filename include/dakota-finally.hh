@@ -28,9 +28,20 @@ class finally {
     ~finally() { functor(); }
 };
 
+// try {
+// }
+// ...
+// catch (more-specific-thing::klass e1) {
+// }
+// catch (less-specific-thing::klass e2) {
+// }
+// ...
+// catch (...) {
+// }
+
+#define DKT_CATCH_BEGIN(e) catch (object_t e) { if (0) {}
+#define DKT_CATCH(k, e)    else if (dk::instancex3f(e, k)) // dk::instance?(i, k)
+#define DKT_CATCH_END(e)   else { throw; } }
 #define DKT_FINALLY(block) finally __finally([&] block)
 
-#define DKT_CATCH_BEGIN(_e_) catch (object_t _e_) { if (0) {}
-#define DKT_CATCH(kls, v)    else if (dk::instancex3f(v, kls))
-#define DKT_CATCH_END(_e_)   else { throw _e_; } }
 #endif

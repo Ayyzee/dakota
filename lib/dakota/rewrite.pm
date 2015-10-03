@@ -216,7 +216,7 @@ sub rewrite_declarations {
  #$$filestr_ref =~ s|(?<!$k)(\s+)provide   \s+($rid) \s*;|$1PROVIDE($2);|gsx;
 }
 
-my $use_catch_macros = 1;
+my $use_catch_macros = 0;
 my $catch_block  = qr/catch\s*\(\s*$rid?::klass\s*$k*\s*\)\s*($main::block)/;
 my $catch_object = qr/\}(\s*$catch_block)+/;
 sub rewrite_catch_block {
@@ -245,7 +245,7 @@ sub rewrite_finally {
   # hackhack: added extra single space in case $1 is empty
   #$$filestr_ref =~ s/finally(\s*)($main::block);?/finally$1 __finally([&] $2);/gs;
 
-  $$filestr_ref =~ s/finally(\s*)($main::block);?/DKT-FINALLY$1($2);/gs;
+  $$filestr_ref =~ s/finally(\s*)($main::block);?/DKT-FINALLY($2);/gs;
   return $filestr_ref
 }
 sub rewrite_catch_object {
@@ -268,13 +268,21 @@ sub rewrite_catch_object {
     $str_out =~ s/\}$/\} DKT-CATCH-END(_e_)/;
   } else {
     $str_out =~ s/^\}/\} catch (object-t _e_) { if (0) {}/;
-    $str_out =~ s/\}$/\} else { throw _e_; } }/;
+    $str_out =~ s/\}$/\} else { throw; } }/;
   }
   return $str_out;
+}
+sub rewrite_catch_all {
+  my ($filestr_ref) = @_;
+  # else { throw; } } catch ( ... ) { xx yy zz; throw; }
+  # =>
+  # else { xx yy zz; throw; } }
+  $$filestr_ref =~ s/else\s*\{\s*throw\s*;\s*\}\s*\}\s*catch\s*\(\s*\.\.\.\s*\)\s*(\{\s*.+?throw\s*;\s*\})/else $1 }/gmsx;
 }
 sub rewrite_exceptions {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/($catch_object)/&rewrite_catch_object($1)/eg;
+  $$filestr_ref =~ s/else\s*\{\s*throw\s*;\s*\}\s*\}([ \n]*)catch\s*\(\s*\.\.\.\s*\)\s*(\{\s*.+?throw\s*;\s*\})/$1else $2 }/gmsx;
 }
 sub convert_dash_syntax {
   my ($str1, $str2) = @_;
@@ -395,12 +403,17 @@ sub rewrite_throws {
   # throw make(...) ;
   # throw klass ;
   # throw self ;
+  # throw ;  =>  dkt-capture-current-exception(_e_) ; throw ;
+
+  $$filestr_ref =~ s/\bthrow(\s*);/RETHROW$1;/gsx;
 
   # dont want to rewrite #define THROW throw
   # in parens
   $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)\((.+?)\)(\s*);/throw$1dkt-capture-current-exception($2)$3;/gsx;
   # not in parens
   $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)  (.+?)  (\s*);/throw$1dkt-capture-current-exception($2)$3;/gsx;
+
+  $$filestr_ref =~ s/\bRETHROW(\s*);/throw$1;/gsx;
 }
 sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
@@ -905,15 +918,14 @@ sub convert_dk_to_cc {
   &rewrite_set_literal($filestr_ref);
   &rewrite_sequence_literal($filestr_ref);
 
+  if ($$filestr_ref =~ m/\Wcatch\W/g) {
+    &rewrite_exceptions($filestr_ref);
+  }
+  &rewrite_finally($filestr_ref);
   &rewrite_throws($filestr_ref);
   #&wrapped_rewrite($filestr_ref, [ 'throw', 'make' ], [ 'throw', '*', 'dkt-current-exception', '(', ')', '=', 'make' ]);
   #&wrapped_rewrite($filestr_ref, [ 'throw', '?literal-cstring' ], [ 'throw', '*', 'dkt-current-exception-cstring', '(', ')', '=', '?literal-cstring' ]);
 
-  &rewrite_finally($filestr_ref);
-
-  if ($$filestr_ref =~ m/\Wcatch\W/g) {
-    &rewrite_exceptions($filestr_ref);
-  }
   # [?klass-type is 'klass' xor 'trait']
   # using ?klass-type ?qual-ident;
   # ?klass-type ?ident = ?qual-ident;
