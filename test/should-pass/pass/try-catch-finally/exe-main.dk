@@ -5,7 +5,11 @@ klass str;
 klass system-exception;
 
 int-t main() {
-  object-t _e_ = nullptr; try {
+  try {
+    printf("try\n");
+  }
+  catch (int e0) {
+    USE(e0);
   }
   catch (str-t e1) {
     USE(e1);
@@ -17,10 +21,11 @@ int-t main() {
     USE(e3);
   }
   catch (...) {
-    printf("catch");
+    printf("catch\n");
     throw;
   }
   finally {
+    printf("finally\n");
   }
   return 0;
 }
