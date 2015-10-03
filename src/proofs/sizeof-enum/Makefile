@@ -2,11 +2,11 @@ rootdir := ../../..
 include $(rootdir)/vars.mk
 
 all:
-	g++ -Wall -g -o exe exe.cc
+	g++ -Wall -g -o exe-cc exe-main.cc
 
 check: all
-	./exe
+	./exe-cc
 
 clean:
 	rm -rf obj
-	rm -f exe *~
+	rm -f exe-cc *~

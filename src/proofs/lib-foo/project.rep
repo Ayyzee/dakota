@@ -4,5 +4,4 @@
     'foo-2.dk'
   ],
   'name' => 'foo.$so_ext',
-  'self-file' => 'project.rep'
 }

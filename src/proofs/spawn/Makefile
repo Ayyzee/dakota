@@ -2,11 +2,11 @@ rootdir := ../../..
 include $(rootdir)/vars.mk
 
 all:
-	g++ -Wall -g -o ./exe exe.cc
+	g++ -Wall -g -o ./exe-cc exe-main.cc
 
 check:
-	./exe $(rootdir)/lib/libdakota.$(so_ext)
-	#./exe /bin/ls
+	./exe-cc $(rootdir)/lib/libdakota.$(so_ext)
+	#./exe-cc /bin/ls
 
 clean:
-	rm -f ./exe *~
+	rm -f ./exe-cc *~

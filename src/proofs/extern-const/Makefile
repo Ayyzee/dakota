@@ -5,12 +5,12 @@
 so_ext := dylib
 
 all:
-	clang++ -std=c++11 -Weverything --output exe exe.cc
+	clang++ -std=c++11 -Weverything --output exe-cc exe-main.cc
 	clang++ -std=c++11 -Weverything --shared -fPIC -o lib-1.$(so_ext) lib-1.cc
 
 check: all
-	./exe
+	./exe-cc
 	../../bin/nm.sh lib-1.$(so_ext)
 
 clean:
-	rm -rf exe exe.dSYM *~
+	rm -rf exe-cc exe-cc.dSYM *~

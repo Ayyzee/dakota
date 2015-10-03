@@ -3,10 +3,10 @@
 #include $(rootdir)/vars.mk
 
 all:
-	clang++ -std=c++11 --debug=3 -Weverything -Wno-c++98-compat --output exe exe.cc
+	clang++ -std=c++11 --debug=3 -Weverything -Wno-c++98-compat --output exe-cc exe-main.cc
 
 check: all
-	./exe
+	./exe-cc
 
 clean:
-	rm -rf exe exe.dSYM *~
+	rm -rf exe-cc exe-cc.dSYM *~

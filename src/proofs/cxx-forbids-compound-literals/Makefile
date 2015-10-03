@@ -6,10 +6,10 @@ EXTRA_CXXFLAGS += --pedantic
 CXX_OUTPUT_FLAG := --output
 
 all:
-	${CXX} ${CXXFLAGS} ${EXTRA_CXXFLAGS} ${CXX_OUTPUT_FLAG} exe exe.cc
+	${CXX} ${CXXFLAGS} ${EXTRA_CXXFLAGS} ${CXX_OUTPUT_FLAG} exe-cc exe-main.cc
 
 check:
-	./exe
+	./exe-cc
 
 clean:
-	rm -f exe
+	rm -f exe-cc

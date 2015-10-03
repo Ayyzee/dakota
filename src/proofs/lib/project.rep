@@ -3,5 +3,4 @@
     'lib.dk'
   ],
   'name' => 'lib.$so_ext',
-  'self-file' => 'project.rep'
 }

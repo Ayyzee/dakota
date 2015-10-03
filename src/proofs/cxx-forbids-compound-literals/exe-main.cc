@@ -1,4 +1,4 @@
-// g++ --ansi --pedantic --output exe exe.cc
+// g++ --ansi --pedantic --output exe exe-main.cc
 
 void foo(int[])
 {

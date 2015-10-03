@@ -12,16 +12,16 @@ so_ext := dylib
 %: %.cc
 	clang++ -std=c++11 -Weverything -Wno-pedantic -Wno-old-style-cast -Wno-c99-extensions -Wno-c++98-compat-pedantic --output $@ $^
 
-all: exe exe-w-lib
+all: exe-cc exe-cc-w-lib
 
-exe: set-read-only.cc
+exe-cc: set-read-only.cc
 
-exe-w-lib: exe.cc set-read-only.$(so_ext)
+exe-cc-w-lib: exe-main.cc set-read-only.$(so_ext)
 	clang++ -std=c++11 -Weverything -Wno-old-style-cast -Wno-c99-extensions -Wno-c++98-compat-pedantic --output $@ $^
 
 check: all
-	./exe || true
-	./exe-w-lib || true
+	./exe-cc || true
+	./exe-cc-w-lib || true
 
 clean:
-	rm -rf set-read-only.$(so_ext) exe exe-w-lib 
+	rm -rf set-read-only.$(so_ext) exe-cc exe-cc-w-lib 
