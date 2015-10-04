@@ -2069,7 +2069,7 @@ sub rep_tree_from_dk_path {
     &add_system_include($gbl_root, $1);
   }
   &encode_cpp(\$_);
-  #&encode_strings(\$_);
+  &encode_strings(\$_);
   &encode_comments(\$_);
 
   #my $__sub__ = (caller(0))[3];
@@ -2108,13 +2108,14 @@ sub rep_tree_from_dk_path {
   while (m/\#($mid)/g) {
     &add_symbol($gbl_root, [$1]);
   }
-  $gbl_sst = &sst::make($_, $gbl_filename);
   &decode_comments(\$_);
-  #&decode_strings(\$_);
+  &decode_strings(\$_);
   &decode_cpp(\$_);
 
-  $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
-  &add_klasses_used($gbl_root, $gbl_sst_cursor);
+  $gbl_sst = &sst::make($_, $gbl_filename);
+
+  #$gbl_sst_cursor = &sst_cursor::make($gbl_sst);
+  #&add_klasses_used($gbl_root, $gbl_sst_cursor);
 
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
   &add_generics_used($gbl_root, $gbl_sst_cursor);
