@@ -5,6 +5,8 @@ set -o nounset -o pipefail
 dirs="\
  should-pass/pass/add-method-on-object\
  should-pass/pass/add-method-on-string\
+ should-pass/pass/sets\
+ should-pass/pass/tables\
 "
 
 if [[ $# > 0 ]]; then
