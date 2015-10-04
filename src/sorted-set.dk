@@ -59,14 +59,12 @@ klass sorted-set {
 
   method object-t init(object-t self,
                        uint32-t          initial-capacity : gbl-default-capacity,
-                       compare-t         compare :          dk::compare,
                        object-t          elements :         nullptr,
                        object-t*         items :            nullptr) {
     assert(0 != initial-capacity);
-    assert(nullptr != compare);
 
     self = dk::init(super);
-    self.sa.compare = cast(std-compare-t)(compare);
+    self.sa.compare = cast(std-compare-t)cast(int-t (*)(object-t, object-t))dk::compare;
     self.sa.size =    cast(uint32-t)sizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
     self.sa.elements = cast(void**)dkt::alloc(self.sa.size * self.sa.capacity);

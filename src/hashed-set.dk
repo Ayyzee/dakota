@@ -45,8 +45,6 @@ klass hashed-set {
     object-t buckets; // a vector of deques
     uint32-t size;
 
-    equal-predicate-t equal?;
-    hash-t            hash;
 
     uint32-t iterator-state;
   }
@@ -64,16 +62,13 @@ klass hashed-set {
   // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t self,
-                       hash-t            hash :     dk::hash,
                        object-t          elements : nullptr,
                        object-t*         items :    nullptr) {
-    assert(nullptr != hash);
 
     self = dk::init(super);
     self.num-buckets = gbl-prime;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);
     self.size = 0;
-    self.hash = hash;
 
     self.iterator-state = 0;
 
@@ -87,7 +82,7 @@ klass hashed-set {
   method object-t add(object-t self, object-t object1) {
     self.iterator-state++;
 
-    uint32-t index = self.hash(object1) % self.num-buckets;
+    uint32-t index = dk::hash(object1) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
@@ -121,7 +116,7 @@ klass hashed-set {
     return self;
   }
   method object-t at(object-t self, object-t object1, object-t default-value) {
-    uint32-t index = self.hash(object1) % self.num-buckets;
+    uint32-t index = dk::hash(object1) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
 
@@ -157,7 +152,7 @@ klass hashed-set {
     self.iterator-state++;
     object-t object = null;
 
-    uint32-t index = self.hash(element) % self.num-buckets;
+    uint32-t index = dk::hash(element) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {

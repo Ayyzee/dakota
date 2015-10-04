@@ -16,18 +16,14 @@
 
 module dakota;
 
-klass equal-predicate;
-klass pair;
 klass std-compare; // hackhack
 
 klass sorted-counted-set {
   superklass sorted-set;
   trait      counted-set;
 
-  method object-t init(object-t self,
-                       equal-predicate-t equal? :  cast(equal-predicate-t)dk::method-for-selector(pair::klass, selector(equal?(object-t, object-t))),
-                       compare-t         compare : cast(compare-t        )dk::method-for-selector(pair::klass, selector(compare(object-t, object-t)))) {
-    self = dk::init(super, #equal? : equal?, #compare : compare);
+  method object-t va::init(object-t self, va-list-t args) {
+    self = dk::va::init(super, args);
     return self;
   }
 }

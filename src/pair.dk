@@ -58,9 +58,7 @@ klass pair {
   }
   method boole-t equal?(object-t self, object-t other) {
     boole-t result;
-    object-t first = self;
-    if (dk::instance?(first, klass))
-      first = unbox(first)->first;
+    object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
     if (klass == klass-of(other))
@@ -78,9 +76,7 @@ klass pair {
   }
   method int-t compare(object-t self, object-t other) {
     int-t result;
-    object-t first = self;
-    if (dk::instance?(first, klass))
-      first = unbox(first)->first;
+    object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
     if (klass == klass-of(other))
@@ -98,9 +94,7 @@ klass pair {
   }
   method uintptr-t hash(object-t self) {
     uintptr-t result;
-    object-t first = self;
-    if (dk::instance?(first, klass))
-      first = unbox(first)->first;
+    object-t first = self.first;
     assert(nullptr != first);
     if (self == first)
       result = dk::hash(super);

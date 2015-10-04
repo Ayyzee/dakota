@@ -25,7 +25,6 @@ namespace sorted_ptr_array {
   slots_t* create(uint32_t capacity, uint32_t size, std_compare_t compare);
 
   result_t search(slots_t* t, void const* key);
-
   void const* intern(slots_t* t, void const* key);
   void const* at(slots_t* t, uint32_t offset);
   void const* remove_last(slots_t* t);
@@ -35,4 +34,4 @@ namespace sorted_ptr_array {
   void const* remove_at(slots_t* t, void const* key, uint32_t offset);
   slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
-#endif // dkt_sorted_ptr_array_hh
+#endif

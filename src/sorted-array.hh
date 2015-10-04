@@ -33,4 +33,4 @@ namespace sorted_array {
   void const* remove_at(slots_t* t, void const* key, uint32_t offset);
   slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
-#endif // dkt_sorted_array_hh
+#endif
