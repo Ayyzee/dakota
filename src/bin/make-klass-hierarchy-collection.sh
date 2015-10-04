@@ -9,8 +9,8 @@ graph_klass_hierarchy()
 	klses=`cat $bname.txt`
 	
 	for kls in $klses; do
-	    bin/dakota-introspector --only $kls lib/libdakota.$so_ext      >> "$bname.ctlg"
-	    bin/dakota-introspector --only $kls lib/libdakota-util.$so_ext >> "$bname.ctlg"
+	    bin/dakota-info --only $kls lib/libdakota.$so_ext      >> "$bname.ctlg"
+	    bin/dakota-info --only $kls lib/libdakota-util.$so_ext >> "$bname.ctlg"
 	done
 	
 	cat /dev/null > "$bname.dot"

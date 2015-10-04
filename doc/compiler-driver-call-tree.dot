@@ -72,9 +72,9 @@ digraph "compiler-driver-call-tree"
   "loop-obj-from-cc" [ color = gray, fontcolor = gray ];
 
   "exec-cmd" -> "g++" [ color = green, style = dashed ];
-  "exec-cmd" -> "dakota-introspector" [ color = red, style = dashed ];
+  "exec-cmd" -> "dakota-info" [ color = red, style = dashed ];
   "g++" [ style = rounded ];
-  "dakota-introspector" [ style = rounded ];
+  "dakota-info" [ style = rounded ];
 
     subgraph { graph [ rank = same ]; "obj-from-cc"; "dso-from-obj"; "so-from-obj"; "exe-from-obj" };
 }

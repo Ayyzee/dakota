@@ -27,7 +27,7 @@ install:
 uninstall:
 
 check: $(lib_prefix)dakota-distexec.$(so_ext)
-	dakota-introspector $^
+	dakota-info $^
 
 $(lib_prefix)dakota-distexec.$(so_ext): $(libdakota_distexec_dk_files)
 	$(DAKOTA) --shared --output $@ $(DAKOTAFLAGS) $^ $(libdir)/$(lib_prefix)dakota-util.$(so_ext) $(libdir)/$(lib_prefix)dakota-mom.$(so_ext) $(libdir)/$(lib_prefix)dakota-x.$(so_ext)

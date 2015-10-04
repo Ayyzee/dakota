@@ -16,12 +16,12 @@ fi
 
 if [ -e lib/libdakota.$so_ext ]; then
     echo "//  lib/libdakota.$so_ext"
-    dakota-introspector --only hashed-$part lib/libdakota.$so_ext > /tmp/hashed-$part.ctlg
-    dakota-introspector --only sorted-$part lib/libdakota.$so_ext > /tmp/sorted-$part.ctlg
+    dakota-info --only hashed-$part lib/libdakota.$so_ext > /tmp/hashed-$part.ctlg
+    dakota-info --only sorted-$part lib/libdakota.$so_ext > /tmp/sorted-$part.ctlg
 else
     echo "//  /usr/local/lib/libdakota.$so_ext"
-    dakota-introspector --only hashed-$part /usr/local/lib/libdakota.$so_ext > /tmp/hashed-$part.ctlg
-    dakota-introspector --only sorted-$part /usr/local/lib/libdakota.$so_ext > /tmp/sorted-$part.ctlg
+    dakota-info --only hashed-$part /usr/local/lib/libdakota.$so_ext > /tmp/hashed-$part.ctlg
+    dakota-info --only sorted-$part /usr/local/lib/libdakota.$so_ext > /tmp/sorted-$part.ctlg
 fi
 
 diff /tmp/hashed-$part.ctlg /tmp/sorted-$part.ctlg

@@ -6,7 +6,7 @@ all:
 	DK_NO_LINE= dakota --shared --output k0123.$(so_ext) k0123.dk
 
 check:
-	dakota-introspector k0123.$(so_ext)
+	dakota-info k0123.$(so_ext)
 
 clean:
 	rm -rf obj

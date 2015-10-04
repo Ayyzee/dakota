@@ -21,4 +21,4 @@ method alias
 interposing
 va method defn
 dynamic klass creation
-showing use of dakota-introspector
+showing use of dakota-info

@@ -7,8 +7,8 @@ cat /dev/null > common.ctlg
 klses=`cat $bname.txt`
 
 for kls in $klses; do
-    bin/dakota-introspector --only $kls --noslots --nomethods lib/libdakota.dylib      >> common.ctlg
-    bin/dakota-introspector --only $kls --noslots --nomethods lib/libdakota-util.dylib >> common.ctlg
+    bin/dakota-info --only $kls --noslots --nomethods lib/libdakota.dylib      >> common.ctlg
+    bin/dakota-info --only $kls --noslots --nomethods lib/libdakota-util.dylib >> common.ctlg
 done
 
 #bin/make-klass-hierarchy.pl --output $bname.dot common.ctlg

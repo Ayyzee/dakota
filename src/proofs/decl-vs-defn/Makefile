@@ -6,7 +6,7 @@ all:
 	DK_NO_LINE= dakota --shared --output lib-1.$(so_ext) lib-1.dk
 
 check:
-	dakota-introspector lib-1.$(so_ext)
+	dakota-info lib-1.$(so_ext)
 
 clean:
 	rm -rf obj
