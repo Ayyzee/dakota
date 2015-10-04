@@ -25,9 +25,9 @@ typedef char char8_t; // hackhack
 SO_IMPORT format_va_printf(2) int_t dkt_va_log(uint32_t priority, str_t format, va_list_t args);
 SO_IMPORT format_printf(   2) int_t dkt_log(   uint32_t priority, str_t format, ...);
 
-#define log_method()     dkt_log(dkt::k_log_debug, "'klass'=>'%s','method'=>'%s','params'=>'%s'", __klass__, __method__->name, __method__->parameter_types)
-#define log_klass_func() dkt_log(dkt::k_log_debug, "'klass'=>'%s','func'=>'%s'", __klass__, __func__)
-#define log_func()       dkt_log(dkt::k_log_debug, "'func'=>'%s'", __func__)
+#define log_method()     dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"method\": \"%s\",\"params\": \"%s\"", __klass__, __method__->name, __method__->parameter_types)
+#define log_klass_func() dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"func\": \"%s\"", __klass__, __func__)
+#define log_func()       dkt_log(dkt::k_log_debug, "\"func\": \"%s\"", __func__)
 
 namespace dkt {
   enum log_priority_t : uint_t {
