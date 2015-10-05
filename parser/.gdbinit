@@ -1,4 +1,4 @@
-source ~/.dakota/.gdbinit
+source ~/.dakota.d/.gdbinit
 file exe
 catch throw
 break main

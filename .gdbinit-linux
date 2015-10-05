@@ -2,5 +2,5 @@ set annotate 1
 file bin/dakota-info
 catch throw
 break main
-source ~/.dakota/.gdbinit
-run lib/libdakota.so
+source ~/.dakota.d/.gdbinit
+run lib/libdakota.so lib/libdakota-util.dylib

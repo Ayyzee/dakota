@@ -4,5 +4,5 @@ file exe
 directory ../../../src
 directory ../../../src/obj
 directory ../../../src/obj/lib
-source ~/.dakota/.gdbinit
+source ~/.dakota.d/.gdbinit
 run
