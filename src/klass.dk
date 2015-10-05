@@ -23,6 +23,7 @@
   #include "config.hh"
 #endif
 
+#include "dakota-safe-str.hh"
 #include "dakota-log.hh"
 #include "dakota-private.hh"
 #include "dakota-rt-private.hh"

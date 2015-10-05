@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cstring>
 
+#include "dakota-safe-str.hh"
 #include "dakota-private.hh"
 
 module dakota-util;

@@ -44,7 +44,6 @@
       '$(srcdir)/property.dk',
       '$(srcdir)/ptr.dk',
       '$(srcdir)/result.dk',
-      '$(srcdir)/safe-str.dk',
       '$(srcdir)/selector-node.dk',
       '$(srcdir)/selector.dk',
       '$(srcdir)/sequence.dk',

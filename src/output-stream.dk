@@ -21,6 +21,7 @@
   #include "config.hh"
 #endif
 
+#include "dakota-safe-str.hh"
 #include "dakota-private.hh"
 
 module dakota;
