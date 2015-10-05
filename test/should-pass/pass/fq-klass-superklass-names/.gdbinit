@@ -1,1 +1,1 @@
-source ../../.gdbinit
+source ../../../.gdbinit
