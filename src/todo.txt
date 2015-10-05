@@ -36,3 +36,5 @@ refactoring tools
 automate klass-for-name(#someklass) in initialize() which is currently (manually) handled by the consumer
 
 warnings/errors on elements in the module import export that don't actually exist.
+
+have test/bin/check.pl read dirs from stdin
