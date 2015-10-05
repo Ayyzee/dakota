@@ -5,4 +5,5 @@
   'libs' => [
   ],
   'name' => 'run-with-timeout',
+  'install' => { 'files' => [ '../bin/run-with-timeout' ] },
 }

@@ -154,14 +154,18 @@ sub process_scalar_expr {
   my ($data, $opts, $scopes, $out) = @_;
   my $lhs = &tsv_set($opts, $scopes, $out);
   my $style;
-  $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
+  if ($data) {
+    $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
+  }
 }
 # seq is rhs of expr (lhs = rhs ...)
 sub process_seq_expr {
   my ($data, $opts, $scopes, $out) = @_;
   my $lhs = &tsv_set($opts, $scopes, $out);
   my $style;
-  $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
+  if ($data) {
+    $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
+  }
 }
 sub mkstr {
   my ($out, $sep) = @_;
@@ -169,18 +173,16 @@ sub mkstr {
   foreach my $lhs (sort keys %{$$out{'mk'}}) {
     my $rhs = $$out{'mk'}{$lhs};
     my $style;
-    $result .= $lhs . $sep . &mydump($rhs, $style = 'mk') . "\n";
+    if ($rhs) {
+      $result .= $lhs . $sep . &mydump($rhs, $style = 'mk') . "\n";
+    }
   }
   return $result;
 }
 sub mydump {
   my ($ref, $style) = @_;
   my $result = '';
-  if (!$ref) {
-    $result = 'null';
-  } else {
-    $result = &Dumper($ref);
-  }
+  $result = &Dumper($ref);
   $result =~ s/\\"//g;
   $result =~ s/"//g;
   if ($style && 'mk' eq $style) {
