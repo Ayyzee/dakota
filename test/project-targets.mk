@@ -6,7 +6,7 @@ all: $(target)
 $(target): $(prereq)
 
 check: all
-	if [[ -e $@.sh ]]; then ./$@.sh $(target); else ./$(target); fi
+	if [[ -e $@.sh ]]; then ./$@.sh $(rootdir)/test/bin/run-with-timeout 3 ./$(target); else $(rootdir)/test/bin/run-with-timeout 3 ./$(target); fi
 
 clean:
 	$(RM) $(RMFLAGS) $(objdir-name)

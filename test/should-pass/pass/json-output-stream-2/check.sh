@@ -1,3 +1,3 @@
 #!/bin/sh -u
 
-./exe < libdakota.rep > libdakota.xml
+../../../bin/run-with-timeout 3 ./exe < libdakota.rep > libdakota.xml

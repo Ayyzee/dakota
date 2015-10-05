@@ -1,3 +1,3 @@
 #!/bin/sh -u
 
-./exe ops.txt
+../../../bin/run-with-timeout 3 ./exe ops.txt

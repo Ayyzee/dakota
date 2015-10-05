@@ -1,6 +1,6 @@
 #!/bin/sh -u
 
-./exe &> out
+../../../bin/run-with-timeout 3 ./exe &> out
 ./wrap.sh out
 #make $1.dot.ps
 #open $1.dot

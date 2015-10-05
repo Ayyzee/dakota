@@ -50,3 +50,6 @@ clean-should-fail:
 	$(RM) $(RMFLAGS) should-fail/*/{exe,lib-{1,2,3}.$(so_ext)}
 	$(RM) $(RMFLAGS) should-fail/*/{exe,lib-{1,2,3}.$(so_ext)}.$(cxx_debug_symbols_ext)
 	bin/run-each-script-in-dir.sh should-fail/*/clean.sh
+
+check: all
+	if [[ -e bin/$@.sh ]]; then ./bin/$@.sh $(target); fi

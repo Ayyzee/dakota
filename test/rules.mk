@@ -4,7 +4,7 @@
 %.dk: %.pl
 	./$< > $@
 
-%-$(cc_ext): %-main.$(cc_ext)
+%: %-main.$(cc_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) --output $@ $^
 
 %: %-main.dk

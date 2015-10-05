@@ -1,4 +1,4 @@
 #!/bin/sh -u
 
-./exe > out.pl
+../../../bin/run-with-timeout 3 ./exe > out.pl
 ./dump.pl < out.pl > out-dumped.pl

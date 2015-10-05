@@ -1,0 +1,8 @@
+{
+  'srcs' => [
+    'run-with-timeout-main.cc',
+  ],
+  'libs' => [
+  ],
+  'name' => 'run-with-timeout',
+}
