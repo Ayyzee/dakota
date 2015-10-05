@@ -58,18 +58,19 @@ main(int argc, char const* const argv[]) {
   tmr.it_value.tv_usec =    0;
   tmr.it_interval.tv_sec =  0;
   tmr.it_interval.tv_usec = 0;
-  r = setitimer(ITIMER_REAL, &tmr, nullptr); if (0 != r) std::abort();
+  r = setitimer(ITIMER_REAL,    &tmr, nullptr); if (0 != r) std::abort();
 //r = setitimer(ITIMER_VIRTUAL, &tmr, nullptr); if (0 != r) std::abort();
 
   child_pid = fork(); if (-1 == child_pid) std::abort();
 
   if (child_pid) { // parent
-    int status = 0;
-    r = waitpid(child_pid, &status, 0); if (-1 == r) std::abort();
+    while (1) {
+      int status = 0;
+      r = waitpid(child_pid, &status, 0); if (-1 == r) std::abort();
 
-    if (WIFEXITED(status))
-      exit(WEXITSTATUS(status));
-    clean_exit_fail(child_pid);
+      if (WIFEXITED(status))
+        exit(WEXITSTATUS(status));
+    }
   } else { // child
     execvp(argv[2], cast(char * const*)&argv[2]); std::abort();
   }
