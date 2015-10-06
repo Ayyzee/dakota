@@ -2,7 +2,9 @@
 
 set -o errexit -o nounset -o pipefail
 
-bin/check.pl --output check-history/should-pass-pass-$$.txt should-pass/pass/*/
+path=check-history/should-pass-pass-$$.txt
+echo $path >> check-history/should-pass-pass-order.txt
+bin/check.pl --output $path should-pass/pass/*/
 cat check-history/should-pass-pass-$$.txt
 #
 #
