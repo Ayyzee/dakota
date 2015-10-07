@@ -425,10 +425,11 @@ klass klass {
   }
   method method-t add-method-for-selector(object-t self, selector-t selector, method-t m) {
     assert(selector < self.methods.count);
+    method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
       dk::set-bit(self.behavior, cast(uint32-t)selector, true);
-    return m;
+    return prev-m;
   }
   method object-t dump(object-t self) {
     object::dump(self);
