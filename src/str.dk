@@ -43,7 +43,24 @@ klass str {
 
   slots char8-t const*;
 
+  method boole-t equal?(object-t self, object-t other) {
+    assert(nullptr != other);
+    boole-t state;
+    if (0 == dk::compare(self, other))
+      state = true;
+    else
+      state = false;
+    return state;
+  }
+  method uintptr-t hash(object-t self) {
+    slots-t slots = *unbox(self);
+    assert(nullptr != slots);
+    uintptr-t result = dk-hash(slots);
+    fprintf(stderr, "str::slots-t: %s: %p\n", slots, result);
+    return result;
+  }
   method int-t compare(object-t self, object-t other) {
+    assert(nullptr != other);
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 

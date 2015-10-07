@@ -95,7 +95,7 @@ klass hashed-set {
       object-t element = nullptr;
 
       for (object-t object2 in deque) {
-        if (dk::equal?(object1, object2)) {
+        if (dk::equal?(object2, object1)) { // arg order matters here!!
           element = object2;
           break;
         }
@@ -122,12 +122,18 @@ klass hashed-set {
 
     if (nullptr != deque) {
       for (object-t object2 in deque) {
-        if (dk::equal?(object1, object2)) {
+        if (dk::equal?(object2, object1)) { // arg order matters here!!
           result = object2;
           break;
         }
       }
     }
+    return result;
+  }
+  method object-t at(object-t self, object-t object) {
+    object-t result = dk::at(self, object, cast(object-t)nullptr);
+    if (nullptr == result)
+      throw make(exception::klass, #message : "oops");
     return result;
   }
   method boole-t contains?(object-t self, object-t key) {
@@ -148,11 +154,11 @@ klass hashed-set {
       state = false;
     return state;
   }
-  method object-t remove(object-t self, object-t element) {
+  method object-t remove(object-t self, object-t element1) {
     self.iterator-state++;
     object-t object = null;
 
-    uint32-t index = dk::hash(element) % self.num-buckets;
+    uint32-t index = dk::hash(element1) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {
@@ -161,7 +167,7 @@ klass hashed-set {
         //printf("element: %s\n", dk::name(element));
         //printf("element2: %s\n", dk::name(element2));
 
-        if (dk::equal?(element, element2)) {
+        if (dk::equal?(element2, element1)) { // arg order matters here!!
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           object = dk::remove(forward-iterator); //element2

@@ -57,6 +57,11 @@ klass sorted-set {
   // using compound literals 'items' can be used as follows:
   // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
+  static int-t swap-compare(object-t first, object-t second) {
+    int-t result = dk::compare(second, first);
+    result *= -1;
+    return result;
+  }
   method object-t init(object-t self,
                        uint32-t          initial-capacity : gbl-default-capacity,
                        object-t          elements :         nullptr,
@@ -64,7 +69,7 @@ klass sorted-set {
     assert(0 != initial-capacity);
 
     self = dk::init(super);
-    self.sa.compare = cast(std-compare-t)cast(int-t (*)(object-t, object-t))dk::compare;
+    self.sa.compare = cast(std-compare-t)cast(compare-t)swap-compare;
     self.sa.size =    cast(uint32-t)sizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
     self.sa.elements = cast(void**)dkt::alloc(self.sa.size * self.sa.capacity);

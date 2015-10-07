@@ -57,7 +57,6 @@ klass pair {
     return self;
   }
   method boole-t equal?(object-t self, object-t other) {
-    boole-t result;
     object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
@@ -68,14 +67,10 @@ klass pair {
     else
       other-first = other;
     assert(nullptr != other-first);
-    if (self == first && other == other-first)
-      result = dk::equal?(super, other-first);
-    else
-      result = dk::equal?(first, other-first);
+    boole-t result = dk::equal?(first, other-first);
     return result;
   }
   method int-t compare(object-t self, object-t other) {
-    int-t result;
     object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
@@ -86,20 +81,13 @@ klass pair {
     else
       other-first = other;
     assert(nullptr != other-first);
-    if (self == first && other == other-first)
-      result = dk::compare(super, other-first);
-    else
-      result = dk::compare(first, other-first);
+    int-t result = dk::compare(first, other-first);
     return result;
   }
   method uintptr-t hash(object-t self) {
-    uintptr-t result;
     object-t first = self.first;
     assert(nullptr != first);
-    if (self == first)
-      result = dk::hash(super);
-    else
-      result = dk::hash(first);
+    uintptr-t result = dk::hash(first);
     return result;
   }
   method object-t first(slots-t* s) {

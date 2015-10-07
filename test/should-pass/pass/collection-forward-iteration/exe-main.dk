@@ -18,7 +18,7 @@ enum collection-type-t
 //MUMBLE  = 1 << 2,
 }
 
-static void check-collection(object-t klass, collection-type-t collection-type, size-t count)
+static int-t check-collection(object-t klass, collection-type-t collection-type, size-t count)
 {
   assert(0xff >= count); // 2 hex digits wide max
   object-t collection = make(klass);
@@ -45,32 +45,42 @@ static void check-collection(object-t klass, collection-type-t collection-type, 
   for (object-t e in collection)
     offset += sprintf(rhs + offset, "/%zx", *size::unbox(e));
 
-  printf("\"%s\" == \"%s\"\n", lhs, rhs);
+  printf("  \"%s\" == \"%s\"\n", lhs, rhs);
+  int-t result = 0;
   
-  if (ORDERED & collection-type || SORTED & collection-type)
-    assert(!strcmp(lhs, rhs));
-  else
-    assert(strlen(lhs) == strlen(rhs));
-  return;
+  if (ORDERED & collection-type || SORTED & collection-type) {
+    if (0 != strcmp(lhs, rhs)) {
+      fprintf(stderr, "  FAILED: strcmp(\"%s\", \"%s\")\n", lhs, rhs);
+      result = 1;
+    }
+  } else {
+    if (strlen(lhs) != strlen(rhs)) {
+      fprintf(stderr, " FAILED: strlen(\"%s\") == strlen(\"%s\")\n", lhs, rhs);
+      result = 1;
+    }
+  }
+  return result;
 }
 
-static void check-collection(object-t klass, collection-type-t collection-type)
+static int-t check-collection(object-t klass, collection-type-t collection-type)
 {
+  int-t result = 0;
+  fprintf(stderr, "%s:\n", name-of(klass));
   for (size-t i = 1; i < 5; i++)
-    check-collection(klass, collection-type, i);
-  return;
+    result += check-collection(klass, collection-type, i);
+  return result;
 }
 
 int-t main()
 {
-  check-collection(vector::klass, ORDERED);
-  check-collection(deque::klass,  ORDERED);
+  int-t r1 = check-collection(vector::klass, ORDERED);
+  int-t r2 = check-collection(deque::klass,  ORDERED);
 
-  check-collection(sorted-set::klass, SORTED);
-  check-collection(hashed-set::klass, NONE);
+  int-t r3 = check-collection(sorted-set::klass, SORTED);
+  int-t r4 = check-collection(hashed-set::klass, NONE);
 
 //   check-collection(sorted-counted-set::klass, SORTED);
 //   check-collection(hashed-counted-set::klass, NONE);
 
-  return 0;
+  return r1 || r2 || r3 || r4;
 }

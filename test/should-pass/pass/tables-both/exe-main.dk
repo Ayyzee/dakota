@@ -1,0 +1,51 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#include <stdio.h>
+#include <assert.h>
+
+#include "out.cc"
+
+klass sorted-table;
+klass hashed-table;
+klass pair;
+klass uint32;
+
+static int-t check(object-t klass, str-pair-t* sp, size-t sp-len)
+{
+  int-t result = 0;
+  object-t collection = make(klass);
+
+  fprintf(stderr, "%s:\n", name-of(klass));
+  fprintf(stderr, "  add():\n");
+  for (uint32-t i = 0; i < sp-len; i++) {
+    object-t first = str::box(sp[i].first);
+    object-t last =  str::box(sp[i].last);
+    dk::add(collection, first, last);
+  }
+
+  fprintf(stderr, "  at():\n");
+  for (uint32-t i = 0; i < sp-len; i++) {
+    object-t first = str::box(sp[i].first);
+    object-t last = dk::at(collection, first, nullptr);
+    if (nullptr != last)
+      fprintf(stdout, "    first/last: %s/%s\n", *str::unbox(first),
+                                             *str::unbox(last));
+    else {
+      fprintf(stdout, "    FAILED: first: %s\n", *str::unbox(first));
+      result = 1;
+    }
+  }
+  // for (object-t e in collection) {
+  //   pair-t* pair = pair::unbox(e);
+  // }
+  return result;
+}
+
+int-t main()
+{
+  size-t str-pair-len = DK-COUNTOF(str-pair);
+  
+  int-t r1 = check(sorted-table::klass, str-pair, str-pair-len);
+  int-t r2 = check(hashed-table::klass, str-pair, str-pair-len);
+  return r1 || r2;
+}

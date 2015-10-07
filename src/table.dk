@@ -65,17 +65,17 @@ trait table {
     return pair;
   }
   static object-t at(object-t self, object-t first) {
-    object-t pair = dk::pair-at(self, first);
-    object-t last = pair::unbox(pair)->last;
+    object-t last = dk::pair-at(self, first);
+    if (dk::instance?(last, pair::klass))
+      last = pair::unbox(last)->last;
     return last;
   }
   static object-t at(object-t self, object-t first, object-t default-last) {
-    object-t last = default-last;
-    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
-
-    if (nullptr != pair) {
-      last = pair::unbox(pair)->last;
-    }
+    object-t last = dk::pair-at(self, first, cast(object-t)nullptr);
+    if (nullptr == last)
+      last = default-last;
+    if (nullptr != last && dk::instance?(last, pair::klass))
+      last = pair::unbox(last)->last;
     return last;
   }
   object-t initialize(object-t kls) {
