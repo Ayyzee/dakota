@@ -264,4 +264,17 @@ DEBUG_IMPORT void dkt_dump_methods(klass::slots_t*);
 
 DEBUG_IMPORT void dkt_unbox_check(object_t object, object_t kls);
 
+// namespace dk { method_t method_for_selector(    object_t, selector_t          ); }
+// namespace dk { method_t add_method_for_selector(object_t, selector_t, method_t); }
+
+// inline method_t REASSOC_AND_ADD_METHOD_FOR_SELECTOR(object_t kls, selector_t selector1,
+//                                                                   selector_t selector2,
+//                                                                   method_t   method) {
+//   dk::add_method_for_selector(kls,                         selector1,
+//                               dk::method_for_selector(kls, selector2));
+//   method_t prev_method =
+//   dk::add_method_for_selector(kls,                         selector2,
+//                                                            method);
+//   return prev_method;
+// }
 #endif // dkt_dakota_hh
