@@ -38,3 +38,7 @@ automate klass-for-name(#someklass) in initialize() which is currently (manually
 warnings/errors on elements in the module import export that don't actually exist.
 
 have test/bin/check.pl read dirs from stdin
+
+add --debug=, --optimize= to dakota to pass through to compiler
+
+dakota.dk: name-from-address() should also return the shared library name (better error reporting)
