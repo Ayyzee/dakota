@@ -63,7 +63,7 @@ klass token {
 #if 0
     if (0 != tokenid) {
       char8-t[4 + (1)] tokenid-str = "";
-      tokenid::str-from(tokenid, tokenid-str, sizeof(tokenid-str));
+      tokenid::utf8-from(tokenid, tokenid-str, sizeof(tokenid-str));
 
       printf("{ 'line':'%i', 'column':'%i', 'tokenid':'%s', 'buffer':'%s' },\n",
              line, column, tokenid-str, buffer);
