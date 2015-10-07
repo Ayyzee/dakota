@@ -19,7 +19,28 @@
 
 module dakota;
 
+klass char8;
+klass no-such-slot-exception;
+
+klass str-compare {
+  slots int-t (*)(char8-t const*, char8-t const*);
+}
+
+klass str-klass {
+  superklass klass;
+
+  slots {
+    str-compare::slots-t strcmp;
+  }
+  method object-t va::init(object-t self, va-list-t args) {
+    self = dk::va::init(super, args);
+    self.strcmp = safe-strcmp;
+    return self;
+  }
+}
 klass str {
+  klass str-klass;
+
   slots char8-t const*;
 
   method int-t compare(object-t self, object-t other) {
@@ -27,11 +48,13 @@ klass str {
     int-t result;
 
     if (dk::instance?(other, klass)) {
+      assert(dk::instance?(klass-of(self), str-klass::klass));
+      str-klass::slots-t& ks = *str-klass::unbox(klass-of(self));
       // what if both utf8s are nullptr?
       // what if only one utf8 is nullptr?
       slots-t s1 = *unbox(self);
       slots-t s2 = *unbox(other);
-      result = safe-strcmp(s1, s2);
+      result = ks.strcmp(s1, s2);
     } else {
       result = dk::compare(super, other);
     }

@@ -36,6 +36,7 @@
       '$(srcdir)/named-info.dk',
       '$(srcdir)/no-such-keyword-exception.dk',
       '$(srcdir)/no-such-method-exception.dk',
+      '$(srcdir)/no-such-slot-exception.dk',
       '$(srcdir)/object-input-stream.dk',
       '$(srcdir)/object-output-stream.dk',
       '$(srcdir)/object.dk',
