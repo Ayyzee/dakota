@@ -56,7 +56,6 @@ klass str {
     slots-t slots = *unbox(self);
     assert(nullptr != slots);
     uintptr-t result = dk-hash(slots);
-    fprintf(stderr, "str::slots-t: %s: %p\n", slots, result);
     return result;
   }
   method int-t compare(object-t self, object-t other) {
