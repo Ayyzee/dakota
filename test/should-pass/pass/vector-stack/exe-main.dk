@@ -3,22 +3,12 @@
 klass vector;
 trait stack;
 
-int-t main()
-{
+int-t main() {
   int-t value = 0;
-
-  try
-  {
-    object-t stack = make(vector::klass);
-    dk::push(stack, null);
-    object-t object = dk::pop(stack);
-    USE(object);
-    // hackhack: should test for null
-  }
-  catch(...)
-  {
-    fprintf(stderr, "ERROR: uncaught exception\n");
-    value = 1;
-  }
+  object-t stack = make(vector::klass);
+  dk::push(stack, null);
+  object-t object = dk::pop(stack);
+  USE(object);
+  // hackhack: should test for null
   return value;
 }

@@ -4,33 +4,22 @@ klass pair;
 klass sorted-table;
 klass string;
 
-int-t main()
-{
+int-t main() {
   int-t value = 0;
+  object-t table = make(sorted-table::klass);
 
-  try
-  {
-    object-t table = make(sorted-table::klass);
+  object-t string1-key = make(string::klass, #bytes : "father");
+  object-t string1-element = make(string::klass, #bytes : "FATHER");
+  dk::add(table, string1-key, string1-element);
 
-    object-t string1-key = make(string::klass, #bytes : "father");
-    object-t string1-element = make(string::klass, #bytes : "FATHER");
-    dk::add(table, string1-key, string1-element);
+  // object-t string2-key = make(string::klass, #bytes : "mother");
+  // object-t string2-element = make(string::klass, #bytes : "MOTHER");
+  // dk::add(table, string2-key, string2-element);
 
-//     object-t string2-key = make(string::klass, #bytes : "mother");
-//     object-t string2-element = make(string::klass, #bytes : "MOTHER");
-//     dk::add(table, string2-key, string2-element);
+  object-t element = dk::at(table, string1-key, cast(object-t)nullptr);
+  printf("%p == %p\n", cast(void*)string1-element, cast(void*)element);
 
-    object-t element = dk::at(table, string1-key, cast(object-t)nullptr);
-    printf("%p == %p\n", cast(void*)string1-element, cast(void*)element);
-
-    object-t pair = dk::pair-at(table, string1-key, cast(object-t)nullptr);
-    printf("%p == %p\n", cast(void*)dk::first(pair), cast(void*)element);
-  }
-  catch(...)
-  {
-    fprintf(stderr, "ERROR: uncaught exception\n");
-    value = 1;
-  }
-
+  object-t pair = dk::pair-at(table, string1-key, cast(object-t)nullptr);
+  printf("%p == %p\n", cast(void*)dk::first(pair), cast(void*)element);
   return value;
 }

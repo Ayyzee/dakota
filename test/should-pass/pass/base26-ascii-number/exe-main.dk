@@ -4,22 +4,12 @@ klass object;
 klass klass;
 klass ascii-number-klass;
 
-int-t main()
-{
+int-t main() {
   int-t rtn = 0;
-
-  try
-  {
-    object-t info = dk-make-named-info(#base26-ascii-number-klass, #superklass-name, #ascii-number, nullptr);
-    object-t base26-ascii-number-klass = make(ascii-number-klass::klass, #info : info, #digits : "abcdefghijklmnopqrstuvwxyz");
-    dk::dump(base26-ascii-number-klass);
-    object-t base26-ascii-number = make(base26-ascii-number-klass, #number : 42);
-    USE(base26-ascii-number);
-  }
-  catch(...)
-  {
-    fprintf(stderr, "ERROR: uncaught unknown exception was thrown\n");
-    rtn = 1;
-  }
+  object-t info = dk-make-named-info(#base26-ascii-number-klass, #superklass-name, #ascii-number, nullptr);
+  object-t base26-ascii-number-klass = make(ascii-number-klass::klass, #info : info, #digits : "abcdefghijklmnopqrstuvwxyz");
+  dk::dump(base26-ascii-number-klass);
+  object-t base26-ascii-number = make(base26-ascii-number-klass, #number : 42);
+  USE(base26-ascii-number);
   return rtn;
 }
