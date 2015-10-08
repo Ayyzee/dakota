@@ -419,7 +419,7 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
 static named-info-t* gbl-registration-info-list;
 
 void register-info-common(named-info-t* registration-info);
-void export-klass(named-info-t* klass-info);
+void dk-export-klass(named-info-t* klass-info);
 
 // SO-EXPORT object-t
 // dk-make-simple-singleton(symbol-t name, symbol-t superklass-name)
@@ -437,7 +437,7 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
   if (klass-name != nullptr)
     num-klass-props++;
 
-  property-t*        klass-props = cast(property-t*)       dkt::alloc(sizeof(property-t) * num-klass-props);
+  property-t*   klass-props = cast(property-t*)  dkt::alloc(sizeof(property-t) * num-klass-props);
   named-info-t* klass-info =  cast(named-info-t*)dkt::alloc(sizeof(named-info-t));
 
   // need to be sorted
@@ -451,7 +451,7 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
     klass-props[i++] = { #superklass-name, cast(uintptr-t)superklass-name };
 
   *klass-info = { klass-props, num-klass-props, nullptr };
-  export-klass(klass-info);
+  dk-export-klass(klass-info);
 
   object-t klass = dk-klass-for-name(name);
   return klass;
@@ -634,8 +634,8 @@ add-interposers(property-t* interposers) {
 //     fprintf(stderr, "===\n");
   return;
 }
-void
-export-klass(named-info-t* klass-info) {
+SO-EXPORT void
+dk-export-klass(named-info-t* klass-info) {
   named-info::sort(klass-info);
   symbol-t name = name-from-info(klass-info);
   assert(nullptr != name);
@@ -665,7 +665,7 @@ export-klasses(named-info-t* klass-info) {
     named-info-t* var-klass-info = &klass-info[i++];
     if (nullptr == var-klass-info->elements)
       break;
-    export-klass(var-klass-info);
+    dk-export-klass(var-klass-info);
   }
   return;
 }
