@@ -228,7 +228,7 @@ SO_IMPORT void dkt_deregister_info(named_info_t*);
 // SO_IMPORT          object_t dk_va_add_all(object_t self, va_list_t);
 // SO_IMPORT sentinel object_t dk_add_all(object_t self, ...);
 
-SO_IMPORT void dk_export_klass(named_info_t* klass_info);
+SO_IMPORT object_t dk_export_klass(named_info_t* klass_info);
 SO_IMPORT void dk_init_runtime();
 SO_IMPORT object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
