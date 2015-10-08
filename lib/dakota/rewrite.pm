@@ -665,7 +665,9 @@ sub hash {
   my ($keyword) = @_;
   $keyword =~ s|^\'||;  # strip leading  single-quote
   $keyword =~ s|\'$||;  # strip trailing single-quote
-  return "dk-hash(\"$keyword\")";
+  my $qkeyword = "\"$keyword\"";
+  &encode_strings(\$qkeyword);
+  return "dk-hash($qkeyword)";
 }
 sub rewrite_case_with_string_rhs {
   my ($ws1, $str, $ws2) = @_;
@@ -679,10 +681,10 @@ sub rewrite_case_with_string {
 }
 sub rewrite_strswitch {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|strswitch(\s*)\((\s*)  ($id) (\s*)\)|switch$1(dk-hash($2$3$4))  |gsx;
-  $$filestr_ref =~ s|   switch(\s*)\((\s*)\#(.*?) (\s*)\)|switch$1(dk-hash($2"$3"$4))|gsx;
-  $$filestr_ref =~ s|   switch(\s*)\((\s*) "(.*?)"(\s*)\)|switch$1(dk-hash($2"$3"$4))|gsx;
-  $$filestr_ref =~ s|   switch(\s*)\((\s*) '(.*?)'(\s*)\)|switch$1(dk-hash($2'$3'$4))|gsx;
+  $$filestr_ref =~ s|strswitch(\s*)\((\s*)  ($id) (\s*)\)|switch$1($2dk-hash($3)$4)|gsx;
+  $$filestr_ref =~ s|   switch(\s*)\((\s*)\#(.*?) (\s*)\)|"switch$1($2" . &hash($3)   . "$4)"|egsx;
+  $$filestr_ref =~ s|   switch(\s*)\((\s*) "(.*?)"(\s*)\)|"switch$1($2" . &hash($3)   . "$4)"|egsx;
+  $$filestr_ref =~ s|   switch(\s*)\((\s*) '(.*?)'(\s*)\)|"switch$1($2" . &hash('$3') . "$4)"|egsx;
 }
 sub remove_non_newlines {
   my ($str) = @_;

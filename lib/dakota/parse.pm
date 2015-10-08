@@ -502,7 +502,6 @@ sub add_type {
 sub add_hash {
   my ($file, $str) = @_;
   my $ident = &path::string([$str]);
-  &add_symbol_ident($file, $ident);
   $$file{'hashes'}{$ident} = undef;
 }
 sub add_keyword {
