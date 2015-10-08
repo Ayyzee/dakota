@@ -80,18 +80,17 @@ klass token {
     return self;
   }
   method uintptr-t hash(object-t self) {
-    object-t string = make(string::klass, #bytes : cast(str-t)(self.buffer));
-    uintptr-t result = dk::hash(string);
+    uintptr-t result = dk-hash(self.buffer);
     return result;
   }
   method boole-t equal?(object-t self, object-t other) {
     boole-t state;
 
     if (dk::instance?(other, klass)) {
-      slots-t* t = unbox(other);
-      object-t s-string = make(string::klass, #bytes : cast(str-t)(self.buffer));
-      object-t t-string = make(string::klass, #bytes : cast(str-t)(t->buffer));
-      state = dk::equal?(s-string, t-string);
+      if (0 == dk::compare(self, other))
+        state = true;
+      else
+        state = false;
     } else {
       state = false;
     }
@@ -207,10 +206,13 @@ klass token {
     return self;
   }
   method int-t compare(object-t self, object-t other) {
-    dk::dump(other);
-  //fprintf(stderr, "%s <: %s\n", unbox(self)->buffer, unbox(other)->buffer);
-    int-t result = safe-strcmp(unbox(self)->buffer, unbox(other)->buffer);
-    result = dkt-normalize-compare-result(result);
+    int-t result;
+    if (dk::instance?(other, klass)) {
+      result = safe-strcmp(self.buffer, unbox(other)->buffer);
+      result = dkt-normalize-compare-result(result);
+    } else {
+      result = dk::compare(super, other);
+    }
     return result;
   }
 }
