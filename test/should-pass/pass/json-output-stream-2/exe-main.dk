@@ -2,6 +2,7 @@
 
 klass json-parser;
 klass xml-object-output-stream;
+klass features;
 
 klass k1
 {

@@ -2,8 +2,7 @@
 
 module test-1;
 
-klass test
-{
+klass test {
 #define arg5-default nullptr
 #define arg6-default nullptr
   method object-t init(object-t self,
@@ -13,6 +12,7 @@ klass test
                        void****   arg4 : {~},
                        void*****  arg5 : arg5-default,
                        void****** arg6 : arg6-default) {
+    self = dk::init(super);
     USE(self);
     USE(arg1);
     USE(arg2);
@@ -20,7 +20,7 @@ klass test
     USE(arg4);
     USE(arg5);
     USE(arg6);
-    return null;
+    return self;
   }
   method object-t va::print-format(object-t self, str-t format, va-list-t args) {
     USE(self);
