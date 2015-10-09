@@ -669,17 +669,18 @@ sub hash {
   &encode_strings(\$stmt);
   return $stmt;
 }
-sub rewrite_case_with_string_rhs {
-  my ($ws1, $str, $ws2) = @_;
-  my $ident = &hash($str);
-  return "case$ws1$ident$ws2:";
+sub encode_str {
+  my ($str) = @_;
+  my $qstr = "\"$str\"";
+  &encode_strings(\$qstr);
+  return $qstr;
 }
 sub rewrite_switch_replacement {
   my ($expr, $body) = @_;
   if ($body =~ m/\bcase\s*(".*?"|\#$id)\s*:/g) {
     $expr = '(dk-hash' . $expr . ')';
-    $body =~ s|(\bcase)(\s*)(".*?")(\s*)(:)|$1$2dk-hash($3)$4$5|gsx;
-    $body =~ s|(\bcase)(\s*)\#(.*?) (\s*)(:)|&rewrite_case_with_string_rhs($2, $3, $4)|egsx;
+    $body =~ s|(\bcase\s*)(".*?")(\s*:)|$1 . 'dk-hash(' .             $2 . ')' . $3|egsx;
+    $body =~ s|(\bcase\s*)\#(.*?)(\s*:)|$1 . 'dk-hash(' . &encode_str($2) .')' . $3|egsx; # __hash::_abc_def
   }
   return "switch$expr$body";
 }
