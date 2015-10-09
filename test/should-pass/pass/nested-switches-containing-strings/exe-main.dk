@@ -5,7 +5,7 @@
 int-t main()
 {
   const char8-t* str1;
-  strswitch (str1)
+  switch (str1)
   {
     case "aa":
       //

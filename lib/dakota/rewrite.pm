@@ -665,26 +665,27 @@ sub hash {
   my ($keyword) = @_;
   $keyword =~ s|^\'||;  # strip leading  single-quote
   $keyword =~ s|\'$||;  # strip trailing single-quote
-  my $qkeyword = "\"$keyword\"";
-  &encode_strings(\$qkeyword);
-  return "dk-hash($qkeyword)";
+  my $stmt = "dk-hash(\"$keyword\")";
+  &encode_strings(\$stmt);
+  return $stmt;
 }
 sub rewrite_case_with_string_rhs {
   my ($ws1, $str, $ws2) = @_;
   my $ident = &hash($str);
   return "case$ws1$ident$ws2:";
 }
-sub rewrite_case_with_string {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(case)(\s*) "(.*?)"(\s*)(:)|&rewrite_case_with_string_rhs($2, $3, $4)|gesx;
-  $$filestr_ref =~ s|(case)(\s*)\#(.*?) (\s*)(:)|&rewrite_case_with_string_rhs($2, $3, $4)|gesx;
+sub rewrite_switch_replacement {
+  my ($expr, $body) = @_;
+  if ($body =~ m/\bcase\s*(".*?"|\#$id)\s*:/g) {
+    $expr = '(dk-hash' . $expr . ')';
+    $body =~ s|(\bcase)(\s*)(".*?")(\s*)(:)|$1$2dk-hash($3)$4$5|gsx;
+    $body =~ s|(\bcase)(\s*)\#(.*?) (\s*)(:)|&rewrite_case_with_string_rhs($2, $3, $4)|egsx;
+  }
+  return "switch$expr$body";
 }
-sub rewrite_strswitch {
+sub rewrite_switch {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|strswitch(\s*)\((\s*)  ($id) (\s*)\)|switch$1($2dk-hash($3)$4)|gsx;
-  $$filestr_ref =~ s|   switch(\s*)\((\s*)\#(.*?) (\s*)\)|"switch$1($2" . &hash($3)   . "$4)"|egsx;
-  $$filestr_ref =~ s|   switch(\s*)\((\s*) "(.*?)"(\s*)\)|"switch$1($2" . &hash($3)   . "$4)"|egsx;
-  $$filestr_ref =~ s|   switch(\s*)\((\s*) '(.*?)'(\s*)\)|"switch$1($2" . &hash('$3') . "$4)"|egsx;
+  $$filestr_ref =~ s/\bswitch(.*?$main::list)(.*?$main::block)/&rewrite_switch_replacement($1, $2)/egs;
 }
 sub remove_non_newlines {
   my ($str) = @_;
@@ -892,8 +893,7 @@ sub convert_dk_to_cc {
   &encode_strings($filestr_ref);
   &encode_comments($filestr_ref);
 
-  &rewrite_strswitch($filestr_ref);
-  &rewrite_case_with_string($filestr_ref);
+  &rewrite_switch($filestr_ref);
 
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading #, rnielsen
   &rewrite_keywords($filestr_ref);

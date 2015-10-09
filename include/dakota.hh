@@ -216,6 +216,9 @@ typedef selector_t* (*dkt_selector_function_t)();
 constexpr uintptr_t dk_hash(str_t str, uintptr_t i = 0) { // Daniel J. Bernstein
   return !str[i] ? cast(uintptr_t)5381 : ( dk_hash(str, i + 1) * cast(uintptr_t)33 ) ^ cast(uchar8_t)(str[i]);
 }
+constexpr uintptr_t dk_hash(uintptr_t val) {
+  return val;
+}
 SO_IMPORT int_t  safe_strcmp(str_t, str_t);
 SO_IMPORT size_t safe_strlen(str_t);
 

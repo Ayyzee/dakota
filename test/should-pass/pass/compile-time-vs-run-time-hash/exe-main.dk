@@ -3,7 +3,7 @@
 int-t main()
 {
   symbol-t default-initial-capacity = #default-initial-capacity;
-  strswitch(default-initial-capacity)
+  switch(default-initial-capacity)
   {
     case #default-initial-capacity:
       break;
@@ -27,7 +27,7 @@ int-t main()
       fprintf(stderr, "\"%s\"\n", "default-initial-capacity");
       abort();
   }
-  uintmax-t hash-value = dk-hash(#default-initial-capacity);
+  uintptr-t hash-value = dk-hash(#default-initial-capacity);
   switch(hash-value)
   {
     case #default-initial-capacity:
