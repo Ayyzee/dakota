@@ -1562,7 +1562,8 @@ info-for-name(symbol-t klass-name) {
 SO-EXPORT symbol-t
 dk-intern(str-t key) {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
-  static sorted-ptr-array-t* intern-array = sorted-ptr-array::create(32, cast(uint32-t)sizeof(symbol-t), cast(std-compare-t)safe-strcmp);
+  // start with half a page (4096/2 bytes) of intern memory
+  static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), cast(uint32-t)sizeof(symbol-t), cast(std-compare-t)safe-strcmp);
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;
