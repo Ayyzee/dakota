@@ -21,6 +21,7 @@
   'SOCK-DGRAM' => '<sys/socket.h>',
   'SOCK-RAW' => '<sys/socket.h>',
   'SOCK-STREAM' => '<sys/socket.h>',
+  'getcwd' => '<unistd.h>',
   'in-addr' => '<netinet/in.h>',
   'in-port-t' => '<netinet/in.h>',
   'in6-addr' => '<netinet/in.h>',

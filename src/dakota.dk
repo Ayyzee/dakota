@@ -24,11 +24,14 @@
 #include <cstring>
 #include <exception>
 
+#include <cxxabi.h>
+
 #include <unistd.h>
 
 #include <sys/mman.h>
 #include <sys/stat.h> // struct stat, stat()
 #include <syslog.h>
+#include <dlfcn.h>
 
 #include "config.hh"
 
@@ -143,7 +146,7 @@ extern resource-usage::slots-t gbl-ru;
 
 typedef int32-t (*)(void*, void*) vcompare-t;
 
-static object-t null-klass = nullptr;
+static DKT-RODATA-SECTION object-t null-klass = nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t null =       nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t std-input =  nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t std-output = nullptr;
@@ -493,11 +496,28 @@ dk-init-runtime() {
     null = make(null-klass);
     klass::unbox(object::klass)->superklass = null;
 #endif
-    assert(klass::klass == klass-of(klass::klass));
-
     // core runtime klasses are setup
     // klasses: object, klass, (optionally) singleton-klass
-    // and (optionally) null-klass and null singleton
+    // and (optionally) null-klass and null (singleton)
+
+    // instantiation hier:
+    //   klass <- klass
+    //   klass <- object
+    //   klass <- singleton-klass <- null-klass <- null
+    // inheritance hier:
+    //   null <- object <- klass <- singleton-klass
+    //   null <- object <- null-klass
+
+    assert(klass::klass           == klass-of(klass::klass));
+    assert(klass::klass           == klass-of(singleton-klass::klass));
+    assert(klass::klass           == klass-of(object::klass));
+    assert(singleton-klass::klass == klass-of(null-klass));
+    assert(null-klass             == klass-of(null));
+
+    assert(null          == superklass-of(object::klass));
+    assert(object::klass == superklass-of(klass::klass));
+    assert(object::klass == superklass-of(null-klass));
+    assert(klass::klass  == superklass-of(singleton-klass::klass));
 
 #if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(#bit-vector);
@@ -534,6 +554,7 @@ dk-init-runtime() {
 #if 0
     dk::dump(object::klass);
     dk::dump(klass::klass);
+    dk::dump(singleton-klass::klass);
     if (null) {
       dk::dump(null-klass);
       dk::dump(null);
@@ -1189,6 +1210,7 @@ klass registration-info {
     assoc-node-t*      imported-klasses;
     named-info-t*      klass-defns;
     property-t*        interposers;
+    char8-t const*     dir;
     symbol-t           name;
     get-segment-data-t get-segment-data;
   }
@@ -1204,6 +1226,7 @@ named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) {
     .imported-klasses =       cast(decltype(ri->imported-klasses))       named-info::at(ni, #imported-klasses),
     .klass-defns =            cast(decltype(ri->klass-defns))            named-info::at(ni, #klass-defns),
     .interposers =            cast(decltype(ri->interposers))            named-info::at(ni, #interposers),
+    .dir =                    cast(decltype(ri->dir))                    named-info::at(ni, #dir),
     .name =                   cast(decltype(ri->name))                   named-info::at(ni, #name),
     .get-segment-data =       cast(decltype(ri->get-segment-data))       named-info::at(ni, #get-segment-data),
   };
@@ -1279,7 +1302,7 @@ klass addr2name-pair {
     symbol-t name;
   }
 }
-static addr2name-pair-t others[] = {
+static addr2name-pair-t named-instances[] = {
   { cast(void**)&null,       #null       },
   { cast(void**)&std-input,  #std-input  },
   { cast(void**)&std-output, #std-output },
@@ -1287,18 +1310,20 @@ static addr2name-pair-t others[] = {
 };
 klass so-symbol-info {
   slots {
-    str-t soname;
-    str-t name;
+    str-t fdir;
+    str-t fname;
+    str-t sname;
   }
 }
 static so-symbol-info::slots-t*
 name-from-address(object-t addr, so-symbol-info::slots-t* info) { // slowslow
-  // others
-  for (size-t i = 0; i < DK-COUNTOF(others); i++) {
-    addr2name-pair-t other = others[i];
-    if (other.addr == cast(decltype(other.addr))addr) {
-        info->soname = "libdakota";
-        info->name =   other.name;
+  // named-instances
+  for (size-t i = 0; i < DK-COUNTOF(named-instances); i++) {
+    addr2name-pair-t named-instance = named-instances[i];
+    if (named-instance.addr == cast(decltype(named-instance.addr))addr) {
+        info->fdir =  nullptr;
+        info->fname = nullptr;
+        info->sname = named-instance.name;
         return info;
     }
   }
@@ -1311,8 +1336,9 @@ name-from-address(object-t addr, so-symbol-info::slots-t* info) { // slowslow
     // imported-klasses
     for (uint-t i = 0; nullptr != cast(object-t*)ri.imported-klasses[i].element; i++) {
       if (cast(object-t*)ri.imported-klasses[i].element == cast(object-t*)addr) {
-        info->soname = ri.name;
-        info->name =   ri.imported-klasses-names[i];
+        info->fdir =  ri.dir;
+        info->fname = ri.name;
+        info->sname = ri.imported-klasses-names[i];
         return info;
       }
     }
@@ -1322,10 +1348,28 @@ name-from-address(object-t addr, so-symbol-info::slots-t* info) { // slowslow
 }
 [[noreturn]] static void
 bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) noexcept {
+  Dl_info dl-info {};
+  if (dladdr(si->si-addr, &dl-info)) {
+    if (si->si-addr == dl-info.dli-saddr) {
+      int status = -1;
+      char8-t const* sname-demangled = abi::__cxa_demangle(dl-info.dli-sname, nullptr, nullptr, &status);
+      if (0 != status)
+        sname-demangled = dl-info.dli-sname;
+      syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
+             sys-signame[sig], dl-info.dli-fname, sname-demangled, si->si-addr);
+      if (0 == status)
+        free(cast(void*)sname-demangled);
+    }
+  }
   so-symbol-info::slots-t info {};
   if (name-from-address(cast(object-t)si->si-addr, &info)) {
-    syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
-           sys-signame[sig], info.soname, info.name, si->si-addr);
+    if (nullptr == info.fname) {
+      syslog(LOG-ERR, "caught sig%s at named-instance \"%s\" %p\n",
+             sys-signame[sig], info.sname, si->si-addr);
+    } else {
+      syslog(LOG-ERR, "caught sig%s in \"%s/%s\" at \"%s::klass\" %p\n",
+             sys-signame[sig], info.fdir, info.fname, info.sname, si->si-addr);
+    }
   }
   x::sigaction-handler-t prev-sa-handler =
     sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;

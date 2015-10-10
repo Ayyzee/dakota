@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-digraph "inherit+instant2"
+digraph "inherit+instant"
 {
   graph [ label = "\G", fontcolor = red ];
   graph [ rankdir = LR, center = true, page = "8.5,11", size = "7.5,10" ];
@@ -20,22 +20,36 @@ digraph "inherit+instant2"
   node [ shape = box, style = rounded ];
   
   "null-instance1" [ label = "null", shape = plaintext ];
-  "null-instance"  [ label = "null", shape = plaintext ];
+  "null-instance2" [ label = "null", shape = plaintext ];
 
   node [ width = "1.5" ];
-  
-  "null1"           [ label = "null" ];
-  "object1"         [ label = "object" ];
-  "klass1"          [ label = "klass" ];
+
+  "klass1"           [ label = "klass" ];
+  "klass2"           [ label = "klass" ];
+  "null1"            [ label = "null" ];
+  "null2"            [ label = "null" ];
+  "object1"          [ label = "object" ];
+  "object2"          [ label = "object" ];
+  "singleton-klass1" [ label = "singleton-klass" ];
+  "singleton-klass2" [ label = "singleton-klass" ];
   
   edge [ style = solid ];
+  "null-instance1"  -> "object1";
   "object1"         -> "klass1";
   "object1"         -> "null1";
-  "null-instance1"  -> "object1";
+  "klass1"          -> "singleton-klass1";
 
   edge [ style = dashed ];
-  "klass"          -> "klass";
-  "klass"          -> "object";
-  "klass"          -> "null";
-  "null"           -> "null-instance";
+  "klass2"           -> "klass2";
+  "klass2"           -> "object2";
+  "klass2"           -> "singleton-klass2";
+  "null2"            -> "null-instance2";
+  "singleton-klass2" -> "null2";
 }
+// instantiation hier:
+//   klass <- klass
+//   klass <- object
+//   klass <- singleton-klass <- null-klass <- null
+// inheritence hier:
+//   null <- object <- klass <- singleton-klass
+//   null <- object <- null-klass

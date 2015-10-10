@@ -68,6 +68,7 @@
     'char-t' => undef, # hardcode typedef
     'construct' => undef,
     'date' => undef,
+    'dir' => undef,
     'enum' => undef,
     'enum-base' => undef,
     'executable' => undef,

@@ -507,10 +507,14 @@ sub generate_defn_footer {
                   "\#time" => '__TIME__',
                   "\#file" => '__FILE__',
                   "\#construct" => 'DKT-CONSTRUCT',
+                  "\#dir" => 'getcwd(dir, DK-COUNTOF(dir))',
                   "\#name" => 'DKT-NAME',
                   "\#get-segment-data" => 'dkt-get-segment-data',
                  };
   $rt_cc_str .= "\n";
+  $rt_cc_str .= "#include <unistd.h>\n";
+  $rt_cc_str .= "\n";
+  $rt_cc_str .= "static char dir[4096] = \"\";\n";
   #my $col;
   $rt_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 
