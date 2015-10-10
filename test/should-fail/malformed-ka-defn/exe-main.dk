@@ -11,7 +11,7 @@ klass k1
 
 int-t main()
 {
-  object-t o = make(k1::klass, #token : null, #filename : nullptr);
+  object-t o = make(k1::klass, #token : null, #filename : nullptr, #token : null);
   USE(o);
   return 0;
 }

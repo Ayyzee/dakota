@@ -1285,13 +1285,21 @@ static addr2name-pair-t others[] = {
   { cast(void**)&std-output, #std-output },
   { cast(void**)&std-error,  #std-error  },
 };
-static symbol-t
-name-from-address(object-t addr) { // slowslow
+klass so-symbol-info {
+  slots {
+    str-t soname;
+    str-t name;
+  }
+}
+static so-symbol-info::slots-t*
+name-from-address(object-t addr, so-symbol-info::slots-t* info) { // slowslow
   // others
   for (size-t i = 0; i < DK-COUNTOF(others); i++) {
     addr2name-pair-t other = others[i];
     if (other.addr == cast(decltype(other.addr))addr) {
-      return other.name;
+        info->soname = "libdakota";
+        info->name =   other.name;
+        return info;
     }
   }
   named-info-t* ni = gbl-registration-info-list;
@@ -1303,7 +1311,9 @@ name-from-address(object-t addr) { // slowslow
     // imported-klasses
     for (uint-t i = 0; nullptr != cast(object-t*)ri.imported-klasses[i].element; i++) {
       if (cast(object-t*)ri.imported-klasses[i].element == cast(object-t*)addr) {
-        return ri.imported-klasses-names[i];
+        info->soname = ri.name;
+        info->name =   ri.imported-klasses-names[i];
+        return info;
       }
     }
     ni = ni->next;
@@ -1312,10 +1322,10 @@ name-from-address(object-t addr) { // slowslow
 }
 [[noreturn]] static void
 bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) noexcept {
-  symbol-t name = name-from-address(cast(object-t)si->si-addr);
-  if (nullptr != name) {
-    syslog(LOG-ERR, "caught sig%s at \"%s\" %p\n",
-           sys-signame[sig], name, si->si-addr);
+  so-symbol-info::slots-t info {};
+  if (name-from-address(cast(object-t)si->si-addr, &info)) {
+    syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
+           sys-signame[sig], info.soname, info.name, si->si-addr);
   }
   x::sigaction-handler-t prev-sa-handler =
     sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;
@@ -1383,7 +1393,7 @@ static void last-user-code-before-main() {
 }
 SO-EXPORT void
 dkt-register-info(named-info-t* registration-info) {
-  //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #file));
+  //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
   file-t ctlg-output = nullptr;
   str-t output-path = getenv("DKT_INFO_OUTPUT");
