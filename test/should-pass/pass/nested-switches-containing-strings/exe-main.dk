@@ -4,7 +4,7 @@
 
 int-t main()
 {
-  const char8-t* str1;
+  const char8-t* str1 = "";
   switch (str1)
   {
     case "aa":
@@ -13,8 +13,8 @@ int-t main()
     case "bb":
       //
       break;
-    case "cc":
-      const char8-t* str2;
+    case "cc": {
+      const char8-t* str2 = "";
       switch (str2)
       {
         case "dd":
@@ -25,8 +25,10 @@ int-t main()
           break;
       }
       break;
+    }
     default:
       //
+      ;
   }
   return 0;
 }

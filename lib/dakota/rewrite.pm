@@ -677,16 +677,21 @@ sub encode_str {
 }
 sub rewrite_switch_replacement {
   my ($expr, $body) = @_;
-  if ($body =~ m/\bcase\s*(".*?"|\#$id)\s*:/g) {
-    $expr = '(dk-hash' . $expr . ')';
+  if ($body =~ m/\bcase\s*(".*?"|\#$id|dk-hash\s*$main::list)\s*:/g) {
+    $expr =~ s/^(\s*)(.+)$/$1(dk-hash$2)/s;
     $body =~ s|(\bcase\s*)(".*?")(\s*:)|$1 . 'dk-hash(' .             $2 . ')' . $3|egsx;
     $body =~ s|(\bcase\s*)\#(.*?)(\s*:)|$1 . 'dk-hash(' . &encode_str($2) .')' . $3|egsx; # __hash::_abc_def
   }
   return "switch$expr$body";
 }
+sub rewrite_switch_recursive {
+  my ($expr, $body) = @_;
+  $body =~ s/\bswitch(.*?$main::list)(.*?$main::block)/&rewrite_switch_recursive($1, $2)/egs;
+  return &rewrite_switch_replacement($expr, $body);
+}
 sub rewrite_switch {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/\bswitch(.*?$main::list)(.*?$main::block)/&rewrite_switch_replacement($1, $2)/egs;
+  $$filestr_ref =~ s/\bswitch(.*?$main::list)(.*?$main::block)/&rewrite_switch_recursive($1, $2)/egs;
 }
 sub remove_non_newlines {
   my ($str) = @_;
