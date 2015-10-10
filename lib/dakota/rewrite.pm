@@ -678,7 +678,7 @@ sub encode_str {
 sub rewrite_switch_replacement {
   my ($expr, $body) = @_;
   if ($body =~ m/\bcase\s*(".*?"|\#$id|dk-hash\s*$main::list)\s*:/g) {
-    $expr =~ s/^(\s*)(.+)$/$1(dk-hash$2)/s;
+    $expr =~ s/^(\s*)(.+)$/$1(dkt-hash-switch$2)/s;
     $body =~ s|(\bcase\s*)(".*?")(\s*:)|$1 . 'dk-hash(' .             $2 . ')' . $3|egsx;
     $body =~ s|(\bcase\s*)\#(.*?)(\s*:)|$1 . 'dk-hash(' . &encode_str($2) .')' . $3|egsx; # __hash::_abc_def
   }
