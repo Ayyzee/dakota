@@ -27,7 +27,7 @@ klass schar8 {
 }
 klass wchar {
   slots wchar-t;
-}
+} // typedef wchar::slots-t wchar-t is illegal since wchar-t is a fundamental type
 klass char16 {
   slots char16-t;
 }

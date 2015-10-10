@@ -45,3 +45,9 @@ dakota.dk: name-from-address() should also return the shared library name (bette
 
 make REASSOC-AND-ADD-METHOD-FOR-SELECTOR(3) an inline function
 
+http://www.rubyinside.com/what-rubys-double-pipe-or-equals-really-does-5488.html
+// research what ||= would be in C++
+str-t str = some-expr ||= ""
+=>
+str-t str = some-expr; if (!str) str = "";
+o
