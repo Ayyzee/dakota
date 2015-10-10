@@ -1,0 +1,28 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass str;
+klass symbol;
+
+int-t ptr-compare(void* ptr1, void* ptr2) {
+  return dkt-normalize-compare-result(cast(intptr-t)ptr1 - cast(intptr-t)ptr2);
+}
+int-t main()
+{
+  str-t first-str =  "aa";
+  str-t second-str = "bb";
+  printf("strcmp: %i\n", strcmp(first-str,
+                                second-str));
+  printf("symbol compare: %i\n", ptr-compare(cast(void*)#aa,
+                                             cast(void*)#bb));
+  printf("dk-intern() compare: %i\n", ptr-compare(cast(void*)dk-intern(first-str),
+                                                  cast(void*)dk-intern(second-str)));
+
+  printf("strcmp: %i\n", strcmp(second-str,
+                                first-str));
+  printf("symbol compare: %i\n", ptr-compare(cast(void*)#bb,
+                                             cast(void*)#aa));
+  printf("dk-intern() compare: %i\n", ptr-compare(cast(void*)dk-intern(second-str),
+                                                  cast(void*)dk-intern(first-str)));
+
+  return 0;
+}

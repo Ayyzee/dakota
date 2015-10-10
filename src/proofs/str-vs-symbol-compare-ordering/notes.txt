@@ -1,0 +1,3 @@
+This is only true for symbols defined within a single library or executable (an SO).
+Comparison ordering of symbols from multiple SOs is undefined.
+
