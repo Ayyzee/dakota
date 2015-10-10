@@ -20,8 +20,8 @@
 #include "dakota.hh"
 
 namespace named_info {
-  /*method*/ int_t compare(slots_t* s, slots_t* other_s);
-  int_t compare(slots_t** s, slots_t** other_s);
+  /*method*/ int_t compare(slots_t*  s, slots_t*  other_s);
+             int_t compare(slots_t** s, slots_t** other_s);
   /*method*/ int_t compare(object_t self, object_t other);
 }
 #endif
