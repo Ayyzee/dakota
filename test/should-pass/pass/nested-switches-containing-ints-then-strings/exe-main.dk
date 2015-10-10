@@ -1,0 +1,34 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#include <string>
+
+int-t main()
+{
+  int-t int1 = 0;
+  switch (int1)
+  {
+    case 1:
+      //
+      break;
+    case 2:
+      //
+      break;
+    case 3: {
+      const char8-t* str2 = "";
+      switch (str2)
+      {
+        case "dd":
+          //
+          break;
+        case "ee":
+          //
+          break;
+      }
+      break;
+    }
+    default:
+      //
+      ;
+  }
+  return 0;
+}
