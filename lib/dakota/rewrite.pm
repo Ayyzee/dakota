@@ -120,7 +120,8 @@ my $rewrite_compound_literal_names = {
                                       'vector' =>   undef,
                                      };
 
-my $use_compound_literals = $ENV{'DK_USE_COMPOUND_LITERALS'};
+my $use_compound_literals = 1;
+$use_compound_literals = 0 if $ENV{'DK_NO_COMPOUND_LITERALS'};
 sub rewrite_compound_literal {
   my ($filestr_ref) = @_;
   foreach my $name (keys %$rewrite_compound_literal_names) {

@@ -112,7 +112,7 @@ my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
-  if (exists $ENV{'DK_ABS_PATH'}) {
+  if ($ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
     return "$cwd/$objdir/$name.$ext";
   } else {
@@ -1998,7 +1998,7 @@ sub generate_klass_construct {
   my $col = '';
   if ($$klass_scope{'slots'}{'cat'} &&
       'struct' eq $$klass_scope{'slots'}{'cat'}) {
-    if (!$ENV{'DK_USE_COMPOUND_LITERALS'}) {
+    if ($ENV{'DK_NO_COMPOUND_LITERALS'}) {
       if (&has_slots_info($klass_scope)) {
         my ($names, $pairs, $pairs_w_expr) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
         #print "generate-klass-construct: " . &Dumper($$klass_scope{'slots'}{'info'});
@@ -4160,11 +4160,11 @@ sub dk_generate_cc {
   print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # user-dk-cc
   my $remove;
 
-  if (exists $ENV{'DK_NO_LINE'}) {
+  if ($ENV{'DK_NO_LINE'}) {
     &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1);
   } else {
     my $num = 1;
-    if (exists $ENV{'DK_ABS_PATH'}) {
+    if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
       &write_to_file_converted_strings("$output", [ "#line $num \"$cwd/$file_basename.dk\"\n", $filestr ], $remove = 1);
     } else {
