@@ -103,7 +103,7 @@ klass hashed-set {
 //       if (should-throw && nullptr != element)
 //         throw make(exception::klass, #message : "oops");
 
-      if (nullptr != element) {
+      if (nullptr == element) {
         dk::add-first(deque, object1);
         self.size++; // bugbug - could wrap
       }
