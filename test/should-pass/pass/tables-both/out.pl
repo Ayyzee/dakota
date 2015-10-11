@@ -33,7 +33,7 @@ print "static str_pair_t str_pair[] = {\n";
 
 my $i = 0;
 while (my ($first, $last) = each (%$tbl)) {
-  if ($i == 16) { last; }
+  if ($i == 32) { last; }
   $i++;
   print "  { .first = \"$first\", .last = \"$last\" },\n";
 }
