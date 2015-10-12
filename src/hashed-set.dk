@@ -45,7 +45,6 @@ klass hashed-set {
     object-t buckets; // a vector of deques
     uint32-t size;
 
-
     uint32-t iterator-state;
   }
   object-t initialize(object-t kls) {
@@ -61,10 +60,9 @@ klass hashed-set {
   // using compound literals 'items' can be used as follows:
   // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
-  method object-t init(object-t self,
-                       object-t          elements : nullptr,
-                       object-t*         items :    nullptr) {
-
+  method object-t init(object-t  self,
+                       object-t  elements : nullptr,
+                       object-t* items :    nullptr) {
     self = dk::init(super);
     self.num-buckets = gbl-prime;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);
@@ -80,15 +78,14 @@ klass hashed-set {
     return self;
   }
   method object-t add(object-t self, object-t object1) {
-    self.iterator-state++;
-
     uint32-t index = dk::hash(object1) % self.num-buckets;
     object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
       deque = make(deque::klass);
-      dk::add-first(deque, object1);
+      self.iterator-state++;
       self.size++; // bugbug - could wrap
+      dk::add-first(deque, object1);
       // why use replace-at?  should be add-at
       dk::replace-at(self.buckets, index, deque);
     } else {
@@ -100,19 +97,19 @@ klass hashed-set {
           break;
         }
       }
-//       if (should-throw && nullptr != element)
-//         throw make(exception::klass, #message : "oops");
-
       if (nullptr == element) {
-        dk::add-first(deque, object1);
+        self.iterator-state++;
         self.size++; // bugbug - could wrap
+        dk::add-first(deque, object1);
       }
     }
     return object1;
   }
   method object-t empty(object-t self) {
-    self.iterator-state++;
-    dk::empty(self.buckets);
+    if (0 != self.size) {
+      self.iterator-state++;
+      dk::empty(self.buckets);
+    }
     return self;
   }
   method object-t at(object-t self, object-t object1, object-t default-value) {
@@ -155,7 +152,6 @@ klass hashed-set {
     return state;
   }
   method object-t remove(object-t self, object-t element1) {
-    self.iterator-state++;
     object-t object = null;
 
     uint32-t index = dk::hash(element1) % self.num-buckets;
@@ -170,6 +166,7 @@ klass hashed-set {
         if (dk::equal?(element2, element1)) { // arg order matters here!!
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
+          self.iterator-state++;
           object = dk::remove(forward-iterator); //element2
           self.size--;
           break;
