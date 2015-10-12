@@ -8,7 +8,7 @@ dirs="should-pass/pass"
 
 for dir in $dirs; do
   path=check-history/$dir/$num.txt
-  echo $path >> check-history/$dir.txt
   bin/check.pl --output $path $dir/*/
+  echo $path >> check-history/$dir.txt
   cat $path
 done
