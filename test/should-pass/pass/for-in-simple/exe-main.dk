@@ -1,0 +1,19 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass deque;
+klass iter-pair;
+klass pair;
+klass sequence;
+klass str;
+klass string;
+
+int-t main()
+{
+  object-t sequence = make(deque::klass);
+  dk::add-first(sequence, str::box("mother"));
+  dk::add-first(sequence, str::box("father"));
+
+  for (object-t element in sequence)
+    fprintf(stderr, "%s\n", *str::unbox(element));
+  return 0;
+}

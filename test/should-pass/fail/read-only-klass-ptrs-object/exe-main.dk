@@ -1,0 +1,10 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass object;
+
+int-t main()
+{
+  object::klass = nullptr; // this should fail
+
+  return 0;
+}

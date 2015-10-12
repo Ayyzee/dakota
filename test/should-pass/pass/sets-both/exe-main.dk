@@ -1,0 +1,45 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#include <stdio.h>
+#include <assert.h>
+
+#include "out.cc"
+
+klass sorted-set;
+klass hashed-set;
+klass pair;
+klass uint32;
+
+static int-t check(object-t klass, str-pair-t* sp, size-t sp-len)
+{
+  int-t result = 0;
+  object-t collection = make(klass);
+
+  fprintf(stderr, "%s:\n", name-of(klass));
+  fprintf(stderr, "  add():\n");
+  for (uint32-t i = 0; i < sp-len; i++) {
+    object-t first = str::box(sp[i].first);
+    dk::add(collection, first);
+  }
+
+  fprintf(stderr, "  at():\n");
+  for (uint32-t i = 0; i < sp-len; i++) {
+    object-t first = dk::at(collection, str::box(sp[i].first), nullptr);
+    if (nullptr != first)
+      fprintf(stdout, "    first: %s/%s\n", sp[i].first, *str::unbox(first));
+    else {
+      fprintf(stdout, "    FAILED: first: %s\n", sp[i].first);
+      result = 1;
+    }
+  }
+  return result;
+}
+
+int-t main()
+{
+  size-t str-pair-len = DK-COUNTOF(str-pair);
+  
+  int-t r1 = 0; //check(sorted-set::klass, str-pair, str-pair-len);
+  int-t r2 = check(hashed-set::klass, str-pair, str-pair-len);
+  return r1 || r2;
+}

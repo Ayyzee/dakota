@@ -1,0 +1,30 @@
+tu: files (translation units)
+lu: exes/libs (linkage units)
+
+klasses -> klasses, traits, generics/selectors, slots
+
+determining klasses:
+  superklass chain
+  klass chain
+  ?qual-ident::klass
+  ?qual-ident::box
+  ?qual-ident::unbox
+  ?qual-ident::slots-t (maybe only slots)
+  make(?qual-ident::klass
+  klass-for-name(?symbol-literal)
+  #[, #{, #(
+  catch (?qual-ident::klass
+
+klasses can depend on:
+  klasses
+  slots
+  types defined in header files
+  internally:
+    generic functions
+    direct methods
+
+generic functions can depend on
+  klasses
+  slots
+  types defined in header files
+  
