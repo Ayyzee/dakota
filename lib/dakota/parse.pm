@@ -2078,7 +2078,7 @@ sub rep_tree_from_dk_path {
   pos $_ = 0;
   $_ =~ s/(\bcase\s)\s+/$1/g;
   pos $_ = 0;
-  while (m/(?<!\bcase\s)($id)\s*$colon/g) {
+  while (m/(?<!\bcase\s)($mid)\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
