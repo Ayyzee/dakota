@@ -362,6 +362,7 @@ sub generate_rt {
       &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/rt/%.$dkhh_ext
     }
     &write_to_file_converted_strings($output, [ $str_hh ]);
+    print "    creating $output ... done" . &pann(__FILE__, __LINE__) . "\n"; # rt-hh
     return "$dir/$name.$hh_ext";
   } else {
     my $pre_output = "$dir/$name.$dkcc_ext";
@@ -396,6 +397,7 @@ sub generate_rt {
       &write_to_file_strings($pre_output, [ $str_cc ]); # generated $objdir/rt/%.$dkcc_ext
     }
     &write_to_file_converted_strings($output, [ $str_cc ]);
+    print "    creating $output ... done" . &pann(__FILE__, __LINE__) . "\n"; # rt-cc
     return $output;
   }
 } # sub generate_rt
@@ -435,9 +437,9 @@ sub colout {
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $suffix) = @_;
   my $result = {};
-  my $klass_names = &order_klasses($file);
+  my $ordered_klass_names = &order_klasses($file);
 
-  $$result{"headers-hh"} =             &linkage_unit::generate_headers(        $file, $klass_names);
+  $$result{"headers-hh"} =             &linkage_unit::generate_headers(        $file, $ordered_klass_names);
   $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $generics, $symbols);
   $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, $generics, $symbols);
   $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file, $generics, $symbols);
@@ -449,7 +451,7 @@ sub generate_decl_defn {
   $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq( $file, $generics);
 
   my $col; my $klass_path;
-  $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $col = '', $klass_path = [], $klass_names);
+  $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $col = '', $klass_path = [], $ordered_klass_names);
 
   return $result;
 } # generate_decl_defn
@@ -1054,7 +1056,7 @@ sub common::generate_signature_defns {
 
   $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach my $generic (@$generics) {
+  foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
       if (!&is_slots($generic)) {
@@ -1070,7 +1072,7 @@ sub common::generate_signature_defns {
     $scratch_str .= "#if 0\n";
     $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
-    foreach my $generic (@$generics) {
+    foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
         my $keyword_types = $$varargs_generic{'keyword-types'} ||= undef;
@@ -1086,7 +1088,7 @@ sub common::generate_signature_defns {
   } # if ()
   $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach my $generic (@$generics) {
+  foreach my $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
       if (!&is_slots($generic)) {
@@ -1156,7 +1158,7 @@ sub common::generate_selector_defns {
 
   $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach my $generic (@$generics) {
+  foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
       if (!&is_slots($generic)) {
@@ -1172,7 +1174,7 @@ sub common::generate_selector_defns {
     $scratch_str .= "#if 0\n";
     $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
-    foreach my $generic (@$generics) {
+    foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
         my $varargs_generic = &method::varargs_from_qual_va_list($generic);
         my $keyword_types = $$varargs_generic{'keyword-types'} ||= undef;
@@ -1188,7 +1190,7 @@ sub common::generate_selector_defns {
   } # if ()
   $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach my $generic (@$generics) {
+  foreach my $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       my $keyword_types = $$generic{'keyword-types'} ||= undef;
       if (!&is_slots($generic)) {
@@ -1207,7 +1209,7 @@ sub va_generics {
   my ($generics, $name) = @_;
   my $va_generics = [];
   my $fa_generics = [];
-  foreach my $generic (@$generics) {
+  foreach my $generic (sort method::compare @$generics) {
     if (!$name || $name eq "@{$$generic{'name'}}") {
       if (&is_va($generic)) {
         &dakota::util::add_last($va_generics, $generic);
@@ -1232,7 +1234,7 @@ sub generics::generate_signature_seq {
   } else {
     $scratch_str .= $col . "static signature-t const* const signatures-va[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     my $max_width = 0;
-    foreach $generic (@$va_generics) {
+    foreach $generic (sort method::compare @$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
       my $width = length($method_type);
       if ($width > $max_width) {
@@ -1240,7 +1242,7 @@ sub generics::generate_signature_seq {
       }
     }
     $col = &colin($col);
-    foreach $generic (@$va_generics) {
+    foreach $generic (sort method::compare @$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
       my $width = length($method_type);
       my $pad = ' ' x ($max_width - $width);
@@ -1256,7 +1258,7 @@ sub generics::generate_signature_seq {
   } else {
     $scratch_str .= $col . "static signature-t const* const signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     my $max_width = 0;
-    foreach $generic (@$va_generics) {
+    foreach $generic (sort method::compare @$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
       my $width = length($method_type);
       if ($width > $max_width) {
@@ -1296,7 +1298,7 @@ sub generics::generate_selector_seq {
     $col = &colin($col);
     my $max_width = 0;
     my $max_name_width = 0;
-    foreach $generic (@$va_generics) {
+    foreach $generic (sort method::compare @$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
       my $width = length($method_type);
       if ($width > $max_width) {
@@ -1309,7 +1311,7 @@ sub generics::generate_selector_seq {
         $max_name_width = $name_width;
       }
     }
-    foreach $generic (@$va_generics) {
+    foreach $generic (sort method::compare @$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
       my $width = length($method_type);
       my $pad = ' ' x ($max_width - $width);
@@ -1366,7 +1368,7 @@ sub generics::generate_selector_seq {
 }
 sub generics::generate_va_generic_defns {
   my ($generics, $is_inline, $col) = @_;
-  foreach my $generic (@$generics) {
+  foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       my $scope = [];
       &path::add_last($scope, 'dk');
@@ -1573,7 +1575,7 @@ sub generics::generate_generic_defns {
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach $generic (@$generics) {
+  foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
         &generics::generate_generic_defn($generic, $is_inline, $col);
@@ -1585,7 +1587,7 @@ sub generics::generate_generic_defns {
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-super-t");
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach $generic (@$generics) {
+  foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
         &generics::generate_super_generic_defn($generic, $is_inline, $col);
@@ -1601,7 +1603,7 @@ sub generics::generate_generic_defns {
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t");
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach $generic (@$generics) {
+  foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
         &generics::generate_generic_defn($generic, $is_inline, $col);
@@ -1613,7 +1615,7 @@ sub generics::generate_generic_defns {
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t");
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  foreach $generic (@$generics) {
+  foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
         &generics::generate_super_generic_defn($generic, $is_inline, $col);
@@ -2530,7 +2532,8 @@ sub order_klasses {
   my ($klass_name, $klass_scope);
 
   foreach my $klass_type_plural ('traits', 'klasses') {
-    while (($klass_name, $klass_scope) = each (%{$$scope{$klass_type_plural}})) {
+    foreach $klass_name (keys %{$$scope{$klass_type_plural}}) {
+      $klass_scope = $$scope{$klass_type_plural}{$klass_name};
       if (!$klass_scope) {
         $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
       }
@@ -2566,7 +2569,8 @@ sub order_klasses {
     print STDERR &Dumper($type_aliases);
   }
   foreach my $klass_type_plural ('traits', 'klasses') {
-    while (($klass_name, $klass_scope) = each (%{$$scope{$klass_type_plural}})) {
+    foreach $klass_name (keys %{$$scope{$klass_type_plural}}) {
+      $klass_scope = $$scope{$klass_type_plural}{$klass_name};
       if (!$klass_scope) {
         $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
       }
@@ -2628,14 +2632,14 @@ sub order_klasses {
 sub order_depends {
   my ($depends) = @_;
   my $ordered_klasses = { 'seq' => [], 'set' => {} };
-  while (my ($klass_name, $dummy) = each %$depends) {
+  foreach my $klass_name (keys %$depends) {
     &order_depends_recursive($depends, $klass_name, $ordered_klasses);
   }
   return $ordered_klasses;
 }
 sub order_depends_recursive {
   my ($depends, $klass_name, $ordered_klasses) = @_;
-  while (my ($lhs, $dummy) = each %{$$depends{$klass_name}}) {
+  foreach my $lhs (keys %{$$depends{$klass_name}}) {
     &order_depends_recursive($depends, $lhs, $ordered_klasses);
   }
   &add_ordered($ordered_klasses, $klass_name);
@@ -2667,10 +2671,10 @@ sub klass_part {
   }
 }
 sub linkage_unit::generate_klasses {
-  my ($scope, $col, $klass_path, $klass_names) = @_;
+  my ($scope, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path, $klass_names);
+  &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path, $ordered_klass_names);
   if (&is_decl()) {
     $$scratch_str_ref .=
       "\n" .
@@ -2686,20 +2690,20 @@ sub linkage_unit::generate_klasses {
     $$scratch_str_ref .= "\n";
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
-  &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $klass_names);
+  &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $ordered_klass_names);
 
   $$scratch_str_ref .= &labeled_src_str(undef, "klass-defns");
-  foreach my $klass_name (@$klass_names) {
+  foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass($scope, $col, $klass_path, $klass_name);
   }
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses_types_before {
-  my ($scope, $col, $klass_path, $klass_names) = @_;
+  my ($scope, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= &labeled_src_str(undef, "klass-decls");
   if (&is_decl()) {
-    foreach my $klass_name (@$klass_names) {
+    foreach my $klass_name (@$ordered_klass_names) { # do not sort!
       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
       if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
@@ -2711,9 +2715,9 @@ sub linkage_unit::generate_klasses_types_before {
   }
 }
 sub linkage_unit::generate_klasses_types_after {
-  my ($scope, $col, $klass_path, $klass_names) = @_;
+  my ($scope, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  foreach my $klass_name (@$klass_names) {
+  foreach my $klass_name (@$ordered_klass_names) { # do not sort!
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
     my $is_exported;
     my $is_slots;
