@@ -1811,7 +1811,7 @@ sub generate_enum_defn {
     $$scratch_str_ref .= 'slots enum';
   }
   elsif ($$enum{'type'}) {
-    $$scratch_str_ref .= 'enum' . @{$$enum{'type'}};
+    $$scratch_str_ref .= 'enum' . " @{$$enum{'type'}}";
   } else {
     $$scratch_str_ref .= 'enum';
   }
@@ -1838,7 +1838,7 @@ sub generate_enum_defn {
     }
   }
   $col = &colout($col);
-  $$scratch_str_ref .= $col . '}';
+  $$scratch_str_ref .= $col . '};';
 }
 sub parameter_list_from_slots_info {
   my ($slots_info) = @_;
