@@ -2532,9 +2532,11 @@ sub order_klasses {
   my ($klass_name, $klass_scope);
 
   foreach my $klass_type_plural ('traits', 'klasses') {
-    foreach $klass_name (keys %{$$scope{$klass_type_plural}}) {
+    foreach $klass_name (sort keys %{$$scope{$klass_type_plural}}) {
       $klass_scope = $$scope{$klass_type_plural}{$klass_name};
-      if (!$klass_scope) {
+      if (!$klass_scope || !$$klass_scope{'slots'}) {
+        # if one has a klass scope locally (like adding a method on klass object)
+        # dont use it since it won't have a slots defn
         $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
       }
       if ($klass_scope) {
@@ -2569,9 +2571,11 @@ sub order_klasses {
     print STDERR &Dumper($type_aliases);
   }
   foreach my $klass_type_plural ('traits', 'klasses') {
-    foreach $klass_name (keys %{$$scope{$klass_type_plural}}) {
+    foreach $klass_name (sort keys %{$$scope{$klass_type_plural}}) {
       $klass_scope = $$scope{$klass_type_plural}{$klass_name};
-      if (!$klass_scope) {
+      if (!$klass_scope || !$$klass_scope{'slots'}) {
+        # if one has a klass scope locally (like adding a method on klass object)
+        # dont use it since it won't have a slots defn
         $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
       }
       if ($klass_scope) {
@@ -2632,14 +2636,14 @@ sub order_klasses {
 sub order_depends {
   my ($depends) = @_;
   my $ordered_klasses = { 'seq' => [], 'set' => {} };
-  foreach my $klass_name (keys %$depends) {
+  foreach my $klass_name (sort keys %$depends) {
     &order_depends_recursive($depends, $klass_name, $ordered_klasses);
   }
   return $ordered_klasses;
 }
 sub order_depends_recursive {
   my ($depends, $klass_name, $ordered_klasses) = @_;
-  foreach my $lhs (keys %{$$depends{$klass_name}}) {
+  foreach my $lhs (sort keys %{$$depends{$klass_name}}) {
     &order_depends_recursive($depends, $lhs, $ordered_klasses);
   }
   &add_ordered($ordered_klasses, $klass_name);
