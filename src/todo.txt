@@ -1,9 +1,7 @@
 add trailig ! to more danerous version of methods
-add safer versions of ! metthods
+add safer versions of ! methods
 
 sort out mutable/immutable design
-
-fix emacs dakota-mode finding
 
 superklass-of() => dk::superklass()
 name-of() =>       dk::name()
@@ -41,12 +39,11 @@ have test/bin/check.pl read dirs from stdin
 
 add --debug=, --optimize= to dakota to pass through to compiler
 
-dakota.dk: name-from-address() should also return the shared library name (better error reporting)
-
 make REASSOC-AND-ADD-METHOD-FOR-SELECTOR(3) an inline function
 
 http://www.rubyinside.com/what-rubys-double-pipe-or-equals-really-does-5488.html
 
-int l = info@len;
+my $len = $$info{size}{len}
+int l = info@size@len;
 =>
-int l = dk::at(info, len);
+int l = dk::at(dk::at(info, size), len);
