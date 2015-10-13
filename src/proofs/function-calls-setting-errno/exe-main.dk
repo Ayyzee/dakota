@@ -1,0 +1,46 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#include <errno.h>
+
+#define EXCEPT(...) __except__(__VA_ARGS__, __FILE__, __LINE__, __func__)
+
+klass errno-exception {
+  superklass exception;
+
+  slots {
+    str-t file;
+    int-t line;
+    str-t func;
+    int-t num;
+    str-t name;
+    str-t msg;
+  }
+  method object-t init(object-t self, str-t file : nullptr,
+                                      int-t line : 0,
+                                      str-t func : nullptr,
+                                      int-t num :  errno,
+                                      str-t name : strerror-name(errno),
+                                      str-t msg :  strerror(errno)) {
+    self = dk::init(super);
+    self.file = file;
+    self.line = line;
+    self.func = func;
+    self.num =  num;
+    self.name = name;
+    self.msg =  msg;
+    return self;
+  }
+}
+static void* __except__(void* p, str-t file, int-t line, str-t func) {
+  if (NULL == p)
+    throw make(errno-exception::klass, #file : file, #line : line, #func : func, #num : errno, #name : strerror-name(errno), #msg : strerror(errno));
+  return p;
+}
+static int-t __except__(int-t i, str-t file, int-t line, str-t func) {
+  if (-1 == i)
+    throw make(errno-exception::klass, #file : file, #line : line, #func : func, #num : errno, #name : strerror-name(errno), #msg : strerror(errno));
+  return i;
+}
+int-t main() {
+  return 0;
+}
