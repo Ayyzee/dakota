@@ -2,41 +2,36 @@
 
 klass uint32;
 
-klass d
+klass dd
 {
   slots uint32-t;
 }
-klass c
+klass cc
 {
   slots
   {
-    d::slots-t a1;
-    d-t       a2;
+    dd::slots-t a1;
+    dd-t        a2;
   }
 }
-klass b
+klass bb
 {
   slots
   {
-    c::slots-t  ai5;
-    c-t        ai6;
-    c::slots-t* ai7;
-    c-t*       ai8;
+    cc::slots-t  ai5;
+  //cc-t         ai6;
+    cc::slots-t* ai7;
+  //cc-t*        ai8;
   }
 }
-klass a
+klass aa
 {
   slots
   {
-    b::slots-t    ai1;
-    b-t          ai2;
-    b::slots-t*   ai3;
-    b-t*         ai4;
-
-    c::slots-t  ai5;
-    c-t        ai6;
-    c::slots-t* ai7;
-    c-t*       ai8;
+    bb::slots-t    ai1;
+  //bb-t           ai2;
+    bb::slots-t*   ai3;
+  //bb-t*          ai4;
   }
 }
 
