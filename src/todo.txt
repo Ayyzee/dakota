@@ -47,3 +47,5 @@ my $len = $$info{size}{len}
 int l = info@size@len;
 =>
 int l = dk::at(dk::at(info, size), len);
+
+flush out signal-exception klasses (move/reorg some code from dakota.dk)
