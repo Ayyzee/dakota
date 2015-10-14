@@ -39,7 +39,7 @@ int-t main()
 {
   size-t str-pair-len = DK-COUNTOF(str-pair);
   
-  int-t r1 = 0; //check(sorted-set::klass, str-pair, str-pair-len);
+  int-t r1 = check(sorted-set::klass, str-pair, str-pair-len);
   int-t r2 = check(hashed-set::klass, str-pair, str-pair-len);
   return r1 || r2;
 }
