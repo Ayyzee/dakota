@@ -171,8 +171,9 @@ sub add_visibility {
         my $klass_name = $1;
         # klass/trait
         if ($debug) { print STDERR "klass/trait:        $klass_name\n"; }
-        if ($$root{'klasses'}{$klass_name} &&
-		    $$root{'klasses'}{$klass_name}{'module'} eq $name) {
+        if ($$root{'klasses'}{$klass_name}
+         && $$root{'klasses'}{$klass_name}{'module'}
+         && $$root{'klasses'}{$klass_name}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'exported?'} = 22;
         }
         if ($$root{'traits'}{$klass_name}) {

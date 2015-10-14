@@ -6,8 +6,8 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'CXX' => [ 'clang++' ],
-  # clang does not understand --visibility nor --dollars-in-identifiers
-  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fdollars-in-identifiers' ],
+  # clang does not understand --visibility=, --dollars-in-identifiers, nor --non-call-exceptions
+  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fdollars-in-identifiers', '-fnon-call-exceptions' ],
   'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
   # clang does not understand --PIC
   'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ],
