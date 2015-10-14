@@ -49,6 +49,7 @@
       '$(srcdir)/selector.dk',
       '$(srcdir)/sequence.dk',
       '$(srcdir)/set.dk',
+      '$(srcdir)/signal-exception.dk',
       '$(srcdir)/signature.dk',
       '$(srcdir)/singleton-klass.dk',
       '$(srcdir)/size.dk',
