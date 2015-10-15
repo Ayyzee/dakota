@@ -39,8 +39,6 @@ have test/bin/check.pl read dirs from stdin
 
 add --debug=, --optimize= to dakota to pass through to compiler
 
-make REASSOC-AND-ADD-METHOD-FOR-SELECTOR(3) an inline function
-
 http://www.rubyinside.com/what-rubys-double-pipe-or-equals-really-does-5488.html
 
 my $len = $$info{size}{len}

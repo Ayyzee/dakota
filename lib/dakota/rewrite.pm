@@ -340,25 +340,6 @@ sub remove_extra_whitespace {
   $str =~ s|__WHITESPACE__| |g;
   return $str;
 }
-sub rewrite_reassoc_and_add_method_for_selector_sub {
-  my ($ws1, $ws2, $arglist) = @_;
-  my $members_info = &arglist_members($arglist);
-  #my $offset = $$members_info[0];
-  my ($kls, $selector1, $selector2, $function) = @{$$members_info[1]};
-  my $result = '';
-  my $xws = ' ' x length("$kls");
-
-  $result .= sprintf("%s dk::add-method-for-selector%s(%s,                         %s,\n",   $ws1, $ws2, $kls,       $selector1);
-  $result .= sprintf("%s                            %s dk::method-for-selector(%s, %s));\n", $ws1, $ws2,       $kls, $selector2);
-  #
-  $result .= sprintf("%s dk::add-method-for-selector%s(%s,                         %s,\n",   $ws1, $ws2, $kls,       $selector2);
-  $result .= sprintf("%s                            %s cast(method-t)          %s  %s);",    $ws1, $ws2, $xws,       $function);
-  return $result;
-}
-sub rewrite_reassoc_and_add_method_for_selector {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/( *)REASSOC-AND-ADD-METHOD-FOR-SELECTOR( *)\(($main::list_in)\)\s*;/&rewrite_reassoc_and_add_method_for_selector_sub($1, $2, $3)/egms;
-}
 sub arglist_members {
   my ($arglist, $i) = @_;
   my $result = [];
@@ -952,7 +933,6 @@ sub convert_dk_to_cc {
   &rewrite_sentinal_generic_uses($filestr_ref, $kw_args_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_args_generics);
-  &rewrite_reassoc_and_add_method_for_selector($filestr_ref);
   &rewrite_functions($filestr_ref);
   &rewrite_for_each($filestr_ref);
   &rewrite_unboxes($filestr_ref);

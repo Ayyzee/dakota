@@ -79,13 +79,15 @@ trait table {
     return last;
   }
   object-t initialize(object-t kls) {
-    REASSOC-AND-ADD-METHOD-FOR-SELECTOR(kls, selector( pair-at(object-t, object-t)),
-                                             selector(      at(object-t, object-t)),
-                                             cast(object-t (*)(object-t, object-t))at);
+    dk::reassoc-and-add-method-for-selector(kls,
+                                            selector(               pair-at(object-t, object-t)),
+                                            selector(                    at(object-t, object-t)),
+                                            cast(method-t)cast(object-t (*)(object-t, object-t))at);
 
-    REASSOC-AND-ADD-METHOD-FOR-SELECTOR(kls, selector( pair-at(object-t, object-t, object-t)),
-                                             selector(      at(object-t, object-t, object-t)),
-                                             cast(object-t (*)(object-t, object-t, object-t))at);
+    dk::reassoc-and-add-method-for-selector(kls,
+                                            selector(               pair-at(object-t, object-t, object-t)),
+                                            selector(                    at(object-t, object-t, object-t)),
+                                            cast(method-t)cast(object-t (*)(object-t, object-t, object-t))at);
     return kls;
   }
   object-t finalize(object-t kls) {
