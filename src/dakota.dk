@@ -148,8 +148,6 @@ init-runtime-ds() {
 extern resource-usage::slots-t gbl-ru;
 #endif
 
-typedef int32-t (*)(void*, void*) vcompare-t;
-
 static DKT-RODATA-SECTION object-t null-klass = nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t null =       nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t std-input =  nullptr;
