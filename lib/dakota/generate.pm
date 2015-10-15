@@ -1140,7 +1140,7 @@ sub common::print_selector {
     my $parameter_types_str = $$new_arg_type_list;
     my $null_selector = 0;
 
-    $scratch_str .= $col . "static selector-t result = $null_selector;\n";
+    $scratch_str .= $col . "static DKT-RODATA-SECTION selector-t result = $null_selector;\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
     if (&is_va($generic)) {

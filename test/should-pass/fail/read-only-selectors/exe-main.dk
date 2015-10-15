@@ -1,0 +1,15 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#define selector-ptr(name, args) (cast(dkt_selector_function_t)(cast(selector_t* (*)args) __selector::name))()
+
+int-t main()
+{
+  selector-t sel = selector(hash(object-t));
+  USE(sel);
+  selector-t* sel-ptr = selector-ptr(hash,(object-t));
+  fprintf(stderr, "sel=%lu\n", *sel-ptr);
+  *sel-ptr = cast(selector-t)0; // this should fail
+  fprintf(stderr, "sel=%lu\n", *sel-ptr);
+
+  return 0;
+}
