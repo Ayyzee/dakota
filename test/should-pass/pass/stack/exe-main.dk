@@ -1,51 +1,22 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass deque;
-klass exception;
-klass no-such-method-exception;
 klass vector;
 
 int-t main()
 {
-//   fprintf(stderr, "main()\n");
-  int-t rtn = 0;
+  object-t stack;
+  object-t element;
 
-  try
-  {
-    {
-    object-t stack;
-    object-t element;
+  stack = make(vector::klass);
+  dk::push(stack, null);
+  element = dk::pop(stack);
+  assert(null == element);
 
-    stack = make(vector::klass);
-    dk::push(stack, null);
-    element = dk::pop(stack);
+  stack = make(deque::klass);
+  dk::push(stack, null);
+  element = dk::pop(stack);
+  assert(null == element);
 
-    stack = make(deque::klass);
-    dk::push(stack, null);
-    element = dk::pop(stack);
-    }
-  }
-  catch(no-such-method-exception::klass e)
-  {
-    USE(e);
-    fprintf(stderr, "ERROR: catch-ed instance-of(no-such-method-exception::klass)\n");
-    rtn = 1;
-  }
-  catch(exception::klass e)
-  {
-    USE(e);
-    fprintf(stderr, "ERROR: catch-ed instance-of(exception::klass)\n");
-    rtn = 1;
-  }
-  catch(const char8-t* msg)
-  {
-    fprintf(stderr, "ERROR: catch-ed %s\n", msg);
-    rtn = 1;
-  }
-  catch(...)
-  {
-    fprintf(stderr, "ERROR: uncaught unknown exception was thrown\n");
-    rtn = 1;
-  }
-  return rtn;
+  return 0;
 }

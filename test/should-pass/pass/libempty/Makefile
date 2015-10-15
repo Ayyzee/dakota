@@ -1,6 +1,8 @@
 rootdir := ../../../..
 
-include $(rootdir)/dakota.mk
+include $(rootdir)/test/vars.mk
+include $(rootdir)/test/project-vars.mk
+include $(rootdir)/test/rules.mk
 
 .PHONY:\
  all\

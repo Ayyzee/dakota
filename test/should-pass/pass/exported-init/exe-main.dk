@@ -10,16 +10,7 @@ klass thing
 
 int-t main()
 {
-  int-t status = 0;
-  try
-  {
-    object-t o = make(thing::klass);
-    USE(o);
-  }
-  catch(...)
-  {
-    fprintf(stderr, "ERROR: uncaught unknown exception was thrown\n");
-    status = 1;
-  }
-  return status;
+  object-t o = make(thing::klass);
+  USE(o);
+  return 0;
 }
