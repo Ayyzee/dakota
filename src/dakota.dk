@@ -1200,7 +1200,7 @@ dump-klass(ofile-t ofl, named-info-t* klass-info) {
 void import-selectors(signature-t**, selector-node-t*); // hackhack
 
 klass get-segment-data {
-  slots void* (*)(char-t const*, void**, size-t*);
+  slots void* (*)(char8-t const*, void**, size-t*);
 }
 klass registration-info {
   slots {

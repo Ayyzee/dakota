@@ -171,7 +171,7 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
     (((cast(int32_t)cast(char8_t) c4) <<  0) & 0x000000ff))
 
 #if !defined NUL
-  #define    NUL cast(char_t)0
+  #define    NUL cast(char8_t)0
 #endif
 
 // boole-t is promoted to int-t when used in va_arg() macro

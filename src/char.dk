@@ -17,17 +17,14 @@
 module dakota;
 
 klass char8 {
-  slots char-t;
+  slots char;
 }
 klass uchar8 {
-  slots uchar-t;
+  slots unsigned char;
 }
 klass schar8 {
-  slots schar-t;
+  slots signed char;
 }
-klass wchar {
-  slots wchar-t;
-} // typedef wchar::slots-t wchar-t is illegal since wchar-t is a fundamental type
 klass char16 {
   slots char16-t;
 }
