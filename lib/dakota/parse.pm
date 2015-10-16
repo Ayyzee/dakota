@@ -2080,15 +2080,11 @@ sub rep_tree_from_dk_path {
   pos $_ = 0;
   $_ =~ s/(\bcase\s)\s+/$1/g;
   pos $_ = 0;
-  while (m/(?<!\bcase\s)($mid)\s*$colon/g) {
+  while (m/(?<!\bcase\b)\s*($mid)\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/(?<!\bcase\s)($mid)\s*$colon/g) {
-    &add_keyword($gbl_root, $1);
-  }
-  pos $_ = 0;
-  while (m/(?<!\bcase\s)\#\'(.*?)\'\s*$colon/g) {
+  while (m/(?<!\bcase)\s*\#\'(.*?)\'\s*$colon/g) {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
@@ -2100,15 +2096,15 @@ sub rep_tree_from_dk_path {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\bcase\s"(.*)"\s*:/g) {
+  while (m/\bcase\s*"(.*)"\s*:/g) {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\bcase\s\#(.*)\s*:/g) {
+  while (m/\bcase\s*\#(.*)\s*:/g) {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/(?<!\bcase\s)\#($mid)/g) {
+  while (m/(?<!\bcase)\s*\#($mid)/g) {
     &add_symbol($gbl_root, [$1]);
   }
   &decode_comments(\$_);

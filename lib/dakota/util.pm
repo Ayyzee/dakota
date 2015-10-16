@@ -195,7 +195,7 @@ sub needs_hex_encoding {
   }
   return 0;
 }
-sub encode_char { my ($char) = @_; return sprintf("x%02x", ord($char)); }
+sub encode_char { my ($char) = @_; return sprintf("%02x", ord($char)); }
 sub make_ident_symbol_scalar {
   my ($symbol) = @_;
   my $k = qr/[\w-]/;
@@ -215,6 +215,7 @@ sub make_ident_symbol_scalar {
     }
     &dakota::util::add_last($ident_symbol, $part);
   }
+  &dakota::util::add_last($ident_symbol, '_');
   my $value = &path::string($ident_symbol);
   return $value;
 }
