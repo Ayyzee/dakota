@@ -6,7 +6,7 @@ klass k1
 {
   method object-t foo(object-t self)
   {
-    dk::foo(super);
+    $foo(super);
     return self;
   }
 }
@@ -14,6 +14,6 @@ klass k1
 int-t main()
 {
   object-t o = make(k1::klass);
-  dk::foo(o);
+  $foo(o);
   return 0;
 }

@@ -5,19 +5,19 @@ klass k1
   method object-t retain(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk::retain(super);
+    return $retain(super);
   }
 
   method object-t release(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk::release(super);
+    return $release(super);
   }
 
   method object-t dealloc(object-t self)
   {
     printf("%s:%s(%p)\n", __klass__, __method__, (void*)self);
-    return dk::dealloc(super);
+    return $dealloc(super);
   }
 }
 
@@ -27,11 +27,11 @@ int-t main()
   uint32-t c = 2;
 
   for (uint32-t i = 0; i < c; i++)
-    dk::retain(s);
+    $retain(s);
   printf("---\n");
 
   for (uint32-t i = 0; i < c + 1; i++)
-    dk::release(s);
+    $release(s);
 
   return 0;
 }

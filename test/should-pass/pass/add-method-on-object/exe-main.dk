@@ -13,6 +13,6 @@ klass object
 int-t main()
 {
   object-t o = make(string::klass);
-  dk::foobar(o);
+  $foobar(o);
   return 0;
 }

@@ -23,11 +23,11 @@ int-t main() {
     printf("finally works\n");
   }
   object-t o = make(hashed-table::klass);
-  dk::dump(o);
-  dk::println(o, std-output);
-  printf("klass=%s\n", dk::utf8-from(klass-of(o)));
-  printf("superklass=%s\n", dk::utf8-from(dk::superklass(klass-of(o))));
-  dk::dump(dk::superklass(klass-of(o)));
+  $dump(o);
+  $println(o, std-output);
+  printf("klass=%s\n", $utf8-from(klass-of(o)));
+  printf("superklass=%s\n", $utf8-from($superklass(klass-of(o))));
+  $dump($superklass(klass-of(o)));
   #if defined DEBUG
   char8-t buf[1024] = "";
   printf("klass-chain=%s\n", dkt-get-klass-chain(klass-of(o), buf, sizeof(buf)));
@@ -39,13 +39,13 @@ int-t main() {
     #endif
     object-t null-klass = null->klass;
     object-t second-null = make(null-klass);
-    dk::dump(null);
+    $dump(null);
     printf("---\n");
-    dk::dump(second-null);
+    $dump(second-null);
     printf("---\n");
-    dk::dump(klass-of(null));
+    $dump(klass-of(null));
     printf("---\n");
-    dk::dump(klass-of(second-null));
+    $dump(klass-of(second-null));
   }
   return 0;
 }

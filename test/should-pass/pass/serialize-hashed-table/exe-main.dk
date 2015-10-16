@@ -8,11 +8,11 @@ int-t main()
 {
   object-t st = make(hashed-table::klass);
 
-  dk::add(st, #"key0", #"element0");
+  $add(st, #"key0", #"element0");
 
   object-t json-object-output-stream = make(json-object-output-stream::klass);
-  dk::write(json-object-output-stream, st);
+  $write(json-object-output-stream, st);
 
-  dk::close(json-object-output-stream);
+  $close(json-object-output-stream);
   return 0;
 }

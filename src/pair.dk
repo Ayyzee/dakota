@@ -35,25 +35,25 @@ klass pair {
   method object-t init(object-t self,
                        object-t first : null,
                        object-t last :  null) {
-    self = dk::init(super);
+    self = $init(super);
     self.first = first;
     self.last =  last;
     return self;
   }
   method object-t dump(object-t self) {
-    dk::dump(super);
-    dk::dump(self.first);
-    dk::dump(self.last);
+    $dump(super);
+    $dump(self.first);
+    $dump(self.last);
     return self;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
 
-    dk::write-element-idref(out, self.first, "first");
-    dk::write-element-idref(out, self.last,  "last");
+    $write-element-idref(out, self.first, "first");
+    $write-element-idref(out, self.last,  "last");
 
-    dk::write-slots-end(out);
+    $write-slots-end(out);
     return self;
   }
   method boole-t equal?(object-t self, object-t other) {
@@ -62,12 +62,12 @@ klass pair {
     object-t other-first;
     if (klass == klass-of(other))
       other-first = unbox(other)->first;
-    else-if (dk::method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
-      other-first = dk::first(other);
+    else-if ($method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
+      other-first = $first(other);
     else
       other-first = other;
     assert(nullptr != other-first);
-    boole-t result = dk::equal?(first, other-first);
+    boole-t result = $equal?(first, other-first);
     return result;
   }
   method int-t compare(object-t self, object-t other) {
@@ -76,18 +76,18 @@ klass pair {
     object-t other-first;
     if (klass == klass-of(other))
       other-first = unbox(other)->first;
-    else-if (dk::method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
-      other-first = dk::first(other);
+    else-if ($method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
+      other-first = $first(other);
     else
       other-first = other;
     assert(nullptr != other-first);
-    int-t result = dk::compare(first, other-first);
+    int-t result = $compare(first, other-first);
     return result;
   }
   method uintptr-t hash(object-t self) {
     object-t first = self.first;
     assert(nullptr != first);
-    uintptr-t result = dk::hash(first);
+    uintptr-t result = $hash(first);
     return result;
   }
   method object-t first(slots-t* s) {

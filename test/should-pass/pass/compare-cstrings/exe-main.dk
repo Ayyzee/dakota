@@ -2,7 +2,7 @@
 
 int-t main()
 {
-  intptr-t result = dk::compare(#"key0", #"element0");
+  intptr-t result = $compare(#"key0", #"element0");
   USE(result);
   return 0;
 }

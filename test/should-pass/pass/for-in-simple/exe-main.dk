@@ -10,8 +10,8 @@ klass string;
 int-t main()
 {
   object-t sequence = make(deque::klass);
-  dk::add-first(sequence, str::box("mother"));
-  dk::add-first(sequence, str::box("father"));
+  $add-first(sequence, str::box("mother"));
+  $add-first(sequence, str::box("father"));
 
   for (object-t element in sequence)
     fprintf(stderr, "%s\n", *str::unbox(element));

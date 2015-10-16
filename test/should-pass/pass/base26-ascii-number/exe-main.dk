@@ -8,7 +8,7 @@ int-t main() {
   int-t rtn = 0;
   object-t info = dk-make-named-info(#base26-ascii-number-klass, #superklass-name, #ascii-number, nullptr);
   object-t base26-ascii-number-klass = make(ascii-number-klass::klass, #info : info, #digits : "abcdefghijklmnopqrstuvwxyz");
-  dk::dump(base26-ascii-number-klass);
+  $dump(base26-ascii-number-klass);
   object-t base26-ascii-number = make(base26-ascii-number-klass, #number : 42);
   USE(base26-ascii-number);
   return rtn;

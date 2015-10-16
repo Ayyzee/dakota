@@ -3,6 +3,6 @@
 int-t main()
 {
   object-t o = make(object::klass);
-  dk::autorelease(o);
+  $autorelease(o);
   return 0;
 }

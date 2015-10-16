@@ -17,7 +17,7 @@ klass k1
   method object-t init(object-t self)
   {
     printf("%s:%s()\n", __klass__, __func__);
-    self = dk::init(super);
+    self = $init(super);
     self.value = k-e0;
     return self;
   }

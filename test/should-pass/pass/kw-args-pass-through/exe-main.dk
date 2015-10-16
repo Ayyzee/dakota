@@ -10,7 +10,7 @@ klass k1
 {
   method object-t init(object-t self, int32-t meaning-of-life : 0, const char8-t* message : nullptr)
   {
-    self = dk::init(super);
+    self = $init(super);
     assert(arg1 == meaning-of-life);
     assert(0 == strcmp(arg2, message));
     return self;
@@ -23,7 +23,7 @@ klass k2
 
  method object-t va::init(object-t self, va-list-t args)
   {
-    self = dk::va::init(super, args);
+    self = $va::init(super, args);
     return self;
   }
 }

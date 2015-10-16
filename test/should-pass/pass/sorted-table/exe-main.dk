@@ -10,16 +10,16 @@ int-t main() {
 
   object-t string1-key = make(string::klass, #bytes : "father");
   object-t string1-element = make(string::klass, #bytes : "FATHER");
-  dk::add(table, string1-key, string1-element);
+  $add(table, string1-key, string1-element);
 
   // object-t string2-key = make(string::klass, #bytes : "mother");
   // object-t string2-element = make(string::klass, #bytes : "MOTHER");
-  // dk::add(table, string2-key, string2-element);
+  // $add(table, string2-key, string2-element);
 
-  object-t element = dk::at(table, string1-key, cast(object-t)nullptr);
+  object-t element = $at(table, string1-key, cast(object-t)nullptr);
   printf("%p == %p\n", cast(void*)string1-element, cast(void*)element);
 
-  object-t pair = dk::pair-at(table, string1-key, cast(object-t)nullptr);
-  printf("%p == %p\n", cast(void*)dk::first(pair), cast(void*)element);
+  object-t pair = $pair-at(table, string1-key, cast(object-t)nullptr);
+  printf("%p == %p\n", cast(void*)$first(pair), cast(void*)element);
   return value;
 }

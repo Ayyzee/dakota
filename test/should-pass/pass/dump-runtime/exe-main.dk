@@ -2,17 +2,17 @@
 
 int-t main()
 {
-  dk::dump(object::klass);
-  //dk::dump-methods(object::klass);
+  $dump(object::klass);
+  //$dump-methods(object::klass);
   printf("---\n");
-  dk::dump(klass::klass);
-  //dk::dump-methods(klass::klass);
+  $dump(klass::klass);
+  //$dump-methods(klass::klass);
   printf("---\n");
   if (null) {
-    dk::dump(null->klass);
-    //dk::dump-methods(null->klass);
+    $dump(null->klass);
+    //$dump-methods(null->klass);
     printf("---\n");
-    dk::dump(null);
+    $dump(null);
   } else {
     fprintf(stderr, "nullptr\n");
     printf("---\n");

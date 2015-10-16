@@ -5,7 +5,7 @@ klass k1
   method object-t init(object-t self)
   {
     klass = null; // error
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 }
@@ -16,7 +16,7 @@ klass k2
 
   method object-t init(object-t self)
   {
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 }

@@ -56,7 +56,7 @@ klass text-output-stream {
     "        ",
   };
   method object-t init(object-t self, file-t file : stdout, uint32-t column-width : 2) {
-    self = dk::init(super, #file : file);
+    self = $init(super, #file : file);
     self.column = 0;
     if (column-width > DK-COUNTOF(ws))
       column-width = DK-COUNTOF(ws);
@@ -79,23 +79,23 @@ klass text-output-stream {
 
     if (0 != (features & k-indent))
       for (uint32-t i = 0; i < self.column; i++)
-        dk::write(self, ws[self.column-width]);
+        $write(self, ws[self.column-width]);
 
     if (0 != (features & k-leading-ws))
       if (0 == (self.previous-features & k-trailing-newline))
-        dk::write(self, " ");
+        $write(self, " ");
 
     if (0 != (features & k-leading-newline))
       if (0 == (self.previous-features & k-trailing-newline))
-        dk::write(self, "\n");
+        $write(self, "\n");
 
-    dk::write(self, string);
+    $write(self, string);
 
     if (0 != (features & k-trailing-ws))
-      dk::write(self, " ");
+      $write(self, " ");
 
     if (0 != (features & k-trailing-newline))
-      dk::write(self, "\n");
+      $write(self, "\n");
 
     self.previous-features = features;
     return self;

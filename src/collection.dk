@@ -24,7 +24,7 @@ klass std-compare;
 // {
 //   object-t element;
 //   while (nullptr != (element = va-arg(args, object-t)))
-//     dk::add(self, element);
+//     $add(self, element);
 //   return self;
 // }
 // SO-EXPORT sentinel object-t
@@ -46,8 +46,8 @@ klass collection {
     return self;
   }
   method object-t writeln-lite(object-t self, object-t out) {
-    dk::write-lite(self, out);
-    dk::write(out, "\n");
+    $write-lite(self, out);
+    $write(out, "\n");
     return self;
   }
 //   method object-t add-all(object-t self, str-t const* strings, symbol-t encoding : #utf-8)
@@ -58,13 +58,13 @@ klass collection {
 //     {
 //       object-t string = make(string::klass, #bytes : *strings, #encoding : encoding);
 //       strings++;
-//       dk::add(self, string);
+//       $add(self, string);
 //     }
 //     return null;
 //   }
   method object-t add-all(object-t self, object-t collection) {
     for (object-t element in collection)
-      dk::add(self, element);
+      $add(self, element);
     return collection;
   }
   // items are nullptr terminated lists of objects
@@ -72,12 +72,12 @@ klass collection {
     object-t arg;
     object-t* args = items;
     while (nullptr != (arg = *args++))
-      dk::add(self, arg);
+      $add(self, arg);
     return self; // nullnull?
   }
   method iter-pair::slots-t iter-pair(object-t self) {
-    object-t iter = dk::forward-iterator(self);
-    method-t next = dk::method-for-selector(klass-of(iter), SELECTOR(next(object-t)));
+    object-t iter = $forward-iterator(self);
+    method-t next = $method-for-selector(klass-of(iter), SELECTOR(next(object-t)));
     return cast(iter-pair-t){ .iter = iter, .next = next };
   }
   method object-t add(object-t self, object-t element);

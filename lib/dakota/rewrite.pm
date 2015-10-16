@@ -881,6 +881,8 @@ sub convert_dk_to_cc {
   &encode_strings($filestr_ref);
   &encode_comments($filestr_ref);
 
+  $$filestr_ref =~ s/\$/dk::/g;
+
   &rewrite_switch($filestr_ref);
 
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading #, rnielsen

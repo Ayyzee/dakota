@@ -10,8 +10,8 @@ klass vector;
 int-t main()
 {
   object-t sequence = make(vector::klass);
-  dk::add-last(sequence, #"mother");
-  dk::add-last(sequence, #"father");
+  $add-last(sequence, #"mother");
+  $add-last(sequence, #"father");
 
 //for (object-t element in sequence)
 //  printf("%p\n", cast(void*)element);
@@ -21,14 +21,14 @@ int-t main()
 
   // should rewrite to
 
-//for (iter-pair::slots-t _pair = dk::iter-pair(sequence); object-t element = _pair.next(_pair.iter); /**/)
+//for (iter-pair::slots-t _pair = $iter-pair(sequence); object-t element = _pair.next(_pair.iter); /**/)
 //  printf("%p\n", cast(void*)element);
 
 //---
 
   object-t table = make(sorted-table::klass);
-  dk::add(table, #"mother", #"MOTHER");
-  dk::add(table, #"father", #"FATHER");
+  $add(table, #"mother", #"MOTHER");
+  $add(table, #"father", #"FATHER");
   // ...
 
 //for (pair-t* pair in table)
@@ -39,7 +39,7 @@ int-t main()
 
   // should rewrite to
 
-//for (iter_pair_t _iter_pair = dk::iter_pair(table); object_t _element_ = _iter_pair.next(_iter_pair.iter); /**/)
+//for (iter_pair_t _iter_pair = $iter_pair(table); object_t _element_ = _iter_pair.next(_iter_pair.iter); /**/)
 //  { pair_t* pair = pair::unbox(_element_); printf("%p: %p\n", cast(void*)pair->first, cast(void*)pair->last); }
 
   return 0;

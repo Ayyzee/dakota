@@ -57,7 +57,7 @@ klass lexer {
   method object-t init(object-t self,
                        file-t   file :     stdin,
                        str-t    filename : nullptr) {
-    self = dk::init(super);
+    self = $init(super);
 
     if (nullptr != filename) {
       self.filename = filename;
@@ -100,7 +100,7 @@ klass lexer {
   }
   method object-t dealloc(object-t self) {
     dkt::dealloc(self.buffer);
-    object-t result = dk::dealloc(super);
+    object-t result = $dealloc(super);
     return result;
   }
   method str-t filename(object-t self) {
@@ -155,15 +155,15 @@ klass lexer {
     object-t token;
     object-t leading-ws = make(vector::klass);
 
-    while (nullptr != (token = dk::lex(self))) {
-      if (0 == dk::tokenid(token)) {
-        dk::add-last(leading-ws, token);
+    while (nullptr != (token = $lex(self))) {
+      if (0 == $tokenid(token)) {
+        $add-last(leading-ws, token);
       } else {
-        unless (dk::empty?(leading-ws)) {
-          dk::set-leading-ws(token, leading-ws);
+        unless ($empty?(leading-ws)) {
+          $set-leading-ws(token, leading-ws);
           leading-ws = make(vector::klass);
         }
-        dk::add-last(seq, token);
+        $add-last(seq, token);
       }
     }
     return seq;
@@ -474,7 +474,7 @@ klass lexer {
           cstring::concat(&buf, c1);
           object-t open-token = make(open-token::klass, #tokenid : '(', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
-          dk::push(self.open-tokens, open-token);
+          $push(self.open-tokens, open-token);
           return open-token;
         }
         case ')': {
@@ -484,12 +484,12 @@ klass lexer {
                                 #line : self.line, #column : self.column - buf.len);
           object-t open-token;
           do {
-            open-token = dk::pop(self.open-tokens);
-          } while ('<' == dk::tokenid(open-token));
+            open-token = $pop(self.open-tokens);
+          } while ('<' == $tokenid(open-token));
 
-          if ('(' != dk::tokenid(open-token))
+          if ('(' != $tokenid(open-token))
             throw make(syntax-exception::klass, #token : token, #filename : self.filename, #message : "not balenced");
-          dk::set-close-token(open-token, token);
+          $set-close-token(open-token, token);
           return token;
         }
         case '*': {
@@ -682,7 +682,7 @@ klass lexer {
           unget-char8(self);
           object-t open-token = make(open-token::klass, #tokenid : '<', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
-          dk::push(self.open-tokens, open-token);
+          $push(self.open-tokens, open-token);
           return open-token;
         }
         case '=': {
@@ -738,11 +738,11 @@ klass lexer {
           unget-char8(self);
           object-t token = make(token::klass, #tokenid : '>', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
-          object-t open-token = dk::pop(self.open-tokens);
-          if ('<' != dk::tokenid(open-token))
-            dk::push(self.open-tokens, open-token);
+          object-t open-token = $pop(self.open-tokens);
+          if ('<' != $tokenid(open-token))
+            $push(self.open-tokens, open-token);
           else
-            dk::set-close-token(open-token, token);
+            $set-close-token(open-token, token);
           return token;
         }
         case '?': {
@@ -764,7 +764,7 @@ klass lexer {
           cstring::concat(&buf, c1);
           object-t open-token = make(open-token::klass, #tokenid : '[', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
-          dk::push(self.open-tokens, open-token);
+          $push(self.open-tokens, open-token);
           return open-token;
         }
         case ']': {
@@ -774,12 +774,12 @@ klass lexer {
                                 #line : self.line, #column : self.column - buf.len);
           object-t open-token;
           do {
-            open-token = dk::pop(self.open-tokens);
-          } while ('<' == dk::tokenid(open-token));
+            open-token = $pop(self.open-tokens);
+          } while ('<' == $tokenid(open-token));
 
-          if ('[' != dk::tokenid(open-token))
+          if ('[' != $tokenid(open-token))
             throw make(syntax-exception::klass, #token : token, #filename : self.filename, #message : "not balenced");
-          dk::set-close-token(open-token, token);
+          $set-close-token(open-token, token);
           return token;
         }
         case '^': {
@@ -811,7 +811,7 @@ klass lexer {
           cstring::concat(&buf, c1);
           object-t open-token = make(open-token::klass, #tokenid : '{', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
-          dk::push(self.open-tokens, open-token);
+          $push(self.open-tokens, open-token);
           return open-token;
         }
         case '|': {
@@ -844,12 +844,12 @@ klass lexer {
                                 #line : self.line, #column : self.column - buf.len);
           object-t open-token;
           do {
-            open-token = dk::pop(self.open-tokens);
-          } while ('<' == dk::tokenid(open-token));
+            open-token = $pop(self.open-tokens);
+          } while ('<' == $tokenid(open-token));
 
-          if ('{' != dk::tokenid(open-token))
+          if ('{' != $tokenid(open-token))
             throw make(syntax-exception::klass, #token : token, #filename : self.filename, #message : "not balenced");
-          dk::set-close-token(open-token, token);
+          $set-close-token(open-token, token);
           return token;
         }
         case '~': {

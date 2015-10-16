@@ -33,7 +33,7 @@ klass cstring {
     uint32-t capacity;
   }
   method object-t init(object-t self, uint32-t capacity : 8) {
-    self = dk::init(super);
+    self = $init(super);
     self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * capacity);
     self.ptr[0] = NUL;
     self.len = 0;
@@ -42,22 +42,22 @@ klass cstring {
   }
   method object-t dealloc(object-t self) {
     dkt::dealloc(self.ptr);
-    object-t result = dk::dealloc(super);
+    object-t result = $dealloc(super);
     return result;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
 
-    dk::write-element(out, self.ptr, "ptr");
-    dk::write-element(out, self.len, "len");
-    dk::write-element(out, self.capacity, "capacity");
+    $write-element(out, self.ptr, "ptr");
+    $write-element(out, self.len, "len");
+    $write-element(out, self.capacity, "capacity");
 
-    dk::write-slots-end(out);
+    $write-slots-end(out);
     return self;
   }
   method slots-t* dump(slots-t* s) {
-  //dk::dump(super);
+  //$dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%u, capacity=%u }\n",
             cast(void*)nullptr, cast(void*)(s), s->ptr, s->len, s->capacity);
     return s;
@@ -74,12 +74,12 @@ klass cstring {
   method int-t compare(object-t self, object-t other) {
     int-t result;
 
-    if (dk::instance?(other, klass)) {
+    if ($instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
     } else {
-      result = dk::compare(super, other);
+      result = $compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;

@@ -15,20 +15,20 @@ int-t main()
   object-t o1 = make(string::klass, #bytes : "mother");
   object-t o2 = make(string::klass, #bytes : "father");
 
-  dk::add-last(vector, o1);
-  dk::add-last(vector, vector);
-  dk::add-last(vector, klass-of(vector));
-  dk::add-last(vector, null);
-  dk::add-last(vector, o2);
+  $add-last(vector, o1);
+  $add-last(vector, vector);
+  $add-last(vector, klass-of(vector));
+  $add-last(vector, null);
+  $add-last(vector, o2);
 
   {
     object-t json-object-output-stream = make(json-object-output-stream::klass);
-    dk::write(json-object-output-stream, vector);
-    dk::close(json-object-output-stream);
+    $write(json-object-output-stream, vector);
+    $close(json-object-output-stream);
   }
 //   {
 //   object-t xml-object-output-stream = make(xml-object-output-stream::klass);
-//   dk::write(xml-object-output-stream, vector);
+//   $write(xml-object-output-stream, vector);
 //   }
 
   return 0;

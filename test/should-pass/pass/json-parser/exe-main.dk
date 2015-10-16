@@ -7,11 +7,11 @@ klass features; // hackhack
 int-t main()
 {
   object-t parser = make(json-parser::klass);
-  object-t property-list = dk::read-property-list(parser);
+  object-t property-list = $read-property-list(parser);
   fprintf(stderr, "---\n");
   object-t output-stream = make(json-object-output-stream::klass);
-  dk::write(output-stream, property-list);
-  dk::close(output-stream);
+  $write(output-stream, property-list);
+  $close(output-stream);
   fprintf(stderr, "---\n");
   return 0;
 }

@@ -29,39 +29,39 @@ trait counted-set {
     object-t result = make(set-kls);
     for (pair-t* pair in self) {
       object-t first = pair->first;
-      dk::add(result, first);
+      $add(result, first);
     }
     return result;
   }
   method object-t counts(object-t self) {
-    object-t result = make(vector::klass, #size : dk::size(self));
+    object-t result = make(vector::klass, #size : $size(self));
     for (pair-t* pair in self) {
       object-t last = pair->last;
-      dk::add-last(result, last);
+      $add-last(result, last);
     }
     return result;
   }
   method object-t write-lite(object-t self, object-t out) {
-    dk::write(out, "{");
+    $write(out, "{");
     str-t delim = "";
 
     for (pair-t* pair in self) {
       object-t first = pair->first;
       object-t last =  pair->last;
-      dk::write(out, delim);
-      dk::write-lite(first, out); // must be primitive type
-      dk::write(out, ":");
+      $write(out, delim);
+      $write-lite(first, out); // must be primitive type
+      $write(out, ":");
       if (nullptr == last || null == last)
-        dk::write(out, "null");
+        $write(out, "null");
       else
-        dk::write-lite(last, out);
+        $write-lite(last, out);
       delim = ",";
     }
-    dk::write(out, "}");
+    $write(out, "}");
     return self;
   }
   static object-t add(object-t self, object-t first) {
-    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
+    object-t pair = $pair-at(self, first, cast(object-t)nullptr);
 
     if (nullptr != pair) {
       object-t last = pair::unbox(pair)->last;
@@ -70,33 +70,33 @@ trait counted-set {
     } else {
       object-t last = uint32::box(1);
       pair = pair::box({first, last});
-      dk::add-pair(self, pair);
+      $add-pair(self, pair);
     }
     return pair;
   }
   static object-t at(object-t self, object-t first) {
-    object-t last = dk::pair-at(self, first);
-    if (dk::instance?(last, pair::klass))
+    object-t last = $pair-at(self, first);
+    if ($instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
   static object-t at(object-t self, object-t first, object-t default-last) {
-    object-t last = dk::pair-at(self, first, cast(object-t)nullptr);
+    object-t last = $pair-at(self, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
-    if (nullptr != last && dk::instance?(last, pair::klass))
+    if (nullptr != last && $instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
   method uint32-t count-at(object-t self, object-t first) {
-    object-t pair = dk::pair-at(self, first);
-    object-t last = dk::last(pair);
+    object-t pair = $pair-at(self, first);
+    object-t last = $last(pair);
     uint32-t count = *uint32::unbox(last);
     return count;
   }
   method uint32-t count-at(object-t self, object-t first, uint32-t default-count) {
     uint32-t count = default-count;
-    object-t pair = dk::pair-at(self, first, cast(object-t)nullptr);
+    object-t pair = $pair-at(self, first, cast(object-t)nullptr);
 
     if (nullptr != pair) {
       object-t last = pair::unbox(pair)->last;
@@ -105,17 +105,17 @@ trait counted-set {
     return count;
   }
   object-t initialize(object-t kls) {
-    dk::reassoc-and-add-method-for-selector(kls,
+    $reassoc-and-add-method-for-selector(kls,
                                             SELECTOR(               pair-at(object-t, object-t)),
                                             SELECTOR(                    at(object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t))at);
 
-    dk::reassoc-and-add-method-for-selector(kls,
+    $reassoc-and-add-method-for-selector(kls,
                                             SELECTOR(               pair-at(object-t, object-t, object-t)),
                                             SELECTOR(                    at(object-t, object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t, object-t))at);
 
-    dk::reassoc-and-add-method-for-selector(kls,
+    $reassoc-and-add-method-for-selector(kls,
                                             SELECTOR(              add-pair(object-t, object-t)),
                                             SELECTOR(                   add(object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t))add);

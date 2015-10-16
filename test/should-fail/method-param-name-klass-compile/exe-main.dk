@@ -5,7 +5,7 @@ klass k1
   // bug: parameter named 'klass'
   method object-t init(object-t self, object-t klass : null)
   {
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 }

@@ -23,25 +23,25 @@ klass sequence {
   superklass collection;
 
   method object-t write-lite(object-t self, object-t out) {
-    dk::write(out, "[");
+    $write(out, "[");
     str-t delim = "";
 
     for (object-t element in self) {
-      dk::write(out, delim);
-      dk::write-lite(element, out);
+      $write(out, delim);
+      $write-lite(element, out);
       delim = ",";
     }
-    dk::write(out, "]");
+    $write(out, "]");
     return self;
   }
   method object-t add-all-first(object-t self, object-t collection) {
     for (object-t element in collection)
-      dk::add-first(self, element);
+      $add-first(self, element);
     return collection;
   }
   method object-t add-all-last(object-t self, object-t collection) {
     for (object-t element in collection)
-      dk::add-last(self, element);
+      $add-last(self, element);
     return collection;
   }
   method object-t add-first(object-t self, object-t element);

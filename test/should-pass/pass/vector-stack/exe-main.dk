@@ -6,8 +6,8 @@ trait stack;
 int-t main() {
   int-t value = 0;
   object-t stack = make(vector::klass);
-  dk::push(stack, null);
-  object-t object = dk::pop(stack);
+  $push(stack, null);
+  object-t object = $pop(stack);
   USE(object);
   // hackhack: should test for null
   return value;

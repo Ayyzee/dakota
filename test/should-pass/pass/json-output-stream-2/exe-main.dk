@@ -14,10 +14,10 @@ klass k1
 
   method object-t write-part(object-t self, object-t out)
   {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
-    dk::write-element(out, self.value, "value");
-    dk::write-slots-end(out);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+    $write-element(out, self.value, "value");
+    $write-slots-end(out);
     return self;
   }
 }
@@ -31,10 +31,10 @@ klass k2
   }
   method object-t write-slots(object-t self, object-t out)
   {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
-    dk::write-element(out, self.value, "value");
-    dk::write-slots-end(out);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+    $write-element(out, self.value, "value");
+    $write-slots-end(out);
     return self;
   }
 }
@@ -48,10 +48,10 @@ klass k3
   }
   method object-t write-slots(object-t self, object-t out)
   {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
-    dk::write-element(out, self.value, "value");
-    dk::write-slots-end(out);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+    $write-element(out, self.value, "value");
+    $write-slots-end(out);
     return self;
   }
 }
@@ -59,15 +59,15 @@ klass k3
 int-t main()
 {
   object-t parser = make(json-parser::klass);
-  object-t property-list = dk::read-property-list(parser);
+  object-t property-list = $read-property-list(parser);
 
 //   object-t i = make(k3::klass);
 //   object-t ooutput-stream = make(json-object-output-stream::klass);
-//   dk::write(ooutput-stream, i);
+//   $write(ooutput-stream, i);
 
   object-t poutput-stream = make(xml-object-output-stream::klass);
-  dk::write(poutput-stream, property-list);
+  $write(poutput-stream, property-list);
 
-  dk::close(poutput-stream);
+  $close(poutput-stream);
   return 0;
 }

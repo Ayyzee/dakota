@@ -55,10 +55,10 @@ klass sorted-set {
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
+  // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
   static int-t swap-compare(object-t first, object-t second) {
-    int-t result = dk::compare(second, first);
+    int-t result = $compare(second, first);
     result *= -1;
     return result;
   }
@@ -68,7 +68,7 @@ klass sorted-set {
                        object-t*         items :            nullptr) {
     assert(0 != initial-capacity);
 
-    self = dk::init(super);
+    self = $init(super);
     self.sa.compare = cast(std-compare-t)cast(compare-t)swap-compare;
     self.sa.size =    cast(uint32-t)sizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
@@ -78,15 +78,15 @@ klass sorted-set {
     self.iterator-state = 0;
 
     if (nullptr != elements)
-      dk::add-all(self, elements);
+      $add-all(self, elements);
 
     if (nullptr != items)
-      dk::add-items(self, items);
+      $add-items(self, items);
     return self;
   }
   method object-t dealloc(object-t self) {
     dkt::dealloc(self.sa.elements);
-    object-t result = dk::dealloc(super);
+    object-t result = $dealloc(super);
     return result;
   }
   method object-t add(object-t self, object-t element) {
@@ -121,7 +121,7 @@ klass sorted-set {
     return object2;
   }
   method object-t at(object-t self, object-t object1) {
-    object-t result = dk::at(self, object1, cast(object-t)nullptr);
+    object-t result = $at(self, object1, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #message : "oops");
     return result;
@@ -129,7 +129,7 @@ klass sorted-set {
   method boole-t contains?(object-t self, object-t key) {
     boole-t state;
 
-    if (nullptr == dk::at(self, key, cast(object-t)nullptr))
+    if (nullptr == $at(self, key, cast(object-t)nullptr))
       state = false;
     else
       state = true;
@@ -182,24 +182,24 @@ klass sorted-set {
     return forward-iterator;
   }
   method object-t dump(object-t self) {
-    dk::dump(super);
+    $dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
             cast(void*)(self), cast(void*)unbox(self), self.sa.count, self.sa.capacity);
     for (object-t element in self)
-      dk::dump(element);
+      $dump(element);
     return self;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
 
-    dk::write-sequence-start(out, "elements");
+    $write-sequence-start(out, "elements");
 
     for (object-t element in self)
-      dk::write-element-idref(out, element, cast(str-t)nullptr);
-    dk::write-sequence-end(out);
+      $write-element-idref(out, element, cast(str-t)nullptr);
+    $write-sequence-end(out);
 
-    dk::write-slots-end(out);
+    $write-slots-end(out);
     return self;
   }
 }
@@ -213,8 +213,8 @@ klass sorted-set-forward-iterator {
     uint32-t  iterator-state;
   }
   method object-t init(object-t self, object-t sorted-set : {~}) {
-    self = dk::init(super);
-    assert(dk::instance?(sorted-set, sorted-set::klass));
+    self = $init(super);
+    assert($instance?(sorted-set, sorted-set::klass));
     sorted-set::slots-t* ss = sorted-set::unbox(sorted-set);
     self.sorted-set = sorted-set;
     self.offset = 0;
@@ -243,8 +243,8 @@ klass sorted-set-forward-iterator {
   method object-t next(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk::next?(self)) {
-      element = dk::element(self);
+    if ($next?(self)) {
+      element = $element(self);
       self.offset++;
     }
     return element;
@@ -252,7 +252,7 @@ klass sorted-set-forward-iterator {
   method object-t element(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk::next?(self)) {
+    if ($next?(self)) {
       sorted-set::slots-t* ss = sorted-set::unbox(self.sorted-set);
       element = cast(object-t)sorted-ptr-array::at(&ss->sa, self.offset);
       assert(nullptr != element);

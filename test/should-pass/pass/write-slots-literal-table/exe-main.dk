@@ -13,11 +13,11 @@ int-t main()
 
   object-t o = #{ #a : b, #c : d };
 
-  dk::dump(o);
+  $dump(o);
 
   object-t json-object-output-stream = make(json-object-output-stream::klass);
-  dk::write-slots(o, json-object-output-stream);
-  dk::close(json-object-output-stream);
+  $write-slots(o, json-object-output-stream);
+  $close(json-object-output-stream);
 
   USE(a);
   USE(c);

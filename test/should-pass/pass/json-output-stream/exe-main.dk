@@ -14,11 +14,11 @@ klass k1
 
   method object-t write-part(object-t self, object-t out)
   {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
-    dk::write-element(out, self.value1, "value1");
-    dk::write-element(out, self.value2, "value2");
-    dk::write-slots-end(out);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+    $write-element(out, self.value1, "value1");
+    $write-element(out, self.value2, "value2");
+    $write-slots-end(out);
     return self;
   }
 }
@@ -34,12 +34,12 @@ klass k2
   }
   method object-t write-slots(object-t self, object-t out)
   {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
-    dk::write-element(out, self.value1, "value1");
-    dk::write-element(out, self.value2, "value2");
-    dk::write-element(out, self.value3, "value3");
-    dk::write-slots-end(out);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+    $write-element(out, self.value1, "value1");
+    $write-element(out, self.value2, "value2");
+    $write-element(out, self.value3, "value3");
+    $write-slots-end(out);
     return self;
   }
 }
@@ -53,17 +53,17 @@ klass k3
   }
   method object-t init(object-t self)
   {
-    self = dk::init(super);
+    self = $init(super);
     self.object = k2::klass;
     return self;
   }
 
   method object-t write-slots(object-t self, object-t out)
   {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
-    dk::write-element-idref(out, self.object, "object");
-    dk::write-slots-end(out);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+    $write-element-idref(out, self.object, "object");
+    $write-slots-end(out);
     return self;
   }
 }
@@ -73,10 +73,10 @@ int-t main()
   object-t i = make(k3::klass);
 
 //   object-t ooutput-stream = make(xml-object-output-stream::klass);
-//   dk::write(ooutput-stream, i);
+//   $write(ooutput-stream, i);
 
   object-t poutput-stream = make(json-object-output-stream::klass);
-  dk::write(poutput-stream, i);
-  dk::close(poutput-stream);
+  $write(poutput-stream, i);
+  $close(poutput-stream);
   return 0;
 }

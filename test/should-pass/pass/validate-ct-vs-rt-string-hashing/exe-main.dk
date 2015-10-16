@@ -8,8 +8,8 @@ int-t main()
   uintmax-t h = #'foobar';
   symbol-t s = #foobar;
   object-t o = symbol::box(s);
-  printf("dk::hash(#foobar) = 0x%x, __hash::_foobar = 0x%x\n",
-         (uint-t)dk::hash(o), (uint-t)h);
-  assert((uint-t)dk::hash(o) == (uint-t)h);
+  printf("$hash(#foobar) = 0x%x, __hash::_foobar = 0x%x\n",
+         (uint-t)$hash(o), (uint-t)h);
+  assert((uint-t)$hash(o) == (uint-t)h);
   return 0;
 }

@@ -6,7 +6,7 @@ klass k1
 {
   method object-t init(object-t self, void* #arg1, void** arg2 : nullptr)
   {
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 }
@@ -14,7 +14,7 @@ klass k2
 {
   method object-t init(object-t self)
   {
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 }

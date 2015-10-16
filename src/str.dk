@@ -33,7 +33,7 @@ klass str-klass {
     str-compare::slots-t strcmp;
   }
   method object-t va::init(object-t self, va-list-t args) {
-    self = dk::va::init(super, args);
+    self = $va::init(super, args);
     self.strcmp = safe-strcmp;
     return self;
   }
@@ -46,7 +46,7 @@ klass str {
   method boole-t equal?(object-t self, object-t other) {
     assert(nullptr != other);
     boole-t state;
-    if (0 == dk::compare(self, other))
+    if (0 == $compare(self, other))
       state = true;
     else
       state = false;
@@ -63,8 +63,8 @@ klass str {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 
-    if (dk::instance?(other, klass)) {
-      assert(dk::instance?(klass-of(self), str-klass::klass));
+    if ($instance?(other, klass)) {
+      assert($instance?(klass-of(self), str-klass::klass));
       str-klass::slots-t& ks = *str-klass::unbox(klass-of(self));
       // what if both utf8s are nullptr?
       // what if only one utf8 is nullptr?
@@ -72,7 +72,7 @@ klass str {
       slots-t s2 = *unbox(other);
       result = ks.strcmp(s1, s2);
     } else {
-      result = dk::compare(super, other);
+      result = $compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;

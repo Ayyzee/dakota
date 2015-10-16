@@ -17,7 +17,7 @@ klass path {
 
   method object-t init(object-t self, const char8-t* bytes : nullptr, const char8-t* delimiter : default-delimiter)
   {
-    self = dk::init(super, #bytes : bytes);
+    self = $init(super, #bytes : bytes);
     self.delimiter = delimiter;
     //self.rdn = make(string::klass, #bytes : "Robert D. Nielsen");
     return self;

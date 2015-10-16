@@ -52,12 +52,12 @@ klass signature {
   method int-t compare(object-t self, object-t other) {
     int-t result;
 
-    if (dk::instance?(other, klass)) {
+    if ($instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
     } else {
-      result = dk::compare(super, other);
+      result = $compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;

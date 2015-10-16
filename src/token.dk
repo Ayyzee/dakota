@@ -38,20 +38,20 @@ klass token {
     object-t leading-ws;
   }
   method object-t write-lite(object-t self, object-t out) {
-    dk::write(out, "\"");
-    dk::write(out, self.buffer);
-    dk::write(out, "\"");
+    $write(out, "\"");
+    $write(out, self.buffer);
+    $write(out, "\"");
     return self;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
 
-    dk::write-element(out, self.line,   "line");
-    dk::write-element(out, self.column, "column");
-    dk::write-element(out, self.buffer, "buffer");
+    $write-element(out, self.line,   "line");
+    $write-element(out, self.column, "column");
+    $write-element(out, self.buffer, "buffer");
 
-    dk::write-slots-end(out);
+    $write-slots-end(out);
     return self;
   }
   method object-t init(object-t self,
@@ -59,7 +59,7 @@ klass token {
                        uint32-t       column :  0,
                        tokenid-t      tokenid : 0,
                        str-t buffer :  nullptr) {
-    self = dk::init(super);
+    self = $init(super);
 #if 0
     if (0 != tokenid) {
       char8-t[4 + (1)] tokenid-str = "";
@@ -86,8 +86,8 @@ klass token {
   method boole-t equal?(object-t self, object-t other) {
     boole-t state;
 
-    if (dk::instance?(other, klass)) {
-      if (0 == dk::compare(self, other))
+    if ($instance?(other, klass)) {
+      if (0 == $compare(self, other))
         state = true;
       else
         state = false;
@@ -156,7 +156,7 @@ klass token {
   }
   // this should be merged with buffer - this is a hackhack
   method str-t utf8-from(object-t self) {
-    str-t buffer = dk::buffer(self);
+    str-t buffer = $buffer(self);
     return buffer;
   }
   method object-t dump-shallow(object-t self) {
@@ -186,7 +186,7 @@ klass token {
 #endif
   }
   method object-t dump(object-t self) {
-    dk::dump(super);
+    $dump(super);
     fprintf(stderr, "%p:%p { buffer=\"%s\" }\n",
             cast(void*)(self), cast(void*)unbox(self), self.buffer);
     return self;
@@ -194,7 +194,7 @@ klass token {
   method object-t print(object-t self, object-t out) {
     if (null == out)
       out = std-output;
-    dk::print(out, dk::utf8-from(self));
+    $print(out, $utf8-from(self));
     return self;
   }
   // should be in superklass string??
@@ -207,11 +207,11 @@ klass token {
   }
   method int-t compare(object-t self, object-t other) {
     int-t result;
-    if (dk::instance?(other, klass)) {
+    if ($instance?(other, klass)) {
       result = safe-strcmp(self.buffer, unbox(other)->buffer);
       result = dkt-normalize-compare-result(result);
     } else {
-      result = dk::compare(super, other);
+      result = $compare(super, other);
     }
     return result;
   }

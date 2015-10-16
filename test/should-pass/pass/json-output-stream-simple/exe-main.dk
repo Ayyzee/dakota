@@ -8,12 +8,12 @@ int-t main()
 {
   object-t o = make(string::klass, #bytes : "hello world");
   object-t stream = make(json-object-output-stream::klass, #indent-level : 1);
-  dk::write(stream, o);
-  dk::close(stream);
-  dk::dump(o);
+  $write(stream, o);
+  $close(stream);
+  $dump(o);
   fprintf(stderr, "---\n");
-  dk::dump(superklass-of(klass-of(o)));
+  $dump(superklass-of(klass-of(o)));
   fprintf(stderr, "---\n");
-  dk::dump(klass-of(o));
+  $dump(klass-of(o));
   return 0;
 }

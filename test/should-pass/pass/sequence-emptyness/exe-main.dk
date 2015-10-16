@@ -10,8 +10,8 @@ static void check(object-t klass)
 //   for (uint32-t i = 0; i < 4; i++)
 //   {
 //     object-t o = make(object::klass);
-//     dk::add-last(seq, o);
-//     dk::test-dump(seq);
+//     $add-last(seq, o);
+//     $test-dump(seq);
 //   }
 
   object-t o1 = make(object::klass);
@@ -19,30 +19,30 @@ static void check(object-t klass)
   object-t o3 = make(object::klass);
   object-t o4 = make(object::klass);
   object-t seq = make(klass);
-  assert(dk::empty?(seq));
-  dk::test-dump(seq);
-  dk::add-last(seq, o1);
-  dk::test-dump(seq);
-  dk::add-last(seq, o2);
-  dk::test-dump(seq);
-  dk::add-last(seq, o3);
-  dk::test-dump(seq);
-  dk::add-last(seq, o4);
-  dk::test-dump(seq);
-  assert(!dk::empty?(seq));
-  object-t first = dk::remove-first(seq);
-  dk::test-dump(seq);
-  object-t second = dk::remove-first(seq);
-  dk::test-dump(seq);
-  object-t third = dk::remove-first(seq);
-  dk::test-dump(seq);
-  object-t fourth = dk::remove-first(seq);
-  dk::test-dump(seq);
+  assert($empty?(seq));
+  $test-dump(seq);
+  $add-last(seq, o1);
+  $test-dump(seq);
+  $add-last(seq, o2);
+  $test-dump(seq);
+  $add-last(seq, o3);
+  $test-dump(seq);
+  $add-last(seq, o4);
+  $test-dump(seq);
+  assert(!$empty?(seq));
+  object-t first = $remove-first(seq);
+  $test-dump(seq);
+  object-t second = $remove-first(seq);
+  $test-dump(seq);
+  object-t third = $remove-first(seq);
+  $test-dump(seq);
+  object-t fourth = $remove-first(seq);
+  $test-dump(seq);
   assert(o1 == first);
   assert(o2 == second);
   assert(o3 == third);
   assert(o4 == fourth);
-  assert(dk::empty?(seq));
+  assert($empty?(seq));
   return;
 }
 

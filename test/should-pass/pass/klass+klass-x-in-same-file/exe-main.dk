@@ -6,7 +6,7 @@ klass foobar
 {
   method object-t foo(object-t self)
 	{
-    dk::print-format(std-output, "%s:%s(%s)\n", __klass__, __method__, __signature__->parameter-types);
+    $print-format(std-output, "%s:%s(%s)\n", __klass__, __method__, __signature__->parameter-types);
     return self;
   }
 }
@@ -15,7 +15,7 @@ klass foobar
 {
   method object-t bar(object-t self)
 	{
-    dk::print-format(std-output, "%s:%s(%s)\n", __klass__, __method__, __signature__->parameter-types);
+    $print-format(std-output, "%s:%s(%s)\n", __klass__, __method__, __signature__->parameter-types);
     return self;
   }
 }
@@ -24,8 +24,8 @@ int-t main()
 {
   object-t o = make(foobar::klass);
 
-  dk::bar(o);
-  dk::foo(o);
+  $bar(o);
+  $foo(o);
 
   return 0;
 }

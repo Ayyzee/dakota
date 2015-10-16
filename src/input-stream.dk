@@ -31,7 +31,7 @@ klass input-stream {
   method object-t init(object-t self,
                        file-t         file :     nullptr,
                        str-t filename : nullptr) {
-    self = dk::init(super);
+    self = $init(super);
     assert(!(nullptr != file &&
              nullptr != filename)); // these are mutually exclusive
     assert(stdout != file);

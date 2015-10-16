@@ -6,7 +6,7 @@ klass k1
 {
   method object-t init(object-t self, uint32-t count : 0)
   {
-    self = dk::init(super);
+    self = $init(super);
     assert(0x0c0c0c0c == count);
     //
     return self;
@@ -22,6 +22,6 @@ klass k1
 int-t main()
 {
   object-t o = make(k1::klass, #count : 0x0c0c0c0c);
-  dk::foo(o, #bar : 0xf0f0f0f0);
+  $foo(o, #bar : 0xf0f0f0f0);
   return 0;
 }

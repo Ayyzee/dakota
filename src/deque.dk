@@ -40,7 +40,7 @@ klass node {
 //               "<tr><td port=\"prev\">prev</td></tr>"
 //               "<tr><td port=\"next\">next</td></tr>"
 //               "</table> > ];\n", cast(void*)(s), iterator-state);
-//       fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk::name(klass-of(s->element)));
+//       fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), $name(klass-of(s->element)));
 //       fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(void*)(s), iterator-state, cast(void*)(s->element), iterator-state);
 
       if (nullptr != s->prev)
@@ -61,7 +61,7 @@ klass node {
               "<tr><td port=\"prev\">prev</td></tr>"
               "<tr><td port=\"next\">next</td></tr>"
               "</table> > ];\n", cast(void*)(s), iterator-state);
-      fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), dk::name(klass-of(s->element)));
+      fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(void*)(s->element), iterator-state, cast(void*)(s->element), $name(klass-of(s->element)));
       fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(void*)(s), iterator-state, cast(void*)(s->element), iterator-state);
 
       if (nullptr != s->next)
@@ -122,7 +122,7 @@ klass deque {
     return self;
   }
   method object-t init(object-t self, object-t element : nullptr) {
-    self = dk::init(super);
+    self = $init(super);
 
     if (nullptr == element) {
       self.first = nullptr;
@@ -149,11 +149,11 @@ klass deque {
     return self;
   }
   method object-t dump(object-t self) {
-    object-t result = dk::write-slots(self, std-output);
+    object-t result = $write-slots(self, std-output);
     return result;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
+    $write-slots(super, out);
 //     dkt-log(stdout, "deque: %s(%p, ...)\n",
 //            __func__, cast(void*)deque);
     node::slots-t* first = self.first;
@@ -316,19 +316,19 @@ klass deque {
   //          { out = std-output; } // wrong! should be system::object-out
   //        char8-t[128] buffer;
   //        snprintf(buffer, sizeof(buffer), "<sequence name=\"%s\" size=\"%u\">", name, self.size);
-  //        dk::writeln(out, buffer);
-  //        dk::increment-column(out);
+  //        $writeln(out, buffer);
+  //        $increment-column(out);
 
   //        if (0 != self.size) {
   //          node::slots-t* node = self.first;
 
   //          do {
-  //            dk::write-element-idref(out, node->element);
+  //            $write-element-idref(out, node->element);
   //          } while (nullptr != (node = node->next));
   //        }
-  //        dk::decrement-column(out);
+  //        $decrement-column(out);
   //        snprintf(buffer, sizeof(buffer), "</sequence>");
-  //        dk::writeln(out, buffer);
+  //        $writeln(out, buffer);
   //        return null;
   //      }
 }
@@ -349,8 +349,8 @@ klass deque-forward-iterator {
     return;
   }
   method object-t init(object-t self, object-t deque : {~}) {
-    self = dk::init(super);
-    assert(dk::instance?(deque, deque::klass));
+    self = $init(super);
+    assert($instance?(deque, deque::klass));
     deque::slots-t* d = deque::unbox(deque);
 
     self.deque =          deque;
@@ -398,8 +398,8 @@ klass deque-forward-iterator {
   method object-t next(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk::next?(self)) {
-      element = dk::element(self);
+    if ($next?(self)) {
+      element = $element(self);
       self.node = self.node->next;
     }
     //       printf("%s:%s(%p) = %p\n",
@@ -409,7 +409,7 @@ klass deque-forward-iterator {
   method object-t element(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk::next?(self)) {
+    if ($next?(self)) {
       element = self.node->element;
       assert(nullptr != element);
     }

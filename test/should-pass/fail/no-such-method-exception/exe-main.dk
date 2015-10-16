@@ -5,6 +5,6 @@ klass sequence;
 int-t main()
 {
   object-t o = make(object::klass);
-  dk::add-last(o, o);
+  $add-last(o, o);
   return(0);
 }

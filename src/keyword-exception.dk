@@ -36,7 +36,7 @@ klass keyword-exception {
     assert(nullptr != signature);
     assert(nullptr != keyword);
 
-    self = dk::init(super);
+    self = $init(super);
 
     self.object =    object;
     self.signature = signature;
@@ -44,11 +44,11 @@ klass keyword-exception {
     return self;
   }
   method object-t dump(object-t self) {
-    dk::dump(super);
-    fprintf(stderr, "\"%s\": {", dk::utf8-from(self));
+    $dump(super);
+    fprintf(stderr, "\"%s\": {", $utf8-from(self));
     fprintf(stderr, " \"object\": [ %p, \"%s\" ]",
             cast(void*)self.object,
-            dk::utf8-from(self.object));
+            $utf8-from(self.object));
     fprintf(stderr, ", \"signature\": [ %p, \"%s(%s)\" ]",
             cast(void*)self.signature,
             self.signature->name,
@@ -57,21 +57,21 @@ klass keyword-exception {
             cast(void*)self.keyword,
             self.keyword);
     fprintf(stderr, " }\n");
-    dk::dump(self.object);
+    $dump(self.object);
     return self;
   }
   method object-t print(object-t self, object-t out, str-t msg) {
-    dk::print(super, out);
+    $print(super, out);
     assert(nullptr != self.object);
     assert(nullptr != self.signature);
     assert(nullptr != self.keyword);
 
-    if (dk::instance?(self.object, klass::klass)) {
-      dk::print-format(out, ", \"instance\": \"%s\"", name-of(self.object));
+    if ($instance?(self.object, klass::klass)) {
+      $print-format(out, ", \"instance\": \"%s\"", name-of(self.object));
     } else {
-      dk::print-format(out, ", \"instance\": \"%s\"", dk::utf8-from(self.object));
+      $print-format(out, ", \"instance\": \"%s\"", $utf8-from(self.object));
     }
-    dk::print-format(out, ", \"klass\": \"%s\", \"method\": \"%s(%s)\", \"%s\": \"%s\"",
+    $print-format(out, ", \"klass\": \"%s\", \"method\": \"%s(%s)\", \"%s\": \"%s\"",
                      name-of(klass-of(self.object)),
                      self.signature->name,
                      self.signature->parameter-types,

@@ -18,8 +18,8 @@ int-t main(int-t argc, const char8-t* const* argv)
 
   while (nullptr != (filename = *filenames++)) {
     object-t f = make(input-file::klass, #filename : filename);
-    object-t t = dk::split(f, space?);
-    dk::dump(t);
+    object-t t = $split(f, space?);
+    $dump(t);
   }
   return 0;
 }

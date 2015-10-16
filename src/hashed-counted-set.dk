@@ -21,7 +21,7 @@ klass hashed-counted-set {
   trait      counted-set;
 
   method object-t va::init(object-t self, va-list-t args) {
-    self = dk::va::init(super, args);
+    self = $va::init(super, args);
     return self;
   }
 }

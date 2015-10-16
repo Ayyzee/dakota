@@ -12,7 +12,7 @@ klass test {
                        void****   arg4 : {~},
                        void*****  arg5 : arg5-default,
                        void****** arg6 : arg6-default) {
-    self = dk::init(super);
+    self = $init(super);
     USE(self);
     USE(arg1);
     USE(arg2);

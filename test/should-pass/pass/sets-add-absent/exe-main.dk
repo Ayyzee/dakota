@@ -13,11 +13,11 @@ static object-t check(object-t kls)
   printf("%s\n", name);
   object-t i1 = uint32::box(cast(uint32-t)0);
   object-t collection = make(kls);
-  uint32-t s1 = dk::size(collection);
-  dk::add(collection, i1);
-  uint32-t s2 = dk::size(collection);
-  dk::add(collection, i1);
-  uint32-t s3 = dk::size(collection);
+  uint32-t s1 = $size(collection);
+  $add(collection, i1);
+  uint32-t s2 = $size(collection);
+  $add(collection, i1);
+  uint32-t s3 = $size(collection);
   assert(0 == s1 && 1 == s2 && 1 == s3);
   return collection;
 }
@@ -28,14 +28,14 @@ static object-t check-throw(object-t kls)
   printf("%s\n", name);
   object-t i1 = uint32::box(cast(uint32-t)0);
   object-t collection = make(kls);
-  uint32-t s1 = dk::size(collection);
-  dk::add-absent(collection, i1);
-  uint32-t s2 = dk::size(collection);
+  uint32-t s1 = $size(collection);
+  $add-absent(collection, i1);
+  uint32-t s2 = $size(collection);
   try
-  { dk::add-absent(collection, i1); }
+  { $add-absent(collection, i1); }
   catch (...)
   {
-    uint32-t s3 = dk::size(collection);
+    uint32-t s3 = $size(collection);
     assert(0 == s1 && 1 == s2 && 1 == s3);
     return collection;
   }

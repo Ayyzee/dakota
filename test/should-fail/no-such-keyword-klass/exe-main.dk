@@ -2,8 +2,8 @@
 
 int-t main()
 {
-  object-t o = dk::alloc(klass::klass);
-  dk::init(o, bogus : 42);
+  object-t o = $alloc(klass::klass);
+  $init(o, bogus : 42);
   USE(o);
   //  make(klass::klass, bogus : 42);
   return 0;

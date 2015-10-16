@@ -14,12 +14,12 @@ int-t main() {
 //   char8-t* filename = argv[1];
   char8-t const* filename = "ops.txt";
   object-t ops-stream = make(input-file::klass, #filename : filename);
-  object-t ops = dk::split(ops-stream, nullptr);
+  object-t ops = $split(ops-stream, nullptr);
 
-  dk::dump(ops);
+  $dump(ops);
 
   object-t obj-out = make(json-object-output-stream::klass);
-  dk::write(obj-out, ops);
+  $write(obj-out, ops);
 
   return 0;
 }

@@ -1,12 +1,12 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass string; // dk::length()
+klass string; // $length()
 
 // no-such-method
 
 int-t main()
 {
   object-t o = make(object::klass);
-  dk::length(o);
+  $length(o);
   return 0;
 }

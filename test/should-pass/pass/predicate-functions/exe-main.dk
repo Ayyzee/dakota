@@ -18,8 +18,8 @@ klass thing
   // could be implemented as a generic rather than a method
   method object-t empty(object-t self)
   {
-    //object-t result = dk::copy(self);
-    //dk::empty!(result);
+    //object-t result = $copy(self);
+    //$empty!(result);
     object-t result = null;
     return result;
   }
@@ -50,18 +50,18 @@ int-t main()
 {
   object-t t1 = make(thing::klass);
   
-  if (!dk::empty?(t1))
+  if (!$empty?(t1))
     ;
   
-  object-t t2 = dk::empty(t1);
+  object-t t2 = $empty(t1);
 
-  dk::empty!(t1);
+  $empty!(t1);
 
   //
 
   object-t o = make(other-thing::klass);
 
-  dk::set-count(o, 7);
+  $set-count(o, 7);
 
   USE(t2);
   return 0;

@@ -17,14 +17,14 @@ int-t main()
     object-t vector =  make(vector::klass);
     object-t string1 = make(string::klass, #bytes : "hello father");
     object-t string2 = make(string::klass, #bytes : "hello mother");
-    dk::add-last(vector, string1);
-    dk::add-last(vector, vector);
-    dk::add-last(vector, string2);
-    dk::add-last(vector, null);
-    dk::add(table, string2, vector);
+    $add-last(vector, string1);
+    $add-last(vector, vector);
+    $add-last(vector, string2);
+    $add-last(vector, null);
+    $add(table, string2, vector);
 
-    dk::write(json-object-output-stream, table);
-    dk::close(json-object-output-stream);
+    $write(json-object-output-stream, table);
+    $close(json-object-output-stream);
   }
   catch(...)
   {

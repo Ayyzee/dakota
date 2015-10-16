@@ -11,6 +11,6 @@ klass k1 {
 }
 int-t main() {
   object-t o = make(k1::klass);
-  dk::m1(o, 0, #width : 0, #length : 3);
+  $m1(o, 0, #width : 0, #length : 3);
   return 0;
 }

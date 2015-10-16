@@ -7,18 +7,18 @@ klass json-object-output-stream;
 int-t main()
 {
   object-t vector1 = make(vector::klass);
-  dk::add-last(vector1, #"0");
+  $add-last(vector1, #"0");
 
   object-t vector2 = make(vector::klass);
-  dk::add-last(vector2, #"1");
-  dk::add-last(vector2, #"2");
-  dk::add-last(vector2, #"3");
+  $add-last(vector2, #"1");
+  $add-last(vector2, #"2");
+  $add-last(vector2, #"3");
 
-  dk::add-all-first(vector1, vector2);
+  $add-all-first(vector1, vector2);
 
   object-t json-object-output-stream = make(json-object-output-stream::klass);
-  dk::write(json-object-output-stream, vector1);
-  dk::close(json-object-output-stream);
+  $write(json-object-output-stream, vector1);
+  $close(json-object-output-stream);
 
   return 0;
 }

@@ -41,7 +41,7 @@ klass autorelease-pool-klass {
   method object-t init(object-t self,
                        named-info::slots-t* info-slots : nullptr,
                        object-t                 info :      nullptr) {
-    self = dk::init(super, #info-slots : info-slots, #info : info);
+    self = $init(super, #info-slots : info-slots, #info : info);
     self.pools = make(deque::klass);
     return self;
   }
@@ -50,8 +50,8 @@ klass autorelease-pool-klass {
     return result;
   }
   method object-t current-pool(object-t self) {
-    assert(false == dk::empty?(self.pools));
-    object-t result = dk::top(self.pools);
+    assert(false == $empty?(self.pools));
+    object-t result = $top(self.pools);
     return result;
   }
 }
@@ -62,34 +62,34 @@ klass autorelease-pool {
     object-t counted-elements;
   }
   method object-t init(object-t self) {
-    self = dk::init(super);
+    self = $init(super);
     self.counted-elements = make(sorted-counted-set::klass);
     object-t kls = klass-of(self);
-    object-t pools = dk::pools(kls);
-    dk::push(pools, self);
+    object-t pools = $pools(kls);
+    $push(pools, self);
     return self;
   }
   method object-t add(object-t self, object-t element) {
-    dk::add(self.counted-elements, element);
+    $add(self.counted-elements, element);
     return self;
   }
   method object-t release(object-t self) {
     for (pair-t* pair in self.counted-elements) {
       uint32-t n = *uint32::unbox(pair->last);
       for (uint32-t i = 0; i < n; i++) {
-        dk::release(pair->first);
+        $release(pair->first);
       }
     }
     object-t kls = klass-of(self);
-    object-t pools = dk::pools(kls);
-    object-t pool = dk::pop(pools);
+    object-t pools = $pools(kls);
+    object-t pool = $pop(pools);
     assert(self == pool);
-    object-t result = dk::dealloc(self);
+    object-t result = $dealloc(self);
     return result;
   }
   method object-t dealloc(object-t self) {
-    dk::dealloc(self.counted-elements);
-    object-t result = dk::dealloc(super);
+    $dealloc(self.counted-elements);
+    object-t result = $dealloc(super);
     return result;
   }
 }

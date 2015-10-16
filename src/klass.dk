@@ -353,7 +353,7 @@ klass klass {
   method object-t alloc(object-t self, str-t file, uint32-t line) {
     DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%i','func':'%s','args':['%s']",
                          file, line, __method__->name, self.name);
-    object-t instance = dk::alloc(self);
+    object-t instance = $alloc(self);
     return instance;
   }
   method object-t alloc(object-t self) {
@@ -404,7 +404,7 @@ klass klass {
   method boole-t method-for-selector?(object-t self, selector-t selector) {
     assert(selector < self.methods.count);
     boole-t result = false;
-    method-t m = dk::method-for-selector(self, selector);
+    method-t m = $method-for-selector(self, selector);
     if (DKT-NULL-METHOD != m) {
       result = true;
     }
@@ -420,7 +420,7 @@ klass klass {
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
-      dk::set-bit(self.behavior, cast(uint32-t)selector, false);
+      $set-bit(self.behavior, cast(uint32-t)selector, false);
     return m;
   }
   method method-t add-method-for-selector(object-t self, selector-t selector, method-t m) {
@@ -428,17 +428,17 @@ klass klass {
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
-      dk::set-bit(self.behavior, cast(uint32-t)selector, true);
+      $set-bit(self.behavior, cast(uint32-t)selector, true);
     return prev-m;
   }
   method method-t reassoc-and-add-method-for-selector(object-t   self,
                                                       selector-t selector1,
                                                       selector-t selector2,
                                                       method-t   method) {
-  dk::add-method-for-selector(self,                         selector1,
-                              dk::method-for-selector(self, selector2));
+  $add-method-for-selector(self,                         selector1,
+                              $method-for-selector(self, selector2));
   method-t prev-method =
-  dk::add-method-for-selector(self,                         selector2,
+  $add-method-for-selector(self,                         selector2,
                                                             method);
   return prev-method;
 }
@@ -494,8 +494,8 @@ klass klass {
 
     if (nullptr != self.superklass) {
 //       if (null == self.superklass)
-//         dk::dump(klass-of(null));
-      dk::dump(self.superklass);
+//         $dump(klass-of(null));
+      $dump(self.superklass);
     }
     return self;
   }
@@ -507,14 +507,14 @@ klass klass {
       uint32-t i = 0;
       symbol-t trait-name;
       while (nullptr != (trait-name = traits[i++])) {
-        dk::add-last(seq, symbol::box(trait-name));
+        $add-last(seq, symbol::box(trait-name));
       }
     }
     return seq;
   }
   method slots-t* dump-methods(slots-t* s) {
     if (nullptr != s->behavior)
-      dk::dump(s->behavior);
+      $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
     uint32-t max-width = 0;
 
@@ -577,7 +577,7 @@ klass klass {
             add-method-for-selector(self, selector, address);
 
             if (nullptr != self.behavior) {
-              dk::set-bit(self.behavior, cast(uint32-t)selector, true);
+              $set-bit(self.behavior, cast(uint32-t)selector, true);
             }
           } else {
             // ???
@@ -629,7 +629,7 @@ klass klass {
   }
   method boole-t behavior?(object-t self, object-t kls) {
     assert((nullptr != self.behavior) || (nullptr != unbox(kls)->behavior));
-    boole-t state = dk::bit-and?(self.behavior, unbox(kls)->behavior);
+    boole-t state = $bit-and?(self.behavior, unbox(kls)->behavior);
     return state;
   }
   method object-t behavior(object-t self) {
@@ -638,7 +638,7 @@ klass klass {
 
       for (uint32-t index = 0; index < self.methods.count; index++)
         if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
-          dk::set-bit(self.behavior, index, true);
+          $set-bit(self.behavior, index, true);
     }
     return self.behavior;
   }
@@ -649,7 +649,7 @@ klass klass {
   method object-t init(object-t self,
                        named-info::slots-t* info-slots : nullptr,
                        object-t                 info :      nullptr) {
-    self = dk::init(super);
+    self = $init(super);
     assert(!(nullptr != info-slots &&
              nullptr != info));
     named-info::slots-t* tmp-info-slots;
@@ -662,7 +662,7 @@ klass klass {
   }
   method object-t dealloc(object-t self) {
     dkt::dealloc(self.methods.addrs);
-    object-t result = dk::dealloc(super);
+    object-t result = $dealloc(super);
     return result;
   }
   // called from init-klass() from dk-init-runtime()
@@ -771,15 +771,15 @@ klass klass {
     return buffer;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
 
-    dk::write-element(out, self.name,   "name");
-    dk::write-element(out, self.size,   "size");
-    dk::write-element(out, self.offset, "offset");
-    dk::write-element-idref(out, self.superklass, "superklass");
+    $write-element(out, self.name,   "name");
+    $write-element(out, self.size,   "size");
+    $write-element(out, self.offset, "offset");
+    $write-element-idref(out, self.superklass, "superklass");
 
-    dk::write-slots-end(out);
+    $write-slots-end(out);
     return self;
   }
 }

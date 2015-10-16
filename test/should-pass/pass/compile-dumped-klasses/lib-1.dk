@@ -4,7 +4,7 @@
 //name=/usr/local/lib/libdakota-util.dylib
 module dakota-util;
 
-generic object-t dk::init(object-t,object-t info:{0},str-t digits:{0});
+generic object-t $init(object-t,object-t info:{0},str-t digits:{0});
 
 klass ascii-number-klass
 {
@@ -14,7 +14,7 @@ klass ascii-number-klass
   method object-t va::init(object-t,va-list-t);
   method str-t    digits(object-t);
 }
-generic object-t dk::init(object-t,int32-t number:{0});
+generic object-t $init(object-t,int32-t number:{0});
 
 klass ascii-number
 {
@@ -26,7 +26,7 @@ klass ascii-number
   method boole-t   equal?(object-t,object-t);
   method uintmax-t hash(object-t);
 }
-generic object-t dk::init(object-t,uint32-t capacity:{0});
+generic object-t $init(object-t,uint32-t capacity:{0});
 
 klass cstring
 {
@@ -73,7 +73,7 @@ klass float64
 {
   slots double;
 }
-generic object-t dk::init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0});
+generic object-t $init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0});
 
 klass hashed-counted-set
 {
@@ -83,7 +83,7 @@ klass hashed-counted-set
 //method object-t init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0});
   method object-t va::init(object-t,va-list-t);
 }
-generic object-t dk::init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t[] items:{0});
+generic object-t $init(object-t,hash-t hash:{0},equal-predicate-t equal?:{0},object-t elements:{0},object-t[] items:{0});
 
 klass hashed-set
 {
@@ -104,7 +104,7 @@ klass hashed-set
   method uint32-t size(object-t);
   method object-t write-slots(object-t,object-t);
 }
-generic object-t dk::init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0},object-t elements:{0},object-t* items:{0});
+generic object-t $init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0},object-t elements:{0},object-t* items:{0});
 
 klass hashed-table
 {
@@ -114,7 +114,7 @@ klass hashed-table
 //method object-t init(object-t,equal-predicate-t equal?:{0},hash-t hash:{0},object-t elements:{0},object-t* items:{0});
   method object-t va::init(object-t,va-list-t);
 }
-generic object-t dk::init(object-t,file-t file:{0},str-t filename:{0});
+generic object-t $init(object-t,file-t file:{0},str-t filename:{0});
 
 klass input-file
 {
@@ -126,7 +126,7 @@ klass input-file
   method object-t put-char8(object-t,char8-t);
   method object-t split(object-t,type-predicate-t);
 }
-generic object-t dk::init(object-t,file-t file:{0},str-t filename:{0});
+generic object-t $init(object-t,file-t file:{0},str-t filename:{0});
 
 klass lexer
 {
@@ -146,7 +146,7 @@ klass open-token
   method object-t set-close-token(object-t,object-t);
   method object-t write-slots(object-t,object-t);
 }
-generic object-t dk::init(object-t,object-t first:{},object-t last:{});
+generic object-t $init(object-t,object-t first:{},object-t last:{});
 
 klass pair
 {
@@ -160,7 +160,7 @@ klass pair
   method object-t first(object-t);
   method object-t last(object-t);
 }
-generic object-t dk::init(object-t,file-t file:{0});
+generic object-t $init(object-t,file-t file:{0});
 
 klass json-object-output-stream
 {
@@ -176,7 +176,7 @@ klass json-object-output-stream
   method object-t write-table-end(object-t);
   method object-t write-table-start(object-t,str-t);
 }
-generic object-t dk::init(object-t,file-t file:{0},str-t filename:{0});
+generic object-t $init(object-t,file-t file:{0},str-t filename:{0});
 
 klass json-parser
 {
@@ -210,7 +210,7 @@ klass slot-info
     uint32-t size;
   }
 }
-generic object-t dk::init(object-t,object-t token:{},str-t filename:{},str-t message:{0});
+generic object-t $init(object-t,object-t token:{},str-t filename:{},str-t message:{0});
 
 klass syntax-exception
 {
@@ -221,7 +221,7 @@ klass syntax-exception
   method object-t print(object-t,object-t);
   method object-t print-shallow(object-t,object-t);
 }
-generic object-t dk::init(object-t,file-t file:{0});
+generic object-t $init(object-t,file-t file:{0});
 
 klass text-output-stream
 {
@@ -233,7 +233,7 @@ klass text-output-stream
   method object-t column-incr(object-t);
   method object-t write(object-t,str-t,features-t);
 }
-generic object-t dk::init(object-t,uint32-t line:{0},uint32-t column:{0},tokenid-t tokenid:{0},str-t buffer:{0});
+generic object-t $init(object-t,uint32-t line:{0},uint32-t column:{0},tokenid-t tokenid:{0},str-t buffer:{0});
 
 klass token
 {
@@ -271,7 +271,7 @@ klass type-predicate
 {
   slots boole-t(*)(int-t);
 }
-generic object-t dk::init(object-t,file-t file:{0});
+generic object-t $init(object-t,file-t file:{0});
 
 klass xml-object-output-stream
 {

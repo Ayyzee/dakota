@@ -58,12 +58,12 @@ klass hashed-set {
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
-  // dk::init(o, #items : cast(object-t[]){ o1, o2, nullptr });
+  // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
   method object-t init(object-t  self,
                        object-t  elements : nullptr,
                        object-t* items :    nullptr) {
-    self = dk::init(super);
+    self = $init(super);
     self.num-buckets = gbl-prime;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);
     self.size = 0;
@@ -71,28 +71,28 @@ klass hashed-set {
     self.iterator-state = 0;
 
     if (nullptr != elements)
-      dk::add-all(self, elements);
+      $add-all(self, elements);
 
     if (nullptr != items)
-      dk::add-items(self, items);
+      $add-items(self, items);
     return self;
   }
   method object-t add(object-t self, object-t object1) {
-    uint32-t index = dk::hash(object1) % self.num-buckets;
-    object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
+    uint32-t index = $hash(object1) % self.num-buckets;
+    object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
       deque = make(deque::klass);
       self.iterator-state++;
       self.size++; // bugbug - could wrap
-      dk::add-first(deque, object1);
+      $add-first(deque, object1);
       // why use replace-at?  should be add-at
-      dk::replace-at(self.buckets, index, deque);
+      $replace-at(self.buckets, index, deque);
     } else {
       object-t element = nullptr;
 
       for (object-t object2 in deque) {
-        if (dk::equal?(object2, object1)) { // arg order matters here!!
+        if ($equal?(object2, object1)) { // arg order matters here!!
           element = object2;
           break;
         }
@@ -100,7 +100,7 @@ klass hashed-set {
       if (nullptr == element) {
         self.iterator-state++;
         self.size++; // bugbug - could wrap
-        dk::add-first(deque, object1);
+        $add-first(deque, object1);
       }
     }
     return object1;
@@ -108,18 +108,18 @@ klass hashed-set {
   method object-t empty(object-t self) {
     if (0 != self.size) {
       self.iterator-state++;
-      dk::empty(self.buckets);
+      $empty(self.buckets);
     }
     return self;
   }
   method object-t at(object-t self, object-t object1, object-t default-value) {
-    uint32-t index = dk::hash(object1) % self.num-buckets;
-    object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
+    uint32-t index = $hash(object1) % self.num-buckets;
+    object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
 
     if (nullptr != deque) {
       for (object-t object2 in deque) {
-        if (dk::equal?(object2, object1)) { // arg order matters here!!
+        if ($equal?(object2, object1)) { // arg order matters here!!
           result = object2;
           break;
         }
@@ -128,7 +128,7 @@ klass hashed-set {
     return result;
   }
   method object-t at(object-t self, object-t object) {
-    object-t result = dk::at(self, object, cast(object-t)nullptr);
+    object-t result = $at(self, object, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #message : "oops");
     return result;
@@ -136,7 +136,7 @@ klass hashed-set {
   method boole-t contains?(object-t self, object-t key) {
     boole-t state;
 
-    if (nullptr == dk::at(self, key, cast(object-t)nullptr))
+    if (nullptr == $at(self, key, cast(object-t)nullptr))
       state = false;
     else
       state = true;
@@ -154,20 +154,20 @@ klass hashed-set {
   method object-t remove(object-t self, object-t element1) {
     object-t object = null;
 
-    uint32-t index = dk::hash(element1) % self.num-buckets;
-    object-t deque = dk::at(self.buckets, index, cast(object-t)nullptr);
+    uint32-t index = $hash(element1) % self.num-buckets;
+    object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {
-      for (object-t forward-iterator = dk::forward-iterator(deque);
-           object-t element2 = dk::next(forward-iterator); ) {
-        //printf("element: %s\n", dk::name(element));
-        //printf("element2: %s\n", dk::name(element2));
+      for (object-t forward-iterator = $forward-iterator(deque);
+           object-t element2 = $next(forward-iterator); ) {
+        //printf("element: %s\n", $name(element));
+        //printf("element2: %s\n", $name(element2));
 
-        if (dk::equal?(element2, element1)) { // arg order matters here!!
+        if ($equal?(element2, element1)) { // arg order matters here!!
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           self.iterator-state++;
-          object = dk::remove(forward-iterator); //element2
+          object = $remove(forward-iterator); //element2
           self.size--;
           break;
         }
@@ -181,7 +181,7 @@ klass hashed-set {
     slots-t* s1 = unbox(self);
     slots-t* s2 = unbox(copy);
     *s2 = *s1;
-    s2->buckets = dk::copy-shallow(s1->buckets);
+    s2->buckets = $copy-shallow(s1->buckets);
     s2->iterator-state = 0;
     return copy;
   }
@@ -193,24 +193,24 @@ klass hashed-set {
     return forward-iterator;
   }
   method object-t dump(object-t self) {
-    dk::dump(super);
+    $dump(super);
     fprintf(stderr, "%p:%p { size=%u, elements=[] }\n",
             cast(void*)(self), cast(void*)unbox(self), self.size);
     for (object-t element in self)
-      dk::dump(element);
+      $dump(element);
     return self;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
 
-    dk::write-sequence-start(out, "elements");
+    $write-sequence-start(out, "elements");
 
     for (object-t element in self)
-      dk::write-element-idref(out, element, cast(str-t)nullptr);
-    dk::write-sequence-end(out);
+      $write-element-idref(out, element, cast(str-t)nullptr);
+    $write-sequence-end(out);
 
-    dk::write-slots-end(out);
+    $write-slots-end(out);
     return self;
   }
 }
@@ -232,17 +232,17 @@ klass hashed-set-forward-iterator {
     return;
   }
   method object-t init(object-t self, object-t hashed-set : {~}) {
-    self = dk::init(super);
+    self = $init(super);
     assert(null != hashed-set);
     hashed-set::slots-t* hs = hashed-set::unbox(hashed-set);
     self.hashed-set = hashed-set;
-    self.vector-iter = dk::forward-iterator(hs->buckets);
+    self.vector-iter = $forward-iterator(hs->buckets);
     self.iterator-state = hs->iterator-state;
     self.deque-iter = nullptr;
-    object-t deque = dk::next(self.vector-iter);
+    object-t deque = $next(self.vector-iter);
     if (nullptr != deque) {
-      assert(0 != dk::size(deque));
-      self.deque-iter = dk::forward-iterator(deque);
+      assert(0 != $size(deque));
+      self.deque-iter = $forward-iterator(deque);
     }
     return self;
   }
@@ -250,31 +250,31 @@ klass hashed-set-forward-iterator {
     check-iterator-state(self);
     boole-t result = false;
     if (nullptr != self.deque-iter)
-      result = dk::next?(self.deque-iter);
+      result = $next?(self.deque-iter);
     return result;
   }
   static object-t next-deque-iterator(object-t vector-iter) {
-    object-t deque = dk::next(vector-iter);
+    object-t deque = $next(vector-iter);
     object-t deque-iter = nullptr;
     if (nullptr != deque) {
-      assert(0 != dk::size(deque));
-      deque-iter = dk::forward-iterator(deque);
+      assert(0 != $size(deque));
+      deque-iter = $forward-iterator(deque);
     }
     return deque-iter;
   }
   method object-t next(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk::next?(self)) {
-      element = dk::next(self.deque-iter);
+    if ($next?(self)) {
+      element = $next(self.deque-iter);
       if (nullptr == element) {
         self.deque-iter = next-deque-iterator(self.vector-iter);
         if (nullptr != self.deque-iter)
-          element = dk::next(self.deque-iter); // may return nullptr
+          element = $next(self.deque-iter); // may return nullptr
       }
       if (nullptr != element)
         if (nullptr != self.deque-iter)
-          unless (dk::next?(self.deque-iter))
+          unless ($next?(self.deque-iter))
             self.deque-iter = next-deque-iterator(self.vector-iter); // may return nullptr
     }
     return element;
@@ -282,8 +282,8 @@ klass hashed-set-forward-iterator {
   method object-t element(object-t self) {
     check-iterator-state(self);
     object-t element = nullptr;
-    if (dk::next?(self)) {
-      element = dk::element(self.deque-iter);
+    if ($next?(self)) {
+      element = $element(self.deque-iter);
       assert(nullptr != element);
     }
     return element; // returns nullptr on error

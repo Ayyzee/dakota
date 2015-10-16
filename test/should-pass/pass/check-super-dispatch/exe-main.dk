@@ -4,7 +4,7 @@ klass k1
 {
   method object-t init(object-t self)
   {
-    self = dk::init(super);
+    self = $init(super);
     log-klass-func();
     return self;
   }
@@ -16,7 +16,7 @@ klass k2
 
   method object-t init(object-t self)
   {
-    self = dk::init(super);
+    self = $init(super);
     log-klass-func();
     return self;
   }
@@ -28,7 +28,7 @@ klass k3
 
   method object-t init(object-t self)
   {
-    self = dk::init(super);
+    self = $init(super);
     log-klass-func();
     return self;
   }

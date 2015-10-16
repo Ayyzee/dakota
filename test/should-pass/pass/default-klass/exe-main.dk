@@ -25,7 +25,7 @@ klass o1
   {
     // the klass klass, not the klass k1-klass
     object-t kls = klass-of(klass-of(self));
-    dk::bar(kls); // this should fail
+    $bar(kls); // this should fail
     return self;
   }
 }
@@ -40,7 +40,7 @@ int-t main()
 {
   try {
     object-t i2 = make(o2::klass);
-    dk::foo(i2);
+    $foo(i2);
   } catch (no-such-method-exception::klass e) {
     //
   }

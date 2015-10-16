@@ -53,7 +53,7 @@ klass json-parser {
   method object-t init(object-t self,
                        file-t   file :     stdin,
                        str-t    filename : nullptr) {
-    self = dk::init(super);
+    self = $init(super);
     assert(!(stdin != file &&
              nullptr  != filename)); // these are mutually exclusive
 
@@ -155,7 +155,7 @@ klass json-parser {
           if (quote-type == c)
             return token; // empty string
           do {
-            dk::append(token, cast(uint32-t)c);
+            $append(token, cast(uint32-t)c);
 
             if ('\\' == c)
               escaped? = true;
@@ -191,7 +191,7 @@ klass json-parser {
           object-t token = make(token::klass, #tokenid : 'st', // 'st' should be 'idnt'
                                 #line : self.line, #column : self.column - 1);
           do {
-            dk::append(token, cast(uint32-t)c);
+            $append(token, cast(uint32-t)c);
             c = json-parser::get(self);
           } while (isalnum(c) || '_' == c);
           if (EOF != c)
@@ -216,20 +216,20 @@ klass json-parser {
       return null;
     }
     object-t key;
-    switch (dk::tokenid(token)) {
+    switch ($tokenid(token)) {
       case 'sqst':
-        key = make(string::klass, #bytes : dk::buffer(token));
+        key = make(string::klass, #bytes : $buffer(token));
         break;
       case 'dqst':
-        key = make(string::klass, #bytes : dk::buffer(token));
+        key = make(string::klass, #bytes : $buffer(token));
         break;
       case 'st':
-        key = make(string::klass, #bytes : dk::buffer(token));
+        key = make(string::klass, #bytes : $buffer(token));
         break;
       case '}':
         return null;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or '}' but got '%s'\n", dk::buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or '}' but got '%s'\n", $buffer(token));
         return null;
     }
     return key;
@@ -240,11 +240,11 @@ klass json-parser {
       print-error(self.filename, self.line, self.column, "incomplete table\n");
       return null;
     }
-    if (dk::tokenid(token) != ':') {
-      print-error(self.filename, self.line, self.column, "expected ':' but got '%s'\n", dk::buffer(token));
+    if ($tokenid(token) != ':') {
+      print-error(self.filename, self.line, self.column, "expected ':' but got '%s'\n", $buffer(token));
       return null;
     }
-    return make(string::klass, #bytes : dk::buffer(token));
+    return make(string::klass, #bytes : $buffer(token));
   }
   /* method */ static object-t get-element(object-t self)
   { // get table element - element is NOT optional
@@ -254,18 +254,18 @@ klass json-parser {
       return null;
     }
     object-t element;
-    switch (dk::tokenid(token)) {
+    switch ($tokenid(token)) {
       case 'null':
         element = null;
         break;
       case 'sqst':
-        element = make(string::klass, #bytes : dk::buffer(token));
+        element = make(string::klass, #bytes : $buffer(token));
         break;
       case 'dqst':
-        element = make(string::klass, #bytes : dk::buffer(token));
+        element = make(string::klass, #bytes : $buffer(token));
         break;
       case 'st':
-        element = make(string::klass, #bytes : dk::buffer(token));
+        element = make(string::klass, #bytes : $buffer(token));
         break;
       case '{':
         element = json-parser::get-table(self);
@@ -274,7 +274,7 @@ klass json-parser {
         element = json-parser::get-vector(self);
         break;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", dk::buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
         return null;
     }
     return element;
@@ -287,18 +287,18 @@ klass json-parser {
       return null;
     }
     object-t element;
-    switch (dk::tokenid(token)) {
+    switch ($tokenid(token)) {
       case 'null':
         element = null;
         break;
       case 'sqst':
-        element = make(string::klass, #bytes : dk::buffer(token));
+        element = make(string::klass, #bytes : $buffer(token));
         break;
       case 'dqst':
-        element = make(string::klass, #bytes : dk::buffer(token));
+        element = make(string::klass, #bytes : $buffer(token));
         break;
       case 'st':
-        element = make(string::klass, #bytes : dk::buffer(token));
+        element = make(string::klass, #bytes : $buffer(token));
         break;
       case '{':
         element = json-parser::get-table(self);
@@ -309,7 +309,7 @@ klass json-parser {
       case ']': // only difference from get-element()
         return null;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' or ']' but got '%s'\n", dk::buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' or ']' but got '%s'\n", $buffer(token));
         return null;
     }
     return element;
@@ -336,18 +336,18 @@ klass json-parser {
         return vector;
 
       // add 'element' to 'vector'
-      dk::add-last(vector, element);
+      $add-last(vector, element);
 
       token = json-parser::lex(self);
       if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete vector\n");
         return null;
       }
-    } while (',' == dk::tokenid(token));
+    } while (',' == $tokenid(token));
       
       
-    if (']' != dk::tokenid(token)) {
-      print-error(self.filename, self.line, self.column, "expected ',' or ']' but got '%s'\n", dk::buffer(token));
+    if (']' != $tokenid(token)) {
+      print-error(self.filename, self.line, self.column, "expected ',' or ']' but got '%s'\n", $buffer(token));
       return null;
     }
     return vector;
@@ -361,17 +361,17 @@ klass json-parser {
         return table;
 
       // add 'table-pair' to 'table'
-      dk::add(table, table-pair);
+      $add(table, table-pair);
 
       token = json-parser::lex(self);
       if (null == token) {
         print-error(self.filename, self.line, self.column, "incomplete table\n");
         return null;
       }
-    } while (',' == dk::tokenid(token));
+    } while (',' == $tokenid(token));
       
-    if ('}' != dk::tokenid(token)) {
-      print-error(self.filename, self.line, self.column, "expected ',' or '}' but got '%s'\n", dk::buffer(token));
+    if ('}' != $tokenid(token)) {
+      print-error(self.filename, self.line, self.column, "expected ',' or '}' but got '%s'\n", $buffer(token));
       return null;
     }
     return table;
@@ -381,7 +381,7 @@ klass json-parser {
   //      {
   //        object-t token;
   //        while (null != (token = json-parser::lex(self)))
-  //          dk::token::print(token, stdout);
+  //          $token::print(token, stdout);
   //        return null;
   //      }
   method object-t read-property-list(object-t self) {
@@ -389,21 +389,21 @@ klass json-parser {
     if (null == token)
       return null;
 
-    switch (dk::tokenid(token)) {
+    switch ($tokenid(token)) {
       case 'null':
         return null;
       case 'sqst':
-        return make(string::klass, #bytes : dk::buffer(token));
+        return make(string::klass, #bytes : $buffer(token));
       case 'dqst':
-        return make(string::klass, #bytes : dk::buffer(token));
+        return make(string::klass, #bytes : $buffer(token));
       case 'st':
-        return make(string::klass, #bytes : dk::buffer(token));
+        return make(string::klass, #bytes : $buffer(token));
       case '{':
         return json-parser::get-table(self);
       case '[':
         return json-parser::get-vector(self);
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", dk::buffer(token));
+        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
         return null;
     }
   }

@@ -4,7 +4,7 @@ klass test
 {
   method object-t init(object-t self)
   {
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 }

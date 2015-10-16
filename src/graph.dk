@@ -28,7 +28,7 @@ klass node {
   method object-t init(object-t self,
                        str-t    name :  {~},
                        object-t attrs : null) {
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 }
@@ -44,7 +44,7 @@ klass edge {
                        str-t    lhs-name : {~},
                        str-t    rhs-name : {~},
                        object-t attrs :    null) {
-    self = dk::init(super);
+    self = $init(super);
     self.lhs-name = lhs-name;
     self.rhs-name = rhs-name;
     self.attr =     attr;
@@ -56,7 +56,7 @@ klass attrs {
 
   method object-t init(object-t self,
                        object-t attrs : {~}) {
-    self = dk::init(super);
+    self = $init(super);
     *unbox(self) = attrs;
     return self;
   }
@@ -73,14 +73,14 @@ klass graph {
                        symbol-t type :  #graph,
                        str-t    name :  nullptr,
                        object-t attrs : null) {
-    self = dk::init(super);
+    self = $init(super);
     self.type = type;
     self.name = name;
     // what should I do with attrs?
     return self;
   }
   method object-t add-stmt(object-t self, object-t stmt) {
-    dk::add-last(self.stmts, stmt);
+    $add-last(self.stmts, stmt);
     return self;
   }
   method object-t add-graph-attrs(object-t self, object-t attrs) {

@@ -46,7 +46,7 @@ klass input-file {
   method object-t init(object-t self,
                        file-t   file :     nullptr,
                        str-t    filename : nullptr) {
-    self = dk::init(super);
+    self = $init(super);
     assert(!(nullptr != file && nullptr != filename)); // these are mutually exclusive
     assert(stdout != file);
     assert(stderr != file);
@@ -84,7 +84,7 @@ klass input-file {
   }
   method object-t dealloc(object-t self) {
     dkt::dealloc(self.buffer);
-    object-t result = dk::dealloc(super);
+    object-t result = $dealloc(super);
     return result;
   }
   method str-t filename(object-t self) {
@@ -127,24 +127,24 @@ klass input-file {
     while (1) {
       str128-t  ws-buf = "";
       uint32-t ws-buf-pos = 0;
-      while (type?(c = dk::get-char8(self))) {
+      while (type?(c = $get-char8(self))) {
         ws-buf[ws-buf-pos] = c;
         ws-buf-pos++;
         ws-buf[ws-buf-pos] = NUL;
       }
       if (NUL == c)
         return result;
-      dk::put-char8(self, c);
+      $put-char8(self, c);
 
       str128-t  buf = "";
       uint32-t buf-pos = 0;
-      until (type?(c = dk::get-char8(self))) {
+      until (type?(c = $get-char8(self))) {
         buf[buf-pos] = c;
         buf-pos++;
         buf[buf-pos] = NUL;
       }
       object-t t = make(token::klass, #line : self.line, #column : self.column, #buffer : buf);
-      dk::add-last(result, t);
+      $add-last(result, t);
 
       if (NUL == c)
         return result;

@@ -9,12 +9,12 @@ klass uint32;
 
 static void check-for(object-t collection)
 {
-  printf("%i[", dk::size(collection));
+  printf("%i[", $size(collection));
   char8-t const* delim = "";
-  for (object-t iter = dk::forward-iterator(collection);
-       dk::next?(iter);
-       dk::next(iter)) {
-    object-t e = dk::element(iter);
+  for (object-t iter = $forward-iterator(collection);
+       $next?(iter);
+       $next(iter)) {
+    object-t e = $element(iter);
     printf("%s%i", delim, *uint32::unbox(e));
     delim = ",";
   }
@@ -24,7 +24,7 @@ static void check-for(object-t collection)
 
 static void check-for-each(object-t collection)
 {
-  printf("%i[", dk::size(collection));
+  printf("%i[", $size(collection));
   char8-t const* delim = "";
   for (object-t e in collection) {
     printf("%s%i", delim, *uint32::unbox(e));
@@ -61,8 +61,8 @@ static void check(object-t klass, object-t (*add)(object-t, object-t))
 
 int-t main()
 {
-  check(vector::klass, dk::add-last);
-  check(deque::klass,  dk::add-last);
+  check(vector::klass, $add-last);
+  check(deque::klass,  $add-last);
 
   return 0;
 }

@@ -20,13 +20,13 @@ static int-t check(object-t klass, str-pair-t* sp, size-t sp-len)
   for (uint32-t i = 0; i < sp-len; i++) {
     object-t first = str::box(sp[i].first);
     object-t last =  str::box(sp[i].last);
-    dk::add(collection, first, last);
+    $add(collection, first, last);
   }
 
   fprintf(stderr, "  at():\n");
   for (uint32-t i = 0; i < sp-len; i++) {
     object-t first = str::box(sp[i].first);
-    object-t last = dk::at(collection, first, nullptr);
+    object-t last = $at(collection, first, nullptr);
     if (nullptr != last)
       fprintf(stdout, "    first/last: %s/%s\n", *str::unbox(first),
                                              *str::unbox(last));

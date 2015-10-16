@@ -132,19 +132,19 @@ verbose-terminate() noexcept {
 
   if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
-      dk::dump(current-exception);
+      $dump(current-exception);
 
-  dk::print-format(std-error, "{ \"progname\": \"%s\", \"pid\": %i, \"root-msg\": \"uncaught/unexpected exception\"",
+  $print-format(std-error, "{ \"progname\": \"%s\", \"pid\": %i, \"root-msg\": \"uncaught/unexpected exception\"",
                    getprogname(), getpid());
 
   if (nullptr != current-exception)
-    dk::print(current-exception, std-error);
-    // dk::println-format(std-error, ", \"exception\": \"%s\"", current-exception);
+    $print(current-exception, std-error);
+    // $println-format(std-error, ", \"exception\": \"%s\"", current-exception);
   else-if (nullptr != current-exception-string)
-    dk::print-format(std-error, ", \"exception\": \"%s\"", current-exception-string);
+    $print-format(std-error, ", \"exception\": \"%s\"", current-exception-string);
   else
-    dk::print(std-error, "");
-  dk::println(std-error, " }");
+    $print(std-error, "");
+  $println(std-error, " }");
 
   if (nullptr != original-terminate)
     original-terminate();
@@ -169,14 +169,14 @@ klass exception {
     str-t message;
   }
   method object-t init(object-t self, str-t message : name-of(klass-of(self))) {
-    self = dk::init(super);
+    self = $init(super);
     self.message = message;
     return self;
   }
   method object-t print(object-t self, object-t out) {
     if (null == out)
       out = std-error;
-    dk::print-format(out, ", \"%s\": \"%s\"", name-of(klass), self.message);
+    $print-format(out, ", \"%s\": \"%s\"", name-of(klass), self.message);
     return self;
   }
 }

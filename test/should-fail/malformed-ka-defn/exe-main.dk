@@ -4,7 +4,7 @@ klass k1
 {
   method object-t init(object-t self, object-t token : nullptr, const char8-t* filename : nullptr)
   {
-    self = dk::init(super);
+    self = $init(super);
     return self;
   }
 } 

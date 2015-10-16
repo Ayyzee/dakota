@@ -34,7 +34,7 @@ klass system-exception {
     str128-t       strerror;
   }
   method object-t init(object-t self, int-t errnum : {~}) {
-    self = dk::init(super);
+    self = $init(super);
     assert(0 != errnum);
     self.errnum = errnum;
     self.name = strerror-name(self.errnum);
@@ -44,8 +44,8 @@ klass system-exception {
   method object-t print(object-t self, object-t out) {
     if (null == out)
       out = std-error;
-    dk::print(super, out);
-    dk::print-format(out, ": errno=%s (\"%s\")\n",
+    $print(super, out);
+    $print-format(out, ": errno=%s (\"%s\")\n",
                     self.name, self.strerror);
     return self;
   }

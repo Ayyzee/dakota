@@ -7,7 +7,7 @@ trait t1
   method object-t f1(object-t self)
 	{
     symbol-t klass-name = name-of(klass-of(self));
-    dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
+    $print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
 }
@@ -17,7 +17,7 @@ trait t1
   method object-t f2(object-t self)
 	{
     symbol-t klass-name = name-of(klass-of(self));
-    dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
+    $print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
 }
@@ -32,7 +32,7 @@ trait t2
   method object-t f2(object-t self)
 	{
     symbol-t klass-name = name-of(klass-of(self));
-    dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
+    $print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
 }
@@ -42,13 +42,13 @@ trait t3
   method object-t f2(object-t self)
 	{
     symbol-t klass-name = name-of(klass-of(self));
-    dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
+    $print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
   method object-t f3(object-t self)
 	{
     symbol-t klass-name = name-of(klass-of(self));
-    dk::print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
+    $print-format(std-output, "%s|%s:%s(%s)\n", klass-name, __klass__, __method__, __signature__->parameter-types);
     return self;
   }
 }
@@ -71,20 +71,20 @@ int-t main()
 {
   {
   object-t o = make(k1::klass);
-  dk::f1(o);
-  dk::f2(o);
+  $f1(o);
+  $f2(o);
   }
 
   {
   object-t o = make(k2::klass);
-  dk::f2(o);
+  $f2(o);
   }
 
   {
   object-t o = make(k3::klass);
-  dk::f1(o);
-  dk::f2(o);
-  dk::f3(o);
+  $f1(o);
+  $f2(o);
+  $f3(o);
   }
 
   return 0;

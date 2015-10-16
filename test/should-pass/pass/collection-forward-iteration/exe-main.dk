@@ -34,10 +34,10 @@ static int-t check-collection(object-t klass, collection-type-t collection-type,
     object-t e = size::box(i);
     offset += sprintf(lhs + offset, "/%zx", *size::unbox(e));
     if (ORDERED & collection-type)
-      dk::add-last(collection, e);
+      $add-last(collection, e);
     else
-      dk::add(collection, e);
-//     size-t size = dk::size(collection);
+      $add(collection, e);
+//     size-t size = $size(collection);
 //     printf("1 + %i == %i\n", i, size);
   }
 

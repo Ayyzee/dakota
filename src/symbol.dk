@@ -45,20 +45,20 @@ klass symbol {
   method int-t compare(object-t self, object-t other) {
     int-t result;
 
-    if (dk::instance?(other, klass)) {
+    if ($instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
     } else {
-      result = dk::compare(super, other);
+      result = $compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;
   }
   method object-t dump(object-t self) {
-    dk::dump(super);
+    $dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n",
-            cast(void*)(self), cast(void*)unbox(self), dk::utf8-from(self));
+            cast(void*)(self), cast(void*)unbox(self), $utf8-from(self));
     return self;
   }
   method uintptr-t hash(slots-t s) {
@@ -70,10 +70,10 @@ klass symbol {
     return utf8;
   }
   method object-t write-lite(object-t self, object-t out) {
-    str-t utf8 = dk::utf8-from(self);
-    dk::write(out, "\"");
-    dk::write(out, utf8);
-    dk::write(out, "\"");
+    str-t utf8 = $utf8-from(self);
+    $write(out, "\"");
+    $write(out, utf8);
+    $write(out, "\"");
     return self;
   }
 }

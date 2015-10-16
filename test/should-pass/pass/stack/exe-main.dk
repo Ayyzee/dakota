@@ -9,13 +9,13 @@ int-t main()
   object-t element;
 
   stack = make(vector::klass);
-  dk::push(stack, null);
-  element = dk::pop(stack);
+  $push(stack, null);
+  element = $pop(stack);
   assert(null == element);
 
   stack = make(deque::klass);
-  dk::push(stack, null);
-  element = dk::pop(stack);
+  $push(stack, null);
+  element = $pop(stack);
   assert(null == element);
 
   return 0;

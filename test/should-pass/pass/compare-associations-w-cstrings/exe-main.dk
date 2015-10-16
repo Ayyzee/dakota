@@ -14,12 +14,12 @@ int-t main()
                         first : #"key0",
                         last :  #"element0");
 
-  intptr-t result = dk::compare(pair1, pair2);
+  intptr-t result = $compare(pair1, pair2);
   assert(0 == result);
 
 //   object-t json-object-output-stream = make(json-object-output-stream::klass);
-//   dk::write(json-object-output-stream, pair);
-//   dk::close(json-object-output-stream);
+//   $write(json-object-output-stream, pair);
+//   $close(json-object-output-stream);
 
   return 0;
 }

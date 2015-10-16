@@ -50,15 +50,15 @@ trait set {
     return null;
   }
   method object-t write-lite(object-t self, object-t out) {
-    dk::write(out, "{");
+    $write(out, "{");
     str-t delim = "";
 
     for (object-t element in self) {
-      dk::write(out, delim);
-      dk::write-lite(element, out); // must be primitive type
+      $write(out, delim);
+      $write-lite(element, out); // must be primitive type
       delim = ",";
     }
-    dk::write(out, "}");
+    $write(out, "}");
     return self;
   }
   method object-t forward-iterator(object-t); // hackhack

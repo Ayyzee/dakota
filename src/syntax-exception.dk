@@ -34,7 +34,7 @@ klass syntax-exception {
                        object-t token :    {~},
                        str-t    filename : {~},
                        str-t    message :  __klass__) {
-    self = dk::init(super);
+    self = $init(super);
     assert(nullptr != token &&
            null != token);
     self.token = token;
@@ -46,16 +46,16 @@ klass syntax-exception {
     assert(nullptr != out);
     if (null == out)
       out = std-error;
-    dk::print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
-                    self.filename, dk::line(self.token), dk::column(self.token), dk::buffer(self.token), self.message);
+    $print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
+                    self.filename, $line(self.token), $column(self.token), $buffer(self.token), self.message);
     return self;
   }
   method object-t print(object-t self, object-t out) {
     assert(nullptr != out);
     if (null == out)
       out = std-error;
-    dk::print(super, out);
-    dk::print-shallow(self, out);
+    $print(super, out);
+    $print-shallow(self, out);
     return self;
   }
 }

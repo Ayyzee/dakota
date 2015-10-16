@@ -2071,6 +2071,8 @@ sub rep_tree_from_dk_path {
   &encode_strings(\$_);
   &encode_comments(\$_);
 
+  $_ =~ s/\$/dk::/g;
+
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
   #print STDERR $_;

@@ -36,7 +36,7 @@ int-t main()
   int-t overwrite;
   setenv("DK_DUMP_CTLG", "", overwrite = 1);
   object-t k2-klass = dk-export-klass(&k2-info);
-  dk::dump(k2-klass);
+  $dump(k2-klass);
 
   return 0;
 }

@@ -11,8 +11,8 @@ int-t main()
                        #last :  #"element0");
 
   object-t json-object-output-stream = make(json-object-output-stream::klass);
-  dk::write(json-object-output-stream, pair);
-  dk::close(json-object-output-stream);
+  $write(json-object-output-stream, pair);
+  $close(json-object-output-stream);
 
   return 0;
 }

@@ -28,63 +28,63 @@ trait table {
     object-t result = make(set-kls);
     for (pair-t* pair in self) {
       object-t first = pair->first;
-      dk::add(result, first);
+      $add(result, first);
     }
     return result;
   }
   method object-t elements(object-t self) {
-    object-t result = make(vector::klass, #size : dk::size(self));
+    object-t result = make(vector::klass, #size : $size(self));
     for (pair-t* pair in self) {
       object-t last = pair->last;
-      dk::add-last(result, last);
+      $add-last(result, last);
     }
     return result;
   }
   method object-t write-lite(object-t self, object-t out) {
-    dk::write(out, "{");
+    $write(out, "{");
     str-t delim = "";
 
     for (pair-t* pair in self) {
       object-t first = pair->first;
       object-t last =  pair->last;
-      dk::write(out, delim);
-      dk::write-lite(first, out); // must be primitive type
-      dk::write(out, ":");
+      $write(out, delim);
+      $write-lite(first, out); // must be primitive type
+      $write(out, ":");
       if (nullptr == last || null == last)
-        dk::write(out, "null");
+        $write(out, "null");
       else
-        dk::write-lite(last, out);
+        $write-lite(last, out);
       delim = ",";
     }
-    dk::write(out, "}");
+    $write(out, "}");
     return self;
   }
   method object-t add(object-t self, object-t first, object-t last) {
     object-t pair = pair::box({first, last});
-    dk::add(self, pair);
+    $add(self, pair);
     return pair;
   }
   static object-t at(object-t self, object-t first) {
-    object-t last = dk::pair-at(self, first);
-    if (dk::instance?(last, pair::klass))
+    object-t last = $pair-at(self, first);
+    if ($instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
   static object-t at(object-t self, object-t first, object-t default-last) {
-    object-t last = dk::pair-at(self, first, cast(object-t)nullptr);
+    object-t last = $pair-at(self, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
-    if (nullptr != last && dk::instance?(last, pair::klass))
+    if (nullptr != last && $instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
   object-t initialize(object-t kls) {
-    dk::reassoc-and-add-method-for-selector(kls,
+    $reassoc-and-add-method-for-selector(kls,
                                             SELECTOR(               pair-at(object-t, object-t)),
                                             SELECTOR(                    at(object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t))at);
 
-    dk::reassoc-and-add-method-for-selector(kls,
+    $reassoc-and-add-method-for-selector(kls,
                                             SELECTOR(               pair-at(object-t, object-t, object-t)),
                                             SELECTOR(                    at(object-t, object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t, object-t))at);

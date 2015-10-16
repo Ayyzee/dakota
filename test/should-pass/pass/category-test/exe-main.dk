@@ -7,7 +7,7 @@ klass foobar;
 int-t main()
 {
   object-t o = make(foobar::klass);
-  dk::foo(o);
-  dk::bar(o);
+  $foo(o);
+  $bar(o);
   return 0;
 }

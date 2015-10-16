@@ -28,17 +28,17 @@ klass str64 {
   slots char8-t[64];
 
   method slots-t* dump(slots-t* s) {
-  //dk::dump(super);
+  //$dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n", cast(void*)nullptr, cast(void*)(s), *s);
     return s;
   }
   method object-t write-slots(object-t self, object-t out) {
-    dk::write-slots(super, out);
-    dk::write-slots-start(out, klass);
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
 
-    dk::write-element(out, *unbox(self), "contents");
+    $write-element(out, *unbox(self), "contents");
 
-    dk::write-slots-end(out);
+    $write-slots-end(out);
     return self;
   }
   method int-t compare(slots-t* s, slots-t* other-s) {
@@ -49,12 +49,12 @@ klass str64 {
   method int-t compare(object-t self, object-t other) {
     int-t result;
 
-    if (dk::instance?(other, klass)) {
+    if ($instance?(other, klass)) {
       slots-t* s1 = unbox(self);
       slots-t* s2 = unbox(other);
       result = compare(s1, s2);
     } else {
-      result = dk::compare(super, other);
+      result = $compare(super, other);
     }
     result = dkt-normalize-compare-result(result);
     return result;

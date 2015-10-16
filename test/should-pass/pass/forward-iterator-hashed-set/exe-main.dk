@@ -21,24 +21,24 @@ static object-t create(object-t klass, add-t add, uint32-t len)
 
 int-t main()
 {
-  object-t c = create(hashed-set::klass, dk::add, 3);
-//   object-t c = create(deque::klass, dk::add-first, 1);
+  object-t c = create(hashed-set::klass, $add, 3);
+//   object-t c = create(deque::klass, $add-first, 1);
 //   object-t json-object-output-stream = make(json-object-output-stream::klass);
-//   dk::write(json-object-output-stream, c);
+//   $write(json-object-output-stream, c);
 
   if (1) {
-    for (object-t iter = dk::forward-iterator(c);
-         object-t e = dk::next(iter); ) {
+    for (object-t iter = $forward-iterator(c);
+         object-t e = $next(iter); ) {
       fprintf(stderr, "%p\n", (void*)e);
     }
     fprintf(stderr, "--\n");
   }
 
   if (1) {
-    for (object-t iter = dk::forward-iterator(c);
-         dk::next?(iter);
-         dk::next(iter)) {
-      object-t e = dk::element(iter);
+    for (object-t iter = $forward-iterator(c);
+         $next?(iter);
+         $next(iter)) {
+      object-t e = $element(iter);
       fprintf(stderr, "%p\n", (void*)e);
     }
     fprintf(stderr, "\n");

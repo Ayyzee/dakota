@@ -525,12 +525,12 @@ dk-init-runtime() {
     dk-klass-for-name(#bit-vector);
 
     object-t behavior;
-    behavior = dk::behavior(object::klass);
-    behavior = dk::behavior(klass::klass);
-    behavior = dk::behavior(bit-vector::klass);
+    behavior = $behavior(object::klass);
+    behavior = $behavior(klass::klass);
+    behavior = $behavior(bit-vector::klass);
 
     if (null-klass)
-      behavior = dk::behavior(null-klass);
+      behavior = $behavior(null-klass);
 #else
     klass::unbox(object::klass)->behavior =     nullptr;
     klass::unbox(klass::klass)->behavior =      nullptr;
@@ -554,12 +554,12 @@ dk-init-runtime() {
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 #if 0
-    dk::dump(object::klass);
-    dk::dump(klass::klass);
-    dk::dump(singleton-klass::klass);
+    $dump(object::klass);
+    $dump(klass::klass);
+    $dump(singleton-klass::klass);
     if (null) {
-      dk::dump(null-klass);
-      dk::dump(null);
+      $dump(null-klass);
+      $dump(null);
     }
 #endif
   }
@@ -962,7 +962,7 @@ dump-method(ofile-t ofl, signature-t const* info, uint32-t max-return-type-width
 }
 static void
 dump-generic(ofile-t ofl, signature-t const* info) {
- ofile::printf(ofl, "generic %s dk::%s(%s);\n",
+ ofile::printf(ofl, "generic %s $%s(%s);\n",
               info->return-type,
               info->name,
               info->parameter-types);
@@ -1645,10 +1645,10 @@ dk-intern(str-t key) {
 }
 static char8-t*
 get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) {
-  object-t superklass = dk::superklass(klass);
+  object-t superklass = $superklass(klass);
   if (nullptr != superklass && null != superklass)
     get-klass-chain(superklass, buf, buf-len); // recursive
-  str-t klass-name = dk::name(klass);
+  str-t klass-name = $name(klass);
   strcat(buf, "/");
   strcat(buf, klass-name);
   return buf;
