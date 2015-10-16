@@ -1,4 +1,4 @@
-add trailig ! to more danerous version of methods
+add trailing ! to more dangerous version of methods
 add safer versions of ! methods
 
 sort out mutable/immutable design
@@ -12,8 +12,6 @@ Added leading $ to generic functions and va prefixes
   then using namespace dk brings them all in.
   dk::add() =>      $add()
   dk::va::init() => $va::init()
-
-undef => null
 
 trait sets-w-pairs
 
@@ -31,7 +29,7 @@ add to counted-set::counts()?
 
 refactoring tools
 
-automate klass-for-name(#someklass) in initialize() which is currently (manually) handled by the consumer
+automate dk-klass-for-name(#someklass) in initialize(object-t) which is currently (manually) handled by the consumer
 
 warnings/errors on elements in the module import export that don't actually exist.
 
@@ -41,9 +39,22 @@ add --debug=, --optimize= to dakota to pass through to compiler
 
 http://www.rubyinside.com/what-rubys-double-pipe-or-equals-really-does-5488.html
 
-my $len = $$info{size}{len}
-int l = info@size@len;
+in perl: my $len = $$info{size}{len}
+int-t len = info@size@len;
 =>
-int l = dk::at(dk::at(info, size), len);
+int-t len = dk::at(dk::at(info, size), len);
+int-t len = $at($at(info, size), len);
+int-t len = info.$at(size).$at(len);
 
 flush out signal-exception klasses (move/reorg some code from dakota.dk)
+
+function => func
+FUNCTION => FUNC
+
+SELECTOR  => SELECTOR-FUNC
+SIGNATURE => SIGNATURE-FUNC
+
+selector()              => SELECTOR()
+dkt-signature()         => SIGNATURE()
+dkt-kw-args-signature() => KW-ARGS-METHOD-SIGNATURE()
+dkt-slots-signature()   => SLOTS-METHOD-SIGNATURE()
