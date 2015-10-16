@@ -23,6 +23,7 @@
       '-Wno-c99-extensions', # c99 designated initializers, c99 compound literals
       '-Wno-cast-align',
       '-Wno-disabled-macro-expansion',
+      '-Wno-dollar-in-identifier-extension',
       '-Wno-exit-time-destructors',
       '-Wno-four-char-constants',
       '-Wno-global-constructors',
