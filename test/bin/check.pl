@@ -84,4 +84,10 @@ if (0 != $num_failed_run) {
   }
   print "\n";
 }
-print "# summary: pass/total = $num_pass/$total ($num_failed_build + $num_failed_run = $num_failed failure(s))\n";
+my $summary = sprintf("# summary: pass/total = %3i/%3i (%2i + %2i = %2i failure(s))\n",
+                      $num_pass,
+                      $total,
+                      $num_failed_build,
+                      $num_failed_run,
+                      $num_failed);
+print $summary;
