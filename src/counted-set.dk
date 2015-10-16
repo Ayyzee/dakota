@@ -106,18 +106,18 @@ trait counted-set {
   }
   object-t initialize(object-t kls) {
     dk::reassoc-and-add-method-for-selector(kls,
-                                            selector(               pair-at(object-t, object-t)),
-                                            selector(                    at(object-t, object-t)),
+                                            SELECTOR(               pair-at(object-t, object-t)),
+                                            SELECTOR(                    at(object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t))at);
 
     dk::reassoc-and-add-method-for-selector(kls,
-                                            selector(               pair-at(object-t, object-t, object-t)),
-                                            selector(                    at(object-t, object-t, object-t)),
+                                            SELECTOR(               pair-at(object-t, object-t, object-t)),
+                                            SELECTOR(                    at(object-t, object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t, object-t))at);
 
     dk::reassoc-and-add-method-for-selector(kls,
-                                            selector(              add-pair(object-t, object-t)),
-                                            selector(                   add(object-t, object-t)),
+                                            SELECTOR(              add-pair(object-t, object-t)),
+                                            SELECTOR(                   add(object-t, object-t)),
                                             cast(method-t)cast(object-t (*)(object-t, object-t))add);
     return kls;
   }

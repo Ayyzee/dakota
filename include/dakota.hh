@@ -154,12 +154,12 @@ constexpr size_t dk_countof(T(&)[N]) {
 
 inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 // file scope
-#define selector(name, args)             *(cast(dkt_selector_function_t) (cast(selector_t*        (*)args) __selector::name))()
-#define dkt_signature(name, args)         (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __signature::name))()
+#define SELECTOR(name, args)                *(cast(dkt_selector_func_t) (cast(selector_t*        (*)args) __selector::name))()
+#define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(signature_t const* (*)args) __signature::name))()
 
 // klass/trait scope
-#define dkt_slots_signature(name,args)    (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __slots_signature::name))()
-#define dkt_kw_args_signature(name, args) (cast(dkt_signature_function_t)(cast(signature_t const* (*)args) __kw_args_signature::name))()
+#define SLOTS_METHOD_SIGNATURE(name, args)   (cast(dkt_signature_func_t)(cast(signature_t const* (*)args) __slots_method_signature::name))()
+#define KW_ARGS_METHOD_SIGNATURE(name, args) (cast(dkt_signature_func_t)(cast(signature_t const* (*)args) __kw_args_method_signature::name))()
 
 #define unless(e) if (0 == (e))
 #define until(e)  while (0 == (e))
@@ -210,8 +210,8 @@ extern SO_IMPORT object_t std_error;
 
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef uintmax_t (*hash_t)(object_t);
-typedef signature_t const* (*dkt_signature_function_t)();
-typedef selector_t* (*dkt_selector_function_t)();
+typedef signature_t const* (*dkt_signature_func_t)();
+typedef selector_t* (*dkt_selector_func_t)();
 
 constexpr uintptr_t dk_hash(str_t str, uintptr_t i = 0) { // Daniel J. Bernstein
   return !str[i] ? cast(uintptr_t)5381 : ( dk_hash(str, i + 1) * cast(uintptr_t)33 ) ^ cast(uchar8_t)(str[i]);

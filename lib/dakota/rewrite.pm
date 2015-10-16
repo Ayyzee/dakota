@@ -170,23 +170,23 @@ sub rewrite_klass_defn {
 }
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(.*?)(\()          /$1,$2/gx;
-  $$filestr_ref =~ s/(?<!$k)(dkt-signature        \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(SIGNATURE        \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
+  $$filestr_ref =~ s/(?<!$k)(SIGNATURE        \s*\(.*?)(\()          /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(SIGNATURE        \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
 
-  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
-  $$filestr_ref =~ s/(?<!$k)(dkt-kw-args-signature\s*\(.*?)(\()          /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(KW-ARGS-METHOD-SIGNATURE\s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
+  $$filestr_ref =~ s/(?<!$k)(KW-ARGS-METHOD-SIGNATURE\s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(KW-ARGS-METHOD-SIGNATURE\s*\(.*?)(\()          /$1,$2/gx;
 
-  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature  \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature  \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
-  $$filestr_ref =~ s/(?<!$k)(dkt-slots-signature  \s*\(.*?)(\()          /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(SLOTS-METHOD-SIGNATURE  \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
+  $$filestr_ref =~ s/(?<!$k)(SLOTS-METHOD-SIGNATURE  \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(SLOTS-METHOD-SIGNATURE  \s*\(.*?)(\()          /$1,$2/gx;
 }
 sub rewrite_selectors {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!$k)(  selector\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(  selector\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
-  $$filestr_ref =~ s/(?<!$k)(  selector\s*\(.*?)(\()        /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
+  $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(.*?)(\()        /$1,$2/gx;
   ###
   $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
   $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
@@ -311,12 +311,12 @@ sub vars_from_defn {
   }
 
   if (!exists $$kw_args_generics{$name}) { # hackhack
-    $result .= " static signature-t const* __method__ = dkt-signature($name,($params)); USE(__method__);";
+    $result .= " static signature-t const* __method__ = SIGNATURE($name,($params)); USE(__method__);";
   } else {
     # replace keyword args with va-list-t
     $params =~ s|,[^,]+?/\*$colon.*?\*/||g;
     $params .= ", va-list-t";
-    $result .= " static signature-t const* __method__ = dkt-kw-args-signature(va::$name,($params)); USE(__method__);";
+    $result .= " static signature-t const* __method__ = KW-ARGS-METHOD-SIGNATURE(va::$name,($params)); USE(__method__);";
   }
   return $result;
 }

@@ -62,7 +62,7 @@ klass pair {
     object-t other-first;
     if (klass == klass-of(other))
       other-first = unbox(other)->first;
-    else-if (dk::method-for-selector?(klass-of(other), selector(first(object-t))))
+    else-if (dk::method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
       other-first = dk::first(other);
     else
       other-first = other;
@@ -76,7 +76,7 @@ klass pair {
     object-t other-first;
     if (klass == klass-of(other))
       other-first = unbox(other)->first;
-    else-if (dk::method-for-selector?(klass-of(other), selector(first(object-t))))
+    else-if (dk::method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
       other-first = dk::first(other);
     else
       other-first = other;

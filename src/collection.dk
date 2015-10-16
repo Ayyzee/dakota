@@ -77,7 +77,7 @@ klass collection {
   }
   method iter-pair::slots-t iter-pair(object-t self) {
     object-t iter = dk::forward-iterator(self);
-    method-t next = dk::method-for-selector(klass-of(iter), selector(next(object-t)));
+    method-t next = dk::method-for-selector(klass-of(iter), SELECTOR(next(object-t)));
     return cast(iter-pair-t){ .iter = iter, .next = next };
   }
   method object-t add(object-t self, object-t element);
