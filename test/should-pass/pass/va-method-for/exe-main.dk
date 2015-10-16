@@ -24,8 +24,8 @@ klass test
 int-t main()
 {
   dk::dump-methods(test::klass);
-  method-t m = dk::method-for-selector(test::klass, selector(method-1(object-t)));
+  method-t m = dk::method-for-selector(test::klass, SELECTOR(method-1(object-t)));
   USE(m);
-//   va-method-t vm = dk::va-method-for-selector(test::klass, selector(va::method-3(object-t, va-list-t)));
+//   va-method-t vm = dk::va-method-for-selector(test::klass, SELECTOR(va::method-3(object-t, va-list-t)));
   return 0;
 }

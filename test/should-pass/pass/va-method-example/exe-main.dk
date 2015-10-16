@@ -17,7 +17,7 @@ klass fred
 int-t main()
 {
   object-t o = make(fred::klass);
-  selector-t s = selector(va::wilma(object-t, va-list-t));
+  selector-t s = SELECTOR(va::wilma(object-t, va-list-t));
   method-t m = dk::method-for-selector(klass-of(o), s);
   USE(m);
 //   va-method-t vm = dk::va-method-for-selector(klass-of(o));
