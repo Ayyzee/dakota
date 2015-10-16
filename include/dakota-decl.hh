@@ -19,17 +19,21 @@
 
 #define KLASS_NS namespace
 #define TRAIT_NS namespace
-#define METHOD
-#define GENERIC
-#define KW_ARGS_METHOD
-#define KW_ARGS_METHOD_SIGNATURE_FUNC
+
 #define SELECTOR_FUNC
 #define SIGNATURE_FUNC
-#define SLOTS_METHOD_SIGNATURE_FUNC
-#define VA_GENERIC
-#define VA_METHOD
+#define GENERIC
+#define METHOD
+
 #define VA_SELECTOR_FUNC
 #define VA_SIGNATURE_FUNC
+#define VA_GENERIC
+#define VA_METHOD
+#define KW_ARGS_METHOD
+
+#define KW_ARGS_METHOD_SIGNATURE_FUNC
+#define SLOTS_METHOD_SIGNATURE_FUNC
+
 #define ALIAS(m)
 #define INCLUDE(f)
 #define INTERPOSE(k)
