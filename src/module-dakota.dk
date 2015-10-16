@@ -15,8 +15,6 @@
 // limitations under the License.
 
 module dakota export
-  aa::bb::cc,
-  aa::bb::cc::slots-t,
   addr2name-pair,
   addr2name-pair::slots-t,
   assoc-node,
