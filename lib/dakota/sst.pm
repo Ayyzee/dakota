@@ -223,6 +223,7 @@ sub sst::line {
     if (0 eq $index_w_line) {
       last;
     }
+    $index_w_line--;
   }
   my $line = $$sst{'tokens'}[$index_w_line]{'line'};
   return $line;
@@ -911,7 +912,7 @@ sub sst_cursor::balenced {
       my $expected_close_token = &remove_last($stk);
 
       if ($expected_close_token ne $token) {
-        die "error: expected $expected_close_token but got $token\n";
+        &sst_cursor::error($sst_cursor, $i,  "expected $expected_close_token but got $token");
       }
 
       if (0 == @$stk) {
@@ -919,7 +920,7 @@ sub sst_cursor::balenced {
       }
     }
   }
-  die "error: unbalenced\n";
+  &sst_cursor::error($sst_cursor, $index,  "unbalenced");
 }
 sub sst_cursor::logger {
   my ($sst_cursor, $file, $line) = @_;
@@ -973,28 +974,35 @@ sub sst_cursor::match_re {
   return &sst::at($$sst_cursor{'sst'}, $$sst_cursor{'current-token-index'} - 1);
 }
 sub sst_cursor::warning {
-  my ($sst_cursor, $token_index) = @_;
+  my ($sst_cursor, $token_index, $msg) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
 
-  if (!defined $token_index) {
+  if (!defined $token_index || -1 == $token_index) {
     $token_index = $$sst_cursor{'current-token-index'};
   }
   my $sst = $$sst_cursor{'sst'};
   my $line = &sst::line($sst, $token_index);
 
-  printf STDERR "%s:%i: did not expect \'%s\'\n",
-    $$sst{'file'} ||= "<unknown>",
-    $line,
-    &sst::at($sst, $token_index);
+  if ($msg) {
+    printf STDERR "%s:%i: %s\n",
+      $$sst{'file'} ||= "<unknown>",
+      $line,
+      $msg;
+  } else {
+    printf STDERR "%s:%i: did not expect \'%s\'\n",
+      $$sst{'file'} ||= "<unknown>",
+      $line,
+      &sst::at($sst, $token_index);
+  }
   return;
 }
 sub sst_cursor::error {
-  my ($sst_cursor, $token_index) = @_;
+  my ($sst_cursor, $token_index, $msg) = @_;
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);
-  &sst_cursor::warning($sst_cursor, $token_index);
-  exit 1;
+  &sst_cursor::warning($sst_cursor, $token_index, $msg);
+  die;
 }
 my $__gbl_user_data;
 sub lang_user_data {
