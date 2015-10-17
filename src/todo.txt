@@ -48,14 +48,39 @@ warn if something is exported in a module description that is not in
 the compiled image it represents
 
 support something like perl's map function
+my       @doubles = map { $_ * 2 } @numbers;
+object-t  doubles = map {  _ * 2 }  numbers;
+
+support #"some string", #42, #'a', #true, #false
 
 in perl:
   my $len = $$info{size}{len}
 in dakota:
   int-t len = info@size@len;
 
-object-t info = #{ #size : ${ #len : 42, #width : 84 }}
+object-t info = #{ #size : ${ #len : as(uint32)42, #width : as(uint32)84 }}
 int-t len = info@#size@#len;
 =>
 int-t len = info.$at(#size).$at(#len);
 int-t len = $at($at(info, #size), #len);
+
+also
+
+info@#size@#len = 42; // +=, -=, |=, ^=, &=, ||=, &&=, ...
+
+= info@size
+=>
+= $at(info, size)
+
+info@size = expr
+=>
+$set-at(info, size, expr)
+
+#`...`
+
+klass number {
+  superklass of all float types, int types, and char types
+
+allow tracing on specific generics
+
+consider slot-at() and set-slot-at() generated funcs
