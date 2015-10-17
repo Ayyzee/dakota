@@ -84,10 +84,11 @@ if (0 != $num_failed_run) {
   }
   print "\n";
 }
-my $summary = sprintf("# summary: pass/total = %3i/%3i (%2i + %2i = %2i failure(s))\n",
+my $summary = sprintf("# summary: pass/total = %3i/%3i (%2i + %2i = %2i failure(s)) %s\n",
                       $num_pass,
                       $total,
                       $num_failed_build,
                       $num_failed_run,
-                      $num_failed);
+                      $num_failed,
+                      $ENV{'SHA1'});
 print $summary;
