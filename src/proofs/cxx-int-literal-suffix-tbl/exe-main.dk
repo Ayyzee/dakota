@@ -1,0 +1,16 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// http://en.cppreference.com/w/cpp/language/integer_literal
+
+int-t main() {
+  printf("{\n");
+  printf("  \"%c%lu\" : \"%s\"\n", 'i', 8 * sizeof(0L),   "L");
+  if (sizeof(0L) < sizeof(0LL))
+    printf("  \"%c%lu\" : \"%s\"\n", 'i', 8 * sizeof(0LL),  "LL");
+  printf("  \"%c%lu\" : \"%s\"\n", 'u', 8 * sizeof(0U),   "U");
+  printf("  \"%c%lu\" : \"%s\"\n", 'u', 8 * sizeof(0UL),  "UL");
+  if (sizeof(0UL) < sizeof(0ULL))
+    printf("  \"%c%lu\" : \"%s\"\n", 'u', 8 * sizeof(0ULL), "ULL");
+  printf("}\n");
+  return 0;
+}
