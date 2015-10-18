@@ -131,8 +131,6 @@ namespace dkt {
   #define DEBUG_IMPORT
 #endif
 
-#define NULLPTR nullptr
-
 #if !defined HAVE_STRERROR_NAME
   SO_IMPORT str_t strerror_name(int_t);
 #endif
@@ -209,7 +207,7 @@ extern SO_IMPORT object_t std_output;
 extern SO_IMPORT object_t std_error;
 
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
-typedef uintmax_t (*hash_t)(object_t);
+typedef uintptr_t (*hash_t)(object_t);
 typedef signature_t const* (*dkt_signature_func_t)();
 typedef selector_t* (*dkt_selector_func_t)();
 
@@ -218,14 +216,7 @@ constexpr uintptr_t dk_hash(str_t str) { // Daniel J. Bernstein
 }
 constexpr uintptr_t dk_hash_switch(str_t str) { return dk_hash(str); }
 
-constexpr  int8_t   dk_hash_switch( int8_t  val) { return val; }
-constexpr uint8_t   dk_hash_switch(uint8_t  val) { return val; }
-constexpr  int16_t  dk_hash_switch( int16_t val) { return val; }
-constexpr uint16_t  dk_hash_switch(uint16_t val) { return val; }
-constexpr  int32_t  dk_hash_switch( int32_t val) { return val; }
-constexpr uint32_t  dk_hash_switch(uint32_t val) { return val; }
-constexpr  int64_t  dk_hash_switch( int64_t val) { return val; }
-constexpr uint64_t  dk_hash_switch(uint64_t val) { return val; }
+constexpr uintptr_t dk_hash_switch(uintptr_t val) { return val; }
 
 SO_IMPORT int_t  safe_strcmp(str_t, str_t);
 SO_IMPORT size_t safe_strlen(str_t);

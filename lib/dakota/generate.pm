@@ -3700,11 +3700,11 @@ sub generate_kw_args_method_defn {
     }
     $$scratch_str_ref .= " } _state_ = { $initializer };\n";
   }
-  #$$scratch_str_ref .= $col . "if (NULLPTR != $$new_arg_names[-1]) {\n";
+  #$$scratch_str_ref .= $col . "if (nullptr != $$new_arg_names[-1]) {\n";
   #$col = &colin($col);
   $$scratch_str_ref .=
     $col . "keyword-t* _keyword_;\n" .
-    $col . "while (NULLPTR != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {" . &ann(__FILE__, __LINE__) . "\n";
+    $col . "while (nullptr != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated.\n";
   $col = &colin($col);
