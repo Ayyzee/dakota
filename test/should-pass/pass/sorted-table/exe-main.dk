@@ -19,7 +19,5 @@ int-t main() {
   object-t element = $at(table, string1-key, cast(object-t)nullptr);
   printf("%p == %p\n", cast(void*)string1-element, cast(void*)element);
 
-  object-t pair = $pair-at(table, string1-key, cast(object-t)nullptr);
-  printf("%p == %p\n", cast(void*)$first(pair), cast(void*)element);
   return value;
 }

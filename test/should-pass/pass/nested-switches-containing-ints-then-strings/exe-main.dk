@@ -5,7 +5,7 @@
 int-t main()
 {
   int-t int1 = 0;
-  switch (int1)
+  switch (cast(intptr-t)int1)
   {
     case 1:
       //
