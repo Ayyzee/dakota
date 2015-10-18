@@ -574,9 +574,20 @@ sub rewrite_creates {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/($id)::create\((\s*\{.*?\}\s*)\)/$1::create(($1::slots-t)$2)/g;
 }
+sub rewrite_supers_in_klass {
+  my ($type, $name, $block) = @_;
+  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b/$1(super(self, klass)/g;
+  return $type . ' ' . $name . ' ' . $block;
+}
+sub rewrite_supers_in_trait {
+  my ($type, $name, $block) = @_;
+  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b/$1(super(self, klass(self))/g;
+  return $type . ' ' . $name . ' ' . $block;
+}
 sub rewrite_supers {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b/$1(super(self, klass)/gx;
+  $$filestr_ref =~ s/\b(klass)\s+($rid)\s*(.*?$main::block)/&rewrite_supers_in_klass($1, $2, $3)/egs;
+  $$filestr_ref =~ s/\b(trait)\s+($rid)\s*(.*?$main::block)/&rewrite_supers_in_trait($1, $2, $3)/egs;
 }
 #sub rewrite_makes
 #{
