@@ -216,6 +216,7 @@ constexpr uintptr_t dk_hash(str_t str) { // Daniel J. Bernstein
 }
 constexpr uintptr_t dk_hash_switch(str_t str) { return dk_hash(str); }
 
+constexpr  intptr_t dk_hash_switch( intptr_t val) { return val; }
 constexpr uintptr_t dk_hash_switch(uintptr_t val) { return val; }
 
 SO_IMPORT int_t  safe_strcmp(str_t, str_t);
