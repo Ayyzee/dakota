@@ -3712,7 +3712,7 @@ sub generate_kw_args_method_defn {
 
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     $kw_arg_name = $$kw_arg{'name'};
-    $$scratch_str_ref .= $col . "case dk-hash(\"$kw_arg_name\"): // dk-hash() is a constexpr. its compile-time evaluated.\n";
+    $$scratch_str_ref .= $col . "case \#$kw_arg_name: // dk-hash() is a constexpr. its compile-time evaluated.\n";
     #            $$scratch_str_ref .= $col . "{\n";
     $col = &colin($col);
     my $kw_type = &arg::type($$kw_arg{'type'});

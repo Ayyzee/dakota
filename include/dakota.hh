@@ -213,16 +213,19 @@ typedef uintmax_t (*hash_t)(object_t);
 typedef signature_t const* (*dkt_signature_func_t)();
 typedef selector_t* (*dkt_selector_func_t)();
 
-constexpr uintptr_t dk_hash(str_t str, uintptr_t i = 0) { // Daniel J. Bernstein
-  return !str[i] ? cast(uintptr_t)5381 : ( dk_hash(str, i + 1) * cast(uintptr_t)33 ) ^ cast(uchar8_t)(str[i]);
+constexpr uintptr_t dk_hash(str_t str) { // Daniel J. Bernstein
+  return !*str ? cast(uintptr_t)5381 : cast(uintptr_t)(*str) ^ (33 * dk_hash(str + 1));
 }
-constexpr uintptr_t dkt_hash_switch(str_t str) { return dk_hash(str); }
+constexpr uintptr_t dk_hash_switch(str_t str) { return dk_hash(str); }
 
-constexpr  intptr_t dkt_hash_switch( intptr_t val) { return val; }
-constexpr uintptr_t dkt_hash_switch(uintptr_t val) { return val; }
-
-constexpr  int_t dkt_hash_switch( int_t val) { return val; }
-constexpr uint_t dkt_hash_switch(uint_t val) { return val; }
+constexpr  int8_t   dk_hash_switch( int8_t  val) { return val; }
+constexpr uint8_t   dk_hash_switch(uint8_t  val) { return val; }
+constexpr  int16_t  dk_hash_switch( int16_t val) { return val; }
+constexpr uint16_t  dk_hash_switch(uint16_t val) { return val; }
+constexpr  int32_t  dk_hash_switch( int32_t val) { return val; }
+constexpr uint32_t  dk_hash_switch(uint32_t val) { return val; }
+constexpr  int64_t  dk_hash_switch( int64_t val) { return val; }
+constexpr uint64_t  dk_hash_switch(uint64_t val) { return val; }
 
 SO_IMPORT int_t  safe_strcmp(str_t, str_t);
 SO_IMPORT size_t safe_strlen(str_t);
