@@ -1,0 +1,46 @@
+  method object-t slot-at(object-t self, symbol-t name, object-t default-element) {
+    object-t result;
+    strswitch (name) {
+      case #strcmp: result = str-compare::box(self.strcmp);
+        break;
+      // ...
+      default:      result = default-element;
+    };
+    return result;
+  }
+  method object-t slot-at!(object-t self, symbol-t name) {
+    object-t result = dk::slot-at(self, name, cast(object-t)nullptr);
+    if (nullptr == result)
+      throw make(no-such-slot-exception::klass,
+                 #object :    self,
+                 #signature : __method__,
+                 #name :      name);
+    return result;
+  }
+  method object-t slot-at(object-t self, symbol-t name) {
+    object-t result = dk::slot-at(self, name, nullptr);
+    return result;
+  }
+  method object-t set-slot-at(object-t self, symbol-t name, object-t element) {
+    object-t result;
+    strswitch (name) {
+      case #strcmp:
+        assert(dk::instance?(element, str-compare::klass));
+        self.strcmp = *str-compare::unbox(element);
+        result = element;
+        break;
+      default:
+        result = nullptr;
+    }
+    return element;
+  }
+  method object-t set-slot-at!(object-t self, symbol-t name, object-t element) {
+    object-t result = dk::set-slot-at(self, name, element);
+    if (nullptr == result) {
+      throw make(no-such-slot-exception::klass,
+                 #object :    self,
+                 #signature : __method__,
+                 #name :      name);
+    }
+    return result;
+  }
