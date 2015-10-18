@@ -763,6 +763,19 @@ klass klass {
     }
     return state;
   }
+  method object-t klass-with-trait(object-t self, symbol-t trait) {
+    object-t kls = self;
+    while (nullptr != kls && null != kls) {
+      symbol-t const* traits = cast(symbol-t const*)named-info::at(unbox(kls)->info-slots, #traits);
+      while (nullptr != traits && nullptr != *traits) {
+        if (trait == *traits++) {
+          return kls;
+        }
+      }
+      kls = superklass-of(kls);
+    }
+    return nullptr;
+  }
   method str-t utf8-from(object-t self) {
     symbol-t name = self.name;
     uint32-t name-len = cast(uint32-t)safe-strlen(name);

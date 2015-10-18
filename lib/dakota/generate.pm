@@ -2045,6 +2045,13 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = \#@$klass_path; }" . &ann(__FILE__, __LINE__) . "\n";
   }
 
+  if ('trait' eq $klass_type) {
+    if (&is_nrt_decl() || &is_rt_decl()) {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass(object-t); }" . &ann(__FILE__, __LINE__) . "\n";
+    } elsif (&is_rt_defn()) {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass(object-t self) { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . "\n";
+    }
+  }
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { extern DKT-RODATA-SECTION object-t klass; }" . &ann(__FILE__, __LINE__) . "\n";
