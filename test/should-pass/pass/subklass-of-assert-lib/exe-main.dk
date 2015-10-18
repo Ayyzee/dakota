@@ -2,6 +2,8 @@
 
 #include <assert.h>
 
+module test-1;
+
 int-t main()
 {
   object-t o1 = make(k1::klass);
