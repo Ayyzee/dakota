@@ -21,7 +21,7 @@ klass uintmax;
 
 klass keyword {
   slots {
-    symbol-t  symbol; // should be first! offsetof() should return 0 for 'symbol' for best performance
+    symbol-t  symbol;
     uintptr-t hash;
   }
   //SO-EXPORT slots-t null{};
