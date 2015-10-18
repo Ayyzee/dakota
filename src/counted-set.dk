@@ -60,28 +60,29 @@ trait counted-set {
     $write(out, "}");
     return self;
   }
-  static object-t add(object-t self, object-t first) {
-    object-t pair = $pair-at(self, first, cast(object-t)nullptr);
+  method object-t add(object-t self, object-t first) {
+    object-t last = $at(self, first, cast(object-t)nullptr);
 
-    if (nullptr != pair) {
-      object-t last = pair::unbox(pair)->last;
+    if (nullptr != last) {
+      if ($instance?(last, pair::klass))
+        last = pair::unbox(last)->last;
       uint32-t* count-ptr = uint32::unbox(last);
       (*count-ptr)++;
     } else {
-      object-t last = uint32::box(1);
-      pair = pair::box({first, last});
-      $add-pair(self, pair);
+      last = uint32::box(1);
+      object-t pair = pair::box({first, last});
+      $add(super, pair);
     }
-    return pair;
+    return last;
   }
-  static object-t at(object-t self, object-t first) {
-    object-t last = $pair-at(self, first);
+  method object-t at(object-t self, object-t first) {
+    object-t last = $at(super, first);
     if ($instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
-  static object-t at(object-t self, object-t first, object-t default-last) {
-    object-t last = $pair-at(self, first, cast(object-t)nullptr);
+  method object-t at(object-t self, object-t first, object-t default-last) {
+    object-t last = $at(super, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
     if (nullptr != last && $instance?(last, pair::klass))
@@ -89,42 +90,27 @@ trait counted-set {
     return last;
   }
   method uint32-t count-at(object-t self, object-t first) {
-    object-t pair = $pair-at(self, first);
-    object-t last = $last(pair);
+    object-t last = $at(self, first);
+    if ($instance?(last, pair::klass))
+      last = pair::unbox(last)->last;
     uint32-t count = *uint32::unbox(last);
     return count;
   }
   method uint32-t count-at(object-t self, object-t first, uint32-t default-count) {
     uint32-t count = default-count;
-    object-t pair = $pair-at(self, first, cast(object-t)nullptr);
+    object-t last = $at(self, first, cast(object-t)nullptr);
 
-    if (nullptr != pair) {
-      object-t last = pair::unbox(pair)->last;
+    if (nullptr != last) {
+      if ($instance?(last, pair::klass))
+        last = pair::unbox(last)->last;
       count = *uint32::unbox(last);
     }
     return count;
   }
   object-t initialize(object-t kls) {
-    $reassoc-and-add-method-for-selector(kls,
-                                            SELECTOR(               pair-at(object-t, object-t)),
-                                            SELECTOR(                    at(object-t, object-t)),
-                                            cast(method-t)cast(object-t (*)(object-t, object-t))at);
-
-    $reassoc-and-add-method-for-selector(kls,
-                                            SELECTOR(               pair-at(object-t, object-t, object-t)),
-                                            SELECTOR(                    at(object-t, object-t, object-t)),
-                                            cast(method-t)cast(object-t (*)(object-t, object-t, object-t))at);
-
-    $reassoc-and-add-method-for-selector(kls,
-                                            SELECTOR(              add-pair(object-t, object-t)),
-                                            SELECTOR(                   add(object-t, object-t)),
-                                            cast(method-t)cast(object-t (*)(object-t, object-t))add);
     return kls;
   }
   object-t finalize(object-t kls) {
     return kls;
   }
-  method object-t pair-at(object-t self, object-t first);
-  method object-t pair-at(object-t self, object-t first, object-t default-pair);
-  method object-t add-pair(object-t self, object-t pair);
 }

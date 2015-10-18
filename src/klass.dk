@@ -431,17 +431,6 @@ klass klass {
       $set-bit(self.behavior, cast(uint32-t)selector, true);
     return prev-m;
   }
-  method method-t reassoc-and-add-method-for-selector(object-t   self,
-                                                      selector-t selector1,
-                                                      selector-t selector2,
-                                                      method-t   method) {
-  $add-method-for-selector(self,                         selector1,
-                              $method-for-selector(self, selector2));
-  method-t prev-method =
-  $add-method-for-selector(self,                         selector2,
-                                                            method);
-  return prev-method;
-}
   method object-t dump(object-t self) {
     object::dump(self);
     fprintf(stderr, "%p:%p {", cast(void*)(self), cast(void*)unbox(self));

@@ -64,14 +64,14 @@ trait table {
     $add(self, pair);
     return pair;
   }
-  static object-t at(object-t self, object-t first) {
-    object-t last = $pair-at(self, first);
+  method object-t at(object-t self, object-t first) {
+    object-t last = $at(super, first);
     if ($instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
-  static object-t at(object-t self, object-t first, object-t default-last) {
-    object-t last = $pair-at(self, first, cast(object-t)nullptr);
+  method object-t at(object-t self, object-t first, object-t default-last) {
+    object-t last = $at(super, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
     if (nullptr != last && $instance?(last, pair::klass))
@@ -79,20 +79,9 @@ trait table {
     return last;
   }
   object-t initialize(object-t kls) {
-    $reassoc-and-add-method-for-selector(kls,
-                                            SELECTOR(               pair-at(object-t, object-t)),
-                                            SELECTOR(                    at(object-t, object-t)),
-                                            cast(method-t)cast(object-t (*)(object-t, object-t))at);
-
-    $reassoc-and-add-method-for-selector(kls,
-                                            SELECTOR(               pair-at(object-t, object-t, object-t)),
-                                            SELECTOR(                    at(object-t, object-t, object-t)),
-                                            cast(method-t)cast(object-t (*)(object-t, object-t, object-t))at);
     return kls;
   }
   object-t finalize(object-t kls) {
     return kls;
   }
-  method object-t pair-at(object-t self, object-t first);
-  method object-t pair-at(object-t self, object-t first, object-t default-pair);
 }
