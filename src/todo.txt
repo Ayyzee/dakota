@@ -76,7 +76,7 @@ info@size = expr
 =>
 $set-at(info, size, expr)
 
-#`...`
+#`...`  make(process::klass, #path : ..., #args : ..., #vars : ...).exec()
 
 klass number {
   superklass of all float types, int types, and char types
@@ -84,3 +84,5 @@ klass number {
 allow tracing on specific generics
 
 consider slot-at() and set-slot-at() generated funcs
+
+lib/dakota/util.pm: sub encode_cpp // just insert whitespace between # and directive
