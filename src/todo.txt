@@ -3,9 +3,6 @@ add safer versions of ! methods
 
 sort out mutable/immutable design
 
-superklass-of() => dk::superklass()
-name-of() =>       dk::name()
-
 convert to use in() and in?() [formally contains?()]
 
 Added leading $ to generic functions and va prefixes
@@ -31,7 +28,7 @@ refactoring tools
 
 automate dk-klass-for-name(#someklass) in initialize(object-t) which is currently (manually) handled by the consumer
 
-warnings/errors on elements in the module import export that don't actually exist.
+warnings/errors on elements in the module import/export that don't actually exist.
 
 have test/bin/check.pl read dirs from stdin
 
@@ -43,9 +40,6 @@ flush out signal-exception klasses (move/reorg some code from dakota.dk)
 
 selector in every method (like _cmd in objective-c) like __method__ which is a signature (which is like __func__)
 name would likely __selector__
-
-warn if something is exported in a module description that is not in
-the compiled image it represents
 
 support something like perl's map function
 my       @doubles = map { $_ * 2 } @numbers;
@@ -86,3 +80,8 @@ allow tracing on specific generics
 consider slot-at() and set-slot-at() generated funcs
 
 lib/dakota/util.pm: sub encode_cpp // just insert whitespace between # and directive
+
+selector in every method (like _cmd in objective-c) like __method__ which is a signature (which is like __func__)
+
+warn if something is exported in a module description that is not in
+the compiled image it represents
