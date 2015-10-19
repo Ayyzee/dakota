@@ -177,12 +177,15 @@ sub decode_cpp {
   }
 }
 # method-ident: allow end in ! or ?
-# symbol-ident: allow end in ! or ? and allow . or : never as first char
+# symbol-ident: allow end in ! or ? and allow . or : or / but never as first nor last char
 
-# !  x21  \u0021  only as last char
-# .  x2e  \u002e  never as first char
-# :  x3a  \u003a  never as first char
-# ?  x3f  \u003f  only as last char
+# -       only interior char (never first nor last)
+# .  x2e  only interior char (never first nor last)
+# /  x2f  only interior char (never first nor last)
+# :  x3a  only interior char (never first nor last)
+#
+# !  x21  only as last char
+# ?  x3f  only as last char
 
 sub needs_hex_encoding {
   my ($str) = @_;
@@ -248,6 +251,9 @@ sub pann {
 sub kw_args_placeholders {
   return { 'default' => '{}', 'nodefault' => '{~}' };
 }
+# literal symbol/keyword grammar: ^_* ... _*$
+# interior only chars: - : . /
+# last only chars: ? !
 sub ident_regex {
   my $id =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9]              )?/x;
   my $mid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!])/x; # method ident
