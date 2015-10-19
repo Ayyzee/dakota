@@ -2,15 +2,17 @@
 
 #include <cstdint>
 
+#define DEFAULT-SEQUENCE-KLASS vector::klass
+#define DEFAULT-SET-KLASS      hashed-set::klass
+#define DEFAULT-TABLE-KLASS    hashed-table::klass
+
+//
+
 klass hashed-set;
 klass hashed-table;
 klass int32;
 klass pair;
 klass vector;
-
-#define DEFAULT-SEQUENCE-KLASS vector::klass
-#define DEFAULT-SET-KLASS      hashed-set::klass
-#define DEFAULT-TABLE-KLASS    hashed-table::klass
 
 int-t main()
 {
