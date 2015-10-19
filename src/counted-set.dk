@@ -20,6 +20,8 @@ klass pair;
 klass uint32;
 klass vector;
 
+trait set;
+
 trait counted-set {
   //provides set;
   require collection;
@@ -61,31 +63,32 @@ trait counted-set {
     return self;
   }
   method object-t add(object-t self, object-t first) {
-    object-t last = $at(self, first, cast(object-t)nullptr);
+    object-t pair = $at(self, first, cast(object-t)nullptr);
+    object-t last = pair;
 
-    if (nullptr != last) {
-      if ($instance?(last, pair::klass))
-        last = pair::unbox(last)->last;
+    if (pair) {
+      if ($instance?(pair, pair::klass))
+        last = pair::unbox(pair)->last;
       uint32-t* count-ptr = uint32::unbox(last);
       (*count-ptr)++;
     } else {
       last = uint32::box(1);
-      object-t pair = pair::box({first, last});
+      pair = pair::box({first, last});
       $add(super, pair);
     }
     return last;
   }
   method object-t at(object-t self, object-t first) {
-    object-t last = $at(super, first);
+    object-t last = $in(super, first);
     if ($instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
   method object-t at(object-t self, object-t first, object-t default-last) {
-    object-t last = $at(super, first, cast(object-t)nullptr);
+    object-t last = $in(super, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
-    if (nullptr != last && $instance?(last, pair::klass))
+    if (last && $instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
@@ -100,7 +103,7 @@ trait counted-set {
     uint32-t count = default-count;
     object-t last = $at(self, first, cast(object-t)nullptr);
 
-    if (nullptr != last) {
+    if (last) {
       if ($instance?(last, pair::klass))
         last = pair::unbox(last)->last;
       count = *uint32::unbox(last);

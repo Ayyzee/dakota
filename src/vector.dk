@@ -118,7 +118,7 @@ klass vector {
     return self;
   }
   // maybe could return number present
-  method boole-t contains?(object-t self, object-t element) {
+  method boole-t in?(object-t self, object-t element) {
     boole-t state = false;
 
     for (object-t element2 in self) {

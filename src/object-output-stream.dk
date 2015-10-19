@@ -72,7 +72,7 @@ klass object-output-stream {
     return self;
   }
   method object-t write-element-id(object-t self, object-t object) {
-    unless ($contains?(self.objects, object)) {
+    unless ($in?(self.objects, object)) {
       $add(self.objects, object); // only grows, never shrinks
       object-t id = $at(self.id-from-object, object, cast(object-t)nullptr);
 

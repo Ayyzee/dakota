@@ -112,7 +112,7 @@ klass hashed-set {
     }
     return self;
   }
-  method object-t at(object-t self, object-t object1, object-t default-value) {
+  method object-t in(object-t self, object-t object1, object-t default-value) {
     uint32-t index = $hash(object1) % self.num-buckets;
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
@@ -127,16 +127,16 @@ klass hashed-set {
     }
     return result;
   }
-  method object-t at(object-t self, object-t object) {
-    object-t result = $at(self, object, cast(object-t)nullptr);
+  method object-t in(object-t self, object-t object) {
+    object-t result = $in(self, object, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #message : "oops");
     return result;
   }
-  method boole-t contains?(object-t self, object-t key) {
+  method boole-t in?(object-t self, object-t key) {
     boole-t state;
 
-    if (nullptr == $at(self, key, cast(object-t)nullptr))
+    if (nullptr == $in(self, key, cast(object-t)nullptr))
       state = false;
     else
       state = true;

@@ -3,8 +3,6 @@ add safer versions of ! methods
 
 sort out mutable/immutable design
 
-convert to use in() and in?() [formally contains?()]
-
 Added leading $ to generic functions and va prefixes
   then using namespace dk brings them all in.
   dk::add() =>      $add()

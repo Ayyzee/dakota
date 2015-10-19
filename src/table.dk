@@ -17,9 +17,9 @@
 module dakota;
 
 klass pair;
-klass sorted-set;
-klass std-compare; // hackhack
 klass vector;
+
+trait set;
 
 trait table {
   //provides set;
@@ -79,13 +79,13 @@ trait table {
     return current-last;
   }
   method object-t at(object-t self, object-t first) {
-    object-t last = $at(super, first);
+    object-t last = $in(super, first);
     if ($instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
   method object-t at(object-t self, object-t first, object-t default-last) {
-    object-t last = $at(super, first, cast(object-t)nullptr);
+    object-t last = $in(super, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
     if (last && $instance?(last, pair::klass))
