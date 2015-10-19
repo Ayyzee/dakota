@@ -198,10 +198,26 @@ sub needs_hex_encoding {
   }
   return 0;
 }
+sub rand_str {
+  my ($len, $alphabet) = @_;
+  if (!$len) {
+    $len = 16;
+  }
+  if (!$alphabet) {
+    $alphabet = ["A".."Z", "a".."z", "0".."9"];
+  }
+  my $str = '';
+  $str .= $$alphabet[rand @$alphabet] for 1..$len;
+  return $str;
+}
 sub encode_char { my ($char) = @_; return sprintf("%02x", ord($char)); }
 sub make_ident_symbol_scalar {
   my ($symbol) = @_;
-  my $k = qr/[\w-]/;
+  # swap underscore (_) with dash (-)
+  my $rand_str = &rand_str();
+  $symbol =~ s/_/$rand_str/g;
+  $symbol =~ s/-/_/g;
+  $symbol =~ s/$rand_str/-/g;
   my $ident_symbol = [];
   &dakota::util::add_first($ident_symbol, '_');
 
@@ -209,9 +225,7 @@ sub make_ident_symbol_scalar {
 
   foreach my $char (@$chars) {
     my $part;
-    if ($char eq '-') {
-      $part = '_';
-    } elsif ($char =~ /$k/) {
+    if ($char =~ /\w/) {
       $part = $char;
     } else {
       $part = &encode_char($char);
