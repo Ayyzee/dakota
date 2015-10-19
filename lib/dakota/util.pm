@@ -159,9 +159,9 @@ sub encode_cpp {
   foreach my $directive (keys %$directives) {
     my $next_tkn_regex = $$directives{$directive};
     if ($next_tkn_regex) {
-      $$filestr_ref =~ s/^(\s*)#(\s*$directive\s+$next_tkn_regex.*)$/$1\@\@\@$2/gm;
+      $$filestr_ref =~ s/^(\s*)#(\s*$directive\s+$next_tkn_regex.*)$/$1# $2/gm;
     } else {
-      $$filestr_ref =~ s/^(\s*)#(\s*$directive\b.*)$/$1\@\@\@$2/gm;
+      $$filestr_ref =~ s/^(\s*)#(\s*$directive\b.*)$/$1# $2/gm;
     }
   }
 }
@@ -170,9 +170,9 @@ sub decode_cpp {
   foreach my $directive (keys %$directives) {
     my $next_tkn_regex = $$directives{$directive};
     if ($next_tkn_regex) {
-      $$filestr_ref =~ s/^(\s*)\@\@\@(\s*$directive\s+$next_tkn_regex.*)$/$1#$2/gm;
+      $$filestr_ref =~ s/^(\s*)# (\s*$directive\s+$next_tkn_regex.*)$/$1#$2/gm;
     } else {
-      $$filestr_ref =~ s/^(\s*)\@\@\@(\s*$directive\b.*)$/$1#$2/gm;
+      $$filestr_ref =~ s/^(\s*)# (\s*$directive\b.*)$/$1#$2/gm;
     }
   }
 }
