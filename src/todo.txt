@@ -36,7 +36,6 @@ support something like perl's map function
 my       @doubles = map { $_ * 2 } @numbers;
 object-t  doubles = map {  _ * 2 }  numbers;
 
-support #42, #060, 0xa6f2, 0b0101010
 support #'abcd', #true, #false
 
 in perl:

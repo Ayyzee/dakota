@@ -277,6 +277,7 @@ sub generate_nrt {
       &labeled_src_str($result, "hashes-hh") .
       &labeled_src_str($result, "keywords-hh") .
       &labeled_src_str($result, "strings-hh") .
+      &labeled_src_str($result, "integers-hh") .
       &labeled_src_str($result, "selectors-hh") .
       &labeled_src_str($result, "signatures-hh") .
       &labeled_src_str($result, "generics-hh");
@@ -353,6 +354,7 @@ sub generate_rt {
       &labeled_src_str($result, "hashes-hh") .
       &labeled_src_str($result, "keywords-hh") .
       &labeled_src_str($result, "strings-hh") .
+      &labeled_src_str($result, "integers-hh") .
       &labeled_src_str($result, "selectors-hh") .
       &labeled_src_str($result, "signatures-hh") .
       &labeled_src_str($result, "generics-hh");
@@ -384,6 +386,7 @@ sub generate_rt {
       &labeled_src_str($result, "hashes-cc") .
       &labeled_src_str($result, "keywords-cc") .
       &labeled_src_str($result, "strings-cc") .
+      &labeled_src_str($result, "integers-cc") .
       &labeled_src_str($result, "klasses-cc") .
       &labeled_src_str($result, "selectors-cc") .
       &labeled_src_str($result, "signatures-cc") .
@@ -444,7 +447,8 @@ sub generate_decl_defn {
   $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $generics, $symbols);
   $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file, $generics, $symbols);
   $$result{"keywords-$suffix"} =       &linkage_unit::generate_keywords(       $file, $generics, $symbols);
-  $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, $generics, $symbols);
+  $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, ''); # column 0
+  $$result{"integers-$suffix"} =       &linkage_unit::generate_integers(       $file, ''); # column 0
   $$result{"selectors-$suffix"} =      &linkage_unit::generate_selectors(      $file, $generics);
   $$result{"signatures-$suffix"} =     &linkage_unit::generate_signatures(     $file, $generics);
   $$result{"generics-$suffix"} =       &linkage_unit::generate_generics(       $file, $generics);
@@ -492,6 +496,7 @@ sub generate_defn_footer {
     $col = &colout($col);
     $rt_cc_str .= $col . "};\n";
     $rt_cc_str .= &linkage_unit::generate_strings_seq($file, $col);
+    $rt_cc_str .= &linkage_unit::generate_integers_seq($file, $col);
   }
   $rt_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
   #$rt_cc_str .= $col . "extern \"C\"\n";
@@ -518,6 +523,10 @@ sub generate_defn_footer {
   if (0 < scalar keys %{$$file{'strings'}}) {
     $$info_tbl{"\#strings-literals"} = '__strings-literals';
     $$info_tbl{"\#strings"} =          '__strings';
+  }
+  if (0 < scalar keys %{$$file{'integers'}}) {
+    $$info_tbl{"\#integers-literals"} = '__integers-literals';
+    $$info_tbl{"\#integers"} =          '__integers';
   }
   $rt_cc_str .= "\n";
   $rt_cc_str .= "#include <unistd.h>\n";
@@ -4064,9 +4073,8 @@ sub linkage_unit::generate_keywords {
   return $scratch_str;
 }
 sub linkage_unit::generate_strings {
-  my ($file, $generics, $strings) = @_;
+  my ($file, $col) = @_;
   my $scratch_str = "";
-  my $col = '';
   $scratch_str .= $col . "namespace __string {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach my $string (sort keys %{$$file{'strings'}}) {
@@ -4102,6 +4110,51 @@ sub linkage_unit::generate_strings_seq {
     foreach my $string (sort keys %{$$file{'strings'}}) {
       my $string_ident = &make_ident_symbol_scalar($string);
       $scratch_str .= $col . "&__string::$string_ident,\n";
+    }
+    $scratch_str .= $col . "nullptr\n";
+    $col = &colout($col);
+    $scratch_str .= $col . "};\n";
+  }
+  return $scratch_str;
+}
+sub linkage_unit::generate_integers {
+  my ($file, $col) = @_;
+  my $scratch_str = "";
+  $scratch_str .= $col . "namespace __integer {" . &ann(__FILE__, __LINE__) . "\n";
+  $col = &colin($col);
+  foreach my $integer (sort keys %{$$file{'integers'}}) {
+    my $integer_ident = '_' . $integer . '_';
+    if (&is_decl()) {
+      $scratch_str .= $col . "extern object-t $integer_ident;\n";
+    } else {
+      $scratch_str .= $col . "object-t $integer_ident = nullptr;\n";
+    }
+  }
+  $col = &colout($col);
+  $scratch_str .= $col . "}\n";
+  return $scratch_str;
+}
+sub linkage_unit::generate_integers_seq {
+  my ($file, $col) = @_;
+  my $scratch_str = "";
+  if (0 == scalar keys %{$$file{'integers'}}) {
+    $scratch_str .= $col . "//static uintptr-t const __integers-literals[] = {};" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $scratch_str .= $col . "//static object-t* __integers[] = {};" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+  } else {
+    $scratch_str .= $col . "static uintptr-t const __integers-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $col = &colin($col);
+    foreach my $integer (sort keys %{$$file{'integers'}}) {
+      $scratch_str .= $col . "$integer,\n";
+    }
+    $scratch_str .= $col . "0 // nullptr\n";
+    $col = &colout($col);
+    $scratch_str .= $col . "};\n";
+
+    $scratch_str .= $col . "static object-t* __integers[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $col = &colin($col);
+    foreach my $integer (sort keys %{$$file{'integers'}}) {
+      my $integer_ident = '_' . $integer . '_';
+      $scratch_str .= $col . "&__integer::$integer_ident,\n";
     }
     $scratch_str .= $col . "nullptr\n";
     $col = &colout($col);

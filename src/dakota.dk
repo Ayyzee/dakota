@@ -69,6 +69,7 @@ klass std-compare;
 klass str128;
 klass super;
 klass symbol;
+klass uintptr;
 
 #if DKT-WORKAROUND
 namespace property {
@@ -473,20 +474,36 @@ static void each(named-info-t* root-info-list, named-info-func-t func, void* use
   }
   return;
 }
-static void each-strs(named-info-t* info, object-t (*box)(str-t)) {
-  str-t* strings-literals = cast(str-t*)named-info::at(info, #strings-literals);
-  if (strings-literals) {
-    object-t** strings = cast(object-t**)named-info::at(info, #strings);
-    assert(nullptr != strings);
+static void each-str(named-info-t* info, object-t (*box)(str-t)) {
+  object-t** strings = cast(object-t**)named-info::at(info, #strings);
+  if (strings) {
+    str-t* strings-literals = cast(str-t*)named-info::at(info, #strings-literals);
+    assert(nullptr != strings-literals);
     str-t string-literal;
     object-t* string;
     uint32-t i = 0;
-    while (nullptr != (string-literal = strings-literals[i])) {
-      string = strings[i++];
+    while (nullptr != (string = strings[i])) {
+      string-literal = strings-literals[i++];
       assert(nullptr != string);
       *string = box(string-literal);
     }
-    assert(nullptr == strings[i]);
+    assert(nullptr == strings-literals[i]);
+  }
+}
+static void each-integer(named-info-t* info, object-t (*box)(uintptr-t)) {
+    object-t** integers = cast(object-t**)named-info::at(info, #integers);
+  if (integers) {
+    uintptr-t* integers-literals = cast(uintptr-t*)named-info::at(info, #integers-literals);
+    assert(nullptr != integers-literals);
+    uintptr-t integer-literal;
+    object-t* integer;
+    uint32-t i = 0;
+    while (nullptr != (integer = integers[i])) {
+      integer-literal = integers-literals[i++];
+      assert(nullptr != integer);
+      *integer = box(integer-literal);
+    }
+    assert(0 == integers-literals[i]); // nullptr
   }
 }
 
@@ -571,8 +588,12 @@ dk-init-runtime() {
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, void*))cast(void (*)(named-info-t*, object-t (*)(str-t)))each-strs,
+         cast(void (*)(named-info-t*, void*))cast(void (*)(named-info-t*, object-t (*)(str-t)))each-str,
          cast(void*)cast(object-t (*)(str-t))str::box);
+    dk-klass-for-name(#uintptr);
+    each(gbl-registration-info-list,
+         cast(void (*)(named-info-t*, void*))cast(void (*)(named-info-t*, object-t (*)(uintptr-t)))each-integer,
+         cast(void*)cast(object-t (*)(uintptr-t))uintptr::box);
 
     auto previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);

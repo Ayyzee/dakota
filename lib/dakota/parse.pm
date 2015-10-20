@@ -514,6 +514,10 @@ sub add_string {
   my ($file, $string) = @_;
   $$file{'strings'}{$string} = undef;
 }
+sub add_integer {
+  my ($file, $val) = @_;
+  $$file{'integers'}{$val} = undef;
+}
 sub token_seq::simple_seq {
   my ($tokens) = @_;
   my $seq = [];
@@ -2066,6 +2070,10 @@ sub rep_tree_from_dk_path {
   local $_ = &dakota::util::filestr_from_file($gbl_filename);
   while (m/^\s*\#\s*include\s+(<.*?>)/gm) {
     &add_system_include($gbl_root, $1);
+  }
+  pos $_ = 0;
+  while (m/\#(0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+)/g) {
+    &add_integer($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/\#\"(.*?)\"/g) {

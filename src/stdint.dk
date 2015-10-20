@@ -176,4 +176,11 @@ klass uintptr {
   slots uintptr-t;
 
   const slots-t max = UINTPTR_MAX;
+
+  method object-t dump(object-t self) {
+    $dump(super);
+    fprintf(stderr, "%p:%p { slots=\"%lu\" }\n",
+            cast(void*)self, cast(void*)unbox(self), *unbox(self));
+    return self;
+  }
 }

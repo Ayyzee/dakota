@@ -519,6 +519,15 @@ sub rewrite_strings {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\#"(.*?)")/&string($2)/ge;
 }
+sub integer {
+  my ($val) = @_;
+  my $ident = '_' . $val . '_';
+  return "__integer\::$ident";
+}
+sub rewrite_integers {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/(\#(0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+))/&integer($2)/ge;
+}
 sub rewrite_keywords {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(?<!\\)\#($sqstr)/&keyword($1)/ge;
@@ -886,13 +895,14 @@ sub rewrite_export_method {
 }
 sub remove_system_includes {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|^(\s*)\#(\s*)include(\s)*(<.+?>)|$1$2INCLUDE$3($4);|gm;
+  $$filestr_ref =~ s|^(\s*)\#(\s*)include\s*(<.+?>)|$1$2INCLUDE($3);|gm;
 }
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
   if ($remove) {
     &remove_system_includes($filestr_ref);
   }
+  &rewrite_integers($filestr_ref);
   &rewrite_strings($filestr_ref);
   &encode_cpp($filestr_ref);
   &encode_strings($filestr_ref);

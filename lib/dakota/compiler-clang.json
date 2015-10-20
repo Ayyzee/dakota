@@ -18,6 +18,7 @@
   'CXX_SHARED_FLAGS' =>      [ '--shared'  ],
   'EXTRA_CXXFLAGS' =>        [
       '-Weverything',
+      '-Wno-c++1y-extensions',
       '-Wno-c++98-compat',
       '-Wno-c++98-compat-pedantic',
       '-Wno-c99-extensions', # c99 designated initializers, c99 compound literals

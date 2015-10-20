@@ -1,0 +1,9 @@
+{
+  'srcs' => [
+    'exe-main.dk',
+  ],
+  'libs' => [
+    '/usr/local/lib/libdakota-util.$so_ext',
+  ],
+  'name' => 'exe',
+}

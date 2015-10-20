@@ -1,0 +1,14 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+static object-t i1 = #42;
+static object-t i2 = #060;
+static object-t i3 = #0xa6f2;    // upper & lower case x
+static object-t i4 = #0b0101010; // upper & lower case b
+
+int-t main() {
+  $dump(i1);
+  $dump(i2);
+  $dump(i3);
+  $dump(i4);
+  return 0;
+}
