@@ -1,0 +1,8 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+static object-t s = #"hello world";
+
+int-t main() {
+  $dump(s);
+  return 0;
+}
