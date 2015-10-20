@@ -83,3 +83,5 @@ selector in every method (like _cmd in objective-c) like __method__ which is a s
 
 warn if something is exported in a module description that is not in
 the compiled image it represents
+
+allow const on property::element; must supply no-op box() so it does not generate a box that won't compile
