@@ -1778,7 +1778,7 @@ sub generate_struct_or_union_defn {
   foreach my $slot_info (@$slots_info) {
     my $width = length($$slot_info{'type'});
     my $pad = ' ' x ($max_width - $width);
-    if ($$slot_info{'expr'}) {
+    if (defined $$slot_info{'expr'}) {
       $$scratch_str_ref .= $col . "$$slot_info{'type'} " . $pad . "$$slot_info{'name'} = $$slot_info{'expr'};\n";
     } else {
       $$scratch_str_ref .= $col . "$$slot_info{'type'} " . $pad . "$$slot_info{'name'};\n";
@@ -1835,7 +1835,7 @@ sub generate_enum_defn {
     }
   }
   foreach my $slot_info (@$slots_info) {
-    if ($$slot_info{'expr'}) {
+    if (defined $$slot_info{'expr'}) {
       my $width = length($$slot_info{'name'});
       my $pad = ' ' x ($max_width - $width);
       $$scratch_str_ref .= $col . "$$slot_info{'name'} = " . $pad . "$$slot_info{'expr'},\n";
@@ -1862,7 +1862,7 @@ sub parameter_list_from_slots_info {
     $pairs_w_expr .= "$sep$type _$name";
     $sep = ', ';
 
-    if ($$slot_info{'expr'}) {
+    if (defined $$slot_info{'expr'}) {
      #$pairs_w_expr .= " /*= $$slot_info{'expr'}*/";
       $pairs_w_expr .= " = $$slot_info{'expr'}";
     }
@@ -3356,7 +3356,7 @@ sub dk_generate_cc_footer_klass {
         my $tbl = {};
         $$tbl{'#name'} = "\#$$slot_info{'name'}";
         if (defined $$slot_info{'expr'}) {
-          $$tbl{'#expr'} = "\"$$slot_info{'expr'}\"";
+          $$tbl{'#expr'} = "($$slot_info{'expr'})";
           $$tbl{'#expr-str'} = "\"$$slot_info{'expr'}\"";
         }
         my $prop_name = sprintf("%s-%s", $root_name, $$slot_info{'name'});
@@ -3380,7 +3380,7 @@ sub dk_generate_cc_footer_klass {
         $$tbl{'#size'} = "sizeof((cast(slots-t*)nullptr)->$$slot_info{'name'})";
         $$tbl{'#type'} = "\"$$slot_info{'type'}\"";
 
-        if ($$slot_info{'expr'}) {
+        if (defined $$slot_info{'expr'}) {
           $$tbl{'#expr'} = "($$slot_info{'expr'})";
           $$tbl{'#expr-str'} = "\"$$slot_info{'expr'}\"";
         }
@@ -3403,7 +3403,7 @@ sub dk_generate_cc_footer_klass {
       my $slots_info = $$enum{'info'};
       foreach my $slot_info (@$slots_info) {
         my $name = $$slot_info{'name'};
-        if ($$slots_info{'expr'}) {
+        if (defined $$slot_info{'expr'}) {
           my $expr = $$slot_info{'expr'};
           $$scratch_str_ref .= $col . "{ \#$name, $expr },\n";
         } else {
