@@ -108,6 +108,8 @@
     'slots-info' => undef,
     'slots-type' => undef,
     'state-exported?' => undef,
+    'strings' => undef,
+    'strings-literals' => undef,
     'struct' => undef,
     'superklass-name' => undef,
     'time' => undef,

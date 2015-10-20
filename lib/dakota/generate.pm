@@ -274,9 +274,9 @@ sub generate_nrt {
       &include_dakota_decl_hh() .
       &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
-      &labeled_src_str($result, "strings-hh") .
       &labeled_src_str($result, "hashes-hh") .
       &labeled_src_str($result, "keywords-hh") .
+      &labeled_src_str($result, "strings-hh") .
       &labeled_src_str($result, "selectors-hh") .
       &labeled_src_str($result, "signatures-hh") .
       &labeled_src_str($result, "generics-hh");
@@ -287,6 +287,7 @@ sub generate_nrt {
       &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/nrt/%.$dkhh_ext
     }
     &write_to_file_converted_strings($output, [ $str_hh ]);
+
     return "$dir/$name.$hh_ext";
   } else {
     my $pre_output = "$dir/$name.$dkcc_ext";
@@ -349,9 +350,9 @@ sub generate_rt {
       &include_dakota_decl_hh() .
       &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
-      &labeled_src_str($result, "strings-hh") .
       &labeled_src_str($result, "hashes-hh") .
       &labeled_src_str($result, "keywords-hh") .
+      &labeled_src_str($result, "strings-hh") .
       &labeled_src_str($result, "selectors-hh") .
       &labeled_src_str($result, "signatures-hh") .
       &labeled_src_str($result, "generics-hh");
@@ -380,9 +381,9 @@ sub generate_rt {
       "#include \"$name.$hh_ext\"\n" .
       "\n" .
       &labeled_src_str($result, "symbols-cc") .
-      &labeled_src_str($result, "strings-cc") .
       &labeled_src_str($result, "hashes-cc") .
       &labeled_src_str($result, "keywords-cc") .
+      &labeled_src_str($result, "strings-cc") .
       &labeled_src_str($result, "klasses-cc") .
       &labeled_src_str($result, "selectors-cc") .
       &labeled_src_str($result, "signatures-cc") .
@@ -441,9 +442,9 @@ sub generate_decl_defn {
 
   $$result{"headers-hh"} =             &linkage_unit::generate_headers(        $file, $ordered_klass_names);
   $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $generics, $symbols);
-  $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, $generics, $symbols);
   $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file, $generics, $symbols);
   $$result{"keywords-$suffix"} =       &linkage_unit::generate_keywords(       $file, $generics, $symbols);
+  $$result{"strings-$suffix"} =        &linkage_unit::generate_strings(        $file, $generics, $symbols);
   $$result{"selectors-$suffix"} =      &linkage_unit::generate_selectors(      $file, $generics);
   $$result{"signatures-$suffix"} =     &linkage_unit::generate_signatures(     $file, $generics);
   $$result{"generics-$suffix"} =       &linkage_unit::generate_generics(       $file, $generics);
@@ -490,6 +491,7 @@ sub generate_defn_footer {
     $rt_cc_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
     $col = &colout($col);
     $rt_cc_str .= $col . "};\n";
+    $rt_cc_str .= &linkage_unit::generate_strings_seq($file, $col);
   }
   $rt_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
   #$rt_cc_str .= $col . "extern \"C\"\n";
@@ -513,6 +515,10 @@ sub generate_defn_footer {
                   "\#name" => 'DKT-NAME',
                   "\#get-segment-data" => 'dkt-get-segment-data',
                  };
+  if (0 < scalar keys %{$$file{'strings'}}) {
+    $$info_tbl{"\#strings-literals"} = '__strings-literals';
+    $$info_tbl{"\#strings"} =          '__strings';
+  }
   $rt_cc_str .= "\n";
   $rt_cc_str .= "#include <unistd.h>\n";
   $rt_cc_str .= "\n";
@@ -4063,16 +4069,44 @@ sub linkage_unit::generate_strings {
   my $col = '';
   $scratch_str .= $col . "namespace __string {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  while (my ($string, $dummy) = each(%{$$file{'strings'}})) {
+  foreach my $string (sort keys %{$$file{'strings'}}) {
     my $string_ident = &make_ident_symbol_scalar($string);
     if (&is_decl()) {
-      $scratch_str .= $col . "//extern object-t $string_ident;\n";
+      $scratch_str .= $col . "extern object-t $string_ident; // \"$string\"\n";
     } else {
-      $scratch_str .= $col . "//object-t $string_ident = make(string::klass, #bytes $colon \"$string\");\n";
+      $scratch_str .= $col . "object-t $string_ident = nullptr; // \"$string\"\n";
     }
   }
   $col = &colout($col);
   $scratch_str .= $col . "}\n";
+  return $scratch_str;
+}
+sub linkage_unit::generate_strings_seq {
+  my ($file, $col) = @_;
+  my $scratch_str = "";
+  if (0 == scalar keys %{$$file{'strings'}}) {
+    $scratch_str .= $col . "//static str-t const __strings-literals[] = {};" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $scratch_str .= $col . "//static object-t* __strings[] = {};" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+  } else {
+    $scratch_str .= $col . "static str-t const __strings-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $col = &colin($col);
+    foreach my $string (sort keys %{$$file{'strings'}}) {
+      $scratch_str .= $col . "\"$string\",\n";
+    }
+    $scratch_str .= $col . "nullptr\n";
+    $col = &colout($col);
+    $scratch_str .= $col . "};\n";
+
+    $scratch_str .= $col . "static object-t* __strings[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $col = &colin($col);
+    foreach my $string (sort keys %{$$file{'strings'}}) {
+      my $string_ident = &make_ident_symbol_scalar($string);
+      $scratch_str .= $col . "&__string::$string_ident,\n";
+    }
+    $scratch_str .= $col . "nullptr\n";
+    $col = &colout($col);
+    $scratch_str .= $col . "};\n";
+  }
   return $scratch_str;
 }
 sub generate_property_tbl {

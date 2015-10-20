@@ -510,9 +510,14 @@ sub rewrite_symbols {
   &rewrite_keywords($filestr_ref);
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?)/&symbol($1)/ge; # rnielsen
 }
+sub string {
+  my ($string) = @_;
+  my $ident = &make_ident_symbol_scalar($string);
+  return "__string\::$ident";
+}
 sub rewrite_strings {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!\\)\#(\".+?\")/str::box($1)/g; # this leaks memory!!
+  $$filestr_ref =~ s/(\#"(.*?)")/&string($2)/ge;
 }
 sub rewrite_keywords {
   my ($filestr_ref) = @_;
@@ -888,6 +893,7 @@ sub convert_dk_to_cc {
   if ($remove) {
     &remove_system_includes($filestr_ref);
   }
+  &rewrite_strings($filestr_ref);
   &encode_cpp($filestr_ref);
   &encode_strings($filestr_ref);
   &encode_comments($filestr_ref);
@@ -900,7 +906,6 @@ sub convert_dk_to_cc {
   &rewrite_keywords($filestr_ref);
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);
-  &rewrite_strings($filestr_ref);
 
   &rewrite_multi_char_consts($filestr_ref);
   &rewrite_module_statement($filestr_ref);

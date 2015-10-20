@@ -2067,6 +2067,10 @@ sub rep_tree_from_dk_path {
   while (m/^\s*\#\s*include\s+(<.*?>)/gm) {
     &add_system_include($gbl_root, $1);
   }
+  pos $_ = 0;
+  while (m/\#\"(.*?)\"/g) {
+    &add_string($gbl_root, $1);
+  }
   &encode_cpp(\$_);
   &encode_strings(\$_);
   &encode_comments(\$_);
@@ -2086,10 +2090,6 @@ sub rep_tree_from_dk_path {
   pos $_ = 0;
   while (m/(?<!\bcase)\s*\#\'(.*?)\'\s*$colon/g) {
     &add_keyword($gbl_root, $1);
-  }
-  pos $_ = 0;
-  while (m/\#\"(.*?)\"/g) {
-    &add_string($gbl_root, $1);
   }
   pos $_ = 0;
   while (m/\#\'(.*?)\'/g) {
