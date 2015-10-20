@@ -3,11 +3,6 @@ add safer versions of ! methods
 
 sort out mutable/immutable design
 
-Added leading $ to generic functions and va prefixes
-  then using namespace dk brings them all in.
-  dk::add() =>      $add()
-  dk::va::init() => $va::init()
-
 trait sets-w-pairs
 
 improve the output format of no-such-method-exception
@@ -20,30 +15,29 @@ add to table::elements()?
 add to counted-set::counts()?
  // , object-t sequence-klass : vector::klass
 
---define-macro DKT-NULL-METHOD=dkt-null-method (how should we convert lexical syntax of lhs vs rhs?)
+--define-macro DKT-NULL-METHOD=dkt-null-method (how should we convert
+lexical syntax of lhs vs rhs?)
 
 refactoring tools
 
-automate dk-klass-for-name(#someklass) in initialize(object-t) which is currently (manually) handled by the consumer
-
-warnings/errors on elements in the module import/export that don't actually exist.
+automate dk-klass-for-name(#someklass) in initialize(object-t) which
+is currently (manually) handled by the consumer
 
 have test/bin/check.pl read dirs from stdin
 
 add --debug=, --optimize= to dakota to pass through to compiler
 
-http://www.rubyinside.com/what-rubys-double-pipe-or-equals-really-does-5488.html
-
 flush out signal-exception klasses (move/reorg some code from dakota.dk)
 
-selector in every method (like _cmd in objective-c) like __method__ which is a signature (which is like __func__)
-name would likely __selector__
+selector in every method (like _cmd in objective-c) like __method__ which
+is a signature (which is like __func__) name would likely __selector__
 
 support something like perl's map function
 my       @doubles = map { $_ * 2 } @numbers;
 object-t  doubles = map {  _ * 2 }  numbers;
 
-support #"some string", #42, #'a', #true, #false
+support #42, #060, 0xa6f2, 0b0101010
+support #'abcd', #true, #false
 
 in perl:
   my $len = $$info{size}{len}
@@ -68,7 +62,7 @@ info@size = expr
 =>
 $set-at(info, size, expr)
 
-#`...`  make(process::klass, #path : ..., #args : ..., #vars : ...).exec()
+#`...`  make(process::klass, #path : ..., #args : ..., #vars : ...).$exec()
 
 klass number {
   superklass of all float types, int types, and char types
@@ -77,11 +71,11 @@ allow tracing on specific generics
 
 consider slot-at() and set-slot-at() generated funcs
 
-lib/dakota/util.pm: sub encode_cpp // just insert whitespace between # and directive
-
-selector in every method (like _cmd in objective-c) like __method__ which is a signature (which is like __func__)
+selector in every method (like _cmd in objective-c) like __method__
+which is a signature (which is like __func__)
 
 warn if something is exported in a module description that is not in
 the compiled image it represents
 
-allow const on property::element; must supply no-op box() so it does not generate a box that won't compile
+allow const on property::element; must supply no-op box() so it does
+not generate a box that won't compile
