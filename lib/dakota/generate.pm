@@ -1273,7 +1273,7 @@ sub generics::generate_signature_seq {
   } else {
     $scratch_str .= $col . "static signature-t const* const signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     my $max_width = 0;
-    foreach $generic (sort method::compare @$va_generics) {
+    foreach $generic (sort method::compare @$fa_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
       my $width = length($method_type);
       if ($width > $max_width) {
