@@ -167,6 +167,7 @@ sub encode_cpp {
 }
 sub decode_cpp {
   my ($filestr_ref) = @_;
+  return;
   foreach my $directive (keys %$directives) {
     my $next_tkn_regex = $$directives{$directive};
     if ($next_tkn_regex) {
