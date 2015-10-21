@@ -28,6 +28,7 @@ const uintptr-t max-prime32 = 0xfffffffb;
 module dakota;
 
 klass object-output-stream;
+klass hash;
 klass vector;
 
 klass string {
@@ -161,8 +162,8 @@ klass string {
     }
     return result;
   }
-  method uintptr-t hash(object-t self) {
-    uintptr-t result = dk-hash(self.ptr);
+  method hash-t hash(object-t self) {
+    hash-t result = dk-hash(self.ptr);
     return result;
   }
   method object-t append-sequence(object-t self, object-t sequence) {

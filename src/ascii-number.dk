@@ -23,6 +23,7 @@
 module dakota-util;
 
 klass ascii-number-klass;
+klass hash;
 
 klass ascii-number {
   klass klass;
@@ -31,7 +32,7 @@ klass ascii-number {
     char8-t* ascii-string;
     int32-t  number;
   }
-  method uintptr-t hash(object-t self) {
+  method hash-t hash(object-t self) {
     uintptr-t result = cast(uintptr-t)(self.number);
     return result;
   }

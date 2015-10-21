@@ -16,14 +16,6 @@
 
 module dakota;
 
-klass symbol;
-klass hash;
-
-klass keyword {
-  slots {
-    symbol-t symbol;
-    hash-t   hash;
-  }
-  //SO-EXPORT slots-t null{};
+klass hash {
+  slots uintptr-t;
 }
-static-assert(sizeof(keyword-t*) == sizeof(std::nullptr-t), "Keyword argument processing functions read (va-arg()) sizeof(keyword-t*) and then compare to nullptr.");

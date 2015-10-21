@@ -207,7 +207,6 @@ extern SO_IMPORT object_t std_output;
 extern SO_IMPORT object_t std_error;
 
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
-typedef uintptr_t (*hash_t)(object_t);
 typedef signature_t const* (*dkt_signature_func_t)();
 typedef selector_t* (*dkt_selector_func_t)();
 

@@ -47,6 +47,8 @@ module dakota export
   forward-iterator,
   get-segment-data,
   get-segment-data::slots-t,
+  hash,
+  hash::slots-t,
   input-stream,
   int-fast16,
   int-fast16::max,

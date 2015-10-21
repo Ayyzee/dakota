@@ -20,10 +20,12 @@
 module dakota;
 
 klass char8;
+klass hash;
 klass no-such-slot-exception;
+klass str;
 
 klass str-compare {
-  slots int-t (*)(char8-t const*, char8-t const*);
+  slots int-t (*)(str-t, str-t);
 }
 
 klass str-klass {
@@ -58,10 +60,10 @@ klass str {
       state = false;
     return state;
   }
-  method uintptr-t hash(object-t self) {
+  method hash-t hash(object-t self) {
     slots-t slots = *unbox(self);
     assert(nullptr != slots);
-    uintptr-t result = dk-hash(slots);
+    hash-t result = dk-hash(slots);
     return result;
   }
   method int-t compare(object-t self, object-t other) {

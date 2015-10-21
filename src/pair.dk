@@ -19,6 +19,7 @@
 module dakota;
 
 klass object-output-stream;
+klass hash;
 
 klass pair {
   slots {
@@ -84,10 +85,10 @@ klass pair {
     int-t result = $compare(first, other-first);
     return result;
   }
-  method uintptr-t hash(object-t self) {
+  method hash-t hash(object-t self) {
     object-t first = self.first;
     assert(nullptr != first);
-    uintptr-t result = $hash(first);
+    hash-t result = $hash(first);
     return result;
   }
   method object-t first(slots-t* s) {

@@ -21,6 +21,8 @@
 
 module dakota;
 
+klass hash;
+
 klass symbol {
   slots char8-t const*;
 
@@ -61,8 +63,8 @@ klass symbol {
             cast(void*)(self), cast(void*)unbox(self), $utf8-from(self));
     return self;
   }
-  method uintptr-t hash(slots-t s) {
-    uintptr-t result = dk-hash(s);
+  method hash-t hash(slots-t s) {
+    hash-t result = dk-hash(s);
     return result;
   }
   method str-t utf8-from(object-t self) {

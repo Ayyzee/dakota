@@ -31,6 +31,7 @@
     'boole' => undef,
     'char8' => undef,
     'file' => undef,
+    'hash' => undef,
     'input-stream' => undef, # std-input
     'iter-pair' => undef,
     'keyword' => undef,
@@ -42,6 +43,7 @@
     'no-such-keyword-exception' => undef, # kw-args processing funcs (throw)
     'object' => undef,
     'output-stream' => undef, # std-output, std-error
+    'ptr' => undef,
     'property' => undef,
     'selector' => undef,
     'signature' => undef,

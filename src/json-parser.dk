@@ -75,7 +75,7 @@ klass json-parser {
     self.column =   0;
     return self;
   }
-  method uint32-t read(object-t self, void* buffer, uint32-t element-size, uint32-t num-elements-max) {
+  method uint32-t read(object-t self, ptr-t buffer, uint32-t element-size, uint32-t num-elements-max) {
     uint32-t num-elements-read = cast(uint32-t)fread(buffer, cast(size-t)element-size, cast(size-t)num-elements-max, self.in);
     
     // fread() does not distinguish between end-of-file and error, and callers must use

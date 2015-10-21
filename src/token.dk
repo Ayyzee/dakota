@@ -22,6 +22,7 @@
 
 module dakota-util;
 
+klass hash;
 klass object-output-stream;
 klass output-stream;
 klass str512;
@@ -79,8 +80,8 @@ klass token {
     self.leading-ws = nullptr;
     return self;
   }
-  method uintptr-t hash(object-t self) {
-    uintptr-t result = dk-hash(self.buffer);
+  method hash-t hash(object-t self) {
+    hash-t result = dk-hash(self.buffer);
     return result;
   }
   method boole-t equal?(object-t self, object-t other) {

@@ -21,6 +21,7 @@ module dakota;
 
 klass autorelease-pool;
 klass exception;
+klass hash;
 klass resource-usage;
 klass object-output-stream;
 klass output-stream;
@@ -108,7 +109,7 @@ klass object {
     $add(current-pool, self);
     return self;
   }
-  method uintptr-t hash(object-t self) {
+  method hash-t hash(object-t self) {
     uintptr-t result = cast(uintptr-t)self;
     return result;
   }
