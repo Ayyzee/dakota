@@ -78,3 +78,5 @@ the compiled image it represents
 
 allow const on property::element; must supply no-op box() so it does
 not generate a box that won't compile
+
+add null/#std{in,out,err}/#false/#true to the readonly pages
