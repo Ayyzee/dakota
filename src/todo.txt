@@ -80,3 +80,7 @@ allow const on property::element; must supply no-op box() so it does
 not generate a box that won't compile
 
 add null/#std{in,out,err}/#false/#true to the readonly pages
+
+check sorted order of named-info/property data structures in rt/*.cc
+
+fix padding for rt/*.cc imported-klasses[]
