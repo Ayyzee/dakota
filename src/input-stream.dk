@@ -44,6 +44,9 @@ klass input-stream {
     assert(stdout != file);
     assert(stderr != file);
 
+    if (nullptr != file)
+      *unbox(self) = file;
+
     if (nullptr == file && nullptr == filename)
       *unbox(self) = stdin; // default
 

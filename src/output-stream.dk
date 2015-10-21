@@ -45,6 +45,9 @@ klass output-stream {
              nullptr != filename)); // these are mutually exclusive
     assert(stdin != file);
 
+    if (nullptr != file)
+      *unbox(self) = file;
+
     if (nullptr == file && nullptr == filename)
       *unbox(self) = stdout; // default
 
