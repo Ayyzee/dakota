@@ -206,14 +206,17 @@ sub kw_args_translate {
             my $kw_args_types = [];
             my $kw_args_name;        # not used
             foreach $kw_args_name (@{$$method{'kw-args-names'}}) {
-              my $kw_args_type = &dakota::util::remove_last($$method{'parameter-types'});
+              my $kw_args_type =
+                &dakota::util::remove_last($$method{'parameter-types'});
               &dakota::util::add_last($kw_args_types, $kw_args_type);
             }
             &dakota::util::add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
             my $kw_args_defaults = [];
             my $kw_args_default;
-            if (exists $$method{'kw-args-defaults'} && defined $$method{'kw-args-defaults'}) {
-              while ($kw_args_default = &dakota::util::remove_last($$method{'kw-args-defaults'})) {
+            if (exists  $$method{'kw-args-defaults'} &&
+                defined $$method{'kw-args-defaults'}) {
+              while ($kw_args_default =
+                       &dakota::util::remove_last($$method{'kw-args-defaults'})) {
                 my $val = "@$kw_args_default";
                 &dakota::util::add_last($kw_args_defaults, $val);
               }
@@ -227,9 +230,9 @@ sub kw_args_translate {
             my $kw_args_type;
             while (scalar @$kw_args_types) {
               my $keyword_type = {
-                                  type => &dakota::util::remove_last($kw_args_types),
-                                  default => &dakota::util::remove_last($kw_args_defaults),
-                                  name => &dakota::util::remove_first($$method{'kw-args-names'}) };
+                type =>    &dakota::util::remove_last($kw_args_types),
+                default => &dakota::util::remove_last($kw_args_defaults),
+                name =>    &dakota::util::remove_first($$method{'kw-args-names'}) };
 
               &dakota::util::add_last($$method{'keyword-types'}, $keyword_type);
             }
@@ -240,7 +243,8 @@ sub kw_args_translate {
             my $kw_args_generics = &dakota::util::kw_args_generics();
             if (exists $$kw_args_generics{$name}) {
               if (!&dakota::generate::is_va($method)) {
-                &dakota::util::add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
+                &dakota::util::add_last($$method{'parameter-types'},
+                                        [ 'va-list-t' ]);
                 $$method{'keyword-types'} = [];
               }
             }
@@ -256,7 +260,9 @@ sub tbl_add_info {
   while (my ($key, $element) = each %$tbl) {
     if (!exists $$root_tbl{$key}) {
       $$root_tbl{$key} = $$tbl{$key};
-    } elsif (exists $$root_tbl{$key} && !defined $$root_tbl{$key} && defined $$tbl{$key}) {
+    } elsif (exists  $$root_tbl{$key} &&
+            !defined $$root_tbl{$key} &&
+             defined $$tbl{$key}) {
       $$root_tbl{$key} = $$tbl{$key};
     }
   }
@@ -265,23 +271,37 @@ sub _rep_merge { # recursive
   my ($root_ref, $scope) = @_;
   my ($subscope_name, $subscope);
 
-  foreach my $name ('klasses', 'traits', 'generics', 'symbols', 'keywords', 'strings', 'modules') {
+  foreach my $name (
+    'generics',
+    'hashes',
+    'integers',
+    'keywords',
+    'klasses',
+    'modules',
+    'named-instances',
+    'strings',
+    'symbols',
+    'traits') {
     while (($subscope_name, $subscope) = each(%{$$scope{$name}})) {
       if ($subscope) {
-	if (!defined $$root_ref{$name}{$subscope_name}) {
-	  $$root_ref{$name}{$subscope_name} = &dakota::util::deep_copy($subscope);
-	} elsif ('klasses' eq $name || 'traits' eq $name) {
-	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'methods'}, $$subscope{'methods'});
-	  #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-methods'}, $$subscope{'va-methods'});
-	  &tbl_add_info($$root_ref{$name}{$subscope_name}{'slots-methods'}, $$subscope{'slots-methods'});
-	  #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-slots-methods'}, $$subscope{'va-slots-methods'});
+        if (!defined $$root_ref{$name}{$subscope_name}) {
+          $$root_ref{$name}{$subscope_name} = &dakota::util::deep_copy($subscope);
+        } elsif ('klasses' eq $name || 'traits' eq $name) {
+          &tbl_add_info($$root_ref{$name}{$subscope_name}{'methods'},
+                        $$subscope{'methods'});
+          #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-methods'},
+          #$$subscope{'va-methods'});
+          &tbl_add_info($$root_ref{$name}{$subscope_name}{'slots-methods'},
+                        $$subscope{'slots-methods'});
+          #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-slots-methods'},
+          #$$subscope{'va-slots-methods'});
 
-	  # need to merge 'slots' and bunch-o-stuff
-	}
+          # need to merge 'slots' and bunch-o-stuff
+        }
       } else {
-	if (!exists $$root_ref{$name}{$subscope_name}) {
-	  $$root_ref{$name}{$subscope_name} = undef;
-	}
+        if (!exists $$root_ref{$name}{$subscope_name}) {
+          $$root_ref{$name}{$subscope_name} = undef;
+        }
       }
     }
   }
@@ -531,12 +551,12 @@ sub warning {
   my ($file, $line, $token_index) = @_;
   printf STDERR "%s:%i: warning/error\n",
     $file,
-      $line;
+    $line;
 
   printf STDERR "%s:%i: did not expect \'%s\'\n",
     $gbl_filename,
-      $$gbl_sst{'tokens'}[$token_index]{'line'},
-        &sst::at($gbl_sst, $token_index);
+    $$gbl_sst{'tokens'}[$token_index]{'line'},
+    &sst::at($gbl_sst, $token_index);
   return;
 }
 sub error {
@@ -551,8 +571,8 @@ sub match {
   } else {
     printf STDERR "%s:%i: expected \'%s\'\n",
       $file,
-        $line,
-          $match_token;
+      $line,
+      $match_token;
     &error($file, $line, $$gbl_sst_cursor{'current-token-index'});
   }
   return $match_token;
@@ -642,7 +662,9 @@ sub trait {
         }
       }
       if (m/^method$/) {
-        if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) || '{' eq &sst_cursor::previous_token($gbl_sst_cursor) || '}' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
+        if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
+            '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
+            '}' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
           &method({ 'exported?' => 0 });
           last;
         }
@@ -916,9 +938,12 @@ sub enum {
         $$enum{'type'} = $type;
       }
       $$enum{'info'} = [];
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+      my ($open_curley_index, $close_curley_index) =
+        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
-        my $enum_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
+        my $enum_defs = &sst::token_seq($gbl_sst,
+                                        $open_curley_index + 1,
+                                        $close_curley_index - 1);
         &enum_seq($enum_defs, $$enum{'info'});
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
@@ -955,7 +980,8 @@ sub initialize {
     if (m/^\{$/) {
       &add_symbol($gbl_root, ['initialize']);
       $$gbl_current_scope{'has-initialize'} = 1;
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+      my ($open_curley_index, $close_curley_index) =
+        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
       last;
     }
@@ -986,7 +1012,8 @@ sub finalize {
     if (m/^\{$/) {
       &add_symbol($gbl_root, ['finalize']);
       $$gbl_current_scope{'has-finalize'} = 1;
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+      my ($open_curley_index, $close_curley_index) =
+        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
       last;
     }
@@ -1030,14 +1057,12 @@ sub interpose {
   if ($$gbl_root{'interposers'}{$first}) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-
   if ($$gbl_root{'interposers-unordered'}{$first}) {
     # check for sameness here
     delete $$gbl_root{'interposers-unordered'}{$first};
   }
   $$gbl_root{'interposers'}{$first} = $seq;
 }
-
 # this works for methods because zero or one params are allowed, so comma is not seen in a a param list
 sub match_qual_ident {
   my ($file, $line) = @_;
@@ -1064,7 +1089,7 @@ sub module_import {
         if (!exists $$gbl_root{'modules'}{$module_name}{'import'}{'module'}{$imported_module_name}) {
           $$gbl_root{'modules'}{$module_name}{'import'}{'module'}{$imported_module_name} = $tbl;
         }
-        return;                 # leaving ';' as the current token
+        return; # leaving ';' as the current token
       } elsif (m/^,$/) {
         &match(__FILE__, __LINE__, ',');
       } elsif (m/^module$/) {
@@ -1137,7 +1162,8 @@ sub klass {
 
     if ($$args{'exported?'}) {
       $$gbl_root{'exported-klass-decls'}{$body} = {};
-      $$gbl_current_scope{'exported-klass-decls'} = &dakota::util::deep_copy($$gbl_root{'exported-klass-decls'});
+      $$gbl_current_scope{'exported-klass-decls'} =
+        &dakota::util::deep_copy($$gbl_root{'exported-klass-decls'});
     }
     return $body;
   }
@@ -1206,7 +1232,9 @@ sub klass {
         last;
       }
       if (m/^method$/) {
-        if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) || '{' eq &sst_cursor::previous_token($gbl_sst_cursor) || '}' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
+        if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
+            '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
+            '}' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
           &method({ 'exported?' => 0 });
           last;
         }
@@ -1362,7 +1390,6 @@ sub expand_type {
   for (my $i = 0; $i < @$type; $i++) {
     $previous_token = $$type[$i];
   }
-
   if (1 < @$type &&
       $$type[@$type - 1] =~ /$id/) {
     &dakota::util::remove_last($type);
@@ -1641,25 +1668,33 @@ sub method {
       &error(__FILE__, __LINE__, $last_type_token);
     }
   }
-  my $return_type = &sst::token_seq($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'}, $last_type_token);
+  my $return_type = &sst::token_seq($$gbl_sst_cursor{'sst'},
+                                    $$gbl_sst_cursor{'current-token-index'},
+                                    $last_type_token);
   $return_type = &token_seq::simple_seq($return_type);
 
   if ('void' eq &path::string($return_type)) {
     $$method{'return-type'} = undef;
-    &warning(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'}); # 'void' is not a recommended return type for a method
+    &warning(__FILE__, __LINE__,
+             $$gbl_sst_cursor{'current-token-index'}); # 'void' is not a recommended return type for a method
   } else {
     $$method{'return-type'} = $return_type;
   }
-  $$method{'name'} = &sst::token_seq($gbl_sst, $last_type_token + 1, $last_name_token);
+  $$method{'name'} = &sst::token_seq($gbl_sst,
+                                     $last_type_token + 1,
+                                     $last_name_token);
   $$method{'name'} = &token_seq::simple_seq($$method{'name'});
   &add_generic($gbl_root, "@{$$method{'name'}}");
 
   if ($open_paren_index + 1 == $close_paren_index) {
     &error(__FILE__, __LINE__, $close_paren_index);
   }
-  my $parameter_types = &sst::token_seq($gbl_sst, $open_paren_index + 1, $close_paren_index - 1);
+  my $parameter_types = &sst::token_seq($gbl_sst,
+                                        $open_paren_index + 1,
+                                        $close_paren_index - 1);
   $parameter_types = &token_seq::simple_seq($parameter_types);
-  my ($kw_args_parameter_types, $kw_args_names, $kw_args_defaults) = &parameter_list($parameter_types);
+  my ($kw_args_parameter_types, $kw_args_names, $kw_args_defaults) =
+    &parameter_list($parameter_types);
   $$method{'parameter-types'} = $kw_args_parameter_types;
 
   if ($kw_args_names) {
@@ -1677,10 +1712,13 @@ sub method {
     if (m/^\{$/) {
       $$method{'defined?'} = 1;
       $$method{'module'} = $gbl_current_module;
-      my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
-      my $block_sst_cursor = &sst_cursor::make($gbl_sst, $open_curley_index, $close_curley_index);
+      my ($open_curley_index, $close_curley_index) =
+        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+      my $block_sst_cursor = &sst_cursor::make($gbl_sst,
+                                               $open_curley_index,
+                                               $close_curley_index);
       #&errdump($block_sst_cursor);
-     #&add_generics_used($method, $block_sst_cursor);
+      #&add_generics_used($method, $block_sst_cursor);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
       last;
     }
@@ -1693,22 +1731,26 @@ sub method {
   my $signature = &function::overloadsig($method, undef);
 
   if (0) {
-  } elsif (&dakota::generate::is_slots($method) && &dakota::generate::is_va($method)) { # 11
+  } elsif (&dakota::generate::is_slots($method) &&
+             &dakota::generate::is_va($method)) { # 11
     if (!defined $$gbl_current_scope{'slots-methods'}) {
       $$gbl_current_scope{'slots-methods'} = {};
     }
     $$gbl_current_scope{'slots-methods'}{$signature} = $method;
-  } elsif (&dakota::generate::is_slots($method) && !&dakota::generate::is_va($method)) { # 10
+  } elsif (&dakota::generate::is_slots($method) &&
+             !&dakota::generate::is_va($method)) { # 10
     if (!defined $$gbl_current_scope{'slots-methods'}) {
       $$gbl_current_scope{'slots-methods'} = {};
     }
     $$gbl_current_scope{'slots-methods'}{$signature} = $method;
-  } elsif (!&dakota::generate::is_slots($method) && &dakota::generate::is_va($method)) { # 01
+  } elsif (!&dakota::generate::is_slots($method) &&
+             &dakota::generate::is_va($method)) { # 01
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }
     $$gbl_current_scope{'methods'}{$signature} = $method;
-  } elsif (!&dakota::generate::is_slots($method) && !&dakota::generate::is_va($method)) { # 00
+  } elsif (!&dakota::generate::is_slots($method) &&
+             !&dakota::generate::is_va($method)) { # 00
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }
@@ -1735,7 +1777,8 @@ sub generics::klass_type_from_klass_name {
     $klass_type = 'klass||trait';
   } else {
     my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
-    die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
+    die __FILE__, ":", __LINE__,
+      ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
   }
   return $klass_type;
 }
@@ -1760,34 +1803,43 @@ sub generics::klass_scope_from_klass_name {
 
 sub _add_indirect_klasses { # recursive
   my ($klass_names_set, $klass_name, $col) = @_;
-  my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  my $klass_scope =
+    &generics::klass_scope_from_klass_name($klass_name);
 
   if (defined $$klass_scope{'klass'}) {
     $$klass_names_set{'klasses'}{$$klass_scope{'klass'}} = undef;
 
     if ('klass' ne $$klass_scope{'klass'}) {
-      &_add_indirect_klasses($klass_names_set, $$klass_scope{'klass'}, &dakota::generate::colin($col));
+      &_add_indirect_klasses($klass_names_set,
+                             $$klass_scope{'klass'},
+                             &dakota::generate::colin($col));
     }
   }
   if (defined $$klass_scope{'interpose'}) {
     $$klass_names_set{'klasses'}{$$klass_scope{'interpose'}} = undef;
 
     if ('object' ne $$klass_scope{'interpose'}) {
-      &_add_indirect_klasses($klass_names_set, $$klass_scope{'interpose'}, &dakota::generate::colin($col));
+      &_add_indirect_klasses($klass_names_set,
+                             $$klass_scope{'interpose'},
+                             &dakota::generate::colin($col));
     }
   }
   if (defined $$klass_scope{'superklass'}) {
     $$klass_names_set{'klasses'}{$$klass_scope{'superklass'}} = undef;
 
     if ('object' ne $$klass_scope{'superklass'}) {
-      &_add_indirect_klasses($klass_names_set, $$klass_scope{'superklass'}, &dakota::generate::colin($col));
+      &_add_indirect_klasses($klass_names_set,
+                             $$klass_scope{'superklass'},
+                             &dakota::generate::colin($col));
     }
   }
   if (defined $$klass_scope{'traits'}) {
     foreach my $trait (@{$$klass_scope{'traits'}}) {
       $$klass_names_set{'traits'}{$trait} = undef;
       if ($klass_name ne $trait) {
-        &_add_indirect_klasses($klass_names_set, $trait, &dakota::generate::colin($col));
+        &_add_indirect_klasses($klass_names_set,
+                               $trait,
+                               &dakota::generate::colin($col));
       }
     }
   }
@@ -1795,7 +1847,9 @@ sub _add_indirect_klasses { # recursive
     foreach my $reqr (@{$$klass_scope{'requires'}}) {
       $$klass_names_set{'requires'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
-        &_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
+        &_add_indirect_klasses($klass_names_set,
+                               $reqr,
+                               &dakota::generate::colin($col));
       }
     }
   }
@@ -1803,7 +1857,9 @@ sub _add_indirect_klasses { # recursive
     foreach my $reqr (@{$$klass_scope{'provides'}}) {
       $$klass_names_set{'provides'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
-        &_add_indirect_klasses($klass_names_set, $reqr, &dakota::generate::colin($col));
+        &_add_indirect_klasses($klass_names_set,
+                               $reqr,
+                               &dakota::generate::colin($col));
       }
     }
   }
@@ -1912,7 +1968,8 @@ sub generics::_parse { # no longer recursive
     &dakota::util::add_last($data, $generic);
 
     # not sure if we should type translate the return type
-    $$generic{'return-type'} = &dakota::generate::type_trans($$generic{'return-type'});
+    $$generic{'return-type'} =
+      &dakota::generate::type_trans($$generic{'return-type'});
 
     my $args    = $$generic{'parameter-types'};
     my $num_args = @$args;
@@ -1990,7 +2047,8 @@ sub parse_root {
         last;
       }
       if (m/^klass$/) {
-        if (0 == $$gbl_sst_cursor{'current-token-index'} || &sst_cursor::previous_token($gbl_sst_cursor) ne '::') {
+        if (0 == $$gbl_sst_cursor{'current-token-index'} ||
+              &sst_cursor::previous_token($gbl_sst_cursor) ne '::') {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
             if ($next_token =~ m/$id/) {
@@ -2013,8 +2071,10 @@ sub parse_root {
     }
   }
   foreach my $klass_type ( 'klasses', 'traits' ) {
-    if (exists $$gbl_root{'exported-headers'} && defined $$gbl_root{'exported-headers'}) {
-      while (my ($header, $dummy) = each(%{$$gbl_root{'exported-headers'}})) {
+    if (exists  $$gbl_root{'exported-headers'} &&
+        defined $$gbl_root{'exported-headers'}) {
+      while (my ($header, $dummy) =
+               each(%{$$gbl_root{'exported-headers'}})) {
         $$gbl_root{'exported-headers'}{$header} = undef;
       }
       while (my ($klass, $info) = each(%{$$gbl_root{$klass_type}})) {
@@ -2033,10 +2093,13 @@ sub parse_root {
 sub add_object_methods_decls_to_klass {
   my ($klass_scope, $methods_key, $slots_methods_key) = @_;
   if (exists $$klass_scope{$slots_methods_key}) {
-    while (my ($slots_method_sig, $slots_method_info) = each (%{$$klass_scope{$slots_methods_key}})) {
+    while (my ($slots_method_sig, $slots_method_info) =
+             each (%{$$klass_scope{$slots_methods_key}})) {
       if ($$slots_method_info{'defined?'}) {
-        my $object_method_info = &dakota::generate::convert_to_object_method($slots_method_info);
-        my $object_method_signature = &function::overloadsig($object_method_info, undef);
+        my $object_method_info =
+          &dakota::generate::convert_to_object_method($slots_method_info);
+        my $object_method_signature =
+          &function::overloadsig($object_method_info, undef);
 
         if (($$klass_scope{'methods'}{$object_method_signature} &&
              $$klass_scope{'methods'}{$object_method_signature}{'defined?'})) {
@@ -2045,7 +2108,8 @@ sub add_object_methods_decls_to_klass {
           $$object_method_info{'is-generated'} = 1;
           #print STDERR "$object_method_signature\n";
           #print STDERR &Dumper($object_method_info);
-          $$klass_scope{$methods_key}{$object_method_signature} = $object_method_info;
+          $$klass_scope{$methods_key}{$object_method_signature} =
+            $object_method_info;
         }
       }
     }
@@ -2057,8 +2121,11 @@ sub add_object_methods_decls {
 
   foreach my $construct ('klasses', 'traits') {
     if (exists $$root{$construct}) {
-      while (my ($klass_name, $klass_scope) = each (%{$$root{$construct}})) {
-        &add_object_methods_decls_to_klass($klass_scope, 'methods', 'slots-methods');
+      while (my ($klass_name, $klass_scope) =
+               each (%{$$root{$construct}})) {
+        &add_object_methods_decls_to_klass($klass_scope,
+                                           'methods',
+                                           'slots-methods');
       }
     }
   }
