@@ -180,7 +180,7 @@ klass uintptr {
   method object-t dump(object-t self) {
     $dump(super);
     fprintf(stderr, "%p:%p { slots=\"%lu\" }\n",
-            cast(void*)self, cast(void*)unbox(self), *unbox(self));
+            cast(ptr-t)self, cast(ptr-t)unbox(self), *unbox(self));
     return self;
   }
 }

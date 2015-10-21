@@ -27,7 +27,7 @@ klass std-compare;
 
 klass sorted-array {
   slots {
-    void*         elements;
+    ptr-t         elements;
     uint32-t      count;
     uint32-t      capacity;
     uint32-t      size;
@@ -38,7 +38,7 @@ klass sorted-array {
     assert(0 != size);
     assert(nullptr != compare);
     slots-t* result = cast(slots-t*)dkt::alloc(sizeof(slots-t));
-    result->elements = cast(void*)dkt::alloc(size * capacity);
+    result->elements = cast(ptr-t)dkt::alloc(size * capacity);
     result->count =    0;
     result->capacity = capacity;
     result->size =     size;
@@ -88,8 +88,8 @@ klass sorted-array {
     assert(nullptr != key);
     assert(offset <= t->count);
 
-    memmove(cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
-            cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
+    memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
+            cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
             (t->count - offset) * t->size);
     memcpy(cast(uint8-t*)(t->elements) + (t->size * (offset + 0)), key, t->size);
     t->count++;
@@ -108,8 +108,8 @@ klass sorted-array {
     assert(0 < t->count);
 
     void const* element = at(t, offset);
-    memmove(cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
-            cast(void*)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
+    memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
+            cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
             (t->count - offset - 1) * t->size); // this arg may be zero
     if (nullptr != key)
       assert(0 == t->compare(key, element));

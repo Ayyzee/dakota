@@ -60,7 +60,7 @@ klass symbol {
   method object-t dump(object-t self) {
     $dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n",
-            cast(void*)(self), cast(void*)unbox(self), $utf8-from(self));
+            cast(ptr-t)(self), cast(ptr-t)unbox(self), $utf8-from(self));
     return self;
   }
   method hash-t hash(slots-t s) {

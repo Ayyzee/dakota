@@ -82,7 +82,7 @@ klass vector {
   method object-t dump(object-t self) {
     $dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
-            cast(void*)(self), cast(void*)unbox(self), self.count, self.capacity);
+            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.count, self.capacity);
     for (object-t element in self)
       $dump(element);
     return self;
@@ -369,7 +369,7 @@ klass vector-forward-iterator {
       self.index = vector::next-index(self.vector, self.index + 1);
     }
     //       printf("%s:%s(%p) = %p\n",
-    //              "vector-forward-iterator", __func__, (void*)self, (void*)element);
+    //              "vector-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
     return element;
   }
   method object-t element(object-t self) {

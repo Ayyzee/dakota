@@ -47,14 +47,14 @@ klass keyword-exception {
     $dump(super);
     fprintf(stderr, "\"%s\": {", $utf8-from(self));
     fprintf(stderr, " \"object\": [ %p, \"%s\" ]",
-            cast(void*)self.object,
+            cast(ptr-t)self.object,
             $utf8-from(self.object));
     fprintf(stderr, ", \"signature\": [ %p, \"%s(%s)\" ]",
-            cast(void*)self.signature,
+            cast(ptr-t)self.signature,
             self.signature->name,
             self.signature->parameter-types);
     fprintf(stderr, ", \"keyword\": [ %p, \"#%s\" ]",
-            cast(void*)self.keyword,
+            cast(ptr-t)self.keyword,
             self.keyword);
     fprintf(stderr, " }\n");
     $dump(self.object);

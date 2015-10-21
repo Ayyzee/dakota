@@ -59,7 +59,7 @@ klass cstring {
   method slots-t* dump(slots-t* s) {
   //$dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%u, capacity=%u }\n",
-            cast(void*)nullptr, cast(void*)(s), s->ptr, s->len, s->capacity);
+            cast(ptr-t)nullptr, cast(ptr-t)(s), s->ptr, s->len, s->capacity);
     return s;
   }
   method int-t compare(slots-t* s, slots-t* other-s) {

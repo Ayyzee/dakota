@@ -93,7 +93,7 @@ klass string {
   method object-t dump(object-t self) {
     $dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%i }\n",
-            cast(void*)(self), cast(void*)unbox(self), self.ptr, self.len);
+            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.ptr, self.len);
     return self;
   }
   method uint32-t uint32-value(object-t self) {

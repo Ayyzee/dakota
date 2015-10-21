@@ -433,11 +433,11 @@ klass klass {
   }
   method object-t dump(object-t self) {
     object::dump(self);
-    fprintf(stderr, "%p:%p {", cast(void*)(self), cast(void*)unbox(self));
+    fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)unbox(self));
 
     // name
     if (nullptr != self.name)
-      fprintf(stderr, " name=%p #%s", cast(void*)(self.name), self.name);
+      fprintf(stderr, " name=%p #%s", cast(ptr-t)(self.name), self.name);
     else
       fprintf(stderr, " name=%s", #nullptr);
 
@@ -447,12 +447,12 @@ klass klass {
 
       if (null == self.superklass) {
         superklass-name = "-null-";
-        fprintf(stderr, ", superklass=%p %s", cast(void*)(self.superklass), superklass-name);
+        fprintf(stderr, ", superklass=%p %s", cast(ptr-t)(self.superklass), superklass-name);
       } else {
         if (nullptr == (superklass-name = name(self.superklass)))
           superklass-name = #nullptr;
 
-        fprintf(stderr, ", superklass=%p <%s>", cast(void*)(self.superklass), superklass-name);
+        fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)(self.superklass), superklass-name);
       }
     } else {
       fprintf(stderr, ", superklass=%s", #nullptr);
@@ -532,7 +532,7 @@ klass klass {
           fprintf(out, " ");
           width++;
         }
-        str-t symbol-name = symbol-name-from-address(cast(void*)cast(uintptr-t)(m));
+        str-t symbol-name = symbol-name-from-address(cast(ptr-t)cast(uintptr-t)(m));
 
         if (nullptr != symbol-name) {
           // should demangle here
@@ -663,7 +663,7 @@ klass klass {
     symbol-t name = name-from-info(self.info-slots);
     assert(#trait != cast(symbol-t)named-info::at(self.info-slots, #type));
     self.name = name;
-//     fprintf(stderr, "%p: { name=%s }\n", cast(void*)(self), self.name);
+//     fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), self.name);
     uint32-t size = size-from-info(self.info-slots);
     self.size = size;
     object-t superklass = superklass-from-info(self.info-slots, self.name);

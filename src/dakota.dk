@@ -424,7 +424,7 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
 }
 static named-info-t* gbl-registration-info-list;
 
-void register-info-common(named-info-t* registration-info, void* user-data);
+void register-info-common(named-info-t* registration-info, ptr-t user-data);
 object-t dk-export-klass(named-info-t* klass-info);
 
 // SO-EXPORT object-t
@@ -461,8 +461,8 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
   object-t klass = dk-export-klass(klass-info);
   return klass;
 }
-typedef void (*)(named-info-t*, void*) named-info-func-t;
-static void each(named-info-t* root-info-list, named-info-func-t func, void* user-data) {
+typedef void (*)(named-info-t*, ptr-t) named-info-func-t;
+static void each(named-info-t* root-info-list, named-info-func-t func, ptr-t user-data) {
   named-info-t* info;
   named-info-t* info-list = root-info-list;
   while (nullptr != (info = info-list)) {
@@ -520,7 +520,7 @@ dk-init-runtime() {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   if (nullptr == object::klass) {
     init-runtime-ds();
-    each(gbl-registration-info-list, register-info-common, cast(void*)nullptr);
+    each(gbl-registration-info-list, register-info-common, cast(ptr-t)nullptr);
 
     // alloc
     klass::klass =  alloc-klass(#klass); // must be first
@@ -588,12 +588,12 @@ dk-init-runtime() {
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, void*))cast(void (*)(named-info-t*, object-t (*)(str-t)))each-str,
-         cast(void*)cast(object-t (*)(str-t))str::box);
+         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(str-t)))each-str,
+         cast(ptr-t)cast(object-t (*)(str-t))str::box);
     dk-klass-for-name(#uintptr);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, void*))cast(void (*)(named-info-t*, object-t (*)(uintptr-t)))each-integer,
-         cast(void*)cast(object-t (*)(uintptr-t))uintptr::box);
+         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(uintptr-t)))each-integer,
+         cast(ptr-t)cast(object-t (*)(uintptr-t))uintptr::box);
 
     auto previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
@@ -630,7 +630,7 @@ imported-klasses-for-klass(symbol-t klass-name) {
 }
 void
 import-klass(symbol-t klass-name, assoc-node-t* node) {
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(void*)(node));
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { klass-name, node };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
 
@@ -651,8 +651,8 @@ static void
 import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc) {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%p']",
                         __func__,
-                        cast(void*)(klass-names),
-                        cast(void*)(klass-assoc));
+                        cast(ptr-t)(klass-names),
+                        cast(ptr-t)(klass-assoc));
   assert((nullptr != klass-names) &&
          (nullptr != klass-assoc));
   uint32-t i = 0;
@@ -711,7 +711,7 @@ dk-export-klass(named-info-t* klass-info) {
   named-info::sort(klass-info);
   symbol-t name = name-from-info(klass-info);
   assert(nullptr != name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(void*)(klass-info), name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(klass-info), name);
 
   symbol-t interpose-name = cast(symbol-t)named-info::at(klass-info, #interpose-name);
   if (nullptr != interpose-name) {
@@ -735,7 +735,7 @@ dk-export-klass(named-info-t* klass-info) {
 }
 static void
 export-klasses(named-info-t* klass-info) {
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p']", __func__, cast(void*)(klass-info));
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p']", __func__, cast(ptr-t)(klass-info));
   uint32-t i = 0;
 
   while (1) {
@@ -1248,7 +1248,7 @@ dump-klass(ofile-t ofl, named-info-t* klass-info) {
 void import-selectors(signature-t**, selector-node-t*); // hackhack
 
 klass get-segment-data {
-  slots void* (*)(char8-t const*, void**, size-t*);
+  slots ptr-t (*)(char8-t const*, ptr-t*, size-t*);
 }
 klass registration-info {
   slots {
@@ -1283,7 +1283,7 @@ named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) {
   return;
 }
 void
-register-info-common(named-info-t* ni, void* user-data) { USE(user-data);
+register-info-common(named-info-t* ni, ptr-t user-data) { USE(user-data);
   registration-info-t ri {};
   named-info-to-registration-info(ni, &ri);
 
@@ -1327,7 +1327,7 @@ klass x::siginfo {
   slots siginfo-t;
 }
 klass x::sigaction-handler {
-  slots void (*)(int-t, x::siginfo-t*, void*);
+  slots void (*)(int-t, x::siginfo-t*, ptr-t);
 }
 klass x::sigaction {
   slots struct sigaction;
@@ -1348,15 +1348,15 @@ static x::sigaction-pair-t sa-pairs[] = {
 };
 klass addr2name-pair {
   slots {
-    void**   addr;
+    ptr-t*   addr;
     symbol-t name;
   }
 }
 static addr2name-pair-t named-instances[] = {
-  { cast(void**)&null,       #null       },
-  { cast(void**)&std-input,  #std-input  },
-  { cast(void**)&std-output, #std-output },
-  { cast(void**)&std-error,  #std-error  },
+  { cast(ptr-t*)&null,       #null       },
+  { cast(ptr-t*)&std-input,  #std-input  },
+  { cast(ptr-t*)&std-output, #std-output },
+  { cast(ptr-t*)&std-error,  #std-error  },
 };
 klass so-symbol-info {
   slots {
@@ -1408,7 +1408,7 @@ bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) {
       syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
              sys-signame[sig], dl-info.dli-fname, sname-demangled, si->si-addr);
       if (0 == status)
-        free(cast(void*)sname-demangled);
+        free(cast(ptr-t)sname-demangled);
     }
   }
   so-symbol-info::slots-t info {};
@@ -1459,7 +1459,7 @@ sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) {
 static int-t
 set-read-only(char8-t const* segment, get-segment-data-t get-segment-data) {
   assert(NULL != segment);
-  void* addr = nullptr;
+  ptr-t addr = nullptr;
   size-t size = 0;
   get-segment-data(segment, &addr, &size); // code-generated in each dso
 
@@ -1584,7 +1584,7 @@ dkt-deregister-info(named-info-t* registration-info) {
   }
   symbol-t name = name-from-info(registration-info);
   assert(nullptr != name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(void*)(registration-info), name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(registration-info), name);
   return;
 }
 static symbol-t
@@ -1680,7 +1680,7 @@ dk-intern(str-t key) {
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;
-    intern-array->elements = cast(void**)dkt::alloc(intern-array->size * intern-array->capacity, intern-array->elements);
+    intern-array->elements = cast(ptr-t*)dkt::alloc(intern-array->size * intern-array->capacity, intern-array->elements);
   }
 #if 0
   symbol-t val = key;

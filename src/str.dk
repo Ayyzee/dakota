@@ -48,7 +48,7 @@ klass str {
   method object-t dump(object-t self) {
     $dump(super);
     fprintf(stderr, "%p:%p { slots=\"%s\" }\n",
-            cast(void*)self, cast(void*)unbox(self), *unbox(self));
+            cast(ptr-t)self, cast(ptr-t)unbox(self), *unbox(self));
     return self;
   }
   method boole-t equal?(object-t self, object-t other) {

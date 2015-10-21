@@ -72,7 +72,7 @@ klass sorted-set {
     self.sa.compare = cast(std-compare-t)cast(compare-t)swap-compare;
     self.sa.size =    cast(uint32-t)sizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
-    self.sa.elements = cast(void**)dkt::alloc(self.sa.size * self.sa.capacity);
+    self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity);
     self.sa.count = 0;
 
     self.iterator-state = 0;
@@ -101,7 +101,7 @@ klass sorted-set {
     {
       if (self.sa.count == self.sa.capacity) {
         self.sa.capacity *= 2; // the growth algorithm should be consumer setable
-        self.sa.elements = cast(void**)dkt::alloc(self.sa.size * self.sa.capacity, self.sa.elements);
+        self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity, self.sa.elements);
       }
       sorted-ptr-array::add-at(&self.sa, element, result.offset);
     }
@@ -169,7 +169,7 @@ klass sorted-set {
     slots-t* s1 = unbox(self);
     slots-t* s2 = unbox(copy);
     *s2 = *s1;
-    s2->sa.elements = cast(void**)dkt::alloc(s2->sa.size * s2->sa.capacity);
+    s2->sa.elements = cast(ptr-t*)dkt::alloc(s2->sa.size * s2->sa.capacity);
     memcpy(s2->sa.elements, s1->sa.elements, s2->sa.size * s2->sa.capacity);
     s2->iterator-state = 0;
     return copy;
@@ -184,7 +184,7 @@ klass sorted-set {
   method object-t dump(object-t self) {
     $dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
-            cast(void*)(self), cast(void*)unbox(self), self.sa.count, self.sa.capacity);
+            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.sa.count, self.sa.capacity);
     for (object-t element in self)
       $dump(element);
     return self;

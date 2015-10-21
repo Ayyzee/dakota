@@ -25,7 +25,7 @@ klass x::dl-info {
 }
 // returns nullptr if no exact match
 str-t
-symbol-name-from-address(void* saddr) {
+symbol-name-from-address(ptr-t saddr) {
   str-t result = nullptr;
 #if defined WIN32
 #error "not yet implemented on win32"
@@ -61,7 +61,7 @@ load-library(str-t name) {
   }
 #else
   //fprintf(stdout, "//dlopen(\"%s\", RTLD-NOW)\n", name);
-  void* dl-handle = dlopen(name, RTLD-NOW);
+  ptr-t dl-handle = dlopen(name, RTLD-NOW);
 
   if (nullptr == dl-handle) {
     str-t error = dlerror();

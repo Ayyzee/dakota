@@ -195,7 +195,7 @@ klass hashed-set {
   method object-t dump(object-t self) {
     $dump(super);
     fprintf(stderr, "%p:%p { size=%u, elements=[] }\n",
-            cast(void*)(self), cast(void*)unbox(self), self.size);
+            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.size);
     for (object-t element in self)
       $dump(element);
     return self;

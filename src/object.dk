@@ -120,9 +120,9 @@ klass object {
     if (nullptr != klass-of(self) && nullptr != name-of(klass-of(self)))
       klass-name = name-of(klass-of(self));
     if (nullptr != klass-of(self))
-      fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(void*)(self), cast(void*)(self), cast(void*)klass-of(self), klass-name);
+      fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(ptr-t)(self), cast(ptr-t)(self), cast(ptr-t)klass-of(self), klass-name);
     else
-      fprintf(stderr, "%p:%p { klass=%s }\n", cast(void*)(self), cast(void*)(self), #nullptr);
+      fprintf(stderr, "%p:%p { klass=%s }\n", cast(ptr-t)(self), cast(ptr-t)(self), #nullptr);
 
 //     if (nullptr != klass-of(self) && self != klass-of(self))
 //       $dump(klass-of(self));
@@ -132,7 +132,7 @@ klass object {
   method str-t utf8-from(object-t self) {
     size-t len = 2 + PRIxPTR-WIDTH + (1);
     char8-t* buffer = cast(char8-t*)dkt::alloc(len);
-    snprintf(buffer, len, "%p", cast(void*)self);
+    snprintf(buffer, len, "%p", cast(ptr-t)self);
     return cast(str-t)(buffer);
   }
   method object-t print(object-t self, object-t out) {
@@ -153,17 +153,17 @@ klass object {
 DEBUG-SO-EXPORT void
 dkt-unbox-check(object-t object, object-t kls) {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
-                        __func__, cast(void*)(object), $name(kls));
+                        __func__, cast(ptr-t)(object), $name(kls));
   unless (object::instance?(object, kls)) {
     str-t object-kls-name = name-of(klass-of(object));
     str-t kls-name = name-of(kls);
 
     if (object::instance?(object, klass::klass))
       dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s', name='%s'})",
-              kls-name, cast(void*)object, object-kls-name, name-of(object));
+              kls-name, cast(ptr-t)object, object-kls-name, name-of(object));
     else
       dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s'})",
-              kls-name, cast(void*)object, object-kls-name);
+              kls-name, cast(ptr-t)object, object-kls-name);
 
     throw make(exception::klass, #message : "oops");
   }

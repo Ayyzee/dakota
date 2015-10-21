@@ -55,9 +55,9 @@ dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, v
   if (NULL != getenv("DK_ENABLE_TRACE")) {
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
                            signature->name, signature->parameter-types + sizeof("object-t") - 1,
-                           cast(void*)(context.self), name-of(klass-of(context.self)),
-                           cast(void*)(context.klass), name-of(context.klass),
-                           cast(void*)cast(uintptr-t)(m));
+                           cast(ptr-t)(context.self), name-of(klass-of(context.self)),
+                           cast(ptr-t)(context.klass), name-of(context.klass),
+                           cast(ptr-t)cast(uintptr-t)(m));
     trace-column-in();
   }
   return result;
@@ -69,8 +69,8 @@ dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, v
   if (NULL != getenv("DK_ENABLE_TRACE")) {
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
                            signature->name, signature->parameter-types,
-                           cast(void*)(object), name-of(klass-of(object)),
-                           cast(void*)cast(uintptr-t)(m));
+                           cast(ptr-t)(object), name-of(klass-of(object)),
+                           cast(ptr-t)cast(uintptr-t)(m));
     trace-column-in();
   }
   return result;
@@ -83,9 +83,9 @@ dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va
   if (NULL != getenv("DK_ENABLE_TRACE"))
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
                            signature->name, signature->parameter-types + sizeof("object-t") - 1,
-                           cast(void*)(context.self), name-of(klass-of(context.self)),
-                           cast(void*)(context.klass), name-of(context.klass),
-                           cast(void*)cast(uintptr-t)(m));
+                           cast(ptr-t)(context.self), name-of(klass-of(context.self)),
+                           cast(ptr-t)(context.klass), name-of(context.klass),
+                           cast(ptr-t)cast(uintptr-t)(m));
   return result;
 }
 DEBUG-SO-EXPORT int-t
@@ -96,8 +96,8 @@ dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va
   if (NULL != getenv("DK_ENABLE_TRACE"))
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
                            signature->name, signature->parameter-types,
-                           cast(void*)(object), name-of(klass-of(object)),
-                           cast(void*)cast(uintptr-t)(m));
+                           cast(ptr-t)(object), name-of(klass-of(object)),
+                           cast(ptr-t)cast(uintptr-t)(m));
   return result;
 }
 DEBUG-SO-EXPORT int-t
