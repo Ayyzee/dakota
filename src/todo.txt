@@ -84,3 +84,6 @@ add null/#std{in,out,err}/#false/#true to the readonly pages
 check sorted order of named-info/property data structures in rt/*.cc
 
 fix padding for rt/*.cc imported-klasses[]
+
+add to macro system the abilty to write and use "context" macros (like
+"klass context" or "slots context" or "method context")
