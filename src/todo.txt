@@ -87,3 +87,13 @@ fix padding for rt/*.cc imported-klasses[]
 
 add to macro system the abilty to write and use "context" macros (like
 "klass context" or "slots context" or "method context")
+
+generate a naming summary (for example)
+  every unique method/gf signature and number across klasses
+  every unique keyword name (within a specific generic basename or across all generics) and its type across klasses
+  name of slots members and its type across klasses
+  the name of (eventual) subklass of 'klass' end with -klass (klass boole-klass { superklass klass; ... })
+
+module defn should allow us to specify methods/generics by arity  add(2), add(3) (assume both object-t and super-t)
+
+consider := operator like Dylan (it calls the setter func)?
