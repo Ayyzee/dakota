@@ -149,7 +149,8 @@ init-runtime-ds() {
 extern resource-usage::slots-t gbl-ru;
 #endif
 
-static DKT-RODATA-SECTION object-t null-klass = nullptr;
+klass null-singleton { klass singleton-klass; }
+
 SO-EXPORT DKT-RODATA-SECTION object-t null =       nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t std-input =  nullptr;
 SO-EXPORT DKT-RODATA-SECTION object-t std-output = nullptr;
@@ -507,13 +508,13 @@ static void each-integer(named-info-t* info, object-t (*box)(uintptr-t)) {
   }
 }
 
-// object klass' superklass is null instance (singleton)
-// klass klass'  superklass is object klass
-// null klass'   superklass is object klass
+// object         klass' superklass is null instance (singleton)
+// klass          klass' superklass is object klass
+// null-singleton klass' superklass is object klass
 //
-// object klass' klass is klass klass
-// klass klass'  klass is klass klass
-// null klass'   klass is klass klass
+// object         klass' klass is klass klass
+// klass          klass' klass is klass klass
+// null-singleton klass' klass is klass klass
 SO-EXPORT void
 dk-init-runtime() {
   //fprintf(stderr, "%s()\n", __func__);
@@ -532,32 +533,32 @@ dk-init-runtime() {
 
     klass::unbox(object::klass)->superklass = nullptr;
 #if 1
-    dk-klass-for-name(#singleton-klass);
-    null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
-    null = make(null-klass);
+    //dk-klass-for-name(#singleton-klass); // ???
+    null-singleton::klass = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
+    null = make(null-singleton::klass);
     klass::unbox(object::klass)->superklass = null;
 #endif
     // core runtime klasses are setup
     // klasses: object, klass, (optionally) singleton-klass
-    // and (optionally) null-klass and null (singleton)
+    // and (optionally) null-singleton and null (singleton)
 
     // instantiation hier:
     //   klass <- klass
     //   klass <- object
-    //   klass <- singleton-klass <- null-klass <- null
+    //   klass <- singleton-klass <- null-singleton <- null
     // inheritance hier:
     //   null <- object <- klass <- singleton-klass
-    //   null <- object <- null-klass
+    //   null <- object <- null-singleton
 
     assert(klass::klass           == klass-of(klass::klass));
     assert(klass::klass           == klass-of(singleton-klass::klass));
     assert(klass::klass           == klass-of(object::klass));
-    assert(singleton-klass::klass == klass-of(null-klass));
-    assert(null-klass             == klass-of(null));
+    assert(singleton-klass::klass == klass-of(null-singleton::klass));
+    assert(null-singleton::klass  == klass-of(null));
 
     assert(null          == superklass-of(object::klass));
     assert(object::klass == superklass-of(klass::klass));
-    assert(object::klass == superklass-of(null-klass));
+    assert(object::klass == superklass-of(null-singleton::klass));
     assert(klass::klass  == superklass-of(singleton-klass::klass));
 
 #if !defined DKT-OMIT-BEHAVIOR
@@ -568,14 +569,14 @@ dk-init-runtime() {
     behavior = $behavior(klass::klass);
     behavior = $behavior(bit-vector::klass);
 
-    if (null-klass)
-      behavior = $behavior(null-klass);
+    if (null-singleton::klass)
+      behavior = $behavior(null-singleton::klass);
 #else
     klass::unbox(object::klass)->behavior =     nullptr;
     klass::unbox(klass::klass)->behavior =      nullptr;
     klass::unbox(bit-vector::klass)->behavior = nullptr;
-    if (null-klass)
-      klass::unbox(null-klass)->behavior =     nullptr;
+    if (null-singleton::klass)
+      klass::unbox(null-singleton::klass)->behavior = nullptr;
 #endif
 #if 1
     dk-klass-for-name(#input-stream);
@@ -606,7 +607,7 @@ dk-init-runtime() {
     $dump(klass::klass);
     $dump(singleton-klass::klass);
     if (null) {
-      $dump(null-klass);
+      $dump(null-singleton::klass);
       $dump(null);
     }
 #endif
@@ -1371,8 +1372,8 @@ name-from-address(object-t addr, so-symbol-info::slots-t* info) { // slowslow
   for (size-t i = 0; i < DK-COUNTOF(named-instances); i++) {
     addr2name-pair-t named-instance = named-instances[i];
     if (named-instance.addr == cast(decltype(named-instance.addr))addr) {
-        info->fdir =  nullptr;
-        info->fname = nullptr;
+        info->fdir =  nullptr; // fixfix
+        info->fname = nullptr; // fixfix
         info->sname = named-instance.name;
         return info;
     }

@@ -131,6 +131,7 @@ module dakota export
   no-such-keyword-exception,
   no-such-method-exception,
   no-such-slot-exception,
+  null-singleton,
   object,
   object-input-stream,
   object-output-stream,
