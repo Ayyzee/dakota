@@ -26,8 +26,8 @@ digraph "inherit+instant"
 
   "klass1"           [ label = "klass" ];
   "klass2"           [ label = "klass" ];
-  "null1"            [ label = "null" ];
-  "null2"            [ label = "null" ];
+  "null1"            [ label = "null-singleton" ];
+  "null2"            [ label = "null-singleton" ];
   "object1"          [ label = "object" ];
   "object2"          [ label = "object" ];
   "singleton-klass1" [ label = "singleton-klass" ];
