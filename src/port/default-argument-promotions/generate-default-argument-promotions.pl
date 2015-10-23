@@ -140,6 +140,7 @@ my $fn = "default-argument-promotions.pl";
 open(my $fh, '>', $fn) or die "Could not open file '$fn' $!";
 print $fh $str;
 close($fh);
+print "# result written to $fn\n";
 $str = &Dumper($unpromoted);
-print "# not promoted\n";
+print "# NOT promoted:\n";
 print $str;
