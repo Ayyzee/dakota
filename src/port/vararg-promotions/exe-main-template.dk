@@ -1,0 +1,49 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+#include <stdio.h>
+#include <limits>
+#include <stdint.h>
+#include <stdarg.h>
+
+klass boole;
+// klass uchar;
+// klass schar;
+
+klass char8;
+klass uchar8;
+klass schar8;
+
+klass char16;
+klass char32;
+
+klass int8;
+klass int16;
+klass int32;
+klass int64;
+
+klass uint8;
+klass uint16;
+klass uint32;
+klass uint64;
+
+// klass float32;
+// klass float64;
+
+namespace va { void func(void*, va_list_t); }
+void func(void*, ...);
+
+namespace va { void func(void*, va_list_t args) {
+  __TYPE__ arg = va_arg(args, decltype(arg));
+  USE(arg);
+  return;
+} }
+void func(void* self, ...) {
+  va_list_t args;
+  va_start(args, self);
+  va::func(self, args);
+  va_end(args);
+  return;
+}
+int main() {
+  return 0;
+}
