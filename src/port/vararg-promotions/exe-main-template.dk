@@ -6,8 +6,6 @@
 #include <stdarg.h>
 
 klass boole;
-// klass uchar;
-// klass schar;
 
 klass char8;
 klass uchar8;
@@ -26,8 +24,8 @@ klass uint16;
 klass uint32;
 klass uint64;
 
-// klass float32;
-// klass float64;
+klass float32;
+klass float64;
 
 namespace va { void func(void*, va_list_t); }
 void func(void*, ...);

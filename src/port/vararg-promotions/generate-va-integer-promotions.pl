@@ -73,9 +73,6 @@ my $type_tbl = {
 
     'float64-t'         => 1,
     'float64::slots-t'  => 1,
-
-    'float128-t'         => 1,
-    'float128::slots-t'  => 1,
   },
 };
 my $unknown_types = {
