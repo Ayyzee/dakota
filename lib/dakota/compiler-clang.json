@@ -6,8 +6,8 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'CXX' => [ 'clang++' ],
-  # clang does not understand --visibility=, --dollars-in-identifiers, nor --non-call-exceptions
-  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fdollars-in-identifiers', '-fnon-call-exceptions' ],
+  # clang does not understand --visibility=, nor --non-call-exceptions
+  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fnon-call-exceptions' ],
   'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
   # clang does not understand --PIC
   'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ],
@@ -17,20 +17,20 @@
   'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
   'CXX_SHARED_FLAGS' =>      [ '--shared'  ],
   'EXTRA_CXXFLAGS' =>        [
-      '-Weverything',
-      '-Wno-c++1y-extensions',
-      '-Wno-c++98-compat',
-      '-Wno-c++98-compat-pedantic',
-      '-Wno-c99-extensions', # c99 designated initializers, c99 compound literals
-      '-Wno-cast-align',
-      '-Wno-disabled-macro-expansion',
-      '-Wno-dollar-in-identifier-extension',
-      '-Wno-exit-time-destructors',
-      '-Wno-four-char-constants',
-      '-Wno-global-constructors',
-      '-Wno-multichar',
-      '-Wno-old-style-cast',
-      '-Wno-padded',
+      '--warn-everything',
+      '--warn-no-c++1y-extensions',
+      '--warn-no-c++98-compat',
+      '--warn-no-c++98-compat-pedantic',
+      '--warn-no-c99-extensions', # c99 designated initializers, c99 compound literals
+      '--warn-no-cast-align',
+      '--warn-no-disabled-macro-expansion',
+      '--warn-no-dollar-in-identifier-extension',
+      '--warn-no-exit-time-destructors',
+      '--warn-no-four-char-constants',
+      '--warn-no-global-constructors',
+      '--warn-no-multichar',
+      '--warn-no-old-style-cast',
+      '--warn-no-padded',
       ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
   'cc_ext' => 'cc',
