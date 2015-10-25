@@ -279,42 +279,21 @@ sub _rep_merge { # recursive
   my ($root_ref, $scope) = @_;
   foreach my $name1 (sort keys %$scope) {
     if (&is_tbl($$scope{$name1})) {
-      while (my ($name2, $subscope) = each(%{$$scope{$name1}})) {
-        if ($subscope) {
-          if (!defined $$root_ref{$name1}{$name2}) {
-            $$root_ref{$name1}{$name2} = &dakota::util::deep_copy($subscope);
-          } else {
-            foreach my $name3 (sort keys %{$$root_ref{$name1}{$name2}}) {
-              my $name1_ok = {
-                'klasses' => 1,
-                'traits' => 1,
-                # 'export' => 1,
-                # 'exported-headers' => 1,
-                # 'generics' => 1,
-                # 'includes' => 1,
-                # 'keywords' => 1,
-                # 'modules' => 1,
-                # 'supers' => 1,
-                # 'symbols' => 1,
-              };
-              if ($$name1_ok{$name1}) {
-                my $name3_ok = {
-                  'methods' => 1,
-                  'slots-methods' => 1,
-                  # 'export' => 1,
-                  # 'exported-headers' => 1,
-                  # 'slots' => 1,
-                };
-                if ($$name3_ok{$name3}) {
-                  &tbl_add_info($$root_ref{$name1}{$name2}{$name3},
-                                $$subscope{$name3});
-                }
-              }
-            }
-          }
-        } else {
+      foreach my $name2 (sort keys %{$$scope{$name1}}) {
+        if (!$$scope{$name1}{$name2}) {
           if (!exists $$root_ref{$name1}{$name2}) {
             $$root_ref{$name1}{$name2} = undef;
+          }
+        } else {
+          if (!$$root_ref{$name1}{$name2}) {
+            $$root_ref{$name1}{$name2} = &dakota::util::deep_copy($$scope{$name1}{$name2});
+          } else {
+            foreach my $name3 (sort keys %{$$scope{$name1}{$name2}}) {
+              if (&is_tbl($$scope{$name1}{$name2}{$name3})) {
+                &tbl_add_info($$root_ref{$name1}{$name2}{$name3},
+                              $$scope{$name1}{$name2}{$name3});
+              }
+            }
           }
         }
       }
