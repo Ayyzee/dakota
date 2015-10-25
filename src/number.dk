@@ -16,30 +16,7 @@
 
 module dakota;
 
-klass number;
-
-klass char8 {
-  superklass number;
-  
-  slots char-t;
-}
-klass uchar8 {
-  superklass number;
-  
-  slots uchar-t;
-}
-klass schar8 {
-  superklass number;
-  
-  slots schar-t;
-}
-klass char16 {
-  superklass number;
-  
-  slots char16-t;
-}
-klass char32 {
-  superklass number;
-  
-  slots char32-t;
+klass number {
+  superklass object;
+  klass      klass;
 }

@@ -172,11 +172,6 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
   #define    NUL cast(char8_t)0
 #endif
 
-// boole-t is promoted to int-t when used in va_arg() macro
-typedef int_t dkt_va_arg_boole_t;
-typedef va_list va_list_t;
-
-
 #if defined DK_ENABLE_TRACE_MACROS
   #define DKT_VA_TRACE_BEFORE(signature, method, object, args)               dkt_va_trace_before(signature, method, object, args)
   #define DKT_VA_TRACE_AFTER( signature, method, object, /* result, */ args) dkt_va_trace_after( signature, method, object, args)

@@ -38,6 +38,7 @@
       '$(srcdir)/no-such-keyword-exception.dk',
       '$(srcdir)/no-such-method-exception.dk',
       '$(srcdir)/no-such-slot-exception.dk',
+      '$(srcdir)/number.dk',
       '$(srcdir)/object-input-stream.dk',
       '$(srcdir)/object-output-stream.dk',
       '$(srcdir)/object.dk',
@@ -100,6 +101,7 @@
       'files' => [ # install.files
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang.json',
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-default-argument-promotions.json',
         '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-darwin.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-linux.json',

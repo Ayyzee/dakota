@@ -58,7 +58,18 @@
 
 #define DKT_ENABLE_TYPEINFO SO_EXPORT
 
-typedef int           int_t;
-typedef unsigned int  uint_t;
+typedef bool bool_t;
+
+typedef          char  char_t;
+typedef   signed char schar_t;
+typedef unsigned char uchar_t;
+
+typedef          int    int_t;
+typedef unsigned int   uint_t;
+
+typedef float  float_t;
+typedef double double_t;
+
+typedef va_list va_list_t;
 
 #endif
