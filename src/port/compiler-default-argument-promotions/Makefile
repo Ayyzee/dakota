@@ -1,4 +1,5 @@
 rootdir := ../../..
+prefix := ../../..
 
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk

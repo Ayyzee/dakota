@@ -19,10 +19,30 @@ klass int16;
 klass int32;
 klass int64;
 
+klass int-fast8;
+klass int-fast16;
+klass int-fast32;
+klass int-fast64;
+
+klass int-least8;
+klass int-least16;
+klass int-least32;
+klass int-least64;
+
 klass uint8;
 klass uint16;
 klass uint32;
 klass uint64;
+
+klass uint-fast8;
+klass uint-fast16;
+klass uint-fast32;
+klass uint-fast64;
+
+klass uint-least8;
+klass uint-least16;
+klass uint-least32;
+klass uint-least64;
 
 klass float32;
 klass float64;
