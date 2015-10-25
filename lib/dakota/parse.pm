@@ -267,40 +267,55 @@ sub tbl_add_info {
     }
   }
 }
+sub is_tbl {
+  my ($v) = @_;
+  my $result = 0;
+  if ('HASH' eq ref($v)) {
+    $result = 1;
+  }
+  return $result;
+}
 sub _rep_merge { # recursive
   my ($root_ref, $scope) = @_;
-  my ($subscope_name, $subscope);
-
-  foreach my $name (
-    'generics',
-    'hashes',
-    'integers',
-    'keywords',
-    'klasses',
-    'modules',
-    'named-instances',
-    'strings',
-    'symbols',
-    'traits') {
-    while (($subscope_name, $subscope) = each(%{$$scope{$name}})) {
-      if ($subscope) {
-        if (!defined $$root_ref{$name}{$subscope_name}) {
-          $$root_ref{$name}{$subscope_name} = &dakota::util::deep_copy($subscope);
-        } elsif ('klasses' eq $name || 'traits' eq $name) {
-          &tbl_add_info($$root_ref{$name}{$subscope_name}{'methods'},
-                        $$subscope{'methods'});
-          #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-methods'},
-          #$$subscope{'va-methods'});
-          &tbl_add_info($$root_ref{$name}{$subscope_name}{'slots-methods'},
-                        $$subscope{'slots-methods'});
-          #&tbl_add_info($$root_ref{$name}{$subscope_name}{'va-slots-methods'},
-          #$$subscope{'va-slots-methods'});
-
-          # need to merge 'slots' and bunch-o-stuff
-        }
-      } else {
-        if (!exists $$root_ref{$name}{$subscope_name}) {
-          $$root_ref{$name}{$subscope_name} = undef;
+  foreach my $name1 (sort keys %$scope) {
+    if (&is_tbl($$scope{$name1})) {
+      while (my ($name2, $subscope) = each(%{$$scope{$name1}})) {
+        if ($subscope) {
+          if (!defined $$root_ref{$name1}{$name2}) {
+            $$root_ref{$name1}{$name2} = &dakota::util::deep_copy($subscope);
+          } else {
+            foreach my $name3 (sort keys %{$$root_ref{$name1}{$name2}}) {
+              my $name1_ok = {
+                'klasses' => 1,
+                'traits' => 1,
+                # 'export' => 1,
+                # 'exported-headers' => 1,
+                # 'generics' => 1,
+                # 'includes' => 1,
+                # 'keywords' => 1,
+                # 'modules' => 1,
+                # 'supers' => 1,
+                # 'symbols' => 1,
+              };
+              if ($$name1_ok{$name1}) {
+                my $name3_ok = {
+                  'methods' => 1,
+                  'slots-methods' => 1,
+                  # 'export' => 1,
+                  # 'exported-headers' => 1,
+                  # 'slots' => 1,
+                };
+                if ($$name3_ok{$name3}) {
+                  &tbl_add_info($$root_ref{$name1}{$name2}{$name3},
+                                $$subscope{$name3});
+                }
+              }
+            }
+          }
+        } else {
+          if (!exists $$root_ref{$name1}{$name2}) {
+            $$root_ref{$name1}{$name2} = undef;
+          }
         }
       }
     }
