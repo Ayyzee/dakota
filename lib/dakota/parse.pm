@@ -1452,11 +1452,11 @@ sub parameter_list {
             $parameter_n = [];
             next;
           }
-        } elsif (m/^\($/) {
+        } elsif (m/^\{|\($/) {
           $opens++;
           &dakota::util::add_last($parameter_n, $$parameter_types[$i]);
           $i++;
-        } elsif (m/^\)$/) {
+        } elsif (m/^\)|\}$/) {
           $opens--;
           &dakota::util::add_last($parameter_n, $$parameter_types[$i]);
           $i++;

@@ -8,7 +8,7 @@ klass path {
   superklass string;
   //klass klass;
 
-  static const char8-t* default-delimiter = "/"; // NOT IN REFLECTION DATA!!
+  static const char8-t* default-delimiter = "/";
 
   slots {
     const char8-t* delimiter;

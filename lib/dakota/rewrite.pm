@@ -360,9 +360,9 @@ sub arglist_members {
         last;
       }
     }
-    if ('(' eq $$chars[$i]) {
+    if ($$chars[$i] =~ m/\{|\(/) {
       $is_framed++;
-    } elsif (')' eq $$chars[$i] && $is_framed) {
+    } elsif ($$chars[$i] =~ m/\)|\}/ && $is_framed) {
       $is_framed--;
     }
     $tkn .= $$chars[$i];
@@ -397,6 +397,17 @@ sub rewrite_throws {
 
   $$filestr_ref =~ s/\bRETHROW(\s*);/throw$1;/gsx;
 }
+sub rewrite_slots_typedef {
+  my ($t1, $ws1, $ws2, $tkns, $ws3) = @_;
+  my $rewrite = "$t1${ws1}typedef$ws2$tkns slots-t$ws3;";
+  my $no_rewrite = "$t1$ws1$ws2$tkns$ws3;";
+
+  if ($tkns =~ m/=/) {
+    return $no_rewrite;
+  } else {
+    return $rewrite;
+  }
+}
 sub rewrite_slots {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
@@ -405,7 +416,7 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
-  $$filestr_ref =~ s|(?<![\#\w-])slots(\s+$t+?)(\s*);|typedef$1 slots-t$2;|gsx;
+  $$filestr_ref =~ s/(\{|;)(\s+)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4, $5)/egs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -722,8 +733,8 @@ sub rewrite_module_statement {
 }
 sub add_implied_slots_struct {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\s+slots)(\s*\{)/$1 struct$2/gx;
-  $$filestr_ref =~ s/(\s+slots)(\s*;) /$1 struct$2/gx;
+  $$filestr_ref =~ s/(\{|;)(\s*slots)(\s*\{)/$1$2 struct$3/gs;
+  $$filestr_ref =~ s/(\{|;)(\s*slots)(\s*;)/$1$2 struct$3/gs;
 }
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
@@ -756,6 +767,7 @@ sub rewrite_keyword_syntax_list {
     $list =~ s/^\(//;
     $list =~ s/\)$//;
     $list =~ s/($rid*$main::list)/&remove_non_newlines($1)/ges;
+    $list =~ s/($rid*$main::block)/&remove_non_newlines($1)/ges;
     $list = "($list)";
 
     $list =~ s{($mid\s*)((?<!$colon)$colon(?!$colon)\s*.*?)(\s*,|\))}{$1/* $2 */$3}gx;

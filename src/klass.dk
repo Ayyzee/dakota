@@ -339,8 +339,6 @@ klass methods {
   }
 }
 klass klass {
-  //     klass klass;
-
   slots {
     uint32-t                 offset; // first so its offset is 0
     methods::slots-t          methods;
