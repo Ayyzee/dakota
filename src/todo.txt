@@ -106,3 +106,5 @@ allow supply to supply ONE argument (which default to self)
 add unbox-illegal-use-exception
 
 add illegal-klass-exception
+
+to the macro system add the notion of a zero-width statement boundry ( for example \{|\}|; )
