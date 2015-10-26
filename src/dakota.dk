@@ -1633,8 +1633,8 @@ dk-klass-for-name(symbol-t klass-name, uint32-t column) {
       assert(nullptr != klass-klass);
     } else {
       klass-klass = dk-klass-for-name(name, column + 1); // recursive
-      assert(klass::klass == klass-klass || klass::subklass?(klass-klass, klass::klass));
-      assert(nullptr != klass-klass);
+      if (!(klass::klass == klass-klass || klass::subklass?(klass-klass, klass::klass))) // hardhard
+        throw make(exception::klass, #message : "illegal klass");
     }
     klass = make(klass-klass, #info-slots : klass-info-slots);
   }
