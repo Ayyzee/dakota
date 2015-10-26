@@ -51,6 +51,7 @@ module dakota export
   get-segment-data::slots-t,
   hash,
   hash::slots-t,
+  illegal-klass-exception,
   input-stream,
   int-fast16,
   int-fast16::max,

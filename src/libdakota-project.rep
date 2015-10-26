@@ -24,6 +24,7 @@
       '$(srcdir)/file.dk',
       '$(srcdir)/forward-iterator.dk',
       '$(srcdir)/hash.dk',
+      '$(srcdir)/illegal-klass-exception.dk',
       '$(srcdir)/input-stream.dk',
       '$(srcdir)/iter-pair.dk',
       '$(srcdir)/keyword-exception.dk',

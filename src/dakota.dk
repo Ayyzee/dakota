@@ -53,6 +53,7 @@ klass const-info;
 klass construct;
 klass enum-info;
 klass exception;
+klass illegal-klass-exception;
 klass named-enum-info;
 klass named-info;
 klass property;
@@ -560,6 +561,8 @@ dk-init-runtime() {
     assert(object::klass == superklass-of(klass::klass));
     assert(object::klass == superklass-of(null-singleton::klass));
     assert(klass::klass  == superklass-of(singleton-klass::klass));
+
+    dk-klass-for-name(#illegal-klass-exception);
 
 #if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(#bit-vector);
@@ -1634,7 +1637,7 @@ dk-klass-for-name(symbol-t klass-name, uint32-t column) {
     } else {
       klass-klass = dk-klass-for-name(name, column + 1); // recursive
       if (!(klass::klass == klass-klass || klass::subklass?(klass-klass, klass::klass))) // hardhard
-        throw make(exception::klass, #message : "illegal klass");
+        throw make(illegal-klass-exception::klass);
     }
     klass = make(klass-klass, #info-slots : klass-info-slots);
   }
