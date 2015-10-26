@@ -48,6 +48,9 @@
 
 module dakota;
 
+extern boole-t pre-main?; // to quiet clang
+boole-t pre-main? = true;
+
 klass bit-vector;
 klass const-info;
 klass construct;
@@ -71,6 +74,7 @@ klass str128;
 klass super;
 klass symbol;
 klass uintptr;
+klass unbox-illegal-klass-exception;
 
 #if DKT-WORKAROUND
 namespace property {
@@ -563,6 +567,7 @@ dk-init-runtime() {
     assert(klass::klass  == superklass-of(singleton-klass::klass));
 
     dk-klass-for-name(#illegal-klass-exception);
+    dk-klass-for-name(#unbox-illegal-klass-exception);
 
 #if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(#bit-vector);
@@ -1547,6 +1552,7 @@ dkt-register-info(named-info-t* registration-info) {
       last-user-code-before-main();
       if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
+      pre-main? = false;
       break;
   }
   if (nullptr != output-path && NUL != output-path[0] && nullptr != ctlg-output)

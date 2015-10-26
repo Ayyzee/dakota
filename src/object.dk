@@ -25,6 +25,7 @@ klass hash;
 klass resource-usage;
 klass object-output-stream;
 klass output-stream;
+klass unbox-illegal-klass-exception;
 
 klass object {
   slots {
@@ -165,7 +166,7 @@ dkt-unbox-check(object-t object, object-t kls) {
       dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s'})",
               kls-name, cast(ptr-t)object, object-kls-name);
 
-    throw make(exception::klass, #message : "oops");
+    throw make(unbox-illegal-klass-exception::klass);
   }
   return;
 }

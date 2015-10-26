@@ -1,0 +1,10 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass boole;
+klass klass;
+
+int-t main() {
+  object-t t = make(boole::klass, #slots : true);
+  printf("%p\n", klass::unbox(t)); // should fail at runtime
+  return 0;
+}

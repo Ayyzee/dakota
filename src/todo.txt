@@ -103,6 +103,4 @@ swap order of args to super {klass, self} or {klass(self), self}
 allow supply to supply ONE argument (which default to self)
   super(self) is shorthand for super (which converts to super(self=self, klass=klass)
 
-add unbox-illegal-use-exception
-
 to the macro system add the notion of a zero-width statement boundry ( for example \{|\}|; )

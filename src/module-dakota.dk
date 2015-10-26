@@ -251,6 +251,7 @@ module dakota export
   uintptr,
   uintptr::max,
   uintptr::slots-t,
+  unbox-illegal-klass-exception,
   va-method,
   va-method::slots-t,
   vector,

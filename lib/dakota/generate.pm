@@ -1908,6 +1908,7 @@ sub generate_klass_unbox {
     } elsif (&is_rt_defn()) {
       $result .=
         " {" . &ann(__FILE__, __LINE__) . " // special-case\n" .
+        $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n" .
         $col . "  slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n" .
         $col . "  return s;\n" .
         $col . "}}\n";
