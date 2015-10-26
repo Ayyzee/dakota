@@ -3635,15 +3635,15 @@ sub generate_slots_method_signature_defn {
   $$scratch_str_ref .= $col . "}}}\n";
 }
 sub generate_kw_args_method_defns {
-  my ($methods, $klass_name, $col, $klass_type) = @_;
+  my ($slots, $methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
     if ($$method{'keyword-types'}) {
-      &generate_kw_args_method_defn($method, $klass_name, $col, $klass_type);
+      &generate_kw_args_method_defn($slots, $method, $klass_name, $col, $klass_type);
     }
   }
 }
 sub generate_kw_args_method_defn {
-  my ($method, $klass_name, $col, $klass_type) = @_;
+  my ($slots, $method, $klass_name, $col, $klass_type) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_kw_args_method_defn()\n";
 
@@ -3857,7 +3857,7 @@ sub dk_generate_kw_args_method_defns {
         &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
         &generate_kw_args_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
-        &generate_kw_args_method_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+        &generate_kw_args_method_defns($$klass_scope{'slots'}, $$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
       }
       &path::remove_last($stack);
     }

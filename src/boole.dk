@@ -21,21 +21,7 @@ module dakota;
 klass boole-klass {
   superklass klass;
 
-  slots {
-    object-t f;
-    object-t t;
-  }
-  method object-t va::init(object-t self, va-list-t args) {
-    self = $va::init(super, args);
-    self.f = make(boole::klass, #slots : false);
-    self.t = make(boole::klass, #slots : true);
-    return self;
-  }
-  object-t initialize(object-t kls) {
-    dk-klass-for-name(#boole);
-    return kls;
-  }
-
+  slots object-t[2];
 }
 // its George Boole (not George Bool)
 klass boole { // a doubleton :-)
@@ -44,19 +30,17 @@ klass boole { // a doubleton :-)
 
   slots bool-t;
 
+  object-t initialize(object-t kls) {
+    *boole-klass::unbox(kls)[0] = make(boole::klass, #slots : false);
+    *boole-klass::unbox(kls)[1] = make(boole::klass, #slots : true);
+    return kls;
+  }
   method object-t init(object-t self, slots-t slots : false) {
     self = $init(super); // self = super.$init();
     *unbox(self) = slots;
-    boole-klass::slots-t* ks = boole-klass::unbox(klass-of(self));
-    if (slots) {
-      if (nullptr == ks->t)
-        ks->t = self;
-      self = ks->t; // intentionally throw away self if not needed 
-    } else {
-      if (nullptr == ks->f)
-        ks->f = self;
-      self = ks->f; // intentionally throw away self if not needed 
-    }
+    self = *boole-klass::unbox(klass-of(self))[slots]; // intentionally throwing away self
     return self;
   }
 }
+static-assert(0 == false, "Boolean false must equal 0");
+static-assert(1 == true,  "Boolean true must equal 1");
