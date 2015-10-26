@@ -22,6 +22,10 @@ klass boole-klass {
   superklass klass;
 
   slots object-t[2];
+
+  static object-t alloc(object-t self) { // intentionally omitted 'method' declaration
+    return *unbox(self)[0]; // return false object by default
+  }
 }
 // its George Boole (not George Bool)
 klass boole { // a doubleton :-)
@@ -31,16 +35,33 @@ klass boole { // a doubleton :-)
   slots bool-t;
 
   object-t initialize(object-t kls) {
-    *boole-klass::unbox(kls)[0] = make(boole::klass, #slots : false);
-    *boole-klass::unbox(kls)[1] = make(boole::klass, #slots : true);
+    assert(klass == kls);
+    
+    auto mk = [](object-t k, boole-t v) {
+      object-t self = $alloc(k);
+      self = $init(super);
+      *unbox(self) = v;
+      return self;
+    };
+    boole-t f = false;
+    *boole-klass::unbox(kls)[f] = mk(kls, f);
+    boole-t t = true;
+    *boole-klass::unbox(kls)[t] = mk(kls, t);
+    $add-method-for-selector(klass-of(kls), SELECTOR(alloc(object-t)), boole-klass::alloc);
+
     return kls;
   }
   method object-t init(object-t self, slots-t slots : false) {
-    self = $init(super); // self = super.$init();
-    *unbox(self) = slots;
-    self = *boole-klass::unbox(klass-of(self))[slots]; // intentionally throwing away self
+    // intentionally not chaining $init()
+    assert(false == *unbox(self));
+    assert(1 >= slots);
+    if (slots)
+      self = *boole-klass::unbox(klass-of(self))[slots]; // intentionally throwing away self
     return self;
   }
 }
 static-assert(0 == false, "Boolean false must equal 0");
 static-assert(1 == true,  "Boolean true must equal 1");
+
+// $init(super, ...
+// $init(super(self), ...

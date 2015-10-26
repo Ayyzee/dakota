@@ -32,6 +32,7 @@ my $emacs_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width:
 
 my $gbl_prefix;
 my $gbl_compiler;
+my $gbl_compiler_default_argument_promotions;
 my $objdir;
 my $dkhh_ext;
 my $dkcc_ext;
@@ -54,6 +55,8 @@ BEGIN {
   unshift @INC, "$gbl_prefix/lib";
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
     or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  $gbl_compiler_default_argument_promotions = do "$gbl_prefix/lib/dakota/compiler-default-argument-promotions.json"
+    or die "do $gbl_prefix/lib/dakota/compiler-default-argument-promotions.json failed: $!\n";
   my $platform = do "$gbl_prefix/lib/dakota/platform.json"
     or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
   my ($key, $values);
@@ -1986,7 +1989,7 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . "\n";
           $col = &colin($col);
           $result .=
-            $col . "object-t result = make(klass);\n" .
+            $col . "object-t result = make(klass); // consider using #slots : ...\n" .
             $col . "*unbox(result) = *arg;\n" .
             $col . "return result;\n";
           $col = &colout($col);
@@ -3738,14 +3741,24 @@ sub generate_kw_args_method_defn {
     #            $$scratch_str_ref .= $col . "{\n";
     $col = &colin($col);
     my $kw_type = &arg::type($$kw_arg{'type'});
-
-    if ('boole-t' eq $kw_type) {
-      $kw_type = 'dkt-va-arg-boole-t'; # bools are promoted to ints
-    }
     # should do this for other types (char=>int, float=>double, ... ???
     $$scratch_str_ref .=
-      $col . "assert(_keyword_->symbol == \#$kw_arg_name);\n" .
-      $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));\n" .
+      $col . "assert(_keyword_->symbol == \#$kw_arg_name);\n";
+    my $promoted_type;
+    if ($$gbl_compiler_default_argument_promotions{$kw_type}) {
+      $promoted_type = $$gbl_compiler_default_argument_promotions{$kw_type};
+    } elsif ($$slots{'type'} && $$gbl_compiler_default_argument_promotions{$$slots{'type'}}) {
+      $promoted_type = $$gbl_compiler_default_argument_promotions{$$slots{'type'}};
+    }
+    if ($promoted_type) {
+      $$scratch_str_ref .=
+        $col . "$kw_arg_name = cast($kw_type)va-arg($$new_arg_names[-1], $promoted_type); // special-case: default argument promotions\n";
+    } else {
+      $$scratch_str_ref .=
+        $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));\n";
+    }
+
+    $$scratch_str_ref .=
       $col . "_state_.$kw_arg_name = true;\n" .
       $col . "break;\n";
     $col = &colout($col);
