@@ -97,3 +97,12 @@ generate a naming summary (for example)
 module defn should allow us to specify methods/generics by arity  add(2), add(3) (assume both object-t and super-t)
 
 consider := operator like Dylan (it calls the setter func)?
+
+swap order of args to super {klass, self} or {klass(self), self}
+
+allow supply to supply ONE argument (which default to self)
+  super(self) is shorthand for super (which converts to super(self=self, klass=klass)
+
+add unbox-illegal-use-exception
+
+add illegal-klass-exception
