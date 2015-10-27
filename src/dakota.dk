@@ -916,7 +916,7 @@ dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only) {
   if (nullptr != klass-defns) {
     uint32-t i = 0;
       
-    if (NULL != output-dir) {
+    if (nullptr != output-dir) {
       int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
         std::abort();
@@ -1323,7 +1323,7 @@ getenv-boole(str-t name, boole-t default-value) {
   boole-t value = default-value;
   str-t value-str = getenv(name);
 
-  if (NULL != value-str) {
+  if (nullptr != value-str) {
     if (0 != safe-strcmp("0", value-str))
       value = true;
   }
@@ -1471,13 +1471,13 @@ sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) {
   
 static int-t
 set-read-only(char8-t const* segment, get-segment-data-t get-segment-data) {
-  assert(NULL != segment);
+  assert(nullptr != segment);
   ptr-t addr = nullptr;
   size-t size = 0;
   get-segment-data(segment, &addr, &size); // code-generated in each dso
 
   int-t result = -1;
-  if (NULL != addr) {
+  if (nullptr != addr) {
     result = mprotect(addr, size, PROT-READ);
     if (-1 == result) {
       perror("mprotect");
@@ -1513,7 +1513,7 @@ dkt-register-info(named-info-t* registration-info) {
   assert(nullptr != registration-info);
   stream-t ctlg-output = nullptr;
   str-t output-path = getenv("DKT_INFO_OUTPUT");
-  if (NULL != output-path) {
+  if (nullptr != output-path) {
     if (NUL == output-path[0]) // empty-string ("") means use default-value
       ctlg-output = stdout;
     else
@@ -1535,7 +1535,7 @@ dkt-register-info(named-info-t* registration-info) {
     if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
       dump-klass-defns(ostrm, registration-info, ctlg-only);
       dump-interposers(ostrm, registration-info);
-      if (NULL == ctlg-only)
+      if (nullptr == ctlg-only)
         dump-module-description(ostrm, registration-info);
     }
   }
@@ -1547,14 +1547,14 @@ dkt-register-info(named-info-t* registration-info) {
       break;
     case construct::k-executable:
       add-registration-info(registration-info);
-      if (NULL != getenv("DKT_JSON_DUMP_KLASSES"))
+      if (nullptr != getenv("DKT_JSON_DUMP_KLASSES"))
         json-dump-klass-defns(gbl-klass-defns-table);
       if (0)
         json-dump-resource-info(gbl-klass-defns-table);
-      if (NULL == getenv("DKT_NO_INIT_RUNTIME"))
+      if (nullptr == getenv("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
       last-user-code-before-main();
-      if (NULL != getenv("DKT_EXIT_BEFORE_MAIN"))
+      if (nullptr != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
       pre-main? = false;
       break;
@@ -1567,8 +1567,8 @@ SO-EXPORT void
 dkt-deregister-info(named-info-t* registration-info) {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #file));
   assert(nullptr != registration-info);
-  if (NULL != getenv("DKT_INFO_OUTPUT") ||
-      NULL != getenv("DKT_NO_INIT_RUNTIME"))
+  if (nullptr != getenv("DKT_INFO_OUTPUT") ||
+      nullptr != getenv("DKT_NO_INIT_RUNTIME"))
     return;
   named-info::sort(registration-info);
   named-info-t* klass-defns = cast(named-info-t*)named-info::at(registration-info, #klass-defns);
@@ -1665,7 +1665,7 @@ info-for-name(symbol-t klass-name) {
   if (nullptr == klass-info-ptr) {
     str-t klasspath = getenv("KLASSPATH");
 
-    if (NULL == klasspath) {
+    if (nullptr == klasspath) {
       fprintf(stderr, "%s:%i: ERROR: klass '%s' not found and KLASSPATH not set.\n", __FILE__, __LINE__, klass-name);
       throw "bummer";
     } else {

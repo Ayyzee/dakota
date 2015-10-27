@@ -50,7 +50,7 @@ namespace dkt {
 #elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
     buf = malloc(size);
 
-    if (NULL == buf)
+    if (nullptr == buf)
       throw std::bad_alloc();
 #else
     #error DK_MEM_MGMT
@@ -66,7 +66,7 @@ namespace dkt {
 #elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
     buf = realloc(ptr, size);
 
-    if (NULL == buf)
+    if (nullptr == buf)
       throw std::bad_alloc();
 #else
     #error DK_MEM_MGMT

@@ -130,7 +130,7 @@ verbose-terminate() noexcept {
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
   object-t current-exception = dkt-capture-current-exception(cast(object-t)nullptr);
 
-  if (NULL != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
+  if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
       $dump(current-exception);
 

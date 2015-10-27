@@ -444,10 +444,10 @@ klass klass {
       symbol-t superklass-name;
 
       if (null == self.superklass) {
-        superklass-name = "-null-";
+        superklass-name = #null;
         fprintf(stderr, ", superklass=%p %s", cast(ptr-t)(self.superklass), superklass-name);
       } else {
-        if (nullptr == (superklass-name = name(self.superklass)))
+        if (nullptr == (superklass-name = name-of(self.superklass)))
           superklass-name = #nullptr;
 
         fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)(self.superklass), superklass-name);
