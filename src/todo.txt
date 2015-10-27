@@ -116,3 +116,14 @@ look at output-file and input-file (currently empty) and see if they, too, need 
 
 deal with input-stream/output-stream have #slots, and their subklasses have #stream for same variable
 (maybe one could tag a keyword as an alias to slots (so the generated box would work)
+
+features that show:
+  #"..." like symbols, hashes, and keywords
+  #'...' instance of some klass of char ... multibyte
+  #`...` instance of klass process
+  i32, i64, u32, u64
+  range (first, last, interval)
+  #true/#false instance of klass boole
+  selector in every method body (__selector__)
+  map like in perl (use lambda func)
+  as(a klass) casting syntax
