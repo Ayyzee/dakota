@@ -26,6 +26,11 @@ klass hash;
 klass symbol {
   slots char8-t const*;
 
+  method object-t init(object-t self, slots-t slots : nullptr) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
   method uint32-t length(slots-t s) {
     uint32-t result = cast(uint32-t)safe-strlen(s);
     return result;

@@ -28,6 +28,11 @@ klass signature {
     str-t name;
     str-t parameter-types;
   }
+  method object-t init(object-t self, slots-t slots : {nullptr, nullptr, nullptr}) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
   method slots-t* dump(slots-t* s) {
     printf("%s(%s)", s->name, s->parameter-types);
     return s;

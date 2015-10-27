@@ -131,7 +131,7 @@ klass bit-vector {
 //   }
   method object-t dump(object-t self) {
     $dump(super);
-    file-t out = stderr;
+    stream-t out = stderr;
     fprintf(out, "%p:%p { count=%i, capacity=%i, elements=\"",
             cast(ptr-t)(self), cast(ptr-t)(unbox(self)), self.count, self.capacity);
     for (uint32-t i = 0; i < self.count * gbl-element-width; i++) {

@@ -18,4 +18,10 @@ module dakota;
 
 klass ptr {
   slots void*;
+
+  method object-t init(object-t self, slots-t slots : nullptr) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }

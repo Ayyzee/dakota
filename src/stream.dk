@@ -16,6 +16,12 @@
 
 module dakota;
 
-klass file {
-  slots FILE*;
+klass stream {
+  slots FILE*; // not currently used (both input-stream and output-stream have their own)
+
+  method object-t init(object-t self, slots-t slots : nullptr) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }

@@ -23,4 +23,10 @@ klass named-enum-info {
     str-t        name; // really the type, not the name
     enum-info-t* info;
   }
+
+  method object-t init(object-t self, slots-t slots : {nullptr, nullptr}) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }

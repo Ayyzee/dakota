@@ -27,11 +27,9 @@ klass open-token {
   slots {
     object-t close-token;
   }
-  // prevents (normally) generated $va::init() generic from being generated
-  // because $init() is a keyword argument function (normally)
-  method object-t va::init(object-t self, va-list-t args) {
-    self = $va::init(super, args);
-    self.close-token = null;
+  method object-t init(object-t self, slots-t slots : {null}) {
+    self = $init(super);
+    *unbox(self) = slots;
     return self;
   }
   method object-t write-slots(object-t self, object-t out) {

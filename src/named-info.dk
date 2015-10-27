@@ -35,6 +35,11 @@ klass named-info {
   //            compare = property::compare()
     slots-t*    next;
   }
+  method object-t init(object-t self, slots-t slots : {nullptr, 0, nullptr}) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
   method int32-t check(slots-t* s) {
     for (uint32-t i = 0; i < s->count; i++) {
       // need to add test for #name (since its required)

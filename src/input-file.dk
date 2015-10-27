@@ -20,16 +20,18 @@
 #include <cstdio>
 #include <cstring>
 
+module dakota-util;
+
 static boole-t
 space?(int-t c) {
   return isspace(c);
 }
-module dakota-util;
 
 klass exception;
 klass token;
 klass type-predicate;
 klass str128;
+klass stream;
 klass system-exception;
 klass vector;
 
@@ -44,38 +46,38 @@ klass input-file {
     int32-t  column;
   }
   method object-t init(object-t self,
-                       file-t   file :     nullptr,
+                       stream-t stream :   nullptr,
                        str-t    filename : nullptr) {
     self = $init(super);
-    assert(!(nullptr != file && nullptr != filename)); // these are mutually exclusive
-    assert(stdout != file);
-    assert(stderr != file);
+    assert(!(nullptr != stream && nullptr != filename)); // these are mutually exclusive
+    assert(stdout != stream);
+    assert(stderr != stream);
 
-    if (nullptr == file && nullptr == filename)
-      file = stdin; // default
+    if (nullptr == stream && nullptr == filename)
+      stream = stdin; // default
 
     if (nullptr != filename) {
-      file = fopen(filename, "r");
+      stream = fopen(filename, "r");
 
-      if (nullptr == file)
+      if (nullptr == stream)
         throw make(system-exception::klass, #errnum : errno);
     }
     self.filename = filename; // copycopy: should make a copy?
     fpos-t fpos;
-    fgetpos(file, &fpos);
-    fseeko(file, 0L, SEEK-END);
-    self.length = ftello(file); // this might be longer than needed
-    fsetpos(file, &fpos);
+    fgetpos(stream, &fpos);
+    fseeko(stream, 0L, SEEK-END);
+    self.length = ftello(stream); // this might be longer than needed
+    fsetpos(stream, &fpos);
     self.buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
-    fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
+    fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, stream);
     self.buffer[self.length] = NUL;
 
     // check for embedded NUL?
 
     if (nullptr != filename)
-      fclose(file);
+      fclose(stream);
     else
-      fsetpos(file, &fpos);
+      fsetpos(stream, &fpos);
 
     self.current-position = 0;
     self.column = 0;

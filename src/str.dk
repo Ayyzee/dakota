@@ -26,6 +26,12 @@ klass str;
 
 klass str-compare {
   slots int-t (*)(str-t, str-t);
+
+  method object-t init(object-t self, slots-t slots : nullptr) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 
 klass str-klass {

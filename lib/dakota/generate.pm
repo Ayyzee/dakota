@@ -2009,7 +2009,7 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . "\n";
           $col = &colin($col);
           $result .=
-            $col . "object-t result = box(&arg);\n" .
+            $col . "object-t result = $klass_name\::box(&arg);\n" .
             $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";

@@ -25,6 +25,11 @@ klass property {
     symbol-t  key;
     uintptr-t element;
   }
+  method object-t init(object-t self, slots-t slots : {nullptr, 0}) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
   method int-t compare(slots-t* slots, slots-t* other-slots) {
     int-t result = symbol::compare(slots->key, other-slots->key);
     result = dkt-normalize-compare-result(result);

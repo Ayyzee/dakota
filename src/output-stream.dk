@@ -28,27 +28,25 @@
 
 module dakota;
 
-klass file;
 klass ptr;
+klass stream;
 klass system-exception;
 
 klass output-stream {
+  superklass stream;
+
   static str-t endl = "\n";
 
-  slots file-t;
+  slots stream-t;
 
   method object-t init(object-t self,
-                       file-t   file :     nullptr,
+                       slots-t  slots :    stdout,
                        str-t    filename : nullptr) {
     self = $init(super);
-    assert(!(nullptr != file &&
-             nullptr != filename)); // these are mutually exclusive
-    assert(stdin != file);
+    *unbox(self) = slots;
+    assert(stdin != slots);
 
-    if (nullptr != file)
-      *unbox(self) = file;
-
-    if (nullptr == file && nullptr == filename)
+    if (nullptr == slots && nullptr == filename)
       *unbox(self) = stdout; // default
 
     if (nullptr != filename) {
@@ -60,14 +58,14 @@ klass output-stream {
     return self;
   }
   method object-t close(object-t self) {
-    file-t file = *unbox(self);
+    slots-t slots = *unbox(self);
 #if defined DEBUG
-    if (stdout == file)
+    if (stdout == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stdout\"");
-    else-if (stderr == file)
+    else-if (stderr == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
 #endif // DEBUG
-    int-t rtn = fclose(file);
+    int-t rtn = fclose(slots);
 
     if (0 != rtn)
       throw make(system-exception::klass, #errnum : errno);

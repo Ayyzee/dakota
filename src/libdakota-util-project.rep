@@ -20,6 +20,7 @@
       '$(srcdir)/lexer.dk',
       '$(srcdir)/module-dakota-util.dk',
       '$(srcdir)/open-token.dk',
+      '$(srcdir)/output-file.dk',
       '$(srcdir)/point.dk',
       '$(srcdir)/rect.dk',
       '$(srcdir)/slot-info.dk',

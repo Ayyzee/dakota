@@ -516,7 +516,7 @@ klass klass {
         }
       }
     }
-    file-t out = stdout;
+    stream-t out = stdout;
     
     fprintf(out, "{\n");
     for (uint32-t index = 0; index < s->methods.count; index++) {

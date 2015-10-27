@@ -1692,11 +1692,21 @@ sub method {
   $$method{'parameter-types'} = $kw_args_parameter_types;
 
   if ($kw_args_names) {
-    &dakota::util::kw_args_generics_add("@{$$method{'name'}}");
-    if ('init' eq $$method{'name'}[0] && 1 == @{$$method{'name'}}) {
+    my $method_name = "@{$$method{'name'}}";
+    &dakota::util::kw_args_generics_add($method_name);
+    if ('init' eq $method_name) {
       foreach my $kw_arg_name (@$kw_args_names) {
         if ('slots' eq $kw_arg_name) {
-          $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
+          if (1 == @$kw_args_names) {
+            # only one kw-arg and its slots (does not matter aggregate or not)
+            $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
+          } elsif ($$gbl_current_scope{'slots'} && $$gbl_current_scope{'slots'}{'type'}) {
+            # not an aggregate
+            $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
+          } else {
+            my $kw_arg_names_list = join(', #', @$kw_args_names);
+            print STDERR "warning: slots is an aggregate and init(#$kw_arg_names_list) supports more than just #slots.\n";
+          }
         }
       }
     }

@@ -40,7 +40,7 @@ klass text-output-stream {
   klass      klass;
 
   slots {
-    uint32-t column;
+    uint32-t   column;
     uint32-t   column-width;
     features-t previous-features;
   }
@@ -55,8 +55,8 @@ klass text-output-stream {
     "       ",
     "        ",
   };
-  method object-t init(object-t self, file-t file : stdout, uint32-t column-width : 2) {
-    self = $init(super, #file : file);
+  method object-t init(object-t self, stream-t stream : stdout, uint32-t column-width : 2) {
+    self = $init(super, #stream : stream);
     self.column = 0;
     if (column-width > DK-COUNTOF(ws))
       column-width = DK-COUNTOF(ws);

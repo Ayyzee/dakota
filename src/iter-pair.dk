@@ -21,4 +21,10 @@ klass iter-pair {
     object-t iter;
     method-t next;
   }
+
+  method object-t init(object-t self, slots-t slots : {nullptr, nullptr}) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }

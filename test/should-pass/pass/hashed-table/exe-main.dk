@@ -8,7 +8,7 @@ klass vector;
 
 int-t main()
 {
-  object-t json-object-output-stream = make(json-object-output-stream::klass, #file : stdout);
+  object-t json-object-output-stream = make(json-object-output-stream::klass, #stream : stdout);
   object-t table =  make(hashed-table::klass);
   object-t vector =  make(vector::klass);
   object-t string1 = make(string::klass, #bytes : "hello father");

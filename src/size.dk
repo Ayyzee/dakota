@@ -18,7 +18,19 @@ module dakota;
 
 klass size {
   slots size-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 klass ssize {
   slots ssize-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }

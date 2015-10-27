@@ -44,17 +44,17 @@ print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...) {
 }
 klass json-parser {  
   slots {
-    file-t   in;
+    stream-t   in;
     str-t    filename;
     uint32-t line;
     uint32-t column;
   }
     
   method object-t init(object-t self,
-                       file-t   file :     stdin,
+                       stream-t stream :   stdin,
                        str-t    filename : nullptr) {
     self = $init(super);
-    assert(!(stdin != file &&
+    assert(!(stdin != stream &&
              nullptr  != filename)); // these are mutually exclusive
 
     if (nullptr != filename) {
@@ -69,7 +69,7 @@ klass json-parser {
       }
     } else {
       self.filename = nullptr;
-      self.in =       file;
+      self.in =       stream;
     }
     self.line =     1;
     self.column =   0;

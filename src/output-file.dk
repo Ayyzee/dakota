@@ -14,18 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota;
+module dakota-util;
 
-// need to convert to info-t
-klass enum-info {
-  slots {
-    str-t name;  // never nullptr
-    str-t expr;  // never nullptr
-  }
-
-  method object-t init(object-t self, slots-t slots : {nullptr, nullptr}) {
-    self = $init(super);
-    *unbox(self) = slots;
-    return self;
-  }
+klass output-file {
 }

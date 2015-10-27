@@ -63,7 +63,7 @@ getprogname() {
 
 static format-va-printf(2) int-t
 va-log(uint32-t priority, str-t format, va-list-t args) {
-  file-t log-file = stderr;
+  stream-t log-file = stderr;
 
   if (nullptr != getenv("DEBUG")) {
     fprintf(log-file, "%s[%i]: ", getprogname(), getpid());

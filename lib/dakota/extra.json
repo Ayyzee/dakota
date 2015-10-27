@@ -31,7 +31,6 @@
   'nrt_extra_klass_decls' => {
     'boole' => undef,
     'char8' => undef,
-    'file' => undef,
     'hash' => undef,
     'input-stream' => undef, # std-input
     'iter-pair' => undef,
@@ -51,6 +50,7 @@
     'symbol' => undef,
     'super' => undef,
     'str' => undef,
+    'stream' => undef,
     'uchar8' => undef,
     'uintptr' => undef,
   },

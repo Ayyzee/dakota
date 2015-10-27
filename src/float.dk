@@ -20,16 +20,34 @@ klass float32 {
   superklass number;
   
   slots float-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 klass float64 {
   superklass number;
   
   slots double-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 klass float128 {
   superklass number;
   
   slots long double;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 static-assert(32/8  == sizeof(float32-t),  "The slots type of klass float32  must be  4 bytes in size");
 static-assert(64/8  == sizeof(float64-t),  "The slots type of klass float64  must be  8 bytes in size");

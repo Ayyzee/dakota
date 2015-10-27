@@ -55,40 +55,40 @@ klass lexer {
     object-t open-tokens;
   }
   method object-t init(object-t self,
-                       file-t   file :     stdin,
+                       stream-t stream :   stdin,
                        str-t    filename : nullptr) {
     self = $init(super);
 
     if (nullptr != filename) {
       self.filename = filename;
-      file = fopen(self.filename, "r");
-      if (nullptr == file) {
+      stream = fopen(self.filename, "r");
+      if (nullptr == stream) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s", buf);
         throw make(exception::klass, #message : "oops");
       }
-      fseeko(file, 0L, SEEK-END);
-      self.length = ftello(file);
-      rewind(file);
+      fseeko(stream, 0L, SEEK-END);
+      self.length = ftello(stream);
+      rewind(stream);
       self.buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
-      fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
+      fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, stream);
       // check for embedded NUL?
       self.buffer[self.length] = NUL;
-      fclose(file);
+      fclose(stream);
       self.current-position = 0;
     } else {
       self.filename = nullptr;
       fpos-t fpos;
-      fgetpos(file, &fpos);
-      fseeko(file, 0L, SEEK-END);
-      self.length = ftello(file);
-      fsetpos(file, &fpos);
+      fgetpos(stream, &fpos);
+      fseeko(stream, 0L, SEEK-END);
+      self.length = ftello(stream);
+      fsetpos(stream, &fpos);
       self.buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
-      fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, file);
+      fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, stream);
       // check for embedded NUL?
       self.buffer[self.length] = NUL;
-      fsetpos(file, &fpos);
+      fsetpos(stream, &fpos);
       self.current-position = 0;
     }
     self.line =     1;

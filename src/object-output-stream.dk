@@ -42,9 +42,9 @@ klass object-output-stream {
   object-t finalize(object-t kls) {
     return kls;
   }
-  method object-t init(object-t self, file-t file : stdout) {
-    self = $init(super, #file : file);
-    assert(nullptr != file);
+  method object-t init(object-t self, stream-t stream : stdout) {
+    self = $init(super, #slots : stream);
+    assert(nullptr != stream);
 //     equal-predicate-t equal? = cast(equal-predicate-t)$method-for-selector(object::klass,
 //                                                                                        SELECTOR(equal?(object-t, object-t));
 //     compare-t compare = cast(compare-t)$method-for-selector(object::klass,

@@ -108,3 +108,11 @@ to the macro system add the notion of a zero-width statement boundry ( for examp
 clean up uses of uintptr-t (should be hash-t)
 
 consider dumped (from bin/dakota-info) both init() and va::init() method decls
+
+we have str/string/cstring. consider removing cstring.
+
+consider moving methods from input-stream and output-stream up to stream
+look at output-file and input-file (currently empty) and see if they, too, need a common parent
+
+deal with input-stream/output-stream have #slots, and their subklasses have #stream for same variable
+(maybe one could tag a keyword as an alias to slots (so the generated box would work)

@@ -18,4 +18,10 @@ module dakota;
 
 klass std-compare {
   slots int-t (*)(void const*, void const*);
+
+  method object-t init(object-t self, slots-t slots : nullptr) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }

@@ -12,7 +12,7 @@ int-t main() {
   $add(set, string1);
   $add(set, string2);
 
-  object-t json-object-output-stream = make(json-object-output-stream::klass, #file : stdout);
+  object-t json-object-output-stream = make(json-object-output-stream::klass, #stream : stdout);
   $write(json-object-output-stream, set);
   $close(json-object-output-stream);
 

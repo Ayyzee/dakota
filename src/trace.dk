@@ -28,23 +28,23 @@ trace-column-out() {
     gbl-trace-column--;
 }
 static format-va-printf(2) int-t
-trace-vfprintf(file-t file, str-t format, va-list-t args) {
+trace-vfprintf(stream-t stream, str-t format, va-list-t args) {
   str-t col = "  "; // two spaces per column :-) [my way]
   for (uint32-t i = 0; i < gbl-trace-column; i++) {
     if (0 == i)
-      fprintf(file, "%s", col);
+      fprintf(stream, "%s", col);
     else
-      fprintf(file, "%c%s", '.', col);
+      fprintf(stream, "%c%s", '.', col);
   }
-  int-t result = vfprintf(file, format, args);
+  int-t result = vfprintf(stream, format, args);
   // bugbug: need to adjust result
   return result;
 }
 static format-printf(2) int-t
-trace-fprintf(file-t file, str-t format, ...) {
+trace-fprintf(stream-t stream, str-t format, ...) {
   va-list-t args;
   va-start(args, format);
-  int-t result = trace-vfprintf(file, format, args);
+  int-t result = trace-vfprintf(stream, format, args);
   va-end(args);
   return result;
 }

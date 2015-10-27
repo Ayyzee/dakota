@@ -43,8 +43,8 @@ klass json-object-output-stream {
     str-t start-tbl-delim;
     str-t end-tbl-delim;
   }
-  method object-t init(object-t self, file-t file : stdout, uint32-t indent-level : 1) {
-    self = $init(super, #file : file);
+  method object-t init(object-t self, stream-t stream : stdout, uint32-t indent-level : 1) {
+    self = $init(super, #stream : stream);
     self.indent-level = indent-level; // set to zero for maximum compactness
 
     self.start-seq-delim = "[";

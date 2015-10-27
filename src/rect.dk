@@ -24,6 +24,11 @@ klass rect {
     point::slots-t     point;
     dimension::slots-t dimension;
   }
+  method object-t init(object-t self, slots-t slots : {{0, 0}, {0, 0}}) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
   method boole-t equal?(slots-t* slots, slots-t* other-slots) {
     boole-t result = true;
 

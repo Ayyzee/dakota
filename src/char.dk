@@ -22,24 +22,54 @@ klass char8 {
   superklass number;
   
   slots char-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 klass uchar8 {
   superklass number;
   
   slots uchar-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 klass schar8 {
   superklass number;
   
   slots schar-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 klass char16 {
   superklass number;
   
   slots char16-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
 klass char32 {
   superklass number;
   
   slots char32-t;
+
+  method object-t init(object-t self, slots-t slots : 0) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }

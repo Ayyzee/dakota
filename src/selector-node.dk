@@ -25,4 +25,9 @@ klass selector-node {
     selector-t* key;
     slots-t*    next;
   }
+  method object-t init(object-t self, slots-t slots : {nullptr, nullptr}) {
+    self = $init(super);
+    *unbox(self) = slots;
+    return self;
+  }
 }
