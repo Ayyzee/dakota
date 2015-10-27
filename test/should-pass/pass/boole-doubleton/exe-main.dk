@@ -1,0 +1,28 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass boole;
+
+int-t main() {
+  object-t f = make(boole::klass, #slots : false);
+  $dump(f);
+  object-t t = make(boole::klass, #slots : true);
+  $dump(t);
+
+  object-t f1 = make(boole::klass, #slots : false);
+  $dump(f1);
+  assert(f1 == f);
+
+  object-t t1 = make(boole::klass, #slots : true);
+  $dump(t1);
+  assert(t1 == t);
+
+  object-t f2 = box(false);
+  $dump(f2);
+  assert(f2 == f);
+
+  object-t t2 = box(true);
+  $dump(t2);
+  assert(t2 == t);
+
+  return 0;
+}

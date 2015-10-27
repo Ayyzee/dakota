@@ -1,0 +1,14 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+static object-t i1 = #'a';
+static object-t i2 = #'bc';
+static object-t i3 = #'def';
+static object-t i4 = #'ghij';
+
+int-t main() {
+  $dump(i1);
+  $dump(i2);
+  $dump(i3);
+  $dump(i4);
+  return 0;
+}
