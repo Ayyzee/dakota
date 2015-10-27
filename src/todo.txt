@@ -104,3 +104,7 @@ allow supply to supply ONE argument (which default to self)
   super(self) is shorthand for super (which converts to super(self=self, klass=klass)
 
 to the macro system add the notion of a zero-width statement boundry ( for example \{|\}|; )
+
+clean up uses of uintptr-t (should be hash-t)
+
+consider dumped (from bin/dakota-info) both init() and va::init() method decls
