@@ -387,15 +387,15 @@ sub rewrite_throws {
   # throw self ;
   # throw ;  =>  dkt-capture-current-exception(_e_) ; throw ;
 
-  $$filestr_ref =~ s/\bthrow(\s*);/RETHROW$1;/gsx;
+  $$filestr_ref =~ s/(\s+)throw(\s*);/$1RETHROW$2;/gsx;
 
   # dont want to rewrite #define THROW throw
   # in parens
-  $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)\((.+?)\)(\s*);/throw $1dkt-capture-current-exception($2)$3;/gsx;
+  $$filestr_ref =~ s/(\s+)throw(\s*)\((.+?)\)(\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
   # not in parens
-  $$filestr_ref =~ s/(?<!THROW\s)throw\b(\s*)  (.+?)  (\s*);/throw $1dkt-capture-current-exception($2)$3;/gsx;
+  $$filestr_ref =~ s/(\s+)throw(\s*)  (.+?)  (\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
 
-  $$filestr_ref =~ s/\bRETHROW(\s*);/throw$1;/gsx;
+  $$filestr_ref =~ s/(\s+)RETHROW(\s*);/$1throw$2;/gsx;
 }
 sub rewrite_slots_typedef {
   my ($t1, $ws1, $ws2, $tkns, $ws3) = @_;
