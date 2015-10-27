@@ -24,6 +24,7 @@
   'rt_extra_keywords' => {
     'kls' => undef,
     'message' => undef,
+    'slots' => undef,
     'superkls' => undef,
     'symbol' => undef,
   },

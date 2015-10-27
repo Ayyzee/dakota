@@ -1989,10 +1989,15 @@ sub generate_klass_box {
         } elsif (&is_rt_defn()) {
           $result .= " {" . &ann(__FILE__, __LINE__) . "\n";
           $col = &colin($col);
-          $result .=
-            $col . "object-t result = make(klass); // consider using #slots : ...\n" .
-            $col . "*unbox(result) = *arg;\n" .
-            $col . "return result;\n";
+          if ($$klass_scope{'init-supports-kw-slots?'}) {
+            $result .=
+              $col . "object-t result = make(klass, \#slots : *arg);\n";
+          } else {
+            $result .=
+              $col . "object-t result = make(klass);\n" .
+              $col . "*unbox(result) = *arg;\n";
+          }
+          $result .= $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";
         }

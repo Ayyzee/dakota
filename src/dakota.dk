@@ -1225,7 +1225,10 @@ dump-klass(ofile-t ofl, named-info-t* klass-info) {
     index = 0;
     if (nullptr != kw-args-method-signatures)
       while (nullptr != (info = kw-args-method-signatures[index++])) {
-        fprintf(ofl.output, "//");
+        if (!strcmp(#init, info->name))
+          fprintf(ofl.output, "  ");
+        else
+          fprintf(ofl.output, "//");
         ofile-t ofl0 = {ofl.output, 0};
         dump-method(ofl0, info, max-return-type-width);
       }

@@ -1692,7 +1692,14 @@ sub method {
   $$method{'parameter-types'} = $kw_args_parameter_types;
 
   if ($kw_args_names) {
-    &dakota::util::kw_args_generics_add("@{$$method{name}}");
+    &dakota::util::kw_args_generics_add("@{$$method{'name'}}");
+    if ('init' eq $$method{'name'}[0] && 1 == @{$$method{'name'}}) {
+      foreach my $kw_arg_name (@$kw_args_names) {
+        if ('slots' eq $kw_arg_name) {
+          $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
+        }
+      }
+    }
   }
   if ($kw_args_names) {
     $$method{'kw-args-names'} = $kw_args_names;
