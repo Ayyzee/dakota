@@ -2,10 +2,11 @@
 
 module test-1;
 
-klass k1
-{
-  export method object-t dummy-method(object-t self, dimension-t dummy-arg)
-  {
+klass dimension;
+
+klass k1 {
+  method object-t dummy-method(object-t self, dimension-t dummy-arg) {
+    USE(dummy-arg);
     return self;
   }
 }

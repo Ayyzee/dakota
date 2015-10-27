@@ -21,8 +21,7 @@ klass token;
 klass tokenid;
 klass sequence; // hackhack: should be implied by use of for-each construct
 
-int-t main(int argc, char** argv)
-{
+int-t main(int, char** argv) {
   object-t l = make(lexer::klass, #filename : argv[1]);
   object-t seq = $tokenize(l);
 

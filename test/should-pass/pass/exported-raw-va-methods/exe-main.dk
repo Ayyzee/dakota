@@ -1,17 +1,13 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass k1
-{
+klass k1 {
   slots int32-t;
 
-  export method slots-t* va::sum(slots-t* s, va-list-t args)
-  {
+  method slots-t* va::sum(slots-t* s, va-list-t args) {
     USE(args);
     return s;
   }
 }
-
-int-t main()
-{
+int-t main() {
   return 0;
 }

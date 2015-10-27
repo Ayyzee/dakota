@@ -7,8 +7,7 @@ klass uint32;
 klass sorted-set;
 klass hashed-set;
 
-static object-t check(object-t kls)
-{
+static object-t check(object-t kls) {
   symbol-t name = name-of(kls);
   printf("%s\n", name);
   object-t i1 = uint32::box(cast(uint32-t)0);
@@ -21,9 +20,7 @@ static object-t check(object-t kls)
   assert(0 == s1 && 1 == s2 && 1 == s3);
   return collection;
 }
-
-static object-t check-throw(object-t kls)
-{
+static object-t check-throw(object-t kls) {
   symbol-t name = name-of(kls);
   printf("%s\n", name);
   object-t i1 = uint32::box(cast(uint32-t)0);
@@ -31,19 +28,17 @@ static object-t check-throw(object-t kls)
   uint32-t s1 = $size(collection);
   $add-absent(collection, i1);
   uint32-t s2 = $size(collection);
-  try
-  { $add-absent(collection, i1); }
-  catch (...)
-  {
+  try {
+    $add-absent(collection, i1);
+  }
+  catch (...) {
     uint32-t s3 = $size(collection);
     assert(0 == s1 && 1 == s2 && 1 == s3);
     return collection;
   }
   abort();
 }
-
-int-t main()
-{
+int-t main() {
   check(sorted-set::klass);
   check(hashed-set::klass);
 

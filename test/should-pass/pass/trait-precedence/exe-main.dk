@@ -3,38 +3,27 @@
 #include <assert.h>
 #include <string.h>
 
-trait t1
-{
-  method symbol-t f1(object-t self)
-	{
+trait t1 {
+  method symbol-t f1(object-t self) {
     return __klass__;
   }
-  method symbol-t f2(object-t self)
-	{
+  method symbol-t f2(object-t self) {
     return __klass__;
   }
 }
-
-trait t2
-{
-  method symbol-t f2(object-t self)
-	{
+trait t2 {
+  method symbol-t f2(object-t self) {
     return __klass__;
   }
-  method symbol-t f3(object-t self)
-	{
+  method symbol-t f3(object-t self) {
     return __klass__;
   }
 }
-
-klass k1
-{
+klass k1 {
   trait t1;
   trait t2;
 }
-
-int-t main()
-{
+int-t main() {
   object-t o = make(k1::klass);
 
   symbol-t s1 = $f1(o);

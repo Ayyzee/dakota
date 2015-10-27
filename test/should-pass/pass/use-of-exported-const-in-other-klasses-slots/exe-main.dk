@@ -2,7 +2,7 @@
 
 klass k1
 {
-  export const uint-t length = 2;
+  const uint-t length = 2;
 }
 
 klass k2

@@ -2,7 +2,7 @@
 
 klass k1
 {
-  export enum
+  enum
   {
     k-e0 = 0,
     k-e1 = 1,

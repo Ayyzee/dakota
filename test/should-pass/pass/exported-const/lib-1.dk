@@ -2,8 +2,7 @@
 
 module test-1;
 
-klass k1
-{
-  export const char8-t* myname = "myrhs";
-  export enum answer-t { no = 0, yes = 1 };
+klass k1 {
+  const char8-t* myname = "myrhs";
+  enum answer-t { no = 0, yes = 1 };
 }

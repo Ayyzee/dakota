@@ -4,6 +4,10 @@
 
 module test-1;
 
+klass k1;
+klass k2;
+klass k3;
+
 int-t main()
 {
   object-t o1 = make(k1::klass);

@@ -1,10 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-int-t main()
-{
+int-t main() {
   uintmax-t hash-value = dk-hash(#default-initial-capacity);
-  switch(hash-value)
-  {
+  switch (hash-value) {
     case #default-initial-capacity:
       break;
     case "default-initial-capacity":

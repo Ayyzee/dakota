@@ -5,13 +5,10 @@
 
 klass input-file;
 
-boole-t space?(int-t c)
-{
+static boole-t space?(int-t c) {
   return isspace(c);
 }
-
-int-t main(int-t argc, const char8-t* const* argv)
-{
+int-t main(int-t argc, const char8-t* const* argv) {
   const char8-t* const* filenames = &argv[1];
   assert(nullptr != *filenames);
   const char8-t* filename;

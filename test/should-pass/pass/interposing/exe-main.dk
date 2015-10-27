@@ -9,14 +9,13 @@ klass a3 { superklass a1; }
 
 interpose a3, a2;
 
-int-t main()
-{
+int-t main() {
   const char8-t* expected = "/object/a1/a2/a3";
 
   printf("%s\n", expected);
 
   char8-t chain[1024] = "";
-  dk-get-klass-chain(a3::klass, chain, sizeof(chain) - 1);
+  dkt-get-klass-chain(a3::klass, chain, sizeof(chain) - 1);
   printf("%s\n", chain);
 
   assert(0 == strcmp(expected, chain));

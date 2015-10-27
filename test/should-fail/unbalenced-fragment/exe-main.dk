@@ -1,15 +1,11 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass k1
-{
-  method object-t m1(object-t self)
-  {
+klass k1 {
+  method object-t m1(object-t self) {
     void (*f1)(int[)] = nullptr; // error
     return self;
   }
 }
-
-int-t main()
-{
+int-t main() {
   return 0;
 }

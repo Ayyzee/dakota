@@ -2,7 +2,7 @@
 
 klass thing
 {
-  export method object-t init(object-t self)
+  method object-t init(object-t self)
   {
     return self;
   }

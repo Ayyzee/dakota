@@ -2,22 +2,15 @@
 
 #include <signal.h>
 
-klass xsiginfo
-{
+klass xsiginfo {
   slots siginfo-t;
 }
-
-klass xsigaction-cb
-{
+klass xsigaction-cb {
   slots void (*)(xsignal-t, xsiginfo-t*, void*);
 }
-
-klass xsignal
-{
+klass xsignal {
   slots int-t;
 }
-
-int-t main()
-{
+int-t main() {
   return 0;
 }
