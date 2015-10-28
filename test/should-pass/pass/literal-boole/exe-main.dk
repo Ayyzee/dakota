@@ -1,12 +1,12 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-static object-t b1 = #false;
-static object-t b2 = #true;
+static object-t f = #false;
+static object-t t = #true;
 
 int-t main() {
-  $dump(b1);
+  $dump(f);
   $dump(#false);
-  $dump(b2);
+  $dump(t);
   $dump(#true);
   return 0;
 }

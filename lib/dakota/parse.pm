@@ -118,7 +118,7 @@ our @EXPORT= qw(
                  add_generic
                  add_keyword
                  add_klass_decl
-                 add_string
+                 add_str
                  add_symbol
                  add_symbol_ident
                  add_trait_decl
@@ -521,16 +521,18 @@ sub add_hash {
 sub add_keyword {
   my ($file, $keyword) = @_;
   my $ident = &path::string([$keyword]);
-  &add_symbol_ident($file, $ident);
   $$file{'keywords'}{$ident} = undef;
+  &add_symbol($file, [$keyword]);
 }
-sub add_string {
-  my ($file, $string) = @_;
-  $$file{'strings'}{$string} = undef;
+sub add_str {
+  my ($file, $str) = @_;
+  &add_symbol($file, [$str]);
+  $$file{'literal-strs'}{$str} = undef;
 }
-sub add_integer {
+sub add_int {
   my ($file, $val) = @_;
-  $$file{'integers'}{$val} = undef;
+  $$file{'literal-ints'}{$val} = undef;
+  &add_symbol($file, [$val]);
 }
 sub token_seq::simple_seq {
   my ($tokens) = @_;
@@ -2151,11 +2153,11 @@ sub rep_tree_from_dk_path {
   }
   pos $_ = 0;
   while (m/\#(0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+)/g) {
-    &add_integer($gbl_root, $1);
+    &add_int($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\#\"(.*?)\"/g) {
-    &add_string($gbl_root, $1);
+  while (m/\#"(.*?)"/g) {
+    &add_str($gbl_root, $1);
   }
   &encode_cpp(\$_);
   &encode_strings(\$_);

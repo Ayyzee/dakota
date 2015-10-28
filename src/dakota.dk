@@ -482,35 +482,45 @@ static void each(named-info-t* root-info-list, named-info-func-t func, ptr-t use
   return;
 }
 static void each-str(named-info-t* info, object-t (*box)(str-t)) {
-  object-t** strings = cast(object-t**)named-info::at(info, #strings);
-  if (strings) {
-    str-t* strings-literals = cast(str-t*)named-info::at(info, #strings-literals);
-    assert(nullptr != strings-literals);
-    str-t string-literal;
-    object-t* string;
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #strs);
+  if (assocs) {
+    symbol-t* names =    cast(symbol-t*)named-info::at(info, #str-names);
+    str-t*    literals = cast(str-t*)   named-info::at(info, #str-literals);
+    assert(nullptr != literals);
     uint32-t i = 0;
-    while (nullptr != (string = strings[i])) {
-      string-literal = strings-literals[i++];
-      assert(nullptr != string);
-      *string = box(string-literal);
+    while (1) {
+      assoc-node-t& assoc =   assocs[i];
+      symbol-t      name =    names[i];
+      str-t         literal = literals[i];
+      if (nullptr == cast(object-t*)assoc.element)
+        break;
+      *(cast(object-t*)assoc.element) = box(literal);
+      // loop here over chain
+      i++;
     }
-    assert(nullptr == strings-literals[i]);
+    assert(nullptr == names[i]);
+    assert(nullptr == literals[i]);
   }
 }
-static void each-integer(named-info-t* info, object-t (*box)(uintptr-t)) {
-    object-t** integers = cast(object-t**)named-info::at(info, #integers);
-  if (integers) {
-    uintptr-t* integers-literals = cast(uintptr-t*)named-info::at(info, #integers-literals);
-    assert(nullptr != integers-literals);
-    uintptr-t integer-literal;
-    object-t* integer;
+static void each-int(named-info-t* info, object-t (*box)(uintptr-t)) {
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #ints);
+  if (assocs) {
+    symbol-t*  names =    cast(symbol-t*) named-info::at(info, #int-names);
+    uintptr-t* literals = cast(uintptr-t*)named-info::at(info, #int-literals);
+    assert(nullptr != literals);
     uint32-t i = 0;
-    while (nullptr != (integer = integers[i])) {
-      integer-literal = integers-literals[i++];
-      assert(nullptr != integer);
-      *integer = box(integer-literal);
+    while (1) {
+      assoc-node-t& assoc =   assocs[i];
+      symbol-t      name =    names[i];
+      uintptr-t     literal = literals[i];
+      if (nullptr == cast(object-t*)assoc.element)
+        break;
+      *(cast(object-t*)assoc.element) = box(literal);
+      // loop here over chain
+      i++;
     }
-    assert(0 == integers-literals[i]); // nullptr
+    assert(nullptr == names[i]);
+    assert(0 == literals[i]); // nullptr
   }
 }
 
@@ -602,7 +612,7 @@ dk-init-runtime() {
          cast(ptr-t)cast(object-t (*)(str-t))str::box);
     dk-klass-for-name(#uintptr);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(uintptr-t)))each-integer,
+         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(uintptr-t)))each-int,
          cast(ptr-t)cast(object-t (*)(uintptr-t))uintptr::box);
 
     auto previous-terminate = std::set-terminate(verbose-terminate);

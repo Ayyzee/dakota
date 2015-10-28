@@ -516,32 +516,52 @@ sub rewrite_array_types {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/($tid)(\s*)($main::seq)(\s*)($id)/$1$2$4$5$3/gm;
 }
+sub symbol {
+  my ($symbol) = @_;
+  my $ident = &make_ident_symbol_scalar($symbol);
+  return "__symbol::$ident";
+}
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
-  &rewrite_keywords($filestr_ref);
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?)/&symbol($1)/ge; # rnielsen
 }
-sub string {
+sub literal_str {
   my ($string) = @_;
   my $ident = &make_ident_symbol_scalar($string);
-  return "__string\::$ident";
+  return "__literal::__str::$ident";
 }
-sub rewrite_strings {
+sub rewrite_literal_strs {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\#"(.*?)")/&string($2)/ge;
+  $$filestr_ref =~ s/(\#"(.*?)")/&literal_str($2)/ge;
 }
-sub integer {
+sub literal_int {
   my ($val) = @_;
   my $ident = '_' . $val . '_';
-  return "__integer\::$ident";
+  return "__literal::__int::$ident";
 }
-sub rewrite_integers {
+sub rewrite_literal_ints {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\#(0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+))/&integer($2)/ge;
+  $$filestr_ref =~ s/(\#(0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+))/&literal_int($2)/ge;
+  # '' multibyte char
 }
-sub rewrite_keywords {
+# 'a'
+# '\\'
+# '\''
+# '\0'
+sub literal_char {
+  my ($val) = @_;
+  $val =~ s|^\'||;  # strip leading  single-quote
+  $val =~ s|\'$||;  # strip trailing single-quote
+  my $ident = &make_ident_symbol_scalar($val);
+  return "__literal::__char::$ident";
+}
+sub rewrite_literal_chars {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!\\)\#($sqstr)/&keyword($1)/ge;
+  $$filestr_ref =~ s/(?<!\\)\#($sqstr)/&literal_char($1)/ge;
+}
+sub rewrite_literal_booles {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/(\#(false|true))\b/__literal::__boole::_$2_/g;
 }
 sub rewrite_boxes {
   my ($filestr_ref) = @_;
@@ -670,15 +690,6 @@ sub rewrite_slot_access {
 
   #    $$filestr_ref =~ s/unbox\((.*?)\)\./unbox($1)->/g;
 }
-sub symbol {
-  my ($symbol) = @_;
-  my $ident = &make_ident_symbol_scalar($symbol);
-  return "__symbol\::$ident";
-}
-sub keyword {
-  my ($keyword) = @_;
-  return &hash($keyword);
-}
 sub hash {
   my ($keyword) = @_;
   $keyword =~ s|^\'||;  # strip leading  single-quote
@@ -776,18 +787,18 @@ sub rewrite_keyword_syntax_list {
   }
   return "$arg1$arg2$list";
 }
-sub rewrite_keyword_syntax_use_rhs {
+sub keyword_use {
   my ($arg1, $arg2) = @_;
   my $arg1_ident = &dakota::generate::make_ident_symbol_scalar($arg1);
   return "&__keyword::$arg1_ident$arg2,";
 }
-sub rewrite_keyword_syntax_use {
+sub rewrite_keyword_use {
   my ($arg1, $arg2) = @_;
   my $list = $arg2;
 
   #print STDERR "$arg1$list\n";
-  $list =~ s/\#?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
-  $list =~ s/\#?($id)(\s*)(?<!$colon)$colon(?!$colon)/&rewrite_keyword_syntax_use_rhs($1, $2)/ge;
+  $list =~ s/\#?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
+  $list =~ s/\#?($id)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
   $list =~ s/\)$/, nullptr\)/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";
@@ -796,10 +807,10 @@ sub rewrite_keyword_syntax {
   my ($filestr_ref, $kw_args_generics) = @_;
   foreach my $name (keys %$kw_args_generics) {
     $$filestr_ref =~ s/(method.*?)($name)($main::list)/&rewrite_keyword_syntax_list($1, $2, $3)/ge;
-    $$filestr_ref =~ s/(dk::$name)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
+    $$filestr_ref =~ s/(dk::$name)($main::list)/&rewrite_keyword_use($1, $2)/ge;
   }
   $$filestr_ref =~ s|make(\([^\)]+?\.\.\.\))|__MAKE__$1|gs;
-  $$filestr_ref =~ s/(make)($main::list)/&rewrite_keyword_syntax_use($1, $2)/ge;
+  $$filestr_ref =~ s/(make)($main::list)/&rewrite_keyword_use($1, $2)/ge;
   $$filestr_ref =~ s|__MAKE__|make|gs;
 }
 sub rewrite_sentinal_generic_uses_sub {
@@ -914,8 +925,10 @@ sub convert_dk_to_cc {
   if ($remove) {
     &remove_system_includes($filestr_ref);
   }
-  &rewrite_integers($filestr_ref);
-  &rewrite_strings($filestr_ref);
+  &rewrite_literal_booles($filestr_ref);
+  &rewrite_literal_chars($filestr_ref);
+  &rewrite_literal_ints($filestr_ref);
+  &rewrite_literal_strs($filestr_ref);
   &encode_cpp($filestr_ref);
   &encode_strings($filestr_ref);
   &encode_comments($filestr_ref);
@@ -925,7 +938,6 @@ sub convert_dk_to_cc {
   &rewrite_switch($filestr_ref);
 
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading #, rnielsen
-  &rewrite_keywords($filestr_ref);
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);
 

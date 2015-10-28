@@ -7,8 +7,12 @@ static object-t i4 = #0b0101010; // upper & lower case b
 
 int-t main() {
   $dump(i1);
+  $dump(#42);
   $dump(i2);
+  $dump(#060);
   $dump(i3);
+  $dump(#0xa6f2);
   $dump(i4);
+  $dump(#0b0101010);
   return 0;
 }
