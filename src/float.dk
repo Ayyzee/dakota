@@ -19,9 +19,9 @@ module dakota-util;
 klass float32 {
   superklass number;
   
-  slots float-t;
+  slots float32-t;
 
-  method object-t init(object-t self, slots-t slots : 0) {
+  method object-t init(object-t self, slots-t slots : 0.0) {
     self = $init(super);
     *unbox(self) = slots;
     return self;
@@ -30,9 +30,9 @@ klass float32 {
 klass float64 {
   superklass number;
   
-  slots double-t;
+  slots float64-t;
 
-  method object-t init(object-t self, slots-t slots : 0) {
+  method object-t init(object-t self, slots-t slots : 0.0) {
     self = $init(super);
     *unbox(self) = slots;
     return self;
@@ -41,9 +41,9 @@ klass float64 {
 klass float128 {
   superklass number;
   
-  slots long double;
+  slots float128-t;
 
-  method object-t init(object-t self, slots-t slots : 0) {
+  method object-t init(object-t self, slots-t slots : 0.0) {
     self = $init(super);
     *unbox(self) = slots;
     return self;

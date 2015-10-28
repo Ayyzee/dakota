@@ -2152,7 +2152,7 @@ sub rep_tree_from_dk_path {
     &add_system_include($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\#(0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+)/g) {
+  while (m/\#((0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|[1-9]\d*)([uUiI](32|64|128))?)/g) {
     &add_int($gbl_root, $1);
   }
   pos $_ = 0;

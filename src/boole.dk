@@ -32,7 +32,7 @@ klass boole { // a doubleton :-)
   superklass number;
   klass      boole-klass;
 
-  slots bool-t;
+  slots boole-t;
 
   object-t initialize(object-t kls) {
     assert(klass == kls);

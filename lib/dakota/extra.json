@@ -67,7 +67,7 @@
     'behavior-exported?' => undef,
     'boole-t' => undef, # hardcode typedef
     'cat' => undef,
-    'char-t' => undef, # hardcode typedef
+    'char8-t' => undef, # hardcode typedef
     'construct' => undef,
     'date' => undef,
     'dir' => undef,
@@ -105,7 +105,7 @@
     'name' => undef,
     'offset' => undef,
     'requires' => undef,
-    'schar-t' => undef, # hardcode typedef
+    'schar8-t' => undef, # hardcode typedef
     'selectors' => undef,
     'selectors-va' => undef,
     'signatures' => undef,
@@ -123,7 +123,7 @@
     'trait' => undef,
     'traits' => undef,
     'type' => undef,
-    'uchar-t' => undef, # hardcode typedef
+    'uchar8-t' => undef, # hardcode typedef
     'uint-t' => undef,  # hardcode typedef
     'union' => undef,
     'va-method' => undef,

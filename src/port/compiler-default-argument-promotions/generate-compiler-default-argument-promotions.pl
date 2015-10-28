@@ -15,9 +15,6 @@ my $extra = 2; # NEVER set this to 1
 
 my $type_tbl = {
   'int-t' => {
-    'signed char'          => $extra,
-    'schar-t'              => 1,
-
     'schar8-t'             => 1,
     'schar8::slots-t'      => 1,
 
@@ -49,14 +46,8 @@ my $type_tbl = {
     'int-fast64::slots-t'  => 1,
   },
   'uint-t' => {
-    'bool'                  => $extra,
-    'bool-t'                => 1,
-
     'boole-t'               => 1,
     'boole::slots-t'        => 1,
-
-    'unsigned char'         => $extra,
-    'uchar-t'               => 1,
 
     'uchar8-t'              => 1,
     'uchar8::slots-t'       => 1,
@@ -95,20 +86,17 @@ my $type_tbl = {
     'uint-fast64::slots-t'  => 1,
   },
   'double-t' => {
-    'float'             => $extra,
-    'float-t'           => 1,
-
     'float32-t'         => 1,
     'float32::slots-t'  => 1,
 
     'float64-t'         => 1,
     'float64::slots-t'  => 1,
+
+    'float128-t'        => 1,
+    'float128::slots-t' => 1,
   },
 };
-my $unknown_types = {
-  'char'             => $extra,
-
-  'char-t'           => 1,
+my $implementation_defined_signedness = {
   'char8-t'          => 1,
   'char8::slots-t'   => 1,
 
@@ -118,9 +106,9 @@ my $unknown_types = {
 my $index = `./type-index`;
 my $int_types = [ 'uint-t', 'int-t' ];
 
-foreach my $type (sort keys %$unknown_types) {
-  if ($type && $extra != $$unknown_types{$type} ) {
-    $$type_tbl{$$int_types[$index]}{$type} = $$unknown_types{$type};
+foreach my $type (sort keys %$implementation_defined_signedness) {
+  if ($type && $extra != $$implementation_defined_signedness{$type} ) {
+    $$type_tbl{$$int_types[$index]}{$type} = $$implementation_defined_signedness{$type};
   }
 }
 my $result_tbl = {};

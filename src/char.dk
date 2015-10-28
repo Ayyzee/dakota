@@ -21,7 +21,7 @@ klass number;
 klass char8 {
   superklass number;
   
-  slots char-t;
+  slots char8-t;
 
   method object-t init(object-t self, slots-t slots : 0) {
     self = $init(super);
@@ -32,7 +32,7 @@ klass char8 {
 klass uchar8 {
   superklass number;
   
-  slots uchar-t;
+  slots uchar8-t;
 
   method object-t init(object-t self, slots-t slots : 0) {
     self = $init(super);
@@ -43,7 +43,7 @@ klass uchar8 {
 klass schar8 {
   superklass number;
   
-  slots schar-t;
+  slots schar8-t;
 
   method object-t init(object-t self, slots-t slots : 0) {
     self = $init(super);

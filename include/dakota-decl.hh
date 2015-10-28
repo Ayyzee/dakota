@@ -58,18 +58,32 @@
 
 #define DKT_ENABLE_TYPEINFO SO_EXPORT
 
-typedef bool bool_t;
+typedef bool boole_t;
 
-typedef          char  char_t;
-typedef   signed char schar_t;
-typedef unsigned char uchar_t;
+typedef          char  char8_t; // may be signed or unsigned (same with wchar_t)
+typedef   signed char schar8_t;
+typedef unsigned char uchar8_t;
 
-typedef          int    int_t;
-typedef unsigned int   uint_t;
 
-typedef float  float_t;
+// integer promotions are
+//   float -> double
+//   char  -> int or unsigned int
+//   bool  -> unsigned int
+
 typedef double double_t;
+typedef          int    int_t; // no corresponding klass/slots defn
+typedef unsigned int   uint_t; // no corresponding klass/slots defn
 
-typedef va_list va_list_t;
+
+typedef va_list va_list_t; // no corresponding klass/slots defn
+
+// <cstdfloat>
+typedef float       float32_t;
+typedef double      float64_t;
+typedef long double float128_t;
+
+static_assert(32/8  == sizeof(float32_t),  "The sizeof float32_t  must equal  32/8 bytes in size");
+static_assert(64/8  == sizeof(float64_t),  "The sizeof float64_t  must equal  64/8 bytes in size");
+static_assert(128/8 == sizeof(float128_t), "The sizeof float128_t must equal 128/8 bytes in size");
 
 #endif
