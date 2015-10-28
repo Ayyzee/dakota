@@ -127,3 +127,9 @@ features that show:
   selector in every method body (__selector__)
   map like in perl (use lambda func)
   as(a klass) casting syntax
+
+echo out method kw-arg defaults when using dakota-info
+maybe as a comment? this info is not required for the parser
+but it might be nice to suppy it for the user
+
+rename various things to consistent kw-args, kw-arg-method..., or simpley keyword
