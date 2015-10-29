@@ -133,3 +133,23 @@ maybe as a comment? this info is not required for the parser
 but it might be nice to suppy it for the user
 
 rename various things to consistent kw-args, kw-arg-method..., or simpley keyword
+
+allow return type to be specified similar to lambda functions (with optional delimiter)
+  lambda function syntax:
+  [...](...) -> return-type-t {
+  //
+  method object-t at(object-t self, object-t element) {
+  //=>
+  method at(object-t self, object-t element) -> object-t {
+  //or
+  method at(object-t self, object-t element)    object-t {
+
+new alias syntax:
+  method alias (inside klass defn)
+    method push() => add-last();
+    // or if add-last(...) is overloaded
+    method push() => add-last(object-t, object-t);
+  method/generic keyword alias
+    method init(slots => stream);
+    // or if init() is overloaded
+    method init(object-t, int32-t, slots => stream);
