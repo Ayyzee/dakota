@@ -18,6 +18,8 @@
 #include <cinttypes>
 #include <cstdlib>
 
+module dakota;
+
 klass exception;
 
 klass node {
@@ -76,8 +78,6 @@ klass node {
     return;
   }
 }
-module dakota;
-
 klass deque {
   superklass sequence;
   trait      stack;
