@@ -160,3 +160,14 @@ from swift:
 bin/dakota-build --project [project.rep] --jobs 4 ../lib/libdakota.so
   which uses bin/dakota just like make does
 
+convert non-method functions to the new syntax
+
+convert typedefs (both coded and generated) to use the trailing return type style
+
+convert method [[alias(...)]] to method ...() => ...(...)
+
+create support for keyword aliasing
+
+consider authoring headers in dakota syntax and generating the actual headers
+
+[[...]] around unbox-attrs (and around all attrs)
