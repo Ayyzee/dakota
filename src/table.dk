@@ -25,7 +25,7 @@ trait table {
   //provides set;
   require collection;
 
-  method object-t keys(object-t self) {
+  method keys(object-t self) -> object-t {
     object-t set-kls = superklass-of(klass-of(self));
     object-t result = make(set-kls);
     for (pair-t* pair in self) {
@@ -34,7 +34,7 @@ trait table {
     }
     return result;
   }
-  method object-t elements(object-t self) {
+  method elements(object-t self) -> object-t {
     object-t result = make(vector::klass, #size : $size(self));
     for (pair-t* pair in self) {
       object-t last = pair->last;
@@ -42,7 +42,7 @@ trait table {
     }
     return result;
   }
-  method object-t write-lite(object-t self, object-t out) {
+  method write-lite(object-t self, object-t out) -> object-t {
     $write(out, "{");
     str-t delim = "";
 
@@ -61,7 +61,7 @@ trait table {
     $write(out, "}");
     return self;
   }
-  method object-t add(object-t self, object-t first, object-t last) {
+  method add(object-t self, object-t first, object-t last) -> object-t {
     object-t pair = $at(self, first, cast(object-t)nullptr);
     object-t current-last = pair;
 
@@ -78,13 +78,13 @@ trait table {
     }
     return current-last;
   }
-  method object-t at(object-t self, object-t first) {
+  method at(object-t self, object-t first) -> object-t {
     object-t last = $in(super, first);
     if ($instance?(last, pair::klass))
       last = pair::unbox(last)->last;
     return last;
   }
-  method object-t at(object-t self, object-t first, object-t default-last) {
+  method at(object-t self, object-t first, object-t default-last) -> object-t {
     object-t last = $in(super, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
@@ -92,10 +92,10 @@ trait table {
       last = pair::unbox(last)->last;
     return last;
   }
-  object-t initialize(object-t kls) {
+  initialize(object-t kls) -> object-t {
     return kls;
   }
-  object-t finalize(object-t kls) {
+  finalize(object-t kls) -> object-t {
     return kls;
   }
 }

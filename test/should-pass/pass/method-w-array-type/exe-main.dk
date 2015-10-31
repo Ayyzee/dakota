@@ -2,13 +2,11 @@
 
 klass k1
 {
-  method object-t m1(object-t self, char8-t[7777] a1, int32-t a2)
-  {
+  method m1(object-t self, char8-t[7777] a1, int32-t a2) -> object-t {
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

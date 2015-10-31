@@ -1,15 +1,13 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-int-t main()
-{
+int-t main() {
   int-t i;
 
   try
   {
     i = 1;
   }
-  catch (...)
-  {
+  catch (...) {
     i = 1;
   }
   finally

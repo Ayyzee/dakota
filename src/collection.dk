@@ -41,18 +41,18 @@ klass collection {
 
   trait forward-iterator;
 
-  method object-t write-lite(object-t self, object-t out) {
+  method write-lite(object-t self, object-t out) -> object-t {
     USE(out);
     return self;
   }
-  method object-t writeln-lite(object-t self, object-t out) {
+  method writeln-lite(object-t self, object-t out) -> object-t {
     $write-lite(self, out);
     $write(out, "\n");
     return self;
   }
-//   method object-t add-all(object-t self, str-t const* strings, symbol-t encoding : #utf-8)
+//   method add-all(object-t self, str-t const* strings, symbol-t encoding : #utf-8)
 //   {
-//     assert(nullptr != strings);
+//     assert(nullptr != strings) -> object-t;
 //     assert(nullptr != encoding);
 //     while (nullptr != *strings) // rnielsen: modifying a parameter - bad practice?
 //     {
@@ -62,28 +62,28 @@ klass collection {
 //     }
 //     return null;
 //   }
-  method object-t add-all(object-t self, object-t collection) {
+  method add-all(object-t self, object-t collection) -> object-t {
     for (object-t element in collection)
       $add(self, element);
     return collection;
   }
   // items are nullptr terminated lists of objects
-  method object-t add-items(object-t self, object-t[] items) {
+  method add-items(object-t self, object-t[] items) -> object-t {
     object-t arg;
     object-t* args = items;
     while (nullptr != (arg = *args++))
       $add(self, arg);
     return self; // nullnull?
   }
-  method iter-pair::slots-t iter-pair(object-t self) {
+  method iter-pair(object-t self) -> iter-pair::slots-t {
     object-t iter = $forward-iterator(self);
     method-t next = $method-for-selector(klass-of(iter), SELECTOR(next(object-t)));
     return cast(iter-pair-t){ .iter = iter, .next = next };
   }
-  method object-t add(object-t self, object-t element);
-  method object-t forward-iterator(object-t self);
+  method add(object-t self, object-t element) -> object-t;
+  method forward-iterator(object-t self) -> object-t;
 
-  //     method uint32-t size(object-t self);
-  //     method boole-t empty?(object-t self);
-  //     method object-t empty(object-t self);
+  //     method size(object-t self) -> uint32-t;
+  //     method empty?(object-t self) -> boole-t;
+  //     method empty(object-t self) -> object-t;
 }

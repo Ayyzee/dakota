@@ -1,7 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-int-t main()
-{
+int-t main() {
   try {
     throw (object-t)~0;     // does not rewrite correctly
     //throw cast(int-t)42; // rewrites correctly

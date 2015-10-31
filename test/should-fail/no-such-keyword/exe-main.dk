@@ -2,23 +2,20 @@
 
 klass k1
 {
-  method object-t init(object-t self, void* arg1, void** arg2 : nullptr)
-  {
+  method init(object-t self, void* arg1, void** arg2 : nullptr) -> object-t {
     self = $init(super);
     return self;
   }
 }
 klass k2
 {
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     self = $init(super);
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t o = make(k1::klass, #bogus : 42);
   USE(o);
   return 0;

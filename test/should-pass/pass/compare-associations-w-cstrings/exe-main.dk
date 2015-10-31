@@ -4,8 +4,7 @@
 
 klass pair;
 
-int-t main()
-{
+int-t main() {
   object-t pair1 = make(pair::klass,
                         first : #"key0",
                         last :  #"element0");

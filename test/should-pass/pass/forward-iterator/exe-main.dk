@@ -12,8 +12,7 @@ klass sorted-set;
 klass uint32;
 klass vector;
 
-static void check-for(object-t collection)
-{
+static void check-for(object-t collection) {
   uint32-t size = $size(collection);
   printf("%i[", size);
   char8-t* delim = "";
@@ -31,8 +30,7 @@ static void check-for(object-t collection)
   return;
 }
 
-static void check-for-each(object-t collection)
-{
+static void check-for-each(object-t collection) {
   printf("%i[", $size(collection));
   char8-t* delim = "";
   for (object-t e in collection) {
@@ -48,8 +46,7 @@ static void check-for-each(object-t collection)
 
 static const uint32-t count = 3;
 
-static void check(object-t klass, object-t (*add)(object-t, object-t), void (*check-for-func)(object-t))
-{
+static void check(object-t klass, object-t (*add)(object-t, object-t), void (*check-for-func)(object-t)) {
   object-t c = make(klass);
   char8-t* delim = "";
 
@@ -64,15 +61,13 @@ static void check(object-t klass, object-t (*add)(object-t, object-t), void (*ch
   return;
 }
 
-static void check(object-t klass, object-t (*add)(object-t, object-t))
-{
+static void check(object-t klass, object-t (*add)(object-t, object-t)) {
   check(klass, add, check-for-each);
   check(klass, add, check-for);
   return;
 }
 
-int-t main()
-{
+int-t main() {
   check(vector::klass, $add-last);
   check(deque::klass,  $add-last);
   check(sorted-set::klass, $add);

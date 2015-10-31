@@ -2,8 +2,7 @@
 
 klass k1
 {
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     self = $init(super);
     log-klass-func();
     return self;
@@ -14,8 +13,7 @@ klass k2
 {
   superklass k1;
 
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     self = $init(super);
     log-klass-func();
     return self;
@@ -26,16 +24,14 @@ klass k3
 {
   superklass k2;
 
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     self = $init(super);
     log-klass-func();
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t o = make(k3::klass);
 
   char8-t chain[1024] = "";

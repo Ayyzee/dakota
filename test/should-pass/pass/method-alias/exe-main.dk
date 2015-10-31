@@ -1,17 +1,14 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-klass k1
-{
-  method [[alias(real-method)]] object-t alias-method(object-t self);
-  method object-t real-method(object-t self)
-  {
+klass k1 {
+  method [[alias(real-method)]] alias-method(object-t self) -> object-t;
+  method real-method(object-t self) -> object-t {
     log-method();
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t i = make(k1::klass);
   $alias-method(i);
   return 0;

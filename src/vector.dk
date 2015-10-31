@@ -46,11 +46,11 @@ klass vector {
   // using compound literals 'items' can be used as follows:
   // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
-  method object-t init(object-t  self,
+  method init(object-t  self,
                        uint32-t  initial-capacity : gbl-default-initial-capacity,
                        object-t  fill :             gbl-default-fill,
                        object-t  elements :         nullptr,
-                       object-t* items :            nullptr) {
+                       object-t* items :            nullptr) -> object-t {
     // it IS legal to have the 'fill' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);
@@ -74,12 +74,12 @@ klass vector {
       $add-items(self, items);
     return self;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.elements);
     object-t result = $dealloc(super);
     return result;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.count, self.capacity);
@@ -87,7 +87,7 @@ klass vector {
       $dump(element);
     return self;
   }
-  method object-t copy-shallow(object-t self) {
+  method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = make(kls, #capacity : self.capacity);
     slots-t* s1 = unbox(self);
@@ -97,7 +97,7 @@ klass vector {
     s2->iterator-state = 0;
     return copy;
   }
-  method boole-t empty?(object-t self) {
+  method empty?(object-t self) -> boole-t {
     boole-t state;
 
     if (0 == self.count)
@@ -106,7 +106,7 @@ klass vector {
       state = false;
     return state;
   }
-  method object-t empty(object-t self) {
+  method empty(object-t self) -> object-t {
     self.count = 0;
 
     for (object-t forward-iterator = $forward-iterator(self);
@@ -118,7 +118,7 @@ klass vector {
     return self;
   }
   // maybe could return number present
-  method boole-t in?(object-t self, object-t element) {
+  method in?(object-t self, object-t element) -> boole-t {
     boole-t state = false;
 
     for (object-t element2 in self) {
@@ -130,7 +130,7 @@ klass vector {
     return state;
   }
   // reverse in place
-  method object-t reverse(object-t self) {
+  method reverse(object-t self) -> object-t {
     uint32-t head-offset = 0, tail-offset = self.count - 1;
     while (head-offset < tail-offset) {
       object-t head-element = self.elements[head-offset];
@@ -141,7 +141,7 @@ klass vector {
     self.iterator-state++;
     return self;
   }
-  method object-t remove-at(object-t self, uint32-t index) {
+  method remove-at(object-t self, uint32-t index) -> object-t {
     object-t element = self.elements[index];
 
     if (index + 1 < self.capacity)
@@ -153,7 +153,7 @@ klass vector {
     return element;
   }
   // should also have remove-all
-  method object-t remove(object-t self, object-t element) {
+  method remove(object-t self, object-t element) -> object-t {
     // element could be null
     // any/all elements could be null
     object-t object = null; // returns 'null' if element was not present
@@ -168,7 +168,7 @@ klass vector {
     self.iterator-state++;
     return object;
   }
-  method object-t remove-first(object-t self) {
+  method remove-first(object-t self) -> object-t {
     assert(0 != self.count);
     object-t element = self.elements[0];
     memmove(self.elements, self.elements + 1, self.size * (self.count - 1));
@@ -176,15 +176,15 @@ klass vector {
     self.count--;
     return element;
   }
-  method [[alias(remove-last)]] object-t pop(object-t self);
-  method object-t remove-last(object-t self) {
+  method [[alias(remove-last)]] pop(object-t self) -> object-t;
+  method remove-last(object-t self) -> object-t {
     assert(0 != self.count);
     object-t element = self.elements[self.count - 1];
     self.elements[self.count - 1] = self.fill;
     self.count--;
     return element;
   }
-  method object-t replace(object-t self, object-t object1, object-t object2) {
+  method replace(object-t self, object-t object1, object-t object2) -> object-t {
     for (object-t forward-iterator = $forward-iterator(self);
          $next?(forward-iterator);
          $next(forward-iterator)) {
@@ -193,10 +193,10 @@ klass vector {
     }
     return object1;
   }
-  //     method object-t replace-first(object-t self, object-t element);
-  //     method object-t replace-last(object-t self, object-t element);
+  //     method replace-first(object-t self, object-t element) -> object-t;
+  //     method replace-last(object-t self, object-t element) -> object-t;
 
-  method object-t at(object-t self, uint32-t index, object-t default-result) {
+  method at(object-t self, uint32-t index, object-t default-result) -> object-t {
     object-t element = default-result;
     if (self.count > index) {
       element = self.elements[index];
@@ -206,24 +206,24 @@ klass vector {
     return element;
   }
   // should be auto-generated!!!
-  method object-t at(object-t self, object-t boxed-index, object-t default-result) {
+  method at(object-t self, object-t boxed-index, object-t default-result) -> object-t {
     uint32-t index = *uint32::unbox(boxed-index);
     object-t result = $at(self, index, default-result);
     return result;
   }
-  method object-t at(object-t self, uint32-t index) {
+  method at(object-t self, uint32-t index) -> object-t {
     object-t element = $at(self, index, cast(object-t)nullptr);
     if (nullptr == element)
       throw make(exception::klass, #message : "oops");
     return element;
   }
   // should be auto-generated!!!
-  method object-t at(object-t self, object-t boxed-index) {
+  method at(object-t self, object-t boxed-index) -> object-t {
     uint32-t index = *uint32::unbox(boxed-index);
     object-t result = $at(self, index);
     return result;
   }
-  method object-t replace-at(object-t self, uint32-t index, object-t object) {
+  method replace-at(object-t self, uint32-t index, object-t object) -> object-t {
     if (index >= self.capacity)
       throw make(exception::klass, #message : "oops");
 
@@ -234,10 +234,10 @@ klass vector {
       self.count = index + 1;
     return rtn;
   }
-  method uint32-t size(object-t self) {
+  method size(object-t self) -> uint32-t {
     return self.count;
   }
-  method object-t add-first(object-t self, object-t element) {
+  method add-first(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {
@@ -250,11 +250,11 @@ klass vector {
     self.iterator-state++;
     return element;
   }
-  //     method object-t add-at(object-t self, object-t element, uint32-t index);
+  //     method add-at(object-t self, object-t element, uint32-t index) -> object-t;
 
-  method [[alias(add-last)]] object-t add(object-t self, object-t element);
-  method [[alias(add-last)]] object-t push(object-t self, object-t element);
-  method object-t add-last(object-t self, object-t element) {
+  method [[alias(add-last)]] add(object-t self, object-t element) -> object-t;
+  method [[alias(add-last)]] push(object-t self, object-t element) -> object-t;
+  method add-last(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {
@@ -266,20 +266,20 @@ klass vector {
     self.iterator-state++;
     return element;
   }
-  method object-t first(object-t self) {
+  method first(object-t self) -> object-t {
     assert(0 != self.count);
     return self.elements[0];
   }
-  method [[alias(last)]] object-t top(object-t self);
-  method object-t last(object-t self) {
+  method [[alias(last)]] top(object-t self) -> object-t;
+  method last(object-t self) -> object-t {
     assert(0 != self.count);
     return self.elements[self.count - 1];
   }
-  method object-t forward-iterator(object-t self) {
+  method forward-iterator(object-t self) -> object-t {
     object-t forward-iterator = make(vector-forward-iterator::klass, #vector : self);
     return forward-iterator;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -330,7 +330,7 @@ klass vector-forward-iterator {
       throw make(exception::klass, #message : "oops");
     return;
   }
-  method object-t init(object-t self, object-t vector : {~}) {
+  method init(object-t self, object-t vector : {~}) -> object-t {
     self = $init(super);
     assert(null != vector);
     vector::slots-t* a = vector::unbox(vector);
@@ -340,7 +340,7 @@ klass vector-forward-iterator {
     self.iterator-state = a->iterator-state;
     return self;
   }
-  method boole-t first?(object-t self) {
+  method first?(object-t self) -> boole-t {
     boole-t state;
     if (0 == self.index)
       state = true;
@@ -348,11 +348,11 @@ klass vector-forward-iterator {
       state = false;
     return state;
   }
-  method object-t set-element(object-t self, object-t element) {
+  method set-element(object-t self, object-t element) -> object-t {
     $replace-at(self.vector, self.index, element);
     return self;
   }
-  method boole-t next?(object-t self) {
+  method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     boole-t result;
     if (nullptr != $at(self.vector, self.index, cast(object-t)nullptr))
@@ -361,7 +361,7 @@ klass vector-forward-iterator {
       result = false;
     return result;
   }
-  method object-t next(object-t self) {
+  method next(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
@@ -372,7 +372,7 @@ klass vector-forward-iterator {
     //              "vector-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
     return element;
   }
-  method object-t element(object-t self) {
+  method element(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {

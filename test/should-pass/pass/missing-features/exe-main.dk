@@ -3,8 +3,7 @@
 klass text-output-stream;
 klass features; // hackhack
 
-int-t main()
-{
+int-t main() {
   object-t stream = make(text-output-stream::klass);
   $write(stream, "", features::k-trailing-newline);
   return 0;

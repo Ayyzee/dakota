@@ -26,16 +26,16 @@ klass hash;
 klass symbol {
   slots char8-t const*;
 
-  method object-t init(object-t self, slots-t slots : nullptr) {
+  method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     return self;
   }
-  method uint32-t length(slots-t s) {
+  method length(slots-t s) -> uint32-t {
     uint32-t result = cast(uint32-t)safe-strlen(s);
     return result;
   }
-  method int-t compare(slots-t s, slots-t other-s) {
+  method compare(slots-t s, slots-t other-s) -> int-t {
     int-t result;
     if (s == other-s)
       result = 0;
@@ -45,11 +45,11 @@ klass symbol {
     //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
     return result;
   }
-  method int-t compare(slots-t* s, slots-t* other-s) {
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
     int-t result = compare(*s, *other-s);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     int-t result;
 
     if ($instance?(other, klass)) {
@@ -62,21 +62,21 @@ klass symbol {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n",
             cast(ptr-t)(self), cast(ptr-t)unbox(self), $utf8-from(self));
     return self;
   }
-  method hash-t hash(slots-t s) {
+  method hash(slots-t s) -> hash-t {
     hash-t result = dk-hash(s);
     return result;
   }
-  method str-t utf8-from(object-t self) {
+  method utf8-from(object-t self) -> str-t {
     str-t utf8 = *unbox(self);
     return utf8;
   }
-  method object-t write-lite(object-t self, object-t out) {
+  method write-lite(object-t self, object-t out) -> object-t {
     str-t utf8 = $utf8-from(self);
     $write(out, "\"");
     $write(out, utf8);

@@ -3,8 +3,7 @@
 klass deque;
 trait stack;
 
-int-t main()
-{
+int-t main() {
   int-t value = 0;
 
   try
@@ -15,8 +14,7 @@ int-t main()
     USE(object);
     // hackhack: should test for null
   }
-  catch(...)
-  {
+  catch(...) {
     fprintf(stderr, "ERROR: uncaught exception\n");
     value = 1;
   }

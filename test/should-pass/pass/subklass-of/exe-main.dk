@@ -20,8 +20,7 @@ klass k3
 #define DUMP(val, cmd) printf("%i == %i = " # cmd "\n", val, cmd)
 
 int
-main()
-{
+main() {
   object-t o1 = make(k1::klass);
   object-t o2 = make(k2::klass);
   object-t o3 = make(k3::klass);

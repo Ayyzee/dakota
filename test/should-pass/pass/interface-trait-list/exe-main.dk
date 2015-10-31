@@ -13,7 +13,6 @@ klass zz::k1
 //  trait xx::i1, yy::i2;
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

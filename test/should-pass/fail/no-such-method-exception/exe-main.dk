@@ -2,8 +2,7 @@
 
 klass sequence;
 
-int-t main()
-{
+int-t main() {
   object-t o = make(object::klass);
   $add-last(o, o);
   return(0);

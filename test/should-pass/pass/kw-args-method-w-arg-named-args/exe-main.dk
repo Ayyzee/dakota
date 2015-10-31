@@ -2,15 +2,13 @@
 
 klass k1
 {
-  method object-t init(object-t self, char8-t** args : {})
-  {
+  method init(object-t self, char8-t** args : {}) -> object-t {
     self = $init(super);
     //
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

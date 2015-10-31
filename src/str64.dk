@@ -27,12 +27,12 @@ klass object-output-stream;
 klass str64 {
   slots char8-t[64];
 
-  method slots-t* dump(slots-t* s) {
+  method dump(slots-t* s) -> slots-t*{
   //$dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n", cast(ptr-t)nullptr, cast(ptr-t)(s), *s);
     return s;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -41,12 +41,12 @@ klass str64 {
     $write-slots-end(out);
     return self;
   }
-  method int-t compare(slots-t* s, slots-t* other-s) {
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
     int-t result = cast(int-t)safe-strncmp(cast(str-t)(s), cast(str-t)(other-s), sizeof(slots-t));
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     int-t result;
 
     if ($instance?(other, klass)) {

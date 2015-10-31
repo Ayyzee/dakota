@@ -4,8 +4,7 @@
 
 klass string;
 
-int-t main()
-{
+int-t main() {
 //   int-t overwrite;
 //   setenv("DK_ENABLE_TRACE", "", overwrite = 1);
 

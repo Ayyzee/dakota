@@ -4,23 +4,20 @@
 
 klass k1
 {
-  method object-t init(object-t self, uint32-t count : 0)
-  {
+  method init(object-t self, uint32-t count : 0) -> object-t {
     self = $init(super);
     assert(0x0c0c0c0c == count);
     //
     return self;
   }
-  method object-t foo(object-t self, object-t bar : nullptr)
-  {
+  method foo(object-t self, object-t bar : nullptr) -> object-t {
     assert((object-t)0xf0f0f0f0 == bar);
     //
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t o = make(k1::klass, #count : 0x0c0c0c0c);
   $foo(o, #bar : 0xf0f0f0f0);
   return 0;

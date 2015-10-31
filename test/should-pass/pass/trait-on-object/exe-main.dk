@@ -4,8 +4,7 @@ klass string;
 
 trait t1
 {
-  method object-t foobar(object-t self)
-  {
+  method foobar(object-t self) -> object-t {
     return self;
   }
 }
@@ -15,8 +14,7 @@ klass object
   trait t1;
 }
 
-int-t main()
-{
+int-t main() {
   object-t o = make(string::klass);
   $foobar(o);
   return 0;

@@ -47,12 +47,12 @@ klass hashed-set {
 
     uint32-t iterator-state;
   }
-  object-t initialize(object-t kls) {
+  initialize(object-t kls) -> object-t {
     dk-klass-for-name(#deque); // hackhack
     dk-klass-for-name(#vector); // hackhack
     return kls;
   }
-  object-t finalize(object-t kls) {
+  finalize(object-t kls) -> object-t {
     return kls;
   }
   // 'elements' is a collection (of objects)
@@ -60,9 +60,9 @@ klass hashed-set {
   // using compound literals 'items' can be used as follows:
   // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
-  method object-t init(object-t  self,
+  method init(object-t  self,
                        object-t  elements : nullptr,
-                       object-t* items :    nullptr) {
+                       object-t* items :    nullptr) -> object-t {
     self = $init(super);
     self.num-buckets = gbl-prime;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);
@@ -77,7 +77,7 @@ klass hashed-set {
       $add-items(self, items);
     return self;
   }
-  method object-t add(object-t self, object-t object1) {
+  method add(object-t self, object-t object1) -> object-t {
     uint32-t index = $hash(object1) % self.num-buckets;
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
@@ -105,14 +105,14 @@ klass hashed-set {
     }
     return object1;
   }
-  method object-t empty(object-t self) {
+  method empty(object-t self) -> object-t {
     if (0 != self.size) {
       self.iterator-state++;
       $empty(self.buckets);
     }
     return self;
   }
-  method object-t in(object-t self, object-t object1, object-t default-value) {
+  method in(object-t self, object-t object1, object-t default-value) -> object-t {
     uint32-t index = $hash(object1) % self.num-buckets;
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
@@ -127,13 +127,13 @@ klass hashed-set {
     }
     return result;
   }
-  method object-t in(object-t self, object-t object) {
+  method in(object-t self, object-t object) -> object-t {
     object-t result = $in(self, object, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #message : "oops");
     return result;
   }
-  method boole-t in?(object-t self, object-t key) {
+  method in?(object-t self, object-t key) -> boole-t {
     boole-t state;
 
     if (nullptr == $in(self, key, cast(object-t)nullptr))
@@ -142,7 +142,7 @@ klass hashed-set {
       state = true;
     return state;
   }
-  method boole-t empty?(object-t self) {
+  method empty?(object-t self) -> boole-t {
     boole-t state;
 
     if (0 == self.size)
@@ -151,7 +151,7 @@ klass hashed-set {
       state = false;
     return state;
   }
-  method object-t remove(object-t self, object-t element1) {
+  method remove(object-t self, object-t element1) -> object-t {
     object-t object = null;
 
     uint32-t index = $hash(element1) % self.num-buckets;
@@ -175,7 +175,7 @@ klass hashed-set {
     }
     return object;
   }
-  method object-t copy-shallow(object-t self) {
+  method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = make(kls);
     slots-t* s1 = unbox(self);
@@ -185,14 +185,14 @@ klass hashed-set {
     s2->iterator-state = 0;
     return copy;
   }
-  method uint32-t size(object-t self) {
+  method size(object-t self) -> uint32-t {
     return self.size;
   }
-  method object-t forward-iterator(object-t self) {
+  method forward-iterator(object-t self) -> object-t {
     object-t forward-iterator = make(hashed-set-forward-iterator::klass, #hashed-set : self);
     return forward-iterator;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { size=%u, elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.size);
@@ -200,7 +200,7 @@ klass hashed-set {
       $dump(element);
     return self;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -231,7 +231,7 @@ klass hashed-set-forward-iterator {
       throw make(exception::klass, #message : "oops");
     return;
   }
-  method object-t init(object-t self, object-t hashed-set : {~}) {
+  method init(object-t self, object-t hashed-set : {~}) -> object-t {
     self = $init(super);
     assert(null != hashed-set);
     hashed-set::slots-t* hs = hashed-set::unbox(hashed-set);
@@ -246,7 +246,7 @@ klass hashed-set-forward-iterator {
     }
     return self;
   }
-  method boole-t next?(object-t self) {
+  method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     boole-t result = false;
     if (nullptr != self.deque-iter)
@@ -262,7 +262,7 @@ klass hashed-set-forward-iterator {
     }
     return deque-iter;
   }
-  method object-t next(object-t self) {
+  method next(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
@@ -279,7 +279,7 @@ klass hashed-set-forward-iterator {
     }
     return element;
   }
-  method object-t element(object-t self) {
+  method element(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {

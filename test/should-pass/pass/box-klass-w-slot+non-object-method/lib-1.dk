@@ -8,8 +8,7 @@ klass bk
 {
   slots int32-t;
 
-  method slots-t max(slots-t s, slots-t other-s)
-  {
+  method max(slots-t s, slots-t other-s) -> slots-t {
     slots-t result;
     if (s >= other-s)
       result = s;

@@ -1,7 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-int-t main(int-t argc, char8-t* argv[])
-{
+int-t main(int-t argc, char8-t* argv[]) {
   const char8-t* name = "sorted-table";
   if (2 == argc)
     name = argv[argc - 1];

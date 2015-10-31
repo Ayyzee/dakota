@@ -6,8 +6,7 @@ static str64-t s1 = "mother";
 static str64-t s2 = "father";
 static str64-t s3 = "sister";
 
-int-t main()
-{
+int-t main() {
   {
     object-t o1 = str64::box(s1);
     object-t o2 = str64::box(s2);

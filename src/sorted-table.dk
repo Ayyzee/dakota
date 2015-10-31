@@ -22,7 +22,7 @@ klass sorted-table {
   superklass sorted-set;
   trait      table;
 
-  method object-t va::init(object-t self, va-list-t args) {
+  method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
     return self;
   }

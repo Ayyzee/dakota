@@ -11,8 +11,7 @@ klass bk
     int32-t s1;
   }
 
-  method slots-t* max(slots-t* s, slots-t* other-s)
-  {
+  method max(slots-t* s, slots-t* other-s) -> slots-t*{
     slots-t* result;
     if (s->s1 >= other-s->s1)
       result = s;

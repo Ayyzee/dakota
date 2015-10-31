@@ -9,14 +9,12 @@ klass k1
     int32-t s1;
   }
 
-  method slots-t* init(slots-t* s, int32-t s1 : 0)
-  {
+  method init(slots-t* s, int32-t s1 : 0) -> slots-t*{
     s->s1 = s1;
     return s;
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

@@ -4,15 +4,13 @@ klass k1;
 
 klass k2
 {
-  method object-t f2(object-t self, object-t o)
-  {
+  method f2(object-t self, object-t o) -> object-t {
     $f1(o);
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t i1 = make(k1::klass);
   object-t i2 = make(k2::klass);
 

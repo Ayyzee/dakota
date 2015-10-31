@@ -23,7 +23,7 @@ klass slot-info {
     uint32-t size;   // never 0
   }
 
-  method object-t init(object-t self, slots-t slots : {nullptr, 0}) {
+  method init(object-t self, slots-t slots : {nullptr, 0}) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     return self;

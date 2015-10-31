@@ -15,8 +15,7 @@ klass path {
     //object-t rdn;
   }
 
-  method object-t init(object-t self, const char8-t* bytes : nullptr, const char8-t* delimiter : default-delimiter)
-  {
+  method init(object-t self, const char8-t* bytes : nullptr, const char8-t* delimiter : default-delimiter) -> object-t {
     self = $init(super, #bytes : bytes);
     self.delimiter = delimiter;
     //self.rdn = make(string::klass, #bytes : "Robert D. Nielsen");

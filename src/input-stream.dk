@@ -37,9 +37,9 @@ klass input-stream {
   
   slots stream-t;
 
-  method object-t init(object-t self,
+  method init(object-t self,
                        slots-t  slots :    stdin,
-                       str-t    filename : nullptr) {
+                       str-t    filename : nullptr) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     assert(stdout != slots);
@@ -55,7 +55,7 @@ klass input-stream {
     }
     return self;
   }
-  method object-t close(object-t self) {
+  method close(object-t self) -> object-t {
     slots-t slots = *unbox(self);
 #if defined DEBUG
     if (stdin == slots)
@@ -67,10 +67,10 @@ klass input-stream {
       throw make(system-exception::klass, #errnum : errno);
     return self;
   }
-  method uint32-t read(object-t self,
+  method read(object-t self,
                        ptr-t    buffer,
                        uint32-t element-size,
-                       uint32-t num-elements-max) {
+                       uint32-t num-elements-max) -> uint32-t {
     uint32-t num-elements-read = cast(uint32-t)fread(buffer,
                                                      cast(size-t)element-size,
                                                      cast(size-t)num-elements-max,

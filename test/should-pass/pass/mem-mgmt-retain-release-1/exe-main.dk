@@ -4,33 +4,28 @@ klass autorelease-pool;
 
 klass my-object
 {
-  method object-t retain(object-t self)
-  {
+  method retain(object-t self) -> object-t {
     printf("%s:%s(%p)\n", __klass__, __method__->name, (void*)self);
     return $retain(super);
   }
 
-  method object-t autorelease(object-t self)
-  {
+  method autorelease(object-t self) -> object-t {
     printf("%s:%s(%p)\n", __klass__, __method__->name, (void*)self);
     return $autorelease(super);
   }
 
-  method object-t release(object-t self)
-  {
+  method release(object-t self) -> object-t {
     printf("%s:%s(%p)\n", __klass__, __method__->name, (void*)self);
     return $release(super);
   }
 
-  method object-t dealloc(object-t self)
-  {
+  method dealloc(object-t self) -> object-t {
     printf("%s:%s(%p)\n", __klass__, __method__->name, (void*)self);
     return $dealloc(super);
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t s = make(my-object::klass);
   uint32-t c = 2;
 

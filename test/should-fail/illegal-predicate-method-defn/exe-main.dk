@@ -2,13 +2,11 @@
 
 klass o1
 {
-  method object-t empty?(object-t self)
-  {
+  method empty?(object-t self) -> object-t {
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

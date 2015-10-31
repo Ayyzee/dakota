@@ -16,8 +16,7 @@
 
 klass k1
 {
-  object-t initialize(object-t kls)
-  {
+  initialize(object-t kls) -> object-t {
     USE(kls);
     object-t k2-klass-info = dk-make-named-info(#k2, nullptr);
     object-t k2-klass-klass = dk-klass-for-name(#klass);
@@ -27,7 +26,6 @@ klass k1
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

@@ -864,7 +864,7 @@ sub function::decl {
   }
   my $return_type = &arg::type($$function{'return-type'});
   my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
-  $function_decl .= $visibility . $func_spec . "$return_type $name($parameter_types);";
+  $function_decl .= $visibility . $func_spec . "auto $name($parameter_types) -> $return_type;";
   return \$function_decl;
 }
 sub function::overloadsig_parts {
@@ -954,7 +954,7 @@ sub method::generate_va_method_defn {
   my $scope_va = &dakota::util::deep_copy($scope);
   &dakota::util::add_last($scope_va, '::');
   &dakota::util::add_last($scope_va, 'va');
-  $$scratch_str_ref .= $visibility . $func_spec . "$return_type $va_method_name($$new_arg_list_va_ref)";
+  $$scratch_str_ref .= $visibility . $func_spec . "auto $va_method_name($$new_arg_list_va_ref) -> $return_type";
 
   if (!$$va_method{'defined?'} || &is_nrt_decl() || &is_rt_decl()) {
     $$scratch_str_ref .= "; }" . &ann(__FILE__, $line) . "\n";
@@ -1037,7 +1037,7 @@ sub common::print_signature {
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
-  $scratch_str .= $visibility . "signature-t const* $generic_name($$new_arg_type_list)";
+  $scratch_str .= $visibility . "auto $generic_name($$new_arg_type_list) -> signature-t const*";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= '; }' . "\n";
@@ -1057,7 +1057,7 @@ sub common::print_signature {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= $col . "static signature-t const result = { \"$return_type_str\", \"$name_str\", \"$parameter_types_str\" };\n";
+    $scratch_str .= $col . "static signature-t const result = { \"$name_str\", \"$parameter_types_str\", \"$return_type_str\" };\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
 
@@ -1139,7 +1139,7 @@ sub common::print_selector {
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
-  $scratch_str .= $visibility . "selector-t* $generic_name($$new_arg_type_list)";
+  $scratch_str .= $visibility . "auto $generic_name($$new_arg_type_list) -> selector-t*";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= '; }' . $in . "\n";
@@ -1431,7 +1431,7 @@ sub generics::generate_generic_defn {
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
 
-  $$scratch_str_ref .= $visibility . $func_spec . "$return_type $generic_name($$new_arg_list)";
+  $$scratch_str_ref .= $visibility . $func_spec . "auto $generic_name($$new_arg_list) -> $return_type";
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
@@ -1521,7 +1521,7 @@ sub generics::generate_super_generic_defn {
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
 
-  $$scratch_str_ref .= $visibility . $func_spec . "$return_type $generic_name($$new_arg_list)";
+  $$scratch_str_ref .= $visibility . $func_spec . "auto $generic_name($$new_arg_list) -> $return_type";
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
@@ -2265,7 +2265,7 @@ sub generate_object_method_defn {
     $visibility = 'SO-EXPORT ';
   }
   my $method_name = "@{$$method{'name'}}";
-  $$scratch_str_ref .= $col . "$klass_type @$klass_path { METHOD " . $visibility . " $return_type $method_name($$new_arg_list)";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_path { METHOD " . $visibility . "auto $method_name($$new_arg_list) -> $return_type";
 
   my $new_unboxed_arg_names = &arg_type::names_unboxed($$non_object_method{'parameter-types'});
   my $new_unboxed_arg_names_list = &arg_type::list_names($new_unboxed_arg_names);
@@ -3597,7 +3597,7 @@ sub generate_kw_args_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $kw_list_types = &method::kw_list_types($method);
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC signature-t const* $method_name($$list_types); }}}" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC auto $method_name($$list_types) -> signature-t const*; }}}" . &ann(__FILE__, __LINE__) . "\n";
 }
 sub generate_kw_args_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3605,12 +3605,12 @@ sub generate_kw_args_method_signature_defn {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC signature-t const* $method_name($$list_types) {" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC auto $method_name($$list_types) -> signature-t const* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
-  my $kw_arg_list = "static signature-t const result = { \"$return_type\", \"$method_name\", \"";
+  my $kw_arg_list = "static signature-t const result = { \"$method_name\", \"";
   $kw_arg_list .= &method::kw_list_types($method);
-  $kw_arg_list .= "\" };";
+  $kw_arg_list .= "\", \"$return_type\" };";
   $$scratch_str_ref .=
     $col . "$kw_arg_list\n" .
     $col . "return &result;\n";
@@ -3623,7 +3623,7 @@ sub generate_slots_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC signature-t const* $method_name($$list_types); }}" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC auto $method_name($$list_types) -> signature-t const*; }}" . &ann(__FILE__, __LINE__) . "\n";
 }
 sub generate_slots_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3631,12 +3631,12 @@ sub generate_slots_method_signature_defn {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC signature-t const* $method_name($$list_types) {" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC auto $method_name($$list_types) -> signature-t const* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
-  my $arg_list = "static signature-t const result = { \"$return_type\", \"$method_name\", \"";
+  my $arg_list = "static signature-t const result = { \"$method_name\", \"";
   $arg_list .= &method::list_types($method);
-  $arg_list .= "\" };";
+  $arg_list .= "\", \"$return_type\" };";
   $$scratch_str_ref .=
     $col . "$arg_list\n" .
     $col . "return &result;\n";
@@ -3682,7 +3682,7 @@ sub generate_kw_args_method_defn {
   my $list_names = &arg_type::list_names($$method{'parameter-types'});
 
   $$scratch_str_ref .=
-    "$klass_type @$klass_name { namespace va { KW-ARGS-METHOD " . $visibility . $func_spec . "$return_type $method_name($$new_arg_list) {" . &ann(__FILE__, __LINE__) . "\n";
+    "$klass_type @$klass_name { namespace va { KW-ARGS-METHOD " . $visibility . $func_spec . "auto $method_name($$new_arg_list) -> $return_type {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
   $$scratch_str_ref .=

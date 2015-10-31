@@ -4,8 +4,7 @@ klass string;
 
 namespace string {}
 
-int-t main()
-{
+int-t main() {
   object-t str = make(string::klass, #bytes : "hello world!");
   $println(str, std-output);
   return 0;

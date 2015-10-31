@@ -159,7 +159,7 @@ sub sst::make {
 
   my $sst = {
     'prev-line' => 0,
-    'file' => '',
+    'file' => undef,
     'line' => 1,
     'tokens' => [],
     'tokens-count' => 0,
@@ -184,6 +184,7 @@ sub sst::make {
     elsif (m/\G(\#(\(|\{|\[))/gc)         { &sst::add_token($sst, $1); }
     elsif (m|\G($id)|gc)                  { &sst::add_token($sst, $1); }
     elsif (m|\G(\d+)|gc)                  { &sst::add_token($sst, $1); }
+    elsif (m|\G(=>)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(->)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(<<)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(>>)|gc)                   { &sst::add_token($sst, $1); }

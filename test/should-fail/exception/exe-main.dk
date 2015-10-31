@@ -2,8 +2,7 @@
 
 klass exception;
 
-int-t main()
-{
+int-t main() {
   throw make(exception::klass, message : "oops");
   return 0;
 }

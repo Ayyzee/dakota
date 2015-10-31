@@ -22,7 +22,7 @@ trait forward-iterator;
 klass sequence {
   superklass collection;
 
-  method object-t write-lite(object-t self, object-t out) {
+  method write-lite(object-t self, object-t out) -> object-t {
     $write(out, "[");
     str-t delim = "";
 
@@ -34,36 +34,36 @@ klass sequence {
     $write(out, "]");
     return self;
   }
-  method object-t add-all-first(object-t self, object-t collection) {
+  method add-all-first(object-t self, object-t collection) -> object-t {
     for (object-t element in collection)
       $add-first(self, element);
     return collection;
   }
-  method object-t add-all-last(object-t self, object-t collection) {
+  method add-all-last(object-t self, object-t collection) -> object-t {
     for (object-t element in collection)
       $add-last(self, element);
     return collection;
   }
-  method object-t add-first(object-t self, object-t element);
-  method object-t add-last(object-t self, object-t element);
-  method object-t remove-first(object-t self);
-  method object-t remove-last(object-t self);
+  method add-first(object-t self, object-t element) -> object-t;
+  method add-last(object-t self, object-t element) -> object-t;
+  method remove-first(object-t self) -> object-t;
+  method remove-last(object-t self) -> object-t;
 
-  //     method uint32-t first-index(object-t self, object-t element);
-  //     method uint32-t last-index(object-t self, object-t element);
+  //     method first-index(object-t self, object-t element) -> uint32-t;
+  //     method last-index(object-t self, object-t element) -> uint32-t;
 
-  //     method object-t first(object-t self);
-  //     method object-t last(object-t self);
-  //     method object-t add-first(object-t self, object-t element);
-  //     method object-t add-last(object-t self, object-t element);
-  //     method object-t remove-first(object-t self);
-  //     method object-t remove-last(object-t self);
-  //     method object-t replace-first(object-t self, object-t element);
-  //     method object-t replace-last(object-t self, object-t element);
-  //     method object-t reverse(object-t self);
+  //     method first(object-t self) -> object-t;
+  //     method last(object-t self) -> object-t;
+  //     method add-first(object-t self, object-t element) -> object-t;
+  //     method add-last(object-t self, object-t element) -> object-t;
+  //     method remove-first(object-t self) -> object-t;
+  //     method remove-last(object-t self) -> object-t;
+  //     method replace-first(object-t self, object-t element) -> object-t;
+  //     method replace-last(object-t self, object-t element) -> object-t;
+  //     method reverse(object-t self) -> object-t;
 
-  //     method object-t add-at(object-t self, uint32-t offset, object-t element);
-  //     method object-t remove-at(object-t self, uint32-t offset);
-  //     method object-t at(object-t self, uint32-t offset); // o = a[i]  vs  o = at(a, i);
-  //     method object-t replace-at(object-t self, uint32-t offset, object-t object);
+  //     method add-at(object-t self, uint32-t offset, object-t element) -> object-t;
+  //     method remove-at(object-t self, uint32-t offset) -> object-t;
+  //     method at(object-t self, uint32-t offset) -> object-t; // o = a[i]  vs  o = at(a, i);
+  //     method replace-at(object-t self, uint32-t offset, object-t object) -> object-t;
 }

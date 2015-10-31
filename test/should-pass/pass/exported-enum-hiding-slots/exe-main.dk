@@ -14,8 +14,7 @@ klass k1
     uint32-t value;
   }
 
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     printf("%s:%s()\n", __klass__, __func__);
     self = $init(super);
     self.value = k-e0;
@@ -23,8 +22,7 @@ klass k1
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t i = make(k1::klass);
   USE(i);
   return 0;

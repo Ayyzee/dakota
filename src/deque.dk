@@ -89,7 +89,7 @@ klass deque {
 
     uint32-t iterator-state;
   }
-  method object-t test-dump(object-t self) {
+  method test-dump(object-t self) -> object-t {
     slots-t* s = unbox(self);
     if (nullptr != s) {
       fprintf(stderr, "  subgraph \"cluster-%p-%i\"\n", cast(ptr-t)(s), s->iterator-state);
@@ -121,7 +121,7 @@ klass deque {
     }
     return self;
   }
-  method object-t init(object-t self, object-t element : nullptr) {
+  method init(object-t self, object-t element : nullptr) -> object-t {
     self = $init(super);
 
     if (nullptr == element) {
@@ -148,11 +148,11 @@ klass deque {
       snprintf(buf, buf-len, "%p", cast(ptr-t)mn);
     return self;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     object-t result = $write-slots(self, std-output);
     return result;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
 //     dkt-log(stdout, "deque: %s(%p, ...)\n",
 //            __func__, cast(ptr-t)deque);
@@ -183,7 +183,7 @@ klass deque {
     }
     return self;
   }
-  method object-t copy-shallow(object-t self) {
+  method copy-shallow(object-t self) -> object-t {
     USE(self);
     throw make(exception::klass, #message : "not yet implemented");
     return null;
@@ -193,10 +193,10 @@ klass deque {
   // before
   // after
 
-  method uint32-t size(object-t self) {
+  method size(object-t self) -> uint32-t {
     return self.size;
   }
-  method boole-t empty?(object-t self) {
+  method empty?(object-t self) -> boole-t {
     boole-t state;
 
     if (0 == self.size)
@@ -205,12 +205,12 @@ klass deque {
       state = false;
     return state;
   }
-  method object-t empty(object-t self) {
+  method empty(object-t self) -> object-t {
     USE(self);
     throw make(exception::klass, #message : "not yet implemented");
     return null;
   }
-  method object-t add-first(object-t self, object-t element) {
+  method add-first(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
     node::slots-t* node = node::create(nullptr, element, self.first); // self.first may be nullptr
     //        node->prev = nullptr;
@@ -220,9 +220,9 @@ klass deque {
     self.iterator-state++;
     return self;
   }
-  method [[alias(add-last)]] object-t add(object-t self, object-t element);
-  method [[alias(add-last)]] object-t push(object-t self, object-t element);
-  method object-t add-last(object-t self, object-t element) {
+  method [[alias(add-last)]] add(object-t self, object-t element) -> object-t;
+  method [[alias(add-last)]] push(object-t self, object-t element) -> object-t;
+  method add-last(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
     node::slots-t* node = node::create(self.last, element, nullptr); // self.last may be nullptr
     if (nullptr != self.last)
@@ -238,7 +238,7 @@ klass deque {
     //   deque::dump(self, stderr);
     return self;
   }
-  method object-t first(object-t self) {
+  method first(object-t self) -> object-t {
     assert(0 != self.size);
     //assert(nullptr != self.first);
     object-t element = nullptr;
@@ -246,8 +246,8 @@ klass deque {
       element = self.first->element;
     return element;
   }
-  method [[alias(last)]] object-t top(object-t self);
-  method object-t last(object-t self) {
+  method [[alias(last)]] top(object-t self) -> object-t;
+  method last(object-t self) -> object-t {
     assert(0 != self.size);
     //assert(nullptr != self.last);
     object-t element = nullptr;
@@ -255,7 +255,7 @@ klass deque {
       element = self.last->element;
     return element;
   }
-  method object-t remove-first(object-t self) {
+  method remove-first(object-t self) -> object-t {
     assert(0 != self.size);
     assert(nullptr != self.first);
     object-t element = nullptr;
@@ -282,8 +282,8 @@ klass deque {
     self.iterator-state++;
     return element;
   }
-  method [[alias(remove-last)]] object-t pop(object-t self);
-  method object-t remove-last(object-t self) {
+  method [[alias(remove-last)]] pop(object-t self) -> object-t;
+  method remove-last(object-t self) -> object-t {
     assert(0 != self.size);
     //assert(nullptr != self.last);
     node::slots-t* node = self.last;
@@ -298,20 +298,20 @@ klass deque {
     self.iterator-state++;
     return node->element;
   }
-  //     method object-t replace-first(object-t self, object-t element);
-  //     method object-t replace-last(object-t self, object-t element);
+  //     method replace-first(object-t self, object-t element) -> object-t;
+  //     method replace-last(object-t self, object-t element) -> object-t;
 
   // reverse in place
-  method object-t reverse(object-t self) {
+  method reverse(object-t self) -> object-t {
     USE(self);
     throw make(exception::klass, #message : "not yet implemented");
     return null;
   }
-  method object-t forward-iterator(object-t self) {
+  method forward-iterator(object-t self) -> object-t {
     object-t forward-iterator = make(deque-forward-iterator::klass, #deque : self);
     return forward-iterator;
   }
-  //      method object-t write-element(object-t self, object-t out, str-t name) {
+  //      method write-element(object-t self, object-t out, str-t name) -> object-t {
   //        if (null == out)
   //          { out = std-output; } // wrong! should be system::object-out
   //        char8-t[128] buffer;
@@ -348,7 +348,7 @@ klass deque-forward-iterator {
       throw make(exception::klass, #message : "oops");
     return;
   }
-  method object-t init(object-t self, object-t deque : {~}) {
+  method init(object-t self, object-t deque : {~}) -> object-t {
     self = $init(super);
     assert($instance?(deque, deque::klass));
     deque::slots-t* d = deque::unbox(deque);
@@ -358,7 +358,7 @@ klass deque-forward-iterator {
     self.iterator-state = d->iterator-state;
     return self;
   }
-  method object-t remove(object-t self) {
+  method remove(object-t self) -> object-t {
     check-iterator-state(self);
     //assert(nullptr != self.node);
     node::slots-t* node = self.node;
@@ -375,18 +375,18 @@ klass deque-forward-iterator {
     deque::unbox(self.deque)->size--;
     return node->element;
   }
-  method object-t set-element(object-t self, object-t element) {
+  method set-element(object-t self, object-t element) -> object-t {
     check-iterator-state(self);
     self.node->element = element;
     return self;
   }
-  //     method boole-t last?(object-t self) {
+  //     method last?(object-t self) -> boole-t {
   //       deque::slots-t* d = deque::unbox(self.deque);
   //       boole-t state = (null == d->next);
 
   //       return state;
   //     }
-  method boole-t next?(object-t self) {
+  method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     boole-t result;
     if (nullptr != self.node)
@@ -395,7 +395,7 @@ klass deque-forward-iterator {
       result = false;
     return result;
   }
-  method object-t next(object-t self) {
+  method next(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
@@ -406,7 +406,7 @@ klass deque-forward-iterator {
     //              "deque-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
     return element;
   }
-  method object-t element(object-t self) {
+  method element(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {

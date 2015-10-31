@@ -73,7 +73,7 @@ klass bit-vector {
   static const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const uint32-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
 
-  method object-t init(object-t self, uint32-t initial-capacity : gbl-default-initial-capacity) {
+  method init(object-t self, uint32-t initial-capacity : gbl-default-initial-capacity) -> object-t {
     self = $init(super);
     if (0 == initial-capacity)
       initial-capacity = gbl-default-initial-capacity;
@@ -84,12 +84,12 @@ klass bit-vector {
     memset(self.elements, 0, sizeof(self.elements[0]) * num-elements);
     return self;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.elements);
     object-t result = $dealloc(super);
     return result;
   }
-  method object-t copy-shallow(object-t self) {
+  method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = make(kls);
     slots-t* s1 = unbox(self);
@@ -100,7 +100,7 @@ klass bit-vector {
     memcpy(s2->elements, self.elements, sizeof(self.elements[0]) * num-elements);
     return copy;
   }
-  method boole-t bit(object-t self, uint32-t index) {
+  method bit(object-t self, uint32-t index) -> boole-t {
     uint32-t offset = index/gbl-element-width;
     uint32-t mask = 1 << (index % gbl-element-width);
     if (self.count < (offset + 1))
@@ -109,7 +109,7 @@ klass bit-vector {
     boole-t result = (self.elements[offset] & mask);
     return result;
   }
-  method object-t set-bit(object-t self, uint32-t index, boole-t value) {
+  method set-bit(object-t self, uint32-t index, boole-t value) -> object-t {
     uint32-t offset = index/gbl-element-width;
     uint32-t mask = 1 << (index % gbl-element-width);
     if (self.count < (offset + 1))
@@ -121,15 +121,15 @@ klass bit-vector {
       self.elements[offset] |= mask;  // set bit to one
     return self;
   }
-//   method object-t clr-bit(object-t self, uint32-t index)
+//   method clr-bit(object-t self, uint32-t index)
 //   {
-//     return set-bit(self, index, false);
+//     return set-bit(self, index, false) -> object-t;
 //   }
-//   method object-t set-bit(object-t self, uint32-t index)
+//   method set-bit(object-t self, uint32-t index)
 //   {
-//     return set-bit(self, index, true);
+//     return set-bit(self, index, true) -> object-t;
 //   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     stream-t out = stderr;
     fprintf(out, "%p:%p { count=%i, capacity=%i, elements=\"",
@@ -157,7 +157,7 @@ klass bit-vector {
   static uint32-t op-bit-xor(uint32-t i1, uint32-t i2) {
     return i1 ^ i2;
   }
-  method object-t bit-not(object-t self) {
+  method bit-not(object-t self) -> object-t {
     slots-t* self-slots =  unbox(self);
     for (uint32-t offset = 0; offset < self-slots->count; offset++)
       self-slots->elements[offset] = ~self-slots->elements[offset];
@@ -186,31 +186,31 @@ klass bit-vector {
     }
     return result;
   }
-  method object-t bit-and(object-t self, object-t other) {
+  method bit-and(object-t self, object-t other) -> object-t {
     op-common(self, other, op-bit-and);
     return self;
   }
-  method object-t bit-or(object-t self, object-t other) {
+  method bit-or(object-t self, object-t other) -> object-t {
     op-common(self, other, op-bit-or);
     return self;
   }
-  method object-t bit-xor(object-t self, object-t other) {
+  method bit-xor(object-t self, object-t other) -> object-t {
     op-common(self, other, op-bit-xor);
     return self;
   }
-  method boole-t bit-and?(object-t self, object-t other) {
+  method bit-and?(object-t self, object-t other) -> boole-t {
     boole-t result = op-common?(self, other, op-bit-and);
     return result;
   }
-  method boole-t bit-or?(object-t self, object-t other) {
+  method bit-or?(object-t self, object-t other) -> boole-t {
     boole-t result = op-common?(self, other, op-bit-or);
     return result;
   }
-  method boole-t bit-xor?(object-t self, object-t other) {
+  method bit-xor?(object-t self, object-t other) -> boole-t {
     boole-t result = op-common?(self, other, op-bit-xor);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result = 0;
 

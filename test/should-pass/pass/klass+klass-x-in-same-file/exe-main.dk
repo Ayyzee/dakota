@@ -3,13 +3,13 @@
 klass output-stream;
 
 klass foobar {
-  method object-t foo(object-t self) {
+  method foo(object-t self) -> object-t {
     $print-format(std-output, "%s:%s(%s)\n", __klass__, __method__->name, __method__->parameter-types);
     return self;
   }
 }
 klass foobar {
-  method object-t bar(object-t self) {
+  method bar(object-t self) -> object-t {
     $print-format(std-output, "%s:%s(%s)\n", __klass__, __method__->name, __method__->parameter-types);
     return self;
   }

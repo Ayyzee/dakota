@@ -4,8 +4,7 @@ klass string; // $length()
 
 // no-such-method
 
-int-t main()
-{
+int-t main() {
   object-t o = make(object::klass);
   $length(o);
   return 0;

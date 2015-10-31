@@ -24,20 +24,20 @@ module dakota;
 
 klass signature {
   slots {
-    str-t return-type; // not considered in compare()
     str-t name;
     str-t parameter-types;
+    str-t return-type; // not considered in compare()
   }
-  method object-t init(object-t self, slots-t slots : {nullptr, nullptr, nullptr}) {
+  method init(object-t self, slots-t slots : {nullptr, nullptr, nullptr}) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     return self;
   }
-  method slots-t* dump(slots-t* s) {
+  method dump(slots-t* s) -> slots-t*{
     printf("%s(%s)", s->name, s->parameter-types);
     return s;
   }
-  method int-t compare(slots-t* s, slots-t* other-s) {
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
@@ -54,7 +54,7 @@ klass signature {
     int-t result = compare(*s, *other-s);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     int-t result;
 
     if ($instance?(other, klass)) {

@@ -21,7 +21,7 @@ klass point {
     int32-t x;
     int32-t y;
   }
-  method object-t init(object-t self, slots-t slots : {0, 0}) {
+  method init(object-t self, slots-t slots : {0, 0}) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     return self;

@@ -2,14 +2,12 @@
 
 #include <stdio.h>
 
-static int* forward-iterator(int* i)
-{
+static int* forward-iterator(int* i) {
   *i = 0;
   return i;
 }
 
-static void* next-element(int* i)
-{
+static void* next-element(int* i) {
   (*i)++;
   if (4 > *i)
     return cast(void*)*i;
@@ -17,8 +15,7 @@ static void* next-element(int* i)
     return nullptr;
 }
 
-int-t main()
-{
+int-t main() {
   int-t o;
   for (int* i = forward-iterator(&o); void* e = next-element(i); ) {
     printf("%p\n", e);

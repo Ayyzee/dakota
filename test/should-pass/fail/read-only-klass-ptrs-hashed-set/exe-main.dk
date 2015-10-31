@@ -2,8 +2,7 @@
 
 klass hashed-set;
 
-int-t main()
-{
+int-t main() {
   hashed-set::klass = nullptr; // this should fail
 
   return 0;

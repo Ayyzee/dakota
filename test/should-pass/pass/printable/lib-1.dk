@@ -4,33 +4,28 @@ module test-1;
 
 trait printable
 {
-  method object-t name0(object-t self, const char8-t* arg1)
-  {
+  method name0(object-t self, const char8-t* arg1) -> object-t {
     //
     return null;
   }
 
-  method object-t va::name1(object-t self, const char8-t* format, va-list-t args)
-  {
+  method va::name1(object-t self, const char8-t* format, va-list-t args) -> object-t {
     //
     return null;
   }
     
-  method object-t name2(object-t self, const char8-t* arg1)
-  {
+  method name2(object-t self, const char8-t* arg1) -> object-t {
     //
     return self;
   }
 
 
-  method object-t va::name3(object-t self, const char8-t* format, va-list-t args)
-  {
+  method va::name3(object-t self, const char8-t* format, va-list-t args) -> object-t {
     //
     return self;
   }
 
-  method object-t name4(object-t self)
-  {
+  method name4(object-t self) -> object-t {
     //
     return self;
   }

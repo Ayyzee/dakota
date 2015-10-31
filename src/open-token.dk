@@ -27,12 +27,12 @@ klass open-token {
   slots {
     object-t close-token;
   }
-  method object-t init(object-t self, slots-t slots : {null}) {
+  method init(object-t self, slots-t slots : {null}) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     return self;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -41,12 +41,12 @@ klass open-token {
     $write-slots-end(out);
     return self;
   }
-  method object-t set-close-token(object-t self, object-t close-token) {
+  method set-close-token(object-t self, object-t close-token) -> object-t {
     assert(null == self.close-token);
     self.close-token = close-token;
     return self;
   }
-  method object-t close-token(object-t self) {
+  method close-token(object-t self) -> object-t {
     assert(null != self.close-token);
     return self.close-token;
   }

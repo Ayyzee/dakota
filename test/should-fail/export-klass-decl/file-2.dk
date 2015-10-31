@@ -8,8 +8,7 @@ klass k1;
 
 klass k2
 {
-  method k1::slots-t m1(object-t self)
-  {
+  method m1(object-t self) -> k1::slots-t {
     k1::slots-t result = {0};
     return result;
   }

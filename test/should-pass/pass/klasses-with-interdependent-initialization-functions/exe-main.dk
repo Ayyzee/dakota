@@ -3,13 +3,13 @@
 #include <assert.h>
 
 klass k1 {
-  object-t initialize(object-t kls) {
+  initialize(object-t kls) -> object-t {
     dk-klass-for-name(#k2);
     return kls;
   }
 }
 klass k2 {
-  object-t initialize(object-t kls) {
+  initialize(object-t kls) -> object-t {
     dk-klass-for-name(#k1);
     return kls;
   }

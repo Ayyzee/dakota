@@ -3,8 +3,7 @@
 //klass bit-vector;
 klass sorted-set;
 
-int-t main()
-{
+int-t main() {
 //   object-t ss-behavior = $behavior(sorted-set::klass);
 //   $dump(ss-behavior);
 //   $dump-behavior(sorted-set::klass);

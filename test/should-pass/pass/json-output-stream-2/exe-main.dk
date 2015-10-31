@@ -12,8 +12,7 @@ klass k1
     int32-t value;
   }
 
-  method object-t write-part(object-t self, object-t out)
-  {
+  method write-part(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
     $write-element(out, self.value, "value");
@@ -29,8 +28,7 @@ klass k2
   {
     int32-t value;
   }
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
     $write-element(out, self.value, "value");
@@ -46,8 +44,7 @@ klass k3
   {
     int32-t value;
   }
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
     $write-element(out, self.value, "value");
@@ -56,8 +53,7 @@ klass k3
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t parser = make(json-parser::klass);
   object-t property-list = $read-property-list(parser);
 

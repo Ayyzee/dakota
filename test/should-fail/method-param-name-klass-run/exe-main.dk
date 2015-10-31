@@ -2,8 +2,7 @@
 
 klass k1
 {
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     klass = null; // error
     self = $init(super);
     return self;
@@ -14,15 +13,13 @@ klass k2
 {
   superklass k1;
 
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     self = $init(super);
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   make(k2::klass);
   return 0;
 }

@@ -39,9 +39,9 @@ klass output-stream {
 
   slots stream-t;
 
-  method object-t init(object-t self,
+  method init(object-t self,
                        slots-t  slots :    stdout,
-                       str-t    filename : nullptr) {
+                       str-t    filename : nullptr) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     assert(stdin != slots);
@@ -57,7 +57,7 @@ klass output-stream {
     }
     return self;
   }
-  method object-t close(object-t self) {
+  method close(object-t self) -> object-t {
     slots-t slots = *unbox(self);
 #if defined DEBUG
     if (stdout == slots)
@@ -72,7 +72,7 @@ klass output-stream {
     return self;
   }
   // hackhack?  use print below?
-  method object-t write(object-t self, str-t string) {
+  method write(object-t self, str-t string) -> object-t {
     uint32-t len = cast(uint32-t)safe-strlen(string);
     fwrite(string, sizeof(char8-t), len, *unbox(self));
     return self;
@@ -82,62 +82,62 @@ klass output-stream {
       $print(self, "  "); // two spaces per column :-) [my way]
     return self;
   }
-  method [[format-va-printf(2)]] object-t va::print-format(object-t self, str-t format, va-list-t args) {
+  method [[format-va-printf(2)]] va::print-format(object-t self, str-t format, va-list-t args) -> object-t {
     char8-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     $print(self, cast(str-t)(buffer));
     return self;
   }
-  method [[format-va-printf(2)]] object-t va::println-format(object-t self, str-t format, va-list-t args) {
+  method [[format-va-printf(2)]] va::println-format(object-t self, str-t format, va-list-t args) -> object-t {
     char8-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     $println(self, cast(str-t)(buffer));
     return self;
   }
-  method object-t print(object-t self, str-t string) {
+  method print(object-t self, str-t string) -> object-t {
     uint32-t len = cast(uint32-t)safe-strlen(string);
     fwrite(string, sizeof(char8-t), len, *unbox(self));
     return self;
   }
-  method object-t print(object-t self, object-t object) {
+  method print(object-t self, object-t object) -> object-t {
     $print(object, self);
     return self;
   }
-  method object-t print-shallow(object-t self, object-t object) {
+  method print-shallow(object-t self, object-t object) -> object-t {
     $print-shallow(object, self);
     return self;
   }
-  method object-t println(object-t self, str-t string) {
+  method println(object-t self, str-t string) -> object-t {
     $print(self, string);
     $print(self, output-stream::endl);
     return self;
   }
-  method object-t println(object-t self, object-t object) {
+  method println(object-t self, object-t object) -> object-t {
     $print(self, object);
     $print(self, output-stream::endl);
     return self;
   }
-  method object-t println-shallow(object-t self, object-t object) {
+  method println-shallow(object-t self, object-t object) -> object-t {
     $print-shallow(self, object);
     $print(self, output-stream::endl);
     return self;
   }
-  method object-t print-in-col(object-t self, str-t string, uint32-t col) {
+  method print-in-col(object-t self, str-t string, uint32-t col) -> object-t {
     pad-to-col(self, col);
     $print(self, string);
     return self;
   }
-  method object-t print-in-col(object-t self, object-t object, uint32-t col) {
+  method print-in-col(object-t self, object-t object, uint32-t col) -> object-t {
     pad-to-col(self, col);
     $print(self, object);
     return self;
   }
-  method object-t println-in-col(object-t self, str-t string, uint32-t col) {
+  method println-in-col(object-t self, str-t string, uint32-t col) -> object-t {
     $print-in-col(self, string, col);
     $print(self, "\n");
     return self;
   }
-  method object-t println-in-col(object-t self, object-t object, uint32-t col) {
+  method println-in-col(object-t self, object-t object, uint32-t col) -> object-t {
     $print-in-col(self, object, col);
     $print(self, "\n");
     return self;

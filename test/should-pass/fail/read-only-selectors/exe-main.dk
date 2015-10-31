@@ -2,8 +2,7 @@
 
 #define SELECTOR-PTR(name, args) (cast(dkt_selector_func_t)(cast(selector_t* (*)args) __selector::name))()
 
-int-t main()
-{
+int-t main() {
   selector-t sel = SELECTOR(hash(object-t));
   USE(sel);
   selector-t* sel-ptr = SELECTOR-PTR(hash,(object-t));

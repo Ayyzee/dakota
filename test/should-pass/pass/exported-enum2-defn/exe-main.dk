@@ -24,8 +24,7 @@ klass k1
   }
 }
 
-int-t main()
-{
+int-t main() {
   int-t e1-1 = k1::e1-1;
   USE(e1-1);
   int-t e1-2 = k1::e1-2;

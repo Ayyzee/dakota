@@ -5,7 +5,6 @@ klass xjmp-buf
   slots jmp-buf;
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

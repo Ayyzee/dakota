@@ -35,6 +35,7 @@
 #define SLOTS_METHOD_SIGNATURE_FUNC
 
 #define ALIAS(m)
+#define METHOD_ALIAS(a, r)
 #define INCLUDE(f)
 #define INTERPOSE(k)
 #define MODULE(n)

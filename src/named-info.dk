@@ -35,12 +35,12 @@ klass named-info {
   //            compare = property::compare()
     slots-t*    next;
   }
-  method object-t init(object-t self, slots-t slots : {nullptr, 0, nullptr}) {
+  method init(object-t self, slots-t slots : {nullptr, 0, nullptr}) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     return self;
   }
-  method int32-t check(slots-t* s) {
+  method check(slots-t* s) -> int32-t {
     for (uint32-t i = 0; i < s->count; i++) {
       // need to add test for #name (since its required)
 
@@ -49,31 +49,31 @@ klass named-info {
     }
     return 0;
   }
-  method slots-t* sort(slots-t* s) {
+  method sort(slots-t* s) -> slots-t*{
     qsort(s->elements, s->count, sizeof(s->elements[0]),
           cast(std-compare-t)cast(int-t(*)(property::slots-t*,property::slots-t*))property::compare);
     return s;
   }
-  method property-t* search(slots-t* s, symbol-t key) {
+  method search(slots-t* s, symbol-t key) -> property-t*{
     property::slots-t property = { cast(symbol-t)(key), cast(uintptr-t)0 };
     property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
                                                               cast(std-compare-t)cast(int-t (*)(property::slots-t*,property::slots-t*))property::compare);
     return result;
   }
-  method uintptr-t at(slots-t* s, symbol-t key) {
+  method at(slots-t* s, symbol-t key) -> uintptr-t {
     uintptr-t element = 0;
     property::slots-t* property = search(s, key);
     if (nullptr != property)
       element = property->element;
     return element;
   }
-  method uintptr-t at(slots-t* s, symbol-t key, uintptr-t default-element) {
+  method at(slots-t* s, symbol-t key, uintptr-t default-element) -> uintptr-t {
     uintptr-t element = at(s, key);
     if (0 == element) // aka: if (nullptr == element)
       element = default-element;
     return element;
   }
-  method slots-t* dump(slots-t* s) {
+  method dump(slots-t* s) -> slots-t*{
     slots-t* current = s;
     while (nullptr != current) {
       printf("{\n");
@@ -95,7 +95,7 @@ klass named-info {
     }
     return s;
   }
-  method int-t compare(slots-t* s, slots-t* other-s) {
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
     symbol-t s-name = cast(symbol-t)at(s, #name);
     symbol-t other-name = cast(symbol-t)at(other-s, #name);
     //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
@@ -107,7 +107,7 @@ klass named-info {
     int-t result = compare(*s, *other-s);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     int-t result;
 
     if ($instance?(other, klass)) {

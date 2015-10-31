@@ -23,8 +23,7 @@ klass k1
 {
 }
 
-int-t main()
-{
+int-t main() {
   property-t k2-info-props[] =
   {
     { #name,            (uintptr-t)#k2 },

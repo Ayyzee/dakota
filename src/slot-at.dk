@@ -1,4 +1,4 @@
-  method object-t slot-at(object-t self, symbol-t name, object-t default-element) {
+  method slot-at(object-t self, symbol-t name, object-t default-element) -> object-t {
     object-t result;
     strswitch (name) {
       case #strcmp: result = str-compare::box(self.strcmp);
@@ -8,7 +8,7 @@
     };
     return result;
   }
-  method object-t slot-at!(object-t self, symbol-t name) {
+  method slot-at!(object-t self, symbol-t name) -> object-t {
     object-t result = dk::slot-at(self, name, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(no-such-slot-exception::klass,
@@ -17,11 +17,11 @@
                  #name :      name);
     return result;
   }
-  method object-t slot-at(object-t self, symbol-t name) {
+  method slot-at(object-t self, symbol-t name) -> object-t {
     object-t result = dk::slot-at(self, name, nullptr);
     return result;
   }
-  method object-t set-slot-at(object-t self, symbol-t name, object-t element) {
+  method set-slot-at(object-t self, symbol-t name, object-t element) -> object-t {
     object-t result;
     strswitch (name) {
       case #strcmp:
@@ -34,7 +34,7 @@
     }
     return element;
   }
-  method object-t set-slot-at!(object-t self, symbol-t name, object-t element) {
+  method set-slot-at!(object-t self, symbol-t name, object-t element) -> object-t {
     object-t result = dk::set-slot-at(self, name, element);
     if (nullptr == result) {
       throw make(no-such-slot-exception::klass,

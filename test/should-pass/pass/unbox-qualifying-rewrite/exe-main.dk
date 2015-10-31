@@ -2,8 +2,7 @@
 
 klass pair;
 
-int-t main()
-{
+int-t main() {
   object-t element = make(pair::klass);
   
   pair-t* pair-1 =  pair::unbox(element);

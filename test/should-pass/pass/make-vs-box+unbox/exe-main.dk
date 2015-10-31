@@ -6,8 +6,7 @@ klass dimension;
 klass point;
 klass rect;
 
-int-t main()
-{
+int-t main() {
   object-t o1 = make(rect::klass);
 
   rect-t*  i1 = rect::unbox(o1);

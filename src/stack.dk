@@ -17,7 +17,7 @@
 module dakota;
 
 trait stack {
-  method object-t push(object-t self, object-t element);
-  method object-t pop(object-t self);
-  method object-t empty(object-t self);
+  method push(object-t self, object-t element) -> object-t;
+  method pop(object-t self) -> object-t;
+  method empty(object-t self) -> object-t;
 }

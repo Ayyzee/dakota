@@ -2,7 +2,6 @@
 
 typedef void (*callback-t)(object-t, object-t);
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

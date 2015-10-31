@@ -4,18 +4,18 @@
 #include <string.h>
 
 trait t1 {
-  method symbol-t f1(object-t self) {
+  method f1(object-t self) -> symbol-t {
     return __klass__;
   }
-  method symbol-t f2(object-t self) {
+  method f2(object-t self) -> symbol-t {
     return __klass__;
   }
 }
 trait t2 {
-  method symbol-t f2(object-t self) {
+  method f2(object-t self) -> symbol-t {
     return __klass__;
   }
-  method symbol-t f3(object-t self) {
+  method f3(object-t self) -> symbol-t {
     return __klass__;
   }
 }

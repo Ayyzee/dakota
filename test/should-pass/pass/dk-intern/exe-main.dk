@@ -1,7 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-int-t main()
-{
+int-t main() {
   int-t value = 0;
 
   try
@@ -22,8 +21,7 @@ int-t main()
     USE(dakota1);
     USE(dakota2);
   }
-  catch(...)
-  {
+  catch(...) {
     fprintf(stderr, "ERROR: uncaught exception\n");
     value = 1;
   }

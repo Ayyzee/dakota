@@ -38,13 +38,13 @@ klass token {
     // could include filename
     object-t leading-ws;
   }
-  method object-t write-lite(object-t self, object-t out) {
+  method write-lite(object-t self, object-t out) -> object-t {
     $write(out, "\"");
     $write(out, self.buffer);
     $write(out, "\"");
     return self;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -55,11 +55,11 @@ klass token {
     $write-slots-end(out);
     return self;
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        uint32-t       line :    0,
                        uint32-t       column :  0,
                        tokenid-t      tokenid : 0,
-                       str-t buffer :  nullptr) {
+                       str-t buffer :  nullptr) -> object-t {
     self = $init(super);
 #if 0
     if (0 != tokenid) {
@@ -80,11 +80,11 @@ klass token {
     self.leading-ws = nullptr;
     return self;
   }
-  method hash-t hash(object-t self) {
+  method hash(object-t self) -> hash-t {
     hash-t result = dk-hash(self.buffer);
     return result;
   }
-  method boole-t equal?(object-t self, object-t other) {
+  method equal?(object-t self, object-t other) -> boole-t {
     boole-t state;
 
     if ($instance?(other, klass)) {
@@ -97,20 +97,20 @@ klass token {
     }
     return state;
   }
-  method boole-t empty?(object-t self) {
+  method empty?(object-t self) -> boole-t {
     boole-t result = false;
     if (NUL == self.buffer[0])
       result = true;
     return result;
   }
-  method object-t empty(object-t self) {
+  method empty(object-t self) -> object-t {
     self.line =      0;
     self.column =    0;
     self.tokenid =   0;
     self.buffer[0] = NUL;
     return self;
   }
-  method boole-t tokenid?(object-t self, tokenid-t tokenid) {
+  method tokenid?(object-t self, tokenid-t tokenid) -> boole-t {
     boole-t result;
     if (self.tokenid == tokenid)
       result = true;
@@ -118,20 +118,20 @@ klass token {
       result = false;
     return result;
   }
-  method object-t set-tokenid(object-t self, tokenid-t tokenid) {
+  method set-tokenid(object-t self, tokenid-t tokenid) -> object-t {
     self.tokenid = tokenid;
     return self;
   }
-  method tokenid-t tokenid(object-t self) {
+  method tokenid(object-t self) -> tokenid-t {
     tokenid-t result = self.tokenid;
     return result;
   }
-  method object-t set-leading-ws(object-t self, object-t leading-ws) {
+  method set-leading-ws(object-t self, object-t leading-ws) -> object-t {
     assert(nullptr == self.leading-ws);
     self.leading-ws = leading-ws;
     return self;
   }
-  method boole-t leading-ws?(object-t self) {
+  method leading-ws?(object-t self) -> boole-t {
     boole-t result;
     if (nullptr == self.leading-ws)
       result = false;
@@ -139,28 +139,28 @@ klass token {
       result = true;
     return result;
   }
-  method object-t leading-ws(object-t self) {
+  method leading-ws(object-t self) -> object-t {
     return self.leading-ws;
   }
-  method uint32-t line(object-t self) {
+  method line(object-t self) -> uint32-t {
     return self.line;
   }
-  method uint32-t column(object-t self) {
+  method column(object-t self) -> uint32-t {
     return self.column;
   }
-  method str-t buffer(object-t self) {
+  method buffer(object-t self) -> str-t {
     return cast(str-t)(self.buffer);
   }
-  method char8-t first-char8(object-t self) {
+  method first-char8(object-t self) -> char8-t {
     const char8-t result = self.buffer[0];
     return result;
   }
   // this should be merged with buffer - this is a hackhack
-  method str-t utf8-from(object-t self) {
+  method utf8-from(object-t self) -> str-t {
     str-t buffer = $buffer(self);
     return buffer;
   }
-  method object-t dump-shallow(object-t self) {
+  method dump-shallow(object-t self) -> object-t {
 #if 0
     if (0 != self.tokenid)
       fprintf(stderr, "%s\n", self.buffer);
@@ -186,27 +186,27 @@ klass token {
     return self;
 #endif
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { buffer=\"%s\" }\n",
             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.buffer);
     return self;
   }
-  method object-t print(object-t self, object-t out) {
+  method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-output;
     $print(out, $utf8-from(self));
     return self;
   }
   // should be in superklass string??
-  method object-t append(object-t self, uint32-t c) {
+  method append(object-t self, uint32-t c) -> object-t {
     assert(nullptr != self.buffer);
     uint32-t len = cast(uint32-t)safe-strlen(self.buffer);
     self.buffer[len] =     cast(char8-t)(c);
     self.buffer[len + 1] = NUL;
     return self;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     int-t result;
     if ($instance?(other, klass)) {
       result = safe-strcmp(self.buffer, unbox(other)->buffer);

@@ -4,20 +4,17 @@ klass k1
   {
   }
 
-  method slots-t* init(slots-t* s)
-  {
+  method init(slots-t* s) -> slots-t*{
     return s;
   }
 
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     self = $init(super);
     init(unbox(self));
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

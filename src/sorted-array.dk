@@ -45,7 +45,7 @@ klass sorted-array {
     result->compare =  compare;
     return result;
   }
-  method slots-t* sort(slots-t* t) {
+  method sort(slots-t* t) -> slots-t*{
     qsort(t->elements, t->count, t->size, t->compare);
     return t;
   }

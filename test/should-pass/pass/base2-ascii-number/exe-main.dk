@@ -2,8 +2,7 @@
 
 klass ascii-number-klass;
 
-int-t main()
-{
+int-t main() {
   object-t base2-ascii-number-klass = make(ascii-number-klass::klass);
   $dump(base2-ascii-number-klass);
   object-t base2-ascii-number = make(base2-ascii-number-klass, #number : 42);

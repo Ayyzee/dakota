@@ -1,10 +1,10 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 klass fred {
-  method object-t init(object-t self) {
+  method init(object-t self) -> object-t {
     return self;
   }
-  method object-t va::wilma(object-t self, va-list-t args) {
+  method va::wilma(object-t self, va-list-t args) -> object-t {
     USE(args);
     printf("%s()\n", __method__->name);
     return self;

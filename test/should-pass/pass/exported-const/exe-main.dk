@@ -2,8 +2,7 @@
 
 klass k1;
 
-int-t main()
-{
+int-t main() {
   k1::answer-t answer = k1::no;
   USE(answer);
   const char8-t* name = k1::myname;

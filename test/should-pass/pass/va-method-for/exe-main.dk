@@ -3,15 +3,15 @@
 #include <stdio.h>
 
 klass test {
-  method object-t method-1(object-t self) {
+  method method-1(object-t self) -> object-t {
     printf("%s::%s()\n", __klass__, __method__->name);
     return self;
   }
-  method object-t method-2(object-t self) {
+  method method-2(object-t self) -> object-t {
     printf("%s::%s()\n", __klass__, __method__->name);
     return self;
   }
-  method object-t va::method-3(object-t self, va-list-t args) {
+  method va::method-3(object-t self, va-list-t args) -> object-t {
     USE(args);
     printf("%s::%s()\n", __klass__, __method__->name);
     return self;

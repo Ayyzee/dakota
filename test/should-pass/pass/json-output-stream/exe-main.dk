@@ -12,8 +12,7 @@ klass k1
     int32-t value2;
   }
 
-  method object-t write-part(object-t self, object-t out)
-  {
+  method write-part(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
     $write-element(out, self.value1, "value1");
@@ -32,8 +31,7 @@ klass k2
     int32-t value2;
     int32-t value3;
   }
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
     $write-element(out, self.value1, "value1");
@@ -51,15 +49,13 @@ klass k3
   {
     object-t object;
   }
-  method object-t init(object-t self)
-  {
+  method init(object-t self) -> object-t {
     self = $init(super);
     self.object = k2::klass;
     return self;
   }
 
-  method object-t write-slots(object-t self, object-t out)
-  {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
     $write-element-idref(out, self.object, "object");
@@ -68,8 +64,7 @@ klass k3
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t i = make(k3::klass);
 
 //   object-t ooutput-stream = make(xml-object-output-stream::klass);

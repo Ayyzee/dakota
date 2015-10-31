@@ -3,8 +3,7 @@ klass k1
   noexport void***** arg5-default = nullptr;
   noexport void****** arg6-default = nullptr;
 
-  method object-t init(object-t self, void* arg1, void** arg2, void*** #arg3, void**** #arg4, void***** arg5 : arg5-default, void****** arg6 : arg6-default)
-  {
+  method init(object-t self, void* arg1, void** arg2, void*** #arg3, void**** #arg4, void***** arg5 : arg5-default, void****** arg6 : arg6-default) -> object-t {
     self = $init(super);
     return self;
   }

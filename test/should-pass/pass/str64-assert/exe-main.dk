@@ -9,8 +9,7 @@ static str64-t s1 = "mother";
 static str64-t s2 = "father";
 static str64-t s3 = "sister";
 
-int-t main()
-{
+int-t main() {
   {
     object-t o1 = str64::box(s1);
     object-t o2 = str64::box(s2);
@@ -40,8 +39,7 @@ klass file-permissions
 {
   slots char8-t[3]; // rwx
 
-  method intptr-t compare(slots-t* slots, slots-t* other-slots)
-  {
+  method compare(slots-t* slots, slots-t* other-slots) -> intptr-t {
     int32-t result = strncmp((const char8-t*)slots, (const char8-t*)other-slots, sizeof(slots-t));
     return result;
   }

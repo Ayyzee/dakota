@@ -4,8 +4,7 @@
 
 klass deque;
 
-static void check(object-t klass)
-{
+static void check(object-t klass) {
 //   object-t seq = make(klass);
 //   for (uint32-t i = 0; i < 4; i++)
 //   {
@@ -46,8 +45,7 @@ static void check(object-t klass)
   return;
 }
 
-int-t main()
-{
+int-t main() {
 //   check(vector::klass);
   check(deque::klass);
 

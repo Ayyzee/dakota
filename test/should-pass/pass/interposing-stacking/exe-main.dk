@@ -13,8 +13,7 @@ klass a4 { superklass a1; }
 interpose a4, a3;
 interpose a3, a2;
 
-int-t main()
-{
+int-t main() {
   const char8-t* expected = "/object/a1/a2/a3/a4";
 
   printf("%s\n", expected);

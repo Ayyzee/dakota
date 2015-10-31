@@ -15,7 +15,6 @@ klass zz::k3
   superklass yy::k2;
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

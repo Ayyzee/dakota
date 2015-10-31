@@ -9,8 +9,7 @@ klass pair; // hackhack
 klass json-object-output-stream;
 klass sorted-table; // hackhack
 
-int-t main()
-{
+int-t main() {
   int32-t a = 11, b = 13, c = 17, d = 19;
 
   object-t o = #{ #a : b, #c : d };

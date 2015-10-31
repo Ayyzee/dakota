@@ -4,8 +4,7 @@ klass features; // hackhack
 klass pair;
 klass json-object-output-stream;
 
-int-t main()
-{
+int-t main() {
   object-t pair = make(pair::klass);
 
   object-t json-object-output-stream = make(json-object-output-stream::klass);

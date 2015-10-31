@@ -23,33 +23,33 @@ klass klass;
 trait forward-iterator;
 
 trait set {
-  method boole-t all-in?(object-t self, object-t collection) {
+  method all-in?(object-t self, object-t collection) -> boole-t {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return false;
   }
-  method boole-t any-in?(object-t self, object-t collection) {
+  method any-in?(object-t self, object-t collection) -> boole-t {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return false;
   }
   // complement (if collection is set)
-  method object-t remove-all(object-t self, object-t collection) {
+  method remove-all(object-t self, object-t collection) -> object-t {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return null;
   }
   // intersection (if collection is set)
-  method object-t retain-all(object-t self, object-t collection) {
+  method retain-all(object-t self, object-t collection) -> object-t {
     USE(self);
     USE(collection);
     throw make(exception::klass, #message : "not yet implemented");
     return null;
   }
-  method object-t write-lite(object-t self, object-t out) {
+  method write-lite(object-t self, object-t out) -> object-t {
     $write(out, "{");
     str-t delim = "";
 
@@ -61,8 +61,8 @@ trait set {
     $write(out, "}");
     return self;
   }
-  method object-t forward-iterator(object-t); // hackhack
-  method object-t in( object-t self, object-t element, object-t default-element);
-  method object-t in( object-t self, object-t element);
-  method boole-t  in?(object-t self, object-t element);
+  method forward-iterator(object-t) -> object-t; // hackhack
+  method in( object-t self, object-t element, object-t default-element) -> object-t;
+  method in( object-t self, object-t element) -> object-t;
+  method in?(object-t self, object-t element) -> boole-t;
 }

@@ -3,13 +3,13 @@
 module test-1;
 
 klass test {
-  method object-t init(object-t self,
+  method init(object-t self,
                        void*      arg1,
                        void**     arg2,
                        void***    arg3 : {~},
                        void****   arg4 : {~},
                        void*****  arg5 : nullptr,
-                       void****** arg6 : nullptr) {
+                       void****** arg6 : nullptr) -> object-t {
     self = $init(super);
     USE(self);
     USE(arg1);
@@ -20,7 +20,7 @@ klass test {
     USE(arg6);
     return self;
   }
-  method object-t va::print-format(object-t self, str-t format, va-list-t args) {
+  method va::print-format(object-t self, str-t format, va-list-t args) -> object-t {
     USE(self);
     USE(format);
     USE(args);

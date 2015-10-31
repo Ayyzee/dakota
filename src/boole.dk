@@ -23,7 +23,7 @@ klass boole-klass {
 
   slots object-t[2];
 
-  method object-t alloc(object-t self) {
+  method alloc(object-t self) -> object-t {
     return *unbox(self)[0]; // return false object by default
   }
 }
@@ -34,7 +34,7 @@ klass boole { // a doubleton :-)
 
   slots boole-t;
 
-  object-t initialize(object-t kls) {
+  initialize(object-t kls) -> object-t {
     assert(klass == kls);
 
     auto mk = [](object-t k, boole-t v) {
@@ -52,7 +52,7 @@ klass boole { // a doubleton :-)
 
     return kls;
   }
-  method object-t init(object-t self, slots-t slots : false) {
+  method init(object-t self, slots-t slots : false) -> object-t {
     // intentionally not chaining $init()
     assert(false == *unbox(self));
     assert(1 >= slots);

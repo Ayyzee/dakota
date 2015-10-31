@@ -3,8 +3,7 @@
 #define CONCAT(a, b) a ## b
 #define STRINGIFY(a) # a
 
-int-t main()
-{
+int-t main() {
   const char8-t* foobar = "foobar";
   printf("%s\n", CONCAT(foo, bar));
   printf("%s\n", STRINGIFY(foo));

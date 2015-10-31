@@ -20,7 +20,7 @@ klass hashed-counted-set {
   superklass hashed-set;
   trait      counted-set;
 
-  method object-t va::init(object-t self, va-list-t args) {
+  method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
     return self;
   }

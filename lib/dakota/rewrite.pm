@@ -322,14 +322,14 @@ sub vars_from_defn {
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|(\s+)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3)|gs; #hackhack
+  $$filestr_ref =~ s|(\s+)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) auto|gs; #hackhack
   $$filestr_ref =~ s|(\s+method\s+)\[\[($id\(\d+\))\]\]|$1$2|gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
-  $$filestr_ref =~ s|(method\s+[^(]*?($rmid)\((object-t self.*?)\)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<!SO-EXPORT)(\s+)(method)(\s+)|$1METHOD$3|gm;
+  $$filestr_ref =~ s|(method\s+[^(]*?($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
+  $$filestr_ref =~ s|(?<!SO-EXPORT)(\s+)(method)(\s+)|$1METHOD$3auto |gm;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack
@@ -921,8 +921,18 @@ sub remove_system_includes {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|^(\s*)\#(\s*)include\s*(<.+?>)|$1$2INCLUDE($3);|gm;
 }
+sub rewrite_method_aliases {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/(\s+)method\s+((va::)?$mid\s*\(\s*\))\s*=>\s*((va::)?$mid\s*$main::list)\s*;/$1METHOD-ALIAS($2, $4);/gs
+}
+sub rewrite_initialze_finalize {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/auto $1/gs;
+}
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
+  &rewrite_method_aliases($filestr_ref);
+
   if ($remove) {
     &remove_system_includes($filestr_ref);
   }
@@ -986,6 +996,7 @@ sub convert_dk_to_cc {
   &rewrite_sentinal_generic_uses($filestr_ref, $kw_args_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_args_generics);
+  &rewrite_initialze_finalize($filestr_ref);
   &rewrite_functions($filestr_ref);
   &rewrite_for_each($filestr_ref);
   &rewrite_unboxes($filestr_ref);

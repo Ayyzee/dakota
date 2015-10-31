@@ -1,10 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-int-t main()
-{
+int-t main() {
   symbol-t default-initial-capacity = #default-initial-capacity;
-  switch(default-initial-capacity)
-  {
+  switch(default-initial-capacity) {
     case #default-initial-capacity:
       break;
     default:
@@ -28,8 +26,7 @@ int-t main()
       abort();
   }
   uintptr-t hash-value = dk-hash(#default-initial-capacity);
-  switch(hash-value)
-  {
+  switch(hash-value) {
     case #default-initial-capacity:
       break;
     default:

@@ -8,8 +8,7 @@ klass pair;
 klass sorted-counted-set;
 klass uint32;
 
-static object-t check(object-t klass)
-{
+static object-t check(object-t klass) {
   printf("klass-name=\"%s\"\n", name-of(klass));
   object-t collection = make(klass);
 
@@ -31,8 +30,7 @@ static object-t check(object-t klass)
   return collection;
 }
 
-int-t main()
-{
+int-t main() {
 //object-t json-object-output-stream = make(json-object-output-stream::klass);
 
   object-t c1 = check(sorted-counted-set::klass);

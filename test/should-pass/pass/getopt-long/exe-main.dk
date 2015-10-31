@@ -15,21 +15,18 @@ static struct option longopts[] =
 
 static
 int
-handle-opts(int-t argc, char8-t** argv, struct option* longopts)
-{
+handle-opts(int-t argc, char8-t** argv, struct option* longopts) {
   int-t opt;
 
   while (-1 != (opt = getopt-long(argc, argv, "", longopts, nullptr))) {
-    if (opt-base > opt)
-    { // errors
+    if (opt-base > opt) { // errors
       if (':' == opt || '?' == opt) {
         printf("%i = %c\n", opt, opt);
       } else {
         abort();
       }
     }
-    else if (opt-base <= opt)
-    {
+    else if (opt-base <= opt) {
       struct option* o = &longopts[opt - opt-base];
       printf("%s", o->name);
       if (o->has-arg) {
@@ -42,8 +39,7 @@ handle-opts(int-t argc, char8-t** argv, struct option* longopts)
 }
 
 int
-main(int-t argc, char8-t** argv, char8-t** envp)
-{
+main(int-t argc, char8-t** argv, char8-t** envp) {
   int-t i = handle-opts(argc, argv, longopts);
 
   for (; i < argc; i++) {

@@ -4,8 +4,7 @@ klass features; // hackhack
 klass json-object-output-stream;
 klass sorted-set;
 
-int-t main()
-{
+int-t main() {
   object-t ss = make(sorted-set::klass);
 
   $add(ss, #"key1");

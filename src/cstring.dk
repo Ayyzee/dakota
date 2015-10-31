@@ -32,7 +32,7 @@ klass cstring {
     uint32-t len;
     uint32-t capacity;
   }
-  method object-t init(object-t self, uint32-t capacity : 8) {
+  method init(object-t self, uint32-t capacity : 8) -> object-t {
     self = $init(super);
     self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * capacity);
     self.ptr[0] = NUL;
@@ -40,12 +40,12 @@ klass cstring {
     self.capacity = capacity;
     return self;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.ptr);
     object-t result = $dealloc(super);
     return result;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -56,13 +56,13 @@ klass cstring {
     $write-slots-end(out);
     return self;
   }
-  method slots-t* dump(slots-t* s) {
+  method dump(slots-t* s) -> slots-t*{
   //$dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%u, capacity=%u }\n",
             cast(ptr-t)nullptr, cast(ptr-t)(s), s->ptr, s->len, s->capacity);
     return s;
   }
-  method int-t compare(slots-t* s, slots-t* other-s) {
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
     int-t result = safe-strcmp(s->ptr, other-s->ptr);
     result = dkt-normalize-compare-result(result);
     return result;
@@ -71,7 +71,7 @@ klass cstring {
     int-t result = compare(*s, *other-s);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     int-t result;
 
     if ($instance?(other, klass)) {
@@ -84,14 +84,14 @@ klass cstring {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  method uint32-t length(slots-t* s) {
+  method length(slots-t* s) -> uint32-t {
     if (0    == s->len &&
         nullptr != s->ptr &&
         NUL  != s->ptr[0])
       s->len = cast(uint32-t)safe-strlen(s->ptr);
     return s->len;
   }
-  method slots-t* concat(slots-t* s, char8-t c) {
+  method concat(slots-t* s, char8-t c) -> slots-t*{
     assert(NUL != c);
     assert(s->len + 1 != s->capacity);
       

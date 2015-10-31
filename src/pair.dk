@@ -33,21 +33,21 @@ klass pair {
   //   klass symbol-uint32-pair { slots { symbol-t first; uint32-t last; } }
   //   klass object-uint32-pair { slots { object-t first; uint32-t last; } }
   
-  method object-t init(object-t self,
+  method init(object-t self,
                        object-t first : null,
-                       object-t last :  null) {
+                       object-t last :  null) -> object-t {
     self = $init(super);
     self.first = first;
     self.last =  last;
     return self;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     $dump(self.first);
     $dump(self.last);
     return self;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -57,7 +57,7 @@ klass pair {
     $write-slots-end(out);
     return self;
   }
-  method boole-t equal?(object-t self, object-t other) {
+  method equal?(object-t self, object-t other) -> boole-t {
     object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
@@ -71,7 +71,7 @@ klass pair {
     boole-t result = $equal?(first, other-first);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
@@ -85,17 +85,17 @@ klass pair {
     int-t result = $compare(first, other-first);
     return result;
   }
-  method hash-t hash(object-t self) {
+  method hash(object-t self) -> hash-t {
     object-t first = self.first;
     assert(nullptr != first);
     hash-t result = $hash(first);
     return result;
   }
-  method object-t first(slots-t* s) {
+  method first(slots-t* s) -> object-t {
     object-t result = s->first;
     return result;
   }
-  method object-t last(slots-t* s) {
+  method last(slots-t* s) -> object-t {
     object-t result = s->last;
     return result;
   }

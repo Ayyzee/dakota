@@ -27,7 +27,6 @@ klass bar-wo {
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

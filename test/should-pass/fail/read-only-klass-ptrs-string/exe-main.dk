@@ -2,8 +2,7 @@
 
 klass string;
 
-int-t main()
-{
+int-t main() {
   string::klass = nullptr; // this should fail
 
   return 0;

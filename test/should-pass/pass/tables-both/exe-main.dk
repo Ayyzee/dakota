@@ -10,8 +10,7 @@ klass hashed-table;
 klass pair;
 klass uint32;
 
-static int-t check(object-t klass, str-pair-t* sp, size-t sp-len)
-{
+static int-t check(object-t klass, str-pair-t* sp, size-t sp-len) {
   int-t result = 0;
   object-t collection = make(klass);
 
@@ -41,8 +40,7 @@ static int-t check(object-t klass, str-pair-t* sp, size-t sp-len)
   return result;
 }
 
-int-t main()
-{
+int-t main() {
   size-t str-pair-len = DK-COUNTOF(str-pair);
   
   int-t r1 = check(sorted-table::klass, str-pair, str-pair-len);

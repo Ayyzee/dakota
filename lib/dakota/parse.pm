@@ -565,10 +565,7 @@ sub match {
   if (&sst_cursor::current_token($gbl_sst_cursor) eq $match_token) {
     $$gbl_sst_cursor{'current-token-index'}++;
   } else {
-    printf STDERR "%s:%i: expected \'%s\'\n",
-      $file,
-      $line,
-      $match_token;
+    &sst_cursor::error($gbl_sst_cursor, $$gbl_sst_cursor{'current-token-index'}, "expected '$match_token'");
     &error($file, $line, $$gbl_sst_cursor{'current-token-index'});
   }
   return $match_token;
@@ -972,6 +969,8 @@ sub initialize {
     #&match(__FILE__, __LINE__, 'klass');
   }
   &match(__FILE__, __LINE__, ')');
+  &match(__FILE__, __LINE__, '->');
+  &match(__FILE__, __LINE__, 'object-t');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
       &add_symbol($gbl_root, ['initialize']);
@@ -1004,6 +1003,8 @@ sub finalize {
     #&match(__FILE__, __LINE__, 'klass');
   }
   &match(__FILE__, __LINE__, ')');
+  &match(__FILE__, __LINE__, '->');
+  &match(__FILE__, __LINE__, 'object-t');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
       &add_symbol($gbl_root, ['finalize']);
@@ -1614,9 +1615,44 @@ sub method {
       &dakota::util::add_last($$method{'attributes'}, $attr);
     }
   }
+  my $name = [];
+  push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
+  if ('va' eq $$name[0]) {
+    $$method{'is-va'} = 1;
+    push @$name, &match(__FILE__, __LINE__, '::');
+    push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
+  }
   my ($open_paren_index, $close_paren_index)
     = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
 
+  if ($close_paren_index == $open_paren_index + 1) {
+    # METHOD ALIAS
+    &match(__FILE__, __LINE__, '(');
+    # this must be empty!
+    &match(__FILE__, __LINE__, ')');
+    &match(__FILE__, __LINE__, '=>');
+    my $realname = [];
+    push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
+    if ($$method{'is-va'}) {
+      push @$realname, &match(__FILE__, __LINE__, '::');
+      push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
+    }
+    my ($open_index, $close_index)
+      = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+    if ($close_index > $open_index + 1) {
+      die "Time to support aliasing of overloaded methods.";
+    }
+    &match(__FILE__, __LINE__, '(');
+    &match(__FILE__, __LINE__, ')');
+    &match(__FILE__, __LINE__, ';');
+    $$method{'alias'} = $realname;
+    $$method{'name'} = $name;
+    ###&add_generic($gbl_root, "@{$$method{'name'}}");
+    return;
+  } else {
+    $$method{'name'} = $name;
+    &add_generic($gbl_root, "@{$$method{'name'}}");
+  }
   if ('object-t' eq &sst::at($gbl_sst, $open_paren_index + 1)) {
     if (',' ne &sst::at($gbl_sst, $open_paren_index + 1 + 1) &&
         ')' ne &sst::at($gbl_sst, $open_paren_index + 1 + 1)) {
@@ -1625,44 +1661,6 @@ sub method {
       }
     }
   }
-  my $j;
-  for ($j = $open_paren_index + 1; $j < $close_paren_index; $j++) {
-    if ('klass' eq &sst::at($gbl_sst, $j)) {
-      #&error(__FILE__, __LINE__, $j);
-    }
-  }
-  my $last_name_token = $open_paren_index - 1;
-  my $last_type_token = $last_name_token;
-  $last_type_token--;
-
-  if ('::' eq &sst::at($gbl_sst, $last_type_token)) {
-    $last_type_token--;
-
-    if ('va' eq &sst::at($gbl_sst, $last_type_token)) {
-      $$method{'is-va'} = 1;
-      $last_type_token--;
-    } else {
-      &error(__FILE__, __LINE__, $last_type_token);
-    }
-  }
-  my $return_type = &sst::token_seq($$gbl_sst_cursor{'sst'},
-                                    $$gbl_sst_cursor{'current-token-index'},
-                                    $last_type_token);
-  $return_type = &token_seq::simple_seq($return_type);
-
-  if ('void' eq &path::string($return_type)) {
-    $$method{'return-type'} = undef;
-    &warning(__FILE__, __LINE__,
-             $$gbl_sst_cursor{'current-token-index'}); # 'void' is not a recommended return type for a method
-  } else {
-    $$method{'return-type'} = $return_type;
-  }
-  $$method{'name'} = &sst::token_seq($gbl_sst,
-                                     $last_type_token + 1,
-                                     $last_name_token);
-  $$method{'name'} = &token_seq::simple_seq($$method{'name'});
-  &add_generic($gbl_root, "@{$$method{'name'}}");
-
   if ($open_paren_index + 1 == $close_paren_index) {
     &error(__FILE__, __LINE__, $close_paren_index);
   }
@@ -1701,6 +1699,24 @@ sub method {
     $$method{'kw-args-defaults'} = $kw_args_defaults;
   }
   $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
+
+  #print STDERR &Dumper($method);
+  &match(__FILE__, __LINE__, '->'); # this syntax is similiar to how Lambda functions are specified in C++11
+
+  ### RETURN-TYPE
+  my $return_type = [];
+  while (&sst::at($$gbl_sst_cursor{'sst'},
+                  $$gbl_sst_cursor{'current-token-index'}) !~ m/^(\;|\{)$/) {
+    push @$return_type, &match_any();
+  }
+  if ('void' eq &path::string($return_type)) {
+    $$method{'return-type'} = undef;
+    &warning(__FILE__, __LINE__,
+             $$gbl_sst_cursor{'current-token-index'}); # 'void' is not a recommended return type for a method
+  } else {
+    $$method{'return-type'} = $return_type;
+  }
+  #print STDERR &Dumper($method);
 
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {

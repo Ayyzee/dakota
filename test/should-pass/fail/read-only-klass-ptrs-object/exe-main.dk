@@ -2,8 +2,7 @@
 
 klass object;
 
-int-t main()
-{
+int-t main() {
   object::klass = nullptr; // this should fail
 
   return 0;

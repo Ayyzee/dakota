@@ -4,14 +4,12 @@ klass string;
 
 klass object
 {
-  method object-t foobar(object-t self)
-  {
+  method foobar(object-t self) -> object-t {
     return self;
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t o = make(string::klass);
   $foobar(o);
   return 0;

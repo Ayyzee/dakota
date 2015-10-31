@@ -55,7 +55,7 @@ klass text-output-stream {
     "       ",
     "        ",
   };
-  method object-t init(object-t self, stream-t stream : stdout, uint32-t column-width : 2) {
+  method init(object-t self, stream-t stream : stdout, uint32-t column-width : 2) -> object-t {
     self = $init(super, #stream : stream);
     self.column = 0;
     if (column-width > DK-COUNTOF(ws))
@@ -64,16 +64,16 @@ klass text-output-stream {
     self.previous-features = k-trailing-newline;
     return self;
   }
-  method object-t column-incr(object-t self) {
+  method column-incr(object-t self) -> object-t {
     self.column++;
     return self;
   }
-  method object-t column-decr(object-t self) {
+  method column-decr(object-t self) -> object-t {
     if (0 != self.column)
       self.column--;
     return self;
   }
-  method object-t write(object-t self, str-t string, features-t features) {
+  method write(object-t self, str-t string, features-t features) -> object-t {
     assert(!((features & k-indent) &&
              (features & k-leading-ws)));
 

@@ -2,8 +2,7 @@
 
 #include <stdio.h>
 
-int-t main()
-{
+int-t main() {
   int-t foo-bar = 14;
   
   int-t foo = 45;

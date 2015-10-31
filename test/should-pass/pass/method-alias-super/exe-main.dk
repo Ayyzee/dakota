@@ -4,11 +4,10 @@
 
 klass k1
 {
-  method [[alias(hash)]] uintmax-t alias-hash(object-t);
+  method [[alias(hash)]] alias-hash(object-t) -> uintmax-t;
 }
 
-int-t main()
-{
+int-t main() {
   selector-t hash-selector = SELECTOR(hash(object-t));
   method-t hash = $method-for-selector(k1::klass, hash-selector);
   selector-t alias-hash-selector = SELECTOR(alias-hash(object-t));

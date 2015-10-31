@@ -33,7 +33,7 @@ klass system-exception {
     str-t name;
     str128-t       strerror;
   }
-  method object-t init(object-t self, int-t errnum : {~}) {
+  method init(object-t self, int-t errnum : {~}) -> object-t {
     self = $init(super);
     assert(0 != errnum);
     self.errnum = errnum;
@@ -41,7 +41,7 @@ klass system-exception {
     strerror-r(self.errnum, self.strerror, sizeof(self.strerror));
     return self;
   }
-  method object-t print(object-t self, object-t out) {
+  method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-error;
     $print(super, out);

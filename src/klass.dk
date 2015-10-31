@@ -81,7 +81,7 @@ klass selector-pair {
     signature-t const* key;
     selector-node-t*   element;
   }
-  method int-t compare(slots-t* s, slots-t* other-s) {
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
@@ -305,12 +305,12 @@ klass resource-usage {
     uint32-t method-memory;
     uint32-t method-count;
   }
-  method slots-t* add-alloc(slots-t* s, uint32-t size) {
+  method add-alloc(slots-t* s, uint32-t size) -> slots-t*{
     s->instances++;
     s->memory += size;
     return s;
   }
-  method slots-t* log-alloc(slots-t* s, object-t o) {
+  method log-alloc(slots-t* s, object-t o) -> slots-t*{
     printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"\n",
            s->instances,
            klass::unbox(o)->offset + klass::unbox(o)->size,
@@ -318,12 +318,12 @@ klass resource-usage {
            klass::unbox(o)->name);
     return s;
   }
-  method slots-t* log-alloc(slots-t* s, uint32-t size, symbol-t name) {
+  method log-alloc(slots-t* s, uint32-t size, symbol-t name) -> slots-t*{
     printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"~\n",
            s->instances, size, s->memory, name);
     return s;
   }
-  method slots-t* log-method-alloc(slots-t* s) {
+  method log-method-alloc(slots-t* s) -> slots-t*{
     printf("method-count=%u, method-memory=%i\n", s->method-count, s->method-memory);
     return s;
   }
@@ -348,13 +348,13 @@ klass klass {
     named-info::slots-t* info-slots;
     object-t behavior; // bit-vector
   }
-  method object-t alloc(object-t self, str-t file, uint32-t line) {
+  method alloc(object-t self, str-t file, uint32-t line) -> object-t {
     DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%i','func':'%s','args':['%s']",
                          file, line, __method__->name, self.name);
     object-t instance = $alloc(self);
     return instance;
   }
-  method object-t alloc(object-t self) {
+  method alloc(object-t self) -> object-t {
     uint32-t size = self.offset + self.size;
 
 #if defined DKT-DUMP-MEM-FOOTPRINT
@@ -369,7 +369,7 @@ klass klass {
     instance->retain-count = 1;
     return instance;
   }
-  method symbol-t name(object-t self) {
+  method name(object-t self) -> symbol-t {
     symbol-t name = self.name;
     return name;
   }
@@ -394,12 +394,12 @@ klass klass {
     }
     return self;
   }
-  //      method va-method-t va-method-for-selector(object-t self, selector-t selector)
+  //      method va-method-for-selector(object-t self, selector-t selector)
   //      {
-  //        throw make(exception::klass, #message : "not yet implemented");
+  //        throw make(exception::klass, #message : "not yet implemented") -> va-method-t;
   //        // return nullptr
   //      }
-  method boole-t method-for-selector?(object-t self, selector-t selector) {
+  method method-for-selector?(object-t self, selector-t selector) -> boole-t {
     assert(selector < self.methods.count);
     boole-t result = false;
     method-t m = $method-for-selector(self, selector);
@@ -408,12 +408,12 @@ klass klass {
     }
     return result;
   }
-  method method-t method-for-selector(object-t self, selector-t selector) {
+  method method-for-selector(object-t self, selector-t selector) -> method-t {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     return m;
   }
-  method method-t remove-method-for-selector(object-t self, selector-t selector) {
+  method remove-method-for-selector(object-t self, selector-t selector) -> method-t {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
@@ -421,7 +421,7 @@ klass klass {
       $set-bit(self.behavior, cast(uint32-t)selector, false);
     return m;
   }
-  method method-t add-method-for-selector(object-t self, selector-t selector, method-t m) {
+  method add-method-for-selector(object-t self, selector-t selector, method-t m) -> method-t {
     assert(selector < self.methods.count);
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
@@ -429,7 +429,7 @@ klass klass {
       $set-bit(self.behavior, cast(uint32-t)selector, true);
     return prev-m;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     object::dump(self);
     fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)unbox(self));
 
@@ -486,7 +486,7 @@ klass klass {
     }
     return self;
   }
-  method object-t traits(object-t self) {
+  method traits(object-t self) -> object-t {
     object-t seq = make(vector::klass);
     symbol-t const* traits = cast(symbol-t const*)named-info::at(self.info-slots, #traits);
     
@@ -499,7 +499,7 @@ klass klass {
     }
     return seq;
   }
-  method slots-t* dump-methods(slots-t* s) {
+  method dump-methods(slots-t* s) -> slots-t*{
     if (nullptr != s->behavior)
       $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
@@ -614,12 +614,12 @@ klass klass {
     }
     return self;
   }
-  method boole-t behavior?(object-t self, object-t kls) {
+  method behavior?(object-t self, object-t kls) -> boole-t {
     assert((nullptr != self.behavior) || (nullptr != unbox(kls)->behavior));
     boole-t state = $bit-and?(self.behavior, unbox(kls)->behavior);
     return state;
   }
-  method object-t behavior(object-t self) {
+  method behavior(object-t self) -> object-t {
     if (nullptr == self.behavior) {
       self.behavior = make(bit-vector::klass, #initial-capacity : self.methods.count);
 
@@ -633,9 +633,9 @@ klass klass {
 
   object-t init(object-t self, named-info::slots-t* info-slots);
 
-  method object-t init(object-t self,
+  method init(object-t self,
                        named-info::slots-t* info-slots : nullptr,
-                       object-t                 info :      nullptr) {
+                       object-t                 info :      nullptr) -> object-t {
     self = $init(super);
     assert(!(nullptr != info-slots &&
              nullptr != info));
@@ -647,7 +647,7 @@ klass klass {
     object-t result = init(self, tmp-info-slots);
     return result;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.methods.addrs);
     object-t result = $dealloc(super);
     return result;
@@ -734,11 +734,11 @@ klass klass {
     return self;
   } // init(object-t self, named-info::slots-t*)
 
-  method object-t superklass(object-t self) {
+  method superklass(object-t self) -> object-t {
     object-t superklass = self.superklass;
     return superklass;
   }
-  method boole-t subklass?(object-t self, object-t kls) {
+  method subklass?(object-t self, object-t kls) -> boole-t {
     boole-t state = false;
     object-t tmp-kls = self;
 
@@ -750,7 +750,7 @@ klass klass {
     }
     return state;
   }
-  method object-t klass-with-trait(object-t self, symbol-t trait) {
+  method klass-with-trait(object-t self, symbol-t trait) -> object-t {
     object-t kls = self;
     while (nullptr != kls && null != kls) {
       symbol-t const* traits = cast(symbol-t const*)named-info::at(unbox(kls)->info-slots, #traits);
@@ -763,14 +763,14 @@ klass klass {
     }
     return nullptr;
   }
-  method str-t utf8-from(object-t self) {
+  method utf8-from(object-t self) -> str-t {
     symbol-t name = self.name;
     uint32-t name-len = cast(uint32-t)safe-strlen(name);
     char8-t* buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (name-len + (1)));
     snprintf(buffer, name-len + (1), "%s", name);
     return buffer;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 

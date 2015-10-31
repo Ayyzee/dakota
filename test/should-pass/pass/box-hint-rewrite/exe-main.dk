@@ -2,8 +2,7 @@
 
 klass symbol;
 
-int-t main()
-{
+int-t main() {
   object-t o2 = box(#foo);
   object-t o3 = symbol::box(#foo);
   USE(o2);

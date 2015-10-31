@@ -46,10 +46,10 @@ klass sorted-set {
   }
   static const uint32-t gbl-default-capacity = 64; // shall never be 0
 
-  object-t initialize(object-t kls) {
+  initialize(object-t kls) -> object-t {
     return kls;
   }
-  object-t finalize(object-t kls) {
+  finalize(object-t kls) -> object-t {
     return kls;
   }
   // 'elements' is a collection (of objects)
@@ -62,10 +62,10 @@ klass sorted-set {
     result *= -1;
     return result;
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        uint32-t          initial-capacity : gbl-default-capacity,
                        object-t          elements :         nullptr,
-                       object-t*         items :            nullptr) {
+                       object-t*         items :            nullptr) -> object-t {
     assert(0 != initial-capacity);
 
     self = $init(super);
@@ -84,12 +84,12 @@ klass sorted-set {
       $add-items(self, items);
     return self;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.sa.elements);
     object-t result = $dealloc(super);
     return result;
   }
-  method object-t add(object-t self, object-t element) {
+  method add(object-t self, object-t element) -> object-t {
     self.iterator-state++;
 
     result-t result = sorted-ptr-array::search(&self.sa, element);
@@ -107,12 +107,12 @@ klass sorted-set {
     }
     return element;
   }
-  method object-t empty(object-t self) {
+  method empty(object-t self) -> object-t {
     self.iterator-state++;
     self.sa.count = 0; // hackhack
     return self;
   }
-  method object-t in(object-t self, object-t object1, object-t default-value) {
+  method in(object-t self, object-t object1, object-t default-value) -> object-t {
     object-t object2 = default-value;
     result-t result = sorted-ptr-array::search(&self.sa, object1);
 
@@ -120,13 +120,13 @@ klass sorted-set {
       object2 = cast(object-t)sorted-ptr-array::at(&self.sa, result.offset);
     return object2;
   }
-  method object-t in(object-t self, object-t object1) {
+  method in(object-t self, object-t object1) -> object-t {
     object-t result = $in(self, object1, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #message : "oops");
     return result;
   }
-  method boole-t in?(object-t self, object-t key) {
+  method in?(object-t self, object-t key) -> boole-t {
     boole-t state;
 
     if (nullptr == $in(self, key, cast(object-t)nullptr))
@@ -135,7 +135,7 @@ klass sorted-set {
       state = true;
     return state;
   }
-  method boole-t empty?(object-t self) {
+  method empty?(object-t self) -> boole-t {
     boole-t state;
 
     if (0 == self.sa.count)
@@ -144,7 +144,7 @@ klass sorted-set {
       state = false;
     return state;
   }
-  method object-t remove(object-t self, object-t element) {
+  method remove(object-t self, object-t element) -> object-t {
     result-t result = sorted-ptr-array::search(&self.sa, element);
     object-t object = null;
 
@@ -155,7 +155,7 @@ klass sorted-set {
     }
     return object;
   }
-  method object-t remove-last(object-t self) {
+  method remove-last(object-t self) -> object-t {
     object-t object = nullptr;
     if (0 != self.sa.count) {
       self.iterator-state++;
@@ -163,7 +163,7 @@ klass sorted-set {
     }
     return object; // returns nullptr on error
   }
-  method object-t copy-shallow(object-t self) {
+  method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = make(kls);
     slots-t* s1 = unbox(self);
@@ -174,14 +174,14 @@ klass sorted-set {
     s2->iterator-state = 0;
     return copy;
   }
-  method uint32-t size(object-t self) {
+  method size(object-t self) -> uint32-t {
     return self.sa.count;
   }
-  method object-t forward-iterator(object-t self) {
+  method forward-iterator(object-t self) -> object-t {
     object-t forward-iterator = make(sorted-set-forward-iterator::klass, #sorted-set : self);
     return forward-iterator;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.sa.count, self.sa.capacity);
@@ -189,7 +189,7 @@ klass sorted-set {
       $dump(element);
     return self;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -212,7 +212,7 @@ klass sorted-set-forward-iterator {
 
     uint32-t  iterator-state;
   }
-  method object-t init(object-t self, object-t sorted-set : {~}) {
+  method init(object-t self, object-t sorted-set : {~}) -> object-t {
     self = $init(super);
     assert($instance?(sorted-set, sorted-set::klass));
     sorted-set::slots-t* ss = sorted-set::unbox(sorted-set);
@@ -230,7 +230,7 @@ klass sorted-set-forward-iterator {
     }
     return;
   }
-  method boole-t next?(object-t self) {
+  method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     sorted-set::slots-t* ss = sorted-set::unbox(self.sorted-set);
     boole-t result;
@@ -240,7 +240,7 @@ klass sorted-set-forward-iterator {
       result = false;
     return result;
   }
-  method object-t next(object-t self) {
+  method next(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
@@ -249,7 +249,7 @@ klass sorted-set-forward-iterator {
     }
     return element;
   }
-  method object-t element(object-t self) {
+  method element(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {

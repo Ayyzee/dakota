@@ -4,8 +4,7 @@ module test-n;
 
 klass foobar
 {
-  method object-t bar(object-t self)
-	{
+  method bar(object-t self) -> object-t {
     return self;
   }
 }

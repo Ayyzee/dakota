@@ -6,8 +6,7 @@ klass k1
 {
   slots int-t;
 
-  method slots-t f1(slots-t s)
-  {
+  method f1(slots-t s) -> slots-t {
     return s;
   }
 }

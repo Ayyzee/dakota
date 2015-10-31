@@ -2,15 +2,13 @@
 
 #include <stdio.h>
 
-int-t main()
-{
+int-t main() {
   printf("%i\n", __LINE__);
   try
   {
     printf("%i\n", __LINE__);
   }
-  catch (...)
-  {
+  catch (...) {
     printf("%i\n", __LINE__);
   }
   finally

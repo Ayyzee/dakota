@@ -7,8 +7,7 @@ klass sorted-table;
 klass string;
 klass vector;
 
-int-t main()
-{
+int-t main() {
   object-t sequence = make(vector::klass);
   $add-last(sequence, #"mother");
   $add-last(sequence, #"father");

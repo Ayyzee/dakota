@@ -3,7 +3,7 @@
 klass k1 {
   slots int32-t;
 
-  method slots-t* va::sum(slots-t* s, va-list-t args) {
+  method va::sum(slots-t* s, va-list-t args) -> slots-t*{
     USE(args);
     return s;
   }

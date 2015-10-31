@@ -13,7 +13,6 @@ klass my-context
   }
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

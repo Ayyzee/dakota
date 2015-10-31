@@ -27,7 +27,7 @@ klass str;
 klass str-compare {
   slots int-t (*)(str-t, str-t);
 
-  method object-t init(object-t self, slots-t slots : nullptr) {
+  method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
     *unbox(self) = slots;
     return self;
@@ -40,7 +40,7 @@ klass str-klass {
   slots {
     str-compare::slots-t strcmp;
   }
-  method object-t va::init(object-t self, va-list-t args) {
+  method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
     self.strcmp = safe-strcmp;
     return self;
@@ -51,13 +51,13 @@ klass str {
 
   slots char8-t const*;
 
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { slots=\"%s\" }\n",
             cast(ptr-t)self, cast(ptr-t)unbox(self), *unbox(self));
     return self;
   }
-  method boole-t equal?(object-t self, object-t other) {
+  method equal?(object-t self, object-t other) -> boole-t {
     assert(nullptr != other);
     boole-t state;
     if (0 == $compare(self, other))
@@ -66,13 +66,13 @@ klass str {
       state = false;
     return state;
   }
-  method hash-t hash(object-t self) {
+  method hash(object-t self) -> hash-t {
     slots-t slots = *unbox(self);
     assert(nullptr != slots);
     hash-t result = dk-hash(slots);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     assert(nullptr != other);
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;

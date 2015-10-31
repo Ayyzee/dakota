@@ -3,8 +3,7 @@
 klass text-output-stream;
 klass features; // hackhack
 
-int-t main()
-{
+int-t main() {
   features-t none = features::k-none;
   USE(none);
   return 0;

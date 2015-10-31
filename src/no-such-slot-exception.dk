@@ -28,17 +28,17 @@ klass no-such-slot-exception {
     symbol-t     name;
     signature-t* signature;
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        object-t     object :    {~},
                        symbol-t     name :      {~},
-                       signature-t* signature : {~}) {
+                       signature-t* signature : {~}) -> object-t {
     self = $init(super);
     self.object = object;
     self.name = name;
     self.signature = signature;
     return self;
   }
-  method object-t print(object-t self, object-t out) {
+  method print(object-t self, object-t out) -> object-t {
     $print(super, out);
 
     if ($instance?(self.object, klass::klass)) {

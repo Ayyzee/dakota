@@ -7,8 +7,7 @@ klass sequence;
 klass str;
 klass string;
 
-int-t main()
-{
+int-t main() {
   object-t sequence = make(deque::klass);
   $add-first(sequence, str::box("mother"));
   $add-first(sequence, str::box("father"));

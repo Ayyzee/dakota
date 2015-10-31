@@ -2,11 +2,9 @@
 
 #include <string>
 
-int-t main()
-{
+int-t main() {
   const char8-t* str1 = "";
-  switch (str1)
-  {
+  switch (str1) {
     case "aa":
       //
       break;
@@ -15,8 +13,7 @@ int-t main()
       break;
     case "cc": {
       const char8-t* str2 = "";
-      switch (str2)
-      {
+      switch (str2) {
         case "dd":
           //
           break;

@@ -22,12 +22,12 @@ klass singleton-klass {
   slots {
     object-t instance;
   }
-  method object-t alloc(object-t self) {
+  method alloc(object-t self) -> object-t {
     if (self.instance == nullptr)
       self.instance = $alloc(super);
     return self.instance;
   }
-  method object-t va::init(object-t self, va-list-t args) {
+  method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
     self.instance = nullptr;
     return self;

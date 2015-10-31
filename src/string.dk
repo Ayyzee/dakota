@@ -39,11 +39,11 @@ klass string {
   }
   //uint32-t size; // sizeof(ptr[0])
 
-  method object-t init(object-t self,
+  method init(object-t self,
                        symbol-t       encoding : #utf-8,
                        str-t bytes :    "",
                        uint32-t       start :    0,
-                       uint32-t       length :   cast(uint32-t)safe-strlen(bytes) - start) {
+                       uint32-t       length :   cast(uint32-t)safe-strlen(bytes) - start) -> object-t {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = $init(super);
     assert(nullptr != bytes);
@@ -57,30 +57,30 @@ klass string {
     self.ptr[self.len] = NUL;
     return self;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.ptr);
     object-t result = $dealloc(super);
     return result;
   }
-  method uint32-t length(object-t self) {
+  method length(object-t self) -> uint32-t {
     if (0    == self.len &&
         nullptr != self.ptr &&
         NUL  != self.ptr[0])
       self.len = cast(uint32-t)safe-strlen(self.ptr);
     return self.len;
   }
-  method symbol-t intern(object-t self) {
+  method intern(object-t self) -> symbol-t {
     symbol-t result = dk-intern(cast(symbol-t)(self.ptr));
     return result;
   }
-  method object-t write-lite(object-t self, object-t out) {
+  method write-lite(object-t self, object-t out) -> object-t {
     str-t utf8 = $utf8-from(self);
     $write(out, "\"");
     $write(out, utf8);
     $write(out, "\"");
     return self;
   }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -90,21 +90,21 @@ klass string {
     $write-slots-end(out);
     return self;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%i }\n",
             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.ptr, self.len);
     return self;
   }
-  method uint32-t uint32-value(object-t self) {
+  method uint32-value(object-t self) -> uint32-t {
     uint32-t result = cast(uint32-t)strtoumax(self.ptr, nullptr, 10);
     return result;
   }
-  method int32-t int32-value(object-t self) {
+  method int32-value(object-t self) -> int32-t {
     int32-t result = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
     return result;
   }
-  method boole-t boole-value(object-t self) {
+  method boole-value(object-t self) -> boole-t {
     int32-t int-value = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
     boole-t result;
     if (0 == int-value)
@@ -113,7 +113,7 @@ klass string {
       result = true;
     return result;
   }
-  method object-t append(object-t self, str-t bytes, symbol-t encoding : #utf-8) {
+  method append(object-t self, str-t bytes, symbol-t encoding : #utf-8) -> object-t {
     assert(nullptr != bytes);
     assert(nullptr != encoding);
     assert(#utf-8 != encoding);
@@ -124,17 +124,17 @@ klass string {
     strcat(self.ptr, bytes);
     return self;
   }
-  method str-t utf8-from(object-t self) {
+  method utf8-from(object-t self) -> str-t {
     return self.ptr;
   }
   // returns an vector of string objects
-  method object-t tokenize(object-t self, object-t delimiter) {
+  method tokenize(object-t self, object-t delimiter) -> object-t {
     assert($instance?(delimiter, klass));
     slots-t* d = unbox(delimiter);
     object-t result = $tokenize(self, d->ptr);
     return result;
   }
-  method object-t tokenize(object-t self, str-t delimiter) {
+  method tokenize(object-t self, str-t delimiter) -> object-t {
     object-t result = make(vector::klass);
     uint32-t delimiter-length = cast(uint32-t)safe-strlen(delimiter);
     str-t p1 = self.ptr;
@@ -162,11 +162,11 @@ klass string {
     }
     return result;
   }
-  method hash-t hash(object-t self) {
+  method hash(object-t self) -> hash-t {
     hash-t result = dk-hash(self.ptr);
     return result;
   }
-  method object-t append-sequence(object-t self, object-t sequence) {
+  method append-sequence(object-t self, object-t sequence) -> object-t {
     for (object-t element in sequence) {
       str-t utf8 = $utf8-from(element);
       uint32-t length = cast(uint32-t)safe-strlen(utf8);
@@ -176,7 +176,7 @@ klass string {
     }
     return self;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 
@@ -193,7 +193,7 @@ klass string {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  method object-t print(object-t self, object-t out) {
+  method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-output;
     $print(out, $utf8-from(self));

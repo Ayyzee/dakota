@@ -2,15 +2,13 @@
 
 klass k1
 {
-  method object-t init(object-t self, object-t token : nullptr, const char8-t* filename : nullptr)
-  {
+  method init(object-t self, object-t token : nullptr, const char8-t* filename : nullptr) -> object-t {
     self = $init(super);
     return self;
   }
 } 
 
-int-t main()
-{
+int-t main() {
   object-t o = make(k1::klass, #token : null, #filename : nullptr, #token : null);
   USE(o);
   return 0;

@@ -5,8 +5,7 @@ klass json-object-output-stream;
 klass string;
 klass vector;
 
-int-t main()
-{
+int-t main() {
 //   int-t overwrite;
 //   setenv("DK_ENABLE_TRACE", "", overwrite = 1);
 

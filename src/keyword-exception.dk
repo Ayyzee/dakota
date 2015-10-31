@@ -28,10 +28,10 @@ klass keyword-exception {
     signature-t* signature;
     symbol-t     keyword;
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        object-t     object :    {~},
                        signature-t* signature : {~},
-                       symbol-t     keyword :   {~}) {
+                       symbol-t     keyword :   {~}) -> object-t {
     assert(nullptr != object);
     assert(nullptr != signature);
     assert(nullptr != keyword);
@@ -43,7 +43,7 @@ klass keyword-exception {
     self.keyword =   keyword;
     return self;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "\"%s\": {", $utf8-from(self));
     fprintf(stderr, " \"object\": [ %p, \"%s\" ]",
@@ -60,7 +60,7 @@ klass keyword-exception {
     $dump(self.object);
     return self;
   }
-  method object-t print(object-t self, object-t out, str-t msg) {
+  method print(object-t self, object-t out, str-t msg) -> object-t {
     $print(super, out);
     assert(nullptr != self.object);
     assert(nullptr != self.signature);

@@ -14,22 +14,21 @@ klass int32;
 klass pair;
 klass vector;
 
-int-t main()
-{
+int-t main() {
   int32-t a = 0, b = 0, c = 0, d = 0;
   //object-t a = nullptr, b = nullptr, c = nullptr, d = nullptr;
 
 //object-t x1 = #[a, b];
   object-t x1 = #[a, b];
-//object-t x2 = make(DEFAULT-SEQUENCE-KLASS, #items : cast(object-t[]){ box(a), box(b), nullptr });
+//object-t x2 = make(DEFAULT-SEQUENCE-KLASS, #items : cast(object-t[]) { box(a), box(b), nullptr });
 
 //object-t y1 = #{a, b};
   object-t y1 = #{a, b};
-//object-t y2 = make(DEFAULT-SET-KLASS, #items : cast(object-t[]){ box(a), box(b), nullptr });
+//object-t y2 = make(DEFAULT-SET-KLASS, #items : cast(object-t[]) { box(a), box(b), nullptr });
 
 //object-t z1 = #{a : b, c : d};
   object-t z1 = #{a : b, c : d};
-//object-t z2 = make(DEFAULT-TABLE-KLASS, #items : cast(object-t[]){ pair::box({box(a), box(b)}), pair::box({box(c), box(d)}), nullptr });
+//object-t z2 = make(DEFAULT-TABLE-KLASS, #items : cast(object-t[]) { pair::box({box(a), box(b)}), pair::box({box(c), box(d)}), nullptr });
 
 //x1 = #[];
   x1 = #[];

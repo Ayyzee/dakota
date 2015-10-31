@@ -39,7 +39,7 @@ klass object {
   // slots-t* unbox(object-t object) { // special-case
   //   return object;
   // }
-  method object-t write-slots(object-t self, object-t out) {
+  method write-slots(object-t self, object-t out) -> object-t {
   //$write-slots(super, out);
     $write-slots-start(out, klass);
 
@@ -48,13 +48,13 @@ klass object {
     $write-slots-end(out);
     return self;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     intptr-t result = cast(uint8-t*)self - cast(uint8-t*)(other);
     result = dkt-normalize-compare-result(result);
     return cast(int-t)(result);
   }
-  method boole-t equal?(object-t self, object-t other) {
+  method equal?(object-t self, object-t other) -> boole-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     boole-t state = false;
 
@@ -62,7 +62,7 @@ klass object {
       state = true;
     return state;
   }
-  method boole-t instance?(object-t self, object-t kls) {
+  method instance?(object-t self, object-t kls) -> boole-t {
     boole-t state = false;
     object-t tmp-kls = klass-of(self);
 
@@ -75,46 +75,46 @@ klass object {
     }
     return state;
   }
-  method object-t perform-method-for-selector(object-t self, selector-t selector) {
+  method perform-method-for-selector(object-t self, selector-t selector) -> object-t {
     object-t kls = klass-of(self);
     method-t m = $method-for-selector(kls, selector);
     object-t value = m(self);
     return value;
   }
   // documented to do nothing
-  method object-t init(object-t self) {
+  method init(object-t self) -> object-t {
     return self;
   }
-  method object-t copy(object-t self) {
+  method copy(object-t self) -> object-t {
     USE(self);
     throw make(exception::klass, #message : "not yet implemented");
     return nullptr;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     $release(klass-of(self));
     dkt::dealloc(self);
     return nullptr;
   }
-  method object-t retain(object-t self) {
+  method retain(object-t self) -> object-t {
     self->retain-count++;
     return self;
   }
-  method object-t release(object-t self) {
+  method release(object-t self) -> object-t {
     self->retain-count--;
     if (0 == self->retain-count)
       self = $dealloc(self);
     return self;
   }
-  method object-t autorelease(object-t self) {
+  method autorelease(object-t self) -> object-t {
     object-t current-pool = $current-pool(autorelease-pool::klass);
     $add(current-pool, self);
     return self;
   }
-  method hash-t hash(object-t self) {
+  method hash(object-t self) -> hash-t {
     uintptr-t result = cast(uintptr-t)self;
     return result;
   }
-  method object-t dump(object-t self) {
+  method dump(object-t self) -> object-t {
     symbol-t klass-name = #nullptr;
 
     // klass
@@ -130,20 +130,20 @@ klass object {
 
     return self;
   }
-  method str-t utf8-from(object-t self) {
+  method utf8-from(object-t self) -> str-t {
     size-t len = 2 + PRIxPTR-WIDTH + (1);
     char8-t* buffer = cast(char8-t*)dkt::alloc(len);
     snprintf(buffer, len, "%p", cast(ptr-t)self);
     return cast(str-t)(buffer);
   }
-  method object-t print(object-t self, object-t out) {
+  method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-output;
     str-t utf8 = $utf8-from(self);
     $print(out, utf8);
     return self;
   }
-  method object-t println(object-t self, object-t out) {
+  method println(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-output;
     $print(self, out);

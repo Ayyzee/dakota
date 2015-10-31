@@ -9,8 +9,7 @@ klass k1-klass
   // default klass
   superklass klass;
 
-  method object-t bar(object-t self)
-  {
+  method bar(object-t self) -> object-t {
     throw "oops!"; // this should never get called
     return self;
   }
@@ -21,8 +20,7 @@ klass o1
   klass k1-klass;
   // default superklass is 'object'
 
-  method object-t foo(object-t self)
-  {
+  method foo(object-t self) -> object-t {
     // the klass klass, not the klass k1-klass
     object-t kls = klass-of(klass-of(self));
     $bar(kls); // this should fail
@@ -36,8 +34,7 @@ klass o2
   superklass o1;
 }
 
-int-t main()
-{
+int-t main() {
   try {
     object-t i2 = make(o2::klass);
     $foo(i2);

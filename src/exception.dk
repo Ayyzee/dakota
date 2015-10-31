@@ -168,12 +168,12 @@ klass exception {
   slots {
     str-t message;
   }
-  method object-t init(object-t self, str-t message : name-of(klass-of(self))) {
+  method init(object-t self, str-t message : name-of(klass-of(self))) -> object-t {
     self = $init(super);
     self.message = message;
     return self;
   }
-  method object-t print(object-t self, object-t out) {
+  method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-error;
     $print-format(out, ", \"%s\": \"%s\"", name-of(klass), self.message);

@@ -15,7 +15,6 @@ klass k1
   slots int32-t[2];
 }
 
-int-t main()
-{
+int-t main() {
   return 0;
 }

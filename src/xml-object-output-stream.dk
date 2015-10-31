@@ -43,7 +43,7 @@ klass xml-object-output-stream {
     str-t start-tbl-delim;
     str-t end-tbl-delim;
   }
-  method object-t init(object-t self, stream-t stream : stdout) {
+  method init(object-t self, stream-t stream : stdout) -> object-t {
     self = $init(super, #stream : stream);
     self.indent-level = 1; // set to zero for maximum compactness
 
@@ -69,7 +69,7 @@ klass xml-object-output-stream {
     else
       return k-none;
   }
-  method object-t write-element(object-t self, str-t element, str-t key) {
+  method write-element(object-t self, str-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s\"%s\"%s",  key, self.key-delim, element, self.element-delim);
@@ -78,7 +78,7 @@ klass xml-object-output-stream {
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method object-t write-element(object-t self, int32-t element, str-t key) {
+  method write-element(object-t self, int32-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%i%s",  key, self.key-delim, element, self.element-delim);
@@ -87,7 +87,7 @@ klass xml-object-output-stream {
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method object-t write-element(object-t self, uint32-t element, str-t key) {
+  method write-element(object-t self, uint32-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%u%s",  key, self.key-delim, element, self.element-delim);
@@ -96,7 +96,7 @@ klass xml-object-output-stream {
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method object-t write-table-start(object-t self, str-t key) {
+  method write-table-start(object-t self, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-tbl-delim);
@@ -106,14 +106,14 @@ klass xml-object-output-stream {
     $column-incr(self);
     return self;
   }
-  method object-t write-table-end(object-t self) {
+  method write-table-end(object-t self) -> object-t {
     char8-t[128] buffer;
     snprintf(buffer, sizeof(buffer), "%s%s", self.end-tbl-delim, self.element-delim);
     $column-decr(self);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method object-t write-sequence-start(object-t self, str-t key) {
+  method write-sequence-start(object-t self, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-seq-delim);
@@ -123,7 +123,7 @@ klass xml-object-output-stream {
     $column-incr(self);
     return self;
   }
-  method object-t write-sequence-end(object-t self) {
+  method write-sequence-end(object-t self) -> object-t {
     char8-t[128] buffer;
     snprintf(buffer, sizeof(buffer), "%s%s", self.end-seq-delim, self.element-delim);
     $column-decr(self);

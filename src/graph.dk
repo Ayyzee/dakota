@@ -25,9 +25,9 @@ klass node {
     str-t    name;  // may NOT be nullptr
     object-t attrs; // <table>
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        str-t    name :  {~},
-                       object-t attrs : null) {
+                       object-t attrs : null) -> object-t {
     self = $init(super);
     return self;
   }
@@ -40,10 +40,10 @@ klass edge {
     str-t    rhs-name; // may NOT be nullptr
     object-t attrs;    // <table>
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        str-t    lhs-name : {~},
                        str-t    rhs-name : {~},
-                       object-t attrs :    null) {
+                       object-t attrs :    null) -> object-t {
     self = $init(super);
     self.lhs-name = lhs-name;
     self.rhs-name = rhs-name;
@@ -54,8 +54,8 @@ klass edge {
 klass attrs {
   slots object-t;
 
-  method object-t init(object-t self,
-                       object-t attrs : {~}) {
+  method init(object-t self,
+                       object-t attrs : {~}) -> object-t {
     self = $init(super);
     *unbox(self) = attrs;
     return self;
@@ -69,27 +69,27 @@ klass graph {
     str-t    name;  // may be nullptr
     object-t stmts; // <sequence>
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        symbol-t type :  #graph,
                        str-t    name :  nullptr,
-                       object-t attrs : null) {
+                       object-t attrs : null) -> object-t {
     self = $init(super);
     self.type = type;
     self.name = name;
     // what should I do with attrs?
     return self;
   }
-  method object-t add-stmt(object-t self, object-t stmt) {
+  method add-stmt(object-t self, object-t stmt) -> object-t {
     $add-last(self.stmts, stmt);
     return self;
   }
-  method object-t add-graph-attrs(object-t self, object-t attrs) {
+  method add-graph-attrs(object-t self, object-t attrs) -> object-t {
     return self;
   }
-  method object-t add-node-attrs(object-t self, object-t attrs) {
+  method add-node-attrs(object-t self, object-t attrs) -> object-t {
     return self;
   }
-  method object-t add-edge-attrs(object-t self, object-t attrs) {
+  method add-edge-attrs(object-t self, object-t attrs) -> object-t {
     return self;
   }
 }

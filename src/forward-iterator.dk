@@ -17,9 +17,9 @@
 module dakota;
 
 trait forward-iterator {
-  method object-t  next(object-t self); // returns nullptr on end
-  method boole-t   next?(object-t self);
-  method object-t  element(object-t self);
-  method object-t  set-element(object-t self, object-t element);
-  method object-t  remove(object-t self);
+  method next(object-t self) -> object-t; // returns nullptr on end
+  method next?(object-t self) -> boole-t;
+  method element(object-t self) -> object-t;
+  method set-element(object-t self, object-t element) -> object-t;
+  method remove(object-t self) -> object-t;
 }

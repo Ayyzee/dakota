@@ -54,9 +54,9 @@ klass lexer {
 
     object-t open-tokens;
   }
-  method object-t init(object-t self,
+  method init(object-t self,
                        stream-t stream :   stdin,
-                       str-t    filename : nullptr) {
+                       str-t    filename : nullptr) -> object-t {
     self = $init(super);
 
     if (nullptr != filename) {
@@ -98,12 +98,12 @@ klass lexer {
     self.open-tokens = make(deque::klass);
     return self;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.buffer);
     object-t result = $dealloc(super);
     return result;
   }
-  method str-t filename(object-t self) {
+  method filename(object-t self) -> str-t {
     return cast(str-t)(self.filename);
   }
     
@@ -150,7 +150,7 @@ klass lexer {
     }
     return c;
   }
-  method object-t tokenize(object-t self) {
+  method tokenize(object-t self) -> object-t {
     object-t seq = make(vector::klass);
     object-t token;
     object-t leading-ws = make(vector::klass);
@@ -168,7 +168,7 @@ klass lexer {
     }
     return seq;
   }
-  method object-t lex(object-t self) {
+  method lex(object-t self) -> object-t {
     while (1) {
       char8-t c1 = get-char8(self);
       switch (c1) {

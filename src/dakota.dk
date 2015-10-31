@@ -104,7 +104,7 @@ klass named-assoc-node {
     symbol-t name;
     assoc-node-t* node;
   }
-  method int-t compare(slots-t* s, slots-t* other-s) {
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
@@ -886,6 +886,7 @@ dump-module-description(ostream-t ostrm, named-info-t* registration-info) {
       //signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
 
       if (nullptr == modulee) {
+        named-info::dump(klass-info);
         fprintf(stderr, "%s:%i: error: missing module declaration\n", __FILE__, __LINE__);
         std::abort();
       }
@@ -998,42 +999,20 @@ max-slot-name-width(named-info-t* slots-info) {
   }
   return result;
 }
-static uint32-t
-max-method-return-type-width(signature-t const* const* method-signatures, ...) {
-  uint32-t result = 0;
-  va-list-t args;
-  va-start(args, method-signatures);
-  signature-t const* const* arg = method-signatures;
-  do {
-    uint32-t index =  0;
-
-    if (nullptr != arg) {
-      signature-t const* info;
-      while (nullptr != (info = arg[index++])) {
-        uint32-t width = cast(uint32-t)safe-strlen(info->return-type);
-        if (width > result)
-          result = width;
-      }
-    }
-  }  while (nullptr != (arg = va-arg(args, signature-t const* const*)));
-  va-end(args);
-  return result;
-}
 static void
-dump-method(ostream-t ostrm, signature-t const* info, uint32-t max-return-type-width) {
- ostream::printf(ostrm, "method %-*s %s(%s);\n",
-              max-return-type-width,
-              info->return-type,
-              info->name,
-              info->parameter-types);
+dump-method(ostream-t ostrm, signature-t const* info) {
+  ostream::printf(ostrm, "method %s(%s) -> %s;\n",
+                  info->name,
+                  info->parameter-types,
+                  info->return-type);
   return;
 }
 static void
 dump-generic(ostream-t ostrm, signature-t const* info) {
- ostream::printf(ostrm, "generic %s $%s(%s);\n",
-              info->return-type,
-              info->name,
-              info->parameter-types);
+  ostream::printf(ostrm, "generic $%s(%s) -> %s;\n",
+                  info->name,
+                  info->parameter-types,
+                  info->return-type);
   return;
 }
 void
@@ -1223,17 +1202,8 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       ostream::printf(ostrm, "\n");
     }
     signature-t const* info;
-    uint32-t index;
-    uint32-t max-return-type-width;
+    uint32-t index = 0;
 
-  //max-return-type-width = max-method-return-type-width(kw-args-method-signatures, nullptr);
-    max-return-type-width = max-method-return-type-width(method-signatures,
-                                                         slots-method-signatures,
-                                                         exported-method-signatures,
-                                                         exported-slots-method-signatures,
-                                                         nullptr);
-
-    index = 0;
     if (nullptr != kw-args-method-signatures)
       while (nullptr != (info = kw-args-method-signatures[index++])) {
         if (!strcmp(#init, info->name))
@@ -1241,27 +1211,27 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
         else
           fprintf(ostrm.output, "//");
         ostream-t ostrm0 = {ostrm.output, 0};
-        dump-method(ostrm0, info, max-return-type-width);
+        dump-method(ostrm0, info);
       }
     index = 0;
     if (nullptr != method-signatures)
       while (nullptr != (info = method-signatures[index++]))
-        dump-method(ostrm, info, max-return-type-width);
+        dump-method(ostrm, info);
 
     index = 0;
     if (nullptr != slots-method-signatures)
       while (nullptr != (info = slots-method-signatures[index++]))
-        dump-method(ostrm, info, max-return-type-width);
+        dump-method(ostrm, info);
 
     index = 0;
     if (nullptr != exported-method-signatures)
       while (nullptr != (info = exported-method-signatures[index++]))
-        dump-method(ostrm, info, max-return-type-width);
+        dump-method(ostrm, info);
 
     index = 0;
     if (nullptr != exported-slots-method-signatures)
       while (nullptr != (info = exported-slots-method-signatures[index++]))
-        dump-method(ostrm, info, max-return-type-width);
+        dump-method(ostrm, info);
 
     ostrm.col--;
     ostream::printf(ostrm, "}\n");

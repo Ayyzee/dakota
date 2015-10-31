@@ -7,8 +7,7 @@ static char8-t buf[16] = "";
 
 klass k1
 {
-  object-t initialize(object-t kls)
-  {
+  initialize(object-t kls) -> object-t {
     strcat(buf, __klass__);
     fprintf(stderr, "%s(%p <%s>)\n", __func__, (void*)kls, __klass__);
     assert(klass == kls);
@@ -20,8 +19,7 @@ klass k2
 {
   superklass k1;
 
-  object-t initialize(object-t kls)
-  {
+  initialize(object-t kls) -> object-t {
     strcat(buf, __klass__);
     fprintf(stderr, "%s(%p <%s>)\n", __func__, (void*)kls, __klass__);
     assert(klass == kls);
@@ -33,8 +31,7 @@ klass k3
 {
   superklass k2;
 
-  object-t initialize(object-t kls)
-  {
+  initialize(object-t kls) -> object-t {
     strcat(buf, __klass__);
     fprintf(stderr, "%s(%p <%s>)\n", __func__, (void*)kls, __klass__);
     assert(klass == kls);
@@ -42,8 +39,7 @@ klass k3
   }
 }
 
-int-t main()
-{
+int-t main() {
   object-t o = make(k3::klass);
   USE(o);
   assert(0 == strcmp("k1k2k3", buf));

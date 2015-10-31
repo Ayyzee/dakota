@@ -18,8 +18,7 @@ enum collection-type-t
 //MUMBLE  = 1 << 2,
 }
 
-static int-t check-collection(object-t klass, collection-type-t collection-type, size-t count)
-{
+static int-t check-collection(object-t klass, collection-type-t collection-type, size-t count) {
   assert(0xff >= count); // 2 hex digits wide max
   object-t collection = make(klass);
   size-t width = (count * (1 + 2)) + (1);
@@ -62,8 +61,7 @@ static int-t check-collection(object-t klass, collection-type-t collection-type,
   return result;
 }
 
-static int-t check-collection(object-t klass, collection-type-t collection-type)
-{
+static int-t check-collection(object-t klass, collection-type-t collection-type) {
   int-t result = 0;
   fprintf(stderr, "%s:\n", name-of(klass));
   for (size-t i = 1; i < 5; i++)
@@ -71,8 +69,7 @@ static int-t check-collection(object-t klass, collection-type-t collection-type)
   return result;
 }
 
-int-t main()
-{
+int-t main() {
   int-t r1 = check-collection(vector::klass, ORDERED);
   int-t r2 = check-collection(deque::klass,  ORDERED);
 

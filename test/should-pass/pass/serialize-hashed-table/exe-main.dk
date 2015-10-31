@@ -4,8 +4,7 @@ klass features; // hackhack
 klass hashed-table;
 klass json-object-output-stream;
 
-int-t main()
-{
+int-t main() {
   object-t st = make(hashed-table::klass);
 
   $add(st, #"key0", #"element0");

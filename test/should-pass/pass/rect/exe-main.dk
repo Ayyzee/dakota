@@ -4,8 +4,7 @@ klass rect;
 klass point;
 klass dimension;
 
-int-t main()
-{
+int-t main() {
   rect-t v1 = { {0, 0}, {640, 480} };
 
   object-t o1 = rect::box(&v1);

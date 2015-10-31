@@ -32,11 +32,11 @@ klass ascii-number {
     char8-t* ascii-string;
     int32-t  number;
   }
-  method hash-t hash(object-t self) {
+  method hash(object-t self) -> hash-t {
     uintptr-t result = cast(uintptr-t)(self.number);
     return result;
   }
-  method int-t compare(object-t self, object-t other) {
+  method compare(object-t self, object-t other) -> int-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
     if ($instance?(other, klass)) {
@@ -49,7 +49,7 @@ klass ascii-number {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  method boole-t equal?(object-t self, object-t other) {
+  method equal?(object-t self, object-t other) -> boole-t {
     boole-t state;
 
     if ($instance?(other, klass)) {
@@ -109,7 +109,7 @@ klass ascii-number {
     reverse(buffer, offset);
     return;
   }
-  method object-t init(object-t self, int32-t number : 0) {
+  method init(object-t self, int32-t number : 0) -> object-t {
     self = $init(super);
     self.number = number;
     self.ascii-string = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (32 + 1));
@@ -119,12 +119,12 @@ klass ascii-number {
     convert(number, cast(int32-t)(base), digits, self.ascii-string);
     return self;
   }
-  method object-t dealloc(object-t self) {
+  method dealloc(object-t self) -> object-t {
     dkt::dealloc(self.ascii-string);
     object-t result = $dealloc(super);
     return result;
   }
-  method str-t ascii-string(object-t self) {
+  method ascii-string(object-t self) -> str-t {
     return self.ascii-string;
   }
 }
