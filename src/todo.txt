@@ -153,3 +153,10 @@ new alias syntax:
     method init(slots => stream);
     // or if init() is overloaded
     method init(object-t, int32-t, slots => stream);
+
+from swift:
+  case "cucumber", "watercress":
+
+bin/dakota-build --project [project.rep] --jobs 4 ../lib/libdakota.so
+  which uses bin/dakota just like make does
+
