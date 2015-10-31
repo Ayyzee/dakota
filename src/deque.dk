@@ -220,8 +220,8 @@ klass deque {
     self.iterator-state++;
     return self;
   }
-  method alias(add-last) object-t add(object-t self, object-t element);
-  method alias(add-last) object-t push(object-t self, object-t element);
+  method [[alias(add-last)]] object-t add(object-t self, object-t element);
+  method [[alias(add-last)]] object-t push(object-t self, object-t element);
   method object-t add-last(object-t self, object-t element) {
     assert(nullptr != element);
     node::slots-t* node = node::create(self.last, element, nullptr); // self.last may be nullptr
@@ -246,7 +246,7 @@ klass deque {
       element = self.first->element;
     return element;
   }
-  method alias(last) object-t top(object-t self);
+  method [[alias(last)]] object-t top(object-t self);
   method object-t last(object-t self) {
     assert(0 != self.size);
     //assert(nullptr != self.last);
@@ -282,7 +282,7 @@ klass deque {
     self.iterator-state++;
     return element;
   }
-  method alias(remove-last) object-t pop(object-t self);
+  method [[alias(remove-last)]] object-t pop(object-t self);
   method object-t remove-last(object-t self) {
     assert(0 != self.size);
     //assert(nullptr != self.last);

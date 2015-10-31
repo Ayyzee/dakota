@@ -2,7 +2,7 @@
 
 klass k1
 {
-  method alias(real-method) object-t alias-method(object-t self);
+  method [[alias(real-method)]] object-t alias-method(object-t self);
   method object-t real-method(object-t self)
   {
     log-method();

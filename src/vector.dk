@@ -176,7 +176,7 @@ klass vector {
     self.count--;
     return element;
   }
-  method alias(remove-last) object-t pop(object-t self);
+  method [[alias(remove-last)]] object-t pop(object-t self);
   method object-t remove-last(object-t self) {
     assert(0 != self.count);
     object-t element = self.elements[self.count - 1];
@@ -252,8 +252,8 @@ klass vector {
   }
   //     method object-t add-at(object-t self, object-t element, uint32-t index);
 
-  method alias(add-last) object-t add(object-t self, object-t element);
-  method alias(add-last) object-t push(object-t self, object-t element);
+  method [[alias(add-last)]] object-t add(object-t self, object-t element);
+  method [[alias(add-last)]] object-t push(object-t self, object-t element);
   method object-t add-last(object-t self, object-t element) {
     assert(nullptr != element);
 
@@ -270,7 +270,7 @@ klass vector {
     assert(0 != self.count);
     return self.elements[0];
   }
-  method alias(last) object-t top(object-t self);
+  method [[alias(last)]] object-t top(object-t self);
   method object-t last(object-t self) {
     assert(0 != self.count);
     return self.elements[self.count - 1];

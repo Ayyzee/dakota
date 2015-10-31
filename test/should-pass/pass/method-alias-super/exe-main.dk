@@ -4,7 +4,7 @@
 
 klass k1
 {
-  method alias(hash) uintmax-t alias-hash(object-t);
+  method [[alias(hash)]] uintmax-t alias-hash(object-t);
 }
 
 int-t main()

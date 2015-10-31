@@ -322,7 +322,8 @@ sub vars_from_defn {
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|(\s+)method(\s+)alias\(($id)\)|$1METHOD$2ALIAS($3)|gs; #hackhack
+  $$filestr_ref =~ s|(\s+)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3)|gs; #hackhack
+  $$filestr_ref =~ s|(\s+method\s+)\[\[($id\(\d+\))\]\]|$1$2|gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack

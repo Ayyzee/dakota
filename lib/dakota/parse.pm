@@ -1592,46 +1592,27 @@ sub method {
   if ($$args{'exported?'}) {
     $$method{'exported?'} = 1;
   }
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq 'alias') {
-    &match(__FILE__, __LINE__, 'alias');
+  if (&sst_cursor::current_token($gbl_sst_cursor) eq '[') {
+    my ($open_bracket_index, $close_bracket_index)
+      = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+    &match(__FILE__, __LINE__, '[');
+    &match(__FILE__, __LINE__, '[');
+    my $attr = &match_re(__FILE__, __LINE__, $id);
     &match(__FILE__, __LINE__, '(');
-    my $alias = &match_re(__FILE__, __LINE__, $id);
+    my $attr_arg = &match_any(__FILE__, __LINE__);
     &match(__FILE__, __LINE__, ')');
-    $$method{'alias'} = [ $alias ];
-  }
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq 'format-va-printf') {
-    &match(__FILE__, __LINE__, 'format-va-printf');
-    &match(__FILE__, __LINE__, '(');
-    my $alias = &match_re(__FILE__, __LINE__, '\d+');
-    &match(__FILE__, __LINE__, ')');
-    if (!exists $$method{'attributes'}) {
-      $$method{'attributes'} = [];
+    &match(__FILE__, __LINE__, ']');
+    &match(__FILE__, __LINE__, ']');
+
+    if (0) {
+    } elsif ('alias' eq $attr) {
+      $$method{'alias'} = [ $attr_arg ];
+    } elsif ('format-printf' eq $attr || 'format-va-printf' eq $attr) {
+      if (!exists $$method{'attributes'}) {
+        $$method{'attributes'} = [];
+      }
+      &dakota::util::add_last($$method{'attributes'}, $attr);
     }
-    &dakota::util::add_last($$method{'attributes'}, 'format-va-printf');
-  }
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq 'format-printf') {
-    &match(__FILE__, __LINE__, 'format-printf');
-    &match(__FILE__, __LINE__, '(');
-    my $alias = &match_re(__FILE__, __LINE__, '\d+');
-    &match(__FILE__, __LINE__, ')');
-    if (!exists $$method{'attributes'}) {
-      $$method{'attributes'} = [];
-    }
-    &dakota::util::add_last($$method{'attributes'}, 'format-printf');
-  }
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq 'extern') {
-    &warning(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
-    &match(__FILE__, __LINE__, 'extern');
-    $$method{'exported?'} = 1;
-  }
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq 'static') {
-    &warning(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
-    &match(__FILE__, __LINE__, 'static');
-    $$method{'exported?'} = 0;
-  }
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq 'inline') {
-    &match(__FILE__, __LINE__, 'inline');
-    $$method{'is-inline'} = 1;
   }
   my ($open_paren_index, $close_paren_index)
     = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
