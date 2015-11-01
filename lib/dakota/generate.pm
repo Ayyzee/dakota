@@ -541,7 +541,7 @@ sub generate_defn_footer {
   $rt_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 
   $rt_cc_str .= "\n";
-  $rt_cc_str .= $col . "static void __initial() {" . &ann(__FILE__, __LINE__) . "\n";
+  $rt_cc_str .= $col . "static auto __initial() -> void {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   $rt_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
@@ -550,7 +550,7 @@ sub generate_defn_footer {
     $col . "return;\n";
   $col = &colout($col);
   $rt_cc_str .= $col . "}\n";
-  $rt_cc_str .= $col . "static void __final() {" . &ann(__FILE__, __LINE__) . "\n";
+  $rt_cc_str .= $col . "static auto __final() -> void {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   $rt_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
@@ -1901,7 +1901,7 @@ sub generate_klass_unbox {
   if ($klass_name eq 'object') {
     #$result .= $col . "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n";
   } elsif ($klass_name eq 'klass') {
-    $result .= $col . "klass $klass_name { unbox-attrs slots-t* unbox(object-t object)";
+    $result .= $col . "klass $klass_name { unbox-attrs auto unbox(object-t object) -> slots-t*";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . " // special-case\n";
@@ -1916,7 +1916,7 @@ sub generate_klass_unbox {
   } else {
     ### unbox() same for all types
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
-      $result .= $col . "klass $klass_name { unbox-attrs slots-t* unbox(object-t object)";
+      $result .= $col . "klass $klass_name { unbox-attrs auto unbox(object-t object) -> slots-t*";
       if (&is_nrt_decl() || &is_rt_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . "\n"; # general-case
       } elsif (&is_rt_defn()) {
@@ -1938,7 +1938,7 @@ sub generate_klass_box {
 
   if ('object' eq &path::string($klass_path)) {
     ### box() non-array-type
-    $result .= $col . "klass $klass_name { object-t box(slots-t* arg)";
+    $result .= $col . "klass $klass_name { auto box(slots-t* arg) -> object-t";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -1953,7 +1953,7 @@ sub generate_klass_box {
       ### box()
       if (&is_array_type($$klass_scope{'slots'}{'type'})) {
         ### box() array-type
-        $result .= $col . "klass $klass_name { object-t box(slots-t arg)";
+        $result .= $col . "klass $klass_name { auto box(slots-t arg) -> object-t";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -1967,7 +1967,7 @@ sub generate_klass_box {
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
-        $result .= $col . "klass $klass_name { object-t box(slots-t* arg)";
+        $result .= $col . "klass $klass_name { auto box(slots-t* arg) -> object-t";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -1982,7 +1982,7 @@ sub generate_klass_box {
         }
       } else { # !&is_array_type()
         ### box() non-array-type
-        $result .= $col . "klass $klass_name { object-t box(slots-t* arg)";
+        $result .= $col . "klass $klass_name { auto box(slots-t* arg) -> object-t";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -2001,7 +2001,7 @@ sub generate_klass_box {
           $col = &colout($col);
           $result .= $col . "}}\n";
         }
-        $result .= $col . "klass $klass_name { object-t box(slots-t arg)";
+        $result .= $col . "klass $klass_name { auto box(slots-t arg) -> object-t";
 
         if (&is_nrt_decl() || &is_rt_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . "\n";
@@ -2036,9 +2036,9 @@ sub generate_klass_construct {
         if ($pairs =~ m/\[/g) {
         } else {
           if (&is_nrt_decl() || &is_rt_decl()) {
-            $result .= $col . "klass $klass_name { slots-t construct($pairs_w_expr); }" . &ann(__FILE__, __LINE__) . "\n";
+            $result .= $col . "klass $klass_name { auto construct($pairs_w_expr) -> slots-t; }" . &ann(__FILE__, __LINE__) . "\n";
           } elsif (&is_rt_defn()) {
-            $result .= $col . "klass $klass_name { slots-t construct($pairs) {" . &ann(__FILE__, __LINE__) . "\n";
+            $result .= $col . "klass $klass_name { auto construct($pairs) -> slots-t {" . &ann(__FILE__, __LINE__) . "\n";
             $col = &colin($col);
             $result .=
               $col . "slots-t result = cast(slots-t){ $names };\n" .
@@ -2071,9 +2071,9 @@ sub linkage_unit::generate_klasses_body {
 
   if ('trait' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass(object-t); }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { auto klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass(object-t self) { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { auto klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . "\n";
     }
   }
   if ('klass' eq $klass_type) {
@@ -2161,10 +2161,10 @@ sub linkage_unit::generate_klasses_body {
     }
   } # if ('klass' eq $klass_type)
   if (&is_decl() && $$klass_scope{'has-initialize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t initialize(object-t kls); }" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { initialize(object-t kls) -> object-t; }" . &ann(__FILE__, __LINE__) . "\n";
   }
   if (&is_decl() && $$klass_scope{'has-finalize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t finalize(object-t kls); }" . &ann(__FILE__, __LINE__) . "\n";
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { finalize(object-t kls) -> object-t; }" . &ann(__FILE__, __LINE__) . "\n";
   }
   if (&is_decl() && @$kw_args_methods) {
     #print STDERR Dumper($va_list_methods);
