@@ -418,6 +418,7 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
   $$filestr_ref =~ s/(\{|;)(\s+)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4, $5)/egs;
+  $$filestr_ref =~ s/(\{|;)(\s+)slots(\s*\(\s*\*\s*)(\).+?);/$1$2typedef auto $3slots-t$4;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;

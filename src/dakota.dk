@@ -1082,8 +1082,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       }
       ostream::printf(ostrm, "\n");
     }
-    ostream::printf(ostrm, "%s %s\n", construct, name);
-    ostream::printf(ostrm, "{\n");
+    ostream::printf(ostrm, "%s %s {\n", construct, name);
     ostrm.col++;
 
     if (nullptr != interpose-name)
@@ -1155,12 +1154,11 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       }
       else-if (nullptr != slots-info) {
         if (nullptr == cat || #struct == cat)
-          ostream::printf(ostrm, "slots\n");
+          ostream::printf(ostrm, "slots {\n");
         else-if (enum-base)
-          ostream::printf(ostrm, "slots %s : %s\n", cat, enum-base);
+          ostream::printf(ostrm, "slots %s : %s {\n", cat, enum-base);
         else
-          ostream::printf(ostrm, "slots %s\n", cat);
-        ostream::printf(ostrm, "{\n");
+          ostream::printf(ostrm, "slots %s {\n", cat);
         ostrm.col++;
         if (#enum == cat) {
           uint32-t max-type-width = max-slot-name-width(slots-info);
@@ -1241,7 +1239,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
 void import-selectors(signature-t**, selector-node-t*); // hackhack
 
 klass get-segment-data {
-  slots ptr-t (*)(char8-t const*, ptr-t*, size-t*);
+  slots (*)(char8-t const*, ptr-t*, size-t*) -> ptr-t;
 }
 klass registration-info {
   slots {
@@ -1320,7 +1318,7 @@ klass x::siginfo {
   slots siginfo-t;
 }
 klass x::sigaction-handler {
-  slots void (*)(int-t, x::siginfo-t*, ptr-t);
+  slots (*)(int-t, x::siginfo-t*, ptr-t) -> void;
 }
 klass x::sigaction {
   slots struct sigaction;

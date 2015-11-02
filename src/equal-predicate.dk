@@ -17,7 +17,7 @@
 module dakota;
 
 klass equal-predicate {
-  slots boole-t (*)(object-t, object-t);
+  slots (*)(object-t, object-t) -> boole-t;
   // or
   // boole-t (*slots-t)(object-t, object-t);
 }

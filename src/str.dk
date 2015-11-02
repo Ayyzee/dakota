@@ -25,7 +25,7 @@ klass no-such-slot-exception;
 klass str;
 
 klass str-compare {
-  slots int-t (*)(str-t, str-t);
+  slots (*)(str-t, str-t) -> int-t;
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);

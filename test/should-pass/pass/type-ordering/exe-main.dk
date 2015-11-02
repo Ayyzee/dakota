@@ -8,7 +8,7 @@ klass xsiginfo {
   slots siginfo-t;
 }
 klass xsigaction-cb {
-  slots void (*)(xsignal-t, xsiginfo-t*, void*);
+  slots (*)(xsignal-t, xsiginfo-t*, void*) -> void;
 }
 klass xsignal {
   slots int-t;

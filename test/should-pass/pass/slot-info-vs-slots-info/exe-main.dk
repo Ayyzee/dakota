@@ -2,7 +2,7 @@
 
 klass w-slot
 {
-  slots cstring::slots-t * (*)(cstring::slots-t *, cstring::slots-t *);
+  slots (*)(cstring::slots-t *, cstring::slots-t *) -> cstring::slots-t*;
 }
 
 // klass w_slots

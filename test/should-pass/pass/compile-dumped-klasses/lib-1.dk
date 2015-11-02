@@ -269,7 +269,7 @@ klass tokenid
 }
 klass type-predicate
 {
-  slots boole-t(*)(int-t);
+  slots (*)(int-t) -> boole-t;
 }
 generic object-t $init(object-t,file-t file:{0});
 
