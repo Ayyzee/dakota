@@ -41,7 +41,7 @@ host-to-little-32(uint32-t arg) {
     ((arg >> 24) & 0x000000ff);
   return result;
 }
-unused static uint32-t
+[[unused]] static uint32-t
 reverse-32(uint32-t arg) {
 #if 0
   return arg;

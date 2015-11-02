@@ -78,6 +78,7 @@ our @EXPORT= qw(
                  pann
                  remove_first
                  remove_last
+                 remove_non_newlines
                  scalar_from_file
                  split_path
                  sqstr_regex
@@ -117,10 +118,19 @@ sub encode_strings1 {
   my ($s1, $s2, $s3) = ($1, $2, $3);
   return &encode_strings5($s1, $ENCODED_STRING_BEGIN, $s2, $ENCODED_STRING_END, $s3);
 }
+sub remove_non_newlines {
+  my ($str) = @_;
+  my $result = $str;
+  $result =~ s|[^\n]+||gs;
+  return $result;
+}
 sub encode_comments {
   my ($filestr_ref) = @_;
-    $$filestr_ref =~ s|(//)(.*?)(\n)|&encode_comments3($1, $2, $3)|egs;
-    $$filestr_ref =~ s|(/\*)(.*?)(\*/)|&encode_comments3($1, $2, $3)|egs;
+    #$$filestr_ref =~ s|(//)(.*?)(\n)|&encode_comments3($1, $2, $3)|egs;
+    #$$filestr_ref =~ s|(/\*)(.*?)(\*/)|&encode_comments3($1, $2, $3)|egs;
+
+  $$filestr_ref =~ s|(//.*?)$|&remove_non_newlines($1)|egm;
+  $$filestr_ref =~ s|(/\*.*?\*/)|&remove_non_newlines($1)|egs;
 }
 sub encode_strings {
   my ($filestr_ref) = @_;
@@ -133,7 +143,7 @@ sub encode_strings {
 }
 sub decode_comments {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s{$ENCODED_COMMENT_BEGIN([A-Za-z0-9]*)$ENCODED_COMMENT_END}{pack('H*',$1)}gseo;
+  #$$filestr_ref =~ s{$ENCODED_COMMENT_BEGIN([A-Za-z0-9]*)$ENCODED_COMMENT_END}{pack('H*',$1)}gseo;
 }
 sub decode_strings {
   my ($filestr_ref) = @_;
@@ -159,9 +169,9 @@ sub encode_cpp {
   foreach my $directive (keys %$directives) {
     my $next_tkn_regex = $$directives{$directive};
     if ($next_tkn_regex) {
-      $$filestr_ref =~ s/^(\s*)#(\s*$directive\s+$next_tkn_regex.*)$/$1# $2/gm;
+      $$filestr_ref =~ s/^(\s*)#($directive\s+$next_tkn_regex.*)$/$1# $2/gm;
     } else {
-      $$filestr_ref =~ s/^(\s*)#(\s*$directive\b.*)$/$1# $2/gm;
+      $$filestr_ref =~ s/^(\s*)#($directive\b.*)$/$1# $2/gm;
     }
   }
 }

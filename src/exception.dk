@@ -61,8 +61,8 @@ getprogname() {
 #endif
 #endif
 
-static format-va-printf(2) int-t
-va-log(uint32-t priority, str-t format, va-list-t args) {
+[[format-va-printf(2)]] static auto
+va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
   stream-t log-file = stderr;
 
   if (nullptr != getenv("DEBUG")) {
@@ -91,13 +91,13 @@ va-log(uint32-t priority, str-t format, va-list-t args) {
   // bugbug: need to adjust result
   return result;
 }
-DEBUG-SO-EXPORT format-va-printf(2) int-t
-dkt-va-log(uint32-t priority, str-t format, va-list-t args) {
+DEBUG-SO-EXPORT [[format-va-printf(2)]]
+auto dkt-va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
   int-t result = va-log(priority, format, args);
   return result;
 }
-DEBUG-SO-EXPORT format-printf(2) int-t
-dkt-log(uint32-t priority, str-t format, ...) {
+DEBUG-SO-EXPORT [[format-printf(2)]]
+auto dkt-log(uint32-t priority, str-t format, ...) -> int-t {
   va-list-t args;
   va-start(args, format);
   int-t result = dkt-va-log(priority, format, args);

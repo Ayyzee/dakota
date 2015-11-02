@@ -67,7 +67,7 @@ klass cstring {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  unused static int-t compare(slots-t** s, slots-t** other-s) {
+  [[unused]] static int-t compare(slots-t** s, slots-t** other-s) {
     int-t result = compare(*s, *other-s);
     return result;
   }

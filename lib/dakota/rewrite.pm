@@ -100,6 +100,7 @@ $main::seq = qr{
 my $colon = ':'; # key/element delim only
 my $k = qr/[\w-]/;
 my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
+my $stmt_boundry = qr/\{|\}|;/s;
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
@@ -210,7 +211,7 @@ sub rewrite_declarations {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|(?<!$k)(\s+)interpose \s+([^;])+\s*;|$1INTERPOSE($2);|gsx;
   $$filestr_ref =~ s|(?<!$k)(\s+)superklass\s+($rid) \s*;|$1SUPERKLASS($2);|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)klass     \s+($rid) \s*;|$1KLASS($2);|gsx;
+  $$filestr_ref =~ s|($stmt_boundry\s*)klass     \s+($rid) \s*;|$1KLASS($2);|gsx;
   $$filestr_ref =~ s|(?<!$k)(\s+)trait     \s+($rid) \s*;|$1TRAIT($2);|gsx;
   $$filestr_ref =~ s|(?<!$k)(\s+)traits    \s+($rid(\s*,\s*$rid)*)\s*;|$1TRAIT($2);|gsx;
   $$filestr_ref =~ s|(?<!$k)(\s+)require   \s+($rid) \s*;|$1REQUIRE($2);|gsx;
@@ -322,14 +323,14 @@ sub vars_from_defn {
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|(\s+)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) auto|gs; #hackhack
-  $$filestr_ref =~ s|(\s+method\s+)\[\[($id\(\d+\))\]\]|$1$2|gs; #hackhack
+  $$filestr_ref =~ s|(method\s+(\[\[.+?\]\])?\s*($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_args_generics)|ges;
+  $$filestr_ref =~ s|($stmt_boundry\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) auto|gs; #hackhack
+  $$filestr_ref =~ s|($stmt_boundry\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 auto |gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
-  $$filestr_ref =~ s|(method\s+[^(]*?($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $2, $3, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<!SO-EXPORT)(\s+)(method)(\s+)|$1METHOD$3auto |gm;
+  #$$filestr_ref =~ s|(?<!SO-EXPORT)(\s+)(method)(\s*)|$1METHOD$3auto |gm;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack
@@ -417,8 +418,8 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
   $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
-  $$filestr_ref =~ s/(\{|;)(\s+)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4, $5)/egs;
-  $$filestr_ref =~ s/(\{|;)(\s+)slots(\s*\(\s*\*\s*)(\).+?);/$1$2typedef auto $3slots-t$4;/gs;
+  $$filestr_ref =~ s/($stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4, $5)/egs;
+  $$filestr_ref =~ s/($stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\).+?);/$1$2typedef auto $3slots-t$4;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -724,12 +725,6 @@ sub rewrite_switch {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/\bswitch(.*?$main::list)(.*?$main::block)/&rewrite_switch_recursive($1, $2)/egs;
 }
-sub remove_non_newlines {
-  my ($str) = @_;
-  my $result = $str;
-  $result =~ s|[^\n]+||gs;
-  return $result;
-}
 sub exported_slots_body {
   my ($a, $b, $c, $d, $e, $f) = @_;
   #my $d = &remove_non_newlines($c);
@@ -746,8 +741,8 @@ sub rewrite_module_statement {
 }
 sub add_implied_slots_struct {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\{|;)(\s*slots)(\s*\{)/$1$2 struct$3/gs;
-  $$filestr_ref =~ s/(\{|;)(\s*slots)(\s*;)/$1$2 struct$3/gs;
+  $$filestr_ref =~ s/($stmt_boundry)(\s*slots)(\s*\{)/$1$2 struct$3/gs;
+  $$filestr_ref =~ s/($stmt_boundry)(\s*slots)(\s*;)/$1$2 struct$3/gs;
 }
 sub remove_exported_slots {
   my ($filestr_ref) = @_;

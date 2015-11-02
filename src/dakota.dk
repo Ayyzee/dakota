@@ -157,10 +157,10 @@ extern resource-usage::slots-t gbl-ru;
 
 klass null-singleton { klass singleton-klass; }
 
-SO-EXPORT DKT-RODATA-SECTION object-t null =       nullptr;
-SO-EXPORT DKT-RODATA-SECTION object-t std-input =  nullptr;
-SO-EXPORT DKT-RODATA-SECTION object-t std-output = nullptr;
-SO-EXPORT DKT-RODATA-SECTION object-t std-error =  nullptr;
+SO-EXPORT object-t null =       nullptr;
+SO-EXPORT object-t std-input =  nullptr;
+SO-EXPORT object-t std-output = nullptr;
+SO-EXPORT object-t std-error =  nullptr;
 
 klass x::stat {
   slots struct stat;
@@ -302,16 +302,14 @@ klass ostream {
       fprintf(s.output, "  "); // two spaces per column :-) [my way]
     return s;
   }
-  static slots-t
-  format-va-printf(2)
-  va-printf(slots-t s, str-t format, va-list-t args) {
+  [[format-va-printf(2)]] static
+  auto va-printf(slots-t s, str-t format, va-list-t args) -> slots-t {
     pad(s);
     vfprintf(s.output, format, args);
     return s;
   }
-  static slots-t
-  format-printf(2)
-  printf(slots-t s, str-t format, ...) {
+  [[format-printf(2)]] static
+  auto printf(slots-t s, str-t format, ...) -> slots-t {
     va-list-t args;
     va-start(args, format);
     va-printf(s, format, args);
@@ -813,7 +811,7 @@ remove-dir(str-t path) {
   assert(NUL != result[0]); // not empty-string
   return result;
 }
-unused static str-t
+[[unused]] static str-t
 remove-ext(str-t path) {
   char8-t* dot = strrchr(path, '.');
   if (nullptr != dot)
@@ -821,7 +819,7 @@ remove-ext(str-t path) {
   assert(NUL != path[0]); // not empty-string
   return path;
 }
-unused static char8-t*
+[[unused]] static char8-t*
 pad(char8-t* buf, uint32-t buf-len, uint32-t len) {
   assert(buf-len >= len);
   buf[0] = NUL;

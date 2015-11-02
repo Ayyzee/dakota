@@ -27,8 +27,8 @@ trace-column-out() {
   if (0 != gbl-trace-column)
     gbl-trace-column--;
 }
-static format-va-printf(2) int-t
-trace-vfprintf(stream-t stream, str-t format, va-list-t args) {
+[[format-va-printf(2)]] static
+auto trace-vfprintf(stream-t stream, str-t format, va-list-t args) -> int-t {
   str-t col = "  "; // two spaces per column :-) [my way]
   for (uint32-t i = 0; i < gbl-trace-column; i++) {
     if (0 == i)
@@ -40,8 +40,8 @@ trace-vfprintf(stream-t stream, str-t format, va-list-t args) {
   // bugbug: need to adjust result
   return result;
 }
-static format-printf(2) int-t
-trace-fprintf(stream-t stream, str-t format, ...) {
+[[format-printf(2)]] static
+auto trace-fprintf(stream-t stream, str-t format, ...) -> int-t {
   va-list-t args;
   va-start(args, format);
   int-t result = trace-vfprintf(stream, format, args);

@@ -123,13 +123,13 @@ handle_opts(int* argc, char*** argv) {
   return;
 }
 namespace va {
-  [[noreturn]] format_va_printf(3) static void _abort_with_log(const char* file, int line, const char* format, va_list args) {
+  [[noreturn]] [[format_va_printf(3)]] static void _abort_with_log(const char* file, int line, const char* format, va_list args) {
     fprintf(stderr, "%s:%i: ", file, line);
     vfprintf(stderr, format, args);
     std::abort();
   }
 }
-[[noreturn]] format_printf(3) static void _abort_with_log(const char* file, int line, const char* format, ...) {
+[[noreturn]] [[format_printf(3)]] static void _abort_with_log(const char* file, int line, const char* format, ...) {
   va_list args;
   va_start(args, format);
   va::_abort_with_log(file, line, format, args);

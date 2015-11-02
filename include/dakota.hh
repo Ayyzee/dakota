@@ -82,46 +82,25 @@ namespace dkt {
 
 #if defined WIN32
   #define DKT_RODATA_SECTION
-  #define format_va_printf(fmtarg)
-  #define format_va_scanf(fmtarg)
-  #define format_printf(fmtarg)
-  #define format_scanf(fmtarg)
-  #define flatten
-  #define pure
+  #define format_va_printf(n)
+  #define format_va_scanf(n)
+  #define format_printf(n)
+  #define format_scanf(n)
   #define sentinel
   #define unused
-  #define artificial
-  #define leaf
-  #define nothrow
-  #define hot
-  #define designated_init
-  #define noreturn
 #else
-  #define DKT_RODATA_SECTION __attribute__((__section__("__DKT_RODATA, __dkt_rodata")))
-  #define format_va_printf(fmtarg) __attribute__((__format__(__printf__, fmtarg, 0)))
-  #define format_va_scanf(fmtarg)  __attribute__((__format__(__scanf__,  fmtarg, 0)))
-  #define format_printf(fmtarg)    __attribute__((__format__(__printf__, fmtarg, fmtarg + 1)))
-  #define format_scanf(fmtarg)     __attribute__((__format__(__scanf__,  fmtarg, fmtarg + 1)))
-  #define flatten  __attribute__((__flatten__))
-  #define pure     __attribute__((__pure__))
-  #define sentinel __attribute__((__sentinel__))
-  #define unused   __attribute__((__unused__))
-  #define artificial __attribute__((__artificial__))
-  #define leaf       __attribute__((__leaf__))
-  #define nothrow    __attribute__((__nothrow__))
-// don't forget about c++s' noexcept
-  #define hot        __attribute__((__hot__))
-  #define designated_init __attribute__((__designated_init__))
-  // #if 0
-  //   #define noreturn  __attribute__((__noreturn__))
-  // #else
-  //   #define noreturn [[noreturn]]
-  // #endif
+  #define DKT_RODATA_SECTION  gnu::section("__DKT_RODATA, __dkt_rodata")
+  #define format_va_printf(n) gnu::format(__printf__, n, 0)
+  #define format_va_scanf(n)  gnu::format(__scanf__,  n, 0)
+  #define format_printf(n)    gnu::format(__printf__, n, n + 1)
+  #define format_scanf(n)     gnu::format(__scanf__,  n, n + 1)
+  #define sentinel            gnu::sentinel
+  #define unused              gnu::unused
 #endif
 
 #define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwin
 
-#define unbox_attrs pure hot nothrow
+#define unbox_attrs gnu::pure,gnu::hot,gnu::nothrow
 
 #if defined DEBUG
   #define DEBUG_SO_EXPORT SO_EXPORT
@@ -196,10 +175,10 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
 
 #define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 
-extern SO_IMPORT object_t null;
-extern SO_IMPORT object_t std_input;
-extern SO_IMPORT object_t std_output;
-extern SO_IMPORT object_t std_error;
+extern SO_IMPORT object_t null       [[DKT_RODATA_SECTION]];
+extern SO_IMPORT object_t std_input  [[DKT_RODATA_SECTION]];
+extern SO_IMPORT object_t std_output [[DKT_RODATA_SECTION]];
+extern SO_IMPORT object_t std_error  [[DKT_RODATA_SECTION]];
 
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef signature_t const* (*dkt_signature_func_t)();
@@ -235,8 +214,8 @@ SO_IMPORT str_t    dkt_capture_current_exception(str_t arg);
 SO_IMPORT named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
 SO_IMPORT object_t      dk_va_make_named_info(      symbol_t name, va_list_t args);
 
-SO_IMPORT sentinel named_info_t* dk_make_named_info_slots(symbol_t name, ...);
-SO_IMPORT sentinel object_t      dk_make_named_info(      symbol_t name, ...);
+SO_IMPORT [[sentinel]] named_info_t* dk_make_named_info_slots(symbol_t name, ...);
+SO_IMPORT [[sentinel]] object_t      dk_make_named_info(      symbol_t name, ...);
 
 DEBUG_IMPORT named_info_t* dkt_dump_named_info(named_info_t* info);
 

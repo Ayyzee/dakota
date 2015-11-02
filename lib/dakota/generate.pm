@@ -941,7 +941,7 @@ sub method::generate_va_method_defn {
   }
   my $kw_args_generics = &dakota::util::kw_args_generics();
   if (exists $$kw_args_generics{$va_method_name}) {
-    $$scratch_str_ref .= 'sentinel ';
+    $$scratch_str_ref .= '[[sentinel]] ';
   }
   my $visibility = '';
   if (&is_exported($va_method)) {
@@ -1160,7 +1160,7 @@ sub common::print_selector {
     my $parameter_types_str = $$new_arg_type_list;
     my $null_selector = 0;
 
-    $scratch_str .= $col . "static DKT-RODATA-SECTION selector-t result = $null_selector;\n";
+    $scratch_str .= $col . "[[DKT-RODATA-SECTION]] static selector-t result = $null_selector;\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
     if (&is_va($generic)) {
@@ -1698,7 +1698,7 @@ sub generics::generate_va_make_defn {
   my ($generics, $is_inline, $col) = @_;
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()\n";
-  $result .= $col . "sentinel object-t make(object-t kls, ...)";
+  $result .= $col . "[[sentinel]] object-t make(object-t kls, ...)";
   if (&is_nrt_decl() || &is_rt_decl()) {
     $result .= ";\n";
   } elsif (&is_rt_defn()) {
@@ -1901,7 +1901,7 @@ sub generate_klass_unbox {
   if ($klass_name eq 'object') {
     #$result .= $col . "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n";
   } elsif ($klass_name eq 'klass') {
-    $result .= $col . "klass $klass_name { unbox-attrs auto unbox(object-t object) -> slots-t*";
+    $result .= $col . "klass $klass_name { [[unbox-attrs]] auto unbox(object-t object) noexcept -> slots-t*";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . " // special-case\n";
@@ -1916,7 +1916,7 @@ sub generate_klass_unbox {
   } else {
     ### unbox() same for all types
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
-      $result .= $col . "klass $klass_name { unbox-attrs auto unbox(object-t object) -> slots-t*";
+      $result .= $col . "klass $klass_name { [[unbox-attrs]] auto unbox(object-t object) noexcept -> slots-t*";
       if (&is_nrt_decl() || &is_rt_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . "\n"; # general-case
       } elsif (&is_rt_defn()) {
@@ -2078,9 +2078,9 @@ sub linkage_unit::generate_klasses_body {
   }
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern DKT-RODATA-SECTION object-t klass; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[DKT-RODATA-SECTION]]; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { DKT-RODATA-SECTION object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
     }
     if (!&is_rt_defn()) {
       my $is_exported;

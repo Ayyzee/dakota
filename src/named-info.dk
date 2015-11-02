@@ -159,7 +159,7 @@ dk-va-make-named-info(symbol-t name, va-list-t args) {
   object-t info = box(info-slots);
   return info;
 }
-SO-EXPORT sentinel named-info-t*
+SO-EXPORT [[sentinel]] named-info-t*
 dk-make-named-info-slots(symbol-t name, ...) {
   va-list-t args;
   va-start(args, name);
@@ -167,7 +167,7 @@ dk-make-named-info-slots(symbol-t name, ...) {
   va-end(args);
   return info-slots;
 }
-SO-EXPORT sentinel object-t
+SO-EXPORT [[sentinel]] object-t
 dk-make-named-info(symbol-t name, ...) {
   va-list-t args;
   va-start(args, name);

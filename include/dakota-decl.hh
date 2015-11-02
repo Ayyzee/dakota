@@ -50,11 +50,11 @@
 #define TRAITS(t1, ...)
 
 #if defined WIN32
-  #define SO_IMPORT __declspec(dllimport)
-  #define SO_EXPORT __declspec(dllexport)
+  #define SO_IMPORT [[ms::dllimport]]
+  #define SO_EXPORT [[ms::dllexport]]
 #else
   #define SO_IMPORT
-  #define SO_EXPORT __attribute__((__visibility__("default")))
+  #define SO_EXPORT [[gnu::visibility("default")]]
 #endif
 
 #define DKT_ENABLE_TYPEINFO SO_EXPORT
