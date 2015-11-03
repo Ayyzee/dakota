@@ -134,16 +134,6 @@ but it might be nice to suppy it for the user
 
 rename various things to consistent kw-args, kw-arg-method..., or simpley keyword
 
-allow return type to be specified similar to lambda functions (with optional delimiter)
-  lambda function syntax:
-  [...](...) -> return-type-t {
-  //
-  method object-t at(object-t self, object-t element) {
-  //=>
-  method at(object-t self, object-t element) -> object-t {
-  //or
-  method at(object-t self, object-t element)    object-t {
-
 new alias syntax:
   method alias (inside klass defn)
     method push() => add-last();
@@ -162,12 +152,16 @@ bin/dakota-build --project [project.rep] --jobs 4 ../lib/libdakota.so
 
 convert non-method functions to the new syntax
 
-convert typedefs (both coded and generated) to use the trailing return type style
-
 convert method [[alias(...)]] to method ...() => ...(...)
 
 create support for keyword aliasing
 
 consider authoring headers in dakota syntax and generating the actual headers
 
-[[...]] around unbox-attrs (and around all attrs)
+rewrite lib/dakota/rewrite.pm to use $stmt_boundry everywhere possible
+
+klass::klass-with-trait() could be more efficient with the right data structure
+
+add --modules (-fmodules) to clang++ command line
+
+consider modeling module system after http://clang.llvm.org/docs/Modules.html

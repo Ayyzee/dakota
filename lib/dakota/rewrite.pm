@@ -209,13 +209,13 @@ sub rewrite_functions {
 }
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|(?<!$k)(\s+)interpose \s+([^;])+\s*;|$1INTERPOSE($2);|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)superklass\s+($rid) \s*;|$1SUPERKLASS($2);|gsx;
-  $$filestr_ref =~ s|($stmt_boundry\s*)klass     \s+($rid) \s*;|$1KLASS($2);|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)trait     \s+($rid) \s*;|$1TRAIT($2);|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)traits    \s+($rid(\s*,\s*$rid)*)\s*;|$1TRAIT($2);|gsx;
-  $$filestr_ref =~ s|(?<!$k)(\s+)require   \s+($rid) \s*;|$1REQUIRE($2);|gsx;
- #$$filestr_ref =~ s|(?<!$k)(\s+)provide   \s+($rid) \s*;|$1PROVIDE($2);|gsx;
+  $$filestr_ref =~ s|($stmt_boundry\s*)interpose \s+([^;])+\s*(?=;)|$1INTERPOSE($2)|gsx;
+  $$filestr_ref =~ s|($stmt_boundry\s*)superklass\s+($rid) \s*(?=;)|$1SUPERKLASS($2)|gsx;
+  $$filestr_ref =~ s|($stmt_boundry\s*)klass     \s+($rid) \s*(?=;)|$1KLASS($2)|gsx;
+  $$filestr_ref =~ s|($stmt_boundry\s*)trait     \s+($rid) \s*(?=;)|$1TRAIT($2)|gsx;
+  $$filestr_ref =~ s|($stmt_boundry\s*)traits    \s+($rid(\s*,\s*$rid)*)\s*(?=;)|$1TRAIT($2)|gsx;
+  $$filestr_ref =~ s|($stmt_boundry\s*)require   \s+($rid) \s*(?=;)|$1REQUIRE($2)|gsx;
+ #$$filestr_ref =~ s|($stmt_boundry\s*)provide   \s+($rid) \s*(?=;)|$1PROVIDE($2)|gsx;
 }
 
 my $use_catch_macros = 0;
@@ -389,37 +389,29 @@ sub rewrite_throws {
   # throw self ;
   # throw ;  =>  dkt-capture-current-exception(_e_) ; throw ;
 
-  $$filestr_ref =~ s/(\s+)throw(\s*);/$1RETHROW$2;/gsx;
+  $$filestr_ref =~ s/($stmt_boundry\s*)throw(\s*);/$1RETHROW$2;/gsx;
 
   # dont want to rewrite #define THROW throw
   # in parens
-  $$filestr_ref =~ s/(\s+)throw(\s*)\((.+?)\)(\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
+  $$filestr_ref =~ s/($stmt_boundry\s*)throw(\s*)\((.+?)\)(\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
   # not in parens
-  $$filestr_ref =~ s/(\s+)throw(\s*)  (.+?)  (\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
+  $$filestr_ref =~ s/($stmt_boundry\s*)throw(\s*)  (.+?)  (\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
 
-  $$filestr_ref =~ s/(\s+)RETHROW(\s*);/$1throw$2;/gsx;
+  $$filestr_ref =~ s/($stmt_boundry\s*)RETHROW(\s*);/$1throw$2;/gsx;
 }
 sub rewrite_slots_typedef {
   my ($t1, $ws1, $ws2, $tkns, $ws3) = @_;
-  my $rewrite = "$t1${ws1}typedef$ws2$tkns slots-t$ws3;";
-  my $no_rewrite = "$t1$ws1$ws2$tkns$ws3;";
-
-  if ($tkns =~ m/=/) {
-    return $no_rewrite;
-  } else {
-    return $rewrite;
-  }
+  return "$t1${ws1}typedef$ws2$tkns slots-t$ws3;";
 }
 sub rewrite_slots {
-  # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(          \s*$main::block)/$2$1DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(struct|union)(\s*);                     /$2$1DKT-ENABLE-TYPEINFO slots-t$3;/gsx;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$2$1slots-t$3;/gsx;
-  $$filestr_ref =~ s/(?<!\#)\bslots(\s+)(enum)        (\s*:\s*$id\s*);           /$2$1slots-t$3;/gsx; # forward decl
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(          \s*$main::block)/$1$3$2DKT-ENABLE-TYPEINFO slots-t$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(\s*);                     /$1$3$2DKT-ENABLE-TYPEINFO slots-t$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$1$3$2slots-t$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*);           /$1$3$2slots-t$4;/gsx; # forward decl
   $$filestr_ref =~ s/($stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4, $5)/egs;
-  $$filestr_ref =~ s/($stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\).+?);/$1$2typedef auto $3slots-t$4;/gs;
+  $$filestr_ref =~ s/($stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\)\s*$main::list\s*->\s*.+?);/$1$2typedef auto $3slots-t$4;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;

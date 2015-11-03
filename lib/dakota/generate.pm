@@ -3739,26 +3739,25 @@ sub generate_kw_args_method_defn {
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated.\n";
   $col = &colin($col);
-  my $kw_arg_name;
 
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
-    $kw_arg_name = $$kw_arg{'name'};
+    my $kw_arg_name = $$kw_arg{'name'};
+    my $kw_arg_type = &arg::type($$kw_arg{'type'});
     $$scratch_str_ref .= $col . "case \#$kw_arg_name: // dk-hash() is a constexpr. its compile-time evaluated.\n";
     #            $$scratch_str_ref .= $col . "{\n";
     $col = &colin($col);
-    my $kw_type = &arg::type($$kw_arg{'type'});
     # should do this for other types (char=>int, float=>double, ... ???
     $$scratch_str_ref .=
       $col . "assert(_keyword_->symbol == \#$kw_arg_name);\n";
     my $promoted_type;
-    if ($$gbl_compiler_default_argument_promotions{$kw_type}) {
-      $promoted_type = $$gbl_compiler_default_argument_promotions{$kw_type};
+    if ($$gbl_compiler_default_argument_promotions{$kw_arg_type}) {
+      $promoted_type = $$gbl_compiler_default_argument_promotions{$kw_arg_type};
     } elsif ($$slots{'type'} && $$gbl_compiler_default_argument_promotions{$$slots{'type'}}) {
       $promoted_type = $$gbl_compiler_default_argument_promotions{$$slots{'type'}};
     }
     if ($promoted_type) {
       $$scratch_str_ref .=
-        $col . "$kw_arg_name = cast($kw_type)va-arg($$new_arg_names[-1], $promoted_type); // special-case: default argument promotions\n";
+        $col . "$kw_arg_name = cast($kw_arg_type)va-arg($$new_arg_names[-1], $promoted_type); // special-case: default argument promotions\n";
     } else {
       $$scratch_str_ref .=
         $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));\n";

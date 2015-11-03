@@ -130,6 +130,8 @@ module dakota export
   named-enum-info::slots-t,
   named-info,
   named-info::slots-t,
+  named-info-func,
+  named-info-func::slots-t,
   no-such-keyword-exception,
   no-such-method-exception,
   no-such-slot-exception,

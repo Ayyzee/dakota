@@ -30,7 +30,6 @@ klass zzz::character-counter
 }
 
 interpose object-input-stream, yyy::input-line-counter, xxx::input-character-counter;
-
 interpose json-object-output-stream, yyy::output-line-counter, xxx::output-character-counter;
 
 int-t main() {

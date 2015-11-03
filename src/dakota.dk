@@ -466,7 +466,9 @@ dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-nam
   object-t klass = dk-export-klass(klass-info);
   return klass;
 }
-typedef void (*)(named-info-t*, ptr-t) named-info-func-t;
+klass named-info-func {
+  slots (*)(named-info-t*, ptr-t) -> void;
+}
 static void each(named-info-t* root-info-list, named-info-func-t func, ptr-t user-data) {
   named-info-t* info;
   named-info-t* info-list = root-info-list;
