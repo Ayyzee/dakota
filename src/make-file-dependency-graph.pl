@@ -340,7 +340,7 @@ unless (caller) {
   if (@ARGV == 1) {
     $repository = $ARGV[0];
   } else {
-    $repository = 'dummy-project.rep';
+    $repository = 'dummy-project.json';
   }
   &start($opts, $repository);
 }

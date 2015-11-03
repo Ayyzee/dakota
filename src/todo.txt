@@ -160,6 +160,8 @@ consider authoring headers in dakota syntax and generating the actual headers
 
 klass::klass-with-trait() could be more efficient with the right data structure
 
-add --modules (-fmodules) to clang++ command line
-
 consider modeling module system after http://clang.llvm.org/docs/Modules.html
+Remove module ... ; decl in *.dk file and get the information from the module map file
+rename module-dakota.dk      dakota.module
+rename module-dakota-util.dk dakota-util.module
+add to dakota --module=%s

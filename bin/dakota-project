@@ -20,7 +20,7 @@ $Data::Dumper::Indent =    1; # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-my $default_project_file = 'project.rep';
+my $default_project_file = 'project.json';
 my $opts = { 'var' => {} };
 my $rep_hdr =
   '# -*- mode: cperl -*-' . "\n" .
