@@ -158,8 +158,6 @@ create support for keyword aliasing
 
 consider authoring headers in dakota syntax and generating the actual headers
 
-rewrite lib/dakota/rewrite.pm to use $stmt_boundry everywhere possible
-
 klass::klass-with-trait() could be more efficient with the right data structure
 
 add --modules (-fmodules) to clang++ command line

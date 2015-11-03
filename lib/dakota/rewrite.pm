@@ -209,13 +209,13 @@ sub rewrite_functions {
 }
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|($stmt_boundry\s*)interpose \s+([^;])+\s*(?=;)|$1INTERPOSE($2)|gsx;
-  $$filestr_ref =~ s|($stmt_boundry\s*)superklass\s+($rid) \s*(?=;)|$1SUPERKLASS($2)|gsx;
-  $$filestr_ref =~ s|($stmt_boundry\s*)klass     \s+($rid) \s*(?=;)|$1KLASS($2)|gsx;
-  $$filestr_ref =~ s|($stmt_boundry\s*)trait     \s+($rid) \s*(?=;)|$1TRAIT($2)|gsx;
-  $$filestr_ref =~ s|($stmt_boundry\s*)traits    \s+($rid(\s*,\s*$rid)*)\s*(?=;)|$1TRAIT($2)|gsx;
-  $$filestr_ref =~ s|($stmt_boundry\s*)require   \s+($rid) \s*(?=;)|$1REQUIRE($2)|gsx;
- #$$filestr_ref =~ s|($stmt_boundry\s*)provide   \s+($rid) \s*(?=;)|$1PROVIDE($2)|gsx;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)interpose \s+([^;])+\s*;|$1INTERPOSE($2);|gsx;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)superklass\s+($rid) \s*;|$1SUPERKLASS($2);|gsx;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)klass     \s+($rid) \s*;|$1KLASS($2);|gsx;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)trait     \s+($rid) \s*;|$1TRAIT($2);|gsx;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)traits    \s+($rid(\s*,\s*$rid)*)\s*;|$1TRAIT($2);|gsx;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)require   \s+($rid) \s*;|$1REQUIRE($2);|gsx;
+ #$$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)provide   \s+($rid) \s*;|$1PROVIDE($2);|gsx;
 }
 
 my $use_catch_macros = 0;
@@ -324,8 +324,8 @@ sub vars_from_defn {
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
   $$filestr_ref =~ s|(method\s+(\[\[.+?\]\])?\s*($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|($stmt_boundry\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) auto|gs; #hackhack
-  $$filestr_ref =~ s|($stmt_boundry\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 auto |gs; #hackhack
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) auto|gs; #hackhack
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 auto |gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
@@ -389,19 +389,19 @@ sub rewrite_throws {
   # throw self ;
   # throw ;  =>  dkt-capture-current-exception(_e_) ; throw ;
 
-  $$filestr_ref =~ s/($stmt_boundry\s*)throw(\s*);/$1RETHROW$2;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*);/$1RETHROW$2;/gsx;
 
   # dont want to rewrite #define THROW throw
   # in parens
-  $$filestr_ref =~ s/($stmt_boundry\s*)throw(\s*)\((.+?)\)(\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)\((.+?)\)(\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
   # not in parens
-  $$filestr_ref =~ s/($stmt_boundry\s*)throw(\s*)  (.+?)  (\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)  (.+?)  (\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
 
-  $$filestr_ref =~ s/($stmt_boundry\s*)RETHROW(\s*);/$1throw$2;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)RETHROW(\s*);/$1throw$2;/gsx;
 }
 sub rewrite_slots_typedef {
-  my ($t1, $ws1, $ws2, $tkns, $ws3) = @_;
-  return "$t1${ws1}typedef$ws2$tkns slots-t$ws3;";
+  my ($ws1, $ws2, $tkns, $ws3) = @_;
+  return "${ws1}typedef$ws2$tkns slots-t$ws3;";
 }
 sub rewrite_slots {
   my ($filestr_ref) = @_;
@@ -410,8 +410,8 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(\s*);                     /$1$3$2DKT-ENABLE-TYPEINFO slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$1$3$2slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*);           /$1$3$2slots-t$4;/gsx; # forward decl
-  $$filestr_ref =~ s/($stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4, $5)/egs;
-  $$filestr_ref =~ s/($stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\)\s*$main::list\s*->\s*.+?);/$1$2typedef auto $3slots-t$4;/gs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4)/egs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\)\s*$main::list\s*->\s*.+?);/$1typedef auto $2slots-t$3;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -733,8 +733,8 @@ sub rewrite_module_statement {
 }
 sub add_implied_slots_struct {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/($stmt_boundry)(\s*slots)(\s*\{)/$1$2 struct$3/gs;
-  $$filestr_ref =~ s/($stmt_boundry)(\s*slots)(\s*;)/$1$2 struct$3/gs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*slots)(\s*\{)/$1 struct$2/gs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*slots)(\s*;)/$1 struct$2/gs;
 }
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
