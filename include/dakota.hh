@@ -25,10 +25,6 @@
 #include <cstring> // memcpy()
 #include <new> // std::bad_alloc
 
-#if defined WIN32
-  #include <windows.h>
-#endif // WIN32
-
 #define DKT_MEM_MGMT_MALLOC 0
 #define DKT_MEM_MGMT_NEW    1
 #define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
@@ -80,23 +76,13 @@ namespace dkt {
   #define DEBUG_STMT(stmt)
 #endif
 
-#if defined WIN32
-  #define DKT_RODATA_SECTION
-  #define format_va_printf(n)
-  #define format_va_scanf(n)
-  #define format_printf(n)
-  #define format_scanf(n)
-  #define sentinel
-  #define unused
-#else
-  #define DKT_RODATA_SECTION  gnu::section("__DKT_RODATA, __dkt_rodata")
-  #define format_va_printf(n) gnu::format(__printf__, n, 0)
-  #define format_va_scanf(n)  gnu::format(__scanf__,  n, 0)
-  #define format_printf(n)    gnu::format(__printf__, n, n + 1)
-  #define format_scanf(n)     gnu::format(__scanf__,  n, n + 1)
-  #define sentinel            gnu::sentinel
-  #define unused              gnu::unused
-#endif
+#define DKT_RODATA_SECTION  gnu::section("__DKT_RODATA, __dkt_rodata")
+#define format_va_printf(n) gnu::format(__printf__, n, 0)
+#define format_va_scanf(n)  gnu::format(__scanf__,  n, 0)
+#define format_printf(n)    gnu::format(__printf__, n, n + 1)
+#define format_scanf(n)     gnu::format(__scanf__,  n, n + 1)
+#define sentinel            gnu::sentinel
+#define unused              gnu::unused
 
 #define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwin
 
