@@ -1,3 +1,5 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-module test-n export foobar;
+module test-n {
+  export foobar;
+}

@@ -287,7 +287,8 @@ klass xml-object-output-stream
   method write-table-end(object-t) -> object-t;
   method write-table-start(object-t,str-t) -> object-t;
 }
-module dakota-util export
+module dakota-util {
+ export
   ascii-number-klass,
   ascii-number-klass::slots-t,
   ascii-number,
@@ -338,3 +339,4 @@ module dakota-util export
   type-predicate::slots-t,
   xml-object-output-stream,
   xml-object-output-stream::slots-t;
+}

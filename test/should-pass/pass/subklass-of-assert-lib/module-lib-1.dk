@@ -1,6 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-module test-1 export
-  k1,
-  k2,
-  k3;
+module test-1 {
+  export
+    k1,
+    k2,
+    k3;
+}

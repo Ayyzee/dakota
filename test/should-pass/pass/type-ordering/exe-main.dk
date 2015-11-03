@@ -17,10 +17,12 @@ int-t main() {
   return 0;
 }
 
-module foo export
-  xsiginfo,
-  xsiginfo::slots-t,
-  xsigaction-cb,
-  xsigaction-cb::slots-t,
-  xsignal,
-  xsignal::slots-t;
+module foo {
+  export
+    xsiginfo,
+    xsiginfo::slots-t,
+    xsigaction-cb,
+    xsigaction-cb::slots-t,
+    xsignal,
+    xsignal::slots-t;
+}
