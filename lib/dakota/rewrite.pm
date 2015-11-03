@@ -727,8 +727,7 @@ sub exported_slots_body {
 }
 sub rewrite_module_statement {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|\bmodule\s+($id)\s+import(\s*)module\s+($id)(.+?)\s*;|MODULE-IMPORT($1,$2$3,$4);|gs;
-  $$filestr_ref =~ s|\bmodule\s+($id)\s+export(\s*)(.+?)\s*;|MODULE-EXPORT($1,$2$3);|gs;
+  $$filestr_ref =~ s|\bmodule\s+($id)\s*\{(\s*export\s*)(.+?)\s*;(\s*)\}|MODULE-EXPORT($1,$2$3$4);|gs;
   $$filestr_ref =~ s|\bmodule\s+($id)\s*;|MODULE($1);|gs;
 }
 sub add_implied_slots_struct {

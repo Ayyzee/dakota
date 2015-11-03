@@ -1074,43 +1074,17 @@ sub match_qual_ident {
   }
   return $seq;
 }
-sub module_import {
-  my ($module_name) = @_;
-  my $tbl = {};
-  &match(__FILE__, __LINE__, 'module');
-  my $imported_module_name = &match_re(__FILE__, __LINE__, $id);
-  while (1) {
-    for (&sst_cursor::current_token($gbl_sst_cursor)) {
-      if (0) {
-      } elsif (m/^;$/) {
-        if (!exists $$gbl_root{'modules'}{$module_name}{'import'}{'module'}{$imported_module_name}) {
-          $$gbl_root{'modules'}{$module_name}{'import'}{'module'}{$imported_module_name} = $tbl;
-        }
-        return; # leaving ';' as the current token
-      } elsif (m/^,$/) {
-        &match(__FILE__, __LINE__, ',');
-      } elsif (m/^module$/) {
-        $$gbl_root{'modules'}{$module_name}{'import'}{'module'}{$imported_module_name} = $tbl;
-        $tbl = {};
-        &module_import($module_name);
-      } elsif (m/^($id)$/) {
-        my $name = &match_re(__FILE__, __LINE__, $id);
-        $$tbl{$name} = 1;
-      } else {
-        die __FILE__, ":", __LINE__, ": error:\n";
-      }
-    }
-  }
-}
 sub module_export {
   my ($module_name) = @_;
+  &match(__FILE__, __LINE__, 'export');
   my $tbl = {};
   while (1) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (0) {
       } elsif (m/^;$/) {
+        &match(__FILE__, __LINE__, ';');
         $$gbl_root{'modules'}{$module_name}{'export'} = $tbl;
-        return;                 # leaving ';' as the current token
+        return;
       } elsif (m/^,$/) {
         &match(__FILE__, __LINE__, ',');
         my $seq = &match_qual_ident(__FILE__, __LINE__);
@@ -1137,13 +1111,20 @@ sub module_statement {
       &match(__FILE__, __LINE__, ';');
       $gbl_current_module = $module_name;
       return;
-    } elsif (m/^export$/) {
-      &match(__FILE__, __LINE__, 'export');
-      &module_export($module_name);
-    } elsif (m/^import$/) {
-      &match(__FILE__, __LINE__, 'import');
-      &module_import($module_name);
+    } elsif (m/^\{$/) {
+      &match(__FILE__, __LINE__, '{');
+      for (&sst_cursor::current_token($gbl_sst_cursor)) {
+        if (0) {
+        } elsif (m/^export$/) {
+          &module_export($module_name);
+        } else {
+          print STDERR "TOKEN: " . &sst_cursor::current_token($gbl_sst_cursor) . "\n";
+          die __FILE__, ":", __LINE__, ": error:\n";
+        }
+      }
+      &match(__FILE__, __LINE__, '}');
     } else {
+      print STDERR "TOKEN: " . &sst_cursor::current_token($gbl_sst_cursor) . "\n";
       die __FILE__, ":", __LINE__, ": error:\n";
     }
   }

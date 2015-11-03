@@ -14,13 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-util import module dakota
-  input-stream,
-  object-input-stream,
-  object-output-stream,
-  output-stream;
-
-module dakota-util export
+module dakota-util {
+ export
   ascii-number,
   ascii-number-klass,
   cstring,
@@ -57,3 +52,4 @@ module dakota-util export
   type-predicate,
   type-predicate::slots-t,
   xml-object-output-stream;
+}

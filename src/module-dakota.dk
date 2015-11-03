@@ -14,7 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota export
+module dakota {
+ export
   addr2name-pair,
   addr2name-pair::slots-t,
   assoc-node,
@@ -269,3 +270,4 @@ module dakota export
   x::siginfo::slots-t,
   x::stat,
   x::stat::slots-t;
+}

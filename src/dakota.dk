@@ -891,7 +891,7 @@ dump-module-description(ostream-t ostrm, named-info-t* registration-info) {
         std::abort();
       }
       if (module-name != modulee)
-        ostream::printf(ostrm, "%s %s %s", "module", modulee, "export");
+        ostream::printf(ostrm, "%s %s {\n %s", "module", modulee, "export");
       module-name = modulee;
       ostream::printf(ostrm, "%s\n  %s", c, name);
       c = ",";
@@ -911,7 +911,7 @@ dump-module-description(ostream-t ostrm, named-info-t* registration-info) {
         }
       }
     }
-    ostream::printf(ostrm, ";\n");
+    ostream::printf(ostrm, ";\n}\n");
   }
   return;
 }
