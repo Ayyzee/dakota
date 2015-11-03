@@ -32,12 +32,12 @@ module dakota;
 klass output-stream;
 klass system-exception;
 
-SO-EXPORT auto dkt-capture-current-exception(object-t arg) -> object-t {
+auto dkt-capture-current-exception(object-t arg) -> object-t {
   static THREAD_LOCAL object-t result;
   if (nullptr != arg) result = arg;
   return result;
 }
-SO-EXPORT auto dkt-capture-current-exception(str-t arg) -> str-t {
+auto dkt-capture-current-exception(str-t arg) -> str-t {
   static THREAD_LOCAL str-t result;
   if (nullptr != arg) result = arg;
   return result;
@@ -89,11 +89,11 @@ auto getprogname() -> str {
   // bugbug: need to adjust result
   return result;
 }
-DEBUG-SO-EXPORT [[format-va-printf(2)]] auto dkt-va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
+[[format-va-printf(2)]] auto dkt-va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
   int-t result = va-log(priority, format, args);
   return result;
 }
-DEBUG-SO-EXPORT [[format-printf(2)]] auto dkt-log(uint32-t priority, str-t format, ...) -> int-t {
+[[format-printf(2)]] auto dkt-log(uint32-t priority, str-t format, ...) -> int-t {
   va-list-t args;
   va-start(args, format);
   int-t result = dkt-va-log(priority, format, args);

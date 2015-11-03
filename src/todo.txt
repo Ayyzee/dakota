@@ -165,3 +165,5 @@ Remove module ... ; decl in *.dk file and get the information from the module ma
 rename module-dakota.dk      dakota.module
 rename module-dakota-util.dk dakota-util.module
 add to dakota --module=%s
+
+fix so not only init() can be dumped with kw-arg info

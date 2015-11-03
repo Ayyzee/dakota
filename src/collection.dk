@@ -19,17 +19,13 @@ module dakota;
 klass iter-pair;
 klass std-compare;
 
-// SO-EXPORT object-t
-// dk-va-add-all(object-t self, va-list-t args)
-// {
+// auto dk-va-add-all(object-t self, va-list-t args) -> object-t {
 //   object-t element;
 //   while (nullptr != (element = va-arg(args, object-t)))
 //     $add(self, element);
 //   return self;
 // }
-// SO-EXPORT sentinel object-t
-// dk-add-all(object-t self, ...)
-// {
+// [[sentinel]] auto dk-add-all(object-t self, ...) -> object-t {
 //   va-list-t args;
 //   va-start(args, self);
 //   object-t result = dk-va-add-all(self, args);
@@ -50,18 +46,17 @@ klass collection {
     $write(out, "\n");
     return self;
   }
-//   method add-all(object-t self, str-t const* strings, symbol-t encoding : #utf-8)
-//   {
-//     assert(nullptr != strings) -> object-t;
-//     assert(nullptr != encoding);
-//     while (nullptr != *strings) // rnielsen: modifying a parameter - bad practice?
-//     {
-//       object-t string = make(string::klass, #bytes : *strings, #encoding : encoding);
-//       strings++;
-//       $add(self, string);
-//     }
-//     return null;
-//   }
+  // method add-all(object-t self, str-t const* strings, symbol-t encoding : #utf-8) -> object-t {
+  //   assert(nullptr != strings) -> object-t;
+  //   assert(nullptr != encoding);
+  //   while (nullptr != *strings) // rnielsen: modifying a parameter - bad practice?
+  //   {
+  //     object-t string = make(string::klass, #bytes : *strings, #encoding : encoding);
+  //     strings++;
+  //     $add(self, string);
+  //   }
+  //   return null;
+  // }
   method add-all(object-t self, object-t collection) -> object-t {
     for (object-t element in collection)
       $add(self, element);
@@ -83,7 +78,7 @@ klass collection {
   method add(object-t self, object-t element) -> object-t;
   method forward-iterator(object-t self) -> object-t;
 
-  //     method size(object-t self) -> uint32-t;
-  //     method empty?(object-t self) -> boole-t;
-  //     method empty(object-t self) -> object-t;
+  // method size(object-t self) -> uint32-t;
+  // method empty?(object-t self) -> boole-t;
+  // method empty(object-t self) -> object-t;
 }

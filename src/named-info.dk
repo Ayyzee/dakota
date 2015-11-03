@@ -152,25 +152,25 @@ auto dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t*
   sort(info);
   return info;
 }
-DEBUG-SO-EXPORT auto dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
+auto dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   object-t info = box(info-slots);
   return info;
 }
-SO-EXPORT [[sentinel]] auto dk-make-named-info-slots(symbol-t name, ...) -> named-info-t* {
+[[sentinel]] auto dk-make-named-info-slots(symbol-t name, ...) -> named-info-t* {
   va-list-t args;
   va-start(args, name);
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   va-end(args);
   return info-slots;
 }
-SO-EXPORT [[sentinel]] auto dk-make-named-info(symbol-t name, ...) -> object-t {
+[[sentinel]] auto dk-make-named-info(symbol-t name, ...) -> object-t {
   va-list-t args;
   va-start(args, name);
   object-t info = dk-va-make-named-info(name, args);
   va-end(args);
   return info;
 }
-DEBUG-SO-EXPORT auto dkt-dump-named-info(named-info-t* info) -> named-info-t* {
+auto dkt-dump-named-info(named-info-t* info) -> named-info-t* {
   return named-info::dump(info);
 }

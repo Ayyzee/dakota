@@ -73,7 +73,7 @@ namespace klass {
 }
 #endif
 
-[[noreturn]] SO-EXPORT auto dkt-null-method(object-t object, ...) -> void {
+[[noreturn]] auto dkt-null-method(object-t object, ...) -> void {
   throw make(no-such-method-exception::klass, #object : object, #kls : klass-of(object));
 }
 klass selector-pair {
@@ -783,11 +783,11 @@ klass klass {
     return self;
   }
 }
-DEBUG-SO-EXPORT auto dkt-dump-methods(klass::slots-t* s) -> void {
+auto dkt-dump-methods(klass::slots-t* s) -> void {
   klass::dump-methods(s);
   return;
 }
-DEBUG-SO-EXPORT auto dkt-dump-methods(object-t kls) -> void {
+auto dkt-dump-methods(object-t kls) -> void {
   klass::slots-t* kls-s = unbox(kls);
   dkt-dump-methods(kls-s);
   return;

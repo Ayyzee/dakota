@@ -33,6 +33,11 @@ named_info_t* info_for_name(symbol_t);
 int_t  safe_strptrcmp(str_t const* sp1, str_t const* sp2);
 int_t  safe_strncmp(str_t s1, str_t s2, size_t n);
 
+auto safe_strcmp(str_t, str_t) -> int_t;
+auto safe_strlen(str_t) -> size_t;
+
+auto strerror_name(int_t errnum) -> str_t;
+
 uint32_t size_from_info(named_info_t* info);
 uint32_t offset_from_info(named_info_t* info);
 symbol_t name_from_info(named_info_t* info);

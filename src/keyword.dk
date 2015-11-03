@@ -24,7 +24,7 @@ klass keyword {
     symbol-t symbol;
     hash-t   hash;
   }
-  //SO-EXPORT slots-t null{};
+  //slots-t null{};
 
   method init(object-t self, slots-t slots : {nullptr, 0}) -> object-t {
     self = $init(super);

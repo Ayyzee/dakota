@@ -24,8 +24,7 @@ klass k1
 }
 
 int-t main() {
-  property-t k2-info-props[] =
-  {
+  property-t k2-info-props[] = {
     { #name,            (uintptr-t)#k2 },
     { #exported?,       (uintptr-t)1   },
     { #superklass,      (uintptr-t)k1::klass },
@@ -35,7 +34,7 @@ int-t main() {
 
   int-t overwrite;
   setenv("DK_DUMP_CTLG", "", overwrite = 1);
-  object-t k2-klass = dk-export-klass(&k2-info);
+  object-t k2-klass = dk-register-klass(&k2-info);
   $dump(k2-klass);
 
   return 0;

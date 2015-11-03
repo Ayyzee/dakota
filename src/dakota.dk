@@ -157,10 +157,10 @@ extern resource-usage::slots-t gbl-ru;
 
 klass null-singleton { klass singleton-klass; }
 
-SO-EXPORT object-t null =       nullptr;
-SO-EXPORT object-t std-input =  nullptr;
-SO-EXPORT object-t std-output = nullptr;
-SO-EXPORT object-t std-error =  nullptr;
+object-t null =       nullptr;
+object-t std-input =  nullptr;
+object-t std-output = nullptr;
+object-t std-error =  nullptr;
 
 klass x::stat {
   slots struct stat;
@@ -430,14 +430,13 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
 static named-info-t* gbl-registration-info-list;
 
 void register-info-common(named-info-t* registration-info, ptr-t user-data);
-object-t dk-export-klass(named-info-t* klass-info);
 
-// SO-EXPORT auto dk-make-simple-singleton(symbol-t name, symbol-t superklass-name) -> object-t {
+// auto dk-make-simple-singleton(symbol-t name, symbol-t superklass-name) -> object-t {
 //   object-t kls = dk-make-simple-klass(name, superklass-name, #singleton-klass);
 //   object-t singleton = make(kls);
 //   return singleton;
 // }
-SO-EXPORT auto dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name) -> object-t {
+auto dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name) -> object-t {
   //fprintf(stderr, "%s(#%s, #%s, #%s)\n", __func__, name, superklass-name, klass-name);
   assert(name != nullptr);
   uint32-t num-klass-props = 1;
@@ -460,7 +459,7 @@ SO-EXPORT auto dk-make-simple-klass(symbol-t name, symbol-t superklass-name, sym
     klass-props[i++] = { #superklass-name, cast(uintptr-t)superklass-name };
 
   *klass-info = { klass-props, num-klass-props, nullptr };
-  object-t klass = dk-export-klass(klass-info);
+  object-t klass = dk-register-klass(klass-info);
   return klass;
 }
 klass named-info-func {
@@ -528,7 +527,7 @@ static void each-int(named-info-t* info, object-t (*box)(uintptr-t)) {
 // object         klass' klass is klass klass
 // klass          klass' klass is klass klass
 // null-singleton klass' klass is klass klass
-SO-EXPORT auto dk-init-runtime() -> void {
+auto dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   if (nullptr == object::klass) {
@@ -721,7 +720,7 @@ add-interposers(property-t* interposers) {
 //     fprintf(stderr, "===\n");
   return;
 }
-SO-EXPORT auto dk-export-klass(named-info-t* klass-info) -> object-t {
+auto dk-register-klass(named-info-t* klass-info) -> object-t {
   //fprintf(stderr, "%s(#%s)\n", __func__, cast(symbol-t)named-info::at(klass-info, #name));
   named-info::sort(klass-info);
   symbol-t name = name-from-info(klass-info);
@@ -757,7 +756,7 @@ export-klasses(named-info-t* klass-info) {
     named-info-t* var-klass-info = &klass-info[i++];
     if (nullptr == var-klass-info->elements)
       break;
-    dk-export-klass(var-klass-info);
+    dk-register-klass(var-klass-info);
   }
   return;
 }
@@ -1480,7 +1479,7 @@ static void last-user-code-before-main() {
   if (-1 == r) std::abort();
   return;
 }
-SO-EXPORT auto dkt-register-info(named-info-t* registration-info) -> void {
+auto dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
   stream-t ctlg-output = nullptr;
@@ -1535,7 +1534,7 @@ SO-EXPORT auto dkt-register-info(named-info-t* registration-info) -> void {
     fclose(ctlg-output);
   return;
 }
-SO-EXPORT auto dkt-deregister-info(named-info-t* registration-info) -> void {
+auto dkt-deregister-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #file));
   assert(nullptr != registration-info);
   if (nullptr != getenv("DKT_INFO_OUTPUT") ||
@@ -1582,7 +1581,7 @@ superklass-name-for-name(symbol-t klass-name) {
 object-t dk-klass-for-name(symbol-t, uint32-t);
 namespace object { boole-t instance?(object-t, object-t); }
 
-SO-EXPORT auto dk-klass-for-name(symbol-t klass-name) -> object-t {
+auto dk-klass-for-name(symbol-t klass-name) -> object-t {
   auto result = dk-klass-for-name(klass-name, 0);
   return result;
 }
@@ -1664,7 +1663,7 @@ info-for-name(symbol-t klass-name) {
   sequence.
  */
 
-SO-EXPORT auto dk-intern(str-t key) -> symbol-t {
+auto dk-intern(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
   static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), cast(uint32-t)sizeof(symbol-t), cast(std-compare-t)safe-strcmp);
@@ -1692,7 +1691,7 @@ get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) {
   strcat(buf, klass-name);
   return buf;
 }
-DEBUG-SO-EXPORT auto dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) -> char8-t* {
+auto dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) -> char8-t* {
   buf[0] = NUL;
   return get-klass-chain(klass, buf, buf-len);
 }

@@ -66,7 +66,7 @@ static auto set-name(int-t errnum, str-t name) -> void {
   return;
 }
 #if !defined HAVE-STRERROR-NAME
-SO-EXPORT auto strerror-name(int-t errnum) -> str-t {
+auto strerror-name(int-t errnum) -> str-t {
   assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));
   str-t name = gbl-sys-err-names[errnum];
   return name;
