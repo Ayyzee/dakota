@@ -133,7 +133,7 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
   #define    NUL cast(char8_t)0
 #endif
 
-#if defined DK_ENABLE_TRACE_MACROS
+#if defined DEBUG && defined DK_ENABLE_TRACE_MACROS
   #define DKT_VA_TRACE_BEFORE(signature, method, object, args)               dkt_va_trace_before(signature, method, object, args)
   #define DKT_VA_TRACE_AFTER( signature, method, object, /* result, */ args) dkt_va_trace_after( signature, method, object, args)
   #define DKT_TRACE_BEFORE(signature, method, object, ...)                   dkt_trace_before(   signature, method, object, __VA_ARGS__)
@@ -148,7 +148,7 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
 #endif
 
 #if defined DKT_USE_MAKE_MACRO
-  #if DEBUG
+  #if defined DEBUG
     #define make(kls, ...) dk::init(dk::alloc(kls, __FILE__, __LINE__), __VA_ARGS__)
   #else
     #define make(kls, ...) dk::init(dk::alloc(kls), __VA_ARGS__)
