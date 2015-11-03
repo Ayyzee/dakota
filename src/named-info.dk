@@ -103,7 +103,7 @@ klass named-info {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  int-t compare(slots-t** s, slots-t** other-s) {
+  auto compare(slots-t** s, slots-t** other-s) -> int-t {
     int-t result = compare(*s, *other-s);
     return result;
   }
@@ -121,8 +121,7 @@ klass named-info {
     return result;
   }
 }
-named-info-t*
-dk-va-make-named-info-slots(symbol-t name, va-list-t args) {
+auto dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
 //   assert(nullptr != name);
   symbol-t key;
   uintptr-t element;
@@ -153,29 +152,25 @@ dk-va-make-named-info-slots(symbol-t name, va-list-t args) {
   sort(info);
   return info;
 }
-DEBUG-SO-EXPORT object-t
-dk-va-make-named-info(symbol-t name, va-list-t args) {
+DEBUG-SO-EXPORT auto dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   object-t info = box(info-slots);
   return info;
 }
-SO-EXPORT [[sentinel]] named-info-t*
-dk-make-named-info-slots(symbol-t name, ...) {
+SO-EXPORT [[sentinel]] auto dk-make-named-info-slots(symbol-t name, ...) -> named-info-t* {
   va-list-t args;
   va-start(args, name);
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   va-end(args);
   return info-slots;
 }
-SO-EXPORT [[sentinel]] object-t
-dk-make-named-info(symbol-t name, ...) {
+SO-EXPORT [[sentinel]] auto dk-make-named-info(symbol-t name, ...) -> object-t {
   va-list-t args;
   va-start(args, name);
   object-t info = dk-va-make-named-info(name, args);
   va-end(args);
   return info;
 }
-DEBUG-SO-EXPORT named-info-t*
-dkt-dump-named-info(named-info-t* info) {
+DEBUG-SO-EXPORT auto dkt-dump-named-info(named-info-t* info) -> named-info-t* {
   return named-info::dump(info);
 }

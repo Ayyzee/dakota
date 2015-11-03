@@ -43,8 +43,7 @@ static str-t gbl-sys-err-names[] = {
    "130",  "131"
 };
 
-static void
-set-name(int-t errnum, str-t name) {
+static auto set-name(int-t errnum, str-t name) -> void {
   assert(0 != errnum);
   assert(nullptr != name);
   assert(NUL != name[0]);
@@ -67,19 +66,18 @@ set-name(int-t errnum, str-t name) {
   return;
 }
 #if !defined HAVE-STRERROR-NAME
-SO-EXPORT str-t
-strerror-name(int-t errnum) {
+SO-EXPORT auto strerror-name(int-t errnum) -> str-t {
   assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));
   str-t name = gbl-sys-err-names[errnum];
   return name;
 }
 #endif
 
-static void __initial() {
+static auto __initial() -> void {
 #include "strerror-name.tbl"
   return;
 }
-static void __final() {
+static auto __final() -> void {
   return;
 }
 namespace { struct /* visibility(hidden) */ __ddl_t {
