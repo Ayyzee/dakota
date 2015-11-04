@@ -311,15 +311,16 @@ klass ostream {
       fprintf(s.output, "  "); // two spaces per column :-) [my way]
     return s;
   }
-  [[format-va-printf(2)]] static auto va-printf(slots-t s, str-t format, va-list-t args) -> slots-t {
+  namespace va { [[format-va-printf(2)]] static auto println-format(slots-t, str-t, va-list-t) -> slots-t; }
+  [[format-va-printf(2)]] static auto va::println-format(slots-t s, str-t format, va-list-t args) -> slots-t {
     pad(s);
     vfprintf(s.output, format, args);
     return s;
   }
-  [[format-printf(2)]] static auto printf(slots-t s, str-t format, ...) -> slots-t {
+  [[format-printf(2)]] static auto println-format(slots-t s, str-t format, ...) -> slots-t {
     va-list-t args;
     va-start(args, format);
-    va-printf(s, format, args);
+    va::println-format(s, format, args);
     va-end(args);
     return s;
   }
@@ -367,7 +368,7 @@ json-dump-resource-info(sorted-array-t* klass-defns-table) {
     } while (nullptr != (current-info = current-info->next));
   }
   ostream-t ostrm = { stdout, 0 };
-  ostream::printf(ostrm, "{ 'klasses' : '%i', 'selectors' : '%u' 'methods' : '%i' },\n",
+  ostream::println-format(ostrm, "{ 'klasses' : '%i', 'selectors' : '%u' 'methods' : '%i' },\n",
          klasses-count, gbl-selectors-table.count, methods-count);
   return;
 }
@@ -376,7 +377,7 @@ json-dump-resource-info(sorted-array-t* klass-defns-table) {
 static void
 json-dump-klass-defns(sorted-array-t* klass-defns-table) {
   ostream-t ostrm = { stdout, 0 };
-  ostream::printf(ostrm, "{\n");
+  ostream::println-format(ostrm, "{\n");
   ostream::col-incr(ostrm);
 
   for (uint32-t i = 0; i < klass-defns-table->count; i++) {
@@ -387,20 +388,20 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
       symbol-t name =            name-from-info(current-info);
       symbol-t klass-name =      klass-name-from-info(current-info);
       symbol-t superklass-name = superklass-name-from-info(current-info);
-      ostream::printf(ostrm, "'%s' :\n", name);
-      ostream::printf(ostrm, "{\n");
+      ostream::println-format(ostrm, "'%s' :\n", name);
+      ostream::println-format(ostrm, "{\n");
       ostream::col-incr(ostrm);
       symbol-t construct = cast(symbol-t)named-info::at(current-info, #construct);
-      ostream::printf(ostrm, "'construct' : '%s',\n", construct);
+      ostream::println-format(ostrm, "'construct' : '%s',\n", construct);
       if (nullptr != klass-name)
-        ostream::printf(ostrm, "'klass' : '%s',\n",      klass-name);
+        ostream::println-format(ostrm, "'klass' : '%s',\n",      klass-name);
       if (nullptr != superklass-name)
-        ostream::printf(ostrm, "'superklass' : '%s',\n", superklass-name);
+        ostream::println-format(ostrm, "'superklass' : '%s',\n", superklass-name);
       
       signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method-signatures);
       if (nullptr != method-signatures) {
-        ostream::printf(ostrm, "'methods' :\n");
-        ostream::printf(ostrm, "{\n");
+        ostream::println-format(ostrm, "'methods' :\n");
+        ostream::println-format(ostrm, "{\n");
         ostream::col-incr(ostrm);
         method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method-addresses);
         uint32-t j = 0;
@@ -413,7 +414,7 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
             defined = 0;
           else
             defined = 1;
-          ostream::printf(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%i' },\n",
+          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%i' },\n",
                        method-signature->name, method-signature->parameter-types,
                        method-signature->return-type,
                        method-signature->name,
@@ -422,14 +423,14 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
           j++;
         }
         ostream::col-decr(ostrm);
-        ostream::printf(ostrm, "},\n");
+        ostream::println-format(ostrm, "},\n");
       }
       ostream::col-decr(ostrm);
-      ostream::printf(ostrm, "},\n");
+      ostream::println-format(ostrm, "},\n");
     } while (nullptr != (current-info = current-info->next));
   }
   ostream::col-decr(ostrm);
-  ostream::printf(ostrm, "},\n");
+  ostream::println-format(ostrm, "},\n");
   return;
 }
 static named-info-t* gbl-registration-info-list;
@@ -770,7 +771,7 @@ dump-interposers(ostream-t ostrm, named-info-t* registration-info) {
   property-t const* interposers = cast(property-t const*)named-info::at(registration-info, #interposers);
   if (nullptr != interposers) {
     for (uint32-t i = 0; nullptr != interposers[i].key; i++)
-      ostream::printf(ostrm, "interpose %s, %s;\n", interposers[i].key, (symbol-t)interposers[i].element);
+      ostream::println-format(ostrm, "interpose %s, %s;\n", interposers[i].key, (symbol-t)interposers[i].element);
   }
   return;
 }
@@ -890,12 +891,12 @@ dump-module-description(ostream-t ostrm, named-info-t* registration-info) {
         std::abort();
       }
       if (module-name != modulee)
-        ostream::printf(ostrm, "%s %s {\n %s", "module", modulee, "export");
+        ostream::println-format(ostrm, "%s %s {\n %s", "module", modulee, "export");
       module-name = modulee;
-      ostream::printf(ostrm, "%s\n  %s", c, name);
+      ostream::println-format(ostrm, "%s\n  %s", c, name);
       c = ",";
       if (nullptr != slots-info || nullptr != slots-type)
-        ostream::printf(ostrm, ",\n  %s::%s", name, "slots-t");
+        ostream::println-format(ostrm, ",\n  %s::%s", name, "slots-t");
       if (nullptr != method-signatures) {
         uint32-t index = 0;
         signature-t const* info;
@@ -906,11 +907,11 @@ dump-module-description(ostream-t ostrm, named-info-t* registration-info) {
           assert(len < DK-COUNTOF(first-parameter-type) - 1);
           strncpy(first-parameter-type, info->parameter-types, len);
           first-parameter-type[len] = cast(char8-t)0;
-          //ostream::printf(ostrm, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
+          //ostream::println-format(ostrm, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
         }
       }
     }
-    ostream::printf(ostrm, ";\n}\n");
+    ostream::println-format(ostrm, ";\n}\n");
   }
   return;
 }
@@ -1000,7 +1001,7 @@ max-slot-name-width(named-info-t* slots-info) {
 }
 static void
 dump-method(ostream-t ostrm, signature-t const* info) {
-  ostream::printf(ostrm, "method %s(%s) -> %s;\n",
+  ostream::println-format(ostrm, "method %s(%s) -> %s;\n",
                   info->name,
                   info->parameter-types,
                   info->return-type);
@@ -1008,7 +1009,7 @@ dump-method(ostream-t ostrm, signature-t const* info) {
 }
 static void
 dump-generic(ostream-t ostrm, signature-t const* info) {
-  ostream::printf(ostrm, "generic $%s(%s) -> %s;\n",
+  ostream::println-format(ostrm, "generic $%s(%s) -> %s;\n",
                   info->name,
                   info->parameter-types,
                   info->return-type);
@@ -1069,7 +1070,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       klass-name = nullptr;
   }
   if (nullptr != modulee && 0 != safe-strcmp(gbl-current-module, modulee)) {
-    ostream::printf(ostrm, "module %s;\n\n", modulee);
+    ostream::println-format(ostrm, "module %s;\n\n", modulee);
     gbl-current-module = modulee;
   }
   if (exported? || state-exported? || behavior-exported?) {
@@ -1079,22 +1080,22 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       while (nullptr != (info = kw-args-method-signatures[index++])) {
         dump-generic(ostrm, info);
       }
-      ostream::printf(ostrm, "\n");
+      ostream::println-format(ostrm, "\n");
     }
-    ostream::printf(ostrm, "%s %s {\n", construct, name);
+    ostream::println-format(ostrm, "%s %s {\n", construct, name);
     ostream::col-incr(ostrm);
 
     if (nullptr != interpose-name)
-      ostream::printf(ostrm, "interpose %s;\n", interpose-name);
+      ostream::println-format(ostrm, "interpose %s;\n", interpose-name);
     if (nullptr != superklass-name)
-      ostream::printf(ostrm, "superklass %s;\n", superklass-name);
+      ostream::println-format(ostrm, "superklass %s;\n", superklass-name);
     if (nullptr != klass-name)
-      ostream::printf(ostrm, "klass %s;\n", klass-name);
+      ostream::println-format(ostrm, "klass %s;\n", klass-name);
     if (nullptr != traits) {
       uint32-t index = 0;
 
       while (nullptr != traits[index]) {
-        ostream::printf(ostrm, "trait %s;\n", traits[index]);
+        ostream::println-format(ostrm, "trait %s;\n", traits[index]);
         index++;
       }
     }
@@ -1102,7 +1103,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       uint32-t index = 0;
 
       while (nullptr != requires[index]) {
-        ostream::printf(ostrm, "require %s;\n", requires[index]);
+        ostream::println-format(ostrm, "require %s;\n", requires[index]);
         index++;
       }
     }
@@ -1110,54 +1111,54 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       uint32-t index = 0;
 
       while (nullptr != provides[index]) {
-        ostream::printf(ostrm, "provides %s;\n", provides[index]);
+        ostream::println-format(ostrm, "provides %s;\n", provides[index]);
         index++;
       }
     }
     if (nullptr != enum-info) {
       uint32-t i = 0;
       while (nullptr != enum-info[i].info) {
-        ostream::printf(ostrm, "export\n"); // hackhack
+        ostream::println-format(ostrm, "export\n"); // hackhack
         if (nullptr != enum-info[i].name)
-          ostream::printf(ostrm, "enum %s\n", enum-info[i].name);
+          ostream::println-format(ostrm, "enum %s\n", enum-info[i].name);
         else
-          ostream::printf(ostrm, "enum\n");
-        ostream::printf(ostrm, "{\n");
+          ostream::println-format(ostrm, "enum\n");
+        ostream::println-format(ostrm, "{\n");
         ostream::col-incr(ostrm);
         uint32-t max-name-width = max-enum-name-width(enum-info[i].info);
         uint32-t j = 0;
         while (nullptr != enum-info[i].info[j].name) {
-          ostream::printf(ostrm, "%-*s = %s,\n",
+          ostream::println-format(ostrm, "%-*s = %s,\n",
                        max-name-width,
                        enum-info[i].info[j].name,
                        enum-info[i].info[j].expr);
           j++;
         }
         ostream::col-decr(ostrm);
-        ostream::printf(ostrm, "}\n");
+        ostream::println-format(ostrm, "}\n");
         i++;
       }
     }
     if (nullptr != const-info) {
       uint32-t i = 0;
       while (nullptr != const-info[i].name) {
-        ostream::printf(ostrm, "export\n"); // hackhack
-        ostream::printf(ostrm, "const %s %s = %s;\n", const-info[i].type, const-info[i].name, const-info[i].value);
+        ostream::println-format(ostrm, "export\n"); // hackhack
+        ostream::println-format(ostrm, "const %s %s = %s;\n", const-info[i].type, const-info[i].name, const-info[i].value);
         i++;
       }
     }
 #define DKT-DEBUG-CODEGEN 0
     if (DKT-DEBUG-CODEGEN || state-exported?) {
       if (nullptr != slots-type) {
-        ostream::printf(ostrm, "slots %s;\n", slots-type);
+        ostream::println-format(ostrm, "slots %s;\n", slots-type);
       }
       else-if (nullptr != slots-info) {
         if (nullptr == cat || #struct == cat)
-          ostream::printf(ostrm, "slots {\n");
+          ostream::println-format(ostrm, "slots {\n");
         else-if (enum-base)
-          ostream::printf(ostrm, "slots %s : %s {\n", cat, enum-base);
+          ostream::println-format(ostrm, "slots %s : %s {\n", cat, enum-base);
         else
-          ostream::printf(ostrm, "slots %s {\n", cat);
+          ostream::println-format(ostrm, "slots %s {\n", cat);
         ostream::col-incr(ostrm);
         if (#enum == cat) {
           uint32-t max-type-width = max-slot-name-width(slots-info);
@@ -1168,7 +1169,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
             str-t slot-expr-str = cast(str-t)named-info::at(&slots-info[i], #expr-str);
             assert(nullptr != slot-expr-str);
             
-            ostream::printf(ostrm, "%-*s = %s,\n", max-type-width, slot-name, slot-expr-str);
+            ostream::println-format(ostrm, "%-*s = %s,\n", max-type-width, slot-name, slot-expr-str);
             i++;
           }
         } else {
@@ -1182,21 +1183,21 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
             str-t slot-expr-str = cast(str-t)named-info::at(&slots-info[i], #expr-str);
             
             if (nullptr != slot-expr-str)
-              ostream::printf(ostrm, "%-*s %s = %s;\n", max-type-width, slot-type, slot-name, slot-expr-str);
+              ostream::println-format(ostrm, "%-*s %s = %s;\n", max-type-width, slot-type, slot-name, slot-expr-str);
             else
-              ostream::printf(ostrm, "%-*s %s;\n", max-type-width, slot-type, slot-name);
+              ostream::println-format(ostrm, "%-*s %s;\n", max-type-width, slot-type, slot-name);
             i++;
           }
         }
         ostream::col-decr(ostrm);
-        ostream::printf(ostrm, "}\n");
+        ostream::println-format(ostrm, "}\n");
       } else {
         fprintf(stderr, "%s:%i::error: exported slots without type or info\n", __FILE__, __LINE__);
       }
     } // if (state-exported?
     if ((nullptr != superklass-name || nullptr != klass-name || nullptr != traits || nullptr != requires || nullptr != provides)
         && nullptr != method-signatures) {
-      ostream::printf(ostrm, "\n");
+      ostream::println-format(ostrm, "\n");
     }
     signature-t const* info;
     uint32-t index = 0;
@@ -1231,7 +1232,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
         dump-method(ostrm, info);
 
     ostream::col-decr(ostrm);
-    ostream::printf(ostrm, "}\n");
+    ostream::println-format(ostrm, "}\n");
   }
   return;
 }
@@ -1503,8 +1504,8 @@ auto dkt-register-info(named-info-t* registration-info) -> void {
 
     symbol-t name = name-from-info(registration-info);
     assert(nullptr != name);
-    ostream::printf(ostrm, "//arg=%s\n",  ctlg-arg);
-    ostream::printf(ostrm, "//name=%s\n", name);
+    ostream::println-format(ostrm, "//arg=%s\n",  ctlg-arg);
+    ostream::println-format(ostrm, "//name=%s\n", name);
     str-t arg-base =  remove-dir(ctlg-arg);
     str-t name-base = remove-dir(name);
 
