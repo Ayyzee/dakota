@@ -200,7 +200,6 @@ klass token {
   }
   // should be in superklass string??
   method append(object-t self, uint32-t c) -> object-t {
-    assert(nullptr != self.buffer);
     uint32-t len = cast(uint32-t)safe-strlen(self.buffer);
     self.buffer[len] =     cast(char8-t)(c);
     self.buffer[len + 1] = NUL;
