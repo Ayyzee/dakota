@@ -296,36 +296,41 @@ klass ostream {
     stream-t output;
     uint32-t col;
   }
-  static slots-t
-  pad(slots-t s) {
+  static auto col-incr(slots-t& s) -> slots-t& {
+    s.col++;
+    return s;
+  }
+  static auto col-decr(slots-t& s) -> slots-t& {
+    if (0 != s.col) {
+      s.col--;
+    }
+    return s;
+  }
+  static auto pad(slots-t& s) -> slots-t& {
     for (uint32-t i = 0; i < s.col; i++)
       fprintf(s.output, "  "); // two spaces per column :-) [my way]
     return s;
   }
-  [[format-va-printf(2)]] static
-  auto va-printf(slots-t s, str-t format, va-list-t args) -> slots-t {
+  [[format-va-printf(2)]] static auto va-printf(slots-t s, str-t format, va-list-t args) -> slots-t {
     pad(s);
     vfprintf(s.output, format, args);
     return s;
   }
-  [[format-printf(2)]] static
-  auto printf(slots-t s, str-t format, ...) -> slots-t {
+  [[format-printf(2)]] static auto printf(slots-t s, str-t format, ...) -> slots-t {
     va-list-t args;
     va-start(args, format);
     va-printf(s, format, args);
     va-end(args);
     return s;
   }
-  static slots-t
-  fopen(str-t path) {
+  static auto fopen(str-t path) -> slots-t {
     slots-t s = { nullptr, 0 };
     s.output = ::fopen(path, "w");
     if (nullptr == s.output)
       std::abort();
     return s;
   }
-  static slots-t
-  fclose(slots-t s) {
+  static auto fclose(slots-t& s) -> slots-t& {
     int n = ::fclose(s.output);
     if (-1 == n)
       std::abort();
@@ -372,7 +377,7 @@ static void
 json-dump-klass-defns(sorted-array-t* klass-defns-table) {
   ostream-t ostrm = { stdout, 0 };
   ostream::printf(ostrm, "{\n");
-  ostrm.col++;
+  ostream::col-incr(ostrm);
 
   for (uint32-t i = 0; i < klass-defns-table->count; i++) {
     named-info-t* klass-info = *cast(named-info-t**)sorted-array::at(klass-defns-table, i);
@@ -384,7 +389,7 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
       symbol-t superklass-name = superklass-name-from-info(current-info);
       ostream::printf(ostrm, "'%s' :\n", name);
       ostream::printf(ostrm, "{\n");
-      ostrm.col++;
+      ostream::col-incr(ostrm);
       symbol-t construct = cast(symbol-t)named-info::at(current-info, #construct);
       ostream::printf(ostrm, "'construct' : '%s',\n", construct);
       if (nullptr != klass-name)
@@ -396,7 +401,7 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
       if (nullptr != method-signatures) {
         ostream::printf(ostrm, "'methods' :\n");
         ostream::printf(ostrm, "{\n");
-        ostrm.col++;
+        ostream::col-incr(ostrm);
         method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method-addresses);
         uint32-t j = 0;
         signature-t const* method-signature;
@@ -416,14 +421,14 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
                        defined);
           j++;
         }
-        ostrm.col--;
+        ostream::col-decr(ostrm);
         ostream::printf(ostrm, "},\n");
       }
-      ostrm.col--;
+      ostream::col-decr(ostrm);
       ostream::printf(ostrm, "},\n");
     } while (nullptr != (current-info = current-info->next));
   }
-  ostrm.col--;
+  ostream::col-decr(ostrm);
   ostream::printf(ostrm, "},\n");
   return;
 }
@@ -1077,7 +1082,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       ostream::printf(ostrm, "\n");
     }
     ostream::printf(ostrm, "%s %s {\n", construct, name);
-    ostrm.col++;
+    ostream::col-incr(ostrm);
 
     if (nullptr != interpose-name)
       ostream::printf(ostrm, "interpose %s;\n", interpose-name);
@@ -1118,7 +1123,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
         else
           ostream::printf(ostrm, "enum\n");
         ostream::printf(ostrm, "{\n");
-        ostrm.col++;
+        ostream::col-incr(ostrm);
         uint32-t max-name-width = max-enum-name-width(enum-info[i].info);
         uint32-t j = 0;
         while (nullptr != enum-info[i].info[j].name) {
@@ -1128,7 +1133,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
                        enum-info[i].info[j].expr);
           j++;
         }
-        ostrm.col--;
+        ostream::col-decr(ostrm);
         ostream::printf(ostrm, "}\n");
         i++;
       }
@@ -1153,7 +1158,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
           ostream::printf(ostrm, "slots %s : %s {\n", cat, enum-base);
         else
           ostream::printf(ostrm, "slots %s {\n", cat);
-        ostrm.col++;
+        ostream::col-incr(ostrm);
         if (#enum == cat) {
           uint32-t max-type-width = max-slot-name-width(slots-info);
           uint32-t i = 0;
@@ -1183,7 +1188,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
             i++;
           }
         }
-        ostrm.col--;
+        ostream::col-decr(ostrm);
         ostream::printf(ostrm, "}\n");
       } else {
         fprintf(stderr, "%s:%i::error: exported slots without type or info\n", __FILE__, __LINE__);
@@ -1225,7 +1230,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
       while (nullptr != (info = exported-slots-method-signatures[index++]))
         dump-method(ostrm, info);
 
-    ostrm.col--;
+    ostream::col-decr(ostrm);
     ostream::printf(ostrm, "}\n");
   }
   return;
