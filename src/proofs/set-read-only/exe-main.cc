@@ -1,16 +1,16 @@
-#include <errno.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <syslog.h>
-#include <unistd.h>
+# include <errno.h>
+# include <signal.h>
+# include <stdarg.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <sys/mman.h>
+# include <syslog.h>
+# include <unistd.h>
 
-#include "set-read-only.hh"
+# include "set-read-only.hh"
 
-#define handle_error(msg) \
+# define handle_error(msg) \
   do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
 static char8_t const* progname;
@@ -62,9 +62,9 @@ int_t
 main(int_t, char8_t const* const argv[]) {
   progname = argv[0];
   dk_intern(symbol_addrs, symbol_strs, symbol_len);
-#if 1
+# if 1
   set_read_only("__DKT_RODATA");
-#endif
+# endif
   openlog(progname, LOG_CONS | LOG_PID | LOG_PERROR, LOG_USER);
   sigaction_setup(SIGBUS,  bus_segv_handler);
   sigaction_setup(SIGSEGV, bus_segv_handler);

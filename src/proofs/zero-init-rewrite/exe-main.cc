@@ -1,4 +1,4 @@
-#define cast(t) (t)
+# define cast(t) (t)
 
 int main()
 {

@@ -1,6 +1,6 @@
-#include <mach-o/ldsyms.h>
+# include <mach-o/ldsyms.h>
 
-#include "set-read-only.hh"
+# include "set-read-only.hh"
 
 namespace __symbol {
   page_align

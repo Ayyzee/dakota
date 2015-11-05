@@ -1,8 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
+# include <stdio.h>
+# include <stdint.h>
+# include <string.h>
 
 struct tkns4x4_t { // 4 bits of total-len and 4 bits of num-strs
   char const *tkns;

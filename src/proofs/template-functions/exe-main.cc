@@ -1,7 +1,7 @@
-#include <cstdio>
-#include <cstdlib>
+# include <cstdio>
+# include <cstdlib>
 
-#define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwi
+# define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwi
 
 template <class type> type add(type a, type b)
 {

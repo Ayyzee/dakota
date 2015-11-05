@@ -1,7 +1,7 @@
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <assert.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <assert.h>
 
 void
 pis(int8_t i)
@@ -42,12 +42,12 @@ int main()
   pis(c1_2);
   pis(c1_4);
 
-#if 1
+# if 1
   int16_t c2_2 = 'ab';
   int32_t c2_4 = 'ab';
   pis(c2_2);
   pis(c2_4);
-#endif
+# endif
 
   int32_t c4_4 = 'abcd';
   pis(c4_4);

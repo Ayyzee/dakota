@@ -1,11 +1,11 @@
-#define cast(t) (t)
+# define cast(t) (t)
 
 // static seems to imply inline in this example
-#if defined should_inline
-  #define unbox_attrs inline __attribute__((__always_inline__,__pure__,__nothrow__,__hot__))
-#else
-  #define unbox_attrs 
-#endif
+# if defined should_inline
+  # define unbox_attrs inline __attribute__((__always_inline__,__pure__,__nothrow__,__hot__))
+# else
+  # define unbox_attrs 
+# endif
 
 namespace object { struct slots_t; }
 typedef object::slots_t* object_t;

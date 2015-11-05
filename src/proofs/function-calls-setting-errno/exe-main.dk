@@ -1,8 +1,8 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <errno.h>
+# include <errno.h>
 
-#define EXCEPT(...) __except__(__VA_ARGS__, __FILE__, __LINE__, __func__)
+# define EXCEPT(...) __except__(__VA_ARGS__, __FILE__, __LINE__, __func__)
 
 klass errno-exception {
   superklass exception;

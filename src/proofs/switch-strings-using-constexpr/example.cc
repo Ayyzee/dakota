@@ -1,6 +1,6 @@
 // only C++11 and better
 
-#include "hash.hh"
+# include "hash.hh"
 
 int main() {
   const char* str = "Value2";

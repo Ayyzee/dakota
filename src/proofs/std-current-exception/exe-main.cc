@@ -2,10 +2,10 @@
 
 // http://en.cppreference.com/w/cpp/error/current_exception
 
-#include <iostream>
-#include <string>
-#include <exception>
-#include <stdexcept>
+# include <iostream>
+# include <string>
+# include <exception>
+# include <stdexcept>
 
 static void handle_eptr(std::exception_ptr eptr) // passing by value is ok
 {

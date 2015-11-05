@@ -1,8 +1,8 @@
-#if !defined typeinfo_hh
-#define      typeinfo_hh
+# if !defined typeinfo_hh
+# define      typeinfo_hh
 
-#include <string>
-#include <typeinfo>
+# include <string>
+# include <typeinfo>
 
 std::string demangle(const char* name);
 
@@ -10,4 +10,4 @@ std::string demangle(const char* name);
 // std::string type(const T& t) {
 //   return demangle(typeid(t).name());
 // }
-#endif
+# endif

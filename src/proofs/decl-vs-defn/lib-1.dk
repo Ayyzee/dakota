@@ -3,8 +3,8 @@
 // NOTE: enum and typedefs are both decls and defns
 
 // so we won't confuse the parser
-#define KLASS namespace
-#define METHOD
+# define KLASS namespace
+# define METHOD
 
 // DECL
 KLASS object { struct SLOTS-t; } // object:SLOTS-t
@@ -12,23 +12,23 @@ typedef object:SLOTS-t* OBJECT-t; // special case
 
 KLASS k1 { struct SLOTS-t; } // k1:SLOTS-t
 KLASS k2 { union  SLOTS-t; } // k2:SLOTS-t
-#if 0
+# if 0
 KLASS k3 { enum   SLOTS-t; } // k3:SLOTS-t
-#endif
+# endif
 KLASS k3 { enum SLOTS-t { k-none = 0 }; } // k3:SLOTS-t, k3:k-none
 KLASS k4 { typedef int32-t SLOTS-t; } // k4:SLOTS-t
 KLASS k1 { METHOD OBJECT-t m1(OBJECT-t); } // k1:m1(OBJECT-t)
 
 // DEFN
-#if 0
+# if 0
 KLASS k1 { struct SLOTS-t { }; } // k1:SLOTS-t
 KLASS k2 { union  SLOTS-t { }; } // k2:SLOTS-t
 KLASS k1 { METHOD OBJECT-t m1(OBJECT-t self) { return self; } } // k1:m1(OBJECT-t)
-#else
+# else
 struct k1:SLOTS-t { };
 union  k2:SLOTS-t { };
 METHOD OBJECT-t k1:m1(OBJECT-t self) { return self; } // k1:m1(OBJECT-t)
-#endif
+# endif
 
 
 KLASS e1 { enum SLOTS-t { k-none = 0 }; }

@@ -1,10 +1,10 @@
 // only C++11 and better
 
-#include <cstdio>
+# include <cstdio>
 
 //#include <dakota.hh>
 
-#include "hash.hh"
+# include "hash.hh"
 
 int main(int argc, const char* const* argv) {
   for (int i = 1; i < argc; i++) {

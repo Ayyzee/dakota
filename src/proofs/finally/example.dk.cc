@@ -1,5 +1,5 @@
-#include "finally.hh"
-#include <stdio.h>
+# include "finally.hh"
+# include <stdio.h>
 
 int fnc1(void) {
   fprintf(stdout, "fnc1: before-finally [1]\n");

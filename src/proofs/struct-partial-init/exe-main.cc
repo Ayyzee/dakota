@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdio.h>
+# include <stdio.h>
 
 namespace file { typedef FILE* slots_t; }
 typedef file::slots_t file_t;

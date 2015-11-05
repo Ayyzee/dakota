@@ -1,8 +1,8 @@
-#include <wchar.h>
+# include <wchar.h>
 //#include <uchar.h>
-#include <stdlib.h>
-#include <string.h>
-#include <locale.h>
+# include <stdlib.h>
+# include <string.h>
+# include <locale.h>
 
 // 0x21  !  \u0021
 // 0x24  $  \u0024 special?

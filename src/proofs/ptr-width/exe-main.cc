@@ -1,9 +1,9 @@
-#include <cstdio>
+# include <cstdio>
 
-#ifndef  __STDC_FORMAT_MACROS
-#define  __STDC_FORMAT_MACROS
-#endif //__STDC_FORMAT_MACROS
-#include <inttypes.h>
+# ifndef  __STDC_FORMAT_MACROS
+# define  __STDC_FORMAT_MACROS
+# endif //__STDC_FORMAT_MACROS
+# include <inttypes.h>
 
 const int ptr_width =  snprintf(nullptr, 0, "0x%" PRIxPTR, (uintptr_t)~0);
 

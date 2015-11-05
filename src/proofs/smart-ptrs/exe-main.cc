@@ -1,6 +1,6 @@
-#include <memory>
-#include <cstdio>
-#include <stdint.h>
+# include <memory>
+# include <cstdio>
+# include <stdint.h>
 
 template<T>
 struct S

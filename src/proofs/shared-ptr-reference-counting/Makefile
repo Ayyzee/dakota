@@ -1,6 +1,6 @@
 #rootdir := ../../..
-#include $(rootdir)/config.mk
-#include $(rootdir)/vars.mk
+# include $(rootdir)/config.mk
+# include $(rootdir)/vars.mk
 
 all:
 	clang++-3.7.0 -std=c++11 --debug=3 --no-warnings --output exe-cc exe-main.cc

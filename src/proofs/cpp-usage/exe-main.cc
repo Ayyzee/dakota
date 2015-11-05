@@ -1,8 +1,8 @@
-#define TRAIT namespace
-#define TRAIT(t)
+# define TRAIT namespace
+# define TRAIT(t)
 
-#define KLASS namespace
-#define KLASS(k)
+# define KLASS namespace
+# define KLASS(k)
 
 int main()
 {

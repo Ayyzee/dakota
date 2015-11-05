@@ -1,26 +1,26 @@
-#include <cstdlib>
-#include <cstddef>
-#include <cstdio>
-#include <cassert>
-#include <cstring>
+# include <cstdlib>
+# include <cstddef>
+# include <cstdio>
+# include <cassert>
+# include <cstring>
 
-#include <unistd.h>
-#include <errno.h>
+# include <unistd.h>
+# include <errno.h>
 
-#include <dlfcn.h>
+# include <dlfcn.h>
 
-#include <sys/mman.h>
-#include <mach-o/ldsyms.h>
-#include <mach-o/getsect.h>
+# include <sys/mman.h>
+# include <mach-o/ldsyms.h>
+# include <mach-o/getsect.h>
 
 
-#define COUNTOF(a) (sizeof(a)/sizeof(a[0]))
-#define symbols_section __attribute__((__section__("__DKT_RODATA,__dkt_rodata")))
-#define page_align      __attribute__((__aligned__(__pagesize)))
-#define cast(t) (t)
+# define COUNTOF(a) (sizeof(a)/sizeof(a[0]))
+# define symbols_section __attribute__((__section__("__DKT_RODATA,__dkt_rodata")))
+# define page_align      __attribute__((__aligned__(__pagesize)))
+# define cast(t) (t)
 
-#define tst(expr) if (expr) { fprintf(stderr, "errno: %i, str-errno: %s\n", errno, strerror(errno)); }
-#define sc(i) tst(0 != i)
+# define tst(expr) if (expr) { fprintf(stderr, "errno: %i, str-errno: %s\n", errno, strerror(errno)); }
+# define sc(i) tst(0 != i)
 
 const size_t __pagesize = 4096;
 

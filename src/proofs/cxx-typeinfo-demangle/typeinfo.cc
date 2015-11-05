@@ -1,10 +1,10 @@
-#include <cstdlib>
-#include <cxxabi.h>
-#include <memory>
+# include <cstdlib>
+# include <cxxabi.h>
+# include <memory>
 
-#include "typeinfo.hh"
+# include "typeinfo.hh"
 
-#if defined __GNUG__
+# if defined __GNUG__
 std::string demangle(const char* name) {
   int status = -1;
   std::unique_ptr<char, void(*)(void*)> res {
@@ -12,8 +12,8 @@ std::string demangle(const char* name) {
   };
   return (status == 0) ? res.get() : name;
 }
-#else // does nothing if not g++
+# else // does nothing if not g++
 std::string demangle(const char* name) {
   return name;
 }
-#endif
+# endif

@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <cstdio>
+# include <cstdio>
 
 enum one_t { one_zero = 0 };
 enum two_t { two_zero = 0 };

@@ -1,7 +1,7 @@
-#include <cstdlib>
-#include <stdint.h>
+# include <cstdlib>
+# include <stdint.h>
 
-#define cast(t) (t)
+# define cast(t) (t)
 
 namespace object { struct slots_t { }; }
 typedef object::slots_t* object_t;

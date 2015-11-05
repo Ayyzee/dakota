@@ -1,5 +1,5 @@
-#include <regex>
-#include <cstdio>
+# include <regex>
+# include <cstdio>
 
 char const* cmatch_at(std::cmatch& m, std::regex& e, size_t i, char const* file, unsigned int line, char const* dflt = "");
 char const* cmatch_at(std::cmatch& m, std::regex& e, size_t i, char const* file, unsigned int line, char const* dflt) {
@@ -31,11 +31,11 @@ int main() {
   }
   {
   // SUBSTITUTE: s =~ /\b(sub)([^ ]*)/$1-$2/
-#if 1
+# if 1
   std::regex e("\\b(sub)([^ ]*)"); s = std::regex_replace(s, e, "$1-$2").c_str();
-#else
+# else
   s = std::regex_replace(s, std::regex("\\b(sub)([^ ]*)"), "$1-$2").c_str();
-#endif
+# endif
   }
   printf("%s\n", s);
   return 0;

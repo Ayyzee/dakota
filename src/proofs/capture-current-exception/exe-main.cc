@@ -1,7 +1,7 @@
-#include <cstdio>
-#include <cstdlib>
+# include <cstdio>
+# include <cstdlib>
 
-#define THREAD_LOCAL __thread
+# define THREAD_LOCAL __thread
 typedef char const* str_t;
 
 static str_t dkt_capture_current_exception(str_t arg)

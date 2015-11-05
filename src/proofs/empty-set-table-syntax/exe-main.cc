@@ -1,4 +1,4 @@
-#include <cstdio>
+# include <cstdio>
 
 // keyword arguments
 //   required (no RHS of =>)

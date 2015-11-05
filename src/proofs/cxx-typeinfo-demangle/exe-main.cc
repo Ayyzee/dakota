@@ -1,8 +1,8 @@
-#include <iostream>
-#include <stdint.h>
+# include <iostream>
+# include <stdint.h>
 
-#include "typeinfo.hh"
-#include "typeinfo.cc"
+# include "typeinfo.hh"
+# include "typeinfo.cc"
 
 namespace foo {
   struct slots_t {

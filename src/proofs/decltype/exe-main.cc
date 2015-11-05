@@ -1,9 +1,9 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdio.h>
-#include <stdint.h>
+# include <stdio.h>
+# include <stdint.h>
 
-#define cast(t) (t)
+# define cast(t) (t)
 
 int main()
 {

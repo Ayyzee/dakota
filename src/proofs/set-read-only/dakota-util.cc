@@ -1,6 +1,6 @@
-#include <mach-o/ldsyms.h>
+# include <mach-o/ldsyms.h>
 
-#include "dakota-util.hh"
+# include "dakota-util.hh"
 
 namespace __symbol {
   page_align
