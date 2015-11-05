@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <dlfcn.h> // struct Dl-info, dladdr()
+# include <dlfcn.h> // struct Dl-info, dladdr()
 
-#include "dl.hh"
+# include "dl.hh"
 
 module dakota;
 
@@ -27,18 +27,18 @@ klass x::dl-info {
 str-t
 symbol-name-from-address(ptr-t saddr) {
   str-t result = nullptr;
-#if defined WIN32
-#error "not yet implemented on win32"
-#else
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
   x::dl-info::slots-t dli;
   if (0 != dladdr(saddr, &dli) && (dli.dli-saddr == saddr))
     result = dli.dli-sname;
-#endif
+# endif
   return result;
 }
 void
 load-library(str-t name) {
-#if defined WIN32
+# if defined WIN32
   //fprintf(stdout, "LoadLibrary(\"%s\")\n", name);
   HINSTANCE h-dll = LoadLibrary(name);
 
@@ -59,7 +59,7 @@ load-library(str-t name) {
             __FILE__, __LINE__, name);
     throw "bummer";
   }
-#else
+# else
   //fprintf(stdout, "//dlopen(\"%s\", RTLD-NOW)\n", name);
   ptr-t dl-handle = dlopen(name, RTLD-NOW);
 
@@ -70,6 +70,6 @@ load-library(str-t name) {
     throw "bummer";
   }
   // should record dl-handle and directory-string for dlclose()
-#endif // WIN32
+# endif // WIN32
   return;
 }

@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <getopt.h> // getopt_long()
-#include <dlfcn.h>  // dlopen()
-#include <sys/param.h> // MAXPATHLEN
-#include <errno.h>
-#include <string.h>
-#include <assert.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
+# include <getopt.h> // getopt_long()
+# include <dlfcn.h>  // dlopen()
+# include <sys/param.h> // MAXPATHLEN
+# include <errno.h>
+# include <string.h>
+# include <assert.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <sys/wait.h>
 
-#include "dakota-dummy.hh"
-#include "dakota.hh" // format_printf(), format_va_printf()
+# include "dakota-dummy.hh"
+# include "dakota.hh" // format_printf(), format_va_printf()
 
 enum {
   DKT_INFO_HELP = 256,
@@ -135,9 +135,9 @@ namespace va {
   va::_abort_with_log(file, line, format, args);
   va_end(args);
 }
-#define abort_with_log(...) _abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
+# define abort_with_log(...) _abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
 
-#include "spawn.cc"
+# include "spawn.cc"
 
 static int
 setenv_boole(const char* name, bool value, int overwrite) {

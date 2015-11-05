@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dakota_safe_str_hh
-#define      dakota_safe_str_hh
+# if !defined dakota_safe_str_hh
+# define      dakota_safe_str_hh
 
-#include <cstdlib>
-#include <cstring>
+# include <cstdlib>
+# include <cstring>
 
 inline int_t safe_strcmp(str_t s1, str_t s2) {
     int_t value = 0;
@@ -73,4 +73,4 @@ inline size_t safe_strlen(str_t str) {
     return len;
   }
 
-#endif
+# endif

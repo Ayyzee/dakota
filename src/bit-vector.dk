@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cstring>
+# include <cassert>
+# include <cstring>
 
 module dakota;
 
@@ -31,9 +31,9 @@ max(uint32-t a, uint32-t b) {
 }
 inline uint32-t
 host-to-little-32(uint32-t arg) {
-#if 0
+# if 0
   return arg;
-#endif
+# endif
   uint32-t result = 
     ((arg << 24) & 0xff000000) |
     ((arg <<  8) & 0x00ff0000) |
@@ -43,9 +43,9 @@ host-to-little-32(uint32-t arg) {
 }
 [[unused]] static uint32-t
 reverse-32(uint32-t arg) {
-#if 0
+# if 0
   return arg;
-#endif
+# endif
   uint32-t result = 0;
   for (uint32-t i = 0; i < (sizeof(arg) * 8); i++) {
     uint32-t bit = arg & (1 << i);

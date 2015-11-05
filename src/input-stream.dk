@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
+# include <cassert>
+# include <cerrno>
+# include <cstdio>
+# include <cstring>
 
-#if HAVE-CONFIG-HH
-  #include "config.hh"
-#endif
+# if HAVE-CONFIG-HH
+  # include "config.hh"
+# endif
 
-#include "dakota-safe-str.hh"
-#include "dakota-private.hh"
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
 
 module dakota;
 
@@ -57,10 +57,10 @@ klass input-stream {
   }
   method close(object-t self) -> object-t {
     slots-t slots = *unbox(self);
-#if defined DEBUG
+# if defined DEBUG
     if (stdin == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stdin\"");
-#endif // DEBUG
+# endif // DEBUG
     int-t rtn = fclose(slots);
 
     if (0 != rtn)

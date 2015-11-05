@@ -14,50 +14,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dkt_dakota_decl_hh
-#define      dkt_dakota_decl_hh
+# if !defined dkt_dakota_decl_hh
+# define      dkt_dakota_decl_hh
 
-#define KLASS_NS namespace
-#define TRAIT_NS namespace
+# define KLASS_NS namespace
+# define TRAIT_NS namespace
 
-#define SELECTOR_FUNC
-#define SIGNATURE_FUNC
-#define GENERIC
-#define METHOD
+# define SELECTOR_FUNC
+# define SIGNATURE_FUNC
+# define GENERIC
+# define METHOD
 
-#define VA_SELECTOR_FUNC
-#define VA_SIGNATURE_FUNC
-#define VA_GENERIC
-#define VA_METHOD
-#define KW_ARGS_METHOD
+# define VA_SELECTOR_FUNC
+# define VA_SIGNATURE_FUNC
+# define VA_GENERIC
+# define VA_METHOD
+# define KW_ARGS_METHOD
 
-#define KW_ARGS_METHOD_SIGNATURE_FUNC
-#define SLOTS_METHOD_SIGNATURE_FUNC
+# define KW_ARGS_METHOD_SIGNATURE_FUNC
+# define SLOTS_METHOD_SIGNATURE_FUNC
 
-#define ALIAS(m)
-#define METHOD_ALIAS(a, r)
-#define INCLUDE(f)
-#define INTERPOSE(k)
-#define MODULE(n)
-#define MODULE_EXPORT(n, ...)
-#define MODULE_IMPORT(n1, n2, ...)
-#define PROVIDE(t)
-#define REQUIRE(t)
-#define SLOTS(t, ...)
-#define SUPERKLASS(k)
-#define KLASS(k)
-#define TRAIT(t)
-#define TRAITS(t1, ...)
+# define ALIAS(m)
+# define METHOD_ALIAS(a, r)
+# define INCLUDE(f)
+# define INTERPOSE(k)
+# define MODULE(n)
+# define MODULE_EXPORT(n, ...)
+# define MODULE_IMPORT(n1, n2, ...)
+# define PROVIDE(t)
+# define REQUIRE(t)
+# define SLOTS(t, ...)
+# define SUPERKLASS(k)
+# define KLASS(k)
+# define TRAIT(t)
+# define TRAITS(t1, ...)
 
-#if defined WIN32
-  #define SO_IMPORT [[ms::dllimport]]
-  #define SO_EXPORT [[ms::dllexport]]
-#else
-  #define SO_IMPORT
-  #define SO_EXPORT [[gnu::visibility("default")]]
-#endif
+# if defined WIN32
+  # define SO_IMPORT [[ms::dllimport]]
+  # define SO_EXPORT [[ms::dllexport]]
+# else
+  # define SO_IMPORT
+  # define SO_EXPORT [[gnu::visibility("default")]]
+# endif
 
-#define DKT_ENABLE_TYPEINFO SO_EXPORT
+# define DKT_ENABLE_TYPEINFO SO_EXPORT
 
 typedef bool boole_t;
 
@@ -87,4 +87,4 @@ static_assert(32/8  == sizeof(float32_t),  "The sizeof float32_t  must equal  32
 static_assert(64/8  == sizeof(float64_t),  "The sizeof float64_t  must equal  64/8 bytes in size");
 static_assert(128/8 == sizeof(float128_t), "The sizeof float128_t must equal 128/8 bytes in size");
 
-#endif
+# endif

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dkt_dakota_finally_hh
-#define      dkt_dakota_finally_hh
+# if !defined dkt_dakota_finally_hh
+# define      dkt_dakota_finally_hh
 
 // http://www.codeproject.com/Tips/476970/finally-clause-in-Cplusplus
 
-#include <functional>
+# include <functional>
 
 class finally {
     std::function<void(void)> functor;
@@ -39,9 +39,9 @@ class finally {
 // catch (...) {
 // }
 
-#define DKT_CATCH_BEGIN(e) catch (object_t e) { if (0) {}
-#define DKT_CATCH(k, e)    else if (dk::instancex3f(e, k)) // dk::instance?(i, k)
-#define DKT_CATCH_END(e)   else { throw; } }
-#define DKT_FINALLY(block) finally __finally([&] block)
+# define DKT_CATCH_BEGIN(e) catch (object_t e) { if (0) {}
+# define DKT_CATCH(k, e)    else if (dk::instancex3f(e, k)) // dk::instance?(i, k)
+# define DKT_CATCH_END(e)   else { throw; } }
+# define DKT_FINALLY(block) finally __finally([&] block)
 
-#endif
+# endif

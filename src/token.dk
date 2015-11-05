@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cstring>
+# include <cassert>
+# include <cstring>
 
-#include "dakota-safe-str.hh"
-#include "dakota-private.hh"
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
 
 module dakota-util;
 
@@ -61,7 +61,7 @@ klass token {
                        tokenid-t      tokenid : 0,
                        str-t buffer :  nullptr) -> object-t {
     self = $init(super);
-#if 0
+# if 0
     if (0 != tokenid) {
       char8-t[4 + (1)] tokenid-str = "";
       tokenid::utf8-from(tokenid, tokenid-str, sizeof(tokenid-str));
@@ -69,7 +69,7 @@ klass token {
       printf("{ 'line':'%i', 'column':'%i', 'tokenid':'%s', 'buffer':'%s' },\n",
              line, column, tokenid-str, buffer);
     }
-#endif
+# endif
     self.line =    line;
     self.column =  column;
     self.tokenid = tokenid;
@@ -161,11 +161,11 @@ klass token {
     return buffer;
   }
   method dump-shallow(object-t self) -> object-t {
-#if 0
+# if 0
     if (0 != self.tokenid)
       fprintf(stderr, "%s\n", self.buffer);
     return self;
-#else
+# else
 //     fprintf(stderr, "%p:%p { line=%i, buffer=\"",
 //             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.line);
 
@@ -184,7 +184,7 @@ klass token {
 //     fprintf(stderr, "\" }");
     fprintf(stderr, "\n");
     return self;
-#endif
+# endif
   }
   method dump(object-t self) -> object-t {
     $dump(super);

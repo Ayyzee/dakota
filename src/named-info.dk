@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cinttypes>
-#include <cstdlib>
-#include <cstring>
+# include <cinttypes>
+# include <cstdlib>
+# include <cstring>
 
-#include "dakota-private.hh"
-#include "named-info.hh"
+# include "dakota-private.hh"
+# include "named-info.hh"
 
 module dakota;
 

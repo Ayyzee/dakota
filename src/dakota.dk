@@ -14,37 +14,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cerrno>
-#include <cinttypes>
-#include <csignal>
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <exception>
+# include <cassert>
+# include <cerrno>
+# include <cinttypes>
+# include <csignal>
+# include <cstdarg>
+# include <cstdio>
+# include <cstdlib>
+# include <cstring>
+# include <exception>
 
-#include <cxxabi.h>
+# include <cxxabi.h>
 
-#include <unistd.h>
+# include <unistd.h>
 
-#include <sys/mman.h>
-#include <sys/stat.h> // struct stat, stat()
-#include <syslog.h>
-#include <dlfcn.h>
+# include <sys/mman.h>
+# include <sys/stat.h> // struct stat, stat()
+# include <syslog.h>
+# include <dlfcn.h>
 
-#include "config.hh"
+# include "config.hh"
 
-#include "dakota-log.hh"
-#include "dakota-private.hh"
-#include "dakota-rt-private.hh"
-#include "dl.hh" // load-library()
-#include "sorted-array.hh"
-#include "sorted-ptr-array.hh"
+# include "dakota-log.hh"
+# include "dakota-private.hh"
+# include "dakota-rt-private.hh"
+# include "dl.hh" // load-library()
+# include "sorted-array.hh"
+# include "sorted-ptr-array.hh"
 
-#if !defined SO-EXT
-#define SO-EXT "so"
-#endif
+# if !defined SO-EXT
+# define SO-EXT "so"
+# endif
 
 module dakota;
 
@@ -77,7 +77,7 @@ klass symbol;
 klass uintptr;
 klass unbox-illegal-klass-exception;
 
-#if DKT-WORKAROUND
+# if DKT-WORKAROUND
 namespace property {
   int-t compare(slots-t**, slots-t**);
 }
@@ -88,7 +88,7 @@ namespace klass {
   object-t init(object-t, named-info-t*);
   boole-t subklass?(object-t, object-t);
 }
-#endif
+# endif
 
 static const char8-t gbl-delimiter = '/'; // unix path delimiter
 static str-t gbl-current-module = "";
@@ -151,9 +151,9 @@ init-runtime-ds() {
                         cast(std-compare-t)cast(int-t(*)(symbol::slots-t*,symbol::slots-t*))symbol::compare);
   return;
 }
-#if defined DKT-DUMP-MEM-FOOTPRINT
+# if defined DKT-DUMP-MEM-FOOTPRINT
 extern resource-usage::slots-t gbl-ru;
-#endif
+# endif
 
 klass null-singleton { klass singleton-klass; }
 
@@ -270,10 +270,10 @@ alloc-klass(symbol-t name) {
   uint32-t size =   size-from-info(klass-info);
   //fprintf(stderr, "%s(#%s):\toffset=%i + size=%i\n", __func__, name, offset, size);
 
-#if defined DKT-DUMP-MEM-FOOTPRINT
+# if defined DKT-DUMP-MEM-FOOTPRINT
   resource-usage::add-alloc(&gbl-ru, offset + size);
   resource-usage::log-alloc(&gbl-ru, offset + size, name);
-#endif
+# endif
 
   object-t kls = cast(object-t)dkt::alloc(offset + size);
   if (nullptr != klass::klass)
@@ -338,7 +338,7 @@ klass ostream {
     return s;
   }
 }
-#if 1
+# if 1
 extern sorted-array-t gbl-selectors-table;
 static void
 json-dump-resource-info(sorted-array-t* klass-defns-table) {
@@ -372,7 +372,7 @@ json-dump-resource-info(sorted-array-t* klass-defns-table) {
          klasses-count, gbl-selectors-table.count, methods-count);
   return;
 }
-#endif
+# endif
 
 static void
 json-dump-klass-defns(sorted-array-t* klass-defns-table) {
@@ -549,12 +549,12 @@ auto dk-init-runtime() -> void {
     klass::klass =  init-klass(klass::klass,  #klass);
 
     klass::unbox(object::klass)->superklass = nullptr;
-#if 1
+# if 1
     //dk-klass-for-name(#singleton-klass); // ???
     null-singleton::klass = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
     null = make(null-singleton::klass);
     klass::unbox(object::klass)->superklass = null;
-#endif
+# endif
     // core runtime klasses are setup
     // klasses: object, klass, (optionally) singleton-klass
     // and (optionally) null-singleton and null (singleton)
@@ -581,7 +581,7 @@ auto dk-init-runtime() -> void {
     dk-klass-for-name(#illegal-klass-exception);
     dk-klass-for-name(#unbox-illegal-klass-exception);
 
-#if !defined DKT-OMIT-BEHAVIOR
+# if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(#bit-vector);
 
     object-t behavior;
@@ -591,21 +591,21 @@ auto dk-init-runtime() -> void {
 
     if (null-singleton::klass)
       behavior = $behavior(null-singleton::klass);
-#else
+# else
     klass::unbox(object::klass)->behavior =     nullptr;
     klass::unbox(klass::klass)->behavior =      nullptr;
     klass::unbox(bit-vector::klass)->behavior = nullptr;
     if (null-singleton::klass)
       klass::unbox(null-singleton::klass)->behavior = nullptr;
-#endif
-#if 1
+# endif
+# if 1
     dk-klass-for-name(#input-stream);
     dk-klass-for-name(#output-stream);
 
     std-input =  make(input-stream::klass,  #slots : stdin);
     std-output = make(output-stream::klass, #slots : stdout);
     std-error =  make(output-stream::klass, #slots : stderr);
-#endif
+# endif
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
@@ -622,7 +622,7 @@ auto dk-init-runtime() -> void {
     auto previous-unexpected = std::set-unexpected(verbose-unexpected);
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
-#if 0
+# if 0
     $dump(object::klass);
     $dump(klass::klass);
     $dump(singleton-klass::klass);
@@ -630,7 +630,7 @@ auto dk-init-runtime() -> void {
       $dump(null-singleton::klass);
       $dump(null);
     }
-#endif
+# endif
   }
   init-imported-klasses();
 
@@ -1147,7 +1147,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
         i++;
       }
     }
-#define DKT-DEBUG-CODEGEN 0
+# define DKT-DEBUG-CODEGEN 0
     if (DKT-DEBUG-CODEGEN || state-exported?) {
       if (nullptr != slots-type) {
         ostream::println-format(ostrm, "slots %s;\n", slots-type);
@@ -1678,12 +1678,12 @@ auto dk-intern(str-t key) -> symbol-t {
     intern-array->capacity *= 2;
     intern-array->elements = cast(ptr-t*)dkt::alloc(intern-array->size * intern-array->capacity, intern-array->elements);
   }
-#if 0
+# if 0
   symbol-t val = key;
-#else
+# else
   symbol-t val = cast(symbol-t)sorted-ptr-array::intern(intern-array, cast(void const*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
-#endif
+# endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
   return val;
 }

@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cerrno>
-#include <cstring>
+# include <cassert>
+# include <cerrno>
+# include <cstring>
 
-#include "dakota-private.hh"
+# include "dakota-private.hh"
 
 module dakota;
 

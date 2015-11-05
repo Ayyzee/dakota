@@ -1,9 +1,9 @@
-#if !defined dkt_dakota_dummy_hh
-#define      dkt_dakota_dummy_hh
+# if !defined dkt_dakota_dummy_hh
+# define      dkt_dakota_dummy_hh
 
-#include <cstdint> // uintptr_t
+# include <cstdint> // uintptr_t
 
-#include "dakota-declare-klass-type.hh"
+# include "dakota-declare-klass-type.hh"
 
 dkt_declare_klass_type_typedef(boole,    bool);
 dkt_declare_klass_type_typedef(char8,    char);
@@ -22,4 +22,4 @@ dkt_declare_klass_type_struct(super);
 namespace method { typedef object_t (*slots_t)(object_t); }
 typedef method::slots_t method_t;
 
-#endif
+# endif

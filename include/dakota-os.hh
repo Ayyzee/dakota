@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dkt_dakota_os_hh
-#define      dkt_dakota_os_hh
+# if !defined dkt_dakota_os_hh
+# define      dkt_dakota_os_hh
 
-#if defined __linux__
-  #include <libelf.h>
+# if defined __linux__
+  # include <libelf.h>
 
   static inline void* dkt_get_segment_data(char8_t const* segment, void** addr_out, size_t* size_out) {
     needs work
   }
-#elif defined __darwin__
-  #include <mach-o/getsect.h>
+# elif defined __darwin__
+  # include <mach-o/getsect.h>
 
   extern void* __dso_handle;
 
@@ -32,8 +32,8 @@
     *addr_out = cast(void*)getsegmentdata(cast(const struct mach_header_64*)&__dso_handle, segment, size_out);
     return *addr_out;
   }
-#else
-  #error "Neither __linux__ nor __darwin__ is defined."
-#endif
+# else
+  # error "Neither __linux__ nor __darwin__ is defined."
+# endif
 
-#endif
+# endif

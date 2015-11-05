@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cstdlib>
-#include <cstring>
+# include <cassert>
+# include <cstdlib>
+# include <cstring>
 
-#include "sorted-ptr-array.hh"
+# include "sorted-ptr-array.hh"
 
 module dakota;
 
-#if DKT-WORKAROUND
+# if DKT-WORKAROUND
 namespace sorted-ptr-array {
   result-t search(slots-t*, void const*);
 }
-#endif
+# endif
 
 klass exception;
 klass equal-predicate;

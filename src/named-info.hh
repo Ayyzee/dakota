@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dkt_named_info_hh
-#define      dkt_named_info_hh
+# if !defined dkt_named_info_hh
+# define      dkt_named_info_hh
 
-#include "dakota.hh"
+# include "dakota.hh"
 
 namespace named_info {
   /*method*/ int_t compare(slots_t*  s, slots_t*  other_s);
              int_t compare(slots_t** s, slots_t** other_s);
   /*method*/ int_t compare(object_t self, object_t other);
 }
-#endif
+# endif

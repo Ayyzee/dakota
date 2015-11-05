@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dkt_dl_hh
-#define      dkt_dl_hh
+# if !defined dkt_dl_hh
+# define      dkt_dl_hh
 
 str_t symbol_name_from_address(void*);
 void load_library(str_t);
 
-#endif // dkt_dl_hh
+# endif // dkt_dl_hh

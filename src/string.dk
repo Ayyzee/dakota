@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cinttypes>
-#include <cstdlib>
-#include <cstring>
+# include <cassert>
+# include <cinttypes>
+# include <cstdlib>
+# include <cstring>
 
-#include "dakota-safe-str.hh"
-#include "dakota-private.hh"
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
 
 // 2^32 - 5 = 4294967291 or 0xfffffffb
 const uintptr-t max-prime32 = 0xfffffffb;

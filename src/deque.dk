@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cinttypes>
-#include <cstdlib>
+# include <cassert>
+# include <cinttypes>
+# include <cstdlib>
 
 module dakota;
 
@@ -270,12 +270,12 @@ klass deque {
 
       if (nullptr != self.first)
         self.first->prev = nullptr;
-#if 0
+# if 0
       else {
         //node->prev = nullptr;
         node->next = nullptr;
       }
-#endif
+# endif
       element = node->element;
     }
     self.size--;

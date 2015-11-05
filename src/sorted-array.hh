@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dkt_sorted_array_hh
-#define      dkt_sorted_array_hh
+# if !defined dkt_sorted_array_hh
+# define      dkt_sorted_array_hh
 
-#include "dakota.hh"
+# include "dakota.hh"
 
 namespace sorted_array {
   struct slots_t;
@@ -33,4 +33,4 @@ namespace sorted_array {
   void const* remove_at(slots_t* t, void const* key, uint32_t offset);
   slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
 }
-#endif
+# endif

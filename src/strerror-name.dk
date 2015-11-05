@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cctype>
-#include <cerrno>
-#include <cstdio>
-#include <cstring>
+# include <cassert>
+# include <cctype>
+# include <cerrno>
+# include <cstdio>
+# include <cstring>
 
-#if HAVE-CONFIG-HH
-  #include "config.hh"
-#endif
+# if HAVE-CONFIG-HH
+  # include "config.hh"
+# endif
 
-#include "dakota-private.hh"
+# include "dakota-private.hh"
 
 static str-t gbl-sys-err-names[] = {
      "0",    "1",    "2",    "3",    "4",    "5",    "6",    "7",    "8",    "9",
@@ -67,16 +67,16 @@ static auto set-name(int-t errnum, str-t name) -> void {
   }
   return;
 }
-#if !defined HAVE-STRERROR-NAME
+# if !defined HAVE-STRERROR-NAME
 auto strerror-name(int-t errnum) -> str-t {
   assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));
   str-t name = gbl-sys-err-names[errnum];
   return name;
 }
-#endif
+# endif
 
 static auto __initial() -> void {
-#include "strerror-name.tbl"
+# include "strerror-name.tbl"
   return;
 }
 static auto __final() -> void {

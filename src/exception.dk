@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cerrno>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <exception>
-#include <unistd.h> // getpid()
+# include <cerrno>
+# include <cstdio>
+# include <cstdlib>
+# include <cstring>
+# include <exception>
+# include <unistd.h> // getpid()
 
-#if HAVE-CONFIG-HH
-  #include "config.hh"
-#endif
+# if HAVE-CONFIG-HH
+  # include "config.hh"
+# endif
 
-#include "dakota-private.hh"
+# include "dakota-private.hh"
 
 module dakota;
 
@@ -42,8 +42,8 @@ auto dkt-capture-current-exception(str-t arg) -> str-t {
   if (nullptr != arg) result = arg;
   return result;
 }
-#if !defined HAVE-GETPROGNAME
-#if defined HAVE-PROCFS
+# if !defined HAVE-GETPROGNAME
+# if defined HAVE-PROCFS
 static char8-t[4 * 1024] gbl-buf;
 auto getprogname() -> str {
   int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
@@ -57,8 +57,8 @@ auto getprogname() -> str {
     progname = gbl-buf;
   return progname;
 }
-#endif
-#endif
+# endif
+# endif
 
 [[format-va-printf(2)]] static auto va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
   stream-t log-file = stderr;

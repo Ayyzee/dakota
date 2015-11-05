@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if !defined dkt_dakota_log_hh
-#define      dkt_dakota_log_hh
+# if !defined dkt_dakota_log_hh
+# define      dkt_dakota_log_hh
 
-#include <syslog.h>
-#include <stdarg.h>
+# include <syslog.h>
+# include <stdarg.h>
 
 typedef char char8_t; // hackhack
 
 SO_EXPORT [[format_va_printf(2)]] int_t dkt_va_log(uint32_t priority, str_t format, va_list_t args);
 SO_EXPORT [[format_printf(   2)]] int_t dkt_log(   uint32_t priority, str_t format, ...);
 
-#define log_method()     dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"method\": \"%s\",\"params\": \"%s\"", __klass__, __method__->name, __method__->parameter_types)
-#define log_klass_func() dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"func\": \"%s\"", __klass__, __func__)
-#define log_func()       dkt_log(dkt::k_log_debug, "\"func\": \"%s\"", __func__)
+# define log_method()     dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"method\": \"%s\",\"params\": \"%s\"", __klass__, __method__->name, __method__->parameter_types)
+# define log_klass_func() dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"func\": \"%s\"", __klass__, __func__)
+# define log_func()       dkt_log(dkt::k_log_debug, "\"func\": \"%s\"", __func__)
 
 namespace dkt {
   enum log_priority_t : uint_t {
@@ -61,14 +61,14 @@ namespace dkt {
 // #define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { syslog(LOG_ERROR  |LOG_DAEMON, __VA_ARGS__); }
 // #define DKT_LOG_DEBUG(flags, ...)   if (flags & dkt::log_flags) { syslog(LOG_DEBUG  |LOG_DAEMON, __VA_ARGS__); }
 
-#define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { dkt_log(dkt::k_log_info,    __VA_ARGS__); }
-#define DKT_LOG_WARNING(flags, ...) if (flags & dkt::log_flags) { dkt_log(dkt::k_log_warning, __VA_ARGS__); }
-#define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { dkt_log(dkt::k_log_error,   __VA_ARGS__); }
-#define DKT_LOG_DEBUG(flags, ...)   if (flags & dkt::log_flags) { dkt_log(dkt::k_log_debug,   __VA_ARGS__); }
+# define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { dkt_log(dkt::k_log_info,    __VA_ARGS__); }
+# define DKT_LOG_WARNING(flags, ...) if (flags & dkt::log_flags) { dkt_log(dkt::k_log_warning, __VA_ARGS__); }
+# define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { dkt_log(dkt::k_log_error,   __VA_ARGS__); }
+# define DKT_LOG_DEBUG(flags, ...)   if (flags & dkt::log_flags) { dkt_log(dkt::k_log_debug,   __VA_ARGS__); }
 
-#define DKT_LOG_MEM_FOOTPRINT(...) DKT_LOG_INFO(dkt::k_log_mem_footprint, __VA_ARGS__)
-#define DKT_LOG_OBJECT_ALLOC(...)  DKT_LOG_INFO(dkt::k_log_object_alloc,  __VA_ARGS__)
-#define DKT_LOG_INITIAL_FINAL(...) DKT_LOG_INFO(dkt::k_log_initial_final, __VA_ARGS__)
-#define DKT_LOG_TRACE_RUNTIME(...) DKT_LOG_INFO(dkt::k_log_trace_runtime, __VA_ARGS__)
+# define DKT_LOG_MEM_FOOTPRINT(...) DKT_LOG_INFO(dkt::k_log_mem_footprint, __VA_ARGS__)
+# define DKT_LOG_OBJECT_ALLOC(...)  DKT_LOG_INFO(dkt::k_log_object_alloc,  __VA_ARGS__)
+# define DKT_LOG_INITIAL_FINAL(...) DKT_LOG_INFO(dkt::k_log_initial_final, __VA_ARGS__)
+# define DKT_LOG_TRACE_RUNTIME(...) DKT_LOG_INFO(dkt::k_log_trace_runtime, __VA_ARGS__)
 
-#endif // dkt_dakota_log_hh
+# endif // dkt_dakota_log_hh

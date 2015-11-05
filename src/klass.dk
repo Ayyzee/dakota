@@ -14,28 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cassert>
-#include <cinttypes>
-#include <cstdio>
-#include <cstring>
+# include <cassert>
+# include <cinttypes>
+# include <cstdio>
+# include <cstring>
 
-#if HAVE-CONFIG-HH
-  #include "config.hh"
-#endif
+# if HAVE-CONFIG-HH
+  # include "config.hh"
+# endif
 
-#include "dakota-safe-str.hh"
-#include "dakota-log.hh"
-#include "dakota-private.hh"
-#include "dakota-rt-private.hh"
-#include "dl.hh" // symbol-name-from-address()
-#include "sorted-array.hh"
+# include "dakota-safe-str.hh"
+# include "dakota-log.hh"
+# include "dakota-private.hh"
+# include "dakota-rt-private.hh"
+# include "dl.hh" // symbol-name-from-address()
+# include "sorted-array.hh"
 
-#if 0
+# if 0
 
-#define SET-METHOD-FOR-SELECTOR( methods, selector, method) (methods)->addrs[(selector)] = (method)
-#define METHOD-FOR-SELECTOR(     methods, selector)         (methods)->addrs[(selector)]
+# define SET-METHOD-FOR-SELECTOR( methods, selector, method) (methods)->addrs[(selector)] = (method)
+# define METHOD-FOR-SELECTOR(     methods, selector)         (methods)->addrs[(selector)]
 
-#else
+# else
 
 inline void
 SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
@@ -48,7 +48,7 @@ METHOD-FOR-SELECTOR(methods::slots-t* methods,
                     selector-t       selector) {
   return methods->addrs[selector];
 }
-#endif
+# endif
 
 module dakota;
 
@@ -65,13 +65,13 @@ klass std-compare;
 klass symbol;
 klass vector;
 
-#if DKT-WORKAROUND
+# if DKT-WORKAROUND
 namespace selector-node  { int-t compare(slots-t**, slots-t**); }
 namespace object        { object-t dump(object-t); }
 namespace klass {
   symbol-t name(object-t);
 }
-#endif
+# endif
 
 [[noreturn]] auto dkt-null-method(object-t object, ...) -> void {
   throw make(no-such-method-exception::klass, #object : object, #kls : klass-of(object));
@@ -328,9 +328,9 @@ klass resource-usage {
     return s;
   }
 }
-#if defined DKT-DUMP-MEM-FOOTPRINT
+# if defined DKT-DUMP-MEM-FOOTPRINT
 resource-usage::slots-t gbl-ru = { 0, 0, 0, 0 };
-#endif
+# endif
 
 klass methods {
   slots {
@@ -357,14 +357,14 @@ klass klass {
   method alloc(object-t self) -> object-t {
     uint32-t size = self.offset + self.size;
 
-#if defined DKT-DUMP-MEM-FOOTPRINT
+# if defined DKT-DUMP-MEM-FOOTPRINT
     resource-usage::add-alloc(&gbl-ru, size);
     resource-usage::log-alloc(&gbl-ru, self);
-#endif
+# endif
     object-t instance = cast(object-t)dkt::alloc(size);
-#if 0
+# if 0
     memset(instance, 0, size);
-#endif
+# endif
     instance->klass = self;
     instance->retain-count = 1;
     return instance;
@@ -377,11 +377,11 @@ klass klass {
     self.methods.count = methods-count;
     self.methods.addrs = cast(method-t*)dkt::alloc(sizeof(method-t) * self.methods.count);
 
-#if defined DKT-DUMP-MEM-FOOTPRINT
+# if defined DKT-DUMP-MEM-FOOTPRINT
     gbl-ru.method-count =  self.methods.count;
     gbl-ru.method-memory += gbl-ru.method-count * sizeof(method-t);
     resource-usage::log-method-alloc(&gbl-ru);
-#endif    
+# endif    
 
     for (uint32-t index = 0; index < self.methods.count; index++)
       self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
@@ -724,13 +724,13 @@ klass klass {
     }
     if (nullptr == bit-vector::klass)
       self.behavior = nullptr;
-#if !defined DKT-OMIT-BEHAVIOR
+# if !defined DKT-OMIT-BEHAVIOR
     else
       self.behavior = behavior(self);
-#else
+# else
     else
       self.behavior = nullptr;
-#endif
+# endif
     return self;
   } // init(object-t self, named-info::slots-t*)
 
