@@ -1,8 +1,8 @@
 // -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+# include <stdio.h>
+# include <ctype.h>
+# include <string.h>
 
 char8-t* ops[] =
 {
@@ -70,7 +70,7 @@ char8-t* equal_ops[] = { "+", "-", "/", "*", "%", "!", "<", ">", "^", "~", "<<",
 
 char8-t* other_ops[] = { "->", ".*", "->*", "::*" };
 
-#define foreach(i, s)   for (uint-t i = 0; i < sizeof(s)/sizeof(s[0]); i++)
+# define foreach(i, s)   for (uint-t i = 0; i < sizeof(s)/sizeof(s[0]); i++)
 
 int-t main()
 {

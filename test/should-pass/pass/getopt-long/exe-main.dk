@@ -1,7 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdlib.h> // abort()
-#include <getopt.h> // getopt-long(), struct option
+# include <stdlib.h> // abort()
+# include <getopt.h> // getopt-long(), struct option
 
 const int-t opt-base = 256;
 

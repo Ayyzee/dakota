@@ -1,7 +1,7 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <string.h>
-#include <assert.h>
+# include <string.h>
+# include <assert.h>
 
 int32-t arg1 = 42;
 const char8-t* arg2 = "so long and ...";

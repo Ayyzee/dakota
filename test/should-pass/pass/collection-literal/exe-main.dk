@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <cstdint>
+# include <cstdint>
 
 static object-t DEFAULT-SEQUENCE-KLASS = vector::klass;
 static object-t DEFAULT-SET-KLASS =      hashed-set::klass;

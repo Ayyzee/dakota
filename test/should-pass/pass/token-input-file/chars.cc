@@ -1,7 +1,7 @@
 // -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdio.h>
-#include <ctype.h>
+# include <stdio.h>
+# include <ctype.h>
 
 int main()
 {

@@ -5,9 +5,9 @@ set -o nounset -o errexit -o pipefail
 return_value=0
 for file in "$@"; do
   #size=`stat -c%s $file 2>/dev/null` # linux
-  #if [[ $? -eq 0 ]]; then
+  # if [[ $? -eq 0 ]]; then
   #  printf "% 9i %s\n" $size $file
-  #else
+  # else
   #  return_value=1
   #fi
 

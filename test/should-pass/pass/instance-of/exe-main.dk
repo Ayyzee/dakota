@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdio.h>
+# include <stdio.h>
 
 klass k1
 {
@@ -17,7 +17,7 @@ klass k3
   superklass k2;
 }
 
-#define DUMP(val, cmd) printf("%i == %i = " # cmd "\n", val, cmd)
+# define DUMP(val, cmd) printf("%i == %i = " # cmd "\n", val, cmd)
 
 int
 main() {

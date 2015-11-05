@@ -28,15 +28,15 @@ int-t main() {
   printf("klass=%s\n", $utf8-from(klass-of(o)));
   printf("superklass=%s\n", $utf8-from($superklass(klass-of(o))));
   $dump($superklass(klass-of(o)));
-  #if defined DEBUG
+  # if defined DEBUG
   char8-t buf[1024] = "";
   printf("klass-chain=%s\n", dkt-get-klass-chain(klass-of(o), buf, sizeof(buf)));
-  #endif
+  # endif
 
   if (null) {
-    #if defined DEBUG
+    # if defined DEBUG
     printf("klass-chain=%s\n", dkt-get-klass-chain(klass-of(null), buf, sizeof(buf)));
-    #endif
+    # endif
     object-t null-klass = null->klass;
     object-t second-null = make(null-klass);
     $dump(null);

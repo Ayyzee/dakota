@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define DEFAULT-SEQUENCE-KLASS vector::klass
-#define DEFAULT-SET-KLASS      sorted-set::klass
-#define DEFAULT-TABLE-KLASS    sorted-table::klass
+# define DEFAULT-SEQUENCE-KLASS vector::klass
+# define DEFAULT-SET-KLASS      sorted-set::klass
+# define DEFAULT-TABLE-KLASS    sorted-table::klass
 
 klass sorted-set;
 

@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cstdio>
-#include <cstdlib>
-#include <csignal>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <unistd.h>
+# include <cstdio>
+# include <cstdlib>
+# include <csignal>
+# include <sys/time.h>
+# include <sys/types.h>
+# include <unistd.h>
 
-#define cast(t) (t)
+# define cast(t) (t)
 
 static pid_t child_pid = 0;
 

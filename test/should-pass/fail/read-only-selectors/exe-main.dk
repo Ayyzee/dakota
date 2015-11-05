@@ -1,6 +1,6 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#define SELECTOR-PTR(name, args) (cast(dkt_selector_func_t)(cast(selector_t* (*)args) __selector::name))()
+# define SELECTOR-PTR(name, args) (cast(dkt_selector_func_t)(cast(selector_t* (*)args) __selector::name))()
 
 int-t main() {
   selector-t sel = SELECTOR(hash(object-t));
