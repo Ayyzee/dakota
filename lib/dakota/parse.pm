@@ -2137,7 +2137,6 @@ sub rep_tree_from_dk_path {
   while (m/\#"(.*?)"/g) {
     &add_str($gbl_root, $1);
   }
-  &encode_cpp(\$_);
   &encode_strings(\$_);
   &encode_comments(\$_);
 
@@ -2175,7 +2174,6 @@ sub rep_tree_from_dk_path {
   }
   &decode_comments(\$_);
   &decode_strings(\$_);
-  &decode_cpp(\$_);
 
   $gbl_sst = &sst::make($_, $gbl_filename);
 

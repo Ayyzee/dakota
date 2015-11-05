@@ -916,6 +916,12 @@ sub rewrite_initialze_finalize {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/auto $1/gs;
 }
+sub rewrite_multi_char_consts {
+  my ($filestr_ref) = @_;
+  my $c = ' ';
+  $$filestr_ref =~ s/'([^'\\])([^'\\])([^'\\])'/'$1$2$3$c'/g;
+  $$filestr_ref =~ s/'([^'\\])([^'\\])'/'$1$2$c$c'/g;
+}
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
   &rewrite_method_aliases($filestr_ref);
@@ -927,7 +933,6 @@ sub convert_dk_to_cc {
   &rewrite_literal_chars($filestr_ref);
   &rewrite_literal_ints($filestr_ref);
   &rewrite_literal_strs($filestr_ref);
-  &encode_cpp($filestr_ref);
   &encode_strings($filestr_ref);
   &encode_comments($filestr_ref);
 
@@ -1010,14 +1015,7 @@ sub convert_dk_to_cc {
 
   &decode_comments($filestr_ref);
   &decode_strings($filestr_ref);
-  &decode_cpp($filestr_ref);
   return $filestr_ref;
-}
-sub rewrite_multi_char_consts {
-  my ($filestr_ref) = @_;
-  my $c = ' ';
-  $$filestr_ref =~ s/'([^'\\])([^'\\])([^'\\])'/'$1$2$3$c'/g;
-  $$filestr_ref =~ s/'([^'\\])([^'\\])'/'$1$2$c$c'/g;
 }
 sub dakota_lang_user_data_old {
   my $kw_args_generics;

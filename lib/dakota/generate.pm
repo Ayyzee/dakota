@@ -306,9 +306,9 @@ sub generate_nrt {
     $str_cc .= &labeled_src_str(undef, "nrt-cc");
     $str_cc .=
       "\n" .
-      "#include \"$name.$hh_ext\"\n" .
+      "# include \"$name.$hh_ext\"\n" .
       "\n" .
-      "#include \"../$name.$cc_ext\"\n" . # user-code (converted from dk to cc)
+      "# include \"../$name.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
 
@@ -383,7 +383,7 @@ sub generate_rt {
     $str_cc .= &labeled_src_str(undef, "rt-cc");
     $str_cc .=
       "\n" .
-      "#include \"$name.$hh_ext\"\n" .
+      "# include \"$name.$hh_ext\"\n" .
       "\n" .
       &labeled_src_str($result, "symbols-cc") .
       &labeled_src_str($result, "hashes-cc") .
@@ -534,7 +534,7 @@ sub generate_defn_footer {
     $$info_tbl{"\#ints"} =         '__ints';
   }
   $rt_cc_str .= "\n";
-  $rt_cc_str .= "#include <unistd.h>\n";
+  $rt_cc_str .= "# include <unistd.h>\n";
   $rt_cc_str .= "\n";
   $rt_cc_str .= "static char dir[4096] = \"\";\n";
   #my $col;
@@ -1089,7 +1089,7 @@ sub common::generate_signature_defns {
   $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
 
   if (1) {
-    $scratch_str .= "#if 0\n";
+    $scratch_str .= "# if 0\n";
     $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
     foreach my $generic (sort method::compare @$generics) {
@@ -1104,7 +1104,7 @@ sub common::generate_signature_defns {
     }
     $col = &colout($col);
     $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
-    $scratch_str .= "#endif\n";
+    $scratch_str .= "# endif\n";
   } # if ()
   $scratch_str .= $col . 'namespace __signature {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
@@ -1191,7 +1191,7 @@ sub common::generate_selector_defns {
   $scratch_str .= $col . '}' . "\n";
 
   if (1) {
-    $scratch_str .= "#if 0\n";
+    $scratch_str .= "# if 0\n";
     $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
     foreach my $generic (sort method::compare @$generics) {
@@ -1206,7 +1206,7 @@ sub common::generate_selector_defns {
     }
     $col = &colout($col);
     $scratch_str .= $col . '}' . "\n";
-    $scratch_str .= "#endif\n";
+    $scratch_str .= "# endif\n";
   } # if ()
   $scratch_str .= $col . 'namespace __selector {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
@@ -1591,7 +1591,7 @@ sub generics::generate_generic_defns {
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_generic_defns()\n";
   my $generic;
-  #$$scratch_str_ref .= "#if defined DKT-VA-GENERICS\n";
+  #$$scratch_str_ref .= "# if defined DKT-VA-GENERICS\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
@@ -1616,7 +1616,7 @@ sub generics::generate_generic_defns {
   }
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
-  #$$scratch_str_ref .= "#endif // defined DKT-VA-GENERICS\n";
+  #$$scratch_str_ref .= "# endif // defined DKT-VA-GENERICS\n";
   #if (!&is_slots($generic)) {
   &generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
   #}
@@ -1689,9 +1689,9 @@ sub linkage_unit::generate_generics {
 
     $$scratch_str_ref .=
       "\n" .
-      "#if !defined DK-USE-MAKE-MACRO\n" .
+      "# if !defined DK-USE-MAKE-MACRO\n" .
       &generics::generate_va_make_defn($scope, $is_inline = 1, $col) .
-      "#endif\n";
+      "# endif\n";
   return $$scratch_str_ref;
 }
 sub generics::generate_va_make_defn {
@@ -2434,7 +2434,7 @@ sub generate_exported_slots_decls {
 sub include_dakota_decl_hh {
   my $result =
     "\n" .
-    "#include <dakota-decl.hh>\n" .
+    "# include <dakota-decl.hh>\n" .
     "\n";
   return $result;
 }
@@ -2468,7 +2468,7 @@ sub linkage_unit::generate_headers {
       $$all_headers{$header_name} = undef;
     }
     foreach $header_name (sort keys %$all_headers) {
-      $result .= "#include $header_name\n";
+      $result .= "# include $header_name\n";
     }
   }
   return $result;
@@ -2713,14 +2713,14 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       "\n" .
-      $col . "#include <dakota-finally.$hh_ext> // hackhack: should be before dakota.$hh_ext\n" .
-      $col . "#include <dakota.$hh_ext>\n" .
-      $col . "#include <dakota-log.$hh_ext>\n";
+      $col . "# include <dakota-finally.$hh_ext> // hackhack: should be before dakota.$hh_ext\n" .
+      $col . "# include <dakota.$hh_ext>\n" .
+      $col . "# include <dakota-log.$hh_ext>\n";
 
     if (&is_rt()) {
       $$scratch_str_ref .=
         "\n" .
-        $col . "#include <dakota-os.$hh_ext>\n";
+        $col . "# include <dakota-os.$hh_ext>\n";
     }
     $$scratch_str_ref .= "\n";
   }
@@ -4314,9 +4314,9 @@ sub dk_generate_cc {
     my $num = 1;
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "#line $num \"$cwd/$file_basename.dk\"\n", $filestr ], $remove = 1);
+      &write_to_file_converted_strings("$output", [ "# line $num \"$cwd/$file_basename.dk\"\n", $filestr ], $remove = 1);
     } else {
-      &write_to_file_converted_strings("$output", [ "#line $num \"$file_basename.dk\"\n", $filestr ], $remove = 1);
+      &write_to_file_converted_strings("$output", [ "# line $num \"$file_basename.dk\"\n", $filestr ], $remove = 1);
     }
   }
 }

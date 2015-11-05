@@ -50,13 +50,11 @@ our @EXPORT= qw(
                  canon_path
                  cpp_directives
                  decode_comments
-                 decode_cpp
                  decode_strings
                  deep_copy
                  dqstr_regex
                  encode_char
                  encode_comments
-                 encode_cpp
                  encode_strings
                  filestr_from_file
                  first
@@ -148,44 +146,6 @@ sub decode_comments {
 sub decode_strings {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s{$ENCODED_STRING_BEGIN([A-Za-z0-9]*)$ENCODED_STRING_END}{pack('H*',$1)}gseo;
-}
-my $directives = {
-  'define' => '\w+',
-  'elif' => '(\w+|\d+|!|\()',
-  'else' => undef,
-  'endif' => undef,
-  'error' => '".*?"',
-  'if' => '(\w+|\d+|!|\()',
-  'ifdef' => '\w+',
-  'ifndef' => '\w+',
-  'include' => '(".+?"|<.+?>)',,
-  'line' => '\d+',
-  'pragma' => undef,
-  'undef' => '\w+',
-  'warning' => '".*?"',
-};
-sub encode_cpp {
-  my ($filestr_ref) = @_;
-  foreach my $directive (keys %$directives) {
-    my $next_tkn_regex = $$directives{$directive};
-    if ($next_tkn_regex) {
-      $$filestr_ref =~ s/^(\s*)#($directive\s+$next_tkn_regex.*)$/$1# $2/gm;
-    } else {
-      $$filestr_ref =~ s/^(\s*)#($directive\b.*)$/$1# $2/gm;
-    }
-  }
-}
-sub decode_cpp {
-  my ($filestr_ref) = @_;
-  return;
-  foreach my $directive (keys %$directives) {
-    my $next_tkn_regex = $$directives{$directive};
-    if ($next_tkn_regex) {
-      $$filestr_ref =~ s/^(\s*)# (\s*$directive\s+$next_tkn_regex.*)$/$1#$2/gm;
-    } else {
-      $$filestr_ref =~ s/^(\s*)# (\s*$directive\b.*)$/$1#$2/gm;
-    }
-  }
 }
 # method-ident: allow end in ! or ?
 # symbol-ident: allow end in ! or ? and allow . or : or / but never as first nor last char
