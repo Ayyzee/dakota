@@ -1,0 +1,8 @@
+namespace __symbol {
+  extern symbol-t _blue_;
+}
+static int-t init() {
+  printf("blue=\"%s\", ptr=%p\n", __symbol::_blue_, cast(void*)__symbol::_blue_);
+  return 0;
+}
+static int-t i = init();

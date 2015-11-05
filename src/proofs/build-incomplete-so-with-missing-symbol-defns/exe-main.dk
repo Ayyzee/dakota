@@ -1,0 +1,9 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+namespace __symbol {
+  extern symbol-t _red_;
+}
+int-t main() {
+  printf("red=\"%s\", ptr=%p\n", __symbol::_red_, cast(void*)__symbol::_red_);
+  return 0;
+}

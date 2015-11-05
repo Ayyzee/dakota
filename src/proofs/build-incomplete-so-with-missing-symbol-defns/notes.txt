@@ -1,0 +1,1 @@
+http://stackoverflow.com/questions/1617286/easy-check-for-unresolved-symbols-in-shared-libraries
