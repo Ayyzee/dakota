@@ -1,8 +1,0 @@
-{
-  'srcs' => [
-    'exe-main.cc',
-  ],
-  'libs' => [
-  ],
-  'name' => 'exe-cc',
-}
