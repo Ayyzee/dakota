@@ -167,3 +167,17 @@ rename module-dakota-util.dk dakota-util.module
 add to dakota --module=%s
 
 fix so not only init() can be dumped with kw-arg info
+
+dakota should accept .cc, .cxx, .CC, .cpp files (etc)
+
+add support for
+[[dk::initializer]] static void my-initializer();
+[[dk::finalizer]]   static void my-finalizer();
+to be called AFTER the dakota runtime is fully setup, but before main()
+
+fix --precompile option. Any lib/exe depending on something being generated should
+instead be able to use the corresponding rep file. This might require some convergence of the respective schemas, or a way to convert from one type of rep file to the other.
+
+consider using std::type_info::before()
+as a way to order the various types
+http://en.cppreference.com/w/cpp/types/type_info/before

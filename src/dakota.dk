@@ -1007,14 +1007,14 @@ dump-method(ostream-t ostrm, signature-t const* info) {
                   info->return-type);
   return;
 }
-static void
-dump-generic(ostream-t ostrm, signature-t const* info) {
-  ostream::println-format(ostrm, "generic $%s(%s) -> %s;\n",
-                  info->name,
-                  info->parameter-types,
-                  info->return-type);
-  return;
-}
+// static void
+// dump-generic(ostream-t ostrm, signature-t const* info) {
+//   ostream::println-format(ostrm, "generic $%s(%s) -> %s;\n",
+//                   info->name,
+//                   info->parameter-types,
+//                   info->return-type);
+//   return;
+// }
 void
 dump-klass(ostream-t ostrm, named-info-t* klass-info) {
   assert(nullptr != ostrm.output);
@@ -1077,9 +1077,9 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
     if (nullptr != kw-args-method-signatures) {
       uint32-t index = 0;
       signature-t const* info;
-      while (nullptr != (info = kw-args-method-signatures[index++])) {
-        dump-generic(ostrm, info);
-      }
+      // while (nullptr != (info = kw-args-method-signatures[index++])) {
+      //   dump-generic(ostrm, info);
+      // }
       ostream::println-format(ostrm, "\n");
     }
     ostream::println-format(ostrm, "%s %s {\n", construct, name);
@@ -1176,10 +1176,13 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
           uint32-t max-type-width = max-slot-type-width(slots-info);
           uint32-t i = 0;
           while (nullptr != slots-info[i].elements) {
-            str-t slot-type = cast(str-t)named-info::at(&slots-info[i], #type);
+            str-t slot-type =   cast(str-t)named-info::at(&slots-info[i], #type);
+            str-t slot-typeid = cast(str-t)named-info::at(&slots-info[i], #typeid);
+            USE(slot-typeid);
             assert(nullptr != slot-type);
             symbol-t slot-name = name-from-info(&slots-info[i]);
             assert(nullptr != slot-name);
+            // printf("%s::%s, type: %s, typeid: %s\n", name, slot-name, slot-type, slot-typeid);
             str-t slot-expr-str = cast(str-t)named-info::at(&slots-info[i], #expr-str);
             
             if (nullptr != slot-expr-str)

@@ -3395,8 +3395,10 @@ sub dk_generate_cc_footer_klass {
         if ('struct' eq $$klass_scope{'slots'}{'cat'}) {
           $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
         }
-        $$tbl{'#size'} = "sizeof((cast(slots-t*)nullptr)->$$slot_info{'name'})";
-        $$tbl{'#type'} = "\"$$slot_info{'type'}\"";
+        $$tbl{'#size'} = "sizeof(slots-t::$$slot_info{'name'})";
+        #$$tbl{'#type'} = '__symbol::' . &make_ident_symbol_scalar($$slot_info{'type'});
+        $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
+        $$tbl{'#typeid'} = "dk-intern(demangle(typeid(slots-t::" . $$slot_info{'name'} . ").name()))";
 
         if (defined $$slot_info{'expr'}) {
           $$tbl{'#expr'} = "($$slot_info{'expr'})";
@@ -3474,6 +3476,7 @@ sub dk_generate_cc_footer_klass {
     my $slots_type_ident = &make_ident_symbol_scalar($$klass_scope{'slots'}{'type'});
     my $type_symbol = $$klass_scope{'slots'}{'type'};
     $$tbbl{'#slots-type'} = "\"$type_symbol\"";
+    $$tbbl{'#slots-typeid'} = "dk-intern(demangle(typeid(slots-t).name()))";
   } elsif (&has_slots_info($klass_scope)) {
     my $cat = $$klass_scope{'slots'}{'cat'};
     $$tbbl{'#cat'} = "\#$cat";

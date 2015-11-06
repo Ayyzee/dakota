@@ -23,11 +23,27 @@
 # include <cstdarg> // va_list
 # include <cstdint>
 # include <cstring> // memcpy()
+# include <cxxabi.h>
 # include <new> // std::bad_alloc
 
 # define DKT_MEM_MGMT_MALLOC 0
 # define DKT_MEM_MGMT_NEW    1
 # define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
+
+# if defined __GNUG__
+inline auto demangle(str_t mangled_name) -> str_t {
+  int status = -1;
+  str_t name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
+  if (0 == status)
+    return name;
+  else
+    return nullptr;
+}
+# else // does nothing if not g++
+inline auto demangle(str_t mangled_name) -> str_t {
+  return name;
+}
+# endif
 
 namespace dkt {
   inline void dealloc(void* ptr) {

@@ -113,6 +113,7 @@
     'size' => undef,
     'slots-info' => undef,
     'slots-type' => undef,
+    'slots-typeid' => undef,
     'state-exported?' => undef,
     'strs' => undef,
     'str-literals' => undef,
@@ -123,6 +124,7 @@
     'trait' => undef,
     'traits' => undef,
     'type' => undef,
+    'typeid' => undef,
     'uchar8-t' => undef, # hardcode typedef
     'uint-t' => undef,  # hardcode typedef
     'union' => undef,
