@@ -29,9 +29,9 @@ klass no-such-slot-exception {
     signature-t* signature;
   }
   method init(object-t self,
-                       object-t     object :    {~},
-                       symbol-t     name :      {~},
-                       signature-t* signature : {~}) -> object-t {
+                       object-t     object :,
+                       symbol-t     name :,
+                       signature-t* signature :) -> object-t {
     self = $init(super);
     self.object = object;
     self.name = name;

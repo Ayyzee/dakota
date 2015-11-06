@@ -231,7 +231,7 @@ klass hashed-set-forward-iterator {
       throw make(exception::klass, #message : "oops");
     return;
   }
-  method init(object-t self, object-t hashed-set : {~}) -> object-t {
+  method init(object-t self, object-t hashed-set :) -> object-t {
     self = $init(super);
     assert(null != hashed-set);
     hashed-set::slots-t* hs = hashed-set::unbox(hashed-set);

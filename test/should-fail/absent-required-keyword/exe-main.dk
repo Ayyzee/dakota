@@ -3,7 +3,7 @@
 klass klass;
 
 klass k1 {
-  method init(object-t self, void* arg1 : {~}, void** arg2 : nullptr) -> object-t {
+  method init(object-t self, void* arg1 :, void** arg2 : nullptr) -> object-t {
     self = $init(super);
     return self;
   }

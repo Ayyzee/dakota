@@ -1458,6 +1458,9 @@ sub parameter_list {
   my $kw_args_names = [];
   my $kw_args_defaults = [];
   foreach my $type (@$params) {
+    if (':' eq $$type[-1]) {
+      push @$type, split('', $$kw_args_placeholders{'nodefault'});
+    }
     my ($colon_offset) = &kw_args_offsets($type);
 
     if ($colon_offset) {

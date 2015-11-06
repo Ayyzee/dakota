@@ -33,7 +33,7 @@ klass system-exception {
     str-t name;
     str128-t       strerror;
   }
-  method init(object-t self, int-t errnum : {~}) -> object-t {
+  method init(object-t self, int-t errnum :) -> object-t {
     self = $init(super);
     assert(0 != errnum);
     self.errnum = errnum;

@@ -29,7 +29,7 @@ klass no-such-method-exception {
     signature-t* signature;
   }
   method init(object-t self,
-                       object-t     object :    {~},
+                       object-t     object :,
                        object-t     superkls :  nullptr,
                        signature-t* signature : nullptr) -> object-t {
     self = $init(super);

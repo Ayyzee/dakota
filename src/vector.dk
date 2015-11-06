@@ -330,7 +330,7 @@ klass vector-forward-iterator {
       throw make(exception::klass, #message : "oops");
     return;
   }
-  method init(object-t self, object-t vector : {~}) -> object-t {
+  method init(object-t self, object-t vector :) -> object-t {
     self = $init(super);
     assert(null != vector);
     vector::slots-t* a = vector::unbox(vector);

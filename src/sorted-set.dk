@@ -212,7 +212,7 @@ klass sorted-set-forward-iterator {
 
     uint32-t  iterator-state;
   }
-  method init(object-t self, object-t sorted-set : {~}) -> object-t {
+  method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);
     assert($instance?(sorted-set, sorted-set::klass));
     sorted-set::slots-t* ss = sorted-set::unbox(sorted-set);

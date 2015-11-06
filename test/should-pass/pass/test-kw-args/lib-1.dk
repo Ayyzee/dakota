@@ -6,8 +6,8 @@ klass test {
   method init(object-t self,
                        void*      arg1,
                        void**     arg2,
-                       void***    arg3 : {~},
-                       void****   arg4 : {~},
+                       void***    arg3 :,
+                       void****   arg4 :,
                        void*****  arg5 : nullptr,
                        void****** arg6 : nullptr) -> object-t {
     self = $init(super);

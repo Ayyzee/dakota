@@ -31,8 +31,8 @@ klass syntax-exception {
     str-t    message;
   }
   method init(object-t self,
-                       object-t token :    {~},
-                       str-t    filename : {~},
+                       object-t token :,
+                       str-t    filename :,
                        str-t    message :  __klass__) -> object-t {
     self = $init(super);
     assert(nullptr != token &&

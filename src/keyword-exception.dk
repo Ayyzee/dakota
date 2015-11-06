@@ -29,9 +29,9 @@ klass keyword-exception {
     symbol-t     keyword;
   }
   method init(object-t self,
-                       object-t     object :    {~},
-                       signature-t* signature : {~},
-                       symbol-t     keyword :   {~}) -> object-t {
+                       object-t     object :,
+                       signature-t* signature :,
+                       symbol-t     keyword :) -> object-t {
     assert(nullptr != object);
     assert(nullptr != signature);
     assert(nullptr != keyword);

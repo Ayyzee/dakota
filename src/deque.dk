@@ -348,7 +348,7 @@ klass deque-forward-iterator {
       throw make(exception::klass, #message : "oops");
     return;
   }
-  method init(object-t self, object-t deque : {~}) -> object-t {
+  method init(object-t self, object-t deque :) -> object-t {
     self = $init(super);
     assert($instance?(deque, deque::klass));
     deque::slots-t* d = deque::unbox(deque);
