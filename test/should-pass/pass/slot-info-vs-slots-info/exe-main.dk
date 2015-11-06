@@ -2,14 +2,12 @@
 
 klass w-slot
 {
-  slots (*)(cstring::slots-t *, cstring::slots-t *) -> cstring::slots-t*;
+  slots (*)(str-buffer::slots-t*, str-buffer::slots-t*) -> str-buffer::slots-t*;
 }
 
-// klass w_slots
-// {
-//   slots
-//   {
-//     const char8-t * (*callback)(const char8-t *, const char8-t *);
+// klass w_slots {
+//   slots {
+//     (*callback)(const char8-t*, const char8-t*) -> const char8-t*;
 //   }
 // }
 
