@@ -8,7 +8,6 @@
     'srcs' => [ # cmd-line
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',
-      '$(srcdir)/cstring.dk',
       '$(srcdir)/dimension.dk',
       '$(srcdir)/float.dk',
       '$(srcdir)/hashed-counted-set.dk',
@@ -24,6 +23,7 @@
       '$(srcdir)/point.dk',
       '$(srcdir)/rect.dk',
       '$(srcdir)/slot-info.dk',
+      '$(srcdir)/str-buffer.dk',
       '$(srcdir)/syntax-exception.dk',
       '$(srcdir)/text-output-stream.dk',
       '$(srcdir)/token.dk',

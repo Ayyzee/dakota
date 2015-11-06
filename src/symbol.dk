@@ -24,7 +24,7 @@ module dakota;
 klass hash;
 
 klass symbol {
-  slots char8-t const*;
+  slots str-t;
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);

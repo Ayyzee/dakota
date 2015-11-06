@@ -18,8 +18,6 @@ module dakota-util {
  export
   ascii-number,
   ascii-number-klass,
-  cstring,
-  cstring::slots-t,
   dimension,
   dimension::slots-t,
   features,
@@ -44,6 +42,8 @@ module dakota-util {
   rect::slots-t,
   slot-info,
   slot-info::slots-t,
+  str-buffer,
+  str-buffer::slots-t,
   syntax-exception,
   text-output-stream,
   token,

@@ -1007,14 +1007,6 @@ dump-method(ostream-t ostrm, signature-t const* info) {
                   info->return-type);
   return;
 }
-// static void
-// dump-generic(ostream-t ostrm, signature-t const* info) {
-//   ostream::println-format(ostrm, "generic $%s(%s) -> %s;\n",
-//                   info->name,
-//                   info->parameter-types,
-//                   info->return-type);
-//   return;
-// }
 void
 dump-klass(ostream-t ostrm, named-info-t* klass-info) {
   assert(nullptr != ostrm.output);
@@ -1074,14 +1066,6 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
     gbl-current-module = modulee;
   }
   if (exported? || state-exported? || behavior-exported?) {
-    if (nullptr != kw-args-method-signatures) {
-      uint32-t index = 0;
-      signature-t const* info;
-      // while (nullptr != (info = kw-args-method-signatures[index++])) {
-      //   dump-generic(ostrm, info);
-      // }
-      ostream::println-format(ostrm, "\n");
-    }
     ostream::println-format(ostrm, "%s %s {\n", construct, name);
     ostream::col-incr(ostrm);
 
@@ -1242,7 +1226,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
 void import-selectors(signature-t**, selector-node-t*); // hackhack
 
 klass get-segment-data {
-  slots (*)(char8-t const*, ptr-t*, size-t*) -> ptr-t;
+  slots (*)(str-t, ptr-t*, size-t*) -> ptr-t;
 }
 klass registration-info {
   slots {
@@ -1254,7 +1238,7 @@ klass registration-info {
     assoc-node-t*      imported-klasses;
     named-info-t*      klass-defns;
     property-t*        interposers;
-    char8-t const*     dir;
+    str-t              dir;
     symbol-t           name;
     get-segment-data-t get-segment-data;
   }
