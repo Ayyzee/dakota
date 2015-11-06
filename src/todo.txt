@@ -1,5 +1,11 @@
-add trailing ! to more dangerous version of methods
-add safer versions of ! methods
+add trailing ! to more dangerous version of methods (returns nullptr)
+add safer versions of ! methods (throw exception)
+
+at!(object-t self, object-t key, object-t default-element); // may return nullptr if default-element is nullptr
+at(object-t self, object-t key, object-t default-element);  // will throw exception rather than return nullptr
+
+at!(object-t self, object-t key); // return nullptr if not found
+at(object-t self, object-t key);  // throws exception if not found
 
 sort out mutable/immutable design
 
@@ -109,8 +115,6 @@ clean up uses of uintptr-t (should be hash-t)
 
 consider dumped (from bin/dakota-info) both init() and va::init() method decls
 
-we have str/string/cstring. consider removing cstring.
-
 consider moving methods from input-stream and output-stream up to stream
 look at output-file and input-file (currently empty) and see if they, too, need a common parent
 
@@ -127,10 +131,6 @@ features that show:
   selector in every method body (__selector__)
   map like in perl (use lambda func)
   as(a klass) casting syntax
-
-echo out method kw-arg defaults when using dakota-info
-maybe as a comment? this info is not required for the parser
-but it might be nice to suppy it for the user
 
 rename various things to consistent kw-args, kw-arg-method..., or simpley keyword
 
@@ -165,8 +165,6 @@ Remove module ... ; decl in *.dk file and get the information from the module ma
 rename module-dakota.dk      dakota.module
 rename module-dakota-util.dk dakota-util.module
 add to dakota --module=%s
-
-fix so not only init() can be dumped with kw-arg info
 
 dakota should accept .cc, .cxx, .CC, .cpp files (etc)
 

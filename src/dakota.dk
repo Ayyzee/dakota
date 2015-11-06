@@ -1191,10 +1191,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
 
     if (nullptr != kw-args-method-signatures)
       while (nullptr != (info = kw-args-method-signatures[index++])) {
-        if (!strcmp(#init, info->name))
-          fprintf(ostrm.output, "  ");
-        else
-          fprintf(ostrm.output, "//");
+        fprintf(ostrm.output, "  ");
         ostream-t ostrm0 = {ostrm.output, 0};
         dump-method(ostrm0, info);
       }
