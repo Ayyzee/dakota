@@ -1,33 +1,23 @@
 # include <exception>
 # include <iostream>
 # include <cxxabi.h>
+# include <cstdint>
 
-struct empty { };
+# define cast(t) (t)
 
-template <typename T, int N>
-struct bar { };
+namespace foo { struct slots_t { intptr_t fred; }; }
 
-
-int main()
-{
-  char   *realname;
-
-  // exception classes not in <stdexcept>, thrown by the implementation
-  // instead of the user
-  // std::bad_exception  e;
-  // realname = abi::__cxa_demangle(e.what(), 0, 0, &status);
-  // std::cout << e.what() << "\t=> " << realname << "\t: " << status << '\n';
-  // free(realname);
-
-
-  // typeid
-  bar<empty,17>          u;
-  const std::type_info  &ti = typeid(u);
-
+auto demangle(char const* mangled_name) -> char const* {
   int status = -1;
-  char* realname = abi::__cxa_demangle(ti.name(), 0, 0, &status);
-  std::cout << ti.name() << "\t=> " << realname << "\t: " << status << '\n';
-  free(realname);
+  char const* name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
+  if (0 == status)
+    return name;
+  else
+    return nullptr;
+}
+static char const* name = demangle(typeid(foo::slots_t::fred).name());
 
+int main() {
+  printf("%s\n", demangle(typeid(foo::slots_t::fred).name()));
   return 0;
 }
