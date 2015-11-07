@@ -165,7 +165,7 @@ sub add_visibility {
         if ($$root{'klasses'}{$klass_name} &&
 		    $$root{'klasses'}{$klass_name}{'slots'} &&
 		    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
-          $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = 33;
+          $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
       } elsif ($str =~ /^($rid)$/) {
         my $klass_name = $1;
@@ -174,10 +174,10 @@ sub add_visibility {
         if ($$root{'klasses'}{$klass_name}
          && $$root{'klasses'}{$klass_name}{'module'}
          && $$root{'klasses'}{$klass_name}{'module'} eq $name) {
-          $$root{'klasses'}{$klass_name}{'exported?'} = 22;
+          $$root{'klasses'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
         if ($$root{'traits'}{$klass_name}) {
-          $$root{'traits'}{$klass_name}{'exported?'} = 22;
+          $$root{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
 	    } elsif ($str =~ /^($rid)::($msig)$/) {
         my ($klass_name, $method_name) = ($1, $2);
@@ -198,7 +198,7 @@ sub add_visibility {
                 if ($sig_min eq $method_name) {
                   if ($debug) { print STDERR "$sig == $method_name\n"; }
                   if ($debug) { print STDERR "$sig_min == $method_name\n"; }
-                  $$scope{'exported?'} = 44;
+                  $$scope{'exported?'} = __FILE__ . '::' . __LINE__;
                 }
               }
             }
