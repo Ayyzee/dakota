@@ -166,7 +166,10 @@ rename module-dakota.dk      dakota.module
 rename module-dakota-util.dk dakota-util.module
 add to dakota --module=%s
 
-dakota should accept .cc, .cxx, .CC, .cpp files (etc)
+allow more than one module to exists in a single shared library
+
+dakota should accept .cc, .cxx, .cpp, .c++ files (etc)
+dakota should accept .hh, .hxx, .hpp, .h++ files (etc)
 
 add support for
 [[dk::initializer]] static void my-initializer();
