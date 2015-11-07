@@ -49,15 +49,15 @@
 # define TRAIT(t)
 # define TRAITS(t1, ...)
 
-# if defined WIN32
-  # define SO_IMPORT [[ms::dllimport]]
-  # define SO_EXPORT [[ms::dllexport]]
+# if defined _WIN32 || defined _WIN64
+  # define so_import ms::dllimport
+  # define so_export ms::dllexport
 # else
-  # define SO_IMPORT
-  # define SO_EXPORT [[gnu::visibility("default")]]
+  # define so_import
+  # define so_export gnu::visibility("default")
 # endif
 
-# define DKT_ENABLE_TYPEINFO SO_EXPORT
+# define dkt_enable_typeinfo so_export
 
 typedef bool boole_t;
 

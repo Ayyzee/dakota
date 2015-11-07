@@ -92,7 +92,7 @@ namespace dkt {
   # define DEBUG_STMT(stmt)
 # endif
 
-# define DKT_RODATA_SECTION  gnu::section("__DKT_RODATA, __dkt_rodata")
+# define dkt_rodata_section  gnu::section("__DKT_RODATA, __dkt_rodata")
 # define format_va_printf(n) gnu::format(__printf__, n, 0)
 # define format_va_scanf(n)  gnu::format(__scanf__,  n, 0)
 # define format_printf(n)    gnu::format(__printf__, n, n + 1)
@@ -105,11 +105,11 @@ namespace dkt {
 # define unbox_attrs gnu::pure,gnu::hot,gnu::nothrow
 
 # if defined DEBUG
-  # define DEBUG_SO_EXPORT SO_EXPORT
-  # define DEBUG_SO_IMPORT SO_IMPORT
+  # define debug_so_export so_export
+  # define debug_so_import so_import
 # else
-  # define DEBUG_SO_EXPORT
-  # define DEBUG_SO_IMPORT
+  # define debug_so_export
+  # define debug_so_import
 # endif
 
 # define cast(t) (t)
@@ -173,10 +173,10 @@ inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n
 
 # define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 
-extern object_t null       SO_EXPORT [[DKT_RODATA_SECTION]];
-extern object_t std_input  SO_EXPORT [[DKT_RODATA_SECTION]];
-extern object_t std_output SO_EXPORT [[DKT_RODATA_SECTION]];
-extern object_t std_error  SO_EXPORT [[DKT_RODATA_SECTION]];
+extern object_t null       [[so_export]] [[dkt_rodata_section]];
+extern object_t std_input  [[so_export]] [[dkt_rodata_section]];
+extern object_t std_output [[so_export]] [[dkt_rodata_section]];
+extern object_t std_error  [[so_export]] [[dkt_rodata_section]];
 
 typedef int_t  (*compare_t)(object_t, object_t); // comparitor
 typedef signature_t const* (*dkt_signature_func_t)();
@@ -190,50 +190,50 @@ constexpr uintptr_t dk_hash_switch(str_t str) { return dk_hash(str); }
 constexpr  intptr_t dk_hash_switch( intptr_t val) { return val; }
 constexpr uintptr_t dk_hash_switch(uintptr_t val) { return val; }
 
-SO_EXPORT symbol_t dk_intern(str_t);
-SO_EXPORT object_t dk_klass_for_name(symbol_t);
+[[so_export]] symbol_t dk_intern(str_t);
+[[so_export]] object_t dk_klass_for_name(symbol_t);
 
-SO_EXPORT void dkt_register_info(named_info_t*);
-SO_EXPORT void dkt_deregister_info(named_info_t*);
+[[so_export]] void dkt_register_info(named_info_t*);
+[[so_export]] void dkt_deregister_info(named_info_t*);
 
-// SO_EXPORT          object_t dk_va_add_all(object_t self, va_list_t);
-// SO_EXPORT sentinel object_t dk_add_all(object_t self, ...);
+// [[so_export]]              auto dk_va_add_all(object_t self, va_list_t) -> object-t;
+// [[so_export]] [[sentinel]] auto dk_add_all(object_t self, ...) -> object-t;
 
-SO_EXPORT object_t dk_register_klass(named_info_t* klass_info);
-SO_EXPORT void dk_init_runtime();
-SO_EXPORT object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
+[[so_export]] object_t dk_register_klass(named_info_t* klass_info);
+[[so_export]] void dk_init_runtime();
+[[so_export]] object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
 
-SO_EXPORT object_t dkt_capture_current_exception(object_t arg);
-SO_EXPORT str_t    dkt_capture_current_exception(str_t arg);
+[[so_export]] object_t dkt_capture_current_exception(object_t arg);
+[[so_export]] str_t    dkt_capture_current_exception(str_t arg);
 
-SO_EXPORT named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-SO_EXPORT object_t      dk_va_make_named_info(      symbol_t name, va_list_t args);
+[[so_export]] named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
+[[so_export]] object_t      dk_va_make_named_info(      symbol_t name, va_list_t args);
 
-SO_EXPORT [[sentinel]] named_info_t* dk_make_named_info_slots(symbol_t name, ...);
-SO_EXPORT [[sentinel]] object_t      dk_make_named_info(      symbol_t name, ...);
+[[so_export]] [[sentinel]] named_info_t* dk_make_named_info_slots(symbol_t name, ...);
+[[so_export]] [[sentinel]] object_t      dk_make_named_info(      symbol_t name, ...);
 
-DEBUG_SO_EXPORT named_info_t* dkt_dump_named_info(named_info_t* info);
+[[debug_so_export]] named_info_t* dkt_dump_named_info(named_info_t* info);
 
 //#define DKT_NULL_METHOD nullptr
 # define DKT_NULL_METHOD cast(method_t)dkt_null_method
 
-SO_EXPORT [[noreturn]] void dkt_null_method(object_t object, ...);
+[[so_export]] [[noreturn]] void dkt_null_method(object_t object, ...);
 
-DEBUG_SO_EXPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
-DEBUG_SO_EXPORT int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);
-DEBUG_SO_EXPORT int_t dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args);
-DEBUG_SO_EXPORT int_t dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args);
+[[debug_so_export]] int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
+[[debug_so_export]] int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);
+[[debug_so_export]] int_t dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args);
+[[debug_so_export]] int_t dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args);
 
-DEBUG_SO_EXPORT int_t dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...);
-DEBUG_SO_EXPORT int_t dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...);
-DEBUG_SO_EXPORT int_t dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...);
-DEBUG_SO_EXPORT int_t dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...);
+[[debug_so_export]] int_t dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...);
+[[debug_so_export]] int_t dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...);
+[[debug_so_export]] int_t dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...);
+[[debug_so_export]] int_t dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...);
 
-DEBUG_SO_EXPORT char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
+[[debug_so_export]] char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
 
-DEBUG_SO_EXPORT void dkt_dump_methods(object_t);
-DEBUG_SO_EXPORT void dkt_dump_methods(klass::slots_t*);
+[[debug_so_export]] void dkt_dump_methods(object_t);
+[[debug_so_export]] void dkt_dump_methods(klass::slots_t*);
 
-DEBUG_SO_EXPORT void dkt_unbox_check(object_t object, object_t kls);
+[[debug_so_export]] void dkt_unbox_check(object_t object, object_t kls);
 
 # endif // dkt_dakota_hh

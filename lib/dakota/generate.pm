@@ -855,7 +855,7 @@ sub function::decl {
 
   my $visibility = '';
   if (&is_exported($function)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $func_spec = '';
   if ($$function{'is-inline'}) {
@@ -944,7 +944,7 @@ sub method::generate_va_method_defn {
   }
   my $visibility = '';
   if (&is_exported($va_method)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -1032,7 +1032,7 @@ sub common::print_signature {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
@@ -1134,7 +1134,7 @@ sub common::print_selector {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
@@ -1159,7 +1159,7 @@ sub common::print_selector {
     my $parameter_types_str = $$new_arg_type_list;
     my $null_selector = 0;
 
-    $scratch_str .= $col . "[[DKT-RODATA-SECTION]] static selector-t result = $null_selector;\n";
+    $scratch_str .= $col . "[[dkt-rodata-section]] static selector-t result = $null_selector;\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
     if (&is_va($generic)) {
@@ -1421,7 +1421,7 @@ sub generics::generate_generic_defn {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -1511,7 +1511,7 @@ sub generics::generate_super_generic_defn {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -2077,7 +2077,7 @@ sub linkage_unit::generate_klasses_body {
   }
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[DKT-RODATA-SECTION]]; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[dkt-rodata-section]]; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
     }
@@ -2215,7 +2215,7 @@ sub linkage_unit::generate_klasses_body {
                 $other_method_decl =~ s|\(\*($id)\)| $1|;
                 my $visibility = '';
                 if (&is_exported($method)) {
-                  $visibility = 'SO-EXPORT ';
+                  $visibility = '[[so-export]] ';
                 }
                 if ($$method{'is-inline'}) {
                   #$$scratch_str_ref .= 'INLINE ';
@@ -2261,7 +2261,7 @@ sub generate_object_method_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   my $visibility = '';
   if (&is_exported($method)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $method_name = "@{$$method{'name'}}";
   $$scratch_str_ref .= $col . "$klass_type @$klass_path { METHOD " . $visibility . "auto $method_name($$new_arg_list) -> $return_type";
@@ -3671,7 +3671,7 @@ sub generate_kw_args_method_defn {
   my $return_type = &arg::type($$method{'return-type'});
   my $visibility = '';
   if (&is_exported($method)) {
-    $visibility = 'SO-EXPORT ';
+    $visibility = '[[so-export]] ';
   }
   my $func_spec = '';
   #if ($$method{'is-inline'})
