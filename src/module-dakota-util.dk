@@ -36,6 +36,7 @@ module dakota-util {
   json-parser,
   lexer,
   open-token,
+  open-token::slots-t,
   point,
   point::slots-t,
   rect,
