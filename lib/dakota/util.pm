@@ -65,8 +65,8 @@ our @EXPORT= qw(
                  kw_args_generics_add
                  kw_args_placeholders
                  last
-                 make_ident_symbol
-                 make_ident_symbol_scalar
+                 dk_mangle_seq
+                 dk_mangle
                  max
                  method_sig_regex
                  method_sig_type_regex
@@ -182,7 +182,7 @@ sub rand_str {
   return $str;
 }
 sub encode_char { my ($char) = @_; return sprintf("%02x", ord($char)); }
-sub make_ident_symbol_scalar {
+sub dk_mangle {
   my ($symbol) = @_;
   # swap underscore (_) with dash (-)
   my $rand_str = &rand_str();
@@ -207,9 +207,9 @@ sub make_ident_symbol_scalar {
   my $value = &path::string($ident_symbol);
   return $value;
 }
-sub make_ident_symbol {
+sub dk_mangle_seq {
   my ($seq) = @_;
-  my $ident_symbols = [map { &make_ident_symbol_scalar($_) } @$seq];
+  my $ident_symbols = [map { &dk_mangle($_) } @$seq];
   return &path::string($ident_symbols);
 }
 sub ann {

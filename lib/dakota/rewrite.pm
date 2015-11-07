@@ -513,7 +513,7 @@ sub rewrite_array_types {
 }
 sub symbol {
   my ($symbol) = @_;
-  my $ident = &make_ident_symbol_scalar($symbol);
+  my $ident = &dk_mangle($symbol);
   return "__symbol::$ident";
 }
 sub rewrite_symbols {
@@ -522,7 +522,7 @@ sub rewrite_symbols {
 }
 sub literal_str {
   my ($string) = @_;
-  my $ident = &make_ident_symbol_scalar($string);
+  my $ident = &dk_mangle($string);
   return "__literal::__str::$ident";
 }
 sub rewrite_literal_strs {
@@ -531,7 +531,7 @@ sub rewrite_literal_strs {
 }
 sub literal_int {
   my ($val) = @_;
-  my $ident = '_' . $val . '_';
+  my $ident = &dk_mangle($val);
   return "__literal::__int::$ident";
 }
 sub rewrite_literal_ints {
@@ -547,7 +547,7 @@ sub literal_char {
   my ($val) = @_;
   $val =~ s|^\'||;  # strip leading  single-quote
   $val =~ s|\'$||;  # strip trailing single-quote
-  my $ident = &make_ident_symbol_scalar($val);
+  my $ident = &dk_mangle($val);
   return "__literal::__char::$ident";
 }
 sub rewrite_literal_chars {
@@ -777,7 +777,7 @@ sub rewrite_keyword_syntax_list {
 }
 sub keyword_use {
   my ($arg1, $arg2) = @_;
-  my $arg1_ident = &dakota::generate::make_ident_symbol_scalar($arg1);
+  my $arg1_ident = &dakota::generate::dk_mangle($arg1);
   return "&__keyword::$arg1_ident$arg2,";
 }
 sub rewrite_keyword_use {

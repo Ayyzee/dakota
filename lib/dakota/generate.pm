@@ -3395,7 +3395,7 @@ sub dk_generate_cc_footer_klass {
           $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
         }
         $$tbl{'#size'} = "sizeof(slots-t::$$slot_info{'name'})";
-        #$$tbl{'#type'} = '__symbol::' . &make_ident_symbol_scalar($$slot_info{'type'});
+        #$$tbl{'#type'} = '__symbol::' . &dk_mangle($$slot_info{'type'});
         $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
         $$tbl{'#typeid'} = "dk-intern(demangle(typeid(slots-t::" . $$slot_info{'name'} . ").name()))";
 
@@ -3472,7 +3472,7 @@ sub dk_generate_cc_footer_klass {
   $$tbbl{'#construct'} = "\#$klass_type";
 
   if (&has_slots_type($klass_scope)) {
-    my $slots_type_ident = &make_ident_symbol_scalar($$klass_scope{'slots'}{'type'});
+    my $slots_type_ident = &dk_mangle($$klass_scope{'slots'}{'type'});
     my $type_symbol = $$klass_scope{'slots'}{'type'};
     $$tbbl{'#slots-type'} = "\"$type_symbol\"";
     $$tbbl{'#slots-typeid'} = "dk-intern(demangle(typeid(slots-t).name()))";
@@ -3924,7 +3924,7 @@ sub dk_generate_imported_klasses_info {
 sub add_symbol_to_ident_symbol {
   my ($file_symbols, $symbols, $symbol) = @_;
   if (defined $symbol) {
-    my $ident_symbol = &make_ident_symbol_scalar($symbol);
+    my $ident_symbol = &dk_mangle($symbol);
     $$file_symbols{$symbol} = $ident_symbol;
     $$symbols{$symbol} = $ident_symbol;
   }
@@ -3949,7 +3949,7 @@ sub linkage_unit::generate_symbols {
   my $col = '';
 
   while (my ($symbol, $symbol_seq) = each(%$symbols)) {
-    my $ident_symbol = &make_ident_symbol($symbol_seq);
+    my $ident_symbol = &dk_mangle_seq($symbol_seq);
     $$symbols{$symbol} = $ident_symbol;
   }
   while (my ($symbol, $symbol_seq) = each(%{$$file{'symbols'}})) {
@@ -3978,7 +3978,7 @@ sub linkage_unit::generate_symbols {
   my $scratch_str = "";
   my $max_width = 0;
   foreach my $symbol (@$symbol_keys) {
-    my $ident = &make_ident_symbol_scalar($symbol);
+    my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     if ($width > $max_width) {
       $max_width = $width;
@@ -3988,7 +3988,7 @@ sub linkage_unit::generate_symbols {
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
   while (my ($ln, $symbol) = each @$symbol_keys) {
-    my $ident = &make_ident_symbol_scalar($symbol);
+    my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
@@ -4015,7 +4015,7 @@ sub linkage_unit::generate_hashes {
   my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
-    my $ident = &make_ident_symbol_scalar($symbol);
+    my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     if ($width > $max_width) {
       $max_width = $width;
@@ -4027,7 +4027,7 @@ sub linkage_unit::generate_hashes {
     $col = &colin($col);
     my $num_lns = @$symbol_keys;
     while (my ($ln, $symbol) = each @$symbol_keys) {
-      my $ident = &make_ident_symbol_scalar($symbol);
+      my $ident = &dk_mangle($symbol);
       my $width = length($ident);
       my $pad = ' ' x ($max_width - $width);
       if (&should_ann($ln, $num_lns)) {
@@ -4059,7 +4059,7 @@ sub linkage_unit::generate_keywords {
   my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
-    my $ident = &make_ident_symbol_scalar($symbol);
+    my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     if ($width > $max_width) {
       $max_width = $width;
@@ -4071,7 +4071,7 @@ sub linkage_unit::generate_keywords {
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
   while (my ($ln, $symbol) = each @$symbol_keys) {
-    my $ident = &make_ident_symbol_scalar($symbol);
+    my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
@@ -4099,7 +4099,7 @@ sub linkage_unit::generate_strs {
   $scratch_str .= $col . "namespace __literal::__str {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach my $str (sort keys %{$$file{'literal-strs'}}) {
-    my $str_ident = &make_ident_symbol_scalar($str);
+    my $str_ident = &dk_mangle($str);
     if (&is_decl()) {
       $scratch_str .= $col . "extern object-t $str_ident; // \"$str\"\n";
     } else {
@@ -4130,7 +4130,7 @@ sub linkage_unit::generate_strs_seq {
     $scratch_str .= $col . "static symbol-t __str-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     $col = &colin($col);
     foreach my $str (sort keys %{$$file{'literal-strs'}}) {
-      my $ident = &make_ident_symbol_scalar($str);
+      my $ident = &dk_mangle($str);
       $scratch_str .= $col . "__symbol::$ident,\n";
     }
     $scratch_str .= $col . "nullptr\n";
@@ -4140,7 +4140,7 @@ sub linkage_unit::generate_strs_seq {
     $scratch_str .= $col . "static assoc-node-t __strs[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
     $col = &colin($col);
     foreach my $str (sort keys %{$$file{'literal-strs'}}) {
-      my $str_ident = &make_ident_symbol_scalar($str);
+      my $str_ident = &dk_mangle($str);
       $scratch_str .= $col . "{ cast(uintptr-t)&__literal::__str::$str_ident, nullptr },\n";
     }
     $scratch_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
@@ -4156,7 +4156,7 @@ sub linkage_unit::generate_ints {
   $scratch_str .= $col . "namespace __literal::__int {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach my $int (sort keys %{$$file{'literal-ints'}}) {
-    my $int_ident = '_' . $int . '_';
+    my $int_ident = &dk_mangle($int);
     if (&is_decl()) {
       $scratch_str .= $col . "extern object-t $int_ident;\n";
     } else {
@@ -4187,7 +4187,7 @@ sub linkage_unit::generate_ints_seq {
     $scratch_str .= $col . "static symbol-t __int-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     $col = &colin($col);
     foreach my $int (sort keys %{$$file{'literal-ints'}}) {
-      my $ident = '_' . $int . '_';
+      my $ident = &dk_mangle($int);
       $scratch_str .= $col . "__symbol::$ident,\n";
     }
     $scratch_str .= $col . "nullptr\n";
@@ -4197,7 +4197,7 @@ sub linkage_unit::generate_ints_seq {
     $scratch_str .= $col . "static assoc-node-t __ints[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
     $col = &colin($col);
     foreach my $int (sort keys %{$$file{'literal-ints'}}) {
-      my $int_ident = '_' . $int . '_';
+      my $int_ident = &dk_mangle($int);
       $scratch_str .= $col . "{ cast(uintptr-t)&__literal::__int::$int_ident, nullptr },\n";
     }
     $scratch_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
