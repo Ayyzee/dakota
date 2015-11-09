@@ -101,6 +101,7 @@ my ($id,  $mid,  $bid,  $tid,
 
 my $global_is_defn = undef;     # klass decl vs defn
 my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
+my $global_suffix = undef;
 
 my $gbl_nrt_file = undef;
 my $global_scratch_str_ref;
@@ -135,18 +136,25 @@ sub set_global_scratch_str_ref {
 sub set_nrt_decl() {
   $global_is_rt   = 0;
   $global_is_defn = 0;
+  $global_suffix = 'hh';
 }
 sub set_nrt_defn() {
   $global_is_rt   = 0;
   $global_is_defn = 1;
+  $global_suffix = 'cc';
 }
 sub set_rt_decl() {
   $global_is_rt   = 1;
   $global_is_defn = 0;
+  $global_suffix = 'hh';
 }
 sub set_rt_defn() {
   $global_is_rt   = 1;
   $global_is_defn = 1;
+  $global_suffix = 'cc';
+}
+sub suffix {
+  return $global_suffix
 }
 sub is_nrt_decl {
   if (!$global_is_rt && !$global_is_defn) {
@@ -267,7 +275,7 @@ sub generate_nrt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # nrt-hh
-    $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
+    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
 
     my $str_hh = '// ' . $emacs_mode_file_variables  . "\n";
     $str_hh .= &labeled_src_str(undef, "nrt-hh");
@@ -300,7 +308,7 @@ sub generate_nrt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # nrt-cc
-    $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
+    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
 
     my $str_cc = '// ' . $emacs_mode_file_variables  . "\n";
     $str_cc .= &labeled_src_str(undef, "nrt-cc");
@@ -344,7 +352,7 @@ sub generate_rt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # rt-hh
-    $result = &generate_decl_defn($file, $generics, $symbols, 'hh');
+    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
 
     my $str_hh = '// ' . $emacs_mode_file_variables  . "\n";
     $str_hh .= &labeled_src_str(undef, "rt-hh");
@@ -377,7 +385,7 @@ sub generate_rt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # rt-cc
-    $result = &generate_decl_defn($file, $generics, $symbols, 'cc');
+    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
 
     my $str_cc = '// ' . $emacs_mode_file_variables  . "\n";
     $str_cc .= &labeled_src_str(undef, "rt-cc");
@@ -412,9 +420,10 @@ sub labeled_src_str {
   my ($tbl, $key) = @_;
   my $str;
   if (! $tbl) {
-    $str = "//==$key==\n";
+    #$key = uc($key);
+    $str = "# undef $key\n";
   } else {
-    $str = "//--$key--\n";
+    $str = "# undef $key\n";
     $str .= $$tbl{$key};
     if (!exists $$tbl{$key}) {
       print STDERR "NO SUCH KEY $key\n";
@@ -446,7 +455,7 @@ sub generate_decl_defn {
   my $result = {};
   my $ordered_klass_names = &order_klasses($file);
 
-  $$result{"headers-hh"} =             &linkage_unit::generate_headers(        $file, $ordered_klass_names);
+  $$result{"headers-$suffix"} =        &linkage_unit::generate_headers(        $file, $ordered_klass_names);
   $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $symbols);
   $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file);
   $$result{"keywords-$suffix"} =       &linkage_unit::generate_keywords(       $file);
@@ -1591,7 +1600,7 @@ sub generics::generate_generic_defns {
   #$$scratch_str_ref .= $col . "// generate_generic_defns()\n";
   my $generic;
   #$$scratch_str_ref .= "# if defined DKT-VA-GENERICS\n";
-  $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t");
+  $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t" . '-' . &suffix());
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
@@ -1603,7 +1612,7 @@ sub generics::generate_generic_defns {
   }
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
-  $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-super-t");
+  $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-super-t" . '-' . &suffix());
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
@@ -1619,7 +1628,7 @@ sub generics::generate_generic_defns {
   #if (!&is_slots($generic)) {
   &generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
   #}
-  $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t");
+  $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t" . '-' . &suffix());
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
@@ -1631,7 +1640,7 @@ sub generics::generate_generic_defns {
   }
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
-  $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t");
+  $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t" . '-' . &suffix());
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
@@ -2723,10 +2732,10 @@ sub linkage_unit::generate_klasses {
     }
     $$scratch_str_ref .= "\n";
   }
-  $$scratch_str_ref .= &labeled_src_str(undef, "slots-defns");
+  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots" . '-' . &suffix());
   &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $ordered_klass_names);
 
-  $$scratch_str_ref .= &labeled_src_str(undef, "klass-defns");
+  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass" . '-' . &suffix());
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass($scope, $col, $klass_path, $klass_name);
   }
@@ -2735,8 +2744,8 @@ sub linkage_unit::generate_klasses {
 sub linkage_unit::generate_klasses_types_before {
   my ($scope, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  $$scratch_str_ref .= &labeled_src_str(undef, "klass-decls");
   if (&is_decl()) {
+    $$scratch_str_ref .= &labeled_src_str(undef, "klass-hh");
     foreach my $klass_name (@$ordered_klass_names) { # do not sort!
       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 

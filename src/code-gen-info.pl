@@ -59,15 +59,15 @@ foreach my $arg (@$args) {
 
     foreach my $element (@{$$tbl{$prev_arg}}) {
       if ($$arg_tbl{$element}) {
-        if ($element =~ m/^(.+?)_defns$/) {
+        if ($element =~ m/^(.+?)_cc$/) {
           print "  \"$prev_arg|$element\" -> \"$arg|$element\" [ color = red ];\n";
         } else {
           print "  \"$prev_arg|$element\" -> \"$arg|$element\" [ color = blue ];\n";
         }
-      } elsif ($element =~ m/^(.+?)_decls$/) {
+      } elsif ($element =~ m/^(.+?)_hh$/) {
         my $base = $1;
-        if ($$arg_tbl{"${base}_defns"}) {
-          print "  \"$prev_arg|${base}_decls\" -> \"$arg|${base}_defns\" [ color = green ];\n";
+        if ($$arg_tbl{"${base}_cc"}) {
+          print "  \"$prev_arg|${base}_hh\" -> \"$arg|${base}_cc\" [ color = green ];\n";
         }
       }
     }
