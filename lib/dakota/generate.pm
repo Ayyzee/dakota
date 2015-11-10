@@ -283,8 +283,8 @@ sub generate_nrt {
       "\n" .
       &labeled_src_str($result, "headers-hh") .
       &include_dakota_decl_hh() .
-      &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
+      &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "hashes-hh") .
       &labeled_src_str($result, "keywords-hh") .
       &labeled_src_str($result, "strs-hh") .
@@ -360,8 +360,8 @@ sub generate_rt {
       "\n" .
       &labeled_src_str($result, "headers-hh") .
       &include_dakota_decl_hh() .
-      &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "symbols-hh") .
+      &labeled_src_str($result, "klasses-hh") .
       &labeled_src_str($result, "hashes-hh") .
       &labeled_src_str($result, "keywords-hh") .
       &labeled_src_str($result, "strs-hh") .
@@ -394,11 +394,11 @@ sub generate_rt {
       "# include \"$name.$hh_ext\"\n" .
       "\n" .
       &labeled_src_str($result, "symbols-cc") .
+      &labeled_src_str($result, "klasses-cc") .
       &labeled_src_str($result, "hashes-cc") .
       &labeled_src_str($result, "keywords-cc") .
       &labeled_src_str($result, "strs-cc") .
       &labeled_src_str($result, "ints-cc") .
-      &labeled_src_str($result, "klasses-cc") .
       &labeled_src_str($result, "selectors-cc") .
       &labeled_src_str($result, "signatures-cc") .
       &labeled_src_str($result, "generics-cc") .
