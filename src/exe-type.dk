@@ -16,9 +16,10 @@
 
 module dakota;
 
-klass construct {
+klass exe-type {
   slots enum : uint32-t {
-    k-library    = 0,
-    k-executable = 1,
+    // zero is illegal
+    k-lib = 1,
+    k-exe = 2,
   }
 }

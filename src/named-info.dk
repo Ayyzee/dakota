@@ -85,8 +85,8 @@ klass named-info {
         if (0) {}
         else-if (0 == symbol::compare(#file, key))
               printf("  \"%s\",", cast(str-t)(element));
-        else-if (0 == symbol::compare(#name,      key) ||
-                 0 == symbol::compare(#construct, key))
+        else-if (0 == symbol::compare(#name, key) ||
+                 0 == symbol::compare(#type, key))
               printf("  #%s,",    cast(symbol-t)(element));
         printf("\n");
       }

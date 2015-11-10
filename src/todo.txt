@@ -179,12 +179,18 @@ to be called AFTER the dakota runtime is fully setup, but before main()
 fix --precompile option. Any lib/exe depending on something being generated should
 instead be able to use the corresponding rep file. This might require some convergence of the respective schemas, or a way to convert from one type of rep file to the other.
 
-consider using std::type_info::before()
-as a way to order the various types
-http://en.cppreference.com/w/cpp/types/type_info/before
-
 put dir-buffer and dir on read-only segment
 put dkt-construct, dkt-name as well.
 
 support stack based object creation
   make() va stack-make()
+
+make super() take an arg for self (defaults to self of course)
+
+dk-intern() should allow to have multiple (unique) tables so one might create a filesystem-only intern table, etc.
+
+Consider the name of a klass (or trait) is within the klass' (or traits') scope; its name is __klass__.
+  should this change? offer __trait__ as an alias to __klass__
+  how about __scope-name__ which will work with klasses, traits, namespaces, methods, and potentially even funcs.
+
+convert symbol-from-addr() and related code to a dladdr() compatible interface to be used when dladdr() is missing.

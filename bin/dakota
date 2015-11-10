@@ -99,7 +99,12 @@ if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
   #`dakota --help`;
   exit 1;
 }
-
+if ($$root_cmd{'opts'}{'soname'}) {
+  $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
+}
+if ($$root_cmd{'opts'}{'output'}) {
+  $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
+}
 my $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
   or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
 {

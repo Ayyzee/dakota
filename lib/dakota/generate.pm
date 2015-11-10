@@ -525,9 +525,9 @@ sub generate_defn_footer {
                   "\#date" => '__DATE__',
                   "\#time" => '__TIME__',
                   "\#file" => '__FILE__',
-                  "\#construct" => 'DKT-CONSTRUCT',
+                  "\#type" => $$file{'other'}{'type'},
                   "\#dir" => 'dir',
-                  "\#name" => 'DKT-NAME',
+                  "\#name" => 'name',
                   "\#get-segment-data" => 'dkt-get-segment-data',
                  };
   if (0 < scalar keys %{$$file{'literal-strs'}}) {
@@ -543,16 +543,9 @@ sub generate_defn_footer {
   $rt_cc_str .= "\n";
   $rt_cc_str .= "# include <unistd.h>\n";
   $rt_cc_str .= "\n";
-  $rt_cc_str .= "static char8-t        dir-buffer[4096] = \"\";\n";
-  $rt_cc_str .= "static char8-t const* dir = getcwd(dir-buffer, DK-COUNTOF(dir-buffer));\n";
-  if ($$file{'other'}) {
-    if ($$file{'other'}{'DKT-CONSTRUCT'}) {
-      $rt_cc_str .= 'static construct-t DKT-CONSTRUCT = ' . $$file{'other'}{'DKT-CONSTRUCT'} . ";\n";
-    }
-    if ($$file{'other'}{'DKT-NAME'}) {
-      $rt_cc_str .= 'static str-t       DKT-NAME = "' . $$file{'other'}{'DKT-NAME'} . "\";\n";
-    }
-  }
+  $rt_cc_str .= "[[dkt-rodata-section]] static char8-t  dir-buffer[4096] = \"\";\n";
+  $rt_cc_str .= "[[dkt-rodata-section]] static str-t    dir = getcwd(dir-buffer, DK-COUNTOF(dir-buffer));\n";
+  $rt_cc_str .= "[[dkt-rodata-section]] static symbol-t name = \"$$file{'other'}{'name'}\";\n";
   $rt_cc_str .= "\n";
   #my $col;
   $rt_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
@@ -561,18 +554,18 @@ sub generate_defn_footer {
   $rt_cc_str .= $col . "static auto __initial() -> void {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   $rt_cc_str .=
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);\n" .
     $col . "dkt-register-info(&reg-info);\n" .
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"after\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);\n" .
     $col . "return;\n";
   $col = &colout($col);
   $rt_cc_str .= $col . "}\n";
   $rt_cc_str .= $col . "static auto __final() -> void {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   $rt_cc_str .=
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"before\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);\n" .
     $col . "dkt-deregister-info(&reg-info);\n" .
-    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','args':[],'context':'%s','name':'%s'\", __func__, \"after\", DKT-NAME);\n" .
+    $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);\n" .
     $col . "return;\n";
   $col = &colout($col);
   $rt_cc_str .= $col . "}\n";
@@ -3415,7 +3408,7 @@ sub dk_generate_cc_footer_klass {
         $$tbl{'#size'} = "sizeof(slots-t::$$slot_info{'name'})";
         #$$tbl{'#type'} = '__symbol::' . &dk_mangle($$slot_info{'type'});
         $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
-        $$tbl{'#typeid'} = "dk-intern(demangle(typeid(slots-t::" . $$slot_info{'name'} . ").name()))";
+        $$tbl{'#typeid'} = "dk-intern(demangle(typeid(slots-t::" . $$slot_info{'name'} . ").name()))"; # leakleak
 
         if (defined $$slot_info{'expr'}) {
           $$tbl{'#expr'} = "($$slot_info{'expr'})";
@@ -3487,7 +3480,7 @@ sub dk_generate_cc_footer_klass {
   }
   my $symbol = &path::string($klass_name);
   $$tbbl{'#name'} = '__klass__';
-  $$tbbl{'#construct'} = "\#$klass_type";
+  $$tbbl{'#type'} = "\#$klass_type";
 
   if (&has_slots_type($klass_scope)) {
     my $slots_type_ident = &dk_mangle($$klass_scope{'slots'}{'type'});
@@ -3921,11 +3914,11 @@ sub dk_generate_imported_klasses_info {
       $$tbl{'imported-klasses'}{$import_string} = $seq;
     }
   }
-  foreach my $construct ('traits', 'klasses') {
-    while (my ($klass_name, $klass_scope) = each(%{$$scope{$construct}})) {
+  foreach my $klass_type ('traits', 'klasses') {
+    while (my ($klass_name, $klass_scope) = each(%{$$scope{$klass_type}})) {
       &path::add_last($stack, $klass_name);
       my $import_string = &path::string($stack);
-      $$tbl{$construct}{$import_string} = &dakota::util::deep_copy($stack);
+      $$tbl{$klass_type}{$import_string} = &dakota::util::deep_copy($stack);
 
       if ($klass_scope) {
         $$tbl{'imported-klasses'}{$import_string} = &dakota::util::deep_copy($stack);

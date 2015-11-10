@@ -92,7 +92,7 @@ my $want_separate_precompile_pass = 0;
 my $show_outfile_info = 0;
 my $global_should_echo = 0;
 my $exit_status = 0;
-my $dk_construct = undef;
+my $dk_exe_type = undef;
 
 my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
 my $cxx_output_flags =      &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',      '--output');
@@ -362,21 +362,21 @@ sub start_cmd {
   my $ld_soname_flags = &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
 
   if ($$cmd_info{'opts'}{'compile'}) {
-    $dk_construct = undef;
+    $dk_exe_type = undef;
   } elsif ($$cmd_info{'opts'}{'shared'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
 	    $cxx_shared_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
     }
-    $dk_construct = 'construct::k_library';
+    $dk_exe_type = 'exe-type::k_lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
 	    $cxx_dynamic_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
     }
-    $dk_construct = 'construct::k_library';
+    $dk_exe_type = 'exe-type::k_lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
              && !$$cmd_info{'opts'}{'shared'}
              && !$$cmd_info{'opts'}{'dynamic'}) {
-    $dk_construct = 'construct::k_executable';
+    $dk_exe_type = 'exe-type::k_exe';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
@@ -537,13 +537,13 @@ sub gen_rt_o {
   $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
-  if ($dk_construct) {
-    $$other{'DKT-CONSTRUCT'} = $dk_construct;
+  if ($dk_exe_type) {
+    $$other{'type'} = $dk_exe_type;
   }
   if ($$cmd_info{'opts'}{'soname'}) {
-    $$other{'DKT-NAME'} = $$cmd_info{'opts'}{'soname'};
+    $$other{'name'} = $$cmd_info{'opts'}{'soname'};
   } elsif ($$cmd_info{'output'}) {
-    $$other{'DKT-NAME'} = $$cmd_info{'output'};
+    $$other{'name'} = $$cmd_info{'output'};
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
   &rt_o_from_rep($cmd_info, $other);

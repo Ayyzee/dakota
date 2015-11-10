@@ -53,9 +53,9 @@ boole-t pre-main? = true;
 
 klass bit-vector;
 klass const-info;
-klass construct;
 klass enum-info;
 klass exception;
+klass exe-type;
 klass illegal-klass-exception;
 klass named-enum-info;
 klass named-info;
@@ -349,8 +349,8 @@ json-dump-resource-info(sorted-array-t* klass-defns-table) {
     named-info-t* current-info = klass-info;
 
     do {
-      symbol-t construct = cast(symbol-t)named-info::at(current-info, #construct);
-      if (0 == symbol::compare(#klass, construct))
+      symbol-t type = cast(symbol-t)named-info::at(current-info, #type);
+      if (0 == symbol::compare(#klass, type))
         klasses-count++;
       signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method-signatures);
 
@@ -391,8 +391,8 @@ json-dump-klass-defns(sorted-array-t* klass-defns-table) {
       ostream::println-format(ostrm, "'%s' :\n", name);
       ostream::println-format(ostrm, "{\n");
       ostream::col-incr(ostrm);
-      symbol-t construct = cast(symbol-t)named-info::at(current-info, #construct);
-      ostream::println-format(ostrm, "'construct' : '%s',\n", construct);
+      symbol-t type = cast(symbol-t)named-info::at(current-info, #type);
+      ostream::println-format(ostrm, "'type' : '%s',\n", type);
       if (nullptr != klass-name)
         ostream::println-format(ostrm, "'klass' : '%s',\n",      klass-name);
       if (nullptr != superklass-name)
@@ -735,8 +735,8 @@ auto dk-register-klass(named-info-t* klass-info) -> object-t {
 
   symbol-t interpose-name = cast(symbol-t)named-info::at(klass-info, #interpose-name);
   if (nullptr != interpose-name) {
-    symbol-t construct = cast(symbol-t)named-info::at(klass-info, #construct);
-    assert(0 == symbol::compare(#klass, construct));
+    symbol-t type = cast(symbol-t)named-info::at(klass-info, #type);
+    assert(0 == symbol::compare(#klass, type));
     add-interpose-prop(interpose-name, name);
   }
   named-info-t** klass-info-ptr = cast(named-info-t**)sorted-array::bsearch(gbl-klass-defns-table, &klass-info);
@@ -1022,13 +1022,13 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
   boole-t                   state-exported? =                cast(boole-t)                  named-info::at(klass-info, #state-exported?);
   boole-t                   behavior-exported? =             cast(boole-t)                  named-info::at(klass-info, #behavior-exported?);
   symbol-t                  cat =                            cast(symbol-t)                 named-info::at(klass-info, #cat, cast(uintptr-t)#struct);
-  symbol-t                  construct =                      cast(symbol-t)                 named-info::at(klass-info, #construct, cast(uintptr-t)#klass);
+  symbol-t                  type =                           cast(symbol-t)                 named-info::at(klass-info, #type, cast(uintptr-t)#klass);
   symbol-t                  interpose-name =                 cast(symbol-t)                 named-info::at(klass-info, #interpose-name);
   symbol-t const*           traits =                         cast(symbol-t const*)          named-info::at(klass-info, #traits);
   symbol-t const*           requires =                       cast(symbol-t const*)          named-info::at(klass-info, #requires);
   symbol-t const*           provides =                       cast(symbol-t const*)          named-info::at(klass-info, #provides);
   signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info::at(klass-info, #method-signatures);
-  signature-t const* const* kw-args-method-signatures =           cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
+  signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
   signature-t const* const* exported-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #exported-method-signatures);
   signature-t const* const* exported-slots-method-signatures = cast(signature-t const* const*)named-info::at(klass-info, #exported-slots-method-signatures);
   signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info::at(klass-info, #slots-method-signatures);
@@ -1038,13 +1038,13 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
   const-info-t const*       const-info =                     cast(const-info-t const*)      named-info::at(klass-info, #const-info);
   str-t                     slots-type =                     cast(str-t)                    named-info::at(klass-info, #slots-type);
   str-t                     enum-base =                      cast(str-t)                    named-info::at(klass-info, #enum-base);
-  named-info-t*        slots-info =                     cast(named-info-t*)       named-info::at(klass-info, #slots-info);
+  named-info-t*             slots-info =                     cast(named-info-t*)            named-info::at(klass-info, #slots-info);
 //     method-t const* method-addresses =          cast(method-t*)named-info::at(klass-info, #method-addresses);
 //     method-t const* va-method-addresses =       cast(method-t*)named-info::at(klass-info, #va-method-addresses);
 //     method-t const* slots-method-addresses =    cast(method-t*)named-info::at(klass-info, #slots-method-addresses);
 //     method-t const* va-slots-method-addresses = cast(method-t*)named-info::at(klass-info, #va-slots-method-addresses);
 
-  assert(nullptr != construct);
+  assert(nullptr != type);
   assert(nullptr != name);
   assert(!(nullptr != interpose-name && nullptr != superklass-name));
 
@@ -1066,7 +1066,7 @@ dump-klass(ostream-t ostrm, named-info-t* klass-info) {
     gbl-current-module = modulee;
   }
   if (exported? || state-exported? || behavior-exported?) {
-    ostream::println-format(ostrm, "%s %s {\n", construct, name);
+    ostream::println-format(ostrm, "%s %s {\n", type, name);
     ostream::col-incr(ostrm);
 
     if (nullptr != interpose-name)
@@ -1500,13 +1500,13 @@ auto dkt-register-info(named-info-t* registration-info) -> void {
         dump-module-description(ostrm, registration-info);
     }
   }
-  construct-t construct = cast(construct-t)named-info::at(registration-info, #construct);
+  exe-type-t type = cast(exe-type-t)named-info::at(registration-info, #type);
 
-  switch (construct) {
-    case construct::k-library:
+  switch (type) {
+    case exe-type::k-lib:
       add-registration-info(registration-info);
       break;
-    case construct::k-executable:
+    case exe-type::k-exe:
       add-registration-info(registration-info);
       if (nullptr != getenv("DKT_JSON_DUMP_KLASSES"))
         json-dump-klass-defns(gbl-klass-defns-table);
@@ -1581,7 +1581,7 @@ dk-klass-for-name(symbol-t klass-name, uint32-t column) {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   assert(nullptr != klass-name);
   named-info-t* klass-info-slots = info-for-name(klass-name);
-  assert(#trait != cast(symbol-t)named-info::at(klass-info-slots, #construct));
+  assert(#trait != cast(symbol-t)named-info::at(klass-info-slots, #type));
   assoc-node-t* klass-assoc = imported-klasses-for-klass(klass-name);
   object-t klass = nullptr;
 
