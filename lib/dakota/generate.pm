@@ -528,7 +528,7 @@ sub generate_defn_footer {
                   "\#time" => '__TIME__',
                   "\#file" => '__FILE__',
                   "\#construct" => 'DKT-CONSTRUCT',
-                  "\#dir" => 'getcwd(dir, DK-COUNTOF(dir))',
+                  "\#dir" => 'dir',
                   "\#name" => 'DKT-NAME',
                   "\#get-segment-data" => 'dkt-get-segment-data',
                  };
@@ -545,7 +545,17 @@ sub generate_defn_footer {
   $rt_cc_str .= "\n";
   $rt_cc_str .= "# include <unistd.h>\n";
   $rt_cc_str .= "\n";
-  $rt_cc_str .= "static char dir[4096] = \"\";\n";
+  $rt_cc_str .= "static char8-t        dir-buffer[4096] = \"\";\n";
+  $rt_cc_str .= "static char8-t const* dir = getcwd(dir-buffer, DK-COUNTOF(dir-buffer));\n";
+  if ($$file{'other'}) {
+    if ($$file{'other'}{'DKT-CONSTRUCT'}) {
+      $rt_cc_str .= 'static construct-t DKT-CONSTRUCT = ' . $$file{'other'}{'DKT-CONSTRUCT'} . ";\n";
+    }
+    if ($$file{'other'}{'DKT-NAME'}) {
+      $rt_cc_str .= 'static str-t       DKT-NAME = "' . $$file{'other'}{'DKT-NAME'} . "\";\n";
+    }
+  }
+  $rt_cc_str .= "\n";
   #my $col;
   $rt_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 

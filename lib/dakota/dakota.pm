@@ -536,16 +536,17 @@ sub gen_rt_o {
   }
   $$cmd_info{'rep'} = &rep_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
+  my $other = {};
   if ($dk_construct) {
-    $flags .= " --define-macro DKT_CONSTRUCT=$dk_construct";
+    $$other{'DKT-CONSTRUCT'} = $dk_construct;
   }
   if ($$cmd_info{'opts'}{'soname'}) {
-    $flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'opts'}{'soname'}\\\"";
-  } else {
-    $flags .= " --define-macro DKT_NAME=\\\"$$cmd_info{'output'}\\\"";
+    $$other{'DKT-NAME'} = $$cmd_info{'opts'}{'soname'};
+  } elsif ($$cmd_info{'output'}) {
+    $$other{'DKT-NAME'} = $$cmd_info{'output'};
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
-  &rt_o_from_rep($cmd_info);
+  &rt_o_from_rep($cmd_info, $other);
 }
 sub loop_o_from_dk {
   my ($cmd_info) = @_;
@@ -617,7 +618,7 @@ sub o_from_cc {
     &outfile_from_infiles($o_cmd, $should_echo = 1);
 }
 sub rt_o_from_rep {
-  my ($cmd_info) = @_;
+  my ($cmd_info, $other) = @_;
   my $rep_path;
   my $cc_path;
   if (&is_so($$cmd_info{'output'})) {
@@ -637,6 +638,8 @@ sub rt_o_from_rep {
     &init_global_rep($$cmd_info{'reps'});
   }
   $file = &scalar_from_file($rep_path);
+  die if $$file{'other'};
+  $$file{'other'} = $other;
   $file = &kw_args_translate($file);
   $$file{'should-generate-make'} = 1;
 
