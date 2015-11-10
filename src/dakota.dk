@@ -1377,7 +1377,7 @@ bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) {
   if (dladdr(si->si-addr, &dl-info)) {
     if (si->si-addr == dl-info.dli-saddr) {
       int status = -1;
-      char8-t const* sname-demangled = abi::__cxa_demangle(dl-info.dli-sname, nullptr, nullptr, &status);
+      str-t sname-demangled = abi::__cxa_demangle(dl-info.dli-sname, nullptr, nullptr, &status);
       if (0 != status)
         sname-demangled = dl-info.dli-sname;
       syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
@@ -1432,11 +1432,11 @@ sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) {
 }
   
 static int-t
-set-read-only(char8-t const* segment, get-segment-data-t get-segment-data) {
+set-read-only(str-t segment, get-segment-data-t get-segment-data) {
   assert(nullptr != segment);
   ptr-t addr = nullptr;
   size-t size = 0;
-  get-segment-data(segment, &addr, &size); // code-generated in each dso
+  get-segment-data(segment, &addr, &size); // code-generated in each lib/exe
 
   int-t result = -1;
   if (nullptr != addr) {
@@ -1449,7 +1449,7 @@ set-read-only(char8-t const* segment, get-segment-data-t get-segment-data) {
   return result;
 }
 static int-t
-set-read-only-all(char8-t const* segment) {
+set-read-only-all(str-t segment) {
   int-t result = 0;
   named-info-t* ni = gbl-registration-info-list;
   while (nullptr != ni) {

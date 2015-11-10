@@ -194,3 +194,5 @@ Consider the name of a klass (or trait) is within the klass' (or traits') scope;
   how about __scope-name__ which will work with klasses, traits, namespaces, methods, and potentially even funcs.
 
 convert symbol-from-addr() and related code to a dladdr() compatible interface to be used when dladdr() is missing.
+
+sysconf(_SC_PAGE_SIZE)
