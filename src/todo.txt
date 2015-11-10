@@ -182,3 +182,9 @@ instead be able to use the corresponding rep file. This might require some conve
 consider using std::type_info::before()
 as a way to order the various types
 http://en.cppreference.com/w/cpp/types/type_info/before
+
+put dir-buffer and dir on read-only segment
+put dkt-construct, dkt-name as well.
+
+support stack based object creation
+  make() va stack-make()
