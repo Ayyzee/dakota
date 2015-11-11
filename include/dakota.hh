@@ -46,7 +46,7 @@ inline auto demangle(str_t mangled_name) -> str_t {
 # endif
 
 namespace dkt {
-  inline void dealloc(void* ptr) {
+  inline auto dealloc(void* ptr) -> void {
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
     operator delete(ptr);
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
@@ -55,7 +55,7 @@ namespace dkt {
     # error DK_MEM_MGMT
 # endif
   }
-  inline void* alloc(std::size_t size) {
+  inline auto alloc(std::size_t size) -> void* {
     void* buf;
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
     buf = operator new(size);
@@ -69,7 +69,7 @@ namespace dkt {
 # endif
     return buf;
   }
-  inline void* alloc(std::size_t size, void* ptr) {
+  inline auto alloc(std::size_t size, void* ptr) -> void* {
     void* buf;
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
     buf = dkt::alloc(size);
@@ -115,10 +115,10 @@ namespace dkt {
 # define cast(t) (t)
 # define DK_COUNTOF(array) (sizeof((array))/sizeof((array)[0]))
 
-template <typename T, size_t N>
-constexpr size_t dk_countof(T(&)[N]) {
-  return N;
-}
+// template <typename T, size_t N>
+// constexpr size_t dk_countof(T(&)[N]) {
+//   return N;
+// }
 # if !defined USE
   # define    USE(v) cast(void)v
 # endif
@@ -127,7 +127,7 @@ constexpr size_t dk_countof(T(&)[N]) {
 # define superklass_of(kls) klass::unbox(kls)->superklass
 # define name_of(kls)       klass::unbox(kls)->name
 
-inline int_t dkt_normalize_compare_result(intmax_t n) { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
+inline auto dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 // file scope
 # define SELECTOR(name, args)                *(cast(dkt_selector_func_t) (cast(selector_t*        (*)args) __selector::name))()
 # define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(signature_t const* (*)args) __signature::name))()
@@ -178,62 +178,62 @@ extern object_t std_input  [[so_export]] [[dkt_rodata_section]];
 extern object_t std_output [[so_export]] [[dkt_rodata_section]];
 extern object_t std_error  [[so_export]] [[dkt_rodata_section]];
 
-typedef int_t  (*compare_t)(object_t, object_t); // comparitor
-typedef signature_t const* (*dkt_signature_func_t)();
-typedef selector_t* (*dkt_selector_func_t)();
+typedef auto (*compare_t)(object_t, object_t) -> int_t; // comparitor
+typedef auto (*dkt_signature_func_t)() -> signature_t const*;
+typedef auto (*dkt_selector_func_t)() -> selector_t*;
 
-constexpr uintptr_t dk_hash(str_t str) { // Daniel J. Bernstein
+constexpr auto dk_hash(str_t str) -> uintptr_t { // Daniel J. Bernstein
   return !*str ? cast(uintptr_t)5381 : cast(uintptr_t)(*str) ^ (33 * dk_hash(str + 1));
 }
-constexpr uintptr_t dk_hash_switch(str_t str) { return dk_hash(str); }
+constexpr auto dk_hash_switch(str_t str) -> uintptr_t { return dk_hash(str); }
 
-constexpr  intptr_t dk_hash_switch( intptr_t val) { return val; }
-constexpr uintptr_t dk_hash_switch(uintptr_t val) { return val; }
+constexpr auto dk_hash_switch( intptr_t val) -> intptr_t  { return val; }
+constexpr auto dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 
-[[so_export]] symbol_t dk_intern(str_t);
-[[so_export]] object_t dk_klass_for_name(symbol_t);
+[[so_export]] auto dk_intern(str_t) -> symbol_t;
+[[so_export]] auto dk_klass_for_name(symbol_t) -> object_t;
 
-[[so_export]] void dkt_register_info(named_info_t*);
-[[so_export]] void dkt_deregister_info(named_info_t*);
+[[so_export]] auto dkt_register_info(named_info_t*) -> void;
+[[so_export]] auto dkt_deregister_info(named_info_t*) -> void;
 
-// [[so_export]]              auto dk_va_add_all(object_t self, va_list_t) -> object-t;
-// [[so_export]] [[sentinel]] auto dk_add_all(object_t self, ...) -> object-t;
+// [[so_export]]              auto dk_va_add_all(object_t self, va_list_t) -> object_t;
+// [[so_export]] [[sentinel]] auto dk_add_all(object_t self, ...) -> object_t;
 
-[[so_export]] object_t dk_register_klass(named_info_t* klass_info);
-[[so_export]] void dk_init_runtime();
-[[so_export]] object_t dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name);
+[[so_export]] auto dk_register_klass(named_info_t* klass_info) -> object_t;
+[[so_export]] auto dk_init_runtime() -> void;
+[[so_export]] auto dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name) -> object_t;
 
-[[so_export]] object_t dkt_capture_current_exception(object_t arg);
-[[so_export]] str_t    dkt_capture_current_exception(str_t arg);
+[[so_export]] auto dkt_capture_current_exception(object_t arg) -> object_t;
+[[so_export]] auto dkt_capture_current_exception(str_t arg) -> str_t;
 
-[[so_export]] named_info_t* dk_va_make_named_info_slots(symbol_t name, va_list_t args);
-[[so_export]] object_t      dk_va_make_named_info(      symbol_t name, va_list_t args);
+[[so_export]] auto dk_va_make_named_info_slots(symbol_t name, va_list_t args) -> named_info_t*;
+[[so_export]] auto dk_va_make_named_info(      symbol_t name, va_list_t args) -> object_t;
 
-[[so_export]] [[sentinel]] named_info_t* dk_make_named_info_slots(symbol_t name, ...);
-[[so_export]] [[sentinel]] object_t      dk_make_named_info(      symbol_t name, ...);
+[[so_export]] [[sentinel]] auto dk_make_named_info_slots(symbol_t name, ...) -> named_info_t*;
+[[so_export]] [[sentinel]] auto dk_make_named_info(      symbol_t name, ...) -> object_t;
 
-[[debug_so_export]] named_info_t* dkt_dump_named_info(named_info_t* info);
+[[debug_so_export]] auto dkt_dump_named_info(named_info_t* info) -> named_info_t*;
 
 //#define DKT_NULL_METHOD nullptr
 # define DKT_NULL_METHOD cast(method_t)dkt_null_method
 
-[[so_export]] [[noreturn]] void dkt_null_method(object_t object, ...);
+[[so_export]] [[noreturn]] auto dkt_null_method(object_t object, ...) -> void;
 
-[[debug_so_export]] int_t dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args);
-[[debug_so_export]] int_t dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args);
-[[debug_so_export]] int_t dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args);
-[[debug_so_export]] int_t dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args);
+[[debug_so_export]] auto dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args) -> int_t;
+[[debug_so_export]] auto dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args) -> int_t;
+[[debug_so_export]] auto dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args) -> int_t;
+[[debug_so_export]] auto dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args) -> int_t;
 
-[[debug_so_export]] int_t dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...);
-[[debug_so_export]] int_t dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...);
-[[debug_so_export]] int_t dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...);
-[[debug_so_export]] int_t dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...);
+[[debug_so_export]] auto dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...) -> int_t;
+[[debug_so_export]] auto dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...) -> int_t;
+[[debug_so_export]] auto dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...) -> int_t;
+[[debug_so_export]] auto dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...) -> int_t;
 
-[[debug_so_export]] char8_t* dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len);
+[[debug_so_export]] auto dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len) -> char8_t*;
 
-[[debug_so_export]] void dkt_dump_methods(object_t);
-[[debug_so_export]] void dkt_dump_methods(klass::slots_t*);
+[[debug_so_export]] auto dkt_dump_methods(object_t) -> void;
+[[debug_so_export]] auto dkt_dump_methods(klass::slots_t*) -> void;
 
-[[debug_so_export]] void dkt_unbox_check(object_t object, object_t kls);
+[[debug_so_export]] auto dkt_unbox_check(object_t object, object_t kls) -> void;
 
 # endif // dkt_dakota_hh
