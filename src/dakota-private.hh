@@ -23,34 +23,34 @@
 dkt_declare_klass_type_struct(selector_node);
 //dkt_declare_klass_type_struct(signature);
 
-void import_selectors(signature_t** signatures, selector_node_t* selector_nodes);
+auto import_selectors(signature_t** signatures, selector_node_t* selector_nodes) -> void;
 
-symbol_t interposer_name_for_klass_name(symbol_t klass_name);
-void add_interpose_prop(symbol_t key, symbol_t element);
+auto interposer_name_for_klass_name(symbol_t klass_name) -> symbol_t;
+auto add_interpose_prop(symbol_t key, symbol_t element) -> void;
 
-named_info_t* info_for_name(symbol_t);
+auto info_for_name(symbol_t) -> named_info_t*;
 
-int_t  safe_strptrcmp(str_t const* sp1, str_t const* sp2);
-int_t  safe_strncmp(str_t s1, str_t s2, size_t n);
+auto safe_strptrcmp(str_t const* sp1, str_t const* sp2) -> int_t;
+auto safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t;
 
 auto safe_strcmp(str_t, str_t) -> int_t;
 auto safe_strlen(str_t) -> size_t;
 
 auto strerror_name(int_t errnum) -> str_t;
 
-uint32_t size_from_info(named_info_t* info);
-uint32_t offset_from_info(named_info_t* info);
-symbol_t name_from_info(named_info_t* info);
-symbol_t klass_name_from_info(named_info_t* info);
-symbol_t superklass_name_from_info(named_info_t* info);
-symbol_t superklass_name_from_info(named_info_t* info, symbol_t name);
+auto size_from_info(named_info_t* info) -> uint32_t;
+auto offset_from_info(named_info_t* info) -> uint32_t;
+auto name_from_info(named_info_t* info) -> symbol_t;
+auto klass_name_from_info(named_info_t* info) -> symbol_t;
+auto superklass_name_from_info(named_info_t* info) -> symbol_t;
+auto superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
 
-symbol_t default_superklass_name();
-symbol_t default_klass_name();
+auto default_superklass_name() -> symbol_t;
+auto default_klass_name() -> symbol_t;
 
-[[noreturn]] void verbose_terminate()  noexcept;
-[[noreturn]] void verbose_unexpected() noexcept;
-[[noreturn]] void pre_runtime_verbose_terminate() noexcept;
-[[noreturn]] void pre_runtime_verbose_unexpected() noexcept;
+[[noreturn]] auto verbose_terminate()  noexcept -> void;
+[[noreturn]] auto verbose_unexpected() noexcept -> void;
+[[noreturn]] auto pre_runtime_verbose_terminate() noexcept -> void;
+[[noreturn]] auto pre_runtime_verbose_unexpected() noexcept -> void;
 
 # endif // dkt_dakota_private_hh
