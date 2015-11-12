@@ -94,7 +94,7 @@ klass sorted-set {
 
     result-t result = sorted-ptr-array::search(&self.sa, element);
 
-//     if (should-throw && nullptr != result.element)
+//     if (throw? && nullptr != result.element)
 //       throw make(exception::klass, #message : "oops");
 
   //if (nullptr == result.element)

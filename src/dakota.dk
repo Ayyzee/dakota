@@ -757,7 +757,7 @@ static auto dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
   }
   return;
 }
-static auto should-dump(named-info-t* klass-info, str-t only) -> boole-t {
+static auto dump?(named-info-t* klass-info, str-t only) -> boole-t {
   assert(nullptr != klass-info);
   assert(nullptr != only);
   symbol-t name = name-from-info(klass-info);
@@ -912,7 +912,7 @@ static auto dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
       assert(nullptr != klass-info);
       if (nullptr == klass-info->elements)
         break;
-      if (nullptr == only || should-dump(klass-info, only)) {
+      if (nullptr == only || dump?(klass-info, only)) {
         if (1)
           dump-klass(ostrm, klass-info);
         if (nullptr != output-dir) {
