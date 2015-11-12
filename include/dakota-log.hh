@@ -22,8 +22,8 @@
 
 typedef char char8_t; // hackhack
 
-[[so_export]] [[format_va_printf(2)]] int_t dkt_va_log(uint32_t priority, str_t format, va_list_t args);
-[[so_export]] [[format_printf(   2)]] int_t dkt_log(   uint32_t priority, str_t format, ...);
+[[so_export]] [[format_va_printf(2)]] auto dkt_va_log(uint32_t priority, str_t format, va_list_t args) -> int_t;
+[[so_export]] [[format_printf(   2)]] auto dkt_log(   uint32_t priority, str_t format, ...) -> int_t;
 
 # define log_method()     dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"method\": \"%s\",\"params\": \"%s\"", __klass__, __method__->name, __method__->parameter_types)
 # define log_klass_func() dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"func\": \"%s\"", __klass__, __func__)
@@ -51,15 +51,14 @@ namespace dkt {
 
     k_log_all = (log_element_t)~0
   };
-  const uint32_t log_flags =
-  k_log_null;
-  //k_log_mem_footprint | k_log_object_alloc | k_log_initial_final | k_log_trace_runtime;
-  //k_log_trace_runtime;
+  const uint32_t log_flags = k_log_null;
+  //k-log-mem-footprint | k-log-object-alloc | k-log-initial-final | k-log-trace-runtime;
+  //k-log-trace-runtime;
 }
-// #define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { syslog(LOG_INFO   |LOG_DAEMON, __VA_ARGS__); }
-// #define DKT_LOG_WARNING(flags, ...) if (flags & dkt::log_flags) { syslog(LOG_WARNING|LOG_DAEMON, __VA_ARGS__); }
-// #define DKT_LOG_ERROR(flags, ...)   if (flags & dkt::log_flags) { syslog(LOG_ERROR  |LOG_DAEMON, __VA_ARGS__); }
-// #define DKT_LOG_DEBUG(flags, ...)   if (flags & dkt::log_flags) { syslog(LOG_DEBUG  |LOG_DAEMON, __VA_ARGS__); }
+// #define DKT-LOG-INFO(flags, ...)    if (flags & dkt::log-flags) { syslog(LOG-INFO   |LOG-DAEMON, __VA-ARGS__); }
+// #define DKT-LOG-WARNING(flags, ...) if (flags & dkt::log-flags) { syslog(LOG-WARNING|LOG-DAEMON, __VA-ARGS__); }
+// #define DKT-LOG-ERROR(flags, ...)   if (flags & dkt::log-flags) { syslog(LOG-ERROR  |LOG-DAEMON, __VA-ARGS__); }
+// #define DKT-LOG-DEBUG(flags, ...)   if (flags & dkt::log-flags) { syslog(LOG-DEBUG  |LOG-DAEMON, __VA-ARGS__); }
 
 # define DKT_LOG_INFO(flags, ...)    if (flags & dkt::log_flags) { dkt_log(dkt::k_log_info,    __VA_ARGS__); }
 # define DKT_LOG_WARNING(flags, ...) if (flags & dkt::log_flags) { dkt_log(dkt::k_log_warning, __VA_ARGS__); }
@@ -71,4 +70,4 @@ namespace dkt {
 # define DKT_LOG_INITIAL_FINAL(...) DKT_LOG_INFO(dkt::k_log_initial_final, __VA_ARGS__)
 # define DKT_LOG_TRACE_RUNTIME(...) DKT_LOG_INFO(dkt::k_log_trace_runtime, __VA_ARGS__)
 
-# endif // dkt_dakota_log_hh
+# endif // dkt-dakota-log-hh

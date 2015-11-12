@@ -40,8 +40,8 @@ class finally {
 // }
 
 # define DKT_CATCH_BEGIN(e) catch (object_t e) { if (0) {}
-# define DKT_CATCH(k, e)    else if (dk::instancex3f(e, k)) // dk::instance?(i, k)
+# define DKT_CATCH(k, e)    else if (dk::instance3f(e, k)) // dk::instance?(e, k)
 # define DKT_CATCH_END(e)   else { throw; } }
-# define DKT_FINALLY(block) finally __finally([&] block)
+# define DKT_FINALLY(block) finally _finally_([&] block)
 
 # endif

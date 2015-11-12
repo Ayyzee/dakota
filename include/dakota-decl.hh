@@ -61,7 +61,7 @@
 
 typedef bool boole_t;
 
-typedef          char  char8_t; // may be signed or unsigned (same with wchar_t)
+typedef          char  char8_t; // may be signed or unsigned (same with wchar-t)
 typedef   signed char schar8_t;
 typedef unsigned char uchar8_t;
 
@@ -85,8 +85,8 @@ typedef long double float128_t;
 
 namespace symbol { typedef char8_t const* slots_t; } typedef symbol::slots_t symbol_t;
 
-static_assert(32/8  == sizeof(float32_t),  "The sizeof float32_t  must equal  32/8 bytes in size");
-static_assert(64/8  == sizeof(float64_t),  "The sizeof float64_t  must equal  64/8 bytes in size");
-static_assert(128/8 == sizeof(float128_t), "The sizeof float128_t must equal 128/8 bytes in size");
+static_assert(32/8  == sizeof(float32_t),  "The sizeof float32-t  must equal  32/8 bytes in size");
+static_assert(64/8  == sizeof(float64_t),  "The sizeof float64-t  must equal  64/8 bytes in size");
+static_assert(128/8 == sizeof(float128_t), "The sizeof float128-t must equal 128/8 bytes in size");
 
 # endif

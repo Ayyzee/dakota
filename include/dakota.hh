@@ -20,11 +20,11 @@
 # include <cstddef>
 # include <cstdlib>
 # include <cstdio>
-# include <cstdarg> // va_list
+# include <cstdarg> // va-list
 # include <cstdint>
 # include <cstring> // memcpy()
 # include <cxxabi.h>
-# include <new> // std::bad_alloc
+# include <new> // std::bad-alloc
 
 # define DKT_MEM_MGMT_MALLOC 0
 # define DKT_MEM_MGMT_NEW    1
@@ -100,7 +100,7 @@ namespace dkt {
 # define sentinel            gnu::sentinel
 # define unused              gnu::unused
 
-# define THREAD_LOCAL __thread // bummer that clang does not support thread_local on darwin
+# define THREAD_LOCAL __thread // bummer that clang does not support thread-local on darwin
 
 # define unbox_attrs gnu::pure,gnu::hot,gnu::nothrow
 
@@ -115,8 +115,8 @@ namespace dkt {
 # define cast(t) (t)
 # define DK_COUNTOF(array) (sizeof((array))/sizeof((array)[0]))
 
-// template <typename T, size_t N>
-// constexpr size_t dk_countof(T(&)[N]) {
+// template <typename T, size-t N>
+// constexpr size-t dk-countof(T(&)[N]) {
 //   return N;
 // }
 # if !defined USE
@@ -196,8 +196,8 @@ constexpr auto dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 [[so_export]] auto dkt_register_info(named_info_t*) -> void;
 [[so_export]] auto dkt_deregister_info(named_info_t*) -> void;
 
-// [[so_export]]              auto dk_va_add_all(object_t self, va_list_t) -> object_t;
-// [[so_export]] [[sentinel]] auto dk_add_all(object_t self, ...) -> object_t;
+// [[so-export]]              auto dk-va-add-all(object-t self, va-list-t) -> object-t;
+// [[so-export]] [[sentinel]] auto dk-add-all(object-t self, ...) -> object-t;
 
 [[so_export]] auto dk_register_klass(named_info_t* klass_info) -> object_t;
 [[so_export]] auto dk_init_runtime() -> void;
@@ -214,7 +214,7 @@ constexpr auto dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 
 [[debug_so_export]] auto dkt_dump_named_info(named_info_t* info) -> named_info_t*;
 
-//#define DKT_NULL_METHOD nullptr
+//#define DKT-NULL-METHOD nullptr
 # define DKT_NULL_METHOD cast(method_t)dkt_null_method
 
 [[so_export]] [[noreturn]] auto dkt_null_method(object_t object, ...) -> void;
@@ -236,4 +236,4 @@ constexpr auto dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 
 [[debug_so_export]] auto dkt_unbox_check(object_t object, object_t kls) -> void;
 
-# endif // dkt_dakota_hh
+# endif // dkt-dakota-hh
