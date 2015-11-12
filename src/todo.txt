@@ -88,6 +88,8 @@ not generate a box that won't compile
 add null/#std{in,out,err}/#false/#true to the readonly pages
 
 check sorted order of named-info/property data structures in rt/*.cc
+if not need be sorted, maybe convert from a named-info-t seq to a regular named-info-t
+which is sorted, and with no sentinal.
 
 fix padding for rt/*.cc imported-klasses[]
 
@@ -106,7 +108,7 @@ consider := operator like Dylan (it calls the setter func)?
 
 swap order of args to super {klass, self} or {klass(self), self}
 
-allow supply to supply ONE argument (which default to self)
+allow super to supply ONE argument (which default to self)
   super(self) is shorthand for super (which converts to super(self=self, klass=klass)
 
 to the macro system add the notion of a zero-width statement boundry ( for example \{|\}|; )
@@ -195,4 +197,8 @@ Consider the name of a klass (or trait) is within the klass' (or traits') scope;
 
 convert symbol-from-addr() and related code to a dladdr() compatible interface to be used when dladdr() is missing.
 
+nested klass/traits defns (i.e. inner klasses/traits)?
+
 sysconf(_SC_PAGE_SIZE)
+
+use .name = <> for all generated struct instances
