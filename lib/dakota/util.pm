@@ -128,7 +128,7 @@ sub encode_comments {
     #$$filestr_ref =~ s|(/\*)(.*?)(\*/)|&encode_comments3($1, $2, $3)|egs;
 
   $$filestr_ref =~ s|(//.*?)$|&remove_non_newlines($1)|egm;
-  $$filestr_ref =~ s|(/\*.*?\*/)|&remove_non_newlines($1)|egs;
+  $$filestr_ref =~ s|(/\*.*?\*/)|' ' . &remove_non_newlines($1)|egs;
 }
 sub encode_strings {
   my ($filestr_ref) = @_;
