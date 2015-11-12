@@ -500,9 +500,9 @@ sub generate_defn_footer {
     $col = &colin($col);
     $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
-      $rt_cc_str .= $col . "{ cast(uintptr-t)&$klass_name\::klass, nullptr },\n";
+      $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(uintptr-t)&$klass_name\::klass },\n";
     }
-    $rt_cc_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
+    $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(uintptr-t)nullptr }\n";
     $col = &colout($col);
     $rt_cc_str .= $col . "};\n";
     $rt_cc_str .= &linkage_unit::generate_strs_seq($file);
@@ -1348,10 +1348,10 @@ sub generics::generate_selector_seq {
       my $name_width = length($name);
       my $name_pad = ' ' x ($max_name_width - $name_width);
       $scratch_str .=
-        $col . "{ (cast(dkt-selector-func-t)(cast($method_type) " .
-        $pad . "__selector::va::$name" . $name_pad . "))(), nullptr },\n";
+        $col . "{ .next = nullptr, .key = (cast(dkt-selector-func-t)(cast($method_type) " .
+        $pad . "__selector::va::$name" . $name_pad . "))() },\n";
     }
-    $scratch_str .= $col . "{ nullptr, nullptr },\n";
+    $scratch_str .= $col . "{ .next = nullptr, .key = nullptr },\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
@@ -1385,11 +1385,11 @@ sub generics::generate_selector_seq {
         my $name_width = length($name);
         my $name_pad = ' ' x ($max_name_width - $name_width);
         $scratch_str .=
-          $col . "{ (cast(dkt-selector-func-t)(cast($method_type) " .
-          $pad . "__selector::$name" . $name_pad . "))(), nullptr }," . $in . "\n";
+          $col . "{ .next = nullptr, .key = (cast(dkt-selector-func-t)(cast($method_type) " .
+          $pad . "__selector::$name" . $name_pad . "))() }," . $in . "\n";
       }
     }
-    $scratch_str .= $col . "{ nullptr, nullptr },\n";
+    $scratch_str .= $col . "{ .next = nullptr, .key = nullptr },\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
@@ -4265,7 +4265,7 @@ sub generate_property_tbl {
     }
     my $in1 = &ident_comment($key, 1);
     my $in2 = &ident_comment($element, 1);
-    $result .= $col . "{ $key, " . $pad . "cast(uintptr-t)$element }," . $in1 . $in2 . "\n";
+    $result .= $col . "{ .key = $key, " . $pad . ".element = cast(uintptr-t)$element }," . $in1 . $in2 . "\n";
   }
   $col = &colout($col);
   $result .= $col . "};";
@@ -4275,14 +4275,14 @@ sub generate_info {
   my ($name, $tbl, $col, $symbols, $line) = @_;
   my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, $line);
   $result .= "\n";
-  $result .= $col . "static named-info-t $name = { $name-props, DK-COUNTOF($name-props), nullptr };" . &ann(__FILE__, $line) . "\n";
+  $result .= $col . "static named-info-t $name = { .next = nullptr, .count = DK-COUNTOF($name-props), .elements = $name-props };" . &ann(__FILE__, $line) . "\n";
   return $result;
 }
 sub generate_info_seq {
   my ($name, $seq, $col, $line) = @_;
   my $result = '';
 
-  $result .= $col . "static named-info-t $name\[] = {" . &ann(__FILE__, $line) . " //ro-data\n";
+  $result .= $col . "static named-info-t $name\[] = {" . &ann(__FILE__, $line) . " //rw-data (.next)\n";
   $col = &colin($col);
 
   my $max_width = 0;
@@ -4295,9 +4295,9 @@ sub generate_info_seq {
   foreach my $element (@$seq) {
     my $width = length($element);
     my $pad = ' ' x ($max_width - $width);
-    $result .= $col . "{ $element, " . $pad . "DK-COUNTOF($element), " . $pad . "nullptr },\n";
+    $result .= $col . "{ .next = nullptr, .count = DK-COUNTOF($element), " . $pad . ".elements = $element },\n";
   }
-  $result .= $col . "{ nullptr, 0, nullptr }\n";
+  $result .= $col . "{ .next = nullptr, .count = 0, .elements = nullptr }\n";
   $col = &colout($col);
   $result .= $col . "};";
   return $result;
