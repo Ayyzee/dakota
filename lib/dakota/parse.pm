@@ -498,6 +498,9 @@ sub add_generic {
 }
 sub add_symbol_ident {
   my ($file, $ident) = @_;
+  if ($ident !~ m/^#/) {
+    $ident = '#' . $ident;
+  }
   $$file{'symbols'}{$ident} = undef;
 }
 sub add_symbol {
@@ -521,6 +524,9 @@ sub add_hash {
 sub add_keyword {
   my ($file, $keyword) = @_;
   my $ident = &path::string([$keyword]);
+  if ($ident !~ m/^#/) {
+    $ident = '#' . $ident;
+  }
   $$file{'keywords'}{$ident} = undef;
   &add_symbol($file, [$keyword]);
 }
@@ -1939,7 +1945,7 @@ sub generics::parse {
     }
     foreach my $arg (@{$$generic{'keyword-types'} ||= []}) {
       &add_type([$arg]);
-      $$symbols{$$arg{'name'}} = [$$arg{'name'}];
+      &add_symbol($gbl_root, ['#' . $$arg{'name'}]);
     }
   }
   my $sorted_generics_seq = [sort method::compare @$generics_seq];
@@ -2168,7 +2174,7 @@ sub rep_tree_from_dk_path {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\bcase\s*\#(.*)\s*:/g) {
+  while (m/\bcase\s*(\#.*)\s*:/g) {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;

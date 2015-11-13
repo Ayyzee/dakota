@@ -3935,7 +3935,9 @@ sub dk_generate_imported_klasses_info {
 sub add_symbol_to_ident_symbol {
   my ($file_symbols, $symbols, $symbol) = @_;
   if (defined $symbol) {
+    $symbol =~ s/^#//;
     my $ident_symbol = &dk_mangle($symbol);
+    $symbol = '#' . $symbol;
     $$file_symbols{$symbol} = $ident_symbol;
     $$symbols{$symbol} = $ident_symbol;
   }
@@ -3989,6 +3991,7 @@ sub linkage_unit::generate_symbols {
   my $scratch_str = "";
   my $max_width = 0;
   foreach my $symbol (@$symbol_keys) {
+    $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     if ($width > $max_width) {
@@ -3999,6 +4002,7 @@ sub linkage_unit::generate_symbols {
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
   while (my ($ln, $symbol) = each @$symbol_keys) {
+    $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
@@ -4038,6 +4042,7 @@ sub linkage_unit::generate_hashes {
     $col = &colin($col);
     my $num_lns = @$symbol_keys;
     while (my ($ln, $symbol) = each @$symbol_keys) {
+      $symbol =~ s/^#//;
       my $ident = &dk_mangle($symbol);
       my $width = length($ident);
       my $pad = ' ' x ($max_width - $width);
@@ -4070,6 +4075,7 @@ sub linkage_unit::generate_keywords {
   my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
+    $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     if ($width > $max_width) {
@@ -4082,6 +4088,7 @@ sub linkage_unit::generate_keywords {
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
   while (my ($ln, $symbol) = each @$symbol_keys) {
+    $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
