@@ -934,7 +934,7 @@ sub convert_dk_to_cc {
   &rewrite_literal_ints($filestr_ref);
   &rewrite_literal_strs($filestr_ref);
   &encode_strings($filestr_ref);
-  &encode_comments($filestr_ref);
+  my $parts = &encode_comments($filestr_ref);
 
   $$filestr_ref =~ s/\$/dk::/g;
 
@@ -1013,7 +1013,7 @@ sub convert_dk_to_cc {
   $$filestr_ref =~ s/,(\s*\})/$1/gs; # remove harmless trailing comma
   $$filestr_ref =~ s|;;|;|g;
 
-  &decode_comments($filestr_ref);
+  &decode_comments($filestr_ref, $parts);
   &decode_strings($filestr_ref);
   return $filestr_ref;
 }

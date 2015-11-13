@@ -122,13 +122,43 @@ sub remove_non_newlines {
   $result =~ s|[^\n]+||gs;
   return $result;
 }
+sub tear {
+  my ($filestr, $tbl) = @_;
+  foreach my $line (split /\n/, $filestr) {
+    if ($line =~ m|^(.*?)(\s*//.*)?$|m) {
+      $$tbl{'src'} .= $1 . "\n";
+      if ($2) {
+        $$tbl{'src-comments'} .= $2;
+      }
+      $$tbl{'src-comments'} .= "\n";
+    } else {
+      die "$!";
+    }
+  }
+}
+sub mend {
+  my ($filestr_ref, $tbl) = @_;
+  my $result = '';
+  my $src_lines = [split /\n/, $$filestr_ref];
+  my $src_comment_lines = [split /\n/, $$tbl{'src-comments'}];
+  #if (scalar(@$src_lines) != scalar(@$src_comment_lines) ) {
+  #  print "warning: mend: src-lines = " . scalar(@$src_lines) . ", src-comment-lines = " . scalar(@$src_comment_lines) . "\n";
+  #}
+  for (my $i = 0; $i < scalar(@$src_lines); $i++) {
+    $result .= $$src_lines[$i];
+    if (defined $$src_comment_lines[$i]) {
+      $result .= $$src_comment_lines[$i];
+    }
+    $result .= "\n";
+  }
+  return $result;
+}
 sub encode_comments {
   my ($filestr_ref) = @_;
-    #$$filestr_ref =~ s|(//)(.*?)(\n)|&encode_comments3($1, $2, $3)|egs;
-    #$$filestr_ref =~ s|(/\*)(.*?)(\*/)|&encode_comments3($1, $2, $3)|egs;
-
-  $$filestr_ref =~ s|(//.*?)$|&remove_non_newlines($1)|egm;
-  $$filestr_ref =~ s|(/\*.*?\*/)|' ' . &remove_non_newlines($1)|egs;
+  my $tbl = { 'src' => '', 'src-comments' => '' };
+  &tear($$filestr_ref, $tbl);
+  $$filestr_ref = $$tbl{'src'};
+  return $tbl;
 }
 sub encode_strings {
   my ($filestr_ref) = @_;
@@ -140,8 +170,8 @@ sub encode_strings {
   $$filestr_ref =~ s|($sqstr)|&encode_strings1($1)|eg;
 }
 sub decode_comments {
-  my ($filestr_ref) = @_;
-  #$$filestr_ref =~ s{$ENCODED_COMMENT_BEGIN([A-Za-z0-9]*)$ENCODED_COMMENT_END}{pack('H*',$1)}gseo;
+  my ($filestr_ref, $tbl) = @_;
+  $$filestr_ref = &mend($filestr_ref, $tbl);
 }
 sub decode_strings {
   my ($filestr_ref) = @_;

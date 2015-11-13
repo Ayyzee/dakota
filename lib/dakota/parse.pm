@@ -2141,7 +2141,7 @@ sub rep_tree_from_dk_path {
     &add_str($gbl_root, $1);
   }
   &encode_strings(\$_);
-  &encode_comments(\$_);
+  my $parts = &encode_comments(\$_);
 
   $_ =~ s/\$/dk::/g;
 
@@ -2175,7 +2175,7 @@ sub rep_tree_from_dk_path {
   while (m/(?<!\bcase)\s*\#($mid)/g) {
     &add_symbol($gbl_root, [$1]);
   }
-  &decode_comments(\$_);
+  &decode_comments(\$_, $parts);
   &decode_strings(\$_);
 
   $gbl_sst = &sst::make($_, $gbl_filename);
