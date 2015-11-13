@@ -65,6 +65,7 @@ so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
 
 EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG # debug flags
+#EXTRA_CXXFLAGS += -MMD -MP
 
 ifdef DKT_PROFILE
   DAKOTA ?= DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota-profile --define-macro DK_ENABLE_TRACE_MACROS=1 --define-macro $(HOST_OS)
