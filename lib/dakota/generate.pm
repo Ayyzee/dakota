@@ -2230,7 +2230,7 @@ sub linkage_unit::generate_klasses_body {
                 if ($$method{'is-inline'}) {
                   #$$scratch_str_ref .= 'INLINE ';
                 }
-                $$scratch_str_ref .= $col . "$klass_type $klass_name { METHOD " . $visibility . " $other_method_decl; }" . &ann(__FILE__, __LINE__, "stmt3") . "\n";
+                $$scratch_str_ref .= $col . "$klass_type $klass_name { METHOD " . $visibility . "$other_method_decl; }" . &ann(__FILE__, __LINE__, "stmt3") . "\n";
               }
             }
           }
@@ -2849,27 +2849,27 @@ sub method::type {
     $return_type_str = &arg::type($return_type);
   }
   my $arg_type_list = &arg_type::list_types($$method{'parameter-types'});
-  return "$return_type_str(*)($$arg_type_list)";
+  return "auto (*)($$arg_type_list) -> $return_type_str";
 }
 sub method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &arg_type::list_types($$method{'parameter-types'});
   my $name = &dakota::util::last($$method{'name'});
-  return "$return_type(*$name)($$arg_type_list)";
+  return "auto (*$name)($$arg_type_list) -> $return_type";
 }
 sub kw_args_method::type {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
-  return "$return_type(*)($$arg_type_list)";
+  return "auto (*)($$arg_type_list) -> $return_type";
 }
 sub kw_args_method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
   my $name = &dakota::util::last($$method{'name'});
-  return "$return_type(*$name)($$arg_type_list)";
+  return "auto (*$name)($$arg_type_list) -> $return_type";
 }
 sub slots_signature_body {
   my ($klass_name, $methods, $col) = @_;
