@@ -201,4 +201,4 @@ nested klass/traits defns (i.e. inner klasses/traits)?
 
 sysconf(_SC_PAGE_SIZE)
 
-use .name = <> for all generated struct instances
+move get-segment-data() to own header only used by rt-cc
