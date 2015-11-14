@@ -1,0 +1,47 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+klass boole;
+klass input-stream;
+klass null-singleton;
+klass output-stream;
+
+// singleton null {}
+// //=>
+// klass null-singleton { klass singleton-klass; }
+// instance null    of klass null-singleton;
+
+// instance <qual-name> of klass <qual-ident> [ { ... } ] ;
+// or
+// instance <qual-name> of <qual-ident>::klass [ { ... } ] ;
+
+instance null       of klass null-singleton;
+instance #false     of klass boole          { *unbox(self) = false;  };
+instance #true      of klass boole          { *unbox(self) = true;   };
+instance std-input  of klass input-stream   { *unbox(self) = stdin;  };
+instance std-output of klass output-stream  { *unbox(self) = stdout; };
+instance std-error  of klass output-stream  { *unbox(self) = stderr; };
+
+// =>
+
+{
+  { &null,                     #null-singleton, nullptr },
+  { &__instance::_false_,      #boole,          [] (object-t self) -> void { *boole::unbox(self) = false;          } },
+  { &__instance::_true_,       #boole,          [] (object-t self) -> void { *boole::unbox(self) = true;           } },
+  { &__instance::_std-input_,  #input-stream,   [] (object-t self) -> void { *input-stream::unbox(self) =  stdin;  } },
+  { &__instance::_std-output_, #output-stream,  [] (object-t self) -> void { *output-stream::unbox(self) = stdout; } },
+  { &__instance::_std-error_,  #output-stream,  [] (object-t self) -> void { *output-stream::unbox(self) = stderr; } },
+}
