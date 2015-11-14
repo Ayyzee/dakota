@@ -199,3 +199,21 @@ nested klass/traits defns (i.e. inner klasses/traits)?
 sysconf(_SC_PAGE_SIZE)
 
 move get-segment-data() to own header only used by rt-cc
+
+when rewriting ...
+dynamically generate a pattern for each symbol in __symbol to replace the unneccessary
+explicit use of dk-intern()
+for example
+  { dk-intern ( "strings" ) } => { #strings }
+which will later be rewritten to
+ __symbol :: _strings_
+It might be possible to generate a function-like macro where the double quoted string and the symbol syntax
+are variable and the user just passes in a list of compile-time known symbols
+
+0 == symbol::compare(a, b)
+or
+0 != symbol::compare(a, b)
+can be replaced
+a == b
+or
+a != b

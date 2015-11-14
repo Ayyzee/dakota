@@ -28,20 +28,72 @@ klass output-stream;
 // or
 // instance <qual-name> of <qual-ident>::klass [ { ... } ] ;
 
-instance null       of klass null-singleton;
-instance #false     of klass boole          { *unbox(self) = false;  };
-instance #true      of klass boole          { *unbox(self) = true;   };
-instance std-input  of klass input-stream   { *unbox(self) = stdin;  };
-instance std-output of klass output-stream  { *unbox(self) = stdout; };
-instance std-error  of klass output-stream  { *unbox(self) = stderr; };
+instance null       { return make(null-singleton::klass); }
+instance #false     { return make(boole::klass, #slots : false);  };
+instance #true      { return make(boole::klass, #slots : true);   };
+instance std-input  { return make(input-stream::klass,  #slots : stdin);  };
+instance std-output { return make(output-stream::klass, #slots : stdout); };
+instance std-error  { return make(output-stream::klass, #slots : stderr); };
 
-// =>
+// defn for export
 
-{
-  { &null,                     #null-singleton, nullptr },
-  { &__instance::_false_,      #boole,          [] (object-t self) -> void { *boole::unbox(self) = false;          } },
-  { &__instance::_true_,       #boole,          [] (object-t self) -> void { *boole::unbox(self) = true;           } },
-  { &__instance::_std-input_,  #input-stream,   [] (object-t self) -> void { *input-stream::unbox(self) =  stdin;  } },
-  { &__instance::_std-output_, #output-stream,  [] (object-t self) -> void { *output-stream::unbox(self) = stdout; } },
-  { &__instance::_std-error_,  #output-stream,  [] (object-t self) -> void { *output-stream::unbox(self) = stderr; } },
+{ // ro-data
+  // name (for lookup)
+  { #null,              [] () -> object-t { return make(null-singleton::klass); } },
+  { dk-intern("false"), [] () -> object-t { return make(boole::klass, #slots : false); } },
+  { dk-intern("true"),  [] () -> object-t { return make(boole::klass, #slots : true);  } },
+  { #std-input,         [] () -> object-t { return make(input-stream::klass,  #slots : stdin);  } },
+  { #std-output,        [] () -> object-t { return make(output-stream::klass, #slots : stdout); } },
+  { #std-error,         [] () -> object-t { return make(output-stream::klass, #slots : stderr); } },
 }
+// AND
+{ // rw-data
+  &null,
+  &__instance::_false_,
+  &__instance::_true_,
+  &std-input,
+  &std-output,
+  &std-error,
+}
+
+// decl for import
+
+{ array of names } // ro-data
+// AND
+{ array of ptrs } // rw-data
+
+klass named-instance-defn-func {
+  slots (*)() -> object-t;
+}
+klass named-instance-defn {
+  slots { // ro-only
+    symbol-t                   name;
+    named-instance-defn-func-t func;
+  }
+}
+klass ptr-node {
+  slots {
+    ptr-t       ptr;
+    ptr-node-t* next;
+  }
+}
+// example: export 2, import 3
+
+static ptr-node-t named-instance-ptrs[] = {
+  { &aa, nullptr }, // #aa
+  { &bb, nullptr }, // #bb
+  { &cc, nullptr }, // #cc
+  { &dd, nullptr }, // #dd (only if defining SO also imports it)
+  { &ee, nullptr }, // #ee (only if defining SO also imports it)
+};
+static symbol-t const* named-instance-names[] = {
+  #aa,
+  #bb,
+  #cc,
+  //#dd,
+  //#ee,
+};
+static named-instance-defn-t named-instance-defns[] {
+  #dd, []() { return make(...); }
+  #ee, []() { return make(...); }
+};
