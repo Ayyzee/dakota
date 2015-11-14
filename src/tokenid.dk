@@ -27,7 +27,7 @@ klass tokenid {
     return self;
   }
   method str-from(slots-t s, char8-t* str, uint32-t len) -> str-t {
-    //#if LITTLE-ENDIAN
+    //# if LITTLE-ENDIAN
     if (128 > s) {
       assert(1 <= len);
       str[0] = cast(char8-t)s;
@@ -42,8 +42,8 @@ klass tokenid {
       if (4 + (1) <= len)
         str[4] = NUL;
     }
-    //#else
-    //#endif
+    //# else
+    //# endif
     return str;
   }
 }

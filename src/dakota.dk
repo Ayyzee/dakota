@@ -343,10 +343,10 @@ static auto json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type);
       if (0 == symbol::compare(#klass, type))
         klasses-count++;
-      signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method-signatures);
+      signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method.signatures);
 
       if (nullptr != method-signatures) {
-        method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method-addresses);
+        method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method.addresses);
         uint32-t j = 0;
         signature-t const* method-signature;
         while (nullptr != (method-signature = method-signatures[j])) {
@@ -388,12 +388,12 @@ static auto json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
       if (nullptr != superklass-name)
         ostream::println-format(ostrm, "'superklass' : '%s',\n", superklass-name);
       
-      signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method-signatures);
+      signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method.signatures);
       if (nullptr != method-signatures) {
         ostream::println-format(ostrm, "'methods' :\n");
         ostream::println-format(ostrm, "{\n");
         ostream::col-incr(ostrm);
-        method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method-addresses);
+        method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method.addresses);
         uint32-t j = 0;
         signature-t const* method-signature;
         
@@ -474,10 +474,10 @@ static auto each(named-info-t* root-info-list, named-info-func-t func, ptr-t use
   return;
 }
 static auto each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #strs);
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str);
   if (assocs) {
-    symbol-t* names =    cast(symbol-t*)named-info::at(info, #str-names);
-    str-t*    literals = cast(str-t*)   named-info::at(info, #str-literals);
+    symbol-t* names =    cast(symbol-t*)named-info::at(info, #str.names);
+    str-t*    literals = cast(str-t*)   named-info::at(info, #str.literals);
     assert(nullptr != literals);
     uint32-t i = 0;
     while (1) {
@@ -495,10 +495,10 @@ static auto each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
   }
 }
 static auto each-int(named-info-t* info, object-t (*box)(uintptr-t)) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #ints);
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int);
   if (assocs) {
-    symbol-t*  names =    cast(symbol-t*) named-info::at(info, #int-names);
-    uintptr-t* literals = cast(uintptr-t*)named-info::at(info, #int-literals);
+    symbol-t*  names =    cast(symbol-t*) named-info::at(info, #int.names);
+    uintptr-t* literals = cast(uintptr-t*)named-info::at(info, #int.literals);
     assert(nullptr != literals);
     uint32-t i = 0;
     while (1) {
@@ -855,10 +855,10 @@ static auto dump-module-description(ostream-t ostrm, named-info-t* registration-
       named-info-t*             slots-info =                     cast(named-info-t*)            named-info::at(klass-info, #slots-info);
       symbol-t                  slots-type =                     cast(symbol-t)                 named-info::at(klass-info, #slots-type);
 
-      signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info::at(klass-info, #method-signatures);
-      //signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info::at(klass-info, #va-method-signatures);
-      //signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info::at(klass-info, #slots-method-signatures);
-      //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #va-slots-method-signatures);
+      signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info::at(klass-info, #method.signatures);
+      //signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info::at(klass-info, #va-method.signatures);
+      //signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info::at(klass-info, #slots-method.signatures);
+      //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #va-slots-method.signatures);
       //signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
 
       if (nullptr == modulee) {
@@ -997,22 +997,22 @@ auto dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
   symbol-t const*           traits =                         cast(symbol-t const*)          named-info::at(klass-info, #traits);
   symbol-t const*           requires =                       cast(symbol-t const*)          named-info::at(klass-info, #requires);
   symbol-t const*           provides =                       cast(symbol-t const*)          named-info::at(klass-info, #provides);
-  signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info::at(klass-info, #method-signatures);
+  signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info::at(klass-info, #method.signatures);
   signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
-  signature-t const* const* exported-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #exported-method-signatures);
-  signature-t const* const* exported-slots-method-signatures = cast(signature-t const* const*)named-info::at(klass-info, #exported-slots-method-signatures);
-  signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info::at(klass-info, #slots-method-signatures);
-  //signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info::at(klass-info, #va-method-signatures);
-  //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #va-slots-method-signatures);
+  signature-t const* const* exported-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #exported-method.signatures);
+  signature-t const* const* exported-slots-method-signatures = cast(signature-t const* const*)named-info::at(klass-info, #exported-slots-method.signatures);
+  signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info::at(klass-info, #slots-method.signatures);
+//signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info::at(klass-info, #va-method.signatures);
+//signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #va-slots-method.signatures);
   named-enum-info-t const*  enum-info =                      cast(named-enum-info-t const*) named-info::at(klass-info, #enum-info);
   const-info-t const*       const-info =                     cast(const-info-t const*)      named-info::at(klass-info, #const-info);
   str-t                     slots-type =                     cast(str-t)                    named-info::at(klass-info, #slots-type);
   str-t                     enum-base =                      cast(str-t)                    named-info::at(klass-info, #enum-base);
   named-info-t*             slots-info =                     cast(named-info-t*)            named-info::at(klass-info, #slots-info);
-//     method-t const* method-addresses =          cast(method-t*)named-info::at(klass-info, #method-addresses);
-//     method-t const* va-method-addresses =       cast(method-t*)named-info::at(klass-info, #va-method-addresses);
-//     method-t const* slots-method-addresses =    cast(method-t*)named-info::at(klass-info, #slots-method-addresses);
-//     method-t const* va-slots-method-addresses = cast(method-t*)named-info::at(klass-info, #va-slots-method-addresses);
+//     method-t const* method-addresses =          cast(method-t*)named-info::at(klass-info, #method.addresses);
+//     method-t const* va-method-addresses =       cast(method-t*)named-info::at(klass-info, #va-method.addresses);
+//     method-t const* slots-method-addresses =    cast(method-t*)named-info::at(klass-info, #slots-method.addresses);
+//     method-t const* va-slots-method-addresses = cast(method-t*)named-info::at(klass-info, #va-slots-method.addresses);
 
   assert(nullptr != type);
   assert(nullptr != name);
@@ -1197,32 +1197,32 @@ klass get-segment-data {
 }
 klass registration-info {
   slots {
-    signature-t**      signatures-va;
-    signature-t**      signatures;
-    selector-node-t*   selectors-va;
-    selector-node-t*   selectors;
-    symbol-t*          imported-klasses-names;
-    assoc-node-t*      imported-klasses;
-    named-info-t*      klass-defns;
-    property-t*        interposers;
     str-t              dir;
-    symbol-t           name;
     get-segment-data-t get-segment-data;
+    symbol-t*          imported-klass-names;
+    assoc-node-t*      imported-klass-ptrs;
+    property-t*        interposers;
+    named-info-t*      klass-defns;
+    symbol-t           name;
+    selector-node-t*   selectors;
+    signature-t**      signatures;
+    selector-node-t*   va-selectors;
+    signature-t**      va-signatures;
   }
 }
 static auto named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) -> void {
   *ri = {
-    .signatures-va =          cast(decltype(ri->signatures-va))          named-info::at(ni, #signatures-va),
-    .signatures =             cast(decltype(ri->signatures))             named-info::at(ni, #signatures),
-    .selectors-va =           cast(decltype(ri->selectors-va))           named-info::at(ni, #selectors-va),
-    .selectors =              cast(decltype(ri->selectors))              named-info::at(ni, #selectors),
-    .imported-klasses-names = cast(decltype(ri->imported-klasses-names)) named-info::at(ni, #imported-klasses-names),
-    .imported-klasses =       cast(decltype(ri->imported-klasses))       named-info::at(ni, #imported-klasses),
-    .klass-defns =            cast(decltype(ri->klass-defns))            named-info::at(ni, #klass-defns),
-    .interposers =            cast(decltype(ri->interposers))            named-info::at(ni, #interposers),
     .dir =                    cast(decltype(ri->dir))                    named-info::at(ni, #dir),
-    .name =                   cast(decltype(ri->name))                   named-info::at(ni, #name),
     .get-segment-data =       cast(decltype(ri->get-segment-data))       named-info::at(ni, #get-segment-data),
+    .imported-klass-names =   cast(decltype(ri->imported-klass-names))   named-info::at(ni, #imported-klass.names),
+    .imported-klass-ptrs =    cast(decltype(ri->imported-klass-ptrs))    named-info::at(ni, #imported-klass.ptrs),
+    .interposers =            cast(decltype(ri->interposers))            named-info::at(ni, #interposers),
+    .klass-defns =            cast(decltype(ri->klass-defns))            named-info::at(ni, #klass-defns),
+    .name =                   cast(decltype(ri->name))                   named-info::at(ni, #name),
+    .selectors =              cast(decltype(ri->selectors))              named-info::at(ni, #selectors),
+    .signatures =             cast(decltype(ri->signatures))             named-info::at(ni, #signatures),
+    .va-selectors =           cast(decltype(ri->va-selectors))           named-info::at(ni, #va-selectors),
+    .va-signatures =          cast(decltype(ri->va-signatures))          named-info::at(ni, #va-signatures),
   };
   return;
 }
@@ -1232,15 +1232,15 @@ auto register-info-common(named-info-t* ni, ptr-t user-data) -> void { USE(user-
 
   assert((nullptr == ri.signatures    && nullptr == ri.selectors   ) ||
          (nullptr != ri.signatures    && nullptr != ri.selectors   ));
-  assert((nullptr == ri.signatures-va && nullptr == ri.selectors-va) ||
-         (nullptr != ri.signatures-va && nullptr != ri.selectors-va));
+  assert((nullptr == ri.va-signatures && nullptr == ri.va-selectors) ||
+         (nullptr != ri.va-signatures && nullptr != ri.va-selectors));
 
-  if (nullptr != ri.signatures-va)
-    import-selectors(ri.signatures-va, ri.selectors-va);
+  if (nullptr != ri.va-signatures)
+    import-selectors(ri.va-signatures, ri.va-selectors);
   if (nullptr != ri.signatures)
     import-selectors(ri.signatures, ri.selectors);
-  if (nullptr != ri.imported-klasses)
-    import-klasses(ri.imported-klasses-names, ri.imported-klasses);
+  if (nullptr != ri.imported-klass-ptrs)
+    import-klasses(ri.imported-klass-names, ri.imported-klass-ptrs);
   if (nullptr != ri.klass-defns)
     export-klasses(ri.klass-defns);
   if (nullptr != ri.interposers)
@@ -1324,11 +1324,11 @@ static auto name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
     //printf("name: \"%s\"\n", ri.name);
 
     // imported-klasses
-    for (uint-t i = 0; nullptr != cast(object-t*)ri.imported-klasses[i].element; i++) {
-      if (cast(object-t*)ri.imported-klasses[i].element == cast(object-t*)addr) {
+    for (uint-t i = 0; nullptr != cast(object-t*)ri.imported-klass-ptrs[i].element; i++) {
+      if (cast(object-t*)ri.imported-klass-ptrs[i].element == cast(object-t*)addr) {
         info->fdir =  ri.dir;
         info->fname = ri.name;
-        info->sname = ri.imported-klasses-names[i];
+        info->sname = ri.imported-klass-names[i];
         return info;
       }
     }

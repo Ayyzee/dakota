@@ -586,8 +586,8 @@ klass klass {
         named-info-t* info = info-for-name(traits[pos - 1]);
         symbol-t const* used-traits = cast(symbol-t const*)named-info::at(info, #traits);
         add-traits(self, used-traits);
-        add-methods(self, info, #method-signatures, #method-addresses);
-        add-methods(self, info, #exported-method-signatures, #exported-method-addresses);
+        add-methods(self, info, #method.signatures, #method.addresses);
+        add-methods(self, info, #exported-method.signatures, #exported-method.addresses);
         pos--;
       }
     }
@@ -685,8 +685,8 @@ klass klass {
     alloc-methods(self, gbl-selectors-table.count);
     init-methods(self);
     add-traits(self, traits);
-    add-methods(self, self.info-slots, #method-signatures, #method-addresses);
-    add-methods(self, self.info-slots, #exported-method-signatures, #exported-method-addresses);
+    add-methods(self, self.info-slots, #method.signatures, #method.addresses);
+    add-methods(self, self.info-slots, #exported-method.signatures, #exported-method.addresses);
 
     if (nullptr != name) {
       assoc-node-t* imported-klasses = imported-klasses-for-klass(name);

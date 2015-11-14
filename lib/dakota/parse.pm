@@ -2181,6 +2181,10 @@ sub rep_tree_from_dk_path {
   while (m/(?<!\bcase)\s*\#($mid)/g) {
     &add_symbol($gbl_root, [$1]);
   }
+  pos $_ = 0;
+  while (m|(\#[\w\.:/-]+)|g) {
+    &add_symbol($gbl_root, [$1]);
+  }
   &decode_comments(\$_, $parts);
   &decode_strings(\$_);
 

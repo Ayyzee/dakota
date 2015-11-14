@@ -483,10 +483,10 @@ sub generate_defn_footer {
   my $keys_count;
   $keys_count = keys %{$$file{'klasses'}};
   if (0 == $keys_count) {
-    $rt_cc_str .= $col . "static assoc-node-t* imported-klasses = nullptr;\n";
-    $rt_cc_str .= $col . "static symbol-t const* imported-klasses-names = nullptr;\n";
+    $rt_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;\n";
+    $rt_cc_str .= $col . "static symbol-t const* imported-klass-names = nullptr;\n";
   } else {
-    $rt_cc_str .= $col . "static symbol-t imported-klasses-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
+    $rt_cc_str .= $col . "static symbol-t imported-klass-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     $col = &colin($col);
     my $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
@@ -496,7 +496,7 @@ sub generate_defn_footer {
     $col = &colout($col);
     $rt_cc_str .= $col . "};\n";
     ###
-    $rt_cc_str .= $col . "static assoc-node-t imported-klasses[] = {" . &ann(__FILE__, __LINE__) . " //rw-data\n";
+    $rt_cc_str .= $col . "static assoc-node-t imported-klass-ptrs[] = {" . &ann(__FILE__, __LINE__) . " //rw-data\n";
     $col = &colin($col);
     $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
@@ -514,31 +514,31 @@ sub generate_defn_footer {
   #$col = &colin($col);
 
   my $info_tbl = {
-                  "\#signatures-va" => 'signatures-va',
-                  "\#signatures" => 'signatures',
-                  "\#selectors-va" => 'selectors-va',
-                  "\#selectors" => 'selectors',
-                  "\#imported-klasses-names" => 'imported-klasses-names',
-                  "\#imported-klasses" => 'imported-klasses',
-                  "\#klass-defns" => 'klass-defns',
-                  "\#interposers" => 'interposers',
                   "\#date" => '__DATE__',
-                  "\#time" => '__TIME__',
-                  "\#file" => '__FILE__',
-                  "\#type" => $$file{'other'}{'type'},
                   "\#dir" => 'dir',
-                  "\#name" => 'name',
+                  "\#file" => '__FILE__',
                   "\#get-segment-data" => 'dkt-get-segment-data',
+                  "\#imported-klass.names" => 'imported-klass-names',
+                  "\#imported-klass.ptrs" =>  'imported-klass-ptrs',
+                  "\#interposers" => 'interposers',
+                  "\#klass-defns" => 'klass-defns',
+                  "\#name" => 'name',
+                  "\#selectors" =>  'selectors',
+                  "\#signatures" => 'signatures',
+                  "\#time" => '__TIME__',
+                  "\#type" => $$file{'other'}{'type'},
+                  "\#va-selectors" =>  'va-selectors',
+                  "\#va-signatures" => 'va-signatures',
                  };
   if (0 < scalar keys %{$$file{'literal-strs'}}) {
-    $$info_tbl{"\#str-literals"} = '__str-literals';
-    $$info_tbl{"\#str-names"} =    '__str-names';
-    $$info_tbl{"\#strs"} =         '__strs';
+    $$info_tbl{"\#str.literals"} = '__str-literals';
+    $$info_tbl{"\#str.names"} =    '__str-names';
+    $$info_tbl{"\#str"} =          '__str';
   }
   if (0 < scalar keys %{$$file{'literal-ints'}}) {
-    $$info_tbl{"\#int-literals"} = '__int-literals';
-    $$info_tbl{"\#int-names"} =    '__int-names';
-    $$info_tbl{"\#ints"} =         '__ints';
+    $$info_tbl{"\#int.literals"} = '__int-literals';
+    $$info_tbl{"\#int.names"} =    '__int-names';
+    $$info_tbl{"\#int"} =          '__int';
   }
   $rt_cc_str .= "\n";
   $rt_cc_str .= "# include <unistd.h>\n";
@@ -1259,9 +1259,9 @@ sub generics::generate_signature_seq {
   my $return_type = 'signature-t const*';
 
   if (0 == @$va_generics) {
-    $scratch_str .= $col . "static signature-t const* const* signatures-va = nullptr;\n";
+    $scratch_str .= $col . "static signature-t const* const* va-signatures = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static signature-t const* const signatures-va[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
+    $scratch_str .= $col . "static signature-t const* const va-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     my $max_width = 0;
     foreach $generic (sort method::compare @$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
@@ -1321,9 +1321,9 @@ sub generics::generate_selector_seq {
   my $return_type = "selector-t*";
 
   if (0 == @$va_generics) {
-    $scratch_str .= $col . "static selector-node-t* selectors-va = nullptr;\n";
+    $scratch_str .= $col . "static selector-node-t* va-selectors = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static selector-node-t selectors-va[] = {" . &ann(__FILE__, __LINE__) . " //rw-data\n";
+    $scratch_str .= $col . "static selector-node-t va-selectors[] = {" . &ann(__FILE__, __LINE__) . " //rw-data\n";
     $col = &colin($col);
     my $max_width = 0;
     my $max_name_width = 0;
@@ -1601,7 +1601,7 @@ sub generics::generate_generic_defns {
   #$$scratch_str_ref .= $col . "// generate_generic_defns()\n";
   my $generic;
   #$$scratch_str_ref .= "# if defined DKT-VA-GENERICS\n";
-  $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-object-t" . '-' . &suffix());
+  $$scratch_str_ref .= &labeled_src_str(undef, "va-generics-object-t" . '-' . &suffix());
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
@@ -1613,7 +1613,7 @@ sub generics::generate_generic_defns {
   }
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
-  $$scratch_str_ref .= &labeled_src_str(undef, "generics-va-super-t" . '-' . &suffix());
+  $$scratch_str_ref .= &labeled_src_str(undef, "va-generics-super-t" . '-' . &suffix());
   $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
@@ -3508,23 +3508,23 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#kw-args-method-signatures'} = '__kw-args-method-signatures';
   }
   if (values %{$$klass_scope{'methods'}}) {
-    $$tbbl{'#method-signatures'} = '__method-signatures';
-    $$tbbl{'#method-addresses'}  = '__method-addresses';
+    $$tbbl{'#method.signatures'} = '__method-signatures';
+    $$tbbl{'#method.addresses'}  = '__method-addresses';
   }
   if ($num_method_aliases) {
     $$tbbl{'#method-aliases'} = '&__method-aliases';
   }
   if (values %{$exported_methods ||= []}) {
-    $$tbbl{'#exported-method-signatures'} = '__exported-method-signatures';
-    $$tbbl{'#exported-method-addresses'}  = '__exported-method-addresses';
+    $$tbbl{'#exported-method.signatures'} = '__exported-method-signatures';
+    $$tbbl{'#exported-method.addresses'}  = '__exported-method-addresses';
   }
   if (values %{$exported_slots_methods ||= []}) {
-    $$tbbl{'#exported-slots-method-signatures'} = '__exported-slots-method-signatures';
-    $$tbbl{'#exported-slots-method-addresses'}  = '__exported-slots-method-addresses';
+    $$tbbl{'#exported-slots-method.signatures'} = '__exported-slots-method-signatures';
+    $$tbbl{'#exported-slots-method.addresses'}  = '__exported-slots-method-addresses';
   }
   if (@$va_list_methods) {
-    $$tbbl{'#va-method-signatures'} = '__va-method-signatures';
-    $$tbbl{'#va-method-addresses'}  = '__va-method-addresses';
+    $$tbbl{'#va-method.signatures'} = '__va-method-signatures';
+    $$tbbl{'#va-method.addresses'}  = '__va-method-addresses';
   }
   $token_seq = $$klass_scope{'interpose'};
   if ($token_seq) {
@@ -4133,8 +4133,8 @@ sub linkage_unit::generate_strs_seq {
   my $scratch_str = "";
   my $col = '';
   if (0 == scalar keys %{$$file{'literal-strs'}}) {
-    $scratch_str .= $col . "//static str-t const __str-literals[] = {};" . &ann(__FILE__, __LINE__) . " // ro-data\n";
-    $scratch_str .= $col . "//static object-t* __strs[] = {};" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "//static str-t const __str-literals[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $scratch_str .= $col . "//static object-t* __str[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // rw-data\n";
   } else {
     $scratch_str .= $col . "static str-t const __str-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
     $col = &colin($col);
@@ -4155,7 +4155,7 @@ sub linkage_unit::generate_strs_seq {
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
 
-    $scratch_str .= $col . "static assoc-node-t __strs[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "static assoc-node-t __str[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
     $col = &colin($col);
     foreach my $str (sort keys %{$$file{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
@@ -4190,8 +4190,8 @@ sub linkage_unit::generate_ints_seq {
   my $scratch_str = "";
   my $col = '';
   if (0 == scalar keys %{$$file{'literal-ints'}}) {
-    $scratch_str .= $col . "//static uintptr-t const __int-literals[] = {};" . &ann(__FILE__, __LINE__) . " // ro-data\n";
-    $scratch_str .= $col . "//static object-t* __ints[] = {};" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "//static uintptr-t const __int-literals[] = { 0 };" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $scratch_str .= $col . "//static object-t* __int[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // rw-data\n";
   } else {
     $scratch_str .= $col . "static uintptr-t const __int-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
     $col = &colin($col);
@@ -4212,7 +4212,7 @@ sub linkage_unit::generate_ints_seq {
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
 
-    $scratch_str .= $col . "static assoc-node-t __ints[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "static assoc-node-t __int[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
     $col = &colin($col);
     foreach my $int (sort keys %{$$file{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
