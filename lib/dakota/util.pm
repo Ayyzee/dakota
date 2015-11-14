@@ -123,9 +123,10 @@ sub remove_non_newlines {
   return $result;
 }
 sub tear {
-  my ($filestr, $tbl) = @_;
+  my ($filestr) = @_;
+  my $tbl = { 'src' => '', 'src-comments' => '' };
   foreach my $line (split /\n/, $filestr) {
-    if ($line =~ m=^(.*?)((\s*/\*.*\*/\s*)*(\s*//.*))?$=m) {
+    if ($line =~ m=^(.*?)(((/\*.*\*/\s*)*(//.*))|/\*.*\*/)?$=m) {
       $$tbl{'src'} .= $1 . "\n";
       if ($2) {
         $$tbl{'src-comments'} .= $2;
@@ -135,6 +136,7 @@ sub tear {
       die "$!";
     }
   }
+  return $tbl;
 }
 sub mend {
   my ($filestr_ref, $tbl) = @_;
@@ -155,8 +157,7 @@ sub mend {
 }
 sub encode_comments {
   my ($filestr_ref) = @_;
-  my $tbl = { 'src' => '', 'src-comments' => '' };
-  &tear($$filestr_ref, $tbl);
+  my $tbl = &tear($$filestr_ref);
   $$filestr_ref = $$tbl{'src'};
   return $tbl;
 }
