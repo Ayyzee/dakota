@@ -181,9 +181,6 @@ to be called AFTER the dakota runtime is fully setup, but before main()
 fix --precompile option. Any lib/exe depending on something being generated should
 instead be able to use the corresponding rep file. This might require some convergence of the respective schemas, or a way to convert from one type of rep file to the other.
 
-put dir-buffer and dir on read-only segment
-put dkt-construct, dkt-name as well.
-
 support stack based object creation
   make() va stack-make()
 
