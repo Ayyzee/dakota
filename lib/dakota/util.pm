@@ -125,7 +125,7 @@ sub remove_non_newlines {
 sub tear {
   my ($filestr, $tbl) = @_;
   foreach my $line (split /\n/, $filestr) {
-    if ($line =~ m|^(.*?)(\s*//.*)?$|m) {
+    if ($line =~ m=^(.*?)((\s*/\*.*\*/\s*)*(\s*//.*))?$=m) {
       $$tbl{'src'} .= $1 . "\n";
       if ($2) {
         $$tbl{'src-comments'} .= $2;

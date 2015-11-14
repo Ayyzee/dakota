@@ -4005,6 +4005,7 @@ sub linkage_unit::generate_symbols {
     $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
     my $width = length($ident);
+    $ident =~ s/(\w)_(\w)/$1-$2/g;
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
       $scratch_str .= $col . "extern symbol-t $ident;" . "\n";
@@ -4045,6 +4046,7 @@ sub linkage_unit::generate_hashes {
       $symbol =~ s/^#//;
       my $ident = &dk_mangle($symbol);
       my $width = length($ident);
+      $ident =~ s/(\w)_(\w)/$1-$2/g;
       my $pad = ' ' x ($max_width - $width);
       if (&should_ann($ln, $num_lns)) {
         $scratch_str .= $col . "constexpr hash-t $ident = " . $pad . "dk-hash(\"$symbol\");" . &ann(__FILE__, __LINE__) . "\n";
@@ -4091,6 +4093,7 @@ sub linkage_unit::generate_keywords {
     $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
     my $width = length($ident);
+    $ident =~ s/(\w)_(\w)/$1-$2/g;
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
       if (&is_decl()) {
