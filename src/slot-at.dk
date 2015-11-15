@@ -1,6 +1,6 @@
   method slot-at(object-t self, symbol-t name, object-t default-element) -> object-t {
     object-t result;
-    strswitch (name) {
+    switch (name) {
       case #strcmp: result = str-compare::box(self.strcmp);
         break;
       // ...
@@ -23,7 +23,7 @@
   }
   method set-slot-at(object-t self, symbol-t name, object-t element) -> object-t {
     object-t result;
-    strswitch (name) {
+    switch (name) {
       case #strcmp:
         assert(dk::instance?(element, str-compare::klass));
         self.strcmp = *str-compare::unbox(element);
