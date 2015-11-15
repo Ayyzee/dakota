@@ -1610,7 +1610,12 @@ auto info-for-name(symbol-t klass-name) -> named-info-t* {
   dk-intern needs to be able to be used **early** in the static initialization
   sequence.
  */
-
+auto dk-intern-free(str-t key) -> symbol-t {
+  symbol-t result = dk-intern(key);
+  if (result != key)
+    free(cast(void*)key);
+  return result;
+}
 auto dk-intern(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory

@@ -191,6 +191,7 @@ constexpr auto dk_hash_switch( intptr_t val) -> intptr_t  { return val; }
 constexpr auto dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 
 [[so_export]] auto dk_intern(str_t) -> symbol_t;
+[[so_export]] auto dk_intern_free(str_t) -> symbol_t;
 [[so_export]] auto dk_klass_for_name(symbol_t) -> object_t;
 
 [[so_export]] auto dkt_register_info(named_info_t*) -> void;
