@@ -474,7 +474,7 @@ static auto each(named-info-t* root-info-list, named-info-func-t func, ptr-t use
   return;
 }
 static auto each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str);
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str.ptrs);
   if (assocs) {
     symbol-t* names =    cast(symbol-t*)named-info::at(info, #str.names);
     str-t*    literals = cast(str-t*)   named-info::at(info, #str.literals);
@@ -495,7 +495,7 @@ static auto each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
   }
 }
 static auto each-int(named-info-t* info, object-t (*box)(uintptr-t)) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int);
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int.ptrs);
   if (assocs) {
     symbol-t*  names =    cast(symbol-t*) named-info::at(info, #int.names);
     uintptr-t* literals = cast(uintptr-t*)named-info::at(info, #int.literals);

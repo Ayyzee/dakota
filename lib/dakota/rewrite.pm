@@ -924,6 +924,7 @@ sub rewrite_multi_char_consts {
 }
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
+  &rewrite_literal_strs($filestr_ref);
   &encode_strings($filestr_ref);
   my $parts = &encode_comments($filestr_ref);
   &rewrite_method_aliases($filestr_ref);
@@ -934,7 +935,6 @@ sub convert_dk_to_cc {
   &rewrite_literal_booles($filestr_ref);
   &rewrite_literal_chars($filestr_ref);
   &rewrite_literal_ints($filestr_ref);
-  &rewrite_literal_strs($filestr_ref);
 
   $$filestr_ref =~ s/\$/dk::/g;
 

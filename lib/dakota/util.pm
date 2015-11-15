@@ -88,11 +88,11 @@ use Fcntl qw(:DEFAULT :flock);
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 
-my $ENCODED_COMMENT_BEGIN = '__ENCODED_COMMENT_BEGIN__';
-my $ENCODED_COMMENT_END =   '__ENCODED_COMMENT_END__';
+my $ENCODED_COMMENT_BEGIN = 'ENCODEDCOMMENTBEGIN';
+my $ENCODED_COMMENT_END =   'ENCODEDCOMMENTEND';
 
-my $ENCODED_STRING_BEGIN = '__ENCODED_STRING_BEGIN__';
-my $ENCODED_STRING_END =   '__ENCODED_STRING_END__';
+my $ENCODED_STRING_BEGIN = 'ENCODEDSTRINGBEGIN';
+my $ENCODED_STRING_END =   'ENCODEDSTRINGEND';
 
 sub concat3 {
   my ($s1, $s2, $s3) = @_;

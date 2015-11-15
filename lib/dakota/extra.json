@@ -89,7 +89,7 @@
     '#imported-klass.ptrs' => undef,
     '#int.literals' => undef,
     '#int.names' => undef,
-    '#int' => undef,
+    '#int.ptrs' => undef,
     '#int-t' => undef, # hardcode typedef
     '#interpose-name' => undef,
     '#interposers' => undef,
@@ -117,7 +117,7 @@
     '#state-exported?' => undef,
     '#str.literals' => undef,
     '#str.names' => undef,
-    '#str' => undef,
+    '#str.ptrs' => undef,
     '#struct' => undef,
     '#superklass-name' => undef,
     '#time' => undef,

@@ -533,12 +533,12 @@ sub generate_defn_footer {
   if (0 < scalar keys %{$$file{'literal-strs'}}) {
     $$info_tbl{"\#str.literals"} = '__str-literals';
     $$info_tbl{"\#str.names"} =    '__str-names';
-    $$info_tbl{"\#str"} =          '__str';
+    $$info_tbl{"\#str.ptrs"} =     '__str-ptrs';
   }
   if (0 < scalar keys %{$$file{'literal-ints'}}) {
     $$info_tbl{"\#int.literals"} = '__int-literals';
     $$info_tbl{"\#int.names"} =    '__int-names';
-    $$info_tbl{"\#int"} =          '__int';
+    $$info_tbl{"\#int.ptrs"} =     '__int-ptrs';
   }
   $rt_cc_str .= "\n";
   $rt_cc_str .= "# include <unistd.h>\n";
@@ -4137,7 +4137,7 @@ sub linkage_unit::generate_strs_seq {
   my $col = '';
   if (0 == scalar keys %{$$file{'literal-strs'}}) {
     $scratch_str .= $col . "//static str-t const __str-literals[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // ro-data\n";
-    $scratch_str .= $col . "//static object-t* __str[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "//static object-t* __str-ptrs[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // rw-data\n";
   } else {
     $scratch_str .= $col . "static str-t const __str-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
     $col = &colin($col);
@@ -4158,7 +4158,7 @@ sub linkage_unit::generate_strs_seq {
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
 
-    $scratch_str .= $col . "static assoc-node-t __str[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "static assoc-node-t __str-ptrs[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
     $col = &colin($col);
     foreach my $str (sort keys %{$$file{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
@@ -4194,7 +4194,7 @@ sub linkage_unit::generate_ints_seq {
   my $col = '';
   if (0 == scalar keys %{$$file{'literal-ints'}}) {
     $scratch_str .= $col . "//static uintptr-t const __int-literals[] = { 0 };" . &ann(__FILE__, __LINE__) . " // ro-data\n";
-    $scratch_str .= $col . "//static object-t* __int[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "//static object-t* __int-ptrs[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // rw-data\n";
   } else {
     $scratch_str .= $col . "static uintptr-t const __int-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
     $col = &colin($col);
@@ -4215,7 +4215,7 @@ sub linkage_unit::generate_ints_seq {
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
 
-    $scratch_str .= $col . "static assoc-node-t __int[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
+    $scratch_str .= $col . "static assoc-node-t __int-ptrs[] = {" . &ann(__FILE__, __LINE__) . " // rw-data\n";
     $col = &colin($col);
     foreach my $int (sort keys %{$$file{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
