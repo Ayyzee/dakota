@@ -1066,7 +1066,7 @@ sub common::print_signature {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= $col . "static signature-t const result = { \"$name_str\", \"$parameter_types_str\", \"$return_type_str\" };\n";
+    $scratch_str .= $col . "static signature-t const result = { .name = \"$name_str\", .parameter-types = \"$parameter_types_str\", .return-type = \"$return_type_str\" };\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
 
@@ -3621,9 +3621,9 @@ sub generate_kw_args_method_signature_defn {
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC auto $method_name($$list_types) -> signature-t const* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
-  my $kw_arg_list = "static signature-t const result = { \"$method_name\", \"";
+  my $kw_arg_list = "static signature-t const result = { .name = \"$method_name\", .parameter-types = \"";
   $kw_arg_list .= &method::kw_list_types($method);
-  $kw_arg_list .= "\", \"$return_type\" };";
+  $kw_arg_list .= "\", .return-type = \"$return_type\" };";
   $$scratch_str_ref .=
     $col . "$kw_arg_list\n" .
     $col . "return &result;\n";
@@ -3647,9 +3647,9 @@ sub generate_slots_method_signature_defn {
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC auto $method_name($$list_types) -> signature-t const* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
-  my $arg_list = "static signature-t const result = { \"$method_name\", \"";
+  my $arg_list = "static signature-t const result = { .name = \"$method_name\", .parameter-types = \"";
   $arg_list .= &method::list_types($method);
-  $arg_list .= "\", \"$return_type\" };";
+  $arg_list .= "\", .return-type = \"$return_type\" };";
   $$scratch_str_ref .=
     $col . "$arg_list\n" .
     $col . "return &result;\n";
