@@ -292,8 +292,6 @@ sub generate_nrt {
       &labeled_src_str($result, "selectors-hh") .
       &labeled_src_str($result, "signatures-hh") .
       &labeled_src_str($result, "generics-hh");
-      #&labeled_src_str($result, "selectors-seq-hh") .
-      #&labeled_src_str($result, "signatures-seq-hh") .
 
     if ($should_write_pre_output) {
       &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/nrt/%.$dkhh_ext
@@ -308,7 +306,6 @@ sub generate_nrt {
       $output = $ENV{'DKT_DIR'} . '/' . $output
     }
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # nrt-cc
-    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
 
     my $str_cc = '// ' . $emacs_mode_file_variables  . "\n";
     $str_cc .= &labeled_src_str(undef, "nrt-cc");
@@ -369,8 +366,6 @@ sub generate_rt {
       &labeled_src_str($result, "selectors-hh") .
       &labeled_src_str($result, "signatures-hh") .
       &labeled_src_str($result, "generics-hh");
-      #&labeled_src_str($result, "selectors-seq-hh") .
-      #&labeled_src_str($result, "signatures-seq-hh") .
 
     if ($should_write_pre_output) {
       &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/rt/%.$dkhh_ext
@@ -403,10 +398,7 @@ sub generate_rt {
       &labeled_src_str($result, "signatures-cc") .
       &labeled_src_str($result, "generics-cc") .
 
-      &labeled_src_str($result, "selectors-seq-cc") .
-      &labeled_src_str($result, "signatures-seq-cc") .
-
-      &generate_defn_footer($file);
+      &generate_defn_footer($file, $generics);
 
     if ($should_write_pre_output) {
       &write_to_file_strings($pre_output, [ $str_cc ]); # generated $objdir/rt/%.$dkcc_ext
@@ -450,41 +442,38 @@ sub colout {
   my $result = $gbl_col_width x $len;
   return $result;
 }
+sub add_labeled_src {
+  my ($result, $label, $src) = @_;
+  if (!$$result{'--labels'}) { $$result{'--labels'} = []; }
+  &add_last($$result{'--labels'}, $label);
+  $$result{$label} = $src;
+}
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $suffix) = @_;
   my $result = {};
   my $ordered_klass_names = &order_klasses($file);
 
-  $$result{"headers-$suffix"} =        &linkage_unit::generate_headers(        $file, $ordered_klass_names);
-  $$result{"symbols-$suffix"} =        &linkage_unit::generate_symbols(        $file, $symbols);
-  $$result{"klasses-$suffix"} =        &linkage_unit::generate_klasses(        $file, $ordered_klass_names);
-  $$result{"hashes-$suffix"} =         &linkage_unit::generate_hashes(         $file);
-  $$result{"keywords-$suffix"} =       &linkage_unit::generate_keywords(       $file);
-  $$result{"strs-$suffix"} =           &linkage_unit::generate_strs(           $file);
-  $$result{"ints-$suffix"} =           &linkage_unit::generate_ints(           $file);
-  $$result{"selectors-$suffix"} =      &linkage_unit::generate_selectors(      $generics);
-  $$result{"signatures-$suffix"} =     &linkage_unit::generate_signatures(     $generics);
-  $$result{"generics-$suffix"} =       &linkage_unit::generate_generics(       $generics);
-  $$result{"selectors-seq-$suffix"} =  &linkage_unit::generate_selectors_seq(  $generics);
-  $$result{"signatures-seq-$suffix"} = &linkage_unit::generate_signatures_seq( $generics);
+  &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names));
+  &add_labeled_src($result, "symbols-$suffix",    &linkage_unit::generate_symbols(   $file, $symbols));
+  &add_labeled_src($result, "klasses-$suffix",    &linkage_unit::generate_klasses(   $file, $ordered_klass_names));
+  &add_labeled_src($result, "hashes-$suffix",     &linkage_unit::generate_hashes(    $file));
+  &add_labeled_src($result, "keywords-$suffix",   &linkage_unit::generate_keywords(  $file));
+  &add_labeled_src($result, "strs-$suffix",       &linkage_unit::generate_strs(      $file));
+  &add_labeled_src($result, "ints-$suffix",       &linkage_unit::generate_ints(      $file));
+  &add_labeled_src($result, "selectors-$suffix",  &linkage_unit::generate_selectors( $generics));
+  &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
+  &add_labeled_src($result, "generics-$suffix",   &linkage_unit::generate_generics(  $generics));
 
   return $result;
 } # generate_decl_defn
 sub generate_defn_footer {
-  my ($file) = @_;
+  my ($file, $generics) = @_;
   my $rt_cc_str = '';
   my $col = '';
-  my $stack = [];
-  my $tbl = {
-             'imported-klasses' => {},
-             'klasses' =>          {},
-            };
-  &dk_generate_imported_klasses_info($file, $stack, $tbl);
-  my $keys_count;
-  $keys_count = keys %{$$file{'klasses'}};
+  my $keys_count = keys %{$$file{'klasses'}};
   if (0 == $keys_count) {
-    $rt_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;\n";
     $rt_cc_str .= $col . "static symbol-t const* imported-klass-names = nullptr;\n";
+    $rt_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;\n";
   } else {
     $rt_cc_str .= $col . "static symbol-t imported-klass-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     $col = &colin($col);
@@ -505,9 +494,18 @@ sub generate_defn_footer {
     $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(uintptr-t)nullptr }\n";
     $col = &colout($col);
     $rt_cc_str .= $col . "};\n";
+    $rt_cc_str .= &linkage_unit::generate_selectors_seq( $generics);
+    $rt_cc_str .= &linkage_unit::generate_signatures_seq($generics);
     $rt_cc_str .= &linkage_unit::generate_strs_seq($file);
     $rt_cc_str .= &linkage_unit::generate_ints_seq($file);
   }
+  my $stack = [];
+  my $tbl = {
+             'imported-klasses' => {},
+             'klasses' =>          {},
+           };
+  &dk_generate_imported_klasses_info($file, $stack, $tbl);
+  # the previous call may be useless
   $rt_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
   #$rt_cc_str .= $col . "extern \"C\"\n";
   #$rt_cc_str .= $col . "{\n";
