@@ -217,3 +217,5 @@ can be replaced
 a == b
 or
 a != b
+
+add optional offset to iterator

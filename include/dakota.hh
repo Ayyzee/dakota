@@ -182,10 +182,12 @@ typedef auto (*compare_t)(object_t, object_t) -> int_t; // comparitor
 typedef auto (*dkt_signature_func_t)() -> signature_t const*;
 typedef auto (*dkt_selector_func_t)() -> selector_t*;
 
-constexpr auto dk_hash(str_t str) -> uintptr_t { // Daniel J. Bernstein
-  return !*str ? cast(uintptr_t)5381 : cast(uintptr_t)(*str) ^ (33 * dk_hash(str + 1));
+namespace hash { typedef uintptr_t slots_t; } typedef hash::slots_t hash_t;
+
+constexpr auto dk_hash(str_t str) -> hash_t { // Daniel J. Bernstein
+  return !*str ? cast(hash_t)5381 : cast(hash_t)(*str) ^ (33 * dk_hash(str + 1));
 }
-constexpr auto dk_hash_switch(str_t str) -> uintptr_t { return dk_hash(str); }
+constexpr auto dk_hash_switch(str_t str) -> hash_t { return dk_hash(str); }
 
 constexpr auto dk_hash_switch( intptr_t val) -> intptr_t  { return val; }
 constexpr auto dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
