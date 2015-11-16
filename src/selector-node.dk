@@ -22,7 +22,7 @@ klass selector;
 
 klass selector-node {
   slots {
-    selector-t* key;
+    selector-t* ptr;
     slots-t*    next;
   }
   method init(object-t self, slots-t slots : {nullptr, nullptr}) -> object-t {

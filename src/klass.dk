@@ -127,7 +127,7 @@ selector-for-signature(signature-t const* signature) {
   selector-pair-t pair = { signature, nullptr };
   selector-pair-t* found-pair =
     cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
-  selector-t selector = *(found-pair->element->key);
+  selector-t selector = *(found-pair->element->ptr);
   return selector;
 }
 static method-t
@@ -145,19 +145,19 @@ import-selectors(signature-t** signatures, selector-node-t* selector-nodes) {
     selector-node-t* selector-node = &selector-nodes[i];
     i++;
 
-    assert((nullptr == signature && nullptr == selector-node->key) ||
-           (nullptr != signature && nullptr != selector-node->key));
+    assert((nullptr == signature && nullptr == selector-node->ptr) ||
+           (nullptr != signature && nullptr != selector-node->ptr));
     if (nullptr == signature)
       break;
     selector-pair-t pair = { signature, selector-node };
     selector-pair-t* found-pair =
       cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
     if (nullptr == found-pair) {
-      *(pair.element->key) = cast(selector-t)(gbl-selectors-table.count);
+      *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count);
       pair.element->next = nullptr;
       sorted-array::add(&gbl-selectors-table, &pair);
     } else {
-      *(selector-node->key) = *(found-pair->element->key);
+      *(selector-node->ptr) = *(found-pair->element->ptr);
       selector-node->next = found-pair->element;
       found-pair->element->next = selector-node;
     }

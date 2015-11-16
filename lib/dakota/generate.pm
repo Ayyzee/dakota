@@ -1346,10 +1346,10 @@ sub generics::generate_selector_seq {
       my $name_width = length($name);
       my $name_pad = ' ' x ($max_name_width - $name_width);
       $scratch_str .=
-        $col . "{ .next = nullptr, .key = (cast(dkt-selector-func-t)(cast($method_type) " .
+        $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast($method_type) " .
         $pad . "__selector::va::$name" . $name_pad . "))() },\n";
     }
-    $scratch_str .= $col . "{ .next = nullptr, .key = nullptr },\n";
+    $scratch_str .= $col . "{ .next = nullptr, .ptr = nullptr },\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
@@ -1383,11 +1383,11 @@ sub generics::generate_selector_seq {
         my $name_width = length($name);
         my $name_pad = ' ' x ($max_name_width - $name_width);
         $scratch_str .=
-          $col . "{ .next = nullptr, .key = (cast(dkt-selector-func-t)(cast($method_type) " .
+          $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast($method_type) " .
           $pad . "__selector::$name" . $name_pad . "))() }," . $in . "\n";
       }
     }
-    $scratch_str .= $col . "{ .next = nullptr, .key = nullptr },\n";
+    $scratch_str .= $col . "{ .next = nullptr, .ptr = nullptr },\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
