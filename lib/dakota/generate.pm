@@ -133,28 +133,48 @@ sub set_global_scratch_str_ref {
   my ($ref) = @_;
   $global_scratch_str_ref = $ref;
 }
-sub set_nrt_decl() {
+sub set_nrt_decl {
+  my ($path) = @_;
+  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
+  $gbl_nrt_file = &canon_path("$name.dk");
   $global_is_rt   = 0;
   $global_is_defn = 0;
   $global_suffix = 'hh';
 }
-sub set_nrt_defn() {
+sub set_nrt_defn {
+  my ($path) = @_;
+  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
+  $gbl_nrt_file = &canon_path("$name.dk");
   $global_is_rt   = 0;
   $global_is_defn = 1;
   $global_suffix = 'cc';
 }
-sub set_rt_decl() {
+sub set_rt_decl {
+  my ($path) = @_;
+  $gbl_nrt_file = undef;
   $global_is_rt   = 1;
   $global_is_defn = 0;
   $global_suffix = 'hh';
 }
-sub set_rt_defn() {
+sub set_rt_defn {
+  my ($path) = @_;
+  $gbl_nrt_file = undef;
   $global_is_rt   = 1;
   $global_is_defn = 1;
   $global_suffix = 'cc';
 }
 sub suffix {
   return $global_suffix
+}
+sub extra_header {
+  my ($name) = @_;
+  if (&is_decl) {
+    return "\n# include <dakota-decl.hh>\n\n";
+  } elsif (&is_rt_defn()) {
+    return "\n# include \"$name.$hh_ext\"\n\n";
+  }
+  return "\nbug-in-code-gen\n"
+  # do nothing for rt-defn/rt-cc
 }
 sub is_nrt_decl {
   if (!$global_is_rt && !$global_is_defn) {
@@ -252,161 +272,74 @@ sub write_to_file_converted_strings {
 }
 sub generate_nrt_decl {
   my ($path, $file) = @_;
-  &set_nrt_decl();
+  &set_nrt_decl($path);
   return &generate_nrt($path, $file);
 }
 sub generate_nrt_defn {
   my ($path, $file) = @_;
-  &set_nrt_defn();
+  &set_nrt_defn($path);
   return &generate_nrt($path, $file);
 }
 sub generate_nrt {
   my ($path, $file) = @_;
   my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
-  $gbl_nrt_file = &canon_path("$name.dk");
-
   my ($generics, $symbols) = &generics::parse($file);
-  my $result;
-
+  my $suffix = &suffix();
+  my $pre_output = "$dir/$name.dk$suffix";
+  my $output =     "$dir/$name.$suffix";
+  if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+    $output = $ENV{'DKT_DIR'} . '/' . $output;
+  }
+  print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
+  my $str;
   if (&is_nrt_decl()) {
-    my $pre_output = "$dir/$name.$dkhh_ext";
-    my $output =     "$dir/$name.$hh_ext";
-    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-      $output = $ENV{'DKT_DIR'} . '/' . $output
-    }
-    print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # nrt-hh
-    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
-
-    my $str_hh = '// ' . $emacs_mode_file_variables  . "\n";
-    $str_hh .= &labeled_src_str(undef, "nrt-hh");
-    $str_hh .=
-      "\n" .
-      &labeled_src_str($result, "headers-hh") .
-      &include_dakota_decl_hh() .
-      &labeled_src_str($result, "symbols-hh") .
-      &labeled_src_str($result, "klasses-hh") .
-      &labeled_src_str($result, "hashes-hh") .
-      &labeled_src_str($result, "keywords-hh") .
-      &labeled_src_str($result, "strs-hh") .
-      &labeled_src_str($result, "ints-hh") .
-      &labeled_src_str($result, "selectors-hh") .
-      &labeled_src_str($result, "signatures-hh") .
-      &labeled_src_str($result, "generics-hh");
-
-    if ($should_write_pre_output) {
-      &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/nrt/%.$dkhh_ext
-    }
-    &write_to_file_converted_strings($output, [ $str_hh ]);
-
-    return "$dir/$name.$hh_ext";
+    $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name);
   } else {
-    my $pre_output = "$dir/$name.$dkcc_ext";
-    my $output =     "$dir/$name.$cc_ext";
-    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-      $output = $ENV{'DKT_DIR'} . '/' . $output
-    }
-    print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # nrt-cc
-
-    my $str_cc = '// ' . $emacs_mode_file_variables  . "\n";
-    $str_cc .= &labeled_src_str(undef, "nrt-cc");
-    $str_cc .=
+    $str = '// ' . $emacs_mode_file_variables  . "\n" .
       "\n" .
       "# include \"$name.$hh_ext\"\n" .
       "\n" .
       "# include \"../$name.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
-
-    if ($should_write_pre_output) {
-      &write_to_file_strings($pre_output, [ $str_cc ]); # generated $objdir/nrt/%.$dkcc_ext
-    }
-    &write_to_file_converted_strings($output, [ $str_cc ]);
-    return $output;
   }
+  if ($should_write_pre_output) {
+    &write_to_file_strings($pre_output, [ $str ]);
+  }
+  &write_to_file_converted_strings($output, [ $str ]);
+  return $output;
 } # sub generate_nrt
 sub generate_rt_decl {
   my ($path, $file) = @_;
-  &set_rt_decl();
+  &set_rt_decl($path);
   return &generate_rt($path, $file);
 }
 sub generate_rt_defn {
   my ($path, $file) = @_;
-  &set_rt_defn();
+  &set_rt_defn($path);
   return &generate_rt($path, $file);
 }
 sub generate_rt {
   my ($path, $file) = @_;
   my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
-  $gbl_nrt_file = undef;
-
   my ($generics, $symbols) = &generics::parse($file);
-  my $result;
-
-  if (&is_rt_decl()) {
-    my $pre_output = "$dir/$name.$dkhh_ext";
-    my $output =     "$dir/$name.$hh_ext";
-    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-      $output = $ENV{'DKT_DIR'} . '/' . $output
-    }
-    print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # rt-hh
-    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
-
-    my $str_hh = '// ' . $emacs_mode_file_variables  . "\n";
-    $str_hh .= &labeled_src_str(undef, "rt-hh");
-    $str_hh .=
-      "\n" .
-      &labeled_src_str($result, "headers-hh") .
-      &include_dakota_decl_hh() .
-      &labeled_src_str($result, "symbols-hh") .
-      &labeled_src_str($result, "klasses-hh") .
-      &labeled_src_str($result, "hashes-hh") .
-      &labeled_src_str($result, "keywords-hh") .
-      &labeled_src_str($result, "strs-hh") .
-      &labeled_src_str($result, "ints-hh") .
-      &labeled_src_str($result, "selectors-hh") .
-      &labeled_src_str($result, "signatures-hh") .
-      &labeled_src_str($result, "generics-hh");
-
-    if ($should_write_pre_output) {
-      &write_to_file_strings($pre_output, [ $str_hh ]); # generated $objdir/rt/%.$dkhh_ext
-    }
-    &write_to_file_converted_strings($output, [ $str_hh ]);
-    print "    creating $output ... done" . &pann(__FILE__, __LINE__) . "\n"; # rt-hh
-    return "$dir/$name.$hh_ext";
-  } else {
-    my $pre_output = "$dir/$name.$dkcc_ext";
-    my $output =     "$dir/$name.$cc_ext";
-    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-      $output = $ENV{'DKT_DIR'} . '/' . $output
-    }
-    print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # rt-cc
-    $result = &generate_decl_defn($file, $generics, $symbols, &suffix());
-
-    my $str_cc = '// ' . $emacs_mode_file_variables  . "\n";
-    $str_cc .= &labeled_src_str(undef, "rt-cc");
-    $str_cc .=
-      "\n" .
-      "# include \"$name.$hh_ext\"\n" .
-      "\n" .
-      &labeled_src_str($result, "symbols-cc") .
-      &labeled_src_str($result, "klasses-cc") .
-      &labeled_src_str($result, "hashes-cc") .
-      &labeled_src_str($result, "keywords-cc") .
-      &labeled_src_str($result, "strs-cc") .
-      &labeled_src_str($result, "ints-cc") .
-      &labeled_src_str($result, "selectors-cc") .
-      &labeled_src_str($result, "signatures-cc") .
-      &labeled_src_str($result, "generics-cc") .
-
-      &generate_defn_footer($file, $generics);
-
-    if ($should_write_pre_output) {
-      &write_to_file_strings($pre_output, [ $str_cc ]); # generated $objdir/rt/%.$dkcc_ext
-    }
-    &write_to_file_converted_strings($output, [ $str_cc ]);
-    print "    creating $output ... done" . &pann(__FILE__, __LINE__) . "\n"; # rt-cc
-    return $output;
+  my $suffix = &suffix();
+  my $pre_output = "$dir/$name.dk$suffix";
+  my $output =     "$dir/$name.$suffix";
+  if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+    $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
+  print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
+  my $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name);
+
+  if (&is_rt_defn()) {
+    $str .= &generate_defn_footer($file, $generics);
+  }
+  if ($should_write_pre_output) {
+    &write_to_file_strings($pre_output, [ $str ]);
+  }
+  &write_to_file_converted_strings($output, [ $str ]);
+  return $output;
 } # sub generate_rt
 sub labeled_src_str {
   my ($tbl, $key) = @_;
@@ -449,11 +382,12 @@ sub add_labeled_src {
   $$result{$label} = $src;
 }
 sub generate_decl_defn {
-  my ($file, $generics, $symbols, $suffix) = @_;
+  my ($file, $generics, $symbols, $suffix, $name) = @_;
   my $result = {};
+  my $extra_header = &extra_header($name);
   my $ordered_klass_names = &order_klasses($file);
 
-  &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names));
+  &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names, $extra_header));
   &add_labeled_src($result, "symbols-$suffix",    &linkage_unit::generate_symbols(   $file, $symbols));
   &add_labeled_src($result, "klasses-$suffix",    &linkage_unit::generate_klasses(   $file, $ordered_klass_names));
   &add_labeled_src($result, "hashes-$suffix",     &linkage_unit::generate_hashes(    $file));
@@ -464,7 +398,20 @@ sub generate_decl_defn {
   &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
   &add_labeled_src($result, "generics-$suffix",   &linkage_unit::generate_generics(  $generics));
 
-  return $result;
+  my $str = '// ' . $emacs_mode_file_variables  . "\n" .
+    "\n" .
+    &labeled_src_str($result, "headers-$suffix") .
+    &labeled_src_str($result, "symbols-$suffix") .
+    &labeled_src_str($result, "klasses-$suffix") .
+    &labeled_src_str($result, "hashes-$suffix") .
+    &labeled_src_str($result, "keywords-$suffix") .
+    &labeled_src_str($result, "strs-$suffix") .
+    &labeled_src_str($result, "ints-$suffix") .
+    &labeled_src_str($result, "selectors-$suffix") .
+    &labeled_src_str($result, "signatures-$suffix") .
+    &labeled_src_str($result, "generics-$suffix");
+
+  return $str;
 } # generate_decl_defn
 sub generate_defn_footer {
   my ($file, $generics) = @_;
@@ -2438,18 +2385,11 @@ sub generate_exported_slots_decls {
     die __FILE__, ':', __LINE__, ": error: box klass \'$klass_name\' without slot or slots\n";
   }
 }
-sub include_dakota_decl_hh {
-  my $result =
-    "\n" .
-    "# include <dakota-decl.hh>\n" .
-    "\n";
-  return $result;
-}
 sub linkage_unit::generate_headers {
-  my ($scope, $klass_names) = @_;
+  my ($scope, $klass_names, $extra_header) = @_;
   my $result = '';
 
-  if (&is_decl() || &is_rt_defn()) { # not sure if this is right
+  if (&is_decl()) {
     my $exported_headers = {};
     $$exported_headers{'<cassert>'}{'hardcoded-by-rnielsen'} = undef; # assert()
     $$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
@@ -2478,6 +2418,7 @@ sub linkage_unit::generate_headers {
       $result .= "# include $header_name\n";
     }
   }
+  $result .= $extra_header;
   return $result;
 }
 sub is_same_file {
