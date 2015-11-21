@@ -408,8 +408,8 @@ sub _replace_last {
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-  my $old_last = &remove_last($seq);
-  &add_last($seq, $element);
+  my $old_last = &dakota::util::remove_last($seq);
+  &dakota::util::add_last($seq, $element);
   return $old_last;
 }
 sub scalar_from_file {

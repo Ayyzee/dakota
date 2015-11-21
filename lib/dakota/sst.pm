@@ -316,7 +316,7 @@ sub sst::add_token {
     $$token{'leading-ws'} = $$sst{'leading-ws'};
     $$sst{'leading-ws'} = '';
   }
-  &add_last($$sst{'tokens'}, $token);
+  &dakota::util::add_last($$sst{'tokens'}, $token);
   $$sst{'tokens-count'} = scalar @{$$sst{'tokens'}};
 }
 sub sst::add_comment {
@@ -453,7 +453,7 @@ sub sst::_process_ws {
       $lhs_token = { 'str' => undef };
     }
     $$lhs_token{'str'} = $$seq[$i]{'str'};
-    &add_last($new_seq, $lhs_token);
+    &dakota::util::add_last($new_seq, $lhs_token);
   }
   return $new_seq;
 }
@@ -538,7 +538,7 @@ sub constraint_literal_dquoted_cstring {
 
   if ($token =~ m/\#$dqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &add_last($result_rhs, $token);
+    &dakota::util::add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -549,7 +549,7 @@ sub constraint_literal_squoted_cstring {
 
   if ($token =~ m/\#$sqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &add_last($result_rhs, $token);
+    &dakota::util::add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -560,7 +560,7 @@ sub constraint_ident {
 
   if ($token =~ m/$id/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &add_last($result_rhs, $token);
+    &dakota::util::add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -603,7 +603,7 @@ sub constraint_qual_ident {
 
   if ($token =~ m/^$id$/) {
     $result_lhs = [ $$range[0], $i ];
-    &add_last($result_rhs, $token);
+    &dakota::util::add_last($result_rhs, $token);
 
     while (1) {
       $i++;
@@ -615,8 +615,8 @@ sub constraint_qual_ident {
         #print "TKN: " . '{' . $token . '}' . "\n";
         if ($token =~ m/^$id$/) {
           $result_lhs = [ $$range[0], $i ];
-          &add_last($result_rhs, $sro);
-          &add_last($result_rhs, $token);
+          &dakota::util::add_last($result_rhs, $sro);
+          &dakota::util::add_last($result_rhs, $token);
         } else {
           last;
         }
@@ -637,7 +637,7 @@ sub constraint_method_name {
 
   if ($token =~ m/$mid/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &add_last($result_rhs, $token);
+    &dakota::util::add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -672,9 +672,9 @@ sub constraint_balenced {
       my $token = &sst::at($sst, $close_token_index);
 
       if (&sst::is_open_token($token, $user_data)) {
-        &add_last($opens, $token);
+        &dakota::util::add_last($opens, $token);
       } elsif (&sst::is_close_token($token, $user_data)) {
-        my $open_token = &remove_last($opens);
+        my $open_token = &dakota::util::remove_last($opens);
 
         if (!defined $open_token) {
           return undef;
@@ -683,7 +683,7 @@ sub constraint_balenced {
         my $open_tokens = &sst::open_tokens_for_close_token($token, $user_data);
         die if ! exists $$open_tokens{$open_token}
       }
-      &add_last($result_rhs, $token);
+      &dakota::util::add_last($result_rhs, $token);
 
       if (0 == @$opens) {
         $result_lhs = [ $$range[0], $close_token_index ];
@@ -707,7 +707,7 @@ sub constraint_balenced_in {
 
       for (my $i = $$result_lhs[0]; $i < $$result_lhs[1]; $i++) {
         my $token = &sst::at($sst, $i);
-        &add_last($result_rhs, $token);
+        &dakota::util::add_last($result_rhs, $token);
       }
     }
   }
@@ -908,9 +908,9 @@ sub sst_cursor::balenced {
     my $token = &sst::at($$sst_cursor{'sst'}, $i);
     if (&sst::is_open_token($token, $user_data)) {
       my $expected_close_token = &sst::close_token_for_open_token($token, $user_data);
-      &add_last($stk, $expected_close_token);
+      &dakota::util::add_last($stk, $expected_close_token);
     } elsif (&sst::is_close_token($token, $user_data)) {
-      my $expected_close_token = &remove_last($stk);
+      my $expected_close_token = &dakota::util::remove_last($stk);
 
       if ($expected_close_token ne $token) {
         &sst_cursor::error($sst_cursor, $i,  "expected $expected_close_token but got $token");

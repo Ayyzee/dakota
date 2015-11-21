@@ -859,10 +859,10 @@ sub rewrite {
         if ($tkn =~ m/^\?/) {
           my $seq = $$match[1]{$tkn};
           foreach my $seq_tkn (@$seq) {
-            &add_last($result, $seq_tkn);
+            &dakota::util::add_last($result, $seq_tkn);
           }
         } else {
-          &add_last($result, $tkn);
+          &dakota::util::add_last($result, $tkn);
         }
       }
       my $index = $$match[0][0];
@@ -1035,7 +1035,7 @@ sub start {
   my $user_data = &dakota_lang_user_data_old();
 
   foreach my $arg (@$argv) {
-    my $filestr = &dakota::filestr_from_file($arg);
+    my $filestr = &dakota::util::filestr_from_file($arg);
 
     &convert_dk_to_cc(\$filestr, $$user_data{'kw-args-generics'});
     print $filestr;

@@ -726,26 +726,26 @@ sub slots_seq {
       $has_expr = 1;
     }
     if (';' ne $$tkn{'str'}) {
-      &add_last($type, $$tkn{'str'});
+      &dakota::util::add_last($type, $$tkn{'str'});
     } else {
       my $expr = [];
       if ($has_expr) {
         while (scalar @$type) {
-          &add_first($expr, &remove_last($type));
+          &add_first($expr, &dakota::util::remove_last($type));
           if ('=' eq &last($type)) {
-            &remove_last($type);
+            &dakota::util::remove_last($type);
             last;
           }
         }
       }
-      my $name = &remove_last($type);
+      my $name = &dakota::util::remove_last($type);
       &add_symbol($gbl_root, [ $name ]);
       my $slot_info = { 'name' => $name,
                         'type' => &arg::type($type) };
       if (scalar @$expr) {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
-      &add_last($seq, $slot_info);
+      &dakota::util::add_last($seq, $slot_info);
       &maybe_add_exported_header_for_symbol_seq($type);
       $has_expr = 0;
       $type = [];
@@ -759,7 +759,7 @@ sub enum_seq {
   my $expr = [];
   foreach my $tkn (@$tkns) {
     if (',' ne $$tkn{'str'}) {
-      &add_last($expr, $$tkn{'str'});
+      &dakota::util::add_last($expr, $$tkn{'str'});
     } else {
       my $name = &remove_first($expr);
       my $slot_info = { 'name' => $name };
@@ -770,7 +770,7 @@ sub enum_seq {
         }
         $$slot_info{'expr'} = join(' ', @$expr);
       }
-      &add_last($seq, $slot_info);
+      &dakota::util::add_last($seq, $slot_info);
       &maybe_add_exported_header_for_symbol_seq($expr);
       $expr = [];
     }
@@ -785,7 +785,7 @@ sub enum_seq {
       }
       $$slot_info{'expr'} = join(' ', @$expr);
     }
-    &add_last($seq, $slot_info);
+    &dakota::util::add_last($seq, $slot_info);
     &maybe_add_exported_header_for_symbol_seq($expr);
   }
   #print 'enum_seq: ' . &Dumper($seq);

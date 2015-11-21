@@ -378,7 +378,7 @@ sub colout {
 sub add_labeled_src {
   my ($result, $label, $src) = @_;
   if (!$$result{'--labels'}) { $$result{'--labels'} = []; }
-  &add_last($$result{'--labels'}, $label);
+  &dakota::util::add_last($$result{'--labels'}, $label);
   $$result{$label} = $src;
 }
 sub generate_decl_defn {
@@ -2273,7 +2273,7 @@ sub typedef_slots_t {
   } else {
     my $parts = [split(/::/, $klass_name)];
     if (1 < scalar @$parts) {
-      my $basename = &remove_last($parts);
+      my $basename = &dakota::util::remove_last($parts);
       my $ns = join('::', @$parts);
       $result = "namespace $ns { typedef $basename\::slots-t $basename-t; }";
     } else {
@@ -2631,7 +2631,7 @@ sub add_ordered {
   my ($ordered_klasses, $str) = @_;
   if (!$$ordered_klasses{'set'}{$str}) {
     $$ordered_klasses{'set'}{$str} = 1;
-    &add_last($$ordered_klasses{'seq'}, $str);
+    &dakota::util::add_last($$ordered_klasses{'seq'}, $str);
   } else {
     $$ordered_klasses{'set'}{$str}++;
   }

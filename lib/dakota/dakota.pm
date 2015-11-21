@@ -120,10 +120,10 @@ sub loop_merged_rep_from_dk {
     if ($arg =~ m|\.dk$| ||
           $arg =~ m|\.ctlg$|) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
-      &add_last($rep_files, &rep_path_from_any_path($arg));
+      &dakota::util::add_last($rep_files, &rep_path_from_any_path($arg));
     } elsif ($arg =~ m|\.rep$|) {
       $root = &scalar_from_file($arg);
-      &add_last($rep_files, $arg);
+      &dakota::util::add_last($rep_files, $arg);
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
@@ -289,9 +289,9 @@ sub loop_cc_from_dk {
 
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if ($input =~ m|\.rep$|) {
-      &add_last($rep, $input);
+      &dakota::util::add_last($rep, $input);
     } else {
-      &add_last($inputs, $input);
+      &dakota::util::add_last($inputs, $input);
     }
   }
   $$cmd_info{'reps'} = $rep;
@@ -580,10 +580,10 @@ sub loop_o_from_dk {
       delete $$o_cmd{'opts'}{'output'};
       if (!$ENV{'DKT_PRECOMPILE'}) {
         &o_from_cc($o_cmd);
-        &add_last($outfiles, $o_path);
+        &dakota::util::add_last($outfiles, $o_path);
       }
     } else {
-      &add_last($outfiles, $arg);
+      &dakota::util::add_last($outfiles, $arg);
     }
   }
   $$cmd_info{'inputs'} = $outfiles;
@@ -858,9 +858,9 @@ sub ctlg_from_so {
     my $precompile_inputs = [];
     foreach my $input (@{$$cmd_info{'inputs'}}) {
       if (-e $input) {
-        &add_last($precompile_inputs, $input);
+        &dakota::util::add_last($precompile_inputs, $input);
       } else {
-        &add_last($precompile_inputs, "../lib/libempty.$so_ext");
+        &dakota::util::add_last($precompile_inputs, "../lib/libempty.$so_ext");
       }
     }
     $$ctlg_cmd{'inputs'} = $precompile_inputs;
@@ -879,7 +879,7 @@ sub ordered_set_add {
       return;
     }
   }
-  &add_last($ordered_set, $element);
+  &dakota::util::add_last($ordered_set, $element);
 }
 sub start {
   my ($argv) = @_;
