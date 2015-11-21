@@ -198,8 +198,6 @@ nested klass/traits defns (i.e. inner klasses/traits)?
 
 sysconf(_SC_PAGE_SIZE)
 
-move get-segment-data() to own header only used by rt-cc
-
 when rewriting ...
 dynamically generate a pattern for each symbol in __symbol to replace the unneccessary
 explicit use of dk-intern()
@@ -218,4 +216,18 @@ a == b
 or
 a != b
 
+generate compile-time symbols for all shared objects only when linking an executable (so ALL compile-time
+symbols (and keywords) will be in sorted ascending/decending order so they may be $compare()ed.
+
 add optional offset to iterator
+
+text-(input,output}-stream is subklass of object-{input,output}-stream?
+
+symbol-t sym = "hi fred";
+=>
+symbol-t sym = #hi20fred;
+=>
+...
+
+convert generated unbox() of aggregate type to return slots-t& rather than slots-t*
+so self.foo becomes unbox(self).foo
