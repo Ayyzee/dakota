@@ -38,10 +38,8 @@ klass autorelease-pool-klass {
   finalize(object-t kls) -> object-t {
     return kls;
   }
-  method init(object-t self,
-                       named-info::slots-t* info-slots : nullptr,
-                       object-t                 info :      nullptr) -> object-t {
-    self = $init(super, #info-slots : info-slots, #info : info);
+  method va::init(object-t self, va-list-t args) -> object-t {
+    self = $va::init(super, args);
     self.pools = make(deque::klass);
     return self;
   }
