@@ -238,3 +238,5 @@ make sure PS1 is conditionally set
 if [ "${PS1+set}" = set ]
 then prompt=...
 fi
+
+add iter-like interface that takes a lambda func
