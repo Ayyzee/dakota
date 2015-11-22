@@ -18,6 +18,16 @@ module dakota;
 
 trait forward-iterator;
 
+auto map(object-t seq, method-t func) -> object-t {
+  object-t result = make(klass-of(seq));
+  for (object-t o in seq) {
+    object-t e = func(o);
+    if (nullptr != e)
+      $add(result, func(e));
+  }
+  return result;
+}
+
 /// first, last, at, ...
 klass sequence {
   superklass collection;

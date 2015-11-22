@@ -1,0 +1,14 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass int32;
+klass vector;
+
+int-t main() {
+  object-t seq1 = make(vector::klass, #items : { 0, 1, 2, 3, 4, 5 });
+  object-t seq2 = map(seq1, [](object-t e) -> object-t { if (*int32::unbox(e) % 2) return e; return nullptr; });
+  for (object-t e in seq2) {
+    unless (*int32::unbox(e) % 2)
+      std::abort();
+  }
+  return 0;
+}

@@ -155,7 +155,14 @@ sub rewrite_compound_literal_cstring_null {
 }
 sub nest_namespaces {
   my ($filestr_ref) = @_;
-  foreach my $kind ('klass', 'trait', 'namespace', 'KLASS-NS', 'TRAIT-NS') {
+  my $tbl = {
+    'klass' =>     'KLASS-NS',
+    'trait' =>     'TRAIT-NS',
+    'KLASS-NS' =>  'KLASS-NS',
+    'TRAIT-NS' =>  'TRAIT-NS',
+    'namespace' => 'namespace',
+  };
+  foreach my $kind (keys %$tbl) {
     while ($$filestr_ref =~ s/$kind(\s+)(::)?($id)::($rid)(\s*)($main::block)/namespace $3 { $kind$1$4$5$6 }/gs) { # intentionally omitted $2
     }
   }
@@ -167,7 +174,7 @@ sub rewrite_klass_decl {
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=^     (klass|trait)(\s+$rid\s*)(\{)=uc($1) . "-NS" . $2 . "{"=gemx;
+  $$filestr_ref =~ s=^(\s*)(klass|trait)(\s+$rid\s*)(\{)=$1 . uc($2) . "-NS" . $3 . "{"=gemx;
 }
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
@@ -430,6 +437,27 @@ sub trim {
   $str =~ s/^\s+//;
   $str =~ s/\s+$//;
   return $str;
+}
+sub rewrite_items_replacement {
+  my ($block_in) = @_;
+  my $result = "#items $colon cast(object-t[]){";
+  my $items = [split(/\s*,\s*/, $block_in)]; # bugbug: this will fail if a pointer to a function with two or more args
+  foreach my $item (@$items) {
+    $item = &trim($item);
+    if ($item =~ m/^\#/ || $item =~ m/^__symbol::/) {
+      $result .= " symbol::box($item),";
+    } elsif ($item =~ m/^\"/) {
+      $result .= " str::box($item),";
+    } else {
+      $result .= " box($item),";
+    }
+  }
+  $result .= ' nullptr }';
+  return $result;
+}
+sub rewrite_items {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/\#items\s+$colon\s*\{($main::block_in)\}/&rewrite_items_replacement($1)/egs;
 }
 sub rewrite_table_literal_replacement {
   my ($body) = @_;
@@ -940,6 +968,7 @@ sub convert_dk_to_cc {
 
   &rewrite_switch($filestr_ref);
 
+  &rewrite_items($filestr_ref); # must be before line removing leading #
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading #, rnielsen
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);

@@ -221,6 +221,7 @@ constexpr auto dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 # define DKT_NULL_METHOD cast(method_t)dkt_null_method
 
 [[so_export]] [[noreturn]] auto dkt_null_method(object_t object, ...) -> void;
+[[so_export]] auto map(object_t seq, method_t func) -> object_t;
 
 [[debug_so_export]] auto dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args) -> int_t;
 [[debug_so_export]] auto dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args) -> int_t;
