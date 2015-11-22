@@ -231,3 +231,10 @@ symbol-t sym = #hi20fred;
 
 convert generated unbox() of aggregate type to return slots-t& rather than slots-t*
 so self.foo becomes unbox(self).foo
+
+search for (*) and convert to auto/trailing-return-type if needed
+
+make sure PS1 is conditionally set
+if [ "${PS1+set}" = set ]
+then prompt=...
+fi
