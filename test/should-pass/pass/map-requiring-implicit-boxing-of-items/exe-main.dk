@@ -1,0 +1,10 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass vector;
+klass int32;
+
+int-t main() {
+  object-t seq = make(vector::klass, #items : { 0, 1, 2, 3, 4, 5 });
+
+  return 0;
+}
