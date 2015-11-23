@@ -1,9 +1,9 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-#include <stdio.h>
-#include <limits>
-#include <stdint.h>
-#include <stdarg.h>
+# include <cstdio>
+# include <limits>
+# include <cstdint>
+# include <cstdarg>
 
 klass boole;
 
@@ -47,21 +47,21 @@ klass uint-least64;
 klass float32;
 klass float64;
 
-namespace va { void func(void*, va_list_t); }
-void func(void*, ...);
+namespace va { auto func(void*, va_list_t) -> void; }
+auto func(void*, ...) -> void;
 
-namespace va { void func(void*, va_list_t args) {
-  __TYPE__ arg = va_arg(args, decltype(arg));
+namespace va { auto func(void*, va_list_t args) -> void {
+  wchar-t arg = va_arg(args, decltype(arg));
   USE(arg);
   return;
 } }
-void func(void* self, ...) {
+auto func(void* self, ...) -> void {
   va_list_t args;
   va_start(args, self);
   va::func(self, args);
   va_end(args);
   return;
 }
-int main() {
+auto main() -> int-t {
   return 0;
 }

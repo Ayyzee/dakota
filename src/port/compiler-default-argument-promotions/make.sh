@@ -2,4 +2,4 @@
 
 set -o errexit -o nounset -o pipefail
 
-./generate-default-argument-promotions.pl
+./generate-compiler-default-argument-promotions.pl
