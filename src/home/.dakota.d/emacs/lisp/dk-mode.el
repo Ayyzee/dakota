@@ -32,14 +32,15 @@
                     "void"
                     ))
 (setq dk-types '(
+                 "boole-t"
                  "keyword-t"
                  "object-t"
                  "slots-t"
                  "str-t"
                  "symbol-t"
-                 "boole-t"
                  ))
 (setq dk-constants '(
+                     "NUL"
                      "null"
                      "nullptr"
                      "std-error"
@@ -57,21 +58,20 @@
                      "SIGNATURE"
                      "superklass-of"
                      ))
-
 ;; generate regex string for each category of keywords
 (setq dk-keywords-regexp  (regexp-opt dk-keywords  'words))
-(setq dk-type-regexp      (regexp-opt dk-types     'words))
-(setq dk-constant-regexp  (regexp-opt dk-constants 'words))
+(setq dk-types-regexp     (regexp-opt dk-types     'words))
+(setq dk-constants-regexp (regexp-opt dk-constants 'words))
 (setq dk-functions-regexp (regexp-opt dk-functions 'words))
 
 ;; create the list for font-lock.
 ;; each category of keyword is given a particular face
 (setq dk-font-lock-keywords
       `(
-        (,dk-type-regexp . font-lock-type-face)
-        (,dk-constant-regexp . font-lock-constant-face)
+        (,dk-types-regexp     . font-lock-type-face)
+        (,dk-constants-regexp . font-lock-constant-face)
         (,dk-functions-regexp . font-lock-function-name-face)
-        (,dk-keywords-regexp . font-lock-keyword-face)
+        (,dk-keywords-regexp  . font-lock-keyword-face)
         ;; note: order above matters, because once colored, that part won't change.
         ;; in general, longer words first
         ))
@@ -85,18 +85,16 @@
   ;; code for syntax highlighting
   (setq font-lock-defaults '((dk-font-lock-keywords))) ; REQUIRED
   (setq font-lock-maximum-decoration 3)
-  ;(font-lock-mode 3)
   )
-
 ;; clear memory. no longer needed
-(setq dk-keywords nil)
-(setq dk-types nil)
+(setq dk-keywords  nil)
+(setq dk-types     nil)
 (setq dk-constants nil)
 (setq dk-functions nil)
 
 ;; clear memory. no longer needed
-(setq dk-keywords-regexp nil)
-(setq dk-types-regexp nil)
+(setq dk-keywords-regexp  nil)
+(setq dk-types-regexp     nil)
 (setq dk-constants-regexp nil)
 (setq dk-functions-regexp nil)
 
