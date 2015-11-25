@@ -1,13 +1,13 @@
 ; -*- mode: Emacs-Lisp -*-
 
-(defvar dk-mode-syntax-table
+(defvar dakota-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?- "w" st)
     st)
-  "Syntax table for `dk-mode'.")
+  "Syntax table for `dakota-mode'.")
 
 ;; define several category of keywords
-(setq dk-keywords '(
+(setq dakota-keywords '(
                     "auto"
                     "break"
                     "case"
@@ -38,7 +38,7 @@
                     "while"
                     "void"
                     ))
-(setq dk-types '(
+(setq dakota-types '(
                  "boole-t"
                  "keyword-t"
                  "method-t"
@@ -47,7 +47,7 @@
                  "str-t"
                  "symbol-t"
                  ))
-(setq dk-constants '(
+(setq dakota-constants '(
                      "false"
                      "NUL"
                      "exception::klass"
@@ -60,7 +60,7 @@
                      "std-output"
                      "true"
                      ))
-(setq dk-functions '(
+(setq dakota-functions '(
                      "at?"
                      "SELECTOR"
                      "SIGNATURE"
@@ -69,10 +69,10 @@
                      "__method__"
                      "__trait__"
                      "cast"
-                     "dk-hash"
-                     "dk-intern"
-                     "dk-intern-free"
-                     "dk-klass-for-name"
+                     "dakota-hash"
+                     "dakota-intern"
+                     "dakota-intern-free"
+                     "dakota-klass-for-name"
                      "equal?"
                      "in?"
                      "klass-of"
@@ -84,46 +84,44 @@
                      "typeid"
                      ))
 ;; generate regex string for each category of keywords
-(setq dk-keywords-regexp  (regexp-opt dk-keywords  'words))
-(setq dk-types-regexp     (regexp-opt dk-types     'words))
-(setq dk-constants-regexp (regexp-opt dk-constants 'words))
-(setq dk-functions-regexp (regexp-opt dk-functions 'words))
+(setq dakota-keywords-regexp  (regexp-opt dakota-keywords  'words))
+(setq dakota-types-regexp     (regexp-opt dakota-types     'words))
+(setq dakota-constants-regexp (regexp-opt dakota-constants 'words))
+(setq dakota-functions-regexp (regexp-opt dakota-functions 'words))
 
 ;; create the list for font-lock.
 ;; each category of keyword is given a particular face
-(setq dk-font-lock-keywords
+(setq dakota-font-lock-keywords
       `(
-        (,dk-types-regexp     . font-lock-type-face)
-        (,dk-constants-regexp . font-lock-constant-face)
-        (,dk-functions-regexp . font-lock-function-name-face)
-        (,dk-keywords-regexp  . font-lock-keyword-face)
+        (,dakota-types-regexp     . font-lock-type-face)
+        (,dakota-constants-regexp . font-lock-constant-face)
+        (,dakota-functions-regexp . font-lock-function-name-face)
+        (,dakota-keywords-regexp  . font-lock-keyword-face)
         ;; note: order above matters, because once colored, that part won't change.
         ;; in general, longer words first
         ))
 
 ;;;###autoload
-(define-derived-mode dk-mode c++-mode
-  "dk mode"
-  "Major mode for editing dk files"
-  ;:syntax-table dk-mode-syntax-table ; FAILS
+(define-derived-mode dakota-mode c++-mode
+  "dakota mode"
+  "Major mode for editing dakota files"
+  ;:syntax-table dakota-mode-syntax-table ; FAILS
 
   ;; code for syntax highlighting
-  (setq font-lock-defaults '((dk-font-lock-keywords))) ; REQUIRED
+  (setq font-lock-defaults '((dakota-font-lock-keywords))) ; REQUIRED
   (setq font-lock-maximum-decoration 3)
   )
 ;; clear memory. no longer needed
-(setq dk-keywords  nil)
-(setq dk-types     nil)
-(setq dk-constants nil)
-(setq dk-functions nil)
+(setq dakota-keywords  nil)
+(setq dakota-types     nil)
+(setq dakota-constants nil)
+(setq dakota-functions nil)
 
 ;; clear memory. no longer needed
-(setq dk-keywords-regexp  nil)
-(setq dk-types-regexp     nil)
-(setq dk-constants-regexp nil)
-(setq dk-functions-regexp nil)
+(setq dakota-keywords-regexp  nil)
+(setq dakota-types-regexp     nil)
+(setq dakota-constants-regexp nil)
+(setq dakota-functions-regexp nil)
 
 ;; add the mode to the `features' list
-(provide 'dk-mode)
-
-;;; dk-mode.el ends here
+(provide 'dakota-mode)
