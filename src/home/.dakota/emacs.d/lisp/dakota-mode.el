@@ -12,7 +12,6 @@
                         "break"
                         "case"
                         "catch"
-                        "const"
                         "default"
                         "do"
                         "else"
@@ -36,19 +35,22 @@
                         "true"
                         "try"
                         "while"
-                        "void"
                         ))
 (setq dakota-types '(
                      "boole-t"
+                     "const"
+                     "int-t"
                      "keyword-t"
                      "method-t"
                      "object-t"
                      "ptr-t"
+                     "selector-t"
+                     "signature-t"
                      "slots-t"
                      "str-t"
                      "symbol-t"
                      "va-list-t"
-                     "int-t"
+                     "void"
                      ))
 (setq dakota-constants '(
                          "NUL"
