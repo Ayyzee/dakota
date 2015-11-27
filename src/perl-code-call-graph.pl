@@ -27,9 +27,19 @@ $main::block = qr{
                    \}
                }x;
 
-my $data = { 'name-tbl' => {}, 'defn' => {}, 'defn-lines-total' => 0, 'defn-lines-max' => 0, 'use' => {}, 'use-total' => 0 };
-$$data{'excluded-use'} = do "perl-code-call-graph-excluded-use.pl";
-my $summary = { 'defn-count' => 0, 'use-count' => 0 };
+my $data = {
+  'excluded-use' => do "perl-code-call-graph-excluded-use.pl",
+  'defn' => {},
+  'defn-lines-max' => 0,
+  'defn-lines-total' => 0,
+  'name-tbl' => {},
+  'use' => {},
+  'use-total' => 0,
+  'summary' => {
+    'defn-count' => 0,
+    'use-count' => 0,
+  },
+};
 sub add_defn {
   my ($data, $name, $body) = @_;
   my $lines = $body =~ tr/\n//;
@@ -38,7 +48,7 @@ sub add_defn {
     $$data{'defn-lines-max'} = $lines;
   }
   $$data{'defn-lines-total'} += $lines;
-  $$summary{'defn-count'}++;
+  $$data{'summary'}{'defn-count'}++;
 }
 sub add_use {
   my ($data, $name) = @_;
@@ -46,7 +56,7 @@ sub add_use {
     $$data{'use'}{$name} = 0;
   }
   $$data{'use'}{$name}++;
-  $$summary{'use-count'}++;
+  $$data{'summary'}{'use-count'}++;
 }
 sub add_name {
   my ($data, $name) = @_;
@@ -96,7 +106,7 @@ foreach my $n1 (keys %$tbl1) {
   }
 }
 #use Data::Dumper; print STDERR &Dumper($$data{'defn'});
-use Data::Dumper; print STDERR &Dumper($summary);
+use Data::Dumper; print STDERR &Dumper($$data{'summary'});
 #use Data::Dumper; print &Dumper($tbl1);
 #use Data::Dumper; print STDERR &Dumper($tbl2);
 #use Data::Dumper; print STDERR &Dumper($name_tbl);
