@@ -8,7 +8,7 @@
 (define-derived-mode dakota-mode c++-mode "Dakota"
   "Major mode for editing Dakota source files."
   (modify-syntax-entry ?- "w")
-  (run-hooks 'dakota-mode-hook)
+  ;(run-hooks 'dakota-mode-hook)
 )
 (provide 'dakota-mode)
 
@@ -18,10 +18,9 @@
   ""
   (font-lock-add-keywords 'dakota-mode
                           '(("\\<\\(module\\|klass\\|trait\\)\\>" . font-lock-builtin-face)))
-
   (font-lock-add-keywords 'dakota-mode
                           '(("\\<\\(make\\|dk::?\\w+\\)\\>" . font-lock-builtin-face)))
-  (setq font-lock-maximum-decoration t)
-  (font-lock-mode 3)
+  ;(setq font-lock-maximum-decoration 3)
+  ;(setq font-lock-mode 3)
 )
 (add-hook 'dakota-mode-hook 'dakota-font-lock-setup)

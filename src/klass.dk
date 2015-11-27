@@ -305,12 +305,12 @@ klass resource-usage {
     uint32-t method-memory;
     uint32-t method-count;
   }
-  method add-alloc(slots-t* s, uint32-t size) -> slots-t*{
+  method add-alloc(slots-t* s, uint32-t size) -> slots-t* {
     s->instances++;
     s->memory += size;
     return s;
   }
-  method log-alloc(slots-t* s, object-t o) -> slots-t*{
+  method log-alloc(slots-t* s, object-t o) -> slots-t* {
     printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"\n",
            s->instances,
            klass::unbox(o)->offset + klass::unbox(o)->size,
@@ -510,7 +510,8 @@ klass klass {
         signature-t const* signature = cast(signature-t const*)selectors[index].key;
         method-t m = method-for-signature(&s->methods, signature);
         if (nullptr != m) {
-          uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 + cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
+          uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 +
+                           cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
           if (width > max-width)
             max-width = width;
         }
@@ -525,7 +526,8 @@ klass klass {
 
       if (nullptr != m) {
         fprintf(out, "  '%s(%s)'", signature->name, signature->parameter-types);
-        uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 + cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
+        uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 +
+                         cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
         while (width < max-width) {
           fprintf(out, " ");
           width++;
@@ -634,8 +636,8 @@ klass klass {
   object-t init(object-t self, named-info::slots-t* info-slots);
 
   method init(object-t self,
-                       named-info::slots-t* info-slots : nullptr,
-                       object-t                 info :      nullptr) -> object-t {
+              named-info::slots-t* info-slots : nullptr,
+              object-t             info :       nullptr) -> object-t {
     self = $init(super);
     assert(!(nullptr != info-slots &&
              nullptr != info));
