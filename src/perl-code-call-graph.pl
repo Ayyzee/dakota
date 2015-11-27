@@ -115,15 +115,18 @@ if (1) {
   print "digraph {\n";
   print "  graph [ rankdir = LR, size = \"8,10.5\", center = true, ratio = expand ];\n";
   print "  node [ shape = rect, style = rounded, fontname = \"Courier-Oblique\" ];\n";
+  print "\n";
 
   my $lines_ave = scalar $$data{'defn-lines-total'} / (scalar keys %{$$data{'defn'}});
   foreach my $node (sort keys %{$$data{'defn'}}) {
     if (!exists $$data{'excluded-use'}{$node}) {
       my $lines = $$data{'defn'}{$node};
       my $node_height = sprintf("%.2f", log($lines / length($node)));
-      if (0 < $node_height) {
-        print " \"$node\" [ height = \"$node_height\" ];\n";
+      my $min_height = 0.02;
+      if ($node_height < $min_height) {
+        $node_height = $min_height;
       }
+      print "  \"$node\" [ height = \"$node_height\" ];\n";
     }
   }
   print "\n";
