@@ -21,7 +21,7 @@ klass dimension {
     int32-t width;
     int32-t height;
   }
-  method init(object-t self, slots-t slots : {0, 0}) -> object-t {
+  method init(object-t self, slots-t slots : {.width = 0, .height = 0}) -> object-t {
     self = $init(super);
     unbox(self) = slots;
     return self;

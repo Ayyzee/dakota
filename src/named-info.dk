@@ -35,7 +35,7 @@ klass named-info {
   //            compare = property::compare()
     slots-t*    next;
   }
-  method init(object-t self, slots-t slots : {nullptr, 0, nullptr}) -> object-t {
+  method init(object-t self, slots-t slots : {.elements = nullptr, .count = 0, .next = nullptr}) -> object-t {
     self = $init(super);
     unbox(self) = slots;
     return self;
@@ -83,12 +83,15 @@ klass named-info {
         uintptr-t element = current->elements[i].element;
         printf("  #%s : %p", key, cast(ptr-t)element);
 
-        if (0) {}
-        else-if (0 == symbol::compare(#file, key))
-              printf("  \"%s\",", cast(str-t)(element));
-        else-if (0 == symbol::compare(#name, key) ||
-                 0 == symbol::compare(#type, key))
-              printf("  #%s,",    cast(symbol-t)(element));
+        switch (key) {
+          case #file:
+            printf("  \"%s\",", cast(str-t)(element));
+            break;
+          case #name:
+          case #type:
+            printf("  #%s,",    cast(symbol-t)(element));
+            break;
+        }
         printf("\n");
       }
       printf("},\n");
@@ -101,7 +104,6 @@ klass named-info {
     symbol-t other-name = cast(symbol-t)at(other-s, #name);
     //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
     int-t result = symbol::compare(s-name, other-name);
-    result = dkt-normalize-compare-result(result);
     return result;
   }
   method compare(slots-t** s, slots-t** other-s) -> int-t {
@@ -118,7 +120,6 @@ klass named-info {
     } else {
       result = $compare(super, other);
     }
-    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

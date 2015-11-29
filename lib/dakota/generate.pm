@@ -3318,7 +3318,9 @@ sub dk_generate_cc_footer_klass {
         $$tbl{'#size'} = "sizeof(slots-t::$$slot_info{'name'})";
         #$$tbl{'#type'} = '__symbol::' . &dk_mangle($$slot_info{'type'});
         $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
-        $$tbl{'#typeid'} = "dk-intern-free(demangle(typeid(slots-t::" . $$slot_info{'name'} . ").name()))"; # leakleak
+        my $tp = 'slots-t::' . $$slot_info{'name'};
+       #$$tbl{'#typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
+        $$tbl{'#typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
 
         if (defined $$slot_info{'expr'}) {
           $$tbl{'#expr'} = "($$slot_info{'expr'})";
@@ -3396,7 +3398,9 @@ sub dk_generate_cc_footer_klass {
     my $slots_type_ident = &dk_mangle($$klass_scope{'slots'}{'type'});
     my $type_symbol = $$klass_scope{'slots'}{'type'};
     $$tbbl{'#slots-type'} = "\"$type_symbol\"";
-    $$tbbl{'#slots-typeid'} = "dk-intern-free(demangle(typeid(slots-t).name()))";
+    my $tp = 'slots-t';
+   #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
+    $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
   } elsif (&has_slots_info($klass_scope)) {
     my $cat = $$klass_scope{'slots'}{'cat'};
     $$tbbl{'#cat'} = "\#$cat";

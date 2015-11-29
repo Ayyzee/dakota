@@ -49,7 +49,7 @@ klass str-klass {
 klass str {
   klass str-klass;
 
-  slots char8-t const*;
+  slots const char8-t*;
 
   method dump(object-t self) -> object-t {
     $dump(super);
@@ -85,10 +85,10 @@ klass str {
       slots-t s1 = unbox(self);
       slots-t s2 = unbox(other);
       result = ks.strcmp(s1, s2);
+      result = dkt-normalize-compare-result(result);
     } else {
       result = $compare(super, other);
     }
-    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

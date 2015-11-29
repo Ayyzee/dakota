@@ -64,7 +64,8 @@ INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MO
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
 
-EXTRA_CXXFLAGS += --optimize=0 --debug=3 --define-macro DEBUG # debug flags
+EXTRA_CXXFLAGS += --optimize=0 --debug=3 # debug flags
+EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
 #EXTRA_CXXFLAGS += -MMD -MP
 
 ifdef DKT_PROFILE

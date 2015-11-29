@@ -30,22 +30,22 @@
 # define DKT_MEM_MGMT_NEW    1
 # define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
 
+namespace dkt {
 # if defined __GNUG__
-inline func demangle(str_t mangled_name) -> str_t {
-  int status = -1;
-  str_t name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
-  if (0 == status)
-    return name;
-  else
-    return nullptr;
-}
+  inline func demangle(str_t mangled_name) -> str_t {
+    int status = -1;
+    str_t name = abi::__cxa_demangle(mangled_name, 0, 0, &status); // must be free()d
+    if (0 == status)
+      return name;
+    else
+      return nullptr;
+  }
 # else // does nothing if not g++
-inline func demangle(str_t mangled_name) -> str_t {
-  return name;
-}
+  inline func demangle(str_t mangled_name) -> str_t {
+    return name;
+  }
 # endif
 
-namespace dkt {
   inline func dealloc(void* ptr) -> void {
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
     operator delete(ptr);
@@ -88,8 +88,10 @@ namespace dkt {
 }
 # if defined DEBUG
   # define DEBUG_STMT(stmt) stmt
+  # define INTERNED_DEMANGLED_TYPEID_NAME(t) dk_intern_free(dkt::demangle(typeid(t).name()))
 # else
   # define DEBUG_STMT(stmt)
+  # define INTERNED_DEMANGLED_TYPEID_NAME(t) nullptr
 # endif
 
 # define dkt_rodata_section  gnu::section("__DKT_RODATA, __dkt_rodata")

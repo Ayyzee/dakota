@@ -38,10 +38,6 @@ flush out signal-exception klasses (move/reorg some code from dakota.dk)
 selector in every method (like _cmd in objective-c) like __method__ which
 is a signature (which is like __func__) name would likely __selector__
 
-support something like perl's map function
-my       @doubles = map { $_ * 2 } @numbers;
-object-t  doubles = map {  _ * 2 }  numbers;
-
 support #'abcd', #true, #false
 
 in perl:
@@ -68,9 +64,6 @@ info@size = expr
 $set-at(info, size, expr)
 
 #`...`  make(process::klass, #path : ..., #args : ..., #vars : ...).$exec()
-
-klass number {
-  superklass of all float types, int types, and char types
 
 allow tracing on specific generics
 
@@ -131,7 +124,6 @@ features that show:
   range (first, last, interval)
   #true/#false instance of klass boole
   selector in every method body (__selector__)
-  map like in perl (use lambda func)
   as(a klass) casting syntax
 
 rename various things to consistent kw-args, kw-arg-method..., or simpley keyword
@@ -148,11 +140,27 @@ new alias syntax:
 
 from swift:
   case "cucumber", "watercress":
+  for e in seq {
+  if parens-not-required {
+  []:  empty array
+  [:]: empty dict
+  ??: val-which-might-be-null ?? default-val-if-lhs-is-null
+  for (first, last) in table {
+
+o.$m1().$m2()
+=>
+$m2($m1(o))
+
+o.$m1(a1, a2).$m2(a3)
+=>
+$m2($m1(o, a1, a2), a3)
+
+o.$m1(a1, a2).$m2(a3, a4).$m3(a5, a6)
+=>
+$m3($m2($m1(o, a1, a2), a3, a4), a5, a6)
 
 bin/dakota-build --project [project.rep] --jobs 4 ../lib/libdakota.so
   which uses bin/dakota just like make does
-
-convert non-method functions to the new syntax
 
 convert method [[alias(...)]] to method ...() => ...(...)
 
@@ -216,10 +224,7 @@ a == b
 or
 a != b
 
-generate compile-time symbols for all shared objects only when linking an executable (so ALL compile-time
-symbols (and keywords) will be in sorted ascending/decending order so they may be $compare()ed.
-
-add optional offset to iterator
+add optional index to for/in iterator
 
 text-(input,output}-stream is subklass of object-{input,output}-stream?
 
@@ -228,11 +233,6 @@ symbol-t sym = "hi fred";
 symbol-t sym = #hi20fred;
 =>
 ...
-
-convert generated unbox() of aggregate type to return slots-t& rather than slots-t*
-so self.foo becomes unbox(self).foo
-
-search for (*) and convert to auto/trailing-return-type if needed
 
 make sure PS1 is conditionally set
 if [ "${PS1+set}" = set ]
@@ -244,3 +244,24 @@ add iter-like interface that takes a lambda func
 prefix initialize()/finalize() with 'klass method'
 
 replace visibility comment with [[]]
+
+do  {} catch (...) {}
+=>
+try {} catch (...) {}
+
+do {} ...
+=>
+do {} while (0); ...
+
+do {} until (...);
+=>
+do {} while (!(...));
+
+switch { case: automatically get trailing break added IFF the last token is not nobreak
+
+fix code to remove excessive typeinfo echoed with src/bin/check-symbols.sh
+
+fix "never" slots (slots which comments indicate will never be something only to have #slots default to set to those never values
+
+current: dkt-get-klass-chain(object-t kls, char8-t* buf, uint32-t buf-len) -> char8-t*;
+add:     dkt-get-klass-chain(object-t kls, str-buffer-t str-buf)

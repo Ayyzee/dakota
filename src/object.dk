@@ -50,9 +50,9 @@ klass object {
   }
   method compare(object-t self, object-t other) -> int-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    intptr-t result = cast(uint8-t*)self - cast(uint8-t*)(other);
-    result = dkt-normalize-compare-result(result);
-    return cast(int-t)(result);
+    intmax-t diff = cast(uint8-t*)self - cast(uint8-t*)(other);
+    int-t result = dkt-normalize-compare-result(diff);
+    return result;
   }
   method equal?(object-t self, object-t other) -> boole-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));

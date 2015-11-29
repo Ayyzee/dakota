@@ -272,7 +272,7 @@ offset-from-info(named-info-t* info) {
   uint32-t result;
 
   symbol-t name = name-from-info(info);
-  if (0 == symbol::compare(#object, name))
+  if (#object == name)
   { // klass is "object"
     result = 0;
   } else {

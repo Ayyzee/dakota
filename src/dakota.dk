@@ -104,8 +104,7 @@ klass named-assoc-node {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
-    int-t result = symbol::compare(cast(symbol-t)(s->name), cast(symbol-t)(other-s->name)); // hackhack
-    result = dkt-normalize-compare-result(result);
+    int-t result = symbol::compare(s->name, other-s->name);
     return result;
   }
 //   slots-t* dump(slots-t* s)
@@ -341,7 +340,7 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
 
     do {
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type);
-      if (0 == symbol::compare(#klass, type))
+      if (#klass == type)
         klasses-count++;
       signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method.signatures);
 
@@ -688,7 +687,7 @@ func interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t {
   }
 //   if (nullptr != result)
 //     fprintf(stderr, "%s = %s(%s)\n", result, __func__, klass-name);
-  assert(0 != symbol::compare(klass-name, result));
+  assert(klass-name != result);
   return result;
 }
 func add-interpose-prop(symbol-t key, symbol-t element) -> void {
@@ -720,7 +719,7 @@ func dk-register-klass(named-info-t* klass-info) -> object-t {
   symbol-t interpose-name = cast(symbol-t)named-info::at(klass-info, #interpose-name);
   if (nullptr != interpose-name) {
     symbol-t type = cast(symbol-t)named-info::at(klass-info, #type);
-    assert(0 == symbol::compare(#klass, type));
+    assert(#klass == type);
     add-interpose-prop(interpose-name, name);
   }
   named-info-t** klass-info-ptr = cast(named-info-t**)sorted-array::bsearch(gbl-klass-defns-table, &klass-info);
@@ -1025,9 +1024,9 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
     if (nullptr == klass-name)
       superklass-name = default-klass-name();
   } else {
-    if (0 == symbol::compare(default-superklass-name(), superklass-name))
+    if (default-superklass-name() == superklass-name)
       superklass-name = nullptr;
-    if (0 == symbol::compare(default-klass-name(), klass-name))
+    if (default-klass-name() == klass-name)
       klass-name = nullptr;
   }
   if (nullptr != modulee && 0 != safe-strcmp(gbl-current-module, modulee)) {
