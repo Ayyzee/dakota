@@ -25,7 +25,7 @@ static int-t check(object-t klass, str-pair-t* sp, size-t sp-len) {
   for (uint32-t i = 0; i < sp-len; i++) {
     object-t first = $in(collection, str::box(sp[i].first), nullptr);
     if (nullptr != first)
-      fprintf(stdout, "    first: %s/%s\n", sp[i].first, *str::unbox(first));
+      fprintf(stdout, "    first: %s/%s\n", sp[i].first, str::unbox(first));
     else {
       fprintf(stdout, "    FAILED: first: %s\n", sp[i].first);
       result = 1;

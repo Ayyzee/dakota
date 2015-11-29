@@ -37,7 +37,7 @@ klass named-info {
   }
   method init(object-t self, slots-t slots : {nullptr, 0, nullptr}) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     return self;
   }
   method check(slots-t* s) -> int32-t {
@@ -49,15 +49,16 @@ klass named-info {
     }
     return 0;
   }
-  method sort(slots-t* s) -> slots-t*{
+  method sort(slots-t* s) -> slots-t* {
     qsort(s->elements, s->count, sizeof(s->elements[0]),
-          cast(std-compare-t)cast(int-t(*)(property::slots-t*,property::slots-t*))property::compare);
+          cast(std-compare-t)cast(func (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
     return s;
   }
-  method search(slots-t* s, symbol-t key) -> property-t*{
-    property::slots-t property = { cast(symbol-t)(key), cast(uintptr-t)0 };
+  method search(slots-t* s, symbol-t key) -> property-t* {
+    property::slots-t property = { cast(symbol-t)key, cast(uintptr-t)0 };
     property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
-                                                              cast(std-compare-t)cast(int-t (*)(property::slots-t*,property::slots-t*))property::compare);
+                                                                cast(std-compare-t)cast(func (*)(property::slots-t*,
+                                                                                                 property::slots-t*) -> int-t)property::compare);
     return result;
   }
   method at(slots-t* s, symbol-t key) -> uintptr-t {
@@ -103,7 +104,7 @@ klass named-info {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  auto compare(slots-t** s, slots-t** other-s) -> int-t {
+  method compare(slots-t** s, slots-t** other-s) -> int-t {
     int-t result = compare(*s, *other-s);
     return result;
   }
@@ -111,9 +112,9 @@ klass named-info {
     int-t result;
 
     if ($instance?(other, klass)) {
-      slots-t* s1 = unbox(self);
-      slots-t* s2 = unbox(other);
-      result = compare(s1, s2);
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = compare(&s1, &s2);
     } else {
       result = $compare(super, other);
     }
@@ -121,7 +122,7 @@ klass named-info {
     return result;
   }
 }
-auto dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
+func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
 //   assert(nullptr != name);
   symbol-t key;
   uintptr-t element;
@@ -152,25 +153,25 @@ auto dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t*
   sort(info);
   return info;
 }
-auto dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
+func dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   object-t info = box(info-slots);
   return info;
 }
-[[sentinel]] auto dk-make-named-info-slots(symbol-t name, ...) -> named-info-t* {
+[[sentinel]] func dk-make-named-info-slots(symbol-t name, ...) -> named-info-t* {
   va-list-t args;
   va-start(args, name);
   named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
   va-end(args);
   return info-slots;
 }
-[[sentinel]] auto dk-make-named-info(symbol-t name, ...) -> object-t {
+[[sentinel]] func dk-make-named-info(symbol-t name, ...) -> object-t {
   va-list-t args;
   va-start(args, name);
   object-t info = dk-va-make-named-info(name, args);
   va-end(args);
   return info;
 }
-auto dkt-dump-named-info(named-info-t* info) -> named-info-t* {
+func dkt-dump-named-info(named-info-t* info) -> named-info-t* {
   return named-info::dump(info);
 }

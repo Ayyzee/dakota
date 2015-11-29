@@ -26,7 +26,7 @@
     switch (name) {
       case #strcmp:
         assert(dk::instance?(element, str-compare::klass));
-        self.strcmp = *str-compare::unbox(element);
+        self.strcmp = str-compare::unbox(element);
         result = element;
         break;
       default:

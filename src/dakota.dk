@@ -78,15 +78,11 @@ klass uintptr;
 klass unbox-illegal-klass-exception;
 
 # if DKT-WORKAROUND
-namespace property {
-  auto compare(slots-t**, slots-t**) -> int-t;
-}
-namespace named-info {
-  auto compare(slots-t**, slots-t**) -> int-t;
-}
+namespace property   { func compare(slots-t*,  slots-t* ) -> int-t; }
+namespace named-info { func compare(slots-t**, slots-t**) -> int-t; }
 namespace klass {
-  auto init(object-t, named-info-t*) -> object-t;
-  auto subklass?(object-t, object-t) -> boole-t;
+  func init(object-t, named-info-t*) -> object-t;
+  func subklass?(object-t, object-t) -> boole-t;
 }
 # endif
 
@@ -129,25 +125,25 @@ static sorted-array-t* gbl-klass-defns-table;
 static sorted-array-t* gbl-interposers-table;
 static sorted-array-t* gbl-imported-klasses-file-table;
 
-static auto init-runtime-ds() -> void {
+static func init-runtime-ds() -> void {
   const uint32-t num-klasses = 256;
 
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(named-assoc-node::slots-t),
-                        cast(std-compare-t)cast(int-t(*)(named-assoc-node::slots-t*,named-assoc-node::slots-t*))named-assoc-node::compare);
+                        cast(std-compare-t)cast(func (*)(named-assoc-node::slots-t*,named-assoc-node::slots-t*) -> int-t)named-assoc-node::compare);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(named-info::slots-t*),
-                        cast(std-compare-t)cast(int-t(*)(named-info::slots-t**,named-info::slots-t**))named-info::compare);
+                        cast(std-compare-t)cast(func (*)(named-info::slots-t**,named-info::slots-t**) -> int-t)named-info::compare);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(property::slots-t),
-                        cast(std-compare-t)cast(int-t(*)(property::slots-t*,property::slots-t*))property::compare);
+                        cast(std-compare-t)cast(func (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(symbol-t),
-                        cast(std-compare-t)cast(int-t(*)(symbol::slots-t*,symbol::slots-t*))symbol::compare);
+                        cast(std-compare-t)cast(func (*)(symbol::slots-t*,symbol::slots-t*) -> int-t)symbol::compare);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -165,14 +161,14 @@ klass x::stat {
   slots struct stat;
 }
 // this is quick and dirty!!!!!!!!!!!!!!!!
-static auto init-imported-klasses() -> void {
+static func init-imported-klasses() -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   symbol-t* imported-klass-name-ptr;
   while (nullptr != (imported-klass-name-ptr = (symbol-t*)sorted-array::remove-last(gbl-imported-klasses-file-table)))
     dk-klass-for-name(*imported-klass-name-ptr);
   return;
 }
-static auto file-name-from-klass-name(symbol-t klass-name) -> str-t {
+static func file-name-from-klass-name(symbol-t klass-name) -> str-t {
   char8-t* file-name = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (symbol::length(klass-name) + 1));
   file-name[0] = NUL;
   uint32-t kn = 0;
@@ -199,7 +195,7 @@ static auto file-name-from-klass-name(symbol-t klass-name) -> str-t {
   file-name[fn] = NUL;
   return file-name;
 }
-static auto find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
+static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
   char8-t* file = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (FILENAME-MAX + 1));
   file[0] = NUL;
   uint32-t j1 = 0;
@@ -246,13 +242,13 @@ static auto find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
   }
   return rtn;
 }
-auto default-klass-name() -> symbol-t {
+func default-klass-name() -> symbol-t {
   return #klass;
 }
-static auto default-klass() -> object-t {
+static func default-klass() -> object-t {
   return klass::klass;
 }
-static auto alloc-klass(symbol-t name) -> object-t {
+static func alloc-klass(symbol-t name) -> object-t {
   named-info-t* info = info-for-name(name);
   symbol-t klass-name = klass-name-from-info(info);
   if (nullptr == klass-name)
@@ -276,54 +272,54 @@ static auto alloc-klass(symbol-t name) -> object-t {
   kls->retain-count = 1;
   return kls;
 }
-static auto init-klass(object-t kls, symbol-t name) -> object-t {
+static func init-klass(object-t kls, symbol-t name) -> object-t {
     named-info-t* info = info-for-name(name);
     kls = klass::init(kls, info);
     return kls;
 }
-auto import-klass(symbol-t name, assoc-node-t* klass-assoc) -> void;
+func import-klass(symbol-t name, assoc-node-t* klass-assoc) -> void;
 
 klass ostream {
   slots {
     stream-t output;
     uint32-t col;
   }
-  static auto col-incr(slots-t& s) -> slots-t& {
+  static func col-incr(slots-t& s) -> slots-t& {
     s.col++;
     return s;
   }
-  static auto col-decr(slots-t& s) -> slots-t& {
+  static func col-decr(slots-t& s) -> slots-t& {
     if (0 != s.col) {
       s.col--;
     }
     return s;
   }
-  static auto pad(slots-t& s) -> slots-t& {
+  static func pad(slots-t& s) -> slots-t& {
     for (uint32-t i = 0; i < s.col; i++)
       fprintf(s.output, "  "); // two spaces per column :-) [my way]
     return s;
   }
-  namespace va { [[format-va-printf(2)]] static auto println-format(slots-t, str-t, va-list-t) -> slots-t; }
-  [[format-va-printf(2)]] static auto va::println-format(slots-t s, str-t format, va-list-t args) -> slots-t {
+  namespace va { [[format-va-printf(2)]] static func println-format(slots-t, str-t, va-list-t) -> slots-t; }
+  [[format-va-printf(2)]] static func va::println-format(slots-t s, str-t format, va-list-t args) -> slots-t {
     pad(s);
     vfprintf(s.output, format, args);
     return s;
   }
-  [[format-printf(2)]] static auto println-format(slots-t s, str-t format, ...) -> slots-t {
+  [[format-printf(2)]] static func println-format(slots-t s, str-t format, ...) -> slots-t {
     va-list-t args;
     va-start(args, format);
     va::println-format(s, format, args);
     va-end(args);
     return s;
   }
-  static auto fopen(str-t path) -> slots-t {
+  static func fopen(str-t path) -> slots-t {
     slots-t s = { nullptr, 0 };
     s.output = ::fopen(path, "w");
     if (nullptr == s.output)
       std::abort();
     return s;
   }
-  static auto fclose(slots-t& s) -> slots-t& {
+  static func fclose(slots-t& s) -> slots-t& {
     int n = ::fclose(s.output);
     if (-1 == n)
       std::abort();
@@ -332,7 +328,7 @@ klass ostream {
 }
 # if 1
 extern sorted-array-t gbl-selectors-table;
-static auto json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
+static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
   uint32-t klasses-count = 0;
   uint32-t methods-count = 0;
   for (uint32-t i = 0; i < klass-defns-table->count; i++) {
@@ -365,7 +361,7 @@ static auto json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
 }
 # endif
 
-static auto json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
+static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
   ostream-t ostrm = { stdout, 0 };
   ostream::println-format(ostrm, "{\n");
   ostream::col-incr(ostrm);
@@ -425,14 +421,14 @@ static auto json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
 }
 static named-info-t* gbl-registration-info-list;
 
-auto register-info-common(named-info-t* registration-info, ptr-t user-data) -> void;
+func register-info-common(named-info-t* registration-info, ptr-t user-data) -> void;
 
-// auto dk-make-simple-singleton(symbol-t name, symbol-t superklass-name) -> object-t {
+// func dk-make-simple-singleton(symbol-t name, symbol-t superklass-name) -> object-t {
 //   object-t kls = dk-make-simple-klass(name, superklass-name, #singleton-klass);
 //   object-t singleton = make(kls);
 //   return singleton;
 // }
-auto dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name) -> object-t {
+func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name) -> object-t {
   //fprintf(stderr, "%s(#%s, #%s, #%s)\n", __func__, name, superklass-name, klass-name);
   assert(name != nullptr);
   uint32-t num-klass-props = 1;
@@ -461,19 +457,19 @@ auto dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
 klass named-info-func {
   slots (*)(named-info-t*, ptr-t) -> void;
 }
-static auto each(named-info-t* root-info-list, named-info-func-t func, ptr-t user-data) -> void  {
+static func each(named-info-t* root-info-list, named-info-func-t info-func, ptr-t user-data) -> void  {
   named-info-t* info;
   named-info-t* info-list = root-info-list;
   while (nullptr != (info = info-list)) {
     info-list = info-list->next;
     named-info-t* next = info->next;
     info->next = nullptr;
-    func(info, user-data);
+    info-func(info, user-data);
     info->next = next;
   }
   return;
 }
-static auto each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
+static func each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
   assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str.ptrs);
   if (assocs) {
     symbol-t* names =    cast(symbol-t*)named-info::at(info, #str.names);
@@ -494,7 +490,7 @@ static auto each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
     assert(nullptr == literals[i]);
   }
 }
-static auto each-int(named-info-t* info, object-t (*box)(uintptr-t)) -> void  {
+static func each-int(named-info-t* info, object-t (*box)(uintptr-t)) -> void  {
   assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int.ptrs);
   if (assocs) {
     symbol-t*  names =    cast(symbol-t*) named-info::at(info, #int.names);
@@ -523,7 +519,7 @@ static auto each-int(named-info-t* info, object-t (*box)(uintptr-t)) -> void  {
 // object         klass' klass is klass klass
 // klass          klass' klass is klass klass
 // null-singleton klass' klass is klass klass
-auto dk-init-runtime() -> void {
+func dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   if (nullptr == object::klass) {
@@ -538,12 +534,12 @@ auto dk-init-runtime() -> void {
     object::klass = init-klass(object::klass, #object); // must be first
     klass::klass =  init-klass(klass::klass,  #klass);
 
-    klass::unbox(object::klass)->superklass = nullptr;
+    klass::unbox(object::klass).superklass = nullptr;
 # if 1
     //dk-klass-for-name(#singleton-klass); // ???
     null-singleton::klass = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
     null = make(null-singleton::klass);
-    klass::unbox(object::klass)->superklass = null;
+    klass::unbox(object::klass).superklass = null;
 # endif
     // core runtime klasses are setup
     // klasses: object, klass, (optionally) singleton-klass
@@ -582,11 +578,11 @@ auto dk-init-runtime() -> void {
     if (null-singleton::klass)
       behavior = $behavior(null-singleton::klass);
 # else
-    klass::unbox(object::klass)->behavior =     nullptr;
-    klass::unbox(klass::klass)->behavior =      nullptr;
-    klass::unbox(bit-vector::klass)->behavior = nullptr;
+    klass::unbox(object::klass).behavior =     nullptr;
+    klass::unbox(klass::klass).behavior =      nullptr;
+    klass::unbox(bit-vector::klass).behavior = nullptr;
     if (null-singleton::klass)
-      klass::unbox(null-singleton::klass)->behavior = nullptr;
+      klass::unbox(null-singleton::klass).behavior = nullptr;
 # endif
 # if 1
     dk-klass-for-name(#input-stream);
@@ -599,17 +595,17 @@ auto dk-init-runtime() -> void {
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(str-t)))each-str,
-         cast(ptr-t)cast(object-t (*)(str-t))str::box);
+         cast(func (*)(named-info-t*, ptr-t) -> void)cast(func (*)(named-info-t*, func (*)(str-t) -> object-t) -> void)each-str,
+         cast(ptr-t)cast(func (*)(str-t) -> object-t)str::box);
     dk-klass-for-name(#uintptr);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(uintptr-t)))each-int,
-         cast(ptr-t)cast(object-t (*)(uintptr-t))uintptr::box);
+         cast(func (*)(named-info-t*, ptr-t) -> void)cast(func (*)(named-info-t*, func (*)(uintptr-t) -> object-t) -> void)each-int,
+         cast(ptr-t)cast(func (*)(uintptr-t) -> object-t)uintptr::box);
 
-    auto previous-terminate = std::set-terminate(verbose-terminate);
+    func previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
 
-    auto previous-unexpected = std::set-unexpected(verbose-unexpected);
+    func previous-unexpected = std::set-unexpected(verbose-unexpected);
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 # if 0
@@ -626,7 +622,7 @@ auto dk-init-runtime() -> void {
 
   return;
 }
-auto imported-klasses-for-klass(symbol-t klass-name) -> assoc-node-t* {
+func imported-klasses-for-klass(symbol-t klass-name) -> assoc-node-t* {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   named-assoc-node-t named-node = { klass-name, nullptr };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node); // hackhack
@@ -638,7 +634,7 @@ auto imported-klasses-for-klass(symbol-t klass-name) -> assoc-node-t* {
     result = found-named-node->node;
   return result;
 }
-auto import-klass(symbol-t klass-name, assoc-node-t* node) -> void {
+func import-klass(symbol-t klass-name, assoc-node-t* node) -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { klass-name, node };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
@@ -656,7 +652,7 @@ auto import-klass(symbol-t klass-name, assoc-node-t* node) -> void {
   }
   return;
 }
-static auto import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc) -> void {
+static func import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc) -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%p']",
                         __func__,
                         cast(ptr-t)(klass-names),
@@ -675,7 +671,7 @@ static auto import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc) -> 
   }
   return;
 }
-auto interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t {
+func interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t {
   property-t key = { klass-name, cast(uintptr-t)nullptr };
   property-t* assoc-ptr = cast(property-t*)sorted-array::bsearch(gbl-interposers-table, &key);
   symbol-t result;
@@ -691,13 +687,13 @@ auto interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t {
   assert(0 != symbol::compare(klass-name, result));
   return result;
 }
-auto add-interpose-prop(symbol-t key, symbol-t element) -> void {
+func add-interpose-prop(symbol-t key, symbol-t element) -> void {
 //   dkt-log(dkt::k-log-info, "%s(%s, %s)", __func__, key, element);
   property-t prop = { key, cast(uintptr-t)element };
   sorted-array::add(gbl-interposers-table, &prop);
   return;
 }
-static auto add-interposers(property-t* interposers) -> void {
+static func add-interposers(property-t* interposers) -> void {
 //assert(nullptr != interposers);
   uint32-t i = 0;
   while (1) {
@@ -710,7 +706,7 @@ static auto add-interposers(property-t* interposers) -> void {
 //     fprintf(stderr, "===\n");
   return;
 }
-auto dk-register-klass(named-info-t* klass-info) -> object-t {
+func dk-register-klass(named-info-t* klass-info) -> object-t {
   //fprintf(stderr, "%s(#%s)\n", __func__, cast(symbol-t)named-info::at(klass-info, #name));
   named-info::sort(klass-info);
   symbol-t name = name-from-info(klass-info);
@@ -737,7 +733,7 @@ auto dk-register-klass(named-info-t* klass-info) -> object-t {
     klass = nullptr;
   return klass;
 }
-static auto export-klasses(named-info-t* klass-info) -> void {
+static func export-klasses(named-info-t* klass-info) -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p']", __func__, cast(ptr-t)(klass-info));
   uint32-t i = 0;
 
@@ -749,7 +745,7 @@ static auto export-klasses(named-info-t* klass-info) -> void {
   }
   return;
 }
-static auto dump-interposers(ostream-t ostrm, named-info-t* registration-info) -> void {
+static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -> void {
   property-t const* interposers = cast(property-t const*)named-info::at(registration-info, #interposers);
   if (nullptr != interposers) {
     for (uint32-t i = 0; nullptr != interposers[i].key; i++)
@@ -757,7 +753,7 @@ static auto dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
   }
   return;
 }
-static auto dump?(named-info-t* klass-info, str-t only) -> boole-t {
+static func dump?(named-info-t* klass-info, str-t only) -> boole-t {
   assert(nullptr != klass-info);
   assert(nullptr != only);
   symbol-t name = name-from-info(klass-info);
@@ -782,9 +778,9 @@ static auto dump?(named-info-t* klass-info, str-t only) -> boole-t {
   }
   return result;
 }
-auto dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void;
+func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void;
 
-static auto remove-dir(str-t path) -> str-t {
+static func remove-dir(str-t path) -> str-t {
   str-t result = strrchr(path, '/');
   if (nullptr == result)
     result = path;
@@ -793,21 +789,21 @@ static auto remove-dir(str-t path) -> str-t {
   assert(NUL != result[0]); // not empty-string
   return result;
 }
-[[unused]] static auto remove-ext(str-t path) -> str-t {
+[[unused]] static func remove-ext(str-t path) -> str-t {
   char8-t* dot = strrchr(path, '.');
   if (nullptr != dot)
     *dot = NUL;
   assert(NUL != path[0]); // not empty-string
   return path;
 }
-[[unused]] static auto pad(char8-t* buf, uint32-t buf-len, uint32-t len) -> char8-t* {
+[[unused]] static func pad(char8-t* buf, uint32-t buf-len, uint32-t len) -> char8-t* {
   assert(buf-len >= len);
   buf[0] = NUL;
   for (uint32-t i = 0; i < len; i++)
     strcat(buf, " ");
   return buf;
 }
-static auto first-parameter-type-len(str-t params) -> size-t {
+static func first-parameter-type-len(str-t params) -> size-t {
   size-t i;
   for (i = 0; i < strlen(params); i++) {
     char8-t c = params[i];
@@ -817,7 +813,7 @@ static auto first-parameter-type-len(str-t params) -> size-t {
   return i;
 } 
 
-static auto dump-module-description(ostream-t ostrm, named-info-t* registration-info) -> void {
+static func dump-module-description(ostream-t ostrm, named-info-t* registration-info) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != registration-info);
@@ -891,7 +887,7 @@ static auto dump-module-description(ostream-t ostrm, named-info-t* registration-
   }
   return;
 }
-static auto dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only) -> void {
+static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != registration-info);
@@ -936,7 +932,7 @@ static auto dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
   }
   return;
 }
-static auto max-enum-name-width(enum-info-t* enum-info) -> uint32-t {
+static func max-enum-name-width(enum-info-t* enum-info) -> uint32-t {
   uint32-t result = 0;
   uint32-t i = 0;
   str-t name;
@@ -947,7 +943,7 @@ static auto max-enum-name-width(enum-info-t* enum-info) -> uint32-t {
   }
   return result;
 }
-static auto max-slot-type-width(named-info-t* slots-info) -> uint32-t {
+static func max-slot-type-width(named-info-t* slots-info) -> uint32-t {
   uint32-t result = 0;
   uint32-t i = 0;
   while (nullptr != slots-info[i].elements) {
@@ -959,7 +955,7 @@ static auto max-slot-type-width(named-info-t* slots-info) -> uint32-t {
   }
   return result;
 }
-static auto max-slot-name-width(named-info-t* slots-info) -> uint32-t {
+static func max-slot-name-width(named-info-t* slots-info) -> uint32-t {
   uint32-t result = 0;
   uint32-t i = 0;
   while (nullptr != slots-info[i].elements) {
@@ -971,14 +967,14 @@ static auto max-slot-name-width(named-info-t* slots-info) -> uint32-t {
   }
   return result;
 }
-static auto dump-method(ostream-t ostrm, signature-t const* info) -> void {
+static func dump-method(ostream-t ostrm, signature-t const* info) -> void {
   ostream::println-format(ostrm, "method %s(%s) -> %s;\n",
                   info->name,
                   info->parameter-types,
                   info->return-type);
   return;
 }
-auto dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
+func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != klass-info);
@@ -1190,7 +1186,7 @@ auto dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
   }
   return;
 }
-auto import-selectors(signature-t**, selector-node-t*) -> void; // hackhack
+func import-selectors(signature-t**, selector-node-t*) -> void; // hackhack
 
 klass get-segment-data {
   slots (*)(str-t, ptr-t*, size-t*) -> ptr-t;
@@ -1210,7 +1206,7 @@ klass registration-info {
     signature-t**      va-signatures;
   }
 }
-static auto named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) -> void {
+static func named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) -> void {
   *ri = {
     .dir =                    cast(decltype(ri->dir))                    named-info::at(ni, #dir),
     .get-segment-data =       cast(decltype(ri->get-segment-data))       named-info::at(ni, #get-segment-data),
@@ -1226,7 +1222,7 @@ static auto named-info-to-registration-info(named-info-t* ni, registration-info-
   };
   return;
 }
-auto register-info-common(named-info-t* ni, ptr-t user-data) -> void { USE(user-data);
+func register-info-common(named-info-t* ni, ptr-t user-data) -> void { USE(user-data);
   registration-info-t ri {};
   named-info-to-registration-info(ni, &ri);
 
@@ -1248,7 +1244,7 @@ auto register-info-common(named-info-t* ni, ptr-t user-data) -> void { USE(user-
 
   return;
 }
-static auto getenv-boole(str-t name, boole-t default-value) -> boole-t {
+static func getenv-boole(str-t name, boole-t default-value) -> boole-t {
   boole-t value = default-value;
   str-t value-str = getenv(name);
 
@@ -1258,7 +1254,7 @@ static auto getenv-boole(str-t name, boole-t default-value) -> boole-t {
   }
   return value;
 }
-static auto add-registration-info(named-info-t* registration-info) -> void {
+static func add-registration-info(named-info-t* registration-info) -> void {
   assert(nullptr == registration-info->next);
   registration-info->next = gbl-registration-info-list;
   gbl-registration-info-list = registration-info;
@@ -1306,7 +1302,7 @@ klass so-symbol-info {
     str-t sname;
   }
 }
-static auto name-from-address(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
+static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
   // named-instances
   for (size-t i = 0; i < DK-COUNTOF(named-instances); i++) {
     addr2name-pair-t named-instance = named-instances[i];
@@ -1336,7 +1332,7 @@ static auto name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
   }
   return nullptr;
 }
-[[noreturn]] static auto bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) -> void {
+[[noreturn]] static func bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) -> void {
   Dl_info dl-info {};
   if (dladdr(si->si-addr, &dl-info)) {
     if (si->si-addr == dl-info.dli-saddr) {
@@ -1379,7 +1375,7 @@ static auto name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
       throw make(signal-exception::klass);
   }
 }
-static auto sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) -> int-t {
+static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) -> int-t {
   x::sigaction-t sa {};
   sa.sa-flags = SA-SIGINFO | SA-RESETHAND | SA-RESTART;
   sigemptyset(&sa.sa-mask);
@@ -1394,7 +1390,7 @@ static auto sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   return r;
 }
   
-static auto set-read-only(str-t segment, get-segment-data-t get-segment-data) -> int-t {
+static func set-read-only(str-t segment, get-segment-data-t get-segment-data) -> int-t {
   assert(nullptr != segment);
   ptr-t addr = nullptr;
   size-t size = 0;
@@ -1410,7 +1406,7 @@ static auto set-read-only(str-t segment, get-segment-data-t get-segment-data) ->
   }
   return result;
 }
-static auto set-read-only-all(str-t segment) -> int-t {
+static func set-read-only-all(str-t segment) -> int-t {
   int-t result = 0;
   named-info-t* ni = gbl-registration-info-list;
   while (nullptr != ni) {
@@ -1422,7 +1418,7 @@ static auto set-read-only-all(str-t segment) -> int-t {
   }
   return result;
 }
-static auto last-user-code-before-main() -> void  {
+static func last-user-code-before-main() -> void  {
   openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
@@ -1430,7 +1426,7 @@ static auto last-user-code-before-main() -> void  {
   if (-1 == r) std::abort();
   return;
 }
-auto dkt-register-info(named-info-t* registration-info) -> void {
+func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
   stream-t ctlg-output = nullptr;
@@ -1485,7 +1481,7 @@ auto dkt-register-info(named-info-t* registration-info) -> void {
     fclose(ctlg-output);
   return;
 }
-auto dkt-deregister-info(named-info-t* registration-info) -> void {
+func dkt-deregister-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #file));
   assert(nullptr != registration-info);
   if (nullptr != getenv("DKT_INFO_OUTPUT") ||
@@ -1522,20 +1518,20 @@ auto dkt-deregister-info(named-info-t* registration-info) -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(registration-info), name);
   return;
 }
-static auto superklass-name-for-name(symbol-t klass-name) -> symbol-t {
+static func superklass-name-for-name(symbol-t klass-name) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   named-info-t* klass-info = info-for-name(klass-name);
   symbol-t superklass-name = superklass-name-from-info(klass-info, klass-name); // namename: ???
   return superklass-name;
 }
-auto dk-klass-for-name(symbol-t, uint32-t) ->  object-t;
-namespace object { auto instance?(object-t, object-t) -> boole-t; }
+func dk-klass-for-name(symbol-t, uint32-t) ->  object-t;
+namespace object { func instance?(object-t, object-t) -> boole-t; }
 
-auto dk-klass-for-name(symbol-t klass-name) -> object-t {
-  auto result = dk-klass-for-name(klass-name, 0);
+func dk-klass-for-name(symbol-t klass-name) -> object-t {
+  func result = dk-klass-for-name(klass-name, 0);
   return result;
 }
-auto dk-klass-for-name(symbol-t klass-name, uint32-t column) -> object-t {
+func dk-klass-for-name(symbol-t klass-name, uint32-t column) -> object-t {
   //for (uint32-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, klass-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   assert(nullptr != klass-name);
@@ -1572,7 +1568,7 @@ auto dk-klass-for-name(symbol-t klass-name, uint32-t column) -> object-t {
   assert(nullptr != klass);
   return klass;
 }
-auto info-for-name(symbol-t klass-name) -> named-info-t* {
+func info-for-name(symbol-t klass-name) -> named-info-t* {
   assert(nullptr != klass-name);
   property-t[] properties = { { #name, cast(uintptr-t)klass-name } };
   named-info-t info = { properties, DK-COUNTOF(properties), nullptr };
@@ -1610,13 +1606,13 @@ auto info-for-name(symbol-t klass-name) -> named-info-t* {
   dk-intern needs to be able to be used **early** in the static initialization
   sequence.
  */
-auto dk-intern-free(str-t key) -> symbol-t {
+func dk-intern-free(str-t key) -> symbol-t {
   symbol-t result = dk-intern(key);
   if (result != key)
     free(cast(void*)key);
   return result;
 }
-auto dk-intern(str-t key) -> symbol-t {
+func dk-intern(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
   static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), cast(uint32-t)sizeof(symbol-t), cast(std-compare-t)safe-strcmp);
@@ -1634,7 +1630,7 @@ auto dk-intern(str-t key) -> symbol-t {
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
   return val;
 }
-static auto get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) -> char8-t* {
+static func get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) -> char8-t* {
   object-t superklass = $superklass(klass);
   if (nullptr != superklass && null != superklass)
     get-klass-chain(superklass, buf, buf-len); // recursive
@@ -1643,7 +1639,7 @@ static auto get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) -> c
   strcat(buf, klass-name);
   return buf;
 }
-auto dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) -> char8-t* {
+func dkt-get-klass-chain(object-t klass, char8-t* buf, uint32-t buf-len) -> char8-t* {
   buf[0] = NUL;
   return get-klass-chain(klass, buf, buf-len);
 }

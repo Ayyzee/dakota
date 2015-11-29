@@ -41,22 +41,22 @@ klass input-stream {
                        slots-t  slots :    stdin,
                        str-t    filename : nullptr) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     assert(stdout != slots);
 
     if (nullptr == slots && nullptr == filename)
-      *unbox(self) = stdin; // default
+      unbox(self) = stdin; // default
 
     if (nullptr != filename) {
-      *unbox(self) = fopen(filename, "r");
+      unbox(self) = fopen(filename, "r");
 
-      if (nullptr == *unbox(self))
+      if (nullptr == unbox(self))
         throw make(system-exception::klass, #errnum : errno);
     }
     return self;
   }
   method close(object-t self) -> object-t {
-    slots-t slots = *unbox(self);
+    slots-t slots = unbox(self);
 # if defined DEBUG
     if (stdin == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stdin\"");
@@ -74,7 +74,7 @@ klass input-stream {
     uint32-t num-elements-read = cast(uint32-t)fread(buffer,
                                                      cast(size-t)element-size,
                                                      cast(size-t)num-elements-max,
-                                                     *unbox(self));
+                                                     unbox(self));
 
     // fread() does not distinguish between end-of-file and error, and callers must use
     // feof(3) and ferror(3) to determine which occurred.

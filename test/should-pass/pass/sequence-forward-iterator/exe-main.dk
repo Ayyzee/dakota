@@ -14,7 +14,7 @@ static void check-for(object-t collection) {
        $next?(iter);
        $next(iter)) {
     object-t e = $element(iter);
-    printf("%s%i", delim, *uint32::unbox(e));
+    printf("%s%i", delim, uint32::unbox(e));
     delim = ",";
   }
   printf("]");
@@ -25,7 +25,7 @@ static void check-for-each(object-t collection) {
   printf("%i[", $size(collection));
   char8-t const* delim = "";
   for (object-t e in collection) {
-    printf("%s%i", delim, *uint32::unbox(e));
+    printf("%s%i", delim, uint32::unbox(e));
     delim = ",";
   }
   printf("]");

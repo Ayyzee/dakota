@@ -29,7 +29,7 @@ klass open-token {
   }
   method init(object-t self, slots-t slots : {null}) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     return self;
   }
   method write-slots(object-t self, object-t out) -> object-t {

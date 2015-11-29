@@ -331,13 +331,13 @@ sub vars_from_defn {
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
   $$filestr_ref =~ s|(method\s+(\[\[.+?\]\])?\s*($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) auto|gs; #hackhack
-  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 auto |gs; #hackhack
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) func|gs; #hackhack
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 func |gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
-  #$$filestr_ref =~ s|(?<!\[\[so-export\]\])(\s+)(method)(\s*)|$1METHOD$3auto |gm;
+  #$$filestr_ref =~ s|(?<!\[\[so-export\]\])(\s+)(method)(\s*)|$1METHOD$3func |gm;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack
@@ -418,7 +418,7 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$1$3$2slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*);           /$1$3$2slots-t$4;/gsx; # forward decl
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4)/egs;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\)\s*$main::list\s*->\s*.+?);/$1typedef auto $2slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\)\s*$main::list\s*->\s*.+?);/$1typedef func $2slots-t$3;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -705,11 +705,12 @@ sub rewrite_for_each_replacement {
 sub rewrite_for_each {
   my ($filestr_ref) = @_;
   # for ( object-t xx : yy )
-  $$filestr_ref =~ s|for\s*\(\s*($id\*?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)|&rewrite_for_each_replacement($1, $2, $3, $4, $5, $6, $7, $8)|gse;
+  # for ( pair-t& xx : yy )
+  $$filestr_ref =~ s=for\s*\(\s*($id(\*|&)?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_each_replacement($1, $3, $4, $5, $6, $7, $8, $9)=gse;
 }
 sub rewrite_slot_access {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/self\./unbox(self)->/g;
+  $$filestr_ref =~ s/self\./unbox(self)./g;
 
   #    $$filestr_ref =~ s/unbox\((.*?)\)\./unbox($1)->/g;
 }
@@ -942,7 +943,7 @@ sub rewrite_method_aliases {
 }
 sub rewrite_initialze_finalize {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/auto $1/gs;
+  $$filestr_ref =~ s/((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/func $1/gs;
 }
 sub rewrite_multi_char_consts {
   my ($filestr_ref) = @_;

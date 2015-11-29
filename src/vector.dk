@@ -82,7 +82,7 @@ klass vector {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
-            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.count, self.capacity);
+            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.count, self.capacity);
     for (object-t element in self)
       $dump(element);
     return self;
@@ -90,11 +90,11 @@ klass vector {
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = make(kls, #capacity : self.capacity);
-    slots-t* s1 = unbox(self);
-    slots-t* s2 = unbox(copy);
-    *s2 = *s1;
-    memcpy(s2->elements, s1->elements, s2->size * s2->capacity);
-    s2->iterator-state = 0;
+    slots-t& s1 = unbox(self);
+    slots-t& s2 = unbox(copy);
+    s2 = s1;
+    memcpy(s2.elements, s1.elements, s2.size * s2.capacity);
+    s2.iterator-state = 0;
     return copy;
   }
   method empty?(object-t self) -> boole-t {
@@ -207,7 +207,7 @@ klass vector {
   }
   // should be auto-generated!!!
   method at(object-t self, object-t boxed-index, object-t default-result) -> object-t {
-    uint32-t index = *uint32::unbox(boxed-index);
+    uint32-t index = uint32::unbox(boxed-index);
     object-t result = $at(self, index, default-result);
     return result;
   }
@@ -219,7 +219,7 @@ klass vector {
   }
   // should be auto-generated!!!
   method at(object-t self, object-t boxed-index) -> object-t {
-    uint32-t index = *uint32::unbox(boxed-index);
+    uint32-t index = uint32::unbox(boxed-index);
     object-t result = $at(self, index);
     return result;
   }
@@ -324,20 +324,20 @@ klass vector-forward-iterator {
     uint32-t iterator-state;
   }
   static void check-iterator-state(object-t self) {
-    vector::slots-t* d = vector::unbox(self.vector);
+    vector::slots-t& d = vector::unbox(self.vector);
 
-    if (self.iterator-state != d->iterator-state)
+    if (self.iterator-state != d.iterator-state)
       throw make(exception::klass, #message : "oops");
     return;
   }
   method init(object-t self, object-t vector :) -> object-t {
     self = $init(super);
     assert(null != vector);
-    vector::slots-t* a = vector::unbox(vector);
+    vector::slots-t& a = vector::unbox(vector);
     self.vector =       vector;
-    self.count = a->count;
+    self.count = a.count;
     self.index = vector::first-index(self.vector);
-    self.iterator-state = a->iterator-state;
+    self.iterator-state = a.iterator-state;
     return self;
   }
   method first?(object-t self) -> boole-t {

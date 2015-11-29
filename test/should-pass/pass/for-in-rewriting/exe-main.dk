@@ -31,15 +31,15 @@ int-t main() {
   // ...
 
 //for (pair-t* pair in table)
-//  printf("%p: %p\n", cast(void*)pair->first, cast(void*)pair->last);
+//  printf("%p: %p\n", cast(void*)pair.first, cast(void*)pair.last);
 
-  for (pair-t* pair in table)
-    printf("%p: %p\n", cast(void*)pair->first, cast(void*)pair->last);
+  for (pair-t& pair in table)
+    printf("%p: %p\n", cast(void*)pair.first, cast(void*)pair.last);
 
   // should rewrite to
 
 //for (iter_pair_t _iter_pair = $iter_pair(table); object_t _element_ = _iter_pair.next(_iter_pair.iter); /**/)
-//  { pair_t* pair = pair::unbox(_element_); printf("%p: %p\n", cast(void*)pair->first, cast(void*)pair->last); }
+//  { pair_t* pair = pair::unbox(_element_); printf("%p: %p\n", cast(void*)pair.first, cast(void*)pair.last); }
 
   return 0;
 }

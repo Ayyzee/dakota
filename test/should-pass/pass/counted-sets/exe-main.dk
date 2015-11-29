@@ -21,8 +21,8 @@ static object-t check(object-t klass) {
   uint32-t i1 = 1;
 
   for (object-t e in collection) {
-    pair-t* pair = pair::unbox(e);
-    uint32-t ei = *uint32::unbox(pair->last);
+    pair-t& pair = pair::unbox(e);
+    uint32-t ei = uint32::unbox(pair.last);
     uint32-t i2 = $count-at(collection, e, 0);
     printf("%i: %i == %i\n", i1, ei, i2);
     i1++;

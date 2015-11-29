@@ -20,10 +20,10 @@ static object-t check(object-t klass) {
   uint32-t i1 = 1;
 
   for (object-t e in collection) {
-    pair-t* pair = pair::unbox(e);
-    uint32-t ei = *uint32::unbox(pair->first);
+    pair-t& pair = pair::unbox(e);
+    uint32-t ei = uint32::unbox(pair.first);
     object-t element = $at(collection, e, nullptr);
-    uint32-t i2 = *uint32::unbox(element);
+    uint32-t i2 = uint32::unbox(element);
     printf("%i: %i == %i\n", i1, ei, i2);
     i1++;
   }

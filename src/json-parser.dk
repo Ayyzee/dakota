@@ -32,7 +32,7 @@ klass tokenid;
 klass vector;
 
 [[format-printf(4)]] static
-auto print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...) -> int-t{
+func print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...) -> int-t{
   int-t result = fprintf(stderr, "%s:%i:%i ", filename, line, column);
   if (-1 != result) {
     va-list-t args;

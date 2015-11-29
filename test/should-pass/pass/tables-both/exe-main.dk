@@ -27,15 +27,17 @@ static int-t check(object-t klass, str-pair-t* sp, size-t sp-len) {
     object-t first = str::box(sp[i].first);
     object-t last = $at(collection, first, nullptr);
     if (nullptr != last)
-      fprintf(stdout, "    first/last: %s/%s\n", *str::unbox(first),
-                                             *str::unbox(last));
+      fprintf(stdout, "    first/last: %s/%s\n",
+              str::unbox(first),
+              str::unbox(last));
     else {
-      fprintf(stdout, "    FAILED: first: %s\n", *str::unbox(first));
+      fprintf(stdout, "    FAILED: first: %s\n",
+              str::unbox(first));
       result = 1;
     }
   }
   // for (object-t e in collection) {
-  //   pair-t* pair = pair::unbox(e);
+  //   pair-t& pair = pair::unbox(e);
   // }
   return result;
 }

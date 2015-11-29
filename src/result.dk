@@ -23,7 +23,7 @@ klass result {
   }
   method init(object-t self, slots-t slots : {nullptr, 0}) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     return self;
   }
 }

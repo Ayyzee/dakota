@@ -13,6 +13,6 @@ int-t main() {
   $add-first(sequence, str::box("father"));
 
   for (object-t element in sequence)
-    fprintf(stderr, "%s\n", *str::unbox(element));
+    fprintf(stderr, "%s\n", str::unbox(element));
   return 0;
 }

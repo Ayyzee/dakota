@@ -36,7 +36,7 @@ klass str64 {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
-    $write-element(out, *unbox(self), "contents");
+    $write-element(out, unbox(self), "contents");
 
     $write-slots-end(out);
     return self;
@@ -50,9 +50,9 @@ klass str64 {
     int-t result;
 
     if ($instance?(other, klass)) {
-      slots-t* s1 = unbox(self);
-      slots-t* s2 = unbox(other);
-      result = compare(s1, s2);
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = compare(&s1, &s2);
     } else {
       result = $compare(super, other);
     }

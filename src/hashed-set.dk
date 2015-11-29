@@ -178,11 +178,11 @@ klass hashed-set {
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = make(kls);
-    slots-t* s1 = unbox(self);
-    slots-t* s2 = unbox(copy);
-    *s2 = *s1;
-    s2->buckets = $copy-shallow(s1->buckets);
-    s2->iterator-state = 0;
+    slots-t& s1 = unbox(self);
+    slots-t& s2 = unbox(copy);
+    s2 = s1;
+    s2.buckets = $copy-shallow(s1.buckets);
+    s2.iterator-state = 0;
     return copy;
   }
   method size(object-t self) -> uint32-t {
@@ -195,7 +195,7 @@ klass hashed-set {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { size=%u, elements=[] }\n",
-            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.size);
+            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.size);
     for (object-t element in self)
       $dump(element);
     return self;
@@ -225,19 +225,19 @@ klass hashed-set-forward-iterator {
     uint32-t  iterator-state;
   }
   static void check-iterator-state(object-t self) {
-    hashed-set::slots-t* hs = hashed-set::unbox(self.hashed-set);
+    hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
 
-    if (self.iterator-state != hs->iterator-state)
+    if (self.iterator-state != hs.iterator-state)
       throw make(exception::klass, #message : "oops");
     return;
   }
   method init(object-t self, object-t hashed-set :) -> object-t {
     self = $init(super);
     assert(null != hashed-set);
-    hashed-set::slots-t* hs = hashed-set::unbox(hashed-set);
+    hashed-set::slots-t& hs = hashed-set::unbox(hashed-set);
     self.hashed-set = hashed-set;
-    self.vector-iter = $forward-iterator(hs->buckets);
-    self.iterator-state = hs->iterator-state;
+    self.vector-iter = $forward-iterator(hs.buckets);
+    self.iterator-state = hs.iterator-state;
     self.deque-iter = nullptr;
     object-t deque = $next(self.vector-iter);
     if (nullptr != deque) {

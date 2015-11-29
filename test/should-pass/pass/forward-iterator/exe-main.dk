@@ -22,8 +22,8 @@ static void check-for(object-t collection) {
     object-t e = $element(iter);
     object-t key = e;
     if ($instance?(key, pair::klass))
-      key = pair::unbox(key)->first;
-    printf("%s%i", delim, *uint32::unbox(key));
+      key = pair::unbox(key).first;
+    printf("%s%i", delim, uint32::unbox(key));
     delim = ",";
   }
   printf("]");
@@ -36,8 +36,8 @@ static void check-for-each(object-t collection) {
   for (object-t e in collection) {
     object-t key = e;
     if ($instance?(key, pair::klass))
-      key = pair::unbox(key)->first;
-    printf("%s%i", delim, *uint32::unbox(key));
+      key = pair::unbox(key).first;
+    printf("%s%i", delim, uint32::unbox(key));
     delim = ",";
   }
   printf("]");

@@ -28,7 +28,7 @@ klass symbol {
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     return self;
   }
   method length(slots-t s) -> uint32-t {
@@ -53,8 +53,8 @@ klass symbol {
     int-t result;
 
     if ($instance?(other, klass)) {
-      slots-t* s1 = unbox(self);
-      slots-t* s2 = unbox(other);
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
       result = compare(s1, s2);
     } else {
       result = $compare(super, other);
@@ -73,7 +73,7 @@ klass symbol {
     return result;
   }
   method utf8-from(object-t self) -> str-t {
-    str-t utf8 = *unbox(self);
+    str-t utf8 = unbox(self);
     return utf8;
   }
   method write-lite(object-t self, object-t out) -> object-t {
