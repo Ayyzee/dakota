@@ -37,7 +37,7 @@ klass boole { // a doubleton :-)
   initialize(object-t kls) -> object-t {
     assert(klass == kls);
 
-    func mk = [](object-t k, boole-t v) {
+    auto mk = [](object-t k, boole-t v) -> object-t {
       method-t alloc = dk::method-for-selector(superklass-of(klass-of(k)),
                                                SELECTOR(alloc(object-t)));
       object-t self = alloc(k);

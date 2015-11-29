@@ -19,6 +19,7 @@
                         "enum"
                         "extern"
                         "finally" ; not c++
+                        "func"
                         "for"
                         "if"
                         "in"

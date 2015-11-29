@@ -931,7 +931,7 @@ sub method::generate_va_method_defn {
       $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
     if (defined $$va_method{'return-type'}) {
-      $$scratch_str_ref .= $col . "func result = ";
+      $$scratch_str_ref .= $col . "auto result = ";
     } else {
       $$scratch_str_ref .= $col . "";
     }
@@ -1670,7 +1670,7 @@ sub generics::generate_va_make_defn {
       $col . "static $init_type_decl = dk::va::init;\n" .
       $col . "va-list-t args;\n" .
       $col . "va-start(args, kls);\n" .
-      $col . "func result = alloc(kls);\n" .
+      $col . "object-t result = alloc(kls);\n" .
       $col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "result = _func_(result, args); // init()\n" .
       $col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
@@ -2792,27 +2792,27 @@ sub method::type {
     $return_type_str = &arg::type($return_type);
   }
   my $arg_type_list = &arg_type::list_types($$method{'parameter-types'});
-  return "func (*)($$arg_type_list) -> $return_type_str";
+  return "auto (*)($$arg_type_list) -> $return_type_str";
 }
 sub method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &arg_type::list_types($$method{'parameter-types'});
   my $name = &dakota::util::last($$method{'name'});
-  return "func (*$name)($$arg_type_list) -> $return_type";
+  return "auto (*$name)($$arg_type_list) -> $return_type";
 }
 sub kw_args_method::type {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
-  return "func (*)($$arg_type_list) -> $return_type";
+  return "auto (*)($$arg_type_list) -> $return_type";
 }
 sub kw_args_method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
   my $name = &dakota::util::last($$method{'name'});
-  return "func (*$name)($$arg_type_list) -> $return_type";
+  return "auto (*$name)($$arg_type_list) -> $return_type";
 }
 sub slots_signature_body {
   my ($klass_name, $methods, $col) = @_;
