@@ -315,6 +315,7 @@ my $gbl_sst_cursor = undef;
 my $gbl_user_data = &dakota::sst::lang_user_data();
 
 my $gbl_root = {};
+my $gbl_current_name = [];
 my $gbl_current_scope = $gbl_root;
 my $gbl_current_module = undef;
 my $gbl_filename = undef;
@@ -1152,9 +1153,10 @@ sub klass {
     return $body;
   }
   &match(__FILE__, __LINE__, '{');
+  push @$gbl_current_name, $body;
   my $braces = 1;
   my $previous_scope = $gbl_current_scope;
-  my $construct_name = &path::string($seq);
+  my $construct_name = join('::', @$gbl_current_name);
 
   if (!defined $$gbl_current_scope{'klasses'}{$construct_name}) {
     $$gbl_current_scope{'klasses'}{$construct_name}{'defined?'} = 1;
@@ -1295,15 +1297,19 @@ sub klass {
       if (m/^klass$/) {
         if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$' &&
             &sst_cursor::previous_token($gbl_sst_cursor) ne '::') {
-          my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
-          if ($next_token) {
-            if ($next_token =~ m/$id/) {
-              my ($body, $seq) = &dkdecl('klass');
+          my ($body, $seq, $de) = &dkdecl_peek('klass');
+          if (scalar @$seq) {
+            if (';' eq $de) {
+              ($body, $seq) = &dkdecl('klass');
               &match(__FILE__, __LINE__, ';');
               my $path = &path::string($seq);
               $$gbl_current_scope{'klass'} = $path;
               &add_klass_decl($gbl_root, $path);
               last;
+            } elsif ('{' eq $de) {
+              &klass({});
+            } else {
+              die;
             }
           }
         }
@@ -1319,6 +1325,7 @@ sub klass {
 
         if (0 == $braces) {
           $gbl_current_scope = $previous_scope;
+          pop @$gbl_current_name;
           return &path::string($seq);
         }
         last;
@@ -1326,6 +1333,7 @@ sub klass {
       $$gbl_sst_cursor{'current-token-index'}++;
     }
   }
+  pop @$gbl_current_name;
   return &path::string($seq);
 }
 sub dkdecl {
@@ -1345,6 +1353,13 @@ sub dkdecl {
   #    }
   my $body = &path::string($parts);
   return ($body, $parts);
+}
+sub dkdecl_peek {
+  my ($tkn) = @_;
+  my ($body, $parts) = &dkdecl($tkn);
+  my $de = &sst_cursor::current_token($gbl_sst_cursor); # ; or {
+  $$gbl_sst_cursor{'current-token-index'} -= (scalar @$parts + 1);
+  return ($body, $parts, $de);
 }
 sub dkdecl_list {
   my ($tkn) = @_;

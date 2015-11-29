@@ -1,0 +1,18 @@
+klass outer {
+  slots int-t;
+
+  klass inner {
+    slots slots-t*;
+  }
+}
+int main() {
+  // object-t k1 = dk-klass-for-name(#outer);
+  // $dump(k1);
+  // object-t k2 = dk-klass-for-name(#outer::inner);
+  // $dump(k2);
+  object-t o1 = make(outer::klass);
+  $dump(o1);
+  object-t o2 = make(outer::inner::klass);
+  $dump(o2);
+  return 0;
+}
