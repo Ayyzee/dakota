@@ -558,7 +558,7 @@ sub warning {
 
   printf STDERR "%s:%i: did not expect \'%s\'\n",
     $gbl_filename,
-    $$gbl_sst{'tokens'}[$token_index]{'line'},
+    &sst::line($gbl_sst, $token_index),
     &sst::at($gbl_sst, $token_index);
   return;
 }
