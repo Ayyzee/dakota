@@ -78,12 +78,8 @@ klass uintptr;
 klass unbox-illegal-klass-exception;
 
 # if DKT-WORKAROUND
-namespace property {
-  func compare(slots-t**, slots-t**) -> int-t;
-}
-namespace named-info {
-  func compare(slots-t**, slots-t**) -> int-t;
-}
+namespace property   { func compare(slots-t*,  slots-t* ) -> int-t; }
+namespace named-info { func compare(slots-t**, slots-t**) -> int-t; }
 namespace klass {
   func init(object-t, named-info-t*) -> object-t;
   func subklass?(object-t, object-t) -> boole-t;
@@ -135,19 +131,19 @@ static func init-runtime-ds() -> void {
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(named-assoc-node::slots-t),
-                        cast(std-compare-t)cast(int-t(*)(named-assoc-node::slots-t*,named-assoc-node::slots-t*))named-assoc-node::compare);
+                        cast(std-compare-t)cast(func (*)(named-assoc-node::slots-t*,named-assoc-node::slots-t*) -> int-t)named-assoc-node::compare);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(named-info::slots-t*),
-                        cast(std-compare-t)cast(int-t(*)(named-info::slots-t**,named-info::slots-t**))named-info::compare);
+                        cast(std-compare-t)cast(func (*)(named-info::slots-t**,named-info::slots-t**) -> int-t)named-info::compare);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(property::slots-t),
-                        cast(std-compare-t)cast(int-t(*)(property::slots-t*,property::slots-t*))property::compare);
+                        cast(std-compare-t)cast(func (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(symbol-t),
-                        cast(std-compare-t)cast(int-t(*)(symbol::slots-t*,symbol::slots-t*))symbol::compare);
+                        cast(std-compare-t)cast(func (*)(symbol::slots-t*,symbol::slots-t*) -> int-t)symbol::compare);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -599,12 +595,12 @@ func dk-init-runtime() -> void {
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(str-t)))each-str,
-         cast(ptr-t)cast(object-t (*)(str-t))str::box);
+         cast(func (*)(named-info-t*, ptr-t) -> void)cast(func (*)(named-info-t*, func (*)(str-t) -> object-t) -> void)each-str,
+         cast(ptr-t)cast(func (*)(str-t) -> object-t)str::box);
     dk-klass-for-name(#uintptr);
     each(gbl-registration-info-list,
-         cast(void (*)(named-info-t*, ptr-t))cast(void (*)(named-info-t*, object-t (*)(uintptr-t)))each-int,
-         cast(ptr-t)cast(object-t (*)(uintptr-t))uintptr::box);
+         cast(func (*)(named-info-t*, ptr-t) -> void)cast(func (*)(named-info-t*, func (*)(uintptr-t) -> object-t) -> void)each-int,
+         cast(ptr-t)cast(func (*)(uintptr-t) -> object-t)uintptr::box);
 
     func previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);

@@ -49,15 +49,16 @@ klass named-info {
     }
     return 0;
   }
-  method sort(slots-t* s) -> slots-t*{
+  method sort(slots-t* s) -> slots-t* {
     qsort(s->elements, s->count, sizeof(s->elements[0]),
-          cast(std-compare-t)cast(int-t(*)(property::slots-t*,property::slots-t*))property::compare);
+          cast(std-compare-t)cast(func (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
     return s;
   }
-  method search(slots-t* s, symbol-t key) -> property-t*{
-    property::slots-t property = { cast(symbol-t)(key), cast(uintptr-t)0 };
+  method search(slots-t* s, symbol-t key) -> property-t* {
+    property::slots-t property = { cast(symbol-t)key, cast(uintptr-t)0 };
     property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
-                                                              cast(std-compare-t)cast(int-t (*)(property::slots-t*,property::slots-t*))property::compare);
+                                                                cast(std-compare-t)cast(func (*)(property::slots-t*,
+                                                                                                 property::slots-t*) -> int-t)property::compare);
     return result;
   }
   method at(slots-t* s, symbol-t key) -> uintptr-t {
@@ -103,7 +104,7 @@ klass named-info {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  func compare(slots-t** s, slots-t** other-s) -> int-t {
+  method compare(slots-t** s, slots-t** other-s) -> int-t {
     int-t result = compare(*s, *other-s);
     return result;
   }
