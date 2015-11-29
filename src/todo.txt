@@ -265,3 +265,5 @@ fix "never" slots (slots which comments indicate will never be something only to
 
 current: dkt-get-klass-chain(object-t kls, char8-t* buf, uint32-t buf-len) -> char8-t*;
 add:     dkt-get-klass-chain(object-t kls, str-buffer-t str-buf)
+
+consider renaming #items to #objects (or #objects[] ?)

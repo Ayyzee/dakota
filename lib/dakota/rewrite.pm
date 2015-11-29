@@ -951,6 +951,10 @@ sub rewrite_multi_char_consts {
   $$filestr_ref =~ s/'([^'\\])([^'\\])([^'\\])'/'$1$2$3$c'/g;
   $$filestr_ref =~ s/'([^'\\])([^'\\])'/'$1$2$c$c'/g;
 }
+sub rewrite_map {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/(map\s*\($rid\s*,\s*)\{/$1\[\](object-t _) -> object-t {/g;
+}
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
   &rewrite_literal_strs($filestr_ref);
@@ -1020,6 +1024,7 @@ sub convert_dk_to_cc {
   &rewrite_methods($filestr_ref, $kw_args_generics);
   &rewrite_initialze_finalize($filestr_ref);
   &rewrite_functions($filestr_ref);
+  &rewrite_map($filestr_ref);
   &rewrite_for_each($filestr_ref);
   &rewrite_unboxes($filestr_ref);
 
