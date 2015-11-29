@@ -32,12 +32,12 @@ module dakota;
 klass output-stream;
 klass system-exception;
 
-auto dkt-capture-current-exception(object-t arg) -> object-t {
+func dkt-capture-current-exception(object-t arg) -> object-t {
   static THREAD_LOCAL object-t result;
   if (nullptr != arg) result = arg;
   return result;
 }
-auto dkt-capture-current-exception(str-t arg) -> str-t {
+func dkt-capture-current-exception(str-t arg) -> str-t {
   static THREAD_LOCAL str-t result;
   if (nullptr != arg) result = arg;
   return result;
@@ -45,7 +45,7 @@ auto dkt-capture-current-exception(str-t arg) -> str-t {
 # if !defined HAVE-GETPROGNAME
 # if defined HAVE-PROCFS
 static char8-t[4 * 1024] gbl-buf;
-auto getprogname() -> str {
+func getprogname() -> str {
   int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
     throw make(system-exception::klass, #errnum : errno);
@@ -60,7 +60,7 @@ auto getprogname() -> str {
 # endif
 # endif
 
-[[format-va-printf(2)]] static auto va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
+[[format-va-printf(2)]] static func va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
   stream-t log-file = stderr;
 
   if (nullptr != getenv("DEBUG")) {
@@ -89,11 +89,11 @@ auto getprogname() -> str {
   // bugbug: need to adjust result
   return result;
 }
-[[format-va-printf(2)]] auto dkt-va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
+[[format-va-printf(2)]] func dkt-va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
   int-t result = va-log(priority, format, args);
   return result;
 }
-[[format-printf(2)]] auto dkt-log(uint32-t priority, str-t format, ...) -> int-t {
+[[format-printf(2)]] func dkt-log(uint32-t priority, str-t format, ...) -> int-t {
   va-list-t args;
   va-start(args, format);
   int-t result = dkt-va-log(priority, format, args);
@@ -103,7 +103,7 @@ auto getprogname() -> str {
 static /*THREAD-LOCAL*/ void (*original-terminate)() =  std::set-terminate(pre-runtime-verbose-terminate);
 static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
 
-[[noreturn]] auto pre-runtime-verbose-terminate() noexcept -> void {
+[[noreturn]] func pre-runtime-verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
@@ -118,7 +118,7 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
     original-terminate();
   std::abort(); // should never get called
 }
-[[noreturn]] auto verbose-terminate() noexcept -> void {
+[[noreturn]] func verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
@@ -144,12 +144,12 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
     original-terminate();
   std::abort(); // should never get called
 }
-[[noreturn]] auto pre-runtime-verbose-unexpected() noexcept -> void {
+[[noreturn]] func pre-runtime-verbose-unexpected() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   pre-runtime-verbose-terminate();
 }
-[[noreturn]] auto verbose-unexpected() noexcept -> void {
+[[noreturn]] func verbose-unexpected() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
 
   verbose-terminate();

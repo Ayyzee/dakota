@@ -45,8 +45,7 @@ struct opts_t {
 };
 static opts_t opts;
 
-static int
-usage(const char* progname, option* options) {
+static func usage(const char* progname, option* options) -> int {
   const char* tmp_progname = strrchr(progname, '/');
   if (nullptr != tmp_progname)
     tmp_progname++;
@@ -74,8 +73,7 @@ usage(const char* progname, option* options) {
   fprintf(stdout, " <> [...]\n");
   return result;
 }
-static void
-handle_opts(int* argc, char*** argv) {
+static func handle_opts(int* argc, char*** argv) -> void {
   const char* progname = *argv[0];
   int unrecognized_opt_cnt = 0;
   // options descriptor
@@ -123,13 +121,13 @@ handle_opts(int* argc, char*** argv) {
   return;
 }
 namespace va {
-  [[noreturn]] [[format_va_printf(3)]] static void _abort_with_log(const char* file, int line, const char* format, va_list args) {
+  [[noreturn]] [[format_va_printf(3)]] static func _abort_with_log(const char* file, int line, const char* format, va_list args) -> void {
     fprintf(stderr, "%s:%i: ", file, line);
     vfprintf(stderr, format, args);
     std::abort();
   }
 }
-[[noreturn]] [[format_printf(3)]] static void _abort_with_log(const char* file, int line, const char* format, ...) {
+[[noreturn]] [[format_printf(3)]] static func _abort_with_log(const char* file, int line, const char* format, ...) -> void {
   va_list args;
   va_start(args, format);
   va::_abort_with_log(file, line, format, args);
@@ -139,8 +137,7 @@ namespace va {
 
 # include "spawn.cc"
 
-static int
-setenv_boole(const char* name, bool value, int overwrite) {
+static func setenv_boole(const char* name, bool value, int overwrite) -> int {
   int result = 0;
   if (value)
     result = setenv(name, "1", overwrite);
@@ -152,8 +149,7 @@ setenv_boole(const char* name, bool value, int overwrite) {
 //    if that fails
 // 2: try to dlopen() path
 
-int
-main(int argc, char** argv, char**) {
+func main(int argc, char** argv, char**) -> int {
   handle_opts(&argc, &argv);
   char output_pid[MAXPATHLEN] = "";
 

@@ -23,34 +23,34 @@
 dkt_declare_klass_type_struct(selector_node);
 //dkt_declare_klass_type_struct(signature);
 
-auto import_selectors(signature_t** signatures, selector_node_t* selector_nodes) -> void;
+func import_selectors(signature_t** signatures, selector_node_t* selector_nodes) -> void;
 
-auto interposer_name_for_klass_name(symbol_t klass_name) -> symbol_t;
-auto add_interpose_prop(symbol_t key, symbol_t element) -> void;
+func interposer_name_for_klass_name(symbol_t klass_name) -> symbol_t;
+func add_interpose_prop(symbol_t key, symbol_t element) -> void;
 
-auto info_for_name(symbol_t) -> named_info_t*;
+func info_for_name(symbol_t) -> named_info_t*;
 
-auto safe_strptrcmp(str_t const* sp1, str_t const* sp2) -> int_t;
-auto safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t;
+func safe_strptrcmp(str_t const* sp1, str_t const* sp2) -> int_t;
+func safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t;
 
-auto safe_strcmp(str_t, str_t) -> int_t;
-auto safe_strlen(str_t) -> size_t;
+func safe_strcmp(str_t, str_t) -> int_t;
+func safe_strlen(str_t) -> size_t;
 
-auto strerror_name(int_t errnum) -> str_t;
+func strerror_name(int_t errnum) -> str_t;
 
-auto size_from_info(named_info_t* info) -> uint32_t;
-auto offset_from_info(named_info_t* info) -> uint32_t;
-auto name_from_info(named_info_t* info) -> symbol_t;
-auto klass_name_from_info(named_info_t* info) -> symbol_t;
-auto superklass_name_from_info(named_info_t* info) -> symbol_t;
-auto superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
+func size_from_info(named_info_t* info) -> uint32_t;
+func offset_from_info(named_info_t* info) -> uint32_t;
+func name_from_info(named_info_t* info) -> symbol_t;
+func klass_name_from_info(named_info_t* info) -> symbol_t;
+func superklass_name_from_info(named_info_t* info) -> symbol_t;
+func superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
 
-auto default_superklass_name() -> symbol_t;
-auto default_klass_name() -> symbol_t;
+func default_superklass_name() -> symbol_t;
+func default_klass_name() -> symbol_t;
 
-[[noreturn]] auto verbose_terminate()  noexcept -> void;
-[[noreturn]] auto verbose_unexpected() noexcept -> void;
-[[noreturn]] auto pre_runtime_verbose_terminate() noexcept -> void;
-[[noreturn]] auto pre_runtime_verbose_unexpected() noexcept -> void;
+[[noreturn]] func verbose_terminate()  noexcept -> void;
+[[noreturn]] func verbose_unexpected() noexcept -> void;
+[[noreturn]] func pre_runtime_verbose_terminate() noexcept -> void;
+[[noreturn]] func pre_runtime_verbose_unexpected() noexcept -> void;
 
 # endif // dkt_dakota_private_hh

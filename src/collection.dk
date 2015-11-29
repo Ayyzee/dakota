@@ -19,13 +19,13 @@ module dakota;
 klass iter-pair;
 klass std-compare;
 
-// auto dk-va-add-all(object-t self, va-list-t args) -> object-t {
+// func dk-va-add-all(object-t self, va-list-t args) -> object-t {
 //   object-t element;
 //   while (nullptr != (element = va-arg(args, object-t)))
 //     $add(self, element);
 //   return self;
 // }
-// [[sentinel]] auto dk-add-all(object-t self, ...) -> object-t {
+// [[sentinel]] func dk-add-all(object-t self, ...) -> object-t {
 //   va-list-t args;
 //   va-start(args, self);
 //   object-t result = dk-va-add-all(self, args);
