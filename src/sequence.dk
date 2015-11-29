@@ -23,7 +23,7 @@ func map(object-t seq, method-t f) -> object-t {
   for (object-t o in seq) {
     object-t e = f(o);
     if (nullptr != e)
-      $add(result, f(e));
+      $add(result, e);
   }
   return result;
 }
