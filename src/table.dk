@@ -28,16 +28,16 @@ trait table {
   method keys(object-t self) -> object-t {
     object-t set-kls = superklass-of(klass-of(self));
     object-t result = make(set-kls);
-    for (pair-t* pair in self) {
-      object-t first = pair->first;
+    for (pair-t& pair in self) {
+      object-t first = pair.first;
       $add(result, first);
     }
     return result;
   }
   method elements(object-t self) -> object-t {
     object-t result = make(vector::klass, #size : $size(self));
-    for (pair-t* pair in self) {
-      object-t last = pair->last;
+    for (pair-t& pair in self) {
+      object-t last = pair.last;
       $add-last(result, last);
     }
     return result;
@@ -46,9 +46,9 @@ trait table {
     $write(out, "{");
     str-t delim = "";
 
-    for (pair-t* pair in self) {
-      object-t first = pair->first;
-      object-t last =  pair->last;
+    for (pair-t& pair in self) {
+      object-t first = pair.first;
+      object-t last =  pair.last;
       $write(out, delim);
       $write-lite(first, out); // must be primitive type
       $write(out, ":");
@@ -67,9 +67,9 @@ trait table {
 
     if (pair) {
       if ($instance?(pair, pair::klass)) {
-        current-last = pair::unbox(pair)->last;
+        current-last = pair::unbox(pair).last;
         if (!$equal?(current-last, last))
-          pair::unbox(pair)->last = last;
+          pair::unbox(pair).last = last;
       }
     } else {
       current-last = last;
@@ -81,7 +81,7 @@ trait table {
   method at(object-t self, object-t first) -> object-t {
     object-t last = $in(super, first);
     if ($instance?(last, pair::klass))
-      last = pair::unbox(last)->last;
+      last = pair::unbox(last).last;
     return last;
   }
   method at(object-t self, object-t first, object-t default-last) -> object-t {
@@ -89,7 +89,7 @@ trait table {
     if (nullptr == last)
       last = default-last;
     if (last && $instance?(last, pair::klass))
-      last = pair::unbox(last)->last;
+      last = pair::unbox(last).last;
     return last;
   }
   initialize(object-t kls) -> object-t {

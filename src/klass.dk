@@ -312,9 +312,9 @@ klass resource-usage {
   method log-alloc(slots-t* s, object-t o) -> slots-t* {
     printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"\n",
            s->instances,
-           klass::unbox(o)->offset + klass::unbox(o)->size,
+           klass::unbox(o).offset + klass::unbox(o).size,
            s->memory,
-           klass::unbox(o)->name);
+           klass::unbox(o).name);
     return s;
   }
   method log-alloc(slots-t* s, uint32-t size, symbol-t name) -> slots-t*{
@@ -388,8 +388,8 @@ klass klass {
   }
   static object-t init-methods(object-t self) {
     if (nullptr != self.superklass && null != self.superklass) {
-      memcpy(self.methods.addrs, unbox(self.superklass)->methods.addrs,
-             sizeof(method-t) * unbox(self.superklass)->methods.count);
+      memcpy(self.methods.addrs, unbox(self.superklass).methods.addrs,
+             sizeof(method-t) * unbox(self.superklass).methods.count);
     }
     return self;
   }
@@ -430,7 +430,7 @@ klass klass {
   }
   method dump(object-t self) -> object-t {
     object::dump(self);
-    fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)unbox(self));
+    fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)&unbox(self));
 
     // name
     if (nullptr != self.name)
@@ -616,8 +616,8 @@ klass klass {
     return self;
   }
   method behavior?(object-t self, object-t kls) -> boole-t {
-    assert((nullptr != self.behavior) || (nullptr != unbox(kls)->behavior));
-    boole-t state = $bit-and?(self.behavior, unbox(kls)->behavior);
+    assert((nullptr != self.behavior) || (nullptr != unbox(kls).behavior));
+    boole-t state = $bit-and?(self.behavior, unbox(kls).behavior);
     return state;
   }
   method behavior(object-t self) -> object-t {
@@ -644,7 +644,7 @@ klass klass {
     if (nullptr == info)
       tmp-info-slots = info-slots;
     else
-      tmp-info-slots = named-info::unbox(info);
+      tmp-info-slots = &named-info::unbox(info);
     object-t result = init(self, tmp-info-slots);
     return result;
   }
@@ -754,7 +754,7 @@ klass klass {
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
     object-t kls = self;
     while (nullptr != kls && null != kls) {
-      symbol-t const* traits = cast(symbol-t const*)named-info::at(unbox(kls)->info-slots, #traits);
+      symbol-t const* traits = cast(symbol-t const*)named-info::at(unbox(kls).info-slots, #traits);
       while (nullptr != traits && nullptr != *traits) {
         if (trait == *traits++) {
           return kls;
@@ -789,7 +789,7 @@ func dkt-dump-methods(klass::slots-t* s) -> void {
   return;
 }
 func dkt-dump-methods(object-t kls) -> void {
-  klass::slots-t* kls-s = unbox(kls);
-  dkt-dump-methods(kls-s);
+  klass::slots-t& kls-s = unbox(kls);
+  dkt-dump-methods(&kls-s);
   return;
 }

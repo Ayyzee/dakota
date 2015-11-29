@@ -8,11 +8,11 @@ int-t main() {
   rect-t v1 = { {0, 0}, {640, 480} };
 
   object-t o1 = rect::box(&v1);
-  rect-t*  i1 = rect::unbox(o1);
+  rect-t&  i1 = rect::unbox(o1);
 
   printf("%p:{{%i, %i}, {%i, %i}} == %p:{{%i, %i}, {%i, %i}}\n",
          (void*)&v1, v1.point.x, v1.point.y, v1.dimension.width, v1.dimension.height,
-         (void*)&i1, i1->point.x, i1->point.y, i1->dimension.width, i1->dimension.height);
+         (void*)&i1, i1.point.x, i1.point.y, i1.dimension.width, i1.dimension.height);
 
 //   object-t o3 = rect::box({{0, 0},{3, 5}});
 //   rect-t*  i3 = rect::unbox(o2);
@@ -20,11 +20,11 @@ int-t main() {
   point-t p1 = {0, 0};
   dimension-t d1 = {3, 5};
   object-t o2 = rect::box({p1, d1});
-  rect-t*  i2 = rect::unbox(o2);
+  rect-t&  i2 = rect::unbox(o2);
 
   printf("%p:{{%i, %i}, {%i, %i}}\n",
          (void*)&i2,
-         i2->point.x, i2->point.y,
-         i2->dimension.width, i2->dimension.height);
+         i2.point.x, i2.point.y,
+         i2.dimension.width, i2.dimension.height);
   return 0;
 }

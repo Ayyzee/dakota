@@ -5,20 +5,17 @@ klass pair;
 int-t main() {
   object-t element = make(pair::klass);
   
-  pair-t* pair-1 =  pair::unbox(element);
-  pair-t  pair-2 = *pair::unbox(element);
-  pair-t& pair-3 = *pair::unbox(element);
+  pair-t& pair-1 = pair::unbox(element);
+  pair-t  pair-2 = pair::unbox(element);
   
-  pair::slots-t* pair-4 =  pair::unbox(element);
-  pair::slots-t  pair-5 = *pair::unbox(element);
-  pair::slots-t& pair-6 = *pair::unbox(element);
+  pair::slots-t& pair-3 = pair::unbox(element);
+  pair::slots-t  pair-4 = pair::unbox(element);
 
   USE(pair-1);
   USE(pair-2);
+
   USE(pair-3);
   USE(pair-4);
-  USE(pair-5);
-  USE(pair-6);
 
   return 0;
 }

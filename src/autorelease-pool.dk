@@ -72,10 +72,10 @@ klass autorelease-pool {
     return self;
   }
   method release(object-t self) -> object-t {
-    for (pair-t* pair in self.counted-elements) {
-      uint32-t n = *uint32::unbox(pair->last);
+    for (pair-t& pair in self.counted-elements) {
+      uint32-t n = uint32::unbox(pair.last);
       for (uint32-t i = 0; i < n; i++) {
-        $release(pair->first);
+        $release(pair.first);
       }
     }
     object-t kls = klass-of(self);

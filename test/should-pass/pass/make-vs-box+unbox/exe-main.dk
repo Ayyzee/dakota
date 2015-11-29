@@ -9,26 +9,25 @@ klass rect;
 int-t main() {
   object-t o1 = make(rect::klass);
 
-  rect-t*  i1 = rect::unbox(o1);
-  assert(0 == i1->point.x         &&
-         0 == i1->point.y         &&
-         0 == i1->dimension.width &&
-         0 == i1->dimension.height);
+  rect-t&  i1 = rect::unbox(o1);
+  assert(0 == i1.point.x         &&
+         0 == i1.point.y         &&
+         0 == i1.dimension.width &&
+         0 == i1.dimension.height);
 
   rect-t   v4 = {{0, 0}, {3, 5}};
   object-t o4 = rect::box(&v4);
-  rect-t*  i4 = rect::unbox(o4);
-  assert(&v4 != i4);
-  assert(v4.point.x          == i4->point.x         &&
-         v4.point.y          == i4->point.y         &&
-         v4.dimension.width  == i4->dimension.width &&
-         v4.dimension.height == i4->dimension.height);
+  rect-t&  i4 = rect::unbox(o4);
+  assert(v4.point.x          == i4.point.x         &&
+         v4.point.y          == i4.point.y         &&
+         v4.dimension.width  == i4.dimension.width &&
+         v4.dimension.height == i4.dimension.height);
 
 //   object-t o5 = rect::box({{0, 0}, {3, 5}});
-//   rect-t*  i5 = rect::unbox(o5);
-//   assert(0 == i5->point.x         &&
-//          0 == i5->point.y         &&
-//          3 == i5->dimension.width &&
-//          5 == i5->dimension.height);
+//   rect-t&  i5 = rect::unbox(o5);
+//   assert(0 == i5.point.x         &&
+//          0 == i5.point.y         &&
+//          3 == i5.dimension.width &&
+//          5 == i5.dimension.height);
   return 0;
 }

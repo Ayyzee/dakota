@@ -29,7 +29,7 @@ klass str-compare {
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     return self;
   }
 }
@@ -54,7 +54,7 @@ klass str {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { slots=\"%s\" }\n",
-            cast(ptr-t)self, cast(ptr-t)unbox(self), *unbox(self));
+            cast(ptr-t)self, cast(ptr-t)unbox(self), unbox(self));
     return self;
   }
   method equal?(object-t self, object-t other) -> boole-t {
@@ -67,7 +67,7 @@ klass str {
     return state;
   }
   method hash(object-t self) -> hash-t {
-    slots-t slots = *unbox(self);
+    slots-t slots = unbox(self);
     assert(nullptr != slots);
     hash-t result = dk-hash(slots);
     return result;
@@ -79,11 +79,11 @@ klass str {
 
     if ($instance?(other, klass)) {
       assert($instance?(klass-of(self), str-klass::klass));
-      str-klass::slots-t& ks = *str-klass::unbox(klass-of(self));
+      str-klass::slots-t& ks = str-klass::unbox(klass-of(self));
       // what if both utf8s are nullptr?
       // what if only one utf8 is nullptr?
-      slots-t s1 = *unbox(self);
-      slots-t s2 = *unbox(other);
+      slots-t s1 = unbox(self);
+      slots-t s2 = unbox(other);
       result = ks.strcmp(s1, s2);
     } else {
       result = $compare(super, other);

@@ -5,8 +5,8 @@ klass int32;
 int-t main() {
   int32-t v = -42;
   object-t o = int32::box(v);
-  int32-t* i = int32::unbox(o);
+  int32-t& i = int32::unbox(o);
 
-  printf("%i == %i\n", v, *i);
+  printf("%i == %i\n", v, i);
   return 0;
 }

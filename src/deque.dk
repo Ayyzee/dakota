@@ -90,35 +90,35 @@ klass deque {
     uint32-t iterator-state;
   }
   method test-dump(object-t self) -> object-t {
-    slots-t* s = unbox(self);
-    if (nullptr != s) {
-      fprintf(stderr, "  subgraph \"cluster-%p-%i\"\n", cast(ptr-t)(s), s->iterator-state);
+    slots-t& s = unbox(self);
+  //if (nullptr != &s) {
+      fprintf(stderr, "  subgraph \"cluster-%p-%i\"\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "  {\n");
 
       fprintf(stderr, "    graph [ rankdir = LR ];\n");
-      fprintf(stderr, "    graph [ label = \"%p-%i\" ];\n", cast(ptr-t)(s), s->iterator-state);
+      fprintf(stderr, "    graph [ label = \"%p-%i\" ];\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "    node [ shape = plaintext ];\n");
 
       fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
               "<tr><td port=\"first\">first</td></tr>"
               "<tr><td port=\"last\">last</td></tr>"
               "<tr><td port=\"size\">size=%i</td></tr>"
-              "</table> > ];\n", cast(ptr-t)(s), s->iterator-state, s->size);
-      if (nullptr == s->first && nullptr == s->last) {
-        fprintf(stderr, "    \"%p-%i-nullptr\" [ label = \"nullptr\" ];\n", cast(ptr-t)(s), s->iterator-state);
-        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i-nullptr\";\n", cast(ptr-t)(s), s->iterator-state, cast(ptr-t)(s), s->iterator-state);
-        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i-nullptr\";\n", cast(ptr-t)(s), s->iterator-state, cast(ptr-t)(s), s->iterator-state);
+              "</table> > ];\n", cast(ptr-t)(&s), s.iterator-state, s.size);
+      if (nullptr == s.first && nullptr == s.last) {
+        fprintf(stderr, "    \"%p-%i-nullptr\" [ label = \"nullptr\" ];\n", cast(ptr-t)(&s), s.iterator-state);
+        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i-nullptr\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
+        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i-nullptr\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
       } else {
-        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i\";\n", cast(ptr-t)(s), s->iterator-state, cast(ptr-t)(s->first), s->iterator-state);
-        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i\";\n", cast(ptr-t)(s), s->iterator-state, cast(ptr-t)(s->last), s->iterator-state);
+        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.first), s.iterator-state);
+        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.last), s.iterator-state);
       }
-      node::dump-next(s->first, s->iterator-state);
-      node::dump-prev(s->last,  s->iterator-state);
+      node::dump-next(s.first, s.iterator-state);
+      node::dump-prev(s.last,  s.iterator-state);
 
       fprintf(stderr, "  }\n");
 
       // size
-    }
+  //}
     return self;
   }
   method init(object-t self, object-t element : nullptr) -> object-t {
@@ -342,20 +342,20 @@ klass deque-forward-iterator {
     uint32-t iterator-state;
   }
   static void check-iterator-state(object-t self) {
-    deque::slots-t* d = deque::unbox(self.deque);
+    deque::slots-t& d = deque::unbox(self.deque);
 
-    if (self.iterator-state != d->iterator-state)
+    if (self.iterator-state != d.iterator-state)
       throw make(exception::klass, #message : "oops");
     return;
   }
   method init(object-t self, object-t deque :) -> object-t {
     self = $init(super);
     assert($instance?(deque, deque::klass));
-    deque::slots-t* d = deque::unbox(deque);
+    deque::slots-t& d = deque::unbox(deque);
 
     self.deque =          deque;
-    self.node =           d->first;
-    self.iterator-state = d->iterator-state;
+    self.node =           d.first;
+    self.iterator-state = d.iterator-state;
     return self;
   }
   method remove(object-t self) -> object-t {
@@ -371,8 +371,8 @@ klass deque-forward-iterator {
     node->next = nullptr; // gc help
 
     self.iterator-state++;
-    deque::unbox(self.deque)->iterator-state++;
-    deque::unbox(self.deque)->size--;
+    deque::unbox(self.deque).iterator-state++;
+    deque::unbox(self.deque).size--;
     return node->element;
   }
   method set-element(object-t self, object-t element) -> object-t {
@@ -381,8 +381,8 @@ klass deque-forward-iterator {
     return self;
   }
   //     method last?(object-t self) -> boole-t {
-  //       deque::slots-t* d = deque::unbox(self.deque);
-  //       boole-t state = (null == d->next);
+  //       deque::slots-t& d = deque::unbox(self.deque);
+  //       boole-t state = (null == d.next);
 
   //       return state;
   //     }

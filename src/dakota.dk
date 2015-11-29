@@ -534,12 +534,12 @@ func dk-init-runtime() -> void {
     object::klass = init-klass(object::klass, #object); // must be first
     klass::klass =  init-klass(klass::klass,  #klass);
 
-    klass::unbox(object::klass)->superklass = nullptr;
+    klass::unbox(object::klass).superklass = nullptr;
 # if 1
     //dk-klass-for-name(#singleton-klass); // ???
     null-singleton::klass = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
     null = make(null-singleton::klass);
-    klass::unbox(object::klass)->superklass = null;
+    klass::unbox(object::klass).superklass = null;
 # endif
     // core runtime klasses are setup
     // klasses: object, klass, (optionally) singleton-klass
@@ -578,11 +578,11 @@ func dk-init-runtime() -> void {
     if (null-singleton::klass)
       behavior = $behavior(null-singleton::klass);
 # else
-    klass::unbox(object::klass)->behavior =     nullptr;
-    klass::unbox(klass::klass)->behavior =      nullptr;
-    klass::unbox(bit-vector::klass)->behavior = nullptr;
+    klass::unbox(object::klass).behavior =     nullptr;
+    klass::unbox(klass::klass).behavior =      nullptr;
+    klass::unbox(bit-vector::klass).behavior = nullptr;
     if (null-singleton::klass)
-      klass::unbox(null-singleton::klass)->behavior = nullptr;
+      klass::unbox(null-singleton::klass).behavior = nullptr;
 # endif
 # if 1
     dk-klass-for-name(#input-stream);

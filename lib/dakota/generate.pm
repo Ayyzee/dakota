@@ -641,18 +641,22 @@ sub arg_type::names_unboxed {
   my $arg_names = [];
 
   if ('slots-t*' eq "@{$$arg_type_ref[0]}") {
-    $$arg_names[0] = 'unbox(object)';
+    $$arg_names[0] = '&unbox(object)';
   } elsif ('slots-t' eq "@{$$arg_type_ref[0]}") {
-    $$arg_names[0] = '*unbox(object)';
+    $$arg_names[0] = 'unbox(object)';
+  } elsif ('slots-t&' eq "@{$$arg_type_ref[0]}") {
+    $$arg_names[0] = 'unbox(object)';
   } else {
     $$arg_names[0] = 'object';
   }
 
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
     if ('slots-t*' eq "@{$$arg_type_ref[$arg_num]}") {
-      $$arg_names[$arg_num] = "unbox(arg$arg_num)";
+      $$arg_names[$arg_num] = "\&unbox(arg$arg_num)";
     } elsif ('slots-t' eq "@{$$arg_type_ref[$arg_num]}") {
-      $$arg_names[$arg_num] = "*unbox(arg$arg_num)";
+      $$arg_names[$arg_num] = "unbox(arg$arg_num)";
+    } elsif ('slots-t&' eq "@{$$arg_type_ref[$arg_num]}") {
+      $$arg_names[$arg_num] = "unbox(arg$arg_num)";
     } else {
       $$arg_names[$arg_num] = "arg$arg_num";
     }
@@ -1401,13 +1405,13 @@ sub generics::generate_generic_defn {
         $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
         $col . "object-t kls = object->klass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
+        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
         $col . "object-t kls = object->klass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
+        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon object, \#signature $colon signature));\n";
@@ -1490,14 +1494,14 @@ sub generics::generate_super_generic_defn {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
-        $col . "object-t kls = klass::unbox(arg0.klass)->superklass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
+        $col . "object-t kls = klass::unbox(arg0.klass).superklass;\n" .
+        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
-        $col . "object-t kls = klass::unbox(arg0.klass)->superklass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls)->methods.addrs[selector];\n";
+        $col . "object-t kls = klass::unbox(arg0.klass).superklass;\n" .
+        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon arg0.self, \#superkls $colon superklass-of(arg0.klass), \#signature $colon signature));\n";
@@ -1855,7 +1859,7 @@ sub generate_klass_unbox {
   if ($klass_name eq 'object') {
     #$result .= $col . "// special-case: no generated unbox() for klass 'object' due to Koenig lookup\n";
   } elsif ($klass_name eq 'klass') {
-    $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t*";
+    $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
 
     if (&is_nrt_decl() || &is_rt_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . " // special-case\n";
@@ -1863,21 +1867,21 @@ sub generate_klass_unbox {
       $result .=
         " {" . &ann(__FILE__, __LINE__) . " // special-case\n" .
         $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n" .
-        $col . "  slots-t* s = cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n" .
+        $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));\n" .
         $col . "  return s;\n" .
         $col . "}}\n";
     }
   } else {
     ### unbox() same for all types
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
-      $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t*";
+      $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
       if (&is_nrt_decl() || &is_rt_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . "\n"; # general-case
       } elsif (&is_rt_defn()) {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . "\n" .
           $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional\n" .
-          $col . "  slots-t* s = cast(slots-t*)(cast(uint8-t*)object + klass::unbox(klass)->offset);\n" .
+          $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(klass).offset);\n" .
           $col . "  return s;\n" .
           $col . "}}\n";
       }
@@ -1916,7 +1920,7 @@ sub generate_klass_box {
           $col = &colin($col);
           $result .=
             $col . "object-t result = make(klass);\n" .
-            $col . "memcpy(*unbox(result), arg, sizeof(slots-t)); // unfortunate\n" .
+            $col . "memcpy(unbox(result), arg, sizeof(slots-t)); // unfortunate\n" .
             $col . "return result;\n";
           $col = &colout($col);
           $result .= $col . "}}\n";
@@ -1949,7 +1953,7 @@ sub generate_klass_box {
           } else {
             $result .=
               $col . "object-t result = make(klass);\n" .
-              $col . "*unbox(result) = *arg;\n";
+              $col . "unbox(result) = *arg;\n";
           }
           $result .= $col . "return result;\n";
           $col = &colout($col);

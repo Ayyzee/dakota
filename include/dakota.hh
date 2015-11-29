@@ -124,8 +124,8 @@ namespace dkt {
 # endif
 
 # define klass_of(object)   (object)->klass
-# define superklass_of(kls) klass::unbox(kls)->superklass
-# define name_of(kls)       klass::unbox(kls)->name
+# define superklass_of(kls) klass::unbox(kls).superklass
+# define name_of(kls)       klass::unbox(kls).name
 
 inline func dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 // file scope

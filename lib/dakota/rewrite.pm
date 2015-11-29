@@ -705,11 +705,12 @@ sub rewrite_for_each_replacement {
 sub rewrite_for_each {
   my ($filestr_ref) = @_;
   # for ( object-t xx : yy )
-  $$filestr_ref =~ s|for\s*\(\s*($id\*?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)|&rewrite_for_each_replacement($1, $2, $3, $4, $5, $6, $7, $8)|gse;
+  # for ( pair-t& xx : yy )
+  $$filestr_ref =~ s=for\s*\(\s*($id(\*|&)?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_each_replacement($1, $3, $4, $5, $6, $7, $8, $9)=gse;
 }
 sub rewrite_slot_access {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/self\./unbox(self)->/g;
+  $$filestr_ref =~ s/self\./unbox(self)./g;
 
   #    $$filestr_ref =~ s/unbox\((.*?)\)\./unbox($1)->/g;
 }

@@ -1,20 +1,15 @@
-klass k1
-{
-  slots
-  {
+klass k1 {
+  slots {
   }
-
-  method init(slots-t* s) -> slots-t*{
+  method init(slots-t* s) -> slots-t* {
     return s;
   }
-
   method init(object-t self) -> object-t {
     self = $init(super);
-    init(unbox(self));
+    init(&unbox(self));
     return self;
   }
 }
-
 int-t main() {
   return 0;
 }

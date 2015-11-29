@@ -31,7 +31,7 @@ static int-t check-collection(object-t klass, collection-type-t collection-type,
   offset = 0;
   for (size-t i = 0; i < count; i++) {
     object-t e = size::box(i);
-    offset += sprintf(lhs + offset, "/%zx", *size::unbox(e));
+    offset += sprintf(lhs + offset, "/%zx", size::unbox(e));
     if (ORDERED & collection-type)
       $add-last(collection, e);
     else
@@ -42,7 +42,7 @@ static int-t check-collection(object-t klass, collection-type-t collection-type,
 
   offset = 0;
   for (object-t e in collection)
-    offset += sprintf(rhs + offset, "/%zx", *size::unbox(e));
+    offset += sprintf(rhs + offset, "/%zx", size::unbox(e));
 
   printf("  \"%s\" == \"%s\"\n", lhs, rhs);
   int-t result = 0;

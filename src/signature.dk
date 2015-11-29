@@ -30,7 +30,7 @@ klass signature {
   }
   method init(object-t self, slots-t slots : {nullptr, nullptr, nullptr}) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     return self;
   }
   method dump(slots-t* s) -> slots-t*{
@@ -51,9 +51,9 @@ klass signature {
     int-t result;
 
     if ($instance?(other, klass)) {
-      slots-t* s1 = unbox(self);
-      slots-t* s2 = unbox(other);
-      result = compare(s1, s2);
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = compare(&s1, &s2);
     } else {
       result = $compare(super, other);
     }

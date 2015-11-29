@@ -24,7 +24,7 @@ klass boole-klass {
   slots object-t[2];
 
   method alloc(object-t self) -> object-t {
-    return *unbox(self)[0]; // return false object by default
+    return unbox(self)[0]; // return false object by default
   }
 }
 // its George Boole (not George Bool)
@@ -42,21 +42,21 @@ klass boole { // a doubleton :-)
                                                SELECTOR(alloc(object-t)));
       object-t self = alloc(k);
       self = $init(super);
-      *unbox(self) = v;
+      unbox(self) = v;
       return self;
     };
     boole-t f = false;
-    (*boole-klass::unbox(kls))[f] = mk(kls, f);
+    (boole-klass::unbox(kls))[f] = mk(kls, f);
     boole-t t = true;
-    (*boole-klass::unbox(kls))[t] = mk(kls, t);
+    (boole-klass::unbox(kls))[t] = mk(kls, t);
 
     return kls;
   }
   method init(object-t self, slots-t slots : false) -> object-t {
     // intentionally not chaining $init()
-    assert(false == *unbox(self));
+    assert(false == unbox(self));
     if (slots)
-      self = (*boole-klass::unbox(klass-of(self)))[slots];
+      self = (boole-klass::unbox(klass-of(self)))[slots];
     return self;
   }
 }

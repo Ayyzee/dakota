@@ -23,7 +23,7 @@ klass tokenid {
 
   method init(object-t self, slots-t slots : 0) -> object-t {
     self = $init(super);
-    *unbox(self) = slots;
+    unbox(self) = slots;
     return self;
   }
   method str-from(slots-t s, char8-t* str, uint32-t len) -> str-t {

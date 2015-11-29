@@ -14,10 +14,10 @@ klass k6 {  slots                       {} } // struct slots-t {}
 klass k7 {  slots struct sockaddr-in    ;  } // typedef struct sockaddr-in slots-t;
 
 
-// klass k1 { method foo(object-t self) -> object-t { slots-t* s = unbox(self); (void)s; return self; }}
-klass k2 { method foo(object-t self) -> object-t { slots-t* s = unbox(self); (void)s; return self; }}
-klass k3 { method foo(object-t self) -> object-t { slots-t* s = unbox(self); (void)s; return self; }}
-// klass k4 { method foo(object-t self) -> object-t { slots-t* s = unbox(self); (void)s; return self; }}
-klass k5 { method foo(object-t self) -> object-t { slots-t* s = unbox(self); (void)s; return self; }}
-klass k6 { method foo(object-t self) -> object-t { slots-t* s = unbox(self); (void)s; return self; }}
-klass k7 { method foo(object-t self) -> object-t { slots-t* s = unbox(self); (void)s; return self; }}
+// klass k1 { method foo(object-t self) -> object-t { slots-t& s = unbox(self); (void)s; return self; }}
+klass k2 { method foo(object-t self) -> object-t { slots-t& s = unbox(self); (void)s; return self; }}
+klass k3 { method foo(object-t self) -> object-t { slots-t& s = unbox(self); (void)s; return self; }}
+// klass k4 { method foo(object-t self) -> object-t { slots-t& s = unbox(self); (void)s; return self; }}
+klass k5 { method foo(object-t self) -> object-t { slots-t& s = unbox(self); (void)s; return self; }}
+klass k6 { method foo(object-t self) -> object-t { slots-t& s = unbox(self); (void)s; return self; }}
+klass k7 { method foo(object-t self) -> object-t { slots-t& s = unbox(self); (void)s; return self; }}

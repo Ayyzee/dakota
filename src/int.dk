@@ -238,7 +238,7 @@ klass uintptr {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { slots=\"%lu\" }\n",
-            cast(ptr-t)self, cast(ptr-t)unbox(self), *unbox(self));
+            cast(ptr-t)self, cast(ptr-t)unbox(self), unbox(self));
     return self;
   }
 }

@@ -189,7 +189,7 @@ klass token {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { buffer=\"%s\" }\n",
-            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.buffer);
+            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.buffer);
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
@@ -208,7 +208,7 @@ klass token {
   method compare(object-t self, object-t other) -> int-t {
     int-t result;
     if ($instance?(other, klass)) {
-      result = safe-strcmp(self.buffer, unbox(other)->buffer);
+      result = safe-strcmp(self.buffer, unbox(other).buffer);
       result = dkt-normalize-compare-result(result);
     } else {
       result = $compare(super, other);

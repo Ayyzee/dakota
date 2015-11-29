@@ -93,7 +93,7 @@ klass string {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%i }\n",
-            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.ptr, self.len);
+            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.ptr, self.len);
     return self;
   }
   method uint32-value(object-t self) -> uint32-t {
@@ -130,8 +130,8 @@ klass string {
   // returns an vector of string objects
   method tokenize(object-t self, object-t delimiter) -> object-t {
     assert($instance?(delimiter, klass));
-    slots-t* d = unbox(delimiter);
-    object-t result = $tokenize(self, d->ptr);
+    slots-t& d = unbox(delimiter);
+    object-t result = $tokenize(self, d.ptr);
     return result;
   }
   method tokenize(object-t self, str-t delimiter) -> object-t {
@@ -183,9 +183,9 @@ klass string {
     if ($instance?(other, klass)) {
       // what if both utf8s are nullptr?
       // what if only one utf8 is nullptr?
-      slots-t* s1 = unbox(self);
-      slots-t* s2 = unbox(other);
-      result = safe-strcmp(s1->ptr, s2->ptr);
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = safe-strcmp(s1.ptr, s2.ptr);
       result = dkt-normalize-compare-result(result);
     } else {
       result = $compare(super, other);

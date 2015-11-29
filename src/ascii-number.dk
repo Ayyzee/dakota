@@ -40,9 +40,9 @@ klass ascii-number {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
     if ($instance?(other, klass)) {
-      slots-t* s1 = unbox(self);
-      slots-t* s2 = unbox(other);
-      result = s1->number - s2->number;
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = s1.number - s2.number;
     } else {
       result = $compare(super, other);
     }
@@ -53,10 +53,10 @@ klass ascii-number {
     boole-t state;
 
     if ($instance?(other, klass)) {
-      slots-t* s1 = unbox(self);
-      slots-t* s2 = unbox(other);
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
 
-      if (s1->number == s2->number)
+      if (s1.number == s2.number)
         state = true;
       else
         state = false;

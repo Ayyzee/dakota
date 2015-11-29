@@ -166,12 +166,12 @@ klass sorted-set {
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = make(kls);
-    slots-t* s1 = unbox(self);
-    slots-t* s2 = unbox(copy);
-    *s2 = *s1;
-    s2->sa.elements = cast(ptr-t*)dkt::alloc(s2->sa.size * s2->sa.capacity);
-    memcpy(s2->sa.elements, s1->sa.elements, s2->sa.size * s2->sa.capacity);
-    s2->iterator-state = 0;
+    slots-t& s1 = unbox(self);
+    slots-t& s2 = unbox(copy);
+    s2 = s1;
+    s2.sa.elements = cast(ptr-t*)dkt::alloc(s2.sa.size * s2.sa.capacity);
+    memcpy(s2.sa.elements, s1.sa.elements, s2.sa.size * s2.sa.capacity);
+    s2.iterator-state = 0;
     return copy;
   }
   method size(object-t self) -> uint32-t {
@@ -184,7 +184,7 @@ klass sorted-set {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
-            cast(ptr-t)(self), cast(ptr-t)unbox(self), self.sa.count, self.sa.capacity);
+            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.sa.count, self.sa.capacity);
     for (object-t element in self)
       $dump(element);
     return self;
@@ -215,26 +215,26 @@ klass sorted-set-forward-iterator {
   method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);
     assert($instance?(sorted-set, sorted-set::klass));
-    sorted-set::slots-t* ss = sorted-set::unbox(sorted-set);
+    sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
     self.sorted-set = sorted-set;
     self.offset = 0;
-    self.iterator-state = ss->iterator-state;
+    self.iterator-state = ss.iterator-state;
     return self;
   }
   static void check-iterator-state(object-t self) {
-    sorted-set::slots-t* ss = sorted-set::unbox(self.sorted-set);
+    sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
 
-    if (self.iterator-state != ss->iterator-state) {
-      fprintf(stderr, "%i == %i\n", self.iterator-state, ss->iterator-state);
+    if (self.iterator-state != ss.iterator-state) {
+      fprintf(stderr, "%i == %i\n", self.iterator-state, ss.iterator-state);
       throw make(exception::klass, #message : "oops");
     }
     return;
   }
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
-    sorted-set::slots-t* ss = sorted-set::unbox(self.sorted-set);
+    sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
     boole-t result;
-    if (self.offset < ss->sa.count)
+    if (self.offset < ss.sa.count)
       result = true;
     else
       result = false;
@@ -253,8 +253,8 @@ klass sorted-set-forward-iterator {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
-      sorted-set::slots-t* ss = sorted-set::unbox(self.sorted-set);
-      element = cast(object-t)sorted-ptr-array::at(&ss->sa, self.offset);
+      sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
+      element = cast(object-t)sorted-ptr-array::at(&ss.sa, self.offset);
       assert(nullptr != element);
     }
     return element; // returns nullptr on error

@@ -29,16 +29,16 @@ trait counted-set {
   method elements(object-t self) -> object-t {
     object-t set-kls = superklass-of(klass-of(self));
     object-t result = make(set-kls);
-    for (pair-t* pair in self) {
-      object-t first = pair->first;
+    for (pair-t& pair in self) {
+      object-t first = pair.first;
       $add(result, first);
     }
     return result;
   }
   method counts(object-t self) -> object-t {
     object-t result = make(vector::klass, #size : $size(self));
-    for (pair-t* pair in self) {
-      object-t last = pair->last;
+    for (pair-t& pair in self) {
+      object-t last = pair.last;
       $add-last(result, last);
     }
     return result;
@@ -47,9 +47,9 @@ trait counted-set {
     $write(out, "{");
     str-t delim = "";
 
-    for (pair-t* pair in self) {
-      object-t first = pair->first;
-      object-t last =  pair->last;
+    for (pair-t& pair in self) {
+      object-t first = pair.first;
+      object-t last =  pair.last;
       $write(out, delim);
       $write-lite(first, out); // must be primitive type
       $write(out, ":");
@@ -68,9 +68,9 @@ trait counted-set {
 
     if (pair) {
       if ($instance?(pair, pair::klass))
-        last = pair::unbox(pair)->last;
-      uint32-t* count-ptr = uint32::unbox(last);
-      (*count-ptr)++;
+        last = pair::unbox(pair).last;
+      uint32-t& count-ptr = uint32::unbox(last);
+      count-ptr++;
     } else {
       last = uint32::box(1);
       pair = pair::box({first, last});
@@ -81,7 +81,7 @@ trait counted-set {
   method at(object-t self, object-t first) -> object-t {
     object-t last = $in(super, first);
     if ($instance?(last, pair::klass))
-      last = pair::unbox(last)->last;
+      last = pair::unbox(last).last;
     return last;
   }
   method at(object-t self, object-t first, object-t default-last) -> object-t {
@@ -89,14 +89,14 @@ trait counted-set {
     if (nullptr == last)
       last = default-last;
     if (last && $instance?(last, pair::klass))
-      last = pair::unbox(last)->last;
+      last = pair::unbox(last).last;
     return last;
   }
   method count-at(object-t self, object-t first) -> uint32-t {
     object-t last = $at(self, first);
     if ($instance?(last, pair::klass))
-      last = pair::unbox(last)->last;
-    uint32-t count = *uint32::unbox(last);
+      last = pair::unbox(last).last;
+    uint32-t count = uint32::unbox(last);
     return count;
   }
   method count-at(object-t self, object-t first, uint32-t default-count) -> uint32-t {
@@ -105,8 +105,8 @@ trait counted-set {
 
     if (last) {
       if ($instance?(last, pair::klass))
-        last = pair::unbox(last)->last;
-      count = *uint32::unbox(last);
+        last = pair::unbox(last).last;
+      count = uint32::unbox(last);
     }
     return count;
   }
