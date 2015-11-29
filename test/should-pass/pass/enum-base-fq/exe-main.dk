@@ -1,0 +1,16 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+namespace foo {
+  typedef int32-t int32-t;
+}
+
+klass bar {
+  slots enum : foo::int32-t {
+    k-zero = 0,
+    k-one =  1,
+  }
+}
+
+int-t main() {
+  return 0;
+}
