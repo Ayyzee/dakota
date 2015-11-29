@@ -2995,39 +2995,6 @@ sub exported_slots_methods {
   }
   return $exported_slots_methods;
 }
-sub exports {
-  my ($scope) = @_;
-  my $exports = {};
-
-  foreach my $klass_type ('klass', 'trait') {
-    while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
-      my $exported_methods = &exported_methods($klass_scope);
-      my $exported_slots_methods = &exported_slots_methods($klass_scope);
-
-      while (my ($key, $element) = each (%$exported_methods)) {
-        my ($lhs, $rhs) = &export_pair($klass_name, $element);
-        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
-      }
-      while (my ($key, $element) = each (%$exported_slots_methods)) {
-        my ($lhs, $rhs) = &export_pair($klass_name, $element);
-        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
-      }
-
-      if (&is_exported($klass_scope)) {
-        my $lhs = "\#$klass_name";
-        my $rhs = 1;
-        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
-      }
-
-      if (&has_exported_slots($klass_scope)) {
-        my $lhs = "\#$klass_name\::slots-t";
-        my $rhs = 1;
-        $$exports{"\#$$klass_scope{'module'}"}{$lhs} = $rhs;
-      }
-    }
-  }
-  return $exports;
-}
 sub dk_generate_cc_footer_klass {
   my ($klass_scope, $klass_name, $col, $klass_type, $symbols) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
