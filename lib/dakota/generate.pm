@@ -3316,8 +3316,11 @@ sub dk_generate_cc_footer_klass {
           $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
         }
         $$tbl{'#size'} = "sizeof(slots-t::$$slot_info{'name'})";
-        #$$tbl{'#type'} = '__symbol::' . &dk_mangle($$slot_info{'type'});
-        $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
+        if (&is_symbol_candidate($$slot_info{'type'})) {
+          $$tbl{'#type'} = "\#$$slot_info{'type'}";
+        } else {
+          $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
+        }
         my $tp = 'slots-t::' . $$slot_info{'name'};
        #$$tbl{'#typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
         $$tbl{'#typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
@@ -3397,7 +3400,11 @@ sub dk_generate_cc_footer_klass {
   if (&has_slots_type($klass_scope)) {
     my $slots_type_ident = &dk_mangle($$klass_scope{'slots'}{'type'});
     my $type_symbol = $$klass_scope{'slots'}{'type'};
-    $$tbbl{'#slots-type'} = "\"$type_symbol\"";
+    if (&is_symbol_candidate($type_symbol)) {
+      $$tbbl{'#slots-type'} = "\#$type_symbol";
+    } else {
+      $$tbbl{'#slots-type'} = "\"$type_symbol\"";
+    }
     my $tp = 'slots-t';
    #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
     $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
@@ -3407,7 +3414,7 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#slots-info'} = '__slots-info';
   }
   if ($$klass_scope{'slots'}{'enum-base'}) {
-    $$tbbl{'#enum-base'} = "\"$$klass_scope{'slots'}{'enum-base'}\"";
+    $$tbbl{'#enum-base'} = "\#$$klass_scope{'slots'}{'enum-base'}";
   }
   if (&has_slots_type($klass_scope) || &has_slots_info($klass_scope)) {
     $$tbbl{'#size'} = 'sizeof(slots-t)';

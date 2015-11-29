@@ -741,8 +741,12 @@ sub slots_seq {
       }
       my $name = &dakota::util::remove_last($type);
       &add_symbol($gbl_root, [ $name ]);
+      my $arg_type = &arg::type($type);
       my $slot_info = { 'name' => $name,
-                        'type' => &arg::type($type) };
+                        'type' => $arg_type };
+      if (&is_symbol_candidate($arg_type)) {
+        &add_symbol_ident($gbl_root, $arg_type);
+      }
       if (scalar @$expr) {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
@@ -818,6 +822,7 @@ sub slots {
       my $tkn =    &dakota::util::remove_last($type);
       die if ':' ne $tkn; # not key/element delim
       $$gbl_current_scope{'slots'}{'enum-base'} = $enum_base;
+      &add_symbol_ident($gbl_root, $enum_base);
       #print STDERR &Dumper($$gbl_current_scope{'slots'});
     }
   }
@@ -839,7 +844,11 @@ sub slots {
   }
   if (@$type) {
     &add_type($type);
-    $$gbl_current_scope{'slots'}{'type'} = &arg::type($type);
+    my $arg_type = &arg::type($type);
+    if (&is_symbol_candidate($arg_type)) {
+      &add_symbol_ident($gbl_root, $arg_type);
+    }
+    $$gbl_current_scope{'slots'}{'type'} = $arg_type;
   } else {
     $$gbl_current_scope{'slots'}{'cat'} = $cat;
   }
@@ -2197,7 +2206,7 @@ sub rep_tree_from_dk_path {
     &add_symbol($gbl_root, [$1]);
   }
   pos $_ = 0;
-  while (m|(\#[\w\.:/-]+)|g) {
+  while (m|(\#[\w./:-]+)|g) {
     &add_symbol($gbl_root, [$1]);
   }
   &decode_comments(\$_, $parts);

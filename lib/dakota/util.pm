@@ -61,6 +61,7 @@ our @EXPORT= qw(
                  flatten
                  header_file_regex
                  ident_regex
+                 is_symbol_candidate
                  kw_args_generics
                  kw_args_generics_add
                  kw_args_placeholders
@@ -211,6 +212,14 @@ sub rand_str {
   my $str = '';
   $str .= $$alphabet[rand @$alphabet] for 1..$len;
   return $str;
+}
+sub is_symbol_candidate {
+  my ($str) = @_;
+  if ($str =~ m|^[\w./:-]+$|) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 sub encode_char { my ($char) = @_; return sprintf("%02x", ord($char)); }
 sub dk_mangle {
