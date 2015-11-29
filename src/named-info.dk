@@ -51,13 +51,13 @@ klass named-info {
   }
   method sort(slots-t* s) -> slots-t* {
     qsort(s->elements, s->count, sizeof(s->elements[0]),
-          cast(std-compare-t)cast(func (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
+          cast(std-compare-t)cast(auto (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
     return s;
   }
   method search(slots-t* s, symbol-t key) -> property-t* {
     property::slots-t property = { cast(symbol-t)key, cast(uintptr-t)0 };
     property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
-                                                                cast(std-compare-t)cast(func (*)(property::slots-t*,
+                                                                cast(std-compare-t)cast(auto (*)(property::slots-t*,
                                                                                                  property::slots-t*) -> int-t)property::compare);
     return result;
   }

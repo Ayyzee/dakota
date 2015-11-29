@@ -240,3 +240,7 @@ then prompt=...
 fi
 
 add iter-like interface that takes a lambda func
+
+prefix initialize()/finalize() with 'klass method'
+
+replace visibility comment with [[]]

@@ -131,19 +131,23 @@ static func init-runtime-ds() -> void {
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(named-assoc-node::slots-t),
-                        cast(std-compare-t)cast(func (*)(named-assoc-node::slots-t*,named-assoc-node::slots-t*) -> int-t)named-assoc-node::compare);
+                        cast(std-compare-t)cast(auto (*)(named-assoc-node::slots-t*,
+                                                         named-assoc-node::slots-t*) -> int-t)named-assoc-node::compare);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(named-info::slots-t*),
-                        cast(std-compare-t)cast(func (*)(named-info::slots-t**,named-info::slots-t**) -> int-t)named-info::compare);
+                        cast(std-compare-t)cast(auto (*)(named-info::slots-t**,
+                                                         named-info::slots-t**) -> int-t)named-info::compare);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(property::slots-t),
-                        cast(std-compare-t)cast(func (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
+                        cast(std-compare-t)cast(auto (*)(property::slots-t*,
+                                                         property::slots-t*) -> int-t)property::compare);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                         cast(uint32-t)sizeof(symbol-t),
-                        cast(std-compare-t)cast(func (*)(symbol::slots-t*,symbol::slots-t*) -> int-t)symbol::compare);
+                        cast(std-compare-t)cast(auto (*)(symbol::slots-t*,
+                                                         symbol::slots-t*) -> int-t)symbol::compare);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -401,11 +405,11 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
           else
             defined = 1;
           ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%i' },\n",
-                       method-signature->name, method-signature->parameter-types,
-                       method-signature->return-type,
-                       method-signature->name,
-                       method-signature->parameter-types,
-                       defined);
+                                  method-signature->name, method-signature->parameter-types,
+                                  method-signature->return-type,
+                                  method-signature->name,
+                                  method-signature->parameter-types,
+                                  defined);
           j++;
         }
         ostream::col-decr(ostrm);
@@ -595,17 +599,17 @@ func dk-init-runtime() -> void {
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
-         cast(func (*)(named-info-t*, ptr-t) -> void)cast(func (*)(named-info-t*, func (*)(str-t) -> object-t) -> void)each-str,
-         cast(ptr-t)cast(func (*)(str-t) -> object-t)str::box);
+         cast(auto (*)(named-info-t*, ptr-t) -> void)cast(auto (*)(named-info-t*, auto (*)(str-t) -> object-t) -> void)each-str,
+         cast(ptr-t)cast(auto (*)(str-t) -> object-t)str::box);
     dk-klass-for-name(#uintptr);
     each(gbl-registration-info-list,
-         cast(func (*)(named-info-t*, ptr-t) -> void)cast(func (*)(named-info-t*, func (*)(uintptr-t) -> object-t) -> void)each-int,
-         cast(ptr-t)cast(func (*)(uintptr-t) -> object-t)uintptr::box);
+         cast(auto (*)(named-info-t*, ptr-t) -> void)cast(auto (*)(named-info-t*, auto (*)(uintptr-t) -> object-t) -> void)each-int,
+         cast(ptr-t)cast(auto (*)(uintptr-t) -> object-t)uintptr::box);
 
-    func previous-terminate = std::set-terminate(verbose-terminate);
+    auto previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
 
-    func previous-unexpected = std::set-unexpected(verbose-unexpected);
+    auto previous-unexpected = std::set-unexpected(verbose-unexpected);
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 # if 0
@@ -812,7 +816,6 @@ static func first-parameter-type-len(str-t params) -> size-t {
   }
   return i;
 } 
-
 static func dump-module-description(ostream-t ostrm, named-info-t* registration-info) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
@@ -1093,7 +1096,10 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
       uint32-t i = 0;
       while (nullptr != const-info[i].name) {
         ostream::println-format(ostrm, "export\n"); // hackhack
-        ostream::println-format(ostrm, "const %s %s = %s;\n", const-info[i].type, const-info[i].name, const-info[i].value);
+        ostream::println-format(ostrm, "const %s %s = %s;\n",
+                                const-info[i].type,
+                                const-info[i].name,
+                                const-info[i].value);
         i++;
       }
     }
@@ -1389,7 +1395,6 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   }
   return r;
 }
-  
 static func set-read-only(str-t segment, get-segment-data-t get-segment-data) -> int-t {
   assert(nullptr != segment);
   ptr-t addr = nullptr;
@@ -1528,7 +1533,7 @@ func dk-klass-for-name(symbol-t, uint32-t) ->  object-t;
 namespace object { func instance?(object-t, object-t) -> boole-t; }
 
 func dk-klass-for-name(symbol-t klass-name) -> object-t {
-  func result = dk-klass-for-name(klass-name, 0);
+  object-t result = dk-klass-for-name(klass-name, 0);
   return result;
 }
 func dk-klass-for-name(symbol-t klass-name, uint32-t column) -> object-t {
