@@ -49,7 +49,7 @@
 # define TRAIT(t)
 # define TRAITS(t1, ...)
 
-# define func auto
+# define FUNC auto
 
 # if defined _WIN32 || defined _WIN64
   # define so_import ms::dllimport

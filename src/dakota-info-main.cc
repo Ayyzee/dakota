@@ -45,7 +45,7 @@ struct opts_t {
 };
 static opts_t opts;
 
-static func usage(const char* progname, option* options) -> int {
+static FUNC usage(const char* progname, option* options) -> int {
   const char* tmp_progname = strrchr(progname, '/');
   if (nullptr != tmp_progname)
     tmp_progname++;
@@ -73,7 +73,7 @@ static func usage(const char* progname, option* options) -> int {
   fprintf(stdout, " <> [...]\n");
   return result;
 }
-static func handle_opts(int* argc, char*** argv) -> void {
+static FUNC handle_opts(int* argc, char*** argv) -> void {
   const char* progname = *argv[0];
   int unrecognized_opt_cnt = 0;
   // options descriptor
@@ -121,13 +121,13 @@ static func handle_opts(int* argc, char*** argv) -> void {
   return;
 }
 namespace va {
-  [[noreturn]] [[format_va_printf(3)]] static func _abort_with_log(const char* file, int line, const char* format, va_list args) -> void {
+  [[noreturn]] [[format_va_printf(3)]] static FUNC _abort_with_log(const char* file, int line, const char* format, va_list args) -> void {
     fprintf(stderr, "%s:%i: ", file, line);
     vfprintf(stderr, format, args);
     std::abort();
   }
 }
-[[noreturn]] [[format_printf(3)]] static func _abort_with_log(const char* file, int line, const char* format, ...) -> void {
+[[noreturn]] [[format_printf(3)]] static FUNC _abort_with_log(const char* file, int line, const char* format, ...) -> void {
   va_list args;
   va_start(args, format);
   va::_abort_with_log(file, line, format, args);
@@ -137,7 +137,7 @@ namespace va {
 
 # include "spawn.cc"
 
-static func setenv_boole(const char* name, bool value, int overwrite) -> int {
+static FUNC setenv_boole(const char* name, bool value, int overwrite) -> int {
   int result = 0;
   if (value)
     result = setenv(name, "1", overwrite);
@@ -149,7 +149,7 @@ static func setenv_boole(const char* name, bool value, int overwrite) -> int {
 //    if that fails
 // 2: try to dlopen() path
 
-func main(int argc, char** argv, char**) -> int {
+FUNC main(int argc, char** argv, char**) -> int {
   handle_opts(&argc, &argv);
   char output_pid[MAXPATHLEN] = "";
 
