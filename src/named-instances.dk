@@ -29,8 +29,6 @@ klass output-stream;
 // instance <qual-name> of <qual-ident>::klass [ { ... } ] ;
 
 instance null       { return make(null-singleton::klass); }
-instance #false     { return make(boole::klass, #slots : false);  };
-instance #true      { return make(boole::klass, #slots : true);   };
 instance std-input  { return make(input-stream::klass,  #slots : stdin);  };
 instance std-output { return make(output-stream::klass, #slots : stdout); };
 instance std-error  { return make(output-stream::klass, #slots : stderr); };
@@ -40,8 +38,6 @@ instance std-error  { return make(output-stream::klass, #slots : stderr); };
 { // ro-data
   // name (for lookup)
   { #null,              [] () -> object-t { return make(null-singleton::klass); } },
-  { dk-intern("false"), [] () -> object-t { return make(boole::klass, #slots : false); } },
-  { dk-intern("true"),  [] () -> object-t { return make(boole::klass, #slots : true);  } },
   { #std-input,         [] () -> object-t { return make(input-stream::klass,  #slots : stdin);  } },
   { #std-output,        [] () -> object-t { return make(output-stream::klass, #slots : stdout); } },
   { #std-error,         [] () -> object-t { return make(output-stream::klass, #slots : stderr); } },
@@ -49,8 +45,6 @@ instance std-error  { return make(output-stream::klass, #slots : stderr); };
 // AND
 { // rw-data
   &null,
-  &__instance::_false_,
-  &__instance::_true_,
   &std-input,
   &std-output,
   &std-error,
@@ -58,7 +52,7 @@ instance std-error  { return make(output-stream::klass, #slots : stderr); };
 
 // decl for import
 
-{ array of names } // ro-data
+{ array of names/lambdas } // ro-data
 // AND
 { array of ptrs } // rw-data
 

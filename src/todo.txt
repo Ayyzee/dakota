@@ -237,3 +237,5 @@ add:     dkt-get-klass-chain(object-t kls, str-buffer-t str-buf)
 consider renaming #items to #objects (or #objects[] ?)
 
 convert code to use intNN-t vs uintNN-t where possible
+
+clean up or remove DKT-WORKAROUND

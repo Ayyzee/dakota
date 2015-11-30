@@ -86,7 +86,6 @@ klass selector-pair {
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
     int-t result = signature::compare(const-cast<signature-t*>(s->key),
                                       const-cast<signature-t*>(other-s->key)); // hackhack
-    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

@@ -457,26 +457,27 @@ func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
   object-t klass = dk-register-klass(klass-info);
   return klass;
 }
-klass named-info-func {
-  slots (*)(named-info-t*, ptr-t) -> void;
-}
-static func each(named-info-t* root-info-list, named-info-func-t info-func, ptr-t user-data) -> void  {
+typedef auto (*named-info-func-t)(named-info-t*, ptr-t) -> void;
+typedef auto (*str-box-func-t)(str-t)     -> object-t;
+typedef auto (*int-box-func-t)(uintptr-t) -> object-t;
+    
+static func each(named-info-t* root-info-list, named-info-func-t func, ptr-t user-data) -> void  {
   named-info-t* info;
   named-info-t* info-list = root-info-list;
   while (nullptr != (info = info-list)) {
     info-list = info-list->next;
     named-info-t* next = info->next;
     info->next = nullptr;
-    info-func(info, user-data);
+    func(info, user-data);
     info->next = next;
   }
   return;
 }
-static func each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
+static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
   assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str.ptrs);
   if (assocs) {
-    symbol-t* names =    cast(symbol-t*)named-info::at(info, #str.names);
-    str-t*    literals = cast(str-t*)   named-info::at(info, #str.literals);
+    symbol-t* names =    cast(decltype(names))   named-info::at(info, #str.names);
+    str-t*    literals = cast(decltype(literals))named-info::at(info, #str.literals);
     assert(nullptr != literals);
     uint32-t i = 0;
     while (1) {
@@ -485,19 +486,20 @@ static func each-str(named-info-t* info, object-t (*box)(str-t)) -> void  {
       str-t         literal = literals[i];
       if (nullptr == cast(object-t*)assoc.element)
         break;
-      *(cast(object-t*)assoc.element) = box(literal);
+      *(cast(object-t*)assoc.element) = box-func(literal);
       // loop here over chain
       i++;
     }
     assert(nullptr == names[i]);
     assert(nullptr == literals[i]);
   }
+  return;
 }
-static func each-int(named-info-t* info, object-t (*box)(uintptr-t)) -> void  {
+static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
   assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int.ptrs);
   if (assocs) {
-    symbol-t*  names =    cast(symbol-t*) named-info::at(info, #int.names);
-    uintptr-t* literals = cast(uintptr-t*)named-info::at(info, #int.literals);
+    symbol-t*  names =    cast(decltype(names))   named-info::at(info, #int.names);
+    uintptr-t* literals = cast(decltype(literals))named-info::at(info, #int.literals);
     assert(nullptr != literals);
     uint32-t i = 0;
     while (1) {
@@ -506,13 +508,14 @@ static func each-int(named-info-t* info, object-t (*box)(uintptr-t)) -> void  {
       uintptr-t     literal = literals[i];
       if (nullptr == cast(object-t*)assoc.element)
         break;
-      *(cast(object-t*)assoc.element) = box(literal);
+      *(cast(object-t*)assoc.element) = box-func(literal);
       // loop here over chain
       i++;
     }
     assert(nullptr == names[i]);
     assert(0 == literals[i]); // nullptr
   }
+  return;
 }
 
 // object         klass' superklass is null instance (singleton)
@@ -598,12 +601,12 @@ func dk-init-runtime() -> void {
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
-         cast(auto (*)(named-info-t*, ptr-t) -> void)cast(auto (*)(named-info-t*, auto (*)(str-t) -> object-t) -> void)each-str,
-         cast(ptr-t)cast(auto (*)(str-t) -> object-t)str::box);
+         cast(named-info-func-t)cast(auto (*)(named-info-t*, str-box-func-t) -> void)each-str,
+         cast(ptr-t)cast(str-box-func-t)str::box);
     dk-klass-for-name(#uintptr);
     each(gbl-registration-info-list,
-         cast(auto (*)(named-info-t*, ptr-t) -> void)cast(auto (*)(named-info-t*, auto (*)(uintptr-t) -> object-t) -> void)each-int,
-         cast(ptr-t)cast(auto (*)(uintptr-t) -> object-t)uintptr::box);
+         cast(named-info-func-t)cast(auto (*)(named-info-t*, int-box-func-t) -> void)each-int,
+         cast(ptr-t)cast(int-box-func-t)uintptr::box);
 
     auto previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
