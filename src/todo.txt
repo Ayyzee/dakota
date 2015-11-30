@@ -106,8 +106,6 @@ allow super to supply ONE argument (which default to self)
 
 to the macro system add the notion of a zero-width statement boundry ( for example \{|\}|; )
 
-clean up uses of uintptr-t (should be hash-t)
-
 consider dumped (from bin/dakota-info) both init() and va::init() method decls
 
 consider moving methods from input-stream and output-stream up to stream
@@ -122,9 +120,8 @@ features that show:
   #`...` instance of klass process
   i32, i64, u32, u64
   range (first, last, interval)
-  #true/#false instance of klass boole
   selector in every method body (__selector__)
-  as(a klass) casting syntax
+  as(a-klass) casting syntax
 
 rename various things to consistent kw-args, kw-arg-method..., or simpley keyword
 
@@ -194,8 +191,6 @@ support stack based object creation
 
 make super() take an arg for self (defaults to self of course)
 
-dk-intern() should allow to have multiple (unique) tables so one might create a filesystem-only intern table, etc.
-
 Consider the name of a klass (or trait) is within the klass' (or traits') scope; its name is __klass__.
   should this change? offer __trait__ as an alias to __klass__
   how about __scope-name__ which will work with klasses, traits, namespaces, methods, and potentially even funcs.
@@ -204,33 +199,10 @@ convert symbol-from-addr() and related code to a dladdr() compatible interface t
 
 sysconf(_SC_PAGE_SIZE)
 
-when rewriting ...
-dynamically generate a pattern for each symbol in __symbol to replace the unneccessary
-explicit use of dk-intern()
-for example
-  { dk-intern ( "strings" ) } => { #strings }
-which will later be rewritten to
- __symbol :: _strings_
-It might be possible to generate a function-like macro where the double quoted string and the symbol syntax
-are variable and the user just passes in a list of compile-time known symbols
-
-0 == symbol::compare(a, b)
-or
-0 != symbol::compare(a, b)
-can be replaced
-a == b
-or
-a != b
-
 add optional index to for/in iterator
+add table iteration that is more natural than iterating over the pairs
 
 text-(input,output}-stream is subklass of object-{input,output}-stream?
-
-symbol-t sym = "hi fred";
-=>
-symbol-t sym = #hi20fred;
-=>
-...
 
 make sure PS1 is conditionally set
 if [ "${PS1+set}" = set ]
@@ -256,8 +228,6 @@ do {} until (...);
 do {} while (!(...));
 
 switch { case: automatically get trailing break added IFF the last token is not nobreak
-
-fix code to remove excessive typeinfo echoed with src/bin/check-symbols.sh
 
 fix "never" slots (slots which comments indicate will never be something only to have #slots default to set to those never values
 
