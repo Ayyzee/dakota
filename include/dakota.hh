@@ -180,9 +180,9 @@ extern object_t std_input  [[so_export]] [[dkt_rodata_section]];
 extern object_t std_output [[so_export]] [[dkt_rodata_section]];
 extern object_t std_error  [[so_export]] [[dkt_rodata_section]];
 
-typedef func (*compare_t)(object_t, object_t) -> int_t; // comparitor
-typedef func (*dkt_signature_func_t)() -> signature_t const*;
-typedef func (*dkt_selector_func_t)() -> selector_t*;
+typedef auto (*compare_t)(object_t, object_t) -> int_t; // comparitor
+typedef auto (*dkt_signature_func_t)() -> signature_t const*;
+typedef auto (*dkt_selector_func_t)() -> selector_t*;
 
 namespace hash { typedef uintptr_t slots_t; } typedef hash::slots_t hash_t;
 
