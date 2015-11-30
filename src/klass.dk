@@ -37,15 +37,14 @@
 
 # else
 
-inline void
-SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
-                        selector-t       selector,
-                        method-t         method) {
+inline func SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
+                                    selector-t        selector,
+                                    method-t          method) -> void {
   methods->addrs[selector] = method;
+  return;
 }
-inline method-t
-METHOD-FOR-SELECTOR(methods::slots-t* methods,
-                    selector-t       selector) {
+inline func METHOD-FOR-SELECTOR(methods::slots-t* methods,
+                                selector-t        selector) -> method-t {
   return methods->addrs[selector];
 }
 # endif
@@ -111,34 +110,29 @@ static sorted-array-t   gbl-selectors-table = { gbl-selectors,
 //     }
 //     return;
 //   }
-symbol-t
-default-superklass-name() {
+func default-superklass-name() -> symbol-t {
   return #object;
 }
-static object-t
-default-superklass() {
+static func default-superklass() -> object-t {
   return object::klass;
 }
-symbol-t interposer-name-for-klass-name(symbol-t klass-name);
-void add-interpose-prop(symbol-t key, symbol-t element);
+func interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t;
+func add-interpose-prop(symbol-t key, symbol-t element) -> void;
 
-static selector-t
-selector-for-signature(signature-t const* signature) {
+static func selector-for-signature(signature-t const* signature) -> selector-t {
   selector-pair-t pair = { signature, nullptr };
   selector-pair-t* found-pair =
     cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
   selector-t selector = *(found-pair->element->ptr);
   return selector;
 }
-static method-t
-method-for-signature(methods::slots-t* methods, signature-t const* signature) {
+static func method-for-signature(methods::slots-t* methods, signature-t const* signature) -> method-t {
   selector-t selector = selector-for-signature(signature);
   assert(selector < methods->count);
   method-t m = METHOD-FOR-SELECTOR(methods, selector);
   return m;
 }
-void
-import-selectors(signature-t** signatures, selector-node-t* selector-nodes) {
+func import-selectors(signature-t** signatures, selector-node-t* selector-nodes) -> void {
   uint32-t i = 0;
   while (1) {
     signature-t*     signature =     signatures[i];
@@ -164,8 +158,7 @@ import-selectors(signature-t** signatures, selector-node-t* selector-nodes) {
   }
   return;
 }
-static void const*
-ptr-from-info(named-info-t* info, symbol-t key) {
+static func ptr-from-info(named-info-t* info, symbol-t key) -> void const* {
   named-info-t* current-info = info;
   void const* previous-element = nullptr;
   void const* element = nullptr;
@@ -180,8 +173,7 @@ ptr-from-info(named-info-t* info, symbol-t key) {
 
   return element;
 }
-static uint32-t
-uint32-from-info(named-info-t* info, symbol-t key) {
+static func uint32-from-info(named-info-t* info, symbol-t key) -> uint32-t {
   named-info-t* current-info = info;
   uint32-t previous-element = 0;
   uint32-t element = 0;
@@ -198,32 +190,27 @@ uint32-from-info(named-info-t* info, symbol-t key) {
 
   return element;
 }
-uint32-t
-size-from-info(named-info-t* info) {
+func size-from-info(named-info-t* info) -> uint32-t {
   uint32-t size = uint32-from-info(info, #size);
   return size;
 }
-static object-t
-superklass-from-info(named-info-t* info) {
+static func superklass-from-info(named-info-t* info) -> object-t {
   object-t superklass = cast(object-t)ptr-from-info(info, #superklass);
   return superklass;
 }
-static object-t
-superklass-from-info(named-info-t* info, symbol-t name) {
+static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t {
   object-t superklass = superklass-from-info(info);
   USE(name);
   return superklass;
 }
-symbol-t
-superklass-name-from-info(named-info-t* info) {
+func superklass-name-from-info(named-info-t* info) -> symbol-t {
   symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
 
   if (nullptr == superklass-name && #object != name-from-info(info))
     superklass-name = default-superklass-name();
   return superklass-name;
 }
-symbol-t
-superklass-name-from-info(named-info-t* info, symbol-t name) {
+func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t {
   symbol-t superklass-name = superklass-name-from-info(info);
   if (nullptr == superklass-name) {
     object-t superklass = superklass-from-info(info, name);
@@ -243,13 +230,11 @@ superklass-name-from-info(named-info-t* info, symbol-t name) {
   }
   return superklass-name;
 }
-symbol-t
-name-from-info(named-info-t* info) {
+func name-from-info(named-info-t* info) -> symbol-t {
   symbol-t name = cast(symbol-t)ptr-from-info(info, #name);
   return name;
 }
-symbol-t
-klass-name-from-info(named-info-t* info) {
+func klass-name-from-info(named-info-t* info) -> symbol-t {
   symbol-t klass-name = cast(symbol-t)ptr-from-info(info, #klass-name);
 
   if (nullptr == klass-name)
@@ -260,14 +245,12 @@ const uint32-t k-alignment = 8;
 
 // consider using alignas(8) on the slots struct decl/defn
 
-inline uint32-t
-round-alignment(uint32-t n) {
+inline func round-alignment(uint32-t n) -> uint32-t {
   uint32-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
   return result;
 }
 // offset is 'offset() of superklass' + 'size of superklass'
-uint32-t
-offset-from-info(named-info-t* info) {
+func offset-from-info(named-info-t* info) -> uint32-t {
   uint32-t result;
 
   symbol-t name = name-from-info(info);
@@ -286,8 +269,7 @@ offset-from-info(named-info-t* info) {
   result = round-alignment(result);
   return result;
 }
-static void
-load-traits(symbol-t const* traits) {
+static func load-traits(symbol-t const* traits) -> void {
   if (nullptr != traits) {
     uint32-t i = 0;
     symbol-t trait-name;
@@ -499,7 +481,7 @@ klass klass {
     }
     return seq;
   }
-  method dump-methods(slots-t* s) -> slots-t*{
+  method dump-methods(slots-t* s) -> slots-t* {
     if (nullptr != s->behavior)
       $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
@@ -547,8 +529,8 @@ klass klass {
     return s;
   }
   // use for both klasses (and klass-x) and traits (and trait-x)
-  static void add-methods(object-t self, named-info-t* info,
-                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses) {
+  static func add-methods(object-t self, named-info-t* info,
+                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses) -> void {
     named-info-t* current-info = info;
     do {
       signature-t** method-signatures = cast(signature-t**)named-info::at(current-info, symbol-method-signatures);
@@ -577,7 +559,7 @@ klass klass {
     } while (nullptr != (current-info = current-info->next));
     return;
   }
-  static void add-traits(object-t self, symbol-t const* traits) {
+  static func add-traits(object-t self, symbol-t const* traits) -> void {
     if (nullptr != traits) {
       uint32-t length = 0;
       while (nullptr != traits[length])
@@ -595,7 +577,7 @@ klass klass {
     }
     return;
   }
-  static object-t traits-initialize(object-t self, symbol-t const* traits) {
+  static func traits-initialize(object-t self, symbol-t const* traits) -> object-t {
     if (nullptr != traits) {
       uint32-t i = 0;
       symbol-t trait-name;
@@ -633,7 +615,7 @@ klass klass {
   }
   static named-info::slots-t gbl-default-info-slots = { nullptr, 0, nullptr };
 
-  object-t init(object-t self, named-info::slots-t* info-slots);
+  func init(object-t self, named-info::slots-t* info-slots) -> object-t;
 
   method init(object-t self,
               named-info::slots-t* info-slots : nullptr,
@@ -655,7 +637,7 @@ klass klass {
     return result;
   }
   // called from init-klass() from dk-init-runtime()
-  object-t init(object-t self, named-info::slots-t* info-slots) {
+  func init(object-t self, named-info::slots-t* info-slots) -> object-t {
     if (nullptr == info-slots)
       info-slots = &gbl-default-info-slots;
     named-info::sort(info-slots);

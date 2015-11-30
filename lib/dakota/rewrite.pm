@@ -943,7 +943,7 @@ sub rewrite_method_aliases {
 }
 sub rewrite_initialze_finalize {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/func $1/gs;
+  $$filestr_ref =~ s/(\s)((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/$1func $2/gs;
 }
 sub rewrite_multi_char_consts {
   my ($filestr_ref) = @_;
