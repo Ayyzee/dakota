@@ -424,8 +424,6 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
 }
 static named-info-t* gbl-registration-info-list;
 
-func register-info-common(named-info-t* registration-info, ptr-t user-data) -> void;
-
 // func dk-make-simple-singleton(symbol-t name, symbol-t superklass-name) -> object-t {
 //   object-t kls = dk-make-simple-klass(name, superklass-name, #singleton-klass);
 //   object-t singleton = make(kls);
@@ -457,11 +455,14 @@ func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
   object-t klass = dk-register-klass(klass-info);
   return klass;
 }
-typedef auto (*named-info-func-t)(named-info-t*, ptr-t) -> void;
+typedef auto (*each-box-func-t)(...) -> object-t;
+typedef auto (*named-info-func-t)(named-info-t*, each-box-func-t) -> void;
 typedef auto (*str-box-func-t)(str-t)     -> object-t;
 typedef auto (*int-box-func-t)(uintptr-t) -> object-t;
     
-static func each(named-info-t* root-info-list, named-info-func-t func, ptr-t user-data) -> void  {
+func register-info-common(named-info-t* ni, each-box-func-t box-func) -> void;
+
+static func each(named-info-t* root-info-list, named-info-func-t func, each-box-func-t user-data) -> void  {
   named-info-t* info;
   named-info-t* info-list = root-info-list;
   while (nullptr != (info = info-list)) {
@@ -530,7 +531,7 @@ func dk-init-runtime() -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   if (nullptr == object::klass) {
     init-runtime-ds();
-    each(gbl-registration-info-list, register-info-common, cast(ptr-t)nullptr);
+    each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
     // alloc
     klass::klass =  alloc-klass(#klass); // must be first
@@ -602,11 +603,11 @@ func dk-init-runtime() -> void {
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
          cast(named-info-func-t)cast(auto (*)(named-info-t*, str-box-func-t) -> void)each-str,
-         cast(ptr-t)cast(str-box-func-t)str::box);
+         cast(each-box-func-t)cast(str-box-func-t)str::box);
     dk-klass-for-name(#uintptr);
     each(gbl-registration-info-list,
          cast(named-info-func-t)cast(auto (*)(named-info-t*, int-box-func-t) -> void)each-int,
-         cast(ptr-t)cast(int-box-func-t)uintptr::box);
+         cast(each-box-func-t)cast(int-box-func-t)uintptr::box);
 
     auto previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
@@ -1230,7 +1231,7 @@ static func named-info-to-registration-info(named-info-t* ni, registration-info-
   };
   return;
 }
-func register-info-common(named-info-t* ni, ptr-t user-data) -> void { USE(user-data);
+func register-info-common(named-info-t* ni, each-box-func-t) -> void {
   registration-info-t ri {};
   named-info-to-registration-info(ni, &ri);
 
