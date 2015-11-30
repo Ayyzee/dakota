@@ -80,10 +80,8 @@ klass unbox-illegal-klass-exception;
 # if DKT-WORKAROUND
 namespace property   { func compare(slots-t*,  slots-t* ) -> int-t; }
 namespace named-info { func compare(slots-t**, slots-t**) -> int-t; }
-namespace klass {
-  func init(object-t, named-info-t*) -> object-t;
-  func subklass?(object-t, object-t) -> boole-t;
-}
+namespace klass      { func init(object-t, named-info-t*) -> object-t; }
+namespace klass      { func subklass?(object-t, object-t) -> boole-t;  }
 # endif
 
 static const char8-t gbl-delimiter = '/'; // unix path delimiter
