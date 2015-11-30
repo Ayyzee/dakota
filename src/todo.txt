@@ -38,7 +38,7 @@ flush out signal-exception klasses (move/reorg some code from dakota.dk)
 selector in every method (like _cmd in objective-c) like __method__ which
 is a signature (which is like __func__) name would likely __selector__
 
-support #'abcd', #true, #false
+support #'abcd'
 
 in perl:
   my $len = $$info{size}{len}
@@ -78,7 +78,7 @@ the compiled image it represents
 allow const on property::element; must supply no-op box() so it does
 not generate a box that won't compile
 
-add null/#std{in,out,err}/#false/#true to the readonly pages
+add null/std-{input,output,error} to the readonly pages
 
 check sorted order of named-info/property data structures in rt/*.cc
 if not need be sorted, maybe convert from a named-info-t seq to a regular named-info-t
@@ -202,8 +202,6 @@ Consider the name of a klass (or trait) is within the klass' (or traits') scope;
 
 convert symbol-from-addr() and related code to a dladdr() compatible interface to be used when dladdr() is missing.
 
-nested klass/traits defns (i.e. inner klasses/traits)?
-
 sysconf(_SC_PAGE_SIZE)
 
 when rewriting ...
@@ -267,3 +265,5 @@ current: dkt-get-klass-chain(object-t kls, char8-t* buf, uint32-t buf-len) -> ch
 add:     dkt-get-klass-chain(object-t kls, str-buffer-t str-buf)
 
 consider renaming #items to #objects (or #objects[] ?)
+
+convert code to use intNN-t vs uintNN-t where possible
