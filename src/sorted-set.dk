@@ -22,12 +22,6 @@
 
 module dakota;
 
-# if DKT-WORKAROUND
-namespace sorted-ptr-array {
-  result-t search(slots-t*, void const*);
-}
-# endif
-
 klass exception;
 klass equal-predicate;
 klass object-output-stream;
@@ -62,10 +56,10 @@ klass sorted-set {
     result *= -1;
     return result;
   }
-  method init(object-t self,
-                       uint32-t          initial-capacity : gbl-default-capacity,
-                       object-t          elements :         nullptr,
-                       object-t*         items :            nullptr) -> object-t {
+  method init(object-t  self,
+              uint32-t  initial-capacity : gbl-default-capacity,
+              object-t  elements :         nullptr,
+              object-t* items :            nullptr) -> object-t {
     assert(0 != initial-capacity);
 
     self = $init(super);
@@ -221,7 +215,7 @@ klass sorted-set-forward-iterator {
     self.iterator-state = ss.iterator-state;
     return self;
   }
-  static void check-iterator-state(object-t self) {
+  static func check-iterator-state(object-t self) -> void {
     sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
 
     if (self.iterator-state != ss.iterator-state) {
