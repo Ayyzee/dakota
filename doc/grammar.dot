@@ -23,15 +23,30 @@ digraph "grammar"
 
   node [ shape = circle, fontname = "Courier" ];
 
-  000 [ shape = doublecircle, fontcolor = blue ];
-  100 [ color = blue ];
-  178 [ color = blue ];
-  174 [ color = blue ];
+  000 [ shape = doublecircle, fontcolor = blue, fixedsize = true, width = 0.5 ];
+  100 [ color = blue, fixedsize = true, width = 0.5, label = "mdl" ];
+  125 [ color = blue, fixedsize = true, width = 0.5, label = "trt" ];
+  126 [ color = blue, fixedsize = true, width = 0.5, label = "mth" ];
+  178 [ color = blue, fixedsize = true, width = 0.5, label = "slt" ];
+  174 [ color = blue, fixedsize = true, width = 0.5, label = "mth" ];
+  270 [ color = blue, fixedsize = true, width = 0.5, label = "trt" ];
+
+  324 [ shape = doublecircle, fontcolor = blue, fixedsize = true, width = 0.5, label = "trt" ];
+  324 -> 325 [ label = "trait" ];
+  325 -> 327 [ label = "qual-ident", fontcolor = blue ];
+  327 -> 325 [ label = ",", fontname = "Courier-Bold", color = green ];
+  327 -> 324 [ label = ";", fontname = "Courier-Bold", color = green ];
 
   000 -> 100 [ label = "module", dir = both, style = dashed ];
   000 -> 133 [ label = "interpose" ];
   000 -> 150 [ label = "klass" ];
-  000 -> 150 [ label = "trait" ];
+  000 -> 120 [ label = "trait" ];
+  120 -> 122 [ label = "qual-ident", fontcolor = blue ];
+  122 -> 124 [ label = "{", fontname = "Courier-Bold" ];
+  124 -> 126 [ label = "method", dir = both, style = dashed ];
+  124 -> 125 [ label = "trait", dir = both, style = dashed ];
+  124 -> 000 [ label = "}", fontname = "Courier-Bold", color = green ];
+
   133 -> 137 [ label = "qual-ident", fontcolor = blue ];
   137 -> 138 [ label = ",", fontname = "Courier-Bold" ];
   138 -> 140 [ label = "qual-ident", fontcolor = blue, color = green ];
@@ -46,7 +61,7 @@ digraph "grammar"
   160 -> 170 [ label = "klass" ];
   160 -> 170 [ label = "superklass" ];
   160 -> 165 [ label = "klass" ];
-  160 -> 270 [ label = "trait" ];
+  160 -> 270 [ label = "trait", dir = both, style = dashed ];
   170 -> 180 [ label = "qual-ident", fontcolor = blue ];
   165 -> 178 [ label = "slots" ];
   165 -> 174 [ label = "method" ];
@@ -56,7 +71,7 @@ digraph "grammar"
   165 -> 180 [ label = "qual-ident", fontcolor = blue ];
   165 -> 270 [ label = "trait" ];
   180 -> 160 [ label = ";", fontname = "Courier-Bold", color = green ];
-  270 -> 280 [ label = "qual-ident", fontcolor = blue ];
-  280 -> 160 [ label = ";", fontname = "Courier-Bold", color = green ];
-  280 -> 270 [ label = ",", fontname = "Courier-Bold", color = green ];
+  // 270 -> 280 [ label = "qual-ident", fontcolor = blue ];
+  // 280 -> 160 [ label = ";", fontname = "Courier-Bold", color = green ];
+  // 280 -> 270 [ label = ",", fontname = "Courier-Bold", color = green ];
 }
