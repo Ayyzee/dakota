@@ -20,19 +20,20 @@
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
 
-# define SELECTOR_FUNC
-# define SIGNATURE_FUNC
-# define GENERIC
-# define METHOD
+# define GENERIC auto
+# define METHOD  auto
+# define FUNC    auto
+# define SELECTOR_FUNC  FUNC
+# define SIGNATURE_FUNC FUNC
 
-# define VA_SELECTOR_FUNC
-# define VA_SIGNATURE_FUNC
-# define VA_GENERIC
-# define VA_METHOD
-# define KW_ARGS_METHOD
+# define VA_SELECTOR_FUNC  FUNC
+# define VA_SIGNATURE_FUNC FUNC
+# define VA_GENERIC        GENERIC
+# define VA_METHOD         METHOD
+# define KW_ARGS_METHOD    METHOD
 
-# define KW_ARGS_METHOD_SIGNATURE_FUNC
-# define SLOTS_METHOD_SIGNATURE_FUNC
+# define KW_ARGS_METHOD_SIGNATURE_FUNC FUNC
+# define SLOTS_METHOD_SIGNATURE_FUNC   FUNC
 
 # define ALIAS(m)
 # define METHOD_ALIAS(a, r)
@@ -48,8 +49,6 @@
 # define KLASS(k)
 # define TRAIT(t)
 # define TRAITS(t1, ...)
-
-# define FUNC auto
 
 # if defined _WIN32 || defined _WIN64
   # define so_import ms::dllimport

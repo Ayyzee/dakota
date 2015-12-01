@@ -331,13 +331,13 @@ sub vars_from_defn {
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
   $$filestr_ref =~ s|(method\s+(\[\[.+?\]\])?\s*($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) auto|gs; #hackhack
-  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 auto |gs; #hackhack
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) |gs; #hackhack
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 |gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
-  #$$filestr_ref =~ s|(?<!\[\[so-export\]\])(\s+)(method)(\s*)|$1METHOD$3auto |gm;
+  #$$filestr_ref =~ s|(?<!\[\[so-export\]\])(\s+)(method)(\s*)|$1METHOD$3 |gm;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack

@@ -32,6 +32,10 @@ klass ptr;
 klass stream;
 klass system-exception;
 
+namespace output-stream {
+  [[format-va-printf(2)]] METHOD va::print-format(object-t self, str-t format, va-list-t args) -> object-t;
+  [[format-va-printf(2)]] METHOD va::println-format(object-t self, str-t format, va-list-t args) -> object-t;
+}
 klass output-stream {
   superklass stream;
 
@@ -82,13 +86,13 @@ klass output-stream {
       $print(self, "  "); // two spaces per column :-) [my way]
     return self;
   }
-  method [[format-va-printf(2)]] va::print-format(object-t self, str-t format, va-list-t args) -> object-t {
+  method va::print-format(object-t self, str-t format, va-list-t args) -> object-t {
     char8-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     $print(self, cast(str-t)(buffer));
     return self;
   }
-  method [[format-va-printf(2)]] va::println-format(object-t self, str-t format, va-list-t args) -> object-t {
+  method va::println-format(object-t self, str-t format, va-list-t args) -> object-t {
     char8-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     $println(self, cast(str-t)(buffer));
