@@ -1,0 +1,9 @@
+Normally a user would not specify the metaklass using the klass
+decl. If the user did, the extracted metaklass must be a subklass of
+the user declared metaklass (the extracted metaklass must declare
+itself to be a subklass of the user declared metaklass. And the name
+of the extracted metaklass should be <klass-name>-<user-declared-klass>.
+
+A metaklass must be an eventual subklass of klass (so the default
+superklass for a metaklass is klass). A metaklass (or any klass for
+that matter) must use klass or a subklass in its klass decl.
