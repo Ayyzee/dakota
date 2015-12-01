@@ -34,15 +34,26 @@ $main::block_in = qr{
                       )*
                   }x;
 my $implicit_metaklass_stmts = qr/( *klass\s+(((klass|trait|superklass)\s+[\w:-]+)|(slots|method)).*)/s;
-undef $/;
-while (<>) {
-  while ($_ =~ m/^klass(\s+)([\w:-]+)(\s*)\{(\s*$main::block_in\s*)\}/gms) {
-    my ($s1, $klass_name, $s2, $body) = ($1, $2, $3, $4);
-    $body =~ s/$implicit_metaklass_stmts/&metaklass_body_rewrite($klass_name, $1)/egs;
-    my $klass_metaklass_defn = "klass$s1$klass_name$s2\{ klass $klass_name-klass;" . $body . "}";
-    $klass_metaklass_defn = &compress_lines($klass_metaklass_defn, 1);
-    print $klass_metaklass_defn . "\n";
+sub metaklass_body_rewrite {
+  my ($klass_name, $metaklass_stmts) = @_;
+  $metaklass_stmts =~ s/klass\s+(superklass\s+[\w:-]+)/$1/x;
+  $metaklass_stmts =~ s/klass\s+(klass     \s+[\w:-]+)/$1/x;
+  $metaklass_stmts =~ s/klass\s+(trait     \s+[\w:-]+)/$1/x;
+  $metaklass_stmts =~ s/klass\s+(slots)/$1/;
+  $metaklass_stmts =~ s/klass\s+(method)/$1/;
+  my $result = "} klass $klass_name-klass {\n" . $metaklass_stmts;
+  return $result;
+}
+sub klass_with_implicit_metaklass_rewrite {
+  my ($s1, $klass_name, $s2, $body) = @_;
+  my $result;
+  if ($body =~ s/$implicit_metaklass_stmts/&metaklass_body_rewrite($klass_name, $1)/egs) {
+    $result = "klass$s1$klass_name$s2\{ klass $klass_name-klass;" . $body . "}";
+  } else {
+    $result =  "klass$s1$klass_name$s2\{" . $body . "}";
   }
+  $result = &compress_lines($result, 1);
+  return $result;
 }
 sub compress_lines {
   my ($lines, $num) = @_;
@@ -50,13 +61,13 @@ sub compress_lines {
   $lines =~ s/ *}\s*}(\s*)$/} }$1/;
   return $lines;
 }
-sub metaklass_body_rewrite {
-  my ($klass_name, $body) = @_;
-  $body =~ s/klass\s+(superklass\s+[\w:-]+)/$1/x;
-  $body =~ s/klass\s+(klass     \s+[\w:-]+)/$1/x;
-  $body =~ s/klass\s+(trait     \s+[\w:-]+)/$1/x;
-  $body =~ s/klass\s+(slots)/$1/;
-  $body =~ s/klass\s+(method)/$1/;
-  my $result = "} klass $klass_name-klass {\n" . $body;
-  return $result;
+sub rewrite_klass_defn_with_implicit_metaklass_defn {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/^klass(\s+)([\w:-]+)(\s*)\{(\s*$main::block_in\s*)\}/&klass_with_implicit_metaklass_rewrite($1, $2, $3, $4)/egms;
+}
+undef $/;
+while (<>) {
+  my $filestr = $_;
+  &rewrite_klass_defn_with_implicit_metaklass_defn(\$filestr);
+  print $filestr;
 }
