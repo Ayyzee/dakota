@@ -17,14 +17,18 @@ digraph "grammar"
   graph [ label = "\G", fontcolor = red ];
   graph [ rankdir = LR, center = true ];
   graph [ page = "8.5,11", size = "7.5,10", margin = 0.125 ];
-//   graph [ concentrate = true ];
+  node [ label = "", width = 0.25 ];
+
   node [ shape = circle ];
 
   "dakota" [ label = "", shape = doublecircle, fontcolor = blue ];
+  100 [ color = blue ];
+  163 [ color = blue ];
+  168 [ color = blue ];
+  470 [ color = blue ];
+  490 [ color = blue ];
 
-  node [ label = "", width = 0.25 ];
-
-  "dakota" -> 100 [ label = "module", dir = both, fontcolor = blue ];
+  "dakota" -> 100 [ label = "module", dir = both, style = dashed ];
   "dakota" -> 140 [ label = ";", dir = back, color = green ];
   "dakota" -> 160 [ label = "}", dir = back, color = green ];
 
@@ -33,22 +37,31 @@ digraph "grammar"
   "dakota" -> 150 [ label = "trait" ];
   133 -> 137 [ label = "qual-ident", fontcolor = blue ];
   137 -> 138 [ label = "," ];
-  138 -> 140 [ label = "qual-ident", fontcolor = blue ];
+  138 -> 140 [ label = "qual-ident", fontcolor = blue, color = green ];
   140 -> 138 [ label = "," ];
   150 -> 155 [ label = "qual-ident", fontcolor = blue ];
   155 -> 160 [ label = "{" ];
-  160 -> 163 [ label = "slots", fontcolor = blue, dir = both ];
-  160 -> 167 [ label = "method", fontcolor = blue, dir = both ];
+  160 -> 163 [ label = "slots", dir = both, style = dashed ];
+  171 -> 163 [ label = "slots" ];
+  171 -> 170 [ label = "interpose" ];
+  171 -> 170 [ label = "superklass" ];
+  171 -> 170 [ label = "klass" ];
+  160 -> 168 [ label = "method", dir = both, style = dashed ];
   160 -> 170 [ label = "superklass" ];
-  160 -> 170 [ label = "klass" ];
+  160 -> 171 [ label = "klass" ];
   160 -> 170 [ label = "interpose" ];
+  160 -> 170 [ label = "klass" ];
   160 -> 270 [ label = "trait" ];
+  171 -> 270 [ label = "trait" ];
   170 -> 180 [ label = "qual-ident", fontcolor = blue ];
+  171 -> 490 [ label = "method" ];
+  171 -> 180 [ label = "qual-ident", fontcolor = blue ];
   270 -> 280 [ label = "qual-ident", fontcolor = blue ];
-  460 -> 470 [ label = "{" ];
-  470 -> 480 [ label = "...", color = cyan ];
+  460 -> 462 [ label = "->" ];
+  462 -> 464 [ label = "object-t" ];
+  464 -> 160 [ label = ";", color = green ];
+  464 -> 470 [ label = "{" ];
 
-  160 -> 490 [ label = "object-t" ];
   490 -> 500 [ label = "initialize\nfinalize" ];
   500 -> 510 [ label = "(" ];
   510 -> 520 [ label = "object-t" ];
@@ -56,11 +69,13 @@ digraph "grammar"
   520 -> 460 [ label = ")" ];
   530 -> 460 [ label = ")" ];
 
-  480 -> 160 [ label = "}", color = green ];
+  470 -> 160 [ label = "}", color = green ];
 
   180 -> 160 [ label = ";", color = green ];
   280 -> 160 [ label = ";", color = green ];
   460 -> 160 [ label = ";", color = green ];
 
   280 -> 270 [ label = ",", color = green ];
+
+  subgraph { graph [ rank = same ]; 168; 490; }
 }
