@@ -239,3 +239,6 @@ consider renaming #items to #objects (or #objects[] ?)
 convert code to use intNN-t vs uintNN-t where possible
 
 clean up or remove DKT-WORKAROUND
+
+remove partial nested klass support (already fails, but should fail without implying nested klasses are legal)
+
