@@ -14,7 +14,7 @@
 
 digraph "grammar" {
   graph [ label = "\G", fontcolor = red ];
-  graph [ rankdir = LR, center = true ];
+  graph [ rankdir = LR, center = true, ratio = fill ];
   node [ shape = circle, fontname = "Courier" ];
 
   // comment out the follow lines when editing
@@ -43,7 +43,6 @@ digraph "grammar" {
   124 -> 126 [ label = "method", dir = both, style = dashed, weight = 8 ];
   124 -> 125 [ label = "trait", dir = both, style = dashed, weight = 8 ];
   124 -> 000 [ label = "}", fontname = "Courier-Bold", color = green ];
-
   133 -> 137 [ label = "qual-ident", fontcolor = blue, weight = 8 ];
   137 -> 138 [ label = ",", fontname = "Courier-Bold", weight = 8 ];
   138 -> 140 [ label = "qual-ident", fontcolor = blue, weight = 8 ];
