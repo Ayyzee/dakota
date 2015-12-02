@@ -100,7 +100,7 @@ $main::seq = qr{
 my $colon = ':'; # key/element delim only
 my $k = qr/[\w-]/;
 my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
-my $stmt_boundry = qr/\{|\}|;/s;
+my $stmt_boundry = qr/\{|\}|:|;/s;
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
@@ -400,9 +400,9 @@ sub rewrite_throws {
 
   # dont want to rewrite #define THROW throw
   # in parens
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)\((.+?)\)(\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)\(($main::list_in)\)/          $1throw $2dkt-capture-current-exception($3)/gsx;
   # not in parens
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)  (.+?)  (\s*);/$1throw $2dkt-capture-current-exception($3)$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)       (.+?)        (\s*)(;|})/$1throw $2dkt-capture-current-exception($3)$4$5;/gsx;
 
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)RETHROW(\s*);/$1throw$2;/gsx;
 }
