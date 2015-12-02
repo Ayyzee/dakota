@@ -1,20 +1,37 @@
 // -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-// __attribute__((nonnull (2))) static auto at(void* self, void* key) -> void*;
-// static auto at(void* self, void* key) -> void* {
-//   return self;
-// }
-
-[[gnu::nonnull(3)]] static auto at(void* self, void* key, void* default-value) -> void*;
-static auto at(void* self, void* key, void* default-value) -> void* {
+[[gnu::nonnull(2)]] static auto at(object-t, object-t key) -> object-t;
+static auto at!(object-t, object-t key) -> object-t { // may return nullptr
+  USE(key);
+  return nullptr;
+}
+[[gnu::nonnull(2)]] static auto at(object-t, object-t key) -> object-t;
+static auto at(object-t, object-t key) -> object-t { // may throw exception
+  USE(key);
+  return null;
+}
+[[gnu::nonnull(2)]] static auto at(object-t, object-t key, object-t default-value) -> object-t;
+static auto at!(object-t, object-t key, object-t default-value) -> object-t { // may return nullptr
   USE(key);
   USE(default-value);
-  return self;
+  return default-value; // may be nullptr
 }
-
+[[gnu::nonnull(2,3)]] static auto at(object-t, object-t key, object-t default-value) -> object-t;
+static auto at(object-t, object-t key, object-t default-value) -> object-t { // may throw exception
+  USE(key);
+  USE(default-value);
+  return default-value; // may NOT be nullptr
+}
 auto main() -> int {
-  void* o = cast(void*)"hello";
-  // at(o, nullptr);
-  at(o, o, nullptr);
+  object-t o = null;
+  object-t k = null;
+  object-t val1 = at (o, nullptr); // should warn
+  object-t val2 = at!(o, k);
+  object-t val3 = at (o, k, nullptr);
+  object-t val4 = at!(o, k, nullptr); // should warn
+  USE(val1);
+  USE(val2);
+  USE(val3);
+  USE(val4);
   return 0;
 }
