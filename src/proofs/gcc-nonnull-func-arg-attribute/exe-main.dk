@@ -1,0 +1,20 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// __attribute__((nonnull (2))) static auto at(void* self, void* key) -> void*;
+// static auto at(void* self, void* key) -> void* {
+//   return self;
+// }
+
+[[gnu::nonnull(3)]] static auto at(void* self, void* key, void* default-value) -> void*;
+static auto at(void* self, void* key, void* default-value) -> void* {
+  USE(key);
+  USE(default-value);
+  return self;
+}
+
+auto main() -> int {
+  void* o = cast(void*)"hello";
+  // at(o, nullptr);
+  at(o, o, nullptr);
+  return 0;
+}
