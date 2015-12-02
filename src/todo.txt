@@ -1,11 +1,18 @@
 add trailing ! to more dangerous version of methods (returns nullptr)
 add safer versions of ! methods (throw exception)
 
-at!(object-t self, object-t key, object-t default-element); // may return nullptr if default-element is nullptr
-at(object-t self, object-t key, object-t default-element);  // will throw exception rather than return nullptr
+// may return nullptr if default-element is nullptr
+at!(object-t self, object-t key, object-t default-element);
 
-at!(object-t self, object-t key); // return nullptr if not found
-at(object-t self, object-t key);  // throws exception if not found
+// will warn and assert() if default-element is nullptr
+// will throw exception rather than return nullptr
+at(object-t self, object-t key, object-t default-element) -> object-t { object-t element = $at!(self, key, nullptr); if (nullptr == element) element = default-element; return result; }
+
+// return nullptr if not found
+at!(object-t self, object-t key) -> object-t { return $at!(self, nullptr); }
+
+// throws exception if not found
+at(object-t self, object-t key) -> object-t;
 
 sort out mutable/immutable design
 
@@ -250,3 +257,11 @@ perl map() can return a table as well as set/sequence.
 klass my-klass { klass method/slots must be moved to own klass
   subklass of klass with name my-klass-klass
   subklass of klass declared with: klass klass ?qual-ident;
+
+a singleton that is not allowed in any collection
+
+method add?(object-t self, object-t element) -> boole-t;
+method each(object-t self, method-t anon-func) -> object-t;
+method member?(object-t self, object-t element) -> boole-t;
+subset?()
+superset?()
