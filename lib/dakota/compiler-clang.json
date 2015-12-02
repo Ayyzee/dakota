@@ -9,6 +9,7 @@
   # clang does not understand --visibility=, --non-call-exceptions, nor --asynchronous-unwind-tables
   'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fnon-call-exceptions', '-fasynchronous-unwind-tables' ],
   'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
+  'CXX_COMPILE_THREAD_FLAGS' => [ '-pthread', '-lpthread', '--define-macro=__REENTRANT' ],
   # clang does not understand --PIC
   'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ],
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
