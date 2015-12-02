@@ -13,8 +13,7 @@ klass foo { klass foo-klass;
   superklass klass;
   klass klass;
   slots {}
-  method init(object-t self) -> object-t {
-    self = $init(super);
+  method initialize(object-t self) -> object-t {
     return self;
 } }
 func main(int-t, str-t[]) -> int-t {

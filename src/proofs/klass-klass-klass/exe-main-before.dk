@@ -12,8 +12,7 @@ klass foo {
   klass superklass klass;
   klass klass klass;
   klass slots {}
-  klass method init(object-t self) -> object-t {
-    self = $init(super);
+  klass method initialize(object-t self) -> object-t {
     return self;
   }
 }
