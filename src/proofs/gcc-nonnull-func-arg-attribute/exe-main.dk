@@ -27,8 +27,8 @@ auto main() -> int {
   object-t k = null;
   object-t val1 = at (o, nullptr); // should warn
   object-t val2 = at!(o, k);
-  object-t val3 = at (o, k, nullptr);
-  object-t val4 = at!(o, k, nullptr); // should warn
+  object-t val3 = at (o, k, nullptr); // should warn
+  object-t val4 = at!(o, k, nullptr);
   USE(val1);
   USE(val2);
   USE(val3);
