@@ -22,16 +22,16 @@
 namespace sorted_ptr_array {
   struct slots_t;
 
-  slots_t* create(uint32_t capacity, uint32_t size, std_compare_t compare);
+  FUNC   create(uint32_t capacity, uint32_t size, std_compare_t compare) -> slots_t*;
 
-  result_t search(slots_t* t, void const* key);
-  void const* intern(slots_t* t, void const* key);
-  void const* at(slots_t* t, uint32_t offset);
-  void const* remove_last(slots_t* t);
+  METHOD search(slots_t* t, void const* key) -> result_t;
+  FUNC   intern(slots_t* t, void const* key) -> void const*;
+  FUNC   at(slots_t* t, uint32_t offset) -> void const*;
+  FUNC   remove_last(slots_t* t) -> void const*;
 
-  slots_t*    add(slots_t* t, void const* key);
-  void const* bsearch(slots_t* t, void const* key);
-  void const* remove_at(slots_t* t, void const* key, uint32_t offset);
-  slots_t*    add_at(slots_t* t, void const* key, uint32_t offset);
+  FUNC   add(slots_t* t, void const* key) -> slots_t*;
+  FUNC   bsearch(slots_t* t, void const* key) -> void const*;
+  FUNC   remove_at(slots_t* t, void const* key, uint32_t offset) -> void const*;
+  FUNC   add_at(slots_t* t, void const* key, uint32_t offset) -> slots_t*;
 }
 # endif

@@ -33,7 +33,7 @@ klass sorted-array {
     uint32-t      size;
     std-compare-t compare;
   }
-  slots-t* create(uint32-t capacity, uint32-t size, std-compare-t compare) {
+  func create(uint32-t capacity, uint32-t size, std-compare-t compare) -> slots-t* {
     assert(0 != capacity);
     assert(0 != size);
     assert(nullptr != compare);
@@ -45,13 +45,13 @@ klass sorted-array {
     result->compare =  compare;
     return result;
   }
-  method sort(slots-t* t) -> slots-t*{
+  method sort(slots-t* t) -> slots-t* {
     qsort(t->elements, t->count, t->size, t->compare);
     return t;
   }
   
   //(-(insertion point) - 1)
-  static result-t search(slots-t* t, void const* key) {
+  static func search(slots-t* t, void const* key) -> result-t {
     assert(nullptr != key);
 
     result-t result = { nullptr, UINT32-MAX };
@@ -84,7 +84,7 @@ klass sorted-array {
     result.offset = i;
     return result;
   }
-  slots-t* add-at(slots-t* t, void const* key, uint32-t offset) {
+  func add-at(slots-t* t, void const* key, uint32-t offset) -> slots-t* {
     assert(nullptr != key);
     assert(offset <= t->count);
 
@@ -95,7 +95,7 @@ klass sorted-array {
     t->count++;
     return t;
   }
-  void const* at(slots-t* t, uint32-t offset) {
+  func at(slots-t* t, uint32-t offset) -> void const* {
     assert(offset < t->count);
     assert(0 < t->count);
 
@@ -103,7 +103,7 @@ klass sorted-array {
     return element;
   }
   // key not required
-  void const* remove-at(slots-t* t, void const* key, uint32-t offset) {
+  func remove-at(slots-t* t, void const* key, uint32-t offset) -> void const* {
     assert(offset < t->count);
     assert(0 < t->count);
 
@@ -117,7 +117,7 @@ klass sorted-array {
     t->count--;
     return element;
   }
-  slots-t* add(slots-t* t, void const* key) {
+  func add(slots-t* t, void const* key) -> slots-t* {
     assert(nullptr != key);
 
     result-t result = search(t, key);
@@ -125,7 +125,7 @@ klass sorted-array {
       add-at(t, key, result.offset);
     return t;
   }
-  void const* intern(slots-t* t, void const* key) {
+  func intern(slots-t* t, void const* key) -> void const* {
     assert(nullptr != key);
     void const* element = key;
     result-t result = search(t, key);
@@ -136,7 +136,7 @@ klass sorted-array {
       add-at(t, key, result.offset);
     return element;
   }
-  void const* remove-last(slots-t* t) {
+  func remove-last(slots-t* t) -> void const* {
   //assert(0 < t->count);
 
     void const* element;
@@ -149,7 +149,7 @@ klass sorted-array {
     }
     return element;
   }
-  void const* bsearch(slots-t* t, void const* key) {
+  func bsearch(slots-t* t, void const* key) -> void const* {
     assert(nullptr != key);
  
     result-t result = search(t, key);
