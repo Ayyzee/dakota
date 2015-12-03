@@ -71,11 +71,13 @@ klass keyword-exception {
     // } else {
     //   $print-format(out, ", \"instance\": \"%s\"", $utf8-from(self.object));
     // }
-    $print-format(out, ", \"klass\": \"%s\", \"method\": \"%s(%s)\", \"keyword\": \"#%s\"",
-                     name-of(klass-of(self.object)),
-                     self.signature->name,
-                     self.signature->parameter-types,
-                     self.keyword);
+    $print-format(out,
+                  ", \"keyword\": \"#%s\""
+                  ", \"klass\": \"%s\""
+                  ", \"method\": \"%s(%s)\"",
+                  self.keyword,
+                  name-of(klass-of(self.object)),
+                  self.signature->name, self.signature->parameter-types);
     return self;
   }
 }
