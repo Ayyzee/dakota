@@ -82,7 +82,7 @@ static func __initial() -> void {
 static func __final() -> void {
   return;
 }
-namespace { struct /* visibility(hidden) */ __ddl_t {
+namespace { struct [[gnu::visibility("hidden")]] __ddl_t {
   __ddl_t(const __ddl_t&) = default;
 
   __ddl_t()  { __initial(); }

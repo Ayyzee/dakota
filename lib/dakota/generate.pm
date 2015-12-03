@@ -518,7 +518,7 @@ sub generate_defn_footer {
   #$rt_cc_str .= $col . "};\n";
 
   $rt_cc_str .=
-    $col . "namespace { struct /* visibility(hidden) */ __ddl_t {" . &ann(__FILE__, __LINE__) . "\n" .
+    $col . "namespace { struct [[gnu::visibility(\"hidden\")]] __ddl_t {" . &ann(__FILE__, __LINE__) . "\n" .
     $col . "  __ddl_t(const __ddl_t&) = default;\n" .
     $col . "  __ddl_t()  { __initial(); }\n" .
     $col . "  ~__ddl_t() { __final();   }\n" .
