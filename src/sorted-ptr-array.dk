@@ -51,7 +51,7 @@ klass sorted-ptr-array {
   }
   
   //(-(insertion point) - 1)
-  func search(slots-t* t, void const* key) -> result-t {
+  method search(slots-t* t, void const* key) -> result-t {
     assert(nullptr != key);
 
     result-t result = { nullptr, UINT32-MAX };
