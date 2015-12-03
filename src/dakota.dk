@@ -1530,9 +1530,9 @@ static func superklass-name-for-name(symbol-t klass-name) -> symbol-t {
   symbol-t superklass-name = superklass-name-from-info(klass-info, klass-name); // namename: ???
   return superklass-name;
 }
-func dk-klass-for-name(symbol-t, uint32-t) ->  object-t;
 namespace object { func instance?(object-t, object-t) -> boole-t; }
 
+func dk-klass-for-name(symbol-t, uint32-t) ->  object-t;
 func dk-klass-for-name(symbol-t klass-name) -> object-t {
   object-t result = dk-klass-for-name(klass-name, 0);
   return result;
