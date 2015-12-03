@@ -165,7 +165,7 @@ klass x::stat {
 static func init-imported-klasses() -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   symbol-t* imported-klass-name-ptr;
-  while (nullptr != (imported-klass-name-ptr = (symbol-t*)sorted-array::remove-last(gbl-imported-klasses-file-table)))
+  while (nullptr != (imported-klass-name-ptr = cast(symbol-t*)sorted-array::remove-last(gbl-imported-klasses-file-table)))
     dk-klass-for-name(*imported-klass-name-ptr);
   return;
 }
@@ -754,7 +754,7 @@ static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
   property-t const* interposers = cast(property-t const*)named-info::at(registration-info, #interposers);
   if (nullptr != interposers) {
     for (uint32-t i = 0; nullptr != interposers[i].key; i++)
-      ostream::println-format(ostrm, "interpose %s, %s;\n", interposers[i].key, (symbol-t)interposers[i].element);
+      ostream::println-format(ostrm, "interpose %s, %s;\n", interposers[i].key, cast(symbol-t)interposers[i].element);
   }
   return;
 }
