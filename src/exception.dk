@@ -128,12 +128,17 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
     if (nullptr != current-exception)
       $dump(current-exception);
 
-  $print-format(std-error, "{ \"progname\": \"%s\", \"pid\": %i, \"root-msg\": \"uncaught/unexpected exception\"",
-                   getprogname(), getpid());
+  $print-format(std-error,
+                "{ \"program-name\": \"%s\""
+                ", \"process-id\": %i"
+                ", \"root-message\": \"%s\"",
+                getprogname(),
+                getpid(),
+                "uncaught/unexpected exception");
 
   if (nullptr != current-exception)
     $print(current-exception, std-error);
-    // $println-format(std-error, ", \"exception\": \"%s\"", current-exception);
+    // $print-format(std-error, ", \"exception\": \"%s\"", name-of(klass-of(current-exception)));
   else-if (nullptr != current-exception-string)
     $print-format(std-error, ", \"exception\": \"%s\"", current-exception-string);
   else

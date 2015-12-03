@@ -20,9 +20,4 @@ module dakota;
 
 klass missing-keyword-exception {
   superklass keyword-exception;
-
-  method print(object-t self, object-t out) -> object-t {
-    $print(super, out, "missing keyword");
-    return self;
-  }
 }
