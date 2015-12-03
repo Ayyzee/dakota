@@ -253,7 +253,6 @@ make sure rewriting considers this: catch (...) handler must come last
 
 perl map() can return a table as well as set/sequence.
 
-
 klass my-klass { klass method/slots must be moved to own klass
   subklass of klass with name my-klass-klass
   subklass of klass declared with: klass klass ?qual-ident;
@@ -265,3 +264,5 @@ method each(object-t self, method-t anon-func) -> object-t;
 method member?(object-t self, object-t element) -> boole-t;
 subset?()
 superset?()
+
+if a klass is an eventual subklass of klass, then its name should end in -klass
