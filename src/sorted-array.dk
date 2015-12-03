@@ -45,13 +45,13 @@ klass sorted-array {
     result->compare =  compare;
     return result;
   }
-  method sort(slots-t* t) -> slots-t* {
+  func sort(slots-t* t) -> slots-t* {
     qsort(t->elements, t->count, t->size, t->compare);
     return t;
   }
   
   //(-(insertion point) - 1)
-  method search(slots-t* t, void const* key) -> result-t {
+  static func search(slots-t* t, void const* key) -> result-t {
     assert(nullptr != key);
 
     result-t result = { nullptr, UINT32-MAX };

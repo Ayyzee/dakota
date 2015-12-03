@@ -40,12 +40,6 @@ klass sorted-set {
   }
   static const uint32-t gbl-default-capacity = 64; // shall never be 0
 
-  initialize(object-t kls) -> object-t {
-    return kls;
-  }
-  finalize(object-t kls) -> object-t {
-    return kls;
-  }
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
