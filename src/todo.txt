@@ -265,4 +265,5 @@ method member?(object-t self, object-t element) -> boole-t;
 subset?()
 superset?()
 
-if a klass is an eventual subklass of klass, then its name should end in -klass
+if a klass is an eventual subklass of klass,     then its name should end in -klass
+if a klass is an eventual subklass of exception, then its name should end in -exception
