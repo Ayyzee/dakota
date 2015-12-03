@@ -71,7 +71,7 @@ klass keyword-exception {
     } else {
       $print-format(out, ", \"instance\": \"%s\"", $utf8-from(self.object));
     }
-    $print-format(out, ", \"klass\": \"%s\", \"method\": \"%s(%s)\", \"%s\": \"%s\"",
+    $print-format(out, ", \"klass\": \"%s\", \"method\": \"%s(%s)\", \"%s\": \"#%s\"",
                      name-of(klass-of(self.object)),
                      self.signature->name,
                      self.signature->parameter-types,
