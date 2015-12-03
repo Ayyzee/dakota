@@ -1,0 +1,23 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+klass str;
+klass klass;
+
+klass foo {
+  klass foo-klass;
+}
+klass foo-klass {
+  superklass klass;
+  // method va::init(object-t self, va-list-t args) -> object-t {
+  //   self = $va::init(super, args);
+  //   return self;
+  // }
+  method init(object-t self) -> object-t { // incorrect: must pass up #info-slots : to superklass (or use va::init()
+    self = $init(super);
+    return self;
+  }
+}
+func main(int-t, str-t[]) -> int-t {
+  $dump(foo::klass);
+  return 0;
+}
