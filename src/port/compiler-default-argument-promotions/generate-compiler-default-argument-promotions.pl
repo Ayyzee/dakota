@@ -100,9 +100,17 @@ my $implementation_defined_signedness = {
   'char8-t'          => 1,
   'char8::slots-t'   => 1,
 
-  'wchar-t'          => 1
+  'wchar-t'          => 1,
+  'wchar::slots-t'   => 1,
 };
-`make type-index`;
+my $o_exts = {
+  'g++' =>     'o',
+  'clang++' => 'bc',
+};
+my $compiler = 'clang++';
+my $o_ext = $$o_exts{$compiler};
+
+`$compiler -std=c++11 --output type-index type-index-main.cc`;
 my $index = `./type-index`;
 my $int_types = [ 'uint-t', 'int-t' ];
 
@@ -119,26 +127,28 @@ while (my ($promoted_type, $types) = each(%$type_tbl)) {
     if ($extra == $$types{$small_type}) {
       next;
     }
-    my $in_name = 'exe-main-template.dk';
+    my $in_name = 'test-template.cc';
     open(my $fh, '<', $in_name) or die "Could not open file '$in_name' $!";
     my $filestr = <$fh>;
     close($fh);
-    $filestr =~ s/__TYPE__/$small_type/g;
-    `make clean`;
-    my $out_name = 'exe-main.dk';
-    open(my $out, '>', $out_name)  or die "Could not open file '$out_name' $!";
+    my $small_type_ident = $small_type =~ s/-/_/gr;
+    $filestr =~ s/__TYPE__/$small_type_ident/g;
+    my $cc_file = "test.cc";
+    my $o_file =  "test.$o_ext";
+    open(my $out, '>', $cc_file)  or die "Could not open file '$cc_file' $!";
     print $out $filestr;
     close($out);
     #print "small-type: " . $small_type . "\n";
-    my $cmd = "make exe";
+    my $cmd = "$compiler --compile -std=c++11 --warn-varargs --warn-error --output $o_file $cc_file";
     my $output = `$cmd`; # 2>&1
     my $exit_val = $?;
+    `rm -f $cc_file $o_file`;
     print $output;
     #print "exit-val: " . $exit_val . "\n";
     if ($exit_val) {
       $$result_tbl{$small_type} = $promoted_type;
     } else {
-      $$unpromoted{$small_type} = 1;
+      $$unpromoted{$small_type} = $small_type;
     }
   }
 }
@@ -152,7 +162,7 @@ $Data::Dumper::Indent    = 1; # default = 2
 
 my $str;
 $str = &Dumper($result_tbl);
-$str =~ s/\{[\s\n]*"/\{ "/gs;
+#$str =~ s/\{[\s\n]*"/\{ "/gs;
 $str =~ s/1[\s\n]*\}/1 \}/gs;
 my $fn = "compiler-default-argument-promotions.json";
 open(my $fh, '>', $fn) or die "Could not open file '$fn' $!";
