@@ -51,7 +51,7 @@ namespace va { auto func(void*, va_list_t) -> void; }
 auto func(void*, ...) -> void;
 
 namespace va { auto func(void*, va_list_t args) -> void {
-  wchar-t arg = va_arg(args, decltype(arg));
+  __TYPE__ arg = va_arg(args, decltype(arg));
   USE(arg);
   return;
 } }
@@ -62,6 +62,6 @@ auto func(void* self, ...) -> void {
   va_end(args);
   return;
 }
-auto main() -> int-t {
+auto main(int-t, const str-t[]) -> int-t {
   return 0;
 }
