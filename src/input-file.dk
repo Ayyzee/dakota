@@ -41,28 +41,28 @@ klass input-file {
     off-t    current-position;
     char8-t* buffer;
 
-    str-t    filename;
+    str-t    file;
     int32-t  line;
     int32-t  column;
   }
   method init(object-t self,
                        stream-t stream :   nullptr,
-                       str-t    filename : nullptr) -> object-t {
+                       str-t    file : nullptr) -> object-t {
     self = $init(super);
-    assert(!(nullptr != stream && nullptr != filename)); // these are mutually exclusive
+    assert(!(nullptr != stream && nullptr != file)); // these are mutually exclusive
     assert(stdout != stream);
     assert(stderr != stream);
 
-    if (nullptr == stream && nullptr == filename)
+    if (nullptr == stream && nullptr == file)
       stream = stdin; // default
 
-    if (nullptr != filename) {
-      stream = fopen(filename, "r");
+    if (nullptr != file) {
+      stream = fopen(file, "r");
 
       if (nullptr == stream)
         throw make(system-exception::klass, #errnum : errno);
     }
-    self.filename = filename; // copycopy: should make a copy?
+    self.file = file; // copycopy: should make a copy?
     fpos-t fpos;
     fgetpos(stream, &fpos);
     fseeko(stream, 0L, SEEK-END);
@@ -74,7 +74,7 @@ klass input-file {
 
     // check for embedded NUL?
 
-    if (nullptr != filename)
+    if (nullptr != file)
       fclose(stream);
     else
       fsetpos(stream, &fpos);
@@ -89,15 +89,15 @@ klass input-file {
     object-t result = $dealloc(super);
     return result;
   }
-  method filename(object-t self) -> str-t {
-    return cast(str-t)(self.filename);
+  method file(object-t self) -> str-t {
+    return cast(str-t)(self.file);
   }
   
   method put-char8(object-t self, char8-t c) -> object-t {
     if (0 == self.current-position)
-      throw make(exception::klass, #message : "oops");
+      throw make(exception::klass, #msg : "oops");
     if (c != self.buffer[self.current-position - 1])
-      throw make(exception::klass, #message : "oops");
+      throw make(exception::klass, #msg : "oops");
     self.current-position--;
     if ('\n' == c) {
       self.line--;

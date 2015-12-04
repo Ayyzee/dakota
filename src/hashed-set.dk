@@ -47,14 +47,6 @@ klass hashed-set {
 
     uint32-t iterator-state;
   }
-  initialize(object-t kls) -> object-t {
-    dk-klass-for-name(#deque); // hackhack
-    dk-klass-for-name(#vector); // hackhack
-    return kls;
-  }
-  finalize(object-t kls) -> object-t {
-    return kls;
-  }
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
   // using compound literals 'items' can be used as follows:
@@ -130,7 +122,7 @@ klass hashed-set {
   method in(object-t self, object-t object) -> object-t {
     object-t result = $in(self, object, cast(object-t)nullptr);
     if (nullptr == result)
-      throw make(exception::klass, #message : "oops");
+      throw make(exception::klass, #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t key) -> boole-t {
@@ -228,7 +220,7 @@ klass hashed-set-forward-iterator {
     hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
 
     if (self.iterator-state != hs.iterator-state)
-      throw make(exception::klass, #message : "oops");
+      throw make(exception::klass, #msg : "oops");
     return;
   }
   method init(object-t self, object-t hashed-set :) -> object-t {

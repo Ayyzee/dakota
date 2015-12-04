@@ -31,13 +31,6 @@ klass autorelease-pool-klass {
   slots {
     object-t pools;
   }
-  initialize(object-t kls) -> object-t {
-    dk-klass-for-name(#deque); // hackhack
-    return kls;
-  }
-  finalize(object-t kls) -> object-t {
-    return kls;
-  }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
     self.pools = make(deque::klass);

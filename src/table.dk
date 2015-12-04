@@ -92,10 +92,4 @@ trait table {
       last = pair::unbox(last).last;
     return last;
   }
-  initialize(object-t kls) -> object-t {
-    return kls;
-  }
-  finalize(object-t kls) -> object-t {
-    return kls;
-  }
 }

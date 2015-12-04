@@ -27,19 +27,21 @@ klass syntax-exception {
 
   slots {
     object-t token;
-    str-t    filename;
-    str-t    message;
+    str-t    file;
+    str-t    msg;
   }
   method init(object-t self,
-                       object-t token :,
-                       str-t    filename :,
-                       str-t    message :  __klass__) -> object-t {
-    self = $init(super);
-    assert(nullptr != token &&
-           null != token);
+              str-t    src-time :,
+              str-t    src-date :,
+              str-t    src-file :,
+              int-t    src-line :,
+              object-t token :,
+              str-t    file :,
+              str-t    msg :  name-of(klass-of(self))) -> object-t {
+    self = $init(super, #src-time : src-time, #src-date : src-date, #src-file : src-file, #src-line : src-line);
     self.token = token;
-    self.filename = filename;
-    self.message = message;
+    self.file =  file;
+    self.msg =   msg;
     return self;
   }
   method print-shallow(object-t self, object-t out) -> object-t {
@@ -47,7 +49,7 @@ klass syntax-exception {
     if (null == out)
       out = std-error;
     $print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
-                    self.filename, $line(self.token), $column(self.token), $buffer(self.token), self.message);
+                    self.file, $line(self.token), $column(self.token), $buffer(self.token), self.msg);
     return self;
   }
   method print(object-t self, object-t out) -> object-t {

@@ -47,7 +47,7 @@ klass lexer {
     off-t    current-position;
     char8-t* buffer;
 
-    str-t    filename;
+    str-t    file;
     uint32-t line;
     uint32-t previous-column;
     uint32-t column;
@@ -56,17 +56,17 @@ klass lexer {
   }
   method init(object-t self,
                        stream-t stream :   stdin,
-                       str-t    filename : nullptr) -> object-t {
+                       str-t    file : nullptr) -> object-t {
     self = $init(super);
 
-    if (nullptr != filename) {
-      self.filename = filename;
-      stream = fopen(self.filename, "r");
+    if (nullptr != file) {
+      self.file = file;
+      stream = fopen(self.file, "r");
       if (nullptr == stream) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s", buf);
-        throw make(exception::klass, #message : "oops");
+        throw make(exception::klass, #msg : "oops");
       }
       fseeko(stream, 0L, SEEK-END);
       self.length = ftello(stream);
@@ -78,7 +78,7 @@ klass lexer {
       fclose(stream);
       self.current-position = 0;
     } else {
-      self.filename = nullptr;
+      self.file = nullptr;
       fpos-t fpos;
       fgetpos(stream, &fpos);
       fseeko(stream, 0L, SEEK-END);
@@ -103,8 +103,8 @@ klass lexer {
     object-t result = $dealloc(super);
     return result;
   }
-  method filename(object-t self) -> str-t {
-    return cast(str-t)(self.filename);
+  method file(object-t self) -> str-t {
+    return cast(str-t)(self.file);
   }
     
   /* method */ inline char8-t previous-char8(object-t self) {
@@ -488,7 +488,7 @@ klass lexer {
           } while ('<' == $tokenid(open-token));
 
           if ('(' != $tokenid(open-token))
-            throw make(syntax-exception::klass, #token : token, #filename : self.filename, #message : "not balenced");
+            throw make(syntax-exception::klass, #token : token, #file : self.file, #msg : "not balenced");
           $set-close-token(open-token, token);
           return token;
         }
@@ -778,7 +778,7 @@ klass lexer {
           } while ('<' == $tokenid(open-token));
 
           if ('[' != $tokenid(open-token))
-            throw make(syntax-exception::klass, #token : token, #filename : self.filename, #message : "not balenced");
+            throw make(syntax-exception::klass, #token : token, #file : self.file, #msg : "not balenced");
           $set-close-token(open-token, token);
           return token;
         }
@@ -848,7 +848,7 @@ klass lexer {
           } while ('<' == $tokenid(open-token));
 
           if ('{' != $tokenid(open-token))
-            throw make(syntax-exception::klass, #token : token, #filename : self.filename, #message : "not balenced");
+            throw make(syntax-exception::klass, #token : token, #file : self.file, #msg : "not balenced");
           $set-close-token(open-token, token);
           return token;
         }

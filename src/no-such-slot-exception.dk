@@ -28,11 +28,15 @@ klass no-such-slot-exception {
     symbol-t     name;
     signature-t* signature;
   }
-  method init(object-t self,
-                       object-t     object :,
-                       symbol-t     name :,
-                       signature-t* signature :) -> object-t {
-    self = $init(super);
+  method init(object-t     self,
+              str-t        src-time :,
+              str-t        src-date :,
+              str-t        src-file :,
+              int-t        src-line :,
+              object-t     object :,
+              symbol-t     name :,
+              signature-t* signature :) -> object-t {
+    self = $init(super, #src-time : src-time, #src-date, src-date, #src-file : src-file, #src-line : src-line);
     self.object = object;
     self.name = name;
     self.signature = signature;
@@ -42,19 +46,25 @@ klass no-such-slot-exception {
     $print(super, out);
 
     if ($instance?(self.object, klass::klass)) {
-      $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\", \"method\": \"%s(%s)\": #%s",
-                       name-of(self.object),
-                       name-of(klass-of(self.object)),
-                       self.signature->name,
-                       self.signature->parameter-types,
-                       self.name);
+      $print-format(out,
+                    ", \"instance\": \"%s\""
+                    ", \"klass\": \"%s\""
+                    ", \"method\": \"%s(%s)\""
+                    ", \"slot-name\": \"#%s\"",
+                    name-of(self.object),
+                    name-of(klass-of(self.object)),
+                    self.signature->name, self.signature->parameter-types,
+                    self.name);
     } else {
-      $print-format(out, ", \"instance\": %s, \"klass\": \"%s\". \"method\": \"%s(%s)\": #%s",
-                       $utf8-from(self.object),
-                       name-of(klass-of(self.object)),
-                       self.signature->name,
-                       self.signature->parameter-types,
-                       self.name);
+      $print-format(out,
+                    ", \"instance\": \"%s\""
+                    ", \"klass\": \"%s\""
+                    ", \"method\": \"%s(%s)\""
+                    ", \"slot-name\": \"#%s\"",
+                    $utf8-from(self.object),
+                    name-of(klass-of(self.object)),
+                    self.signature->name, self.signature->parameter-types,
+                    self.name);
     }
     return self;
   }

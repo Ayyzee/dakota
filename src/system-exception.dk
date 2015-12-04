@@ -29,12 +29,17 @@ klass system-exception {
   superklass exception;
 
   slots {
-    int-t          errnum;
-    str-t name;
-    str128-t       strerror;
+    int-t    errnum;
+    str-t    name;
+    str128-t strerror;
   }
-  method init(object-t self, int-t errnum :) -> object-t {
-    self = $init(super);
+  method init(object-t self,
+              str-t    src-time :,
+              str-t    src-date :,
+              str-t    src-file :,
+              int-t    src-line :,
+              int-t    errnum :) -> object-t {
+    self = $init(super, #src-time : src-time, #src-date : src-date, #src-file : src-file, #src-line : src-line);
     assert(0 != errnum);
     self.errnum = errnum;
     self.name = strerror-name(self.errnum);

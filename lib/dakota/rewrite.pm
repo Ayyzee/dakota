@@ -100,7 +100,7 @@ $main::seq = qr{
 my $colon = ':'; # key/element delim only
 my $k = qr/[\w-]/;
 my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
-my $stmt_boundry = qr/\{|\}|:|;/s;
+my $stmt_boundry = qr/\{|\}|\)|:|;/s;
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
@@ -174,7 +174,8 @@ sub rewrite_klass_decl {
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=^(\s*)(klass|trait)(\s+$rid\s*)(\{)=$1 . uc($2) . "-NS" . $3 . "{"=gemx;
+  $$filestr_ref =~ s/^                 (\s*)(klass|trait)(\s+$rid\s*)(\{)/$1 . uc($2) . "-NS" . $3 . $4/gemx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)(klass|trait)(\s+$rid\s*)(\{)/$1 . uc($2) . "-NS" . $3 . $4/gemx;
 }
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
@@ -400,9 +401,10 @@ sub rewrite_throws {
 
   # dont want to rewrite #define THROW throw
   # in parens
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)\(($main::list_in)\)/          $1throw $2dkt-capture-current-exception($3)/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)\(($main::list_in)\)/       $1throw$2 $3/gsx;
   # not in parens
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)       (.+?)        (\s*)(;|})/$1throw $2dkt-capture-current-exception($3)$4$5;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s+)make\s*\(($main::list_in)\)/$1throw$2dkt-capture-current-exception(make($3, \#src-time : __TIME__, \#src-date : __DATE__, \#src-file : __FILE__, \#src-line : __LINE__))/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)(".*?")/                    $1throw$2dkt-capture-current-exception($3, __TIME__, __DATE__, __FILE__, __LINE__)/gsx;
 
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)RETHROW(\s*);/$1throw$2;/gsx;
 }
@@ -941,10 +943,6 @@ sub rewrite_method_aliases {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s+)method\s+((va::)?$mid\s*\(\s*\))\s*=>\s*((va::)?$mid\s*$main::list)\s*;/$1METHOD-ALIAS($2, $4);/gs
 }
-sub rewrite_initialze_finalize {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\s)((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/$1func $2/gs;
-}
 sub rewrite_multi_char_consts {
   my ($filestr_ref) = @_;
   my $c = ' ';
@@ -986,6 +984,7 @@ sub convert_dk_to_cc {
   &rewrite_module_statement($filestr_ref);
 
   &rewrite_klass_decl($filestr_ref);
+  &rewrite_klass_defn_with_implicit_metaklass_defn($filestr_ref);
   &add_implied_slots_struct($filestr_ref);
   if ($remove) {
     &remove_exported_slots($filestr_ref);
@@ -1026,7 +1025,6 @@ sub convert_dk_to_cc {
   &rewrite_sentinal_generic_uses($filestr_ref, $kw_args_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_args_generics);
-  &rewrite_initialze_finalize($filestr_ref);
   &rewrite_functions($filestr_ref);
   &rewrite_map($filestr_ref);
   &rewrite_for_each($filestr_ref);

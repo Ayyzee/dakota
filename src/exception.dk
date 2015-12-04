@@ -32,14 +32,29 @@ module dakota;
 klass output-stream;
 klass system-exception;
 
+static THREAD-LOCAL str-t current-exception-src-time;
+static THREAD-LOCAL str-t current-exception-src-date;
+static THREAD-LOCAL str-t current-exception-src-file;
+static THREAD-LOCAL int-t current-exception-src-line;
+
 func dkt-capture-current-exception(object-t arg) -> object-t {
   static THREAD_LOCAL object-t result;
-  if (nullptr != arg) result = arg;
+  if (nullptr != arg)
+    result = arg;
   return result;
 }
-func dkt-capture-current-exception(str-t arg) -> str-t {
+func dkt-capture-current-exception(str-t arg,
+                                   str-t src-time,
+                                   str-t src-date,
+                                   str-t src-file,
+                                   int-t src-line) -> str-t {
+  current-exception-src-time = src-time;
+  current-exception-src-date = src-date;
+  current-exception-src-file = src-file;
+  current-exception-src-line = src-line;
   static THREAD_LOCAL str-t result;
-  if (nullptr != arg) result = arg;
+  if (nullptr != arg)
+    result = arg;
   return result;
 }
 # if !defined HAVE-GETPROGNAME
@@ -105,12 +120,26 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
 
 [[noreturn]] func pre-runtime-verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
+  str-t src-time = current-exception-src-time;
+  str-t src-date = current-exception-src-date;
+  str-t src-file = current-exception-src-file;
+  int-t src-line = current-exception-src-line;
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
+  str-t current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, nullptr, nullptr, 0);
   dkt-log(dkt::k-log-error, "uncaught/unexpected exception");
 
-  if (nullptr != current-exception-string)
-    fprintf(stderr, ": \"%s\"\n", current-exception-string);
+  if (nullptr != current-exception-str)
+    fprintf(stderr,
+            ": \"src-time\": \"%s\""
+            ": \"src-date\": \"%s\""
+            ": \"src-file\": \"%s\""
+            ", \"src-line\": %i"
+            ", \"exception-str\": \"%s\"" "\n",
+            src-time,
+            src-date,
+            src-file,
+            src-line,
+            current-exception-str);
   else
     fprintf(stderr, "\n");
 
@@ -120,9 +149,13 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
 }
 [[noreturn]] func verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
+  str-t src-time = current-exception-src-time;
+  str-t src-date = current-exception-src-date;
+  str-t src-file = current-exception-src-file;
+  int-t src-line = current-exception-src-line;
 
-  str-t current-exception-string = dkt-capture-current-exception(cast(str-t)nullptr);
-  object-t current-exception = dkt-capture-current-exception(cast(object-t)nullptr);
+  str-t    current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, nullptr, nullptr, 0);
+  object-t current-exception =     dkt-capture-current-exception(cast(object-t)nullptr);
 
   if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
@@ -131,7 +164,7 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
   $print-format(std-error,
                 "{ \"program-name\": \"%s\""
                 ", \"process-id\": %i"
-                ", \"root-message\": \"%s\"",
+                ", \"root-msg\": \"%s\"",
                 getprogname(),
                 getpid(),
                 "uncaught/unexpected exception");
@@ -139,8 +172,18 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
   if (nullptr != current-exception)
     $print(current-exception, std-error);
     // $print-format(std-error, ", \"exception\": \"%s\"", name-of(klass-of(current-exception)));
-  else-if (nullptr != current-exception-string)
-    $print-format(std-error, ", \"exception\": \"%s\"", current-exception-string);
+  else-if (nullptr != current-exception-str)
+    $print-format(std-error,
+                  ", \"src-time\": \"%s\""
+                  ", \"src-date\": \"%s\""
+                  ", \"src-file\": \"%s\""
+                  ", \"src-line\": %i"
+                  ", \"exception-str\": \"%s\"",
+                  src-time,
+                  src-date,
+                  src-file,
+                  src-line,
+                  current-exception-str);
   else
     $print(std-error, "");
   $println(std-error, " }");
@@ -163,17 +206,40 @@ klass exception {
   superklass object;
 
   slots {
-    str-t message;
+    str-t src-time;
+    str-t src-date;
+    str-t src-file;
+    int-t src-line;
+    str-t msg;
   }
-  method init(object-t self, str-t message : name-of(klass-of(self))) -> object-t {
+  method init(object-t self,
+              str-t    src-time :,
+              str-t    src-date :,
+              str-t    src-file :,
+              int-t    src-line :,
+              str-t    msg : name-of(klass-of(self))) -> object-t {
     self = $init(super);
-    self.message = message;
+    self.src-time = src-time;
+    self.src-date = src-date;
+    self.src-file = src-file;
+    self.src-line = src-line;
+    self.msg = msg;
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-error;
-    $print-format(out, ", \"%s\": \"%s\"", name-of(klass), self.message);
+    $print-format(out,
+                  ", \"src-time\": \"%s\""
+                  ", \"src-date\": \"%s\""
+                  ", \"src-file\": \"%s\""
+                  ", \"src-line\": %i"
+                  ", \"msg\": \"%s\"",
+                  self.src-time,
+                  self.src-date,
+                  self.src-file,
+                  self.src-line,
+                  self.msg);
     return self;
   }
 }

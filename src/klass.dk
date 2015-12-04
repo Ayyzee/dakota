@@ -376,7 +376,7 @@ klass klass {
   }
   //      method va-method-for-selector(object-t self, selector-t selector)
   //      {
-  //        throw make(exception::klass, #message : "not yet implemented") -> va-method-t;
+  //        throw make(exception::klass, #msg : "not yet implemented") -> va-method-t;
   //        // return nullptr
   //      }
   method method-for-selector?(object-t self, selector-t selector) -> boole-t {

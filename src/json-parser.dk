@@ -32,8 +32,8 @@ klass tokenid;
 klass vector;
 
 [[format-printf(4)]] static
-func print-error(str-t filename, uint32-t line, uint32-t column, str-t format, ...) -> int-t{
-  int-t result = fprintf(stderr, "%s:%i:%i ", filename, line, column);
+func print-error(str-t file, uint32-t line, uint32-t column, str-t format, ...) -> int-t{
+  int-t result = fprintf(stderr, "%s:%i:%i ", file, line, column);
   if (-1 != result) {
     va-list-t args;
     va-start(args, format);
@@ -45,30 +45,30 @@ func print-error(str-t filename, uint32-t line, uint32-t column, str-t format, .
 klass json-parser {  
   slots {
     stream-t   in;
-    str-t    filename;
+    str-t    file;
     uint32-t line;
     uint32-t column;
   }
     
   method init(object-t self,
                        stream-t stream :   stdin,
-                       str-t    filename : nullptr) -> object-t {
+                       str-t    file : nullptr) -> object-t {
     self = $init(super);
     assert(!(stdin != stream &&
-             nullptr  != filename)); // these are mutually exclusive
+             nullptr  != file)); // these are mutually exclusive
 
-    if (nullptr != filename) {
-      self.filename = filename;
-      self.in =       fopen(self.filename, "r");
+    if (nullptr != file) {
+      self.file = file;
+      self.in =       fopen(self.file, "r");
   
       if (nullptr == self.in) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
-        fprintf(stderr, "%s: %s", filename, buf);
-        throw make(exception::klass, #message : "oops");
+        fprintf(stderr, "%s: %s", file, buf);
+        throw make(exception::klass, #msg : "oops");
       }
     } else {
-      self.filename = nullptr;
+      self.file = nullptr;
       self.in =       stream;
     }
     self.line =     1;
@@ -104,7 +104,7 @@ klass json-parser {
     }
     return c;
   }
-  //void error-msg(char8-t* filename, uint32-t line, uint32-t column, str-t msg0, ...); // one or more msg strings
+  //void error-msg(char8-t* file, uint32-t line, uint32-t column, str-t msg0, ...); // one or more msg strings
 
   /* method */ static object-t lex(object-t self) {
     int32-t c;
@@ -135,7 +135,7 @@ klass json-parser {
         case '=': {
           c = json-parser::get(self);
           if (EOF == c || '>' != c) {
-            print-error(self.filename, self.line, self.column - 2, "unknown token '='\n");
+            print-error(self.file, self.line, self.column - 2, "unknown token '='\n");
             return null;
           } else {
             return make(token::klass, #tokenid : ':', #buffer : ":",
@@ -149,7 +149,7 @@ klass json-parser {
           boole-t escaped?;
           c = json-parser::get(self);
           if (EOF == c) {
-            print-error(self.filename, self.line, self.column, "unterminated string\n");
+            print-error(self.file, self.line, self.column, "unterminated string\n");
             return null;
           }
           if (quote-type == c)
@@ -164,7 +164,7 @@ klass json-parser {
 
             c = json-parser::get(self);
             if (EOF == c) {
-              print-error(self.filename, self.line, self.column, "unterminated string\n");
+              print-error(self.file, self.line, self.column, "unterminated string\n");
               return null;
             }
           } while ((quote-type != c) || escaped?);
@@ -199,7 +199,7 @@ klass json-parser {
           return token;
         }
         default: {
-          print-error(self.filename, self.line, self.column, "unknown token '%c'\n", c);
+          print-error(self.file, self.line, self.column, "unknown token '%c'\n", c);
           return null;
         }
       }
@@ -212,7 +212,7 @@ klass json-parser {
   /* method */ static object-t key(object-t self) {
     object-t token = json-parser::lex(self);
     if (null == token) {
-      print-error(self.filename, self.line, self.column, "incomplete table\n");
+      print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
     object-t key;
@@ -229,7 +229,7 @@ klass json-parser {
       case '}':
         return null;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or '}' but got '%s'\n", $buffer(token));
+        print-error(self.file, self.line, self.column, "expected <string> or '}' but got '%s'\n", $buffer(token));
         return null;
     }
     return key;
@@ -237,11 +237,11 @@ klass json-parser {
   /* method */ static object-t get-corresponds-to(object-t self) {
     object-t token = json-parser::lex(self);
     if (null == token) {
-      print-error(self.filename, self.line, self.column, "incomplete table\n");
+      print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
     if ($tokenid(token) != ':') {
-      print-error(self.filename, self.line, self.column, "expected ':' but got '%s'\n", $buffer(token));
+      print-error(self.file, self.line, self.column, "expected ':' but got '%s'\n", $buffer(token));
       return null;
     }
     return make(string::klass, #bytes : $buffer(token));
@@ -250,7 +250,7 @@ klass json-parser {
   { // get table element - element is NOT optional
     object-t token = json-parser::lex(self);
     if (null == token) {
-      print-error(self.filename, self.line, self.column, "incomplete table\n");
+      print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
     object-t element;
@@ -274,7 +274,7 @@ klass json-parser {
         element = json-parser::get-vector(self);
         break;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
+        print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
         return null;
     }
     return element;
@@ -283,7 +283,7 @@ klass json-parser {
   { // get vector element - element is optional
     object-t token = json-parser::lex(self);
     if (null == token) {
-      print-error(self.filename, self.line, self.column, "incomplete table\n");
+      print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
     object-t element;
@@ -309,7 +309,7 @@ klass json-parser {
       case ']': // only difference from get-element()
         return null;
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' or ']' but got '%s'\n", $buffer(token));
+        print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' or ']' but got '%s'\n", $buffer(token));
         return null;
     }
     return element;
@@ -340,14 +340,14 @@ klass json-parser {
 
       token = json-parser::lex(self);
       if (null == token) {
-        print-error(self.filename, self.line, self.column, "incomplete vector\n");
+        print-error(self.file, self.line, self.column, "incomplete vector\n");
         return null;
       }
     } while (',' == $tokenid(token));
       
       
     if (']' != $tokenid(token)) {
-      print-error(self.filename, self.line, self.column, "expected ',' or ']' but got '%s'\n", $buffer(token));
+      print-error(self.file, self.line, self.column, "expected ',' or ']' but got '%s'\n", $buffer(token));
       return null;
     }
     return vector;
@@ -365,13 +365,13 @@ klass json-parser {
 
       token = json-parser::lex(self);
       if (null == token) {
-        print-error(self.filename, self.line, self.column, "incomplete table\n");
+        print-error(self.file, self.line, self.column, "incomplete table\n");
         return null;
       }
     } while (',' == $tokenid(token));
       
     if ('}' != $tokenid(token)) {
-      print-error(self.filename, self.line, self.column, "expected ',' or '}' but got '%s'\n", $buffer(token));
+      print-error(self.file, self.line, self.column, "expected ',' or '}' but got '%s'\n", $buffer(token));
       return null;
     }
     return table;
@@ -403,7 +403,7 @@ klass json-parser {
       case '[':
         return json-parser::get-vector(self);
       default:
-        print-error(self.filename, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
+        print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
         return null;
     }
   }

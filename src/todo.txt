@@ -267,3 +267,25 @@ superset?()
 
 if a klass is an eventual subklass of klass,     then its name should end in -klass
 if a klass is an eventual subklass of exception, then its name should end in -exception
+
+the init() method of any subklass of klass must have a keyword arg "info-slots"?
+
+func main(string-array-t* sa) -> int-t { ... }
+
+generated kw-arg func throw make(no_such_keyword_exception::klass, ...) should complain about all unknown keywords, not just the first.
+
+in dakota.dk rename gbl-*-table to gbl-*-collection
+
+method:
+  method-signature
+  method
+  method-name
+klass:
+  klass-type
+  klass
+
+rename __method__ to __method-signature__
+add __klass-type__  (immediately before __klass__)
+add __method__      (immediately after __method-signature__)
+add __method-name__ (immediately after __method__ after __method-signature__)
+add to dkt-capture-current-exception() __klass-type__, __klass__, and __method__ (simple version, not __signature__)

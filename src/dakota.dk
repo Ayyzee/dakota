@@ -1538,7 +1538,7 @@ func dk-klass-for-name(symbol-t klass-name) -> object-t {
   return result;
 }
 func dk-klass-for-name(symbol-t klass-name, uint32-t column) -> object-t {
-  //for (uint32-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, klass-name);
+  for (uint32-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, klass-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   assert(nullptr != klass-name);
   named-info-t* klass-info-slots = info-for-name(klass-name);

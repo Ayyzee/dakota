@@ -315,7 +315,6 @@ my $gbl_sst_cursor = undef;
 my $gbl_user_data = &dakota::sst::lang_user_data();
 
 my $gbl_root = {};
-my $gbl_current_name = [];
 my $gbl_current_scope = $gbl_root;
 my $gbl_current_module = undef;
 my $gbl_filename = undef;
@@ -552,14 +551,13 @@ sub token_seq::simple_seq {
 }
 sub warning {
   my ($file, $line, $token_index) = @_;
-  printf STDERR "%s:%i: warning/error\n",
-    $file,
-    $line;
-
   printf STDERR "%s:%i: did not expect \'%s\'\n",
     $gbl_filename,
     &sst::line($gbl_sst, $token_index),
     &sst::at($gbl_sst, $token_index);
+  printf STDERR "%s:%i: warning/error\n",
+    $file,
+    $line;
   return;
 }
 sub error {
@@ -642,14 +640,6 @@ sub trait {
 
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
-      if (m/^initialize$/) {
-        &initialize();
-        last;
-      }
-      if (m/^finalize$/) {
-        &finalize();
-        last;
-      }
       if (m/^export$/) {
         &match(__FILE__, __LINE__, 'export');
         for (&sst_cursor::current_token($gbl_sst_cursor)) {
@@ -970,74 +960,6 @@ sub enum {
   &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
   return;
 }
-sub initialize {
-  &match(__FILE__, __LINE__, 'initialize');
-  if ('(' ne &sst_cursor::current_token($gbl_sst_cursor)) {
-    return;
-  }
-  &match(__FILE__, __LINE__, '(');
-  if ('object-t' ne &sst_cursor::current_token($gbl_sst_cursor)) {
-    return;
-  }
-  &match(__FILE__, __LINE__, 'object-t');
-  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$id/) {
-    &match_any();
-    #&match(__FILE__, __LINE__, 'klass');
-  }
-  &match(__FILE__, __LINE__, ')');
-  &match(__FILE__, __LINE__, '->');
-  &match(__FILE__, __LINE__, 'object-t');
-  for (&sst_cursor::current_token($gbl_sst_cursor)) {
-    if (m/^\{$/) {
-      &add_symbol($gbl_root, ['initialize']);
-      $$gbl_current_scope{'has-initialize'} = 1;
-      my ($open_curley_index, $close_curley_index) =
-        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
-      $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      last;
-    }
-    if (m/^;$/) {
-      &match(__FILE__, __LINE__, ';');
-      last;
-    }
-    &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
-  }
-  return;
-}
-sub finalize {
-  &match(__FILE__, __LINE__, 'finalize');
-  if ('(' ne &sst_cursor::current_token($gbl_sst_cursor)) {
-    return;
-  }
-  &match(__FILE__, __LINE__, '(');
-  if ('object-t' ne &sst_cursor::current_token($gbl_sst_cursor)) {
-    return;
-  }
-  &match(__FILE__, __LINE__, 'object-t');
-  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$id/) {
-    &match_any();
-    #&match(__FILE__, __LINE__, 'klass');
-  }
-  &match(__FILE__, __LINE__, ')');
-  &match(__FILE__, __LINE__, '->');
-  &match(__FILE__, __LINE__, 'object-t');
-  for (&sst_cursor::current_token($gbl_sst_cursor)) {
-    if (m/^\{$/) {
-      &add_symbol($gbl_root, ['finalize']);
-      $$gbl_current_scope{'has-finalize'} = 1;
-      my ($open_curley_index, $close_curley_index) =
-        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
-      $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      last;
-    }
-    if (m/^;$/) {
-      &match(__FILE__, __LINE__, ';');
-      last;
-    }
-    &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
-  }
-  return;
-}
 sub export {
   &match(__FILE__, __LINE__, 'export');
 
@@ -1162,10 +1084,9 @@ sub klass {
     return $body;
   }
   &match(__FILE__, __LINE__, '{');
-  push @$gbl_current_name, $body;
   my $braces = 1;
   my $previous_scope = $gbl_current_scope;
-  my $construct_name = join('::', @$gbl_current_name);
+  my $construct_name = $body;
 
   if (!defined $$gbl_current_scope{'klasses'}{$construct_name}) {
     $$gbl_current_scope{'klasses'}{$construct_name}{'defined?'} = 1;
@@ -1217,14 +1138,6 @@ sub klass {
           &slots({ 'exported?' => 0 });
           last;
         }
-      }
-      if (m/^initialize$/) {
-        &initialize();
-        last;
-      }
-      if (m/^finalize$/) {
-        &finalize();
-        last;
       }
       if (m/^method$/) {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
@@ -1315,10 +1228,8 @@ sub klass {
               $$gbl_current_scope{'klass'} = $path;
               &add_klass_decl($gbl_root, $path);
               last;
-            } elsif ('{' eq $de) {
-              &klass({});
             } else {
-              die;
+              &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
             }
           }
         }
@@ -1334,7 +1245,6 @@ sub klass {
 
         if (0 == $braces) {
           $gbl_current_scope = $previous_scope;
-          pop @$gbl_current_name;
           return &path::string($seq);
         }
         last;
@@ -1342,7 +1252,6 @@ sub klass {
       $$gbl_sst_cursor{'current-token-index'}++;
     }
   }
-  pop @$gbl_current_name;
   return &path::string($seq);
 }
 sub dkdecl {
@@ -2174,6 +2083,8 @@ sub rep_tree_from_dk_path {
   my $parts = &encode_comments(\$_);
 
   $_ =~ s/\$/dk::/g;
+
+  &rewrite_klass_defn_with_implicit_metaklass_defn(\$_);
 
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);

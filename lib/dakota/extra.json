@@ -20,6 +20,10 @@
     '#keyword' => undef,       # kw-args processing funcs (throw)
     '#object' => undef,        # kw-args processing funcs (throw)
     '#signature' => undef,     # kw-args processing funcs (throw)
+    '#src-time' => undef,
+    '#src-date' => undef,
+    '#src-file' => undef,
+    '#src-line' => undef,
   },
   'rt_extra_keywords' => {
     '#kls' => undef,

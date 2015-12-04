@@ -22,22 +22,13 @@ module dakota-util;
 klass ascii-number;
 klass named-info;
 
+static object-t gbl-base2-ascii-number-klass-info;
+
 klass ascii-number-klass {
   superklass klass;
 
   slots {
     str-t digits;
-  }
-  static object-t gbl-base2-ascii-number-klass-info;
-
-  initialize(object-t kls) -> object-t {
-    gbl-base2-ascii-number-klass-info = dk-make-named-info(#base2-ascii-number-klass,
-                                                           #superklass-name, cast(uintptr-t)#ascii-number,
-                                                           nullptr);
-    return kls;
-  }
-  finalize(object-t kls) -> object-t {
-    return kls;
   }
   method init(object-t self,
                        object-t       info :   gbl-base2-ascii-number-klass-info,
@@ -51,5 +42,14 @@ klass ascii-number-klass {
   method digits(object-t self) -> str-t {
     str-t digits = self.digits;
     return digits;
+  }
+  klass method initialize(object-t self) -> object-t {
+    gbl-base2-ascii-number-klass-info = dk-make-named-info(#base2-ascii-number-klass,
+                                                           #superklass-name, cast(uintptr-t)#ascii-number,
+                                                           nullptr);
+    return self;
+  }
+  klass method finalize(object-t self) -> object-t {
+    return self;
   }
 }

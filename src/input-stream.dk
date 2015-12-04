@@ -39,16 +39,16 @@ klass input-stream {
 
   method init(object-t self,
                        slots-t  slots :    stdin,
-                       str-t    filename : nullptr) -> object-t {
+                       str-t    file : nullptr) -> object-t {
     self = $init(super);
     unbox(self) = slots;
     assert(stdout != slots);
 
-    if (nullptr == slots && nullptr == filename)
+    if (nullptr == slots && nullptr == file)
       unbox(self) = stdin; // default
 
-    if (nullptr != filename) {
-      unbox(self) = fopen(filename, "r");
+    if (nullptr != file) {
+      unbox(self) = fopen(file, "r");
 
       if (nullptr == unbox(self))
         throw make(system-exception::klass, #errnum : errno);

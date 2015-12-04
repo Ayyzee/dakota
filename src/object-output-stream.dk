@@ -34,14 +34,6 @@ klass object-output-stream {
     uint32-t id;
     object-t id-from-object;        // sorted-table (ptr) key=object, value=id
   }
-  initialize(object-t kls) -> object-t {
-    dk-klass-for-name(#sorted-set); // hackhack
-    dk-klass-for-name(#sorted-table); // hackhack
-    return kls;
-  }
-  finalize(object-t kls) -> object-t {
-    return kls;
-  }
   method init(object-t self, stream-t stream : stdout) -> object-t {
     self = $init(super, #slots : stream);
     assert(nullptr != stream);

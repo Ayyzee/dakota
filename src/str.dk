@@ -21,7 +21,6 @@ module dakota;
 
 klass char8;
 klass hash;
-klass no-such-slot-exception;
 klass str;
 
 klass str-compare {

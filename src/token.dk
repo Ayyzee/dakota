@@ -35,7 +35,7 @@ klass token {
     uint32-t line;
     uint32-t column;
     str512-t buffer;
-    // could include filename
+    // could include file
     object-t leading-ws;
   }
   method write-lite(object-t self, object-t out) -> object-t {

@@ -28,16 +28,15 @@ klass keyword-exception {
     signature-t* signature;
     symbol-t     keyword;
   }
-  method init(object-t self,
-                       object-t     object :,
-                       signature-t* signature :,
-                       symbol-t     keyword :) -> object-t {
-    assert(nullptr != object);
-    assert(nullptr != signature);
-    assert(nullptr != keyword);
-
-    self = $init(super);
-
+  method init(object-t     self,
+              str-t        src-time :,
+              str-t        src-date :,
+              str-t        src-file :,
+              int-t        src-line :,
+              object-t     object :,
+              signature-t* signature :,
+              symbol-t     keyword :) -> object-t {
+    self = $init(super, #src-time : src-time, #src-date : src-date, #src-file : src-file, #src-line : src-line);
     self.object =    object;
     self.signature = signature;
     self.keyword =   keyword;

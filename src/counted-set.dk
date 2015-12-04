@@ -110,10 +110,4 @@ trait counted-set {
     }
     return count;
   }
-  initialize(object-t kls) -> object-t {
-    return kls;
-  }
-  finalize(object-t kls) -> object-t {
-    return kls;
-  }
 }

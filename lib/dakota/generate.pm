@@ -2137,12 +2137,6 @@ sub linkage_unit::generate_klasses_body {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
-  if (&is_decl() && $$klass_scope{'has-initialize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { initialize(object-t kls) -> object-t; }" . &ann(__FILE__, __LINE__) . "\n";
-  }
-  if (&is_decl() && $$klass_scope{'has-finalize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { finalize(object-t kls) -> object-t; }" . &ann(__FILE__, __LINE__) . "\n";
-  }
   if (&is_decl() && @$kw_args_methods) {
     #print STDERR Dumper($va_list_methods);
     &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
@@ -3499,12 +3493,6 @@ sub dk_generate_cc_footer_klass {
   if (&has_exported_methods($klass_scope)) {
     $$tbbl{'#behavior-exported?'} = '1';
   }
-  if ($$klass_scope{'has-initialize'}) {
-    $$tbbl{'#initialize'} = 'cast(method-t)initialize';
-  }
-  if ($$klass_scope{'has-finalize'}) {
-    $$tbbl{'#finalize'} = 'cast(method-t)finalize';
-  }
   if ($$klass_scope{'module'}) {
     $$tbbl{'#module'} = "\#$$klass_scope{'module'}";
   }
@@ -3639,13 +3627,13 @@ sub generate_kw_args_method_defn {
   $col = &colin($col);
 
   $$scratch_str_ref .=
-    $col . "static signature-t const* __method__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method__);\n";
+    $col . "static signature-t const* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);\n";
 
   $$method{'name'} = [ '_func_' ];
   my $func_name = "@{$$method{'name'}}";
 
   #$$scratch_str_ref .=
-  #  $col . "static signature-t const* __method__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method__);\n";
+  #  $col . "static signature-t const* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);\n";
 
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
@@ -3728,7 +3716,7 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .=
     $col . "throw make(no-such-keyword-exception::klass,\n" .
     $col . "           \#object $colon    self,\n" .
-    $col . "           \#signature $colon __method__,\n" .
+    $col . "           \#signature $colon __method-signature__,\n" .
     $col . "           \#keyword $colon   _keyword_->symbol);\n";
   $col = &colout($col);
   #        $$scratch_str_ref .= $col . "}\n";
@@ -3748,7 +3736,7 @@ sub generate_kw_args_method_defn {
       $$scratch_str_ref .=
         $col . "throw make(missing-keyword-exception::klass,\n" .
         $col . "           \#object $colon    self,\n" .
-        $col . "           \#signature $colon __method__,\n" .
+        $col . "           \#signature $colon __method-signature__,\n" .
         $col . "           \#keyword $colon   _keyword_->symbol);\n";
     }
     $col = &colout($col);

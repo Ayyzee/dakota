@@ -187,7 +187,7 @@ typedef auto (*dkt_selector_func_t)() -> selector_t*;
 namespace hash { typedef uintptr_t slots_t; } typedef hash::slots_t hash_t;
 
 constexpr FUNC dk_hash(str_t str) -> hash_t { // Daniel J. Bernstein
-  return !*str ? cast(hash_t)5381 : cast(hash_t)(*str) ^ (33 * dk_hash(str + 1));
+  return !*str ? cast(hash_t)5381 : cast(hash_t)(*str) ^ (cast(hash_t)33 * dk_hash(str + 1));
 }
 constexpr FUNC dk_hash_switch(str_t str) -> hash_t { return dk_hash(str); }
 
@@ -209,7 +209,7 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 [[so_export]] FUNC dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name) -> object_t;
 
 [[so_export]] FUNC dkt_capture_current_exception(object_t arg) -> object_t;
-[[so_export]] FUNC dkt_capture_current_exception(str_t arg) -> str_t;
+[[so_export]] FUNC dkt_capture_current_exception(str_t arg, str_t src_time, str_t src_date, str_t src_file, int_t src_line) -> str_t;
 
 [[so_export]] FUNC dk_va_make_named_info_slots(symbol_t name, va_list_t args) -> named_info_t*;
 [[so_export]] FUNC dk_va_make_named_info(      symbol_t name, va_list_t args) -> object_t;
