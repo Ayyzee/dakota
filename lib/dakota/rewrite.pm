@@ -320,12 +320,12 @@ sub vars_from_defn {
   }
 
   if (!exists $$kw_args_generics{$name}) { # hackhack
-    $result .= " static signature-t const* __method__ = SIGNATURE($name,($params)); USE(__method__);";
+    $result .= " static const signature-t* __method__ = SIGNATURE($name,($params)); USE(__method__);";
   } else {
     # replace keyword args with va-list-t
     $params =~ s|,[^,]+?/\*$colon.*?\*/||g;
     $params .= ", va-list-t";
-    $result .= " static signature-t const* __method__ = KW-ARGS-METHOD-SIGNATURE(va::$name,($params)); USE(__method__);";
+    $result .= " static const signature-t* __method__ = KW-ARGS-METHOD-SIGNATURE(va::$name,($params)); USE(__method__);";
   }
   return $result;
 }

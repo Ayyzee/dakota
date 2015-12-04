@@ -419,7 +419,7 @@ sub generate_defn_footer {
   my $col = '';
   my $keys_count = keys %{$$file{'klasses'}};
   if (0 == $keys_count) {
-    $rt_cc_str .= $col . "static symbol-t const* imported-klass-names = nullptr;\n";
+    $rt_cc_str .= $col . "static const symbol-t* imported-klass-names = nullptr;\n";
     $rt_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;\n";
   } else {
     $rt_cc_str .= $col . "static symbol-t imported-klass-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
@@ -1002,7 +1002,7 @@ sub common::print_signature {
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
-  $scratch_str .= $visibility . "$generic_name($$new_arg_type_list) -> signature-t const*";
+  $scratch_str .= $visibility . "$generic_name($$new_arg_type_list) -> const signature-t*";
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= '; }' . "\n";
@@ -1212,12 +1212,12 @@ sub generics::generate_signature_seq {
   #$scratch_str .= $col . "// generate_signature_seq()\n";
   my $generic;
   my $i;
-  my $return_type = 'signature-t const*';
+  my $return_type = 'const signature-t*';
 
   if (0 == @$va_generics) {
-    $scratch_str .= $col . "static signature-t const* const* va-signatures = nullptr;\n";
+    $scratch_str .= $col . "static const signature-t* const* va-signatures = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static signature-t const* const va-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
+    $scratch_str .= $col . "static const signature-t* const va-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     my $max_width = 0;
     foreach $generic (sort method::compare @$va_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
@@ -1239,9 +1239,9 @@ sub generics::generate_signature_seq {
     $scratch_str .= $col . "};\n";
   }
   if (0 == @$fa_generics) {
-    $scratch_str .= $col . "static signature-t const* const* signatures = nullptr;\n";
+    $scratch_str .= $col . "static const signature-t* const* signatures = nullptr;\n";
   } else {
-    $scratch_str .= $col . "static signature-t const* const signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
+    $scratch_str .= $col . "static const signature-t* const signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     my $max_width = 0;
     foreach $generic (sort method::compare @$fa_generics) {
       my $method_type = &method::type($generic, [ $return_type ]);
@@ -1415,13 +1415,13 @@ sub generics::generate_generic_defn {
     $col = &colin($col);
     if (&is_va($generic)) {
       $$scratch_str_ref .=
-        $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
+        $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
         $col . "object-t kls = object->klass;\n" .
         $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
-        $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
+        $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
         $col . "object-t kls = object->klass;\n" .
         $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
@@ -1511,13 +1511,13 @@ sub generics::generate_super_generic_defn {
     $col = &colin($col);
     if (&is_va($generic)) {
       $$scratch_str_ref .=
-        $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
+        $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
         $col . "object-t kls = klass::unbox(arg0.klass).superklass;\n" .
         $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
-        $col . "DEBUG-STMT(static signature-t const* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
+        $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
         $col . "object-t kls = klass::unbox(arg0.klass).superklass;\n" .
         $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
@@ -2834,7 +2834,7 @@ sub slots_signature_body {
   my $result = '';
   my $method_num  = 0;
   my $max_width = 0;
-  my $return_type = 'signature-t const*';
+  my $return_type = 'const signature-t*';
   foreach my $method (@$sorted_methods) {
     my $method_type = &method::type($method, [ $return_type ]);
     my $width = length($method_type);
@@ -2874,7 +2874,7 @@ sub signature_body {
   my $result = '';
   my $method_num  = 0;
   my $max_width = 0;
-  my $return_type = 'signature-t const*';
+  my $return_type = 'const signature-t*';
   foreach my $method (@$sorted_methods) {
     my $method_type = &method::type($method, [ $return_type ]);
     my $width = length($method_type);
@@ -3036,13 +3036,13 @@ sub dk_generate_cc_footer_klass {
   #$col = &colin($col);
   ###
   if (@$va_list_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static signature-t const* const __va-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " // redundant\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __va-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " // redundant\n";
 
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
 
     $va_method_num = 0;
     my $max_width = 0;
-    my $return_type = 'signature-t const*';
+    my $return_type = 'const signature-t*';
     foreach my $va_method (@$sorted_va_methods) {
       my $va_method_type = &method::type($va_method, [ $return_type ]);
       my $width = length($va_method_type);
@@ -3143,7 +3143,7 @@ sub dk_generate_cc_footer_klass {
   #}
   ###
   if (@$kw_args_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static signature-t const* const __kw-args-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __kw-args-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     #$col = &colin($col);
 
     #$$scratch_str_ref .= "\#if 0\n";
@@ -3166,7 +3166,7 @@ sub dk_generate_cc_footer_klass {
       my $list_types = &arg_type::list_types($$kw_args_method{'parameter-types'});
       my $kw_list_types = &method::kw_list_types($kw_args_method);
       $$scratch_str_ref .=
-        $col . "  (cast(dkt-signature-func-t)cast(signature-t const*(*)($$list_types))" .
+        $col . "  (cast(dkt-signature-func-t)cast(const signature-t*(*)($$list_types))" .
         $pad . "__kw-args-method-signature::va::$method_name)(),\n";
     }
     #$$scratch_str_ref .= "\#endif\n";
@@ -3175,7 +3175,7 @@ sub dk_generate_cc_footer_klass {
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
     $$scratch_str_ref .=
-      $col . "$klass_type @$klass_name { static signature-t const* const __method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
+      $col . "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
       $col . &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
       $col . "};}\n";
   }
@@ -3197,7 +3197,7 @@ sub dk_generate_cc_footer_klass {
 
   if (values %{$exported_methods ||= []}) {
     $$scratch_str_ref .=
-      $col . "$klass_type @$klass_name { static signature-t const* const __exported-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
+      $col . "$klass_type @$klass_name { static const signature-t* const __exported-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
       $col . &signature_body($klass_name, $exported_methods, &colin($col)) .
       $col . "};}\n" .
       $col . "$klass_type @$klass_name { static method-t __exported-method-addresses[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
@@ -3206,7 +3206,7 @@ sub dk_generate_cc_footer_klass {
   }
   if (values %{$exported_slots_methods ||= []}) {
     $$scratch_str_ref .=
-      $col . "$klass_type @$klass_name { static signature-t const* const __exported-slots-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
+      $col . "$klass_type @$klass_name { static const signature-t* const __exported-slots-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
       $col . &slots_signature_body($klass_name, $exported_slots_methods, &colin($col)) .
       $col . "};}\n" .
       $col . "$klass_type @$klass_name { static method-t __exported-slots-method-addresses[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n" .
@@ -3539,7 +3539,7 @@ sub generate_kw_args_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   my $kw_list_types = &method::kw_list_types($method);
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> signature-t const*; }}}" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t*; }}}" . &ann(__FILE__, __LINE__) . "\n";
 }
 sub generate_kw_args_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3547,7 +3547,7 @@ sub generate_kw_args_method_signature_defn {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> signature-t const* {" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
   my $kw_arg_list = "static signature-t const result = { .name = \"$method_name\", .parameter-types = \"";
@@ -3565,7 +3565,7 @@ sub generate_slots_method_signature_decl {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> signature-t const*; }}" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t*; }}" . &ann(__FILE__, __LINE__) . "\n";
 }
 sub generate_slots_method_signature_defn {
   my ($method, $klass_name, $col, $klass_type) = @_;
@@ -3573,7 +3573,7 @@ sub generate_slots_method_signature_defn {
   my $method_name = "@{$$method{'name'}}";
   my $return_type = &arg::type($$method{'return-type'});
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> signature-t const* {" . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
   my $arg_list = "static signature-t const result = { .name = \"$method_name\", .parameter-types = \"";
@@ -3628,13 +3628,13 @@ sub generate_kw_args_method_defn {
   $col = &colin($col);
 
   $$scratch_str_ref .=
-    $col . "static signature-t const* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);\n";
+    $col . "static const signature-t* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);\n";
 
   $$method{'name'} = [ '_func_' ];
   my $func_name = "@{$$method{'name'}}";
 
   #$$scratch_str_ref .=
-  #  $col . "static signature-t const* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);\n";
+  #  $col . "static const signature-t* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);\n";
 
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);

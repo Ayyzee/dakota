@@ -132,11 +132,11 @@ namespace dkt {
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 // file scope
 # define SELECTOR(name, args)                *(cast(dkt_selector_func_t) (cast(selector_t*        (*)args) __selector::name))()
-# define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(signature_t const* (*)args) __signature::name))()
+# define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(const signature_t* (*)args) __signature::name))()
 
 // klass/trait scope
-# define SLOTS_METHOD_SIGNATURE(name, args)   (cast(dkt_signature_func_t)(cast(signature_t const* (*)args) __slots_method_signature::name))()
-# define KW_ARGS_METHOD_SIGNATURE(name, args) (cast(dkt_signature_func_t)(cast(signature_t const* (*)args) __kw_args_method_signature::name))()
+# define SLOTS_METHOD_SIGNATURE(name, args)   (cast(dkt_signature_func_t)(cast(const signature_t* (*)args) __slots_method_signature::name))()
+# define KW_ARGS_METHOD_SIGNATURE(name, args) (cast(dkt_signature_func_t)(cast(const signature_t* (*)args) __kw_args_method_signature::name))()
 
 # define unless(e) if (0 == (e))
 # define until(e)  while (0 == (e))
@@ -181,7 +181,7 @@ extern object_t std_output [[so_export]] [[dkt_rodata_section]];
 extern object_t std_error  [[so_export]] [[dkt_rodata_section]];
 
 typedef auto (*compare_t)(object_t, object_t) -> int_t; // comparitor
-typedef auto (*dkt_signature_func_t)() -> signature_t const*;
+typedef auto (*dkt_signature_func_t)() -> const signature_t*;
 typedef auto (*dkt_selector_func_t)() -> selector_t*;
 
 namespace hash { typedef uintptr_t slots_t; } typedef hash::slots_t hash_t;
@@ -225,15 +225,15 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 [[so_export]] [[noreturn]] FUNC dkt_null_method(object_t object, ...) -> void;
 [[so_export]] FUNC map(object_t, method_t) -> object_t;
 
-[[debug_so_export]] FUNC dkt_va_trace_before(signature_t const* signature, method_t method, object_t object,  va_list_t args) -> int_t;
-[[debug_so_export]] FUNC dkt_va_trace_before(signature_t const* signature, method_t method, super_t  context, va_list_t args) -> int_t;
-[[debug_so_export]] FUNC dkt_va_trace_after( signature_t const* signature, method_t method, object_t object,  va_list_t args) -> int_t;
-[[debug_so_export]] FUNC dkt_va_trace_after( signature_t const* signature, method_t method, super_t  context, va_list_t args) -> int_t;
+[[debug_so_export]] FUNC dkt_va_trace_before(const signature_t* signature, method_t method, object_t object,  va_list_t args) -> int_t;
+[[debug_so_export]] FUNC dkt_va_trace_before(const signature_t* signature, method_t method, super_t  context, va_list_t args) -> int_t;
+[[debug_so_export]] FUNC dkt_va_trace_after( const signature_t* signature, method_t method, object_t object,  va_list_t args) -> int_t;
+[[debug_so_export]] FUNC dkt_va_trace_after( const signature_t* signature, method_t method, super_t  context, va_list_t args) -> int_t;
 
-[[debug_so_export]] FUNC dkt_trace_before(signature_t const* signature, method_t method, super_t  context, ...) -> int_t;
-[[debug_so_export]] FUNC dkt_trace_before(signature_t const* signature, method_t method, object_t object,  ...) -> int_t;
-[[debug_so_export]] FUNC dkt_trace_after( signature_t const* signature, method_t method, super_t  context, ...) -> int_t;
-[[debug_so_export]] FUNC dkt_trace_after( signature_t const* signature, method_t method, object_t object,  ...) -> int_t;
+[[debug_so_export]] FUNC dkt_trace_before(const signature_t* signature, method_t method, super_t  context, ...) -> int_t;
+[[debug_so_export]] FUNC dkt_trace_before(const signature_t* signature, method_t method, object_t object,  ...) -> int_t;
+[[debug_so_export]] FUNC dkt_trace_after( const signature_t* signature, method_t method, super_t  context, ...) -> int_t;
+[[debug_so_export]] FUNC dkt_trace_after( const signature_t* signature, method_t method, object_t object,  ...) -> int_t;
 
 [[debug_so_export]] FUNC dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len) -> char8_t*;
 

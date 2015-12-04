@@ -340,12 +340,12 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type);
       if (#klass == type)
         klasses-count++;
-      signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method.signatures);
+      const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method.signatures);
 
       if (nullptr != method-signatures) {
-        method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method.addresses);
+        const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method.addresses);
         uint32-t j = 0;
-        signature-t const* method-signature;
+        const signature-t* method-signature;
         while (nullptr != (method-signature = method-signatures[j])) {
           method-t method-address = method-addresses[j];
           if (nullptr != method-address && cast(method-t)DKT-NULL-METHOD != method-address)
@@ -385,14 +385,14 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
       if (nullptr != superklass-name)
         ostream::println-format(ostrm, "'superklass' : '%s',\n", superklass-name);
       
-      signature-t const* const* method-signatures = cast(signature-t const* const*)named-info::at(current-info, #method.signatures);
+      const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method.signatures);
       if (nullptr != method-signatures) {
         ostream::println-format(ostrm, "'methods' :\n");
         ostream::println-format(ostrm, "{\n");
         ostream::col-incr(ostrm);
-        method-t const* method-addresses = cast(method-t const*)named-info::at(current-info, #method.addresses);
+        const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method.addresses);
         uint32-t j = 0;
-        signature-t const* method-signature;
+        const signature-t* method-signature;
         
         while (nullptr != (method-signature = method-signatures[j])) {
           method-t method-address = method-addresses[j];
@@ -751,7 +751,7 @@ static func export-klasses(named-info-t* klass-info) -> void {
   return;
 }
 static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -> void {
-  property-t const* interposers = cast(property-t const*)named-info::at(registration-info, #interposers);
+  const property-t* interposers = cast(const property-t*)named-info::at(registration-info, #interposers);
   if (nullptr != interposers) {
     for (uint32-t i = 0; nullptr != interposers[i].key; i++)
       ostream::println-format(ostrm, "interpose %s, %s;\n", interposers[i].key, cast(symbol-t)interposers[i].element);
@@ -855,11 +855,11 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
       named-info-t*             slots-info =                     cast(named-info-t*)            named-info::at(klass-info, #slots-info);
       symbol-t                  slots-type =                     cast(symbol-t)                 named-info::at(klass-info, #slots-type);
 
-      signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info::at(klass-info, #method.signatures);
-      //signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info::at(klass-info, #va-method.signatures);
-      //signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info::at(klass-info, #slots-method.signatures);
-      //signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #va-slots-method.signatures);
-      //signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
+      const signature-t* const* method-signatures =              cast(const signature-t* const*)named-info::at(klass-info, #method.signatures);
+      //const signature-t* const* va-method-signatures =           cast(const signature-t* const*)named-info::at(klass-info, #va-method.signatures);
+      //const signature-t* const* slots-method-signatures =        cast(const signature-t* const*)named-info::at(klass-info, #slots-method.signatures);
+      //const signature-t* const* va-slots-method-signatures =     cast(const signature-t* const*)named-info::at(klass-info, #va-slots-method.signatures);
+      //const signature-t* const* kw-args-method-signatures =      cast(const signature-t* const*)named-info::at(klass-info, #kw-args-method-signatures);
 
       if (nullptr == modulee) {
         named-info::dump(klass-info);
@@ -875,7 +875,7 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         ostream::println-format(ostrm, ",\n  %s::%s", name, "slots-t");
       if (nullptr != method-signatures) {
         uint32-t index = 0;
-        signature-t const* info;
+        const signature-t* info;
 
         while (nullptr != (info = method-signatures[index++])) {
           char8-t first-parameter-type[15 + (1)] = "";
@@ -971,7 +971,7 @@ static func max-slot-name-width(named-info-t* slots-info) -> uint32-t {
   }
   return result;
 }
-static func dump-method(ostream-t ostrm, signature-t const* info) -> void {
+static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
   ostream::println-format(ostrm, "method %s(%s) -> %s;\n",
                   info->name,
                   info->parameter-types,
@@ -994,25 +994,25 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
   symbol-t                  cat =                            cast(symbol-t)                 named-info::at(klass-info, #cat, cast(uintptr-t)#struct);
   symbol-t                  type =                           cast(symbol-t)                 named-info::at(klass-info, #type, cast(uintptr-t)#klass);
   symbol-t                  interpose-name =                 cast(symbol-t)                 named-info::at(klass-info, #interpose-name);
-  symbol-t const*           traits =                         cast(symbol-t const*)          named-info::at(klass-info, #traits);
-  symbol-t const*           requires =                       cast(symbol-t const*)          named-info::at(klass-info, #requires);
-  symbol-t const*           provides =                       cast(symbol-t const*)          named-info::at(klass-info, #provides);
-  signature-t const* const* method-signatures =              cast(signature-t const* const*)named-info::at(klass-info, #method.signatures);
-  signature-t const* const* kw-args-method-signatures =      cast(signature-t const* const*)named-info::at(klass-info, #kw-args-method-signatures);
-  signature-t const* const* exported-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #exported-method.signatures);
-  signature-t const* const* exported-slots-method-signatures = cast(signature-t const* const*)named-info::at(klass-info, #exported-slots-method.signatures);
-  signature-t const* const* slots-method-signatures =        cast(signature-t const* const*)named-info::at(klass-info, #slots-method.signatures);
-//signature-t const* const* va-method-signatures =           cast(signature-t const* const*)named-info::at(klass-info, #va-method.signatures);
-//signature-t const* const* va-slots-method-signatures =     cast(signature-t const* const*)named-info::at(klass-info, #va-slots-method.signatures);
-  named-enum-info-t const*  enum-info =                      cast(named-enum-info-t const*) named-info::at(klass-info, #enum-info);
-  const-info-t const*       const-info =                     cast(const-info-t const*)      named-info::at(klass-info, #const-info);
+  const symbol-t*           traits =                         cast(const symbol-t*)          named-info::at(klass-info, #traits);
+  const symbol-t*           requires =                       cast(const symbol-t*)          named-info::at(klass-info, #requires);
+  const symbol-t*           provides =                       cast(const symbol-t*)          named-info::at(klass-info, #provides);
+  const signature-t* const* method-signatures =              cast(const signature-t* const*)named-info::at(klass-info, #method.signatures);
+  const signature-t* const* kw-args-method-signatures =      cast(const signature-t* const*)named-info::at(klass-info, #kw-args-method-signatures);
+  const signature-t* const* exported-method-signatures =     cast(const signature-t* const*)named-info::at(klass-info, #exported-method.signatures);
+  const signature-t* const* exported-slots-method-signatures = cast(const signature-t* const*)named-info::at(klass-info, #exported-slots-method.signatures);
+  const signature-t* const* slots-method-signatures =        cast(const signature-t* const*)named-info::at(klass-info, #slots-method.signatures);
+//const signature-t* const* va-method-signatures =           cast(const signature-t* const*)named-info::at(klass-info, #va-method.signatures);
+//const signature-t* const* va-slots-method-signatures =     cast(const signature-t* const*)named-info::at(klass-info, #va-slots-method.signatures);
+  const named-enum-info-t*  enum-info =                      cast(const named-enum-info-t*) named-info::at(klass-info, #enum-info);
+  const const-info-t*       const-info =                     cast(const const-info-t*)      named-info::at(klass-info, #const-info);
   str-t                     slots-type =                     cast(str-t)                    named-info::at(klass-info, #slots-type);
   str-t                     enum-base =                      cast(str-t)                    named-info::at(klass-info, #enum-base);
   named-info-t*             slots-info =                     cast(named-info-t*)            named-info::at(klass-info, #slots-info);
-//     method-t const* method-addresses =          cast(method-t*)named-info::at(klass-info, #method.addresses);
-//     method-t const* va-method-addresses =       cast(method-t*)named-info::at(klass-info, #va-method.addresses);
-//     method-t const* slots-method-addresses =    cast(method-t*)named-info::at(klass-info, #slots-method.addresses);
-//     method-t const* va-slots-method-addresses = cast(method-t*)named-info::at(klass-info, #va-slots-method.addresses);
+//     const method-t* method-addresses =          cast(method-t*)named-info::at(klass-info, #method.addresses);
+//     const method-t* va-method-addresses =       cast(method-t*)named-info::at(klass-info, #va-method.addresses);
+//     const method-t* slots-method-addresses =    cast(method-t*)named-info::at(klass-info, #slots-method.addresses);
+//     const method-t* va-slots-method-addresses = cast(method-t*)named-info::at(klass-info, #va-slots-method.addresses);
 
   assert(nullptr != type);
   assert(nullptr != name);
@@ -1159,7 +1159,7 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
         && nullptr != method-signatures) {
       ostream::println-format(ostrm, "\n");
     }
-    signature-t const* info;
+    const signature-t* info;
     uint32-t index = 0;
 
     if (nullptr != kw-args-method-signatures)
@@ -1630,7 +1630,7 @@ func dk-intern(str-t key) -> symbol-t {
 # if 0
   symbol-t val = key;
 # else
-  symbol-t val = cast(symbol-t)sorted-ptr-array::intern(intern-array, cast(void const*)(key));
+  symbol-t val = cast(symbol-t)sorted-ptr-array::intern(intern-array, cast(const void*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 # endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);

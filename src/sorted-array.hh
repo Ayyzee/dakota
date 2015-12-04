@@ -25,13 +25,13 @@ namespace sorted_array {
   FUNC   create(uint32_t capacity, uint32_t size, std_compare_t compare) -> slots_t*;
 
   FUNC   sort(slots_t* t) -> slots_t*;
-  FUNC   intern(slots_t* t, void const* key) -> void const*;
-  FUNC   at(slots_t* t, uint32_t offset) -> void const*;
-  FUNC   remove_last(slots_t* t) -> void const*;
+  FUNC   intern(slots_t* t, const void* key) -> const void*;
+  FUNC   at(slots_t* t, uint32_t offset) -> const void*;
+  FUNC   remove_last(slots_t* t) -> const void*;
 
-  FUNC   add(slots_t* t, void const* key) -> slots_t*;
-  FUNC   bsearch(slots_t* t, void const* key) -> void const*;
-  FUNC   remove_at(slots_t* t, void const* key, uint32_t offset) -> void const*;
-  FUNC   add_at(slots_t* t, void const* key, uint32_t offset) -> slots_t*;
+  FUNC   add(slots_t* t, const void* key) -> slots_t*;
+  FUNC   bsearch(slots_t* t, const void* key) -> const void*;
+  FUNC   remove_at(slots_t* t, const void* key, uint32_t offset) -> const void*;
+  FUNC   add_at(slots_t* t, const void* key, uint32_t offset) -> slots_t*;
 }
 # endif

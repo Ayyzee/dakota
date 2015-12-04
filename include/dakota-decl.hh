@@ -84,7 +84,7 @@ namespace std { typedef float       float32_t;  }
 namespace std { typedef double      float64_t;  }
 namespace std { typedef long double float128_t; }
 
-namespace symbol { typedef char8_t const* slots_t; } typedef symbol::slots_t symbol_t;
+namespace symbol { typedef const char8_t* slots_t; } typedef symbol::slots_t symbol_t;
 
 static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");
 static_assert(64/8  == sizeof(std::float64_t),  "The sizeof std::float64-t  must equal  64/8 bytes in size");

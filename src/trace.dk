@@ -44,7 +44,7 @@ static func trace-column-out() -> void {
   va-end(args);
   return result;
 }
-func dkt-va-trace-before(signature-t const* signature, method-t m, super-t context, va-list-t args) -> int-t {
+func dkt-va-trace-before(const signature-t* signature, method-t m, super-t context, va-list-t args) -> int-t {
   USE(args);
   int-t result = 0;
   if (nullptr != getenv("DK_ENABLE_TRACE")) {
@@ -57,7 +57,7 @@ func dkt-va-trace-before(signature-t const* signature, method-t m, super-t conte
   }
   return result;
 }
-func dkt-va-trace-before(signature-t const* signature, method-t m, object-t object, va-list-t args) -> int-t {
+func dkt-va-trace-before(const signature-t* signature, method-t m, object-t object, va-list-t args) -> int-t {
   USE(args);
   int-t result = 0;
   if (nullptr != getenv("DK_ENABLE_TRACE")) {
@@ -69,7 +69,7 @@ func dkt-va-trace-before(signature-t const* signature, method-t m, object-t obje
   }
   return result;
 }
-func dkt-va-trace-after(signature-t const* signature, method-t m, super-t context, va-list-t args) -> int-t {
+func dkt-va-trace-after(const signature-t* signature, method-t m, super-t context, va-list-t args) -> int-t {
   USE(args);
   trace-column-out();
   int-t result = 0;
@@ -81,7 +81,7 @@ func dkt-va-trace-after(signature-t const* signature, method-t m, super-t contex
                            cast(ptr-t)cast(uintptr-t)(m));
   return result;
 }
-func dkt-va-trace-after(signature-t const* signature, method-t m, object-t object, va-list-t args) -> int-t {
+func dkt-va-trace-after(const signature-t* signature, method-t m, object-t object, va-list-t args) -> int-t {
   USE(args);
   trace-column-out();
   int-t result = 0;
@@ -92,7 +92,7 @@ func dkt-va-trace-after(signature-t const* signature, method-t m, object-t objec
                            cast(ptr-t)cast(uintptr-t)(m));
   return result;
 }
-func dkt-trace-before(signature-t const* signature, method-t m, super-t context, ...) -> int-t {
+func dkt-trace-before(const signature-t* signature, method-t m, super-t context, ...) -> int-t {
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
@@ -101,7 +101,7 @@ func dkt-trace-before(signature-t const* signature, method-t m, super-t context,
   va-end(args);
   return result;
 }
-func dkt-trace-before(signature-t const* signature, method-t m, object-t object, ...) -> int-t {
+func dkt-trace-before(const signature-t* signature, method-t m, object-t object, ...) -> int-t {
   int-t result = 0;
   va-list-t args;
   va-start(args, object);
@@ -110,7 +110,7 @@ func dkt-trace-before(signature-t const* signature, method-t m, object-t object,
   va-end(args);
   return result;
 }
-func dkt-trace-after(signature-t const* signature, method-t m, super-t context, ...) -> int-t {
+func dkt-trace-after(const signature-t* signature, method-t m, super-t context, ...) -> int-t {
   int-t result = 0;
   va-list-t args;
   va-start(args, context);
@@ -119,7 +119,7 @@ func dkt-trace-after(signature-t const* signature, method-t m, super-t context, 
   va-end(args);
   return result;
 }
-func dkt-trace-after(signature-t const* signature, method-t m, object-t object, ...) -> int-t {
+func dkt-trace-after(const signature-t* signature, method-t m, object-t object, ...) -> int-t {
   int-t result = 0;
   va-list-t args;
   va-start(args, object);

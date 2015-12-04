@@ -35,7 +35,7 @@ inline int_t safe_strcmp(str_t s1, str_t s2) {
     }
     return value;
   }
-inline int_t safe_strptrcmp(str_t const* sp1, str_t const* sp2) {
+inline int_t safe_strptrcmp(const str_t* sp1, const str_t* sp2) {
     str_t s1;
     if (nullptr == sp1)
       s1 = nullptr;

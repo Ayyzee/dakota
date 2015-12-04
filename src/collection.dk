@@ -46,7 +46,7 @@ klass collection {
     $write(out, "\n");
     return self;
   }
-  // method add-all(object-t self, str-t const* strings, symbol-t encoding : #utf-8) -> object-t {
+  // method add-all(object-t self, const str-t* strings, symbol-t encoding : #utf-8) -> object-t {
   //   assert(nullptr != strings) -> object-t;
   //   assert(nullptr != encoding);
   //   while (nullptr != *strings) // rnielsen: modifying a parameter - bad practice?

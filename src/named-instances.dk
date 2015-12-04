@@ -80,7 +80,7 @@ static ptr-node-t named-instance-ptrs[] = {
   { &dd, nullptr }, // #dd (only if defining SO also imports it)
   { &ee, nullptr }, // #ee (only if defining SO also imports it)
 };
-static symbol-t const* named-instance-names[] = {
+static const symbol-t* named-instance-names[] = {
   #aa,
   #bb,
   #cc,

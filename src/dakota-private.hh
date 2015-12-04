@@ -30,7 +30,7 @@ FUNC add_interpose_prop(symbol_t key, symbol_t element) -> void;
 
 FUNC info_for_name(symbol_t) -> named_info_t*;
 
-FUNC safe_strptrcmp(str_t const* sp1, str_t const* sp2) -> int_t;
+FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> int_t;
 FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t;
 
 FUNC safe_strcmp(str_t, str_t) -> int_t;
