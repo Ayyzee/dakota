@@ -58,26 +58,6 @@ install: $(install-files)
 	  sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-darwin.json platform.json; \
   fi
 
-pkg:
-	@echo srcdir = $(srcdir)
-	@echo blddir = $(blddir)
-	@echo objdir = $(objdir)
-	@echo DESTDIR = $(DESTDIR)
-	@echo prefix = $(prefix)
-	@echo so_ext = $(so_ext)
-	@echo
-	@echo dakota-info.srcs = $(dakota-info.srcs)
-	@echo
-	@echo dakota-info.install.files = $(dakota-info.install.files)
-	@echo
-	@echo libdakota.srcs = $(libdakota.srcs)
-	@echo
-	@echo libdakota.install.files = $(libdakota.install.files)
-	@echo
-	@echo libdakota-util.srcs = $(libdakota-util.srcs)
-	@echo
-	@echo libdakota-util.install.files = $(libdakota-util.install.files)
-
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
