@@ -258,6 +258,8 @@ module dakota {
   va-method,
   va-method::slots-t,
   vector,
+  wchar,
+  wchar::slots-t,
   x::sigaction,
   x::sigaction::slots-t,
   x::sigaction-handler,

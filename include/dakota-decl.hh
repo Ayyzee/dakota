@@ -80,14 +80,14 @@ typedef unsigned int   uint_t; // no corresponding klass/slots defn
 typedef va_list va_list_t; // no corresponding klass/slots defn
 
 // <cstdfloat>
-typedef float       float32_t;
-typedef double      float64_t;
-typedef long double float128_t;
+namespace std { typedef float       float32_t;  }
+namespace std { typedef double      float64_t;  }
+namespace std { typedef long double float128_t; }
 
 namespace symbol { typedef char8_t const* slots_t; } typedef symbol::slots_t symbol_t;
 
-static_assert(32/8  == sizeof(float32_t),  "The sizeof float32-t  must equal  32/8 bytes in size");
-static_assert(64/8  == sizeof(float64_t),  "The sizeof float64-t  must equal  64/8 bytes in size");
-static_assert(128/8 == sizeof(float128_t), "The sizeof float128-t must equal 128/8 bytes in size");
+static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");
+static_assert(64/8  == sizeof(std::float64_t),  "The sizeof std::float64-t  must equal  64/8 bytes in size");
+static_assert(128/8 == sizeof(std::float128_t), "The sizeof std::float128-t must equal 128/8 bytes in size");
 
 # endif

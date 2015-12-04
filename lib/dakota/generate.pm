@@ -2377,6 +2377,7 @@ sub generate_exported_slots_decls {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
+                           'wchar-t'  => undef,
                          };
     if (!exists $$excluded_types{"$klass_name-t"}) {
       $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . "\n";
