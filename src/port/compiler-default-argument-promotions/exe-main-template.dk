@@ -51,7 +51,7 @@ namespace va { auto func(void*, va_list_t) -> void; }
 auto func(void*, ...) -> void;
 
 namespace va { auto func(void*, va_list_t args) -> void {
-  __TYPE__ arg = va_arg(args, decltype(arg));
+  __TYPE__ arg = va_arg(args, __TYPE__);
   USE(arg);
   return;
 } }

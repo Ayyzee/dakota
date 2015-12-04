@@ -123,7 +123,7 @@ while (my ($promoted_type, $types) = each(%$type_tbl)) {
     open(my $fh, '<', $in_name) or die "Could not open file '$in_name' $!";
     my $filestr = <$fh>;
     close($fh);
-    $filestr =~ s/__TYPE__/$small_type/;
+    $filestr =~ s/__TYPE__/$small_type/g;
     `make clean`;
     my $out_name = 'exe-main.dk';
     open(my $out, '>', $out_name)  or die "Could not open file '$out_name' $!";
