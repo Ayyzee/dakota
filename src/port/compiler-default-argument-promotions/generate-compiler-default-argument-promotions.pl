@@ -86,9 +86,11 @@ my $type_tbl = {
     'uint-fast64::slots-t'  => 1,
   },
   'double-t' => {
+    'std::float32-t'    => 1,
     'float32-t'         => 1,
     'float32::slots-t'  => 1,
 
+    'std::float64-t'    => 1,
     'float64-t'         => 1,
     'float64::slots-t'  => 1,
   },
@@ -103,8 +105,9 @@ my $implementation_defined_signedness = {
 my $o_exts = {
   'g++' =>     'o',
   'clang++' => 'bc',
+  'clang++-3.7.0' => 'bc',
 };
-my $compiler = 'clang++';
+my $compiler = 'clang++-3.7.0';
 my $o_ext = $$o_exts{$compiler};
 
 `$compiler -std=c++11 --output type-index type-index-main.cc`;
