@@ -25,12 +25,16 @@
   }
 # elif defined __darwin__
   # include <mach-o/getsect.h>
+  # include <signal.h>
 
   extern void* __dso_handle;
 
   static inline FUNC dkt_get_segment_data(str_t segment, void** addr_out, size_t* size_out) -> void* {
     *addr_out = cast(void*)getsegmentdata(cast(const struct mach_header_64*)&__dso_handle, segment, size_out);
     return *addr_out;
+  }
+  static inline FUNC strsignal_name(int sig) -> str_t {
+    return sys_signame[sig];
   }
 # else
   # error "Neither __linux__ nor __darwin__ is defined."

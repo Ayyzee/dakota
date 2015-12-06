@@ -33,6 +33,8 @@
 # include <syslog.h>
 # include <dlfcn.h>
 
+# include "dakota-os.hh"
+
 # include "config.hh"
 
 # include "dakota-log.hh"
@@ -1348,7 +1350,7 @@ static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
       if (0 != status)
         sname-demangled = dl-info.dli-sname;
       syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
-             sys-signame[sig], dl-info.dli-fname, sname-demangled, si->si-addr);
+             strsignal-name(sig), dl-info.dli-fname, sname-demangled, si->si-addr);
       if (0 == status)
         free(cast(ptr-t)sname-demangled);
     }
@@ -1357,10 +1359,10 @@ static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
   if (name-from-address(cast(object-t)si->si-addr, &info)) {
     if (nullptr == info.fname) {
       syslog(LOG-ERR, "caught sig%s at named-instance \"%s\" %p\n",
-             sys-signame[sig], info.sname, si->si-addr);
+             strsignal-name(sig), info.sname, si->si-addr);
     } else {
       syslog(LOG-ERR, "caught sig%s in \"%s/%s\" at \"%s::klass\" %p\n",
-             sys-signame[sig], info.fdir, info.fname, info.sname, si->si-addr);
+             strsignal-name(sig), info.fdir, info.fname, info.sname, si->si-addr);
     }
   }
   x::sigaction-handler-t prev-sa-handler =
