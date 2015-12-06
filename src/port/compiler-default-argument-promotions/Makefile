@@ -1,5 +1,10 @@
+rootdir := ../../..
+
+include $(rootdir)/config.mk
+include $(rootdir)/vars.mk
+
 all:
-	./generate-compiler-default-argument-promotions.pl
+	CXX=$(CXX) ./generate-compiler-default-argument-promotions.pl
 
 install:
 	cp compiler-default-argument-promotions.json ../../../lib/dakota
