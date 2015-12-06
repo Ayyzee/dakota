@@ -284,8 +284,30 @@ klass:
   klass-type
   klass
 
+
+bar                     func-name
+foo::bar                qual-func-name
+bar(int, int)           func-overload-signature
+foo::bar(int, int)      qual-func-overload-signature
+bar(int, int)->int      func-signature
+foo::bar(int, int)->int qual-func-signature
+
+[[scope]][[scope]name][[param-types]][return-type]
+
+should signature be called prototype or declaration?
+C++ has a very specific meaning when it mentions 'signature'
+signature: qualified name and parameter types (does not include return type)
 rename __method__ to __method-signature__
 add __klass-type__  (immediately before __klass__)
 add __method__      (immediately after __method-signature__)
 add __method-name__ (immediately after __method__ after __method-signature__)
 add to dkt-capture-current-exception() __klass-type__, __klass__, and __method__ (simple version, not __signature__)
+
+When exceptions are throw (and #src-file and #src-line are added) we
+should also consider adding the SO name if the error occured in an SO
+and not the executable.
+
+Add comments to the #initialize and #finalize in src/klass.dk. The
+code does nothing since we no longer gather that information and write
+it into the info that is registered. But we might want to look them up
+using method-for-selector() and call them.
