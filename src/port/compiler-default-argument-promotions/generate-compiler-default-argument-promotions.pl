@@ -103,13 +103,13 @@ my $implementation_defined_signedness = {
   'wchar::slots-t'   => 1,
 };
 my $o_exts = {
-  'gcc' =>     'o',
-  'gcc-4.8' => 'o',
+  'g++' =>     'o',
+  'g++-4.8' => 'o',
 
-  'clang' =>       'bc',
-  'clang-3.6' =>   'bc',
-  'clang-3.7' =>   'bc',
-  'clang-3.7.0' => 'bc',
+  'clang++' =>       'bc',
+  'clang++-3.6' =>   'bc',
+  'clang++-3.7' =>   'bc',
+  'clang++-3.7.0' => 'bc',
 };
 my $compiler = $ENV{'CXX'};
 my $o_ext = $$o_exts{$compiler};
