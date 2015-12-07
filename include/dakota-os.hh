@@ -18,10 +18,11 @@
 # define      dkt_dakota_os_hh
 
 # if defined __linux__
-  # include <libelf.h>
-
   static inline FUNC dkt_get_segment_data(str_t segment, void** addr_out, size_t* size_out) -> void* {
-    needs work
+    return nullptr;
+  }
+  static inline FUNC strsignal_name(int sig) -> str_t {
+    return "not-yet-implimented: strsignal-name(int-t) -> str-t";
   }
 # elif defined __darwin__
   # include <mach-o/getsect.h>
