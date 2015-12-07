@@ -52,11 +52,9 @@ clean: goal-clean
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 install: $(install-files)
-	if [[ "Darwin" == `uname` ]]; then \
-	  cd $(DESTDIR)$(prefix)/lib/dakota; \
-	  sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-clang.json  compiler.json; \
-	  sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-darwin.json platform.json; \
-  fi
+	cd $(DESTDIR)$(prefix)/lib/dakota; \
+	sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-clang.json  compiler.json; \
+	sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-darwin.json platform.json; \
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
