@@ -25,6 +25,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  clean\
  goal-clean\
  install\
+ ls-install-files\
  precompile\
  uninstall\
 
@@ -55,6 +56,11 @@ install: $(install-files)
 	cd $(DESTDIR)$(prefix)/lib/dakota; \
 	sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-clang.json  compiler.json; \
 	sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-darwin.json platform.json; \
+
+ls-install-files:
+	@for file in $(install-files); do echo $$file; done | sort
+	@echo '-> $(DESTDIR)$(prefix)/lib/dakota/compiler.json'
+	@echo '-> $(DESTDIR)$(prefix)/lib/dakota/platform.json'
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
