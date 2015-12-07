@@ -1,9 +1,6 @@
 $(blddir)/%.tbl: $(srcdir)/%.pl
 	./$< > $@
 
-$(srcdir)/%.dk: $(srcdir)/%.pl
-	./$< > $@
-
 $(blddir)/../bin/%: $(srcdir)/%-main.cc
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(shell ls -t $^)
 $(blddir)/%: $(srcdir)/%-main.cc
