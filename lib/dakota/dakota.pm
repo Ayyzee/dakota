@@ -94,7 +94,7 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_exe_type = undef;
 
-my $cxx_compile_pic_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_PIC_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
+my $cxx_compile_flags =     &dakota::util::var($gbl_compiler, 'CXX_COMPILE_FLAGS',     [ '--compile', '--PIC' ]); # or -fPIC
 my $cxx_output_flags =      &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',      '--output');
 my $cxx_shared_flags =      &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',      '--shared');
 my $cxx_dynamic_flags =     &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS',     '--dynamic');
@@ -427,7 +427,7 @@ sub start_cmd {
   }
   if ($$cmd_info{'opts'}{'compile'}) {
     if ($want_separate_precompile_pass) {
-      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
+      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
       &o_from_cc($cmd_info);
     }
   } elsif (!$ENV{'DKT_PRECOMPILE'}) {
@@ -604,7 +604,7 @@ sub o_from_cc {
   my ($cmd_info) = @_;
     my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$o_cmd{'cmd-major-mode-flags'} = $cxx_compile_pic_flags;
+    $$o_cmd{'cmd-major-mode-flags'} = $cxx_compile_flags;
     $$o_cmd{'cmd-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
     $$o_cmd{'output'} = $$cmd_info{'output'};
     $$o_cmd{'inputs'} = $$cmd_info{'inputs'};
