@@ -5,7 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'CXX' => [ 'clang++-3.7.0' ],
+  'CXX' => [ 'clang++-3.6' ],
   # clang does not understand --visibility=, --non-call-exceptions, nor --asynchronous-unwind-tables
   'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fnon-call-exceptions', '-fasynchronous-unwind-tables' ],
   'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],

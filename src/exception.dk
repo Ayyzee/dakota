@@ -61,7 +61,7 @@ func dkt-capture-current-exception(str-t arg,
 # if defined HAVE-PROCFS
 static char8-t[4 * 1024] gbl-buf;
 func getprogname() -> str-t {
-  int-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
+  ssize-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
     throw make(system-exception::klass, #errnum : errno);
   gbl-buf[n] = NUL;

@@ -1386,7 +1386,7 @@ static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
 }
 static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) -> int-t {
   x::sigaction-t sa {};
-  sa.sa-flags = SA-SIGINFO | SA-RESETHAND | SA-RESTART;
+  sa.sa-flags = cast(decltype(sa.sa-flags))(SA-SIGINFO | SA-RESETHAND | SA-RESTART);
   sigemptyset(&sa.sa-mask);
   sa.sa-sigaction = bus-segv-handler;
   
