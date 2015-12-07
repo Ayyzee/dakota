@@ -1,22 +1,8 @@
 #!/bin/bash
 
-set -o nounset -o errexit -o pipefail
+set -o nounset -o errexit -o pipefail -o verbose
 
 sysname=darwin
 compiler=clang
 
-rm -f config.mk
-rm -f config.sh
-rm -f include/config.hh
-rm -f lib/dakota/compiler.json
-rm -f lib/dakota/platform.json
-
-ln -s config-$sysname-$compiler.mk config.mk
-ln -s config-$sysname.sh config.sh
-pushd src > /dev/null
-ln -s config-$sysname.hh config.hh
-popd > /dev/null # src
-pushd lib/dakota > /dev/null
-ln -s compiler-$compiler.json compiler.json
-ln -s platform-$sysname.json  platform.json
-popd > /dev/null # lib/dakota
+./configure-common $sysname $compiler

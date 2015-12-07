@@ -217,7 +217,7 @@ sub start {
     'json' => $pair_sep,
   };
   foreach my $file (@$argv) {
-    my $data = do $file or die;
+    my $data = do $file or die "cannot evaluate $file: $!";
 
     if ($$opts{'key'}) {
       $data = $$data{$$opts{'key'}} or die;

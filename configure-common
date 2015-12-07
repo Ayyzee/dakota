@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -o nounset -o errexit -o pipefail -o verbose
+
+sysname=$1
+compiler=$2
+
+rm -f config.mk
+rm -f config.sh
+rm -f src/config.hh
+rm -f lib/dakota/compiler.json
+rm -f lib/dakota/platform.json
+
+ln -s config-$sysname-$compiler.mk config.mk
+ln -s config-$sysname.sh config.sh
+
+pushd src
+ln -s config-$sysname.hh config.hh
+popd
+
+pushd lib/dakota
+ln -s compiler-$compiler.json compiler.json
+ln -s platform-$sysname.json  platform.json
+popd
+
+make --directory src/port/compiler-default-argument-promotions install > /dev/null 2>&1
+make --directory src/port/compiler-default-argument-promotions clean
