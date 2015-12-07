@@ -181,7 +181,8 @@ sub scalar_to_file {
 }
 sub kw_args_translate {
   my ($parse_tree) = @_;
-  while (my ($generic, $discarded) = each(%{$$parse_tree{'generics'}})) {
+  my $keys = [sort keys %{$$parse_tree{'generics'}}];
+  foreach my $generic (@$keys) {
     my $va_generic = $generic;
 
     if ($generic =~ s/^va:://) {
@@ -329,7 +330,6 @@ sub init_rep_from_dk_vars {
 }
 sub str_from_cmd_info {
   my ($cmd_info) = @_;
-  #my $global_output_flags_tbl = { 'g++' => '--output', 'dakota-info' => '--output' };
 
   my $str = '';
   if (defined $$cmd_info{'cmd'}) {
@@ -346,7 +346,6 @@ sub str_from_cmd_info {
   if ($$cmd_info{'output-directory'}) {
     $str .= " --output-directory $$cmd_info{'output-directory'}";
   }
-  #{ $str .= " $$global_output_flags_tbl{$$cmd_info{'cmd'}} $$cmd_info{'output'}"; }
   if ($$cmd_info{'cmd-flags'}) {
     $str .= " $$cmd_info{'cmd-flags'}";
   }

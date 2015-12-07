@@ -228,12 +228,11 @@ sub start {
       my $keys = [ keys %$data ];
 
       if (1 == scalar @$keys) {
-        my $prefix = $$keys[0];
-        my $subdata = $$data{$$keys[0]};
+        my $key = $$keys[0];
 
-        if ($$subdata{'srcs'} && $$subdata{'output'}) { # min requirements
-          $$opts{'prefix'} = $prefix;
-          $data = $subdata;
+        if (&is_tbl($$data{$key}) && exists $$data{$key}{'srcs'} && exists $$data{$key}{'output'}) { # min requirements
+          $$opts{'prefix'} = $key;
+          $data = $$data{$key};
         }
       }
     }

@@ -81,7 +81,7 @@
       '$(srcdir)/vector.dk',
     ],
     'libs' => [ # cmd-line
-      '/usr/lib/libdl.$(so_ext)',
+      '/usr/lib/$(target-triplet)/libdl.$(so_ext)',
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)',

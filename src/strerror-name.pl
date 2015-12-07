@@ -19,7 +19,7 @@ foreach my $path (glob "/usr/include/{*/,}errno.h") {
   close($in);
 }
 foreach my $key (keys %$err_set) {
-  print "\#if defined $key\n";
+  print "\# if defined $key\n";
   print "  set_name($key, \"$key\");\n";
-  print "\#endif\n";
+  print "\# endif\n";
 }

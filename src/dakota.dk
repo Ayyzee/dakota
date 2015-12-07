@@ -796,10 +796,10 @@ static func remove-dir(str-t path) -> str-t {
   assert(NUL != result[0]); // not empty-string
   return result;
 }
-[[unused]] static func remove-ext(str-t path) -> str-t {
-  char8-t* dot = strrchr(path, '.');
+[[unused]] static func remove-ext(char8-t* path) -> str-t {
+  const char8-t* dot = strrchr(cast(const char8-t*)path, '.');
   if (nullptr != dot)
-    *dot = NUL;
+    *(const-cast<char8-t*>(dot)) = NUL;
   assert(NUL != path[0]); // not empty-string
   return path;
 }

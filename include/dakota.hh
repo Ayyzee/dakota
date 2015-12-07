@@ -40,7 +40,7 @@ namespace dkt {
     else
       return nullptr;
   }
-# else // does nothing if not g++
+# else // does nothing if not gcc/clang (g++/clang++)
   inline FUNC demangle(str_t mangled_name) -> str_t {
     return name;
   }

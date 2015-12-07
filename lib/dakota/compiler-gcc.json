@@ -6,7 +6,7 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'CXX' => [ 'g++' ],
-  'CXXFLAGS' => [ '-std=c++14', '--visibility=hidden', '--non-call-exceptions', '--asynchronous-unwind-tables' ],
+  'CXXFLAGS' => [ '-std=c++11', '--visibility=hidden', '--non-call-exceptions', '--asynchronous-unwind-tables' ],
   'CXX_COMPILE_FLAGS' =>     [ '--compile' ],
   'CXX_COMPILE_PIC_FLAGS' => [ '--compile', '--PIC' ],
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic' ],
