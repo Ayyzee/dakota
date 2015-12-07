@@ -11,8 +11,8 @@
     'append' => 2               # rhs = num-fixed args
   },
   'visibility' => {             # constant for a language
-    'export'   => 1,
-    'import'   => 1,
+    'SO-EXPORT'   => 1,
+    'SO-IMPORT'   => 1,
   },
     'array' =>            { 'open'  => { '[' => 1 },
                             'close' => { ']' => 1 } },
