@@ -1,0 +1,39 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+{
+  'used-klasses' => [
+    #{ 'pattern' => [ '#(', '?ident', ':'   ], 'result' => [ 'pair'                 ] },
+
+    #{ 'pattern' => [ '#[',           ','   ], 'result' => [ 'vector'               ] },
+    #{ 'pattern' => [ '#[', '?ident', ','   ], 'result' => [ 'vector'               ] },
+
+    #{ 'pattern' => [ '#{',           ','   ], 'result' => [ 'hashed-set'           ] },
+    #{ 'pattern' => [ '#{',           ':'   ], 'result' => [ 'hashed-table', 'pair' ] },
+    #{ 'pattern' => [ '#{', '?ident', ','   ], 'result' => [ 'hashed-set'           ] },
+    #{ 'pattern' => [ '#{', '?ident', ':'   ], 'result' => [ 'hashed-table', 'pair' ] },
+
+    #{ 'pattern' => [ '?qual-scope', '::', 'box',    ], },
+    #{ 'pattern' => [ '?qual-scope', '::', 'unbox',  ], },
+    #{ 'pattern' => [ '?qual-scope', '::', 'slots-t' ], },
+  ],
+  'used-generics' => [
+    { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name', '(', 'super' ], },
+    { 'name' => 'supers',   'range' => [2,2], 'pattern' => [ 'dk', '::',              '?method-name', '(', 'super' ], },
+
+    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name'               ], },
+    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'dk', '::',              '?method-name'               ], },
+
+    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'SELECTOR',  '(', 'va', '::', '?method-name', '('     ], },
+    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'SELECTOR',  '(',             '?method-name', '('     ], },
+
+    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'SIGNATURE', '(', 'va', '::', '?method-name', '('     ], },
+    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'SIGNATURE', '(',             '?method-name', '('     ], },
+
+    { 'name' => 'generics', 'range' => [0,2], 'pattern' => [ 'va', '::', 'make', '(' ], },
+    { 'name' => 'generics', 'range' => [0,0], 'pattern' => [             'make', '(' ], },
+  ],
+}

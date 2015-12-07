@@ -1,0 +1,145 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
+{ 'libdakota' => {
+    'srcs' => [ # cmd-line
+      '$(srcdir)/autorelease-pool.dk',
+      '$(srcdir)/bit-vector.dk',
+      '$(srcdir)/boole.dk',
+      '$(srcdir)/char.dk',
+      '$(srcdir)/collection.dk',
+      '$(srcdir)/const-info.dk',
+      '$(srcdir)/counted-set.dk',
+      '$(srcdir)/dakota.dk',
+      '$(srcdir)/deque.dk',
+      '$(srcdir)/dl.dk',
+      '$(srcdir)/enum-info.dk',
+      '$(srcdir)/equal-predicate.dk',
+      '$(srcdir)/exception.dk',
+      '$(srcdir)/exe-type.dk',
+      '$(srcdir)/forward-iterator.dk',
+      '$(srcdir)/hash.dk',
+      '$(srcdir)/illegal-klass-exception.dk',
+      '$(srcdir)/input-stream.dk',
+      '$(srcdir)/int.dk',
+      '$(srcdir)/iter-pair.dk',
+      '$(srcdir)/keyword-exception.dk',
+      '$(srcdir)/keyword.dk',
+      '$(srcdir)/klass.dk',
+      '$(srcdir)/method-alias.dk',
+      '$(srcdir)/method.dk',
+      '$(srcdir)/missing-keyword-exception.dk',
+      '$(srcdir)/module-dakota.dk',
+      '$(srcdir)/named-enum-info.dk',
+      '$(srcdir)/named-info.dk',
+      '$(srcdir)/no-such-keyword-exception.dk',
+      '$(srcdir)/no-such-method-exception.dk',
+      '$(srcdir)/no-such-slot-exception.dk',
+      '$(srcdir)/number.dk',
+      '$(srcdir)/object-input-stream.dk',
+      '$(srcdir)/object-output-stream.dk',
+      '$(srcdir)/object.dk',
+      '$(srcdir)/output-stream.dk',
+      '$(srcdir)/pair.dk',
+      '$(srcdir)/property.dk',
+      '$(srcdir)/ptr.dk',
+      '$(srcdir)/result.dk',
+      '$(srcdir)/selector-node.dk',
+      '$(srcdir)/selector.dk',
+      '$(srcdir)/sequence.dk',
+      '$(srcdir)/set.dk',
+      '$(srcdir)/signal-exception.dk',
+      '$(srcdir)/signature.dk',
+      '$(srcdir)/singleton-klass.dk',
+      '$(srcdir)/size.dk',
+      '$(srcdir)/sorted-array.dk',
+      '$(srcdir)/sorted-counted-set.dk',
+      '$(srcdir)/sorted-ptr-array.dk',
+      '$(srcdir)/sorted-set.dk',
+      '$(srcdir)/sorted-table.dk',
+      '$(srcdir)/stack.dk',
+      '$(srcdir)/std-compare.dk',
+      '$(srcdir)/str.dk',
+      '$(srcdir)/stream.dk',
+      '$(srcdir)/str128.dk',
+      '$(srcdir)/str256.dk',
+      '$(srcdir)/str32.dk',
+      '$(srcdir)/str512.dk',
+      '$(srcdir)/str64.dk',
+      '$(srcdir)/strerror-name.dk',
+      '$(srcdir)/string.dk',
+      '$(srcdir)/super.dk',
+      '$(srcdir)/symbol.dk',
+      '$(srcdir)/system-exception.dk',
+      '$(srcdir)/table.dk',
+      '$(srcdir)/trace.dk',
+      '$(srcdir)/unbox-illegal-klass-exception.dk',
+      '$(srcdir)/vector.dk',
+    ],
+    'libs' => [ # cmd-line
+      '/usr/lib/$(target-triplet)/libdl.$(so_ext)',
+    ],
+    'include-dirs' => [ # cmd-line
+      '$(srcdir)',
+      '$(srcdir)/../include',
+    ],
+    'macros' => [ # cmd-line
+      'DKT_WORKAROUND',
+      'HAVE_CONFIG_HH',
+    ],
+    'output' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
+    'compatibility-version' => '1.0.0',                 # cmd-line
+    'current-version' =>       '1.0.0',                 # cmd-line
+    'soname' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
+    'install' => {
+      '-rules' => [
+        '$(DESTDIR)$(prefix)/%', '$(srcdir)/../%',
+        '$(DESTDIR)$(prefix)/%', '$(blddir)/../%',
+      ],
+      'files' => [ # install.files
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-default-argument-promotions.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/platform-darwin.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/platform-linux.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/header-from-symbol.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/lang-user-data.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/used.json',
+
+        '$(DESTDIR)$(prefix)/lib/dakota/macros.pl',
+
+        '$(DESTDIR)$(prefix)/lib/dakota/dakota.pm',
+        '$(DESTDIR)$(prefix)/lib/dakota/generate.pm',
+        '$(DESTDIR)$(prefix)/lib/dakota/macro_system.pm',
+        '$(DESTDIR)$(prefix)/lib/dakota/parse.pm',
+        '$(DESTDIR)$(prefix)/lib/dakota/rewrite.pm',
+        '$(DESTDIR)$(prefix)/lib/dakota/sst.pm',
+        '$(DESTDIR)$(prefix)/lib/dakota/util.pm',
+
+        '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)',
+
+        '$(DESTDIR)$(prefix)/include/dakota-decl.hh',
+        '$(DESTDIR)$(prefix)/include/dakota-finally.hh',
+        '$(DESTDIR)$(prefix)/include/dakota-log.hh',
+        '$(DESTDIR)$(prefix)/include/dakota-os.hh',
+        '$(DESTDIR)$(prefix)/include/dakota.hh',
+
+        '$(DESTDIR)$(prefix)/bin/dakota',
+        '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr.pl',
+        '$(DESTDIR)$(prefix)/bin/dakota-project',
+        '$(DESTDIR)$(prefix)/bin/dakota-json2mk',
+      ],
+      '-home' => [ # install.home
+        '$(srcdir)/home/.dakota/.bashrc',
+        '$(srcdir)/home/.dakota/.gdbinit',
+        '$(srcdir)/home/.dakota/emacs/dakota-mode.el',
+        '$(srcdir)/home/.dakota/emacs/init.el',
+      ],
+    }
+  }
+}

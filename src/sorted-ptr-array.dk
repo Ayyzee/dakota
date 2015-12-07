@@ -1,0 +1,158 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cstdlib>
+# include <cstring>
+
+# include "sorted-ptr-array.hh"
+
+module dakota;
+
+klass result;
+klass std-compare;
+
+klass sorted-ptr-array {
+  slots {
+    ptr-t*        elements;
+    uint32-t      count;
+    uint32-t      capacity;
+    uint32-t      size;
+    std-compare-t compare;
+  }
+  func create(uint32-t capacity, uint32-t size, std-compare-t compare) -> slots-t* {
+    assert(0 != capacity);
+    assert(0 != size);
+    assert(nullptr != compare);
+    slots-t* result = cast(slots-t*)dkt::alloc(sizeof(slots-t));
+    result->elements = cast(ptr-t*)dkt::alloc(size * capacity);
+    result->count =    0;
+    result->capacity = capacity;
+    result->size =     size;
+    result->compare =  compare;
+    return result;
+  }
+  func sort(slots-t* t) -> slots-t* {
+    qsort(t->elements, t->count, t->size, t->compare);
+    return t;
+  }
+  
+  //(-(insertion point) - 1)
+  func search(slots-t* t, const void* key) -> result-t {
+    assert(nullptr != key);
+
+    result-t result = { nullptr, UINT32-MAX };
+    int-t comparison;
+    boole-t increment? = false;
+
+    uint32-t i = 0;
+    uint32-t l = 0;
+    uint32-t u = t->count;
+
+    while (l < u) {
+      i = l + ((u - l) / 2); // calc midpoint without overflowing
+      const void** p = cast(const void**)(cast(uint8-t*)(t->elements) + (i * t->size));
+      comparison = t->compare(key, *p);
+
+      if (0 > comparison) {
+        increment? = false;
+        u = i;
+      }
+      else-if (0 < comparison) {
+        increment? = true;
+        l = i + 1;
+      } else {
+        result.element = *p;
+        break;
+      }
+    }
+    if (nullptr == result.element && increment?)
+      i++;
+    result.offset = i;
+    return result;
+  }
+  func add-at(slots-t* t, const void* key, uint32-t offset) -> slots-t* {
+    assert(nullptr != key);
+    assert(offset <= t->count);
+
+    memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
+            cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
+            (t->count - offset) * t->size);
+    memcpy(cast(uint8-t*)(t->elements) + (t->size * (offset + 0)), &key, t->size);
+    t->count++;
+    return t;
+  }
+  func at(slots-t* t, uint32-t offset) -> const void* {
+    assert(offset < t->count);
+    assert(0 < t->count);
+
+    const void* element = *cast(const void**)(cast(uint8-t*)(t->elements) + (t->size * offset));
+    return element;
+  }
+  // key not required
+  func remove-at(slots-t* t, const void* key, uint32-t offset) -> const void* {
+    assert(offset < t->count);
+    assert(0 < t->count);
+
+    const void* element = at(t, offset);
+    memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
+            cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
+            (t->count - offset - 1) * t->size); // this arg may be zero
+    if (nullptr != key)
+      assert(0 == t->compare(key, element));
+    memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, t->size);
+    t->count--;
+    return element;
+  }
+  func add(slots-t* t, const void* key) -> slots-t* {
+    assert(nullptr != key);
+
+    result-t result = search(t, key);
+    if (nullptr == result.element)
+      add-at(t, key, result.offset);
+    return t;
+  }
+  func intern(slots-t* t, const void* key) -> const void* {
+    assert(nullptr != key);
+    const void* element = key;
+    result-t result = search(t, key);
+
+    if (nullptr != result.element)
+      element = result.element;
+    else
+      add-at(t, key, result.offset);
+    return element;
+  }
+  func remove-last(slots-t* t) -> const void* {
+  //assert(0 < t->count);
+
+    const void* element;
+    if (0 != t->count) {
+      element = at(t, t->count - 1);
+      memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, t->size);
+      t->count--;
+    } else {
+      element = nullptr;
+    }
+    return element;
+  }
+  func bsearch(slots-t* t, const void* key) -> const void* {
+    assert(nullptr != key);
+ 
+    result-t result = search(t, key);
+    return result.element;
+  }
+}

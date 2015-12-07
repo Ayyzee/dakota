@@ -1,0 +1,82 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+
+module dakota;
+
+klass output-stream;
+
+klass keyword-exception {
+  superklass exception;
+
+  slots {
+    object-t     object;
+    signature-t* signature;
+    symbol-t     keyword;
+  }
+  method init(object-t     self,
+              str-t        src-time :,
+              str-t        src-date :,
+              str-t        src-file :,
+              int-t        src-line :,
+              object-t     object :,
+              signature-t* signature :,
+              symbol-t     keyword :) -> object-t {
+    self = $init(super, #src-time : src-time, #src-date : src-date, #src-file : src-file, #src-line : src-line);
+    self.object =    object;
+    self.signature = signature;
+    self.keyword =   keyword;
+    return self;
+  }
+  method dump(object-t self) -> object-t {
+    $dump(super);
+    fprintf(stderr, "\"%s\": {", $utf8-from(self));
+    fprintf(stderr, " \"object\": [ %p, \"%s\" ]",
+            cast(ptr-t)self.object,
+            $utf8-from(self.object));
+    fprintf(stderr, ", \"signature\": [ %p, \"%s(%s)\" ]",
+            cast(ptr-t)self.signature,
+            self.signature->name,
+            self.signature->parameter-types);
+    fprintf(stderr, ", \"keyword\": [ %p, \"#%s\" ]",
+            cast(ptr-t)self.keyword,
+            self.keyword);
+    fprintf(stderr, " }\n");
+    $dump(self.object);
+    return self;
+  }
+  method print(object-t self, object-t out) -> object-t {
+    $print(super, out);
+    assert(nullptr != self.object);
+    assert(nullptr != self.signature);
+    assert(nullptr != self.keyword);
+
+    // if ($instance?(self.object, klass::klass)) {
+    //   $print-format(out, ", \"instance\": \"%s\"", name-of(self.object));
+    // } else {
+    //   $print-format(out, ", \"instance\": \"%s\"", $utf8-from(self.object));
+    // }
+    $print-format(out,
+                  ", \"keyword\": \"#%s\""
+                  ", \"klass\": \"%s\""
+                  ", \"method\": \"%s(%s)\"",
+                  self.keyword,
+                  name-of(klass-of(self.object)),
+                  self.signature->name, self.signature->parameter-types);
+    return self;
+  }
+}

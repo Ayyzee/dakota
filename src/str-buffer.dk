@@ -1,0 +1,99 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cinttypes>
+# include <cstring>
+
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
+
+module dakota-util;
+
+// same code as in klass string (badbad)
+klass object-output-stream;
+
+klass str-buffer {
+  slots {
+    char8-t* ptr;
+    uint32-t len;
+    uint32-t capacity;
+  }
+  method init(object-t self, uint32-t capacity : 8) -> object-t {
+    self = $init(super);
+    self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * capacity);
+    self.ptr[0] = NUL;
+    self.len = 0;
+    self.capacity = capacity;
+    return self;
+  }
+  method dealloc(object-t self) -> object-t {
+    dkt::dealloc(self.ptr);
+    object-t result = $dealloc(super);
+    return result;
+  }
+  method write-slots(object-t self, object-t out) -> object-t {
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+
+    $write-element(out, self.ptr, "ptr");
+    $write-element(out, self.len, "len");
+    $write-element(out, self.capacity, "capacity");
+
+    $write-slots-end(out);
+    return self;
+  }
+  method dump(slots-t* s) -> slots-t*{
+  //$dump(super);
+    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%u, capacity=%u }\n",
+            cast(ptr-t)nullptr, cast(ptr-t)(s), s->ptr, s->len, s->capacity);
+    return s;
+  }
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
+    int-t result = safe-strcmp(s->ptr, other-s->ptr);
+    result = dkt-normalize-compare-result(result);
+    return result;
+  }
+  method compare(object-t self, object-t other) -> int-t {
+    int-t result;
+
+    if ($instance?(other, klass)) {
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = compare(&s1, &s2);
+    } else {
+      result = $compare(super, other);
+    }
+    result = dkt-normalize-compare-result(result);
+    return result;
+  }
+  method length(slots-t* s) -> uint32-t {
+    if (0    == s->len &&
+        nullptr != s->ptr &&
+        NUL  != s->ptr[0])
+      s->len = cast(uint32-t)safe-strlen(s->ptr);
+    return s->len;
+  }
+  method concat(slots-t* s, char8-t c) -> slots-t*{
+    assert(NUL != c);
+    assert(s->len + 1 != s->capacity);
+      
+    s->ptr[s->len] = c;
+    s->len++;
+    s->ptr[s->len] = NUL;
+    return s;
+  }
+}

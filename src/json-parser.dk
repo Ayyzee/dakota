@@ -1,0 +1,410 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cctype>
+# include <cerrno>
+# include <cstdlib>
+# include <cstring>
+
+module dakota-util;
+
+klass exception;
+klass hashed-table;
+klass pair;
+klass str128;
+klass string;
+klass token;
+klass tokenid;
+klass vector;
+
+[[format-printf(4)]] static
+func print-error(str-t file, uint32-t line, uint32-t column, str-t format, ...) -> int-t{
+  int-t result = fprintf(stderr, "%s:%i:%i ", file, line, column);
+  if (-1 != result) {
+    va-list-t args;
+    va-start(args, format);
+    result += vfprintf(stderr, format, args);
+    va-end(args);
+  }
+  return result;
+}
+klass json-parser {  
+  slots {
+    stream-t   in;
+    str-t    file;
+    uint32-t line;
+    uint32-t column;
+  }
+    
+  method init(object-t self,
+                       stream-t stream :   stdin,
+                       str-t    file : nullptr) -> object-t {
+    self = $init(super);
+    assert(!(stdin != stream &&
+             nullptr  != file)); // these are mutually exclusive
+
+    if (nullptr != file) {
+      self.file = file;
+      self.in =       fopen(self.file, "r");
+  
+      if (nullptr == self.in) {
+        str128-t buf = "";
+        strerror-r(errno, buf, sizeof(buf));
+        fprintf(stderr, "%s: %s", file, buf);
+        throw make(exception::klass, #msg : "oops");
+      }
+    } else {
+      self.file = nullptr;
+      self.in =       stream;
+    }
+    self.line =     1;
+    self.column =   0;
+    return self;
+  }
+  method read(object-t self, ptr-t buffer, uint32-t element-size, uint32-t num-elements-max) -> uint32-t {
+    uint32-t num-elements-read = cast(uint32-t)fread(buffer, cast(size-t)element-size, cast(size-t)num-elements-max, self.in);
+    
+    // fread() does not distinguish between end-of-file and error, and callers must use
+    // feof(3) and ferror(3) to determine which occurred.
+    
+    return num-elements-read;
+  }
+  /* method */ static void putback(object-t self, int32-t c) {
+    if ('\n' == c)
+      self.line--;
+      // where is column left?
+    else
+      self.column--;
+    ungetc(c, self.in);
+    return;
+  }
+  /* method */ static int32-t get(object-t self) {
+    int32-t c = getc(self.in);
+    if (EOF != c) {
+      if ('\n' == c) {
+        self.line++;
+        self.column = 0;
+      } else {
+        self.column++;
+      }
+    }
+    return c;
+  }
+  //void error-msg(char8-t* file, uint32-t line, uint32-t column, str-t msg0, ...); // one or more msg strings
+
+  /* method */ static object-t lex(object-t self) {
+    int32-t c;
+    while (1) {
+      while (isspace(c = json-parser::get(self))) {
+      }
+      if (EOF == c)
+      { return null; }
+      switch (c) {
+        // self.column needs to be adjusted by the length of the token
+        case '[': { return make(token::klass, #tokenid : '[', #buffer : "[",
+                                #line : self.line, #column : self.column - 1); }
+        case ']': { return make(token::klass, #tokenid : ']', #buffer : "]",
+                                #line : self.line, #column : self.column - 1); }
+        case '{': { return make(token::klass, #tokenid : '{', #buffer : "{",
+                                #line : self.line, #column : self.column - 1); }
+        case '}': { return make(token::klass, #tokenid : '}', #buffer : "}",
+                                #line : self.line, #column : self.column - 1); }
+        case ',': { return make(token::klass, #tokenid : ',', #buffer : ",",
+                                #line : self.line, #column : self.column - 1); }
+        case '#': {
+          while ('\n' != (c = json-parser::get(self))) {
+            if (EOF == c)
+              return null;
+          }
+          break;
+        }
+        case '=': {
+          c = json-parser::get(self);
+          if (EOF == c || '>' != c) {
+            print-error(self.file, self.line, self.column - 2, "unknown token '='\n");
+            return null;
+          } else {
+            return make(token::klass, #tokenid : ':', #buffer : ":",
+                        #line : self.line, #column : self.column - 2);
+          }
+        }
+        case '\'': {
+          int32-t quote-type = '\'';
+          object-t token = make(token::klass, #tokenid : 'sqst',
+                                #line : self.line, #column : self.column - 1);
+          boole-t escaped?;
+          c = json-parser::get(self);
+          if (EOF == c) {
+            print-error(self.file, self.line, self.column, "unterminated string\n");
+            return null;
+          }
+          if (quote-type == c)
+            return token; // empty string
+          do {
+            $append(token, cast(uint32-t)c);
+
+            if ('\\' == c)
+              escaped? = true;
+            else
+              escaped? = false;
+
+            c = json-parser::get(self);
+            if (EOF == c) {
+              print-error(self.file, self.line, self.column, "unterminated string\n");
+              return null;
+            }
+          } while ((quote-type != c) || escaped?);
+            
+          return token;
+        }
+        //case '"':
+        //{
+        //}
+        case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':
+        case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
+        case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':
+        case 'v': case 'w': case 'x': case 'y': case 'z':
+
+        case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
+        case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
+        case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':
+        case 'V': case 'W': case 'X': case 'Y': case 'Z':
+
+        case '0': case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '8': case '9':
+            
+        case '_': {
+          object-t token = make(token::klass, #tokenid : 'st', // 'st' should be 'idnt'
+                                #line : self.line, #column : self.column - 1);
+          do {
+            $append(token, cast(uint32-t)c);
+            c = json-parser::get(self);
+          } while (isalnum(c) || '_' == c);
+          if (EOF != c)
+            json-parser::putback(self, c);
+          return token;
+        }
+        default: {
+          print-error(self.file, self.line, self.column, "unknown token '%c'\n", c);
+          return null;
+        }
+      }
+    }
+  }
+    
+  /* method */ object-t get-table(object-t self);
+  /* method */ object-t get-vector(object-t self);
+
+  /* method */ static object-t key(object-t self) {
+    object-t token = json-parser::lex(self);
+    if (null == token) {
+      print-error(self.file, self.line, self.column, "incomplete table\n");
+      return null;
+    }
+    object-t key;
+    switch ($tokenid(token)) {
+      case 'sqst':
+        key = make(string::klass, #bytes : $buffer(token));
+        break;
+      case 'dqst':
+        key = make(string::klass, #bytes : $buffer(token));
+        break;
+      case 'st':
+        key = make(string::klass, #bytes : $buffer(token));
+        break;
+      case '}':
+        return null;
+      default:
+        print-error(self.file, self.line, self.column, "expected <string> or '}' but got '%s'\n", $buffer(token));
+        return null;
+    }
+    return key;
+  }
+  /* method */ static object-t get-corresponds-to(object-t self) {
+    object-t token = json-parser::lex(self);
+    if (null == token) {
+      print-error(self.file, self.line, self.column, "incomplete table\n");
+      return null;
+    }
+    if ($tokenid(token) != ':') {
+      print-error(self.file, self.line, self.column, "expected ':' but got '%s'\n", $buffer(token));
+      return null;
+    }
+    return make(string::klass, #bytes : $buffer(token));
+  }
+  /* method */ static object-t get-element(object-t self)
+  { // get table element - element is NOT optional
+    object-t token = json-parser::lex(self);
+    if (null == token) {
+      print-error(self.file, self.line, self.column, "incomplete table\n");
+      return null;
+    }
+    object-t element;
+    switch ($tokenid(token)) {
+      case 'null':
+        element = null;
+        break;
+      case 'sqst':
+        element = make(string::klass, #bytes : $buffer(token));
+        break;
+      case 'dqst':
+        element = make(string::klass, #bytes : $buffer(token));
+        break;
+      case 'st':
+        element = make(string::klass, #bytes : $buffer(token));
+        break;
+      case '{':
+        element = json-parser::get-table(self);
+        break;
+      case '[':
+        element = json-parser::get-vector(self);
+        break;
+      default:
+        print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
+        return null;
+    }
+    return element;
+  }
+  /* method */ static object-t element(object-t self)
+  { // get vector element - element is optional
+    object-t token = json-parser::lex(self);
+    if (null == token) {
+      print-error(self.file, self.line, self.column, "incomplete table\n");
+      return null;
+    }
+    object-t element;
+    switch ($tokenid(token)) {
+      case 'null':
+        element = null;
+        break;
+      case 'sqst':
+        element = make(string::klass, #bytes : $buffer(token));
+        break;
+      case 'dqst':
+        element = make(string::klass, #bytes : $buffer(token));
+        break;
+      case 'st':
+        element = make(string::klass, #bytes : $buffer(token));
+        break;
+      case '{':
+        element = json-parser::get-table(self);
+        break;
+      case '[':
+        element = json-parser::get-vector(self);
+        break;
+      case ']': // only difference from get-element()
+        return null;
+      default:
+        print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' or ']' but got '%s'\n", $buffer(token));
+        return null;
+    }
+    return element;
+  }
+  /* method */ static object-t get-table-pair(object-t self) {
+    object-t key = json-parser::key(self);
+    if (null == key)
+      return nullptr;
+    object-t corresponds-to = json-parser::get-corresponds-to(self);
+    if (null == corresponds-to)
+      return nullptr;
+    object-t element = json-parser::get-element(self);
+    if (null == element)
+      return nullptr;
+    return pair::box({key, element});
+  }
+  // hackhack - multiple return statements
+  /* method */ object-t get-vector(object-t self) {
+    object-t vector = make(vector::klass);
+    object-t token;
+    do {
+      object-t element = json-parser::element(self);
+      if (null == element)
+        return vector;
+
+      // add 'element' to 'vector'
+      $add-last(vector, element);
+
+      token = json-parser::lex(self);
+      if (null == token) {
+        print-error(self.file, self.line, self.column, "incomplete vector\n");
+        return null;
+      }
+    } while (',' == $tokenid(token));
+      
+      
+    if (']' != $tokenid(token)) {
+      print-error(self.file, self.line, self.column, "expected ',' or ']' but got '%s'\n", $buffer(token));
+      return null;
+    }
+    return vector;
+  }
+  /* method */ object-t get-table(object-t self) {
+    object-t table = make(hashed-table::klass);
+    object-t token;
+    do {
+      object-t table-pair = json-parser::get-table-pair(self);
+      if (nullptr == table-pair)
+        return table;
+
+      // add 'table-pair' to 'table'
+      $add(table, table-pair);
+
+      token = json-parser::lex(self);
+      if (null == token) {
+        print-error(self.file, self.line, self.column, "incomplete table\n");
+        return null;
+      }
+    } while (',' == $tokenid(token));
+      
+    if ('}' != $tokenid(token)) {
+      print-error(self.file, self.line, self.column, "expected ',' or '}' but got '%s'\n", $buffer(token));
+      return null;
+    }
+    return table;
+  }
+    
+  //      method read-property-list(object-t self)
+  //      {
+  //        object-t token;
+  //        while (null != (token = json-parser::lex(self)))
+  //          $token::print(token, stdout) -> object-t _;
+  //        return null;
+  //      }
+  method read-property-list(object-t self) -> object-t {
+    object-t token = json-parser::lex(self);
+    if (null == token)
+      return null;
+
+    switch ($tokenid(token)) {
+      case 'null':
+        return null;
+      case 'sqst':
+        return make(string::klass, #bytes : $buffer(token));
+      case 'dqst':
+        return make(string::klass, #bytes : $buffer(token));
+      case 'st':
+        return make(string::klass, #bytes : $buffer(token));
+      case '{':
+        return json-parser::get-table(self);
+      case '[':
+        return json-parser::get-vector(self);
+      default:
+        print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
+        return null;
+    }
+  }
+}

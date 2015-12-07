@@ -1,0 +1,63 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cstring>
+
+module dakota-util;
+
+klass output-stream;
+klass token;
+
+klass syntax-exception {
+  superklass exception;
+
+  slots {
+    object-t token;
+    str-t    file;
+    str-t    msg;
+  }
+  method init(object-t self,
+              str-t    src-time :,
+              str-t    src-date :,
+              str-t    src-file :,
+              int-t    src-line :,
+              object-t token :,
+              str-t    file :,
+              str-t    msg :  name-of(klass-of(self))) -> object-t {
+    self = $init(super, #src-time : src-time, #src-date : src-date, #src-file : src-file, #src-line : src-line);
+    self.token = token;
+    self.file =  file;
+    self.msg =   msg;
+    return self;
+  }
+  method print-shallow(object-t self, object-t out) -> object-t {
+    assert(nullptr != out);
+    if (null == out)
+      out = std-error;
+    $print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
+                    self.file, $line(self.token), $column(self.token), $buffer(self.token), self.msg);
+    return self;
+  }
+  method print(object-t self, object-t out) -> object-t {
+    assert(nullptr != out);
+    if (null == out)
+      out = std-error;
+    $print(super, out);
+    $print-shallow(self, out);
+    return self;
+  }
+}

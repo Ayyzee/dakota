@@ -1,0 +1,178 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cinttypes>
+# include <cstdlib>
+# include <cstring>
+
+# include "dakota-private.hh"
+# include "named-info.hh"
+
+module dakota;
+
+klass property;
+klass std-compare;
+klass symbol;
+
+klass named-info {
+  slots {
+    property-t* elements; // property
+    uint32-t    count;    // sizeof(property)/sizeof(property[0])
+  //            size = sizeof(property::slots-t)
+  //            compare = property::compare()
+    slots-t*    next;
+  }
+  method init(object-t self, slots-t slots : {.elements = nullptr, .count = 0, .next = nullptr}) -> object-t {
+    self = $init(super);
+    unbox(self) = slots;
+    return self;
+  }
+  method check(slots-t* s) -> int32-t {
+    for (uint32-t i = 0; i < s->count; i++) {
+      // need to add test for #name (since its required)
+
+      property-t element = s->elements[i];
+      property::check(&element);
+    }
+    return 0;
+  }
+  method sort(slots-t* s) -> slots-t* {
+    qsort(s->elements, s->count, sizeof(s->elements[0]),
+          cast(std-compare-t)cast(auto (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
+    return s;
+  }
+  method search(slots-t* s, symbol-t key) -> property-t* {
+    property::slots-t property = { cast(symbol-t)key, cast(uintptr-t)0 };
+    property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
+                                                                cast(std-compare-t)cast(auto (*)(property::slots-t*,
+                                                                                                 property::slots-t*) -> int-t)property::compare);
+    return result;
+  }
+  method at(slots-t* s, symbol-t key) -> uintptr-t {
+    uintptr-t element = 0;
+    property::slots-t* property = search(s, key);
+    if (nullptr != property)
+      element = property->element;
+    return element;
+  }
+  method at(slots-t* s, symbol-t key, uintptr-t default-element) -> uintptr-t {
+    uintptr-t element = at(s, key);
+    if (0 == element) // aka: if (nullptr == element)
+      element = default-element;
+    return element;
+  }
+  method dump(slots-t* s) -> slots-t*{
+    slots-t* current = s;
+    while (nullptr != current) {
+      printf("{\n");
+      for (uint32-t i = 0; i < current->count; i++) {
+        symbol-t key = current->elements[i].key;
+        uintptr-t element = current->elements[i].element;
+        printf("  #%s : %p", key, cast(ptr-t)element);
+
+        switch (key) {
+          case #file:
+            printf("  \"%s\",", cast(str-t)(element));
+            break;
+          case #name:
+          case #type:
+            printf("  #%s,",    cast(symbol-t)(element));
+            break;
+        }
+        printf("\n");
+      }
+      printf("},\n");
+      current = current->next;
+    }
+    return s;
+  }
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
+    symbol-t s-name = cast(symbol-t)at(s, #name);
+    symbol-t other-name = cast(symbol-t)at(other-s, #name);
+    //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
+    int-t result = symbol::compare(s-name, other-name);
+    return result;
+  }
+  method compare(slots-t** s, slots-t** other-s) -> int-t {
+    int-t result = compare(*s, *other-s);
+    return result;
+  }
+  method compare(object-t self, object-t other) -> int-t {
+    int-t result;
+
+    if ($instance?(other, klass)) {
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = compare(&s1, &s2);
+    } else {
+      result = $compare(super, other);
+    }
+    return result;
+  }
+}
+func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
+//   assert(nullptr != name);
+  symbol-t key;
+  uintptr-t element;
+
+  uint32-t props-capacity = 4;
+  property-t* props = cast(property-t*)dkt::alloc(sizeof(property-t) * props-capacity);
+  uint32-t count = 0;
+
+  props[count].key = #name;
+  props[count].element = cast(uintptr-t)(name);
+  count++;
+
+  while (nullptr != (key = va-arg(args, symbol-t))) {
+    element = va-arg(args, uintptr-t);
+    if (props-capacity == count + 1) {
+      props-capacity *= 2;
+      props = cast(property-t*)dkt::alloc(sizeof(property-t) * props-capacity, props);
+    }
+    props[count].key =     key;
+    props[count].element = element;
+    count++;
+  }
+  // hackhack: should be allocated in previous (initial) dkt::alloc()
+  named-info-t* info = cast(named-info-t*)dkt::alloc(sizeof(named-info-t));
+  info->elements = props;
+  info->count = count;
+  info->next = nullptr;
+  sort(info);
+  return info;
+}
+func dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
+  named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
+  object-t info = box(info-slots);
+  return info;
+}
+[[sentinel]] func dk-make-named-info-slots(symbol-t name, ...) -> named-info-t* {
+  va-list-t args;
+  va-start(args, name);
+  named-info-t* info-slots = dk-va-make-named-info-slots(name, args);
+  va-end(args);
+  return info-slots;
+}
+[[sentinel]] func dk-make-named-info(symbol-t name, ...) -> object-t {
+  va-list-t args;
+  va-start(args, name);
+  object-t info = dk-va-make-named-info(name, args);
+  va-end(args);
+  return info;
+}
+func dkt-dump-named-info(named-info-t* info) -> named-info-t* {
+  return named-info::dump(info);
+}

@@ -1,0 +1,202 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cinttypes>
+# include <cstdlib>
+# include <cstring>
+
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
+
+// 2^32 - 5 = 4294967291 or 0xfffffffb
+const uintptr-t max-prime32 = 0xfffffffb;
+
+module dakota;
+
+klass object-output-stream;
+klass hash;
+klass vector;
+
+klass string {
+  slots {
+    symbol-t encoding;
+    char8-t* ptr;
+    uint32-t len;
+  }
+  //uint32-t size; // sizeof(ptr[0])
+
+  method init(object-t self,
+                       symbol-t       encoding : #utf-8,
+                       str-t bytes :    "",
+                       uint32-t       start :    0,
+                       uint32-t       length :   cast(uint32-t)safe-strlen(bytes) - start) -> object-t {
+    // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
+    self = $init(super);
+    assert(nullptr != bytes);
+    assert(nullptr != encoding);
+    assert(start <= length);
+    USE(encoding);
+    self.encoding = encoding;
+    self.len = length;
+    self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (self.len + 1));
+    strncpy(self.ptr, bytes + start, self.len);
+    self.ptr[self.len] = NUL;
+    return self;
+  }
+  method dealloc(object-t self) -> object-t {
+    dkt::dealloc(self.ptr);
+    object-t result = $dealloc(super);
+    return result;
+  }
+  method length(object-t self) -> uint32-t {
+    if (0    == self.len &&
+        nullptr != self.ptr &&
+        NUL  != self.ptr[0])
+      self.len = cast(uint32-t)safe-strlen(self.ptr);
+    return self.len;
+  }
+  method intern(object-t self) -> symbol-t {
+    symbol-t result = dk-intern(cast(symbol-t)(self.ptr));
+    return result;
+  }
+  method write-lite(object-t self, object-t out) -> object-t {
+    str-t utf8 = $utf8-from(self);
+    $write(out, "\"");
+    $write(out, utf8);
+    $write(out, "\"");
+    return self;
+  }
+  method write-slots(object-t self, object-t out) -> object-t {
+    $write-slots(super, out);
+    $write-slots-start(out, klass);
+
+    $write-element(out, self.ptr, "ptr");
+    $write-element(out, self.len, "len");
+
+    $write-slots-end(out);
+    return self;
+  }
+  method dump(object-t self) -> object-t {
+    $dump(super);
+    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%i }\n",
+            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.ptr, self.len);
+    return self;
+  }
+  method uint32-value(object-t self) -> uint32-t {
+    uint32-t result = cast(uint32-t)strtoumax(self.ptr, nullptr, 10);
+    return result;
+  }
+  method int32-value(object-t self) -> int32-t {
+    int32-t result = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
+    return result;
+  }
+  method boole-value(object-t self) -> boole-t {
+    int32-t int-value = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
+    boole-t result;
+    if (0 == int-value)
+      result = false;
+    else
+      result = true;
+    return result;
+  }
+  method append(object-t self, str-t bytes, symbol-t encoding : #utf-8) -> object-t {
+    assert(nullptr != bytes);
+    assert(nullptr != encoding);
+    assert(#utf-8 != encoding);
+    USE(encoding);
+    uint32-t len = cast(uint32-t)safe-strlen(bytes);
+    self.len += len;
+    self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * sizeof(char8-t)), self.ptr);
+    strcat(self.ptr, bytes);
+    return self;
+  }
+  method utf8-from(object-t self) -> str-t {
+    return self.ptr;
+  }
+  // returns an vector of string objects
+  method tokenize(object-t self, object-t delimiter) -> object-t {
+    assert($instance?(delimiter, klass));
+    slots-t& d = unbox(delimiter);
+    object-t result = $tokenize(self, d.ptr);
+    return result;
+  }
+  method tokenize(object-t self, str-t delimiter) -> object-t {
+    object-t result = make(vector::klass);
+    uint32-t delimiter-length = cast(uint32-t)safe-strlen(delimiter);
+    str-t p1 = self.ptr;
+    str-t p2;
+
+    object-t kls = klass-of(self);
+    object-t delimiter-object = make(kls, #bytes : delimiter);
+
+    // leading 'delimiter'
+    if (0 == strncmp(self.ptr, delimiter, delimiter-length)) {
+      $add-last(result, delimiter-object);
+      p1 += delimiter-length;
+    }
+    // 'part' 'delimiter' pairs
+    while (nullptr != (p2 = strstr(p1, delimiter))) {
+      object-t part-object = make(kls, #bytes : cast(str-t)(p1), #length : cast(uint32-t)(p2 - p1));
+      $add-last(result, part-object);
+      $add-last(result, delimiter-object);
+      p1 = p2 + delimiter-length;
+    }
+    // trailing 'part'
+    if (NUL != *p1) {
+      object-t part-object = make(kls, #bytes : p1);
+      $add-last(result, part-object);
+    }
+    return result;
+  }
+  method hash(object-t self) -> hash-t {
+    hash-t result = dk-hash(self.ptr);
+    return result;
+  }
+  method append-sequence(object-t self, object-t sequence) -> object-t {
+    for (object-t element in sequence) {
+      str-t utf8 = $utf8-from(element);
+      uint32-t length = cast(uint32-t)safe-strlen(utf8);
+      self.len += cast(uint32-t)(length);
+      self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * sizeof(char8-t)), self.ptr);
+      strcat(self.ptr, utf8);
+    }
+    return self;
+  }
+  method compare(object-t self, object-t other) -> int-t {
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
+    int-t result;
+
+    if ($instance?(other, klass)) {
+      // what if both utf8s are nullptr?
+      // what if only one utf8 is nullptr?
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = safe-strcmp(s1.ptr, s2.ptr);
+      result = dkt-normalize-compare-result(result);
+    } else {
+      result = $compare(super, other);
+    }
+    result = dkt-normalize-compare-result(result);
+    return result;
+  }
+  method print(object-t self, object-t out) -> object-t {
+    if (null == out)
+      out = std-output;
+    $print(out, $utf8-from(self));
+    return self;
+  }
+}

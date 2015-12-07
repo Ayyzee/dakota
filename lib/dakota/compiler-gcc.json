@@ -1,0 +1,44 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+{
+  'CXX' => [ 'g++' ],
+  'CXXFLAGS' => [ '-std=c++11', '--visibility=hidden', '--non-call-exceptions', '--asynchronous-unwind-tables' ],
+  'CXX_COMPILE_FLAGS' =>     [ '--compile' ],
+  'CXX_COMPILE_FLAGS' => [ '--compile', '--PIC' ],
+  'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic', '--PIC' ],
+  'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
+  'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
+  'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
+  'CXX_SHARED_FLAGS' =>      [ '--shared', '--PIC' ],
+  'EXTRA_CXXFLAGS' =>        [
+      '--all-warnings',
+      '--no-common',
+      '--trapv',
+      '--warn-cast-qual',
+      '--warn-conversion',
+      '--warn-extra',
+      '--warn-format=2',
+      '--warn-missing-format-attribute',
+      '--warn-missing-include-dirs',
+      '--warn-no-multichar',
+      '--warn-no-variadic-macros',
+      '--warn-pointer-arith',
+      '--warn-redundant-decls',
+      '--warn-shadow',
+      '--warn-switch-default',
+      '--warn-switch-enum',
+      '--warn-undef',
+      '--warn-unused',
+      ],
+  'LD_SONAME_FLAGS' => [ '-soname' ],
+  'cc_ext' => 'cc',
+  'dkcc_ext' => 'dkcc',
+  'dkhh_ext' => 'dkhh',
+  'hh_ext' => 'hh',
+  'o_ext' =>  'o',
+  'so_ext' => 'so',
+}

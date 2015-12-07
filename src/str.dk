@@ -1,0 +1,93 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
+
+module dakota;
+
+klass char8;
+klass hash;
+klass str;
+
+klass str-compare {
+  slots (*)(str-t, str-t) -> int-t;
+
+  method init(object-t self, slots-t slots : nullptr) -> object-t {
+    self = $init(super);
+    unbox(self) = slots;
+    return self;
+  }
+}
+
+klass str-klass {
+  superklass klass;
+
+  slots {
+    str-compare::slots-t strcmp;
+  }
+  method va::init(object-t self, va-list-t args) -> object-t {
+    self = $va::init(super, args);
+    self.strcmp = safe-strcmp;
+    return self;
+  }
+}
+klass str {
+  klass str-klass;
+
+  slots const char8-t*;
+
+  method dump(object-t self) -> object-t {
+    $dump(super);
+    fprintf(stderr, "%p:%p { slots=\"%s\" }\n",
+            cast(ptr-t)self, cast(ptr-t)unbox(self), unbox(self));
+    return self;
+  }
+  method equal?(object-t self, object-t other) -> boole-t {
+    assert(nullptr != other);
+    boole-t state;
+    if (0 == $compare(self, other))
+      state = true;
+    else
+      state = false;
+    return state;
+  }
+  method hash(object-t self) -> hash-t {
+    slots-t slots = unbox(self);
+    assert(nullptr != slots);
+    hash-t result = dk-hash(slots);
+    return result;
+  }
+  method compare(object-t self, object-t other) -> int-t {
+    assert(nullptr != other);
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
+    int-t result;
+
+    if ($instance?(other, klass)) {
+      assert($instance?(klass-of(self), str-klass::klass));
+      str-klass::slots-t& ks = str-klass::unbox(klass-of(self));
+      // what if both utf8s are nullptr?
+      // what if only one utf8 is nullptr?
+      slots-t s1 = unbox(self);
+      slots-t s2 = unbox(other);
+      result = ks.strcmp(s1, s2);
+      result = dkt-normalize-compare-result(result);
+    } else {
+      result = $compare(super, other);
+    }
+    return result;
+  }
+}

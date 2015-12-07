@@ -1,0 +1,163 @@
+#!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
+# Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+use strict;
+use warnings;
+use Cwd;
+
+my $gbl_prefix;
+
+sub dk_prefix {
+  my ($path) = @_;
+  $path =~ s|^./||;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &dk_prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
+
+BEGIN {
+  $gbl_prefix = &dk_prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
+};
+
+use dakota::dakota;
+use dakota::util;
+
+use Data::Dumper;
+$Data::Dumper::Terse     = 1;
+$Data::Dumper::Deepcopy  = 1;
+$Data::Dumper::Purity    = 1;
+$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Indent    = 1; # default = 2
+
+use Getopt::Long;
+$Getopt::Long::ignorecase = 0;
+
+my $root_cmd = { 'reps' => [],
+                 'opts' => { 'directory' => [],
+                             'include-directory' => [],
+                             'define-macro' => [],
+                             'var' => {} } };
+
+&GetOptions($$root_cmd{'opts'},
+            'compile',              # gcc-like
+            'define-macro=s',       # gcc-like
+            'directory=s',          # make-like
+            'dynamic',              # gcc-like
+            'include-directory=s',  # gcc-like
+            'keep-going',           # make-like
+            'nodefaultlibs',        # gcc-like
+            'output=s',             # gcc-like
+            'precompile',           # gcc-ish (--compile)
+            'shared',               # gcc-like
+            'soname=s',             # ld-like (-soname <>)
+            'var=s',                # for env vars like MAKEFLAGS, etc.
+           #'compiler-flags=s',     # similiar to env vars CXXFLAGS & EXTRA_CXXFLAGS
+           #'compiler=s',           # similiar to env var CXX
+           #'environment-overrides' # make-like
+           #'for-compiler=s',       # gcc-like (--for-linker <>)
+           #'for-linker=s',         # gcc-like
+           #'jobs'                  # make-like
+           #'library-directory=s',  # gcc-like, ld-like (--library-path[=]; consider SEARCH_DIR)
+           #'library=s',            # gcc-like (-l<> or --library=<> ???)
+           #'linker-flags=s',       # similiar to env vars LDFLAGS & EXTRA_LDFLAGS
+           #'linker=s',             # similiar to env var LD
+           #'pie'                   # ld-like
+           #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
+           #'touch'                 # make-like
+           );
+# --quiet
+# --help
+# --verbose
+
+$$root_cmd{'inputs'} = [map { &canon_path($_) } @ARGV];
+
+if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
+  #`dakota --help`;
+  exit 1;
+}
+if ($$root_cmd{'opts'}{'soname'}) {
+  $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
+}
+if ($$root_cmd{'opts'}{'output'}) {
+  $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
+}
+my $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
+  or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+{
+  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
+    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
+  my ($key, $values);
+  while (($key, $values) = each (%$platform)) {
+    $$gbl_compiler{$key} = $values;
+  }
+}
+
+if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
+  my $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+  my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
+  if ($$root_cmd{'opts'}{'output'} ne $libdakota) {
+    &add_last($$root_cmd{'inputs'}, $libdakota);
+  }
+}
+$ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
+
+my $gcc_from_dakota = {
+  '--include-directory' => '--include-directory', # yep, the same
+  '--define-macro' =>      '--define-macro',      # yep, the same
+};
+
+if ($$root_cmd{'opts'}{'include-directory'}) {
+  my $flags = '';
+  foreach my $dir (@{$$root_cmd{'opts'}{'include-directory'}}) {
+    $flags .= ' ' . $$gcc_from_dakota{'--include-directory'} . ' ' . $dir;
+  }
+  $ENV{'CXXFLAGS'} .= $flags;
+}
+if ($$root_cmd{'opts'}{'define-macro'}) {
+  my $flags = '';
+  foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}}) {
+    $flags .= ' ' . $$gcc_from_dakota{'--define-macro'} . ' ' . $mcr;
+  }
+  $ENV{'CXXFLAGS'} .= $flags;
+}
+if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
+  my $initial_workdir = &getcwd();
+  foreach my $dir (@{$$root_cmd{'opts'}{'directory'}}) {
+    if ($dir ne '.' &&
+        $dir ne './') {
+      chdir $dir;
+      my $current_workdir = &getcwd();
+      my $reldir = File::Spec->abs2rel($current_workdir, $initial_workdir);
+      $ENV{'DKT_DIR'} = $reldir;
+    }
+  }
+}
+if ($$root_cmd{'opts'}{'precompile'}) {
+  $ENV{'DKT_PRECOMPILE'} = 1;
+}
+my $result = &dakota::dakota::start_cmd($root_cmd);
+exit $result;

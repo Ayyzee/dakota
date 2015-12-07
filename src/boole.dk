@@ -1,0 +1,62 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+module dakota;
+
+klass number;
+
+// its George Boole (not George Bool)
+klass boole { // a doubleton :-)
+  superklass number;
+  klass      boole-klass;
+
+  slots boole-t;
+
+  method init(object-t self, slots-t slots : false) -> object-t {
+    // intentionally not chaining $init()
+    assert(false == unbox(self));
+    if (slots)
+      self = (boole-klass::unbox(klass-of(self)))[slots];
+    return self;
+  }
+  static func mk(object-t k, boole-t v) -> object-t {
+    method-t alloc = dk::method-for-selector(superklass-of(klass-of(k)),
+                                             SELECTOR(alloc(object-t)));
+    object-t self = alloc(k);
+    self = $init(super);
+    unbox(self) = v;
+    return self;
+  }
+}
+klass boole-klass {
+  superklass klass;
+
+  slots object-t[2];
+
+  method alloc(object-t self) -> object-t {
+    return unbox(self)[0]; // return false object by default
+  }
+  method initialize(object-t self) -> object-t {
+    boole-t f = false;
+    (unbox(self))[f] = boole::mk(self, f);
+    boole-t t = true;
+    (unbox(self))[t] = boole::mk(self, t);
+
+    return self;
+  }
+}
+static-assert(0 == false, "Boolean false must equal 0");
+static-assert(1 == true,  "Boolean true must equal 1");

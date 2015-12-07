@@ -1,0 +1,28 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+{ 'dakota-info' => {
+    'srcs' => [ # cmd-line
+      '$(srcdir)/dakota-info-main.$(cc_ext)',
+    ],
+    'libs' => [ # cmd-line
+      '/usr/lib/$(target-triplet)/libdl.$(so_ext)',
+    ],
+    'include-dirs' => [ # cmd-line
+      '$(srcdir)',
+      '$(srcdir)/../include',
+    ],
+    'output' => '$(blddir)/../bin/dakota-info', # cmd-line
+    'install' => {
+      '-rules' => [
+        '$(DESTDIR)$(prefix)/bin/%', '$(blddir)/../bin/%',
+      ],
+      'files' =>   [ # install.files
+        '$(DESTDIR)$(prefix)/bin/dakota-info',
+      ],
+    }
+  }
+}

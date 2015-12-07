@@ -1,0 +1,78 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cctype>
+# include <cerrno>
+# include <cstdio>
+# include <cstring>
+
+# if HAVE-CONFIG-HH
+  # include "config.hh"
+# endif
+
+# include "dakota-private.hh"
+
+func set-name(int-t errnum, str-t name) -> void;
+
+# include "strerror-name.tbl"
+
+func set-name(int-t errnum, str-t name) -> void {
+  assert(0 != errnum);
+  assert(nullptr != name);
+  assert(NUL != name[0]);
+//   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);
+  assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));
+  if (isdigit(gbl-sys-err-names[errnum][0])) {
+    gbl-sys-err-names[errnum] = name;
+  }
+  else {
+    str-t delim = "|";
+    uint32-t len = cast(uint32-t)strlen(gbl-sys-err-names[errnum]) + cast(uint32-t)strlen(delim) + cast(uint32-t)strlen(name) + (1);
+    char8-t* buf = cast(char8-t*)dkt::alloc(sizeof(char8-t) * len); // leakleak
+    buf[0] = NUL;
+    strcat(buf, gbl-sys-err-names[errnum]);
+    strcat(buf, delim);
+    strcat(buf, name);
+    gbl-sys-err-names[errnum] = buf;
+//     fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, buf);
+  }
+  return;
+}
+# if !defined HAVE-STRERROR-NAME
+func strerror-name(int-t errnum) -> str-t {
+  assert(errnum <= cast(int-t)DK-COUNTOF(gbl-sys-err-names));
+  str-t name = gbl-sys-err-names[errnum];
+  return name;
+}
+# endif
+
+static func E-set-names() -> void;
+
+static func __initial() -> void {
+  E-set-names();
+  return;
+}
+static func __final() -> void {
+  return;
+}
+namespace { struct [[gnu::visibility("hidden")]] __ddl_t {
+  __ddl_t(const __ddl_t&) = default;
+
+  __ddl_t()  { __initial(); }
+  ~__ddl_t() { __final();   }
+}; }
+static __ddl_t __ddl = __ddl_t();

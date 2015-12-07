@@ -1,0 +1,68 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+module dakota;
+
+klass exception;
+klass collection; // add()
+klass klass;
+
+trait forward-iterator;
+
+trait set {
+  method all-in?(object-t self, object-t collection) -> boole-t {
+    USE(self);
+    USE(collection);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return false;
+  }
+  method any-in?(object-t self, object-t collection) -> boole-t {
+    USE(self);
+    USE(collection);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return false;
+  }
+  // complement (if collection is set)
+  method remove-all(object-t self, object-t collection) -> object-t {
+    USE(self);
+    USE(collection);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return null;
+  }
+  // intersection (if collection is set)
+  method retain-all(object-t self, object-t collection) -> object-t {
+    USE(self);
+    USE(collection);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return null;
+  }
+  method write-lite(object-t self, object-t out) -> object-t {
+    $write(out, "{");
+    str-t delim = "";
+
+    for (object-t element in self) {
+      $write(out, delim);
+      $write-lite(element, out); // must be primitive type
+      delim = ",";
+    }
+    $write(out, "}");
+    return self;
+  }
+  method forward-iterator(object-t) -> object-t; // hackhack
+  method in( object-t self, object-t element, object-t default-element) -> object-t;
+  method in( object-t self, object-t element) -> object-t;
+  method in?(object-t self, object-t element) -> boole-t;
+}

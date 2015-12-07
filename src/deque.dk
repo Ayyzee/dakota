@@ -1,0 +1,418 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cinttypes>
+# include <cstdlib>
+
+module dakota;
+
+klass exception;
+
+klass node {
+  slots {
+    object-t element; // may NOT be nullptr, may be null
+    slots-t* prev;    // nullptr (not null) for first
+    slots-t* next;    // nullptr (not null) for last
+  }
+  static slots-t* create(slots-t* prev, object-t element, slots-t* next) {
+    slots-t* node = cast(slots-t*)dkt::alloc(sizeof(slots-t));
+    node->prev =    prev;
+    node->element = element;
+    node->next =    next;
+    return node;
+  }
+  static void dump-prev(slots-t* s, uint32-t iterator-state) {
+    if (nullptr != s) {
+//       fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
+//               "<tr><td port=\"element\">element</td></tr>"
+//               "<tr><td port=\"prev\">prev</td></tr>"
+//               "<tr><td port=\"next\">next</td></tr>"
+//               "</table> > ];\n", cast(ptr-t)(s), iterator-state);
+//       fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(ptr-t)(s->element), iterator-state, cast(ptr-t)(s->element), $name(klass-of(s->element)));
+//       fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->element), iterator-state);
+
+      if (nullptr != s->prev)
+        fprintf(stderr, "    \"%p-%i\" -> \"%p-%i\":prev [ dir = back ];\n", cast(ptr-t)(s->prev), iterator-state, cast(ptr-t)(s), iterator-state);
+      else {
+        fprintf(stderr, "    \"%p-%i-prev-nullptr\" [ label = \"nullptr\" ];\n", cast(ptr-t)(s), iterator-state);
+        fprintf(stderr, "    \"%p-%i-prev-nullptr\" -> \"%p-%i\":prev [ dir = back ];\n", cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
+      }
+      if (nullptr != s->prev)
+        dump-prev(s->prev, iterator-state);
+    }
+    return;
+  }
+  static void dump-next(slots-t* s, uint32-t iterator-state) {
+    if (nullptr != s) {
+      fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
+              "<tr><td port=\"element\">element</td></tr>"
+              "<tr><td port=\"prev\">prev</td></tr>"
+              "<tr><td port=\"next\">next</td></tr>"
+              "</table> > ];\n", cast(ptr-t)(s), iterator-state);
+      fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n", cast(ptr-t)(s->element), iterator-state, cast(ptr-t)(s->element), $name(klass-of(s->element)));
+      fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n", cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->element), iterator-state);
+
+      if (nullptr != s->next)
+        fprintf(stderr, "    \"%p-%i\":next -> \"%p-%i\";\n", cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->next), iterator-state);
+      else {
+        fprintf(stderr, "    \"%p-%i-next-nullptr\" [ label = \"nullptr\" ];\n", cast(ptr-t)(s), iterator-state);
+        fprintf(stderr, "    \"%p-%i\":next -> \"%p-%i-next-nullptr\";\n", cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
+      }
+      if (nullptr != s->next)
+        dump-next(s->next, iterator-state);
+    }
+    return;
+  }
+}
+klass deque {
+  superklass sequence;
+  trait      stack;
+
+  slots {
+    node::slots-t* first; // if (nullptr != first)  first->prev = nullptr;
+    node::slots-t* last;  // if (nullptr != last)   last->next =  nullptr;
+    uint32-t      size;
+
+    uint32-t iterator-state;
+  }
+  method test-dump(object-t self) -> object-t {
+    slots-t& s = unbox(self);
+  //if (nullptr != &s) {
+      fprintf(stderr, "  subgraph \"cluster-%p-%i\"\n", cast(ptr-t)(&s), s.iterator-state);
+      fprintf(stderr, "  {\n");
+
+      fprintf(stderr, "    graph [ rankdir = LR ];\n");
+      fprintf(stderr, "    graph [ label = \"%p-%i\" ];\n", cast(ptr-t)(&s), s.iterator-state);
+      fprintf(stderr, "    node [ shape = plaintext ];\n");
+
+      fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
+              "<tr><td port=\"first\">first</td></tr>"
+              "<tr><td port=\"last\">last</td></tr>"
+              "<tr><td port=\"size\">size=%i</td></tr>"
+              "</table> > ];\n", cast(ptr-t)(&s), s.iterator-state, s.size);
+      if (nullptr == s.first && nullptr == s.last) {
+        fprintf(stderr, "    \"%p-%i-nullptr\" [ label = \"nullptr\" ];\n", cast(ptr-t)(&s), s.iterator-state);
+        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i-nullptr\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
+        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i-nullptr\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
+      } else {
+        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.first), s.iterator-state);
+        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i\";\n", cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.last), s.iterator-state);
+      }
+      node::dump-next(s.first, s.iterator-state);
+      node::dump-prev(s.last,  s.iterator-state);
+
+      fprintf(stderr, "  }\n");
+
+      // size
+  //}
+    return self;
+  }
+  method init(object-t self, object-t element : nullptr) -> object-t {
+    self = $init(super);
+
+    if (nullptr == element) {
+      self.first = nullptr;
+      self.last =  nullptr;
+      self.size =  0;
+    } else {
+      node::slots-t* node = node::create(nullptr, element, nullptr);
+      //        node->prev = nullptr;
+      //        node->next = nullptr;
+      self.first = node;
+      self.last =  node;
+      self.size =  1;
+    }
+    self.iterator-state = 0;
+    return self;
+  }
+  static object-t string-from-node(object-t self, node::slots-t* mn, char8-t* buf, uint32-t buf-len) {
+    if (self.first == mn && self.first != nullptr)
+      snprintf(buf, buf-len, "%s", "first     ");
+    else-if (self.last == mn && self.last != nullptr)
+      snprintf(buf, buf-len, "%s", "last      ");
+    else
+      snprintf(buf, buf-len, "%p", cast(ptr-t)mn);
+    return self;
+  }
+  method dump(object-t self) -> object-t {
+    object-t result = $write-slots(self, std-output);
+    return result;
+  }
+  method write-slots(object-t self, object-t out) -> object-t {
+    $write-slots(super, out);
+//     dkt-log(stdout, "deque: %s(%p, ...)\n",
+//            __func__, cast(ptr-t)deque);
+    node::slots-t* first = self.first;
+    node::slots-t* last =  self.last;
+    char8-t[16] buf = "";
+
+    if (nullptr == first) {
+      fprintf(stdout, " %p", cast(ptr-t)first);
+      fprintf(stdout, "\n");
+    } else {
+      deque::string-from-node(self, first->prev, buf, cast(uint32-t)sizeof(buf));
+      fprintf(stdout, " %s", buf);
+      fprintf(stdout, " %p", cast(ptr-t)first->element);
+      deque::string-from-node(self, first->next, buf, cast(uint32-t)sizeof(buf));
+      fprintf(stdout, " %s", buf);
+      fprintf(stdout, "\n");
+    }
+    if (nullptr == last) {
+      fprintf(stdout, " %p\n", cast(ptr-t)last);
+    } else {
+      deque::string-from-node(self, last->prev, buf, cast(uint32-t)sizeof(buf));
+      fprintf(stdout, " %s", buf);
+      fprintf(stdout, " %p", cast(ptr-t)last->element);
+      deque::string-from-node(self, last->next, buf, cast(uint32-t)sizeof(buf));
+      fprintf(stdout, " %s", buf);
+      fprintf(stdout, "\n");
+    }
+    return self;
+  }
+  method copy-shallow(object-t self) -> object-t {
+    USE(self);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return null;
+  }
+  // insert-before
+  // insert-after
+  // before
+  // after
+
+  method size(object-t self) -> uint32-t {
+    return self.size;
+  }
+  method empty?(object-t self) -> boole-t {
+    boole-t state;
+
+    if (0 == self.size)
+      state = true;
+    else
+      state = false;
+    return state;
+  }
+  method empty(object-t self) -> object-t {
+    USE(self);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return null;
+  }
+  method add-first(object-t self, object-t element) -> object-t {
+    assert(nullptr != element);
+    node::slots-t* node = node::create(nullptr, element, self.first); // self.first may be nullptr
+    //        node->prev = nullptr;
+    //        node->next = self.first;
+    self.first = node;
+    self.size++;
+    self.iterator-state++;
+    return self;
+  }
+  method [[alias(add-last)]] add(object-t self, object-t element) -> object-t;
+  method [[alias(add-last)]] push(object-t self, object-t element) -> object-t;
+  method add-last(object-t self, object-t element) -> object-t {
+    assert(nullptr != element);
+    node::slots-t* node = node::create(self.last, element, nullptr); // self.last may be nullptr
+    if (nullptr != self.last)
+      self.last->next = node;
+
+    self.last = node;
+
+    if (nullptr == self.first)
+      self.first = self.last;
+
+    self.size++;
+    self.iterator-state++;
+    //   deque::dump(self, stderr);
+    return self;
+  }
+  method first(object-t self) -> object-t {
+    assert(0 != self.size);
+    //assert(nullptr != self.first);
+    object-t element = nullptr;
+    if (nullptr != self.first)
+      element = self.first->element;
+    return element;
+  }
+  method [[alias(last)]] top(object-t self) -> object-t;
+  method last(object-t self) -> object-t {
+    assert(0 != self.size);
+    //assert(nullptr != self.last);
+    object-t element = nullptr;
+    if (nullptr != self.last)
+      element = self.last->element;
+    return element;
+  }
+  method remove-first(object-t self) -> object-t {
+    assert(0 != self.size);
+    assert(nullptr != self.first);
+    object-t element = nullptr;
+
+    if (self.last == self.first) {
+      self.last = nullptr;
+    }
+    //if (nullptr != self.first)
+    {
+      node::slots-t* node = self.first;
+      self.first = self.first->next;
+
+      if (nullptr != self.first)
+        self.first->prev = nullptr;
+# if 0
+      else {
+        //node->prev = nullptr;
+        node->next = nullptr;
+      }
+# endif
+      element = node->element;
+    }
+    self.size--;
+    self.iterator-state++;
+    return element;
+  }
+  method [[alias(remove-last)]] pop(object-t self) -> object-t;
+  method remove-last(object-t self) -> object-t {
+    assert(0 != self.size);
+    //assert(nullptr != self.last);
+    node::slots-t* node = self.last;
+    self.last = self.last->prev;
+
+    if (nullptr != self.last)
+      self.last->next = nullptr;
+
+    node->prev = nullptr;
+    //node->next = nullptr;
+    self.size--;
+    self.iterator-state++;
+    return node->element;
+  }
+  //     method replace-first(object-t self, object-t element) -> object-t;
+  //     method replace-last(object-t self, object-t element) -> object-t;
+
+  // reverse in place
+  method reverse(object-t self) -> object-t {
+    USE(self);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return null;
+  }
+  method forward-iterator(object-t self) -> object-t {
+    object-t forward-iterator = make(deque-forward-iterator::klass, #deque : self);
+    return forward-iterator;
+  }
+  //      method write-element(object-t self, object-t out, str-t name) -> object-t {
+  //        if (null == out)
+  //          { out = std-output; } // wrong! should be system::object-out
+  //        char8-t[128] buffer;
+  //        snprintf(buffer, sizeof(buffer), "<sequence name=\"%s\" size=\"%u\">", name, self.size);
+  //        $writeln(out, buffer);
+  //        $increment-column(out);
+
+  //        if (0 != self.size) {
+  //          node::slots-t* node = self.first;
+
+  //          do {
+  //            $write-element-idref(out, node->element);
+  //          } while (nullptr != (node = node->next));
+  //        }
+  //        $decrement-column(out);
+  //        snprintf(buffer, sizeof(buffer), "</sequence>");
+  //        $writeln(out, buffer);
+  //        return null;
+  //      }
+}
+klass deque-forward-iterator {
+  trait forward-iterator;
+
+  slots {
+    object-t deque; // needed for iterator-state
+    node::slots-t* node;
+
+    uint32-t iterator-state;
+  }
+  static void check-iterator-state(object-t self) {
+    deque::slots-t& d = deque::unbox(self.deque);
+
+    if (self.iterator-state != d.iterator-state)
+      throw make(exception::klass, #msg : "oops");
+    return;
+  }
+  method init(object-t self, object-t deque :) -> object-t {
+    self = $init(super);
+    assert($instance?(deque, deque::klass));
+    deque::slots-t& d = deque::unbox(deque);
+
+    self.deque =          deque;
+    self.node =           d.first;
+    self.iterator-state = d.iterator-state;
+    return self;
+  }
+  method remove(object-t self) -> object-t {
+    check-iterator-state(self);
+    //assert(nullptr != self.node);
+    node::slots-t* node = self.node;
+
+    if (nullptr != self.node->prev)
+      self.node->prev->next = self.node->next;
+    if (nullptr != self.node->next)
+      self.node->next->prev = self.node->prev;
+    node->prev = nullptr; // gc help
+    node->next = nullptr; // gc help
+
+    self.iterator-state++;
+    deque::unbox(self.deque).iterator-state++;
+    deque::unbox(self.deque).size--;
+    return node->element;
+  }
+  method set-element(object-t self, object-t element) -> object-t {
+    check-iterator-state(self);
+    self.node->element = element;
+    return self;
+  }
+  //     method last?(object-t self) -> boole-t {
+  //       deque::slots-t& d = deque::unbox(self.deque);
+  //       boole-t state = (null == d.next);
+
+  //       return state;
+  //     }
+  method next?(object-t self) -> boole-t {
+    check-iterator-state(self);
+    boole-t result;
+    if (nullptr != self.node)
+      result = true;
+    else
+      result = false;
+    return result;
+  }
+  method next(object-t self) -> object-t {
+    check-iterator-state(self);
+    object-t element = nullptr;
+    if ($next?(self)) {
+      element = $element(self);
+      self.node = self.node->next;
+    }
+    //       printf("%s:%s(%p) = %p\n",
+    //              "deque-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
+    return element;
+  }
+  method element(object-t self) -> object-t {
+    check-iterator-state(self);
+    object-t element = nullptr;
+    if ($next?(self)) {
+      element = self.node->element;
+      assert(nullptr != element);
+    }
+    return element; // returns nullptr on error
+  }
+}

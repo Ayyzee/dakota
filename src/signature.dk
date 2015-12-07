@@ -1,0 +1,63 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cstring>
+
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
+
+module dakota;
+
+klass signature {
+  slots {
+    str-t name;
+    str-t parameter-types;
+    str-t return-type; // not considered in compare()
+  }
+  method init(object-t self, slots-t slots : {.name = nullptr, .parameter-types = nullptr, .return-type = nullptr}) -> object-t {
+    self = $init(super);
+    unbox(self) = slots;
+    return self;
+  }
+  method dump(slots-t* s) -> slots-t*{
+    printf("%s(%s)", s->name, s->parameter-types);
+    return s;
+  }
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
+    assert(nullptr != s);
+    assert(nullptr != other-s);
+    //printf("%s(): %s ?= %s\n", __func__, s, other-s);
+    int-t result = safe-strcmp(s->name, other-s->name);
+    if (0 == result)
+      result = safe-strcmp(s->parameter-types, other-s->parameter-types);
+    result = dkt-normalize-compare-result(result);
+    return result;
+  }
+  method compare(object-t self, object-t other) -> int-t {
+    int-t result;
+
+    if ($instance?(other, klass)) {
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = compare(&s1, &s2);
+    } else {
+      result = $compare(super, other);
+    }
+    result = dkt-normalize-compare-result(result);
+    return result;
+  }
+}

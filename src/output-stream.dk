@@ -1,0 +1,149 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cerrno>
+# include <cstdio>
+# include <cstring>
+
+# if HAVE-CONFIG-HH
+  # include "config.hh"
+# endif
+
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
+
+module dakota;
+
+klass ptr;
+klass stream;
+klass system-exception;
+
+namespace output-stream {
+  [[format-va-printf(2)]] METHOD va::print-format(object-t self, str-t format, va-list-t args) -> object-t;
+  [[format-va-printf(2)]] METHOD va::println-format(object-t self, str-t format, va-list-t args) -> object-t;
+}
+klass output-stream {
+  superklass stream;
+
+  static str-t endl = "\n";
+
+  slots stream-t;
+
+  method init(object-t self,
+                       slots-t  slots :    stdout,
+                       str-t    file : nullptr) -> object-t {
+    self = $init(super);
+    unbox(self) = slots;
+    assert(stdin != slots);
+
+    if (nullptr == slots && nullptr == file)
+      unbox(self) = stdout; // default
+
+    if (nullptr != file) {
+      unbox(self) = fopen(file, "w");
+
+      if (nullptr == unbox(self))
+        throw make(system-exception::klass, #errnum : errno);
+    }
+    return self;
+  }
+  method close(object-t self) -> object-t {
+    slots-t slots = unbox(self);
+# if defined DEBUG
+    if (stdout == slots)
+      dkt-log(dkt::k-log-warning, "\"close\" : \"stdout\"");
+    else-if (stderr == slots)
+      dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
+# endif // DEBUG
+    int-t rtn = fclose(slots);
+
+    if (0 != rtn)
+      throw make(system-exception::klass, #errnum : errno);
+    return self;
+  }
+  // hackhack?  use print below?
+  method write(object-t self, str-t string) -> object-t {
+    uint32-t len = cast(uint32-t)safe-strlen(string);
+    fwrite(string, sizeof(char8-t), len, unbox(self));
+    return self;
+  }
+  static object-t pad-to-col(object-t self, uint32-t col) {
+    for (uint32-t i = 0; i < col; i++)
+      $print(self, "  "); // two spaces per column :-) [my way]
+    return self;
+  }
+  method va::print-format(object-t self, str-t format, va-list-t args) -> object-t {
+    char8-t[256] buffer = ""; // hackhack - magic number
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    $print(self, cast(str-t)(buffer));
+    return self;
+  }
+  method va::println-format(object-t self, str-t format, va-list-t args) -> object-t {
+    char8-t[256] buffer = ""; // hackhack - magic number
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    $println(self, cast(str-t)(buffer));
+    return self;
+  }
+  method print(object-t self, str-t string) -> object-t {
+    uint32-t len = cast(uint32-t)safe-strlen(string);
+    fwrite(string, sizeof(char8-t), len, unbox(self));
+    return self;
+  }
+  method print(object-t self, object-t object) -> object-t {
+    $print(object, self);
+    return self;
+  }
+  method print-shallow(object-t self, object-t object) -> object-t {
+    $print-shallow(object, self);
+    return self;
+  }
+  method println(object-t self, str-t string) -> object-t {
+    $print(self, string);
+    $print(self, output-stream::endl);
+    return self;
+  }
+  method println(object-t self, object-t object) -> object-t {
+    $print(self, object);
+    $print(self, output-stream::endl);
+    return self;
+  }
+  method println-shallow(object-t self, object-t object) -> object-t {
+    $print-shallow(self, object);
+    $print(self, output-stream::endl);
+    return self;
+  }
+  method print-in-col(object-t self, str-t string, uint32-t col) -> object-t {
+    pad-to-col(self, col);
+    $print(self, string);
+    return self;
+  }
+  method print-in-col(object-t self, object-t object, uint32-t col) -> object-t {
+    pad-to-col(self, col);
+    $print(self, object);
+    return self;
+  }
+  method println-in-col(object-t self, str-t string, uint32-t col) -> object-t {
+    $print-in-col(self, string, col);
+    $print(self, "\n");
+    return self;
+  }
+  method println-in-col(object-t self, object-t object, uint32-t col) -> object-t {
+    $print-in-col(self, object, col);
+    $print(self, "\n");
+    return self;
+  }
+}

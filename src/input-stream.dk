@@ -1,0 +1,84 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cassert>
+# include <cerrno>
+# include <cstdio>
+# include <cstring>
+
+# if HAVE-CONFIG-HH
+  # include "config.hh"
+# endif
+
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
+
+module dakota;
+
+klass ptr;
+klass stream;
+klass system-exception;
+
+klass input-stream {
+  superklass stream;
+  
+  slots stream-t;
+
+  method init(object-t self,
+                       slots-t  slots :    stdin,
+                       str-t    file : nullptr) -> object-t {
+    self = $init(super);
+    unbox(self) = slots;
+    assert(stdout != slots);
+
+    if (nullptr == slots && nullptr == file)
+      unbox(self) = stdin; // default
+
+    if (nullptr != file) {
+      unbox(self) = fopen(file, "r");
+
+      if (nullptr == unbox(self))
+        throw make(system-exception::klass, #errnum : errno);
+    }
+    return self;
+  }
+  method close(object-t self) -> object-t {
+    slots-t slots = unbox(self);
+# if defined DEBUG
+    if (stdin == slots)
+      dkt-log(dkt::k-log-warning, "\"close\" : \"stdin\"");
+# endif // DEBUG
+    int-t rtn = fclose(slots);
+
+    if (0 != rtn)
+      throw make(system-exception::klass, #errnum : errno);
+    return self;
+  }
+  method read(object-t self,
+                       ptr-t    buffer,
+                       uint32-t element-size,
+                       uint32-t num-elements-max) -> uint32-t {
+    uint32-t num-elements-read = cast(uint32-t)fread(buffer,
+                                                     cast(size-t)element-size,
+                                                     cast(size-t)num-elements-max,
+                                                     unbox(self));
+
+    // fread() does not distinguish between end-of-file and error, and callers must use
+    // feof(3) and ferror(3) to determine which occurred.
+
+    return num-elements-read;
+  }
+}

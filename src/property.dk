@@ -1,0 +1,55 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cstring>
+
+# include "dakota-private.hh"
+
+module dakota;
+
+klass property {
+  slots {
+    symbol-t  key;
+    uintptr-t element;
+  }
+  method init(object-t self, slots-t slots : {.key = nullptr, .element = 0}) -> object-t {
+    self = $init(super);
+    unbox(self) = slots;
+    return self;
+  }
+  method compare(slots-t* s, slots-t* other-s) -> int-t {
+    int-t result = symbol::compare(s->key, other-s->key);
+    return result;
+  }
+  method check(slots-t* s) -> int32-t {
+    if (nullptr == s->key)
+      std::abort();
+    return 0;
+  }
+  method compare(object-t self, object-t other) -> int-t {
+    int-t result;
+
+    if ($instance?(other, klass)) {
+      slots-t& s1 = unbox(self);
+      slots-t& s2 = unbox(other);
+      result = compare(&s1, &s2);
+    } else {
+      result = $compare(super, other);
+    }
+    result = dkt-normalize-compare-result(result);
+    return result;
+  }
+}

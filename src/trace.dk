@@ -1,0 +1,130 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+module dakota;
+
+static uint32-t gbl-trace-column = 0;
+
+static func trace-column-in() -> void {
+  gbl-trace-column++;
+}
+static func trace-column-out() -> void {
+  if (0 != gbl-trace-column)
+    gbl-trace-column--;
+}
+[[format-va-printf(2)]] static func trace-vfprintf(stream-t stream, str-t format, va-list-t args) -> int-t {
+  str-t col = "  "; // two spaces per column :-) [my way]
+  for (uint32-t i = 0; i < gbl-trace-column; i++) {
+    if (0 == i)
+      fprintf(stream, "%s", col);
+    else
+      fprintf(stream, "%c%s", '.', col);
+  }
+  int-t result = vfprintf(stream, format, args);
+  // bugbug: need to adjust result
+  return result;
+}
+[[format-printf(2)]] static func trace-fprintf(stream-t stream, str-t format, ...) -> int-t {
+  va-list-t args;
+  va-start(args, format);
+  int-t result = trace-vfprintf(stream, format, args);
+  va-end(args);
+  return result;
+}
+func dkt-va-trace-before(const signature-t* signature, method-t m, super-t context, va-list-t args) -> int-t {
+  USE(args);
+  int-t result = 0;
+  if (nullptr != getenv("DK_ENABLE_TRACE")) {
+    result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
+                           signature->name, signature->parameter-types + sizeof("object-t") - 1,
+                           cast(ptr-t)(context.self), name-of(klass-of(context.self)),
+                           cast(ptr-t)(context.klass), name-of(context.klass),
+                           cast(ptr-t)cast(uintptr-t)(m));
+    trace-column-in();
+  }
+  return result;
+}
+func dkt-va-trace-before(const signature-t* signature, method-t m, object-t object, va-list-t args) -> int-t {
+  USE(args);
+  int-t result = 0;
+  if (nullptr != getenv("DK_ENABLE_TRACE")) {
+    result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
+                           signature->name, signature->parameter-types,
+                           cast(ptr-t)(object), name-of(klass-of(object)),
+                           cast(ptr-t)cast(uintptr-t)(m));
+    trace-column-in();
+  }
+  return result;
+}
+func dkt-va-trace-after(const signature-t* signature, method-t m, super-t context, va-list-t args) -> int-t {
+  USE(args);
+  trace-column-out();
+  int-t result = 0;
+  if (nullptr != getenv("DK_ENABLE_TRACE"))
+    result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
+                           signature->name, signature->parameter-types + sizeof("object-t") - 1,
+                           cast(ptr-t)(context.self), name-of(klass-of(context.self)),
+                           cast(ptr-t)(context.klass), name-of(context.klass),
+                           cast(ptr-t)cast(uintptr-t)(m));
+  return result;
+}
+func dkt-va-trace-after(const signature-t* signature, method-t m, object-t object, va-list-t args) -> int-t {
+  USE(args);
+  trace-column-out();
+  int-t result = 0;
+  if (nullptr != getenv("DK_ENABLE_TRACE"))
+    result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
+                           signature->name, signature->parameter-types,
+                           cast(ptr-t)(object), name-of(klass-of(object)),
+                           cast(ptr-t)cast(uintptr-t)(m));
+  return result;
+}
+func dkt-trace-before(const signature-t* signature, method-t m, super-t context, ...) -> int-t {
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, context);
+  if (nullptr != getenv("DK_ENABLE_TRACE"))
+    result = dkt-va-trace-before(signature, m, context, args);
+  va-end(args);
+  return result;
+}
+func dkt-trace-before(const signature-t* signature, method-t m, object-t object, ...) -> int-t {
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, object);
+  if (nullptr != getenv("DK_ENABLE_TRACE"))
+    result = dkt-va-trace-before(signature, m, object, args);
+  va-end(args);
+  return result;
+}
+func dkt-trace-after(const signature-t* signature, method-t m, super-t context, ...) -> int-t {
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, context);
+  if (nullptr != getenv("DK_ENABLE_TRACE"))
+    result = dkt-va-trace-after(signature, m, context, args);
+  va-end(args);
+  return result;
+}
+func dkt-trace-after(const signature-t* signature, method-t m, object-t object, ...) -> int-t {
+  int-t result = 0;
+  va-list-t args;
+  va-start(args, object);
+  if (nullptr != getenv("DK_ENABLE_TRACE"))
+    result = dkt-va-trace-after(signature, m, object, args);
+  va-end(args);
+  return result;
+}

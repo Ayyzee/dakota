@@ -1,0 +1,44 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+{
+  'CXX' => [ 'clang++-3.6' ],
+  # clang does not understand --visibility=, --non-call-exceptions, nor --asynchronous-unwind-tables
+  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fnon-call-exceptions', '-fasynchronous-unwind-tables' ],
+  'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
+  'CXX_COMPILE_THREAD_FLAGS' => [ '-pthread', '-lpthread', '--define-macro=__REENTRANT' ],
+  # clang does not understand --PIC
+  'CXX_COMPILE_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ],
+  'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic', '-fPIC' ],
+  'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
+  'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
+  'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
+  'CXX_SHARED_FLAGS' =>      [ '--shared', '-fPIC' ],
+  'EXTRA_CXXFLAGS' =>        [
+      '--warn-everything',
+      '--warn-no-class-varargs',
+      '--warn-no-date-time',
+      '--warn-no-c++1y-extensions',
+      '--warn-no-c++98-compat',
+      '--warn-no-c++98-compat-pedantic',
+      '--warn-no-c99-extensions', # c99 designated initializers, c99 compound literals
+      '--warn-no-cast-align',
+      '--warn-no-disabled-macro-expansion',
+      '--warn-no-exit-time-destructors',
+      '--warn-no-four-char-constants',
+      '--warn-no-global-constructors',
+      '--warn-no-multichar',
+      '--warn-no-old-style-cast',
+      '--warn-no-padded',
+      ],
+  'LD_SONAME_FLAGS' => [ '-soname' ],
+  'cc_ext' => 'cc',
+  'dkcc_ext' => 'dkcc',
+  'dkhh_ext' => 'dkhh',
+  'hh_ext' => 'hh',
+  'o_ext' =>  'bc',
+  'so_ext' => 'so',
+}

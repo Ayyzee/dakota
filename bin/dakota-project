@@ -1,0 +1,312 @@
+#!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
+use strict;
+use warnings;
+use Cwd;
+
+use Data::Dumper;
+$Data::Dumper::Terse =     1;
+$Data::Dumper::Purity =    1;
+$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Indent =    1; # default = 2
+#$Data::Dumper::Pair =      ' : '
+
+use Getopt::Long;
+$Getopt::Long::ignorecase = 0;
+
+my $default_project_file = 'project.json';
+my $opts = { 'var' => {} };
+my $rep_hdr =
+  '# -*- mode: cperl -*-' . "\n" .
+  '# -*- cperl-close-paren-offset: -2 -*-' . "\n" .
+  '# -*- cperl-continued-statement-offset: 2 -*-' . "\n" .
+  '# -*- cperl-indent-level: 2 -*-' . "\n" .
+  '# -*- cperl-indent-parens-as-block: t -*-' . "\n" .
+  '# -*- cperl-tab-always-indent: t -*-' . "\n";
+my $subcmd_tbl = {
+  'add' =>          \&subcmd_add,
+  'libs' =>         \&subcmd_libs,
+  'include-dirs' => \&subcmd_include_dirs,
+  'init' =>         \&subcmd_init,
+  'macros' =>       \&subcmd_macros,
+  'name' =>         \&subcmd_name,
+  'remove' =>       \&subcmd_remove,
+  'set-name' =>     \&subcmd_set_name,
+  'set-soname' =>   \&subcmd_set_soname,
+  'soname' =>       \&subcmd_soname,
+  'srcs' =>         \&subcmd_srcs,
+};
+sub start {
+  my ($argv) = @_;
+  &GetOptions($opts,
+              'abs-path',
+              'directory=s',
+              'repository=s',
+              'var=s',
+            );
+  my $rep_file;
+
+  if ($$opts{'repository'}) {
+    $rep_file = $$opts{'repository'};
+  } else {
+    $rep_file = $default_project_file;
+  }
+  if ($$opts{'directory'}) {
+    chdir $$opts{'directory'};
+  }
+  my $rep;
+
+  if (-e $rep_file) {
+    $rep = &rep_from_file($rep_file);
+  } else {
+    $rep = { '**file**' => $rep_file };
+  }
+  if (0 != @$argv) {
+    &subcmd($rep, $argv);
+  } else {
+    my $subcmds = [sort keys %$subcmd_tbl];
+    print STDERR "missing subcmd. subcmds are: @$subcmds\n";
+    exit 1;
+  }
+}
+sub subcmd {
+  my ($rep, $args) = @_;
+  my $subcmd_name = shift @$args;
+  my $subcmd = $$subcmd_tbl{$subcmd_name};
+  if ($subcmd) {
+    &$subcmd($rep, $args);
+  } else {
+    print STDERR "not a subcmd: $subcmd_name\n";
+    exit 1;
+  }
+}
+sub subcmd_init {
+  my ($rep, $args) = @_;
+  $$rep{'name'} = shift @$args;
+  $$rep{'srcs'} = [];
+  $$rep{'libs'} = [];
+  &subcmd_add($rep, $args);
+  &rep_to_file($rep, $default_project_file);
+}
+sub subcmd_add_srcs {
+  my ($rep, $args) = @_;
+  die if !defined $$rep{'srcs'};
+  my $tbl = {};
+  foreach my $src (@{$$rep{'srcs'}}) {
+    $$tbl{$src} = 1;
+  }
+  foreach my $arg (@$args) {
+    $$tbl{$arg} = 1;
+  }
+  $$rep{'srcs'} = [sort keys %$tbl];
+}
+sub subcmd_add_libs {
+  my ($rep, $args) = @_;
+  die if !defined $$rep{'libs'};
+  push @{$$rep{'libs'}}, @$args; # must maintain input order!
+}
+sub is_src {
+  my ($arg) = @_;
+  if ($arg =~ /\.(dk|c|cc|cxx|c\+\+)$/) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub subcmd_add {
+  my ($rep, $args) = @_;
+  my $srcs = [];
+  my $libs = [];
+  foreach my $arg (@$args) {
+    if (&is_src($arg)) {
+      push @$srcs, $arg;
+    } else {
+      push @$libs, $arg; # must maintain input order!
+    }
+  }
+  &subcmd_add_srcs($rep, $srcs);
+  &subcmd_add_libs($rep, $libs);
+  &rep_to_file($rep);
+}
+sub remove_from_seq {
+  my ($seq, $sarg) = @_;
+  for (my $i = @$seq - 1; $i >= 0; $i--) {
+    my $element = $$seq[$i];
+    my $selement = &subst($element, $$opts{'var'});
+
+    if ($selement eq $sarg) {
+      splice(@$seq, $i ,1)
+    }
+  }
+}
+sub subcmd_remove {
+  my ($rep, $args) = @_;
+  die if !defined $$rep{'srcs'};
+  die if !defined $$rep{'libs'};
+  my $tbl = {};
+  foreach my $src (@{$$rep{'srcs'}}) {
+    my $ssrc = &subst($src, $$opts{'var'});
+    $$tbl{$ssrc} = $src;
+  }
+  foreach my $arg (@$args) {
+    my $sarg = &subst($arg, $$opts{'var'});
+
+    if (&is_src($sarg)) {
+      delete $$tbl{$sarg};
+    } else {
+      &remove_from_seq($$rep{'libs'}, $arg);
+    }
+  }
+  $$rep{'srcs'} = [sort values %$tbl];
+  &rep_to_file($rep);
+}
+sub subst {
+  my ($string, $var) = @_;
+  my ($key, $element);
+  while (($key, $element) = each %$var) {
+    $string =~ s|\$$key\b|$element|g;   # support $ident   style variable
+    $string =~ s|\$\($key\)|$element|g; # support $(ident) style variable
+   #$string =~ s|\$\{$key\}|$element|g; # support ${ident} style variable
+  }
+  return $string
+}
+sub subcmd_srcs {
+  my ($rep, $args) = @_;
+  my $srcs = '';
+  if ($$rep{'srcs'}) {
+    my $cwd = '';
+    if ($$opts{'abs-path'}) {
+      $cwd = getcwd;
+      $cwd .= '/';
+    }
+
+    foreach my $src (@{$$rep{'srcs'}}) {
+      $src = &subst($src, $$opts{'var'});
+      if ($src !~ "^/") {
+        $srcs .= $cwd;
+      }
+      $srcs .= "$src\n";
+    }
+  }
+  print $srcs;
+}
+sub subcmd_libs {
+  my ($rep, $args) = @_;
+  my $libs = '';
+  if ($$rep{'libs'}) {
+    my $cwd = '';
+    if ($$opts{'abs-path'}) {
+      $cwd = getcwd;
+      $cwd .= '/';
+    }
+    foreach my $lib (@{$$rep{'libs'}}) {
+      $lib = &subst($lib, $$opts{'var'});
+
+      if ($lib !~ "^/") {
+        $libs .= $cwd;
+      }
+      $libs .= "$lib\n";
+    }
+  }
+  print $libs;
+}
+sub subcmd_name {
+  my ($rep, $args) = @_;
+  my $name = '';
+  if ($$rep{'name'}) {
+    if ($$opts{'abs-path'}) {
+      $name = getcwd;
+      $name .= '/';
+    }
+    $name .= $$rep{'name'};
+  }
+  if ($$opts{'var'}) {
+    $name = &subst($name, $$opts{'var'});
+  }
+  print "$name\n";
+}
+sub subcmd_macros {
+  my ($rep) = @_;
+  my $result = '';
+  if (exists $$rep{'macros'}) {
+    $result = join(' ', @{$$rep{'macros'}});
+  }
+  print "$result\n";
+}
+sub subcmd_include_dirs {
+  my ($rep) = @_;
+  my $result = '';
+  if (exists $$rep{'include-dirs'}) {
+    my @results = map { &subst($_, $$opts{'var'}) } @{$$rep{'include-dirs'}};
+    $result = join(' ', @results);
+  }
+  print "$result\n";
+}
+sub subcmd_set_name {
+  my ($rep, $args) = @_;
+  die if !defined $$rep{'name'};
+  $$rep{'name'} = shift @$args;
+  &rep_to_file($rep);
+}
+sub var {
+  my ($rep, $name) = @_;
+  my $result = $$rep{$name} ||= '';
+  $result =~ s/(\s*)(.*?)(\s*)//g;
+
+  if ('' eq $result) {
+    $result = undef;
+  }
+  return $result;
+}
+sub subcmd_soname {
+  my ($rep, $args) = @_;
+  my $name = &var($rep, 'soname');
+
+  if (!$name) {
+    $name = &var($$rep, 'output');
+  }
+  if ($name && $$opts{'var'}) {
+    $name = &subst($name, $$opts{'var'});
+  }
+  $name = $name ||= '';
+  print "$name\n";
+}
+sub subcmd_set_soname {
+  my ($rep, $args) = @_;
+  # info msg if changing existing soname?
+  $$rep{'soname'} = shift @$args;
+  &rep_to_file($rep);
+}
+sub rep_from_file {
+  my ($file) = @_;
+  my $rep = do $file or die;
+  $$rep{'**file**'} = $file;
+  return $rep;
+}
+sub rep_to_file {
+  my ($rep, $file) = @_;
+  if (!$file) {
+    $file = $$rep{'**file**'};
+  }
+  delete $$rep{'**file**'};
+  my $fh;
+
+  if ($$opts{'output'}) {
+    open($fh, ">", $$opts{'output'})
+      or die "cannot open > $$opts{'output'}: $!";
+  } else {
+    open($fh, '>&', \*STDOUT)
+      or die "cannot open >& STDOUT: $!";
+  }
+  print $fh $rep_hdr . "\n" . &Dumper($rep);
+  close $fh;
+}
+unless (caller) {
+  &start(\@ARGV);
+}

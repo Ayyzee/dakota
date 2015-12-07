@@ -1,0 +1,171 @@
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+# include <cinttypes>
+# include <cstdlib>
+
+module dakota;
+
+klass autorelease-pool;
+klass exception;
+klass hash;
+klass resource-usage;
+klass object-output-stream;
+klass output-stream;
+klass unbox-illegal-klass-exception;
+
+klass object {
+  slots {
+    object-t klass;
+    uint32-t retain-count;
+  }
+  //     klass klass;
+
+  // keep private, or koenig lookup will cause all
+  // hell to break loose :-)
+  // slots-t* unbox(object-t object) { // special-case
+  //   return object;
+  // }
+  method write-slots(object-t self, object-t out) -> object-t {
+  //$write-slots(super, out);
+    $write-slots-start(out, klass);
+
+    $write-element-idref(out, klass-of(self), "klass");
+
+    $write-slots-end(out);
+    return self;
+  }
+  method compare(object-t self, object-t other) -> int-t {
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
+    intmax-t diff = cast(uint8-t*)self - cast(uint8-t*)(other);
+    int-t result = dkt-normalize-compare-result(diff);
+    return result;
+  }
+  method equal?(object-t self, object-t other) -> boole-t {
+    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
+    boole-t state = false;
+
+    if (0 == compare(self, other))
+      state = true;
+    return state;
+  }
+  method instance?(object-t self, object-t kls) -> boole-t {
+    boole-t state = false;
+    object-t tmp-kls = klass-of(self);
+
+    while (null != tmp-kls) {
+      if (tmp-kls == kls) {
+        state = true;
+        break;
+      }
+      tmp-kls = superklass-of(tmp-kls);
+    }
+    return state;
+  }
+  method perform-method-for-selector(object-t self, selector-t selector) -> object-t {
+    object-t kls = klass-of(self);
+    method-t m = $method-for-selector(kls, selector);
+    object-t value = m(self);
+    return value;
+  }
+  // documented to do nothing
+  method init(object-t self) -> object-t {
+    return self;
+  }
+  method copy(object-t self) -> object-t {
+    USE(self);
+    throw make(exception::klass, #msg : "not yet implemented");
+    return nullptr;
+  }
+  method dealloc(object-t self) -> object-t {
+    $release(klass-of(self));
+    dkt::dealloc(self);
+    return nullptr;
+  }
+  method retain(object-t self) -> object-t {
+    self->retain-count++;
+    return self;
+  }
+  method release(object-t self) -> object-t {
+    self->retain-count--;
+    if (0 == self->retain-count)
+      self = $dealloc(self);
+    return self;
+  }
+  method autorelease(object-t self) -> object-t {
+    object-t current-pool = $current-pool(autorelease-pool::klass);
+    $add(current-pool, self);
+    return self;
+  }
+  method hash(object-t self) -> hash-t {
+    uintptr-t result = cast(uintptr-t)self;
+    return result;
+  }
+  method dump(object-t self) -> object-t {
+    symbol-t klass-name = #nullptr;
+
+    // klass
+    if (nullptr != klass-of(self) && nullptr != name-of(klass-of(self)))
+      klass-name = name-of(klass-of(self));
+    if (nullptr != klass-of(self))
+      fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(ptr-t)(self), cast(ptr-t)(self), cast(ptr-t)klass-of(self), klass-name);
+    else
+      fprintf(stderr, "%p:%p { klass=%s }\n", cast(ptr-t)(self), cast(ptr-t)(self), #nullptr);
+
+//     if (nullptr != klass-of(self) && self != klass-of(self))
+//       $dump(klass-of(self));
+
+    return self;
+  }
+  method utf8-from(object-t self) -> str-t {
+    size-t len = 2 + PRIxPTR-WIDTH + (1);
+    char8-t* buffer = cast(char8-t*)dkt::alloc(len);
+    snprintf(buffer, len, "%p", cast(ptr-t)self);
+    return cast(str-t)(buffer);
+  }
+  method print(object-t self, object-t out) -> object-t {
+    if (null == out)
+      out = std-output;
+    str-t utf8 = $utf8-from(self);
+    $print(out, utf8);
+    return self;
+  }
+  method println(object-t self, object-t out) -> object-t {
+    if (null == out)
+      out = std-output;
+    $print(self, out);
+    $print(out, "\n");
+    return self;
+  }
+}
+func dkt-unbox-check(object-t object, object-t kls) -> void {
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
+                        __func__, cast(ptr-t)(object), $name(kls));
+  unless (object::instance?(object, kls)) {
+    str-t object-kls-name = name-of(klass-of(object));
+    str-t kls-name = name-of(kls);
+
+    if (object::instance?(object, klass::klass))
+      dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s', name='%s'})",
+              kls-name, cast(ptr-t)object, object-kls-name, name-of(object));
+    else
+      dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s'})",
+              kls-name, cast(ptr-t)object, object-kls-name);
+
+    throw make(unbox-illegal-klass-exception::klass);
+  }
+  return;
+}
