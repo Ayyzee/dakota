@@ -1,4 +1,4 @@
-SHELL := /bin/bash -e -u
+SHELL := /bin/bash -o errexit -o nounset -o pipefail
 
 DESTDIR ?=
 
@@ -8,8 +8,6 @@ srcdir ?= .
 blddir := .
 objdir ?= $(blddir)/obj
 objdir-name := $(notdir $(objdir))
-
-$(shell mkdir -p $(objdir))
 
 prefix ?= /usr/local
 
@@ -21,32 +19,33 @@ MAKEFLAGS +=\
 
 # --no-print-directory\
 
-include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/compiler.mk\
- $(rootdir)/lib/dakota/compiler.json\
- $(rootdir)/lib/dakota/platform.json)\
-
 hh_ext := hh
 cc_ext := cc
 
 CP := cp
-CPFLAGS := -pR
+CPFLAGS := --recursive --preserve=mode,ownership,timestamps
 
 RM := rm
-RMFLAGS := -fr
+RMFLAGS := --force --recursive
 
 LN := ln
-LNFLAGS := -s
+LNFLAGS := --symbolic
 
 MKDIR := mkdir
-MKDIRFLAGS := -p
+MKDIRFLAGS := --parents
 
-INSTALL_CREATE_PARENT_DIR_FLAGS := # -D # linux only (absent on darwin)
+$(shell $(MKDIR) $(MKDIRFLAGS) $(objdir))
+
+include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/compiler.mk\
+ $(rootdir)/lib/dakota/compiler.json\
+ $(rootdir)/lib/dakota/platform.json)\
+
+INSTALL_CREATE_PARENT_DIR_FLAGS := -D # linux only (absent on darwin)
 INSTALL := install
 INSTALLFLAGS := $(INSTALL_CREATE_PARENT_DIR_FLAGS)
-INSTALL_MODE_FLAGS := -m
-INSTALL_OWNER_FLAGS := -o
-INSTALL_GROUP_FLAGS := -g
-INSTALL_SAFE_COPY_FLAGS := -S
+INSTALL_MODE_FLAGS := --mode
+INSTALL_OWNER_FLAGS := --owner
+INSTALL_GROUP_FLAGS := --group
 
 INSTALL_OWNER := root
 INSTALL_GROUP := staff
@@ -54,14 +53,15 @@ INSTALL_MODE_LIB :=     0644
 INSTALL_MODE_DATA :=    0644
 INSTALL_MODE_PROGRAM := 0755
 
-EXTRA_INSTALLFLAGS := $(INSTALL_SAFE_COPY_FLAGS) $(INSTALL_OWNER_FLAGS)$(INSTALL_OWNER) $(INSTALL_GROUP_FLAGS)$(INSTALL_GROUP)
+EXTRA_INSTALLFLAGS := $(INSTALL_OWNER_FLAGS)=$(INSTALL_OWNER) $(INSTALL_GROUP_FLAGS)=$(INSTALL_GROUP)
 
 #INSTALL_LIB is for shared libraries only
-INSTALL_LIB  :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)$(INSTALL_MODE_LIB)
-INSTALL_DATA :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)$(INSTALL_MODE_DATA)
-INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)$(INSTALL_MODE_PROGRAM)
+INSTALL_LIB  :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)=$(INSTALL_MODE_LIB)
+INSTALL_DATA :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)=$(INSTALL_MODE_DATA)
+INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)=$(INSTALL_MODE_PROGRAM)
 
 # not really ideal, but it works since the target-triplet is a directory that may/may-not be part of a path
+# this really needs to be fixed
 target-triplet ?= .
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
@@ -73,6 +73,7 @@ EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
 
 ifdef DKT_PROFILE
   DAKOTA ?= DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota-profile --define-macro DK_ENABLE_TRACE_MACROS=1 --define-macro $(HOST_OS)
+	# prof uses -p, gprof uses -pg
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
