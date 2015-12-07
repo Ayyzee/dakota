@@ -62,7 +62,7 @@ INSTALL_DATA :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MO
 INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(INSTALL_MODE_PROGRAM)
 
 # not really ideal, but it works since the target-triplet is a directory that may/may-not be part of a path
-target-triplet := .
+target-triplet ?= .
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
 
