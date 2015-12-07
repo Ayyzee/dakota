@@ -69,9 +69,13 @@ BEGIN {
   $dkhh_ext = &dakota::util::var($gbl_compiler, 'dkhh_ext', undef);
   $dkcc_ext = &dakota::util::var($gbl_compiler, 'dkcc_ext', undef);
 };
+my $use_new_macro_system = 0;
+
 use dakota::rewrite;
-use dakota::macro_system;
 use dakota::util;
+if ($use_new_macro_system) {
+  #use dakota::macro_system;
+}
 
 #use Carp;
 #$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
@@ -237,6 +241,7 @@ sub write_to_file_strings {
 my $gbl_macros;
 sub write_to_file_converted_strings {
   my ($path, $strings, $remove) = @_;
+  if ($use_new_macro_system) {
   if (!defined $gbl_macros) {
     if ($ENV{'DK_MACROS_PATH'}) {
       $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die "do $ENV{'DK_MACROS_PATH'} failed: $!\n";
@@ -245,6 +250,7 @@ sub write_to_file_converted_strings {
     } else {
       die;
     }
+  }
   }
   my $kw_args_generics = &dakota::util::kw_args_generics();
   if (defined $path) {
@@ -258,7 +264,7 @@ sub write_to_file_converted_strings {
     $filestr .= $string;
   }
   my $sst = &sst::make($filestr, ">$path");
-  if (0) {
+  if ($use_new_macro_system) {
     &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_args_generics);
   }
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});

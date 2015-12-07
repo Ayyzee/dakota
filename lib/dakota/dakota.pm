@@ -738,10 +738,10 @@ sub exec_cmd {
     print STDERR "  $cmd_str\n";
   }
     if ($ENV{'DKT_INITIAL_WORKDIR'}) {
-      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl $ENV{'DKT_INITIAL_WORKDIR'}") or die;
+      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr $ENV{'DKT_INITIAL_WORKDIR'}") or die;
     }
     else {
-      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr.pl") or die;
+      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr") or die;
     }
 
   my $exit_val = system($cmd_str);

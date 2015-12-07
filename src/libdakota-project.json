@@ -111,11 +111,8 @@
         '$(DESTDIR)$(prefix)/lib/dakota/lang-user-data.json',
         '$(DESTDIR)$(prefix)/lib/dakota/used.json',
 
-        '$(DESTDIR)$(prefix)/lib/dakota/macros.pl',
-
         '$(DESTDIR)$(prefix)/lib/dakota/dakota.pm',
         '$(DESTDIR)$(prefix)/lib/dakota/generate.pm',
-        '$(DESTDIR)$(prefix)/lib/dakota/macro_system.pm',
         '$(DESTDIR)$(prefix)/lib/dakota/parse.pm',
         '$(DESTDIR)$(prefix)/lib/dakota/rewrite.pm',
         '$(DESTDIR)$(prefix)/lib/dakota/sst.pm',
@@ -130,7 +127,7 @@
         '$(DESTDIR)$(prefix)/include/dakota.hh',
 
         '$(DESTDIR)$(prefix)/bin/dakota',
-        '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr.pl',
+        '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr',
         '$(DESTDIR)$(prefix)/bin/dakota-project',
         '$(DESTDIR)$(prefix)/bin/dakota-json2mk',
       ],
