@@ -296,7 +296,9 @@ sub generate_nrt {
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
-  print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
+  if (&is_debug()) {
+    print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
+  }
   my $str;
   if (&is_nrt_decl()) {
     $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name);
@@ -335,7 +337,9 @@ sub generate_rt {
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
-  print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
+  if (&is_debug()) {
+    print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
+  }
   my $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name);
 
   if (&is_rt_defn()) {
@@ -4263,7 +4267,9 @@ sub dk_generate_cc {
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output
   }
-  print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # user-dk-cc
+  if (&is_debug()) {
+    print "    creating $output" . &pann(__FILE__, __LINE__) . "\n"; # user-dk-cc
+  }
   my $remove;
 
   if ($ENV{'DK_NO_LINE'}) {

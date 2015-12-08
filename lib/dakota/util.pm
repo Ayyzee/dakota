@@ -62,6 +62,7 @@ our @EXPORT= qw(
                  header_file_regex
                  ident_regex
                  is_symbol_candidate
+                 is_debug
                  kw_args_generics
                  kw_args_generics_add
                  kw_args_placeholders
@@ -213,6 +214,9 @@ sub rand_str {
   my $str = '';
   $str .= $$alphabet[rand @$alphabet] for 1..$len;
   return $str;
+}
+sub is_debug {
+  return 0;
 }
 sub is_symbol_candidate {
   my ($str) = @_;
