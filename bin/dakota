@@ -95,6 +95,36 @@ my $root_cmd = { 'reps' => [],
 
 $$root_cmd{'inputs'} = [map { &canon_path($_) } @ARGV];
 
+if (!$$root_cmd{'opts'}{'compile'} &&
+    !$$root_cmd{'opts'}{'shared'}  &&
+    !$$root_cmd{'opts'}{'dynamic'}) {
+  my $output;
+  if (!$$root_cmd{'opts'}{'output'}) {
+    my $last_non_main_dk_base;
+    my $last_main_dk_base;
+    my $num_non_main_dk = 0;
+    my $num_main_dk = 0;
+    for my $input (@{$$root_cmd{'inputs'}}) {
+      if ($input =~ /([\w-]+)-main.dk$/) {
+        $num_main_dk++;
+        $last_main_dk_base = $1;
+        $output = $1;
+      } elsif ($input =~ /([\w-]+).dk$/) {
+        $num_non_main_dk++;
+        $last_non_main_dk_base = $1;
+      }
+    }
+    if (1 == $num_main_dk) { # of of the input files match *-main.dk?
+      $output = $last_main_dk_base;
+    } elsif (1 == $num_non_main_dk) { # of of the input files match *-main.dk?
+      $output = $last_non_main_dk_base;
+    }
+  }
+  if ($output) {
+    $$root_cmd{'opts'}{'output'} = $output;
+  }
+}
+
 if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
   #`dakota --help`;
   exit 1;
