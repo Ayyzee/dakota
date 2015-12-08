@@ -1431,7 +1431,8 @@ static func last-user-code-before-main() -> void  {
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
   int-t r = set-read-only-all("__DKT_RODATA"); // must match segment portion of macro dkt-rodata-section
-  if (-1 == r) std::abort();
+  if (-1 == r)
+    fprintf(stderr, "__DKT_RODATA not being used\n");
   return;
 }
 func dkt-register-info(named-info-t* registration-info) -> void {
