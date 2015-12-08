@@ -45,7 +45,7 @@
     'output' => '$(blddir)/../lib/libdakota-util.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
-    'soname' => '$(blddir)/../lib/libdakota-util.$(so_ext)', # cmd-line
+    'soname' => '$(DESTDIR)$(prefix)/lib/libdakota-util.$(so_ext)', # cmd-line
     'install' => {
       '-rules' => [
         '$(DESTDIR)$(prefix)/lib/%', '$(blddir)/../lib/%',
