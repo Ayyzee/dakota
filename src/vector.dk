@@ -196,7 +196,7 @@ klass vector {
   //     method replace-first(object-t self, object-t element) -> object-t;
   //     method replace-last(object-t self, object-t element) -> object-t;
 
-  method at(object-t self, uint32-t index, object-t default-result) -> object-t {
+  method at(object-t self, hash-t index, object-t default-result) -> object-t {
     object-t element = default-result;
     if (self.count > index) {
       element = self.elements[index];
@@ -211,7 +211,7 @@ klass vector {
     object-t result = $at(self, index, default-result);
     return result;
   }
-  method at(object-t self, uint32-t index) -> object-t {
+  method at(object-t self, hash-t index) -> object-t {
     object-t element = $at(self, index, cast(object-t)nullptr);
     if (nullptr == element)
       throw make(exception::klass, #msg : "oops");

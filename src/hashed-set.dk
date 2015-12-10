@@ -70,7 +70,7 @@ klass hashed-set {
     return self;
   }
   method add(object-t self, object-t object1) -> object-t {
-    uint32-t index = $hash(object1) % self.num-buckets;
+    hash-t index = $hash(object1) % self.num-buckets;
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
@@ -105,7 +105,7 @@ klass hashed-set {
     return self;
   }
   method in(object-t self, object-t object1, object-t default-value) -> object-t {
-    uint32-t index = $hash(object1) % self.num-buckets;
+    hash-t index = $hash(object1) % self.num-buckets;
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
 
@@ -146,7 +146,7 @@ klass hashed-set {
   method remove(object-t self, object-t element1) -> object-t {
     object-t object = null;
 
-    uint32-t index = $hash(element1) % self.num-buckets;
+    hash-t index = $hash(element1) % self.num-buckets;
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {
