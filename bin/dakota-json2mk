@@ -144,6 +144,7 @@ sub tsv_set {
   my $lhs = &lhs($scopes, $prefix);
   return $lhs;
 }
+my $
 # scalar is member of rhs seq
 sub process_scalar {
   my ($data, $opts, $lhs, $out) = @_;
@@ -153,18 +154,18 @@ sub process_scalar {
 sub process_scalar_expr {
   my ($data, $opts, $scopes, $out) = @_;
   my $lhs = &tsv_set($opts, $scopes, $out);
-  my $style;
   if ($data) {
-    $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
+    my $_style;
+    $$out{'mk'}{$lhs} = &mydump($data, $_style = 'mk');
   }
 }
 # seq is rhs of expr (lhs = rhs ...)
 sub process_seq_expr {
   my ($data, $opts, $scopes, $out) = @_;
   my $lhs = &tsv_set($opts, $scopes, $out);
-  my $style;
   if ($data) {
-    $$out{'mk'}{$lhs} = &mydump($data, $style = 'mk');
+    my $_style;
+    $$out{'mk'}{$lhs} = &mydump($data, $_style = 'mk');
   }
 }
 sub mkstr {
@@ -172,9 +173,9 @@ sub mkstr {
   my $result = '';
   foreach my $lhs (sort keys %{$$out{'mk'}}) {
     my $rhs = $$out{'mk'}{$lhs};
-    my $style;
     if ($rhs) {
-      $result .= $lhs . $sep . &mydump($rhs, $style = 'mk') . "\n";
+      my $_style;
+      $result .= $lhs . $sep . &mydump($rhs, $_style = 'mk') . "\n";
     }
   }
   return $result;
@@ -185,7 +186,7 @@ sub mydump {
   $result = &Dumper($ref);
   $result =~ s/\\"//g;
   $result =~ s/"//g;
-  if ($style && 'mk' eq $style) {
+  if ($style && $style eq 'mk') {
     $result =~ s/^\[(.*)\]$/$1/;
     $result =~ s/\s*,\s*/ /g;
     $result =~ s/\\(.)/$1/g;
