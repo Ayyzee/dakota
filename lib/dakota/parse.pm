@@ -400,10 +400,6 @@ sub cc_path_from_nrt_cc_path {
   my ($path) = @_;
   return &out_path_from_in_path('cc_path_from_nrt_cc_path', $path);
 }
-sub ctlg_path_from_so_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('ctlg_path_from_so_path', $path);
-}
 sub ctlg_path_from_any_path {
   my ($path) = @_;
   return &out_path_from_in_path('ctlg_path_from_any_path', $path);
@@ -424,12 +420,29 @@ sub rep_path_from_any_path {
   my ($path) = @_;
   return &out_path_from_in_path('rep_path_from_any_path', $path);
 }
+sub ctlg_path_from_so_path {
+  my ($in_path) = @_;
+  $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
+  my $vers = $1;
+  my $out_path = &out_path_from_in_path('ctlg_path_from_so_path', $in_path);
+  if (defined $vers) {
+    $out_path =~ s/\.ctlg$/.ctlg$vers/;
+  }
+  return $out_path;
+}
 sub rep_path_from_ctlg_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('rep_path_from_ctlg_path', $path);
+  my ($in_path) = @_;
+  $in_path =~ s/\.ctlg((\.\d+)+)$/.ctlg/;
+  my $vers = $1;
+  my $out_path = &out_path_from_in_path('rep_path_from_ctlg_path', $in_path);
+  if (defined $vers) {
+    $out_path =~ s/\.$so_ext\.rep$/.$so_ext$vers.rep/;
+  }
+  return $out_path;
 }
 sub rep_path_from_so_path {
   my ($path) = @_;
+  #
   return &out_path_from_in_path('rep_path_from_so_path', $path);
 }
 sub rt_cc_path_from_any_path {
@@ -438,6 +451,7 @@ sub rt_cc_path_from_any_path {
 }
 sub rt_cc_path_from_so_path {
   my ($path) = @_;
+  #
   return &out_path_from_in_path('rt_cc_path_from_so_path', $path);
 }
 sub var_perl_from_make { # convert variable syntax to perl from make
@@ -448,7 +462,7 @@ sub var_perl_from_make { # convert variable syntax to perl from make
   return $result;
 }
 sub expand {
-  my ($str, $ext, $ver_suffix) = @_;
+  my ($str) = @_;
   $str =~ s/(\$\w+)/$1/eeg;
   return $str;
 }
@@ -464,18 +478,12 @@ sub expand_tbl_values {
 }
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
-  $path_in =~ s/^(.+\.($so_ext|ctlg))((\.\d+)+)$/$1/;
-  my $ext = $2;
-  my $ver_suffix = $3;
-  if (! defined $ver_suffix) {
-    $ver_suffix = '';
-  }
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
   $pattern_replacement =~ s|\%|\%s|;
 
-  my $result = &expand(&var_perl_from_make($path_in), $ext, $ver_suffix);
+  my $result = &expand(&var_perl_from_make($path_in));
   if ($result =~ m|^$pattern_template$|) {
     $result = sprintf($pattern_replacement, &rel_path_canon($1));
     $result = &expand($result);
@@ -483,7 +491,6 @@ sub out_path_from_in_path {
     print STDERR "warning: $pattern_name: $result !~ |^$pattern_template\$|\n";
     die;
   }
-  $result .= $ver_suffix;
   return $result;
 }
 sub add_klass_decl {

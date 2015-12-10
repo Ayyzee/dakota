@@ -925,6 +925,7 @@ sub ctlg_from_so {
   } elsif ($gbl_prefix) {
     $$ctlg_cmd{'cmd'} = "$gbl_prefix/bin/dakota-info";
   } else {
+    die; # should we all just any dakota-info?
     $$ctlg_cmd{'cmd'} = 'dakota-info';
   }
 
