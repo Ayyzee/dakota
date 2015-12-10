@@ -7,7 +7,6 @@
 {
   'CXX' => [ 'g++' ],
   'CXXFLAGS' => [ '-std=c++11', '--visibility=hidden', '--non-call-exceptions', '--asynchronous-unwind-tables' ],
-  'CXX_COMPILE_FLAGS' =>     [ '--compile' ],
   'CXX_COMPILE_FLAGS' => [ '--compile', '--PIC' ],
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic', '--PIC' ],
   'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],

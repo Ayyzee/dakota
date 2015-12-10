@@ -6,12 +6,8 @@
 # -*- cperl-tab-always-indent: t -*-
 {
   'CXX' => [ 'clang++' ],
-  # clang does not understand --visibility=, --non-call-exceptions, nor --asynchronous-unwind-tables
   'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fnon-call-exceptions', '-fasynchronous-unwind-tables' ],
-  'CXX_COMPILE_FLAGS' =>     [ '--compile', '-emit-llvm' ],
-  'CXX_COMPILE_THREAD_FLAGS' => [ '-pthread', '-lpthread', '--define-macro=__REENTRANT' ],
-  # clang does not understand --PIC
-  'CXX_COMPILE_FLAGS' => [ '--compile', '-emit-llvm', '-fPIC' ],
+  'CXX_COMPILE_FLAGS' => [ '--compile', '-fPIC', '-emit-llvm' ],
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic', '-fPIC' ],
   'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
   'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
