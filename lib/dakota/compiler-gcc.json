@@ -32,10 +32,12 @@
       '--warn-switch-enum',
       '--warn-undef',
       '--warn-unused',
+
       '--warn-no-redundant-decls',
       '--warn-no-attributes',
       '--warn-no-missing-field-initializers',
       '--warn-no-cast-qual',
+      '--warn-no-switch-default',
       ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
   'cc_ext' => 'cc',

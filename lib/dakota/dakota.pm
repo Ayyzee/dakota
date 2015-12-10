@@ -96,10 +96,10 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_exe_type = undef;
 
-my $cxx_compile_flags =     &dakota::util::var($gbl_compiler, 'CXX_COMPILE_FLAGS',     [ '--compile', '--PIC' ]); # or -fPIC
-my $cxx_output_flags =      &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',      '--output');
-my $cxx_shared_flags =      &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',      '--shared');
-my $cxx_dynamic_flags =     &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS',     '--dynamic');
+my $cxx_compile_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
+my $cxx_output_flags =  &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  '--output');
+my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',  '--shared');
+my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', '--dynamic');
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -157,16 +157,16 @@ sub add_visibility {
     my $tbl = $$root{'modules'}{$name}{'export'};
     my $strs = [sort keys %$tbl];
     foreach my $str (@$strs) {
-	    my $seq = $$tbl{$str};
-	    if ($debug) { print STDERR "export module $name $str;\n"; }
-	    if (0) {
-	    } elsif ($str =~ /^($rid)::(slots-t)$/) {
+      my $seq = $$tbl{$str};
+      if ($debug) { print STDERR "export module $name $str;\n"; }
+      if (0) {
+      } elsif ($str =~ /^($rid)::(slots-t)$/) {
         my ($klass_name, $type_name) = ($1, $2);
         # klass slots
         if ($debug) { print STDERR "klass       slots:  $klass_name|$type_name\n"; }
         if ($$root{'klasses'}{$klass_name} &&
-		    $$root{'klasses'}{$klass_name}{'slots'} &&
-		    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
+	    $$root{'klasses'}{$klass_name}{'slots'} &&
+	    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
       } elsif ($str =~ /^($rid)$/) {
@@ -181,13 +181,13 @@ sub add_visibility {
         if ($$root{'traits'}{$klass_name}) {
           $$root{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
-	    } elsif ($str =~ /^($rid)::($msig)$/) {
+      } elsif ($str =~ /^($rid)::($msig)$/) {
         my ($klass_name, $method_name) = ($1, $2);
         # klass/trait method
         if ($debug) { print STDERR "klass/trait method $klass_name:$method_name\n"; }
         foreach my $constructs ('klasses', 'traits') {
           if ($$root{$constructs}{$klass_name} &&
-                $$root{$constructs}{$klass_name}{'module'} eq $name) {
+	      $$root{$constructs}{$klass_name}{'module'} eq $name) {
             foreach my $method_type ('slots-methods', 'methods') {
               if ($debug) { print STDERR &Dumper($$root{$constructs}{$klass_name}); }
               while (my ($sig, $scope) = each (%{$$root{$constructs}{$klass_name}{$method_type}})) {
@@ -206,9 +206,9 @@ sub add_visibility {
             }
           }
         }
-	    } else {
+      } else {
         print STDERR "error: not klass/trait/slots/method: $str\n";
-	    }
+      }
     }
   }
 }
@@ -288,7 +288,6 @@ sub loop_cc_from_dk {
   } else {
     $rep = [];
   }
-
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if ($input =~ m|\.rep$|) {
       &dakota::util::add_last($rep, $input);
@@ -350,7 +349,6 @@ sub is_so {
   my $result = $name =~ m|^(.*/)?lib([.\w-]+)\.$so_ext(\.\d+)*$|; # so-regex
   return $result;
 }
-
 sub lib_path_to_cmd_opts {
   my ($lib) = @_;
 
@@ -403,24 +401,23 @@ sub start_cmd {
     $dk_exe_type = undef;
   } elsif ($$cmd_info{'opts'}{'shared'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-	    $cxx_shared_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
-	    $cxx_shared_flags .= " --for-linker --no-undefined";
+      $cxx_shared_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
+      $cxx_shared_flags .= " --for-linker --no-undefined";
     }
     $dk_exe_type = 'exe-type::k_lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-	    $cxx_dynamic_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
-	    $cxx_shared_flags .= " --for-linker --no-undefined";
+      $cxx_dynamic_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
+      $cxx_shared_flags .= " --for-linker --no-undefined";
     }
     $dk_exe_type = 'exe-type::k_lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
-             && !$$cmd_info{'opts'}{'shared'}
-             && !$$cmd_info{'opts'}{'dynamic'}) {
+	   && !$$cmd_info{'opts'}{'shared'}
+	   && !$$cmd_info{'opts'}{'dynamic'}) {
     $dk_exe_type = 'exe-type::k_exe';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($ENV{'DKT_PRECOMPILE'}) {
     my $rt_cc;
@@ -458,7 +455,6 @@ sub start_cmd {
   if ($$cmd_info{'opts'}{'output'} =~ m/\.rep$/) { # this is a real hackhack
     &add_visibility_file($$cmd_info{'opts'}{'output'});
   }
-
   if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
     # this might be useful for distributed building (initiating the building of the slowest first
@@ -476,7 +472,6 @@ sub start_cmd {
       &gen_rt_o($cmd_info);
     }
   }
-
   if ($$cmd_info{'opts'}{'compile'} && exists $$cmd_info{'output'}) {
     my $last = &last($$cmd_info{'inputs'});
     `mv $last $$cmd_info{'output'}`;
@@ -488,17 +483,17 @@ sub start_cmd {
     }
   } elsif (!$ENV{'DKT_PRECOMPILE'}) {
     if ($$cmd_info{'opts'}{'shared'}) {
-	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
-	    &so_from_o($cmd_info);
+            $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
+            &so_from_o($cmd_info);
     } elsif ($$cmd_info{'opts'}{'dynamic'}) {
-	    $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
-	    &dso_from_o($cmd_info);
+            $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
+            &dso_from_o($cmd_info);
     } elsif (!$$cmd_info{'opts'}{'compile'} &&
              !$$cmd_info{'opts'}{'shared'}  &&
              !$$cmd_info{'opts'}{'dynamic'}) {
-	    &exe_from_o($cmd_info);
+            &exe_from_o($cmd_info);
     } else {
-	    die __FILE__, ":", __LINE__, ": error:\n";
+            die __FILE__, ":", __LINE__, ": error:\n";
     }
   }
   return $exit_status;
@@ -675,9 +670,9 @@ sub o_from_cc {
     my $should_echo;
 
     if (0) {
-	    $$o_cmd{'cmd-flags'} .= " -MMD";
-	    &outfile_from_infiles($o_cmd, $should_echo = 1);
-	    $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
+      $$o_cmd{'cmd-flags'} .= " -MMD";
+      &outfile_from_infiles($o_cmd, $should_echo = 1);
+      $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
     }
     &outfile_from_infiles($o_cmd, $should_echo = 0);
 }
@@ -737,54 +732,54 @@ sub rt_o_from_rep {
 }
 sub so_from_o {
   my ($cmd_info) = @_;
-    my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
-    my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
-    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
-    $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
-    $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
-    $$so_cmd{'output'} = $$cmd_info{'output'};
-    if ($use_lib_opts_replace_lib_path) {
-      $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
-    } else {
-      $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
-    }
-    my $should_echo;
-    &outfile_from_infiles($so_cmd, $should_echo = 1);
+  my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
+  my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
+  my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
+  $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
+  $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
+  $$so_cmd{'output'} = $$cmd_info{'output'};
+  if ($use_lib_opts_replace_lib_path) {
+    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+  } else {
+    $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
+  }
+  my $should_echo;
+  &outfile_from_infiles($so_cmd, $should_echo = 1);
 }
 sub dso_from_o {
   my ($cmd_info) = @_;
-    my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
-    my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
-    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
-    $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
-    $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
-    $$so_cmd{'output'} = $$cmd_info{'output'};
-    if ($use_lib_opts_replace_lib_path) {
-      $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
-    } else {
-      $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
-    }
-    my $should_echo;
-    &outfile_from_infiles($so_cmd, $should_echo = 1);
+  my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
+  my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
+  my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
+  $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
+  $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
+  $$so_cmd{'output'} = $$cmd_info{'output'};
+  if ($use_lib_opts_replace_lib_path) {
+    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+  } else {
+    $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
+  }
+  my $should_echo;
+  &outfile_from_infiles($so_cmd, $should_echo = 1);
 }
 sub exe_from_o {
   my ($cmd_info) = @_;
-    my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
-    my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
-    my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
-    $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$exe_cmd{'cmd-major-mode-flags'} = undef;
-    $$exe_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
-    $$exe_cmd{'output'} = $$cmd_info{'output'};
-    if ($use_lib_opts_replace_lib_path) {
-      $$exe_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
-    } else {
-      $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
-    }
-    my $should_echo;
-    &outfile_from_infiles($exe_cmd, $should_echo = 1);
+  my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
+  my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
+  my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
+  $$exe_cmd{'cmd-major-mode-flags'} = undef;
+  $$exe_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
+  $$exe_cmd{'output'} = $$cmd_info{'output'};
+  if ($use_lib_opts_replace_lib_path) {
+    $$exe_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+  } else {
+    $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
+  }
+  my $should_echo;
+  &outfile_from_infiles($exe_cmd, $should_echo = 1);
 }
 sub dir_part {
   my ($path) = @_;
@@ -813,13 +808,12 @@ sub exec_cmd {
   if ($global_should_echo || $should_echo) {
     print STDERR "  $cmd_str\n";
   }
-    if ($ENV{'DKT_INITIAL_WORKDIR'}) {
-      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr $ENV{'DKT_INITIAL_WORKDIR'}") or die;
-    }
-    else {
-      open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr") or die;
-    }
-
+  if ($ENV{'DKT_INITIAL_WORKDIR'}) {
+    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr $ENV{'DKT_INITIAL_WORKDIR'}") or die;
+  }
+  else {
+    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr") or die;
+  }
   my $exit_val = system($cmd_str);
   if (0 != $exit_val >> 8) {
     my $tmp_exit_status = $exit_val >> 8;
@@ -828,26 +822,26 @@ sub exec_cmd {
     }
     if (!$$root_cmd{'opts'}{'keep-going'}) {
       if (!($global_should_echo || $should_echo)) {
-		    print STDERR "  $cmd_str\n";
+        print STDERR "  $cmd_str\n";
       }
       die "exit value from system() was $exit_val\n" if $exit_status == 0;
       exit $exit_status;
     }
   }
 }
-  sub path_stat {
-    my ($path_db, $path, $text) = @_;
-    my $stat;
-    if (exists $$path_db{$path}) {
-      $stat = $$path_db{$path};
-    } else {
-      if ($show_outfile_info) {
-        print "STAT $path, text=$text\n";
-      }
-      @$stat{qw(dev inode mode nlink uid gid rdev size atime mtime ctime blksize blocks)} = stat($path);
+sub path_stat {
+  my ($path_db, $path, $text) = @_;
+  my $stat;
+  if (exists $$path_db{$path}) {
+    $stat = $$path_db{$path};
+  } else {
+    if ($show_outfile_info) {
+      print "STAT $path, text=$text\n";
     }
-    return $stat;
+    @$stat{qw(dev inode mode nlink uid gid rdev size atime mtime ctime blksize blocks)} = stat($path);
   }
+  return $stat;
+}
 sub append_to_env_file {
   my ($key, $elements, $env_var) = @_;
   my $file = $ENV{$env_var};
@@ -874,23 +868,21 @@ sub outfile_from_infiles {
     if (!$$infile_stat{'mtime'}) {
       $$infile_stat{'mtime'} = 0;
     }
-
     if (! -e $outfile || $$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
       &make_dir($$cmd_info{'output'});
       if ($show_outfile_info) {
         print "MK $$cmd_info{'output'}\n";
       }
-	    my $output = $$cmd_info{'output'};
+      my $output = $$cmd_info{'output'};
 
-	    if ($output !~ m|\.rep$| &&
-                $output !~ m|\.ctlg(\.\d+)*$|) {
+      if ($output !~ m|\.rep$| &&
+          $output !~ m|\.ctlg(\.\d+)*$|) {
         #$should_echo = 0;
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
           $output = $ENV{'DKT_DIR'} . '/' . $output
         }
         #print "    creating $output # output" . &pann(__FILE__, __LINE__) . "\n";
-	    }
-
+      }
       if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {
         $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
         delete $$cmd_info{'output'};
@@ -928,7 +920,6 @@ sub ctlg_from_so {
     die; # should we all just any dakota-info?
     $$ctlg_cmd{'cmd'} = 'dakota-info';
   }
-
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
   if ($ENV{'DKT_PRECOMPILE'}) {
