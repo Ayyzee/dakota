@@ -5,6 +5,8 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
+# -*- tab-width: 2
+# -*- indent-tabs-mode: nil
 
 # Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
 #
@@ -337,7 +339,10 @@ sub generate_rt {
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
+  my $start_time;
+  my $end_time;
   if (&is_debug()) {
+    $start_time = time;
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
   }
   my $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name);
@@ -349,6 +354,11 @@ sub generate_rt {
     &write_to_file_strings($pre_output, [ $str ]);
   }
   &write_to_file_converted_strings($output, [ $str ]);
+  if (&is_debug()) {
+    $end_time = time;
+    my $elapsed_time = $end_time - $start_time;
+    print "    creating $output ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . "\n";
+  }
   return $output;
 } # sub generate_rt
 sub labeled_src_str {
@@ -3345,7 +3355,7 @@ sub dk_generate_cc_footer_klass {
         } else {
           $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
         }
-        my $tp = 'slots-t::' . $$slot_info{'name'};
+        my $tp = 'decltype((cast(slots-t*)0)->' . $$slot_info{'name'} . ')';
        #$$tbl{'#typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
         $$tbl{'#typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
 

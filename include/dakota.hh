@@ -94,7 +94,14 @@ namespace dkt {
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) nullptr
 # endif
 
-# define dkt_rodata_section  gnu::section("__DKT_RODATA, __dkt_rodata")
+# if defined __clang__
+  # define dkt_rodata_section  gnu::section("__DKT_RODATA#, __dkt_rodata")
+# elif defined __GNUG__
+  # define dkt_rodata_section  gnu::section("\"__DKT_RODATA#, __dkt_rodata\"")
+# else
+  # error "Neither __clang__ nor __GNUG__ is defined."
+#endif
+
 # define format_va_printf(n) gnu::format(__printf__, n, 0)
 # define format_va_scanf(n)  gnu::format(__scanf__,  n, 0)
 # define format_printf(n)    gnu::format(__printf__, n, n + 1)

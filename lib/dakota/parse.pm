@@ -5,6 +5,8 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
+# -*- tab-width: 2
+# -*- indent-tabs-mode: nil
 
 # Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
 #
@@ -446,7 +448,7 @@ sub var_perl_from_make { # convert variable syntax to perl from make
   return $result;
 }
 sub expand {
-  my ($str) = @_;
+  my ($str, $ext, $ver_suffix) = @_;
   $str =~ s/(\$\w+)/$1/eeg;
   return $str;
 }
@@ -462,12 +464,18 @@ sub expand_tbl_values {
 }
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
+  $path_in =~ s/^(.+\.($so_ext|ctlg))((\.\d+)+)$/$1/;
+  my $ext = $2;
+  my $ver_suffix = $3;
+  if (! defined $ver_suffix) {
+    $ver_suffix = '';
+  }
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
   $pattern_replacement =~ s|\%|\%s|;
 
-  my $result = &expand(&var_perl_from_make($path_in));
+  my $result = &expand(&var_perl_from_make($path_in), $ext, $ver_suffix);
   if ($result =~ m|^$pattern_template$|) {
     $result = sprintf($pattern_replacement, &rel_path_canon($1));
     $result = &expand($result);
@@ -475,6 +483,7 @@ sub out_path_from_in_path {
     print STDERR "warning: $pattern_name: $result !~ |^$pattern_template\$|\n";
     die;
   }
+  $result .= $ver_suffix;
   return $result;
 }
 sub add_klass_decl {

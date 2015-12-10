@@ -91,8 +91,8 @@ static str-t gbl-current-module = "";
 
 klass assoc-node {
   slots {
-    uintptr-t element;
     slots-t*  next;
+    uintptr-t element;
   }
 }
 klass named-assoc-node {
@@ -444,14 +444,14 @@ func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
   // need to be sorted
   uint_t i = 0;
   if (klass-name != nullptr)
-    klass-props[i++] = { #klass-name,      cast(uintptr-t)klass-name      };
+    klass-props[i++] = {.key = #klass-name,      .element = cast(uintptr-t)klass-name     };
 
-  klass-props[i++] =   { #name,            cast(uintptr-t)name            };
+  klass-props[i++] =   {.key = #name,            .element = cast(uintptr-t)name           };
 
   if (superklass-name != nullptr)
-    klass-props[i++] = { #superklass-name, cast(uintptr-t)superklass-name };
+    klass-props[i++] = {.key = #superklass-name, .element = cast(uintptr-t)superklass-name};
 
-  *klass-info = { klass-props, num-klass-props, nullptr };
+  *klass-info = {.next = nullptr, .count = num-klass-props, .elements = klass-props};
   object-t klass = dk-register-klass(klass-info);
   return klass;
 }
@@ -577,13 +577,12 @@ func dk-init-runtime() -> void {
 # if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(#bit-vector);
 
-    object-t behavior;
-    behavior = $behavior(object::klass);
-    behavior = $behavior(klass::klass);
-    behavior = $behavior(bit-vector::klass);
+    $behavior(object::klass);
+    $behavior(klass::klass);
+    $behavior(bit-vector::klass);
 
     if (null-singleton::klass)
-      behavior = $behavior(null-singleton::klass);
+      $behavior(null-singleton::klass);
 # else
     klass::unbox(object::klass).behavior =     nullptr;
     klass::unbox(klass::klass).behavior =      nullptr;
@@ -1284,10 +1283,14 @@ klass x::sigaction-pair {
     x::sigaction-t         prev-sa;
   }
 }
-static int8-t const index-from-sig[NSIG] = {
-  [SIGBUS] =  0,
-  [SIGSEGV] = 1,
+static int8-t const index-from-sig-data[NSIG] = {
+  // [SIGBUS] =  0,
+  // [SIGSEGV] = 1,
 };
+static func index-from-sig(int-t sig) -> int8-t {
+  return 0;
+  return index-from-sig-data[sig];
+}
 static x::sigaction-pair-t sa-pairs[] = {
   { .handler = nullptr, .prev-sa = {} },
   { .handler = nullptr, .prev-sa = {} },
@@ -1366,7 +1369,7 @@ static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
     }
   }
   x::sigaction-handler-t prev-sa-handler =
-    sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction;
+    sa-pairs[index-from-sig(sig)].prev-sa.sa-sigaction;
 
   if (prev-sa-handler &&
       prev-sa-handler != cast(x::sigaction-handler-t)SIG-DFL &&
@@ -1390,8 +1393,8 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   sigemptyset(&sa.sa-mask);
   sa.sa-sigaction = bus-segv-handler;
   
-  sa-pairs[index-from-sig[sig]].prev-sa.sa-sigaction = nullptr;
-  int-t r = sigaction(sig,  &sa, &sa-pairs[index-from-sig[sig]].prev-sa);
+  sa-pairs[index-from-sig(sig)].prev-sa.sa-sigaction = nullptr;
+  int-t r = sigaction(sig, &sa, &sa-pairs[index-from-sig(sig)].prev-sa);
   if (-1 == r) {
     perror("sigaction");
     std::abort();
@@ -1485,6 +1488,8 @@ func dkt-register-info(named-info-t* registration-info) -> void {
         exit(EXIT-SUCCESS);
       pre-main? = false;
       break;
+    default:
+      std::abort();
   }
   if (nullptr != output-path && NUL != output-path[0] && nullptr != ctlg-output)
     fclose(ctlg-output);
@@ -1579,8 +1584,8 @@ func dk-klass-for-name(symbol-t klass-name, uint32-t column) -> object-t {
 }
 func info-for-name(symbol-t klass-name) -> named-info-t* {
   assert(nullptr != klass-name);
-  property-t[] properties = { { #name, cast(uintptr-t)klass-name } };
-  named-info-t info = { properties, DK-COUNTOF(properties), nullptr };
+  property-t[] properties = { {.key = #name, .element = cast(uintptr-t)klass-name } };
+  named-info-t info = {.next = nullptr, .count = DK-COUNTOF(properties), .elements = properties };
   named-info-t* info-ptr = &info;
   named-info-t** klass-info-ptr = cast(named-info-t**)sorted-array::bsearch(gbl-klass-defns-table, &info-ptr);
 

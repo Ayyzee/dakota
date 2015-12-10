@@ -49,7 +49,7 @@ namespace dkt {
     k_log_initial_final =  1 <<  2,
     k_log_trace_runtime =  1 <<  3,
 
-    k_log_all = (log_element_t)~0
+    k_log_all = ~(cast(log_element_t)0)
   };
   const uint32_t log_flags = k_log_null;
   //k-log-mem-footprint | k-log-object-alloc | k-log-initial-final | k-log-trace-runtime;

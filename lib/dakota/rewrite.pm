@@ -5,6 +5,8 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
+# -*- tab-width: 2
+# -*- indent-tabs-mode: nil
 
 # Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
 #

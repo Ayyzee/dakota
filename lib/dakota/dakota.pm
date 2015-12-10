@@ -5,6 +5,8 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
+# -*- tab-width: 2
+# -*- indent-tabs-mode: nil
 
 # Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
 #
@@ -118,7 +120,7 @@ sub loop_merged_rep_from_dk {
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     my $root;
     if ($arg =~ m|\.dk$| ||
-          $arg =~ m|\.ctlg$|) {
+        $arg =~ m|\.ctlg(\.\d+)*$|) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
       &dakota::util::add_last($rep_files, &rep_path_from_any_path($arg));
     } elsif ($arg =~ m|\.rep$|) {
@@ -339,11 +341,47 @@ sub loop_cc_from_dk {
   }
 } # loop_cc_from_dk
 
+# libX.so.3.9.4
+# libX.so.3.9
+# libX.so.3
+# libX.so
 sub is_so {
   my ($name) = @_;
-  my $result = $name =~ m/\.$so_ext$/;
+  my $result = $name =~ m|^(.*/)?lib([.\w-]+)\.$so_ext(\.\d+)*$|; # so-regex
   return $result;
 }
+
+sub lib_path_to_cmd_opts {
+  my ($lib) = @_;
+
+  my $result = '';
+  if ($lib =~ m|^(.*/)?lib([.\w-]+)\.$so_ext(\.\d+)*$|) { # so-regex
+    if (defined $1) {
+      my $dir = $1;
+      $dir =~ s|(.+)/|$1|;
+      $result .= "-L$dir ";
+    }
+    $result .= "-l$2";
+  } else {
+    $result = $lib;
+  }
+  return $result;
+}
+sub split_inputs {
+  my ($inputs) = @_;
+  my $unchanged = [];
+  my $changed = [];
+  foreach my $input (@$inputs) {
+    my $output = &lib_path_to_cmd_opts($input);
+    if ($output eq $input) {
+      push @$unchanged, $output;
+    } else {
+      push @$changed, $output;
+    }
+  }
+  return ($unchanged, $changed);
+}
+my $use_lib_opts_replace_lib_path = 1;
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
@@ -366,11 +404,13 @@ sub start_cmd {
   } elsif ($$cmd_info{'opts'}{'shared'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
 	    $cxx_shared_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
+	    $cxx_shared_flags .= " --for-linker --no-undefined";
     }
     $dk_exe_type = 'exe-type::k_lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
 	    $cxx_dynamic_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
+	    $cxx_shared_flags .= " --for-linker --no-undefined";
     }
     $dk_exe_type = 'exe-type::k_lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
@@ -398,6 +438,18 @@ sub start_cmd {
     }
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
+
+  if ($use_lib_opts_replace_lib_path) {
+    my ($inputs, $lib_opts) = &split_inputs($$cmd_info{'inputs'});
+    $$cmd_info{'inputs'} = $inputs;
+    $$cmd_info{'opts'}{'lib-opts'} = $lib_opts;
+  } else {
+    my $inputs = [];
+    foreach my $input (@{$$cmd_info{'inputs'}}) {
+      push @$inputs, &lib_path_to_cmd_opts($input);
+    }
+    $$cmd_info{'inputs'} = $inputs;
+  }
   #if ($$cmd_info{'opts'}{'output'} =~ m/\.rep$/) # this is a real hackhack
   #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
   if ($want_separate_rep_pass) {
@@ -485,7 +537,7 @@ sub loop_rep_from_so {
   my ($cmd_info) = @_;
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
-        $arg =~ m|\.ctlg$|) {
+        $arg =~ m|\.ctlg(\.\d+)*$|) {
     } else {
       &rep_from_so($cmd_info, $arg);
     }
@@ -506,7 +558,7 @@ sub loop_rep_from_dk {
   my $rep_files = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
-        $arg =~ m|\.ctlg$|) {
+        $arg =~ m|\.ctlg(\.\d+)*$|) {
       my $rep_path = &rep_path_from_any_path($arg);
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$rep_cmd{'output'} = $rep_path;
@@ -561,7 +613,7 @@ sub loop_o_from_dk {
   my $outfiles = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
-          $arg =~ m|\.ctlg$|) {
+        $arg =~ m|\.ctlg(\.\d+)*$|) {
       my $cc_path = &nrt_cc_path_from_dk_path($arg);
       my $o_path = &nrt_o_path_from_dk_path($arg);
       if ($ENV{'DKT_PRECOMPILE'}) {
@@ -627,7 +679,7 @@ sub o_from_cc {
 	    &outfile_from_infiles($o_cmd, $should_echo = 1);
 	    $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
     }
-    &outfile_from_infiles($o_cmd, $should_echo = 1);
+    &outfile_from_infiles($o_cmd, $should_echo = 0);
 }
 sub rt_o_from_rep {
   my ($cmd_info, $other) = @_;
@@ -692,7 +744,11 @@ sub so_from_o {
     $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
     $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
     $$so_cmd{'output'} = $$cmd_info{'output'};
-    $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
+    if ($use_lib_opts_replace_lib_path) {
+      $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+    } else {
+      $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
+    }
     my $should_echo;
     &outfile_from_infiles($so_cmd, $should_echo = 1);
 }
@@ -705,7 +761,11 @@ sub dso_from_o {
     $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
     $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
     $$so_cmd{'output'} = $$cmd_info{'output'};
-    $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
+    if ($use_lib_opts_replace_lib_path) {
+      $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+    } else {
+      $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
+    }
     my $should_echo;
     &outfile_from_infiles($so_cmd, $should_echo = 1);
 }
@@ -718,7 +778,11 @@ sub exe_from_o {
     $$exe_cmd{'cmd-major-mode-flags'} = undef;
     $$exe_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
     $$exe_cmd{'output'} = $$cmd_info{'output'};
-    $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
+    if ($use_lib_opts_replace_lib_path) {
+      $$exe_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+    } else {
+      $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
+    }
     my $should_echo;
     &outfile_from_infiles($exe_cmd, $should_echo = 1);
 }
@@ -819,8 +883,8 @@ sub outfile_from_infiles {
 	    my $output = $$cmd_info{'output'};
 
 	    if ($output !~ m|\.rep$| &&
-          $output !~ m|\.ctlg$|) {
-        $should_echo = 0;
+                $output !~ m|\.ctlg(\.\d+)*$|) {
+        #$should_echo = 0;
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
           $output = $ENV{'DKT_DIR'} . '/' . $output
         }
@@ -881,7 +945,7 @@ sub ctlg_from_so {
   }
   #print &Dumper($cmd_info);
   my $should_echo;
-  &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
+  &outfile_from_infiles($ctlg_cmd, $should_echo = 1);
 }
 sub ordered_set_add {
   my ($ordered_set, $element, $file, $line) = @_;

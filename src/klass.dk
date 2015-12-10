@@ -88,7 +88,7 @@ klass selector-pair {
 }
 static const uint32-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
-static sorted-array-t   gbl-selectors-table = { gbl-selectors,
+sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                 0,
                                                 DK-COUNTOF(gbl-selectors),
                                                 cast(uint32-t)sizeof(gbl-selectors[0]),

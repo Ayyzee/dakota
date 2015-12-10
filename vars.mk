@@ -62,6 +62,7 @@ INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MO
 
 # not really ideal, but it works since the target-triplet is a directory that may/may-not be part of a path
 # this really needs to be fixed
+# /usr/lib/x86_64-linux-gnu/libdl.so
 target-triplet ?= .
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD

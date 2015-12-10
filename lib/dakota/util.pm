@@ -5,6 +5,8 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
+# -*- tab-width: 2
+# -*- indent-tabs-mode: nil
 
 # Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
 #
@@ -216,7 +218,7 @@ sub rand_str {
   return $str;
 }
 sub is_debug {
-  return 0;
+  return 1;
 }
 sub is_symbol_candidate {
   my ($str) = @_;
@@ -326,7 +328,7 @@ sub rewrite_klass_defn_with_implicit_metaklass_defn {
   $$filestr_ref =~ s/^klass(\s+)([\w:-]+)(\s*)\{(\s*$main::block_in\s*)\}/&rewrite_klass_defn_with_implicit_metaklass_defn_replacement($1, $2, $3, $4)/egms;
 }
 sub header_file_regex {
-  return qr|[/._A-Za-z0-9-]|;
+  return qr|[/.\w-]|;
 }
 sub method_sig_type_regex {
   return qr/object-t|slots-t|slots-t\s*\*/;
