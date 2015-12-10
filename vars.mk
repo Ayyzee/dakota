@@ -2,7 +2,8 @@ SHELL := /bin/bash -o errexit -o nounset -o pipefail
 
 DESTDIR ?=
 
-rootdir ?= ..
+rootdir ?= .
+include $(rootdir)/makeflags.mk
 
 srcdir ?= .
 blddir := .
@@ -10,14 +11,6 @@ objdir ?= $(blddir)/obj
 objdir-name := $(notdir $(objdir))
 
 prefix ?= /usr/local
-
-MAKE := make
-MAKEFLAGS +=\
- --no-builtin-rules\
- --no-builtin-variables\
- --warn-undefined-variables\
-
-# --no-print-directory\
 
 hh_ext := hh
 cc_ext := cc
@@ -62,7 +55,7 @@ INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MO
 
 # not really ideal, but it works since the target-triplet is a directory that may/may-not be part of a path
 # this really needs to be fixed
-# /usr/lib/x86_64-linux-gnu/libdl.so
+# current us is: /lib/$(target-triplet)/libdl.$(so_ext).2'
 target-triplet ?= .
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
@@ -74,7 +67,7 @@ EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
 
 ifdef DKT_PROFILE
   DAKOTA ?= DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota-profile --define-macro DK_ENABLE_TRACE_MACROS=1 --define-macro $(HOST_OS)
-	# prof uses -p, gprof uses -pg
+  # prof uses -p, gprof uses -pg
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
