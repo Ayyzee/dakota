@@ -32,7 +32,7 @@ klass token;
 klass tokenid;
 klass vector;
 
-static boole-t ident-type?(str-buffer-t buf) {
+static func ident-type?(str-buffer-t buf) -> boole-t {
   boole-t result = false;
   if (3 <= buf.len)
     if ((('_' == buf.ptr[buf.len - 2]) ||

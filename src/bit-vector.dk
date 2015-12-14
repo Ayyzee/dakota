@@ -172,7 +172,7 @@ klass bit-vector {
       self-slots.elements[offset] = op(self-slots.elements[offset], other-slots.elements[offset]);
     return self;
   }
-  static boole-t op-common?(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t)) {
+  static func op-common?(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t)) -> boole-t {
     boole-t result = false;
     slots-t& self-slots =  unbox(self);
     slots-t& other-slots = unbox(other);

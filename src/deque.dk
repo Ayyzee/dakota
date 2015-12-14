@@ -28,7 +28,7 @@ klass node {
     slots-t* prev;    // nullptr (not null) for first
     slots-t* next;    // nullptr (not null) for last
   }
-  static slots-t* create(slots-t* prev, object-t element, slots-t* next) {
+  static func create(slots-t* prev, object-t element, slots-t* next) -> slots-t* {
     slots-t* node = cast(slots-t*)dkt::alloc(sizeof(slots-t));
     node->prev =    prev;
     node->element = element;
@@ -157,8 +157,8 @@ klass deque {
     self.iterator-state = 0;
     return self;
   }
-  static object-t string-from-node(object-t self, node::slots-t* mn,
-				   char8-t* buf, uint32-t buf-len) {
+  static func string-from-node(object-t self, node::slots-t* mn,
+				   char8-t* buf, uint32-t buf-len) -> object-t {
     if (self.first == mn && self.first != nullptr)
       snprintf(buf, buf-len, "%s", "first     ");
     else-if (self.last == mn && self.last != nullptr)
