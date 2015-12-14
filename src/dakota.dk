@@ -1487,9 +1487,6 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (nullptr != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
       pre-main? = false;
-      break;
-    default:
-      std::abort();
   }
   if (nullptr != output-path && NUL != output-path[0] && nullptr != ctlg-output)
     fclose(ctlg-output);

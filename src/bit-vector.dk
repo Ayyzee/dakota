@@ -148,13 +148,13 @@ klass bit-vector {
     fprintf(out, "\" }\n");
     return self;
   }
-  static uint32-t op-bit-and(uint32-t i1, uint32-t i2) {
+  static func op-bit-and(uint32-t i1, uint32-t i2) -> uint32-t {
     return i1 & i2;
   }
-  static uint32-t op-bit-or(uint32-t i1, uint32-t i2) {
+  static func op-bit-or(uint32-t i1, uint32-t i2) -> uint32-t {
     return i1 | i2;
   }
-  static uint32-t op-bit-xor(uint32-t i1, uint32-t i2) {
+  static func op-bit-xor(uint32-t i1, uint32-t i2) -> uint32-t {
     return i1 ^ i2;
   }
   method bit-not(object-t self) -> object-t {
@@ -163,7 +163,7 @@ klass bit-vector {
       self-slots.elements[offset] = ~self-slots.elements[offset];
     return self;
   }
-  static object-t op-common(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t)) {
+  static func op-common(object-t self, object-t other, uint32-t (*op)(uint32-t, uint32-t)) -> object-t {
     slots-t& self-slots =  unbox(self);
     slots-t& other-slots = unbox(other);
     assert(self-slots.capacity == other-slots.capacity);

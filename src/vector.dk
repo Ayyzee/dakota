@@ -292,7 +292,7 @@ klass vector {
     $write-slots-end(out);
     return self;
   }
-  static uint32-t next-index(object-t self, uint32-t index) {
+  static func next-index(object-t self, uint32-t index) -> uint32-t {
     //assert(index <= self.count);
     uint32-t result = index;
     if (result < self.count) {
@@ -305,7 +305,7 @@ klass vector {
     //       printf("%s(%p, %i): %i/%i\n", __func__, self, index, result, self.count);
     return result;
   }
-  static uint32-t first-index(object-t self) {
+  static func first-index(object-t self) -> uint32-t {
     uint32-t index = 0;
     uint32-t result = index;
     result = next-index(self, index);
@@ -323,7 +323,7 @@ klass vector-forward-iterator {
 
     uint32-t iterator-state;
   }
-  static void check-iterator-state(object-t self) {
+  static func check-iterator-state(object-t self) -> void {
     vector::slots-t& d = vector::unbox(self.vector);
 
     if (self.iterator-state != d.iterator-state)

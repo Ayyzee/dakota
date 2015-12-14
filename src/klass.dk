@@ -353,7 +353,7 @@ klass klass {
     symbol-t name = self.name;
     return name;
   }
-  static object-t alloc-methods(object-t self, uint32-t methods-count) {
+  static func alloc-methods(object-t self, uint32-t methods-count) -> object-t {
     self.methods.count = methods-count;
     self.methods.addrs = cast(method-t*)dkt::alloc(sizeof(method-t) * self.methods.count);
 
@@ -367,7 +367,7 @@ klass klass {
       self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
     return self;
   }
-  static object-t init-methods(object-t self) {
+  static func init-methods(object-t self) -> object-t {
     if (nullptr != self.superklass && null != self.superklass) {
       memcpy(self.methods.addrs, unbox(self.superklass).methods.addrs,
              sizeof(method-t) * unbox(self.superklass).methods.count);

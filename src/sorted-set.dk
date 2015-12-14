@@ -45,7 +45,7 @@ klass sorted-set {
   // using compound literals 'items' can be used as follows:
   // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
-  static int-t swap-compare(object-t first, object-t second) {
+  static func swap-compare(object-t first, object-t second) -> int-t {
     int-t result = $compare(second, first);
     result *= -1;
     return result;

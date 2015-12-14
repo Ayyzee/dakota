@@ -107,16 +107,16 @@ klass lexer {
     return cast(str-t)(self.file);
   }
     
-  /* method */ inline char8-t previous-char8(object-t self) {
+  /* method */ inline func previous-char8(object-t self) -> char8-t {
     assert(0 != self.current-position);
     char8-t c = self.buffer[self.current-position - 1];
     return c;
   }
-  /* method */ inline char8-t current-char8(object-t self) {
+  /* method */ inline func current-char8(object-t self) -> char8-t {
     char8-t c = self.buffer[self.current-position];
     return c;
   }
-  /* method */ inline void unget-char8(object-t self) {
+  /* method */ inline func unget-char8(object-t self) -> void {
     assert(0 != self.current-position);
     self.current-position--;
     char8-t c = current-char8(self);
@@ -134,7 +134,7 @@ klass lexer {
     }
     return;
   }
-  /* method */ inline char8-t get-char8(object-t self) {
+  /* method */ inline func get-char8(object-t self) -> char8-t {
     char8-t c = current-char8(self);
     self.current-position++;
     if (NUL != c) {

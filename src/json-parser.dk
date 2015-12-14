@@ -83,7 +83,7 @@ klass json-parser {
     
     return num-elements-read;
   }
-  /* method */ static void putback(object-t self, int32-t c) {
+  /* method */ static func putback(object-t self, int32-t c) -> void {
     if ('\n' == c)
       self.line--;
       // where is column left?
@@ -92,7 +92,7 @@ klass json-parser {
     ungetc(c, self.in);
     return;
   }
-  /* method */ static int32-t get(object-t self) {
+  /* method */ static func get(object-t self) -> int32-t {
     int32-t c = getc(self.in);
     if (EOF != c) {
       if ('\n' == c) {
@@ -104,9 +104,9 @@ klass json-parser {
     }
     return c;
   }
-  //void error-msg(char8-t* file, uint32-t line, uint32-t column, str-t msg0, ...); // one or more msg strings
+  //func error-msg(char8-t* file, uint32-t line, uint32-t column, str-t msg0, ...) -> void; // one or more msg strings
 
-  /* method */ static object-t lex(object-t self) {
+  /* method */ static func lex(object-t self) -> object-t {
     int32-t c;
     while (1) {
       while (isspace(c = json-parser::get(self))) {
@@ -206,10 +206,10 @@ klass json-parser {
     }
   }
     
-  /* method */ object-t get-table(object-t self);
-  /* method */ object-t get-vector(object-t self);
+  /* method */ func get-table(object-t self) -> object-t;
+  /* method */ func get-vector(object-t self) -> object-t;
 
-  /* method */ static object-t key(object-t self) {
+  /* method */ static func key(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
@@ -234,7 +234,7 @@ klass json-parser {
     }
     return key;
   }
-  /* method */ static object-t get-corresponds-to(object-t self) {
+  /* method */ static func get-corresponds-to(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
@@ -246,8 +246,8 @@ klass json-parser {
     }
     return make(string::klass, #bytes : $buffer(token));
   }
-  /* method */ static object-t get-element(object-t self)
-  { // get table element - element is NOT optional
+  // get table element - element is NOT optional
+  /* method */ static func get-element(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
@@ -279,8 +279,8 @@ klass json-parser {
     }
     return element;
   }
-  /* method */ static object-t element(object-t self)
-  { // get vector element - element is optional
+  // get vector element - element is optional
+  /* method */ static func element(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
     if (null == token) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
@@ -314,7 +314,7 @@ klass json-parser {
     }
     return element;
   }
-  /* method */ static object-t get-table-pair(object-t self) {
+  /* method */ static func get-table-pair(object-t self) -> object-t {
     object-t key = json-parser::key(self);
     if (null == key)
       return nullptr;
@@ -327,7 +327,7 @@ klass json-parser {
     return pair::box({key, element});
   }
   // hackhack - multiple return statements
-  /* method */ object-t get-vector(object-t self) {
+  /* method */ func get-vector(object-t self) -> object-t {
     object-t vector = make(vector::klass);
     object-t token;
     do {
@@ -352,7 +352,7 @@ klass json-parser {
     }
     return vector;
   }
-  /* method */ object-t get-table(object-t self) {
+  /* method */ func get-table(object-t self) -> object-t {
     object-t table = make(hashed-table::klass);
     object-t token;
     do {

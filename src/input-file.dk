@@ -125,7 +125,7 @@ klass input-file {
     if (nullptr == type?)
       type? = space?;
     
-    char8-t c;
+    char8-t c = NUL;
     while (1) {
     # if 0
       str128-t  ws-buf = "";

@@ -216,7 +216,7 @@ klass hashed-set-forward-iterator {
 
     uint32-t  iterator-state;
   }
-  static void check-iterator-state(object-t self) {
+  static func check-iterator-state(object-t self) -> void {
     hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
 
     if (self.iterator-state != hs.iterator-state)
@@ -245,7 +245,7 @@ klass hashed-set-forward-iterator {
       result = $next?(self.deque-iter);
     return result;
   }
-  static object-t next-deque-iterator(object-t vector-iter) {
+  static func next-deque-iterator(object-t vector-iter) -> object-t {
     object-t deque = $next(vector-iter);
     object-t deque-iter = nullptr;
     if (nullptr != deque) {

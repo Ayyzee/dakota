@@ -81,7 +81,7 @@ klass output-stream {
     fwrite(string, sizeof(char8-t), len, unbox(self));
     return self;
   }
-  static object-t pad-to-col(object-t self, uint32-t col) {
+  static func pad-to-col(object-t self, uint32-t col) -> object-t {
     for (uint32-t i = 0; i < col; i++)
       $print(self, "  "); // two spaces per column :-) [my way]
     return self;

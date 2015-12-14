@@ -63,7 +63,7 @@ klass json-object-output-stream {
     }
     return self;
   }
-  static features-t features(object-t self, int-t flags) {
+  static func features(object-t self, int-t flags) -> features-t {
     if (0 != self.indent-level)
       return cast(features-t)(flags);
     else

@@ -35,7 +35,7 @@ klass node {
     node->next =    next;
     return node;
   }
-  static void dump-prev(slots-t* s, uint32-t iterator-state) {
+  static func dump-prev(slots-t* s, uint32-t iterator-state) -> void {
     if (nullptr != s) {
       // fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
       //         "<tr><td port=\"element\">element</td></tr>"
@@ -63,7 +63,7 @@ klass node {
     }
     return;
   }
-  static void dump-next(slots-t* s, uint32-t iterator-state) {
+  static func dump-next(slots-t* s, uint32-t iterator-state) -> void {
     if (nullptr != s) {
       fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"
@@ -360,7 +360,7 @@ klass deque-forward-iterator {
 
     uint32-t iterator-state;
   }
-  static void check-iterator-state(object-t self) {
+  static func check-iterator-state(object-t self) -> void {
     deque::slots-t& d = deque::unbox(self.deque);
 
     if (self.iterator-state != d.iterator-state)
