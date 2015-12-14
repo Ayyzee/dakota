@@ -29,12 +29,12 @@ klass object-output-stream;
 klass str-buffer {
   slots {
     char8-t* ptr;
-    uint32-t len;
-    uint32-t capacity;
+    int64-t len;
+    int64-t capacity;
   }
-  method init(object-t self, uint32-t capacity : 8) -> object-t {
+  method init(object-t self, int64-t capacity : 8) -> object-t {
     self = $init(super);
-    self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * capacity);
+    self.ptr = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * capacity);
     self.ptr[0] = NUL;
     self.len = 0;
     self.capacity = capacity;
@@ -58,7 +58,7 @@ klass str-buffer {
   }
   method dump(slots-t* s) -> slots-t*{
   //$dump(super);
-    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%u, capacity=%u }\n",
+    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%" PRIi64 ", capacity=%" PRIi64 " }\n",
             cast(ptr-t)nullptr, cast(ptr-t)(s), s->ptr, s->len, s->capacity);
     return s;
   }
@@ -80,11 +80,11 @@ klass str-buffer {
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  method length(slots-t* s) -> uint32-t {
+  method length(slots-t* s) -> int64-t {
     if (0    == s->len &&
         nullptr != s->ptr &&
         NUL  != s->ptr[0])
-      s->len = cast(uint32-t)safe-strlen(s->ptr);
+      s->len = cast(int64-t)safe-strlen(s->ptr);
     return s->len;
   }
   method concat(slots-t* s, char8-t c) -> slots-t*{

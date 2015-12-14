@@ -18,8 +18,8 @@ module dakota-util;
 
 klass dimension {
   slots {
-    int32-t width;
-    int32-t height;
+    int64-t width;
+    int64-t height;
   }
   method init(object-t self, slots-t slots : {.width = 0, .height = 0}) -> object-t {
     self = $init(super);

@@ -19,7 +19,7 @@
 module dakota-util;
 
 klass features {
-  slots enum : uint32-t {
+  slots enum : int64-t {
     k-none =             0,
     k-indent =           1 << 0,
     k-leading-newline =  1 << 1,
@@ -40,8 +40,8 @@ klass text-output-stream {
   klass      klass;
 
   slots {
-    uint32-t   column;
-    uint32-t   column-width;
+    int64-t    column;
+    int64-t    column-width;
     features-t previous-features;
   }
   static str-t const ws[] = {
@@ -55,10 +55,10 @@ klass text-output-stream {
     "       ",
     "        ",
   };
-  method init(object-t self, stream-t stream : stdout, uint32-t column-width : 2) -> object-t {
+  method init(object-t self, stream-t stream : stdout, ssize-t column-width : 2) -> object-t {
     self = $init(super, #stream : stream);
     self.column = 0;
-    if (column-width > DK-COUNTOF(ws))
+    if (column-width > cast(ssize-t)DK-COUNTOF(ws))
       column-width = DK-COUNTOF(ws);
     self.column-width = column-width;
     self.previous-features = k-trailing-newline;
@@ -78,7 +78,7 @@ klass text-output-stream {
              (features & k-leading-ws)));
 
     if (0 != (features & k-indent))
-      for (uint32-t i = 0; i < self.column; i++)
+      for (int64-t i = 0; i < self.column; i++)
         $write(self, ws[self.column-width]);
 
     if (0 != (features & k-leading-ws))

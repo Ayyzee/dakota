@@ -15,6 +15,7 @@
 // limitations under the License.
 
 # include <cassert>
+# include <cinttypes>
 # include <cstdlib>
 # include <cstring>
 
@@ -36,9 +37,9 @@ klass sorted-set {
 
   slots {
     sorted-ptr-array::slots-t sa;
-    uint32-t                  iterator-state;
+    int64-t                   iterator-state;
   }
-  static const uint32-t gbl-default-capacity = 64; // shall never be 0
+  static const int64-t gbl-default-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
@@ -51,14 +52,14 @@ klass sorted-set {
     return result;
   }
   method init(object-t  self,
-              uint32-t  initial-capacity : gbl-default-capacity,
+              int64-t   initial-capacity : gbl-default-capacity,
               object-t  elements :         nullptr,
               object-t* items :            nullptr) -> object-t {
     assert(0 != initial-capacity);
 
     self = $init(super);
     self.sa.compare = cast(std-compare-t)cast(compare-t)swap-compare;
-    self.sa.size =    cast(uint32-t)sizeof(self.sa.elements[0]);
+    self.sa.size =    cast(int64-t)sizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
     self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity);
     self.sa.count = 0;
@@ -158,11 +159,11 @@ klass sorted-set {
     slots-t& s2 = unbox(copy);
     s2 = s1;
     s2.sa.elements = cast(ptr-t*)dkt::alloc(s2.sa.size * s2.sa.capacity);
-    memcpy(s2.sa.elements, s1.sa.elements, s2.sa.size * s2.sa.capacity);
+    memcpy(s2.sa.elements, s1.sa.elements, cast(size-t)(s2.sa.size * s2.sa.capacity));
     s2.iterator-state = 0;
     return copy;
   }
-  method size(object-t self) -> uint32-t {
+  method size(object-t self) -> int64-t {
     return self.sa.count;
   }
   method forward-iterator(object-t self) -> object-t {
@@ -171,7 +172,7 @@ klass sorted-set {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
+    fprintf(stderr, "%p:%p { count=%" PRIi64 ", capacity=%" PRIi64 ", elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.sa.count, self.sa.capacity);
     for (object-t element in self)
       $dump(element);
@@ -196,9 +197,9 @@ klass sorted-set-forward-iterator {
 
   slots {
     object-t sorted-set;
-    uint32-t offset;
+    int64-t offset;
 
-    uint32-t  iterator-state;
+    int64-t   iterator-state;
   }
   method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);
@@ -213,7 +214,7 @@ klass sorted-set-forward-iterator {
     sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
 
     if (self.iterator-state != ss.iterator-state) {
-      fprintf(stderr, "%i == %i\n", self.iterator-state, ss.iterator-state);
+      fprintf(stderr, "%" PRIi64 " == %" PRIi64 "\n", self.iterator-state, ss.iterator-state);
       throw make(exception::klass, #msg : "oops");
     }
     return;

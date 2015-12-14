@@ -456,9 +456,9 @@ sub generate_defn_footer {
     $col = &colin($col);
     $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
-      $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(uintptr-t)&$klass_name\::klass },\n";
+      $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::klass },\n";
     }
-    $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(uintptr-t)nullptr }\n";
+    $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }\n";
     $col = &colout($col);
     $rt_cc_str .= $col . "};\n";
     $rt_cc_str .= &linkage_unit::generate_selectors_seq( $generics);
@@ -2397,7 +2397,7 @@ sub generate_exported_slots_decls {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
-                           'wchar-t'  => undef,
+                           'wchar-t'  => undef, # __WCHAR_MAX__, __WCHAR_TYPE__
                          };
     if (!exists $$excluded_types{"$klass_name-t"}) {
       $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . "\n";
@@ -3660,13 +3660,13 @@ sub generate_kw_args_method_defn {
   my $arg_names_list = &arg_type::list_names($arg_names);
 
   if (0 < @{$$method{'keyword-types'}}) {
-    #my $param = &dakota::util::remove_last($$method{'parameter-types'}); # remove uintptr-t type
+    #my $param = &dakota::util::remove_last($$method{'parameter-types'}); # remove intptr-t type
     $method_type_decl = &kw_args_method::type_decl($method);
     #&dakota::util::add_last($$method{'parameter-types'}, $param);
   } else {
     my $param1 = &dakota::util::remove_last($$method{'parameter-types'}); # remove va-list-t type
     # should test $param1
-    #my $param2 = &dakota::util::remove_last($$method{'parameter-types'}); # remove uintptr-t type
+    #my $param2 = &dakota::util::remove_last($$method{'parameter-types'}); # remove intptr-t type
     ## should test $param2
     $method_type_decl = &method::type_decl($method);
     #&dakota::util::add_last($$method{'parameter-types'}, $param2);
@@ -3763,14 +3763,14 @@ sub generate_kw_args_method_defn {
     $col = &colout($col);
   }
   my $delim = '';
-  #my $last_arg_name = &dakota::util::remove_last($new_arg_names); # remove name associated with uintptr-t type
+  #my $last_arg_name = &dakota::util::remove_last($new_arg_names); # remove name associated with intptr-t type
   my $args = '';
 
   for (my $i = 0; $i < @$new_arg_names - 1; $i++) {
     $args .= "$delim$$new_arg_names[$i]";
     $delim = ', ';
   }
-  #&dakota::util::add_last($new_arg_names, $last_arg_name); # add name associated with uintptr-t type
+  #&dakota::util::add_last($new_arg_names, $last_arg_name); # add name associated with intptr-t type
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
     $args .= ", $kw_arg_name";
@@ -3818,9 +3818,9 @@ sub dk_generate_cc_footer {
       my $num_klasses = scalar keys %$interposers;
       foreach $key (sort keys %$interposers) {
         $val = $$interposers{$key};
-        $$scratch_str_ref .= $col . "{ $key\::__klass__, cast(uintptr-t)$val\::__klass__ },\n";
+        $$scratch_str_ref .= $col . "{ $key\::__klass__, cast(intptr-t)$val\::__klass__ },\n";
       }
-      $$scratch_str_ref .= $col . "{ nullptr, cast(uintptr-t)nullptr }\n";
+      $$scratch_str_ref .= $col . "{ nullptr, cast(intptr-t)nullptr }\n";
       $col = &colout($col);
       $$scratch_str_ref .= $col . "};\n";
     }
@@ -4111,9 +4111,9 @@ sub linkage_unit::generate_strs_seq {
     $col = &colin($col);
     foreach my $str (sort keys %{$$file{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
-      $scratch_str .= $col . "{ cast(uintptr-t)&__literal::__str::$str_ident, nullptr },\n";
+      $scratch_str .= $col . "{ cast(intptr-t)&__literal::__str::$str_ident, nullptr },\n";
     }
-    $scratch_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
+    $scratch_str .= $col . "{ cast(intptr-t)nullptr, nullptr }\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
@@ -4142,10 +4142,10 @@ sub linkage_unit::generate_ints_seq {
   my $scratch_str = "";
   my $col = '';
   if (0 == scalar keys %{$$file{'literal-ints'}}) {
-    $scratch_str .= $col . "//static uintptr-t const __int-literals[] = { 0 };" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $scratch_str .= $col . "//static intptr-t const __int-literals[] = { 0 };" . &ann(__FILE__, __LINE__) . " // ro-data\n";
     $scratch_str .= $col . "//static object-t* __int-ptrs[] = { nullptr };" . &ann(__FILE__, __LINE__) . " // rw-data\n";
   } else {
-    $scratch_str .= $col . "static uintptr-t const __int-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
+    $scratch_str .= $col . "static intptr-t const __int-literals[] = {" . &ann(__FILE__, __LINE__) . " // ro-data\n";
     $col = &colin($col);
     foreach my $int (sort keys %{$$file{'literal-ints'}}) {
       $scratch_str .= $col . "$int,\n";
@@ -4168,9 +4168,9 @@ sub linkage_unit::generate_ints_seq {
     $col = &colin($col);
     foreach my $int (sort keys %{$$file{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
-      $scratch_str .= $col . "{ cast(uintptr-t)&__literal::__int::$int_ident, nullptr },\n";
+      $scratch_str .= $col . "{ cast(intptr-t)&__literal::__int::$int_ident, nullptr },\n";
     }
-    $scratch_str .= $col . "{ cast(uintptr-t)nullptr, nullptr }\n";
+    $scratch_str .= $col . "{ cast(intptr-t)nullptr, nullptr }\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
@@ -4224,7 +4224,7 @@ sub generate_property_tbl {
     }
     my $in1 = &ident_comment($key, 1);
     my $in2 = &ident_comment($element, 1);
-    $result .= $col . "{ .key = $key, " . $pad . ".element = cast(uintptr-t)$element }," . $in1 . $in2 . "\n";
+    $result .= $col . "{ .key = $key, " . $pad . ".element = cast(intptr-t)$element }," . $in1 . $in2 . "\n";
   }
   $col = &colout($col);
   $result .= $col . "};";

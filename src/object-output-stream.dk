@@ -22,7 +22,7 @@ klass pair;
 klass sorted-set;
 klass sorted-table;
 klass std-compare;
-klass uint32;
+klass int64;
 
 klass object-output-stream {
   superklass output-stream;
@@ -31,7 +31,7 @@ klass object-output-stream {
   slots {
     object-t objects;    // sorted-set (ptr) <objects already written>
     object-t object-from-id; // sorted-table key=id, value=object <objects to be written>
-    uint32-t id;
+    int64-t  id;
     object-t id-from-object;        // sorted-table (ptr) key=object, value=id
   }
   method init(object-t self, stream-t stream : stdout) -> object-t {
@@ -69,7 +69,7 @@ klass object-output-stream {
       object-t id = $at(self.id-from-object, object, cast(object-t)nullptr);
 
       if (nullptr == id) {
-        id = uint32::box(self.id);
+        id = int64::box(self.id);
         $add(self.id-from-object, object, id);
         self.id++;
       }
@@ -94,7 +94,7 @@ klass object-output-stream {
     object-t id = $at(self.id-from-object, object, cast(object-t)nullptr);
     
     if (nullptr == id) {
-      id = uint32::box(self.id);
+      id = int64::box(self.id);
       $add(self.id-from-object, object, id);
       self.id++;
     }
@@ -107,8 +107,8 @@ klass object-output-stream {
     return self;
   }
   method write-element(object-t self, str-t t, str-t key) -> object-t;
-  method write-element(object-t self, int32-t t, str-t key) -> object-t;
-  method write-element(object-t self, uint32-t t, str-t key) -> object-t;
+  method write-element(object-t self, int64-t t, str-t key) -> object-t;
+  method write-element(object-t self, int64-t t, str-t key) -> object-t;
   method write-sequence-start(object-t self, str-t key) -> object-t;
   method write-sequence-end(object-t self) -> object-t;
   method write-table-start(object-t self, str-t key) -> object-t;

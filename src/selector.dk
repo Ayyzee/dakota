@@ -17,7 +17,7 @@
 module dakota;
 
 klass selector {
-  slots uintptr-t;
+  slots ssize-t;
 
   method init(object-t self, slots-t slots : 0) -> object-t {
     self = $init(super);

@@ -75,7 +75,7 @@ func getprogname() -> str-t {
 # endif
 # endif
 
-[[format-va-printf(2)]] static func va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
+[[format-va-printf(2)]] static func va-log(int64-t priority, str-t format, va-list-t args) -> int-t {
   stream-t log-file = stderr;
 
   if (nullptr != getenv("DEBUG")) {
@@ -104,11 +104,11 @@ func getprogname() -> str-t {
   // bugbug: need to adjust result
   return result;
 }
-[[format-va-printf(2)]] func dkt-va-log(uint32-t priority, str-t format, va-list-t args) -> int-t {
+[[format-va-printf(2)]] func dkt-va-log(int64-t priority, str-t format, va-list-t args) -> int-t {
   int-t result = va-log(priority, format, args);
   return result;
 }
-[[format-printf(2)]] func dkt-log(uint32-t priority, str-t format, ...) -> int-t {
+[[format-printf(2)]] func dkt-log(int64-t priority, str-t format, ...) -> int-t {
   va-list-t args;
   va-start(args, format);
   int-t result = dkt-va-log(priority, format, args);

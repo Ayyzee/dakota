@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+# include <cinttypes>
 # include <cstring>
 
 module dakota-util;
@@ -32,7 +33,7 @@ klass xml-object-output-stream {
   superklass text-output-stream;
 
   slots {
-    uint32-t indent-level;
+    int64-t indent-level;
 
     str-t key-delim;
     str-t element-delim;
@@ -78,21 +79,21 @@ klass xml-object-output-stream {
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method write-element(object-t self, int32-t element, str-t key) -> object-t {
+  method write-element(object-t self, int64-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s%i%s",  key, self.key-delim, element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s%" PRIi64 "%s",  key, self.key-delim, element, self.element-delim);
     else
-      snprintf(buffer, sizeof(buffer), "%i%s", element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "%" PRIi64 "%s", element, self.element-delim);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method write-element(object-t self, uint32-t element, str-t key) -> object-t {
+  method write-element(object-t self, uint64-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s%u%s",  key, self.key-delim, element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s%" PRIi64 "%s",  key, self.key-delim, element, self.element-delim);
     else
-      snprintf(buffer, sizeof(buffer), "%u%s", element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "%" PRIi64 "%s", element, self.element-delim);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }

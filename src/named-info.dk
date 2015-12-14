@@ -30,7 +30,7 @@ klass symbol;
 klass named-info {
   slots {
     slots-t*    next;
-    uint32-t    count;    // sizeof(property)/sizeof(property[0])
+    ssize-t     count;    // sizeof(property)/sizeof(property[0])
     property-t* elements; // property
   //            size = sizeof(property::slots-t)
   //            compare = property::compare()
@@ -40,8 +40,8 @@ klass named-info {
     unbox(self) = slots;
     return self;
   }
-  method check(slots-t* s) -> int32-t {
-    for (uint32-t i = 0; i < s->count; i++) {
+  method check(slots-t* s) -> int64-t {
+    for (int64-t i = 0; i < s->count; i++) {
       // need to add test for #name (since its required)
 
       property-t element = s->elements[i];
@@ -50,37 +50,37 @@ klass named-info {
     return 0;
   }
   method sort(slots-t* s) -> slots-t* {
-    qsort(s->elements, s->count, sizeof(s->elements[0]),
+    qsort(s->elements, cast(size-t)s->count, sizeof(s->elements[0]),
           cast(std-compare-t)cast(auto (*)(property::slots-t*,property::slots-t*) -> int-t)property::compare);
     return s;
   }
   method search(slots-t* s, symbol-t key) -> property-t* {
-    property::slots-t property = { cast(symbol-t)key, cast(uintptr-t)0 };
-    property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, s->count, sizeof(s->elements[0]),
+    property::slots-t property = {.key = cast(symbol-t)key, .element = cast(intptr-t)0};
+    property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, cast(size-t)s->count, sizeof(s->elements[0]),
                                                                 cast(std-compare-t)cast(auto (*)(property::slots-t*,
                                                                                                  property::slots-t*) -> int-t)property::compare);
     return result;
   }
-  method at(slots-t* s, symbol-t key) -> uintptr-t {
-    uintptr-t element = 0;
+  method at(slots-t* s, symbol-t key) -> intptr-t {
+    intptr-t element = 0;
     property::slots-t* property = search(s, key);
     if (nullptr != property)
       element = property->element;
     return element;
   }
-  method at(slots-t* s, symbol-t key, uintptr-t default-element) -> uintptr-t {
-    uintptr-t element = at(s, key);
+  method at(slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
+    intptr-t element = at(s, key);
     if (0 == element) // aka: if (nullptr == element)
       element = default-element;
     return element;
   }
-  method dump(slots-t* s) -> slots-t*{
+  method dump(slots-t* s) -> slots-t* {
     slots-t* current = s;
     while (nullptr != current) {
       printf("{\n");
-      for (uint32-t i = 0; i < current->count; i++) {
+      for (int64-t i = 0; i < current->count; i++) {
         symbol-t key = current->elements[i].key;
-        uintptr-t element = current->elements[i].element;
+        intptr-t element = current->elements[i].element;
         printf("  #%s : %p", key, cast(ptr-t)element);
 
         switch (key) {
@@ -128,21 +128,21 @@ klass named-info {
 func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
 //   assert(nullptr != name);
   symbol-t key;
-  uintptr-t element;
+  intptr-t element;
 
-  uint32-t props-capacity = 4;
-  property-t* props = cast(property-t*)dkt::alloc(sizeof(property-t) * props-capacity);
-  uint32-t count = 0;
+  int64-t props-capacity = 4;
+  property-t* props = cast(property-t*)dkt::alloc(ssizeof(property-t) * props-capacity);
+  ssize-t count = 0;
 
   props[count].key = #name;
-  props[count].element = cast(uintptr-t)(name);
+  props[count].element = cast(intptr-t)(name);
   count++;
 
   while (nullptr != (key = va-arg(args, symbol-t))) {
-    element = va-arg(args, uintptr-t);
+    element = va-arg(args, intptr-t);
     if (props-capacity == count + 1) {
       props-capacity *= 2;
-      props = cast(property-t*)dkt::alloc(sizeof(property-t) * props-capacity, props);
+      props = cast(property-t*)dkt::alloc(ssizeof(property-t) * props-capacity, props);
     }
     props[count].key =     key;
     props[count].element = element;

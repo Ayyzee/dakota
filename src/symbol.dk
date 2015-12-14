@@ -31,8 +31,8 @@ klass symbol {
     unbox(self) = slots;
     return self;
   }
-  method length(slots-t s) -> uint32-t {
-    uint32-t result = cast(uint32-t)safe-strlen(s);
+  method length(slots-t s) -> int64-t {
+    int64-t result = cast(int64-t)safe-strlen(s);
     return result;
   }
   method compare(slots-t s, slots-t other-s) -> int-t {

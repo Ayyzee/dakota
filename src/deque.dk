@@ -35,7 +35,7 @@ klass node {
     node->next =    next;
     return node;
   }
-  static func dump-prev(slots-t* s, uint32-t iterator-state) -> void {
+  static func dump-prev(slots-t* s, int64-t iterator-state) -> void {
     if (nullptr != s) {
       // fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
       //         "<tr><td port=\"element\">element</td></tr>"
@@ -50,12 +50,12 @@ klass node {
       //         cast(ptr-t)(s->element), iterator-state);
 
       if (nullptr != s->prev)
-        fprintf(stderr, "    \"%p-%i\" -> \"%p-%i\":prev [ dir = back ];\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "\" -> \"%p-%" PRIi64 "\":prev [ dir = back ];\n",
                 cast(ptr-t)(s->prev), iterator-state, cast(ptr-t)(s), iterator-state);
       else {
-        fprintf(stderr, "    \"%p-%i-prev-nullptr\" [ label = \"nullptr\" ];\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "-prev-nullptr\" [ label = \"nullptr\" ];\n",
                 cast(ptr-t)(s), iterator-state);
-        fprintf(stderr, "    \"%p-%i-prev-nullptr\" -> \"%p-%i\":prev [ dir = back ];\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "-prev-nullptr\" -> \"%p-%" PRIi64 "\":prev [ dir = back ];\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
       }
       if (nullptr != s->prev)
@@ -63,26 +63,26 @@ klass node {
     }
     return;
   }
-  static func dump-next(slots-t* s, uint32-t iterator-state) -> void {
+  static func dump-next(slots-t* s, int64-t iterator-state) -> void {
     if (nullptr != s) {
-      fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
+      fprintf(stderr, "    \"%p-%" PRIi64 "\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"
               "<tr><td port=\"prev\">prev</td></tr>"
               "<tr><td port=\"next\">next</td></tr>"
               "</table> > ];\n", cast(ptr-t)(s), iterator-state);
-      fprintf(stderr, "    \"%p-%i\" [ label = \"%p <%s>\" ];\n",
+      fprintf(stderr, "    \"%p-%" PRIi64 "\" [ label = \"%p <%s>\" ];\n",
               cast(ptr-t)(s->element), iterator-state,
               cast(ptr-t)(s->element), $name(klass-of(s->element)));
-      fprintf(stderr, "    \"%p-%i\":element -> \"%p-%i\";\n",
+      fprintf(stderr, "    \"%p-%" PRIi64 "\":element -> \"%p-%" PRIi64 "\";\n",
               cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->element), iterator-state);
 
       if (nullptr != s->next)
-        fprintf(stderr, "    \"%p-%i\":next -> \"%p-%i\";\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "\":next -> \"%p-%" PRIi64 "\";\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->next), iterator-state);
       else {
-        fprintf(stderr, "    \"%p-%i-next-nullptr\" [ label = \"nullptr\" ];\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "-next-nullptr\" [ label = \"nullptr\" ];\n",
                 cast(ptr-t)(s), iterator-state);
-        fprintf(stderr, "    \"%p-%i\":next -> \"%p-%i-next-nullptr\";\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "\":next -> \"%p-%" PRIi64 "-next-nullptr\";\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
       }
       if (nullptr != s->next)
@@ -98,36 +98,36 @@ klass deque {
   slots {
     node::slots-t* first; // if (nullptr != first)  first->prev = nullptr;
     node::slots-t* last;  // if (nullptr != last)   last->next =  nullptr;
-    uint32-t      size;
+    int64-t       size;
 
-    uint32-t iterator-state;
+    int64-t iterator-state;
   }
   method test-dump(object-t self) -> object-t {
     slots-t& s = unbox(self);
     // if (nullptr != &s) {
-      fprintf(stderr, "  subgraph \"cluster-%p-%i\"\n", cast(ptr-t)(&s), s.iterator-state);
+      fprintf(stderr, "  subgraph \"cluster-%p-%" PRIi64 "\"\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "  {\n");
 
       fprintf(stderr, "    graph [ rankdir = LR ];\n");
-      fprintf(stderr, "    graph [ label = \"%p-%i\" ];\n", cast(ptr-t)(&s), s.iterator-state);
+      fprintf(stderr, "    graph [ label = \"%p-%" PRIi64 "\" ];\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "    node [ shape = plaintext ];\n");
 
-      fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
+      fprintf(stderr, "    \"%p-%" PRIi64 "\" [ label = < <table>"
               "<tr><td port=\"first\">first</td></tr>"
               "<tr><td port=\"last\">last</td></tr>"
-              "<tr><td port=\"size\">size=%i</td></tr>"
+              "<tr><td port=\"size\">size=%" PRIi64 "</td></tr>"
               "</table> > ];\n", cast(ptr-t)(&s), s.iterator-state, s.size);
       if (nullptr == s.first && nullptr == s.last) {
-        fprintf(stderr, "    \"%p-%i-nullptr\" [ label = \"nullptr\" ];\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "-nullptr\" [ label = \"nullptr\" ];\n",
                 cast(ptr-t)(&s), s.iterator-state);
-        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i-nullptr\";\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "\":first -> \"%p-%" PRIi64 "-nullptr\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
-        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i-nullptr\";\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "\":last  -> \"%p-%" PRIi64 "-nullptr\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
       } else {
-        fprintf(stderr, "    \"%p-%i\":first -> \"%p-%i\";\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "\":first -> \"%p-%" PRIi64 "\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.first), s.iterator-state);
-        fprintf(stderr, "    \"%p-%i\":last  -> \"%p-%i\";\n",
+        fprintf(stderr, "    \"%p-%" PRIi64 "\":last  -> \"%p-%" PRIi64 "\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.last), s.iterator-state);
       }
       node::dump-next(s.first, s.iterator-state);
@@ -158,13 +158,13 @@ klass deque {
     return self;
   }
   static func string-from-node(object-t self, node::slots-t* mn,
-				   char8-t* buf, uint32-t buf-len) -> object-t {
+				   char8-t* buf, ssize-t buf-len) -> object-t {
     if (self.first == mn && self.first != nullptr)
-      snprintf(buf, buf-len, "%s", "first     ");
+      snprintf(buf, cast(size-t)buf-len, "%s", "first     ");
     else-if (self.last == mn && self.last != nullptr)
-      snprintf(buf, buf-len, "%s", "last      ");
+      snprintf(buf, cast(size-t)buf-len, "%s", "last      ");
     else
-      snprintf(buf, buf-len, "%p", cast(ptr-t)mn);
+      snprintf(buf, cast(size-t)buf-len, "%p", cast(ptr-t)mn);
     return self;
   }
   method dump(object-t self) -> object-t {
@@ -183,20 +183,20 @@ klass deque {
       fprintf(stdout, " %p", cast(ptr-t)first);
       fprintf(stdout, "\n");
     } else {
-      deque::string-from-node(self, first->prev, buf, cast(uint32-t)sizeof(buf));
+      deque::string-from-node(self, first->prev, buf, cast(int64-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, " %p", cast(ptr-t)first->element);
-      deque::string-from-node(self, first->next, buf, cast(uint32-t)sizeof(buf));
+      deque::string-from-node(self, first->next, buf, cast(int64-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, "\n");
     }
     if (nullptr == last) {
       fprintf(stdout, " %p\n", cast(ptr-t)last);
     } else {
-      deque::string-from-node(self, last->prev, buf, cast(uint32-t)sizeof(buf));
+      deque::string-from-node(self, last->prev, buf, cast(int64-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, " %p", cast(ptr-t)last->element);
-      deque::string-from-node(self, last->next, buf, cast(uint32-t)sizeof(buf));
+      deque::string-from-node(self, last->next, buf, cast(int64-t)sizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, "\n");
     }
@@ -212,7 +212,7 @@ klass deque {
   // before
   // after
 
-  method size(object-t self) -> uint32-t {
+  method size(object-t self) -> int64-t {
     return self.size;
   }
   method empty?(object-t self) -> boole-t {
@@ -358,7 +358,7 @@ klass deque-forward-iterator {
     object-t deque; // needed for iterator-state
     node::slots-t* node;
 
-    uint32-t iterator-state;
+    int64-t iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     deque::slots-t& d = deque::unbox(self.deque);

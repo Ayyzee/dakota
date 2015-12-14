@@ -77,12 +77,12 @@ klass output-stream {
   }
   // hackhack?  use print below?
   method write(object-t self, str-t string) -> object-t {
-    uint32-t len = cast(uint32-t)safe-strlen(string);
-    fwrite(string, sizeof(char8-t), len, unbox(self));
+    ssize-t len = cast(ssize-t)safe-strlen(string);
+    fwrite(string, sizeof(char8-t), cast(size-t)len, unbox(self));
     return self;
   }
-  static func pad-to-col(object-t self, uint32-t col) -> object-t {
-    for (uint32-t i = 0; i < col; i++)
+  static func pad-to-col(object-t self, int64-t col) -> object-t {
+    for (int64-t i = 0; i < col; i++)
       $print(self, "  "); // two spaces per column :-) [my way]
     return self;
   }
@@ -99,8 +99,8 @@ klass output-stream {
     return self;
   }
   method print(object-t self, str-t string) -> object-t {
-    uint32-t len = cast(uint32-t)safe-strlen(string);
-    fwrite(string, sizeof(char8-t), len, unbox(self));
+    ssize-t len = cast(ssize-t)safe-strlen(string);
+    fwrite(string, sizeof(char8-t), cast(size-t)len, unbox(self));
     return self;
   }
   method print(object-t self, object-t object) -> object-t {
@@ -126,22 +126,22 @@ klass output-stream {
     $print(self, output-stream::endl);
     return self;
   }
-  method print-in-col(object-t self, str-t string, uint32-t col) -> object-t {
+  method print-in-col(object-t self, str-t string, int64-t col) -> object-t {
     pad-to-col(self, col);
     $print(self, string);
     return self;
   }
-  method print-in-col(object-t self, object-t object, uint32-t col) -> object-t {
+  method print-in-col(object-t self, object-t object, int64-t col) -> object-t {
     pad-to-col(self, col);
     $print(self, object);
     return self;
   }
-  method println-in-col(object-t self, str-t string, uint32-t col) -> object-t {
+  method println-in-col(object-t self, str-t string, int64-t col) -> object-t {
     $print-in-col(self, string, col);
     $print(self, "\n");
     return self;
   }
-  method println-in-col(object-t self, object-t object, uint32-t col) -> object-t {
+  method println-in-col(object-t self, object-t object, int64-t col) -> object-t {
     $print-in-col(self, object, col);
     $print(self, "\n");
     return self;

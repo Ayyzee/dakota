@@ -7,9 +7,9 @@
 
 dkt_declare_klass_type_typedef(boole,    bool);
 dkt_declare_klass_type_typedef(char8,    char);
-dkt_declare_klass_type_typedef(selector, uintptr_t);
-dkt_declare_klass_type_typedef(str,      char const*);
-dkt_declare_klass_type_typedef(symbol,   char const*);
+dkt_declare_klass_type_typedef(selector, ssize_t);
+dkt_declare_klass_type_typedef(str,      const char*);
+dkt_declare_klass_type_typedef(symbol,   const char*);
 dkt_declare_klass_type_typedef(uchar8,   unsigned char);
 
 dkt_declare_klass_type_structptr(object);

@@ -41,8 +41,8 @@ func set-name(int-t errnum, str-t name) -> void {
   }
   else {
     str-t delim = "|";
-    uint32-t len = cast(uint32-t)strlen(gbl-sys-err-names[errnum]) + cast(uint32-t)strlen(delim) + cast(uint32-t)strlen(name) + (1);
-    char8-t* buf = cast(char8-t*)dkt::alloc(sizeof(char8-t) * len); // leakleak
+    ssize-t len = cast(ssize-t)strlen(gbl-sys-err-names[errnum]) + cast(ssize-t)strlen(delim) + cast(ssize-t)strlen(name) + (1);
+    char8-t* buf = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * len); // leakleak
     buf[0] = NUL;
     strcat(buf, gbl-sys-err-names[errnum]);
     strcat(buf, delim);

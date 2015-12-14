@@ -16,8 +16,8 @@
 
 module dakota;
 
+klass int64;
 klass pair;
-klass uint32;
 klass vector;
 
 trait set;
@@ -69,10 +69,10 @@ trait counted-set {
     if (pair) {
       if ($instance?(pair, pair::klass))
         last = pair::unbox(pair).last;
-      uint32-t& count-ptr = uint32::unbox(last);
+      int64-t& count-ptr = int64::unbox(last);
       count-ptr++;
     } else {
-      last = uint32::box(1);
+      last = int64::box(1);
       pair = pair::box({first, last});
       $add(super, pair);
     }
@@ -92,21 +92,21 @@ trait counted-set {
       last = pair::unbox(last).last;
     return last;
   }
-  method count-at(object-t self, object-t first) -> uint32-t {
+  method count-at(object-t self, object-t first) -> int64-t {
     object-t last = $at(self, first);
     if ($instance?(last, pair::klass))
       last = pair::unbox(last).last;
-    uint32-t count = uint32::unbox(last);
+    int64-t count = int64::unbox(last);
     return count;
   }
-  method count-at(object-t self, object-t first, uint32-t default-count) -> uint32-t {
-    uint32-t count = default-count;
+  method count-at(object-t self, object-t first, int64-t default-count) -> int64-t {
+    int64-t count = default-count;
     object-t last = $at(self, first, cast(object-t)nullptr);
 
     if (last) {
       if ($instance?(last, pair::klass))
         last = pair::unbox(last).last;
-      count = uint32::unbox(last);
+      count = int64::unbox(last);
     }
     return count;
   }

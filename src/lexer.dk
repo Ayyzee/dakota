@@ -48,9 +48,9 @@ klass lexer {
     char8-t* buffer;
 
     str-t    file;
-    uint32-t line;
-    uint32-t previous-column;
-    uint32-t column;
+    int64-t line;
+    int64-t previous-column;
+    int64-t column;
 
     object-t open-tokens;
   }
@@ -71,7 +71,7 @@ klass lexer {
       fseeko(stream, 0L, SEEK-END);
       self.length = ftello(stream);
       rewind(stream);
-      self.buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
+      self.buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (self.length + 1));
       fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, stream);
       // check for embedded NUL?
       self.buffer[self.length] = NUL;
@@ -84,7 +84,7 @@ klass lexer {
       fseeko(stream, 0L, SEEK-END);
       self.length = ftello(stream);
       fsetpos(stream, &fpos);
-      self.buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
+      self.buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (self.length + 1));
       fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, stream);
       // check for embedded NUL?
       self.buffer[self.length] = NUL;
@@ -175,7 +175,7 @@ klass lexer {
         // whitespace
         case '\t': case ' ':
         case '\n': case '\r': case '\v': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           while (1) {
             char8-t c2 = get-char8(self);
@@ -196,7 +196,7 @@ klass lexer {
         }
         // cpp directive 
         case '#': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           boole-t escaped? = false;
           while (1) {
@@ -222,7 +222,7 @@ klass lexer {
           }
         }
         case '/': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           while (1) {
             char8-t c2 = get-char8(self);
@@ -273,7 +273,7 @@ klass lexer {
 
         // single quoted string
         case '\'': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           boole-t escaped? = false;
           while (1) {
@@ -300,7 +300,7 @@ klass lexer {
         }
         // double quoted string
         case '"': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           boole-t escaped? = false;
           while (1) {
@@ -326,7 +326,7 @@ klass lexer {
           }
         }
         case '0': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -358,7 +358,7 @@ klass lexer {
         }
         case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           do {
             str-buffer::concat(&buf, c1);
             c1 = get-char8(self);
@@ -380,7 +380,7 @@ klass lexer {
 
         case '_': {
         //case '-':
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           //str-buffer::concat(&buf, c1);
           do {
             str-buffer::concat(&buf, c1);
@@ -400,7 +400,7 @@ klass lexer {
           return token;
         }
         case '!': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -423,14 +423,14 @@ klass lexer {
           return token;
         }
         case '$': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : '$', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '%': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -447,7 +447,7 @@ klass lexer {
           return token;
         }
         case '&': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -470,7 +470,7 @@ klass lexer {
           return token;
         }
         case '(': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t open-token = make(open-token::klass, #tokenid : '(', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
@@ -478,7 +478,7 @@ klass lexer {
           return open-token;
         }
         case ')': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : ')', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
@@ -493,7 +493,7 @@ klass lexer {
           return token;
         }
         case '*': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -516,7 +516,7 @@ klass lexer {
           return token;
         }
         case '+': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -539,14 +539,14 @@ klass lexer {
           return token;
         }
         case ',': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : ',', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '-': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -585,7 +585,7 @@ klass lexer {
           return token;
         }
         case '.': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -618,7 +618,7 @@ klass lexer {
           return token;
         }
         case ':': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -645,14 +645,14 @@ klass lexer {
           return token;
         }
         case ';': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : ';', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '<': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -686,7 +686,7 @@ klass lexer {
           return open-token;
         }
         case '=': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -709,7 +709,7 @@ klass lexer {
           return token;
         }
         case '>': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -746,21 +746,21 @@ klass lexer {
           return token;
         }
         case '?': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : '?', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '@': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : '@', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '[': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t open-token = make(open-token::klass, #tokenid : '[', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
@@ -768,7 +768,7 @@ klass lexer {
           return open-token;
         }
         case ']': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : ']', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
@@ -783,7 +783,7 @@ klass lexer {
           return token;
         }
         case '^': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -800,14 +800,14 @@ klass lexer {
           return token;
         }
         case '`': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : '`', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '{': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t open-token = make(open-token::klass, #tokenid : '{', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
@@ -815,7 +815,7 @@ klass lexer {
           return open-token;
         }
         case '|': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           char8-t c2 = get-char8(self);
           switch (c2) {
@@ -838,7 +838,7 @@ klass lexer {
           return token;
         }
         case '}': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : '}', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
@@ -853,7 +853,7 @@ klass lexer {
           return token;
         }
         case '~': {
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : '~', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
@@ -862,7 +862,7 @@ klass lexer {
         default: {
           if (NUL == c1)
             return nullptr;
-          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(uint32-t)sizeof(chunk) };
+          char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, cast(int64-t)sizeof(chunk) };
           str-buffer::concat(&buf, c1);
           object-t token = make(token::klass, #tokenid : 'undf', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);

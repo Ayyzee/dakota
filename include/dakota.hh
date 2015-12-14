@@ -26,6 +26,9 @@
 # include <cxxabi.h>
 # include <new> // std::bad-alloc
 
+# define cast(t) (t)
+# define ssizeof(t) (cast(ssize_t)sizeof(t))
+
 # define DKT_MEM_MGMT_MALLOC 0
 # define DKT_MEM_MGMT_NEW    1
 # define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
@@ -55,12 +58,12 @@ namespace dkt {
     # error DK_MEM_MGMT
 # endif
   }
-  inline FUNC alloc(std::size_t size) -> void* {
+  inline FUNC alloc(ssize_t size) -> void* {
     void* buf;
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
     buf = operator new(size);
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
-    buf = malloc(size);
+    buf = malloc(cast(size_t)size);
 
     if (nullptr == buf)
       throw std::bad_alloc();
@@ -69,14 +72,14 @@ namespace dkt {
 # endif
     return buf;
   }
-  inline FUNC alloc(std::size_t size, void* ptr) -> void* {
+  inline FUNC alloc(ssize_t size, void* ptr) -> void* {
     void* buf;
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
     buf = dkt::alloc(size);
     memcpy(buf, ptr, size);
     dkt::dealloc(ptr);
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
-    buf = realloc(ptr, size);
+    buf = realloc(ptr, cast(size_t)size);
 
     if (nullptr == buf)
       throw std::bad_alloc();
@@ -94,6 +97,7 @@ namespace dkt {
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) nullptr
 # endif
 
+// gcc has bug in code generation so the assembler omit the quotes
 # if defined __clang__
   # define dkt_rodata_section  gnu::section("__DKT_RODATA#, __dkt_rodata")
 # elif defined __GNUG__
@@ -121,7 +125,6 @@ namespace dkt {
   # define debug_so_import
 # endif
 
-# define cast(t) (t)
 # define DK_COUNTOF(array) (sizeof((array))/sizeof((array)[0]))
 
 // template <typename T, size-t N>
@@ -149,10 +152,10 @@ inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ?
 # define until(e)  while (0 == (e))
 
 # define intstr(c1, c2, c3, c4) \
-   ((((cast(int32_t)cast(char8_t) c1) << 24) & 0xff000000) | \
-    (((cast(int32_t)cast(char8_t) c2) << 16) & 0x00ff0000) | \
-    (((cast(int32_t)cast(char8_t) c3) <<  8) & 0x0000ff00) | \
-    (((cast(int32_t)cast(char8_t) c4) <<  0) & 0x000000ff))
+   ((((cast(int64_t)cast(char8_t) c1) << 24) & 0xff000000) | \
+    (((cast(int64_t)cast(char8_t) c2) << 16) & 0x00ff0000) | \
+    (((cast(int64_t)cast(char8_t) c3) <<  8) & 0x0000ff00) | \
+    (((cast(int64_t)cast(char8_t) c4) <<  0) & 0x000000ff))
 
 # if !defined NUL
   # define    NUL cast(char8_t)0
@@ -242,7 +245,7 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 [[debug_so_export]] FUNC dkt_trace_after( const signature_t* signature, method_t method, super_t  context, ...) -> int_t;
 [[debug_so_export]] FUNC dkt_trace_after( const signature_t* signature, method_t method, object_t object,  ...) -> int_t;
 
-[[debug_so_export]] FUNC dkt_get_klass_chain(object_t klass, char8_t* buf, uint32_t buf_len) -> char8_t*;
+[[debug_so_export]] FUNC dkt_get_klass_chain(object_t klass, char8_t* buf, int64_t buf_len) -> char8_t*;
 
 [[debug_so_export]] FUNC dkt_dump_methods(object_t) -> void;
 [[debug_so_export]] FUNC dkt_dump_methods(klass::slots_t*) -> void;

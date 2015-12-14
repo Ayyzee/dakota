@@ -25,6 +25,7 @@ klass size {
     return self;
   }
 }
+// essentially a signed size-t
 klass ssize {
   slots ssize-t;
 
@@ -34,3 +35,5 @@ klass ssize {
     return self;
   }
 }
+static-assert(sizeof(ssize-t) == sizeof(size-t),
+              "The types ssize-t and size-t must be interchangable with respect to their size.");

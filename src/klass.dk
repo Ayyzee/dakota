@@ -86,21 +86,21 @@ klass selector-pair {
     return result;
   }
 }
-static const uint32-t gbl-num-generics = 512;
+static const int64-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
 sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                 0,
                                                 DK-COUNTOF(gbl-selectors),
-                                                cast(uint32-t)sizeof(gbl-selectors[0]),
+                                                cast(int64-t)sizeof(gbl-selectors[0]),
                                                 cast(std-compare-t)cast(auto (*)(selector-pair-t*,
                                                                                  selector-pair-t*) -> int-t)selector-pair::compare };
 
 //   void dump-selectors()
 //   {
-//     for (uint32-t index = 0; index < gbl-selectors-table.count; index++)
+//     for (int64-t index = 0; index < gbl-selectors-table.count; index++)
 //     {
 //       symbol-t   selector =  gbl-selectors[index]->name;
-//       uint32-t selector =  *gbl-selectors[index]->ptr;
+//       int64-t selector =  *gbl-selectors[index]->ptr;
 //       char8-t[1024] buffer; buffer[0] = NUL;
 
 //       printf("pair[%03u]: selector = %03u, selector = %s\n",
@@ -131,7 +131,7 @@ static func method-for-signature(methods::slots-t* methods, const signature-t* s
   return m;
 }
 func import-selectors(signature-t** signatures, selector-node-t* selector-nodes) -> void {
-  uint32-t i = 0;
+  int64-t i = 0;
   while (1) {
     signature-t*     signature =     signatures[i];
     selector-node-t* selector-node = &selector-nodes[i];
@@ -171,12 +171,12 @@ static func ptr-from-info(named-info-t* info, symbol-t key) -> const void* {
 
   return element;
 }
-static func uint32-from-info(named-info-t* info, symbol-t key) -> uint32-t {
+static func int64-from-info(named-info-t* info, symbol-t key) -> int64-t {
   named-info-t* current-info = info;
-  uint32-t previous-element = 0;
-  uint32-t element = 0;
+  int64-t previous-element = 0;
+  int64-t element = 0;
   do {
-    element = cast(uint32-t)named-info::at(current-info, key);
+    element = cast(int64-t)named-info::at(current-info, key);
     assert((0 == previous-element && 0 != element) ||
            (0 != previous-element && 0 == element) ||
            (previous-element ==  element));
@@ -188,8 +188,8 @@ static func uint32-from-info(named-info-t* info, symbol-t key) -> uint32-t {
 
   return element;
 }
-func size-from-info(named-info-t* info) -> uint32-t {
-  uint32-t size = uint32-from-info(info, #size);
+func size-from-info(named-info-t* info) -> int64-t {
+  int64-t size = int64-from-info(info, #size);
   return size;
 }
 static func superklass-from-info(named-info-t* info) -> object-t {
@@ -239,17 +239,17 @@ func klass-name-from-info(named-info-t* info) -> symbol-t {
     klass-name = default-klass-name();
   return klass-name;
 }
-const uint32-t k-alignment = 8;
+const int64-t k-alignment = 8;
 
 // consider using alignas(8) on the slots struct decl/defn
 
-inline func round-alignment(uint32-t n) -> uint32-t {
-  uint32-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
+inline func round-alignment(int64-t n) -> int64-t {
+  int64-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
   return result;
 }
 // offset is 'offset() of superklass' + 'size of superklass'
-func offset-from-info(named-info-t* info) -> uint32-t {
-  uint32-t result;
+func offset-from-info(named-info-t* info) -> int64-t {
+  int64-t result;
 
   symbol-t name = name-from-info(info);
   if (#object == name)
@@ -260,8 +260,8 @@ func offset-from-info(named-info-t* info) -> uint32-t {
     if (nullptr == superklass-name)
       superklass-name = default-superklass-name();
     named-info-t* superklass-info = info-for-name(superklass-name);
-    uint32-t superklass-offset = offset-from-info(superklass-info); // recursive
-    uint32-t superklass-size =   size-from-info(superklass-info);
+    int64-t superklass-offset = offset-from-info(superklass-info); // recursive
+    int64-t superklass-size =   size-from-info(superklass-info);
     result = superklass-offset + superklass-size;
   }
   result = round-alignment(result);
@@ -269,7 +269,7 @@ func offset-from-info(named-info-t* info) -> uint32-t {
 }
 static func load-traits(const symbol-t* traits) -> void {
   if (nullptr != traits) {
-    uint32-t i = 0;
+    int64-t i = 0;
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* info = info-for-name(trait-name);
@@ -280,31 +280,31 @@ static func load-traits(const symbol-t* traits) -> void {
 }
 klass resource-usage {
   slots {
-    uint32-t memory;
-    uint32-t instances;
-    uint32-t method-memory;
-    uint32-t method-count;
+    int64-t memory;
+    int64-t instances;
+    int64-t method-memory;
+    int64-t method-count;
   }
-  method add-alloc(slots-t* s, uint32-t size) -> slots-t* {
+  method add-alloc(slots-t* s, int64-t size) -> slots-t* {
     s->instances++;
     s->memory += size;
     return s;
   }
   method log-alloc(slots-t* s, object-t o) -> slots-t* {
-    printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"\n",
+    printf("%3" PRIi64 ", size = %2" PRIi64 ", total-memory = %4" PRIi64 ", name = \"%s\"\n",
            s->instances,
            klass::unbox(o).offset + klass::unbox(o).size,
            s->memory,
            klass::unbox(o).name);
     return s;
   }
-  method log-alloc(slots-t* s, uint32-t size, symbol-t name) -> slots-t*{
-    printf("%3i, size = %2i, total-memory = %4i, name = \"%s\"~\n",
+  method log-alloc(slots-t* s, int64-t size, symbol-t name) -> slots-t*{
+    printf("%3" PRIi64 ", size = %2" PRIi64 ", total-memory = %4" PRIi64 ", name = \"%s\"~\n",
            s->instances, size, s->memory, name);
     return s;
   }
   method log-method-alloc(slots-t* s) -> slots-t*{
-    printf("method-count=%u, method-memory=%i\n", s->method-count, s->method-memory);
+    printf("method-count=%" PRIi64 ", method-memory=%" PRIi64 "\n", s->method-count, s->method-memory);
     return s;
   }
 }
@@ -315,27 +315,27 @@ resource-usage::slots-t gbl-ru = { 0, 0, 0, 0 };
 klass methods {
   slots {
     method-t* addrs; // first so its offset is 0
-    uint32-t  count;
+    int64-t   count;
   }
 }
 klass klass {
   slots {
-    uint32-t                 offset; // first so its offset is 0
-    methods::slots-t          methods;
-    uint32-t                 size;
+    int64-t                  offset; // first so its offset is 0
+    methods::slots-t         methods;
+    int64-t                  size;
     object-t                 superklass;
     symbol-t                 name; // redundant but convenient
     named-info::slots-t* info-slots;
     object-t behavior; // bit-vector
   }
-  method alloc(object-t self, str-t file, uint32-t line) -> object-t {
-    DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%i','func':'%s','args':['%s']",
+  method alloc(object-t self, str-t file, int64-t line) -> object-t {
+    DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%" PRIi64 "','func':'%s','args':['%s']",
                          file, line, __method__->name, self.name);
     object-t instance = $alloc(self);
     return instance;
   }
   method alloc(object-t self) -> object-t {
-    uint32-t size = self.offset + self.size;
+    int64-t size = self.offset + self.size;
 
 # if defined DKT-DUMP-MEM-FOOTPRINT
     resource-usage::add-alloc(&gbl-ru, size);
@@ -353,24 +353,24 @@ klass klass {
     symbol-t name = self.name;
     return name;
   }
-  static func alloc-methods(object-t self, uint32-t methods-count) -> object-t {
+  static func alloc-methods(object-t self, int64-t methods-count) -> object-t {
     self.methods.count = methods-count;
-    self.methods.addrs = cast(method-t*)dkt::alloc(sizeof(method-t) * self.methods.count);
+    self.methods.addrs = cast(method-t*)dkt::alloc(ssizeof(method-t) * self.methods.count);
 
 # if defined DKT-DUMP-MEM-FOOTPRINT
     gbl-ru.method-count =  self.methods.count;
-    gbl-ru.method-memory += gbl-ru.method-count * sizeof(method-t);
+    gbl-ru.method-memory += gbl-ru.method-count * ssizeof(method-t);
     resource-usage::log-method-alloc(&gbl-ru);
 # endif    
 
-    for (uint32-t index = 0; index < self.methods.count; index++)
+    for (int64-t index = 0; index < self.methods.count; index++)
       self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
     return self;
   }
   static func init-methods(object-t self) -> object-t {
     if (nullptr != self.superklass && null != self.superklass) {
       memcpy(self.methods.addrs, unbox(self.superklass).methods.addrs,
-             sizeof(method-t) * unbox(self.superklass).methods.count);
+             cast(size-t)(ssizeof(method-t) * unbox(self.superklass).methods.count));
     }
     return self;
   }
@@ -398,7 +398,7 @@ klass klass {
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
-      $set-bit(self.behavior, cast(uint32-t)selector, false);
+      $set-bit(self.behavior, cast(int64-t)selector, false);
     return m;
   }
   method add-method-for-selector(object-t self, selector-t selector, method-t m) -> method-t {
@@ -406,7 +406,7 @@ klass klass {
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
-      $set-bit(self.behavior, cast(uint32-t)selector, true);
+      $set-bit(self.behavior, cast(int64-t)selector, true);
     return prev-m;
   }
   method dump(object-t self) -> object-t {
@@ -436,9 +436,9 @@ klass klass {
       fprintf(stderr, ", superklass=%s", #nullptr);
     }
     // size
-    fprintf(stderr, ", size=%i", self.size);
+    fprintf(stderr, ", size=%" PRIi64, self.size);
     // offset
-    fprintf(stderr, ", offset=%i", self.offset);
+    fprintf(stderr, ", offset=%" PRIi64, self.offset);
 
     // traits
     fprintf(stderr, ", traits=["); {
@@ -446,7 +446,7 @@ klass klass {
       if (nullptr != traits) {
         fprintf(stderr, " ");
         str-t delim = "";
-        uint32-t i = 0;
+        int64-t i = 0;
         symbol-t trait-name;
         while (nullptr != (trait-name = traits[i++])) {
           fprintf(stderr, "%s#%s", delim, trait-name);
@@ -471,7 +471,7 @@ klass klass {
     const symbol-t* traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
     
     if (nullptr != traits) {
-      uint32-t i = 0;
+      int64-t i = 0;
       symbol-t trait-name;
       while (nullptr != (trait-name = traits[i++])) {
         $add-last(seq, symbol::box(trait-name));
@@ -483,15 +483,15 @@ klass klass {
     if (nullptr != s->behavior)
       $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
-    uint32-t max-width = 0;
+    int64-t max-width = 0;
 
     if (1) {
-      for (uint32-t index = 0; index < s->methods.count; index++) {
+      for (int64-t index = 0; index < s->methods.count; index++) {
         const signature-t* signature = cast(const signature-t*)selectors[index].key;
         method-t m = method-for-signature(&s->methods, signature);
         if (nullptr != m) {
-          uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 +
-                           cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
+          ssize-t width = cast(ssize-t)safe-strlen(signature->name) + 1 +
+                          cast(ssize-t)safe-strlen(signature->parameter-types) + 1;
           if (width > max-width)
             max-width = width;
         }
@@ -500,14 +500,14 @@ klass klass {
     stream-t out = stdout;
     
     fprintf(out, "{\n");
-    for (uint32-t index = 0; index < s->methods.count; index++) {
+    for (int64-t index = 0; index < s->methods.count; index++) {
       const signature-t* signature =  cast(const signature-t*)selectors[index].key;
       method-t m = method-for-signature(&s->methods, signature);
 
       if (nullptr != m) {
         fprintf(out, "  '%s(%s)'", signature->name, signature->parameter-types);
-        uint32-t width = cast(uint32-t)safe-strlen(signature->name) + 1 +
-                         cast(uint32-t)safe-strlen(signature->parameter-types) + 1;
+        ssize-t width = cast(ssize-t)safe-strlen(signature->name) + 1 +
+                        cast(ssize-t)safe-strlen(signature->parameter-types) + 1;
         while (width < max-width) {
           fprintf(out, " ");
           width++;
@@ -536,7 +536,7 @@ klass klass {
       assert((nullptr != method-signatures && nullptr != method-addresses) ||
              (nullptr == method-signatures && nullptr == method-addresses));
       if (nullptr != method-signatures) {
-        uint32-t index = 0;
+        int64-t index = 0;
         signature-t* signature;
         method-t   address;
         while (nullptr != (signature = method-signatures[index])) {
@@ -546,7 +546,7 @@ klass klass {
             add-method-for-selector(self, selector, address);
 
             if (nullptr != self.behavior) {
-              $set-bit(self.behavior, cast(uint32-t)selector, true);
+              $set-bit(self.behavior, cast(int64-t)selector, true);
             }
           } else {
             // ???
@@ -559,11 +559,11 @@ klass klass {
   }
   static func add-traits(object-t self, const symbol-t* traits) -> void {
     if (nullptr != traits) {
-      uint32-t length = 0;
+      int64-t length = 0;
       while (nullptr != traits[length])
         length++;
 
-      uint32-t pos = length;
+      int64-t pos = length;
       while (pos) {
         named-info-t* info = info-for-name(traits[pos - 1]);
         const symbol-t* used-traits = cast(const symbol-t*)named-info::at(info, #traits);
@@ -577,7 +577,7 @@ klass klass {
   }
   static func traits-initialize(object-t self, const symbol-t* traits) -> object-t {
     if (nullptr != traits) {
-      uint32-t i = 0;
+      int64-t i = 0;
       symbol-t trait-name;
       while (nullptr != (trait-name = traits[i++])) {
         named-info-t* info = info-for-name(trait-name);
@@ -605,7 +605,7 @@ klass klass {
     if (nullptr == self.behavior) {
       self.behavior = make(bit-vector::klass, #initial-capacity : self.methods.count);
 
-      for (uint32-t index = 0; index < self.methods.count; index++)
+      for (int64-t index = 0; index < self.methods.count; index++)
         if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
           $set-bit(self.behavior, index, true);
     }
@@ -644,7 +644,7 @@ klass klass {
     assert(#trait != cast(symbol-t)named-info::at(self.info-slots, #type));
     self.name = name;
 //     fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), self.name);
-    uint32-t size = size-from-info(self.info-slots);
+    int64-t size = size-from-info(self.info-slots);
     self.size = size;
     object-t superklass = superklass-from-info(self.info-slots, self.name);
     self.superklass = superklass;
@@ -662,7 +662,7 @@ klass klass {
 
     if (nullptr != traits)
       load-traits(traits);
-    uint32-t offset = offset-from-info(self.info-slots);
+    int64-t offset = offset-from-info(self.info-slots);
     self.offset = offset;
     alloc-methods(self, gbl-selectors-table.count);
     init-methods(self);
@@ -685,7 +685,7 @@ klass klass {
       self = traits-initialize(self, traits);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info-slots, #method-aliases);
     if (nullptr != method-aliases) {
-      uint32-t i = 0;
+      int64-t i = 0;
       const signature-t* method-signature;
       while (nullptr != (method-signature = method-aliases[i].method-signature)) {
         const signature-t* alias-signature = method-aliases[i].alias-signature;
@@ -747,9 +747,9 @@ klass klass {
   }
   method utf8-from(object-t self) -> str-t {
     symbol-t name = self.name;
-    uint32-t name-len = cast(uint32-t)safe-strlen(name);
-    char8-t* buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (name-len + (1)));
-    snprintf(buffer, name-len + (1), "%s", name);
+    ssize-t name-len = cast(ssize-t)safe-strlen(name);
+    char8-t* buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (name-len + (1)));
+    snprintf(buffer, cast(size-t)(name-len + (1)), "%s", name);
     return buffer;
   }
   method write-slots(object-t self, object-t out) -> object-t {

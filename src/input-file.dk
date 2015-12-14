@@ -42,8 +42,8 @@ klass input-file {
     char8-t* buffer;
 
     str-t    file;
-    int32-t  line;
-    int32-t  column;
+    int64-t   line;
+    int64-t   column;
   }
   method init(object-t self,
                        stream-t stream :   nullptr,
@@ -68,7 +68,7 @@ klass input-file {
     fseeko(stream, 0L, SEEK-END);
     self.length = ftello(stream); // this might be longer than needed
     fsetpos(stream, &fpos);
-    self.buffer = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (cast(size-t)self.length + 1));
+    self.buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (self.length + 1));
     fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, stream);
     self.buffer[self.length] = NUL;
 
@@ -129,7 +129,7 @@ klass input-file {
     while (1) {
     # if 0
       str128-t  ws-buf = "";
-      uint32-t ws-buf-pos = 0;
+      int64-t ws-buf-pos = 0;
       while (type?(c = $get-char8(self))) {
         ws-buf[ws-buf-pos] = c;
         ws-buf-pos++;
@@ -141,7 +141,7 @@ klass input-file {
       $put-char8(self, c);
 
       str128-t  buf = "";
-      uint32-t buf-pos = 0;
+      int64-t buf-pos = 0;
       until (type?(c = $get-char8(self))) {
         buf[buf-pos] = c;
         buf-pos++;

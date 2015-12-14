@@ -17,7 +17,7 @@
 module dakota;
 
 klass exe-type {
-  slots enum : uint32-t {
+  slots enum : int64-t {
     // zero is illegal
     k-lib = 1,
     k-exe = 2,

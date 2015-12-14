@@ -22,7 +22,7 @@ klass pair;
 klass deque;
 klass named-info;
 klass sorted-counted-set;
-klass uint32;
+klass int64;
 trait stack;
 
 klass autorelease-pool-klass {
@@ -66,8 +66,8 @@ klass autorelease-pool {
   }
   method release(object-t self) -> object-t {
     for (pair-t& pair in self.counted-elements) {
-      uint32-t n = uint32::unbox(pair.last);
-      for (uint32-t i = 0; i < n; i++) {
+      int64-t n = int64::unbox(pair.last);
+      for (int64-t i = 0; i < n; i++) {
         $release(pair.first);
       }
     }

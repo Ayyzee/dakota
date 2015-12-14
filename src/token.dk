@@ -32,8 +32,8 @@ klass tokenid;
 klass token {
   slots {
     tokenid-t tokenid;
-    uint32-t line;
-    uint32-t column;
+    int64-t line;
+    int64-t column;
     str512-t buffer;
     // could include file
     object-t leading-ws;
@@ -56,8 +56,8 @@ klass token {
     return self;
   }
   method init(object-t self,
-                       uint32-t       line :    0,
-                       uint32-t       column :  0,
+                       int64-t        line :    0,
+                       int64-t        column :  0,
                        tokenid-t      tokenid : 0,
                        str-t buffer :  nullptr) -> object-t {
     self = $init(super);
@@ -142,10 +142,10 @@ klass token {
   method leading-ws(object-t self) -> object-t {
     return self.leading-ws;
   }
-  method line(object-t self) -> uint32-t {
+  method line(object-t self) -> int64-t {
     return self.line;
   }
-  method column(object-t self) -> uint32-t {
+  method column(object-t self) -> int64-t {
     return self.column;
   }
   method buffer(object-t self) -> str-t {
@@ -169,7 +169,7 @@ klass token {
 //     fprintf(stderr, "%p:%p { line=%i, buffer=\"",
 //             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.line);
 
-    for (uint32-t i = 0; NUL != self.buffer[i]; i++) {
+    for (int64-t i = 0; NUL != self.buffer[i]; i++) {
       switch (self.buffer[i]) {
         case '\n':
           fprintf(stderr, "\\n");
@@ -199,8 +199,8 @@ klass token {
     return self;
   }
   // should be in superklass string??
-  method append(object-t self, uint32-t c) -> object-t {
-    uint32-t len = cast(uint32-t)safe-strlen(self.buffer);
+  method append(object-t self, int64-t c) -> object-t {
+    int64-t len = cast(int64-t)safe-strlen(self.buffer);
     self.buffer[len] =     cast(char8-t)(c);
     self.buffer[len + 1] = NUL;
     return self;

@@ -17,6 +17,7 @@
 # include <cassert>
 # include <cctype>
 # include <cerrno>
+# include <cinttypes>
 # include <cstdlib>
 # include <cstring>
 
@@ -32,8 +33,8 @@ klass tokenid;
 klass vector;
 
 [[format-printf(4)]] static
-func print-error(str-t file, uint32-t line, uint32-t column, str-t format, ...) -> int-t{
-  int-t result = fprintf(stderr, "%s:%i:%i ", file, line, column);
+func print-error(str-t file, int64-t line, int64-t column, str-t format, ...) -> int-t{
+  int-t result = fprintf(stderr, "%s:%" PRIi64 ":%" PRIi64 " ", file, line, column);
   if (-1 != result) {
     va-list-t args;
     va-start(args, format);
@@ -44,12 +45,11 @@ func print-error(str-t file, uint32-t line, uint32-t column, str-t format, ...) 
 }
 klass json-parser {  
   slots {
-    stream-t   in;
+    stream-t in;
     str-t    file;
-    uint32-t line;
-    uint32-t column;
+    int64-t  line;
+    int64-t  column;
   }
-    
   method init(object-t self,
                        stream-t stream :   stdin,
                        str-t    file : nullptr) -> object-t {
@@ -75,15 +75,15 @@ klass json-parser {
     self.column =   0;
     return self;
   }
-  method read(object-t self, ptr-t buffer, uint32-t element-size, uint32-t num-elements-max) -> uint32-t {
-    uint32-t num-elements-read = cast(uint32-t)fread(buffer, cast(size-t)element-size, cast(size-t)num-elements-max, self.in);
+  method read(object-t self, ptr-t buffer, int64-t element-size, int64-t num-elements-max) -> int64-t {
+    int64-t num-elements-read = cast(int64-t)fread(buffer, cast(size-t)element-size, cast(size-t)num-elements-max, self.in);
     
     // fread() does not distinguish between end-of-file and error, and callers must use
     // feof(3) and ferror(3) to determine which occurred.
     
     return num-elements-read;
   }
-  /* method */ static func putback(object-t self, int32-t c) -> void {
+  /* method */ static func putback(object-t self, int-t c) -> void {
     if ('\n' == c)
       self.line--;
       // where is column left?
@@ -92,8 +92,8 @@ klass json-parser {
     ungetc(c, self.in);
     return;
   }
-  /* method */ static func get(object-t self) -> int32-t {
-    int32-t c = getc(self.in);
+  /* method */ static func get(object-t self) -> int-t {
+    int-t c = getc(self.in);
     if (EOF != c) {
       if ('\n' == c) {
         self.line++;
@@ -104,10 +104,10 @@ klass json-parser {
     }
     return c;
   }
-  //func error-msg(char8-t* file, uint32-t line, uint32-t column, str-t msg0, ...) -> void; // one or more msg strings
+  //func error-msg(char8-t* file, int64-t line, int64-t column, str-t msg0, ...) -> void; // one or more msg strings
 
   /* method */ static func lex(object-t self) -> object-t {
-    int32-t c;
+    int-t c;
     while (1) {
       while (isspace(c = json-parser::get(self))) {
       }
@@ -143,7 +143,7 @@ klass json-parser {
           }
         }
         case '\'': {
-          int32-t quote-type = '\'';
+          int64-t quote-type = '\'';
           object-t token = make(token::klass, #tokenid : 'sqst',
                                 #line : self.line, #column : self.column - 1);
           boole-t escaped?;
@@ -155,7 +155,7 @@ klass json-parser {
           if (quote-type == c)
             return token; // empty string
           do {
-            $append(token, cast(uint32-t)c);
+            $append(token, cast(int64-t)c);
 
             if ('\\' == c)
               escaped? = true;
@@ -191,7 +191,7 @@ klass json-parser {
           object-t token = make(token::klass, #tokenid : 'st', // 'st' should be 'idnt'
                                 #line : self.line, #column : self.column - 1);
           do {
-            $append(token, cast(uint32-t)c);
+            $append(token, cast(int64-t)c);
             c = json-parser::get(self);
           } while (isalnum(c) || '_' == c);
           if (EOF != c)

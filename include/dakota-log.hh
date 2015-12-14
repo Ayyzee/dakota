@@ -22,8 +22,8 @@
 
 typedef char char8_t; // hackhack
 
-[[so_export]] [[format_va_printf(2)]] FUNC dkt_va_log(uint32_t priority, str_t format, va_list_t args) -> int_t;
-[[so_export]] [[format_printf(   2)]] FUNC dkt_log(   uint32_t priority, str_t format, ...) -> int_t;
+[[so_export]] [[format_va_printf(2)]] FUNC dkt_va_log(int64_t priority, str_t format, va_list_t args) -> int_t;
+[[so_export]] [[format_printf(   2)]] FUNC dkt_log(   int64_t priority, str_t format, ...) -> int_t;
 
 # define log_method()     dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"method\": \"%s\",\"params\": \"%s\"", __klass__, __method__->name, __method__->parameter_types)
 # define log_klass_func() dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"func\": \"%s\"", __klass__, __func__)
@@ -41,7 +41,7 @@ namespace dkt {
     k_log_debug =     LOG_DEBUG,
   };
 
-  enum log_element_t : uint_t {
+  enum log_element_t : uint64_t {
     k_log_null =           0,
 
     k_log_mem_footprint =  1 <<  0,
@@ -51,7 +51,7 @@ namespace dkt {
 
     k_log_all = ~(cast(log_element_t)0)
   };
-  const uint32_t log_flags = k_log_null;
+  const uint64_t log_flags = k_log_null;
   //k-log-mem-footprint | k-log-object-alloc | k-log-initial-final | k-log-trace-runtime;
   //k-log-trace-runtime;
 }

@@ -15,6 +15,7 @@
 // limitations under the License.
 
 # include <cassert>
+# include <cinttypes>
 
 //  2^n: prime < 2^n
 // ----|--------------------
@@ -23,7 +24,7 @@
 //  512: 509
 // 1024: 1021
 
-static const uint32-t gbl-prime = 127;
+static const int64-t gbl-prime = 127;
 
 // when the user submits a non-prime number, decrement until a prime is found
 
@@ -41,11 +42,11 @@ klass hashed-set {
   trait set;
 
   slots {
-    uint32-t num-buckets;
+    int64-t num-buckets;
     object-t buckets; // a vector of deques
-    uint32-t size;
+    int64-t size;
 
-    uint32-t iterator-state;
+    int64-t iterator-state;
   }
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
@@ -70,7 +71,7 @@ klass hashed-set {
     return self;
   }
   method add(object-t self, object-t object1) -> object-t {
-    hash-t index = $hash(object1) % self.num-buckets;
+    ssize-t index = cast(ssize-t)($hash(object1) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
@@ -105,7 +106,7 @@ klass hashed-set {
     return self;
   }
   method in(object-t self, object-t object1, object-t default-value) -> object-t {
-    hash-t index = $hash(object1) % self.num-buckets;
+    ssize-t index = cast(ssize-t)($hash(object1) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
     object-t result = default-value;
 
@@ -146,7 +147,7 @@ klass hashed-set {
   method remove(object-t self, object-t element1) -> object-t {
     object-t object = null;
 
-    hash-t index = $hash(element1) % self.num-buckets;
+    ssize-t index = cast(ssize-t)($hash(element1) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {
@@ -177,7 +178,7 @@ klass hashed-set {
     s2.iterator-state = 0;
     return copy;
   }
-  method size(object-t self) -> uint32-t {
+  method size(object-t self) -> int64-t {
     return self.size;
   }
   method forward-iterator(object-t self) -> object-t {
@@ -186,7 +187,7 @@ klass hashed-set {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { size=%u, elements=[] }\n",
+    fprintf(stderr, "%p:%p { size=%" PRIi64 ", elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.size);
     for (object-t element in self)
       $dump(element);
@@ -214,7 +215,7 @@ klass hashed-set-forward-iterator {
     object-t vector-iter; // set one time per instantiation
     object-t deque-iter;  // set many times per instantiation
 
-    uint32-t  iterator-state;
+    int64-t   iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);

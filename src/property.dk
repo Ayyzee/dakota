@@ -22,8 +22,8 @@ module dakota;
 
 klass property {
   slots {
-    symbol-t  key;
-    uintptr-t element;
+    symbol-t key;
+    intptr-t element;
   }
   method init(object-t self, slots-t slots : {.key = nullptr, .element = 0}) -> object-t {
     self = $init(super);
@@ -34,7 +34,7 @@ klass property {
     int-t result = symbol::compare(s->key, other-s->key);
     return result;
   }
-  method check(slots-t* s) -> int32-t {
+  method check(slots-t* s) -> int64-t {
     if (nullptr == s->key)
       std::abort();
     return 0;

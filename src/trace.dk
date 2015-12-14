@@ -16,7 +16,7 @@
 
 module dakota;
 
-static uint32-t gbl-trace-column = 0;
+static int64-t gbl-trace-column = 0;
 
 static func trace-column-in() -> void {
   gbl-trace-column++;
@@ -27,7 +27,7 @@ static func trace-column-out() -> void {
 }
 [[format-va-printf(2)]] static func trace-vfprintf(stream-t stream, str-t format, va-list-t args) -> int-t {
   str-t col = "  "; // two spaces per column :-) [my way]
-  for (uint32-t i = 0; i < gbl-trace-column; i++) {
+  for (int64-t i = 0; i < gbl-trace-column; i++) {
     if (0 == i)
       fprintf(stream, "%s", col);
     else

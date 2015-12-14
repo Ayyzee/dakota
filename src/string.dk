@@ -23,7 +23,7 @@
 # include "dakota-private.hh"
 
 // 2^32 - 5 = 4294967291 or 0xfffffffb
-const uintptr-t max-prime32 = 0xfffffffb;
+// const uintptr-t max-prime32 = 0xfffffffb;
 
 module dakota;
 
@@ -35,15 +35,15 @@ klass string {
   slots {
     symbol-t encoding;
     char8-t* ptr;
-    uint32-t len;
+    int64-t len;
   }
-  //uint32-t size; // sizeof(ptr[0])
+  //int64-t size; // sizeof(ptr[0])
 
   method init(object-t self,
                        symbol-t       encoding : #utf-8,
                        str-t bytes :    "",
-                       uint32-t       start :    0,
-                       uint32-t       length :   cast(uint32-t)safe-strlen(bytes) - start) -> object-t {
+                       int64-t        start :    0,
+                       int64-t        length :   cast(int64-t)safe-strlen(bytes) - start) -> object-t {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = $init(super);
     assert(nullptr != bytes);
@@ -52,8 +52,8 @@ klass string {
     USE(encoding);
     self.encoding = encoding;
     self.len = length;
-    self.ptr = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (self.len + 1));
-    strncpy(self.ptr, bytes + start, self.len);
+    self.ptr = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (self.len + 1));
+    strncpy(self.ptr, bytes + start, cast(size-t)self.len);
     self.ptr[self.len] = NUL;
     return self;
   }
@@ -62,11 +62,11 @@ klass string {
     object-t result = $dealloc(super);
     return result;
   }
-  method length(object-t self) -> uint32-t {
+  method length(object-t self) -> int64-t {
     if (0    == self.len &&
         nullptr != self.ptr &&
         NUL  != self.ptr[0])
-      self.len = cast(uint32-t)safe-strlen(self.ptr);
+      self.len = cast(int64-t)safe-strlen(self.ptr);
     return self.len;
   }
   method intern(object-t self) -> symbol-t {
@@ -92,20 +92,20 @@ klass string {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%i }\n",
+    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%" PRIi64 " }\n",
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.ptr, self.len);
     return self;
   }
-  method uint32-value(object-t self) -> uint32-t {
-    uint32-t result = cast(uint32-t)strtoumax(self.ptr, nullptr, 10);
+  method uint64-value(object-t self) -> uint64-t {
+    uint64-t result = cast(uint64-t)strtoumax(self.ptr, nullptr, 10);
     return result;
   }
-  method int32-value(object-t self) -> int32-t {
-    int32-t result = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
+  method int64-value(object-t self) -> int64-t {
+    int64-t result = cast(int64-t)strtoimax(self.ptr, nullptr, 10);
     return result;
   }
   method boole-value(object-t self) -> boole-t {
-    int32-t int-value = cast(int32-t)strtoimax(self.ptr, nullptr, 10);
+    int64-t int-value = cast(int64-t)strtoimax(self.ptr, nullptr, 10);
     boole-t result;
     if (0 == int-value)
       result = false;
@@ -118,9 +118,9 @@ klass string {
     assert(nullptr != encoding);
     assert(#utf-8 != encoding);
     USE(encoding);
-    uint32-t len = cast(uint32-t)safe-strlen(bytes);
+    int64-t len = cast(int64-t)safe-strlen(bytes);
     self.len += len;
-    self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * sizeof(char8-t)), self.ptr);
+    self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * ssizeof(char8-t)), self.ptr);
     strcat(self.ptr, bytes);
     return self;
   }
@@ -136,7 +136,7 @@ klass string {
   }
   method tokenize(object-t self, str-t delimiter) -> object-t {
     object-t result = make(vector::klass);
-    uint32-t delimiter-length = cast(uint32-t)safe-strlen(delimiter);
+    int64-t delimiter-length = cast(int64-t)safe-strlen(delimiter);
     str-t p1 = self.ptr;
     str-t p2;
 
@@ -144,13 +144,13 @@ klass string {
     object-t delimiter-object = make(kls, #bytes : delimiter);
 
     // leading 'delimiter'
-    if (0 == strncmp(self.ptr, delimiter, delimiter-length)) {
+    if (0 == strncmp(self.ptr, delimiter, cast(size-t)delimiter-length)) {
       $add-last(result, delimiter-object);
       p1 += delimiter-length;
     }
     // 'part' 'delimiter' pairs
     while (nullptr != (p2 = strstr(p1, delimiter))) {
-      object-t part-object = make(kls, #bytes : cast(str-t)(p1), #length : cast(uint32-t)(p2 - p1));
+      object-t part-object = make(kls, #bytes : cast(str-t)(p1), #length : cast(int64-t)(p2 - p1));
       $add-last(result, part-object);
       $add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
@@ -169,9 +169,9 @@ klass string {
   method append-sequence(object-t self, object-t sequence) -> object-t {
     for (object-t element in sequence) {
       str-t utf8 = $utf8-from(element);
-      uint32-t length = cast(uint32-t)safe-strlen(utf8);
-      self.len += cast(uint32-t)(length);
-      self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * sizeof(char8-t)), self.ptr);
+      int64-t length = cast(int64-t)safe-strlen(utf8);
+      self.len += cast(int64-t)(length);
+      self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * ssizeof(char8-t)), self.ptr);
       strcat(self.ptr, utf8);
     }
     return self;

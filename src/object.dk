@@ -30,7 +30,7 @@ klass unbox-illegal-klass-exception;
 klass object {
   slots {
     object-t klass;
-    uint32-t retain-count;
+    int64-t retain-count;
   }
   //     klass klass;
 
@@ -131,9 +131,9 @@ klass object {
     return self;
   }
   method utf8-from(object-t self) -> str-t {
-    size-t len = 2 + PRIxPTR-WIDTH + (1);
+    ssize-t len = 2 + PRIxPTR-WIDTH + (1);
     char8-t* buffer = cast(char8-t*)dkt::alloc(len);
-    snprintf(buffer, len, "%p", cast(ptr-t)self);
+    snprintf(buffer, cast(size-t)len, "%p", cast(ptr-t)self);
     return cast(str-t)(buffer);
   }
   method print(object-t self, object-t out) -> object-t {

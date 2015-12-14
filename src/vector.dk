@@ -15,14 +15,16 @@
 // limitations under the License.
 
 # include <cassert>
+# include <cinttypes>
 # include <cstdlib>
 # include <cstring>
 
 module dakota;
 
 klass exception;
+klass int64;
 klass object-output-stream;
-klass uint32;
+klass ssize;
 
 klass vector {
   superklass sequence;
@@ -30,16 +32,16 @@ klass vector {
 
   slots {
     object-t* elements;
-    uint32-t  count;
-    uint32-t  capacity;
-    uint32-t  size; // sizeof(elements[0])
+    ssize-t   count;
+    ssize-t   capacity;
+    ssize-t   size; // sizeof(elements[0])
 
     object-t  fill;
-    uint32-t  iterator-state;
+    int64-t   iterator-state;
   }
-  static const uint32-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
+  static const ssize-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const object-t gbl-default-fill = null;
-  static const uint32-t gbl-default-initial-capacity = 64; // shall never be 0
+  static const ssize-t gbl-default-initial-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
   // 'items' is a nullptr terminated array (of objects)
@@ -47,7 +49,7 @@ klass vector {
   // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t  self,
-                       uint32-t  initial-capacity : gbl-default-initial-capacity,
+                       ssize-t   initial-capacity : gbl-default-initial-capacity,
                        object-t  fill :             gbl-default-fill,
                        object-t  elements :         nullptr,
                        object-t* items :            nullptr) -> object-t {
@@ -61,10 +63,10 @@ klass vector {
     self.count = 0;
     self.iterator-state = 0;
     self.capacity = initial-capacity;
-    self.size = cast(uint32-t)sizeof(self.elements[0]);
+    self.size = cast(ssize-t)sizeof(self.elements[0]);
     self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity); // want to be able to realloc()
 
-    for (uint32-t index = 0; index < self.capacity; index++)
+    for (ssize-t index = 0; index < self.capacity; index++)
       self.elements[index] = self.fill;
 
     if (nullptr != elements)
@@ -81,7 +83,7 @@ klass vector {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { count=%u, capacity=%u, elements=[] }\n",
+    fprintf(stderr, "%p:%p { count=%" PRIi64 ", capacity=%" PRIi64 ", elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.count, self.capacity);
     for (object-t element in self)
       $dump(element);
@@ -93,7 +95,7 @@ klass vector {
     slots-t& s1 = unbox(self);
     slots-t& s2 = unbox(copy);
     s2 = s1;
-    memcpy(s2.elements, s1.elements, s2.size * s2.capacity);
+    memcpy(s2.elements, s1.elements, cast(size-t)(s2.size * s2.capacity));
     s2.iterator-state = 0;
     return copy;
   }
@@ -131,7 +133,7 @@ klass vector {
   }
   // reverse in place
   method reverse(object-t self) -> object-t {
-    uint32-t head-offset = 0, tail-offset = self.count - 1;
+    ssize-t head-offset = 0, tail-offset = self.count - 1;
     while (head-offset < tail-offset) {
       object-t head-element = self.elements[head-offset];
       self.elements[head-offset] = self.elements[tail-offset];
@@ -141,12 +143,12 @@ klass vector {
     self.iterator-state++;
     return self;
   }
-  method remove-at(object-t self, uint32-t index) -> object-t {
+  method remove-at(object-t self, ssize-t index) -> object-t {
     object-t element = self.elements[index];
 
     if (index + 1 < self.capacity)
       memmove(&self.elements[index],
-              &self.elements[index + 1], self.size * (self.count - index - 1));
+              &self.elements[index + 1], cast(size-t)(self.size * (self.count - index - 1)));
     self.elements[self.capacity - 1] = self.fill;
     self.count--;
     self.capacity--; // dumb
@@ -158,7 +160,7 @@ klass vector {
     // any/all elements could be null
     object-t object = null; // returns 'null' if element was not present
 
-    for (uint32-t index = 0; index < self.count; index++) {
+    for (ssize-t index = 0; index < self.count; index++) {
       if ($equal?(element, self.elements[index])) {
         remove-at(self, index);
         object = element;
@@ -171,7 +173,7 @@ klass vector {
   method remove-first(object-t self) -> object-t {
     assert(0 != self.count);
     object-t element = self.elements[0];
-    memmove(self.elements, self.elements + 1, self.size * (self.count - 1));
+    memmove(self.elements, self.elements + 1, cast(size-t)(self.size * (self.count - 1)));
     self.elements[self.count - 1] = self.fill;
     self.count--;
     return element;
@@ -196,7 +198,7 @@ klass vector {
   //     method replace-first(object-t self, object-t element) -> object-t;
   //     method replace-last(object-t self, object-t element) -> object-t;
 
-  method at(object-t self, hash-t index, object-t default-result) -> object-t {
+  method at(object-t self, ssize-t index, object-t default-result) -> object-t {
     object-t element = default-result;
     if (self.count > index) {
       element = self.elements[index];
@@ -207,11 +209,11 @@ klass vector {
   }
   // should be auto-generated!!!
   method at(object-t self, object-t boxed-index, object-t default-result) -> object-t {
-    uint32-t index = uint32::unbox(boxed-index);
+    ssize-t index = ssize::unbox(boxed-index);
     object-t result = $at(self, index, default-result);
     return result;
   }
-  method at(object-t self, hash-t index) -> object-t {
+  method at(object-t self, ssize-t index) -> object-t {
     object-t element = $at(self, index, cast(object-t)nullptr);
     if (nullptr == element)
       throw make(exception::klass, #msg : "oops");
@@ -219,11 +221,11 @@ klass vector {
   }
   // should be auto-generated!!!
   method at(object-t self, object-t boxed-index) -> object-t {
-    uint32-t index = uint32::unbox(boxed-index);
+    ssize-t index = ssize::unbox(boxed-index);
     object-t result = $at(self, index);
     return result;
   }
-  method replace-at(object-t self, uint32-t index, object-t object) -> object-t {
+  method replace-at(object-t self, ssize-t index, object-t object) -> object-t {
     if (index >= self.capacity)
       throw make(exception::klass, #msg : "oops");
 
@@ -234,7 +236,8 @@ klass vector {
       self.count = index + 1;
     return rtn;
   }
-  method size(object-t self) -> uint32-t {
+//method [[alias(size)]] ssize(object-t self, object-t element) -> ssize-t;
+  method size(object-t self) -> ssize-t {
     return self.count;
   }
   method add-first(object-t self, object-t element) -> object-t {
@@ -244,13 +247,13 @@ klass vector {
       self.capacity *= gbl-resize-factor;
       self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
-    memmove(self.elements + 1, self.elements, self.size * self.count);
+    memmove(self.elements + 1, self.elements, cast(size-t)(self.size * self.count));
     self.count++;
     self.elements[0] = element;
     self.iterator-state++;
     return element;
   }
-  //     method add-at(object-t self, object-t element, uint32-t index) -> object-t;
+  //     method add-at(object-t self, object-t element, ssize-t index) -> object-t;
 
   method [[alias(add-last)]] add(object-t self, object-t element) -> object-t;
   method [[alias(add-last)]] push(object-t self, object-t element) -> object-t;
@@ -285,16 +288,16 @@ klass vector {
 
     $write-sequence-start(out, "elements");
 
-    for (uint32-t index = 0; index < self.count; index++)
+    for (ssize-t index = 0; index < self.count; index++)
       $write-element-idref(out, self.elements[index], cast(str-t)nullptr);
     $write-sequence-end(out);
 
     $write-slots-end(out);
     return self;
   }
-  static func next-index(object-t self, uint32-t index) -> uint32-t {
+  static func next-index(object-t self, ssize-t index) -> ssize-t {
     //assert(index <= self.count);
-    uint32-t result = index;
+    ssize-t result = index;
     if (result < self.count) {
       while (nullptr == self.elements[result]) {
         result++;
@@ -305,9 +308,9 @@ klass vector {
     //       printf("%s(%p, %i): %i/%i\n", __func__, self, index, result, self.count);
     return result;
   }
-  static func first-index(object-t self) -> uint32-t {
-    uint32-t index = 0;
-    uint32-t result = index;
+  static func first-index(object-t self) -> ssize-t {
+    ssize-t index = 0;
+    ssize-t result = index;
     result = next-index(self, index);
     //       printf("%s(%p): %i/%i\n", __func__, self, result, self.count);
     return result;
@@ -318,10 +321,10 @@ klass vector-forward-iterator {
 
   slots {
     object-t vector;
-    uint32-t count;
-    uint32-t index;
+    ssize-t count;
+    ssize-t index;
 
-    uint32-t iterator-state;
+    int64-t iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     vector::slots-t& d = vector::unbox(self.vector);
