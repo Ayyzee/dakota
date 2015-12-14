@@ -99,9 +99,9 @@ namespace dkt {
 
 // gcc has bug in code generation so the assembler omit the quotes
 # if defined __clang__
-  # define dkt_rodata_section  gnu::section("__DKT_RODATA#, __dkt_rodata")
+  # define read_only  gnu::section("__DKT_READ_ONLY, __dkt_read_only")
 # elif defined __GNUG__
-  # define dkt_rodata_section  gnu::section("\"__DKT_RODATA#, __dkt_rodata\"")
+  # define read_only  gnu::section("\"__DKT_READ_ONLY, __dkt_read_only\"")
 # else
   # error "Neither __clang__ nor __GNUG__ is defined."
 #endif
@@ -125,7 +125,8 @@ namespace dkt {
   # define debug_so_import
 # endif
 
-# define DK_COUNTOF(array) (sizeof((array))/sizeof((array)[0]))
+# define countof(array) (sizeof((array))/sizeof((array)[0]))
+# define scountof(array) cast(ssize_t)countof(array)
 
 // template <typename T, size-t N>
 // constexpr size-t dk-countof(T(&)[N]) {
@@ -185,10 +186,10 @@ inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ?
 
 # define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 
-extern object_t null       [[so_export]] [[dkt_rodata_section]];
-extern object_t std_input  [[so_export]] [[dkt_rodata_section]];
-extern object_t std_output [[so_export]] [[dkt_rodata_section]];
-extern object_t std_error  [[so_export]] [[dkt_rodata_section]];
+extern object_t null       [[so_export]] [[read_only]];
+extern object_t std_input  [[so_export]] [[read_only]];
+extern object_t std_output [[so_export]] [[read_only]];
+extern object_t std_error  [[so_export]] [[read_only]];
 
 typedef auto (*compare_t)(object_t, object_t) -> int_t; // comparitor
 typedef auto (*dkt_signature_func_t)() -> const signature_t*;

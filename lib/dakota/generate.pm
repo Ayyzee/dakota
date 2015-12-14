@@ -508,9 +508,9 @@ sub generate_defn_footer {
   $rt_cc_str .= "\n";
   $rt_cc_str .= "# include <unistd.h>\n";
   $rt_cc_str .= "\n";
-  $rt_cc_str .= "[[dkt-rodata-section]] static char8-t  dir-buffer[4096] = \"\";\n";
-  $rt_cc_str .= "[[dkt-rodata-section]] static str-t    dir = getcwd(dir-buffer, DK-COUNTOF(dir-buffer));\n";
-  $rt_cc_str .= "[[dkt-rodata-section]] static symbol-t name = \"$$file{'other'}{'name'}\";\n";
+  $rt_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";\n";
+  $rt_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));\n";
+  $rt_cc_str .= "[[read-only]] static symbol-t name = \"$$file{'other'}{'name'}\";\n";
   $rt_cc_str .= "\n";
   #my $col;
   $rt_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
@@ -1145,7 +1145,7 @@ sub common::print_selector {
     my $parameter_types_str = $$new_arg_type_list;
     my $null_selector = 0;
 
-    $scratch_str .= $col . "[[dkt-rodata-section]] static selector-t result = $null_selector;\n";
+    $scratch_str .= $col . "[[read-only]] static selector-t result = $null_selector;\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
     if (&is_va($generic)) {
@@ -2075,7 +2075,7 @@ sub linkage_unit::generate_klasses_body {
   }
   if ('klass' eq $klass_type) {
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[dkt-rodata-section]]; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[read-only]]; }" . &ann(__FILE__, __LINE__) . "\n";
     } elsif (&is_rt_defn()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . "\n";
     }
@@ -4234,7 +4234,7 @@ sub generate_info {
   my ($name, $tbl, $col, $symbols, $line) = @_;
   my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, $line);
   $result .= "\n";
-  $result .= $col . "static named-info-t $name = { .next = nullptr, .count = DK-COUNTOF($name-props), .elements = $name-props };" . &ann(__FILE__, $line) . "\n";
+  $result .= $col . "static named-info-t $name = { .next = nullptr, .count = countof($name-props), .elements = $name-props };" . &ann(__FILE__, $line) . "\n";
   return $result;
 }
 sub generate_info_seq {
@@ -4254,7 +4254,7 @@ sub generate_info_seq {
   foreach my $element (@$seq) {
     my $width = length($element);
     my $pad = ' ' x ($max_width - $width);
-    $result .= $col . "{ .next = nullptr, .count = DK-COUNTOF($element), " . $pad . ".elements = $element },\n";
+    $result .= $col . "{ .next = nullptr, .count = countof($element), " . $pad . ".elements = $element },\n";
   }
   $result .= $col . "{ .next = nullptr, .count = 0, .elements = nullptr }\n";
   $col = &colout($col);

@@ -881,7 +881,7 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         while (nullptr != (info = method-signatures[index++])) {
           char8-t first-parameter-type[15 + (1)] = "";
           size-t len = first-parameter-type-len(info->parameter-types);
-          assert(len < DK-COUNTOF(first-parameter-type) - 1);
+          assert(len < countof(first-parameter-type) - 1);
           strncpy(first-parameter-type, info->parameter-types, len);
           first-parameter-type[len] = cast(char8-t)0;
           //ostream::println-format(ostrm, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
@@ -1316,7 +1316,7 @@ klass so-symbol-info {
 }
 static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
   // named-instances
-  for (size-t i = 0; i < DK-COUNTOF(named-instances); i++) {
+  for (size-t i = 0; i < countof(named-instances); i++) {
     addr2name-pair-t named-instance = named-instances[i];
     if (named-instance.addr == cast(decltype(named-instance.addr))addr) {
         info->fdir =  nullptr; // fixfix
@@ -1433,9 +1433,10 @@ static func last-user-code-before-main() -> void  {
   openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
-  int-t r = set-read-only-all("__DKT_RODATA"); // must match segment portion of macro dkt-rodata-section
+  // must match segment portion of attribute [[read-only]] defined in dakota.hh
+  int-t r = set-read-only-all("__DKT_READ_ONLY");
   if (-1 == r)
-    fprintf(stderr, "__DKT_RODATA not being used\n");
+    fprintf(stderr, "__DKT_READ_ONLY not being used\n");
   return;
 }
 func dkt-register-info(named-info-t* registration-info) -> void {
@@ -1582,7 +1583,7 @@ func dk-klass-for-name(symbol-t klass-name, int64-t column) -> object-t {
 func info-for-name(symbol-t klass-name) -> named-info-t* {
   assert(nullptr != klass-name);
   property-t[] properties = { { .key = #name, .element = cast(intptr-t)klass-name } };
-  named-info-t info = { .next = nullptr, .count = DK-COUNTOF(properties), .elements = properties };
+  named-info-t info = { .next = nullptr, .count = countof(properties), .elements = properties };
   named-info-t* info-ptr = &info;
   named-info-t** klass-info-ptr = cast(named-info-t**)sorted-array::bsearch(gbl-klass-defns-table, &info-ptr);
 
