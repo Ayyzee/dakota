@@ -959,10 +959,24 @@ sub rewrite_func {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s)func(\s+$rmid\s*\()/$1FUNC$2/g;
 }
+sub rewrite_method_chaining_replacement {
+  my ($func, $arg0, $rest) = @_;
+  if (length $rest && $rest !~ /^\s+$/) {
+    return "$func($arg0, $rest)"
+  } else {
+    return "$func($arg0)"
+  }
+}
 sub rewrite_method_chaining {
   my ($filestr_ref) = @_;
-  while ($$filestr_ref =~ s/($rid(\.\$$mid\($main::list_in\))+)\.(\$$mid)\(($main::list_in)\)/$3($1, $4)/g) {}
-  $$filestr_ref =~ s/($rid)\.(\$$mid)\(($main::list_in)\)/$2($1, $3)/;
+  my $rid = qr/[\w-]+/;
+  my $mid = qr/[\w-]+/;
+
+  while ($$filestr_ref =~ s/($rid(\.\$$mid\($main::list_in\)\s*)+)\.(\$$mid)\(($main::list_in)\)/
+           &rewrite_method_chaining_replacement($3, $1, $4)/egs)
+    {}
+  $$filestr_ref =~ s/($rid)\.(\$$mid)\(($main::list_in)\)/
+    &rewrite_method_chaining_replacement($2, $1, $3)/egs;
 }
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
