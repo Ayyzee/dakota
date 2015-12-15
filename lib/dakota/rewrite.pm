@@ -959,11 +959,17 @@ sub rewrite_func {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s)func(\s+$rmid\s*\()/$1FUNC$2/g;
 }
+sub rewrite_method_chaining {
+  my ($filestr_ref) = @_;
+  while ($$filestr_ref =~ s/($rid(\.\$$mid\($main::list_in\))+)\.(\$$mid)\(($main::list_in)\)/$3($1, $4)/g) {}
+  $$filestr_ref =~ s/($rid)\.(\$$mid)\(($main::list_in)\)/$2($1, $3)/;
+}
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
   &rewrite_literal_strs($filestr_ref);
   &encode_strings($filestr_ref);
   my $parts = &encode_comments($filestr_ref);
+  &rewrite_method_chaining($filestr_ref);
   &rewrite_method_aliases($filestr_ref);
 
   if ($remove) {
