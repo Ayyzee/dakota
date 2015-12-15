@@ -960,23 +960,32 @@ sub rewrite_func {
   $$filestr_ref =~ s/(\s)func(\s+$rmid\s*\()/$1FUNC$2/g;
 }
 sub rewrite_method_chaining_replacement {
-  my ($func, $arg0, $rest) = @_;
-  if (length $rest && $rest !~ /^\s+$/) {
-    return "$func($arg0, $rest)"
+  my ($func, $leading_expr, $args) = @_;
+
+  if ($leading_expr =~ /^\s*(\(\s*)+\s*(\s*\))+\s*$/) {
+    print STDERR "warning: leading-expr empty; rewrite will not compile.\n";
+  }
+  if ($args =~ /^\s*$/) {
+    return "$func($leading_expr)"
   } else {
-    return "$func($arg0)"
+    return "$func($leading_expr, $args)"
   }
 }
 sub rewrite_method_chaining {
   my ($filestr_ref) = @_;
-  my $rid = qr/[\w-]+/;
-  my $mid = qr/[\w-]+/;
+  my $gf = qr/\$|dk::/;
+  my $leading_expr = qr/(?:$gf?$id(?:::$id)*(?:$main::list|$main::seq+)?(?:\s*(?:\.|->)\s*$gf?$id(?:$main::list|$main::seq+)?)*|$main::list)/s;
 
-  while ($$filestr_ref =~ s/($rid(\.\$$mid\($main::list_in\)\s*)+)\.(\$$mid)\(($main::list_in)\)/
-           &rewrite_method_chaining_replacement($3, $1, $4)/egs)
-    {}
-  $$filestr_ref =~ s/($rid)\.(\$$mid)\(($main::list_in)\)/
-    &rewrite_method_chaining_replacement($2, $1, $3)/egs;
+  while ($$filestr_ref =~
+           # intentionally not capturing the dot (.)
+           s/($leading_expr(?:\s*\.\s*$gf$mid\($main::list_in\)\s*)+\s*)\.(\s*$gf$mid)\(($main::list_in)\)/
+             # $1: leading-expr, $2: func-name, $3: args
+             &rewrite_method_chaining_replacement($2, $1, $3)/egs) {}
+  $$filestr_ref =~
+    # intentionally not capturing the dot (.)
+    s/($leading_expr\s*)\.(\s*$gf$mid)\(($main::list_in)\)/
+      # $1: leading-expr, $2: func-name, $3: args
+      &rewrite_method_chaining_replacement($2, $1, $3)/egs;
 }
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_args_generics, $remove) = @_;
