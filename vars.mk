@@ -29,13 +29,15 @@ MKDIRFLAGS := --parents
 
 $(shell $(MKDIR) $(MKDIRFLAGS) $(objdir))
 
+platform := $(shell source $(rootdir)/common.sh; platform)
+compiler := $(shell source $(rootdir)/common.sh; compiler)
+
 include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/compiler.mk\
  $(rootdir)/lib/dakota/compiler.json\
  $(rootdir)/lib/dakota/platform.json)\
 
-INSTALL_CREATE_PARENT_DIR_FLAGS := -D # linux only (absent on darwin)
 INSTALL := install
-INSTALLFLAGS := $(INSTALL_CREATE_PARENT_DIR_FLAGS)
+INSTALLFLAGS :=
 INSTALL_MODE_FLAGS := --mode
 INSTALL_OWNER_FLAGS := --owner
 INSTALL_GROUP_FLAGS := --group

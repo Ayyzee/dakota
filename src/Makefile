@@ -25,6 +25,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  clean\
  goal-clean\
  install\
+ install-dirs\
  ls-install-files\
  precompile\
  uninstall\
@@ -52,10 +53,13 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(objdir)/*
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
-install: $(install-files)
+install-dirs:
+	sudo mkdir --parents $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
+
+install: install-dirs $(install-files)
 	cd $(DESTDIR)$(prefix)/lib/dakota; \
-	sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-clang.json  compiler.json; \
-	sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-darwin.json platform.json; \
+	sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-$(compiler).json  compiler.json; \
+	sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-$(platform).json platform.json; \
 
 ls-install-files:
 	@for file in $(install-files); do echo $$file; done | sort
