@@ -805,7 +805,7 @@ sub exec_cmd {
   my ($cmd_info, $should_echo) = @_;
   my $cmd_str;
   $cmd_str = &str_from_cmd_info($cmd_info);
-  if ($global_should_echo || $should_echo) {
+  if (&is_debug() && ($global_should_echo || $should_echo)) {
     print STDERR "  $cmd_str\n";
   }
   if ($ENV{'DKT_INITIAL_WORKDIR'}) {

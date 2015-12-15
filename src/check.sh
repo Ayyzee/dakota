@@ -11,6 +11,5 @@ set -o verbose
 prefix=/usr/local
 $prefix/bin/dakota check.dk
 $prefix/bin/dakota check-util.dk $prefix/lib/libdakota-util.$so_ext
-
 ./check
 ./check-util
