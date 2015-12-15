@@ -8,8 +8,9 @@ echo $src > check-util.dk
 rm -f check
 rm -f check-util
 set -o verbose
+DEST=
 prefix=/usr/local
-$prefix/bin/dakota check.dk
-$prefix/bin/dakota check-util.dk $prefix/lib/libdakota-util.$so_ext
+$DEST$prefix/bin/dakota check.dk
+$DEST$prefix/bin/dakota check-util.dk $DEST$prefix/lib/libdakota-util.$so_ext
 ./check
 ./check-util

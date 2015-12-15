@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -o nounset -o errexit -o pipefail -o verbose
 
 sysname=$1
@@ -11,7 +10,7 @@ rm -f src/config.hh
 rm -f lib/dakota/compiler.json
 rm -f lib/dakota/platform.json
 
-ln -s config-$sysname-$compiler.mk config.mk
+ln -s config-$sysname.mk config.mk
 ln -s config-$sysname.sh config.sh
 
 pushd src
