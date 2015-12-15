@@ -1,3 +1,4 @@
-#!/bin/sh -u
+#!/bin/bash
+set -o errexit -o nounset -o pipefail
 
-SO_EXT=so
+so_ext=so

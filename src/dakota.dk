@@ -44,10 +44,6 @@
 # include "sorted-array.hh"
 # include "sorted-ptr-array.hh"
 
-# if !defined SO-EXT
-# define SO-EXT "so"
-# endif
-
 module dakota;
 
 extern boole-t pre-main?; // to quiet clang
@@ -1436,7 +1432,7 @@ static func last-user-code-before-main() -> void  {
   // must match segment portion of attribute [[read-only]] defined in dakota.hh
   int-t r = set-read-only-all("__DKT_READ_ONLY");
   if (-1 == r)
-    fprintf(stderr, "__DKT_READ_ONLY not being used\n");
+    fprintf(stderr, "[[read-only]] not being used\n");
   return;
 }
 func dkt-register-info(named-info-t* registration-info) -> void {
@@ -1596,7 +1592,7 @@ func info-for-name(symbol-t klass-name) -> named-info-t* {
     } else {
       //fprintf(stdout, "KLASSPATH=%s\n", klasspath);
       str-t file-name = file-name-from-klass-name(klass-name);
-      str-t file = find-file(klasspath, file-name, SO-EXT);
+      str-t file = find-file(klasspath, file-name, so-ext);
 
       if (nullptr != file) {
         load-library(file);

@@ -1,6 +1,7 @@
-#!/bin/sh -u
+#!/bin/bash
+set -o errexit -o nounset -o pipefail
 
-SO_EXT=dylib
+so_ext=dylib
 LD_NAME_FLAG=-install_name
 CXX_SHARED_FLAGS="-dynamiclib"
 CXX_DYNAMIC_FLAGS="-dynamiclib"

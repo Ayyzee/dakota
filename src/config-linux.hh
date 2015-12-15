@@ -19,4 +19,6 @@ const char8_t* getprogname();
 # endif // HAVE_GETPROGNAME
 __END_DECLS
 
+static str_t so_ext = "so";
+
 # endif

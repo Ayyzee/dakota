@@ -8,4 +8,6 @@
 # define USE_DLADDR 1
 # define USE_SYSLOG 0
 
+static str_t so_ext = "dylib";
+
 # endif
