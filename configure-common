@@ -1,12 +1,12 @@
 #!/bin/bash
 set -o nounset -o errexit -o pipefail -o verbose
 
-rm -f config.mk
-rm -f config.sh
-rm -f lib/dakota/compiler-default-argument-promotions.json
-rm -f lib/dakota/compiler.json
-rm -f lib/dakota/platform.json
-rm -f src/config.hh
+rm --force config.mk
+rm --force config.sh
+rm --force src/config.hh
+rm --force lib/dakota/compiler.json
+rm --force lib/dakota/platform.json
+rm --force lib/dakota/compiler-default-argument-promotions.json
 
 if (( 0 == $# )); then
   exit
@@ -15,16 +15,16 @@ fi
 sysname=$1
 compiler=$2
 
-ln -s config-$sysname.mk config.mk
-ln -s config-$sysname.sh config.sh
+ln --symbolic config-$sysname.mk config.mk
+ln --symbolic config-$sysname.sh config.sh
 
 pushd src > /dev/null 2>&1
-ln -s config-$sysname.hh config.hh
+ln --symbolic config-$sysname.hh config.hh
 popd > /dev/null 2>&1
 
 pushd lib/dakota > /dev/null 2>&1
-ln -s compiler-$compiler.json compiler.json
-ln -s platform-$sysname.json  platform.json
+ln --symbolic platform-$sysname.json  platform.json
+ln --symbolic compiler-$compiler.json compiler.json
 popd > /dev/null 2>&1
 
 make --no-print-directory --directory src/port/compiler-default-argument-promotions install > /dev/null 2>&1
