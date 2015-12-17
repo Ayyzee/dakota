@@ -53,13 +53,21 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(objdir)/*
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
-install-dirs:
-	sudo mkdir --parents $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
+install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
 
-install: install-dirs $(install-files)
-	cd $(DESTDIR)$(prefix)/lib/dakota; \
-	sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-$(compiler).json  compiler.json; \
-	sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-$(platform).json platform.json; \
+$(install-dirs):
+	sudo mkdir --parents $@
+
+$(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json
+	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
+
+$(DESTDIR)$(prefix)/lib/dakota/compiler.json: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler).json
+	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
+
+install-links := $(DESTDIR)$(prefix)/lib/dakota/platform.json $(DESTDIR)$(prefix)/lib/dakota/compiler.json
+$(install-links): $(install-files)
+
+install: $(install-dirs) $(install-files) $(install-links)
 
 ls-install-files:
 	@for file in $(install-files); do echo $$file; done | sort
