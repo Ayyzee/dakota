@@ -19,15 +19,15 @@ export {
   klass ascii-number;
   klass ascii-number-klass;
   klass dimension;
-  klass dimension::slots-t;
+  klass dimension { slots; }
   klass features;
-  klass features::slots-t;
+  klass features { slots; }
   klass float32;
-  klass float32::slots-t;
+  klass float32 { slots; }
   klass float64;
-  klass float64::slots-t;
+  klass float64 { slots; }
   klass float128;
-  klass float128::slots-t;
+  klass float128 { slots; }
   klass hashed-counted-set;
   klass hashed-set;
   klass hashed-table;
@@ -36,21 +36,21 @@ export {
   klass json-parser;
   klass lexer;
   klass open-token;
-  klass open-token::slots-t;
+  klass open-token { slots; }
   klass point;
-  klass point::slots-t;
+  klass point { slots; }
   klass rect;
-  klass rect::slots-t;
+  klass rect { slots; }
   klass slot-info;
-  klass slot-info::slots-t;
+  klass slot-info { slots; }
   klass str-buffer;
-  klass str-buffer::slots-t;
+  klass str-buffer { slots; }
   klass syntax-exception;
   klass text-output-stream;
   klass token;
   klass tokenid;
-  klass tokenid::slots-t;
+  klass tokenid { slots; }
   klass type-predicate;
-  klass type-predicate::slots-t;
+  klass type-predicate { slots; }
   klass xml-object-output-stream;
 }

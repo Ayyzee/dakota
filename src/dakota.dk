@@ -872,7 +872,7 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
       ostream::println-format(ostrm, "%s\n  %s %s", c, type, name);
       c = ";";
       if (nullptr != slots-info || nullptr != slots-type)
-        ostream::println-format(ostrm, "%s\n  %s %s::%s", c, type, name, "slots-t");
+        ostream::println-format(ostrm, "%s\n  %s %s { slots ; }", c, type, name);
       if (nullptr != method-signatures) {
         int64-t index = 0;
         const signature-t* info;

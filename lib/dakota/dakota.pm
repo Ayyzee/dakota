@@ -157,6 +157,8 @@ sub add_visibility {
     my $tbl = $$root{'modules'}{$name}{'export'};
     my $strs = [sort keys %$tbl];
     foreach my $str (@$strs) {
+      $str =~ s/\s*;\s*$//;
+      $str =~ s/\s*\{\s*slots\s*;\s*\}\s*$/::slots-t/;
       my $seq = $$tbl{$str};
       if ($debug) { print STDERR "export module $name $str;\n"; }
       if (0) {

@@ -982,27 +982,46 @@ sub fragment_str {
   return $argstr;
 }
 sub export {
+  my $depth = 0;
   &match(__FILE__, __LINE__, 'export');
   &match(__FILE__, __LINE__, '{');
+  $depth++;
 
   my $tbl = {};
   my $seq = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (0) {
+      } elsif (m/^\{$/) {
+        $depth++;
+        push @$seq, $_;
       } elsif (m/^\}$/) {
-        &match(__FILE__, __LINE__, '}');
-        if (scalar @$seq) {
+        die if 0 == $depth;
+        $depth--;
+        if (0 == $depth) {
+          &match(__FILE__, __LINE__, '}');
+          if (scalar @$seq) {
+            my $seqstr = &fragment_str($seq);
+            $$tbl{$seqstr} = $seq;
+            $seq= [];
+          }
+          $$gbl_root{'modules'}{$gbl_current_module}{'export'} = $tbl;
+          return;
+        } elsif (1 == $depth) {
+          push @$seq, $_;
+          my $seqstr = &fragment_str($seq);
+          $$tbl{$seqstr} = $seq;
+          $seq= [];
+        } else {
+          die;
+        }
+      } elsif (m/^;$/) {
+        push @$seq, $_;
+        if (1 == $depth) {
           my $seqstr = &fragment_str($seq);
           $$tbl{$seqstr} = $seq;
           $seq= [];
         }
-        $$gbl_root{'modules'}{$gbl_current_module}{'export'} = $tbl;
-        return;
-      } elsif (m/^;$/) {
-        my $seqstr = &fragment_str($seq);
-        $$tbl{$seqstr} = $seq;
-        $seq= [];
       } else {
         push @$seq, $_;
       }
