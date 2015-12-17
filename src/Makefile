@@ -65,7 +65,6 @@ $(DESTDIR)$(prefix)/lib/dakota/compiler.json: $(DESTDIR)$(prefix)/lib/dakota/com
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
 install-links := $(DESTDIR)$(prefix)/lib/dakota/platform.json $(DESTDIR)$(prefix)/lib/dakota/compiler.json
-$(install-links): $(install-files)
 
 install: $(install-dirs) $(install-files) $(install-links)
 
