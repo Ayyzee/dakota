@@ -760,8 +760,8 @@ sub exported_slots_body {
 }
 sub rewrite_module_statement {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|\bmodule\s+($id)\s*\{(\s*export\s*)(.+?)\s*;(\s*)\}|MODULE-EXPORT($1,$2$3$4);|gs;
   $$filestr_ref =~ s|\bmodule\s+($id)\s*;|MODULE($1);|gs;
+  $$filestr_ref =~ s|\bexport(\s*)\{($main::block_in)\}|MODULE-EXPORT(($1$2));|gs;
 }
 sub add_implied_slots_struct {
   my ($filestr_ref) = @_;

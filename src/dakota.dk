@@ -863,13 +863,15 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         fprintf(stderr, "%s:%i: error: missing module declaration\n", __FILE__, __LINE__);
         std::abort();
       }
-      if (module-name != modulee)
-        ostream::println-format(ostrm, "%s %s {\n %s", "module", modulee, "export");
+      if (module-name != modulee) {
+        ostream::println-format(ostrm, "module %s;\n", modulee);
+        ostream::println-format(ostrm, "export {");
+      }
       module-name = modulee;
       ostream::println-format(ostrm, "%s\n  %s", c, name);
-      c = ",";
+      c = ";";
       if (nullptr != slots-info || nullptr != slots-type)
-        ostream::println-format(ostrm, ",\n  %s::%s", name, "slots-t");
+        ostream::println-format(ostrm, "%s\n  %s::%s", c, name, "slots-t");
       if (nullptr != method-signatures) {
         int64-t index = 0;
         const signature-t* info;
@@ -884,7 +886,7 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         }
       }
     }
-    ostream::println-format(ostrm, ";\n}\n");
+    ostream::println-format(ostrm, "%s\n}\n", c);
   }
   return;
 }

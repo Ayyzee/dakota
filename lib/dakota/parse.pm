@@ -977,27 +977,29 @@ sub enum {
 }
 sub export {
   &match(__FILE__, __LINE__, 'export');
+  &match(__FILE__, __LINE__, '{');
 
-  for (&sst_cursor::current_token($gbl_sst_cursor)) {
-    if (m/^klass$/) {
-      &klass({ 'exported?' => 1 });
-      last;
+  my $tbl = {};
+  my $seq = [];
+  while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
+    for (&sst_cursor::current_token($gbl_sst_cursor)) {
+      if (0) {
+      } elsif (m/^\}$/) {
+        &match(__FILE__, __LINE__, '}');
+        if (scalar @$seq) {
+          $$tbl{"@$seq"} = $seq;
+          $seq= [];
+        }
+        $$gbl_root{'modules'}{$gbl_current_module}{'export'} = $tbl;
+        return;
+      } elsif (m/^;$/) {
+        $$tbl{"@$seq"} = $seq;
+        $seq= [];
+      } else {
+        push @$seq, $_;
+      }
+      &match_any();
     }
-    if (m/^trait$/) {
-      &trait({ 'exported?' => 1 });
-      last;
-    }
-
-    if (m/^"$h+"$/) {
-      &exported_header();
-      last;
-    }
-    if (m/^<$h+>$/) {
-      &exported_header();
-      last;
-    }
-
-    $$gbl_sst_cursor{'current-token-index'}++;
   }
 }
 sub interpose {
@@ -1027,61 +1029,11 @@ sub match_qual_ident {
   }
   return $seq;
 }
-sub module_export {
-  my ($module_name) = @_;
-  &match(__FILE__, __LINE__, 'export');
-  my $tbl = {};
-  while (1) {
-    for (&sst_cursor::current_token($gbl_sst_cursor)) {
-      if (0) {
-      } elsif (m/^;$/) {
-        &match(__FILE__, __LINE__, ';');
-        $$gbl_root{'modules'}{$module_name}{'export'} = $tbl;
-        return;
-      } elsif (m/^,$/) {
-        &match(__FILE__, __LINE__, ',');
-        my $seq = &match_qual_ident(__FILE__, __LINE__);
-        if (!$seq) {
-          die __FILE__, ":", __LINE__, ": error:\n";
-        }
-        $$tbl{"@$seq"} = $seq;
-      } else {
-        my $seq = &match_qual_ident(__FILE__, __LINE__);
-        if (!$seq) {
-          die __FILE__, ":", __LINE__, ": error:\n";
-        }
-        $$tbl{"@$seq"} = $seq;
-      }
-    }
-  }
-}
-sub module_statement {
+sub module {
   &match(__FILE__, __LINE__, 'module');
   my $module_name = &match_re(__FILE__, __LINE__, $id);
-  for (&sst_cursor::current_token($gbl_sst_cursor)) {
-    if (0) {
-    } elsif (m/^;$/) {
-      &match(__FILE__, __LINE__, ';');
-      $gbl_current_module = $module_name;
-      return;
-    } elsif (m/^\{$/) {
-      &match(__FILE__, __LINE__, '{');
-      for (&sst_cursor::current_token($gbl_sst_cursor)) {
-        if (0) {
-        } elsif (m/^export$/) {
-          &module_export($module_name);
-        } else {
-          print STDERR "TOKEN: " . &sst_cursor::current_token($gbl_sst_cursor) . "\n";
-          die __FILE__, ":", __LINE__, ": error:\n";
-        }
-      }
-      &match(__FILE__, __LINE__, '}');
-    } else {
-      print STDERR "TOKEN: " . &sst_cursor::current_token($gbl_sst_cursor) . "\n";
-      die __FILE__, ":", __LINE__, ": error:\n";
-    }
-  }
-  #print STDERR &Dumper($$gbl_root{'modules'});
+  &match(__FILE__, __LINE__, ';');
+  $gbl_current_module = $module_name;
 }
 sub klass {
   my ($args) = @_;
@@ -1983,7 +1935,7 @@ sub parse_root {
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (m/^module$/) {
-        &module_statement();
+        &module();
         last;
       }
       if (m/^export$/) {
