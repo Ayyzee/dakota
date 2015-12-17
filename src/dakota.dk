@@ -868,10 +868,11 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         ostream::println-format(ostrm, "export {");
       }
       module-name = modulee;
-      ostream::println-format(ostrm, "%s\n  %s", c, name);
+      symbol-t type = cast(symbol-t)named-info::at(klass-info, #type);
+      ostream::println-format(ostrm, "%s\n  %s %s", c, type, name);
       c = ";";
       if (nullptr != slots-info || nullptr != slots-type)
-        ostream::println-format(ostrm, "%s\n  %s::%s", c, name, "slots-t");
+        ostream::println-format(ostrm, "%s\n  %s %s::%s", c, type, name, "slots-t");
       if (nullptr != method-signatures) {
         int64-t index = 0;
         const signature-t* info;

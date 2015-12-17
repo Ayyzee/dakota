@@ -160,34 +160,34 @@ sub add_visibility {
       my $seq = $$tbl{$str};
       if ($debug) { print STDERR "export module $name $str;\n"; }
       if (0) {
-      } elsif ($str =~ /^($rid)::(slots-t)$/) {
-        my ($klass_name, $type_name) = ($1, $2);
+      } elsif ($str =~ /^((klass)\s+)?($rid)::(slots-t)$/) {
+        my ($klass_type, $klass_name, $type_name) = ($2, $3, $4);
         # klass slots
-        if ($debug) { print STDERR "klass       slots:  $klass_name|$type_name\n"; }
+        if ($debug) { print STDERR "$klass_type    slots:  $klass_name|$type_name\n"; }
         if ($$root{'klasses'}{$klass_name} &&
-	    $$root{'klasses'}{$klass_name}{'slots'} &&
-	    $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
+            $$root{'klasses'}{$klass_name}{'slots'} &&
+            $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
-      } elsif ($str =~ /^($rid)$/) {
-        my $klass_name = $1;
+      } elsif ($str =~ /^((klass|trait)\s+)?($rid)$/) {
+        my ($klass_type, $klass_name) = ($2, $3);
         # klass/trait
-        if ($debug) { print STDERR "klass/trait:        $klass_name\n"; }
-        if ($$root{'klasses'}{$klass_name}
-         && $$root{'klasses'}{$klass_name}{'module'}
-         && $$root{'klasses'}{$klass_name}{'module'} eq $name) {
+        if ($debug) { print STDERR "klass-type: <$klass_type>:        klass-name: <$klass_name>\n"; }
+        if ($$root{'klasses'}{$klass_name} &&
+            $$root{'klasses'}{$klass_name}{'module'} &&
+            $$root{'klasses'}{$klass_name}{'module'} eq $name) {
           $$root{'klasses'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
         if ($$root{'traits'}{$klass_name}) {
           $$root{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
         }
-      } elsif ($str =~ /^($rid)::($msig)$/) {
-        my ($klass_name, $method_name) = ($1, $2);
+      } elsif ($str =~ /^((klass|trait)\s+)?($rid)::($msig)$/) {
+        my ($klass_type, $klass_name, $method_name) = ($2, $3, $4);
         # klass/trait method
-        if ($debug) { print STDERR "klass/trait method $klass_name:$method_name\n"; }
+        if ($debug) { print STDERR "$klass_type method $klass_name:$method_name\n"; }
         foreach my $constructs ('klasses', 'traits') {
           if ($$root{$constructs}{$klass_name} &&
-	      $$root{$constructs}{$klass_name}{'module'} eq $name) {
+              $$root{$constructs}{$klass_name}{'module'} eq $name) {
             foreach my $method_type ('slots-methods', 'methods') {
               if ($debug) { print STDERR &Dumper($$root{$constructs}{$klass_name}); }
               while (my ($sig, $scope) = each (%{$$root{$constructs}{$klass_name}{$method_type}})) {

@@ -78,6 +78,7 @@ our @EXPORT= qw(
                  needs_hex_encoding
                  objdir
                  pann
+                 remove_extra_whitespace
                  remove_first
                  remove_last
                  remove_non_newlines
@@ -194,6 +195,13 @@ sub decode_strings {
 # !  x21  only as last char
 # ?  x3f  only as last char
 
+sub remove_extra_whitespace {
+  my ($str) = @_;
+  $str =~ s|(\w)\s+(\w)|$1__WHITESPACE__$2|g;
+  $str =~ s|\s+||g;
+  $str =~ s|__WHITESPACE__| |g;
+  return $str;
+}
 sub needs_hex_encoding {
   my ($str) = @_;
   $str =~ s/^#//;

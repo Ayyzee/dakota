@@ -975,6 +975,12 @@ sub enum {
   &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
   return;
 }
+sub fragment_str {
+  my ($arg) = @_;
+  my $argstr = join(' ', @$arg);
+  $argstr = &remove_extra_whitespace($argstr);
+  return $argstr;
+}
 sub export {
   &match(__FILE__, __LINE__, 'export');
   &match(__FILE__, __LINE__, '{');
@@ -987,13 +993,15 @@ sub export {
       } elsif (m/^\}$/) {
         &match(__FILE__, __LINE__, '}');
         if (scalar @$seq) {
-          $$tbl{"@$seq"} = $seq;
+          my $seqstr = &fragment_str($seq);
+          $$tbl{$seqstr} = $seq;
           $seq= [];
         }
         $$gbl_root{'modules'}{$gbl_current_module}{'export'} = $tbl;
         return;
       } elsif (m/^;$/) {
-        $$tbl{"@$seq"} = $seq;
+        my $seqstr = &fragment_str($seq);
+        $$tbl{$seqstr} = $seq;
         $seq= [];
       } else {
         push @$seq, $_;
