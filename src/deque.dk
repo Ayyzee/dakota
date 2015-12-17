@@ -29,7 +29,7 @@ klass node {
     slots-t* next;    // nullptr (not null) for last
   }
   static func create(slots-t* prev, object-t element, slots-t* next) -> slots-t* {
-    slots-t* node = cast(slots-t*)dkt::alloc(sizeof(slots-t));
+    slots-t* node = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
     node->prev =    prev;
     node->element = element;
     node->next =    next;
@@ -183,20 +183,20 @@ klass deque {
       fprintf(stdout, " %p", cast(ptr-t)first);
       fprintf(stdout, "\n");
     } else {
-      deque::string-from-node(self, first->prev, buf, cast(int64-t)sizeof(buf));
+      deque::string-from-node(self, first->prev, buf, ssizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, " %p", cast(ptr-t)first->element);
-      deque::string-from-node(self, first->next, buf, cast(int64-t)sizeof(buf));
+      deque::string-from-node(self, first->next, buf, ssizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, "\n");
     }
     if (nullptr == last) {
       fprintf(stdout, " %p\n", cast(ptr-t)last);
     } else {
-      deque::string-from-node(self, last->prev, buf, cast(int64-t)sizeof(buf));
+      deque::string-from-node(self, last->prev, buf, ssizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, " %p", cast(ptr-t)last->element);
-      deque::string-from-node(self, last->next, buf, cast(int64-t)sizeof(buf));
+      deque::string-from-node(self, last->next, buf, ssizeof(buf));
       fprintf(stdout, " %s", buf);
       fprintf(stdout, "\n");
     }

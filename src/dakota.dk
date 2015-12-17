@@ -125,22 +125,22 @@ static func init-runtime-ds() -> void {
 
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
-                        cast(int64-t)sizeof(named-assoc-node::slots-t),
+                        ssizeof(named-assoc-node::slots-t),
                         cast(std-compare-t)cast(auto (*)(named-assoc-node::slots-t*,
                                                          named-assoc-node::slots-t*) -> int-t)named-assoc-node::compare);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
-                        cast(int64-t)sizeof(named-info::slots-t*),
+                        ssizeof(named-info::slots-t*),
                         cast(std-compare-t)cast(auto (*)(named-info::slots-t**,
                                                          named-info::slots-t**) -> int-t)named-info::compare);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
-                        cast(int64-t)sizeof(property::slots-t),
+                        ssizeof(property::slots-t),
                         cast(std-compare-t)cast(auto (*)(property::slots-t*,
                                                          property::slots-t*) -> int-t)property::compare);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
-                        cast(int64-t)sizeof(symbol-t),
+                        ssizeof(symbol-t),
                         cast(std-compare-t)cast(auto (*)(symbol::slots-t*,
                                                          symbol::slots-t*) -> int-t)symbol::compare);
   return;
@@ -1625,7 +1625,7 @@ func dk-intern-free(str-t key) -> symbol-t {
 func dk-intern(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
-  static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), cast(int64-t)sizeof(symbol-t), cast(std-compare-t)safe-strcmp);
+  static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), ssizeof(symbol-t), cast(std-compare-t)safe-strcmp);
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;

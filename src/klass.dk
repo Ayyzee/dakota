@@ -91,7 +91,7 @@ static selector-pair-t[gbl-num-generics] gbl-selectors;
 sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                 0,
                                                 countof(gbl-selectors),
-                                                cast(int64-t)sizeof(gbl-selectors[0]),
+                                                ssizeof(gbl-selectors[0]),
                                                 cast(std-compare-t)cast(auto (*)(selector-pair-t*,
                                                                                  selector-pair-t*) -> int-t)selector-pair::compare };
 

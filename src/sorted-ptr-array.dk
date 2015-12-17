@@ -37,7 +37,7 @@ klass sorted-ptr-array {
     assert(0 != capacity);
     assert(0 != size);
     assert(nullptr != compare);
-    slots-t* result = cast(slots-t*)dkt::alloc(sizeof(slots-t));
+    slots-t* result = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
     result->elements = cast(ptr-t*)dkt::alloc(size * capacity);
     result->count =    0;
     result->capacity = capacity;

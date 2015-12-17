@@ -59,7 +59,7 @@ klass sorted-set {
 
     self = $init(super);
     self.sa.compare = cast(std-compare-t)cast(compare-t)swap-compare;
-    self.sa.size =    cast(int64-t)sizeof(self.sa.elements[0]);
+    self.sa.size =    ssizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
     self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity);
     self.sa.count = 0;

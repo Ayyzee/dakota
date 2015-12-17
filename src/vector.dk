@@ -63,7 +63,7 @@ klass vector {
     self.count = 0;
     self.iterator-state = 0;
     self.capacity = initial-capacity;
-    self.size = cast(ssize-t)sizeof(self.elements[0]);
+    self.size = ssizeof(self.elements[0]);
     self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity); // want to be able to realloc()
 
     for (ssize-t index = 0; index < self.capacity; index++)

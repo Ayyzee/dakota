@@ -64,7 +64,7 @@ klass bit-vector {
     ssize-t   capacity; // number of bits
   //ssize-t   size; // 1 bit
   }
-  static const ssize-t gbl-element-width = cast(ssize-t)(sizeof((cast(slots-t*)0)->elements[0]) * 8);
+  static const ssize-t gbl-element-width = (ssizeof((cast(slots-t*)0)->elements[0]) * 8);
   static const int64-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const ssize-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
 

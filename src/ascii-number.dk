@@ -111,7 +111,7 @@ klass ascii-number {
   method init(object-t self, int64-t number : 0) -> object-t {
     self = $init(super);
     self.number = number;
-    self.ascii-string = cast(char8-t*)dkt::alloc(sizeof(char8-t) * (32 + 1));
+    self.ascii-string = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (32 + 1));
     object-t kls = klass-of(self);
     str-t digits = $digits(kls);
     int64-t base = cast(int64-t)safe-strlen(digits);

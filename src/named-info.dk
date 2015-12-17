@@ -149,7 +149,7 @@ func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t*
     count++;
   }
   // hackhack: should be allocated in previous (initial) dkt::alloc()
-  named-info-t* info = cast(named-info-t*)dkt::alloc(sizeof(named-info-t));
+  named-info-t* info = cast(named-info-t*)dkt::alloc(ssizeof(named-info-t));
   info->elements = props;
   info->count = count;
   info->next = nullptr;
