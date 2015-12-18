@@ -814,6 +814,24 @@ static func first-parameter-type-len(str-t params) -> size-t {
   }
   return i;
 } 
+static func klass-exported?(named-info-t* klass-info,
+                            boole-t*      exportedp-ptr = nullptr,
+                            boole-t*      state-exportedp-ptr = nullptr,
+                            boole-t*      behavior-exportedp-ptr = nullptr) -> boole-t {
+  boole-t exported? =          cast(boole-t)named-info::at(klass-info, #exported?);
+  boole-t state-exported? =    cast(boole-t)named-info::at(klass-info, #state-exported?);
+  boole-t behavior-exported? = cast(boole-t)named-info::at(klass-info, #behavior-exported?);
+
+  if (exportedp-ptr)
+    *exportedp-ptr = exported?;
+  if (state-exportedp-ptr)
+    *state-exportedp-ptr = state-exported?;
+  if (behavior-exportedp-ptr)
+    *behavior-exportedp-ptr = behavior-exported?;
+
+  boole-t result = (exported? || state-exported? || behavior-exported?);
+  return result;
+}
 static func dump-module-description(ostream-t ostrm, named-info-t* registration-info) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
@@ -831,6 +849,8 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
       assert(nullptr != klass-info);
       if (nullptr == klass-info->elements)
         break;
+      if (!klass-exported?(klass-info))
+        continue;
       // klass-name,
       // klass-name::slots-t,
       // klass-name::method-name(slots-t),
@@ -882,7 +902,7 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
           size-t len = first-parameter-type-len(info->parameter-types);
           assert(len < countof(first-parameter-type) - 1);
           strncpy(first-parameter-type, info->parameter-types, len);
-          first-parameter-type[len] = cast(char8-t)0;
+          first-parameter-type[len] = NUL;
           //ostream::println-format(ostrm, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
         }
       }
@@ -915,13 +935,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
       if (nullptr == only || dump?(klass-info, only)) {
         if (1)
           dump-klass(ostrm, klass-info);
-        if (nullptr != output-dir) {
-          boole-t exported? =          cast(boole-t)named-info::at(klass-info, #exported?);
-          boole-t state-exported? =    cast(boole-t)named-info::at(klass-info, #state-exported?);
-          boole-t behavior-exported? = cast(boole-t)named-info::at(klass-info, #behavior-exported?);
-
-          if (exported? || state-exported? || behavior-exported?) {
-            // bugbug: klass and trait can have same name
+        if (nullptr != output-dir && klass-exported?(klass-info)) {
             char8-t[255 + (1)] klass-file = "";
             symbol-t klass-name = name-from-info(klass-info);
             snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, klass-name);
@@ -929,7 +943,6 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
             gbl-current-module = "";
             dump-klass(dostrm, klass-info);
             ostream::fclose(dostrm);
-          }
         }
       }
     }
@@ -988,9 +1001,6 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
   symbol-t klass-name = klass-name-from-info(klass-info);
 
   str-t                     modulee =                        cast(str-t)                    named-info::at(klass-info, #module);
-  boole-t                   exported? =                      cast(boole-t)                  named-info::at(klass-info, #exported?);
-  boole-t                   state-exported? =                cast(boole-t)                  named-info::at(klass-info, #state-exported?);
-  boole-t                   behavior-exported? =             cast(boole-t)                  named-info::at(klass-info, #behavior-exported?);
   symbol-t                  cat =                            cast(symbol-t)                 named-info::at(klass-info, #cat, cast(intptr-t)#struct);
   symbol-t                  type =                           cast(symbol-t)                 named-info::at(klass-info, #type, cast(intptr-t)#klass);
   symbol-t                  interpose-name =                 cast(symbol-t)                 named-info::at(klass-info, #interpose-name);
@@ -1035,7 +1045,10 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
     ostream::println-format(ostrm, "module %s;\n\n", modulee);
     gbl-current-module = modulee;
   }
-  if (exported? || state-exported? || behavior-exported?) {
+  boole-t exported? =          false;
+  boole-t state-exported? =    false;
+  boole-t behavior-exported? = false;
+  if (klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?)) {
     ostream::println-format(ostrm, "%s %s {\n", type, name);
     ostream::col-incr(ostrm);
 

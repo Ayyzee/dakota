@@ -55,14 +55,14 @@ klass named-info {
     return s;
   }
   method search(slots-t* s, symbol-t key) -> property-t* {
-    property::slots-t property = {.key = cast(symbol-t)key, .element = cast(intptr-t)0};
+    property::slots-t property = {.key = cast(symbol-t)key, .element = cast(intptr-t)nullptr};
     property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, cast(size-t)s->count, sizeof(s->elements[0]),
                                                                 cast(std-compare-t)cast(auto (*)(property::slots-t*,
                                                                                                  property::slots-t*) -> int-t)property::compare);
     return result;
   }
   method at(slots-t* s, symbol-t key) -> intptr-t {
-    intptr-t element = 0;
+    intptr-t element = cast(intptr-t)nullptr;
     property::slots-t* property = search(s, key);
     if (nullptr != property)
       element = property->element;
@@ -70,7 +70,7 @@ klass named-info {
   }
   method at(slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
     intptr-t element = at(s, key);
-    if (0 == element) // aka: if (nullptr == element)
+    if (cast(intptr-t)nullptr == element)
       element = default-element;
     return element;
   }
@@ -91,8 +91,8 @@ klass named-info {
           case #type:
             printf("  #%s,",    cast(symbol-t)(element));
             break;
-	  default:
-	    ;
+          default:
+            ;
         }
         printf("\n");
       }
