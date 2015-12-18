@@ -58,8 +58,8 @@ klass text-output-stream {
   method init(object-t self, stream-t stream : stdout, ssize-t column-width : 2) -> object-t {
     self = $init(super, #stream : stream);
     self.column = 0;
-    if (column-width > cast(ssize-t)countof(ws))
-      column-width = countof(ws);
+    if (column-width > scountof(ws))
+      column-width = scountof(ws);
     self.column-width = column-width;
     self.previous-features = k-trailing-newline;
     return self;
