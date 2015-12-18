@@ -90,7 +90,7 @@ static const int64-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
 sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                 0,
-                                                countof(gbl-selectors),
+                                                scountof(gbl-selectors),
                                                 ssizeof(gbl-selectors[0]),
                                                 cast(std-compare-t)cast(auto (*)(selector-pair-t*,
                                                                                  selector-pair-t*) -> int-t)selector-pair::compare };
@@ -156,6 +156,7 @@ func import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
   }
   return;
 }
+// iterate over list of named-info-t
 static func ptr-from-info(named-info-t* info, symbol-t key) -> const void* {
   named-info-t* current-info = info;
   const void* previous-element = nullptr;
