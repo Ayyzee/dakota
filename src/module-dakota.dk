@@ -14,259 +14,258 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota;
-export {
-  klass addr2name-pair;
-  klass addr2name-pair { slots; }
-  klass assoc-node;
-  klass assoc-node { slots; }
-  klass autorelease-pool;
-  klass autorelease-pool-klass;
-  klass bit-vector;
-  klass boole;
-  klass boole { slots; }
-  klass boole-klass;
-  klass boole-klass { slots; }
-  klass char16;
-  klass char16 { slots; }
-  klass char32;
-  klass char32 { slots; }
-  klass char8;
-  klass char8 { slots; }
-  klass collection;
-  klass const-info;
-  klass const-info { slots; }
-  trait counted-set;
-  klass deque;
-  klass enum-info;
-  klass enum-info { slots; }
-  klass equal-predicate;
-  klass equal-predicate { slots; }
-  klass exception;
-  klass exe-type;
-  klass exe-type { slots; }
-  trait forward-iterator;
-  klass get-segment-data;
-  klass get-segment-data { slots; }
-  klass hash;
-  klass hash { slots; }
-  klass illegal-klass-exception;
-  klass input-stream;
-  klass input-stream { slots; }
-  klass int-fast16;
-  klass int-fast16::max;
-  klass int-fast16::min;
-  klass int-fast16 { slots; }
-  klass int-fast32;
-  klass int-fast32::max;
-  klass int-fast32::min;
-  klass int-fast32 { slots; }
-  klass int-fast64;
-  klass int-fast64::max;
-  klass int-fast64::min;
-  klass int-fast64 { slots; }
-  klass int-fast8;
-  klass int-fast8::max;
-  klass int-fast8::min;
-  klass int-fast8 { slots; }
-  klass int-least16;
-  klass int-least16::max;
-  klass int-least16::min;
-  klass int-least16 { slots; }
-  klass int-least32;
-  klass int-least32::max;
-  klass int-least32::min;
-  klass int-least32 { slots; }
-  klass int-least64;
-  klass int-least64::max;
-  klass int-least64::min;
-  klass int-least64 { slots; }
-  klass int-least8;
-  klass int-least8::max;
-  klass int-least8::min;
-  klass int-least8 { slots; }
-  klass int16;
-  klass int16::max;
-  klass int16::min;
-  klass int16 { slots; }
-  klass int32;
-  klass int32::max;
-  klass int32::min;
-  klass int32 { slots; }
-  klass int64;
-  klass int64::max;
-  klass int64::min;
-  klass int64 { slots; }
-  klass int8;
-  klass int8::max;
-  klass int8::min;
-  klass int8 { slots; }
-  klass intmax;
-  klass intmax::max;
-  klass intmax::min;
-  klass intmax { slots; }
-  klass intptr;
-  klass intptr::max;
-  klass intptr::min;
-  klass intptr { slots; }
-  klass iter-pair;
-  klass iter-pair { slots; }
-  klass keyword;
-  klass keyword-exception;
-  klass keyword { slots; }
-  klass klass;
-  klass klass { slots; }
-  klass method;
-  klass method-alias;
-  klass method-alias { slots; }
-  klass method1;
-  klass method1 { slots; }
-  klass method { slots; }
-  klass methods;
-  klass methods { slots; }
-  klass missing-keyword-exception;
-  klass named-assoc-node;
-  klass named-assoc-node { slots; }
-  klass named-enum-info;
-  klass named-enum-info { slots; }
-  klass named-info;
-  klass named-info { slots; }
-  klass no-such-keyword-exception;
-  klass no-such-method-exception;
-  klass no-such-slot-exception;
-  klass number;
-  klass null-singleton;
-  klass object;
-  klass object-input-stream;
-  klass object-output-stream;
-  klass object { slots; }
-  klass ostream;
-  klass ostream { slots; }
-  klass output-stream;
-  klass output-stream { slots; }
-  klass pair;
-  klass pair { slots; }
-  klass property;
-  klass property { slots; }
-  klass ptr;
-  klass ptr { slots; }
-  klass registration-info;
-  klass registration-info { slots; }
-  klass result;
-  klass result { slots; }
-  klass schar8;
-  klass schar8 { slots; }
-  klass selector;
-  klass selector-node;
-  klass selector-node { slots; }
-  klass selector-pair;
-  klass selector-pair { slots; }
-  klass selector { slots; }
-  klass sequence;
-  trait set;
-  klass sigbus-exception;
-  klass signal-exception;
-  klass signature;
-  klass signature { slots; }
-  klass sigsegv-exception;
-  klass singleton-klass;
-  klass size;
-  klass size { slots; }
-  klass sorted-array;
-  klass sorted-array { slots; }
-  klass sorted-counted-set;
-  klass sorted-ptr-array;
-  klass sorted-ptr-array { slots; }
-  klass sorted-set;
-  klass sorted-table;
-  klass ssize;
-  klass ssize { slots; }
-  trait stack;
-  klass std-compare;
-  klass std-compare { slots; }
-  klass str;
-  klass stream;
-  klass stream { slots; }
-  klass str-compare;
-  klass str-compare { slots; }
-  klass str-klass;
-  klass str-klass { slots; }
-  klass str128;
-  klass str128 { slots; }
-  klass str256;
-  klass str256 { slots; }
-  klass str32;
-  klass str32 { slots; }
-  klass str512;
-  klass str512 { slots; }
-  klass str64;
-  klass str64 { slots; }
-  klass str { slots; }
-  klass string;
-  klass super;
-  klass super { slots; }
-  klass symbol;
-  klass symbol { slots; }
-  klass system-exception;
-  trait table;
-  klass uchar8;
-  klass uchar8 { slots; }
-  klass uint-fast16;
-  klass uint-fast16::max;
-  klass uint-fast16 { slots; }
-  klass uint-fast32;
-  klass uint-fast32::max;
-  klass uint-fast32 { slots; }
-  klass uint-fast64;
-  klass uint-fast64::max;
-  klass uint-fast64 { slots; }
-  klass uint-fast8;
-  klass uint-fast8::max;
-  klass uint-fast8 { slots; }
-  klass uint-least16;
-  klass uint-least16::max;
-  klass uint-least16 { slots; }
-  klass uint-least32;
-  klass uint-least32::max;
-  klass uint-least32 { slots; }
-  klass uint-least64;
-  klass uint-least64::max;
-  klass uint-least64 { slots; }
-  klass uint-least8;
-  klass uint-least8::max;
-  klass uint-least8 { slots; }
-  klass uint16;
-  klass uint16::max;
-  klass uint16 { slots; }
-  klass uint32;
-  klass uint32::max;
-  klass uint32 { slots; }
-  klass uint64;
-  klass uint64::max;
-  klass uint64 { slots; }
-  klass uint8;
-  klass uint8::max;
-  klass uint8 { slots; }
-  klass uintmax;
-  klass uintmax::max;
-  klass uintmax { slots; }
-  klass uintptr;
-  klass uintptr::max;
-  klass uintptr { slots; }
-  klass unbox-illegal-klass-exception;
-  klass va-method;
-  klass va-method { slots; }
-  klass vector;
-  klass wchar;
-  klass wchar { slots; }
-  klass x::sigaction;
-  klass x::sigaction { slots; }
-  klass x::sigaction-handler;
-  klass x::sigaction-handler { slots; }
-  klass x::sigaction-pair;
-  klass x::sigaction-pair { slots; }
-  klass x::siginfo;
-  klass x::siginfo { slots; }
-  klass x::stat;
-  klass x::stat { slots; }
+export dakota {
+  addr2name-pair;
+  addr2name-pair::slots-t;
+  assoc-node;
+  assoc-node::slots-t;
+  autorelease-pool;
+  autorelease-pool-klass;
+  bit-vector;
+  boole;
+  boole::slots-t;
+  boole-klass;
+  boole-klass::slots-t;
+  char16;
+  char16::slots-t;
+  char32;
+  char32::slots-t;
+  char8;
+  char8::slots-t;
+  collection;
+  const-info;
+  const-info::slots-t;
+  counted-set;
+  deque;
+  enum-info;
+  enum-info::slots-t;
+  equal-predicate;
+  equal-predicate::slots-t;
+  exception;
+  exe-type;
+  exe-type::slots-t;
+  forward-iterator;
+  get-segment-data;
+  get-segment-data::slots-t;
+  hash;
+  hash::slots-t;
+  illegal-klass-exception;
+  input-stream;
+  input-stream::slots-t;
+  int-fast16;
+  int-fast16::max;
+  int-fast16::min;
+  int-fast16::slots-t;
+  int-fast32;
+  int-fast32::max;
+  int-fast32::min;
+  int-fast32::slots-t;
+  int-fast64;
+  int-fast64::max;
+  int-fast64::min;
+  int-fast64::slots-t;
+  int-fast8;
+  int-fast8::max;
+  int-fast8::min;
+  int-fast8::slots-t;
+  int-least16;
+  int-least16::max;
+  int-least16::min;
+  int-least16::slots-t;
+  int-least32;
+  int-least32::max;
+  int-least32::min;
+  int-least32::slots-t;
+  int-least64;
+  int-least64::max;
+  int-least64::min;
+  int-least64::slots-t;
+  int-least8;
+  int-least8::max;
+  int-least8::min;
+  int-least8::slots-t;
+  int16;
+  int16::max;
+  int16::min;
+  int16::slots-t;
+  int32;
+  int32::max;
+  int32::min;
+  int32::slots-t;
+  int64;
+  int64::max;
+  int64::min;
+  int64::slots-t;
+  int8;
+  int8::max;
+  int8::min;
+  int8::slots-t;
+  intmax;
+  intmax::max;
+  intmax::min;
+  intmax::slots-t;
+  intptr;
+  intptr::max;
+  intptr::min;
+  intptr::slots-t;
+  iter-pair;
+  iter-pair::slots-t;
+  keyword;
+  keyword-exception;
+  keyword::slots-t;
+  klass;
+  klass::slots-t;
+  method;
+  method-alias;
+  method-alias::slots-t;
+  method1;
+  method1::slots-t;
+  method::slots-t;
+  methods;
+  methods::slots-t;
+  missing-keyword-exception;
+  named-assoc-node;
+  named-assoc-node::slots-t;
+  named-enum-info;
+  named-enum-info::slots-t;
+  named-info;
+  named-info::slots-t;
+  no-such-keyword-exception;
+  no-such-method-exception;
+  no-such-slot-exception;
+  number;
+  null-singleton;
+  object;
+  object-input-stream;
+  object-output-stream;
+  object::slots-t;
+  ostream;
+  ostream::slots-t;
+  output-stream;
+  output-stream::slots-t;
+  pair;
+  pair::slots-t;
+  property;
+  property::slots-t;
+  ptr;
+  ptr::slots-t;
+  registration-info;
+  registration-info::slots-t;
+  result;
+  result::slots-t;
+  schar8;
+  schar8::slots-t;
+  selector;
+  selector-node;
+  selector-node::slots-t;
+  selector-pair;
+  selector-pair::slots-t;
+  selector::slots-t;
+  sequence;
+  set;
+  sigbus-exception;
+  signal-exception;
+  signature;
+  signature::slots-t;
+  sigsegv-exception;
+  singleton-klass;
+  size;
+  size::slots-t;
+  sorted-array;
+  sorted-array::slots-t;
+  sorted-counted-set;
+  sorted-ptr-array;
+  sorted-ptr-array::slots-t;
+  sorted-set;
+  sorted-table;
+  ssize;
+  ssize::slots-t;
+  stack;
+  std-compare;
+  std-compare::slots-t;
+  str;
+  stream;
+  stream::slots-t;
+  str-compare;
+  str-compare::slots-t;
+  str-klass;
+  str-klass::slots-t;
+  str128;
+  str128::slots-t;
+  str256;
+  str256::slots-t;
+  str32;
+  str32::slots-t;
+  str512;
+  str512::slots-t;
+  str64;
+  str64::slots-t;
+  str::slots-t;
+  string;
+  super;
+  super::slots-t;
+  symbol;
+  symbol::slots-t;
+  system-exception;
+  table;
+  uchar8;
+  uchar8::slots-t;
+  uint-fast16;
+  uint-fast16::max;
+  uint-fast16::slots-t;
+  uint-fast32;
+  uint-fast32::max;
+  uint-fast32::slots-t;
+  uint-fast64;
+  uint-fast64::max;
+  uint-fast64::slots-t;
+  uint-fast8;
+  uint-fast8::max;
+  uint-fast8::slots-t;
+  uint-least16;
+  uint-least16::max;
+  uint-least16::slots-t;
+  uint-least32;
+  uint-least32::max;
+  uint-least32::slots-t;
+  uint-least64;
+  uint-least64::max;
+  uint-least64::slots-t;
+  uint-least8;
+  uint-least8::max;
+  uint-least8::slots-t;
+  uint16;
+  uint16::max;
+  uint16::slots-t;
+  uint32;
+  uint32::max;
+  uint32::slots-t;
+  uint64;
+  uint64::max;
+  uint64::slots-t;
+  uint8;
+  uint8::max;
+  uint8::slots-t;
+  uintmax;
+  uintmax::max;
+  uintmax::slots-t;
+  uintptr;
+  uintptr::max;
+  uintptr::slots-t;
+  unbox-illegal-klass-exception;
+  va-method;
+  va-method::slots-t;
+  vector;
+  wchar;
+  wchar::slots-t;
+  x::sigaction;
+  x::sigaction::slots-t;
+  x::sigaction-handler;
+  x::sigaction-handler::slots-t;
+  x::sigaction-pair;
+  x::sigaction-pair::slots-t;
+  x::siginfo;
+  x::siginfo::slots-t;
+  x::stat;
+  x::stat::slots-t;
 }

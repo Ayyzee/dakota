@@ -14,43 +14,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-util;
-export {
-  klass ascii-number;
-  klass ascii-number-klass;
-  klass dimension;
-  klass dimension { slots; }
-  klass features;
-  klass features { slots; }
-  klass float32;
-  klass float32 { slots; }
-  klass float64;
-  klass float64 { slots; }
-  klass float128;
-  klass float128 { slots; }
-  klass hashed-counted-set;
-  klass hashed-set;
-  klass hashed-table;
-  klass input-file;
-  klass json-object-output-stream;
-  klass json-parser;
-  klass lexer;
-  klass open-token;
-  klass open-token { slots; }
-  klass point;
-  klass point { slots; }
-  klass rect;
-  klass rect { slots; }
-  klass slot-info;
-  klass slot-info { slots; }
-  klass str-buffer;
-  klass str-buffer { slots; }
-  klass syntax-exception;
-  klass text-output-stream;
-  klass token;
-  klass tokenid;
-  klass tokenid { slots; }
-  klass type-predicate;
-  klass type-predicate { slots; }
-  klass xml-object-output-stream;
+export dakota-util {
+   ascii-number;
+   ascii-number-klass;
+   dimension;
+   dimension::slots-t;
+   features;
+   features::slots-t;
+   float32;
+   float32::slots-t;
+   float64;
+   float64::slots-t;
+   float128;
+   float128::slots-t;
+   hashed-counted-set;
+   hashed-set;
+   hashed-table;
+   input-file;
+   json-object-output-stream;
+   json-parser;
+   lexer;
+   open-token;
+   open-token::slots-t;
+   point;
+   point::slots-t;
+   rect;
+   rect::slots-t;
+   slot-info;
+   slot-info::slots-t;
+   str-buffer;
+   str-buffer::slots-t;
+   syntax-exception;
+   text-output-stream;
+   token;
+   tokenid;
+   tokenid::slots-t;
+   type-predicate;
+   type-predicate::slots-t;
+   xml-object-output-stream;
 }

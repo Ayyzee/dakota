@@ -984,6 +984,8 @@ sub fragment_str {
 sub export {
   my $depth = 0;
   &match(__FILE__, __LINE__, 'export');
+  my $module_name = &match_re(__FILE__, __LINE__, $id);
+  $gbl_current_module = $module_name;
   &match(__FILE__, __LINE__, '{');
   $depth++;
 
@@ -1016,11 +1018,12 @@ sub export {
           die;
         }
       } elsif (m/^;$/) {
-        push @$seq, $_;
         if (1 == $depth) {
           my $seqstr = &fragment_str($seq);
           $$tbl{$seqstr} = $seq;
           $seq= [];
+        } else {
+          push @$seq, $_;
         }
       } else {
         push @$seq, $_;

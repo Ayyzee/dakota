@@ -883,16 +883,13 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         fprintf(stderr, "%s:%i: error: missing module declaration\n", __FILE__, __LINE__);
         std::abort();
       }
-      if (module-name != modulee) {
-        ostream::println-format(ostrm, "module %s;\n", modulee);
-        ostream::println-format(ostrm, "export {");
-      }
+      if (module-name != modulee)
+        ostream::println-format(ostrm, "export %s {", modulee);
       module-name = modulee;
-      symbol-t type = cast(symbol-t)named-info::at(klass-info, #type);
-      ostream::println-format(ostrm, "%s\n  %s %s", c, type, name);
+      ostream::println-format(ostrm, "%s\n  %s", c, name);
       c = ";";
       if (nullptr != slots-info || nullptr != slots-type)
-        ostream::println-format(ostrm, "%s\n  %s %s { slots ; }", c, type, name);
+        ostream::println-format(ostrm, "%s\n  %s::slots-t", c, name);
       if (nullptr != method-signatures) {
         int64-t index = 0;
         const signature-t* info;
