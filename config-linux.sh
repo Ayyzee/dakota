@@ -1,4 +1,4 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 
-so_ext=so
+source $(dirname $0)/common.sh

@@ -104,15 +104,11 @@ my $implementation_defined_signedness = {
 };
 my $o_exts = {
   'g++' =>     'o',
-  'g++-4.8' => 'o',
-
-  'clang++' =>       'bc',
-  'clang++-3.6' =>   'bc',
-  'clang++-3.7' =>   'bc',
-  'clang++-3.7.0' => 'bc',
+  'clang++' => 'bc',
 };
 my $compiler = $ENV{'CXX'};
-my $o_ext = $$o_exts{$compiler};
+my $base_compiler = $compiler =~ s/(\.\d+)+$//r;
+my $o_ext = $$o_exts{$base_compiler};
 
 `$compiler -std=c++11 --output type-index type-index-main.cc`;
 my $index = `./type-index`;
@@ -125,12 +121,14 @@ foreach my $type (sort keys %$implementation_defined_signedness) {
 }
 my $result_tbl = {};
 my $unpromoted = {};
+my $num_tested = 0;
 undef $/;
 while (my ($promoted_type, $types) = each(%$type_tbl)) {
   for my $small_type (sort keys %$types) {
     if ($extra == $$types{$small_type}) {
       next;
     }
+    $num_tested++;
     my $in_name = 'test-template.cc';
     open(my $fh, '<', $in_name) or die "Could not open file '$in_name' $!";
     my $filestr = <$fh>;
@@ -143,7 +141,7 @@ while (my ($promoted_type, $types) = each(%$type_tbl)) {
     print $out $filestr;
     close($out);
     #print "small-type: " . $small_type . "\n";
-    my $cmd = "$compiler --compile -std=c++11 --warn-varargs --warn-error --output $o_file $cc_file";
+    my $cmd = "$compiler -std=c++11 --compile --warn-varargs --warn-error --output $o_file $cc_file";
     my $output = `$cmd`; # 2>&1
     my $exit_val = $?;
     `rm -f $cc_file $o_file`;
@@ -172,7 +170,13 @@ my $fn = "compiler-default-argument-promotions.json";
 open(my $fh, '>', $fn) or die "Could not open file '$fn' $!";
 print $fh $str;
 close($fh);
-print "# result written to $fn\n";
-$str = &Dumper($unpromoted);
-print "# NOT promoted:\n";
-print $str;
+#print "# result written to $fn\n";
+#$str = &Dumper($unpromoted);
+#print "# NOT promoted:\n";
+#print $str;
+
+my $num_unpromoted = scalar keys %$unpromoted;
+my $num_promoted =   scalar keys %$result_tbl;
+
+print "promoted:   $num_promoted/$num_tested\n";
+print "unpromoted: $num_unpromoted/$num_tested\n";

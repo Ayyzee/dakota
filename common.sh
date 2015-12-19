@@ -1,5 +1,5 @@
 #!/bin/bash
-set -o nounset -o errexit -o pipefail
+set -o nounset -o pipefail
 
 platform() {
     sysname=
@@ -10,7 +10,7 @@ platform() {
     if   [[ -n "${OSTYPE-}" && $OSTYPE =~ $os_type_linux_regex ]]; then
         sysname=linux
     elif [[ -n "${OSTYPE-}" && $OSTYPE =~ $os_type_darwin_regex ]]; then
-        sysname=linux
+        sysname=darwin
     fi
     # sysname: second try uname cmd
     if [[ -z "${sysname-}" && $(type uname) ]]; then
@@ -51,3 +51,19 @@ compiler() {
     fi
     echo $compiler
 }
+platform=$(platform)
+compiler=$(compiler)
+
+so_ext=so
+
+CP=cp
+CPFLAGS="--force --recursive"
+
+LN=ln
+LNFLAGS="--symbolic"
+
+MKDIR=mkdir
+MKDIRFLAGS="--parents"
+
+RM=rm
+RMFLAGS="--force --recursive"

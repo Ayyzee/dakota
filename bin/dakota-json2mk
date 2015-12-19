@@ -322,7 +322,7 @@ sub tsv {
     $result .= "\n";
     $result .= "\$($output)" . ' :';
 
-    for my $name ('srcs', 'libs') {
+    for my $name ('srcs') {
       my $var = &lhs([$name], $prefix);
       $result .= ' ' . "\$($var)";
     }

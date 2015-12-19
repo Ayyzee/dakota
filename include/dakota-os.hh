@@ -24,7 +24,7 @@
   static inline FUNC strsignal_name(int) -> str_t {
     return "not-yet-implimented: strsignal-name(int-t) -> str-t";
   }
-# elif defined __darwin__
+# elif defined __APPLE__ && defined __MACH__
   # include <mach-o/getsect.h>
   # include <signal.h>
 
@@ -38,7 +38,7 @@
     return sys_signame[sig];
   }
 # else
-  # error "Neither __linux__ nor __darwin__ is defined."
+  # error "Neither __linux__ nor (__APPLE__ && __MACH__) are defined."
 # endif
 
 # endif

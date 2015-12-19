@@ -127,7 +127,7 @@ klass bit-vector {
   method dump(object-t self) -> object-t {
     $dump(super);
     stream-t out = stderr;
-    fprintf(out, "%p:%p { count=%" PRIi64 ", capacity=%" PRIi64 ", elements=\"",
+    fprintf(out, "%p:%p { count=%zi, capacity=%zi, elements=\"",
             cast(ptr-t)(self), cast(ptr-t)(&unbox(self)), self.count, self.capacity);
     for (ssize-t i = 0; i < self.count * gbl-element-width; i++) {
       if (0 != i && 0 == (i % 8))

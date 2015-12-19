@@ -87,6 +87,7 @@ our @EXPORT= qw(
                  split_path
                  sqstr_regex
                  var
+                 var_array
               );
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
@@ -365,6 +366,15 @@ sub objdir { return $$build_vars{'objdir'}; }
 
 sub var {
   my ($compiler, $lhs, $default_rhs) = @_;
+  my $result = &var_array($compiler, $lhs, $default_rhs);
+  if ('ARRAY' eq ref($result)) {
+    $result = join(' ', @$result);
+  }
+  return $result;
+}
+
+sub var_array {
+  my ($compiler, $lhs, $default_rhs) = @_;
   my $result;
   my $env_rhs = $ENV{$lhs};
   my $compiler_rhs = $$compiler{$lhs};
@@ -378,10 +388,6 @@ sub var {
   }
   die if !defined $result || $result =~ /^\s+$/; # die if undefined or only whitespace
   die if 'HASH' eq ref($result);
-
-  if ('ARRAY' eq ref($result)) {
-    $result = join(' ', @$result);
-  }
   return $result;
 }
 sub kw_args_generics_add {
