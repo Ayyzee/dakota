@@ -398,8 +398,8 @@ sub rewrite_throws {
   # in parens
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)\(($main::list_in)\)/       $1throw$2 $3/gsx;
   # not in parens
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s+)make\s*\(($main::list_in)\)/$1throw$2dkt-capture-current-exception(make($3, \#src-time : __TIME__, \#src-date : __DATE__, \#src-file : __FILE__, \#src-line : __LINE__))/gsx;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)(".*?")/                    $1throw$2dkt-capture-current-exception($3, __TIME__, __DATE__, __FILE__, __LINE__)/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s+)make\s*\(($main::list_in)\)/$1throw$2dkt-capture-current-exception(make($3, \#src-file : __FILE__, \#src-line : __LINE__))/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)(".*?")/                    $1throw$2dkt-capture-current-exception($3, __FILE__, __LINE__)/gsx;
 
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)RETHROW(\s*);/$1throw$2;/gsx;
 }

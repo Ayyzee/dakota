@@ -32,8 +32,6 @@ module dakota;
 klass output-stream;
 klass system-exception;
 
-static THREAD-LOCAL str-t current-exception-src-time;
-static THREAD-LOCAL str-t current-exception-src-date;
 static THREAD-LOCAL str-t current-exception-src-file;
 static THREAD-LOCAL int-t current-exception-src-line;
 
@@ -44,12 +42,8 @@ func dkt-capture-current-exception(object-t arg) -> object-t {
   return result;
 }
 func dkt-capture-current-exception(str-t arg,
-                                   str-t src-time,
-                                   str-t src-date,
                                    str-t src-file,
                                    int-t src-line) -> str-t {
-  current-exception-src-time = src-time;
-  current-exception-src-date = src-date;
   current-exception-src-file = src-file;
   current-exception-src-line = src-line;
   static THREAD_LOCAL str-t result;
@@ -120,23 +114,17 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
 
 [[noreturn]] func pre-runtime-verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
-  str-t src-time = current-exception-src-time;
-  str-t src-date = current-exception-src-date;
   str-t src-file = current-exception-src-file;
   int-t src-line = current-exception-src-line;
 
-  str-t current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, nullptr, nullptr, 0);
+  str-t current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, 0);
   dkt-log(dkt::k-log-error, "uncaught/unexpected exception");
 
   if (nullptr != current-exception-str)
     fprintf(stderr,
-            ": \"src-time\": \"%s\""
-            ": \"src-date\": \"%s\""
             ": \"src-file\": \"%s\""
             ", \"src-line\": %i"
             ", \"exception-str\": \"%s\"" "\n",
-            src-time,
-            src-date,
             src-file,
             src-line,
             current-exception-str);
@@ -149,12 +137,10 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
 }
 [[noreturn]] func verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
-  str-t src-time = current-exception-src-time;
-  str-t src-date = current-exception-src-date;
   str-t src-file = current-exception-src-file;
   int-t src-line = current-exception-src-line;
 
-  str-t    current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, nullptr, nullptr, 0);
+  str-t    current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, 0);
   object-t current-exception =     dkt-capture-current-exception(cast(object-t)nullptr);
 
   if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
@@ -174,13 +160,9 @@ static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-
     // $print-format(std-error, ", \"exception\": \"%s\"", name-of(klass-of(current-exception)));
   else-if (nullptr != current-exception-str)
     $print-format(std-error,
-                  ", \"src-time\": \"%s\""
-                  ", \"src-date\": \"%s\""
                   ", \"src-file\": \"%s\""
                   ", \"src-line\": %i"
                   ", \"exception-str\": \"%s\"",
-                  src-time,
-                  src-date,
                   src-file,
                   src-line,
                   current-exception-str);
@@ -206,21 +188,15 @@ klass exception {
   superklass object;
 
   slots {
-    str-t src-time;
-    str-t src-date;
     str-t src-file;
     int-t src-line;
     str-t msg;
   }
   method init(object-t self,
-              str-t    src-time :,
-              str-t    src-date :,
               str-t    src-file :,
               int-t    src-line :,
               str-t    msg : name-of(klass-of(self))) -> object-t {
     self = $init(super);
-    self.src-time = src-time;
-    self.src-date = src-date;
     self.src-file = src-file;
     self.src-line = src-line;
     self.msg = msg;
@@ -230,13 +206,9 @@ klass exception {
     if (null == out)
       out = std-error;
     $print-format(out,
-                  ", \"src-time\": \"%s\""
-                  ", \"src-date\": \"%s\""
                   ", \"src-file\": \"%s\""
                   ", \"src-line\": %i"
                   ", \"msg\": \"%s\"",
-                  self.src-time,
-                  self.src-date,
                   self.src-file,
                   self.src-line,
                   self.msg);

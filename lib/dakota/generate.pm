@@ -479,7 +479,6 @@ sub generate_defn_footer {
   #$col = &colin($col);
 
   my $info_tbl = {
-                  "\#date" => '__DATE__',
                   "\#dir" => 'dir',
                   "\#file" => '__FILE__',
                   "\#get-segment-data" => 'dkt-get-segment-data',
@@ -490,7 +489,6 @@ sub generate_defn_footer {
                   "\#name" => 'name',
                   "\#selectors" =>  'selectors',
                   "\#signatures" => 'signatures',
-                  "\#time" => '__TIME__',
                   "\#type" => $$file{'other'}{'type'},
                   "\#va-selectors" =>  'va-selectors',
                   "\#va-signatures" => 'va-signatures',
