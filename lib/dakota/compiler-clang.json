@@ -16,8 +16,7 @@
   'CXX_SHARED_FLAGS' =>      [ '--shared', '-fPIC' ],
   'EXTRA_CXXFLAGS' =>        [
       '--warn-everything',
-     #'--warn-no-class-varargs',
-     #'--warn-no-date-time',
+      '--warn-no-class-varargs',
       '--warn-no-c++1y-extensions',
       '--warn-no-c++98-compat',
       '--warn-no-c++98-compat-pedantic',
