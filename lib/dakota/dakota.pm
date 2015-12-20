@@ -352,7 +352,7 @@ sub loop_cc_from_dk {
 #   libX.3.9.so
 #   libX.3.so
 #   libX.so
-sub is_so {
+sub is_so_path {
   my ($name) = @_;
   # linux and darwin so-regexs are combined
   my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
@@ -369,6 +369,14 @@ sub gcc_library_from_library_name {
     print STDERR  "warning: $library_name does not look like a library name.\n";
     return "--library-name $library_name";
   }
+}
+sub cmd_opts_from_library_name {
+  my ($lib) = @_;
+  my $path = $lib;
+  if (&is_so_path($lib) && $lib !~ m|/| && -e $lib) {
+    $path = './' . $lib;
+  }
+  return &cmd_opts_from_library_path($path);
 }
 sub cmd_opts_from_library_path {
   my ($lib) = @_;
@@ -392,7 +400,7 @@ sub split_inputs {
   my $unchanged = [];
   my $changed = [];
   foreach my $input (@$inputs) {
-    my $output = &cmd_opts_from_library_path($input);
+    my $output = &cmd_opts_from_library_name($input);
     if ($output eq $input) {
       push @$unchanged, $output;
     } else {
@@ -452,7 +460,7 @@ sub start_cmd {
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($ENV{'DKT_PRECOMPILE'}) {
     my $rt_cc;
-    if (&is_so($$cmd_info{'output'})) {
+    if (&is_so_path($$cmd_info{'output'})) {
       $rt_cc = &rt_cc_path_from_so_path($$cmd_info{'output'});
     } else {
       $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'});
@@ -474,7 +482,7 @@ sub start_cmd {
   } else {
     my $inputs = [];
     foreach my $input (@{$$cmd_info{'inputs'}}) {
-      push @$inputs, &cmd_opts_from_library_path($input);
+      push @$inputs, &cmd_opts_from_library_name($input);
     }
     $$cmd_info{'inputs'} = $inputs;
   }
@@ -535,7 +543,7 @@ sub rep_from_so {
     $arg = $$cmd_info{'input'};
   }
   my $ctlg_path;
-  if (&is_so($arg)) {
+  if (&is_so_path($arg)) {
     $ctlg_path = &ctlg_path_from_so_path($arg);
   } else {
     $ctlg_path = &ctlg_path_from_any_path($arg);
@@ -595,7 +603,7 @@ sub loop_rep_from_dk {
   }
   if (0 != @$rep_files) {
     my $json_path;
-    if (&is_so($$cmd_info{'output'})) {
+    if (&is_so_path($$cmd_info{'output'})) {
       $json_path = &json_path_from_so_path($$cmd_info{'output'});
     } else {
       $json_path = &json_path_from_any_path($$cmd_info{'output'});
@@ -711,7 +719,7 @@ sub rt_o_from_json {
   my ($cmd_info, $other) = @_;
   my $json_path;
   my $cc_path;
-  if (&is_so($$cmd_info{'output'})) {
+  if (&is_so_path($$cmd_info{'output'})) {
     $json_path = &json_path_from_so_path($$cmd_info{'output'});
     $cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
   } else {
