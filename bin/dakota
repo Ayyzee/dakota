@@ -97,7 +97,18 @@ my $root_cmd = { 'reps' => [],
 # --help
 # --verbose
 
-$$root_cmd{'inputs'} = [map { &canon_path($_) } @ARGV];
+sub mtime {
+  my ($file) = @_;
+  if (! -e $file) {
+    return 0;
+  }
+  my $mtime = 9;
+  my $result = (stat ($file))[$mtime];
+  return $result;
+}
+my $argv = [sort {&mtime($b) <=> &mtime($a)} @ARGV];
+$argv = [map { &canon_path($_) } @$argv];
+$$root_cmd{'inputs'} = [map { &canon_path($_) } @$argv];
 
 if (!$$root_cmd{'opts'}{'compile'} &&
     !$$root_cmd{'opts'}{'shared'}  &&
@@ -129,7 +140,7 @@ if (!$$root_cmd{'opts'}{'compile'} &&
   }
 }
 
-if (!defined $$root_cmd{'opts'}{'output'} || 0 == @ARGV) {
+if (!defined $$root_cmd{'opts'}{'output'} || 0 == @$argv) {
   #`dakota --help`;
   exit 1;
 }
