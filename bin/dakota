@@ -61,6 +61,8 @@ $Getopt::Long::ignorecase = 0;
 my $root_cmd = { 'reps' => [],
                  'opts' => { 'directory' => [],
                              'include-directory' => [ "$gbl_prefix/include" ],
+                             'library-directory' => [],
+                             'library-name' => [],
                              'define-macro' => [],
                              'var' => {} } };
 
@@ -69,8 +71,10 @@ my $root_cmd = { 'reps' => [],
             'define-macro=s',       # gcc-like
             'directory=s',          # make-like
             'dynamic',              # gcc-like
-            'include-directory=s',  # gcc-like
+            'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
             'keep-going',           # make-like
+            'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
+            'library-name=s',       # --library-name libdl.so equivalent to -ldl
             'nodefaultlibs',        # gcc-like
             'output=s',             # gcc-like
             'precompile',           # gcc-ish (--compile)
@@ -83,8 +87,6 @@ my $root_cmd = { 'reps' => [],
            #'for-compiler=s',       # gcc-like (--for-linker <>)
            #'for-linker=s',         # gcc-like
            #'jobs'                  # make-like
-           #'library-directory=s',  # gcc-like, ld-like (--library-path[=]; consider SEARCH_DIR)
-           #'library=s',            # gcc-like (-l<> or --library=<> ???)
            #'linker-flags=s',       # similiar to env vars LDFLAGS & EXTRA_LDFLAGS
            #'linker=s',             # similiar to env var LD
            #'pie'                   # ld-like

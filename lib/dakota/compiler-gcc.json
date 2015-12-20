@@ -11,6 +11,8 @@
   'CXX_DYNAMIC_FLAGS' =>     [ '--dynamic', '--PIC' ],
   'CXX_FOR_LINKER_FLAGS' => [ '--for-linker' ],
   'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
+  'CXX_LIBRARY_DIRECTORY_FLAGS' => [ '--library-directory' ],
+  'CXX_LIBRARY_FLAGS' => [ '--library' ],
   'CXX_NO_WARNINGS_FLAGS' => [ '--no-warnings' ],
   'CXX_OUTPUT_FLAGS' =>      [ '--output'  ],
   'CXX_SHARED_FLAGS' =>      [ '--shared', '--PIC' ],

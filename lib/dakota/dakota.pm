@@ -359,21 +359,29 @@ sub is_so {
   #my $libname = $2 . ".$so_ext";
   return $result;
 }
-sub lib_path_to_cmd_opts {
+sub gcc_library_from_library_name {
+  my ($library_name) = @_;
+  if ($library_name =~ m=^lib([.\w-]+)\.$so_ext((\.\d+)+)?$= ||
+      $library_name =~ m=^lib([.\w-]+)((\.\d+)+)?\.$so_ext$=) { # so-regex
+    my $library_name_base = $1;
+    return "-l$library_name_base"; # hardhard: hardcoded use of -l (both gcc/clang use it)
+  } else {
+    print STDERR  "warning: $library_name does not look like a library name.\n";
+    return "--library-name $library_name";
+  }
+}
+sub cmd_opts_from_library_path {
   my ($lib) = @_;
 
   my $result = '';
   # linux and darwin so-regexs are separate
-  if ($lib =~ m=^(.*/)?(lib([.\w-]+))\.$so_ext((\.\d+)+)?$= ||
-      $lib =~ m=^(.*/)?(lib([.\w-]+))((\.\d+)+)?\.$so_ext$=) { # so-regex
-    my $libdir = $1;
-    my $libname = $2 . ".$so_ext";
-    my $baselibname = $3;
-    if ($libdir) {
-      $libdir = &canon_path($libdir);
-      $result .= "--library-directory $libdir ";
-    }
-    $result .= "-l$baselibname"; # hardhard: hardcoded use of -l
+  if ($lib =~ m=^(.*/)(lib([.\w-]+))\.$so_ext((\.\d+)+)?$= ||
+      $lib =~ m=^(.*/)(lib([.\w-]+))((\.\d+)+)?\.$so_ext$=) { # so-regex
+    my $library_directory = $1;
+    my $library_name = $2 . ".$so_ext";
+    $library_directory = &canon_path($library_directory);
+    $result .= "--library-directory $library_directory ";
+    $result .= &gcc_library_from_library_name($library_name);
   } else {
     $result = $lib;
   }
@@ -384,7 +392,7 @@ sub split_inputs {
   my $unchanged = [];
   my $changed = [];
   foreach my $input (@$inputs) {
-    my $output = &lib_path_to_cmd_opts($input);
+    my $output = &cmd_opts_from_library_path($input);
     if ($output eq $input) {
       push @$unchanged, $output;
     } else {
@@ -402,7 +410,7 @@ sub for_linker {
   }
   return $result;
 }
-my $use_lib_opts_replace_lib_path = 1;
+my $should_replace_library_path_with_lib_opts = 1;
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
@@ -459,14 +467,14 @@ sub start_cmd {
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
 
-  if ($use_lib_opts_replace_lib_path) {
+  if ($should_replace_library_path_with_lib_opts) {
     my ($inputs, $lib_opts) = &split_inputs($$cmd_info{'inputs'});
     $$cmd_info{'inputs'} = $inputs;
-    $$cmd_info{'opts'}{'lib-opts'} = $lib_opts;
+    $$cmd_info{'opts'}{'*lib-opts*'} = $lib_opts;
   } else {
     my $inputs = [];
     foreach my $input (@{$$cmd_info{'inputs'}}) {
-      push @$inputs, &lib_path_to_cmd_opts($input);
+      push @$inputs, &cmd_opts_from_library_path($input);
     }
     $$cmd_info{'inputs'} = $inputs;
   }
@@ -753,6 +761,28 @@ sub rt_o_from_json {
     &add_first($$cmd_info{'inputs'}, $o_path);
   }
 }
+sub gcc_libraries_str {
+  my ($library_names) = @_;
+  my $gcc_libraries = [];
+  foreach my $library_name (@$library_names) {
+    push @$gcc_libraries, &gcc_library_from_library_name($library_name);
+  }
+  my $result = join(' ', @$gcc_libraries);
+  return $result;
+}
+# adding first before any arguments (i.e. files (*.dk, *.$cc_ext, *.$so_ext, etc))
+# but after all cmd-flags
+sub library_names_add_first {
+  my ($cmd_info) = @_;
+  if ($$cmd_info{'opts'}{'library-name'} && 0 < scalar @{$$cmd_info{'opts'}{'library-name'}}) {
+    my $gcc_libraries_str = &gcc_libraries_str($$cmd_info{'opts'}{'library-name'});
+    if (!defined $$cmd_info{'cmd-flags'}) {
+      $$cmd_info{'cmd-flags'} = $gcc_libraries_str;
+    } else {
+      $$cmd_info{'cmd-flags'} .= ' ' . $gcc_libraries_str;
+    }
+  }
+}
 sub so_from_o {
   my ($cmd_info) = @_;
   my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -762,11 +792,12 @@ sub so_from_o {
   $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
   $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
   $$so_cmd{'output'} = $$cmd_info{'output'};
-  if ($use_lib_opts_replace_lib_path) {
-    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+  if ($should_replace_library_path_with_lib_opts) {
+    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
   } else {
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
+  &library_names_add_first($so_cmd);
   my $should_echo;
   &outfile_from_infiles($so_cmd, $should_echo = 1);
 }
@@ -779,11 +810,12 @@ sub dso_from_o {
   $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
   $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
   $$so_cmd{'output'} = $$cmd_info{'output'};
-  if ($use_lib_opts_replace_lib_path) {
-    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+  if ($should_replace_library_path_with_lib_opts) {
+    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
   } else {
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
+  &library_names_add_first($so_cmd);
   my $should_echo;
   &outfile_from_infiles($so_cmd, $should_echo = 1);
 }
@@ -796,11 +828,12 @@ sub exe_from_o {
   $$exe_cmd{'cmd-major-mode-flags'} = undef;
   $$exe_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
   $$exe_cmd{'output'} = $$cmd_info{'output'};
-  if ($use_lib_opts_replace_lib_path) {
-    $$exe_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'lib-opts'} ||= []} ];
+  if ($should_replace_library_path_with_lib_opts) {
+    $$exe_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
   } else {
     $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
+  &library_names_add_first($exe_cmd);
   my $should_echo;
   &outfile_from_infiles($exe_cmd, $should_echo = 1);
 }

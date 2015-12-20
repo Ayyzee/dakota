@@ -29,10 +29,10 @@
       '$(srcdir)/token.dk',
       '$(srcdir)/tokenid.dk',
       '$(srcdir)/type-predicate.dk',
-      '$(srcdir)/xml-object-output-stream.dk'
+      '$(srcdir)/xml-object-output-stream.dk',
+      '$(blddir)/../lib/libdakota.$(so_ext)',
     ],
     'libs' => [ # cmd-line
-      '$(blddir)/../lib/libdakota.$(so_ext)',
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)',
