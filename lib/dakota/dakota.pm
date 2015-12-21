@@ -26,6 +26,7 @@ package dakota::dakota;
 
 use strict;
 use warnings;
+use sort 'stable';
 
 my $should_write_pre_output = 1;
 

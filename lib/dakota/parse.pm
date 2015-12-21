@@ -26,6 +26,7 @@ package dakota::parse;
 
 use strict;
 use warnings;
+use sort 'stable';
 
 $main::seq = qr{
                  \[

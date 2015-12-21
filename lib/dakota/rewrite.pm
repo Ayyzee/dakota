@@ -26,6 +26,7 @@ package dakota::rewrite;
 
 use strict;
 use warnings;
+use sort 'stable';
 
 my $gbl_prefix;
 

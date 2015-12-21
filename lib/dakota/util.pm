@@ -26,6 +26,7 @@ package dakota::util;
 
 use strict;
 use warnings;
+use sort 'stable';
 
 my $kw_args_generics_tbl;
 
@@ -50,6 +51,7 @@ our @EXPORT= qw(
                  add_last
                  ann
                  canon_path
+                 copy_no_dups
                  cpp_directives
                  decode_comments
                  decode_strings
@@ -75,6 +77,7 @@ our @EXPORT= qw(
                  method_sig_regex
                  method_sig_type_regex
                  min
+                 mtime
                  needs_hex_encoding
                  objdir
                  pann
@@ -400,10 +403,33 @@ sub kw_args_generics {
 }
 sub min { my ($x, $y) = @_; return $x <= $y ? $x : $y; }
 sub max { my ($x, $y) = @_; return $x >= $y ? $x : $y; }
+sub mtime {
+  my ($file) = @_;
+  if (! -e $file) {
+    return 0;
+  }
+  my $mtime = 9;
+  my $result = (stat ($file))[$mtime];
+  return $result;
+}
 sub flatten {
     my ($a_of_a) = @_;
     my $a = [map {@$_} @$a_of_a];
     return $a;
+}
+sub copy_no_dups {
+  my ($strs) = @_;
+  my $str_set = {};
+  my $result = [];
+  foreach my $str (@$strs) {
+    if (!$$str_set{$str}) {
+      push @$result, $str;
+      $$str_set{$str} = 1;
+    } else {
+      #printf "$0: warning: removing duplicate $str\n";
+    }
+  }
+  return $result;
 }
 sub canon_path {
   my ($path) = @_;

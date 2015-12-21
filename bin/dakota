@@ -24,9 +24,12 @@
 
 use strict;
 use warnings;
+use sort 'stable';
 use Cwd;
 
 my $gbl_prefix;
+my $gbl_compiler;
+my $so_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -48,6 +51,17 @@ BEGIN {
 use dakota::dakota;
 use dakota::util;
 
+$gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
+  or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+{
+  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
+    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
+  my ($key, $values);
+  while (($key, $values) = each (%$platform)) {
+    $$gbl_compiler{$key} = $values;
+  }
+  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+}
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
@@ -98,52 +112,48 @@ my $root_cmd = { 'reps' => [],
 # --help
 # --verbose
 
-sub mtime {
-  my ($file) = @_;
-  if (! -e $file) {
-    return 0;
-  }
-  my $mtime = 9;
-  my $result = (stat ($file))[$mtime];
-  return $result;
-}
-my $argv = [sort {&mtime($b) <=> &mtime($a)} @ARGV];
-$argv = [map { &canon_path($_) } @$argv];
-$$root_cmd{'inputs'} = [map { &canon_path($_) } @$argv];
+my $argv = [map { &canon_path($_) } @ARGV];
+$argv = &copy_no_dups($argv);
 
-if (!$$root_cmd{'opts'}{'compile'} &&
-    !$$root_cmd{'opts'}{'shared'}  &&
-    !$$root_cmd{'opts'}{'dynamic'}) {
+if (0 == @$argv) {
+  die "$0: error: arguments are requried\n";
+} else {
+  $argv = [sort {&mtime($b) <=> &mtime($a)} @$argv];
+  $$root_cmd{'inputs'} = $argv;
+}
+
+if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'output'}) {
   my $output;
-  if (!$$root_cmd{'opts'}{'output'}) {
-    my $dk_files = [];
-    my $main_dk_file;
-    for my $input (@{$$root_cmd{'inputs'}}) {
-      if ($input =~/([\w-]+)\.dk$/) {
-        push @$dk_files, $input;
+  my $dk_files = [];
+  my $main_dk_file;
+  for my $input (@{$$root_cmd{'inputs'}}) {
+    if ($input =~/([\w-]+)\.dk$/) {
+      push @$dk_files, $input;
+      if (!$main_dk_file) {
         my $inputstr = &filestr_from_file($input);
         if ($inputstr =~ /(FUNC|func|auto|int|int-t)\s+main\s*\(.*?\)\s*(->\s*(int|int-t))?\s*\{/gs) {
           $main_dk_file = $input;
+          last;
         }
       }
     }
-    if (1 == scalar @$dk_files) {
-      $output = $$dk_files[0];
-    } elsif ($main_dk_file) {
-      $output = $main_dk_file;
+  }
+  if ($main_dk_file) {
+    $output = $main_dk_file;
+    if (&is_debug() && $main_dk_file ne $$dk_files[0]) {
+      print "Source file containing main() not listed as first argument.\n";
     }
+  } else {
+    $output = $$dk_files[0];
   }
-  if ($output) {
-    $output =~ m=([\w-]+)\.dk$=;
-    my $name = $1;
-    $$root_cmd{'opts'}{'output'} = $name;
+  $output =~ m/([\w-]+)\.dk$/;
+  my $output_base = $1;
+  if ($$root_cmd{'opts'}{'shared'} ||
+      $$root_cmd{'opts'}{'dynamic'}) {
+    $$root_cmd{'opts'}{'output'} = 'lib' . $output_base . ".$so_ext"; # lib
+  } else {
+    $$root_cmd{'opts'}{'output'} = $output_base; # exe
   }
-}
-if (!defined $$root_cmd{'opts'}{'output'}) {
-  die "$0: error: --output is required\n";
-}
-if (0 == @$argv) {
-  die "$0: error: arguments are requried\n";
 }
 if ($$root_cmd{'opts'}{'soname'}) {
   $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
@@ -151,24 +161,17 @@ if ($$root_cmd{'opts'}{'soname'}) {
 if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
 }
-my $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
-  or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
-{
-  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
-    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
-  my ($key, $values);
-  while (($key, $values) = each (%$platform)) {
-    $$gbl_compiler{$key} = $values;
-  }
-}
 
 if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
-  my $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
   my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
   if ($$root_cmd{'opts'}{'output'} ne $libdakota) {
     &add_last($$root_cmd{'inputs'}, $libdakota);
   }
 }
+my $inputs = [map { &canon_path($_) } @{$$root_cmd{'inputs'}}];
+$inputs = &copy_no_dups($inputs);
+$$root_cmd{'inputs'} = $inputs;
+
 $ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
 
 my $gcc_from_dakota = {
