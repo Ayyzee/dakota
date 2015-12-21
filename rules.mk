@@ -2,17 +2,17 @@ $(blddir)/%.tbl: $(srcdir)/%.pl
 	./$< > $@
 
 $(blddir)/../bin/%: $(srcdir)/%-main.cc
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(shell ls -t $^)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $(shell ls -t $^)
 $(blddir)/%: $(srcdir)/%-main.cc
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(shell ls -t $^)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $(shell ls -t $^)
 
 $(blddir)/../bin/%: $(srcdir)/%-main.dk
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs) $(shell ls -t $(srcs))
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs:lib%.$(so_ext)=-l%) $(shell ls -t $(srcs))
 $(blddir)/%: $(srcdir)/%-main.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --include-directory $(srcdir)/../include --output $@ $^
 
 $(blddir)/../lib/%.$(so_ext):
-	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --soname $(soname) --output $@ $(libs) $(shell ls -t $(srcs))
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --soname $(soname) --output $@ $(libs:lib%.$(so_ext)=-l%) $(shell ls -t $(srcs))
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: $(srcdir)/../lib/dakota/%.json
 	sudo $(INSTALL_DATA) $< $(@D)
