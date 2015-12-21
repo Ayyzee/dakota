@@ -305,7 +305,7 @@ sub loop_cc_from_dk {
   }
   my $argv_length = @{$$cmd_info{'inputs'}};
   if (0 == $argv_length) {
-    exit 1;
+    die "$0: error: arguments are requried\n";
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my ($dir, $name) = &split_path($input, "\.$id");
@@ -873,10 +873,10 @@ sub exec_cmd {
     print STDERR "  $cmd_str\n";
   }
   if ($ENV{'DKT_INITIAL_WORKDIR'}) {
-    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr $ENV{'DKT_INITIAL_WORKDIR'}") or die;
+    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr $ENV{'DKT_INITIAL_WORKDIR'}") or die "$!";
   }
   else {
-    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr") or die;
+    open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr") or die "$!";
   }
   my $exit_val = system($cmd_str);
   if (0 != $exit_val >> 8) {
@@ -923,7 +923,7 @@ sub append_to_env_file {
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
-  if ($outfile =~ m|^$objdir/$objdir/|) { die; } # likely a double $objdir prepend
+  if ($outfile =~ m|^$objdir/$objdir/|) { die "found double objdir/objdir"; } # likely a double $objdir prepend
   &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DKT_DEPENDS_OUTPUT_FILE");
   my $file_db = {};
   my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'}, '--output');
@@ -981,7 +981,7 @@ sub ctlg_from_so {
   } elsif ($gbl_prefix) {
     $$ctlg_cmd{'cmd'} = "$gbl_prefix/bin/dakota-info";
   } else {
-    die; # should we all just any dakota-info?
+    die "should not call just any dakota-info"; # should we call just any dakota-info?
     $$ctlg_cmd{'cmd'} = 'dakota-info';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};

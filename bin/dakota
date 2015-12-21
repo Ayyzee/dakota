@@ -139,10 +139,11 @@ if (!$$root_cmd{'opts'}{'compile'} &&
     $$root_cmd{'opts'}{'output'} = $output;
   }
 }
-
-if (!defined $$root_cmd{'opts'}{'output'} || 0 == @$argv) {
-  #`dakota --help`;
-  exit 1;
+if (!defined $$root_cmd{'opts'}{'output'}) {
+  die "$0: error: --output is required\n";
+}
+if (0 == @$argv) {
+  die "$0: error: arguments are requried\n";
 }
 if ($$root_cmd{'opts'}{'soname'}) {
   $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
