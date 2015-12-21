@@ -354,7 +354,7 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
     } while (nullptr != (current-info = current-info->next));
   }
   ostream-t ostrm = { stdout, 0 };
-  ostream::println-format(ostrm, "{ 'klasses' : '%" PRIi64 "', 'selectors' : '%" PRIu64 "' 'methods' : '%" PRIi64 "' },\n",
+  ostream::println-format(ostrm, "{ 'klasses' : '%zi', 'selectors' : '%zi' 'methods' : '%zi' },\n",
          klasses-count, gbl-selectors-table.count, methods-count);
   return;
 }
@@ -394,12 +394,12 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
         
         while (nullptr != (method-signature = method-signatures[j])) {
           method-t method-address = method-addresses[j];
-          int64-t defined;
+          uint64-t defined;
           if (nullptr == method-address)
             defined = 0;
           else
             defined = 1;
-          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%" PRIi64 "' },\n",
+          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%" PRIu64 "' },\n",
                                   method-signature->name, method-signature->parameter-types,
                                   method-signature->return-type,
                                   method-signature->name,

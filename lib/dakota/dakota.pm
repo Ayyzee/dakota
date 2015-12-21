@@ -340,26 +340,43 @@ sub loop_cc_from_dk {
   }
 } # loop_cc_from_dk
 
-# libX.so.3.9.4
-# libX.so.3.9
-# libX.so.3
-# libX.so
+# linux:
+#   libX.so.3.9.4
+#   libX.so.3.9
+#   libX.so.3
+#   libX.so
+# darwin:
+#   libX.3.9.4.so
+#   libX.3.9.so
+#   libX.3.so
+#   libX.so
 sub is_so {
   my ($name) = @_;
-  my $result = $name =~ m|^(.*/)?lib([.\w-]+)\.$so_ext(\.\d+)*$|; # so-regex
+  # linux and darwin so-regexs are combined
+  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
+  #my $libname = $2 . ".$so_ext";
   return $result;
 }
 sub lib_path_to_cmd_opts {
   my ($lib) = @_;
 
   my $result = '';
-  if ($lib =~ m|^(.*/)?lib([.\w-]+)\.$so_ext(\.\d+)*$|) { # so-regex
-    if (defined $1) {
-      my $dir = $1;
-      $dir =~ s|(.+)/|$1|;
-      $result .= "-L$dir ";
+  # linux and darwin so-regexs are separate
+  if ($lib =~ m=^(.*/)?(lib([.\w-]+))\.$so_ext((\.\d+)+)?$= ||
+      $lib =~ m=^(.*/)?(lib([.\w-]+))((\.\d+)+)?\.$so_ext$=) { # so-regex
+    my $libdir = $1;
+    my $libname = $2 . ".$so_ext";
+    my $baselibname = $3;
+    if ($libdir) {
+      my $sys_libnames = {
+        "libdl.$so_ext" => 'dl',
+      };
+      if (!exists $$sys_libnames{$libname}) {
+        $libdir = &canon_path($libdir);
+        $result .= "-L$libdir ";
+      }
     }
-    $result .= "-l$2";
+    $result .= "-l$baselibname";
   } else {
     $result = $lib;
   }
@@ -379,6 +396,15 @@ sub split_inputs {
   }
   return ($unchanged, $changed);
 }
+sub for_linker {
+  my ($tkns) = @_;
+  my $result = '';
+  my $for_linker = &dakota::util::var($gbl_compiler, 'CXX_FOR_LINKER_FLAGS', [ '--for-linker' ]);
+  foreach my $tkn (@$tkns) {
+    $result .= " $for_linker " . $tkn;
+  }
+  return $result;
+}
 my $use_lib_opts_replace_lib_path = 1;
 my $root_cmd;
 sub start_cmd {
@@ -395,20 +421,20 @@ sub start_cmd {
     my $extra_cxxflags = &dakota::util::var($gbl_compiler, 'EXTRA_CXXFLAGS', '');
     $$cmd_info{'opts'}{'compiler-flags'} = $cxxflags . ' ' . $extra_cxxflags;
   }
-  my $ld_soname_flags = &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
-
+  my $ld_soname_flags =    &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
+  my $no_undefined_flags = &dakota::util::var_array($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', [ '--no-undefined' ]);
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_exe_type = undef;
   } elsif ($$cmd_info{'opts'}{'shared'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_shared_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
-      $cxx_shared_flags .= " --for-linker --no-undefined";
+      $cxx_shared_flags .= &for_linker([ $ld_soname_flags, $$cmd_info{'opts'}{'soname'} ]);
+      $cxx_shared_flags .= &for_linker($no_undefined_flags);
     }
     $dk_exe_type = 'exe-type::k_lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_dynamic_flags .= " --for-linker $ld_soname_flags --for-linker $$cmd_info{'opts'}{'soname'}";
-      $cxx_shared_flags .= " --for-linker --no-undefined";
+      $cxx_shared_flags .= &for_linker([ $ld_soname_flags, $$cmd_info{'opts'}{'soname'} ]);
+      $cxx_shared_flags .= &for_linker($no_undefined_flags);
     }
     $dk_exe_type = 'exe-type::k_lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}

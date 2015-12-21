@@ -92,7 +92,7 @@ klass string {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%" PRIi64 " }\n",
+    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%zi }\n",
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.ptr, self.len);
     return self;
   }

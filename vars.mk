@@ -16,16 +16,16 @@ hh_ext := hh
 cc_ext := cc
 
 CP := cp
-CPFLAGS := --recursive --preserve=mode,ownership,timestamps
+CPFLAGS ?= --recursive --preserve=mode,ownership,timestamps
 
 RM := rm
-RMFLAGS := --force --recursive
+RMFLAGS ?= --force --recursive
 
 LN := ln
-LNFLAGS := --symbolic
+LNFLAGS ?= --symbolic
 
 MKDIR := mkdir
-MKDIRFLAGS := --parents
+MKDIRFLAGS ?= --parents
 
 $(shell $(MKDIR) $(MKDIRFLAGS) $(objdir))
 
@@ -38,9 +38,9 @@ include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/compiler.mk\
 
 INSTALL := install
 INSTALLFLAGS :=
-INSTALL_MODE_FLAGS := --mode
-INSTALL_OWNER_FLAGS := --owner
-INSTALL_GROUP_FLAGS := --group
+INSTALL_MODE_FLAGS ?=  --mode
+INSTALL_OWNER_FLAGS ?= --owner
+INSTALL_GROUP_FLAGS ?= --group
 
 INSTALL_OWNER := root
 INSTALL_GROUP := staff
@@ -48,17 +48,13 @@ INSTALL_MODE_LIB :=     0644
 INSTALL_MODE_DATA :=    0644
 INSTALL_MODE_PROGRAM := 0755
 
-EXTRA_INSTALLFLAGS := $(INSTALL_OWNER_FLAGS)=$(INSTALL_OWNER) $(INSTALL_GROUP_FLAGS)=$(INSTALL_GROUP)
+EXTRA_INSTALLFLAGS := $(INSTALL_OWNER_FLAGS) $(INSTALL_OWNER) $(INSTALL_GROUP_FLAGS) $(INSTALL_GROUP)
 
 #INSTALL_LIB is for shared libraries only
-INSTALL_LIB  :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)=$(INSTALL_MODE_LIB)
-INSTALL_DATA :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)=$(INSTALL_MODE_DATA)
-INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS)=$(INSTALL_MODE_PROGRAM)
+INSTALL_LIB  :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(INSTALL_MODE_LIB)
+INSTALL_DATA :=    $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(INSTALL_MODE_DATA)
+INSTALL_PROGRAM := $(INSTALL) $(INSTALLFLAGS) $(EXTRA_INSTALLFLAGS) $(INSTALL_MODE_FLAGS) $(INSTALL_MODE_PROGRAM)
 
-# not really ideal, but it works since the target-triplet is a directory that may/may-not be part of a path
-# this really needs to be fixed
-# current us is: /lib/$(target-triplet)/libdl.$(so_ext).2'
-target-triplet ?= .
 so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
 
@@ -68,12 +64,12 @@ EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
 #EXTRA_CXXFLAGS += -MMD -MP
 
 ifdef DKT_PROFILE
-  DAKOTA ?= DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota-profile --define-macro DK_ENABLE_TRACE_MACROS=1 --define-macro $(HOST_OS)
+  DAKOTA ?= DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota-profile --define-macro DK_ENABLE_TRACE_MACROS=1
   # prof uses -p, gprof uses -pg
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= DK_NO_LINE=0 DK_NO_CONVERT_DASH_SYNTAX=0 DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota --define-macro DK_ENABLE_TRACE_MACROS=1 --define-macro $(HOST_OS)
+  DAKOTA ?= DK_NO_LINE=0 DK_NO_CONVERT_DASH_SYNTAX=0 DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota --define-macro DK_ENABLE_TRACE_MACROS=1
   # --keep-going
 endif
 

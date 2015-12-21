@@ -7,9 +7,9 @@ all:
 	CXX=$(CXX) ./generate-compiler-default-argument-promotions.pl
 
 install: all
-	cp compiler-default-argument-promotions.json ../../../lib/dakota
+	$(CP) $(CPFLAGS) compiler-default-argument-promotions.json $(rootdir)/lib/dakota
 
 clean:
-	rm -f type-index
-	rm -f compiler-default-argument-promotions.json
-	rm -fr obj
+	$(RM) $(RMFLAGS) type-index
+	$(RM) $(RMFLAGS) compiler-default-argument-promotions.json
+	$(RM) $(RMFLAGS) obj

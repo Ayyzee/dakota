@@ -83,7 +83,7 @@ klass vector {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { count=%" PRIi64 ", capacity=%" PRIi64 ", elements=[] }\n",
+    fprintf(stderr, "%p:%p { count=%zi, capacity=%zi, elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.count, self.capacity);
     for (object-t element in self)
       $dump(element);
@@ -305,14 +305,14 @@ klass vector {
           break;
       }
     }
-    //       printf("%s(%p, %i): %i/%i\n", __func__, self, index, result, self.count);
+    //       printf("%s(%p, %zi): %zi/%zi\n", __func__, self, index, result, self.count);
     return result;
   }
   static func first-index(object-t self) -> ssize-t {
     ssize-t index = 0;
     ssize-t result = index;
     result = next-index(self, index);
-    //       printf("%s(%p): %i/%i\n", __func__, self, result, self.count);
+    //       printf("%s(%p): %zi/%zi\n", __func__, self, result, self.count);
     return result;
   }
 }

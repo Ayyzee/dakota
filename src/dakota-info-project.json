@@ -9,7 +9,7 @@
       '$(srcdir)/dakota-info-main.$(cc_ext)',
     ],
     'libs' => [ # cmd-line
-      '/lib/$(target-triplet)/libdl.$(so_ext).2',
+      'libdl.$(so_ext)', # darwin: /usr/lib/libdl.dylib
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)',

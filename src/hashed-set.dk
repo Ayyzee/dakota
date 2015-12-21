@@ -187,7 +187,7 @@ klass hashed-set {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { size=%" PRIi64 ", elements=[] }\n",
+    fprintf(stderr, "%p:%p { size=%zi, elements=[] }\n",
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.size);
     for (object-t element in self)
       $dump(element);

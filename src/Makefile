@@ -54,12 +54,15 @@ clean: goal-clean
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 install-dirs:
-	sudo mkdir --parents $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
+	sudo $(MKDIR) $(MKDIRFLAGS) $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
 
-install: install-dirs $(install-files)
-	cd $(DESTDIR)$(prefix)/lib/dakota; \
-	sudo $(RM) $(RMFLAGS) compiler.json; sudo $(LN) $(LNFLAGS) compiler-$(compiler).json  compiler.json; \
-	sudo $(RM) $(RMFLAGS) platform.json; sudo $(LN) $(LNFLAGS) platform-$(platform).json platform.json; \
+$(DESTDIR)$(prefix)/lib/dakota/compiler.json: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler).json
+	cd $(dir $@); sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
+
+$(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json
+	cd $(dir $@); sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
+
+install: install-dirs $(install-files) $(DESTDIR)$(prefix)/lib/dakota/compiler.json $(DESTDIR)$(prefix)/lib/dakota/platform.json
 
 ls-install-files:
 	@for file in $(install-files); do echo $$file; done | sort

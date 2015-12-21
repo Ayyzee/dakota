@@ -436,9 +436,9 @@ klass klass {
       fprintf(stderr, ", superklass=%s", #nullptr);
     }
     // size
-    fprintf(stderr, ", size=%" PRIi64, self.size);
+    fprintf(stderr, ", size=%zi", self.size);
     // offset
-    fprintf(stderr, ", offset=%" PRIi64, self.offset);
+    fprintf(stderr, ", offset=%zi", self.offset);
 
     // traits
     fprintf(stderr, ", traits=["); {
