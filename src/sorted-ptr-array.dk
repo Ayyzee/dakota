@@ -28,12 +28,12 @@ klass std-compare;
 klass sorted-ptr-array {
   slots {
     ptr-t*        elements;
-    int64-t       count;
-    int64-t       capacity;
-    int64-t       size;
+    ssize-t       count;
+    ssize-t       capacity;
+    ssize-t       size;
     std-compare-t compare;
   }
-  func create(int64-t capacity, int64-t size, std-compare-t compare) -> slots-t* {
+  func create(ssize-t capacity, ssize-t size, std-compare-t compare) -> slots-t* {
     assert(0 != capacity);
     assert(0 != size);
     assert(nullptr != compare);
@@ -84,7 +84,7 @@ klass sorted-ptr-array {
     result.offset = i;
     return result;
   }
-  func add-at(slots-t* t, const void* key, int64-t offset) -> slots-t* {
+  func add-at(slots-t* t, const void* key, ssize-t offset) -> slots-t* {
     assert(nullptr != key);
     assert(offset <= t->count);
 
@@ -95,7 +95,7 @@ klass sorted-ptr-array {
     t->count++;
     return t;
   }
-  func at(slots-t* t, int64-t offset) -> const void* {
+  func at(slots-t* t, ssize-t offset) -> const void* {
     assert(offset < t->count);
     assert(0 < t->count);
 
@@ -103,7 +103,7 @@ klass sorted-ptr-array {
     return element;
   }
   // key not required
-  func remove-at(slots-t* t, const void* key, int64-t offset) -> const void* {
+  func remove-at(slots-t* t, const void* key, ssize-t offset) -> const void* {
     assert(offset < t->count);
     assert(0 < t->count);
 
