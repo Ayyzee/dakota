@@ -1,6 +1,6 @@
-// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-                                                                                                                           
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+// Copyright (C) 2007-2015 Robert Nielsen <robert@dakota.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -188,14 +188,6 @@ FUNC main(int argc, char** argv, char**) -> int {
       unsetenv("DKT_NO_INIT_RUNTIME");
       unsetenv("DKT_EXIT_BEFORE_MAIN");
       setenv("DKT_INFO_ARG_TYPE", "lib", overwrite = 1); // not currently used
-      // fprintf(stderr, "1 ARG=%s\n", arg);
-      // if (nullptr == strchr(arg, '/')) { // not required on darwin (required on linux)
-      //   char arg_path[MAXPATHLEN] = "";
-      //   strcat(arg_path, "./");
-      //   strcat(arg_path, arg);
-      //   arg = arg_path;
-      // }
-      // fprintf(stderr, "2 ARG=%s\n", arg);
       void* handle = dlopen(arg, RTLD_NOW | RTLD_LOCAL);
       if ((nullptr == handle) || (0 != dlclose(handle)))
         abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
