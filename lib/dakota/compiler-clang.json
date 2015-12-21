@@ -29,6 +29,7 @@
       '--warn-no-multichar',
       '--warn-no-old-style-cast',
       '--warn-no-padded',
+      '--warn-no-unknown-warning-option',
       ],
   'LD_NO_UNDEFINED_FLAGS' => [ '--no-undefined' ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
