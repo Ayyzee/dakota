@@ -227,7 +227,7 @@ sub rand_str {
   return $str;
 }
 sub is_debug {
-  return 1;
+  return 0;
 }
 sub is_symbol_candidate {
   my ($str) = @_;

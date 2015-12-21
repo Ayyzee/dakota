@@ -79,6 +79,7 @@ my $root_cmd = { 'reps' => [],
             'output=s',             # gcc-like
             'precompile',           # gcc-ish (--compile)
             'shared',               # gcc-like
+            'silent',               #
             'soname=s',             # ld-like (-soname <>)
             'var=s',                # for env vars like MAKEFLAGS, etc.
            #'compiler-flags=s',     # similiar to env vars CXXFLAGS & EXTRA_CXXFLAGS

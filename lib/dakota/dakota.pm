@@ -648,6 +648,9 @@ sub loop_o_from_dk {
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if ($arg =~ m|\.dk$| ||
         $arg =~ m|\.ctlg(\.\d+)*$|) {
+      if (! $$cmd_info{'opts'}{'silent'}) {
+        print $arg . "\n";
+      }
       my $cc_path = &nrt_cc_path_from_dk_path($arg);
       my $o_path = &nrt_o_path_from_dk_path($arg);
       if ($ENV{'DKT_PRECOMPILE'}) {
@@ -807,7 +810,7 @@ sub so_from_o {
   }
   &library_names_add_first($so_cmd);
   my $should_echo;
-  &outfile_from_infiles($so_cmd, $should_echo = 1);
+  &outfile_from_infiles($so_cmd, $should_echo = 0);
 }
 sub dso_from_o {
   my ($cmd_info) = @_;
@@ -825,7 +828,7 @@ sub dso_from_o {
   }
   &library_names_add_first($so_cmd);
   my $should_echo;
-  &outfile_from_infiles($so_cmd, $should_echo = 1);
+  &outfile_from_infiles($so_cmd, $should_echo = 0);
 }
 sub exe_from_o {
   my ($cmd_info) = @_;
@@ -843,7 +846,7 @@ sub exe_from_o {
   }
   &library_names_add_first($exe_cmd);
   my $should_echo;
-  &outfile_from_infiles($exe_cmd, $should_echo = 1);
+  &outfile_from_infiles($exe_cmd, $should_echo = 0);
 }
 sub dir_part {
   my ($path) = @_;
@@ -974,6 +977,9 @@ sub outfile_from_infiles {
 }
 sub ctlg_from_so {
   my ($cmd_info) = @_;
+  if (! $$cmd_info{'opts'}{'silent'}) {
+    print join("\n", @{$$cmd_info{'inputs'}}) . "\n";
+  }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
 
   if ($ENV{'DAKOTA_INFO'}) {
@@ -1001,7 +1007,7 @@ sub ctlg_from_so {
   }
   #print &Dumper($cmd_info);
   my $should_echo;
-  &outfile_from_infiles($ctlg_cmd, $should_echo = 1);
+  &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
 }
 sub ordered_set_add {
   my ($ordered_set, $element, $file, $line) = @_;
