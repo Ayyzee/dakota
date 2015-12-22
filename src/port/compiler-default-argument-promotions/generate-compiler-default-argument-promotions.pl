@@ -103,11 +103,13 @@ my $implementation_defined_signedness = {
   'wchar::slots-t'   => 1,
 };
 my $o_exts = {
+  'gcc' =>     'o',
   'g++' =>     'o',
+  'clang' =>   'bc',
   'clang++' => 'bc',
 };
 my $compiler = $ARGV[0];
-my $base_compiler = $compiler =~ s/(\.\d+)+$//r;
+my $base_compiler = $compiler =~ s/-\d+(\.\d+)+$//r;
 my $o_ext = $$o_exts{$base_compiler};
 
 `$compiler -std=c++11 --output type-index type-index-main.cc`;
