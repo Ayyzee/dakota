@@ -423,7 +423,11 @@ sub copy_no_dups {
   my $str_set = {};
   my $result = [];
   foreach my $str (@$strs) {
-    $str = &relpath($str);
+    if (&is_abs($str)) {
+      $str = &canon_path($str);
+    } else {
+      $str = &relpath($str);
+    }
     if (!$$str_set{$str}) {
       push @$result, $str;
       $$str_set{$str} = 1;
@@ -433,9 +437,13 @@ sub copy_no_dups {
   }
   return $result;
 }
+sub is_abs {
+  my ($path) = @_;
+  my $result = File::Spec->file_name_is_absolute($path);
+  return $result;
+}
 sub realpath {
   my ($path) = @_; # base is optional
-  #$path = &canonpath($path);
   my $result = Cwd::realpath($path);
   return $result;
 }
