@@ -23,6 +23,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  all\
  check\
  clean\
+ distclean\
  goal-clean\
  install\
  install-dirs\
@@ -52,6 +53,9 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(libdakota-util.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
+
+distclean: clean
+	cd $(rootdir); ./configure-common
 
 install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
 
