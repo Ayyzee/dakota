@@ -1,6 +1,10 @@
 #!/bin/bash
 set -o nounset -o errexit -o pipefail
-source common.sh
+
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+
+source $DIR/common.sh
 
 rm -f config.mk
 rm -f config.sh
@@ -16,19 +20,19 @@ fi
 sysname=$1
 compiler=$2
 
-source config-$sysname.sh
+source $DIR/config-$sysname.sh
 
-$LN $LNFLAGS config-$sysname.mk config.mk
-$LN $LNFLAGS config-$sysname.sh config.sh
+$LN $LNFLAGS $DIR/config-$sysname.mk config.mk
+$LN $LNFLAGS $DIR/config-$sysname.sh config.sh
 
 pushd src > /dev/null 2>&1
-$LN $LNFLAGS config-$sysname.hh config.hh
+$LN $LNFLAGS $DIR/src/config-$sysname.hh config.hh
 popd > /dev/null 2>&1
 
 pushd lib/dakota > /dev/null 2>&1
-$LN $LNFLAGS platform-$sysname.json  platform.json
-$LN $LNFLAGS compiler-$compiler.json compiler.json
+$LN $LNFLAGS $DIR/lib/dakota/platform-$sysname.json  platform.json
+$LN $LNFLAGS $DIR/lib/dakota/compiler-$compiler.json compiler.json
 popd > /dev/null 2>&1
 
-make --no-print-directory --directory src/port/compiler-default-argument-promotions install
-make --no-print-directory --directory src/port/compiler-default-argument-promotions clean
+make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions install
+make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions clean

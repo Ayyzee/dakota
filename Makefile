@@ -1,12 +1,14 @@
 SHELL := /bin/bash -o errexit -o nounset -o pipefail
 
-rootdir := .
+rootdir ?= .
 include $(rootdir)/makeflags.mk
 
 .PHONY: \
  all \
  check \
  clean \
+ dist \
+ distclean \
  install \
  precompile \
  uninstall \
@@ -14,7 +16,9 @@ include $(rootdir)/makeflags.mk
 all \
 check \
 clean \
+dist \
+distclean \
 install \
 precompile \
 uninstall:
-	$(MAKE) -$(MAKEFLAGS) --directory src $@
+	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/src $@

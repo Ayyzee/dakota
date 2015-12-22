@@ -1,7 +1,10 @@
 #!/bin/bash
 set -o nounset -o errexit -o pipefail
 
-source common.sh
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+
+source $DIR/common.sh
 
 sysname=$(platform)
 compiler=$(compiler)
@@ -17,7 +20,7 @@ if [[ -z "${compiler-}" ]]; then
 fi
 
 if (( ! $e )); then
-  cmd="./configure-common $sysname $compiler"
+  cmd="$DIR/configure-common $sysname $compiler"
   echo $cmd
   exec $cmd
 else
