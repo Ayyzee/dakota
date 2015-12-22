@@ -17,8 +17,10 @@ all \
 check \
 clean \
 dist \
-distclean \
 install \
 precompile \
 uninstall:
 	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/src $@
+
+distclean: clean
+	cd $(rootdir); ./configure-common
