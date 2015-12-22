@@ -56,7 +56,7 @@ clean: goal-clean
 install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
 
 $(install-dirs):
-	sudo mkdir --parents $@
+	sudo $(MKDIR) $(MKDIRFLAGS) $@
 
 $(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);

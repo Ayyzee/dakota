@@ -22,7 +22,7 @@ RM := rm
 RMFLAGS ?= --force --recursive
 
 LN := ln
-LNFLAGS := --symbolic --force
+LNFLAGS ?= --symbolic --force
 
 MKDIR := mkdir
 MKDIRFLAGS ?= --parents
