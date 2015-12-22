@@ -106,7 +106,7 @@ my $o_exts = {
   'g++' =>     'o',
   'clang++' => 'bc',
 };
-my $compiler = $ENV{'CXX'};
+my $compiler = $ARGV[0];
 my $base_compiler = $compiler =~ s/(\.\d+)+$//r;
 my $o_ext = $$o_exts{$base_compiler};
 

@@ -4,7 +4,7 @@ include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
 all:
-	CXX=$(CXX) ./generate-compiler-default-argument-promotions.pl
+	./generate-compiler-default-argument-promotions.pl $(CXX)
 
 install: all
 	$(CP) $(CPFLAGS) compiler-default-argument-promotions.json $(rootdir)/lib/dakota
