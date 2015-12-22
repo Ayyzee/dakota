@@ -68,10 +68,10 @@ my $patterns = {
   'ctlg_path_from_any_path' =>  '$(objdir)/%.ctlg          : %',
   'ctlg_path_from_so_path' =>   '$(objdir)/%.ctlg          : %.$(so_ext)',
 
-  'rep_path_from_any_path' =>   '$(objdir)/%.rep           : %',
-  'rep_path_from_ctlg_path' =>  '$(objdir)/%.$(so_ext).rep : $(objdir)/%.ctlg',
+  'json_path_from_any_path' =>   '$(objdir)/%.json           : %',
+  'json_path_from_ctlg_path' =>  '$(objdir)/%.$(so_ext).json : $(objdir)/%.ctlg',
 
-  'rep_path_from_so_path' =>    '$(objdir)/%.rep           : %.$(so_ext)',
+  'json_path_from_so_path' =>    '$(objdir)/%.json          : %.$(so_ext)',
   'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)  : %',
   'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)  : %.$(so_ext)',
 };
@@ -134,9 +134,9 @@ our @EXPORT= qw(
                  nrt_cc_path_from_dk_path
                  nrt_o_path_from_dk_path
                  o_path_from_cc_path
-                 rep_path_from_any_path
-                 rep_path_from_ctlg_path
-                 rep_path_from_so_path
+                 json_path_from_any_path
+                 json_path_from_ctlg_path
+                 json_path_from_so_path
                  rt_cc_path_from_any_path
                  rt_cc_path_from_so_path
                  str_from_cmd_info
@@ -416,9 +416,9 @@ sub o_path_from_cc_path {
   my ($path) = @_;
   return &out_path_from_in_path('o_path_from_cc_path', $path);
 }
-sub rep_path_from_any_path {
+sub json_path_from_any_path {
   my ($path) = @_;
-  return &out_path_from_in_path('rep_path_from_any_path', $path);
+  return &out_path_from_in_path('json_path_from_any_path', $path);
 }
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
@@ -430,20 +430,20 @@ sub ctlg_path_from_so_path {
   }
   return $out_path;
 }
-sub rep_path_from_ctlg_path {
+sub json_path_from_ctlg_path {
   my ($in_path) = @_;
   $in_path =~ s/\.ctlg((\.\d+)+)$/.ctlg/;
   my $vers = $1;
-  my $out_path = &out_path_from_in_path('rep_path_from_ctlg_path', $in_path);
+  my $out_path = &out_path_from_in_path('json_path_from_ctlg_path', $in_path);
   if (defined $vers) {
-    $out_path =~ s/\.$so_ext\.rep$/.$so_ext$vers.rep/;
+    $out_path =~ s/\.$so_ext\.json$/.$so_ext$vers.json/;
   }
   return $out_path;
 }
-sub rep_path_from_so_path {
+sub json_path_from_so_path {
   my ($path) = @_;
   #
-  return &out_path_from_in_path('rep_path_from_so_path', $path);
+  return &out_path_from_in_path('json_path_from_so_path', $path);
 }
 sub rt_cc_path_from_any_path {
   my ($path) = @_;
