@@ -166,17 +166,23 @@ my $str;
 $str = &Dumper($result_tbl);
 #$str =~ s/\{[\s\n]*"/\{ "/gs;
 $str =~ s/1[\s\n]*\}/1 \}/gs;
+{
 my $fn = "compiler-default-argument-promotions.json";
 open(my $fh, '>', $fn) or die "Could not open file '$fn' $!";
 print $fh $str;
 close($fh);
+}
 #print "# result written to $fn\n";
 #$str = &Dumper($unpromoted);
 #print "# NOT promoted:\n";
 #print $str;
 
+{
 my $num_unpromoted = scalar keys %$unpromoted;
 my $num_promoted =   scalar keys %$result_tbl;
-
-print "promoted:   $num_promoted/$num_tested\n";
-print "unpromoted: $num_unpromoted/$num_tested\n";
+my $fn = "summary.txt";
+open(my $fh, '>', $fn) or die "Could not open file '$fn' $!";
+print $fh "promoted:   $num_promoted/$num_tested\n";
+print $fh "unpromoted: $num_unpromoted/$num_tested\n";
+close($fh);
+}
