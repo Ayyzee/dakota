@@ -72,11 +72,6 @@ install-links := $(DESTDIR)$(prefix)/lib/dakota/platform.json $(DESTDIR)$(prefix
 
 install: $(install-dirs) $(install-files) $(install-links)
 
-ls-install-files:
-	@for file in $(install-files); do echo $$file; done | sort
-	@echo '-> $(DESTDIR)$(prefix)/lib/dakota/compiler.json'
-	@echo '-> $(DESTDIR)$(prefix)/lib/dakota/platform.json'
-
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
