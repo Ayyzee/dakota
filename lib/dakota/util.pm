@@ -92,6 +92,7 @@ our @EXPORT= qw(
                  var
                  var_array
               );
+use Cwd;
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
 
@@ -422,6 +423,7 @@ sub copy_no_dups {
   my $str_set = {};
   my $result = [];
   foreach my $str (@$strs) {
+    $str = &relpath($str);
     if (!$$str_set{$str}) {
       push @$result, $str;
       $$str_set{$str} = 1;
@@ -429,6 +431,26 @@ sub copy_no_dups {
       #printf "$0: warning: removing duplicate $str\n";
     }
   }
+  return $result;
+}
+sub realpath {
+  my ($path) = @_; # base is optional
+  #$path = &canonpath($path);
+  my $result = Cwd::realpath($path);
+  return $result;
+}
+sub relpath {
+  my ($path, $base) = @_; # base is optional
+  $path = &realpath($path);
+  if ($base) {
+    $base = &realpath($base);
+  }
+  my $result = File::Spec->abs2rel($path, $base); # base is optional
+  return $result;
+}
+sub canonpath {
+  my ($path) = @_;
+  my $result = File::Spec->canonpath($path);
   return $result;
 }
 sub canon_path {

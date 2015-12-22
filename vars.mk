@@ -5,8 +5,8 @@ DESTDIR ?=
 rootdir ?= .
 include $(rootdir)/makeflags.mk
 
-srcdir ?= .
-blddir := .
+srcdir ?= $(rootdir)/src
+blddir := $(srcdir)
 objdir ?= $(blddir)/obj
 objdir-name := $(notdir $(objdir))
 
