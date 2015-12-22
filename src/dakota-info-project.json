@@ -6,7 +6,7 @@
 # -*- cperl-tab-always-indent: t -*-
 { 'dakota-info' => {
     'srcs' => [ # cmd-line
-      '$(srcdir)/dakota-info-main.$(cc_ext)',
+      '$(srcdir)/dakota-info.$(cc_ext)',
     ],
     'libs' => [ # cmd-line
       'libdl.$(so_ext)', # darwin: /usr/lib/libdl.dylib

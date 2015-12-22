@@ -1,14 +1,14 @@
 $(blddir)/%.tbl: $(srcdir)/%.pl
 	./$< > $@
 
-$(blddir)/../bin/%: $(srcdir)/%-main.cc
+$(blddir)/../bin/%: $(srcdir)/%.cc
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
-$(blddir)/%: $(srcdir)/%-main.cc
+$(blddir)/%: $(srcdir)/%.cc
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $^
 
-$(blddir)/../bin/%: $(srcdir)/%-main.dk
+$(blddir)/../bin/%: $(srcdir)/%.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs:%=--library-name %) $(srcs)
-$(blddir)/%: $(srcdir)/%-main.dk
+$(blddir)/%: $(srcdir)/%.dk
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) --output $@ $^
 
 $(blddir)/../lib/%.$(so_ext):
