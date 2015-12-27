@@ -65,21 +65,21 @@ klass symbol {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n",
-            cast(ptr-t)(self), cast(ptr-t)unbox(self), $utf8-from(self));
+            cast(ptr-t)(self), cast(ptr-t)unbox(self), $str(self));
     return self;
   }
   method hash(slots-t s) -> hash-t {
     hash-t result = dk-hash(s);
     return result;
   }
-  method utf8-from(object-t self) -> str-t {
-    str-t utf8 = unbox(self);
-    return utf8;
+  method str(object-t self) -> str-t {
+    str-t str = unbox(self);
+    return str;
   }
   method write-lite(object-t self, object-t out) -> object-t {
-    str-t utf8 = $utf8-from(self);
+    str-t str = $str(self);
     $write(out, "\"");
-    $write(out, utf8);
+    $write(out, str);
     $write(out, "\"");
     return self;
   }

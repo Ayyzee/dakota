@@ -26,7 +26,7 @@ klass tokenid {
     unbox(self) = slots;
     return self;
   }
-  method str-from(slots-t s, char8-t* str, int64-t len) -> str-t {
+  method str(slots-t s, char8-t* str, ssize-t len) -> str-t {
     //# if LITTLE-ENDIAN
     if (128 > s) {
       assert(1 <= len);

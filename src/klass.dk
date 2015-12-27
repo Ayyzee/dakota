@@ -746,7 +746,7 @@ klass klass {
     }
     return nullptr;
   }
-  method utf8-from(object-t self) -> str-t {
+  method str(object-t self) -> str-t {
     symbol-t name = self.name;
     ssize-t name-len = cast(ssize-t)safe-strlen(name);
     char8-t* buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (name-len + (1)));

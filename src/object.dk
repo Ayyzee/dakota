@@ -130,7 +130,7 @@ klass object {
 
     return self;
   }
-  method utf8-from(object-t self) -> str-t {
+  method str(object-t self) -> str-t {
     ssize-t len = 2 + PRIxPTR-WIDTH + (1);
     char8-t* buffer = cast(char8-t*)dkt::alloc(len);
     snprintf(buffer, cast(size-t)len, "%p", cast(ptr-t)self);
@@ -139,8 +139,8 @@ klass object {
   method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-output;
-    str-t utf8 = $utf8-from(self);
-    $print(out, utf8);
+    str-t str = $str(self);
+    $print(out, str);
     return self;
   }
   method println(object-t self, object-t out) -> object-t {

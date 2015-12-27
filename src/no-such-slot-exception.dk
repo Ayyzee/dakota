@@ -61,7 +61,7 @@ klass no-such-slot-exception {
                     ", \"klass\": \"%s\""
                     ", \"method\": \"%s(%s)\""
                     ", \"slot-name\": \"#%s\"",
-                    $utf8-from(self.object),
+                    $str(self.object),
                     name-of(klass-of(self.object)),
                     self.signature->name, self.signature->parameter-types,
                     self.name);

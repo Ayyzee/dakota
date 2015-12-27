@@ -64,7 +64,7 @@ klass token {
 # if 0
     if (0 != tokenid) {
       char8-t[4 + (1)] tokenid-str = "";
-      tokenid::utf8-from(tokenid, tokenid-str, sizeof(tokenid-str));
+      tokenid::str(tokenid, tokenid-str, sizeof(tokenid-str));
 
       printf("{ 'line':'%i', 'column':'%i', 'tokenid':'%s', 'buffer':'%s' },\n",
              line, column, tokenid-str, buffer);
@@ -156,7 +156,7 @@ klass token {
     return result;
   }
   // this should be merged with buffer - this is a hackhack
-  method utf8-from(object-t self) -> str-t {
+  method str(object-t self) -> str-t {
     str-t buffer = $buffer(self);
     return buffer;
   }
@@ -195,7 +195,7 @@ klass token {
   method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-output;
-    $print(out, $utf8-from(self));
+    $print(out, $str(self));
     return self;
   }
   // should be in superklass string??

@@ -55,7 +55,7 @@ klass no-such-method-exception {
                          name-of(self.kls));
       } else {
         $print-format(out, ", \"instance\": %s, klass: '%s'",
-                         $utf8-from(self.object),
+                         $str(self.object),
                          name-of(self.kls));
       }
     } else {
@@ -71,7 +71,7 @@ klass no-such-method-exception {
                            self.signature->parameter-types);
         } else {
           $print-format(out, ", \"instance\": %s, \"klass\": \"%s\", \"method\": \"%s(%s)\"",
-                           $utf8-from(self.object),
+                           $str(self.object),
                            name-of(self.kls),
                            self.signature->name,
                            self.signature->parameter-types);
@@ -85,7 +85,7 @@ klass no-such-method-exception {
                            self.signature->parameter-types);
         } else {
           $print-format(out, ", \"instance\": %s, \"klass\": \"%s\". \"method\": \"%s(%s)\"",
-                           $utf8-from(self.object),
+                           $str(self.object),
                            name-of(self.kls),
                            self.signature->name,
                            self.signature->parameter-types);

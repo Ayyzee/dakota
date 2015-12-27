@@ -74,9 +74,9 @@ klass string {
     return result;
   }
   method write-lite(object-t self, object-t out) -> object-t {
-    str-t utf8 = $utf8-from(self);
+    str-t str = $str(self);
     $write(out, "\"");
-    $write(out, utf8);
+    $write(out, str);
     $write(out, "\"");
     return self;
   }
@@ -124,7 +124,7 @@ klass string {
     strcat(self.ptr, bytes);
     return self;
   }
-  method utf8-from(object-t self) -> str-t {
+  method str(object-t self) -> str-t {
     return self.ptr;
   }
   // returns an vector of string objects
@@ -168,11 +168,11 @@ klass string {
   }
   method append-sequence(object-t self, object-t sequence) -> object-t {
     for (object-t element in sequence) {
-      str-t utf8 = $utf8-from(element);
-      int64-t length = cast(int64-t)safe-strlen(utf8);
+      str-t str = $str(element);
+      int64-t length = cast(int64-t)safe-strlen(str);
       self.len += cast(int64-t)(length);
       self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * ssizeof(char8-t)), self.ptr);
-      strcat(self.ptr, utf8);
+      strcat(self.ptr, str);
     }
     return self;
   }
@@ -181,8 +181,8 @@ klass string {
     int-t result;
 
     if ($instance?(other, klass)) {
-      // what if both utf8s are nullptr?
-      // what if only one utf8 is nullptr?
+      // what if both strs are nullptr?
+      // what if only one str is nullptr?
       slots-t& s1 = unbox(self);
       slots-t& s2 = unbox(other);
       result = safe-strcmp(s1.ptr, s2.ptr);
@@ -196,7 +196,7 @@ klass string {
   method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-output;
-    $print(out, $utf8-from(self));
+    $print(out, $str(self));
     return self;
   }
 }

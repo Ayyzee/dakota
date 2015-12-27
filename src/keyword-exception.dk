@@ -44,10 +44,10 @@ klass keyword-exception {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "\"%s\": {", $utf8-from(self));
+    fprintf(stderr, "\"%s\": {", $str(self));
     fprintf(stderr, " \"object\": [ %p, \"%s\" ]",
             cast(ptr-t)self.object,
-            $utf8-from(self.object));
+            $str(self.object));
     fprintf(stderr, ", \"signature\": [ %p, \"%s(%s)\" ]",
             cast(ptr-t)self.signature,
             self.signature->name,
@@ -68,7 +68,7 @@ klass keyword-exception {
     // if ($instance?(self.object, klass::klass)) {
     //   $print-format(out, ", \"instance\": \"%s\"", name-of(self.object));
     // } else {
-    //   $print-format(out, ", \"instance\": \"%s\"", $utf8-from(self.object));
+    //   $print-format(out, ", \"instance\": \"%s\"", $str(self.object));
     // }
     $print-format(out,
                   ", \"keyword\": \"#%s\""

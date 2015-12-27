@@ -79,8 +79,8 @@ klass str {
     if ($instance?(other, klass)) {
       assert($instance?(klass-of(self), str-klass::klass));
       str-klass::slots-t& ks = str-klass::unbox(klass-of(self));
-      // what if both utf8s are nullptr?
-      // what if only one utf8 is nullptr?
+      // what if both strs are nullptr?
+      // what if only one str is nullptr?
       slots-t s1 = unbox(self);
       slots-t s2 = unbox(other);
       result = ks.strcmp(s1, s2);

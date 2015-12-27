@@ -74,7 +74,7 @@ klass object-output-stream {
         self.id++;
       }
       $remove(self.object-from-id, id); // remove if present
-      $write-sequence-start(self, $utf8-from(id));
+      $write-sequence-start(self, $str(id));
 //       object-t object-klass = klass-of(object);
 //       $write-element(self, $name(object-klass), "-klass");
 
@@ -101,7 +101,7 @@ klass object-output-stream {
     $add(self.object-from-id, id, object);
 
     $write-table-start(self, key);
-    $write-element(self, $utf8-from(id), "idref");
+    $write-element(self, $str(id), "idref");
     $write-table-end(self);
 
     return self;
