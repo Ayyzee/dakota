@@ -112,8 +112,7 @@ my $root_cmd = { 'reps' => [],
 # --help
 # --verbose
 
-my $argv = [map { &canon_path($_) } @ARGV];
-$argv = &copy_no_dups($argv);
+my $argv = &clean_paths(\@ARGV);
 
 if (0 == @$argv) {
   die "$0: error: arguments are requried\n";
@@ -168,11 +167,13 @@ if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
     &add_last($$root_cmd{'inputs'}, $libdakota);
   }
 }
-my $inputs = [map { &canon_path($_) } @{$$root_cmd{'inputs'}}];
-$inputs = &copy_no_dups($inputs);
-$$root_cmd{'inputs'} = $inputs;
-
 $ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
+
+&clean_paths($root_cmd, 'inputs');
+&clean_paths($root_cmd, 'include-directory');
+&clean_paths($root_cmd, 'library-directory');
+&clean_paths($root_cmd, 'library');
+&clean_paths($root_cmd, 'define-macro');
 
 my $gcc_from_dakota = {
   '--include-directory' => '--include-directory', # yep, the same

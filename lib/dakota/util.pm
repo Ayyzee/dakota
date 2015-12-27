@@ -51,7 +51,7 @@ our @EXPORT= qw(
                  add_last
                  ann
                  canon_path
-                 copy_no_dups
+                 clean_paths
                  cpp_directives
                  decode_comments
                  decode_strings
@@ -417,6 +417,24 @@ sub flatten {
     my ($a_of_a) = @_;
     my $a = [map {@$_} @$a_of_a];
     return $a;
+}
+sub clean_paths {
+  my ($in, $key) = @_;
+  if ($key && !$$in{$key}) {
+    return undef;
+  }
+  my $elements_in = $in;
+  if ($key) {
+    $elements_in = $$in{$key};
+  }
+  print STDERR "IN: " . &Dumper($elements_in);
+  my $elements = [map { &canon_path($_) } @$elements_in];
+  $elements = &copy_no_dups($elements);
+  if ($key) {
+    $$in{$key} = $elements;
+  }
+  print STDERR "OUT: " . &Dumper($elements);
+  return $elements;
 }
 sub copy_no_dups {
   my ($strs) = @_;
