@@ -76,7 +76,7 @@ my $root_cmd = { 'reps' => [],
                  'opts' => { 'directory' => [],
                              'include-directory' => [ "$gbl_prefix/include" ],
                              'library-directory' => [],
-                             'library-name' => [],
+                             'library' => [],
                              'define-macro' => [],
                              'var' => {} } };
 
@@ -88,7 +88,7 @@ my $root_cmd = { 'reps' => [],
             'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
-            'library-name=s',       # --library-name libdl.so equivalent to -ldl
+            'library=s',            # --library libdl.so equivalent to -ldl (or better -l:libdl.so on linux)
             'nodefaultlibs',        # gcc-like
             'output=s',             # gcc-like
             'precompile',           # gcc-ish (--compile)

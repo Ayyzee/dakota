@@ -368,7 +368,7 @@ sub gcc_library_from_library_name {
     return "-l$library_name_base"; # hardhard: hardcoded use of -l (both gcc/clang use it)
   } else {
     print STDERR  "warning: $library_name does not look like a library name.\n";
-    return "--library-name $library_name";
+    return "--library $library_name";
   }
 }
 sub cmd_opts_from_library_name {
@@ -786,8 +786,8 @@ sub gcc_libraries_str {
 # but after all cmd-flags
 sub library_names_add_first {
   my ($cmd_info) = @_;
-  if ($$cmd_info{'opts'}{'library-name'} && 0 < scalar @{$$cmd_info{'opts'}{'library-name'}}) {
-    my $gcc_libraries_str = &gcc_libraries_str($$cmd_info{'opts'}{'library-name'});
+  if ($$cmd_info{'opts'}{'library'} && 0 < scalar @{$$cmd_info{'opts'}{'library'}}) {
+    my $gcc_libraries_str = &gcc_libraries_str($$cmd_info{'opts'}{'library'});
     if (!defined $$cmd_info{'cmd-flags'}) {
       $$cmd_info{'cmd-flags'} = $gcc_libraries_str;
     } else {
