@@ -31,14 +31,12 @@ klass syntax-exception {
     str-t    msg;
   }
   method init(object-t self,
-              str-t    src-time :,
-              str-t    src-date :,
               str-t    src-file :,
               int-t    src-line :,
               object-t token :,
               str-t    file :,
               str-t    msg :  name-of(klass-of(self))) -> object-t {
-    self = $init(super, #src-time : src-time, #src-date : src-date, #src-file : src-file, #src-line : src-line);
+    self = $init(super, #src-file : src-file, #src-line : src-line);
     self.token = token;
     self.file =  file;
     self.msg =   msg;
