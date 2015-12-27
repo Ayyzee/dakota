@@ -427,13 +427,11 @@ sub clean_paths {
   if ($key) {
     $elements_in = $$in{$key};
   }
-  print STDERR "IN: " . &Dumper($elements_in);
   my $elements = [map { &canon_path($_) } @$elements_in];
   $elements = &copy_no_dups($elements);
   if ($key) {
     $$in{$key} = $elements;
   }
-  print STDERR "OUT: " . &Dumper($elements);
   return $elements;
 }
 sub copy_no_dups {
