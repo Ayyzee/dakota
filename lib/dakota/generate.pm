@@ -37,8 +37,6 @@ my $gbl_prefix;
 my $gbl_compiler;
 my $gbl_compiler_default_argument_promotions;
 my $objdir;
-my $dkhh_ext;
-my $dkcc_ext;
 my $hh_ext;
 my $cc_ext;
 
@@ -69,8 +67,6 @@ BEGIN {
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
-  $dkhh_ext = &dakota::util::var($gbl_compiler, 'dkhh_ext', undef);
-  $dkcc_ext = &dakota::util::var($gbl_compiler, 'dkcc_ext', undef);
 };
 my $use_new_macro_system = 0;
 
@@ -146,7 +142,7 @@ sub set_nrt_decl {
   $gbl_nrt_file = &canon_path("$name.dk");
   $global_is_rt   = 0;
   $global_is_defn = 0;
-  $global_suffix = 'hh';
+  $global_suffix = $hh_ext;
 }
 sub set_nrt_defn {
   my ($path) = @_;
@@ -154,21 +150,21 @@ sub set_nrt_defn {
   $gbl_nrt_file = &canon_path("$name.dk");
   $global_is_rt   = 0;
   $global_is_defn = 1;
-  $global_suffix = 'cc';
+  $global_suffix = $cc_ext;
 }
 sub set_rt_decl {
   my ($path) = @_;
   $gbl_nrt_file = undef;
   $global_is_rt   = 1;
   $global_is_defn = 0;
-  $global_suffix = 'hh';
+  $global_suffix = $hh_ext;
 }
 sub set_rt_defn {
   my ($path) = @_;
   $gbl_nrt_file = undef;
   $global_is_rt   = 1;
   $global_is_defn = 1;
-  $global_suffix = 'cc';
+  $global_suffix = $cc_ext;
 }
 sub suffix {
   return $global_suffix
