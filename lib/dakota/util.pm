@@ -361,7 +361,17 @@ sub sqstr_regex {
 my $build_vars = {
   'objdir' => 'obj',
 };
-sub objdir { return $$build_vars{'objdir'}; }
+sub objdir {
+  my $objdir = $ENV{'OBJDIR'};
+  $objdir = $$build_vars{'objdir'} if ! $objdir;
+  if (-e $objdir && ! -d $objdir) {
+    die;
+  }
+  if (! -e $objdir) {
+    mkdir $objdir; # or try make_path in File::Path
+  }
+ return $objdir;
+}
 
 # 1. cmd line
 # 2. environment

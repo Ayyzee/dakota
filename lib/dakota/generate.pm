@@ -4261,7 +4261,6 @@ sub dk_generate_cc {
   my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
   my $output = "$path_name.$cc_ext";
   $output =~ s|^\./||;
-  my $directory = $ENV{'DKT_DIR'} ||= '.';
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output
   }

@@ -313,7 +313,6 @@ sub loop_cc_from_dk {
     my $file = &dakota::generate::dk_parse("$name.dk");
     #print STDERR "$name.dk\n";
     #print STDERR &Dumper($$file{'klasses'});
-    my $directory = '.';
     my ($cc_path, $cc_name);
     my $output_nrt_cc;
 
@@ -324,7 +323,7 @@ sub loop_cc_from_dk {
         $output_nrt_cc = "$name.$cc_ext";
       }
       my $output_cc = &cc_path_from_nrt_cc_path($output_nrt_cc);
-      ($cc_path, $cc_name) = &split_path("$directory/$output_cc", "\.$cc_ext");
+      ($cc_path, $cc_name) = &split_path($output_cc, "\.$cc_ext");
     }
     &dakota::generate::empty_klass_defns();
     &dakota::generate::dk_generate_cc($name, "$cc_path/$cc_name");
