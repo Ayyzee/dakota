@@ -105,15 +105,15 @@ my $implementation_defined_signedness = {
 my $o_exts = {
   'gcc' =>     'o',
   'g++' =>     'o',
-  'clang' =>   'bc',
-  'clang++' => 'bc',
+  'clang' =>   'o', # could be 'bc'
+  'clang++' => 'o', # could be 'bc'
 };
 my $compiler = $ARGV[0];
 my $base_compiler = $compiler =~ s/-\d+(\.\d+)+$//r;
 my $o_ext = $$o_exts{$base_compiler};
 
-`$compiler -std=c++11 --output type-index type-index-main.cc`;
-my $index = `./type-index`;
+`$compiler -std=c++11 --output char-is-signed char-is-signed.cc`;
+my $index = `./char-is-signed`;
 my $int_types = [ 'uint-t', 'int-t' ];
 
 foreach my $type (sort keys %$implementation_defined_signedness) {
@@ -142,8 +142,9 @@ while (my ($promoted_type, $types) = each(%$type_tbl)) {
     open(my $out, '>', $cc_file)  or die "Could not open file '$cc_file' $!";
     print $out $filestr;
     close($out);
-    #print "small-type: " . $small_type . "\n";
     my $cmd = "$compiler -std=c++11 --compile --warn-varargs --warn-error --output $o_file $cc_file";
+    #print "small-type: " . $small_type . "\n";
+    #print $cmd . "\n";
     my $output = `$cmd`; # 2>&1
     my $exit_val = $?;
     `rm -f $cc_file $o_file`;

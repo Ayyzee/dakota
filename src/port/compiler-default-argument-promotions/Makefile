@@ -11,6 +11,6 @@ install: all
 	$(CP) $(CPFLAGS) compiler-default-argument-promotions.json $(rootdir)/lib/dakota
 
 clean:
-	$(RM) $(RMFLAGS) type-index stderr.txt summary.txt
+	$(RM) $(RMFLAGS) char-is-signed stderr.txt summary.txt
 	$(RM) $(RMFLAGS) compiler-default-argument-promotions.json
 	$(RM) $(RMFLAGS) obj
