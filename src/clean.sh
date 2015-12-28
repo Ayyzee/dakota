@@ -2,4 +2,4 @@
 
 set -o errexit -o nounset -o pipefail
 
-rm -f check.dk check-util.dk check check-util
+rm -f installcheck.dk installcheck-util.dk installcheck installcheck-util

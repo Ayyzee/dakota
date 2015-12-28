@@ -26,6 +26,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  distclean\
  goal-clean\
  install\
+ installcheck\
  precompile\
  uninstall\
 
@@ -36,6 +37,8 @@ $(libdakota.output): $(srcdir)/strerror-name.tbl # not ideal, but ...
 
 check: all
 	$(dakota-info.output) $(libdakota.output) $(libdakota-util.output)
+
+installcheck: check install
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
@@ -68,7 +71,7 @@ $(DESTDIR)$(prefix)/lib/dakota/compiler.json: $(DESTDIR)$(prefix)/lib/dakota/com
 
 install-links := $(DESTDIR)$(prefix)/lib/dakota/compiler.json $(DESTDIR)$(prefix)/lib/dakota/platform.json
 
-install: $(install-dirs) $(install-files) $(install-links)
+install: all $(install-dirs) $(install-files) $(install-links)
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
