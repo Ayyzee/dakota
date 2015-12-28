@@ -4,10 +4,10 @@ $(blddir)/%.tbl: $(srcdir)/%.pl
 $(blddir)/../bin/%: $(srcdir)/%.$(cc_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
 
-$(blddir)/../bin/%: $(srcdir)/%.dk
+$(blddir)/../bin/%:
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs:%=--library %) $(srcs)
 
-$(blddir)/../lib/%.$(so_ext): $(srcdir)/%.dk
+$(blddir)/../lib/%.$(so_ext):
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --soname $(soname) --output $@ $(libs:%=--library %) $(srcs)
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: $(blddir)/../lib/dakota/%.json
