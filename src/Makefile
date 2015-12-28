@@ -53,7 +53,6 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(libdakota-util.output)
 	$(RM) $(RMFLAGS) $(libdakota-util.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
-	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 distclean: clean
 	cd $(rootdir); ./configure-common

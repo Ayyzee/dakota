@@ -9,7 +9,9 @@ include $(rootdir)/makeflags.mk
  clean \
  dist \
  distclean \
+ goal-clean \
  install \
+ installcheck \
  precompile \
  uninstall \
 
@@ -17,10 +19,10 @@ all \
 check \
 clean \
 dist \
+distclean \
+goal-clean \
 install \
+installcheck \
 precompile \
 uninstall:
 	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/src $@
-
-distclean: clean
-	cd $(rootdir); ./configure-common

@@ -15,3 +15,5 @@ $DEST$prefix/bin/dakota installcheck.dk
 $DEST$prefix/bin/dakota installcheck-util.dk $DEST$prefix/lib/libdakota-util.$so_ext
 ./installcheck
 ./installcheck-util
+
+rm -f installcheck.dk installcheck-util.dk installcheck installcheck-util
