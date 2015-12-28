@@ -26,8 +26,6 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  distclean\
  goal-clean\
  install\
- install-dirs\
- ls-install-files\
  precompile\
  uninstall\
 
@@ -68,7 +66,7 @@ $(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/pla
 $(DESTDIR)$(prefix)/lib/dakota/compiler.json: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-install-links := $(DESTDIR)$(prefix)/lib/dakota/{compiler,platform}.json
+install-links := $(DESTDIR)$(prefix)/lib/dakota/compiler.json $(DESTDIR)$(prefix)/lib/dakota/platform.json
 
 install: $(install-dirs) $(install-files) $(install-links)
 
