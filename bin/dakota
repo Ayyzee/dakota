@@ -84,7 +84,6 @@ my $root_cmd = { 'reps' => [],
             'compile',              # gcc-like
             'define-macro=s',       # gcc-like
             'directory=s',          # make-like
-            'dynamic',              # gcc-like
             'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
@@ -147,8 +146,7 @@ if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'output'}) {
   }
   $output =~ m/([\w-]+)\.dk$/;
   my $output_base = $1;
-  if ($$root_cmd{'opts'}{'shared'} ||
-      $$root_cmd{'opts'}{'dynamic'}) {
+  if ($$root_cmd{'opts'}{'shared'}) {
     $$root_cmd{'opts'}{'output'} = 'lib' . $output_base . ".$so_ext"; # lib
   } else {
     $$root_cmd{'opts'}{'output'} = $output_base; # exe
