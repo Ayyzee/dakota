@@ -450,6 +450,7 @@ sub start_cmd {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
+  if ($$cmd_info{'output'}) {
   if ($ENV{'DKT_PRECOMPILE'}) {
     my $rt_cc;
     if (&is_so_path($$cmd_info{'output'})) {
@@ -464,6 +465,7 @@ sub start_cmd {
     if (&is_debug()) {
       print "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
     }
+  }
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
 
@@ -503,16 +505,17 @@ sub start_cmd {
       &gen_rt_o($cmd_info);
     }
   }
-  if ($$cmd_info{'opts'}{'compile'} && exists $$cmd_info{'output'}) {
+  if ($$cmd_info{'opts'}{'compile'} && $$cmd_info{'output'}) {
     my $last = &last($$cmd_info{'inputs'});
     `mv $last $$cmd_info{'output'}`;
   }
+  if (!$ENV{'DKT_PRECOMPILE'}) {
   if ($$cmd_info{'opts'}{'compile'}) {
     if ($want_separate_precompile_pass) {
       $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
       &o_from_cc($cmd_info);
     }
-  } elsif (!$ENV{'DKT_PRECOMPILE'}) {
+  } else {
     if ($$cmd_info{'opts'}{'shared'}) {
             $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
             &so_from_o($cmd_info);
@@ -522,6 +525,7 @@ sub start_cmd {
     } else {
             die __FILE__, ":", __LINE__, ": error:\n";
     }
+  }
   }
   return $exit_status;
 }
@@ -536,10 +540,10 @@ sub rep_from_so {
   } else {
     $ctlg_path = &ctlg_path_from_any_path($arg);
   }
-  my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'output'} = $ctlg_path;
   if (0) {
+    my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
     $$ctlg_cmd{'output-directory'} = $ctlg_dir; # writes individual klass ctlgs (one per file)
   }
   $$ctlg_cmd{'inputs'} = [ $arg ];
@@ -589,6 +593,7 @@ sub loop_rep_from_dk {
       &ordered_set_add($rep_files, $json_path, __FILE__, __LINE__);
     }
   }
+  if ($$cmd_info{'output'}) {
   if (0 != @$rep_files) {
     my $json_path;
     if (&is_so_path($$cmd_info{'output'})) {
@@ -602,12 +607,19 @@ sub loop_rep_from_dk {
     $$rep_cmd{'inputs'} = $rep_files;
     &rep_from_dk($rep_cmd);
   }
+  }
   return $cmd_info;
 } # loop_rep_from_dk
 sub gen_rt_o {
   my ($cmd_info) = @_;
+  if ($$cmd_info{'output'}) {
   if ($ENV{'DKT_PRECOMPILE'}) {
-    my $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
+    my $rt_cc_path;
+    if (&is_so_path($$cmd_info{'output'})) {
+      $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
+    } else {
+      $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'});
+    }
     if (&is_debug()) {
       print "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
     }
@@ -615,6 +627,7 @@ sub gen_rt_o {
     if (&is_debug()) {
       print "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
     }
+  }
   }
   $$cmd_info{'rep'} = &json_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
@@ -968,7 +981,20 @@ sub ctlg_from_so {
       if (-e $input) {
         &dakota::util::add_last($precompile_inputs, $input);
       } else {
-        &dakota::util::add_last($precompile_inputs, "../lib/libempty.$so_ext");
+        print STDERR "warning: $input does not exist.\n";
+        my $json_path;
+        if (&is_so_path($input)) {
+          $json_path = &json_path_from_so_path($input);
+        } else {
+          $json_path = &json_path_from_any_path($input);
+        }
+        if (-e $json_path) {
+         #my $ctlg_path = $json_path . '.' . 'ctlg';
+          my $ctlg_path = $json_path =~ s/\.json$/\.ctlg/r;
+          print STDERR "warning: consider using $json_path to create $ctlg_path.\n";
+        }
+        #&dakota::util::add_last($precompile_inputs, $input);
+        #&dakota::util::add_last($precompile_inputs, $json_path);
       }
     }
     $$ctlg_cmd{'inputs'} = $precompile_inputs;

@@ -159,9 +159,9 @@ if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
 }
 
-if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'nodefaultlibs'}) {
+if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
   my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
-  if ($$root_cmd{'opts'}{'output'} ne $libdakota) {
+  if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota) {
     &add_last($$root_cmd{'inputs'}, $libdakota);
   }
 }
