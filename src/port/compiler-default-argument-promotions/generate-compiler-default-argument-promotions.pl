@@ -108,11 +108,17 @@ my $o_exts = {
   'clang' =>   'o', # could be 'bc'
   'clang++' => 'o', # could be 'bc'
 };
-my $compiler = $ARGV[0];
+my $compiler_tbl = {
+  'clang++' => 'clang',
+  'g++' => 'gcc',
+};
+my $cxx = $ARGV[0];
+my $compiler = $cxx =~ s|^(.*?)([\w-]+)(\+\+)?$|$2$3|r;
+$compiler = $$compiler_tbl{$compiler} ||= $compiler;
 my $o_ext = $$o_exts{$compiler};
 my $fn = $ARGV[1];
 
-`$compiler -std=c++11 --language c++ --output char-is-signed char-is-signed.cc`;
+`$cxx -std=c++11 --language c++ --output char-is-signed char-is-signed.cc`;
 my $index = `./char-is-signed`;
 my $int_types = [ 'uint-t', 'int-t' ];
 
@@ -142,7 +148,7 @@ while (my ($promoted_type, $types) = each(%$type_tbl)) {
     open(my $out, '>', $cc_file)  or die "Could not open file '$cc_file' $!";
     print $out $filestr;
     close($out);
-    my $cmd = "$compiler -std=c++11 --compile --warn-varargs --warn-error --output $o_file $cc_file";
+    my $cmd = "$cxx -std=c++11 --compile --warn-varargs --warn-error --output $o_file $cc_file";
     #print "small-type: " . $small_type . "\n";
     #print $cmd . "\n";
     my $output = `$cmd`; # 2>&1
