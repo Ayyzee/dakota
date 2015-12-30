@@ -21,7 +21,7 @@ platform() {
             sysname=darwin
         fi
     fi
-    echo $sysname
+   echo $sysname
 }
 compiler() {
     if (( 0 < $# )); then
@@ -54,16 +54,24 @@ compiler() {
     echo $compiler
 }
 
-so_ext=so
-
 CP=cp
 CPFLAGS="--force --recursive"
 
 LN=ln
-LNFLAGS="--symbolic"
+LNFLAGS="--force --symbolic"
 
 MKDIR=mkdir
 MKDIRFLAGS="--parents"
 
 RM=rm
-RMFLAGS="--force --recursive"
+RMFLAGS="--force"
+
+so_ext=so
+
+if [[ "darwin" == "$(platform)" ]]; then
+    CPFLAGS="-fr"
+    LNFLAGS="-fs"
+    MKDIRFLAGS="-p"
+    RMFLAGS="-f"
+    so_ext=dylib
+fi

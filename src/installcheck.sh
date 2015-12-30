@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
 rootdir=..
-#source $rootdir/common.sh
+source $rootdir/common.sh
 source $rootdir/config.sh
 src="func main(int-t, const str-t[]) -> int-t { return 0; }" 
 echo $src > installcheck.dk
