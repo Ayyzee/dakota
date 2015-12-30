@@ -64,7 +64,7 @@ MKDIR=mkdir
 MKDIRFLAGS="--parents"
 
 RM=rm
-RMFLAGS="--force"
+RMFLAGS="--force --recursive"
 
 so_ext=so
 
@@ -72,6 +72,6 @@ if [[ "darwin" == "$(platform)" ]]; then
     CPFLAGS="-fr"
     LNFLAGS="-fs"
     MKDIRFLAGS="-p"
-    RMFLAGS="-f"
+    RMFLAGS="-fr"
     so_ext=dylib
 fi
