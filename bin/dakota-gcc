@@ -10,7 +10,7 @@ num_dk_files=0
 for arg in $@; do
     dk_file="\.dk$"
     if [[ $arg =~ $dk_file ]]; then
-        (( num_dk_files++ ))
+        (( num_dk_files++ )) || true
         # create obj/nrt/*.cc and add to arg list here
     fi
     args=" $args $arg"
