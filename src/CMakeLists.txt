@@ -1,13 +1,14 @@
 cmake_minimum_required (VERSION 2.8)
 
+#set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} "dk")
 set (CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
 
 # CMAKE_SHARED_LIBRARY_SUFFIX
 
 # dakota-info
 project (dakota-info CXX)
-set (DAKOTA_INFO_SRCS dakota-info.cc)
-add_executable        (dakota-info ${DAKOTA_INFO_SRCS})
+set (dakota-info-srcs dakota-info.cc)
+add_executable        (dakota-info ${dakota-info-srcs})
 target_link_libraries (dakota-info LINK_PUBLIC ${CMAKE_DL_LIBS})
 set_target_properties (dakota-info
   PROPERTIES
@@ -17,12 +18,19 @@ set_target_properties (dakota-info
 # libdakota.so
 project (libfoobar CXX)
 
-set (FOOBAR_SRCS foo.cc bar.cc)
-add_library           (libfoobar SHARED ${FOOBAR_SRCS})
+set (CMAKE_CXX_COMPILER "/home/robert/dakota/bin/dakota-gcc")
+set (CMAKE_COMPILER_IS_GNUCXX 1)
+
+set (libfoobar-srcs foo.cc bar.cc)
+
+# hackhack: should be able to add dk to CMAKE_CXX_SOURCE_FILE_EXTENSIONS
+set_source_files_properties (${libfoobar-srcs} PROPERTIES LANGUAGE CXX)
+
+add_library           (libfoobar SHARED ${libfoobar-srcs})
 target_link_libraries (libfoobar LINK_PUBLIC ${CMAKE_DL_LIBS})
 set_target_properties (libfoobar
   PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "../lib"
   PREFIX ""
-  # LINKER_LANGUAGE CXX
+  LINKER_LANGUAGE CXX
 )
