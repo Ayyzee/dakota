@@ -29,10 +29,11 @@ pushd src > /dev/null 2>&1
 $LN $LNFLAGS $DIR/src/config-$sysname.hh config.hh
 popd > /dev/null 2>&1
 
+canon_compiler=$(compiler $compiler)
 pushd lib/dakota > /dev/null 2>&1
-$LN $LNFLAGS $DIR/lib/dakota/compiler-$compiler compiler
-$LN $LNFLAGS $DIR/lib/dakota/platform-$sysname.json  platform.json
+$LN $LNFLAGS compiler-$canon_compiler compiler
+$LN $LNFLAGS platform-$sysname.json   platform.json
 popd > /dev/null 2>&1
 
-make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions all
-make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions clean
+CXX=$compiler make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions all
+CXX=$compiler make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions clean

@@ -24,6 +24,9 @@ platform() {
     echo $sysname
 }
 compiler() {
+    if (( 0 < $# )); then
+        CXX=$1
+    fi
     compiler=
     compiler_clangxx_regex=".*clang\+\+.*"
     compiler_gxx_regex=".*g\+\+.*"
@@ -34,7 +37,6 @@ compiler() {
     elif [[ -n "${CXX-}" && $CXX =~ $compiler_gxx_regex ]]; then
         compiler=gcc
     elif [[ -n "${CXX-}" ]]; then
-        echo "attempting to use non-standard c++ compiler $CXX"
         compiler=$CXX
     fi
     # compiler: second try common dirs
@@ -51,8 +53,6 @@ compiler() {
     fi
     echo $compiler
 }
-platform=$(platform)
-compiler=$(compiler)
 
 so_ext=so
 
