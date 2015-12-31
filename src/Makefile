@@ -57,7 +57,7 @@ clean: goal-clean
 distclean: clean
 	cd $(rootdir); ./configure-common
 
-install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota}
+install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-{clang,gcc}}
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
@@ -65,10 +65,10 @@ $(install-dirs):
 $(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-$(DESTDIR)$(prefix)/lib/dakota/compiler.json: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler).json
+$(DESTDIR)$(prefix)/lib/dakota/compiler: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-install-links := $(DESTDIR)$(prefix)/lib/dakota/compiler.json $(DESTDIR)$(prefix)/lib/dakota/platform.json
+install-links := $(DESTDIR)$(prefix)/lib/dakota/compiler $(DESTDIR)$(prefix)/lib/dakota/platform.json
 
 install: all $(install-dirs) $(install-files) $(install-links)
 
@@ -77,5 +77,6 @@ precompile:
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install-files)
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/{compiler,platform}.json
+	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler
+	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/platform.json
 	#if [[ -d $(DESTDIR)$(prefix)/lib/dakota ]]; then sudo rmdir $(DESTDIR)$(prefix)/lib/dakota; fi

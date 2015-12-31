@@ -4,13 +4,9 @@ include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
 all:
-	./generate-compiler-default-argument-promotions.pl $(CXX) 2> stderr.txt
+	./generate-compiler-default-argument-promotions.pl $(compiler) $(rootdir)/lib/dakota/compiler-$(compiler)/default-argument-promotions.json 2> stderr.txt
 	cat summary.txt
-
-install: all
-	$(CP) $(CPFLAGS) compiler-default-argument-promotions.json $(rootdir)/lib/dakota
 
 clean:
 	$(RM) $(RMFLAGS) char-is-signed stderr.txt summary.txt
-	$(RM) $(RMFLAGS) compiler-default-argument-promotions.json
 	$(RM) $(RMFLAGS) obj

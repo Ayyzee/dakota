@@ -101,9 +101,10 @@
         '$(DESTDIR)$(prefix)/%', '$(blddir)/../%',
       ],
       'files' => [ # install.files
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang.json',
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc.json',
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-default-argument-promotions.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang/command-line.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang/default-argument-promotions.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc/command-line.json',
+        '$(DESTDIR)$(prefix)/lib/dakota/compiler-gcc/default-argument-promotions.json',
         '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-darwin.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-linux.json',

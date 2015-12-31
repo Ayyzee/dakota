@@ -109,10 +109,10 @@ my $o_exts = {
   'clang++' => 'o', # could be 'bc'
 };
 my $compiler = $ARGV[0];
-my $base_compiler = $compiler =~ s/-\d+(\.\d+)+$//r;
-my $o_ext = $$o_exts{$base_compiler};
+my $o_ext = $$o_exts{$compiler};
+my $fn = $ARGV[1];
 
-`$compiler -std=c++11 --output char-is-signed char-is-signed.cc`;
+`$compiler -std=c++11 --language c++ --output char-is-signed char-is-signed.cc`;
 my $index = `./char-is-signed`;
 my $int_types = [ 'uint-t', 'int-t' ];
 
@@ -170,7 +170,6 @@ $str = &Dumper($result_tbl);
 #$str =~ s/\{[\s\n]*"/\{ "/gs;
 $str =~ s/1[\s\n]*\}/1 \}/gs;
 {
-my $fn = "compiler-default-argument-promotions.json";
 open(my $fh, '>', $fn) or die "Could not open file '$fn' $!";
 print $fh $str;
 close($fh);

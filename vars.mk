@@ -33,7 +33,7 @@ platform := $(shell source $(rootdir)/common.sh; platform)
 compiler := $(shell source $(rootdir)/common.sh; compiler)
 
 include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/compiler.mk\
- $(rootdir)/lib/dakota/compiler.json\
+ $(rootdir)/lib/dakota/compiler/command-line.json\
  $(rootdir)/lib/dakota/platform.json)\
 
 INSTALL := install

@@ -55,8 +55,8 @@ BEGIN {
   use dakota::util;
   use dakota::parse;
   use dakota::generate;
-  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
-    or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
+  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
+    or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
   my $platform = do "$gbl_prefix/lib/dakota/platform.json"
     or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
   my ($key, $values);

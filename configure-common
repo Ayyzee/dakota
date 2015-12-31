@@ -9,7 +9,7 @@ source $DIR/common.sh
 rm -f config.mk
 rm -f config.sh
 rm -f src/config.hh
-rm -f lib/dakota/compiler.json
+rm -f lib/dakota/compiler
 rm -f lib/dakota/platform.json
 rm -f lib/dakota/compiler-default-argument-promotions.json
 
@@ -30,9 +30,9 @@ $LN $LNFLAGS $DIR/src/config-$sysname.hh config.hh
 popd > /dev/null 2>&1
 
 pushd lib/dakota > /dev/null 2>&1
+$LN $LNFLAGS $DIR/lib/dakota/compiler-$compiler compiler
 $LN $LNFLAGS $DIR/lib/dakota/platform-$sysname.json  platform.json
-$LN $LNFLAGS $DIR/lib/dakota/compiler-$compiler.json compiler.json
 popd > /dev/null 2>&1
 
-make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions install
+make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions all
 make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions clean

@@ -54,10 +54,10 @@ sub dk_prefix {
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
-  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler.json"
-    or die "do $gbl_prefix/lib/dakota/compiler.json failed: $!\n";
-  $gbl_compiler_default_argument_promotions = do "$gbl_prefix/lib/dakota/compiler-default-argument-promotions.json"
-    or die "do $gbl_prefix/lib/dakota/compiler-default-argument-promotions.json failed: $!\n";
+  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
+    or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
+  $gbl_compiler_default_argument_promotions = do "$gbl_prefix/lib/dakota/compiler/default-argument-promotions.json"
+    or die "do $gbl_prefix/lib/dakota/compiler/default-argument-promotions.json failed: $!\n";
   my $platform = do "$gbl_prefix/lib/dakota/platform.json"
     or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
   my ($key, $values);
