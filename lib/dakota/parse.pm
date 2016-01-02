@@ -59,10 +59,10 @@ sub dk_prefix {
   }
 }
 my $patterns = {
-  'cc_path_from_nrt_cc_path' => '$(objdir)/%.$(cc_ext)  : $(objdir)/nrt/%.$(cc_ext)',
+  'cc_path_from_nrt_cc_path' => '$(objdir)/nrt/%.$(cc_ext)  : $(objdir)/%.$(cc_ext)',
 
-  'nrt_cc_path_from_dk_path' => '$(objdir)/nrt/%.$(cc_ext) : %.dk',
-  'nrt_o_path_from_dk_path' =>  '$(objdir)/nrt/%.$(o_ext)  : %.dk',
+  'nrt_cc_path_from_dk_path' => '$(objdir)/%.$(cc_ext) : %.dk',
+  'nrt_o_path_from_dk_path' =>  '$(objdir)/%.$(o_ext)  : %.dk',
 
   'o_path_from_cc_path' =>      '$(objdir)/%.$(o_ext)      : $(objdir)/%.$(cc_ext)',
 

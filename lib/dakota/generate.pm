@@ -306,7 +306,7 @@ sub generate_nrt {
       "\n" .
       "# include \"$name.$hh_ext\"\n" .
       "\n" .
-      "# include \"../$name.$cc_ext\"\n" . # user-code (converted from dk to cc)
+      "# include \"nrt/$name.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
   }

@@ -370,6 +370,9 @@ sub objdir {
   if (! -e $objdir) {
     mkdir $objdir; # or try make_path in File::Path
   }
+  if (! -e "$objdir/nrt") {
+    mkdir "$objdir/nrt";
+  }
  return $objdir;
 }
 
