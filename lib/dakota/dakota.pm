@@ -911,15 +911,29 @@ sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
   if ($outfile =~ m|^$objdir/$objdir/|) { die "found double objdir/objdir"; } # likely a double $objdir prepend
-  &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DKT_DEPENDS_OUTPUT_FILE");
   my $file_db = {};
   my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'}, '--output');
+  my $infiles;
+  if (-e $outfile) {
+    $infiles = [];
   foreach my $infile (@{$$cmd_info{'inputs'}}) {
     my $infile_stat = &path_stat($file_db, $infile, '--inputs');
     if (!$$infile_stat{'mtime'}) {
       $$infile_stat{'mtime'} = 0;
     }
     if (! -e $outfile || $$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
+      push @$infiles, $infile;
+    }
+  }
+  } else {
+    $infiles = $$cmd_info{'inputs'};
+  }
+  if (0 < scalar @$infiles) {
+    if (0) {
+      &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DKT_DEPENDS_OUTPUT_FILE");
+    } else {
+      &append_to_env_file($outfile, $infiles, "DKT_DEPENDS_OUTPUT_FILE");
+    }
       &make_dir($$cmd_info{'output'});
       if ($show_outfile_info) {
         print "MK $$cmd_info{'output'}\n";
@@ -951,12 +965,6 @@ sub outfile_from_infiles {
       } else {
         &exec_cmd($cmd_info, $should_echo);
       }
-      last;
-    } else {
-      if ($show_outfile_info) {
-        print "OK $$cmd_info{'output'}\n";
-      }
-    }
   }
 }
 sub ctlg_from_so {
