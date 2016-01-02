@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use sort 'stable';
 
-my $should_write_pre_output = 1;
+my $should_write_pre_output = 0;
 my $gbl_ann_interval = 30;
 
 my $emacs_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
