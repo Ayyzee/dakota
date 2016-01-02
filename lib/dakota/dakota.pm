@@ -613,21 +613,22 @@ sub loop_rep_from_dk {
 sub gen_rt_o {
   my ($cmd_info) = @_;
   if ($$cmd_info{'output'}) {
-  if ($ENV{'DKT_PRECOMPILE'}) {
     my $rt_cc_path;
     if (&is_so_path($$cmd_info{'output'})) {
       $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
     } else {
       $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'});
     }
-    if (&is_debug()) {
-      print "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
+    if (! $$cmd_info{'opts'}{'silent'}) {
+      print '<' . $rt_cc_path . ">\n";
     }
-  } else {
     if (&is_debug()) {
-      print "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
+      if ($ENV{'DKT_PRECOMPILE'}) {
+        print "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
+      } else {
+        print "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
+      }
     }
-  }
   }
   $$cmd_info{'rep'} = &json_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
