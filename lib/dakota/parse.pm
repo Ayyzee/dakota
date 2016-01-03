@@ -59,22 +59,23 @@ sub dk_prefix {
   }
 }
 my $patterns = {
-  'cc_path_from_nrt_cc_path' => '$(objdir)/nrt/%.$(cc_ext)  : $(objdir)/%.$(cc_ext)',
+  'cc_path_from_nrt_cc_path' => '$(objdir)/nrt/%.dk.$(cc_ext)   : $(objdir)/%.$(cc_ext)',
 
-  'nrt_cc_path_from_dk_path' => '$(objdir)/%.$(cc_ext) : %.dk',
-  'nrt_o_path_from_dk_path' =>  '$(objdir)/%.$(o_ext)  : %.dk',
+  'nrt_cc_path_from_dk_path' => '$(objdir)/%.$(cc_ext)          : %.dk',
+  'nrt_o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
 
-  'o_path_from_cc_path' =>      '$(objdir)/%.$(o_ext)      : $(objdir)/%.$(cc_ext)',
+  'o_path_from_cc_path' =>      '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
 
-  'ctlg_path_from_any_path' =>  '$(objdir)/%.ctlg          : %',
-  'ctlg_path_from_so_path' =>   '$(objdir)/%.ctlg          : %.$(so_ext)',
+  'json_path_from_ctlg_path' => '$(objdir)/%.$(so_ext).json     : $(objdir)/%.ctlg',
 
-  'json_path_from_any_path' =>   '$(objdir)/%.json           : %',
-  'json_path_from_ctlg_path' =>  '$(objdir)/%.$(so_ext).json : $(objdir)/%.ctlg',
+  'json_path_from_any_path' =>  '$(objdir)/%.json               : %',
+  'json_path_from_so_path' =>   '$(objdir)/%.$(so_ext).json     : %.$(so_ext)',
 
-  'json_path_from_so_path' =>    '$(objdir)/%.json          : %.$(so_ext)',
-  'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)  : %',
-  'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)  : %.$(so_ext)',
+  'ctlg_path_from_any_path' =>  '$(objdir)/%.ctlg               : %',
+  'ctlg_path_from_so_path' =>   '$(objdir)/%.ctlg               : %.$(so_ext)',
+
+  'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)       : %',
+  'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)       : %.$(so_ext)',
 };
 my $expanded_patterns = &expand_tbl_values($patterns);
 #print STDERR &Dumper($expanded_patterns);
@@ -442,18 +443,28 @@ sub json_path_from_ctlg_path {
   return $out_path;
 }
 sub json_path_from_so_path {
-  my ($path) = @_;
-  #
-  return &out_path_from_in_path('json_path_from_so_path', $path);
+  my ($in_path) = @_;
+  $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
+  my $vers = $1;
+  my $out_path = &out_path_from_in_path('json_path_from_so_path', $in_path);
+  if (defined $vers) {
+    $out_path =~ s/\.$so_ext\.json$/.$so_ext$vers.json/;
+  }
+  return $out_path;
 }
 sub rt_cc_path_from_any_path {
   my ($path) = @_;
   return &out_path_from_in_path('rt_cc_path_from_any_path', $path);
 }
 sub rt_cc_path_from_so_path {
-  my ($path) = @_;
-  #
-  return &out_path_from_in_path('rt_cc_path_from_so_path', $path);
+  my ($in_path) = @_;
+  $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
+  my $vers = $1;
+  my $out_path = &out_path_from_in_path('rt_cc_path_from_so_path', $in_path);
+  if (defined $vers) {
+    $out_path =~ s/\.$so_ext$/.$so_ext$vers/;
+  }
+  return $out_path;
 }
 sub var_perl_from_make { # convert variable syntax to perl from make
   my ($str) = @_;
