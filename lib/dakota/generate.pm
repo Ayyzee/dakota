@@ -306,7 +306,7 @@ sub generate_nrt {
       "\n" .
       "# include \"$name.$hh_ext\"\n" .
       "\n" .
-      "# include \"nrt/$name.dk.$cc_ext\"\n" . # user-code (converted from dk to cc)
+      "# include \"user/$name.dk.$cc_ext\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
   }
@@ -1716,9 +1716,9 @@ sub path::string {
 ## exists()  (does this key exist)
 ## defined() (is the value (for this key) non-undef)
 sub dk_parse {
-  my ($dkfile) = @_;            # string.dk
-  my $plfile = &dakota::parse::json_path_from_any_path($dkfile);
-  my $file = &dakota::util::scalar_from_file($plfile);
+  my ($dk_path) = @_;            # string.dk
+  my $json_path = &dakota::parse::json_path_from_any_path($dk_path);
+  my $file = &dakota::util::scalar_from_file($json_path);
   $file = &dakota::parse::kw_args_translate($file);
   return $file;
 }

@@ -538,7 +538,8 @@ sub rep_from_so {
   if (&is_so_path($arg)) {
     $ctlg_path = &ctlg_path_from_so_path($arg);
   } else {
-    $ctlg_path = &ctlg_path_from_any_path($arg);
+    die;
+    #$ctlg_path = &ctlg_path_from_any_path($arg); # _from_exe_path
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'output'} = $ctlg_path;
@@ -597,9 +598,9 @@ sub loop_rep_from_dk {
   if (0 != @$rep_files) {
     my $json_path;
     if (&is_so_path($$cmd_info{'output'})) {
-      $json_path = &json_path_from_so_path($$cmd_info{'output'});
+      $json_path = &rt_json_path_from_so_path($$cmd_info{'output'});
     } else {
-      $json_path = &json_path_from_any_path($$cmd_info{'output'});
+      $json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
     }
     &ordered_set_add($$cmd_info{'reps'}, $json_path, __FILE__, __LINE__);
     my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -630,7 +631,7 @@ sub gen_rt_o {
       }
     }
   }
-  $$cmd_info{'rep'} = &json_path_from_any_path($$cmd_info{'output'});
+  $$cmd_info{'rep'} = &rt_json_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
   if ($dk_exe_type) {
@@ -725,10 +726,10 @@ sub rt_o_from_json {
   my $json_path;
   my $cc_path;
   if (&is_so_path($$cmd_info{'output'})) {
-    $json_path = &json_path_from_so_path($$cmd_info{'output'});
+    $json_path = &rt_json_path_from_so_path($$cmd_info{'output'});
     $cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
   } else {
-    $json_path = &json_path_from_any_path($$cmd_info{'output'});
+    $json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
     $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'});
   }
   my $o_path = &o_path_from_cc_path($cc_path);

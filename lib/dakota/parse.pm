@@ -59,22 +59,22 @@ sub dk_prefix {
   }
 }
 my $patterns = {
-  'cc_path_from_nrt_cc_path' => '$(objdir)/nrt/%.dk.$(cc_ext)   : $(objdir)/%.$(cc_ext)',
+  'cc_path_from_nrt_cc_path' => '$(objdir)/user/%.dk.$(cc_ext)  : $(objdir)/%.$(cc_ext)',
 
   'nrt_cc_path_from_dk_path' => '$(objdir)/%.$(cc_ext)          : %.dk',
   'nrt_o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
 
   'o_path_from_cc_path' =>      '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
 
-  'json_path_from_ctlg_path' => '$(objdir)/%.$(so_ext).json     : $(objdir)/%.ctlg',
+  'json_path_from_any_path' =>  '$(objdir)/%.json               : %', # dk or ctlg
+  'json_path_from_ctlg_path' => '$(objdir)/%.ctlg.json          : $(objdir)/%.ctlg',
 
-  'json_path_from_any_path' =>  '$(objdir)/%.json               : %',
-  'json_path_from_so_path' =>   '$(objdir)/%.$(so_ext).json     : %.$(so_ext)',
+  'rt_json_path_from_any_path' => '$(objdir)/rt/%.json            : %', # _from_exe_path
+  'rt_json_path_from_so_path' =>  '$(objdir)/rt/%.$(so_ext).json  : %.$(so_ext)',
 
-  'ctlg_path_from_any_path' =>  '$(objdir)/%.ctlg               : %',
-  'ctlg_path_from_so_path' =>   '$(objdir)/%.ctlg               : %.$(so_ext)',
+  'ctlg_path_from_so_path' =>   '$(objdir)/%.$(so_ext).ctlg     : %.$(so_ext)',
 
-  'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)       : %',
+  'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)       : %', # _from_exe_path
   'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)       : %.$(so_ext)',
 };
 my $expanded_patterns = &expand_tbl_values($patterns);
@@ -128,7 +128,6 @@ our @EXPORT= qw(
                  add_trait_decl
                  colin
                  colout
-                 ctlg_path_from_any_path
                  ctlg_path_from_so_path
                  cc_path_from_nrt_cc_path
                  init_global_rep
@@ -138,7 +137,8 @@ our @EXPORT= qw(
                  o_path_from_cc_path
                  json_path_from_any_path
                  json_path_from_ctlg_path
-                 json_path_from_so_path
+                 rt_json_path_from_any_path
+                 rt_json_path_from_so_path
                  rt_cc_path_from_any_path
                  rt_cc_path_from_so_path
                  str_from_cmd_info
@@ -402,10 +402,6 @@ sub cc_path_from_nrt_cc_path {
   my ($path) = @_;
   return &out_path_from_in_path('cc_path_from_nrt_cc_path', $path);
 }
-sub ctlg_path_from_any_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('ctlg_path_from_any_path', $path);
-}
 sub nrt_cc_path_from_dk_path {
   my ($path) = @_;
   return &out_path_from_in_path('nrt_cc_path_from_dk_path', $path);
@@ -418,9 +414,9 @@ sub o_path_from_cc_path {
   my ($path) = @_;
   return &out_path_from_in_path('o_path_from_cc_path', $path);
 }
-sub json_path_from_any_path {
+sub rt_json_path_from_any_path {
   my ($path) = @_;
-  return &out_path_from_in_path('json_path_from_any_path', $path);
+  return &out_path_from_in_path('rt_json_path_from_any_path', $path);
 }
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
@@ -434,19 +430,19 @@ sub ctlg_path_from_so_path {
 }
 sub json_path_from_ctlg_path {
   my ($in_path) = @_;
-  $in_path =~ s/\.ctlg((\.\d+)+)$/.ctlg/;
-  my $vers = $1;
   my $out_path = &out_path_from_in_path('json_path_from_ctlg_path', $in_path);
-  if (defined $vers) {
-    $out_path =~ s/\.$so_ext\.json$/.$so_ext$vers.json/;
-  }
+  return $out_path;
+ }
+sub json_path_from_any_path {
+  my ($in_path) = @_;
+  my $out_path = &out_path_from_in_path('json_path_from_any_path', $in_path);
   return $out_path;
 }
-sub json_path_from_so_path {
+sub rt_json_path_from_so_path {
   my ($in_path) = @_;
   $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
   my $vers = $1;
-  my $out_path = &out_path_from_in_path('json_path_from_so_path', $in_path);
+  my $out_path = &out_path_from_in_path('rt_json_path_from_so_path', $in_path);
   if (defined $vers) {
     $out_path =~ s/\.$so_ext\.json$/.$so_ext$vers.json/;
   }

@@ -370,8 +370,8 @@ sub objdir {
   if (! -e $objdir) {
     mkdir $objdir; # or try make_path in File::Path
   }
-  if (! -e "$objdir/nrt") {
-    mkdir "$objdir/nrt";
+  if (! -e "$objdir/user") {
+    mkdir "$objdir/user";
   }
  return $objdir;
 }
