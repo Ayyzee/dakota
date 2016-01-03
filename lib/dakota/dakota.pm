@@ -137,7 +137,7 @@ sub loop_merged_rep_from_inputs {
     my $root;
     if (&is_dk_src_path($arg)) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
-      &dakota::util::add_last($rep_files, &json_path_from_any_path($arg));
+      &dakota::util::add_last($rep_files, &json_path_from_any_path($arg)); # _from_dk_src_path
     } elsif ($arg =~ m|\.json$|) {
       $root = &scalar_from_file($arg);
       &dakota::util::add_last($rep_files, $arg);
@@ -471,7 +471,7 @@ sub start_cmd {
     if (&is_so_path($$cmd_info{'output'})) {
       $rt_cc = &rt_cc_path_from_so_path($$cmd_info{'output'});
     } else {
-      $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'});
+      $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
     }
     if (&is_debug()) {
       print "creating $rt_cc" . &pann(__FILE__, __LINE__) . "\n";
@@ -551,13 +551,7 @@ sub rep_from_so {
   if (!$arg) {
     $arg = $$cmd_info{'input'};
   }
-  my $ctlg_path;
-  if (&is_so_path($arg)) {
-    $ctlg_path = &ctlg_path_from_so_path($arg);
-  } else {
-    die;
-    #$ctlg_path = &ctlg_path_from_any_path($arg); # _from_exe_path
-  }
+  my $ctlg_path = &ctlg_path_from_so_path($arg);
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'output'} = $ctlg_path;
   if (0) {
@@ -580,8 +574,7 @@ sub rep_from_so {
 sub loop_rep_from_so {
   my ($cmd_info) = @_;
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if (&is_dk_src_path($arg)) {
-    } else {
+    if (&is_so_path($arg)) {
       &rep_from_so($cmd_info, $arg);
     }
   }
@@ -601,7 +594,7 @@ sub loop_rep_from_inputs {
   my $rep_files = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($arg)) {
-      my $json_path = &json_path_from_any_path($arg);
+      my $json_path = &json_path_from_any_path($arg); # _from_dk_src_path
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$rep_cmd{'output'} = $json_path;
       $$rep_cmd{'inputs'} = [ $arg ];
@@ -611,12 +604,7 @@ sub loop_rep_from_inputs {
   }
   if ($$cmd_info{'output'}) {
   if (0 != @$rep_files) {
-    my $json_path;
-    if (&is_so_path($$cmd_info{'output'})) {
-      $json_path = &rt_json_path_from_so_path($$cmd_info{'output'});
-    } else {
-      $json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
-    }
+    my $json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
     &ordered_set_add($$cmd_info{'reps'}, $json_path, __FILE__, __LINE__);
     my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$rep_cmd{'output'} = $json_path;
@@ -633,7 +621,7 @@ sub gen_rt_o {
     if (&is_so_path($$cmd_info{'output'})) {
       $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
     } else {
-      $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'});
+      $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
     }
     if (! $$cmd_info{'opts'}{'silent'}) {
       print '<' . $rt_cc_path . ">\n";
@@ -685,7 +673,7 @@ sub loop_o_from_dk {
         }
       }
       if (!$want_separate_rep_pass) {
-        my $json_path = &json_path_from_any_path($arg);
+        my $json_path = &json_path_from_any_path($arg); # _from_dk_src_path
         my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
         $$rep_cmd{'inputs'} = [ $arg ];
         $$rep_cmd{'output'} = $json_path;
@@ -748,8 +736,8 @@ sub rt_o_from_json {
     $json_path = &rt_json_path_from_so_path($$cmd_info{'output'});
     $cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
   } else {
-    $json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
-    $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'});
+    $json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
+    $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
   }
   my $o_path = &o_path_from_cc_path($cc_path);
   &make_dir($cc_path);
@@ -918,19 +906,16 @@ sub append_to_env_file {
   my $file = $ENV{$env_var};
 
   if ($file) {
-    my $elements_str = '';
+    my $elements_str = join ', ', map { qq/"$_"/ } @$elements;
     open FILE, ">>$ENV{$env_var}" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-    foreach my $element (@$elements) {
-      $elements_str .= "\"$element\",";
-    }
-    print FILE "  { \"$key\", [ $elements_str ] },\n";
+    print FILE "  { \"$key\" => [ $elements_str ] },\n";
     close FILE;
   }
 }
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
-  if ($outfile =~ m|^$objdir/$objdir/|) { die "found double objdir/objdir"; } # likely a double $objdir prepend
+  if ($outfile =~ m|^$objdir/$objdir/|) { die "found double objdir/objdir: $outfile"; } # likely a double $objdir prepend
   my $file_db = {};
   my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'}, '--output');
   my $infiles;
@@ -1014,8 +999,10 @@ sub ctlg_from_so {
         my $json_path;
         if (&is_so_path($input)) {
           $json_path = &json_path_from_so_path($input);
+        } elsif (&is_dk_src_path($input)) {
+          $json_path = &json_path_from_any_path($input); # _from_dk_src_path
         } else {
-          $json_path = &json_path_from_any_path($input);
+          print "skipping $input\n";
         }
         if (-e $json_path) {
          #my $ctlg_path = $json_path . '.' . 'ctlg';

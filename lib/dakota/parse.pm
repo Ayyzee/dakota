@@ -59,7 +59,7 @@ sub dk_prefix {
   }
 }
 my $patterns = {
-  'cc_path_from_nrt_cc_path' => '$(objdir)/user/%.dk.$(cc_ext)  : $(objdir)/%.$(cc_ext)',
+  'cc_path_from_nrt_cc_path' => '$(objdir)/-user/%.dk.$(cc_ext)  : $(objdir)/%.$(cc_ext)',
 
   'nrt_cc_path_from_dk_path' => '$(objdir)/%.$(cc_ext)          : %.dk',
   'nrt_o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
@@ -69,13 +69,13 @@ my $patterns = {
   'json_path_from_any_path' =>  '$(objdir)/%.json               : %', # dk or ctlg
   'json_path_from_ctlg_path' => '$(objdir)/%.ctlg.json          : $(objdir)/%.ctlg',
 
-  'rt_json_path_from_any_path' => '$(objdir)/rt/%.json            : %', # _from_exe_path
-  'rt_json_path_from_so_path' =>  '$(objdir)/rt/%.$(so_ext).json  : %.$(so_ext)',
+  'rt_json_path_from_any_path' => '$(objdir)/-rt/%.json            : %', # _from_exe_path
+  'rt_json_path_from_so_path' =>  '$(objdir)/-rt/%.$(so_ext).json  : %.$(so_ext)',
 
   'ctlg_path_from_so_path' =>   '$(objdir)/%.$(so_ext).ctlg     : %.$(so_ext)',
 
-  'rt_cc_path_from_any_path' => '$(objdir)/rt/%.$(cc_ext)       : %', # _from_exe_path
-  'rt_cc_path_from_so_path' =>  '$(objdir)/rt/%.$(cc_ext)       : %.$(so_ext)',
+  'rt_cc_path_from_any_path' => '$(objdir)/-rt/%.$(cc_ext)       : %', # _from_exe_path
+  'rt_cc_path_from_so_path' =>  '$(objdir)/-rt/%.$(cc_ext)       : %.$(so_ext)',
 };
 my $expanded_patterns = &expand_tbl_values($patterns);
 #print STDERR &Dumper($expanded_patterns);
