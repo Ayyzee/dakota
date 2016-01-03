@@ -323,7 +323,7 @@ my $gbl_root = {};
 my $gbl_current_scope = $gbl_root;
 my $gbl_current_module = undef;
 my $gbl_filename = undef;
-sub init_rep_from_dk_vars {
+sub init_rep_from_inputs_vars {
   my ($cmd_info) = @_;
   $gbl_root = {};
   #$$gbl_root{'keywords'} = {};

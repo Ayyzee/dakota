@@ -76,7 +76,6 @@ BEGIN {
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 loop_merged_rep_from_dk
              );
 
 use Data::Dumper;
@@ -105,22 +104,38 @@ my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
-sub loop_merged_rep_from_dk {
+sub is_dk_src_path {
+  my ($arg) = @_;
+  if ($arg =~ m|\.dk$| ||
+      $arg =~ m|\.ctlg(\.\d+)*$|) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_rep_input_path { # dk, ctlg, or so
+  my ($arg) = @_;
+  if (&is_so_path($arg) || &is_dk_src_path($arg)) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub loop_merged_rep_from_inputs {
   my ($cmd_info, $should_echo) = @_; 
   if ($should_echo) {
     $" = ' ';
-    print STDERR "  &loop_merged_rep_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
+    print STDERR "  &loop_merged_rep_from_inputs --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
     $" = '';
   }
-  &dakota::parse::init_rep_from_dk_vars($cmd_info);
+  &dakota::parse::init_rep_from_inputs_vars($cmd_info);
   my $rep_files = [];
   if ($$cmd_info{'reps'}) {
     $rep_files = $$cmd_info{'reps'};
   }
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
     my $root;
-    if ($arg =~ m|\.dk$| ||
-        $arg =~ m|\.ctlg(\.\d+)*$|) {
+    if (&is_dk_src_path($arg)) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
       &dakota::util::add_last($rep_files, &json_path_from_any_path($arg));
     } elsif ($arg =~ m|\.json$|) {
@@ -141,7 +156,7 @@ sub loop_merged_rep_from_dk {
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
     }
   }
-} # loop_merged_rep_from_dk
+} # loop_merged_rep_from_inputs
 sub add_visibility_file {
   my ($arg) = @_;
   #print STDERR "&add_visibility_file(path=\"$arg\")\n";
@@ -483,7 +498,7 @@ sub start_cmd {
   #if ($$cmd_info{'opts'}{'output'} =~ m/\.json$/) # this is a real hackhack
   #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
   if ($want_separate_rep_pass) {
-    $cmd_info = &loop_rep_from_dk($cmd_info);
+    $cmd_info = &loop_rep_from_inputs($cmd_info);
   }
   if ($$cmd_info{'opts'}{'output'} =~ m/\.json$/) { # this is a real hackhack
     &add_visibility_file($$cmd_info{'opts'}{'output'});
@@ -507,7 +522,9 @@ sub start_cmd {
   }
   if ($$cmd_info{'opts'}{'compile'} && $$cmd_info{'output'}) {
     my $last = &last($$cmd_info{'inputs'});
-    `mv $last $$cmd_info{'output'}`;
+    if ($last ne $$cmd_info{'output'}) {
+      `mv $last $$cmd_info{'output'}`;
+    }
   }
   if (!$ENV{'DKT_PRECOMPILE'}) {
   if ($$cmd_info{'opts'}{'compile'}) {
@@ -554,7 +571,7 @@ sub rep_from_so {
   my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$rep_cmd{'output'} = $json_path;
   $$rep_cmd{'inputs'} = [ $ctlg_path ];
-  &rep_from_dk($rep_cmd);
+  &rep_from_inputs($rep_cmd);
   if (1) {
     unlink $ctlg_path;
   }
@@ -563,34 +580,32 @@ sub rep_from_so {
 sub loop_rep_from_so {
   my ($cmd_info) = @_;
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if ($arg =~ m|\.dk$| ||
-        $arg =~ m|\.ctlg(\.\d+)*$|) {
+    if (&is_dk_src_path($arg)) {
     } else {
       &rep_from_so($cmd_info, $arg);
     }
   }
   return $cmd_info;
 } # loop_rep_from_so
-sub rep_from_dk {
+sub rep_from_inputs {
   my ($cmd_info) = @_;
   my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$rep_cmd{'cmd'} = '&loop_merged_rep_from_dk';
+  $$rep_cmd{'cmd'} = '&loop_merged_rep_from_inputs';
   $$rep_cmd{'output'} = $$cmd_info{'output'};
   $$rep_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
   &outfile_from_infiles($rep_cmd, $should_echo = 0);
 }
-sub loop_rep_from_dk {
+sub loop_rep_from_inputs {
   my ($cmd_info) = @_;
   my $rep_files = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if ($arg =~ m|\.dk$| ||
-        $arg =~ m|\.ctlg(\.\d+)*$|) {
+    if (&is_dk_src_path($arg)) {
       my $json_path = &json_path_from_any_path($arg);
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$rep_cmd{'output'} = $json_path;
       $$rep_cmd{'inputs'} = [ $arg ];
-      &rep_from_dk($rep_cmd);
+      &rep_from_inputs($rep_cmd);
       &ordered_set_add($rep_files, $json_path, __FILE__, __LINE__);
     }
   }
@@ -606,11 +621,11 @@ sub loop_rep_from_dk {
     my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$rep_cmd{'output'} = $json_path;
     $$rep_cmd{'inputs'} = $rep_files;
-    &rep_from_dk($rep_cmd);
+    &rep_from_inputs($rep_cmd);
   }
   }
   return $cmd_info;
-} # loop_rep_from_dk
+} # loop_rep_from_inputs
 sub gen_rt_o {
   my ($cmd_info) = @_;
   if ($$cmd_info{'output'}) {
@@ -649,13 +664,17 @@ sub loop_o_from_dk {
   my ($cmd_info) = @_;
   my $outfiles = [];
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if ($arg =~ m|\.dk$| ||
-        $arg =~ m|\.ctlg(\.\d+)*$|) {
+    if (&is_dk_src_path($arg)) {
       if (! $$cmd_info{'opts'}{'silent'}) {
         print $arg . "\n";
       }
       my $cc_path = &nrt_cc_path_from_dk_path($arg);
       my $o_path = &nrt_o_path_from_dk_path($arg);
+      #if ($$cmd_info{'output'}) {
+      #  $o_path = $$cmd_info{'output'};
+      #} else {
+      #  $o_path = &nrt_o_path_from_dk_path($arg);
+      #}
       if ($ENV{'DKT_PRECOMPILE'}) {
         if (&is_debug()) {
           print "  creating $cc_path" . &pann(__FILE__, __LINE__) . "\n";
@@ -670,7 +689,7 @@ sub loop_o_from_dk {
         my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
         $$rep_cmd{'inputs'} = [ $arg ];
         $$rep_cmd{'output'} = $json_path;
-        &rep_from_dk($rep_cmd);
+        &rep_from_inputs($rep_cmd);
         &ordered_set_add($$cmd_info{'reps'}, $json_path, __FILE__, __LINE__);
       }
       my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -949,13 +968,13 @@ sub outfile_from_infiles {
         }
         #print "    creating $output # output" . &pann(__FILE__, __LINE__) . "\n";
       }
-      if ('&loop_merged_rep_from_dk' eq $$cmd_info{'cmd'}) {
+      if ('&loop_merged_rep_from_inputs' eq $$cmd_info{'cmd'}) {
         $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
         delete $$cmd_info{'output'};
         delete $$cmd_info{'cmd'};
         delete $$cmd_info{'cmd-major-mode-flags'};
         delete $$cmd_info{'cmd-flags'};
-        &loop_merged_rep_from_dk($cmd_info, $global_should_echo || $should_echo);
+        &loop_merged_rep_from_inputs($cmd_info, $global_should_echo || $should_echo);
       } elsif ('&loop_cc_from_dk' eq $$cmd_info{'cmd'}) {
         $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
         delete $$cmd_info{'output'};
