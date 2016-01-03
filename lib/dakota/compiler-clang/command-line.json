@@ -5,9 +5,15 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'CXX' => [ 'clang++' ],
-  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden', '-fnon-call-exceptions', '-fasynchronous-unwind-tables', '-fobjc-exceptions', '-lobjc' ],
-  'CXX_COMPILE_FLAGS' => [ '--compile', '-fPIC', '--language', 'objective-c++' ],
+  'CXX' => [ 'clang++', '-ObjC++' ],
+  'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden',
+                  '-fuse-ld=gold', '-use-gold-plugin', '-flto',
+                  '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
+                  '-fobjc-exceptions', '-lobjc'
+                ],
+  'CXX_COMPILE_FLAGS' => [ '--compile', '-fPIC',
+                          #'--language', 'objective-c++'
+                         ],
   'CXX_FOR_LINKER_FLAGS' => [ '--for-linker' ],
   'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
   'CXX_LIBRARY_DIRECTORY_FLAGS' => [ '--library-directory' ],
@@ -40,3 +46,8 @@
   'o_ext' =>  'o',
   'so_ext' => 'so',
 }
+# gold: --no-allow-shlib-undefined
+# gold: --demangle
+# gold: --no-undefined (warning only?)
+# gold: --threads
+# gold: --error-unresolved-symbols
