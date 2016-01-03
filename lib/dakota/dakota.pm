@@ -602,7 +602,7 @@ sub loop_rep_from_inputs {
       &ordered_set_add($rep_files, $json_path, __FILE__, __LINE__);
     }
   }
-  if ($$cmd_info{'output'}) {
+  if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
   if (0 != @$rep_files) {
     my $json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
     &ordered_set_add($$cmd_info{'reps'}, $json_path, __FILE__, __LINE__);
