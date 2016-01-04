@@ -36,6 +36,7 @@ my $extra;
 my $objdir;
 my $hh_ext;
 my $cc_ext;
+my $o_ext;
 my $so_ext;
 
 sub dk_prefix {
@@ -68,6 +69,7 @@ BEGIN {
   $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', 'hh');
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', 'cc');
+  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext',  'o');
   $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
 };
 #use Carp;
@@ -323,25 +325,18 @@ sub loop_cc_from_dk {
     die "$0: error: arguments are requried\n";
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
-    my ($dir, $name) = &split_path($input, "\.$id");
-    my $file = &dakota::generate::dk_parse("$name.dk");
-    #print STDERR "$name.dk\n";
-    #print STDERR &Dumper($$file{'klasses'});
-    my ($cc_path, $cc_name);
+    my ($input_dir, $input_name, $input_ext) = &split_path($input, $id);
+    my $file = &dakota::generate::dk_parse("$input_name.dk");
     my $output_nrt_cc;
-
-    if (!$$cmd_info{'opts'}{'stdout'}) {
-      if ($$cmd_info{'opts'}{'output'}) {
-        $output_nrt_cc = "$$cmd_info{'opts'}{'output'}";
-      } else {
-        $output_nrt_cc = "$name.$cc_ext";
-      }
-      my $output_cc = &cc_path_from_nrt_cc_path($output_nrt_cc);
-      ($cc_path, $cc_name) = &split_path($output_cc, "\.$cc_ext");
+    if ($$cmd_info{'opts'}{'output'}) {
+      $output_nrt_cc = $$cmd_info{'opts'}{'output'};
+    } else {
+      $output_nrt_cc = "$input_name.$cc_ext";
     }
+    my $user_cc = &user_cc_path_from_dk_path($input);
+    my ($user_cc_dir, $user_cc_name, $user_cc_ext) = &split_path($user_cc, $cc_ext);
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($name, "$cc_path/$cc_name");
-
+    &dakota::generate::dk_generate_cc($input_name, $user_cc);
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
@@ -436,7 +431,6 @@ my $should_replace_library_path_with_lib_opts = 1;
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
-  #print STDERR &Dumper($cmd_info);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -648,54 +642,77 @@ sub gen_rt_o {
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
   &rt_o_from_json($cmd_info, $other);
 }
-sub loop_o_from_dk {
-  my ($cmd_info) = @_;
-  my $outfiles = [];
-  foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if (&is_dk_src_path($arg)) {
-      if (! $$cmd_info{'opts'}{'silent'}) {
-        print $arg . "\n";
-      }
-      my $cc_path = &nrt_cc_path_from_dk_path($arg);
-      my $o_path = &nrt_o_path_from_dk_path($arg);
-      #if ($$cmd_info{'output'}) {
-      #  $o_path = $$cmd_info{'output'};
-      #} else {
-      #  $o_path = &nrt_o_path_from_dk_path($arg);
-      #}
+sub cc_path_from_o_path { # reverse dependency
+  my ($o_path) = @_;
+
+  my $cc_path = $o_path =~ s/\.$o_ext$//r;
+  if ($cc_path !~ m/\.(dk|$cc_ext)$/) {
+    $cc_path .= ".$cc_ext";
+  }
+  return $cc_path;
+}
+sub o_from_dk {
+  my ($cmd_info, $input) = @_;
+  if (!$$cmd_info{'opts'}{'silent'}) {
+    print $input . "\n";
+  }
+  my $outfile;
+  if (!&is_dk_src_path($input)) {
+    $outfile = $input;
+  } else {
+    my $o_path;
+    my $cc_path;
+    if ($$cmd_info{'output'} && $$cmd_info{'output'} =~ /\.$o_ext$/) {
+      $o_path = $$cmd_info{'output'};
+    } else {
+      $o_path =  &o_path_from_dk_path($input);
+    }
+    $cc_path = &cc_path_from_o_path($o_path); # reverse dependency
+    if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        if (&is_debug()) {
-          print "  creating $cc_path" . &pann(__FILE__, __LINE__) . "\n";
-        }
+        print "  creating $cc_path" . &pann(__FILE__, __LINE__) . "\n";
       } else {
-        if (&is_debug()) {
-          print "  creating $o_path" . &pann(__FILE__, __LINE__) . "\n";
-        }
+        print "  creating $o_path" . &pann(__FILE__, __LINE__) . "\n";
       }
-      if (!$want_separate_rep_pass) {
-        my $json_path = &json_path_from_any_path($arg); # _from_dk_src_path
-        my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
-        $$rep_cmd{'inputs'} = [ $arg ];
-        $$rep_cmd{'output'} = $json_path;
-        &rep_from_inputs($rep_cmd);
-        &ordered_set_add($$cmd_info{'reps'}, $json_path, __FILE__, __LINE__);
-      }
-      my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$cc_cmd{'inputs'} = [ $arg ];
-      $$cc_cmd{'output'} = $cc_path;
-      $$cc_cmd{'reps'} = $$cmd_info{'reps'};
-      &cc_from_dk($cc_cmd);
+    }
+    if (!$want_separate_rep_pass) {
+      my $json_path = &json_path_from_any_path($input); # _from_dk_src_path
+      my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
+      $$rep_cmd{'inputs'} = [ $input ];
+      $$rep_cmd{'output'} = $json_path;
+      &rep_from_inputs($rep_cmd);
+      &ordered_set_add($$cmd_info{'reps'}, $json_path, __FILE__, __LINE__);
+    }
+    my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
+    $$cc_cmd{'inputs'} = [ $input ];
+    $$cc_cmd{'output'} = $cc_path;
+    $$cc_cmd{'reps'} = $$cmd_info{'reps'};
+    &cc_from_dk($cc_cmd);
+    if ($ENV{'DKT_PRECOMPILE'}) {
+      $outfile = $$cc_cmd{'output'};
+    } else {
       my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$o_cmd{'inputs'} = [ $cc_path ];
       $$o_cmd{'output'} = $o_path;
       delete $$o_cmd{'opts'}{'output'};
-      if (!$ENV{'DKT_PRECOMPILE'}) {
-        &o_from_cc($o_cmd);
-        &dakota::util::add_last($outfiles, $o_path);
-      }
-    } else {
-      &dakota::util::add_last($outfiles, $arg);
+      &o_from_cc($o_cmd);
+      $outfile = $$o_cmd{'output'};
     }
+  }
+  return $outfile;
+} # o_from_dk
+sub loop_o_from_dk {
+  my ($cmd_info) = @_;
+  my $outfiles = [];
+  if (2 > scalar @{$$cmd_info{'inputs'}}) {
+    push @$outfiles, &o_from_dk($cmd_info, $$cmd_info{'inputs'}[0]);
+  } else {
+    my $output = $$cmd_info{'output'};
+    $$cmd_info{'output'} = undef;
+    foreach my $arg (@{$$cmd_info{'inputs'}}) {
+      push @$outfiles, &o_from_dk($cmd_info, $arg);
+    }
+    $$cmd_info{'output'} = $output;
   }
   $$cmd_info{'inputs'} = $outfiles;
   delete $$cmd_info{'opts'}{'output'}; # hackhack
@@ -971,7 +988,7 @@ sub outfile_from_infiles {
         &exec_cmd($cmd_info, $should_echo);
       }
   }
-}
+} # outfile_from_infiles
 sub ctlg_from_so {
   my ($cmd_info) = @_;
   if (! $$cmd_info{'opts'}{'silent'}) {

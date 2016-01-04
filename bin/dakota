@@ -51,6 +51,9 @@ BEGIN {
 use dakota::dakota;
 use dakota::util;
 
+my ( $id,  $mid,  $bid,  $tid,
+    $rid, $rmid, $rbid, $rtid) = &ident_regex();
+
 $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
   or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
 {
@@ -119,46 +122,21 @@ if (0 == @$argv) {
   $argv = [sort {&mtime($b) <=> &mtime($a)} @$argv];
   $$root_cmd{'inputs'} = $argv;
 }
+# dakota --compile --output <> {dk}
+# dakota --shared  --output <> {o}+ {so}* [obj/rt/<>.cc.o]
+# dakota           --output <> {o}+ {so}* [obj/rt/<>.cc.o]
 
-if (!$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'output'}) {
-  my $output;
-  my $dk_files = [];
-  my $main_dk_file;
-  for my $input (@{$$root_cmd{'inputs'}}) {
-    if ($input =~/([\w-]+)\.dk$/) {
-      push @$dk_files, $input;
-      if (!$main_dk_file) {
-        my $inputstr = &filestr_from_file($input);
-        if ($inputstr =~ /(FUNC|func|auto|int|int-t)\s+main\s*\(.*?\)\s*(->\s*(int|int-t))?\s*\{/gs) {
-          $main_dk_file = $input;
-          last;
-        }
-      }
-    }
-  }
-  if ($main_dk_file) {
-    $output = $main_dk_file;
-    if (&is_debug() && $main_dk_file ne $$dk_files[0]) {
-      print "Source file containing main() not listed as first argument.\n";
-    }
-  } else {
-    $output = $$dk_files[0];
-  }
-  $output =~ m/([\w-]+)\.dk$/;
-  my $output_base = $1;
-  if ($$root_cmd{'opts'}{'shared'}) {
-    $$root_cmd{'opts'}{'output'} = 'lib' . $output_base . ".$so_ext"; # lib
-  } else {
-    $$root_cmd{'opts'}{'output'} = $output_base; # exe
-  }
-}
-if ($$root_cmd{'opts'}{'soname'}) {
-  $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
+if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'shared'}) {
+  my $output = $$root_cmd{'inputs'}[0] =~ s{($id)(\.$id)*$}{$1}r;
+  print "using implicit executable name: $output\n";
+  $$root_cmd{'opts'}{'output'} = $output;
 }
 if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
 }
-
+if ($$root_cmd{'opts'}{'soname'}) {
+  $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
+}
 if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
   my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
   if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota) {

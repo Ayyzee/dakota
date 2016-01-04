@@ -59,23 +59,23 @@ sub dk_prefix {
   }
 }
 my $patterns = {
-  'cc_path_from_nrt_cc_path' => '$(objdir)/-user/%.dk.$(cc_ext)  : $(objdir)/%.$(cc_ext)',
+  'user_cc_path_from_dk_path' => '$(objdir)/-user/%.dk.$(cc_ext) : %.dk',
 
-  'nrt_cc_path_from_dk_path' => '$(objdir)/%.$(cc_ext)          : %.dk',
-  'nrt_o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
-
-  'o_path_from_cc_path' =>      '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
+  'o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
+  'o_path_from_cc_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
 
   'json_path_from_any_path' =>  '$(objdir)/%.json               : %', # dk or ctlg
   'json_path_from_ctlg_path' => '$(objdir)/%.ctlg.json          : $(objdir)/%.ctlg',
 
+  # -rt also used in dakota.pm
   'rt_json_path_from_any_path' => '$(objdir)/-rt/%.json            : %', # _from_exe_path
   'rt_json_path_from_so_path' =>  '$(objdir)/-rt/%.$(so_ext).json  : %.$(so_ext)',
 
   'ctlg_path_from_so_path' =>   '$(objdir)/%.$(so_ext).ctlg     : %.$(so_ext)',
 
+  # -rt also used in dakota.pm
   'rt_cc_path_from_any_path' => '$(objdir)/-rt/%.$(cc_ext)       : %', # _from_exe_path
-  'rt_cc_path_from_so_path' =>  '$(objdir)/-rt/%.$(cc_ext)       : %.$(so_ext)',
+  'rt_cc_path_from_so_path' =>  '$(objdir)/-rt/%.$(so_ext).$(cc_ext)       : %.$(so_ext)',
 };
 my $expanded_patterns = &expand_tbl_values($patterns);
 #print STDERR &Dumper($expanded_patterns);
@@ -129,11 +129,10 @@ our @EXPORT= qw(
                  colin
                  colout
                  ctlg_path_from_so_path
-                 cc_path_from_nrt_cc_path
+                 user_cc_path_from_dk_path
                  init_global_rep
                  kw_args_translate
-                 nrt_cc_path_from_dk_path
-                 nrt_o_path_from_dk_path
+                 o_path_from_dk_path
                  o_path_from_cc_path
                  json_path_from_any_path
                  json_path_from_ctlg_path
@@ -398,17 +397,13 @@ sub rel_path_canon {
   }
   return $result;
 }
-sub cc_path_from_nrt_cc_path {
+sub user_cc_path_from_dk_path {
   my ($path) = @_;
-  return &out_path_from_in_path('cc_path_from_nrt_cc_path', $path);
+  return &out_path_from_in_path('user_cc_path_from_dk_path', $path);
 }
-sub nrt_cc_path_from_dk_path {
+sub o_path_from_dk_path {
   my ($path) = @_;
-  return &out_path_from_in_path('nrt_cc_path_from_dk_path', $path);
-}
-sub nrt_o_path_from_dk_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('nrt_o_path_from_dk_path', $path);
+  return &out_path_from_in_path('o_path_from_dk_path', $path);
 }
 sub o_path_from_cc_path {
   my ($path) = @_;

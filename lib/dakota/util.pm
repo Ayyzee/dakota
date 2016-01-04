@@ -508,7 +508,7 @@ sub split_path {
   my $ext;
   if ($ext_re) {
     $ext = $name =~ s|^.+?($ext_re)$|$1|r;
-    $name =~ s|^(.+?)$ext_re$|$1|;
+    $name =~ s|^(.+?)\.$ext_re$|$1|;
   }
   return ($dir, $name, $ext);
 }

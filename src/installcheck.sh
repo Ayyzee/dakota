@@ -1,5 +1,8 @@
 #!/bin/bash
 set -o errexit -o nounset -o pipefail
+finish() {
+  find $OBJDIR -type f | sort
+}
 rootdir=..
 source $rootdir/common.sh
 source $rootdir/config.sh

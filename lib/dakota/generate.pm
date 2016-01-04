@@ -138,7 +138,7 @@ sub set_global_scratch_str_ref {
 }
 sub set_nrt_decl {
   my ($path) = @_;
-  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
+  my ($dir, $name, $ext) = &split_path($path, $id);
   $gbl_nrt_file = &canon_path("$name.dk");
   $global_is_rt   = 0;
   $global_is_defn = 0;
@@ -146,11 +146,11 @@ sub set_nrt_decl {
 }
 sub set_nrt_defn {
   my ($path) = @_;
-  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
+  my ($dir, $name, $ext) = &split_path($path, $id);
   $gbl_nrt_file = &canon_path("$name.dk");
   $global_is_rt   = 0;
   $global_is_defn = 1;
-  $global_suffix = $cc_ext;
+  $global_suffix = $ext;
 }
 sub set_rt_decl {
   my ($path) = @_;
@@ -277,17 +277,19 @@ sub write_to_file_converted_strings {
 }
 sub generate_nrt_decl {
   my ($path, $file) = @_;
+  #print "generate_nrt_decl($path, ...)\n";
   &set_nrt_decl($path);
   return &generate_nrt($path, $file);
 }
 sub generate_nrt_defn {
   my ($path, $file) = @_;
+  #print "generate_nrt_defn($path, ...)\n";
   &set_nrt_defn($path);
   return &generate_nrt($path, $file);
 }
 sub generate_nrt {
   my ($path, $file) = @_;
-  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
+  my ($dir, $name, $ext) = &split_path($path, $id);
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $pre_output = "$dir/$name.dk$suffix";
@@ -318,17 +320,19 @@ sub generate_nrt {
 } # sub generate_nrt
 sub generate_rt_decl {
   my ($path, $file) = @_;
+  #print "generate_rt_decl($path, ...)\n";
   &set_rt_decl($path);
   return &generate_rt($path, $file);
 }
 sub generate_rt_defn {
   my ($path, $file) = @_;
+  #print "generate_rt_defn($path, ...)\n";
   &set_rt_defn($path);
   return &generate_rt($path, $file);
 }
 sub generate_rt {
   my ($path, $file) = @_;
-  my ($dir, $name) = &split_path($path, "\.$id"); # only $cc_ext?
+  my ($dir, $name, $ext) = &split_path($path, $id);
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $pre_output = "$dir/$name.dk$suffix";
@@ -4259,7 +4263,7 @@ sub pad {
 sub dk_generate_cc {
   my ($file_basename, $path_name) = @_;
   my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
-  my $output = "$path_name.$cc_ext";
+  my $output = $path_name;
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output
