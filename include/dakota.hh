@@ -23,8 +23,10 @@
 # include <cstdarg> // va-list
 # include <cstdint>
 # include <cstring> // memcpy()
-# include <cxxabi.h>
 # include <new> // std::bad-alloc
+
+# include <syslog.h>
+# include <cxxabi.h>
 
 # define cast(t) (t)
 # define ssizeof(t) (cast(ssize_t)sizeof(t))
@@ -132,6 +134,7 @@ namespace va {
   [[noreturn]] [[format_va_printf(3)]] static inline FUNC _abort_with_log(const char8_t* file, int_t line, const char8_t* format, va_list_t args) -> void {
     fprintf(stderr, "%s:%i: ", file, line);
     vfprintf(stderr, format, args);
+    vsyslog(LOG_ERR, format, args);
     std::abort();
   }
 }
