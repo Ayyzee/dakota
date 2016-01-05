@@ -159,6 +159,7 @@ static FUNC file_exists(const char* path, int flags = O_RDONLY) -> bool {
 // 2: try to dlopen() path
 
 FUNC main(int argc, char** argv, char**) -> int {
+  int exit_value = 0;
   handle_opts(&argc, &argv);
   const char* dev_null = "/dev/null";
   char buffer[MAXPATHLEN] = "";
@@ -166,7 +167,7 @@ FUNC main(int argc, char** argv, char**) -> int {
 
   if (nullptr != opts.directory) {
     int n = chdir(opts.directory);
-    if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", opts.directory, strerror(errno));
+    if (-1 == n) exit_fail_with_msg("ERROR:8 %s: \"%s\"\n", opts.directory, strerror(errno));
   }
   if (nullptr != opts.output) {
     if (0 == strcmp(dev_null, opts.output)) {
@@ -176,9 +177,9 @@ FUNC main(int argc, char** argv, char**) -> int {
       snprintf(output_pid, sizeof(buffer), "%s-%i", opts.output, pid);
       // create an empty file
       int fd = open(output_pid, O_CREAT | O_TRUNC, 0644);
-      if (-1 == fd) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
+      if (-1 == fd) exit_fail_with_msg("ERROR:7 %s: \"%s\"\n", output_pid, strerror(errno));
       int n = close(fd);
-      if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
+      if (-1 == n) exit_value = non_exit_fail_with_msg("ERROR:6 %s: \"%s\"\n", output_pid, strerror(errno));
     }
   }
   int overwrite;
@@ -222,21 +223,21 @@ FUNC main(int argc, char** argv, char**) -> int {
             if (! opts.silent)
               printf("%s\n", lmap->l_name);
           } else
-            abort_with_log("ERROR: dlinfo(RTLD_DI_LINKMAP) failed to return absolute path of shared library dynamically loaded by dlopen(\"%s\")",
+            exit_value = non_exit_fail_with_msg("ERROR:5 dlinfo(RTLD_DI_LINKMAP) failed to return absolute path of shared library dynamically loaded by dlopen(\"%s\")",
                            arg);
         } else
-          abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
+          exit_value = non_exit_fail_with_msg("ERROR:4 %s: \"%s\"\n", arg, dlerror()); // dlinfo() failure
+        if (0 != dlclose(handle))
+          exit_value = non_exit_fail_with_msg("ERROR:2 %s: \"%s\"\n", arg, dlerror()); // dlclose() failure
       } else
-        abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
-      if (0 != dlclose(handle))
-        abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
+        exit_value = non_exit_fail_with_msg("ERROR:3 %s: \"%s\"\n", arg, dlerror());   // dlopen() failure
     }
   }
   if (nullptr != opts.output) {
     if (dev_null != output_pid) {
       int n = rename(output_pid, opts.output);
-      if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));
+      if (-1 == n) exit_value = non_exit_fail_with_msg("ERROR:1 %s: \"%s\"\n", opts.output, strerror(errno));
     }
   }
-  return 0;
+  return exit_value;
 }

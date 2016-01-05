@@ -131,20 +131,34 @@ namespace dkt {
 # define scountof(array) cast(ssize_t)countof(array)
 
 namespace va {
-  [[noreturn]] [[format_va_printf(3)]] static inline FUNC _abort_with_log(const char8_t* file, int_t line, const char8_t* format, va_list_t args) -> void {
-    fprintf(stderr, "%s:%i: ", file, line);
+  [[format_va_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, va_list_t args) -> int {
+    if (1) {
+      va_list syslog_args;
+      va_copy(syslog_args, args);
+      vsyslog(LOG_ERR, format, syslog_args);
+    }
     vfprintf(stderr, format, args);
-    vsyslog(LOG_ERR, format, args);
-    std::abort();
+    return EXIT_FAILURE;
   }
 }
-[[noreturn]] [[format_printf(3)]] static inline FUNC _abort_with_log(const char8_t* file, int_t line, const char8_t* format, ...) -> void {
+[[format_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, ...) -> int {
   va_list_t args;
   va_start(args, format);
-  va::_abort_with_log(file, line, format, args);
+  int val = va::non_exit_fail_with_msg(format, args);
+  va_end(args);
+  return val;
+}
+namespace va {
+  [[noreturn]] [[format_va_printf(1)]] static inline FUNC exit_fail_with_msg(const char8_t* format, va_list_t args) -> void {
+    exit(va::non_exit_fail_with_msg(format, args));
+  }
+}
+[[noreturn]] [[format_printf(1)]] static inline FUNC exit_fail_with_msg(const char8_t* format, ...) -> void {
+  va_list_t args;
+  va_start(args, format);
+  va::exit_fail_with_msg(format, args);
   va_end(args);
 }
-# define abort_with_log(...) _abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
 // template <typename T, size-t N>
 // constexpr size-t dk-countof(T(&)[N]) {
 //   return N;

@@ -320,13 +320,13 @@ klass ostream {
     slots-t s = { nullptr, 0 };
     s.output = ::fopen(path, "w");
     if (nullptr == s.output)
-      std::abort();
+      exit-fail-with-msg("ERROR: %s: \"%s\"", path, strerror(errno));
     return s;
   }
   static func fclose(slots-t& s) -> slots-t& {
     int n = ::fclose(s.output);
     if (-1 == n)
-      std::abort();
+      non-exit-fail-with-msg("ERROR: %s: \"%s\"", "fclose", strerror(errno));
     return s;
   }
 }
@@ -885,8 +885,7 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
 
       if (nullptr == modulee) {
         named-info::dump(klass-info);
-        fprintf(stderr, "%s:%i: error: missing module declaration\n", __FILE__, __LINE__);
-        std::abort();
+        exit-fail-with-msg("ERROR: missing module declaration");
       }
       if (module-name != modulee)
         ostream::println-format(ostrm, "export %s {", modulee);
@@ -927,7 +926,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
     if (nullptr != output-dir) {
       int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
-        std::abort();
+        exit-fail-with-msg("ERROR: %s: \"%s\"", output-dir, strerror(errno));
     }
     while (1) {
       named-info-t* klass-info = &klass-defns[i++];
@@ -1410,8 +1409,7 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   sa-pairs[index-from-sig(sig)].prev-sa.sa-sigaction = nullptr;
   int-t r = sigaction(sig, &sa, &sa-pairs[index-from-sig(sig)].prev-sa);
   if (-1 == r) {
-    perror("sigaction");
-    std::abort();
+    exit-fail-with-msg("ERROR: %s: \"%s\"", "sigaction", strerror(errno));
   }
   return r;
 }
@@ -1425,8 +1423,7 @@ static func set-read-only(str-t segment, get-segment-data-t get-segment-data) ->
   if (nullptr != addr) {
     result = mprotect(addr, size, PROT-READ);
     if (-1 == result) {
-      perror("mprotect");
-      std::abort();
+      exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
     }
   }
   return result;
@@ -1464,7 +1461,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     else {
       ctlg-output = fopen(output-path, "a"); // output-path is initially truncated by dakota-catalog
       if (nullptr == ctlg-output)
-        abort-with-log("ERROR: %s: \"%s\"\n", output-path, strerror(errno));
+        exit-fail-with-msg("ERROR: %s: \"%s\"", output-path, strerror(errno));
     }
   }
   if (nullptr != ctlg-output) {
