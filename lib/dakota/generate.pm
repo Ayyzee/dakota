@@ -76,8 +76,7 @@ if ($use_new_macro_system) {
   #use dakota::macro_system;
 }
 
-#use Carp;
-#$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use integer;
 use Cwd;

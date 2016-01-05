@@ -72,8 +72,7 @@ BEGIN {
   $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext',  'o');
   $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
 };
-#use Carp;
-#$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 require Exporter;
 our @ISA = qw(Exporter);
