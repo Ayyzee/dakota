@@ -36,7 +36,7 @@ $(libdakota-util.output): $(libdakota.output)
 $(libdakota.output): $(srcdir)/strerror-name.tbl # not ideal, but ...
 
 check: all
-	$(dakota-info.output) $(libdakota.output) $(libdakota-util.output)
+	$(dakota-info.output) --silent $(libdakota.output) $(libdakota-util.output)
 
 installcheck: check install
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
