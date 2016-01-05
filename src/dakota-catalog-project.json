@@ -4,9 +4,9 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
-{ 'dakota-info' => {
+{ 'dakota-catalog' => {
     'srcs' => [ # cmd-line
-      '$(srcdir)/dakota-info.$(cc_ext)',
+      '$(srcdir)/dakota-catalog.$(cc_ext)',
     ],
     'libs' => [ # cmd-line
       'libdl.$(so_ext)', # darwin: /usr/lib/libdl.dylib
@@ -15,13 +15,13 @@
       '$(srcdir)',
       '$(srcdir)/../include',
     ],
-    'output' => '$(blddir)/../bin/dakota-info', # cmd-line
+    'output' => '$(blddir)/../bin/dakota-catalog', # cmd-line
     'install' => {
       '-rules' => [
         '$(DESTDIR)$(prefix)/bin/%', '$(blddir)/../bin/%',
       ],
       'files' =>   [ # install.files
-        '$(DESTDIR)$(prefix)/bin/dakota-info',
+        '$(DESTDIR)$(prefix)/bin/dakota-catalog',
       ],
     }
   }

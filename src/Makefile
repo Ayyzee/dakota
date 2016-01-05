@@ -2,17 +2,17 @@ rootdir := ..
 
 include $(rootdir)/dakota.mk
 
-include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/dakota-info-project.mk    $(srcdir)/dakota-info-project.json)
+include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/dakota-catalog-project.mk $(srcdir)/dakota-catalog-project.json)
 include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.json)
 include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.json)
 
 # include-dirs
-dakota-info.include-dirs :=    $(patsubst %,--include-directory %,$(dakota-info.include-dirs))
+dakota-catalog.include-dirs := $(patsubst %,--include-directory %,$(dakota-catalog.include-dirs))
 libdakota.include-dirs :=      $(patsubst %,--include-directory %,$(libdakota.include-dirs))
 libdakota-util.include-dirs := $(patsubst %,--include-directory %,$(libdakota-util.include-dirs))
 
 # macros
-#dakota-info.macros :=
+#dakota-catalog.macros :=
 libdakota.macros :=      $(patsubst %,--define-macro %,$(libdakota.macros))
 libdakota-util.macros := $(patsubst %,--define-macro %,$(libdakota-util.macros))
 
@@ -30,13 +30,13 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  precompile\
  uninstall\
 
-$(libdakota.output) $(libdakota-util.output): $(dakota-info.output)
+$(libdakota.output) $(libdakota-util.output): $(dakota-catalog.output)
 $(libdakota-util.output): $(libdakota.output)
 
 $(libdakota.output): $(srcdir)/strerror-name.tbl # not ideal, but ...
 
 check: all
-	$(dakota-info.output) --silent $(libdakota.output) $(libdakota-util.output)
+	$(dakota-catalog.output) --silent $(libdakota.output) $(libdakota-util.output)
 
 installcheck: check install
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
@@ -46,8 +46,8 @@ goal-clean:
 
 clean: goal-clean
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
-	$(RM) $(RMFLAGS) $(dakota-info.output)
-	$(RM) $(RMFLAGS) $(dakota-info.output).$(cxx_debug_symbols_ext)
+	$(RM) $(RMFLAGS) $(dakota-catalog.output)
+	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(libdakota.output)
 	$(RM) $(RMFLAGS) $(libdakota.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(libdakota-util.output)

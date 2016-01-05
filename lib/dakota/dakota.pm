@@ -995,13 +995,13 @@ sub ctlg_from_so {
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
 
-  if ($ENV{'DAKOTA_INFO'}) {
-    $$ctlg_cmd{'cmd'} = $ENV{'DAKOTA_INFO'};
+  if ($ENV{'DAKOTA_CATALOG'}) {
+    $$ctlg_cmd{'cmd'} = $ENV{'DAKOTA_CATALOG'};
   } elsif ($gbl_prefix) {
-    $$ctlg_cmd{'cmd'} = "$gbl_prefix/bin/dakota-info";
+    $$ctlg_cmd{'cmd'} = "$gbl_prefix/bin/dakota-catalog";
   } else {
-    die "should not call just any dakota-info"; # should we call just any dakota-info?
-    $$ctlg_cmd{'cmd'} = 'dakota-info';
+    die "should not call just any dakota-catalog"; # should we call just any dakota-catalog?
+    $$ctlg_cmd{'cmd'} = 'dakota-catalog';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};

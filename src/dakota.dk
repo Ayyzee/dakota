@@ -1462,7 +1462,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     if (NUL == output-path[0]) // empty-string ("") means use default-value
       ctlg-output = stdout;
     else {
-      ctlg-output = fopen(output-path, "a"); // output-path is initially truncated by dakota-info
+      ctlg-output = fopen(output-path, "a"); // output-path is initially truncated by dakota-catalog
       if (nullptr == ctlg-output)
         abort-with-log("ERROR: %s: \"%s\"\n", output-path, strerror(errno));
     }

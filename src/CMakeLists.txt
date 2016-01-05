@@ -1,9 +1,9 @@
-# dakota-info
-project (dakota-info CXX)
-set (dakota-info-srcs dakota-info.cc)
-add_executable        (dakota-info ${dakota-info-srcs})
-target_link_libraries (dakota-info LINK_PUBLIC ${CMAKE_DL_LIBS})
-set_target_properties (dakota-info
+# dakota-catalog
+project (dakota-catalog CXX)
+set (dakota-catalog-srcs dakota-catalog.cc)
+add_executable        (dakota-catalog ${dakota-catalog-srcs})
+target_link_libraries (dakota-catalog LINK_PUBLIC ${CMAKE_DL_LIBS})
+set_target_properties (dakota-catalog
   PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
 )

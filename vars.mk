@@ -73,7 +73,7 @@ else
   # --keep-going
 endif
 
-DAKOTA_INFO ?= $(blddir)/../bin/dakota-info
+DAKOTA_CATALOG ?= $(blddir)/../bin/dakota-catalog
 
 DAKOTAFLAGS ?=
 EXTRA_DAKOTAFLAGS ?=
@@ -82,5 +82,5 @@ EXTRA_DAKOTAFLAGS ?=
 
 cxx_debug_symbols_ext ?=
 
-export DAKOTA_INFO
+export DAKOTA_CATALOG
 export EXTRA_CXXFLAGS

@@ -31,8 +31,8 @@ rm -f installcheck-so.so installcheck-util-so.so
 set -o verbose
 $DEST$prefix/bin/dakota --shared installcheck-so.dk
 $DEST$prefix/bin/dakota --shared installcheck-util-so.dk $DEST$prefix/lib/libdakota-util.$so_ext
-$prefix/bin/dakota-info installcheck-so.so
-$prefix/bin/dakota-info installcheck-util-so.so
+$prefix/bin/dakota-catalog installcheck-so.so
+$prefix/bin/dakota-catalog installcheck-util-so.so
 set +o verbose
 rm -f installcheck-so.dk installcheck-util-so.dk
 
