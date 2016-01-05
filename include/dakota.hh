@@ -128,6 +128,20 @@ namespace dkt {
 # define countof(array) (sizeof((array))/sizeof((array)[0]))
 # define scountof(array) cast(ssize_t)countof(array)
 
+namespace va {
+  [[noreturn]] [[format_va_printf(3)]] static inline FUNC _abort_with_log(const char8_t* file, int_t line, const char8_t* format, va_list_t args) -> void {
+    fprintf(stderr, "%s:%i: ", file, line);
+    vfprintf(stderr, format, args);
+    std::abort();
+  }
+}
+[[noreturn]] [[format_printf(3)]] static inline FUNC _abort_with_log(const char8_t* file, int_t line, const char8_t* format, ...) -> void {
+  va_list_t args;
+  va_start(args, format);
+  va::_abort_with_log(file, line, format, args);
+  va_end(args);
+}
+# define abort_with_log(...) _abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
 // template <typename T, size-t N>
 // constexpr size-t dk-countof(T(&)[N]) {
 //   return N;

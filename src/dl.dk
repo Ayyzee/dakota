@@ -14,7 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <dlfcn.h> // struct Dl-info, dladdr()
+# if ! defined _GNU_SOURCE
+# define _GNU_SOURCE // dlinfo()
+# endif
+# include <link.h>
+# include <dlfcn.h> // dlopen(), dlclose(), dladdr(), struct Dl-info
 
 # include "dl.hh"
 

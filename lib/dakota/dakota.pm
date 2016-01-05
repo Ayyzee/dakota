@@ -653,7 +653,7 @@ sub cc_path_from_o_path { # reverse dependency
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
   if (!$$cmd_info{'opts'}{'silent'}) {
-    print $input . "\n";
+    print $input . "\n"; # dk_path
   }
   my $outfile;
   if (!&is_dk_src_path($input)) {
@@ -991,7 +991,7 @@ sub outfile_from_infiles {
 sub ctlg_from_so {
   my ($cmd_info) = @_;
   if (! $$cmd_info{'opts'}{'silent'}) {
-    print join("\n", @{$$cmd_info{'inputs'}}) . "\n";
+    #map { print '// ' . $_ . "\n"; } @{$$cmd_info{'inputs'}};
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
 

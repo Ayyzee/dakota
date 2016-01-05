@@ -15,7 +15,6 @@
 // limitations under the License.
 
 # include <getopt.h> // getopt_long()
-# include <dlfcn.h>  // dlopen()
 # include <sys/param.h> // MAXPATHLEN
 # include <errno.h>
 # include <string.h>
@@ -24,6 +23,12 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/wait.h>
+
+# if ! defined _GNU_SOURCE
+# define _GNU_SOURCE // dlinfo()
+# endif
+# include <link.h>
+# include <dlfcn.h>  // dlopen()/dlclose()
 
 # include "dakota-dummy.hh"
 # include "dakota.hh" // format_printf(), format_va_printf()
@@ -34,7 +39,8 @@ enum {
   DKT_INFO_OUTPUT_DIRECTORY,
   DKT_INFO_DIRECTORY,
   DKT_INFO_ONLY,
-  DKT_INFO_RECURSIVE
+  DKT_INFO_RECURSIVE,
+  DKT_INFO_SILENT,
 };
 struct opts_t {
   char* only; // full or partial (prefix) klass name
@@ -42,6 +48,7 @@ struct opts_t {
   char* output_directory; // path or "" for .
   char* directory;
   bool  recursive;
+  bool  silent;
 };
 static opts_t opts;
 
@@ -84,6 +91,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
     { "directory",        required_argument, nullptr, DKT_INFO_DIRECTORY },
     { "only",             required_argument, nullptr, DKT_INFO_ONLY },
     { "recursive",        no_argument,       nullptr, DKT_INFO_RECURSIVE },
+    { "silent",           no_argument,       nullptr, DKT_INFO_SILENT },
     { nullptr, 0, nullptr, 0 }
   };
   int opt;
@@ -108,6 +116,9 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
       case DKT_INFO_RECURSIVE:
         opts.recursive = true;
         break;
+      case DKT_INFO_SILENT:
+        opts.silent = true;
+        break;
       default:
         unrecognized_opt_cnt++;
     }
@@ -120,20 +131,6 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
   *argv += optind;
   return;
 }
-namespace va {
-  [[noreturn]] [[format_va_printf(3)]] static FUNC _abort_with_log(const char* file, int line, const char* format, va_list args) -> void {
-    fprintf(stderr, "%s:%i: ", file, line);
-    vfprintf(stderr, format, args);
-    std::abort();
-  }
-}
-[[noreturn]] [[format_printf(3)]] static FUNC _abort_with_log(const char* file, int line, const char* format, ...) -> void {
-  va_list args;
-  va_start(args, format);
-  va::_abort_with_log(file, line, format, args);
-  va_end(args);
-}
-# define abort_with_log(...) _abort_with_log(__FILE__, __LINE__, __VA_ARGS__)
 
 # include "spawn.cc"
 
@@ -151,20 +148,26 @@ static FUNC setenv_boole(const char* name, bool value, int overwrite) -> int {
 
 FUNC main(int argc, char** argv, char**) -> int {
   handle_opts(&argc, &argv);
-  char output_pid[MAXPATHLEN] = "";
+  const char* dev_null = "/dev/null";
+  char buffer[MAXPATHLEN] = "";
+  char* output_pid = buffer;
 
   if (nullptr != opts.directory) {
     int n = chdir(opts.directory);
-    if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
+    if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", opts.directory, strerror(errno));
   }
   if (nullptr != opts.output) {
-    pid_t pid = getpid();
-    snprintf(output_pid, sizeof(output_pid), "%s-%i", opts.output, pid);
-    // create an empty file
-    int fd = open(output_pid, O_CREAT | O_TRUNC, 0644);
-    if (-1 == fd) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
-    int n = close(fd);
-    if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
+    if (0 == strcmp(dev_null, opts.output)) {
+      output_pid = cast(char*)dev_null;
+    } else {
+      pid_t pid = getpid();
+      snprintf(output_pid, sizeof(buffer), "%s-%i", opts.output, pid);
+      // create an empty file
+      int fd = open(output_pid, O_CREAT | O_TRUNC, 0644);
+      if (-1 == fd) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
+      int n = close(fd);
+      if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", output_pid, strerror(errno));
+    }
   }
   int overwrite;
   setenv("DKT_INFO_OUTPUT", output_pid, overwrite = 1);
@@ -189,13 +192,29 @@ FUNC main(int argc, char** argv, char**) -> int {
       unsetenv("DKT_EXIT_BEFORE_MAIN");
       setenv("DKT_INFO_ARG_TYPE", "lib", overwrite = 1); // not currently used
       void* handle = dlopen(arg, RTLD_NOW | RTLD_LOCAL);
-      if ((nullptr == handle) || (0 != dlclose(handle)))
+      if (nullptr != handle) {
+        struct link_map* lmap = nullptr;
+        int e = dlinfo(handle, RTLD_DI_LINKMAP, &lmap);
+        if (-1 != e) {
+          if (nullptr != lmap->l_name) {
+            if (! opts.silent)
+              printf("%s\n", lmap->l_name);
+          } else
+            abort_with_log("ERROR: dlinfo(RTLD_DI_LINKMAP) failed to return absolute path of shared library dynamically loaded by dlopen(\"%s\")",
+                           arg);
+        } else
+          abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
+      } else
+        abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
+      if (0 != dlclose(handle))
         abort_with_log("ERROR: %s: \"%s\"\n", arg, dlerror());
     }
   }
   if (nullptr != opts.output) {
-    int n = rename(output_pid, opts.output);
-    if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));
+    if (dev_null != output_pid) {
+      int n = rename(output_pid, opts.output);
+      if (-1 == n) abort_with_log("ERROR: %s: \"%s\"\n", opts.output, strerror(errno));
+    }
   }
   return 0;
 }
