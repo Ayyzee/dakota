@@ -142,6 +142,18 @@ static FUNC setenv_boole(const char* name, bool value, int overwrite) -> int {
     unsetenv(name);
   return result;
 }
+static FUNC file_exists(const char* path, int flags = O_RDONLY) -> bool {
+  bool state;
+  int fd = open(path, flags);
+  if (-1 == fd) {
+    state = false;
+  } else {
+    state = true;
+    close(fd);
+  }
+  return state;
+}
+
 // 1: try to exec() path
 //    if that fails
 // 2: try to dlopen() path
@@ -192,6 +204,16 @@ FUNC main(int argc, char** argv, char**) -> int {
       unsetenv("DKT_EXIT_BEFORE_MAIN");
       setenv("DKT_INFO_ARG_TYPE", "lib", overwrite = 1); // not currently used
       void* handle = dlopen(arg, RTLD_NOW | RTLD_LOCAL);
+
+      // if the shared library is not found in the search path
+      // and the argument *could* be relative to the cwd
+      if (nullptr == handle && nullptr == strchr(arg, '/')) {
+        char rel_arg[MAXPATHLEN] = "";
+        strcat(rel_arg, "./");
+        strcat(rel_arg, arg);
+        if (file_exists(rel_arg))
+          handle = dlopen(rel_arg, RTLD_NOW | RTLD_LOCAL);
+      }
       if (nullptr != handle) {
         struct link_map* lmap = nullptr;
         int e = dlinfo(handle, RTLD_DI_LINKMAP, &lmap);

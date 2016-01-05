@@ -126,9 +126,14 @@ if (0 == @$argv) {
 # dakota --shared  --output <> {o}+ {so}* [obj/rt/<>.cc.o]
 # dakota           --output <> {o}+ {so}* [obj/rt/<>.cc.o]
 
-if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'} && !$$root_cmd{'opts'}{'shared'}) {
+if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
   my $output = $$root_cmd{'inputs'}[0] =~ s{($id)(\.$id)*$}{$1}r;
-  print "using implicit executable name: $output\n";
+  if ($$root_cmd{'opts'}{'shared'}) {
+    $output .= ".$so_ext";
+    print "using implicit lib name: $output\n";
+  } else {
+    print "using implicit exe name: $output\n";
+  }
   $$root_cmd{'opts'}{'output'} = $output;
 }
 if ($$root_cmd{'opts'}{'output'}) {
