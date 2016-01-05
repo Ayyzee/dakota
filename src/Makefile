@@ -39,6 +39,7 @@ check: all
 	$(dakota-catalog.output) --silent $(libdakota.output) $(libdakota-util.output)
 
 installcheck: check install
+	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
