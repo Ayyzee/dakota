@@ -1015,7 +1015,8 @@ sub ctlg_from_so {
         print STDERR "warning: $input does not exist.\n";
         my $json_path;
         if (&is_so_path($input)) {
-          $json_path = &json_path_from_so_path($input);
+          my $ctlg_path = &ctlg_path_from_so_path($input);
+          $json_path = &json_path_from_ctlg_path($ctlg_path);
         } elsif (&is_dk_src_path($input)) {
           $json_path = &json_path_from_any_path($input); # _from_dk_src_path
         } else {
