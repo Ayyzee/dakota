@@ -58,6 +58,11 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
+sub json_path_from_o_path {
+  my ($in_path) = @_;
+  my $out_path = $in_path =~ s/(\.($cc_ext|dk))?\.$o_ext$/.dk.json/r; # hackhack
+  return $out_path;
+ }
 my $patterns = {
   'user_cc_path_from_dk_path' => '$(objdir)/-user/%.dk.$(cc_ext) : %.dk',
 
@@ -135,6 +140,7 @@ our @EXPORT= qw(
                  o_path_from_cc_path
                  json_path_from_any_path
                  json_path_from_ctlg_path
+                 json_path_from_o_path
                  rt_json_path_from_any_path
                  rt_json_path_from_so_path
                  rt_cc_path_from_any_path
