@@ -134,8 +134,8 @@ sub loop_merged_rep_from_inputs {
   if ($$cmd_info{'reps'}) {
     $rep_files = $$cmd_info{'reps'};
   }
+  my $root;
   foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    my $root;
     if (&is_dk_src_path($arg)) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
       &dakota::util::add_last($rep_files, &json_path_from_any_path($arg)); # _from_dk_src_path
@@ -145,13 +145,12 @@ sub loop_merged_rep_from_inputs {
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
-    if (1 == @{$$cmd_info{'inputs'}}) {
-      if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
-        &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
-      }
-    }
   }
-  if (1 < @{$$cmd_info{'inputs'}}) {
+  if (1 == @{$$cmd_info{'inputs'}}) {
+    if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
+      &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
+    }
+  } elsif (1 < @{$$cmd_info{'inputs'}}) {
     if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
       my $rep = &dakota::parse::rep_merge($rep_files);
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
@@ -746,13 +745,14 @@ sub o_from_cc {
 }
 sub rt_o_from_json {
   my ($cmd_info, $other) = @_;
-  my $json_path;
+  die if ! defined $$cmd_info{'reps'} || 0 == scalar @{$$cmd_info{'reps'}};
+  my $rt_json_path;
   my $cc_path;
   if (&is_so_path($$cmd_info{'output'})) {
-    $json_path = &rt_json_path_from_so_path($$cmd_info{'output'});
+    $rt_json_path = &rt_json_path_from_so_path($$cmd_info{'output'});
     $cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
   } else {
-    $json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
+    $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
     $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
   }
   my $o_path = &o_path_from_cc_path($cc_path);
@@ -764,7 +764,7 @@ sub rt_o_from_json {
   if ($$cmd_info{'reps'}) {
     &init_global_rep($$cmd_info{'reps'});
   }
-  $file = &scalar_from_file($json_path);
+  $file = &scalar_from_file($rt_json_path);
   die if $$file{'other'};
   $$file{'other'} = $other;
   $file = &kw_args_translate($file);
