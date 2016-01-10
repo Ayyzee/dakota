@@ -86,6 +86,7 @@ our @EXPORT= qw(
                  remove_non_newlines
                  rewrite_klass_defn_with_implicit_metaklass_defn
                  scalar_from_file
+                 scalar_to_file
                  split_path
                  sqstr_regex
                  var
@@ -550,6 +551,26 @@ sub _replace_last {
   my $old_last = &dakota::util::remove_last($seq);
   &dakota::util::add_last($seq, $element);
   return $old_last;
+}
+sub unwrap_seq {
+  my ($seq) = @_;
+  $seq =~ s/\s*\n+\s*/ /gms;
+  $seq =~ s/\s+/ /gs;
+  return $seq;
+}
+sub scalar_to_file {
+  my ($file, $ref) = @_;
+  if (!defined $ref) {
+    print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file($ref)\n";
+  }
+  my $refstr = &Dumper($ref);
+  $refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
+
+  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  flock FILE, 2; # LOCK_EX
+  truncate FILE, 0;
+  print FILE $refstr;
+  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
 }
 sub scalar_from_file {
   my ($file) = @_;
