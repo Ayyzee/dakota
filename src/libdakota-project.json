@@ -7,6 +7,7 @@
 
 { 'libdakota' => {
     'srcs' => [ # cmd-line
+      '$(srcdir)/libdakota.dk',
       '$(srcdir)/autorelease-pool.dk',
       '$(srcdir)/bit-vector.dk',
       '$(srcdir)/boole.dk',
@@ -33,7 +34,6 @@
       '$(srcdir)/method-alias.dk',
       '$(srcdir)/method.dk',
       '$(srcdir)/missing-keyword-exception.dk',
-      '$(srcdir)/module-dakota.dk',
       '$(srcdir)/named-enum-info.dk',
       '$(srcdir)/named-info.dk',
       '$(srcdir)/no-such-keyword-exception.dk',

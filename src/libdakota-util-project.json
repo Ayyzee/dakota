@@ -6,6 +6,7 @@
 # -*- cperl-tab-always-indent: t -*-
 { 'libdakota-util' => {
     'srcs' => [ # cmd-line
+      '$(srcdir)/libdakota-util.dk',
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',
       '$(srcdir)/dimension.dk',
@@ -17,7 +18,6 @@
       '$(srcdir)/json-object-output-stream.dk',
       '$(srcdir)/json-parser.dk',
       '$(srcdir)/lexer.dk',
-      '$(srcdir)/module-dakota-util.dk',
       '$(srcdir)/open-token.dk',
       '$(srcdir)/output-file.dk',
       '$(srcdir)/point.dk',
