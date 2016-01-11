@@ -141,6 +141,7 @@ our @EXPORT= qw(
                  json_path_from_any_path
                  json_path_from_ctlg_path
                  json_path_from_o_path
+                 rep_merge
                  rt_json_path_from_any_path
                  rt_json_path_from_so_path
                  rt_cc_path_from_any_path

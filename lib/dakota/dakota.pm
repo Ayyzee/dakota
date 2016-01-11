@@ -755,6 +755,20 @@ sub rt_o_from_json {
     $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
     $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
   }
+  my $reps = [];
+  my $state = 0;
+  if ($state) {
+    my $json_paths = [];
+    foreach my $input (@{$$cmd_info{'inputs'}}) {
+      # .../foo.cc.o or .../foo.dk.o or .../foo.o
+      if ($input =~ m/\.$o_ext$/) {
+        my $json_path = &json_path_from_o_path($input);
+        push @$json_paths, $json_path;
+      }
+    }
+    push @$reps, @$json_paths;
+    $reps = &clean_paths($reps);
+  }
   my $o_path = &o_path_from_cc_path($cc_path);
   &make_dir($cc_path);
   my ($path, $file_basename, $file) = ($cc_path, $cc_path, undef);
@@ -763,6 +777,18 @@ sub rt_o_from_json {
   $file_basename =~ s|-rt\.$cc_ext$||; # strip off trailing -rt.cc
   if ($$cmd_info{'reps'}) {
     &init_global_rep($$cmd_info{'reps'});
+  }
+  if ($state) { # remove preceeding 3 lines when $state is non-zero
+    my $rep = &rep_merge($reps);
+
+    &scalar_to_file($rt_json_path, $rep); # herehere
+    &add_visibility_file($rt_json_path);
+
+    if (1) {
+      my $rt_json_path_rn = $rt_json_path . '.rn';
+      &scalar_to_file($rt_json_path_rn, $rep);
+      #&add_visibility_file($rt_json_path_rn);
+    }
   }
   $file = &scalar_from_file($rt_json_path);
   die if $$file{'other'};
