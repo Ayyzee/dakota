@@ -41,7 +41,7 @@
 # define INTERPOSE(k)
 # define MODULE(n)
 # define MODULE_EXPORT(n, ...)
-# define MODULE_IMPORT(n)
+# define MODULE_IMPORT(n, ...)
 # define PROVIDE(t)
 # define REQUIRE(t)
 # define SLOTS(t, ...)

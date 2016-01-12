@@ -976,6 +976,73 @@ sub module_decl {
   &match(__FILE__, __LINE__, ';');
   $gbl_current_module = $module_name;
 }
+sub module_import_defn {
+  my $depth = 0;
+  &match(__FILE__, __LINE__, 'import');
+  my $module_name = &match_re(__FILE__, __LINE__, $id);
+  $gbl_current_module = $module_name;
+  &match(__FILE__, __LINE__, '{');
+  $depth++;
+  my $dqstr = &dqstr_regex();
+
+  my $tbl = {};
+  while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
+    for (&sst_cursor::current_token($gbl_sst_cursor)) {
+      if (0) {
+      } elsif (m/^\{$/) {
+        $depth++;
+      } elsif (m/^\}$/) {
+        die if 0 == $depth;
+        $depth--;
+        if (0 == $depth) {
+          &match(__FILE__, __LINE__, '}');
+          $$gbl_root{'modules'}{$gbl_current_module}{'import'} = $tbl;
+          return;
+        } else {
+          die;
+        }
+      } elsif (m/^self$/) {
+        my $lhs = &match(__FILE__, __LINE__, $_);
+        my $rhs = &match_re(__FILE__, __LINE__, $dqstr);
+        $rhs =~ s/^"(.+)"$/$1/;
+        &match(__FILE__, __LINE__, ';');
+        if (defined $$tbl{'self'}) {
+          die;
+        }
+        $$tbl{'self'} = $rhs;
+      } elsif (m/^source$/) {
+        my $lhs = &match(__FILE__, __LINE__, $_);
+        my $rhs = &match_re(__FILE__, __LINE__, $dqstr);
+        $rhs =~ s/^"(.+)"$/$1/;
+        &match(__FILE__, __LINE__, ';');
+        if (!exists $$tbl{'sources'}) {
+          $$tbl{'sources'} = [];
+        }
+        &add_last($$tbl{'sources'}, $rhs);
+      } elsif (m/^shared-library$/) {
+        my $lhs = &match(__FILE__, __LINE__, $_);
+        my $rhs = &match_re(__FILE__, __LINE__, $dqstr);
+        $rhs =~ s/^"(.+)"$/$1/;
+        &match(__FILE__, __LINE__, ';');
+        if (!exists $$tbl{'shared-libraries'}) {
+          $$tbl{'shared-libraries'} = [];
+        }
+        $rhs =~ s/\$\(so_ext\)/$so_ext/;
+        &add_last($$tbl{'shared-libraries'}, $rhs);
+      } elsif (m/^module$/) {
+        my $lhs = &match(__FILE__, __LINE__, $_);
+        my $rhs = &match_re(__FILE__, __LINE__, $id);
+        &match(__FILE__, __LINE__, ';');
+        if (!exists $$tbl{'modules'}) {
+          $$tbl{'modules'} = [];
+        }
+        &add_last($$tbl{'modules'}, $rhs);
+      } else {
+        die;
+      }
+    }
+  }
+}
 sub module_export_defn {
   my $depth = 0;
   &match(__FILE__, __LINE__, 'export');
@@ -1955,6 +2022,10 @@ sub parse_root {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (m/^module$/) {
         &module_decl();
+        last;
+      }
+      if (m/^import$/) {
+        &module_import_defn();
         last;
       }
       if (m/^export$/) {

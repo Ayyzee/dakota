@@ -14,42 +14,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import dakota-util {
+  self "libdakota-util.dk";
+
+  source "ascii-number-klass.dk";
+  source "ascii-number.dk";
+  source "dimension.dk";
+  source "float.dk";
+  source "hashed-counted-set.dk";
+  source "hashed-set.dk";
+  source "hashed-table.dk";
+  source "input-file.dk";
+  source "json-object-output-stream.dk";
+  source "json-parser.dk";
+  source "lexer.dk";
+  source "open-token.dk";
+  source "output-file.dk";
+  source "point.dk";
+  source "rect.dk";
+  source "slot-info.dk";
+  source "str-buffer.dk";
+  source "syntax-exception.dk";
+  source "text-output-stream.dk";
+  source "token.dk";
+  source "tokenid.dk";
+  source "type-predicate.dk";
+  source "xml-object-output-stream.dk";
+
+  shared-library "../lib/libdakota.$(so_ext)";
+}
 export dakota-util {
-   ascii-number;
-   ascii-number-klass;
-   dimension;
-   dimension::slots-t;
-   features;
-   features::slots-t;
-   float32;
-   float32::slots-t;
-   float64;
-   float64::slots-t;
-   float128;
-   float128::slots-t;
-   hashed-counted-set;
-   hashed-set;
-   hashed-table;
-   input-file;
-   json-object-output-stream;
-   json-parser;
-   lexer;
-   open-token;
-   open-token::slots-t;
-   point;
-   point::slots-t;
-   rect;
-   rect::slots-t;
-   slot-info;
-   slot-info::slots-t;
-   str-buffer;
-   str-buffer::slots-t;
-   syntax-exception;
-   text-output-stream;
-   token;
-   tokenid;
-   tokenid::slots-t;
-   type-predicate;
-   type-predicate::slots-t;
-   xml-object-output-stream;
+  ascii-number;
+  ascii-number-klass;
+  dimension;
+  dimension::slots-t;
+  features;
+  features::slots-t;
+  float32;
+  float32::slots-t;
+  float64;
+  float64::slots-t;
+  float128;
+  float128::slots-t;
+  hashed-counted-set;
+  hashed-set;
+  hashed-table;
+  input-file;
+  json-object-output-stream;
+  json-parser;
+  lexer;
+  open-token;
+  open-token::slots-t;
+  point;
+  point::slots-t;
+  rect;
+  rect::slots-t;
+  slot-info;
+  slot-info::slots-t;
+  str-buffer;
+  str-buffer::slots-t;
+  syntax-exception;
+  text-output-stream;
+  token;
+  tokenid;
+  tokenid::slots-t;
+  type-predicate;
+  type-predicate::slots-t;
+  xml-object-output-stream;
 }
