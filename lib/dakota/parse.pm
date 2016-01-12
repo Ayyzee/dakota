@@ -970,7 +970,7 @@ sub fragment_str {
   $argstr = &remove_extra_whitespace($argstr);
   return $argstr;
 }
-sub export {
+sub module_export_defn {
   my $depth = 0;
   &match(__FILE__, __LINE__, 'export');
   my $module_name = &match_re(__FILE__, __LINE__, $id);
@@ -1048,7 +1048,7 @@ sub match_qual_ident {
   }
   return $seq;
 }
-sub module {
+sub module_decl {
   &match(__FILE__, __LINE__, 'module');
   my $module_name = &match_re(__FILE__, __LINE__, $id);
   &match(__FILE__, __LINE__, ';');
@@ -1954,11 +1954,11 @@ sub parse_root {
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (m/^module$/) {
-        &module();
+        &module_decl();
         last;
       }
       if (m/^export$/) {
-        &export();
+        &module_export_defn();
         last;
       }
       if (m/^interpose$/) {
