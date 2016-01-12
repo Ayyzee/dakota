@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota;
+
 # include <cassert>
 # include <cinttypes>
 # include <cstdlib>
@@ -24,8 +26,6 @@
 
 // 2^32 - 5 = 4294967291 or 0xfffffffb
 // const uintptr-t max-prime32 = 0xfffffffb;
-
-module dakota;
 
 klass object-output-stream;
 klass hash;

@@ -596,7 +596,7 @@ sub loop_rep_from_inputs {
   }
   if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
   if (0 != @$rep_files) {
-    my $json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
+    my $json_path = &json_path_from_any_path($$cmd_info{'output'});
     &ordered_set_add($$cmd_info{'reps'}, $json_path, __FILE__, __LINE__);
     my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$rep_cmd{'output'} = $json_path;
@@ -626,7 +626,7 @@ sub gen_rt_o {
       }
     }
   }
-  $$cmd_info{'rep'} = &rt_json_path_from_any_path($$cmd_info{'output'});
+  $$cmd_info{'rep'} = &json_path_from_any_path($$cmd_info{'output'});
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
   if ($dk_exe_type) {
@@ -749,10 +749,10 @@ sub rt_o_from_json {
   my $rt_json_path;
   my $cc_path;
   if (&is_so_path($$cmd_info{'output'})) {
-    $rt_json_path = &rt_json_path_from_so_path($$cmd_info{'output'});
+    $rt_json_path = &json_path_from_any_path($$cmd_info{'output'}); # should be from_so_path
     $cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
   } else {
-    $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
+    $rt_json_path = &json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
     $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
   }
   my $reps = [];

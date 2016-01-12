@@ -14,6 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota;
+
 # if ! defined _GNU_SOURCE
 # define _GNU_SOURCE // dlinfo()
 # endif
@@ -21,8 +23,6 @@
 # include <dlfcn.h> // dlopen(), dlclose(), dladdr(), struct Dl-info
 
 # include "dl.hh"
-
-module dakota;
 
 klass x::dl-info {
   slots Dl-info;

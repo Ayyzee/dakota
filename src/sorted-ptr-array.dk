@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota;
+
 # include <cassert>
 # include <cstdlib>
 # include <cstring>
 
 # include "sorted-ptr-array.hh"
-
-module dakota;
 
 klass result;
 klass std-compare;

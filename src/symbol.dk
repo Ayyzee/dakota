@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota;
+
 # include <cstring>
 
 # include "dakota-safe-str.hh"
 # include "dakota-private.hh"
-
-module dakota;
 
 klass hash;
 

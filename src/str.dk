@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota;
+
 # include "dakota-safe-str.hh"
 # include "dakota-private.hh"
-
-module dakota;
 
 klass char8;
 klass hash;

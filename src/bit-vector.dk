@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota;
+
 # include <cassert>
 # include <cstring>
 # include <cinttypes>
-
-module dakota;
 
 inline func min(int64-t a, int64-t b) -> int64-t {
   int64-t r = a < b ? a : b;

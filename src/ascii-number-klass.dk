@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module dakota-util;
+
 # include <cassert>
 # include <cstring>
-
-module dakota-util;
 
 klass ascii-number;
 klass named-info;

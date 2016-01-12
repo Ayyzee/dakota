@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <cassert>
-
 module dakota-util;
+
+# include <cassert>
 
 klass features {
   slots enum : int64-t {
