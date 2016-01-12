@@ -970,6 +970,12 @@ sub fragment_str {
   $argstr = &remove_extra_whitespace($argstr);
   return $argstr;
 }
+sub module_decl {
+  &match(__FILE__, __LINE__, 'module');
+  my $module_name = &match_re(__FILE__, __LINE__, $id);
+  &match(__FILE__, __LINE__, ';');
+  $gbl_current_module = $module_name;
+}
 sub module_export_defn {
   my $depth = 0;
   &match(__FILE__, __LINE__, 'export');
@@ -1047,12 +1053,6 @@ sub match_qual_ident {
     $seq = undef;
   }
   return $seq;
-}
-sub module_decl {
-  &match(__FILE__, __LINE__, 'module');
-  my $module_name = &match_re(__FILE__, __LINE__, $id);
-  &match(__FILE__, __LINE__, ';');
-  $gbl_current_module = $module_name;
 }
 sub klass {
   my ($args) = @_;
