@@ -848,6 +848,7 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
     int64-t i = 0;
     symbol-t module-name = nullptr;
     str-t c = "";
+    boole-t in-export? = false;
 
     while (1) {
       named-info-t* klass-info = &klass-defns[i++];
@@ -887,8 +888,14 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         named-info::dump(klass-info);
         exit-fail-with-msg("ERROR: missing module declaration");
       }
-      if (module-name != modulee)
+      if (module-name != modulee) {
+        if (in-export?) {
+          ostream::println-format(ostrm, "%s\n}\n", c);
+        }
         ostream::println-format(ostrm, "export %s {", modulee);
+        c = "";
+        in-export? = true;
+      }
       module-name = modulee;
       ostream::println-format(ostrm, "%s\n  %s", c, name);
       c = ";";
@@ -908,7 +915,8 @@ static func dump-module-description(ostream-t ostrm, named-info-t* registration-
         }
       }
     }
-    ostream::println-format(ostrm, "%s\n}\n", c);
+    if (in-export?)
+      ostream::println-format(ostrm, "%s\n}\n", c);
   }
   return;
 }
