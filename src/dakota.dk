@@ -941,10 +941,12 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
       assert(nullptr != klass-info);
       if (nullptr == klass-info->elements)
         break;
+      if (!klass-exported?(klass-info))
+        continue;
       if (nullptr == only || dump?(klass-info, only)) {
         if (1)
           prev-module = dump-klass(ostrm, klass-info, prev-module);
-        if (nullptr != output-dir && klass-exported?(klass-info)) {
+        if (nullptr != output-dir) {
             char8-t[255 + (1)] klass-file = "";
             symbol-t klass-name = name-from-info(klass-info);
             snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, klass-name);
