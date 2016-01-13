@@ -88,7 +88,6 @@ namespace klass      { func subklass?(object-t, object-t) -> boole-t;  }
 # endif
 
 static const char8-t gbl-delimiter = '/'; // unix path delimiter
-static str-t gbl-current-module = "";
 
 klass assoc-node {
   slots {
@@ -785,7 +784,7 @@ static func dump?(named-info-t* klass-info, str-t only) -> boole-t {
   }
   return result;
 }
-func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void;
+func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module) -> symbol-t;
 
 static func remove-dir(str-t path) -> str-t {
   str-t result = strrchr(path, '/');
@@ -936,6 +935,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
       if (-1 == n && EEXIST != errno)
         exit-fail-with-msg("ERROR: %s: \"%s\"", output-dir, strerror(errno));
     }
+    symbol-t prev-module = nullptr;
     while (1) {
       named-info-t* klass-info = &klass-defns[i++];
       assert(nullptr != klass-info);
@@ -943,14 +943,13 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
         break;
       if (nullptr == only || dump?(klass-info, only)) {
         if (1)
-          dump-klass(ostrm, klass-info);
+          prev-module = dump-klass(ostrm, klass-info, prev-module);
         if (nullptr != output-dir && klass-exported?(klass-info)) {
             char8-t[255 + (1)] klass-file = "";
             symbol-t klass-name = name-from-info(klass-info);
             snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, klass-name);
             ostream-t dostrm = ostream::fopen(klass-file);
-            gbl-current-module = "";
-            dump-klass(dostrm, klass-info);
+            dump-klass(dostrm, klass-info, nullptr);
             ostream::fclose(dostrm);
         }
       }
@@ -1000,7 +999,7 @@ static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
                   info->return-type);
   return;
 }
-func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
+func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module) -> symbol-t {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != klass-info);
@@ -1009,7 +1008,7 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
   symbol-t superklass-name = superklass-name-from-info(klass-info);
   symbol-t klass-name = klass-name-from-info(klass-info);
 
-  str-t                     modulee =                        cast(str-t)                    named-info::at(klass-info, #module);
+  symbol-t                  modulee =                        cast(str-t)                    named-info::at(klass-info, #module);
   symbol-t                  cat =                            cast(symbol-t)                 named-info::at(klass-info, #cat, cast(intptr-t)#struct);
   symbol-t                  type =                           cast(symbol-t)                 named-info::at(klass-info, #type, cast(intptr-t)#klass);
   symbol-t                  interpose-name =                 cast(symbol-t)                 named-info::at(klass-info, #interpose-name);
@@ -1050,9 +1049,8 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
     if (default-klass-name() == klass-name)
       klass-name = nullptr;
   }
-  if (nullptr != modulee && 0 != safe-strcmp(gbl-current-module, modulee)) {
+  if (prev-module != modulee) {
     ostream::println-format(ostrm, "module %s;\n\n", modulee);
-    gbl-current-module = modulee;
   }
   boole-t exported? =          false;
   boole-t state-exported? =    false;
@@ -1213,7 +1211,7 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info) -> void {
     ostream::col-decr(ostrm);
     ostream::println-format(ostrm, "}\n");
   }
-  return;
+  return modulee;
 }
 func import-selectors(signature-t**, selector-node-t*) -> void; // hackhack
 
