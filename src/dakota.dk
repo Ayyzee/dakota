@@ -1186,9 +1186,7 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module)
 
     if (nullptr != kw-args-method-signatures)
       while (nullptr != (info = kw-args-method-signatures[index++])) {
-        fprintf(ostrm.output, "  ");
-        ostream-t ostrm0 = { ostrm.output, 0 };
-        dump-method(ostrm0, info);
+        dump-method(ostrm, info);
       }
     index = 0;
     if (nullptr != method-signatures)
