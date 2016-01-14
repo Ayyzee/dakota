@@ -155,7 +155,7 @@ klass json-parser {
           if (quote-type == c)
             return token; // empty string
           do {
-            $append(token, cast(int64-t)c);
+            $append-char(token, cast(int64-t)c);
 
             if ('\\' == c)
               escaped? = true;
@@ -191,7 +191,7 @@ klass json-parser {
           object-t token = make(token::klass, #tokenid : 'st', // 'st' should be 'idnt'
                                 #line : self.line, #column : self.column - 1);
           do {
-            $append(token, cast(int64-t)c);
+            $append-char(token, cast(int64-t)c);
             c = json-parser::get(self);
           } while (isalnum(c) || '_' == c);
           if (EOF != c)
