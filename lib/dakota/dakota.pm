@@ -581,7 +581,7 @@ sub rep_from_inputs {
   $$rep_cmd{'output'} = $$cmd_info{'output'};
   $$rep_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
-  &outfile_from_infiles($rep_cmd, $should_echo = 0);
+  return &outfile_from_infiles($rep_cmd, $should_echo = 0);
 }
 sub loop_rep_from_inputs {
   my ($cmd_info) = @_;
@@ -732,8 +732,7 @@ sub cc_from_dk {
   $$cc_cmd{'output'} = $$cmd_info{'output'};
   $$cc_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
-  my $result = &outfile_from_infiles($cc_cmd, $should_echo = 0);
-  return $result;
+  return &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
 sub o_from_cc {
   my ($cmd_info) = @_;
@@ -747,10 +746,10 @@ sub o_from_cc {
 
     if (0) {
       $$o_cmd{'cmd-flags'} .= " -MMD";
-      &outfile_from_infiles($o_cmd, $should_echo = 1);
+      return &outfile_from_infiles($o_cmd, $should_echo = 1);
       $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
     }
-    &outfile_from_infiles($o_cmd, $should_echo = 0);
+    return &outfile_from_infiles($o_cmd, $should_echo = 0);
 }
 sub rt_o_from_json {
   my ($cmd_info, $other) = @_;
@@ -871,7 +870,7 @@ sub so_from_o {
   }
   &library_names_add_first($so_cmd);
   my $should_echo;
-  &outfile_from_infiles($so_cmd, $should_echo = 0);
+  return &outfile_from_infiles($so_cmd, $should_echo = 0);
 }
 sub exe_from_o {
   my ($cmd_info) = @_;
@@ -889,7 +888,7 @@ sub exe_from_o {
   }
   &library_names_add_first($exe_cmd);
   my $should_echo;
-  &outfile_from_infiles($exe_cmd, $should_echo = 0);
+  return &outfile_from_infiles($exe_cmd, $should_echo = 0);
 }
 sub dir_part {
   my ($path) = @_;
@@ -1073,7 +1072,7 @@ sub ctlg_from_so {
   }
   #print &Dumper($cmd_info);
   my $should_echo;
-  &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
+  return &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
 }
 sub ordered_set_add {
   my ($ordered_set, $element, $file, $line) = @_;
