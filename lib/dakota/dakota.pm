@@ -322,6 +322,7 @@ sub loop_cc_from_dk {
   if (0 == $argv_length) {
     die "$0: error: arguments are requried\n";
   }
+  my $num_inputs = scalar @{$$cmd_info{'inputs'}};
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my ($input_dir, $input_name, $input_ext) = &split_path($input, $id);
     my $file = &dakota::generate::dk_parse("$input_name.dk");
@@ -347,6 +348,7 @@ sub loop_cc_from_dk {
     }
     &dakota::generate::generate_nrt_defn($output_nrt_cc, $file);
   }
+  return $num_inputs;
 } # loop_cc_from_dk
 
 # linux:
@@ -651,11 +653,12 @@ sub cc_path_from_o_path { # reverse dependency
 }
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
-  if (!$$cmd_info{'opts'}{'silent'}) {
-    print $input . "\n"; # dk_path
-  }
+  my $num_out_of_date_infiles = 0;
   my $outfile;
   if (!&is_dk_src_path($input)) {
+    if (!$$cmd_info{'opts'}{'silent'}) {
+      print $input . "\n"; # dk_path
+    }
     $outfile = $input;
   } else {
     my $o_path;
@@ -685,7 +688,12 @@ sub o_from_dk {
     $$cc_cmd{'inputs'} = [ $input ];
     $$cc_cmd{'output'} = $cc_path;
     $$cc_cmd{'reps'} = $$cmd_info{'reps'};
-    &cc_from_dk($cc_cmd);
+    $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
+    if ($num_out_of_date_infiles) {
+      if (!$$cmd_info{'opts'}{'silent'}) {
+        print $input . "\n"; # dk_path
+      }
+    }
     if ($ENV{'DKT_PRECOMPILE'}) {
       $outfile = $$cc_cmd{'output'};
     } else {
@@ -724,7 +732,8 @@ sub cc_from_dk {
   $$cc_cmd{'output'} = $$cmd_info{'output'};
   $$cc_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
-  &outfile_from_infiles($cc_cmd, $should_echo = 0);
+  my $result = &outfile_from_infiles($cc_cmd, $should_echo = 0);
+  return $result;
 }
 sub o_from_cc {
   my ($cmd_info) = @_;
@@ -975,7 +984,8 @@ sub outfile_from_infiles {
   } else {
     $infiles = $$cmd_info{'inputs'};
   }
-  if (0 < scalar @$infiles) {
+  my $num_out_of_date_infiles = scalar @$infiles;
+  if (0 < $num_out_of_date_infiles) {
     if (0) {
       &append_to_env_file($outfile, $$cmd_info{'inputs'}, "DKT_DEPENDS_OUTPUT_FILE");
     } else {
@@ -1013,6 +1023,7 @@ sub outfile_from_infiles {
         &exec_cmd($cmd_info, $should_echo);
       }
   }
+  return $num_out_of_date_infiles;
 } # outfile_from_infiles
 sub ctlg_from_so {
   my ($cmd_info) = @_;
