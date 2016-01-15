@@ -28,8 +28,6 @@ use strict;
 use warnings;
 use sort 'stable';
 
-my $should_write_ctlg_files = 1;
-
 my $gbl_prefix;
 my $gbl_compiler;
 my $extra;
@@ -90,6 +88,8 @@ $Data::Dumper::Indent    = 1;   # default = 2
 undef $/;
 $" = '';
 
+my $should_replace_library_path_with_lib_opts = 1;
+my $should_write_ctlg_files = 1;
 my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
 my $show_outfile_info = 0;
@@ -427,7 +427,6 @@ sub for_linker {
   }
   return $result;
 }
-my $should_replace_library_path_with_lib_opts = 1;
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
