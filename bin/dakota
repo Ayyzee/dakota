@@ -119,6 +119,7 @@ my $argv = &clean_paths(\@ARGV);
 
 my $module_import_sources = [];
 my $module_desc = &dakota::parse::rep_tree_from_dk_path($$root_cmd{'opts'}{'module'});
+my $module_json = &rep_from_module($$root_cmd{'opts'}{'module'});
 
 foreach my $module (keys %{$$module_desc{'modules'}}) {
   my $sources = $$module_desc{'modules'}{$module}{'import'}{'sources'};
@@ -136,10 +137,7 @@ if (0 == @$argv) {
   $argv = [sort {&mtime($b) <=> &mtime($a)} @$argv];
   $$root_cmd{'inputs'} = $argv;
 }
-if (1) {
-  push @{$$root_cmd{'inputs'}}, $$root_cmd{'opts'}{'module'}; # this seems VERY wrong
-  $$root_cmd{'inputs'} = &clean_paths($$root_cmd{'inputs'});
-}
+push @{$$root_cmd{'inputs'}}, $module_json;
 
 # dakota --compile --output <> {dk}
 # dakota --shared  --output <> {o}+ {so}* [obj/rt/<>.cc.o]
