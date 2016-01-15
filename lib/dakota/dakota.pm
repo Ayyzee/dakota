@@ -105,10 +105,28 @@ my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
+
+# linux:
+#   libX.so.3.9.4
+#   libX.so.3.9
+#   libX.so.3
+#   libX.so
+# darwin:
+#   libX.3.9.4.so
+#   libX.3.9.so
+#   libX.3.so
+#   libX.so
+sub is_so_path {
+  my ($name) = @_;
+  # linux and darwin so-regexs are combined
+  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
+  #my $libname = $2 . ".$so_ext";
+  return $result;
+}
 sub is_dk_src_path {
   my ($arg) = @_;
-  if ($arg =~ m|\.dk$| ||
-      $arg =~ m|\.ctlg(\.\d+)*$|) {
+  if ($arg =~ m/\.dk$/ ||
+      $arg =~ m/\.ctlg(\.\d+)*$/) {
     return 1;
   } else {
     return 0;
@@ -117,6 +135,30 @@ sub is_dk_src_path {
 sub is_rep_input_path { # dk, ctlg, or so
   my ($arg) = @_;
   if (&is_so_path($arg) || &is_dk_src_path($arg)) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_rep_path { # json
+  my ($arg) = @_;
+  if ($arg =~ m/\.json$/) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_o_path { # $o_ext
+  my ($arg) = @_;
+  if ($arg =~ m/\.$o_ext$/) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_ctlg_path { # ctlg
+  my ($arg) = @_;
+  if ($arg =~ m/\.ctlg(\.\d+)*$/) {
     return 1;
   } else {
     return 0;
@@ -139,7 +181,7 @@ sub loop_merged_rep_from_inputs {
     if (&is_dk_src_path($arg)) {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
       &dakota::util::add_last($rep_files, &json_path_from_any_path($arg)); # _from_dk_src_path
-    } elsif ($arg =~ m|\.json$|) {
+    } elsif (&is_rep_path($arg)) {
       $root = &scalar_from_file($arg);
       &dakota::util::add_last($rep_files, $arg);
     } else {
@@ -306,7 +348,7 @@ sub loop_cc_from_dk {
     $rep = [];
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
-    if ($input =~ m|\.json$|) {
+    if (&is_rep_path($input)) {
       &dakota::util::add_last($rep, $input);
     } else {
       &dakota::util::add_last($inputs, $input);
@@ -351,23 +393,6 @@ sub loop_cc_from_dk {
   return $num_inputs;
 } # loop_cc_from_dk
 
-# linux:
-#   libX.so.3.9.4
-#   libX.so.3.9
-#   libX.so.3
-#   libX.so
-# darwin:
-#   libX.3.9.4.so
-#   libX.3.9.so
-#   libX.3.so
-#   libX.so
-sub is_so_path {
-  my ($name) = @_;
-  # linux and darwin so-regexs are combined
-  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
-  #my $libname = $2 . ".$so_ext";
-  return $result;
-}
 sub gcc_library_from_library_name {
   my ($library_name) = @_;
   if ($library_name =~ m=^lib([.\w-]+)\.$so_ext((\.\d+)+)?$= ||
@@ -488,12 +513,12 @@ sub start_cmd {
     }
     $$cmd_info{'inputs'} = $inputs;
   }
-  #if ($$cmd_info{'opts'}{'output'} =~ m/\.json$/) # this is a real hackhack
+  #if (&is_rep_path($$cmd_info{'opts'}{'output'})) # this is a real hackhack
   #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
   if ($want_separate_rep_pass) {
     $cmd_info = &loop_rep_from_inputs($cmd_info);
   }
-  if ($$cmd_info{'opts'}{'output'} =~ m/\.json$/) { # this is a real hackhack
+  if (&is_rep_path($$cmd_info{'opts'}{'output'})) { # this is a real hackhack
     &add_visibility_file($$cmd_info{'opts'}{'output'});
   }
   if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
@@ -662,7 +687,7 @@ sub o_from_dk {
   } else {
     my $o_path;
     my $cc_path;
-    if ($$cmd_info{'output'} && $$cmd_info{'output'} =~ /\.$o_ext$/) {
+    if ($$cmd_info{'output'} && &is_o_path($$cmd_info{'output'})) {
       $o_path = $$cmd_info{'output'};
     } else {
       $o_path =  &o_path_from_dk_path($input);
@@ -995,8 +1020,8 @@ sub outfile_from_infiles {
       }
       my $output = $$cmd_info{'output'};
 
-      if ($output !~ m|\.json$| &&
-          $output !~ m|\.ctlg(\.\d+)*$|) {
+      if (!&is_rep_path($output) &&
+          !&is_ctlg_path($output)) {
         #$should_echo = 0;
         if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
           $output = $ENV{'DKT_DIR'} . '/' . $output

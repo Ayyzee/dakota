@@ -137,8 +137,8 @@ if (0 == @$argv) {
   $$root_cmd{'inputs'} = $argv;
 }
 if (1) {
-  push @$argv, $$root_cmd{'opts'}{'module'}; # this seems VERY wrong
-  $argv = &clean_paths($argv);
+  push @{$$root_cmd{'inputs'}}, $$root_cmd{'opts'}{'module'}; # this seems VERY wrong
+  $$root_cmd{'inputs'} = &clean_paths($$root_cmd{'inputs'});
 }
 
 # dakota --compile --output <> {dk}
