@@ -183,27 +183,27 @@ FUNC main(int argc, char** argv, char**) -> int {
     }
   }
   int overwrite;
-  setenv("DKT_INFO_OUTPUT", output_pid, overwrite = 1);
+  setenv("DAKOTA_CATALOG_OUTPUT", output_pid, overwrite = 1);
 
   if (nullptr != opts.output_directory)
-    setenv("DKT_INFO_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
+    setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
   if (nullptr != opts.only)
-    setenv("DKT_INFO_ONLY", opts.only, overwrite = 1);
+    setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1);
   if (opts.recursive)
-    setenv_boole("DKT_INFO_RECURSIVE", opts.recursive, overwrite = 1);
+    setenv_boole("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
   int i = 0;
   const char* arg = nullptr;
   while (nullptr != (arg = argv[i++])) {
     setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
     setenv("DKT_EXIT_BEFORE_MAIN", "", overwrite = 1);
-    setenv("DKT_INFO_ARG", arg, overwrite = 1);
-    setenv("DKT_INFO_ARG_TYPE", "exe", overwrite = 1); // not currently used
+    setenv("DAKOTA_CATALOG_ARG", arg, overwrite = 1);
+    setenv("DAKOTA_CATALOG_ARG_TYPE", "exe", overwrite = 1); // not currently used
     int status = spawn(arg);
     if (-1 == status) {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
       unsetenv("DKT_NO_INIT_RUNTIME");
       unsetenv("DKT_EXIT_BEFORE_MAIN");
-      setenv("DKT_INFO_ARG_TYPE", "lib", overwrite = 1); // not currently used
+      setenv("DAKOTA_CATALOG_ARG_TYPE", "lib", overwrite = 1); // not currently used
       void* handle = dlopen(arg, RTLD_NOW | RTLD_LOCAL);
 
       // if the shared library is not found in the search path

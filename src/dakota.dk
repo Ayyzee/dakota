@@ -832,7 +832,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
   assert(8 > ostrm.col);
   assert(nullptr != registration-info);
 
-  str-t output-dir = getenv("DKT_INFO_OUTPUT_DIRECTORY");
+  str-t output-dir = getenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY");
   named-info-t* klass-defns = cast(named-info-t*)named-info::at(registration-info, #klass-defns);
 
   if (nullptr != klass-defns) {
@@ -1378,7 +1378,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
   stream-t ctlg-output = nullptr;
-  str-t output-path = getenv("DKT_INFO_OUTPUT");
+  str-t output-path = getenv("DAKOTA_CATALOG_OUTPUT");
   if (nullptr != output-path) {
     if (NUL == output-path[0]) // empty-string ("") means use default-value
       ctlg-output = stdout;
@@ -1389,9 +1389,9 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     }
   }
   if (nullptr != ctlg-output) {
-    boole-t ctlg-recursive = getenv-boole("DKT_INFO_RECURSIVE", false);
-    str-t ctlg-only = getenv("DKT_INFO_ONLY");
-    str-t ctlg-arg =  getenv("DKT_INFO_ARG");
+    boole-t ctlg-recursive = getenv-boole("DAKOTA_CATALOG_RECURSIVE", false);
+    str-t ctlg-only = getenv("DAKOTA_CATALOG_ONLY");
+    str-t ctlg-arg =  getenv("DAKOTA_CATALOG_ARG");
     ostream-t ostrm = { ctlg-output, 0 };
 
     symbol-t name = name-from-info(registration-info);
@@ -1433,7 +1433,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
 func dkt-deregister-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #file));
   assert(nullptr != registration-info);
-  if (nullptr != getenv("DKT_INFO_OUTPUT") ||
+  if (nullptr != getenv("DAKOTA_CATALOG_OUTPUT") ||
       nullptr != getenv("DKT_NO_INIT_RUNTIME"))
     return;
   named-info::sort(registration-info);
