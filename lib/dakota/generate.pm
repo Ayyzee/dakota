@@ -229,7 +229,6 @@ sub is_decl {
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
-  my $kw_args_generics = &dakota::util::kw_args_generics();
   open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
   foreach my $string (@$strings) {
     print PATH $string;
@@ -250,7 +249,6 @@ sub write_to_file_converted_strings {
     }
   }
   }
-  my $kw_args_generics = &dakota::util::kw_args_generics();
   if (defined $path) {
     open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
   } else {
@@ -262,6 +260,7 @@ sub write_to_file_converted_strings {
     $filestr .= $string;
   }
   my $sst = &sst::make($filestr, ">$path");
+  my $kw_args_generics = &dakota::util::kw_args_generics();
   if ($use_new_macro_system) {
     &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_args_generics);
   }
@@ -908,8 +907,7 @@ sub method::generate_va_method_defn {
   else {
     $$scratch_str_ref .= $col . "namespace" . " @$scope { ";
   }
-  my $kw_args_generics = &dakota::util::kw_args_generics();
-  if (exists $$kw_args_generics{$va_method_name}) {
+  if (&is_kw_args_generic($va_method)) {
     $$scratch_str_ref .= '[[sentinel]] ';
   }
   my $visibility = '';

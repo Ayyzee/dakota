@@ -229,9 +229,7 @@ sub kw_args_translate {
             delete $$method{'kw-args-names'};
             delete $$method{'kw-args-defaults'};
           } else {
-            my $name = &path::string($$method{'name'});
-            my $kw_args_generics = &dakota::util::kw_args_generics();
-            if (exists $$kw_args_generics{$name}) {
+            if (&is_kw_args_generic($method)) {
               if (!&dakota::generate::is_va($method)) {
                 &dakota::util::add_last($$method{'parameter-types'},
                                         [ 'va-list-t' ]);
@@ -1647,10 +1645,16 @@ sub method {
   my ($kw_args_parameter_types, $kw_args_names, $kw_args_defaults) =
     &parameter_list($parameter_types);
   $$method{'parameter-types'} = $kw_args_parameter_types;
+  # if method has kw-arg-names, then its a kw arg
+  # but it could still be a kw arg
 
   if ($kw_args_names) {
-    my $method_name = "@{$$method{'name'}}";
-    &dakota::util::kw_args_generics_add($method_name);
+    my $method_name = &str_from_seq($$method{'name'});
+    $$method{'kw-args-names'} = $kw_args_names;
+    if ($kw_args_defaults) {
+      $$method{'kw-args-defaults'} = $kw_args_defaults;
+    }
+    &dakota::util::kw_args_generics_add($method);
     if ('init' eq $method_name) {
       foreach my $kw_arg_name (@$kw_args_names) {
         if ('slots' eq $kw_arg_name) {
@@ -1667,12 +1671,6 @@ sub method {
         }
       }
     }
-  }
-  if ($kw_args_names) {
-    $$method{'kw-args-names'} = $kw_args_names;
-  }
-  if ($kw_args_defaults) {
-    $$method{'kw-args-defaults'} = $kw_args_defaults;
   }
   $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
 
@@ -2191,6 +2189,7 @@ sub rep_tree_from_dk_path {
   my $result = &parse_root($gbl_sst_cursor);
   &add_object_methods_decls($result);
   #print STDERR &Dumper($result);
+  #print &Dumper(&kw_args_generics());
   return $result;
 }
 sub start {

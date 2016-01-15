@@ -31,7 +31,7 @@ use sort 'stable';
 my $kw_args_generics_tbl;
 
 BEGIN {
-  $kw_args_generics_tbl = { 'init' => undef };
+  $kw_args_generics_tbl = {};
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -66,6 +66,7 @@ our @EXPORT= qw(
                  ident_regex
                  is_symbol_candidate
                  is_debug
+                 is_kw_args_generic
                  kw_args_generics
                  kw_args_generics_add
                  kw_args_placeholders
@@ -89,6 +90,7 @@ our @EXPORT= qw(
                  scalar_to_file
                  split_path
                  sqstr_regex
+                 str_from_seq
                  var
                  var_array
               );
@@ -407,13 +409,64 @@ sub var_array {
   die if 'HASH' eq ref($result);
   return $result;
 }
-sub kw_args_generics_add {
-  my ($generic) = @_;
-  my $tbl = &kw_args_generics();
-  $$tbl{$generic} = undef;
+sub str_from_seq {
+  my ($seq) = @_;
+  my $str = &remove_extra_whitespace(join(' ', @$seq)); # str is lexically correct
+  return $str;
+}
+sub parameter_types_str {
+  my ($parameter_types) = @_;
+  my $strs = [];
+  foreach my $type (@$parameter_types) {
+    &add_last($strs, &str_from_seq($type));
+  }
+  my $result = join(',', @$strs);
+  return $result;
 }
 sub kw_args_generics {
   return $kw_args_generics_tbl;
+}
+# [ name, fixed-parameter-types ]
+# [ [ x :: signal ], [ object-t, int64-t, ... ] ]
+sub kw_args_generics_sig {
+  my ($generic) = @_;
+  my $keyword_types_len = scalar @{$$generic{'kw-args-names'} ||= []};
+  my $parameter_types = &deep_copy($$generic{'parameter-types'});
+  my $offset = scalar @$parameter_types - $keyword_types_len;
+  my $keyword_types = [splice @$parameter_types, 0, $offset];
+  &add_last($keyword_types, ['...']);
+  return ($$generic{'name'}, $keyword_types);
+}
+sub kw_args_generics_add {
+  my ($generic) = @_;
+  my $state = 0;
+  my ($name, $types) = &kw_args_generics_sig($generic);
+  my $name_str =  &str_from_seq($name);
+  my $types_str = &parameter_types_str($types);
+  my $tbl = &kw_args_generics();
+
+  #$$tbl{$name_str} = $name; # changechange: 1/2
+  $$tbl{$name_str}{$types_str} = [ $name, $types ];
+
+  return $state;
+}
+sub is_kw_args_generic {
+  my ($generic) = @_;
+  my $state = 0;
+  if (exists $$generic{'kw-args-names'} && 0 != scalar @{$$generic{'kw-args-names'}}) {
+    return 1;
+  }
+  my ($name, $types) = &kw_args_generics_sig($generic);
+  my $name_str =  &str_from_seq($name);
+  my $types_str = &parameter_types_str($types);
+  my $tbl = &kw_args_generics();
+
+  #if (exists $$tbl{$name_str}) { # changechange: 2/2
+  if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
+
+    return 1;
+  }
+  return $state;
 }
 sub min { my ($x, $y) = @_; return $x <= $y ? $x : $y; }
 sub max { my ($x, $y) = @_; return $x >= $y ? $x : $y; }
