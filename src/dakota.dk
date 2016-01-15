@@ -1396,8 +1396,9 @@ func dkt-register-info(named-info-t* registration-info) -> void {
 
     symbol-t name = name-from-info(registration-info);
     assert(nullptr != name);
-    ostream::println-format(ostrm, "//arg=%s\n",  ctlg-arg);
-    ostream::println-format(ostrm, "//name=%s\n", name);
+    ostream::println-format(ostrm, "// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-\n");
+    ostream::println-format(ostrm, "// arg = %s\n",  ctlg-arg);
+    ostream::println-format(ostrm, "// name = %s\n", name);
     str-t arg-base =  remove-dir(ctlg-arg);
     str-t name-base = remove-dir(name);
 
