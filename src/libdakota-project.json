@@ -7,7 +7,6 @@
 
 { 'libdakota' => {
     'srcs' => [ # cmd-line
-      '$(srcdir)/libdakota.dk',
       '$(srcdir)/autorelease-pool.dk',
       '$(srcdir)/bit-vector.dk',
       '$(srcdir)/boole.dk',
@@ -91,6 +90,7 @@
       'DKT_WORKAROUND',
       'HAVE_CONFIG_HH',
     ],
+    'module' => '$(srcdir)/libdakota.dk', # cmd-line
     'output' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line

@@ -30,10 +30,9 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  precompile\
  uninstall\
 
-$(libdakota.output) $(libdakota-util.output): $(dakota-catalog.output)
 $(libdakota-util.output): $(libdakota.output)
 
-$(libdakota.output): $(srcdir)/strerror-name.tbl # not ideal, but ...
+$(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
 check: all
 	$(dakota-catalog.output) --silent $(libdakota.output) $(libdakota-util.output)

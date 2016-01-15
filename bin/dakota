@@ -91,6 +91,7 @@ my $root_cmd = { 'reps' => [],
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
             'library=s',            # --library libdl.so equivalent to -ldl (or better -l:libdl.so on linux)
+            'module=s',             #
             'nodefaultlibs',        # gcc-like
             'output=s',             # gcc-like
             'precompile',           # gcc-ish (--compile)
@@ -116,12 +117,30 @@ my $root_cmd = { 'reps' => [],
 
 my $argv = &clean_paths(\@ARGV);
 
+my $module_import_sources = [];
+my $module_desc = &dakota::parse::rep_tree_from_dk_path($$root_cmd{'opts'}{'module'});
+
+foreach my $module (keys %{$$module_desc{'modules'}}) {
+  my $sources = $$module_desc{'modules'}{$module}{'import'}{'sources'};
+  if ($sources) {
+    push @$module_import_sources, @$sources;
+  }
+}
+$module_import_sources = &clean_paths($module_import_sources);
+push @$argv, @$module_import_sources;
+$argv = &clean_paths($argv);
+
 if (0 == @$argv) {
   die "$0: error: arguments are requried\n";
 } else {
   $argv = [sort {&mtime($b) <=> &mtime($a)} @$argv];
   $$root_cmd{'inputs'} = $argv;
 }
+if (1) {
+  push @$argv, $$root_cmd{'opts'}{'module'}; # this seems VERY wrong
+  $argv = &clean_paths($argv);
+}
+
 # dakota --compile --output <> {dk}
 # dakota --shared  --output <> {o}+ {so}* [obj/rt/<>.cc.o]
 # dakota           --output <> {o}+ {so}* [obj/rt/<>.cc.o]

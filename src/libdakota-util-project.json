@@ -6,7 +6,6 @@
 # -*- cperl-tab-always-indent: t -*-
 { 'libdakota-util' => {
     'srcs' => [ # cmd-line
-      '$(srcdir)/libdakota-util.dk',
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',
       '$(srcdir)/dimension.dk',
@@ -42,6 +41,7 @@
       'DKT_WORKAROUND',
       'HAVE_CONFIG_HH',
     ],
+    'module' => '$(srcdir)/libdakota-util.dk', # cmd-line
     'output' => '$(blddir)/../lib/libdakota-util.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
