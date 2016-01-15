@@ -448,8 +448,8 @@ sub start_cmd {
   } elsif ($$cmd_info{'opts'}{'shared'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
       $cxx_shared_flags .= &for_linker([ $ld_soname_flags, $$cmd_info{'opts'}{'soname'} ]);
-      $cxx_shared_flags .= &for_linker($no_undefined_flags);
     }
+    $cxx_shared_flags .= &for_linker($no_undefined_flags);
     $dk_exe_type = 'exe-type::k_lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
 	   && !$$cmd_info{'opts'}{'shared'}) {
