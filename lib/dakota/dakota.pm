@@ -29,6 +29,7 @@ use warnings;
 use sort 'stable';
 
 my $should_write_pre_output = 1;
+my $should_write_ctlg_files = 1;
 
 my $gbl_prefix;
 my $gbl_compiler;
@@ -558,7 +559,7 @@ sub rep_from_so {
   $$rep_cmd{'output'} = $json_path;
   $$rep_cmd{'inputs'} = [ $ctlg_path ];
   &rep_from_inputs($rep_cmd);
-  if (1) {
+  if (!$should_write_ctlg_files) {
     unlink $ctlg_path;
   }
   &add_visibility_file($$rep_cmd{'output'});

@@ -809,15 +809,6 @@ static func remove-dir(str-t path) -> str-t {
     strcat(buf, " ");
   return buf;
 }
-static func first-parameter-type-len(str-t params) -> size-t {
-  size-t i;
-  for (i = 0; i < strlen(params); i++) {
-    char8-t c = params[i];
-    if (c == ',')
-      break;
-  }
-  return i;
-} 
 static func klass-exported?(named-info-t* klass-info,
                             boole-t*      exportedp-ptr = nullptr,
                             boole-t*      state-exportedp-ptr = nullptr,
@@ -835,89 +826,6 @@ static func klass-exported?(named-info-t* klass-info,
 
   boole-t result = (exported? || state-exported? || behavior-exported?);
   return result;
-}
-static func dump-module-description(ostream-t ostrm, named-info-t* registration-info) -> void {
-  assert(nullptr != ostrm.output);
-  assert(8 > ostrm.col);
-  assert(nullptr != registration-info);
-
-  named-info-t* klass-defns = cast(named-info-t*)named-info::at(registration-info, #klass-defns);
-
-  if (nullptr != klass-defns) {
-    int64-t i = 0;
-    symbol-t module-name = nullptr;
-    str-t c = "";
-    boole-t in-export? = false;
-
-    while (1) {
-      named-info-t* klass-info = &klass-defns[i++];
-      assert(nullptr != klass-info);
-      if (nullptr == klass-info->elements)
-        break;
-      if (!klass-exported?(klass-info))
-        continue;
-      // klass-name,
-      // klass-name::slots-t,
-      // klass-name::method-name(slots-t),
-      // klass-name::method-name(object-t), // maybe generated
-      // klass-name::va::method-name(slots-t),
-      // klass-name::va::method-name(object-t), // maybe generated
-      // klass-name::kw-args-method-name(slots-t), ???
-      // klass-name::kw-args-method-name(object-t), // maybe generated
-      symbol-t name = name-from-info(klass-info);
-
-      str-t                     modulee =                        cast(str-t)                    named-info::at(klass-info, #module);
-
-      //boole-t                   exported? =                      cast(boole-t)                  named-info::at(klass-info, #exported?);
-      //boole-t                   state-exported? =                cast(boole-t)                  named-info::at(klass-info, #state-exported?);
-      //boole-t                   behavior-exported? =             cast(boole-t)                  named-info::at(klass-info, #behavior-exported?);
-      
-      //symbol-t                  interpose-name =                 cast(symbol-t)                 named-info::at(klass-info, #interpose-name);
-
-      named-info-t*             slots-info =                     cast(named-info-t*)            named-info::at(klass-info, #slots-info);
-      symbol-t                  slots-type =                     cast(symbol-t)                 named-info::at(klass-info, #slots-type);
-
-      const signature-t* const* method-signatures =              cast(const signature-t* const*)named-info::at(klass-info, #method.signatures);
-      //const signature-t* const* va-method-signatures =           cast(const signature-t* const*)named-info::at(klass-info, #va-method.signatures);
-      //const signature-t* const* slots-method-signatures =        cast(const signature-t* const*)named-info::at(klass-info, #slots-method.signatures);
-      //const signature-t* const* va-slots-method-signatures =     cast(const signature-t* const*)named-info::at(klass-info, #va-slots-method.signatures);
-      //const signature-t* const* kw-args-method-signatures =      cast(const signature-t* const*)named-info::at(klass-info, #kw-args-method-signatures);
-
-      if (nullptr == modulee) {
-        named-info::dump(klass-info);
-        exit-fail-with-msg("ERROR: missing module declaration");
-      }
-      if (module-name != modulee) {
-        if (in-export?) {
-          ostream::println-format(ostrm, "%s\n}\n", c);
-        }
-        ostream::println-format(ostrm, "export %s {", modulee);
-        c = "";
-        in-export? = true;
-      }
-      module-name = modulee;
-      ostream::println-format(ostrm, "%s\n  %s", c, name);
-      c = ";";
-      if (nullptr != slots-info || nullptr != slots-type)
-        ostream::println-format(ostrm, "%s\n  %s::slots-t", c, name);
-      if (nullptr != method-signatures) {
-        int64-t index = 0;
-        const signature-t* info;
-
-        while (nullptr != (info = method-signatures[index++])) {
-          char8-t first-parameter-type[15 + (1)] = "";
-          size-t len = first-parameter-type-len(info->parameter-types);
-          assert(len < countof(first-parameter-type) - 1);
-          strncpy(first-parameter-type, info->parameter-types, len);
-          first-parameter-type[len] = NUL;
-          //ostream::println-format(ostrm, ",\n  %s:%s(%s)", name, info->name, first-parameter-type); // this code works just fine
-        }
-      }
-    }
-    if (in-export?)
-      ostream::println-format(ostrm, "%s\n}\n", c);
-  }
-  return;
 }
 static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only) -> void {
   assert(nullptr != ostrm.output);
@@ -952,10 +860,14 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
             snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, klass-name);
             ostream-t dostrm = ostream::fopen(klass-file);
             dump-klass(dostrm, klass-info, nullptr);
+            ostream::col-decr(dostrm);
+            ostream::println-format(dostrm, "} // export\n"); // closes "export {" from dump-klass()
             ostream::fclose(dostrm);
         }
       }
     }
+    ostream::col-decr(ostrm);
+    ostream::println-format(ostrm, "} // export\n"); // closes "export {" from dump-klass()
   }
   return;
 }
@@ -1051,9 +963,15 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module)
     if (default-klass-name() == klass-name)
       klass-name = nullptr;
   }
+  if (nullptr != prev-module && prev-module != modulee) {
+    ostream::col-decr(ostrm);
+    ostream::println-format(ostrm, "} // export\n"); // closes "export {" from prev dump-klass()
+  }
   if (prev-module != modulee) {
     ostream::println-format(ostrm, "module %s;\n\n", modulee);
+    ostream::println-format(ostrm, "export {\n");
   }
+  ostream::col-incr(ostrm);
   boole-t exported? =          false;
   boole-t state-exported? =    false;
   boole-t behavior-exported? = false;
@@ -1486,8 +1404,6 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
       dump-klass-defns(ostrm, registration-info, ctlg-only);
       dump-interposers(ostrm, registration-info);
-      if (nullptr == ctlg-only)
-        dump-module-description(ostrm, registration-info);
     }
   }
   exe-type-t type = cast(exe-type-t)named-info::at(registration-info, #type);

@@ -1186,7 +1186,7 @@ sub klass {
       }
       if (m/^slots$/) {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) || '{' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
-          &slots({ 'exported?' => 0 });
+          &slots({ 'exported?' => $$args{'exported?'} });
           last;
         }
       }
@@ -2012,7 +2012,8 @@ sub init_global_rep {
   return $global_rep;
 }
 sub parse_root {
-  my ($gbl_sst_cursor) = @_;
+  my ($gbl_sst_cursor, $exported) = @_;
+  my $depth = 0;
   $gbl_current_scope = $gbl_root;
 
   # root
@@ -2027,7 +2028,15 @@ sub parse_root {
         last;
       }
       if (m/^export$/) {
-        &module_export_defn();
+        if (&sst_cursor::next_token($gbl_sst_cursor) eq '{') {
+          &warning(__FILE__, __LINE__, 'nested export { } not allowed') if $exported;
+          &match(__FILE__, __LINE__, 'export');
+          &match(__FILE__, __LINE__, '{');
+          &parse_root($gbl_sst_cursor, 1); # exported = 1
+          #&match(__FILE__, __LINE__, '}'); # bugbug: this is broken, but goes unnoticed when there is only one module per shared-library
+        } else {
+          &module_export_defn();
+        }
         last;
       }
       if (m/^interpose$/) {
@@ -2040,7 +2049,7 @@ sub parse_root {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
             if ($next_token =~ m/$id/) {
-              &klass({'exported?' => 0});
+              &klass({'exported?' => $exported});
               last;
             }
           }
@@ -2050,7 +2059,7 @@ sub parse_root {
         my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
         if ($next_token) {
           if ($next_token =~ m/$id/) {
-            &trait({'exported?' => 0});
+            &trait({'exported?' => $exported});
             last;
           }
         }
@@ -2186,7 +2195,8 @@ sub rep_tree_from_dk_path {
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
   &add_generics_used($gbl_root, $gbl_sst_cursor);
 
-  my $result = &parse_root($gbl_sst_cursor);
+  my $exported;
+  my $result = &parse_root($gbl_sst_cursor, $exported = 0);
   &add_object_methods_decls($result);
   #print STDERR &Dumper($result);
   #print &Dumper(&kw_args_generics());
