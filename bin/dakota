@@ -137,7 +137,7 @@ if (0 == @$argv) {
   $argv = [sort {&mtime($b) <=> &mtime($a)} @$argv];
   $$root_cmd{'inputs'} = $argv;
 }
-push @{$$root_cmd{'inputs'}}, $module_json;
+unshift @{$$root_cmd{'inputs'}}, $module_json; # add_first
 
 # dakota --compile --output <> {dk}
 # dakota --shared  --output <> {o}+ {so}* [obj/rt/<>.cc.o]

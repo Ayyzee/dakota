@@ -195,7 +195,7 @@ sub loop_merged_rep_from_inputs {
     }
   } elsif (1 < @{$$cmd_info{'inputs'}}) {
     if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
-      my $rep = &dakota::parse::rep_merge($rep_files);
+      my $rep = &rep_merge($rep_files);
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
     }
   }
@@ -518,10 +518,8 @@ sub start_cmd {
   #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
   if ($want_separate_rep_pass) {
     $cmd_info = &loop_rep_from_inputs($cmd_info);
-    for (my $i = 0; $i < @{$$cmd_info{'inputs'}}; $i++) {
-      if (&is_rep_path($$cmd_info{'inputs'}[$i])) { # removing $module_json added in bin/dakota
-        delete $$cmd_info{'inputs'}[$i];
-      }
+    if (&is_rep_path($$cmd_info{'inputs'}[0])) {
+      shift @{$$cmd_info{'inputs'}}; # removing $module_json added in bin/dakota
     }
   }
   if (&is_rep_path($$cmd_info{'opts'}{'output'})) { # this is a real hackhack
