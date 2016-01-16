@@ -239,15 +239,15 @@ my $gbl_macros;
 sub write_to_file_converted_strings {
   my ($path, $strings, $remove) = @_;
   if ($use_new_macro_system) {
-  if (!defined $gbl_macros) {
-    if ($ENV{'DK_MACROS_PATH'}) {
-      $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die "do $ENV{'DK_MACROS_PATH'} failed: $!\n";
-    } elsif ($gbl_prefix) {
-      $gbl_macros = do "$gbl_prefix/lib/dakota/macros.pl" or die "do $gbl_prefix/lib/dakota/macros.pl failed: $!\n";
-    } else {
-      die;
+    if (!defined $gbl_macros) {
+      if ($ENV{'DK_MACROS_PATH'}) {
+        $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die "do $ENV{'DK_MACROS_PATH'} failed: $!\n";
+      } elsif ($gbl_prefix) {
+        $gbl_macros = do "$gbl_prefix/lib/dakota/macros.pl" or die "do $gbl_prefix/lib/dakota/macros.pl failed: $!\n";
+      } else {
+        die;
+      }
     }
-  }
   }
   if (defined $path) {
     open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
@@ -679,8 +679,7 @@ sub arg_type::list_pair {
   my $num_arg_names = @$arg_names_ref;
   my $list          = '';
   my $arg_num;
-  my $delim = ''
-;
+  my $delim = '';
   for ($arg_num = 0; $arg_num < $num_arg_types; $arg_num++) {
     $list .= $delim . &arg::type(${$arg_types_ref}[$arg_num]);
     if (defined ${$arg_names_ref}[$arg_num]) {
@@ -3888,10 +3887,10 @@ sub should_ann {
   }
   my $num_ann_lns = $num_lns / $ann_interval;
   my $adjusted_ann_interval = ($num_lns / ($num_ann_lns + 1)) + 1;
- #print "ann-interval: " . $ann_interval . "\n"; 
- #print "num-ann-lns: " . $num_lns . ' / ' . $ann_interval . "\n";
- #print "num-ann-lns: " . $num_ann_lns . "\n";
- #print "adjusted-ann-interval: " . $adjusted_ann_interval . "\n";
+  #print "ann-interval: " . $ann_interval . "\n"; 
+  #print "num-ann-lns: " . $num_lns . ' / ' . $ann_interval . "\n";
+  #print "num-ann-lns: " . $num_ann_lns . "\n";
+  #print "adjusted-ann-interval: " . $adjusted_ann_interval . "\n";
   $result = 1 if !(($ln + 1) % $adjusted_ann_interval);
   return $result;
 }

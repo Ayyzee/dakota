@@ -1716,25 +1716,25 @@ sub method {
 
   if (0) {
   } elsif (&dakota::generate::is_slots($method) &&
-             &dakota::generate::is_va($method)) { # 11
+           &dakota::generate::is_va($method)) { # 11
     if (!defined $$gbl_current_scope{'slots-methods'}) {
       $$gbl_current_scope{'slots-methods'} = {};
     }
     $$gbl_current_scope{'slots-methods'}{$signature} = $method;
   } elsif (&dakota::generate::is_slots($method) &&
-             !&dakota::generate::is_va($method)) { # 10
+          !&dakota::generate::is_va($method)) { # 10
     if (!defined $$gbl_current_scope{'slots-methods'}) {
       $$gbl_current_scope{'slots-methods'} = {};
     }
     $$gbl_current_scope{'slots-methods'}{$signature} = $method;
   } elsif (!&dakota::generate::is_slots($method) &&
-             &dakota::generate::is_va($method)) { # 01
+            &dakota::generate::is_va($method)) { # 01
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }
     $$gbl_current_scope{'methods'}{$signature} = $method;
   } elsif (!&dakota::generate::is_slots($method) &&
-             !&dakota::generate::is_va($method)) { # 00
+           !&dakota::generate::is_va($method)) { # 00
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }

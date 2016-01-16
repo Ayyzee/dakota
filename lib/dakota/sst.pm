@@ -573,7 +573,6 @@ sub constraint_qual_scope {
   #print "result_lhs: " . &Dumper($result_lhs) . "\n";
   #print "result_rhs: " . &Dumper($result_rhs) . "\n";
 
-  if (1) {
   if (0 != @$result_rhs) {
     if ($$special_idents{$$result_rhs[-1]}) {
       $$result_lhs[1] -= 1;
@@ -588,7 +587,6 @@ sub constraint_qual_scope {
         }
       }
     }
-  }
   }
   return ($result_lhs, $result_rhs);
 }

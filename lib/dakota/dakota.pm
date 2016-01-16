@@ -485,21 +485,21 @@ sub start_cmd {
   }
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'output'}) {
-  if ($ENV{'DKT_PRECOMPILE'}) {
-    my $rt_cc;
-    if (&is_so_path($$cmd_info{'output'})) {
-      $rt_cc = &rt_cc_path_from_so_path($$cmd_info{'output'});
+    if ($ENV{'DKT_PRECOMPILE'}) {
+      my $rt_cc;
+      if (&is_so_path($$cmd_info{'output'})) {
+        $rt_cc = &rt_cc_path_from_so_path($$cmd_info{'output'});
+      } else {
+        $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
+      }
+      if (&is_debug()) {
+        print "creating $rt_cc" . &pann(__FILE__, __LINE__) . "\n";
+      }
     } else {
-      $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
+      if (&is_debug()) {
+        print "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
+      }
     }
-    if (&is_debug()) {
-      print "creating $rt_cc" . &pann(__FILE__, __LINE__) . "\n";
-    }
-  } else {
-    if (&is_debug()) {
-      print "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
-    }
-  }
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
 
@@ -549,22 +549,22 @@ sub start_cmd {
     }
   }
   if (!$ENV{'DKT_PRECOMPILE'}) {
-  if ($$cmd_info{'opts'}{'compile'}) {
-    if ($want_separate_precompile_pass) {
-      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
-      &o_from_cc($cmd_info);
-    }
-  } else {
-    if ($$cmd_info{'opts'}{'shared'}) {
-            $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
-            &so_from_o($cmd_info);
-    } elsif (!$$cmd_info{'opts'}{'compile'} &&
-             !$$cmd_info{'opts'}{'shared'}) {
-            &exe_from_o($cmd_info);
+    if ($$cmd_info{'opts'}{'compile'}) {
+      if ($want_separate_precompile_pass) {
+        $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
+        &o_from_cc($cmd_info);
+      }
     } else {
-            die __FILE__, ":", __LINE__, ": error:\n";
+      if ($$cmd_info{'opts'}{'shared'}) {
+        $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
+        &so_from_o($cmd_info);
+      } elsif (!$$cmd_info{'opts'}{'compile'} &&
+                 !$$cmd_info{'opts'}{'shared'}) {
+        &exe_from_o($cmd_info);
+      } else {
+        die __FILE__, ":", __LINE__, ": error:\n";
+      }
     }
-  }
   }
   return $exit_status;
 }
@@ -637,14 +637,14 @@ sub loop_rep_from_inputs {
     }
   }
   if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
-  if (0 != @$rep_files) {
-    my $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
-    &ordered_set_add($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
-    my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
-    $$rep_cmd{'output'} = $rt_json_path;
-    $$rep_cmd{'inputs'} = $rep_files;
-    &rep_from_inputs($rep_cmd);
-  }
+    if (0 != @$rep_files) {
+      my $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
+      &ordered_set_add($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
+      my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
+      $$rep_cmd{'output'} = $rt_json_path;
+      $$rep_cmd{'inputs'} = $rep_files;
+      &rep_from_inputs($rep_cmd);
+    }
   }
   return $cmd_info;
 } # loop_rep_from_inputs
@@ -1011,15 +1011,15 @@ sub outfile_from_infiles {
   my $infiles;
   if (-e $outfile) {
     $infiles = [];
-  foreach my $infile (@{$$cmd_info{'inputs'}}) {
-    my $infile_stat = &path_stat($file_db, $infile, '--inputs');
-    if (!$$infile_stat{'mtime'}) {
-      $$infile_stat{'mtime'} = 0;
+    foreach my $infile (@{$$cmd_info{'inputs'}}) {
+      my $infile_stat = &path_stat($file_db, $infile, '--inputs');
+      if (!$$infile_stat{'mtime'}) {
+        $$infile_stat{'mtime'} = 0;
+      }
+      if (! -e $outfile || $$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
+        push @$infiles, $infile;
+      }
     }
-    if (! -e $outfile || $$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
-      push @$infiles, $infile;
-    }
-  }
   } else {
     $infiles = $$cmd_info{'inputs'};
   }
@@ -1030,37 +1030,37 @@ sub outfile_from_infiles {
     } else {
       &append_to_env_file($outfile, $infiles, "DKT_DEPENDS_OUTPUT_FILE");
     }
-      &make_dir($$cmd_info{'output'});
-      if ($show_outfile_info) {
-        print "MK $$cmd_info{'output'}\n";
-      }
-      my $output = $$cmd_info{'output'};
+    &make_dir($$cmd_info{'output'});
+    if ($show_outfile_info) {
+      print "MK $$cmd_info{'output'}\n";
+    }
+    my $output = $$cmd_info{'output'};
 
-      if (!&is_rep_path($output) &&
-          !&is_ctlg_path($output)) {
-        #$should_echo = 0;
-        if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-          $output = $ENV{'DKT_DIR'} . '/' . $output
-        }
-        #print "    creating $output # output" . &pann(__FILE__, __LINE__) . "\n";
+    if (!&is_rep_path($output) &&
+        !&is_ctlg_path($output)) {
+      #$should_echo = 0;
+      if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+        $output = $ENV{'DKT_DIR'} . '/' . $output
       }
-      if ('&loop_merged_rep_from_inputs' eq $$cmd_info{'cmd'}) {
-        $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
-        delete $$cmd_info{'output'};
-        delete $$cmd_info{'cmd'};
-        delete $$cmd_info{'cmd-major-mode-flags'};
-        delete $$cmd_info{'cmd-flags'};
-        &loop_merged_rep_from_inputs($cmd_info, $global_should_echo || $should_echo);
-      } elsif ('&loop_cc_from_dk' eq $$cmd_info{'cmd'}) {
-        $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
-        delete $$cmd_info{'output'};
-        delete $$cmd_info{'cmd'};
-        delete $$cmd_info{'cmd-major-mode-flags'};
-        delete $$cmd_info{'cmd-flags'};
-        &loop_cc_from_dk($cmd_info, $global_should_echo || $should_echo);
-      } else {
-        &exec_cmd($cmd_info, $should_echo);
-      }
+      #print "    creating $output # output" . &pann(__FILE__, __LINE__) . "\n";
+    }
+    if ('&loop_merged_rep_from_inputs' eq $$cmd_info{'cmd'}) {
+      $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
+      delete $$cmd_info{'output'};
+      delete $$cmd_info{'cmd'};
+      delete $$cmd_info{'cmd-major-mode-flags'};
+      delete $$cmd_info{'cmd-flags'};
+      &loop_merged_rep_from_inputs($cmd_info, $global_should_echo || $should_echo);
+    } elsif ('&loop_cc_from_dk' eq $$cmd_info{'cmd'}) {
+      $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
+      delete $$cmd_info{'output'};
+      delete $$cmd_info{'cmd'};
+      delete $$cmd_info{'cmd-major-mode-flags'};
+      delete $$cmd_info{'cmd-flags'};
+      &loop_cc_from_dk($cmd_info, $global_should_echo || $should_echo);
+    } else {
+      &exec_cmd($cmd_info, $should_echo);
+    }
   }
   return $num_out_of_date_infiles;
 } # outfile_from_infiles
