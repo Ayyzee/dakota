@@ -94,6 +94,7 @@ my $should_write_ctlg_files = 1;
 my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
 my $show_outfile_info = 0;
+my $show_stat_info = 0;
 my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_exe_type = undef;
@@ -984,7 +985,7 @@ sub path_stat {
   if (exists $$path_db{$path}) {
     $stat = $$path_db{$path};
   } else {
-    if ($show_outfile_info) {
+    if ($show_stat_info) {
       print "STAT $path, text=$text\n";
     }
     @$stat{qw(dev inode mode nlink uid gid rdev size atime mtime ctime blksize blocks)} = stat($path);
