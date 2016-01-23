@@ -1,0 +1,38 @@
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
+# need to add use of $DESTDIR, $blddir, $srcdir
+
+{
+  'output' => '../lib/libdakota-util.so',
+  'inputs' => [
+    'ascii-number-klass.dk',
+    'ascii-number.dk',
+    'dimension.dk',
+    'float.dk',
+    'hashed-counted-set.dk',
+    'hashed-set.dk',
+    'hashed-table.dk',
+    'input-file.dk',
+    'json-object-output-stream.dk',
+    'json-parser.dk',
+    'lexer.dk',
+    'open-token.dk',
+    'output-file.dk',
+    'point.dk',
+    'rect.dk',
+    'slot-info.dk',
+    'str-buffer.dk',
+    'syntax-exception.dk',
+    'text-output-stream.dk',
+    'token.dk',
+    'tokenid.dk',
+    'type-predicate.dk',
+    'xml-object-output-stream.dk',
+    '../lib/libdakota.so',
+  ],
+}

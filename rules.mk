@@ -8,7 +8,7 @@ $(blddir)/../bin/%:
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs:%=--library %) $(srcs)
 
 $(blddir)/../lib/%.$(so_ext):
-	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --module $(module) --soname $(soname) --output $@ $(libs:%=--library %) $?
+	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --module $(module) --soname $(soname) --output $@ $(libs:%=--library %) $?
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: $(blddir)/../lib/dakota/%.json
 	sudo $(INSTALL_DATA) $< $(@D)

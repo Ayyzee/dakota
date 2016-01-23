@@ -42,6 +42,7 @@
       'HAVE_CONFIG_HH',
     ],
     'module' => '$(srcdir)/libdakota-util.dk', # cmd-line
+    'project' => '$(srcdir)/libdakota-util.project', # cmd-line
     'output' => '$(blddir)/../lib/libdakota-util.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
