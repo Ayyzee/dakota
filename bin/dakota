@@ -91,7 +91,6 @@ my $root_cmd = { 'reps' => [],
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
             'library=s',            # --library libdl.so equivalent to -ldl (or better -l:libdl.so on linux)
-            'module=s',             #
             'nodefaultlibs',        # gcc-like
             'output=s',             # gcc-like
             'precompile',           # gcc-ish (--compile)
@@ -123,18 +122,11 @@ if ($$root_cmd{'opts'}{'project'}) {
   $$root_cmd{'project-inputs'} = $$project{'inputs'};
   $$root_cmd{'project-output'} = $$project{'output'};
 }
-my $module_import_sources = [];
-my $module_desc = &dakota::parse::rep_tree_from_dk_path($$root_cmd{'opts'}{'module'});
-my $module_json = &rep_from_module($$root_cmd{'opts'}{'module'});
+my $project = &scalar_from_file($$root_cmd{'opts'}{'project'});
 
-foreach my $module (keys %{$$module_desc{'modules'}}) {
-  my $sources = $$module_desc{'modules'}{$module}{'import'}{'sources'};
-  if ($sources) {
-    push @$module_import_sources, @$sources;
-  }
+if ($$project{'inputs'}) {
+  push @$argv, @{$$project{'inputs'}};
 }
-$module_import_sources = &clean_paths($module_import_sources);
-push @$argv, @$module_import_sources;
 $argv = &clean_paths($argv);
 
 if (0 == @$argv) {
@@ -143,7 +135,6 @@ if (0 == @$argv) {
   $argv = [sort {&mtime($b) <=> &mtime($a)} @$argv];
   $$root_cmd{'inputs'} = $argv;
 }
-unshift @{$$root_cmd{'inputs'}}, $module_json; # add_first
 
 # dakota --compile --output <> {dk}
 # dakota --shared  --output <> {o}+ {so}* [obj/rt/<>.cc.o]

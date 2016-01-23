@@ -75,7 +75,6 @@ BEGIN {
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
-                 rep_from_module
              );
 
 use Data::Dumper;
@@ -519,9 +518,6 @@ sub start_cmd {
   #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
   if ($want_separate_rep_pass) {
     $cmd_info = &loop_rep_from_inputs($cmd_info);
-    if (&is_rep_path($$cmd_info{'inputs'}[0])) {
-      shift @{$$cmd_info{'inputs'}}; # removing $module_json added in bin/dakota
-    }
   }
   if (&is_rep_path($$cmd_info{'opts'}{'output'})) { # this is a real hackhack
     &add_visibility_file($$cmd_info{'opts'}{'output'});
@@ -611,16 +607,6 @@ sub rep_from_inputs {
   $$rep_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
   return &outfile_from_infiles($rep_cmd, $should_echo = 0);
-}
-sub rep_from_module {
-  my ($module) = @_;
-  my $json_path = &json_path_from_any_path($module); # _from_dk_src_path
-  my $rep_cmd = {};
-  $$rep_cmd{'cmd'} = '&loop_merged_rep_from_inputs';
-  $$rep_cmd{'output'} = $json_path;
-  $$rep_cmd{'inputs'} = [ $module ];
-  &rep_from_inputs($rep_cmd);
-  return $json_path;
 }
 sub loop_rep_from_inputs {
   my ($cmd_info) = @_;

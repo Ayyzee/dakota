@@ -14,35 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import dakota-util {
-  self "libdakota-util.dk";
-
-  source "ascii-number-klass.dk";
-  source "ascii-number.dk";
-  source "dimension.dk";
-  source "float.dk";
-  source "hashed-counted-set.dk";
-  source "hashed-set.dk";
-  source "hashed-table.dk";
-  source "input-file.dk";
-  source "json-object-output-stream.dk";
-  source "json-parser.dk";
-  source "lexer.dk";
-  source "open-token.dk";
-  source "output-file.dk";
-  source "point.dk";
-  source "rect.dk";
-  source "slot-info.dk";
-  source "str-buffer.dk";
-  source "syntax-exception.dk";
-  source "text-output-stream.dk";
-  source "token.dk";
-  source "tokenid.dk";
-  source "type-predicate.dk";
-  source "xml-object-output-stream.dk";
-
-  shared-library "../lib/libdakota.$(so_ext)";
-}
 export dakota-util {
   ascii-number;
   ascii-number-klass;
