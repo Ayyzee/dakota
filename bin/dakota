@@ -95,6 +95,7 @@ my $root_cmd = { 'reps' => [],
             'nodefaultlibs',        # gcc-like
             'output=s',             # gcc-like
             'precompile',           # gcc-ish (--compile)
+            'project=s',
             'shared',               # gcc-like
             'silent',               #
             'soname=s',             # ld-like (-soname <>)
@@ -117,6 +118,11 @@ my $root_cmd = { 'reps' => [],
 
 my $argv = &clean_paths(\@ARGV);
 
+if ($$root_cmd{'opts'}{'project'}) {
+  my $project = &scalar_from_file($$root_cmd{'opts'}{'project'});
+  $$root_cmd{'project-inputs'} = $$project{'inputs'};
+  $$root_cmd{'project-output'} = $$project{'output'};
+}
 my $module_import_sources = [];
 my $module_desc = &dakota::parse::rep_tree_from_dk_path($$root_cmd{'opts'}{'module'});
 my $module_json = &rep_from_module($$root_cmd{'opts'}{'module'});
