@@ -461,6 +461,7 @@ sub update_rep_from_all_inputs {
                   'opts' => &deep_copy($$cmd_info{'opts'}),
                 };
   delete $$rep_cmd{'opts'}{'compile'};
+  $rep_cmd = &loop_rep_from_so($rep_cmd);
   $rep_cmd = &loop_rep_from_inputs($rep_cmd);
 
   my $rt_json_path;
