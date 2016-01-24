@@ -115,7 +115,7 @@ my $root_cmd = { 'reps' => [],
 # --help
 # --verbose
 
-my $argv = &clean_paths(\@ARGV);
+my $inputs = &clean_paths(\@INPUTS);
 
 if ($$root_cmd{'opts'}{'project'}) {
   my $project = &scalar_from_file($$root_cmd{'opts'}{'project'});
@@ -125,15 +125,15 @@ if ($$root_cmd{'opts'}{'project'}) {
 my $project = &scalar_from_file($$root_cmd{'opts'}{'project'});
 
 if ($$project{'inputs'}) {
-  push @$argv, @{$$project{'inputs'}};
+  push @$inputs, @{$$project{'inputs'}};
 }
-$argv = &clean_paths($argv);
+$inputs = &clean_paths($inputs);
 
-if (0 == @$argv) {
+if (0 == @$inputs) {
   die "$0: error: arguments are requried\n";
 } else {
-  $argv = [sort {&mtime($b) <=> &mtime($a)} @$argv];
-  $$root_cmd{'inputs'} = $argv;
+  $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
+  $$root_cmd{'inputs'} = $inputs;
 }
 
 # dakota --compile --output <> {dk}
