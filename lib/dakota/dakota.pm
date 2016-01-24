@@ -453,9 +453,28 @@ sub for_linker {
   }
   return $result;
 }
+sub update_rep_from_all_inputs {
+  my ($cmd_info) = @_;
+  my $rep_cmd = { 'output' => $$cmd_info{'project-output'},
+                  'inputs' => $$cmd_info{'project-inputs'},
+                  'reps' => [],
+                  'opts' => &deep_copy($$cmd_info{'opts'}),
+                };
+  delete $$rep_cmd{'opts'}{'compile'};
+  $rep_cmd = &loop_rep_from_inputs($rep_cmd);
+
+  my $rt_json_path;
+  if (&is_so_path($$rep_cmd{'output'})) {
+    $rt_json_path = &rt_json_path_from_so_path($$rep_cmd{'output'}); # should be from_so_path
+  } else {
+    $rt_json_path = &rt_json_path_from_any_path($$rep_cmd{'output'}); # _from_exe_path
+  }
+  &add_visibility_file($rt_json_path);
+}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
+  &update_rep_from_all_inputs($cmd_info);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
