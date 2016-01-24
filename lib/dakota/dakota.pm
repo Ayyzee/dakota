@@ -455,40 +455,47 @@ sub for_linker {
 }
 sub update_rep_from_all_inputs {
   my ($cmd_info) = @_;
-  my $rep_cmd = { 'output' => $$cmd_info{'project-output'},
-                  'inputs' => $$cmd_info{'project-inputs'},
-                  'reps' => [],
-                  'opts' => &deep_copy($$cmd_info{'opts'}),
-                };
-  $$rep_cmd{'opts'}{'silent'} = 1;
-  delete $$rep_cmd{'opts'}{'compile'};
+  my $start_time = time;
+  my $orig = { 'inputs' => $$cmd_info{'inputs'},
+               'output' => $$cmd_info{'output'},
+               'opts' =>   &deep_copy($$cmd_info{'opts'}),
+             };
+  $$cmd_info{'inputs'} = $$cmd_info{'project-inputs'},
+  $$cmd_info{'output'} = $$cmd_info{'project-output'},
+  $$cmd_info{'opts'}{'silent'} = 1;
+  delete $$cmd_info{'opts'}{'compile'};
 
   my $rt_json_path;
-  if (&is_so_path($$rep_cmd{'output'})) {
-    $rt_json_path = &rt_json_path_from_so_path($$rep_cmd{'output'}); # should be from_so_path
+  if (&is_so_path($$cmd_info{'output'})) {
+    $rt_json_path = &rt_json_path_from_so_path($$cmd_info{'output'}); # should be from_so_path
   } else {
-    $rt_json_path = &rt_json_path_from_any_path($$rep_cmd{'output'}); # _from_exe_path
+    $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
   }
-  $rep_cmd = &loop_rep_from_so($rep_cmd); # duplicated (but needed)
-  $rep_cmd = &loop_rep_from_inputs($rep_cmd);
+  if (&is_debug()) {
+    print "creating $rt_json_path" . &pann(__FILE__, __LINE__) . "\n";
+  }
+  $cmd_info = &loop_rep_from_so($cmd_info);
+  $cmd_info = &loop_rep_from_inputs($cmd_info);
   &add_visibility_file($rt_json_path);
+
+  $$cmd_info{'inputs'} = $$orig{'inputs'};
+  $$cmd_info{'output'} = $$orig{'output'};
+  $$cmd_info{'opts'} =   $$orig{'opts'};
+
+  if (&is_debug()) {
+    my $end_time = time;
+    my $elapsed_time = $end_time - $start_time;
+    print "creating $rt_json_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . "\n";
+  }
   if ($ENV{'DAKOTA_CREATE_REP_ONLY'}) {
     exit 0;
   }
-  return ($rt_json_path, $$rep_cmd{'reps'});
+  return $cmd_info;
 }
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
-  my $start_time = time;
-  my $rep;
-  ($rep, $$cmd_info{'reps'}) = &update_rep_from_all_inputs($cmd_info);
-  $$cmd_info{'reps'} = &update_rep_from_all_inputs($cmd_info);
-  if (&is_debug()) {
-    my $end_time = time;
-    my $elapsed_time = $end_time - $start_time;
-    print "creating $rep ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . "\n";
-  }
+  $cmd_info = &update_rep_from_all_inputs($cmd_info);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -534,8 +541,6 @@ sub start_cmd {
       }
     }
   }
-  $cmd_info = &loop_rep_from_so($cmd_info); # needed
-
   if ($should_replace_library_path_with_lib_opts) {
     my ($inputs, $lib_opts) = &split_inputs($$cmd_info{'inputs'});
     $$cmd_info{'inputs'} = $inputs;
