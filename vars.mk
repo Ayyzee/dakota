@@ -63,13 +63,15 @@ EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
 #EXTRA_CXXFLAGS += $(CXX_COMPILE_THREAD_FLAGS)
 #EXTRA_CXXFLAGS += -MMD -MP
 
+DAKOTA-BASE = $(srcdir)/../bin/dakota
+
 ifdef DKT_PROFILE
   DAKOTA ?= DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota-profile --define-macro DK_ENABLE_TRACE_MACROS=1
   # prof uses -p, gprof uses -pg
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= DKT_DEPENDS_OUTPUT_FILE=$(objdir)/-depends.pl DK_NO_LINE=0 DK_NO_CONVERT_DASH_SYNTAX=0 DK_ENABLE_TRACE_MACROS=1 $(srcdir)/../bin/dakota --define-macro DK_ENABLE_TRACE_MACROS=1
+  DAKOTA ?= DKT_DEPENDS_OUTPUT_FILE=$(objdir)/-depends.pl DK_NO_LINE=0 DK_NO_CONVERT_DASH_SYNTAX=0 DK_ENABLE_TRACE_MACROS=1 $(DAKOTA-BASE) --define-macro DK_ENABLE_TRACE_MACROS=1
   # --keep-going
 endif
 
