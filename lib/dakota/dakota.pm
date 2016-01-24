@@ -471,11 +471,12 @@ sub update_rep_from_all_inputs {
     $rt_json_path = &rt_json_path_from_any_path($$rep_cmd{'output'}); # _from_exe_path
   }
   &add_visibility_file($rt_json_path);
+  return $$rep_cmd{'reps'};
 }
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
-  &update_rep_from_all_inputs($cmd_info);
+  $$cmd_info{'reps'} = &update_rep_from_all_inputs($cmd_info);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
