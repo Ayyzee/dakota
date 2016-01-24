@@ -612,13 +612,14 @@ sub unwrap_seq {
   return $seq;
 }
 sub scalar_to_file {
-  my ($file, $ref) = @_;
+  my ($file, $ref, $original_state) = @_;
   if (!defined $ref) {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file($ref)\n";
   }
   my $refstr = &Dumper($ref);
-  $refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
-
+  if (!$original_state) {
+    $refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
+  }
   open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   flock FILE, 2; # LOCK_EX
   truncate FILE, 0;
