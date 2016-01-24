@@ -115,7 +115,7 @@ my $root_cmd = { 'reps' => [],
 # --help
 # --verbose
 
-my $inputs = &clean_paths(\@INPUTS);
+my $inputs = &clean_paths(\@ARGV);
 
 if ($$root_cmd{'opts'}{'project'}) {
   my $project = &scalar_from_file($$root_cmd{'opts'}{'project'});
