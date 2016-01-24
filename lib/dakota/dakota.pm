@@ -359,7 +359,7 @@ sub loop_cc_from_dk {
   $$cmd_info{'inputs'} = $inputs;
 
   if ($$cmd_info{'reps'}) {
-    &init_global_rep($$cmd_info{'reps'});
+    &init_global_rep($$cmd_info{'reps'}); # within loop_cc_from_dk
   }
   my $argv_length = @{$$cmd_info{'inputs'}};
   if (0 == $argv_length) {
@@ -460,9 +460,8 @@ sub update_rep_from_all_inputs {
                   'reps' => [],
                   'opts' => &deep_copy($$cmd_info{'opts'}),
                 };
+  $$rep_cmd{'opts'}{'silent'} = 1;
   delete $$rep_cmd{'opts'}{'compile'};
-  $rep_cmd = &loop_rep_from_so($rep_cmd);
-  $rep_cmd = &loop_rep_from_inputs($rep_cmd);
 
   my $rt_json_path;
   if (&is_so_path($$rep_cmd{'output'})) {
@@ -470,13 +469,26 @@ sub update_rep_from_all_inputs {
   } else {
     $rt_json_path = &rt_json_path_from_any_path($$rep_cmd{'output'}); # _from_exe_path
   }
+  $rep_cmd = &loop_rep_from_so($rep_cmd); # duplicated (but needed)
+  $rep_cmd = &loop_rep_from_inputs($rep_cmd);
   &add_visibility_file($rt_json_path);
-  return $$rep_cmd{'reps'};
+  if ($ENV{'DAKOTA_CREATE_REP_ONLY'}) {
+    exit 0;
+  }
+  return ($rt_json_path, $$rep_cmd{'reps'});
 }
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
+  my $start_time = time;
+  my $rep;
+  ($rep, $$cmd_info{'reps'}) = &update_rep_from_all_inputs($cmd_info);
   $$cmd_info{'reps'} = &update_rep_from_all_inputs($cmd_info);
+  if (&is_debug()) {
+    my $end_time = time;
+    my $elapsed_time = $end_time - $start_time;
+    print "creating $rep ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . "\n";
+  }
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -522,7 +534,7 @@ sub start_cmd {
       }
     }
   }
-  $cmd_info = &loop_rep_from_so($cmd_info);
+  $cmd_info = &loop_rep_from_so($cmd_info); # needed
 
   if ($should_replace_library_path_with_lib_opts) {
     my ($inputs, $lib_opts) = &split_inputs($$cmd_info{'inputs'});
@@ -534,14 +546,6 @@ sub start_cmd {
       push @$inputs, &cmd_opts_from_library_name($input);
     }
     $$cmd_info{'inputs'} = $inputs;
-  }
-  #if (&is_rep_path($$cmd_info{'opts'}{'output'})) # this is a real hackhack
-  #{ &add_visibility_file($$cmd_info{'opts'}{'output'}); }
-  if ($want_separate_rep_pass) {
-    $cmd_info = &loop_rep_from_inputs($cmd_info);
-  }
-  if (&is_rep_path($$cmd_info{'opts'}{'output'})) { # this is a real hackhack
-    &add_visibility_file($$cmd_info{'opts'}{'output'});
   }
   if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
@@ -609,7 +613,6 @@ sub rep_from_so {
   if (!$should_write_ctlg_files) {
     unlink $ctlg_path;
   }
-  &add_visibility_file($$rep_cmd{'output'});
 }
 sub loop_rep_from_so {
   my ($cmd_info) = @_;
@@ -665,7 +668,7 @@ sub gen_rt_o {
     } else {
       $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
     }
-    if (! $$cmd_info{'opts'}{'silent'}) {
+    if (!$$cmd_info{'opts'}{'silent'}) {
       print '<' . $rt_cc_path . ">\n";
     }
     if (&is_debug()) {
@@ -812,19 +815,6 @@ sub rt_o_from_json {
     $cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
   }
   my $reps = [];
-  my $state = 0;
-  if ($state) {
-    my $json_paths = [];
-    foreach my $input (@{$$cmd_info{'inputs'}}) {
-      # .../foo.cc.o or .../foo.dk.o or .../foo.o
-      if ($input =~ m/\.$o_ext$/) {
-        my $json_path = &json_path_from_o_path($input);
-        push @$json_paths, $json_path;
-      }
-    }
-    push @$reps, @$json_paths;
-    $reps = &clean_paths($reps);
-  }
   my $o_path = &o_path_from_cc_path($cc_path);
   &make_dir($cc_path);
   my ($path, $file_basename, $file) = ($cc_path, $cc_path, undef);
@@ -832,19 +822,7 @@ sub rt_o_from_json {
   $file_basename =~ s|^[^/]*/||;       # strip off leading $objdir/
   $file_basename =~ s|-rt\.$cc_ext$||; # strip off trailing -rt.cc
   if ($$cmd_info{'reps'}) {
-    &init_global_rep($$cmd_info{'reps'});
-  }
-  if ($state) { # remove preceeding 3 lines when $state is non-zero
-    my $rep = &rep_merge($reps);
-
-    &scalar_to_file($rt_json_path, $rep); # herehere
-    &add_visibility_file($rt_json_path);
-
-    if (1) {
-      my $rt_json_path_rn = $rt_json_path . '.rn';
-      &scalar_to_file($rt_json_path_rn, $rep);
-      #&add_visibility_file($rt_json_path_rn);
-    }
+    &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
   }
   $file = &scalar_from_file($rt_json_path);
   die if $$file{'other'};
@@ -1074,7 +1052,7 @@ sub outfile_from_infiles {
 } # outfile_from_infiles
 sub ctlg_from_so {
   my ($cmd_info) = @_;
-  if (! $$cmd_info{'opts'}{'silent'}) {
+  if (!$$cmd_info{'opts'}{'silent'}) {
     #map { print '// ' . $_ . "\n"; } @{$$cmd_info{'inputs'}};
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };

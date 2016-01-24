@@ -259,13 +259,13 @@ sub write_to_file_converted_strings {
   foreach my $string (@$strings) {
     $filestr .= $string;
   }
-  my $sst = &sst::make($filestr, ">$path");
+  my $sst = &sst::make($filestr, ">$path"); # costly (< 1/4 of total)
   my $kw_args_generics = &dakota::util::kw_args_generics();
   if ($use_new_macro_system) {
     &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_args_generics);
   }
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
-  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics, $remove);
+  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics, $remove); # costly (< 3/4 of total)
 
   print PATH $converted_string;
 
@@ -344,7 +344,7 @@ sub generate_rt {
     $start_time = time;
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
   }
-  my $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name);
+  my $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name); # costly (> 1/8 of total)
 
   if (&is_rt_defn()) {
     $str .= &generate_defn_footer($file, $generics);
