@@ -75,6 +75,8 @@ BEGIN {
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
+                 is_dk_path
+                 is_o_path
              );
 
 use Data::Dumper;
@@ -123,6 +125,14 @@ sub is_so_path {
   my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
   #my $libname = $2 . ".$so_ext";
   return $result;
+}
+sub is_dk_path {
+  my ($arg) = @_;
+  if ($arg =~ m/\.dk$/) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 sub is_dk_src_path {
   my ($arg) = @_;
@@ -365,6 +375,7 @@ sub loop_cc_from_dk {
   if (0 == $argv_length) {
     die "$0: error: arguments are requried\n";
   }
+  my $project_rep = &global_project_rep();
   my $num_inputs = scalar @{$$cmd_info{'inputs'}};
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my ($input_dir, $input_name, $input_ext) = &split_path($input, $id);
@@ -378,7 +389,7 @@ sub loop_cc_from_dk {
     my $user_cc = &user_cc_path_from_dk_path($input);
     my ($user_cc_dir, $user_cc_name, $user_cc_ext) = &split_path($user_cc, $cc_ext);
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input_name, $user_cc);
+    &dakota::generate::dk_generate_cc($input_name, $user_cc, $project_rep);
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
@@ -387,9 +398,9 @@ sub loop_cc_from_dk {
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
-      &dakota::generate::generate_nrt_decl($output_nrt_cc, $file);
+      &dakota::generate::generate_nrt_decl($output_nrt_cc, $file, $project_rep);
     }
-    &dakota::generate::generate_nrt_defn($output_nrt_cc, $file);
+    &dakota::generate::generate_nrt_defn($output_nrt_cc, $file, $project_rep);
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -471,12 +482,13 @@ sub update_rep_from_all_inputs {
   } else {
     $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
   }
+  $$cmd_info{'project-rep'} = $rt_json_path;
   if (&is_debug()) {
     print "creating $rt_json_path" . &pann(__FILE__, __LINE__) . "\n";
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   $cmd_info = &loop_rep_from_inputs($cmd_info);
-  &add_visibility_file($rt_json_path);
+  &add_visibility_file($$cmd_info{'project-rep'});
 
   $$cmd_info{'inputs'} = $$orig{'inputs'};
   $$cmd_info{'output'} = $$orig{'output'};
@@ -496,6 +508,7 @@ my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
   $cmd_info = &update_rep_from_all_inputs($cmd_info);
+  &set_global_project_rep($$cmd_info{'project-rep'});
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -697,15 +710,6 @@ sub gen_rt_o {
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
   &rt_o_from_json($cmd_info, $other);
-}
-sub cc_path_from_o_path { # reverse dependency
-  my ($o_path) = @_;
-
-  my $cc_path = $o_path =~ s/\.$o_ext$//r;
-  if ($cc_path !~ m/\.(dk|$cc_ext)$/) {
-    $cc_path .= ".$cc_ext";
-  }
-  return $cc_path;
 }
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
@@ -961,7 +965,7 @@ sub exec_cmd {
       $exit_status = $tmp_exit_status;
     }
     if (!$$root_cmd{'opts'}{'keep-going'}) {
-      if (!($global_should_echo || $should_echo)) {
+      if (!(&is_debug() && ($global_should_echo || $should_echo))) {
         print STDERR "  $cmd_str\n";
       }
       die "exit value from system() was $exit_val\n" if $exit_status == 0;

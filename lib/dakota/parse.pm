@@ -58,6 +58,19 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
+sub hh_path_from_cc_path {
+  my ($cc_path) = @_;
+  my $hh_path = $cc_path =~ s/\.$cc_ext/\.$hh_ext/r;
+  return $hh_path;
+}
+sub cc_path_from_o_path { # reverse dependency
+  my ($o_path) = @_;
+  my $cc_path = $o_path =~ s/\.$o_ext$//r;
+  if ($cc_path !~ m/\.(dk|$cc_ext)$/) {
+    $cc_path .= ".$cc_ext";
+  }
+  return $cc_path;
+}
 sub json_path_from_o_path {
   my ($in_path) = @_;
   my $out_path = $in_path =~ s/(\.($cc_ext|dk))?\.$o_ext$/.dk.json/r; # hackhack
@@ -130,10 +143,12 @@ our @EXPORT= qw(
                  add_symbol
                  add_symbol_ident
                  add_trait_decl
+                 cc_path_from_o_path
                  colin
                  colout
                  ctlg_path_from_so_path
                  user_cc_path_from_dk_path
+                 hh_path_from_cc_path
                  init_global_rep
                  kw_args_translate
                  o_path_from_dk_path
@@ -1654,7 +1669,11 @@ sub method {
     if ($kw_args_defaults) {
       $$method{'kw-args-defaults'} = $kw_args_defaults;
     }
-    &dakota::util::kw_args_generics_add($method);
+    my ($name, $types) = &kw_args_generics_sig($method);
+    my $name_str =  &str_from_seq($name);
+    my $types_str = &parameter_types_str($types);
+    $$gbl_root{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
+
     if ('init' eq $method_name) {
       foreach my $kw_arg_name (@$kw_args_names) {
         if ('slots' eq $kw_arg_name) {

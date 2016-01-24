@@ -28,10 +28,7 @@ use strict;
 use warnings;
 use sort 'stable';
 
-my $kw_args_generics_tbl;
-
 BEGIN {
-  $kw_args_generics_tbl = {};
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -68,7 +65,7 @@ our @EXPORT= qw(
                  is_debug
                  is_kw_args_generic
                  kw_args_generics
-                 kw_args_generics_add
+                 kw_args_generics_sig
                  kw_args_placeholders
                  last
                  dk_mangle_seq
@@ -81,6 +78,7 @@ our @EXPORT= qw(
                  needs_hex_encoding
                  objdir
                  pann
+                 parameter_types_str
                  remove_extra_whitespace
                  remove_first
                  remove_last
@@ -93,6 +91,8 @@ our @EXPORT= qw(
                  str_from_seq
                  var
                  var_array
+                 global_project_rep
+                 set_global_project_rep
               );
 use Cwd;
 use File::Spec;
@@ -423,9 +423,6 @@ sub parameter_types_str {
   my $result = join(',', @$strs);
   return $result;
 }
-sub kw_args_generics {
-  return $kw_args_generics_tbl;
-}
 # [ name, fixed-parameter-types ]
 # [ [ x :: signal ], [ object-t, int64-t, ... ] ]
 sub kw_args_generics_sig {
@@ -437,18 +434,13 @@ sub kw_args_generics_sig {
   &add_last($keyword_types, ['...']);
   return ($$generic{'name'}, $keyword_types);
 }
-sub kw_args_generics_add {
-  my ($generic) = @_;
-  my $state = 0;
-  my ($name, $types) = &kw_args_generics_sig($generic);
-  my $name_str =  &str_from_seq($name);
-  my $types_str = &parameter_types_str($types);
-  my $tbl = &kw_args_generics();
-
-  #$$tbl{$name_str} = $name; # changechange: 1/2
-  $$tbl{$name_str}{$types_str} = [ $name, $types ];
-
-  return $state;
+my $global_project_rep;
+sub global_project_rep {
+  return $global_project_rep;
+}
+sub set_global_project_rep {
+  my ($project_rep_path) = @_;
+  $global_project_rep = &scalar_from_file($project_rep_path);
 }
 sub is_kw_args_generic {
   my ($generic) = @_;
@@ -459,12 +451,13 @@ sub is_kw_args_generic {
   my ($name, $types) = &kw_args_generics_sig($generic);
   my $name_str =  &str_from_seq($name);
   my $types_str = &parameter_types_str($types);
-  my $tbl = &kw_args_generics();
+  my $global_project_rep = &global_project_rep();
+  my $tbl = $$global_project_rep{'kw-args-generics'};
 
   #if (exists $$tbl{$name_str}) { # changechange: 2/2
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
 
-    return 1;
+    $state = 1;
   }
   return $state;
 }
@@ -623,6 +616,14 @@ sub scalar_to_file {
   open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   flock FILE, 2; # LOCK_EX
   truncate FILE, 0;
+  print FILE
+    '# -*- mode: cperl -*-' . "\n" .
+    '# -*- cperl-close-paren-offset: -2 -*-' . "\n" .
+    '# -*- cperl-continued-statement-offset: 2 -*-' . "\n" .
+    '# -*- cperl-indent-level: 2 -*-' . "\n" .
+    '# -*- cperl-indent-parens-as-block: t -*-' . "\n" .
+    '# -*- cperl-tab-always-indent: t -*-' . "\n" .
+    "\n";
   print FILE $refstr;
   close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
 }
