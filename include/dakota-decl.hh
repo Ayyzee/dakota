@@ -50,6 +50,8 @@
 # define TRAIT(t)
 # define TRAITS(t1, ...)
 
+# define SENTINAL_PTR nullptr
+
 # if defined _WIN32 || defined _WIN64
   # define so_import ms::dllimport
   # define so_export ms::dllexport

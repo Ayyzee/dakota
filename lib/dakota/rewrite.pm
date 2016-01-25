@@ -814,7 +814,7 @@ sub rewrite_keyword_use {
   #print STDERR "$arg1$list\n";
   $list =~ s/\#?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
   $list =~ s/\#?($id)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
-  $list =~ s/\)$/, nullptr\)/g;
+  $list =~ s/\)$/, SENTINAL-PTR\)/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";
 }
@@ -832,9 +832,9 @@ sub rewrite_sentinal_generic_uses_sub {
   my ($name, $arg_list, $kw_args_generics) = @_;
   &rewrite_sentinal_generic_uses(\$arg_list, $kw_args_generics);
   if (1) {
-    $arg_list =~ s/$/, nullptr/g;
-    $arg_list =~ s/,\s*nullptr\s*,\s*nullptr\s*$/, nullptr/g;
-    $arg_list =~ s/^(\s*(object-t|super-t)\s*.*?),\s*nullptr\s*$/$1/g;
+    $arg_list =~ s/$/, SENTINAL-PTR/g;
+    $arg_list =~ s/,\s*SENTINAL-PTR\s*,\s*SENTINAL-PTR\s*$/, SENTINAL-PTR/g;
+    $arg_list =~ s/^(\s*(object-t|super-t)\s*.*?),\s*SENTINAL-PTR\s*$/$1/g;
   }
   return "$name\($arg_list\)";
 }
