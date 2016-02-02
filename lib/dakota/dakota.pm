@@ -477,10 +477,8 @@ sub loop_cc_from_dk {
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $$project_io{'all'}{$input}{$user_cc_path} = 1;
     $$project_io{'all'}{$rt_json_path}{$user_cc_path} = 1;
-    $$project_io{'all'}{$user_cc_path}{$cc_path} = 1;
     $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
     $$project_io{'all'}{$rt_json_path}{$cc_path} = 1;
-    $$project_io{'all'}{$hh_path}{$cc_path} = 1;
     my ($user_cc_dir, $user_cc_name, $user_cc_ext) = &split_path($user_cc_path, $cc_ext);
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
@@ -876,14 +874,14 @@ sub o_from_dk {
     }
     $outfile = $input;
   } else {
+    my $user_cc_path = &user_cc_path_from_dk_path($input);
     my $o_path;
-    my $cc_path;
     if ($$cmd_info{'output'} && &is_o_path($$cmd_info{'output'})) {
       $o_path = $$cmd_info{'output'};
     } else {
       $o_path =  &o_path_from_dk_path($input);
     }
-    $cc_path = &cc_path_from_o_path($o_path); # reverse dependency
+    my $cc_path = &cc_path_from_o_path($o_path); # reverse dependency
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
@@ -938,7 +936,13 @@ sub o_from_dk {
       &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
       if ($num_out_of_date_infiles) {
-        &project_io_add($cmd_info, $cc_path, $o_path);
+        my $project_io = &scalar_from_file($$cmd_info{'project.io'});
+        $$project_io{'all'}{$cc_path}{$o_path} = 1;
+        $$project_io{'all'}{$hh_path}{$o_path} = 1;
+        $$project_io{'all'}{$user_cc_path}{$o_path} = 1;
+        $$project_io{'all'}{$json_path}{$cc_path} = 1;
+        $$project_io{'all'}{$json_path}{$hh_path} = 1;
+        &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
       }
       $outfile = $$o_cmd{'output'};
     }
@@ -1005,7 +1009,7 @@ sub rt_o_from_json {
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   $$project_io{'all'}{$rt_json_path}{$rt_hh_path} = 1;
   $$project_io{'all'}{$rt_json_path}{$rt_cc_path} = 1;
-  $$project_io{'all'}{$rt_hh_path}{$rt_cc_path} = 1;
+  $$project_io{'all'}{$rt_hh_path}{$rt_o_path} = 1;
   $$project_io{'all'}{$rt_cc_path}{$rt_o_path} = 1;
   &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 

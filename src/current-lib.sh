@@ -3,13 +3,17 @@ set -o nounset -o pipefail -o xtrace -o errexit
 ../bin/dakota --clean --project libtest.project
 cat libtest.io
 rm -f libtest.io
-find obj/libtest -type f | sort
+if [[ -e obj/libtest ]]; then
+  find obj/libtest -type f | sort
+fi
 rm -rf obj/libtest
 ../bin/dakota --compile --project libtest.project
 #cat libtest.io
 ../bin/dakota --shared  --project libtest.project
 #cat libtest.io
 ../bin/dakota-catalog ./libtest.so
+
+./gen-graph.pl libtest.io > libtest.io.dot && sort -u libtest.io.dot | wc
 #exit
 
 echo ===
@@ -24,3 +28,4 @@ mkdir -p $builddir
 ../bin/dakota --shared  --project libtest.project --output libtest.so $builddir/test1.cc.o $builddir/test2.cc.o
 ../bin/dakota-catalog ./libtest.so
 
+./gen-graph.pl libtest.io > libtest.io.dot && sort -u libtest.io.dot | wc
