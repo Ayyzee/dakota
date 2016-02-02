@@ -446,44 +446,44 @@ sub loop_cc_from_dk {
 
     my ($input_dir, $input_name, $input_ext) = &split_path($input, $id);
     my $file = &dakota::generate::dk_parse("$input_name.dk");
-    my $output_nrt_cc;
+    my $cc_path;
     if ($$cmd_info{'opts'}{'output'}) {
-      $output_nrt_cc = $$cmd_info{'opts'}{'output'};
+      $cc_path = $$cmd_info{'opts'}{'output'};
     } else {
-      $output_nrt_cc = "$input_name.$cc_ext";
+      $cc_path = "$input_name.$cc_ext";
     }
-    my $user_cc = &user_cc_path_from_dk_path($input);
-    my $output_nrt_hh = $output_nrt_cc =~ s/\.$cc_ext$/\.$hh_ext/r;
-    $$project_io{'all'}{$input}{$user_cc} = 1;
-    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$user_cc} = 1;
-    $$project_io{'all'}{$user_cc}{$output_nrt_cc} = 1;
-    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$output_nrt_hh} = 1;
-    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$output_nrt_cc} = 1;
-    $$project_io{'all'}{$output_nrt_hh}{$output_nrt_cc} = 1;
-    my ($user_cc_dir, $user_cc_name, $user_cc_ext) = &split_path($user_cc, $cc_ext);
+    my $user_cc_path = &user_cc_path_from_dk_path($input);
+    my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
+    $$project_io{'all'}{$input}{$user_cc_path} = 1;
+    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$user_cc_path} = 1;
+    $$project_io{'all'}{$user_cc_path}{$cc_path} = 1;
+    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$hh_path} = 1;
+    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$cc_path} = 1;
+    $$project_io{'all'}{$hh_path}{$cc_path} = 1;
+    my ($user_cc_dir, $user_cc_name, $user_cc_ext) = &split_path($user_cc_path, $cc_ext);
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input_name, $user_cc, $project_rep);
+    &dakota::generate::dk_generate_cc($input_name, $user_cc_path, $project_rep);
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
     &nrt::add_extra_generics($file);
 
-    my $rt_cc;
+    my $rt_cc_path;
     if (&is_so_path($$cmd_info{'project.output'})) {
-      $rt_cc = &rt_cc_path_from_so_path($$cmd_info{'project.output'});
+      $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'project.output'});
     } else {
-      $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'project.output'}); # _from_exe_path
+      $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'project.output'}); # _from_exe_path
     }
-    my $rel_rt_hh = $rt_cc =~ s=^$objdir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+    my $rel_rt_hh_path = $rt_cc_path =~ s=^$objdir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
 
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
-      &dakota::generate::generate_nrt_decl($output_nrt_cc, $file, $project_rep, $rel_rt_hh);
+      &dakota::generate::generate_nrt_decl($cc_path, $file, $project_rep, $rel_rt_hh_path);
     }
-    &dakota::generate::generate_nrt_defn($output_nrt_cc, $file, $project_rep, $rel_rt_hh); # rel_rt_hh not used
+    &dakota::generate::generate_nrt_defn($cc_path, $file, $project_rep, $rel_rt_hh_path); # rel_rt_hh not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -626,14 +626,14 @@ sub start_cmd {
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'output'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
-      my $rt_cc;
+      my $rt_cc_path;
       if (&is_so_path($$cmd_info{'output'})) {
-        $rt_cc = &rt_cc_path_from_so_path($$cmd_info{'output'});
+        $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
       } else {
-        $rt_cc = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
+        $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
       }
       if (&is_debug()) {
-        print "creating $rt_cc" . &pann(__FILE__, __LINE__) . "\n";
+        print "creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
       }
     } else {
       if (&is_debug()) {

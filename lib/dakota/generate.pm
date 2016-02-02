@@ -274,22 +274,22 @@ sub write_to_file_converted_strings {
   }
 }
 sub generate_nrt_decl {
-  my ($path, $file, $project_rep, $rel_rt_hh) = @_;
+  my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   #print "generate_nrt_decl($path, ...)\n";
   &set_nrt_decl($path);
-  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh);
+  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh_path);
 }
 sub generate_nrt_defn {
-  my ($path, $file, $project_rep, $rel_rt_hh) = @_;
+  my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   #print "generate_nrt_defn($path, ...)\n";
   &set_nrt_defn($path);
-  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh);
+  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh_path);
 }
 sub generate_nrt {
-  my ($path, $file, $project_rep, $rel_rt_hh) = @_;
+  my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
-  my $rel_hh = "$name.$hh_ext";
-  my $rel_user_cc = "-user/$name.dk.$cc_ext";
+  my $rel_hh_path = "$name.$hh_ext";
+  my $rel_user_cc_path = "-user/$name.dk.$cc_ext";
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $pre_output = "$dir/$name.dk$suffix";
@@ -307,12 +307,12 @@ sub generate_nrt {
     $str = '// ' . $emacs_mode_file_variables  . "\n" .
       "\n" .
       "# if 0\n" .
-      "# include \"$rel_rt_hh\"\n" .
+      "# include \"$rel_rt_hh_path\"\n" .
       "# else\n" .
-      "# include \"$rel_hh\"\n" .
+      "# include \"$rel_hh_path\"\n" .
       "# endif\n" .
       "\n" .
-      "# include \"$rel_user_cc\"\n" . # user-code (converted from dk to cc)
+      "# include \"$rel_user_cc_path\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
   }
