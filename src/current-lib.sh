@@ -3,7 +3,7 @@ set -o nounset -o pipefail -o xtrace -o errexit
 ../bin/dakota --clean --project libtest.project
 cat libtest.io
 rm -f libtest.io
-find obj/libtest -type f
+find obj/libtest -type f | sort
 rm -rf obj/libtest
 ../bin/dakota --compile --project libtest.project
 #cat libtest.io

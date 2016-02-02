@@ -394,6 +394,26 @@ sub sig1 {
   $result .= ')';
   return $result;
 }
+sub rt_json_path {
+  my ($cmd_info) = @_;
+  my $rt_json_path;
+  if (&is_so_path($$cmd_info{'project.output'})) {
+    $rt_json_path = &rt_json_path_from_so_path($$cmd_info{'project.output'}); # should be from_so_path
+  } else {
+    $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'project.output'}); # _from_exe_path
+  }
+  return $rt_json_path;
+}
+sub rt_cc_path {
+  my ($cmd_info) = @_;
+  my $rt_cc_path;
+  if (&is_so_path($$cmd_info{'project.output'})) {
+    $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'project.output'});
+  } else {
+    $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'project.output'});
+  }
+  return $rt_cc_path;
+}
 sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
@@ -452,13 +472,14 @@ sub loop_cc_from_dk {
     } else {
       $cc_path = "$input_name.$cc_ext";
     }
+    my $rt_json_path = &rt_json_path($cmd_info);
     my $user_cc_path = &user_cc_path_from_dk_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $$project_io{'all'}{$input}{$user_cc_path} = 1;
-    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$user_cc_path} = 1;
+    $$project_io{'all'}{$rt_json_path}{$user_cc_path} = 1;
     $$project_io{'all'}{$user_cc_path}{$cc_path} = 1;
-    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$hh_path} = 1;
-    $$project_io{'all'}{$$cmd_info{'project.rep'}}{$cc_path} = 1;
+    $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
+    $$project_io{'all'}{$rt_json_path}{$cc_path} = 1;
     $$project_io{'all'}{$hh_path}{$cc_path} = 1;
     my ($user_cc_dir, $user_cc_name, $user_cc_ext) = &split_path($user_cc_path, $cc_ext);
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
@@ -470,12 +491,7 @@ sub loop_cc_from_dk {
     &nrt::add_extra_keywords($file);
     &nrt::add_extra_generics($file);
 
-    my $rt_cc_path;
-    if (&is_so_path($$cmd_info{'project.output'})) {
-      $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'project.output'});
-    } else {
-      $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'project.output'}); # _from_exe_path
-    }
+    my $rt_cc_path = &rt_cc_path($cmd_info);
     my $rel_rt_hh_path = $rt_cc_path =~ s=^$objdir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
 
     if (0) {
@@ -560,21 +576,14 @@ sub update_rep_from_all_inputs {
   $$cmd_info{'output'} = $$cmd_info{'project.output'},
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
-
-  my $rt_json_path;
-  if (&is_so_path($$cmd_info{'output'})) {
-    $rt_json_path = &rt_json_path_from_so_path($$cmd_info{'output'}); # should be from_so_path
-  } else {
-    $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
-  }
+  my $rt_json_path = &rt_json_path($cmd_info);
   &check_path($rt_json_path);
-  $$cmd_info{'project.rep'} = $rt_json_path;
   if (&is_debug()) {
     print "creating $rt_json_path" . &pann(__FILE__, __LINE__) . "\n";
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   $cmd_info = &loop_rep_from_inputs($cmd_info);
-  &add_visibility_file($$cmd_info{'project.rep'});
+  &add_visibility_file($rt_json_path);
 
   $$cmd_info{'inputs'} = $$orig{'inputs'};
   $$cmd_info{'output'} = $$orig{'output'};
@@ -595,7 +604,8 @@ sub start_cmd {
   my ($cmd_info) = @_;
   $objdir = &dakota::util::objdir();
   $cmd_info = &update_rep_from_all_inputs($cmd_info);
-  &set_global_project_rep($$cmd_info{'project.rep'});
+  my $rt_json_path = &rt_json_path($cmd_info);
+  &set_global_project_rep($rt_json_path);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -626,12 +636,7 @@ sub start_cmd {
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'output'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
-      my $rt_cc_path;
-      if (&is_so_path($$cmd_info{'output'})) {
-        $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
-      } else {
-        $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
-      }
+      my $rt_cc_path = &rt_cc_path($cmd_info);
       if (&is_debug()) {
         print "creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
       }
@@ -703,7 +708,6 @@ sub rep_from_so {
   my $ctlg_path = &ctlg_path_from_so_path($arg);
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'project.io'} = $$cmd_info{'project.io'};
-  $$ctlg_cmd{'project.rep'} = $$cmd_info{'project.rep'};
   $$ctlg_cmd{'output'} = $ctlg_path;
   if (0) {
     my ($ctlg_dir, $ctlg_file) = &split_path($ctlg_path);
@@ -718,7 +722,6 @@ sub rep_from_so {
   $$rep_cmd{'output'} = $json_path;
   $$rep_cmd{'inputs'} = [ $ctlg_path ];
   $$rep_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$rep_cmd{'project.rep'} = $$cmd_info{'project.rep'};
   &rep_from_inputs($rep_cmd);
   if (!$should_write_ctlg_files) {
     #unlink $ctlg_path;
@@ -727,6 +730,7 @@ sub rep_from_so {
 sub loop_rep_from_so {
   my ($cmd_info) = @_;
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
+  my $rt_json_path = &rt_json_path($cmd_info);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
       &rep_from_so($cmd_info, $input);
@@ -734,7 +738,7 @@ sub loop_rep_from_so {
       my $json_path = &json_path_from_ctlg_path($ctlg_path);
       $$project_io{'all'}{$input}{$ctlg_path} = 1;
       $$project_io{'all'}{$ctlg_path}{$json_path} = 1;
-      $$project_io{'all'}{$json_path}{$$cmd_info{'project.rep'}} = 1;
+      $$project_io{'all'}{$json_path}{$rt_json_path} = 1;
     }
   }
   &scalar_to_file($$cmd_info{'project.io'}, $project_io);
@@ -752,7 +756,6 @@ sub rep_from_inputs {
     'opts' =>        $$cmd_info{'opts'},
     'output' =>      $$cmd_info{'output'},
     'inputs' =>      $$cmd_info{'inputs'},
-    'project.rep' => $$cmd_info{'project.rep'},
     'project.io' =>  $$cmd_info{'project.io'},
     'project.output' =>  $$cmd_info{'project.output'},
   };
@@ -760,7 +763,8 @@ sub rep_from_inputs {
   my $result = &outfile_from_infiles($rep_cmd, $should_echo = 0);
   if ($result) {
     if (0 < scalar @{$$rep_cmd{'reps'} ||= []}) {
-      &project_io_add($cmd_info, $$rep_cmd{'reps'}, $$rep_cmd{'project.rep'});
+      my $rt_json_path = &rt_json_path($cmd_info);
+      &project_io_add($cmd_info, $$rep_cmd{'reps'}, $rt_json_path);
     }
     if (1 == scalar @{$$rep_cmd{'inputs'}}) {
       my $input = $$rep_cmd{'inputs'}[0];
@@ -785,10 +789,10 @@ sub rep_from_inputs {
         print "skipping $input, line=" . __LINE__ . "\n";
       }
     } elsif (1 < scalar @{$$rep_cmd{'inputs'}}) {
-      my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      $$project_io{'project.rep'} = $$rep_cmd{'project.rep'};
-      $$project_io{'project.rep.inputs'} = { map { $_ => 1 } @{$$rep_cmd{'inputs'}} };
-      &scalar_to_file($$cmd_info{'project.io'}, $project_io);
+      #my $project_io = &scalar_from_file($$cmd_info{'project.io'});
+      #$$project_io{'project.rep'} = $$rep_cmd{'project.rep'};
+      #$$project_io{'project.rep.inputs'} = { map { $_ => 1 } @{$$rep_cmd{'inputs'}} };
+      #&scalar_to_file($$cmd_info{'project.io'}, $project_io);
     } else { # no inputs
       die;
     }
@@ -805,7 +809,6 @@ sub loop_rep_from_inputs {
       my $rep_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
-        'project.rep' => $$cmd_info{'project.rep'},
         'output' => $json_path,
         'inputs' => [ $input ],
       };
@@ -817,13 +820,12 @@ sub loop_rep_from_inputs {
   }
   if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
     if (0 != @$rep_files) {
-      my $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'});
+      my $rt_json_path = &rt_json_path($cmd_info);
       &check_path($rt_json_path);
       &ordered_set_add($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
       my $rep_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
-        'project.rep' => $$cmd_info{'project.rep'},
         'output' => $rt_json_path,
         'inputs' => $rep_files,
       };
@@ -835,12 +837,7 @@ sub loop_rep_from_inputs {
 sub gen_rt_o {
   my ($cmd_info) = @_;
   if ($$cmd_info{'output'}) {
-    my $rt_cc_path;
-    if (&is_so_path($$cmd_info{'output'})) {
-      $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
-    } else {
-      $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
-    }
+    my $rt_cc_path = &rt_cc_path($cmd_info);
     if (!$$cmd_info{'opts'}{'silent'}) {
       print '<' . $rt_cc_path . ">\n";
     }
@@ -852,9 +849,9 @@ sub gen_rt_o {
       }
     }
   }
-  my $json_path = &json_path_from_any_path($$cmd_info{'output'}); # rt_json_path_from_...???
-  &check_path($json_path);
-  $$cmd_info{'rep'} = $json_path; # isn't a rep path really just a rt_json_path???
+  my $rt_json_path = &rt_json_path($cmd_info);
+  &check_path($rt_json_path);
+  $$cmd_info{'rep'} = $rt_json_path;
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
   if ($dk_exe_type) {
@@ -901,7 +898,6 @@ sub o_from_dk {
       $$rep_cmd{'inputs'} = [ $input ];
       $$rep_cmd{'output'} = $json_path;
       $$rep_cmd{'project.io'} =  $$cmd_info{'project.io'};
-      $$rep_cmd{'project.rep'} = $$cmd_info{'project.rep'};
       $num_out_of_date_infiles = &rep_from_inputs($rep_cmd);
       if ($num_out_of_date_infiles) {
         &project_io_add($cmd_info, $input, $json_path);
@@ -913,17 +909,17 @@ sub o_from_dk {
     $$cc_cmd{'output'} = $cc_path;
     $$cc_cmd{'reps'} = $$cmd_info{'reps'};
     $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
-    $$cc_cmd{'project.rep'} = $$cmd_info{'project.rep'};
     $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
       if (!$$cmd_info{'opts'}{'silent'}) {
         print $input . "\n"; # dk_path
       }
+      my $rt_json_path = &rt_json_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      if (!$$project_io{'all'}{$$cmd_info{'project.rep'}}{$cc_path}) {
-        $$project_io{'all'}{$$cmd_info{'project.rep'}}{$cc_path} = 1;
-        $$project_io{'all'}{$$cmd_info{'project.rep'}}{$hh_path} = 1;
+      if (!$$project_io{'all'}{$rt_json_path}{$cc_path}) {
+        $$project_io{'all'}{$rt_json_path}{$cc_path} = 1;
+        $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
         &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
       }
     }
@@ -934,7 +930,6 @@ sub o_from_dk {
       $$o_cmd{'inputs'} = [ $cc_path ];
       $$o_cmd{'output'} = $o_path;
       $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
-      $$o_cmd{'project.rep'} = $$cmd_info{'project.rep'};
       delete $$o_cmd{'opts'}{'output'};
       $num_out_of_date_infiles = &o_from_cc($o_cmd);
 
@@ -971,7 +966,6 @@ sub cc_from_dk {
   my ($cmd_info) = @_;
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$cc_cmd{'project.rep'} = $$cmd_info{'project.rep'};
   $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
   $$cc_cmd{'cmd'} = '&loop_cc_from_dk';
   $$cc_cmd{'reps'} = $$cmd_info{'reps'};
@@ -984,7 +978,6 @@ sub o_from_cc {
   my ($cmd_info) = @_;
     my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
-    $$o_cmd{'project.rep'} = $$cmd_info{'project.rep'};
     $$o_cmd{'project.output'} = $$cmd_info{'project.output'};
     $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
     $$o_cmd{'cmd-major-mode-flags'} = $cxx_compile_flags;
@@ -1003,15 +996,8 @@ sub o_from_cc {
 sub rt_o_from_json {
   my ($cmd_info, $other) = @_;
   die if ! defined $$cmd_info{'reps'} || 0 == scalar @{$$cmd_info{'reps'}};
-  my $rt_json_path;
-  my $rt_cc_path;
-  if (&is_so_path($$cmd_info{'output'})) {
-    $rt_json_path = &rt_json_path_from_so_path($$cmd_info{'output'}); # should be from_so_path
-    $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'output'});
-  } else {
-    $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
-    $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'output'}); # _from_exe_path
-  }
+  my $rt_json_path = &rt_json_path($cmd_info);
+  my $rt_cc_path =   &rt_cc_path($cmd_info);
   &check_path($rt_json_path);
   my $rt_o_path = &o_path_from_cc_path($rt_cc_path);
   my $rt_hh_path = $rt_cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
@@ -1051,7 +1037,6 @@ sub rt_o_from_json {
 
   my $o_info = {'opts' => {}, 'inputs' => [ $rt_cc_path ], 'output' => $rt_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};
-  $$o_info{'project.rep'} = $$cmd_info{'project.rep'};
   if ($$cmd_info{'opts'}{'precompile'}) {
     $$o_info{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
   }
@@ -1092,7 +1077,6 @@ sub so_from_o {
   my ($cmd_info) = @_;
   my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$so_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$so_cmd{'project.rep'} = $$cmd_info{'project.rep'};
   my $inputs = &deep_copy($$cmd_info{'inputs'});
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
@@ -1118,7 +1102,6 @@ sub exe_from_o {
   my ($cmd_info) = @_;
   my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$exe_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$exe_cmd{'project.rep'} = $$cmd_info{'project.rep'};
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
   $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
@@ -1271,7 +1254,6 @@ sub ctlg_from_so {
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$ctlg_cmd{'project.rep'} = $$cmd_info{'project.rep'};
 
   if ($ENV{'DAKOTA_CATALOG'}) {
     $$ctlg_cmd{'cmd'} = $ENV{'DAKOTA_CATALOG'};

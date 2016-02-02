@@ -330,7 +330,8 @@ sub use_project {
   my $original_state;
   if (! -e $project_io_path) {
     # dk2json : $foo{'dk'}{$dk_path}{'json'}{$json_path}
-    my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {} };
+    my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},
+                               'output' => $$project{'output'}, 'objdir' => undef };
     &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);
   }
   $project_io = &scalar_from_file($project_io_path);
@@ -343,8 +344,7 @@ sub use_project {
 }
 sub project_clean {
   my ($root_cmd, $project, $project_io) = @_;
-  #print "project: " . &Dumper($project);
-  #print "project.io: " . &Dumper($project_io);
+  my $remove = {};
   if (!$project_io && $$project{'io'}) {
     $project_io = &scalar_from_file($$project{'io'});
   }
@@ -353,14 +353,12 @@ sub project_clean {
     while (my ($in_path, $out_paths) = each (%{$$project_io{'all'}})) {
       foreach my $out_path (keys %$out_paths) {
         if (-e $out_path) {
-          print "rm $out_path\n";
-          unlink $out_path;
+          $$remove{$out_path} = 1;
         }
       }
       if (! $$project_io{'inputs'}{$in_path}) {
         if (-e $in_path) {
-          print "rm $in_path\n";
-          unlink $in_path;
+          $$remove{$in_path} = 1;
         }
       }
     }
@@ -369,13 +367,9 @@ sub project_clean {
     my $original_state;
     &scalar_to_file($project_io_path, $project_io, $original_state = 1);
   }
-  if ($$project{'output'} && -e $$project{'output'}) {
-    print "rm $$project{'output'}\n";
-    unlink $$project{'output'};
-  }
-  if ($$project{'project.rep'} && -e $$project{'project.rep'}) {
-    print "rm $$project{'project.rep'}\n";
-    unlink $$project{'project.rep'};
+  foreach my $path (sort keys %$remove) {
+    print "rm $path\n";
+    unlink $path;
   }
 }
 sub default_output {
