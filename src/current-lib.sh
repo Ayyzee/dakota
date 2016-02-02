@@ -13,7 +13,7 @@ rm -rf obj/libtest
 #cat libtest.io
 ../bin/dakota-catalog ./libtest.so
 
-./gen-graph.pl libtest.io > libtest.io.dot && sort -u libtest.io.dot | wc
+./gen-graph.pl libtest.io > libtest.io.implicit.dot && sort -u libtest.io.implicit.dot | wc
 #exit
 
 echo ===
