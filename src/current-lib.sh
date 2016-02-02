@@ -10,11 +10,12 @@ rm -rf obj/libtest
 ../bin/dakota --shared  --project libtest.project
 #cat libtest.io
 ../bin/dakota-catalog ./libtest.so
-exit
+#exit
 
 echo ===
 
-builddir=/tmp/current-lib
+../bin/dakota --clean --project libtest.project
+builddir=obj/libtest
 rm -rf $builddir
 mkdir -p $builddir
 ../bin/dakota --compile --project libtest.project --output $builddir/test1.cc.o test1.dk

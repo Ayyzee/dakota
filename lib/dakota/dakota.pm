@@ -1256,6 +1256,7 @@ sub outfile_from_infiles {
     } else {
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
       foreach my $input (@$infiles) {
+        $input =~ s=^--library-directory\s+(.+)\s+-l(.+)$=$1/lib$2.$so_ext=;
         $$project_io{'all'}{$input}{$output} = 1;
       }
       &scalar_to_file($$cmd_info{'project.io'}, $project_io);
