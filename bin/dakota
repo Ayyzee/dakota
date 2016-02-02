@@ -341,7 +341,7 @@ sub use_project {
   }
   &scalar_to_file($project_io_path, $project_io, $original_state = 1);
   return ($project, $project_io);
-}
+} # use_project
 sub project_clean {
   my ($root_cmd, $project, $project_io) = @_;
   my $remove = {};

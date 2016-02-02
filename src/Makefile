@@ -68,10 +68,6 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-catalog.output)
 	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)
-	$(RM) $(RMFLAGS) $(libdakota.output)
-	$(RM) $(RMFLAGS) $(libdakota.output).$(cxx_debug_symbols_ext)
-	$(RM) $(RMFLAGS) $(libdakota-util.output)
-	$(RM) $(RMFLAGS) $(libdakota-util.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
 
 distclean: clean
