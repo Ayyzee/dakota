@@ -34,6 +34,22 @@ $(libdakota-util.output): $(libdakota.output)
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
+libdakota.single: $(libdakota.srcs)
+	set -o verbose; for src in $(libdakota.srcs); do\
+    if [[ $$src =~ \.dk$$ ]]; then\
+      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota.project $$src;\
+    fi\
+  done
+	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota.project
+
+libdakota-util.single: $(libdakota-util.srcs)
+	set -o verbose; for src in $(libdakota-util.srcs); do\
+    if [[ $$src =~ \.dk$$ ]]; then\
+      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-util.project $$src;\
+    fi\
+  done
+	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-util.project
+
 check: all
 	$(dakota-catalog.output) --silent $(libdakota.output) $(libdakota-util.output)
 
@@ -45,6 +61,10 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(output-files)
 
 clean: goal-clean
+	$(DAKOTA-BASE) --clean --project libdakota.project
+	$(DAKOTA-BASE) --clean --project libdakota-util.project
+	$(RM) $(RMFLAGS) libdakota.project.io
+	$(RM) $(RMFLAGS) libdakota-util.project.io
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-catalog.output)
 	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)

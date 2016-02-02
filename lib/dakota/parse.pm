@@ -95,7 +95,6 @@ my $patterns = {
   'rt_cc_path_from_any_path' => '$(objdir)/-rt/%.$(cc_ext)       : %', # _from_exe_path
   'rt_cc_path_from_so_path' =>  '$(objdir)/-rt/%.$(so_ext).$(cc_ext)       : %.$(so_ext)',
 };
-my $expanded_patterns = &expand_tbl_values($patterns);
 #print STDERR &Dumper($expanded_patterns);
 
 BEGIN {
@@ -116,7 +115,6 @@ BEGIN {
     or die "do $prefix/lib/dakota/header-from-symbol.json failed: $!\n";
   $gbl_used = do "$prefix/lib/dakota/used.json"
     or die "do $prefix/lib/dakota/used.json failed: $!\n";
-  $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
   $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', undef);
@@ -465,9 +463,14 @@ sub var_perl_from_make { # convert variable syntax to perl from make
 }
 sub expand {
   my ($str) = @_;
+  $objdir if 0;
+  $cc_ext if 0;
+  $o_ext  if 0;
+  $so_ext if 0;
   $str =~ s/(\$\w+)/$1/eeg;
   return $str;
 }
+### $s if 0;
 sub expand_tbl_values {
   my ($tbl_in, $tbl_out) = @_;
   if (!$tbl_out) { $tbl_out = {}; }
@@ -480,6 +483,9 @@ sub expand_tbl_values {
 }
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
+  $path_in = &canon_path($path_in);
+  $objdir = &dakota::util::objdir();
+  my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
   $pattern_template =~ s|\%|(\.+?)|;
@@ -493,6 +499,7 @@ sub out_path_from_in_path {
     print STDERR "warning: $pattern_name: $result !~ |^$pattern_template\$|\n";
     die;
   }
+  $result = &canon_path($result);
   return $result;
 }
 sub add_klass_decl {

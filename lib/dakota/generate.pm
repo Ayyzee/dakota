@@ -64,7 +64,6 @@ BEGIN {
   while (($key, $values) = each (%$platform)) {
     $$gbl_compiler{$key} = $values;
   }
-  $objdir = &dakota::util::objdir();
   $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
   $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
 };
@@ -118,6 +117,7 @@ my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
+  $objdir = &dakota::util::objdir();
   if ($ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
     return "$cwd/$objdir/$name.$ext";
@@ -170,7 +170,7 @@ sub suffix {
 }
 sub extra_header {
   my ($name) = @_;
-  if (&is_decl) {
+  if (&is_decl()) {
     return "\n# include <dakota-decl.hh>\n\n";
   } elsif (&is_rt_defn()) {
     return "\n# include \"$name.$hh_ext\"\n\n";
@@ -274,20 +274,22 @@ sub write_to_file_converted_strings {
   }
 }
 sub generate_nrt_decl {
-  my ($path, $file, $project_rep) = @_;
+  my ($path, $file, $project_rep, $rel_rt_hh) = @_;
   #print "generate_nrt_decl($path, ...)\n";
   &set_nrt_decl($path);
-  return &generate_nrt($path, $file, $project_rep);
+  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh);
 }
 sub generate_nrt_defn {
-  my ($path, $file, $project_rep) = @_;
+  my ($path, $file, $project_rep, $rel_rt_hh) = @_;
   #print "generate_nrt_defn($path, ...)\n";
   &set_nrt_defn($path);
-  return &generate_nrt($path, $file, $project_rep);
+  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh);
 }
 sub generate_nrt {
-  my ($path, $file, $project_rep) = @_;
+  my ($path, $file, $project_rep, $rel_rt_hh) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
+  my $rel_hh = "$name.$hh_ext";
+  my $rel_user_cc = "-user/$name.dk.$cc_ext";
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $pre_output = "$dir/$name.dk$suffix";
@@ -304,9 +306,13 @@ sub generate_nrt {
   } else {
     $str = '// ' . $emacs_mode_file_variables  . "\n" .
       "\n" .
-      "# include \"$name.$hh_ext\"\n" .
+      "# if 0\n" .
+      "# include \"$rel_rt_hh\"\n" .
+      "# else\n" .
+      "# include \"$rel_hh\"\n" .
+      "# endif\n" .
       "\n" .
-      "# include \"-user/$name.dk.$cc_ext\"\n" . # user-code (converted from dk to cc)
+      "# include \"$rel_user_cc\"\n" . # user-code (converted from dk to cc)
       "\n" .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
   }

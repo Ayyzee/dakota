@@ -30,6 +30,7 @@ use Cwd;
 my $gbl_prefix;
 my $gbl_compiler;
 my $so_ext;
+my $o_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -49,6 +50,7 @@ BEGIN {
 };
 
 use dakota::dakota;
+use dakota::parse;
 use dakota::util;
 
 my ( $id,  $mid,  $bid,  $tid,
@@ -64,6 +66,7 @@ $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
     $$gbl_compiler{$key} = $values;
   }
   $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', 'o'); # could be .bc or .lto
 }
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
@@ -84,6 +87,7 @@ my $root_cmd = { 'reps' => [],
                              'var' => {} } };
 
 &GetOptions($$root_cmd{'opts'},
+            'clean',                # make target like
             'compile',              # gcc-like
             'define-macro=s',       # gcc-like
             'directory=s',          # make-like
@@ -115,23 +119,65 @@ my $root_cmd = { 'reps' => [],
 # --help
 # --verbose
 
+# 1/1: one  input,  one output
+# 1/0: one  input,  no  output
+# m/0: many inputs, no  output
+# m/1: many inputs, one output (directory)
+
 my $inputs = &clean_paths(\@ARGV);
+my $project;
+my $project_io;
+my $project_io_path;
 
-if ($$root_cmd{'opts'}{'project'}) {
-  my $project = &scalar_from_file($$root_cmd{'opts'}{'project'});
-  $$root_cmd{'project-inputs'} = $$project{'inputs'};
-  $$root_cmd{'project-output'} = $$project{'output'};
+# create default project file when missing (when linking)
+if (!exists $$root_cmd{'compile'} && !$$root_cmd{'opts'}{'project'}) {
+  $$root_cmd{'opts'}{'project'} = &create_missing_project($root_cmd, $inputs);
 }
-my $project = &scalar_from_file($$root_cmd{'opts'}{'project'});
-
-if ($$project{'inputs'}) {
-  push @$inputs, @{$$project{'inputs'}};
+if ($$root_cmd{'opts'}{'project'}) {
+  ($project, $project_io) = &use_project($root_cmd);
+}
+if ($$root_cmd{'opts'}{'clean'}) {
+  &project_clean($root_cmd, $project, $project_io);
+  exit 0;
+}
+if ($project) {
+  if (!$$root_cmd{'opts'}{'output'} && exists $$root_cmd{'opts'}{'compile'}) {
+    if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
+      my $o_path = &o_path_from_dk_path($$inputs[0]);
+      $$root_cmd{'opts'}{'output'} = $o_path; # setting default output (compile) path for single .dk input path
+    }
+  }
+  if ($$root_cmd{'opts'}{'output'} && exists $$root_cmd{'opts'}{'compile'}) {
+    if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
+      $$project_io{'compile'}{$$inputs[0]} = $$root_cmd{'opts'}{'output'};
+      my $original_state;
+      &scalar_to_file($project_io_path, $project_io, $original_state = 1);
+    }
+  }
+}
+if (!exists $$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) {
+  foreach my $input (@$inputs) {
+    if ($$project_io{'compile'}{$input}) {
+      delete $$project_io{'compile'}{$input};
+    }
+  }
+  push @$inputs, values %{$$project_io{'compile'}};
+  foreach my $input (@{$$project{'inputs'}}) {
+    if ($input =~ /\.$so_ext$/) { # is_so_path()
+      push @$inputs, $input;
+    }
+  }
 }
 $inputs = &clean_paths($inputs);
 
-if (0 == @$inputs) {
+if (0 == scalar @$inputs) {
+  $inputs = $$root_cmd{'project.inputs'};
+}
+if (0 == scalar @$inputs) {
   die "$0: error: arguments are requried\n";
 } else {
+  # should only reorder the dk files leaving the so files in the same place
+  # so the inputs should be split into separate sublist (and then sorted)
   $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
   $$root_cmd{'inputs'} = $inputs;
 }
@@ -141,14 +187,7 @@ if (0 == @$inputs) {
 # dakota           --output <> {o}+ {so}* [obj/rt/<>.cc.o]
 
 if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-  my $output = $$root_cmd{'inputs'}[0] =~ s{($id)(\.$id)*$}{$1}r;
-  if ($$root_cmd{'opts'}{'shared'}) {
-    $output .= ".$so_ext";
-    print "using implicit lib name: $output\n";
-  } else {
-    print "using implicit exe name: $output\n";
-  }
-  $$root_cmd{'opts'}{'output'} = $output;
+  $$root_cmd{'opts'}{'output'} = &canon_path(&default_output($root_cmd));
 }
 if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
@@ -206,3 +245,152 @@ if ($$root_cmd{'opts'}{'precompile'}) {
 }
 my $result = &dakota::dakota::start_cmd($root_cmd);
 exit $result;
+
+sub create_missing_project {
+  my ($root_cmd, $inputs) = @_;
+  if (0 == scalar @$inputs) {
+    die "error: missing both --project <file> and input files; at least one is required.";
+  }
+  if ($$root_cmd{'opts'}{'compile'}) {
+    print "warning: missing --project <file> (creating default).\n";
+  } else {
+    print "info: missing --project <file> (creating default).\n";
+  }
+  # create and write a default project file
+  $project = { 'output' => undef, 'inputs' => [],
+               'objdir' => undef, 'io' => undef };
+  foreach my $input (@$inputs) {
+    if ($input =~ m/\.(dk|$so_ext)$/) {
+      add_last($$project{'inputs'}, $input);
+    } else {
+      print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
+    }
+  }
+  if ($ENV{'OBJDIR'}) {
+    $$project{'objdir'} = $ENV{'OBJDIR'};
+  } else {
+    $$project{'objdir'} = 'obj';
+  }
+  my $project_base;
+  my $project_path;
+
+  if ($$root_cmd{'opts'}{'output'}) {
+    $$project{'output'} = $$root_cmd{'opts'}{'output'};
+    $project_base = $$project{'output'} =~ s/\.$so_ext$//r;
+  } elsif (scalar @$inputs) {
+    $project_base = &project_base($inputs);
+    if ($$root_cmd{'opts'}{'shared'}) {
+      $$project{'output'} = $project_base . ".$so_ext";
+    } else {
+      $$project{'output'} = $project_base;
+    }
+  }
+  $$project{'io'} = $project_base . '.io';
+  $project_path =   $project_base . '.project';
+  if (-e $$project{'io'}) {
+    die;
+  }
+  if (-e $project_path) {
+    die;
+  }
+  my $original_state;
+  &scalar_to_file($project_path, $project, $original_state = 1);
+  return $project_path;
+}
+sub project_base {
+  my ($inputs) = @_;
+  my $dk_path = &first_dk_path($inputs);
+  my $project_base = $dk_path =~ s/\.dk$//r;
+  return $project_base;
+}
+sub first_dk_path {
+  my ($inputs) = @_;
+  foreach my $input (@$inputs) {
+    if (&is_dk_path($input)) {
+      return $input;
+    }
+  }
+  die;
+}
+sub use_project {
+  my ($root_cmd, $project) = @_;
+  $project = &set_global_project($$root_cmd{'opts'}{'project'});
+  if ($$project{'objdir'}) {
+    $$root_cmd{'project.objdir'} = $$project{'objdir'};
+  }
+  $$root_cmd{'project.inputs'} = $$project{'inputs'};
+  $$root_cmd{'project.output'} = $$project{'output'};
+  if ($$project{'io'}) {
+    $$root_cmd{'project.io'} = $$project{'io'};
+  } else {
+    $$root_cmd{'project.io'} = $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
+    print "warning: missing 'io' path in project file; using $$root_cmd{'project.io'}\n";
+  }
+  $project_io_path = $$root_cmd{'project.io'};
+  my $original_state;
+  if (! -e $project_io_path) {
+    # dk2json : $foo{'dk'}{$dk_path}{'json'}{$json_path}
+    my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {} };
+    &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);
+  }
+  $project_io = &scalar_from_file($project_io_path);
+  $$project_io{'inputs'} = { map { $_ => 1 } @{$$project{'inputs'}} };
+  if ($$project{'objdir'}) {
+    $$project_io{'objdir'} = $$project{'objdir'};
+  }
+  &scalar_to_file($project_io_path, $project_io, $original_state = 1);
+  return ($project, $project_io);
+}
+sub project_clean {
+  my ($root_cmd, $project, $project_io) = @_;
+  #print "project: " . &Dumper($project);
+  #print "project.io: " . &Dumper($project_io);
+  if (!$project_io && $$project{'io'}) {
+    $project_io = &scalar_from_file($$project{'io'});
+  }
+  # {'all'}{$in}{$out} = 1
+  if ($project_io) {
+    while (my ($in_path, $out_paths) = each (%{$$project_io{'all'}})) {
+      foreach my $out_path (keys %$out_paths) {
+        if (-e $out_path) {
+          print "rm $out_path\n";
+          unlink $out_path;
+        }
+      }
+      if (! $$project_io{'inputs'}{$in_path}) {
+        if (-e $in_path) {
+          print "rm $in_path\n";
+          unlink $in_path;
+        }
+      }
+    }
+    $$project_io{'all'} = {};
+    $$project_io{'compile'} = {};
+    my $original_state;
+    &scalar_to_file($project_io_path, $project_io, $original_state = 1);
+  }
+  if ($$project{'output'} && -e $$project{'output'}) {
+    print "rm $$project{'output'}\n";
+    unlink $$project{'output'};
+  }
+  if ($$project{'project.rep'} && -e $$project{'project.rep'}) {
+    print "rm $$project{'project.rep'}\n";
+    unlink $$project{'project.rep'};
+  }
+}
+sub default_output {
+  my ($root_cmd, $inputs) = @_;
+  my $output;
+  if ($$root_cmd{'project.output'}) {
+    $output = $$root_cmd{'project.output'};
+  } else {
+    $output = &project_base($inputs);
+    if ($$root_cmd{'opts'}{'shared'}) {
+      $output .= ".$so_ext";
+      print "using implicit lib name: $output\n";
+    } else {
+      print "using implicit exe name: $output\n";
+    }
+  }
+  return $output;
+}

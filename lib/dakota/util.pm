@@ -91,6 +91,8 @@ our @EXPORT= qw(
                  str_from_seq
                  var
                  var_array
+                 global_project
+                 set_global_project
                  global_project_rep
                  set_global_project_rep
               );
@@ -364,7 +366,8 @@ my $build_vars = {
   'objdir' => 'obj',
 };
 sub objdir {
-  my $objdir = $ENV{'OBJDIR'};
+  my $project = &global_project();
+  my $objdir = $$project{'objdir'};
   $objdir = $$build_vars{'objdir'} if ! $objdir;
   if (-e $objdir && ! -d $objdir) {
     die;
@@ -434,6 +437,15 @@ sub kw_args_generics_sig {
   &add_last($keyword_types, ['...']);
   return ($$generic{'name'}, $keyword_types);
 }
+my $global_project;
+sub global_project {
+  return $global_project;
+}
+sub set_global_project {
+  my ($project_path) = @_;
+  $global_project = &scalar_from_file($project_path);
+  return $global_project;
+}
 my $global_project_rep;
 sub global_project_rep {
   return $global_project_rep;
@@ -441,6 +453,7 @@ sub global_project_rep {
 sub set_global_project_rep {
   my ($project_rep_path) = @_;
   $global_project_rep = &scalar_from_file($project_rep_path);
+  return $global_project_rep;
 }
 sub is_kw_args_generic {
   my ($generic) = @_;
