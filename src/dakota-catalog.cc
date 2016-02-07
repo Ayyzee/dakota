@@ -35,19 +35,19 @@
 
 enum {
   DAKOTA_CATALOG_HELP = 256,
-  DAKOTA_CATALOG_OUTPUT,
-  DAKOTA_CATALOG_OUTPUT_DIRECTORY,
   DAKOTA_CATALOG_DIRECTORY,
   DAKOTA_CATALOG_ONLY,
+  DAKOTA_CATALOG_OUTPUT,
+  DAKOTA_CATALOG_OUTPUT_DIRECTORY,
   DAKOTA_CATALOG_PATH_ONLY,
   DAKOTA_CATALOG_RECURSIVE,
   DAKOTA_CATALOG_SILENT,
 };
 struct opts_t {
+  char* directory;
   char* only; // full or partial (prefix) klass name
   char* output; // path or "" for stdout
   char* output_directory; // path or "" for .
-  char* directory;
   bool  path_only;
   bool  recursive;
   bool  silent;
@@ -88,10 +88,10 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
   // options descriptor
   static struct option longopts[] = {
     { "help",             no_argument,       nullptr, DAKOTA_CATALOG_HELP },
-    { "output",           required_argument, nullptr, DAKOTA_CATALOG_OUTPUT },
-    { "output-directory", required_argument, nullptr, DAKOTA_CATALOG_OUTPUT_DIRECTORY },
     { "directory",        required_argument, nullptr, DAKOTA_CATALOG_DIRECTORY },
     { "only",             required_argument, nullptr, DAKOTA_CATALOG_ONLY },
+    { "output",           required_argument, nullptr, DAKOTA_CATALOG_OUTPUT },
+    { "output-directory", required_argument, nullptr, DAKOTA_CATALOG_OUTPUT_DIRECTORY },
     { "path-only",        no_argument,       nullptr, DAKOTA_CATALOG_PATH_ONLY },
     { "recursive",        no_argument,       nullptr, DAKOTA_CATALOG_RECURSIVE },
     { "silent",           no_argument,       nullptr, DAKOTA_CATALOG_SILENT },
@@ -104,23 +104,23 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
       case DAKOTA_CATALOG_HELP:
         usage(progname, longopts);
         exit(EXIT_SUCCESS);
-      case DAKOTA_CATALOG_OUTPUT:
-        opts.output = optarg;
-        break;
-      case DAKOTA_CATALOG_OUTPUT_DIRECTORY:
-        opts.output_directory = optarg;
-        break;
       case DAKOTA_CATALOG_DIRECTORY:
         opts.directory = optarg;
         break;
       case DAKOTA_CATALOG_ONLY:
         opts.only = optarg;
         break;
-      case DAKOTA_CATALOG_RECURSIVE:
-        opts.recursive = true;
+      case DAKOTA_CATALOG_OUTPUT:
+        opts.output = optarg;
+        break;
+      case DAKOTA_CATALOG_OUTPUT_DIRECTORY:
+        opts.output_directory = optarg;
         break;
       case DAKOTA_CATALOG_PATH_ONLY:
         opts.path_only = true;
+        break;
+      case DAKOTA_CATALOG_RECURSIVE:
+        opts.recursive = true;
         break;
       case DAKOTA_CATALOG_SILENT:
         opts.silent = true;
