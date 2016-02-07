@@ -34,13 +34,13 @@
 # include "dakota.hh" // format_printf(), format_va_printf()
 
 enum {
-  DKT_INFO_HELP = 256,
-  DKT_INFO_OUTPUT,
-  DKT_INFO_OUTPUT_DIRECTORY,
-  DKT_INFO_DIRECTORY,
-  DKT_INFO_ONLY,
-  DKT_INFO_RECURSIVE,
-  DKT_INFO_SILENT,
+  DAKOTA_CATALOG_HELP = 256,
+  DAKOTA_CATALOG_OUTPUT,
+  DAKOTA_CATALOG_OUTPUT_DIRECTORY,
+  DAKOTA_CATALOG_DIRECTORY,
+  DAKOTA_CATALOG_ONLY,
+  DAKOTA_CATALOG_RECURSIVE,
+  DAKOTA_CATALOG_SILENT,
 };
 struct opts_t {
   char* only; // full or partial (prefix) klass name
@@ -85,38 +85,38 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
   int unrecognized_opt_cnt = 0;
   // options descriptor
   static struct option longopts[] = {
-    { "help",             no_argument,       nullptr, DKT_INFO_HELP },
-    { "output",           required_argument, nullptr, DKT_INFO_OUTPUT },
-    { "output-directory", required_argument, nullptr, DKT_INFO_OUTPUT_DIRECTORY },
-    { "directory",        required_argument, nullptr, DKT_INFO_DIRECTORY },
-    { "only",             required_argument, nullptr, DKT_INFO_ONLY },
-    { "recursive",        no_argument,       nullptr, DKT_INFO_RECURSIVE },
-    { "silent",           no_argument,       nullptr, DKT_INFO_SILENT },
+    { "help",             no_argument,       nullptr, DAKOTA_CATALOG_HELP },
+    { "output",           required_argument, nullptr, DAKOTA_CATALOG_OUTPUT },
+    { "output-directory", required_argument, nullptr, DAKOTA_CATALOG_OUTPUT_DIRECTORY },
+    { "directory",        required_argument, nullptr, DAKOTA_CATALOG_DIRECTORY },
+    { "only",             required_argument, nullptr, DAKOTA_CATALOG_ONLY },
+    { "recursive",        no_argument,       nullptr, DAKOTA_CATALOG_RECURSIVE },
+    { "silent",           no_argument,       nullptr, DAKOTA_CATALOG_SILENT },
     { nullptr, 0, nullptr, 0 }
   };
   int opt;
 
   while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, nullptr))) {
     switch (opt) {
-      case DKT_INFO_HELP:
+      case DAKOTA_CATALOG_HELP:
         usage(progname, longopts);
         exit(EXIT_SUCCESS);
-      case DKT_INFO_OUTPUT:
+      case DAKOTA_CATALOG_OUTPUT:
         opts.output = optarg;
         break;
-      case DKT_INFO_OUTPUT_DIRECTORY:
+      case DAKOTA_CATALOG_OUTPUT_DIRECTORY:
         opts.output_directory = optarg;
         break;
-      case DKT_INFO_DIRECTORY:
+      case DAKOTA_CATALOG_DIRECTORY:
         opts.directory = optarg;
         break;
-      case DKT_INFO_ONLY:
+      case DAKOTA_CATALOG_ONLY:
         opts.only = optarg;
         break;
-      case DKT_INFO_RECURSIVE:
+      case DAKOTA_CATALOG_RECURSIVE:
         opts.recursive = true;
         break;
-      case DKT_INFO_SILENT:
+      case DAKOTA_CATALOG_SILENT:
         opts.silent = true;
         break;
       default:
