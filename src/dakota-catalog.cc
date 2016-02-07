@@ -39,6 +39,7 @@ enum {
   DAKOTA_CATALOG_OUTPUT_DIRECTORY,
   DAKOTA_CATALOG_DIRECTORY,
   DAKOTA_CATALOG_ONLY,
+  DAKOTA_CATALOG_PATH_ONLY,
   DAKOTA_CATALOG_RECURSIVE,
   DAKOTA_CATALOG_SILENT,
 };
@@ -47,10 +48,11 @@ struct opts_t {
   char* output; // path or "" for stdout
   char* output_directory; // path or "" for .
   char* directory;
+  bool  path_only;
   bool  recursive;
   bool  silent;
 };
-static opts_t opts;
+static opts_t opts {};
 
 static FUNC usage(const char* progname, option* options) -> int {
   const char* tmp_progname = strrchr(progname, '/');
@@ -90,6 +92,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
     { "output-directory", required_argument, nullptr, DAKOTA_CATALOG_OUTPUT_DIRECTORY },
     { "directory",        required_argument, nullptr, DAKOTA_CATALOG_DIRECTORY },
     { "only",             required_argument, nullptr, DAKOTA_CATALOG_ONLY },
+    { "path-only",        no_argument,       nullptr, DAKOTA_CATALOG_PATH_ONLY },
     { "recursive",        no_argument,       nullptr, DAKOTA_CATALOG_RECURSIVE },
     { "silent",           no_argument,       nullptr, DAKOTA_CATALOG_SILENT },
     { nullptr, 0, nullptr, 0 }
@@ -115,6 +118,9 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         break;
       case DAKOTA_CATALOG_RECURSIVE:
         opts.recursive = true;
+        break;
+      case DAKOTA_CATALOG_PATH_ONLY:
+        opts.path_only = true;
         break;
       case DAKOTA_CATALOG_SILENT:
         opts.silent = true;
@@ -183,27 +189,36 @@ FUNC main(int argc, char** argv, char**) -> int {
     }
   }
   int overwrite;
-  setenv("DAKOTA_CATALOG_OUTPUT", output_pid, overwrite = 1);
+  if (!opts.path_only) {
+    setenv("DAKOTA_CATALOG_OUTPUT", output_pid, overwrite = 1);
 
-  if (nullptr != opts.output_directory)
-    setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
-  if (nullptr != opts.only)
-    setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1);
-  if (opts.recursive)
-    setenv_boole("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
+    if (nullptr != opts.output_directory)
+      setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
+    if (nullptr != opts.only)
+      setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1);
+    if (opts.recursive)
+      setenv_boole("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
+  }
   int i = 0;
   const char* arg = nullptr;
   while (nullptr != (arg = argv[i++])) {
-    setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
-    setenv("DKT_EXIT_BEFORE_MAIN", "", overwrite = 1);
-    setenv("DAKOTA_CATALOG_ARG", arg, overwrite = 1);
-    setenv("DAKOTA_CATALOG_ARG_TYPE", "exe", overwrite = 1); // not currently used
-    int status = spawn(arg);
+    if (!opts.path_only) {
+      setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
+      setenv("DKT_EXIT_BEFORE_MAIN", "", overwrite = 1);
+      setenv("DAKOTA_CATALOG_ARG", arg, overwrite = 1);
+      setenv("DAKOTA_CATALOG_ARG_TYPE", "exe", overwrite = 1); // not currently used
+    }
+    int status = -1;
+    if (!opts.path_only) {
+      status = spawn(arg);
+    }
     if (-1 == status) {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
-      unsetenv("DKT_NO_INIT_RUNTIME");
-      unsetenv("DKT_EXIT_BEFORE_MAIN");
-      setenv("DAKOTA_CATALOG_ARG_TYPE", "lib", overwrite = 1); // not currently used
+      if (!opts.path_only) {
+        unsetenv("DKT_NO_INIT_RUNTIME");
+        unsetenv("DKT_EXIT_BEFORE_MAIN");
+        setenv("DAKOTA_CATALOG_ARG_TYPE", "lib", overwrite = 1); // not currently used
+      }
       void* handle = dlopen(arg, RTLD_NOW | RTLD_LOCAL);
 
       // if the shared library is not found in the search path
