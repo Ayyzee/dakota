@@ -258,7 +258,7 @@ sub create_missing_project {
   }
   # create and write a default project file
   $project = { 'output' => undef, 'inputs' => [],
-               'objdir' => undef, 'io' => undef };
+               'objdir' => undef };
   foreach my $input (@$inputs) {
     if ($input =~ m/\.(dk|$so_ext)$/) {
       add_last($$project{'inputs'}, $input);
@@ -285,11 +285,7 @@ sub create_missing_project {
       $$project{'output'} = $project_base;
     }
   }
-  $$project{'io'} = $project_base . '.io';
   $project_path =   $project_base . '.project';
-  if (-e $$project{'io'}) {
-    die;
-  }
   if (-e $project_path) {
     die;
   }
@@ -344,9 +340,6 @@ sub use_project {
 sub project_clean {
   my ($root_cmd, $project, $project_io) = @_;
   my $remove = {};
-  if (!$project_io && $$project{'io'}) {
-    $project_io = &scalar_from_file($$project{'io'});
-  }
   # {'all'}{$in}{$out} = 1
   if ($project_io) {
     while (my ($in_path, $out_paths) = each (%{$$project_io{'all'}})) {
