@@ -315,17 +315,16 @@ sub first_dk_path {
 sub use_project {
   my ($root_cmd, $project) = @_;
   $project = &set_global_project($$root_cmd{'opts'}{'project'});
-  if ($$project{'objdir'}) {
-    $$root_cmd{'project.objdir'} = $$project{'objdir'};
+  if (! $$project{'objdir'}) {
+    $$project{'objdir'} = &objdir();
+  }
+  if (! -e $$project{'objdir'}) {
+    mkdir $$project{'objdir'}; # or try make_path in File::Path
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
+  $$root_cmd{'project.objdir'} = $$project{'objdir'};
   $$root_cmd{'project.output'} = $$project{'output'};
-  if ($$project{'io'}) {
-    $$root_cmd{'project.io'} = $$project{'io'};
-  } else {
-    $$root_cmd{'project.io'} = $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
-    print "warning: missing 'io' path in project file; using $$root_cmd{'project.io'}\n";
-  }
+  $$root_cmd{'project.io'} = $$project{'objdir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
   $project_io_path = $$root_cmd{'project.io'};
   my $original_state;
   if (! -e $project_io_path) {

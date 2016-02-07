@@ -8,7 +8,6 @@
 # need to add use of $DESTDIR, $blddir, $srcdir
 
 {
-  'io' => 'libdakota.io',
   'objdir' => 'obj/libdakota',
   'output' => '../lib/libdakota.so',
   'inputs' => [
