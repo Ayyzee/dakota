@@ -587,6 +587,7 @@ sub update_rep_from_all_inputs {
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   $cmd_info = &loop_rep_from_inputs($cmd_info);
+  die if $$cmd_info{'reps'}[0] ne $rt_json_path; # assert
   &add_visibility_file($rt_json_path);
 
   $$cmd_info{'inputs'} = $$orig{'inputs'};
@@ -826,7 +827,7 @@ sub loop_rep_from_inputs {
     if (0 != @$rep_files) {
       my $rt_json_path = &rt_json_path($cmd_info);
       &check_path($rt_json_path);
-      &ordered_set_add($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
+      &ordered_set_add_first($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
       my $rep_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
@@ -1325,6 +1326,16 @@ sub ordered_set_add {
     }
   }
   &dakota::util::add_last($ordered_set, $element);
+}
+sub ordered_set_add_first {
+  my ($ordered_set, $element, $file, $line) = @_;
+  foreach my $member (@$ordered_set) {
+    if ($element eq $member) {
+      #printf STDERR "%s:%i: warning: element \"$element\" already present\n", $file, $line;
+      return;
+    }
+  }
+  &dakota::util::add_first($ordered_set, $element);
 }
 sub start {
   my ($argv) = @_;
