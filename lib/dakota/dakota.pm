@@ -76,6 +76,8 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  is_dk_path
                  is_o_path
+                 rt_cc_path
+                 rel_rt_hh_path
              );
 
 use Data::Dumper;
@@ -414,6 +416,12 @@ sub rt_cc_path {
   }
   return $rt_cc_path;
 }
+sub rel_rt_hh_path {
+  my ($cmd_info) = @_;
+  my $rt_cc_path = &rt_cc_path($cmd_info);
+  my $rel_rt_hh_path = $rt_cc_path =~ s=^$objdir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  return $rel_rt_hh_path;
+}
 sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
@@ -488,9 +496,7 @@ sub loop_cc_from_dk {
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
     &nrt::add_extra_generics($file);
-
-    my $rt_cc_path = &rt_cc_path($cmd_info);
-    my $rel_rt_hh_path = $rt_cc_path =~ s=^$objdir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+    my $rel_rt_hh_path = &rel_rt_hh_path($cmd_info);
 
     if (0) {
       #  for each translation unit create links to the linkage unit header file
