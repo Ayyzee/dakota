@@ -1575,6 +1575,13 @@ sub add_generics_used {
   }
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
 }
+sub kw_args_generics_add {
+  my ($rt_rep, $method) = @_;
+  my ($name, $types) = &kw_args_generics_sig($method);
+  my $name_str =  &str_from_seq($name);
+  my $types_str = &parameter_types_str($types);
+  $$rt_rep{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
+}
 
 # 'methods'
 # 'slots-methods'
@@ -1676,10 +1683,7 @@ sub method {
     if ($kw_args_defaults) {
       $$method{'kw-args-defaults'} = $kw_args_defaults;
     }
-    my ($name, $types) = &kw_args_generics_sig($method);
-    my $name_str =  &str_from_seq($name);
-    my $types_str = &parameter_types_str($types);
-    $$gbl_root{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
+    &kw_args_generics_add($gbl_root, $method);
 
     if ('init' eq $method_name) {
       foreach my $kw_arg_name (@$kw_args_names) {
