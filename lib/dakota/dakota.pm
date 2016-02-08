@@ -448,16 +448,13 @@ sub loop_cc_from_dk {
   $$cmd_info{'reps'} = $rep;
   $$cmd_info{'inputs'} = $inputs;
 
-  if ($$cmd_info{'reps'}) {
-    &init_global_rep($$cmd_info{'reps'}); # within loop_cc_from_dk
-  }
+  my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within loop_cc_from_dk
   my $argv_length = @{$$cmd_info{'inputs'}};
   if (0 == $argv_length) {
     die "$0: error: arguments are requried\n";
   }
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
 
-  my $project_rep = &global_project_rep();
   my $num_inputs = scalar @{$$cmd_info{'inputs'}};
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my $json_path;
@@ -491,7 +488,7 @@ sub loop_cc_from_dk {
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input_name, $user_cc_path, $project_rep);
+    &dakota::generate::dk_generate_cc($input_name, $user_cc_path, $global_rep);
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
@@ -501,9 +498,9 @@ sub loop_cc_from_dk {
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
-      &dakota::generate::generate_nrt_decl($cc_path, $file, $project_rep, $rel_rt_hh_path);
+      &dakota::generate::generate_nrt_decl($cc_path, $file, $global_rep, $rel_rt_hh_path);
     }
-    &dakota::generate::generate_nrt_defn($cc_path, $file, $project_rep, $rel_rt_hh_path); # rel_rt_hh not used
+    &dakota::generate::generate_nrt_defn($cc_path, $file, $global_rep, $rel_rt_hh_path); # rel_rt_hh not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
