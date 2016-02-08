@@ -4107,9 +4107,9 @@ sub linkage_unit::generate_strs_seq {
     $col = &colin($col);
     foreach my $str (sort keys %{$$file{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
-      $scratch_str .= $col . "{ cast(intptr-t)&__literal::__str::$str_ident, nullptr },\n";
+      $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__str::$str_ident },\n";
     }
-    $scratch_str .= $col . "{ cast(intptr-t)nullptr, nullptr }\n";
+    $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
