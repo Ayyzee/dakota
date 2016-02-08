@@ -48,6 +48,7 @@ BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
 };
+#use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use dakota::dakota;
 use dakota::parse;
@@ -79,6 +80,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $root_cmd = { 'reps' => [],
+                 'inputs' => [],
                  'opts' => { 'directory' => [],
                              'include-directory' => [ "$gbl_prefix/include" ],
                              'library-directory' => [],
@@ -170,18 +172,20 @@ if (!exists $$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compi
 }
 $inputs = &clean_paths($inputs);
 
-if (0 == scalar @$inputs) {
-  $inputs = $$root_cmd{'project.inputs'};
+if (1 >= scalar @$inputs) { # only the implied libdakota.so
+  if (1 >= scalar $$root_cmd{'project.inputs'}) {
+    die "$0: error: inputs are requried either in the project file or the command line.\n";
+  } else {
+    $inputs = $$root_cmd{'project.inputs'};
+    $$root_cmd{'inputs'} = [];
+  }
 }
-if (0 == scalar @$inputs) {
-  die "$0: error: arguments are requried\n";
-} else {
-  # should only reorder the dk files leaving the so files in the same place
-  # so the inputs should be split into separate sublist (and then sorted)
+# should only reorder the dk files leaving the so files in the same place
+# so the inputs should be split into separate sublist (and then sorted)
+if (1) {
   $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
-  $$root_cmd{'inputs'} = $inputs;
 }
-
+$$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
 # dakota --compile --output <> {dk}
 # dakota --shared  --output <> {o}+ {so}* [obj/rt/<>.cc.o]
 # dakota           --output <> {o}+ {so}* [obj/rt/<>.cc.o]
@@ -194,12 +198,6 @@ if ($$root_cmd{'opts'}{'output'}) {
 }
 if ($$root_cmd{'opts'}{'soname'}) {
   $$root_cmd{'opts'}{'soname'} = &canon_path($$root_cmd{'opts'}{'soname'});
-}
-if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
-  my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
-  if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota) {
-    &add_last($$root_cmd{'inputs'}, $libdakota);
-  }
 }
 $ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
 
@@ -287,10 +285,11 @@ sub create_missing_project {
   }
   $project_path =   $project_base . '.project';
   if (-e $project_path) {
-    die;
+    print "info: found $project_path; using for missing --project <>.\n";
+  } else {
+    my $original_state;
+    &scalar_to_file($project_path, $project, $original_state = 1);
   }
-  my $original_state;
-  &scalar_to_file($project_path, $project, $original_state = 1);
   return $project_path;
 }
 sub project_base {
@@ -316,6 +315,13 @@ sub use_project {
   }
   if (! -e $$project{'objdir'}) {
     mkdir $$project{'objdir'}; # or try make_path in File::Path
+  }
+  if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
+    my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
+    if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota) {
+      &add_last($$root_cmd{'inputs'}, $libdakota);
+      &add_last($$project{'inputs'}, $libdakota);
+    }
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.objdir'} = $$project{'objdir'};
