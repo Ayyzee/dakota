@@ -35,6 +35,5 @@
     'tokenid.dk',
     'type-predicate.dk',
     'xml-object-output-stream.dk',
-    '../lib/libdakota.so',
   ],
 }
