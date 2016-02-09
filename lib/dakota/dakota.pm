@@ -1118,7 +1118,10 @@ sub so_from_o {
   }
   &library_names_add_first($so_cmd);
   my $should_echo;
-  my $result = &outfile_from_infiles($so_cmd, $should_echo = 0);
+  if ($ENV{'DK_ECHO_LINK_CMD'}) {
+    $should_echo = 1;
+  }
+  my $result = &outfile_from_infiles($so_cmd, $should_echo);
   if ($result) {
     &project_io_add($cmd_info, $inputs, $$cmd_info{'output'});
   }
@@ -1142,7 +1145,11 @@ sub exe_from_o {
   }
   &library_names_add_first($exe_cmd);
   my $should_echo;
-  return &outfile_from_infiles($exe_cmd, $should_echo = 0);
+  if ($ENV{'DK_ECHO_LINK_CMD'}) {
+    $should_echo = 1;
+  }
+  my $result = &outfile_from_infiles($exe_cmd, $should_echo);
+  return 
 }
 sub dir_part {
   my ($path) = @_;
@@ -1168,7 +1175,7 @@ sub exec_cmd {
   my ($cmd_info, $should_echo) = @_;
   my $cmd_str;
   $cmd_str = &str_from_cmd_info($cmd_info);
-  if (&is_debug() && ($global_should_echo || $should_echo)) {
+  if (&is_debug() || $global_should_echo || $should_echo) {
     print STDERR "  $cmd_str\n";
   }
   if ($ENV{'DKT_INITIAL_WORKDIR'}) {
@@ -1184,7 +1191,7 @@ sub exec_cmd {
       $exit_status = $tmp_exit_status;
     }
     if (!$$root_cmd{'opts'}{'keep-going'}) {
-      if (!(&is_debug() && ($global_should_echo || $should_echo))) {
+      if (!(&is_debug() || $global_should_echo || $should_echo)) {
         print STDERR "  $cmd_str\n";
       }
       die "exit value from system() was $exit_val\n" if $exit_status == 0;
