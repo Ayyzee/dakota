@@ -213,7 +213,7 @@ sub kw_args_translate {
                 &dakota::util::remove_last($$method{'parameter-types'});
               &dakota::util::add_last($kw_args_types, $kw_args_type);
             }
-            &dakota::util::add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
+            &update_to_kw_args($method);
             my $kw_args_defaults = [];
             my $kw_args_default;
             if (exists  $$method{'kw-args-defaults'} &&
@@ -229,7 +229,6 @@ sub kw_args_translate {
               $no_default--;
               &dakota::util::add_last($kw_args_defaults, undef);
             }
-            $$method{'keyword-types'} = [];
             my $kw_args_type;
             while (scalar @$kw_args_types) {
               my $keyword_type = {
@@ -244,9 +243,7 @@ sub kw_args_translate {
           } else {
             if (&is_kw_args_generic($method)) {
               if (!&dakota::generate::is_va($method)) {
-                &dakota::util::add_last($$method{'parameter-types'},
-                                        [ 'va-list-t' ]);
-                $$method{'keyword-types'} = [];
+                &update_to_kw_args($method);
               }
             }
           }
@@ -255,6 +252,13 @@ sub kw_args_translate {
     }
   }
   return $parse_tree;
+}
+sub update_to_kw_args {
+  my ($method) = @_;
+  die if $$method{'parameter-types'}[-1][0] eq 'va-list-t';
+  die if $$method{'keyword-types'};
+  &dakota::util::add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
+  $$method{'keyword-types'} = [];
 }
 sub tbl_add_info {
   my ($root_tbl, $tbl) = @_;
