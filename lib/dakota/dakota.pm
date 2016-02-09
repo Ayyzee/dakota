@@ -533,9 +533,9 @@ sub cmd_opts_from_library_path {
       $lib =~ m=^(.*/)?(lib([.\w-]+))((\.\d+)+)?\.$so_ext$=) { # so-regex
     my $library_directory = $1;
     my $library_name = $2 . ".$so_ext";
-    if ($library_directory) {
+    if ($library_directory && 0 != length($library_directory)) {
       $library_directory = &canon_path($library_directory);
-      $result .= "--library-directory $library_directory ";
+      $result .= "--library-directory=$library_directory --for-linker -rpath=$library_directory ";
     }
     $result .= &gcc_library_from_library_name($library_name);
   } else {
