@@ -566,6 +566,26 @@ sub for_linker {
   }
   return $result;
 }
+sub update_kw_args_generics {
+  my ($reps) = @_;
+  my $kw_args_generics = {};
+  foreach my $path (@$reps) {
+    my $rep = &scalar_from_file($path);
+    my $tbl = $$rep{'kw-args-generics'};
+    if ($tbl) {
+      while (my ($name, $params_tbl) = each(%$tbl)) {
+        while (my ($params_str, $params) = each(%$params_tbl)) {
+          $$kw_args_generics{$name}{$params_str} = $params;
+        }
+      }
+    }
+  }
+  foreach my $path (@$reps) {
+    my $rep = &scalar_from_file($path);
+    $$rep{'kw-args-generics'} = $kw_args_generics;
+    &scalar_to_file($path, $rep);
+  }
+}
 sub update_rep_from_all_inputs {
   my ($cmd_info) = @_;
   my $start_time = time;
@@ -587,6 +607,7 @@ sub update_rep_from_all_inputs {
   die if $$cmd_info{'reps'}[-1] ne $rt_json_path; # assert
   &add_visibility_file($rt_json_path);
 
+  &update_kw_args_generics($$cmd_info{'reps'});
   $$cmd_info{'inputs'} = $$orig{'inputs'};
   $$cmd_info{'output'} = $$orig{'output'};
   $$cmd_info{'opts'} =   $$orig{'opts'};
