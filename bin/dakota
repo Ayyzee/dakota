@@ -308,8 +308,8 @@ sub first_dk_path {
   die;
 }
 sub use_project {
-  my ($root_cmd, $project) = @_;
-  $project = &set_global_project($$root_cmd{'opts'}{'project'});
+  my ($root_cmd) = @_;
+  my $project = &set_global_project($$root_cmd{'opts'}{'project'});
   if (! $$project{'objdir'}) {
     $$project{'objdir'} = &objdir();
   }
