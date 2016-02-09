@@ -1022,10 +1022,7 @@ sub rt_o_from_json {
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $objdir/
   $file_basename =~ s|-rt\.$cc_ext$||; # strip off trailing -rt.cc
-  if ($$cmd_info{'reps'}) {
-    my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
-    &scalar_to_file("global-rep.json", $global_rep);
-  }
+  my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
   $file = &scalar_from_file($rt_json_path);
   die if $$file{'other'};
   $$file{'other'} = $other;
