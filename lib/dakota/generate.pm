@@ -3655,7 +3655,7 @@ sub generate_kw_args_method_defn {
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
 
-  if (0 < @{$$method{'keyword-types'}}) {
+  if (scalar @{$$method{'keyword-types'}}) {
     #my $param = &dakota::util::remove_last($$method{'parameter-types'}); # remove intptr-t type
     $method_type_decl = &kw_args_method::type_decl($method);
     #&dakota::util::add_last($$method{'parameter-types'}, $param);
