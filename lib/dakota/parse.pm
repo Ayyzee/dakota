@@ -2042,7 +2042,9 @@ sub init_global_rep {
   #if ($reinit) { print STDERR &Dumper([keys %{$$global_rep{'klasses'}}]); }
   $global_rep = &rep_merge($reps);
   $global_rep = &kw_args_translate($global_rep);
-  &scalar_to_file("global-rep.json", $global_rep);
+  if (1) {
+    &scalar_to_file("global-rep.json", $global_rep);
+  }
   #if ($reinit) { print STDERR &Dumper([keys %{$$global_rep{'klasses'}}]); }
   return $global_rep;
 }

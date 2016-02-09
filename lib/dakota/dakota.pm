@@ -580,11 +580,10 @@ sub update_kw_args_generics {
       }
     }
   }
-  foreach my $path (@$reps) {
-    my $rep = &scalar_from_file($path);
-    $$rep{'kw-args-generics'} = $kw_args_generics;
-    &scalar_to_file($path, $rep);
-  }
+  my $path = $$reps[-1]; # only update the project file rep
+  my $rep = &scalar_from_file($path);
+  $$rep{'kw-args-generics'} = $kw_args_generics;
+  &scalar_to_file($path, $rep);
 }
 sub update_rep_from_all_inputs {
   my ($cmd_info) = @_;
