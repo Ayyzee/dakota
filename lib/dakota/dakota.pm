@@ -466,7 +466,7 @@ sub loop_cc_from_dk {
       $json_path = &json_path_from_any_path($input); # _from_dk_src_path
       &check_path($json_path);
     } else {
-      print "skipping $input\n";
+      #print "skipping $input, line=" . __LINE__ . "\n";
     }
 
     my ($input_dir, $input_name, $input_ext) = &split_path($input, $id);
@@ -584,7 +584,7 @@ sub update_rep_from_all_inputs {
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   $cmd_info = &loop_rep_from_inputs($cmd_info);
-  die if $$cmd_info{'reps'}[0] ne $rt_json_path; # assert
+  die if $$cmd_info{'reps'}[-1] ne $rt_json_path; # assert
   &add_visibility_file($rt_json_path);
 
   $$cmd_info{'inputs'} = $$orig{'inputs'};
@@ -788,7 +788,7 @@ sub rep_from_inputs {
         &check_path($json_path);
         &project_io_add($cmd_info, $input, $json_path);
       } else {
-        print "skipping $input, line=" . __LINE__ . "\n";
+        #print "skipping $input, line=" . __LINE__ . "\n";
       }
     } elsif (1 < scalar @{$$rep_cmd{'inputs'}}) {
       #my $project_io = &scalar_from_file($$cmd_info{'project.io'});
@@ -824,7 +824,7 @@ sub loop_rep_from_inputs {
     if (0 != @$rep_files) {
       my $rt_json_path = &rt_json_path($cmd_info);
       &check_path($rt_json_path);
-      &ordered_set_add_first($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
+      &ordered_set_add($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
       my $rep_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
@@ -1023,7 +1023,8 @@ sub rt_o_from_json {
   $file_basename =~ s|^[^/]*/||;       # strip off leading $objdir/
   $file_basename =~ s|-rt\.$cc_ext$||; # strip off trailing -rt.cc
   if ($$cmd_info{'reps'}) {
-    &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
+    my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
+    &scalar_to_file("global-rep.json", $global_rep);
   }
   $file = &scalar_from_file($rt_json_path);
   die if $$file{'other'};
@@ -1295,7 +1296,7 @@ sub ctlg_from_so {
           $json_path = &json_path_from_any_path($input); # _from_dk_src_path
           &check_path($json_path);
         } else {
-          print "skipping $input\n";
+          #print "skipping $input, line=" . __LINE__ . "\n";
         }
         if (-e $json_path) {
          #my $ctlg_path = $json_path . '.' . 'ctlg';

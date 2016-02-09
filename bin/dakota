@@ -319,8 +319,8 @@ sub use_project {
   if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
     my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
     if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota) {
-      &add_last($$root_cmd{'inputs'}, $libdakota);
-      &add_last($$project{'inputs'}, $libdakota);
+      &add_first($$root_cmd{'inputs'}, $libdakota);
+      &add_first($$project{'inputs'}, $libdakota);
     }
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
