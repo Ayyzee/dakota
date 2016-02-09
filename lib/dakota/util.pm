@@ -557,8 +557,8 @@ sub canon_path {
   if ($path) {
     $path =~ s|//+|/|g; # replace multiple /s with single /s
     $path =~ s|/+\./+|/|g; # replace /./s with single /
-    $path =~ s|^\./||g; # remove leading ./
-    $path =~ s|/\.$||g; # remove trailing /.
+    $path =~ s|^\./(.+)|$1|g; # remove leading ./
+    $path =~ s|(.+)/\.$|$1|g; # remove trailing /.
     $path =~ s|/+$||g; # remove trailing /s
   }
   return $path;
