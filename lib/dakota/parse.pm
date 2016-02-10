@@ -647,14 +647,15 @@ sub trait {
 
     if ($$args{'exported?'}) {
       $$gbl_root{'exported-trait-decls'}{$body} = {};
-      $$gbl_current_scope{'exported-trait-decls'} = &dakota::util::deep_copy($$gbl_root{'exported-trait-decls'});
+      $$gbl_current_scope{'exported-trait-decls'} =
+        &dakota::util::deep_copy($$gbl_root{'exported-trait-decls'});
     }
     return $body;
   }
   &match(__FILE__, __LINE__, '{');
   my $braces = 1;
   my $previous_scope = $gbl_current_scope;
-  my $construct_name = &path::string($seq);
+  my $construct_name = $body;
 
   if (!defined $$gbl_current_scope{'traits'}{$construct_name}) {
     $$gbl_current_scope{'traits'}{$construct_name}{'defined?'} = 1;
@@ -1296,17 +1297,15 @@ sub klass {
       if (m/^klass$/) {
         if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$' &&
             &sst_cursor::previous_token($gbl_sst_cursor) ne '::') {
-          my ($body, $seq, $de) = &dkdecl_peek('klass');
-          if (scalar @$seq) {
-            if (';' eq $de) {
-              ($body, $seq) = &dkdecl('klass');
+          my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
+          if ($next_token) {
+            if ($next_token =~ m/$id/) {
+              my ($body, $seq) = &dkdecl('klass');
               &match(__FILE__, __LINE__, ';');
               my $path = &path::string($seq);
               $$gbl_current_scope{'klass'} = $path;
               &add_klass_decl($gbl_root, $path);
               last;
-            } else {
-              &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
             }
           }
         }
