@@ -19,6 +19,15 @@ module dakota;
 klass number;
 
 // its George Boole (not George Bool)
+klass boole-klass {
+  superklass klass;
+
+  slots object-t[2];
+
+  method alloc(object-t self) -> object-t {
+    return unbox(self)[0]; // return false object by default
+  }
+}
 klass boole { // a doubleton :-)
   superklass number;
   klass      boole-klass;
@@ -33,29 +42,17 @@ klass boole { // a doubleton :-)
     return self;
   }
   static func mk(object-t k, boole-t v) -> object-t {
-    method-t alloc = dk::method-for-selector(superklass-of(klass-of(k)),
-                                             SELECTOR(alloc(object-t)));
-    object-t self = alloc(k);
+    object-t self = $alloc(super(k, klass-of(k)));
     self = $init(super);
     unbox(self) = v;
     return self;
   }
-}
-klass boole-klass {
-  superklass klass;
-
-  slots object-t[2];
-
-  method alloc(object-t self) -> object-t {
-    return unbox(self)[0]; // return false object by default
-  }
-  method initialize(object-t self) -> object-t {
+  initialize(object-t kls) -> void {
     boole-t f = false;
-    (unbox(self))[f] = boole::mk(self, f);
+    (boole-klass::unbox(kls))[f] = mk(kls, f);
     boole-t t = true;
-    (unbox(self))[t] = boole::mk(self, t);
-
-    return self;
+    (boole-klass::unbox(kls))[t] = mk(kls, t);
+    return;
   }
 }
 static-assert(0 == false, "Boolean false must equal 0");

@@ -2153,6 +2153,12 @@ sub linkage_unit::generate_klasses_body {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
+  if (&is_decl() && $$klass_scope{'has-initialize'}) {
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . "\n";
+  }
+  if (&is_decl() && $$klass_scope{'has-finalize'}) {
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . "\n";
+  }
   if (&is_decl() && @$kw_args_methods) {
     #print STDERR Dumper($va_list_methods);
     &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
@@ -3509,6 +3515,12 @@ sub dk_generate_cc_footer_klass {
   }
   if (&has_exported_methods($klass_scope)) {
     $$tbbl{'#behavior-exported?'} = '1';
+  }
+  if ($$klass_scope{'has-initialize'}) {
+    $$tbbl{'#initialize'} = 'cast(method-t)initialize';
+  }
+  if ($$klass_scope{'has-finalize'}) {
+    $$tbbl{'#finalize'} = 'cast(method-t)finalize';
   }
   if ($$klass_scope{'module'}) {
     $$tbbl{'#module'} = "\#$$klass_scope{'module'}";

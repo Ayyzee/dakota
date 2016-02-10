@@ -319,6 +319,11 @@ klass methods {
     int64-t   count;
   }
 }
+klass initialize-func {
+  slots (*)(object-t) -> void;
+}
+typedef initialize-func::slots-t initialize-func-t;
+
 klass klass {
   slots {
     int64-t                  offset; // first so its offset is 0
@@ -576,30 +581,30 @@ klass klass {
     }
     return;
   }
-  static func traits-initialize(object-t self, const symbol-t* traits) -> object-t {
+  static func traits-initialize(object-t self, const symbol-t* traits) -> void {
     if (nullptr == traits || nullptr == traits[0])
-      return self;
+      return;
     int64-t i = 0;
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* info = info-for-name(trait-name);
 
       if (nullptr != info) {
-        method-t trait-initialize = cast(method-t)named-info::at(info, #initialize);
+        initialize-func-t trait-initialize = cast(initialize-func-t)named-info::at(info, #initialize);
         if (nullptr != trait-initialize) {
           DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
                                 "initialize", trait-name, "klass",
                                 cast(symbol-t)named-info::at(self.info-slots, #name),
                                 cast(symbol-t)named-info::at(self.info-slots, #file));
-          self = trait-initialize(self);
+          trait-initialize(self);
         }
       }
     }
-    return self;
+    return;
   }
-  // func traits-finalize(object-t self, const symbol-t* traits) -> object-t {
+  // func traits-finalize(object-t self, const symbol-t* traits) -> void {
   //   if (nullptr == traits || nullptr == traits[0])
-  //     return self;
+  //     return;
   //   int64-t i = 0;
   //   symbol-t trait-name;
   //   // finalization must be in the opposite order of initialization
@@ -617,11 +622,11 @@ klass klass {
   //                               "finalize", trait-name, "klass",
   //                               cast(symbol-t)named-info::at(self.info-slots, #name),
   //                               cast(symbol-t)named-info::at(self.info-slots, #file));
-  //         self = trait-finalize(self);
+  //         trait-finalize(self);
   //       }
   //     }
   //   }
-  //   return self;
+  //   return;
   // }
   method behavior?(object-t self, object-t kls) -> boole-t {
     assert((nullptr != self.behavior) || (nullptr != unbox(kls).behavior));
@@ -709,7 +714,7 @@ klass klass {
     else
       dkt-log(dkt::k-log-warning, "nullptr klass name");
     if (nullptr != traits)
-      self = traits-initialize(self, traits);
+      traits-initialize(self, traits);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info-slots, #method-aliases);
     if (nullptr != method-aliases) {
       int64-t i = 0;
@@ -724,12 +729,12 @@ klass klass {
         i++;
       }
     }
-    method-t klass-initialize = cast(method-t)named-info::at(self.info-slots, #initialize);
+    initialize-func-t klass-initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
     if (nullptr != klass-initialize) {
       DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                             "initialize", "klass", name,
                             cast(symbol-t)named-info::at(self.info-slots, #file));
-      self = klass-initialize(self);
+      klass-initialize(self);
     }
     if (nullptr == bit-vector::klass)
       self.behavior = nullptr;

@@ -669,6 +669,14 @@ sub trait {
 
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
+      if (m/^initialize$/) {
+        &initialize();
+        last;
+      }
+      if (m/^finalize$/) {
+        &finalize();
+        last;
+      }
       if (m/^export$/) {
         &match(__FILE__, __LINE__, 'export');
         for (&sst_cursor::current_token($gbl_sst_cursor)) {
@@ -989,6 +997,74 @@ sub enum {
   &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
   return;
 }
+sub initialize {
+  &match(__FILE__, __LINE__, 'initialize');
+  if ('(' ne &sst_cursor::current_token($gbl_sst_cursor)) {
+    return;
+  }
+  &match(__FILE__, __LINE__, '(');
+  if ('object-t' ne &sst_cursor::current_token($gbl_sst_cursor)) {
+    return;
+  }
+  &match(__FILE__, __LINE__, 'object-t');
+  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$id/) {
+    &match_any();
+    #&match(__FILE__, __LINE__, 'klass');
+  }
+  &match(__FILE__, __LINE__, ')');
+  &match(__FILE__, __LINE__, '->');
+  &match(__FILE__, __LINE__, 'void');
+  for (&sst_cursor::current_token($gbl_sst_cursor)) {
+    if (m/^\{$/) {
+      &add_symbol($gbl_root, ['initialize']);
+      $$gbl_current_scope{'has-initialize'} = 1;
+      my ($open_curley_index, $close_curley_index) =
+        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+      $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
+      last;
+    }
+    if (m/^;$/) {
+      &match(__FILE__, __LINE__, ';');
+      last;
+    }
+    &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
+  }
+  return;
+}
+sub finalize {
+  &match(__FILE__, __LINE__, 'finalize');
+  if ('(' ne &sst_cursor::current_token($gbl_sst_cursor)) {
+    return;
+  }
+  &match(__FILE__, __LINE__, '(');
+  if ('object-t' ne &sst_cursor::current_token($gbl_sst_cursor)) {
+    return;
+  }
+  &match(__FILE__, __LINE__, 'object-t');
+  if (&sst_cursor::current_token($gbl_sst_cursor) =~ m/$id/) {
+    &match_any();
+    #&match(__FILE__, __LINE__, 'klass');
+  }
+  &match(__FILE__, __LINE__, ')');
+  &match(__FILE__, __LINE__, '->');
+  &match(__FILE__, __LINE__, 'void');
+  for (&sst_cursor::current_token($gbl_sst_cursor)) {
+    if (m/^\{$/) {
+      &add_symbol($gbl_root, ['finalize']);
+      $$gbl_current_scope{'has-finalize'} = 1;
+      my ($open_curley_index, $close_curley_index) =
+        &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
+      $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
+      last;
+    }
+    if (m/^;$/) {
+      &match(__FILE__, __LINE__, ';');
+      last;
+    }
+    &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
+  }
+  return;
+}
 sub fragment_str {
   my ($arg) = @_;
   my $argstr = join(' ', @$arg);
@@ -1178,6 +1254,14 @@ sub klass {
 
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
+      if (m/^initialize$/) {
+        &initialize();
+        last;
+      }
+      if (m/^finalize$/) {
+        &finalize();
+        last;
+      }
       if (m/^export$/) {
         &match(__FILE__, __LINE__, 'export');
         for (&sst_cursor::current_token($gbl_sst_cursor)) {
