@@ -60,7 +60,11 @@
   # define so_export gnu::visibility("default")
 # endif
 
-# define dkt_enable_typeinfo so_export
+# if 0
+# define dkt_enable_typeinfo [[so_export]]
+# else
+# define dkt_enable_typeinfo
+# endif
 
 typedef bool boole_t;
 

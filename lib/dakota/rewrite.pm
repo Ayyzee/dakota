@@ -410,8 +410,8 @@ sub rewrite_slots_typedef {
 sub rewrite_slots {
   my ($filestr_ref) = @_;
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(          \s*$main::block)/$1$3$2\[\[dkt-enable-typeinfo\]\] slots-t$4;/gsx;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(\s*);                     /$1$3$2\[\[dkt-enable-typeinfo\]\] slots-t$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(          \s*$main::block)/$1$3$2dkt-enable-typeinfo slots-t$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(\s*);                     /$1$3$2dkt-enable-typeinfo slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$1$3$2slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*);           /$1$3$2slots-t$4;/gsx; # forward decl
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4)/egs;
@@ -641,12 +641,12 @@ sub rewrite_creates {
 }
 sub rewrite_supers_in_klass {
   my ($type, $name, $block) = @_;
-  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b/$1(super(self, klass)/g;
+  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b(?!\()/$1(super(self, klass)/g;
   return $type . ' ' . $name . ' ' . $block;
 }
 sub rewrite_supers_in_trait {
   my ($type, $name, $block) = @_;
-  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b/$1(super(self, klass(self))/g;
+  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b(?!\()/$1(super(self, klass(self))/g;
   return $type . ' ' . $name . ' ' . $block;
 }
 sub rewrite_supers {
@@ -939,6 +939,10 @@ sub rewrite_method_aliases {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s+)method\s+((va::)?$mid\s*\(\s*\))\s*=>\s*((va::)?$mid\s*$main::list)\s*;/$1METHOD-ALIAS($2, $4);/gs
 }
+sub rewrite_initialze_finalize {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/(\s)((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/$1func $2/gs;
+}
 sub rewrite_multi_char_consts {
   my ($filestr_ref) = @_;
   my $c = ' ';
@@ -1050,6 +1054,7 @@ sub convert_dk_to_cc {
   &rewrite_sentinal_generic_uses($filestr_ref, $kw_args_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_args_generics);
+  &rewrite_initialze_finalize($filestr_ref);
   &rewrite_functions($filestr_ref);
   &rewrite_map($filestr_ref);
   &rewrite_for_each($filestr_ref);
