@@ -259,6 +259,7 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 [[so_export]] [[sentinel]] FUNC dk_make_named_info_slots(symbol_t name, ...) -> named_info_t*;
 [[so_export]] [[sentinel]] FUNC dk_make_named_info(      symbol_t name, ...) -> object_t;
 
+[[debug_so_export]] FUNC dkt_dump(object_t object) -> object_t;
 [[debug_so_export]] FUNC dkt_dump_named_info(named_info_t* info) -> named_info_t*;
 
 //#define DKT-NULL-METHOD nullptr
