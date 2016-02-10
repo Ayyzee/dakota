@@ -1448,7 +1448,11 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       if (nullptr == klass-info->elements)
         break;
       symbol-t klass-name = name-from-info(klass-info);
-      str-t file = cast(symbol-t)named-info::at(klass-info, #file);
+      // const symbol-t* traits = cast(const symbol-t*)named-info::at(klass-info, #traits);
+      // if (nullptr != traits) {
+      //   object-t kls = dk-klass-for-name(klass-name);
+      //   klass::traits-finalize(kls, traits);
+      // }
       method-t finalize =   cast(method-t)named-info::at(klass-info, #finalize);
       if (nullptr != finalize) {
         named-assoc-node-t named-node = { .name = klass-name, .node = nullptr };
@@ -1456,7 +1460,9 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
         if (nullptr != found-named-node) {
           object-t kls = cast(object-t)(found-named-node->node->element);
           DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
-                                "finalize", "klass", klass-name, file);
+                                "finalize", "klass", klass-name,
+                                cast(symbol-t)named-info::at(klass-info, #file));
+
           kls = finalize(kls);
         }
       }

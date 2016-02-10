@@ -48,6 +48,10 @@ FUNC superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
 FUNC default_superklass_name() -> symbol_t;
 FUNC default_klass_name() -> symbol_t;
 
+// KLASS_NS klass {
+//   FUNC traits_finalize(object_t self, const symbol_t* traits) -> object_t;
+// }
+
 [[noreturn]] FUNC verbose_terminate()  noexcept -> void;
 [[noreturn]] FUNC verbose_unexpected() noexcept -> void;
 [[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;
