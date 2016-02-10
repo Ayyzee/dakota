@@ -49,7 +49,7 @@ FUNC default_superklass_name() -> symbol_t;
 FUNC default_klass_name() -> symbol_t;
 
 // KLASS_NS klass {
-//   FUNC traits_finalize(object_t self, const symbol_t* traits) -> object_t;
+//   FUNC traits_finalize(object_t self, const symbol_t* traits) -> void;
 // }
 
 [[noreturn]] FUNC verbose_terminate()  noexcept -> void;
