@@ -1433,14 +1433,12 @@ sub generics::generate_generic_defn {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
-        $col . "object-t kls = object->klass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
+        $col . "method-t _func_ = klass::unbox(klass-of(object)).methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
-        $col . "object-t kls = object->klass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
+        $col . "method-t _func_ = klass::unbox(klass-of(object)).methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon object, \#signature $colon signature));\n";
@@ -1529,14 +1527,12 @@ sub generics::generate_super_generic_defn {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
-        $col . "object-t kls = klass::unbox(arg0.klass).superklass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
+        $col . "method-t _func_ = klass::unbox(superklass-of(arg0.klass)).methods.addrs[selector];\n";
     } else {
       $$scratch_str_ref .=
         $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n" .
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
-        $col . "object-t kls = klass::unbox(arg0.klass).superklass;\n" .
-        $col . "method-t _func_ = klass::unbox(kls).methods.addrs[selector];\n";
+        $col . "method-t _func_ = klass::unbox(superklass-of(arg0.self)).methods.addrs[selector];\n";
     }
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
     $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon arg0.self, \#superkls $colon superklass-of(arg0.klass), \#signature $colon signature));\n";
