@@ -44,15 +44,15 @@ klass vector {
   static const ssize-t gbl-default-initial-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
-  // 'items' is a nullptr terminated array (of objects)
-  // using compound literals 'items' can be used as follows:
-  // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
+  // 'objects' is a nullptr terminated array (of objects)
+  // using compound literals 'objects' can be used as follows:
+  // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t  self,
                        ssize-t   initial-capacity : gbl-default-initial-capacity,
                        object-t  fill :             gbl-default-fill,
                        object-t  elements :         nullptr,
-                       object-t* items :            nullptr) -> object-t {
+                       object-t* objects :          nullptr) -> object-t {
     // it IS legal to have the 'fill' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);
@@ -72,8 +72,8 @@ klass vector {
     if (nullptr != elements)
       $add-all(self, elements);
 
-    if (nullptr != items)
-      $add-items(self, items);
+    if (nullptr != objects)
+      $add-objects(self, objects);
     return self;
   }
   method dealloc(object-t self) -> object-t {

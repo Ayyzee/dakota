@@ -62,10 +62,10 @@ klass collection {
       $add(self, element);
     return collection;
   }
-  // items are nullptr terminated lists of objects
-  method add-items(object-t self, object-t[] items) -> object-t {
+  // objects is a nullptr terminated list of objects
+  method add-objects(object-t self, object-t[] objects) -> object-t {
     object-t arg;
-    object-t* args = items;
+    object-t* args = objects;
     while (nullptr != (arg = *args++))
       $add(self, arg);
     return self; // nullnull?

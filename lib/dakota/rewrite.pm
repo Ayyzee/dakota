@@ -435,11 +435,11 @@ sub trim {
   $str =~ s/\s+$//;
   return $str;
 }
-sub rewrite_items_replacement {
+sub rewrite_objects_replacement {
   my ($block_in) = @_;
-  my $result = "#items $colon cast(object-t[]){";
-  my $items = [split(/\s*,\s*/, $block_in)]; # bugbug: this will fail if a pointer to a function with two or more args
-  foreach my $item (@$items) {
+  my $result = "#objects $colon cast(object-t[]){";
+  my $objects = [split(/\s*,\s*/, $block_in)]; # bugbug: this will fail if a pointer to a function with two or more args
+  foreach my $item (@$objects) {
     $item = &trim($item);
     if ($item =~ m/^\#/ || $item =~ m/^__symbol::/) {
       $result .= " symbol::box($item),";
@@ -452,9 +452,9 @@ sub rewrite_items_replacement {
   $result .= ' nullptr }';
   return $result;
 }
-sub rewrite_items {
+sub rewrite_objects {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/\#items\s+$colon\s*\{($main::block_in)\}/&rewrite_items_replacement($1)/egs;
+  $$filestr_ref =~ s/\#objects\s+$colon\s*\{($main::block_in)\}/&rewrite_objects_replacement($1)/egs;
 }
 sub rewrite_table_literal_replacement {
   my ($body) = @_;
@@ -463,7 +463,7 @@ sub rewrite_table_literal_replacement {
   my $pairs = [split /,/, $body];
 
   if (0 != @$pairs && '' ne $$pairs[0]) {
-    $result .= ", #items $colon cast(object-t[]){ ";
+    $result .= ", #objects $colon cast(object-t[]){ ";
     foreach my $pair (@$pairs) {
       my ($first, $last) = split /(?<!$colon)$colon(?!$colon)/, $pair;
       $first = &trim($first);
@@ -507,7 +507,7 @@ sub rewrite_list_literal_replacement {
   $pairs = [map {&trim($_)} @$pairs];
 
   if (0 != @$pairs && '' ne $$pairs[0]) {
-    $result .= ", #items $colon cast(object-t[]){ ";
+    $result .= ", #objects $colon cast(object-t[]){ ";
 
     foreach my $pair (@$pairs) {
       $result .= "box($pair), ";
@@ -1007,7 +1007,7 @@ sub convert_dk_to_cc {
 
   &rewrite_switch($filestr_ref);
 
-  &rewrite_items($filestr_ref); # must be before line removing leading #
+  &rewrite_objects($filestr_ref); # must be before line removing leading #
   $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading #, rnielsen
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);

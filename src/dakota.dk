@@ -1365,7 +1365,7 @@ static func set-read-only-all(str-t segment) -> int-t {
   return result;
 }
 static func last-user-code-before-main() -> void  {
-  if (1) {
+  if (nullptr != getenv("DKT_DUMP_RANDOM")) {
     printf("null-method: %p\n", DKT-NULL-METHOD);
     printf("num-generics: %zi\n", gbl-selectors-table.count);
   }
@@ -1419,12 +1419,12 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       break;
     case exe-type::k-exe:
       add-registration-info(registration-info);
+      if (nullptr == getenv("DKT_NO_INIT_RUNTIME"))
+        dk-init-runtime();
       if (nullptr != getenv("DKT_JSON_DUMP_KLASSES"))
         json-dump-klass-defns(gbl-klass-defns-table);
       if (nullptr != getenv("DKT_JSON_DUMP_RESOURCE_INFO"))
         json-dump-resource-info(gbl-klass-defns-table);
-      if (nullptr == getenv("DKT_NO_INIT_RUNTIME"))
-        dk-init-runtime();
       last-user-code-before-main();
       if (nullptr != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);

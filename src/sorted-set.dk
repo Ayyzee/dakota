@@ -42,9 +42,9 @@ klass sorted-set {
   static const int64-t gbl-default-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
-  // 'items' is a nullptr terminated array (of objects)
-  // using compound literals 'items' can be used as follows:
-  // $init(o, #items : cast(object-t[]){ o1, o2, nullptr });
+  // 'objects' is a nullptr terminated array (of objects)
+  // using compound literals 'objects' can be used as follows:
+  // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
   static func swap-compare(object-t first, object-t second) -> int-t {
     int-t result = $compare(second, first);
@@ -54,7 +54,7 @@ klass sorted-set {
   method init(object-t  self,
               int64-t   initial-capacity : gbl-default-capacity,
               object-t  elements :         nullptr,
-              object-t* items :            nullptr) -> object-t {
+              object-t* objects :            nullptr) -> object-t {
     assert(0 != initial-capacity);
 
     self = $init(super);
@@ -69,8 +69,8 @@ klass sorted-set {
     if (nullptr != elements)
       $add-all(self, elements);
 
-    if (nullptr != items)
-      $add-items(self, items);
+    if (nullptr != objects)
+      $add-objects(self, objects);
     return self;
   }
   method dealloc(object-t self) -> object-t {

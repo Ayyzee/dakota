@@ -753,7 +753,7 @@ klass klass {
                             cast(symbol-t)named-info::at(self.info-slots, #file));
       klass-initialize(self);
     }
-    if (1) {
+    if (nullptr != getenv("DKT_DUMP_RANDOM")) {
       printf("klass: %s\n", self.name);
       for (int64-t index = 0; index < self.methods.count; index++) {
         printf("method: %p\n", self.methods.addrs[index]);
