@@ -1545,7 +1545,7 @@ sub generics::generate_super_generic_defn {
     } else {
       $$scratch_str_ref .=
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
-        $col . "method-t _func_ = klass::unbox(superklass-of(arg0.self)).methods.addrs[selector];\n";
+        $col . "method-t _func_ = klass::unbox(superklass-of(arg0.klass)).methods.addrs[selector];\n";
     }
     my $arg_names_list;
     if ($big_generic) {
