@@ -1456,7 +1456,7 @@ sub generics::generate_generic_defn {
 
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
-    $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
+    $$scratch_str_ref .= "(cast(func (*)($$new_arg_type_list) -> $return_type)_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
       my $result = 'result';
       if ($$arg_names_list =~ m/,/) {
@@ -1551,7 +1551,7 @@ sub generics::generate_super_generic_defn {
     &dakota::util::_replace_first($new_arg_names, "arg0.self");
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
-    $$scratch_str_ref .= "(cast($return_type (*)($$new_arg_type_list))_func_)($$new_arg_names_list);\n";
+    $$scratch_str_ref .= "(cast(func (*)($$new_arg_type_list) -> $return_type)_func_)($$new_arg_names_list);\n";
     if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
       my $result = 'result';
       if ($$arg_names_list =~ m/,/) {
@@ -3184,7 +3184,7 @@ sub dk_generate_cc_footer_klass {
       my $list_types = &arg_type::list_types($$kw_args_method{'parameter-types'});
       my $kw_list_types = &method::kw_list_types($kw_args_method);
       $$scratch_str_ref .=
-        $col . "  (cast(dkt-signature-func-t)cast(const signature-t*(*)($$list_types))" .
+        $col . "  (cast(dkt-signature-func-t)cast(func (*)($$list_types) -> const signature-t*)" .
         $pad . "__kw-args-method-signature::va::$method_name)(),\n";
     }
     #$$scratch_str_ref .= "\#endif\n";
