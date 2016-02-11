@@ -949,12 +949,13 @@ sub method::generate_va_method_defn {
     $$scratch_str_ref .= " {" . &ann(__FILE__, $line) . "\n";
     $col = &colin($col);
     $$scratch_str_ref .=
-      $col . "static auto $method_type_decl = $scope_str\::va::$va_method_name;\n" .
+      $col . "static func $method_type_decl = $scope_str\::va::$va_method_name;\n" .
       $col . "va-list-t args;\n" .
       $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);\n";
 
     if (defined $$va_method{'return-type'}) {
-      $$scratch_str_ref .= $col . "auto result = ";
+      my $return_type = &arg::type($$va_method{'return-type'});
+      $$scratch_str_ref .= $col . "$return_type result = ";
     } else {
       $$scratch_str_ref .= $col . "";
     }
@@ -1248,7 +1249,7 @@ sub generics::generate_signature_seq {
       my $width = length($method_type);
       my $pad = ' ' x ($max_width - $width);
       my $name = "@{$$generic{'name'}}";
-      $scratch_str .= $col . "(cast(dkt-signature-func-t)cast(auto $method_type) " . $pad . "__signature::va::$name)(),\n";
+      $scratch_str .= $col . "(cast(dkt-signature-func-t)cast(func $method_type) " . $pad . "__signature::va::$name)(),\n";
     }
     $scratch_str .= $col . "nullptr,\n";
     $col = &colout($col);
@@ -1274,7 +1275,7 @@ sub generics::generate_signature_seq {
         my $pad = ' ' x ($max_width - $width);
         my $name = "@{$$generic{'name'}}";
         my $in = &ident_comment($name);
-        $scratch_str .= $col . "(cast(dkt-signature-func-t)cast(auto $method_type) " . $pad . "__signature::$name)()," . $in . "\n";
+        $scratch_str .= $col . "(cast(dkt-signature-func-t)cast(func $method_type) " . $pad . "__signature::$name)()," . $in . "\n";
       }
     }
     $scratch_str .= $col . "nullptr,\n";
@@ -1320,7 +1321,7 @@ sub generics::generate_selector_seq {
       my $name_width = length($name);
       my $name_pad = ' ' x ($max_name_width - $name_width);
       $scratch_str .=
-        $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast(auto $method_type) " .
+        $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast(func $method_type) " .
         $pad . "__selector::va::$name" . $name_pad . "))() },\n";
     }
     $scratch_str .= $col . "{ .next = nullptr, .ptr = nullptr },\n";
@@ -1357,7 +1358,7 @@ sub generics::generate_selector_seq {
         my $name_width = length($name);
         my $name_pad = ' ' x ($max_name_width - $name_width);
         $scratch_str .=
-          $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast(auto $method_type) " .
+          $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast(func $method_type) " .
           $pad . "__selector::$name" . $name_pad . "))() }," . $in . "\n";
       }
     }
@@ -1718,8 +1719,8 @@ sub generics::generate_va_make_defn {
   if (&is_nrt_decl() || &is_rt_decl()) {
     $result .= ";\n";
   } elsif (&is_rt_defn()) {
-    my $alloc_type_decl = "auto (*alloc)(object-t) -> object-t"; ### should use method::type_decl
-    my $init_type_decl =  "auto (*_func_)(object-t, va-list-t) -> object-t"; ### should use method::type_decl
+    my $alloc_type_decl = "FUNC (*alloc)(object-t) -> object-t"; ### should use method::type_decl
+    my $init_type_decl =  "FUNC (*_func_)(object-t, va-list-t) -> object-t"; ### should use method::type_decl
 
     $result .= " {" . &ann(__FILE__, __LINE__) . "\n";
     $col = &colin($col);
@@ -2896,9 +2897,9 @@ sub slots_signature_body {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
       if (&is_va($method)) {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(auto $method_type)" . $pad . "__slots-method-signature::va::$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)" . $pad . "__slots-method-signature::va::$generic_name)(),\n";
       } else {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(auto $method_type)" . $pad . "__slots-method-signature::$generic_name)(),\n";
+        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)" . $pad . "__slots-method-signature::$generic_name)(),\n";
       }
       my $method_name;
 
@@ -2937,9 +2938,9 @@ sub signature_body {
       my $generic_name = "@{$$method{'name'}}";
       my $in = &ident_comment($generic_name);
       if (&is_va($method)) {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(auto $method_type)" . $pad . "__signature::va::$generic_name)()," . $in . "\n";
+        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)" . $pad . "__signature::va::$generic_name)()," . $in . "\n";
       } else {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(auto $method_type)" . $pad . "__signature::$generic_name)()," . $in . "\n";
+        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)" . $pad . "__signature::$generic_name)()," . $in . "\n";
       }
       my $method_name;
 
@@ -2965,7 +2966,7 @@ sub address_body {
       # skip because its declared but not defined and should not be considered for padding
     } else {
       my $method_type = &method::type($method);
-      my $width = length("cast(auto $method_type)");
+      my $width = length("cast(func $method_type)");
       if ($width > $max_width) {
         $max_width = $width;
       }
@@ -2973,7 +2974,7 @@ sub address_body {
   }
   foreach my $method (@$sorted_methods) {
     my $method_type = &method::type($method);
-    my $width = length("cast(auto $method_type)");
+    my $width = length("cast(func $method_type)");
     my $pad = ' ' x ($max_width - $width);
 
     if (!$$method{'alias'}) {
@@ -2993,9 +2994,9 @@ sub address_body {
         $result .=   $col . "cast(method-t)"                   . $pad . "dkt-null-method, /*$method_name()*/\n";
       } else {
         if (&is_va($method)) {
-          $result .= $col . "cast(method-t)cast(auto $method_type)" . $pad . "va::$method_name," . $in . "\n";
+          $result .= $col . "cast(method-t)cast(func $method_type)" . $pad . "va::$method_name," . $in . "\n";
         } else {
-          $result .= $col . "cast(method-t)cast(auto $method_type)" . $pad . "$method_name," . $in . "\n";
+          $result .= $col . "cast(method-t)cast(func $method_type)" . $pad . "$method_name," . $in . "\n";
         }
       }
     }
@@ -3106,7 +3107,7 @@ sub dk_generate_cc_footer_klass {
 
         my $generic_name = "@{$$va_method{'name'}}";
 
-        $$scratch_str_ref .= $col . "(cast(dkt-signature-func-t)cast(auto $va_method_type)" . $pad . "__signature::va::$generic_name)(),\n";
+        $$scratch_str_ref .= $col . "(cast(dkt-signature-func-t)cast(func $va_method_type)" . $pad . "__signature::va::$generic_name)(),\n";
         my $method_name;
 
         if ($$va_method{'alias'}) {
@@ -3174,7 +3175,7 @@ sub dk_generate_cc_footer_klass {
 
         my $return_type = &arg::type($$va_method{'return-type'});
         my $va_method_name = $method_name;
-        $$scratch_str_ref .= $col . "cast(va-method-t)cast(auto $method_type)" . $pad . "$va_method_name,\n";
+        $$scratch_str_ref .= $col . "cast(va-method-t)cast(func $method_type)" . $pad . "$va_method_name,\n";
       }
       $va_method_num++;
     }
@@ -3806,7 +3807,7 @@ sub generate_kw_args_method_defn {
     my $kw_arg_name = $$kw_arg{'name'};
     $args .= ", $kw_arg_name";
   }
-  $$scratch_str_ref .= $col . "static auto $method_type_decl = $qualified_klass_name\::$method_name; /*qualqual*/\n";
+  $$scratch_str_ref .= $col . "static func $method_type_decl = $qualified_klass_name\::$method_name; /*qualqual*/\n";
   if ($$method{'return-type'}) {
     $$scratch_str_ref .=
       $col . "$return_type _result_ = $func_name($args);\n" .
