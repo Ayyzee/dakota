@@ -240,6 +240,8 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 [[so_export]] FUNC dk_intern_free(str_t) -> symbol_t;
 [[so_export]] FUNC dk_klass_for_name(symbol_t) -> object_t;
 
+[[so_export]] FUNC map(object_t, method_t) -> object_t;
+
 [[so_export]] FUNC dkt_register_info(named_info_t*) -> void;
 [[so_export]] FUNC dkt_deregister_info(named_info_t*) -> void;
 
@@ -266,7 +268,8 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 # define DKT_NULL_METHOD cast(method_t)dkt_null_method
 
 [[so_export]] [[noreturn]] FUNC dkt_null_method(object_t object, ...) -> void;
-[[so_export]] FUNC map(object_t, method_t) -> object_t;
+[[so_export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(object_t object, const signature_t* signature) -> void;
+[[so_export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(super_t context, const signature_t* signature) -> void;
 
 [[debug_so_export]] FUNC dkt_va_trace_before(const signature_t* signature, method_t method, object_t object,  va_list_t args) -> int_t;
 [[debug_so_export]] FUNC dkt_va_trace_before(const signature_t* signature, method_t method, super_t  context, va_list_t args) -> int_t;

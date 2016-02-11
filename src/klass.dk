@@ -70,7 +70,13 @@ namespace klass  { func name(object-t) -> symbol-t; }
 # endif
 
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
-  throw make(no-such-method-exception::klass, #object : object, #kls : klass-of(object));
+  throw make(no-such-method-exception::klass, #object : object);
+}
+[[noreturn]] func dkt-throw-no-such-method-exception(object-t object, const signature-t* signature) -> void {
+  throw make(no-such-method-exception::klass, #object : object, #signature : signature);
+}
+[[noreturn]] func dkt-throw-no-such-method-exception(super-t context, const signature-t* signature) -> void {
+  throw make(no-such-method-exception::klass, #context : context, #signature : signature);
 }
 klass selector-pair {
   slots {
@@ -331,6 +337,7 @@ klass klass {
     int64-t                  size;
     object-t                 superklass;
     symbol-t                 name; // redundant but convenient
+    const symbol-t*          traits; // redundant but convenient
     named-info::slots-t* info-slots;
     object-t behavior; // bit-vector
   }
@@ -699,15 +706,15 @@ klass klass {
         self.superklass = default-superklass();
     }
     self.behavior = nullptr; // hackhack
-    const symbol-t* traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
+    self.traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
 
-    if (nullptr != traits)
-      load-traits(traits);
+    if (nullptr != self.traits)
+      load-traits(self.traits);
     int64-t offset = offset-from-info(self.info-slots);
     self.offset = offset;
     alloc-methods(self, gbl-selectors-table.count);
     init-methods(self);
-    add-traits(self, traits);
+    add-traits(self, self.traits);
     boole-t override?;
     add-methods(self, self.info-slots, #method.signatures, #method.addresses, override? = true);
     add-methods(self, self.info-slots, #exported-method.signatures, #exported-method.addresses, override? = true);
@@ -723,8 +730,8 @@ klass klass {
     }
     else
       dkt-log(dkt::k-log-warning, "nullptr klass name");
-    if (nullptr != traits)
-      traits-initialize(self, traits);
+    if (nullptr != self.traits)
+      traits-initialize(self, self.traits);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info-slots, #method-aliases);
     if (nullptr != method-aliases) {
       int64-t i = 0;
@@ -745,6 +752,12 @@ klass klass {
                             "initialize", "klass", name,
                             cast(symbol-t)named-info::at(self.info-slots, #file));
       klass-initialize(self);
+    }
+    if (1) {
+      printf("klass: %s\n", self.name);
+      for (int64-t index = 0; index < self.methods.count; index++) {
+        printf("method: %p\n", self.methods.addrs[index]);
+      }
     }
     if (nullptr == bit-vector::klass)
       self.behavior = nullptr;
@@ -777,7 +790,7 @@ klass klass {
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
     object-t kls = self;
     while (nullptr != kls && null != kls) {
-      const symbol-t* traits = cast(const symbol-t*)named-info::at(unbox(kls).info-slots, #traits);
+      const symbol-t* traits = unbox(kls).traits;
       while (nullptr != traits && nullptr != *traits) {
         if (trait == *traits++) {
           return kls;

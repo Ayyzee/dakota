@@ -24,67 +24,71 @@ klass no-such-method-exception {
   superklass exception;
 
   slots {
-    object-t     object;
-    object-t     kls;
+    super-t      context; // used as context xor just .object (for object-t self aka 'object')
     signature-t* signature;
   }
   method init(object-t     self,
               str-t        src-file :,
               int-t        src-line :,
-              object-t     object :,
-              object-t     superkls :  nullptr,
+              object-t     object : nullptr,
+              super-t      context : { nullptr, nullptr },
               signature-t* signature : nullptr) -> object-t {
     self = $init(super, #src-file : src-file, #src-line : src-line);
-    self.object = object;
     self.signature = signature;
-    if (nullptr != superkls)
-      self.kls = superkls;
-    else
-      self.kls = klass-of(self.object);
+    if ((!object && !context.object) || (object && context.object))
+      abort();
+    self.context = { nullptr, nullptr };
+    if (nullptr != context.object)
+      self.context = context;
+    else if (nullptr != object) 
+      self.context.object = object;
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
     $print(super, out);
+    object-t kls = klass-of(self.context.object);
+    if (self.context.klass)
+      klass = superklass-of(self.context.klass);
 
     if (nullptr == self.signature) {
-      if ($instance?(self.object, klass::klass)) {
+      if ($instance?(self.context.object, klass::klass)) {
         $print-format(out, ", \"instance\": '%s', klass: '%s'",
-                         name-of(self.object),
-                         name-of(self.kls));
+                         name-of(self.context.object),
+                         name-of(klass-of(self.context.object)));
       } else {
         $print-format(out, ", \"instance\": %s, klass: '%s'",
-                         $str(self.object),
-                         name-of(self.kls));
+                         $str(self.context.object),
+                         name-of(klass-of(self.context.object)));
       }
     } else {
-      assert(self.kls == klass-of(self.object) ||
-             self.kls == superklass-of(klass-of(self.object)));
+      assert(kls == klass-of(self.context.object) ||
+             kls == superklass-of(klass-of(self.context.object)));
 
-      if (self.kls == superklass-of(self.kls)) {
-        if ($instance?(self.object, klass::klass)) {
+      if (kls == superklass-of(kls)) {
+        if ($instance?(self.context.object, klass::klass)) {
           $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\", \"method\": \"%s(%s)\"",
-                           name-of(self.object),
-                           name-of(self.kls),
+                           name-of(self.context.object),
+                           name-of(kls),
                            self.signature->name,
                            self.signature->parameter-types);
         } else {
           $print-format(out, ", \"instance\": %s, \"klass\": \"%s\", \"method\": \"%s(%s)\"",
-                           $str(self.object),
-                           name-of(self.kls),
+                           $str(self.context.object),
+                           name-of(kls),
                            self.signature->name,
                            self.signature->parameter-types);
         }
       } else {
-        if ($instance?(self.object, klass::klass)) {
+        if ($instance?(self.context.object, klass::klass)) {
           $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\", \"method\": \"%s(%s)\"",
-                           name-of(self.object),
-                           name-of(self.kls),
+                           name-of(self.context.object),
+                           name-of(kls),
                            self.signature->name,
                            self.signature->parameter-types);
         } else {
           $print-format(out, ", \"instance\": %s, \"klass\": \"%s\". \"method\": \"%s(%s)\"",
-                           $str(self.object),
-                           name-of(self.kls),
+                           $str(self.context.object),
+                           name-of(kls),
                            self.signature->name,
                            self.signature->parameter-types);
         }

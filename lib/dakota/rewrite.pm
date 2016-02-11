@@ -956,6 +956,8 @@ sub rewrite_map {
 sub rewrite_func {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s)func(\s+$rmid\s*\()/$1FUNC$2/g;
+  $$filestr_ref =~ s/\bcast(\s*)\((\s*)func(\s+)/cast$1($2FUNC$3/g;
+  $$filestr_ref =~ s/\btypedef(\s+)func(\s+)/typedef$1FUNC$2/g;
 }
 sub rewrite_method_chaining_replacement {
   my ($func, $leading_expr, $args) = @_;

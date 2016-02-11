@@ -607,7 +607,7 @@ sub arg_type::names {
   my $arg_names = [];
 
   if (&path::string($global_seq_super_t) eq  "@{$$arg_type_ref[0]}") {
-    $$arg_names[0] = "arg0";    # replace_first
+    $$arg_names[0] = "context";    # replace_first
   } else {
     $$arg_names[0] = 'object';  # replace_first
   }
@@ -1437,22 +1437,27 @@ sub generics::generate_generic_defn {
         $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n";
       }
     }
+    my $signature;
     if (&is_va($generic)) {
-      $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
-        $col . "method-t _func_ = klass::unbox(klass-of(object)).methods.addrs[selector];\n";
+      $signature = "SIGNATURE(va::$generic_name($$new_arg_type_list))";
+      $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n";
     } else {
-      $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
-        $col . "method-t _func_ = klass::unbox(klass-of(object)).methods.addrs[selector];\n";
+      $signature = "SIGNATURE($generic_name($$new_arg_type_list))";
+      $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n";
     }
+    $$scratch_str_ref .= $col . "typedef func (*func-t)($$new_arg_type_list) -> $return_type;\n";
+    $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(object)).methods.addrs[selector];\n";
+    $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
+    $col = &colin($col);
+    $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(object, $signature);)\n";
+    $col = &colout($col);
     my $arg_names_list;
     if ($big_generic) {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
-      $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon object, \#signature $colon signature));\n";
       my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
       $arg_names_list = &arg_type::list_names($arg_names);
 
       if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
-        $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list, nullptr);\n";
+        $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, cast(method-t)_func_, $$arg_names_list, nullptr);\n";
       }
     }
     if (defined $$generic{'return-type'}) {
@@ -1463,7 +1468,7 @@ sub generics::generate_generic_defn {
 
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
-    $$scratch_str_ref .= "(cast(func (*)($$new_arg_type_list) -> $return_type)_func_)($$new_arg_names_list);\n";
+    $$scratch_str_ref .= "_func_($$new_arg_names_list);\n";
     if ($big_generic) {
       if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
         my $result = 'result';
@@ -1538,24 +1543,29 @@ sub generics::generate_super_generic_defn {
         $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n";
       }
     }
+    my $signature;
     if (&is_va($generic)) {
+      $signature = "SIGNATURE(va::$generic_name($$new_arg_type_list))";
       $$scratch_str_ref .=
-        $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n" .
-        $col . "method-t _func_ = klass::unbox(superklass-of(arg0.klass)).methods.addrs[selector];\n";
+        $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n";
     } else {
+      $signature = "SIGNATURE($generic_name($$new_arg_type_list))";
       $$scratch_str_ref .=
-        $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n" .
-        $col . "method-t _func_ = klass::unbox(superklass-of(arg0.klass)).methods.addrs[selector];\n";
+        $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n";
     }
+    $$scratch_str_ref .= $col . "typedef func (*func-t)($$new_arg_type_list) -> $return_type;\n";
+    $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];\n";
+    $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
+    $col = &colin($col);
+    $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(context, $signature);)\n";
+    $col = &colout($col);
     my $arg_names_list;
     if ($big_generic) {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == _func_)\n";
-      $$scratch_str_ref .= $col . "  throw make(no-such-method-exception::klass, \#object $colon arg0.self, \#superkls $colon superklass-of(arg0.klass), \#signature $colon signature));\n";
       my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
       $arg_names_list = &arg_type::list_names($arg_names);
 
       if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
-        $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, _func_, $$arg_names_list, nullptr);\n";
+        $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, cast(method-t)_func_, $$arg_names_list, nullptr);\n";
       }
     }
     if (defined $$generic{'return-type'}) {
@@ -1564,10 +1574,10 @@ sub generics::generate_super_generic_defn {
 
     $new_arg_type = &arg_type::super($new_arg_type);
     $new_arg_names = &arg_type::names($new_arg_type);
-    &dakota::util::_replace_first($new_arg_names, "arg0.self");
+    &dakota::util::_replace_first($new_arg_names, "context.object");
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
-    $$scratch_str_ref .= "(cast(func (*)($$new_arg_type_list) -> $return_type)_func_)($$new_arg_names_list);\n";
+    $$scratch_str_ref .= "_func_($$new_arg_names_list);\n";
     if ($big_generic) {
       if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
         my $result = 'result';
