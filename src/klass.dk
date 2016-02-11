@@ -534,7 +534,7 @@ klass klass {
   }
   // use for both klasses (and klass-x) and traits (and trait-x)
   static func add-methods(object-t self, named-info-t* info,
-                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses) -> void {
+                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses, boole-t override?) -> void {
     named-info-t* current-info = info;
     do {
       signature-t** method-signatures = cast(signature-t**)named-info::at(current-info, symbol-method-signatures);
@@ -545,14 +545,29 @@ klass klass {
         int64-t index = 0;
         signature-t* signature;
         method-t   address;
+
+        auto add-method-and-set-behavior = [](object-t self, selector-t _selector, method-t _address) -> method-t {
+          method-t prev-address = add-method-for-selector(self, _selector, _address);
+          if (nullptr != self.behavior) {
+            $set-bit(self.behavior, cast(int64-t)_selector, true);
+          }
+          return prev-address;
+        };
+
         while (nullptr != (signature = method-signatures[index])) {
           if (nullptr != (address = method-addresses[index])) {
             // can NOT dynamicly dispatch
             selector-t selector = selector-for-signature(signature);
-            add-method-for-selector(self, selector, address);
-
-            if (nullptr != self.behavior) {
-              $set-bit(self.behavior, cast(int64-t)selector, true);
+            if (!override?) { // don't set if an already valid method is present
+              printf("%s: %s ...\n", self.name, name-from-info(current-info));
+              method-t prev-address = method-for-selector(self, selector);
+              if (nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address) {
+                printf("%s: %s ... done\n", self.name, name-from-info(current-info));
+                prev-address = add-method-and-set-behavior(self, selector, address);
+                assert(nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address);
+              }
+            } else {
+              add-method-and-set-behavior(self, selector, address);
             }
           } else {
             // ???
@@ -565,18 +580,14 @@ klass klass {
   }
   static func add-traits(object-t self, const symbol-t* traits) -> void {
     if (nullptr != traits) {
-      int64-t length = 0;
-      while (nullptr != traits[length])
-        length++;
-
-      int64-t pos = length;
-      while (pos) {
-        named-info-t* info = info-for-name(traits[pos - 1]);
+      symbol-t trt;
+      for (int64-t i = 0; nullptr != (trt = traits[i]); i++) {
+        named-info-t* info = info-for-name(trt);
         const symbol-t* used-traits = cast(const symbol-t*)named-info::at(info, #traits);
         add-traits(self, used-traits);
-        add-methods(self, info, #method.signatures, #method.addresses);
-        add-methods(self, info, #exported-method.signatures, #exported-method.addresses);
-        pos--;
+        boole-t override?;
+        add-methods(self, info, #method.signatures, #method.addresses, override? = false);
+        add-methods(self, info, #exported-method.signatures, #exported-method.addresses, override? = false);
       }
     }
     return;
@@ -699,8 +710,9 @@ klass klass {
     alloc-methods(self, gbl-selectors-table.count);
     init-methods(self);
     add-traits(self, traits);
-    add-methods(self, self.info-slots, #method.signatures, #method.addresses);
-    add-methods(self, self.info-slots, #exported-method.signatures, #exported-method.addresses);
+    boole-t override?;
+    add-methods(self, self.info-slots, #method.signatures, #method.addresses, override? = true);
+    add-methods(self, self.info-slots, #exported-method.signatures, #exported-method.addresses, override? = true);
 
     if (nullptr != name) {
       assoc-node-t* imported-klasses = imported-klasses-for-klass(name);
