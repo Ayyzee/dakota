@@ -559,10 +559,8 @@ klass klass {
             // can NOT dynamicly dispatch
             selector-t selector = selector-for-signature(signature);
             if (!override?) { // don't set if an already valid method is present
-              printf("%s: %s ...\n", self.name, name-from-info(current-info));
               method-t prev-address = method-for-selector(self, selector);
               if (nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address) {
-                printf("%s: %s ... done\n", self.name, name-from-info(current-info));
                 prev-address = add-method-and-set-behavior(self, selector, address);
                 assert(nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address);
               }
