@@ -1039,7 +1039,7 @@ sub common::print_signature {
     }
     my $parameter_types_str = $$new_arg_type_list;
 
-    $scratch_str .= $col . "static signature-t const result = { .name = \"$name_str\", .parameter-types = \"$parameter_types_str\", .return-type = \"$return_type_str\" };\n";
+    $scratch_str .= $col . "static const signature-t result = { .name = \"$name_str\", .parameter-types = \"$parameter_types_str\", .return-type = \"$return_type_str\" };\n";
     $scratch_str .= $col . "return &result;\n";
     $col = &colout($col);
 
@@ -3602,8 +3602,8 @@ sub generate_kw_args_method_signature_defn {
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   my $padlen = length($col);;
-  $padlen += length("static signature-t const result = { ");
-  my $kw_arg_list = "static signature-t const result = { .name = \"$method_name\"," . "\n" .
+  $padlen += length("static const signature-t result = { ");
+  my $kw_arg_list = "static const signature-t result = { .name = \"$method_name\"," . "\n" .
     (' ' x $padlen) . ".parameter-types = " .
     "\"" . &method::kw_list_types($method) . "\"," . "\n" .
     (' ' x $padlen) . ".return-type = \"$return_type\" };";
@@ -3630,7 +3630,7 @@ sub generate_slots_method_signature_defn {
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
 
-  my $arg_list = "static signature-t const result = { .name = \"$method_name\", .parameter-types = \"";
+  my $arg_list = "static const signature-t result = { .name = \"$method_name\", .parameter-types = \"";
   $arg_list .= &method::list_types($method);
   $arg_list .= "\", .return-type = \"$return_type\" };";
   $$scratch_str_ref .=
@@ -3712,6 +3712,7 @@ sub generate_kw_args_method_defn {
     foreach my $kw_arg (@{$$method{'keyword-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
       my $kw_arg_type = &arg::type($$kw_arg{'type'});
+      $kw_arg_type =~ s/\[\s*\]$/*/; # to change object-t[] objects to object-t* objects
       $$scratch_str_ref .= "$delim$kw_arg_type $kw_arg_name \{};";
       $delim = ' ';
     }

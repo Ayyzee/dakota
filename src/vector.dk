@@ -89,11 +89,11 @@ klass vector {
   // using compound literals 'objects' can be used as follows:
   // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
-  method init(object-t  self,
-              ssize-t   initial-capacity : $initial-capacity(klass-of(self)),
-              object-t  fill-element :     $fill-element(klass-of(self)),
-              object-t  elements :         nullptr,
-              object-t* objects :          nullptr) -> object-t {
+  method init(object-t   self,
+              ssize-t    initial-capacity : $initial-capacity(klass-of(self)),
+              object-t   fill-element :     $fill-element(klass-of(self)),
+              object-t   elements :         nullptr,
+              object-t[] objects :          nullptr) -> object-t {
     // it IS legal to have the 'fill' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);

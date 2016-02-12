@@ -53,9 +53,9 @@ klass hashed-set {
   // using compound literals 'objects' can be used as follows:
   // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
-  method init(object-t  self,
-                       object-t  elements : nullptr,
-                       object-t* objects :    nullptr) -> object-t {
+  method init(object-t   self,
+              object-t   elements : nullptr,
+              object-t[] objects :  nullptr) -> object-t {
     self = $init(super);
     self.num-buckets = gbl-prime;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);

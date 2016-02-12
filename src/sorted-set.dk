@@ -51,10 +51,10 @@ klass sorted-set {
     result *= -1;
     return result;
   }
-  method init(object-t  self,
-              int64-t   initial-capacity : gbl-default-capacity,
-              object-t  elements :         nullptr,
-              object-t* objects :            nullptr) -> object-t {
+  method init(object-t   self,
+              int64-t    initial-capacity : gbl-default-capacity,
+              object-t   elements :         nullptr,
+              object-t[] objects :          nullptr) -> object-t {
     assert(0 != initial-capacity);
 
     self = $init(super);
