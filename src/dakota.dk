@@ -130,22 +130,22 @@ static func init-runtime-ds() -> void {
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
                         ssizeof(named-assoc-node::slots-t),
-                        cast(std-compare-t)cast(auto (*)(named-assoc-node::slots-t*,
+                        cast(std-compare-t)cast(func (*)(named-assoc-node::slots-t*,
                                                          named-assoc-node::slots-t*) -> int-t)named-assoc-node::compare);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
                         ssizeof(named-info::slots-t*),
-                        cast(std-compare-t)cast(auto (*)(named-info::slots-t**,
+                        cast(std-compare-t)cast(func (*)(named-info::slots-t**,
                                                          named-info::slots-t**) -> int-t)named-info::compare);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                         ssizeof(property::slots-t),
-                        cast(std-compare-t)cast(auto (*)(property::slots-t*,
+                        cast(std-compare-t)cast(func (*)(property::slots-t*,
                                                          property::slots-t*) -> int-t)property::compare);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                         ssizeof(symbol-t),
-                        cast(std-compare-t)cast(auto (*)(symbol::slots-t*,
+                        cast(std-compare-t)cast(func (*)(symbol::slots-t*,
                                                          symbol::slots-t*) -> int-t)symbol::compare);
   return;
 }
@@ -455,10 +455,10 @@ func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
   object-t klass = dk-register-klass(klass-info);
   return klass;
 }
-typedef auto (*each-box-func-t)(...) -> object-t;
-typedef auto (*named-info-func-t)(named-info-t*, each-box-func-t) -> void;
-typedef auto (*str-box-func-t)(str-t)     -> object-t;
-typedef auto (*int-box-func-t)(intptr-t) -> object-t;
+typedef func (*each-box-func-t)(...) -> object-t;
+typedef func (*named-info-func-t)(named-info-t*, each-box-func-t) -> void;
+typedef func (*str-box-func-t)(str-t)     -> object-t;
+typedef func (*int-box-func-t)(intptr-t) -> object-t;
     
 func register-info-common(named-info-t* ni, each-box-func-t box-func) -> void;
 
@@ -601,17 +601,17 @@ func dk-init-runtime() -> void {
 
     dk-klass-for-name(#str);
     each(gbl-registration-info-list,
-         cast(named-info-func-t)cast(auto (*)(named-info-t*, str-box-func-t) -> void)each-str,
+         cast(named-info-func-t)cast(func (*)(named-info-t*, str-box-func-t) -> void)each-str,
          cast(each-box-func-t)cast(str-box-func-t)str::box);
     dk-klass-for-name(#intptr);
     each(gbl-registration-info-list,
-         cast(named-info-func-t)cast(auto (*)(named-info-t*, int-box-func-t) -> void)each-int,
+         cast(named-info-func-t)cast(func (*)(named-info-t*, int-box-func-t) -> void)each-int,
          cast(each-box-func-t)cast(int-box-func-t)intptr::box);
 
-    auto previous-terminate = std::set-terminate(verbose-terminate);
+    FUNC previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
 
-    auto previous-unexpected = std::set-unexpected(verbose-unexpected);
+    FUNC previous-unexpected = std::set-unexpected(verbose-unexpected);
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 # if 0
@@ -1589,16 +1589,16 @@ func dk-intern(str-t key) -> symbol-t {
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
   return val;
 }
-static func get-klass-chain(object-t klass, char8-t* buf, int64-t buf-len) -> char8-t* {
-  object-t superklass = $superklass(klass);
+static func get-klass-chain(object-t kls, char8-t* buf, int64-t buf-len) -> char8-t* {
+  object-t superklass = superklass-of(kls);
   if (nullptr != superklass && null != superklass)
     get-klass-chain(superklass, buf, buf-len); // recursive
-  str-t klass-name = $name(klass);
+  str-t kls-name = name-of(kls);
   strcat(buf, "/");
-  strcat(buf, klass-name);
+  strcat(buf, kls-name);
   return buf;
 }
-func dkt-get-klass-chain(object-t klass, char8-t* buf, int64-t buf-len) -> char8-t* {
+func dkt-get-klass-chain(object-t kls, char8-t* buf, int64-t buf-len) -> char8-t* {
   buf[0] = NUL;
-  return get-klass-chain(klass, buf, buf-len);
+  return get-klass-chain(kls, buf, buf-len);
 }

@@ -98,7 +98,7 @@ sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                 0,
                                                 scountof(gbl-selectors),
                                                 ssizeof(gbl-selectors[0]),
-                                                cast(std-compare-t)cast(auto (*)(selector-pair-t*,
+                                                cast(std-compare-t)cast(func (*)(selector-pair-t*,
                                                                                  selector-pair-t*) -> int-t)selector-pair::compare };
 
 //   void dump-selectors()
@@ -274,17 +274,6 @@ func offset-from-info(named-info-t* info) -> int64-t {
   result = round-alignment(result);
   return result;
 }
-static func load-traits(const symbol-t* traits) -> void {
-  if (nullptr != traits) {
-    int64-t i = 0;
-    symbol-t trait-name;
-    while (nullptr != (trait-name = traits[i++])) {
-      named-info-t* info = info-for-name(trait-name);
-      load-traits(cast(const symbol-t*)named-info::at(info, #traits));
-    }
-  }
-  return;
-}
 klass resource-usage {
   slots {
     int64-t memory;
@@ -455,7 +444,7 @@ klass klass {
 
     // traits
     fprintf(stderr, ", traits=["); {
-      const symbol-t* traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
+      const symbol-t* traits = self.traits;;
       if (nullptr != traits) {
         fprintf(stderr, " ");
         str-t delim = "";
@@ -481,7 +470,7 @@ klass klass {
   }
   method traits(object-t self) -> object-t {
     object-t seq = make(vector::klass);
-    const symbol-t* traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
+    const symbol-t* traits = self.traits;;
     
     if (nullptr != traits) {
       int64-t i = 0;
@@ -553,7 +542,7 @@ klass klass {
         signature-t* signature;
         method-t   address;
 
-        auto add-method-and-set-behavior = [](object-t self, selector-t _selector, method-t _address) -> method-t {
+        FUNC add-method-and-set-behavior = [&](selector-t _selector, method-t _address) -> method-t {
           method-t prev-address = add-method-for-selector(self, _selector, _address);
           if (nullptr != self.behavior) {
             $set-bit(self.behavior, cast(int64-t)_selector, true);
@@ -568,11 +557,11 @@ klass klass {
             if (!override?) { // don't set if an already valid method is present
               method-t prev-address = method-for-selector(self, selector);
               if (nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address) {
-                prev-address = add-method-and-set-behavior(self, selector, address);
+                prev-address = add-method-and-set-behavior(selector, address);
                 assert(nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address);
               }
             } else {
-              add-method-and-set-behavior(self, selector, address);
+              add-method-and-set-behavior(selector, address);
             }
           } else {
             // ???
@@ -583,17 +572,28 @@ klass klass {
     } while (nullptr != (current-info = current-info->next));
     return;
   }
+  static func load-traits(const symbol-t* traits) -> void {
+    if (nullptr == traits || nullptr == traits[0])
+      return;
+    int64-t i = 0;
+    symbol-t trait-name;
+    while (nullptr != (trait-name = traits[i++])) {
+      named-info-t* trait-info = info-for-name(trait-name);
+      load-traits(cast(const symbol-t*)named-info::at(trait-info, #traits));
+    }
+    return;
+  }
   static func add-traits(object-t self, const symbol-t* traits) -> void {
-    if (nullptr != traits) {
-      symbol-t trt;
-      for (int64-t i = 0; nullptr != (trt = traits[i]); i++) {
-        named-info-t* info = info-for-name(trt);
-        const symbol-t* used-traits = cast(const symbol-t*)named-info::at(info, #traits);
-        add-traits(self, used-traits);
-        boole-t override?;
-        add-methods(self, info, #method.signatures, #method.addresses, override? = false);
-        add-methods(self, info, #exported-method.signatures, #exported-method.addresses, override? = false);
-      }
+    if (nullptr == traits || nullptr == traits[0])
+      return;
+    int64-t i = 0;
+    symbol-t trait-name;
+    while (nullptr != (trait-name = traits[i++])) {
+      named-info-t* trait-info = info-for-name(trait-name);
+      add-traits(self, cast(const symbol-t*)named-info::at(trait-info, #traits));
+      boole-t override?;
+      add-methods(self, trait-info, #method.signatures, #method.addresses, override? = false);
+      add-methods(self, trait-info, #exported-method.signatures, #exported-method.addresses, override? = false);
     }
     return;
   }
@@ -603,17 +603,14 @@ klass klass {
     int64-t i = 0;
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
-      named-info-t* info = info-for-name(trait-name);
-
-      if (nullptr != info) {
-        initialize-func-t trait-initialize = cast(initialize-func-t)named-info::at(info, #initialize);
-        if (nullptr != trait-initialize) {
-          DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
-                                "initialize", trait-name, "klass",
-                                cast(symbol-t)named-info::at(self.info-slots, #name),
-                                cast(symbol-t)named-info::at(self.info-slots, #file));
-          trait-initialize(self);
-        }
+      named-info-t* trait-info = info-for-name(trait-name);
+      initialize-func-t trait-initialize = cast(initialize-func-t)named-info::at(trait-info, #initialize);
+      if (nullptr != trait-initialize) {
+        DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
+                              "initialize", trait-name, "klass",
+                              cast(symbol-t)named-info::at(self.info-slots, #name),
+                              cast(symbol-t)named-info::at(self.info-slots, #file));
+        trait-initialize(self);
       }
     }
     return;
@@ -770,11 +767,6 @@ klass klass {
 # endif
     return self;
   } // init(object-t self, named-info::slots-t*)
-
-  method superklass(object-t self) -> object-t {
-    object-t superklass = superklass-of(self);
-    return superklass;
-  }
   method subklass?(object-t self, object-t kls) -> boole-t {
     boole-t state = false;
     object-t tmp-kls = self;
