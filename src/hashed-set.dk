@@ -58,7 +58,7 @@ klass hashed-set {
               object-t[] objects :  nullptr) -> object-t {
     self = $init(super);
     self.num-buckets = gbl-prime;
-    self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill : nullptr);
+    self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill-element : nullptr);
     self.size = 0;
 
     self.iterator-state = 0;
