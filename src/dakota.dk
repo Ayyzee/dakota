@@ -339,7 +339,7 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
     named-info-t* current-info = klass-info;
 
     do {
-      symbol-t type = cast(symbol-t)named-info::at(current-info, #type);
+      symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(intptr-t)#klass);
       if (#klass == type)
         klasses-count++;
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method.signatures);
@@ -380,7 +380,7 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
       ostream::println-format(ostrm, "'%s' :\n", name);
       ostream::println-format(ostrm, "{\n");
       ostream::col-incr(ostrm);
-      symbol-t type = cast(symbol-t)named-info::at(current-info, #type);
+      symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(intptr-t)#klass);
       ostream::println-format(ostrm, "'type' : '%s',\n", type);
       if (nullptr != klass-name)
         ostream::println-format(ostrm, "'klass' : '%s',\n",      klass-name);
@@ -500,7 +500,7 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
   assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int.ptrs);
   if (assocs) {
     symbol-t*  names =    cast(decltype(names))   named-info::at(info, #int.names);
-    intptr-t* literals = cast(decltype(literals))named-info::at(info, #int.literals);
+    intptr-t*  literals = cast(decltype(literals))named-info::at(info, #int.literals);
     assert(nullptr != literals);
     int64-t i = 0;
     while (1) {
@@ -721,7 +721,7 @@ func dk-register-klass(named-info-t* klass-info) -> object-t {
 
   symbol-t interpose-name = cast(symbol-t)named-info::at(klass-info, #interpose-name);
   if (nullptr != interpose-name) {
-    symbol-t type = cast(symbol-t)named-info::at(klass-info, #type);
+    symbol-t type = cast(symbol-t)named-info::at(klass-info, #type, cast(intptr-t)#klass);
     assert(#klass == type);
     add-interpose-prop(interpose-name, name);
   }
@@ -870,7 +870,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
     ostream::println-format(ostrm, "} // export\n"); // closes "export {" from dump-klass()
   }
   return;
-}
+} // dump-klass-defns()
 static func max-enum-name-width(enum-info-t* enum-info) -> int-t {
   int-t result = 0;
   int-t i = 0;
@@ -913,62 +913,92 @@ static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
                   info->return-type);
   return;
 }
+klass catalog-info {
+  slots {
+    symbol-t                  name;
+    symbol-t                  superklass-name;
+    symbol-t                  klass-name;
+
+    symbol-t                  modulee;
+    symbol-t                  cat;
+    symbol-t                  type;
+    symbol-t                  interpose-name;
+    const symbol-t*           traits;
+    const symbol-t*           requires;
+    const symbol-t*           provides;
+    const signature-t* const* method-signatures;
+    const signature-t* const* kw-args-method-signatures;
+    const signature-t* const* exported-method-signatures;
+    const signature-t* const* exported-slots-method-signatures;
+    const signature-t* const* slots-method-signatures;
+  //const signature-t* const* va-method-signatures;
+  //const signature-t* const* va-slots-method-signatures;
+    const named-enum-info-t*  enum-info;
+    const const-info-t*       const-info;
+    str-t                     slots-type;
+    str-t                     enum-base;
+    named-info-t*             slots-info;
+  }
+}
+static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* ci) -> void {
+  *ci = {
+    .name =            name-from-info(ni),
+    .superklass-name = superklass-name-from-info(ni),
+    .klass-name =      klass-name-from-info(ni),
+
+    .modulee =                          cast(decltype(ci->modulee))                           named-info::at(ni, #module),
+    .cat =                              cast(decltype(ci->cat))                               named-info::at(ni, #cat, cast(intptr-t)#struct),
+    .type =                             cast(decltype(ci->type))                              named-info::at(ni, #type, cast(intptr-t)#klass),
+    .interpose-name =                   cast(decltype(ci->interpose-name))                    named-info::at(ni, #interpose-name),
+    .traits =                           cast(decltype(ci->traits))                            named-info::at(ni, #traits),
+    .requires =                         cast(decltype(ci->requires))                          named-info::at(ni, #requires),
+    .provides =                         cast(decltype(ci->provides))                          named-info::at(ni, #provides),
+    .method-signatures =                cast(decltype(ci->method-signatures))                 named-info::at(ni, #method.signatures),
+    .kw-args-method-signatures =        cast(decltype(ci->kw-args-method-signatures))         named-info::at(ni, #kw-args-method-signatures),
+    .exported-method-signatures =       cast(decltype(ci->exported-method-signatures))        named-info::at(ni, #exported-method.signatures),
+    .exported-slots-method-signatures = cast(decltype(ci->exported-slots-method-signatures))  named-info::at(ni, #exported-slots-method.signatures),
+    .slots-method-signatures =          cast(decltype(ci->slots-method-signatures))           named-info::at(ni, #slots-method.signatures),
+  //.va-method-signatures =             cast(decltype(ci->va-method-signatures))              named-info::at(ni, #va-method.signatures),
+  //.va-slots-method-signatures =       cast(decltype(ci->va-slots-method-signatures))        named-info::at(ni, #va-slots-method.signatures),
+    .enum-info =                        cast(decltype(ci->enum-info))                         named-info::at(ni, #enum-info),
+    .const-info =                       cast(decltype(ci->const-info))                        named-info::at(ni, #const-info),
+    .slots-type =                       cast(decltype(ci->slots-type))                        named-info::at(ni, #slots-type),
+    .enum-base =                        cast(decltype(ci->enum-base))                         named-info::at(ni, #enum-base),
+    .slots-info =                       cast(decltype(ci->slots-info))                        named-info::at(ni, #slots-info),
+  };
+  return;
+}
 func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module) -> symbol-t {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != klass-info);
 
-  symbol-t name = name-from-info(klass-info);
-  symbol-t superklass-name = superklass-name-from-info(klass-info);
-  symbol-t klass-name = klass-name-from-info(klass-info);
+  catalog-info::slots-t ci {};
+  named-info-to-catalog-info(klass-info, &ci);
 
-  symbol-t                  modulee =                        cast(str-t)                    named-info::at(klass-info, #module);
-  symbol-t                  cat =                            cast(symbol-t)                 named-info::at(klass-info, #cat, cast(intptr-t)#struct);
-  symbol-t                  type =                           cast(symbol-t)                 named-info::at(klass-info, #type, cast(intptr-t)#klass);
-  symbol-t                  interpose-name =                 cast(symbol-t)                 named-info::at(klass-info, #interpose-name);
-  const symbol-t*           traits =                         cast(const symbol-t*)          named-info::at(klass-info, #traits);
-  const symbol-t*           requires =                       cast(const symbol-t*)          named-info::at(klass-info, #requires);
-  const symbol-t*           provides =                       cast(const symbol-t*)          named-info::at(klass-info, #provides);
-  const signature-t* const* method-signatures =              cast(const signature-t* const*)named-info::at(klass-info, #method.signatures);
-  const signature-t* const* kw-args-method-signatures =      cast(const signature-t* const*)named-info::at(klass-info, #kw-args-method-signatures);
-  const signature-t* const* exported-method-signatures =     cast(const signature-t* const*)named-info::at(klass-info, #exported-method.signatures);
-  const signature-t* const* exported-slots-method-signatures = cast(const signature-t* const*)named-info::at(klass-info, #exported-slots-method.signatures);
-  const signature-t* const* slots-method-signatures =        cast(const signature-t* const*)named-info::at(klass-info, #slots-method.signatures);
-//const signature-t* const* va-method-signatures =           cast(const signature-t* const*)named-info::at(klass-info, #va-method.signatures);
-//const signature-t* const* va-slots-method-signatures =     cast(const signature-t* const*)named-info::at(klass-info, #va-slots-method.signatures);
-  const named-enum-info-t*  enum-info =                      cast(const named-enum-info-t*) named-info::at(klass-info, #enum-info);
-  const const-info-t*       const-info =                     cast(const const-info-t*)      named-info::at(klass-info, #const-info);
-  str-t                     slots-type =                     cast(str-t)                    named-info::at(klass-info, #slots-type);
-  str-t                     enum-base =                      cast(str-t)                    named-info::at(klass-info, #enum-base);
-  named-info-t*             slots-info =                     cast(named-info-t*)            named-info::at(klass-info, #slots-info);
-//     const method-t* method-addresses =          cast(method-t*)named-info::at(klass-info, #method.addresses);
-//     const method-t* va-method-addresses =       cast(method-t*)named-info::at(klass-info, #va-method.addresses);
-//     const method-t* slots-method-addresses =    cast(method-t*)named-info::at(klass-info, #slots-method.addresses);
-//     const method-t* va-slots-method-addresses = cast(method-t*)named-info::at(klass-info, #va-slots-method.addresses);
-
-  assert(nullptr != type);
-  assert(nullptr != name);
-  assert(!(nullptr != interpose-name && nullptr != superklass-name));
+  assert(nullptr != ci.type);
+  assert(nullptr != ci.name);
+  assert(!(nullptr != ci.interpose-name && nullptr != ci.superklass-name));
 
   boole-t verbose = 0;
 
   if (verbose) {
-    if (nullptr == superklass-name)
-      superklass-name = default-superklass-name();
-    if (nullptr == klass-name)
-      superklass-name = default-klass-name();
+    if (nullptr == ci.superklass-name)
+      ci.superklass-name = default-superklass-name();
+    if (nullptr == ci.klass-name)
+      ci.superklass-name = default-klass-name();
   } else {
-    if (default-superklass-name() == superklass-name)
-      superklass-name = nullptr;
-    if (default-klass-name() == klass-name)
-      klass-name = nullptr;
+    if (default-superklass-name() == ci.superklass-name)
+      ci.superklass-name = nullptr;
+    if (default-klass-name() == ci.klass-name)
+      ci.klass-name = nullptr;
   }
-  if (nullptr != prev-module && prev-module != modulee) {
+  if (nullptr != prev-module && prev-module != ci.modulee) {
     ostream::col-decr(ostrm);
     ostream::println-format(ostrm, "} // export\n"); // closes "export {" from prev dump-klass()
   }
-  if (prev-module != modulee) {
-    ostream::println-format(ostrm, "module %s;\n\n", modulee);
+  if (prev-module != ci.modulee) {
+    ostream::println-format(ostrm, "module %s;\n\n", ci.modulee);
     ostream::println-format(ostrm, "export {\n");
   }
   ostream::col-incr(ostrm);
@@ -976,56 +1006,56 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module)
   boole-t state-exported? =    false;
   boole-t behavior-exported? = false;
   if (klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?)) {
-    ostream::println-format(ostrm, "%s %s {\n", type, name);
+    ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
     ostream::col-incr(ostrm);
 
-    if (nullptr != interpose-name)
-      ostream::println-format(ostrm, "interpose %s;\n", interpose-name);
-    if (nullptr != superklass-name)
-      ostream::println-format(ostrm, "superklass %s;\n", superklass-name);
-    if (nullptr != klass-name)
-      ostream::println-format(ostrm, "klass %s;\n", klass-name);
-    if (nullptr != traits) {
+    if (nullptr != ci.interpose-name)
+      ostream::println-format(ostrm, "interpose %s;\n", ci.interpose-name);
+    if (nullptr != ci.superklass-name)
+      ostream::println-format(ostrm, "superklass %s;\n", ci.superklass-name);
+    if (nullptr != ci.klass-name)
+      ostream::println-format(ostrm, "klass %s;\n", ci.klass-name);
+    if (nullptr != ci.traits) {
       int64-t index = 0;
 
-      while (nullptr != traits[index]) {
-        ostream::println-format(ostrm, "trait %s;\n", traits[index]);
+      while (nullptr != ci.traits[index]) {
+        ostream::println-format(ostrm, "trait %s;\n", ci.traits[index]);
         index++;
       }
     }
-    if (nullptr != requires) {
+    if (nullptr != ci.requires) {
       int64-t index = 0;
 
-      while (nullptr != requires[index]) {
-        ostream::println-format(ostrm, "require %s;\n", requires[index]);
+      while (nullptr != ci.requires[index]) {
+        ostream::println-format(ostrm, "require %s;\n", ci.requires[index]);
         index++;
       }
     }
-    if (nullptr != provides) {
+    if (nullptr != ci.provides) {
       int64-t index = 0;
 
-      while (nullptr != provides[index]) {
-        ostream::println-format(ostrm, "provides %s;\n", provides[index]);
+      while (nullptr != ci.provides[index]) {
+        ostream::println-format(ostrm, "provides %s;\n", ci.provides[index]);
         index++;
       }
     }
-    if (nullptr != enum-info) {
+    if (nullptr != ci.enum-info) {
       int64-t i = 0;
-      while (nullptr != enum-info[i].info) {
+      while (nullptr != ci.enum-info[i].info) {
         ostream::println-format(ostrm, "export\n"); // hackhack
-        if (nullptr != enum-info[i].name)
-          ostream::println-format(ostrm, "enum %s\n", enum-info[i].name);
+        if (nullptr != ci.enum-info[i].name)
+          ostream::println-format(ostrm, "enum %s\n", ci.enum-info[i].name);
         else
           ostream::println-format(ostrm, "enum\n");
         ostream::println-format(ostrm, "{\n");
         ostream::col-incr(ostrm);
-        int-t max-name-width = max-enum-name-width(enum-info[i].info);
+        int-t max-name-width = max-enum-name-width(ci.enum-info[i].info);
         int-t j = 0;
-        while (nullptr != enum-info[i].info[j].name) {
+        while (nullptr != ci.enum-info[i].info[j].name) {
           ostream::println-format(ostrm, "%-*s = %s,\n",
                        max-name-width,
-                       enum-info[i].info[j].name,
-                       enum-info[i].info[j].expr);
+                       ci.enum-info[i].info[j].name,
+                       ci.enum-info[i].info[j].expr);
           j++;
         }
         ostream::col-decr(ostrm);
@@ -1033,54 +1063,54 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module)
         i++;
       }
     }
-    if (nullptr != const-info) {
+    if (nullptr != ci.const-info) {
       int64-t i = 0;
-      while (nullptr != const-info[i].name) {
+      while (nullptr != ci.const-info[i].name) {
         ostream::println-format(ostrm, "export\n"); // hackhack
         ostream::println-format(ostrm, "const %s %s = %s;\n",
-                                const-info[i].type,
-                                const-info[i].name,
-                                const-info[i].value);
+                                ci.const-info[i].type,
+                                ci.const-info[i].name,
+                                ci.const-info[i].value);
         i++;
       }
     }
 # define DKT-DEBUG-CODEGEN 0
     if (DKT-DEBUG-CODEGEN || state-exported?) {
-      if (nullptr != slots-type) {
-        ostream::println-format(ostrm, "slots %s;\n", slots-type);
+      if (nullptr != ci.slots-type) {
+        ostream::println-format(ostrm, "slots %s;\n", ci.slots-type);
       }
-      else-if (nullptr != slots-info) {
-        if (nullptr == cat || #struct == cat)
+      else-if (nullptr != ci.slots-info) {
+        if (nullptr == ci.cat || #struct == ci.cat)
           ostream::println-format(ostrm, "slots {\n");
-        else-if (enum-base)
-          ostream::println-format(ostrm, "slots %s : %s {\n", cat, enum-base);
+        else-if (ci.enum-base)
+          ostream::println-format(ostrm, "slots %s : %s {\n", ci.cat, ci.enum-base);
         else
-          ostream::println-format(ostrm, "slots %s {\n", cat);
+          ostream::println-format(ostrm, "slots %s {\n", ci.cat);
         ostream::col-incr(ostrm);
-        if (#enum == cat) {
-          int-t max-type-width = max-slot-name-width(slots-info);
+        if (#enum == ci.cat) {
+          int-t max-type-width = max-slot-name-width(ci.slots-info);
           int-t i = 0;
-          while (nullptr != slots-info[i].elements) {
-            symbol-t slot-name = name-from-info(&slots-info[i]);
+          while (nullptr != ci.slots-info[i].elements) {
+            symbol-t slot-name = name-from-info(&ci.slots-info[i]);
             assert(nullptr != slot-name);
-            str-t slot-expr-str = cast(str-t)named-info::at(&slots-info[i], #expr-str);
+            str-t slot-expr-str = cast(str-t)named-info::at(&ci.slots-info[i], #expr-str);
             assert(nullptr != slot-expr-str);
             
             ostream::println-format(ostrm, "%-*s = %s,\n", max-type-width, slot-name, slot-expr-str);
             i++;
           }
         } else {
-          int-t max-type-width = max-slot-type-width(slots-info);
+          int-t max-type-width = max-slot-type-width(ci.slots-info);
           int64-t i = 0;
-          while (nullptr != slots-info[i].elements) {
-            str-t slot-type =   cast(str-t)named-info::at(&slots-info[i], #type);
-            str-t slot-typeid = cast(str-t)named-info::at(&slots-info[i], #typeid);
+          while (nullptr != ci.slots-info[i].elements) {
+            str-t slot-type =   cast(str-t)named-info::at(&ci.slots-info[i], #type, cast(intptr-t)#klass);
+            str-t slot-typeid = cast(str-t)named-info::at(&ci.slots-info[i], #typeid);
             USE(slot-typeid);
             assert(nullptr != slot-type);
-            symbol-t slot-name = name-from-info(&slots-info[i]);
+            symbol-t slot-name = name-from-info(&ci.slots-info[i]);
             assert(nullptr != slot-name);
             // printf("%s::%s, type: %s, typeid: %s\n", name, slot-name, slot-type, slot-typeid);
-            str-t slot-expr-str = cast(str-t)named-info::at(&slots-info[i], #expr-str);
+            str-t slot-expr-str = cast(str-t)named-info::at(&ci.slots-info[i], #expr-str);
             
             if (nullptr != slot-expr-str)
               ostream::println-format(ostrm, "%-*s %s = %s;\n", max-type-width, slot-type, slot-name, slot-expr-str);
@@ -1095,41 +1125,41 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module)
         fprintf(stderr, "%s:%i:error: exported slots without type or info\n", __FILE__, __LINE__);
       }
     } // if (state-exported?
-    if ((nullptr != superklass-name || nullptr != klass-name || nullptr != traits || nullptr != requires || nullptr != provides)
-        && nullptr != method-signatures) {
+    if ((nullptr != ci.superklass-name || nullptr != ci.klass-name || nullptr != ci.traits || nullptr != ci.requires || nullptr != ci.provides)
+        && nullptr != ci.method-signatures) {
       ostream::println-format(ostrm, "\n");
     }
-    const signature-t* info;
+    const signature-t* sig;
+
     int64-t index = 0;
-
-    if (nullptr != kw-args-method-signatures)
-      while (nullptr != (info = kw-args-method-signatures[index++])) {
-        dump-method(ostrm, info);
-      }
-    index = 0;
-    if (nullptr != method-signatures)
-      while (nullptr != (info = method-signatures[index++]))
-        dump-method(ostrm, info);
+    if (nullptr != ci.kw-args-method-signatures)
+      while (nullptr != (sig = ci.kw-args-method-signatures[index++]))
+        dump-method(ostrm, sig);
 
     index = 0;
-    if (nullptr != slots-method-signatures)
-      while (nullptr != (info = slots-method-signatures[index++]))
-        dump-method(ostrm, info);
+    if (nullptr != ci.method-signatures)
+      while (nullptr != (sig = ci.method-signatures[index++]))
+        dump-method(ostrm, sig);
 
     index = 0;
-    if (nullptr != exported-method-signatures)
-      while (nullptr != (info = exported-method-signatures[index++]))
-        dump-method(ostrm, info);
+    if (nullptr != ci.slots-method-signatures)
+      while (nullptr != (sig = ci.slots-method-signatures[index++]))
+        dump-method(ostrm, sig);
 
     index = 0;
-    if (nullptr != exported-slots-method-signatures)
-      while (nullptr != (info = exported-slots-method-signatures[index++]))
-        dump-method(ostrm, info);
+    if (nullptr != ci.exported-method-signatures)
+      while (nullptr != (sig = ci.exported-method-signatures[index++]))
+        dump-method(ostrm, sig);
+
+    index = 0;
+    if (nullptr != ci.exported-slots-method-signatures)
+      while (nullptr != (sig = ci.exported-slots-method-signatures[index++]))
+        dump-method(ostrm, sig);
 
     ostream::col-decr(ostrm);
     ostream::println-format(ostrm, "}\n");
   }
-  return modulee;
+  return ci.modulee;
 }
 func import-selectors(signature-t**, selector-node-t*) -> void; // hackhack
 
@@ -1411,7 +1441,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       dump-interposers(ostrm, registration-info);
     }
   }
-  exe-type-t type = cast(exe-type-t)named-info::at(registration-info, #type);
+  exe-type-t type = cast(exe-type-t)named-info::at(registration-info, #type, cast(intptr-t)#klass);
 
   switch (type) {
     case exe-type::k-lib:
@@ -1467,7 +1497,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
                                 "finalize", "klass", klass-name,
                                 cast(symbol-t)named-info::at(klass-info, #file));
 
-          kls = finalize(kls);
+          finalize(kls);
         }
       }
     }
@@ -1495,7 +1525,7 @@ func dk-klass-for-name(symbol-t klass-name, int64-t column) -> object-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   assert(nullptr != klass-name);
   named-info-t* klass-info-slots = info-for-name(klass-name);
-  assert(#trait != cast(symbol-t)named-info::at(klass-info-slots, #type));
+  assert(#trait != cast(symbol-t)named-info::at(klass-info-slots, #type, cast(intptr-t)#klass));
   assoc-node-t* klass-assoc = imported-klasses-for-klass(klass-name);
   object-t klass = nullptr;
 
