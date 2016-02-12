@@ -256,6 +256,7 @@ export dakota {
   va-method;
   va-method::slots-t;
   vector;
+  vector-klass;
   wchar;
   wchar::slots-t;
   x::sigaction;
