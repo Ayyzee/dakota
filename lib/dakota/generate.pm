@@ -3438,7 +3438,7 @@ sub dk_generate_cc_footer_klass {
     $$scratch_str_ref .= $col . "};}\n";
   }
   if (&has_const_info($klass_scope)) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const-info-t __const-info\[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const-info-t __const-info[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     $col = &colin($col);
 
     foreach my $const (@{$$klass_scope{'const'}}) {
