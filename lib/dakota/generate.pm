@@ -3601,10 +3601,12 @@ sub generate_kw_args_method_signature_defn {
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-
-  my $kw_arg_list = "static signature-t const result = { .name = \"$method_name\", .parameter-types = \"";
-  $kw_arg_list .= &method::kw_list_types($method);
-  $kw_arg_list .= "\", .return-type = \"$return_type\" };";
+  my $padlen = length($col);;
+  $padlen += length("static signature-t const result = { ");
+  my $kw_arg_list = "static signature-t const result = { .name = \"$method_name\"," . "\n" .
+    (' ' x $padlen) . ".parameter-types = " .
+    "\"" . &method::kw_list_types($method) . "\"," . "\n" .
+    (' ' x $padlen) . ".return-type = \"$return_type\" };";
   $$scratch_str_ref .=
     $col . "$kw_arg_list\n" .
     $col . "return &result;\n";
