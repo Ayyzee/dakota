@@ -193,8 +193,8 @@ klass exception {
     str-t msg;
   }
   method init(object-t self,
-              str-t    src-file :,
-              int-t    src-line :,
+              str-t    src-file : nullptr,
+              int-t    src-line : -1,
               str-t    msg : name-of(klass-of(self))) -> object-t {
     self = $init(super);
     self.src-file = src-file;
@@ -205,13 +205,16 @@ klass exception {
   method print(object-t self, object-t out) -> object-t {
     if (null == out)
       out = std-error;
-    $print-format(out,
-                  ", \"src-file\": \"%s\""
-                  ", \"src-line\": %i"
-                  ", \"msg\": \"%s\"",
-                  self.src-file,
-                  self.src-line,
-                  self.msg);
+    if (self.src-file)
+      $print-format(out,
+                    ", \"src-file\": \"%s\""
+                    ", \"src-line\": %i"
+                    ", \"msg\": \"%s\"",
+                    self.src-file,
+                    self.src-line,
+                    self.msg);
+    else
+      $print-format(out, ", \"msg\": \"%s\"", self.msg);
     return self;
   }
 }

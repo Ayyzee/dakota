@@ -302,7 +302,7 @@ klass resource-usage {
            s->instances,
            klass::unbox(o).offset + klass::unbox(o).size,
            s->memory,
-           klass::unbox(o).name);
+           name-of(o));
     return s;
   }
   method log-alloc(slots-t* s, int64-t size, symbol-t name) -> slots-t*{
@@ -332,18 +332,18 @@ typedef initialize-func::slots-t initialize-func-t;
 
 klass klass {
   slots {
-    int64-t                  offset; // first so its offset is 0
-    methods::slots-t         methods;
-    int64-t                  size;
-    object-t                 superklass;
-    symbol-t                 name; // redundant but convenient
-    const symbol-t*          traits; // redundant but convenient
+    int64-t              offset; // first so its offset is 0
+    methods::slots-t     methods;
+    int64-t              size;
+    object-t             superklass;
+    symbol-t             name; // redundant but convenient
+    const symbol-t*      traits; // redundant but convenient
     named-info::slots-t* info-slots;
-    object-t behavior; // bit-vector
+    object-t             behavior; // bit-vector
   }
   method alloc(object-t self, str-t file, int64-t line) -> object-t {
     DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%" PRIi64 "','func':'%s','args':['%s']",
-                         file, line, __method__->name, self.name);
+                         file, line, __method__->name, name-of(self));
     object-t instance = $alloc(self);
     return instance;
   }
@@ -363,7 +363,7 @@ klass klass {
     return instance;
   }
   method name(object-t self) -> symbol-t {
-    symbol-t name = self.name;
+    symbol-t name = name-of(self);
     return name;
   }
   static func alloc-methods(object-t self, int64-t methods-count) -> object-t {
@@ -381,9 +381,9 @@ klass klass {
     return self;
   }
   static func init-methods(object-t self) -> object-t {
-    if (nullptr != self.superklass && null != self.superklass) {
-      memcpy(self.methods.addrs, unbox(self.superklass).methods.addrs,
-             cast(size-t)(ssizeof(method-t) * unbox(self.superklass).methods.count));
+    if (nullptr != superklass-of(self) && null != superklass-of(self)) {
+      memcpy(self.methods.addrs, unbox(superklass-of(self)).methods.addrs,
+             cast(size-t)(ssizeof(method-t) * unbox(superklass-of(self)).methods.count));
     }
     return self;
   }
@@ -427,23 +427,23 @@ klass klass {
     fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)&unbox(self));
 
     // name
-    if (nullptr != self.name)
-      fprintf(stderr, " name=%p #%s", cast(ptr-t)(self.name), self.name);
+    if (nullptr != name-of(self))
+      fprintf(stderr, " name=%p #%s", cast(ptr-t)(name-of(self)), name-of(self));
     else
       fprintf(stderr, " name=%s", #nullptr);
 
     // superklass
-    if (nullptr != self.superklass) {
+    if (nullptr != superklass-of(self)) {
       symbol-t superklass-name;
 
-      if (null == self.superklass) {
+      if (null == superklass-of(self)) {
         superklass-name = #null;
-        fprintf(stderr, ", superklass=%p %s", cast(ptr-t)(self.superklass), superklass-name);
+        fprintf(stderr, ", superklass=%p %s", cast(ptr-t)(superklass-of(self)), superklass-name);
       } else {
-        if (nullptr == (superklass-name = name-of(self.superklass)))
+        if (nullptr == (superklass-name = name-of(superklass-of(self))))
           superklass-name = #nullptr;
 
-        fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)(self.superklass), superklass-name);
+        fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)(superklass-of(self)), superklass-name);
       }
     } else {
       fprintf(stderr, ", superklass=%s", #nullptr);
@@ -472,10 +472,10 @@ klass klass {
 
     fprintf(stderr, " }\n");
 
-    if (nullptr != self.superklass) {
-//       if (null == self.superklass)
+    if (nullptr != superklass-of(self)) {
+//       if (null == superklass-of(self))
 //         $dump(klass-of(null));
-      $dump(self.superklass);
+      $dump(superklass-of(self));
     }
     return self;
   }
@@ -691,14 +691,14 @@ klass klass {
     symbol-t name = name-from-info(self.info-slots);
     assert(#trait != cast(symbol-t)named-info::at(self.info-slots, #type));
     self.name = name;
-//     fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), self.name);
+//     fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
     int64-t size = size-from-info(self.info-slots);
     self.size = size;
-    object-t superklass = superklass-from-info(self.info-slots, self.name);
+    object-t superklass = superklass-from-info(self.info-slots, name-of(self));
     self.superklass = superklass;
 
-    if (nullptr == self.superklass) {
-      symbol-t superklass-name = superklass-name-from-info(self.info-slots, self.name);
+    if (nullptr == superklass-of(self)) {
+      symbol-t superklass-name = superklass-name-from-info(self.info-slots, name-of(self));
 
       if (nullptr != superklass-name)
         self.superklass = dk-klass-for-name(superklass-name);
@@ -754,7 +754,7 @@ klass klass {
       klass-initialize(self);
     }
     if (nullptr != getenv("DKT_DUMP_RANDOM")) {
-      printf("klass: %s\n", self.name);
+      printf("klass: %s\n", name-of(self));
       for (int64-t index = 0; index < self.methods.count; index++) {
         printf("method: %p\n", self.methods.addrs[index]);
       }
@@ -772,7 +772,7 @@ klass klass {
   } // init(object-t self, named-info::slots-t*)
 
   method superklass(object-t self) -> object-t {
-    object-t superklass = self.superklass;
+    object-t superklass = superklass-of(self);
     return superklass;
   }
   method subklass?(object-t self, object-t kls) -> boole-t {
@@ -801,7 +801,7 @@ klass klass {
     return nullptr;
   }
   method str(object-t self) -> str-t {
-    symbol-t name = self.name;
+    symbol-t name = name-of(self);
     ssize-t name-len = cast(ssize-t)safe-strlen(name);
     char8-t* buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (name-len + (1)));
     snprintf(buffer, cast(size-t)(name-len + (1)), "%s", name);
@@ -811,10 +811,10 @@ klass klass {
     $write-slots(super, out);
     $write-slots-start(out, klass);
 
-    $write-element(out, self.name,   "name");
+    $write-element(out, name-of(self),   "name");
     $write-element(out, self.size,   "size");
     $write-element(out, self.offset, "offset");
-    $write-element-idref(out, self.superklass, "superklass");
+    $write-element-idref(out, superklass-of(self), "superklass");
 
     $write-slots-end(out);
     return self;

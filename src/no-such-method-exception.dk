@@ -28,8 +28,8 @@ klass no-such-method-exception {
     signature-t* signature;
   }
   method init(object-t     self,
-              str-t        src-file :,
-              int-t        src-line :,
+              str-t        src-file : nullptr,
+              int-t        src-line : -1,
               object-t     object : nullptr,
               super-t      context : { nullptr, nullptr },
               signature-t* signature : nullptr) -> object-t {
@@ -48,15 +48,15 @@ klass no-such-method-exception {
     $print(super, out);
     object-t kls = klass-of(self.context.object);
     if (self.context.klass)
-      klass = superklass-of(self.context.klass);
+      kls = superklass-of(self.context.klass);
 
     if (nullptr == self.signature) {
       if ($instance?(self.context.object, klass::klass)) {
-        $print-format(out, ", \"instance\": '%s', klass: '%s'",
+        $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\"",
                          name-of(self.context.object),
                          name-of(klass-of(self.context.object)));
       } else {
-        $print-format(out, ", \"instance\": %s, klass: '%s'",
+        $print-format(out, ", \"instance\": %s, \"klass\": \"%s\"",
                          $str(self.context.object),
                          name-of(klass-of(self.context.object)));
       }
