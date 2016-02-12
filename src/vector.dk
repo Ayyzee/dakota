@@ -26,8 +26,46 @@ klass int64;
 klass object-output-stream;
 klass ssize;
 
+klass vector-klass {
+  superklass klass;
+
+  slots {
+    ssize-t  resize-factor;
+    object-t fill-element;
+    ssize-t  initial-capacity;
+  }
+  method va::init(object-t self, va-list-t args) -> object-t {
+    self = $va::init(super, args);
+    self.resize-factor = 2;
+    self.fill-element = null;
+    self.initial-capacity = 64;
+    return self;
+  }
+  method set-resize-factor(object-t self, ssize-t resize-factor) -> object-t {
+    self.resize-factor = resize-factor;
+    return self;
+  }
+  method set-fill-element(object-t self, object-t fill-element) -> object-t {
+    self.fill-element = fill-element;
+    return self;
+  }
+  method set-initial-capacity(object-t self, ssize-t initial-capacity) -> object-t {
+    self.initial-capacity = initial-capacity;
+    return self;
+  }
+  method resize-factor(object-t self) -> ssize-t {
+    return self.resize-factor;
+  }
+  method fill-element(object-t self) -> object-t {
+    return self.fill-element;
+  }
+  method initial-capacity(object-t self) -> ssize-t {
+    return self.initial-capacity;
+  }
+}
 klass vector {
   superklass sequence;
+  klass      vector-klass;
   trait      stack;
 
   slots {
@@ -36,12 +74,15 @@ klass vector {
     ssize-t   capacity;
     ssize-t   size; // sizeof(elements[0])
 
-    object-t  fill;
+    object-t  fill-element;
     int64-t   iterator-state;
   }
-  static const ssize-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
-  static const object-t gbl-default-fill = null;
-  static const ssize-t gbl-default-initial-capacity = 64; // shall never be 0
+  initialize(object-t kls) -> void {
+    $set-resize-factor(kls, 2);
+    $set-fill-element(kls, null);
+    $set-initial-capacity(kls, 64);
+    return;
+  }
 
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
@@ -49,17 +90,17 @@ klass vector {
   // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t  self,
-                       ssize-t   initial-capacity : gbl-default-initial-capacity,
-                       object-t  fill :             gbl-default-fill,
-                       object-t  elements :         nullptr,
-                       object-t* objects :          nullptr) -> object-t {
+              ssize-t   initial-capacity : $initial-capacity(klass-of(self)),
+              object-t  fill-element :     $fill-element(klass-of(self)),
+              object-t  elements :         nullptr,
+              object-t* objects :          nullptr) -> object-t {
     // it IS legal to have the 'fill' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);
 
     self = $init(super);
 
-    self.fill = fill;
+    self.fill-element = fill-element;
     self.count = 0;
     self.iterator-state = 0;
     self.capacity = initial-capacity;
@@ -67,7 +108,7 @@ klass vector {
     self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity); // want to be able to realloc()
 
     for (ssize-t index = 0; index < self.capacity; index++)
-      self.elements[index] = self.fill;
+      self.elements[index] = self.fill-element;
 
     if (nullptr != elements)
       $add-all(self, elements);
@@ -114,7 +155,7 @@ klass vector {
     for (object-t forward-iterator = $forward-iterator(self);
          $next?(forward-iterator);
          $next(forward-iterator)) {
-      $set-element(forward-iterator, self.fill);
+      $set-element(forward-iterator, self.fill-element);
     }
     self.iterator-state++;
     return self;
@@ -149,7 +190,7 @@ klass vector {
     if (index + 1 < self.capacity)
       memmove(&self.elements[index],
               &self.elements[index + 1], cast(size-t)(self.size * (self.count - index - 1)));
-    self.elements[self.capacity - 1] = self.fill;
+    self.elements[self.capacity - 1] = self.fill-element;
     self.count--;
     self.capacity--; // dumb
     return element;
@@ -174,7 +215,7 @@ klass vector {
     assert(0 != self.count);
     object-t element = self.elements[0];
     memmove(self.elements, self.elements + 1, cast(size-t)(self.size * (self.count - 1)));
-    self.elements[self.count - 1] = self.fill;
+    self.elements[self.count - 1] = self.fill-element;
     self.count--;
     return element;
   }
@@ -182,7 +223,7 @@ klass vector {
   method remove-last(object-t self) -> object-t {
     assert(0 != self.count);
     object-t element = self.elements[self.count - 1];
-    self.elements[self.count - 1] = self.fill;
+    self.elements[self.count - 1] = self.fill-element;
     self.count--;
     return element;
   }
@@ -244,7 +285,7 @@ klass vector {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {
-      self.capacity *= gbl-resize-factor;
+      self.capacity *= $resize-factor(klass-of(self));
       self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
     memmove(self.elements + 1, self.elements, cast(size-t)(self.size * self.count));
@@ -261,7 +302,7 @@ klass vector {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {
-      self.capacity *= gbl-resize-factor;
+      self.capacity *= $resize-factor(klass-of(self));
       self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
     self.count++;
