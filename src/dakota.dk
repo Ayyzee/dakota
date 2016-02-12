@@ -1473,7 +1473,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   named-info::sort(registration-info);
   named-info-t* klass-defns = cast(named-info-t*)named-info::at(registration-info, #klass-defns);
 
-  if (nullptr != klass-defns) {
+  if (nullptr != klass-defns) { // this should be done in reverse
     int64-t i = 0;
       
     while (1) {
@@ -1487,8 +1487,9 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       //   object-t kls = dk-klass-for-name(klass-name);
       //   klass::traits-finalize(kls, traits);
       // }
-      method-t finalize =   cast(method-t)named-info::at(klass-info, #finalize);
-      if (nullptr != finalize) {
+      typedef func (*finalize-func-t)(object-t) -> void;
+      finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(klass-info, #finalize);
+      if (nullptr != klass-finalize) {
         named-assoc-node-t named-node = { .name = klass-name, .node = nullptr };
         named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
         if (nullptr != found-named-node) {
@@ -1497,7 +1498,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
                                 "finalize", "klass", klass-name,
                                 cast(symbol-t)named-info::at(klass-info, #file));
 
-          finalize(kls);
+          klass-finalize(kls);
         }
       }
     }

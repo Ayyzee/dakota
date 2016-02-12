@@ -314,11 +314,6 @@ klass methods {
     int64-t   count;
   }
 }
-klass initialize-func {
-  slots (*)(object-t) -> void;
-}
-typedef initialize-func::slots-t initialize-func-t;
-
 klass klass {
   slots {
     int64-t              offset; // first so its offset is 0
@@ -604,6 +599,7 @@ klass klass {
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* trait-info = info-for-name(trait-name);
+      typedef func (*initialize-func-t)(object-t) -> void;
       initialize-func-t trait-initialize = cast(initialize-func-t)named-info::at(trait-info, #initialize);
       if (nullptr != trait-initialize) {
         DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
@@ -743,6 +739,7 @@ klass klass {
         i++;
       }
     }
+    typedef func (*initialize-func-t)(object-t) -> void;
     initialize-func-t klass-initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
     if (nullptr != klass-initialize) {
       DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",

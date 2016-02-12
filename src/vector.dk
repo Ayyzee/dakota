@@ -94,7 +94,7 @@ klass vector {
               object-t   fill-element :     $fill-element(klass-of(self)),
               object-t   elements :         nullptr,
               object-t[] objects :          nullptr) -> object-t {
-    // it IS legal to have the 'fill' value be nullptr
+    // it IS legal to have the 'fill-element' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);
 
