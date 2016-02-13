@@ -41,6 +41,8 @@ klass no-such-slot-exception {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
+    if (nullptr == out || null == out)
+      out = std-error;
     $print(super, out);
 
     if ($instance?(self.object, klass::klass)) {

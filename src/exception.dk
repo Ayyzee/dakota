@@ -203,7 +203,7 @@ klass exception {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (null == out)
+    if (nullptr == out || null == out)
       out = std-error;
     if (self.src-file)
       $print-format(out,

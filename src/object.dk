@@ -137,14 +137,14 @@ klass object {
     return cast(str-t)(buffer);
   }
   method print(object-t self, object-t out) -> object-t {
-    if (null == out)
+    if (nullptr == out || null == out)
       out = std-output;
     str-t str = $str(self);
     $print(out, str);
     return self;
   }
   method println(object-t self, object-t out) -> object-t {
-    if (null == out)
+    if (nullptr == out || null == out)
       out = std-output;
     $print(self, out);
     $print(out, "\n");

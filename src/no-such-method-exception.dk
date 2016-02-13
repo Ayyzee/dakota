@@ -45,6 +45,8 @@ klass no-such-method-exception {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
+    if (nullptr == out || null == out)
+      out = std-error;
     $print(super, out);
     object-t kls = klass-of(self.context.object);
     if (self.context.klass)

@@ -43,16 +43,14 @@ klass syntax-exception {
     return self;
   }
   method print-shallow(object-t self, object-t out) -> object-t {
-    assert(nullptr != out);
-    if (null == out)
+    if (nullptr == out || null == out)
       out = std-error;
     $print-format(out, "%s:%i:%i: '%s' \"%s\"\n",
                     self.file, $line(self.token), $column(self.token), $buffer(self.token), self.msg);
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
-    assert(nullptr != out);
-    if (null == out)
+    if (nullptr == out || null == out)
       out = std-error;
     $print(super, out);
     $print-shallow(self, out);

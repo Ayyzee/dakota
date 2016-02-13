@@ -58,6 +58,8 @@ klass keyword-exception {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
+    if (nullptr == out || null == out)
+      out = std-error;
     $print(super, out);
     assert(nullptr != self.object);
     assert(nullptr != self.signature);

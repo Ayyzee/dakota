@@ -194,7 +194,7 @@ klass string {
     return result;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (null == out)
+    if (nullptr == out || null == out)
       out = std-output;
     $print(out, $str(self));
     return self;
