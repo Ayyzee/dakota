@@ -17,15 +17,18 @@
 # if !defined dkt_dakota_finally_hh
 # define      dkt_dakota_finally_hh
 
-// http://www.codeproject.com/Tips/476970/finally-clause-in-Cplusplus
+// http://the-witness.net/news/2012/11/scopeexit-in-c11
 
-# include <functional>
-
-class finally {
-    std::function<void(void)> functor;
-  public:
-    finally(const std::function<void(void)> &ftor) : functor(ftor) {}
-    ~finally() { functor(); }
+template <typename F>
+struct finally_t {
+  finally_t(F f) : _f(f) {}
+  //finally_t(const finally_t& r) : _f(r._f) {}
+   ~finally_t() { _f(); }
+  F _f;
+};
+template <typename F>
+finally_t<F> finally(F f) {
+  return finally_t<F>(f);
 };
 
 // try {
@@ -38,10 +41,12 @@ class finally {
 // ...
 // catch (...) {
 // }
+// finally {
+// }
 
 # define DKT_CATCH_BEGIN(e) catch (object_t e) { if (0) {}
 # define DKT_CATCH(k, e)    else if (dk::instance3f(e, k)) // dk::instance?(e, k)
 # define DKT_CATCH_END(e)   else { throw; } }
-# define DKT_FINALLY(block) finally _finally_([&] block)
+# define DKT_FINALLY(block) auto _finally_ = finally([&] block)
 
 # endif
