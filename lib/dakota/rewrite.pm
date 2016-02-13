@@ -284,17 +284,20 @@ sub rewrite_catch_object {
   }
   return $str_out;
 }
-sub rewrite_catch_all {
-  my ($filestr_ref) = @_;
-  # else { throw; } } catch ( ... ) { xx yy zz; throw; }
-  # =>
-  # else { xx yy zz; throw; } }
-  $$filestr_ref =~ s/else\s*\{\s*throw\s*;\s*\}\s*\}\s*catch\s*\(\s*\.\.\.\s*\)\s*(\{\s*.+?throw\s*;\s*\})/else $1 }/gmsx;
+sub rewrite_exceptions_replacement {
+  my ($ws, $block) = @_;
+  my $linear_block = $block =~ s/\n/ /gr;
+  $linear_block =~ s/\s\s+/ /g;
+  my $result = 'else ' . $linear_block . '}' . $ws . 'catch (...) ' . $block;
+  return $result;
 }
 sub rewrite_exceptions {
   my ($filestr_ref) = @_;
+  # $ws else { throw ; } }     catch ( ... ) $block
+  # =>
+  #     else   $block    } $ws catch ( ... ) $block
   $$filestr_ref =~ s/($catch_object)/&rewrite_catch_object($1)/eg;
-  $$filestr_ref =~ s/else\s*\{\s*throw\s*;\s*\}\s*\}([ \n]*)catch\s*\(\s*\.\.\.\s*\)\s*(\{\s*.+?throw\s*;\s*\})/$1else $2 }/gmsx;
+  $$filestr_ref =~ s/else\s*\{\s*throw\s*;\s*\}\s*\}([ \n]*)catch\s*\(\s*\.\.\.\s*\)\s*($main::block)/&rewrite_exceptions_replacement($1, $2)/egmsx;
 }
 sub convert_dash_syntax {
   my ($str1, $str2) = @_;
