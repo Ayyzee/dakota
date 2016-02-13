@@ -874,9 +874,8 @@ sub method::varargs_from_qual_va_list {
   my ($method) = @_;
   my $new_method = &dakota::util::deep_copy($method);
 
-  if (3 == @{$$new_method{'name'}}) {
-    my $va  = &dakota::util::remove_first($$new_method{'name'});
-    my $sro = &dakota::util::remove_first($$new_method{'name'});
+  if ('va' eq $$new_method{'name'}[0]) {
+    &remove_name_va_scope($new_method);
   }
   if (exists $$new_method{'parameter-types'}) {
     &dakota::util::_replace_last($$new_method{'parameter-types'}, ['...']);
@@ -3338,11 +3337,6 @@ sub dk_generate_cc_footer_klass {
 
     if (!$$token_registry{$path}) {
       $$token_registry{$path} = 1;
-
-      foreach $token (@$klass_name) {
-        #               $$scratch_str_ref .= $col . "\"$gbl_token\", ";
-      }
-      #           $$scratch_str_ref .= "  nullptr }; ";
     }
   }
   if (&has_slots_info($klass_scope)) {

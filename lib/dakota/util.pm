@@ -83,6 +83,7 @@ our @EXPORT= qw(
                  remove_first
                  remove_last
                  remove_non_newlines
+                 remove_name_va_scope
                  rewrite_klass_defn_with_implicit_metaklass_defn
                  scalar_from_file
                  scalar_to_file
@@ -579,6 +580,16 @@ sub split_path {
 sub deep_copy {
   my ($ref) = @_;
   return eval &Dumper($ref);
+}
+sub remove_name_va_scope {
+  my ($method) = @_;
+  #die if 'va' ne $$method{'name'}[0];
+  #die if 'va-list-t' ne $$method{'parameter-types'}[-1];
+  if (3 == scalar @{$$method{'name'}} && 'va' eq $$method{'name'}[0] && '::' eq $$method{'name'}[1]) {
+    &remove_first($$method{'name'});
+    &remove_first($$method{'name'});
+  }
+  else { print "not-va-method: " . &Dumper($method); }
 }
 sub add_first {
   my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             unshift @$seq, $element; return;

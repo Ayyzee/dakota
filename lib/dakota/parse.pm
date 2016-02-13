@@ -198,11 +198,9 @@ sub kw_args_translate {
     my ($name, $scope);
     if ($$parse_tree{$construct}) {
       while (($name, $scope) = each %{$$parse_tree{$construct}}) {
-        foreach my $method (values %{$$scope{'methods'}}) {
-          if ('va' eq &dakota::util::first($$method{'name'})) {
-            my $discarded;
-            $discarded = &dakota::util::remove_first($$method{'name'}); # lose 'va'
-            $discarded = &dakota::util::remove_first($$method{'name'}); # lose '::'
+        foreach my $method (values %{$$scope{'methods'}}, values %{$$scope{'slots-methods'}}) {
+          if ('va' eq $$method{'name'}[0]) {
+            &remove_name_va_scope($method);
           }
 
           if ($$method{'kw-args-names'}) {
