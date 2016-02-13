@@ -3016,14 +3016,14 @@ sub alias_body {
       my $generic_name = "@{$$method{'name'}}";
       my $alias_name = "@{$$method{'alias'}}";
       if (&is_va($method)) {
-        $result .= $col . "{ SIGNATURE(va::$alias_name($$new_arg_type_list)), SIGNATURE(va::$generic_name($$new_arg_type_list)) },\n";
+        $result .= $col . "{ .alias-signature = SIGNATURE(va::$alias_name($$new_arg_type_list)), .method-signature = SIGNATURE(va::$generic_name($$new_arg_type_list)) },\n";
       } else {
-        $result .= $col . "{ SIGNATURE($alias_name($$new_arg_type_list)), SIGNATURE($generic_name($$new_arg_type_list)) },\n";
+        $result .= $col . "{ .alias-signature = SIGNATURE($alias_name($$new_arg_type_list)), .method-signature = SIGNATURE($generic_name($$new_arg_type_list)) },\n";
       }
     }
     $method_num++;
   }
-  $result .= $col . "{ nullptr, nullptr }\n";
+  $result .= $col . "{ .alias-signature = nullptr, .method-signature = nullptr }\n";
   return $result;
 }
 sub export_pair {
@@ -3410,12 +3410,12 @@ sub dk_generate_cc_footer_klass {
         my $name = $$slot_info{'name'};
         if (defined $$slot_info{'expr'}) {
           my $expr = $$slot_info{'expr'};
-          $$scratch_str_ref .= $col . "{ \#$name, $expr },\n";
+          $$scratch_str_ref .= $col . "{ .name = \#$name, .expr = $expr },\n";
         } else {
-          $$scratch_str_ref .= $col . "{ \#$name, nullptr },\n";
+          $$scratch_str_ref .= $col . "{ .name = \#$name, .expr = nullptr },\n";
         }
       }
-      $$scratch_str_ref .= $col . "{ nullptr, nullptr }\n";
+      $$scratch_str_ref .= $col . "{ .name = nullptr, .expr = nullptr }\n";
       $col = &colout($col);
       $$scratch_str_ref .= $col . "};}\n";
 
@@ -3427,13 +3427,13 @@ sub dk_generate_cc_footer_klass {
     foreach my $enum (@{$$klass_scope{'enum'}}) {
       if ($$enum{'type'}) {
         my $type = "@{$$enum{'type'}}";
-        $$scratch_str_ref .= $col . "{ \"$type\", __enum-info-$num },\n";
+        $$scratch_str_ref .= $col . "{ .name = \"$type\", .info = __enum-info-$num },\n";
       } else {
-        $$scratch_str_ref .= $col . "{ nullptr, __enum-info-$num },\n";
+        $$scratch_str_ref .= $col . "{ .name = nullptr, .info = __enum-info-$num },\n";
       }
       $num++;
     }
-    $$scratch_str_ref .= $col . "{ nullptr, nullptr }\n";
+    $$scratch_str_ref .= $col . "{ .name = nullptr, .info = nullptr }\n";
     $col = &colout($col);
     $$scratch_str_ref .= $col . "};}\n";
   }
@@ -3447,9 +3447,9 @@ sub dk_generate_cc_footer_klass {
       my $value = "@{$$const{'rhs'}}";
       $" = $delim;
       $value =~ s/"/\\"/g;
-      $$scratch_str_ref .= $col . "{ \#$$const{'name'}, \"$$const{'type'}\", \"$value\" },\n";
+      $$scratch_str_ref .= $col . "{ .name = \#$$const{'name'}, .type = \"$$const{'type'}\", .value = \"$value\" },\n";
     }
-    $$scratch_str_ref .= $col . "{ nullptr, nullptr, nullptr }\n";
+    $$scratch_str_ref .= $col . "{ .name = nullptr, .type = nullptr, .value = nullptr }\n";
     $col = &colout($col);
     $$scratch_str_ref .= $col . "};}\n";
   }
@@ -3853,9 +3853,9 @@ sub dk_generate_cc_footer {
       my $num_klasses = scalar keys %$interposers;
       foreach $key (sort keys %$interposers) {
         $val = $$interposers{$key};
-        $$scratch_str_ref .= $col . "{ $key\::__klass__, cast(intptr-t)$val\::__klass__ },\n";
+        $$scratch_str_ref .= $col . "{ .key = $key\::__klass__, .element = cast(intptr-t)$val\::__klass__ },\n";
       }
-      $$scratch_str_ref .= $col . "{ nullptr, cast(intptr-t)nullptr }\n";
+      $$scratch_str_ref .= $col . "{ .key = nullptr, .element = cast(intptr-t)nullptr }\n";
       $col = &colout($col);
       $$scratch_str_ref .= $col . "};\n";
     }
