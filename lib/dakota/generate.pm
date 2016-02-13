@@ -4203,9 +4203,9 @@ sub linkage_unit::generate_ints_seq {
     $col = &colin($col);
     foreach my $int (sort keys %{$$file{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
-      $scratch_str .= $col . "{ cast(intptr-t)&__literal::__int::$int_ident, nullptr },\n";
+      $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__int::$int_ident },\n";
     }
-    $scratch_str .= $col . "{ cast(intptr-t)nullptr, nullptr }\n";
+    $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }\n";
     $col = &colout($col);
     $scratch_str .= $col . "};\n";
   }
