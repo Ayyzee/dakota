@@ -652,16 +652,14 @@ klass klass {
     }
     return self.behavior;
   }
-  static named-info::slots-t gbl-default-info-slots = { nullptr, 0, nullptr };
-
   func init(object-t self, named-info::slots-t* info-slots) -> object-t;
 
   method init(object-t self,
               named-info::slots-t* info-slots : nullptr,
               object-t             info :       nullptr) -> object-t {
     self = $init(super);
-    assert(!(nullptr != info-slots &&
-             nullptr != info));
+    assert(!(nullptr == info-slots &&
+             nullptr == info));
     named-info::slots-t* tmp-info-slots;
     if (nullptr == info)
       tmp-info-slots = info-slots;
@@ -677,11 +675,11 @@ klass klass {
   }
   // called from init-klass() from dk-init-runtime()
   func init(object-t self, named-info::slots-t* info-slots) -> object-t {
-    if (nullptr == info-slots)
-      info-slots = &gbl-default-info-slots;
+    assert(nullptr != info-slots);
     named-info::sort(info-slots);
     self.info-slots = info-slots;
     symbol-t name = name-from-info(self.info-slots);
+    assert(nullptr != name);
     assert(#trait != cast(symbol-t)named-info::at(self.info-slots, #type));
     self.name = name;
 //     fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
