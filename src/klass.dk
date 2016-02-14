@@ -476,7 +476,7 @@ klass klass {
     }
     return seq;
   }
-  method dump-methods(slots-t* s) -> slots-t* {
+  method dump-methods(slots-t* s) -> int64-t {
     if (nullptr != s->behavior)
       $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
@@ -521,7 +521,7 @@ klass klass {
       }
     }
     fprintf(out, "},\n");
-    return s;
+    return s->methods.count;
   }
   // use for both klasses (and klass-x) and traits (and trait-x)
   static func add-methods(object-t self, named-info-t* info,
@@ -807,12 +807,10 @@ klass klass {
     return self;
   }
 }
-func dkt-dump-methods(klass::slots-t* s) -> void {
-  klass::dump-methods(s);
-  return;
+func dkt-dump-methods(klass::slots-t* s) -> int64-t {
+  return klass::dump-methods(s);
 }
-func dkt-dump-methods(object-t kls) -> void {
+func dkt-dump-methods(object-t kls) -> int64-t {
   klass::slots-t& kls-s = unbox(kls);
-  dkt-dump-methods(&kls-s);
-  return;
+  return dkt-dump-methods(&kls-s);
 }

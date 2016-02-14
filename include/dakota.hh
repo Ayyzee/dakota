@@ -284,8 +284,8 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 
 [[debug_so_export]] FUNC dkt_get_klass_chain(object_t klass, char8_t* buf, int64_t buf_len) -> char8_t*;
 
-[[debug_so_export]] FUNC dkt_dump_methods(object_t) -> void;
-[[debug_so_export]] FUNC dkt_dump_methods(klass::slots_t*) -> void;
+[[debug_so_export]] FUNC dkt_dump_methods(object_t) -> int64_t;
+[[debug_so_export]] FUNC dkt_dump_methods(klass::slots_t*) -> int64_t;
 
 [[debug_so_export]] FUNC dkt_unbox_check(object_t object, object_t kls) -> void;
 
