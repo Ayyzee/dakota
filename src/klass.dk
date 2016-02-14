@@ -652,6 +652,11 @@ klass klass {
     }
     return self.behavior;
   }
+  method dealloc(object-t self) -> object-t {
+    dkt::dealloc(self.methods.addrs);
+    object-t result = $dealloc(super);
+    return result;
+  }
   func init(object-t self, named-info::slots-t* info-slots) -> object-t;
 
   method init(object-t self,
@@ -668,61 +673,35 @@ klass klass {
     object-t result = init(self, tmp-info-slots);
     return result;
   }
-  method dealloc(object-t self) -> object-t {
-    dkt::dealloc(self.methods.addrs);
-    object-t result = $dealloc(super);
-    return result;
-  }
   // called from init-klass() from dk-init-runtime()
   func init(object-t self, named-info::slots-t* info-slots) -> object-t {
     assert(nullptr != info-slots);
     named-info::sort(info-slots);
     self.info-slots = info-slots;
-    symbol-t name = name-from-info(self.info-slots);
-    assert(nullptr != name);
+    self.name = name-from-info(self.info-slots);
+    assert(nullptr != name-of(self));
     assert(#trait != cast(symbol-t)named-info::at(self.info-slots, #type));
-    self.name = name;
-//     fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
-    int64-t size = size-from-info(self.info-slots);
-    self.size = size;
-    object-t superklass = superklass-from-info(self.info-slots, name-of(self));
-    self.superklass = superklass;
-
+    // fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
+    self.offset = offset-from-info(self.info-slots);
+    self.size = size-from-info(self.info-slots);
+    self.superklass = superklass-from-info(self.info-slots, name-of(self));
     if (nullptr == superklass-of(self)) {
       symbol-t superklass-name = superklass-name-from-info(self.info-slots, name-of(self));
-
       if (nullptr != superklass-name)
         self.superklass = dk-klass-for-name(superklass-name);
       else // nullptr == superklass && nullptr == superklass-name
         self.superklass = default-superklass();
     }
-    self.behavior = nullptr; // hackhack
-    self.traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
-
-    if (nullptr != self.traits)
-      load-traits(self.traits);
-    int64-t offset = offset-from-info(self.info-slots);
-    self.offset = offset;
+    self.behavior = nullptr;
+# if !defined DKT-OMIT-BEHAVIOR
+    if (nullptr != bit-vector::klass)
+      self.behavior = behavior(self);
+# endif
     alloc-methods(self, gbl-selectors-table.count);
     init-methods(self);
-    add-traits(self, self.traits);
     boole-t override?;
     add-methods(self, self.info-slots, #method.signatures, #method.addresses, override? = true);
     add-methods(self, self.info-slots, #exported-method.signatures, #exported-method.addresses, override? = true);
-
-    if (nullptr != name) {
-      assoc-node-t* imported-klasses = imported-klasses-for-klass(name);
-      assoc-node-t* current-imported-klass = imported-klasses; // to ease debugging
-
-      while (nullptr != current-imported-klass) {
-        *(cast(object-t*)(current-imported-klass->element)) = self;
-        current-imported-klass = current-imported-klass->next;
-      }
-    }
-    else
-      dkt-log(dkt::k-log-warning, "nullptr klass name");
-    if (nullptr != self.traits)
-      traits-initialize(self, self.traits);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info-slots, #method-aliases);
     if (nullptr != method-aliases) {
       int64-t i = 0;
@@ -737,11 +716,23 @@ klass klass {
         i++;
       }
     }
+    self.traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
+    if (nullptr != self.traits) {
+      load-traits(self.traits);
+      add-traits(self, self.traits);
+      traits-initialize(self, self.traits);
+    }
+    assoc-node-t* imported-klasses = imported-klasses-for-klass(name-of(self));
+    assoc-node-t* current-imported-klass = imported-klasses; // to ease debugging
+    while (nullptr != current-imported-klass) {
+      *(cast(object-t*)(current-imported-klass->element)) = self;
+      current-imported-klass = current-imported-klass->next;
+    }
     typedef func (*initialize-func-t)(object-t) -> void;
     initialize-func-t klass-initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
     if (nullptr != klass-initialize) {
       DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
-                            "initialize", "klass", name,
+                            "initialize", "klass", name-of(self),
                             cast(symbol-t)named-info::at(self.info-slots, #file));
       klass-initialize(self);
     }
@@ -751,15 +742,6 @@ klass klass {
         printf("method: %p\n", self.methods.addrs[index]);
       }
     }
-    if (nullptr == bit-vector::klass)
-      self.behavior = nullptr;
-# if !defined DKT-OMIT-BEHAVIOR
-    else
-      self.behavior = behavior(self);
-# else
-    else
-      self.behavior = nullptr;
-# endif
     return self;
   } // init(object-t self, named-info::slots-t*)
   method subklass?(object-t self, object-t kls) -> boole-t {
