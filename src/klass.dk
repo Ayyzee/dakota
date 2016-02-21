@@ -666,6 +666,15 @@ klass klass {
     }
     return;
   }
+  static func dump-random(object-t self) -> void {
+    if (nullptr != getenv("DKT_DUMP_RANDOM")) {
+      printf("klass: %s\n", name-of(self));
+      for (int64-t index = 0; index < self.methods.count; index++) {
+        printf("method: %p\n", self.methods.addrs[index]);
+      }
+    }
+    return;
+  }
   func init(object-t self, named-info::slots-t* info-slots) -> object-t;
 
   method init(object-t self,
@@ -741,12 +750,7 @@ klass klass {
                             cast(symbol-t)named-info::at(self.info-slots, #file));
       klass-initialize(self); // calls user code
     }
-    if (nullptr != getenv("DKT_DUMP_RANDOM")) {
-      printf("klass: %s\n", name-of(self));
-      for (int64-t index = 0; index < self.methods.count; index++) {
-        printf("method: %p\n", self.methods.addrs[index]);
-      }
-    }
+    dump-random(self);
     return self;
   } // init(object-t self, named-info::slots-t*)
   method subklass?(object-t self, object-t kls) -> boole-t {

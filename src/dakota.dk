@@ -1394,11 +1394,15 @@ static func set-read-only-all(str-t segment) -> int-t {
   }
   return result;
 }
-static func last-user-code-before-main() -> void  {
+static func dump-random() -> void {
   if (nullptr != getenv("DKT_DUMP_RANDOM")) {
     printf("null-method: %p\n", DKT-NULL-METHOD);
     printf("num-generics: %zi\n", gbl-selectors-table.count);
   }
+  return;
+}
+static func last-user-code-before-main() -> void  {
+  dump-random();
   openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
