@@ -657,6 +657,15 @@ klass klass {
     object-t result = $dealloc(super);
     return result;
   }
+  static func set-all-klass-ptrs(object-t self) -> void {
+    assoc-node-t* imported-klasses = imported-klasses-for-klass(name-of(self));
+    assoc-node-t* current-imported-klass = imported-klasses; // to ease debugging
+    while (nullptr != current-imported-klass) {
+      *(cast(object-t*)(current-imported-klass->element)) = self;
+      current-imported-klass = current-imported-klass->next;
+    }
+    return;
+  }
   func init(object-t self, named-info::slots-t* info-slots) -> object-t;
 
   method init(object-t self,
@@ -722,12 +731,7 @@ klass klass {
       add-traits(self, self.traits);
       traits-initialize(self, self.traits);
     }
-    assoc-node-t* imported-klasses = imported-klasses-for-klass(name-of(self));
-    assoc-node-t* current-imported-klass = imported-klasses; // to ease debugging
-    while (nullptr != current-imported-klass) {
-      *(cast(object-t*)(current-imported-klass->element)) = self;
-      current-imported-klass = current-imported-klass->next;
-    }
+    set-all-klass-ptrs(self);
     typedef func (*initialize-func-t)(object-t) -> void;
     initialize-func-t klass-initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
     if (nullptr != klass-initialize) {
