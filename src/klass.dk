@@ -729,16 +729,17 @@ klass klass {
     if (nullptr != self.traits) {
       load-traits(self.traits);
       add-traits(self, self.traits);
-      traits-initialize(self, self.traits);
     }
-    set-all-klass-ptrs(self);
+    set-all-klass-ptrs(self); // do this as late as possible, but before calling user code
+    if (nullptr != self.traits)
+      traits-initialize(self, self.traits); // calls user code (eventually)
     typedef func (*initialize-func-t)(object-t) -> void;
     initialize-func-t klass-initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
     if (nullptr != klass-initialize) {
       DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                             "initialize", "klass", name-of(self),
                             cast(symbol-t)named-info::at(self.info-slots, #file));
-      klass-initialize(self);
+      klass-initialize(self); // calls user code
     }
     if (nullptr != getenv("DKT_DUMP_RANDOM")) {
       printf("klass: %s\n", name-of(self));
