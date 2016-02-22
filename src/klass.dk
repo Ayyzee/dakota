@@ -579,6 +579,7 @@ klass klass {
     }
     return;
   }
+  typedef func (*initialize-func-t)(object-t) -> void;
   static func traits-initialize(object-t self, const symbol-t* traits) -> void {
     if (nullptr == traits || nullptr == traits[0])
       return;
@@ -586,15 +587,26 @@ klass klass {
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* trait-info = info-for-name(trait-name);
-      typedef func (*initialize-func-t)(object-t) -> void;
-      initialize-func-t trait-initialize = cast(initialize-func-t)named-info::at(trait-info, #initialize);
-      if (nullptr != trait-initialize) {
+      initialize-func-t initialize = cast(initialize-func-t)named-info::at(trait-info, #initialize);
+      if (nullptr != initialize) {
         DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
                               "initialize", trait-name, "klass",
                               cast(symbol-t)named-info::at(self.info-slots, #name),
                               cast(symbol-t)named-info::at(self.info-slots, #file));
-        trait-initialize(self);
+        initialize(self);
       }
+    }
+    return;
+  }
+  static func klass-initialize(object-t self) -> void {
+    if (nullptr != self.traits)
+      traits-initialize(self, self.traits); // calls user code (eventually)
+    initialize-func-t initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
+    if (nullptr != initialize) {
+      DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
+                            "initialize", "klass", name-of(self),
+                            cast(symbol-t)named-info::at(self.info-slots, #file));
+      initialize(self); // calls user code
     }
     return;
   }
@@ -726,17 +738,8 @@ klass klass {
       load-traits(self.traits);
       add-traits(self, self.traits);
     }
-    set-all-klass-ptrs(self); // do this as late as possible, but before calling user code
-    if (nullptr != self.traits)
-      traits-initialize(self, self.traits); // calls user code (eventually)
-    typedef func (*initialize-func-t)(object-t) -> void;
-    initialize-func-t klass-initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
-    if (nullptr != klass-initialize) {
-      DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
-                            "initialize", "klass", name-of(self),
-                            cast(symbol-t)named-info::at(self.info-slots, #file));
-      klass-initialize(self); // calls user code
-    }
+    set-all-klass-ptrs(self); // do this as late as possible, but before calling klass-initialize()
+    klass-initialize(self);
     dump-random(self);
     return self;
   } // init(object-t self, named-info::slots-t*)
