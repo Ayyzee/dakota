@@ -590,10 +590,9 @@ klass klass {
       initialize-func-t initialize = cast(initialize-func-t)named-info::at(trait-info, #initialize);
       if (nullptr != initialize) {
         DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
-                              "initialize", trait-name, "klass",
-                              cast(symbol-t)named-info::at(self.info-slots, #name),
+                              "initialize", trait-name, "klass", name-of(self),
                               cast(symbol-t)named-info::at(self.info-slots, #file));
-        initialize(self);
+        initialize(self); // calls user code
       }
     }
     return;
