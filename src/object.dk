@@ -117,19 +117,13 @@ klass object {
     return result;
   }
   method dump(object-t self) -> object-t {
-    symbol-t klass-name = #nullptr;
+    // if (klass::klass != klass-of(self))
+    //   $dump(klass-of(self));
 
-    // klass
-    if (nullptr != klass-of(self) && nullptr != name-of(klass-of(self)))
-      klass-name = name-of(klass-of(self));
-    if (nullptr != klass-of(self))
-      fprintf(stderr, "%p:%p { klass=%p <%s> }\n", cast(ptr-t)(self), cast(ptr-t)(self), cast(ptr-t)klass-of(self), klass-name);
-    else
-      fprintf(stderr, "%p:%p { klass=%s }\n", cast(ptr-t)(self), cast(ptr-t)(self), #nullptr);
-
-//     if (nullptr != klass-of(self) && self != klass-of(self))
-//       $dump(klass-of(self));
-
+    fprintf(stderr, "%p:%p { klass=%p <%s> }\n",
+            cast(ptr-t)self, cast(ptr-t)self,
+            cast(ptr-t)klass-of(self),
+            name-of(klass-of(self)));
     return self;
   }
   method str(object-t self) -> str-t {

@@ -448,12 +448,6 @@ klass klass {
     fprintf(stderr, "],");
 
     fprintf(stderr, " }\n");
-
-    if (!root-superklass?(superklass-of(self))) {
-//       if (root-superklass?(superklass-of(self)))
-//         $dump(klass-of(null));
-      $dump(superklass-of(self));
-    }
     return self;
   }
   method traits(object-t self) -> object-t {
