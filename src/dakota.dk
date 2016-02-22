@@ -54,6 +54,9 @@ module dakota;
 extern boole-t pre-main?; // to quiet clang
 boole-t pre-main? = true;
 
+extern boole-t min-runtime?; // to quiet clang
+boole-t min-runtime? = false;
+
 klass bit-vector;
 klass const-info;
 klass enum-info;
@@ -247,10 +250,6 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
 }
 func default-klass-name() -> symbol-t {
   return #klass;
-}
-static func default-klass() -> object-t {
-  assert(nullptr != klass::klass);
-  return klass::klass;
 }
 static func alloc-klass(symbol-t name) -> object-t {
   named-info-t* info = info-for-name(name);
@@ -530,7 +529,7 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
 func dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
-  if (nullptr == object::klass) {
+  if (!min-runtime?) {
     init-runtime-ds();
     each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
@@ -543,8 +542,9 @@ func dk-init-runtime() -> void {
     klass::klass =  init-klass(klass::klass,  #klass);
 
     klass::unbox(object::klass).superklass = nullptr;
+    min-runtime? = true;
+
 # if 1
-    //dk-klass-for-name(#singleton-klass); // ???
     null-singleton::klass = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
     null = make(null-singleton::klass);
     klass::unbox(object::klass).superklass = null;
@@ -572,8 +572,8 @@ func dk-init-runtime() -> void {
     assert(object::klass == superklass-of(null-singleton::klass));
     assert(klass::klass  == superklass-of(singleton-klass::klass));
 
-    dk-klass-for-name(#illegal-klass-exception);
-    dk-klass-for-name(#unbox-illegal-klass-exception);
+    dk-klass-for-name(#illegal-klass-exception); // can be thrown by dk-klass-for-name()
+    dk-klass-for-name(#unbox-illegal-klass-exception); // can be thrown by any unbox()
 
 # if !defined DKT-OMIT-BEHAVIOR
     dk-klass-for-name(#bit-vector);
@@ -733,11 +733,9 @@ func dk-register-klass(named-info-t* klass-info) -> object-t {
     klass-info->next = *klass-info-ptr;
     *klass-info-ptr = klass-info;
   }
-  object-t klass;
-  if (nullptr != object::klass)
+  object-t klass = nullptr;
+  if (min-runtime?)  // this is a late (post-init) registration
     klass = dk-klass-for-name(name);
-  else
-    klass = nullptr;
   return klass;
 }
 static func export-klasses(named-info-t* klass-info) -> void {
@@ -1513,16 +1511,12 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(registration-info), name);
   return;
 }
-static func superklass-name-for-name(symbol-t klass-name) -> symbol-t {
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
-  named-info-t* klass-info = info-for-name(klass-name);
-  symbol-t superklass-name = superklass-name-from-info(klass-info, klass-name); // namename: ???
-  return superklass-name;
-}
 static func klass-for-name-simple(symbol-t name) -> object-t {
   assoc-node-t* klass-assoc = imported-klasses-for-klass(name);
-  assert(nullptr != klass-assoc);
-  object-t kls = *cast(object-t*)(klass-assoc->element);
+  // if (nullptr == klass-assoc) printf("klass='%s', not imported\n", name);
+  object-t kls = nullptr;
+  if (nullptr != klass-assoc)
+    kls = *cast(object-t*)(klass-assoc->element);
   return kls; // may be nullptr
 }
 func dk-klass-for-name(symbol-t, int64-t) ->  object-t;
@@ -1542,26 +1536,25 @@ func dk-klass-for-name(symbol-t name, int64-t column) -> object-t {
 
   if (nullptr != klass)
     return klass;
+
+  // superklass chain first
+  symbol-t superklass-name;
+  if (nullptr != (superklass-name = superklass-name-from-info(info-slots)))
+    if (nullptr == klass-for-name-simple(superklass-name))
+      dk-klass-for-name(superklass-name, column + 1); // recursive
+
+  symbol-t klass-name;
   object-t klass-klass;
-  symbol-t klass-name = klass-name-from-info(info-slots);
-  if (nullptr == klass-name) {
-    symbol-t superklass-name = superklass-name-for-name(name);
-    if (nullptr == superklass-name)
-      superklass-name = default-superklass-name();
-
-    named-info-t* superklass-info-slots = info-for-name(superklass-name);
-    assert(nullptr != superklass-info-slots);
-    symbol-t superklass-klass-name = klass-name-from-info(superklass-info-slots);
-
-    if (nullptr == superklass-klass-name)
-      klass-klass = default-klass();
-    else
-      klass-klass = dk-klass-for-name(superklass-klass-name, column + 1); // recursive
-  } else {
-    klass-klass = dk-klass-for-name(klass-name, column + 1); // recursive
+  if (nullptr != (klass-name = klass-name-from-info(info-slots))) {
+    if (nullptr == (klass-klass = klass-for-name-simple(klass-name)))
+      klass-klass = dk-klass-for-name(klass-name, column + 1); // recursive
   }
+  else
+    klass-klass = klass::klass;
+
   if (klass-klass != klass::klass && !klass::subklass?(klass-klass, klass::klass)) // hardhard
     throw make(illegal-klass-exception::klass);
+
   klass = make(klass-klass, #info-slots : info-slots);
   return klass;
 }
