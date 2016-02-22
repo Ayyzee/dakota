@@ -408,7 +408,7 @@ klass klass {
     return prev-m;
   }
   method dump(object-t self) -> object-t {
-    object::dump(self);
+    $dump(super);
     fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)&unbox(self));
 
     // name
@@ -418,21 +418,13 @@ klass klass {
       fprintf(stderr, " name=%s", #nullptr);
 
     // superklass
-    if (!root-superklass?(superklass-of(self))) {
-      symbol-t superklass-name;
-
-      if (root-superklass?(superklass-of(self))) {
-        superklass-name = #null;
-        fprintf(stderr, ", superklass=%p %s", cast(ptr-t)(superklass-of(self)), superklass-name);
-      } else {
-        if (nullptr == (superklass-name = name-of(superklass-of(self))))
-          superklass-name = #nullptr;
-
-        fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)(superklass-of(self)), superklass-name);
-      }
-    } else {
+    if (!root-superklass?(superklass-of(self)))
+      fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)superklass-of(self), name-of(superklass-of(self)));
+    else if (null == superklass-of(self))
+      fprintf(stderr, ", superklass=%p %s", cast(ptr-t)superklass-of(self), #null);
+    else if (nullptr == superklass-of(self))
       fprintf(stderr, ", superklass=%s", #nullptr);
-    }
+
     // size
     fprintf(stderr, ", size=%zi", self.size);
     // offset
