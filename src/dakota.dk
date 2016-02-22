@@ -1525,21 +1525,22 @@ func dk-klass-for-name(symbol-t klass-name) -> object-t {
   object-t result = dk-klass-for-name(klass-name, 0);
   return result;
 }
-func dk-klass-for-name(symbol-t klass-name, int64-t column) -> object-t {
-  // for (int64-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, klass-name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
-  assert(nullptr != klass-name);
-  named-info-t* klass-info-slots = info-for-name(klass-name);
+func dk-klass-for-name(symbol-t name, int64-t column) -> object-t {
+  // for (int64-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, name);
+  assert(nullptr != name);
+  named-info-t* klass-info-slots = info-for-name(name);
   assert(#trait != cast(symbol-t)named-info::at(klass-info-slots, #type, cast(intptr-t)#klass));
-  assoc-node-t* klass-assoc = imported-klasses-for-klass(klass-name);
+  assoc-node-t* klass-assoc = imported-klasses-for-klass(name);
+  assert(nullptr != klass-assoc);
   object-t klass = nullptr;
 
   if (nullptr == klass-assoc || nullptr == (klass = *cast(object-t*)(klass-assoc->element))) {
     object-t klass-klass = nullptr;
-    symbol-t name = klass-name-from-info(klass-info-slots);
+    symbol-t klass-name = klass-name-from-info(klass-info-slots);
 
-    if (nullptr == name) {
-      symbol-t superklass-name = superklass-name-for-name(klass-name);
+    if (nullptr == klass-name) {
+      symbol-t superklass-name = superklass-name-for-name(name);
 
       if (nullptr == superklass-name)
         superklass-name = default-superklass-name();
@@ -1553,7 +1554,7 @@ func dk-klass-for-name(symbol-t klass-name, int64-t column) -> object-t {
         klass-klass = dk-klass-for-name(superklass-klass-name, column + 1); // recursive
       assert(nullptr != klass-klass);
     } else {
-      klass-klass = dk-klass-for-name(name, column + 1); // recursive
+      klass-klass = dk-klass-for-name(klass-name, column + 1); // recursive
       if (!(klass::klass == klass-klass || klass::subklass?(klass-klass, klass::klass))) // hardhard
         throw make(illegal-klass-exception::klass);
     }
