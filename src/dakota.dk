@@ -249,6 +249,7 @@ func default-klass-name() -> symbol-t {
   return #klass;
 }
 static func default-klass() -> object-t {
+  assert(nullptr != klass::klass);
   return klass::klass;
 }
 static func alloc-klass(symbol-t name) -> object-t {
@@ -1518,49 +1519,50 @@ static func superklass-name-for-name(symbol-t klass-name) -> symbol-t {
   symbol-t superklass-name = superklass-name-from-info(klass-info, klass-name); // namename: ???
   return superklass-name;
 }
-namespace object { func instance?(object-t, object-t) -> boole-t; }
-
+static func klass-for-name-simple(symbol-t name) -> object-t {
+  assoc-node-t* klass-assoc = imported-klasses-for-klass(name);
+  assert(nullptr != klass-assoc);
+  object-t kls = *cast(object-t*)(klass-assoc->element);
+  return kls; // may be nullptr
+}
 func dk-klass-for-name(symbol-t, int64-t) ->  object-t;
-func dk-klass-for-name(symbol-t klass-name) -> object-t {
-  object-t result = dk-klass-for-name(klass-name, 0);
-  return result;
+func dk-klass-for-name(symbol-t name) -> object-t {
+  int64-t column;
+  object-t klass = dk-klass-for-name(name, column = 0);
+  return klass;
 }
 func dk-klass-for-name(symbol-t name, int64-t column) -> object-t {
   // for (int64-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, name);
   assert(nullptr != name);
-  named-info-t* klass-info-slots = info-for-name(name);
-  assert(#trait != cast(symbol-t)named-info::at(klass-info-slots, #type, cast(intptr-t)#klass));
-  assoc-node-t* klass-assoc = imported-klasses-for-klass(name);
-  assert(nullptr != klass-assoc);
-  object-t klass = nullptr;
+  named-info-t* info-slots = info-for-name(name);
+  assert(nullptr != info-slots);
+  assert(#klass == cast(symbol-t)named-info::at(info-slots, #type, cast(intptr-t)#klass));
+  object-t klass = klass-for-name-simple(name);
 
-  if (nullptr == klass-assoc || nullptr == (klass = *cast(object-t*)(klass-assoc->element))) {
-    object-t klass-klass = nullptr;
-    symbol-t klass-name = klass-name-from-info(klass-info-slots);
+  if (nullptr != klass)
+    return klass;
+  object-t klass-klass;
+  symbol-t klass-name = klass-name-from-info(info-slots);
+  if (nullptr == klass-name) {
+    symbol-t superklass-name = superklass-name-for-name(name);
+    if (nullptr == superklass-name)
+      superklass-name = default-superklass-name();
 
-    if (nullptr == klass-name) {
-      symbol-t superklass-name = superklass-name-for-name(name);
+    named-info-t* superklass-info-slots = info-for-name(superklass-name);
+    assert(nullptr != superklass-info-slots);
+    symbol-t superklass-klass-name = klass-name-from-info(superklass-info-slots);
 
-      if (nullptr == superklass-name)
-        superklass-name = default-superklass-name();
-
-      named-info-t* superklass-info = info-for-name(superklass-name);
-      symbol-t superklass-klass-name = klass-name-from-info(superklass-info);
-
-      if (nullptr == superklass-klass-name)
-        klass-klass = default-klass();
-      else
-        klass-klass = dk-klass-for-name(superklass-klass-name, column + 1); // recursive
-      assert(nullptr != klass-klass);
-    } else {
-      klass-klass = dk-klass-for-name(klass-name, column + 1); // recursive
-      if (!(klass::klass == klass-klass || klass::subklass?(klass-klass, klass::klass))) // hardhard
-        throw make(illegal-klass-exception::klass);
-    }
-    klass = make(klass-klass, #info-slots : klass-info-slots);
+    if (nullptr == superklass-klass-name)
+      klass-klass = default-klass();
+    else
+      klass-klass = dk-klass-for-name(superklass-klass-name, column + 1); // recursive
+  } else {
+    klass-klass = dk-klass-for-name(klass-name, column + 1); // recursive
   }
-  assert(nullptr != klass);
+  if (klass-klass != klass::klass && !klass::subklass?(klass-klass, klass::klass)) // hardhard
+    throw make(illegal-klass-exception::klass);
+  klass = make(klass-klass, #info-slots : info-slots);
   return klass;
 }
 func info-for-name(symbol-t klass-name) -> named-info-t* {

@@ -118,6 +118,7 @@ func default-superklass-name() -> symbol-t {
   return #object;
 }
 static func default-superklass() -> object-t {
+  assert(nullptr != object::klass);
   return object::klass;
 }
 func interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t;

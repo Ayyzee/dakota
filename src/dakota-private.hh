@@ -52,6 +52,9 @@ FUNC default_klass_name() -> symbol_t;
 //   FUNC traits_finalize(object_t self, const symbol_t* traits) -> void;
 // }
 
+KLASS_NS object {
+  METHOD instance3f(object_t, object_t) -> boole_t; // instance?()
+}
 [[noreturn]] FUNC verbose_terminate()  noexcept -> void;
 [[noreturn]] FUNC verbose_unexpected() noexcept -> void;
 [[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;
