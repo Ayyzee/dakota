@@ -220,7 +220,7 @@ func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t {
   symbol-t superklass-name = superklass-name-from-info(info);
   if (nullptr == superklass-name) {
     object-t superklass = superklass-from-info(info, name);
-    if (nullptr != superklass && null != superklass)
+    if (!root-superklass?(superklass))
       superklass-name = klass::name(superklass);
   }
   if (nullptr != name) {
@@ -366,7 +366,7 @@ klass klass {
     return self;
   }
   static func init-methods(object-t self) -> object-t {
-    if (nullptr != superklass-of(self) && null != superklass-of(self)) {
+    if (!root-superklass?(superklass-of(self))) {
       memcpy(self.methods.addrs, unbox(superklass-of(self)).methods.addrs,
              cast(size-t)(ssizeof(method-t) * unbox(superklass-of(self)).methods.count));
     }
@@ -418,10 +418,10 @@ klass klass {
       fprintf(stderr, " name=%s", #nullptr);
 
     // superklass
-    if (nullptr != superklass-of(self)) {
+    if (!root-superklass?(superklass-of(self))) {
       symbol-t superklass-name;
 
-      if (null == superklass-of(self)) {
+      if (root-superklass?(superklass-of(self))) {
         superklass-name = #null;
         fprintf(stderr, ", superklass=%p %s", cast(ptr-t)(superklass-of(self)), superklass-name);
       } else {
@@ -457,8 +457,8 @@ klass klass {
 
     fprintf(stderr, " }\n");
 
-    if (nullptr != superklass-of(self)) {
-//       if (null == superklass-of(self))
+    if (!root-superklass?(superklass-of(self))) {
+//       if (root-superklass?(superklass-of(self)))
 //         $dump(klass-of(null));
       $dump(superklass-of(self));
     }
@@ -704,11 +704,11 @@ klass klass {
     self.offset = offset-from-info(self.info-slots);
     self.size = size-from-info(self.info-slots);
     self.superklass = superklass-from-info(self.info-slots, name-of(self));
-    if (nullptr == superklass-of(self)) {
+    if (root-superklass?(superklass-of(self))) {
       symbol-t superklass-name = superklass-name-from-info(self.info-slots, name-of(self));
       if (nullptr != superklass-name)
         self.superklass = dk-klass-for-name(superklass-name);
-      else // nullptr == superklass && nullptr == superklass-name
+      else
         self.superklass = default-superklass();
     }
     self.behavior = nullptr;
@@ -758,7 +758,7 @@ klass klass {
     boole-t state = false;
     object-t tmp-kls = self;
 
-    while (null != (tmp-kls = superklass-of(tmp-kls))) {
+    while (!root-superklass?((tmp-kls = superklass-of(tmp-kls)))) {
       if (tmp-kls == kls) {
         state = true;
         break;
@@ -768,7 +768,7 @@ klass klass {
   }
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
     object-t kls = self;
-    while (nullptr != kls && null != kls) {
+    while (!root-superklass?(kls)) {
       const symbol-t* traits = unbox(kls).traits;
       while (nullptr != traits && nullptr != *traits) {
         if (trait == *traits++) {

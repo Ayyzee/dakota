@@ -60,4 +60,6 @@ KLASS_NS object {
 [[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;
 [[noreturn]] FUNC pre_runtime_verbose_unexpected() noexcept -> void;
 
+inline boole_t root_superklass3f(object_t object) { if (nullptr == object || null == object) return true; else return false; }
+
 # endif // dkt_dakota_private_hh

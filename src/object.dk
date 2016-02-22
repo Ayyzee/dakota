@@ -19,6 +19,8 @@ module dakota;
 # include <cinttypes>
 # include <cstdlib>
 
+# include "dakota-private.hh"
+
 klass autorelease-pool;
 klass exception;
 klass hash;
@@ -66,7 +68,7 @@ klass object {
     boole-t state = false;
     object-t tmp-kls = klass-of(self);
 
-    while (null != tmp-kls) {
+    while (!root-superklass?(tmp-kls)) {
       if (tmp-kls == kls) {
         state = true;
         break;
