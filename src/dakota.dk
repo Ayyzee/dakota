@@ -431,11 +431,11 @@ static named-info-t* gbl-registration-info-list;
 // }
 func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name) -> object-t {
   //fprintf(stderr, "%s(#%s, #%s, #%s)\n", __func__, name, superklass-name, klass-name);
-  assert(name != nullptr);
+  assert(nullptr != name);
   int64-t num-klass-props = 1;
-  if (superklass-name != nullptr)
+  if (nullptr != superklass-name)
     num-klass-props++;
-  if (klass-name != nullptr)
+  if (nullptr != klass-name)
     num-klass-props++;
 
   property-t*   klass-props = cast(property-t*)  dkt::alloc(ssizeof(property-t) * num-klass-props);
@@ -443,12 +443,12 @@ func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
 
   // need to be sorted
   uint_t i = 0;
-  if (klass-name != nullptr)
+  if (nullptr != klass-name)
     klass-props[i++] = { .key = #klass-name,      .element = cast(intptr-t)klass-name     };
 
   klass-props[i++] =   { .key = #name,            .element = cast(intptr-t)name           };
 
-  if (superklass-name != nullptr)
+  if (nullptr != superklass-name)
     klass-props[i++] = { .key = #superklass-name, .element = cast(intptr-t)superklass-name};
 
   *klass-info = { .next = nullptr, .count = num-klass-props, .elements = klass-props};
@@ -619,7 +619,7 @@ func dk-init-runtime() -> void {
     $dump(object::klass);
     $dump(klass::klass);
     $dump(singleton-klass::klass);
-    if (null) {
+    if (nullptr != null) {
       $dump(null-singleton::klass);
       $dump(null);
     }
