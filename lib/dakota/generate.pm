@@ -1036,10 +1036,14 @@ sub common::print_signature {
     } else {
       $name_str = "$generic_name";
     }
-    my $parameter_types_str = $$new_arg_type_list;
-
-    $scratch_str .= $col . "static const signature-t result = { .name = \"$name_str\", .parameter-types = \"$parameter_types_str\", .return-type = \"$return_type_str\" };\n";
-    $scratch_str .= $col . "return &result;\n";
+    my $padlen = length($col);
+    $padlen += length("static const signature-t result = { ");
+    my $arg_list =    "static const signature-t result = { .name =            \"$name_str\"," . "\n" .
+      (' ' x $padlen) . ".parameter-types = \"$$new_arg_type_list\"," . "\n" .
+      (' ' x $padlen) . ".return-type =     \"$return_type_str\" };" . "\n";
+    $scratch_str .=
+      $col . "$arg_list\n" .
+      $col . "return &result;\n";
     $col = &colout($col);
 
     if (&is_va($generic)) {
@@ -3209,7 +3213,7 @@ sub dk_generate_cc_footer_klass {
 
       my $method_name = "@{$$kw_args_method{'name'}}";
       my $list_types = &arg_type::list_types($$kw_args_method{'parameter-types'});
-      my $kw_list_types = &method::kw_list_types($kw_args_method);
+     #my $kw_list_types = &method::kw_list_types($kw_args_method);
       $$scratch_str_ref .=
         $col . "  (cast(dkt-signature-func-t)cast(func (*)($$list_types) -> const signature-t*)" .
         $pad . "__kw-args-method-signature::va::$method_name)(),\n";
@@ -3584,7 +3588,7 @@ sub generate_kw_args_method_signature_decl {
   my $return_type = &arg::type($$method{'return-type'});
   my $method_name = "@{$$method{'name'}}";
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
-  my $kw_list_types = &method::kw_list_types($method);
+ #my $kw_list_types = &method::kw_list_types($method);
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t*; }}}" . &ann(__FILE__, __LINE__) . "\n";
 }
 sub generate_kw_args_method_signature_defn {
@@ -3595,12 +3599,13 @@ sub generate_kw_args_method_signature_defn {
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-  my $padlen = length($col);;
+  my $kw_list_types = &method::kw_list_types($method);
+  $kw_list_types = &remove_extra_whitespace($kw_list_types);
+  my $padlen = length($col);
   $padlen += length("static const signature-t result = { ");
-  my $kw_arg_list = "static const signature-t result = { .name = \"$method_name\"," . "\n" .
-    (' ' x $padlen) . ".parameter-types = " .
-    "\"" . &method::kw_list_types($method) . "\"," . "\n" .
-    (' ' x $padlen) . ".return-type = \"$return_type\" };";
+  my $kw_arg_list = "static const signature-t result = { .name =            \"$method_name\"," . "\n" .
+    (' ' x $padlen) . ".parameter-types = \"$kw_list_types\"," . "\n" .
+    (' ' x $padlen) . ".return-type =     \"$return_type\" };" . "\n";
   $$scratch_str_ref .=
     $col . "$kw_arg_list\n" .
     $col . "return &result;\n";
@@ -3623,10 +3628,13 @@ sub generate_slots_method_signature_defn {
   my $list_types = &arg_type::list_types($$method{'parameter-types'});
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __slots-method-signature { SLOTS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
-
-  my $arg_list = "static const signature-t result = { .name = \"$method_name\", .parameter-types = \"";
-  $arg_list .= &method::list_types($method);
-  $arg_list .= "\", .return-type = \"$return_type\" };";
+  my $method_list_types = &method::list_types($method);
+  $method_list_types = &remove_extra_whitespace($method_list_types);
+  my $padlen = length($col);
+  $padlen += length("static const signature-t result = { ");
+  my $arg_list =    "static const signature-t result = { .name =            \"$method_name\"," . "\n" .
+    (' ' x $padlen) . ".parameter-types = \"$method_list_types\"," . "\n" .
+    (' ' x $padlen) . ".return-type =     \"$return_type\" };" . "\n";
   $$scratch_str_ref .=
     $col . "$arg_list\n" .
     $col . "return &result;\n";
