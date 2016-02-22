@@ -231,7 +231,7 @@ sub start {
       if (1 == scalar @$keys) {
         my $key = $$keys[0];
 
-        if (&is_tbl($$data{$key}) && exists $$data{$key}{'srcs'} && exists $$data{$key}{'output'}) { # min requirements
+        if (&is_tbl($$data{$key}) && exists $$data{$key}{'inputs'} && exists $$data{$key}{'output'}) { # min requirements
           $$opts{'prefix'} = $key;
           $data = $$data{$key};
         }
@@ -322,7 +322,7 @@ sub tsv {
     $result .= "\n";
     $result .= "\$($output)" . ' :';
 
-    for my $name ('srcs') {
+    for my $name ('inputs') {
       my $var = &lhs([$name], $prefix);
       $result .= ' ' . "\$($var)";
     }

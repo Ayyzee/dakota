@@ -6,7 +6,7 @@
 # -*- cperl-tab-always-indent: t -*-
 
 { 'libdakota' => {
-    'srcs' => [ # cmd-line
+    'inputs' => [ # cmd-line
       '$(srcdir)/autorelease-pool.dk',
       '$(srcdir)/bit-vector.dk',
       '$(srcdir)/boole.dk',

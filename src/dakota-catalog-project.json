@@ -5,7 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 { 'dakota-catalog' => {
-    'srcs' => [ # cmd-line
+    'inputs' => [ # cmd-line
       '$(srcdir)/dakota-catalog.$(cc_ext)',
     ],
     'libs' => [ # cmd-line

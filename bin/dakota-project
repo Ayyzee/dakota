@@ -35,12 +35,12 @@ my $subcmd_tbl = {
   'include-dirs' => \&subcmd_include_dirs,
   'init' =>         \&subcmd_init,
   'macros' =>       \&subcmd_macros,
-  'name' =>         \&subcmd_name,
+  'output' =>       \&subcmd_output,
   'remove' =>       \&subcmd_remove,
-  'set-name' =>     \&subcmd_set_name,
+  'set-output' =>   \&subcmd_set_output,
   'set-soname' =>   \&subcmd_set_soname,
   'soname' =>       \&subcmd_soname,
-  'srcs' =>         \&subcmd_srcs,
+  'inputs' =>       \&subcmd_inputs,
 };
 sub start {
   my ($argv) = @_;
@@ -77,34 +77,34 @@ sub start {
 }
 sub subcmd {
   my ($rep, $args) = @_;
-  my $subcmd_name = shift @$args;
-  my $subcmd = $$subcmd_tbl{$subcmd_name};
+  my $subcmd_output = shift @$args;
+  my $subcmd = $$subcmd_tbl{$subcmd_output};
   if ($subcmd) {
     &$subcmd($rep, $args);
   } else {
-    print STDERR "not a subcmd: $subcmd_name\n";
+    print STDERR "not a subcmd: $subcmd_output\n";
     exit 1;
   }
 }
 sub subcmd_init {
   my ($rep, $args) = @_;
-  $$rep{'name'} = shift @$args;
-  $$rep{'srcs'} = [];
+  $$rep{'output'} = shift @$args;
+  $$rep{'inputs'} = [];
   $$rep{'libs'} = [];
   &subcmd_add($rep, $args);
   &rep_to_file($rep, $default_project_file);
 }
-sub subcmd_add_srcs {
+sub subcmd_add_inputs {
   my ($rep, $args) = @_;
-  die if !defined $$rep{'srcs'};
+  die if !defined $$rep{'inputs'};
   my $tbl = {};
-  foreach my $src (@{$$rep{'srcs'}}) {
-    $$tbl{$src} = 1;
+  foreach my $input (@{$$rep{'inputs'}}) {
+    $$tbl{$input} = 1;
   }
   foreach my $arg (@$args) {
     $$tbl{$arg} = 1;
   }
-  $$rep{'srcs'} = [sort keys %$tbl];
+  $$rep{'inputs'} = [sort keys %$tbl];
 }
 sub subcmd_add_libs {
   my ($rep, $args) = @_;
@@ -121,16 +121,16 @@ sub is_src {
 }
 sub subcmd_add {
   my ($rep, $args) = @_;
-  my $srcs = [];
+  my $inputs = [];
   my $libs = [];
   foreach my $arg (@$args) {
     if (&is_src($arg)) {
-      push @$srcs, $arg;
+      push @$inputs, $arg;
     } else {
       push @$libs, $arg; # must maintain input order!
     }
   }
-  &subcmd_add_srcs($rep, $srcs);
+  &subcmd_add_inputs($rep, $inputs);
   &subcmd_add_libs($rep, $libs);
   &rep_to_file($rep);
 }
@@ -147,12 +147,12 @@ sub remove_from_seq {
 }
 sub subcmd_remove {
   my ($rep, $args) = @_;
-  die if !defined $$rep{'srcs'};
+  die if !defined $$rep{'inputs'};
   die if !defined $$rep{'libs'};
   my $tbl = {};
-  foreach my $src (@{$$rep{'srcs'}}) {
-    my $ssrc = &subst($src, $$opts{'var'});
-    $$tbl{$ssrc} = $src;
+  foreach my $input (@{$$rep{'inputs'}}) {
+    my $sinput = &subst($input, $$opts{'var'});
+    $$tbl{$sinput} = $input;
   }
   foreach my $arg (@$args) {
     my $sarg = &subst($arg, $$opts{'var'});
@@ -163,7 +163,7 @@ sub subcmd_remove {
       &remove_from_seq($$rep{'libs'}, $arg);
     }
   }
-  $$rep{'srcs'} = [sort values %$tbl];
+  $$rep{'inputs'} = [sort values %$tbl];
   &rep_to_file($rep);
 }
 sub subst {
@@ -176,25 +176,25 @@ sub subst {
   }
   return $string
 }
-sub subcmd_srcs {
+sub subcmd_inputs {
   my ($rep, $args) = @_;
-  my $srcs = '';
-  if ($$rep{'srcs'}) {
+  my $inputs = '';
+  if ($$rep{'inputs'}) {
     my $cwd = '';
     if ($$opts{'abs-path'}) {
       $cwd = getcwd;
       $cwd .= '/';
     }
 
-    foreach my $src (@{$$rep{'srcs'}}) {
-      $src = &subst($src, $$opts{'var'});
-      if ($src !~ "^/") {
-        $srcs .= $cwd;
+    foreach my $input (@{$$rep{'inputs'}}) {
+      $input = &subst($input, $$opts{'var'});
+      if ($input !~ "^/") {
+        $inputs .= $cwd;
       }
-      $srcs .= "$src\n";
+      $inputs .= "$input\n";
     }
   }
-  print $srcs;
+  print $inputs;
 }
 sub subcmd_libs {
   my ($rep, $args) = @_;
@@ -216,20 +216,20 @@ sub subcmd_libs {
   }
   print $libs;
 }
-sub subcmd_name {
+sub subcmd_output {
   my ($rep, $args) = @_;
-  my $name = '';
-  if ($$rep{'name'}) {
+  my $output = '';
+  if ($$rep{'output'}) {
     if ($$opts{'abs-path'}) {
-      $name = getcwd;
-      $name .= '/';
+      $output = getcwd;
+      $output .= '/';
     }
-    $name .= $$rep{'name'};
+    $output .= $$rep{'output'};
   }
   if ($$opts{'var'}) {
-    $name = &subst($name, $$opts{'var'});
+    $output = &subst($output, $$opts{'var'});
   }
-  print "$name\n";
+  print "$output\n";
 }
 sub subcmd_macros {
   my ($rep) = @_;
@@ -248,10 +248,10 @@ sub subcmd_include_dirs {
   }
   print "$result\n";
 }
-sub subcmd_set_name {
+sub subcmd_set_output {
   my ($rep, $args) = @_;
-  die if !defined $$rep{'name'};
-  $$rep{'name'} = shift @$args;
+  die if !defined $$rep{'output'};
+  $$rep{'output'} = shift @$args;
   &rep_to_file($rep);
 }
 sub var {
