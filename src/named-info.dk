@@ -70,7 +70,7 @@ klass named-info {
   }
   method at(slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
     intptr-t element = at(s, key);
-    if (cast(intptr-t)nullptr == element)
+    if (cast(intptr-t)nullptr == element) // nullptr (i.e. zero) must be illegal for this to work
       element = default-element;
     return element;
   }
