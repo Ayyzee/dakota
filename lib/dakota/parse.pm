@@ -218,7 +218,8 @@ sub kw_args_translate {
                 defined $$method{'kw-args-defaults'}) {
               while ($kw_args_default =
                        &dakota::util::remove_last($$method{'kw-args-defaults'})) {
-                my $val = "@$kw_args_default";
+                my $val = join(' ', @$kw_args_default);
+                $val = &remove_extra_whitespace($val);
                 &dakota::util::add_last($kw_args_defaults, $val);
               }
             } # if
@@ -1502,14 +1503,25 @@ sub types {
 }
 sub kw_args_offsets {
   my ($seq, $gbl_token) = @_;
-  my $result;
-  my $i;
-  for ($i = 0; $i < @$seq; $i++) {
-    if ($colon eq $$seq[$i]) {
-      $result = $i;
+  my $opens = 0;
+  # start at 2 since type and name preceed colon
+  for (my $i = 2; $i < @$seq; $i++) {
+    # we don't want to find a colon inside a block or function call
+    if ($$seq[$i] =~ /^\{|\($/) {
+      $opens++;
+    } elsif ($$seq[$i] =~ /^\}|\)$/) {
+      if (0 == $opens) {
+        &sst_cursor::error($gbl_sst_cursor, $$gbl_sst_cursor{'current-token-index'}, "unbalenced {} or ()");
+      }
+      $opens--;
+    }
+    if (0 == $opens) {
+      if ($colon eq $$seq[$i]) {
+        return $i;
+      }
     }
   }
-  return ( $result );
+  return 0; # illegal offset value since type and name preceed colon
 }
 sub parameter_list {
   my ($parameter_types) = @_;
@@ -1558,7 +1570,7 @@ sub parameter_list {
     if (':' eq $$type[-1]) {
       push @$type, split('', $$kw_args_placeholders{'nodefault'});
     }
-    my ($colon_offset) = &kw_args_offsets($type);
+    my $colon_offset = &kw_args_offsets($type);
 
     if ($colon_offset) {
       my $kw_args_name = $colon_offset - 1;

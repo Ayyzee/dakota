@@ -1733,9 +1733,9 @@ sub generics::generate_va_make_defn {
       $col . "va-list-t args;\n" .
       $col . "va-start(args, kls);\n" .
       $col . "object-t result = alloc(kls);\n" .
-      $col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
+      #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "result = _func_(result, args); // init()\n" .
-      $col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
+      #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);\n" .
       $col . "va-end(args);\n" .
       $col . "return result;\n";
     $col = &colout($col);
@@ -3606,9 +3606,7 @@ sub generate_kw_args_method_signature_defn {
     foreach my $keyword_types (@{$$method{'keyword-types'}}) {
       if (defined $$keyword_types{'default'}) {
         my $def = $$keyword_types{'default'};
-        if ($def =~ /^".*"$/) {
-          $def =~ s/^(")(.*?)(")$/\\"$2\\"/;
-        }
+        $def =~ s/"/\\"/g;
         &add_last($defs, $def);
       }
     }
@@ -3800,12 +3798,17 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .= $col . "}\n";
 
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
+    my $kw_arg_type =  &arg::type($$kw_arg{'type'});
     my $kw_arg_name    = $$kw_arg{'name'};
     $$scratch_str_ref .= $col . "unless (_state_.$kw_arg_name)\n";
     $col = &colin($col);
     if (defined $$kw_arg{'default'}) {
       my $kw_arg_default = $$kw_arg{'default'};
-      $$scratch_str_ref .= $col . "$kw_arg_name = $kw_arg_default;\n";
+      if ($kw_arg_type =~ /\[\]$/ && $kw_arg_default =~ /^\{/) {
+        $$scratch_str_ref .= $col . "$kw_arg_name = cast($kw_arg_type)$kw_arg_default;\n";
+      } else {
+        $$scratch_str_ref .= $col . "$kw_arg_name = $kw_arg_default;\n";
+      }
     } else {
       $$scratch_str_ref .=
         $col . "throw make(missing-keyword-exception::klass,\n" .
