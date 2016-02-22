@@ -736,7 +736,7 @@ sub method::kw_list_types {
 
     if ('va-list-t' ne $arg_type) {
       $result .= $delim . $arg_type;
-      $delim = ',';
+      $delim = ', '; # extra whitespace
     }
   }
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
@@ -745,9 +745,9 @@ sub method::kw_list_types {
 
     if (defined $$kw_arg{'default'}) {
       my $kw_arg_default_placeholder = $$kw_args_placeholders{'default'};
-      $result .= ",$kw_arg_type $kw_arg_name:$kw_arg_default_placeholder";
+      $result .= "$delim$kw_arg_type $kw_arg_name:$kw_arg_default_placeholder"; # extra whitespace
     } else {
-      $result .= ",$kw_arg_type $kw_arg_name:";
+      $result .= "$delim$kw_arg_type $kw_arg_name:"; # extra whitespace
     }
   }
   return $result;
@@ -3600,7 +3600,23 @@ sub generate_kw_args_method_signature_defn {
   $$scratch_str_ref .= $col . "$klass_type @$klass_name { namespace __kw-args-method-signature { namespace va { KW-ARGS-METHOD-SIGNATURE-FUNC $method_name($$list_types) -> const signature-t* {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   my $kw_list_types = &method::kw_list_types($method);
-  $kw_list_types = &remove_extra_whitespace($kw_list_types);
+ #$kw_list_types = &remove_extra_whitespace($kw_list_types);
+  if (1) { # optional?
+    my $defs = [];
+    foreach my $keyword_types (@{$$method{'keyword-types'}}) {
+      if (defined $$keyword_types{'default'}) {
+        my $def = $$keyword_types{'default'};
+        if ($def =~ /^".*"$/) {
+          $def =~ s/^(")(.*?)(")$/\\"$2\\"/;
+        }
+        &add_last($defs, $def);
+      }
+    }
+    foreach my $def (@$defs) {
+      my $count = $kw_list_types =~ s/\{\}/ $def/; # extra whitespace
+      die if 1 != $count;
+    }
+  }
   my $padlen = length($col);
   $padlen += length("static const signature-t result = { ");
   my $kw_arg_list = "static const signature-t result = { .name =            \"$method_name\"," . "\n" .
