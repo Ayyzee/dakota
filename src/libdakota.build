@@ -131,8 +131,9 @@
 
         '$(DESTDIR)$(prefix)/bin/dakota',
         '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr',
-        '$(DESTDIR)$(prefix)/bin/dakota-project',
-        '$(DESTDIR)$(prefix)/bin/dakota-json2mk',
+        '$(DESTDIR)$(prefix)/bin/dakota-build',
+        '$(DESTDIR)$(prefix)/bin/dakota-build2mk',
+        '$(DESTDIR)$(prefix)/bin/dakota-build2project',
       ],
       '-home' => [ # install.home
         '$(srcdir)/home/.dakota/.bashrc',

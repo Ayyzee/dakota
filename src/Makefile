@@ -2,9 +2,9 @@ rootdir := ..
 
 include $(rootdir)/dakota.mk
 
-include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/dakota-catalog-project.mk $(srcdir)/dakota-catalog-project.json)
-include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/libdakota-project.mk      $(srcdir)/libdakota-project.json)
-include $(shell $(rootdir)/bin/dakota-json2mk --output $(objdir)/libdakota-util-project.mk $(srcdir)/libdakota-util-project.json)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/dakota-catalog.mk $(srcdir)/dakota-catalog.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/libdakota.mk      $(srcdir)/libdakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/libdakota-util.mk $(srcdir)/libdakota-util.build)
 
 # include-dirs
 dakota-catalog.include-dirs := $(patsubst %,--include-directory %,$(dakota-catalog.include-dirs))
@@ -32,8 +32,8 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  uninstall\
 
 projects:
-	$(rootdir)/bin/dakota-recipe libdakota-project.json      libdakota      libdakota.project
-	$(rootdir)/bin/dakota-recipe libdakota-util-project.json libdakota-util libdakota-util.project
+	$(rootdir)/bin/dakota-build2project libdakota.build      libdakota      libdakota.project
+	$(rootdir)/bin/dakota-build2project libdakota-util.build libdakota-util libdakota-util.project
 
 $(libdakota-util.output): $(libdakota.output)
 
