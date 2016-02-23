@@ -6,6 +6,7 @@
 # -*- cperl-tab-always-indent: t -*-
 { 'libdakota-util' => {
     'inputs' => [ # cmd-line
+      '$(srcdir)/libdakota-util.dk',
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',
       '$(srcdir)/dimension.dk',
@@ -29,7 +30,6 @@
       '$(srcdir)/tokenid.dk',
       '$(srcdir)/type-predicate.dk',
       '$(srcdir)/xml-object-output-stream.dk',
-      '$(blddir)/../lib/libdakota.$(so_ext)',
     ],
     'libs' => [ # cmd-line
     ],
