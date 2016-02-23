@@ -21,10 +21,10 @@
 
 template <typename F>
 struct finally_t {
-  finally_t(F f) : _f(f) {}
-  //finally_t(const finally_t& r) : _f(r._f) {}
-   ~finally_t() { _f(); }
   F _f;
+  finally_t(F f) : _f(f) {}
+  finally_t(const finally_t& r) : _f(r._f) {}
+  ~finally_t() { _f(); }
 };
 template <typename F>
 finally_t<F> finally(F f) {
@@ -47,6 +47,6 @@ finally_t<F> finally(F f) {
 # define DKT_CATCH_BEGIN(e) catch (object_t e) { if (0) {}
 # define DKT_CATCH(k, e)    else if (dk::instance3f(e, k)) // dk::instance?(e, k)
 # define DKT_CATCH_END(e)   else { throw; } }
-# define DKT_FINALLY(block) auto _finally_ = finally([&] block)
+# define DKT_FINALLY(block) auto _finally_ = finally([&]() block)
 
 # endif
