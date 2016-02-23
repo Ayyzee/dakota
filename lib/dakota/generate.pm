@@ -2201,7 +2201,11 @@ sub linkage_unit::generate_klasses_body {
     #print STDERR Dumper($va_list_methods);
     foreach $method (@$va_list_methods) {
       my ($visibility, $method_decl_ref) = &function::decl($method, $klass_path);
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}VA-METHOD $$method_decl_ref }}" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
+      if (exists $$method{'keyword-types'}) {
+        $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}KW-ARGS-METHOD $$method_decl_ref }}" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
+      } else {
+        $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}VA-METHOD $$method_decl_ref }}" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
+      }
     }
   }
   if (@$va_list_methods) {
