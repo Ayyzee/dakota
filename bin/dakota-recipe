@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+# -*- mode: cperl -*-
+# -*- cperl-close-paren-offset: -2 -*-
+# -*- cperl-continued-statement-offset: 2 -*-
+# -*- cperl-indent-level: 2 -*-
+# -*- cperl-indent-parens-as-block: t -*-
+# -*- cperl-tab-always-indent: t -*-
+
+use strict;
+use warnings;
+use Cwd;
+
+use Fcntl qw(:DEFAULT :flock);
+
+use Data::Dumper;
+#$Data::Dumper::Pair =      ' : '
+$Data::Dumper::Indent =    1; # default = 2
+$Data::Dumper::Purity =    1;
+$Data::Dumper::Quotekeys = 1;
+$Data::Dumper::Sortkeys  = 1;
+$Data::Dumper::Terse =     1;
+
+sub start {
+  my ($argv) = @_;
+  my $build = &scalar_from_file($$argv[0]);
+  my $name = $$argv[1];
+  my $file = $$argv[2];
+  my $opts = { 'var' => { 'blddir' => '.',
+                          'srcdir' => '.',
+                          'so_ext' => 'so',
+                        }
+            };
+  my $result = {};
+  $$result{'inputs'} = [ map { &subst($_, $$opts{'var'}) } @{$$build{$name}{'inputs'}} ];
+  $$result{'objdir'} = &subst($$build{$name}{'objdir'}, $$opts{'var'});
+  $$result{'output'} = &subst($$build{$name}{'output'}, $$opts{'var'});
+  my $original_state;
+  &scalar_to_file($file, $result, $original_state = 0);
+}
+sub subst {
+  my ($string, $var) = @_;
+  while (my ($key, $element) = each %$var) {
+    $string =~ s/\$$key\b/$element/g;   # support $ident   style variable
+    $string =~ s/\$\($key\)/$element/g; # support $(ident) style variable
+   #$string =~ s/\$\{$key\}/$element/g; # support ${ident} style variable
+  }
+  return $string
+}
+sub deep_copy {
+  my ($ref, $var) = @_;
+  my $result = eval &subst(&Dumper($ref), $var);
+  return $result;
+}
+sub scalar_to_file {
+  my ($file, $ref, $original_state) = @_;
+  if (!defined $ref) {
+    print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file($ref)\n";
+  }
+  my $refstr = &Dumper($ref);
+  if (!$original_state) {
+    #$refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
+  }
+  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  flock FILE, 2; # LOCK_EX
+  truncate FILE, 0;
+  print FILE
+    '# -*- mode: cperl -*-' . "\n" .
+    '# -*- cperl-close-paren-offset: -2 -*-' . "\n" .
+    '# -*- cperl-continued-statement-offset: 2 -*-' . "\n" .
+    '# -*- cperl-indent-level: 2 -*-' . "\n" .
+    '# -*- cperl-indent-parens-as-block: t -*-' . "\n" .
+    '# -*- cperl-tab-always-indent: t -*-' . "\n" .
+    "\n";
+  print FILE $refstr;
+  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+}
+sub scalar_from_file {
+  my ($file) = @_;
+  my $filestr = &filestr_from_file($file);
+  $filestr = eval $filestr;
+
+  if (!defined $filestr) {
+    print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_from_file(\"$file\")\n";
+  }
+  return $filestr;
+}
+sub filestr_from_file {
+  my ($file) = @_;
+  undef $/; ## force files to be read in one slurp
+  open FILE, "<$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  flock FILE, LOCK_SH;
+  my $filestr = <FILE>;
+  close FILE;
+  return $filestr;
+}
+unless (caller) {
+  &start(\@ARGV);
+}

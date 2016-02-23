@@ -28,7 +28,12 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  install\
  installcheck\
  precompile\
+ projects\
  uninstall\
+
+projects:
+	$(rootdir)/bin/dakota-recipe libdakota-project.json      libdakota      libdakota.project
+	$(rootdir)/bin/dakota-recipe libdakota-util-project.json libdakota-util libdakota-util.project
 
 $(libdakota-util.output): $(libdakota.output)
 
