@@ -5,11 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 
-# need to add use of $DESTDIR, $blddir, $srcdir
-
 {
-  'objdir' => 'obj/libdakota',
-  'output' => '../lib/libdakota.so',
   'inputs' => [
     'libdakota.dk',
     'autorelease-pool.dk',
@@ -85,4 +81,6 @@
     'vector.dk',
     'libdl.so',
   ],
+  'objdir' => 'obj/libdakota',
+  'output' => '../lib/libdakota.so',
 }

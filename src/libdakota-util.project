@@ -5,11 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 
-# need to add use of $DESTDIR, $blddir, $srcdir
-
 {
-  'objdir' => 'obj/libdakota-util',
-  'output' => '../lib/libdakota-util.so',
   'inputs' => [
     'libdakota-util.dk',
     'ascii-number-klass.dk',
@@ -36,4 +32,6 @@
     'type-predicate.dk',
     'xml-object-output-stream.dk',
   ],
+  'objdir' => 'obj/libdakota-util',
+  'output' => '../lib/libdakota-util.so',
 }
