@@ -109,8 +109,8 @@ func getprogname() -> str-t {
   va-end(args);
   return result;
 }
-static /*THREAD-LOCAL*/ void (*original-terminate)() =  std::set-terminate(pre-runtime-verbose-terminate);
-static /*THREAD-LOCAL*/ void (*original-unexpected)() = std::set-unexpected(pre-runtime-verbose-unexpected);
+static /*THREAD-LOCAL*/ std::terminate_handler original-terminate =  std::set-terminate(pre-runtime-verbose-terminate);
+static /*THREAD-LOCAL*/ std::terminate_handler original-unexpected = std::set-unexpected(pre-runtime-verbose-unexpected);
 
 [[noreturn]] func pre-runtime-verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);

@@ -1449,7 +1449,7 @@ sub generics::generate_generic_defn {
       $signature = "SIGNATURE($generic_name($$new_arg_type_list))";
       $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n";
     }
-    $$scratch_str_ref .= $col . "typedef func (*func-t)($$new_arg_type_list) -> $return_type;\n";
+    $$scratch_str_ref .= $col . "using func-t = func (*)($$new_arg_type_list) -> $return_type;\n";
     $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(object)).methods.addrs[selector];\n";
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
     $col = &colin($col);
@@ -1557,7 +1557,7 @@ sub generics::generate_super_generic_defn {
       $$scratch_str_ref .=
         $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n";
     }
-    $$scratch_str_ref .= $col . "typedef func (*func-t)($$new_arg_type_list) -> $return_type;\n";
+    $$scratch_str_ref .= $col . "using func-t = func (*)($$new_arg_type_list) -> $return_type;\n";
     $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];\n";
     $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
     $col = &colin($col);
@@ -2335,19 +2335,19 @@ sub convert_to_object_method {
   }
   return $method;
 }
-sub typedef_slots_t {
+sub typealias_slots_t {
   my ($klass_name) = @_;
   my $result;
   if ('object' eq $klass_name) {
-    $result = "typedef $klass_name\::slots-t* $klass_name-t; /*special-case*/"; # special-case
+    $result = "using $klass_name-t = $klass_name\::slots-t*; /*special-case*/"; # special-case
   } else {
     my $parts = [split(/::/, $klass_name)];
     if (1 < scalar @$parts) {
       my $basename = &dakota::util::remove_last($parts);
       my $ns = join('::', @$parts);
-      $result = "namespace $ns { typedef $basename\::slots-t $basename-t; }";
+      $result = "namespace $ns { using $basename-t = $basename\::slots-t; }";
     } else {
-      $result = "typedef $klass_name\::slots-t $klass_name-t;";
+      $result = "using $klass_name-t = $klass_name\::slots-t;";
     }
   }
   return $result;
@@ -2360,7 +2360,7 @@ sub generate_slots_decls {
   my $scratch_str_ref = &global_scratch_str_ref();
   if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
-    $$scratch_str_ref .= $col . '//' . &typedef_slots_t($klass_name) . "\n";
+    $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . "\n";
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {
@@ -2375,7 +2375,7 @@ sub generate_slots_decls {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . '//' . &typedef_slots_t($klass_name) . "\n";
+    $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . "\n";
   }
 }
 sub is_array_type {
@@ -2403,7 +2403,7 @@ sub generate_exported_slots_decls {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . &ann(__FILE__, __LINE__) . " // special-case\n";
+    $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . &ann(__FILE__, __LINE__) . " // special-case\n";
   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
@@ -2411,7 +2411,7 @@ sub generate_exported_slots_decls {
                            'wchar-t'  => undef, # __WCHAR_MAX__, __WCHAR_TYPE__
                          };
     if (!exists $$excluded_types{"$klass_name-t"}) {
-      $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . "\n";
+      $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . "\n";
     }
   } elsif (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
@@ -2427,7 +2427,7 @@ sub generate_exported_slots_decls {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . "\n";
+    $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . "\n";
   } else {
     #errdump($klass_name);
     #errdump($klass_scope);
@@ -3967,10 +3967,10 @@ sub linkage_unit::generate_symbols {
       if (!exists $$symbols{$slots}) {
         #&add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $slots);
       }
-      my $klass_typedef = "$symbol-t";
+      my $klass_typealias = "$symbol-t";
 
-      if (!exists $$symbols{$klass_typedef}) {
-        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $klass_typedef);
+      if (!exists $$symbols{$klass_typealias}) {
+        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $klass_typealias);
       }
     }
   }

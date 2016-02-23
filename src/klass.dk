@@ -579,7 +579,7 @@ klass klass {
     }
     return;
   }
-  typedef func (*initialize-func-t)(object-t) -> void;
+  using initialize-func-t = func (*)(object-t) -> void;
   static func traits-initialize(object-t self, const symbol-t* traits) -> void {
     if (nullptr == traits || nullptr == traits[0])
       return;

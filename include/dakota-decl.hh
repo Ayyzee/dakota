@@ -66,31 +66,29 @@
 # define dkt_enable_typeinfo
 # endif
 
-typedef bool boole_t;
+using boole_t = bool;
 
-typedef          char  char8_t; // may be signed or unsigned (same with wchar-t)
-typedef   signed char schar8_t;
-typedef unsigned char uchar8_t;
-
+using  char8_t =          char; // may be signed or unsigned (same with wchar-t)
+using schar8_t =   signed char;
+using uchar8_t = unsigned char;
 
 // integer promotions are
 //   float -> double
 //   char  -> int or unsigned int
 //   bool  -> unsigned int
 
-typedef double double_t;
-typedef          int    int_t; // no corresponding klass/slots defn
-typedef unsigned int   uint_t; // no corresponding klass/slots defn
+using double_t = double;
+using  int_t =          int; // no corresponding klass/slots defn
+using uint_t = unsigned int; // no corresponding klass/slots defn
 
-
-typedef va_list va_list_t; // no corresponding klass/slots defn
+using va_list_t = va_list; // no corresponding klass/slots defn
 
 // <cstdfloat>
-namespace std { typedef float       float32_t;  }
-namespace std { typedef double      float64_t;  }
-namespace std { typedef long double float128_t; }
+namespace std { using float32_t =  float; }
+namespace std { using float64_t =       double; }
+namespace std { using float128_t = long double; }
 
-namespace symbol { typedef const char8_t* slots_t; } typedef symbol::slots_t symbol_t;
+namespace symbol { using slots_t = const char8_t*; } using symbol_t = symbol::slots_t;
 
 static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");
 static_assert(64/8  == sizeof(std::float64_t),  "The sizeof std::float64-t  must equal  64/8 bytes in size");

@@ -406,9 +406,9 @@ sub rewrite_throws {
 
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)RETHROW(\s*);/$1throw$2;/gsx;
 }
-sub rewrite_slots_typedef {
+sub rewrite_slots_typealias {
   my ($ws1, $ws2, $tkns, $ws3) = @_;
-  return "${ws1}typedef$ws2$tkns slots-t$ws3;";
+  return "${ws1}using slots-t =$ws2$tkns$ws3;";
 }
 sub rewrite_slots {
   my ($filestr_ref) = @_;
@@ -417,8 +417,8 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(\s*);                     /$1$3$2dkt-enable-typeinfo slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$1$3$2slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*);           /$1$3$2slots-t$4;/gsx; # forward decl
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typedef($1, $2, $3, $4)/egs;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*)(\)\s*$main::list\s*->\s*.+?);/$1typedef auto $2slots-t$3;/gs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typealias($1, $2, $3, $4)/egs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*\)\s*$main::list\s*->\s*.+?);/$1using slots-t = FUNC $2;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
@@ -530,10 +530,6 @@ sub rewrite_const {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|\b\[\[so-export\]\](\s+const.*?;)|/*\[\[so-export\]\]*/$1|g;
-}
-sub rewrite_function_typedef {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/((typedef)\s*[^;]+?\s*\(\s*\*)(\s*\)\(.*?\))(\s*$id)(\s*;)/$1$4$3$5/gs;
 }
 sub rewrite_array_types {
   my ($filestr_ref) = @_;
@@ -959,9 +955,9 @@ sub rewrite_map {
 sub rewrite_func {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s)func(\s+$rmid\s*\()/$1FUNC$2/g;
+  $$filestr_ref =~ s/\bfunc(\s*\(\s*\*\s*\))/FUNC$1/g;
   $$filestr_ref =~ s/\bfunc(\s*\(\s*\*\s*$mid\s*\))/FUNC$1/g;
   $$filestr_ref =~ s/\bcast(\s*)\((\s*)func(\s+|\()/cast$1($2FUNC$3/g;
-  $$filestr_ref =~ s/\btypedef(\s+)func(\s+|\()/typedef$1FUNC$2/g;
   $$filestr_ref =~ s/\bstatic(\s+)func(\s+)/static$1FUNC$2/g;
 }
 sub rewrite_method_chaining_replacement {
@@ -1053,7 +1049,6 @@ sub convert_dk_to_cc {
   &rewrite_slots($filestr_ref);
   &rewrite_enums($filestr_ref);
   &rewrite_const($filestr_ref);
-  &rewrite_function_typedef($filestr_ref);
 
   &rewrite_signatures($filestr_ref);
   &rewrite_selectors($filestr_ref);

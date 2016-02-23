@@ -222,11 +222,11 @@ extern object_t std_input  [[so_export]] [[read_only]];
 extern object_t std_output [[so_export]] [[read_only]];
 extern object_t std_error  [[so_export]] [[read_only]];
 
-typedef auto (*compare_t)(object_t, object_t) -> int_t; // comparitor
-typedef auto (*dkt_signature_func_t)() -> const signature_t*;
-typedef auto (*dkt_selector_func_t)() -> selector_t*;
+using compare_t =            FUNC (*)(object_t, object_t) -> int_t; // comparitor
+using dkt_signature_func_t = FUNC (*)() -> const signature_t*;
+using dkt_selector_func_t =  FUNC (*)() -> selector_t*;
 
-namespace hash { typedef uintptr_t slots_t; } typedef hash::slots_t hash_t;
+namespace hash { using slots_t = uintptr_t; } using hash_t = hash::slots_t;
 
 constexpr FUNC dk_hash(str_t str) -> hash_t { // Daniel J. Bernstein
   return !*str ? cast(hash_t)5381 : cast(hash_t)(*str) ^ (cast(hash_t)33 * dk_hash(str + 1));
