@@ -58,7 +58,7 @@ static func ceiling-divide(int64-t numerator, int64-t denominator) -> int64-t {
   return result;
 }
 klass bit-vector-op {
-  slots func (*)(uint64-t, uint64-t) -> uint64-t;
+  slots (*)(uint64-t, uint64-t) -> uint64-t;
 }
 klass bit-vector {
   slots {

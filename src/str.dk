@@ -24,7 +24,7 @@ klass hash;
 klass str;
 
 klass str-compare {
-  slots func (*)(str-t, str-t) -> int-t;
+  slots (*)(str-t, str-t) -> int-t;
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);

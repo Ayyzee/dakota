@@ -102,7 +102,7 @@ klass assoc-node {
   }
 }
 klass named-assoc-node-compare {
-  slots func (*)(named-assoc-node::slots-t*, named-assoc-node::slots-t*) -> int-t;
+  slots (*)(named-assoc-node::slots-t*, named-assoc-node::slots-t*) -> int-t;
 }
 klass named-assoc-node {
   slots {
@@ -1165,7 +1165,7 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module)
 func import-selectors(signature-t**, selector-node-t*) -> void; // hackhack
 
 klass get-segment-data {
-  slots func (*)(str-t, ptr-t*, size-t*) -> ptr-t;
+  slots (*)(str-t, ptr-t*, size-t*) -> ptr-t;
 }
 klass registration-info {
   slots {
@@ -1240,7 +1240,7 @@ klass x::siginfo {
   slots siginfo-t;
 }
 klass x::sigaction-handler {
-  slots func (*)(int-t, x::siginfo-t*, ptr-t) -> void;
+  slots (*)(int-t, x::siginfo-t*, ptr-t) -> void;
 }
 klass x::sigaction {
   slots struct sigaction;

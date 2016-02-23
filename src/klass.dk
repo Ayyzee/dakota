@@ -79,7 +79,7 @@ namespace klass  { func name(object-t) -> symbol-t; }
   throw make(no-such-method-exception::klass, #context : context, #signature : signature);
 }
 klass selector-pair-compare {
-  slots func (*)(selector-pair::slots-t*, selector-pair::slots-t*) -> int-t;
+  slots (*)(selector-pair::slots-t*, selector-pair::slots-t*) -> int-t;
 }
 klass selector-pair {
   slots {

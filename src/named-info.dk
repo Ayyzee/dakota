@@ -29,7 +29,7 @@ klass std-compare;
 klass symbol;
 
 klass named-info-compare {
-  slots func (*)(named-info::slots-t**, named-info::slots-t**) -> int-t;
+  slots (*)(named-info::slots-t**, named-info::slots-t**) -> int-t;
 }
 klass named-info {
   slots {
