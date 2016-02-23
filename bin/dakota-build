@@ -20,7 +20,7 @@ $Data::Dumper::Indent =    1; # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-my $default_project_file = 'project.json';
+my $default_build_file = 'exe.build';
 my $opts = { 'var' => {} };
 my $rep_hdr =
   '# -*- mode: cperl -*-' . "\n" .
@@ -47,15 +47,15 @@ sub start {
   &GetOptions($opts,
               'abs-path',
               'directory=s',
-              'repository=s',
+              'build=s',
               'var=s',
             );
   my $rep_file;
 
-  if ($$opts{'repository'}) {
-    $rep_file = $$opts{'repository'};
+  if ($$opts{'build'}) {
+    $rep_file = $$opts{'build'};
   } else {
-    $rep_file = $default_project_file;
+    $rep_file = $default_build_file;
   }
   if ($$opts{'directory'}) {
     chdir $$opts{'directory'};
@@ -92,7 +92,7 @@ sub subcmd_init {
   $$rep{'inputs'} = [];
   $$rep{'libs'} = [];
   &subcmd_add($rep, $args);
-  &rep_to_file($rep, $default_project_file);
+  &rep_to_file($rep, $default_build_file);
 }
 sub subcmd_add_inputs {
   my ($rep, $args) = @_;
