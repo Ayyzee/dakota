@@ -33,5 +33,5 @@
     './xml-object-output-stream.dk',
   ],
   'objdir' => 'obj/libdakota-util',
-  'output' => '../lib/libdakota-util.so',
+  'output' => './../lib/libdakota-util.so',
 }

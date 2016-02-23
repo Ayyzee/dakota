@@ -79,8 +79,8 @@
     './trace.dk',
     './unbox-illegal-klass-exception.dk',
     './vector.dk',
-    './libdl.so',
+    'libdl.so',
   ],
   'objdir' => 'obj/libdakota',
-  'output' => '../lib/libdakota.so',
+  'output' => './../lib/libdakota.so',
 }
