@@ -332,13 +332,13 @@ sub use_project {
   if (! -e $project_io_path) {
     # dk2json : $foo{'dk'}{$dk_path}{'json'}{$json_path}
     my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},
-                               'output' => $$project{'output'}, 'objdir' => undef };
+                               'output' => &canon_path($$project{'output'}), 'objdir' => undef };
     &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);
   }
   $project_io = &scalar_from_file($project_io_path);
-  $$project_io{'inputs'} = { map { $_ => 1 } @{$$project{'inputs'}} };
+  $$project_io{'inputs'} = { map { &canon_path($_) => 1 } @{$$project{'inputs'}} };
   if ($$project{'objdir'}) {
-    $$project_io{'objdir'} = $$project{'objdir'};
+    $$project_io{'objdir'} = &canon_path($$project{'objdir'});
   }
   &scalar_to_file($project_io_path, $project_io, $original_state = 1);
   return ($project, $project_io);
@@ -349,6 +349,7 @@ sub project_clean {
   # {'all'}{$in}{$out} = 1
   if ($project_io) {
     while (my ($in_path, $out_paths) = each (%{$$project_io{'all'}})) {
+      $in_path = &canon_path($in_path);
       foreach my $out_path (keys %$out_paths) {
         if (-e $out_path) {
           $$remove{$out_path} = 1;

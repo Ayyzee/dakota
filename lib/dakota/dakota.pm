@@ -241,20 +241,26 @@ sub project_io_add {
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
 
   if (&is_array($input)) {
+    $depend = &canon_path($depend);
     foreach my $in (@$input) {
+      $in = &canon_path($in);
       if (!exists $$project_io{'all'}{$in}{$depend}) {
         $$project_io{'all'}{$in}{$depend} = 1;
         $should_write = 1;
       }
     }
   } elsif (&is_array($depend)) {
+    $input = &canon_path($input);
     foreach my $dp (@$depend) {
+      $dp = &canon_path($dp);
       if (!exists $$project_io{'all'}{$input}{$dp}) {
         $$project_io{'all'}{$input}{$dp} = 1;
         $should_write = 1;
       }
     }
   } else {
+    $input = &canon_path($input);
+    $depend = &canon_path($depend);
     if (!exists $$project_io{'all'}{$input}{$depend}) {
       $$project_io{'all'}{$input}{$depend} = 1;
       $should_write = 1;
@@ -480,6 +486,7 @@ sub loop_cc_from_dk {
     my $rt_json_path = &rt_json_path($cmd_info);
     my $user_cc_path = &user_cc_path_from_dk_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
+    $input = &canon_path($input);
     $$project_io{'all'}{$input}{$user_cc_path} = 1;
     $$project_io{'all'}{$rt_json_path}{$user_cc_path} = 1;
     $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
@@ -758,6 +765,7 @@ sub loop_rep_from_so {
       &rep_from_so($cmd_info, $input);
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $json_path = &json_path_from_ctlg_path($ctlg_path);
+      $input = &canon_path($input);
       $$project_io{'all'}{$input}{$ctlg_path} = 1;
       $$project_io{'all'}{$ctlg_path}{$json_path} = 1;
       $$project_io{'all'}{$json_path}{$rt_json_path} = 1;
@@ -1273,6 +1281,7 @@ sub outfile_from_infiles {
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
       foreach my $input (@$infiles) {
         $input =~ s=^--library-directory\s+(.+)\s+-l(.+)$=$1/lib$2.$so_ext=;
+        $input = &canon_path($input);
         $$project_io{'all'}{$input}{$output} = 1;
       }
       &scalar_to_file($$cmd_info{'project.io'}, $project_io);
@@ -1312,6 +1321,7 @@ sub ctlg_from_so {
           $json_path = &json_path_from_ctlg_path($ctlg_path);
 
           my $project_io = &scalar_from_file($$cmd_info{'project.io'});
+          $input = &canon_path($input);
           $$project_io{'all'}{$input}{$ctlg_path} = 1;
           $$project_io{'all'}{$ctlg_path}{$json_path} = 1;
           &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
