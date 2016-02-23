@@ -15,18 +15,18 @@
 // limitations under the License.
 
 export dakota-util {
-  ascii-number;
   ascii-number-klass;
-  dimension;
+  ascii-number;
   dimension::slots-t;
-  features;
+  dimension;
   features::slots-t;
-  float32;
-  float32::slots-t;
-  float64;
-  float64::slots-t;
-  float128;
+  features;
   float128::slots-t;
+  float128;
+  float32::slots-t;
+  float32;
+  float64::slots-t;
+  float64;
   hashed-counted-set;
   hashed-set;
   hashed-table;
@@ -34,22 +34,22 @@ export dakota-util {
   json-object-output-stream;
   json-parser;
   lexer;
-  open-token;
   open-token::slots-t;
-  point;
+  open-token;
   point::slots-t;
-  rect;
+  point;
   rect::slots-t;
-  slot-info;
+  rect;
   slot-info::slots-t;
-  str-buffer;
+  slot-info;
   str-buffer::slots-t;
+  str-buffer;
   syntax-exception;
   text-output-stream;
   token;
-  tokenid;
   tokenid::slots-t;
-  type-predicate;
+  tokenid;
   type-predicate::slots-t;
+  type-predicate;
   xml-object-output-stream;
 }
