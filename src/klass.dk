@@ -65,8 +65,8 @@ klass symbol;
 klass vector;
 
 # if DKT-WORKAROUND
-namespace object { func dump(object-t) -> object-t; }
-namespace klass  { func name(object-t) -> symbol-t; }
+namespace object { /*LOCAL*/ func dump(object-t) -> object-t; }
+namespace klass  { /*LOCAL*/ func name(object-t) -> symbol-t; }
 # endif
 
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
@@ -97,12 +97,11 @@ klass selector-pair {
 }
 static const int64-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
-sorted-array-t   gbl-selectors-table = { gbl-selectors,
-                                                0,
-                                                scountof(gbl-selectors),
-                                                ssizeof(gbl-selectors[0]),
-                                                cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
-
+sorted-array-t   gbl-selectors-table = { .elements = gbl-selectors,
+                                         .count = 0,
+                                         .capacity = scountof(gbl-selectors),
+                                         .size = ssizeof(gbl-selectors[0]),
+                                         .compare = cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
 //   void dump-selectors()
 //   {
 //     for (int64-t index = 0; index < gbl-selectors-table.count; index++)
@@ -116,18 +115,15 @@ sorted-array-t   gbl-selectors-table = { gbl-selectors,
 //     }
 //     return;
 //   }
-func default-superklass-name() -> symbol-t {
+/*LOCAL*/ func default-superklass-name() -> symbol-t {
   return #object;
 }
 static func default-superklass() -> object-t {
   assert(nullptr != object::klass);
   return object::klass;
 }
-func interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t;
-func add-interpose-prop(symbol-t key, symbol-t element) -> void;
-
 static func selector-for-signature(const signature-t* signature) -> selector-t {
-  selector-pair-t pair = { signature, nullptr };
+  selector-pair-t pair = { .key = signature, .element = nullptr };
   selector-pair-t* found-pair =
     cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
   selector-t selector = *(found-pair->element->ptr);
@@ -139,7 +135,7 @@ static func method-for-signature(methods::slots-t* methods, const signature-t* s
   method-t m = METHOD-FOR-SELECTOR(methods, selector);
   return m;
 }
-func import-selectors(signature-t** signatures, selector-node-t* selector-nodes) -> void {
+/*LOCAL*/ func import-selectors(signature-t** signatures, selector-node-t* selector-nodes) -> void {
   int64-t i = 0;
   while (1) {
     signature-t*     signature =     signatures[i];
@@ -150,7 +146,7 @@ func import-selectors(signature-t** signatures, selector-node-t* selector-nodes)
            (nullptr != signature && nullptr != selector-node->ptr));
     if (nullptr == signature)
       break;
-    selector-pair-t pair = { signature, selector-node };
+    selector-pair-t pair = { .key = signature, .element = selector-node };
     selector-pair-t* found-pair =
       cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
     if (nullptr == found-pair) {
@@ -198,7 +194,7 @@ static func int64-from-info(named-info-t* info, symbol-t key) -> int64-t {
 
   return element;
 }
-func size-from-info(named-info-t* info) -> int64-t {
+/*LOCAL*/ func size-from-info(named-info-t* info) -> int64-t {
   int64-t size = int64-from-info(info, #size);
   return size;
 }
@@ -211,14 +207,14 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
   USE(name);
   return superklass;
 }
-func superklass-name-from-info(named-info-t* info) -> symbol-t {
+/*LOCAL*/ func superklass-name-from-info(named-info-t* info) -> symbol-t {
   symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
 
   if (nullptr == superklass-name && #object != name-from-info(info))
     superklass-name = default-superklass-name();
   return superklass-name;
 }
-func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t {
+/*LOCAL*/ func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t {
   symbol-t superklass-name = superklass-name-from-info(info);
   if (nullptr == superklass-name) {
     object-t superklass = superklass-from-info(info, name);
@@ -238,11 +234,11 @@ func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t {
   }
   return superklass-name;
 }
-func name-from-info(named-info-t* info) -> symbol-t {
+/*LOCAL*/ func name-from-info(named-info-t* info) -> symbol-t {
   symbol-t name = cast(symbol-t)ptr-from-info(info, #name);
   return name;
 }
-func klass-name-from-info(named-info-t* info) -> symbol-t {
+/*LOCAL*/ func klass-name-from-info(named-info-t* info) -> symbol-t {
   symbol-t klass-name = cast(symbol-t)ptr-from-info(info, #klass-name);
 
   if (nullptr == klass-name)
@@ -258,7 +254,7 @@ inline func round-alignment(int64-t n) -> int64-t {
   return result;
 }
 // offset is 'offset() of superklass' + 'size of superklass'
-func offset-from-info(named-info-t* info) -> int64-t {
+/*LOCAL*/ func offset-from-info(named-info-t* info) -> int64-t {
   int64-t result;
 
   symbol-t name = name-from-info(info);
@@ -308,7 +304,7 @@ klass resource-usage {
   }
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
-resource-usage::slots-t gbl-ru = { 0, 0, 0, 0 };
+resource-usage::slots-t gbl-ru = { .memory = 0, .instances = 0, .method-memory = 0, .method-count = 0 };
 # endif
 
 klass methods {
@@ -513,8 +509,10 @@ klass klass {
     return s->methods.count;
   }
   // use for both klasses (and klass-x) and traits (and trait-x)
-  static func add-methods(object-t self, named-info-t* info,
-                          symbol-t symbol-method-signatures, symbol-t symbol-method-addresses, boole-t override?) -> void {
+  static func add-methods(object-t self,
+                          named-info-t* info,
+                          symbol-t symbol-method-signatures,
+                          symbol-t symbol-method-addresses, boole-t override?) -> void {
     named-info-t* current-info = info;
     do {
       signature-t** method-signatures = cast(signature-t**)named-info::at(current-info, symbol-method-signatures);
@@ -675,24 +673,8 @@ klass klass {
     }
     return;
   }
-  func init(object-t self, named-info::slots-t* info-slots) -> object-t;
-
-  method init(object-t self,
-              named-info::slots-t* info-slots : nullptr,
-              object-t             info :       nullptr) -> object-t {
-    self = $init(super);
-    assert(!(nullptr == info-slots &&
-             nullptr == info));
-    named-info::slots-t* tmp-info-slots;
-    if (nullptr == info)
-      tmp-info-slots = info-slots;
-    else
-      tmp-info-slots = &named-info::unbox(info);
-    object-t result = init(self, tmp-info-slots);
-    return result;
-  }
   // called from init-klass() from dk-init-runtime()
-  func init(object-t self, named-info::slots-t* info-slots) -> object-t {
+  /*LOCAL*/ func init(object-t self, named-info::slots-t* info-slots) -> object-t {
     assert(nullptr != info-slots);
     named-info::sort(info-slots);
     self.info-slots = info-slots;
@@ -744,6 +726,20 @@ klass klass {
     dump-random(self);
     return self;
   } // init(object-t self, named-info::slots-t*)
+  method init(object-t self,
+              named-info::slots-t* info-slots : nullptr,
+              object-t             info :       nullptr) -> object-t {
+    self = $init(super);
+    assert(!(nullptr == info-slots &&
+             nullptr == info));
+    named-info::slots-t* tmp-info-slots;
+    if (nullptr == info)
+      tmp-info-slots = info-slots;
+    else
+      tmp-info-slots = &named-info::unbox(info);
+    object-t result = init(self, tmp-info-slots);
+    return result;
+  }
   method subklass?(object-t self, object-t kls) -> boole-t {
     boole-t state = false;
     object-t tmp-kls = self;

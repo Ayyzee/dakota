@@ -48,9 +48,10 @@ FUNC superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
 FUNC default_superklass_name() -> symbol_t;
 FUNC default_klass_name() -> symbol_t;
 
-// KLASS_NS klass {
-//   FUNC traits_finalize(object_t self, const symbol_t* traits) -> void;
-// }
+KLASS_NS klass {
+  // FUNC traits_finalize(object_t self, const symbol_t* traits) -> void;
+  METHOD init(object_t, named_info_t*) -> object_t;
+}
 
 KLASS_NS object {
   METHOD instance3f(object_t, object_t) -> boole_t; // instance?()

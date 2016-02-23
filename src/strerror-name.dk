@@ -26,11 +26,11 @@
 
 # include "dakota-private.hh"
 
-func set-name(int-t errnum, str-t name) -> void;
+/*LOCAL*/ func set-name(int-t errnum, str-t name) -> void;
 
 # include "strerror-name.tbl"
 
-func set-name(int-t errnum, str-t name) -> void {
+/*LOCAL*/ func set-name(int-t errnum, str-t name) -> void {
   assert(0 != errnum);
   assert(nullptr != name);
   assert(NUL != name[0]);
