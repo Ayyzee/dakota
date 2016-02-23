@@ -113,6 +113,25 @@ klass string {
       result = true;
     return result;
   }
+  // // sentinel method must be va:: and va-list-t (and be last)
+  // [[sentinel]] method va::concat(object-t self, va-list-t args) -> object-t {
+  //   // walk twice using va-copy()
+  //   str-t str;
+  //   while (nullptr != (str = va-arg(args, decltype(str)))) {
+  //     USE(str);
+  //   }
+  //   return self;
+  // }
+  // // sentinel type must be pointer type, declared [] (or maybe *) and be last
+  // method concat(object-t self, [[sentinel]] str-t[] strs) -> object-t {
+  //   // walk twice
+  //   int64-t i = 0;
+  //   str-t str;
+  //   while (nullptr != (str = strs[i++])) {
+  //     USE(str);
+  //   }
+  //   return self;
+  // }
   method append(object-t self, str-t bytes, symbol-t encoding : #utf-8) -> object-t {
     assert(nullptr != bytes);
     assert(nullptr != encoding);
