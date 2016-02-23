@@ -25,17 +25,30 @@ sub start {
   my $build = &scalar_from_file($$argv[0]);
   my $name = $$argv[1];
   my $file = $$argv[2];
-  my $opts = { 'var' => { 'blddir' => '.',
+  my $opts = { 'var' => { 'DEST' =>   '',
+                          'blddir' => '.',
                           'srcdir' => '.',
                           'so_ext' => 'so',
                         }
             };
   my $result = {};
-  $$result{'inputs'} = [ map { &subst($_, $$opts{'var'}) } @{$$build{$name}{'inputs'}} ];
-  $$result{'objdir'} = &subst($$build{$name}{'objdir'}, $$opts{'var'});
-  $$result{'output'} = &subst($$build{$name}{'output'}, $$opts{'var'});
+  $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{$name}{'inputs'}} ];
+  $$result{'libs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{$name}{'libs'}} ];
+  $$result{'objdir'} = &canon_path(&subst($$build{$name}{'objdir'}, $$opts{'var'}));
+  $$result{'output'} = &canon_path(&subst($$build{$name}{'output'}, $$opts{'var'}));
   my $original_state;
   &scalar_to_file($file, $result, $original_state = 0);
+}
+sub canon_path {
+  my ($path) = @_;
+  if ($path) {
+    $path =~ s|//+|/|g; # replace multiple /s with single /s
+    $path =~ s|/+\./+|/|g; # replace /./s with single /
+    $path =~ s|^\./(.+)|$1|g; # remove leading ./
+    $path =~ s|(.+)/\.$|$1|g; # remove trailing /.
+    $path =~ s|/+$||g; # remove trailing /s
+  }
+  return $path;
 }
 sub subst {
   my ($string, $var) = @_;
