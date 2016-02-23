@@ -30,8 +30,8 @@
     './token.dk',
     './tokenid.dk',
     './type-predicate.dk',
-    './xml-object-output-stream.dk',
+    './xml-object-output-stream.dk'
   ],
   'objdir' => 'obj/libdakota-util',
-  'output' => './../lib/libdakota-util.so',
+  'output' => './../lib/libdakota-util.so'
 }
