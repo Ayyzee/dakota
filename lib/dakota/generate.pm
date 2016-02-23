@@ -2359,7 +2359,6 @@ sub generate_slots_decls {
   }
   my $scratch_str_ref = &global_scratch_str_ref();
   if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
-    my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     $$scratch_str_ref .= $col . '//' . &typedef_slots_t($klass_name) . "\n";
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
@@ -2388,26 +2387,6 @@ sub is_array_type {
   }
   return $is_array_type;
 }
-sub typedef_body {
-  my ($type, $name) = @_;
-  my $is_array_type = &is_array_type($type);
-  my $is_function_pointer_type = 0;
-  if ($type =~ m|\)\s*\(|) {
-    $is_function_pointer_type = 1;
-  }
-  my $typedef_body = $type;
-
-  if ($is_function_pointer_type && $is_array_type) {
-    die __FILE__, ":", __LINE__, ": error:\n";
-  } elsif ($is_function_pointer_type) {
-    $typedef_body =~ s|\)\s*\(|$name\)\(|g;
-  } elsif ($is_array_type) {
-    $typedef_body =~ s|\[| $name\[|g;
-  } else {
-    $typedef_body = "$type $name";
-  }
-  return $typedef_body
-}
 sub generate_exported_slots_decls {
   my ($scope, $col, $klass_path, $klass_name, $klass_scope) = @_;
   if (!$klass_scope) {
@@ -2426,7 +2405,6 @@ sub generate_exported_slots_decls {
     }
     $$scratch_str_ref .= $col . &typedef_slots_t($klass_name) . &ann(__FILE__, __LINE__) . " // special-case\n";
   } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
-    my $typedef_body = &typedef_body($$klass_scope{'slots'}{'type'}, 'slots-t');
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
