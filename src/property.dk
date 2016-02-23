@@ -20,6 +20,9 @@ module dakota;
 
 # include "dakota-private.hh"
 
+klass property-compare {
+  slots func (*)(property-t*, property-t*) -> int-t;
+}
 klass property {
   slots {
     symbol-t key;

@@ -21,6 +21,8 @@ export dakota {
   assoc-node;
   autorelease-pool-klass;
   autorelease-pool;
+  bit-vector-op::slots-t;
+  bit-vector-op;
   bit-vector;
   boole-klass::slots-t;
   boole-klass;
@@ -124,10 +126,14 @@ export dakota {
   methods::slots-t;
   methods;
   missing-keyword-exception;
+  named-assoc-node-compare::slots-t;
+  named-assoc-node-compare;
   named-assoc-node::slots-t;
   named-assoc-node;
   named-enum-info::slots-t;
   named-enum-info;
+  named-info-compare::slots-t;
+  named-info-compare;
   named-info::slots-t;
   named-info;
   no-such-keyword-exception;
@@ -145,6 +151,8 @@ export dakota {
   output-stream;
   pair::slots-t;
   pair;
+  property-compare::slots-t;
+  property-compare;
   property::slots-t;
   property;
   ptr::slots-t;
@@ -157,6 +165,8 @@ export dakota {
   schar8;
   selector-node::slots-t;
   selector-node;
+  selector-pair-compare::slots-t;
+  selector-pair-compare;
   selector-pair::slots-t;
   selector-pair;
   selector::slots-t;
@@ -204,6 +214,8 @@ export dakota {
   string;
   super::slots-t;
   super;
+  symbol-compare::slots-t;
+  symbol-compare;
   symbol::slots-t;
   symbol;
   system-exception;

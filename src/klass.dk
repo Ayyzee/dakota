@@ -78,6 +78,9 @@ namespace klass  { func name(object-t) -> symbol-t; }
 [[noreturn]] func dkt-throw-no-such-method-exception(super-t context, const signature-t* signature) -> void {
   throw make(no-such-method-exception::klass, #context : context, #signature : signature);
 }
+klass selector-pair-compare {
+  slots func (*)(selector-pair::slots-t*, selector-pair::slots-t*) -> int-t;
+}
 klass selector-pair {
   slots {
     const signature-t* key;
@@ -98,8 +101,7 @@ sorted-array-t   gbl-selectors-table = { gbl-selectors,
                                                 0,
                                                 scountof(gbl-selectors),
                                                 ssizeof(gbl-selectors[0]),
-                                                cast(std-compare-t)cast(func (*)(selector-pair-t*,
-                                                                                 selector-pair-t*) -> int-t)selector-pair::compare };
+                                                cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
 
 //   void dump-selectors()
 //   {

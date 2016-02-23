@@ -57,6 +57,9 @@ static func ceiling-divide(int64-t numerator, int64-t denominator) -> int64-t {
   int64-t result = (numerator + denominator - 1) / denominator;
   return result;
 }
+klass bit-vector-op {
+  slots func (*)(uint64-t, uint64-t) -> uint64-t;
+}
 klass bit-vector {
   slots {
     uint64-t* elements;
@@ -158,7 +161,7 @@ klass bit-vector {
       self-slots.elements[offset] = ~self-slots.elements[offset];
     return self;
   }
-  static func op-common(object-t self, object-t other, uint64-t (*op)(uint64-t, uint64-t)) -> object-t {
+  static func op-common(object-t self, object-t other, bit-vector-op-t op) -> object-t {
     slots-t& self-slots =  unbox(self);
     slots-t& other-slots = unbox(other);
     assert(self-slots.capacity == other-slots.capacity);
@@ -167,7 +170,7 @@ klass bit-vector {
       self-slots.elements[offset] = op(self-slots.elements[offset], other-slots.elements[offset]);
     return self;
   }
-  static func op-common?(object-t self, object-t other, uint64-t (*op)(uint64-t, uint64-t)) -> boole-t {
+  static func op-common?(object-t self, object-t other, bit-vector-op-t op) -> boole-t {
     boole-t result = false;
     slots-t& self-slots =  unbox(self);
     slots-t& other-slots = unbox(other);

@@ -65,7 +65,9 @@ klass exe-type;
 klass illegal-klass-exception;
 klass intptr;
 klass named-enum-info;
+klass named-info-compare;
 klass named-info;
+klass property-compare;
 klass property;
 klass resource-usage;
 klass result;
@@ -80,6 +82,7 @@ klass std-compare;
 klass str128;
 klass stream;
 klass super;
+klass symbol-compare;
 klass symbol;
 klass unbox-illegal-klass-exception;
 
@@ -97,6 +100,9 @@ klass assoc-node {
     slots-t*  next;
     intptr-t element;
   }
+}
+klass named-assoc-node-compare {
+  slots func (*)(named-assoc-node::slots-t*, named-assoc-node::slots-t*) -> int-t;
 }
 klass named-assoc-node {
   slots {
@@ -133,23 +139,19 @@ static func init-runtime-ds() -> void {
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
                         ssizeof(named-assoc-node::slots-t),
-                        cast(std-compare-t)cast(func (*)(named-assoc-node::slots-t*,
-                                                         named-assoc-node::slots-t*) -> int-t)named-assoc-node::compare);
+                        cast(std-compare-t)cast(named-assoc-node-compare-t)named-assoc-node::compare);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
                         ssizeof(named-info::slots-t*),
-                        cast(std-compare-t)cast(func (*)(named-info::slots-t**,
-                                                         named-info::slots-t**) -> int-t)named-info::compare);
+                        cast(std-compare-t)cast(named-info-compare-t)named-info::compare);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                         ssizeof(property::slots-t),
-                        cast(std-compare-t)cast(func (*)(property::slots-t*,
-                                                         property::slots-t*) -> int-t)property::compare);
+                        cast(std-compare-t)cast(property-compare-t)property::compare);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                         ssizeof(symbol-t),
-                        cast(std-compare-t)cast(func (*)(symbol::slots-t*,
-                                                         symbol::slots-t*) -> int-t)symbol::compare);
+                        cast(std-compare-t)cast(symbol-compare-t)symbol::compare);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -1163,7 +1165,7 @@ func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module)
 func import-selectors(signature-t**, selector-node-t*) -> void; // hackhack
 
 klass get-segment-data {
-  slots (*)(str-t, ptr-t*, size-t*) -> ptr-t;
+  slots func (*)(str-t, ptr-t*, size-t*) -> ptr-t;
 }
 klass registration-info {
   slots {
@@ -1238,7 +1240,7 @@ klass x::siginfo {
   slots siginfo-t;
 }
 klass x::sigaction-handler {
-  slots (*)(int-t, x::siginfo-t*, ptr-t) -> void;
+  slots func (*)(int-t, x::siginfo-t*, ptr-t) -> void;
 }
 klass x::sigaction {
   slots struct sigaction;

@@ -17,5 +17,5 @@
 module dakota-util;
 
 klass type-predicate {
-  slots (*)(int-t) -> boole-t;
+  slots func (*)(int-t) -> boole-t;
 }
