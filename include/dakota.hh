@@ -167,18 +167,30 @@ namespace va {
   # define    USE(v) cast(void)v
 # endif
 
+# if 1
 # define klass_of(object)   (object)->klass
 # define superklass_of(kls) klass::unbox(kls).superklass
 # define name_of(kls)       klass::unbox(kls).name
+# else
+inline FUNC klass_of(object_t instance) -> object_t {
+  return instance->klass;
+}
+inline FUNC superklass_of(object_t kls) -> object_t {
+  return klass::unbox(kls).superklass;
+}
+inline FUNC name_of(object_t kls) -> object_t {
+  return klass::unbox(kls).name;
+}
+# endif
 
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 // file scope
-# define SELECTOR(name, args)                *(cast(dkt_selector_func_t) (cast(selector_t*        (*)args) __selector::name))()
-# define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(const signature_t* (*)args) __signature::name))()
+# define SELECTOR(name, args)                *(cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
+# define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __signature::name))()
 
 // klass/trait scope
-# define SLOTS_METHOD_SIGNATURE(name, args)   (cast(dkt_signature_func_t)(cast(const signature_t* (*)args) __slots_method_signature::name))()
-# define KW_ARGS_METHOD_SIGNATURE(name, args) (cast(dkt_signature_func_t)(cast(const signature_t* (*)args) __kw_args_method_signature::name))()
+# define SLOTS_METHOD_SIGNATURE(name, args)   (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __slots_method_signature::name))()
+# define KW_ARGS_METHOD_SIGNATURE(name, args) (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __kw_args_method_signature::name))()
 
 # define unless(e) if (0 == (e))
 # define until(e)  while (0 == (e))
