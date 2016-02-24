@@ -193,14 +193,11 @@ static func int64-from-info(named-info-t* info, symbol-t key) -> int64-t {
 
   return element;
 }
-/*LOCAL*/ func size-from-info(named-info-t* info) -> int64-t {
-  int64-t size = int64-from-info(info, #size);
-  return size;
-}
 static func superklass-from-info(named-info-t* info) -> object-t {
   object-t superklass = cast(object-t)ptr-from-info(info, #superklass);
   return superklass;
 }
+// the extra arg (name) is so we can determin if there is an interposer registered
 static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t {
   object-t superklass = superklass-from-info(info);
   USE(name);
@@ -251,6 +248,10 @@ const int64-t k-alignment = 8;
 inline func round-alignment(int64-t n) -> int64-t {
   int64-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
   return result;
+}
+/*LOCAL*/ func size-from-info(named-info-t* info) -> int64-t {
+  int64-t size = int64-from-info(info, #size);
+  return size;
 }
 // offset is 'offset() of superklass' + 'size of superklass'
 /*LOCAL*/ func offset-from-info(named-info-t* info) -> int64-t {
@@ -322,7 +323,7 @@ klass klass {
     object-t             superklass;
     symbol-t             name; // redundant but convenient
     const symbol-t*      traits; // redundant but convenient
-    named-info::slots-t* info-slots;
+    named-info-t*        info;
     object-t             behavior; // bit-vector
   }
   method alloc(object-t self, str-t file, int64-t line) -> object-t {
@@ -591,7 +592,7 @@ klass klass {
       if (nullptr != initialize) {
         DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
                               "initialize", trait-name, "klass", name-of(self),
-                              cast(symbol-t)named-info::at(self.info-slots, #file));
+                              cast(symbol-t)named-info::at(self.info, #file));
         initialize(self); // calls user code
       }
     }
@@ -600,11 +601,11 @@ klass klass {
   static func klass-initialize(object-t self) -> void {
     if (nullptr != self.traits)
       traits-initialize(self, self.traits); // calls user code (eventually)
-    initialize-func-t initialize = cast(initialize-func-t)named-info::at(self.info-slots, #initialize);
+    initialize-func-t initialize = cast(initialize-func-t)named-info::at(self.info, #initialize);
     if (nullptr != initialize) {
       DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                             "initialize", "klass", name-of(self),
-                            cast(symbol-t)named-info::at(self.info-slots, #file));
+                            cast(symbol-t)named-info::at(self.info, #file));
       initialize(self); // calls user code
     }
     return;
@@ -627,8 +628,8 @@ klass klass {
   //       if (nullptr != trait-finalize) {
   //         DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
   //                               "finalize", trait-name, "klass",
-  //                               cast(symbol-t)named-info::at(self.info-slots, #name),
-  //                               cast(symbol-t)named-info::at(self.info-slots, #file));
+  //                               cast(symbol-t)named-info::at(self.info, #name),
+  //                               cast(symbol-t)named-info::at(self.info, #file));
   //         trait-finalize(self);
   //       }
   //     }
@@ -674,23 +675,23 @@ klass klass {
     return;
   }
   // called from init-klass() from dk-init-runtime()
-  /*LOCAL*/ func init(object-t self, named-info::slots-t* info-slots) -> object-t {
-    assert(nullptr != info-slots);
-    named-info::sort(info-slots);
-    self.info-slots = info-slots;
-    self.name = name-from-info(self.info-slots);
+  /*LOCAL*/ func init(object-t self, named-info-t* info) -> object-t {
+    assert(nullptr != info);
+    named-info::sort(info);
+    self.info = info;
+    self.name = name-from-info(self.info);
     assert(nullptr != name-of(self));
-    assert(#trait != cast(symbol-t)named-info::at(self.info-slots, #type));
+    assert(#trait != cast(symbol-t)named-info::at(self.info, #type));
     // fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
-    self.offset = offset-from-info(self.info-slots);
-    self.size = size-from-info(self.info-slots);
-    self.superklass = superklass-from-info(self.info-slots, name-of(self));
-    if (root-superklass?(superklass-of(self))) {
-      symbol-t superklass-name = superklass-name-from-info(self.info-slots, name-of(self));
-      if (nullptr != superklass-name)
-        self.superklass = dk-klass-for-name(superklass-name);
-      else
+    self.offset = offset-from-info(self.info);
+    self.size = size-from-info(self.info);
+    self.superklass = superklass-from-info(self.info, name-of(self)); // interposing
+    if (nullptr == superklass-of(self)) {
+      symbol-t superklass-name = superklass-name-from-info(self.info, name-of(self));
+      if (nullptr == superklass-name)
         self.superklass = default-superklass();
+      else
+        self.superklass = dk-klass-for-name(superklass-name);
     }
     self.behavior = nullptr;
 # if !defined DKT-OMIT-BEHAVIOR
@@ -700,9 +701,9 @@ klass klass {
     alloc-methods(self, selector-count());
     init-methods(self);
     boole-t override?;
-    add-methods(self, self.info-slots, #method.signatures, #method.addresses, override? = true);
-    add-methods(self, self.info-slots, #exported-method.signatures, #exported-method.addresses, override? = true);
-    method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info-slots, #method-aliases);
+    add-methods(self, self.info, #method.signatures, #method.addresses, override? = true);
+    add-methods(self, self.info, #exported-method.signatures, #exported-method.addresses, override? = true);
+    method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info, #method-aliases);
     if (nullptr != method-aliases) {
       int64-t i = 0;
       const signature-t* method-signature;
@@ -716,7 +717,7 @@ klass klass {
         i++;
       }
     }
-    self.traits = cast(const symbol-t*)named-info::at(self.info-slots, #traits);
+    self.traits = cast(const symbol-t*)named-info::at(self.info, #traits);
     if (nullptr != self.traits) {
       load-traits(self.traits);
       add-traits(self, self.traits);
@@ -725,14 +726,14 @@ klass klass {
     klass-initialize(self);
     dump-random(self);
     return self;
-  } // init(object-t self, named-info::slots-t*)
+  } // init(object-t self, named-info-t*)
   method init(object-t self,
-              named-info::slots-t* info-slots : nullptr,
-              object-t             info :       nullptr) -> object-t {
+              named-info-t* info-slots : nullptr,
+              object-t      info :       nullptr) -> object-t {
     self = $init(super);
     assert(!(nullptr == info-slots &&
              nullptr == info));
-    named-info::slots-t* tmp-info-slots;
+    named-info-t* tmp-info-slots;
     if (nullptr == info)
       tmp-info-slots = info-slots;
     else
