@@ -2903,6 +2903,46 @@ sub slots_signature_body {
   $result .= $col . "nullptr\n";
   return $result;
 }
+sub split_methods_by_addr {
+  my ($methods) = @_;
+  my $sorted_methods = [sort method::compare @$methods];
+  my $methods_w_addr = [];
+  my $methods_wo_addr = [];
+  foreach my $method (@$sorted_methods) {
+    if (!$$method{'alias'}) {
+      if ($$method{'defined?'} || $$method{'is-generated'}) {
+        &add_last($methods_w_addr, $method);
+      } else {
+        &add_last($methods_wo_addr, $method);
+      }
+    }
+  }
+  return ( $methods_w_addr, $methods_wo_addr );
+}
+sub signature_body_common {
+  my ($methods, $return_type, $col, $max_width) = @_;
+  my $result = '';
+
+  foreach my $method (@$methods) {
+    if (!$$method{'alias'}) {
+      my $method_type = &method::type($method, [ $return_type ]);
+      my $width = length("cast(func $method_type)");
+      my $pad = ' ' x ($max_width - $width);
+      my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
+      my $generic_name = "@{$$method{'name'}}";
+      my $in = &ident_comment($generic_name);
+      $method_type =~ s/(\s*->\s*)/$pad$1/;
+
+      if (&is_va($method)) {
+        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)__signature::va::$generic_name)()," . $in . "\n";
+      } else {
+        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)__signature::$generic_name)()," . $in . "\n";
+      }
+    }
+  }
+  return $result;
+}
+
 sub signature_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
@@ -2918,22 +2958,12 @@ sub signature_body {
       }
     }
   }
-  foreach my $method (@$sorted_methods) {
-    if (!$$method{'alias'}) {
-      my $method_type = &method::type($method, [ $return_type ]);
-      my $width = length("cast(func $method_type)");
-      my $pad = ' ' x ($max_width - $width);
-      my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
-      my $generic_name = "@{$$method{'name'}}";
-      my $in = &ident_comment($generic_name);
-
-      if (&is_va($method)) {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)" . $pad . "__signature::va::$generic_name)()," . $in . "\n";
-      } else {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)" . $pad . "__signature::$generic_name)()," . $in . "\n";
-      }
-    }
+  my ($methods_w_addr, $methods_wo_addr) = &split_methods_by_addr($sorted_methods);
+  $result .= &signature_body_common($methods_w_addr, $return_type, $col, $max_width);
+  if (scalar @$methods_w_addr && @$methods_wo_addr) {
+    $result .= "\n";
   }
+  $result .= &signature_body_common($methods_wo_addr, $return_type, $col, $max_width);
   $result .= $col . "nullptr\n";
   return $result;
 }
@@ -2955,7 +2985,8 @@ sub address_body {
       }
     }
   }
-  foreach my $method (@$sorted_methods) {
+  my ($methods_w_addr, $methods_wo_addr) = &split_methods_by_addr($sorted_methods);
+  foreach my $method (@$methods_w_addr) {
     if (!$$method{'alias'}) {
       my $method_type = &method::type($method);
       my $width = length("cast(func $method_type)");
@@ -2964,16 +2995,27 @@ sub address_body {
       my $generic_name = "@{$$method{'name'}}";
       my $in = &ident_comment($generic_name);
 
-      if ($$method{'defined?'} || $$method{'is-generated'}) {
-        if (&is_va($method)) {
-          $result .= $col . "cast(method-t)cast(func $method_type)" . $pad . "va::$generic_name," . $in . "\n";
-        } else {
-          $result .= $col . "cast(method-t)cast(func $method_type)" . $pad . "$generic_name," . $in . "\n";
-        }
+      if (&is_va($method)) {
+        $result .= $col . "cast(method-t)cast(func $method_type)" . $pad . "va::$generic_name," . $in . "\n";
       } else {
-        $pad = ' ' x $max_width;
-        $result .=   $col . "cast(method-t)"                        . $pad . "dkt-null-method, /*$generic_name()*/\n";
+        $result .= $col . "cast(method-t)cast(func $method_type)" . $pad . "$generic_name," . $in . "\n";
       }
+    }
+  }
+  if (scalar @$methods_w_addr && @$methods_wo_addr) {
+    $result .= "\n";
+  }
+  foreach my $method (@$methods_wo_addr) {
+    if (!$$method{'alias'}) {
+      my $method_type = &method::type($method);
+      my $width = length("cast(func $method_type)");
+      my $pad = ' ' x ($max_width - $width);
+      my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
+      my $generic_name = "@{$$method{'name'}}";
+      my $in = &ident_comment($generic_name);
+
+      $pad = ' ' x $max_width;
+      $result .=   $col . "cast(method-t)" . $pad . "dkt-null-method, /*$generic_name()*/\n";
     }
   }
   $result .= $col . "nullptr\n";
