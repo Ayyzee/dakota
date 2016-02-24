@@ -356,7 +356,7 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
   }
   ostream-t ostrm = { .output = stdout, .col = 0 };
   ostream::println-format(ostrm, "{ 'klasses' : '%zi', 'selectors' : '%zi' 'methods' : '%zi' },\n",
-         klasses-count, gbl-selectors-table.count, methods-count);
+                          klasses-count, selector-count(), methods-count);
   return;
 }
 # endif
@@ -1387,7 +1387,7 @@ static func set-read-only-all(str-t segment) -> int-t {
 static func dump-random() -> void {
   if (nullptr != getenv("DKT_DUMP_RANDOM")) {
     printf("null-method: %p\n", DKT-NULL-METHOD);
-    printf("num-generics: %zi\n", gbl-selectors-table.count);
+    printf("num-generics: %zi\n", selector-count());
   }
   return;
 }

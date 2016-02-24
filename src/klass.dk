@@ -92,14 +92,18 @@ klass selector-pair {
 }
 static const int64-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
-sorted-array-t   gbl-selectors-table = { .elements = gbl-selectors,
-                                         .count = 0,
-                                         .capacity = scountof(gbl-selectors),
-                                         .size = ssizeof(gbl-selectors[0]),
-                                         .compare = cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
+static sorted-array-t gbl-selectors-table = { .elements = gbl-selectors,
+                                              .count = 0,
+                                              .capacity = scountof(gbl-selectors),
+                                              .size = ssizeof(gbl-selectors[0]),
+                                              .compare = cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
+/*LOCAL*/ func selector-count() -> int64-t {
+  return gbl-selectors-table.count;
+}
+
 //   void dump-selectors()
 //   {
-//     for (int64-t index = 0; index < gbl-selectors-table.count; index++)
+//     for (int64-t index = 0; index < selector-count(); index++)
 //     {
 //       symbol-t   selector =  gbl-selectors[index]->name;
 //       int64-t selector =  *gbl-selectors[index]->ptr;
@@ -145,7 +149,7 @@ static func method-for-signature(methods::slots-t* methods, const signature-t* s
     selector-pair-t* found-pair =
       cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
     if (nullptr == found-pair) {
-      *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count);
+      *(pair.element->ptr) = cast(selector-t)(selector-count());
       pair.element->next = nullptr;
       sorted-array::add(&gbl-selectors-table, &pair);
     } else {
@@ -692,7 +696,7 @@ klass klass {
     if (nullptr != bit-vector::klass)
       self.behavior = behavior(self);
 # endif
-    alloc-methods(self, gbl-selectors-table.count);
+    alloc-methods(self, selector-count());
     init-methods(self);
     boole-t override?;
     add-methods(self, self.info-slots, #method.signatures, #method.addresses, override? = true);

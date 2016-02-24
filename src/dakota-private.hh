@@ -48,6 +48,8 @@ FUNC superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
 FUNC default_superklass_name() -> symbol_t;
 FUNC default_klass_name() -> symbol_t;
 
+FUNC selector_count() -> int64_t;
+
 KLASS_NS object {
   /*LOCAL*/ METHOD dump(object_t) -> object_t;
   /*LOCAL*/ METHOD instance3f(object_t, object_t) -> boole_t; // instance?()
