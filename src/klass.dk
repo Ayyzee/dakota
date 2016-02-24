@@ -502,7 +502,7 @@ klass klass {
           // should demangle here
           fprintf(out, " : '%s',", symbol-name);
         } else {
-          fprintf(out, " : null,");
+          fprintf(out, " : %p,", cast(ptr-t)m);
         }
         fprintf(out, "\n");
       }
