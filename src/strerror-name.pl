@@ -67,7 +67,7 @@ foreach my $key (@$keys) {
   print "\# endif\n";
 }
 print "\n";
-print "static FUNC ${prefix}_set_names() -> void {\n";
+print "static FUNC set_names() -> void {\n";
 foreach my $key (@$keys) {
   print "  if (BOGUS != $key)\n";
   print "    set_name($key, \"$key\");\n";

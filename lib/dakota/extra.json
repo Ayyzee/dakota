@@ -70,9 +70,9 @@
   },
   'rt_extra_symbols' => {
     '#behavior-exported?' => undef,
-    '#boole-t' => undef, # hardcode typedef
+    '#boole-t' => undef, # hardcode typealias
     '#cat' => undef,
-    '#char8-t' => undef, # hardcode typedef
+    '#char8-t' => undef, # hardcode typealias
     '#date' => undef,
     '#dir' => undef,
     '#enum' => undef,
@@ -94,7 +94,7 @@
     '#int.literals' => undef,
     '#int.names' => undef,
     '#int.ptrs' => undef,
-    '#int-t' => undef, # hardcode typedef
+    '#int-t' => undef, # hardcode typealias
     '#interpose-name' => undef,
     '#interposers' => undef,
     '#ints' => undef,
@@ -111,7 +111,7 @@
     '#name' => undef,
     '#offset' => undef,
     '#requires' => undef,
-    '#schar8-t' => undef, # hardcode typedef
+    '#schar8-t' => undef, # hardcode typealias
     '#selectors' => undef,
     '#signatures' => undef,
     '#size' => undef,
@@ -129,8 +129,8 @@
     '#traits' => undef,
     '#type' => undef,
     '#typeid' => undef,
-    '#uchar8-t' => undef, # hardcode typedef
-    '#uint-t' => undef,  # hardcode typedef
+    '#uchar8-t' => undef, # hardcode typealias
+    '#uint-t' => undef,  # hardcode typealias
     '#union' => undef,
     '#va-method' => undef,
     '#va-method.addresses' => undef,

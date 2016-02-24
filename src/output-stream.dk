@@ -32,7 +32,7 @@ klass ptr;
 klass stream;
 klass system-exception;
 
-namespace output-stream {
+KLASS-NS output-stream {
   [[format-va-printf(2)]] METHOD va::print-format(object-t self, str-t format, va-list-t args) -> object-t;
   [[format-va-printf(2)]] METHOD va::println-format(object-t self, str-t format, va-list-t args) -> object-t;
 }

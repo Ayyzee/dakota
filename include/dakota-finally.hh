@@ -22,8 +22,8 @@
 template <typename F>
 struct finally_t {
   F _f;
+  finally_t(const finally_t&) = default;
   finally_t(F f) : _f(f) {}
-  finally_t(const finally_t& r) : _f(r._f) {}
   ~finally_t() { _f(); }
 };
 template <typename F>

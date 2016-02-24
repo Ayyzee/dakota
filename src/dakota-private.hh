@@ -48,14 +48,20 @@ FUNC superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
 FUNC default_superklass_name() -> symbol_t;
 FUNC default_klass_name() -> symbol_t;
 
+KLASS_NS object {
+  /*LOCAL*/ METHOD dump(object_t) -> object_t;
+  /*LOCAL*/ METHOD instance3f(object_t, object_t) -> boole_t; // instance?()
+}
 KLASS_NS klass {
-  // FUNC traits_finalize(object_t self, const symbol_t* traits) -> void;
-  METHOD init(object_t, named_info_t*) -> object_t;
+  /*LOCAL*/ METHOD init(object_t, named_info_t*) -> object_t;
+  /*LOCAL*/ METHOD subklass3f(object_t, object_t) -> boole_t; // subklass?()
 }
 
-KLASS_NS object {
-  METHOD instance3f(object_t, object_t) -> boole_t; // instance?()
-}
+# if DKT_WORKAROUND
+KLASS_NS property   { /*LOCAL*/ METHOD compare(slots_t*,  slots_t* ) -> int_t; }
+KLASS_NS named_info { /*LOCAL*/ METHOD compare(slots_t**, slots_t**) -> int_t; }
+# endif
+
 [[noreturn]] FUNC verbose_terminate()  noexcept -> void;
 [[noreturn]] FUNC verbose_unexpected() noexcept -> void;
 [[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;

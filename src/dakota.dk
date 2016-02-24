@@ -86,13 +86,6 @@ klass symbol-compare;
 klass symbol;
 klass unbox-illegal-klass-exception;
 
-# if DKT-WORKAROUND
-namespace property   { /*LOCAL*/ func compare(slots-t*,  slots-t* ) -> int-t; }
-namespace named-info { /*LOCAL*/ func compare(slots-t**, slots-t**) -> int-t; }
-namespace klass      { /*LOCAL*/ func init(object-t, named-info-t*) -> object-t; }
-namespace klass      { /*LOCAL*/ func subklass?(object-t, object-t) -> boole-t;  }
-# endif
-
 static const char8-t gbl-delimiter = '/'; // unix path delimiter
 
 klass assoc-node {
@@ -286,6 +279,7 @@ static func init-klass(object-t kls, symbol-t name) -> object-t {
     kls = klass::init(kls, info);
     return kls;
 }
+KLASS-NS ostream { namespace va { [[format-va-printf(2)]] static func println-format(slots-t, str-t, va-list-t) -> slots-t; }}
 klass ostream {
   slots {
     stream-t output;
@@ -306,7 +300,6 @@ klass ostream {
       fprintf(s.output, "  "); // two spaces per column :-) [my way]
     return s;
   }
-  namespace va { [[format-va-printf(2)]] static func println-format(slots-t, str-t, va-list-t) -> slots-t; }
   [[format-va-printf(2)]] static func va::println-format(slots-t s, str-t format, va-list-t args) -> slots-t {
     pad(s);
     vfprintf(s.output, format, args);

@@ -64,11 +64,6 @@ klass std-compare;
 klass symbol;
 klass vector;
 
-# if DKT-WORKAROUND
-namespace object { /*LOCAL*/ func dump(object-t) -> object-t; }
-namespace klass  { /*LOCAL*/ func name(object-t) -> symbol-t; }
-# endif
-
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
   throw make(no-such-method-exception::klass, #object : object);
 }
@@ -219,7 +214,7 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
   if (nullptr == superklass-name) {
     object-t superklass = superklass-from-info(info, name);
     if (!root-superklass?(superklass))
-      superklass-name = klass::name(superklass);
+      superklass-name = name-of(superklass);
   }
   if (nullptr != name) {
     symbol-t interposer-name = interposer-name-for-klass-name(name);
