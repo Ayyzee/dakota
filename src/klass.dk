@@ -306,6 +306,8 @@ klass resource-usage {
 resource-usage::slots-t gbl-ru = { .memory = 0, .instances = 0, .method-memory = 0, .method-count = 0 };
 # endif
 
+klass initialize-func { slots (*)(object-t) -> void; }
+
 klass methods {
   slots {
     method-t* addrs; // first so its offset is 0
@@ -578,7 +580,6 @@ klass klass {
     }
     return;
   }
-  using initialize-func-t = func (*)(object-t) -> void;
   static func traits-initialize(object-t self, const symbol-t* traits) -> void {
     if (nullptr == traits || nullptr == traits[0])
       return;

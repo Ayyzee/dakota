@@ -2360,7 +2360,11 @@ sub generate_slots_decls {
   my $scratch_str_ref = &global_scratch_str_ref();
   if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . "\n";
-    $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . "\n";
+    if (&is_same_src_file($klass_scope)) {
+      $$scratch_str_ref .= $col .        &typealias_slots_t($klass_name) . "\n";
+    } else {
+      $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . "\n";
+    }
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
     if ('struct' eq $$klass_scope{'slots'}{'cat'} ||
         'union'  eq $$klass_scope{'slots'}{'cat'}) {

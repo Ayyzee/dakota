@@ -52,6 +52,8 @@ export dakota {
   hash::slots-t;
   hash;
   illegal-klass-exception;
+  initialize-func::slots-t;
+  initialize-func;
   input-stream::slots-t;
   input-stream;
   int-fast16::max;

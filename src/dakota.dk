@@ -63,6 +63,7 @@ klass enum-info;
 klass exception;
 klass exe-type;
 klass illegal-klass-exception;
+klass initialize-func;
 klass intptr;
 klass named-enum-info;
 klass named-info-compare;
@@ -452,10 +453,10 @@ func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
   object-t klass = dk-register-klass(klass-info);
   return klass;
 }
-using each-box-func-t =   func (*)(...) -> object-t;
-using named-info-func-t = func (*)(named-info-t*, each-box-func-t) -> void;
-using str-box-func-t =    func (*)(str-t) -> object-t;
-using int-box-func-t =    func (*)(intptr-t) -> object-t;
+klass each-box-func   { slots (*)(...) -> object-t; }
+klass named-info-func { slots (*)(named-info-t*, each-box-func::slots-t) -> void; } // fixfix
+klass str-box-func    { slots (*)(str-t) -> object-t; }
+klass int-box-func    { slots (*)(intptr-t) -> object-t; }
 
 static func each(named-info-t* root-info-list, named-info-func-t func, each-box-func-t user-data) -> void  {
   named-info-t* info;
@@ -1481,7 +1482,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       //   object-t kls = dk-klass-for-name(klass-name);
       //   klass::traits-finalize(kls, traits);
       // }
-      using finalize-func-t = func (*)(object-t) -> void;
+      using finalize-func-t = initialize-func-t;
       finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(klass-info, #finalize);
       if (nullptr != klass-finalize) {
         named-assoc-node-t named-node = { .name = klass-name, .node = nullptr };
