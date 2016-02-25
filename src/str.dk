@@ -50,6 +50,17 @@ klass str {
 
   slots const char8-t*;
 
+  method init(object-t self, slots-t slots : "") -> object-t {
+    self = $init(super);
+    unbox(self) = slots;
+    return self;
+  }
+  // causes make-format(object-t, str-t, ...) to be generated
+  // method va::init-format(object-t self, str-t format, va-list-t args) {
+  //   self = $init(super);
+  //   //
+  //   return self;
+  // }
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p:%p { slots=\"%s\" }\n",
