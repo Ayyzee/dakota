@@ -1238,21 +1238,12 @@ sub generics::generate_signature_seq {
     $scratch_str .= $col . "static const signature-t* const* va-signatures = nullptr;\n";
   } else {
     $scratch_str .= $col . "static const signature-t* const va-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
-    my $max_width = 0;
-    foreach $generic (sort method::compare @$va_generics) {
-      my $method_type = &method::type($generic, [ $return_type ]);
-      my $width = length($method_type);
-      if ($width > $max_width) {
-        $max_width = $width;
-      }
-    }
     $col = &colin($col);
     foreach $generic (sort method::compare @$va_generics) {
-      my $method_type = &method::type($generic, [ $return_type ]);
-      my $width = length($method_type);
-      my $pad = ' ' x ($max_width - $width);
-      my $name = "@{$$generic{'name'}}";
-      $scratch_str .= $col . "(cast(dkt-signature-func-t)cast(func $method_type) " . $pad . "__signature::va::$name)(),\n";
+      my $new_arg_type_list = &arg_type::list_types($$generic{'parameter-types'});
+      my $generic_name = "@{$$generic{'name'}}";
+      my $in = &ident_comment($generic_name);
+      $scratch_str .= $col . "SIGNATURE(va::$generic_name($$new_arg_type_list))," . $in . "\n";
     }
     $scratch_str .= $col . "nullptr,\n";
     $col = &colout($col);
@@ -1262,23 +1253,13 @@ sub generics::generate_signature_seq {
     $scratch_str .= $col . "static const signature-t* const* signatures = nullptr;\n";
   } else {
     $scratch_str .= $col . "static const signature-t* const signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
-    my $max_width = 0;
-    foreach $generic (sort method::compare @$fa_generics) {
-      my $method_type = &method::type($generic, [ $return_type ]);
-      my $width = length($method_type);
-      if ($width > $max_width) {
-        $max_width = $width;
-      }
-    }
     $col = &colin($col);
-    foreach $generic (@$fa_generics) {
+    foreach $generic (sort method::compare @$fa_generics) {
       if (!&is_slots($generic)) {
-        my $method_type = &method::type($generic, [ $return_type ]);
-        my $width = length($method_type);
-        my $pad = ' ' x ($max_width - $width);
-        my $name = "@{$$generic{'name'}}";
-        my $in = &ident_comment($name);
-        $scratch_str .= $col . "(cast(dkt-signature-func-t)cast(func $method_type) " . $pad . "__signature::$name)()," . $in . "\n";
+        my $new_arg_type_list = &arg_type::list_types($$generic{'parameter-types'});
+        my $generic_name = "@{$$generic{'name'}}";
+        my $in = &ident_comment($generic_name);
+        $scratch_str .= $col . "SIGNATURE($generic_name($$new_arg_type_list))," . $in . "\n";
       }
     }
     $scratch_str .= $col . "nullptr,\n";
@@ -3072,7 +3053,6 @@ sub dk_generate_cc_footer_klass {
   my $va_list_methods = &klass::va_list_methods($klass_scope);
   my $kw_args_methods = &klass::kw_args_methods($klass_scope);
 
-  my $va_method_num = 0;
   #my $num_va_methods = @$va_list_methods;
 
   #if (@$va_list_methods)
@@ -3085,28 +3065,13 @@ sub dk_generate_cc_footer_klass {
 
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
 
-    $va_method_num = 0;
-    my $max_width = 0;
-    my $return_type = 'const signature-t*';
-    foreach my $va_method (@$sorted_va_methods) {
-      my $va_method_type = &method::type($va_method, [ $return_type ]);
-      my $width = length($va_method_type);
-      if ($width > $max_width) {
-        $max_width = $width;
-      }
-    }
     $col = &colin($col);
     foreach my $va_method (@$sorted_va_methods) {
-      my $va_method_type = &method::type($va_method, [ $return_type ]);
-      my $width = length($va_method_type);
-      my $pad = ' ' x ($max_width - $width);
-
       if ($$va_method{'defined?'} || $$va_method{'alias'}) {
-        my $new_arg_names_list = &arg_type::list_types($$va_method{'parameter-types'});
-
+        my $new_arg_type_list = &arg_type::list_types($$va_method{'parameter-types'});
         my $generic_name = "@{$$va_method{'name'}}";
-
-        $$scratch_str_ref .= $col . "(cast(dkt-signature-func-t)cast(func $va_method_type)" . $pad . "__signature::va::$generic_name)(),\n";
+        my $in = &ident_comment($generic_name);
+        $$scratch_str_ref .= $col . "SIGNATURE(va::$generic_name($$new_arg_type_list))," . $in . "\n";
         my $method_name;
 
         if ($$va_method{'alias'}) {
@@ -3124,7 +3089,6 @@ sub dk_generate_cc_footer_klass {
         my $va_method_name = $method_name;
         #$$scratch_str_ref .= $col . "(va-method-t)(($method_type)$va_method_name),\n";
       }
-      $va_method_num++;
     }
     $$scratch_str_ref .= $col . "nullptr,\n";
     $col = &colout($col);
@@ -3138,7 +3102,6 @@ sub dk_generate_cc_footer_klass {
     ### todo: this looks like it might merge with address_body(). see die below
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
 
-    $va_method_num = 0;
     my $max_width = 0;
     foreach my $va_method (@$sorted_va_methods) {
       $va_method = &dakota::util::deep_copy($va_method);
@@ -3176,7 +3139,6 @@ sub dk_generate_cc_footer_klass {
         my $va_method_name = $method_name;
         $$scratch_str_ref .= $col . "cast(va-method-t)cast(func $method_type)" . $pad . "$va_method_name,\n";
       }
-      $va_method_num++;
     }
     $$scratch_str_ref .= $col . "nullptr,\n";
     $col = &colout($col);
@@ -3189,33 +3151,19 @@ sub dk_generate_cc_footer_klass {
   ###
   if (@$kw_args_methods) {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __kw-args-method-signatures[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
-    #$col = &colin($col);
-
+    $col = &colin($col);
     #$$scratch_str_ref .= "\#if 0\n";
-    my $max_width = 0;
     foreach my $kw_args_method (@$kw_args_methods) {
       $kw_args_method = &dakota::util::deep_copy($kw_args_method);
-      my $kw_args_method_type = &kw_args_method::type($kw_args_method);
-      my $width = length($kw_args_method_type);
-      if ($width > $max_width) {
-        $max_width = $width;
-      }
-    }
-    foreach my $kw_args_method (@$kw_args_methods) {
-      $kw_args_method = &dakota::util::deep_copy($kw_args_method);
-      my $kw_args_method_type = &kw_args_method::type($kw_args_method);
-      my $width = length($kw_args_method_type);
-      my $pad = ' ' x ($max_width - $width);
-
-      my $method_name = "@{$$kw_args_method{'name'}}";
       my $list_types = &arg_type::list_types($$kw_args_method{'parameter-types'});
+      my $method_name = "@{$$kw_args_method{'name'}}";
+      my $in = &ident_comment($method_name);
      #my $kw_list_types = &method::kw_list_types($kw_args_method);
-      $$scratch_str_ref .=
-        $col . "  (cast(dkt-signature-func-t)cast(func (*)($$list_types) -> const signature-t*)" .
-        $pad . "__kw-args-method-signature::va::$method_name)(),\n";
+      $$scratch_str_ref .= $col . "KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types))," . $in . "\n";
     }
     #$$scratch_str_ref .= "\#endif\n";
-    $$scratch_str_ref .= $col . "  nullptr\n";
+    $$scratch_str_ref .= $col . "nullptr\n";
+    $col = &colout($col);
     $$scratch_str_ref .= $col . "};}\n";
   }
   if (values %{$$klass_scope{'methods'} ||= []}) {
