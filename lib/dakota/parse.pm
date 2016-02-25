@@ -1718,7 +1718,7 @@ sub method {
   my $name = [];
   push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
   if ('va' eq $$name[0]) {
-    $$method{'is-va'} = 1;
+    $$method{'va?'} = 1;
     push @$name, &match(__FILE__, __LINE__, '::');
     push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
   }
@@ -1733,7 +1733,7 @@ sub method {
     &match(__FILE__, __LINE__, '=>');
     my $realname = [];
     push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
-    if ($$method{'is-va'}) {
+    if ($$method{'va?'}) {
       push @$realname, &match(__FILE__, __LINE__, '::');
       push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
     }
@@ -2068,7 +2068,7 @@ sub generics::_parse { # no longer recursive
   foreach my $method (values %{$$klass_scope{'methods'}}) {
     my $generic = &dakota::util::deep_copy($method);
     $$generic{'exported?'} = 0;
-    #$$generic{'is-inline'} = 1;
+    #$$generic{'inline?'} = 1;
 
     #if ($$generic{'alias'}) {
     #    $$generic{'name'} = $$generic{'alias'};
@@ -2232,7 +2232,7 @@ sub add_object_methods_decls_to_klass {
              $$klass_scope{'methods'}{$object_method_signature}{'defined?'})) {
         } else {
           $$object_method_info{'defined?'} = 0;
-          $$object_method_info{'is-generated'} = 1;
+          $$object_method_info{'generated?'} = 1;
           #print STDERR "$object_method_signature\n";
           #print STDERR &Dumper($object_method_info);
           $$klass_scope{$methods_key}{$object_method_signature} =

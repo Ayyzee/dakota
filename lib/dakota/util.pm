@@ -467,7 +467,7 @@ sub is_kw_args_generic {
   if (exists $$generic{'keyword-types'} && defined $$generic{'keyword-types'} && 0 != scalar @{$$generic{'keyword-types'}}) {
     return 1;
   }
-  if (exists $$generic{'keyword-types'} && !exists $$generic{'is-va'}) {
+  if (exists $$generic{'keyword-types'} && !exists $$generic{'va?'}) {
     return 1;
   }
   if (exists $$generic{'kw-args-names'} && 0 != scalar @{$$generic{'kw-args-names'}}) {

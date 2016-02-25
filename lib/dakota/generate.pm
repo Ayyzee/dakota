@@ -834,7 +834,7 @@ sub function::decl {
     $visibility = '[[export]] ';
   }
   my $func_spec = '';
-  if ($$function{'is-inline'}) {
+  if ($$function{'inline?'}) {
     $func_spec = 'INLINE ';
   }
   my $return_type = &arg::type($$function{'return-type'});
@@ -862,7 +862,7 @@ sub is_va {
   my ($method) = @_;
   my $num_args = @{$$method{'parameter-types'}};
 
-  if ($$method{'is-va'}) {
+  if ($$method{'va?'}) {
     return 1;
   } elsif ("va-list-t" eq "@{$$method{'parameter-types'}[$num_args - 1]}") {
     return 1;
@@ -880,13 +880,13 @@ sub method::varargs_from_qual_va_list {
   if (exists $$new_method{'parameter-types'}) {
     &dakota::util::_replace_last($$new_method{'parameter-types'}, ['...']);
   }
-  delete $$new_method{'is-va'};
+  delete $$new_method{'va?'};
   return $new_method;
 }
 sub method::generate_va_method_defn {
   #my ($scope, $va_method) = @_;
   my ($va_method, $scope, $col, $klass_type, $line) = @_;
-  my $is_inline  = $$va_method{'is-inline'};
+  my $is_inline  = $$va_method{'inline?'};
 
   my $new_arg_types_ref      = $$va_method{'parameter-types'};
   my $new_arg_types_va_ref   = &arg_type::va($new_arg_types_ref);
@@ -1318,7 +1318,7 @@ sub generics::generate_va_generic_defns {
       my $scope = [];
       &path::add_last($scope, 'dk');
       my $new_generic = &dakota::util::deep_copy($generic);
-      $$new_generic{'is-inline'} = $is_inline;
+      $$new_generic{'inline?'} = $is_inline;
 
       $$new_generic{'defined?'} = 1; # hackhack
 
@@ -2152,7 +2152,7 @@ sub linkage_unit::generate_klasses_body {
     foreach $method (@$va_list_methods) {
       if (1) {
         my $va_method = &dakota::util::deep_copy($method);
-        #$$va_method{'is-inline'} = 1;
+        #$$va_method{'inline?'} = 1;
         #if (&is_decl() || &is_same_file($klass_scope)) #rn1
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
           if (defined $$method{'keyword-types'}) {
@@ -2182,7 +2182,7 @@ sub linkage_unit::generate_klasses_body {
                 if (&is_exported($method)) {
                   $visibility = '[[export]] ';
                 }
-                if ($$method{'is-inline'}) {
+                if ($$method{'inline?'}) {
                   #$$scratch_str_ref .= 'INLINE ';
                 }
                 $$scratch_str_ref .= $col . "$klass_type $klass_name { " . $visibility . "METHOD $other_method_decl; }" . &ann(__FILE__, __LINE__, "stmt3") . "\n";
@@ -2850,7 +2850,7 @@ sub split_methods_by_addr {
   my $methods_wo_addr = [];
   foreach my $method (@$sorted_methods) {
     if (!$$method{'alias'}) {
-      if ($$method{'defined?'} || $$method{'is-generated'}) {
+      if ($$method{'defined?'} || $$method{'generated?'}) {
         &add_last($methods_w_addr, $method);
       } else {
         &add_last($methods_wo_addr, $method);
@@ -2897,7 +2897,7 @@ sub address_body {
   my $max_width = 0;
   foreach my $method (@$sorted_methods) {
     if (!$$method{'alias'}) {
-      if ($$method{'defined?'} || $$method{'is-generated'}) {
+      if ($$method{'defined?'} || $$method{'generated?'}) {
         my $method_type = &method::type($method);
         my $width = length("cast(func $method_type)");
         if ($width > $max_width) {
@@ -3087,7 +3087,7 @@ sub dk_generate_cc_footer_klass {
         } else {
           $method_name = "@{$$va_method{'name'}}";
         }
-        die if (!$$va_method{'defined?'} && !$$va_method{'alias'} && !$$va_method{'is-generated'});
+        die if (!$$va_method{'defined?'} && !$$va_method{'alias'} && !$$va_method{'generated?'});
 
         my $old_parameter_types = $$va_method{'parameter-types'};
         $$va_method{'parameter-types'} = &arg_type::va($$va_method{'parameter-types'});
@@ -3587,7 +3587,7 @@ sub generate_kw_args_method_defn {
     $visibility = '[[export]] ';
   }
   my $func_spec = '';
-  #if ($$method{'is-inline'})
+  #if ($$method{'inline?'})
   #{
   #    $func_spec = 'INLINE ';
   #}
