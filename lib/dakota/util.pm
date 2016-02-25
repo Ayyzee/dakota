@@ -464,6 +464,12 @@ sub set_global_project_rep {
 sub is_kw_args_generic {
   my ($generic) = @_;
   my $state = 0;
+  if (exists $$generic{'keyword-types'} && defined $$generic{'keyword-types'} && 0 != scalar @{$$generic{'keyword-types'}}) {
+    return 1;
+  }
+  if (exists $$generic{'keyword-types'} && !exists $$generic{'is-va'}) {
+    return 1;
+  }
   if (exists $$generic{'kw-args-names'} && 0 != scalar @{$$generic{'kw-args-names'}}) {
     return 1;
   }
