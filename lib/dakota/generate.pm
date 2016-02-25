@@ -1282,31 +1282,11 @@ sub generics::generate_selector_seq {
   } else {
     $scratch_str .= $col . "static selector-node-t va-selectors[] = {" . &ann(__FILE__, __LINE__) . " //rw-data\n";
     $col = &colin($col);
-    my $max_width = 0;
-    my $max_name_width = 0;
     foreach $generic (sort method::compare @$va_generics) {
-      my $method_type = &method::type($generic, [ $return_type ]);
-      my $width = length($method_type);
-      if ($width > $max_width) {
-        $max_width = $width;
-      }
-
+      my $new_arg_type_list   = &arg_type::list_types($$generic{'parameter-types'});
       my $name = "@{$$generic{'name'}}";
-      my $name_width = length($name);
-      if ($name_width > $max_name_width) {
-        $max_name_width = $name_width;
-      }
-    }
-    foreach $generic (sort method::compare @$va_generics) {
-      my $method_type = &method::type($generic, [ $return_type ]);
-      my $width = length($method_type);
-      my $pad = ' ' x ($max_width - $width);
-      my $name = "@{$$generic{'name'}}";
-      my $name_width = length($name);
-      my $name_pad = ' ' x ($max_name_width - $name_width);
-      $scratch_str .=
-        $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast(func $method_type) " .
-        $pad . "__selector::va::$name" . $name_pad . "))() },\n";
+      my $in = &ident_comment($name);
+      $scratch_str .= $col . "{ .next = nullptr, .ptr = DKT-SELECTOR-PTR(va::$name($$new_arg_type_list)) }," . $in . "\n";
     }
     $scratch_str .= $col . "{ .next = nullptr, .ptr = nullptr },\n";
     $col = &colout($col);
@@ -1317,33 +1297,12 @@ sub generics::generate_selector_seq {
   } else {
     $scratch_str .= $col . "static selector-node-t selectors[] = {" . &ann(__FILE__, __LINE__) . " //rw-data\n";
     $col = &colin($col);
-    my $max_width = 0;
-    my $max_name_width = 0;
-    foreach $generic (@$fa_generics) {
-      my $method_type = &method::type($generic, [ $return_type ]);
-      my $width = length($method_type);
-      if ($width > $max_width) {
-        $max_width = $width;
-      }
-
-      my $name = "@{$$generic{'name'}}";
-      my $name_width = length($name);
-      if ($name_width > $max_name_width) {
-        $max_name_width = $name_width;
-      }
-    }
     foreach $generic (@$fa_generics) {
       if (!&is_slots($generic)) {
-        my $method_type = &method::type($generic, [ $return_type ]);
-        my $width = length($method_type);
-        my $pad = ' ' x ($max_width - $width);
+        my $new_arg_type_list   = &arg_type::list_types($$generic{'parameter-types'});
         my $name = "@{$$generic{'name'}}";
         my $in = &ident_comment($name);
-        my $name_width = length($name);
-        my $name_pad = ' ' x ($max_name_width - $name_width);
-        $scratch_str .=
-          $col . "{ .next = nullptr, .ptr = (cast(dkt-selector-func-t)(cast(func $method_type) " .
-          $pad . "__selector::$name" . $name_pad . "))() }," . $in . "\n";
+        $scratch_str .= $col . "{ .next = nullptr, .ptr = DKT-SELECTOR-PTR($name($$new_arg_type_list)) }," . $in . "\n";
       }
     }
     $scratch_str .= $col . "{ .next = nullptr, .ptr = nullptr },\n";

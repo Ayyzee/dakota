@@ -185,6 +185,7 @@ inline FUNC name_of(object_t kls) -> object_t {
 
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 // file scope
+# define DKT_SELECTOR_PTR(name, args)         (cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
 # define SELECTOR(name, args)                *(cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
 # define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __signature::name))()
 
