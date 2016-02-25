@@ -53,15 +53,15 @@
 # define SENTINAL_PTR nullptr
 
 # if defined _WIN32 || defined _WIN64
-  # define so_import ms::dllimport
-  # define so_export ms::dllexport
+  # define import ms::dllimport
+  # define export ms::dllexport
 # else
-  # define so_import
-  # define so_export gnu::visibility("default")
+  # define import
+  # define export gnu::visibility("default")
 # endif
 
 # if 0
-# define dkt_enable_typeinfo [[so_export]]
+# define dkt_enable_typeinfo [[export]]
 # else
 # define dkt_enable_typeinfo
 # endif

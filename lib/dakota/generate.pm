@@ -831,7 +831,7 @@ sub function::decl {
 
   my $visibility = '';
   if (&is_exported($function)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $func_spec = '';
   if ($$function{'is-inline'}) {
@@ -918,7 +918,7 @@ sub method::generate_va_method_defn {
   }
   my $visibility = '';
   if (&is_exported($va_method)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -1014,7 +1014,7 @@ sub common::print_signature {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
@@ -1120,7 +1120,7 @@ sub common::print_selector {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
@@ -1348,7 +1348,7 @@ sub generics::generate_generic_defn {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -1454,7 +1454,7 @@ sub generics::generate_super_generic_defn {
   }
   my $visibility = '';
   if (&is_exported($generic)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -2180,7 +2180,7 @@ sub linkage_unit::generate_klasses_body {
                 $other_method_decl =~ s|\(\*($id)\)| $1|;
                 my $visibility = '';
                 if (&is_exported($method)) {
-                  $visibility = '[[so-export]] ';
+                  $visibility = '[[export]] ';
                 }
                 if ($$method{'is-inline'}) {
                   #$$scratch_str_ref .= 'INLINE ';
@@ -2226,7 +2226,7 @@ sub generate_object_method_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   my $visibility = '';
   if (&is_exported($method)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $method_name = "@{$$method{'name'}}";
   $$scratch_str_ref .= $col . "$klass_type @$klass_path { " . $visibility . "METHOD $method_name($$new_arg_list) -> $return_type";
@@ -3584,7 +3584,7 @@ sub generate_kw_args_method_defn {
   my $return_type = &arg::type($$method{'return-type'});
   my $visibility = '';
   if (&is_exported($method)) {
-    $visibility = '[[so-export]] ';
+    $visibility = '[[export]] ';
   }
   my $func_spec = '';
   #if ($$method{'is-inline'})

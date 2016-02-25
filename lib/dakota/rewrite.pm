@@ -347,7 +347,7 @@ sub rewrite_methods {
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
 
-  #$$filestr_ref =~ s|(?<!\[\[so-export\]\])(\s+)(method)(\s*)|$1METHOD$3 |gm;
+  #$$filestr_ref =~ s|(?<!\[\[export\]\])(\s+)(method)(\s*)|$1METHOD$3 |gm;
 
   $$filestr_ref =~ s/klass_method/klass method/gs;           #hackhack
   $$filestr_ref =~ s/namespace_method/namespace method/gs;   #hackhack
@@ -533,7 +533,7 @@ sub rewrite_enums {
 sub rewrite_const {
   # does not deal with comments containing '{' or '}' between the { }
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s|\b\[\[so-export\]\](\s+const.*?;)|/*\[\[so-export\]\]*/$1|g;
+  $$filestr_ref =~ s|\b\[\[export\]\](\s+const.*?;)|/*\[\[export\]\]*/$1|g;
 }
 sub rewrite_array_types {
   my ($filestr_ref) = @_;
@@ -767,7 +767,7 @@ sub add_implied_slots_struct {
 }
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=(\[\[so-export\]\])(\s+slots\s+)=/*$1*/$2=gs;
+  $$filestr_ref =~ s=(\[\[export\]\])(\s+slots\s+)=/*$1*/$2=gs;
   $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)([^;]*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5, $6)=gse;
 }
 sub exported_enum_body {
@@ -776,7 +776,7 @@ sub exported_enum_body {
 }
 sub remove_exported_enum {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\[\[so-export\]\])(\s+enum)(\s*$k*)(.*?)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
+  $$filestr_ref =~ s/(\[\[export\]\])(\s+enum)(\s*$k*)(.*?)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
 }
 # method init( ... , object-t $arg1, object-t $arg2 = ...) {|;
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;
@@ -906,7 +906,7 @@ sub export_method_rhs {
   #$c =~ s/(\bnoexport\b)(\s+\bmethod\b.*?$sig_min\s*$main::list\s*;)/$1/gm;
   #$c =~ s/(\bnoexport\b)(\s+\bmethod\b.*?$sig_min\s*$main::list\s*$main::block)/$1/gm;
 
-  $c =~ s/(\bmethod\b.*?$sig_min\s*$main::list\s*(;|$main::block))/\[\[so-export\]\] $1/gm;
+  $c =~ s/(\bmethod\b.*?$sig_min\s*$main::list\s*(;|$main::block))/\[\[export\]\] $1/gm;
 
   #print STDERR "$a$b\{ ... method ... $sig_min \( ... \) { ... } ... \}\n";
   #print STDERR "$c\n";
@@ -1025,13 +1025,13 @@ sub convert_dk_to_cc {
   if ($remove) {
     &remove_exported_slots($filestr_ref);
   }
-  #&wrapped_rewrite($filestr_ref, [ '[[so-export]]', 'slots', '?block' ], [ ]);
+  #&wrapped_rewrite($filestr_ref, [ '[[export]]', 'slots', '?block' ], [ ]);
 
   if ($remove) {
     &remove_exported_enum($filestr_ref);
   }
-  #&wrapped_rewrite($filestr_ref, [ '[[so-export]]', 'enum',           '?block' ], [ ]);
-  #&wrapped_rewrite($filestr_ref, [ '[[so-export]]', 'enum', '?ident', '?block' ], [ ]);
+  #&wrapped_rewrite($filestr_ref, [ '[[export]]', 'enum',           '?block' ], [ ]);
+  #&wrapped_rewrite($filestr_ref, [ '[[export]]', 'enum', '?ident', '?block' ], [ ]);
 
   &rewrite_set_literal($filestr_ref);
   &rewrite_sequence_literal($filestr_ref);
