@@ -929,10 +929,10 @@ sub method::generate_va_method_defn {
   &dakota::util::add_last($scope_va, 'va');
   $$scratch_str_ref .= $visibility . $func_spec;
   if ($klass_type) {
-    $$scratch_str_ref .= ' METHOD ';
+    $$scratch_str_ref .= 'METHOD ';
   }
   else {
-    $$scratch_str_ref .= ' GENERIC ';
+    $$scratch_str_ref .= 'GENERIC ';
   }
   $$scratch_str_ref .= "$va_method_name($$new_arg_list_va_ref) -> $return_type";
 
@@ -1359,9 +1359,9 @@ sub generics::generate_generic_defn {
 
   $$scratch_str_ref .= $visibility . $func_spec;
   if (&is_va($generic)) {
-    $$scratch_str_ref .= ' VA-GENERIC ';
+    $$scratch_str_ref .= 'VA-GENERIC ';
   } else {
-    $$scratch_str_ref .= ' GENERIC ';
+    $$scratch_str_ref .= 'GENERIC ';
   }
   $$scratch_str_ref .= "$generic_name($$new_arg_list) -> $return_type";
 
@@ -1465,9 +1465,9 @@ sub generics::generate_super_generic_defn {
 
   $$scratch_str_ref .= $visibility . $func_spec;
   if (&is_va($generic)) {
-    $$scratch_str_ref .= ' VA-GENERIC ';
+    $$scratch_str_ref .= 'VA-GENERIC ';
   } else {
-    $$scratch_str_ref .= ' GENERIC ';
+    $$scratch_str_ref .= 'GENERIC ';
   }
   $$scratch_str_ref .= "$generic_name($$new_arg_list) -> $return_type";
 
