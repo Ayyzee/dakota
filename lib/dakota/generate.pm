@@ -2920,50 +2920,33 @@ sub split_methods_by_addr {
   return ( $methods_w_addr, $methods_wo_addr );
 }
 sub signature_body_common {
-  my ($methods, $return_type, $col, $max_width) = @_;
+  my ($methods, $col) = @_;
   my $result = '';
 
   foreach my $method (@$methods) {
     if (!$$method{'alias'}) {
-      my $method_type = &method::type($method, [ $return_type ]);
-      my $width = length("cast(func $method_type)");
-      my $pad = ' ' x ($max_width - $width);
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = "@{$$method{'name'}}";
       my $in = &ident_comment($generic_name);
-      $method_type =~ s/(\s*->\s*)/$pad$1/;
-
       if (&is_va($method)) {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)__signature::va::$generic_name)()," . $in . "\n";
+        $result .= $col . "SIGNATURE(va::$generic_name($$new_arg_type_list))," . $in . "\n";
       } else {
-        $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)__signature::$generic_name)()," . $in . "\n";
+        $result .= $col . "SIGNATURE($generic_name($$new_arg_type_list))," . $in . "\n";
       }
     }
   }
   return $result;
 }
-
 sub signature_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
   my $result = '';
-  my $max_width = 0;
-  my $return_type = 'const signature-t*';
-  foreach my $method (@$sorted_methods) {
-    if (!$$method{'alias'}) {
-      my $method_type = &method::type($method, [ $return_type ]);
-      my $width = length("cast(func $method_type)");
-      if ($width > $max_width) {
-        $max_width = $width;
-      }
-    }
-  }
   my ($methods_w_addr, $methods_wo_addr) = &split_methods_by_addr($sorted_methods);
-  $result .= &signature_body_common($methods_w_addr, $return_type, $col, $max_width);
+  $result .= &signature_body_common($methods_w_addr, $col);
   if (scalar @$methods_w_addr && @$methods_wo_addr) {
     $result .= "\n";
   }
-  $result .= &signature_body_common($methods_wo_addr, $return_type, $col, $max_width);
+  $result .= &signature_body_common($methods_wo_addr, $col);
   $result .= $col . "nullptr\n";
   return $result;
 }
