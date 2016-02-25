@@ -1033,7 +1033,6 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
     if (nullptr != ci.enum-info) {
       int64-t i = 0;
       while (nullptr != ci.enum-info[i].info) {
-        ostream::println-format(ostrm, "export\n"); // hackhack
         if (nullptr != ci.enum-info[i].name)
           ostream::println-format(ostrm, "enum %s\n", ci.enum-info[i].name);
         else
@@ -1057,7 +1056,6 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
     if (nullptr != ci.const-info) {
       int64-t i = 0;
       while (nullptr != ci.const-info[i].name) {
-        ostream::println-format(ostrm, "export\n"); // hackhack
         ostream::println-format(ostrm, "const %s %s = %s;\n",
                                 ci.const-info[i].type,
                                 ci.const-info[i].name,
