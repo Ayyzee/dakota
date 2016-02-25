@@ -760,10 +760,14 @@ func dk-init-runtime() -> void {
 
 # if 0
     $dump(object::klass);
+    fprintf(stderr, "---\n");
     $dump(klass::klass);
+    fprintf(stderr, "---\n");
     $dump(singleton-klass::klass);
     if (nullptr != null) {
+      fprintf(stderr, "---\n");
       $dump(null-singleton::klass);
+      fprintf(stderr, "---\n");
       $dump(null);
     }
 # endif

@@ -454,9 +454,12 @@ klass klass {
         fprintf(stderr, " ");
       }
     }
-    fprintf(stderr, "],");
-
+    fprintf(stderr, "]");
+    fprintf(stderr, ", behavior=%p", self.behavior);
     fprintf(stderr, " }\n");
+    if (0)
+      if (nullptr != self.behavior)
+        $dump(self.behavior);
     return self;
   }
   method traits(object-t self) -> object-t {
