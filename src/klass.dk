@@ -97,7 +97,10 @@ static sorted-array-t gbl-selectors-table = { .elements = gbl-selectors,
                                               .capacity = scountof(gbl-selectors),
                                               .size = ssizeof(gbl-selectors[0]),
                                               .compare = cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
+static const int64-t selector-count-max = 255;
 /*LOCAL*/ func selector-count() -> int64-t {
+  assert(0 < gbl-selectors-table.count);
+  assert(selector-count-max > gbl-selectors-table.count);
   return gbl-selectors-table.count;
 }
 
@@ -149,7 +152,7 @@ static func method-for-signature(methods::slots-t* methods, const signature-t* s
     selector-pair-t* found-pair =
       cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
     if (nullptr == found-pair) {
-      *(pair.element->ptr) = cast(selector-t)(selector-count());
+      *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count); // may be zero
       pair.element->next = nullptr;
       sorted-array::add(&gbl-selectors-table, &pair);
     } else {
@@ -352,6 +355,8 @@ klass klass {
     return name;
   }
   static func alloc-methods(object-t self, int64-t methods-count) -> object-t {
+    assert(0 < methods-count);
+    assert(selector-count-max > methods-count);
     self.methods.count = methods-count;
     self.methods.addrs = cast(method-t*)dkt::alloc(ssizeof(method-t) * self.methods.count);
 
@@ -396,7 +401,7 @@ klass klass {
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
-      $set-bit(self.behavior, cast(int64-t)selector, false);
+      bit-vector::set-bit(self.behavior, cast(int64-t)selector, false);
     return m;
   }
   method add-method-for-selector(object-t self, selector-t selector, method-t m) -> method-t {
@@ -404,7 +409,7 @@ klass klass {
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
-      $set-bit(self.behavior, cast(int64-t)selector, true);
+      bit-vector::set-bit(self.behavior, cast(int64-t)selector, true);
     return prev-m;
   }
   method dump(object-t self) -> object-t {
@@ -429,6 +434,10 @@ klass klass {
     fprintf(stderr, ", size=%zi", self.size);
     // offset
     fprintf(stderr, ", offset=%zi", self.offset);
+
+    // methods.count, methods.addrs
+    fprintf(stderr, ", methods.count=%zi", self.methods.count);
+    fprintf(stderr, ", methods.addrs=%p",  self.methods.addrs);
 
     // traits
     fprintf(stderr, ", traits=["); {
@@ -637,18 +646,33 @@ klass klass {
   //   return;
   // }
   method behavior?(object-t self, object-t kls) -> boole-t {
+# if defined DKT-OMIT-BEHAVIOR
+    return false;
+# endif
     assert((nullptr != self.behavior) || (nullptr != unbox(kls).behavior));
     boole-t state = $bit-and?(self.behavior, unbox(kls).behavior);
     return state;
   }
+  static func behavior(object-t self, int64-t methods-count) -> object-t {
+# if defined DKT-OMIT-BEHAVIOR
+    return nullptr;
+# endif
+    assert(0 < methods-count);
+    assert(selector-count-max > methods-count);
+    assert(nullptr == self.behavior);
+    object-t result = make(bit-vector::klass, #initial-capacity : methods-count);
+    return result;
+  }
   method behavior(object-t self) -> object-t {
-    if (nullptr == self.behavior) {
-      self.behavior = make(bit-vector::klass, #initial-capacity : self.methods.count);
-
-      for (int64-t index = 0; index < self.methods.count; index++)
-        if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
-          $set-bit(self.behavior, index, true);
-    }
+# if defined DKT-OMIT-BEHAVIOR
+    return nullptr;
+# endif
+    if (nullptr != self.behavior)
+      return self.behavior;
+    self.behavior = behavior(self, selector-count());
+    for (int64-t index = 0; index < self.methods.count; index++)
+      if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
+        bit-vector::set-bit(self.behavior, index, true);
     return self.behavior;
   }
   method dealloc(object-t self) -> object-t {
@@ -693,10 +717,11 @@ klass klass {
       else
         self.superklass = dk-klass-for-name(superklass-name);
     }
+    self.methods = { .addrs = nullptr, .count = 0 };
     self.behavior = nullptr;
 # if !defined DKT-OMIT-BEHAVIOR
     if (nullptr != bit-vector::klass)
-      self.behavior = behavior(self);
+      self.behavior = behavior(self, selector-count());
 # endif
     alloc-methods(self, selector-count());
     init-methods(self);
