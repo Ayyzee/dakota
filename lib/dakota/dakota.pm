@@ -693,14 +693,16 @@ sub start_cmd {
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline functions)
     if (!$$cmd_info{'opts'}{'compile'}) {
-      &gen_rt_o($cmd_info);
+      my $is_exe = !defined $$cmd_info{'opts'}{'shared'};
+      &gen_rt_o($cmd_info, $is_exe);
     }
     $cmd_info = &loop_o_from_dk($cmd_info);
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
     $cmd_info = &loop_o_from_dk($cmd_info);
     if (!$$cmd_info{'opts'}{'compile'}) {
-      &gen_rt_o($cmd_info);
+      my $is_exe = !defined $$cmd_info{'opts'}{'shared'};
+      &gen_rt_o($cmd_info, $is_exe);
     }
   }
   if ($$cmd_info{'opts'}{'compile'} && $$cmd_info{'output'}) {
@@ -865,7 +867,7 @@ sub loop_rep_from_inputs {
   return $cmd_info;
 } # loop_rep_from_inputs
 sub gen_rt_o {
-  my ($cmd_info) = @_;
+  my ($cmd_info, $is_exe) = @_;
   if ($$cmd_info{'output'}) {
     my $rt_cc_path = &rt_cc_path($cmd_info);
     if (!$$cmd_info{'opts'}{'silent'}) {
@@ -893,7 +895,7 @@ sub gen_rt_o {
     $$other{'name'} = $$cmd_info{'output'};
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
-  &rt_o_from_json($cmd_info, $other);
+  &rt_o_from_json($cmd_info, $other, $is_exe);
 }
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
@@ -1030,7 +1032,7 @@ sub o_from_cc {
     return &outfile_from_infiles($o_cmd, $should_echo = 0);
 }
 sub rt_o_from_json {
-  my ($cmd_info, $other) = @_;
+  my ($cmd_info, $other, $is_exe) = @_;
   die if ! defined $$cmd_info{'reps'} || 0 == scalar @{$$cmd_info{'reps'}};
   my $rt_json_path = &rt_json_path($cmd_info);
   my $rt_cc_path =   &rt_cc_path($cmd_info);
@@ -1066,8 +1068,9 @@ sub rt_o_from_json {
   &nrt::add_extra_keywords($file);
   &nrt::add_extra_generics($file);
 
-  &dakota::generate::generate_rt_decl($rt_cc_path, $file);
-  &dakota::generate::generate_rt_defn($rt_cc_path, $file);
+  my $project_rep;
+  &dakota::generate::generate_rt_decl($rt_cc_path, $file, $project_rep = undef, $is_exe);
+  &dakota::generate::generate_rt_defn($rt_cc_path, $file, $project_rep = undef, $is_exe);
 
   my $o_info = {'opts' => {}, 'inputs' => [ $rt_cc_path ], 'output' => $rt_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};
@@ -1157,7 +1160,7 @@ sub exe_from_o {
     $should_echo = 1;
   }
   my $result = &outfile_from_infiles($exe_cmd, $should_echo);
-  return 
+  return;
 }
 sub dir_part {
   my ($path) = @_;

@@ -102,6 +102,7 @@ my ($id,  $mid,  $bid,  $tid,
 
 my $global_is_defn = undef;     # klass decl vs defn
 my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
+my $global_is_exe_rt = undef;
 my $global_suffix = undef;
 
 my $gbl_nrt_file = undef;
@@ -165,6 +166,10 @@ sub set_rt_defn {
   $global_is_defn = 1;
   $global_suffix = $cc_ext;
 }
+sub set_exe_rt {
+  my ($path) = @_;
+  $global_is_exe_rt = $path;
+}
 sub suffix {
   return $global_suffix
 }
@@ -226,6 +231,9 @@ sub is_decl {
   } else {
     return 0;
   }
+}
+sub is_exe_rt {
+  return $global_is_exe_rt;
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
@@ -324,15 +332,21 @@ sub generate_nrt {
   return $output;
 } # sub generate_nrt
 sub generate_rt_decl {
-  my ($path, $file, $project_rep) = @_;
+  my ($path, $file, $project_rep, $is_exe) = @_;
   #print "generate_rt_decl($path, ...)\n";
   &set_rt_decl($path);
+  if ($is_exe) {
+    &set_exe_rt($path);
+  }
   return &generate_rt($path, $file, $project_rep);
 }
 sub generate_rt_defn {
-  my ($path, $file, $project_rep) = @_;
+  my ($path, $file, $project_rep, $is_exe) = @_;
   #print "generate_rt_defn($path, ...)\n";
   &set_rt_defn($path);
+  if ($is_exe) {
+    &set_exe_rt($path);
+  }
   return &generate_rt($path, $file, $project_rep);
 }
 sub generate_rt {
