@@ -126,6 +126,7 @@
         '$(DESTDIR)$(prefix)/include/dakota-decl.hh',
         '$(DESTDIR)$(prefix)/include/dakota-finally.hh',
         '$(DESTDIR)$(prefix)/include/dakota-log.hh',
+        '$(DESTDIR)$(prefix)/include/dakota-of.hh',
         '$(DESTDIR)$(prefix)/include/dakota-os.hh',
         '$(DESTDIR)$(prefix)/include/dakota.hh',
 

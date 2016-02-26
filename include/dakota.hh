@@ -167,22 +167,6 @@ namespace va {
   # define    USE(v) cast(void)v
 # endif
 
-# if 1
-# define klass_of(object)   (object)->klass
-# define superklass_of(kls) klass::unbox(kls).superklass
-# define name_of(kls)       klass::unbox(kls).name
-# else
-inline FUNC klass_of(object_t instance) -> object_t {
-  return instance->klass;
-}
-inline FUNC superklass_of(object_t kls) -> object_t {
-  return klass::unbox(kls).superklass;
-}
-inline FUNC name_of(object_t kls) -> object_t {
-  return klass::unbox(kls).name;
-}
-# endif
-
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 // file scope
 # define DKT_SELECTOR_PTR(name, args)         (cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()

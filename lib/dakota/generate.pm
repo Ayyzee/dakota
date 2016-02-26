@@ -2660,6 +2660,12 @@ sub linkage_unit::generate_klasses {
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass($scope, $col, $klass_path, $klass_name);
   }
+  if (&is_decl()) {
+    $$scratch_str_ref .=
+      "\n" .
+      $col . "# include <dakota-of.$hh_ext> // klass-of(), superklass-of(), name-of()\n" .
+      "\n";
+  }
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses_types_before {
