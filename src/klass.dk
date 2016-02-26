@@ -179,12 +179,12 @@ static func ptr-from-info(named-info-t* info, symbol-t key) -> const void* {
 
   return element;
 }
-static func size-from-info(named-info-t* info, symbol-t key) -> size-t {
+static func size-from-info(named-info-t* info, symbol-t key) -> ssize-t {
   named-info-t* current-info = info;
-  size-t previous-element = 0;
-  size-t element = 0;
+  ssize-t previous-element = 0;
+  ssize-t element = 0;
   do {
-    element = cast(size-t)named-info::at(current-info, key);
+    element = named-info::at(current-info, key);
     assert((0 == previous-element && 0 != element) ||
            (0 != previous-element && 0 == element) ||
            (previous-element ==  element));
@@ -244,12 +244,10 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
     klass-name = default-klass-name();
   return klass-name;
 }
-const int64-t k-alignment = 8;
+const size-t k-alignment = 8;
 
-// consider using alignas(8) on the slots struct decl/defn
-
-inline func round-alignment(int64-t n) -> int64-t {
-  int64-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
+inline func round-alignment(size-t n) -> size-t {
+  size-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
   return result;
 }
 /*LOCAL*/ func size-from-info(named-info-t* info) -> ssize-t {
@@ -273,7 +271,7 @@ inline func round-alignment(int64-t n) -> int64-t {
     ssize-t superklass-size =   size-from-info(superklass-info);
     result = superklass-offset + superklass-size;
   }
-  result = round-alignment(result);
+  result = cast(ssize-t)round-alignment(cast(size-t)result);
   return result;
 }
 klass resource-usage {
