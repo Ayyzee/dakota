@@ -998,82 +998,82 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
   boole-t behavior-exported? = false;
   if (!klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?))
     return ci.modulee;
-    ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
-    ostream::col-incr(ostrm);
+  ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
+  ostream::col-incr(ostrm);
 
-    if (nullptr != ci.interpose-name)
-      ostream::println-format(ostrm, "interpose %s;\n", ci.interpose-name);
-    if (nullptr != ci.superklass-name)
-      ostream::println-format(ostrm, "superklass %s;\n", ci.superklass-name);
-    if (nullptr != ci.klass-name)
-      ostream::println-format(ostrm, "klass %s;\n", ci.klass-name);
-    if (nullptr != ci.traits) {
-      int64-t index = 0;
+  if (nullptr != ci.interpose-name)
+    ostream::println-format(ostrm, "interpose %s;\n", ci.interpose-name);
+  if (nullptr != ci.superklass-name)
+    ostream::println-format(ostrm, "superklass %s;\n", ci.superklass-name);
+  if (nullptr != ci.klass-name)
+    ostream::println-format(ostrm, "klass %s;\n", ci.klass-name);
+  if (nullptr != ci.traits) {
+    int64-t index = 0;
 
-      while (nullptr != ci.traits[index]) {
-        ostream::println-format(ostrm, "trait %s;\n", ci.traits[index]);
-        index++;
-      }
+    while (nullptr != ci.traits[index]) {
+      ostream::println-format(ostrm, "trait %s;\n", ci.traits[index]);
+      index++;
     }
-    if (nullptr != ci.requires) {
-      int64-t index = 0;
+  }
+  if (nullptr != ci.requires) {
+    int64-t index = 0;
 
-      while (nullptr != ci.requires[index]) {
-        ostream::println-format(ostrm, "require %s;\n", ci.requires[index]);
-        index++;
-      }
+    while (nullptr != ci.requires[index]) {
+      ostream::println-format(ostrm, "require %s;\n", ci.requires[index]);
+      index++;
     }
-    if (nullptr != ci.provides) {
-      int64-t index = 0;
+  }
+  if (nullptr != ci.provides) {
+    int64-t index = 0;
 
-      while (nullptr != ci.provides[index]) {
-        ostream::println-format(ostrm, "provides %s;\n", ci.provides[index]);
-        index++;
-      }
+    while (nullptr != ci.provides[index]) {
+      ostream::println-format(ostrm, "provides %s;\n", ci.provides[index]);
+      index++;
     }
-    if (nullptr != ci.enum-info) {
-      int64-t i = 0;
-      while (nullptr != ci.enum-info[i].info) {
-        if (nullptr != ci.enum-info[i].name)
-          ostream::println-format(ostrm, "enum %s\n", ci.enum-info[i].name);
-        else
-          ostream::println-format(ostrm, "enum\n");
-        ostream::println-format(ostrm, "{\n");
-        ostream::col-incr(ostrm);
-        int-t max-name-width = max-enum-name-width(ci.enum-info[i].info);
-        int-t j = 0;
-        while (nullptr != ci.enum-info[i].info[j].name) {
-          ostream::println-format(ostrm, "%-*s = %s,\n",
-                       max-name-width,
-                       ci.enum-info[i].info[j].name,
-                       ci.enum-info[i].info[j].expr);
-          j++;
-        }
-        ostream::col-decr(ostrm);
-        ostream::println-format(ostrm, "}\n");
-        i++;
+  }
+  if (nullptr != ci.enum-info) {
+    int64-t i = 0;
+    while (nullptr != ci.enum-info[i].info) {
+      if (nullptr != ci.enum-info[i].name)
+        ostream::println-format(ostrm, "enum %s\n", ci.enum-info[i].name);
+      else
+        ostream::println-format(ostrm, "enum\n");
+      ostream::println-format(ostrm, "{\n");
+      ostream::col-incr(ostrm);
+      int-t max-name-width = max-enum-name-width(ci.enum-info[i].info);
+      int-t j = 0;
+      while (nullptr != ci.enum-info[i].info[j].name) {
+        ostream::println-format(ostrm, "%-*s = %s,\n",
+                                max-name-width,
+                                ci.enum-info[i].info[j].name,
+                                ci.enum-info[i].info[j].expr);
+        j++;
       }
+      ostream::col-decr(ostrm);
+      ostream::println-format(ostrm, "}\n");
+      i++;
     }
-    if (nullptr != ci.const-info) {
-      int64-t i = 0;
-      while (nullptr != ci.const-info[i].name) {
-        ostream::println-format(ostrm, "const %s %s = %s;\n",
-                                ci.const-info[i].type,
-                                ci.const-info[i].name,
-                                ci.const-info[i].value);
-        i++;
-      }
+  }
+  if (nullptr != ci.const-info) {
+    int64-t i = 0;
+    while (nullptr != ci.const-info[i].name) {
+      ostream::println-format(ostrm, "const %s %s = %s;\n",
+                              ci.const-info[i].type,
+                              ci.const-info[i].name,
+                              ci.const-info[i].value);
+      i++;
     }
+  }
 # define DKT-DEBUG-CODEGEN 0
-    if (DKT-DEBUG-CODEGEN || state-exported?) {
-      if (nullptr != ci.slots-type) {
-        ostream::println-format(ostrm, "slots %s;\n", ci.slots-type);
-      }
-      else-if (nullptr != ci.slots-info) {
+  if (DKT-DEBUG-CODEGEN || state-exported?) {
+    if (nullptr != ci.slots-type) {
+      ostream::println-format(ostrm, "slots %s;\n", ci.slots-type);
+    }
+    else-if (nullptr != ci.slots-info) {
         if (nullptr == ci.cat || #struct == ci.cat)
           ostream::println-format(ostrm, "slots {\n");
         else-if (ci.enum-base)
-          ostream::println-format(ostrm, "slots %s : %s {\n", ci.cat, ci.enum-base);
+                  ostream::println-format(ostrm, "slots %s : %s {\n", ci.cat, ci.enum-base);
         else
           ostream::println-format(ostrm, "slots %s {\n", ci.cat);
         ostream::col-incr(ostrm);
@@ -1112,42 +1112,42 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
         ostream::col-decr(ostrm);
         ostream::println-format(ostrm, "}\n");
       } else {
-        fprintf(stderr, "%s:%i:error: exported slots without type or info\n", __FILE__, __LINE__);
-      }
-    } // if (state-exported?
-    if ((nullptr != ci.superklass-name || nullptr != ci.klass-name || nullptr != ci.traits || nullptr != ci.requires || nullptr != ci.provides)
-        && nullptr != ci.method-signatures) {
-      ostream::println-format(ostrm, "\n");
+      fprintf(stderr, "%s:%i:error: exported slots without type or info\n", __FILE__, __LINE__);
     }
-    const signature-t* sig;
+  } // if (state-exported?
+  if ((nullptr != ci.superklass-name || nullptr != ci.klass-name || nullptr != ci.traits || nullptr != ci.requires || nullptr != ci.provides)
+      && nullptr != ci.method-signatures) {
+    ostream::println-format(ostrm, "\n");
+  }
+  const signature-t* sig;
 
-    int64-t index = 0;
-    if (nullptr != ci.kw-args-method-signatures)
-      while (nullptr != (sig = ci.kw-args-method-signatures[index++]))
-        dump-method(ostrm, sig);
+  int64-t index = 0;
+  if (nullptr != ci.kw-args-method-signatures)
+    while (nullptr != (sig = ci.kw-args-method-signatures[index++]))
+      dump-method(ostrm, sig);
 
-    index = 0;
-    if (nullptr != ci.method-signatures)
-      while (nullptr != (sig = ci.method-signatures[index++]))
-        dump-method(ostrm, sig);
+  index = 0;
+  if (nullptr != ci.method-signatures)
+    while (nullptr != (sig = ci.method-signatures[index++]))
+      dump-method(ostrm, sig);
 
-    index = 0;
-    if (nullptr != ci.slots-method-signatures)
-      while (nullptr != (sig = ci.slots-method-signatures[index++]))
-        dump-method(ostrm, sig);
+  index = 0;
+  if (nullptr != ci.slots-method-signatures)
+    while (nullptr != (sig = ci.slots-method-signatures[index++]))
+      dump-method(ostrm, sig);
 
-    index = 0;
-    if (nullptr != ci.exported-method-signatures)
-      while (nullptr != (sig = ci.exported-method-signatures[index++]))
-        dump-method(ostrm, sig);
+  index = 0;
+  if (nullptr != ci.exported-method-signatures)
+    while (nullptr != (sig = ci.exported-method-signatures[index++]))
+      dump-method(ostrm, sig);
 
-    index = 0;
-    if (nullptr != ci.exported-slots-method-signatures)
-      while (nullptr != (sig = ci.exported-slots-method-signatures[index++]))
-        dump-method(ostrm, sig);
+  index = 0;
+  if (nullptr != ci.exported-slots-method-signatures)
+    while (nullptr != (sig = ci.exported-slots-method-signatures[index++]))
+      dump-method(ostrm, sig);
 
-    ostream::col-decr(ostrm);
-    ostream::println-format(ostrm, "}\n");
+  ostream::col-decr(ostrm);
+  ostream::println-format(ostrm, "}\n");
   return ci.modulee;
 }
 static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only) -> void {
