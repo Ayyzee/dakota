@@ -208,9 +208,20 @@ sub decode_strings {
 
 sub remove_extra_whitespace {
   my ($str) = @_;
-  $str =~ s|(\w)\s+(\w)|$1__WHITESPACE__$2|g;
-  $str =~ s|\s+||g;
-  $str =~ s|__WHITESPACE__| |g;
+  $str =~ s/(\w)\s+(\w)/$1__WHITESPACE__$2/g;
+  $str =~ s/(:)\s+(::)/$1__WHITESPACE__$2/g;
+  $str =~ s/(&)\s+(&&)/$1__WHITESPACE__$2/g;
+  $str =~ s/(<)\s+(<<)/$1__WHITESPACE__$2/g;
+  $str =~ s/(>)\s+(>>)/$1__WHITESPACE__$2/g;
+  $str =~ s/(-)\s+(--)/$1__WHITESPACE__$2/g;
+  $str =~ s/(\+)\s+(\+\+)/$1__WHITESPACE__$2/g;
+  $str =~ s/(\|)\s+(\|\|)/$1__WHITESPACE__$2/g;
+  $str =~ s/\s+//g;
+  $str =~ s/__WHITESPACE__/ /g;
+  if (1) {
+    $str =~ s/\s*->\s*/ -> /g;
+    $str =~ s/\s*,\s*/, /g;
+  }
   return $str;
 }
 sub needs_hex_encoding {
