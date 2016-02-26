@@ -2158,15 +2158,18 @@ sub parse_root {
         &module_import_defn();
         last;
       }
+      my $exported_all = 1;
+      my $exported_single = 2;
       if (m/^export$/) {
-        if (&sst_cursor::next_token($gbl_sst_cursor) eq '{') {
-          &warning(__FILE__, __LINE__, 'nested export { } not allowed') if $exported;
-          &match(__FILE__, __LINE__, 'export');
-          &match(__FILE__, __LINE__, '{');
-          &parse_root($gbl_sst_cursor, 1); # exported = 1
-          #&match(__FILE__, __LINE__, '}'); # bugbug: this is broken, but goes unnoticed when there is only one module per shared-library
-        } else {
-          &module_export_defn();
+        die if $exported;
+        my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
+        if ($next_token) {
+          if ($next_token =~ /^(klass|trait)$/) {
+            $exported = $exported_single;
+            &match(__FILE__, __LINE__, 'export');
+          } else {
+            &module_export_defn();
+          }
         }
         last;
       }
@@ -2181,6 +2184,9 @@ sub parse_root {
           if ($next_token) {
             if ($next_token =~ m/$id/) {
               &klass({'exported?' => $exported});
+              if ($exported == $exported_single) {
+                $exported = 0;
+              }
               last;
             }
           }
@@ -2191,6 +2197,9 @@ sub parse_root {
         if ($next_token) {
           if ($next_token =~ m/$id/) {
             &trait({'exported?' => $exported});
+            if ($exported == $exported_single) {
+              $exported = 0;
+            }
             last;
           }
         }

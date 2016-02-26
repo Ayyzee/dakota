@@ -984,21 +984,28 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
     if (default-klass-name() == ci.klass-name)
       ci.klass-name = nullptr;
   }
+# if defined DKT-ENABLE-EXPORT-GROUP
   if (nullptr != prev-module && prev-module != ci.modulee) {
     ostream::col-decr(ostrm);
     ostream::println-format(ostrm, "} // export\n"); // closes "export {" from prev dump-klass()
   }
+# endif
   if (prev-module != ci.modulee) {
     ostream::println-format(ostrm, "module %s;\n\n", ci.modulee);
+# if defined DKT-ENABLE-EXPORT-GROUP
     ostream::println-format(ostrm, "export {\n");
+# endif
   }
+# if defined DKT-ENABLE-EXPORT-GROUP
   ostream::col-incr(ostrm);
+# endif
   boole-t exported? =          false;
   boole-t state-exported? =    false;
   boole-t behavior-exported? = false;
-  if (!klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?))
-    return ci.modulee;
-  ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
+  if (klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?))
+    ostream::println-format(ostrm, "export %s %s {\n", ci.type, ci.name);
+  else
+    ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
   ostream::col-incr(ostrm);
 
   if (nullptr != ci.interpose-name)
@@ -1172,8 +1179,9 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
       assert(nullptr != klass-info);
       if (nullptr == klass-info->elements)
         break;
-      if (!klass-exported?(klass-info))
-        continue;
+      if (0)
+        if (!klass-exported?(klass-info))
+          continue;
       if (nullptr == only || dump?(klass-info, only)) {
         if (1)
           prev-module = dump-klass(ostrm, klass-info, prev-module);
@@ -1183,14 +1191,18 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
             snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, klass-name);
             ostream-t dostrm = ostream::fopen(klass-file);
             dump-klass(dostrm, klass-info, nullptr);
+# if defined DKT-ENABLE-EXPORT-GROUP
             ostream::col-decr(dostrm);
             ostream::println-format(dostrm, "} // export\n"); // closes "export {" from dump-klass()
+# endif
             ostream::fclose(dostrm);
         }
       }
     }
+# if defined DKT-ENABLE-EXPORT-GROUP
     ostream::col-decr(ostrm);
     ostream::println-format(ostrm, "} // export\n"); // closes "export {" from dump-klass()
+# endif
   }
   return;
 } // dump-klass-defns()
