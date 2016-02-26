@@ -1,4 +1,4 @@
-// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-                                        
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 // Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
 //
@@ -17,8 +17,12 @@
 # if !defined dkt_dakota_log_hh
 # define      dkt_dakota_log_hh
 
+# include <cstdarg>
+# include <cstdint>
+
 # include <syslog.h>
-# include <stdarg.h>
+
+# include <dakota-decl.hh>
 
 [[export]] [[format_va_printf(2)]] FUNC dkt_va_log(int64_t priority, str_t format, va_list_t args) -> int_t;
 [[export]] [[format_printf(   2)]] FUNC dkt_log(   int64_t priority, str_t format, ...) -> int_t;

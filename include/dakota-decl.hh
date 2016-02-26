@@ -17,6 +17,9 @@
 # if !defined dkt_dakota_decl_hh
 # define      dkt_dakota_decl_hh
 
+# include <cstdarg>
+# include <sys/types.h> // ssize_t
+
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
 
@@ -51,6 +54,26 @@
 # define TRAITS(t1, ...)
 
 # define SENTINAL_PTR nullptr
+
+# define cast(t) (t)
+
+// gcc has bug in code generation so the assembler omit the quotes
+# if defined __clang__
+  # define read_only  gnu::section("__DKT_READ_ONLY, __dkt_read_only")
+# elif defined __GNUG__
+  # define read_only  gnu::section("\"__DKT_READ_ONLY, __dkt_read_only\"")
+# else
+  # error "Neither __clang__ nor __GNUG__ is defined."
+#endif
+
+# define format_va_printf(n) gnu::format(__printf__, n, 0)
+# define format_va_scanf(n)  gnu::format(__scanf__,  n, 0)
+# define format_printf(n)    gnu::format(__printf__, n, n + 1)
+# define format_scanf(n)     gnu::format(__scanf__,  n, n + 1)
+# define sentinel            gnu::sentinel
+# define unused              gnu::unused
+
+# define unbox_attrs gnu::pure,gnu::hot,gnu::nothrow
 
 # if defined _WIN32 || defined _WIN64
   # define import ms::dllimport
@@ -88,6 +111,7 @@ namespace std { using float32_t =  float; }
 namespace std { using float64_t =       double; }
 namespace std { using float128_t = long double; }
 
+// symbols are defined before klasses
 namespace symbol { using slots_t = const char8_t*; } using symbol_t = symbol::slots_t;
 
 static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");

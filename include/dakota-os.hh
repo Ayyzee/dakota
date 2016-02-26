@@ -1,4 +1,4 @@
-// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-                                        
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 // Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
 //
@@ -16,6 +16,8 @@
 
 # if !defined dkt_dakota_os_hh
 # define      dkt_dakota_os_hh
+
+# include <dakota-decl.hh>
 
 # if defined __linux__
   static inline FUNC dkt_get_segment_data(str_t, void**, size_t*) -> void* {

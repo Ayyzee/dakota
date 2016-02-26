@@ -17,6 +17,8 @@
 # if !defined dkt_dakota_of_hh
 # define      dkt_dakota_of_hh
 
+# include <dakota-decl.hh>
+
 inline FUNC klass_of(object_t instance) -> object_t {
   return instance->klass;
 }

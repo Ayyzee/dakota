@@ -28,7 +28,8 @@
 # include <syslog.h>
 # include <cxxabi.h>
 
-# define cast(t) (t)
+# include <dakota-decl.hh>
+
 # define ssizeof(t) (cast(ssize_t)sizeof(t))
 
 # define DKT_MEM_MGMT_MALLOC 0
@@ -99,25 +100,7 @@ namespace dkt {
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) nullptr
 # endif
 
-// gcc has bug in code generation so the assembler omit the quotes
-# if defined __clang__
-  # define read_only  gnu::section("__DKT_READ_ONLY, __dkt_read_only")
-# elif defined __GNUG__
-  # define read_only  gnu::section("\"__DKT_READ_ONLY, __dkt_read_only\"")
-# else
-  # error "Neither __clang__ nor __GNUG__ is defined."
-#endif
-
-# define format_va_printf(n) gnu::format(__printf__, n, 0)
-# define format_va_scanf(n)  gnu::format(__scanf__,  n, 0)
-# define format_printf(n)    gnu::format(__printf__, n, n + 1)
-# define format_scanf(n)     gnu::format(__scanf__,  n, n + 1)
-# define sentinel            gnu::sentinel
-# define unused              gnu::unused
-
 # define THREAD_LOCAL __thread // bummer that clang does not support thread-local on darwin
-
-# define unbox_attrs gnu::pure,gnu::hot,gnu::nothrow
 
 # if defined DEBUG
   # define debug_export export
