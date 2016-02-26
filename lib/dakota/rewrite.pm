@@ -939,6 +939,10 @@ sub remove_system_includes {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|^(\s*)\#(\s*)include\s*(<.+?>)|$1$2INCLUDE($3);|gm;
 }
+sub convert_types_to_include {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/((?:klass|trait)\s+$rid\s+\{\s*)types(\s*(?:".+?"|<.+?>)\s*);([^\n]*)\n(\s*)/# include$2$3$4\n$1/gs;
+}
 sub rewrite_method_aliases {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s+)method\s+((va::)?$mid\s*\(\s*\))\s*=>\s*((va::)?$mid\s*$main::list)\s*;/$1METHOD-ALIAS($2, $4);/gs
@@ -1004,6 +1008,7 @@ sub convert_dk_to_cc {
   if ($remove) {
     &remove_system_includes($filestr_ref);
   }
+  &convert_types_to_include($filestr_ref);
   &rewrite_literal_booles($filestr_ref);
   &rewrite_literal_chars($filestr_ref);
   &rewrite_literal_ints($filestr_ref);
