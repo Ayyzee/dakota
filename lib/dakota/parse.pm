@@ -622,9 +622,12 @@ sub match_re {
   }
   return &sst::at($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'} - 1);
 }
+my $enable_exported_header = 1;
 sub add_exported_header {
   my ($tkn) = @_;
-  $$gbl_root{'exported-headers'}{$tkn} = undef;
+  if ($enable_exported_header) {
+    $$gbl_root{'exported-headers'}{$tkn} = undef;
+  }
 }
 sub header {
   my $tkn = &match_any();
@@ -2207,6 +2210,7 @@ sub parse_root {
       $$gbl_sst_cursor{'current-token-index'}++;
     }
   }
+  if ($enable_exported_header) {
   foreach my $klass_type ( 'klasses', 'traits' ) {
     if (exists  $$gbl_root{'exported-headers'} &&
         defined $$gbl_root{'exported-headers'}) {
@@ -2220,6 +2224,7 @@ sub parse_root {
         }
       }
     }
+  }
   }
   if (exists $$gbl_root{'generics'}) {
     delete $$gbl_root{'generics'}{'make'};
