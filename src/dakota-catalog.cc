@@ -36,6 +36,7 @@
 enum {
   DAKOTA_CATALOG_HELP = 256,
   DAKOTA_CATALOG_DIRECTORY,
+  DAKOTA_CATALOG_EXPORTED_ONLY,
   DAKOTA_CATALOG_ONLY,
   DAKOTA_CATALOG_OUTPUT,
   DAKOTA_CATALOG_OUTPUT_DIRECTORY,
@@ -45,6 +46,7 @@ enum {
 };
 struct opts_t {
   char* directory;
+  bool  exported_only;
   char* only; // full or partial (prefix) klass name
   char* output; // path or "" for stdout
   char* output_directory; // path or "" for .
@@ -89,6 +91,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
   static struct option longopts[] = {
     { "help",             no_argument,       nullptr, DAKOTA_CATALOG_HELP },
     { "directory",        required_argument, nullptr, DAKOTA_CATALOG_DIRECTORY },
+    { "exported-only",    no_argument,       nullptr, DAKOTA_CATALOG_EXPORTED_ONLY },
     { "only",             required_argument, nullptr, DAKOTA_CATALOG_ONLY },
     { "output",           required_argument, nullptr, DAKOTA_CATALOG_OUTPUT },
     { "output-directory", required_argument, nullptr, DAKOTA_CATALOG_OUTPUT_DIRECTORY },
@@ -106,6 +109,9 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         exit(EXIT_SUCCESS);
       case DAKOTA_CATALOG_DIRECTORY:
         opts.directory = optarg;
+        break;
+      case DAKOTA_CATALOG_EXPORTED_ONLY:
+        opts.exported_only = true;
         break;
       case DAKOTA_CATALOG_ONLY:
         opts.only = optarg;
@@ -189,6 +195,8 @@ FUNC main(int argc, char** argv, char**) -> int {
     }
   }
   int overwrite;
+  if (opts.exported_only)
+    setenv_boole("DAKOTA_CATALOG_EXPORTED_ONLY", opts.exported_only, overwrite = 1);
   if (!opts.path_only) {
     setenv("DAKOTA_CATALOG_OUTPUT", output_pid, overwrite = 1);
 

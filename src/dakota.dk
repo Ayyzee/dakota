@@ -1159,7 +1159,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
   ostream::println-format(ostrm, "}\n");
   return ci.modulee;
 }
-static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only) -> void {
+static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only, boole-t exported-only?) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != registration-info);
@@ -1181,9 +1181,8 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
       assert(nullptr != klass-info);
       if (nullptr == klass-info->elements)
         break;
-      if (0)
-        if (!klass-exported?(klass-info))
-          continue;
+      if (exported-only? && !klass-exported?(klass-info))
+        continue;
       if (nullptr == only || dump?(klass-info, only)) {
         if (1)
           prev-module = dump-klass(ostrm, klass-info, prev-module);
@@ -1422,6 +1421,7 @@ static func last-user-code-before-main() -> void  {
 func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
+  boole-t exported-only? = getenv-boole("DAKOTA_CATALOG_EXPORTED_ONLY", false);
   stream-t ctlg-output = nullptr;
   str-t output-path = getenv("DAKOTA_CATALOG_OUTPUT");
   if (nullptr != output-path) {
@@ -1448,7 +1448,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     str-t name-base = remove-dir(name);
 
     if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
-      dump-klass-defns(ostrm, registration-info, ctlg-only);
+      dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only?);
       dump-interposers(ostrm, registration-info);
     }
   }
