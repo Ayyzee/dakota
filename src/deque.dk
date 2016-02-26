@@ -212,7 +212,7 @@ klass deque {
   // before
   // after
 
-  method size(object-t self) -> int64-t {
+  method size(object-t self) -> ssize-t {
     return self.size;
   }
   method empty?(object-t self) -> boole-t {

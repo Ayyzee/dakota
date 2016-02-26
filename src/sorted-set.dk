@@ -163,7 +163,7 @@ klass sorted-set {
     s2.iterator-state = 0;
     return copy;
   }
-  method size(object-t self) -> int64-t {
+  method size(object-t self) -> ssize-t {
     return self.sa.count;
   }
   method forward-iterator(object-t self) -> object-t {

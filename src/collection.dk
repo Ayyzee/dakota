@@ -78,7 +78,7 @@ klass collection {
   method add(object-t self, object-t element) -> object-t;
   method forward-iterator(object-t self) -> object-t;
 
-  // method size(object-t self) -> int64-t;
+  // method size(object-t self) -> ssize-t;
   // method empty?(object-t self) -> boole-t;
   // method empty(object-t self) -> object-t;
 }
