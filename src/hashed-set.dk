@@ -42,9 +42,9 @@ klass hashed-set {
   trait set;
 
   slots {
-    int64-t num-buckets;
+    ssize-t  num-buckets;
     object-t buckets; // a vector of deques
-    int64-t size;
+    ssize-t  size;
 
     int64-t iterator-state;
   }

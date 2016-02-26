@@ -197,7 +197,7 @@ klass sorted-set-forward-iterator {
 
   slots {
     object-t sorted-set;
-    int64-t offset;
+    ssize-t offset;
 
     int64-t   iterator-state;
   }

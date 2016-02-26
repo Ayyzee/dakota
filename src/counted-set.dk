@@ -92,21 +92,21 @@ trait counted-set {
       last = pair::unbox(last).last;
     return last;
   }
-  method count-at(object-t self, object-t first) -> int64-t {
+  method count-at(object-t self, object-t first) -> ssize-t {
     object-t last = $at(self, first);
     if ($instance?(last, pair::klass))
       last = pair::unbox(last).last;
-    int64-t count = int64::unbox(last);
+    ssize-t count = ssize::unbox(last);
     return count;
   }
-  method count-at(object-t self, object-t first, int64-t default-count) -> int64-t {
-    int64-t count = default-count;
+  method count-at(object-t self, object-t first, ssize-t default-count) -> ssize-t {
+    ssize-t count = default-count;
     object-t last = $at(self, first, cast(object-t)nullptr);
 
     if (last) {
       if ($instance?(last, pair::klass))
         last = pair::unbox(last).last;
-      count = int64::unbox(last);
+      count = ssize::unbox(last);
     }
     return count;
   }

@@ -98,7 +98,7 @@ klass deque {
   slots {
     node::slots-t* first; // if (nullptr != first)  first->prev = nullptr;
     node::slots-t* last;  // if (nullptr != last)   last->next =  nullptr;
-    int64-t       size;
+    ssize-t        size;
 
     int64-t iterator-state;
   }

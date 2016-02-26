@@ -179,12 +179,12 @@ static func ptr-from-info(named-info-t* info, symbol-t key) -> const void* {
 
   return element;
 }
-static func int64-from-info(named-info-t* info, symbol-t key) -> int64-t {
+static func size-from-info(named-info-t* info, symbol-t key) -> size-t {
   named-info-t* current-info = info;
-  int64-t previous-element = 0;
-  int64-t element = 0;
+  size-t previous-element = 0;
+  size-t element = 0;
   do {
-    element = cast(int64-t)named-info::at(current-info, key);
+    element = cast(size-t)named-info::at(current-info, key);
     assert((0 == previous-element && 0 != element) ||
            (0 != previous-element && 0 == element) ||
            (previous-element ==  element));
@@ -252,13 +252,13 @@ inline func round-alignment(int64-t n) -> int64-t {
   int64-t result = (n + (k-alignment - 1)) & ~(k-alignment - 1);
   return result;
 }
-/*LOCAL*/ func size-from-info(named-info-t* info) -> int64-t {
-  int64-t size = int64-from-info(info, #size);
+/*LOCAL*/ func size-from-info(named-info-t* info) -> ssize-t {
+  ssize-t size = size-from-info(info, #size);
   return size;
 }
 // offset is 'offset() of superklass' + 'size of superklass'
-/*LOCAL*/ func offset-from-info(named-info-t* info) -> int64-t {
-  int64-t result;
+/*LOCAL*/ func offset-from-info(named-info-t* info) -> ssize-t {
+  ssize-t result;
 
   symbol-t name = name-from-info(info);
   if (#object == name)
@@ -269,8 +269,8 @@ inline func round-alignment(int64-t n) -> int64-t {
     if (nullptr == superklass-name)
       superklass-name = default-superklass-name();
     named-info-t* superklass-info = info-for-name(superklass-name);
-    int64-t superklass-offset = offset-from-info(superklass-info); // recursive
-    int64-t superklass-size =   size-from-info(superklass-info);
+    ssize-t superklass-offset = offset-from-info(superklass-info); // recursive
+    ssize-t superklass-size =   size-from-info(superklass-info);
     result = superklass-offset + superklass-size;
   }
   result = round-alignment(result);
@@ -283,7 +283,7 @@ klass resource-usage {
     int64-t method-memory;
     int64-t method-count;
   }
-  method add-alloc(slots-t* s, int64-t size) -> slots-t* {
+  method add-alloc(slots-t* s, ssize-t size) -> slots-t* {
     s->instances++;
     s->memory += size;
     return s;
@@ -296,7 +296,7 @@ klass resource-usage {
            name-of(o));
     return s;
   }
-  method log-alloc(slots-t* s, int64-t size, symbol-t name) -> slots-t*{
+  method log-alloc(slots-t* s, ssize-t size, symbol-t name) -> slots-t*{
     printf("%3" PRIi64 ", size = %2" PRIi64 ", total-memory = %4" PRIi64 ", name = \"%s\"~\n",
            s->instances, size, s->memory, name);
     return s;
@@ -315,14 +315,14 @@ klass initialize-func { slots (*)(object-t) -> void; }
 klass methods {
   slots {
     method-t* addrs; // first so its offset is 0
-    int64-t   count;
+    ssize-t   count;
   }
 }
 klass klass {
   slots {
-    int64-t              offset; // first so its offset is 0
+    ssize-t              offset; // first so its offset is 0
     methods::slots-t     methods;
-    int64-t              size;
+    ssize-t              size;
     object-t             superklass;
     symbol-t             name; // redundant but convenient
     const symbol-t*      traits; // redundant but convenient
@@ -336,7 +336,7 @@ klass klass {
     return instance;
   }
   method alloc(object-t self) -> object-t {
-    int64-t size = self.offset + self.size;
+    ssize-t size = self.offset + self.size;
 
 # if defined DKT-DUMP-MEM-FOOTPRINT
     resource-usage::add-alloc(&gbl-ru, size);
@@ -354,7 +354,7 @@ klass klass {
     symbol-t name = name-of(self);
     return name;
   }
-  static func alloc-methods(object-t self, int64-t methods-count) -> object-t {
+  static func alloc-methods(object-t self, ssize-t methods-count) -> object-t {
     assert(0 < methods-count);
     assert(selector-count-max > methods-count);
     self.methods.count = methods-count;
@@ -366,7 +366,7 @@ klass klass {
     resource-usage::log-method-alloc(&gbl-ru);
 # endif    
 
-    for (int64-t index = 0; index < self.methods.count; index++)
+    for (ssize-t index = 0; index < self.methods.count; index++)
       self.methods.addrs[index] = DKT-NULL-METHOD;
     return self;
   }
@@ -401,7 +401,7 @@ klass klass {
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
-      bit-vector::set-bit(self.behavior, cast(int64-t)selector, false);
+      bit-vector::set-bit(self.behavior, cast(ssize-t)selector, false);
     return m;
   }
   method add-method-for-selector(object-t self, selector-t selector, method-t m) -> method-t {
@@ -409,7 +409,7 @@ klass klass {
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
-      bit-vector::set-bit(self.behavior, cast(int64-t)selector, true);
+      bit-vector::set-bit(self.behavior, cast(ssize-t)selector, true);
     return prev-m;
   }
   method dump(object-t self) -> object-t {
@@ -445,7 +445,7 @@ klass klass {
       if (nullptr != traits) {
         fprintf(stderr, " ");
         str-t delim = "";
-        int64-t i = 0;
+        ssize-t i = 0;
         symbol-t trait-name;
         while (nullptr != (trait-name = traits[i++])) {
           fprintf(stderr, "%s#%s", delim, trait-name);
@@ -467,7 +467,7 @@ klass klass {
     const symbol-t* traits = self.traits;;
     
     if (nullptr != traits) {
-      int64-t i = 0;
+      ssize-t i = 0;
       symbol-t trait-name;
       while (nullptr != (trait-name = traits[i++])) {
         $add-last(seq, symbol::box(trait-name));
@@ -475,14 +475,14 @@ klass klass {
     }
     return seq;
   }
-  method dump-methods(slots-t* s) -> int64-t {
+  method dump-methods(slots-t* s) -> ssize-t {
     if (nullptr != s->behavior)
       $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
-    int64-t max-width = 0;
+    ssize-t max-width = 0;
 
     if (1) {
-      for (int64-t index = 0; index < s->methods.count; index++) {
+      for (ssize-t index = 0; index < s->methods.count; index++) {
         const signature-t* signature = cast(const signature-t*)selectors[index].key;
         method-t m = method-for-signature(&s->methods, signature);
         if (nullptr != m) {
@@ -496,7 +496,7 @@ klass klass {
     stream-t out = stdout;
     
     fprintf(out, "{\n");
-    for (int64-t index = 0; index < s->methods.count; index++) {
+    for (ssize-t index = 0; index < s->methods.count; index++) {
       const signature-t* signature =  cast(const signature-t*)selectors[index].key;
       method-t m = method-for-signature(&s->methods, signature);
 
@@ -534,14 +534,14 @@ klass klass {
       assert((nullptr != method-signatures && nullptr != method-addresses) ||
              (nullptr == method-signatures && nullptr == method-addresses));
       if (nullptr != method-signatures) {
-        int64-t index = 0;
+        ssize-t index = 0;
         signature-t* signature;
         method-t   address;
 
         FUNC add-method-and-set-behavior = [&](selector-t _selector, method-t _address) -> method-t {
           method-t prev-address = add-method-for-selector(self, _selector, _address);
           if (nullptr != self.behavior) {
-            bit-vector::set-bit(self.behavior, cast(int64-t)_selector, true); // $set-bit()
+            bit-vector::set-bit(self.behavior, cast(ssize-t)_selector, true); // $set-bit()
           }
           return prev-address;
         };
@@ -571,7 +571,7 @@ klass klass {
   static func load-traits(const symbol-t* traits) -> void {
     if (nullptr == traits || nullptr == traits[0])
       return;
-    int64-t i = 0;
+    ssize-t i = 0;
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* trait-info = info-for-name(trait-name);
@@ -582,7 +582,7 @@ klass klass {
   static func add-traits(object-t self, const symbol-t* traits) -> void {
     if (nullptr == traits || nullptr == traits[0])
       return;
-    int64-t i = 0;
+    ssize-t i = 0;
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* trait-info = info-for-name(trait-name);
@@ -596,7 +596,7 @@ klass klass {
   static func traits-initialize(object-t self, const symbol-t* traits) -> void {
     if (nullptr == traits || nullptr == traits[0])
       return;
-    int64-t i = 0;
+    ssize-t i = 0;
     symbol-t trait-name;
     while (nullptr != (trait-name = traits[i++])) {
       named-info-t* trait-info = info-for-name(trait-name);
@@ -625,7 +625,7 @@ klass klass {
   // func traits-finalize(object-t self, const symbol-t* traits) -> void {
   //   if (nullptr == traits || nullptr == traits[0])
   //     return;
-  //   int64-t i = 0;
+  //   ssize-t i = 0;
   //   symbol-t trait-name;
   //   // finalization must be in the opposite order of initialization
   //   while (nullptr != traits[i])
@@ -656,7 +656,7 @@ klass klass {
     boole-t state = $bit-and?(self.behavior, unbox(kls).behavior);
     return state;
   }
-  static func behavior(object-t self, int64-t methods-count) -> object-t {
+  static func behavior(object-t self, ssize-t methods-count) -> object-t {
 # if defined DKT-OMIT-BEHAVIOR
     return nullptr;
 # endif
@@ -673,7 +673,7 @@ klass klass {
     if (nullptr != self.behavior)
       return self.behavior;
     self.behavior = behavior(self, selector-count());
-    for (int64-t index = 0; index < self.methods.count; index++)
+    for (ssize-t index = 0; index < self.methods.count; index++)
       if (DKT-NULL-METHOD != self.methods.addrs[index])
         bit-vector::set-bit(self.behavior, index, true);
     return self.behavior;
@@ -695,7 +695,7 @@ klass klass {
   static func dump-random(object-t self) -> void {
     if (nullptr != getenv("DKT_DUMP_RANDOM")) {
       printf("klass: %s\n", name-of(self));
-      for (int64-t index = 0; index < self.methods.count; index++) {
+      for (ssize-t index = 0; index < self.methods.count; index++) {
         printf("method: %p\n", self.methods.addrs[index]);
       }
     }
@@ -733,7 +733,7 @@ klass klass {
     add-methods(self, self.info, #exported-method.signatures, #exported-method.addresses, override? = true);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info, #method-aliases);
     if (nullptr != method-aliases) {
-      int64-t i = 0;
+      ssize-t i = 0;
       const signature-t* method-signature;
       while (nullptr != (method-signature = method-aliases[i].method-signature)) {
         const signature-t* alias-signature = method-aliases[i].alias-signature;
@@ -814,10 +814,10 @@ klass klass {
     return self;
   }
 }
-func dkt-dump-methods(klass::slots-t* s) -> int64-t {
+func dkt-dump-methods(klass::slots-t* s) -> ssize-t {
   return klass::dump-methods(s);
 }
-func dkt-dump-methods(object-t kls) -> int64-t {
+func dkt-dump-methods(object-t kls) -> ssize-t {
   klass::slots-t& kls-s = unbox(kls);
   return dkt-dump-methods(&kls-s);
 }

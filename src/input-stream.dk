@@ -69,9 +69,9 @@ klass input-stream {
   }
   method read(object-t self,
                        ptr-t    buffer,
-                       int64-t element-size,
-                       int64-t num-elements-max) -> int64-t {
-    int64-t num-elements-read = cast(int64-t)fread(buffer,
+                       ssize-t element-size,
+                       ssize-t num-elements-max) -> ssize-t {
+    ssize-t num-elements-read = cast(ssize-t)fread(buffer,
                                                      cast(size-t)element-size,
                                                      cast(size-t)num-elements-max,
                                                      unbox(self));

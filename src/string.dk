@@ -42,8 +42,8 @@ klass string {
   method init(object-t self,
                        symbol-t       encoding : #utf-8,
                        str-t bytes :    "",
-                       int64-t        start :    0,
-                       int64-t        length :   cast(int64-t)safe-strlen(bytes) - start) -> object-t {
+                       ssize-t        start :    0,
+                       ssize-t        length :   cast(ssize-t)safe-strlen(bytes) - start) -> object-t {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = $init(super);
     assert(nullptr != bytes);
@@ -62,11 +62,11 @@ klass string {
     object-t result = $dealloc(super);
     return result;
   }
-  method length(object-t self) -> int64-t {
+  method length(object-t self) -> ssize-t {
     if (0    == self.len &&
         nullptr != self.ptr &&
         NUL  != self.ptr[0])
-      self.len = cast(int64-t)safe-strlen(self.ptr);
+      self.len = cast(ssize-t)safe-strlen(self.ptr);
     return self.len;
   }
   method intern(object-t self) -> symbol-t {
@@ -96,18 +96,18 @@ klass string {
             cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.ptr, self.len);
     return self;
   }
-  method uint64-value(object-t self) -> uint64-t {
-    uint64-t result = cast(uint64-t)strtoumax(self.ptr, nullptr, 10);
+  method intmax-value(object-t self) -> intmax-t {
+    intmax-t result = cast(intmax-t)strtoimax(self.ptr, nullptr, 10);
     return result;
   }
-  method int64-value(object-t self) -> int64-t {
-    int64-t result = cast(int64-t)strtoimax(self.ptr, nullptr, 10);
+  method uintmax-value(object-t self) -> uintmax-t {
+    uintmax-t result = cast(uintmax-t)strtoumax(self.ptr, nullptr, 10);
     return result;
   }
   method boole-value(object-t self) -> boole-t {
-    int64-t int-value = cast(int64-t)strtoimax(self.ptr, nullptr, 10);
+    uintmax-t uint-value = cast(uintmax-t)strtoumax(self.ptr, nullptr, 10);
     boole-t result;
-    if (0 == int-value)
+    if (0 == uint-value)
       result = false;
     else
       result = true;
@@ -125,7 +125,7 @@ klass string {
   // // sentinel type must be pointer type, declared [] (or maybe *) and be last
   // method concat(object-t self, [[sentinel]] str-t[] strs) -> object-t {
   //   // walk twice
-  //   int64-t i = 0;
+  //   ssize-t i = 0;
   //   str-t str;
   //   while (nullptr != (str = strs[i++])) {
   //     USE(str);
@@ -137,7 +137,7 @@ klass string {
     assert(nullptr != encoding);
     assert(#utf-8 != encoding);
     USE(encoding);
-    int64-t len = cast(int64-t)safe-strlen(bytes);
+    ssize-t len = cast(ssize-t)safe-strlen(bytes);
     self.len += len;
     self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * ssizeof(char8-t)), self.ptr);
     strcat(self.ptr, bytes);
@@ -155,7 +155,7 @@ klass string {
   }
   method tokenize(object-t self, str-t delimiter) -> object-t {
     object-t result = make(vector::klass);
-    int64-t delimiter-length = cast(int64-t)safe-strlen(delimiter);
+    ssize-t delimiter-length = cast(ssize-t)safe-strlen(delimiter);
     str-t p1 = self.ptr;
     str-t p2;
 
@@ -169,7 +169,7 @@ klass string {
     }
     // 'part' 'delimiter' pairs
     while (nullptr != (p2 = strstr(p1, delimiter))) {
-      object-t part-object = make(kls, #bytes : cast(str-t)(p1), #length : cast(int64-t)(p2 - p1));
+      object-t part-object = make(kls, #bytes : cast(str-t)(p1), #length : cast(ssize-t)(p2 - p1));
       $add-last(result, part-object);
       $add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
@@ -188,8 +188,8 @@ klass string {
   method append-sequence(object-t self, object-t sequence) -> object-t {
     for (object-t element in sequence) {
       str-t str = $str(element);
-      int64-t length = cast(int64-t)safe-strlen(str);
-      self.len += cast(int64-t)(length);
+      ssize-t length = cast(ssize-t)safe-strlen(str);
+      self.len += cast(ssize-t)(length);
       self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * ssizeof(char8-t)), self.ptr);
       strcat(self.ptr, str);
     }

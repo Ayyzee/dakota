@@ -71,8 +71,8 @@ klass sequence {
   method remove-first(object-t self) -> object-t;
   method remove-last(object-t self) -> object-t;
 
-  //     method first-index(object-t self, object-t element) -> int64-t;
-  //     method last-index(object-t self, object-t element) -> int64-t;
+  //     method first-index(object-t self, object-t element) -> ssize-t;
+  //     method last-index(object-t self, object-t element) -> ssize-t;
 
   //     method first(object-t self) -> object-t;
   //     method last(object-t self) -> object-t;
@@ -84,8 +84,8 @@ klass sequence {
   //     method replace-last(object-t self, object-t element) -> object-t;
   //     method reverse(object-t self) -> object-t;
 
-  //     method add-at(object-t self, int64-t offset, object-t element) -> object-t;
-  //     method remove-at(object-t self, int64-t offset) -> object-t;
-  //     method at(object-t self, int64-t offset) -> object-t; // o = a[i]  vs  o = at(a, i);
-  //     method replace-at(object-t self, int64-t offset, object-t object) -> object-t;
+  //     method add-at(object-t self, ssize-t offset, object-t element) -> object-t;
+  //     method remove-at(object-t self, ssize-t offset) -> object-t;
+  //     method at(object-t self, ssize-t offset) -> object-t; // o = a[i]  vs  o = at(a, i);
+  //     method replace-at(object-t self, ssize-t offset, object-t object) -> object-t;
 }

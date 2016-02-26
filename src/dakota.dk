@@ -258,8 +258,8 @@ static func alloc-klass(symbol-t name) -> object-t {
     klass-name = default-klass-name();
   named-info-t* klass-info = info-for-name(klass-name);
   
-  int64-t offset = offset-from-info(klass-info);
-  int64-t size =   size-from-info(klass-info);
+  ssize-t offset = offset-from-info(klass-info);
+  ssize-t size =   size-from-info(klass-info);
   //fprintf(stderr, "%s(#%s):\toffset=%i + size=%i\n", __func__, name, offset, size);
 
 # if defined DKT-DUMP-MEM-FOOTPRINT

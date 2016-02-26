@@ -200,7 +200,7 @@ klass token {
   }
   // should be in superklass string??
   method append-char(object-t self, int64-t c) -> object-t {
-    int64-t len = cast(int64-t)safe-strlen(self.buffer);
+    ssize-t len = cast(ssize-t)safe-strlen(self.buffer);
     self.buffer[len] =     cast(char8-t)(c);
     self.buffer[len + 1] = NUL;
     return self;
