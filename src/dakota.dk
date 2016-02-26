@@ -344,13 +344,15 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
 
       if (nullptr != method-signatures) {
         const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method.addresses);
-        int64-t j = 0;
-        const signature-t* method-signature;
-        while (nullptr != (method-signature = method-signatures[j])) {
-          method-t method-address = method-addresses[j];
-          if (nullptr != method-address && cast(method-t)DKT-NULL-METHOD != method-address)
-            methods-count++;
-          j++;
+        if (nullptr != method-addresses) {
+          int64-t j = 0;
+          const signature-t* method-signature;
+          while (nullptr != (method-signature = method-signatures[j])) {
+            method-t method-address = method-addresses[j];
+            if (nullptr != method-address && DKT-NULL-METHOD != method-address)
+              methods-count++;
+            j++;
+          }
         }
       }
     } while (nullptr != (current-info = current-info->next));
@@ -395,19 +397,19 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
         const signature-t* method-signature;
         
         while (nullptr != (method-signature = method-signatures[j])) {
-          method-t method-address = method-addresses[j];
-          uint64-t defined;
-          if (nullptr == method-address)
-            defined = 0;
-          else
-            defined = 1;
+          uint64-t defined = 0;
+          if (nullptr != method-addresses) {
+            method-t method-address = method-addresses[j];
+            if (nullptr != method-address && DKT-NULL-METHOD != method-address)
+              defined = 1;
+          }
+          j++;
           ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%" PRIu64 "' },\n",
                                   method-signature->name, method-signature->parameter-types,
                                   method-signature->return-type,
                                   method-signature->name,
                                   method-signature->parameter-types,
                                   defined);
-          j++;
         }
         ostream::col-decr(ostrm);
         ostream::println-format(ostrm, "},\n");

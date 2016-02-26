@@ -367,7 +367,7 @@ klass klass {
 # endif    
 
     for (int64-t index = 0; index < self.methods.count; index++)
-      self.methods.addrs[index] = cast(method-t)DKT-NULL-METHOD;
+      self.methods.addrs[index] = DKT-NULL-METHOD;
     return self;
   }
   static func init-methods(object-t self) -> object-t {
@@ -399,7 +399,7 @@ klass klass {
   method remove-method-for-selector(object-t self, selector-t selector) -> method-t {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
-    SET-METHOD-FOR-SELECTOR(&self.methods, selector, cast(method-t)DKT-NULL-METHOD); // hackhack
+    SET-METHOD-FOR-SELECTOR(&self.methods, selector, DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
       bit-vector::set-bit(self.behavior, cast(int64-t)selector, false);
     return m;
@@ -541,7 +541,7 @@ klass klass {
         FUNC add-method-and-set-behavior = [&](selector-t _selector, method-t _address) -> method-t {
           method-t prev-address = add-method-for-selector(self, _selector, _address);
           if (nullptr != self.behavior) {
-            $set-bit(self.behavior, cast(int64-t)_selector, true);
+            bit-vector::set-bit(self.behavior, cast(int64-t)_selector, true); // $set-bit()
           }
           return prev-address;
         };
@@ -549,12 +549,12 @@ klass klass {
         while (nullptr != (signature = method-signatures[index])) {
           if (nullptr != (address = method-addresses[index])) {
             // can NOT dynamicly dispatch
-            selector-t selector = selector-for-signature(signature);
+            selector-t selector = selector-for-signature(signature); // $selector-for-signature()
             if (!override?) { // don't set if an already valid method is present
               method-t prev-address = method-for-selector(self, selector);
-              if (nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address) {
+              if (nullptr == prev-address || cast(method-t)dkt-null-method == prev-address) { // not DKT-NULL-METHOD
                 prev-address = add-method-and-set-behavior(selector, address);
-                assert(nullptr == prev-address || cast(decltype(prev-address))dkt-null-method == prev-address);
+                assert(nullptr == prev-address || cast(method-t)dkt-null-method == prev-address); // not DKT-NULL-METHOD
               }
             } else {
               add-method-and-set-behavior(selector, address);
@@ -674,7 +674,7 @@ klass klass {
       return self.behavior;
     self.behavior = behavior(self, selector-count());
     for (int64-t index = 0; index < self.methods.count; index++)
-      if (cast(method-t)DKT-NULL-METHOD != self.methods.addrs[index])
+      if (DKT-NULL-METHOD != self.methods.addrs[index])
         bit-vector::set-bit(self.behavior, index, true);
     return self.behavior;
   }

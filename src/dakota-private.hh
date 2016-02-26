@@ -59,9 +59,8 @@ KLASS_NS klass {
   /*LOCAL*/ METHOD subklass3f(object_t, object_t) -> boole_t; // subklass?()
 }
 KLASS_NS bit_vector {
-  /*LOCAL*/ METHOD set_bit(object_t, int64_t, boole_t) -> object_t;
+  /*LOCAL*/ METHOD set_bit(object_t, ssize_t, boole_t) -> object_t;
 }
-
 # if DKT_WORKAROUND
 KLASS_NS property   { /*LOCAL*/ METHOD compare(slots_t*,  slots_t* ) -> int_t; }
 KLASS_NS named_info { /*LOCAL*/ METHOD compare(slots_t**, slots_t**) -> int_t; }

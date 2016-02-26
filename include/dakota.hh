@@ -278,8 +278,11 @@ constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
 [[debug_export]] FUNC dkt_dump(object_t object) -> object_t;
 [[debug_export]] FUNC dkt_dump_named_info(named_info_t* info) -> named_info_t*;
 
-//#define DKT-NULL-METHOD nullptr
+# if 0
+# define DKT_NULL_METHOD nullptr
+# else
 # define DKT_NULL_METHOD cast(method_t)dkt_null_method
+# endif
 
 [[export]] [[noreturn]] FUNC dkt_null_method(object_t object, ...) -> void;
 [[export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(object_t object, const signature_t* signature) -> void;
