@@ -3499,8 +3499,12 @@ sub generate_kw_args_method_signature_defn {
         &add_last($defs, $def);
       }
     }
+    my $kw_arg_default_placeholder = $$kw_args_placeholders{'default'};
     foreach my $def (@$defs) {
-      my $count = $kw_list_types =~ s/\{\}/ $def/; # extra whitespace
+      if (1) {
+        $def =~ s/dk::/\$/g;
+      }
+      my $count = $kw_list_types =~ s/$kw_arg_default_placeholder/ $def/; # extra whitespace
       die if 1 != $count;
     }
   }
