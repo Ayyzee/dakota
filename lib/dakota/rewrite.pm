@@ -421,8 +421,9 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(\s*);                     /$1$3$2dkt-enable-typeinfo slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*$main::block)/$1$3$2slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$id\s*);           /$1$3$2slots-t$4;/gsx; # forward decl
+ #$$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)func(\s|\()/$1slots$2$3/gsx; # lose 'func' when preceeded by 'slots'
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typealias($1, $2, $3, $4)/egs;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*\)\s*$main::list\s*->\s*.+?);/$1using slots-t = FUNC $2;/gs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*\)\s*$main::list\s*->\s*.+?);/$1using slots-t = func$2;/gs;
 }
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
