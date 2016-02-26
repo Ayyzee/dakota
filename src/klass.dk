@@ -319,7 +319,7 @@ klass methods {
 klass klass {
   slots {
     ssize-t              offset; // first so its offset is 0
-    methods::slots-t     methods;
+    methods-t            methods;
     ssize-t              size;
     object-t             superklass;
     symbol-t             name; // redundant but convenient
@@ -375,11 +375,10 @@ klass klass {
     }
     return self;
   }
-  //      method va-method-for-selector(object-t self, selector-t selector)
-  //      {
-  //        throw make(exception::klass, #msg : "not yet implemented") -> va-method-t;
-  //        // return nullptr
-  //      }
+  // method va-method-for-selector(object-t self, selector-t selector) {
+  //   throw make(exception::klass, #msg : "not yet implemented") -> va-method-t;
+  //   // return nullptr
+  // }
   method method-for-selector?(object-t self, selector-t selector) -> boole-t {
     assert(selector < self.methods.count);
     boole-t result = false;

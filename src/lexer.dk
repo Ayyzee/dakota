@@ -48,15 +48,15 @@ klass lexer {
     char8-t* buffer;
 
     str-t    file;
-    int64-t line;
-    int64-t previous-column;
-    int64-t column;
+    int64-t  line;
+    int64-t  previous-column;
+    int64-t  column;
 
     object-t open-tokens;
   }
   method init(object-t self,
-                       stream-t stream :   stdin,
-                       str-t    file : nullptr) -> object-t {
+              stream-t stream :   stdin,
+              str-t    file : nullptr) -> object-t {
     self = $init(super);
 
     if (nullptr != file) {

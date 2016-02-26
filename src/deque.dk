@@ -158,7 +158,7 @@ klass deque {
     return self;
   }
   static func string-from-node(object-t self, node::slots-t* mn,
-				   char8-t* buf, ssize-t buf-len) -> object-t {
+                               char8-t* buf, ssize-t buf-len) -> object-t {
     if (self.first == mn && self.first != nullptr)
       snprintf(buf, cast(size-t)buf-len, "%s", "first     ");
     else-if (self.last == mn && self.last != nullptr)
@@ -232,8 +232,8 @@ klass deque {
   method add-first(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
     node::slots-t* node = node::create(nullptr, element, self.first); // self.first may be nullptr
-    //        node->prev = nullptr;
-    //        node->next = self.first;
+    // node->prev = nullptr;
+    // node->next = self.first;
     self.first = node;
     self.size++;
     self.iterator-state++;
