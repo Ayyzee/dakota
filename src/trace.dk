@@ -52,7 +52,7 @@ func dkt-va-trace-before(const signature-t* signature, method-t m, super-t conte
                            signature->name, signature->parameter-types + sizeof("object-t") - 1,
                            cast(ptr-t)(context.object), name-of(klass-of(context.object)),
                            cast(ptr-t)(context.klass), name-of(context.klass),
-                           cast(ptr-t)cast(uintptr-t)(m));
+                           cast(ptr-t)cast(size-t)(m));
     trace-column-in();
   }
   return result;
@@ -64,7 +64,7 @@ func dkt-va-trace-before(const signature-t* signature, method-t m, object-t obje
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
                            signature->name, signature->parameter-types,
                            cast(ptr-t)(object), name-of(klass-of(object)),
-                           cast(ptr-t)cast(uintptr-t)(m));
+                           cast(ptr-t)cast(size-t)(m));
     trace-column-in();
   }
   return result;
@@ -78,7 +78,7 @@ func dkt-va-trace-after(const signature-t* signature, method-t m, super-t contex
                            signature->name, signature->parameter-types + sizeof("object-t") - 1,
                            cast(ptr-t)(context.object), name-of(klass-of(context.object)),
                            cast(ptr-t)(context.klass), name-of(context.klass),
-                           cast(ptr-t)cast(uintptr-t)(m));
+                           cast(ptr-t)cast(size-t)(m));
   return result;
 }
 func dkt-va-trace-after(const signature-t* signature, method-t m, object-t object, va-list-t args) -> int-t {
@@ -89,7 +89,7 @@ func dkt-va-trace-after(const signature-t* signature, method-t m, object-t objec
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
                            signature->name, signature->parameter-types,
                            cast(ptr-t)(object), name-of(klass-of(object)),
-                           cast(ptr-t)cast(uintptr-t)(m));
+                           cast(ptr-t)cast(size-t)(m));
   return result;
 }
 func dkt-trace-before(const signature-t* signature, method-t m, super-t context, ...) -> int-t {

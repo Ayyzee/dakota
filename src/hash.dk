@@ -17,7 +17,7 @@
 module dakota;
 
 klass hash {
-  slots uintptr-t;
+  slots size-t;
 
   method init(object-t self, slots-t slots : 0) -> object-t {
     self = $init(super);

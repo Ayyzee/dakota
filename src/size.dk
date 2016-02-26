@@ -35,5 +35,8 @@ klass ssize {
     return self;
   }
 }
+
+static-assert(sizeof( size-t) == sizeof(uintptr-t),  "size-t is synonymous with uintptr-t");
+static-assert(sizeof(ssize-t) == sizeof( intptr-t), "ssize-t is synonymous with intptr-t");
 static-assert(sizeof(ssize-t) == sizeof(size-t),
               "The types ssize-t and size-t must be interchangable with respect to their size.");

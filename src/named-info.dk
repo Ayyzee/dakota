@@ -64,16 +64,16 @@ klass named-info {
                                                                 cast(std-compare-t)cast(property-compare-t)property::compare);
     return result;
   }
-  method at(slots-t* s, symbol-t key) -> intptr-t {
-    intptr-t element = cast(intptr-t)nullptr;
+  method at(slots-t* s, symbol-t key) -> ssize-t {
+    ssize-t element = cast(ssize-t)nullptr;
     property::slots-t* property = search(s, key);
     if (nullptr != property)
       element = property->element;
     return element;
   }
-  method at(slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
-    intptr-t element = at(s, key);
-    if (cast(intptr-t)nullptr == element) // nullptr (i.e. zero) must be illegal for this to work
+  method at(slots-t* s, symbol-t key, ssize-t default-element) -> ssize-t {
+    ssize-t element = at(s, key);
+    if (cast(ssize-t)nullptr == element) // nullptr (i.e. zero) must be illegal for this to work
       element = default-element;
     return element;
   }

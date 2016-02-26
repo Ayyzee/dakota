@@ -508,7 +508,7 @@ klass klass {
           fprintf(out, " ");
           width++;
         }
-        str-t symbol-name = symbol-name-from-address(cast(ptr-t)cast(uintptr-t)(m));
+        str-t symbol-name = symbol-name-from-address(cast(ptr-t)cast(size-t)(m));
 
         if (nullptr != symbol-name) {
           // should demangle here

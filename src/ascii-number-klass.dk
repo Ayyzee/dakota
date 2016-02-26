@@ -45,7 +45,7 @@ klass ascii-number-klass {
   }
   klass initialize(object-t) -> void {
     gbl-base2-ascii-number-klass-info = dk-make-named-info(#base2-ascii-number-klass,
-                                                           #superklass-name, cast(uintptr-t)#ascii-number,
+                                                           #superklass-name, cast(size-t)#ascii-number,
                                                            nullptr);
     return;
   }

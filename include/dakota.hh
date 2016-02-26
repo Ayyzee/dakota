@@ -223,15 +223,15 @@ using compare_t =            FUNC (*)(object_t, object_t) -> int_t; // comparito
 using dkt_signature_func_t = FUNC (*)() -> const signature_t*;
 using dkt_selector_func_t =  FUNC (*)() -> selector_t*;
 
-namespace hash { using slots_t = uintptr_t; } using hash_t = hash::slots_t;
+namespace hash { using slots_t = size_t; } using hash_t = hash::slots_t;
 
 constexpr FUNC dk_hash(str_t str) -> hash_t { // Daniel J. Bernstein
   return !*str ? cast(hash_t)5381 : cast(hash_t)(*str) ^ (cast(hash_t)33 * dk_hash(str + 1));
 }
 constexpr FUNC dk_hash_switch(str_t str) -> hash_t { return dk_hash(str); }
 
-constexpr FUNC dk_hash_switch( intptr_t val) -> intptr_t  { return val; }
-constexpr FUNC dk_hash_switch(uintptr_t val) -> uintptr_t { return val; }
+constexpr FUNC dk_hash_switch(ssize_t val) -> ssize_t  { return val; }
+constexpr FUNC dk_hash_switch(size_t  val) -> size_t   { return val; }
 
 [[export]] FUNC dk_intern(str_t) -> symbol_t;
 [[export]] FUNC dk_intern_free(str_t) -> symbol_t;

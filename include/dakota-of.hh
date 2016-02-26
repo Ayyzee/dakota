@@ -26,4 +26,10 @@ inline FUNC superklass_of(object_t kls) -> object_t {
 inline FUNC name_of(object_t kls) -> symbol_t {
   return klass::unbox(kls).name;
 }
+
+// namespace dk {
+//   using  size_t =  size::slots_t;
+//   using ssize_t = ssize::slots_t;
+// }
+
 # endif // dkt-dakota-of-hh

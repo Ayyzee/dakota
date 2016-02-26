@@ -113,7 +113,7 @@ klass object {
     return self;
   }
   method hash(object-t self) -> hash-t {
-    uintptr-t result = cast(uintptr-t)self;
+    size-t result = cast(size-t)self;
     return result;
   }
   method dump(object-t self) -> object-t {

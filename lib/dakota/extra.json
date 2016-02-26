@@ -51,6 +51,8 @@
     'property' => undef,
     'selector' => undef,
     'signature' => undef,
+    'size' => undef,
+    'ssize' => undef,
     'symbol' => undef,
     'super' => undef,
     'str' => undef,
