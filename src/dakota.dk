@@ -996,7 +996,8 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
   boole-t exported? =          false;
   boole-t state-exported? =    false;
   boole-t behavior-exported? = false;
-  if (klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?)) {
+  if (!klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?))
+    return ci.modulee;
     ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
     ostream::col-incr(ostrm);
 
@@ -1147,7 +1148,6 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
 
     ostream::col-decr(ostrm);
     ostream::println-format(ostrm, "}\n");
-  }
   return ci.modulee;
 }
 static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only) -> void {
