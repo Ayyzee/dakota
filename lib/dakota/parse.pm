@@ -1715,10 +1715,11 @@ sub method {
       &dakota::util::add_last($$method{'attributes'}, $attr);
     }
   }
+  my $is_va = 0;
   my $name = [];
   push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
   if ('va' eq $$name[0]) {
-    $$method{'va?'} = 1;
+    $is_va = 1;
     push @$name, &match(__FILE__, __LINE__, '::');
     push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
   }
@@ -1733,7 +1734,7 @@ sub method {
     &match(__FILE__, __LINE__, '=>');
     my $realname = [];
     push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
-    if ($$method{'va?'}) {
+    if ($is_va) {
       push @$realname, &match(__FILE__, __LINE__, '::');
       push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
     }

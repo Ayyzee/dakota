@@ -857,19 +857,6 @@ sub function::overloadsig {
   my $function_overloadsig = "$name($parameter_types)";
   return $function_overloadsig;
 }
-# should test for 'va', '::' AND va-list-t
-sub is_va {
-  my ($method) = @_;
-  my $num_args = @{$$method{'parameter-types'}};
-
-  if ($$method{'va?'}) {
-    return 1;
-  } elsif ("va-list-t" eq "@{$$method{'parameter-types'}[$num_args - 1]}") {
-    return 1;
-  } else {
-    return 0;
-  }
-}
 sub method::varargs_from_qual_va_list {
   my ($method) = @_;
   my $new_method = &dakota::util::deep_copy($method);
@@ -880,7 +867,6 @@ sub method::varargs_from_qual_va_list {
   if (exists $$new_method{'parameter-types'}) {
     &dakota::util::_replace_last($$new_method{'parameter-types'}, ['...']);
   }
-  delete $$new_method{'va?'};
   return $new_method;
 }
 sub method::generate_va_method_defn {

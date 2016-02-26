@@ -64,6 +64,7 @@ our @EXPORT= qw(
                  is_symbol_candidate
                  is_debug
                  is_kw_args_generic
+                 is_va
                  kw_args_generics
                  kw_args_generics_sig
                  kw_args_placeholders
@@ -461,16 +462,20 @@ sub set_global_project_rep {
   $global_project_rep = &scalar_from_file($project_rep_path);
   return $global_project_rep;
 }
+sub is_va {
+  my ($method) = @_;
+  my $num_args = @{$$method{'parameter-types'}};
+
+  if ('va-list-t' eq "@{$$method{'parameter-types'}[-1]}") {
+    return 1;
+  } else {
+    return 0;
+  }
+}
 sub is_kw_args_generic {
   my ($generic) = @_;
   my $state = 0;
-  if (exists $$generic{'keyword-types'} && defined $$generic{'keyword-types'} && 0 != scalar @{$$generic{'keyword-types'}}) {
-    return 1;
-  }
-  if (exists $$generic{'keyword-types'} && !exists $$generic{'va?'}) {
-    return 1;
-  }
-  if (exists $$generic{'kw-args-names'} && 0 != scalar @{$$generic{'kw-args-names'}}) {
+  if (exists $$generic{'keyword-types'} && !&is_va($generic)) {
     return 1;
   }
   my ($name, $types) = &kw_args_generics_sig($generic);
@@ -481,7 +486,6 @@ sub is_kw_args_generic {
 
   #if (exists $$tbl{$name_str}) { # changechange: 2/2
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
-
     $state = 1;
   }
   return $state;
