@@ -38,8 +38,8 @@ klass input-stream {
   slots stream-t;
 
   method init(object-t self,
-                       slots-t  slots :    stdin,
-                       str-t    file : nullptr) -> object-t {
+              slots-t  slots : stdin,
+              str-t    file :  nullptr) -> object-t {
     self = $init(super);
     unbox(self) = slots;
     assert(stdout != slots);

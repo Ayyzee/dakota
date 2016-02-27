@@ -44,8 +44,8 @@ klass output-stream {
   slots stream-t;
 
   method init(object-t self,
-                       slots-t  slots :    stdout,
-                       str-t    file : nullptr) -> object-t {
+              slots-t  slots : stdout,
+              str-t    file :  nullptr) -> object-t {
     self = $init(super);
     unbox(self) = slots;
     assert(stdin != slots);
