@@ -2,46 +2,52 @@
 
 # define func auto
 
-namespace __signature { namespace va {
-} }
+namespace __signature { namespace va { } }
 namespace object {
-  //namespace __signature { using namespace ::__signature; }
   namespace __signature { namespace va { using namespace ::__signature::va; } }
+  namespace __signature { using namespace ::__signature; }
   namespace __signature {
+    static const char* foo = "object::__signature::foo"; 
     namespace va { static const char* foo = "object::__signature::va::foo"; }
   }
 }
 namespace __signature {
+  static const char* foo = "__signature::foo"; // never used
+  static const char* bar = "__signature::bar";
   namespace va { static const char* foo = "__signature::va::foo"; } // never used
   namespace va { static const char* bar = "__signature::va::bar"; }
 }
 namespace object {
+  static func foo(void*, ...) -> void {
+    static const char* sig = __signature::foo; // object::__signature::foo
+    printf("%p: %s\n", sig, sig);
+  }
+  static func bar(void*, ...) -> void {
+    static const char* sig = __signature::bar; // __signature::bar
+    printf("%p: %s\n", sig, sig);
+  }
   namespace va { static func foo(void*, va_list) -> void {
-    static const char* sig = __signature::va::foo;
+    static const char* sig = __signature::va::foo; // object::__signature::va::foo
     printf("%p: %s\n", sig, sig);
   } }
   namespace va { static func bar(void*, va_list) -> void {
-    static const char* sig = __signature::va::bar;
+    static const char* sig = __signature::va::bar; // __signature::va::bar
     printf("%p: %s\n", sig, sig);
   } }
 }
-// namespace object {
-//   static func foo(void*, ...) -> void {
-//     static const char* sig = __signature::foo;
-//     printf("%p: %s\n", sig, __PRETTY_FUNCTION__);
-//   }
-//   static func bar(void*, ...) -> void {
-//     static const char* sig = __signature::bar;
-//     printf("%p: %s\n", sig, __PRETTY_FUNCTION__);
-//   }
-// }
-
 func main() -> int {
+  printf("%p: %s\n",         __signature::foo,         __signature::foo);
+  printf("%p: %s\n",         __signature::bar,         __signature::bar);
+  printf("%p: %s\n", object::__signature::foo, object::__signature::foo);
+  printf("\n");
   printf("%p: %s\n",         __signature::va::foo,         __signature::va::foo);
   printf("%p: %s\n",         __signature::va::bar,         __signature::va::bar);
   printf("%p: %s\n", object::__signature::va::foo, object::__signature::va::foo);
-  printf("\n");
+  printf("---\n");
 
+  object::foo(nullptr, nullptr);
+  object::bar(nullptr, nullptr);
+  printf("\n");
   object::va::foo(nullptr, nullptr);
   object::va::bar(nullptr, nullptr);
   return 0;
