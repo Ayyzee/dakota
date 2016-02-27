@@ -340,9 +340,10 @@ sub vars_from_defn {
 }
 sub rewrite_methods {
   my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|(method\s+(\[\[.+?\]\])?\s*($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_args_generics)|ges;
-  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)\[\[alias\(($id)\)\]\]|$1METHOD$2ALIAS($3) |gs; #hackhack
-  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+(\[\[.+?\]\])?)|$1METHOD$2 |gs; #hackhack
+  $$filestr_ref =~ s|((\[\[.+?\]\])?\s*method\s+($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_args_generics)|ges;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)\[\[alias\(($id)\)\]\](\s*)method(\s+)|$1ALIAS($2)$3METHOD$4|gs;
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)(\s*(\[\[.+?\]\])*)(\s*)method(\s+)($id)|$1$2$4METHOD$5$6|gs; #hackhack
+  $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)($id)|$1METHOD$2$3|gs; #hackhack
 
   $$filestr_ref =~ s/klass method/klass_method/gs;           #hackhack
   $$filestr_ref =~ s/namespace method/namespace_method/gs;   #hackhack
@@ -1003,7 +1004,7 @@ sub convert_dk_to_cc {
   &encode_strings($filestr_ref);
   my $parts = &encode_comments($filestr_ref);
   &rewrite_method_chaining($filestr_ref);
-  &rewrite_method_aliases($filestr_ref);
+  #&rewrite_method_aliases($filestr_ref);
 
   if ($remove) {
     &remove_system_includes($filestr_ref);

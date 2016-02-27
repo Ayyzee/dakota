@@ -219,7 +219,7 @@ klass vector {
     self.count--;
     return element;
   }
-  method [[alias(remove-last)]] pop(object-t self) -> object-t;
+  [[alias(remove-last)]] method pop(object-t self) -> object-t;
   method remove-last(object-t self) -> object-t {
     assert(0 != self.count);
     object-t element = self.elements[self.count - 1];
@@ -277,7 +277,7 @@ klass vector {
       self.count = index + 1;
     return rtn;
   }
-//method [[alias(size)]] ssize(object-t self, object-t element) -> ssize-t;
+//[[alias(size)]] method ssize(object-t self, object-t element) -> ssize-t;
   method size(object-t self) -> ssize-t {
     return self.count;
   }
@@ -296,8 +296,8 @@ klass vector {
   }
   //     method add-at(object-t self, object-t element, ssize-t index) -> object-t;
 
-  method [[alias(add-last)]] add(object-t self, object-t element) -> object-t;
-  method [[alias(add-last)]] push(object-t self, object-t element) -> object-t;
+  [[alias(add-last)]] method add(object-t self, object-t element) -> object-t;
+  [[alias(add-last)]] method push(object-t self, object-t element) -> object-t;
   method add-last(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
 
@@ -314,7 +314,7 @@ klass vector {
     assert(0 != self.count);
     return self.elements[0];
   }
-  method [[alias(last)]] top(object-t self) -> object-t;
+  [[alias(last)]] method top(object-t self) -> object-t;
   method last(object-t self) -> object-t {
     assert(0 != self.count);
     return self.elements[self.count - 1];

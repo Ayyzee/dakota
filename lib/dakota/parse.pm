@@ -669,6 +669,7 @@ sub trait {
   $$gbl_current_scope{'module'} = $gbl_current_module;
   $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
+  my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (m/^initialize$/) {
@@ -682,6 +683,9 @@ sub trait {
       if (m/^export$/) {
         &match(__FILE__, __LINE__, 'export');
         for (&sst_cursor::current_token($gbl_sst_cursor)) {
+          # [[export]] method
+          # [[sentinel]] method
+          # [[alias(...)]] method
           if (m/^method$/) {
             $$gbl_root{'traits'}{$construct_name}{'exported?'} = 1; # export trait if any method is exported
             $$gbl_root{'traits'}{$construct_name}{'behavior-exported?'} = 1;
@@ -690,11 +694,46 @@ sub trait {
           }
         }
       }
+      # [[export]] method
+      # [[sentinel]] method
+      # [[alias(...)]] method
+      if (m/^\[$/) {
+        &match(__FILE__, __LINE__, '[');
+        my $layer = 1;
+        if ('[' ne &sst_cursor::current_token($gbl_sst_cursor)) {
+          last;
+        }
+        $attrs = [];
+        push @$attrs, '[';
+        while (0 < $layer) {
+          my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
+          if (0) {
+          } elsif ('[' eq $current_token) {
+            &match(__FILE__, __LINE__, '[');
+            $layer++;
+          } elsif (']' eq $current_token) {
+            &match(__FILE__, __LINE__, ']');
+            die if 0 == $layer;
+            $layer--;
+          } else {
+            &match_any();
+          }
+          push @$attrs, $current_token;
+        }
+        last;
+      }
       if (m/^method$/) {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
-            '}' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
-          &method({ 'exported?' => 0 });
+            '}' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
+            ']' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
+          my $args = { 'exported?' => 0 };
+          if (0 < @$attrs) {
+            $$args{'attrs'} = &deep_copy($attrs);
+            $attrs = [];
+            #print &Dumper($$args{'attrs'});
+          }
+          &method($args);
           last;
         }
       }
@@ -705,6 +744,7 @@ sub trait {
           $$gbl_current_scope{'traits'} = [];
         }
         foreach my $trait (@$seq) {
+         #&add_trait_decl($gbl_root, $trait);
           &dakota::util::add_last($$gbl_current_scope{'traits'}, $trait);
         }
         last;
@@ -1254,6 +1294,7 @@ sub klass {
   $$gbl_current_scope{'module'} = $gbl_current_module;
   $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
+  my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
       if (m/^initialize$/) {
@@ -1290,6 +1331,7 @@ sub klass {
           }
           # [[export]] method
           # [[sentinel]] method
+          # [[alias(...)]] method
           if (m/^method$/) {
             $$gbl_root{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
             $$gbl_root{'klasses'}{$construct_name}{'behavior-exported?'} = 1;
@@ -1307,11 +1349,44 @@ sub klass {
       }
       # [[export]] method
       # [[sentinel]] method
+      # [[alias(...)]] method
+      if (m/^\[$/) {
+        &match(__FILE__, __LINE__, '[');
+        my $layer = 1;
+        if ('[' ne &sst_cursor::current_token($gbl_sst_cursor)) {
+          last;
+        }
+        $attrs = [];
+        push @$attrs, '[';
+        while (0 < $layer) {
+          my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
+          if (0) {
+          } elsif ('[' eq $current_token) {
+            &match(__FILE__, __LINE__, '[');
+            $layer++;
+          } elsif (']' eq $current_token) {
+            &match(__FILE__, __LINE__, ']');
+            die if 0 == $layer;
+            $layer--;
+          } else {
+            &match_any();
+          }
+          push @$attrs, $current_token;
+        }
+        last;
+      }
       if (m/^method$/) {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
-            '}' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
-          &method({ 'exported?' => 0 });
+            '}' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
+            ']' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
+          my $args = { 'exported?' => 0 };
+          if (0 < @$attrs) {
+            $$args{'attrs'} = &deep_copy($attrs);
+            $attrs = [];
+            #print &Dumper($$args{'attrs'});
+          }
+          &method($args);
           last;
         }
       }
@@ -1700,26 +1775,22 @@ sub method {
   if ($$args{'exported?'}) {
     $$method{'exported?'} = 1;
   }
-  if (&sst_cursor::current_token($gbl_sst_cursor) eq '[') {
-    my ($open_bracket_index, $close_bracket_index)
-      = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
-    &match(__FILE__, __LINE__, '[');
-    &match(__FILE__, __LINE__, '[');
-    my $attr = &match_re(__FILE__, __LINE__, $id);
-    &match(__FILE__, __LINE__, '(');
-    my $attr_arg = &match_any(__FILE__, __LINE__);
-    &match(__FILE__, __LINE__, ')');
-    &match(__FILE__, __LINE__, ']');
-    &match(__FILE__, __LINE__, ']');
+  if ($$args{'attrs'}) {
+    #print &Dumper($$args{'attrs'});
+    my $attrs = "@{$$args{'attrs'}}";
+    my ($attr, $attr_arg);
+    if ($attrs =~ /^\[\[\s*([\w-]+)\s*\(\s*([\w-]+)\s*\)\s*\]\]$/) {
+      ($attr, $attr_arg) = ($1, $2);
 
-    if (0) {
-    } elsif ('alias' eq $attr) {
-      $$method{'alias'} = [ $attr_arg ];
-    } elsif ('format-printf' eq $attr || 'format-va-printf' eq $attr) {
-      if (!exists $$method{'attributes'}) {
-        $$method{'attributes'} = [];
+      if (0) {
+      } elsif ('alias' eq $attr) {
+        $$method{'alias'} = [ $attr_arg ];
+      } elsif ('format-printf' eq $attr || 'format-va-printf' eq $attr) {
+        if (!exists $$method{'attributes'}) {
+          $$method{'attributes'} = [];
+        }
+        &dakota::util::add_last($$method{'attributes'}, $attr);
       }
-      &dakota::util::add_last($$method{'attributes'}, $attr);
     }
   }
   my $is_va = 0;
