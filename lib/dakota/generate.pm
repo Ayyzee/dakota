@@ -605,7 +605,7 @@ sub arg_type::super {
   #}
   return $new_arg_type_ref;
 }
-sub arg_type::va {
+sub arg_type::varargs {
   my ($arg_type_ref) = @_;
   my $num_args       = @$arg_type_ref;
 
@@ -889,7 +889,7 @@ sub method::generate_va_method_defn {
   my $is_inline  = $$va_method{'inline?'};
 
   my $new_arg_types_ref      = $$va_method{'parameter-types'};
-  my $new_arg_types_va_ref   = &arg_type::va($new_arg_types_ref);
+  my $new_arg_types_va_ref   = &arg_type::varargs($new_arg_types_ref);
   my $new_arg_names_ref      = &arg_type::names($new_arg_types_ref);
   my $new_arg_names_va_ref   = &arg_type::names($new_arg_types_va_ref);
   my $new_arg_list_va_ref    = &arg_type::list_pair($new_arg_types_va_ref, $new_arg_names_va_ref);
@@ -3046,7 +3046,7 @@ sub dk_generate_cc_footer_klass {
         }
 
         my $old_parameter_types = $$va_method{'parameter-types'};
-        $$va_method{'parameter-types'} = &arg_type::va($$va_method{'parameter-types'});
+        $$va_method{'parameter-types'} = &arg_type::varargs($$va_method{'parameter-types'});
         my $method_type = &method::type($va_method);
         $$va_method{'parameter-types'} = $old_parameter_types;
 
@@ -3096,7 +3096,7 @@ sub dk_generate_cc_footer_klass {
         die if (!$$va_method{'defined?'} && !$$va_method{'alias'} && !$$va_method{'generated?'});
 
         my $old_parameter_types = $$va_method{'parameter-types'};
-        $$va_method{'parameter-types'} = &arg_type::va($$va_method{'parameter-types'});
+        $$va_method{'parameter-types'} = &arg_type::varargs($$va_method{'parameter-types'});
         my $method_type = &method::type($va_method);
         $$va_method{'parameter-types'} = $old_parameter_types;
 
