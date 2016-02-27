@@ -1288,6 +1288,8 @@ sub klass {
               last;
             }
           }
+          # [[export]] method
+          # [[sentinel]] method
           if (m/^method$/) {
             $$gbl_root{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
             $$gbl_root{'klasses'}{$construct_name}{'behavior-exported?'} = 1;
@@ -1303,6 +1305,8 @@ sub klass {
           last;
         }
       }
+      # [[export]] method
+      # [[sentinel]] method
       if (m/^method$/) {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||

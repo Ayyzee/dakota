@@ -486,18 +486,34 @@ sub is_va {
 sub is_kw_args_generic {
   my ($generic) = @_;
   my $state = 0;
-  if (exists $$generic{'keyword-types'} && !&is_va($generic)) {
-    return 1;
-  }
+  my $names =
+    {};
+    #{ 'init' => 1, 'va::init' => 1, 'append' => 1, 'va::append' => 1, 'print-format' => 1, 'va::print-format' => 1 };
+
   my ($name, $types) = &kw_args_generics_sig($generic);
   my $name_str =  &str_from_seq($name);
   my $types_str = &parameter_types_str($types);
   my $global_project_rep = &global_project_rep();
   my $tbl = $$global_project_rep{'kw-args-generics'};
 
-  #if (exists $$tbl{$name_str}) { # changechange: 2/2
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
     $state = 1;
+    if ($$names{$name_str}) {
+      print "$name_str: yes\n";
+    }
+  } else {
+    if ($$names{$name_str}) {
+      print "$name_str: no\n";
+    }
+  }
+  if (defined $$generic{'kw-args-names'} && 0 < @{$$generic{'kw-args-names'}}) {
+    $state = 1;
+  }
+  if (defined $$generic{'keyword-types'} && 0 < @{$$generic{'keyword-types'}}) {
+    $state = 1;
+  }
+  if ($$names{$name_str}) {
+    print "$name_str: $state\n";
   }
   return $state;
 }

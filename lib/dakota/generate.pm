@@ -610,7 +610,7 @@ sub arg_type::varargs {
   my $num_args       = @$arg_type_ref;
 
   my $new_arg_type_ref = &dakota::util::deep_copy($arg_type_ref);
-  # should assert that $$new_arg_type_ref[$num_args - 1] == "va-list-t"
+  die if 'va-list-t' ne "@{$$new_arg_type_ref[-1]}";
   $$new_arg_type_ref[$num_args - 1] = $global_seq_ellipsis;
   return $new_arg_type_ref;
 }
@@ -629,7 +629,7 @@ sub arg_type::names {
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
     if (&path::string($global_seq_ellipsis) eq  "@{$$arg_type_ref[$arg_num]}") {
       $$arg_names[$arg_num] = undef;
-    } elsif ("va-list-t" eq "@{$$arg_type_ref[$arg_num]}") {
+    } elsif ('va-list-t' eq "@{$$arg_type_ref[$arg_num]}") {
       $$arg_names[$arg_num] = "args";
     } else {
       $$arg_names[$arg_num] = "arg$arg_num";
@@ -913,7 +913,9 @@ sub method::generate_va_method_defn {
   else {
     $$scratch_str_ref .= $col . "namespace" . " @$scope { ";
   }
-  if (&is_kw_args_generic($va_method)) {
+  my $vararg_method = &deep_copy($va_method);
+  $$vararg_method{'parameter-types'} = &arg_type::varargs($$vararg_method{'parameter-types'});
+  if (&is_kw_args_generic($vararg_method)) {
     $$scratch_str_ref .= '[[sentinel]] ';
   }
   my $visibility = '';
@@ -2159,6 +2161,7 @@ sub linkage_unit::generate_klasses_body {
             &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
             if (0 == @{$$va_method{'keyword-types'}}) {
               my $last = &dakota::util::remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
+              die if 'va-list-t' ne "@$last";
               my ($visibility, $method_decl_ref) = &function::decl($va_method, $klass_path);
               $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "stmt2") . "\n";
               &dakota::util::add_last($$va_method{'parameter-types'}, $last);
