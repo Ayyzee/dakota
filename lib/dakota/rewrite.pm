@@ -195,9 +195,9 @@ sub rewrite_signatures {
 }
 sub rewrite_selectors {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!$k)(  DKT-SELECTOR-PTR\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(  DKT-SELECTOR-PTR\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
-  $$filestr_ref =~ s/(?<!$k)(  DKT-SELECTOR-PTR\s*\(.*?)(\()        /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(  SELECTOR-PTR\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
+  $$filestr_ref =~ s/(?<!$k)(  SELECTOR-PTR\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(  SELECTOR-PTR\s*\(.*?)(\()        /$1,$2/gx;
   ###
   $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
   $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack

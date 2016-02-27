@@ -151,14 +151,15 @@ namespace va {
 # endif
 
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
-// file scope
-# define DKT_SELECTOR_PTR(name, args)         (cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
-# define SELECTOR(name, args)                *(cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
-# define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __signature::name))()
 
 // klass/trait scope
 # define SLOTS_METHOD_SIGNATURE(name, args)   (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __slots_method_signature::name))()
 # define KW_ARGS_METHOD_SIGNATURE(name, args) (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __kw_args_method_signature::name))()
+
+// file scope
+# define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __signature::name))()
+# define SELECTOR_PTR(name, args)             (cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
+# define SELECTOR(name, args)                *SELECTOR_PTR(name, args)
 
 # define unless(e) if (0 == (e))
 # define until(e)  while (0 == (e))

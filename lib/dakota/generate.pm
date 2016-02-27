@@ -1288,7 +1288,7 @@ sub generics::generate_selector_seq {
       my $new_arg_type_list   = &arg_type::list_types($$generic{'parameter-types'});
       my $name = "@{$$generic{'name'}}";
       my $in = &ident_comment($name);
-      $scratch_str .= $col . "{ .next = nullptr, .ptr = DKT-SELECTOR-PTR(va::$name($$new_arg_type_list)) }," . $in . "\n";
+      $scratch_str .= $col . "{ .next = nullptr, .ptr = SELECTOR-PTR(va::$name($$new_arg_type_list)) }," . $in . "\n";
     }
     $scratch_str .= $col . "{ .next = nullptr, .ptr = nullptr },\n";
     $col = &colout($col);
@@ -1304,7 +1304,7 @@ sub generics::generate_selector_seq {
         my $new_arg_type_list   = &arg_type::list_types($$generic{'parameter-types'});
         my $name = "@{$$generic{'name'}}";
         my $in = &ident_comment($name);
-        $scratch_str .= $col . "{ .next = nullptr, .ptr = DKT-SELECTOR-PTR($name($$new_arg_type_list)) }," . $in . "\n";
+        $scratch_str .= $col . "{ .next = nullptr, .ptr = SELECTOR-PTR($name($$new_arg_type_list)) }," . $in . "\n";
       }
     }
     $scratch_str .= $col . "{ .next = nullptr, .ptr = nullptr },\n";
