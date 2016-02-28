@@ -915,12 +915,15 @@ sub method::generate_va_method_defn {
   }
   my $vararg_method = &deep_copy($va_method);
   $$vararg_method{'parameter-types'} = &arg_type::varargs($$vararg_method{'parameter-types'});
-  if (&is_kw_args_generic($vararg_method)) {
-    $$scratch_str_ref .= '[[sentinel]] ';
-  }
   my $visibility = '';
   if (&is_exported($va_method)) {
     $visibility = '[[export]] ';
+  }
+  if (&is_kw_args_generic($vararg_method)) {
+    $$scratch_str_ref .= '[[sentinel]] ';
+  }
+  if (&is_nrt_decl() || &is_rt_decl()) {
+    $$scratch_str_ref .= 'extern ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -1315,7 +1318,8 @@ sub generics::generate_va_generic_defns {
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       my $scope = [];
-      &path::add_last($scope, 'dk');
+      my $ns;
+      &path::add_last($scope, $ns = 'dk');
       my $new_generic = &dakota::util::deep_copy($generic);
       $$new_generic{'inline?'} = $is_inline;
 
@@ -1348,6 +1352,9 @@ sub generics::generate_generic_defn {
   my $visibility = '';
   if (&is_exported($generic)) {
     $visibility = '[[export]] ';
+  }
+  if (&is_nrt_decl() || &is_rt_decl()) {
+    $$scratch_str_ref .= 'extern ';
   }
   my $func_spec = '';
   if ($is_inline) {
@@ -1455,6 +1462,9 @@ sub generics::generate_super_generic_defn {
   if (&is_exported($generic)) {
     $visibility = '[[export]] ';
   }
+  if (&is_nrt_decl() || &is_rt_decl()) {
+    $$scratch_str_ref .= 'extern ';
+  }
   my $func_spec = '';
   if ($is_inline) {
     $func_spec = 'INLINE ';
@@ -1546,13 +1556,13 @@ sub generics::generate_super_generic_defn {
   }
 }
 sub generics::generate_generic_defns {
-  my ($generics, $is_inline, $col) = @_;
+  my ($generics, $is_inline, $ns, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_generic_defns()\n";
   my $generic;
   #$$scratch_str_ref .= "# if defined DKT-VA-GENERICS\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "va-generics-object-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
@@ -1564,7 +1574,7 @@ sub generics::generate_generic_defns {
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "va-generics-super-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
@@ -1580,7 +1590,7 @@ sub generics::generate_generic_defns {
   &generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
   #}
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
@@ -1592,7 +1602,7 @@ sub generics::generate_generic_defns {
   $col = &colout($col);
   $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . 'namespace dk {' . &ann(__FILE__, __LINE__) . "\n";
+  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
   $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
@@ -1643,8 +1653,8 @@ sub linkage_unit::generate_generics {
   my $col = '';
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $is_inline;
-  &generics::generate_generic_defns($scope, $is_inline = 0, $col);
+  my ($is_inline, $ns);
+  &generics::generate_generic_defns($scope, $is_inline = 0, $ns = 'dk', $col);
 
     $$scratch_str_ref .=
       "\n" .
@@ -2284,8 +2294,8 @@ sub typealias_slots_t {
     my $parts = [split(/::/, $klass_name)];
     if (1 < scalar @$parts) {
       my $basename = &dakota::util::remove_last($parts);
-      my $ns = join('::', @$parts);
-      $result = "namespace $ns { using $basename-t = $basename\::slots-t; }";
+      my $inner_ns = join('::', @$parts);
+      $result = "namespace $inner_ns { using $basename-t = $basename\::slots-t; }";
     } else {
       $result = "using $klass_name-t = $klass_name\::slots-t;";
     }
