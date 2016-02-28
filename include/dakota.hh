@@ -153,8 +153,9 @@ namespace va {
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
 
 // klass/trait scope
-# define SLOTS_METHOD_SIGNATURE(name, args)   (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __slots_method_signature::name))()
-# define KW_ARGS_METHOD_SIGNATURE(name, args) (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __kw_args_method_signature::name))()
+# define METHOD_SIGNATURE(name, args)         (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __method_signature::name))()
+# define KW_ARGS_METHOD_SIGNATURE(name, args) METHOD_SIGNATURE(name, args)
+# define SLOTS_METHOD_SIGNATURE(name, args)   METHOD_SIGNATURE(name, args)
 
 // file scope
 # define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __signature::name))()
