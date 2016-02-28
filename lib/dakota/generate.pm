@@ -100,7 +100,7 @@ my $kw_args_placeholders = &kw_args_placeholders();
 my ($id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 
-my $global_is_defn = undef;     # klass decl vs defn
+my $global_is_defn = undef; # klass decl vs defn
 my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
 my $global_is_exe_rt = undef;
 my $global_suffix = undef;
@@ -926,9 +926,6 @@ sub method::generate_va_method_defn {
   if ($is_inline) {
     $func_spec = 'INLINE ';
   }
-  my $scope_va = &dakota::util::deep_copy($scope);
-  &dakota::util::add_last($scope_va, '::');
-  &dakota::util::add_last($scope_va, 'va');
   $$scratch_str_ref .= $visibility . $func_spec;
   if ($klass_type) {
     $$scratch_str_ref .= 'METHOD ';
@@ -1693,7 +1690,7 @@ sub path::string {
 ## exists()  (does this key exist)
 ## defined() (is the value (for this key) non-undef)
 sub dk_parse {
-  my ($dk_path) = @_;            # string.dk
+  my ($dk_path) = @_; # string.dk
   my $json_path = &dakota::parse::json_path_from_any_path($dk_path);
   my $file = &dakota::util::scalar_from_file($json_path);
   $file = &dakota::parse::kw_args_translate($file);
@@ -2160,7 +2157,7 @@ sub linkage_unit::generate_klasses_body {
           if (defined $$method{'keyword-types'}) {
             &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
             if (0 == @{$$va_method{'keyword-types'}}) {
-              my $last = &dakota::util::remove_last($$va_method{'parameter-types'}); # bugbug: should make sure its va-list-t
+              my $last = &dakota::util::remove_last($$va_method{'parameter-types'});
               die if 'va-list-t' ne "@$last";
               my ($visibility, $method_decl_ref) = &function::decl($va_method, $klass_path);
               $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "stmt2") . "\n";
@@ -2978,7 +2975,7 @@ sub export_pair {
   my ($symbol, $element) = @_;
   my $name = "@{$$element{'name'}}";
   my $type0 = "@{$$element{'parameter-types'}[0]}";
-  $type0 = '';                  # hackhack
+  $type0 = ''; # hackhack
   my $lhs = "\"$symbol::$name($type0)\"";
   my $rhs = 1;
   return ($lhs, $rhs);
@@ -3586,7 +3583,7 @@ sub generate_kw_args_method_defn {
 
   my $qualified_klass_name = &path::string($klass_name);
 
-  #    &path::add_last($klass_name, 'va');
+  #&path::add_last($klass_name, 'va');
   my $new_arg_type = $$method{'parameter-types'};
   my $new_arg_type_list = &arg_type::list_types($new_arg_type);
   $new_arg_type = $$method{'parameter-types'};
@@ -3673,7 +3670,7 @@ sub generate_kw_args_method_defn {
     my $kw_arg_name = $$kw_arg{'name'};
     my $kw_arg_type = &arg::type($$kw_arg{'type'});
     $$scratch_str_ref .= $col . "case \#$kw_arg_name: // dk-hash() is a constexpr. its compile-time evaluated.\n";
-    #            $$scratch_str_ref .= $col . "{\n";
+    #$$scratch_str_ref .= $col . "{\n";
     $col = &colin($col);
     # should do this for other types (char=>int, float=>double, ... ???
     $$scratch_str_ref .=
@@ -3696,10 +3693,10 @@ sub generate_kw_args_method_defn {
       $col . "_state_.$kw_arg_name = true;\n" .
       $col . "break;\n";
     $col = &colout($col);
-    #            $$scratch_str_ref .= $col . "}\n";
+    #$$scratch_str_ref .= $col . "}\n";
   }
   $$scratch_str_ref .= $col . "default:\n";
-  #        $$scratch_str_ref .= $col . "{\n";
+  #$$scratch_str_ref .= $col . "{\n";
   $col = &colin($col);
   $$scratch_str_ref .=
     $col . "throw make(no-such-keyword-exception::klass,\n" .
@@ -3707,7 +3704,7 @@ sub generate_kw_args_method_defn {
     $col . "           \#signature $colon __method-signature__,\n" .
     $col . "           \#keyword $colon   _keyword_->symbol);\n";
   $col = &colout($col);
-  #        $$scratch_str_ref .= $col . "}\n";
+  #$$scratch_str_ref .= $col . "}\n";
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}\n";
   $col = &colout($col);
