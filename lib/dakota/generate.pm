@@ -605,7 +605,7 @@ sub arg_type::super {
   #}
   return $new_arg_type_ref;
 }
-sub arg_type::varargs {
+sub arg_type::var_args {
   my ($arg_type_ref) = @_;
   my $num_args       = @$arg_type_ref;
 
@@ -871,7 +871,7 @@ sub function::overloadsig {
   my $function_overloadsig = "$name($parameter_types)";
   return $function_overloadsig;
 }
-sub method::varargs_from_qual_va_list {
+sub method::var_args_from_qual_va_list {
   my ($method) = @_;
   my $new_method = &dakota::util::deep_copy($method);
 
@@ -889,7 +889,7 @@ sub method::generate_va_method_defn {
   my $is_inline  = $$va_method{'inline?'};
 
   my $new_arg_types_ref      = $$va_method{'parameter-types'};
-  my $new_arg_types_va_ref   = &arg_type::varargs($new_arg_types_ref);
+  my $new_arg_types_va_ref   = &arg_type::var_args($new_arg_types_ref);
   my $new_arg_names_ref      = &arg_type::names($new_arg_types_ref);
   my $new_arg_names_va_ref   = &arg_type::names($new_arg_types_va_ref);
   my $new_arg_list_va_ref    = &arg_type::list_pair($new_arg_types_va_ref, $new_arg_names_va_ref);
@@ -914,7 +914,7 @@ sub method::generate_va_method_defn {
     $$scratch_str_ref .= $col . "namespace" . " @$scope { ";
   }
   my $vararg_method = &deep_copy($va_method);
-  $$vararg_method{'parameter-types'} = &arg_type::varargs($$vararg_method{'parameter-types'});
+  $$vararg_method{'parameter-types'} = &arg_type::var_args($$vararg_method{'parameter-types'});
   my $visibility = '';
   if (&is_exported($va_method)) {
     $visibility = '[[export]] ';
@@ -1081,12 +1081,12 @@ sub common::generate_signature_defns {
     $col = &colin($col);
     foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
-        my $varargs_generic = &method::varargs_from_qual_va_list($generic);
-        my $keyword_types = $$varargs_generic{'keyword-types'} ||= undef;
-        #if (!&is_slots($varargs_generic)) {
-        $scratch_str .= &common::print_signature($varargs_generic, $col, ['signature']);
+        my $var_args_generic = &method::var_args_from_qual_va_list($generic);
+        my $keyword_types = $$var_args_generic{'keyword-types'} ||= undef;
+        #if (!&is_slots($var_args_generic)) {
+        $scratch_str .= &common::print_signature($var_args_generic, $col, ['signature']);
         #}
-        $$varargs_generic{'keyword-types'} = $keyword_types;
+        $$var_args_generic{'keyword-types'} = $keyword_types;
       }
     }
     $col = &colout($col);
@@ -1183,12 +1183,12 @@ sub common::generate_selector_defns {
     $col = &colin($col);
     foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
-        my $varargs_generic = &method::varargs_from_qual_va_list($generic);
-        my $keyword_types = $$varargs_generic{'keyword-types'} ||= undef;
+        my $var_args_generic = &method::var_args_from_qual_va_list($generic);
+        my $keyword_types = $$var_args_generic{'keyword-types'} ||= undef;
         if (!&is_slots($generic)) {
-          $scratch_str .= &common::print_selector($varargs_generic, $col, ['__selector']);
+          $scratch_str .= &common::print_selector($var_args_generic, $col, ['__selector']);
         }
-        $$varargs_generic{'keyword-types'} = $keyword_types;
+        $$var_args_generic{'keyword-types'} = $keyword_types;
       }
     }
     $col = &colout($col);
@@ -3039,13 +3039,13 @@ sub dk_generate_cc_footer_klass {
         }
 
         my $old_parameter_types = $$va_method{'parameter-types'};
-        $$va_method{'parameter-types'} = &arg_type::varargs($$va_method{'parameter-types'});
+        $$va_method{'parameter-types'} = &arg_type::var_args($$va_method{'parameter-types'});
         my $method_type = &method::type($va_method);
         $$va_method{'parameter-types'} = $old_parameter_types;
 
         my $return_type = &arg::type($$va_method{'return-type'});
         my $va_method_name = $method_name;
-        #$$scratch_str_ref .= $col . "(va-method-t)(($method_type)$va_method_name),\n";
+        #$$scratch_str_ref .= $col . "(var-args-method-t)(($method_type)$va_method_name),\n";
       }
     }
     $$scratch_str_ref .= $col . "nullptr,\n";
@@ -3055,7 +3055,7 @@ sub dk_generate_cc_footer_klass {
   ###
   ###
   if (@$va_list_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static va-method-t __va-method-addresses[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static var-args-method-t __var-args-method-addresses[] = {" . &ann(__FILE__, __LINE__) . " //ro-data\n";
     $col = &colin($col);
     ### todo: this looks like it might merge with address_body(). see die below
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
@@ -3089,13 +3089,13 @@ sub dk_generate_cc_footer_klass {
         die if (!$$va_method{'defined?'} && !$$va_method{'alias'} && !$$va_method{'generated?'});
 
         my $old_parameter_types = $$va_method{'parameter-types'};
-        $$va_method{'parameter-types'} = &arg_type::varargs($$va_method{'parameter-types'});
+        $$va_method{'parameter-types'} = &arg_type::var_args($$va_method{'parameter-types'});
         my $method_type = &method::type($va_method);
         $$va_method{'parameter-types'} = $old_parameter_types;
 
         my $return_type = &arg::type($$va_method{'return-type'});
         my $va_method_name = $method_name;
-        $$scratch_str_ref .= $col . "cast(va-method-t)cast(func $method_type)" . $pad . "$va_method_name,\n";
+        $$scratch_str_ref .= $col . "cast(var-args-method-t)cast(func $method_type)" . $pad . "$va_method_name,\n";
       }
     }
     $$scratch_str_ref .= $col . "nullptr,\n";
@@ -3404,8 +3404,8 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#exported-slots-method.addresses'}  = '__exported-slots-method-addresses';
   }
   if (@$va_list_methods) {
-    $$tbbl{'#va-method.signatures'} = '__va-method-signatures';
-    $$tbbl{'#va-method.addresses'}  = '__va-method-addresses';
+    $$tbbl{'#va-method.signatures'} =       '__va-method-signatures';
+    $$tbbl{'#var-args-method.addresses'}  = '__var-args-method-addresses';
   }
   $token_seq = $$klass_scope{'interpose'};
   if ($token_seq) {

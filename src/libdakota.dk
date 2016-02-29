@@ -121,8 +121,6 @@ export dakota {
   klass;
   method-alias::slots-t;
   method-alias;
-  method1::slots-t;
-  method1;
   method::slots-t;
   method;
   methods::slots-t;
@@ -267,8 +265,8 @@ export dakota {
   uintptr::slots-t;
   uintptr;
   unbox-illegal-klass-exception;
-  va-method::slots-t;
-  va-method;
+  var-args-method::slots-t;
+  var-args-method;
   vector-klass;
   vector;
   wchar::slots-t;

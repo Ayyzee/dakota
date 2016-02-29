@@ -66,7 +66,7 @@
     'method-alias' => undef,
     'no-such-method-exception' => undef, # generic funcs (throw)
     'selector-node' => undef,
-    'va-method' => undef,
+    'var-args-method' => undef,
   },
   'nrt_extra_symbols' => {
   },
@@ -135,9 +135,9 @@
     '#uint-t' => undef,  # hardcode typealias
     '#union' => undef,
     '#va-method' => undef,
-    '#va-method.addresses' => undef,
     '#va-method.signatures' => undef,
     '#va-selectors' => undef,
     '#va-signatures' => undef,
+    '#var-args-method.addresses' => undef,
   }
 }

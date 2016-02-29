@@ -19,9 +19,6 @@ module dakota;
 klass method {
   slots (*)(object-t) -> object-t;
 }
-klass method1 {
-  slots (*)(object-t, object-t) -> object-t;
-}
-klass va-method {
+klass var-args-method {
   slots (*)(object-t, ...) -> object-t;
 }
