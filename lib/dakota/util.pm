@@ -33,12 +33,12 @@ BEGIN {
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
-$Data::Dumper::Terse     = 1;
-$Data::Dumper::Deepcopy  = 1;
-$Data::Dumper::Purity    = 1;
-$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Terse =     1;
+$Data::Dumper::Deepcopy =  1;
+$Data::Dumper::Purity =    1;
+$Data::Dumper::Useqq =     1;
 $Data::Dumper::Sortkeys =  0;
-$Data::Dumper::Indent    = 1;  # default = 2
+$Data::Dumper::Indent =    1;  # default = 2
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -181,7 +181,7 @@ sub encode_comments {
 sub encode_strings {
   my ($filestr_ref) = @_;
   my $dqstr = &dqstr_regex();
-  my $h  = &header_file_regex();
+  my $h =  &header_file_regex();
   my $sqstr = &sqstr_regex();
   $$filestr_ref =~ s|($dqstr)|&encode_strings1($1)|eg;
   $$filestr_ref =~ s|(<$h+>)|&encode_strings1($1)|eg;
@@ -635,16 +635,16 @@ sub add_last {
   my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             push    @$seq, $element; return;
 }
 sub remove_first {
-  my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = shift   @$seq;           return $first;
+  my ($seq) =           @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = shift   @$seq;           return $first;
 }
 sub remove_last {
-  my ($seq)           = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = pop     @$seq;           return $last;
+  my ($seq) =           @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last =  pop     @$seq;           return $last;
 }
 sub first {
   my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = $$seq[0];  return $first;
 }
 sub last {
-  my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last  = $$seq[-1]; return $last;
+  my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last =  $$seq[-1]; return $last;
 }
 sub _replace_first {
   my ($seq, $element) = @_;

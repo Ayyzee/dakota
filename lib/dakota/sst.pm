@@ -49,12 +49,12 @@ BEGIN {
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
-$Data::Dumper::Terse     = 1;
-$Data::Dumper::Deepcopy  = 1;
-$Data::Dumper::Purity    = 1;
-$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Terse =     1;
+$Data::Dumper::Deepcopy =  1;
+$Data::Dumper::Purity =    1;
+$Data::Dumper::Useqq =     1;
 $Data::Dumper::Sortkeys =  0;
-$Data::Dumper::Indent    = 1;  # default = 2
+$Data::Dumper::Indent =    1;  # default = 2
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -94,7 +94,7 @@ our @EXPORT= qw(
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
-my $h  = &dakota::util::header_file_regex();
+my $h =  &dakota::util::header_file_regex();
 my $dqstr = &dakota::util::dqstr_regex();
 my $sqstr = &dakota::util::sqstr_regex();
 

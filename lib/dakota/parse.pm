@@ -124,12 +124,12 @@ BEGIN {
 
 use Cwd;
 use Data::Dumper;
-$Data::Dumper::Terse     = 1;
-$Data::Dumper::Deepcopy  = 1;
-$Data::Dumper::Purity    = 1;
-$Data::Dumper::Useqq     = 1;
+$Data::Dumper::Terse =     1;
+$Data::Dumper::Deepcopy =  1;
+$Data::Dumper::Purity =    1;
+$Data::Dumper::Useqq =     1;
 $Data::Dumper::Sortkeys =  0;
-$Data::Dumper::Indent    = 1;  # default = 2
+$Data::Dumper::Indent =    1;  # default = 2
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -165,7 +165,7 @@ my $colon = ':'; # key/element delim only
 my $kw_args_placeholders = &kw_args_placeholders();
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
-my $h  = &dakota::util::header_file_regex();
+my $h =  &dakota::util::header_file_regex();
 
 $ENV{'DKT-DEBUG'} = 0;
 
@@ -326,7 +326,7 @@ sub init_rep_from_inputs_vars {
   my ($cmd_info) = @_;
   $gbl_root = {};
   #$$gbl_root{'keywords'} = {};
-  #$$gbl_root{'symbols'}  = {};
+  #$$gbl_root{'symbols'} =  {};
 
   $gbl_current_scope = $gbl_root;
   $gbl_filename = undef;
@@ -2161,7 +2161,7 @@ sub generics::_parse { # no longer recursive
     $$generic{'return-type'} =
       &dakota::generate::type_trans($$generic{'return-type'});
 
-    my $args    = $$generic{'parameter-types'};
+    my $args =    $$generic{'parameter-types'};
     my $num_args = @$args;
     my $arg_num;
     for ($arg_num = 0; $arg_num < $num_args; $arg_num++) {

@@ -233,7 +233,7 @@ sub rewrite_declarations {
 }
 
 my $use_catch_macros = 0;
-my $catch_block  = qr/catch\s*\(\s*$rid?::klass\s*$k*\s*\)\s*($main::block)/;
+my $catch_block =  qr/catch\s*\(\s*$rid?::klass\s*$k*\s*\)\s*($main::block)/;
 my $catch_object = qr/\}(\s*$catch_block)+/;
 sub rewrite_catch_block {
   my ($str_in) = @_;
@@ -780,10 +780,10 @@ sub remove_exported_enum {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\[\[export\]\])(\s+enum)(\s*$k*)(.*?)(\{.*?\}\s*;?)/&exported_enum_body($1, $2, $3, $4, $5)/gse;
 }
-# method init( ... , object-t $arg1, object-t $arg2 = ...) {|;
+# method init( ... , object-t #arg1, object-t #arg2 = ...) {|;
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;
 
-# dk::init(...,        $arg1  =     ...,         $arg2  =     ...)
+# dk::init(...,        #arg1 =      ...,         #arg2 =      ...)
 # dk::init(..., SYMBOL(_arg1) , ARG(...), SYMBOL(_arg2) , ARG(...), nullptr)
 sub rewrite_keyword_syntax_list {
   my ($arg1, $arg2, $arg3) = @_;

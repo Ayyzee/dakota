@@ -109,8 +109,8 @@ my $gbl_nrt_file = undef;
 my $global_scratch_str_ref;
 #my $global_nrt_cc_str;
 
-my $global_seq_super_t   = [ 'super-t' ]; # special (used in eq compare)
-my $global_seq_ellipsis  = [ '...' ];
+my $global_seq_super_t =   [ 'super-t' ]; # special (used in eq compare)
+my $global_seq_ellipsis =  [ '...' ];
 my $global_klass_defns = [];
 
 my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
@@ -140,7 +140,7 @@ sub set_nrt_decl {
   my ($path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $gbl_nrt_file = &canon_path("$name.dk");
-  $global_is_rt   = 0;
+  $global_is_rt =   0;
   $global_is_defn = 0;
   $global_suffix = $hh_ext;
 }
@@ -148,21 +148,21 @@ sub set_nrt_defn {
   my ($path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $gbl_nrt_file = &canon_path("$name.dk");
-  $global_is_rt   = 0;
+  $global_is_rt =   0;
   $global_is_defn = 1;
   $global_suffix = $ext;
 }
 sub set_rt_decl {
   my ($path) = @_;
   $gbl_nrt_file = undef;
-  $global_is_rt   = 1;
+  $global_is_rt =   1;
   $global_is_defn = 0;
   $global_suffix = $hh_ext;
 }
 sub set_rt_defn {
   my ($path) = @_;
   $gbl_nrt_file = undef;
-  $global_is_rt   = 1;
+  $global_is_rt =   1;
   $global_is_defn = 1;
   $global_suffix = $cc_ext;
 }
@@ -594,7 +594,7 @@ sub arg::type {
 }
 sub arg_type::super {
   my ($arg_type_ref) = @_;
-  my $num_args       = @$arg_type_ref;
+  my $num_args =       @$arg_type_ref;
 
   my $new_arg_type_ref = &dakota::util::deep_copy($arg_type_ref);
 
@@ -607,7 +607,7 @@ sub arg_type::super {
 }
 sub arg_type::var_args {
   my ($arg_type_ref) = @_;
-  my $num_args       = @$arg_type_ref;
+  my $num_args =       @$arg_type_ref;
 
   my $new_arg_type_ref = &dakota::util::deep_copy($arg_type_ref);
   die if 'va-list-t' ne "@{$$new_arg_type_ref[-1]}";
@@ -616,8 +616,8 @@ sub arg_type::var_args {
 }
 sub arg_type::names {
   my ($arg_type_ref) = @_;
-  my $num_args       = @$arg_type_ref;
-  my $arg_num        = 0;
+  my $num_args =       @$arg_type_ref;
+  my $arg_num =        0;
   my $arg_names = [];
 
   if (&path::string($global_seq_super_t) eq  "@{$$arg_type_ref[0]}") {
@@ -668,8 +668,8 @@ sub is_box_type {
 }
 sub arg_type::names_unboxed {
   my ($arg_type_ref) = @_;
-  my $num_args       = @$arg_type_ref;
-  my $arg_num        = 0;
+  my $num_args =       @$arg_type_ref;
+  my $arg_num =        0;
   my $arg_names = [];
 
   if ('slots-t*' eq "@{$$arg_type_ref[0]}") {
@@ -699,7 +699,7 @@ sub arg_type::list_pair {
   my ($arg_types_ref, $arg_names_ref) = @_;
   my $num_arg_types = @$arg_types_ref;
   my $num_arg_names = @$arg_names_ref;
-  my $list          = '';
+  my $list =          '';
   my $arg_num;
   my $delim = '';
   for ($arg_num = 0; $arg_num < $num_arg_types; $arg_num++) {
@@ -715,8 +715,8 @@ sub arg_type::list_pair {
 # see below
 sub arg_type::list_names {
   my ($args_ref) = @_;
-  my $num_args   = @$args_ref;
-  my $list       = '';
+  my $num_args =   @$args_ref;
+  my $list =       '';
   my $arg_num;
   my $delim = '';
 
@@ -730,8 +730,8 @@ sub arg_type::list_names {
 # see above
 sub arg_type::list_types {
   my ($args_ref) = @_;
-  my $num_args   = @$args_ref;
-  my $list       = '';
+  my $num_args =   @$args_ref;
+  my $list =       '';
   my $arg_num;
   my $delim = '';
 
@@ -782,9 +782,9 @@ sub method::list_types {
 }
 sub kw_arg_type::list_types {
   my ($args_ref, $kw_args_ref) = @_;
-  my $num_args    = @$args_ref;
+  my $num_args =    @$args_ref;
   my $num_kw_args = @$kw_args_ref;
-  my $list        = '';
+  my $list =        '';
   my $arg_num;
   my $delim = '';
 
@@ -886,13 +886,13 @@ sub method::var_args_from_qual_va_list {
 sub method::generate_va_method_defn {
   #my ($scope, $va_method) = @_;
   my ($va_method, $scope, $col, $klass_type, $line) = @_;
-  my $is_inline  = $$va_method{'inline?'};
+  my $is_inline =  $$va_method{'inline?'};
 
-  my $new_arg_types_ref      = $$va_method{'parameter-types'};
-  my $new_arg_types_va_ref   = &arg_type::var_args($new_arg_types_ref);
-  my $new_arg_names_ref      = &arg_type::names($new_arg_types_ref);
-  my $new_arg_names_va_ref   = &arg_type::names($new_arg_types_va_ref);
-  my $new_arg_list_va_ref    = &arg_type::list_pair($new_arg_types_va_ref, $new_arg_names_va_ref);
+  my $new_arg_types_ref =      $$va_method{'parameter-types'};
+  my $new_arg_types_va_ref =   &arg_type::var_args($new_arg_types_ref);
+  my $new_arg_names_ref =      &arg_type::names($new_arg_types_ref);
+  my $new_arg_names_va_ref =   &arg_type::names($new_arg_types_va_ref);
+  my $new_arg_list_va_ref =    &arg_type::list_pair($new_arg_types_va_ref, $new_arg_names_va_ref);
   my $new_arg_names_list_ref = &arg_type::list_names($new_arg_names_ref);
 
   my $num_args = @$new_arg_names_va_ref;
@@ -1285,7 +1285,7 @@ sub generics::generate_selector_seq {
     $scratch_str .= $col . "static selector-node-t va-selectors[] = {" . &ann(__FILE__, __LINE__) . " //rw-data\n";
     $col = &colin($col);
     foreach $generic (sort method::compare @$va_generics) {
-      my $new_arg_type_list   = &arg_type::list_types($$generic{'parameter-types'});
+      my $new_arg_type_list =   &arg_type::list_types($$generic{'parameter-types'});
       my $name = "@{$$generic{'name'}}";
       my $in = &ident_comment($name);
       $scratch_str .= $col . "{ .next = nullptr, .ptr = SELECTOR-PTR(va::$name($$new_arg_type_list)) }," . $in . "\n";
@@ -1301,7 +1301,7 @@ sub generics::generate_selector_seq {
     $col = &colin($col);
     foreach $generic (@$fa_generics) {
       if (!&is_slots($generic)) {
-        my $new_arg_type_list   = &arg_type::list_types($$generic{'parameter-types'});
+        my $new_arg_type_list =   &arg_type::list_types($$generic{'parameter-types'});
         my $name = "@{$$generic{'name'}}";
         my $in = &ident_comment($name);
         $scratch_str .= $col . "{ .next = nullptr, .ptr = SELECTOR-PTR($name($$new_arg_type_list)) }," . $in . "\n";
@@ -1336,12 +1336,12 @@ sub generics::generate_va_generic_defns {
 my $big_generic = 0;
 sub generics::generate_generic_defn {
   my ($generic, $is_inline, $col) = @_;
-  my $new_arg_type            = $$generic{'parameter-types'};
-  my $new_arg_type_list   = &arg_type::list_types($new_arg_type);
-  $new_arg_type            = $$generic{'parameter-types'};
+  my $new_arg_type =            $$generic{'parameter-types'};
+  my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
+  $new_arg_type =            $$generic{'parameter-types'};
 
-  my $new_arg_names           = &arg_type::names($new_arg_type);
-  my $new_arg_list            = &arg_type::list_pair($new_arg_type, $new_arg_names);
+  my $new_arg_names =           &arg_type::names($new_arg_type);
+  my $new_arg_list =            &arg_type::list_pair($new_arg_type, $new_arg_names);
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_va($generic)) {
@@ -1437,12 +1437,12 @@ sub generics::generate_generic_defn {
 }
 sub generics::generate_super_generic_defn {
   my ($generic, $is_inline, $col) = @_;
-  my $new_arg_type            = $$generic{'parameter-types'};
-  my $new_arg_type_list   = &arg_type::list_types($new_arg_type);
-  $new_arg_type            = $$generic{'parameter-types'};
-  $new_arg_type            = &arg_type::super($new_arg_type);
-  my $new_arg_names           = &arg_type::names($new_arg_type);
-  my $new_arg_list            = &arg_type::list_pair($new_arg_type, $new_arg_names);
+  my $new_arg_type =            $$generic{'parameter-types'};
+  my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
+  $new_arg_type =            $$generic{'parameter-types'};
+  $new_arg_type =            &arg_type::super($new_arg_type);
+  my $new_arg_names =           &arg_type::names($new_arg_type);
+  my $new_arg_list =            &arg_type::list_pair($new_arg_type, $new_arg_names);
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_va($generic)) {
@@ -2212,7 +2212,7 @@ sub generate_object_method_defn {
   my $new_arg_type_list = &arg_type::list_types($new_arg_type);
   $new_arg_type = $$method{'parameter-types'};
   my $new_arg_names = &arg_type::names($new_arg_type);
-  my $new_arg_list  = &arg_type::list_pair($new_arg_type, $new_arg_names);
+  my $new_arg_list =  &arg_type::list_pair($new_arg_type, $new_arg_names);
 
   my $non_object_return_type = &arg::type($$non_object_method{'return-type'});
   my $return_type = &arg::type($$method{'return-type'});
@@ -2806,7 +2806,7 @@ sub slots_signature_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
   my $result = '';
-  my $method_num  = 0;
+  my $method_num =  0;
   my $max_width = 0;
   my $return_type = 'const signature-t*';
   foreach my $method (@$sorted_methods) {
@@ -2947,7 +2947,7 @@ sub alias_body {
   my ($klass_name, $methods, $col) = @_;
   my $sorted_methods = [sort method::compare values %$methods];
   my $result = '';
-  my $method_num  = 0;
+  my $method_num =  0;
   foreach my $method (@$sorted_methods) {
     if ($$method{'alias'}) {
       my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
@@ -3390,22 +3390,22 @@ sub dk_generate_cc_footer_klass {
   }
   if (values %{$$klass_scope{'methods'}}) {
     $$tbbl{'#method.signatures'} = '__method-signatures';
-    $$tbbl{'#method.addresses'}  = '__method-addresses';
+    $$tbbl{'#method.addresses'} =  '__method-addresses';
   }
   if ($num_method_aliases) {
     $$tbbl{'#method-aliases'} = '&__method-aliases';
   }
   if (values %{$exported_methods ||= []}) {
     $$tbbl{'#exported-method.signatures'} = '__exported-method-signatures';
-    $$tbbl{'#exported-method.addresses'}  = '__exported-method-addresses';
+    $$tbbl{'#exported-method.addresses'} =  '__exported-method-addresses';
   }
   if (values %{$exported_slots_methods ||= []}) {
     $$tbbl{'#exported-slots-method.signatures'} = '__exported-slots-method-signatures';
-    $$tbbl{'#exported-slots-method.addresses'}  = '__exported-slots-method-addresses';
+    $$tbbl{'#exported-slots-method.addresses'} =  '__exported-slots-method-addresses';
   }
   if (@$va_list_methods) {
     $$tbbl{'#va-method.signatures'} =       '__va-method-signatures';
-    $$tbbl{'#var-args-method.addresses'}  = '__var-args-method-addresses';
+    $$tbbl{'#var-args-method.addresses'} =  '__var-args-method-addresses';
   }
   $token_seq = $$klass_scope{'interpose'};
   if ($token_seq) {
@@ -3583,7 +3583,7 @@ sub generate_kw_args_method_defn {
   my $new_arg_names = &arg_type::names($new_arg_type);
   &dakota::util::_replace_first($new_arg_names, 'self');
   &dakota::util::_replace_last($new_arg_names, '_args_');
-  my $new_arg_list  = &arg_type::list_pair($new_arg_type, $new_arg_names);
+  my $new_arg_list =  &arg_type::list_pair($new_arg_type, $new_arg_names);
   my $return_type = &arg::type($$method{'return-type'});
   my $visibility = '';
   if (&is_exported($method)) {
@@ -3705,7 +3705,7 @@ sub generate_kw_args_method_defn {
 
   foreach my $kw_arg (@{$$method{'keyword-types'}}) {
     my $kw_arg_type =  &arg::type($$kw_arg{'type'});
-    my $kw_arg_name    = $$kw_arg{'name'};
+    my $kw_arg_name =    $$kw_arg{'name'};
     $$scratch_str_ref .= $col . "unless (_state_.$kw_arg_name)\n";
     $col = &colin($col);
     if (defined $$kw_arg{'default'}) {
