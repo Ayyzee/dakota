@@ -883,7 +883,7 @@ sub method::var_args_from_qual_va_list {
   }
   return $new_method;
 }
-sub method::generate_va_method_defn {
+sub generate_va_generic_defn {
   #my ($scope, $va_method) = @_;
   my ($va_method, $scope, $col, $klass_type, $line) = @_;
   my $is_inline =  $$va_method{'inline?'};
@@ -1326,20 +1326,29 @@ sub generics::generate_va_generic_defns {
       $$new_generic{'defined?'} = 1; # hackhack
 
       my $klass_type;
-      &method::generate_va_method_defn($new_generic, $scope, $col, $klass_type = undef, __LINE__); # object-t
+      &generate_va_generic_defn($new_generic, $scope, $col, $klass_type = undef, __LINE__); # object-t
       $$new_generic{'parameter-types'}[0] = $global_seq_super_t; # replace_first
-      &method::generate_va_method_defn($new_generic, $scope, $col, $klass_type = undef, __LINE__); # super-t
+      &generate_va_generic_defn($new_generic, $scope, $col, $klass_type = undef, __LINE__); # super-t
       &path::remove_last($scope);
     }
   }
 }
+sub is_super {
+  my ($generic) = @_;
+  if ('super-t' eq $$generic{'parameter-types'}[0][0]) {
+    return 1;
+  }
+  return 0;
+}
 my $big_generic = 0;
-sub generics::generate_generic_defn {
+sub generate_generic_defn {
   my ($generic, $is_inline, $col) = @_;
+  my $tmp = $$generic{'parameter-types'}[0][0];
+  $$generic{'parameter-types'}[0][0] = 'object-t';
   my $new_arg_type =            $$generic{'parameter-types'};
   my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
+  $$generic{'parameter-types'}[0][0] = $tmp;
   $new_arg_type =            $$generic{'parameter-types'};
-
   my $new_arg_names =           &arg_type::names($new_arg_type);
   my $new_arg_list =            &arg_type::list_pair($new_arg_type, $new_arg_names);
   my $return_type = &arg::type($$generic{'return-type'});
@@ -1396,11 +1405,19 @@ sub generics::generate_generic_defn {
       $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n";
     }
     $$scratch_str_ref .= $col . "using func-t = func (*)($$new_arg_type_list) -> $return_type;\n";
-    $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(object)).methods.addrs[selector];\n";
-    $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
-    $col = &colin($col);
-    $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(object, $signature));\n";
-    $col = &colout($col);
+    if (&is_super($generic)) {
+      $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];\n";
+      $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
+      $col = &colin($col);
+      $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(context, $signature));\n";
+      $col = &colout($col);
+    } else {
+      $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(object)).methods.addrs[selector];\n";
+      $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
+      $col = &colin($col);
+      $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(object, $signature));\n";
+      $col = &colout($col);
+    }
     my $arg_names_list;
     if ($big_generic) {
       my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'parameter-types'})));
@@ -1410,9 +1427,13 @@ sub generics::generate_generic_defn {
         $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, cast(method-t)_func_, $$arg_names_list, nullptr);\n";
       }
     }
-
+    if (&is_super($generic)) {
+      $new_arg_type = &arg_type::super($new_arg_type);
+    }
     $new_arg_names = &arg_type::names($new_arg_type);
-
+    if (&is_super($generic)) {
+      &dakota::util::_replace_first($new_arg_names, "context.object");
+    }
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
     $$scratch_str_ref .= $col . "return _func_($$new_arg_names_list);\n";
@@ -1435,110 +1456,7 @@ sub generics::generate_generic_defn {
     }
   }
 }
-sub generics::generate_super_generic_defn {
-  my ($generic, $is_inline, $col) = @_;
-  my $new_arg_type =            $$generic{'parameter-types'};
-  my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
-  $new_arg_type =            $$generic{'parameter-types'};
-  $new_arg_type =            &arg_type::super($new_arg_type);
-  my $new_arg_names =           &arg_type::names($new_arg_type);
-  my $new_arg_list =            &arg_type::list_pair($new_arg_type, $new_arg_names);
-  my $return_type = &arg::type($$generic{'return-type'});
-  my $scratch_str_ref = &global_scratch_str_ref();
-  if (&is_va($generic)) {
-    $$scratch_str_ref .= $col . 'namespace va { ';
-  } else {
-    $$scratch_str_ref .= $col;
-  }
-  my $visibility = '';
-  if (&is_exported($generic)) {
-    $visibility = '[[export]] ';
-  }
-  if (&is_nrt_decl() || &is_rt_decl()) {
-    $$scratch_str_ref .= 'extern ';
-  }
-  my $func_spec = '';
-  if ($is_inline) {
-    $func_spec = 'INLINE ';
-  }
-  my $generic_name = "@{$$generic{'name'}}";
-  my $in = &ident_comment($generic_name);
-
-  $$scratch_str_ref .= $visibility . $func_spec;
-  if (&is_va($generic)) {
-    $$scratch_str_ref .= 'VA-GENERIC ';
-  } else {
-    $$scratch_str_ref .= 'GENERIC ';
-  }
-  $$scratch_str_ref .= "$generic_name($$new_arg_list) -> $return_type";
-
-  if (&is_nrt_decl() || &is_rt_decl()) {
-    if (&is_va($generic)) {
-      $$scratch_str_ref .= "; }" . "\n";
-    } else {
-      $$scratch_str_ref .= ";" . $in . "\n";
-    }
-  } elsif (&is_rt_defn()) {
-    $$scratch_str_ref .= " {" . $in . "\n";
-    $col = &colin($col);
-    if ($big_generic) {
-      if (&is_va($generic)) {
-        $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE(va::$generic_name($$new_arg_type_list)));\n";
-      } else {
-        $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($generic_name($$new_arg_type_list)));\n";
-      }
-    }
-    my $signature;
-    if (&is_va($generic)) {
-      $signature = "SIGNATURE(va::$generic_name($$new_arg_type_list))";
-      $$scratch_str_ref .=
-        $col . "static selector-t selector = SELECTOR(va::$generic_name($$new_arg_type_list));\n";
-    } else {
-      $signature = "SIGNATURE($generic_name($$new_arg_type_list))";
-      $$scratch_str_ref .=
-        $col . "static selector-t selector = SELECTOR($generic_name($$new_arg_type_list));\n";
-    }
-    $$scratch_str_ref .= $col . "using func-t = func (*)($$new_arg_type_list) -> $return_type;\n";
-    $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];\n";
-    $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)\n";
-    $col = &colin($col);
-    $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(context, $signature));\n";
-    $col = &colout($col);
-    my $arg_names_list;
-    if ($big_generic) {
-      my $arg_names = &dakota::util::deep_copy(&arg_type::names(&arg_type::super($$generic{'parameter-types'})));
-      $arg_names_list = &arg_type::list_names($arg_names);
-
-      if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
-        $$scratch_str_ref .= $col . "DKT-TRACE-BEFORE(signature, cast(method-t)_func_, $$arg_names_list, nullptr);\n";
-      }
-    }
-    $new_arg_type = &arg_type::super($new_arg_type);
-    $new_arg_names = &arg_type::names($new_arg_type);
-    &dakota::util::_replace_first($new_arg_names, "context.object");
-    my $new_arg_names_list = &arg_type::list_names($new_arg_names);
-
-    $$scratch_str_ref .= $col . "return _func_($$new_arg_names_list);\n";
-    if ($big_generic) {
-      if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
-        my $result = 'result';
-        if ($$arg_names_list =~ m/,/) {
-          $$arg_names_list =~ s/^(.+?),\s*(.*)$/$1, $result, $2/;
-        } else {
-          $$arg_names_list .= ", $result";
-        }
-        $$scratch_str_ref .= $col . "DKT-TRACE-AFTER(signature, _func_, $$arg_names_list, nullptr);\n";
-      }
-    }
-    $col = &colout($col);
-    if (&is_va($generic)) {
-      $$scratch_str_ref .= $col . '}}' . "\n";
-    } else {
-      $$scratch_str_ref .= $col . '}' . "\n";
-    }
-  }
-}
-sub generics::generate_generic_defns {
+sub generate_generic_defns {
   my ($generics, $is_inline, $ns, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_generic_defns()\n";
@@ -1550,7 +1468,7 @@ sub generics::generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generics::generate_generic_defn($generic, $is_inline, $col);
+        &generate_generic_defn($generic, $is_inline, $col);
       }
     }
   }
@@ -1562,7 +1480,9 @@ sub generics::generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generics::generate_super_generic_defn($generic, $is_inline, $col);
+        my $copy = &deep_copy($generic);
+        $$copy{'parameter-types'}[0][0] = 'super-t';
+        &generate_generic_defn($copy, $is_inline, $col);
       }
     }
   }
@@ -1578,7 +1498,7 @@ sub generics::generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generics::generate_generic_defn($generic, $is_inline, $col);
+        &generate_generic_defn($generic, $is_inline, $col);
       }
     }
   }
@@ -1590,7 +1510,9 @@ sub generics::generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generics::generate_super_generic_defn($generic, $is_inline, $col);
+        my $copy = &deep_copy($generic);
+        $$copy{'parameter-types'}[0][0] = 'super-t';
+        &generate_generic_defn($copy, $is_inline, $col);
       }
     }
   }
@@ -1637,7 +1559,7 @@ sub linkage_unit::generate_generics {
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   my ($is_inline, $ns);
-  &generics::generate_generic_defns($scope, $is_inline = 0, $ns = 'dk', $col);
+  &generate_generic_defns($scope, $is_inline = 0, $ns = 'dk', $col);
 
     $$scratch_str_ref .=
       "\n" .
@@ -2148,7 +2070,7 @@ sub linkage_unit::generate_klasses_body {
         #if (&is_decl() || &is_same_file($klass_scope)) #rn1
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
           if (defined $$method{'keyword-types'}) {
-            &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
+            &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
             if (0 == @{$$va_method{'keyword-types'}}) {
               my $last = &dakota::util::remove_last($$va_method{'parameter-types'});
               die if 'va-list-t' ne "@$last";
@@ -2158,10 +2080,10 @@ sub linkage_unit::generate_klasses_body {
             }
           }
           else {
-            &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
+            &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
           }
         } else {
-          &method::generate_va_method_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
+          &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
         }
         if (&is_decl) {
           if (&is_same_src_file($klass_scope) || &is_rt()) { #rn2
