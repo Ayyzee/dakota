@@ -22,3 +22,6 @@ klass method {
 klass var-args-method {
   slots (*)(object-t, ...) -> object-t;
 }
+klass generic-func {
+  slots (*)(object-t) -> object-t;
+}

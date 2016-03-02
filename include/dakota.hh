@@ -162,14 +162,18 @@ inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ?
 # define SELECTOR_PTR(name, args)             (cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
 # define SELECTOR(name, args)                *SELECTOR_PTR(name, args)
 
+# define GENERIC_FUNC_PTR(name, args)         (cast(dkt_generic_func_func_t)(cast(FUNC (*)args -> generic_func_t*) __generic_func::name))()
+# define GENERIC_FUNC(name, args)            *GENERIC_FUNC_PTR(name, args)
+
 # define unless(e) if (0 == (e))
 # define until(e)  while (0 == (e))
 
-# define intstr(c1, c2, c3, c4) \
-   ((((cast(int64_t)cast(char8_t) c1) << 24) & 0xff000000) | \
-    (((cast(int64_t)cast(char8_t) c2) << 16) & 0x00ff0000) | \
-    (((cast(int64_t)cast(char8_t) c3) <<  8) & 0x0000ff00) | \
-    (((cast(int64_t)cast(char8_t) c4) <<  0) & 0x000000ff))
+inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4) -> uint32_t {
+  return ((((cast(uint32_t)cast(uchar8_t) c1) << 24) & 0xff000000) |
+          (((cast(uint32_t)cast(uchar8_t) c2) << 16) & 0x00ff0000) |
+          (((cast(uint32_t)cast(uchar8_t) c3) <<  8) & 0x0000ff00) |
+          (((cast(uint32_t)cast(uchar8_t) c4) <<  0) & 0x000000ff));
+}
 
 # if !defined NUL
   # define    NUL cast(char8_t)0
@@ -207,6 +211,7 @@ extern object_t std_error  [[export]] [[read_only]];
 using compare_t =            FUNC (*)(object_t, object_t) -> int_t; // comparitor
 using dkt_signature_func_t = FUNC (*)() -> const signature_t*;
 using dkt_selector_func_t =  FUNC (*)() -> selector_t*;
+using dkt_generic_func_func_t = FUNC (*)() -> generic_func_t*;
 
 namespace hash { using slots_t = size_t; } using hash_t = hash::slots_t;
 

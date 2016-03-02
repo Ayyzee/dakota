@@ -47,6 +47,8 @@ export dakota {
   exe-type::slots-t;
   exe-type;
   forward-iterator;
+  generic-func;
+  generic-func::slots-t;
   get-segment-data::slots-t;
   get-segment-data;
   hash::slots-t;
