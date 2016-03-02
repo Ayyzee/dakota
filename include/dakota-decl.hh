@@ -28,9 +28,11 @@
 # define FUNC    auto
 # define SELECTOR_FUNC  FUNC
 # define SIGNATURE_FUNC FUNC
+# define GENERIC_FUNC_FUNC FUNC
 
 # define VA_SELECTOR_FUNC  FUNC
 # define VA_SIGNATURE_FUNC FUNC
+# define VA_GENERIC_FUNC_FUNC FUNC
 # define VA_GENERIC        GENERIC
 # define VA_METHOD         METHOD
 # define KW_ARGS_METHOD    METHOD

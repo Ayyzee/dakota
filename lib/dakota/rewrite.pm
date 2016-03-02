@@ -212,14 +212,14 @@ sub rewrite_selsig_replacement {
   my $result = $aa . &encode_char($bb);
   return $result;
 }
-sub rewrite_functions_replacement {
+sub rewrite_funcs_replacement {
   my ($aa, $bb, $cc) = @_;
   my $result = $aa . &encode_char($bb) . $cc;
   return $result;
 }
-sub rewrite_functions {
+sub rewrite_funcs {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/((dk::va|dk|va)::)(\?|\!)(\(|\))/&rewrite_functions_replacement($1, $3, $4)/gesx;
+  $$filestr_ref =~ s/((dk::va|dk|va)::)(\?|\!)(\(|\))/&rewrite_funcs_replacement($1, $3, $4)/gesx;
 }
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
@@ -447,7 +447,7 @@ sub trim {
 sub rewrite_objects_replacement {
   my ($block_in) = @_;
   my $result = "#objects $colon cast(object-t[]){";
-  my $objects = [split(/\s*,\s*/, $block_in)]; # bugbug: this will fail if a pointer to a function with two or more args
+  my $objects = [split(/\s*,\s*/, $block_in)]; # bugbug: this will fail if a pointer to a func with two or more args
   foreach my $item (@$objects) {
     $item = &trim($item);
     if ($item =~ m/^\#/ || $item =~ m/^__symbol::/) {
@@ -1068,7 +1068,7 @@ sub convert_dk_to_cc {
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_args_generics);
   &rewrite_initialze_finalize($filestr_ref);
-  &rewrite_functions($filestr_ref);
+  &rewrite_funcs($filestr_ref);
   &rewrite_map($filestr_ref);
   &rewrite_for_each($filestr_ref);
   &rewrite_unboxes($filestr_ref);

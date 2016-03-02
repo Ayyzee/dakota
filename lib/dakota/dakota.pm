@@ -691,7 +691,7 @@ sub start_cmd {
     # this might be useful for distributed building (initiating the building of the slowest first
     # or for testing runtime code generation
     # also, this might be useful if the runtime .h file is being used rather than generating a
-    # translation unit specific .h file (like in the case of inline functions)
+    # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
       my $is_exe = !defined $$cmd_info{'opts'}{'shared'};
       &gen_rt_o($cmd_info, $is_exe);

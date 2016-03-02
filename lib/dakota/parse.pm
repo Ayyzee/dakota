@@ -1588,7 +1588,7 @@ sub kw_args_offsets {
   my $opens = 0;
   # start at 2 since type and name preceed colon
   for (my $i = 2; $i < @$seq; $i++) {
-    # we don't want to find a colon inside a block or function call
+    # we don't want to find a colon inside a block or func call
     if ($$seq[$i] =~ /^\{|\($/) {
       $opens++;
     } elsif ($$seq[$i] =~ /^\}|\)$/) {
@@ -1881,7 +1881,7 @@ sub method {
   $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
 
   #print STDERR &Dumper($method);
-  &match(__FILE__, __LINE__, '->'); # this syntax is similiar to how Lambda functions are specified in C++11
+  &match(__FILE__, __LINE__, '->'); # this syntax is similiar to how Lambda funcs are specified in C++11
 
   ### RETURN-TYPE
   my $return_type = [];
@@ -1918,7 +1918,7 @@ sub method {
     }
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
   }
-  my $signature = &function::overloadsig($method, undef);
+  my $signature = &func::overloadsig($method, undef);
 
   if (0) {
   } elsif (&dakota::generate::is_slots($method) &&
@@ -2110,7 +2110,7 @@ sub generics::parse {
     if (!&dakota::generate::is_va($generic)) {
       my $scope = [];
       &path::add_last($scope, 'dk');
-      my $generics_key = &function::overloadsig($generic, $scope);
+      my $generics_key = &func::overloadsig($generic, $scope);
       &path::remove_last($scope);
       $$generics_tbl{$generics_key} = $generic;
     }
@@ -2120,7 +2120,7 @@ sub generics::parse {
       my $scope = [];
       &path::add_last($scope, 'dk');
       &path::add_last($scope, 'va');
-      my $generics_key = &function::overloadsig($generic, $scope);
+      my $generics_key = &func::overloadsig($generic, $scope);
       &path::remove_last($scope);
       &path::remove_last($scope);
       $$generics_tbl{$generics_key} = $generic;
@@ -2316,7 +2316,7 @@ sub add_object_methods_decls_to_klass {
         my $object_method_info =
           &dakota::generate::convert_to_object_method($slots_method_info);
         my $object_method_signature =
-          &function::overloadsig($object_method_info, undef);
+          &func::overloadsig($object_method_info, undef);
 
         if (($$klass_scope{'methods'}{$object_method_signature} &&
              $$klass_scope{'methods'}{$object_method_signature}{'defined?'})) {

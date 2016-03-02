@@ -8,6 +8,6 @@
 # define dkt_declare_klass_type_struct(k)       namespace k { struct [[dkt_enable_typeinfo]] slots_t;     } using k ## _t = k::slots_t
 # define dkt_declare_klass_type_union(k)        namespace k { union  [[dkt_enable_typeinfo]] slots_t;     } using k ## _t = k::slots_t
 # define dkt_declare_klass_type_enum(k, i)      namespace k { enum                           slots_t : i; } using k ## _t = k::slots_t
-// not represented: function ptr typealias
+// not represented: func ptr typealias
 
 # endif

@@ -85,7 +85,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  empty_klass_defns
-                 function::overloadsig
+                 func::overloadsig
                  generate_nrt_decl
                  generate_nrt_defn
                  generate_rt_decl
@@ -839,37 +839,37 @@ sub klass::method_aliases {
 }
 # should make seq of tokens and hand off to a output
 # routine that knows what can/can-not be immediatly adjacent.
-sub function::decl {
-  my ($function, $scope) = @_;
-  my $function_decl = '';
+sub func::decl {
+  my ($func, $scope) = @_;
+  my $func_decl = '';
 
   my $visibility = '';
-  if (&is_exported($function)) {
+  if (&is_exported($func)) {
     $visibility = '[[export]] ';
   }
   my $func_spec = '';
-  if ($$function{'inline?'}) {
+  if ($$func{'inline?'}) {
     $func_spec = 'INLINE ';
   }
-  my $return_type = &arg::type($$function{'return-type'});
-  my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
-  $function_decl .= $func_spec . "$name($parameter_types) -> $return_type;";
-  return ($visibility, \$function_decl);
+  my $return_type = &arg::type($$func{'return-type'});
+  my ($name, $parameter_types) = &func::overloadsig_parts($func, $scope);
+  $func_decl .= $func_spec . "$name($parameter_types) -> $return_type;";
+  return ($visibility, \$func_decl);
 }
-sub function::overloadsig_parts {
-  my ($function, $scope) = @_;
-  my $last_element = $$function{'parameter-types'}[-1];
+sub func::overloadsig_parts {
+  my ($func, $scope) = @_;
+  my $last_element = $$func{'parameter-types'}[-1];
   my $last_type = &arg::type($last_element);
-  my $name = "@{$$function{'name'} ||= []}"; # rnielsenrnielsen hackhack
+  my $name = "@{$$func{'name'} ||= []}"; # rnielsenrnielsen hackhack
   #if ($name eq '') { return undef; }
-  my $parameter_types = &arg_type::list_types($$function{'parameter-types'});
+  my $parameter_types = &arg_type::list_types($$func{'parameter-types'});
   return ($name, $$parameter_types);
 }
-sub function::overloadsig {
-  my ($function, $scope) = @_;
-  my ($name, $parameter_types) = &function::overloadsig_parts($function, $scope);
-  my $function_overloadsig = "$name($parameter_types)";
-  return $function_overloadsig;
+sub func::overloadsig {
+  my ($func, $scope) = @_;
+  my ($name, $parameter_types) = &func::overloadsig_parts($func, $scope);
+  my $func_overloadsig = "$name($parameter_types)";
+  return $func_overloadsig;
 }
 sub method::var_args_from_qual_va_list {
   my ($method) = @_;
@@ -976,8 +976,8 @@ sub generate_va_generic_defn {
 }
 sub method::compare {
   my $scope;
-  my $a_string = &function::overloadsig($a, $scope = []); # the a and b values sometimes
-  my $b_string = &function::overloadsig($b, $scope = []); # are missing the 'name' key
+  my $a_string = &func::overloadsig($a, $scope = []); # the a and b values sometimes
+  my $b_string = &func::overloadsig($b, $scope = []); # are missing the 'name' key
 
   $a_string =~ s/(.*?va-list-t.*?)/ $1/;
   $b_string =~ s/(.*?va-list-t.*?)/ $1/;
@@ -1760,7 +1760,7 @@ sub has_object_method_defn {
   my $result = 0;
 
   my $object_method_info = &convert_to_object_method($slots_method_info);
-  my $object_method_sig = &function::overloadsig($object_method_info, []);
+  my $object_method_sig = &func::overloadsig($object_method_info, []);
 
   if ($$klass_scope{'methods'}{$object_method_sig} &&
       $$klass_scope{'methods'}{$object_method_sig}{'defined?'}) {
@@ -1969,11 +1969,11 @@ sub linkage_unit::generate_klasses_body {
       if (&is_nrt_defn() || &is_rt_defn() || &is_exported($method)) {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
-            my ($visibility, $method_decl_ref) = &function::decl($method, $klass_path);
+            my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
             #$$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "REMOVE") . "\n";
             if (!&has_object_method_defn($klass_scope, $method)) {
               my $object_method = &convert_to_object_method($method);
-              my $sig = &function::overloadsig($object_method, []);
+              my $sig = &func::overloadsig($object_method, []);
               if (!$$object_method_defns{$sig}) {
                 &generate_object_method_defn($method, $klass_path, $col, $klass_type, __LINE__);
               }
@@ -1983,10 +1983,10 @@ sub linkage_unit::generate_klasses_body {
         }
       } else {
         if (!&is_va($method)) {
-          my ($visibility, $method_decl_ref) = &function::decl($method, $klass_path);
+          my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
           $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "DUPLICATE") . "\n";
           my $object_method = &convert_to_object_method($method);
-          my $sig = &function::overloadsig($object_method, []);
+          my $sig = &func::overloadsig($object_method, []);
           if (!$$object_method_defns{$sig}) {
             &generate_object_method_decl($method, $klass_path, $col, $klass_type, __LINE__);
           }
@@ -2000,11 +2000,11 @@ sub linkage_unit::generate_klasses_body {
       if (&is_nrt_defn() || &is_rt_defn()) {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
-            my ($visibility, $method_decl_ref) = &function::decl($method, $klass_path);
+            my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
             $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__) . "\n";
             if (!&has_object_method_defn($klass_scope, $method)) {
               my $object_method = &convert_to_object_method($method);
-              my $sig = &function::overloadsig($object_method, []);
+              my $sig = &func::overloadsig($object_method, []);
               if (!$$object_method_defns{$sig}) {
                 &generate_object_method_defn($method, $klass_path, &colin($col), $klass_type, __LINE__);
               }
@@ -2015,7 +2015,7 @@ sub linkage_unit::generate_klasses_body {
       } else {
         if (!&is_va($method)) {
           #my $object_method = &convert_to_object_method($method);
-          #my $sig = &function::overloadsig($object_method, []);
+          #my $sig = &func::overloadsig($object_method, []);
           #if (!$$object_method_defns{$sig}) {
           #&generate_object_method_decl($method, $klass_path, $col, __LINE__);
           #}
@@ -2054,7 +2054,7 @@ sub linkage_unit::generate_klasses_body {
   if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
     foreach $method (@$va_list_methods) {
-      my ($visibility, $method_decl_ref) = &function::decl($method, $klass_path);
+      my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
       if (exists $$method{'keyword-types'}) {
         $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}KW-ARGS-METHOD $$method_decl_ref }}" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
       } else {
@@ -2074,7 +2074,7 @@ sub linkage_unit::generate_klasses_body {
             if (0 == @{$$va_method{'keyword-types'}}) {
               my $last = &dakota::util::remove_last($$va_method{'parameter-types'});
               die if 'va-list-t' ne "@$last";
-              my ($visibility, $method_decl_ref) = &function::decl($va_method, $klass_path);
+              my ($visibility, $method_decl_ref) = &func::decl($va_method, $klass_path);
               $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "stmt2") . "\n";
               &dakota::util::add_last($$va_method{'parameter-types'}, $last);
             }
@@ -2113,7 +2113,7 @@ sub linkage_unit::generate_klasses_body {
     if (&is_decl) {
       if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
         if (!&is_va($method)) {
-          my ($visibility, $method_decl_ref) = &function::decl($method, $klass_path);
+          my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
           $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "DUPLICATE") . "\n";
         }
       }
@@ -2124,7 +2124,7 @@ sub generate_object_method_decl {
   my ($non_object_method, $klass_path, $col, $klass_type, $line) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   my $object_method = &convert_to_object_method($non_object_method);
-  my ($visibility, $method_decl_ref) = &function::decl($object_method, $klass_path);
+  my ($visibility, $method_decl_ref) = &func::decl($object_method, $klass_path);
   $$scratch_str_ref .= $col . "$klass_type @$klass_path { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, $line) . "\n";
 }
 sub generate_object_method_defn {

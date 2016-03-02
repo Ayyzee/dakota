@@ -1591,13 +1591,13 @@ func dk-klass-for-name(symbol-t name) -> object-t {
         //init-imported-klasses();
 
         named-info-t* loaded-klass-info = info-for-name(klass-name); // recursive
-        return loaded-klass-info; // rnielsen: should have only one return per function
+        return loaded-klass-info; // rnielsen: should have only one return per func
       }
       fprintf(stderr, "%s:%i: ERROR: klass '%s' not found.\n", __FILE__, __LINE__, klass-name);
       throw "bummer";
     }
   }
-  return *klass-info-ptr; // rnielsen: should have only one return per function
+  return *klass-info-ptr; // rnielsen: should have only one return per func
 }
 /*
   dk-intern needs to be able to be used **early** in the static initialization
