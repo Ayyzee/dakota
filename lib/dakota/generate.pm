@@ -1457,7 +1457,7 @@ sub generate_generic_defn {
   }
 }
 sub generate_generic_defns {
-  my ($generics, $is_inline, $ns, $col) = @_;
+  my ($generics, $is_inline, $col, $ns) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_generic_defns()\n";
   my $generic;
@@ -1559,7 +1559,7 @@ sub linkage_unit::generate_generics {
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   my ($is_inline, $ns);
-  &generate_generic_defns($scope, $is_inline = 0, $ns = 'dk', $col);
+  &generate_generic_defns($scope, $is_inline = 0, $col, $ns = 'dk');
 
     $$scratch_str_ref .=
       "\n" .
