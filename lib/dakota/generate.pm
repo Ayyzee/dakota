@@ -310,7 +310,7 @@ sub generate_nrt {
   }
   my $str;
   if (&is_nrt_decl()) {
-    $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name);
+    $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
   } else {
     $str = '// ' . $emacs_mode_file_variables  . "\n" .
       "\n" .
@@ -365,7 +365,7 @@ sub generate_rt {
     $start_time = time;
     print "    creating $output" . &pann(__FILE__, __LINE__) . "\n";
   }
-  my $str = &generate_decl_defn($file, $generics, $symbols, $suffix, $name); # costly (> 1/8 of total)
+  my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
 
   if (&is_rt_defn()) {
     $str .= &generate_defn_footer($file, $generics);
@@ -423,7 +423,7 @@ sub add_labeled_src {
   $$result{$label} = $src;
 }
 sub generate_decl_defn {
-  my ($file, $generics, $symbols, $suffix, $name) = @_;
+  my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
   my $result = {};
   my $extra_header = &extra_header($name);
   my $ordered_klass_names = &order_klasses($file);
