@@ -437,7 +437,25 @@ sub generate_decl_defn {
   &add_labeled_src($result, "ints-$suffix",       &linkage_unit::generate_ints(      $file));
   &add_labeled_src($result, "selectors-$suffix",  &linkage_unit::generate_selectors( $generics));
   &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
-  &add_labeled_src($result, "generics-$suffix",   &linkage_unit::generate_generics(  $generics));
+  my $generics_src = &linkage_unit::generate_generics($generics);
+  if (&is_rt_defn()) {
+    my $output_base = "$name-generic-func-defns";
+    my $rel_hh_path = "$output_base.$hh_ext";
+    my $output = "$dir/$rel_hh_path";
+    my $strings = [ '// ', $emacs_mode_file_variables, "\n\n", $generics_src ];
+    if ($should_write_pre_output) {
+      my $pre_output = "$dir/$output_base.dk$hh_ext";
+      &write_to_file_strings($pre_output, $strings);
+    }
+    &write_to_file_converted_strings($output, $strings);
+    &add_labeled_src($result, "generics-$suffix",
+                     "# if !defined DK-INLINE-GENERIC-FUNCS\n" .
+                     "  //# define INLINE\n" .
+                     "  # include \"$rel_hh_path\"\n" .
+                     "# endif\n");
+  } else {
+    &add_labeled_src($result, "generics-$suffix", $generics_src);
+  }
 
   my $str = '// ' . $emacs_mode_file_variables  . "\n" .
     "\n" .
