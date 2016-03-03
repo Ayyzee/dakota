@@ -23,24 +23,12 @@
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
 
-# define GENERIC auto
-# define METHOD  auto
-# define FUNC    auto
-# define SELECTOR_FUNC  FUNC
-# define SIGNATURE_FUNC FUNC
-# define GENERIC_FUNC_FUNC FUNC
+# define FUNC       auto
+# define METHOD     auto
+# define VA_METHOD  METHOD
 
-# define VA_SELECTOR_FUNC  FUNC
-# define VA_SIGNATURE_FUNC FUNC
-# define VA_GENERIC_FUNC_FUNC FUNC
-# define VA_GENERIC        GENERIC
-# define VA_METHOD         METHOD
-# define KW_ARGS_METHOD    METHOD
-# define SLOTS_METHOD      METHOD
-
-# define METHOD_SIGNATURE_FUNC FUNC
-# define KW_ARGS_METHOD_SIGNATURE_FUNC METHOD_SIGNATURE_FUNC
-# define SLOTS_METHOD_SIGNATURE_FUNC   METHOD_SIGNATURE_FUNC
+# define GENERIC
+# define VA_GENERIC GENERIC
 
 # define ALIAS(m)
 # define METHOD_ALIAS(a, r)
