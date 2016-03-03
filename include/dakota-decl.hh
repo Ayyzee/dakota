@@ -116,8 +116,10 @@ namespace std { using float64_t =       double; }
 namespace std { using float128_t = long double; }
 
 // symbols are defined before klasses
-namespace str {    using slots_t = const char8_t*; } using str_t =    str::slots_t;
-namespace symbol { using slots_t = str_t;          } using symbol_t = symbol::slots_t;
+namespace object       { using slots_t = struct slots_t;                 } using object_t =       object::slots_t*;
+namespace generic_func { using slots_t = FUNC (*)(object_t) -> object_t; } using generic_func_t = generic_func::slots_t;
+namespace str          { using slots_t = const char8_t*;                 } using str_t =          str::slots_t;
+namespace symbol       { using slots_t = str_t;                          } using symbol_t =       symbol::slots_t;
 
 static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");
 static_assert(64/8  == sizeof(std::float64_t),  "The sizeof std::float64-t  must equal  64/8 bytes in size");
