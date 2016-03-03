@@ -23,12 +23,9 @@
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
 
-# define FUNC       auto
-# define METHOD     auto
-# define VA_METHOD  METHOD
-
 # define GENERIC
-# define VA_GENERIC GENERIC
+# define FUNC    auto
+# define METHOD  auto
 
 # define ALIAS(m)
 # define METHOD_ALIAS(a, r)

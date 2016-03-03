@@ -1373,12 +1373,7 @@ sub generate_generic_defn {
   my $in = &ident_comment($generic_name);
 
   $$scratch_str_ref .= $visibility . $func_spec;
-  if (&is_va($generic)) {
-    $$scratch_str_ref .= 'VA-GENERIC FUNC ';
-  } else {
-    $$scratch_str_ref .= 'GENERIC FUNC ';
-  }
-  $$scratch_str_ref .= "$generic_name($$new_arg_list) -> $return_type";
+  $$scratch_str_ref .= "GENERIC FUNC $generic_name($$new_arg_list) -> $return_type";
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
@@ -2058,7 +2053,7 @@ sub linkage_unit::generate_klasses_body {
       if (exists $$method{'keyword-types'}) {
         $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}METHOD $$method_decl_ref }} /*kw-args*/" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
       } else {
-        $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}VA-METHOD $$method_decl_ref }}" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
+        $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}METHOD $$method_decl_ref }} /*va*/" . &ann(__FILE__, __LINE__, "stmt1") . "\n";
       }
     }
   }
