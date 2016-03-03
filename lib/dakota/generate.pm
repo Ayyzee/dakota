@@ -1331,7 +1331,7 @@ sub generics::generate_selector_seq {
   }
   return $scratch_str;
 }
-sub generics::generate_va_generic_defns {
+sub generate_va_generic_defns {
   my ($generics, $is_inline, $col) = @_;
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
@@ -1503,7 +1503,7 @@ sub generate_generic_defns {
   $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   #$$scratch_str_ref .= "# endif // defined DKT-VA-GENERICS\n";
   #if (!&is_slots($generic)) {
-  &generics::generate_va_generic_defns($generics, $is_inline = 0, $col);
+  &generate_va_generic_defns($generics, $is_inline = 0, $col);
   #}
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t" . '-' . &suffix());
   $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
@@ -1577,11 +1577,11 @@ sub linkage_unit::generate_generics {
     $$scratch_str_ref .=
       "\n" .
       "# if !defined DK-USE-MAKE-MACRO\n" .
-      &generics::generate_va_make_defn($scope, $is_inline = 1, $col) .
+      &generate_va_make_defn($scope, $is_inline = 1, $col) .
       "# endif\n";
   return $$scratch_str_ref;
 }
-sub generics::generate_va_make_defn {
+sub generate_va_make_defn {
   my ($generics, $is_inline, $col) = @_;
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()\n";
