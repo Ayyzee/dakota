@@ -1638,7 +1638,7 @@ sub generate_va_make_defn {
   my ($generics, $is_inline, $col) = @_;
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()" . $nl;
-  $result .= $col . "[[sentinel]] func make(object-t kls, ...) -> object-t";
+  $result .= $col . "[[sentinel]] INLINE func make(object-t kls, ...) -> object-t";
   if (&is_nrt_decl() || &is_rt_decl()) {
     $result .= ";" . $nl;
   } elsif (&is_rt_defn()) {
