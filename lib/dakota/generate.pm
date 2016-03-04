@@ -1369,7 +1369,7 @@ sub is_super {
 my $big_generic = 0;
 sub generate_generic_defn {
   my ($generic, $is_inline, $col, $ns) = @_;
-  my $name_str = $$generic{'name'}[0];
+  my $generic_name = $$generic{'name'}[0];
   my $orig_arg_type_list = &arg_type::list_types($$generic{'parameter-types'});
   my $tmp = $$generic{'parameter-types'}[0][0];
   $$generic{'parameter-types'}[0][0] = 'object-t';
@@ -1389,24 +1389,9 @@ sub generate_generic_defn {
     $opt_va_close = '}'
   }
   my $scratch_str_ref = &global_scratch_str_ref();
-  $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $name_str . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
-  $$scratch_str_ref .= $col . 'namespace __generic-func { ' . $opt_va_open;
-  my $visibility = '';
-  if (&is_exported($generic)) {
-    $visibility = '[[export]] ';
-  }
-  if (&is_nrt_decl() || &is_rt_decl()) {
-    $$scratch_str_ref .= 'extern ';
-  }
-  my $func_spec = '';
-  if ($is_inline) {
-    $func_spec = 'INLINE ';
-  }
-  my $generic_name = "@{$$generic{'name'}}";
   my $in = &ident_comment($generic_name);
-
-  $$scratch_str_ref .= $visibility . $func_spec;
-  $$scratch_str_ref .= "GENERIC FUNC $generic_name($$new_arg_list) -> $return_type";
+  $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
+  $$scratch_str_ref .= $col . 'namespace __generic-func { ' . $opt_va_open . 'static INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
@@ -1469,10 +1454,10 @@ sub generate_generic_defn {
 } # generate_generic_defn
 sub generate_generic_func_ptr_defn {
   my ($generic, $is_inline, $col, $ns) = @_;
-  my $name_str = $$generic{'name'}[0];
+  my $generic_name = $$generic{'name'}[0];
   my $list_types_str_ref = &arg_type::list_types($$generic{'parameter-types'});
   my $return_type_str = &remove_extra_whitespace(join(' ', @{$$generic{'return-type'}}));
-  my $in = &ident_comment($name_str);
+  my $in = &ident_comment($generic_name);
   my $opt_va_open = '';
   my $opt_va_prefix = '';
   my $opt_va_close = '';
@@ -1487,7 +1472,7 @@ sub generate_generic_func_ptr_defn {
   #  return &result;
   #}}
   my $scratch_str_ref = &global_scratch_str_ref();
-  $$scratch_str_ref .= $col . 'namespace __generic-func-ptr { ' . $opt_va_open . 'INLINE func ' . $name_str . '(' . $$list_types_str_ref . ') -> generic-func-t*';
+  $$scratch_str_ref .= $col . 'namespace __generic-func-ptr { ' . $opt_va_open . 'static INLINE func ' . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
@@ -1495,7 +1480,7 @@ sub generate_generic_func_ptr_defn {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "using func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
-    $$scratch_str_ref .= $col . 'static generic-func-t result = cast(generic-func-t)cast(func-t)(__generic-func::' . $opt_va_prefix . $name_str . ');' . $nl;
+    $$scratch_str_ref .= $col . 'static generic-func-t result = cast(generic-func-t)cast(func-t)(__generic-func::' . $opt_va_prefix . $generic_name . ');' . $nl;
     $$scratch_str_ref .= $col . 'return &result;' . $nl;
     $col = &colout($col);
     $$scratch_str_ref .= $col . '}}' . $opt_va_close . $nl;
@@ -1503,13 +1488,13 @@ sub generate_generic_func_ptr_defn {
 }
 sub generate_generic_func_defn {
   my ($generic, $is_inline, $col, $ns) = @_;
-  my $name_str = $$generic{'name'}[0];
+  my $generic_name = $$generic{'name'}[0];
   my $list_types_str_ref = &arg_type::list_types($$generic{'parameter-types'});
   my $list_names = &arg_type::names($$generic{'parameter-types'});
   my $list_names_str =  &remove_extra_whitespace(join(', ', @$list_names));
   my $arg_list =  &arg_type::list_pair($$generic{'parameter-types'}, $list_names);
   my $return_type_str = &remove_extra_whitespace(join(' ', @{$$generic{'return-type'}}));
-  my $in = &ident_comment($name_str);
+  my $in = &ident_comment($generic_name);
   my $opt_va_open = '';
   my $opt_va_prefix = '';
   my $opt_va_close = '';
@@ -1524,7 +1509,7 @@ sub generate_generic_func_defn {
   #  return _func_(arg0, arg1);
   #}}
   my $scratch_str_ref = &global_scratch_str_ref();
-  $$scratch_str_ref .= $col . 'namespace dk { ' . $opt_va_open . 'INLINE func ' . $name_str . '(' . $$arg_list . ') -> ' . $return_type_str;
+  $$scratch_str_ref .= $col . 'namespace dk { ' . $opt_va_open . 'INLINE func ' . $generic_name . '(' . $$arg_list . ') -> ' . $return_type_str;
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
@@ -1532,7 +1517,7 @@ sub generate_generic_func_defn {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "using func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
-    $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $name_str . '(' . $$list_types_str_ref . '));' . $nl;
+    $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
     $$scratch_str_ref .= $col . 'return _func_(' . $list_names_str . ');' . $nl;
     $col = &colout($col);
     $$scratch_str_ref .= $col . '}}' . $opt_va_close . $nl;
@@ -1548,8 +1533,10 @@ sub generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generate_generic_defn($generic, $is_inline, $col, $ns);
-        &generate_generic_func_ptr_defn($generic, $is_inline, $col, $ns);
+        if (!&is_nrt_decl() && !&is_rt_decl()) {
+          &generate_generic_defn($generic, $is_inline, $col, $ns);
+          &generate_generic_func_ptr_defn($generic, $is_inline, $col, $ns);
+        }
         &generate_generic_func_defn($generic, $is_inline, $col, $ns);
       }
     }
@@ -1560,8 +1547,10 @@ sub generate_generic_defns {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
         $$copy{'parameter-types'}[0][0] = 'super-t';
-        &generate_generic_defn($copy, $is_inline, $col, $ns);
-        &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
+        if (!&is_nrt_decl() && !&is_rt_decl()) {
+          &generate_generic_defn($copy, $is_inline, $col, $ns);
+          &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
+        }
         &generate_generic_func_defn($copy, $is_inline, $col, $ns);
       }
     }
@@ -1574,8 +1563,10 @@ sub generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generate_generic_defn($generic, $is_inline, $col, $ns);
-        &generate_generic_func_ptr_defn($generic, $is_inline, $col, $ns);
+        if (!&is_nrt_decl() && !&is_rt_decl()) {
+          &generate_generic_defn($generic, $is_inline, $col, $ns);
+          &generate_generic_func_ptr_defn($generic, $is_inline, $col, $ns);
+        }
         &generate_generic_func_defn($generic, $is_inline, $col, $ns);
       }
     }
@@ -1586,8 +1577,10 @@ sub generate_generic_defns {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
         $$copy{'parameter-types'}[0][0] = 'super-t';
-        &generate_generic_defn($copy, $is_inline, $col, $ns);
-        &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
+        if (!&is_nrt_decl() && !&is_rt_decl()) {
+          &generate_generic_defn($copy, $is_inline, $col, $ns);
+          &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
+        }
         &generate_generic_func_defn($copy, $is_inline, $col, $ns);
       }
     }
