@@ -1332,12 +1332,11 @@ sub generics::generate_selector_seq {
   return $scratch_str;
 }
 sub generate_va_generic_defns {
-  my ($generics, $is_inline, $col) = @_;
+  my ($generics, $is_inline, $col, $ns) = @_;
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       my $scope = [];
-      my $ns;
-      &path::add_last($scope, $ns = 'dk');
+      &path::add_last($scope, $ns);
       my $new_generic = &dakota::util::deep_copy($generic);
       $$new_generic{'inline?'} = $is_inline;
 
@@ -1360,7 +1359,7 @@ sub is_super {
 }
 my $big_generic = 0;
 sub generate_generic_defn {
-  my ($generic, $is_inline, $col) = @_;
+  my ($generic, $is_inline, $col, $ns) = @_;
   my $tmp = $$generic{'parameter-types'}[0][0];
   $$generic{'parameter-types'}[0][0] = 'object-t';
   my $new_arg_type =            $$generic{'parameter-types'};
@@ -1372,9 +1371,9 @@ sub generate_generic_defn {
   my $return_type = &arg::type($$generic{'return-type'});
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_va($generic)) {
-    $$scratch_str_ref .= $col . 'namespace va { ';
+    $$scratch_str_ref .= $col . 'namespace dk { namespace va { ';
   } else {
-    $$scratch_str_ref .= $col;
+    $$scratch_str_ref .= $col . 'namespace dk { ';
   }
   my $visibility = '';
   if (&is_exported($generic)) {
@@ -1395,9 +1394,9 @@ sub generate_generic_defn {
 
   if (&is_nrt_decl() || &is_rt_decl()) {
     if (&is_va($generic)) {
-      $$scratch_str_ref .= "; }" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= "; }}" . &ann(__FILE__, __LINE__) . "\n";
     } else {
-      $$scratch_str_ref .= ";" . &ann(__FILE__, __LINE__) . "\n";
+      $$scratch_str_ref .= "; }" . &ann(__FILE__, __LINE__) . "\n";
     }
   } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . "\n";
@@ -1463,9 +1462,9 @@ sub generate_generic_defn {
     }
     $col = &colout($col);
     if (&is_va($generic)) {
-      $$scratch_str_ref .= $col . '}}' . "\n";
+      $$scratch_str_ref .= $col . '}}}' . "\n";
     } else {
-      $$scratch_str_ref .= $col . '}' . "\n";
+      $$scratch_str_ref .= $col . '}}' . "\n";
     }
   }
 }
@@ -1476,61 +1475,45 @@ sub generate_generic_defns {
   my $generic;
   #$$scratch_str_ref .= "# if defined DKT-VA-GENERICS\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "va-generics-object-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
-  $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generate_generic_defn($generic, $is_inline, $col);
+        &generate_generic_defn($generic, $is_inline, $col, $ns);
       }
     }
   }
-  $col = &colout($col);
-  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "va-generics-super-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
-  $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
         $$copy{'parameter-types'}[0][0] = 'super-t';
-        &generate_generic_defn($copy, $is_inline, $col);
+        &generate_generic_defn($copy, $is_inline, $col, $ns);
       }
     }
   }
-  $col = &colout($col);
-  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   #$$scratch_str_ref .= "# endif // defined DKT-VA-GENERICS\n";
   #if (!&is_slots($generic)) {
-  &generate_va_generic_defns($generics, $is_inline = 0, $col);
+  &generate_va_generic_defns($generics, $is_inline = 0, $col, $ns);
   #}
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-object-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
-  $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
-        &generate_generic_defn($generic, $is_inline, $col);
+        &generate_generic_defn($generic, $is_inline, $col, $ns);
       }
     }
   }
-  $col = &colout($col);
-  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
   $$scratch_str_ref .= &labeled_src_str(undef, "generics-super-t" . '-' . &suffix());
-  $$scratch_str_ref .= $col . "namespace $ns {" . &ann(__FILE__, __LINE__) . "\n";
-  $col = &colin($col);
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
         $$copy{'parameter-types'}[0][0] = 'super-t';
-        &generate_generic_defn($copy, $is_inline, $col);
+        &generate_generic_defn($copy, $is_inline, $col, $ns);
       }
     }
   }
-  $col = &colout($col);
-  $$scratch_str_ref .= $col . '}' . &ann(__FILE__, __LINE__) . "\n";
 }
 sub linkage_unit::generate_signatures {
   my ($generics) = @_;
