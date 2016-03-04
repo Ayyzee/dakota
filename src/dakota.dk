@@ -481,7 +481,9 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
     int64-t i = 0;
     while (1) {
       assoc-node-t& assoc =   assocs[i];
+# if 0
       symbol-t      name =    names[i];
+# endif
       str-t         literal = literals[i];
       if (nullptr == cast(object-t*)assoc.element)
         break;
@@ -503,7 +505,9 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
     int64-t i = 0;
     while (1) {
       assoc-node-t& assoc =   assocs[i];
+# if 0
       symbol-t      name =    names[i];
+# endif
       intmax-t      literal = literals[i];
       if (nullptr == cast(object-t*)assoc.element)
         break;
