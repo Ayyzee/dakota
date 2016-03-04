@@ -36,6 +36,7 @@ my $hh_ext;
 my $cc_ext;
 my $o_ext;
 my $so_ext;
+my $nl = "\n";
 
 sub dk_prefix {
   my ($path) = @_;
@@ -472,7 +473,7 @@ sub loop_cc_from_dk {
       $json_path = &json_path_from_any_path($input); # _from_dk_src_path
       &check_path($json_path);
     } else {
-      #print "skipping $input, line=" . __LINE__ . "\n";
+      #print "skipping $input, line=" . __LINE__ . $nl;
     }
 
     my ($input_dir, $input_name, $input_ext) = &split_path($input, $id);
@@ -606,7 +607,7 @@ sub update_rep_from_all_inputs {
   my $rt_json_path = &rt_json_path($cmd_info);
   &check_path($rt_json_path);
   if (&is_debug()) {
-    print "creating $rt_json_path" . &pann(__FILE__, __LINE__) . "\n";
+    print "creating $rt_json_path" . &pann(__FILE__, __LINE__) . $nl;
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   $cmd_info = &loop_rep_from_inputs($cmd_info);
@@ -621,7 +622,7 @@ sub update_rep_from_all_inputs {
   if (&is_debug()) {
     my $end_time = time;
     my $elapsed_time = $end_time - $start_time;
-    print "creating $rt_json_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . "\n";
+    print "creating $rt_json_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
   }
   if ($ENV{'DAKOTA_CREATE_REP_ONLY'}) {
     exit 0;
@@ -667,11 +668,11 @@ sub start_cmd {
     if ($ENV{'DKT_PRECOMPILE'}) {
       my $rt_cc_path = &rt_cc_path($cmd_info);
       if (&is_debug()) {
-        print "creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
+        print "creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       }
     } else {
       if (&is_debug()) {
-        print "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
+        print "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
       }
     }
   }
@@ -818,7 +819,7 @@ sub rep_from_inputs {
         &check_path($json_path);
         &project_io_add($cmd_info, $input, $json_path);
       } else {
-        #print "skipping $input, line=" . __LINE__ . "\n";
+        #print "skipping $input, line=" . __LINE__ . $nl;
       }
     } elsif (1 < scalar @{$$rep_cmd{'inputs'}}) {
       #my $project_io = &scalar_from_file($$cmd_info{'project.io'});
@@ -875,9 +876,9 @@ sub gen_rt_o {
     }
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . "\n";
+        print "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       } else {
-        print "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . "\n";
+        print "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
       }
     }
   }
@@ -904,7 +905,7 @@ sub o_from_dk {
   my $outfile;
   if (!&is_dk_src_path($input)) {
     if (!$$cmd_info{'opts'}{'silent'}) {
-      #print $input . "\n"; # dk_path
+      #print $input . $nl; # dk_path
     }
     $outfile = $input;
   } else {
@@ -919,9 +920,9 @@ sub o_from_dk {
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print "  creating $cc_path" . &pann(__FILE__, __LINE__) . "\n";
+        print "  creating $cc_path" . &pann(__FILE__, __LINE__) . $nl;
       } else {
-        print "  creating $o_path" . &pann(__FILE__, __LINE__) . "\n";
+        print "  creating $o_path" . &pann(__FILE__, __LINE__) . $nl;
       }
     }
     if (!$want_separate_rep_pass) {
@@ -945,7 +946,7 @@ sub o_from_dk {
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
       if (!$$cmd_info{'opts'}{'silent'}) {
-        print $input . "\n"; # dk_path
+        print $input . $nl; # dk_path
       }
       my $rt_json_path = &rt_json_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
@@ -1258,7 +1259,7 @@ sub outfile_from_infiles {
       if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
         $output = $ENV{'DKT_DIR'} . '/' . $output
       }
-      #print "    creating $output # output" . &pann(__FILE__, __LINE__) . "\n";
+      #print "    creating $output # output" . &pann(__FILE__, __LINE__) . $nl;
     }
     if ('&loop_merged_rep_from_inputs' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
@@ -1295,7 +1296,7 @@ sub outfile_from_infiles {
 sub ctlg_from_so {
   my ($cmd_info) = @_;
   if (!$$cmd_info{'opts'}{'silent'}) {
-    #map { print '// ' . $_ . "\n"; } @{$$cmd_info{'inputs'}};
+    #map { print '// ' . $_ . $nl; } @{$$cmd_info{'inputs'}};
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$ctlg_cmd{'project.io'} =  $$cmd_info{'project.io'};
@@ -1333,7 +1334,7 @@ sub ctlg_from_so {
           $json_path = &json_path_from_any_path($input); # _from_dk_src_path
           &check_path($json_path);
         } else {
-          #print "skipping $input, line=" . __LINE__ . "\n";
+          #print "skipping $input, line=" . __LINE__ . $nl;
         }
         if (-e $json_path) {
          #my $ctlg_path = $json_path . '.' . 'ctlg';

@@ -46,6 +46,7 @@ my $hh_ext;
 my $cc_ext;
 my $o_ext;
 my $so_ext;
+my $nl = "\n";
 
 sub dk_prefix {
   my ($path) = @_;
@@ -389,7 +390,7 @@ sub rel_path_canon {
     if ($ENV{'DKT-DEBUG'}) {
       print "$path1 = arg\n";
       print "$cwd = cwd\n";
-      print "\n";
+      print $nl;
       print "$path1 = $path1\n";
       print "$result = $path1\n";
       print "$result = result\n";
@@ -1717,9 +1718,9 @@ sub add_klasses_used {
           $Data::Dumper::Indent = 0;
 
           if ($$gbl_sst_cursor{'file'}) {
-            print "FILE: " . $$gbl_sst_cursor{'file'} . "\n";
+            print "FILE: " . $$gbl_sst_cursor{'file'} . $nl;
           }
-          print "RANGE: " . &Dumper($range) . ", MATCHES: " . &Dumper($matches) . ", NAME: " . $name . "\n";
+          print "RANGE: " . &Dumper($range) . ", MATCHES: " . &Dumper($matches) . ", NAME: " . $name . $nl;
           $Data::Dumper::Indent = $prev_indent;
         }
         &add_klass_decl($gbl_root, $name);
@@ -1968,7 +1969,7 @@ sub generics::klass_type_from_klass_name {
   } else {
     my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
     die __FILE__, ":", __LINE__,
-      ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
+      ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"" . $nl;
   }
   return $klass_type;
 }
@@ -1986,7 +1987,7 @@ sub generics::klass_scope_from_klass_name {
     $klass_scope = {};
   } else {
     my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'} ||= []}];
-    die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"\n";
+    die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"" . $nl;
   }
   return $klass_scope;
 }

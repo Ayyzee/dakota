@@ -29,6 +29,7 @@ use warnings;
 use sort 'stable';
 
 my $gbl_prefix;
+my $nl = "\n";
 
 sub dk_prefix {
   my ($path) = @_;
@@ -360,7 +361,7 @@ sub arglist_members {
   my $is_framed = 0;
   my $chars = [split(//, $arglist)];
   if (!$i) { $i = 0; }
-  #print STDERR scalar @$chars . "\n";
+  #print STDERR scalar @$chars . $nl;
 
   while (scalar @$chars > $i) {
     if (!$is_framed) {

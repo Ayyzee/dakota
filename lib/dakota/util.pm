@@ -28,6 +28,8 @@ use strict;
 use warnings;
 use sort 'stable';
 
+my $nl = "\n";
+
 BEGIN {
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
@@ -144,11 +146,11 @@ sub tear {
   my $tbl = { 'src' => '', 'src-comments' => '' };
   foreach my $line (split /\n/, $filestr) {
     if ($line =~ m=^(.*?)(((/\*.*\*/\s*)*(//.*))|/\*.*\*/)?$=m) {
-      $$tbl{'src'} .= $1 . "\n";
+      $$tbl{'src'} .= $1 . $nl;
       if ($2) {
         $$tbl{'src-comments'} .= $2;
       }
-      $$tbl{'src-comments'} .= "\n";
+      $$tbl{'src-comments'} .= $nl;
     } else {
       die "$!";
     }
@@ -161,14 +163,14 @@ sub mend {
   my $src_lines = [split /\n/, $$filestr_ref];
   my $src_comment_lines = [split /\n/, $$tbl{'src-comments'}];
   #if (scalar(@$src_lines) != scalar(@$src_comment_lines) ) {
-  #  print "warning: mend: src-lines = " . scalar(@$src_lines) . ", src-comment-lines = " . scalar(@$src_comment_lines) . "\n";
+  #  print "warning: mend: src-lines = " . scalar(@$src_lines) . ", src-comment-lines = " . scalar(@$src_comment_lines) . $nl;
   #}
   for (my $i = 0; $i < scalar(@$src_lines); $i++) {
     $result .= $$src_lines[$i];
     if (defined $$src_comment_lines[$i]) {
       $result .= $$src_comment_lines[$i];
     }
-    $result .= "\n";
+    $result .= $nl;
   }
   return $result;
 }
@@ -683,13 +685,13 @@ sub scalar_to_file {
   flock FILE, 2; # LOCK_EX
   truncate FILE, 0;
   print FILE
-    '# -*- mode: cperl -*-' . "\n" .
-    '# -*- cperl-close-paren-offset: -2 -*-' . "\n" .
-    '# -*- cperl-continued-statement-offset: 2 -*-' . "\n" .
-    '# -*- cperl-indent-level: 2 -*-' . "\n" .
-    '# -*- cperl-indent-parens-as-block: t -*-' . "\n" .
-    '# -*- cperl-tab-always-indent: t -*-' . "\n" .
-    "\n";
+    '# -*- mode: cperl -*-' . $nl .
+    '# -*- cperl-close-paren-offset: -2 -*-' . $nl .
+    '# -*- cperl-continued-statement-offset: 2 -*-' . $nl .
+    '# -*- cperl-indent-level: 2 -*-' . $nl .
+    '# -*- cperl-indent-parens-as-block: t -*-' . $nl .
+    '# -*- cperl-tab-always-indent: t -*-' . $nl .
+    $nl;
   print FILE $refstr;
   close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
 }

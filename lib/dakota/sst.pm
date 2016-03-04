@@ -29,6 +29,7 @@ use warnings;
 use sort 'stable';
 
 my $gbl_prefix;
+my $nl = "\n";
 
 sub dk_prefix {
   my ($path) = @_;
@@ -495,9 +496,9 @@ sub sst_fragment::filestr {
       $prev_was_ident = $is_ident;
     }
   }
-  if ("\n" ne substr $filestr, -1) { # add trailing newline if missing
+  if ($nl ne substr $filestr, -1) { # add trailing newline if missing
     print STDERR "Warning: Adding missing final newline\n";
-    $filestr .= "\n";
+    $filestr .= $nl;
   }
   return $filestr;
 }
@@ -570,8 +571,8 @@ sub constraint_qual_scope {
   my ($sst, $range, $user_data) = @_;
   my ($result_lhs, $result_rhs) = &constraint_qual_ident($sst, $range, $user_data);
   my $special_idents = { 'slots-t' => 1, 'klass' => 1, 'box' => 1, 'unbox' => 1 };
-  #print "result_lhs: " . &Dumper($result_lhs) . "\n";
-  #print "result_rhs: " . &Dumper($result_rhs) . "\n";
+  #print "result_lhs: " . &Dumper($result_lhs) . $nl;
+  #print "result_rhs: " . &Dumper($result_rhs) . $nl;
 
   if (0 != @$result_rhs) {
     if ($$special_idents{$$result_rhs[-1]}) {
@@ -608,11 +609,11 @@ sub constraint_qual_ident {
     while (1) {
       $i++;
       my $sro = &sst::at($sst, $i);
-      #print "SRO: " . '{' . $sro . '}' . "\n";
+      #print "SRO: " . '{' . $sro . '}' . $nl;
       if ($sro eq '::') {
         $i++;
         $token = &sst::at($sst, $i);
-        #print "TKN: " . '{' . $token . '}' . "\n";
+        #print "TKN: " . '{' . $token . '}' . $nl;
         if ($token =~ m/^$id$/) {
           $result_lhs = [ $$range[0], $i ];
           &dakota::util::add_last($result_rhs, $sro);
@@ -766,7 +767,7 @@ sub sst_cursor::match_pattern_seq {
           if ('?qual-scope' eq $pattern_token) {
             my $prev_indent = $Data::Dumper::Indent;
             $Data::Dumper::Indent = 0;
-            print "RANGE: " . &Dumper($range) . ", QUAL_IDENT: " . &Dumper($result_rhs) . "\n";
+            print "RANGE: " . &Dumper($range) . ", QUAL_IDENT: " . &Dumper($result_rhs) . $nl;
             $Data::Dumper::Indent = $prev_indent;
           }
         } else {
@@ -785,7 +786,7 @@ sub sst_cursor::match_pattern_seq {
           if (0) {
             my $prev_indent = $Data::Dumper::Indent;
             $Data::Dumper::Indent = 0;
-            print "RANGE: " . &Dumper($range) . ", TOKEN: \"" . $input_token . "\"\n";
+            print "RANGE: " . &Dumper($range) . ", TOKEN: \"" . $input_token . "\"" . $nl;
             $Data::Dumper::Indent = $prev_indent;
           }
         } else {
@@ -929,7 +930,7 @@ sub sst_cursor::logger {
   #&log_sub_name($__sub__);
   my $current_token = &sst_cursor::current_token($sst_cursor);
   if (defined $current_token) {
-    print STDERR $file, ":", $line, ": ", $current_token, "\n";
+    print STDERR $file, ":", $line, ": ", $current_token, $nl;
   }
 }
 sub sst_cursor::token_index {
