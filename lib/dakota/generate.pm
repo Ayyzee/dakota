@@ -1650,14 +1650,16 @@ sub generate_va_make_defn {
     $result .=
       $col . "static $alloc_type_decl = dk::alloc;" . $nl .
       $col . "static $init_type_decl = dk::va::init;" . $nl .
+      $nl .
+      $col . "object-t instance = alloc(kls);" . $nl .
+      $nl .
       $col . "va-list-t args;" . $nl .
       $col . "va-start(args, kls);" . $nl .
-      $col . "object-t result = alloc(kls);" . $nl .
-      #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);" . $nl .
-      $col . "result = _func_(result, args); // init()" . $nl .
-      #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, result, args);" . $nl .
+      #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
+      $col . "instance = _func_(instance, args); // dk::va::init(object-t, va-list-t)" . $nl .
+      #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
       $col . "va-end(args);" . $nl .
-      $col . "return result;" . $nl;
+      $col . "return instance;" . $nl;
     $col = &colout($col);
     $result .= $col . "}" . $nl;
   }
