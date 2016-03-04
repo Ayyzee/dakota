@@ -439,13 +439,11 @@ sub generate_decl_defn {
   &add_labeled_src($result, "selectors-$suffix",  &linkage_unit::generate_selectors( $generics));
   &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
   my $col = '';
-  $col = &colin($col);
-  my $generics_src = &linkage_unit::generate_generics($generics, $col);
   my $output_base = "$name-generic-func-defns";
   my $rel_hh_path = "$output_base.$hh_ext";
   if (&is_rt_defn()) {
     my $output = "$dir/$rel_hh_path";
-    my $strings = [ '// ', $emacs_mode_file_variables, "\n\n", $generics_src ];
+    my $strings = [ '// ', $emacs_mode_file_variables, "\n\n", &linkage_unit::generate_generics($generics, $col) ];
     if ($should_write_pre_output) {
       my $pre_output = "$dir/$output_base.dk$hh_ext";
       &write_to_file_strings($pre_output, $strings);
@@ -463,7 +461,7 @@ sub generate_decl_defn {
                      "  # include \"$rel_hh_path\"" . $nl .
                      "# else" . $nl .
                      "  # define INLINE" . $nl .
-                     $generics_src .
+                     &linkage_unit::generate_generics($generics, &colin($col)) .
                      "# endif" . $nl);
   }
 
@@ -1000,7 +998,7 @@ sub generate_va_generic_defn {
       $$scratch_str_ref .= $col . "return;" . $nl;
     }
     $col = &colout($col);
-    $$scratch_str_ref .= "}}" . $nl;
+    $$scratch_str_ref .= $col . "}}" . $nl;
   }
 }
 sub method::compare {
@@ -1372,6 +1370,7 @@ my $big_generic = 0;
 sub generate_generic_defn {
   my ($generic, $is_inline, $col, $ns) = @_;
   my $name_str = $$generic{'name'}[0];
+  my $orig_arg_type_list = &arg_type::list_types($$generic{'parameter-types'});
   my $tmp = $$generic{'parameter-types'}[0][0];
   $$generic{'parameter-types'}[0][0] = 'object-t';
   my $new_arg_type =            $$generic{'parameter-types'};
@@ -1390,7 +1389,7 @@ sub generate_generic_defn {
     $opt_va_close = '}'
   }
   my $scratch_str_ref = &global_scratch_str_ref();
-  $$scratch_str_ref .= $col . '// ' . $name_str . '(' . $$new_arg_type_list . ')' . ' -> ' . $return_type . $nl;
+  $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $name_str . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
   $$scratch_str_ref .= $col . 'namespace __generic-func { ' . $opt_va_open;
   my $visibility = '';
   if (&is_exported($generic)) {
