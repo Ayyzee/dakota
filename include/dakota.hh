@@ -152,8 +152,8 @@ inline FUNC dkt_normalize_compare_result(intmax_t n) -> int_t { return (n < 0) ?
 # define SELECTOR_PTR(name, args)             (cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
 # define SELECTOR(name, args)                *SELECTOR_PTR(name, args)
 
-# define GENERIC_FUNC_PTR(name, args)         (cast(dkt_generic_func_func_t)(cast(FUNC (*)args -> generic_func_t*) __generic_func::name))()
-# define GENERIC_FUNC(name, args)            *GENERIC_FUNC_PTR(name, args)
+# define GENERIC_FUNC_PTR_PTR(name, args)     (cast(dkt_generic_func_func_t)(cast(FUNC (*)args -> generic_func_t*) __generic_func_ptr::name))()
+# define GENERIC_FUNC_PTR(name, args)        *GENERIC_FUNC_PTR_PTR(name, args)
 
 # define unless(e) if (0 == (e))
 # define until(e)  while (0 == (e))
