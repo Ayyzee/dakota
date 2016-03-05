@@ -524,6 +524,7 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
 static func named-info-to-registration-info(named-info-t* ni, registration-info-t* ri) -> void {
   *ri = {
     .dir =                    cast(decltype(ri->dir))                    named-info::at(ni, #dir),
+    .generic-func-ptrs =      cast(decltype(ri->generic-func-ptrs))      named-info::at(ni, #generic-func-ptrs),
     .get-segment-data =       cast(decltype(ri->get-segment-data))       named-info::at(ni, #get-segment-data),
     .imported-klass-names =   cast(decltype(ri->imported-klass-names))   named-info::at(ni, #imported-klass.names),
     .imported-klass-ptrs =    cast(decltype(ri->imported-klass-ptrs))    named-info::at(ni, #imported-klass.ptrs),
@@ -532,6 +533,7 @@ static func named-info-to-registration-info(named-info-t* ni, registration-info-
     .name =                   cast(decltype(ri->name))                   named-info::at(ni, #name),
     .selectors =              cast(decltype(ri->selectors))              named-info::at(ni, #selectors),
     .signatures =             cast(decltype(ri->signatures))             named-info::at(ni, #signatures),
+    .va-generic-func-ptrs =   cast(decltype(ri->va-generic-func-ptrs))   named-info::at(ni, #va-generic-func-ptrs),
     .va-selectors =           cast(decltype(ri->va-selectors))           named-info::at(ni, #va-selectors),
     .va-signatures =          cast(decltype(ri->va-signatures))          named-info::at(ni, #va-signatures),
   };
@@ -1217,6 +1219,7 @@ klass get-segment-data {
 klass registration-info {
   slots {
     str-t              dir;
+    generic-func-t*    generic-func-ptrs;
     get-segment-data-t get-segment-data;
     symbol-t*          imported-klass-names;
     assoc-node-t*      imported-klass-ptrs;
@@ -1225,6 +1228,7 @@ klass registration-info {
     symbol-t           name;
     selector-node-t*   selectors;
     signature-t**      signatures;
+    generic-func-t*    va-generic-func-ptrs;
     selector-node-t*   va-selectors;
     signature-t**      va-signatures;
   }

@@ -91,6 +91,7 @@
     '#expr' => undef,
     '#expr-str' => undef,
     '#file' => undef,
+    '#generic-func-ptrs' => undef,
     '#get-segment-data' => undef,
     '#imported-klass.names' => undef,
     '#imported-klass.ptrs' => undef,
@@ -135,6 +136,7 @@
     '#uchar8-t' => undef, # hardcode typealias
     '#uint-t' => undef,  # hardcode typealias
     '#union' => undef,
+    '#va-generic-func-ptrs' => undef,
     '#va-method' => undef,
     '#va-method.signatures' => undef,
     '#va-selectors' => undef,

@@ -511,6 +511,7 @@ sub generate_defn_footer {
     $rt_cc_str .= $col . "};" . $nl;
     $rt_cc_str .= &linkage_unit::generate_selectors_seq( $generics);
     $rt_cc_str .= &linkage_unit::generate_signatures_seq($generics);
+    $rt_cc_str .= &linkage_unit::generate_generic_func_ptrs_seq($generics);
     $rt_cc_str .= &linkage_unit::generate_strs_seq($file);
     $rt_cc_str .= &linkage_unit::generate_ints_seq($file);
   }
@@ -529,6 +530,7 @@ sub generate_defn_footer {
   my $info_tbl = {
                   "\#dir" => 'dir',
                   "\#file" => '__FILE__',
+                  "\#generic-func-ptrs" => 'generic-func-ptrs',
                   "\#get-segment-data" => 'dkt-get-segment-data',
                   "\#imported-klass.names" => 'imported-klass-names',
                   "\#imported-klass.ptrs" =>  'imported-klass-ptrs',
@@ -538,6 +540,7 @@ sub generate_defn_footer {
                   "\#selectors" =>  'selectors',
                   "\#signatures" => 'signatures',
                   "\#type" => $$file{'other'}{'type'},
+                  "\#va-generic-func-ptrs" => 'va-generic-func-ptrs',
                   "\#va-selectors" =>  'va-selectors',
                   "\#va-signatures" => 'va-signatures',
                  };
@@ -1253,6 +1256,50 @@ sub va_generics {
     }
   }
   return ($va_generics, $fa_generics);
+}
+sub linkage_unit::generate_generic_func_ptrs_seq {
+  my ($generics) = @_;
+  my $col = '';
+  my ($va_generics, $fa_generics) = &va_generics($generics, undef);
+  my $scratch_str = "";
+  #$scratch_str .= $col . "// generate_generic_func_ptrs_seq()" . $nl;
+  my $generic;
+  my $i;
+  my $return_type = 'generic-func-t*';
+
+  if (0 == @$va_generics) {
+    $scratch_str .= $col . "static generic-func-t** va-generic-func-ptrs = nullptr;" . $nl;
+  } else {
+    $scratch_str .= $col . "static generic-func-t* va-generic-func-ptrs[] = {" . &ann(__FILE__, __LINE__) . " //ro-data" . $nl;
+    $col = &colin($col);
+    foreach $generic (sort method::compare @$va_generics) {
+      my $new_arg_type_list = &arg_type::list_types($$generic{'parameter-types'});
+      my $generic_name = "@{$$generic{'name'}}";
+      my $in = &ident_comment($generic_name);
+      $scratch_str .= $col . "GENERIC-FUNC-PTR-PTR(va::$generic_name($$new_arg_type_list))," . $in . $nl;
+    }
+    $scratch_str .= $col . "nullptr," . $nl;
+    $col = &colout($col);
+    $scratch_str .= $col . "};" . $nl;
+  }
+  if (0 == @$fa_generics) {
+    $scratch_str .= $col . "static generic-func-t** generic-func-ptrs = nullptr;" . $nl;
+  } else {
+    $scratch_str .= $col . "static generic-func-t* generic-func-ptrs[] = {" . &ann(__FILE__, __LINE__) . " //ro-data" . $nl;
+    $col = &colin($col);
+    foreach $generic (sort method::compare @$fa_generics) {
+      if (!&is_slots($generic)) {
+        my $new_arg_type_list = &arg_type::list_types($$generic{'parameter-types'});
+        my $generic_name = "@{$$generic{'name'}}";
+        my $in = &ident_comment($generic_name);
+        $scratch_str .= $col . "GENERIC-FUNC-PTR-PTR($generic_name($$new_arg_type_list))," . $in . $nl;
+      }
+    }
+    $scratch_str .= $col . "nullptr," . $nl;
+    $col = &colout($col);
+    $scratch_str .= $col . "};" . $nl;
+  }
+  return $scratch_str;
 }
 sub generics::generate_signature_seq {
   my ($generics, $is_inline, $col) = @_;
