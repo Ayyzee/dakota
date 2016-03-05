@@ -1451,7 +1451,7 @@ sub generate_generic_defn {
     my $signature;
     $signature = "SIGNATURE($opt_va_prefix$generic_name($$new_arg_type_list))";
     $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($opt_va_prefix$generic_name($$new_arg_type_list));" . $nl;
-    $$scratch_str_ref .= $col . "using func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
+    $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
       $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)" . $nl;
@@ -1514,7 +1514,7 @@ sub generate_generic_func_ptr_defn {
     $opt_va_close = '}'
   }
   #namespace __generic-func-ptr { INLINE func add(object-t, object-t) -> generic-func-t* {
-  #  using func-t = func (*)(object-t, object-t) -> object-t; // no runtime cost
+  #  typealias func-t = func (*)(object-t, object-t) -> object-t; // no runtime cost
   #    static generic-func-t result = cast(generic-func-t)cast(func-t)__generic-func::add;
   #  return &result;
   #}}
@@ -1526,7 +1526,7 @@ sub generate_generic_func_ptr_defn {
   } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    $$scratch_str_ref .= $col . "using func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
+    $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
     $$scratch_str_ref .= $col . 'static generic-func-t result = cast(generic-func-t)cast(func-t)(__generic-func::' . $opt_va_prefix . $generic_name . ');' . $nl;
     $$scratch_str_ref .= $col . 'return &result;' . $nl;
     $col = &colout($col);
@@ -1551,7 +1551,7 @@ sub generate_generic_func_defn {
     $opt_va_close = '}'
   }
   #namespace dk { INLINE generic-func add(object-t arg0, object-t arg1) -> object-t {
-  #  using func-t = func (*)(object-t, object-t) -> object-t; // no runtime cost
+  #  typealias func-t = func (*)(object-t, object-t) -> object-t; // no runtime cost
   #  func-t _func_ = cast(func-t)GENERIC-FUNC(add(object-t, object-t)); // static would be faster, but more rigid
   #  return _func_(arg0, arg1);
   #}}
@@ -1563,7 +1563,7 @@ sub generate_generic_func_defn {
   } elsif (&is_rt_defn()) {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    $$scratch_str_ref .= $col . "using func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
+    $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
     $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
     $$scratch_str_ref .= $col . 'return _func_(' . $list_names_str . ');' . $nl;
     $col = &colout($col);
@@ -2309,15 +2309,15 @@ sub typealias_slots_t {
   my ($klass_name) = @_;
   my $result;
   if ('object' eq $klass_name) {
-    $result = "using $klass_name-t = $klass_name\::slots-t*; /*special-case*/"; # special-case
+    $result = "typealias $klass_name-t = $klass_name\::slots-t*; /*special-case*/"; # special-case
   } else {
     my $parts = [split(/::/, $klass_name)];
     if (1 < scalar @$parts) {
       my $basename = &dakota::util::remove_last($parts);
       my $inner_ns = join('::', @$parts);
-      $result = "namespace $inner_ns { using $basename-t = $basename\::slots-t; }";
+      $result = "namespace $inner_ns { typealias $basename-t = $basename\::slots-t; }";
     } else {
-      $result = "using $klass_name-t = $klass_name\::slots-t;";
+      $result = "typealias $klass_name-t = $klass_name\::slots-t;";
     }
   }
   return $result;

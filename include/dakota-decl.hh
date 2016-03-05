@@ -44,6 +44,8 @@
 
 # define SENTINAL_PTR nullptr
 
+# define typealias using
+
 # define cast(t) (t)
 
 // gcc has bug in code generation so the assembler omit the quotes
@@ -78,33 +80,33 @@
   # define dkt_enable_typeinfo
 # endif
 
-using boole_t = bool;
+typealias boole_t = bool;
 
-using  char8_t =          char; // may be signed or unsigned (same with wchar-t)
-using schar8_t =   signed char;
-using uchar8_t = unsigned char;
+typealias  char8_t =          char; // may be signed or unsigned (same with wchar-t)
+typealias schar8_t =   signed char;
+typealias uchar8_t = unsigned char;
 
 // integer promotions are
 //   float -> double
 //   char  -> int or unsigned int
 //   bool  -> unsigned int
 
-using double_t = double;
-using  int_t =          int; // no corresponding klass/slots defn
-using uint_t = unsigned int; // no corresponding klass/slots defn
+typealias double_t = double;
+typealias  int_t =          int; // no corresponding klass/slots defn
+typealias uint_t = unsigned int; // no corresponding klass/slots defn
 
-using va_list_t = va_list; // no corresponding klass/slots defn
+typealias va_list_t = va_list; // no corresponding klass/slots defn
 
 // <cstdfloat>
-namespace std { using float32_t =  float; }
-namespace std { using float64_t =       double; }
-namespace std { using float128_t = long double; }
+namespace std { typealias float32_t =  float; }
+namespace std { typealias float64_t =       double; }
+namespace std { typealias float128_t = long double; }
 
 // symbols are defined before klasses
-namespace object       { using slots_t = struct slots_t;                 } using object_t =       object::slots_t*;
-namespace generic_func { using slots_t = FUNC (*)(object_t) -> object_t; } using generic_func_t = generic_func::slots_t;
-namespace str          { using slots_t = const char8_t*;                 } using str_t =          str::slots_t;
-namespace symbol       { using slots_t = str_t;                          } using symbol_t =       symbol::slots_t;
+namespace object       { typealias slots_t = struct slots_t;                 } typealias object_t =       object::slots_t*;
+namespace generic_func { typealias slots_t = FUNC (*)(object_t) -> object_t; } typealias generic_func_t = generic_func::slots_t;
+namespace str          { typealias slots_t = const char8_t*;                 } typealias str_t =          str::slots_t;
+namespace symbol       { typealias slots_t = str_t;                          } typealias symbol_t =       symbol::slots_t;
 
 static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");
 static_assert(64/8  == sizeof(std::float64_t),  "The sizeof std::float64-t  must equal  64/8 bytes in size");

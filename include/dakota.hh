@@ -199,12 +199,12 @@ extern object_t std_input  [[export]] [[read_only]];
 extern object_t std_output [[export]] [[read_only]];
 extern object_t std_error  [[export]] [[read_only]];
 
-using compare_t =               FUNC (*)(object_t, object_t) -> int_t; // comparitor
-using dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
-using dkt_selector_func_t =     FUNC (*)() -> selector_t*;        // rw
-using dkt_generic_func_func_t = FUNC (*)() -> generic_func_t*;    // rw
+typealias compare_t =               FUNC (*)(object_t, object_t) -> int_t; // comparitor
+typealias dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
+typealias dkt_selector_func_t =     FUNC (*)() -> selector_t*;        // rw
+typealias dkt_generic_func_func_t = FUNC (*)() -> generic_func_t*;    // rw
 
-namespace hash { using slots_t = size_t; } using hash_t = hash::slots_t;
+namespace hash { typealias slots_t = size_t; } typealias hash_t = hash::slots_t;
 
 constexpr FUNC dk_hash(str_t str) -> hash_t { // Daniel J. Bernstein
   return !*str ? cast(hash_t)5381 : cast(hash_t)(*str) ^ (cast(hash_t)33 * dk_hash(str + 1));

@@ -19,7 +19,7 @@ dkt_declare_klass_type_struct(named_info);
 dkt_declare_klass_type_struct(signature);
 dkt_declare_klass_type_struct(super);
 
-namespace method { using slots_t = FUNC (*)(object_t) -> object_t; }
-using method_t = method::slots_t;
+namespace method { typealias slots_t = FUNC (*)(object_t) -> object_t; }
+typealias method_t = method::slots_t;
 
 # endif

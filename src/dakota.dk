@@ -1506,7 +1506,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       //   object-t kls = dk-klass-for-name(klass-name);
       //   klass::traits-finalize(kls, traits);
       // }
-      using finalize-func-t = initialize-func-t;
+      typealias finalize-func-t = initialize-func-t;
       finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(klass-info, #finalize);
       if (nullptr != klass-finalize) {
         named-assoc-node-t named-node = { .name = klass-name, .node = nullptr };
