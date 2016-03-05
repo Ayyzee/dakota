@@ -24,6 +24,7 @@ namespace sorted_array {
 
   FUNC   create(ssize_t capacity, ssize_t size, std_compare_t compare) -> slots_t*;
 
+  FUNC   search(slots_t* t, const void* key) -> result_t;
   FUNC   sort(slots_t* t) -> slots_t*;
   FUNC   intern(slots_t* t, const void* key) -> const void*;
   FUNC   at(slots_t* t, ssize_t offset) -> const void*;
