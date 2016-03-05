@@ -22,17 +22,17 @@
 namespace sorted_array {
   struct slots_t;
 
-  FUNC   create(ssize_t capacity, ssize_t size, std_compare_t compare) -> slots_t*;
+  FUNC create(ssize_t capacity, ssize_t size, std_compare_t compare) -> slots_t*;
 
-  FUNC   search(slots_t* t, const void* key) -> result_t;
-  FUNC   sort(slots_t* t) -> slots_t*;
-  FUNC   intern(slots_t* t, const void* key) -> const void*;
-  FUNC   at(slots_t* t, ssize_t offset) -> const void*;
-  FUNC   remove_last(slots_t* t) -> const void*;
+  FUNC search(slots_t* t, const void* key) -> result_t;
+  FUNC sort(slots_t* t) -> slots_t*;
+  FUNC intern(slots_t* t, const void* key) -> const void*;
+  FUNC at(slots_t* t, ssize_t offset) -> const void*;
+  FUNC remove_last(slots_t* t) -> const void*;
 
-  FUNC   add(slots_t* t, const void* key) -> slots_t*;
-  FUNC   bsearch(slots_t* t, const void* key) -> const void*;
-  FUNC   remove_at(slots_t* t, const void* key, ssize_t offset) -> const void*;
-  FUNC   add_at(slots_t* t, const void* key, ssize_t offset) -> slots_t*;
+  FUNC add(slots_t* t, const void* key) -> slots_t*;
+  FUNC bsearch(slots_t* t, const void* key) -> const void*;
+  FUNC remove_at(slots_t* t, const void* key, ssize_t offset) -> const void*;
+  FUNC add_at(slots_t* t, const void* key, ssize_t offset) -> slots_t*;
 }
 # endif
