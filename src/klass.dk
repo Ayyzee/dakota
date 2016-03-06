@@ -58,6 +58,7 @@ klass named-info;
 klass no-such-method-exception;
 klass object-output-stream;
 klass property;
+klass result;
 klass selector-node;
 klass sorted-array;
 klass std-compare;
