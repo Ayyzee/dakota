@@ -93,6 +93,7 @@ my $root_cmd = { 'reps' => [],
             'compile',              # gcc-like
             'define-macro=s',       # gcc-like
             'directory=s',          # make-like
+            'dynamic',              # gcc-like
             'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)

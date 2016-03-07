@@ -105,6 +105,7 @@ my $dk_exe_type = undef;
 my $cxx_compile_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
 my $cxx_output_flags =  &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  '--output');
 my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',  '--shared');
+my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', '--dynamic');
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -657,8 +658,15 @@ sub start_cmd {
     }
     $cxx_shared_flags .= &for_linker($no_undefined_flags);
     $dk_exe_type = 'exe-type::k_lib';
+  } elsif ($$cmd_info{'opts'}{'dynamic'}) {
+    if ($$cmd_info{'opts'}{'soname'}) {
+      $cxx_shared_flags .= &for_linker([ $ld_soname_flags, $$cmd_info{'opts'}{'soname'} ]);
+      $cxx_shared_flags .= &for_linker($no_undefined_flags);
+    }
+    $dk_exe_type = 'exe-type::k_lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
-	   && !$$cmd_info{'opts'}{'shared'}) {
+	   && !$$cmd_info{'opts'}{'shared'}
+	   && !$$cmd_info{'opts'}{'dynamic'}) {
     $dk_exe_type = 'exe-type::k_exe';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
@@ -718,16 +726,18 @@ sub start_cmd {
         $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
         &o_from_cc($cmd_info);
       }
+    } elsif ($$cmd_info{'opts'}{'shared'}) {
+      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
+      &so_from_o($cmd_info);
+    } elsif ($$cmd_info{'opts'}{'dynamic'}) {
+      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
+      &dso_from_o($cmd_info);
+    } elsif (!$$cmd_info{'opts'}{'compile'} &&
+             !$$cmd_info{'opts'}{'shared'}  &&
+             !$$cmd_info{'opts'}{'dynamic'}) {
+      &exe_from_o($cmd_info);
     } else {
-      if ($$cmd_info{'opts'}{'shared'}) {
-        $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
-        &so_from_o($cmd_info);
-      } elsif (!$$cmd_info{'opts'}{'compile'} &&
-                 !$$cmd_info{'opts'}{'shared'}) {
-        &exe_from_o($cmd_info);
-      } else {
-        die __FILE__, ":", __LINE__, ": error:\n";
-      }
+      die __FILE__, ":", __LINE__, ": error:\n";
     }
   }
   return $exit_status;
@@ -1138,6 +1148,24 @@ sub so_from_o {
     &project_io_add($cmd_info, $inputs, $$cmd_info{'output'});
   }
   return $result;
+}
+sub dso_from_o {
+  my ($cmd_info) = @_;
+  my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
+  my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
+  my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
+  $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
+  $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
+  $$so_cmd{'output'} = $$cmd_info{'output'};
+  if ($should_replace_library_path_with_lib_opts) {
+    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
+  } else {
+    $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
+  }
+  &library_names_add_first($so_cmd);
+  my $should_echo;
+  &outfile_from_infiles($so_cmd, $should_echo = 0);
 }
 sub exe_from_o {
   my ($cmd_info) = @_;
