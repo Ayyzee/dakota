@@ -173,7 +173,7 @@ if (!exists $$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compi
 }
 $inputs = &clean_paths($inputs);
 
-if (1 >= scalar @$inputs) { # only the implied libdakota.so
+if (1 >= scalar @$inputs) { # only the implied libdakota-core.so
   if (1 >= scalar $$root_cmd{'project.inputs'}) {
     die "$0: error: inputs are requried either in the project file or the command line.\n";
   } else {
@@ -318,10 +318,10 @@ sub use_project {
     mkdir $$project{'objdir'}; # or try make_path in File::Path
   }
   if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
-    my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
-    if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota) {
-      &add_first($$root_cmd{'inputs'}, $libdakota);
-      &add_first($$project{'inputs'}, $libdakota);
+    my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
+    if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota_core) {
+      &add_first($$root_cmd{'inputs'}, $libdakota_core);
+      &add_first($$project{'inputs'}, $libdakota_core);
     }
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};

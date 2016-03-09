@@ -7,7 +7,7 @@
 
 {
   'inputs' => [
-    'libdakota.dk',
+    'libdakota-core.dk',
     'autorelease-pool.dk',
     'bit-vector.dk',
     'boole.dk',
@@ -83,6 +83,6 @@
   'libs' => [
     'libdl.so'
   ],
-  'objdir' => 'obj/libdakota',
-  'output' => '../lib/libdakota.so'
+  'objdir' => 'obj/libdakota-core',
+  'output' => '../lib/libdakota-core.so'
 }

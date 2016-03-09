@@ -5,9 +5,9 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 
-{ 'libdakota' => {
+{ 'libdakota-core' => {
     'inputs' => [ # cmd-line
-      '$(srcdir)/libdakota.dk',
+      '$(srcdir)/libdakota-core.dk',
       '$(srcdir)/autorelease-pool.dk',
       '$(srcdir)/bit-vector.dk',
       '$(srcdir)/boole.dk',
@@ -91,12 +91,12 @@
       'DKT_WORKAROUND',
       'HAVE_CONFIG_HH',
     ],
-    'project' => '$(srcdir)/libdakota.project', # cmd-line
-    'objdir' => 'obj/libdakota',
-    'output' => '$(blddir)/../lib/libdakota.$(so_ext)', # cmd-line
+    'project' => '$(srcdir)/libdakota-core.project', # cmd-line
+    'objdir' => 'obj/libdakota-core',
+    'output' => '$(blddir)/../lib/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line
-    'soname' => '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)', # cmd-line
+    'soname' => '$(DESTDIR)$(prefix)/lib/libdakota-core.$(so_ext)', # cmd-line
     'install' => {
       '-rules' => [
         '$(DESTDIR)$(prefix)/%', '$(srcdir)/../%',
@@ -121,7 +121,7 @@
         '$(DESTDIR)$(prefix)/lib/dakota/sst.pm',
         '$(DESTDIR)$(prefix)/lib/dakota/util.pm',
 
-        '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)',
+        '$(DESTDIR)$(prefix)/lib/libdakota-core.$(so_ext)',
 
         '$(DESTDIR)$(prefix)/include/dakota-decl.hh',
         '$(DESTDIR)$(prefix)/include/dakota-finally.hh',
