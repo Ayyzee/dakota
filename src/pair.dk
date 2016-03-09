@@ -34,8 +34,8 @@ klass pair {
   //   klass object-int64-pair { slots { object-t first; int64-t last; } }
   
   method init(object-t self,
-                       object-t first : null,
-                       object-t last :  null) -> object-t {
+              object-t first : null,
+              object-t last :  null) -> object-t {
     self = $init(super);
     self.first = first;
     self.last =  last;
