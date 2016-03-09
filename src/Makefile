@@ -4,17 +4,17 @@ include $(rootdir)/dakota.mk
 
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/dakota-catalog.mk $(srcdir)/dakota-catalog.build)
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/libdakota-core.mk $(srcdir)/libdakota-core.build)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/libdakota-util.mk $(srcdir)/libdakota-util.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/libdakota.mk      $(srcdir)/libdakota.build)
 
 # include-dirs
 dakota-catalog.include-dirs := $(patsubst %,--include-directory %,$(dakota-catalog.include-dirs))
 libdakota-core.include-dirs := $(patsubst %,--include-directory %,$(libdakota-core.include-dirs))
-libdakota-util.include-dirs := $(patsubst %,--include-directory %,$(libdakota-util.include-dirs))
+libdakota.include-dirs :=      $(patsubst %,--include-directory %,$(libdakota.include-dirs))
 
 # macros
 #dakota-catalog.macros :=
 libdakota-core.macros := $(patsubst %,--define-macro %,$(libdakota-core.macros))
-libdakota-util.macros := $(patsubst %,--define-macro %,$(libdakota-util.macros))
+libdakota.macros :=      $(patsubst %,--define-macro %,$(libdakota.macros))
 
 # should be generated
 install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
@@ -33,9 +33,9 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 
 projects:
 	$(rootdir)/bin/dakota-build2project libdakota-core.build libdakota-core libdakota-core.project
-	$(rootdir)/bin/dakota-build2project libdakota-util.build libdakota-util libdakota-util.project
+	$(rootdir)/bin/dakota-build2project libdakota.build libdakota libdakota.project
 
-$(libdakota-util.output): $(libdakota-core.output)
+$(libdakota.output): $(libdakota-core.output)
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
@@ -47,16 +47,16 @@ libdakota-core.single: $(libdakota-core.srcs)
   done
 	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project
 
-libdakota-util.single: $(libdakota-util.srcs)
-	set -o verbose; for src in $(libdakota-util.srcs); do\
+libdakota.single: $(libdakota.srcs)
+	set -o verbose; for src in $(libdakota.srcs); do\
     if [[ $$src =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-util.project $$src;\
+      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota.project $$src;\
     fi\
   done
-	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-util.project
+	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota.project
 
 check: all
-	$(dakota-catalog.output) --silent $(libdakota-core.output) $(libdakota-util.output)
+	$(dakota-catalog.output) --silent $(libdakota-core.output) $(libdakota.output)
 
 installcheck: check install
 	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
@@ -67,9 +67,9 @@ goal-clean:
 
 clean: goal-clean
 	$(DAKOTA-BASE) --clean --project libdakota-core.project
-	$(DAKOTA-BASE) --clean --project libdakota-util.project
+	$(DAKOTA-BASE) --clean --project libdakota.project
 	$(RM) $(RMFLAGS) libdakota-core.project.io
-	$(RM) $(RMFLAGS) libdakota-util.project.io
+	$(RM) $(RMFLAGS) libdakota.project.io
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-catalog.output)
 	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)

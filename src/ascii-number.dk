@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-util;
+module dakota;
 
 # include <cstdlib>
 # include <cstring>

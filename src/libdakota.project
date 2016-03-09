@@ -7,7 +7,7 @@
 
 {
   'inputs' => [
-    'libdakota-util.dk',
+    'libdakota.dk',
     'ascii-number-klass.dk',
     'ascii-number.dk',
     'dimension.dk',
@@ -33,6 +33,6 @@
     'xml-object-output-stream.dk'
   ],
   'libs' => [],
-  'objdir' => 'obj/libdakota-util',
-  'output' => '../lib/libdakota-util.so'
+  'objdir' => 'obj/libdakota',
+  'output' => '../lib/libdakota.so'
 }

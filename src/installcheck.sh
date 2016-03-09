@@ -19,7 +19,7 @@ cat /dev/null > installcheck-o.dk
 cat /dev/null > installcheck-util-o.dk
 set -o verbose
 $DEST$prefix/bin/dakota --compile installcheck-o.dk
-$DEST$prefix/bin/dakota --compile installcheck-util-o.dk $DEST$prefix/lib/libdakota-util.$so_ext
+$DEST$prefix/bin/dakota --compile installcheck-util-o.dk $DEST$prefix/lib/libdakota.$so_ext
 set +o verbose
 rm -f installcheck-o.dk installcheck-util-o.dk
 
@@ -30,7 +30,7 @@ cat /dev/null > installcheck-util-so.dk
 rm -f installcheck-so.so installcheck-util-so.so
 set -o verbose
 $DEST$prefix/bin/dakota --shared installcheck-so.dk
-$DEST$prefix/bin/dakota --shared installcheck-util-so.dk $DEST$prefix/lib/libdakota-util.$so_ext
+$DEST$prefix/bin/dakota --shared installcheck-util-so.dk $DEST$prefix/lib/libdakota.$so_ext
 $prefix/bin/dakota-catalog installcheck-so.so
 $prefix/bin/dakota-catalog installcheck-util-so.so
 set +o verbose
@@ -44,7 +44,7 @@ echo $src > installcheck-util.dk
 rm -f installcheck installcheck-util
 set -o verbose
 $DEST$prefix/bin/dakota installcheck.dk
-$DEST$prefix/bin/dakota installcheck-util.dk $DEST$prefix/lib/libdakota-util.$so_ext
+$DEST$prefix/bin/dakota installcheck-util.dk $DEST$prefix/lib/libdakota.$so_ext
 ./installcheck
 ./installcheck-util
 set +o verbose
