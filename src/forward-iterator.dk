@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota;
+module dakota-core;
 
 trait forward-iterator {
   method next(object-t self) -> object-t; // returns nullptr on end

@@ -1,7 +1,7 @@
 # include <cinttypes>
 # include <cstdint>
 
-module dakota;
+module dakota-core;
 
 klass number;
 

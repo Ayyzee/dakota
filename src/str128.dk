@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota;
+module dakota-core;
 
 klass str128 {
   slots char8-t[128];
