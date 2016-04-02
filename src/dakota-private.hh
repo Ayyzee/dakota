@@ -71,6 +71,6 @@ KLASS_NS named_info { /*LOCAL*/ METHOD compare(slots_t**, slots_t**) -> int_t; }
 [[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;
 [[noreturn]] FUNC pre_runtime_verbose_unexpected() noexcept -> void;
 
-inline boole_t root_superklass3f(object_t object) { if (nullptr == object || null == object) return true; else return false; }
+inline FUNC root_superklass3f(object_t object) -> boole_t { if (nullptr == object || null == object) return true; else return false; } // root-superklass?()
 
 # endif // dkt_dakota_private_hh

@@ -14,7 +14,7 @@
 __BEGIN_DECLS
 # ifndef HAVE_GETPROGNAME
 # ifdef HAVE_PROCFS
-const char8_t* getprogname();
+FUNC getprogname() -> const char8_t*;
 # endif // HAVE_PROCFS
 # endif // HAVE_GETPROGNAME
 __END_DECLS

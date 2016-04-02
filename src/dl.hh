@@ -17,7 +17,7 @@
 # if !defined dkt_dl_hh
 # define      dkt_dl_hh
 
-str_t symbol_name_from_address(void*);
-void load_library(str_t);
+FUNC symbol_name_from_address(void*) -> str_t;
+FUNC load_library(str_t) -> void;
 
 # endif // dkt_dl_hh
