@@ -1,8 +1,8 @@
 #!/bin/bash
 
-paths=$(echo obj/*.cc)
+paths=$(echo obj/*/-user/*.cc)
 for ccfile in $paths; do
-    base=$(basename $ccfile .cc)
+    base=$(basename $ccfile .dk.cc)
     dkfile="$base.dk"
     dkfile_lines=($(wc -l $dkfile))
     ccfile_lines=($(wc -l $ccfile))
