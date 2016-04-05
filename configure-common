@@ -22,11 +22,11 @@ compiler=$2
 
 source $DIR/config-$sysname.sh
 
-$LN $LNFLAGS $DIR/config-$sysname.mk config.mk
-$LN $LNFLAGS $DIR/config-$sysname.sh config.sh
+$LN $LNFLAGS config-$sysname.mk config.mk
+$LN $LNFLAGS config-$sysname.sh config.sh
 
 pushd src > /dev/null 2>&1
-$LN $LNFLAGS $DIR/src/config-$sysname.hh config.hh
+$LN $LNFLAGS config-$sysname.hh config.hh
 popd > /dev/null 2>&1
 
 canon_compiler=$(compiler $compiler)
