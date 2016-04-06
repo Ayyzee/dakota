@@ -218,4 +218,16 @@ klass string {
     $print(out, $str(self));
     return self;
   }
+  method println(object-t self, object-t out) -> object-t {
+    if (nullptr == out || null == out)
+      out = std-output;
+    $println(out, $str(self));
+    return self;
+  }
+  method print(object-t self) -> object-t {
+    return $print(self, null);
+  }
+  method println(object-t self) -> object-t {
+    return $println(self, null);
+  }
 }
