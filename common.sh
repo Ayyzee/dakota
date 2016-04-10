@@ -1,24 +1,38 @@
 #!/bin/bash
 set -o nounset -o pipefail
 
+at() {
+    keys=("${!1}")
+    vals=("${!2}")
+    key=$3
+    for (( i=0; i < ${#keys[@]}; i++ )); do
+        if [[ $key == "${keys[$i]}" ]]; then
+            echo "${vals[$i]}"
+            return 0
+        fi
+    done
+    echo "$0: error: could not find value for key '$key'" 1>&2
+    return 1
+}
+os_names[0]="linux";          os_names[1]="darwin"
+os_regexs[0]=".*(L|l)inux.*"; os_regexs[1]=".*(D|d)arwin.*"
+
 platform() {
     sysname=
-    os_type_linux_regex=".*(L|l)inux.*"
-    os_type_darwin_regex=".*(D|d)arwin.*"
 
     # sysname: first try env var OSTYPE
-    if   [[ -n "${OSTYPE-}" && $OSTYPE =~ $os_type_linux_regex ]]; then
-        sysname=linux
-    elif [[ -n "${OSTYPE-}" && $OSTYPE =~ $os_type_darwin_regex ]]; then
-        sysname=darwin
-    fi
+    for name in ${os_names[@]}; do
+        regex=$(at os_names[@] os_regexs[@] $name)
+        if [[ -n "${OSTYPE-}" && $OSTYPE =~ $regex ]]; then
+            sysname=$name
+        fi
+    done
     # sysname: second try uname cmd
     if [[ -z "${sysname-}" && $(type uname) ]]; then
         name=$(uname -s)
-        if   [[ $name =~ $os_type_linux_regex ]]; then
-            sysname=linux
-        elif [[ $name =~ $os_type_darwin_regex ]]; then
-            sysname=darwin
+        regex=$(at os_names[@] os_regexs[@] $name)
+        if   [[ $name =~ $regex ]]; then
+            sysname=$name
         fi
     fi
    echo $sysname
