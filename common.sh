@@ -18,54 +18,58 @@ os_names[0]="linux";          os_names[1]="darwin"
 os_regexs[0]=".*(L|l)inux.*"; os_regexs[1]=".*(D|d)arwin.*"
 
 platform() {
-    sysname=
-
     # sysname: first try env var OSTYPE
     for name in ${os_names[@]}; do
         regex=$(at os_names[@] os_regexs[@] $name)
         if [[ -n "${OSTYPE-}" && $OSTYPE =~ $regex ]]; then
-            sysname=$name
+            echo $name
+            return 0
         fi
     done
     # sysname: second try uname cmd
     if [[ -z "${sysname-}" && $(type uname) ]]; then
         name=$(uname -s)
         regex=$(at os_names[@] os_regexs[@] $name)
-        if   [[ $name =~ $regex ]]; then
-            sysname=$name
+        if [[ $name =~ $regex ]]; then
+            echo $name
+            return 0
         fi
     fi
-   echo $sysname
+    return 1
 }
+compiler_names[0]="clang";              compiler_names[1]="gcc"
+compiler_regexs[0]=".*clang\+\+.*";     compiler_regexs[1]=".*g\+\+.*"
+compiler_globs[0]="/usr/bin/*clang++*"; compiler_globs[1]="/usr/bin/*g++*"
+
 compiler() {
     if (( 0 < $# )); then
         CXX=$1
     fi
-    compiler=
-    compiler_clangxx_regex=".*clang\+\+.*"
-    compiler_gxx_regex=".*g\+\+.*"
 
     # compiler: first try env var CXX
-    if   [[ -n "${CXX-}" && $CXX =~ $compiler_clangxx_regex ]]; then
-        compiler=clang
-    elif [[ -n "${CXX-}" && $CXX =~ $compiler_gxx_regex ]]; then
-        compiler=gcc
-    elif [[ -n "${CXX-}" ]]; then
-        compiler=$CXX
-    fi
+    for name in ${compiler_names[@]}; do
+        regex=$(at compiler_names[@] compiler_regexs[@] $name)
+        if [[ -n "${CXX-}" && $CXX =~ $regex ]]; then
+            echo $name
+            return 0
+        elif [[ -n "${CXX-}" ]]; then
+            echo $CXX
+            return 0
+        fi
+    done
+
     # compiler: second try common dirs
     if [[ -z "${compiler-}" ]]; then
-        clangxx_glob="/usr/bin/*clang++*"
-        gxx_glob="/usr/bin/*g++*"
-        clangxx=$(echo $clangxx_glob)
-        gxx=$(echo $gxx_glob)
-        if   [[ "$clangxx" != "$clangxx_glob" ]]; then
-            compiler=clang
-        elif [[ "$gxx"     != "$gxx_glob" ]]; then
-            compiler=gcc
-        fi
+        for name in ${compiler_names[@]}; do
+            glob=$(at compiler_names[@] compiler_globs[@] $name)
+            match=$(echo $glob)
+            if [[ "$match" != "$glob" ]]; then
+                echo $name
+                return 0
+            fi
+        done
     fi
-    echo $compiler
+    return 1
 }
 
 CP=cp
