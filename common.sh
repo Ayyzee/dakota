@@ -18,7 +18,7 @@ os_names[0]="linux";          os_names[1]="darwin"
 os_regexs[0]=".*(L|l)inux.*"; os_regexs[1]=".*(D|d)arwin.*"
 
 platform() {
-    # sysname: first try env var OSTYPE
+    # first try env var OSTYPE
     for name in ${os_names[@]}; do
         regex=$(at os_names[@] os_regexs[@] $name)
         if [[ -n "${OSTYPE-}" && $OSTYPE =~ $regex ]]; then
@@ -26,8 +26,8 @@ platform() {
             return 0
         fi
     done
-    # sysname: second try uname cmd
-    if [[ -z "${sysname-}" && $(type uname) ]]; then
+    # second try uname cmd
+    if [[ $(type uname) ]]; then
         name=$(uname -s)
         regex=$(at os_names[@] os_regexs[@] $name)
         if [[ $name =~ $regex ]]; then
@@ -35,6 +35,7 @@ platform() {
             return 0
         fi
     fi
+    echo "$0: error: could not determine platform" 1>&2
     return 1
 }
 compiler_names[0]="clang";              compiler_names[1]="gcc"
@@ -46,7 +47,7 @@ compiler() {
         CXX=$1
     fi
 
-    # compiler: first try env var CXX
+    # first try env var CXX
     for name in ${compiler_names[@]}; do
         regex=$(at compiler_names[@] compiler_regexs[@] $name)
         if [[ -n "${CXX-}" && $CXX =~ $regex ]]; then
@@ -58,7 +59,7 @@ compiler() {
         fi
     done
 
-    # compiler: second try common dirs
+    # second try common dirs
     if [[ -z "${compiler-}" ]]; then
         for name in ${compiler_names[@]}; do
             glob=$(at compiler_names[@] compiler_globs[@] $name)
@@ -69,6 +70,7 @@ compiler() {
             fi
         done
     fi
+    echo "$0: error: could not determine compiler" 1>&2
     return 1
 }
 
