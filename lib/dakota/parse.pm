@@ -526,10 +526,11 @@ sub add_generic {
 }
 sub add_symbol_ident {
   my ($file, $ident) = @_;
-  if ($ident !~ m/^#/) {
+  $ident =~ s/^#//;
+  if (&is_symbol_candidate($ident)) {
     $ident = '#' . $ident;
+    $$file{'symbols'}{$ident} = undef;
   }
-  $$file{'symbols'}{$ident} = undef;
 }
 sub add_symbol {
   my ($file, $symbol) = @_;
@@ -2398,11 +2399,11 @@ sub rep_tree_from_dk_path {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/(?<!\bcase)\s*\#($mid)/g) {
+  while (m/(?<!\bcase)\s*\#([\w-]+\??)/g) {
     &add_symbol($gbl_root, [$1]);
   }
   pos $_ = 0;
-  while (m|(\#[\w./:-]+)|g) {
+  while (m|(\#[\w-]+\??)|g) {
     &add_symbol($gbl_root, [$1]);
   }
   &decode_comments(\$_, $parts);

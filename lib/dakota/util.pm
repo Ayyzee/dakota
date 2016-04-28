@@ -254,7 +254,7 @@ sub is_debug {
 }
 sub is_symbol_candidate {
   my ($str) = @_;
-  if ($str =~ m|^[\w./:-]+$|) {
+  if ($str =~ m/^[\w-]+\??$/) {
     return 1;
   } else {
     return 0;

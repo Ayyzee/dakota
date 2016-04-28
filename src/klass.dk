@@ -586,8 +586,8 @@ klass klass {
       named-info-t* trait-info = info-for-name(trait-name);
       add-traits(self, cast(const symbol-t*)named-info::at(trait-info, #traits));
       boole-t override?;
-      add-methods(self, trait-info, #method.signatures, #method.addresses, override? = false);
-      add-methods(self, trait-info, #exported-method.signatures, #exported-method.addresses, override? = false);
+      add-methods(self, trait-info, #method-signatures, #method-addresses, override? = false);
+      add-methods(self, trait-info, #exported-method-signatures, #exported-method-addresses, override? = false);
     }
     return;
   }
@@ -727,8 +727,8 @@ klass klass {
     alloc-methods(self, selector-count());
     init-methods(self);
     boole-t override?;
-    add-methods(self, self.info, #method.signatures, #method.addresses, override? = true);
-    add-methods(self, self.info, #exported-method.signatures, #exported-method.addresses, override? = true);
+    add-methods(self, self.info, #method-signatures, #method-addresses, override? = true);
+    add-methods(self, self.info, #exported-method-signatures, #exported-method-addresses, override? = true);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info, #method-aliases);
     if (nullptr != method-aliases) {
       ssize-t i = 0;

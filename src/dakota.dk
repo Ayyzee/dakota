@@ -340,10 +340,10 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(ssize-t)#klass);
       if (#klass == type)
         klasses-count++;
-      const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method.signatures);
+      const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method-signatures);
 
       if (nullptr != method-signatures) {
-        const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method.addresses);
+        const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method-addresses);
         if (nullptr != method-addresses) {
           int64-t j = 0;
           const signature-t* method-signature;
@@ -387,12 +387,12 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
       if (nullptr != superklass-name)
         ostream::println-format(ostrm, "'superklass' : '%s',\n", superklass-name);
       
-      const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method.signatures);
+      const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method-signatures);
       if (nullptr != method-signatures) {
         ostream::println-format(ostrm, "'methods' :\n");
         ostream::println-format(ostrm, "{\n");
         ostream::col-incr(ostrm);
-        const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method.addresses);
+        const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method-addresses);
         int64-t j = 0;
         const signature-t* method-signature;
         
@@ -473,10 +473,10 @@ static func each(named-info-t* root-info-list, named-info-func-t func, each-box-
   return;
 }
 static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str.ptrs);
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #str-ptrs);
   if (assocs) {
-    symbol-t* names =    cast(decltype(names))   named-info::at(info, #str.names);
-    str-t*    literals = cast(decltype(literals))named-info::at(info, #str.literals);
+    symbol-t* names =    cast(decltype(names))   named-info::at(info, #str-names);
+    str-t*    literals = cast(decltype(literals))named-info::at(info, #str-literals);
     assert(nullptr != literals);
     int64-t i = 0;
     while (1) {
@@ -497,10 +497,10 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
   return;
 }
 static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
-  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int.ptrs);
+  assoc-node-t* assocs = cast(assoc-node-t*)named-info::at(info, #int-ptrs);
   if (assocs) {
-    symbol-t*  names =    cast(decltype(names))   named-info::at(info, #int.names);
-    intmax-t*  literals = cast(decltype(literals))named-info::at(info, #int.literals);
+    symbol-t*  names =    cast(decltype(names))   named-info::at(info, #int-names);
+    intmax-t*  literals = cast(decltype(literals))named-info::at(info, #int-literals);
     assert(nullptr != literals);
     int64-t i = 0;
     while (1) {
@@ -526,8 +526,8 @@ static func named-info-to-registration-info(named-info-t* ni, registration-info-
     .dir =                    cast(decltype(ri->dir))                    named-info::at(ni, #dir),
     .generic-func-ptrs =      cast(decltype(ri->generic-func-ptrs))      named-info::at(ni, #generic-func-ptrs),
     .get-segment-data =       cast(decltype(ri->get-segment-data))       named-info::at(ni, #get-segment-data),
-    .imported-klass-names =   cast(decltype(ri->imported-klass-names))   named-info::at(ni, #imported-klass.names),
-    .imported-klass-ptrs =    cast(decltype(ri->imported-klass-ptrs))    named-info::at(ni, #imported-klass.ptrs),
+    .imported-klass-names =   cast(decltype(ri->imported-klass-names))   named-info::at(ni, #imported-klass-names),
+    .imported-klass-ptrs =    cast(decltype(ri->imported-klass-ptrs))    named-info::at(ni, #imported-klass-ptrs),
     .interposers =            cast(decltype(ri->interposers))            named-info::at(ni, #interposers),
     .klass-defns =            cast(decltype(ri->klass-defns))            named-info::at(ni, #klass-defns),
     .name =                   cast(decltype(ri->name))                   named-info::at(ni, #name),
@@ -892,13 +892,13 @@ static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* 
     .traits =                           cast(decltype(ci->traits))                            named-info::at(ni, #traits),
     .requires =                         cast(decltype(ci->requires))                          named-info::at(ni, #requires),
     .provides =                         cast(decltype(ci->provides))                          named-info::at(ni, #provides),
-    .method-signatures =                cast(decltype(ci->method-signatures))                 named-info::at(ni, #method.signatures),
+    .method-signatures =                cast(decltype(ci->method-signatures))                 named-info::at(ni, #method-signatures),
     .kw-args-method-signatures =        cast(decltype(ci->kw-args-method-signatures))         named-info::at(ni, #kw-args-method-signatures),
-    .exported-method-signatures =       cast(decltype(ci->exported-method-signatures))        named-info::at(ni, #exported-method.signatures),
-    .exported-slots-method-signatures = cast(decltype(ci->exported-slots-method-signatures))  named-info::at(ni, #exported-slots-method.signatures),
-    .slots-method-signatures =          cast(decltype(ci->slots-method-signatures))           named-info::at(ni, #slots-method.signatures),
-  //.va-method-signatures =             cast(decltype(ci->va-method-signatures))              named-info::at(ni, #va-method.signatures),
-  //.va-slots-method-signatures =       cast(decltype(ci->va-slots-method-signatures))        named-info::at(ni, #va-slots-method.signatures),
+    .exported-method-signatures =       cast(decltype(ci->exported-method-signatures))        named-info::at(ni, #exported-method-signatures),
+    .exported-slots-method-signatures = cast(decltype(ci->exported-slots-method-signatures))  named-info::at(ni, #exported-slots-method-signatures),
+    .slots-method-signatures =          cast(decltype(ci->slots-method-signatures))           named-info::at(ni, #slots-method-signatures),
+  //.va-method-signatures =             cast(decltype(ci->va-method-signatures))              named-info::at(ni, #va-method-signatures),
+  //.va-slots-method-signatures =       cast(decltype(ci->va-slots-method-signatures))        named-info::at(ni, #va-slots-method-signatures),
     .enum-info =                        cast(decltype(ci->enum-info))                         named-info::at(ni, #enum-info),
     .const-info =                       cast(decltype(ci->const-info))                        named-info::at(ni, #const-info),
     .slots-type =                       cast(decltype(ci->slots-type))                        named-info::at(ni, #slots-type),

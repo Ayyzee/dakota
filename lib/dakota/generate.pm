@@ -532,8 +532,8 @@ sub generate_defn_footer {
                   "\#file" => '__FILE__',
                   "\#generic-func-ptrs" => 'generic-func-ptrs',
                   "\#get-segment-data" => 'dkt-get-segment-data',
-                  "\#imported-klass.names" => 'imported-klass-names',
-                  "\#imported-klass.ptrs" =>  'imported-klass-ptrs',
+                  "\#imported-klass-names" => 'imported-klass-names',
+                  "\#imported-klass-ptrs" =>  'imported-klass-ptrs',
                   "\#interposers" => 'interposers',
                   "\#klass-defns" => 'klass-defns',
                   "\#name" => 'name',
@@ -545,14 +545,14 @@ sub generate_defn_footer {
                   "\#va-signatures" => 'va-signatures',
                  };
   if (0 < scalar keys %{$$file{'literal-strs'}}) {
-    $$info_tbl{"\#str.literals"} = '__str-literals';
-    $$info_tbl{"\#str.names"} =    '__str-names';
-    $$info_tbl{"\#str.ptrs"} =     '__str-ptrs';
+    $$info_tbl{"\#str-literals"} = '__str-literals';
+    $$info_tbl{"\#str-names"} =    '__str-names';
+    $$info_tbl{"\#str-ptrs"} =     '__str-ptrs';
   }
   if (0 < scalar keys %{$$file{'literal-ints'}}) {
-    $$info_tbl{"\#int.literals"} = '__int-literals';
-    $$info_tbl{"\#int.names"} =    '__int-names';
-    $$info_tbl{"\#int.ptrs"} =     '__int-ptrs';
+    $$info_tbl{"\#int-literals"} = '__int-literals';
+    $$info_tbl{"\#int-names"} =    '__int-names';
+    $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
   }
   $rt_cc_str .= $nl;
   $rt_cc_str .= "# include <unistd.h>" . $nl;
@@ -2055,7 +2055,12 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern symbol-t __klass__; }" . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_rt_defn()) {
     #$$scratch_str_ref .= $col . "symbol-t __type__ = \$$klass_type;" . $nl;
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = \#@$klass_path; }" . &ann(__FILE__, __LINE__) . $nl;
+    my $path = "@$klass_path";
+    if (&is_symbol_candidate($path)) {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = \#$path; }" . &ann(__FILE__, __LINE__) . $nl;
+    } else {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = dk-intern(\"$path\"); }" . &ann(__FILE__, __LINE__) . $nl;
+    }
   }
 
   if ('trait' eq $klass_type) {
@@ -3400,7 +3405,7 @@ sub dk_generate_cc_footer_klass {
     if (&is_symbol_candidate($type_symbol)) {
       $$tbbl{'#slots-type'} = "\#$type_symbol";
     } else {
-      $$tbbl{'#slots-type'} = "\"$type_symbol\"";
+      $$tbbl{'#slots-type'} = "dk-intern(\"$type_symbol\")";
     }
     my $tp = 'slots-t';
    #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
@@ -3426,23 +3431,23 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#kw-args-method-signatures'} = '__kw-args-method-signatures';
   }
   if (values %{$$klass_scope{'methods'}}) {
-    $$tbbl{'#method.signatures'} = '__method-signatures';
-    $$tbbl{'#method.addresses'} =  '__method-addresses';
+    $$tbbl{'#method-signatures'} = '__method-signatures';
+    $$tbbl{'#method-addresses'} =  '__method-addresses';
   }
   if ($num_method_aliases) {
     $$tbbl{'#method-aliases'} = '&__method-aliases';
   }
   if (values %{$exported_methods ||= []}) {
-    $$tbbl{'#exported-method.signatures'} = '__exported-method-signatures';
-    $$tbbl{'#exported-method.addresses'} =  '__exported-method-addresses';
+    $$tbbl{'#exported-method-signatures'} = '__exported-method-signatures';
+    $$tbbl{'#exported-method-addresses'} =  '__exported-method-addresses';
   }
   if (values %{$exported_slots_methods ||= []}) {
-    $$tbbl{'#exported-slots-method.signatures'} = '__exported-slots-method-signatures';
-    $$tbbl{'#exported-slots-method.addresses'} =  '__exported-slots-method-addresses';
+    $$tbbl{'#exported-slots-method-signatures'} = '__exported-slots-method-signatures';
+    $$tbbl{'#exported-slots-method-addresses'} =  '__exported-slots-method-addresses';
   }
   if (@$va_list_methods) {
-    $$tbbl{'#va-method.signatures'} =       '__va-method-signatures';
-    $$tbbl{'#var-args-method.addresses'} =  '__var-args-method-addresses';
+    $$tbbl{'#va-method-signatures'} =       '__va-method-signatures';
+    $$tbbl{'#var-args-method-addresses'} =  '__var-args-method-addresses';
   }
   $token_seq = $$klass_scope{'interpose'};
   if ($token_seq) {
@@ -3884,10 +3889,12 @@ sub add_symbol_to_ident_symbol {
   my ($file_symbols, $symbols, $symbol) = @_;
   if (defined $symbol) {
     $symbol =~ s/^#//;
-    my $ident_symbol = &dk_mangle($symbol);
-    $symbol = '#' . $symbol;
-    $$file_symbols{$symbol} = $ident_symbol;
-    $$symbols{$symbol} = $ident_symbol;
+    if (&is_symbol_candidate($symbol)) {
+      my $ident_symbol = &dk_mangle($symbol);
+      $symbol = '#' . $symbol;
+      $$file_symbols{$symbol} = $ident_symbol;
+      $$symbols{$symbol} = $ident_symbol;
+    }
   }
 }
 sub should_ann {

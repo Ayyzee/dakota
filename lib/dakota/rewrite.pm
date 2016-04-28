@@ -557,7 +557,7 @@ sub symbol {
 }
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=\#([\w\.:/-]+(\?|\!)?)=&symbol($1)=ge; # rnielsen
+  $$filestr_ref =~ s/\#([\w-]+\??)/&symbol($1)/ge;
 }
 sub literal_str {
   my ($string) = @_;
