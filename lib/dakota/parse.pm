@@ -78,7 +78,7 @@ sub json_path_from_o_path {
   return $out_path;
  }
 my $patterns = {
-  'user_cc_path_from_dk_path' => '$(objdir)/-user/%.dk.$(cc_ext) : %.dk',
+  'user_cc_path_from_dk_path' => '$(objdir)/-user/%.dk : %.dk',
 
   'o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
   'o_path_from_cc_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
