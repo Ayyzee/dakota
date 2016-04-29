@@ -39,6 +39,8 @@ export dakota-core {
   const-info;
   counted-set;
   deque;
+  each-box-func::slots-t;
+  each-box-func;
   enum-info::slots-t;
   enum-info;
   equal-predicate::slots-t;

@@ -96,7 +96,7 @@ klass assoc-node {
   }
 }
 klass named-assoc-node-compare {
-  slots (*)(named-assoc-node::slots-t*, named-assoc-node::slots-t*) -> int-t;
+  slots (*)(named-assoc-node-t*, named-assoc-node-t*) -> int-t;
 }
 klass named-assoc-node {
   slots {
@@ -456,7 +456,7 @@ func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klas
   return klass;
 }
 klass each-box-func   { slots (*)(...) -> object-t; }
-klass named-info-func { slots (*)(named-info-t*, each-box-func::slots-t) -> void; } // fixfix
+klass named-info-func { slots (*)(named-info-t*, each-box-func-t) -> void; }
 klass str-box-func    { slots (*)(str-t) -> object-t; }
 klass int-box-func    { slots (*)(intmax-t) -> object-t; }
 
