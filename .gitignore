@@ -1,6 +1,6 @@
 *~
-.DS_Store
 *.dSYM
+.DS_Store
 
 build
 build/Makefile
@@ -10,3 +10,11 @@ build/cmake_install.cmake
 build/bin/
 build/lib/
 build/src/
+
+config.mk
+config.sh
+lib/dakota/compiler
+lib/dakota/platform.json
+src/config.hh
+src/obj
+src/strerror-name.tbl
