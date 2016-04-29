@@ -20,7 +20,7 @@ module dakota-core;
 # include <cerrno>
 # include <cstring>
 
-# include "dakota-private.hh"
+# include "dakota-private.kt"
 
 klass output-stream;
 klass str128;

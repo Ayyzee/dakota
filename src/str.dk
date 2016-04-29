@@ -16,8 +16,8 @@
 
 module dakota-core;
 
-# include "dakota-safe-str.hh"
-# include "dakota-private.hh"
+# include "dakota-safe-str.kt"
+# include "dakota-private.kt"
 
 klass char8;
 klass hash;

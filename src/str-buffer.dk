@@ -20,8 +20,8 @@ module dakota;
 # include <cinttypes>
 # include <cstring>
 
-# include "dakota-safe-str.hh"
-# include "dakota-private.hh"
+# include "dakota-safe-str.kt"
+# include "dakota-private.kt"
 
 // same code as in klass string (badbad)
 klass object-output-stream;

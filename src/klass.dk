@@ -25,12 +25,11 @@ module dakota-core;
   # include "config.hh"
 # endif
 
-# include "dakota-safe-str.hh"
-# include "dakota-log.hh"
-# include "dakota-private.hh"
-# include "dakota-rt-private.hh"
-# include "dl.hh" // symbol-name-from-address()
-# include "sorted-array.hh"
+# include "dakota-safe-str.kt"
+# include "dakota-private.kt"
+# include "dakota-rt-private.kt"
+# include "dl.kt" // symbol-name-from-address()
+# include "sorted-array.kt"
 
 # if 0
 

@@ -18,7 +18,7 @@ module dakota-core;
 
 # include <cstring>
 
-# include "dakota-private.hh"
+# include "dakota-private.kt"
 
 klass property-compare {
   slots (*)(property-t*, property-t*) -> int-t;

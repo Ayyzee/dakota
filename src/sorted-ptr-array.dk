@@ -20,7 +20,7 @@ module dakota-core;
 # include <cstdlib>
 # include <cstring>
 
-# include "sorted-ptr-array.hh"
+# include "sorted-ptr-array.kt"
 
 klass result;
 klass std-compare;

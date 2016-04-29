@@ -10,6 +10,8 @@
     'libdakota.dk',
     'ascii-number-klass.dk',
     'ascii-number.dk',
+    'dakota-private.kt',
+    'dakota-safe-str.kt',
     'dimension.dk',
     'float.dk',
     'hashed-counted-set.dk',

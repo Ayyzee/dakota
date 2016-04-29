@@ -21,8 +21,8 @@ module dakota-core;
 # include <cstdlib>
 # include <cstring>
 
-# include "dakota-safe-str.hh"
-# include "dakota-private.hh"
+# include "dakota-safe-str.kt"
+# include "dakota-private.kt"
 
 // 2^32 - 5 = 4294967291 or 0xfffffffb
 // const size-t max-prime32 = 0xfffffffb;

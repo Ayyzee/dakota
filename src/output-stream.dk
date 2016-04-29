@@ -25,8 +25,8 @@ module dakota-core;
   # include "config.hh"
 # endif
 
-# include "dakota-safe-str.hh"
-# include "dakota-private.hh"
+# include "dakota-safe-str.kt"
+# include "dakota-private.kt"
 
 klass ptr;
 klass stream;
