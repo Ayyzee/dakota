@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_named_info_hh
-# define      dkt_named_info_hh
+# if !defined dkt-named-info-hh
+# define      dkt-named-info-hh
 
 # include "dakota.hh"
 
-namespace named_info {
-  /*method*/ METHOD compare(slots_t*  s, slots_t*  other_s) -> int_t;
-             FUNC   compare(slots_t** s, slots_t** other_s) -> int_t;
-  /*method*/ METHOD compare(object_t self, object_t other) -> int_t;
+klass named-info {
+  method compare(object-t self, object-t other) -> int-t;
+  method compare(slots-t*  s, slots-t*  other-s) -> int-t;
+  func   compare(slots-t** s, slots-t** other-s) -> int-t;
 }
 # endif

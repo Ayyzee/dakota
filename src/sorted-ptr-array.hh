@@ -14,25 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_sorted_ptr_array_hh
-# define      dkt_sorted_ptr_array_hh
+# if !defined dkt-sorted-ptr-array-hh
+# define      dkt-sorted-ptr-array-hh
 
 # include "dakota.hh"
 
-namespace sorted_ptr_array {
-  struct slots_t;
+klass sorted-ptr-array {
+  func   create(ssize-t capacity, ssize-t size, std-compare-t compare) -> slots-t*;
 
-  FUNC create(ssize_t capacity, ssize_t size, std_compare_t compare) -> slots_t*;
+  method search(slots-t* t, const void* key) -> result-t;
+  method sort(slots-t* t) -> slots-t*;
+  method intern(slots-t* t, const void* key) -> const void*;
+  method at(slots-t* t, ssize-t offset) -> const void*;
+  method remove-last(slots-t* t) -> const void*;
 
-  FUNC search(slots_t* t, const void* key) -> result_t;
-  FUNC sort(slots_t* t) -> slots_t*;
-  FUNC intern(slots_t* t, const void* key) -> const void*;
-  FUNC at(slots_t* t, ssize_t offset) -> const void*;
-  FUNC remove_last(slots_t* t) -> const void*;
-
-  FUNC add(slots_t* t, const void* key) -> slots_t*;
-  FUNC bsearch(slots_t* t, const void* key) -> const void*;
-  FUNC remove_at(slots_t* t, const void* key, ssize_t offset) -> const void*;
-  FUNC add_at(slots_t* t, const void* key, ssize_t offset) -> slots_t*;
+  method add(slots-t* t, const void* key) -> slots-t*;
+  method bsearch(slots-t* t, const void* key) -> const void*;
+  method remove-at(slots-t* t, const void* key, ssize-t offset) -> const void*;
+  method add-at(slots-t* t, const void* key, ssize-t offset) -> slots-t*;
 }
 # endif
