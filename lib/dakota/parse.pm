@@ -526,11 +526,9 @@ sub add_generic {
 }
 sub add_symbol_ident {
   my ($file, $ident) = @_;
-  $ident =~ s/^#//;
-  if (&is_symbol_candidate($ident)) {
-    $ident = '#' . $ident;
-    $$file{'symbols'}{$ident} = undef;
-  }
+  $ident = &as_literal_symbol_interior($ident);
+  $ident = &as_literal_symbol($ident);
+  $$file{'symbols'}{$ident} = undef;
 }
 sub add_symbol {
   my ($file, $symbol) = @_;
@@ -815,9 +813,7 @@ sub slots_seq {
       my $arg_type = &arg::type($type);
       my $slot_info = { 'name' => $name,
                         'type' => $arg_type };
-      if (&is_symbol_candidate($arg_type)) {
-        &add_symbol_ident($gbl_root, $arg_type);
-      }
+      &add_symbol_ident($gbl_root, $arg_type);
       if (scalar @$expr) {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
@@ -916,9 +912,7 @@ sub slots {
   if (@$type) {
     &add_type($type);
     my $arg_type = &arg::type($type);
-    if (&is_symbol_candidate($arg_type)) {
-      &add_symbol_ident($gbl_root, $arg_type);
-    }
+    &add_symbol_ident($gbl_root, $arg_type);
     $$gbl_current_scope{'slots'}{'type'} = $arg_type;
   } else {
     $$gbl_current_scope{'slots'}{'cat'} = $cat;
@@ -2137,7 +2131,7 @@ sub generics::parse {
     }
     foreach my $arg (@{$$generic{'keyword-types'} ||= []}) {
       &add_type([$arg]);
-      &add_symbol($gbl_root, ['#' . $$arg{'name'}]);
+      &add_symbol($gbl_root, [$$arg{'name'}]);
     }
   }
   my $sorted_generics_seq = [sort method::compare @$generics_seq];
@@ -2399,12 +2393,13 @@ sub rep_tree_from_dk_path {
     &add_hash($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/(?<!\bcase)\s*\#([\w-]+\??)/g) {
-    &add_symbol($gbl_root, [$1]);
+  while (m/(?<!\bcase)\s*(#$bid|#\|.+?\|)/g) {
+    # should this be &add_hash() ???
+    &add_symbol($gbl_root, [&as_literal_symbol_interior($1)]);
   }
   pos $_ = 0;
-  while (m|(\#[\w-]+\??)|g) {
-    &add_symbol($gbl_root, [$1]);
+  while (m/(#$bid|#\|.+?\|)/g) {
+    &add_symbol($gbl_root, [&as_literal_symbol_interior($1)]);
   }
   &decode_comments(\$_, $parts);
   &decode_strings(\$_);

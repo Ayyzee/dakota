@@ -557,7 +557,8 @@ sub symbol {
 }
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/\#([\w-]+\??)/&symbol($1)/ge;
+  $$filestr_ref =~ s/\#($bid)/&symbol($1)/ge;
+  $$filestr_ref =~ s/\#\|(.+?)\|/&symbol($1)/ge;
 }
 sub literal_str {
   my ($string) = @_;
@@ -1028,7 +1029,7 @@ sub convert_dk_to_cc {
   &rewrite_switch($filestr_ref);
 
   &rewrite_objects($filestr_ref); # must be before line removing leading #
-  $$filestr_ref =~ s/\#([\w:-]+(\?|\!)?\s+$colon)/$1/g; # just remove leading #, rnielsen
+  $$filestr_ref =~ s/\#($bid\s+$colon)/$1/g; # just remove leading #, rnielsen
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);
 

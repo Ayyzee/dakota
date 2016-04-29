@@ -2055,12 +2055,8 @@ sub linkage_unit::generate_klasses_body {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern symbol-t __klass__; }" . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_rt_defn()) {
     #$$scratch_str_ref .= $col . "symbol-t __type__ = \$$klass_type;" . $nl;
-    my $path = "@$klass_path";
-    if (&is_symbol_candidate($path)) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = \#$path; }" . &ann(__FILE__, __LINE__) . $nl;
-    } else {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = dk-intern(\"$path\"); }" . &ann(__FILE__, __LINE__) . $nl;
-    }
+    my $literal_symbol = &as_literal_symbol("@$klass_path");
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = $literal_symbol; }" . &ann(__FILE__, __LINE__) . $nl;
   }
 
   if ('trait' eq $klass_type) {
@@ -3318,11 +3314,7 @@ sub dk_generate_cc_footer_klass {
           $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
         }
         $$tbl{'#size'} = "sizeof(slots-t::$$slot_info{'name'})";
-        if (&is_symbol_candidate($$slot_info{'type'})) {
-          $$tbl{'#type'} = "\#$$slot_info{'type'}";
-        } else {
-          $$tbl{'#type'} = "dk-intern(\"$$slot_info{'type'}\")";
-        }
+        $$tbl{'#type'} = &as_literal_symbol($$slot_info{'type'});
         my $tp = 'decltype((cast(slots-t*)0)->' . $$slot_info{'name'} . ')';
        #$$tbl{'#typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
         $$tbl{'#typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
@@ -3401,12 +3393,7 @@ sub dk_generate_cc_footer_klass {
 
   if (&has_slots_type($klass_scope)) {
     my $slots_type_ident = &dk_mangle($$klass_scope{'slots'}{'type'});
-    my $type_symbol = $$klass_scope{'slots'}{'type'};
-    if (&is_symbol_candidate($type_symbol)) {
-      $$tbbl{'#slots-type'} = "\#$type_symbol";
-    } else {
-      $$tbbl{'#slots-type'} = "dk-intern(\"$type_symbol\")";
-    }
+    $$tbbl{'#slots-type'} = &as_literal_symbol($$klass_scope{'slots'}{'type'});
     my $tp = 'slots-t';
    #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
     $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
@@ -3888,13 +3875,11 @@ sub dk_generate_imported_klasses_info {
 sub add_symbol_to_ident_symbol {
   my ($file_symbols, $symbols, $symbol) = @_;
   if (defined $symbol) {
-    $symbol =~ s/^#//;
-    if (&is_symbol_candidate($symbol)) {
-      my $ident_symbol = &dk_mangle($symbol);
-      $symbol = '#' . $symbol;
-      $$file_symbols{$symbol} = $ident_symbol;
-      $$symbols{$symbol} = $ident_symbol;
-    }
+    $symbol = &as_literal_symbol_interior($symbol);
+    my $literal_symbol = &as_literal_symbol($symbol);
+    my $ident_symbol = &dk_mangle($symbol);
+    $$file_symbols{$literal_symbol} = $ident_symbol;
+    $$symbols{$literal_symbol} = $ident_symbol;
   }
 }
 sub should_ann {
@@ -3920,7 +3905,7 @@ sub linkage_unit::generate_symbols {
     my $ident_symbol = &dk_mangle_seq($symbol_seq);
     $$symbols{$symbol} = $ident_symbol;
   }
-  while (my ($symbol, $symbol_seq) = each(%{$$file{'symbols'}})) {
+  foreach my $symbol (keys %{$$file{'symbols'}}) {
     &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol);
   }
   foreach my $klass_type ('klasses', 'traits') {
@@ -3946,7 +3931,7 @@ sub linkage_unit::generate_symbols {
   my $scratch_str = "";
   my $max_width = 0;
   foreach my $symbol (@$symbol_keys) {
-    $symbol =~ s/^#//;
+    $symbol = &as_literal_symbol_interior($symbol);
     my $ident = &dk_mangle($symbol);
     my $width = length($ident);
     if ($width > $max_width) {
@@ -3963,7 +3948,7 @@ sub linkage_unit::generate_symbols {
     $ident =~ s/(\w)_(\w)/$1-$2/g;
     my $pad = ' ' x ($max_width - $width);
     if (&is_nrt_decl() || &is_rt_decl()) {
-      $scratch_str .= $col . "extern symbol-t $ident;" . $nl;
+      $scratch_str .= $col . "extern symbol-t $ident;" . ' /* ' . &as_literal_symbol($symbol) . ' */' . $nl;
     } elsif (&is_rt_defn()) {
       $symbol =~ s|"|\\"|g;
       if (&should_ann($ln, $num_lns)) {
@@ -4221,9 +4206,9 @@ sub generate_property_tbl {
     my $pad = ' ' x ($max_key_width - $key_width);
 
     if ($element =~ /^"(.*)"$/) {
-      my $element_in = $1;
-      if ($$symbols{$element_in}) {
-        $element = "\#$element_in";
+      my $literal_symbol = &as_literal_symbol($1);
+      if ($$symbols{$literal_symbol}) {
+        $element = $literal_symbol;
       } else {
         $element = "dk-intern($element)";
       }

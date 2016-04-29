@@ -48,6 +48,8 @@ our @EXPORT= qw(
                  add_first
                  add_last
                  ann
+                 as_literal_symbol
+                 as_literal_symbol_interior
                  canon_path
                  clean_paths
                  cpp_directives
@@ -254,11 +256,29 @@ sub is_debug {
 }
 sub is_symbol_candidate {
   my ($str) = @_;
-  if ($str =~ m/^[\w-]+\??$/) {
+  if ($str =~ m/^$bid$/) {
     return 1;
   } else {
     return 0;
   }
+}
+sub as_literal_symbol_interior {
+  my ($str) = @_;
+  $str =~ s/^#\|(.+?)\|$/#$1/; # strip only the framing | while leave leading #
+  $str =~ s/^#//; # now remove leading #
+  return $str;
+}
+sub as_literal_symbol {
+  my ($str) = @_;
+  $str =~ s/^#(.+)$/$1/;
+  $str =~ s/^\|(.+)\|$/$1/;
+  my $result;
+  if (&is_symbol_candidate($str)) {
+    $result = '#' . $str;
+  } else {
+    $result = '#|' . $str . '|'
+  }
+  return $result;
 }
 sub encode_char { my ($char) = @_; return sprintf("%02x", ord($char)); }
 sub dk_mangle {
@@ -321,7 +341,8 @@ sub kw_args_placeholders {
 sub ident_regex {
   my $id =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9]              )?/x;
   my $mid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!])/x; # method ident
-  my $bid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?]  )|(?:[\?]  )/x; # bool   ident
+ #my $bid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?]  )|(?:[\?]  )/x; # bool   ident
+  my $bid = qr/[\w-]+\??/x; # bool   ident
   my $tid = qr/[_a-zA-Z]   [_a-zA-Z0-9-]*?-t/x;                          # type   ident
 
   my $sro =  qr/::/;
