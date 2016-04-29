@@ -35,6 +35,7 @@
       '$(srcdir)/method.dk',
       '$(srcdir)/missing-keyword-exception.dk',
       '$(srcdir)/named-enum-info.dk',
+      '$(srcdir)/named-info.hh',
       '$(srcdir)/named-info.dk',
       '$(srcdir)/no-such-keyword-exception.dk',
       '$(srcdir)/no-such-method-exception.dk',
@@ -56,8 +57,10 @@
       '$(srcdir)/signature.dk',
       '$(srcdir)/singleton-klass.dk',
       '$(srcdir)/size.dk',
+      '$(srcdir)/sorted-array.hh',
       '$(srcdir)/sorted-array.dk',
       '$(srcdir)/sorted-counted-set.dk',
+      '$(srcdir)/sorted-ptr-array.hh',
       '$(srcdir)/sorted-ptr-array.dk',
       '$(srcdir)/sorted-set.dk',
       '$(srcdir)/sorted-table.dk',
@@ -86,6 +89,7 @@
     'include-dirs' => [ # cmd-line
       '$(srcdir)',
       '$(srcdir)/../include',
+      '$(srcdir)/obj/libdakota-core/-user',
     ],
     'macros' => [ # cmd-line
       'DKT_WORKAROUND',
