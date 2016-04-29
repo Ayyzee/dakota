@@ -91,9 +91,9 @@
       'libdl.$(so_ext)', # darwin: /usr/lib/libdl.dylib
     ],
     'include-dirs' => [ # cmd-line
-      '$(srcdir)/obj/libdakota-core/-user', # hackhack
       '$(srcdir)',
       '$(srcdir)/../include',
+      '$(srcdir)/obj/libdakota-core/-user', # hackhack
     ],
     'macros' => [ # cmd-line
       'DKT_WORKAROUND',

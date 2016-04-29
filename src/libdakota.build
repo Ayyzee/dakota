@@ -36,9 +36,9 @@
     'libs' => [ # cmd-line
     ],
     'include-dirs' => [ # cmd-line
-      '$(srcdir)/obj/libdakota/-user', # hackhack
       '$(srcdir)',
       '$(srcdir)/../include',
+      '$(srcdir)/obj/libdakota/-user', # hackhack
     ],
     'macros' => [ # cmd-line
       'DKT_WORKAROUND',
