@@ -76,7 +76,11 @@ sub json_path_from_o_path {
   my ($in_path) = @_;
   my $out_path = $in_path =~ s/(\.($cc_ext|dk))?\.$o_ext$/.dk.json/r; # hackhack
   return $out_path;
- }
+}
+sub user_dir {
+  $objdir = &dakota::util::objdir();
+  return $objdir . '/' . '-user';
+}
 my $patterns = {
   'user_dk_path_from_dk_path' => '$(objdir)/-user/%.dk : %.dk',
 
@@ -161,6 +165,7 @@ our @EXPORT= qw(
                  rt_cc_path_from_any_path
                  rt_cc_path_from_so_path
                  str_from_cmd_info
+                 user_dir
               );
 my $colon = ':'; # key/element delim only
 my $kw_args_placeholders = &kw_args_placeholders();

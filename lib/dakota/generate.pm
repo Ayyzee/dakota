@@ -94,6 +94,7 @@ our @EXPORT= qw(
                  global_scratch_str_ref
                  set_global_scratch_str_ref
                  should_use_include
+                 write_to_file_converted_file
               );
 
 my $colon = ':'; # key/element delim only
@@ -281,6 +282,14 @@ sub write_to_file_converted_strings {
   if (defined $path) {
     close PATH;
   }
+}
+sub write_to_file_converted_file {
+  my ($path_out, $path_in) = @_;
+  my $in_str = &dakota::util::filestr_from_file($path_in);
+  my $num = 1;
+  my $remove;
+  my $project_rep;
+  &write_to_file_converted_strings($path_out, [ "# line $num \"$path_in\"" . $nl, $in_str ], $remove = undef, $project_rep = undef);
 }
 sub generate_nrt_decl {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
