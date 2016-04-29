@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dakota-safe-str-hh
-# define      dakota-safe-str-hh
+# if !defined dakota-safe-str-kt
+# define      dakota-safe-str-kt
 
 # include <cstdlib>
 # include <cstring>

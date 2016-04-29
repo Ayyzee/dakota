@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-dakota-rt-private-hh
-# define      dkt-dakota-rt-private-hh
+# if !defined dkt-dakota-rt-private-kt
+# define      dkt-dakota-rt-private-kt
 
 # include "dakota.hh"
 # include "dakota-declare-klass-type.hh"

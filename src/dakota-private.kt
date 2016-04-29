@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-dakota-private-hh
-# define      dkt-dakota-private-hh
+# if !defined dkt-dakota-private-kt
+# define      dkt-dakota-private-kt
 
 # include "dakota-dummy.hh"
 # include "dakota.hh"
@@ -82,4 +82,4 @@ inline func root-superklass?(object-t object) -> boole-t {
     return false;
 } // root-superklass?()
 
-# endif // dkt-dakota-private-hh
+# endif // dkt-dakota-private-kt

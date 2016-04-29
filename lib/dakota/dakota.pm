@@ -697,8 +697,8 @@ sub start_cmd {
   my $inputs = [];
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if ($input =~ /\.kt$/) {
-      my $user_hh_path = &user_dir() . '/' . $input;
-      &write_to_file_converted_file($user_hh_path, $input);
+      my $user_kt_path = &user_dir() . '/' . $input;
+      &write_to_file_converted_file($user_kt_path, $input);
     } else {
       push @$inputs, $input;
     }

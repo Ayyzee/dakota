@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-named-info-hh
-# define      dkt-named-info-hh
+# if !defined dkt-named-info-kt
+# define      dkt-named-info-kt
 
 # include "dakota.hh"
 

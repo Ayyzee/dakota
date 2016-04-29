@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-dl-hh
-# define      dkt-dl-hh
+# if !defined dkt-dl-kt
+# define      dkt-dl-kt
 
 func symbol-name-from-address(void*) -> str-t;
 func load-library(str-t) -> void;
 
-# endif // dkt-dl-hh
+# endif // dkt-dl-kt

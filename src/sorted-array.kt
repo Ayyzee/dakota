@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-sorted-array-hh
-# define      dkt-sorted-array-hh
+# if !defined dkt-sorted-array-kt
+# define      dkt-sorted-array-kt
 
 # include "dakota.hh"
 
