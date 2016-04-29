@@ -486,18 +486,17 @@ sub loop_cc_from_dk {
       $cc_path = "$input_name.$cc_ext";
     }
     my $rt_json_path = &rt_json_path($cmd_info);
-    my $user_cc_path = &user_cc_path_from_dk_path($input);
+    my $user_dk_path = &user_dk_path_from_dk_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
-    $$project_io{'all'}{$input}{$user_cc_path} = 1;
-    $$project_io{'all'}{$rt_json_path}{$user_cc_path} = 1;
+    $$project_io{'all'}{$input}{$user_dk_path} = 1;
+    $$project_io{'all'}{$rt_json_path}{$user_dk_path} = 1;
     $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
     $$project_io{'all'}{$rt_json_path}{$cc_path} = 1;
-    my ($user_cc_dir, $user_cc_name, $user_cc_ext) = &split_path($user_cc_path, $cc_ext);
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input_name, $user_cc_path, $global_rep);
+    &dakota::generate::dk_generate_cc($input_name, $user_dk_path, $global_rep);
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
@@ -919,7 +918,7 @@ sub o_from_dk {
     }
     $outfile = $input;
   } else {
-    my $user_cc_path = &user_cc_path_from_dk_path($input);
+    my $user_dk_path = &user_dk_path_from_dk_path($input);
     my $o_path;
     if ($$cmd_info{'output'} && &is_o_path($$cmd_info{'output'})) {
       $o_path = $$cmd_info{'output'};
@@ -984,7 +983,7 @@ sub o_from_dk {
         my $project_io = &scalar_from_file($$cmd_info{'project.io'});
         $$project_io{'all'}{$cc_path}{$o_path} = 1;
         $$project_io{'all'}{$hh_path}{$o_path} = 1;
-        $$project_io{'all'}{$user_cc_path}{$o_path} = 1;
+        $$project_io{'all'}{$user_dk_path}{$o_path} = 1;
         $$project_io{'all'}{$json_path}{$cc_path} = 1;
         $$project_io{'all'}{$json_path}{$hh_path} = 1;
         &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);

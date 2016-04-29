@@ -298,7 +298,7 @@ sub generate_nrt {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
-  my $rel_user_cc_path = "-user/$name.dk";
+  my $rel_user_dk_path = "-user/$name.dk";
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $pre_output = "$dir/$name.dk$suffix";
@@ -321,7 +321,7 @@ sub generate_nrt {
       "# include \"$rel_hh_path\"" . $nl .
       "# endif" . $nl .
       $nl .
-      "# include \"$rel_user_cc_path\"" . $nl . # user-code (converted from dk to cc)
+      "# include \"$rel_user_dk_path\"" . $nl . # user-code (converted from dk to cc)
       $nl .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
   }

@@ -78,7 +78,7 @@ sub json_path_from_o_path {
   return $out_path;
  }
 my $patterns = {
-  'user_cc_path_from_dk_path' => '$(objdir)/-user/%.dk : %.dk',
+  'user_dk_path_from_dk_path' => '$(objdir)/-user/%.dk : %.dk',
 
   'o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
   'o_path_from_cc_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
@@ -146,7 +146,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  ctlg_path_from_so_path
-                 user_cc_path_from_dk_path
+                 user_dk_path_from_dk_path
                  hh_path_from_cc_path
                  init_global_rep
                  kw_args_translate
@@ -398,9 +398,9 @@ sub rel_path_canon {
   }
   return $result;
 }
-sub user_cc_path_from_dk_path {
+sub user_dk_path_from_dk_path {
   my ($path) = @_;
-  return &out_path_from_in_path('user_cc_path_from_dk_path', $path);
+  return &out_path_from_in_path('user_dk_path_from_dk_path', $path);
 }
 sub o_path_from_dk_path {
   my ($path) = @_;
