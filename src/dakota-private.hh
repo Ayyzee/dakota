@@ -14,63 +14,72 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_private_hh
-# define      dkt_dakota_private_hh
+# if !defined dkt-dakota-private-hh
+# define      dkt-dakota-private-hh
 
 # include "dakota-dummy.hh"
 # include "dakota.hh"
 
-dkt_declare_klass_type_struct(selector_node);
-//dkt_declare_klass_type_struct(signature);
+dkt-declare-klass-type-struct(selector-node);
+//dkt-declare-klass-type-struct(signature);
 
-FUNC import_selectors(signature_t** signatures, selector_node_t* selector_nodes) -> void;
+func import-selectors(signature-t** signatures, selector-node-t* selector-nodes) -> void;
 
-FUNC interposer_name_for_klass_name(symbol_t klass_name) -> symbol_t;
-FUNC add_interpose_prop(symbol_t key, symbol_t element) -> void;
+func interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t;
+func add-interpose-prop(symbol-t key, symbol-t element) -> void;
 
-FUNC info_for_name(symbol_t) -> named_info_t*;
+func info-for-name(symbol-t) -> named-info-t*;
 
-FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> int_t;
-FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t;
+func safe-strptrcmp(const str-t* sp1, const str-t* sp2) -> int-t;
+func safe-strncmp(str-t s1, str-t s2, size-t n) -> int-t;
 
-FUNC safe_strcmp(str_t, str_t) -> int_t;
-FUNC safe_strlen(str_t) -> size_t;
+func safe-strcmp(str-t, str-t) -> int-t;
+func safe-strlen(str-t) -> size-t;
 
-FUNC strerror_name(int_t errnum) -> str_t;
+func strerror-name(int-t errnum) -> str-t;
 
-FUNC size_from_info(named_info_t* info) -> int64_t;
-FUNC offset_from_info(named_info_t* info) -> int64_t;
-FUNC name_from_info(named_info_t* info) -> symbol_t;
-FUNC klass_name_from_info(named_info_t* info) -> symbol_t;
-FUNC superklass_name_from_info(named_info_t* info) -> symbol_t;
-FUNC superklass_name_from_info(named_info_t* info, symbol_t name) -> symbol_t;
+func size-from-info(named-info-t* info) -> int64-t;
+func offset-from-info(named-info-t* info) -> int64-t;
+func name-from-info(named-info-t* info) -> symbol-t;
+func klass-name-from-info(named-info-t* info) -> symbol-t;
+func superklass-name-from-info(named-info-t* info) -> symbol-t;
+func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t;
 
-FUNC default_superklass_name() -> symbol_t;
-FUNC default_klass_name() -> symbol_t;
+func default-superklass-name() -> symbol-t;
+func default-klass-name() -> symbol-t;
 
-FUNC selector_count() -> int64_t;
+func selector-count() -> int64-t;
 
-KLASS_NS object {
-  /*LOCAL*/ METHOD dump(object_t) -> object_t;
-  /*LOCAL*/ METHOD instance3f(object_t, object_t) -> boole_t; // instance?()
+klass object {
+  method dump(object-t) -> object-t;
+  method instance?(object-t, object-t) -> boole-t; // instance?()
 }
-KLASS_NS klass {
-  /*LOCAL*/ METHOD init(object_t, named_info_t*) -> object_t;
-  /*LOCAL*/ METHOD subklass3f(object_t, object_t) -> boole_t; // subklass?()
+klass klass {
+  method init(object-t, named-info-t*) -> object-t;
+  method subklass?(object-t, object-t) -> boole-t; // subklass?()
 }
-KLASS_NS bit_vector {
-  /*LOCAL*/ METHOD set_bit(object_t, ssize_t, boole_t) -> object_t;
+klass bit-vector {
+  method set-bit(object-t, ssize-t, boole-t) -> object-t;
 }
-# if DKT_WORKAROUND
-KLASS_NS property   { /*LOCAL*/ METHOD compare(slots_t*,  slots_t* ) -> int_t; }
-KLASS_NS named_info { /*LOCAL*/ METHOD compare(slots_t**, slots_t**) -> int_t; }
+# if DKT-WORKAROUND
+klass property {
+  method compare(slots-t*,  slots-t* ) -> int-t;
+}
+klass named-info {
+  func compare(slots-t**, slots-t**) -> int-t;
+}
 # endif
 
-[[noreturn]] FUNC verbose_terminate()  noexcept -> void;
-[[noreturn]] FUNC verbose_unexpected() noexcept -> void;
-[[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;
-[[noreturn]] FUNC pre_runtime_verbose_unexpected() noexcept -> void;
+[[noreturn]] func verbose-terminate()  noexcept -> void;
+[[noreturn]] func verbose-unexpected() noexcept -> void;
+[[noreturn]] func pre-runtime-verbose-terminate() noexcept -> void;
+[[noreturn]] func pre-runtime-verbose-unexpected() noexcept -> void;
 
-inline FUNC root_superklass3f(object_t object) -> boole_t { if (nullptr == object || null == object) return true; else return false; } // root-superklass?()
+inline func root-superklass?(object-t object) -> boole-t {
+  if (nullptr == object || null == object)
+    return true;
+  else
+    return false;
+} // root-superklass?()
 
-# endif // dkt_dakota_private_hh
+# endif // dkt-dakota-private-hh

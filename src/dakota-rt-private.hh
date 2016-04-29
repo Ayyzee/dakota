@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_rt_private_hh
-# define      dkt_dakota_rt_private_hh
+# if !defined dkt-dakota-rt-private-hh
+# define      dkt-dakota-rt-private-hh
 
 # include "dakota.hh"
 # include "dakota-declare-klass-type.hh"
 
-dkt_declare_klass_type_struct(assoc_node);
+dkt-declare-klass-type-struct(assoc-node);
 
-FUNC imported_klasses_for_klass(symbol_t) -> assoc_node_t*;
+func imported-klasses-for-klass(symbol-t) -> assoc-node-t*;
 
 # endif

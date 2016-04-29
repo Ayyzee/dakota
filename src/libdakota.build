@@ -9,6 +9,8 @@
       '$(srcdir)/libdakota.dk',
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',
+      '$(srcdir)/dakota-private.hh',
+      '$(srcdir)/dakota-safe-str.hh',
       '$(srcdir)/dimension.dk',
       '$(srcdir)/float.dk',
       '$(srcdir)/hashed-counted-set.dk',
@@ -34,9 +36,9 @@
     'libs' => [ # cmd-line
     ],
     'include-dirs' => [ # cmd-line
+      '$(srcdir)/obj/libdakota/-user', # hackhack
       '$(srcdir)',
       '$(srcdir)/../include',
-      '$(srcdir)/obj/libdakota/-user',
     ],
     'macros' => [ # cmd-line
       'DKT_WORKAROUND',

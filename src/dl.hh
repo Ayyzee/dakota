@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dl_hh
-# define      dkt_dl_hh
+# if !defined dkt-dl-hh
+# define      dkt-dl-hh
 
-FUNC symbol_name_from_address(void*) -> str_t;
-FUNC load_library(str_t) -> void;
+func symbol-name-from-address(void*) -> str-t;
+func load-library(str-t) -> void;
 
-# endif // dkt_dl_hh
+# endif // dkt-dl-hh

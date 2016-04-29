@@ -14,63 +14,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dakota_safe_str_hh
-# define      dakota_safe_str_hh
+# if !defined dakota-safe-str-hh
+# define      dakota-safe-str-hh
 
 # include <cstdlib>
 # include <cstring>
 
-inline int_t safe_strcmp(str_t s1, str_t s2) {
-    int_t value = 0;
+inline func safe-strcmp(str-t s1, str-t s2) -> int-t {
+  int-t value = 0;
 
-    if (nullptr == s1 || nullptr == s2) {
-      if (nullptr == s1 && nullptr == s2)
-        value = 0;
-      else if (nullptr == s1)
-        value = -1;
-      else if (nullptr == s2)
-        value = 1;
-    } else {
-      value = strcmp(s1, s2);
-    }
-    return value;
+  if (nullptr == s1 || nullptr == s2) {
+    if (nullptr == s1 && nullptr == s2)
+      value = 0;
+    else if (nullptr == s1)
+      value = -1;
+    else if (nullptr == s2)
+      value = 1;
+  } else {
+    value = strcmp(s1, s2);
   }
-inline int_t safe_strptrcmp(const str_t* sp1, const str_t* sp2) {
-    str_t s1;
-    if (nullptr == sp1)
-      s1 = nullptr;
-    else
-      s1 = *sp1;
-    str_t s2;
-    if (nullptr == sp2)
-      s2 = nullptr;
-    else
-      s2 = *sp2;
-    return safe_strcmp(s1, s2);
-  }
-inline int_t safe_strncmp(str_t s1, str_t s2, size_t n) {
-    int_t value = 0;
+  return value;
+}
+inline func safe-strptrcmp(const str-t* sp1, const str-t* sp2) -> int-t {
+  str-t s1;
+  if (nullptr == sp1)
+    s1 = nullptr;
+  else
+    s1 = *sp1;
+  str-t s2;
+  if (nullptr == sp2)
+    s2 = nullptr;
+  else
+    s2 = *sp2;
+  return safe-strcmp(s1, s2);
+}
+inline func safe-strncmp(str-t s1, str-t s2, size-t n) -> int-t {
+  int-t value = 0;
 
-    if (nullptr == s1 || nullptr == s2) {
-      if (nullptr == s1 && nullptr == s2)
-        value = 0;
-      else if (nullptr == s1)
-        value = -1;
-      else if (nullptr == s2)
-        value = 1;
-    } else {
-      value = strncmp(s1, s2, n);
-    }
-    return value;
+  if (nullptr == s1 || nullptr == s2) {
+    if (nullptr == s1 && nullptr == s2)
+      value = 0;
+    else if (nullptr == s1)
+      value = -1;
+    else if (nullptr == s2)
+      value = 1;
+  } else {
+    value = strncmp(s1, s2, n);
   }
-inline size_t safe_strlen(str_t str) {
-    size_t len;
+  return value;
+}
+inline func safe-strlen(str-t str) -> size-t {
+  size-t len;
 
-    if (nullptr == str)
-      len = 0;
-    else
-      len = strlen(str);
-    return len;
-  }
+  if (nullptr == str)
+    len = 0;
+  else
+    len = strlen(str);
+  return len;
+}
 
 # endif
