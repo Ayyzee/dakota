@@ -21,12 +21,12 @@ klass hash;
 
 klass keyword {
   slots {
-    symbol-t symbol;
     hash-t   hash;
+    symbol-t symbol;
   }
   //slots-t null{};
 
-  method init(object-t self, slots-t slots : {.symbol = nullptr, .hash = 0}) -> object-t {
+  method init(object-t self, slots-t slots : {.hash = 0, .symbol = nullptr}) -> object-t {
     self = $init(super);
     unbox(self) = slots;
     return self;

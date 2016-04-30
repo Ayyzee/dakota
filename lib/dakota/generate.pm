@@ -441,7 +441,7 @@ sub generate_decl_defn {
   &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names, $extra_header));
   &add_labeled_src($result, "symbols-$suffix",    &linkage_unit::generate_symbols(   $file, $symbols));
   &add_labeled_src($result, "klasses-$suffix",    &linkage_unit::generate_klasses(   $file, $ordered_klass_names));
-  &add_labeled_src($result, "hashes-$suffix",     &linkage_unit::generate_hashes(    $file));
+ #&add_labeled_src($result, "hashes-$suffix",     &linkage_unit::generate_hashes(    $file));
   &add_labeled_src($result, "keywords-$suffix",   &linkage_unit::generate_keywords(  $file));
   &add_labeled_src($result, "strs-$suffix",       &linkage_unit::generate_strs(      $file));
   &add_labeled_src($result, "ints-$suffix",       &linkage_unit::generate_ints(      $file));
@@ -480,7 +480,7 @@ sub generate_decl_defn {
     &labeled_src_str($result, "headers-$suffix") .
     &labeled_src_str($result, "symbols-$suffix") .
     &labeled_src_str($result, "klasses-$suffix") .
-    &labeled_src_str($result, "hashes-$suffix") .
+   #&labeled_src_str($result, "hashes-$suffix") .
     &labeled_src_str($result, "keywords-$suffix") .
     &labeled_src_str($result, "strs-$suffix") .
     &labeled_src_str($result, "ints-$suffix") .
@@ -4051,9 +4051,9 @@ sub linkage_unit::generate_keywords {
         my $in = &ident_comment($symbol);
         # keyword-defn
         if (&should_ann($ln, $num_lns)) {
-          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . $in . &ann(__FILE__, __LINE__) . $nl;
+          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ dk-hash(\"$symbol\"), " . $pad . "#$symbol };" . $in . &ann(__FILE__, __LINE__) . $nl;
         } else {
-          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ #$symbol, " . $pad . "__hash::$ident };" . $in . $nl;
+          $scratch_str .= $col . "keyword-t $ident = " . $pad . "{ dk-hash(\"$symbol\"), " . $pad . "#$symbol };" . $in . $nl;
         }
       }
     }
