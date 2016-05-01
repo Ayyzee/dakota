@@ -1964,7 +1964,7 @@ sub generics::klass_type_from_klass_name {
   } else {
     my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
     die __FILE__, ":", __LINE__,
-      ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"" . $nl;
+      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . "@$rep_path_var" . '"' . $nl;
   }
   return $klass_type;
 }
@@ -1982,7 +1982,8 @@ sub generics::klass_scope_from_klass_name {
     $klass_scope = {};
   } else {
     my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'} ||= []}];
-    die __FILE__, ":", __LINE__, ": ERROR: klass/trait \"$klass_name\" absent from rep(s) \"@$rep_path_var\"" . $nl;
+    die __FILE__, ":", __LINE__,
+      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . "@$rep_path_var" . '"' . $nl;
   }
   return $klass_scope;
 }
