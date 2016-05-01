@@ -90,7 +90,6 @@ $Data::Dumper::Sortkeys =  1;
 $Data::Dumper::Indent =    1;   # default = 2
 
 undef $/;
-$" = '';
 
 my $should_replace_library_path_with_lib_opts = 1;
 my $should_write_ctlg_files = 1;
@@ -181,9 +180,8 @@ sub is_ctlg_path { # ctlg
 sub loop_merged_rep_from_inputs {
   my ($cmd_info, $should_echo) = @_; 
   if ($should_echo) {
-    $" = ' ';
-    print STDERR "  &loop_merged_rep_from_inputs --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
-    $" = '';
+    print STDERR '  &loop_merged_rep_from_inputs --output ' .
+      $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   &dakota::parse::init_rep_from_inputs_vars($cmd_info);
   my $rep_files = [];
@@ -398,9 +396,9 @@ sub rt::add_extra_symbols {
 sub sig1 {
   my ($scope) = @_;
   my $result = '';
-  $result .= "@{$$scope{'name'}}";
+  $result .= &ct($$scope{'name'});
   $result .= '(';
-  $result .= "@{$$scope{'parameter-types'}[0]}";
+  $result .= &ct($$scope{'parameter-types'}[0]);
   $result .= ')';
   return $result;
 }
@@ -433,9 +431,8 @@ sub rel_rt_hh_path {
 sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
-    $" = ' ';
-    print STDERR "  &loop_cc_from_dk --output $$cmd_info{'opts'}{'output'} @{$$cmd_info{'inputs'}}\n";
-    $" = '';
+    print STDERR '  &loop_cc_from_dk --output ' .
+      $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   &dakota::parse::init_cc_from_dk_vars($cmd_info);
 

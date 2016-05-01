@@ -118,7 +118,7 @@ my $ENCODED_STRING_END =   'ENCODEDSTRINGEND';
 
 sub ct {
   my ($seq) = @_;
-  my $string = "@$seq";
+  my $string = join('', @$seq);
   return $string;
 }
 sub concat3 {
@@ -506,7 +506,7 @@ sub is_va {
   my ($method) = @_;
   my $num_args = @{$$method{'parameter-types'}};
 
-  if ('va-list-t' eq "@{$$method{'parameter-types'}[-1]}") {
+  if ('va-list-t' eq &ct($$method{'parameter-types'}[-1])) {
     return 1;
   } else {
     return 0;

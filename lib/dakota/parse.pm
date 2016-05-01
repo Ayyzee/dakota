@@ -962,7 +962,7 @@ sub const {
     &dakota::util::add_last($type, $tkn);
   }
   my $rhs = [];
-  if ("@$type" =~ m/=/) {
+  if (&ct($type) =~ m/=/) {
     while ('=' ne &dakota::util::last($type)) {
       &dakota::util::add_first($rhs, &dakota::util::remove_last($type));
     }
@@ -1773,7 +1773,7 @@ sub method {
   }
   if ($$args{'attrs'}) {
     #print &Dumper($$args{'attrs'});
-    my $attrs = "@{$$args{'attrs'}}";
+    my $attrs = &ct($$args{'attrs'});
     my ($attr, $attr_arg);
     if ($attrs =~ /^\[\[\s*([\w-]+)\s*\(\s*([\w-]+)\s*\)\s*\]\]$/) {
       ($attr, $attr_arg) = ($1, $2);
@@ -1822,11 +1822,11 @@ sub method {
     &match(__FILE__, __LINE__, ';');
     $$method{'alias'} = $realname;
     $$method{'name'} = $name;
-    ###&add_generic($gbl_root, "@{$$method{'name'}}");
+    ###&add_generic($gbl_root, &ct($$method{'name'}));
     return;
   } else {
     $$method{'name'} = $name;
-    &add_generic($gbl_root, "@{$$method{'name'}}");
+    &add_generic($gbl_root, &ct($$method{'name'}));
   }
   if ('object-t' eq &sst::at($gbl_sst, $open_paren_index + 1)) {
     if (',' ne &sst::at($gbl_sst, $open_paren_index + 1 + 1) &&
@@ -1964,7 +1964,7 @@ sub generics::klass_type_from_klass_name {
   } else {
     my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
     die __FILE__, ":", __LINE__,
-      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . "@$rep_path_var" . '"' . $nl;
+      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . &ct($rep_path_var) . '"' . $nl;
   }
   return $klass_type;
 }
@@ -1983,7 +1983,7 @@ sub generics::klass_scope_from_klass_name {
   } else {
     my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'} ||= []}];
     die __FILE__, ":", __LINE__,
-      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . "@$rep_path_var" . '"' . $nl;
+      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . &ct($rep_path_var) . '"' . $nl;
   }
   return $klass_scope;
 }
@@ -2085,7 +2085,7 @@ sub generics::parse {
       &generics::_parse($data, $klass_scope);
 
       foreach my $generic (@$data) {
-        if (exists $$generics_used{"@{$$generic{'name'}}"}) {
+        if (exists $$generics_used{&ct($$generic{'name'})}) {
           &dakota::util::add_last($big_cahuna, $generic);
         }
       }
