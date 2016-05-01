@@ -543,11 +543,6 @@ sub add_type {
   my ($seq) = @_;
   &maybe_add_exported_header_for_symbol_seq($seq);
 }
-sub add_hash {
-  my ($file, $str) = @_;
-  my $ident = &ct([$str]);
-  $$file{'hashes'}{$ident} = undef;
-}
 sub add_keyword {
   my ($file, $keyword) = @_;
   my $ident = &ct([$keyword]);
@@ -2382,20 +2377,7 @@ sub rep_tree_from_dk_path {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/\#\'(.*?)\'/g) {
-    &add_hash($gbl_root, $1);
-  }
-  pos $_ = 0;
-  while (m/\bcase\s*"(.*)"\s*:/g) {
-    &add_hash($gbl_root, $1);
-  }
-  pos $_ = 0;
-  while (m/\bcase\s*(\#.*)\s*:/g) {
-    &add_hash($gbl_root, $1);
-  }
-  pos $_ = 0;
   while (m/(?<!\bcase)\s*(#$bid|#\|.+?\|)/g) {
-    # should this be &add_hash() ???
     &add_symbol($gbl_root, [&as_literal_symbol_interior($1)]);
   }
   pos $_ = 0;
