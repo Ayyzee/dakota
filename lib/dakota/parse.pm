@@ -140,7 +140,6 @@ our @EXPORT= qw(
                  add_klass_decl
                  add_str
                  add_symbol
-                 add_symbol_ident
                  add_trait_decl
                  cc_path_from_o_path
                  colin
@@ -524,16 +523,11 @@ sub add_generic {
   my ($file, $generic) = @_;
   $$file{'generics'}{$generic} = undef;
 }
-sub add_symbol_ident {
+sub add_symbol {
   my ($file, $ident) = @_;
   $ident = &as_literal_symbol_interior($ident);
   $ident = &as_literal_symbol($ident);
   $$file{'symbols'}{$ident} = undef;
-}
-sub add_symbol {
-  my ($file, $symbol) = @_;
-  my $ident = &ct($symbol);
-  &add_symbol_ident($file, $ident);
 }
 sub add_system_include {
   my ($file, $system_include) = @_;
@@ -550,17 +544,17 @@ sub add_keyword {
     $ident = '#' . $ident;
   }
   $$file{'keywords'}{$ident} = undef;
-  &add_symbol($file, [$keyword]);
+  &add_symbol($file, $keyword);
 }
 sub add_str {
   my ($file, $str) = @_;
-  &add_symbol($file, [$str]);
+  &add_symbol($file, $str);
   $$file{'literal-strs'}{$str} = undef;
 }
 sub add_int {
   my ($file, $val) = @_;
   $$file{'literal-ints'}{$val} = undef;
-  &add_symbol($file, [$val]);
+  &add_symbol($file, $val);
 }
 sub token_seq::simple_seq {
   my ($tokens) = @_;
@@ -804,11 +798,11 @@ sub slots_seq {
         }
       }
       my $name = &dakota::util::remove_last($type);
-      &add_symbol($gbl_root, [ $name ]);
+      &add_symbol($gbl_root, $name);
       my $arg_type = &arg::type($type);
       my $slot_info = { 'name' => $name,
                         'type' => $arg_type };
-      &add_symbol_ident($gbl_root, $arg_type);
+      &add_symbol($gbl_root, $arg_type);
       if (scalar @$expr) {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
@@ -830,7 +824,7 @@ sub enum_seq {
     } else {
       my $name = &remove_first($expr);
       my $slot_info = { 'name' => $name };
-      &add_symbol($gbl_root, [ $name ]);
+      &add_symbol($gbl_root, $name);
       if (scalar @$expr) {
         if ('=' ne &remove_first($expr)) {
           die __FILE__, ":", __LINE__, ": error:\n";
@@ -845,7 +839,7 @@ sub enum_seq {
   if (scalar @$expr) {
     my $name = &remove_first($expr);
     my $slot_info = { 'name' => $name };
-    &add_symbol($gbl_root, [ $name ]);
+    &add_symbol($gbl_root, $name);
     if (scalar @$expr) {
       if ('=' ne &remove_first($expr)) {
         die __FILE__, ":", __LINE__, ": error:\n";
@@ -884,7 +878,7 @@ sub slots {
       my $tkn =    &dakota::util::remove_last($type);
       die if ':' ne $tkn; # not key/element delim
       $$gbl_current_scope{'slots'}{'enum-base'} = $enum_base;
-      &add_symbol_ident($gbl_root, $enum_base);
+      &add_symbol($gbl_root, $enum_base);
       #print STDERR &Dumper($$gbl_current_scope{'slots'});
     }
   }
@@ -893,8 +887,8 @@ sub slots {
         'union' eq  &dakota::util::first($type) ||
         'enum' eq   &dakota::util::first($type)) {
       if ('enum' eq &dakota::util::first($type)) {
-        &add_symbol($gbl_root, ['enum-info']);
-        &add_symbol($gbl_root, ['const-info']);
+        &add_symbol($gbl_root, 'enum-info');
+        &add_symbol($gbl_root, 'const-info');
 
         &add_klass_decl($gbl_root, 'enum-info');
         &add_klass_decl($gbl_root, 'named-enum-info');
@@ -907,7 +901,7 @@ sub slots {
   if (@$type) {
     &add_type($type);
     my $arg_type = &arg::type($type);
-    &add_symbol_ident($gbl_root, $arg_type);
+    &add_symbol($gbl_root, $arg_type);
     $$gbl_current_scope{'slots'}{'type'} = $arg_type;
   } else {
     $$gbl_current_scope{'slots'}{'cat'} = $cat;
@@ -933,7 +927,7 @@ sub slots {
         }
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      &add_symbol($gbl_root, ['size']);
+      &add_symbol($gbl_root, 'size');
       return;
     }
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
@@ -964,7 +958,7 @@ sub const {
     &dakota::util::remove_last($type); # '='
   }
   my $name = &dakota::util::remove_last($type);
-  &add_symbol($gbl_root, [ $name ]); # const var name
+  &add_symbol($gbl_root, $name); # const var name
   if (@$type) {
     $$const{'type'} = &arg::type($type);
     $$const{'name'} = $name;
@@ -1016,8 +1010,8 @@ sub enum {
         &enum_seq($enum_defs, $$enum{'info'});
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      &add_symbol($gbl_root, ['enum-info']);
-      &add_symbol($gbl_root, ['const-info']);
+      &add_symbol($gbl_root, 'enum-info');
+      &add_symbol($gbl_root, 'const-info');
 
       &add_klass_decl($gbl_root, 'enum-info');
       &add_klass_decl($gbl_root, 'named-enum-info');
@@ -1049,7 +1043,7 @@ sub initialize {
   &match(__FILE__, __LINE__, 'void');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
-      &add_symbol($gbl_root, ['initialize']);
+      &add_symbol($gbl_root, 'initialize');
       $$gbl_current_scope{'has-initialize'} = 1;
       my ($open_curley_index, $close_curley_index) =
         &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
@@ -1083,7 +1077,7 @@ sub finalize {
   &match(__FILE__, __LINE__, 'void');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
-      &add_symbol($gbl_root, ['finalize']);
+      &add_symbol($gbl_root, 'finalize');
       $$gbl_current_scope{'has-finalize'} = 1;
       my ($open_curley_index, $close_curley_index) =
         &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
@@ -2127,7 +2121,7 @@ sub generics::parse {
     }
     foreach my $arg (@{$$generic{'keyword-types'} ||= []}) {
       &add_type([$arg]);
-      &add_symbol($gbl_root, [$$arg{'name'}]);
+      &add_symbol($gbl_root, $$arg{'name'});
     }
   }
   my $sorted_generics_seq = [sort method::compare @$generics_seq];
@@ -2378,11 +2372,11 @@ sub rep_tree_from_dk_path {
   }
   pos $_ = 0;
   while (m/(?<!\bcase)\s*(#$bid|#\|.+?\|)/g) {
-    &add_symbol($gbl_root, [&as_literal_symbol_interior($1)]);
+    &add_symbol($gbl_root, &as_literal_symbol_interior($1));
   }
   pos $_ = 0;
   while (m/(#$bid|#\|.+?\|)/g) {
-    &add_symbol($gbl_root, [&as_literal_symbol_interior($1)]);
+    &add_symbol($gbl_root, &as_literal_symbol_interior($1));
   }
   &decode_comments(\$_, $parts);
   &decode_strings(\$_);

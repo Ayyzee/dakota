@@ -383,14 +383,14 @@ sub nrt::add_extra_symbols {
   my ($file) = @_;
   my $symbols = $$extra{'nrt_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
-    &dakota::parse::add_symbol($file, [ $symbol ]);
+    &dakota::parse::add_symbol($file, $symbol);
   }
 }
 sub rt::add_extra_symbols {
   my ($file) = @_;
   my $symbols = $$extra{'rt_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
-    &dakota::parse::add_symbol($file, [ $symbol ]);
+    &dakota::parse::add_symbol($file, $symbol);
   }
 }
 sub sig1 {
