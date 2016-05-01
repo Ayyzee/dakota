@@ -398,10 +398,13 @@ sub arglist_members {
 sub rewrite_throws {
   my ($filestr_ref) = @_;
   # throw "..."
-  # throw $foo
-  # throw $"..." ;
-  # throw $[...] ;
-  # throw ${...} ;
+  # throw #foo
+  # throw #|foo bar|
+  # throw #"..." ;
+  # throw #[...] ;
+  # throw #{...} ;
+  # throw #(...) ;
+  # throw #<...> followed by [|{|( ... )|}|]
   # throw box(...) ;
   # throw foo::box(...) ;
   # throw make(...) ;
