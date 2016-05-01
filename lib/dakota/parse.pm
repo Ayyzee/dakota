@@ -77,12 +77,8 @@ sub json_path_from_o_path {
   my $out_path = $in_path =~ s/(\.($cc_ext|dk))?\.$o_ext$/.dk.json/r; # hackhack
   return $out_path;
 }
-sub user_dir {
-  $objdir = &dakota::util::objdir();
-  return $objdir . '/' . '-user';
-}
 my $patterns = {
-  'user_dk_path_from_dk_path' => '$(objdir)/-user/%.dk : %.dk',
+  'user_path_from_any_path' => '$(objdir)/-user/% : %',
 
   'o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
   'o_path_from_cc_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
@@ -150,7 +146,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  ctlg_path_from_so_path
-                 user_dk_path_from_dk_path
+                 user_path_from_any_path
                  hh_path_from_cc_path
                  init_global_rep
                  kw_args_translate
@@ -165,7 +161,6 @@ our @EXPORT= qw(
                  rt_cc_path_from_any_path
                  rt_cc_path_from_so_path
                  str_from_cmd_info
-                 user_dir
               );
 my $colon = ':'; # key/element delim only
 my $kw_args_placeholders = &kw_args_placeholders();
@@ -403,9 +398,9 @@ sub rel_path_canon {
   }
   return $result;
 }
-sub user_dk_path_from_dk_path {
+sub user_path_from_any_path {
   my ($path) = @_;
-  return &out_path_from_in_path('user_dk_path_from_dk_path', $path);
+  return &out_path_from_in_path('user_path_from_any_path', $path);
 }
 sub o_path_from_dk_path {
   my ($path) = @_;
