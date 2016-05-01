@@ -228,7 +228,7 @@ sub remove_extra_whitespace {
   $str =~ s/(\|)\s+(\|\|)/$1__WHITESPACE__$2/g;
   $str =~ s/\s+//g;
   $str =~ s/__WHITESPACE__/ /g;
-  if (1) {
+  if (0) {
     $str =~ s/\s*->\s*/ -> /g;
     $str =~ s/\s*,\s*/, /g;
   }

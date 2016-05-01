@@ -899,7 +899,7 @@ sub slots {
   if (@$type) {
     &add_type($type);
     my $arg_type = &arg::type($type);
-    &add_symbol($gbl_root, $arg_type);
+    &add_symbol($gbl_root, &remove_extra_whitespace($arg_type));
     $$gbl_current_scope{'slots'}{'type'} = $arg_type;
   } else {
     $$gbl_current_scope{'slots'}{'cat'} = $cat;
