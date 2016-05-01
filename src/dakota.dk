@@ -1419,7 +1419,7 @@ static func last-user-code-before-main() -> void  {
   openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
-  // must match segment portion of attribute [[read-only]] defined in dakota.kt
+  // must match segment portion of attribute [[read-only]] defined in dakota-decl.hh
   int-t r = set-read-only-all("__DKT_READ_ONLY");
   if (-1 == r)
     fprintf(stderr, "[[read-only]] not being used\n");
