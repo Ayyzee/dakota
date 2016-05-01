@@ -532,7 +532,7 @@ sub add_symbol_ident {
 }
 sub add_symbol {
   my ($file, $symbol) = @_;
-  my $ident = &path::string($symbol);
+  my $ident = &ct($symbol);
   &add_symbol_ident($file, $ident);
 }
 sub add_system_include {
@@ -545,12 +545,12 @@ sub add_type {
 }
 sub add_hash {
   my ($file, $str) = @_;
-  my $ident = &path::string([$str]);
+  my $ident = &ct([$str]);
   $$file{'hashes'}{$ident} = undef;
 }
 sub add_keyword {
   my ($file, $keyword) = @_;
-  my $ident = &path::string([$keyword]);
+  my $ident = &ct([$keyword]);
   if ($ident !~ m/^#/) {
     $ident = '#' . $ident;
   }
@@ -755,7 +755,7 @@ sub trait {
         if (!defined $$gbl_current_scope{'requires'}) {
           $$gbl_current_scope{'requires'} = [];
         }
-        &dakota::util::add_last($$gbl_current_scope{'requires'}, &path::string($seq));
+        &dakota::util::add_last($$gbl_current_scope{'requires'}, &ct($seq));
         last;
       }
       if (m/^provide$/) {
@@ -764,7 +764,7 @@ sub trait {
         if (!defined $$gbl_current_scope{'provides'}) {
           $$gbl_current_scope{'provides'} = [];
         }
-        &dakota::util::add_last($$gbl_current_scope{'provides'}, &path::string($seq));
+        &dakota::util::add_last($$gbl_current_scope{'provides'}, &ct($seq));
         last;
       }
       if (m/^\{$/) {
@@ -1404,7 +1404,7 @@ sub klass {
         if (!defined $$gbl_current_scope{'requires'}) {
           $$gbl_current_scope{'requires'} = [];
         }
-        my $path = &path::string($seq);
+        my $path = &ct($seq);
         &dakota::util::add_last($$gbl_current_scope{'requires'}, $path);
         &add_klass_decl($gbl_root, $path);
         last;
@@ -1415,7 +1415,7 @@ sub klass {
         if (!defined $$gbl_current_scope{'provides'}) {
           $$gbl_current_scope{'provides'} = [];
         }
-        my $path = &path::string($seq);
+        my $path = &ct($seq);
         &dakota::util::add_last($$gbl_current_scope{'provides'}, $path);
         &add_klass_decl($gbl_root, $path);
         last;
@@ -1423,7 +1423,7 @@ sub klass {
       if (m/^interpose$/) {
         my ($body, $seq) = &dkdecl('interpose');
         &match(__FILE__, __LINE__, ';');
-        my $name = &path::string($seq);
+        my $name = &ct($seq);
         $$gbl_current_scope{'interpose'} = $name;
         &add_klass_decl($gbl_root, $name);
 
@@ -1447,7 +1447,7 @@ sub klass {
             if ($next_token =~ m/$id/) {
               my ($body, $seq) = &dkdecl('superklass');
               &match(__FILE__, __LINE__, ';');
-              my $path = &path::string($seq);
+              my $path = &ct($seq);
               $$gbl_current_scope{'superklass'} = $path;
               &add_klass_decl($gbl_root, $path);
               last;
@@ -1463,7 +1463,7 @@ sub klass {
             if ($next_token =~ m/$id/) {
               my ($body, $seq) = &dkdecl('klass');
               &match(__FILE__, __LINE__, ';');
-              my $path = &path::string($seq);
+              my $path = &ct($seq);
               $$gbl_current_scope{'klass'} = $path;
               &add_klass_decl($gbl_root, $path);
               last;
@@ -1482,14 +1482,14 @@ sub klass {
 
         if (0 == $braces) {
           $gbl_current_scope = $previous_scope;
-          return &path::string($seq);
+          return &ct($seq);
         }
         last;
       }
       $$gbl_sst_cursor{'current-token-index'}++;
     }
   }
-  return &path::string($seq);
+  return &ct($seq);
 }
 sub dkdecl {
   my ($tkn) = @_;
@@ -1506,7 +1506,7 @@ sub dkdecl {
   #    {
   #        &dakota::util::add_first($parts, '::');
   #    }
-  my $body = &path::string($parts);
+  my $body = &ct($parts);
   return ($body, $parts);
 }
 sub dkdecl_peek {
@@ -1885,7 +1885,7 @@ sub method {
                   $$gbl_sst_cursor{'current-token-index'}) !~ m/^(\;|\{)$/) {
     push @$return_type, &match_any();
   }
-  if ('void' eq &path::string($return_type)) {
+  if ('void' eq &ct($return_type)) {
     $$method{'return-type'} = undef;
     &warning(__FILE__, __LINE__,
              $$gbl_sst_cursor{'current-token-index'}); # 'void' is not a recommended return type for a method

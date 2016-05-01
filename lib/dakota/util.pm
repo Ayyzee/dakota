@@ -53,6 +53,7 @@ our @EXPORT= qw(
                  canon_path
                  clean_paths
                  cpp_directives
+                 ct
                  decode_comments
                  decode_strings
                  deep_copy
@@ -115,6 +116,11 @@ my $ENCODED_COMMENT_END =   'ENCODEDCOMMENTEND';
 my $ENCODED_STRING_BEGIN = 'ENCODEDSTRINGBEGIN';
 my $ENCODED_STRING_END =   'ENCODEDSTRINGEND';
 
+sub ct {
+  my ($seq) = @_;
+  my $string = "@$seq";
+  return $string;
+}
 sub concat3 {
   my ($s1, $s2, $s3) = @_;
   return "$s1$s2$s3";
@@ -303,13 +309,13 @@ sub dk_mangle {
     &dakota::util::add_last($ident_symbol, $part);
   }
   &dakota::util::add_last($ident_symbol, '_');
-  my $value = &path::string($ident_symbol);
+  my $value = &ct($ident_symbol);
   return $value;
 }
 sub dk_mangle_seq {
   my ($seq) = @_;
   my $ident_symbols = [map { &dk_mangle($_) } @$seq];
-  return &path::string($ident_symbols);
+  return &ct($ident_symbols);
 }
 sub ann {
   my ($file, $line, $msg) = @_;

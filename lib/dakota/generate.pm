@@ -626,7 +626,7 @@ sub arg::type {
   }
   my $delim = $";
   $" = ' ';
-  $arg = &path::string($arg);
+  $arg = &ct($arg);
   $" = $delim;
   $arg = &remove_extra_whitespace($arg);
   return $arg;
@@ -659,14 +659,14 @@ sub arg_type::names {
   my $arg_num =        0;
   my $arg_names = [];
 
-  if (&path::string($global_seq_super_t) eq  "@{$$arg_type_ref[0]}") {
+  if (&ct($global_seq_super_t) eq  "@{$$arg_type_ref[0]}") {
     $$arg_names[0] = "context";    # replace_first
   } else {
     $$arg_names[0] = 'object';  # replace_first
   }
 
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
-    if (&path::string($global_seq_ellipsis) eq  "@{$$arg_type_ref[$arg_num]}") {
+    if (&ct($global_seq_ellipsis) eq  "@{$$arg_type_ref[$arg_num]}") {
       $$arg_names[$arg_num] = undef;
     } elsif ('va-list-t' eq "@{$$arg_type_ref[$arg_num]}") {
       $$arg_names[$arg_num] = "args";
@@ -695,7 +695,7 @@ sub is_slots {
 sub is_box_type {
   my ($type_seq) = @_;
   my $result;
-  my $type_str = &path::string($type_seq);
+  my $type_str = &ct($type_seq);
 
   if ('slots-t*' eq $type_str ||
       'slots-t'  eq $type_str) {
@@ -985,7 +985,7 @@ sub generate_va_generic_defn {
     &dakota::util::_replace_last($$va_method{'name'}, $va_name);
     my $method_type_decl = &method::type_decl($va_method);
     &dakota::util::_replace_last($$va_method{'name'}, $name);
-    my $scope_str = &path::string($scope);
+    my $scope_str = &ct($scope);
     $$scratch_str_ref .= " {" . &ann(__FILE__, $line) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .=
@@ -1037,7 +1037,7 @@ sub property::compare {
 sub type_trans {
   my ($arg_type_ref) = @_;
   if (defined $arg_type_ref) {
-    my $arg_type = &path::string($arg_type_ref);
+    my $arg_type = &ct($arg_type_ref);
   }
   return $arg_type_ref;
 }
@@ -1721,11 +1721,6 @@ sub generate_va_make_defn {
   }
   return $result;
 }
-sub path::string {
-  my ($seq) = @_;
-  my $string = "@$seq";
-  return $string;
-}
 ## exists()  (does this key exist)
 ## defined() (is the value (for this key) non-undef)
 sub dk_parse {
@@ -1934,7 +1929,7 @@ sub generate_klass_box {
   my $result = '';
   my $col = '';
 
-  if ('object' eq &path::string($klass_path)) {
+  if ('object' eq &ct($klass_path)) {
     ### box() non-array-type
     $result .= $col . "klass $klass_name { func box(slots-t* arg) -> object-t";
 
@@ -2216,7 +2211,7 @@ sub linkage_unit::generate_klasses_body {
               if (0 != @{$$method{'keyword-types'}}) {
                 my $other_method_decl = &kw_args_method::type_decl($method);
 
-                #my $scope = &path::string($klass_path);
+                #my $scope = &ct($klass_path);
                 $other_method_decl =~ s|\(\*($id)\)| $1|;
                 my $visibility = '';
                 if (&is_exported($method)) {
@@ -3396,7 +3391,7 @@ sub dk_generate_cc_footer_klass {
     $col = &colout($col);
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
-  my $symbol = &path::string($klass_name);
+  my $symbol = &ct($klass_name);
   $$tbbl{'#name'} = '__klass__';
   $$tbbl{'#type'} = "\#$klass_type";
 
@@ -3612,7 +3607,7 @@ sub generate_kw_args_method_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_kw_args_method_defn()" . $nl;
 
-  my $qualified_klass_name = &path::string($klass_name);
+  my $qualified_klass_name = &ct($klass_name);
 
   #&path::add_last($klass_name, 'va');
   my $new_arg_type = $$method{'parameter-types'};
@@ -3866,7 +3861,7 @@ sub dk_generate_imported_klasses_info {
   foreach my $klass_type ('traits', 'klasses') {
     while (my ($klass_name, $klass_scope) = each(%{$$scope{$klass_type}})) {
       &path::add_last($stack, $klass_name);
-      my $import_string = &path::string($stack);
+      my $import_string = &ct($stack);
       $$tbl{$klass_type}{$import_string} = &dakota::util::deep_copy($stack);
 
       if ($klass_scope) {
