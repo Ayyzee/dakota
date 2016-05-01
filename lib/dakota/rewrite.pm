@@ -739,16 +739,18 @@ sub hash {
 }
 sub encode_str {
   my ($str) = @_;
+  $str =~ s/^#\|(.+?)\|$/#$1/;
+  $str =~ s/^#//;
   my $qstr = "\"$str\"";
   &encode_strings(\$qstr);
   return $qstr;
 }
 sub rewrite_switch_replacement {
   my ($expr, $body) = @_;
-  if ($body =~ m/\bcase\s*(".*?"|\#$id|dk-hash\s*$main::list)\s*:/g) {
+  if ($body =~ m/\bcase\s*(".*?"|\#$bid|\#\|.+?\||dk-hash\s*$main::list)\s*:/g) {
     $expr =~ s/^(\s*)(.+)$/$1(dk-hash-switch$2)/s;
-    $body =~ s|(\bcase\s*)(".*?")(\s*:)|$1 . 'dk-hash(' .             $2 . ')' . $3|egsx;
-    $body =~ s|(\bcase\s*)\#(.*?)(\s*:)|$1 . 'dk-hash(' . &encode_str($2) .')' . $3|egsx; # __hash::_abc_def
+    $body =~ s/(\bcase\s*)(".*?")(\s*:)/$1 . 'dk-hash(' .             $2 . ')' . $3/egsx;
+    $body =~ s/(\bcase\s*)(\#.+?)(\s*:)/$1 . 'dk-hash(' . &encode_str($2) .')' . $3/egsx; # __hash::_abc_def
   }
   return "switch$expr$body";
 }
