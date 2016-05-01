@@ -1009,7 +1009,11 @@ sub loop_o_from_dk {
     my $output = $$cmd_info{'output'};
     $$cmd_info{'output'} = undef;
     foreach my $input (@{$$cmd_info{'inputs'}}) {
-      push @$outfiles, &o_from_dk($cmd_info, $input);
+      if (&is_o_path($input)) {
+        push @$outfiles, $input;
+      } else {
+        push @$outfiles, &o_from_dk($cmd_info, $input);
+      }
     }
     $$cmd_info{'output'} = $output;
   }
