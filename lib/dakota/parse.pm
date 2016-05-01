@@ -325,8 +325,8 @@ my $gbl_filename = undef;
 sub init_rep_from_inputs_vars {
   my ($cmd_info) = @_;
   $gbl_root = {};
-  #$$gbl_root{'keywords'} = {};
-  #$$gbl_root{'symbols'} =  {};
+  $$gbl_root{'keywords'} = {};
+  $$gbl_root{'symbols'} =  {};
 
   $gbl_current_scope = $gbl_root;
   $gbl_filename = undef;
@@ -538,13 +538,11 @@ sub add_type {
   &maybe_add_exported_header_for_symbol_seq($seq);
 }
 sub add_keyword {
-  my ($file, $keyword) = @_;
-  my $ident = &ct([$keyword]);
-  if ($ident !~ m/^#/) {
-    $ident = '#' . $ident;
-  }
+  my ($file, $ident) = @_;
+  $ident = &as_literal_symbol_interior($ident);
+  $ident = &as_literal_symbol($ident);
   $$file{'keywords'}{$ident} = undef;
-  &add_symbol($file, $keyword);
+  &add_symbol($file, $ident);
 }
 sub add_str {
   my ($file, $str) = @_;
@@ -1659,6 +1657,8 @@ sub parameter_list {
       } else {
         &dakota::util::add_last($kw_args_defaults, $kw_args_default);
       }
+      my $kw_args_name_str = $$type[$kw_args_name];
+      &add_keyword($gbl_root, $kw_args_name_str);
       my $kw_args_name_seq = [splice(@$type, $kw_args_name)];
       #print STDERR Dumper $kw_args_name_seq;
       #print STDERR Dumper $type;
@@ -2363,11 +2363,7 @@ sub rep_tree_from_dk_path {
   pos $_ = 0;
   $_ =~ s/(\bcase\s)\s+/$1/g;
   pos $_ = 0;
-  while (m/(?<!\bcase\b)\s*($mid)\s*$colon/g) {
-    &add_keyword($gbl_root, $1);
-  }
-  pos $_ = 0;
-  while (m/(?<!\bcase)\s*\#\'(.*?)\'\s*$colon/g) {
+  while (m/(?<!\bcase\b)\s*(#$bid)\s*$colon/g) { # kw-args use
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;

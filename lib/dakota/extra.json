@@ -20,6 +20,7 @@
     '#object' => undef,        # kw-args processing funcs (throw)
     '#objects' => undef,         # implied when using some literal constructs
     '#signature' => undef,     # kw-args processing funcs (throw)
+    '#slots' => undef,
     '#src-time' => undef,
     '#src-date' => undef,
     '#src-file' => undef,
@@ -27,7 +28,6 @@
   },
   'rt_extra_keywords' => {
     '#message' => undef,
-    '#slots' => undef,
     '#symbol' => undef,
   },
   'nrt_extra_klass_decls' => {
