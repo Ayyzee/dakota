@@ -3314,11 +3314,10 @@ sub dk_generate_cc_footer_klass {
         if ('struct' eq $$klass_scope{'slots'}{'cat'}) {
           $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
         }
-        $$tbl{'#size'} = "sizeof(slots-t::$$slot_info{'name'})";
+        my $slot_name_ref = 'slots-t::' . $$slot_info{'name'};
+        $$tbl{'#size'} = 'sizeof(' . $slot_name_ref . ')';
         $$tbl{'#type'} = &as_literal_symbol($$slot_info{'type'});
-        my $tp = 'decltype((cast(slots-t*)0)->' . $$slot_info{'name'} . ')';
-       #$$tbl{'#typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
-        $$tbl{'#typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
+        $$tbl{'#typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $slot_name_ref . ')';
 
         if (defined $$slot_info{'expr'}) {
           $$tbl{'#expr'} = "($$slot_info{'expr'})";
