@@ -237,6 +237,12 @@ sub is_decl {
 sub is_exe_rt {
   return $global_is_exe_rt;
 }
+sub write_to_file_converted_file {
+  my ($path_out, $path_in) = @_;
+  my $in_str = &dakota::util::filestr_from_file($path_in);
+  my $num = 1;
+  &write_to_file_converted_strings($path_out, [ "# line $num \"$path_in\"" . $nl, $in_str ]);
+}
 sub write_to_file_strings {
   my ($path, $strings) = @_;
   open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
@@ -283,14 +289,6 @@ sub write_to_file_converted_strings {
     close PATH;
   }
 }
-sub write_to_file_converted_file {
-  my ($path_out, $path_in) = @_;
-  my $in_str = &dakota::util::filestr_from_file($path_in);
-  my $num = 1;
-  my $remove;
-  my $project_rep;
-  &write_to_file_converted_strings($path_out, [ "# line $num \"$path_in\"" . $nl, $in_str ], $remove = undef, $project_rep = undef);
-}
 sub generate_nrt_decl {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   #print "generate_nrt_decl($path, ...)" . $nl;
@@ -303,6 +301,10 @@ sub generate_nrt_defn {
   &set_nrt_defn($path);
   return &generate_nrt($path, $file, $project_rep, $rel_rt_hh_path);
 }
+my $im_suffix_for_suffix = {
+  $cc_ext => 'dk',
+  $hh_ext => 'kt',
+};
 sub generate_nrt {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
@@ -310,7 +312,7 @@ sub generate_nrt {
   my $rel_user_dk_path = "-user/$name.dk";
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
-  my $pre_output = "$dir/$name.dk$suffix";
+  my $pre_output = "$dir/$name." . $$im_suffix_for_suffix{$suffix};
   my $output =     "$dir/$name.$suffix";
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
@@ -364,7 +366,7 @@ sub generate_rt {
   my ($dir, $name, $ext) = &split_path($path, $id);
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
-  my $pre_output = "$dir/$name.dk$suffix";
+  my $pre_output = "$dir/$name." . $$im_suffix_for_suffix{$suffix};
   my $output =     "$dir/$name.$suffix";
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
@@ -454,7 +456,7 @@ sub generate_decl_defn {
     my $output = "$dir/$rel_hh_path";
     my $strings = [ '// ', $emacs_mode_file_variables, "\n\n", &linkage_unit::generate_generics($generics, $col) ];
     if ($should_write_pre_output) {
-      my $pre_output = "$dir/$output_base.dk$hh_ext";
+      my $pre_output = "$dir/$output_base.kt";
       &write_to_file_strings($pre_output, $strings);
     }
     &write_to_file_converted_strings($output, $strings);
@@ -1722,7 +1724,7 @@ sub generate_va_make_defn {
 ## defined() (is the value (for this key) non-undef)
 sub dk_parse {
   my ($dk_path) = @_; # string.dk
-  my $json_path = &dakota::parse::json_path_from_any_path($dk_path);
+  my $json_path = &dakota::parse::json_path_from_dk_path($dk_path);
   my $file = &dakota::util::scalar_from_file($json_path);
   $file = &dakota::parse::kw_args_translate($file);
   return $file;

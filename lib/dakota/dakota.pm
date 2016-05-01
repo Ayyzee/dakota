@@ -195,7 +195,7 @@ sub loop_merged_rep_from_inputs {
       $root = &dakota::parse::rep_tree_from_dk_path($arg);
       my $json_path;
       if (&is_dk_path($arg)) {
-        $json_path = &json_path_from_any_path($arg);
+        $json_path = &json_path_from_dk_path($arg);
       } elsif (&is_ctlg_path($arg)) {
         $json_path = &json_path_from_ctlg_path($arg);
       } else {
@@ -468,7 +468,7 @@ sub loop_cc_from_dk {
       $json_path = &json_path_from_ctlg_path($ctlg_path);
       &check_path($json_path);
     } elsif (&is_dk_src_path($input)) {
-      $json_path = &json_path_from_any_path($input); # _from_dk_src_path
+      $json_path = &json_path_from_dk_path($input);
       &check_path($json_path);
     } else {
       #print "skipping $input, line=" . __LINE__ . $nl;
@@ -827,11 +827,11 @@ sub rep_from_inputs {
         &project_io_add($cmd_info, $input, $ctlg_path);
         &project_io_add($cmd_info, $ctlg_path, $json_path);
       } elsif (&is_dk_path($input)) {
-        $json_path = &json_path_from_any_path($input); # _from_dk_src_path
+        $json_path = &json_path_from_dk_path($input);
         &check_path($json_path);
         &project_io_add($cmd_info, $input, $json_path);
       } elsif (&is_ctlg_path($input)) {
-        $json_path = &json_path_from_ctlg_path($input); # _from_dk_src_path
+        $json_path = &json_path_from_ctlg_path($input);
         &check_path($json_path);
         &project_io_add($cmd_info, $input, $json_path);
       } else {
@@ -853,7 +853,7 @@ sub loop_rep_from_inputs {
   my $rep_files = [];
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
-      my $json_path = &json_path_from_any_path($input); # _from_dk_src_path
+      my $json_path = &json_path_from_dk_path($input);
       &check_path($json_path);
       my $rep_cmd = {
         'opts' =>        $$cmd_info{'opts'},
@@ -916,7 +916,7 @@ sub gen_rt_o {
 }
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
-  my $json_path = &json_path_from_any_path($input); # _from_dk_src_path
+  my $json_path = &json_path_from_dk_path($input);
   my $num_out_of_date_infiles = 0;
   my $outfile;
   if (!&is_dk_src_path($input)) {
@@ -1365,7 +1365,7 @@ sub ctlg_from_so {
           &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
         } elsif (&is_dk_src_path($input)) {
-          $json_path = &json_path_from_any_path($input); # _from_dk_src_path
+          $json_path = &json_path_from_dk_path($input);
           &check_path($json_path);
         } else {
           #print "skipping $input, line=" . __LINE__ . $nl;
