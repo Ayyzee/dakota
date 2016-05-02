@@ -20,6 +20,7 @@ $Data::Dumper::Indent =    1; # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
+my $nl = "\n";
 my $default_build_file = 'exe.build';
 my $opts = { 'var' => {} };
 my $rep_hdr =
@@ -36,6 +37,7 @@ my $subcmd_tbl = {
   'init' =>         \&subcmd_init,
   'macros' =>       \&subcmd_macros,
   'output' =>       \&subcmd_output,
+  'objdir' =>       \&subcmd_objdir,
   'remove' =>       \&subcmd_remove,
   'set-output' =>   \&subcmd_set_output,
   'set-soname' =>   \&subcmd_set_soname,
@@ -48,6 +50,7 @@ sub start {
               'abs-path',
               'directory=s',
               'build=s',
+              'key=s',
               'var=s',
             );
   my $rep_file;
@@ -64,6 +67,9 @@ sub start {
 
   if (-e $rep_file) {
     $rep = &rep_from_file($rep_file);
+    if ($$opts{'key'}) {
+      $rep = $$rep{$$opts{'key'}};
+    }
   } else {
     $rep = { '**file**' => $rep_file };
   }
@@ -262,6 +268,10 @@ sub var {
     $result = undef;
   }
   return $result;
+}
+sub subcmd_objdir {
+  my ($rep, $args) = @_;
+  print $$rep{'objdir'} . $nl;
 }
 sub subcmd_soname {
   my ($rep, $args) = @_;

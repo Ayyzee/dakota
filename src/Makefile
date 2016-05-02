@@ -19,6 +19,8 @@ libdakota.macros :=      $(patsubst %,--define-macro %,$(libdakota.macros))
 # should be generated
 install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
 
+.PRECIOUS: %.project
+
 .PHONY:\
  all\
  check\
@@ -28,10 +30,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  install\
  installcheck\
  precompile\
- projects\
  uninstall\
-
-projects: libdakota-core.project libdakota.project
 
 $(libdakota.output): $(libdakota-core.output)
 
@@ -72,6 +71,8 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(dakota-catalog.output)
 	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
+	#$(RM) $(RMFLAGS) libdakota-core.project
+	#$(RM) $(RMFLAGS) libdakota.project
 
 distclean: clean
 	cd $(rootdir); ./configure-common
