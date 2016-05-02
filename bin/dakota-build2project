@@ -22,9 +22,12 @@ $Data::Dumper::Terse =     1;
 
 sub start {
   my ($argv) = @_;
-  my $build = &scalar_from_file($$argv[0]);
-  my $name = $$argv[1];
-  my $file = $$argv[2];
+  my $file = $$argv[0]; # really should be --output
+  my $build = &scalar_from_file($$argv[1]);
+  if (3 == scalar @ARGV) {
+    my $name = $$argv[2];
+    $build = $$build{$name};
+  }
   my $opts = { 'var' => { 'DEST' =>   '',
                           'blddir' => '.',
                           'srcdir' => '.',
@@ -32,10 +35,10 @@ sub start {
                         }
             };
   my $result = {};
-  $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{$name}{'inputs'}} ];
-  $$result{'libs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{$name}{'libs'}} ];
-  $$result{'objdir'} = &canon_path(&subst($$build{$name}{'objdir'}, $$opts{'var'}));
-  $$result{'output'} = &canon_path(&subst($$build{$name}{'output'}, $$opts{'var'}));
+  $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'inputs'}} ];
+  $$result{'libs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'libs'}} ];
+  $$result{'objdir'} = &canon_path(&subst($$build{'objdir'}, $$opts{'var'}));
+  $$result{'output'} = &canon_path(&subst($$build{'output'}, $$opts{'var'}));
   my $original_state;
   &scalar_to_file($file, $result, $original_state = 0);
 }
