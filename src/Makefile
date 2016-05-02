@@ -63,16 +63,16 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(output-files)
 
 clean: goal-clean
-	$(DAKOTA-BASE) --clean --project libdakota-core.project
-	$(DAKOTA-BASE) --clean --project libdakota.project
+	if [[ -e libdakota-core.project ]]; then $(DAKOTA-BASE) --clean --project libdakota-core.project; fi
+	if [[ -e libdakota.project      ]]; then $(DAKOTA-BASE) --clean --project libdakota.project; fi
+	$(RM) $(RMFLAGS) libdakota-core.project
+	$(RM) $(RMFLAGS) libdakota.project
 	$(RM) $(RMFLAGS) libdakota-core.project.io
 	$(RM) $(RMFLAGS) libdakota.project.io
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-catalog.output)
 	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(objdir)/*
-	#$(RM) $(RMFLAGS) libdakota-core.project
-	#$(RM) $(RMFLAGS) libdakota.project
 
 distclean: clean
 	cd $(rootdir); ./configure-common

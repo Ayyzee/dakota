@@ -407,7 +407,7 @@ sub sqstr_regex {
   return qr/(?<!\\)'.*?(?<!\\)'/;
 }
 my $build_vars = {
-  'objdir' => 'obj',
+  'objdir' => '../obj',
 };
 sub objdir {
   my $objdir;
