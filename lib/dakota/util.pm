@@ -564,8 +564,9 @@ sub flatten {
 }
 sub clean_paths {
   my ($in, $key) = @_;
-  if ($key && !$$in{$key}) {
-    return undef;
+  die if !defined $in;
+  if ($key && !exists $$in{$key}) {
+    die &Dumper($in);
   }
   my $elements_in = $in;
   if ($key) {
@@ -583,6 +584,9 @@ sub copy_no_dups {
   my $str_set = {};
   my $result = [];
   foreach my $str (@$strs) {
+    if (! -e $str) {
+      print STDERR $0 . ': warning: no-such-path: ' . $str . $nl;
+    }
     if (&is_abs($str)) {
       $str = &canon_path($str);
     } else {

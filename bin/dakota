@@ -203,10 +203,8 @@ if ($$root_cmd{'opts'}{'soname'}) {
 $ENV{'CXXFLAGS'} = &dakota::util::var($gbl_compiler, 'CXXFLAGS', undef);
 
 &clean_paths($root_cmd, 'inputs');
-&clean_paths($root_cmd, 'include-directory');
-&clean_paths($root_cmd, 'library-directory');
-&clean_paths($root_cmd, 'library');
-&clean_paths($root_cmd, 'define-macro');
+&clean_paths($$root_cmd{'opts'}, 'include-directory');
+&clean_paths($$root_cmd{'opts'}, 'library-directory');
 
 my $gcc_from_dakota = {
   '--include-directory' => '--include-directory', # yep, the same
