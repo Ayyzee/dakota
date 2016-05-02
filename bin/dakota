@@ -255,18 +255,13 @@ sub create_missing_project {
   }
   # create and write a default project file
   $project = { 'output' => undef, 'inputs' => [],
-               'objdir' => undef };
+               'objdir' => &objdir() };
   foreach my $input (@$inputs) {
     if ($input =~ m/\.(dk|$so_ext)$/) {
       add_last($$project{'inputs'}, $input);
     } else {
       print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
     }
-  }
-  if ($ENV{'OBJDIR'}) {
-    $$project{'objdir'} = $ENV{'OBJDIR'};
-  } else {
-    $$project{'objdir'} = 'obj';
   }
   my $project_base;
   my $project_path;

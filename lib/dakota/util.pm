@@ -410,9 +410,15 @@ my $build_vars = {
   'objdir' => 'obj',
 };
 sub objdir {
+  my $objdir;
   my $project = &global_project();
-  my $objdir = $$project{'objdir'};
-  $objdir = $$build_vars{'objdir'} if ! $objdir;
+  if ($project && $$project{'objdir'}) {
+    $objdir = $$project{'objdir'};
+  } elsif ($ENV{'OBJDIR'}) {
+    $objdir = $ENV{'OBJDIR'};
+  } else {
+    $objdir = $$build_vars{'objdir'};
+  }
   if (-e $objdir && ! -d $objdir) {
     die;
   }
