@@ -7,10 +7,10 @@ $(blddir)/../bin/%: $(srcdir)/%.$(cc_ext)
 %.project: %.build
 	$(rootdir)/bin/dakota-build2project $< $* $@
 
-$(blddir)/../bin/%:
+$(blddir)/../bin/%: | %.project
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --output $@ $(libs:%=--library %) $?
 
-$(blddir)/../lib/%.$(so_ext):
+$(blddir)/../lib/%.$(so_ext): | %.project
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --soname $(soname) --output $@ $(libs:%=--library %) $?
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: $(blddir)/../lib/dakota/%.json
