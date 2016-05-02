@@ -4,6 +4,9 @@ $(blddir)/%.tbl: $(srcdir)/%.pl
 $(blddir)/../bin/%: $(srcdir)/%.$(cc_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
 
+%.project: %.build
+	$(rootdir)/bin/dakota-build2project $< $* $@
+
 $(blddir)/../bin/%:
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --output $@ $(libs:%=--library %) $(srcs)
 

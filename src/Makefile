@@ -31,9 +31,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  projects\
  uninstall\
 
-projects:
-	$(rootdir)/bin/dakota-build2project libdakota-core.build libdakota-core libdakota-core.project
-	$(rootdir)/bin/dakota-build2project libdakota.build libdakota libdakota.project
+projects: libdakota-core.project libdakota.project
 
 $(libdakota.output): $(libdakota-core.output)
 
