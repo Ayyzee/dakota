@@ -14,23 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-sorted-array-kt
-# define      dkt-sorted-array-kt
+# if !defined dkt_dakota_rt_private_hh
+# define      dkt_dakota_rt_private_hh
 
 # include "dakota.hh"
+# include "dakota-declare-klass-type.hh"
 
-klass sorted-array {
-  func   create(ssize-t capacity, ssize-t size, std-compare-t compare) -> slots-t*;
+dkt_declare_klass_type_struct(assoc_node);
 
-  method search(slots-t* t, const void* key) -> result-t;
-  method sort(slots-t* t) -> slots-t*;
-  method intern(slots-t* t, const void* key) -> const void*;
-  method at(slots-t* t, ssize-t offset) -> const void*;
-  method remove-last(slots-t* t) -> const void*;
+FUNC imported_klasses_for_klass(symbol_t) -> assoc_node_t*;
 
-  method add(slots-t* t, const void* key) -> slots-t*;
-  method bsearch(slots-t* t, const void* key) -> const void*;
-  method remove-at(slots-t* t, const void* key, ssize-t offset) -> const void*;
-  method add-at(slots-t* t, const void* key, ssize-t offset) -> slots-t*;
-}
 # endif

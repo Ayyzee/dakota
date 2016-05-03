@@ -21,7 +21,7 @@ module dakota-core;
 # include <cstdlib>
 # include <cstring>
 
-# include "sorted-ptr-array.kt"
+# include "sorted-ptr-array.hh"
 
 klass exception;
 klass equal-predicate;

@@ -1,6 +1,6 @@
-// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-// Copyright (C) 2007, 2008, 2009 Robert Nielsen <robert@dakota.org>
+// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-dl-kt
-# define      dkt-dl-kt
+# if !defined dkt_named_info_hh
+# define      dkt_named_info_hh
 
-func symbol-name-from-address(void*) -> str-t;
-func load-library(str-t) -> void;
+# include "dakota.hh"
 
-# endif // dkt-dl-kt
+KLASS_NS named_info {
+  METHOD compare(object_t self, object_t other) -> int_t;
+  METHOD compare(slots_t*  s, slots_t*  other_s) -> int_t;
+  FUNC   compare(slots_t** s, slots_t** other_s) -> int_t;
+}
+
+# endif

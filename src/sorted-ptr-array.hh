@@ -14,14 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt-dakota-rt-private-kt
-# define      dkt-dakota-rt-private-kt
+# if !defined dkt_sorted_ptr_array_hh
+# define      dkt_sorted_ptr_array_hh
 
 # include "dakota.hh"
-# include "dakota-declare-klass-type.hh"
 
-dkt-declare-klass-type-struct(assoc-node);
+KLASS_NS sorted_ptr_array {
+  FUNC   create(ssize_t capacity, ssize_t size, std_compare_t compare) -> slots_t*;
 
-func imported-klasses-for-klass(symbol-t) -> assoc-node-t*;
+  METHOD search(slots_t* t, const void* key) -> result_t;
+  METHOD sort(slots_t* t) -> slots_t*;
+  METHOD intern(slots_t* t, const void* key) -> const void*;
+  METHOD at(slots_t* t, ssize_t offset) -> const void*;
+  METHOD remove_last(slots_t* t) -> const void*;
+
+  METHOD add(slots_t* t, const void* key) -> slots_t*;
+  METHOD bsearch(slots_t* t, const void* key) -> const void*;
+  METHOD remove_at(slots_t* t, const void* key, ssize_t offset) -> const void*;
+  METHOD add_at(slots_t* t, const void* key, ssize_t offset) -> slots_t*;
+}
 
 # endif

@@ -44,11 +44,11 @@ module dakota-core;
 
 # include "config.hh"
 
-# include "dakota-private.kt"
-# include "dakota-rt-private.kt"
-# include "dl.kt" // load-library()
-# include "sorted-array.kt"
-# include "sorted-ptr-array.kt"
+# include "dakota-private.hh"
+# include "dakota-rt-private.hh"
+# include "dl.hh" // load-library()
+# include "sorted-array.hh"
+# include "sorted-ptr-array.hh"
 
 extern boole-t pre-main?; // to quiet clang
 boole-t pre-main? = true;

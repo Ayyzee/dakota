@@ -22,7 +22,7 @@ module dakota-core;
 # include <link.h>
 # include <dlfcn.h> // dlopen(), dlclose(), dladdr(), struct Dl-info
 
-# include "dl.kt"
+# include "dl.hh"
 
 klass x::dl-info {
   slots Dl-info;

@@ -693,16 +693,6 @@ sub start_cmd {
     }
     $$cmd_info{'inputs'} = $inputs;
   }
-  my $inputs = [];
-  foreach my $input (@{$$cmd_info{'inputs'}}) {
-    if ($input =~ /\.kt$/) {
-      my $user_kt_path = &user_path_from_any_path($input);
-      &write_to_file_converted_file($user_kt_path, $input);
-    } else {
-      push @$inputs, $input;
-    }
-  }
-  $$cmd_info{'inputs'} = $inputs;
   if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
     # this might be useful for distributed building (initiating the building of the slowest first

@@ -24,7 +24,7 @@
   # include "config.hh"
 # endif
 
-# include "dakota-private.kt"
+# include "dakota-private.hh"
 
 static func set-name(int-t, str-t) -> void;
 

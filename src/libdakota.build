@@ -9,8 +9,6 @@
       '$(srcdir)/libdakota.dk',
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',
-      '$(srcdir)/dakota-private.kt',
-      '$(srcdir)/dakota-safe-str.kt',
       '$(srcdir)/dimension.dk',
       '$(srcdir)/float.dk',
       '$(srcdir)/hashed-counted-set.dk',

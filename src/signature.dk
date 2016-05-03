@@ -19,8 +19,8 @@ module dakota-core;
 # include <cassert>
 # include <cstring>
 
-# include "dakota-safe-str.kt"
-# include "dakota-private.kt"
+# include "dakota-safe-str.hh"
+# include "dakota-private.hh"
 
 klass signature {
   slots {
