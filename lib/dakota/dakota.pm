@@ -669,6 +669,7 @@ sub start_cmd {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
+  die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
       my $rt_cc_path = &rt_cc_path($cmd_info);
@@ -721,7 +722,7 @@ sub start_cmd {
       &gen_rt_o($cmd_info, $is_exe);
     }
   }
-  if ($$cmd_info{'opts'}{'compile'} && $$cmd_info{'output'}) {
+  if ($$cmd_info{'output'} && $$cmd_info{'opts'}{'compile'}) {
     my $last = &last($$cmd_info{'inputs'});
     if ($last ne $$cmd_info{'output'}) {
       `mv $last $$cmd_info{'output'}`;
@@ -868,6 +869,7 @@ sub loop_rep_from_inputs {
       &ordered_set_add($rep_files, $input, __FILE__, __LINE__);
     }
   }
+  die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
     if (0 != @$rep_files) {
       my $rt_json_path = &rt_json_path($cmd_info);
@@ -886,6 +888,7 @@ sub loop_rep_from_inputs {
 } # loop_rep_from_inputs
 sub gen_rt_o {
   my ($cmd_info, $is_exe) = @_;
+  die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
     my $rt_cc_path = &rt_cc_path($cmd_info);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
@@ -908,6 +911,7 @@ sub gen_rt_o {
   if ($dk_exe_type) {
     $$other{'type'} = $dk_exe_type;
   }
+  die if ! $$cmd_info{'output'};
   if ($$cmd_info{'opts'}{'soname'}) {
     $$other{'name'} = $$cmd_info{'opts'}{'soname'};
   } elsif ($$cmd_info{'output'}) {
@@ -1008,8 +1012,12 @@ sub o_from_dk {
 sub loop_o_from_dk {
   my ($cmd_info) = @_;
   my $outfiles = [];
-  if (2 > scalar @{$$cmd_info{'inputs'}}) {
-    push @$outfiles, &o_from_dk($cmd_info, $$cmd_info{'inputs'}[0]);
+  if (1 == scalar @{$$cmd_info{'inputs'}}) {
+    if (&is_o_path($$cmd_info{'inputs'}[0])) {
+      push @$outfiles, $$cmd_info{'inputs'}[0];
+    } else {
+      push @$outfiles, &o_from_dk($cmd_info, $$cmd_info{'inputs'}[0]);
+    }
   } else {
     my $output = $$cmd_info{'output'};
     $$cmd_info{'output'} = undef;
