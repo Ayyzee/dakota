@@ -7,8 +7,7 @@ include $(rootdir)/makeflags.mk
 
 srcdir ?= .
 blddir := .
-objdir := $(shell $(rootdir)/bin/dakota-build --build $(build) objdir)
-objdir-name := $(notdir $(objdir))
+objdir ?= ../obj
 
 prefix ?= /usr/local
 
