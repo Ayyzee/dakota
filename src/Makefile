@@ -39,10 +39,10 @@ $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project
 	set -o verbose; for input in $(libdakota-core.inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project $$input;\
+      $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project
+	$(DAKOTA-BASE) --shared --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project
 
 libdakota.single: $(libdakota.inputs) | libdakota.project
 	set -o verbose; for input in $(libdakota.inputs); do\
