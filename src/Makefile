@@ -36,18 +36,18 @@ $(libdakota.output): $(libdakota-core.output)
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
-libdakota-core.single: $(libdakota-core.inputs)
-	set -o verbose; for src in $(libdakota-core.inputs); do\
-    if [[ $$src =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project $$src;\
+libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project
+	set -o verbose; for input in $(libdakota-core.inputs); do\
+    if [[ $$input =~ \.dk$$ ]]; then\
+      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project $$input;\
     fi\
   done
 	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project
 
-libdakota.single: $(libdakota.inputs)
-	set -o verbose; for src in $(libdakota.inputs); do\
-    if [[ $$src =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota.project $$src;\
+libdakota.single: $(libdakota.inputs) | libdakota.project
+	set -o verbose; for input in $(libdakota.inputs); do\
+    if [[ $$input =~ \.dk$$ ]]; then\
+      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota.project $$input;\
     fi\
   done
 	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota.project
