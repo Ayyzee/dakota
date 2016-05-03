@@ -361,42 +361,6 @@ sub str_from_cmd_info {
   $str =~ s|(\s)\s+|$1|g;
   return $str;
 }
-# found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
-sub longest_common_prefix {
-  my $path_prefix = shift;
-  for (@_) {
-    chop $path_prefix while (! /^$path_prefix/);
-  }
-  return $path_prefix;
-}
-sub rel_path_canon {
-  my ($path1, $cwd) = @_;
-  my $result = $path1;
-
-  if ($path1 =~ m/\.\./g) {
-    if (!$cwd) {
-      $cwd = &cwd();
-    }
-
-    my $path2 = &Cwd::abs_path($path1);
-    confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
-    my $common_prefix = &longest_common_prefix($cwd, $path2);
-    my $adj_common_prefix = $common_prefix;
-    $adj_common_prefix =~ s|/[^/]+/$||g;
-    $result = $path2;
-    $result =~ s|^$adj_common_prefix/||;
-
-    if ($ENV{'DKT-DEBUG'}) {
-      print "$path1 = arg\n";
-      print "$cwd = cwd\n";
-      print $nl;
-      print "$path1 = $path1\n";
-      print "$result = $path1\n";
-      print "$result = result\n";
-    }
-  }
-  return $result;
-}
 sub user_path_from_any_path {
   my ($path) = @_;
   return &out_path_from_in_path('user_path_from_any_path', $path);

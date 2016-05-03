@@ -47,6 +47,7 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  add_first
                  add_last
+                 all_files
                  ann
                  as_literal_symbol
                  as_literal_symbol_interior
@@ -85,6 +86,7 @@ our @EXPORT= qw(
                  objdir
                  pann
                  parameter_types_str
+                 rel_path_canon
                  remove_extra_whitespace
                  remove_first
                  remove_last
@@ -419,6 +421,7 @@ sub objdir {
   } else {
     $objdir = $$build_vars{'objdir'};
   }
+  die if ! $objdir;
   if (-e $objdir && ! -d $objdir) {
     die;
   }
@@ -567,6 +570,84 @@ sub flatten {
     my ($a_of_a) = @_;
     my $a = [map {@$_} @$a_of_a];
     return $a;
+}
+# found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
+sub longest_common_prefix {
+  my $path_prefix = shift;
+  for (@_) {
+    chop $path_prefix while (! /^$path_prefix/);
+  }
+  return $path_prefix;
+}
+sub rel_path_canon {
+  my ($path1, $cwd) = @_;
+  my $result = $path1;
+
+  if ($path1 =~ m/\.\./g) {
+    if (!$cwd) {
+      $cwd = &cwd();
+    }
+
+    my $path2 = &Cwd::abs_path($path1);
+    confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
+    my $common_prefix = &longest_common_prefix($cwd, $path2);
+    my $adj_common_prefix = $common_prefix;
+    $adj_common_prefix =~ s|/[^/]+/$||g;
+    $result = $path2;
+    $result =~ s|^$adj_common_prefix/||;
+
+    if ($ENV{'DKT-DEBUG'}) {
+      print "$path1 = arg\n";
+      print "$cwd = cwd\n";
+      print $nl;
+      print "$path1 = $path1\n";
+      print "$result = $path1\n";
+      print "$result = result\n";
+    }
+  }
+  return $result;
+}
+sub all_files {
+  my ($dirs, $include_regex, $exclude_regex) = @_;
+  if ('ARRAY' ne ref($dirs)) {
+    $dirs = [$dirs];
+  }
+  my $files = {};
+  foreach my $dir (@$dirs) {
+    if (-d $dir) {
+      &all_files_recursive([$dir], $include_regex, $exclude_regex, $files);
+    } else {
+      print STDERR $0 . ':warning: skipping non-existent directory ' . $dir . $nl;
+    }
+  }
+  return $files
+}
+sub all_files_recursive {
+  my ($dirs, $include_regex, $exclude_regex, $files) = @_;
+  my $raw_dir = join('/', @$dirs);
+  my $dir = &Cwd::realpath($raw_dir);
+  opendir(my $dh, $dir) || die "can't opendir $dir: $!";
+  foreach my $leaf (readdir($dh)) {
+    if ('.' ne $leaf && '..' ne $leaf) {
+      my $path = $dir . '/' . $leaf;
+      if (-d $path) {
+        push @$dirs, $leaf;
+        &all_files_recursive($dirs, $include_regex, $exclude_regex, $files);
+        pop @$dirs; # remove $leaf
+      } elsif (-e $path) {
+        if (!defined $include_regex || $path =~ m{$include_regex}) {
+          if (!defined $exclude_regex || $path !~ m{$exclude_regex}) {
+            my $rel_path_dir = &rel_path_canon($dir);
+            my $rel_path = $path =~ s=$rel_path_dir=$raw_dir=r;
+            $rel_path = &canon_path($rel_path);
+            $$files{$path} = $rel_path;
+          }
+        }
+      }
+    }
+  }
+  closedir $dh;
+  return $files;
 }
 sub clean_paths {
   my ($in, $key) = @_;
