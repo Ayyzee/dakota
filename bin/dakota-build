@@ -69,6 +69,11 @@ sub start {
     $rep = &rep_from_file($rep_file);
     if ($$opts{'key'}) {
       $rep = $$rep{$$opts{'key'}};
+    } elsif (! $$rep{'inputs'} && 1 == scalar keys %$rep) {
+      my $only_key = (keys %$rep)[0];
+      if ($$rep{$only_key}{'inputs'}) {
+        $rep = $$rep{$only_key};
+      }
     }
   } else {
     $rep = { '**file**' => $rep_file };
@@ -295,7 +300,6 @@ sub subcmd_set_soname {
 sub rep_from_file {
   my ($file) = @_;
   my $rep = do $file or die;
-  $$rep{'**file**'} = $file;
   return $rep;
 }
 sub rep_to_file {
