@@ -16,10 +16,10 @@
       '$(srcdir)/../include',
     ],
     'objdir' => 'obj/dakota-catalog',
-    'output' => '$(blddir)/../bin/dakota-catalog', # cmd-line
+    'output' => '../bin/dakota-catalog', # cmd-line
     'install' => {
       '-rules' => [
-        '$(DESTDIR)$(prefix)/bin/%', '$(blddir)/../bin/%',
+        '$(DESTDIR)$(prefix)/bin/%', '../bin/%',
       ],
       'files' =>   [ # install.files
         '$(DESTDIR)$(prefix)/bin/dakota-catalog',

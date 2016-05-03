@@ -100,14 +100,14 @@
     ],
     'project' => '$(srcdir)/libdakota-core.project', # cmd-line
     'objdir' => '../obj/libdakota-core',
-    'output' => '$(blddir)/../lib/libdakota-core.$(so_ext)', # cmd-line
+    'output' => '../lib/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line
     'soname' => '$(DESTDIR)$(prefix)/lib/libdakota-core.$(so_ext)', # cmd-line
     'install' => {
       '-rules' => [
         '$(DESTDIR)$(prefix)/%', '$(srcdir)/../%',
-        '$(DESTDIR)$(prefix)/%', '$(blddir)/../%',
+        '$(DESTDIR)$(prefix)/%', '../%',
       ],
       'files' => [ # install.files
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-clang/command-line.json',

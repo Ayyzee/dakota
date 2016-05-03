@@ -6,7 +6,6 @@ rootdir ?= .
 include $(rootdir)/makeflags.mk
 
 srcdir ?= .
-blddir := .
 objdir ?= ../obj
 
 prefix ?= /usr/local
@@ -74,7 +73,7 @@ else
   # --keep-going
 endif
 
-DAKOTA_CATALOG ?= $(blddir)/../bin/dakota-catalog
+DAKOTA_CATALOG ?= ../bin/dakota-catalog
 
 DAKOTAFLAGS ?=
 EXTRA_DAKOTAFLAGS ?=
