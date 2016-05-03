@@ -134,7 +134,7 @@ my $project_io;
 my $project_io_path;
 
 # create default project file when missing (when linking)
-if (!exists $$root_cmd{'compile'} && !$$root_cmd{'opts'}{'project'}) {
+if (!$$root_cmd{'compile'} && !$$root_cmd{'opts'}{'project'}) {
   $$root_cmd{'opts'}{'project'} = &create_missing_project($root_cmd, $inputs);
 }
 if ($$root_cmd{'opts'}{'project'}) {
@@ -145,13 +145,13 @@ if ($$root_cmd{'opts'}{'clean'}) {
   exit 0;
 }
 if ($project) {
-  if (!$$root_cmd{'opts'}{'output'} && exists $$root_cmd{'opts'}{'compile'}) {
+  if (!$$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
     if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
       my $o_path = &o_path_from_dk_path($$inputs[0]);
       $$root_cmd{'opts'}{'output'} = $o_path; # setting default output (compile) path for single .dk input path
     }
   }
-  if ($$root_cmd{'opts'}{'output'} && exists $$root_cmd{'opts'}{'compile'}) {
+  if ($$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
     if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
       $$project_io{'compile'}{$$inputs[0]} = $$root_cmd{'opts'}{'output'};
       my $original_state;
@@ -159,7 +159,7 @@ if ($project) {
     }
   }
 }
-if (!exists $$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) {
+if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) {
   foreach my $input (@$inputs) {
     if ($$project_io{'compile'}{$input}) {
       delete $$project_io{'compile'}{$input};
