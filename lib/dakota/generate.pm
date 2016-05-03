@@ -305,6 +305,14 @@ my $im_suffix_for_suffix = {
   $cc_ext => 'dk',
   $hh_ext => 'kt',
 };
+sub pre_output_path_from_any_path {
+  my ($path) = @_;
+  $path =~ m/\.([\w-]+)$/;
+  my $ext = $1;
+  my $pre_output_ext = $$im_suffix_for_suffix{$ext};
+  my $pre_output = $path =~ s/\.$ext$/.$pre_output_ext/r;
+  return $pre_output;
+}
 sub generate_nrt {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
@@ -312,8 +320,8 @@ sub generate_nrt {
   my $rel_user_dk_path = "-user/$name.dk";
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
-  my $pre_output = "$dir/$name." . $$im_suffix_for_suffix{$suffix};
   my $output =     "$dir/$name.$suffix";
+  my $pre_output = &pre_output_path_from_any_path($output);
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
@@ -366,8 +374,8 @@ sub generate_rt {
   my ($dir, $name, $ext) = &split_path($path, $id);
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
-  my $pre_output = "$dir/$name." . $$im_suffix_for_suffix{$suffix};
   my $output =     "$dir/$name.$suffix";
+  my $pre_output = &pre_output_path_from_any_path($output);
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
@@ -456,7 +464,7 @@ sub generate_decl_defn {
     my $output = "$dir/$rel_hh_path";
     my $strings = [ '// ', $emacs_mode_file_variables, "\n\n", &linkage_unit::generate_generics($generics, $col) ];
     if ($should_write_pre_output) {
-      my $pre_output = "$dir/$output_base.kt";
+      my $pre_output = &pre_output_path_from_any_path($output);
       &write_to_file_strings($pre_output, $strings);
     }
     &write_to_file_converted_strings($output, $strings);

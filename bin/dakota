@@ -103,6 +103,7 @@ my $root_cmd = { 'reps' => [],
             'precompile',           # gcc-ish (--compile)
             'project=s',
             'shared',               # gcc-like
+            'echo-inputs',          #
             'silent',               #
             'soname=s',             # ld-like (-soname <>)
             'var=s',                # for env vars like MAKEFLAGS, etc.

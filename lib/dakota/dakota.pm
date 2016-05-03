@@ -599,6 +599,7 @@ sub update_rep_from_all_inputs {
              };
   $$cmd_info{'inputs'} = $$cmd_info{'project.inputs'},
   $$cmd_info{'output'} = $$cmd_info{'project.output'},
+  $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
   my $rt_json_path = &rt_json_path($cmd_info);
@@ -887,8 +888,9 @@ sub gen_rt_o {
   my ($cmd_info, $is_exe) = @_;
   if ($$cmd_info{'output'}) {
     my $rt_cc_path = &rt_cc_path($cmd_info);
-    if (!$$cmd_info{'opts'}{'silent'}) {
-      print '<' . $rt_cc_path . ">\n";
+    if ($$cmd_info{'opts'}{'echo-inputs'}) {
+      my $rt_dk_path = &dk_path_from_cc_path($rt_cc_path);
+      print $rt_dk_path . $nl;
     }
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
@@ -920,7 +922,7 @@ sub o_from_dk {
   my $num_out_of_date_infiles = 0;
   my $outfile;
   if (!&is_dk_src_path($input)) {
-    if (!$$cmd_info{'opts'}{'silent'}) {
+    if ($$cmd_info{'opts'}{'echo-inputs'}) {
       #print $input . $nl; # dk_path
     }
     $outfile = $input;
@@ -961,8 +963,8 @@ sub o_from_dk {
     $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
-      if (!$$cmd_info{'opts'}{'silent'}) {
-        print $input . $nl; # dk_path
+      if ($$cmd_info{'opts'}{'echo-inputs'}) {
+        print $input . $nl;
       }
       my $rt_json_path = &rt_json_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
@@ -997,6 +999,9 @@ sub o_from_dk {
       }
       $outfile = $$o_cmd{'output'};
     }
+  }
+  if (!$$cmd_info{'opts'}{'silent'}) {
+    print $outfile . $nl;
   }
   return $outfile;
 } # o_from_dk
@@ -1059,6 +1064,9 @@ sub rt_o_from_json {
   my $rt_cc_path =   &rt_cc_path($cmd_info);
   &check_path($rt_json_path);
   my $rt_o_path = &o_path_from_cc_path($rt_cc_path);
+  if (!$$cmd_info{'opts'}{'silent'}) {
+    print $rt_o_path . $nl;
+  }
   my $rt_hh_path = $rt_cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
 
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
@@ -1333,7 +1341,7 @@ sub outfile_from_infiles {
 } # outfile_from_infiles
 sub ctlg_from_so {
   my ($cmd_info) = @_;
-  if (!$$cmd_info{'opts'}{'silent'}) {
+  if ($$cmd_info{'opts'}{'echo-inputs'}) {
     #map { print '// ' . $_ . $nl; } @{$$cmd_info{'inputs'}};
   }
   my $ctlg_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -1346,6 +1354,9 @@ sub ctlg_from_so {
   } else {
     die "should not call just any dakota-catalog"; # should we call just any dakota-catalog?
     $$ctlg_cmd{'cmd'} = 'dakota-catalog';
+  }
+  if ($$cmd_info{'opts'}{'silent'} && !$$cmd_info{'opts'}{'echo-inputs'}) {
+    $$ctlg_cmd{'cmd'} .= ' --silent';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'project.output'} = $$cmd_info{'project.output'};

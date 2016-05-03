@@ -64,6 +64,12 @@ sub hh_path_from_cc_path {
   my $hh_path = $cc_path =~ s/\.$cc_ext/\.$hh_ext/r;
   return $hh_path;
 }
+# related to generate.pm:pre_output_path_from_any_path()
+sub dk_path_from_cc_path { # reverse dependency
+  my ($cc_path) = @_;
+  my $dk_path = $cc_path =~ s/\.$cc_ext$/.dk/r;
+  return $dk_path;
+}
 sub cc_path_from_o_path { # reverse dependency
   my ($o_path) = @_;
   my $cc_path = $o_path =~ s/\.$o_ext$//r;
@@ -145,6 +151,7 @@ our @EXPORT= qw(
                  colin
                  colout
                  ctlg_path_from_so_path
+                 dk_path_from_cc_path
                  user_path_from_any_path
                  hh_path_from_cc_path
                  init_global_rep
