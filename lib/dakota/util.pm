@@ -583,7 +583,7 @@ sub path_stat {
   return $stat;
 }
 sub is_out_of_date {
-  my ($file_db, $infile, $outfile) = @_;
+  my ($infile, $outfile, $file_db) = @_;
   my $outfile_stat = &path_stat($file_db, $outfile, '--output');
   if (!$$outfile_stat{'mtime'}) {
     return 1;

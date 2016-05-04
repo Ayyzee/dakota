@@ -926,6 +926,13 @@ sub o_from_dk {
     } else {
       $o_path =  &o_path_from_dk_path($input);
     }
+    my $is_out_of_date = &is_out_of_date($input, $o_path);
+    if ($is_out_of_date && $$cmd_info{'opts'}{'echo-inputs'}) {
+      print $input . $nl;
+    }
+    if ($is_out_of_date && !$$cmd_info{'opts'}{'silent'}) {
+      print $o_path . $nl;
+    }
     my $cc_path = &cc_path_from_o_path($o_path); # reverse dependency
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     if (&is_debug()) {
@@ -955,9 +962,6 @@ sub o_from_dk {
     $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
-      if ($$cmd_info{'opts'}{'echo-inputs'}) {
-        print $input . $nl;
-      }
       my $rt_json_path = &rt_json_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
       if (!$$project_io{'all'}{$rt_json_path}{$cc_path}) {
@@ -991,9 +995,6 @@ sub o_from_dk {
       }
       $outfile = $$o_cmd{'output'};
     }
-  }
-  if (!$$cmd_info{'opts'}{'silent'}) {
-    print $outfile . $nl;
   }
   return $outfile;
 } # o_from_dk
@@ -1262,7 +1263,7 @@ sub outfile_from_infiles {
     my $file_db = {};
     $infiles = [];
     foreach my $infile (@{$$cmd_info{'inputs'}}) {
-      if (&is_out_of_date($file_db, $infile, $outfile)) {
+      if (&is_out_of_date($infile, $outfile, $file_db)) {
         push @$infiles, $infile;
       }
     }
