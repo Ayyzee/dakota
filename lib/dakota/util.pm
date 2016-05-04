@@ -592,7 +592,7 @@ sub is_out_of_date {
 
   if (!$$infile_stat{'mtime'}) {
     $$infile_stat{'mtime'} = 0;
-    #print STDERR $0 . ': warning: no-such-file: ' . $infile . $nl;
+    print STDERR $0 . ': warning: no-such-file: ' . $infile . $nl;
   }
   if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
     return 1;
