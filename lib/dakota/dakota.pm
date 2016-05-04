@@ -707,19 +707,16 @@ sub start_cmd {
   if (!$ENV{'DKT_PRECOMPILE'}) {
     if ($$cmd_info{'opts'}{'compile'}) {
       if ($want_separate_precompile_pass) {
-        $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_compile_flags;
-        &o_from_cc($cmd_info);
+        &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
       }
     } elsif ($$cmd_info{'opts'}{'shared'}) {
-      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_shared_flags;
-      &so_from_o($cmd_info);
+      &so_from_o($cmd_info, &link_so_opts_path(), $cxx_shared_flags);
     } elsif ($$cmd_info{'opts'}{'dynamic'}) {
-      $$cmd_info{'cmd'}{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
-      &dso_from_o($cmd_info);
+      &so_from_o($cmd_info, &link_dso_opts_path(), $cxx_dynamic_flags);
     } elsif (!$$cmd_info{'opts'}{'compile'} &&
              !$$cmd_info{'opts'}{'shared'}  &&
              !$$cmd_info{'opts'}{'dynamic'}) {
-      &exe_from_o($cmd_info);
+      &exe_from_o($cmd_info, &link_exe_opts_path());
     } else {
       die __FILE__, ":", __LINE__, ": error:\n";
     }
@@ -966,7 +963,7 @@ sub o_from_dk {
       $$o_cmd{'output'} = $o_path;
       $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
       delete $$o_cmd{'opts'}{'output'};
-      $num_out_of_date_infiles = &o_from_cc($o_cmd);
+      $num_out_of_date_infiles = &o_from_cc($o_cmd, &compile_opts_path(), $cxx_compile_flags);
 
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
       $$project_io{'compile'}{$input} = $o_path;
@@ -1036,22 +1033,21 @@ sub link_exe_opts_path {
   return $objdir . '/cxx-link-exe.opts';
 }
 sub o_from_cc {
-  my ($cmd_info) = @_;
+  my ($cmd_info, $opts_path, $mode_flags) = @_;
     open(my $fh1, '>', &common_opts_path());
     print $fh1 $$cmd_info{'opts'}{'compiler-flags'} . $nl;
     close($fh1);
-    my $compile_opts_path = &compile_opts_path();
-    my $compile_opts =
-      $cxx_compile_flags . $nl .
+    my $opts =
+      $mode_flags . $nl .
       '@' . &common_opts_path() . $nl;
-    open(my $fh2, '>', $compile_opts_path);
-    print $fh2 $compile_opts;
+    open(my $fh2, '>', $opts_path);
+    print $fh2 $opts;
     close($fh2);
     my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
     $$o_cmd{'project.output'} = $$cmd_info{'project.output'};
     $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$o_cmd{'cmd-flags'} = '@' . $compile_opts_path;
+    $$o_cmd{'cmd-flags'} = '@' . $opts_path;
     $$o_cmd{'output'} = $$cmd_info{'output'};
     $$o_cmd{'inputs'} = $$cmd_info{'inputs'};
     my $should_echo = 0;
@@ -1121,7 +1117,7 @@ sub rt_o_from_json {
     $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
   if (!$ENV{'DKT_PRECOMPILE'}) {
-    &o_from_cc($o_info);
+    &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
     &add_first($$cmd_info{'inputs'}, $rt_o_path);
   }
 }
@@ -1148,23 +1144,22 @@ sub library_names_add_first {
   }
 }
 sub so_from_o {
-  my ($cmd_info) = @_;
+  my ($cmd_info, $opts_path, $mode_flags) = @_;
   my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$so_cmd{'project.io'} =  $$cmd_info{'project.io'};
   my $inputs = &deep_copy($$cmd_info{'inputs'});
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
-  my $link_so_opts_path = &link_so_opts_path();
-  my $link_so_opts =
-    $cxx_shared_flags . $nl .
+  my $opts =
+    $mode_flags . $nl .
     $ldflags . $nl .
     $extra_ldflags . $nl .
     '@' . &common_opts_path() . $nl;
-  open(my $fh, '>', $link_so_opts_path);
-  print $fh $link_so_opts;
+  open(my $fh, '>', $opts_path);
+  print $fh $opts;
   close($fh);
   $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$so_cmd{'cmd-flags'} = '@' . $link_so_opts_path;
+  $$so_cmd{'cmd-flags'} = '@' . $opts_path;
   $$so_cmd{'output'} = $$cmd_info{'output'};
   $$so_cmd{'project.output'} = $$cmd_info{'project.output'};
   if ($should_replace_library_path_with_lib_opts) {
@@ -1183,52 +1178,23 @@ sub so_from_o {
   }
   return $result;
 }
-sub dso_from_o {
-  my ($cmd_info) = @_;
-  my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
-  my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
-  my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
-  my $link_dso_opts_path = &link_dso_opts_path();
-  my $link_dso_opts =
-    $cxx_dynamic_flags . $nl .
-    $ldflags . $nl .
-    $extra_ldflags . $nl .
-    '@' . &common_opts_path() . $nl;
-  open(my $fh, '>', $link_dso_opts_path);
-  print $fh $link_dso_opts;
-  close($fh);
-  $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$so_cmd{'cmd-flags'} = '@' . $link_dso_opts_path;
-  $$so_cmd{'output'} = $$cmd_info{'output'};
-  if ($should_replace_library_path_with_lib_opts) {
-    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
-  } else {
-    $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
-  }
-  &library_names_add_first($so_cmd);
-  my $should_echo = 0;
-  if ($ENV{'DK_ECHO_LINK_CMD'} || $ENV{'DK_ECHO_LINK_SO_CMD'}) {
-    $should_echo = 1;
-  }
-  &outfile_from_infiles($so_cmd, $should_echo);
-}
 sub exe_from_o {
-  my ($cmd_info) = @_;
+  my ($cmd_info, $opts_path) = @_;
   my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$exe_cmd{'project.io'} =  $$cmd_info{'project.io'};
+  my $inputs = &deep_copy($$cmd_info{'inputs'});
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
-  my $link_exe_opts_path = &link_exe_opts_path();
-  my $link_exe_opts =
+  my $opts =
     # $cxx_exe_flags . $nl .
     $ldflags . $nl .
     $extra_ldflags . $nl .
     '@' . &common_opts_path() . $nl;
-  open(my $fh, '>', $link_exe_opts_path);
-  print $fh $link_exe_opts;
+  open(my $fh, '>', $opts_path);
+  print $fh $opts;
   close($fh);
   $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$exe_cmd{'cmd-flags'} = '@' . $link_exe_opts_path;
+  $$exe_cmd{'cmd-flags'} = '@' . $opts_path;
   $$exe_cmd{'output'} = $$cmd_info{'output'};
   $$exe_cmd{'project.output'} = $$cmd_info{'project.output'};
   if ($should_replace_library_path_with_lib_opts) {
@@ -1242,7 +1208,10 @@ sub exe_from_o {
     $should_echo = 1;
   }
   my $result = &outfile_from_infiles($exe_cmd, $should_echo);
-  return;
+  if ($result) {
+    &project_io_add($cmd_info, $inputs, $$cmd_info{'output'});
+  }
+  return $result;
 }
 sub dir_part {
   my ($path) = @_;
@@ -1328,14 +1297,12 @@ sub outfile_from_infiles {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
       delete $$cmd_info{'output'};
       delete $$cmd_info{'cmd'};
-      delete $$cmd_info{'cmd-major-mode-flags'};
       delete $$cmd_info{'cmd-flags'};
       &loop_merged_rep_from_inputs($cmd_info, $global_should_echo || $should_echo);
     } elsif ('&loop_cc_from_dk' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
       delete $$cmd_info{'output'};
       delete $$cmd_info{'cmd'};
-      delete $$cmd_info{'cmd-major-mode-flags'};
       delete $$cmd_info{'cmd-flags'};
       &loop_cc_from_dk($cmd_info, $global_should_echo || $should_echo);
     } else {
