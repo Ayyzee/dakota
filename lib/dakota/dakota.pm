@@ -1268,21 +1268,33 @@ sub path_stat {
   }
   return $stat;
 }
+sub is_out_of_date {
+  my ($file_db, $infile, $outfile) = @_;
+  my $outfile_stat = &path_stat($file_db, $outfile, '--output');
+  if (!$$outfile_stat{'mtime'}) {
+    return 1;
+  }
+  my $infile_stat = &path_stat($file_db, $infile,  '--inputs');
+
+  if (!$$infile_stat{'mtime'}) {
+    $$infile_stat{'mtime'} = 0;
+    #print STDERR $0 . ': warning: no-such-file: ' . $infile . $nl;
+  }
+  if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
+    return 1;
+  }
+  return 0;
+}
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
   if ($outfile =~ m|^$objdir/$objdir/|) { die "found double objdir/objdir: $outfile"; } # likely a double $objdir prepend
-  my $file_db = {};
-  my $outfile_stat = &path_stat($file_db, $$cmd_info{'output'}, '--output');
   my $infiles;
   if (-e $outfile) {
+    my $file_db = {};
     $infiles = [];
     foreach my $infile (@{$$cmd_info{'inputs'}}) {
-      my $infile_stat = &path_stat($file_db, $infile, '--inputs');
-      if (!$$infile_stat{'mtime'}) {
-        $$infile_stat{'mtime'} = 0;
-      }
-      if (! -e $outfile || $$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
+      if (&is_out_of_date($file_db, $infile, $outfile)) {
         push @$infiles, $infile;
       }
     }
