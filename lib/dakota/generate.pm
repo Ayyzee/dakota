@@ -302,14 +302,16 @@ sub generate_nrt_defn {
   return &generate_nrt($path, $file, $project_rep, $rel_rt_hh_path);
 }
 my $im_suffix_for_suffix = {
-  $cc_ext => 'dk',
-  $hh_ext => 'kt',
+  'dk' =>    'dk.kt',
+  $cc_ext => 'cc.kt',
+  $hh_ext => 'hh.kt',
 };
 sub pre_output_path_from_any_path {
   my ($path) = @_;
   $path =~ m/\.([\w-]+)$/;
   my $ext = $1;
   my $pre_output_ext = $$im_suffix_for_suffix{$ext};
+  die $path if !defined $pre_output_ext;
   my $pre_output = $path =~ s/\.$ext$/.$pre_output_ext/r;
   return $pre_output;
 }

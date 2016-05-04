@@ -70,13 +70,18 @@ sub dk_path_from_cc_path { # reverse dependency
   my $dk_path = $cc_path =~ s/\.$cc_ext$/.dk/r;
   return $dk_path;
 }
-sub cc_path_from_o_path { # reverse dependency
+sub src_path_from_o_path { # reverse dependency
   my ($o_path) = @_;
-  my $cc_path = $o_path =~ s/\.$o_ext$//r;
-  if ($cc_path !~ m/\.(dk|$cc_ext)$/) {
-    $cc_path .= ".$cc_ext";
+  my $src_path = $o_path =~ s/\.$o_ext$//r;
+  if ($src_path !~ m/\.(dk|$cc_ext)$/) {
+    $src_path .= ".$cc_ext";
   }
-  return $cc_path;
+  return $src_path;
+}
+sub hh_path_from_src_path {
+  my ($src_path) = @_;
+  my $hh_path = $src_path =~ s/\.(dk|$cc_ext)$/.$hh_ext/r;
+  return $hh_path;
 }
 sub json_path_from_o_path {
   my ($in_path) = @_;
@@ -147,13 +152,14 @@ our @EXPORT= qw(
                  add_str
                  add_symbol
                  add_trait_decl
-                 cc_path_from_o_path
+                 src_path_from_o_path
                  colin
                  colout
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
                  user_path_from_any_path
                  hh_path_from_cc_path
+                 hh_path_from_src_path
                  init_global_rep
                  kw_args_translate
                  o_path_from_dk_path

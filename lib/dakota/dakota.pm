@@ -921,11 +921,11 @@ sub o_from_dk {
     if ($is_out_of_date && !$$cmd_info{'opts'}{'silent'}) {
       print $o_path . $nl;
     }
-    my $cc_path = &cc_path_from_o_path($o_path); # reverse dependency
-    my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
+    my $src_path = &src_path_from_o_path($o_path); # reverse dependency
+    my $hh_path = &hh_path_from_src_path($src_path);
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print "  creating $cc_path" . &pann(__FILE__, __LINE__) . $nl;
+        print "  creating $src_path" . &pann(__FILE__, __LINE__) . $nl;
       } else {
         print "  creating $o_path" . &pann(__FILE__, __LINE__) . $nl;
       }
@@ -944,7 +944,7 @@ sub o_from_dk {
     }
     my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$cc_cmd{'inputs'} = [ $input ];
-    $$cc_cmd{'output'} = $cc_path;
+    $$cc_cmd{'output'} = $src_path;
     $$cc_cmd{'reps'} = $$cmd_info{'reps'};
     $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
     $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
@@ -952,8 +952,8 @@ sub o_from_dk {
     if ($num_out_of_date_infiles) {
       my $rt_json_path = &rt_json_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      if (!$$project_io{'all'}{$rt_json_path}{$cc_path}) {
-        $$project_io{'all'}{$rt_json_path}{$cc_path} = 1;
+      if (!$$project_io{'all'}{$rt_json_path}{$src_path}) {
+        $$project_io{'all'}{$rt_json_path}{$src_path} = 1;
         $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
         &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
       }
@@ -962,7 +962,7 @@ sub o_from_dk {
       $outfile = $$cc_cmd{'output'};
     } else {
       my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$o_cmd{'inputs'} = [ $cc_path ];
+      $$o_cmd{'inputs'} = [ $src_path ];
       $$o_cmd{'output'} = $o_path;
       $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
       delete $$o_cmd{'opts'}{'output'};
@@ -974,10 +974,10 @@ sub o_from_dk {
 
       if ($num_out_of_date_infiles) {
         my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-        $$project_io{'all'}{$cc_path}{$o_path} = 1;
+        $$project_io{'all'}{$src_path}{$o_path} = 1;
         $$project_io{'all'}{$hh_path}{$o_path} = 1;
         $$project_io{'all'}{$user_dk_path}{$o_path} = 1;
-        $$project_io{'all'}{$json_path}{$cc_path} = 1;
+        $$project_io{'all'}{$json_path}{$src_path} = 1;
         $$project_io{'all'}{$json_path}{$hh_path} = 1;
         &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
       }
