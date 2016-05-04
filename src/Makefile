@@ -54,6 +54,7 @@ libdakota.single: $(libdakota.inputs) | libdakota.project
 
 check: all
 	$(dakota-catalog.output) --silent $(libdakota-core.output) $(libdakota.output)
+	echo "func main() ->int-t { return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
 
 installcheck: check install
 	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
@@ -69,6 +70,7 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) libdakota.project
 	$(RM) $(RMFLAGS) libdakota-core.project.io
 	$(RM) $(RMFLAGS) libdakota.project.io
+	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-catalog.output)
 	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)
