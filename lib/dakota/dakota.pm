@@ -668,7 +668,6 @@ sub start_cmd {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
-  die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
       my $rt_cc_path = &rt_cc_path($cmd_info);
