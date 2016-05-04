@@ -684,12 +684,6 @@ sub start_cmd {
     my ($inputs, $lib_opts) = &split_inputs($$cmd_info{'inputs'});
     $$cmd_info{'inputs'} = $inputs;
     $$cmd_info{'opts'}{'*lib-opts*'} = $lib_opts;
-  } else {
-    my $inputs = [];
-    foreach my $input (@{$$cmd_info{'inputs'}}) {
-      push @$inputs, &cmd_opts_from_library_name($input);
-    }
-    $$cmd_info{'inputs'} = $inputs;
   }
   if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
@@ -708,12 +702,6 @@ sub start_cmd {
     if (!$$cmd_info{'opts'}{'compile'}) {
       my $is_exe = !defined $$cmd_info{'opts'}{'shared'};
       &gen_rt_o($cmd_info, $is_exe);
-    }
-  }
-  if ($$cmd_info{'output'} && $$cmd_info{'opts'}{'compile'}) {
-    my $last = &last($$cmd_info{'inputs'});
-    if ($last ne $$cmd_info{'output'}) {
-      `mv $last $$cmd_info{'output'}`;
     }
   }
   if (!$ENV{'DKT_PRECOMPILE'}) {
@@ -1002,19 +990,19 @@ sub loop_o_from_dk {
   my ($cmd_info) = @_;
   my $outfiles = [];
   if (1 == scalar @{$$cmd_info{'inputs'}}) {
-    if (&is_o_path($$cmd_info{'inputs'}[0])) {
-      push @$outfiles, $$cmd_info{'inputs'}[0];
-    } else {
+    if (&is_dk_path($$cmd_info{'inputs'}[0])) {
       push @$outfiles, &o_from_dk($cmd_info, $$cmd_info{'inputs'}[0]);
+    } else {
+      push @$outfiles, $$cmd_info{'inputs'}[0];
     }
   } else {
     my $output = $$cmd_info{'output'};
     $$cmd_info{'output'} = undef;
     foreach my $input (@{$$cmd_info{'inputs'}}) {
-      if (&is_o_path($input)) {
-        push @$outfiles, $input;
-      } else {
+      if (&is_dk_path($input)) {
         push @$outfiles, &o_from_dk($cmd_info, $input);
+      } else {
+        push @$outfiles, $input;
       }
     }
     $$cmd_info{'output'} = $output;
