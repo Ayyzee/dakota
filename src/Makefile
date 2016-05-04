@@ -36,7 +36,7 @@ $(libdakota.output): $(libdakota-core.output)
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
-libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project
+libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project $(dakota-catalog.output)
 	set -o verbose; for input in $(libdakota-core.inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project ./libdakota-core.project $$input;\

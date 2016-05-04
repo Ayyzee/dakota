@@ -61,10 +61,11 @@ EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
 #EXTRA_CXXFLAGS += $(CXX_COMPILE_THREAD_FLAGS)
 #EXTRA_CXXFLAGS += -MMD -MP
 
-DAKOTA-BASE = $(srcdir)/../bin/dakota
+DAKOTA-BASE :=         $(srcdir)/../bin/dakota
+DAKOTA-PROFILE-BASE := $(srcdir)/../bin/dakota-profile
 
 ifdef DKT_PROFILE
-  DAKOTA ?= DK_ECHO_LINK_CMD=0 DK_NO_LINE=0 DK_NO_CONVERT_DASH_SYNTAX=0 $(srcdir)/../bin/dakota-profile
+  DAKOTA ?= DK_ECHO_LINK_CMD=0 DK_NO_LINE=0 DK_NO_CONVERT_DASH_SYNTAX=0 $(DAKOTA-PROFILE-BASE)
   # prof uses -p, gprof uses -pg
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
