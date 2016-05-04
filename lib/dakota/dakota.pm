@@ -96,7 +96,6 @@ my $should_write_ctlg_files = 1;
 my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
 my $show_outfile_info = 0;
-my $show_stat_info = 0;
 my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_exe_type = undef;
@@ -1254,36 +1253,6 @@ sub exec_cmd {
       exit $exit_status;
     }
   }
-}
-sub path_stat {
-  my ($path_db, $path, $text) = @_;
-  my $stat;
-  if (exists $$path_db{$path}) {
-    $stat = $$path_db{$path};
-  } else {
-    if ($show_stat_info) {
-      print "STAT $path, text=$text\n";
-    }
-    @$stat{qw(dev inode mode nlink uid gid rdev size atime mtime ctime blksize blocks)} = stat($path);
-  }
-  return $stat;
-}
-sub is_out_of_date {
-  my ($file_db, $infile, $outfile) = @_;
-  my $outfile_stat = &path_stat($file_db, $outfile, '--output');
-  if (!$$outfile_stat{'mtime'}) {
-    return 1;
-  }
-  my $infile_stat = &path_stat($file_db, $infile,  '--inputs');
-
-  if (!$$infile_stat{'mtime'}) {
-    $$infile_stat{'mtime'} = 0;
-    #print STDERR $0 . ': warning: no-such-file: ' . $infile . $nl;
-  }
-  if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
-    return 1;
-  }
-  return 0;
 }
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;

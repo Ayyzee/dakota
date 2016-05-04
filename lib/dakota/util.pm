@@ -70,6 +70,7 @@ our @EXPORT= qw(
                  is_symbol_candidate
                  is_debug
                  is_kw_args_generic
+                 is_out_of_date
                  is_va
                  kw_args_generics
                  kw_args_generics_sig
@@ -108,6 +109,8 @@ our @EXPORT= qw(
 use Cwd;
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
+
+my $show_stat_info = 0;
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -565,6 +568,36 @@ sub mtime {
   my $mtime = 9;
   my $result = (stat ($file))[$mtime];
   return $result;
+}
+sub path_stat {
+  my ($path_db, $path, $text) = @_;
+  my $stat;
+  if (exists $$path_db{$path}) {
+    $stat = $$path_db{$path};
+  } else {
+    if ($show_stat_info) {
+      print "STAT $path, text=$text\n";
+    }
+    @$stat{qw(dev inode mode nlink uid gid rdev size atime mtime ctime blksize blocks)} = stat($path);
+  }
+  return $stat;
+}
+sub is_out_of_date {
+  my ($file_db, $infile, $outfile) = @_;
+  my $outfile_stat = &path_stat($file_db, $outfile, '--output');
+  if (!$$outfile_stat{'mtime'}) {
+    return 1;
+  }
+  my $infile_stat = &path_stat($file_db, $infile,  '--inputs');
+
+  if (!$$infile_stat{'mtime'}) {
+    $$infile_stat{'mtime'} = 0;
+    #print STDERR $0 . ': warning: no-such-file: ' . $infile . $nl;
+  }
+  if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
+    return 1;
+  }
+  return 0;
 }
 sub flatten {
     my ($a_of_a) = @_;
