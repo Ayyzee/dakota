@@ -1023,24 +1023,47 @@ sub cc_from_dk {
   my $should_echo;
   return &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
+sub common_opts_path {
+  return $objdir . '/cxx-common.opts';
+}
+sub compile_opts_path {
+  return $objdir . '/cxx-compile.opts';
+}
+sub link_so_opts_path {
+  return $objdir . '/cxx-link-so.opts';
+}
+sub link_exe_opts_path {
+  return $objdir . '/cxx-link-exe.opts';
+}
 sub o_from_cc {
   my ($cmd_info) = @_;
+    open(my $fh1, '>', &common_opts_path());
+    print $fh1 $$cmd_info{'opts'}{'compiler-flags'} . $nl;
+    close($fh1);
+    my $compile_opts_path = &compile_opts_path();
+    my $compile_opts =
+      $cxx_compile_flags . $nl .
+      '@' . &common_opts_path() . $nl;
+    open(my $fh2, '>', $compile_opts_path);
+    print $fh2 $compile_opts;
+    close($fh2);
     my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
     $$o_cmd{'project.output'} = $$cmd_info{'project.output'};
     $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$o_cmd{'cmd-major-mode-flags'} = $cxx_compile_flags;
-    $$o_cmd{'cmd-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
+    $$o_cmd{'cmd-flags'} = '@' . $compile_opts_path;
     $$o_cmd{'output'} = $$cmd_info{'output'};
     $$o_cmd{'inputs'} = $$cmd_info{'inputs'};
-    my $should_echo;
-
+    my $should_echo = 0;
+    if ($ENV{'DK_ECHO_COMPILE_CMD'}) {
+      $should_echo = 1;
+    }
     if (0) {
       $$o_cmd{'cmd-flags'} .= " -MMD";
-      return &outfile_from_infiles($o_cmd, $should_echo = 1);
+      return &outfile_from_infiles($o_cmd, $should_echo);
       $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
     }
-    return &outfile_from_infiles($o_cmd, $should_echo = 0);
+    return &outfile_from_infiles($o_cmd, $should_echo);
 }
 sub rt_o_from_json {
   my ($cmd_info, $other, $is_exe) = @_;
@@ -1131,9 +1154,17 @@ sub so_from_o {
   my $inputs = &deep_copy($$cmd_info{'inputs'});
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  my $link_so_opts_path = &link_so_opts_path();
+  my $link_so_opts =
+    $cxx_shared_flags . $nl .
+    $ldflags . $nl .
+    $extra_ldflags . $nl .
+    '@' . &common_opts_path() . $nl;
+  open(my $fh, '>', $link_so_opts_path);
+  print $fh $link_so_opts;
+  close($fh);
   $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$so_cmd{'cmd-major-mode-flags'} = $cxx_shared_flags;
-  $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
+  $$so_cmd{'cmd-flags'} = '@' . $link_so_opts_path;
   $$so_cmd{'output'} = $$cmd_info{'output'};
   $$so_cmd{'project.output'} = $$cmd_info{'project.output'};
   if ($should_replace_library_path_with_lib_opts) {
@@ -1142,8 +1173,8 @@ sub so_from_o {
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
   &library_names_add_first($so_cmd);
-  my $should_echo;
-  if ($ENV{'DK_ECHO_LINK_CMD'}) {
+  my $should_echo = 0;
+  if ($ENV{'DK_ECHO_LINK_CMD'} || $ENV{'DK_ECHO_LINK_SO_CMD'}) {
     $should_echo = 1;
   }
   my $result = &outfile_from_infiles($so_cmd, $should_echo);
@@ -1157,9 +1188,17 @@ sub dso_from_o {
   my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  my $link_dso_opts_path = &link_dso_opts_path();
+  my $link_dso_opts =
+    $cxx_dynamic_flags . $nl .
+    $ldflags . $nl .
+    $extra_ldflags . $nl .
+    '@' . &common_opts_path() . $nl;
+  open(my $fh, '>', $link_dso_opts_path);
+  print $fh $link_dso_opts;
+  close($fh);
   $$so_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$so_cmd{'cmd-major-mode-flags'} = $cxx_dynamic_flags;
-  $$so_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
+  $$so_cmd{'cmd-flags'} = '@' . $link_dso_opts_path;
   $$so_cmd{'output'} = $$cmd_info{'output'};
   if ($should_replace_library_path_with_lib_opts) {
     $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
@@ -1167,8 +1206,11 @@ sub dso_from_o {
     $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
   &library_names_add_first($so_cmd);
-  my $should_echo;
-  &outfile_from_infiles($so_cmd, $should_echo = 0);
+  my $should_echo = 0;
+  if ($ENV{'DK_ECHO_LINK_CMD'} || $ENV{'DK_ECHO_LINK_SO_CMD'}) {
+    $should_echo = 1;
+  }
+  &outfile_from_infiles($so_cmd, $should_echo);
 }
 sub exe_from_o {
   my ($cmd_info) = @_;
@@ -1176,9 +1218,17 @@ sub exe_from_o {
   $$exe_cmd{'project.io'} =  $$cmd_info{'project.io'};
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  my $link_exe_opts_path = &link_exe_opts_path();
+  my $link_exe_opts =
+    # $cxx_exe_flags . $nl .
+    $ldflags . $nl .
+    $extra_ldflags . $nl .
+    '@' . &common_opts_path() . $nl;
+  open(my $fh, '>', $link_exe_opts_path);
+  print $fh $link_exe_opts;
+  close($fh);
   $$exe_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-  $$exe_cmd{'cmd-major-mode-flags'} = undef;
-  $$exe_cmd{'cmd-flags'} = "$ldflags $extra_ldflags $$cmd_info{'opts'}{'compiler-flags'}";
+  $$exe_cmd{'cmd-flags'} = '@' . $link_exe_opts_path;
   $$exe_cmd{'output'} = $$cmd_info{'output'};
   $$exe_cmd{'project.output'} = $$cmd_info{'project.output'};
   if ($should_replace_library_path_with_lib_opts) {
@@ -1187,8 +1237,8 @@ sub exe_from_o {
     $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
   &library_names_add_first($exe_cmd);
-  my $should_echo;
-  if ($ENV{'DK_ECHO_LINK_CMD'}) {
+  my $should_echo = 0;
+  if ($ENV{'DK_ECHO_LINK_CMD'} || $ENV{'DK_ECHO_LINK_EXE_CMD'}) {
     $should_echo = 1;
   }
   my $result = &outfile_from_infiles($exe_cmd, $should_echo);

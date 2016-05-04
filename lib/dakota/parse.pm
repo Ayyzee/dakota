@@ -353,17 +353,14 @@ sub str_from_cmd_info {
   } else {
     $str .= '<>';
   }
-  if ($$cmd_info{'cmd-major-mode-flags'}) {
-    $str .= " $$cmd_info{'cmd-major-mode-flags'}";
+  if ($$cmd_info{'cmd-flags'}) {
+    $str .= " $$cmd_info{'cmd-flags'}";
   }
   if ($$cmd_info{'output'}) {
     $str .= " --output $$cmd_info{'output'}";
   }
   if ($$cmd_info{'output-directory'}) {
     $str .= " --output-directory $$cmd_info{'output-directory'}";
-  }
-  if ($$cmd_info{'cmd-flags'}) {
-    $str .= " $$cmd_info{'cmd-flags'}";
   }
   foreach my $infile (@{$$cmd_info{'reps'}}) {
     $str .= " $infile";
