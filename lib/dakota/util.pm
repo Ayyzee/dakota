@@ -84,7 +84,7 @@ our @EXPORT= qw(
                  min
                  mtime
                  needs_hex_encoding
-                 objdir
+                 dstdir
                  pann
                  parameter_types_str
                  rel_path_canon
@@ -412,29 +412,29 @@ sub sqstr_regex {
   return qr/(?<!\\)'.*?(?<!\\)'/;
 }
 my $build_vars = {
-  'objdir' => '../obj',
+  'dstdir' => '../dst',
 };
-sub objdir {
-  my $objdir;
+sub dstdir {
+  my $dstdir;
   my $project = &global_project();
-  if ($project && $$project{'objdir'}) {
-    $objdir = $$project{'objdir'};
+  if ($project && $$project{'dstdir'}) {
+    $dstdir = $$project{'dstdir'};
   } elsif ($ENV{'OBJDIR'}) {
-    $objdir = $ENV{'OBJDIR'};
+    $dstdir = $ENV{'OBJDIR'};
   } else {
-    $objdir = $$build_vars{'objdir'};
+    $dstdir = $$build_vars{'dstdir'};
   }
-  die if ! $objdir;
-  if (-e $objdir && ! -d $objdir) {
+  die if ! $dstdir;
+  if (-e $dstdir && ! -d $dstdir) {
     die;
   }
-  if (! -e $objdir) {
-    mkdir $objdir; # or try make_path in File::Path
+  if (! -e $dstdir) {
+    mkdir $dstdir; # or try make_path in File::Path
   }
-  if (! -e "$objdir/+user") {
-    mkdir "$objdir/+user";
+  if (! -e "$dstdir/+user") {
+    mkdir "$dstdir/+user";
   }
- return $objdir;
+ return $dstdir;
 }
 
 # 1. cmd line

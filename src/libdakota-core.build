@@ -92,7 +92,7 @@
       'HAVE_CONFIG_HH',
     ],
     'project' => '$(srcdir)/libdakota-core.project', # cmd-line
-    'objdir' => '../obj/libdakota-core',
+    'dstdir' => '../dst/libdakota-core',
     'output' => '../lib/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line

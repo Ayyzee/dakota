@@ -6,7 +6,7 @@ rootdir ?= .
 include $(rootdir)/makeflags.mk
 
 srcdir ?= .
-objdir ?= ../obj
+dstdir ?= ../dst
 
 prefix ?= /usr/local
 
@@ -25,12 +25,12 @@ LNFLAGS ?= --symbolic --force
 MKDIR := mkdir
 MKDIRFLAGS ?= --parents
 
-$(shell $(MKDIR) $(MKDIRFLAGS) $(objdir))
+$(shell $(MKDIR) $(MKDIRFLAGS) $(dstdir))
 
 platform := $(shell source $(rootdir)/common.sh; platform)
 compiler := $(shell source $(rootdir)/common.sh; compiler)
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/compiler.mk\
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(dstdir)/compiler.mk\
  $(rootdir)/lib/dakota/compiler/command-line.json\
  $(rootdir)/lib/dakota/platform.json)\
 

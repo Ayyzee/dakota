@@ -2,9 +2,9 @@ rootdir := ..
 
 include $(rootdir)/dakota.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/dakota-catalog.mk $(srcdir)/dakota-catalog.build)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/libdakota-core.mk $(srcdir)/libdakota-core.build)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(objdir)/libdakota.mk      $(srcdir)/libdakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(dstdir)/dakota-catalog.mk $(srcdir)/dakota-catalog.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(dstdir)/libdakota-core.mk $(srcdir)/libdakota-core.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(dstdir)/libdakota.mk      $(srcdir)/libdakota.build)
 
 # include-dirs
 dakota-catalog.include-dirs := $(patsubst %,--include-directory %,$(dakota-catalog.include-dirs))
@@ -39,7 +39,7 @@ $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project $(dakota-catalog.output)
 	for input in $(libdakota-core.inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(libdakota-core.objdir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(libdakota-core.dstdir)/$$input.o $$input;\
     fi\
   done
 	$(DAKOTA-BASE) --shared --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
@@ -47,7 +47,7 @@ libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project $(dakot
 libdakota.single: $(libdakota.inputs) | libdakota.project
 	for input in $(libdakota.inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(libdakota.objdir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(libdakota.dstdir)/$$input.o $$input;\
     fi\
   done
 	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
@@ -74,7 +74,6 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(dakota-catalog.output)
 	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)
-	$(RM) $(RMFLAGS) $(objdir)/*
 
 distclean: clean
 	cd $(rootdir); ./configure-common

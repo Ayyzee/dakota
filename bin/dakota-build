@@ -37,7 +37,7 @@ my $subcmd_tbl = {
   'init' =>         \&subcmd_init,
   'macros' =>       \&subcmd_macros,
   'output' =>       \&subcmd_output,
-  'objdir' =>       \&subcmd_objdir,
+  'dstdir' =>       \&subcmd_dstdir,
   'remove' =>       \&subcmd_remove,
   'set-output' =>   \&subcmd_set_output,
   'set-soname' =>   \&subcmd_set_soname,
@@ -274,9 +274,9 @@ sub var {
   }
   return $result;
 }
-sub subcmd_objdir {
+sub subcmd_dstdir {
   my ($rep, $args) = @_;
-  print $$rep{'objdir'} . $nl;
+  print $$rep{'dstdir'} . $nl;
 }
 sub subcmd_soname {
   my ($rep, $args) = @_;

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-paths=$(echo obj/*/-user/*.cc)
+paths=$(echo dst/*/-user/*.cc)
 for ccfile in $paths; do
     base=$(basename $ccfile .dk.cc)
     dkfile="$base.dk"

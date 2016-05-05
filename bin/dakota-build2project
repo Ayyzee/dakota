@@ -37,7 +37,7 @@ sub start {
   my $result = {};
   $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'inputs'}} ];
   $$result{'libs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'libs'}} ];
-  $$result{'objdir'} = &canon_path(&subst($$build{'objdir'}, $$opts{'var'}));
+  $$result{'dstdir'} = &canon_path(&subst($$build{'dstdir'}, $$opts{'var'}));
   $$result{'output'} = &canon_path(&subst($$build{'output'}, $$opts{'var'}));
   my $original_state;
   &scalar_to_file($file, $result, $original_state = 0);

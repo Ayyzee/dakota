@@ -15,7 +15,7 @@
       '$(srcdir)',
       '$(srcdir)/../include',
     ],
-    'objdir' => 'obj/dakota-catalog',
+    'dstdir' => 'dst/dakota-catalog',
     'output' => '../bin/dakota-catalog', # cmd-line
     'install' => {
       '-rules' => [

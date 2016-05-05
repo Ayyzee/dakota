@@ -36,7 +36,7 @@ my $emacs_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width:
 my $gbl_prefix;
 my $gbl_compiler;
 my $gbl_compiler_default_argument_promotions;
-my $objdir;
+my $dstdir;
 my $hh_ext;
 my $cc_ext;
 my $nl = "\n";
@@ -122,12 +122,12 @@ my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
-  $objdir = &dakota::util::objdir();
+  $dstdir = &dakota::util::dstdir();
   if ($ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
-    return "$cwd/$objdir/$name.$ext";
+    return "$cwd/$dstdir/$name.$ext";
   } else {
-    return "$objdir/$name.$ext";
+    return "$dstdir/$name.$ext";
   }
 }
 sub empty_klass_defns {
