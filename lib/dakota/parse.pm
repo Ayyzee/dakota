@@ -366,7 +366,11 @@ sub str_from_cmd_info {
     $str .= " $infile";
   }
   foreach my $infile (@{$$cmd_info{'inputs'}}) {
-    $str .= " $infile";
+    if ($$cmd_info{'inputs-tbl'}{$infile}) {
+      $str .= " $$cmd_info{'inputs-tbl'}{$infile}";
+    } else {
+      $str .= " $infile";
+    }
   }
   $str =~ s|(\s)\s+|$1|g;
   return $str;

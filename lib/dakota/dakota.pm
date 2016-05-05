@@ -547,19 +547,16 @@ sub cmd_opts_from_library_path {
   }
   return $result;
 }
-sub split_inputs {
+sub inputs_tbl {
   my ($inputs) = @_;
-  my $unchanged = [];
-  my $changed = [];
+  my $result = {};
   foreach my $input (@$inputs) {
-    my $output = &cmd_opts_from_library_name($input);
-    if ($output eq $input) {
-      push @$unchanged, $output;
-    } else {
-      push @$changed, $output;
+    my $cmd_opts = &cmd_opts_from_library_name($input);
+    if ($cmd_opts ne $input) {
+      $$result{$input} = $cmd_opts;
     }
   }
-  return ($unchanged, $changed);
+  return $result;
 }
 sub for_linker {
   my ($tkns) = @_;
@@ -681,9 +678,7 @@ sub start_cmd {
     }
   }
   if ($should_replace_library_path_with_lib_opts) {
-    my ($inputs, $lib_opts) = &split_inputs($$cmd_info{'inputs'});
-    $$cmd_info{'inputs'} = $inputs;
-    $$cmd_info{'opts'}{'*lib-opts*'} = $lib_opts;
+    $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
   }
   if ($ENV{'DKT_GENERATE_RUNTIME_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
@@ -1147,7 +1142,6 @@ sub so_from_o {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
   my $so_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$so_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  my $inputs = &deep_copy($$cmd_info{'inputs'});
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
   my $opts =
@@ -1162,11 +1156,8 @@ sub so_from_o {
   $$so_cmd{'cmd-flags'} = '@' . $opts_path;
   $$so_cmd{'output'} = $$cmd_info{'output'};
   $$so_cmd{'project.output'} = $$cmd_info{'project.output'};
-  if ($should_replace_library_path_with_lib_opts) {
-    $$so_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
-  } else {
-    $$so_cmd{'inputs'} = $$cmd_info{'inputs'};
-  }
+  $$so_cmd{'inputs'} =     [ @{$$cmd_info{'inputs'}} ];
+  $$so_cmd{'inputs-tbl'} = $$cmd_info{'inputs-tbl'};
   &library_names_add_first($so_cmd);
   my $should_echo = 0;
   if ($ENV{'DK_ECHO_LINK_CMD'} || $ENV{'DK_ECHO_LINK_SO_CMD'}) {
@@ -1174,7 +1165,7 @@ sub so_from_o {
   }
   my $result = &outfile_from_infiles($so_cmd, $should_echo);
   if ($result) {
-    &project_io_add($cmd_info, $inputs, $$cmd_info{'output'});
+    &project_io_add($cmd_info, $$so_cmd{'inputs'}, $$so_cmd{'output'});
   }
   return $result;
 }
@@ -1182,7 +1173,6 @@ sub exe_from_o {
   my ($cmd_info, $opts_path) = @_;
   my $exe_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$exe_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  my $inputs = &deep_copy($$cmd_info{'inputs'});
   my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
   my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
   my $opts =
@@ -1197,11 +1187,8 @@ sub exe_from_o {
   $$exe_cmd{'cmd-flags'} = '@' . $opts_path;
   $$exe_cmd{'output'} = $$cmd_info{'output'};
   $$exe_cmd{'project.output'} = $$cmd_info{'project.output'};
-  if ($should_replace_library_path_with_lib_opts) {
-    $$exe_cmd{'inputs'} = [ @{$$cmd_info{'inputs'}}, @{$$cmd_info{'opts'}{'*lib-opts*'} ||= []} ];
-  } else {
-    $$exe_cmd{'inputs'} = $$cmd_info{'inputs'};
-  }
+  $$exe_cmd{'inputs'} =     [ @{$$cmd_info{'inputs'}} ];
+  $$exe_cmd{'inputs-tbl'} = $$cmd_info{'inputs-tbl'};
   &library_names_add_first($exe_cmd);
   my $should_echo = 0;
   if ($ENV{'DK_ECHO_LINK_CMD'} || $ENV{'DK_ECHO_LINK_EXE_CMD'}) {
@@ -1209,7 +1196,7 @@ sub exe_from_o {
   }
   my $result = &outfile_from_infiles($exe_cmd, $should_echo);
   if ($result) {
-    &project_io_add($cmd_info, $inputs, $$cmd_info{'output'});
+    &project_io_add($cmd_info, $$exe_cmd{'inputs'}, $$exe_cmd{'output'});
   }
   return $result;
 }
