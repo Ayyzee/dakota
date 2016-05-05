@@ -57,7 +57,7 @@ so_ext ?= so
 LD_PRELOAD ?= LD_PRELOAD
 
 EXTRA_CXXFLAGS += --optimize=0 --debug=3 # debug flags
-EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
+EXTRA_CXXFLAGS += --define-macro=DEBUG   # debug flags
 #EXTRA_CXXFLAGS += $(CXX_COMPILE_THREAD_FLAGS)
 #EXTRA_CXXFLAGS += -MMD -MP
 

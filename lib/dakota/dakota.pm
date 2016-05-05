@@ -557,11 +557,8 @@ sub inputs_tbl {
 }
 sub for_linker {
   my ($tkns) = @_;
-  my $result = '';
   my $for_linker = &dakota::util::var($gbl_compiler, 'CXX_FOR_LINKER_FLAGS', [ '--for-linker' ]);
-  foreach my $tkn (@$tkns) {
-    $result .= " $for_linker " . $tkn;
-  }
+  my $result = ' ' . $for_linker . '=' . $tkns;
   return $result;
 }
 sub update_kw_args_generics {
@@ -639,20 +636,20 @@ sub start_cmd {
     $$cmd_info{'opts'}{'compiler-flags'} = $cxxflags . ' ' . $extra_cxxflags;
   }
   my $ld_soname_flags =    &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
-  my $no_undefined_flags = &dakota::util::var_array($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', [ '--no-undefined' ]);
+  my $no_undefined_flags = &dakota::util::var($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', '--no-undefined');
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_exe_type = undef;
   } elsif ($$cmd_info{'opts'}{'shared'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_shared_flags .= &for_linker([ $ld_soname_flags, $$cmd_info{'opts'}{'soname'} ]);
+      $cxx_shared_flags .= &for_linker($ld_soname_flags . '=' . $$cmd_info{'opts'}{'soname'});
     }
     $cxx_shared_flags .= &for_linker($no_undefined_flags);
     $dk_exe_type = 'exe-type::k_lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_shared_flags .= &for_linker([ $ld_soname_flags, $$cmd_info{'opts'}{'soname'} ]);
-      $cxx_shared_flags .= &for_linker($no_undefined_flags);
+      $cxx_shared_flags .= &for_linker($ld_soname_flags . '=' . $$cmd_info{'opts'}{'soname'});
     }
+    $cxx_shared_flags .= &for_linker($no_undefined_flags);
     $dk_exe_type = 'exe-type::k_lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
 	   && !$$cmd_info{'opts'}{'shared'}
@@ -1017,13 +1014,20 @@ sub link_exe_opts_path {
 sub o_from_cc {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
   open(my $fh1, '>', &common_opts_path());
-  print $fh1 $$cmd_info{'opts'}{'compiler-flags'} . $nl;
+  my $opts = $$cmd_info{'opts'}{'compiler-flags'};
+  $opts =~ s/^\s+//gs;
+  $opts =~ s/\s+$//gs;
+  $opts =~ s/\s+/\n/g;
+  print $fh1 $opts . $nl;
   close($fh1);
-  my $opts =
+  $opts =
     $mode_flags . $nl .
       '@' . &common_opts_path() . $nl;
+  $opts =~ s/^\s+//gs;
+  $opts =~ s/\s+$//gs;
+  $opts =~ s/\s+/\n/g;
   open(my $fh2, '>', $opts_path);
-  print $fh2 $opts;
+  print $fh2 $opts . $nl;
   close($fh2);
   my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
@@ -1137,8 +1141,11 @@ sub linked_output_from_o {
     $ldflags . $nl .
     $extra_ldflags . $nl .
     '@' . &common_opts_path() . $nl;
+  $opts =~ s/^\s+//gs;
+  $opts =~ s/\s+$//gs;
+  $opts =~ s/\s+/\n/g;
   open(my $fh, '>', $opts_path);
-  print $fh $opts;
+  print $fh $opts . $nl;
   close($fh);
   $$cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
   $$cmd{'cmd-flags'} = '@' . $opts_path;
@@ -1182,7 +1189,7 @@ sub exec_cmd {
   my $cmd_str;
   $cmd_str = &str_from_cmd_info($cmd_info);
   if (&is_debug() || $global_should_echo || $should_echo) {
-    print STDERR "  $cmd_str\n";
+    print STDERR $cmd_str . $nl;
   }
   if ($ENV{'DKT_INITIAL_WORKDIR'}) {
     open (STDERR, "|$gbl_prefix/bin/dakota-fixup-stderr $ENV{'DKT_INITIAL_WORKDIR'}") or die "$!";

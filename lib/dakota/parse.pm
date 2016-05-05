@@ -357,10 +357,10 @@ sub str_from_cmd_info {
     $str .= " $$cmd_info{'cmd-flags'}";
   }
   if ($$cmd_info{'output'}) {
-    $str .= " --output $$cmd_info{'output'}";
+    $str .= " --output=" . $$cmd_info{'output'};
   }
   if ($$cmd_info{'output-directory'}) {
-    $str .= " --output-directory $$cmd_info{'output-directory'}";
+    $str .= " --output-directory=" . $$cmd_info{'output-directory'};
   }
   foreach my $infile (@{$$cmd_info{'reps'}}) {
     $str .= " $infile";
