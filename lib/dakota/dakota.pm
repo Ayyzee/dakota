@@ -1156,7 +1156,7 @@ sub so_from_o {
   $$so_cmd{'cmd-flags'} = '@' . $opts_path;
   $$so_cmd{'output'} = $$cmd_info{'output'};
   $$so_cmd{'project.output'} = $$cmd_info{'project.output'};
-  $$so_cmd{'inputs'} =     [ @{$$cmd_info{'inputs'}} ];
+  $$so_cmd{'inputs'} =     $$cmd_info{'inputs'};
   $$so_cmd{'inputs-tbl'} = $$cmd_info{'inputs-tbl'};
   &library_names_add_first($so_cmd);
   my $should_echo = 0;
@@ -1187,7 +1187,7 @@ sub exe_from_o {
   $$exe_cmd{'cmd-flags'} = '@' . $opts_path;
   $$exe_cmd{'output'} = $$cmd_info{'output'};
   $$exe_cmd{'project.output'} = $$cmd_info{'project.output'};
-  $$exe_cmd{'inputs'} =     [ @{$$cmd_info{'inputs'}} ];
+  $$exe_cmd{'inputs'} =     $$cmd_info{'inputs'};
   $$exe_cmd{'inputs-tbl'} = $$cmd_info{'inputs-tbl'};
   &library_names_add_first($exe_cmd);
   my $should_echo = 0;
