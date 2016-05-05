@@ -189,24 +189,24 @@ sub loop_merged_rep_from_inputs {
   }
   my $root;
   my $root_json_path;
-  foreach my $arg (@{$$cmd_info{'inputs'}}) {
-    if (&is_dk_src_path($arg)) {
-      $root = &dakota::parse::rep_tree_from_dk_path($arg);
+  foreach my $input (@{$$cmd_info{'inputs'}}) {
+    if (&is_dk_src_path($input)) {
+      $root = &dakota::parse::rep_tree_from_dk_path($input);
       my $json_path;
-      if (&is_dk_path($arg)) {
-        $json_path = &json_path_from_dk_path($arg);
-      } elsif (&is_ctlg_path($arg)) {
-        $json_path = &json_path_from_ctlg_path($arg);
+      if (&is_dk_path($input)) {
+        $json_path = &json_path_from_dk_path($input);
+      } elsif (&is_ctlg_path($input)) {
+        $json_path = &json_path_from_ctlg_path($input);
       } else {
         die;
       }
       &check_path($json_path);
       $root_json_path = $json_path;
       &dakota::util::add_last($rep_files, $json_path); # _from_dk_src_path
-    } elsif (&is_rep_path($arg)) {
-      $root = &scalar_from_file($arg);
-      $root_json_path = $arg;
-      &dakota::util::add_last($rep_files, $arg);
+    } elsif (&is_rep_path($input)) {
+      $root = &scalar_from_file($input);
+      $root_json_path = $input;
+      &dakota::util::add_last($rep_files, $input);
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
@@ -451,13 +451,12 @@ sub loop_cc_from_dk {
   $$cmd_info{'inputs'} = $inputs;
 
   my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within loop_cc_from_dk
-  my $argv_length = @{$$cmd_info{'inputs'}};
-  if (0 == $argv_length) {
+  my $num_inputs = @{$$cmd_info{'inputs'}};
+  if (0 == $num_inputs) {
     die "$0: error: arguments are requried\n";
   }
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
 
-  my $num_inputs = @{$$cmd_info{'inputs'}};
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my $json_path;
     if (&is_so_path($input)) {
