@@ -1029,32 +1029,32 @@ sub link_exe_opts_path {
 }
 sub o_from_cc {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
-    open(my $fh1, '>', &common_opts_path());
-    print $fh1 $$cmd_info{'opts'}{'compiler-flags'} . $nl;
-    close($fh1);
-    my $opts =
-      $mode_flags . $nl .
+  open(my $fh1, '>', &common_opts_path());
+  print $fh1 $$cmd_info{'opts'}{'compiler-flags'} . $nl;
+  close($fh1);
+  my $opts =
+    $mode_flags . $nl .
       '@' . &common_opts_path() . $nl;
-    open(my $fh2, '>', $opts_path);
-    print $fh2 $opts;
-    close($fh2);
-    my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
-    $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
-    $$o_cmd{'project.output'} = $$cmd_info{'project.output'};
-    $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
-    $$o_cmd{'cmd-flags'} = '@' . $opts_path;
-    $$o_cmd{'output'} = $$cmd_info{'output'};
-    $$o_cmd{'inputs'} = $$cmd_info{'inputs'};
-    my $should_echo = 0;
-    if ($ENV{'DK_ECHO_COMPILE_CMD'}) {
-      $should_echo = 1;
-    }
-    if (0) {
-      $$o_cmd{'cmd-flags'} .= " -MMD";
-      return &outfile_from_infiles($o_cmd, $should_echo);
-      $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
-    }
+  open(my $fh2, '>', $opts_path);
+  print $fh2 $opts;
+  close($fh2);
+  my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
+  $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
+  $$o_cmd{'project.output'} = $$cmd_info{'project.output'};
+  $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
+  $$o_cmd{'cmd-flags'} = '@' . $opts_path;
+  $$o_cmd{'output'} = $$cmd_info{'output'};
+  $$o_cmd{'inputs'} = $$cmd_info{'inputs'};
+  my $should_echo = 0;
+  if ($ENV{'DK_ECHO_COMPILE_CMD'}) {
+    $should_echo = 1;
+  }
+  if (0) {
+    $$o_cmd{'cmd-flags'} .= " -MMD";
     return &outfile_from_infiles($o_cmd, $should_echo);
+    $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
+  }
+  return &outfile_from_infiles($o_cmd, $should_echo);
 }
 sub rt_o_from_json {
   my ($cmd_info, $other, $is_exe) = @_;
