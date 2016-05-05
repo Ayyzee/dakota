@@ -4,9 +4,9 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 include $(rootdir)/dakota.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/dakota-catalog.mk $(srcdir)/dakota-catalog.build)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/libdakota-core.mk $(srcdir)/libdakota-core.build)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/libdakota.mk      $(srcdir)/libdakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/dakota-catalog.mk $(srcdir)/dakota-catalog.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota-core.mk $(srcdir)/libdakota-core.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota.mk      $(srcdir)/libdakota.build)
 
 # include-dirs
 dakota-catalog.include-dirs := $(patsubst %,--include-directory %,$(dakota-catalog.include-dirs))
