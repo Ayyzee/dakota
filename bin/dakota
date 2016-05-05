@@ -190,9 +190,9 @@ if (1) {
   $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
 }
 $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
-# dakota --compile --output <> {dk}
-# dakota --shared  --output <> {o}+ {so}* [dst/rt/<>.cc.o]
-# dakota           --output <> {o}+ {so}* [dst/rt/<>.cc.o]
+# dakota --compile --output <> {dk}+
+# dakota --shared  --output <> {o}+ [build/+rt/<>.o] {so}*
+# dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
 
 if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path(&default_output($root_cmd));
@@ -258,7 +258,7 @@ sub create_missing_project {
   }
   # create and write a default project file
   $project = { 'output' => undef, 'inputs' => [],
-               'dstdir' => &dstdir() };
+               'builddir' => &builddir() };
   foreach my $input (@$inputs) {
     if ($input =~ m/\.(dk|$so_ext)$/) {
       add_last($$project{'inputs'}, $input);
@@ -307,11 +307,11 @@ sub first_dk_path {
 sub use_project {
   my ($root_cmd) = @_;
   my $project = &set_global_project($$root_cmd{'opts'}{'project'});
-  if (! $$project{'dstdir'}) {
-    $$project{'dstdir'} = &dstdir();
+  if (! $$project{'builddir'}) {
+    $$project{'builddir'} = &builddir();
   }
-  if (! -e $$project{'dstdir'}) {
-    mkdir $$project{'dstdir'}; # or try make_path in File::Path
+  if (! -e $$project{'builddir'}) {
+    mkdir $$project{'builddir'}; # or try make_path in File::Path
   }
   if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
     my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
@@ -321,21 +321,21 @@ sub use_project {
     }
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
-  $$root_cmd{'project.dstdir'} = $$project{'dstdir'};
+  $$root_cmd{'project.builddir'} = $$project{'builddir'};
   $$root_cmd{'project.output'} = $$project{'output'};
-  $$root_cmd{'project.io'} = $$project{'dstdir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
+  $$root_cmd{'project.io'} = $$project{'builddir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
   $project_io_path = $$root_cmd{'project.io'};
   my $original_state;
   if (! -e $project_io_path) {
     # dk2json : $foo{'dk'}{$dk_path}{'json'}{$json_path}
     my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},
-                               'output' => &canon_path($$project{'output'}), 'dstdir' => undef };
+                               'output' => &canon_path($$project{'output'}), 'builddir' => undef };
     &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);
   }
   $project_io = &scalar_from_file($project_io_path);
   $$project_io{'inputs'} = { map { &canon_path($_) => 1 } @{$$project{'inputs'}} };
-  if ($$project{'dstdir'}) {
-    $$project_io{'dstdir'} = &canon_path($$project{'dstdir'});
+  if ($$project{'builddir'}) {
+    $$project_io{'builddir'} = &canon_path($$project{'builddir'});
   }
   &scalar_to_file($project_io_path, $project_io, $original_state = 1);
   return ($project, $project_io);

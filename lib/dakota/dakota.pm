@@ -31,7 +31,7 @@ use sort 'stable';
 my $gbl_prefix;
 my $gbl_compiler;
 my $extra;
-my $dstdir;
+my $builddir;
 my $hh_ext;
 my $cc_ext;
 my $o_ext;
@@ -424,7 +424,7 @@ sub rt_cc_path {
 sub rel_rt_hh_path {
   my ($cmd_info) = @_;
   my $rt_cc_path = &rt_cc_path($cmd_info);
-  my $rel_rt_hh_path = $rt_cc_path =~ s=^$dstdir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  my $rel_rt_hh_path = $rt_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
   return $rel_rt_hh_path;
 }
 sub loop_cc_from_dk {
@@ -622,7 +622,7 @@ sub update_rep_from_all_inputs {
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
-  $dstdir = &dakota::util::dstdir();
+  $builddir = &dakota::util::builddir();
   $cmd_info = &update_rep_from_all_inputs($cmd_info);
   my $rt_json_path = &rt_json_path($cmd_info);
   &set_global_project_rep($rt_json_path);
@@ -762,8 +762,8 @@ sub loop_rep_from_so {
 } # loop_rep_from_so
 sub check_path {
   my ($path) = @_;
-  die if $path =~ m=^dst/dst/=;
-  die if $path =~ m=^dst/+{rt|user}/dst/=;
+  die if $path =~ m=^build/build/=;
+  die if $path =~ m=^build/+{rt|user}/build/=;
 }
 sub rep_from_inputs {
   my ($cmd_info) = @_;
@@ -1002,16 +1002,16 @@ sub cc_from_dk {
   return &outfile_from_infiles($cc_cmd, $should_echo = 0);
 }
 sub common_opts_path {
-  return $dstdir . '/cxx-common.opts';
+  return $builddir . '/cxx-common.opts';
 }
 sub compile_opts_path {
-  return $dstdir . '/cxx-compile.opts';
+  return $builddir . '/cxx-compile.opts';
 }
 sub link_so_opts_path {
-  return $dstdir . '/cxx-link-so.opts';
+  return $builddir . '/cxx-link-so.opts';
 }
 sub link_exe_opts_path {
-  return $dstdir . '/cxx-link-exe.opts';
+  return $builddir . '/cxx-link-exe.opts';
 }
 sub o_from_cc {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
@@ -1071,7 +1071,7 @@ sub rt_o_from_json {
   &make_dir($rt_cc_path);
   my ($path, $file_basename, $file) = ($rt_cc_path, $rt_cc_path, undef);
   $path =~ s|/[^/]*$||;
-  $file_basename =~ s|^[^/]*/||;       # strip off leading $dstdir/
+  $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
   my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
   $file = &scalar_from_file($rt_json_path);
   die if $$file{'other'};
@@ -1216,7 +1216,7 @@ sub exec_cmd {
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
-  if ($outfile =~ m|^$dstdir/$dstdir/|) { die "found double dstdir/dstdir: $outfile"; } # likely a double $dstdir prepend
+  if ($outfile =~ m|^$builddir/$builddir/|) { die "found double builddir/builddir: $outfile"; } # likely a double $builddir prepend
   my $infiles;
   if (-e $outfile) {
     my $file_db = {};

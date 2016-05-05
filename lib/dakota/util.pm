@@ -84,7 +84,7 @@ our @EXPORT= qw(
                  min
                  mtime
                  needs_hex_encoding
-                 dstdir
+                 builddir
                  pann
                  parameter_types_str
                  rel_path_canon
@@ -412,29 +412,29 @@ sub sqstr_regex {
   return qr/(?<!\\)'.*?(?<!\\)'/;
 }
 my $build_vars = {
-  'dstdir' => '../dst',
+  'builddir' => '../build',
 };
-sub dstdir {
-  my $dstdir;
+sub builddir {
+  my $builddir;
   my $project = &global_project();
-  if ($project && $$project{'dstdir'}) {
-    $dstdir = $$project{'dstdir'};
+  if ($project && $$project{'builddir'}) {
+    $builddir = $$project{'builddir'};
   } elsif ($ENV{'OBJDIR'}) {
-    $dstdir = $ENV{'OBJDIR'};
+    $builddir = $ENV{'OBJDIR'};
   } else {
-    $dstdir = $$build_vars{'dstdir'};
+    $builddir = $$build_vars{'builddir'};
   }
-  die if ! $dstdir;
-  if (-e $dstdir && ! -d $dstdir) {
+  die if ! $builddir;
+  if (-e $builddir && ! -d $builddir) {
     die;
   }
-  if (! -e $dstdir) {
-    mkdir $dstdir; # or try make_path in File::Path
+  if (! -e $builddir) {
+    mkdir $builddir; # or try make_path in File::Path
   }
-  if (! -e "$dstdir/+user") {
-    mkdir "$dstdir/+user";
+  if (! -e "$builddir/+user") {
+    mkdir "$builddir/+user";
   }
- return $dstdir;
+ return $builddir;
 }
 
 # 1. cmd line

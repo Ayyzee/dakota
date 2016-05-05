@@ -42,7 +42,7 @@
       'HAVE_CONFIG_HH',
     ],
     'project' => '$(srcdir)/libdakota.project', # cmd-line
-    'dstdir' => '../dst/libdakota',
+    'builddir' => '../build/libdakota',
     'output' => '../lib/libdakota.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line

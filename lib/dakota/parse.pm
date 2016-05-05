@@ -41,7 +41,7 @@ $main::seq = qr{
 my $gbl_compiler;
 my $gbl_header_from_symbol;
 my $gbl_used;
-my $dstdir;
+my $builddir;
 my $hh_ext;
 my $cc_ext;
 my $o_ext;
@@ -91,23 +91,23 @@ sub json_path_from_o_path {
   return $out_path;
 }
 my $patterns = {
-  'user_path_from_any_path' => '$(dstdir)/+user/% : %', # +user also used in util.pm
+  'user_path_from_any_path' => '$(builddir)/+user/% : %', # +user also used in util.pm
 
-  'o_path_from_dk_path' =>  '$(dstdir)/%.$(cc_ext).$(o_ext) : %.dk',
-  'o_path_from_cc_path' =>  '$(dstdir)/%.$(cc_ext).$(o_ext) : $(dstdir)/%.$(cc_ext)',
+  'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : %.dk',
+  'o_path_from_cc_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(builddir)/%.$(cc_ext)',
 
-  'json_path_from_dk_path' =>   '$(dstdir)/%.json      : %.dk',
-  'json_path_from_ctlg_path' => '$(dstdir)/%.ctlg.json : $(dstdir)/%.ctlg',
-
-  # +rt also used in dakota.pm
-  'rt_json_path_from_any_path' => '$(dstdir)/+rt/%.json : %', # _from_exe_path
-  'rt_json_path_from_so_path' =>  '$(dstdir)/+rt/%.json : %.$(so_ext)',
-
-  'ctlg_path_from_so_path' =>   '$(dstdir)/%.$(so_ext).ctlg : %.$(so_ext)',
+  'json_path_from_dk_path' =>   '$(builddir)/%.json      : %.dk',
+  'json_path_from_ctlg_path' => '$(builddir)/%.ctlg.json : $(builddir)/%.ctlg',
 
   # +rt also used in dakota.pm
-  'rt_cc_path_from_any_path' => '$(dstdir)/+rt/%.$(cc_ext) : %', # _from_exe_path
-  'rt_cc_path_from_so_path' =>  '$(dstdir)/+rt/%.$(cc_ext) : %.$(so_ext)',
+  'rt_json_path_from_any_path' => '$(builddir)/+rt/%.json : %', # _from_exe_path
+  'rt_json_path_from_so_path' =>  '$(builddir)/+rt/%.json : %.$(so_ext)',
+
+  'ctlg_path_from_so_path' =>   '$(builddir)/%.$(so_ext).ctlg : %.$(so_ext)',
+
+  # +rt also used in dakota.pm
+  'rt_cc_path_from_any_path' => '$(builddir)/+rt/%.$(cc_ext) : %', # _from_exe_path
+  'rt_cc_path_from_so_path' =>  '$(builddir)/+rt/%.$(cc_ext) : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -446,7 +446,7 @@ sub var_perl_from_make { # convert variable syntax to perl from make
 }
 sub expand {
   my ($str) = @_;
-  $dstdir if 0;
+  $builddir if 0;
   $cc_ext if 0;
   $o_ext  if 0;
   $so_ext if 0;
@@ -467,7 +467,7 @@ sub expand_tbl_values {
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
   $path_in = &canon_path($path_in);
-  $dstdir = &dakota::util::dstdir();
+  $builddir = &dakota::util::builddir();
   my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
