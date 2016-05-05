@@ -211,12 +211,10 @@ sub loop_merged_rep_from_inputs {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
   }
-  if (1 == @{$$cmd_info{'inputs'}}) {
-    if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
+  if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
+    if (1 == @{$$cmd_info{'inputs'}}) {
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
-    }
-  } elsif (1 < @{$$cmd_info{'inputs'}}) {
-    if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
+    } elsif (1 < @{$$cmd_info{'inputs'}}) {
       my $rep = &rep_merge($rep_files);
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
       &project_io_add($cmd_info, $rep_files, $$cmd_info{'opts'}{'output'});
@@ -459,7 +457,7 @@ sub loop_cc_from_dk {
   }
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
 
-  my $num_inputs = scalar @{$$cmd_info{'inputs'}};
+  my $num_inputs = @{$$cmd_info{'inputs'}};
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     my $json_path;
     if (&is_so_path($input)) {
@@ -782,39 +780,28 @@ sub rep_from_inputs {
   my $should_echo;
   my $result = &outfile_from_infiles($rep_cmd, $should_echo = 0);
   if ($result) {
-    if (0 < scalar @{$$rep_cmd{'reps'} ||= []}) {
+    if (0 != @{$$rep_cmd{'reps'} ||= []}) {
       my $rt_json_path = &rt_json_path($cmd_info);
       &project_io_add($cmd_info, $$rep_cmd{'reps'}, $rt_json_path);
     }
-    if (1 == scalar @{$$rep_cmd{'inputs'}}) {
-      my $input = $$rep_cmd{'inputs'}[0];
-      my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      my $json_path;
-
+    foreach my $input (@{$$rep_cmd{'inputs'}}) {
       if (&is_so_path($input)) {
         my $ctlg_path = &ctlg_path_from_so_path($input);
-        $json_path = &json_path_from_ctlg_path($ctlg_path);
+        my $json_path = &json_path_from_ctlg_path($ctlg_path);
         &check_path($json_path);
         &project_io_add($cmd_info, $input, $ctlg_path);
         &project_io_add($cmd_info, $ctlg_path, $json_path);
       } elsif (&is_dk_path($input)) {
-        $json_path = &json_path_from_dk_path($input);
+        my $json_path = &json_path_from_dk_path($input);
         &check_path($json_path);
         &project_io_add($cmd_info, $input, $json_path);
       } elsif (&is_ctlg_path($input)) {
-        $json_path = &json_path_from_ctlg_path($input);
+        my $json_path = &json_path_from_ctlg_path($input);
         &check_path($json_path);
         &project_io_add($cmd_info, $input, $json_path);
       } else {
         #print "skipping $input, line=" . __LINE__ . $nl;
       }
-    } elsif (1 < scalar @{$$rep_cmd{'inputs'}}) {
-      #my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      #$$project_io{'project.rep'} = $$rep_cmd{'project.rep'};
-      #$$project_io{'project.rep.inputs'} = { map { $_ => 1 } @{$$rep_cmd{'inputs'}} };
-      #&scalar_to_file($$cmd_info{'project.io'}, $project_io);
-    } else { # no inputs
-      die;
     }
   }
   return $result;
@@ -850,7 +837,7 @@ sub loop_rep_from_inputs {
         'output' => $rt_json_path,
         'inputs' => $rep_files,
       };
-      &rep_from_inputs($rep_cmd);
+      &rep_from_inputs($rep_cmd); # multiple inputs
     }
   }
   return $cmd_info;
@@ -982,22 +969,22 @@ sub o_from_dk {
 sub loop_o_from_dk {
   my ($cmd_info) = @_;
   my $outfiles = [];
-  if (1 == scalar @{$$cmd_info{'inputs'}}) {
-    if (&is_dk_path($$cmd_info{'inputs'}[0])) {
-      push @$outfiles, &o_from_dk($cmd_info, $$cmd_info{'inputs'}[0]);
-    } else {
-      push @$outfiles, $$cmd_info{'inputs'}[0];
-    }
-  } else {
-    my $output = $$cmd_info{'output'};
+  my $output;
+  my $has_multiple_inputs = 0;
+  $has_multiple_inputs = 1 if 1 > @{$$cmd_info{'inputs'}};
+
+  if ($has_multiple_inputs) {
+    $output = $$cmd_info{'output'};
     $$cmd_info{'output'} = undef;
-    foreach my $input (@{$$cmd_info{'inputs'}}) {
-      if (&is_dk_path($input)) {
-        push @$outfiles, &o_from_dk($cmd_info, $input);
-      } else {
-        push @$outfiles, $input;
-      }
+  }
+  foreach my $input (@{$$cmd_info{'inputs'}}) {
+    if (&is_dk_path($input)) {
+      push @$outfiles, &o_from_dk($cmd_info, $input);
+    } else {
+      push @$outfiles, $input;
     }
+  }
+  if ($has_multiple_inputs) {
     $$cmd_info{'output'} = $output;
   }
   $$cmd_info{'inputs'} = $outfiles;
@@ -1059,7 +1046,7 @@ sub o_from_cc {
 }
 sub rt_o_from_json {
   my ($cmd_info, $other, $is_exe) = @_;
-  die if ! defined $$cmd_info{'reps'} || 0 == scalar @{$$cmd_info{'reps'}};
+  die if ! defined $$cmd_info{'reps'} || 0 == @{$$cmd_info{'reps'}};
   my $rt_json_path = &rt_json_path($cmd_info);
   my $rt_cc_path =   &rt_cc_path($cmd_info);
   &check_path($rt_json_path);
@@ -1130,7 +1117,7 @@ sub gcc_libraries_str {
 # but after all cmd-flags
 sub library_names_add_first {
   my ($cmd_info) = @_;
-  if ($$cmd_info{'opts'}{'library'} && 0 < scalar @{$$cmd_info{'opts'}{'library'}}) {
+  if ($$cmd_info{'opts'}{'library'} && 0 != @{$$cmd_info{'opts'}{'library'}}) {
     my $gcc_libraries_str = &gcc_libraries_str($$cmd_info{'opts'}{'library'});
     if (!defined $$cmd_info{'cmd-flags'}) {
       $$cmd_info{'cmd-flags'} = $gcc_libraries_str;
@@ -1235,8 +1222,8 @@ sub outfile_from_infiles {
   } else {
     $infiles = $$cmd_info{'inputs'};
   }
-  my $num_out_of_date_infiles = scalar @$infiles;
-  if (0 < $num_out_of_date_infiles) {
+  my $num_out_of_date_infiles = @$infiles;
+  if (0 != $num_out_of_date_infiles) {
     &make_dir($$cmd_info{'output'});
     if ($show_outfile_info) {
       print "MK $$cmd_info{'output'}\n";
