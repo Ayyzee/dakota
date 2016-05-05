@@ -763,7 +763,7 @@ sub loop_rep_from_so {
 sub check_path {
   my ($path) = @_;
   die if $path =~ m=^obj/obj/=;
-  die if $path =~ m=^obj/-{rt|user}/obj/=;
+  die if $path =~ m=^obj/\+{rt|user}/obj/=;
 }
 sub rep_from_inputs {
   my ($cmd_info) = @_;
