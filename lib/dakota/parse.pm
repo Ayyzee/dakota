@@ -50,6 +50,8 @@ my $nl = "\n";
 
 sub dk_prefix {
   my ($path) = @_;
+  $path =~ s|//+|/|;
+  $path =~ s|/\./+|/|;
   $path =~ s|^./||;
   if (-d "$path/bin" && -d "$path/lib") {
     return $path
