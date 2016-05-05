@@ -321,7 +321,7 @@ sub generate_nrt {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
-  my $rel_user_dk_path = "-user/$name.dk";
+  my $rel_user_dk_path = "+user/$name.dk";
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $output =     "$dir/$name.$suffix";

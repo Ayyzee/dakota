@@ -1072,7 +1072,6 @@ sub rt_o_from_json {
   my ($path, $file_basename, $file) = ($rt_cc_path, $rt_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $objdir/
-  $file_basename =~ s|-rt\.$cc_ext$||; # strip off trailing -rt.cc
   my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
   $file = &scalar_from_file($rt_json_path);
   die if $$file{'other'};

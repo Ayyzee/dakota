@@ -91,7 +91,7 @@ sub json_path_from_o_path {
   return $out_path;
 }
 my $patterns = {
-  'user_path_from_any_path' => '$(objdir)/-user/% : %',
+  'user_path_from_any_path' => '$(objdir)/+user/% : %', # +user also used in util.pm
 
   'o_path_from_dk_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : %.dk',
   'o_path_from_cc_path' =>  '$(objdir)/%.$(cc_ext).$(o_ext) : $(objdir)/%.$(cc_ext)',
@@ -99,15 +99,15 @@ my $patterns = {
   'json_path_from_dk_path' =>   '$(objdir)/%.json      : %.dk',
   'json_path_from_ctlg_path' => '$(objdir)/%.ctlg.json : $(objdir)/%.ctlg',
 
-  # -rt also used in dakota.pm
-  'rt_json_path_from_any_path' => '$(objdir)/-rt/%.json : %', # _from_exe_path
-  'rt_json_path_from_so_path' =>  '$(objdir)/-rt/%.json : %.$(so_ext)',
+  # +rt also used in dakota.pm
+  'rt_json_path_from_any_path' => '$(objdir)/+rt/%.json : %', # _from_exe_path
+  'rt_json_path_from_so_path' =>  '$(objdir)/+rt/%.json : %.$(so_ext)',
 
   'ctlg_path_from_so_path' =>   '$(objdir)/%.$(so_ext).ctlg : %.$(so_ext)',
 
-  # -rt also used in dakota.pm
-  'rt_cc_path_from_any_path' => '$(objdir)/-rt/%.$(cc_ext) : %', # _from_exe_path
-  'rt_cc_path_from_so_path' =>  '$(objdir)/-rt/%.$(cc_ext) : %.$(so_ext)',
+  # +rt also used in dakota.pm
+  'rt_cc_path_from_any_path' => '$(objdir)/+rt/%.$(cc_ext) : %', # _from_exe_path
+  'rt_cc_path_from_so_path' =>  '$(objdir)/+rt/%.$(cc_ext) : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
