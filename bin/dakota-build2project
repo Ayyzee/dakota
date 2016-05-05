@@ -29,7 +29,6 @@ sub start {
     $build = $$build{$name};
   }
   my $opts = { 'var' => { 'DEST' =>   '',
-                          'blddir' => '.',
                           'srcdir' => '.',
                           'so_ext' => 'so',
                         }
