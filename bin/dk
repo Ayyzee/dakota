@@ -65,9 +65,7 @@ sub path_opt {
 }
 sub cc_from_dk {
   my ($path) = @_;
-  print $path . $nl;
   $path =~ s=^(.+\.dk)$=build/$1.cc=;
-  print $path . $nl;
   return $path;
 }
 sub translate_dk_to_cc {
@@ -85,6 +83,12 @@ sub build_precompile_cmd {
   }
   if ($$info{'project'}) {
     push @$cmd, ('--project', $$info{'project'});
+  } else {
+    if ($ENV{'DK_PROJECT'}) {
+      push @$cmd, ('--project', $ENV{'DK_PROJECT'});
+    } else {
+      die $0 . ': error: environment variable DK_PROJECT required' . $nl;
+    }
   }
   push @$cmd, ('--output', $$info{'output'}[1]);
   push @$cmd, (@{$$info{'ordered-input-args'}});
@@ -142,6 +146,17 @@ sub start {
   my $gcc_cmd = [@$cmd];
   &get_gcc_opts($gcc_cmd, $info);
   &translate_dk_to_cc($gcc_cmd, $$info{'inputs'});
+  if ($$info{'cxx'}) {
+    unshift @$gcc_cmd, $$info{'cxx'};
+  } else {
+    if ($ENV{'DK_CXX'}) {
+      unshift @$gcc_cmd, $ENV{'DK_CXX'};
+    } elsif ($ENV{'CXX'}) {
+      unshift @$gcc_cmd, $ENV{'DK_CXX'};
+    } else {
+      die $0 . ': error: environment variables DK_CXX or CXX required' . $nl;
+    }
+  }
   my $dakota_cmd = &build_precompile_cmd($info);
   # executing the precompile cmd should return on stdout
   # the list of cc files that correspond to the dk files (in order)
@@ -154,7 +169,7 @@ sub start {
   if (1) {
     print '# ' . join(' ', ($0, @$argv)) . $nl;
     print '# ' . join(' ', ($0, @$cmd)) . $nl;
-    print '# ' . join(' ', ($$info{'cxx'}, @$gcc_cmd)) . $nl;
+    print '# ' . join(' ', @$gcc_cmd) . $nl;
     print '# ' . join(' ', @$dakota_cmd) . $nl;
   }
 }
