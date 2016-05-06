@@ -683,7 +683,7 @@ sub start_cmd {
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
-      my $is_exe = !defined $$cmd_info{'opts'}{'shared'};
+      my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
       &gen_rt_o($cmd_info, $is_exe);
     }
     $cmd_info = &loop_o_from_dk($cmd_info);
@@ -892,22 +892,30 @@ sub o_from_dk {
     } else {
       $o_path =  &o_path_from_dk_path($input);
     }
-    my $is_out_of_date = &is_out_of_date($input, $o_path);
-    if ($is_out_of_date && $$cmd_info{'opts'}{'echo-inputs'}) {
-      print $input . $nl;
-    }
-    if ($is_out_of_date && !$$cmd_info{'opts'}{'silent'}) {
-      print $o_path . $nl;
-    }
     my $src_path = &src_path_from_o_path($o_path); # reverse dependency
-    my $hh_path = &hh_path_from_src_path($src_path);
-    if (&is_debug()) {
+    if ($$cmd_info{'opts'}{'echo-inputs'}) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print "  creating $src_path" . &pann(__FILE__, __LINE__) . $nl;
+        if (&is_out_of_date($input, $src_path)) {
+          print $input . $nl;
+        }
       } else {
-        print "  creating $o_path" . &pann(__FILE__, __LINE__) . $nl;
+        if (&is_out_of_date($input, $o_path)) {
+          print $input . $nl;
+        }
       }
     }
+    if (!$$cmd_info{'opts'}{'silent'}) {
+      if ($ENV{'DKT_PRECOMPILE'}) {
+        if (&is_out_of_date($input, $src_path)) {
+          print $src_path . $nl;
+        }
+      } else {
+        if (&is_out_of_date($input, $o_path)) {
+          print $o_path . $nl;
+        }
+      }
+    }
+    my $hh_path = &hh_path_from_src_path($src_path);
     if (!$want_separate_rep_pass) {
       &check_path($json_path);
       my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -1057,7 +1065,15 @@ sub rt_o_from_json {
   &check_path($rt_json_path);
   my $rt_o_path = &o_path_from_cc_path($rt_cc_path);
   if (!$$cmd_info{'opts'}{'silent'}) {
-    print $rt_o_path . $nl;
+    if ($ENV{'DKT_PRECOMPILE'}) {
+      #if (&is_out_of_date($input, $rt_cc_path)) {
+        print $rt_cc_path . $nl;
+      #}
+    } else {
+      #if (&is_out_of_date($input, $rt_o_path)) {
+        print $rt_o_path . $nl;
+      #}
+    }
   }
   my $rt_hh_path = $rt_cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
 
@@ -1297,46 +1313,51 @@ sub ctlg_from_so {
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
   $$ctlg_cmd{'project.output'} = $$cmd_info{'project.output'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
+
   if ($ENV{'DKT_PRECOMPILE'}) {
-    my $precompile_inputs = [];
-    foreach my $input (@{$$cmd_info{'inputs'}}) {
-      if (-e $input) {
-        &dakota::util::add_last($precompile_inputs, $input);
-      } else {
-        print STDERR "warning: $input does not exist.\n";
-        my $json_path;
-        if (&is_so_path($input)) {
-          my $ctlg_path = &ctlg_path_from_so_path($input);
-          $json_path = &json_path_from_ctlg_path($ctlg_path);
-
-          my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-          $input = &canon_path($input);
-          $$project_io{'all'}{$input}{$ctlg_path} = 1;
-          $$project_io{'all'}{$ctlg_path}{$json_path} = 1;
-          &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
-
-        } elsif (&is_dk_src_path($input)) {
-          $json_path = &json_path_from_dk_path($input);
-          &check_path($json_path);
-        } else {
-          #print "skipping $input, line=" . __LINE__ . $nl;
-        }
-        if (-e $json_path) {
-         #my $ctlg_path = $json_path . '.' . 'ctlg';
-          my $ctlg_path = $json_path =~ s/\.json$/\.ctlg/r;
-          print STDERR "warning: consider using $json_path to create $ctlg_path.\n";
-        }
-        #&dakota::util::add_last($precompile_inputs, $input);
-        #&dakota::util::add_last($precompile_inputs, $json_path);
-      }
-    }
-    $$ctlg_cmd{'inputs'} = $precompile_inputs;
+    $$ctlg_cmd{'inputs'} = &precompiled_inputs($$cmd_info{'inputs'}, $$cmd_info{'project.io'});
   } else {
     $$ctlg_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
   #print &Dumper($cmd_info);
   my $should_echo;
   return &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
+}
+sub precompiled_inputs {
+  my ($inputs, $project_io_path) = @_;
+  my $precompiled_inputs = [];
+  foreach my $input (@$inputs) {
+    if (-e $input) {
+      &dakota::util::add_last($precompiled_inputs, $input);
+    } else {
+      print STDERR "warning: $input does not exist.\n";
+      my $json_path;
+      if (&is_so_path($input)) {
+        my $ctlg_path = &ctlg_path_from_so_path($input);
+        $json_path = &json_path_from_ctlg_path($ctlg_path);
+
+        $input = &canon_path($input);
+        my $project_io = &scalar_from_file($project_io_path);
+        $$project_io{'all'}{$input}{$ctlg_path} = 1;
+        $$project_io{'all'}{$ctlg_path}{$json_path} = 1;
+        &scalar_to_file($project_io_path, $project_io, 1);
+
+      } elsif (&is_dk_src_path($input)) {
+        $json_path = &json_path_from_dk_path($input);
+        &check_path($json_path);
+      } else {
+        #print "skipping $input, line=" . __LINE__ . $nl;
+      }
+      if (-e $json_path) {
+        #my $ctlg_path = $json_path . '.' . 'ctlg';
+        my $ctlg_path = $json_path =~ s/\.json$/\.ctlg/r;
+        print STDERR "warning: consider using $json_path to create $ctlg_path.\n";
+      }
+      #&dakota::util::add_last($precompiled_inputs, $input);
+      #&dakota::util::add_last($precompiled_inputs, $json_path);
+    }
+  }
+  return $precompiled_inputs;
 }
 sub ordered_set_add {
   my ($ordered_set, $element, $file, $line) = @_;

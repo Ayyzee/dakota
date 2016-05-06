@@ -75,9 +75,8 @@ sub dk_path_from_cc_path { # reverse dependency
 sub src_path_from_o_path { # reverse dependency
   my ($o_path) = @_;
   my $src_path = $o_path =~ s/\.$o_ext$//r;
-  if ($src_path !~ m/\.(dk|$cc_ext)$/) {
-    $src_path .= ".$cc_ext";
-  }
+  $src_path =~ s/\.(dk|$cc_ext)//;
+  $src_path .= '.' . $cc_ext;
   return $src_path;
 }
 sub hh_path_from_src_path {

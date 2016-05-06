@@ -49,10 +49,10 @@ libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project $(dakot
 libdakota.single: $(libdakota.inputs) | libdakota.project
 	for input in $(libdakota.inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(libdakota.builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(libdakota.builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
+	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
 
 check: all
 	$(dakota-catalog.output) --silent $(libdakota-core.output) $(libdakota.output)
