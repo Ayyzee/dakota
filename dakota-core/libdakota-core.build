@@ -5,7 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 
-{ 'libdakota-core' => {
+{
     'inputs' => [ # cmd-line
       '$(srcdir)/autorelease-pool.dk',
       '$(srcdir)/bit-vector.dk',
@@ -92,7 +92,7 @@
       'HAVE_CONFIG_HH',
     ],
     'project' => '$(srcdir)/libdakota-core.project', # cmd-line
-    'builddir' => '../build/libdakota-core',
+    'builddir' => '../build/dakota-core',
     'output' => '../lib/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line
@@ -143,5 +143,4 @@
         '$(srcdir)/home/.dakota/emacs/init.el',
       ],
     }
-  }
 }

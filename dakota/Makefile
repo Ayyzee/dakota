@@ -7,10 +7,10 @@ include $(rootdir)/dakota.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota.mk $(srcdir)/libdakota.build)
 
 # include-dirs
-libdakota.include-dirs := $(patsubst %,--include-directory %,$(libdakota.include-dirs))
+include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
 
 # macros
-libdakota.macros := $(patsubst %,--define-macro %,$(libdakota.macros))
+macros := $(patsubst %,--define-macro %,$(macros))
 
 # should be generated
 install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
@@ -28,18 +28,18 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  precompile\
  uninstall\
 
-$(libdakota.output): $(rootdir)/lib/libdakota-core.$(so_ext)
+$(output): $(rootdir)/lib/libdakota-core.$(so_ext)
 
-libdakota.single: $(libdakota.inputs) | libdakota.project
-	for input in $(libdakota.inputs); do\
+libdakota.single: $(inputs) | libdakota.project
+	for input in $(inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(libdakota.builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(builddir)/$$input.o $$input;\
     fi\
   done
 	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
 
 check: all
-	../bin/dakota-catalog --silent $(libdakota.output)
+	../bin/dakota-catalog --silent $(output)
 	echo "func main() ->int-t { return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
 
 installcheck: check install
@@ -52,7 +52,6 @@ goal-clean:
 clean: goal-clean
 	if [[ -e libdakota.project ]]; then $(DAKOTA-BASE) --clean --project libdakota.project; fi
 	$(RM) $(RMFLAGS) libdakota.project
-	$(RM) $(RMFLAGS) libdakota.project.io
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 
 distclean: clean

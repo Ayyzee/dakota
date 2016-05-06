@@ -5,7 +5,7 @@
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
 
 %.project: %.build
-	$(rootdir)/bin/dakota-build2project $@ $< $*
+	$(rootdir)/bin/dakota-build2project $@ $<
 
 ../bin/%: | %.project
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --output $@ $(libs:%=--library %) $?

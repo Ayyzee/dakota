@@ -7,10 +7,10 @@ include $(rootdir)/dakota.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota-core.mk $(srcdir)/libdakota-core.build)
 
 # include-dirs
-libdakota-core.include-dirs := $(patsubst %,--include-directory %,$(libdakota-core.include-dirs))
+include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
 
 # macros
-libdakota-core.macros := $(patsubst %,--define-macro %,$(libdakota-core.macros))
+macros := $(patsubst %,--define-macro %,$(macros))
 
 # should be generated
 install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
@@ -30,16 +30,16 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
-libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project
-	for input in $(libdakota-core.inputs); do\
+libdakota-core.single: $(inputs) | libdakota-core.project
+	for input in $(inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(libdakota-core.builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(builddir)/$$input.o $$input;\
     fi\
   done
 	$(DAKOTA-BASE) --shared --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
 
 check: all
-	../bin/dakota-catalog --silent $(libdakota-core.output)
+	../bin/dakota-catalog --silent $(output)
 	echo "func main() ->int-t { return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
 
 installcheck: check install
@@ -52,7 +52,6 @@ goal-clean:
 clean: goal-clean
 	if [[ -e libdakota-core.project ]]; then $(DAKOTA-BASE) --clean --project libdakota-core.project; fi
 	$(RM) $(RMFLAGS) libdakota-core.project
-	$(RM) $(RMFLAGS) libdakota-core.project.io
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 

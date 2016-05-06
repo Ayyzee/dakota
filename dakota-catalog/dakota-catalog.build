@@ -4,7 +4,7 @@
 # -*- cperl-indent-level: 2 -*-
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
-{ 'dakota-catalog' => {
+{
     'inputs' => [ # cmd-line
       '$(srcdir)/dakota-catalog.$(cc_ext)',
     ],
@@ -25,5 +25,4 @@
         '$(DESTDIR)$(prefix)/bin/dakota-catalog',
       ],
     }
-  }
 }
