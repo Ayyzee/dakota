@@ -17,7 +17,7 @@
 # if !defined dkt_dakota_private_hh
 # define      dkt_dakota_private_hh
 
-# include "dakota-dummy.hh"
+# include "dummy.hh"
 # include "dakota.hh"
 
 dkt_declare_klass_type_struct(selector_node);

@@ -3,7 +3,7 @@
 
 # include <cstdint> // uintptr_t
 
-# include "dakota-declare-klass-type.hh"
+# include "declare-klass-type.hh"
 
 dkt_declare_klass_type_typealias(boole,    bool);
 dkt_declare_klass_type_typealias(char8,    char);

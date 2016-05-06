@@ -19,8 +19,8 @@ module dakota;
 # include <cassert>
 # include <cstring>
 
-# include "dakota-safe-str.hh"
-# include "dakota-private.hh"
+# include "safe-str.hh"
+# include "private.hh"
 
 klass hash;
 klass object-output-stream;

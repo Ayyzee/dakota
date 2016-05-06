@@ -25,8 +25,8 @@ module dakota-core;
   # include "config.hh"
 # endif
 
-# include "dakota-safe-str.hh"
-# include "dakota-private.hh"
+# include "safe-str.hh"
+# include "private.hh"
 # include "dakota-rt-private.hh"
 # include "dl.hh" // symbol-name-from-address()
 # include "sorted-array.hh"

@@ -27,7 +27,7 @@ module dakota-core;
   # include "config.hh"
 # endif
 
-# include "dakota-private.hh"
+# include "private.hh"
 
 klass output-stream;
 klass system-exception;

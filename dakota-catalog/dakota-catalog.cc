@@ -30,7 +30,7 @@
 # include <link.h>
 # include <dlfcn.h>  // dlopen()/dlclose()
 
-# include "dakota-dummy.hh"
+# include "dummy.hh"
 # include "dakota.hh" // format_printf(), format_va_printf()
 
 enum {

@@ -44,7 +44,7 @@ module dakota-core;
 
 # include "config.hh"
 
-# include "dakota-private.hh"
+# include "private.hh"
 # include "dakota-rt-private.hh"
 # include "dl.hh" // load-library()
 # include "sorted-array.hh"

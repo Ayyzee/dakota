@@ -18,7 +18,7 @@
 # define      dkt_dakota_rt_private_hh
 
 # include "dakota.hh"
-# include "dakota-declare-klass-type.hh"
+# include "declare-klass-type.hh"
 
 dkt_declare_klass_type_struct(assoc_node);
 

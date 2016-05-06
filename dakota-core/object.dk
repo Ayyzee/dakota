@@ -19,7 +19,7 @@ module dakota-core;
 # include <cinttypes>
 # include <cstdlib>
 
-# include "dakota-private.hh"
+# include "private.hh"
 
 klass autorelease-pool;
 klass exception;
