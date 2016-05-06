@@ -2,7 +2,7 @@ rootdir := ..
 
 srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
-include $(rootdir)/dakota.mk
+include $(rootdir)/common.mk
 
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota.mk $(srcdir)/libdakota.build)
 
