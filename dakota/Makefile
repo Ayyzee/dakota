@@ -4,19 +4,13 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 include $(rootdir)/dakota.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/dakota-catalog.mk $(srcdir)/dakota-catalog.build)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota-core.mk $(srcdir)/libdakota-core.build)
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota.mk      $(srcdir)/libdakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota.mk $(srcdir)/libdakota.build)
 
 # include-dirs
-dakota-catalog.include-dirs := $(patsubst %,--include-directory %,$(dakota-catalog.include-dirs))
-libdakota-core.include-dirs := $(patsubst %,--include-directory %,$(libdakota-core.include-dirs))
-libdakota.include-dirs :=      $(patsubst %,--include-directory %,$(libdakota.include-dirs))
+libdakota.include-dirs := $(patsubst %,--include-directory %,$(libdakota.include-dirs))
 
 # macros
-#dakota-catalog.macros :=
-libdakota-core.macros := $(patsubst %,--define-macro %,$(libdakota-core.macros))
-libdakota.macros :=      $(patsubst %,--define-macro %,$(libdakota.macros))
+libdakota.macros := $(patsubst %,--define-macro %,$(libdakota.macros))
 
 # should be generated
 install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
@@ -34,17 +28,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  precompile\
  uninstall\
 
-$(libdakota.output): $(libdakota-core.output)
-
-$(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
-
-libdakota-core.single: $(libdakota-core.inputs) | libdakota-core.project $(dakota-catalog.output)
-	for input in $(libdakota-core.inputs); do\
-    if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(libdakota-core.builddir)/$$input.o $$input;\
-    fi\
-  done
-	$(DAKOTA-BASE) --shared --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
+$(libdakota.output): $(rootdir)/lib/libdakota-core.$(so_ext)
 
 libdakota.single: $(libdakota.inputs) | libdakota.project
 	for input in $(libdakota.inputs); do\
@@ -55,7 +39,7 @@ libdakota.single: $(libdakota.inputs) | libdakota.project
 	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
 
 check: all
-	$(dakota-catalog.output) --silent $(libdakota-core.output) $(libdakota.output)
+	../bin/dakota-catalog --silent $(libdakota.output)
 	echo "func main() ->int-t { return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
 
 installcheck: check install
@@ -66,16 +50,10 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(output-files)
 
 clean: goal-clean
-	if [[ -e libdakota-core.project ]]; then $(DAKOTA-BASE) --clean --project libdakota-core.project; fi
-	if [[ -e libdakota.project      ]]; then $(DAKOTA-BASE) --clean --project libdakota.project; fi
-	$(RM) $(RMFLAGS) libdakota-core.project
+	if [[ -e libdakota.project ]]; then $(DAKOTA-BASE) --clean --project libdakota.project; fi
 	$(RM) $(RMFLAGS) libdakota.project
-	$(RM) $(RMFLAGS) libdakota-core.project.io
 	$(RM) $(RMFLAGS) libdakota.project.io
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
-	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
-	$(RM) $(RMFLAGS) $(dakota-catalog.output)
-	$(RM) $(RMFLAGS) $(dakota-catalog.output).$(cxx_debug_symbols_ext)
 
 distclean: clean
 	cd $(rootdir); ./configure-common

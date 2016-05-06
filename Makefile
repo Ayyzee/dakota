@@ -25,4 +25,6 @@ install \
 installcheck \
 precompile \
 uninstall:
-	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/src $@
+	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
+	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
+	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota $@

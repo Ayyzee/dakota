@@ -8,7 +8,7 @@ source $DIR/common.sh
 
 rm -f config.mk
 rm -f config.sh
-rm -f src/config.hh
+rm -f dakota-core/config.hh
 rm -f lib/dakota/compiler
 rm -f lib/dakota/platform.json
 rm -f lib/dakota/compiler-default-argument-promotions.json
@@ -25,7 +25,7 @@ source $DIR/config-$sysname.sh
 $LN $LNFLAGS config-$sysname.mk config.mk
 $LN $LNFLAGS config-$sysname.sh config.sh
 
-pushd src > /dev/null 2>&1
+pushd dakota-core > /dev/null 2>&1
 $LN $LNFLAGS config-$sysname.hh config.hh
 popd > /dev/null 2>&1
 
@@ -35,5 +35,5 @@ $LN $LNFLAGS compiler-$canon_compiler compiler
 $LN $LNFLAGS platform-$sysname.json   platform.json
 popd > /dev/null 2>&1
 
-CXX=$compiler make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions all
-CXX=$compiler make --no-print-directory --directory $DIR/src/port/compiler-default-argument-promotions clean
+CXX=$compiler make --no-print-directory --directory $DIR/dakota-core/port/compiler-default-argument-promotions all
+CXX=$compiler make --no-print-directory --directory $DIR/dakota-core/port/compiler-default-argument-promotions clean
