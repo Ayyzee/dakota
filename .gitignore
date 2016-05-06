@@ -15,6 +15,6 @@ config.mk
 config.sh
 lib/dakota/compiler
 lib/dakota/platform.json
-src/config.hh
-src/obj
-src/strerror-name.tbl
+dakota-core/config.hh
+dakota-core/obj
+dakota-core/strerror-name.tbl
