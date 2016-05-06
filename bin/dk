@@ -152,7 +152,7 @@ sub start {
     if ($ENV{'DK_CXX'}) {
       unshift @$gcc_cmd, $ENV{'DK_CXX'};
     } elsif ($ENV{'CXX'}) {
-      unshift @$gcc_cmd, $ENV{'DK_CXX'};
+      unshift @$gcc_cmd, $ENV{'CXX'};
     } else {
       die $0 . ': error: environment variables DK_CXX or CXX required' . $nl;
     }
