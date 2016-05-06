@@ -2,14 +2,7 @@
 *.dSYM
 .DS_Store
 
-build
-build/Makefile
-build/CMakeCache.txt
-build/CMakeFiles/
-build/cmake_install.cmake
-build/bin/
-build/lib/
-build/src/
+build/
 
 config.mk
 config.sh
