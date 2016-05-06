@@ -35,14 +35,6 @@ $Data::Dumper::Indent    = 0; # default = 2
 my $nl = "\n";
 my $o_ext =   'o';
 my $so_ext = 'so';
-my $major_mode_tbl = {
-  '-c'        => 'compile',
-  '--compile' => 'compile',
-  '-shared'   => 'shared',
-  '--shared'  => 'shared',
-  '-dynamic'  => 'dynamic',
-  '--dynamic' => 'dynamic',
-};
 sub path_opt {
   my ($cmd, $ir, $short, $long, $info) = @_;
   my $arg = $$cmd[$$ir];
@@ -76,32 +68,30 @@ sub translate_dk_to_cc {
   }
 }
 sub build_precompile_cmd {
-  my ($info) = @_;
+  my ($project, $info, $ordered_input_args) = @_;
   my $cmd = [ 'dakota', '--precompile' ];
   if ($$info{'major-mode'}) {
     push @$cmd, '--' . $$info{'major-mode'}[1];
   }
-  if ($$info{'project'}) {
-    push @$cmd, ('--project', $$info{'project'});
-  } else {
-    if ($ENV{'DK_PROJECT'}) {
-      push @$cmd, ('--project', $ENV{'DK_PROJECT'});
-    } else {
-      die $0 . ': error: environment variable DK_PROJECT required' . $nl;
-    }
+  if ($project) {
+    push @$cmd, ('--project', $project);
   }
   push @$cmd, ('--output', $$info{'output'}[1]);
-  push @$cmd, (@{$$info{'ordered-input-args'}});
+  push @$cmd, (@$ordered_input_args);
   return $cmd;
 }
 sub get_dakota_opts {
-  my ($cmd, $info) = @_;
+  my ($cmd) = @_;
+  my $var4opt = { 'cxx'     => 'DK_CXX',
+                  'project' => 'DK_PROJECT' };
+  my $info = {};
   my $to_remove = [];
   for (my $i = 0; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
-    foreach my $key ('cxx', 'project') {
-      if ($arg =~ /^--$key=(.+)$/) {
-        $$info{$key} = $1;
+    foreach my $opt (keys %$var4opt) {
+      $$info{$opt} = undef if !exists $$info{$opt};
+      if ($arg =~ /^--$opt=(.+)$/) {
+        $$info{$opt} = $1;
         unshift @$to_remove, $i;
         last;
       }
@@ -110,67 +100,79 @@ sub get_dakota_opts {
   foreach my $i (@$to_remove) {
     splice @$cmd, $i, 1;
   }
+  foreach my $opt (keys %$var4opt) {
+    if (!$$info{$opt}) {
+      if ($ENV{$$var4opt{$opt}}) {
+        $$info{$opt} = $ENV{$$var4opt{$opt}};
+      } else {
+        die $0 . ': error: option --' . $opt .
+          ' not used, so environment variable ' .
+          $$var4opt{$opt} . ' required' . $nl;
+      }
+    }
+  }
+  return ($$info{'cxx'},
+          $$info{'project'});
 }
-sub get_gcc_opts {
+my $major_mode_tbl = {
+  '-c'        => 'compile',
+  '--compile' => 'compile',
+  '-shared'   => 'shared',
+  '--shared'  => 'shared',
+  '-dynamic'  => 'dynamic',
+  '--dynamic' => 'dynamic',
+};
+sub detect_gcc_opts {
   my ($cmd, $info) = @_;
-  for (my $i = 0; $i < @$cmd; $i++) {
+  $$info{'library-directory'} = [];
+  $$info{'library'} = [];
+  $$info{'inputs'} = [];
+  my $ordered_input_args = [];
+  for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
     my $pair;
     if (0) {
     } elsif ($$major_mode_tbl{$arg}) {
       $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
     } elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
-      push @{$$info{'ordered-input-args'}}, '--library-directory=' . $$pair[1];
+      push @$ordered_input_args, '--library-directory=' . $$pair[1];
     } elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
-      push @{$$info{'ordered-input-args'}}, '--library=' . $$pair[1];
+      push @$ordered_input_args, '--library=' . $$pair[1];
     } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
     } elsif ($arg !~ /^-/) {
       if ($arg =~ /^(.+?\.(dk|$so_ext|$o_ext))$/) {
         $pair = [$i, $arg];
         push @{$$info{'inputs'}}, $pair;
-        push @{$$info{'ordered-input-args'}}, $$pair[1];
+        push @$ordered_input_args, $$pair[1];
       }
     }
   }
+  return $ordered_input_args;
 }
 sub start {
   my ($argv) = @_;
-  my $cmd = [@$argv];
-  my $info = {
-    'library-directory' => [],
-    'library'           => [],
-    'inputs'            => [],
-    'ordered-input-args' => [],
-  };
-  &get_dakota_opts($cmd, $info);
+  my $cmd = [$0, @$argv];
+  my ($cxx, $project) = &get_dakota_opts($cmd);
   my $gcc_cmd = [@$cmd];
-  &get_gcc_opts($gcc_cmd, $info);
+  $$gcc_cmd[0] = $cxx;
+  my $info = {};
+  my $ordered_input_args = &detect_gcc_opts($gcc_cmd, $info);
+  my $precompile_cmd = &build_precompile_cmd($project, $info, $ordered_input_args);
+  print '# ' . join(' ', @$precompile_cmd) . $nl;
   &translate_dk_to_cc($gcc_cmd, $$info{'inputs'});
-  if ($$info{'cxx'}) {
-    unshift @$gcc_cmd, $$info{'cxx'};
-  } else {
-    if ($ENV{'DK_CXX'}) {
-      unshift @$gcc_cmd, $ENV{'DK_CXX'};
-    } elsif ($ENV{'CXX'}) {
-      unshift @$gcc_cmd, $ENV{'CXX'};
-    } else {
-      die $0 . ': error: environment variables DK_CXX or CXX required' . $nl;
-    }
-  }
-  my $dakota_cmd = &build_precompile_cmd($info);
-  # executing the precompile cmd should return on stdout
-  # the list of cc files that correspond to the dk files (in order)
+  print '# ' . join(' ', @$gcc_cmd) . $nl;
 
   print '{' . $nl;
   foreach my $key (sort keys %$info) {
     print '  ' . "'$key'" . ' => ' . &Dumper($$info{$key}) . $nl;
   }
   print '}' . $nl;
-  if (1) {
+  print &Dumper($ordered_input_args) . $nl;
+  if (0) {
     print '# ' . join(' ', ($0, @$argv)) . $nl;
-    print '# ' . join(' ', ($0, @$cmd)) . $nl;
+    print '# ' . join(' ', @$cmd) . $nl;
     print '# ' . join(' ', @$gcc_cmd) . $nl;
-    print '# ' . join(' ', @$dakota_cmd) . $nl;
+    print '# ' . join(' ', @$precompile_cmd) . $nl;
   }
 }
 &start(\@ARGV);
