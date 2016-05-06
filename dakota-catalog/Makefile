@@ -26,6 +26,9 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  uninstall\
 
 check: all
+	if [[ -e $(rootdir)/lib/libdakota-core.$(so_ext) ]]; then $(dakota-catalog.output) $(rootdir)/lib/libdakota-core.$(so_ext); fi
+	if [[ -e $(rootdir)/lib/libdakota.$(so_ext) ]]; then $(dakota-catalog.output) $(rootdir)/lib/libdakota.$(so_ext); fi
+	$(dakota-catalog.output) libdl.$(so_ext)
 
 installcheck: check install
 	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
