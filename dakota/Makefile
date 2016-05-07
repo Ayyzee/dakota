@@ -26,11 +26,12 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  install\
  installcheck\
  precompile\
+ single\
  uninstall\
 
 $(output): $(rootdir)/lib/libdakota-core.$(so_ext)
 
-libdakota.single: $(inputs) | libdakota.project
+single: $(inputs) | libdakota.project
 	for input in $(inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(builddir)/$$input.o $$input;\
