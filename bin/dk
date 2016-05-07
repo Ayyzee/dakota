@@ -75,8 +75,10 @@ sub translate_dk_to_cc {
   my ($cmd, $cc_paths) = @_;
   for (my $i = 1; $i < @$cmd; $i++) {
     my $arg = $$cmd[$i];
+    die if ! $arg || '' eq $arg;
     if ($arg =~ /\.dk$/) {
       my $cc_path = shift @$cc_paths;
+      die if ! $cc_path || '' eq $cc_path;
       &check_paths($arg, $cc_path);
       $$cmd[$i] = $cc_path;
     }
@@ -176,10 +178,13 @@ sub start {
   my $precompile_cmd = &build_precompile_cmd($project, $info, $ordered_input_args);
   my $precompile_cmd_str = join(' ', @$precompile_cmd) ;
   #print '# 2/3 ' . $precompile_cmd_str . $nl;
-  my $cc_paths = [split $nl, `$precompile_cmd_str`];
-  exit $? if 0 != $?;
+  my $outstr = `$precompile_cmd_str`;
+  if (!defined $outstr) {
+    die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
+  }
+  my $cc_paths = [split $nl, $outstr];
   &translate_dk_to_cc($gcc_cmd, $cc_paths);
-  #print '# 3/3' . join(' ', @$gcc_cmd) . $nl;
+  #print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
   system @$gcc_cmd;
   exit $?;
 
