@@ -90,8 +90,6 @@ sub json_path_from_o_path {
   return $out_path;
 }
 my $patterns = {
-  'user_path_from_any_path' => '$(builddir)/+user/% : %', # +user also used in util.pm
-
   'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : %.dk',
   'o_path_from_cc_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(builddir)/%.$(cc_ext)',
 
@@ -378,7 +376,9 @@ sub str_from_cmd_info {
 }
 sub user_path_from_any_path {
   my ($path) = @_;
-  return &out_path_from_in_path('user_path_from_any_path', $path);
+  my ($dir, $name) = &split_path($path);
+  my $user_path = &builddir() . '/' . $dir . '/+user/'. $name;
+  return $user_path;
 }
 sub o_path_from_dk_path {
   my ($path) = @_;

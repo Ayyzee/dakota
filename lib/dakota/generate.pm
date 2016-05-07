@@ -4276,8 +4276,9 @@ sub pad {
   return $result_str;
 }
 sub dk_generate_cc {
-  my ($file_basename, $path_name, $project_rep) = @_;
-  my $filestr = &dakota::util::filestr_from_file("$file_basename.dk");
+  my ($file, $path_name, $project_rep) = @_;
+  my ($dir, $file_basename) = &split_path($file);
+  my $filestr = &dakota::util::filestr_from_file($file);
   my $output = $path_name;
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {

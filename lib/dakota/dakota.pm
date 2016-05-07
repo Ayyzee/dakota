@@ -472,13 +472,13 @@ sub loop_cc_from_dk {
       #print "skipping $input, line=" . __LINE__ . $nl;
     }
 
-    my ($input_dir, $input_name, $input_ext) = &split_path($input, $id);
-    my $file = &dakota::generate::dk_parse("$input_name.dk");
+    my ($input_dir, $input_name) = &split_path($input, $id);
+    my $file = &dakota::generate::dk_parse($input);
     my $cc_path;
     if ($$cmd_info{'opts'}{'output'}) {
       $cc_path = $$cmd_info{'opts'}{'output'};
     } else {
-      $cc_path = "$input_name.$cc_ext";
+      $cc_path = "$input_dir/$input_name.$cc_ext";
     }
     my $rt_json_path = &rt_json_path($cmd_info);
     my $user_dk_path = &user_path_from_any_path($input);
@@ -491,7 +491,7 @@ sub loop_cc_from_dk {
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input_name, $user_dk_path, $global_rep);
+    &dakota::generate::dk_generate_cc($input, $user_dk_path, $global_rep);
     &nrt::add_extra_symbols($file);
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
