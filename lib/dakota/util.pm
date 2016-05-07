@@ -58,6 +58,7 @@ our @EXPORT= qw(
                  decode_comments
                  decode_strings
                  deep_copy
+                 dmp
                  dqstr_regex
                  encode_char
                  encode_comments
@@ -711,6 +712,10 @@ sub all_files_recursive {
   }
   closedir $dh;
   return $files;
+}
+sub dmp {
+  my ($ref) = @_;
+  print STDERR &Dumper($ref);
 }
 sub clean_paths {
   my ($in, $key) = @_;
