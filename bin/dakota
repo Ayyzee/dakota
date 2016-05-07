@@ -31,6 +31,7 @@ my $gbl_prefix;
 my $gbl_compiler;
 my $so_ext;
 my $o_ext;
+my $nl = "\n";
 
 sub dk_prefix {
   my ($path) = @_;
@@ -179,6 +180,24 @@ if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) 
 }
 $inputs = &clean_paths($inputs);
 
+if (1) {
+  my $dir = $$root_cmd{'project.source-dir'};
+  if (! $dir) {
+    $dir = &getcwd();
+  } elsif (! &is_abs($dir)) {
+    $dir = &getcwd() . '/' . $dir;
+  }
+  for (my $i = 0; $i < @{$$root_cmd{'project.inputs'}}; $i++) {
+    my $project_input = $$root_cmd{'project.inputs'}[$i];
+    if (! &is_abs($project_input)) {
+      my $input = $dir . '/' . $project_input;
+      if (! -e $input) {
+        print STDERR $0 . ': error: no-such-file: ' . $input . $nl;
+      }
+      $$root_cmd{'project.inputs'}[$i] = $input;
+    }
+  }
+}
 if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
   if (1 >= scalar $$root_cmd{'project.inputs'}) {
     die "$0: error: inputs are requried either in the project file or the command line.\n";
@@ -326,6 +345,7 @@ sub use_project {
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
   $$root_cmd{'project.output'} = $$project{'output'};
   $$root_cmd{'project.io'} = $$project{'builddir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
+  $$root_cmd{'project.source-dir'} = $$project{'source-dir'};
   $project_io_path = $$root_cmd{'project.io'};
   my $original_state;
   if (! -e $project_io_path) {
