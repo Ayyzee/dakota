@@ -104,6 +104,7 @@ my $kw_args_placeholders = &kw_args_placeholders();
 my ($id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 
+my $global_should_echo = 0;
 my $global_is_defn = undef; # klass decl vs defn
 my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
 my $global_is_exe_rt = undef;
@@ -247,6 +248,7 @@ sub write_to_file_converted_file {
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
+  &make_dir_part($path, $global_should_echo);
   open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
   foreach my $string (@$strings) {
     print PATH $string;
@@ -268,6 +270,7 @@ sub write_to_file_converted_strings {
     }
   }
   if (defined $path) {
+    &make_dir_part($path, $global_should_echo);
     open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
   } else {
     *PATH = *STDOUT;
@@ -321,7 +324,9 @@ sub generate_nrt {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
-  my $rel_user_dk_path = "+user/$name.dk";
+  my $rt = '+user';
+  my $rel_user_dk_path = $rt . '/' . $name . '.dk';
+  #my $user_dir = $dir . '/' . $rt;
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $output =     "$dir/$name.$suffix";

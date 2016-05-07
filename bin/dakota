@@ -254,30 +254,17 @@ sub create_missing_project {
   if (0 == scalar @$inputs) {
     die "error: missing both --project <file> and input files; at least one is required.";
   }
-  if ($$root_cmd{'opts'}{'compile'}) {
-    print "warning: missing --project <file> (creating default).\n";
-  } else {
-    print "info: missing --project <file> (creating default).\n";
-  }
-  # create and write a default project file
   $project = { 'output' => undef, 'inputs' => [],
                'builddir' => &builddir() };
-  foreach my $input (@$inputs) {
-    if ($input =~ m/\.(dk|$so_ext)$/) {
-      add_last($$project{'inputs'}, $input);
-    } else {
-      print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
-    }
-  }
   my $project_base;
   my $project_path;
 
   if ($$root_cmd{'opts'}{'output'}) {
     $$project{'output'} = $$root_cmd{'opts'}{'output'};
-    $project_base = $$project{'output'} =~ s/\.$so_ext$//r;
-  } elsif (scalar @$inputs) {
+    $project_base = $$project{'output'} =~ s/\.$so_ext$//r; # remove ext if present
+  } else {
     $project_base = &project_base($inputs);
-    if ($$root_cmd{'opts'}{'shared'}) {
+    if ($$root_cmd{'opts'}{'dynamic'} || $$root_cmd{'opts'}{'shared'}) {
       $$project{'output'} = $project_base . ".$so_ext";
     } else {
       $$project{'output'} = $project_base;
@@ -285,11 +272,23 @@ sub create_missing_project {
   }
   $project_path =   $project_base . '.project';
   if (-e $project_path) {
-    print "info: found $project_path; using for missing --project <>.\n";
+    print STDERR "info: found $project_path; using for missing --project <>.\n";
+    return $project_path;
+  } elsif ($$root_cmd{'opts'}{'compile'}) {
+    print STDERR "warning: missing --project <file> (creating default $project_path).\n";
   } else {
-    my $original_state;
-    &scalar_to_file($project_path, $project, $original_state = 1);
+    print STDERR "info: missing --project <file> (creating default $project_path).\n";
   }
+  # create and write a default project file
+  foreach my $input (@$inputs) {
+    if ($input =~ m/\.(dk|$so_ext)$/) {
+      add_last($$project{'inputs'}, $input);
+    } else {
+      print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
+    }
+  }
+  my $original_state;
+  &scalar_to_file($project_path, $project, $original_state = 1);
   return $project_path;
 }
 sub project_base {

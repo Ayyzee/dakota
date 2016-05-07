@@ -113,6 +113,7 @@ use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
 
 my $show_stat_info = 0;
+my $global_should_echo = 0;
 
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
@@ -414,7 +415,7 @@ sub sqstr_regex {
   return qr/(?<!\\)'.*?(?<!\\)'/;
 }
 my $build_vars = {
-  'builddir' => '../build',
+  'builddir' => 'build',
 };
 sub dir_part {
   my ($path) = @_;
@@ -424,9 +425,12 @@ sub dir_part {
   return $dir;
 }
 sub make_dir {
-  my ($path) = @_;
+  my ($path, $should_echo) = @_;
   $path = join('/', @$path) if 'ARRAY' eq ref($path);
   if (! -e $path) {
+    if ($should_echo) {
+      print STDERR $0 . ': info: make_dir(' . $path . ')' . $nl;
+    }
     my $cmd = ['mkdir', '-p', $path];
     my $exit_val = system(@$cmd);
     if (0 != $exit_val) {
@@ -435,10 +439,10 @@ sub make_dir {
   }
 }
 sub make_dir_part {
-  my ($path) = @_;
+  my ($path, $should_echo) = @_;
   my $dir_part = &dir_part($path);
   if ('' ne $dir_part) {
-    &make_dir($dir_part);
+    &make_dir($dir_part, $should_echo);
   } else {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
@@ -458,12 +462,9 @@ sub builddir {
     die;
   }
   if (! -e $builddir) {
-    &make_dir($builddir);
+    &make_dir($builddir, $global_should_echo);
   }
-  if (! -e "$builddir/+user") {
-    &make_dir("$builddir/+user");
-  }
- return $builddir;
+  return $builddir;
 }
 
 # 1. cmd line
@@ -861,6 +862,7 @@ sub scalar_to_file {
   if (!$original_state) {
     $refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
   }
+  &make_dir_part($file);
   open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   flock FILE, 2; # LOCK_EX
   truncate FILE, 0;

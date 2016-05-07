@@ -1084,7 +1084,7 @@ sub rt_o_from_json {
   $$project_io{'all'}{$rt_cc_path}{$rt_o_path} = 1;
   &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
-  &make_dir_part($rt_cc_path);
+  &make_dir_part($rt_cc_path, $global_should_echo);
   my ($path, $file_basename, $file) = ($rt_cc_path, $rt_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
@@ -1212,6 +1212,7 @@ sub exec_cmd {
 sub outfile_from_infiles {
   my ($cmd_info, $should_echo) = @_;
   my $outfile = $$cmd_info{'output'};
+  &make_dir_part($outfile, $should_echo);
   if ($outfile =~ m|^$builddir/$builddir/|) { die "found double builddir/builddir: $outfile"; } # likely a double $builddir prepend
   my $infiles;
   if (-e $outfile) {
@@ -1227,7 +1228,7 @@ sub outfile_from_infiles {
   }
   my $num_out_of_date_infiles = @$infiles;
   if (0 != $num_out_of_date_infiles) {
-    &make_dir_part($$cmd_info{'output'});
+    &make_dir_part($$cmd_info{'output'}, $should_echo);
     if ($show_outfile_info) {
       print "MK $$cmd_info{'output'}\n";
     }
