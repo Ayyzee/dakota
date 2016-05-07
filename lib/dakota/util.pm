@@ -68,6 +68,7 @@ our @EXPORT= qw(
                  flatten
                  header_file_regex
                  ident_regex
+                 is_abs
                  is_symbol_candidate
                  is_debug
                  is_kw_args_generic
