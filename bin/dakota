@@ -130,6 +130,9 @@ my $root_cmd = { 'reps' => [],
 # m/0: many inputs, no  output
 # m/1: many inputs, one output (directory)
 
+if ($$root_cmd{'opts'}{'precompile'}) {
+  $ENV{'DKT_PRECOMPILE'} = 1;
+}
 my $inputs = &clean_paths(\@ARGV);
 my $project;
 my $project_io;
@@ -184,10 +187,13 @@ if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied
     $$root_cmd{'inputs'} = [];
   }
 }
-# should only reorder the dk files leaving the so files in the same place
-# so the inputs should be split into separate sublist (and then sorted)
+# should only reorder the .o files (between .so files) leaving the .so files in their
+# original position so the inputs should be split into separate sublist (and then sorted).
+# its OK to sort the .dk files, but we must link using the original positions.
 if (1) {
-  $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
+  if (!$ENV{'DKT_PRECOMPILE'}) {
+    $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
+  }
 }
 $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
 # dakota --compile --output <> {dk}+
@@ -239,9 +245,6 @@ if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
       $ENV{'DKT_DIR'} = $reldir;
     }
   }
-}
-if ($$root_cmd{'opts'}{'precompile'}) {
-  $ENV{'DKT_PRECOMPILE'} = 1;
 }
 my $result = &dakota::dakota::start_cmd($root_cmd);
 exit $result;

@@ -704,8 +704,8 @@ sub copy_no_dups {
   my $str_set = {};
   my $result = [];
   foreach my $str (@$strs) {
-    if (! -e $str) {
-      print STDERR $0 . ': warning: no-such-path: ' . $str . $nl;
+    if (! $ENV{'DKT_PRECOMPILE'} && ! -e $str) {
+      print STDERR $0 . ': warning: no-such-file: ' . $str . $nl;
     }
     if (&is_abs($str)) {
       $str = &canon_path($str);
