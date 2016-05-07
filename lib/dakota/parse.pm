@@ -72,12 +72,9 @@ sub dk_path_from_cc_path { # reverse dependency
   my $dk_path = $cc_path =~ s/\.$cc_ext$/.dk/r;
   return $dk_path;
 }
-sub src_path_from_o_path { # reverse dependency
-  my ($o_path) = @_;
-  my $src_path = $o_path =~ s/\.$o_ext$//r;
-  $src_path =~ s/\.(dk|$cc_ext)//;
-  $src_path .= '.' . $cc_ext;
-  return $src_path;
+sub cc_path_from_dk_path {
+  my ($path) = @_;
+  return &out_path_from_in_path('cc_path_from_dk_path', $path);
 }
 sub hh_path_from_src_path {
   my ($src_path) = @_;
@@ -90,6 +87,8 @@ sub json_path_from_o_path {
   return $out_path;
 }
 my $patterns = {
+  'cc_path_from_dk_path' => '$(builddir)/%.$(cc_ext) : %.dk',
+
   'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : %.dk',
   'o_path_from_cc_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(builddir)/%.$(cc_ext)',
 
@@ -151,7 +150,7 @@ our @EXPORT= qw(
                  add_str
                  add_symbol
                  add_trait_decl
-                 src_path_from_o_path
+                 cc_path_from_dk_path
                  colin
                  colout
                  ctlg_path_from_so_path
@@ -409,6 +408,7 @@ sub json_path_from_ctlg_path {
  }
 sub json_path_from_dk_path {
   my ($in_path) = @_;
+  $in_path = &Cwd::abs_path($in_path);
   my $out_path = &out_path_from_in_path('json_path_from_dk_path', $in_path);
   return $out_path;
 }

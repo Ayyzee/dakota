@@ -892,7 +892,7 @@ sub o_from_dk {
     } else {
       $o_path =  &o_path_from_dk_path($input);
     }
-    my $src_path = &src_path_from_o_path($o_path); # reverse dependency
+    my $src_path = &cc_path_from_dk_path($input);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
       if ($ENV{'DKT_PRECOMPILE'}) {
         if (&is_out_of_date($input, $src_path)) {

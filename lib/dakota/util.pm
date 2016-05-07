@@ -637,6 +637,7 @@ sub flatten {
 }
 # found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
 sub longest_common_prefix {
+  return '/';
   my $path_prefix = shift;
   for (@_) {
     chop $path_prefix while (! /^$path_prefix/);
