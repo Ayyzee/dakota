@@ -1084,7 +1084,7 @@ sub rt_o_from_json {
   $$project_io{'all'}{$rt_cc_path}{$rt_o_path} = 1;
   &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
-  &make_dir($rt_cc_path);
+  &make_dir_part($rt_cc_path);
   my ($path, $file_basename, $file) = ($rt_cc_path, $rt_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
@@ -1181,26 +1181,6 @@ sub linked_output_from_o {
   }
   return $result;
 }
-sub dir_part {
-  my ($path) = @_;
-  my $parts = [split /\//, $path];
-  &dakota::util::remove_last($parts);
-  my $dir = join '/', @$parts;
-  return $dir;
-}
-sub make_dir {
-  my ($path) = @_;
-  my $dir_part = &dir_part($path);
-  if ("" ne $dir_part) {
-    if (! -e $dir_part) {
-      my $cmd = { 'cmd' => 'mkdir', 'cmd-flags' => '-p', 'inputs' => [ $dir_part ] };
-      #my $cmd_str = &str_from_cmd_info($cmd);
-      #print "  $cmd_str\n";
-      my $should_echo;
-      &exec_cmd($cmd, $should_echo = 0);
-    }
-  }
-}
 sub exec_cmd {
   my ($cmd_info, $should_echo) = @_;
   my $cmd_str;
@@ -1247,7 +1227,7 @@ sub outfile_from_infiles {
   }
   my $num_out_of_date_infiles = @$infiles;
   if (0 != $num_out_of_date_infiles) {
-    &make_dir($$cmd_info{'output'});
+    &make_dir_part($$cmd_info{'output'});
     if ($show_outfile_info) {
       print "MK $$cmd_info{'output'}\n";
     }

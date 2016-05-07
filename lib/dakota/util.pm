@@ -78,6 +78,8 @@ our @EXPORT= qw(
                  last
                  dk_mangle_seq
                  dk_mangle
+                 make_dir
+                 make_dir_part
                  max
                  method_sig_regex
                  method_sig_type_regex
@@ -414,6 +416,33 @@ sub sqstr_regex {
 my $build_vars = {
   'builddir' => '../build',
 };
+sub dir_part {
+  my ($path) = @_;
+  my $parts = [split /\//, $path];
+  &dakota::util::remove_last($parts);
+  my $dir = join '/', @$parts;
+  return $dir;
+}
+sub make_dir {
+  my ($path) = @_;
+  $path = join('/', @$path) if 'ARRAY' eq ref($path);
+  if (! -e $path) {
+    my $cmd = ['mkdir', '-p', $path];
+    my $exit_val = system(@$cmd);
+    if (0 != $exit_val) {
+      die $0 . ': error: make_dir(' . $path .')' . $nl;
+    }
+  }
+}
+sub make_dir_part {
+  my ($path) = @_;
+  my $dir_part = &dir_part($path);
+  if ('' ne $dir_part) {
+    &make_dir($dir_part);
+  } else {
+    print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
+  }
+}
 sub builddir {
   my $builddir;
   my $project = &global_project();
@@ -429,10 +458,10 @@ sub builddir {
     die;
   }
   if (! -e $builddir) {
-    mkdir $builddir; # or try make_path in File::Path
+    &make_dir($builddir);
   }
   if (! -e "$builddir/+user") {
-    mkdir "$builddir/+user";
+    &make_dir("$builddir/+user");
   }
  return $builddir;
 }

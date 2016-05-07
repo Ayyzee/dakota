@@ -314,7 +314,7 @@ sub use_project {
     $$project{'builddir'} = &builddir();
   }
   if (! -e $$project{'builddir'}) {
-    mkdir $$project{'builddir'}; # or try make_path in File::Path
+    &make_dir($$project{'builddir'});
   }
   if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
     my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
