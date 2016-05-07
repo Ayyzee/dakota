@@ -169,7 +169,7 @@ sub detect_gcc_opts {
 sub start {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
-  #print '# 1/3 ' . join(' ', @$cmd) . $nl;
+  print '# 1/3 ' . join(' ', @$cmd) . $nl;
   my ($cxx, $project) = &get_dakota_opts($cmd);
   my $gcc_cmd = [@$cmd];
   $$gcc_cmd[0] = $cxx;
@@ -177,24 +177,23 @@ sub start {
   my $ordered_input_args = &detect_gcc_opts($gcc_cmd, $info);
   my $precompile_cmd = &build_precompile_cmd($project, $info, $ordered_input_args);
   my $precompile_cmd_str = join(' ', @$precompile_cmd) ;
-  #print '# 2/3 ' . $precompile_cmd_str . $nl;
+  print '# 2/3 ' . $precompile_cmd_str . $nl;
   my $outstr = `$precompile_cmd_str`;
+  my $val = $? >> 8;
+  if (0 != $val) {
+    #print $outstr;
+    exit $val;
+  }
   if (!defined $outstr) {
     die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
   }
   my $cc_paths = [split $nl, $outstr];
-  &translate_dk_to_cc($gcc_cmd, $cc_paths);
-  #print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
-  system @$gcc_cmd;
-  exit $?;
-
-  print '{' . $nl;
-  foreach my $key (sort keys %$info) {
-    print '  ' . "'$key'" . ' => ' . &Dumper($$info{$key}) . $nl;
+  if (0 == @$cc_paths) {
+    print 'nothing to do' . $nl;
+    exit 0;
   }
-  print '}' . $nl;
-  print &Dumper($ordered_input_args) . $nl;
+  &translate_dk_to_cc($gcc_cmd, $cc_paths);
+  print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
+  return system @$gcc_cmd;
 }
-&start(\@ARGV);
-# dakota --precompile ...
-# gcc|clang ...
+exit &start(\@ARGV);
