@@ -135,6 +135,7 @@
         '$(DESTDIR)$(prefix)/bin/dakota-build',
         '$(DESTDIR)$(prefix)/bin/dakota-build2mk',
         '$(DESTDIR)$(prefix)/bin/dakota-build2project',
+        '$(DESTDIR)$(prefix)/bin/dk',
       ],
       '-home' => [ # install.home
         '$(srcdir)/home/.dakota/.bashrc',
