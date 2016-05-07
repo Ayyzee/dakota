@@ -415,9 +415,6 @@ sub sqstr_regex {
 # not-escaped ' .*? not-escaped '
   return qr/(?<!\\)'.*?(?<!\\)'/;
 }
-my $build_vars = {
-  'builddir' => 'build',
-};
 sub dir_part {
   my ($path) = @_;
   my $parts = [split /\//, $path];
@@ -448,6 +445,9 @@ sub make_dir_part {
     print STDERR $0 . ': warning: skipping: make_dir_part(' . $path . ')' . $nl;
   }
 }
+my $build_vars = {
+  'builddir' => 'build',
+};
 sub builddir {
   my $builddir;
   my $project = &global_project();
