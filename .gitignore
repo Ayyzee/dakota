@@ -1,13 +1,3 @@
 *~
 *.dSYM
 .DS_Store
-
-build/
-
-config.mk
-config.sh
-lib/dakota/compiler
-lib/dakota/platform.json
-dakota-core/config.hh
-dakota-core/obj
-dakota-core/strerror-name.tbl

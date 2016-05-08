@@ -4295,9 +4295,9 @@ sub dk_generate_cc {
     my $num = 1;
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "# line $num \"$cwd/$file_basename.dk\"" . $nl, $filestr ], $remove = 1, $project_rep);
+      &write_to_file_converted_strings("$output", [ "# line $num \"$cwd/$file_basename\"" . $nl, $filestr ], $remove = 1, $project_rep);
     } else {
-      &write_to_file_converted_strings("$output", [ "# line $num \"$file_basename.dk\"" . $nl, $filestr ], $remove = 1, $project_rep);
+      &write_to_file_converted_strings("$output", [ "# line $num \"$file_basename\"" . $nl, $filestr ], $remove = 1, $project_rep);
     }
   }
 }

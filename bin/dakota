@@ -180,7 +180,7 @@ if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) 
 }
 $inputs = &clean_paths($inputs);
 
-if (1) {
+if (0) {
   my $stuff = {};
   $$stuff{'cwd'} = &getcwd();
   $$stuff{'project-dir'} = &dir_part($$root_cmd{'opts'}{'project'});
@@ -380,7 +380,7 @@ sub project_clean {
       }
       if (! $$project_io{'inputs'}{$in_path}) {
         if (-e $in_path) {
-          $$remove{$in_path} = 1;
+          #$$remove{$in_path} = 1; # too dangerous
         }
       }
     }
