@@ -32,7 +32,7 @@ my $nl = "\n";
 
 BEGIN {
 };
-#use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
 $Data::Dumper::Terse =     1;
@@ -58,6 +58,7 @@ our @EXPORT= qw(
                  decode_comments
                  decode_strings
                  deep_copy
+                 dir_part
                  dmp
                  dqstr_regex
                  encode_char
@@ -92,6 +93,7 @@ our @EXPORT= qw(
                  pann
                  parameter_types_str
                  rel_path_canon
+                 relpath
                  remove_extra_whitespace
                  remove_first
                  remove_last
@@ -655,7 +657,7 @@ sub rel_path_canon {
     }
 
     my $path2 = &Cwd::abs_path($path1);
-    confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
+    Carp::confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
     my $common_prefix = &longest_common_prefix($cwd, $path2);
     my $adj_common_prefix = $common_prefix;
     $adj_common_prefix =~ s|/[^/]+/$||g;

@@ -181,7 +181,12 @@ if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) 
 $inputs = &clean_paths($inputs);
 
 if (1) {
-  my $dir = $$root_cmd{'project.source-dir'};
+  my $stuff = {};
+  $$stuff{'cwd'} = &getcwd();
+  $$stuff{'project-dir'} = &dir_part($$root_cmd{'opts'}{'project'});
+  $$stuff{'rel-dir'} = &relpath($$stuff{'project-dir'}, $$stuff{'cwd'});
+  #&dmp($stuff);
+  my $dir = $$stuff{'rel-dir'};
   if (! $dir) {
     $dir = &getcwd();
   } elsif (! &is_abs($dir)) {
@@ -345,7 +350,6 @@ sub use_project {
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
   $$root_cmd{'project.output'} = $$project{'output'};
   $$root_cmd{'project.io'} = $$project{'builddir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
-  $$root_cmd{'project.source-dir'} = $$project{'source-dir'};
   $project_io_path = $$root_cmd{'project.io'};
   my $original_state;
   if (! -e $project_io_path) {
