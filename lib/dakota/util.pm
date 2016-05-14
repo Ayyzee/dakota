@@ -792,6 +792,7 @@ sub canon_path {
     $path =~ s|^\./(.+)|$1|g; # remove leading ./
     $path =~ s|(.+)/\.$|$1|g; # remove trailing /.
     $path =~ s|/+$||g; # remove trailing /s
+    $path =~ s|/[^/]+/\.\./|/|g; # /xx/../ => /
   }
   return $path;
 }
