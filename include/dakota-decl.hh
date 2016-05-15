@@ -67,15 +67,15 @@
 # define unbox_attrs gnu::pure,gnu::hot,gnu::nothrow
 
 # if defined _WIN32 || defined _WIN64
-  # define import ms::dllimport
-  # define export ms::dllexport
+  # define so_import ms::dllimport
+  # define so_export ms::dllexport
 # else
-  # define import
-  # define export gnu::visibility("default")
+  # define so_import
+  # define so_export gnu::visibility("default")
 # endif
 
 # if 0
-  # define dkt_enable_typeinfo [[export]]
+  # define dkt_enable_typeinfo [[so_export]]
 # else
   # define dkt_enable_typeinfo
 # endif

@@ -1409,7 +1409,7 @@ static func set-read-only-all(str-t segment) -> int-t {
 }
 static func dump-random() -> void {
   if (nullptr != getenv("DKT_DUMP_RANDOM")) {
-    printf("null-method: %p\n", DKT-NULL-METHOD);
+    printf("null-method: %p\n", cast(ptr-t)DKT-NULL-METHOD);
     printf("num-generics: %zi\n", selector-count());
   }
   return;
@@ -1613,7 +1613,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
 func dk-intern-free(str-t key) -> symbol-t {
   symbol-t result = dk-intern(key);
   if (result != key)
-    free(cast(void*)key);
+    free(cast(ptr-t)key);
   return result;
 }
 func dk-intern(str-t key) -> symbol-t {

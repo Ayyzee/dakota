@@ -24,8 +24,8 @@
 
 # include <dakota-decl.hh>
 
-[[export]] [[format_va_printf(2)]] FUNC dkt_va_log(int64_t priority, str_t format, va_list_t args) -> int_t;
-[[export]] [[format_printf(   2)]] FUNC dkt_log(   int64_t priority, str_t format, ...) -> int_t;
+[[so_export]] [[format_va_printf(2)]] FUNC dkt_va_log(int64_t priority, str_t format, va_list_t args) -> int_t;
+[[so_export]] [[format_printf(   2)]] FUNC dkt_log(   int64_t priority, str_t format, ...) -> int_t;
 
 # define log_method()     dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"method\": \"%s\",\"params\": \"%s\"", __klass__, __method__->name, __method__->parameter_types)
 # define log_klass_func() dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"func\": \"%s\"", __klass__, __func__)
