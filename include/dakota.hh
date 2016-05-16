@@ -101,8 +101,8 @@ namespace dkt { inline FUNC alloc(ssize_t size, void* ptr) -> void* {
 # define THREAD_LOCAL __thread // bummer that clang does not support thread-local on darwin
 
 # if defined DEBUG
-  # define debug_export export
-  # define debug_import import
+  # define debug_export so_export
+  # define debug_import so_import
 # else
   # define debug_export
   # define debug_import
@@ -194,10 +194,10 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4) -> uint32_t 
 // width of hex string representation of a uintptr-t
 # define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 
-extern object_t null       [[export]] [[read_only]];
-extern object_t std_input  [[export]] [[read_only]];
-extern object_t std_output [[export]] [[read_only]];
-extern object_t std_error  [[export]] [[read_only]];
+extern object_t null       [[so_export]] [[read_only]];
+extern object_t std_input  [[so_export]] [[read_only]];
+extern object_t std_output [[so_export]] [[read_only]];
+extern object_t std_error  [[so_export]] [[read_only]];
 
 typealias compare_t =               FUNC (*)(object_t, object_t) -> int_t; // comparitor
 typealias dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
@@ -214,31 +214,31 @@ constexpr FUNC dk_hash_switch(str_t str) -> hash_t { return dk_hash(str); }
 constexpr FUNC dk_hash_switch(ssize_t val) -> ssize_t { return val; }
 constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 
-[[export]] FUNC dk_intern(str_t)      -> symbol_t;
-[[export]] FUNC dk_intern_free(str_t) -> symbol_t;
-[[export]] FUNC dk_klass_for_name(symbol_t) -> object_t;
+[[so_export]] FUNC dk_intern(str_t)      -> symbol_t;
+[[so_export]] FUNC dk_intern_free(str_t) -> symbol_t;
+[[so_export]] FUNC dk_klass_for_name(symbol_t) -> object_t;
 
-[[export]] FUNC map(object_t, method_t)   -> object_t;
-[[export]] FUNC map(object_t[], method_t) -> object_t;
+[[so_export]] FUNC map(object_t, method_t)   -> object_t;
+[[so_export]] FUNC map(object_t[], method_t) -> object_t;
 
-[[export]] FUNC dkt_register_info(named_info_t*)   -> void;
-[[export]] FUNC dkt_deregister_info(named_info_t*) -> void;
+[[so_export]] FUNC dkt_register_info(named_info_t*)   -> void;
+[[so_export]] FUNC dkt_deregister_info(named_info_t*) -> void;
 
-// [[so-export]]              FUNC dk-va-add-all(object-t self, va-list-t args) -> object-t;
-// [[so-export]] [[sentinel]] FUNC dk-add-all(object-t self, ...)               -> object-t;
+// [[so_export]]              FUNC dk-va-add-all(object-t self, va-list-t args) -> object-t;
+// [[so_export]] [[sentinel]] FUNC dk-add-all(object-t self, ...)               -> object-t;
 
-[[export]] FUNC dk_register_klass(named_info_t*) -> object_t;
-[[export]] FUNC dk_init_runtime() -> void;
-[[export]] FUNC dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name) -> object_t;
+[[so_export]] FUNC dk_register_klass(named_info_t*) -> object_t;
+[[so_export]] FUNC dk_init_runtime() -> void;
+[[so_export]] FUNC dk_make_simple_klass(symbol_t name, symbol_t superklass_name, symbol_t klass_name) -> object_t;
 
-[[export]] FUNC dkt_capture_current_exception(object_t arg) -> object_t;
-[[export]] FUNC dkt_capture_current_exception(str_t arg, str_t src_file, int_t src_line) -> str_t;
+[[so_export]] FUNC dkt_capture_current_exception(object_t arg) -> object_t;
+[[so_export]] FUNC dkt_capture_current_exception(str_t arg, str_t src_file, int_t src_line) -> str_t;
 
-[[export]] FUNC dk_va_make_named_info_slots(symbol_t name, va_list_t args) -> named_info_t*;
-[[export]] FUNC dk_va_make_named_info(      symbol_t name, va_list_t args) -> object_t;
+[[so_export]] FUNC dk_va_make_named_info_slots(symbol_t name, va_list_t args) -> named_info_t*;
+[[so_export]] FUNC dk_va_make_named_info(      symbol_t name, va_list_t args) -> object_t;
 
-[[export]] [[sentinel]] FUNC dk_make_named_info_slots(symbol_t name, ...) -> named_info_t*;
-[[export]] [[sentinel]] FUNC dk_make_named_info(      symbol_t name, ...) -> object_t;
+[[so_export]] [[sentinel]] FUNC dk_make_named_info_slots(symbol_t name, ...) -> named_info_t*;
+[[so_export]] [[sentinel]] FUNC dk_make_named_info(      symbol_t name, ...) -> object_t;
 
 [[debug_export]] FUNC dkt_dump(object_t) -> object_t;
 [[debug_export]] FUNC dkt_dump_named_info(named_info_t*) -> named_info_t*;
@@ -249,9 +249,9 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
   # define DKT_NULL_METHOD cast(method_t)dkt_null_method
 # endif
 
-[[export]] [[noreturn]] FUNC dkt_null_method(object_t, ...) -> void;
-[[export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(object_t, const signature_t*) -> void;
-[[export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(super_t,  const signature_t*) -> void;
+[[so_export]] [[noreturn]] FUNC dkt_null_method(object_t, ...) -> void;
+[[so_export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(object_t, const signature_t*) -> void;
+[[so_export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(super_t,  const signature_t*) -> void;
 
 [[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, object_t, va_list_t) -> int_t;
 [[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, super_t,  va_list_t) -> int_t;

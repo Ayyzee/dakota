@@ -1409,7 +1409,7 @@ static func set-read-only-all(str-t segment) -> int-t {
 }
 static func dump-random() -> void {
   if (nullptr != getenv("DKT_DUMP_RANDOM")) {
-    printf("null-method: %p\n", DKT-NULL-METHOD);
+    printf("null-method: %p\n", cast(ptr-t)DKT-NULL-METHOD);
     printf("num-generics: %zi\n", selector-count());
   }
   return;

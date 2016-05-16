@@ -434,7 +434,7 @@ klass klass {
 
     // methods.count, methods.addrs
     fprintf(stderr, ", methods.count=%zi", self.methods.count);
-    fprintf(stderr, ", methods.addrs=%p",  self.methods.addrs);
+    fprintf(stderr, ", methods.addrs=%p",  cast(ptr-t)self.methods.addrs);
 
     // traits
     fprintf(stderr, ", traits=["); {
@@ -452,7 +452,7 @@ klass klass {
       }
     }
     fprintf(stderr, "]");
-    fprintf(stderr, ", behavior=%p", self.behavior);
+    fprintf(stderr, ", behavior=%p", cast(ptr-t)self.behavior);
     fprintf(stderr, " }\n");
     if (0)
       if (nullptr != self.behavior)
@@ -693,7 +693,7 @@ klass klass {
     if (nullptr != getenv("DKT_DUMP_RANDOM")) {
       printf("klass: %s\n", name-of(self));
       for (ssize-t index = 0; index < self.methods.count; index++) {
-        printf("method: %p\n", self.methods.addrs[index]);
+        printf("method: %p\n", cast(ptr-t)self.methods.addrs[index]);
       }
     }
     return;

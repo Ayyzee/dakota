@@ -2987,15 +2987,10 @@ sub address_body {
   }
   foreach my $method (@$methods_wo_addr) {
     if (!$$method{'alias'}) {
-      my $method_type = &method::type($method);
-      my $width = length("cast(func $method_type)");
-      my $pad = ' ' x ($max_width - $width);
-      my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
       my $generic_name = &ct($$method{'name'});
-      my $in = &ident_comment($generic_name);
-
-      $pad = ' ' x $max_width;
-      $result .=   $col . "cast(method-t)" . $pad . "dkt-null-method, /*$generic_name()*/" . $nl;
+      my $new_arg_type_list = &arg_type::list_types($$method{'parameter-types'});
+      my $return_type = &arg::type($$method{'return-type'});
+      $result .=   $col . 'cast(method-t)dkt-null-method, ' . "/* $generic_name($$new_arg_type_list) -> $return_type */" . $nl;
     }
   }
   $result .= $col . "nullptr" . $nl;
