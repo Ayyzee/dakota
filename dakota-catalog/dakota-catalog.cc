@@ -27,11 +27,12 @@
 # if ! defined _GNU_SOURCE
 # define _GNU_SOURCE // dlinfo()
 # endif
-# include <link.h>
 # include <dlfcn.h>  // dlopen()/dlclose()
 
 # include "dummy.hh"
 # include "dakota.hh" // format_printf(), format_va_printf()
+
+# include "pathname-for-handle.hh"
 
 enum {
   DAKOTA_CATALOG_HELP = 256,
@@ -239,15 +240,10 @@ FUNC main(int argc, char** argv, char**) -> int {
           handle = dlopen(rel_arg, RTLD_NOW | RTLD_LOCAL);
       }
       if (nullptr != handle) {
-        struct link_map* lmap = nullptr;
-        int e = dlinfo(handle, RTLD_DI_LINKMAP, &lmap);
-        if (-1 != e) {
-          if (nullptr != lmap->l_name) {
-            if (! opts.silent)
-              printf("%s\n", lmap->l_name);
-          } else
-            exit_value = non_exit_fail_with_msg("ERROR:5 dlinfo(RTLD_DI_LINKMAP) failed to return absolute path of shared library dynamically loaded by dlopen(\"%s\")",
-                           arg);
+        const char* l_name = pathname_for_handle(handle);
+        if (nullptr != l_name) {
+          if (! opts.silent)
+            printf("%s\n", l_name);
         } else
           exit_value = non_exit_fail_with_msg("ERROR:4 %s: \"%s\"\n", arg, dlerror()); // dlinfo() failure
         if (0 != dlclose(handle))
