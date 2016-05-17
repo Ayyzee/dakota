@@ -538,7 +538,7 @@ sub cmd_opts_from_library_path {
     my $library_name = $2 . ".$so_ext";
     if ($library_directory && 0 != length($library_directory)) {
       $library_directory = &canon_path($library_directory);
-      $result .= "--library-directory=$library_directory --for-linker -rpath=$library_directory ";
+      $result .= "--library-directory=$library_directory --for-linker -rpath --for-linker $library_directory ";
     }
     $result .= &gcc_library_from_library_name($library_name);
   } else {
@@ -560,7 +560,10 @@ sub inputs_tbl {
 sub for_linker {
   my ($tkns) = @_;
   my $for_linker = &dakota::util::var($gbl_compiler, 'CXX_FOR_LINKER_FLAGS', [ '--for-linker' ]);
-  my $result = ' ' . $for_linker . '=' . $tkns;
+  my $result = '';
+  foreach my $tkn (@$tkns) {
+    $result .= ' ' . $for_linker . ' ' . $tkn;
+  }
   return $result;
 }
 sub update_kw_args_generics {
@@ -637,19 +640,20 @@ sub start_cmd {
     my $extra_cxxflags = &dakota::util::var($gbl_compiler, 'EXTRA_CXXFLAGS', '');
     $$cmd_info{'opts'}{'compiler-flags'} = $cxxflags . ' ' . $extra_cxxflags;
   }
-  my $ld_soname_flags =    &dakota::util::var($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
-  my $no_undefined_flags = &dakota::util::var($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', '--no-undefined');
+  my $ld_soname_flags =    &dakota::util::var_array($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
+  my $no_undefined_flags = &dakota::util::var_array($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', '--no-undefined');
+  push @$ld_soname_flags, $$cmd_info{'opts'}{'soname'};
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_exe_type = undef;
   } elsif ($$cmd_info{'opts'}{'shared'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_shared_flags .= &for_linker($ld_soname_flags . '=' . $$cmd_info{'opts'}{'soname'});
+      $cxx_shared_flags .= &for_linker($ld_soname_flags);
     }
     $cxx_shared_flags .= &for_linker($no_undefined_flags);
     $dk_exe_type = 'exe-type::k_lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_shared_flags .= &for_linker($ld_soname_flags . '=' . $$cmd_info{'opts'}{'soname'});
+      $cxx_shared_flags .= &for_linker($ld_soname_flags);
     }
     $cxx_shared_flags .= &for_linker($no_undefined_flags);
     $dk_exe_type = 'exe-type::k_lib';
