@@ -34,7 +34,7 @@ klass vector;
 
 [[format-printf(4)]]
 static func print-error(str-t file, int64-t line, int64-t column, str-t format, ...) -> int-t{
-  int-t result = fprintf(stderr, "%s:%" PRIi64 ":%" PRIi64 " ", file, line, column);
+  int-t result = fprintf(stderr, "%s:%zi:%zi ", file, line, column);
   if (-1 != result) {
     va-list-t args;
     va-start(args, format);

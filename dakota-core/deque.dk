@@ -50,12 +50,12 @@ klass node {
       //         cast(ptr-t)(s->element), iterator-state);
 
       if (nullptr != s->prev)
-        fprintf(stderr, "    \"%p-%" PRIi64 "\" -> \"%p-%" PRIi64 "\":prev [ dir = back ];\n",
+        fprintf(stderr, "    \"%p-%zi\" -> \"%p-%zi\":prev [ dir = back ];\n",
                 cast(ptr-t)(s->prev), iterator-state, cast(ptr-t)(s), iterator-state);
       else {
-        fprintf(stderr, "    \"%p-%" PRIi64 "-prev-nullptr\" [ label = \"nullptr\" ];\n",
+        fprintf(stderr, "    \"%p-%zi-prev-nullptr\" [ label = \"nullptr\" ];\n",
                 cast(ptr-t)(s), iterator-state);
-        fprintf(stderr, "    \"%p-%" PRIi64 "-prev-nullptr\" -> \"%p-%" PRIi64 "\":prev [ dir = back ];\n",
+        fprintf(stderr, "    \"%p-%zi-prev-nullptr\" -> \"%p-%zi\":prev [ dir = back ];\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
       }
       if (nullptr != s->prev)
@@ -65,24 +65,24 @@ klass node {
   }
   static func dump-next(slots-t* s, int64-t iterator-state) -> void {
     if (nullptr != s) {
-      fprintf(stderr, "    \"%p-%" PRIi64 "\" [ label = < <table>"
+      fprintf(stderr, "    \"%p-%zi\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"
               "<tr><td port=\"prev\">prev</td></tr>"
               "<tr><td port=\"next\">next</td></tr>"
               "</table> > ];\n", cast(ptr-t)(s), iterator-state);
-      fprintf(stderr, "    \"%p-%" PRIi64 "\" [ label = \"%p <%s>\" ];\n",
+      fprintf(stderr, "    \"%p-%zi\" [ label = \"%p <%s>\" ];\n",
               cast(ptr-t)(s->element), iterator-state,
               cast(ptr-t)(s->element), $name(klass-of(s->element)));
-      fprintf(stderr, "    \"%p-%" PRIi64 "\":element -> \"%p-%" PRIi64 "\";\n",
+      fprintf(stderr, "    \"%p-%zi\":element -> \"%p-%zi\";\n",
               cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->element), iterator-state);
 
       if (nullptr != s->next)
-        fprintf(stderr, "    \"%p-%" PRIi64 "\":next -> \"%p-%" PRIi64 "\";\n",
+        fprintf(stderr, "    \"%p-%zi\":next -> \"%p-%zi\";\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->next), iterator-state);
       else {
-        fprintf(stderr, "    \"%p-%" PRIi64 "-next-nullptr\" [ label = \"nullptr\" ];\n",
+        fprintf(stderr, "    \"%p-%zi-next-nullptr\" [ label = \"nullptr\" ];\n",
                 cast(ptr-t)(s), iterator-state);
-        fprintf(stderr, "    \"%p-%" PRIi64 "\":next -> \"%p-%" PRIi64 "-next-nullptr\";\n",
+        fprintf(stderr, "    \"%p-%zi\":next -> \"%p-%zi-next-nullptr\";\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
       }
       if (nullptr != s->next)
@@ -105,29 +105,29 @@ klass deque {
   method test-dump(object-t self) -> object-t {
     slots-t& s = unbox(self);
     // if (nullptr != &s) {
-      fprintf(stderr, "  subgraph \"cluster-%p-%" PRIi64 "\"\n", cast(ptr-t)(&s), s.iterator-state);
+      fprintf(stderr, "  subgraph \"cluster-%p-%zi\"\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "  {\n");
 
       fprintf(stderr, "    graph [ rankdir = LR ];\n");
-      fprintf(stderr, "    graph [ label = \"%p-%" PRIi64 "\" ];\n", cast(ptr-t)(&s), s.iterator-state);
+      fprintf(stderr, "    graph [ label = \"%p-%zi\" ];\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "    node [ shape = plaintext ];\n");
 
-      fprintf(stderr, "    \"%p-%" PRIi64 "\" [ label = < <table>"
+      fprintf(stderr, "    \"%p-%zi\" [ label = < <table>"
               "<tr><td port=\"first\">first</td></tr>"
               "<tr><td port=\"last\">last</td></tr>"
-              "<tr><td port=\"size\">size=%" PRIi64 "</td></tr>"
+              "<tr><td port=\"size\">size=%zi</td></tr>"
               "</table> > ];\n", cast(ptr-t)(&s), s.iterator-state, s.size);
       if (nullptr == s.first && nullptr == s.last) {
-        fprintf(stderr, "    \"%p-%" PRIi64 "-nullptr\" [ label = \"nullptr\" ];\n",
+        fprintf(stderr, "    \"%p-%zi-nullptr\" [ label = \"nullptr\" ];\n",
                 cast(ptr-t)(&s), s.iterator-state);
-        fprintf(stderr, "    \"%p-%" PRIi64 "\":first -> \"%p-%" PRIi64 "-nullptr\";\n",
+        fprintf(stderr, "    \"%p-%zi\":first -> \"%p-%zi-nullptr\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
-        fprintf(stderr, "    \"%p-%" PRIi64 "\":last  -> \"%p-%" PRIi64 "-nullptr\";\n",
+        fprintf(stderr, "    \"%p-%zi\":last  -> \"%p-%zi-nullptr\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(&s), s.iterator-state);
       } else {
-        fprintf(stderr, "    \"%p-%" PRIi64 "\":first -> \"%p-%" PRIi64 "\";\n",
+        fprintf(stderr, "    \"%p-%zi\":first -> \"%p-%zi\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.first), s.iterator-state);
-        fprintf(stderr, "    \"%p-%" PRIi64 "\":last  -> \"%p-%" PRIi64 "\";\n",
+        fprintf(stderr, "    \"%p-%zi\":last  -> \"%p-%zi\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.last), s.iterator-state);
       }
       node::dump-next(s.first, s.iterator-state);

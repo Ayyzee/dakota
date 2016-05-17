@@ -214,7 +214,7 @@ klass sorted-set-forward-iterator {
     sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
 
     if (self.iterator-state != ss.iterator-state) {
-      fprintf(stderr, "%" PRIi64 " == %" PRIi64 "\n", self.iterator-state, ss.iterator-state);
+      fprintf(stderr, "%zi == %zi\n", self.iterator-state, ss.iterator-state);
       throw make(exception::klass, #msg : "oops");
     }
     return;
