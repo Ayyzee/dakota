@@ -16,10 +16,6 @@
 
 module dakota-core;
 
-# if ! defined _GNU_SOURCE
-# define _GNU_SOURCE // dlinfo()
-# endif
-# include <link.h>
 # include <dlfcn.h> // dlopen(), dlclose(), dladdr(), struct Dl-info
 
 # include "dl.hh"

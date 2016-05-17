@@ -34,10 +34,6 @@ module dakota-core;
 # include <sys/stat.h> // struct stat, stat()
 # include <syslog.h>
 
-# if ! defined _GNU_SOURCE
-# define _GNU_SOURCE // dlinfo()
-# endif
-# include <link.h>
 # include <dlfcn.h> // dladdr()
 
 # include "dakota-os.hh"
