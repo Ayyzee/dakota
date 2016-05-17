@@ -7,7 +7,6 @@
 {
     'inputs' => [ # cmd-line
       '$(srcdir)/dakota-catalog.$(cc_ext)',
-      '$(srcdir)/pathname-for-handle.$(cc_ext)',
     ],
     'libs' => [ # cmd-line
       'libdl.$(so_ext)', # darwin: /usr/lib/libdl.dylib

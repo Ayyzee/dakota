@@ -1424,6 +1424,13 @@ static func last-user-code-before-main() -> void  {
 func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
+  Dl_info dl-info {};
+  if (dladdr(registration-info, &dl-info)) {
+    if (1)
+      fprintf(stderr, "DKT_SHARED_LIBRARY_PATH=%s\n", dl-info.dli-fname);
+    int-t overwrite;
+    setenv("DKT_SHARED_LIBRARY_PATH", dl-info.dli-fname, overwrite = 1);
+  }
   boole-t exported-only? = getenv-boole("DAKOTA_CATALOG_EXPORTED_ONLY", false);
   stream-t ctlg-output = nullptr;
   str-t output-path = getenv("DAKOTA_CATALOG_OUTPUT");

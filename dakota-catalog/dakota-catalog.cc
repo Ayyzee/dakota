@@ -24,15 +24,10 @@
 # include <unistd.h>
 # include <sys/wait.h>
 
-# if ! defined _GNU_SOURCE
-# define _GNU_SOURCE // dlinfo()
-# endif
 # include <dlfcn.h>  // dlopen()/dlclose()
 
 # include "dummy.hh"
 # include "dakota.hh" // format_printf(), format_va_printf()
-
-# include "pathname-for-handle.hh"
 
 enum {
   DAKOTA_CATALOG_HELP = 256,
@@ -240,16 +235,16 @@ FUNC main(int argc, char** argv, char**) -> int {
           handle = dlopen(rel_arg, RTLD_NOW | RTLD_LOCAL);
       }
       if (nullptr != handle) {
-        const char* l_name = pathname_for_handle(handle);
+        const char* l_name = getenv("DKT_SHARED_LIBRARY_PATH");
         if (nullptr != l_name) {
           if (! opts.silent)
             printf("%s\n", l_name);
         } else
-          exit_value = non_exit_fail_with_msg("ERROR:4 %s: \"%s\"\n", arg, dlerror()); // dlinfo() failure
+          exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "DKT_SHARED_LIBRARY_PATH", arg, "environment variable not set");
         if (0 != dlclose(handle))
-          exit_value = non_exit_fail_with_msg("ERROR:2 %s: \"%s\"\n", arg, dlerror()); // dlclose() failure
+          exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlclose()", arg, dlerror()); // dlclose() failure
       } else
-        exit_value = non_exit_fail_with_msg("ERROR:3 %s: \"%s\"\n", arg, dlerror());   // dlopen() failure
+        exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlopen", arg, dlerror());   // dlopen() failure
     }
   }
   if (nullptr != opts.output) {
