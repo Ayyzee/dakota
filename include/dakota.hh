@@ -91,6 +91,7 @@ namespace dkt { inline FUNC alloc(ssize_t size, void* ptr) -> void* {
   return buf;
 }}
 # if defined DEBUG
+  # include <typeinfo>
   # define DEBUG_STMT(stmt) stmt
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) dk_intern_free(dkt::demangle(typeid(t).name()))
 # else
