@@ -399,7 +399,7 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
               defined = 1;
           }
           j++;
-          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%" PRIu64 "' },\n",
+          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%z' },\n",
                                   method-signature->name, method-signature->parameter-types,
                                   method-signature->return-type,
                                   method-signature->name,
