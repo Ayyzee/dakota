@@ -44,7 +44,7 @@ klass named-info {
     unbox(self) = slots;
     return self;
   }
-  method check(slots-t* s) -> int64-t {
+  method check(slots-t* s) -> ssize-t {
     for (int64-t i = 0; i < s->count; i++) {
       // need to add test for #name (since its required)
 

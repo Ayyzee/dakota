@@ -16,64 +16,84 @@
 
 module dakota-core;
 
-# if ! defined _GNU_SOURCE
-# define _GNU_SOURCE // dlinfo()
-# endif
-# include <link.h>
 # include <dlfcn.h> // dlopen(), dlclose(), dladdr(), struct Dl-info
 
 # include "dl.hh"
 
+// http://pubs.opengroup.org/onlinepubs/009695399/basedefs/dlfcn.h.html
+
+// dso-open() mode flags (default is dso-NOW|dso-LOCAL)
+int-t dso-LAZY = RTLD-LAZY;
+int-t dso-NOW =  RTLD-NOW;
+//
+int-t dso-GLOBAL = RTLD-GLOBAL;
+int-t dso-LOCAL =  RTLD-LOCAL;
+
+// dso-symbol() pseudo handles
+ptr-t dso-DEFAULT = RTLD-DEFAULT;
+ptr-t dso-NEXT =    RTLD-NEXT;
+
 klass x::dl-info {
   slots Dl-info;
 }
+func dso-open(str-t name, int mode) -> ptr-t {
+# if defined WIN32
+  USE(mode);
+  HINSTANCE handle = LoadLibrary(name);
+# else
+  if (0 == mode)
+    mode = dso-NOW | dso-LOCAL;
+  ptr-t handle = dlopen(name, mode);
+# endif
+  return cast(ptr-t)handle;
+}
 // returns nullptr if no exact match
-str-t
-symbol-name-from-address(ptr-t saddr) {
+func dso-symbol-name-for-addr(ptr-t addr) -> str-t {
   str-t result = nullptr;
 # if defined WIN32
 # error "not yet implemented on win32"
 # else
   x::dl-info::slots-t dli;
-  if (0 != dladdr(saddr, &dli) && (dli.dli-saddr == saddr))
+  if (0 != dladdr(addr, &dli) && (dli.dli-saddr == addr))
     result = dli.dli-sname;
 # endif
   return result;
 }
-void
-load-library(str-t name) {
+func dso-path-containing-addr(ptr-t addr) -> str-t {
+  str-t result = nullptr;
 # if defined WIN32
-  //fprintf(stdout, "LoadLibrary(\"%s\")\n", name);
-  HINSTANCE h-dll = LoadLibrary(name);
-
-  if (nullptr == h-dll) {
-//     DWORD last-error = GetLastError();
-//     LPVOID last-error-msg-buf;
-//     FormatMessage(FORMAT-MESSAGE-ALLOCATE-BUFFER | FORMAT-MESSAGE-FROM-SYSTEM,
-//                   nullptr,
-//                   last-error,
-//                   MAKELANGID(LANG-NEUTRAL, SUBLANG-DEFAULT), // Default language
-//                   (LPTSTR) &last-error-msg-buf,
-//                   0,
-//                   nullptr);
-//     MessageBox(nullptr, (LPTSTR)last-error-msg-buf, "GetLastError", MB-OK | MB-ICONINFORMATION);
-//     LocalFree(last-error-msg-buf);
-
-    fprintf(stderr, "%s:%i: ERROR: LoadLibrary(\"%s\").\n",
-            __FILE__, __LINE__, name);
-    throw "bummer";
-  }
+# error "not yet implemented on win32"
 # else
-  //fprintf(stdout, "//dlopen(\"%s\", RTLD-NOW)\n", name);
-  ptr-t dl-handle = dlopen(name, RTLD-NOW);
-
-  if (nullptr == dl-handle) {
-    str-t error = dlerror();
-    fprintf(stderr, "%s:%i: ERROR: dlopen(\"%s\", RTLD-NOW): %s\n",
-            __FILE__, __LINE__, name, error);
-    throw "bummer";
-  }
-  // should record dl-handle and directory-string for dlclose()
-# endif // WIN32
-  return;
+  Dl-info dl-info {};
+  if (dladdr(addr, &dl-info))
+    result = dl-info.dli-fname;
+# endif
+  return result;
+}
+func dso-symbol(ptr-t handle, str-t symbol-name) -> ptr-t {
+  ptr-t result;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  result = dlsym(handle, symbol-name);
+# endif
+  return result;
+}
+func dso-close(ptr-t handle) -> int-t {
+  int-t result;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  result = dlclose(handle);
+# endif
+  return result;
+}
+func dso-error() -> str-t {
+  str-t result;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  result = dlerror();
+# endif
+  return result;
 }

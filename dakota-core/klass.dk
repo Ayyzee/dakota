@@ -28,7 +28,7 @@ module dakota-core;
 # include "safe-str.hh"
 # include "private.hh"
 # include "dakota-rt-private.hh"
-# include "dl.hh" // symbol-name-from-address()
+# include "dl.hh" // dso-symbol-for-address()
 # include "sorted-array.hh"
 
 # if 0
@@ -287,7 +287,7 @@ klass resource-usage {
     return s;
   }
   method log-alloc(slots-t* s, object-t o) -> slots-t* {
-    printf("%3" PRIi64 ", size = %2" PRIi64 ", total-memory = %4" PRIi64 ", name = \"%s\"\n",
+    printf("%3zi, size = %2zi, total-memory = %4zi, name = \"%s\"\n",
            s->instances,
            klass::unbox(o).offset + klass::unbox(o).size,
            s->memory,
@@ -295,12 +295,12 @@ klass resource-usage {
     return s;
   }
   method log-alloc(slots-t* s, ssize-t size, symbol-t name) -> slots-t*{
-    printf("%3" PRIi64 ", size = %2" PRIi64 ", total-memory = %4" PRIi64 ", name = \"%s\"~\n",
+    printf("%3zi, size = %2zi, total-memory = %4zi, name = \"%s\"~\n",
            s->instances, size, s->memory, name);
     return s;
   }
   method log-method-alloc(slots-t* s) -> slots-t*{
-    printf("method-count=%" PRIi64 ", method-memory=%" PRIi64 "\n", s->method-count, s->method-memory);
+    printf("method-count=%zi, method-memory=%zi\n", s->method-count, s->method-memory);
     return s;
   }
 }
@@ -327,8 +327,8 @@ klass klass {
     named-info-t*        info;
     object-t             behavior; // bit-vector
   }
-  method alloc(object-t self, str-t file, int64-t line) -> object-t {
-    DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%" PRIi64 "','func':'%s','args':['%s']",
+  method alloc(object-t self, str-t file, ssize-t line) -> object-t {
+    DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%zi','func':'%s','args':['%s']",
                          file, line, __method__->name, name-of(self));
     object-t instance = $alloc(self);
     return instance;
@@ -505,7 +505,7 @@ klass klass {
           fprintf(out, " ");
           width++;
         }
-        str-t symbol-name = symbol-name-from-address(cast(ptr-t)cast(size-t)(m));
+        str-t symbol-name = dso-symbol-name-for-addr(cast(ptr-t)(m));
 
         if (nullptr != symbol-name) {
           // should demangle here

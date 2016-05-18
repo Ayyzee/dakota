@@ -34,19 +34,13 @@ module dakota-core;
 # include <sys/stat.h> // struct stat, stat()
 # include <syslog.h>
 
-# if ! defined _GNU_SOURCE
-# define _GNU_SOURCE // dlinfo()
-# endif
-# include <link.h>
-# include <dlfcn.h> // dladdr()
-
 # include "dakota-os.hh"
 
 # include "config.hh"
 
 # include "private.hh"
 # include "dakota-rt-private.hh"
-# include "dl.hh" // load-library()
+# include "dl.hh" // dso-*()
 # include "sorted-array.hh"
 # include "sorted-ptr-array.hh"
 
@@ -283,7 +277,7 @@ KLASS-NS ostream { namespace va { [[format-va-printf(2)]] static func println-fo
 klass ostream {
   slots {
     stream-t output;
-    int64-t col;
+    ssize-t col;
   }
   static func col-incr(slots-t& s) -> slots-t& {
     s.col++;
@@ -396,14 +390,14 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
         const signature-t* method-signature;
         
         while (nullptr != (method-signature = method-signatures[j])) {
-          uint64-t defined = 0;
+          size-t defined = 0;
           if (nullptr != method-addresses) {
             method-t method-address = method-addresses[j];
             if (nullptr != method-address && DKT-NULL-METHOD != method-address)
               defined = 1;
           }
           j++;
-          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%" PRIu64 "' },\n",
+          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%zu' },\n",
                                   method-signature->name, method-signature->parameter-types,
                                   method-signature->return-type,
                                   method-signature->name,
@@ -1294,7 +1288,7 @@ klass so-symbol-info {
     str-t sname;
   }
 }
-static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
+static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
   // named-instances
   for (ssize-t i = 0; i < scountof(named-instances); i++) {
     addr2name-pair-t named-instance = named-instances[i];
@@ -1325,21 +1319,20 @@ static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
   return nullptr;
 }
 [[noreturn]] static func bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) -> void {
-  Dl_info dl-info {};
-  if (dladdr(si->si-addr, &dl-info)) {
-    if (si->si-addr == dl-info.dli-saddr) {
+  str-t sname-mangled = dso-symbol-name-for-addr(si->si-addr);
+  if (nullptr != sname-mangled) {
       int status = -1;
-      str-t sname-demangled = abi::__cxa_demangle(dl-info.dli-sname, nullptr, nullptr, &status);
+      str-t sname-demangled = abi::__cxa_demangle(sname-mangled, nullptr, nullptr, &status);
       if (0 != status)
-        sname-demangled = dl-info.dli-sname;
+        sname-demangled = sname-mangled;
       syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
-             strsignal-name(sig), dl-info.dli-fname, sname-demangled, si->si-addr);
+             strsignal-name(sig), dso-path-containing-addr(si->si-addr), sname-demangled, si->si-addr);
       if (0 == status)
         free(cast(ptr-t)sname-demangled);
-    }
-  }
+  } // else {}
   so-symbol-info::slots-t info {};
-  if (name-from-address(cast(object-t)si->si-addr, &info)) {
+  // could use dso-symbol-name-for-addr()
+  if (symbol-name-for-addr(cast(object-t)si->si-addr, &info)) {
     if (nullptr == info.fname) {
       syslog(LOG-ERR, "caught sig%s at named-instance \"%s\" %p\n",
              strsignal-name(sig), info.sname, si->si-addr);
@@ -1428,6 +1421,11 @@ static func last-user-code-before-main() -> void  {
 func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
+  str-t dso-path = dso-path-containing-addr(registration-info);
+  if (nullptr != dso-path)  {
+    int-t overwrite;
+    setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
+  }
   boole-t exported-only? = getenv-boole("DAKOTA_CATALOG_EXPORTED_ONLY", false);
   stream-t ctlg-output = nullptr;
   str-t output-path = getenv("DAKOTA_CATALOG_OUTPUT");
@@ -1534,7 +1532,7 @@ static func klass-for-name-simple(symbol-t name) -> object-t {
     kls = *cast(object-t*)(klass-assoc->element);
   return kls; // may be nullptr
 }
-static func klass-for-name(symbol-t name, int64-t column) -> object-t {
+static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   // for (int64-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, name);
   assert(nullptr != name);
@@ -1568,7 +1566,7 @@ static func klass-for-name(symbol-t name, int64-t column) -> object-t {
   return klass;
 }
 func dk-klass-for-name(symbol-t name) -> object-t {
-  int64-t column;
+  ssize-t column;
   object-t klass = klass-for-name(name, column = 0);
   return klass;
 }
@@ -1591,7 +1589,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
       str-t file = find-file(klasspath, file-name, so-ext);
 
       if (nullptr != file) {
-        load-library(file);
+        dso-open(file, 0);
 
         // aggregate klass here
 

@@ -24,10 +24,6 @@
 # include <unistd.h>
 # include <sys/wait.h>
 
-# if ! defined _GNU_SOURCE
-# define _GNU_SOURCE // dlinfo()
-# endif
-# include <link.h>
 # include <dlfcn.h>  // dlopen()/dlclose()
 
 # include "dummy.hh"
@@ -239,21 +235,21 @@ FUNC main(int argc, char** argv, char**) -> int {
           handle = dlopen(rel_arg, RTLD_NOW | RTLD_LOCAL);
       }
       if (nullptr != handle) {
-        struct link_map* lmap = nullptr;
-        int e = dlinfo(handle, RTLD_DI_LINKMAP, &lmap);
-        if (-1 != e) {
-          if (nullptr != lmap->l_name) {
-            if (! opts.silent)
-              printf("%s\n", lmap->l_name);
-          } else
-            exit_value = non_exit_fail_with_msg("ERROR:5 dlinfo(RTLD_DI_LINKMAP) failed to return absolute path of shared library dynamically loaded by dlopen(\"%s\")",
-                           arg);
-        } else
-          exit_value = non_exit_fail_with_msg("ERROR:4 %s: \"%s\"\n", arg, dlerror()); // dlinfo() failure
+        if (! opts.silent) {
+          const char* l_name = getenv("DKT_SHARED_LIBRARY_PATH");
+          if (nullptr != l_name) {
+            if (0 == strcmp(l_name, arg))
+              printf("%s\n", l_name);
+            else
+              printf("%s // %s\n", l_name, arg);
+          }
+          else
+            printf("// %s\n", arg);
+        }
         if (0 != dlclose(handle))
-          exit_value = non_exit_fail_with_msg("ERROR:2 %s: \"%s\"\n", arg, dlerror()); // dlclose() failure
+          exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlclose()", arg, dlerror()); // dlclose() failure
       } else
-        exit_value = non_exit_fail_with_msg("ERROR:3 %s: \"%s\"\n", arg, dlerror());   // dlopen() failure
+        exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlopen", arg, dlerror());   // dlopen() failure
     }
   }
   if (nullptr != opts.output) {

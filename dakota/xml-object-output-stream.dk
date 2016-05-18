@@ -33,7 +33,7 @@ klass xml-object-output-stream {
   superklass text-output-stream;
 
   slots {
-    int64-t indent-level;
+    ssize-t indent-level;
 
     str-t key-delim;
     str-t element-delim;
@@ -82,18 +82,18 @@ klass xml-object-output-stream {
   method write-element(object-t self, int64-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s%" PRIi64 "%s",  key, self.key-delim, element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
     else
-      snprintf(buffer, sizeof(buffer), "%" PRIi64 "%s", element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "%zi%s", element, self.element-delim);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
   method write-element(object-t self, uint64-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s%" PRIi64 "%s",  key, self.key-delim, element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
     else
-      snprintf(buffer, sizeof(buffer), "%" PRIi64 "%s", element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "%zi%s", element, self.element-delim);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }

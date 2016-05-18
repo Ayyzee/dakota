@@ -38,8 +38,8 @@ FUNC safe_strlen(str_t) -> size_t;
 
 FUNC strerror_name(int_t errnum) -> str_t;
 
-FUNC size_from_info(named_info_t* info) -> int64_t;
-FUNC offset_from_info(named_info_t* info) -> int64_t;
+FUNC size_from_info(named_info_t* info) -> ssize_t;
+FUNC offset_from_info(named_info_t* info) -> ssize_t;
 FUNC name_from_info(named_info_t* info) -> symbol_t;
 FUNC klass_name_from_info(named_info_t* info) -> symbol_t;
 FUNC superklass_name_from_info(named_info_t* info) -> symbol_t;
