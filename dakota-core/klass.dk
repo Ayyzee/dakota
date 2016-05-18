@@ -28,7 +28,7 @@ module dakota-core;
 # include "safe-str.hh"
 # include "private.hh"
 # include "dakota-rt-private.hh"
-# include "dl.hh" // symbol-name-from-address()
+# include "dl.hh" // dso-symbol-for-address()
 # include "sorted-array.hh"
 
 # if 0
@@ -505,7 +505,7 @@ klass klass {
           fprintf(out, " ");
           width++;
         }
-        str-t symbol-name = symbol-name-from-address(cast(ptr-t)cast(size-t)(m));
+        str-t symbol-name = dso-symbol-name-for-addr(cast(ptr-t)(m));
 
         if (nullptr != symbol-name) {
           // should demangle here

@@ -235,12 +235,17 @@ FUNC main(int argc, char** argv, char**) -> int {
           handle = dlopen(rel_arg, RTLD_NOW | RTLD_LOCAL);
       }
       if (nullptr != handle) {
-        const char* l_name = getenv("DKT_SHARED_LIBRARY_PATH");
-        if (nullptr != l_name) {
-          if (! opts.silent)
-            printf("%s\n", l_name);
-        } else
-          exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "DKT_SHARED_LIBRARY_PATH", arg, "environment variable not set");
+        if (! opts.silent) {
+          const char* l_name = getenv("DKT_SHARED_LIBRARY_PATH");
+          if (nullptr != l_name) {
+            if (0 == strcmp(l_name, arg))
+              printf("%s\n", l_name);
+            else
+              printf("%s // %s\n", l_name, arg);
+          }
+          else
+            printf("// %s\n", arg);
+        }
         if (0 != dlclose(handle))
           exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlclose()", arg, dlerror()); // dlclose() failure
       } else

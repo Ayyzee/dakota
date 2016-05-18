@@ -34,15 +34,13 @@ module dakota-core;
 # include <sys/stat.h> // struct stat, stat()
 # include <syslog.h>
 
-# include <dlfcn.h> // dladdr()
-
 # include "dakota-os.hh"
 
 # include "config.hh"
 
 # include "private.hh"
 # include "dakota-rt-private.hh"
-# include "dl.hh" // load-library()
+# include "dl.hh" // dso-*()
 # include "sorted-array.hh"
 # include "sorted-ptr-array.hh"
 
@@ -1290,7 +1288,7 @@ klass so-symbol-info {
     str-t sname;
   }
 }
-static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
+static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
   // named-instances
   for (ssize-t i = 0; i < scountof(named-instances); i++) {
     addr2name-pair-t named-instance = named-instances[i];
@@ -1321,21 +1319,20 @@ static func name-from-address(object-t addr, so-symbol-info::slots-t* info) -> s
   return nullptr;
 }
 [[noreturn]] static func bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) -> void {
-  Dl_info dl-info {};
-  if (dladdr(si->si-addr, &dl-info)) {
-    if (si->si-addr == dl-info.dli-saddr) {
+  str-t sname-mangled = dso-symbol-name-for-addr(si->si-addr);
+  if (nullptr != sname-mangled) {
       int status = -1;
-      str-t sname-demangled = abi::__cxa_demangle(dl-info.dli-sname, nullptr, nullptr, &status);
+      str-t sname-demangled = abi::__cxa_demangle(sname-mangled, nullptr, nullptr, &status);
       if (0 != status)
-        sname-demangled = dl-info.dli-sname;
+        sname-demangled = sname-mangled;
       syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
-             strsignal-name(sig), dl-info.dli-fname, sname-demangled, si->si-addr);
+             strsignal-name(sig), dso-path-containing-addr(si->si-addr), sname-demangled, si->si-addr);
       if (0 == status)
         free(cast(ptr-t)sname-demangled);
-    }
-  }
+  } // else {}
   so-symbol-info::slots-t info {};
-  if (name-from-address(cast(object-t)si->si-addr, &info)) {
+  // could use dso-symbol-name-for-addr()
+  if (symbol-name-for-addr(cast(object-t)si->si-addr, &info)) {
     if (nullptr == info.fname) {
       syslog(LOG-ERR, "caught sig%s at named-instance \"%s\" %p\n",
              strsignal-name(sig), info.sname, si->si-addr);
@@ -1424,12 +1421,10 @@ static func last-user-code-before-main() -> void  {
 func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
-  Dl_info dl-info {};
-  if (dladdr(registration-info, &dl-info)) {
-    if (1)
-      fprintf(stderr, "DKT_SHARED_LIBRARY_PATH=%s\n", dl-info.dli-fname);
+  str-t dso-path = dso-path-containing-addr(registration-info);
+  if (nullptr != dso-path)  {
     int-t overwrite;
-    setenv("DKT_SHARED_LIBRARY_PATH", dl-info.dli-fname, overwrite = 1);
+    setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   }
   boole-t exported-only? = getenv-boole("DAKOTA_CATALOG_EXPORTED_ONLY", false);
   stream-t ctlg-output = nullptr;
@@ -1594,7 +1589,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
       str-t file = find-file(klasspath, file-name, so-ext);
 
       if (nullptr != file) {
-        load-library(file);
+        dso-open(file, 0);
 
         // aggregate klass here
 
