@@ -82,6 +82,10 @@ klass unbox-illegal-klass-exception;
 
 static const char8-t gbl-delimiter = '/'; // unix path delimiter
 
+// all symbols are strings, but all strings are not symbols
+inline func valid-str?(str_t str) -> boole-t { return nullptr != str && NUL != str[0]; }
+# define assert-valid-str(str) assert(valid-str?(str))
+
 klass assoc-node {
   slots {
     slots-t*  next;
@@ -533,6 +537,7 @@ static func named-info-to-registration-info(named-info-t* ni, registration-info-
   return;
 }
 static func import-klass(symbol-t klass-name, assoc-node-t* node) -> void {
+  assert-valid-str(klass-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { .name = klass-name, .node = node };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
@@ -573,7 +578,7 @@ func dk-register-klass(named-info-t* klass-info) -> object-t {
   //fprintf(stderr, "%s(#%s)\n", __func__, cast(symbol-t)named-info::at(klass-info, #name));
   named-info::sort(klass-info);
   symbol-t name = name-from-info(klass-info);
-  assert(nullptr != name);
+  assert-valid-str(name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(klass-info), name);
 
   symbol-t interpose-name = cast(symbol-t)named-info::at(klass-info, #interpose-name);
@@ -778,6 +783,7 @@ func dk-init-runtime() -> void {
   return;
 }
 /*LOCAL*/ func imported-klasses-for-klass(symbol-t klass-name) -> assoc-node-t* {
+  assert-valid-str(klass-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
   named-assoc-node-t named-node = { .name = klass-name, .node = nullptr };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node); // hackhack
@@ -799,9 +805,9 @@ static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
 }
 static func dump?(named-info-t* klass-info, str-t only) -> boole-t {
   assert(nullptr != klass-info);
-  assert(nullptr != only);
+  assert-valid-str(only);
   symbol-t name = name-from-info(klass-info);
-  assert(nullptr != name);
+  assert-valid-str(name);
 
   boole-t result = true;
   ssize-t only-len = cast(ssize-t)safe-strlen(only);
@@ -828,14 +834,14 @@ static func remove-dir(str-t path) -> str-t {
     result = path;
   else
     result++;
-  assert(NUL != result[0]); // not empty-string
+  assert-valid-str(result);
   return result;
 }
 [[unused]] static func remove-ext(char8-t* path) -> str-t {
   const char8-t* dot = strrchr(cast(const char8-t*)path, '.');
   if (nullptr != dot)
     *(const-cast<char8-t*>(dot)) = NUL;
-  assert(NUL != path[0]); // not empty-string
+  assert-valid-str(path);
   return path;
 }
 [[unused]] static func pad(char8-t* buf, int64-t buf-len, int64-t len) -> char8-t* {
@@ -968,8 +974,8 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
   catalog-info::slots-t ci {};
   named-info-to-catalog-info(klass-info, &ci);
 
-  assert(nullptr != ci.type);
-  assert(nullptr != ci.name);
+  assert-valid-str(ci.type);
+  assert-valid-str(ci.name);
   assert(!(nullptr != ci.interpose-name && nullptr != ci.superklass-name));
 
   boole-t verbose = 0;
@@ -1090,9 +1096,9 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
           int-t i = 0;
           while (nullptr != ci.slots-info[i].elements) {
             symbol-t slot-name = name-from-info(&ci.slots-info[i]);
-            assert(nullptr != slot-name);
+            assert-valid-str(slot-name);
             str-t slot-expr-str = cast(str-t)named-info::at(&ci.slots-info[i], #expr-str);
-            assert(nullptr != slot-expr-str);
+            assert-valid-str(slot-expr-str);
             
             ostream::println-format(ostrm, "%-*s = %s,\n", max-type-width, slot-name, slot-expr-str);
             i++;
@@ -1104,9 +1110,9 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
             str-t slot-type =   cast(str-t)named-info::at(&ci.slots-info[i], #type, cast(ssize-t)#klass);
             str-t slot-typeid = cast(str-t)named-info::at(&ci.slots-info[i], #typeid);
             USE(slot-typeid);
-            assert(nullptr != slot-type);
+            assert-valid-str(slot-type);
             symbol-t slot-name = name-from-info(&ci.slots-info[i]);
-            assert(nullptr != slot-name);
+            assert-valid-str(slot-name);
             // printf("%s::%s, type: %s, typeid: %s\n", name, slot-name, slot-type, slot-typeid);
             str-t slot-expr-str = cast(str-t)named-info::at(&ci.slots-info[i], #expr-str);
             
@@ -1374,7 +1380,7 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   return r;
 }
 static func set-read-only(str-t segment, get-segment-data-t get-segment-data) -> int-t {
-  assert(nullptr != segment);
+  assert-valid-str(segment);
   ptr-t addr = nullptr;
   size-t size = 0;
   get-segment-data(segment, &addr, &size); // code-generated in each lib/exe
@@ -1445,7 +1451,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     ostream-t ostrm = { .output = ctlg-output, .col = 0 };
 
     symbol-t name = name-from-info(registration-info);
-    assert(nullptr != name);
+    assert-valid-str(name);
     ostream::println-format(ostrm, "// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-\n");
     ostream::println-format(ostrm, "// arg = %s\n",  ctlg-arg);
     ostream::println-format(ostrm, "// name = %s\n", name);
@@ -1520,7 +1526,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
     }
   }
   symbol-t name = name-from-info(registration-info);
-  assert(nullptr != name);
+  assert-valid-str(name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(registration-info), name);
   return;
 }
@@ -1535,7 +1541,7 @@ static func klass-for-name-simple(symbol-t name) -> object-t {
 static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   // for (int64-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, name);
-  assert(nullptr != name);
+  assert-valid-str(name);
   named-info-t* info-slots = info-for-name(name);
   assert(nullptr != info-slots);
   assert(#klass == cast(symbol-t)named-info::at(info-slots, #type, cast(ssize-t)#klass));
@@ -1571,7 +1577,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
   return klass;
 }
 /*LOCAL*/ func info-for-name(symbol-t klass-name) -> named-info-t* {
-  assert(nullptr != klass-name);
+  assert-valid-str(klass-name);
   property-t[] properties = { { .key = #name, .element = cast(intptr-t)klass-name } };
   named-info-t info = { .next = nullptr, .count = scountof(properties), .elements = properties };
   named-info-t* info-ptr = &info;
