@@ -37,7 +37,7 @@ klass property {
     int-t result = symbol::compare(s->key, other-s->key);
     return result;
   }
-  method check(slots-t* s) -> int64-t {
+  method check(slots-t* s) -> ssize-t {
     if (nullptr == s->key)
       std::abort();
     return 0;

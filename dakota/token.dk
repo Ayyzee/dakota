@@ -32,8 +32,8 @@ klass tokenid;
 klass token {
   slots {
     tokenid-t tokenid;
-    int64-t line;
-    int64-t column;
+    ssize-t line;
+    ssize-t column;
     str512-t buffer;
     // could include file
     object-t leading-ws;
@@ -56,8 +56,8 @@ klass token {
     return self;
   }
   method init(object-t self,
-                       int64-t        line :    0,
-                       int64-t        column :  0,
+                       ssize-t        line :    0,
+                       ssize-t        column :  0,
                        tokenid-t      tokenid : 0,
                        str-t buffer :  nullptr) -> object-t {
     self = $init(super);
@@ -142,10 +142,10 @@ klass token {
   method leading-ws(object-t self) -> object-t {
     return self.leading-ws;
   }
-  method line(object-t self) -> int64-t {
+  method line(object-t self) -> ssize-t {
     return self.line;
   }
-  method column(object-t self) -> int64-t {
+  method column(object-t self) -> ssize-t {
     return self.column;
   }
   method buffer(object-t self) -> str-t {

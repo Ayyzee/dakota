@@ -279,7 +279,7 @@ KLASS-NS ostream { namespace va { [[format-va-printf(2)]] static func println-fo
 klass ostream {
   slots {
     stream-t output;
-    int64-t col;
+    ssize-t col;
   }
   static func col-incr(slots-t& s) -> slots-t& {
     s.col++;
@@ -392,14 +392,14 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
         const signature-t* method-signature;
         
         while (nullptr != (method-signature = method-signatures[j])) {
-          uint64-t defined = 0;
+          size-t defined = 0;
           if (nullptr != method-addresses) {
             method-t method-address = method-addresses[j];
             if (nullptr != method-address && DKT-NULL-METHOD != method-address)
               defined = 1;
           }
           j++;
-          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%z' },\n",
+          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%zu' },\n",
                                   method-signature->name, method-signature->parameter-types,
                                   method-signature->return-type,
                                   method-signature->name,
@@ -1537,7 +1537,7 @@ static func klass-for-name-simple(symbol-t name) -> object-t {
     kls = *cast(object-t*)(klass-assoc->element);
   return kls; // may be nullptr
 }
-static func klass-for-name(symbol-t name, int64-t column) -> object-t {
+static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   // for (int64-t i = 0; i < column; i++) fprintf(stderr, "  "); fprintf(stderr, "%s(#%s)\n", __func__, name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, name);
   assert(nullptr != name);
@@ -1571,7 +1571,7 @@ static func klass-for-name(symbol-t name, int64-t column) -> object-t {
   return klass;
 }
 func dk-klass-for-name(symbol-t name) -> object-t {
-  int64-t column;
+  ssize-t column;
   object-t klass = klass-for-name(name, column = 0);
   return klass;
 }

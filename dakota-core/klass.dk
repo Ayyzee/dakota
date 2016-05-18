@@ -327,7 +327,7 @@ klass klass {
     named-info-t*        info;
     object-t             behavior; // bit-vector
   }
-  method alloc(object-t self, str-t file, int64-t line) -> object-t {
+  method alloc(object-t self, str-t file, ssize-t line) -> object-t {
     DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%zi','func':'%s','args':['%s']",
                          file, line, __method__->name, name-of(self));
     object-t instance = $alloc(self);

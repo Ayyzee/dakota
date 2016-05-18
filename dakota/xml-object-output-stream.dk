@@ -33,7 +33,7 @@ klass xml-object-output-stream {
   superklass text-output-stream;
 
   slots {
-    int64-t indent-level;
+    ssize-t indent-level;
 
     str-t key-delim;
     str-t element-delim;

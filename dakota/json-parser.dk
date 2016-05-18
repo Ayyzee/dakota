@@ -33,7 +33,7 @@ klass tokenid;
 klass vector;
 
 [[format-printf(4)]]
-static func print-error(str-t file, int64-t line, int64-t column, str-t format, ...) -> int-t{
+static func print-error(str-t file, ssize-t line, ssize-t column, str-t format, ...) -> int-t {
   int-t result = fprintf(stderr, "%s:%zi:%zi ", file, line, column);
   if (-1 != result) {
     va-list-t args;
@@ -104,7 +104,7 @@ klass json-parser {
     }
     return c;
   }
-  //static func error-msg(char8-t* file, int64-t line, int64-t column, str-t msg0, ...) -> void; // one or more msg strings
+  //static func error-msg(char8-t* file, ssize-t line, ssize-t column, str-t msg0, ...) -> void; // one or more msg strings
 
   /* method */ static func lex(object-t self) -> object-t {
     int-t c;
