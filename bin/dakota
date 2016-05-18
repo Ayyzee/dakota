@@ -296,12 +296,12 @@ sub create_missing_project {
   }
   $project_path =   $project_base . '.project';
   if (-e $project_path) {
-    print STDERR "info: found $project_path; using for missing --project <>.\n";
+    print STDERR $0 . ": info: found $project_path; using for missing --project <>.\n";
     return $project_path;
   } elsif ($$root_cmd{'opts'}{'compile'}) {
-    print STDERR "warning: missing --project <file> (creating default $project_path).\n";
+    print STDERR $0 . ": warning: missing --project <file> (creating default $project_path).\n";
   } else {
-    print STDERR "info: missing --project <file> (creating default $project_path).\n";
+    print STDERR $0 . ": info: missing --project <file> (creating default $project_path).\n";
   }
   # create and write a default project file
   foreach my $input (@$inputs) {
