@@ -24,8 +24,7 @@ klass x::dl-info {
   slots Dl-info;
 }
 // returns nullptr if no exact match
-str-t
-symbol-name-from-address(ptr-t saddr) {
+func symbol-name-from-address(ptr-t saddr) -> str-t {
   str-t result = nullptr;
 # if defined WIN32
 # error "not yet implemented on win32"
@@ -36,8 +35,7 @@ symbol-name-from-address(ptr-t saddr) {
 # endif
   return result;
 }
-void
-load-library(str-t name) {
+func load-library(str-t name) -> void {
 # if defined WIN32
   //fprintf(stdout, "LoadLibrary(\"%s\")\n", name);
   HINSTANCE h-dll = LoadLibrary(name);
