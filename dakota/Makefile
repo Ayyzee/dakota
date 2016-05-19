@@ -41,7 +41,10 @@ single: $(inputs) | libdakota.project
 	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
 
 check-exe:
-	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
+	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
+	rm -f exe exe.project
+	$(DAKOTA-BASE) exe.dk
+	./exe
 
 check: all
 	../bin/dakota-catalog --silent $(output)

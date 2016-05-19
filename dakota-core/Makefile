@@ -39,7 +39,10 @@ libdakota-core.single: $(inputs) | libdakota-core.project
   done
 	$(DAKOTA-BASE) --shared --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
 check-exe:
-	echo "func main() -> int-t { klass sorted-table; object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
+	echo "func main() -> int-t { klass sorted-table; object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
+	rm -f exe exe.project
+	$(DAKOTA-BASE) exe.dk
+	./exe
 
 check: all
 	../bin/dakota-catalog --silent $(output)
