@@ -241,10 +241,10 @@ FUNC main(int argc, char** argv, char**) -> int {
             if (0 == strcmp(l_name, arg))
               printf("%s\n", l_name);
             else
-              printf("%s // %s\n", l_name, arg);
+              printf("%s # %s\n", l_name, arg);
           }
           else
-            printf("// %s\n", arg);
+            printf("# %s\n", arg);
         }
         if (0 != dlclose(handle))
           exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlclose()", arg, dlerror()); // dlclose() failure
