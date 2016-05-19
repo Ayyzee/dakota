@@ -311,6 +311,7 @@ sub create_missing_project {
       print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
     }
   }
+  add_last($$project{'inputs'}, "$gbl_prefix/lib/libdakota.$so_ext");
   my $original_state;
   &scalar_to_file($project_path, $project, $original_state = 1);
   return $project_path;
