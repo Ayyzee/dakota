@@ -24,12 +24,12 @@ my $nl = "\n";
 my $default_build_file = 'exe.build';
 my $opts = { 'var' => {} };
 my $rep_hdr =
-  '# -*- mode: cperl -*-' . "\n" .
-  '# -*- cperl-close-paren-offset: -2 -*-' . "\n" .
-  '# -*- cperl-continued-statement-offset: 2 -*-' . "\n" .
-  '# -*- cperl-indent-level: 2 -*-' . "\n" .
-  '# -*- cperl-indent-parens-as-block: t -*-' . "\n" .
-  '# -*- cperl-tab-always-indent: t -*-' . "\n";
+  '# -*- mode: cperl -*-' . $nl .
+  '# -*- cperl-close-paren-offset: -2 -*-' . $nl .
+  '# -*- cperl-continued-statement-offset: 2 -*-' . $nl .
+  '# -*- cperl-indent-level: 2 -*-' . $nl .
+  '# -*- cperl-indent-parens-as-block: t -*-' . $nl .
+  '# -*- cperl-tab-always-indent: t -*-' . $nl;
 my $subcmd_tbl = {
   'add' =>          \&subcmd_add,
   'libs' =>         \&subcmd_libs,
@@ -318,7 +318,7 @@ sub rep_to_file {
     open($fh, '>&', \*STDOUT)
       or die "cannot open >& STDOUT: $!";
   }
-  print $fh $rep_hdr . "\n" . &Dumper($rep);
+  print $fh $rep_hdr . $nl . &Dumper($rep);
   close $fh;
 }
 unless (caller) {
