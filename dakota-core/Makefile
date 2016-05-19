@@ -38,9 +38,10 @@ libdakota-core.single: $(inputs) | libdakota-core.project
     fi\
   done
 	$(DAKOTA-BASE) --shared --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
-check-exe:
+check-exe: all
 	echo "func main() -> int-t { klass sorted-table; object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
-	rm -f exe exe.project
+	echo '{ "builddir" => "exe-build", "inputs" => [ "exe.dk", "../lib/libdakota-core.dylib" ], "output" => "exe" }' > exe.project
+	rm -f exe
 	$(DAKOTA-BASE) exe.dk
 	./exe
 

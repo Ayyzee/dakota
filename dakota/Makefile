@@ -40,9 +40,10 @@ single: $(inputs) | libdakota.project
   done
 	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
 
-check-exe:
+check-exe: all
 	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
-	rm -f exe exe.project
+	echo '{ "builddir" => "exe-build", "inputs" => [ "exe.dk", "../lib/libdakota.dylib" ], "output" => "exe" }' > exe.project
+	rm -f exe
 	$(DAKOTA-BASE) exe.dk
 	./exe
 

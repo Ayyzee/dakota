@@ -26,7 +26,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  precompile\
  uninstall\
 
-check-exe:
+check-exe: all
 	$(output) libdl.$(so_ext)
 
 check: all
