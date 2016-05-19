@@ -7,6 +7,7 @@ include $(rootdir)/makeflags.mk
  all \
  check \
  clean \
+ clean-exe \
  dist \
  distclean \
  goal-clean \
@@ -17,6 +18,7 @@ include $(rootdir)/makeflags.mk
 
 all \
 check \
+check-exe \
 clean \
 dist \
 distclean \
@@ -25,6 +27,6 @@ install \
 installcheck \
 precompile \
 uninstall:
-	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
-	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
-	$(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota $@
+	time $(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
+	time $(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
+	time $(MAKE) -$(MAKEFLAGS) --directory $(rootdir)/dakota $@

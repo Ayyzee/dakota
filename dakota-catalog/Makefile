@@ -17,6 +17,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 .PHONY:\
  all\
  check\
+ check-exe\
  clean\
  distclean\
  goal-clean\
@@ -25,10 +26,13 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  precompile\
  uninstall\
 
+check-exe:
+	$(output) libdl.$(so_ext)
+
 check: all
 	if [[ -e $(rootdir)/lib/libdakota-core.$(so_ext) ]]; then $(output) $(rootdir)/lib/libdakota-core.$(so_ext); fi
 	if [[ -e $(rootdir)/lib/libdakota.$(so_ext) ]]; then $(output) $(rootdir)/lib/libdakota.$(so_ext); fi
-	$(output) libdl.$(so_ext)
+	$(MAKE) $(MAKEFLAGS) check-exe
 
 installcheck: check install
 	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this

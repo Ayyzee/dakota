@@ -20,6 +20,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 .PHONY:\
  all\
  check\
+ check-exe\
  clean\
  distclean\
  goal-clean\
@@ -39,9 +40,12 @@ single: $(inputs) | libdakota.project
   done
 	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
 
+check-exe:
+	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
+
 check: all
 	../bin/dakota-catalog --silent $(output)
-	echo "func main() ->int-t { return 0; }" > exe.dk; rm -f exe exe.project; $(DAKOTA-BASE) exe.dk; ./exe
+	$(MAKE) $(MAKEFLAGS) check-exe
 
 installcheck: check install
 	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
