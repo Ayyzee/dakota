@@ -20,6 +20,31 @@ $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Terse =     1;
 
+my $so_ext;
+
+sub dk_prefix {
+  my ($path) = @_;
+  $path =~ s|//+|/|;
+  $path =~ s|/\./+|/|;
+  $path =~ s|^./||;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &dk_prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
+BEGIN {
+  my $prefix = &dk_prefix($0);
+  my $platform = do "$prefix/lib/dakota/platform.json"
+    or die "do $prefix/lib/dakota/platform.json failed: $!\n";
+  if ($$platform{'so_ext'}) {
+    $so_ext = $$platform{'so_ext'};
+  } else {
+    $so_ext = 'so'; # default dynamic shared object/library extension
+  }
+};
 sub start {
   my ($argv) = @_;
   my $file = $$argv[0]; # really should be --output
@@ -30,7 +55,7 @@ sub start {
   }
   my $opts = { 'var' => { 'DEST' =>   '',
                           'srcdir' => '.',
-                          'so_ext' => 'so',
+                          'so_ext' => $so_ext,
                         }
             };
   my $result = {};
