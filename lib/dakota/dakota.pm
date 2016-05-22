@@ -695,7 +695,7 @@ sub start_cmd {
      # generate user .o files first, then the single (but slow) runtime .o
     $cmd_info = &loop_o_from_dk($cmd_info);
     if (!$$cmd_info{'opts'}{'compile'}) {
-      my $is_exe = !defined $$cmd_info{'opts'}{'shared'};
+      my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
       &gen_rt_o($cmd_info, $is_exe);
     }
   }
