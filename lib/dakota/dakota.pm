@@ -600,7 +600,7 @@ sub update_rep_from_all_inputs {
   my $rt_json_path = &rt_json_path($cmd_info);
   &check_path($rt_json_path);
   if (&is_debug()) {
-    print "creating $rt_json_path" . &pann(__FILE__, __LINE__) . $nl;
+    print STDERR "creating $rt_json_path" . &pann(__FILE__, __LINE__) . $nl;
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   $cmd_info = &loop_rep_from_inputs($cmd_info);
@@ -615,7 +615,7 @@ sub update_rep_from_all_inputs {
   if (&is_debug()) {
     my $end_time = time;
     my $elapsed_time = $end_time - $start_time;
-    print "creating $rt_json_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
+    print STDERR "creating $rt_json_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
   }
   if ($ENV{'DAKOTA_CREATE_REP_ONLY'}) {
     exit 0;
@@ -669,11 +669,11 @@ sub start_cmd {
     if ($ENV{'DKT_PRECOMPILE'}) {
       my $rt_cc_path = &rt_cc_path($cmd_info);
       if (&is_debug()) {
-        print "creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
+        print STDERR "creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       }
     } else {
       if (&is_debug()) {
-        print "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
+        print STDERR "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
       }
     }
   }
@@ -855,9 +855,9 @@ sub gen_rt_o {
     }
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
+        print STDERR "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       } else {
-        print "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
+        print STDERR "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
       }
     }
   }
@@ -1244,7 +1244,7 @@ sub outfile_from_infiles {
       if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
         $output = $ENV{'DKT_DIR'} . '/' . $output
       }
-      #print "    creating $output # output" . &pann(__FILE__, __LINE__) . $nl;
+      #print STDERR "    creating $output # output" . &pann(__FILE__, __LINE__) . $nl;
     }
     if ('&loop_merged_rep_from_inputs' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
