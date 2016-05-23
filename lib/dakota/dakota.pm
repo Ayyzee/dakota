@@ -236,6 +236,7 @@ sub is_array {
 sub project_io_add {
   my ($cmd_info, $input, $depend) = @_;
   die if &is_array($input) && &is_array($depend);
+  $input = &canon_path($input);
   my $should_write = 0;
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
 
