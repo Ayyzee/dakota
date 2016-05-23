@@ -2,6 +2,8 @@ rootdir := ..
 
 srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
+export DKT_EXCLUDE_LIBS = 1
+
 include $(rootdir)/common.mk
 
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota-core.mk $(srcdir)/libdakota-core.build)
@@ -27,17 +29,18 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  install\
  installcheck\
  precompile\
+ single\
  uninstall\
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
-libdakota-core.single: $(inputs) | libdakota-core.project
+single: $(inputs) | libdakota-core.project
 	for input in $(inputs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --shared --nodefaultlibs --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
+	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
 check-exe: all
 	echo "func main() -> int-t { klass sorted-table; object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "builddir" => "exe-build", "inputs" => [ "exe.dk", "../lib/libdakota-core.dylib" ], "output" => "exe" }' > exe.project

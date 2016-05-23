@@ -101,7 +101,6 @@ my $root_cmd = { 'reps' => [],
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
             'library=s',            # --library libdl.so equivalent to -ldl (or better -l:libdl.so on linux)
-            'nodefaultlibs',        # gcc-like
             'output=s',             # gcc-like
             'precompile',           # gcc-ish (--compile)
             'project=s',
@@ -130,6 +129,11 @@ my $root_cmd = { 'reps' => [],
 # 1/0: one  input,  no  output
 # m/0: many inputs, no  output
 # m/1: many inputs, one output (directory)
+
+my $libdakota_core_bit = 0x1;
+my $libdakota_bit =      0x2;
+my $dkt_exclude_libs = 0;
+$dkt_exclude_libs = $ENV{'DKT_EXCLUDE_LIBS'} if $ENV{'DKT_EXCLUDE_LIBS'};
 
 if ($$root_cmd{'opts'}{'precompile'}) {
   $ENV{'DKT_PRECOMPILE'} = 1;
@@ -311,7 +315,11 @@ sub create_missing_project {
       print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
     }
   }
-  add_last($$project{'inputs'}, "$gbl_prefix/lib/libdakota.$so_ext");
+  if ($libdakota_bit < $dkt_exclude_libs) {
+    my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
+    #print STDERR 'adding ' . $libdakota . $nl;
+    add_last($$project{'inputs'}, $libdakota);
+  }
   my $original_state;
   &scalar_to_file($project_path, $project, $original_state = 1);
   return $project_path;
@@ -340,12 +348,11 @@ sub use_project {
   if (! -e $$project{'builddir'}) {
     &make_dir($$project{'builddir'});
   }
-  if (!$$root_cmd{'opts'}{'nodefaultlibs'}) {
+  if ($libdakota_core_bit < $dkt_exclude_libs) {
     my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
-    if (!$$root_cmd{'opts'}{'output'} || $$root_cmd{'opts'}{'output'} ne $libdakota_core) {
-      &add_first($$root_cmd{'inputs'}, $libdakota_core);
-      &add_first($$project{'inputs'}, $libdakota_core);
-    }
+    #print STDERR 'adding ' . $libdakota_core . $nl;
+    &add_first($$root_cmd{'inputs'}, $libdakota_core);
+    &add_first($$project{'inputs'}, $libdakota_core);
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};

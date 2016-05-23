@@ -2,6 +2,8 @@ rootdir := ..
 
 srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
+export DKT_EXCLUDE_LIBS = 2
+
 include $(rootdir)/common.mk
 
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota.mk $(srcdir)/libdakota.build)
@@ -29,8 +31,6 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  precompile\
  single\
  uninstall\
-
-$(output): $(rootdir)/lib/libdakota-core.$(so_ext)
 
 single: $(inputs) | libdakota.project
 	for input in $(inputs); do\
