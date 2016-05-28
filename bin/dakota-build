@@ -43,6 +43,8 @@ my $subcmd_tbl = {
   'set-soname' =>   \&subcmd_set_soname,
   'soname' =>       \&subcmd_soname,
   'inputs' =>       \&subcmd_inputs,
+  'srcs' =>         \&subcmd_srcs,
+  'target' =>       \&subcmd_target,
 };
 sub start {
   my ($argv) = @_;
@@ -186,17 +188,16 @@ sub subst {
   }
   return $string
 }
-sub subcmd_inputs {
-  my ($rep, $args) = @_;
+sub subcmd_inputs_common {
+  my ($rep, $key, $args) = @_;
   my $inputs = [];
-  if ($$rep{'inputs'}) {
+  if ($$rep{$key}) {
     my $cwd = '';
     if ($$opts{'abs-path'}) {
       $cwd = getcwd;
       $cwd .= '/';
     }
-
-    foreach my $input (@{$$rep{'inputs'}}) {
+    foreach my $input (@{$$rep{$key}}) {
       $input = &subst($input, $$opts{'var'});
       if ($input !~ "^/") {
         push @$inputs,  $cwd . $input;
@@ -207,40 +208,40 @@ sub subcmd_inputs {
   }
   print join(' ', @$inputs) . $nl;
 }
+sub subcmd_inputs {
+  my ($rep, $args) = @_;
+  return &subcmd_inputs_common($rep, 'inputs', $args);
+}
+sub subcmd_srcs {
+  my ($rep, $args) = @_;
+  return &subcmd_inputs_common($rep, 'srcs', $args);
+}
 sub subcmd_libs {
   my ($rep, $args) = @_;
-  my $libs = '';
-  if ($$rep{'libs'}) {
-    my $cwd = '';
-    if ($$opts{'abs-path'}) {
-      $cwd = getcwd;
-      $cwd .= '/';
-    }
-    foreach my $lib (@{$$rep{'libs'}}) {
-      $lib = &subst($lib, $$opts{'var'});
-
-      if ($lib !~ "^/") {
-        $libs .= $cwd;
-      }
-      $libs .= "$lib\n";
-    }
-  }
-  print $libs;
+  return &subcmd_inputs_common($rep, 'libs', $args);
 }
-sub subcmd_output {
-  my ($rep, $args) = @_;
+sub subcmd_output_common {
+  my ($rep, $key, $args) = @_;
   my $output = '';
-  if ($$rep{'output'}) {
+  if ($$rep{$key}) {
     if ($$opts{'abs-path'}) {
       $output = getcwd;
       $output .= '/';
     }
-    $output .= $$rep{'output'};
+    $output .= $$rep{$key};
   }
   if ($$opts{'var'}) {
     $output = &subst($output, $$opts{'var'});
   }
   print "$output\n";
+}
+sub subcmd_output {
+  my ($rep, $args) = @_;
+  return &subcmd_output_common($rep, 'output', $args);
+}
+sub subcmd_target {
+  my ($rep, $args) = @_;
+  return &subcmd_output_common($rep, 'target', $args);
 }
 sub subcmd_macros {
   my ($rep) = @_;

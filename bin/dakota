@@ -349,11 +349,17 @@ sub use_project {
   if (! -e $$project{'builddir'}) {
     &make_dir($$project{'builddir'});
   }
+  if (! $$project{'inputs'} && $$project{'srcs'}) {
+    $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'libs'} ||= []} ];
+  }
+  if (! $$project{'output'} && $$project{'target'}) {
+    $$project{'output'} = $$project{'target'};
+  }
   if (0 == $dkt_exclude_libs || $libdakota_core_bit < $dkt_exclude_libs) {
     my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
     #print STDERR 'adding ' . $libdakota_core . $nl;
-    &add_first($$root_cmd{'inputs'}, $libdakota_core);
-    &add_first($$project{'inputs'}, $libdakota_core);
+    &add_last($$root_cmd{'inputs'}, $libdakota_core);
+    &add_last($$project{'inputs'}, $libdakota_core);
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
