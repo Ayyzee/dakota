@@ -43,9 +43,9 @@ single: $(inputs) | libdakota-core.project
 	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
 check-exe: all
 	echo "func main() -> int-t { klass sorted-table; object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
-	echo '{ "builddir" => "dkt", "inputs" => [ "exe.dk", "../lib/libdakota-core.dylib" ], "output" => "exe" }' > exe.project
+	echo '{ "srcs" => [ "exe.dk" ], "target" => "exe" }' > exe.project
 	rm -f exe
-	$(DAKOTA-BASE) exe.dk
+	DKT_EXCLUDE_LIBS=2 $(DAKOTA-BASE) exe.dk
 	./exe
 
 check: all

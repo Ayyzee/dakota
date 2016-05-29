@@ -131,6 +131,9 @@ my $root_cmd = { 'reps' => [],
 # m/0: many inputs, no  output
 # m/1: many inputs, one output (directory)
 
+my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
+my $libdakota =      "$gbl_prefix/lib/libdakota.$so_ext";
+
 my $libdakota_core_bit = 0x1;
 my $libdakota_bit =      0x2;
 my $dkt_exclude_libs = 0;
@@ -316,11 +319,6 @@ sub create_missing_project {
       print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
     }
   }
-  if (0 == $dkt_exclude_libs || $libdakota_bit < $dkt_exclude_libs) {
-    my $libdakota = "$gbl_prefix/lib/libdakota.$so_ext";
-    #print STDERR 'adding ' . $libdakota . $nl;
-    add_last($$project{'inputs'}, $libdakota);
-  }
   my $original_state;
   &scalar_to_file($project_path, $project, $original_state = 1);
   return $project_path;
@@ -356,10 +354,12 @@ sub use_project {
     $$project{'output'} = $$project{'target'};
   }
   if (0 == $dkt_exclude_libs || $libdakota_core_bit < $dkt_exclude_libs) {
-    my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
-    #print STDERR 'adding ' . $libdakota_core . $nl;
     &add_last($$root_cmd{'inputs'}, $libdakota_core);
     &add_last($$project{'inputs'}, $libdakota_core);
+  }
+  if (0 == $dkt_exclude_libs || $libdakota_bit < $dkt_exclude_libs) {
+    &add_last($$root_cmd{'inputs'}, $libdakota);
+    &add_last($$project{'inputs'}, $libdakota);
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};

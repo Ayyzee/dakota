@@ -21,6 +21,7 @@ $Data::Dumper::Sortkeys  = 1;
 $Data::Dumper::Terse =     1;
 
 my $so_ext;
+my $nl = "\n";
 
 sub dk_prefix {
   my ($path) = @_;
@@ -59,10 +60,12 @@ sub start {
                         }
             };
   my $result = {};
-  $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'inputs'}} ];
-  $$result{'libs'} =   [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'libs'}} ];
-  $$result{'builddir'} = &canon_path(&subst($$build{'builddir'}, $$opts{'var'}));
-  $$result{'output'} =   &canon_path(&subst($$build{'output'},   $$opts{'var'}));
+  $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'inputs'}} ] if $$build{'inputs'};
+  $$result{'srcs'} =   [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'srcs'}}   ] if $$build{'srcs'};
+  $$result{'libs'} =   [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'libs'}}   ] if $$build{'libs'};
+  $$result{'builddir'} = &canon_path(&subst($$build{'builddir'}, $$opts{'var'})) if $$build{'builddir'};
+  $$result{'output'} =   &canon_path(&subst($$build{'output'},   $$opts{'var'})) if $$build{'output'};
+  $$result{'target'} =   &canon_path(&subst($$build{'target'},   $$opts{'var'})) if $$build{'target'};
   my $original_state;
   &scalar_to_file($file, $result, $original_state = 0);
 }
@@ -79,6 +82,9 @@ sub canon_path {
 }
 sub subst {
   my ($string, $var) = @_;
+  if (! $string) {
+    return $string;
+  }
   while (my ($key, $element) = each %$var) {
     $string =~ s/\$$key\b/$element/g;   # support $ident   style variable
     $string =~ s/\$\($key\)/$element/g; # support $(ident) style variable
@@ -103,14 +109,7 @@ sub scalar_to_file {
   open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   flock FILE, 2; # LOCK_EX
   truncate FILE, 0;
-  print FILE
-    '# -*- mode: cperl -*-' . "\n" .
-    '# -*- cperl-close-paren-offset: -2 -*-' . "\n" .
-    '# -*- cperl-continued-statement-offset: 2 -*-' . "\n" .
-    '# -*- cperl-indent-level: 2 -*-' . "\n" .
-    '# -*- cperl-indent-parens-as-block: t -*-' . "\n" .
-    '# -*- cperl-tab-always-indent: t -*-' . "\n" .
-    "\n";
+  print FILE '# -*- mode: perl -*-' . $nl;
   print FILE $refstr;
   close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
 }

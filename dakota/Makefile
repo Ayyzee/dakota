@@ -42,9 +42,9 @@ single: $(inputs) | libdakota.project
 
 check-exe: all
 	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
-	echo '{ "builddir" => "dkt", "inputs" => [ "exe.dk", "../lib/libdakota.dylib" ], "output" => "exe" }' > exe.project
+	echo '{ "srcs" => [ "exe.dk" ], "target" => "exe" }' > exe.project
 	rm -f exe
-	$(DAKOTA-BASE) exe.dk
+	DKT_EXCLUDE_LIBS=0 $(DAKOTA-BASE) exe.dk
 	./exe
 
 check: all
