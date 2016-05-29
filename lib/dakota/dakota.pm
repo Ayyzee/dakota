@@ -80,7 +80,7 @@ our @EXPORT= qw(
                  is_dk_path
                  is_o_path
                  rt_cc_path
-                 rel_rt_hh_path
+                 rel_target_hh_path
              );
 
 use Data::Dumper;
@@ -422,11 +422,11 @@ sub rt_cc_path {
   }
   return $rt_cc_path;
 }
-sub rel_rt_hh_path {
+sub rel_target_hh_path {
   my ($cmd_info) = @_;
   my $rt_cc_path = &rt_cc_path($cmd_info);
-  my $rel_rt_hh_path = $rt_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
-  return $rel_rt_hh_path;
+  my $rel_target_hh_path = $rt_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  return $rel_target_hh_path;
 }
 sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
@@ -497,14 +497,14 @@ sub loop_cc_from_dk {
     &nrt::add_extra_klass_decls($file);
     &nrt::add_extra_keywords($file);
     &nrt::add_extra_generics($file);
-    my $rel_rt_hh_path = &rel_rt_hh_path($cmd_info);
+    my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
 
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
-      &dakota::generate::generate_nrt_decl($cc_path, $file, $global_rep, $rel_rt_hh_path);
+      &dakota::generate::generate_src_decl($cc_path, $file, $global_rep, $rel_target_hh_path);
     }
-    &dakota::generate::generate_nrt_defn($cc_path, $file, $global_rep, $rel_rt_hh_path); # rel_rt_hh not used
+    &dakota::generate::generate_src_defn($cc_path, $file, $global_rep, $rel_target_hh_path); # rel_target_hh not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -689,7 +689,7 @@ sub start_cmd {
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
       my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
-      &gen_rt_o($cmd_info, $is_exe);
+      &gen_target_o($cmd_info, $is_exe);
     }
     $cmd_info = &loop_o_from_dk($cmd_info);
   } else {
@@ -697,7 +697,7 @@ sub start_cmd {
     $cmd_info = &loop_o_from_dk($cmd_info);
     if (!$$cmd_info{'opts'}{'compile'}) {
       my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
-      &gen_rt_o($cmd_info, $is_exe);
+      &gen_target_o($cmd_info, $is_exe);
     }
   }
   if (!$ENV{'DKT_PRECOMPILE'}) {
@@ -845,7 +845,7 @@ sub loop_rep_from_inputs {
   }
   return $cmd_info;
 } # loop_rep_from_inputs
-sub gen_rt_o {
+sub gen_target_o {
   my ($cmd_info, $is_exe) = @_;
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
@@ -1110,8 +1110,8 @@ sub rt_o_from_json {
   &nrt::add_extra_generics($file);
 
   my $project_rep;
-  &dakota::generate::generate_rt_decl($rt_cc_path, $file, $project_rep = undef, $is_exe);
-  &dakota::generate::generate_rt_defn($rt_cc_path, $file, $project_rep = undef, $is_exe);
+  &dakota::generate::generate_target_decl($rt_cc_path, $file, $project_rep = undef, $is_exe);
+  &dakota::generate::generate_target_defn($rt_cc_path, $file, $project_rep = undef, $is_exe);
 
   my $o_info = {'opts' => {}, 'inputs' => [ $rt_cc_path ], 'output' => $rt_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};

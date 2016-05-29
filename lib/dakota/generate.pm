@@ -89,10 +89,10 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  empty_klass_defns
                  func::overloadsig
-                 generate_nrt_decl
-                 generate_nrt_defn
-                 generate_rt_decl
-                 generate_rt_defn
+                 generate_src_decl
+                 generate_src_defn
+                 generate_target_decl
+                 generate_target_defn
                  global_scratch_str_ref
                  set_global_scratch_str_ref
                  should_use_include
@@ -110,9 +110,9 @@ my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h
 my $global_is_exe_rt = undef;
 my $global_suffix = undef;
 
-my $gbl_nrt_file = undef;
+my $gbl_src_file = undef;
 my $global_scratch_str_ref;
-#my $global_nrt_cc_str;
+#my $global_src_cc_str;
 
 my $global_seq_super_t =   [ 'super-t' ]; # special (used in eq compare)
 my $global_seq_ellipsis =  [ '...' ];
@@ -141,32 +141,32 @@ sub set_global_scratch_str_ref {
   my ($ref) = @_;
   $global_scratch_str_ref = $ref;
 }
-sub set_nrt_decl {
+sub set_src_decl {
   my ($path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
-  $gbl_nrt_file = &canon_path("$name.dk");
+  $gbl_src_file = &canon_path("$name.dk");
   $global_is_rt =   0;
   $global_is_defn = 0;
   $global_suffix = $hh_ext;
 }
-sub set_nrt_defn {
+sub set_src_defn {
   my ($path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
-  $gbl_nrt_file = &canon_path("$name.dk");
+  $gbl_src_file = &canon_path("$name.dk");
   $global_is_rt =   0;
   $global_is_defn = 1;
   $global_suffix = $ext;
 }
-sub set_rt_decl {
+sub set_target_decl {
   my ($path) = @_;
-  $gbl_nrt_file = undef;
+  $gbl_src_file = undef;
   $global_is_rt =   1;
   $global_is_defn = 0;
   $global_suffix = $hh_ext;
 }
-sub set_rt_defn {
+sub set_target_defn {
   my ($path) = @_;
-  $gbl_nrt_file = undef;
+  $gbl_src_file = undef;
   $global_is_rt =   1;
   $global_is_defn = 1;
   $global_suffix = $cc_ext;
@@ -182,34 +182,34 @@ sub extra_header {
   my ($name) = @_;
   if (&is_decl()) {
     return $nl . "# include <dakota-decl.hh>" . $nl . $nl;
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     return $nl . "# include \"$name.$hh_ext\"" . $nl . $nl;
   }
   return $nl . "bug-in-code-gen" . $nl;
   # do nothing for rt-defn/rt-cc
 }
-sub is_nrt_decl {
+sub is_src_decl {
   if (!$global_is_rt && !$global_is_defn) {
     return 1;
   } else {
     return 0;
   }
 }
-sub is_nrt_defn {
+sub is_src_defn {
   if (!$global_is_rt && $global_is_defn) {
     return 1;
   } else {
     return 0;
   }
 }
-sub is_rt_decl {
+sub is_target_decl {
   if ($global_is_rt && !$global_is_defn) {
     return 1;
   } else {
     return 0;
   }
 }
-sub is_rt_defn {
+sub is_target_defn {
   if ($global_is_rt && $global_is_defn) {
     return 1;
   } else {
@@ -294,17 +294,17 @@ sub write_to_file_converted_strings {
     close PATH;
   }
 }
-sub generate_nrt_decl {
-  my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
-  #print "generate_nrt_decl($path, ...)" . $nl;
-  &set_nrt_decl($path);
-  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh_path);
+sub generate_src_decl {
+  my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
+  #print "generate_src_decl($path, ...)" . $nl;
+  &set_src_decl($path);
+  return &generate_nrt($path, $file, $project_rep, $rel_target_hh_path);
 }
-sub generate_nrt_defn {
-  my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
-  #print "generate_nrt_defn($path, ...)" . $nl;
-  &set_nrt_defn($path);
-  return &generate_nrt($path, $file, $project_rep, $rel_rt_hh_path);
+sub generate_src_defn {
+  my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
+  #print "generate_src_defn($path, ...)" . $nl;
+  &set_src_defn($path);
+  return &generate_nrt($path, $file, $project_rep, $rel_target_hh_path);
 }
 my $im_suffix_for_suffix = {
   $cc_ext => 'cc.dkt',
@@ -320,7 +320,7 @@ sub pre_output_path_from_any_path {
   return $pre_output;
 }
 sub generate_nrt {
-  my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
+  my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
   my $rt = '+srcs';
@@ -337,13 +337,13 @@ sub generate_nrt {
     print "    creating $output" . &pann(__FILE__, __LINE__) . $nl;
   }
   my $str;
-  if (&is_nrt_decl()) {
+  if (&is_src_decl()) {
     $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
   } else {
     $str = '// ' . $emacs_mode_file_variables  . $nl .
       $nl .
       "# if 0" . $nl .
-      "# include \"$rel_rt_hh_path\"" . $nl .
+      "# include \"$rel_target_hh_path\"" . $nl .
       "# else" . $nl .
       "# include \"$rel_hh_path\"" . $nl .
       "# endif" . $nl .
@@ -359,19 +359,19 @@ sub generate_nrt {
   &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_rep);
   return $output;
 } # sub generate_nrt
-sub generate_rt_decl {
+sub generate_target_decl {
   my ($path, $file, $project_rep, $is_exe) = @_;
-  #print "generate_rt_decl($path, ...)" . $nl;
-  &set_rt_decl($path);
+  #print "generate_target_decl($path, ...)" . $nl;
+  &set_target_decl($path);
   if ($is_exe) {
     &set_exe_rt($path);
   }
   return &generate_rt($path, $file, $project_rep);
 }
-sub generate_rt_defn {
+sub generate_target_defn {
   my ($path, $file, $project_rep, $is_exe) = @_;
-  #print "generate_rt_defn($path, ...)" . $nl;
-  &set_rt_defn($path);
+  #print "generate_target_defn($path, ...)" . $nl;
+  &set_target_defn($path);
   if ($is_exe) {
     &set_exe_rt($path);
   }
@@ -395,7 +395,7 @@ sub generate_rt {
   }
   my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
 
-  if (&is_rt_defn()) {
+  if (&is_target_defn()) {
     $str .= &generate_defn_footer($file, $generics);
   }
   if ($should_write_pre_output) {
@@ -468,7 +468,7 @@ sub generate_decl_defn {
   my $col = '';
   my $output_base = "$name-generic-func-defns";
   my $rel_hh_path = "$output_base.$hh_ext";
-  if (&is_rt_defn()) {
+  if (&is_target_defn()) {
     my $output = "$dir/$rel_hh_path";
     my $strings = [ '// ', $emacs_mode_file_variables, "\n\n", &linkage_unit::generate_generics($generics, $col) ];
     if ($should_write_pre_output) {
@@ -481,7 +481,7 @@ sub generate_decl_defn {
                      "  # define INLINE" . $nl .
                      "  # include \"$rel_hh_path\"" . $nl .
                      "# endif" . $nl);
-  } elsif (&is_nrt_decl() || &is_rt_decl()) {
+  } elsif (&is_src_decl() || &is_target_decl()) {
     &add_labeled_src($result, "generics-$suffix",
                      "# if defined DK-INLINE-GENERIC-FUNCS" . $nl .
                      "  # define INLINE inline" . $nl .
@@ -976,7 +976,7 @@ sub generate_va_generic_defn {
   if (&is_kw_args_generic($vararg_method)) {
     $$scratch_str_ref .= '[[sentinel]] ';
   }
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= 'extern ';
   }
   my $func_spec = '';
@@ -992,9 +992,9 @@ sub generate_va_generic_defn {
   }
   $$scratch_str_ref .= "$va_method_name($$new_arg_list_va_ref) -> $return_type";
 
-  if (!$$va_method{'defined?'} || &is_nrt_decl() || &is_rt_decl()) {
+  if (!$$va_method{'defined?'} || &is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= "; }" . &ann(__FILE__, $line) . $nl;
-  } elsif ($$va_method{'defined?'} && (&is_rt_defn())) {
+  } elsif ($$va_method{'defined?'} && (&is_target_defn())) {
     my $name = &dakota::util::last($$va_method{'name'});
     my $va_name = "_func_";
     &dakota::util::_replace_last($$va_method{'name'}, $va_name);
@@ -1075,13 +1075,13 @@ sub common::print_signature {
   my $generic_name = &ct($$generic{'name'});
   my $in = &ident_comment($generic_name);
   $scratch_str .= $visibility . "$generic_name($$new_arg_type_list) -> const signature-t*";
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= '; }' . $nl;
     } else {
       $scratch_str .= ';' . $nl;
     }
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     $scratch_str .= ' {' . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
 
@@ -1181,13 +1181,13 @@ sub common::print_selector {
   my $generic_name = &ct($$generic{'name'});
   my $in = &ident_comment($generic_name);
   $scratch_str .= $visibility . "$generic_name($$new_arg_type_list) -> selector-t*";
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     if (&is_va($generic)) {
       $scratch_str .= '; }' . $in . $nl;
     } else {
         $scratch_str .= ';' . $in . $nl;
     }
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     $scratch_str .= ' {' . $in . $nl;
     $col = &colin($col);
 
@@ -1464,9 +1464,9 @@ sub generate_generic_defn {
   $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
   $$scratch_str_ref .= $col . 'namespace __generic-func { ' . $opt_va_open . 'static INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
 
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     if ($big_generic) {
@@ -1545,9 +1545,9 @@ sub generate_generic_func_ptr_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= $col . 'namespace __generic-func-ptr { ' . $opt_va_open . 'static INLINE func ' . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
 
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
@@ -1582,9 +1582,9 @@ sub generate_generic_func_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= $col . 'namespace dk { ' . $opt_va_open . 'INLINE func ' . $generic_name . '(' . $$arg_list . ') -> ' . $return_type_str;
 
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     $$scratch_str_ref .= " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
@@ -1604,7 +1604,7 @@ sub generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
-        if (!&is_nrt_decl() && !&is_rt_decl()) {
+        if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($generic, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($generic, $is_inline, $col, $ns);
         }
@@ -1618,7 +1618,7 @@ sub generate_generic_defns {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
         $$copy{'parameter-types'}[0][0] = 'super-t';
-        if (!&is_nrt_decl() && !&is_rt_decl()) {
+        if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($copy, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
         }
@@ -1634,7 +1634,7 @@ sub generate_generic_defns {
   foreach $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
-        if (!&is_nrt_decl() && !&is_rt_decl()) {
+        if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($generic, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($generic, $is_inline, $col, $ns);
         }
@@ -1648,7 +1648,7 @@ sub generate_generic_defns {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
         $$copy{'parameter-types'}[0][0] = 'super-t';
-        if (!&is_nrt_decl() && !&is_rt_decl()) {
+        if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($copy, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
         }
@@ -1668,7 +1668,7 @@ sub linkage_unit::generate_signatures_seq {
   my ($generics) = @_;
   my $col = '';
   my $scratch_str = "";
-  if (&is_nrt_defn() || &is_rt_defn()) {
+  if (&is_src_defn() || &is_target_defn()) {
     my $is_inline;
     $scratch_str .= &generics::generate_signature_seq($generics, $is_inline = 0, $col);
   }
@@ -1685,7 +1685,7 @@ sub linkage_unit::generate_selectors_seq {
   my ($generics) = @_;
   my $col = '';
   my $scratch_str = "";
-  if (&is_nrt_defn() || &is_rt_defn()) {
+  if (&is_src_defn() || &is_target_defn()) {
     my $is_inline;
     $scratch_str .= &generics::generate_selector_seq($generics, $is_inline = 0, $col);
   }
@@ -1710,9 +1710,9 @@ sub generate_va_make_defn {
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()" . $nl;
   $result .= $col . "[[sentinel]] INLINE func make(object-t kls, ...) -> object-t";
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     $result .= ";" . $nl;
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     my $alloc_type_decl = "func (*alloc)(object-t) -> object-t"; ### should use method::type_decl
     my $init_type_decl =  "func (*_func_)(object-t, va-list-t) -> object-t"; ### should use method::type_decl
 
@@ -1911,9 +1911,9 @@ sub generate_klass_unbox {
   } elsif ($klass_name eq 'klass') {
     $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
 
-    if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_src_decl() || &is_target_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . " // special-case" . $nl;
-    } elsif (&is_rt_defn()) {
+    } elsif (&is_target_defn()) {
       $result .=
         " {" . &ann(__FILE__, __LINE__) . " // special-case" . $nl .
         $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional" . $nl .
@@ -1925,9 +1925,9 @@ sub generate_klass_unbox {
     ### unbox() same for all types
     if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
       $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
-      if (&is_nrt_decl() || &is_rt_decl()) {
+      if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
-      } elsif (&is_rt_defn()) {
+      } elsif (&is_target_defn()) {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . $nl .
           $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional" . $nl .
@@ -1948,9 +1948,9 @@ sub generate_klass_box {
     ### box() non-array-type
     $result .= $col . "klass $klass_name { func box(slots-t* arg) -> object-t";
 
-    if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_src_decl() || &is_target_decl()) {
       $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
-    } elsif (&is_rt_defn()) {
+    } elsif (&is_target_defn()) {
       $result .=
         " {" . &ann(__FILE__, __LINE__) . $nl .
         $col . "  return arg;" . $nl .
@@ -1963,9 +1963,9 @@ sub generate_klass_box {
         ### box() array-type
         $result .= $col . "klass $klass_name { func box(slots-t arg) -> object-t";
 
-        if (&is_nrt_decl() || &is_rt_decl()) {
+        if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
-        } elsif (&is_rt_defn()) {
+        } elsif (&is_target_defn()) {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
@@ -1977,9 +1977,9 @@ sub generate_klass_box {
         }
         $result .= $col . "klass $klass_name { func box(slots-t* arg) -> object-t";
 
-        if (&is_nrt_decl() || &is_rt_decl()) {
+        if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
-        } elsif (&is_rt_defn()) {
+        } elsif (&is_target_defn()) {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
@@ -1992,9 +1992,9 @@ sub generate_klass_box {
         ### box() non-array-type
         $result .= $col . "klass $klass_name { func box(slots-t* arg) -> object-t";
 
-        if (&is_nrt_decl() || &is_rt_decl()) {
+        if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
-        } elsif (&is_rt_defn()) {
+        } elsif (&is_target_defn()) {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           if ($$klass_scope{'init-supports-kw-slots?'}) {
@@ -2011,9 +2011,9 @@ sub generate_klass_box {
         }
         $result .= $col . "klass $klass_name { func box(slots-t arg) -> object-t";
 
-        if (&is_nrt_decl() || &is_rt_decl()) {
+        if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
-        } elsif (&is_rt_defn()) {
+        } elsif (&is_target_defn()) {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
@@ -2025,7 +2025,7 @@ sub generate_klass_box {
       }
     }
   }
-  if ((&is_nrt_decl() || &is_rt_decl) && &has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  if ((&is_src_decl() || &is_target_decl) && &has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $result .= $col . "using $klass_name\::box;" . &ann(__FILE__, __LINE__) . $nl;
   }
   return $result;
@@ -2043,9 +2043,9 @@ sub generate_klass_construct {
 
         if ($pairs =~ m/\[/g) {
         } else {
-          if (&is_nrt_decl() || &is_rt_decl()) {
+          if (&is_src_decl() || &is_target_decl()) {
             $result .= $col . "klass $klass_name { func construct($pairs_w_expr) -> slots-t; }" . &ann(__FILE__, __LINE__) . $nl;
-          } elsif (&is_rt_defn()) {
+          } elsif (&is_target_defn()) {
             $result .= $col . "klass $klass_name { func construct($pairs) -> slots-t {" . &ann(__FILE__, __LINE__) . $nl;
             $col = &colin($col);
             $result .=
@@ -2069,29 +2069,29 @@ sub linkage_unit::generate_klasses_body {
 
   my $scratch_str_ref = &global_scratch_str_ref();
 
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     #$$scratch_str_ref .= $col . "extern symbol-t __type__;" . $nl;
     $$scratch_str_ref .= $col . "$klass_type $klass_name { extern symbol-t __klass__; }" . &ann(__FILE__, __LINE__) . $nl;
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     #$$scratch_str_ref .= $col . "symbol-t __type__ = \$$klass_type;" . $nl;
     my $literal_symbol = &as_literal_symbol(&ct($klass_path));
     $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = $literal_symbol; }" . &ann(__FILE__, __LINE__) . $nl;
   }
 
   if ('trait' eq $klass_type) {
-    if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_src_decl() || &is_target_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
-    } elsif (&is_rt_defn()) {
+    } elsif (&is_target_defn()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
   if ('klass' eq $klass_type) {
-    if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_src_decl() || &is_target_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[read-only]]; }" . &ann(__FILE__, __LINE__) . $nl;
-    } elsif (&is_rt_defn()) {
+    } elsif (&is_target_defn()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . $nl;
     }
-    if (!&is_rt_defn()) {
+    if (!&is_target_defn()) {
       my $is_exported;
       if (exists $$klass_scope{'const'}) {
         foreach my $const (@{$$klass_scope{'const'}}) {
@@ -2101,7 +2101,7 @@ sub linkage_unit::generate_klasses_body {
     }
     my $object_method_defns = {};
     foreach $method (sort method::compare values %{$$klass_scope{'slots-methods'}}) {
-      if (&is_nrt_defn() || &is_rt_defn() || &is_exported($method)) {
+      if (&is_src_defn() || &is_target_defn() || &is_exported($method)) {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
             my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
@@ -2132,7 +2132,7 @@ sub linkage_unit::generate_klasses_body {
     my $exported_slots_methods = &exported_slots_methods($klass_scope);
     foreach $method (sort method::compare values %$exported_slots_methods) {
       die if !&is_exported($method);
-      if (&is_nrt_defn() || &is_rt_defn()) {
+      if (&is_src_defn() || &is_target_defn()) {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
             my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
@@ -2284,9 +2284,9 @@ sub generate_object_method_defn {
   my $new_unboxed_arg_names = &arg_type::names_unboxed($$non_object_method{'parameter-types'});
   my $new_unboxed_arg_names_list = &arg_type::list_names($new_unboxed_arg_names);
 
-  if (&is_nrt_decl() || &is_rt_decl()) {
+  if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= ";" . &ann(__FILE__, $line) . " }" . $nl;
-  } elsif (&is_rt_defn()) {
+  } elsif (&is_target_defn()) {
     $$scratch_str_ref .= " {" . &ann(__FILE__, $line) . $nl;
     $col = &colin($col);
 
@@ -2467,7 +2467,7 @@ sub linkage_unit::generate_headers {
 sub is_same_file {
   my ($klass_scope) = @_;
   my $file = &canon_path($$klass_scope{'slots'}{'file'});
-  if ($gbl_nrt_file && $$klass_scope{'slots'} && $$klass_scope{'slots'}{'file'} && ($gbl_nrt_file eq $file)) {
+  if ($gbl_src_file && $$klass_scope{'slots'} && $$klass_scope{'slots'}{'file'} && ($gbl_src_file eq $file)) {
     return 1;
   } else {
     return 0;
@@ -2476,7 +2476,7 @@ sub is_same_file {
 sub is_same_src_file {
   my ($klass_scope) = @_;
   my $file = &canon_path($$klass_scope{'file'});
-  if ($gbl_nrt_file && ($gbl_nrt_file eq $file)) {
+  if ($gbl_src_file && ($gbl_src_file eq $file)) {
     return 1;
   } else {
     return 0;
@@ -2781,7 +2781,7 @@ sub linkage_unit::generate_klasses_types_after {
           }
           $$scratch_str_ref .= $col . " }" . $nl;
         }
-      } elsif (&is_nrt_defn() || &is_rt_defn()) {
+      } elsif (&is_src_defn() || &is_target_defn()) {
         if (!&has_exported_slots($klass_scope)) {
           if (&is_exported($klass_scope)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
@@ -3797,7 +3797,7 @@ sub dk_generate_cc_footer {
   &dk_generate_kw_args_method_defns($scope, $stack, 'trait', $col);
   &dk_generate_kw_args_method_defns($scope, $stack, 'klass', $col);
 
-  if (&is_rt_defn()) {
+  if (&is_target_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
     if (0 == $num_klasses) {
       $$scratch_str_ref .= $nl;
@@ -3834,7 +3834,7 @@ sub dk_generate_kw_args_method_defns {
   while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
     if ($klass_scope && 0 < keys(%$klass_scope)) { #print STDERR &Dumper($klass_scope);
       &path::add_last($stack, $klass_name);
-      if (&is_rt_defn()) {
+      if (&is_target_defn()) {
         &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
         &generate_kw_args_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
@@ -3957,9 +3957,9 @@ sub linkage_unit::generate_symbols {
     my $width = length($ident);
     $ident =~ s/(\w)_(\w)/$1-$2/g;
     my $pad = ' ' x ($max_width - $width);
-    if (&is_nrt_decl() || &is_rt_decl()) {
+    if (&is_src_decl() || &is_target_decl()) {
       $scratch_str .= $col . "extern symbol-t $ident;" . ' /* ' . &as_literal_symbol($symbol) . ' */' . $nl;
-    } elsif (&is_rt_defn()) {
+    } elsif (&is_target_defn()) {
       $symbol =~ s|"|\\"|g;
       if (&should_ann($ln, $num_lns)) {
         $scratch_str .= $col . "symbol-t $ident = " . $pad . "dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . $nl;
@@ -3988,7 +3988,7 @@ sub linkage_unit::generate_hashes {
     }
   }
   my $scratch_str = "";
-  if (&is_rt_defn()) {
+  if (&is_target_defn()) {
     $scratch_str .= $col . 'namespace __hash {' . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     my $num_lns = @$symbol_keys;
