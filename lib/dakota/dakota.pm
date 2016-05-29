@@ -79,7 +79,7 @@ our @ISA = qw(Exporter);
 our @EXPORT= qw(
                  is_dk_path
                  is_o_path
-                 rt_cc_path
+                 target_cc_path
                  rel_target_hh_path
              );
 
@@ -342,53 +342,53 @@ sub add_visibility {
     }
   }
 }
-sub nrt::add_extra_generics {
+sub src::add_extra_generics {
   my ($file) = @_;
-  my $generics = $$extra{'nrt_extra_generics'};
+  my $generics = $$extra{'src_extra_generics'};
   foreach my $generic (sort keys %$generics) {
     &add_generic($file, $generic);
   }
 }
-sub nrt::add_extra_keywords {
+sub src::add_extra_keywords {
   my ($file) = @_;
-  my $keywords = $$extra{'nrt_extra_keywords'};
+  my $keywords = $$extra{'src_extra_keywords'};
   foreach my $keyword (sort keys %$keywords) {
     &add_keyword($file, $keyword);
   }
 }
-sub rt::add_extra_keywords {
+sub target::add_extra_keywords {
   my ($file) = @_;
-  my $keywords = $$extra{'rt_extra_keywords'};
+  my $keywords = $$extra{'target_extra_keywords'};
   foreach my $keyword (sort keys %$keywords) {
     &add_keyword($file, $keyword);
   }
 }
 ###
-sub nrt::add_extra_klass_decls {
+sub src::add_extra_klass_decls {
   my ($file) = @_;
-  my $klass_decls = $$extra{'nrt_extra_klass_decls'};
+  my $klass_decls = $$extra{'src_extra_klass_decls'};
   foreach my $klass_decl (sort keys %$klass_decls) {
     &add_klass_decl($file, $klass_decl);
   }
 }
-sub rt::add_extra_klass_decls {
+sub target::add_extra_klass_decls {
   my ($file) = @_;
-  my $klass_decls = $$extra{'rt_extra_klass_decls'};
+  my $klass_decls = $$extra{'target_extra_klass_decls'};
   foreach my $klass_decl (sort keys %$klass_decls) {
     &add_klass_decl($file, $klass_decl);
   }
 }
 ###
-sub nrt::add_extra_symbols {
+sub src::add_extra_symbols {
   my ($file) = @_;
-  my $symbols = $$extra{'nrt_extra_symbols'};
+  my $symbols = $$extra{'src_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
     &dakota::parse::add_symbol($file, $symbol);
   }
 }
-sub rt::add_extra_symbols {
+sub target::add_extra_symbols {
   my ($file) = @_;
-  my $symbols = $$extra{'rt_extra_symbols'};
+  my $symbols = $$extra{'target_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
     &dakota::parse::add_symbol($file, $symbol);
   }
@@ -402,30 +402,30 @@ sub sig1 {
   $result .= ')';
   return $result;
 }
-sub rt_json_path {
+sub target_json_path {
   my ($cmd_info) = @_;
-  my $rt_json_path;
+  my $target_json_path;
   if (&is_so_path($$cmd_info{'project.output'})) {
-    $rt_json_path = &rt_json_path_from_so_path($$cmd_info{'project.output'}); # should be from_so_path
+    $target_json_path = &target_json_path_from_so_path($$cmd_info{'project.output'}); # should be from_so_path
   } else {
-    $rt_json_path = &rt_json_path_from_any_path($$cmd_info{'project.output'}); # _from_exe_path
+    $target_json_path = &target_json_path_from_any_path($$cmd_info{'project.output'}); # _from_exe_path
   }
-  return $rt_json_path;
+  return $target_json_path;
 }
-sub rt_cc_path {
+sub target_cc_path {
   my ($cmd_info) = @_;
-  my $rt_cc_path;
+  my $target_cc_path;
   if (&is_so_path($$cmd_info{'project.output'})) {
-    $rt_cc_path = &rt_cc_path_from_so_path($$cmd_info{'project.output'});
+    $target_cc_path = &target_cc_path_from_so_path($$cmd_info{'project.output'});
   } else {
-    $rt_cc_path = &rt_cc_path_from_any_path($$cmd_info{'project.output'});
+    $target_cc_path = &target_cc_path_from_any_path($$cmd_info{'project.output'});
   }
-  return $rt_cc_path;
+  return $target_cc_path;
 }
 sub rel_target_hh_path {
   my ($cmd_info) = @_;
-  my $rt_cc_path = &rt_cc_path($cmd_info);
-  my $rel_target_hh_path = $rt_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  my $target_cc_path = &target_cc_path($cmd_info);
+  my $rel_target_hh_path = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
   return $rel_target_hh_path;
 }
 sub loop_cc_from_dk {
@@ -481,22 +481,22 @@ sub loop_cc_from_dk {
     } else {
       $cc_path = "$input_dir/$input_name.$cc_ext";
     }
-    my $rt_json_path = &rt_json_path($cmd_info);
+    my $target_json_path = &target_json_path($cmd_info);
     my $user_dk_path = &user_path_from_any_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
     $$project_io{'all'}{$input}{$user_dk_path} = 1;
-    $$project_io{'all'}{$rt_json_path}{$user_dk_path} = 1;
-    $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
-    $$project_io{'all'}{$rt_json_path}{$cc_path} = 1;
+    $$project_io{'all'}{$target_json_path}{$user_dk_path} = 1;
+    $$project_io{'all'}{$target_json_path}{$hh_path} = 1;
+    $$project_io{'all'}{$target_json_path}{$cc_path} = 1;
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
     &dakota::generate::empty_klass_defns();
     &dakota::generate::dk_generate_cc($input, $user_dk_path, $global_rep);
-    &nrt::add_extra_symbols($file);
-    &nrt::add_extra_klass_decls($file);
-    &nrt::add_extra_keywords($file);
-    &nrt::add_extra_generics($file);
+    &src::add_extra_symbols($file);
+    &src::add_extra_klass_decls($file);
+    &src::add_extra_keywords($file);
+    &src::add_extra_generics($file);
     my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
 
     if (0) {
@@ -598,15 +598,15 @@ sub update_rep_from_all_inputs {
   $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
-  my $rt_json_path = &rt_json_path($cmd_info);
-  &check_path($rt_json_path);
+  my $target_json_path = &target_json_path($cmd_info);
+  &check_path($target_json_path);
   if (&is_debug()) {
-    print STDERR "creating $rt_json_path" . &pann(__FILE__, __LINE__) . $nl;
+    print STDERR "creating $target_json_path" . &pann(__FILE__, __LINE__) . $nl;
   }
   $cmd_info = &loop_rep_from_so($cmd_info);
   $cmd_info = &loop_rep_from_inputs($cmd_info);
-  die if $$cmd_info{'reps'}[-1] ne $rt_json_path; # assert
-  &add_visibility_file($rt_json_path);
+  die if $$cmd_info{'reps'}[-1] ne $target_json_path; # assert
+  &add_visibility_file($target_json_path);
 
   &update_kw_args_generics($$cmd_info{'reps'});
   $$cmd_info{'inputs'} = $$orig{'inputs'};
@@ -616,7 +616,7 @@ sub update_rep_from_all_inputs {
   if (&is_debug()) {
     my $end_time = time;
     my $elapsed_time = $end_time - $start_time;
-    print STDERR "creating $rt_json_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
+    print STDERR "creating $target_json_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
   }
   if ($ENV{'DAKOTA_CREATE_REP_ONLY'}) {
     exit 0;
@@ -628,8 +628,8 @@ sub start_cmd {
   my ($cmd_info) = @_;
   $builddir = &dakota::util::builddir();
   $cmd_info = &update_rep_from_all_inputs($cmd_info);
-  my $rt_json_path = &rt_json_path($cmd_info);
-  &set_global_project_rep($rt_json_path);
+  my $target_json_path = &target_json_path($cmd_info);
+  &set_global_project_rep($target_json_path);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -668,9 +668,9 @@ sub start_cmd {
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'output'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
-      my $rt_cc_path = &rt_cc_path($cmd_info);
+      my $target_cc_path = &target_cc_path($cmd_info);
       if (&is_debug()) {
-        print STDERR "creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
+        print STDERR "creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       }
     } else {
       if (&is_debug()) {
@@ -750,7 +750,7 @@ sub rep_from_so {
 sub loop_rep_from_so {
   my ($cmd_info) = @_;
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-  my $rt_json_path = &rt_json_path($cmd_info);
+  my $target_json_path = &target_json_path($cmd_info);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
       &rep_from_so($cmd_info, $input);
@@ -759,7 +759,7 @@ sub loop_rep_from_so {
       $input = &canon_path($input);
       $$project_io{'all'}{$input}{$ctlg_path} = 1;
       $$project_io{'all'}{$ctlg_path}{$json_path} = 1;
-      $$project_io{'all'}{$json_path}{$rt_json_path} = 1;
+      $$project_io{'all'}{$json_path}{$target_json_path} = 1;
     }
   }
   &scalar_to_file($$cmd_info{'project.io'}, $project_io);
@@ -784,8 +784,8 @@ sub rep_from_inputs {
   my $result = &outfile_from_infiles($rep_cmd, $should_echo = 0);
   if ($result) {
     if (0 != @{$$rep_cmd{'reps'} ||= []}) {
-      my $rt_json_path = &rt_json_path($cmd_info);
-      &project_io_add($cmd_info, $$rep_cmd{'reps'}, $rt_json_path);
+      my $target_json_path = &target_json_path($cmd_info);
+      &project_io_add($cmd_info, $$rep_cmd{'reps'}, $target_json_path);
     }
     foreach my $input (@{$$rep_cmd{'inputs'}}) {
       if (&is_so_path($input)) {
@@ -831,13 +831,13 @@ sub loop_rep_from_inputs {
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
     if (0 != @$rep_files) {
-      my $rt_json_path = &rt_json_path($cmd_info);
-      &check_path($rt_json_path);
-      &ordered_set_add($$cmd_info{'reps'}, $rt_json_path, __FILE__, __LINE__);
+      my $target_json_path = &target_json_path($cmd_info);
+      &check_path($target_json_path);
+      &ordered_set_add($$cmd_info{'reps'}, $target_json_path, __FILE__, __LINE__);
       my $rep_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
-        'output' => $rt_json_path,
+        'output' => $target_json_path,
         'inputs' => $rep_files,
       };
       &rep_from_inputs($rep_cmd); # multiple inputs
@@ -849,22 +849,22 @@ sub gen_target_o {
   my ($cmd_info, $is_exe) = @_;
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
-    my $rt_cc_path = &rt_cc_path($cmd_info);
+    my $target_cc_path = &target_cc_path($cmd_info);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
-      my $rt_dk_path = &dk_path_from_cc_path($rt_cc_path);
-      print $rt_dk_path . $nl;
+      my $target_dk_path = &dk_path_from_cc_path($target_cc_path);
+      print $target_dk_path . $nl;
     }
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print STDERR "  creating $rt_cc_path" . &pann(__FILE__, __LINE__) . $nl;
+        print STDERR "  creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       } else {
         print STDERR "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
       }
     }
   }
-  my $rt_json_path = &rt_json_path($cmd_info);
-  &check_path($rt_json_path);
-  $$cmd_info{'rep'} = $rt_json_path;
+  my $target_json_path = &target_json_path($cmd_info);
+  &check_path($target_json_path);
+  $$cmd_info{'rep'} = $target_json_path;
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
   if ($dk_exe_type) {
@@ -877,7 +877,7 @@ sub gen_target_o {
     $$other{'name'} = $$cmd_info{'output'};
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
-  &rt_o_from_json($cmd_info, $other, $is_exe);
+  &target_o_from_json($cmd_info, $other, $is_exe);
 }
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
@@ -941,11 +941,11 @@ sub o_from_dk {
     $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
-      my $rt_json_path = &rt_json_path($cmd_info);
+      my $target_json_path = &target_json_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      if (!$$project_io{'all'}{$rt_json_path}{$src_path}) {
-        $$project_io{'all'}{$rt_json_path}{$src_path} = 1;
-        $$project_io{'all'}{$rt_json_path}{$hh_path} = 1;
+      if (!$$project_io{'all'}{$target_json_path}{$src_path}) {
+        $$project_io{'all'}{$target_json_path}{$src_path} = 1;
+        $$project_io{'all'}{$target_json_path}{$hh_path} = 1;
         &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
       }
     }
@@ -1062,58 +1062,58 @@ sub o_from_cc {
   }
   return &outfile_from_infiles($o_cmd, $should_echo);
 }
-sub rt_o_from_json {
+sub target_o_from_json {
   my ($cmd_info, $other, $is_exe) = @_;
   die if ! defined $$cmd_info{'reps'} || 0 == @{$$cmd_info{'reps'}};
-  my $rt_json_path = &rt_json_path($cmd_info);
-  my $rt_cc_path =   &rt_cc_path($cmd_info);
-  &check_path($rt_json_path);
-  my $rt_o_path = &o_path_from_cc_path($rt_cc_path);
+  my $target_json_path = &target_json_path($cmd_info);
+  my $target_cc_path =   &target_cc_path($cmd_info);
+  &check_path($target_json_path);
+  my $target_o_path = &o_path_from_cc_path($target_cc_path);
   if (!$$cmd_info{'opts'}{'silent'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
-      #if (&is_out_of_date($input, $rt_cc_path)) {
-        print $rt_cc_path . $nl;
+      #if (&is_out_of_date($input, $target_cc_path)) {
+        print $target_cc_path . $nl;
       #}
     } else {
-      #if (&is_out_of_date($input, $rt_o_path)) {
-        print $rt_o_path . $nl;
+      #if (&is_out_of_date($input, $target_o_path)) {
+        print $target_o_path . $nl;
       #}
     }
   }
-  my $rt_hh_path = $rt_cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
+  my $target_hh_path = $target_cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
 
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-  $$project_io{'all'}{$rt_json_path}{$rt_hh_path} = 1;
-  $$project_io{'all'}{$rt_json_path}{$rt_cc_path} = 1;
-  $$project_io{'all'}{$rt_hh_path}{$rt_o_path} = 1;
-  $$project_io{'all'}{$rt_cc_path}{$rt_o_path} = 1;
+  $$project_io{'all'}{$target_json_path}{$target_hh_path} = 1;
+  $$project_io{'all'}{$target_json_path}{$target_cc_path} = 1;
+  $$project_io{'all'}{$target_hh_path}{$target_o_path} = 1;
+  $$project_io{'all'}{$target_cc_path}{$target_o_path} = 1;
   &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
-  &make_dir_part($rt_cc_path, $global_should_echo);
-  my ($path, $file_basename, $file) = ($rt_cc_path, $rt_cc_path, undef);
+  &make_dir_part($target_cc_path, $global_should_echo);
+  my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
-  my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within rt_o_from_json
-  $file = &scalar_from_file($rt_json_path);
+  my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within target_o_from_json
+  $file = &scalar_from_file($target_json_path);
   die if $$file{'other'};
   $$file{'other'} = $other;
   $file = &kw_args_translate($file);
   $$file{'should-generate-make'} = 1;
 
-  &rt::add_extra_symbols($file);
-  &rt::add_extra_klass_decls($file);
-  &rt::add_extra_keywords($file);
+  &target::add_extra_symbols($file);
+  &target::add_extra_klass_decls($file);
+  &target::add_extra_keywords($file);
 
-  &nrt::add_extra_symbols($file);
-  &nrt::add_extra_klass_decls($file);
-  &nrt::add_extra_keywords($file);
-  &nrt::add_extra_generics($file);
+  &src::add_extra_symbols($file);
+  &src::add_extra_klass_decls($file);
+  &src::add_extra_keywords($file);
+  &src::add_extra_generics($file);
 
   my $project_rep;
-  &dakota::generate::generate_target_decl($rt_cc_path, $file, $project_rep = undef, $is_exe);
-  &dakota::generate::generate_target_defn($rt_cc_path, $file, $project_rep = undef, $is_exe);
+  &dakota::generate::generate_target_decl($target_cc_path, $file, $project_rep = undef, $is_exe);
+  &dakota::generate::generate_target_defn($target_cc_path, $file, $project_rep = undef, $is_exe);
 
-  my $o_info = {'opts' => {}, 'inputs' => [ $rt_cc_path ], 'output' => $rt_o_path };
+  my $o_info = {'opts' => {}, 'inputs' => [ $target_cc_path ], 'output' => $target_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};
   if ($$cmd_info{'opts'}{'precompile'}) {
     $$o_info{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
@@ -1126,7 +1126,7 @@ sub rt_o_from_json {
   }
   if (!$ENV{'DKT_PRECOMPILE'}) {
     &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
-    &add_first($$cmd_info{'inputs'}, $rt_o_path);
+    &add_first($$cmd_info{'inputs'}, $target_o_path);
   }
 }
 sub gcc_libraries_str {

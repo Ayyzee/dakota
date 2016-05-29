@@ -96,14 +96,14 @@ my $patterns = {
   'json_path_from_ctlg_path' => '$(builddir)/%.ctlg.json : $(builddir)/%.ctlg',
 
   # +target also used in dakota.pm
-  'rt_json_path_from_any_path' => '$(builddir)/+target/%.json : %', # _from_exe_path
-  'rt_json_path_from_so_path' =>  '$(builddir)/+target/%.json : %.$(so_ext)',
+  'target_json_path_from_any_path' => '$(builddir)/+target/%.json : %', # _from_exe_path
+  'target_json_path_from_so_path' =>  '$(builddir)/+target/%.json : %.$(so_ext)',
 
   'ctlg_path_from_so_path' =>   '$(builddir)/%.$(so_ext).ctlg : %.$(so_ext)',
 
   # +target also used in dakota.pm
-  'rt_cc_path_from_any_path' => '$(builddir)/+target/%.$(cc_ext) : %', # _from_exe_path
-  'rt_cc_path_from_so_path' =>  '$(builddir)/+target/%.$(cc_ext) : %.$(so_ext)',
+  'target_cc_path_from_any_path' => '$(builddir)/+target/%.$(cc_ext) : %', # _from_exe_path
+  'target_cc_path_from_so_path' =>  '$(builddir)/+target/%.$(cc_ext) : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -166,10 +166,10 @@ our @EXPORT= qw(
                  json_path_from_ctlg_path
                  json_path_from_o_path
                  rep_merge
-                 rt_json_path_from_any_path
-                 rt_json_path_from_so_path
-                 rt_cc_path_from_any_path
-                 rt_cc_path_from_so_path
+                 target_json_path_from_any_path
+                 target_json_path_from_so_path
+                 target_cc_path_from_any_path
+                 target_cc_path_from_so_path
                  str_from_cmd_info
               );
 my $colon = ':'; # key/element delim only
@@ -387,9 +387,9 @@ sub o_path_from_cc_path {
   my ($path) = @_;
   return &out_path_from_in_path('o_path_from_cc_path', $path);
 }
-sub rt_json_path_from_any_path {
+sub target_json_path_from_any_path {
   my ($path) = @_;
-  return &out_path_from_in_path('rt_json_path_from_any_path', $path);
+  return &out_path_from_in_path('target_json_path_from_any_path', $path);
 }
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
@@ -412,25 +412,25 @@ sub json_path_from_dk_path {
   my $out_path = &out_path_from_in_path('json_path_from_dk_path', $in_path);
   return $out_path;
 }
-sub rt_json_path_from_so_path {
+sub target_json_path_from_so_path {
   my ($in_path) = @_;
   $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
   my $vers = $1;
-  my $out_path = &out_path_from_in_path('rt_json_path_from_so_path', $in_path);
+  my $out_path = &out_path_from_in_path('target_json_path_from_so_path', $in_path);
   if (defined $vers) {
     $out_path =~ s/\.$so_ext\.json$/.$so_ext$vers.json/;
   }
   return $out_path;
 }
-sub rt_cc_path_from_any_path {
+sub target_cc_path_from_any_path {
   my ($path) = @_;
-  return &out_path_from_in_path('rt_cc_path_from_any_path', $path);
+  return &out_path_from_in_path('target_cc_path_from_any_path', $path);
 }
-sub rt_cc_path_from_so_path {
+sub target_cc_path_from_so_path {
   my ($in_path) = @_;
   $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
   my $vers = $1;
-  my $out_path = &out_path_from_in_path('rt_cc_path_from_so_path', $in_path);
+  my $out_path = &out_path_from_in_path('target_cc_path_from_so_path', $in_path);
   if (defined $vers) {
     $out_path =~ s/\.$so_ext$/.$so_ext$vers/;
   }
@@ -1719,11 +1719,11 @@ sub add_generics_used {
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
 }
 sub kw_args_generics_add {
-  my ($rt_rep, $method) = @_;
+  my ($target_rep, $method) = @_;
   my ($name, $types) = &kw_args_generics_sig($method);
   my $name_str =  &str_from_seq($name);
   my $types_str = &parameter_types_str($types);
-  $$rt_rep{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
+  $$target_rep{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
 }
 
 # 'methods'

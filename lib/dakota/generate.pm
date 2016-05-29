@@ -216,7 +216,7 @@ sub is_target_defn {
     return 0;
   }
 }
-sub is_nrt {
+sub is_src {
   if (!$global_is_rt) {
     return 1;
   } else {
@@ -298,13 +298,13 @@ sub generate_src_decl {
   my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
   #print "generate_src_decl($path, ...)" . $nl;
   &set_src_decl($path);
-  return &generate_nrt($path, $file, $project_rep, $rel_target_hh_path);
+  return &generate_src($path, $file, $project_rep, $rel_target_hh_path);
 }
 sub generate_src_defn {
   my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
   #print "generate_src_defn($path, ...)" . $nl;
   &set_src_defn($path);
-  return &generate_nrt($path, $file, $project_rep, $rel_target_hh_path);
+  return &generate_src($path, $file, $project_rep, $rel_target_hh_path);
 }
 my $im_suffix_for_suffix = {
   $cc_ext => 'cc.dkt',
@@ -319,7 +319,7 @@ sub pre_output_path_from_any_path {
   my $pre_output = $path =~ s/\.$ext$/.$pre_output_ext/r;
   return $pre_output;
 }
-sub generate_nrt {
+sub generate_src {
   my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
@@ -358,7 +358,7 @@ sub generate_nrt {
   my $remove;
   &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_rep);
   return $output;
-} # sub generate_nrt
+} # sub generate_src
 sub generate_target_decl {
   my ($path, $file, $project_rep, $is_exe) = @_;
   #print "generate_target_decl($path, ...)" . $nl;
@@ -510,37 +510,37 @@ sub generate_decl_defn {
 } # generate_decl_defn
 sub generate_defn_footer {
   my ($file, $generics) = @_;
-  my $rt_cc_str = '';
+  my $target_cc_str = '';
   my $col = '';
   my $keys_count = keys %{$$file{'klasses'}};
   if (0 == $keys_count) {
-    $rt_cc_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
-    $rt_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;" . $nl;
+    $target_cc_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
+    $target_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;" . $nl;
   } else {
-    $rt_cc_str .= $col . "static symbol-t imported-klass-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data" . $nl;
+    $target_cc_str .= $col . "static symbol-t imported-klass-names[] = {" . &ann(__FILE__, __LINE__) . " //ro-data" . $nl;
     $col = &colin($col);
     my $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
-      $rt_cc_str .= $col . "$klass_name\::__klass__," . $nl;
+      $target_cc_str .= $col . "$klass_name\::__klass__," . $nl;
     }
-    $rt_cc_str .= $col . "nullptr" . $nl;
+    $target_cc_str .= $col . "nullptr" . $nl;
     $col = &colout($col);
-    $rt_cc_str .= $col . "};" . $nl;
+    $target_cc_str .= $col . "};" . $nl;
     ###
-    $rt_cc_str .= $col . "static assoc-node-t imported-klass-ptrs[] = {" . &ann(__FILE__, __LINE__) . " //rw-data" . $nl;
+    $target_cc_str .= $col . "static assoc-node-t imported-klass-ptrs[] = {" . &ann(__FILE__, __LINE__) . " //rw-data" . $nl;
     $col = &colin($col);
     $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
-      $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::klass }," . $nl;
+      $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::klass }," . $nl;
     }
-    $rt_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
+    $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
     $col = &colout($col);
-    $rt_cc_str .= $col . "};" . $nl;
-    $rt_cc_str .= &linkage_unit::generate_selectors_seq( $generics);
-    $rt_cc_str .= &linkage_unit::generate_signatures_seq($generics);
-    $rt_cc_str .= &linkage_unit::generate_generic_func_ptrs_seq($generics);
-    $rt_cc_str .= &linkage_unit::generate_strs_seq($file);
-    $rt_cc_str .= &linkage_unit::generate_ints_seq($file);
+    $target_cc_str .= $col . "};" . $nl;
+    $target_cc_str .= &linkage_unit::generate_selectors_seq( $generics);
+    $target_cc_str .= &linkage_unit::generate_signatures_seq($generics);
+    $target_cc_str .= &linkage_unit::generate_generic_func_ptrs_seq($generics);
+    $target_cc_str .= &linkage_unit::generate_strs_seq($file);
+    $target_cc_str .= &linkage_unit::generate_ints_seq($file);
   }
   my $stack = [];
   my $tbl = {
@@ -549,9 +549,9 @@ sub generate_defn_footer {
            };
   &dk_generate_imported_klasses_info($file, $stack, $tbl);
   # the previous call may be useless
-  $rt_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
-  #$rt_cc_str .= $col . "extern \"C\$nl;
-  #$rt_cc_str .= $col . "{" . $nl;
+  $target_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
+  #$target_cc_str .= $col . "extern \"C\$nl;
+  #$target_cc_str .= $col . "{" . $nl;
   #$col = &colin($col);
 
   my $info_tbl = {
@@ -581,46 +581,46 @@ sub generate_defn_footer {
     $$info_tbl{"\#int-names"} =    '__int-names';
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
   }
-  $rt_cc_str .= $nl;
-  $rt_cc_str .= "# include <unistd.h>" . $nl;
-  $rt_cc_str .= $nl;
-  $rt_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
-  $rt_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $rt_cc_str .= "[[read-only]] static symbol-t name = \"$$file{'other'}{'name'}\";" . $nl;
-  $rt_cc_str .= $nl;
+  $target_cc_str .= $nl;
+  $target_cc_str .= "# include <unistd.h>" . $nl;
+  $target_cc_str .= $nl;
+  $target_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
+  $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t name = \"$$file{'other'}{'name'}\";" . $nl;
+  $target_cc_str .= $nl;
   #my $col;
-  $rt_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
+  $target_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 
-  $rt_cc_str .= $nl;
-  $rt_cc_str .= $col . "static func __initial() -> void {" . &ann(__FILE__, __LINE__) . $nl;
+  $target_cc_str .= $nl;
+  $target_cc_str .= $col . "static func __initial() -> void {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
-  $rt_cc_str .=
+  $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
     $col . "dkt-register-info(&reg-info);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
-  $rt_cc_str .= $col . "}" . $nl;
-  $rt_cc_str .= $col . "static func __final() -> void {" . &ann(__FILE__, __LINE__) . $nl;
+  $target_cc_str .= $col . "}" . $nl;
+  $target_cc_str .= $col . "static func __final() -> void {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
-  $rt_cc_str .=
+  $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
     $col . "dkt-deregister-info(&reg-info);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
-  $rt_cc_str .= $col . "}" . $nl;
+  $target_cc_str .= $col . "}" . $nl;
   #$col = &colout($col);
-  #$rt_cc_str .= $col . "};" . $nl;
+  #$target_cc_str .= $col . "};" . $nl;
 
-  $rt_cc_str .=
+  $target_cc_str .=
     $col . "namespace { struct [[gnu::visibility(\"hidden\")]] __ddl_t {" . &ann(__FILE__, __LINE__) . $nl .
     $col . "  __ddl_t(const __ddl_t&) = default;" . $nl .
     $col . "  __ddl_t()  { __initial(); }" . $nl .
     $col . "  ~__ddl_t() { __final();   }" . $nl .
     $col . "};}" . $nl .
     $col . "static __ddl_t __ddl = __ddl_t();" . $nl;
-  return $rt_cc_str;
+  return $target_cc_str;
 }
 sub path::add_last {
   my ($stack, $part) = @_;

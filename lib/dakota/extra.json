@@ -5,8 +5,8 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
- #'rt_extra_generics' => {},
-  'nrt_extra_generics' => {
+ #'target_extra_generics' => {},
+  'src_extra_generics' => {
     'alloc' => undef,
     'forward-iterator' => undef,
     'init' => undef,
@@ -15,7 +15,7 @@
     'klass-with-trait' => undef,
     'next' => undef,
   },
-  'nrt_extra_keywords' => {
+  'src_extra_keywords' => {
     '#keyword' => undef,       # kw-args processing funcs (throw)
     '#object' => undef,        # kw-args processing funcs (throw)
     '#objects' => undef,         # implied when using some literal constructs
@@ -26,11 +26,11 @@
     '#src-file' => undef,
     '#src-line' => undef,
   },
-  'rt_extra_keywords' => {
+  'target_extra_keywords' => {
     '#message' => undef,
     '#symbol' => undef,
   },
-  'nrt_extra_klass_decls' => {
+  'src_extra_klass_decls' => {
     'boole' => undef,
     'char8' => undef,
     'generic-func' => undef,
@@ -59,7 +59,7 @@
     'uchar8' => undef,
     'uintptr' => undef,
   },
-  'rt_extra_klass_decls' => {
+  'target_extra_klass_decls' => {
     'assoc-node' => undef,
     'exe-type' => undef,
     'method-alias' => undef,
@@ -67,9 +67,9 @@
     'selector-node' => undef,
     'var-args-method' => undef,
   },
-  'nrt_extra_symbols' => {
+  'src_extra_symbols' => {
   },
-  'rt_extra_symbols' => {
+  'target_extra_symbols' => {
     '#behavior-exported?' => undef,
     '#boole-t' => undef, # hardcode typealias
     '#cat' => undef,
