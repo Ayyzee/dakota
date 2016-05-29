@@ -111,6 +111,7 @@ our @EXPORT= qw(
                  set_global_project
                  global_project_rep
                  set_global_project_rep
+                 use_abs_path
               );
 use Cwd;
 use File::Spec;
@@ -638,9 +639,14 @@ sub flatten {
     my $a = [map {@$_} @$a_of_a];
     return $a;
 }
+sub use_abs_path {
+  return 1;
+}
 # found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
 sub longest_common_prefix {
-  return '/';
+  if (&use_abs_path()) {
+    return '/';
+  }
   my $path_prefix = shift;
   for (@_) {
     chop $path_prefix while (! /^$path_prefix/);
@@ -656,7 +662,10 @@ sub rel_path_canon {
       $cwd = &cwd();
     }
 
-    my $path2 = &Cwd::abs_path($path1);
+    my $path2 = $path1;
+    if (&use_abs_path()) {
+      $path2 = &Cwd::abs_path($path2);
+    }
     Carp::confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
     my $common_prefix = &longest_common_prefix($cwd, $path2);
     my $adj_common_prefix = $common_prefix;
