@@ -307,9 +307,8 @@ sub generate_nrt_defn {
   return &generate_nrt($path, $file, $project_rep, $rel_rt_hh_path);
 }
 my $im_suffix_for_suffix = {
-  'dk' =>    'dk.kt',
-  $cc_ext => 'cc.kt',
-  $hh_ext => 'hh.kt',
+  $cc_ext => 'cc.dkt',
+  $hh_ext => 'hh.dkt',
 };
 sub pre_output_path_from_any_path {
   my ($path) = @_;
@@ -325,7 +324,7 @@ sub generate_nrt {
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
   my $rt = '+user';
-  my $rel_user_dk_path = $rt . '/' . $name . '.dk';
+  my $rel_user_cc_path = $rt . '/' . $name . '.' . $cc_ext;
   #my $user_dir = $dir . '/' . $rt;
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
@@ -349,7 +348,7 @@ sub generate_nrt {
       "# include \"$rel_hh_path\"" . $nl .
       "# endif" . $nl .
       $nl .
-      "# include \"$rel_user_dk_path\"" . $nl . # user-code (converted from dk to cc)
+      "# include \"$rel_user_cc_path\"" . $nl . # user-code (converted from dk to cc)
       $nl .
       &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
   }
@@ -4274,7 +4273,7 @@ sub dk_generate_cc {
   my ($file, $path_name, $project_rep) = @_;
   my ($dir, $file_basename) = &split_path($file);
   my $filestr = &dakota::util::filestr_from_file($file);
-  my $output = $path_name;
+  my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output
