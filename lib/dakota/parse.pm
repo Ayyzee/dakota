@@ -95,15 +95,15 @@ my $patterns = {
   'json_path_from_dk_path' =>   '$(builddir)/%.json      : %.dk',
   'json_path_from_ctlg_path' => '$(builddir)/%.ctlg.json : $(builddir)/%.ctlg',
 
-  # +rt also used in dakota.pm
-  'rt_json_path_from_any_path' => '$(builddir)/+rt/%.json : %', # _from_exe_path
-  'rt_json_path_from_so_path' =>  '$(builddir)/+rt/%.json : %.$(so_ext)',
+  # +target also used in dakota.pm
+  'rt_json_path_from_any_path' => '$(builddir)/+target/%.json : %', # _from_exe_path
+  'rt_json_path_from_so_path' =>  '$(builddir)/+target/%.json : %.$(so_ext)',
 
   'ctlg_path_from_so_path' =>   '$(builddir)/%.$(so_ext).ctlg : %.$(so_ext)',
 
-  # +rt also used in dakota.pm
-  'rt_cc_path_from_any_path' => '$(builddir)/+rt/%.$(cc_ext) : %', # _from_exe_path
-  'rt_cc_path_from_so_path' =>  '$(builddir)/+rt/%.$(cc_ext) : %.$(so_ext)',
+  # +target also used in dakota.pm
+  'rt_cc_path_from_any_path' => '$(builddir)/+target/%.$(cc_ext) : %', # _from_exe_path
+  'rt_cc_path_from_so_path' =>  '$(builddir)/+target/%.$(cc_ext) : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -376,7 +376,7 @@ sub str_from_cmd_info {
 sub user_path_from_any_path {
   my ($path) = @_;
   my ($dir, $name) = &split_path($path);
-  my $user_path = &builddir() . '/' . $dir . '/+user/'. $name;
+  my $user_path = &builddir() . '/' . $dir . '/+srcs/'. $name;
   return $user_path;
 }
 sub o_path_from_dk_path {

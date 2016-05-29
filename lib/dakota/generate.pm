@@ -323,7 +323,7 @@ sub generate_nrt {
   my ($path, $file, $project_rep, $rel_rt_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
-  my $rt = '+user';
+  my $rt = '+srcs';
   my $rel_user_cc_path = $rt . '/' . $name . '.' . $cc_ext;
   #my $user_dir = $dir . '/' . $rt;
   my ($generics, $symbols) = &generics::parse($file);
