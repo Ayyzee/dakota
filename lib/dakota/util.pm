@@ -449,7 +449,7 @@ sub make_dir_part {
   }
 }
 my $build_vars = {
-  'builddir' => 'build',
+  'builddir' => 'dkt',
 };
 sub builddir {
   my $builddir;
