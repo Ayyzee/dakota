@@ -42,7 +42,7 @@ single: $(inputs) | libdakota.project
 
 check-exe: all
 	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
-	echo '{ "builddir" => "exe-build", "inputs" => [ "exe.dk", "../lib/libdakota.dylib" ], "output" => "exe" }' > exe.project
+	echo '{ "builddir" => "dkt", "inputs" => [ "exe.dk", "../lib/libdakota.dylib" ], "output" => "exe" }' > exe.project
 	rm -f exe
 	$(DAKOTA-BASE) exe.dk
 	./exe
