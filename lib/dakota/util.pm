@@ -640,7 +640,7 @@ sub flatten {
     return $a;
 }
 sub use_abs_path {
-  return 1;
+  return 0;
 }
 # found at http://linux.seindal.dk/2005/09/09/longest-common-prefix-in-perl
 sub longest_common_prefix {
