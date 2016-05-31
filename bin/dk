@@ -57,7 +57,8 @@ sub path_opt {
 }
 sub cc_from_dk {
   my ($path) = @_;
-  $path =~ s=^(.+\.dk)$=build/$1.cc=;
+  my $builddir = 'dkt';
+  $path =~ s=^(.+\.dk)$=$builddir/$1.cc=;
   return $path;
 }
 sub bname {

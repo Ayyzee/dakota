@@ -9,4 +9,4 @@ all:
 
 clean:
 	$(RM) $(RMFLAGS) char-is-signed stderr.txt summary.txt
-	$(RM) $(RMFLAGS) ../build
+	$(RM) $(RMFLAGS) ../$(BUILDDIR)

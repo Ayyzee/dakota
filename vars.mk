@@ -6,7 +6,7 @@ rootdir ?= .
 include $(rootdir)/makeflags.mk
 
 srcdir ?= .
-BUILDDIR ?= ../build
+BUILDDIR ?= ../dkt
 
 prefix ?= /usr/local
 
