@@ -44,6 +44,7 @@ goal-clean:
 clean: goal-clean
 	if [[ -e libdakota-core.project ]]; then $(DAKOTA-BASE) --clean --project libdakota-core.project; fi
 	$(RM) $(RMFLAGS) $(output).$(cxx_debug_symbols_ext)
+	$(RM) $(RMFLAGS) $(BUILDDIR)
 
 distclean: clean
 	cd $(rootdir); ./configure-common
