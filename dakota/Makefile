@@ -6,7 +6,7 @@ export DKT_EXCLUDE_LIBS = 2
 
 include $(rootdir)/common.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota.mk $(srcdir)/libdakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/dakota.mk $(srcdir)/dakota.build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -32,13 +32,13 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  single\
  uninstall\
 
-single: $(srcs) | libdakota.project
+single: $(srcs) | dakota.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota.project --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project
+	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota.project
 
 check-exe: all
 	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
@@ -59,8 +59,8 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	if [[ -e libdakota.project ]]; then $(DAKOTA-BASE) --clean --project libdakota.project; fi
-	$(RM) $(RMFLAGS) libdakota.project
+	if [[ -e dakota.project ]]; then $(DAKOTA-BASE) --clean --project dakota.project; fi
+	$(RM) $(RMFLAGS) dakota.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(BUILDDIR)
 

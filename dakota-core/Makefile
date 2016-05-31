@@ -6,7 +6,7 @@ export DKT_EXCLUDE_LIBS = 1
 
 include $(rootdir)/common.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/libdakota-core.mk $(srcdir)/libdakota-core.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/dakota-core.mk $(srcdir)/dakota-core.build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -34,13 +34,13 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
-single: $(srcs) | libdakota-core.project
+single: $(srcs) | dakota-core.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota-core.project --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota-core.project
+	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota-core.project
 check-exe: all
 	echo "func main() -> int-t { klass sorted-table; object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "target" => "exe" }' > exe.project
@@ -60,8 +60,8 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	if [[ -e libdakota-core.project ]]; then $(DAKOTA-BASE) --clean --project libdakota-core.project; fi
-	$(RM) $(RMFLAGS) libdakota-core.project
+	if [[ -e dakota-core.project ]]; then $(DAKOTA-BASE) --clean --project dakota-core.project; fi
+	$(RM) $(RMFLAGS) dakota-core.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(BUILDDIR)

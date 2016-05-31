@@ -15,6 +15,7 @@
       '$(srcdir)/const-info.dk',
       '$(srcdir)/core.dk',
       '$(srcdir)/counted-set.dk',
+      '$(srcdir)/dakota-core.dk',
       '$(srcdir)/deque.dk',
       '$(srcdir)/dl.dk',
       '$(srcdir)/enum-info.dk',
@@ -30,7 +31,6 @@
       '$(srcdir)/keyword-exception.dk',
       '$(srcdir)/keyword.dk',
       '$(srcdir)/klass.dk',
-      '$(srcdir)/libdakota-core.dk',
       '$(srcdir)/method-alias.dk',
       '$(srcdir)/method.dk',
       '$(srcdir)/missing-keyword-exception.dk',
@@ -91,7 +91,7 @@
       'DKT_WORKAROUND',
       'HAVE_CONFIG_HH',
     ],
-    'project' => '$(srcdir)/libdakota-core.project', # cmd-line
+    'project' => '$(srcdir)/dakota-core.project', # cmd-line
     'target' => '../lib/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line

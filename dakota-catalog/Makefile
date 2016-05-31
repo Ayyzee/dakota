@@ -42,7 +42,7 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	if [[ -e libdakota-core.project ]]; then $(DAKOTA-BASE) --clean --project libdakota-core.project; fi
+	if [[ -e dakota-core.project ]]; then $(DAKOTA-BASE) --clean --project dakota-core.project; fi
 	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(BUILDDIR)
 

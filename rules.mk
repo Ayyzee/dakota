@@ -10,7 +10,7 @@
 ../bin/%: | %.project
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --output $@ $(libs:%=--library %) $?
 
-../lib/%.$(so_ext): | %.project
+../lib/lib%.$(so_ext): | %.project
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --soname $(soname) --output $@ $(libs:%=--library %) $?
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: ../lib/dakota/%.json
