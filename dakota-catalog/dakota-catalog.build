@@ -5,7 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-    'inputs' => [ # cmd-line
+    'srcs' => [ # cmd-line
       '$(srcdir)/dakota-catalog.$(cc_ext)',
     ],
     'libs' => [ # cmd-line
@@ -15,7 +15,7 @@
       '$(srcdir)',
       '$(srcdir)/../include',
     ],
-    'output' => '../bin/dakota-catalog', # cmd-line
+    'target' => '../bin/dakota-catalog', # cmd-line
     'install' => {
       '-rules' => [
         '$(DESTDIR)$(prefix)/bin/%', '../bin/%',

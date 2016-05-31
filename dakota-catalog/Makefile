@@ -27,11 +27,11 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  uninstall\
 
 check-exe: all
-	$(output) libdl.$(so_ext)
+	$(target) libdl.$(so_ext)
 
 check: all
-	if [[ -e $(rootdir)/lib/libdakota-core.$(so_ext) ]]; then $(output) $(rootdir)/lib/libdakota-core.$(so_ext); fi
-	if [[ -e $(rootdir)/lib/libdakota.$(so_ext) ]]; then $(output) $(rootdir)/lib/libdakota.$(so_ext); fi
+	if [[ -e $(rootdir)/lib/libdakota-core.$(so_ext) ]]; then $(target) $(rootdir)/lib/libdakota-core.$(so_ext); fi
+	if [[ -e $(rootdir)/lib/libdakota.$(so_ext) ]]; then $(target) $(rootdir)/lib/libdakota.$(so_ext); fi
 	$(MAKE) $(MAKEFLAGS) check-exe
 
 installcheck: check install
@@ -39,11 +39,11 @@ installcheck: check install
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
-	$(RM) $(RMFLAGS) $(output-files)
+	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
 	if [[ -e libdakota-core.project ]]; then $(DAKOTA-BASE) --clean --project libdakota-core.project; fi
-	$(RM) $(RMFLAGS) $(output).$(cxx_debug_symbols_ext)
+	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext)
 	$(RM) $(RMFLAGS) $(BUILDDIR)
 
 distclean: clean

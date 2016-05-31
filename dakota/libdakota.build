@@ -5,7 +5,7 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-    'inputs' => [ # cmd-line
+    'srcs' => [ # cmd-line
       '$(srcdir)/libdakota.dk',
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',
@@ -42,7 +42,7 @@
       'HAVE_CONFIG_HH',
     ],
     'project' => '$(srcdir)/libdakota.project', # cmd-line
-    'output' => '../lib/libdakota.$(so_ext)', # cmd-line
+    'target' => '../lib/libdakota.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
     'soname' => '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)', # cmd-line

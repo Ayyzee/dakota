@@ -231,7 +231,7 @@ sub start {
       if (1 == scalar @$keys) {
         my $key = $$keys[0];
 
-        if (&is_tbl($$data{$key}) && exists $$data{$key}{'inputs'} && exists $$data{$key}{'output'}) { # min requirements
+        if (&is_tbl($$data{$key}) && (exists $$data{$key}{'inputs'} || exists $$data{$key}{'srcs'}) && exists $$data{$key}{'target'}) { # min requirements
           $$opts{'prefix'} = $key;
           $data = $$data{$key};
         }
@@ -268,7 +268,7 @@ sub install_bnames {
 sub tsv_install{
   my ($data, $key, $prefix) = @_;
   my $result = '';
-  #my $output = &lhs(['output'], $prefix);
+  #my $output = &lhs(['target'], $prefix);
   my $install_elements = $$data{'install'}{$key};
 
   for (my $i = 0; $i < @$install_elements; $i++) {
@@ -290,11 +290,11 @@ sub tsv {
   #print STDERR &Dumper($out);
   my $prefix = &prefix($opts);
   my $result = '';
-  my $output = &lhs(['output'], $prefix);
+  my $output = &lhs(['target'], $prefix);
 
-  if ($$data{'output'}) {
+  if ($$data{'target'}) {
     $result .= "\n";
-    $result .= 'output-files' . ' += ' . "\$($output)"  . "\n";
+    $result .= 'target-files' . ' += ' . "\$($output)"  . "\n";
 
     if ($prefix) {
       $result .= "\n";
@@ -316,13 +316,13 @@ sub tsv {
       }
     }
   }
-  if ($$data{'output'}) {
+  if ($$data{'target'}) {
     $result .= "\n";
     $result .= 'all' . $pair_sep . "\$($output)" . "\n"; # must be first target
     $result .= "\n";
     $result .= "\$($output)" . ' :';
 
-    for my $name ('inputs') {
+    for my $name ('srcs') {
       my $var = &lhs([$name], $prefix);
       $result .= ' ' . "\$($var)";
     }

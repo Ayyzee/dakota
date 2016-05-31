@@ -6,7 +6,7 @@
 # -*- cperl-tab-always-indent: t -*-
 
 {
-    'inputs' => [ # cmd-line
+    'srcs' => [ # cmd-line
       '$(srcdir)/autorelease-pool.dk',
       '$(srcdir)/bit-vector.dk',
       '$(srcdir)/boole.dk',
@@ -92,7 +92,7 @@
       'HAVE_CONFIG_HH',
     ],
     'project' => '$(srcdir)/libdakota-core.project', # cmd-line
-    'output' => '../lib/libdakota-core.$(so_ext)', # cmd-line
+    'target' => '../lib/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line
     'soname' => '$(DESTDIR)$(prefix)/lib/libdakota-core.$(so_ext)', # cmd-line

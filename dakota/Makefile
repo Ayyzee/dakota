@@ -32,8 +32,8 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  single\
  uninstall\
 
-single: $(inputs) | libdakota.project
-	for input in $(inputs); do\
+single: $(srcs) | libdakota.project
+	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project libdakota.project --output $(builddir)/$$input.o $$input;\
     fi\
@@ -48,7 +48,7 @@ check-exe: all
 	./exe
 
 check: all
-	../bin/dakota-catalog --silent $(output)
+	../bin/dakota-catalog --silent $(target)
 	$(MAKE) $(MAKEFLAGS) check-exe
 
 installcheck: check install
@@ -56,7 +56,7 @@ installcheck: check install
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
-	$(RM) $(RMFLAGS) $(output-files)
+	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
 	if [[ -e libdakota.project ]]; then $(DAKOTA-BASE) --clean --project libdakota.project; fi
