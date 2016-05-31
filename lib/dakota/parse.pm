@@ -93,7 +93,7 @@ my $patterns = {
   'o_path_from_cc_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(builddir)/%.$(cc_ext)',
 
   'json_path_from_dk_path' =>   '$(builddir)/%.json      : %.dk',
-  'json_path_from_ctlg_path' => '%.ctlg.json : %.ctlg',
+  'json_path_from_ctlg_path' => '$(builddir)/%.ctlg.json : $(builddir)/%.ctlg',
 
   # +target also used in dakota.pm
   'target_json_path_from_any_path' => '$(builddir)/+target/%.json : %', # _from_exe_path
@@ -405,7 +405,7 @@ sub json_path_from_ctlg_path {
   my ($in_path) = @_;
   my $out_path = &out_path_from_in_path('json_path_from_ctlg_path', $in_path);
   return $out_path;
- }
+}
 sub json_path_from_dk_path {
   my ($in_path) = @_;
   if (&use_abs_path()) {

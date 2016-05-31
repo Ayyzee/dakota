@@ -62,6 +62,7 @@ clean: goal-clean
 	if [[ -e libdakota.project ]]; then $(DAKOTA-BASE) --clean --project libdakota.project; fi
 	$(RM) $(RMFLAGS) libdakota.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
+	$(RM) $(RMFLAGS) dkt
 
 distclean: clean
 	cd $(rootdir); ./configure-common
