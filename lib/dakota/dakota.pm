@@ -405,20 +405,20 @@ sub sig1 {
 sub target_json_path {
   my ($cmd_info) = @_;
   my $target_json_path;
-  if (&is_so_path($$cmd_info{'project.output'})) {
-    $target_json_path = &target_json_path_from_so_path($$cmd_info{'project.output'}); # should be from_so_path
+  if (&is_so_path($$cmd_info{'project.target'})) {
+    $target_json_path = &target_json_path_from_so_path($$cmd_info{'project.target'}); # should be from_so_path
   } else {
-    $target_json_path = &target_json_path_from_any_path($$cmd_info{'project.output'}); # _from_exe_path
+    $target_json_path = &target_json_path_from_any_path($$cmd_info{'project.target'}); # _from_exe_path
   }
   return $target_json_path;
 }
 sub target_cc_path {
   my ($cmd_info) = @_;
   my $target_cc_path;
-  if (&is_so_path($$cmd_info{'project.output'})) {
-    $target_cc_path = &target_cc_path_from_so_path($$cmd_info{'project.output'});
+  if (&is_so_path($$cmd_info{'project.target'})) {
+    $target_cc_path = &target_cc_path_from_so_path($$cmd_info{'project.target'});
   } else {
-    $target_cc_path = &target_cc_path_from_any_path($$cmd_info{'project.output'});
+    $target_cc_path = &target_cc_path_from_any_path($$cmd_info{'project.target'});
   }
   return $target_cc_path;
 }
@@ -594,7 +594,7 @@ sub update_rep_from_all_inputs {
                'opts' =>   &deep_copy($$cmd_info{'opts'}),
              };
   $$cmd_info{'inputs'} = $$cmd_info{'project.inputs'},
-  $$cmd_info{'output'} = $$cmd_info{'project.output'},
+  $$cmd_info{'output'} = $$cmd_info{'project.target'},
   $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
@@ -778,7 +778,7 @@ sub rep_from_inputs {
     'output' =>      $$cmd_info{'output'},
     'inputs' =>      $$cmd_info{'inputs'},
     'project.io' =>  $$cmd_info{'project.io'},
-    'project.output' =>  $$cmd_info{'project.output'},
+    'project.target' =>  $$cmd_info{'project.target'},
   };
   my $should_echo;
   my $result = &outfile_from_infiles($rep_cmd, $should_echo = 0);
@@ -938,7 +938,7 @@ sub o_from_dk {
     $$cc_cmd{'output'} = $src_path;
     $$cc_cmd{'reps'} = $$cmd_info{'reps'};
     $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
-    $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
+    $$cc_cmd{'project.target'} = $$cmd_info{'project.target'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_json_path = &target_json_path($cmd_info);
@@ -1006,7 +1006,7 @@ sub cc_from_dk {
   my ($cmd_info) = @_;
   my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$cc_cmd{'project.output'} = $$cmd_info{'project.output'};
+  $$cc_cmd{'project.target'} = $$cmd_info{'project.target'};
   $$cc_cmd{'cmd'} = '&loop_cc_from_dk';
   $$cc_cmd{'reps'} = $$cmd_info{'reps'};
   $$cc_cmd{'output'} = $$cmd_info{'output'};
@@ -1046,7 +1046,7 @@ sub o_from_cc {
   close($fh2);
   my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  $$o_cmd{'project.output'} = $$cmd_info{'project.output'};
+  $$o_cmd{'project.target'} = $$cmd_info{'project.target'};
   $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
   $$o_cmd{'cmd-flags'} = '@' . $opts_path;
   $$o_cmd{'output'} = $$cmd_info{'output'};
@@ -1172,7 +1172,7 @@ sub linked_output_from_o {
   $$cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
   $$cmd{'cmd-flags'} = '@' . $opts_path;
   $$cmd{'output'} = $$cmd_info{'output'};
-  $$cmd{'project.output'} = $$cmd_info{'project.output'};
+  $$cmd{'project.target'} = $$cmd_info{'project.target'};
   $$cmd{'inputs'} =     $$cmd_info{'inputs'};
   $$cmd{'inputs-tbl'} = $$cmd_info{'inputs-tbl'};
   &library_names_add_first($cmd);
@@ -1297,7 +1297,7 @@ sub ctlg_from_so {
     $$ctlg_cmd{'cmd'} .= ' --silent';
   }
   $$ctlg_cmd{'output'} = $$cmd_info{'output'};
-  $$ctlg_cmd{'project.output'} = $$cmd_info{'project.output'};
+  $$ctlg_cmd{'project.target'} = $$cmd_info{'project.target'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
 
   if ($ENV{'DKT_PRECOMPILE'}) {

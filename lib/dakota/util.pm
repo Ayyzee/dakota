@@ -885,14 +885,7 @@ sub scalar_to_file {
   open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   flock FILE, 2; # LOCK_EX
   truncate FILE, 0;
-  print FILE
-    '# -*- mode: cperl -*-' . $nl .
-    '# -*- cperl-close-paren-offset: -2 -*-' . $nl .
-    '# -*- cperl-continued-statement-offset: 2 -*-' . $nl .
-    '# -*- cperl-indent-level: 2 -*-' . $nl .
-    '# -*- cperl-indent-parens-as-block: t -*-' . $nl .
-    '# -*- cperl-tab-always-indent: t -*-' . $nl .
-    $nl;
+  print FILE '# -*- mode: perl -*-' . $nl;
   print FILE $refstr;
   close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
 }

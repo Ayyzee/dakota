@@ -24,12 +24,7 @@ my $nl = "\n";
 my $default_build_file = 'exe.build';
 my $opts = { 'var' => {} };
 my $rep_hdr =
-  '# -*- mode: cperl -*-' . $nl .
-  '# -*- cperl-close-paren-offset: -2 -*-' . $nl .
-  '# -*- cperl-continued-statement-offset: 2 -*-' . $nl .
-  '# -*- cperl-indent-level: 2 -*-' . $nl .
-  '# -*- cperl-indent-parens-as-block: t -*-' . $nl .
-  '# -*- cperl-tab-always-indent: t -*-' . $nl;
+  '# -*- mode: perl -*-' . $nl;
 my $subcmd_tbl = {
   'add' =>          \&subcmd_add,
   'libs' =>         \&subcmd_libs,

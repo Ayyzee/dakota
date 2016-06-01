@@ -233,7 +233,7 @@ $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
 # dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
 
 if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-  $$root_cmd{'opts'}{'output'} = &canon_path(&default_output($root_cmd, $$root_cmd{'inputs'}));
+  $$root_cmd{'opts'}{'output'} = &canon_path(&default_target($root_cmd, $$root_cmd{'inputs'}));
 }
 if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
@@ -286,20 +286,20 @@ sub create_missing_project {
   if (0 == scalar @$inputs) {
     die "error: missing both --project <file> and input files; at least one is required.";
   }
-  $project = { 'output' => undef, 'inputs' => [],
+  $project = { 'target' => undef, 'inputs' => [],
                'builddir' => &builddir() };
   my $project_base;
   my $project_path;
 
   if ($$root_cmd{'opts'}{'output'}) {
-    $$project{'output'} = $$root_cmd{'opts'}{'output'};
-    $project_base = $$project{'output'} =~ s/\.$so_ext$//r; # remove ext if present
+    $$project{'target'} = $$root_cmd{'opts'}{'output'};
+    $project_base = $$project{'target'} =~ s/\.$so_ext$//r; # remove ext if present
   } else {
     $project_base = &project_base($inputs);
     if ($$root_cmd{'opts'}{'dynamic'} || $$root_cmd{'opts'}{'shared'}) {
-      $$project{'output'} = $project_base . ".$so_ext";
+      $$project{'target'} = $project_base . ".$so_ext";
     } else {
-      $$project{'output'} = $project_base;
+      $$project{'target'} = $project_base;
     }
   }
   $project_path =   $project_base . '.project';
@@ -350,11 +350,11 @@ sub use_project {
   if (! $$project{'inputs'} && $$project{'srcs'}) {
     $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'libs'} ||= []} ];
   }
-  if (! $$project{'output'}) {
+  if (! $$project{'target'}) {
     if ($$project{'target'}) {
-      $$project{'output'} = $$project{'target'};
+      $$project{'target'} = $$project{'target'};
     } else {
-      $$project{'output'} = &canon_path(&default_output($root_cmd, $$project{'inputs'}));
+      $$project{'target'} = &canon_path(&default_target($root_cmd, $$project{'inputs'}));
     }
   }
   if (0 == $dkt_exclude_libs || $libdakota_core_bit < $dkt_exclude_libs) {
@@ -367,14 +367,14 @@ sub use_project {
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};
-  $$root_cmd{'project.output'} = $$project{'output'};
+  $$root_cmd{'project.target'} = $$project{'target'};
   $$root_cmd{'project.io'} = $$project{'builddir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
   $project_io_path = $$root_cmd{'project.io'};
   my $original_state;
   if (! -e $project_io_path) {
     # dk2json : $foo{'dk'}{$dk_path}{'json'}{$json_path}
     my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},
-                               'output' => &canon_path($$project{'output'}), 'builddir' => undef };
+                               'target' => &canon_path($$project{'target'}), 'builddir' => undef };
     &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);
   }
   $project_io = &scalar_from_file($project_io_path);
@@ -413,11 +413,11 @@ sub project_clean {
     unlink $path;
   }
 }
-sub default_output {
+sub default_target {
   my ($root_cmd, $inputs) = @_;
   my $output;
-  if ($$root_cmd{'project.output'}) {
-    $output = $$root_cmd{'project.output'};
+  if ($$root_cmd{'project.target'}) {
+    $output = $$root_cmd{'project.target'};
   } else {
     $output = &project_base($inputs);
     if ($$root_cmd{'opts'}{'shared'}) {
