@@ -348,7 +348,10 @@ sub use_project {
     &make_dir($$project{'builddir'});
   }
   if (! $$project{'inputs'} && $$project{'srcs'}) {
-    $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'libs'} ||= []} ];
+    $$project{'inputs'} = [ @{$$project{'srcs'}} ];
+  }
+  if ($$project{'libs'}) {
+    $$project{'inputs'} = [ @{$$project{'inputs'}}, @{$$project{'libs'}} ];
   }
   if (! $$project{'target'}) {
     if ($$project{'target'}) {
