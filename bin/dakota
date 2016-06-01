@@ -233,7 +233,7 @@ $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
 # dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
 
 if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-  $$root_cmd{'opts'}{'output'} = &canon_path(&default_output($root_cmd));
+  $$root_cmd{'opts'}{'output'} = &canon_path(&default_output($root_cmd, $$root_cmd{'inputs'}));
 }
 if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
@@ -350,8 +350,12 @@ sub use_project {
   if (! $$project{'inputs'} && $$project{'srcs'}) {
     $$project{'inputs'} = [ @{$$project{'srcs'}}, @{$$project{'libs'} ||= []} ];
   }
-  if (! $$project{'output'} && $$project{'target'}) {
-    $$project{'output'} = $$project{'target'};
+  if (! $$project{'output'}) {
+    if ($$project{'target'}) {
+      $$project{'output'} = $$project{'target'};
+    } else {
+      $$project{'output'} = &canon_path(&default_output($root_cmd, $$project{'inputs'}));
+    }
   }
   if (0 == $dkt_exclude_libs || $libdakota_core_bit < $dkt_exclude_libs) {
     &add_last($$root_cmd{'inputs'}, $libdakota_core);
