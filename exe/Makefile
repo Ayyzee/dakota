@@ -2,7 +2,7 @@ rootdir := ..
 
 DAKOTA-BASE := $(rootdir)/bin/dakota
 RM := rm
-RMFLAGS := -rf
+RMFLAGS := -fr
 
 .PRECIOUS: %.dk %.project
 
@@ -10,7 +10,6 @@ RMFLAGS := -rf
  all\
  check\
  clean\
- target\
 
 target := exe
 target.project := $(target).project
@@ -18,8 +17,8 @@ target.project := $(target).project
 all: $(target)
 
 $(target):
-	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > $(target).dk
-	$(DAKOTA-BASE) --create-project --output $(target) $(target).dk
+	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > $(target).dk
+	$(DAKOTA-BASE) --create-project $(target.project) --output $(target) $(target).dk
 	$(DAKOTA-BASE) --project $(target.project) $(target).dk
 
 check: all

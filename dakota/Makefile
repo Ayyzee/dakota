@@ -41,7 +41,7 @@ single: $(srcs) | dakota.project
 	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota.project
 
 check-exe: all
-	echo "func main() -> int-t { klass hashed-table; object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
+	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "srcs" => [ "exe.dk" ] }' > exe.project
 	rm -f exe
 	DKT_EXCLUDE_LIBS=0 $(DAKOTA-BASE) exe.dk

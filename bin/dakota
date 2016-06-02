@@ -99,6 +99,7 @@ my $root_cmd = { 'reps' => [],
             'project=s',
             'shared',               # gcc-like
 
+            'create-project=s',
             'clean',                # make target like
             'define-macro=s',       # gcc-like
             'directory=s',          # make-like
@@ -147,6 +148,10 @@ my $project;
 my $project_io;
 my $project_io_path;
 
+if ($$root_cmd{'opts'}{'create-project'}) {
+  &create_missing_project($root_cmd, $inputs);
+  exit;
+}
 # create default project file when missing (when linking)
 if (!$$root_cmd{'compile'} && !$$root_cmd{'opts'}{'project'}) {
   $$root_cmd{'opts'}{'project'} = &create_missing_project($root_cmd, $inputs);
@@ -288,11 +293,16 @@ sub create_missing_project {
   }
   $project = { 'target' => undef, 'inputs' => [],
                'builddir' => &builddir() };
-  my $project_base;
   my $project_path;
 
   if ($$root_cmd{'opts'}{'output'}) {
     $$project{'target'} = $$root_cmd{'opts'}{'output'};
+  }
+  if ($$root_cmd{'opts'}{'create-project'}) {
+    $project_path = $$root_cmd{'opts'}{'create-project'};
+  } else {
+  my $project_base;
+  if ($$project{'target'}) {
     $project_base = $$project{'target'} =~ s/\.$so_ext$//r; # remove ext if present
   } else {
     $project_base = &project_base($inputs);
@@ -310,6 +320,7 @@ sub create_missing_project {
     print STDERR $0 . ": warning: missing --project <file> (creating default $project_path).\n";
   } else {
     print STDERR $0 . ": info: missing --project <file> (creating default $project_path).\n";
+  }
   }
   # create and write a default project file
   foreach my $input (@$inputs) {

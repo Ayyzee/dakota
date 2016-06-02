@@ -273,7 +273,8 @@ sub var {
 }
 sub subcmd_builddir {
   my ($rep, $args) = @_;
-  print $$rep{'builddir'} . $nl;
+  print $$rep{'builddir'} if $$rep{'builddir'};
+  print $nl;
 }
 sub subcmd_soname {
   my ($rep, $args) = @_;
