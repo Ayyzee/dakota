@@ -1,4 +1,4 @@
-rootdir := ..
+rootdir := ../..
 
 DAKOTA-BASE := $(rootdir)/bin/dakota
 RM := rm
@@ -11,19 +11,20 @@ RMFLAGS := -fr
  check\
  clean\
 
-target := exe
-target.project := $(target).project
+target-base := exe
+target := $(target-base)
+target.project := $(target-base).project
 
 all: $(target)
 
-$(target).dk: 
+$(target-base).dk: 
 	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > $@
 
 $(target.project):
-	$(DAKOTA-BASE) --create-project $@ --output $(target) $(target).dk
+	$(DAKOTA-BASE) --create-project $@ --output $(target) $(target-base).dk
 
-$(target): $(target).dk $(target.project)
-	$(DAKOTA-BASE) --project $(target.project) $(target).dk
+$(target): $(target-base).dk $(target.project)
+	$(DAKOTA-BASE) --project $(target.project) $(target-base).dk
 
 check: all
 	./$(target)
@@ -32,4 +33,4 @@ clean:
 	$(RM) $(RMFLAGS) $$($(rootdir)/bin/dakota-build builddir --build $(target.project))
 	$(RM) $(RMFLAGS) $$($(rootdir)/bin/dakota-build target   --build $(target.project))
 	$(RM) $(RMFLAGS) $(target.project)
-	$(RM) $(RMFLAGS) $(target).dk
+	$(RM) $(RMFLAGS) $(target-base).dk
