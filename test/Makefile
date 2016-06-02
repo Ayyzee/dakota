@@ -7,9 +7,11 @@ include $(rootdir)/makeflags.mk
  all \
  check \
  clean \
+ no-project \
 
 all \
 check \
-clean:
+clean \
+no-project:
 	time $(MAKE) -$(MAKEFLAGS) --directory lib $@
 	time $(MAKE) -$(MAKEFLAGS) --directory exe $@

@@ -10,6 +10,7 @@ RMFLAGS := -fr
  all\
  check\
  clean\
+ no-project\
 
 so_ext := dylib
 target-base := l1
@@ -21,11 +22,14 @@ all: $(target)
 $(target-base).dk: 
 	echo "klass hashed-table; func foobar() -> int-t; func foobar() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > $@
 
-$(target.project):
-	$(DAKOTA-BASE) --create-project $@ --output $(target) $(target-base).dk
+$(target.project): $(target-base).dk
+	$(DAKOTA-BASE) --create-project $@ --output $(target) $^
 
-$(target): $(target-base).dk $(target.project)
-	$(DAKOTA-BASE) --shared --project $(target.project) $(target-base).dk
+$(target): $(target-base).dk | $(target.project)
+	$(DAKOTA-BASE) --shared --project $(target.project) $^
+
+no-project: $(target-base).dk
+	$(DAKOTA-BASE) --shared $^
 
 check: all
 	$(rootdir)/bin/dakota-catalog $(target)
