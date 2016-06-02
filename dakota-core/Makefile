@@ -35,6 +35,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
 single: $(srcs) | dakota-core.project
+	$(DAKOTA-BASE) --parse --project dakota-core.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota-core.project --output $(builddir)/$$input.o $$input;\
