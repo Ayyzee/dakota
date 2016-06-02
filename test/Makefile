@@ -13,5 +13,5 @@ all \
 check \
 clean \
 no-project:
-	time $(MAKE) -$(MAKEFLAGS) --directory lib $@
-	time $(MAKE) -$(MAKEFLAGS) --directory exe $@
+	time $(MAKE) $(MAKEFLAGS) --directory lib $@
+	time $(MAKE) $(MAKEFLAGS) --directory exe $@
