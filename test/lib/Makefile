@@ -29,7 +29,7 @@ $(target): $(target-base).dk | $(target.project)
 	$(DAKOTA-BASE) --shared --project $(target.project) $^
 
 no-project: $(target-base).dk
-	$(DAKOTA-BASE) --shared $^
+	$(DAKOTA-BASE) --shared --output $(target) $^
 
 check: all
 	$(rootdir)/bin/dakota-catalog $(target)
