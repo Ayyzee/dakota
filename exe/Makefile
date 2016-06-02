@@ -16,9 +16,13 @@ target.project := $(target).project
 
 all: $(target)
 
-$(target):
-	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > $(target).dk
-	$(DAKOTA-BASE) --create-project $(target.project) --output $(target) $(target).dk
+$(target).dk: 
+	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > $@
+
+$(target.project):
+	$(DAKOTA-BASE) --create-project $@ --output $(target) $(target).dk
+
+$(target): $(target).dk $(target.project)
 	$(DAKOTA-BASE) --project $(target.project) $(target).dk
 
 check: all
