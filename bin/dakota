@@ -95,6 +95,7 @@ my $root_cmd = { 'reps' => [],
             'compile',              # gcc-like
             'dynamic',              # gcc-like
             'output=s',             # gcc-like
+            'parse',
             'precompile',           # gcc-ish (--compile)
             'project=s',
             'shared',               # gcc-like

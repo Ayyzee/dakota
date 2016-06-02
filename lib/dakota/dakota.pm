@@ -628,6 +628,11 @@ sub start_cmd {
   my ($cmd_info) = @_;
   $builddir = &dakota::util::builddir();
   $cmd_info = &update_rep_from_all_inputs($cmd_info);
+  if ($$cmd_info{'opts'}{'parse'}) {
+    my $target_cc_path = &target_cc_path($cmd_info);
+    print $target_cc_path . $nl;
+    return $exit_status;
+  }
   my $target_json_path = &target_json_path($cmd_info);
   &set_global_project_rep($target_json_path);
   $root_cmd = $cmd_info;
