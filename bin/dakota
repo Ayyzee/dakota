@@ -99,6 +99,7 @@ my $root_cmd = { 'reps' => [],
             'precompile',           # gcc-ish (--compile)
             'project=s',
             'shared',               # gcc-like
+            'target',
 
             'create-project=s',
             'clean',                # make target like

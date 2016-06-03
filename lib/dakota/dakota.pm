@@ -628,8 +628,8 @@ sub start_cmd {
   my ($cmd_info) = @_;
   $builddir = &dakota::util::builddir();
   $cmd_info = &update_rep_from_all_inputs($cmd_info);
+  my $target_cc_path = &target_cc_path($cmd_info);
   if ($$cmd_info{'opts'}{'parse'}) {
-    my $target_cc_path = &target_cc_path($cmd_info);
     print $target_cc_path . $nl;
     return $exit_status;
   }
@@ -673,7 +673,6 @@ sub start_cmd {
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'output'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
-      my $target_cc_path = &target_cc_path($cmd_info);
       if (&is_debug()) {
         print STDERR "creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       }
@@ -696,16 +695,20 @@ sub start_cmd {
       my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
       &gen_target_o($cmd_info, $is_exe);
     }
-    $cmd_info = &loop_o_from_dk($cmd_info);
+    if (!$$cmd_info{'opts'}{'target'}) {
+      $cmd_info = &loop_o_from_dk($cmd_info);
+    }
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
-    $cmd_info = &loop_o_from_dk($cmd_info);
+    if (!$$cmd_info{'opts'}{'target'}) {
+      $cmd_info = &loop_o_from_dk($cmd_info);
+    }
     if (!$$cmd_info{'opts'}{'compile'}) {
       my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
       &gen_target_o($cmd_info, $is_exe);
     }
   }
-  if (!$ENV{'DKT_PRECOMPILE'}) {
+  if (!$ENV{'DKT_PRECOMPILE'} && !$$cmd_info{'opts'}{'target'}) {
     if ($$cmd_info{'opts'}{'compile'}) {
       if ($want_separate_precompile_pass) {
         &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
