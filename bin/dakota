@@ -388,7 +388,7 @@ sub use_project {
   $project_io_path = $$root_cmd{'project.io'};
   my $original_state;
   if (! -e $project_io_path) {
-    # dk2json : $foo{'dk'}{$dk_path}{'json'}{$json_path}
+    # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},
                                'target' => &canon_path($$project{'target'}), 'builddir' => undef };
     &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);

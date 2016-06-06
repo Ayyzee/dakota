@@ -1740,8 +1740,8 @@ sub generate_va_make_defn {
 ## defined() (is the value (for this key) non-undef)
 sub dk_parse {
   my ($dk_path) = @_; # string.dk
-  my $json_path = &dakota::parse::json_path_from_dk_path($dk_path);
-  my $file = &dakota::util::scalar_from_file($json_path);
+  my $ast_path = &dakota::parse::ast_path_from_dk_path($dk_path);
+  my $file = &dakota::util::scalar_from_file($ast_path);
   $file = &dakota::parse::kw_args_translate($file);
   return $file;
 }

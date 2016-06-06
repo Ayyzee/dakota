@@ -215,7 +215,7 @@ sub start {
   my $style = 'mk';
   my $sep_from_style = {
     'mk' =>   $rassign_sep,
-    'json' => $pair_sep,
+    'ast' => $pair_sep,
   };
   foreach my $file (@$argv) {
     my $data = do $file or die "cannot evaluate $file: $!";
