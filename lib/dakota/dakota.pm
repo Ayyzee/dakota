@@ -628,12 +628,11 @@ sub start_cmd {
   my ($cmd_info) = @_;
   $builddir = &dakota::util::builddir();
   $cmd_info = &update_rep_from_all_inputs($cmd_info);
-  my $target_cc_path = &target_cc_path($cmd_info);
+  my $target_ast_path = &target_ast_path($cmd_info);
   if ($$cmd_info{'opts'}{'parse'}) {
-    print $target_cc_path . $nl;
+    print $target_ast_path . $nl;
     return $exit_status;
   }
-  my $target_ast_path = &target_ast_path($cmd_info);
   &set_global_project_rep($target_ast_path);
   $root_cmd = $cmd_info;
 
@@ -674,6 +673,7 @@ sub start_cmd {
   if ($$cmd_info{'output'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
       if (&is_debug()) {
+        my $target_cc_path = &target_cc_path($cmd_info);
         print STDERR "creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
       }
     } else {
@@ -886,7 +886,7 @@ sub gen_target_o {
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
   &target_o_from_ast($cmd_info, $other, $is_exe);
-}
+} # gen_target_o
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
   my $ast_path = &ast_path_from_dk_path($input);
@@ -1079,13 +1079,13 @@ sub target_o_from_ast {
   my $target_o_path = &o_path_from_cc_path($target_cc_path);
   if (!$$cmd_info{'opts'}{'silent'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
-      #if (&is_out_of_date($input, $target_cc_path)) {
+      if (&is_out_of_date($target_ast_path, $target_cc_path)) {
         print $target_cc_path . $nl;
-      #}
+      }
     } else {
-      #if (&is_out_of_date($input, $target_o_path)) {
+      if (&is_out_of_date($target_ast_path, $target_o_path)) {
         print $target_o_path . $nl;
-      #}
+      }
     }
   }
   my $target_hh_path = $target_cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
