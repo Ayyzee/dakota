@@ -43,7 +43,7 @@ single: $(srcs) | dakota.project
 
 check-exe: all
 	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
-	echo '{ "srcs" => [ "exe.dk" ] }' > exe.project
+	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
 	rm -f exe
 	DKT_EXCLUDE_LIBS=0 $(DAKOTA-BASE) exe.dk
 	./exe
