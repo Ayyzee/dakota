@@ -30,3 +30,4 @@ uninstall:
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota $@
+	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/test $@

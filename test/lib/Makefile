@@ -39,3 +39,4 @@ clean:
 	$(RM) $(RMFLAGS) $$($(rootdir)/bin/dakota-build target   --build $(target.project))
 	$(RM) $(RMFLAGS) $(target.project)
 	$(RM) $(RMFLAGS) $(target-base).dk
+	$(RM) $(RMFLAGS) $(target)
