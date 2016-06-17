@@ -2533,10 +2533,19 @@ sub has_exported_slots {
   }
   return 0;
 }
+sub has_methods {
+  my ($klass_scope) = @_;
+  if (exists $$klass_scope{'methods'} && 0 != keys %{$$klass_scope{'methods'}}) {
+    return 1;
+  }
+  return 0;
+}
 sub has_exported_methods {
   my ($klass_scope) = @_;
-  if (exists $$klass_scope{'behavior-exported?'} && defined $$klass_scope{'behavior-exported?'}) {
-    return $$klass_scope{'behavior-exported?'};
+  if (&has_methods($klass_scope)) {
+    if (exists $$klass_scope{'behavior-exported?'} && defined $$klass_scope{'behavior-exported?'}) {
+      return $$klass_scope{'behavior-exported?'};
+    }
   }
   return 0;
 }
