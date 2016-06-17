@@ -342,7 +342,7 @@ sub generate_src {
   } else {
     $str = '// ' . $emacs_mode_file_variables  . $nl .
       $nl .
-      "# if defined DK_USE_TARGET_HEADER && 0 != DK_USE_TARGET_HEADER" . $nl .
+      "# if defined DK_USE_SINGLE_TARGET_HEADER && 0 != DK_USE_SINGLE_TARGET_HEADER" . $nl .
       "# include \"$rel_target_hh_path\"" . $nl .
       "# else" . $nl .
       "# include \"$rel_hh_path\"" . $nl .
@@ -2520,11 +2520,10 @@ sub has_enums {
 }
 sub has_slots {
   my ($klass_scope) = @_;
-  if (exists $$klass_scope{'slots'} && $$klass_scope{'slots'}) {
+  if (exists $$klass_scope{'slots'} && defined $$klass_scope{'slots'}) {
     return 1;
-  } else {
-    return 0;
   }
+  return 0;
 }
 sub has_exported_slots {
   my ($klass_scope) = @_;
@@ -2535,8 +2534,8 @@ sub has_exported_slots {
 }
 sub has_exported_methods {
   my ($klass_scope) = @_;
-  if (exists $$klass_scope{'behavior-exported?'}  && $$klass_scope{'behavior-exported?'}) {
-    return 1;
+  if (exists $$klass_scope{'behavior-exported?'} && defined $$klass_scope{'behavior-exported?'}) {
+    return $$klass_scope{'behavior-exported?'};
   }
   return 0;
 }

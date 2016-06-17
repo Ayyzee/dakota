@@ -685,7 +685,7 @@ sub start_cmd {
   if ($should_replace_library_path_with_lib_opts) {
     $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
   }
-  if ($ENV{'DK_GENERATE_TARGET_FIRST'} || $ENV{'DK_USE_TARGET_HEADER'}) {
+  if ($ENV{'DK_GENERATE_TARGET_FIRST'} || $ENV{'DK_USE_SINGLE_TARGET_HEADER'}) {
     # generate the single (but slow) runtime .o, then the user .o files
     # this might be useful for distributed building (initiating the building of the slowest first
     # or for testing runtime code generation
