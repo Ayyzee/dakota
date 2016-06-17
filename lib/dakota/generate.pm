@@ -1923,7 +1923,8 @@ sub generate_klass_unbox {
     }
   } else {
     ### unbox() same for all types
-    if ($is_klass_defn || (&has_exported_slots() && &has_slots_info())) {
+    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+    if ($is_klass_defn || (&has_exported_slots($klass_scope) && &has_slots_info($klass_scope))) {
       $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
