@@ -543,12 +543,6 @@ sub generate_target_footer {
     $target_cc_str .= &linkage_unit::generate_target_footer_ints_seq($file);
   }
   my $stack = [];
-  my $tbl = {
-             'imported-klasses' => {},
-             'klasses' =>          {},
-           };
-  &dk_generate_imported_klasses_info($file, $stack, $tbl);
-  # the previous call may be useless
   $target_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
   #$target_cc_str .= $col . "extern \"C\$nl;
   #$target_cc_str .= $col . "{" . $nl;
@@ -3859,31 +3853,6 @@ sub many_1_to_1_from_1_to_many {
     }
   }
   return $result;
-}
-sub dk_generate_imported_klasses_info {
-  my ($scope, $stack, $tbl) = @_;
-  if (defined $$scope{'imported-klasses'}) {
-    while (my ($import_string, $seq) = each(%{$$scope{'imported-klasses'}})) {
-      $$tbl{'imported-klasses'}{$import_string} = $seq;
-    }
-  }
-  foreach my $klass_type ('traits', 'klasses') {
-    while (my ($klass_name, $klass_scope) = each(%{$$scope{$klass_type}})) {
-      &path::add_last($stack, $klass_name);
-      my $import_string = &ct($stack);
-      $$tbl{$klass_type}{$import_string} = &dakota::util::deep_copy($stack);
-
-      if ($klass_scope) {
-        $$tbl{'imported-klasses'}{$import_string} = &dakota::util::deep_copy($stack);
-      }
-      if (defined $$klass_scope{'imported-klasses'}) {
-        while (my ($import_string, $seq) = each(%{$$klass_scope{'imported-klasses'}})) {
-          $$tbl{'imported-klasses'}{$import_string} = $seq;
-        }
-      }
-      &path::remove_last($stack);
-    }
-  }
 }
 sub add_symbol_to_ident_symbol {
   my ($file_symbols, $symbols, $symbol) = @_;
