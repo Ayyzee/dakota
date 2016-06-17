@@ -350,7 +350,7 @@ sub generate_src {
       $nl .
       "# include \"$rel_user_cc_path\"" . $nl . # user-code (converted from dk to cc)
       $nl .
-      &dk_generate_cc_footer($file, [], ''); # $file, $stack, $col
+      &dk_generate_cc_footer($file);
   }
   if ($should_write_pre_output) {
     &write_to_file_strings($pre_output, [ $str ]);
@@ -541,9 +541,9 @@ sub generate_target_footer {
     $target_cc_str .= &linkage_unit::generate_target_footer_generic_func_ptrs_seq($generics);
     $target_cc_str .= &linkage_unit::generate_target_footer_strs_seq($file);
     $target_cc_str .= &linkage_unit::generate_target_footer_ints_seq($file);
+
+    $target_cc_str .= &dk_generate_cc_footer($file);
   }
-  my $stack = [];
-  $target_cc_str .= &dk_generate_cc_footer($file, $stack, $col);
   #$target_cc_str .= $col . "extern \"C\$nl;
   #$target_cc_str .= $col . "{" . $nl;
   #$col = &colin($col);
@@ -3788,7 +3788,9 @@ sub generate_kw_args_method_defn {
   #&path::remove_last($klass_name);
 }
 sub dk_generate_cc_footer {
-  my ($scope, $stack, $col) = @_;
+  my ($scope) = @_;
+  my $stack = [];
+  my $col = '';
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   &dk_generate_kw_args_method_defns($scope, $stack, 'trait', $col);
