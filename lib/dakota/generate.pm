@@ -2466,21 +2466,17 @@ sub linkage_unit::generate_headers {
 }
 sub is_same_file {
   my ($klass_scope) = @_;
-  my $file = &canon_path($$klass_scope{'slots'}{'file'});
-  if ($gbl_src_file && $$klass_scope{'slots'} && $$klass_scope{'slots'}{'file'} && ($gbl_src_file eq $file)) {
-    return 1;
-  } else {
-    return 0;
+  if ($gbl_src_file && $$klass_scope{'slots'} && $$klass_scope{'slots'}{'file'}) {
+    return 1 if $gbl_src_file eq &canon_path($$klass_scope{'slots'}{'file'});
   }
+  return 0;
 }
 sub is_same_src_file {
   my ($klass_scope) = @_;
-  my $file = &canon_path($$klass_scope{'file'});
-  if ($gbl_src_file && ($gbl_src_file eq $file)) {
-    return 1;
-  } else {
-    return 0;
+  if ($gbl_src_file && $$klass_scope{'file'}) {
+    return 1 if $gbl_src_file eq &canon_path($$klass_scope{'file'});
   }
+  return 0;
 }
 sub has_slots_type {
   my ($klass_scope) = @_;
