@@ -66,6 +66,7 @@ clean: goal-clean
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(BUILDDIR)
+	$(RM) $(RMFLAGS) dkt-exe
 
 distclean: clean
 	cd $(rootdir); ./configure-common
