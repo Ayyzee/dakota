@@ -396,7 +396,7 @@ sub generate_target {
   my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
 
   if (&is_target_defn()) {
-    $str .= &generate_defn_footer($file, $generics);
+    $str .= &generate_target_footer($file, $generics);
   }
   if ($should_write_pre_output) {
     &write_to_file_strings($pre_output, [ $str ]);
@@ -508,7 +508,7 @@ sub generate_decl_defn {
 
   return $str;
 } # generate_decl_defn
-sub generate_defn_footer {
+sub generate_target_footer {
   my ($file, $generics) = @_;
   my $target_cc_str = '';
   my $col = '';
@@ -536,11 +536,11 @@ sub generate_defn_footer {
     $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
     $col = &colout($col);
     $target_cc_str .= $col . "};" . $nl;
-    $target_cc_str .= &linkage_unit::generate_selectors_seq( $generics);
-    $target_cc_str .= &linkage_unit::generate_signatures_seq($generics);
-    $target_cc_str .= &linkage_unit::generate_generic_func_ptrs_seq($generics);
-    $target_cc_str .= &linkage_unit::generate_strs_seq($file);
-    $target_cc_str .= &linkage_unit::generate_ints_seq($file);
+    $target_cc_str .= &linkage_unit::generate_target_footer_selectors_seq( $generics);
+    $target_cc_str .= &linkage_unit::generate_target_footer_signatures_seq($generics);
+    $target_cc_str .= &linkage_unit::generate_target_footer_generic_func_ptrs_seq($generics);
+    $target_cc_str .= &linkage_unit::generate_target_footer_strs_seq($file);
+    $target_cc_str .= &linkage_unit::generate_target_footer_ints_seq($file);
   }
   my $stack = [];
   my $tbl = {
@@ -589,7 +589,7 @@ sub generate_defn_footer {
   $target_cc_str .= "[[read-only]] static symbol-t name = \"$$file{'other'}{'name'}\";" . $nl;
   $target_cc_str .= $nl;
   #my $col;
-  $target_cc_str .= &generate_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
+  $target_cc_str .= &generate_target_footer_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
 
   $target_cc_str .= $nl;
   $target_cc_str .= $col . "static func __initial() -> void {" . &ann(__FILE__, __LINE__) . $nl;
@@ -1281,12 +1281,12 @@ sub va_generics {
   }
   return ($va_generics, $fa_generics);
 }
-sub linkage_unit::generate_generic_func_ptrs_seq {
+sub linkage_unit::generate_target_footer_generic_func_ptrs_seq {
   my ($generics) = @_;
   my $col = '';
   my ($va_generics, $fa_generics) = &va_generics($generics, undef);
   my $scratch_str = "";
-  #$scratch_str .= $col . "// generate_generic_func_ptrs_seq()" . $nl;
+  #$scratch_str .= $col . "// generate_target_footer_generic_func_ptrs_seq()" . $nl;
   my $generic;
   my $i;
   my $return_type = 'generic-func-t*';
@@ -1664,7 +1664,7 @@ sub linkage_unit::generate_signatures {
   $scratch_str .= &common::generate_signature_defns($generics, $col); # __signature::foobar(...)
   return $scratch_str;
 }
-sub linkage_unit::generate_signatures_seq {
+sub linkage_unit::generate_target_footer_signatures_seq {
   my ($generics) = @_;
   my $col = '';
   my $scratch_str = "";
@@ -1681,7 +1681,7 @@ sub linkage_unit::generate_selectors {
   $scratch_str .= &common::generate_selector_defns($generics, $col); # __selector::foobar(...)
   return $scratch_str;
 }
-sub linkage_unit::generate_selectors_seq {
+sub linkage_unit::generate_target_footer_selectors_seq {
   my ($generics) = @_;
   my $col = '';
   my $scratch_str = "";
@@ -3314,12 +3314,12 @@ sub dk_generate_cc_footer_klass {
         }
         my $prop_name = sprintf("%s-%s", $root_name, $$slot_info{'name'});
         $$scratch_str_ref .=
-          $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
+          $col . "$klass_type @$klass_name { " . &generate_target_footer_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
         &dakota::util::add_last($seq, "$prop_name");
         $prop_num++;
       }
       $$scratch_str_ref .=
-        $col . "$klass_type @$klass_name { " . &generate_info_seq($root_name, $seq, $col, __LINE__) . "}" . $nl;
+        $col . "$klass_type @$klass_name { " . &generate_target_footer_info_seq($root_name, $seq, $col, __LINE__) . "}" . $nl;
     } else {
       my $seq = [];
       my $prop_num = 0;
@@ -3341,12 +3341,12 @@ sub dk_generate_cc_footer_klass {
         }
         my $prop_name = sprintf("%s-%s", $root_name, $$slot_info{'name'});
         $$scratch_str_ref .=
-          $col . "$klass_type @$klass_name { " . &generate_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
+          $col . "$klass_type @$klass_name { " . &generate_target_footer_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
         &dakota::util::add_last($seq, "$prop_name");
         $prop_num++;
       }
       $$scratch_str_ref .=
-        $col . "$klass_type @$klass_name { " . &generate_info_seq($root_name, $seq, $col, __LINE__) . " }" . $nl;
+        $col . "$klass_type @$klass_name { " . &generate_target_footer_info_seq($root_name, $seq, $col, __LINE__) . " }" . $nl;
     }
   }
   if (&has_enum_info($klass_scope)) {
@@ -3493,7 +3493,7 @@ sub dk_generate_cc_footer_klass {
   }
   $$tbbl{'#file'} = '__FILE__';
   $$scratch_str_ref .=
-    $col . "$klass_type @$klass_name { " . &generate_property_tbl('__klass-props', $tbbl, $col, $symbols, __LINE__) .
+    $col . "$klass_type @$klass_name { " . &generate_target_footer_property_tbl('__klass-props', $tbbl, $col, $symbols, __LINE__) .
     $col . " }" . $nl;
   &dakota::util::add_last($global_klass_defns, "$symbol\::__klass-props");
   return $$scratch_str_ref;
@@ -3806,7 +3806,7 @@ sub dk_generate_cc_footer {
       $$scratch_str_ref .= $nl;
       $$scratch_str_ref .= $col . "static named-info-t* klass-defns = nullptr;" . $nl;
     } else {
-      $$scratch_str_ref .= &generate_info_seq('klass-defns', [sort @$global_klass_defns], $col, __LINE__);
+      $$scratch_str_ref .= &generate_target_footer_info_seq('klass-defns', [sort @$global_klass_defns], $col, __LINE__);
     }
     if (0 == keys %{$$scope{'interposers'}}) {
       $$scratch_str_ref .= $nl;
@@ -4084,7 +4084,7 @@ sub linkage_unit::generate_strs {
   $scratch_str .= $col . "}" . $nl;
   return $scratch_str;
 }
-sub linkage_unit::generate_strs_seq {
+sub linkage_unit::generate_target_footer_strs_seq {
   my ($file) = @_;
   my $scratch_str = "";
   my $col = '';
@@ -4141,7 +4141,7 @@ sub linkage_unit::generate_ints {
   $scratch_str .= $col . "}" . $nl;
   return $scratch_str;
 }
-sub linkage_unit::generate_ints_seq {
+sub linkage_unit::generate_target_footer_ints_seq {
   my ($file) = @_;
   my $scratch_str = "";
   my $col = '';
@@ -4180,7 +4180,7 @@ sub linkage_unit::generate_ints_seq {
   }
   return $scratch_str;
 }
-sub generate_property_tbl {
+sub generate_target_footer_property_tbl {
   my ($name, $tbl, $col, $symbols, $line) = @_;
   #print STDERR &Dumper($tbl);
   my $sorted_keys = [sort keys %$tbl];
@@ -4192,7 +4192,7 @@ sub generate_property_tbl {
     my $element = $$tbl{$key};
 
     if ('HASH' eq ref $element) {
-      $result .= &generate_info("$name-$num", $element, $col, $symbols, $line);
+      $result .= &generate_target_footer_info("$name-$num", $element, $col, $symbols, $line);
       $element = "&$name-$num";
       $num++;
     } elsif (!defined $element) {
@@ -4234,14 +4234,14 @@ sub generate_property_tbl {
   $result .= $col . "};";
   return $result;
 }
-sub generate_info {
+sub generate_target_footer_info {
   my ($name, $tbl, $col, $symbols, $line) = @_;
-  my $result = &generate_property_tbl("$name-props", $tbl, $col, $symbols, $line);
+  my $result = &generate_target_footer_property_tbl("$name-props", $tbl, $col, $symbols, $line);
   $result .= $nl;
   $result .= $col . "static named-info-t $name = { .next = nullptr, .count = countof($name-props), .elements = $name-props };" . &ann(__FILE__, $line) . $nl;
   return $result;
 }
-sub generate_info_seq {
+sub generate_target_footer_info_seq {
   my ($name, $seq, $col, $line) = @_;
   my $result = '';
 
