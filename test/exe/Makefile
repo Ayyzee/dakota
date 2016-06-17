@@ -9,6 +9,7 @@ RMFLAGS := -fr
 .PHONY:\
  all\
  check\
+ check-exe\
  clean\
 
 target-base := exe
@@ -29,7 +30,7 @@ $(target): $(target-base).dk | $(target.project)
 no-project: $(target-base).dk
 	$(DAKOTA-BASE) $^
 
-check: all
+check check-exe: all
 	./$(target)
 
 clean:

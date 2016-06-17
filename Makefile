@@ -6,8 +6,8 @@ include $(rootdir)/makeflags.mk
 .PHONY: \
  all \
  check \
+ check-exe \
  clean \
- clean-exe \
  dist \
  distclean \
  goal-clean \

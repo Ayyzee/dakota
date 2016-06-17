@@ -106,8 +106,8 @@ my ($id,  $mid,  $bid,  $tid,
 
 my $global_should_echo = 0;
 my $global_is_defn = undef; # klass decl vs defn
-my $global_is_rt = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
-my $global_is_exe_rt = undef;
+my $global_is_target = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
+my $global_is_exe_target = undef;
 my $global_suffix = undef;
 
 my $gbl_src_file = undef;
@@ -145,7 +145,7 @@ sub set_src_decl {
   my ($path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $gbl_src_file = &canon_path("$name.dk");
-  $global_is_rt =   0;
+  $global_is_target =   0;
   $global_is_defn = 0;
   $global_suffix = $hh_ext;
 }
@@ -153,27 +153,27 @@ sub set_src_defn {
   my ($path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $gbl_src_file = &canon_path("$name.dk");
-  $global_is_rt =   0;
+  $global_is_target =   0;
   $global_is_defn = 1;
   $global_suffix = $ext;
 }
 sub set_target_decl {
   my ($path) = @_;
   $gbl_src_file = undef;
-  $global_is_rt =   1;
+  $global_is_target =   1;
   $global_is_defn = 0;
   $global_suffix = $hh_ext;
 }
 sub set_target_defn {
   my ($path) = @_;
   $gbl_src_file = undef;
-  $global_is_rt =   1;
+  $global_is_target =   1;
   $global_is_defn = 1;
   $global_suffix = $cc_ext;
 }
-sub set_exe_rt {
+sub set_exe_target {
   my ($path) = @_;
-  $global_is_exe_rt = $path;
+  $global_is_exe_target = $path;
 }
 sub suffix {
   return $global_suffix
@@ -189,42 +189,42 @@ sub extra_header {
   # do nothing for rt-defn/rt-cc
 }
 sub is_src_decl {
-  if (!$global_is_rt && !$global_is_defn) {
+  if (!$global_is_target && !$global_is_defn) {
     return 1;
   } else {
     return 0;
   }
 }
 sub is_src_defn {
-  if (!$global_is_rt && $global_is_defn) {
+  if (!$global_is_target && $global_is_defn) {
     return 1;
   } else {
     return 0;
   }
 }
 sub is_target_decl {
-  if ($global_is_rt && !$global_is_defn) {
+  if ($global_is_target && !$global_is_defn) {
     return 1;
   } else {
     return 0;
   }
 }
 sub is_target_defn {
-  if ($global_is_rt && $global_is_defn) {
+  if ($global_is_target && $global_is_defn) {
     return 1;
   } else {
     return 0;
   }
 }
 sub is_src {
-  if (!$global_is_rt) {
+  if (!$global_is_target) {
     return 1;
   } else {
     return 0;
   }
 }
-sub is_rt {
-  if ($global_is_rt) {
+sub is_target {
+  if ($global_is_target) {
     return 1;
   } else {
     return 0;
@@ -237,8 +237,8 @@ sub is_decl {
     return 0;
   }
 }
-sub is_exe_rt {
-  return $global_is_exe_rt;
+sub is_exe_target {
+  return $global_is_exe_target;
 }
 sub write_to_file_converted_file {
   my ($path_out, $path_in) = @_;
@@ -342,7 +342,7 @@ sub generate_src {
   } else {
     $str = '// ' . $emacs_mode_file_variables  . $nl .
       $nl .
-      "# if 0" . $nl .
+      "# if defined DK_USE_TARGET_HEADER && 0 != DK_USE_TARGET_HEADER" . $nl .
       "# include \"$rel_target_hh_path\"" . $nl .
       "# else" . $nl .
       "# include \"$rel_hh_path\"" . $nl .
@@ -364,20 +364,20 @@ sub generate_target_decl {
   #print "generate_target_decl($path, ...)" . $nl;
   &set_target_decl($path);
   if ($is_exe) {
-    &set_exe_rt($path);
+    &set_exe_target($path);
   }
-  return &generate_rt($path, $file, $project_rep);
+  return &generate_target($path, $file, $project_rep);
 }
 sub generate_target_defn {
   my ($path, $file, $project_rep, $is_exe) = @_;
   #print "generate_target_defn($path, ...)" . $nl;
   &set_target_defn($path);
   if ($is_exe) {
-    &set_exe_rt($path);
+    &set_exe_target($path);
   }
-  return &generate_rt($path, $file, $project_rep);
+  return &generate_target($path, $file, $project_rep);
 }
-sub generate_rt {
+sub generate_target {
   my ($path, $file, $project_rep) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my ($generics, $symbols) = &generics::parse($file);
@@ -409,7 +409,7 @@ sub generate_rt {
     print "    creating $output ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
   }
   return $output;
-} # sub generate_rt
+} # sub generate_target
 sub labeled_src_str {
   my ($tbl, $key) = @_;
   my $str;
@@ -2183,7 +2183,7 @@ sub linkage_unit::generate_klasses_body {
     #print STDERR Dumper($va_list_methods);
     &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
   }
-  if (&is_rt() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
+  if (&is_target() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
     &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
   }
   if (&is_decl() && @$va_list_methods) { #rn0
@@ -2221,7 +2221,7 @@ sub linkage_unit::generate_klasses_body {
           &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, __LINE__);
         }
         if (&is_decl) {
-          if (&is_same_src_file($klass_scope) || &is_rt()) { #rn2
+          if (&is_same_src_file($klass_scope) || &is_target()) { #rn2
             if (defined $$method{'keyword-types'}) {
               if (0 != @{$$method{'keyword-types'}}) {
                 my $other_method_decl = &kw_args_method::type_decl($method);
@@ -2246,7 +2246,7 @@ sub linkage_unit::generate_klasses_body {
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if (&is_decl) {
-      if (&is_same_src_file($klass_scope) || &is_rt()) { #rn3
+      if (&is_same_src_file($klass_scope) || &is_target()) { #rn3
         if (!&is_va($method)) {
           my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
           $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "DUPLICATE") . $nl;
@@ -2710,7 +2710,7 @@ sub linkage_unit::generate_klasses {
       $col . "# include <dakota.$hh_ext>" . $nl .
       $col . "# include <dakota-log.$hh_ext>" . $nl;
 
-    if (&is_rt()) {
+    if (&is_target()) {
       $$scratch_str_ref .=
         $nl .
         $col . "# include <dakota-os.$hh_ext>" . $nl;
