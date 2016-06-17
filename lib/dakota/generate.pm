@@ -2530,17 +2530,15 @@ sub has_exported_slots {
   my ($klass_scope) = @_;
   if (&has_slots($klass_scope) && &is_exported($$klass_scope{'slots'})) {
     return 1;
-  } else {
-    return 0;
   }
+  return 0;
 }
 sub has_exported_methods {
   my ($klass_scope) = @_;
   if (exists $$klass_scope{'behavior-exported?'}  && $$klass_scope{'behavior-exported?'}) {
     return 1;
-  } else {
-    return 0;
   }
+  return 0;
 }
 sub order_klasses {
   my ($scope) = @_;
