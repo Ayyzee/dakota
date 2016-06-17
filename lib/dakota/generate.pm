@@ -2528,8 +2528,8 @@ sub has_slots {
 }
 sub has_exported_slots {
   my ($klass_scope) = @_;
-  if (&has_slots($klass_scope) && &is_exported($$klass_scope{'slots'})) {
-    return 1;
+  if (&has_slots($klass_scope)) {
+    return &is_exported($$klass_scope{'slots'});
   }
   return 0;
 }
