@@ -1106,7 +1106,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
           int-t max-type-width = max-slot-type-width(ci.slots-info);
           int64-t i = 0;
           while (nullptr != ci.slots-info[i].elements) {
-            str-t slot-type =   cast(str-t)named-info::at(&ci.slots-info[i], #type, cast(ssize-t)#klass);
+            str-t slot-type =   cast(str-t)named-info::at(&ci.slots-info[i], #type, cast(ssize-t)#object-t);
             str-t slot-typeid = cast(str-t)named-info::at(&ci.slots-info[i], #typeid);
             USE(slot-typeid);
             assert-valid-str(slot-type);
