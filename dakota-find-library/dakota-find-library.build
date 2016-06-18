@@ -1,0 +1,20 @@
+# -*- mode: perl -*-
+{
+    'srcs' => [
+      '$(srcdir)/dakota-find-library.$(cc_ext)',
+    ],
+    'libs' => [
+      'libdl.$(so_ext)',
+    ],
+    'include-dirs' => [
+    ],
+    'target' => '../bin/dakota-find-library',
+    'install' => {
+      '-rules' => [
+        '$(DESTDIR)$(prefix)/bin/%', '../bin/%',
+      ],
+      'files' => [
+        '$(DESTDIR)$(prefix)/bin/dakota-find-library',
+      ],
+    }
+}
