@@ -82,7 +82,7 @@ $Data::Dumper::Indent    = 1; # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-my $root_cmd = { 'reps' => [],
+my $root_cmd = { 'asts' => [],
                  'inputs' => [],
                  'opts' => { 'directory' => [],
                              'include-directory' => [ "$gbl_prefix/include" ],

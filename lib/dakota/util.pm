@@ -109,8 +109,8 @@ our @EXPORT= qw(
                  var_array
                  global_project
                  set_global_project
-                 global_project_rep
-                 set_global_project_rep
+                 global_project_ast
+                 set_global_project_ast
                  use_abs_path
               );
 use Cwd;
@@ -540,14 +540,14 @@ sub set_global_project {
   $global_project = &scalar_from_file($project_path);
   return $global_project;
 }
-my $global_project_rep;
-sub global_project_rep {
-  return $global_project_rep;
+my $global_project_ast;
+sub global_project_ast {
+  return $global_project_ast;
 }
-sub set_global_project_rep {
-  my ($project_rep_path) = @_;
-  $global_project_rep = &scalar_from_file($project_rep_path);
-  return $global_project_rep;
+sub set_global_project_ast {
+  my ($project_ast_path) = @_;
+  $global_project_ast = &scalar_from_file($project_ast_path);
+  return $global_project_ast;
 }
 sub is_va {
   my ($method) = @_;
@@ -569,8 +569,8 @@ sub is_kw_args_generic {
   my ($name, $types) = &kw_args_generics_sig($generic);
   my $name_str =  &str_from_seq($name);
   my $types_str = &parameter_types_str($types);
-  my $global_project_rep = &global_project_rep();
-  my $tbl = $$global_project_rep{'kw-args-generics'};
+  my $global_project_ast = &global_project_ast();
+  my $tbl = $$global_project_ast{'kw-args-generics'};
 
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
     $state = 1;

@@ -257,7 +257,7 @@ sub write_to_file_strings {
 }
 my $gbl_macros;
 sub write_to_file_converted_strings {
-  my ($path, $strings, $remove, $project_rep) = @_;
+  my ($path, $strings, $remove, $project_ast) = @_;
   if ($use_new_macro_system) {
     if (!defined $gbl_macros) {
       if ($ENV{'DK_MACROS_PATH'}) {
@@ -281,7 +281,7 @@ sub write_to_file_converted_strings {
     $filestr .= $string;
   }
   my $sst = &sst::make($filestr, ">$path"); # costly (< 1/4 of total)
-  my $kw_args_generics = $$project_rep{'kw-args-generics'};
+  my $kw_args_generics = $$project_ast{'kw-args-generics'};
   if ($use_new_macro_system) {
     &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_args_generics);
   }
@@ -295,16 +295,16 @@ sub write_to_file_converted_strings {
   }
 }
 sub generate_src_decl {
-  my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
+  my ($path, $file, $project_ast, $rel_target_hh_path) = @_;
   #print "generate_src_decl($path, ...)" . $nl;
   &set_src_decl($path);
-  return &generate_src($path, $file, $project_rep, $rel_target_hh_path);
+  return &generate_src($path, $file, $project_ast, $rel_target_hh_path);
 }
 sub generate_src_defn {
-  my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
+  my ($path, $file, $project_ast, $rel_target_hh_path) = @_;
   #print "generate_src_defn($path, ...)" . $nl;
   &set_src_defn($path);
-  return &generate_src($path, $file, $project_rep, $rel_target_hh_path);
+  return &generate_src($path, $file, $project_ast, $rel_target_hh_path);
 }
 my $im_suffix_for_suffix = {
   $cc_ext => 'cc.dkt',
@@ -320,7 +320,7 @@ sub pre_output_path_from_any_path {
   return $pre_output;
 }
 sub generate_src {
-  my ($path, $file, $project_rep, $rel_target_hh_path) = @_;
+  my ($path, $file, $project_ast, $rel_target_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my $rel_hh_path = "$name.$hh_ext";
   my $rt = '+srcs';
@@ -356,29 +356,29 @@ sub generate_src {
     &write_to_file_strings($pre_output, [ $str ]);
   }
   my $remove;
-  &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_rep);
+  &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_ast);
   return $output;
 } # sub generate_src
 sub generate_target_decl {
-  my ($path, $file, $project_rep, $is_exe) = @_;
+  my ($path, $file, $project_ast, $is_exe) = @_;
   #print "generate_target_decl($path, ...)" . $nl;
   &set_target_decl($path);
   if ($is_exe) {
     &set_exe_target($path);
   }
-  return &generate_target($path, $file, $project_rep);
+  return &generate_target($path, $file, $project_ast);
 }
 sub generate_target_defn {
-  my ($path, $file, $project_rep, $is_exe) = @_;
+  my ($path, $file, $project_ast, $is_exe) = @_;
   #print "generate_target_defn($path, ...)" . $nl;
   &set_target_defn($path);
   if ($is_exe) {
     &set_exe_target($path);
   }
-  return &generate_target($path, $file, $project_rep);
+  return &generate_target($path, $file, $project_ast);
 }
 sub generate_target {
-  my ($path, $file, $project_rep) = @_;
+  my ($path, $file, $project_ast) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
@@ -402,7 +402,7 @@ sub generate_target {
     &write_to_file_strings($pre_output, [ $str ]);
   }
   my $remove;
-  &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_rep);
+  &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_ast);
   if (&is_debug()) {
     $end_time = time;
     my $elapsed_time = $end_time - $start_time;
@@ -4244,7 +4244,7 @@ sub pad {
   return $result_str;
 }
 sub dk_generate_cc {
-  my ($file, $path_name, $project_rep) = @_;
+  my ($file, $path_name, $project_ast) = @_;
   my ($dir, $file_basename) = &split_path($file);
   my $filestr = &dakota::util::filestr_from_file($file);
   my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
@@ -4258,14 +4258,14 @@ sub dk_generate_cc {
   my $remove;
 
   if ($ENV{'DK_NO_LINE'}) {
-    &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1, $project_rep);
+    &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1, $project_ast);
   } else {
     my $num = 1;
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "# line $num \"$cwd/$file_basename\"" . $nl, $filestr ], $remove = 1, $project_rep);
+      &write_to_file_converted_strings("$output", [ "# line $num \"$cwd/$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
     } else {
-      &write_to_file_converted_strings("$output", [ "# line $num \"$file_basename\"" . $nl, $filestr ], $remove = 1, $project_rep);
+      &write_to_file_converted_strings("$output", [ "# line $num \"$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
     }
   }
 }
@@ -4275,8 +4275,8 @@ sub start {
     my $filestr = &dakota::util::filestr_from_file($in_path);
     my $path;
     my $remove;
-    my $project_rep;
-    &write_to_file_converted_strings($path = undef, [ $filestr ], $remove = undef, $project_rep = undef);
+    my $project_ast;
+    &write_to_file_converted_strings($path = undef, [ $filestr ], $remove = undef, $project_ast = undef);
   }
 }
 unless (caller) {

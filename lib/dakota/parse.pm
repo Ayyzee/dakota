@@ -158,14 +158,14 @@ our @EXPORT= qw(
                  user_path_from_any_path
                  hh_path_from_cc_path
                  hh_path_from_src_path
-                 init_global_rep
+                 init_global_target_ast
                  kw_args_translate
                  o_path_from_dk_path
                  o_path_from_cc_path
                  ast_path_from_dk_path
                  ast_path_from_ctlg_path
                  ast_path_from_o_path
-                 rep_merge
+                 ast_merge
                  target_ast_path_from_any_path
                  target_ast_path_from_so_path
                  target_cc_path_from_any_path
@@ -290,7 +290,7 @@ sub is_tbl {
   }
   return $result;
 }
-sub _rep_merge { # recursive
+sub _ast_merge { # recursive
   my ($root_ref, $scope) = @_;
   foreach my $name1 (sort keys %$scope) {
     if (&is_tbl($$scope{$name1})) {
@@ -315,12 +315,12 @@ sub _rep_merge { # recursive
     }
   }
 }
-sub rep_merge {
+sub ast_merge {
   my ($argv) = @_;
   my $root_ref = {};
   foreach my $file (@$argv) {
     my $parse_tree = &dakota::util::scalar_from_file($file);
-    &_rep_merge($root_ref, $parse_tree);
+    &_ast_merge($root_ref, $parse_tree);
   }
   return $root_ref;
 }
@@ -333,7 +333,7 @@ my $gbl_root = {};
 my $gbl_current_scope = $gbl_root;
 my $gbl_current_module = undef;
 my $gbl_filename = undef;
-sub init_rep_from_inputs_vars {
+sub init_ast_from_inputs_vars {
   my ($cmd_info) = @_;
   $gbl_root = {};
   $$gbl_root{'keywords'} = {};
@@ -360,7 +360,7 @@ sub str_from_cmd_info {
   if ($$cmd_info{'output-directory'}) {
     $str .= " --output-directory=" . $$cmd_info{'output-directory'};
   }
-  foreach my $infile (@{$$cmd_info{'reps'}}) {
+  foreach my $infile (@{$$cmd_info{'asts'}}) {
     $str .= " $infile";
   }
   foreach my $infile (@{$$cmd_info{'inputs'}}) {
@@ -1721,11 +1721,11 @@ sub add_generics_used {
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
 }
 sub kw_args_generics_add {
-  my ($target_rep, $method) = @_;
+  my ($target_ast, $method) = @_;
   my ($name, $types) = &kw_args_generics_sig($method);
   my $name_str =  &str_from_seq($name);
   my $types_str = &parameter_types_str($types);
-  $$target_rep{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
+  $$target_ast{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
 }
 
 # 'methods'
@@ -1915,7 +1915,7 @@ sub method {
   return;
 }
 my $global_root_cmd;
-my $global_rep;
+my $global_target_ast;
 sub init_cc_from_dk_vars {
   my ($cmd_info) = @_;
   $global_root_cmd = $cmd_info;
@@ -1925,16 +1925,16 @@ sub generics::klass_type_from_klass_name {
   my $klass_type;
 
   if (0) {
-  } elsif ($$global_rep{'klasses'}{$klass_name}) {
+  } elsif ($$global_target_ast{'klasses'}{$klass_name}) {
     $klass_type = 'klass';
-  } elsif ($$global_rep{'traits'}{$klass_name}) {
+  } elsif ($$global_target_ast{'traits'}{$klass_name}) {
     $klass_type = 'trait';
   } elsif ($ENV{'DKT_PRECOMPILE'}) {
     $klass_type = 'klass||trait';
   } else {
-    my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'}}];
+    my $ast_path_var = [join '::', @{$$global_root_cmd{'asts'}}];
     die __FILE__, ":", __LINE__,
-      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . &ct($rep_path_var) . '"' . $nl;
+      ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }
   return $klass_type;
 }
@@ -1944,16 +1944,16 @@ sub generics::klass_scope_from_klass_name {
 
   # should use $type
   if (0) {
-  } elsif ($$global_rep{'klasses'}{$klass_name}) {
-    $klass_scope = $$global_rep{'klasses'}{$klass_name};
-  } elsif ($$global_rep{'traits'}{$klass_name}) {
-    $klass_scope = $$global_rep{'traits'}{$klass_name};
+  } elsif ($$global_target_ast{'klasses'}{$klass_name}) {
+    $klass_scope = $$global_target_ast{'klasses'}{$klass_name};
+  } elsif ($$global_target_ast{'traits'}{$klass_name}) {
+    $klass_scope = $$global_target_ast{'traits'}{$klass_name};
   } elsif ($ENV{'DKT_PRECOMPILE'}) {
     $klass_scope = {};
   } else {
-    my $rep_path_var = [join '::', @{$$global_root_cmd{'reps'} ||= []}];
+    my $ast_path_var = [join '::', @{$$global_root_cmd{'asts'} ||= []}];
     die __FILE__, ":", __LINE__,
-      ': ERROR: klass/trait "' . $klass_name . '" absent from rep(s) "' . &ct($rep_path_var) . '"' . $nl;
+      ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }
   return $klass_scope;
 }
@@ -2174,18 +2174,18 @@ sub dk_klass_names_from_file {
   }
   return $klass_names_set;
 }
-sub init_global_rep {
-  my ($reps) = @_;
+sub init_global_target_ast {
+  my ($asts) = @_;
   #my $reinit = 0;
-  #if ($global_rep) { $reinit = 1; }
-  #if ($reinit) { print STDERR &Dumper([keys %{$$global_rep{'klasses'}}]); }
-  $global_rep = &rep_merge($reps);
-  $global_rep = &kw_args_translate($global_rep);
+  #if ($global_target_ast) { $reinit = 1; }
+  #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
+  $global_target_ast = &ast_merge($asts);
+  $global_target_ast = &kw_args_translate($global_target_ast);
   if (0) {
-    &scalar_to_file("global-rep.ast", $global_rep);
+    &scalar_to_file("global-target.ast", $global_target_ast);
   }
-  #if ($reinit) { print STDERR &Dumper([keys %{$$global_rep{'klasses'}}]); }
-  return $global_rep;
+  #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
+  return $global_target_ast;
 }
 sub parse_root {
   my ($gbl_sst_cursor, $exported) = @_;
@@ -2314,7 +2314,7 @@ sub add_object_methods_decls {
     }
   }
 }
-sub rep_tree_from_dk_path {
+sub ast_tree_from_dk_path {
   my ($arg) = @_;
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);

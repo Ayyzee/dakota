@@ -95,7 +95,7 @@ undef $/;
 
 my $should_replace_library_path_with_lib_opts = 1;
 my $should_write_ctlg_files = 1;
-my $want_separate_rep_pass = 1; # currently required to bootstrap dakota
+my $want_separate_ast_pass = 1; # currently required to bootstrap dakota
 my $want_separate_precompile_pass = 0;
 my $show_outfile_info = 0;
 my $global_should_echo = 0;
@@ -146,7 +146,7 @@ sub is_dk_src_path {
     return 0;
   }
 }
-sub is_rep_input_path { # dk, ctlg, or so
+sub is_ast_input_path { # dk, ctlg, or so
   my ($arg) = @_;
   if (&is_so_path($arg) || &is_dk_src_path($arg)) {
     return 1;
@@ -154,7 +154,7 @@ sub is_rep_input_path { # dk, ctlg, or so
     return 0;
   }
 }
-sub is_rep_path { # ast
+sub is_ast_path { # ast
   my ($arg) = @_;
   if ($arg =~ m/\.ast$/) {
     return 1;
@@ -178,22 +178,22 @@ sub is_ctlg_path { # ctlg
     return 0;
   }
 }
-sub loop_merged_rep_from_inputs {
+sub loop_merged_ast_from_inputs {
   my ($cmd_info, $should_echo) = @_; 
   if ($should_echo) {
-    print STDERR '  &loop_merged_rep_from_inputs --output ' .
+    print STDERR '  &loop_merged_ast_from_inputs --output ' .
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
-  &dakota::parse::init_rep_from_inputs_vars($cmd_info);
-  my $rep_files = [];
-  if ($$cmd_info{'reps'}) {
-    $rep_files = $$cmd_info{'reps'};
+  &dakota::parse::init_ast_from_inputs_vars($cmd_info);
+  my $ast_files = [];
+  if ($$cmd_info{'asts'}) {
+    $ast_files = $$cmd_info{'asts'};
   }
   my $root;
   my $root_ast_path;
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
-      $root = &dakota::parse::rep_tree_from_dk_path($input);
+      $root = &dakota::parse::ast_tree_from_dk_path($input);
       my $ast_path;
       if (&is_dk_path($input)) {
         $ast_path = &ast_path_from_dk_path($input);
@@ -204,11 +204,11 @@ sub loop_merged_rep_from_inputs {
       }
       &check_path($ast_path);
       $root_ast_path = $ast_path;
-      &dakota::util::add_last($rep_files, $ast_path); # _from_dk_src_path
-    } elsif (&is_rep_path($input)) {
+      &dakota::util::add_last($ast_files, $ast_path); # _from_dk_src_path
+    } elsif (&is_ast_path($input)) {
       $root = &scalar_from_file($input);
       $root_ast_path = $input;
-      &dakota::util::add_last($rep_files, $input);
+      &dakota::util::add_last($ast_files, $input);
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
@@ -217,12 +217,12 @@ sub loop_merged_rep_from_inputs {
     if (1 == @{$$cmd_info{'inputs'}}) {
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
     } elsif (1 < @{$$cmd_info{'inputs'}}) {
-      my $rep = &rep_merge($rep_files);
-      &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $rep);
-      &project_io_add($cmd_info, $rep_files, $$cmd_info{'opts'}{'output'});
+      my $ast = &ast_merge($ast_files);
+      &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
+      &project_io_add($cmd_info, $ast_files, $$cmd_info{'opts'}{'output'});
     }
   }
-} # loop_merged_rep_from_inputs
+} # loop_merged_ast_from_inputs
 sub is_array {
   my ($ref) = @_;
   my $state;
@@ -437,23 +437,23 @@ sub loop_cc_from_dk {
   &dakota::parse::init_cc_from_dk_vars($cmd_info);
 
   my $inputs = [];
-  my $rep;
-  if ($$cmd_info{'reps'}) {
-    $rep = $$cmd_info{'reps'};
+  my $ast;
+  if ($$cmd_info{'asts'}) {
+    $ast = $$cmd_info{'asts'};
   } else {
-    $rep = [];
+    $ast = [];
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
-    if (&is_rep_path($input)) {
-      &dakota::util::add_last($rep, $input);
+    if (&is_ast_path($input)) {
+      &dakota::util::add_last($ast, $input);
     } else {
       &dakota::util::add_last($inputs, $input);
     }
   }
-  $$cmd_info{'reps'} = $rep;
+  $$cmd_info{'asts'} = $ast;
   $$cmd_info{'inputs'} = $inputs;
 
-  my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within loop_cc_from_dk
+  my $global_target_ast = &init_global_target_ast($$cmd_info{'asts'}); # within loop_cc_from_dk
   my $num_inputs = @{$$cmd_info{'inputs'}};
   if (0 == $num_inputs) {
     die "$0: error: arguments are requried\n";
@@ -492,7 +492,7 @@ sub loop_cc_from_dk {
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input, $user_dk_path, $global_rep);
+    &dakota::generate::dk_generate_cc($input, $user_dk_path, $global_target_ast);
     &src::add_extra_symbols($file);
     &src::add_extra_klass_decls($file);
     &src::add_extra_keywords($file);
@@ -502,9 +502,9 @@ sub loop_cc_from_dk {
     if (0) {
       #  for each translation unit create links to the linkage unit header file
     } else {
-      &dakota::generate::generate_src_decl($cc_path, $file, $global_rep, $rel_target_hh_path);
+      &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
     }
-    &dakota::generate::generate_src_defn($cc_path, $file, $global_rep, $rel_target_hh_path); # rel_target_hh not used
+    &dakota::generate::generate_src_defn($cc_path, $file, $global_target_ast, $rel_target_hh_path); # rel_target_hh not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -568,11 +568,11 @@ sub for_linker {
   return $result;
 }
 sub update_kw_args_generics {
-  my ($reps) = @_;
+  my ($asts) = @_;
   my $kw_args_generics = {};
-  foreach my $path (@$reps) {
-    my $rep = &scalar_from_file($path);
-    my $tbl = $$rep{'kw-args-generics'};
+  foreach my $path (@$asts) {
+    my $ast = &scalar_from_file($path);
+    my $tbl = $$ast{'kw-args-generics'};
     if ($tbl) {
       while (my ($name, $params_tbl) = each(%$tbl)) {
         while (my ($params_str, $params) = each(%$params_tbl)) {
@@ -581,12 +581,12 @@ sub update_kw_args_generics {
       }
     }
   }
-  my $path = $$reps[-1]; # only update the project file rep
-  my $rep = &scalar_from_file($path);
-  $$rep{'kw-args-generics'} = $kw_args_generics;
-  &scalar_to_file($path, $rep);
+  my $path = $$asts[-1]; # only update the project file ast
+  my $ast = &scalar_from_file($path);
+  $$ast{'kw-args-generics'} = $kw_args_generics;
+  &scalar_to_file($path, $ast);
 }
-sub update_rep_from_all_inputs {
+sub update_ast_from_all_inputs {
   my ($cmd_info) = @_;
   my $start_time = time;
   my $orig = { 'inputs' => $$cmd_info{'inputs'},
@@ -603,12 +603,12 @@ sub update_rep_from_all_inputs {
   if (&is_debug()) {
     print STDERR "creating $target_ast_path" . &pann(__FILE__, __LINE__) . $nl;
   }
-  $cmd_info = &loop_rep_from_so($cmd_info);
-  $cmd_info = &loop_rep_from_inputs($cmd_info);
-  die if $$cmd_info{'reps'}[-1] ne $target_ast_path; # assert
+  $cmd_info = &loop_ast_from_so($cmd_info);
+  $cmd_info = &loop_ast_from_inputs($cmd_info);
+  die if $$cmd_info{'asts'}[-1] ne $target_ast_path; # assert
   &add_visibility_file($target_ast_path);
 
-  &update_kw_args_generics($$cmd_info{'reps'});
+  &update_kw_args_generics($$cmd_info{'asts'});
   $$cmd_info{'inputs'} = $$orig{'inputs'};
   $$cmd_info{'output'} = $$orig{'output'};
   $$cmd_info{'opts'} =   $$orig{'opts'};
@@ -627,13 +627,13 @@ my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
   $builddir = &dakota::util::builddir();
-  $cmd_info = &update_rep_from_all_inputs($cmd_info);
+  $cmd_info = &update_ast_from_all_inputs($cmd_info);
   my $target_ast_path = &target_ast_path($cmd_info);
   if ($$cmd_info{'opts'}{'parse'}) {
     print $target_ast_path . $nl;
     return $exit_status;
   }
-  &set_global_project_rep($target_ast_path);
+  &set_global_project_ast($target_ast_path);
   $root_cmd = $cmd_info;
 
   if (!$$cmd_info{'opts'}{'compiler'}) {
@@ -728,7 +728,7 @@ sub start_cmd {
   }
   return $exit_status;
 }
-sub rep_from_so {
+sub ast_from_so {
   my ($cmd_info, $arg) = @_;
   if (!$arg) {
     $arg = $$cmd_info{'input'};
@@ -745,23 +745,23 @@ sub rep_from_so {
   &ctlg_from_so($ctlg_cmd);
   my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
   &check_path($ast_path);
-  &ordered_set_add($$cmd_info{'reps'}, $ast_path, __FILE__, __LINE__);
-  my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
-  $$rep_cmd{'output'} = $ast_path;
-  $$rep_cmd{'inputs'} = [ $ctlg_path ];
-  $$rep_cmd{'project.io'} =  $$cmd_info{'project.io'};
-  &rep_from_inputs($rep_cmd);
+  &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
+  my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
+  $$ast_cmd{'output'} = $ast_path;
+  $$ast_cmd{'inputs'} = [ $ctlg_path ];
+  $$ast_cmd{'project.io'} =  $$cmd_info{'project.io'};
+  &ast_from_inputs($ast_cmd);
   if (!$should_write_ctlg_files) {
     #unlink $ctlg_path;
   }
 }
-sub loop_rep_from_so {
+sub loop_ast_from_so {
   my ($cmd_info) = @_;
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   my $target_ast_path = &target_ast_path($cmd_info);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
-      &rep_from_so($cmd_info, $input);
+      &ast_from_so($cmd_info, $input);
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
       $input = &canon_path($input);
@@ -772,16 +772,16 @@ sub loop_rep_from_so {
   }
   &scalar_to_file($$cmd_info{'project.io'}, $project_io);
   return $cmd_info;
-} # loop_rep_from_so
+} # loop_ast_from_so
 sub check_path {
   my ($path) = @_;
   die if $path =~ m=^build/build/=;
   die if $path =~ m=^build/+{rt|user}/build/=;
 }
-sub rep_from_inputs {
+sub ast_from_inputs {
   my ($cmd_info) = @_;
-  my $rep_cmd = {
-    'cmd' =>         '&loop_merged_rep_from_inputs',
+  my $ast_cmd = {
+    'cmd' =>         '&loop_merged_ast_from_inputs',
     'opts' =>        $$cmd_info{'opts'},
     'output' =>      $$cmd_info{'output'},
     'inputs' =>      $$cmd_info{'inputs'},
@@ -789,13 +789,13 @@ sub rep_from_inputs {
     'project.target' =>  $$cmd_info{'project.target'},
   };
   my $should_echo;
-  my $result = &outfile_from_infiles($rep_cmd, $should_echo = 0);
+  my $result = &outfile_from_infiles($ast_cmd, $should_echo = 0);
   if ($result) {
-    if (0 != @{$$rep_cmd{'reps'} ||= []}) {
+    if (0 != @{$$ast_cmd{'asts'} ||= []}) {
       my $target_ast_path = &target_ast_path($cmd_info);
-      &project_io_add($cmd_info, $$rep_cmd{'reps'}, $target_ast_path);
+      &project_io_add($cmd_info, $$ast_cmd{'asts'}, $target_ast_path);
     }
-    foreach my $input (@{$$rep_cmd{'inputs'}}) {
+    foreach my $input (@{$$ast_cmd{'inputs'}}) {
       if (&is_so_path($input)) {
         my $ctlg_path = &ctlg_path_from_so_path($input);
         my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
@@ -817,42 +817,42 @@ sub rep_from_inputs {
   }
   return $result;
 }
-sub loop_rep_from_inputs {
+sub loop_ast_from_inputs {
   my ($cmd_info) = @_;
-  my $rep_files = [];
+  my $ast_files = [];
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
       my $ast_path = &ast_path_from_dk_path($input);
       &check_path($ast_path);
-      my $rep_cmd = {
+      my $ast_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
         'output' => $ast_path,
         'inputs' => [ $input ],
       };
-      &rep_from_inputs($rep_cmd);
-      &ordered_set_add($rep_files, $ast_path, __FILE__, __LINE__);
-    } elsif (&is_rep_path($input)) {
-      &ordered_set_add($rep_files, $input, __FILE__, __LINE__);
+      &ast_from_inputs($ast_cmd);
+      &ordered_set_add($ast_files, $ast_path, __FILE__, __LINE__);
+    } elsif (&is_ast_path($input)) {
+      &ordered_set_add($ast_files, $input, __FILE__, __LINE__);
     }
   }
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
-    if (0 != @$rep_files) {
+    if (0 != @$ast_files) {
       my $target_ast_path = &target_ast_path($cmd_info);
       &check_path($target_ast_path);
-      &ordered_set_add($$cmd_info{'reps'}, $target_ast_path, __FILE__, __LINE__);
-      my $rep_cmd = {
+      &ordered_set_add($$cmd_info{'asts'}, $target_ast_path, __FILE__, __LINE__);
+      my $ast_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
         'output' => $target_ast_path,
-        'inputs' => $rep_files,
+        'inputs' => $ast_files,
       };
-      &rep_from_inputs($rep_cmd); # multiple inputs
+      &ast_from_inputs($ast_cmd); # multiple inputs
     }
   }
   return $cmd_info;
-} # loop_rep_from_inputs
+} # loop_ast_from_inputs
 sub gen_target_o {
   my ($cmd_info, $is_exe) = @_;
   die if ! $$cmd_info{'output'};
@@ -872,7 +872,7 @@ sub gen_target_o {
   }
   my $target_ast_path = &target_ast_path($cmd_info);
   &check_path($target_ast_path);
-  $$cmd_info{'rep'} = $target_ast_path;
+  $$cmd_info{'ast'} = $target_ast_path;
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
   if ($dk_exe_type) {
@@ -929,22 +929,22 @@ sub o_from_dk {
       }
     }
     my $hh_path = &hh_path_from_src_path($src_path);
-    if (!$want_separate_rep_pass) {
+    if (!$want_separate_ast_pass) {
       &check_path($ast_path);
-      my $rep_cmd = { 'opts' => $$cmd_info{'opts'} };
-      $$rep_cmd{'inputs'} = [ $input ];
-      $$rep_cmd{'output'} = $ast_path;
-      $$rep_cmd{'project.io'} =  $$cmd_info{'project.io'};
-      $num_out_of_date_infiles = &rep_from_inputs($rep_cmd);
+      my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
+      $$ast_cmd{'inputs'} = [ $input ];
+      $$ast_cmd{'output'} = $ast_path;
+      $$ast_cmd{'project.io'} =  $$cmd_info{'project.io'};
+      $num_out_of_date_infiles = &ast_from_inputs($ast_cmd);
       if ($num_out_of_date_infiles) {
         &project_io_add($cmd_info, $input, $ast_path);
       }
-      &ordered_set_add($$cmd_info{'reps'}, $ast_path, __FILE__, __LINE__);
+      &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
     }
     my $cc_cmd = { 'opts' => $$cmd_info{'opts'} };
     $$cc_cmd{'inputs'} = [ $input ];
     $$cc_cmd{'output'} = $src_path;
-    $$cc_cmd{'reps'} = $$cmd_info{'reps'};
+    $$cc_cmd{'asts'} = $$cmd_info{'asts'};
     $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
     $$cc_cmd{'project.target'} = $$cmd_info{'project.target'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
@@ -1016,7 +1016,7 @@ sub cc_from_dk {
   $$cc_cmd{'project.io'} =  $$cmd_info{'project.io'};
   $$cc_cmd{'project.target'} = $$cmd_info{'project.target'};
   $$cc_cmd{'cmd'} = '&loop_cc_from_dk';
-  $$cc_cmd{'reps'} = $$cmd_info{'reps'};
+  $$cc_cmd{'asts'} = $$cmd_info{'asts'};
   $$cc_cmd{'output'} = $$cmd_info{'output'};
   $$cc_cmd{'inputs'} = $$cmd_info{'inputs'};
   my $should_echo;
@@ -1072,7 +1072,7 @@ sub o_from_cc {
 }
 sub target_o_from_ast {
   my ($cmd_info, $other, $is_exe) = @_;
-  die if ! defined $$cmd_info{'reps'} || 0 == @{$$cmd_info{'reps'}};
+  die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   my $target_ast_path = &target_ast_path($cmd_info);
   my $target_cc_path =   &target_cc_path($cmd_info);
   &check_path($target_ast_path);
@@ -1101,7 +1101,7 @@ sub target_o_from_ast {
   my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
-  my $global_rep = &init_global_rep($$cmd_info{'reps'}); # within target_o_from_ast
+  my $global_target_ast = &init_global_target_ast($$cmd_info{'asts'}); # within target_o_from_ast
   $file = &scalar_from_file($target_ast_path);
   die if $$file{'other'};
   $$file{'other'} = $other;
@@ -1117,9 +1117,9 @@ sub target_o_from_ast {
   &src::add_extra_keywords($file);
   &src::add_extra_generics($file);
 
-  my $project_rep;
-  &dakota::generate::generate_target_decl($target_cc_path, $file, $project_rep = undef, $is_exe);
-  &dakota::generate::generate_target_defn($target_cc_path, $file, $project_rep = undef, $is_exe);
+  my $project_ast;
+  &dakota::generate::generate_target_decl($target_cc_path, $file, $project_ast = undef, $is_exe);
+  &dakota::generate::generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
 
   my $o_info = {'opts' => {}, 'inputs' => [ $target_cc_path ], 'output' => $target_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};
@@ -1247,7 +1247,7 @@ sub outfile_from_infiles {
     }
     my $output = $$cmd_info{'output'};
 
-    if (!&is_rep_path($output) &&
+    if (!&is_ast_path($output) &&
         !&is_ctlg_path($output)) {
       #$should_echo = 0;
       if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
@@ -1255,12 +1255,12 @@ sub outfile_from_infiles {
       }
       #print STDERR "    creating $output # output" . &pann(__FILE__, __LINE__) . $nl;
     }
-    if ('&loop_merged_rep_from_inputs' eq $$cmd_info{'cmd'}) {
+    if ('&loop_merged_ast_from_inputs' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
       delete $$cmd_info{'output'};
       delete $$cmd_info{'cmd'};
       delete $$cmd_info{'cmd-flags'};
-      &loop_merged_rep_from_inputs($cmd_info, $global_should_echo || $should_echo);
+      &loop_merged_ast_from_inputs($cmd_info, $global_should_echo || $should_echo);
     } elsif ('&loop_cc_from_dk' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
       delete $$cmd_info{'output'};
