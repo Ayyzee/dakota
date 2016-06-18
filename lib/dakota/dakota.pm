@@ -655,17 +655,17 @@ sub start_cmd {
       $cxx_shared_flags .= &for_linker($ld_soname_flags);
     }
     $cxx_shared_flags .= &for_linker($no_undefined_flags);
-    $dk_exe_type = 'exe-type::k_lib';
+    $dk_exe_type = '#lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
       $cxx_shared_flags .= &for_linker($ld_soname_flags);
     }
     $cxx_shared_flags .= &for_linker($no_undefined_flags);
-    $dk_exe_type = 'exe-type::k_lib';
+    $dk_exe_type = '#lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
 	   && !$$cmd_info{'opts'}{'shared'}
 	   && !$$cmd_info{'opts'}{'dynamic'}) {
-    $dk_exe_type = 'exe-type::k_exe';
+    $dk_exe_type = '#exe';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }

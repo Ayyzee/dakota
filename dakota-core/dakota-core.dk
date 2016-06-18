@@ -46,8 +46,6 @@ export dakota-core {
   equal-predicate::slots-t;
   equal-predicate;
   exception;
-  exe-type::slots-t;
-  exe-type;
   forward-iterator;
   generic-func;
   generic-func::slots-t;

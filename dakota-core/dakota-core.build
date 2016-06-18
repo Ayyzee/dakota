@@ -15,7 +15,6 @@
       '$(srcdir)/enum-info.dk',
       '$(srcdir)/equal-predicate.dk',
       '$(srcdir)/exception.dk',
-      '$(srcdir)/exe-type.dk',
       '$(srcdir)/forward-iterator.dk',
       '$(srcdir)/hash.dk',
       '$(srcdir)/illegal-klass-exception.dk',

@@ -54,7 +54,6 @@ klass bit-vector;
 klass const-info;
 klass enum-info;
 klass exception;
-klass exe-type;
 klass illegal-klass-exception;
 klass initialize-func;
 klass intptr;
@@ -1463,13 +1462,13 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       dump-interposers(ostrm, registration-info);
     }
   }
-  exe-type-t type = cast(exe-type-t)named-info::at(registration-info, #type, cast(ssize-t)#klass);
+  symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(ssize-t)#exe);
 
   switch (type) {
-    case exe-type::k-lib:
+    case #lib:
       add-registration-info(registration-info);
       break;
-    case exe-type::k-exe:
+    case #exe:
       add-registration-info(registration-info);
       if (nullptr == getenv("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
@@ -1481,6 +1480,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (nullptr != getenv("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
       pre-main? = false;
+      break;
   }
   if (nullptr != output-path && NUL != output-path[0] && nullptr != ctlg-output)
     fclose(ctlg-output);
