@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <dlfcn.h>  // dlopen()/dlclose()/dlinfo()
+# include <dlfcn.h>  // dlopen()/dlclose()/dlinfo()/dlerror()
 # include <stdint.h>
-# include <stdio.h>  // fprintf(), stderr
+# include <stdio.h>  // printf(), fprintf(), stderr
 # include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 
 # define DARWIN 1
@@ -24,6 +24,8 @@
 # if DARWIN
   # include <mach-o/dyld.h>
   # include <mach-o/nlist.h>
+# else
+  # include <link.h>
 # endif
 
 # define FUNC auto
