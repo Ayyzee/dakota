@@ -28,10 +28,41 @@
 # include <dlfcn.h> // dlopen(), dlclose(), dlinfo()
 
 # define FUNC auto
+# define TYPEALIAS using
 # define cast(t) (t)
 
-static inline FUNC abs_path_for_dso_handle(void* handle) -> const char* {
-  const char* result = nullptr;
+TYPEALIAS str_t = const char*;
+TYPEALIAS ptr_t = void*;
+
+static inline FUNC dso_open(str_t name, int mode) -> ptr_t {
+  ptr_t result;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  result = dlopen(name, mode);
+# endif
+  return result;
+}
+static inline FUNC dso_close(ptr_t handle) -> int {
+  int result;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  result = dlclose(handle);
+# endif
+  return result;
+}
+static inline FUNC dso_error() -> str_t {
+  str_t result;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  result = dlerror();
+# endif
+  return result;
+}
+static inline FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t {
+  str_t result = nullptr;
   if (nullptr == handle)
     return result;
 # if defined __linux__
@@ -41,12 +72,21 @@ static inline FUNC abs_path_for_dso_handle(void* handle) -> const char* {
     result = l_map.l_name;
 # elif defined __APPLE__
   for (int32_t i = cast(int32_t)_dyld_image_count(); i >= 0 ; i--) {
-    const char* image_name = _dyld_get_image_name(cast(uint32_t)i);
-    void* image_handle = dlopen(image_name, RTLD_NOLOAD);
-    dlclose(image_handle);
+    str_t image_name = _dyld_get_image_name(cast(uint32_t)i);
+    ptr_t image_handle = dso_open(image_name, RTLD_NOLOAD);
+    dso_close(image_handle);
     if (handle == image_handle)
       return image_name;
   }
 # endif
   return result;
+}
+static inline FUNC dso_abs_path_for_name(str_t name) -> str_t {
+  str_t abs_path = nullptr;
+  ptr_t handle = dso_open(name, RTLD_LAZY | RTLD_LOCAL);
+  if (nullptr != handle) {
+    abs_path = dso_abs_path_for_handle(handle);
+    dso_close(handle);
+  }
+  return abs_path;
 }

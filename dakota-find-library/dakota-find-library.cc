@@ -17,26 +17,15 @@
 # include <stdio.h>  // printf(), fprintf(), stderr
 # include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 
-# include <dlfcn.h> // dlopen(), dlclose(), dlerror()
-
-# include "abs-path-for-dso-handle.hh"
+# include "dso.hh"
 
 # define FUNC auto
 
 static const char* progname;
 
-static FUNC abs_path_for_name(const char* name) -> const char* {
-  const char* abs_path = nullptr;
-  void* handle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);
-  if (nullptr != handle) {
-    abs_path = abs_path_for_dso_handle(handle);
-    dlclose(handle);
-  }
-  return abs_path;
-}
 static FUNC echo_abs_path_for_name(const char* name) -> int {
   int exit_value = EXIT_SUCCESS;
-  const char* abs_path = abs_path_for_name(name);
+  const char* abs_path = dso_abs_path_for_name(name);
   printf("%s\n", abs_path ? abs_path : name);
   if (nullptr == abs_path) {
     fprintf(stderr, "%s: error: %s\n", progname, dlerror());
