@@ -23,10 +23,10 @@
 
 static const char* progname;
 
-static FUNC echo_abs_path_for_name(const char* name) -> int {
+static FUNC echo_abs_path_for_lib_name(const char* lib_name) -> int {
   int exit_value = EXIT_SUCCESS;
-  const char* abs_path = dso_abs_path_for_name(name);
-  printf("%s\n", abs_path ? abs_path : name);
+  const char* abs_path = dso_abs_path_for_lib_name(lib_name);
+  printf("%s\n", abs_path ? abs_path : lib_name);
   if (nullptr == abs_path) {
     fprintf(stderr, "%s: error: %s\n", progname, dlerror());
     exit_value = EXIT_FAILURE;
@@ -37,6 +37,6 @@ FUNC main(int argc, const char* const* argv) -> int {
   progname = argv[0];
   int exit_value = EXIT_SUCCESS;
   for (int i = 1; i < argc; i++)
-    exit_value |= echo_abs_path_for_name(argv[i]);
+    exit_value |= echo_abs_path_for_lib_name(argv[i]);
   return exit_value;
 }

@@ -81,9 +81,9 @@ static inline FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t {
 # endif
   return result;
 }
-static inline FUNC dso_abs_path_for_name(str_t name) -> str_t {
+static inline FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t {
   str_t abs_path = nullptr;
-  ptr_t handle = dso_open(name, RTLD_LAZY | RTLD_LOCAL);
+  ptr_t handle = dso_open(lib_name, RTLD_LAZY | RTLD_LOCAL);
   if (nullptr != handle) {
     abs_path = dso_abs_path_for_handle(handle);
     dso_close(handle);
