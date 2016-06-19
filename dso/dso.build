@@ -1,0 +1,11 @@
+# -*- mode: perl -*-
+{
+  'builddir' => 'dkt',
+  'srcs' => [
+    '$(srcdir)/dso.$(cc_ext)',
+  ],
+  'libs' => [
+    'libdl.$(so_ext)',
+  ],
+  'target' => '../lib/libdso.$(so_ext)',
+}
