@@ -17,28 +17,63 @@
 # include <stdio.h>  // fprintf(), stderr
 # include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 # include <dlfcn.h>  // dlopen()/dlclose()/dlinfo()
+# include <stdint.h>
+
+# define DARWIN 1
+
+# if DARWIN
+  # include <mach-o/dyld.h>
+  # include <mach-o/nlist.h>
+# else
+# endif
 
 # define FUNC auto
+# define cast(t) (t)
 
+static FUNC pathname_for_handle(void* handle) -> const char* {
+  const char* result = nullptr;
+  if (nullptr == handle)
+    return result;
+# if DARWIN
+  for (int32_t i = cast(int32_t)_dyld_image_count(); i >= 0 ; i--) {
+    const char* image_name = _dyld_get_image_name(cast(uint32_t)i);
+    void* image_handle = dlopen(image_name, RTLD_NOLOAD);
+    dlclose(image_handle);
+    if (handle == image_handle)
+      return image_name;
+  }
+# else
+  struct link_map l_map = {};
+  int r = dlinfo(handle, RTLD_DI_LINKMAP, &l_map);
+  if (0 == r && nullptr != l_map.l_name)
+    result = l_map.l_name;
+# endif
+  return result;
+}
+static FUNC pathname_for_name(const char* name) -> const char* {
+  const char* pathname = nullptr;
+  void* handle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);
+  if (nullptr != handle) {
+    pathname = pathname_for_handle(handle);
+    dlclose(handle);
+  }
+  return pathname;
+}
+static FUNC empty_when_null(const char* str) -> const char* {
+  const char* result = str;
+  if (nullptr == result)
+    result = "";
+  return result;
+}
 FUNC main(int argc, const char* const* argv) -> int {
+  const char* prog_name = argv[0];
   int exit_value = EXIT_SUCCESS;
   for (int i = 1; i < argc; i++) {
     const char* arg = argv[i];
-    void* handle = dlopen(arg, RTLD_LAZY | RTLD_LOCAL);
-    if (nullptr != handle) {
-      struct link_map l_map = {};
-      int r = dlinfo(handle, RTLD_DI_LINKMAP, &l_map);
-      if (0 == r && nullptr != l_map.l_name) {
-        printf("%s\n", l_map.l_name);
-        dlclose(handle);
-      } else {
-        printf("%s\n", arg);
-        fprintf(stderr, "%s: error: %s", argv[0], dlerror());
-        exit_value = EXIT_FAILURE;
-      }
-    } else {
-      printf("%s\n", arg);
-      fprintf(stderr, "%s: error: %s", argv[0], dlerror());
+    const char* pathname = pathname_for_name(arg);
+    printf("%s\n", empty_when_null(pathname));
+    if (nullptr == pathname) {
+      fprintf(stderr, "%s: error: %s\n", prog_name, dlerror());
       exit_value = EXIT_FAILURE;
     }
   }
