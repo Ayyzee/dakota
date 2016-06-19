@@ -19,7 +19,7 @@
 
 # include <dlfcn.h> // dlopen(), dlclose(), dlerror()
 
-# include "abs-path-for-handle.hh"
+# include "abs-path-for-dso-handle.hh"
 
 # define FUNC auto
 
@@ -29,7 +29,7 @@ static FUNC abs_path_for_name(const char* name) -> const char* {
   const char* abs_path = nullptr;
   void* handle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);
   if (nullptr != handle) {
-    abs_path = abs_path_for_handle(handle);
+    abs_path = abs_path_for_dso_handle(handle);
     dlclose(handle);
   }
   return abs_path;

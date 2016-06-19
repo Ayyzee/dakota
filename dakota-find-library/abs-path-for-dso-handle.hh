@@ -30,7 +30,7 @@
 # define FUNC auto
 # define cast(t) (t)
 
-static inline FUNC abs_path_for_handle(void* handle) -> const char* {
+static inline FUNC abs_path_for_dso_handle(void* handle) -> const char* {
   const char* result = nullptr;
   if (nullptr == handle)
     return result;
