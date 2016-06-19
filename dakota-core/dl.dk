@@ -22,16 +22,19 @@ module dakota-core;
 
 // http://pubs.opengroup.org/onlinepubs/009695399/basedefs/dlfcn.h.html
 
-// dso-open() mode flags (default is dso-NOW|dso-LOCAL)
-const int-t dso-LAZY = RTLD-LAZY;
-const int-t dso-NOW =  RTLD-NOW;
-//
-const int-t dso-GLOBAL = RTLD-GLOBAL;
-const int-t dso-LOCAL =  RTLD-LOCAL;
+// dso-open() mode flags (default is DSO.NOW | DSO.LOCAL)
+// this is different (but safer) than dlopen()
 
-// dso-symbol() pseudo handles
-const ptr-t dso-DEFAULT = RTLD-DEFAULT;
-const ptr-t dso-NEXT =    RTLD-NEXT;
+const dso-t DSO = {
+  .LAZY = RTLD-LAZY,
+  .NOW =  RTLD-NOW,
+
+  .GLOBAL = RTLD-GLOBAL,
+  .LOCAL =  RTLD-LOCAL,
+
+  .DEFAULT = RTLD-DEFAULT,
+  .NEXT =    RTLD-NEXT,
+};
 
 klass x::dl-info {
   slots Dl-info;
@@ -42,7 +45,7 @@ func dso-open(str-t name, int mode) -> ptr-t {
   HINSTANCE handle = LoadLibrary(name);
 # else
   if (0 == mode)
-    mode = dso-NOW | dso-LOCAL;
+    mode = DSO.NOW | DSO.LOCAL;
   ptr-t handle = dlopen(name, mode);
 # endif
   return cast(ptr-t)handle;
