@@ -14,21 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <stdio.h>  // fprintf(), stderr
-# include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 # include <dlfcn.h>  // dlopen()/dlclose()/dlinfo()
 # include <stdint.h>
+# include <stdio.h>  // fprintf(), stderr
+# include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 
 # define DARWIN 1
 
 # if DARWIN
   # include <mach-o/dyld.h>
   # include <mach-o/nlist.h>
-# else
 # endif
 
 # define FUNC auto
 # define cast(t) (t)
+
+static const char* progname;
 
 static FUNC abs_path_for_handle(void* handle) -> const char* {
   const char* result = nullptr;
@@ -59,25 +60,20 @@ static FUNC abs_path_for_name(const char* name) -> const char* {
   }
   return abs_path;
 }
-static FUNC empty_when_null(const char* str) -> const char* {
-  const char* result = str;
-  if (nullptr == result)
-    result = "";
-  return result;
-}
-static FUNC echo_abs_path_for_name(const char* const* argv, int i) -> int {
+static FUNC echo_abs_path_for_name(const char* name) -> int {
   int exit_value = EXIT_SUCCESS;
-  const char* abs_path = abs_path_for_name(argv[i]);
-  printf("%s\n", empty_when_null(abs_path));
+  const char* abs_path = abs_path_for_name(name);
+  printf("%s\n", nullptr != abs_path ? abs_path : "");
   if (nullptr == abs_path) {
-    fprintf(stderr, "%s: error: %s\n", argv[0], dlerror());
+    fprintf(stderr, "%s: error: %s\n", progname, dlerror());
     exit_value = EXIT_FAILURE;
   }
   return exit_value;
 }
 FUNC main(int argc, const char* const* argv) -> int {
+  progname = argv[0];
   int exit_value = EXIT_SUCCESS;
   for (int i = 1; i < argc; i++)
-    exit_value |= echo_abs_path_for_name(argv, i);
+    exit_value |= echo_abs_path_for_name(argv[i]);
   return exit_value;
 }
