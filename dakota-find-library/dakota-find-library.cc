@@ -65,17 +65,19 @@ static FUNC empty_when_null(const char* str) -> const char* {
     result = "";
   return result;
 }
-FUNC main(int argc, const char* const* argv) -> int {
-  const char* prog_name = argv[0];
+static FUNC echo_abs_path_for_name(const char* const* argv, int i) -> int {
   int exit_value = EXIT_SUCCESS;
-  for (int i = 1; i < argc; i++) {
-    const char* name = argv[i];
-    const char* abs_path = abs_path_for_name(name);
-    printf("%s\n", empty_when_null(abs_path));
-    if (nullptr == abs_path) {
-      fprintf(stderr, "%s: error: %s\n", prog_name, dlerror());
-      exit_value = EXIT_FAILURE;
-    }
+  const char* abs_path = abs_path_for_name(argv[i]);
+  printf("%s\n", empty_when_null(abs_path));
+  if (nullptr == abs_path) {
+    fprintf(stderr, "%s: error: %s\n", argv[0], dlerror());
+    exit_value = EXIT_FAILURE;
   }
+  return exit_value;
+}
+FUNC main(int argc, const char* const* argv) -> int {
+  int exit_value = EXIT_SUCCESS;
+  for (int i = 1; i < argc; i++)
+    exit_value |= echo_abs_path_for_name(argv, i);
   return exit_value;
 }
