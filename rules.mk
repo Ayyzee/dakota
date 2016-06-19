@@ -1,6 +1,9 @@
 %.tbl: $(srcdir)/%.pl
 	./$< > $@
 
+../lib/lib%.$(so_ext): %.$(cc_ext) | %.project
+	$(CXX) $(CXX_SHARED_FLAGS) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
+
 ../bin/%: $(srcdir)/%.$(cc_ext)
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
 
