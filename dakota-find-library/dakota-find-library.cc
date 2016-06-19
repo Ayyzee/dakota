@@ -65,7 +65,7 @@ static FUNC abs_path_for_name(const char* name) -> const char* {
 static FUNC echo_abs_path_for_name(const char* name) -> int {
   int exit_value = EXIT_SUCCESS;
   const char* abs_path = abs_path_for_name(name);
-  printf("%s\n", nullptr != abs_path ? abs_path : "");
+  printf("%s\n", abs_path ? abs_path : name);
   if (nullptr == abs_path) {
     fprintf(stderr, "%s: error: %s\n", progname, dlerror());
     exit_value = EXIT_FAILURE;

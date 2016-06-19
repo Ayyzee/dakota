@@ -617,11 +617,20 @@ sub path_stat {
   }
   return $stat;
 }
+sub find_library {
+  my ($name) = @_;
+  $name = `dakota-find-library $name 2>/dev/null`;
+  $name =~ s/\s+$//;
+  return $name;
+}
 sub is_out_of_date {
   my ($infile, $outfile, $file_db) = @_;
   my $outfile_stat = &path_stat($file_db, $outfile, '--output');
   if (!$$outfile_stat{'mtime'}) {
     return 1;
+  }
+  if (! -e $infile) {
+    $infile = &find_library($infile);
   }
   my $infile_stat = &path_stat($file_db, $infile,  '--inputs');
 
@@ -753,7 +762,9 @@ sub copy_no_dups {
   my $result = [];
   foreach my $str (@$strs) {
     if (! $ENV{'DKT_PRECOMPILE'} && ! -e $str) {
-      print STDERR $0 . ': warning: no-such-file: ' . $str . $nl;
+      if ($str eq &find_library($str)) {
+        print STDERR $0 . ': warning: no-such-file: ' . $str . $nl;
+      }
     }
     if (&is_abs($str)) {
       $str = &canon_path($str);
