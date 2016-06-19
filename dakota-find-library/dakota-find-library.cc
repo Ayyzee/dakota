@@ -14,17 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <dlfcn.h>  // dlopen()/dlclose()/dlinfo()/dlerror()
-# include <stdint.h>
 # include <stdio.h>  // printf(), fprintf(), stderr
 # include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 
 # if defined __linux__
   # include <link.h>
+  # if ! defined _GNU_SOURCE
+    # define _GNU_SOURCE // dlinfo()
+  # endif
 # elif defined __APPLE__
+  # include <stdint.h>
   # include <mach-o/dyld.h>
   # include <mach-o/nlist.h>
 # endif
+
+# include <dlfcn.h>  // dlopen()/dlclose()/dlinfo()/dlerror()
 
 # define FUNC auto
 # define cast(t) (t)
