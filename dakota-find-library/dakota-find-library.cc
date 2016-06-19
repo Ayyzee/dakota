@@ -19,13 +19,11 @@
 # include <stdio.h>  // printf(), fprintf(), stderr
 # include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 
-# define DARWIN 1
-
-# if DARWIN
+# if defined __linux__
+  # include <link.h>
+# elif defined __APPLE__
   # include <mach-o/dyld.h>
   # include <mach-o/nlist.h>
-# else
-  # include <link.h>
 # endif
 
 # define FUNC auto
@@ -37,7 +35,12 @@ static FUNC abs_path_for_handle(void* handle) -> const char* {
   const char* result = nullptr;
   if (nullptr == handle)
     return result;
-# if DARWIN
+# if defined __linux__
+  struct link_map l_map = {};
+  int r = dlinfo(handle, RTLD_DI_LINKMAP, &l_map);
+  if (0 == r && nullptr != l_map.l_name)
+    result = l_map.l_name;
+# elif defined __APPLE__
   for (int32_t i = cast(int32_t)_dyld_image_count(); i >= 0 ; i--) {
     const char* image_name = _dyld_get_image_name(cast(uint32_t)i);
     void* image_handle = dlopen(image_name, RTLD_NOLOAD);
@@ -45,11 +48,6 @@ static FUNC abs_path_for_handle(void* handle) -> const char* {
     if (handle == image_handle)
       return image_name;
   }
-# else
-  struct link_map l_map = {};
-  int r = dlinfo(handle, RTLD_DI_LINKMAP, &l_map);
-  if (0 == r && nullptr != l_map.l_name)
-    result = l_map.l_name;
 # endif
   return result;
 }
