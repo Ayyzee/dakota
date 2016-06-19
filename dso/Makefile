@@ -8,11 +8,25 @@ include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(project).m
 
 .PHONY:\
  all\
+ check\
+ check-exe\
  clean\
+ install\
 
 all: $(target)
+
+check: all
+
+check-exe: all
 
 clean:
 	$(RM) $(RMFLAGS) $(target)
 	$(RM) $(RMFLAGS) $(BUILDDIR)/$(project).mk
 	$(RM) $(RMFLAGS) $(builddir)
+
+install-dirs := $(DESTDIR)$(prefix)/{include,lib}
+
+$(install-dirs):
+	sudo $(MKDIR) $(MKDIRFLAGS) $@
+
+install: all $(install-dirs) $(install-files)

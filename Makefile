@@ -27,6 +27,7 @@ install \
 installcheck \
 precompile \
 uninstall:
+	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
