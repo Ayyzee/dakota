@@ -30,7 +30,7 @@
 # define FUNC auto
 # define cast(t) (t)
 
-static FUNC pathname_for_handle(void* handle) -> const char* {
+static FUNC abs_path_for_handle(void* handle) -> const char* {
   const char* result = nullptr;
   if (nullptr == handle)
     return result;
@@ -50,14 +50,14 @@ static FUNC pathname_for_handle(void* handle) -> const char* {
 # endif
   return result;
 }
-static FUNC pathname_for_name(const char* name) -> const char* {
-  const char* pathname = nullptr;
+static FUNC abs_path_for_name(const char* name) -> const char* {
+  const char* abs_path = nullptr;
   void* handle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);
   if (nullptr != handle) {
-    pathname = pathname_for_handle(handle);
+    abs_path = abs_path_for_handle(handle);
     dlclose(handle);
   }
-  return pathname;
+  return abs_path;
 }
 static FUNC empty_when_null(const char* str) -> const char* {
   const char* result = str;
@@ -69,10 +69,10 @@ FUNC main(int argc, const char* const* argv) -> int {
   const char* prog_name = argv[0];
   int exit_value = EXIT_SUCCESS;
   for (int i = 1; i < argc; i++) {
-    const char* arg = argv[i];
-    const char* pathname = pathname_for_name(arg);
-    printf("%s\n", empty_when_null(pathname));
-    if (nullptr == pathname) {
+    const char* name = argv[i];
+    const char* abs_path = abs_path_for_name(name);
+    printf("%s\n", empty_when_null(abs_path));
+    if (nullptr == abs_path) {
       fprintf(stderr, "%s: error: %s\n", prog_name, dlerror());
       exit_value = EXIT_FAILURE;
     }
