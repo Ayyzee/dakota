@@ -17,44 +17,14 @@
 # include <stdio.h>  // printf(), fprintf(), stderr
 # include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
 
-# if defined __linux__
-  # include <link.h>
-  # if ! defined _GNU_SOURCE
-    # define _GNU_SOURCE // dlinfo()
-  # endif
-# elif defined __APPLE__
-  # include <stdint.h>
-  # include <mach-o/dyld.h>
-  # include <mach-o/nlist.h>
-# endif
+# include <dlfcn.h> // dlopen(), dlclose(), dlerror()
 
-# include <dlfcn.h>  // dlopen()/dlclose()/dlinfo()/dlerror()
+# include "abs-path-for-handle.hh"
 
 # define FUNC auto
-# define cast(t) (t)
 
 static const char* progname;
 
-static FUNC abs_path_for_handle(void* handle) -> const char* {
-  const char* result = nullptr;
-  if (nullptr == handle)
-    return result;
-# if defined __linux__
-  struct link_map l_map = {};
-  int r = dlinfo(handle, RTLD_DI_LINKMAP, &l_map);
-  if (0 == r && nullptr != l_map.l_name)
-    result = l_map.l_name;
-# elif defined __APPLE__
-  for (int32_t i = cast(int32_t)_dyld_image_count(); i >= 0 ; i--) {
-    const char* image_name = _dyld_get_image_name(cast(uint32_t)i);
-    void* image_handle = dlopen(image_name, RTLD_NOLOAD);
-    dlclose(image_handle);
-    if (handle == image_handle)
-      return image_name;
-  }
-# endif
-  return result;
-}
 static FUNC abs_path_for_name(const char* name) -> const char* {
   const char* abs_path = nullptr;
   void* handle = dlopen(name, RTLD_LAZY | RTLD_LOCAL);
