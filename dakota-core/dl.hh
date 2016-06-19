@@ -17,17 +17,23 @@
 # if !defined dkt_dl_hh
 # define      dkt_dl_hh
 
-struct dso_t {
+struct dso_open_mode_t {
+  // xor
+  int_t NOW; // default
   int_t LAZY;
-  int_t NOW;
 
-  int_t GLOBAL;
+  // xor
+  int_t GLOBAL; // default
   int_t LOCAL;
 
+  int_t NOLOAD;
+};
+struct dso_symbol_handle_t {
   ptr_t DEFAULT;
   ptr_t NEXT;
 };
-extern const dso_t DSO;
+extern const dso_open_mode_t     DSO_OPEN_MODE;
+extern const dso_symbol_handle_t DSO_SYMBOL_HANDLE;
 
 FUNC dso_open(str_t path, int_t mode) -> ptr_t;
 FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t;

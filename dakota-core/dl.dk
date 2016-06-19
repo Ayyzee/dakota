@@ -22,30 +22,41 @@ module dakota-core;
 
 // http://pubs.opengroup.org/onlinepubs/009695399/basedefs/dlfcn.h.html
 
-// dso-open() mode flags (default is DSO.NOW | DSO.LOCAL)
-// this is different (but safer) than dlopen()
+// dso-open() mode flags (default contains DSO-OPEN-MODE.NOW)
+// this is different (but safer) than dlopen() default mode flags (default contains RTLD-LAZY)
 
-const dso-t DSO = {
-  .LAZY = RTLD-LAZY,
-  .NOW =  RTLD-NOW,
+const dso-open-mode-t DSO-OPEN-MODE = {
+  .NOW =  RTLD-NOW,  // default
+  .LAZY = RTLD-LAZY, // dlopen() default
 
-  .GLOBAL = RTLD-GLOBAL,
+  .GLOBAL = RTLD-GLOBAL, // default
   .LOCAL =  RTLD-LOCAL,
 
+  .NOLOAD = RTLD-NOLOAD,
+};
+const dso-symbol-handle-t DSO-SYMBOL-HANDLE = {
   .DEFAULT = RTLD-DEFAULT,
   .NEXT =    RTLD-NEXT,
 };
 
-klass x::dl-info {
+static inline boole-t bit-set?(int-t word, uint-t pos) {
+  boole-t state = word & (1 << pos);
+  return state;
+}
+static inline boole-t bit-set?(int-t word, int-t pos) {
+  return bit-set?(word, cast(uint-t)pos);
+}
+
+klass dso-info {
   slots Dl-info;
 }
-func dso-open(str-t name, int mode) -> ptr-t {
+func dso-open(str-t name, int-t mode) -> ptr-t {
 # if defined WIN32
   USE(mode);
   HINSTANCE handle = LoadLibrary(name);
 # else
-  if (0 == mode)
-    mode = DSO.NOW | DSO.LOCAL;
+  if (!bit-set?(mode, DSO-OPEN-MODE.LAZY))
+    mode = DSO-OPEN-MODE.NOW;
   ptr-t handle = dlopen(name, mode);
 # endif
   return cast(ptr-t)handle;
@@ -56,7 +67,7 @@ func dso-symbol-name-for-addr(ptr-t addr) -> str-t {
 # if defined WIN32
 # error "not yet implemented on win32"
 # else
-  x::dl-info::slots-t dli;
+  dso-info::slots-t dli {};
   if (0 != dladdr(addr, &dli) && (dli.dli-saddr == addr))
     result = dli.dli-sname;
 # endif
@@ -67,9 +78,9 @@ func dso-abs-path-containing-addr(ptr-t addr) -> str-t {
 # if defined WIN32
 # error "not yet implemented on win32"
 # else
-  Dl-info dl-info {};
-  if (dladdr(addr, &dl-info))
-    result = dl-info.dli-fname;
+  dso-info::slots-t dli {};
+  if (dladdr(addr, &dli))
+    result = dli.dli-fname;
 # endif
   return result;
 }
