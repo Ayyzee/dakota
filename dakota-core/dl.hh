@@ -18,21 +18,21 @@
 # define      dkt_dl_hh
 
 // dso_open() mode flags (default is dso_NOW|dso_LOCAL)
-extern int_t dso_LAZY;
-extern int_t dso_NOW;
+extern const int_t dso_LAZY;
+extern const int_t dso_NOW;
 //
-extern int_t dso_GLOBAL;
-extern int_t dso_LOCAL;
+extern const int_t dso_GLOBAL;
+extern const int_t dso_LOCAL;
 
 // dso_symbol() pseudo handles
-extern ptr_t dso_DEFAULT;
-extern ptr_t dso_NEXT;
+extern const ptr_t dso_DEFAULT;
+extern const ptr_t dso_NEXT;
 
 FUNC dso_open(str_t path, int_t mode) -> ptr_t;
 FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t;
-FUNC dso_path_containing_addr(ptr_t addr) -> str_t;
+FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t;
 FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t;
-FUNC dso_close(ptr_t) -> int_t;
+FUNC dso_close(ptr_t handle) -> int_t;
 FUNC dso_error() -> str_t;
 
 # endif

@@ -1331,7 +1331,7 @@ static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -
       if (0 != status)
         sname-demangled = sname-mangled;
       syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
-             strsignal-name(sig), dso-path-containing-addr(si->si-addr), sname-demangled, si->si-addr);
+             strsignal-name(sig), dso-abs-path-containing-addr(si->si-addr), sname-demangled, si->si-addr);
       if (0 == status)
         free(cast(ptr-t)sname-demangled);
   } // else {}
@@ -1426,7 +1426,7 @@ static func last-user-code-before-main() -> void  {
 func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(nullptr != registration-info);
-  str-t dso-path = dso-path-containing-addr(registration-info);
+  str-t dso-path = dso-abs-path-containing-addr(registration-info);
   if (nullptr != dso-path)  {
     int-t overwrite;
     setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);

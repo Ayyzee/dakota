@@ -23,15 +23,15 @@ module dakota-core;
 // http://pubs.opengroup.org/onlinepubs/009695399/basedefs/dlfcn.h.html
 
 // dso-open() mode flags (default is dso-NOW|dso-LOCAL)
-int-t dso-LAZY = RTLD-LAZY;
-int-t dso-NOW =  RTLD-NOW;
+const int-t dso-LAZY = RTLD-LAZY;
+const int-t dso-NOW =  RTLD-NOW;
 //
-int-t dso-GLOBAL = RTLD-GLOBAL;
-int-t dso-LOCAL =  RTLD-LOCAL;
+const int-t dso-GLOBAL = RTLD-GLOBAL;
+const int-t dso-LOCAL =  RTLD-LOCAL;
 
 // dso-symbol() pseudo handles
-ptr-t dso-DEFAULT = RTLD-DEFAULT;
-ptr-t dso-NEXT =    RTLD-NEXT;
+const ptr-t dso-DEFAULT = RTLD-DEFAULT;
+const ptr-t dso-NEXT =    RTLD-NEXT;
 
 klass x::dl-info {
   slots Dl-info;
@@ -59,7 +59,7 @@ func dso-symbol-name-for-addr(ptr-t addr) -> str-t {
 # endif
   return result;
 }
-func dso-path-containing-addr(ptr-t addr) -> str-t {
+func dso-abs-path-containing-addr(ptr-t addr) -> str-t {
   str-t result = nullptr;
 # if defined WIN32
 # error "not yet implemented on win32"
