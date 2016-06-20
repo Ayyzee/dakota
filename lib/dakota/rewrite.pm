@@ -1071,7 +1071,7 @@ sub convert_dk_to_cc {
   # [?klass-type is 'klass' xor 'trait']
   # using ?klass-type ?qual-ident;
   # ?klass-type ?ident = ?qual-ident;
-  $$filestr_ref =~ s/\b(using\s+)(klass|trait)\b/$1 . uc($2) . "-NS"/ge;
+  $$filestr_ref =~ s/\b(using\s+)(klass|trait)(\s+)/$1 . uc($2) . "-NS" . $3/ge;
 
   #&nest_generics($filestr_ref);
   &rewrite_slots($filestr_ref);
