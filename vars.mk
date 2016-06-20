@@ -73,12 +73,12 @@ DAKOTA-BASE         := $(srcdir)/../bin/dakota
 DAKOTA-PROFILE-BASE := $(srcdir)/../bin/dakota-profile
 
 ifdef DKT_PROFILE
-  DAKOTA ?= ${DAKOTA-ENV-VARS} ${DAKOTA-PROFILE-BASE} ${DAKOTA-CMD-LINE-OPTS}
+  DAKOTA = ${DAKOTA-ENV-VARS} ${DAKOTA-PROFILE-BASE} ${DAKOTA-CMD-LINE-OPTS}
   # prof uses -p, gprof uses -pg
   EXTRA_CXXFLAGS += -pg
   EXTRA_LDFLAGS  += -pg
 else
-  DAKOTA ?= ${DAKOTA-ENV-VARS} ${DAKOTA-BASE} ${DAKOTA-CMD-LINE-OPTS}
+  DAKOTA = ${DAKOTA-ENV-VARS} ${DAKOTA-BASE} ${DAKOTA-CMD-LINE-OPTS}
 endif
 
 DAKOTA_CATALOG ?= ../bin/dakota-catalog
