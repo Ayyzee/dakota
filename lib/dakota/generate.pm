@@ -1761,7 +1761,7 @@ sub slots_decl {
 sub generate_struct_or_union_decl {
   my ($col, $slots_scope, $is_exported, $is_slots) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $slots_info = $$slots_scope{'info'};
+  my $slots_cat_info = $$slots_scope{'cat-info'};
 
   if ('struct' eq $$slots_scope{'cat'} ||
       'union'  eq $$slots_scope{'cat'}) {
@@ -1773,7 +1773,7 @@ sub generate_struct_or_union_decl {
 sub generate_struct_or_union_defn {
   my ($col, $slots_scope, $is_exported, $is_slots) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $slots_info = $$slots_scope{'info'};
+  my $slots_cat_info = $$slots_scope{'cat-info'};
 
   if ('struct' eq $$slots_scope{'cat'} ||
       'union'  eq $$slots_scope{'cat'}) {
@@ -1783,19 +1783,19 @@ sub generate_struct_or_union_defn {
   }
 
   my $max_width = 0;
-  foreach my $slot_info (@$slots_info) {
-    my $width = length($$slot_info{'type'});
+  foreach my $slot_cat_info (@$slots_cat_info) {
+    my $width = length($$slot_cat_info{'type'});
     if ($width > $max_width) {
       $max_width = $width;
     }
   }
-  foreach my $slot_info (@$slots_info) {
-    my $width = length($$slot_info{'type'});
+  foreach my $slot_cat_info (@$slots_cat_info) {
+    my $width = length($$slot_cat_info{'type'});
     my $pad = ' ' x ($max_width - $width);
-    if (defined $$slot_info{'expr'}) {
-      $$scratch_str_ref .= $col . "$$slot_info{'type'} " . $pad . "$$slot_info{'name'} = $$slot_info{'expr'};" . $nl;
+    if (defined $$slot_cat_info{'expr'}) {
+      $$scratch_str_ref .= $col . "$$slot_cat_info{'type'} " . $pad . "$$slot_cat_info{'name'} = $$slot_cat_info{'expr'};" . $nl;
     } else {
-      $$scratch_str_ref .= $col . "$$slot_info{'type'} " . $pad . "$$slot_info{'name'};" . $nl;
+      $$scratch_str_ref .= $col . "$$slot_cat_info{'type'} " . $pad . "$$slot_cat_info{'name'};" . $nl;
     }
   }
   $col = &colout($col);
@@ -1804,7 +1804,7 @@ sub generate_struct_or_union_defn {
 sub generate_enum_decl {
   my ($col, $enum, $is_exported, $is_slots) = @_;
   die if $$enum{'type'} && $is_slots;
-  my $info = $$enum{'info'};
+  my $info = $$enum{'cat-info'};
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($is_slots) {
@@ -1824,7 +1824,7 @@ sub generate_enum_decl {
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
   die if $$enum{'type'} && $is_slots;
-  my $slots_info = $$enum{'info'};
+  my $slots_cat_info = $$enum{'cat-info'};
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($is_slots) {
@@ -1842,43 +1842,43 @@ sub generate_enum_defn {
   }
   $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . $nl;
   my $max_width = 0;
-  foreach my $slot_info (@$slots_info) {
-    my $width = length($$slot_info{'name'});
+  foreach my $slot_cat_info (@$slots_cat_info) {
+    my $width = length($$slot_cat_info{'name'});
     if ($width > $max_width) {
       $max_width = $width;
     }
   }
-  foreach my $slot_info (@$slots_info) {
-    if (defined $$slot_info{'expr'}) {
-      my $width = length($$slot_info{'name'});
+  foreach my $slot_cat_info (@$slots_cat_info) {
+    if (defined $$slot_cat_info{'expr'}) {
+      my $width = length($$slot_cat_info{'name'});
       my $pad = ' ' x ($max_width - $width);
-      $$scratch_str_ref .= $col . "$$slot_info{'name'} = " . $pad . "$$slot_info{'expr'}," . $nl;
+      $$scratch_str_ref .= $col . "$$slot_cat_info{'name'} = " . $pad . "$$slot_cat_info{'expr'}," . $nl;
     } else {
-      $$scratch_str_ref .= $col . "$$slot_info{'name'}," . $nl;
+      $$scratch_str_ref .= $col . "$$slot_cat_info{'name'}," . $nl;
     }
   }
   $col = &colout($col);
   $$scratch_str_ref .= $col . '};';
 }
-sub parameter_list_from_slots_info {
-  my ($slots_info) = @_;
+sub parameter_list_from_slots_cat_info {
+  my ($slots_cat_info) = @_;
   my $names = '';
   my $pairs = '';
   my $pairs_w_expr = '';
   my $sep = '';
 
-  foreach my $slot_info (@$slots_info) {
-    my $type = $$slot_info{'type'};
-    my $name = $$slot_info{'name'};
+  foreach my $slot_cat_info (@$slots_cat_info) {
+    my $type = $$slot_cat_info{'type'};
+    my $name = $$slot_cat_info{'name'};
    #$names .=        "$sep/*.$name =*/ _$name";
     $names .=        "$sep.$name = _$name";
     $pairs .=        "$sep$type _$name";
     $pairs_w_expr .= "$sep$type _$name";
     $sep = ', ';
 
-    if (defined $$slot_info{'expr'}) {
-     #$pairs_w_expr .= " /*= $$slot_info{'expr'}*/";
-      $pairs_w_expr .= " = $$slot_info{'expr'}";
+    if (defined $$slot_cat_info{'expr'}) {
+     #$pairs_w_expr .= " /*= $$slot_cat_info{'expr'}*/";
+      $pairs_w_expr .= " = $$slot_cat_info{'expr'}";
     }
   }
   return ($names, $pairs, $pairs_w_expr);
@@ -1918,7 +1918,7 @@ sub generate_klass_unbox {
   } else {
     ### unbox() same for all types
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
-    if ($is_klass_defn || (&should_export_slots($klass_scope) && &has_slots_info($klass_scope))) {
+    if ($is_klass_defn || (&should_export_slots($klass_scope) && &has_slots_cat_info($klass_scope))) {
       $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
@@ -2031,12 +2031,12 @@ sub generate_klass_construct {
   my $result = '';
   my $col = '';
   my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
-  my $slots_infos = &at($$klass_scope{'slots'}, 'info');
+  my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
   if ($slots_cat && ('struct' eq $slots_cat)) {
     if ($ENV{'DK_NO_COMPOUND_LITERALS'}) {
-      if (&has_slots_info($klass_scope)) {
-        my ($names, $pairs, $pairs_w_expr) = &parameter_list_from_slots_info($slots_infos);
-        #print "generate-klass-construct: " . &Dumper($slots_infos);
+      if (&has_slots_cat_info($klass_scope)) {
+        my ($names, $pairs, $pairs_w_expr) = &parameter_list_from_slots_cat_info($slots_cat_info);
+        #print "generate-klass-construct: " . &Dumper($slots_cat_info);
 
         if ($pairs =~ m/\[/g) {
         } else {
@@ -2339,6 +2339,11 @@ sub typealias_slots_t {
   }
   return $result;
 }
+# xor
+# {'slots'}{'cat'} = aggregate struct|union|enum
+# {'slots'}{'type'} = typealias type
+#
+# {'slots'}{'cat-info'} = aggregate elements
 sub generate_slots_decls {
   my ($scope, $col, $klass_path, $klass_name, $klass_scope) = @_;
   if (!$klass_scope) {
@@ -2482,9 +2487,9 @@ sub has_slots_type {
   }
   return 0;
 }
-sub has_slots_info {
+sub has_slots_cat_info {
   my ($klass_scope) = @_;
-  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'info')) {
+  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'cat-info')) {
     return 1;
   }
   return 0;
@@ -2567,10 +2572,10 @@ sub order_klasses {
           # even if not exported
           $$type_aliases{"$klass_name-t"} = "$klass_name\::slots-t";
           # hackhack
-          my $slots_infos = &at($$klass_scope{'slots'}, 'info');
-          if ($slots_infos) {
-            foreach my $slots_info (@$slots_infos) {
-              my $types = [values %$slots_info];
+          my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
+          if ($slots_cat_info) {
+            foreach my $slot_cat_info (@$slots_cat_info) {
+              my $types = [values %$slot_cat_info];
               foreach my $type (@$types) {
                 my $parts = {};
                 &klass_part($type_aliases, $type, $parts);
@@ -2606,7 +2611,7 @@ sub order_klasses {
         if ($verbose) {
           print STDERR "klass-name: $klass_name" . $nl;
         }
-        my $slots_infos = &at($$klass_scope{'slots'}, 'info');
+        my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
         if (&has_slots($klass_scope)) {
           my $slots_type = &at($$klass_scope{'slots'}, 'type');
           if ($slots_type) {
@@ -2625,12 +2630,12 @@ sub order_klasses {
                 $$depends{$klass_name}{$type_klass_name} = 1;
               }
             }
-          } elsif ($slots_infos) {
+          } elsif ($slots_cat_info) {
             if ($verbose) {
               print STDERR "  info:" . $nl;
             }
-            foreach my $slots_info (@$slots_infos) {
-              my $types = [values %$slots_info];
+            foreach my $slot_cat_info (@$slots_cat_info) {
+              my $types = [values %$slot_cat_info];
               foreach my $type (@$types) {
                 my $type_klass_name;
                 my $parts = {};
@@ -2771,7 +2776,7 @@ sub linkage_unit::generate_klasses_types_after {
         }
       }
     }
-    if (&has_slots_info($klass_scope)) {
+    if (&has_slots_cat_info($klass_scope)) {
       if (&is_decl()) {
         if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
           $$scratch_str_ref .= $col . "klass $klass_name {";
@@ -3309,20 +3314,20 @@ sub dk_generate_cc_footer_klass {
     }
   }
   my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
-  if (&has_slots_info($klass_scope)) {
-    my $slots_infos = &at($$klass_scope{'slots'}, 'info');
+  if (&has_slots_cat_info($klass_scope)) {
+    my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
     my $root_name = '__slots-info';
     if ('enum' eq $slots_cat) {
       my $seq = [];
       my $prop_num = 0;
-      foreach my $slot_info (@$slots_infos) {
+      foreach my $slot_cat_info (@$slots_cat_info) {
         my $tbl = {};
-        $$tbl{'#name'} = "\#$$slot_info{'name'}";
-        if (defined $$slot_info{'expr'}) {
-          $$tbl{'#expr'} = "($$slot_info{'expr'})";
-          $$tbl{'#expr-str'} = "\"$$slot_info{'expr'}\"";
+        $$tbl{'#name'} = "\#$$slot_cat_info{'name'}";
+        if (defined $$slot_cat_info{'expr'}) {
+          $$tbl{'#expr'} = "($$slot_cat_info{'expr'})";
+          $$tbl{'#expr-str'} = "\"$$slot_cat_info{'expr'}\"";
         }
-        my $prop_name = sprintf("%s-%s", $root_name, $$slot_info{'name'});
+        my $prop_name = sprintf("%s-%s", $root_name, $$slot_cat_info{'name'});
         $$scratch_str_ref .=
           $col . "$klass_type @$klass_name { " . &generate_target_runtime_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
         &dakota::util::add_last($seq, "$prop_name");
@@ -3333,23 +3338,23 @@ sub dk_generate_cc_footer_klass {
     } else {
       my $seq = [];
       my $prop_num = 0;
-      foreach my $slot_info (@$slots_infos) {
+      foreach my $slot_cat_info (@$slots_cat_info) {
         my $tbl = {};
-        $$tbl{'#name'} = "\#$$slot_info{'name'}";
+        $$tbl{'#name'} = "\#$$slot_cat_info{'name'}";
 
         if ('struct' eq $slots_cat) {
-          $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
+          $$tbl{'#offset'} = "offsetof(slots-t, $$slot_cat_info{'name'})";
         }
-        my $slot_name_ref = 'slots-t::' . $$slot_info{'name'};
+        my $slot_name_ref = 'slots-t::' . $$slot_cat_info{'name'};
         $$tbl{'#size'} = 'sizeof(' . $slot_name_ref . ')';
-        $$tbl{'#type'} = &as_literal_symbol($$slot_info{'type'});
+        $$tbl{'#type'} = &as_literal_symbol($$slot_cat_info{'type'});
         $$tbl{'#typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $slot_name_ref . ')';
 
-        if (defined $$slot_info{'expr'}) {
-          $$tbl{'#expr'} = "($$slot_info{'expr'})";
-          $$tbl{'#expr-str'} = "\"$$slot_info{'expr'}\"";
+        if (defined $$slot_cat_info{'expr'}) {
+          $$tbl{'#expr'} = "($$slot_cat_info{'expr'})";
+          $$tbl{'#expr-str'} = "\"$$slot_cat_info{'expr'}\"";
         }
-        my $prop_name = sprintf("%s-%s", $root_name, $$slot_info{'name'});
+        my $prop_name = sprintf("%s-%s", $root_name, $$slot_cat_info{'name'});
         $$scratch_str_ref .=
           $col . "$klass_type @$klass_name { " . &generate_target_runtime_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
         &dakota::util::add_last($seq, "$prop_name");
@@ -3365,11 +3370,11 @@ sub dk_generate_cc_footer_klass {
       $$scratch_str_ref .= $col . "$klass_type @$klass_name { static enum-info-t __enum-info-$num\[] = {" . &ann(__FILE__, __LINE__) . " //ro-data" . $nl;
       $col = &colin($col);
 
-      my $slots_info = $$enum{'info'};
-      foreach my $slot_info (@$slots_info) {
-        my $name = $$slot_info{'name'};
-        if (defined $$slot_info{'expr'}) {
-          my $expr = $$slot_info{'expr'};
+      my $slots_cat_info = $$enum{'cat-info'};
+      foreach my $slot_cat_info (@$slots_cat_info) {
+        my $name = $$slot_cat_info{'name'};
+        if (defined $$slot_cat_info{'expr'}) {
+          my $expr = $$slot_cat_info{'expr'};
           $$scratch_str_ref .= $col . "{ .name = \#$name, .expr = $expr }," . $nl;
         } else {
           $$scratch_str_ref .= $col . "{ .name = \#$name, .expr = nullptr }," . $nl;
@@ -3421,7 +3426,7 @@ sub dk_generate_cc_footer_klass {
     my $tp = 'slots-t';
    #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
     $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
-  } elsif (&has_slots_info($klass_scope)) {
+  } elsif (&has_slots_cat_info($klass_scope)) {
     my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
     $$tbbl{'#cat'} = "\#$slots_cat";
     $$tbbl{'#slots-info'} = '__slots-info';
@@ -3430,7 +3435,7 @@ sub dk_generate_cc_footer_klass {
   if ($slots_enum_base) {
     $$tbbl{'#enum-base'} = '#' . $slots_enum_base;
   }
-  if (&has_slots_type($klass_scope) || &has_slots_info($klass_scope)) {
+  if (&has_slots_type($klass_scope) || &has_slots_cat_info($klass_scope)) {
     $$tbbl{'#size'} = 'sizeof(slots-t)';
   }
   if (&has_enum_info($klass_scope)) {
