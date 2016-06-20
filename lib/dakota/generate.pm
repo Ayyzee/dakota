@@ -3477,7 +3477,7 @@ sub dk_generate_cc_footer_klass {
   if (&is_exported($klass_scope)) {
     $$tbbl{'#exported?'} = '1';
   }
-  if (&should_export_slots($klass_scope)) {
+  if (&has_exported_slots($klass_scope)) {
     $$tbbl{'#state-exported?'} = '1';
   }
   if (&has_exported_methods($klass_scope)) {
