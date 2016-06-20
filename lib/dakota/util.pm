@@ -94,6 +94,7 @@ our @EXPORT= qw(
                  kw_args_generics_sig
                  kw_args_placeholders
                  last
+                 at
                  dk_mangle_seq
                  dk_mangle
                  make_dir
@@ -144,6 +145,13 @@ my $ENCODED_COMMENT_END =   'ENCODEDCOMMENTEND';
 my $ENCODED_STRING_BEGIN = 'ENCODEDSTRINGBEGIN';
 my $ENCODED_STRING_END =   'ENCODEDSTRINGEND';
 
+sub at {
+  my ($tbl, $key) = @_;
+  if (exists $$tbl{$key} && defined $$tbl{$key}) {
+    return $$tbl{$key};
+  }
+  return undef;
+}
 sub ct {
   my ($seq) = @_;
   my $string = join('', @$seq);
