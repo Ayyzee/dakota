@@ -1125,7 +1125,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
         ostream::col-decr(ostrm);
         ostream::println-format(ostrm, "}\n");
       } else {
-      fprintf(stderr, "%s:%i:error: exported slots without type or info\n", __FILE__, __LINE__);
+        fprintf(stderr, "%s:%i: ERROR: %s %s: exported slots without type or info\n", __FILE__, __LINE__, ci.type, ci.name);
     }
   } // if (state-exported?
   if ((nullptr != ci.superklass-name || nullptr != ci.klass-name || nullptr != ci.traits || nullptr != ci.requires || nullptr != ci.provides)

@@ -113,6 +113,7 @@
     '#method-signatures' => undef,
     '#module' => undef,
     '#name' => undef,
+    '#node' => undef,
     '#offset' => undef,
     '#requires' => undef,
     '#schar8-t' => undef, # hardcode typealias
