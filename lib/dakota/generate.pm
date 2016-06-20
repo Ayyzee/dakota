@@ -2459,8 +2459,9 @@ sub linkage_unit::generate_headers {
 }
 sub is_same_file {
   my ($klass_scope) = @_;
-  if ($gbl_src_file && &at($$klass_scope{'slots'}, 'file')) {
-    return 1 if $gbl_src_file eq &canon_path(&at($$klass_scope{'slots'}, 'file'));
+  my $slots_file = &at($$klass_scope{'slots'}, 'file');
+  if ($gbl_src_file && $slots_file) {
+    return 1 if $gbl_src_file eq &canon_path($slots_file);
   }
   return 0;
 }
@@ -2474,7 +2475,8 @@ sub is_same_src_file {
 }
 sub has_slots_type {
   my ($klass_scope) = @_;
-  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'type')) {
+  my $slots_type = &at($$klass_scope{'slots'}, 'type');
+  if (&has_slots($klass_scope) && $slots_type) {
     return 1;
   } else {
     return 0;
@@ -2482,7 +2484,8 @@ sub has_slots_type {
 }
 sub has_slots_info {
   my ($klass_scope) = @_;
-  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'info')) {
+  my $slots_infos = &at($$klass_scope{'slots'}, 'info');
+  if (&has_slots($klass_scope) && $slots_infos) {
     return 1;
   } else {
     return 0;
@@ -2566,8 +2569,9 @@ sub order_klasses {
           # even if not exported
           $$type_aliases{"$klass_name-t"} = "$klass_name\::slots-t";
           # hackhack
-          if (&at($$klass_scope{'slots'}, 'info')) {
-            foreach my $slots_info (@{&at($$klass_scope{'slots'}, 'info')}) {
+          my $slots_infos = &at($$klass_scope{'slots'}, 'info');
+          if ($slots_infos) {
+            foreach my $slots_info (@$slots_infos) {
               my $types = [values %$slots_info];
               foreach my $type (@$types) {
                 my $parts = {};
@@ -2604,6 +2608,7 @@ sub order_klasses {
         if ($verbose) {
           print STDERR "klass-name: $klass_name" . $nl;
         }
+        my $slots_infos = &at($$klass_scope{'slots'}, 'info');
         if (&has_slots($klass_scope)) {
           if (&at($$klass_scope{'slots'}, 'type')) {
             if ($verbose) {
@@ -2621,11 +2626,11 @@ sub order_klasses {
                 $$depends{$klass_name}{$type_klass_name} = 1;
               }
             }
-          } elsif (&at($$klass_scope{'slots'}, 'info')) {
+          } elsif ($slots_infos) {
             if ($verbose) {
               print STDERR "  info:" . $nl;
             }
-            foreach my $slots_info (@{&at($$klass_scope{'slots'}, 'info')}) {
+            foreach my $slots_info (@$slots_infos) {
               my $types = [values %$slots_info];
               foreach my $type (@$types) {
                 my $type_klass_name;
@@ -3306,11 +3311,12 @@ sub dk_generate_cc_footer_klass {
   }
   my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
   if (&has_slots_info($klass_scope)) {
+    my $slots_infos = &at($$klass_scope{'slots'}, 'info');
     my $root_name = '__slots-info';
     if ('enum' eq $slots_cat) {
       my $seq = [];
       my $prop_num = 0;
-      foreach my $slot_info (@{&at($$klass_scope{'slots'}, 'info')}) {
+      foreach my $slot_info (@$slots_infos) {
         my $tbl = {};
         $$tbl{'#name'} = "\#$$slot_info{'name'}";
         if (defined $$slot_info{'expr'}) {
@@ -3328,7 +3334,7 @@ sub dk_generate_cc_footer_klass {
     } else {
       my $seq = [];
       my $prop_num = 0;
-      foreach my $slot_info (@{&at($$klass_scope{'slots'}, 'info')}) {
+      foreach my $slot_info (@$slots_infos) {
         my $tbl = {};
         $$tbl{'#name'} = "\#$$slot_info{'name'}";
 
