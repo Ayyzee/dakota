@@ -29,8 +29,23 @@ use warnings;
 use sort 'stable';
 
 my $nl = "\n";
+my $gbl_prefix;
 
+sub dk_prefix {
+  my ($path) = @_;
+  $path =~ s|//+|/|;
+  $path =~ s|/\./+|/|;
+  $path =~ s|^./||;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    return &dk_prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!\n";
+  }
+}
 BEGIN {
+  $gbl_prefix = &dk_prefix($0);
 };
 use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -619,7 +634,7 @@ sub path_stat {
 }
 sub find_library {
   my ($name) = @_;
-  $name = `dakota-find-library $name 2>/dev/null`;
+  $name = `$gbl_prefix/bin/dakota-find-library $name 2>/dev/null`;
   $name =~ s/\s+$//;
   return $name;
 }
