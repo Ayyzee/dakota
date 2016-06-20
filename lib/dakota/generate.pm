@@ -2029,8 +2029,8 @@ sub generate_klass_construct {
   my ($klass_scope, $klass_name) = @_;
   my $result = '';
   my $col = '';
-  if (&at($$klass_scope{'slots'}, 'cat') &&
-      'struct' eq &at($$klass_scope{'slots'}, 'cat')) {
+  my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+  if ($slots_cat && ('struct' eq $slots_cat)) {
     if ($ENV{'DK_NO_COMPOUND_LITERALS'}) {
       if (&has_slots_info($klass_scope)) {
         my ($names, $pairs, $pairs_w_expr) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
@@ -2351,10 +2351,11 @@ sub generate_slots_decls {
       $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . $nl;
     }
   } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
-    if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
-        'union'  eq &at($$klass_scope{'slots'}, 'cat')) {
+    my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+    if ('struct' eq $slots_cat ||
+        'union'  eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
-    } elsif ('enum' eq &at($$klass_scope{'slots'}, 'cat')) {
+    } elsif ('enum' eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name { ";
       my $is_exported;
       my $is_slots;
@@ -2381,12 +2382,13 @@ sub generate_exported_slots_decls {
   if (!$klass_scope) {
     $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   }
+  my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
   my $scratch_str_ref = &global_scratch_str_ref();
   if ('object' eq "$klass_name") {
-    if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
-        'union'  eq &at($$klass_scope{'slots'}, 'cat')) {
+    if ('struct' eq $slots_cat ||
+        'union'  eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
-    } elsif ('enum' eq &at($$klass_scope{'slots'}, 'cat')) {
+    } elsif ('enum' eq $slots_cat) {
       $$scratch_str_ref .= $col . "//klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
@@ -2403,10 +2405,10 @@ sub generate_exported_slots_decls {
       $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . $nl;
     }
   } elsif (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
-    if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
-        'union'  eq &at($$klass_scope{'slots'}, 'cat')) {
+    if ('struct' eq $slots_cat ||
+        'union'  eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
-    } elsif ('enum' eq &at($$klass_scope{'slots'}, 'cat')) {
+    } elsif ('enum' eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name { ";
       my $is_exported;
       my $is_slots;
@@ -2750,6 +2752,7 @@ sub linkage_unit::generate_klasses_types_after {
   my $scratch_str_ref = &global_scratch_str_ref();
   foreach my $klass_name (@$ordered_klass_names) { # do not sort!
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+    my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
     my $is_exported;
     my $is_slots;
 
@@ -2768,10 +2771,10 @@ sub linkage_unit::generate_klasses_types_after {
       if (&is_decl()) {
         if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
           $$scratch_str_ref .= $col . "klass $klass_name {";
-          if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
-              'union'  eq &at($$klass_scope{'slots'}, 'cat')) {
+          if ('struct' eq $slots_cat ||
+              'union'  eq $slots_cat) {
             &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
-          } elsif ('enum' eq &at($$klass_scope{'slots'}, 'cat')) {
+          } elsif ('enum' eq $slots_cat) {
             &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
           } else {
             print STDERR &Dumper($$klass_scope{'slots'});
@@ -2783,10 +2786,10 @@ sub linkage_unit::generate_klasses_types_after {
         if (!&should_export_slots($klass_scope)) {
           if (&is_exported($klass_scope)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
-            if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
-                'union'  eq &at($$klass_scope{'slots'}, 'cat')) {
+            if ('struct' eq $slots_cat ||
+                'union'  eq $slots_cat) {
               &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
-            } elsif ('enum' eq &at($$klass_scope{'slots'}, 'cat')) {
+            } elsif ('enum' eq $slots_cat) {
               &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
             } else {
               print STDERR &Dumper($$klass_scope{'slots'});
@@ -2795,10 +2798,10 @@ sub linkage_unit::generate_klasses_types_after {
             $$scratch_str_ref .= $col . " }" . $nl;
           } else {
             $$scratch_str_ref .= $col . "klass $klass_name {";
-            if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
-                'union'  eq &at($$klass_scope{'slots'}, 'cat')) {
+            if ('struct' eq $slots_cat ||
+                'union'  eq $slots_cat) {
               &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
-            } elsif ('enum' eq &at($$klass_scope{'slots'}, 'cat')) {
+            } elsif ('enum' eq $slots_cat) {
               &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
             } else {
               print STDERR &Dumper($$klass_scope{'slots'});
@@ -3301,9 +3304,10 @@ sub dk_generate_cc_footer_klass {
       $$token_registry{$path} = 1;
     }
   }
+  my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
   if (&has_slots_info($klass_scope)) {
     my $root_name = '__slots-info';
-    if ('enum' eq &at($$klass_scope{'slots'}, 'cat')) {
+    if ('enum' eq $slots_cat) {
       my $seq = [];
       my $prop_num = 0;
       foreach my $slot_info (@{&at($$klass_scope{'slots'}, 'info')}) {
@@ -3328,7 +3332,7 @@ sub dk_generate_cc_footer_klass {
         my $tbl = {};
         $$tbl{'#name'} = "\#$$slot_info{'name'}";
 
-        if ('struct' eq &at($$klass_scope{'slots'}, 'cat')) {
+        if ('struct' eq $slots_cat) {
           $$tbl{'#offset'} = "offsetof(slots-t, $$slot_info{'name'})";
         }
         my $slot_name_ref = 'slots-t::' . $$slot_info{'name'};
@@ -3412,8 +3416,8 @@ sub dk_generate_cc_footer_klass {
    #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
     $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
   } elsif (&has_slots_info($klass_scope)) {
-    my $cat = &at($$klass_scope{'slots'}, 'cat');
-    $$tbbl{'#cat'} = "\#$cat";
+    my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+    $$tbbl{'#cat'} = "\#$slots_cat";
     $$tbbl{'#slots-info'} = '__slots-info';
   }
   if (&at($$klass_scope{'slots'}, 'enum-base')) {
