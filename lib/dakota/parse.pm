@@ -894,15 +894,15 @@ sub slots {
       if (@$type) {
         &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
       }
-      $$gbl_current_scope{'slots'}{'info'} = [];
+      $$gbl_current_scope{'slots'}{'cat-info'} = [];
       $$gbl_current_scope{'slots'}{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $slots_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
         if ('enum' eq $cat) {
-          &enum_seq($slots_defs, $$gbl_current_scope{'slots'}{'info'});
+          &enum_seq($slots_defs, $$gbl_current_scope{'slots'}{'cat-info'});
         } else {
-          &slots_seq($slots_defs, $$gbl_current_scope{'slots'}{'info'});
+          &slots_seq($slots_defs, $$gbl_current_scope{'slots'}{'cat-info'});
         }
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
@@ -979,14 +979,14 @@ sub enum {
       if (@$type) {
         $$enum{'type'} = $type;
       }
-      $$enum{'info'} = [];
+      $$enum{'cat-info'} = [];
       my ($open_curley_index, $close_curley_index) =
         &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $enum_defs = &sst::token_seq($gbl_sst,
                                         $open_curley_index + 1,
                                         $close_curley_index - 1);
-        &enum_seq($enum_defs, $$enum{'info'});
+        &enum_seq($enum_defs, $$enum{'cat-info'});
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
       &add_symbol($gbl_root, 'enum-info');
