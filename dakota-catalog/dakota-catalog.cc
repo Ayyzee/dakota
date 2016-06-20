@@ -162,9 +162,9 @@ static FUNC file_exists(const char* path, int flags = O_RDONLY) -> bool {
   return state;
 }
 
-// 1: try to exec() path
+// 1: try to spawn() path
 //    if that fails
-// 2: try to dlopen() path
+// 2: try to dso_open() path
 
 FUNC main(int argc, char** argv, char**) -> int {
   int exit_value = 0;
@@ -236,15 +236,12 @@ FUNC main(int argc, char** argv, char**) -> int {
       }
       if (nullptr != handle) {
         if (! opts.silent) {
-          const char* l_name = getenv("DKT_SHARED_LIBRARY_PATH");
-          if (nullptr != l_name) {
-            if (0 == strcmp(l_name, arg))
-              printf("%s\n", l_name);
-            else
-              printf("%s # %s\n", l_name, arg);
-          }
+          // const char* l_name = getenv("DKT_SHARED_LIBRARY_PATH");
+          const char* l_name = dso_abs_path_for_handle(handle);
+          if (nullptr != l_name)
+            printf("%s\n", l_name);
           else
-            printf("# %s\n", arg);
+            exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_abs_path_for_handle()", arg, dso_error()); // dso_close() failure
         }
         if (0 != dso_close(handle))
           exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_close()", arg, dso_error()); // dso_close() failure
