@@ -1954,7 +1954,8 @@ sub generate_klass_box {
   } else {
     if (&should_export_slots($klass_scope)) {
       ### box()
-      if (&is_array_type(&at($$klass_scope{'slots'}, 'type'))) {
+      my $slots_type = &at($$klass_scope{'slots'}, 'type');
+      if (&is_array_type($slots_type)) {
         ### box() array-type
         $result .= $col . "klass $klass_name { func box(slots-t arg) -> object-t";
 
@@ -2030,11 +2031,12 @@ sub generate_klass_construct {
   my $result = '';
   my $col = '';
   my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+  my $slots_infos = &at($$klass_scope{'slots'}, 'info');
   if ($slots_cat && ('struct' eq $slots_cat)) {
     if ($ENV{'DK_NO_COMPOUND_LITERALS'}) {
       if (&has_slots_info($klass_scope)) {
-        my ($names, $pairs, $pairs_w_expr) = &parameter_list_from_slots_info($$klass_scope{'slots'}{'info'});
-        #print "generate-klass-construct: " . &Dumper($$klass_scope{'slots'}{'info'});
+        my ($names, $pairs, $pairs_w_expr) = &parameter_list_from_slots_info($slots_infos);
+        #print "generate-klass-construct: " . &Dumper($slots_infos);
 
         if ($pairs =~ m/\[/g) {
         } else {
@@ -2610,11 +2612,12 @@ sub order_klasses {
         }
         my $slots_infos = &at($$klass_scope{'slots'}, 'info');
         if (&has_slots($klass_scope)) {
-          if (&at($$klass_scope{'slots'}, 'type')) {
+          my $slots_type = &at($$klass_scope{'slots'}, 'type');
+          if ($slots_type) {
             if ($verbose) {
               print STDERR "  type:" . $nl;
             }
-            my $type = &at($$klass_scope{'slots'}, 'type');
+            my $type = $slots_type; # silly
             my $type_klass_name;
             my $parts = {};
             &klass_part($type_aliases, $type, $parts);
@@ -3416,8 +3419,9 @@ sub dk_generate_cc_footer_klass {
   $$tbbl{'#type'} = "\#$klass_type";
 
   if (&has_slots_type($klass_scope)) {
-    my $slots_type_ident = &dk_mangle($$klass_scope{'slots'}{'type'});
-    $$tbbl{'#slots-type'} = &as_literal_symbol($$klass_scope{'slots'}{'type'});
+    my $slots_type = &at($$klass_scope{'slots'}, 'type');
+    my $slots_type_ident = &dk_mangle($slots_type);
+    $$tbbl{'#slots-type'} = &as_literal_symbol($slots_type);
     my $tp = 'slots-t';
    #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
     $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
@@ -3426,8 +3430,9 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#cat'} = "\#$slots_cat";
     $$tbbl{'#slots-info'} = '__slots-info';
   }
-  if (&at($$klass_scope{'slots'}, 'enum-base')) {
-    $$tbbl{'#enum-base'} = '#' . &at($$klass_scope{'slots'}, 'enum-base');
+  my $slots_enum_base = &at($$klass_scope{'slots'}, 'enum-base');
+  if ($slots_enum_base) {
+    $$tbbl{'#enum-base'} = '#' . $slots_enum_base;
   }
   if (&has_slots_type($klass_scope) || &has_slots_info($klass_scope)) {
     $$tbbl{'#size'} = 'sizeof(slots-t)';
