@@ -2345,7 +2345,7 @@ sub generate_slots_decls {
     $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   }
   my $scratch_str_ref = &global_scratch_str_ref();
-  if (!&should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
     if (&is_same_src_file($klass_scope)) {
       $$scratch_str_ref .= $col .        &typealias_slots_t($klass_name) . $nl;
@@ -2406,7 +2406,7 @@ sub generate_exported_slots_decls {
     if (!exists $$excluded_types{"$klass_name-t"}) {
       $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . $nl;
     }
-  } elsif (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
+  } elsif (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
     if ('struct' eq $slots_cat ||
         'union'  eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
@@ -2477,21 +2477,17 @@ sub is_same_src_file {
 }
 sub has_slots_type {
   my ($klass_scope) = @_;
-  my $slots_type = &at($$klass_scope{'slots'}, 'type');
-  if (&has_slots($klass_scope) && $slots_type) {
+  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'type')) {
     return 1;
-  } else {
-    return 0;
   }
+  return 0;
 }
 sub has_slots_info {
   my ($klass_scope) = @_;
-  my $slots_infos = &at($$klass_scope{'slots'}, 'info');
-  if (&has_slots($klass_scope) && $slots_infos) {
+  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'info')) {
     return 1;
-  } else {
-    return 0;
   }
+  return 0;
 }
 sub has_enum_info {
   my ($klass_scope) = @_;
@@ -2519,7 +2515,7 @@ sub has_enums {
 }
 sub has_slots {
   my ($klass_scope) = @_;
-  if (exists $$klass_scope{'slots'} && defined $$klass_scope{'slots'}) {
+  if (exists $$klass_scope{'slots'} && $$klass_scope{'slots'}) {
     return 1;
   }
   return 0;
