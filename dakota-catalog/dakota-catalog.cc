@@ -24,10 +24,10 @@
 # include <unistd.h>
 # include <sys/wait.h>
 
-# include <dlfcn.h>  // dlopen()/dlclose()
-
 # include "dummy.hh"
 # include "dakota.hh" // format_printf(), format_va_printf()
+
+# include "dso.hh"
 
 enum {
   DAKOTA_CATALOG_HELP = 256,
@@ -204,7 +204,7 @@ FUNC main(int argc, char** argv, char**) -> int {
       setenv_boole("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
   }
   int i = 0;
-  const char* arg = nullptr;
+  str_t arg = nullptr;
   while (nullptr != (arg = argv[i++])) {
     if (!opts.path_only) {
       setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
@@ -223,7 +223,7 @@ FUNC main(int argc, char** argv, char**) -> int {
         unsetenv("DKT_EXIT_BEFORE_MAIN");
         setenv("DAKOTA_CATALOG_ARG_TYPE", "lib", overwrite = 1); // not currently used
       }
-      void* handle = dlopen(arg, RTLD_NOW | RTLD_LOCAL);
+      ptr_t handle = dso_open(arg, DSO_OPEN_MODE.NOW | DSO_OPEN_MODE.LOCAL);
 
       // if the shared library is not found in the search path
       // and the argument *could* be relative to the cwd
@@ -232,7 +232,7 @@ FUNC main(int argc, char** argv, char**) -> int {
         strcat(rel_arg, "./");
         strcat(rel_arg, arg);
         if (file_exists(rel_arg))
-          handle = dlopen(rel_arg, RTLD_NOW | RTLD_LOCAL);
+          handle = dso_open(rel_arg, DSO_OPEN_MODE.NOW | DSO_OPEN_MODE.LOCAL);
       }
       if (nullptr != handle) {
         if (! opts.silent) {
@@ -246,10 +246,10 @@ FUNC main(int argc, char** argv, char**) -> int {
           else
             printf("# %s\n", arg);
         }
-        if (0 != dlclose(handle))
-          exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlclose()", arg, dlerror()); // dlclose() failure
+        if (0 != dso_close(handle))
+          exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_close()", arg, dso_error()); // dso_close() failure
       } else
-        exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dlopen", arg, dlerror());   // dlopen() failure
+        exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_open", arg, dso_error());   // dso_open() failure
     }
   }
   if (nullptr != opts.output) {

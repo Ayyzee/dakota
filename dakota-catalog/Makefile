@@ -27,7 +27,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  uninstall\
 
 check-exe: all
-	$(target) libdl.$(so_ext)
+	$(target) libssl.$(so_ext)
 
 check: all
 	if [[ -e $(rootdir)/lib/libdakota-core.$(so_ext) ]]; then $(target) $(rootdir)/lib/libdakota-core.$(so_ext); fi

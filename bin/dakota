@@ -108,7 +108,7 @@ my $root_cmd = { 'asts' => [],
             'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
-            'library=s',            # --library libdl.so equivalent to -ldl (or better -l:libdl.so on linux)
+            'library=s',            # --library libssl.so equivalent to -lssl (or better -l:libssl.so on linux)
             'echo-inputs',          #
             'silent',               #
             'soname=s',             # ld-like (-soname <>)

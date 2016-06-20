@@ -40,7 +40,7 @@ module dakota-core;
 
 # include "private.hh"
 # include "dakota-rt-private.hh"
-# include "dl.hh" // dso-*()
+# include "dso.hh" // dso-*()
 # include "sorted-array.hh"
 # include "sorted-ptr-array.hh"
 

@@ -4,7 +4,7 @@
       '$(srcdir)/dakota-catalog.$(cc_ext)',
     ],
     'libs' => [ # cmd-line
-      'libdl.$(so_ext)', # darwin: /usr/lib/libdl.dylib
+      'libdso.$(so_ext)',
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)',

@@ -27,7 +27,7 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  uninstall\
 
 check-exe: all
-	$(target) libdl.$(so_ext)
+	$(target) libssl.$(so_ext)
 
 check: all
 	$(MAKE) $(MAKEFLAGS) check-exe

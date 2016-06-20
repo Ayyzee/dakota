@@ -28,7 +28,7 @@ module dakota-core;
 # include "safe-str.hh"
 # include "private.hh"
 # include "dakota-rt-private.hh"
-# include "dl.hh" // dso-symbol-for-address()
+# include "dso.hh" // dso-symbol-for-address()
 # include "sorted-array.hh"
 
 # if 0

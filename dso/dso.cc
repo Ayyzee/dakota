@@ -25,6 +25,7 @@
   # include <mach-o/nlist.h>
 # endif
 
+# include <assert.h>
 # include <dlfcn.h> // dlopen(), dlclose(), dlinfo(), dladdr(), struct Dl-info
 
 # include "dso.hh"
@@ -74,17 +75,20 @@ namespace dso_info {
 TYPEALIAS dso_info_t = dso_info::slots_t;
 
 FUNC dso_open(str_t name, int_t mode) -> ptr_t {
+  assert(nullptr != name);
 # if defined WIN32
   USE(mode);
   HINSTANCE handle = LoadLibrary(name);
 # else
   if (!is_bit_set(mode, DSO_OPEN_MODE.LAZY))
-    mode = DSO_OPEN_MODE.NOW;
+    mode |= DSO_OPEN_MODE.NOW;
   ptr_t handle = dlopen(name, mode);
 # endif
   return cast(ptr_t)handle;
 }
 FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t {
+  assert(nullptr != handle);
+  assert(nullptr != symbol_name);
   ptr_t result;
 # if defined WIN32
 # error "not yet implemented on win32"
@@ -94,6 +98,7 @@ FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t {
   return result;
 }
 FUNC dso_close(ptr_t handle) -> int_t {
+  assert(nullptr != handle);
   int_t result;
 # if defined WIN32
 # error "not yet implemented on win32"
@@ -113,6 +118,7 @@ FUNC dso_error() -> str_t {
 }
 // returns nullptr if no exact match
 FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t {
+  assert(nullptr != addr);
   str_t result = nullptr;
 # if defined WIN32
 # error "not yet implemented on win32"
@@ -124,6 +130,7 @@ FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t {
   return result;
 }
 FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t {
+  assert(nullptr != handle);
   str_t result = nullptr;
   if (nullptr == handle)
     return result;
@@ -133,7 +140,8 @@ FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t {
   if (0 == r && nullptr != l_map.l_name)
     result = l_map.l_name;
 # elif defined __APPLE__
-  for (int32_t i = cast(int32_t)_dyld_image_count(); i >= 0 ; i++) {
+  int32_t image_count = cast(int32_t)_dyld_image_count(); 
+  for (int32_t i = 0; i < image_count; i++) {
     str_t image_name = _dyld_get_image_name(cast(uint32_t)i);
     ptr_t image_handle = dso_open(image_name, DSO_OPEN_MODE.NOLOAD);
     dso_close(image_handle);
@@ -144,6 +152,7 @@ FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t {
   return result;
 }
 FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t {
+  assert(nullptr != lib_name);
   str_t abs_path = nullptr;
   ptr_t handle = dso_open(lib_name, DSO_OPEN_MODE.LAZY | DSO_OPEN_MODE.LOCAL);
   if (nullptr != handle) {
@@ -152,14 +161,15 @@ FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t {
   }
   return abs_path;
 }
-// FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t {
-//   str_t result = nullptr;
-// # if defined WIN32
-// # error "not yet implemented on win32"
-// # else
-//   dso_info::slots_t dli {};
-//   if (dladdr(addr, &dli))
-//     result = dli.dli_fname;
-// # endif
-//   return result;
-// }
+FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t {
+  assert(nullptr != addr);
+  str_t result = nullptr;
+# if defined WIN32
+# error "not yet implemented on win32"
+# else
+  dso_info::slots_t dli {};
+  if (dladdr(addr, &dli))
+    result = dli.dli_fname;
+# endif
+  return result;
+}

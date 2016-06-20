@@ -28,5 +28,8 @@ $(DESTDIR)$(prefix)/lib/%.$(so_ext): ../lib/%.$(so_ext)
 $(DESTDIR)$(prefix)/include/%: ../include/%
 	sudo $(INSTALL_DATA) $< $(@D)
 
+$(DESTDIR)$(prefix)/include/%: %
+	sudo $(INSTALL_DATA) $< $(@D)
+
 $(DESTDIR)$(prefix)/bin/%: ../bin/%
 	sudo $(INSTALL_PROGRAM) $< $(@D)

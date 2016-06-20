@@ -4,7 +4,7 @@
       '$(srcdir)/dakota-find-library.$(cc_ext)',
     ],
     'libs' => [
-      'libdl.$(so_ext)',
+      'libdso.$(so_ext)',
     ],
     'include-dirs' => [
         '../include'
