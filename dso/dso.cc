@@ -157,7 +157,7 @@ FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t {
   ptr_t handle = dso_open(lib_name, DSO_OPEN_MODE.LAZY | DSO_OPEN_MODE.LOCAL);
   if (nullptr != handle) {
     abs_path = dso_abs_path_for_handle(handle);
-    dso_close(handle);
+    //dso_close(handle); // bugbug (this should be unloaded)
   }
   return abs_path;
 }
