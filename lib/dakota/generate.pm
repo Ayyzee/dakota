@@ -1918,7 +1918,7 @@ sub generate_klass_unbox {
   } else {
     ### unbox() same for all types
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
-    if ($is_klass_defn || (&has_exported_slots($klass_scope) && &has_slots_info($klass_scope))) {
+    if ($is_klass_defn || (&should_export_slots($klass_scope) && &has_slots_info($klass_scope))) {
       $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
@@ -1952,7 +1952,7 @@ sub generate_klass_box {
         $col . "}}" . $nl;
     }
   } else {
-    if (&has_exported_slots($klass_scope)) {
+    if (&should_export_slots($klass_scope)) {
       ### box()
       if (&is_array_type(&at($$klass_scope{'slots'}, 'type'))) {
         ### box() array-type
@@ -2020,7 +2020,7 @@ sub generate_klass_box {
       }
     }
   }
-  if ((&is_src_decl() || &is_target_decl) && &has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  if ((&is_src_decl() || &is_target_decl) && &should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $result .= $col . "using $klass_name\::box;" . &ann(__FILE__, __LINE__) . $nl;
   }
   return $result;
@@ -2160,7 +2160,7 @@ sub linkage_unit::generate_klasses_body {
       $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
       $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
     } # if (&has_slots()
-    if (&has_exported_slots($klass_scope)) {
+    if (&should_export_slots($klass_scope)) {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
@@ -2343,7 +2343,7 @@ sub generate_slots_decls {
     $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   }
   my $scratch_str_ref = &global_scratch_str_ref();
-  if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  if (!&should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
     if (&is_same_src_file($klass_scope)) {
       $$scratch_str_ref .= $col .        &typealias_slots_t($klass_name) . $nl;
@@ -2393,7 +2393,7 @@ sub generate_exported_slots_decls {
       die __FILE__, ":", __LINE__, ": error:\n";
     }
     $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . &ann(__FILE__, __LINE__) . " // special-case" . $nl;
-  } elsif (&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  } elsif (&should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
@@ -2417,10 +2417,6 @@ sub generate_exported_slots_decls {
       die __FILE__, ":", __LINE__, ": error:\n";
     }
     $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . $nl;
-  } else {
-    #errdump($klass_name);
-    #errdump($klass_scope);
-    die __FILE__, ':', __LINE__, ": error: box klass \'$klass_name\' without slot or slots" . $nl;
   }
 }
 sub linkage_unit::generate_headers {
@@ -2469,6 +2465,7 @@ sub is_same_file {
 sub is_same_src_file {
   my ($klass_scope) = @_;
   if ($gbl_src_file && $$klass_scope{'file'}) {
+    return 1 if $ENV{'DK_USE_SINGLE_TARGET_HEADER'};
     return 1 if $gbl_src_file eq &canon_path($$klass_scope{'file'});
   }
   return 0;
@@ -2526,6 +2523,10 @@ sub has_exported_slots {
     return &is_exported($$klass_scope{'slots'});
   }
   return 0;
+}
+sub should_export_slots {
+  my ($klass_scope) = @_;
+  return ($ENV{'DK_USE_SINGLE_TARGET_HEADER'} && &has_slots($klass_scope)) || &has_exported_slots($klass_scope);
 }
 sub has_methods {
   my ($klass_scope) = @_;
@@ -2736,7 +2737,7 @@ sub linkage_unit::generate_klasses_types_before {
     foreach my $klass_name (@$ordered_klass_names) { # do not sort!
       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
-      if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
+      if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
         &generate_exported_slots_decls($scope, $col, $klass_path, $klass_name, $klass_scope);
       } else {
         &generate_slots_decls($scope, $col, $klass_path, $klass_name, $klass_scope);
@@ -2765,7 +2766,7 @@ sub linkage_unit::generate_klasses_types_after {
     }
     if (&has_slots_info($klass_scope)) {
       if (&is_decl()) {
-        if (&has_exported_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
+        if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
           $$scratch_str_ref .= $col . "klass $klass_name {";
           if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
               'union'  eq &at($$klass_scope{'slots'}, 'cat')) {
@@ -2779,7 +2780,7 @@ sub linkage_unit::generate_klasses_types_after {
           $$scratch_str_ref .= $col . " }" . $nl;
         }
       } elsif (&is_src_defn() || &is_target_defn()) {
-        if (!&has_exported_slots($klass_scope)) {
+        if (!&should_export_slots($klass_scope)) {
           if (&is_exported($klass_scope)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
             if ('struct' eq &at($$klass_scope{'slots'}, 'cat') ||
@@ -2817,10 +2818,10 @@ sub linkage_unit::generate_klasses_klass {
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
-  if (&is_exported($klass_scope) || &has_exported_slots($klass_scope) || &has_exported_methods($klass_scope)) {
+  if (&is_exported($klass_scope) || &should_export_slots($klass_scope) || &has_exported_methods($klass_scope)) {
     &linkage_unit::generate_klasses_body($klass_scope, $col, $klass_type, $klass_path, $klass_name);
   } else {
-    #} elsif (!&has_exported_slots($klass_scope) && !&is_exported($klass_scope)) {
+    #} elsif (!&should_export_slots($klass_scope) && !&is_exported($klass_scope)) {
     &linkage_unit::generate_klasses_body($klass_scope, $col, $klass_type, $klass_path, $klass_name);
   }
   &path::remove_last($klass_path);
@@ -3476,7 +3477,7 @@ sub dk_generate_cc_footer_klass {
   if (&is_exported($klass_scope)) {
     $$tbbl{'#exported?'} = '1';
   }
-  if (&has_exported_slots($klass_scope)) {
+  if (&should_export_slots($klass_scope)) {
     $$tbbl{'#state-exported?'} = '1';
   }
   if (&has_exported_methods($klass_scope)) {
