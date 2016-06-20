@@ -79,7 +79,7 @@ klass xml-object-output-stream {
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method write-element(object-t self, int64-t element, str-t key) -> object-t {
+  method write-element(object-t self, ssize-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
@@ -88,7 +88,7 @@ klass xml-object-output-stream {
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method write-element(object-t self, uint64-t element, str-t key) -> object-t {
+  method write-element(object-t self, size-t element, str-t key) -> object-t {
     char8-t[128] buffer;
     if (nullptr != key)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
