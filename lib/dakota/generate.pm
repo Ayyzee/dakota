@@ -178,15 +178,20 @@ sub set_exe_target {
 sub suffix {
   return $global_suffix
 }
-sub extra_header {
+sub extra_dakota_headers {
   my ($name) = @_;
+  my $result = $nl;
   if (&is_decl()) {
-    return $nl . "# include <dakota-decl.hh>" . $nl . $nl;
+    $result .=
+      "# include <dakota-decl.hh>" . $nl . $nl;
   } elsif (&is_target_defn()) {
-    return $nl . "# include \"$name.$hh_ext\"" . $nl . $nl;
+    $result .=
+      "# include \"$name.$hh_ext\"" . $nl . $nl;
+  } else {
+    $result .=
+      "bug-in-code-gen" . $nl;
   }
-  return $nl . "bug-in-code-gen" . $nl;
-  # do nothing for rt-defn/rt-cc
+  return $result;
 }
 sub is_src_decl {
   if (!$global_is_target && !$global_is_defn) {
@@ -465,10 +470,10 @@ sub add_labeled_src {
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
   my $result = {};
-  my $extra_header = &extra_header($name);
+  my $extra_dakota_headers = &extra_dakota_headers($name);
   my $ordered_klass_names = &order_klasses($file);
 
-  &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names, $extra_header));
+  &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names, $extra_dakota_headers));
   &add_labeled_src($result, "symbols-$suffix",    &linkage_unit::generate_symbols(   $file, $symbols));
   &add_labeled_src($result, "klasses-$suffix",    &linkage_unit::generate_klasses(   $file, $ordered_klass_names));
  #&add_labeled_src($result, "hashes-$suffix",     &linkage_unit::generate_hashes(    $file));
@@ -2447,7 +2452,7 @@ sub generate_exported_slots_decls {
   }
 }
 sub linkage_unit::generate_headers {
-  my ($scope, $klass_names, $extra_header) = @_;
+  my ($scope, $klass_names, $extra_dakota_headers) = @_;
   my $result = '';
 
   if (&is_decl()) {
@@ -2479,7 +2484,7 @@ sub linkage_unit::generate_headers {
       $result .= "# include $header_name" . $nl;
     }
   }
-  $result .= $extra_header;
+  $result .= $extra_dakota_headers;
   return $result;
 }
 sub is_same_file {
@@ -2743,10 +2748,8 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       $nl .
-      $col . "# include <dakota-finally.$hh_ext> // hackhack: should be before dakota.$hh_ext" . $nl .
-      $col . "# include <dakota.$hh_ext>" . $nl .
-      $col . "# include <dakota-log.$hh_ext>" . $nl;
-
+      "# include <dakota.$hh_ext>" . $nl .
+      "# include <dakota-log.$hh_ext>" . $nl;
     if (&is_target()) {
       $$scratch_str_ref .=
         $nl .
@@ -2764,7 +2767,7 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       $nl .
-      $col . "# include <dakota-of.$hh_ext> // klass-of(), superklass-of(), name-of()" . $nl .
+      "# include <dakota-of.$hh_ext> // klass-of(), superklass-of(), name-of()" . $nl .
       $nl;
   }
   return $$scratch_str_ref;

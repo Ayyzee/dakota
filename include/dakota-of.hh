@@ -29,9 +29,4 @@ inline FUNC name_of(object_t kls) -> symbol_t {
   return klass::unbox(kls).name;
 }
 
-// namespace dk {
-//   typealias  size_t =  size::slots_t;
-//   typealias ssize_t = ssize::slots_t;
-// }
-
 # endif // dkt-dakota-of-hh

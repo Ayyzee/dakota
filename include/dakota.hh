@@ -28,7 +28,7 @@
 # include <syslog.h>
 # include <cxxabi.h>
 
-# include <dakota-decl.hh>
+# include <dakota-finally.hh>
 
 # define ssizeof(t) (cast(ssize_t)sizeof(t))
 

@@ -17,9 +17,6 @@
 # if !defined dkt_dakota_decl_hh
 # define      dkt_dakota_decl_hh
 
-# include <cstdarg>
-# include <sys/types.h> // ssize_t
-
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
 
