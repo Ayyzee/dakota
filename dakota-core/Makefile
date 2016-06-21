@@ -90,7 +90,7 @@ precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
-	sudo $(RM) $(RMFLAGS) $(install-files)
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/platform.json
+	sudo $(RM) $(RMFLAGS) $(install-files) $(install-links)
+	#sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler
+	#sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/platform.json
 	#if [[ -d $(DESTDIR)$(prefix)/lib/dakota ]]; then sudo rmdir $(DESTDIR)$(prefix)/lib/dakota; fi

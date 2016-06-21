@@ -12,6 +12,7 @@ include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(project).m
  check-exe\
  clean\
  install\
+ uninstall\
 
 all: $(target)
 
@@ -30,3 +31,6 @@ $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
 
 install: all $(install-dirs) $(install-files)
+
+uninstall:
+	sudo $(RM) $(RMFLAGS) $(install-files)

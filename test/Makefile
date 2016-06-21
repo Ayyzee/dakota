@@ -8,7 +8,9 @@ include $(rootdir)/makeflags.mk
  check \
  check-exe \
  clean \
+ install \
  no-project \
+ uninstall \
 
 all \
 check \
@@ -21,3 +23,4 @@ check-exe: check
 	time $(MAKE) $(MAKEFLAGS) --directory exe $@
 
 install:
+uninstall:
