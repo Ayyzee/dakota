@@ -243,8 +243,11 @@ sub is_exe_target {
 sub write_to_file_converted_file {
   my ($path_out, $path_in) = @_;
   my $in_str = &dakota::util::filestr_from_file($path_in);
-  my $num = 1;
-  &write_to_file_converted_strings($path_out, [ "# line $num \"$path_in\"" . $nl, $in_str ]);
+  my $strings = [ $in_str ];
+  if (!$ENV{'DK_NO_LINE'}) {
+    unshift @$strings, "# line 1 \"$path_in\"" . $nl;
+  }
+  &write_to_file_converted_strings($path_out, $strings);
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
@@ -352,11 +355,15 @@ sub generate_src {
       $nl .
       &dk_generate_cc_footer($file);
   }
+  my $strings = [ $str ];
   if ($should_write_pre_output) {
-    &write_to_file_strings($pre_output, [ $str ]);
+    &write_to_file_strings($pre_output, $strings);
+    if (!$ENV{'DK_NO_LINE'}) {
+      unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
+    }
   }
   my $remove;
-  &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_ast);
+  &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
   return $output;
 } # sub generate_src
 sub generate_target_decl {
@@ -398,11 +405,15 @@ sub generate_target {
   if (&is_target_defn()) {
     $str .= &generate_target_runtime($file, $generics);
   }
+  my $strings = [ $str ];
   if ($should_write_pre_output) {
-    &write_to_file_strings($pre_output, [ $str ]);
+    &write_to_file_strings($pre_output, $strings);
+    if (!$ENV{'DK_NO_LINE'}) {
+      unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
+    }
   }
   my $remove;
-  &write_to_file_converted_strings($output, [ $str ], $remove = undef, $project_ast);
+  &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
   if (&is_debug()) {
     $end_time = time;
     my $elapsed_time = $end_time - $start_time;
@@ -470,10 +481,13 @@ sub generate_decl_defn {
   my $rel_hh_path = "$output_base.$hh_ext";
   if (&is_target_defn()) {
     my $output = "$dir/$rel_hh_path";
-    my $strings = [ '// ', $emacs_mode_file_variables, "\n\n", &linkage_unit::generate_generics($generics, $col) ];
+    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl, &linkage_unit::generate_generics($generics, $col) ];
     if ($should_write_pre_output) {
       my $pre_output = &pre_output_path_from_any_path($output);
       &write_to_file_strings($pre_output, $strings);
+      if (!$ENV{'DK_NO_LINE'}) {
+        unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
+      }
     }
     &write_to_file_converted_strings($output, $strings);
     &add_labeled_src($result, "generics-$suffix",
@@ -2350,14 +2364,14 @@ sub generate_slots_decls {
     $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   }
   my $scratch_str_ref = &global_scratch_str_ref();
-  if (!&has_exported_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  if (!&should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
     $$scratch_str_ref .= $col . "klass $klass_name { " . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
     if (&is_same_src_file($klass_scope)) {
       $$scratch_str_ref .= $col .        &typealias_slots_t($klass_name) . $nl;
     } else {
       $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . $nl;
     }
-  } elsif (!&has_exported_slots($klass_scope) && &has_slots($klass_scope)) {
+  } elsif (!&should_export_slots($klass_scope) && &has_slots($klass_scope)) {
     my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
     if ('struct' eq $slots_cat ||
         'union'  eq $slots_cat) {
@@ -4178,10 +4192,9 @@ sub generate_target_runtime_property_tbl {
   my ($name, $tbl, $col, $symbols, $line) = @_;
   #print STDERR &Dumper($tbl);
   my $sorted_keys = [sort keys %$tbl];
-  my $num;
   my $result = '';
   my $max_key_width = 0;
-  $num = 1;
+  my $num = 1;
   foreach my $key (@$sorted_keys) {
     my $element = $$tbl{$key};
 
@@ -4283,12 +4296,11 @@ sub dk_generate_cc {
   if ($ENV{'DK_NO_LINE'}) {
     &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1, $project_ast);
   } else {
-    my $num = 1;
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "# line $num \"$cwd/$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
+      &write_to_file_converted_strings("$output", [ "# line 1 \"$cwd/$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
     } else {
-      &write_to_file_converted_strings("$output", [ "# line $num \"$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
+      &write_to_file_converted_strings("$output", [ "# line 1 \"$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
     }
   }
 }
