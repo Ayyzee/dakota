@@ -1951,6 +1951,9 @@ sub generate_klass_unbox {
 sub generate_klass_box {
   my ($klass_scope, $klass_path, $klass_name) = @_;
   my $result = '';
+  if (!&has_slots_defn($klass_scope)) {
+    return $result;
+  }
   my $col = '';
 
   if ('object' eq &ct($klass_path)) {
@@ -2536,6 +2539,16 @@ sub has_slots {
   my ($klass_scope) = @_;
   if (exists $$klass_scope{'slots'} && $$klass_scope{'slots'}) {
     return 1;
+  }
+  return 0;
+}
+sub has_slots_defn {
+  my ($klass_scope) = @_;
+  if (&has_slots($klass_scope)) {
+    if (&at($$klass_scope{'slots'}, 'cat-info') ||
+        &at($$klass_scope{'slots'}, 'type')) {
+      return 1;
+    }
   }
   return 0;
 }
