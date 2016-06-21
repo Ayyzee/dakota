@@ -180,13 +180,25 @@ sub suffix {
 }
 sub extra_dakota_headers {
   my ($name) = @_;
-  my $result = $nl;
+  my $result = '';
   if (&is_decl()) {
+    if (&is_target()) {
+      $result .=
+        "# include <unistd.h>" . $nl; # hardcoded-by-rnielsen
+    }
     $result .=
-      "# include <dakota-decl.hh>" . $nl . $nl;
-  } elsif (&is_target_defn()) {
+      $nl .
+      "# include <dakota-decl.$hh_ext>" . $nl .
+      "# include <dakota-log.$hh_ext> // optional" . $nl;
+    if (&is_target()) {
+      $result .=
+        "# include <dakota-os.$hh_ext>" . $nl;
+    }
+    $result .= $nl;
+  } elsif (&is_target_defn()) { # generated target hh file
     $result .=
-      "# include \"$name.$hh_ext\"" . $nl . $nl;
+      "# include \"$name.$hh_ext\"" . $nl .
+      $nl;
   } else {
     $result .=
       "bug-in-code-gen" . $nl;
@@ -595,8 +607,6 @@ sub generate_target_runtime {
     $$info_tbl{"\#int-names"} =    '__int-names';
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
   }
-  $target_cc_str .= $nl;
-  $target_cc_str .= "# include <unistd.h>" . $nl;
   $target_cc_str .= $nl;
   $target_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
@@ -2474,9 +2484,6 @@ sub linkage_unit::generate_headers {
     foreach $header_name (keys %{$$scope{'includes'}}) {
       $$all_headers{$header_name} = undef;
     }
-    foreach $header_name (keys %{$$scope{'headers'}}) {
-      $$all_headers{$header_name} = undef;
-    }
     foreach $header_name (keys %$exported_headers) {
       $$all_headers{$header_name} = undef;
     }
@@ -2748,13 +2755,7 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       $nl .
-      "# include <dakota.$hh_ext>" . $nl .
-      "# include <dakota-log.$hh_ext>" . $nl;
-    if (&is_target()) {
-      $$scratch_str_ref .=
-        $nl .
-        $col . "# include <dakota-os.$hh_ext>" . $nl;
-    }
+      "# include <dakota.$hh_ext>" . $nl;
     $$scratch_str_ref .= $nl;
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots" . '-' . &suffix());

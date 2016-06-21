@@ -597,11 +597,6 @@ sub add_exported_header {
     $$gbl_root{'exported-headers'}{$tkn} = undef;
   }
 }
-sub header {
-  my $tkn = &match_any();
-  &match(__FILE__, __LINE__, ';');
-  $$gbl_root{'headers'}{$tkn} = undef;
-}
 sub exported_header {
   my $tkn = &match_any();
   &match(__FILE__, __LINE__, ';');
