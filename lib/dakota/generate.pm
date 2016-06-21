@@ -341,6 +341,7 @@ sub generate_src {
   }
   my $str;
   if (&is_src_decl()) {
+    return $str if $ENV{'DK_USE_SINGLE_TARGET_HEADER'};
     $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
   } else {
     $str = '// ' . $emacs_mode_file_variables  . $nl .
