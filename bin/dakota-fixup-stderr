@@ -46,10 +46,12 @@ sub start {
 
   while (<STDIN>) {
     my $line = $_;
-    $line =~ s|^\s*[Ii]n file included from .+?:\d+:\s*$||;
+    if (1) {
+      $line =~ s|^\s*[Ii]n file included from .+?:\d+:\s*$||;
 
-    if ($initial_workdir) {
-      $line =~ s|($path_re)(:\d+:)|&fixup($initial_workdir, $1) . $2|eg;
+      if ($initial_workdir) {
+        $line =~ s|($path_re)(:\d+:)|&fixup($initial_workdir, $1) . $2|eg;
+      }
     }
     print $line;
   }
