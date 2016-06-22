@@ -84,7 +84,7 @@ $(DESTDIR)$(prefix)/lib/dakota/compiler: $(DESTDIR)$(prefix)/lib/dakota/compiler
 
 install-links := $(DESTDIR)$(prefix)/lib/dakota/compiler $(DESTDIR)$(prefix)/lib/dakota/platform.json
 
-install: $(install-dirs) $(install-files) $(install-links)
+install: all $(install-dirs) $(install-files) $(install-links)
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all

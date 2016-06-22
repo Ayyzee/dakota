@@ -22,5 +22,5 @@ no-project:
 check-exe: check
 	time $(MAKE) $(MAKEFLAGS) --directory exe $@
 
-install:
+install: all
 uninstall:
