@@ -377,6 +377,7 @@ sub generate_src {
   if ($should_write_pre_output) {
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
+      #my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
       unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
     }
   }
@@ -407,31 +408,52 @@ sub generate_target {
   my ($dir, $name, $ext) = &split_path($path, $id);
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
-  my $output =     "$dir/$name.$suffix";
-  my $pre_output = &pre_output_path_from_any_path($output);
-  if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
-    $output = $ENV{'DKT_DIR'} . '/' . $output;
-  }
+  my $output = "$dir/$name.$suffix";
   my $start_time;
   my $end_time;
   if (&is_debug()) {
     $start_time = time;
     print "    creating $output" . &pann(__FILE__, __LINE__) . $nl;
   }
-  my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
-
+  my $output_runtime;
   if (&is_target_defn()) {
-    $str .= &generate_target_runtime($file, $generics);
-  }
-  my $strings = [ $str ];
-  if ($should_write_pre_output) {
-    &write_to_file_strings($pre_output, $strings);
-    if (!$ENV{'DK_NO_LINE'}) {
-      unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
+    $output_runtime = "$dir/$name-runtime-info.$hh_ext";
+    my $pre_output_runtime = &pre_output_path_from_any_path($output_runtime);
+    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+      $output_runtime = $ENV{'DKT_DIR'} . '/' . $output_runtime;
     }
+    my $str = &generate_target_runtime($file, $generics);
+    my $strings = [ '// ' . $emacs_mode_file_variables  . $nl, $str ];
+    if ($should_write_pre_output) {
+      &write_to_file_strings($pre_output_runtime, $strings);
+      if (!$ENV{'DK_NO_LINE'}) {
+        unshift @$strings, "# line 1 \"$pre_output_runtime\"" . $nl;
+      }
+    }
+    my $remove;
+    &write_to_file_converted_strings($output_runtime, $strings, $remove = undef, $project_ast);
   }
-  my $remove;
-  &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
+  if (1) {
+    my $pre_output = &pre_output_path_from_any_path($output);
+    if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
+      $output = $ENV{'DKT_DIR'} . '/' . $output;
+    }
+    my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
+    my $strings = [ '// ' . $emacs_mode_file_variables  . $nl, $str ];
+    if ($output_runtime) {
+      my $output_runtime_name = $output_runtime =~ s|^.*?([^/]+)$|$1|r;
+      push @$strings, "# include \"$output_runtime_name\"" . $nl;
+    }
+    if ($should_write_pre_output) {
+      &write_to_file_strings($pre_output, $strings);
+      if (!$ENV{'DK_NO_LINE'}) {
+        my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
+        unshift @$strings, "# line 1 \"$pre_output_name\"" . $nl;
+      }
+    }
+    my $remove;
+    &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
+  }
   if (&is_debug()) {
     $end_time = time;
     my $elapsed_time = $end_time - $start_time;
@@ -509,6 +531,7 @@ sub generate_decl_defn {
       my $pre_output = &pre_output_path_from_any_path($output);
       &write_to_file_strings($pre_output, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
+        #my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
         unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
       }
     }
@@ -530,6 +553,7 @@ sub generate_decl_defn {
       my $pre_output = &pre_output_path_from_any_path($output);
       &write_to_file_strings($pre_output, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
+        #my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
         unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
       }
     }
@@ -547,8 +571,7 @@ sub generate_decl_defn {
   }
 
   my $is_inline;
-  my $str = '// ' . $emacs_mode_file_variables  . $nl .
-    $nl .
+  my $str =
     &labeled_src_str($result, "headers-$suffix") .
     &labeled_src_str($result, "symbols-$suffix") .
     &labeled_src_str($result, "klasses-$suffix") .
