@@ -75,8 +75,9 @@ DAKOTA-CMD-LINE-OPTS += --define-macro DK_INLINE_GENERIC_FUNCS=$(DK_INLINE_GENER
 
 #DAKOTA-CMD-LINE-OPTS += --keep-going
 
-DAKOTA-BASE         := $(srcdir)/../bin/dakota
-DAKOTA-PROFILE-BASE := $(srcdir)/../bin/dakota-profile
+DAKOTA_CATALOG      ?= $(rootdir)/bin/dakota-catalog
+DAKOTA-BASE         ?= $(rootdir)/bin/dakota
+DAKOTA-PROFILE-BASE ?= $(rootdir)/bin/dakota-profile
 
 ifdef DKT_PROFILE
   DAKOTA = ${DAKOTA-ENV-VARS} ${DAKOTA-PROFILE-BASE} ${DAKOTA-CMD-LINE-OPTS}
@@ -86,8 +87,6 @@ ifdef DKT_PROFILE
 else
   DAKOTA = ${DAKOTA-ENV-VARS} ${DAKOTA-BASE} ${DAKOTA-CMD-LINE-OPTS}
 endif
-
-DAKOTA_CATALOG ?= ../bin/dakota-catalog
 
 DAKOTAFLAGS ?=
 EXTRA_DAKOTAFLAGS ?=
