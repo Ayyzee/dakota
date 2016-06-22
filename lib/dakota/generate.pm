@@ -28,8 +28,6 @@ use strict;
 use warnings;
 use sort 'stable';
 
-my $HACKHACK01 = 1;
-
 my $should_write_pre_output = 1;
 my $gbl_ann_interval = 30;
 
@@ -517,6 +515,7 @@ sub generate_decl_defn {
     &write_to_file_converted_strings($output, $strings);
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
+                     "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
                      "  # include \"$rel_defns_hh_path\"" . $nl .
                      "# endif" . $nl);
@@ -537,9 +536,11 @@ sub generate_decl_defn {
     &write_to_file_converted_strings($output, $strings);
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
+                     "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
                      "  # include \"$rel_decls_hh_path\"" . $nl .
                      "# else" . $nl .
+                     "  # define STATIC" . $nl .
                      "  # define INLINE inline" . $nl .
                      "  # include \"$rel_defns_hh_path\"" . $nl .
                      "# endif" . $nl);
@@ -1040,7 +1041,6 @@ sub generate_va_generic_defn {
   if (!$$va_method{'defined?'} || &is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . &ann(__FILE__, $line) . $nl;
   } elsif ($$va_method{'defined?'} && (&is_target_defn())) {
-    #$$scratch_str_ref .= $col . $part . "; }" . ' // to silence clang warnings' . &ann(__FILE__, $line) . $nl;
     $$scratch_str_ref .= $col . $part;
     my $name = &dakota::util::last($$va_method{'name'});
     my $va_name = "_func_";
@@ -1509,14 +1509,11 @@ sub generate_generic_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   my $in = &ident_comment($generic_name);
   $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
-  my $part = 'namespace __generic-func { ' . $opt_va_open . 'INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
+  my $part = 'namespace __generic-func { ' . $opt_va_open . 'STATIC INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
 
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
-    if ($HACKHACK01) {
-    $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . ' // to silence clang warnings' . &ann(__FILE__, __LINE__) . $nl;
-    }
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     if ($big_generic) {
@@ -1593,14 +1590,11 @@ sub generate_generic_func_ptr_defn {
   #  return &result;
   #}}
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $part = 'namespace __generic-func-ptr { ' . $opt_va_open . 'INLINE func ' . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
+  my $part = 'namespace __generic-func-ptr { ' . $opt_va_open . 'STATIC INLINE func ' . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
 
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
-    if ($HACKHACK01) {
-    $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . ' // to silence clang warnings' . &ann(__FILE__, __LINE__) . $nl;
-    }
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
@@ -1638,7 +1632,6 @@ sub generate_generic_func_defn {
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
-    #$$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . ' // to silence clang warning' . &ann(__FILE__, __LINE__) . $nl;
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
