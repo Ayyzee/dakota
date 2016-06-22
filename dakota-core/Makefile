@@ -32,6 +32,12 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  single\
  uninstall\
 
+clean-all-cmp:
+	DK_USE_SINGLE_TARGET_HEADER=0 DK_INLINE_GENERIC_FUNCS=0 time $(MAKE) $(MAKEFLAGS) clean all
+	DK_USE_SINGLE_TARGET_HEADER=0 DK_INLINE_GENERIC_FUNCS=1 time $(MAKE) $(MAKEFLAGS) clean all
+	DK_USE_SINGLE_TARGET_HEADER=1 DK_INLINE_GENERIC_FUNCS=0 time $(MAKE) $(MAKEFLAGS) clean all
+	DK_USE_SINGLE_TARGET_HEADER=1 DK_INLINE_GENERIC_FUNCS=1 time $(MAKE) $(MAKEFLAGS) clean all
+
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
 single: $(srcs) | dakota-core.project
