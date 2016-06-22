@@ -492,14 +492,17 @@ sub generate_decl_defn {
   &add_labeled_src($result, "keywords-$suffix",   &linkage_unit::generate_keywords(  $file));
   &add_labeled_src($result, "strs-$suffix",       &linkage_unit::generate_strs(      $file));
   &add_labeled_src($result, "ints-$suffix",       &linkage_unit::generate_ints(      $file));
-  &add_labeled_src($result, "selectors-$suffix",  &linkage_unit::generate_selectors( $generics));
   &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
   my $col = '';
   my $output_base = "$name-generic-func-defns";
   my $rel_hh_path = "$output_base.$hh_ext";
   if (&is_target_defn()) {
     my $output = "$dir/$rel_hh_path";
-    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl, &linkage_unit::generate_generics($generics, $col) ];
+    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+                    &linkage_unit::generate_selectors($generics, $col),
+                    $nl,
+                    &linkage_unit::generate_generics($generics, $col),
+                  ];
     if ($should_write_pre_output) {
       my $pre_output = &pre_output_path_from_any_path($output);
       &write_to_file_strings($pre_output, $strings);
@@ -520,6 +523,8 @@ sub generate_decl_defn {
                      "  # include \"$rel_hh_path\"" . $nl .
                      "# else" . $nl .
                      "  # define INLINE" . $nl .
+                     &linkage_unit::generate_selectors($generics, &colin($col)) .
+                     $nl .
                      &linkage_unit::generate_generics($generics, &colin($col)) .
                      "# endif" . $nl);
   }
@@ -534,7 +539,6 @@ sub generate_decl_defn {
     &labeled_src_str($result, "keywords-$suffix") .
     &labeled_src_str($result, "strs-$suffix") .
     &labeled_src_str($result, "ints-$suffix") .
-    &labeled_src_str($result, "selectors-$suffix") .
     &labeled_src_str($result, "signatures-$suffix") .
     &labeled_src_str($result, "generics-$suffix");
 
@@ -1194,9 +1198,9 @@ sub common::print_selector {
 
   my $scratch_str = "";
   if (&is_va($generic)) {
-    $scratch_str .= $col . 'namespace va { func ';
+    $scratch_str .= $col . 'namespace va { INLINE func ';
   } else {
-    $scratch_str .= $col . 'func ';
+    $scratch_str .= $col . 'INLINE func ';
   }
   my $visibility = '';
   if (&is_exported($generic)) {
@@ -1486,7 +1490,7 @@ sub generate_generic_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   my $in = &ident_comment($generic_name);
   $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
-  $$scratch_str_ref .= $col . 'namespace __generic-func { ' . $opt_va_open . 'static INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
+  $$scratch_str_ref .= $col . 'namespace __generic-func { ' . $opt_va_open . 'INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
 
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
@@ -1567,7 +1571,7 @@ sub generate_generic_func_ptr_defn {
   #  return &result;
   #}}
   my $scratch_str_ref = &global_scratch_str_ref();
-  $$scratch_str_ref .= $col . 'namespace __generic-func-ptr { ' . $opt_va_open . 'static INLINE func ' . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
+  $$scratch_str_ref .= $col . 'namespace __generic-func-ptr { ' . $opt_va_open . 'INLINE func ' . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
 
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
@@ -1699,8 +1703,7 @@ sub linkage_unit::generate_target_runtime_signatures_seq {
   return $scratch_str;
 }
 sub linkage_unit::generate_selectors {
-  my ($generics) = @_;
-  my $col = '';
+  my ($generics, $col) = @_;
   my $scratch_str = "";
   $scratch_str .= &common::generate_selector_defns($generics, $col); # __selector::foobar(...)
   return $scratch_str;
