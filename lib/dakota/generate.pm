@@ -494,10 +494,12 @@ sub generate_decl_defn {
   &add_labeled_src($result, "ints-$suffix",       &linkage_unit::generate_ints(      $file));
   &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
   my $col = '';
-  my $output_base = "$name-generic-func-defns";
-  my $rel_hh_path = "$output_base.$hh_ext";
+  my $output_base_defns = "$name-generic-func-defns";
+  my $rel_defns_hh_path = "$output_base_defns.$hh_ext";
+  my $output_base_decls = "$name-generic-func-decls";
+  my $rel_decls_hh_path = "$output_base_decls.$hh_ext";
   if (&is_target_defn()) {
-    my $output = "$dir/$rel_hh_path";
+    my $output = "$dir/$rel_defns_hh_path";
     my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
                     &linkage_unit::generate_selectors($generics, $col),
                     $nl,
@@ -512,20 +514,32 @@ sub generate_decl_defn {
     }
     &write_to_file_converted_strings($output, $strings);
     &add_labeled_src($result, "generics-$suffix",
-                     "# if !defined DK-INLINE-GENERIC-FUNCS || 0 == DK-INLINE-GENERIC-FUNCS" . $nl .
+                     "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
-                     "  # include \"$rel_hh_path\"" . $nl .
+                     "  # include \"$rel_defns_hh_path\"" . $nl .
                      "# endif" . $nl);
   } elsif (&is_src_decl() || &is_target_decl()) {
+    my $output = "$dir/$rel_decls_hh_path";
+    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+                    &linkage_unit::generate_selectors($generics, $col),
+                    $nl,
+                    &linkage_unit::generate_generics($generics, $col),
+                  ];
+    if ($should_write_pre_output) {
+      my $pre_output = &pre_output_path_from_any_path($output);
+      &write_to_file_strings($pre_output, $strings);
+      if (!$ENV{'DK_NO_LINE'}) {
+        unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
+      }
+    }
+    &write_to_file_converted_strings($output, $strings);
     &add_labeled_src($result, "generics-$suffix",
-                     "# if defined DK-INLINE-GENERIC-FUNCS && 0 != DK-INLINE-GENERIC-FUNCS" . $nl .
-                     "  # define INLINE inline" . $nl .
-                     "  # include \"$rel_hh_path\"" . $nl .
-                     "# else" . $nl .
+                     "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
-                     &linkage_unit::generate_selectors($generics, &colin($col)) .
-                     $nl .
-                     &linkage_unit::generate_generics($generics, &colin($col)) .
+                     "  # include \"$rel_decls_hh_path\"" . $nl .
+                     "# else" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$rel_defns_hh_path\"" . $nl .
                      "# endif" . $nl);
   }
 
@@ -1618,7 +1632,7 @@ sub generate_generic_func_defn {
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
-    $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . ' // to silence clang warning' . &ann(__FILE__, __LINE__) . $nl;
+    #$$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . ' // to silence clang warning' . &ann(__FILE__, __LINE__) . $nl;
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
