@@ -41,7 +41,7 @@ min:
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota
 
-min-install:
+min-install: min
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library install
