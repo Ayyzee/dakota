@@ -28,6 +28,8 @@ use strict;
 use warnings;
 use sort 'stable';
 
+my $HACKHACK01 = 1;
+
 my $should_write_pre_output = 1;
 my $gbl_ann_interval = 30;
 
@@ -1512,7 +1514,9 @@ sub generate_generic_defn {
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
+    if ($HACKHACK01) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . ' // to silence clang warnings' . &ann(__FILE__, __LINE__) . $nl;
+    }
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     if ($big_generic) {
@@ -1594,7 +1598,9 @@ sub generate_generic_func_ptr_defn {
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
+    if ($HACKHACK01) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . ' // to silence clang warnings' . &ann(__FILE__, __LINE__) . $nl;
+    }
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
