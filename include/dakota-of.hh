@@ -21,16 +21,22 @@
 
 // no generated object::unbox() due to Koenig lookup (AKA: argument dependant lookup)
 
+# if !defined DKT_UNBOX_CHECK_ENABLED || 0 == DKT_UNBOX_CHECK_ENABLED
+  # define DKT_UNBOX_CHECK(object, kls)
+# else
+  # define DKT_UNBOX_CHECK(object, kls) dkt_unbox_check(object, kls)
+# endif
+
 KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
   return arg;
 }}
-KLASS_NS klass { [[unbox_attrs]] inline FUNC unbox(object_t object) noexcept -> slots_t& {
-  DEBUG_STMT(dkt_unbox_check(object, klass)); // optional
+KLASS_NS klass { [[unbox_attrs]] inline FUNC unbox(object_t object) -> slots_t& {
+  DKT_UNBOX_CHECK(object, klass); // optional
   slots_t& s = *cast(slots_t*)(cast(uint8_t*)object + sizeof(object::slots_t));
   return s;
 }}
-inline FUNC klass_of(object_t instance) -> object_t {
-  return instance->klass;
+inline FUNC klass_of(object_t object) -> object_t {
+  return object->klass;
 }
 inline FUNC superklass_of(object_t kls) -> object_t {
   return klass::unbox(kls).superklass;

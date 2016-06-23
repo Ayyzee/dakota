@@ -1989,13 +1989,13 @@ sub generate_klass_unbox {
     ### unbox() same for all types
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
     if ($is_klass_defn || (&should_export_slots($klass_scope) && &has_slots_cat_info($klass_scope))) {
-      $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
+      $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
       } elsif (&is_target_defn()) {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . $nl .
-          $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional" . $nl .
+          $col . "  DKT-UNBOX-CHECK(object, klass); // optional" . $nl .
           $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(klass).offset);" . $nl .
           $col . "  return s;" . $nl .
           $col . "}}" . $nl;
