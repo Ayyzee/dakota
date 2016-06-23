@@ -499,11 +499,7 @@ sub loop_cc_from_dk {
     &src::add_extra_generics($file);
     my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
 
-    if (0) {
-      #  for each translation unit create links to the linkage unit header file
-    } else {
-      &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
-    }
+    &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
     &dakota::generate::generate_src_defn($cc_path, $file, $global_target_ast, $rel_target_hh_path); # rel_target_hh not used
   }
   return $num_inputs;
