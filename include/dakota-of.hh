@@ -19,6 +19,16 @@
 
 # include <dakota-decl.hh>
 
+// no generated object::unbox() due to Koenig lookup (AKA: argument dependant lookup)
+
+KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
+  return arg;
+}}
+KLASS_NS klass { [[unbox_attrs]] inline FUNC unbox(object_t object) noexcept -> slots_t& {
+  DEBUG_STMT(dkt_unbox_check(object, klass)); // optional
+  slots_t& s = *cast(slots_t*)(cast(uint8_t*)object + sizeof(object::slots_t));
+  return s;
+}}
 inline FUNC klass_of(object_t instance) -> object_t {
   return instance->klass;
 }

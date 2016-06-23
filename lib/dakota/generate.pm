@@ -579,7 +579,15 @@ sub generate_decl_defn {
     &labeled_src_str($result, "keywords-$suffix") .
     &labeled_src_str($result, "strs-$suffix") .
     &labeled_src_str($result, "ints-$suffix") .
-    &labeled_src_str($result, "signatures-$suffix") .
+    &labeled_src_str($result, "signatures-$suffix");
+
+  if (&is_decl()) {
+    $str .=
+      $nl .
+      "# include <dakota-of.$hh_ext> // klass-of(), superklass-of(), name-of()" . $nl .
+      $nl;
+  }
+  $str .=
     &labeled_src_str($result, "generics-$suffix");
 
   return $str;
@@ -1975,22 +1983,9 @@ sub generate_klass_unbox {
   my ($klass_path, $klass_name, $is_klass_defn) = @_;
   my $result = '';
   my $col = '';
-  if ($klass_name eq 'object') {
-    #$result .= $col . "// special-case: no generated unbox() for klass 'object' due to Koenig lookup" . $nl;
-  } elsif ($klass_name eq 'klass') {
-    $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) noexcept -> slots-t&";
-
-    if (&is_src_decl() || &is_target_decl()) {
-      $result .= "; }" . &ann(__FILE__, __LINE__) . " // special-case" . $nl;
-    } elsif (&is_target_defn()) {
-      $result .=
-        " {" . &ann(__FILE__, __LINE__) . " // special-case" . $nl .
-        $col . "  DEBUG-STMT(dkt-unbox-check(object, klass)); // optional" . $nl .
-        $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + sizeof(object::slots-t));" . $nl .
-        $col . "  return s;" . $nl .
-        $col . "}}" . $nl;
-    }
-  } else {
+  my $special_cases = { 'object' => 1,
+                        'klass'  => 1 };
+  if (! $$special_cases{$klass_name}) {
     ### unbox() same for all types
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
     if ($is_klass_defn || (&should_export_slots($klass_scope) && &has_slots_cat_info($klass_scope))) {
@@ -2017,19 +2012,7 @@ sub generate_klass_box {
   }
   my $col = '';
 
-  if ('object' eq &ct($klass_path)) {
-    ### box() non-array-type
-    $result .= $col . "klass $klass_name { func box(slots-t* arg) -> object-t";
-
-    if (&is_src_decl() || &is_target_decl()) {
-      $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
-    } elsif (&is_target_defn()) {
-      $result .=
-        " {" . &ann(__FILE__, __LINE__) . $nl .
-        $col . "  return arg;" . $nl .
-        $col . "}}" . $nl;
-    }
-  } else {
+  if ('object' ne &ct($klass_path)) {
     if (&should_export_slots($klass_scope)) {
       ### box()
       my $slots_type = &at($$klass_scope{'slots'}, 'type');
@@ -2809,12 +2792,6 @@ sub linkage_unit::generate_klasses {
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass" . '-' . &suffix());
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass($scope, $col, $klass_path, $klass_name);
-  }
-  if (&is_decl()) {
-    $$scratch_str_ref .=
-      $nl .
-      "# include <dakota-of.$hh_ext> // klass-of(), superklass-of(), name-of()" . $nl .
-      $nl;
   }
   return $$scratch_str_ref;
 }
