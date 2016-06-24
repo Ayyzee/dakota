@@ -500,6 +500,22 @@ sub add_labeled_src {
   &dakota::util::add_last($$result{'--labels'}, $label);
   $$result{$label} = $src;
 }
+sub make_strings_and_write_to_file_converted {
+  my ($generics, $output) = @_;
+  my $col = '';
+  my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+                  &linkage_unit::generate_signatures($generics),
+                  &linkage_unit::generate_selectors($generics, $col),
+                  &linkage_unit::generate_generics($generics, $col) ];
+  if ($should_write_pre_output) {
+    my $pre_output = &pre_output_path_from_any_path($output);
+    &write_to_file_strings($pre_output, $strings);
+    if (!$ENV{'DK_NO_LINE'}) {
+      unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+    }
+  }
+  &write_to_file_converted_strings($output, $strings);
+}
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
   my $result = {};
@@ -524,30 +540,19 @@ sub generate_decl_defn {
   my $rel_target_generic_func_defns_hh_path = &dakota::dakota::rel_target_generic_func_defns_hh_path();
 
   if (&is_src_decl()) {
+    &make_strings_and_write_to_file_converted($generics, "$dir/$rel_generic_func_decls_hh_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
-                     "  # include \"$rel_target_generic_func_decls_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "  # include \"$rel_generic_func_decls_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
                      "  # define INLINE inline" . $nl .
                      "  # include \"$rel_target_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
-    my $output = "$dir/$rel_generic_func_decls_hh_path";
-    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
-                    &linkage_unit::generate_signatures($generics),
-                    &linkage_unit::generate_selectors($generics, $col),
-                    &linkage_unit::generate_generics($generics, $col) ];
-    if ($should_write_pre_output) {
-      my $pre_output = &pre_output_path_from_any_path($output);
-      &write_to_file_strings($pre_output, $strings);
-      if (!$ENV{'DK_NO_LINE'}) {
-        unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
-      }
-    } #print STDERR 'generic-func-decls: ' . $output . ' ' . __LINE__ . $nl;
-    &write_to_file_converted_strings($output, $strings);
+    &make_strings_and_write_to_file_converted($generics, "$dir/$rel_generic_func_decls_hh_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
@@ -559,19 +564,7 @@ sub generate_decl_defn {
                      "  # include \"$rel_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
-    my $output = "$dir/$rel_generic_func_defns_hh_path";
-    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
-                    &linkage_unit::generate_signatures($generics),
-                    &linkage_unit::generate_selectors($generics, $col),
-                    &linkage_unit::generate_generics($generics, $col) ];
-    if ($should_write_pre_output) {
-      my $pre_output = &pre_output_path_from_any_path($output);
-      &write_to_file_strings($pre_output, $strings);
-      if (!$ENV{'DK_NO_LINE'}) {
-        unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
-      }
-    } #print STDERR 'generic-func-defns: ' . $output . ' ' . __LINE__ . $nl;
-    &write_to_file_converted_strings($output, $strings);
+    &make_strings_and_write_to_file_converted($generics, "$dir/$rel_generic_func_defns_hh_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
