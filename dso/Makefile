@@ -2,9 +2,8 @@ rootdir := ..
 
 include $(rootdir)/common.mk
 
-project := dso
-
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(project).mk $(srcdir)/$(project).build)
+target-base := dso
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(target-base).mk $(srcdir)/$(target-base).build)
 
 .PHONY:\
  all\
@@ -22,7 +21,7 @@ check-exe: all
 
 clean:
 	$(RM) $(RMFLAGS) $(target)
-	$(RM) $(RMFLAGS) $(BUILDDIR)/$(project).mk
+	$(RM) $(RMFLAGS) $(BUILDDIR)/$(target-base).mk
 	$(RM) $(RMFLAGS) $(builddir)
 
 install-dirs := $(DESTDIR)$(prefix)/{include,lib}

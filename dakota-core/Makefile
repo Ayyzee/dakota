@@ -6,7 +6,8 @@ export DKT_EXCLUDE_LIBS = 1
 
 include $(rootdir)/common.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/dakota-core.mk $(srcdir)/dakota-core.build)
+target-base := dakota-core
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(target-base).mk $(srcdir)/$(target-base).build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -34,14 +35,14 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
-single: $(srcs) | dakota-core.project
-	$(DAKOTA-BASE) --parse --project dakota-core.project
+single: $(srcs) | $(target-base).project
+	$(DAKOTA-BASE) --parse --project $(target-base).project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota-core.project --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota-core.project
+	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project
 check-exe: all
 	echo "klass sorted-table; func main() -> int-t { object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
@@ -61,8 +62,8 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	if [[ -e dakota-core.project ]]; then $(DAKOTA-BASE) --clean --project dakota-core.project; fi
-	$(RM) $(RMFLAGS) dakota-core.project
+	if [[ -e $(target-base).project ]]; then $(DAKOTA-BASE) --clean --project $(target-base).project; fi
+	$(RM) $(RMFLAGS) $(target-base).project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(BUILDDIR)

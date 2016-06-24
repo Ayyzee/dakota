@@ -4,7 +4,8 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 include $(rootdir)/common.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/dakota-find-library.mk $(srcdir)/dakota-find-library.build)
+target-base := dakota-find-library
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(target-base).mk $(srcdir)/$(target-base).build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))

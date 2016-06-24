@@ -6,7 +6,8 @@ export DKT_EXCLUDE_LIBS = 2
 
 include $(rootdir)/common.mk
 
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/dakota.mk $(srcdir)/dakota.build)
+target-base := dakota
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(target-base).mk $(srcdir)/$(target-base).build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -32,14 +33,14 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  single\
  uninstall\
 
-single: $(srcs) | dakota.project
-	$(DAKOTA-BASE) --parse --project dakota.project
+single: $(srcs) | $(target-base).project
+	$(DAKOTA-BASE) --parse --project $(target-base).project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota.project --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project dakota.project
+	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project
 
 check-exe: all
 	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
@@ -60,8 +61,8 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	if [[ -e dakota.project ]]; then $(DAKOTA-BASE) --clean --project dakota.project; fi
-	$(RM) $(RMFLAGS) dakota.project
+	if [[ -e $(target-base).project ]]; then $(DAKOTA-BASE) --clean --project $(target-base).project; fi
+	$(RM) $(RMFLAGS) $(target-base).project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(BUILDDIR)
 	$(RM) $(RMFLAGS) dkt-exe
