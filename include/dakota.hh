@@ -252,8 +252,6 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 # endif
 
 [[so_export]] [[noreturn]] FUNC dkt_null_method(object_t, ...) -> void;
-[[so_export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(object_t, const signature_t*) -> void;
-[[so_export]] [[noreturn]] FUNC dkt_throw_no_such_method_exception(super_t,  const signature_t*) -> void;
 
 [[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, object_t, va_list_t) -> int_t;
 [[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, super_t,  va_list_t) -> int_t;

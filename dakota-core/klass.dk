@@ -64,14 +64,12 @@ klass std-compare;
 klass symbol;
 klass vector;
 
+THREAD-LOCAL const signature-t* dkt-current-signature;
+THREAD-LOCAL super-t            dkt-current-context;
+THREAD-LOCAL super-t            dkt-null-context;
+
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
-  throw make(no-such-method-exception::klass, #object : object);
-}
-[[noreturn]] func dkt-throw-no-such-method-exception(object-t object, const signature-t* signature) -> void {
-  throw make(no-such-method-exception::klass, #object : object, #signature : signature);
-}
-[[noreturn]] func dkt-throw-no-such-method-exception(super-t context, const signature-t* signature) -> void {
-  throw make(no-such-method-exception::klass, #context : context, #signature : signature);
+  throw make(no-such-method-exception::klass, #object : object, #context : dkt-current-context, #signature : dkt-current-signature);
 }
 klass selector-pair-compare {
   slots (*)(selector-pair-t*, selector-pair-t*) -> int-t;
