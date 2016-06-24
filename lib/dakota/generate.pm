@@ -513,7 +513,6 @@ sub generate_decl_defn {
   &add_labeled_src($result, "keywords-$suffix",   &linkage_unit::generate_keywords(  $file));
   &add_labeled_src($result, "strs-$suffix",       &linkage_unit::generate_strs(      $file));
   &add_labeled_src($result, "ints-$suffix",       &linkage_unit::generate_ints(      $file));
-  &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
   my $col = '';
   my $output_base_defns = "$name-generic-func-defns";
   my $output_base_decls = "$name-generic-func-decls";
@@ -538,6 +537,7 @@ sub generate_decl_defn {
   } elsif (&is_target_decl()) {
     my $output = "$dir/$rel_generic_func_decls_hh_path";
     my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+                    &linkage_unit::generate_signatures($generics),
                     &linkage_unit::generate_selectors($generics, $col),
                     &linkage_unit::generate_generics($generics, $col) ];
     if ($should_write_pre_output) {
@@ -561,6 +561,7 @@ sub generate_decl_defn {
   } elsif (&is_target_defn()) {
     my $output = "$dir/$rel_generic_func_defns_hh_path";
     my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+                    &linkage_unit::generate_signatures($generics),
                     &linkage_unit::generate_selectors($generics, $col),
                     &linkage_unit::generate_generics($generics, $col) ];
     if ($should_write_pre_output) {
@@ -587,8 +588,7 @@ sub generate_decl_defn {
    #&labeled_src_str($result, "hashes-$suffix") .
     &labeled_src_str($result, "keywords-$suffix") .
     &labeled_src_str($result, "strs-$suffix") .
-    &labeled_src_str($result, "ints-$suffix") .
-    &labeled_src_str($result, "signatures-$suffix");
+    &labeled_src_str($result, "ints-$suffix");
 
   if (&is_decl()) {
     $str .=
@@ -1151,9 +1151,9 @@ sub common::print_signature {
 
   my $scratch_str = "";
   if (&is_va($generic)) {
-    $scratch_str .= $col . 'namespace va { func ';
+    $scratch_str .= $col . 'namespace va { INLINE func ';
   } else {
-    $scratch_str .= $col . 'func ';
+    $scratch_str .= $col . 'INLINE func ';
   }
   my $visibility = '';
   if (&is_exported($generic)) {
