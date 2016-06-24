@@ -12,6 +12,7 @@ use warnings;
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
+my $nl = "\n";
 my $pair_sep =    ' : ';
 my $assign_sep =  ' := ';
 my $rassign_sep = ' = ';
@@ -206,6 +207,10 @@ sub start {
   my $fh;
 
   if ($$opts{'output'}) {
+    my $dir = $$opts{'output'} =~ s|^(.+)/.+$|$1|r;
+    if (! -e $dir) {
+      `mkdir -p $dir`;
+    }
     open($fh, ">", $$opts{'output'})
       or die "cannot open > $$opts{'output'}: $!";
   } else {
