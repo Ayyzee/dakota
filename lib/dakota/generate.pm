@@ -1548,9 +1548,6 @@ sub generate_generic_defn {
   }
   my $scratch_str_ref = &global_scratch_str_ref();
   my $in = &ident_comment($generic_name);
-  $$scratch_str_ref .= 'extern THREAD-LOCAL const signature-t* dkt-current-signature;' . $nl;
-  $$scratch_str_ref .= 'extern THREAD-LOCAL super-t            dkt-null-context;' . $nl;
-  $$scratch_str_ref .= 'extern THREAD-LOCAL super-t            dkt-current-context;' . $nl;
   $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
   my $part = 'namespace __generic-func { ' . $opt_va_open . 'STATIC INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
 
@@ -1561,7 +1558,7 @@ sub generate_generic_defn {
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
     $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($opt_va_prefix$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
-    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($opt_va_prefix$generic_name($$new_arg_type_list)););" . $nl;
+    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($opt_va_prefix$generic_name($$new_arg_type_list)););" . ' // one time initialization' . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = context;);" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
