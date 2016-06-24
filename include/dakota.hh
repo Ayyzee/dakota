@@ -201,9 +201,9 @@ extern object_t std_input  [[so_export]] [[read_only]];
 extern object_t std_output [[so_export]] [[read_only]];
 extern object_t std_error  [[so_export]] [[read_only]];
 
-extern THREAD_LOCAL const signature_t* dkt_current_signature;
-extern THREAD_LOCAL super_t            dkt_null_context;
-extern THREAD_LOCAL super_t            dkt_current_context;
+extern THREAD_LOCAL const signature_t* dkt_current_signature [[so_export]];
+extern THREAD_LOCAL super_t            dkt_null_context      [[so_export]];
+extern THREAD_LOCAL super_t            dkt_current_context   [[so_export]];
 
 typealias compare_t =               FUNC (*)(object_t, object_t) -> int_t; // comparitor
 typealias dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
