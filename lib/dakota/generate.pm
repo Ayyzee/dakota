@@ -262,7 +262,7 @@ sub write_to_file_converted_file {
   my $in_str = &dakota::util::filestr_from_file($path_in);
   my $strings = [ $in_str ];
   if (!$ENV{'DK_NO_LINE'}) {
-    unshift @$strings, "# line 1 \"$path_in\"" . $nl;
+    unshift @$strings, "# line 1 \"$path_in\"" . &ann(__FILE__, __LINE__) . $nl;
   }
   &write_to_file_converted_strings($path_out, $strings);
 }
@@ -359,17 +359,18 @@ sub generate_src {
   my $str;
   if (&is_src_decl()) {
     return $str if $ENV{'DK_USE_SINGLE_TARGET_HEADER'};
-    $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
-  } else {
     $str = '// ' . $emacs_mode_file_variables  . $nl .
+      &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
+  } else {
+    $str = '// ' . $emacs_mode_file_variables . $nl .
       $nl .
-      "# if defined DK_USE_SINGLE_TARGET_HEADER && 0 != DK_USE_SINGLE_TARGET_HEADER" . $nl .
-      "# include \"$rel_target_hh_path\"" . $nl .
+      "# if !defined DK_USE_SINGLE_TARGET_HEADER || 0 == DK_USE_SINGLE_TARGET_HEADER" . $nl .
+      "  # include \"$rel_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# else" . $nl .
-      "# include \"$rel_hh_path\"" . $nl .
+      "  # include \"$rel_target_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# endif" . $nl .
       $nl .
-      "# include \"$rel_user_cc_path\"" . $nl . # user-code (converted from dk to cc)
+      "# include \"$rel_user_cc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to cc)
       $nl .
       &dk_generate_cc_footer($file);
   }
@@ -377,8 +378,7 @@ sub generate_src {
   if ($should_write_pre_output) {
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      #my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
-      unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
+      unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
   my $remove;
@@ -427,7 +427,7 @@ sub generate_target {
     if ($should_write_pre_output) {
       &write_to_file_strings($pre_output_runtime, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        unshift @$strings, "# line 1 \"$pre_output_runtime\"" . $nl;
+        unshift @$strings, "# line 1 \"$pre_output_runtime\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
     my $remove;
@@ -442,13 +442,12 @@ sub generate_target {
     my $strings = [ '// ' . $emacs_mode_file_variables  . $nl, $str ];
     if ($output_runtime) {
       my $output_runtime_name = $output_runtime =~ s|^.*?([^/]+)$|$1|r;
-      push @$strings, "# include \"$output_runtime_name\"" . $nl;
+      push @$strings, "# include \"$output_runtime_name\"" . &ann(__FILE__, __LINE__) . $nl;
     }
     if ($should_write_pre_output) {
       &write_to_file_strings($pre_output, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
-        unshift @$strings, "# line 1 \"$pre_output_name\"" . $nl;
+        unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
     my $remove;
@@ -517,56 +516,66 @@ sub generate_decl_defn {
   &add_labeled_src($result, "signatures-$suffix", &linkage_unit::generate_signatures($generics));
   my $col = '';
   my $output_base_defns = "$name-generic-func-defns";
-  my $rel_defns_hh_path = "$output_base_defns.$hh_ext";
   my $output_base_decls = "$name-generic-func-decls";
-  my $rel_decls_hh_path = "$output_base_decls.$hh_ext";
-  if (&is_target_defn()) {
-    my $output = "$dir/$rel_defns_hh_path";
-    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
-                    &linkage_unit::generate_selectors($generics, $col),
-                    $nl,
-                    &linkage_unit::generate_generics($generics, $col),
-                  ];
-    if ($should_write_pre_output) {
-      my $pre_output = &pre_output_path_from_any_path($output);
-      &write_to_file_strings($pre_output, $strings);
-      if (!$ENV{'DK_NO_LINE'}) {
-        #my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
-        unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
-      }
-    }
-    &write_to_file_converted_strings($output, $strings);
+
+  my $rel_generic_func_defns_hh_path = "$output_base_defns.$hh_ext";
+  my $rel_generic_func_decls_hh_path = "$output_base_decls.$hh_ext";
+
+  my $rel_target_generic_func_decls_hh_path = &dakota::dakota::rel_target_generic_func_decls_hh_path();
+  my $rel_target_generic_func_defns_hh_path = &dakota::dakota::rel_target_generic_func_defns_hh_path();
+
+  if (&is_src_decl()) {
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
-                     "  # include \"$rel_defns_hh_path\"" . $nl .
-                     "# endif" . $nl);
-  } elsif (&is_src_decl() || &is_target_decl()) {
-    my $output = "$dir/$rel_decls_hh_path";
-    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
-                    &linkage_unit::generate_selectors($generics, $col),
-                    $nl,
-                    &linkage_unit::generate_generics($generics, $col),
-                  ];
-    if ($should_write_pre_output) {
-      my $pre_output = &pre_output_path_from_any_path($output);
-      &write_to_file_strings($pre_output, $strings);
-      if (!$ENV{'DK_NO_LINE'}) {
-        #my $pre_output_name = $pre_output =~ s|^.*?([^/]+)$|$1|r;
-        unshift @$strings, "# line 1 \"$pre_output\"" . $nl;
-      }
-    }
-    &write_to_file_converted_strings($output, $strings);
-    &add_labeled_src($result, "generics-$suffix",
-                     "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
-                     "  # define STATIC static" . $nl .
-                     "  # define INLINE" . $nl .
-                     "  # include \"$rel_decls_hh_path\"" . $nl .
+                     "  # include \"$rel_target_generic_func_decls_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
                      "  # define INLINE inline" . $nl .
-                     "  # include \"$rel_defns_hh_path\"" . $nl .
+                     "  # include \"$rel_target_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# endif" . $nl);
+  } elsif (&is_target_decl()) {
+    my $output = "$dir/$rel_generic_func_decls_hh_path";
+    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+                    &linkage_unit::generate_selectors($generics, $col),
+                    &linkage_unit::generate_generics($generics, $col) ];
+    if ($should_write_pre_output) {
+      my $pre_output = &pre_output_path_from_any_path($output);
+      &write_to_file_strings($pre_output, $strings);
+      if (!$ENV{'DK_NO_LINE'}) {
+        unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      }
+    } #print STDERR 'generic-func-decls: ' . $output . ' ' . __LINE__ . $nl;
+    &write_to_file_converted_strings($output, $strings);
+    &add_labeled_src($result, "generics-$suffix",
+                     "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
+                     "  # define STATIC static" . $nl .
+                     "  # define INLINE" . $nl .
+                     "  # include \"$rel_generic_func_decls_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# else" . $nl .
+                     "  # define STATIC" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$rel_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# endif" . $nl);
+  } elsif (&is_target_defn()) {
+    my $output = "$dir/$rel_generic_func_defns_hh_path";
+    my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+                    &linkage_unit::generate_selectors($generics, $col),
+                    &linkage_unit::generate_generics($generics, $col) ];
+    if ($should_write_pre_output) {
+      my $pre_output = &pre_output_path_from_any_path($output);
+      &write_to_file_strings($pre_output, $strings);
+      if (!$ENV{'DK_NO_LINE'}) {
+        unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      }
+    } #print STDERR 'generic-func-defns: ' . $output . ' ' . __LINE__ . $nl;
+    &write_to_file_converted_strings($output, $strings);
+    &add_labeled_src($result, "generics-$suffix",
+                     "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
+                     "  # define STATIC static" . $nl .
+                     "  # define INLINE" . $nl .
+                     "  # include \"$rel_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   }
 
@@ -1556,15 +1565,15 @@ sub generate_generic_defn {
     $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
-      $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)" . $nl;
+      $$scratch_str_ref .= $col . "//DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)" . $nl;
       $col = &colin($col);
-      $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(context, $signature));" . $nl;
+      $$scratch_str_ref .= $col . "//dkt-throw-no-such-method-exception(context, $signature));" . $nl;
       $col = &colout($col);
     } else {
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(object)).methods.addrs[selector];" . $nl;
-      $$scratch_str_ref .= $col . "DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)" . $nl;
+      $$scratch_str_ref .= $col . "//DEBUG-STMT(if (DKT-NULL-METHOD == cast(method-t)_func_)" . $nl;
       $col = &colin($col);
-      $$scratch_str_ref .= $col . "dkt-throw-no-such-method-exception(object, $signature));" . $nl;
+      $$scratch_str_ref .= $col . "//dkt-throw-no-such-method-exception(object, $signature));" . $nl;
       $col = &colout($col);
     }
     my $arg_names_list;
@@ -4338,9 +4347,9 @@ sub dk_generate_cc {
   } else {
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "# line 1 \"$cwd/$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
+      &write_to_file_converted_strings("$output", [ "# line 1 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl, $filestr ], $remove = 1, $project_ast);
     } else {
-      &write_to_file_converted_strings("$output", [ "# line 1 \"$file_basename\"" . $nl, $filestr ], $remove = 1, $project_ast);
+      &write_to_file_converted_strings("$output", [ "# line 1 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl, $filestr ], $remove = 1, $project_ast);
     }
   }
 }

@@ -127,6 +127,7 @@ our @EXPORT= qw(
                  set_global_project
                  global_project_ast
                  set_global_project_ast
+                 global_project_target
                  use_abs_path
               );
 use Cwd;
@@ -557,6 +558,11 @@ sub kw_args_generics_sig {
 my $global_project;
 sub global_project {
   return $global_project;
+}
+sub global_project_target {
+  my $result = $$global_project{'project.target'};
+  $result = $$global_project{'target'} if ! $result;
+  return $result;
 }
 sub set_global_project {
   my ($project_path) = @_;

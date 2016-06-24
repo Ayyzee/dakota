@@ -32,11 +32,23 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  single\
  uninstall\
 
-clean-all-cmp:
+cmp1:
 	DK_USE_SINGLE_TARGET_HEADER=0 DK_INLINE_GENERIC_FUNCS=0 time $(MAKE) $(MAKEFLAGS) clean all
+
+cmp2:
 	DK_USE_SINGLE_TARGET_HEADER=0 DK_INLINE_GENERIC_FUNCS=1 time $(MAKE) $(MAKEFLAGS) clean all
+
+cmp3:
 	DK_USE_SINGLE_TARGET_HEADER=1 DK_INLINE_GENERIC_FUNCS=0 time $(MAKE) $(MAKEFLAGS) clean all
+
+cmp4:
 	DK_USE_SINGLE_TARGET_HEADER=1 DK_INLINE_GENERIC_FUNCS=1 time $(MAKE) $(MAKEFLAGS) clean all
+
+cmp:
+	$(MAKE) cmp1
+	$(MAKE) cmp2
+	$(MAKE) cmp3
+	$(MAKE) cmp4
 
 $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 

@@ -81,6 +81,8 @@ our @EXPORT= qw(
                  is_o_path
                  target_cc_path
                  rel_target_hh_path
+                 rel_target_generic_func_decls_hh_path
+                 rel_target_generic_func_defns_hh_path
              );
 
 use Data::Dumper;
@@ -428,6 +430,24 @@ sub rel_target_hh_path {
   my $rel_target_hh_path = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
   return $rel_target_hh_path;
 }
+sub default_cmd_info {
+  my $cmd_info = { 'project.target' => &global_project_target() };
+  return $cmd_info;
+}
+sub rel_target_generic_func_decls_hh_path {
+  my ($cmd_info) = @_;
+  $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $target_cc_path = &target_cc_path($cmd_info);
+  my $result = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1-generic-func-decls.$hh_ext=r;
+  return $result;
+}
+sub rel_target_generic_func_defns_hh_path {
+  my ($cmd_info) = @_;
+  $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $target_cc_path = &target_cc_path($cmd_info);
+  my $result = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1-generic-func-defns.$hh_ext=r;
+  return $result;
+}
 sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
@@ -681,7 +701,7 @@ sub start_cmd {
   if ($should_replace_library_path_with_lib_opts) {
     $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
   }
-  if ($ENV{'DK_GENERATE_TARGET_FIRST'} || $ENV{'DK_USE_SINGLE_TARGET_HEADER'}) {
+  if ($ENV{'DK_GENERATE_TARGET_FIRST'} || $ENV{'DK_USE_SINGLE_TARGET_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'}) {
     # generate the single (but slow) runtime .o, then the user .o files
     # this might be useful for distributed building (initiating the building of the slowest first
     # or for testing runtime code generation
