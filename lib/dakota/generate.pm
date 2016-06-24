@@ -315,16 +315,16 @@ sub write_to_file_converted_strings {
   }
 }
 sub generate_src_decl {
-  my ($path, $file, $project_ast, $rel_target_hh_path) = @_;
+  my ($path, $file, $project_ast, $target_hh_path) = @_;
   #print "generate_src_decl($path, ...)" . $nl;
   &set_src_decl($path);
-  return &generate_src($path, $file, $project_ast, $rel_target_hh_path);
+  return &generate_src($path, $file, $project_ast, $target_hh_path);
 }
 sub generate_src_defn {
-  my ($path, $file, $project_ast, $rel_target_hh_path) = @_;
+  my ($path, $file, $project_ast, $target_hh_path) = @_;
   #print "generate_src_defn($path, ...)" . $nl;
   &set_src_defn($path);
-  return &generate_src($path, $file, $project_ast, $rel_target_hh_path);
+  return &generate_src($path, $file, $project_ast, $target_hh_path);
 }
 my $im_suffix_for_suffix = {
   $cc_ext => 'cc.dkt',
@@ -340,12 +340,10 @@ sub pre_output_path_from_any_path {
   return $pre_output;
 }
 sub generate_src {
-  my ($path, $file, $project_ast, $rel_target_hh_path) = @_;
+  my ($path, $file, $project_ast, $target_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
-  my $rel_hh_path = "$name.$hh_ext";
-  my $rt = '+srcs';
-  my $rel_user_cc_path = $rt . '/' . $name . '.' . $cc_ext;
-  #my $user_dir = $dir . '/' . $rt;
+  my $src_hh_path = "$name.$hh_ext";
+  my $user_cc_path = '+srcs/' . $name . '.' . $cc_ext;
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $output =     "$dir/$name.$suffix";
@@ -365,12 +363,12 @@ sub generate_src {
     $str = '// ' . $emacs_mode_file_variables . $nl .
       $nl .
       "# if !defined DK_GENERATE_COMMON_HEADER || 0 == DK_GENERATE_COMMON_HEADER" . $nl .
-      "  # include \"$rel_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+      "  # include \"$src_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# else" . $nl .
-      "  # include \"$rel_target_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+      "  # include \"$target_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# endif" . $nl .
       $nl .
-      "# include \"$rel_user_cc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to cc)
+      "# include \"$user_cc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to cc)
       $nl .
       &dk_generate_cc_footer($file);
   }
@@ -533,43 +531,43 @@ sub generate_decl_defn {
   my $output_base_defns = "$name-generic-func-defns";
   my $output_base_decls = "$name-generic-func-decls";
 
-  my $rel_generic_func_defns_hh_path = "$output_base_defns.$hh_ext";
-  my $rel_generic_func_decls_hh_path = "$output_base_decls.$hh_ext";
+  my $generic_func_defns_path = "$output_base_defns.$hh_ext";
+  my $generic_func_decls_path = "$output_base_decls.$hh_ext";
 
-  my $rel_target_generic_func_decls_hh_path = &dakota::dakota::rel_target_generic_func_decls_hh_path();
-  my $rel_target_generic_func_defns_hh_path = &dakota::dakota::rel_target_generic_func_defns_hh_path();
+  #my $target_generic_func_decls_path = &dakota::dakota::target_generic_func_decls_path();
+  my $target_generic_func_defns_path = &dakota::dakota::target_generic_func_defns_path();
 
   if (&is_src_decl()) {
-    &make_strings_and_write_to_file_converted($generics, "$dir/$rel_generic_func_decls_hh_path");
+    &make_strings_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
-                     "  # include \"$rel_generic_func_decls_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "  # include \"$generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
                      "  # define INLINE inline" . $nl .
-                     "  # include \"$rel_target_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "  # include \"$target_generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
-    &make_strings_and_write_to_file_converted($generics, "$dir/$rel_generic_func_decls_hh_path");
+    &make_strings_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
-                     "  # include \"$rel_generic_func_decls_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "  # include \"$generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
                      "  # define INLINE inline" . $nl .
-                     "  # include \"$rel_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "  # include \"$generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
-    &make_strings_and_write_to_file_converted($generics, "$dir/$rel_generic_func_defns_hh_path");
+    &make_strings_and_write_to_file_converted($generics, "$dir/$generic_func_defns_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
-                     "  # include \"$rel_generic_func_defns_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "  # include \"$generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   }
 

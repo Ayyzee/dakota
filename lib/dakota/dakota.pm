@@ -80,10 +80,10 @@ our @EXPORT= qw(
                  is_dk_path
                  is_o_path
                  target_cc_path
-                 rel_target_hh_path
-                 rel_target_generic_func_decls_hh_path
-                 rel_target_generic_func_defns_hh_path
+                 target_hh_path
+                 target_generic_func_defns_path
              );
+                #target_generic_func_decls_path
 
 use Data::Dumper;
 $Data::Dumper::Terse =     1;
@@ -424,24 +424,24 @@ sub target_cc_path {
   }
   return $target_cc_path;
 }
-sub rel_target_hh_path {
+sub target_hh_path {
   my ($cmd_info) = @_;
   my $target_cc_path = &target_cc_path($cmd_info);
-  my $rel_target_hh_path = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
-  return $rel_target_hh_path;
+  my $target_hh_path = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  return $target_hh_path;
 }
 sub default_cmd_info {
   my $cmd_info = { 'project.target' => &global_project_target() };
   return $cmd_info;
 }
-sub rel_target_generic_func_decls_hh_path {
-  my ($cmd_info) = @_;
-  $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $result = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1-generic-func-decls.$hh_ext=r;
-  return $result;
-}
-sub rel_target_generic_func_defns_hh_path {
+#sub target_generic_func_decls_path {
+#  my ($cmd_info) = @_;
+#  $cmd_info = &default_cmd_info() if ! $cmd_info;
+#  my $target_cc_path = &target_cc_path($cmd_info);
+#  my $result = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1-generic-func-decls.$hh_ext=r;
+#  return $result;
+#}
+sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
   my $target_cc_path = &target_cc_path($cmd_info);
@@ -517,10 +517,10 @@ sub loop_cc_from_dk {
     &src::add_extra_klass_decls($file);
     &src::add_extra_keywords($file);
     &src::add_extra_generics($file);
-    my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
+    my $target_hh_path = &target_hh_path($cmd_info);
 
-    &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
-    &dakota::generate::generate_src_defn($cc_path, $file, $global_target_ast, $rel_target_hh_path); # rel_target_hh not used
+    &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $target_hh_path);
+    &dakota::generate::generate_src_defn($cc_path, $file, $global_target_ast, $target_hh_path); # target_hh not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
