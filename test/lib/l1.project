@@ -1,0 +1,9 @@
+# -*- mode: perl -*-
+{
+  'builddir' => 'dkt',
+  'srcs' => [
+    'l1.dk',
+    'l1-other.dk',
+  ],
+  'target' => 'libl1.dylib'
+}

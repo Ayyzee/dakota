@@ -1,0 +1,10 @@
+// -*- mode: Dakota -*-
+
+klass aa-rubbles {
+  method bb-betty(object-t self) -> object-t {
+    return self;
+  }
+  method cc-barney(object-t self) -> object-t {
+    return self;
+  }
+}

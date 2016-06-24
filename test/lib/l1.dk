@@ -1,0 +1,10 @@
+// -*- mode: Dakota -*-
+
+klass aa-flintstones {
+  method bb-wilma(object-t self) -> object-t {
+    return self;
+  }
+  method cc-fred(object-t self) -> object-t {
+    return self;
+  }
+}
