@@ -34,16 +34,15 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  single\
  uninstall\
 
-$(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
-
 single: $(srcs) | $(target-base).project
 	$(DAKOTA-BASE) --parse --project $(target-base).project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --precompile --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --compile --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --precompile --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project
+	$(DAKOTA-BASE) --shared --define-macro DKT_WORKAROUND --define-macro HAVE_CONFIG_HH --include-directory . --include-directory ../include --project $(target-base).project
+
 check-exe: all
 	echo "klass sorted-table; func main() -> int-t { object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
@@ -66,9 +65,11 @@ clean: goal-clean
 	if [[ -e $(target-base).project ]]; then $(DAKOTA-BASE) --clean --project $(target-base).project; fi
 	$(RM) $(RMFLAGS) $(target-base).project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
-	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
+	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
+
+$(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 
 distclean: clean
 	cd $(rootdir); ./configure-common
@@ -93,6 +94,5 @@ precompile:
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install-files) $(install-links)
-	#sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler
-	#sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/platform.json
-	#if [[ -d $(DESTDIR)$(prefix)/lib/dakota ]]; then sudo rmdir $(DESTDIR)$(prefix)/lib/dakota; fi
+	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler
+	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/platform.json
