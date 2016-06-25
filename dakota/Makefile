@@ -4,10 +4,11 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 export DKT_EXCLUDE_LIBS = 2
 
-include $(rootdir)/common.mk
-
 target-base := dakota
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(target-base).mk $(srcdir)/$(target-base).build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir $(target-base).build)
+
+include $(rootdir)/common.mk
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/$(target-base).mk $(target-base).build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -64,7 +65,7 @@ clean: goal-clean
 	if [[ -e $(target-base).project ]]; then $(DAKOTA-BASE) --clean --project $(target-base).project; fi
 	$(RM) $(RMFLAGS) $(target-base).project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
-	$(RM) $(RMFLAGS) $(BUILDDIR)
+	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
 
 distclean: clean

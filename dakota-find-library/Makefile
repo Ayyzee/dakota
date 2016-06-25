@@ -2,10 +2,11 @@ rootdir := ..
 
 srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
-include $(rootdir)/common.mk
-
 target-base := dakota-find-library
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(BUILDDIR)/$(target-base).mk $(srcdir)/$(target-base).build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir $(target-base).build)
+
+include $(rootdir)/common.mk
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/$(target-base).mk $(target-base).build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -42,7 +43,7 @@ goal-clean:
 
 clean: goal-clean
 	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext)
-	$(RM) $(RMFLAGS) $(BUILDDIR)
+	$(RM) $(RMFLAGS) $(builddir)
 
 distclean: clean
 	cd $(rootdir); ./configure-common

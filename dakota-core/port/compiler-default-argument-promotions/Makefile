@@ -1,5 +1,7 @@
 rootdir := ../../..
 
+builddir := dkt
+
 include $(rootdir)/config.mk
 include $(rootdir)/vars.mk
 
@@ -9,4 +11,4 @@ all:
 
 clean:
 	$(RM) $(RMFLAGS) char-is-signed stderr.txt summary.txt
-	$(RM) $(RMFLAGS) $(BUILDDIR)
+	$(RM) $(RMFLAGS) $(builddir)
