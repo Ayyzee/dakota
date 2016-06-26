@@ -97,7 +97,6 @@ our @EXPORT= qw(
                  global_scratch_str_ref
                  set_global_scratch_str_ref
                  should_use_include
-                 write_to_file_converted_file
               );
 
 my $colon = ':'; # key/element delim only
@@ -257,20 +256,6 @@ sub is_decl {
 }
 sub is_exe_target {
   return $global_is_exe_target;
-}
-sub write_to_file_converted_file {
-  my ($path_out, $path_in) = @_;
-  my $in_str = &dakota::util::filestr_from_file($path_in);
-  my $first = '';
-  $in_str =~ s/^(.*?)\n(.*)$/$2/s;
-  $first = $1;
-  my $strings = [ $in_str ];
-  if (!$ENV{'DK_NO_LINE'}) {
-    unshift @$strings,
-      $first,
-      "# line 2 \"$path_in\"" . &ann(__FILE__, __LINE__) . $nl;
-  }
-  &write_to_file_converted_strings($path_out, $strings);
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
