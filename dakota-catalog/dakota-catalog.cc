@@ -53,8 +53,8 @@ struct opts_t {
 };
 static opts_t opts {};
 
-static FUNC usage(const char* progname, option* options) -> int {
-  const char* tmp_progname = strrchr(progname, '/');
+static FUNC usage(str_t progname, option* options) -> int {
+  str_t tmp_progname = strrchr(progname, '/');
   if (nullptr != tmp_progname)
     tmp_progname++;
   else
@@ -82,7 +82,7 @@ static FUNC usage(const char* progname, option* options) -> int {
   return result;
 }
 static FUNC handle_opts(int* argc, char*** argv) -> void {
-  const char* progname = *argv[0];
+  str_t progname = *argv[0];
   int unrecognized_opt_cnt = 0;
   // options descriptor
   static struct option longopts[] = {
@@ -143,7 +143,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
 
 # include "spawn.cc"
 
-static FUNC setenv_boole(const char* name, bool value, int overwrite) -> int {
+static FUNC setenv_boole(str_t name, bool value, int overwrite) -> int {
   int result = 0;
   if (value)
     result = setenv(name, "1", overwrite);
@@ -151,7 +151,7 @@ static FUNC setenv_boole(const char* name, bool value, int overwrite) -> int {
     unsetenv(name);
   return result;
 }
-static FUNC file_exists(const char* path, int flags = O_RDONLY) -> bool {
+static FUNC file_exists(str_t path, int flags = O_RDONLY) -> bool {
   bool state;
   int fd = open(path, flags);
   if (-1 == fd) {
@@ -167,10 +167,10 @@ static FUNC file_exists(const char* path, int flags = O_RDONLY) -> bool {
 //    if that fails
 // 2: try to dso_open() path
 
-FUNC main(int argc, char** argv, char**) -> int {
+FUNC main(int argc, char** argv) -> int {
   int exit_value = 0;
   handle_opts(&argc, &argv);
-  const char* dev_null = "/dev/null";
+  str_t dev_null = "/dev/null";
   char buffer[MAXPATHLEN] = "";
   char* output_pid = buffer;
 
@@ -237,8 +237,8 @@ FUNC main(int argc, char** argv, char**) -> int {
       }
       if (nullptr != handle) {
         if (! opts.silent) {
-          // const char* l_name = getenv("DKT_SHARED_LIBRARY_PATH");
-          const char* l_name = dso_abs_path_for_handle(handle);
+          // str_t l_name = getenv("DKT_SHARED_LIBRARY_PATH");
+          str_t l_name = dso_abs_path_for_handle(handle);
           if (nullptr != l_name)
             printf("%s\n", l_name);
           else
