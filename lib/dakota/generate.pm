@@ -262,13 +262,13 @@ sub write_to_file_converted_file {
   my ($path_out, $path_in) = @_;
   my $in_str = &dakota::util::filestr_from_file($path_in);
   my $first = '';
-  $in_str =~ s/^(.*?)\n(.*)$/\n$2/s;
+  $in_str =~ s/^(.*?)\n(.*)$/$2/s;
   $first = $1;
   my $strings = [ $in_str ];
   if (!$ENV{'DK_NO_LINE'}) {
     unshift @$strings,
-      $first . $nl,
-      "# line 1 \"$path_in\"" . &ann(__FILE__, __LINE__) . $nl;
+      $first,
+      "# line 2 \"$path_in\"" . &ann(__FILE__, __LINE__) . $nl;
   }
   &write_to_file_converted_strings($path_out, $strings);
 }
@@ -382,7 +382,7 @@ sub generate_src {
     $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      splice @$strings, 1, 0, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -434,7 +434,7 @@ sub generate_target {
       $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
       &write_to_file_strings($pre_output_runtime, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        splice @$strings, 1, 0, "# line 1 \"$pre_output_runtime\"" . &ann(__FILE__, __LINE__) . $nl;
+        splice @$strings, 1, 0, "# line 2 \"$pre_output_runtime\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
     $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -457,7 +457,7 @@ sub generate_target {
       $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
       &write_to_file_strings($pre_output, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        splice @$strings, 1, 0, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+        splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
     $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -523,7 +523,7 @@ sub make_strings_and_write_to_file_converted {
     $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      splice @$strings, 1, 0, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
@@ -4329,7 +4329,7 @@ sub dk_generate_cc {
   my ($dir, $file_basename) = &split_path($file);
   my $filestr = &dakota::util::filestr_from_file($file);
   my $first = '';
-  $filestr =~ s/^(.*?)\n(.*)$/\n$2/s;
+  $filestr =~ s/^(.*?)\n(.*)$/$2/s;
   $first = $1;
   my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
   $output =~ s|^\./||;
@@ -4347,12 +4347,12 @@ sub dk_generate_cc {
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
       &write_to_file_converted_strings("$output", [ $first . $nl,
-                                                    "# line 1 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
+                                                    "# line 2 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
                                                     $filestr ],
                                        $remove = 1, $project_ast);
     } else {
       &write_to_file_converted_strings("$output", [ $first . $nl,
-                                                    "# line 1 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
+                                                    "# line 2 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
                                                     $filestr ],
                                        $remove = 1, $project_ast);
     }
