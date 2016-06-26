@@ -31,7 +31,8 @@ use sort 'stable';
 my $should_write_pre_output = 1;
 my $gbl_ann_interval = 30;
 
-my $emacs_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
+my $emacs_cxx_mode_file_variables =    '-*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
+my $emacs_dakota_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
 
 my $gbl_prefix;
 my $gbl_compiler;
@@ -260,9 +261,14 @@ sub is_exe_target {
 sub write_to_file_converted_file {
   my ($path_out, $path_in) = @_;
   my $in_str = &dakota::util::filestr_from_file($path_in);
+  my $first = '';
+  $in_str =~ s/^(.*?)\n(.*)$/\n$2/s;
+  $first = $1;
   my $strings = [ $in_str ];
   if (!$ENV{'DK_NO_LINE'}) {
-    unshift @$strings, "# line 1 \"$path_in\"" . &ann(__FILE__, __LINE__) . $nl;
+    unshift @$strings,
+      $first . $nl,
+      "# line 2 \"$path_in\"" . &ann(__FILE__, __LINE__) . $nl;
   }
   &write_to_file_converted_strings($path_out, $strings);
 }
@@ -357,11 +363,9 @@ sub generate_src {
   my $str;
   if (&is_src_decl()) {
     return $str if $ENV{'DK_GENERATE_COMMON_HEADER'};
-    $str = '// ' . $emacs_mode_file_variables  . $nl .
-      &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
+    $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
   } else {
-    $str = '// ' . $emacs_mode_file_variables . $nl .
-      $nl .
+    $str =
       "# if !defined DK_GENERATE_COMMON_HEADER || 0 == DK_GENERATE_COMMON_HEADER" . $nl .
       "  # include \"$src_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# else" . $nl .
@@ -372,13 +376,16 @@ sub generate_src {
       $nl .
       &dk_generate_cc_footer($file);
   }
-  my $strings = [ $str ];
+  my $strings = [ undef,
+                  $str ];
   if ($should_write_pre_output) {
+    $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
+  $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
   my $remove;
   &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
   return $output;
@@ -421,13 +428,16 @@ sub generate_target {
       $output_runtime = $ENV{'DKT_DIR'} . '/' . $output_runtime;
     }
     my $str = &generate_target_runtime($file, $generics);
-    my $strings = [ '// ' . $emacs_mode_file_variables  . $nl, $str ];
+    my $strings = [ undef,
+                    $str ];
     if ($should_write_pre_output) {
+      $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
       &write_to_file_strings($pre_output_runtime, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        unshift @$strings, "# line 1 \"$pre_output_runtime\"" . &ann(__FILE__, __LINE__) . $nl;
+        splice @$strings, 1, 0, "# line 2 \"$pre_output_runtime\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
+    $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
     my $remove;
     &write_to_file_converted_strings($output_runtime, $strings, $remove = undef, $project_ast);
   }
@@ -437,17 +447,20 @@ sub generate_target {
       $output = $ENV{'DKT_DIR'} . '/' . $output;
     }
     my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
-    my $strings = [ '// ' . $emacs_mode_file_variables  . $nl, $str ];
+    my $strings = [ undef,
+                    $str ];
     if ($output_runtime) {
       my $output_runtime_name = $output_runtime =~ s|^.*?([^/]+)$|$1|r;
       push @$strings, "# include \"$output_runtime_name\"" . &ann(__FILE__, __LINE__) . $nl;
     }
     if ($should_write_pre_output) {
+      $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
       &write_to_file_strings($pre_output, $strings);
       if (!$ENV{'DK_NO_LINE'}) {
-        unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+        splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
+    $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
     my $remove;
     &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
   }
@@ -501,17 +514,19 @@ sub add_labeled_src {
 sub make_strings_and_write_to_file_converted {
   my ($generics, $output) = @_;
   my $col = '';
-  my $strings = [ '// ', $emacs_mode_file_variables, $nl . $nl,
+  my $strings = [ undef,
                   &linkage_unit::generate_signatures($generics),
                   &linkage_unit::generate_selectors($generics, $col),
                   &linkage_unit::generate_generics($generics, $col) ];
   if ($should_write_pre_output) {
     my $pre_output = &pre_output_path_from_any_path($output);
+    $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
     if (!$ENV{'DK_NO_LINE'}) {
-      unshift @$strings, "# line 1 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
+  $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
   &write_to_file_converted_strings($output, $strings);
 }
 sub generate_decl_defn {
@@ -4313,6 +4328,9 @@ sub dk_generate_cc {
   my ($file, $path_name, $project_ast) = @_;
   my ($dir, $file_basename) = &split_path($file);
   my $filestr = &dakota::util::filestr_from_file($file);
+  my $first = '';
+  $filestr =~ s/^(.*?)\n(.*)$/\n$2/s;
+  $first = $1;
   my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
@@ -4328,9 +4346,15 @@ sub dk_generate_cc {
   } else {
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ "# line 1 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl, $filestr ], $remove = 1, $project_ast);
+      &write_to_file_converted_strings("$output", [ $first . $nl,
+                                                    "# line 2 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
+                                                    $filestr ],
+                                       $remove = 1, $project_ast);
     } else {
-      &write_to_file_converted_strings("$output", [ "# line 1 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl, $filestr ], $remove = 1, $project_ast);
+      &write_to_file_converted_strings("$output", [ $first . $nl,
+                                                    "# line 2 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
+                                                    $filestr ],
+                                       $remove = 1, $project_ast);
     }
   }
 }
