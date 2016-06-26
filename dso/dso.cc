@@ -20,13 +20,12 @@
     # define _GNU_SOURCE // dlinfo()
   # endif
 # elif defined __APPLE__
-  # include <stdint.h>
   # include <mach-o/dyld.h> // _dyld_image_count(), _dyld_get_image_name()
   # include <mach-o/nlist.h>
 # endif
-
-# include <assert.h>
 # include <dlfcn.h> // dlopen(), dlclose(), dlinfo(), dladdr(), struct Dl-info
+
+# include <cassert>
 
 # include "dso.hh"
 

@@ -16,6 +16,12 @@
 
 module dakota-core;
 
+# include <cxxabi.h>
+# include <sys/mman.h>
+# include <sys/stat.h> // struct stat, stat()
+# include <syslog.h>
+# include <unistd.h>
+
 # include <cassert>
 # include <cerrno>
 # include <cinttypes>
@@ -25,14 +31,6 @@ module dakota-core;
 # include <cstdlib>
 # include <cstring>
 # include <exception>
-
-# include <cxxabi.h>
-
-# include <unistd.h>
-
-# include <sys/mman.h>
-# include <sys/stat.h> // struct stat, stat()
-# include <syslog.h>
 
 # include "dakota-os.hh"
 

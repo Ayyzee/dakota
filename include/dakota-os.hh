@@ -28,7 +28,7 @@
   }
 # elif defined __APPLE__ && defined __MACH__
   # include <mach-o/getsect.h>
-  # include <signal.h>
+  # include <csignal>
 
   extern void* __dso_handle;
 

@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# include <stdio.h>  // printf(), fprintf(), stderr
-# include <stdlib.h> // EXIT_SUCCESS, EXIT_FAILURE
+# include <cstdio>  // printf(), fprintf(), stderr
+# include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
 
 # include "dso.hh"
 

@@ -14,14 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+# include <fcntl.h>
 # include <getopt.h> // getopt_long()
 # include <sys/param.h> // MAXPATHLEN
-# include <errno.h>
-# include <string.h>
-# include <assert.h>
-# include <fcntl.h>
-# include <stdio.h>
 # include <unistd.h>
+
+# include <cassert>
+# include <cerrno>
+# include <cstdio>
+# include <cstring>
 # include <sys/wait.h>
 
 # include "dummy.hh"
