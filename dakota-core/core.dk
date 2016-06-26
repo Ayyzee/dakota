@@ -1490,7 +1490,8 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #file));
   assert(nullptr != registration-info);
   if (nullptr != getenv("DAKOTA_CATALOG_OUTPUT") ||
-      nullptr != getenv("DKT_NO_INIT_RUNTIME"))
+      nullptr != getenv("DKT_NO_INIT_RUNTIME") ||
+      !min-runtime?)
     return;
   named-info::sort(registration-info);
   named-info-t* klass-defns = cast(named-info-t*)named-info::at(registration-info, #klass-defns);
