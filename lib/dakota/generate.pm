@@ -4313,9 +4313,6 @@ sub dk_generate_cc {
   my ($file, $path_name, $project_ast) = @_;
   my ($dir, $file_basename) = &split_path($file);
   my $filestr = &dakota::util::filestr_from_file($file);
-  my $first = '';
-  $filestr =~ s/^(.*?)\n(.*)$/$2/s;
-  $first = $1;
   my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
@@ -4331,13 +4328,11 @@ sub dk_generate_cc {
   } else {
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
-      &write_to_file_converted_strings("$output", [ $first . $nl,
-                                                    "# line 2 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
+      &write_to_file_converted_strings("$output", [ "# line 1 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
                                                     $filestr ],
                                        $remove = 1, $project_ast);
     } else {
-      &write_to_file_converted_strings("$output", [ $first . $nl,
-                                                    "# line 2 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
+      &write_to_file_converted_strings("$output", [ "# line 1 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
                                                     $filestr ],
                                        $remove = 1, $project_ast);
     }
