@@ -1,4 +1,4 @@
-// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 // Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
 //

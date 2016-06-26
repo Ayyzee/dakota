@@ -1,3 +1,5 @@
+// -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+
 # if !defined dkt_dakota_declare_klass_type_hh
 # define      dkt_dakota_declare_klass_type_hh
 
