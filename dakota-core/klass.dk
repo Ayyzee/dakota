@@ -21,14 +21,11 @@ module dakota-core;
 # include <cstdio>
 # include <cstring>
 
-# if HAVE-CONFIG-HH
-  # include "config.hh"
-# endif
-
-# include "safe-str.hh"
-# include "private.hh"
+# include "config.hh"
 # include "dakota-rt-private.hh"
 # include "dso.hh" // dso-symbol-for-address()
+# include "private.hh"
+# include "safe-str.hh"
 # include "sorted-array.hh"
 
 # if 0

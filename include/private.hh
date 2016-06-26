@@ -61,15 +61,6 @@ KLASS_NS klass {
 KLASS_NS bit_vector {
   METHOD set_bit(object_t, ssize_t, boole_t) -> object_t;
 }
-# if DKT_WORKAROUND
-KLASS_NS property {
-  METHOD compare(slots_t*,  slots_t* ) -> int_t;
-}
-KLASS_NS named_info {
-  FUNC compare(slots_t**, slots_t**) -> int_t;
-}
-# endif
-
 [[noreturn]] FUNC verbose_terminate()  noexcept -> void;
 [[noreturn]] FUNC verbose_unexpected() noexcept -> void;
 [[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;

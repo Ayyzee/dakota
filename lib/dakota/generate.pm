@@ -362,11 +362,11 @@ sub generate_src {
   }
   my $str;
   if (&is_src_decl()) {
-    return $str if $ENV{'DK_GENERATE_COMMON_HEADER'};
+    return $str if $ENV{'DK_TARGET_COMMON_HEADER'};
     $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
   } else {
     $str =
-      "# if !defined DK_GENERATE_COMMON_HEADER || 0 == DK_GENERATE_COMMON_HEADER" . $nl .
+      "# if !defined DK_TARGET_COMMON_HEADER || 0 == DK_TARGET_COMMON_HEADER" . $nl .
       "  # include \"$src_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# else" . $nl .
       "  # include \"$target_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
@@ -2538,7 +2538,7 @@ sub is_same_file {
 sub is_same_src_file {
   my ($klass_scope) = @_;
   if ($gbl_src_file && $$klass_scope{'file'}) {
-    return 1 if $ENV{'DK_GENERATE_COMMON_HEADER'};
+    return 1 if $ENV{'DK_TARGET_COMMON_HEADER'};
     return 1 if $gbl_src_file eq &canon_path($$klass_scope{'file'});
   }
   return 0;
@@ -2607,7 +2607,7 @@ sub has_exported_slots {
 }
 sub should_export_slots {
   my ($klass_scope) = @_;
-  return ($ENV{'DK_GENERATE_COMMON_HEADER'} && &has_slots($klass_scope)) || &has_exported_slots($klass_scope);
+  return ($ENV{'DK_TARGET_COMMON_HEADER'} && &has_slots($klass_scope)) || &has_exported_slots($klass_scope);
 }
 sub has_methods {
   my ($klass_scope) = @_;

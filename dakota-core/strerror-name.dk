@@ -20,10 +20,7 @@
 # include <cstdio>
 # include <cstring>
 
-# if HAVE-CONFIG-HH
-  # include "config.hh"
-# endif
-
+# include "config.hh"
 # include "private.hh"
 
 static func set-name(int-t, str-t) -> void;

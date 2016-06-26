@@ -21,12 +21,9 @@ module dakota-core;
 # include <cstdio>
 # include <cstring>
 
-# if HAVE-CONFIG-HH
-  # include "config.hh"
-# endif
-
-# include "safe-str.hh"
+# include "config.hh"
 # include "private.hh"
+# include "safe-str.hh"
 
 klass ptr;
 klass stream;

@@ -29,12 +29,9 @@
     'libs' => [ # cmd-line
     ],
     'include-dirs' => [ # cmd-line
-      '$(srcdir)',
       '$(srcdir)/../include',
     ],
     'macros' => [ # cmd-line
-      'DKT_WORKAROUND',
-      'HAVE_CONFIG_HH',
     ],
     'project' => '$(srcdir)/dakota.project', # cmd-line
     'target' => '../lib/libdakota.$(so_ext)', # cmd-line

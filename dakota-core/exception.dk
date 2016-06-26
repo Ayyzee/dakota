@@ -23,10 +23,7 @@ module dakota-core;
 # include <exception>
 # include <unistd.h> // getpid()
 
-# if HAVE-CONFIG-HH
-  # include "config.hh"
-# endif
-
+# include "config.hh"
 # include "private.hh"
 
 klass output-stream;
