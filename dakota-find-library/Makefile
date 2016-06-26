@@ -32,6 +32,8 @@ check-exe: all
 	$(target) libssl.$(so_ext)
 
 check: all
+	if [[ -e $(rootdir)/lib/libdakota-core.$(so_ext) ]]; then $(target) $(rootdir)/lib/libdakota-core.$(so_ext); fi
+	if [[ -e $(rootdir)/lib/libdakota.$(so_ext) ]]; then $(target) $(rootdir)/lib/libdakota.$(so_ext); fi
 	$(MAKE) $(MAKEFLAGS) check-exe
 
 installcheck: check install
