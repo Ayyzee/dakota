@@ -266,10 +266,17 @@ if ($$root_cmd{'opts'}{'include-directory'}) {
   }
   $ENV{'CXXFLAGS'} .= $flags;
 }
+my $env_vars = { 'DK_TARGET_COMMON_HEADER' => 1,
+                 'DK_INLINE_GENERIC_FUNCS' => 1,
+               };
 if ($$root_cmd{'opts'}{'define-macro'}) {
   my $flags = '';
   foreach my $mcr (@{$$root_cmd{'opts'}{'define-macro'}}) {
     $flags .= ' ' . $$gcc_from_dakota{'--define-macro'} . '=' . $mcr;
+    my ($lhs, $rhs) = split(/=/, $mcr);
+    if ($$env_vars{$lhs}) {
+      $ENV{$lhs} = $rhs;
+    }
   }
   $ENV{'CXXFLAGS'} .= $flags;
 }
