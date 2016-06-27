@@ -35,7 +35,6 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  uninstall\
 
 single: $(srcs) | $(target-base).project
-	$(DAKOTA-BASE) --parse --project $(target-base).project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) --compile --include-directory . --include-directory ../include --project $(target-base).project --output $(builddir)/$$input.o $$input;\
