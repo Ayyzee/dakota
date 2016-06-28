@@ -914,13 +914,14 @@ sub unwrap_seq {
 }
 sub filestr_to_file {
   my ($filestr, $file) = @_;
-  my $current_sig = '0';
-  &make_dir_part($file);
-  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-  flock FILE, 2; # LOCK_EX
-  truncate FILE, 0;
-  print FILE $filestr;
-  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  if (1) {
+    &make_dir_part($file);
+    open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+    flock FILE, 2; # LOCK_EX
+    truncate FILE, 0;
+    print FILE $filestr;
+    close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  }
 }
 sub scalar_to_file {
   my ($file, $ref, $original_state) = @_;
