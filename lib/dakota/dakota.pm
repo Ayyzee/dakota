@@ -707,10 +707,8 @@ sub start_cmd {
     # or for testing runtime code generation
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline funcs)
-    if (!$$cmd_info{'opts'}{'compile'}) {
       my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
       &gen_target_o($cmd_info, $is_exe);
-    }
     if (!$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
     }
@@ -719,10 +717,8 @@ sub start_cmd {
     if (!$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
     }
-    if (!$$cmd_info{'opts'}{'compile'}) {
       my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
       &gen_target_o($cmd_info, $is_exe);
-    }
   }
   if (!$ENV{'DKT_PRECOMPILE'} && !$$cmd_info{'opts'}{'target'}) {
     if ($$cmd_info{'opts'}{'compile'}) {
@@ -1094,13 +1090,13 @@ sub target_o_from_ast {
       if (&is_out_of_date($target_ast_path, $target_cc_path)) {
         print $target_cc_path . $nl;
       } else {
-        #return;
+        return;
       }
     } else {
       if (&is_out_of_date($target_ast_path, $target_o_path)) {
         print $target_o_path . $nl;
       } else {
-        #return;
+        return;
       }
     }
   }
