@@ -80,6 +80,7 @@ our @EXPORT= qw(
                  encode_comments
                  encode_strings
                  filestr_from_file
+                 filestr_to_file
                  first
                  flatten
                  header_file_regex
@@ -912,6 +913,16 @@ sub unwrap_seq {
   $seq =~ s/\s+/ /gs;
   return $seq;
 }
+sub filestr_to_file {
+  my ($filestr, $file) = @_;
+  my $current_sig = '0';
+  &make_dir_part($file);
+  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  flock FILE, 2; # LOCK_EX
+  truncate FILE, 0;
+  print FILE $filestr;
+  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+}
 sub scalar_to_file {
   my ($file, $ref, $original_state) = @_;
   if (!defined $ref) {
@@ -921,13 +932,7 @@ sub scalar_to_file {
   if (!$original_state) {
     $refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
   }
-  &make_dir_part($file);
-  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-  flock FILE, 2; # LOCK_EX
-  truncate FILE, 0;
-  print FILE '# -*- mode: perl -*-' . $nl;
-  print FILE $refstr;
-  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  &filestr_to_file($refstr, $file);
 }
 sub scalar_from_file {
   my ($file) = @_;

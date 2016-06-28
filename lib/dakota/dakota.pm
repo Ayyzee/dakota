@@ -1052,22 +1052,18 @@ sub link_exe_opts_path {
 }
 sub o_from_cc {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
-  open(my $fh1, '>', &common_opts_path());
   my $opts = $$cmd_info{'opts'}{'compiler-flags'};
   $opts =~ s/^\s+//gs;
   $opts =~ s/\s+$//gs;
   $opts =~ s/\s+/\n/g;
-  print $fh1 $opts . $nl;
-  close($fh1);
+  &filestr_to_file($opts, &common_opts_path());
   $opts =
     $mode_flags . $nl .
       '@' . &common_opts_path() . $nl;
   $opts =~ s/^\s+//gs;
   $opts =~ s/\s+$//gs;
   $opts =~ s/\s+/\n/g;
-  open(my $fh2, '>', $opts_path);
-  print $fh2 $opts . $nl;
-  close($fh2);
+  &filestr_to_file($opts, $opts_path);
   my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
   $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
   $$o_cmd{'project.target'} = $$cmd_info{'project.target'};
@@ -1097,10 +1093,14 @@ sub target_o_from_ast {
     if ($ENV{'DKT_PRECOMPILE'}) {
       if (&is_out_of_date($target_ast_path, $target_cc_path)) {
         print $target_cc_path . $nl;
+      } else {
+        #return;
       }
     } else {
       if (&is_out_of_date($target_ast_path, $target_o_path)) {
         print $target_o_path . $nl;
+      } else {
+        #return;
       }
     }
   }
@@ -1190,9 +1190,7 @@ sub linked_output_from_o {
   $opts =~ s/^\s+//gs;
   $opts =~ s/\s+$//gs;
   $opts =~ s/\s+/\n/g;
-  open(my $fh, '>', $opts_path);
-  print $fh $opts . $nl;
-  close($fh);
+  &filestr_to_file($opts, $opts_path);
   $$cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
   $$cmd{'cmd-flags'} = '@' . $opts_path;
   $$cmd{'output'} = $$cmd_info{'output'};

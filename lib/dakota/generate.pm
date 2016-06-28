@@ -259,12 +259,11 @@ sub is_exe_target {
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
-  &make_dir_part($path, $global_should_echo);
-  open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
+  my $filestr = '';
   foreach my $string (@$strings) {
-    print PATH $string;
+    $filestr .= $string;
   }
-  close PATH;
+  &filestr_to_file($filestr, $path);
 }
 my $gbl_macros;
 sub write_to_file_converted_strings {
@@ -280,12 +279,6 @@ sub write_to_file_converted_strings {
       }
     }
   }
-  if (defined $path) {
-    &make_dir_part($path, $global_should_echo);
-    open PATH, ">$path" or die __FILE__, ":", __LINE__, ": error: \"$path\" $!\n";
-  } else {
-    *PATH = *STDOUT;
-  }
   my $filestr = '';
 
   foreach my $string (@$strings) {
@@ -298,12 +291,7 @@ sub write_to_file_converted_strings {
   }
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
   &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics, $remove); # costly (< 3/4 of total)
-
-  print PATH $converted_string;
-
-  if (defined $path) {
-    close PATH;
-  }
+  &filestr_to_file($converted_string, $path);
 }
 sub generate_src_decl {
   my ($path, $file, $project_ast, $target_hh_path) = @_;
