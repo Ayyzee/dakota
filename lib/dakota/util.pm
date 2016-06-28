@@ -655,18 +655,17 @@ sub find_library {
 }
 sub is_out_of_date {
   my ($infile, $outfile, $file_db) = @_;
-  my $outfile_stat = &path_stat($file_db, $outfile, '--output');
-  if (!$$outfile_stat{'mtime'}) {
-    return 1;
-  }
   if (! -e $infile) {
     $infile = &find_library($infile);
   }
-  my $infile_stat = &path_stat($file_db, $infile,  '--inputs');
+  my $infile_stat =  &path_stat($file_db, $infile,  '--inputs');
+  my $outfile_stat = &path_stat($file_db, $outfile, '--output');
 
   if (!$$infile_stat{'mtime'}) {
-    $$infile_stat{'mtime'} = 0;
-    die $0 . ': warning: no-such-file: ' . $infile;
+    die $0 . ': warning: no-such-file: ' . $infile . ' on which ' . $outfile . ' depends' . $nl;
+  }
+  if (!$$outfile_stat{'mtime'}) {
+    return 1;
   }
   if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
     return 1;
