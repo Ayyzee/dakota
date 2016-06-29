@@ -28,6 +28,8 @@ use strict;
 use warnings;
 use sort 'stable';
 
+use Digest::MD5 qw(md5 md5_hex md5_base64);
+
 my $nl = "\n";
 my $gbl_prefix;
 
@@ -653,6 +655,14 @@ sub find_library {
   $name =~ s/\s+$//;
   return $name;
 }
+sub digsig {
+  my ($filestr) = @_;
+  my $sig;
+  $sig = &md5_hex($filestr);
+  $sig =~ s/^.*?([a-fA-F0-9]+)\s*$/$1/s;
+  $sig =~ s/^.*?(........)$/$1/s; # extra trim
+  return $sig;
+}
 sub is_out_of_date {
   my ($infile, $outfile, $file_db) = @_;
   if (! -e $infile) {
@@ -920,6 +930,12 @@ sub filestr_to_file {
     flock FILE, 2; # LOCK_EX
     truncate FILE, 0;
     print FILE $filestr;
+    close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+
+    open(FILE, ">", "$file.md5") or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+    flock FILE, 2; # LOCK_EX
+    truncate FILE, 0;
+    print FILE &digsig("file.md5");
     close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   }
 }
