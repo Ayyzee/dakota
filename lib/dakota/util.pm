@@ -922,21 +922,23 @@ sub unwrap_seq {
   $seq =~ s/\s+/ /gs;
   return $seq;
 }
+sub write_filestr_to_file {
+  my ($filestr, $file) = @_;
+  &make_dir_part($file);
+  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  flock FILE, LOCK_EX or die;
+  truncate FILE, 0;
+  print FILE $filestr;
+  flock FILE, LOCK_UN or die;
+  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+}
 sub filestr_to_file {
   my ($filestr, $file) = @_;
+  my $file_md5 = "$file.md5";
+  my $filestr_sig = &digsig($filestr);
   if (1) {
-    &make_dir_part($file);
-    open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-    flock FILE, 2; # LOCK_EX
-    truncate FILE, 0;
-    print FILE $filestr;
-    close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-
-    open(FILE, ">", "$file.md5") or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-    flock FILE, 2; # LOCK_EX
-    truncate FILE, 0;
-    print FILE &digsig("file.md5");
-    close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+    &write_filestr_to_file($filestr,     $file);
+    &write_filestr_to_file($filestr_sig, $file_md5);
   }
 }
 sub scalar_to_file {
@@ -964,9 +966,10 @@ sub filestr_from_file {
   my ($file) = @_;
   undef $/; ## force files to be read in one slurp
   open FILE, "<$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
-  flock FILE, LOCK_SH;
+  flock FILE, LOCK_EX or die;
   my $filestr = <FILE>;
-  close FILE;
+  flock FILE, LOCK_UN or die;
+  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
   return $filestr;
 }
 sub start {
