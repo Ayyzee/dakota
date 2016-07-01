@@ -639,6 +639,15 @@ sub update_ast_from_all_inputs {
   }
   return $cmd_info;
 }
+sub add_target_o_path_to_inputs {
+  my ($cmd_info) = @_;
+  my $target_cc_path = &target_cc_path($cmd_info);
+  my $target_o_path =  &o_path_from_cc_path($target_cc_path);
+  foreach my $input (@{$$cmd_info{'inputs'}}) {
+    return if $input eq $target_o_path;
+  }
+  unshift @{$$cmd_info{'inputs'}}, $target_o_path;
+}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
@@ -726,13 +735,16 @@ sub start_cmd {
         &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
       }
     } elsif ($$cmd_info{'opts'}{'shared'}) {
+      &add_target_o_path_to_inputs($cmd_info);
       &linked_output_from_o($cmd_info, &link_so_opts_path(), $cxx_shared_flags);
     } elsif ($$cmd_info{'opts'}{'dynamic'}) {
+      &add_target_o_path_to_inputs($cmd_info);
       &linked_output_from_o($cmd_info, &link_dso_opts_path(), $cxx_dynamic_flags);
     } elsif (!$$cmd_info{'opts'}{'compile'} &&
              !$$cmd_info{'opts'}{'shared'}  &&
              !$$cmd_info{'opts'}{'dynamic'}) {
       my $mode_flags;
+      &add_target_o_path_to_inputs($cmd_info);
       &linked_output_from_o($cmd_info, &link_exe_opts_path(), $mode_flags = undef);
     } else {
       die __FILE__, ":", __LINE__, ": error:\n";
