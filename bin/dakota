@@ -100,6 +100,7 @@ my $root_cmd = { 'asts' => [],
             'project=s',
             'shared',               # gcc-like
             'target',
+            'pretarget',
 
             'create-project=s',
             'clean',                # make target like

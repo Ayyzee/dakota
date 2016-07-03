@@ -80,7 +80,7 @@ our @EXPORT= qw(
                  is_dk_path
                  is_o_path
                  target_cc_path
-                 target_hh_path
+                 rel_target_hh_path
                  target_generic_func_defns_path
              );
                 #target_generic_func_decls_path
@@ -424,11 +424,11 @@ sub target_cc_path {
   }
   return $target_cc_path;
 }
-sub target_hh_path {
+sub rel_target_hh_path {
   my ($cmd_info) = @_;
   my $target_cc_path = &target_cc_path($cmd_info);
-  my $target_hh_path = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
-  return $target_hh_path;
+  my $rel_target_hh_path = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  return $rel_target_hh_path;
 }
 sub default_cmd_info {
   my $cmd_info = { 'project.target' => &global_project_target() };
@@ -517,10 +517,10 @@ sub loop_cc_from_dk {
     &src::add_extra_klass_decls($file);
     &src::add_extra_keywords($file);
     &src::add_extra_generics($file);
-    my $target_hh_path = &target_hh_path($cmd_info);
+    my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
 
-    &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $target_hh_path);
-    &dakota::generate::generate_src_defn($cc_path, $file, $global_target_ast, $target_hh_path); # target_hh not used
+    &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
+    &dakota::generate::generate_src_defn($cc_path, $file, $global_target_ast, $rel_target_hh_path); # rel_target_hh_path not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -710,26 +710,38 @@ sub start_cmd {
   if ($should_replace_library_path_with_lib_opts) {
     $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
   }
-  if ($ENV{'DK_GENERATE_TARGET_FIRST'} || $ENV{'DK_TARGET_COMMON_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'}) {
+  my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
+  if ($ENV{'DK_TARGET_COMMON_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'}) {
+    if (!$$cmd_info{'opts'}{'compile'}) {
+      &gen_target_hh($cmd_info, $is_exe);
+    }
+  }
+  if ($ENV{'DK_GENERATE_TARGET_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
     # this might be useful for distributed building (initiating the building of the slowest first
     # or for testing runtime code generation
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline funcs)
-      my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
-      &gen_target_o($cmd_info, $is_exe);
-    if (!$$cmd_info{'opts'}{'target'}) {
+    if (!$$cmd_info{'opts'}{'compile'}) {
+      if (!$$cmd_info{'opts'}{'pretarget'}) {
+        &gen_target_o($cmd_info, $is_exe);
+      }
+    }
+    if (!$$cmd_info{'opts'}{'pretarget'} && !$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
     }
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
-    if (!$$cmd_info{'opts'}{'target'}) {
+    if (!$$cmd_info{'opts'}{'pretarget'} && !$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
     }
-      my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
-      &gen_target_o($cmd_info, $is_exe);
+    if (!$$cmd_info{'opts'}{'compile'}) {
+      if (!$$cmd_info{'opts'}{'pretarget'}) {
+        &gen_target_o($cmd_info, $is_exe);
+      }
+    }
   }
-  if (!$ENV{'DKT_PRECOMPILE'} && !$$cmd_info{'opts'}{'target'}) {
+  if (!$ENV{'DKT_PRECOMPILE'} && !$$cmd_info{'opts'}{'pretarget'} && !$$cmd_info{'opts'}{'target'}) {
     if ($$cmd_info{'opts'}{'compile'}) {
       if ($want_separate_precompile_pass) {
         &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
@@ -877,10 +889,21 @@ sub loop_ast_from_inputs {
   }
   return $cmd_info;
 } # loop_ast_from_inputs
+sub gen_target_hh {
+  my ($cmd_info, $is_exe) = @_;
+  my $is_defn;
+  return &gen_target($cmd_info, $is_exe, $is_defn = 0);
+}
 sub gen_target_o {
   my ($cmd_info, $is_exe) = @_;
+  my $is_defn;
+  return &gen_target($cmd_info, $is_exe, $is_defn = 1);
+}
+sub gen_target {
+  my ($cmd_info, $is_exe, $is_defn) = @_;
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
+    my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
     my $target_cc_path = &target_cc_path($cmd_info);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
       my $target_dk_path = &dk_path_from_cc_path($target_cc_path);
@@ -888,9 +911,17 @@ sub gen_target_o {
     }
     if (&is_debug()) {
       if ($ENV{'DKT_PRECOMPILE'}) {
-        print STDERR "  creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
+        if ($is_defn) {
+          print STDERR "  creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
+        } else {
+          print STDERR "  creating $target_hh_path" . &pann(__FILE__, __LINE__) . $nl;
+        }
       } else {
-        print STDERR "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
+        if ($is_defn) {
+          print STDERR "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
+        } else {
+          print STDERR "  creating $target_hh_path" . &pann(__FILE__, __LINE__) . $nl;
+        }
       }
     }
   }
@@ -909,7 +940,10 @@ sub gen_target_o {
     $$other{'name'} = $$cmd_info{'output'};
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
-  &target_o_from_ast($cmd_info, $other, $is_exe);
+  &target_hh_from_ast($cmd_info, $other, $is_exe);
+  if ($is_defn) {
+    &target_o_from_ast($cmd_info, $other, $is_exe);
+  }
 } # gen_target_o
 sub o_from_dk {
   my ($cmd_info, $input) = @_;
@@ -1090,30 +1124,55 @@ sub o_from_cc {
   }
   return &outfile_from_infiles($o_cmd, $should_echo);
 }
+sub target_hh_from_ast {
+  my ($cmd_info, $other, $is_exe) = @_;
+  my $is_defn;
+  return &target_from_ast($cmd_info, $other, $is_exe, $is_defn = 0);
+}
 sub target_o_from_ast {
   my ($cmd_info, $other, $is_exe) = @_;
+  my $is_defn;
+  return &target_from_ast($cmd_info, $other, $is_exe, $is_defn = 1);
+}
+sub target_from_ast {
+  my ($cmd_info, $other, $is_exe, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   my $target_ast_path = &target_ast_path($cmd_info);
-  my $target_cc_path =   &target_cc_path($cmd_info);
+  my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
+  my $target_cc_path =  &target_cc_path($cmd_info);
   &check_path($target_ast_path);
   my $target_o_path = &o_path_from_cc_path($target_cc_path);
   if (!$$cmd_info{'opts'}{'silent'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
-      if (&is_out_of_date($target_ast_path, $target_cc_path)) {
-        print $target_cc_path . $nl;
+      if ($is_defn) {
+        if (&is_out_of_date($target_ast_path, $target_cc_path)) {
+          print $target_cc_path . $nl;
+        } else {
+          return;
+        }
       } else {
-        return;
+        if (&is_out_of_date($target_ast_path, $target_hh_path)) {
+          print $target_hh_path . $nl;
+        } else {
+          return;
+        }
       }
     } else {
-      if (&is_out_of_date($target_ast_path, $target_o_path)) {
-        print $target_o_path . $nl;
+      if ($is_defn) {
+        if (&is_out_of_date($target_ast_path, $target_o_path)) {
+          print $target_o_path . $nl;
+        } else {
+          return;
+        }
       } else {
-        return;
+        if (&is_out_of_date($target_ast_path, $target_hh_path)) {
+          print $target_hh_path . $nl;
+        } else {
+          return;
+        }
       }
     }
   }
-  my $target_hh_path = $target_cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
-
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   $$project_io{'all'}{$target_ast_path}{$target_hh_path} = 1;
   $$project_io{'all'}{$target_ast_path}{$target_cc_path} = 1;
@@ -1143,7 +1202,9 @@ sub target_o_from_ast {
 
   my $project_ast;
   &dakota::generate::generate_target_decl($target_cc_path, $file, $project_ast = undef, $is_exe);
-  &dakota::generate::generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
+  if ($is_defn) {
+    &dakota::generate::generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
+  }
 
   my $o_info = {'opts' => {}, 'inputs' => [ $target_cc_path ], 'output' => $target_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};
@@ -1156,7 +1217,7 @@ sub target_o_from_ast {
   if ($$cmd_info{'opts'}{'compiler-flags'}) {
     $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
-  if (!$ENV{'DKT_PRECOMPILE'}) {
+  if ($is_defn && !$ENV{'DKT_PRECOMPILE'}) {
     &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
     &add_first($$cmd_info{'inputs'}, $target_o_path);
   }
