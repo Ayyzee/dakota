@@ -90,10 +90,10 @@ my $patterns = {
   'cc_path_from_dk_path' => '$(builddir)/%.$(cc_ext) : %.dk',
 
   'o_path_from_dk_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : %.dk',
-  'o_path_from_cc_path' =>  '$(builddir)/%.$(cc_ext).$(o_ext) : $(builddir)/%.$(cc_ext)',
+  'o_path_from_cc_path' =>  '%.$(cc_ext).$(o_ext) : %.$(cc_ext)',
 
   'ast_path_from_dk_path' =>   '$(builddir)/%.ast      : %.dk',
-  'ast_path_from_ctlg_path' => '$(builddir)/%.ctlg.ast : $(builddir)/%.ctlg',
+  'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
   # +target also used in dakota.pm
   'target_ast_path_from_any_path' => '$(builddir)/+target/%.ast : %', # _from_exe_path

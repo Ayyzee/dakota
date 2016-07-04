@@ -417,6 +417,15 @@ sub target_ast_path {
 sub target_cc_path {
   my ($cmd_info) = @_;
   my $target_cc_path;
+  if ($$cmd_info{'project.target.output'}) {
+    return $$cmd_info{'project.target.output'};
+  }
+  if (1) {
+    my $root_cmd = &root_cmd();
+    if ($$root_cmd{'project.target.output'}) {
+      return $$root_cmd{'project.target.output'};
+    }
+  }
   if (&is_so_path($$cmd_info{'project.target'})) {
     $target_cc_path = &target_cc_path_from_so_path($$cmd_info{'project.target'});
   } else {
@@ -445,7 +454,8 @@ sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
   my $target_cc_path = &target_cc_path($cmd_info);
-  my $result = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1-generic-func-defns.$hh_ext=r;
+  my $result = $target_cc_path =~ s=^(.+?)\.$cc_ext$=$1-generic-func-defns.$hh_ext=r;
+  $result =~ s=^$builddir/+==;
   return $result;
 }
 sub loop_cc_from_dk {
@@ -639,19 +649,15 @@ sub update_ast_from_all_inputs {
   }
   return $cmd_info;
 }
-sub add_target_o_path_to_inputs {
-  my ($cmd_info) = @_;
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $target_o_path =  &o_path_from_cc_path($target_cc_path);
-  foreach my $input (@{$$cmd_info{'inputs'}}) {
-    return if $input eq $target_o_path;
-  }
-  unshift @{$$cmd_info{'inputs'}}, $target_o_path;
-}
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
   $builddir = &dakota::util::builddir();
+  if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'path-only'}) {
+    my $target_cc_path = &target_cc_path($cmd_info);
+    print $target_cc_path . $nl;
+    return $exit_status;
+  }
   $cmd_info = &update_ast_from_all_inputs($cmd_info);
   my $target_ast_path = &target_ast_path($cmd_info);
   if ($$cmd_info{'opts'}{'parse'}) {
@@ -716,6 +722,7 @@ sub start_cmd {
       &gen_target_hh($cmd_info, $is_exe);
     }
   }
+  my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   if ($ENV{'DK_GENERATE_TARGET_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
     # this might be useful for distributed building (initiating the building of the slowest first
@@ -723,40 +730,41 @@ sub start_cmd {
     # also, this might be useful if the runtime .h file is being used rather than generating a
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
-      if (!$$cmd_info{'opts'}{'pretarget'}) {
-        &gen_target_o($cmd_info, $is_exe);
+      if (!$$cmd_info{'opts'}{'init'}) {
+        if (!$$project_io{'target-cc'}) {
+          &gen_target_o($cmd_info, $is_exe);
+        }
       }
     }
-    if (!$$cmd_info{'opts'}{'pretarget'} && !$$cmd_info{'opts'}{'target'}) {
+    if (!$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
     }
   } else {
      # generate user .o files first, then the single (but slow) runtime .o
-    if (!$$cmd_info{'opts'}{'pretarget'} && !$$cmd_info{'opts'}{'target'}) {
+    if (!$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
       $cmd_info = &loop_o_from_dk($cmd_info);
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
-      if (!$$cmd_info{'opts'}{'pretarget'}) {
-        &gen_target_o($cmd_info, $is_exe);
+      if (!$$cmd_info{'opts'}{'init'}) {
+        if (!$$project_io{'target-cc'}) {
+          &gen_target_o($cmd_info, $is_exe);
+        }
       }
     }
   }
-  if (!$ENV{'DKT_PRECOMPILE'} && !$$cmd_info{'opts'}{'pretarget'} && !$$cmd_info{'opts'}{'target'}) {
+  if (!$ENV{'DKT_PRECOMPILE'} && !$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
     if ($$cmd_info{'opts'}{'compile'}) {
       if ($want_separate_precompile_pass) {
         &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
       }
     } elsif ($$cmd_info{'opts'}{'shared'}) {
-      &add_target_o_path_to_inputs($cmd_info);
       &linked_output_from_o($cmd_info, &link_so_opts_path(), $cxx_shared_flags);
     } elsif ($$cmd_info{'opts'}{'dynamic'}) {
-      &add_target_o_path_to_inputs($cmd_info);
       &linked_output_from_o($cmd_info, &link_dso_opts_path(), $cxx_dynamic_flags);
     } elsif (!$$cmd_info{'opts'}{'compile'} &&
              !$$cmd_info{'opts'}{'shared'}  &&
              !$$cmd_info{'opts'}{'dynamic'}) {
       my $mode_flags;
-      &add_target_o_path_to_inputs($cmd_info);
       &linked_output_from_o($cmd_info, &link_exe_opts_path(), $mode_flags = undef);
     } else {
       die __FILE__, ":", __LINE__, ": error:\n";
@@ -903,8 +911,8 @@ sub gen_target {
   my ($cmd_info, $is_exe, $is_defn) = @_;
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
-    my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
     my $target_cc_path = &target_cc_path($cmd_info);
+    my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
       my $target_dk_path = &dk_path_from_cc_path($target_cc_path);
       print $target_dk_path . $nl;
@@ -1138,8 +1146,8 @@ sub target_from_ast {
   my ($cmd_info, $other, $is_exe, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   my $target_ast_path = &target_ast_path($cmd_info);
-  my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
   my $target_cc_path =  &target_cc_path($cmd_info);
+  my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
   &check_path($target_ast_path);
   my $target_o_path = &o_path_from_cc_path($target_cc_path);
   if (!$$cmd_info{'opts'}{'silent'}) {
@@ -1175,9 +1183,17 @@ sub target_from_ast {
   }
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   $$project_io{'all'}{$target_ast_path}{$target_hh_path} = 1;
-  $$project_io{'all'}{$target_ast_path}{$target_cc_path} = 1;
-  $$project_io{'all'}{$target_hh_path}{$target_o_path} = 1;
-  $$project_io{'all'}{$target_cc_path}{$target_o_path} = 1;
+  if (!$$project_io{'target-hh'}) {
+    $$project_io{'target-hh'} = $target_hh_path;
+  }
+  if ($is_defn) {
+    $$project_io{'all'}{$target_ast_path}{$target_cc_path} = 1;
+    $$project_io{'all'}{$target_hh_path}{$target_o_path} = 1;
+    $$project_io{'all'}{$target_cc_path}{$target_o_path} = 1;
+    if (!$$project_io{'target-cc'}) {
+      $$project_io{'target-cc'} = $target_cc_path;
+    }
+  }
   &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
   &make_dir_part($target_cc_path, $global_should_echo);

@@ -321,11 +321,12 @@ sub pre_output_path_from_any_path {
 sub generate_src {
   my ($path, $file, $project_ast, $target_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
+  $dir = '.' if !$dir;
   my $src_hh_path = "$name.$hh_ext";
   my $user_cc_path = '+srcs/' . $name . '.' . $cc_ext;
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
-  my $output =     "$dir/$name.$suffix";
+  my $output = &canon_path("$dir/$name.$suffix");
   my $pre_output = &pre_output_path_from_any_path($output);
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
@@ -384,9 +385,10 @@ sub generate_target_defn {
 sub generate_target {
   my ($path, $file, $project_ast) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
+  $dir = '.' if !$dir;
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
-  my $output = "$dir/$name.$suffix";
+  my $output = &canon_path("$dir/$name.$suffix");
   my $start_time;
   my $end_time;
   if (&is_debug()) {
@@ -504,6 +506,7 @@ sub make_strings_and_write_to_file_converted {
 }
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
+  $dir = '.' if !$dir;
   my $result = {};
   my $extra_dakota_headers = &extra_dakota_headers($name);
   my $ordered_klass_names = &order_klasses($file);

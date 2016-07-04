@@ -132,6 +132,8 @@ our @EXPORT= qw(
                  set_global_project_ast
                  global_project_target
                  use_abs_path
+                 set_root_cmd
+                 root_cmd
               );
 use Cwd;
 use File::Spec;
@@ -149,6 +151,14 @@ my $ENCODED_COMMENT_END =   'ENCODEDCOMMENTEND';
 my $ENCODED_STRING_BEGIN = 'ENCODEDSTRINGBEGIN';
 my $ENCODED_STRING_END =   'ENCODEDSTRINGEND';
 
+my $root_cmd;
+sub set_root_cmd {
+  my ($tbl) = @_;
+  $root_cmd = $tbl;
+}
+sub root_cmd {
+  return $root_cmd;
+}
 sub at {
   my ($tbl, $key) = @_;
   if (exists $$tbl{$key} && defined $$tbl{$key}) {
@@ -954,6 +964,7 @@ sub scalar_to_file {
 }
 sub scalar_from_file {
   my ($file) = @_;
+  die if ! -e $file;
   my $filestr = &filestr_from_file($file);
   $filestr = eval $filestr;
 

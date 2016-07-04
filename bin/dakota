@@ -100,7 +100,8 @@ my $root_cmd = { 'asts' => [],
             'project=s',
             'shared',               # gcc-like
             'target',
-            'pretarget',
+            'init',
+            'path-only',
 
             'create-project=s',
             'clean',                # make target like
@@ -126,6 +127,9 @@ my $root_cmd = { 'asts' => [],
            #'runpath=s',            # gcc-like (--for-linker -R|-rpath --for-linker <>), ld-like (-R|-rpath <>)
            #'touch'                 # make-like
            );
+$$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target'};
+&set_root_cmd($root_cmd);
+
 # --quiet
 # --help
 # --verbose
@@ -218,6 +222,9 @@ if (0) {
       $$root_cmd{'project.inputs'}[$i] = $input;
     }
   }
+}
+if ($$root_cmd{'opts'}{'target'} && $$root_cmd{'opts'}{'output'}) {
+  $$root_cmd{'project.target.output'} = $$root_cmd{'opts'}{'output'};
 }
 if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
   if (1 >= scalar $$root_cmd{'project.inputs'}) {
