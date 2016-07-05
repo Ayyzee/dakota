@@ -715,7 +715,7 @@ sub rel_path_canon {
   my ($path1, $cwd) = @_;
   my $result = $path1;
 
-  if ($path1 =~ m/\.\./g) {
+  #if ($path1 =~ m/\.\./g) {
     if (!$cwd) {
       $cwd = &cwd();
     }
@@ -739,7 +739,7 @@ sub rel_path_canon {
       print "$result = $path1\n";
       print "$result = result\n";
     }
-  }
+  #}
   return $result;
 }
 sub all_files {

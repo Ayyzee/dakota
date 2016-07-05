@@ -159,7 +159,7 @@ sub detect_gcc_opts {
       push @$ordered_input_args, '--library=' . $$pair[1];
     } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
     } elsif ($arg !~ /^-/) {
-      if ($arg =~ /^(.+?\.(dk|$so_ext|$o_ext))$/) {
+      if ($arg =~ /^(.+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
         $pair = [$i, $arg];
         push @{$$info{'inputs'}}, $pair;
         push @$ordered_input_args, $$pair[1];
@@ -190,11 +190,9 @@ sub start {
     die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
   }
   my $cc_paths = [split $nl, $outstr];
-  if (0 == @$cc_paths) {
-    print STDERR $0 . ': info: nothing to do' . $nl;
-    exit 0;
+  if (0 != @$cc_paths) {
+    &translate_dk_to_cc($gcc_cmd, $cc_paths);
   }
-  &translate_dk_to_cc($gcc_cmd, $cc_paths);
   print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
   return system @$gcc_cmd;
 }
