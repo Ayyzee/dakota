@@ -33,6 +33,7 @@ $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 0; # default = 2
 
 my $nl = "\n";
+my $cc_ext = 'cc';
 my $o_ext =   'o';
 my $so_ext = 'so';
 sub path_opt {
@@ -58,7 +59,7 @@ sub path_opt {
 sub cc_from_dk {
   my ($path) = @_;
   my $builddir = 'dkt';
-  $path =~ s=^(.+\.dk)$=$builddir/$1.cc=;
+  $path =~ s=^(.+\.dk)$=$builddir/$1.$cc_ext=;
   return $path;
 }
 sub bname {
