@@ -85,6 +85,7 @@ $Getopt::Long::ignorecase = 0;
 my $root_cmd = { 'asts' => [],
                  'inputs' => [],
                  'opts' => { 'directory' => [],
+                             'found-library' => [],
                              'include-directory' => [ "$gbl_prefix/include" ],
                              'library-directory' => [],
                              'library' => [],
@@ -107,6 +108,7 @@ my $root_cmd = { 'asts' => [],
             'clean',                # make target like
             'define-macro=s',       # gcc-like
             'directory=s',          # make-like
+            'found-library=s',
             'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
             'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
