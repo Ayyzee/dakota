@@ -831,6 +831,7 @@ sub copy_no_dups {
 }
 sub is_abs {
   my ($path) = @_;
+  die if !$path;
   my $result = File::Spec->file_name_is_absolute($path);
   return $result;
 }
@@ -841,15 +842,18 @@ sub realpath {
 }
 sub relpath {
   my ($path, $base) = @_; # base is optional
+  die if !$path;
   $path = &realpath($path);
   if ($base) {
     $base = &realpath($base);
   }
+  die if !$path;
   my $result = File::Spec->abs2rel($path, $base); # base is optional
   return $result;
 }
 sub canonpath {
   my ($path) = @_;
+  die if !$path;
   my $result = File::Spec->canonpath($path);
   return $result;
 }
@@ -867,6 +871,7 @@ sub canon_path {
 }
 sub split_path {
   my ($path, $ext_re) = @_;
+  die if !$path;
   my ($vol, $dir, $name) = File::Spec->splitpath($path);
   $dir = &canon_path($dir);
   my $ext;
