@@ -150,7 +150,8 @@ $dkt_exclude_libs = $ENV{'DKT_EXCLUDE_LIBS'} if $ENV{'DKT_EXCLUDE_LIBS'};
 if ($$root_cmd{'opts'}{'precompile'}) {
   $ENV{'DKT_PRECOMPILE'} = 1;
 }
-my $inputs = &clean_paths(\@ARGV);
+my $rel_argv = [map { &rel_path_canon($_) } @ARGV];
+my $inputs = &clean_paths($rel_argv);
 my $project;
 my $project_io;
 my $project_io_path;
