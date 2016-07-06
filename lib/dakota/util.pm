@@ -721,7 +721,7 @@ sub rel_path_canon {
     }
 
     my $path2 = $path1;
-    if (! &use_abs_path()) {
+    if (&use_abs_path()) {
       $path2 = &Cwd::abs_path($path2);
     }
     Carp::confess("ERROR: cwd=$cwd, path1=$path1, path2=$path2\n") if (!$cwd || !$path2);
