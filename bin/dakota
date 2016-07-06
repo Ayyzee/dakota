@@ -132,6 +132,13 @@ my $root_cmd = { 'asts' => [],
 $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target'};
 &set_root_cmd($root_cmd);
 
+my $found_library = [];
+foreach my $pair (@{$$root_cmd{'opts'}{'found-library'}}) {
+  my ($key, $value) = split(':', $pair);
+  push @$found_library, [$key, $value];
+}
+$$root_cmd{'opts'}{'found-library'} = $found_library;
+
 # --quiet
 # --help
 # --verbose
