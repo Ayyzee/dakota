@@ -82,38 +82,44 @@ $Data::Dumper::Indent    = 1; # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-my $root_cmd = { 'asts' => [],
-                 'inputs' => [],
-                 'opts' => { 'directory' => [],
-                             'found-library' => [],
-                             'include-directory' => [ "$gbl_prefix/include" ],
-                             'library-directory' => [],
-                             'library' => [],
-                             'define-macro' => [],
-                             'var' => {} } };
+my $root_cmd = {
+  'asts' => [],
+  'inputs' => [],
+  'opts' => {
+    'define-macro' => [],
+    'include-directory' => [ "$gbl_prefix/include" ],
+    'library-directory' => [],
+    'library' => [],
 
+    'directory' => [],
+    'found-library' => [],
+    'var' => {},
+  }
+};
 &GetOptions($$root_cmd{'opts'},
-            'compile',              # gcc-like
-            'dynamic',              # gcc-like
-            'output=s',             # gcc-like
-            'parse',
-            'precompile',           # gcc-ish (--compile)
-            'project=s',
-            'shared',               # gcc-like
-            'target',
-            'init',
-            'path-only',
-
-            'create-project=s',
-            'clean',                # make target like
             'define-macro=s',       # gcc-like
-            'directory=s',          # make-like
-            'found-library=s',
             'include-directory=s',  # gcc-like (--include-directory=<> OR -I<>)
-            'keep-going',           # make-like
             'library-directory=s',  # gcc-like (--library-directory=<> OR -L<>)
             'library=s',            # --library libssl.so equivalent to -lssl (or better -l:libssl.so on linux)
+            'output=s',             # gcc-like
+
+            'compile',              # gcc-like
+            'dynamic',              # gcc-like
+            'shared',               # gcc-like
+
+            'init',
+            'parse',
+            'path-only',
+            'precompile',           # gcc-ish (--compile)
+            'project=s',
+            'target',
+
+            'clean',                # make target like
+            'create-project=s',
+            'directory=s',          # make-like
             'echo-inputs',          #
+            'found-library=s',
+            'keep-going',           # make-like
             'silent',               #
             'soname=s',             # ld-like (-soname <>)
             'var=s',                # for env vars like MAKEFLAGS, etc.
