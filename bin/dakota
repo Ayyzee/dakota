@@ -154,8 +154,8 @@ $$root_cmd{'opts'}{'found-library'} = $found_library;
 # m/0: many inputs, no  output
 # m/1: many inputs, one output (directory)
 
-my $libdakota_core = "$gbl_prefix/lib/libdakota-core.$so_ext";
-my $libdakota =      "$gbl_prefix/lib/libdakota.$so_ext";
+my $libdakota_core = "libdakota-core.$so_ext";
+my $libdakota =      "libdakota.$so_ext";
 
 my $libdakota_core_bit = 0x1;
 my $libdakota_bit =      0x2;
