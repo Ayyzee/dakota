@@ -3,9 +3,8 @@ rootdir := ../..
 target-base := l1
 so_ext := dylib
 
-project := $(target-base).project
-builddir := $(shell $(rootdir)/bin/dakota-build builddir --build $(project))
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/$(target-base).mk $(project))
+builddir := $(shell $(rootdir)/bin/dakota-build builddir --build project)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/project.mk project)
 
 DAKOTA-BASE := $(rootdir)/bin/dakota
 RM := rm
@@ -20,7 +19,7 @@ RMFLAGS := -fr
 all: $(target)
 
 $(target):
-	$(DAKOTA-BASE) --shared --project $(project) $^
+	$(DAKOTA-BASE) --shared --project project $^
 
 no-project:
 	$(DAKOTA-BASE) --shared --output $(target) $^
@@ -30,4 +29,4 @@ check: all
 
 clean:
 	$(RM) $(RMFLAGS) $(builddir)
-	$(RM) $(RMFLAGS) $(target)
+	$(RM) $(RMFLAGS) $(target) project.mk

@@ -4,11 +4,10 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 export DKT_EXCLUDE_LIBS = 2
 
-target-base := dakota
-builddir := $(shell $(rootdir)/bin/dakota-build builddir $(target-base).build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/$(target-base).mk $(target-base).build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/build.mk build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -19,7 +18,7 @@ macros := $(patsubst %,--define-macro %,$(macros))
 # should be generated
 install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
 
-.PRECIOUS: %.project
+.PRECIOUS: project
 
 .PHONY:\
  all\
@@ -34,19 +33,19 @@ install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(
  single\
  uninstall\
 
-single: $(srcs) | $(target-base).project
+single: $(srcs) | project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --compile --include-directory ../include --project $(target-base).project --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) --compile --include-directory ../include --project project --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --shared --include-directory ../include --project $(target-base).project
+	$(DAKOTA-BASE) --shared --include-directory ../include --project project
 
 check-exe: all
 	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
 	rm -f exe
-	DKT_EXCLUDE_LIBS=0 $(DAKOTA-BASE) exe.dk
+	DKT_EXCLUDE_LIBS=0 $(DAKOTA-BASE) --project exe.project exe.dk
 	./exe
 
 check: all
@@ -61,8 +60,8 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	if [[ -e $(target-base).project ]]; then $(DAKOTA-BASE) --clean --project $(target-base).project; fi
-	$(RM) $(RMFLAGS) $(target-base).project
+	if [[ -e project ]]; then $(DAKOTA-BASE) --clean --project project; fi
+	$(RM) $(RMFLAGS) project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe

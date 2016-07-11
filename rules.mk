@@ -1,7 +1,7 @@
 %.tbl: $(srcdir)/%.pl
 	./$< > $@
 
-../lib/lib%.$(so_ext): %.$(cc_ext) | %.project
+../lib/lib%.$(so_ext): %.$(cc_ext) | project
 	$(CXX) $(CXX_SHARED_FLAGS) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
 
 ../bin/%: $(srcdir)/%.$(cc_ext)
@@ -10,10 +10,13 @@
 %.project: %.build
 	$(rootdir)/bin/dakota-build2project $@ $<
 
-../bin/%: | %.project
+project: build
+	$(rootdir)/bin/dakota-build2project $@ $<
+
+../bin/%: | project
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --output $@ $(libs:%=--library %) $?
 
-../lib/lib%.$(so_ext): | %.project
+../lib/lib%.$(so_ext): | project
 	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --soname $(soname) --output $@ $(libs:%=--library %) $?
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: ../lib/dakota/%.json

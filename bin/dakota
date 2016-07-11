@@ -345,7 +345,7 @@ sub create_missing_project {
       $$project{'target'} = $project_base;
     }
   }
-  $project_path =   $project_base . '.project';
+  $project_path = 'project';
   if (-e $project_path) {
     print STDERR $0 . ": info: found $project_path; using for missing --project <>.\n";
     return $project_path;
