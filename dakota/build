@@ -34,7 +34,7 @@
     ],
     'macros' => [ # cmd-line
     ],
-    'project' => '$(srcdir)/dakota.project', # cmd-line
+    'project' => '$(srcdir)/project', # cmd-line
     'target' => '../lib/libdakota.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
