@@ -7,12 +7,12 @@
       'libdso.$(so_ext)',
     ],
     'include-dirs' => [
-        '../include'
+        '$(srcdir)/../include'
     ],
-    'target' => '../bin/dakota-find-library',
+    'target' => '$(srcdir)/../bin/dakota-find-library',
     'install' => {
       '-rules' => [
-        '$(DESTDIR)$(prefix)/bin/%', '../bin/%',
+        '$(DESTDIR)$(prefix)/bin/%', '$(srcdir)/../bin/%',
       ],
       'files' => [
         '$(DESTDIR)$(prefix)/bin/dakota-find-library',

@@ -1,38 +1,38 @@
 %.tbl: $(srcdir)/%.pl
 	./$< > $@
 
-../lib/lib%.$(so_ext): %.$(cc_ext) | project
-	$(CXX) $(CXX_SHARED_FLAGS) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
-
-../bin/%: $(srcdir)/%.$(cc_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
-
 %.project: %.build
 	$(rootdir)/bin/dakota-build2project $@ $<
 
 project: build
 	$(rootdir)/bin/dakota-build2project $@ $<
 
-../bin/%: | project
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --output $@ $(libs:%=--library %) $?
+$(srcdir)/../lib/lib%.$(so_ext): $(srcdir)/%.$(cc_ext)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
 
-../lib/lib%.$(so_ext): | project
-	$(DAKOTA) --shared $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --project $(project) --soname $(soname) --output $@ $(libs:%=--library %) $?
+$(srcdir)/../bin/%: $(srcdir)/%.$(cc_ext)
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
 
-$(DESTDIR)$(prefix)/lib/dakota/%.json: ../lib/dakota/%.json
+$(srcdir)/../bin/%: $(srcdir)/%.dk | project
+	$(DAKOTA) --project project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs:%=--library %) $?
+
+$(srcdir)/../lib/lib%.$(so_ext): $(srcdir)/%.dk | project
+	$(DAKOTA) --project project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --soname $(soname) --shared --output $@ $(libs:%=--library %) $?
+
+$(DESTDIR)$(prefix)/lib/dakota/%.json: $(srcdir)/../lib/dakota/%.json
 	sudo $(INSTALL_DATA) $< $(@D)
 
-$(DESTDIR)$(prefix)/lib/dakota/%.pm: ../lib/dakota/%.pm
+$(DESTDIR)$(prefix)/lib/dakota/%.pm: $(srcdir)/../lib/dakota/%.pm
 	sudo $(INSTALL_LIB) $< $(@D)
 
-$(DESTDIR)$(prefix)/lib/%.$(so_ext): ../lib/%.$(so_ext)
+$(DESTDIR)$(prefix)/lib/%.$(so_ext): $(srcdir)/../lib/%.$(so_ext)
 	sudo $(INSTALL_LIB) $< $(@D)
 
-$(DESTDIR)$(prefix)/include/%: ../include/%
+$(DESTDIR)$(prefix)/include/%: $(srcdir)/../include/%
 	sudo $(INSTALL_DATA) $< $(@D)
 
-$(DESTDIR)$(prefix)/include/%: %
+$(DESTDIR)$(prefix)/include/%: $(srcdir)/%
 	sudo $(INSTALL_DATA) $< $(@D)
 
-$(DESTDIR)$(prefix)/bin/%: ../bin/%
+$(DESTDIR)$(prefix)/bin/%: $(srcdir)/../bin/%
 	sudo $(INSTALL_PROGRAM) $< $(@D)

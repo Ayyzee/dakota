@@ -34,14 +34,13 @@
     ],
     'macros' => [ # cmd-line
     ],
-    'project' => '$(srcdir)/project', # cmd-line
-    'target' => '../lib/libdakota.$(so_ext)', # cmd-line
+    'target' => '$(srcdir)/../lib/libdakota.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
     'soname' => '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)', # cmd-line
     'install' => {
       '-rules' => [
-        '$(DESTDIR)$(prefix)/lib/%', '../lib/%',
+        '$(DESTDIR)$(prefix)/lib/%', '$(srcdir)/../lib/%',
       ],
       'files' => [ # install.files
         '$(DESTDIR)$(prefix)/lib/libdakota.$(so_ext)',

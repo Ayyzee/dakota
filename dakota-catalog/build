@@ -10,10 +10,10 @@
       '$(srcdir)',
       '$(srcdir)/../include',
     ],
-    'target' => '../bin/dakota-catalog', # cmd-line
+    'target' => '$(srcdir)/../bin/dakota-catalog', # cmd-line
     'install' => {
       '-rules' => [
-        '$(DESTDIR)$(prefix)/bin/%', '../bin/%',
+        '$(DESTDIR)$(prefix)/bin/%', '$(srcdir)/../bin/%',
       ],
       'files' =>   [ # install.files
         '$(DESTDIR)$(prefix)/bin/dakota-catalog',
