@@ -13,7 +13,7 @@ include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
 # should be generated
 install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
 
-.PRECIOUS: %.project
+.PRECIOUS: project
 
 .PHONY:\
  all\
