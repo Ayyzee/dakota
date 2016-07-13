@@ -26,6 +26,7 @@ package dakota::dakota;
 
 use strict;
 use warnings;
+use Fcntl qw(:DEFAULT :flock);
 use sort 'stable';
 
 my $gbl_prefix;
@@ -612,8 +613,8 @@ sub update_kw_args_generics {
   $$ast{'kw-args-generics'} = $kw_args_generics;
   &scalar_to_file($path, $ast);
 }
-sub update_ast_from_all_inputs {
-  my ($cmd_info) = @_;
+sub update_target_ast_from_all_inputs {
+  my ($cmd_info, $target_ast_path) = @_;
   my $start_time = time;
   my $orig = { 'inputs' => $$cmd_info{'inputs'},
                'output' => $$cmd_info{'output'},
@@ -624,7 +625,6 @@ sub update_ast_from_all_inputs {
   $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
-  my $target_ast_path = &target_ast_path($cmd_info);
   &check_path($target_ast_path);
   if (&is_debug()) {
     print STDERR "creating $target_ast_path" . &pann(__FILE__, __LINE__) . $nl;
@@ -661,21 +661,13 @@ sub add_target_o_path_to_inputs {
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info) = @_;
+  $root_cmd = $cmd_info;
   $builddir = &dakota::util::builddir();
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'path-only'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
     print $target_cc_path . $nl;
     return $exit_status;
   }
-  $cmd_info = &update_ast_from_all_inputs($cmd_info);
-  my $target_ast_path = &target_ast_path($cmd_info);
-  if ($$cmd_info{'opts'}{'parse'}) {
-    print $target_ast_path . $nl;
-    return $exit_status;
-  }
-  &set_global_project_ast($target_ast_path);
-  $root_cmd = $cmd_info;
-
   if (!$$cmd_info{'opts'}{'compiler'}) {
     my $cxx = &dakota::util::var($gbl_compiler, 'CXX', 'g++');
     $$cmd_info{'opts'}{'compiler'} = $cxx;
@@ -725,12 +717,32 @@ sub start_cmd {
   if ($should_replace_library_path_with_lib_opts) {
     $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
   }
+  my $target_ast_path = &target_ast_path($cmd_info);
+  my $lock_file = $target_ast_path . '.flock';
+  &make_dir_part($target_ast_path);
+
+  open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
+  flock LOCK_FILE, LOCK_EX or die;
+  $cmd_info = &update_target_ast_from_all_inputs($cmd_info, $target_ast_path);
+  if ($$cmd_info{'opts'}{'parse'}) {
+    print $target_ast_path . $nl;
+    flock LOCK_FILE, LOCK_UN or die;
+    close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
+    unlink $lock_file;
+    return $exit_status;
+  }
+  &set_global_project_ast($target_ast_path);
+
   my $is_exe = !defined $$cmd_info{'opts'}{'dynamic'} && !defined $$cmd_info{'opts'}{'shared'};
   if ($ENV{'DK_TARGET_COMMON_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
       &gen_target_hh($cmd_info, $is_exe);
     }
   }
+  flock LOCK_FILE, LOCK_UN or die;
+  close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
+  unlink $lock_file;
+
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   if ($ENV{'DK_GENERATE_TARGET_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
