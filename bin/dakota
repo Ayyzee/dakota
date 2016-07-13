@@ -155,8 +155,8 @@ $$root_cmd{'opts'}{'found-library'} = $found_library;
 # m/0: many inputs, no  output
 # m/1: many inputs, one output (directory)
 
-my $libdakota_core = "libdakota-core.$so_ext";
-my $libdakota =      "libdakota.$so_ext";
+my $libdakota_core = "dakota-core";
+my $libdakota =      "dakota";
 
 my $libdakota_core_bit = 0x1;
 my $libdakota_bit =      0x2;
@@ -383,6 +383,15 @@ sub first_dk_path {
   }
   die;
 }
+sub lib_from_lib_name {
+  my ($name) = @_;
+  # linux and darwin so-regexs are separate
+  if ($name =~ m=^(.*/)?(lib([.\w-]+))\.$so_ext((\.\d+)+)?$= ||
+      $name =~ m=^(.*/)?(lib([.\w-]+))((\.\d+)+)?\.$so_ext$=) { # so-regex
+    return $name;
+  }
+  return 'lib' . $name . ".$so_ext";
+}
 sub use_project {
   my ($root_cmd) = @_;
   my $project = &set_global_project($$root_cmd{'opts'}{'project'});
@@ -396,7 +405,7 @@ sub use_project {
     $$project{'inputs'} = [ @{$$project{'srcs'}} ];
   }
   if ($$project{'libs'}) {
-    $$project{'inputs'} = [ @{$$project{'inputs'}}, @{$$project{'libs'}} ];
+    $$project{'inputs'} = [ @{$$project{'inputs'}}, map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
   }
   if (! $$project{'target'}) {
     if ($$project{'target'}) {
@@ -406,12 +415,12 @@ sub use_project {
     }
   }
   if (0 == $dkt_exclude_libs || $libdakota_core_bit < $dkt_exclude_libs) {
-    &add_last($$root_cmd{'inputs'}, $libdakota_core);
-    &add_last($$project{'inputs'}, $libdakota_core);
+    &add_last($$root_cmd{'inputs'}, &lib_from_lib_name($libdakota_core));
+    &add_last($$project{'inputs'},  &lib_from_lib_name($libdakota_core));
   }
   if (0 == $dkt_exclude_libs || $libdakota_bit < $dkt_exclude_libs) {
-    &add_last($$root_cmd{'inputs'}, $libdakota);
-    &add_last($$project{'inputs'}, $libdakota);
+    &add_last($$root_cmd{'inputs'}, &lib_from_lib_name($libdakota));
+    &add_last($$project{'inputs'},  &lib_from_lib_name($libdakota));
   }
   $$root_cmd{'project.inputs'} = $$project{'inputs'};
   $$root_cmd{'project.builddir'} = $$project{'builddir'};

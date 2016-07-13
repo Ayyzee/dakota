@@ -27,7 +27,7 @@
       '$(srcdir)/xml-object-output-stream.dk',
     ],
     'libs' => [ # cmd-line
-      'libdso.$(so_ext)',
+      'dso',
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)/../include',

@@ -538,13 +538,13 @@ sub loop_cc_from_dk {
 
 sub gcc_library_from_library_name {
   my ($library_name) = @_;
+  # linux and darwin so-regexs are separate
   if ($library_name =~ m=^lib([.\w-]+)\.$so_ext((\.\d+)+)?$= ||
       $library_name =~ m=^lib([.\w-]+)((\.\d+)+)?\.$so_ext$=) { # so-regex
     my $library_name_base = $1;
     return "-l$library_name_base"; # hardhard: hardcoded use of -l (both gcc/clang use it)
   } else {
-    print STDERR  "warning: $library_name does not look like a library name.\n";
-    return "--library $library_name";
+    return "-l$library_name";
   }
 }
 sub cmd_opts_from_library_name {

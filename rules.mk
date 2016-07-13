@@ -8,10 +8,10 @@ project: build
 	$(rootdir)/bin/dakota-build2project $@ $<
 
 $(srcdir)/../lib/lib%.$(so_ext): $(srcdir)/%.$(cc_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $(libs:%=-l%) $^
 
 $(srcdir)/../bin/%: $(srcdir)/%.$(cc_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:lib%.$(so_ext)=-l%) $^
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:%=-l%) $^
 
 $(srcdir)/../bin/%: $(srcdir)/%.dk | project
 	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs:%=--library %) $?
