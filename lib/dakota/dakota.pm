@@ -721,14 +721,19 @@ sub start_cmd {
   my $lock_file = $target_ast_path . '.flock';
   &make_dir_part($target_ast_path);
 
-  open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
-  flock LOCK_FILE, LOCK_EX or die;
+  my $should_lock = 0;
+  if ($should_lock) {
+    open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
+    flock LOCK_FILE, LOCK_EX or die;
+  }
   $cmd_info = &update_target_ast_from_all_inputs($cmd_info, $target_ast_path);
   if ($$cmd_info{'opts'}{'parse'}) {
     print $target_ast_path . $nl;
-    flock LOCK_FILE, LOCK_UN or die;
-    close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
-    unlink $lock_file;
+    if ($should_lock) {
+      flock LOCK_FILE, LOCK_UN or die;
+      close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
+      unlink $lock_file;
+    }
     return $exit_status;
   }
   &set_global_project_ast($target_ast_path);
@@ -739,9 +744,11 @@ sub start_cmd {
       &gen_target_hh($cmd_info, $is_exe);
     }
   }
-  flock LOCK_FILE, LOCK_UN or die;
-  close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
-  unlink $lock_file;
+  if ($should_lock) {
+    flock LOCK_FILE, LOCK_UN or die;
+    close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
+    unlink $lock_file;
+  }
 
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   if ($ENV{'DK_GENERATE_TARGET_FIRST'}) {
