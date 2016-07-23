@@ -15,9 +15,6 @@ include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
 # macros
 macros := $(patsubst %,--define-macro %,$(macros))
 
-# should be generated
-install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
-
 .PRECIOUS: %.project project
 
 .PHONY:\
@@ -73,7 +70,7 @@ $(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
 distclean: clean
 	cd $(rootdir); ./configure-common
 
-install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-{clang,gcc}}
+install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-$(compiler)}
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
@@ -93,5 +90,4 @@ precompile:
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install-files) $(install-links)
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/platform.json
+	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)

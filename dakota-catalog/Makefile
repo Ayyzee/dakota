@@ -10,9 +10,6 @@ include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/build.mk bui
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
 
-# should be generated
-install-dirs := $(DESTDIR)$(prefix)/bin $(DESTDIR)$(prefix)/include $(DESTDIR)$(prefix)/lib/dakota
-
 .PRECIOUS: project
 
 .PHONY:\
@@ -49,7 +46,7 @@ clean: goal-clean
 distclean: clean
 	cd $(rootdir); ./configure-common
 
-install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-{clang,gcc}}
+install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-$(compiler)}
 
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
