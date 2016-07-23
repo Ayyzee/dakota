@@ -84,7 +84,7 @@
     'target' => '$(srcdir)/../lib/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line
-    'soname' => '$(DESTDIR)$(prefix)/lib/libdakota-core.$(so_ext)', # cmd-line
+    'soname' => 'libdakota-core.$(so_ext)', # cmd-line
     'install' => {
       '-rules' => [
         '$(DESTDIR)$(prefix)/%', '$(srcdir)/../%',
