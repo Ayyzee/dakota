@@ -72,7 +72,6 @@ DAKOTA-CMD-LINE-OPTS += --define-macro DK_INLINE_GENERIC_FUNCS=$(DK_INLINE_GENER
 
 #DAKOTA-CMD-LINE-OPTS += --keep-going
 
-DAKOTA_CATALOG      ?= $(rootdir)/bin/dakota-catalog
 DAKOTA-BASE         ?= $(rootdir)/bin/dakota
 DAKOTA-PROFILE-BASE ?= $(rootdir)/bin/dakota-profile
 

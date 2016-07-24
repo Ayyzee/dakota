@@ -25,7 +25,7 @@ no-project:
 	$(DAKOTA-BASE) --shared --output $(target) $^
 
 check: all
-	$(rootdir)/bin/dakota-catalog $(target)
+	dakota-catalog $(target)
 
 clean:
 	$(RM) $(RMFLAGS) $(builddir)

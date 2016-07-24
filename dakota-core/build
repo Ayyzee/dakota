@@ -81,13 +81,12 @@
     ],
     'macros' => [ # cmd-line
     ],
-    'target' => '$(srcdir)/../lib/libdakota-core.$(so_ext)', # cmd-line
+    'target' => '$(srcdir)/libdakota-core.$(so_ext)', # cmd-line
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line
     'soname' => 'libdakota-core.$(so_ext)', # cmd-line
     'install' => {
       '-rules' => [
-        '$(DESTDIR)$(prefix)/%', '$(srcdir)/../%',
       ],
       'files' => [ # install.files
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)/command-line.json',

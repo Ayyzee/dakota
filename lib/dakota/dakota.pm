@@ -1425,11 +1425,13 @@ sub ctlg_from_so {
 
   if ($ENV{'DAKOTA_CATALOG'}) {
     $$ctlg_cmd{'cmd'} = $ENV{'DAKOTA_CATALOG'};
-  } elsif ($gbl_prefix) {
-    $$ctlg_cmd{'cmd'} = "$gbl_prefix/bin/dakota-catalog";
   } else {
-    die "should not call just any dakota-catalog"; # should we call just any dakota-catalog?
-    $$ctlg_cmd{'cmd'} = 'dakota-catalog';
+    my $dakota_catalog_path = "$gbl_prefix/bin/dakota-catalog";
+    if (-e $dakota_catalog_path) {
+      $$ctlg_cmd{'cmd'} = $dakota_catalog_path;
+    } else {
+      $$ctlg_cmd{'cmd'} = 'dakota-catalog';
+    }
   }
   if ($$cmd_info{'opts'}{'silent'} && !$$cmd_info{'opts'}{'echo-inputs'}) {
     $$ctlg_cmd{'cmd'} .= ' --silent';

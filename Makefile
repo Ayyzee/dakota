@@ -16,7 +16,13 @@ include $(rootdir)/makeflags.mk
  precompile \
  uninstall \
 
-all \
+all min:
+	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso all install
+	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog all install
+	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library all install
+	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core all install
+	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota all install
+
 check \
 check-exe \
 clean \
@@ -33,13 +39,6 @@ uninstall:
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/test $@
-
-min:
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota
 
 min-install: min
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso install

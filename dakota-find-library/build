@@ -9,10 +9,9 @@
     'include-dirs' => [
         '$(srcdir)/../include'
     ],
-    'target' => '$(srcdir)/../bin/dakota-find-library',
+    'target' => '$(srcdir)/dakota-find-library',
     'install' => {
       '-rules' => [
-        '$(DESTDIR)$(prefix)/bin/%', '$(srcdir)/../bin/%',
       ],
       'files' => [
         '$(DESTDIR)$(prefix)/bin/dakota-find-library',

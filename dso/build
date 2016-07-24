@@ -7,10 +7,9 @@
   'libs' => [
     'dl',
   ],
-  'target' => '$(srcdir)/../lib/libdso.$(so_ext)',
+  'target' => '$(srcdir)/libdso.$(so_ext)',
   'install' => {
     '-rules' => [
-      '$(DESTDIR)$(prefix)/lib/%', '$(srcdir)/../lib/%',
     ],
     'files' => [ # install.files
       '$(DESTDIR)$(prefix)/include/dso.$(hh_ext)',

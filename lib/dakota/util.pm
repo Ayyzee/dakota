@@ -661,7 +661,7 @@ sub path_stat {
 }
 sub find_library {
   my ($name) = @_;
-  $name = `$gbl_prefix/bin/dakota-find-library $name 2>/dev/null`;
+  $name = `dakota-find-library $name 2>/dev/null`;
   $name =~ s/\s+$//;
   return $name;
 }
@@ -676,7 +676,10 @@ sub digsig {
 sub is_out_of_date {
   my ($infile, $outfile, $file_db) = @_;
   if (! -e $infile) {
-    $infile = &find_library($infile);
+    my $tmp_infile = &find_library($infile);
+    if ($tmp_infile) {
+      $infile = $tmp_infile;
+    }
   }
   my $infile_stat =  &path_stat($file_db, $infile,  '--inputs');
   my $outfile_stat = &path_stat($file_db, $outfile, '--output');

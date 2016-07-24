@@ -46,7 +46,7 @@ check-exe: all
 	./exe
 
 check: all
-	$(srcdir)/../bin/dakota-catalog --silent $(target)
+	dakota-catalog --silent $(target)
 	$(MAKE) $(MAKEFLAGS) check-exe
 
 installcheck: check install
