@@ -1445,7 +1445,7 @@ sub ctlg_from_so {
   } else {
     $$ctlg_cmd{'inputs'} = $$cmd_info{'inputs'};
   }
-  #print &Dumper($cmd_info);
+  #print &Dumper($ctlg_cmd);
   my $should_echo;
   return &outfile_from_infiles($ctlg_cmd, $should_echo = 0);
 }
@@ -1456,7 +1456,6 @@ sub precompiled_inputs {
     if (-e $input) {
       &dakota::util::add_last($precompiled_inputs, $input);
     } else {
-      print STDERR "warning: $input does not exist.\n";
       my $ast_path;
       if (&is_so_path($input)) {
         my $ctlg_path = &ctlg_path_from_so_path($input);
@@ -1473,11 +1472,6 @@ sub precompiled_inputs {
         &check_path($ast_path);
       } else {
         #print "skipping $input, line=" . __LINE__ . $nl;
-      }
-      if (-e $ast_path) {
-        #my $ctlg_path = $ast_path . '.' . 'ctlg';
-        my $ctlg_path = $ast_path =~ s/\.ast$/\.ctlg/r;
-        print STDERR "warning: consider using $ast_path to create $ctlg_path.\n";
       }
       #&dakota::util::add_last($precompiled_inputs, $input);
       #&dakota::util::add_last($precompiled_inputs, $ast_path);

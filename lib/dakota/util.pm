@@ -995,7 +995,7 @@ sub scalar_from_file {
 sub filestr_from_file {
   my ($file) = @_;
   undef $/; ## force files to be read in one slurp
-  open FILE, "<$file" or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  open FILE, "<$file" or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / $file: $!" . $nl;
   flock FILE, LOCK_EX or die;
   my $filestr = <FILE>;
   flock FILE, LOCK_UN or die;
