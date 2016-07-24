@@ -377,7 +377,7 @@ sub user_path_from_any_path {
   my ($path) = @_;
   my ($dir, $name) = &split_path($path);
   my $user_path = &builddir() . '/' . $dir . '/+srcs/'. $name;
-  return $user_path;
+  return &canon_path($user_path);
 }
 sub o_path_from_dk_path {
   my ($path) = @_;

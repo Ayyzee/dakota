@@ -248,7 +248,7 @@ sub project_io_add {
     foreach my $in (@$input) {
       $in = &canon_path($in);
       if (!exists $$project_io{'all'}{$in}{$depend}) {
-        $$project_io{'all'}{$in}{$depend} = 1;
+        $$project_io{'all'}{$in}{$depend} = undef;
         $should_write = 1;
       }
     }
@@ -257,7 +257,7 @@ sub project_io_add {
     foreach my $dp (@$depend) {
       $dp = &canon_path($dp);
       if (!exists $$project_io{'all'}{$input}{$dp}) {
-        $$project_io{'all'}{$input}{$dp} = 1;
+        $$project_io{'all'}{$input}{$dp} = undef;
         $should_write = 1;
       }
     }
@@ -265,7 +265,7 @@ sub project_io_add {
     $input = &canon_path($input);
     $depend = &canon_path($depend);
     if (!exists $$project_io{'all'}{$input}{$depend}) {
-      $$project_io{'all'}{$input}{$depend} = 1;
+      $$project_io{'all'}{$input}{$depend} = undef;
       $should_write = 1;
     }
   }
@@ -516,10 +516,10 @@ sub loop_cc_from_dk {
     my $user_dk_path = &user_path_from_any_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
-    $$project_io{'all'}{$input}{$user_dk_path} = 1;
-    $$project_io{'all'}{$target_ast_path}{$user_dk_path} = 1;
-    $$project_io{'all'}{$target_ast_path}{$hh_path} = 1;
-    $$project_io{'all'}{$target_ast_path}{$cc_path} = 1;
+    $$project_io{'all'}{$input}{$user_dk_path} = undef;
+    $$project_io{'all'}{$target_ast_path}{$user_dk_path} = undef;
+    $$project_io{'all'}{$target_ast_path}{$hh_path} = undef;
+    $$project_io{'all'}{$target_ast_path}{$cc_path} = undef;
     &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
     &dakota::generate::empty_klass_defns();
@@ -840,9 +840,9 @@ sub loop_ast_from_so {
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
       $input = &canon_path($input);
-      $$project_io{'all'}{$input}{$ctlg_path} = 1;
-      $$project_io{'all'}{$ctlg_path}{$ast_path} = 1;
-      $$project_io{'all'}{$ast_path}{$target_ast_path} = 1;
+      $$project_io{'all'}{$input}{$ctlg_path} = undef;
+      $$project_io{'all'}{$ctlg_path}{$ast_path} = undef;
+      $$project_io{'all'}{$ast_path}{$target_ast_path} = undef;
     }
   }
   &scalar_to_file($$cmd_info{'project.io'}, $project_io);
@@ -1049,8 +1049,8 @@ sub o_from_dk {
       my $target_ast_path = &target_ast_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
       if (!$$project_io{'all'}{$target_ast_path}{$src_path}) {
-        $$project_io{'all'}{$target_ast_path}{$src_path} = 1;
-        $$project_io{'all'}{$target_ast_path}{$hh_path} = 1;
+        $$project_io{'all'}{$target_ast_path}{$src_path} = undef;
+        $$project_io{'all'}{$target_ast_path}{$hh_path} = undef;
         &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
       }
     }
@@ -1070,11 +1070,11 @@ sub o_from_dk {
 
       if ($num_out_of_date_infiles) {
         my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-        $$project_io{'all'}{$src_path}{$o_path} = 1;
-        $$project_io{'all'}{$hh_path}{$o_path} = 1;
-        $$project_io{'all'}{$user_dk_path}{$o_path} = 1;
-        $$project_io{'all'}{$ast_path}{$src_path} = 1;
-        $$project_io{'all'}{$ast_path}{$hh_path} = 1;
+        $$project_io{'all'}{$src_path}{$o_path} = undef;
+        $$project_io{'all'}{$hh_path}{$o_path} = undef;
+        $$project_io{'all'}{$user_dk_path}{$o_path} = undef;
+        $$project_io{'all'}{$ast_path}{$src_path} = undef;
+        $$project_io{'all'}{$ast_path}{$hh_path} = undef;
         &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
       }
       $outfile = $$o_cmd{'output'};
@@ -1213,14 +1213,14 @@ sub target_from_ast {
     }
   }
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-  $$project_io{'all'}{$target_ast_path}{$target_hh_path} = 1;
+  $$project_io{'all'}{$target_ast_path}{$target_hh_path} = undef;
   if (!$$project_io{'target-hh'}) {
     $$project_io{'target-hh'} = $target_hh_path;
   }
   if ($is_defn) {
-    $$project_io{'all'}{$target_ast_path}{$target_cc_path} = 1;
-    $$project_io{'all'}{$target_hh_path}{$target_o_path} = 1;
-    $$project_io{'all'}{$target_cc_path}{$target_o_path} = 1;
+    $$project_io{'all'}{$target_ast_path}{$target_cc_path} = undef;
+    $$project_io{'all'}{$target_hh_path}{$target_o_path} = undef;
+    $$project_io{'all'}{$target_cc_path}{$target_o_path} = undef;
     if (!$$project_io{'target-cc'}) {
       $$project_io{'target-cc'} = $target_cc_path;
     }
@@ -1408,7 +1408,7 @@ sub outfile_from_infiles {
       foreach my $input (@$infiles) {
         $input =~ s=^--library-directory\s+(.+)\s+-l(.+)$=$1/lib$2.$so_ext=;
         $input = &canon_path($input);
-        $$project_io{'all'}{$input}{$output} = 1;
+        $$project_io{'all'}{$input}{$output} = undef;
       }
       &scalar_to_file($$cmd_info{'project.io'}, $project_io);
     }
@@ -1464,8 +1464,8 @@ sub precompiled_inputs {
 
         $input = &canon_path($input);
         my $project_io = &scalar_from_file($project_io_path);
-        $$project_io{'all'}{$input}{$ctlg_path} = 1;
-        $$project_io{'all'}{$ctlg_path}{$ast_path} = 1;
+        $$project_io{'all'}{$input}{$ctlg_path} = undef;
+        $$project_io{'all'}{$ctlg_path}{$ast_path} = undef;
         &scalar_to_file($project_io_path, $project_io, 1);
 
       } elsif (&is_dk_src_path($input)) {

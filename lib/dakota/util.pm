@@ -83,6 +83,7 @@ our @EXPORT= qw(
                  encode_strings
                  filestr_from_file
                  filestr_to_file
+                 find_library
                  first
                  flatten
                  header_file_regex
@@ -660,10 +661,20 @@ sub path_stat {
   return $stat;
 }
 sub find_library {
-  my ($name) = @_;
-  $name = `dakota-find-library $name 2>/dev/null`;
-  $name =~ s/\s+$//;
-  return $name;
+  my ($name, $found_library) = @_;
+  my $result;
+  if ($found_library) {
+    $result = $$found_library{'M2L'}{&canon_path($name)};
+  }
+  if (! $result) {
+    $result = `dakota-find-library $name 2>/dev/null`;
+    if (0 == $?) {
+      $result =~ s/\s+$//;
+    } else {
+      $result = $name;
+    }
+  }
+  return $result;
 }
 sub digsig {
   my ($filestr) = @_;

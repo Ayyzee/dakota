@@ -139,10 +139,15 @@ $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target'};
 $$root_cmd{'opts'}{'project'} = 'default.project' if ! $$root_cmd{'opts'}{'project'} && -e 'default.project';
 &set_root_cmd($root_cmd);
 
-my $found_library = [];
+my $found_library = { 'order' => [] };
 foreach my $pair (@{$$root_cmd{'opts'}{'found-library'}}) {
-  my ($key, $value) = split(':', $pair);
-  push @$found_library, [$key, $value];
+  my ($s, $l) = split(':', $pair);
+  push @{$$found_library{'order'}}, $s;
+  my $m = &lib_from_lib_name($s);
+  # $m could also be created by basename
+  # but the soname aspect comes into play
+  $$found_library{'S2M'}{$s} = $m;
+  $$found_library{'M2L'}{$m} = $l;
 }
 $$root_cmd{'opts'}{'found-library'} = $found_library;
 
@@ -435,7 +440,7 @@ sub use_project {
     &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);
   }
   $project_io = &scalar_from_file($project_io_path);
-  $$project_io{'inputs'} = { map { &canon_path($_) => 1 } @{$$project{'inputs'}} };
+  $$project_io{'inputs'} = { map { &canon_path($_) => &find_library($_, $$root_cmd{'opts'}{'found-library'}) } @{$$project{'inputs'}} };
   if ($$project{'builddir'}) {
     $$project_io{'builddir'} = &canon_path($$project{'builddir'});
   }
@@ -445,18 +450,18 @@ sub use_project {
 sub project_clean {
   my ($root_cmd, $project, $project_io) = @_;
   my $remove = {};
-  # {'all'}{$in}{$out} = 1
+  # {'all'}{$in}{$out} = undef
   if ($project_io) {
     while (my ($in_path, $out_paths) = each (%{$$project_io{'all'}})) {
       $in_path = &canon_path($in_path);
       foreach my $out_path (keys %$out_paths) {
         if (-e $out_path) {
-          $$remove{$out_path} = 1;
+          $$remove{$out_path} = undef;
         }
       }
       if (! $$project_io{'inputs'}{$in_path}) {
         if (-e $in_path) {
-          #$$remove{$in_path} = 1; # too dangerous
+          #$$remove{$in_path} = undef; # too dangerous
         }
       }
     }
