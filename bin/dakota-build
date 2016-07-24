@@ -21,7 +21,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my $nl = "\n";
-my $default_build_file = 'build';
+my $default_build_file = 'default.build';
 my $opts = { 'var' => {} };
 my $rep_hdr =
   '# -*- mode: perl -*-' . $nl;

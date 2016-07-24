@@ -2,15 +2,15 @@ rootdir := ..
 
 srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
-builddir := $(shell $(rootdir)/bin/dakota-build builddir build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/build.mk build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
 
-.PRECIOUS: project
+.PRECIOUS: %.project
 
 .PHONY:\
  all\
@@ -40,7 +40,7 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext) project
+	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext) default.project
 	$(RM) $(RMFLAGS) $(builddir)
 
 distclean: clean

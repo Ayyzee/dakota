@@ -4,10 +4,10 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 export DKT_EXCLUDE_LIBS = 1
 
-builddir := $(shell $(rootdir)/bin/dakota-build builddir build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/build.mk build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -15,7 +15,7 @@ include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
 # macros
 macros := $(patsubst %,--define-macro %,$(macros))
 
-.PRECIOUS: %.project project
+.PRECIOUS: %.project
 
 .PHONY:\
  all\
@@ -30,7 +30,7 @@ macros := $(patsubst %,--define-macro %,$(macros))
  single\
  uninstall\
 
-single: $(srcs) | project
+single: $(srcs) | default.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) --include-directory $(srcdir) --include-directory $(srcdir)/../include --compile --output $(builddir)/$$input.o $$input;\
@@ -57,9 +57,9 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean
-	$(MAKE) $(MAKEFLAGS) --silent project
+	$(MAKE) $(MAKEFLAGS) --silent default.project
 	$(DAKOTA-BASE) --clean
-	$(RM) $(RMFLAGS) project
+	$(RM) $(RMFLAGS) default.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
@@ -81,7 +81,9 @@ $(DESTDIR)$(prefix)/lib/dakota/platform.json: $(DESTDIR)$(prefix)/lib/dakota/pla
 $(DESTDIR)$(prefix)/lib/dakota/compiler: $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)
 	cd $(dir $<);	sudo $(LN) $(LNFLAGS) $(notdir $<) $(notdir $@);
 
-install-links := $(DESTDIR)$(prefix)/lib/dakota/compiler $(DESTDIR)$(prefix)/lib/dakota/platform.json
+install-dir-links :=  $(DESTDIR)$(prefix)/lib/dakota/compiler
+install-file-links := $(DESTDIR)$(prefix)/lib/dakota/platform.json
+install-links := $(install-dir-links) $(install-file-links)
 
 install: all $(install-dirs) $(install-files) $(install-links)
 
@@ -89,4 +91,4 @@ precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
-	sudo $(RM) $(RMFLAGS) $(install-files) $(install-links)
+	sudo $(RM) $(RMFLAGS) $(install-files) $(install-file-links)

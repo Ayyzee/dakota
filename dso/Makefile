@@ -1,9 +1,11 @@
 rootdir := ..
 
-builddir := $(shell $(rootdir)/bin/dakota-build builddir build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/build.mk build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
+
+.PRECIOUS: %.project
 
 .PHONY:\
  all\
@@ -20,7 +22,7 @@ check: all
 check-exe: all
 
 clean:
-	$(RM) $(RMFLAGS) $(target) project
+	$(RM) $(RMFLAGS) $(target) default.project
 	$(RM) $(RMFLAGS) $(builddir)/build.mk
 	$(RM) $(RMFLAGS) $(builddir)
 
