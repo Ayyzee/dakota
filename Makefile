@@ -16,7 +16,7 @@ include $(rootdir)/makeflags.mk
  precompile \
  uninstall \
 
-all install:
+all:
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso all install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog all install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library all install
@@ -36,6 +36,7 @@ clean \
 dist \
 distclean \
 goal-clean \
+install \
 installcheck \
 precompile:
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso $@
