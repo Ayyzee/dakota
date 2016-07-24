@@ -56,8 +56,7 @@ installcheck: check install
 goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
-clean: goal-clean
-	$(MAKE) $(MAKEFLAGS) --silent default.project
+clean: goal-clean | default.project
 	$(DAKOTA-BASE) --clean
 	$(RM) $(RMFLAGS) default.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
