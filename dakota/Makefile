@@ -4,11 +4,10 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 export DKT_EXCLUDE_LIBS = 2
 
-DAKOTA-BASE := dakota
-builddir := $(shell dakota-build builddir default.build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
 
 include $(rootdir)/common.mk
-include $(shell dakota-build2mk --output $(builddir)/default.mk default.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
