@@ -90,4 +90,3 @@ precompile:
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install-files) $(install-links)
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)

@@ -87,5 +87,3 @@ precompile:
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install-files)
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/compiler
-	sudo $(RM) $(RMFLAGS) $(DESTDIR)$(prefix)/lib/dakota/platform.json
