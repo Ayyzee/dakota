@@ -136,7 +136,11 @@ my $root_cmd = {
            #'touch'                 # make-like
            );
 $$root_cmd{'opts'}{'precompile'} = 1 if $$root_cmd{'opts'}{'target'};
-$$root_cmd{'opts'}{'project'} = 'default.project' if ! $$root_cmd{'opts'}{'project'} && -e 'default.project';
+if ($$root_cmd{'opts'}{'project'}) {
+  $$root_cmd{'opts'}{'project'} = &relpath($$root_cmd{'opts'}{'project'});
+} elsif (-e 'default.project') {
+  $$root_cmd{'opts'}{'project'} = 'default.project';
+}
 &set_root_cmd($root_cmd);
 
 my $found_library = { 'order' => [] };
