@@ -33,10 +33,10 @@ macros := $(patsubst %,--define-macro %,$(macros))
 single: $(srcs) | default.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) --include-directory $(srcdir)/../include --compile --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) $(include-dirs) --compile --output $(builddir)/$$input.o $$input;\
     fi\
   done
-	$(DAKOTA-BASE) --include-directory $(srcdir)/../include --shared
+	$(DAKOTA-BASE) --shared
 
 check-exe: all
 	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
