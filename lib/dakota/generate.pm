@@ -2137,6 +2137,13 @@ sub linkage_unit::generate_klasses_body_funcs {
   my $method;
   my $scratch_str_ref = &global_scratch_str_ref();
 
+  if ('trait' eq $klass_type) {
+    if (&is_src_decl() || &is_target_decl()) {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
+    } elsif (&is_target_defn()) {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
+    }
+  }
   if ('klass' eq $klass_type) {
     if (&has_slots($klass_scope)) {
       $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
@@ -2208,19 +2215,6 @@ sub linkage_unit::generate_klasses_body_funcs {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
-  if ('trait' eq $klass_type) {
-    if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
-    } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
-    }
-  }
-  if (&is_decl() && $$klass_scope{'has-initialize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
-  }
-  if (&is_decl() && $$klass_scope{'has-finalize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
-  }
   if (&is_decl() && @$kw_args_methods) {
     #print STDERR Dumper($va_list_methods);
     &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
@@ -2231,6 +2225,24 @@ sub linkage_unit::generate_klasses_body_funcs {
   }
   if (&is_target() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
     &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
+  }
+  #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
+  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
+    if (&is_decl) {
+      if (&is_same_src_file($klass_scope) || &is_target()) { #rn3
+        if (!&is_va($method)) {
+          my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
+          $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "DUPLICATE") . $nl;
+        }
+      }
+    }
+  }
+  ### inline above, non-inline below
+  if (&is_decl() && $$klass_scope{'has-initialize'}) {
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
+  }
+  if (&is_decl() && $$klass_scope{'has-finalize'}) {
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
   if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
@@ -2285,17 +2297,6 @@ sub linkage_unit::generate_klasses_body_funcs {
               }
             }
           }
-        }
-      }
-    }
-  }
-  #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
-    if (&is_decl) {
-      if (&is_same_src_file($klass_scope) || &is_target()) { #rn3
-        if (!&is_va($method)) {
-          my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
-          $$scratch_str_ref .= $col . "$klass_type $klass_name { ${visibility}METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "DUPLICATE") . $nl;
         }
       }
     }
