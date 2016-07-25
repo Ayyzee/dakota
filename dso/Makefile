@@ -22,7 +22,7 @@ check: all
 check-exe: all
 
 clean:
-	$(RM) $(RMFLAGS) $(target) default.project
+	$(RM) $(RMFLAGS) $(target) $(target).dSYM default.project
 	$(RM) $(RMFLAGS) $(builddir)/build.mk
 	$(RM) $(RMFLAGS) $(builddir)
 
