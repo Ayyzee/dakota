@@ -17,6 +17,7 @@ include $(rootdir)/makeflags.mk
  uninstall \
 
 all:
+	sudo true # so password prompt is immediate
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso all install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog all install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library all install
