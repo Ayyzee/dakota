@@ -2211,16 +2211,6 @@ sub linkage_unit::generate_klasses_body_funcs {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
-  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
-  if (&is_decl() && @$kw_args_methods) {
-    &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
-  }
-  if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
-    &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
-  }
-  if (&is_target() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
-    &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
-  }
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
   foreach my $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if (&is_decl) {
@@ -2243,6 +2233,16 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
   }
   if (&is_decl() && $$klass_scope{'has-finalize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
+  }
+  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
+  if (&is_decl() && @$kw_args_methods) {
+    &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+  }
+  if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
+    &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
+  }
+  if (&is_target() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
+    &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
   }
   if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
