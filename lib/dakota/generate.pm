@@ -308,6 +308,7 @@ sub generate_src_defn {
 my $im_suffix_for_suffix = {
   $cc_ext => 'cc.dkt',
   $hh_ext => 'hh.dkt',
+  'inc'   => 'inc.dkt',
 };
 sub pre_output_path_from_any_path {
   my ($path) = @_;
@@ -397,7 +398,7 @@ sub generate_target {
   }
   my $output_runtime;
   if (&is_target_defn()) {
-    $output_runtime = "$dir/$name-runtime-info.$hh_ext";
+    $output_runtime = "$dir/$name-runtime-info.inc";
     my $pre_output_runtime = &pre_output_path_from_any_path($output_runtime);
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output_runtime = $ENV{'DKT_DIR'} . '/' . $output_runtime;
@@ -522,8 +523,8 @@ sub generate_decl_defn {
   my $output_base_defns = "$name-generic-func-defns";
   my $output_base_decls = "$name-generic-func-decls";
 
-  my $generic_func_defns_path = "$output_base_defns.$hh_ext";
-  my $generic_func_decls_path = "$output_base_decls.$hh_ext";
+  my $generic_func_defns_path = "$output_base_defns.inc";
+  my $generic_func_decls_path = "$output_base_decls.inc";
 
   #my $target_generic_func_decls_path = &dakota::dakota::target_generic_func_decls_path();
   my $target_generic_func_defns_path = &dakota::dakota::target_generic_func_defns_path();
