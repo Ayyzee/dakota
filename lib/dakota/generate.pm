@@ -2102,7 +2102,6 @@ sub generate_klass_construct {
 }
 sub linkage_unit::generate_klasses_body_vars {
   my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
-  my $is_klass_defn = scalar keys %$klass_scope;
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if (&is_src_decl() || &is_target_decl()) {
@@ -2131,10 +2130,6 @@ sub linkage_unit::generate_klasses_body_vars {
 }
 sub linkage_unit::generate_klasses_body_funcs {
   my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
-  my $is_klass_defn = scalar keys %$klass_scope;
-  my $va_list_methods = &klass::va_list_methods($klass_scope);
-  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
-  my $method;
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ('trait' eq $klass_type) {
@@ -2146,11 +2141,12 @@ sub linkage_unit::generate_klasses_body_funcs {
   }
   if ('klass' eq $klass_type) {
     if (&has_slots($klass_scope)) {
+      my $is_klass_defn = scalar keys %$klass_scope;
       $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
       $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
     } # if (&has_slots()
     my $object_method_defns = {};
-    foreach $method (sort method::compare values %{$$klass_scope{'slots-methods'}}) {
+    foreach my $method (sort method::compare values %{$$klass_scope{'slots-methods'}}) {
       if (&is_src_defn() || &is_target_defn() || &is_exported($method)) {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
@@ -2180,7 +2176,7 @@ sub linkage_unit::generate_klasses_body_funcs {
       }
     }
     my $exported_slots_methods = &exported_slots_methods($klass_scope);
-    foreach $method (sort method::compare values %$exported_slots_methods) {
+    foreach my $method (sort method::compare values %$exported_slots_methods) {
       die if !&is_exported($method);
       if (&is_src_defn() || &is_target_defn()) {
         if (!&is_va($method)) {
@@ -2215,19 +2211,18 @@ sub linkage_unit::generate_klasses_body_funcs {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
+  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
   if (&is_decl() && @$kw_args_methods) {
-    #print STDERR Dumper($va_list_methods);
     &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
   }
   if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
-    #print STDERR Dumper($va_list_methods);
     &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
   }
   if (&is_target() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
     &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
   }
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
+  foreach my $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if (&is_decl) {
       if (&is_same_src_file($klass_scope) || &is_target()) { #rn3
         if (!&is_va($method)) {
@@ -2237,7 +2232,12 @@ sub linkage_unit::generate_klasses_body_funcs {
       }
     }
   }
-  ### inline above, non-inline below
+}
+sub linkage_unit::generate_klasses_body_funcs_non_inline {
+  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
+  my $scratch_str_ref = &global_scratch_str_ref();
+
+  my $va_list_methods = &klass::va_list_methods($klass_scope);
   if (&is_decl() && $$klass_scope{'has-initialize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
@@ -2246,7 +2246,7 @@ sub linkage_unit::generate_klasses_body_funcs {
   }
   if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
-    foreach $method (@$va_list_methods) {
+    foreach my $method (@$va_list_methods) {
       my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
       if (exists $$method{'keyword-types'}) {
         $$scratch_str_ref .= $col . "$klass_type $klass_name { namespace va { ${visibility}METHOD $$method_decl_ref }} /*kw-args*/" . &ann(__FILE__, __LINE__, "stmt1") . $nl;
@@ -2256,7 +2256,7 @@ sub linkage_unit::generate_klasses_body_funcs {
     }
   }
   if (@$va_list_methods) {
-    foreach $method (@$va_list_methods) {
+    foreach my $method (@$va_list_methods) {
       if (1) {
         my $va_method = &dakota::util::deep_copy($method);
         #$$va_method{'inline?'} = 1;
@@ -2888,6 +2888,7 @@ sub linkage_unit::generate_klasses_klass_funcs {
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
   &linkage_unit::generate_klasses_body_funcs($klass_scope, $col, $klass_type, $klass_path, $klass_name);
+  &linkage_unit::generate_klasses_body_funcs_non_inline($klass_scope, $col, $klass_type, $klass_path, $klass_name);
   &path::remove_last($klass_path);
 }
 sub method::type {
