@@ -2117,14 +2117,6 @@ sub linkage_unit::generate_klasses_body {
     my $literal_symbol = &as_literal_symbol(&ct($klass_path));
     $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = $literal_symbol; }" . &ann(__FILE__, __LINE__) . $nl;
   }
-
-  if ('trait' eq $klass_type) {
-    if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
-    } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
-    }
-  }
   if ('klass' eq $klass_type) {
     if (&is_src_decl() || &is_target_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[read-only]]; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2139,6 +2131,10 @@ sub linkage_unit::generate_klasses_body {
         }
       }
     }
+    if (&has_slots($klass_scope)) {
+      $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
+      $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
+    } # if (&has_slots()
     my $object_method_defns = {};
     foreach $method (sort method::compare values %{$$klass_scope{'slots-methods'}}) {
       if (&is_src_defn() || &is_target_defn() || &is_exported($method)) {
@@ -2201,14 +2197,17 @@ sub linkage_unit::generate_klasses_body {
     if (0 < keys %$object_method_defns) {
       #print STDERR &Dumper($object_method_defns);
     }
-    if (&has_slots($klass_scope)) {
-      $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
-      $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
-    } # if (&has_slots()
     if (&should_export_slots($klass_scope)) {
       $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
     }
   } # if ('klass' eq $klass_type)
+  if ('trait' eq $klass_type) {
+    if (&is_src_decl() || &is_target_decl()) {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
+    } elsif (&is_target_defn()) {
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
+    }
+  }
   if (&is_decl() && $$klass_scope{'has-initialize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name { initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
