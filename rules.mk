@@ -5,16 +5,16 @@
 	$(rootdir)/bin/dakota-build2project $@ $<
 
 $(srcdir)/lib%.$(so_ext): $(srcdir)/%.$(cc_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $(libs:%=-l%) $^
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(libs:%=-l%) $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(srcdir)/%: $(srcdir)/%.$(cc_ext)
-	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(CXX_OUTPUT_FLAGS) $@ $(libs:%=-l%) $^
+	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CXX_INCLUDE_DIRECTORY_FLAGS) $(srcdir)/../include $(libs:%=-l%) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(srcdir)/%: $(srcdir)/%.dk | default.project
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --output $@ $(libs:%=--library %) $?
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) $(libs:%=--library %) --output $@ $?
 
 $(srcdir)/lib%.$(so_ext): $(srcdir)/%.dk | default.project
-	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) --soname $(soname) --shared --output $@ $(libs:%=--library %) $?
+	$(DAKOTA) $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(macros) $(include-dirs) $(libs:%=--library %) --soname $(soname) --shared --output $@ $?
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: $(srcdir)/../lib/dakota/%.json
 	sudo $(INSTALL_DATA) $< $(@D)
