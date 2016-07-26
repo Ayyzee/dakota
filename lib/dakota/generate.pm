@@ -643,7 +643,7 @@ sub generate_target_runtime {
     $col = &colin($col);
     my $num_klasses = scalar keys %{$$file{'klasses'}};
     foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
-      $target_cc_str .= $col . "$klass_name\::__klass__," . $nl;
+      $target_cc_str .= $col . "$klass_name\::__name__," . $nl;
     }
     $target_cc_str .= $col . "nullptr" . $nl;
     $col = &colout($col);
@@ -2152,13 +2152,13 @@ sub linkage_unit::generate_klasses_body_vars {
 
   if (&is_src_decl() || &is_target_decl()) {
     #$$scratch_str_ref .= $col . "extern symbol-t __type__;" . $nl;
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern symbol-t __klass__; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { extern symbol-t __name__; }" . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
     #$$scratch_str_ref .= $col . "symbol-t __type__ = \$$klass_type;" . $nl;
     my $literal_symbol = &as_literal_symbol(&ct($klass_path));
-    $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __klass__ = $literal_symbol; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name { symbol-t __name__ = $literal_symbol; }" . &ann(__FILE__, __LINE__) . $nl;
   }
-  if ('klass' eq $klass_type) {
+  if ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { extern object-t klass [[read-only]]; }" . &ann(__FILE__, __LINE__) . $nl;
     } elsif (&is_target_defn()) {
@@ -2182,7 +2182,7 @@ sub linkage_unit::generate_klasses_body_funcs_klass {
     if (&is_src_decl() || &is_target_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __name__); } }" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
 }
@@ -3379,7 +3379,7 @@ sub dk_generate_cc_footer_klass {
     my $trait_num = 0;
     for ($trait_num = 0; $trait_num < $num_traits; $trait_num++) {
       my $path = "$$klass_scope{'traits'}[$trait_num]";
-      $$scratch_str_ref .= $col . "$path\::__klass__," . $nl;
+      $$scratch_str_ref .= $col . "$path\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
     $col = &colout($col);
@@ -3396,7 +3396,7 @@ sub dk_generate_cc_footer_klass {
     my $require_num = 0;
     for ($require_num = 0; $require_num < $num_requires; $require_num++) {
       my $path = "$$klass_scope{'requires'}[$require_num]";
-      $$scratch_str_ref .= $col . "$path\::__klass__," . $nl;
+      $$scratch_str_ref .= $col . "$path\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
     $col = &colout($col);
@@ -3413,7 +3413,7 @@ sub dk_generate_cc_footer_klass {
     my $provide_num = 0;
     for ($provide_num = 0; $provide_num < $num_provides; $provide_num++) {
       my $path = "$$klass_scope{'provides'}[$provide_num]";
-      $$scratch_str_ref .= $col . "$path\::__klass__," . $nl;
+      $$scratch_str_ref .= $col . "$path\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
     $col = &colout($col);
@@ -3435,7 +3435,7 @@ sub dk_generate_cc_footer_klass {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = {" . &ann(__FILE__, __LINE__) . " //ro-data" . $nl;
     $col = &colin($col);
     while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}})) {
-      $$scratch_str_ref .= $col . "$key\::__klass__," . $nl;
+      $$scratch_str_ref .= $col . "$key\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
     $col = &colout($col);
@@ -3556,7 +3556,7 @@ sub dk_generate_cc_footer_klass {
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
   my $symbol = &ct($klass_name);
-  $$tbbl{'#name'} = '__klass__';
+  $$tbbl{'#name'} = '__name__';
   $$tbbl{'#type'} = "\#$klass_type";
 
   if (&has_slots_type($klass_scope)) {
@@ -3609,17 +3609,17 @@ sub dk_generate_cc_footer_klass {
   $token_seq = $$klass_scope{'interpose'};
   if ($token_seq) {
     my $path = $$klass_scope{'interpose'};
-    $$tbbl{'#interpose-name'} = "$path\::__klass__";
+    $$tbbl{'#interpose-name'} = "$path\::__name__";
   }
   $token_seq = $$klass_scope{'superklass'};
   if ($token_seq) {
     my $path = $$klass_scope{'superklass'};
-    $$tbbl{'#superklass-name'} = "$path\::__klass__";
+    $$tbbl{'#superklass-name'} = "$path\::__name__";
   }
   $token_seq = $$klass_scope{'klass'};
   if ($token_seq) {
     my $path = $$klass_scope{'klass'};
-    $$tbbl{'#klass-name'} = "$path\::__klass__";
+    $$tbbl{'#klass-name'} = "$path\::__name__";
   }
   if ($num_traits > 0) {
     $$tbbl{'#traits'} = '__traits';
@@ -3981,7 +3981,7 @@ sub dk_generate_cc_footer {
       my $num_klasses = scalar keys %$interposers;
       foreach $key (sort keys %$interposers) {
         $val = $$interposers{$key};
-        $$scratch_str_ref .= $col . "{ .key = $key\::__klass__, .element = cast(intptr-t)$val\::__klass__ }," . $nl;
+        $$scratch_str_ref .= $col . "{ .key = $key\::__name__, .element = cast(intptr-t)$val\::__name__ }," . $nl;
       }
       $$scratch_str_ref .= $col . "{ .key = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
       $col = &colout($col);
