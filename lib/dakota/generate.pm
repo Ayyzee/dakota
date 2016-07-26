@@ -2805,13 +2805,13 @@ sub linkage_unit::generate_klasses {
     &linkage_unit::generate_klasses_klass_vars($scope, $col, $klass_path, $klass_name);
   }
   $$scratch_str_ref .= $nl;
-  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs" . '-' . &suffix());
-  $$scratch_str_ref .= &linkage_unit::generate_klasses_funcs($scope, $ordered_klass_names); # optionally inline
-  $$scratch_str_ref .= $nl;
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs-non-inline" . '-' . &suffix());
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs_non_inline($scope, $col, $klass_path, $klass_name);
   }
+  $$scratch_str_ref .= $nl;
+  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs" . '-' . &suffix());
+  $$scratch_str_ref .= &linkage_unit::generate_klasses_funcs($scope, $ordered_klass_names); # optionally inline
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses_types_before {
