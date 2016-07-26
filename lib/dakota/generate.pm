@@ -531,7 +531,6 @@ sub generate_decl_defn {
   &add_labeled_src($result, "headers-$suffix",  &linkage_unit::generate_headers( $file, $ordered_klass_names, $extra_dakota_headers));
   &add_labeled_src($result, "symbols-$suffix",  &linkage_unit::generate_symbols( $file, $symbols));
   &add_labeled_src($result, "klasses-$suffix",  &linkage_unit::generate_klasses( $file, $ordered_klass_names));
- #&add_labeled_src($result, "hashes-$suffix",   &linkage_unit::generate_hashes(  $file));
   &add_labeled_src($result, "keywords-$suffix", &linkage_unit::generate_keywords($file));
   &add_labeled_src($result, "strs-$suffix",     &linkage_unit::generate_strs(    $file));
   &add_labeled_src($result, "ints-$suffix",     &linkage_unit::generate_ints(    $file));
@@ -623,7 +622,6 @@ sub generate_decl_defn {
       $nl;
   }
   $str .=
-   #&labeled_src_str($result, "hashes-$suffix") .
     &labeled_src_str($result, "keywords-$suffix") .
     &labeled_src_str($result, "strs-$suffix") .
     &labeled_src_str($result, "ints-$suffix") .
@@ -4110,42 +4108,6 @@ sub linkage_unit::generate_symbols {
   $col = &colout($col);
   $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . $nl;
   $scratch_str .= $nl;
-  return $scratch_str;
-}
-sub linkage_unit::generate_hashes {
-  my ($file) = @_;
-  my $col = '';
-
-  my ($symbol, $symbol_seq);
-  my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
-  my $max_width = 0;
-  foreach $symbol (@$symbol_keys) {
-    my $ident = &dk_mangle($symbol);
-    my $width = length($ident);
-    if ($width > $max_width) {
-      $max_width = $width;
-    }
-  }
-  my $scratch_str = "";
-  if (&is_target_defn()) {
-    $scratch_str .= $col . 'namespace __hash {' . &ann(__FILE__, __LINE__) . $nl;
-    $col = &colin($col);
-    my $num_lns = @$symbol_keys;
-    while (my ($ln, $symbol) = each @$symbol_keys) {
-      $symbol =~ s/^#//;
-      my $ident = &dk_mangle($symbol);
-      my $width = length($ident);
-      $ident =~ s/(\w)_(\w)/$1-$2/g;
-      my $pad = ' ' x ($max_width - $width);
-      if (&should_ann($ln, $num_lns)) {
-        $scratch_str .= $col . "constexpr hash-t $ident = " . $pad . "dk-hash(\"$symbol\");" . &ann(__FILE__, __LINE__) . $nl;
-      } else {
-        $scratch_str .= $col . "constexpr hash-t $ident = " . $pad . "dk-hash(\"$symbol\");" . $nl;
-      }
-    }
-    $col = &colout($col);
-    $scratch_str .= $col . '}' . &ann(__FILE__, __LINE__) . $nl;
-  }
   return $scratch_str;
 }
 sub ident_comment {
