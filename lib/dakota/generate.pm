@@ -487,7 +487,7 @@ sub add_labeled_src {
   &dakota::util::add_last($$result{'--labels'}, $label);
   $$result{$label} = $src;
 }
-sub make_strings_and_write_to_file_converted {
+sub generate_generics_and_write_to_file_converted {
   my ($generics, $output) = @_;
   my $col = '';
   my $strings = [ undef,
@@ -531,7 +531,7 @@ sub generate_decl_defn {
   my $target_generic_func_defns_path = &dakota::dakota::target_generic_func_defns_path();
 
   if (&is_src_decl()) {
-    &make_strings_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
+    &generate_generics_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
@@ -543,7 +543,7 @@ sub generate_decl_defn {
                      "  # include \"$target_generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
-    &make_strings_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
+    &generate_generics_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
@@ -555,7 +555,7 @@ sub generate_decl_defn {
                      "  # include \"$generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
-    &make_strings_and_write_to_file_converted($generics, "$dir/$generic_func_defns_path");
+    &generate_generics_and_write_to_file_converted($generics, "$dir/$generic_func_defns_path");
     &add_labeled_src($result, "generics-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
