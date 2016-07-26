@@ -512,14 +512,14 @@ sub generate_decl_defn {
   my $extra_dakota_headers = &extra_dakota_headers($name);
   my $ordered_klass_names = &order_klasses($file);
 
-  &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names, $extra_dakota_headers));
-  &add_labeled_src($result, "symbols-$suffix",    &linkage_unit::generate_symbols(   $file, $symbols));
-  &add_labeled_src($result, "klasses-$suffix",    &linkage_unit::generate_klasses(   $file, $ordered_klass_names));
+  &add_labeled_src($result, "headers-$suffix",       &linkage_unit::generate_headers(      $file, $ordered_klass_names, $extra_dakota_headers));
+  &add_labeled_src($result, "symbols-$suffix",       &linkage_unit::generate_symbols(      $file, $symbols));
+  &add_labeled_src($result, "klasses-$suffix",       &linkage_unit::generate_klasses(      $file, $ordered_klass_names));
   &add_labeled_src($result, "klasses-funcs-$suffix", &linkage_unit::generate_klasses_funcs($file, $ordered_klass_names)); # optionally inline
- #&add_labeled_src($result, "hashes-$suffix",     &linkage_unit::generate_hashes(    $file));
-  &add_labeled_src($result, "keywords-$suffix",   &linkage_unit::generate_keywords(  $file));
-  &add_labeled_src($result, "strs-$suffix",       &linkage_unit::generate_strs(      $file));
-  &add_labeled_src($result, "ints-$suffix",       &linkage_unit::generate_ints(      $file));
+ #&add_labeled_src($result, "hashes-$suffix",        &linkage_unit::generate_hashes(       $file));
+  &add_labeled_src($result, "keywords-$suffix",      &linkage_unit::generate_keywords(     $file));
+  &add_labeled_src($result, "strs-$suffix",          &linkage_unit::generate_strs(         $file));
+  &add_labeled_src($result, "ints-$suffix",          &linkage_unit::generate_ints(         $file));
   my $col = '';
   my $output_base_defns = "$name-generic-func-defns";
   my $output_base_decls = "$name-generic-func-decls";
