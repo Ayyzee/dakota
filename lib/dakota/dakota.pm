@@ -223,7 +223,7 @@ sub loop_merged_ast_from_inputs {
     } elsif (1 < @{$$cmd_info{'inputs'}}) {
       my $ast = &ast_merge($ast_files);
       &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
-      &project_io_add($$cmd_info{'project.io'}, 'all', $ast_files, $$cmd_info{'opts'}{'output'});
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_files, $$cmd_info{'opts'}{'output'});
     }
   }
 } # loop_merged_ast_from_inputs
@@ -237,7 +237,7 @@ sub is_array {
   }
   return $state;
 }
-sub project_io_add {
+sub project_io_add_all {
   my ($project_io_path, $key, $input, $depend) = @_;
   die if &is_array($input) && &is_array($depend);
   $input = &canon_path($input);
@@ -523,10 +523,10 @@ sub loop_cc_from_dk {
     my $user_dk_path = &user_path_from_any_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
-    &project_io_add($$cmd_info{'project.io'}, 'all', $input,           $user_dk_path);
-    &project_io_add($$cmd_info{'project.io'}, 'all', $target_ast_path, $user_dk_path);
-    &project_io_add($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
-    &project_io_add($$cmd_info{'project.io'}, 'all', $target_ast_path, $cc_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,           $user_dk_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $user_dk_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $cc_path);
 
     &dakota::generate::empty_klass_defns();
     &dakota::generate::dk_generate_cc($input, $user_dk_path, $global_target_ast);
@@ -845,9 +845,9 @@ sub loop_ast_from_so {
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
       $input = &canon_path($input);
-      &project_io_add($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
-      &project_io_add($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
-      &project_io_add($$cmd_info{'project.io'}, 'all', $ast_path,  $target_ast_path);
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,  $target_ast_path);
     }
   }
   return $cmd_info;
@@ -872,23 +872,23 @@ sub ast_from_inputs {
   if ($result) {
     if (0 != @{$$ast_cmd{'asts'} ||= []}) {
       my $target_ast_path = &target_ast_path($cmd_info);
-      &project_io_add($$cmd_info{'project.io'}, 'all', $$ast_cmd{'asts'}, $target_ast_path);
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $$ast_cmd{'asts'}, $target_ast_path);
     }
     foreach my $input (@{$$ast_cmd{'inputs'}}) {
       if (&is_so_path($input)) {
         my $ctlg_path = &ctlg_path_from_so_path($input);
         my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
         &check_path($ast_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
       } elsif (&is_dk_path($input)) {
         my $ast_path = &ast_path_from_dk_path($input);
         &check_path($ast_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $input, $ast_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
       } elsif (&is_ctlg_path($input)) {
         my $ast_path = &ast_path_from_ctlg_path($input);
         &check_path($ast_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $input, $ast_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
       } else {
         #print "skipping $input, line=" . __LINE__ . $nl;
       }
@@ -1038,7 +1038,7 @@ sub o_from_dk {
       $$ast_cmd{'project.io'} =  $$cmd_info{'project.io'};
       $num_out_of_date_infiles = &ast_from_inputs($ast_cmd);
       if ($num_out_of_date_infiles) {
-        &project_io_add($$cmd_info{'project.io'}, 'all', $input, $ast_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
       }
       &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
     }
@@ -1053,8 +1053,8 @@ sub o_from_dk {
       my $target_ast_path = &target_ast_path($cmd_info);
       my $project_io = &scalar_from_file($$cmd_info{'project.io'});
       if (!$$project_io{'all'}{$target_ast_path}{$src_path}) {
-        &project_io_add($$cmd_info{'project.io'}, 'all', $target_ast_path, $src_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $src_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
       }
     }
     if ($ENV{'DKT_PRECOMPILE'}) {
@@ -1072,11 +1072,11 @@ sub o_from_dk {
       &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
 
       if ($num_out_of_date_infiles) {
-        &project_io_add($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $hh_path,      $o_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $user_dk_path, $o_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $ast_path,     $src_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $hh_path,      $o_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $user_dk_path, $o_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $src_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
       }
       $outfile = $$o_cmd{'output'};
     }
@@ -1213,15 +1213,15 @@ sub target_from_ast {
       }
     }
   }
-  &project_io_add($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_hh_path);
+  &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_hh_path);
   my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   if (!$$project_io{'target-hh'}) {
     $$project_io{'target-hh'} = $target_hh_path;
   }
   if ($is_defn) {
-    &project_io_add($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_cc_path);
-    &project_io_add($$cmd_info{'project.io'}, 'all', $target_hh_path,  $target_o_path);
-    &project_io_add($$cmd_info{'project.io'}, 'all', $target_cc_path,  $target_o_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_cc_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_hh_path,  $target_o_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_cc_path,  $target_o_path);
     if (!$$project_io{'target-cc'}) {
       $$project_io{'target-cc'} = $target_cc_path;
     }
@@ -1321,7 +1321,7 @@ sub linked_output_from_o {
   }
   my $result = &outfile_from_infiles($cmd, $should_echo);
   if ($result) {
-    &project_io_add($$cmd_info{'project.io'}, 'all', $$cmd{'inputs'}, $$cmd{'output'});
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $$cmd{'inputs'}, $$cmd{'output'});
   }
   return $result;
 }
@@ -1403,12 +1403,12 @@ sub outfile_from_infiles {
     }
 
     if (0) {
-      &project_io_add($$cmd_info{'project.io'}, 'all', $infiles, $output);
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $infiles, $output);
     } else {
       foreach my $input (@$infiles) {
         $input =~ s=^--library-directory\s+(.+)\s+-l(.+)$=$1/lib$2.$so_ext=;
         $input = &canon_path($input);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $input, $output);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $output);
       }
     }
   }
@@ -1463,8 +1463,8 @@ sub precompiled_inputs {
 
         $input = &canon_path($input);
 
-        &project_io_add($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
-        &project_io_add($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
+        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
       } elsif (&is_dk_src_path($input)) {
         $ast_path = &ast_path_from_dk_path($input);
         &check_path($ast_path);
