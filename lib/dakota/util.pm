@@ -985,12 +985,13 @@ sub scalar_from_file {
   my ($file) = @_;
   die if ! -e $file;
   my $filestr = &filestr_from_file($file);
-  $filestr = eval $filestr;
+  my $result = eval $filestr;
 
-  if (!defined $filestr) {
+  if (!defined $result) {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_from_file(\"$file\")\n";
+    print STDERR "<" . $filestr . ">" . $nl;
   }
-  return $filestr;
+  return $result;
 }
 sub filestr_from_file {
   my ($file) = @_;
