@@ -82,6 +82,7 @@ our @EXPORT= qw(
                  is_o_path
                  target_cc_path
                  rel_target_hh_path
+                 target_klass_func_defns_path
                  target_generic_func_defns_path
              );
                 #target_generic_func_decls_path
@@ -451,6 +452,14 @@ sub default_cmd_info {
 #  my $result = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
 #  return $result;
 #}
+sub target_klass_func_defns_path {
+  my ($cmd_info) = @_;
+  $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $target_cc_path = &target_cc_path($cmd_info);
+  my $result = $target_cc_path =~ s=^(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
+  $result =~ s=^$builddir/+==;
+  return $result;
+}
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;

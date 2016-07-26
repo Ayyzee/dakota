@@ -487,6 +487,22 @@ sub add_labeled_src {
   &dakota::util::add_last($$result{'--labels'}, $label);
   $$result{$label} = $src;
 }
+sub generate_klass_funcs_and_write_to_file_converted {
+  my ($file, $ordered_klass_names, $output) = @_;
+  my $col = '';
+  my $strings = [ undef,
+                  &linkage_unit::generate_klasses_funcs($file, $ordered_klass_names) ];
+  if ($should_write_pre_output) {
+    my $pre_output = &pre_output_path_from_any_path($output);
+    $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
+    &write_to_file_strings($pre_output, $strings);
+    if (!$ENV{'DK_NO_LINE'}) {
+      splice @$strings, 1, 0, "# line 2 \"$pre_output\"" . &ann(__FILE__, __LINE__) . $nl;
+    }
+  }
+  $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
+  &write_to_file_converted_strings($output, $strings);
+}
 sub generate_generics_and_write_to_file_converted {
   my ($generics, $output) = @_;
   my $col = '';
@@ -515,17 +531,47 @@ sub generate_decl_defn {
   &add_labeled_src($result, "headers-$suffix",       &linkage_unit::generate_headers(      $file, $ordered_klass_names, $extra_dakota_headers));
   &add_labeled_src($result, "symbols-$suffix",       &linkage_unit::generate_symbols(      $file, $symbols));
   &add_labeled_src($result, "klasses-$suffix",       &linkage_unit::generate_klasses(      $file, $ordered_klass_names));
-  &add_labeled_src($result, "klasses-funcs-$suffix", &linkage_unit::generate_klasses_funcs($file, $ordered_klass_names)); # optionally inline
  #&add_labeled_src($result, "hashes-$suffix",        &linkage_unit::generate_hashes(       $file));
   &add_labeled_src($result, "keywords-$suffix",      &linkage_unit::generate_keywords(     $file));
   &add_labeled_src($result, "strs-$suffix",          &linkage_unit::generate_strs(         $file));
   &add_labeled_src($result, "ints-$suffix",          &linkage_unit::generate_ints(         $file));
   my $col = '';
-  my $output_base_defns = "$name-generic-func-defns";
-  my $output_base_decls = "$name-generic-func-decls";
 
-  my $generic_func_defns_path = "$output_base_defns.inc";
-  my $generic_func_decls_path = "$output_base_decls.inc";
+  my $klass_func_defns_path = "$name-klass-func-defns.inc";
+  my $klass_func_decls_path = "$name-klass-func-decls.inc";
+
+  my $target_klass_func_defns_path = &dakota::dakota::target_klass_func_defns_path();
+
+  if (&is_src_decl()) {
+    &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_decls_path");
+    &add_labeled_src($result, "klasses-funcs-$suffix",
+                     "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
+                     "  # define INLINE" . $nl .
+                     "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# else" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$target_klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# endif" . $nl);
+  } elsif (&is_target_decl()) {
+    &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_decls_path");
+    &add_labeled_src($result, "klasses-funcs-$suffix",
+                     "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
+                     "  # define INLINE" . $nl .
+                     "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# else" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# endif" . $nl);
+  } elsif (&is_target_defn()) {
+    &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_defns_path");
+    &add_labeled_src($result, "klasses-funcs-$suffix",
+                     "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
+                     "  # define INLINE" . $nl .
+                     "  # include \"$klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
+                     "# endif" . $nl);
+  }
+  my $generic_func_defns_path = "$name-generic-func-defns.inc";
+  my $generic_func_decls_path = "$name-generic-func-decls.inc";
 
   #my $target_generic_func_decls_path = &dakota::dakota::target_generic_func_decls_path();
   my $target_generic_func_defns_path = &dakota::dakota::target_generic_func_defns_path();
@@ -568,12 +614,7 @@ sub generate_decl_defn {
   my $str =
     &labeled_src_str($result, "headers-$suffix") .
     &labeled_src_str($result, "symbols-$suffix") .
-    &labeled_src_str($result, "klasses-$suffix") .
-    &labeled_src_str($result, "klasses-funcs-$suffix") .
-   #&labeled_src_str($result, "hashes-$suffix") .
-    &labeled_src_str($result, "keywords-$suffix") .
-    &labeled_src_str($result, "strs-$suffix") .
-    &labeled_src_str($result, "ints-$suffix");
+    &labeled_src_str($result, "klasses-$suffix");
 
   if (&is_decl()) {
     $str .=
@@ -582,6 +623,11 @@ sub generate_decl_defn {
       $nl;
   }
   $str .=
+   #&labeled_src_str($result, "hashes-$suffix") .
+    &labeled_src_str($result, "keywords-$suffix") .
+    &labeled_src_str($result, "strs-$suffix") .
+    &labeled_src_str($result, "ints-$suffix") .
+    &labeled_src_str($result, "klasses-funcs-$suffix") .
     &labeled_src_str($result, "generics-$suffix");
 
   return $str;
@@ -1973,7 +2019,7 @@ sub generate_klass_unbox {
     ### unbox() same for all types
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
     if ($is_klass_defn || (&should_export_slots($klass_scope) && &has_slots_cat_info($klass_scope))) {
-      $result .= $col . "klass $klass_name { [[unbox-attrs]] func unbox(object-t object) -> slots-t&";
+      $result .= $col . "klass $klass_name { [[unbox-attrs]] INLINE func unbox(object-t object) -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
       } elsif (&is_target_defn()) {
@@ -2002,7 +2048,7 @@ sub generate_klass_box {
       my $slots_type = &at($$klass_scope{'slots'}, 'type');
       if (&is_array_type($slots_type)) {
         ### box() array-type
-        $result .= $col . "klass $klass_name { func box(slots-t arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> object-t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2016,7 +2062,7 @@ sub generate_klass_box {
           $col = &colout($col);
           $result .= $col . "}}" . $nl;
         }
-        $result .= $col . "klass $klass_name { func box(slots-t* arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> object-t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2031,7 +2077,7 @@ sub generate_klass_box {
         }
       } else { # !&is_array_type()
         ### box() non-array-type
-        $result .= $col . "klass $klass_name { func box(slots-t* arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> object-t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2050,7 +2096,7 @@ sub generate_klass_box {
           $col = &colout($col);
           $result .= $col . "}}" . $nl;
         }
-        $result .= $col . "klass $klass_name { func box(slots-t arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> object-t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2136,9 +2182,9 @@ sub linkage_unit::generate_klasses_body_funcs_klass {
 
   if ('trait' eq $klass_type) {
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __klass__); } }" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
 }
