@@ -237,10 +237,34 @@ sub is_array {
   }
   return $state;
 }
+sub project_io_at {
+  my ($project_io_path, $key) = @_;
+  my $project_io = &scalar_from_file($project_io_path);
+  my $value = $$project_io{$key};
+  return $value;
+}
+sub project_io_assign {
+  my ($project_io_path, $key, $value) = @_;
+  $value = &canon_path($value);
+  my $project_io = &scalar_from_file($project_io_path);
+  if (! $$project_io{$key} || $value ne $$project_io{$key}) {
+    $$project_io{$key} = $value;
+    &scalar_from_file($project_io_path, $project_io);
+  }
+}
+sub project_io_add {
+  my ($project_io_path, $key, $input, $depend) = @_;
+  $input = &canon_path($input);
+  $depend = &canon_path($depend);
+  my $project_io = &scalar_from_file($project_io_path);
+  if (! $$project_io{$key}{$input} || $depend ne $$project_io{$key}{$input}) {
+    $$project_io{$key}{$input} = $depend;
+    &scalar_from_file($project_io_path, $project_io);
+  }
+}
 sub project_io_add_all {
   my ($project_io_path, $key, $input, $depend) = @_;
   die if &is_array($input) && &is_array($depend);
-  $input = &canon_path($input);
   my $should_write = 0;
   my $project_io = &scalar_from_file($project_io_path);
 
@@ -756,7 +780,6 @@ sub start_cmd {
     unlink $lock_file;
   }
 
-  my $project_io = &scalar_from_file($$cmd_info{'project.io'});
   if ($ENV{'DK_GENERATE_TARGET_FIRST'}) {
     # generate the single (but slow) runtime .o, then the user .o files
     # this might be useful for distributed building (initiating the building of the slowest first
@@ -765,7 +788,7 @@ sub start_cmd {
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'init'}) {
-        if (!$$project_io{'target-cc'}) {
+        if (! &project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
           &gen_target_o($cmd_info, $is_exe);
         }
       }
@@ -780,7 +803,7 @@ sub start_cmd {
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'init'}) {
-        if (!$$project_io{'target-cc'}) {
+        if (! &project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
           &gen_target_o($cmd_info, $is_exe);
         }
       }
@@ -1051,11 +1074,7 @@ sub o_from_dk {
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_ast_path = &target_ast_path($cmd_info);
-      my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      if (!$$project_io{'all'}{$target_ast_path}{$src_path}) {
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $src_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
-      }
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, [ $hh_path, $src_path]);
     }
     if ($ENV{'DKT_PRECOMPILE'}) {
       $outfile = $$cc_cmd{'output'};
@@ -1067,9 +1086,7 @@ sub o_from_dk {
       delete $$o_cmd{'opts'}{'output'};
       $num_out_of_date_infiles = &o_from_cc($o_cmd, &compile_opts_path(), $cxx_compile_flags);
 
-      my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-      $$project_io{'compile'}{$input} = $o_path;
-      &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
+      &project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path);
 
       if ($num_out_of_date_infiles) {
         &project_io_add_all($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
@@ -1214,20 +1231,13 @@ sub target_from_ast {
     }
   }
   &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_hh_path);
-  my $project_io = &scalar_from_file($$cmd_info{'project.io'});
-  if (!$$project_io{'target-hh'}) {
-    $$project_io{'target-hh'} = $target_hh_path;
-  }
+  &project_io_assign($$cmd_info{'project.io'}, 'target-hh', $target_hh_path);
+
   if ($is_defn) {
     &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_cc_path);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_hh_path,  $target_o_path);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_cc_path,  $target_o_path);
-    if (!$$project_io{'target-cc'}) {
-      $$project_io{'target-cc'} = $target_cc_path;
-    }
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', [ $target_hh_path, $target_cc_path ],  $target_o_path);
+    &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
-  &scalar_to_file($$cmd_info{'project.io'}, $project_io, 1);
-
   &make_dir_part($target_cc_path, $global_should_echo);
   my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
   $path =~ s|/[^/]*$||;
