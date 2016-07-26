@@ -954,12 +954,12 @@ sub unwrap_seq {
 sub write_filestr_to_file {
   my ($filestr, $file) = @_;
   &make_dir_part($file);
-  open(FILE, ">", $file) or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  open FILE, ">", $file or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
   flock FILE, LOCK_EX or die;
   truncate FILE, 0;
   print FILE $filestr;
   flock FILE, LOCK_UN or die;
-  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  close FILE            or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
 }
 sub filestr_to_file {
   my ($filestr, $file) = @_;
@@ -995,11 +995,11 @@ sub scalar_from_file {
 sub filestr_from_file {
   my ($file) = @_;
   undef $/; ## force files to be read in one slurp
-  open FILE, "<$file" or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / $file: $!" . $nl;
-  flock FILE, LOCK_EX or die;
+  open FILE, "<", $file or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
+  flock FILE, LOCK_SH or die;
   my $filestr = <FILE>;
   flock FILE, LOCK_UN or die;
-  close FILE or die __FILE__, ":", __LINE__, ": ERROR: $file: $!\n";
+  close FILE            or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
   return $filestr;
 }
 sub start {
