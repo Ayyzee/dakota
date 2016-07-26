@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_hh
-# define      dkt_dakota_hh
+# pragma once
 
 # include <cstddef>
 # include <cstdlib>
@@ -273,5 +272,3 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 [[debug_export]] FUNC dkt_dump_methods(klass::slots_t*) -> ssize_t;
 
 [[debug_export]] FUNC dkt_unbox_check(object_t object, object_t kls) -> void;
-
-# endif // dkt-dakota-hh

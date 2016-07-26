@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_log_hh
-# define      dkt_dakota_log_hh
+# pragma once
 
 # include <cstdarg>
 # include <cstdint>
@@ -71,5 +70,3 @@ namespace dkt {
 # define DKT_LOG_OBJECT_ALLOC(...)  DKT_LOG_INFO(dkt::k_log_object_alloc,  __VA_ARGS__)
 # define DKT_LOG_INITIAL_FINAL(...) DKT_LOG_INFO(dkt::k_log_initial_final, __VA_ARGS__)
 # define DKT_LOG_TRACE_RUNTIME(...) DKT_LOG_INFO(dkt::k_log_trace_runtime, __VA_ARGS__)
-
-# endif // dkt-dakota-log-hh

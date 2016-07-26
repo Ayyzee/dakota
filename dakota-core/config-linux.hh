@@ -1,6 +1,6 @@
 // -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
-# if !defined dkt_config_hh
-# define      dkt_config_hh
+
+# pragma once
 
 # define HAVE_EPOLL 1
 # define HAVE_POLL 1
@@ -20,5 +20,3 @@ FUNC getprogname() -> const char8_t*;
 __END_DECLS
 
 static str_t so_ext = "so";
-
-# endif

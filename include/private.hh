@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_private_hh
-# define      dkt_dakota_private_hh
+# pragma once
 
 # include "dummy.hh"
 # include "dakota.hh"
@@ -72,5 +71,3 @@ inline FUNC root_superklass3f(object_t object) -> boole_t {
   else
     return false;
 } // root-superklass?()
-
-# endif

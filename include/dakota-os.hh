@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_os_hh
-# define      dkt_dakota_os_hh
+# pragma once
 
 # include <dakota-decl.hh>
 
@@ -41,6 +40,4 @@
   }
 # else
   # error "Neither __linux__ nor (__APPLE__ && __MACH__) are defined."
-# endif
-
 # endif

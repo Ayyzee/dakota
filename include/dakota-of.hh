@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_of_hh
-# define      dkt_dakota_of_hh
+# pragma once
 
 # include <dakota-decl.hh>
 
@@ -44,5 +43,3 @@ inline FUNC superklass_of(object_t kls) -> object_t {
 inline FUNC name_of(object_t kls) -> symbol_t {
   return klass::unbox(kls).name;
 }
-
-# endif // dkt-dakota-of-hh

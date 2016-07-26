@@ -336,9 +336,13 @@ sub generate_src {
     print "    creating $output" . &pann(__FILE__, __LINE__) . $nl;
   }
   my $str;
+  my $strings;
   if (&is_src_decl()) {
-    return $str if $ENV{'DK_TARGET_COMMON_HEADER'};
+    return undef if $ENV{'DK_TARGET_COMMON_HEADER'};
     $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
+    $strings = [ undef,
+                 '# pragma once' . $nl,
+                 $str ];
   } else {
     $str =
       "# if !defined DK_TARGET_COMMON_HEADER || 0 == DK_TARGET_COMMON_HEADER" . $nl .
@@ -350,9 +354,9 @@ sub generate_src {
       "# include \"$user_cc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to cc)
       $nl .
       &dk_generate_cc_footer($file);
+    $strings = [ undef,
+                 $str ];
   }
-  my $strings = [ undef,
-                  $str ];
   if ($should_write_pre_output) {
     $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
     &write_to_file_strings($pre_output, $strings);
@@ -423,8 +427,15 @@ sub generate_target {
       $output = $ENV{'DKT_DIR'} . '/' . $output;
     }
     my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
-    my $strings = [ undef,
-                    $str ];
+    my $strings;
+    if (&is_decl()) {
+      $strings = [ undef,
+                   '# pragma once' . $nl,
+                   $str ];
+    } else {
+      $strings = [ undef,
+                   $str ];
+    }
     if ($output_runtime) {
       my $output_runtime_name = $output_runtime =~ s|^.*?([^/]+)$|$1|r;
       push @$strings, "# include \"$output_runtime_name\"" . &ann(__FILE__, __LINE__) . $nl;

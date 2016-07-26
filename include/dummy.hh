@@ -1,7 +1,6 @@
 // -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-# if !defined dkt_dakota_dummy_hh
-# define      dkt_dakota_dummy_hh
+# pragma once
 
 # include <cstdint> // uintptr_t
 
@@ -23,5 +22,3 @@ dkt_declare_klass_type_struct(super);
 
 namespace method { typealias slots_t = FUNC (*)(object_t) -> object_t; }
 typealias method_t = method::slots_t;
-
-# endif

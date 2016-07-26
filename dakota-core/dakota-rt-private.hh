@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_rt_private_hh
-# define      dkt_dakota_rt_private_hh
+# pragma once
 
 # include "dakota.hh"
 # include "declare-klass-type.hh"
@@ -23,5 +22,3 @@
 dkt_declare_klass_type_struct(assoc_node);
 
 FUNC imported_klasses_for_klass(symbol_t) -> assoc_node_t*;
-
-# endif

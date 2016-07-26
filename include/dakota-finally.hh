@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_finally_hh
-# define      dkt_dakota_finally_hh
+# pragma once
 
 // http://the-witness.net/news/2012/11/scopeexit-in-c11
 
@@ -48,5 +47,3 @@ finally_t<F> finally(F f) {
 # define DKT_CATCH(k, e)    else if (dk::instance3f(e, k)) // dk::instance?(e, k)
 # define DKT_CATCH_END(e)   else { throw; } }
 # define DKT_FINALLY(block) auto _finally_ = finally([&]() block)
-
-# endif

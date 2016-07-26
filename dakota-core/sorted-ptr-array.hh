@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_sorted_ptr_array_hh
-# define      dkt_sorted_ptr_array_hh
+# pragma once
 
 # include "dakota.hh"
 
@@ -33,5 +32,3 @@ KLASS_NS sorted_ptr_array {
   METHOD remove_at(slots_t* t, const void* key, ssize_t offset) -> const void*;
   METHOD add_at(slots_t* t, const void* key, ssize_t offset) -> slots_t*;
 }
-
-# endif

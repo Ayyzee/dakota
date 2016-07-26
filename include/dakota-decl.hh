@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_dakota_decl_hh
-# define      dkt_dakota_decl_hh
+# pragma once
 
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
@@ -108,5 +107,3 @@ namespace symbol       { typealias slots_t = str_t;                          } t
 static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");
 static_assert(64/8  == sizeof(std::float64_t),  "The sizeof std::float64-t  must equal  64/8 bytes in size");
 static_assert(128/8 == sizeof(std::float128_t), "The sizeof std::float128-t must equal 128/8 bytes in size");
-
-# endif

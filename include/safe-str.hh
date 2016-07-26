@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dakota_safe_str_hh
-# define      dakota_safe_str_hh
+# pragma once
 
 # include <cstdlib>
 # include <cstring>
@@ -72,5 +71,3 @@ inline FUNC safe_strlen(str_t str) -> size_t {
     len = strlen(str);
   return len;
 }
-
-# endif

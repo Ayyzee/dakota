@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dkt_named_info_hh
-# define      dkt_named_info_hh
+# pragma once
 
 # include "dakota.hh"
 
@@ -24,5 +23,3 @@ KLASS_NS named_info {
   METHOD compare(slots_t*  s, slots_t*  other_s) -> int_t;
   FUNC   compare(slots_t** s, slots_t** other_s) -> int_t;
 }
-
-# endif
