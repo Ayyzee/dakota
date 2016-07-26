@@ -528,13 +528,13 @@ sub generate_decl_defn {
   my $extra_dakota_headers = &extra_dakota_headers($name);
   my $ordered_klass_names = &order_klasses($file);
 
-  &add_labeled_src($result, "headers-$suffix",       &linkage_unit::generate_headers(      $file, $ordered_klass_names, $extra_dakota_headers));
-  &add_labeled_src($result, "symbols-$suffix",       &linkage_unit::generate_symbols(      $file, $symbols));
-  &add_labeled_src($result, "klasses-$suffix",       &linkage_unit::generate_klasses(      $file, $ordered_klass_names));
- #&add_labeled_src($result, "hashes-$suffix",        &linkage_unit::generate_hashes(       $file));
-  &add_labeled_src($result, "keywords-$suffix",      &linkage_unit::generate_keywords(     $file));
-  &add_labeled_src($result, "strs-$suffix",          &linkage_unit::generate_strs(         $file));
-  &add_labeled_src($result, "ints-$suffix",          &linkage_unit::generate_ints(         $file));
+  &add_labeled_src($result, "headers-$suffix",  &linkage_unit::generate_headers( $file, $ordered_klass_names, $extra_dakota_headers));
+  &add_labeled_src($result, "symbols-$suffix",  &linkage_unit::generate_symbols( $file, $symbols));
+  &add_labeled_src($result, "klasses-$suffix",  &linkage_unit::generate_klasses( $file, $ordered_klass_names));
+ #&add_labeled_src($result, "hashes-$suffix",   &linkage_unit::generate_hashes(  $file));
+  &add_labeled_src($result, "keywords-$suffix", &linkage_unit::generate_keywords($file));
+  &add_labeled_src($result, "strs-$suffix",     &linkage_unit::generate_strs(    $file));
+  &add_labeled_src($result, "ints-$suffix",     &linkage_unit::generate_ints(    $file));
   my $col = '';
 
   my $klass_func_defns_path = "$name-klass-func-defns.inc";
@@ -544,7 +544,7 @@ sub generate_decl_defn {
 
   if (&is_src_decl()) {
     &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_decls_path");
-    &add_labeled_src($result, "klasses-funcs-$suffix",
+    &add_labeled_src($result, "klass-funcs-$suffix",
                      "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
                      "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
@@ -554,7 +554,7 @@ sub generate_decl_defn {
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
     &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_decls_path");
-    &add_labeled_src($result, "klasses-funcs-$suffix",
+    &add_labeled_src($result, "klass-funcs-$suffix",
                      "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
                      "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
@@ -564,7 +564,7 @@ sub generate_decl_defn {
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
     &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_defns_path");
-    &add_labeled_src($result, "klasses-funcs-$suffix",
+    &add_labeled_src($result, "klass-funcs-$suffix",
                      "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
                      "  # include \"$klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
@@ -578,7 +578,7 @@ sub generate_decl_defn {
 
   if (&is_src_decl()) {
     &generate_generics_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
-    &add_labeled_src($result, "generics-$suffix",
+    &add_labeled_src($result, "generic-funcs-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
@@ -590,7 +590,7 @@ sub generate_decl_defn {
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
     &generate_generics_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
-    &add_labeled_src($result, "generics-$suffix",
+    &add_labeled_src($result, "generic-funcs-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
@@ -602,7 +602,7 @@ sub generate_decl_defn {
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
     &generate_generics_and_write_to_file_converted($generics, "$dir/$generic_func_defns_path");
-    &add_labeled_src($result, "generics-$suffix",
+    &add_labeled_src($result, "generic-funcs-$suffix",
                      "# if !defined DK_INLINE_GENERIC_FUNCS || 0 == DK_INLINE_GENERIC_FUNCS" . $nl .
                      "  # define STATIC static" . $nl .
                      "  # define INLINE" . $nl .
@@ -627,8 +627,8 @@ sub generate_decl_defn {
     &labeled_src_str($result, "keywords-$suffix") .
     &labeled_src_str($result, "strs-$suffix") .
     &labeled_src_str($result, "ints-$suffix") .
-    &labeled_src_str($result, "klasses-funcs-$suffix") .
-    &labeled_src_str($result, "generics-$suffix");
+    &labeled_src_str($result, "klass-funcs-$suffix") .
+    &labeled_src_str($result, "generic-funcs-$suffix");
 
   return $str;
 } # generate_decl_defn
