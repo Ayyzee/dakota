@@ -515,6 +515,7 @@ sub generate_decl_defn {
   &add_labeled_src($result, "headers-$suffix",    &linkage_unit::generate_headers(   $file, $ordered_klass_names, $extra_dakota_headers));
   &add_labeled_src($result, "symbols-$suffix",    &linkage_unit::generate_symbols(   $file, $symbols));
   &add_labeled_src($result, "klasses-$suffix",    &linkage_unit::generate_klasses(   $file, $ordered_klass_names));
+  &add_labeled_src($result, "klasses-funcs-$suffix", &linkage_unit::generate_klasses_funcs($file, $ordered_klass_names)); # optionally inline
  #&add_labeled_src($result, "hashes-$suffix",     &linkage_unit::generate_hashes(    $file));
   &add_labeled_src($result, "keywords-$suffix",   &linkage_unit::generate_keywords(  $file));
   &add_labeled_src($result, "strs-$suffix",       &linkage_unit::generate_strs(      $file));
@@ -568,6 +569,7 @@ sub generate_decl_defn {
     &labeled_src_str($result, "headers-$suffix") .
     &labeled_src_str($result, "symbols-$suffix") .
     &labeled_src_str($result, "klasses-$suffix") .
+    &labeled_src_str($result, "klasses-funcs-$suffix") .
    #&labeled_src_str($result, "hashes-$suffix") .
     &labeled_src_str($result, "keywords-$suffix") .
     &labeled_src_str($result, "strs-$suffix") .
@@ -2774,6 +2776,8 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   my $original_scratch_str_ref = &global_scratch_str_ref();
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
+  $$scratch_str_ref .= $nl;
+  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs" . '-' . &suffix());
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs_klass($scope, $col, $klass_path, $klass_name);
   }
@@ -2809,9 +2813,6 @@ sub linkage_unit::generate_klasses {
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs_non_inline($scope, $col, $klass_path, $klass_name);
   }
-  $$scratch_str_ref .= $nl;
-  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs" . '-' . &suffix());
-  $$scratch_str_ref .= &linkage_unit::generate_klasses_funcs($scope, $ordered_klass_names); # optionally inline
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses_types_before {
