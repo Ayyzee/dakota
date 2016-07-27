@@ -89,6 +89,7 @@ our @EXPORT= qw(
                  header_file_regex
                  ident_regex
                  is_abs
+                 is_exe
                  is_symbol_candidate
                  is_debug
                  is_kw_args_generic
@@ -842,6 +843,18 @@ sub copy_no_dups {
     }
   }
   return $result;
+}
+sub is_exe {
+  my ($cmd_info) = @_;
+  my $is_exe = 1;
+  if ($$cmd_info{'opts'}{'dynamic'} || $$cmd_info{'opts'}{'shared'}) {
+    $is_exe = 0;
+  }
+  my $project = &scalar_from_file($$cmd_info{'opts'}{'project'});
+  if (! $is_exe && ! $$project{'target.lib?'}) {
+    print STDERR $0 . ": warning: missing '\"target.lib?\" : 1' in " . $$cmd_info{'opts'}{'project'} . $nl;
+  }
+  return $is_exe;
 }
 sub is_abs {
   my ($path) = @_;

@@ -66,6 +66,7 @@ sub start {
   $$result{'builddir'} = &canon_path(&subst($$build{'builddir'}, $$opts{'var'})) if $$build{'builddir'};
   $$result{'output'} =   &canon_path(&subst($$build{'output'},   $$opts{'var'})) if $$build{'output'};
   $$result{'target'} =   &canon_path(&subst($$build{'target'},   $$opts{'var'})) if $$build{'target'};
+  $$result{'target.lib?'} = &canon_path(&subst($$build{'target.lib?'}, $$opts{'var'})) if $$build{'target.lib?'};
   my $original_state;
   &scalar_to_file($file, $result, $original_state = 0);
 }

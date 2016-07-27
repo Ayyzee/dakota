@@ -36,6 +36,7 @@
     'macros' => [ # cmd-line
     ],
     'target' => '$(srcdir)/libdakota.$(so_ext)', # cmd-line
+    'target.lib?' => 1,
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
     'soname' => 'libdakota.$(so_ext)', # cmd-line

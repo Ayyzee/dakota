@@ -351,7 +351,8 @@ sub create_missing_project {
     $project_base = $$project{'target'} =~ s/\.$so_ext$//r; # remove ext if present
   } else {
     $project_base = &project_base($inputs);
-    if ($$root_cmd{'opts'}{'dynamic'} || $$root_cmd{'opts'}{'shared'}) {
+    if (! &is_exe($root_cmd)) {
+      $$project{'target.lib?'} = 1;
       $$project{'target'} = $project_base . ".$so_ext";
     } else {
       $$project{'target'} = $project_base;
@@ -419,11 +420,10 @@ sub use_project {
     $$project{'inputs'} = [ @{$$project{'inputs'}}, map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
   }
   if (! $$project{'target'}) {
-    if ($$project{'target'}) {
-      $$project{'target'} = $$project{'target'};
-    } else {
-      $$project{'target'} = &canon_path(&default_target($root_cmd, $$project{'inputs'}));
-    }
+    $$project{'target'} = &canon_path(&default_target($root_cmd, $$project{'inputs'}));
+  }
+  if (! &is_exe($root_cmd)) {
+    $$project{'target.lib?'} = 1;
   }
   if (0 == $dkt_exclude_libs || $libdakota_core_bit < $dkt_exclude_libs) {
     &add_last($$root_cmd{'inputs'}, &lib_from_lib_name($libdakota_core));
