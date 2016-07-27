@@ -237,6 +237,11 @@ sub is_array {
   }
   return $state;
 }
+sub project_io_append {
+  my ($line) = @_;
+  $$line[-1] = 'undef' if ! $$line[-1];
+  #print STDERR join(' ', @$line) . $nl;
+}
 sub project_io_at {
   my ($project_io_path, $key) = @_;
   my $project_io = &scalar_from_file($project_io_path);
@@ -248,6 +253,7 @@ sub project_io_assign {
   $value = &canon_path($value);
   my $project_io = &scalar_from_file($project_io_path);
   if (! $$project_io{$key} || $value ne $$project_io{$key}) {
+    &project_io_append([$key, $value]);
     $$project_io{$key} = $value;
     &scalar_from_file($project_io_path, $project_io);
   }
@@ -258,6 +264,7 @@ sub project_io_add {
   $depend = &canon_path($depend);
   my $project_io = &scalar_from_file($project_io_path);
   if (! $$project_io{$key}{$input} || $depend ne $$project_io{$key}{$input}) {
+    &project_io_append([$key, $input, $depend]);
     $$project_io{$key}{$input} = $depend;
     &scalar_from_file($project_io_path, $project_io);
   }
@@ -273,6 +280,7 @@ sub project_io_add_all {
     foreach my $in (@$input) {
       $in = &canon_path($in);
       if (!exists $$project_io{$key}{$in}{$depend}) {
+        &project_io_append([$key, $in, $depend, undef]);
         $$project_io{$key}{$in}{$depend} = undef;
         $should_write = 1;
       }
@@ -282,6 +290,7 @@ sub project_io_add_all {
     foreach my $dp (@$depend) {
       $dp = &canon_path($dp);
       if (!exists $$project_io{$key}{$input}{$dp}) {
+        &project_io_append([$key, $input, $dp, undef]);
         $$project_io{$key}{$input}{$dp} = undef;
         $should_write = 1;
       }
@@ -290,6 +299,7 @@ sub project_io_add_all {
     $input = &canon_path($input);
     $depend = &canon_path($depend);
     if (!exists $$project_io{$key}{$input}{$depend}) {
+      &project_io_append([$key, $input, $depend, undef]);
       $$project_io{$key}{$input}{$depend} = undef;
       $should_write = 1;
     }
