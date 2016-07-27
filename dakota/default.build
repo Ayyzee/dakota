@@ -1,5 +1,6 @@
 # -*- mode: perl -*-
 {
+    'builddir' => 'dkt',
     'srcs' => [ # cmd-line
       '$(srcdir)/ascii-number-klass.dk',
       '$(srcdir)/ascii-number.dk',

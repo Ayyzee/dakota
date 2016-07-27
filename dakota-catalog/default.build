@@ -1,5 +1,6 @@
 # -*- mode: perl -*-
 {
+    'builddir' => 'dkt',
     'srcs' => [ # cmd-line
       '$(srcdir)/dakota-catalog.$(cc_ext)',
     ],
