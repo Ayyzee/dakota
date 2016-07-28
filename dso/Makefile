@@ -4,6 +4,7 @@ builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
 
 include $(rootdir)/common.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
+target := lib$(target).$(so_ext)
 
 .PRECIOUS: %.project
 
@@ -16,6 +17,8 @@ include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk d
  uninstall\
 
 all: $(target)
+
+$(target): $(srcs)
 
 check: all
 
@@ -31,7 +34,7 @@ install-dirs := $(DESTDIR)$(prefix)/{include,lib}
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
 
-install: all $(install-dirs) $(install-files)
+install: all $(install-dirs) $(install.files)
 
 uninstall:
-	sudo $(RM) $(RMFLAGS) $(install-files)
+	sudo $(RM) $(RMFLAGS) $(install.files)

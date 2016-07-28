@@ -8,6 +8,7 @@ builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
 
 include $(rootdir)/common.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
+target := lib$(target).$(so_ext)
 
 # include-dirs
 include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
@@ -29,6 +30,10 @@ macros := $(patsubst %,--define-macro %,$(macros))
  precompile\
  single\
  uninstall\
+
+all: $(target)
+
+$(target): $(srcs)
 
 single: $(srcs) | default.project
 	for input in $(srcs); do\
@@ -57,7 +62,8 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean | default.project
-	$(DAKOTA-BASE) --clean
+	$(DAKOTA-BASE) --clean # not working
+	$(RM) $(RMFLAGS) $(target)
 	$(RM) $(RMFLAGS) default.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
@@ -84,10 +90,10 @@ install-dir-links :=  $(DESTDIR)$(prefix)/lib/dakota/compiler
 install-file-links := $(DESTDIR)$(prefix)/lib/dakota/platform.json
 install-links := $(install-dir-links) $(install-file-links)
 
-install: all $(install-dirs) $(install-files) $(install-links)
+install: all $(install-dirs) $(install.files) $(install-links)
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
-	sudo $(RM) $(RMFLAGS) $(install-files) $(install-file-links)
+	sudo $(RM) $(RMFLAGS) $(install.files) $(install-file-links)

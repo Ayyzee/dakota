@@ -7,7 +7,7 @@
   'libs' => [
     'dl',
   ],
-  'target' => '$(srcdir)/libdso.$(so_ext)',
+  'target' => 'dso',
   'target.lib?' => 1,
   'install' => {
     '-rules' => [

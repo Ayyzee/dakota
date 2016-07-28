@@ -10,7 +10,7 @@
     'include-dirs' => [
         '$(srcdir)/../include'
     ],
-    'target' => '$(srcdir)/dakota-find-library',
+    'target' => 'dakota-find-library',
     'install' => {
       '-rules' => [
       ],

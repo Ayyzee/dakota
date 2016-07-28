@@ -11,7 +11,7 @@
       '$(srcdir)',
       '$(srcdir)/../include',
     ],
-    'target' => '$(srcdir)/dakota-catalog', # cmd-line
+    'target' => 'dakota-catalog', # cmd-line
     'install' => {
       '-rules' => [
       ],

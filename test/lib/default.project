@@ -5,6 +5,6 @@
     'l1.dk',
     'l1-other.dk',
   ],
-  'target' => 'libl1.dylib',
+  'target' => 'l1',
   'target.lib?' => 1,
 }

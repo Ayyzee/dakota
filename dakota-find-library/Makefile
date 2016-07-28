@@ -24,6 +24,10 @@ include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
  precompile\
  uninstall\
 
+all: $(target)
+
+$(target): $(srcs)
+
 check-exe: all
 	$(target) libssl.$(so_ext)
 
@@ -61,10 +65,10 @@ install-dir-links :=  $(DESTDIR)$(prefix)/lib/dakota/compiler
 install-file-links := $(DESTDIR)$(prefix)/lib/dakota/platform.json
 install-links := $(install-dir-links) $(install-file-links)
 
-install: all $(install-dirs) $(install-files) $(install-links)
+install: all $(install-dirs) $(install.files) $(install-links)
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
-	sudo $(RM) $(RMFLAGS) $(install-files) $(install-file-links)
+	sudo $(RM) $(RMFLAGS) $(install.files) $(install-file-links)
