@@ -255,7 +255,7 @@ sub project_io_assign {
   if (! $$project_io{$key} || $value ne $$project_io{$key}) {
     &project_io_append([$key, $value]);
     $$project_io{$key} = $value;
-    &scalar_from_file($project_io_path, $project_io);
+    &scalar_to_file($project_io_path, $project_io);
   }
 }
 sub project_io_add {
@@ -266,7 +266,7 @@ sub project_io_add {
   if (! $$project_io{$key}{$input} || $depend ne $$project_io{$key}{$input}) {
     &project_io_append([$key, $input, $depend]);
     $$project_io{$key}{$input} = $depend;
-    &scalar_from_file($project_io_path, $project_io);
+    &scalar_to_file($project_io_path, $project_io);
   }
 }
 sub project_io_add_all {
@@ -305,7 +305,7 @@ sub project_io_add_all {
     }
   }
   if ($should_write) {
-    &scalar_from_file($project_io_path, $project_io);
+    &scalar_to_file($project_io_path, $project_io);
   }
 }
 sub add_visibility_file {

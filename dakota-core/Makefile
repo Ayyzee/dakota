@@ -62,8 +62,7 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target-files)
 
 clean: goal-clean | default.project
-	$(DAKOTA-BASE) --clean # not working
-	$(RM) $(RMFLAGS) $(target)
+	$(DAKOTA-BASE) --clean
 	$(RM) $(RMFLAGS) default.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
