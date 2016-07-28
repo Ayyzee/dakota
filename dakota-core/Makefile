@@ -59,7 +59,7 @@ installcheck: check install
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
-	$(RM) $(RMFLAGS) $(target-files)
+	$(RM) $(RMFLAGS) $(target)
 
 clean: goal-clean | default.project
 	$(DAKOTA-BASE) --clean

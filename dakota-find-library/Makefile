@@ -41,7 +41,7 @@ installcheck: check install
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
-	$(RM) $(RMFLAGS) $(target-files)
+	$(RM) $(RMFLAGS) $(target)
 
 clean: goal-clean
 	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext) default.project
