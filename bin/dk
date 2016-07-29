@@ -41,7 +41,7 @@ sub path_opt {
   my $arg = $$cmd[$$ir];
   my $pair;
   if (0) {
-  } elsif ($arg =~ /^(-$short|--$long=)(.+)$/) {
+  } elsif ($arg =~ /^(-$short|--$long=)([^\s]+)$/) {
     $pair = [$$ir, $2];
   } elsif ($arg =~ /^-$short|--$long$/) {
     $pair = [$$ir + 1, $$cmd[$$ir + 1]];
@@ -59,12 +59,12 @@ sub path_opt {
 sub cc_from_dk {
   my ($path) = @_;
   my $builddir = 'dkt';
-  $path =~ s=^(.+\.dk)$=$builddir/$1.$cc_ext=;
+  $path =~ s=^([^\s]+\.dk)$=$builddir/$1.$cc_ext=;
   return $path;
 }
 sub bname {
   my ($path) = @_;
-  my $bname = $path =~ s=^(.*/)?(.+?)\..+$=$2=r;
+  my $bname = $path =~ s=^(.*/)?([^\s]+?)\.[^\s]+$=$2=r;
   return $bname;
 }
 sub check_paths {
@@ -109,7 +109,7 @@ sub get_dakota_opts {
     my $arg = $$cmd[$i];
     foreach my $opt (keys %$var4opt) {
       $$info{$opt} = undef if !exists $$info{$opt};
-      if ($arg =~ /^--$opt=(.+)$/) {
+      if ($arg =~ /^--$opt=([^\s]+)$/) {
         $$info{$opt} = $1;
         unshift @$to_remove, $i;
         last;
@@ -159,7 +159,7 @@ sub detect_gcc_opts {
       push @$ordered_input_args, '--library=' . $$pair[1];
     } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
     } elsif ($arg !~ /^-/) {
-      if ($arg =~ /^(.+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
+      if ($arg =~ /^([^\s]+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
         $pair = [$i, $arg];
         push @{$$info{'inputs'}}, $pair;
         push @$ordered_input_args, $$pair[1];
