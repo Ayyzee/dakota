@@ -102,8 +102,8 @@ sub build_precompile_cmd {
 }
 sub get_dakota_opts {
   my ($cmd) = @_;
-  my $var4opt = { 'cxx'     => 'DK_CXX',
-                  'project' => 'DK_PROJECT' };
+  my $var4opt = { 'project' => 'DK_PROJECT',
+                  'cxx'     => 'DK_CXX' };
   my $info = {};
   my $to_remove = [];
   for (my $i = 0; $i < @$cmd; ) {
@@ -133,8 +133,8 @@ sub get_dakota_opts {
       }
     }
   }
-  return ($$info{'cxx'},
-          $$info{'project'});
+  return ($$info{'project'},
+          $$info{'cxx'});
 }
 my $major_mode_tbl = {
   '-c'        => 'compile',
@@ -171,18 +171,23 @@ sub detect_gcc_opts {
   }
   return $ordered_input_args;
 }
+my $verbose = 1;
 sub convert_cmd {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
-  print '# 1/3 ' . join(' ', @$cmd) . $nl;
-  my ($cxx, $project) = &get_dakota_opts($cmd);
+  if ($verbose) {
+    print '# 1/3 ' . join(' ', @$cmd) . $nl;
+  }
+  my ($project, $cxx) = &get_dakota_opts($cmd);
   my $gcc_cmd = [@$cmd];
   $$gcc_cmd[0] = $cxx;
   my $info = {};
   my $ordered_input_args = &detect_gcc_opts($gcc_cmd, $info);
   my $precompile_cmd = &build_precompile_cmd($project, $info, $ordered_input_args);
   my $precompile_cmd_str = join(' ', @$precompile_cmd) ;
-  print '# 2/3 ' . $precompile_cmd_str . $nl;
+  if ($verbose) {
+    print '# 2/3 ' . $precompile_cmd_str . $nl;
+  }
   my $outstr = `$precompile_cmd_str`;
   my $val = $? >> 8;
   if (0 != $val) {
@@ -196,7 +201,9 @@ sub convert_cmd {
   if (0 != @$cc_paths) {
     &translate_dk_to_cc($gcc_cmd, $cc_paths);
   }
-  print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
+  if ($verbose) {
+    print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
+  }
   return $gcc_cmd;
 }
 my $args = &convert_cmd(\@ARGV);
