@@ -301,6 +301,7 @@ if ($$root_cmd{'opts'}{'include-directory'}) {
 }
 my $env_vars = { 'DK_TARGET_COMMON_HEADER' => undef,
                  'DK_INLINE_GENERIC_FUNCS' => undef,
+                 'DK_INLINE_KLASS_FUNCS' => undef,
                };
 if ($$root_cmd{'opts'}{'define-macro'}) {
   my $flags = '';
