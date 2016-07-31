@@ -248,8 +248,12 @@ sub project_io_at {
   my $value = $$project_io{$key};
   return $value;
 }
+my $skip_project_io_write = 1;
 sub project_io_assign {
   my ($project_io_path, $key, $value) = @_;
+  if ($skip_project_io_write) {
+    return;
+  }
   $value = &canon_path($value);
   my $project_io = &scalar_from_file($project_io_path);
   if (! $$project_io{$key} || $value ne $$project_io{$key}) {
@@ -260,6 +264,9 @@ sub project_io_assign {
 }
 sub project_io_add {
   my ($project_io_path, $key, $input, $depend) = @_;
+  if ($skip_project_io_write) {
+    return;
+  }
   $input = &canon_path($input);
   $depend = &canon_path($depend);
   my $project_io = &scalar_from_file($project_io_path);
@@ -271,6 +278,9 @@ sub project_io_add {
 }
 sub project_io_add_all {
   my ($project_io_path, $key, $input, $depend) = @_;
+  if ($skip_project_io_write) {
+    return;
+  }
   die if &is_array($input) && &is_array($depend);
   my $should_write = 0;
   my $project_io = &scalar_from_file($project_io_path);
