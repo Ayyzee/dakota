@@ -174,9 +174,6 @@ my $libdakota_bit =      0x2;
 my $dkt_exclude_libs = 0;
 $dkt_exclude_libs = $ENV{'DKT_EXCLUDE_LIBS'} if $ENV{'DKT_EXCLUDE_LIBS'};
 
-if ($$root_cmd{'opts'}{'precompile'}) {
-  $ENV{'DKT_PRECOMPILE'} = 1;
-}
 my $rel_argv = [map { &rel_path_canon($_) } @ARGV];
 my $inputs = &clean_paths($rel_argv);
 my $project;
@@ -266,7 +263,7 @@ if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied
 # original position so the inputs should be split into separate sublist (and then sorted).
 # its OK to sort the .dk files, but we must link using the original positions.
 if (1) {
-  if (!$ENV{'DKT_PRECOMPILE'}) {
+  if (!$$root_cmd{'opts'}{'precompile'}) {
     $inputs = [sort {&mtime($b) <=> &mtime($a)} @$inputs];
   }
 }

@@ -822,10 +822,11 @@ sub clean_paths {
 }
 sub copy_no_dups {
   my ($strs) = @_;
+  my $cmd_info = &root_cmd();
   my $str_set = {};
   my $result = [];
   foreach my $str (@$strs) {
-    if (! $ENV{'DKT_PRECOMPILE'} && ! -e $str) {
+    if (! $$cmd_info{'opts'}{'precompile'} && ! -e $str) {
       if ($str eq &find_library($str)) {
         print STDERR $0 . ': warning: no-such-file: ' . $str . $nl;
       }

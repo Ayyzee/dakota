@@ -1917,6 +1917,7 @@ sub init_cc_from_dk_vars {
 }
 sub generics::klass_type_from_klass_name {
   my ($klass_name) = @_;
+  my $cmd_info = &root_cmd();
   my $klass_type;
 
   if (0) {
@@ -1924,7 +1925,7 @@ sub generics::klass_type_from_klass_name {
     $klass_type = 'klass';
   } elsif ($$global_target_ast{'traits'}{$klass_name}) {
     $klass_type = 'trait';
-  } elsif ($ENV{'DKT_PRECOMPILE'}) {
+  } elsif ($$cmd_info{'opts'}{'precompile'}) {
     $klass_type = 'klass||trait';
   } else {
     my $ast_path_var = [join '::', @{$$global_root_cmd{'asts'}}];
@@ -1935,6 +1936,7 @@ sub generics::klass_type_from_klass_name {
 }
 sub generics::klass_scope_from_klass_name {
   my ($klass_name, $type) = @_; # $type currently unused (should be 'klasses' or 'traits')
+  my $cmd_info = &root_cmd();
   my $klass_scope;
 
   # should use $type
@@ -1943,7 +1945,7 @@ sub generics::klass_scope_from_klass_name {
     $klass_scope = $$global_target_ast{'klasses'}{$klass_name};
   } elsif ($$global_target_ast{'traits'}{$klass_name}) {
     $klass_scope = $$global_target_ast{'traits'}{$klass_name};
-  } elsif ($ENV{'DKT_PRECOMPILE'}) {
+  } elsif ($$cmd_info{'opts'}{'precompile'}) {
     $klass_scope = {};
   } else {
     my $ast_path_var = [join '::', @{$$global_root_cmd{'asts'} ||= []}];

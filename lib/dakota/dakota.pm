@@ -760,7 +760,7 @@ sub start_cmd {
   }
   $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
   if ($$cmd_info{'output'}) {
-    if ($ENV{'DKT_PRECOMPILE'}) {
+    if ($$cmd_info{'opts'}{'precompile'}) {
       if (&is_debug()) {
         my $target_cc_path = &target_cc_path($cmd_info);
         print STDERR "creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
@@ -836,7 +836,7 @@ sub start_cmd {
       }
     }
   }
-  if (!$ENV{'DKT_PRECOMPILE'} && !$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
+  if (!$$cmd_info{'opts'}{'precompile'} && !$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
     if ($$cmd_info{'opts'}{'compile'}) {
       if ($want_separate_precompile_pass) {
         &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
@@ -1003,7 +1003,7 @@ sub gen_target {
       print $target_dk_path . $nl;
     }
     if (&is_debug()) {
-      if ($ENV{'DKT_PRECOMPILE'}) {
+      if ($$cmd_info{'opts'}{'precompile'}) {
         if ($is_defn) {
           print STDERR "  creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
         } else {
@@ -1058,7 +1058,7 @@ sub o_from_dk {
     }
     my $src_path = &cc_path_from_dk_path($input);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
-      if ($ENV{'DKT_PRECOMPILE'}) {
+      if ($$cmd_info{'opts'}{'precompile'}) {
         if (&is_out_of_date($input, $src_path)) {
           print $input . $nl;
         }
@@ -1069,7 +1069,7 @@ sub o_from_dk {
       }
     }
     if (!$$cmd_info{'opts'}{'silent'}) {
-      if ($ENV{'DKT_PRECOMPILE'}) {
+      if ($$cmd_info{'opts'}{'precompile'}) {
         if (&is_out_of_date($input, $src_path)) {
           print $src_path . $nl;
         }
@@ -1103,7 +1103,7 @@ sub o_from_dk {
       my $target_ast_path = &target_ast_path($cmd_info);
       &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, [ $hh_path, $src_path]);
     }
-    if ($ENV{'DKT_PRECOMPILE'}) {
+    if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
     } else {
       my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -1227,7 +1227,7 @@ sub target_from_ast {
   &check_path($target_ast_path);
   my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
   if (!$$cmd_info{'opts'}{'silent'}) {
-    if ($ENV{'DKT_PRECOMPILE'}) {
+    if ($$cmd_info{'opts'}{'precompile'}) {
       if ($is_defn) {
         if (&is_out_of_date($target_ast_path, $target_cc_path)) {
           print $target_cc_path . $nl;
@@ -1302,7 +1302,7 @@ sub target_from_ast {
   if ($$cmd_info{'opts'}{'compiler-flags'}) {
     $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
-  if ($is_defn && !$ENV{'DKT_PRECOMPILE'}) {
+  if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {
     &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
     &add_first($$cmd_info{'inputs'}, $target_o_path);
   }
@@ -1476,7 +1476,7 @@ sub ctlg_from_so {
   $$ctlg_cmd{'project.target'} = $$cmd_info{'project.target'};
   $$ctlg_cmd{'output-directory'} = $$cmd_info{'output-directory'};
 
-  if ($ENV{'DKT_PRECOMPILE'}) {
+  if ($$cmd_info{'opts'}{'precompile'}) {
     $$ctlg_cmd{'inputs'} = &precompiled_inputs($cmd_info);
   } else {
     $$ctlg_cmd{'inputs'} = $$cmd_info{'inputs'};
