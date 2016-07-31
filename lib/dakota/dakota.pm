@@ -81,6 +81,7 @@ our @EXPORT= qw(
                  is_dk_path
                  is_o_path
                  target_cc_path
+                 target_o_path
                  rel_target_hh_path
                  target_klass_func_defns_path
                  target_generic_func_defns_path
@@ -479,6 +480,12 @@ sub target_cc_path {
   }
   return $target_cc_path;
 }
+sub target_o_path {
+  my ($cmd_info, $target_cc_path) = @_;
+  # should look in project_io/project.io
+  my $target_o_path = &o_path_from_cc_path($target_cc_path);
+  return $target_o_path;
+}
 sub rel_target_hh_path {
   my ($cmd_info) = @_;
   my $target_cc_path = &target_cc_path($cmd_info);
@@ -702,7 +709,7 @@ sub update_target_ast_from_all_inputs {
 sub add_target_o_path_to_inputs {
   my ($cmd_info) = @_;
   my $target_cc_path = &target_cc_path($cmd_info);
-  my $target_o_path =  &o_path_from_cc_path($target_cc_path);
+  my $target_o_path =  &target_o_path($cmd_info, $target_cc_path);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     return if $input eq $target_o_path;
   }
@@ -1218,7 +1225,7 @@ sub target_from_ast {
   my $target_cc_path =  &target_cc_path($cmd_info);
   my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
   &check_path($target_ast_path);
-  my $target_o_path = &o_path_from_cc_path($target_cc_path);
+  my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
   if (!$$cmd_info{'opts'}{'silent'}) {
     if ($ENV{'DKT_PRECOMPILE'}) {
       if ($is_defn) {
