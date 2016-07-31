@@ -238,6 +238,11 @@ sub is_array {
   }
   return $state;
 }
+sub project_io_from_file {
+  my ($project_io_path) = @_;
+  my $project_io = &scalar_from_file($project_io_path);
+  return $project_io;
+}
 sub project_io_append {
   my ($line) = @_;
   $$line[-1] = 'undef' if ! $$line[-1];
@@ -245,7 +250,7 @@ sub project_io_append {
 }
 sub project_io_at {
   my ($project_io_path, $key) = @_;
-  my $project_io = &scalar_from_file($project_io_path);
+  my $project_io = &project_io_from_file($project_io_path);
   my $value = $$project_io{$key};
   return $value;
 }
@@ -256,7 +261,7 @@ sub project_io_assign {
     return;
   }
   $value = &canon_path($value);
-  my $project_io = &scalar_from_file($project_io_path);
+  my $project_io = &project_io_from_file($project_io_path);
   if (! $$project_io{$key} || $value ne $$project_io{$key}) {
     &project_io_append([$key, $value]);
     $$project_io{$key} = $value;
@@ -270,7 +275,7 @@ sub project_io_add {
   }
   $input = &canon_path($input);
   $depend = &canon_path($depend);
-  my $project_io = &scalar_from_file($project_io_path);
+  my $project_io = &project_io_from_file($project_io_path);
   if (! $$project_io{$key}{$input} || $depend ne $$project_io{$key}{$input}) {
     &project_io_append([$key, $input, $depend]);
     $$project_io{$key}{$input} = $depend;
@@ -284,7 +289,7 @@ sub project_io_add_all {
   }
   die if &is_array($input) && &is_array($depend);
   my $should_write = 0;
-  my $project_io = &scalar_from_file($project_io_path);
+  my $project_io = &project_io_from_file($project_io_path);
 
   if (&is_array($input)) {
     $depend = &canon_path($depend);
