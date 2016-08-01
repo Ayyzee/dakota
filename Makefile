@@ -43,6 +43,6 @@ precompile:
 	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso $@
 	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
 	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota $@
 	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/test $@
