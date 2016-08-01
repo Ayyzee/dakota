@@ -17,6 +17,7 @@
   'CXX_COMPILE_FLAGS' => [ '--compile', '-fPIC',
                            '--language=objective-c++',
                          ],
+  'CXX_DEFINE_MACRO_FLAGS' => [ '--define-macro' ],
   'CXX_FOR_LINKER_FLAGS' => [ '--for-linker' ],
   'CXX_INCLUDE_DIRECTORY_FLAGS' => [ '--include-directory' ],
   'CXX_LIBRARY_DIRECTORY_FLAGS' => [ '--library-directory' ],

@@ -10,12 +10,6 @@ include $(rootdir)/common.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
 target := lib$(target).$(so_ext)
 
-# include-dirs
-include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
-
-# macros
-macros := $(patsubst %,--define-macro %,$(macros))
-
 .PRECIOUS: %.project
 
 .PHONY:\
@@ -38,7 +32,7 @@ $(target): $(srcs)
 single: $(srcs) | default.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
-      $(DAKOTA-BASE) $(include-dirs) --compile --output $(builddir)/$$input.o $$input;\
+      $(DAKOTA-BASE) $(macros:%=--define-macro %) $(include-dirs:%=--include-directory %) --compile --output $(builddir)/$$input.o $$input;\
     fi\
   done
 	$(DAKOTA-BASE) --shared
