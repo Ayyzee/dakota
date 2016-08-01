@@ -7,9 +7,6 @@ builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
 include $(rootdir)/common.mk
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
 
-# include-dirs
-include-dirs := $(patsubst %,--include-directory %,$(include-dirs))
-
 .PRECIOUS: %.project
 
 .PHONY:\
