@@ -115,6 +115,7 @@ our @EXPORT= qw(
                  parameter_types_str
                  project_io_add
                  project_io_add_all
+                 project_io_remove
                  project_io_append
                  project_io_assign
                  project_io_from_file
@@ -642,6 +643,27 @@ sub project_io_assign {
     $$project_io{$key} = $value;
     &project_io_to_file($project_io_path, $project_io);
   }
+}
+sub project_io_remove {
+  my ($project_io, $key, $input) = @_;
+  if (&is_array($input)) {
+    foreach my $in (@$input) {
+      $in = &canon_path($in);
+      if ($$project_io{'compile'}{$in}) {
+        delete $$project_io{'compile'}{$in};
+      }
+    }
+  } else {
+    if ($$project_io{'compile'}{$input}) {
+      delete $$project_io{'compile'}{$input};
+    }
+  }
+}
+sub project_io_path_remove {
+  my ($project_io_path, $key, $input) = @_;
+  my $project_io = &project_io_from_file($project_io_path);
+  &project_io_remove($project_io, $key, $input);
+  &project_io_to_file($project_io_path, $project_io);
 }
 sub project_io_add {
   my ($project_io_path, $key, $input, $depend) = @_;
