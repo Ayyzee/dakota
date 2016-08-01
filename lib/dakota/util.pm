@@ -599,6 +599,16 @@ sub set_global_project_ast {
   $global_project_ast = &scalar_from_file($project_ast_path);
   return $global_project_ast;
 }
+sub is_array {
+  my ($ref) = @_;
+  my $state;
+  if ('ARRAY' eq ref($ref)) {
+    $state = 1;
+  } else {
+    $state = 0;
+  }
+  return $state;
+}
 sub project_io_from_file {
   my ($project_io_path) = @_;
   my $project_io = &scalar_from_file($project_io_path);

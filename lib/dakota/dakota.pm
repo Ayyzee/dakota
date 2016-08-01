@@ -228,16 +228,6 @@ sub loop_merged_ast_from_inputs {
     }
   }
 } # loop_merged_ast_from_inputs
-sub is_array {
-  my ($ref) = @_;
-  my $state;
-  if ('ARRAY' eq ref($ref)) {
-    $state = 1;
-  } else {
-    $state = 0;
-  }
-  return $state;
-}
 sub add_visibility_file {
   my ($arg) = @_;
   #print STDERR "&add_visibility_file(path=\"$arg\")\n";
