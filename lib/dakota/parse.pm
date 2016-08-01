@@ -28,16 +28,6 @@ use strict;
 use warnings;
 use sort 'stable';
 
-$main::seq = qr{ # same code in rewrite.pm
-                 \[
-                 (?:
-                   (?> [^\[\]]+ )     # Non-parens without backtracking
-                 |
-                   (??{ $main::seq }) # Group with matching parens
-                 )*
-                 \]
-             }x;
-
 my $gbl_compiler;
 my $gbl_header_from_symbol;
 my $gbl_used;

@@ -370,8 +370,7 @@ sub create_missing_project {
       print STDERR __FILE__ . ':' . __LINE__ . ": skipping input $input" . $nl;
     }
   }
-  my $original_state;
-  &scalar_to_file($project_path, $project, $original_state = 1);
+  &scalar_to_file($project_path, $project);
   return $project_path;
 }
 sub project_base {
@@ -432,7 +431,6 @@ sub use_project {
   $$root_cmd{'project.target'} = $$project{'target'};
   $$root_cmd{'project.io'} = $$project{'builddir'} . '/' . $$root_cmd{'opts'}{'project'} =~ s/\.project$/\.io/r;
   $project_io_path = $$root_cmd{'project.io'};
-  my $original_state;
   if (! -e $project_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},

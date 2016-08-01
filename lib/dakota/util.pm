@@ -1120,14 +1120,11 @@ sub filestr_to_file {
   }
 }
 sub scalar_to_file {
-  my ($file, $ref, $original_state) = @_;
+  my ($file, $ref) = @_;
   if (!defined $ref) {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file(\"$file\", $ref)\n";
   }
   my $refstr = &Dumper($ref);
-  if (!$original_state) {
-    $refstr =~ s/($main::seq)/&unwrap_seq($1)/ges; # unwrap sequences so they are only one line long (or one long line) :-)
-  }
   &filestr_to_file($refstr, $file);
 }
 sub scalar_from_file {
