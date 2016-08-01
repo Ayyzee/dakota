@@ -63,6 +63,9 @@ sub start {
   $$result{'inputs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'inputs'}} ] if $$build{'inputs'};
   $$result{'srcs'} =   [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'srcs'}}   ] if $$build{'srcs'};
   $$result{'libs'} =   [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'libs'}}   ] if $$build{'libs'};
+  $$result{'lib-dirs'} =     [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'lib-dirs'}}     ] if $$build{'lib-dirs'};
+  $$result{'include-dirs'} = [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'include-dirs'}} ] if $$build{'include-dirs'};
+  $$result{'macros'} =       [ map { &canon_path(&subst($_, $$opts{'var'})) } @{$$build{'macros'}}       ] if $$build{'macros'};
   $$result{'builddir'} = &canon_path(&subst($$build{'builddir'}, $$opts{'var'})) if $$build{'builddir'};
   $$result{'output'} =   &canon_path(&subst($$build{'output'},   $$opts{'var'})) if $$build{'output'};
   $$result{'target'} =   &canon_path(&subst($$build{'target'},   $$opts{'var'})) if $$build{'target'};
