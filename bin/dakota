@@ -43,7 +43,7 @@ sub dk_prefix {
   } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
     &dk_prefix($path);
   } else {
-    die "Could not determine \$prefix from executable path $0: $!\n";
+    die "Could not determine \$prefix from executable path $0: $!" . $nl;
   }
 }
 
@@ -61,10 +61,10 @@ my ( $id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
 $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
-  or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
+  or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!" . $nl;
 {
   my $platform = do "$gbl_prefix/lib/dakota/platform.json"
-    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
+    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!" . $nl;
   my ($key, $values);
   while (($key, $values) = each (%$platform)) {
     $$gbl_compiler{$key} = $values;
@@ -242,7 +242,7 @@ if (0) {
     if (! &is_abs($project_input)) {
       my $input = $dir . '/' . $project_input;
       if (! -e $input) {
-        print STDERR $0 . ': error: no-such-file: ' . $input . $nl;
+        print STDERR $0 . ": error: no-such-file: $input" . $nl;
       }
       $$root_cmd{'project.inputs'}[$i] = $input;
     }
@@ -253,7 +253,7 @@ if ($$root_cmd{'opts'}{'target'} && $$root_cmd{'opts'}{'output'}) {
 }
 if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
   if (1 >= scalar $$root_cmd{'project.inputs'}) {
-    die "$0: error: inputs are requried either in the project file or the command line.\n";
+    die "$0: error: inputs are requried either in the project file or the command line." . $nl;
   } else {
     $inputs = $$root_cmd{'project.inputs'};
     $$root_cmd{'inputs'} = [];
@@ -358,12 +358,12 @@ sub create_missing_project {
   }
   $project_path = $default_project_path;
   if (-e $project_path) {
-    print STDERR $0 . ": info: found $project_path; using for missing --project <>.\n";
+    print STDERR $0 . ": info: found $project_path; using for missing --project <>." . $nl;
     return $project_path;
   } elsif ($$root_cmd{'opts'}{'compile'}) {
-    print STDERR $0 . ": warning: missing --project <file> (creating default $project_path).\n";
+    print STDERR $0 . ": warning: missing --project <file> (creating default $project_path)." . $nl;
   } else {
-    print STDERR $0 . ": info: missing --project <file> (creating default $project_path).\n";
+    print STDERR $0 . ": info: missing --project <file> (creating default $project_path)." . $nl;
   }
   }
   # create and write a default project file
@@ -371,7 +371,7 @@ sub create_missing_project {
     if ($input =~ m/\.(dk|$so_ext)$/) {
       add_last($$project{'inputs'}, $input);
     } else {
-      print __FILE__ . ":" . __LINE__ . ": skipping input $input\n";
+      print STDERR __FILE__ . ':' . __LINE__ . ": skipping input $input" . $nl;
     }
   }
   my $original_state;
@@ -488,9 +488,9 @@ sub default_target {
     $output = &project_base($inputs);
     if ($$root_cmd{'opts'}{'shared'}) {
       $output .= ".$so_ext";
-      print "using implicit lib name: $output\n";
+      print STDERR $0 . ": info: using implicit lib name: $output" . $nl;
     } else {
-      print "using implicit exe name: $output\n";
+      print STDERR $0 . ": info: using implicit exe name: $output" . $nl;
     }
   }
   return $output;
