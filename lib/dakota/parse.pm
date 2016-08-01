@@ -28,7 +28,7 @@ use strict;
 use warnings;
 use sort 'stable';
 
-$main::seq = qr{
+$main::seq = qr{ # same code in rewrite.pm
                  \[
                  (?:
                    (?> [^\[\]]+ )     # Non-parens without backtracking
@@ -155,7 +155,7 @@ our @EXPORT= qw(
                  colout
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
-                 user_path_from_any_path
+                 srcs_cc_path_from_dk_path
                  hh_path_from_cc_path
                  hh_path_from_src_path
                  init_global_target_ast
@@ -373,11 +373,12 @@ sub str_from_cmd_info {
   $str =~ s|(\s)\s+|$1|g;
   return $str;
 }
-sub user_path_from_any_path {
+sub srcs_cc_path_from_dk_path {
   my ($path) = @_;
   my ($dir, $name) = &split_path($path);
-  my $user_path = &builddir() . '/' . $dir . '/+srcs/'. $name;
-  return &canon_path($user_path);
+  $name =~ s/\.dk$/.$cc_ext/;
+  my $srcs_cc_path = &builddir() . '/' . $dir . '/+srcs/'. $name;
+  return &canon_path($srcs_cc_path);
 }
 sub o_path_from_dk_path {
   my ($path) = @_;

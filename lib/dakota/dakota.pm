@@ -480,16 +480,18 @@ sub loop_cc_from_dk {
       $cc_path = "$input_dir/$input_name.$cc_ext";
     }
     my $target_ast_path = &target_ast_path($cmd_info);
-    my $user_dk_path = &user_path_from_any_path($input);
+    my $srcs_cc_path = &srcs_cc_path_from_dk_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,           $user_dk_path);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $user_dk_path);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,           $srcs_cc_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $srcs_cc_path);
     &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $cc_path);
+    if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
+      &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
+    }
 
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input, $user_dk_path, $global_target_ast);
+    &dakota::generate::dk_generate_cc($input, $srcs_cc_path, $global_target_ast);
     &src::add_extra_symbols($file);
     &src::add_extra_klass_decls($file);
     &src::add_extra_keywords($file);
@@ -960,7 +962,7 @@ sub o_from_dk {
     }
     $outfile = $input;
   } else {
-    my $user_dk_path = &user_path_from_any_path($input);
+    my $srcs_cc_path = &srcs_cc_path_from_dk_path($input);
     my $o_path;
     if ($$cmd_info{'output'} && &is_o_path($$cmd_info{'output'})) {
       $o_path = $$cmd_info{'output'};
@@ -1012,7 +1014,10 @@ sub o_from_dk {
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_ast_path = &target_ast_path($cmd_info);
-      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, [ $hh_path, $src_path]);
+      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $src_path);
+      if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
+      }
     }
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
@@ -1024,14 +1029,15 @@ sub o_from_dk {
       delete $$o_cmd{'opts'}{'output'};
       $num_out_of_date_infiles = &o_from_cc($o_cmd, &compile_opts_path(), $cxx_compile_flags);
 
-      &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path);
-
+      &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path); # should also be in dk
       if ($num_out_of_date_infiles) {
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
-        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $hh_path,      $o_path);
-        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $user_dk_path, $o_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $srcs_cc_path, $o_path);
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $src_path);
-        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
+        if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
+          &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
+          &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $hh_path,      $o_path);
+        }
       }
       $outfile = $$o_cmd{'output'};
     }
@@ -1173,8 +1179,6 @@ sub target_from_ast {
 
   if ($is_defn) {
     &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_cc_path);
-    &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', [ $target_hh_path, $target_cc_path ],  $target_o_path);
-    &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
   my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
@@ -1200,6 +1204,7 @@ sub target_from_ast {
   &dakota::generate::generate_target_decl($target_cc_path, $file, $project_ast = undef, $is_exe);
   if ($is_defn) {
     &dakota::generate::generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
+    &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
 
   my $o_info = {'opts' => {}, 'inputs' => [ $target_cc_path ], 'output' => $target_o_path };
@@ -1216,6 +1221,8 @@ sub target_from_ast {
   if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {
     &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
     &add_first($$cmd_info{'inputs'}, $target_o_path);
+    &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', [ $target_hh_path, $target_cc_path ],  $target_o_path);
+    &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $target_cc_path, $target_o_path); # should also be in dk
   }
 }
 sub gcc_libraries_str {

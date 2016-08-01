@@ -92,7 +92,7 @@ $main::list_in = qr{
                      )*
                  }x;
 
-$main::seq = qr{
+$main::seq = qr{ # same code in parse.pm
                  \[
                  (?:
                    (?> [^\[\]]+ )         # Non-parens without backtracking

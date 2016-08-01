@@ -25,6 +25,32 @@
 use strict;
 use warnings;
 
+my $gbl_prefix;
+my $nl = "\n";
+my $cc_ext = 'cc';
+my $o_ext =   'o';
+my $so_ext = 'so';
+
+sub dk_prefix {
+  my ($path) = @_;
+  $path =~ s|//+|/|;
+  $path =~ s|/\./+|/|;
+  $path =~ s|^./||;
+  if (-d "$path/bin" && -d "$path/lib") {
+    return $path
+  } elsif ($path =~ s|^(.+?)/+[^/]+$|$1|) {
+    &dk_prefix($path);
+  } else {
+    die "Could not determine \$prefix from executable path $0: $!" . $nl;
+  }
+}
+
+BEGIN {
+  $gbl_prefix = &dk_prefix($0);
+  unshift @INC, "$gbl_prefix/lib";
+};
+use dakota::util;
+
 use Data::Dumper;
 $Data::Dumper::Terse     = 1;
 $Data::Dumper::Deepcopy  = 1;
@@ -32,10 +58,6 @@ $Data::Dumper::Purity    = 1;
 $Data::Dumper::Quotekeys = 1;
 $Data::Dumper::Indent    = 0; # default = 2
 
-my $nl = "\n";
-my $cc_ext = 'cc';
-my $o_ext =   'o';
-my $so_ext = 'so';
 sub path_opt {
   my ($cmd, $ir, $short, $long, $info) = @_;
   my $arg = $$cmd[$$ir];
@@ -178,8 +200,24 @@ sub detect_gcc_opts {
   }
   return $ordered_input_args;
 }
+sub project_io_path_from_project_path {
+  my ($project_path) = @_;
+  my $project = &dakota::util::scalar_from_file($project_path);
+  my $builddir = 'dkt';
+  $builddir = $$project{'builddir'} if $$project{'builddir'};
+  my $project_io_path = $builddir . '/' . $project_path;
+  $project_io_path =~ s/\.project$/.io/;
+  return $project_io_path;
+}
+sub is_so_path {
+  my ($name) = @_;
+  # linux and darwin so-regexs are combined
+  my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
+  #my $libname = $2 . ".$so_ext";
+  return $result;
+}
 my $verbose = 1;
-sub convert_cmd {
+sub convert_and_exec_cmd {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
   if ($verbose) {
@@ -211,7 +249,21 @@ sub convert_cmd {
   if ($verbose) {
     print '# 3/3 ' . join(' ', @$gcc_cmd) . $nl;
   }
-  return $gcc_cmd;
+  my $exit_val = system @$gcc_cmd;
+  if (!$exit_val) {
+    my $inputs = [];
+    my $output = $$info{'output'}[1];
+    foreach my $pair (@{$$info{'inputs'}}) {
+      my $input = &relpath($$pair[1]);
+      if ($input =~ /\.(dk|$cc_ext)$/) {
+        push @$inputs, $input;
+      }
+    }
+    if (0 != @$inputs && !&is_so_path($output)) {
+      my $project_io_path = &project_io_path_from_project_path($project);
+      &dakota::util::project_io_add($project_io_path, 'compile', $inputs, $output);
+    }
+  }
+  return $exit_val;
 }
-my $args = &convert_cmd(\@ARGV);
-system @$args;
+exit &convert_and_exec_cmd(\@ARGV);

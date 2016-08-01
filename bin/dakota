@@ -203,19 +203,15 @@ if ($project) {
     }
   }
   if ($$root_cmd{'opts'}{'output'} && $$root_cmd{'opts'}{'compile'}) {
-    if (1 == scalar @$inputs && &is_dk_path($$inputs[0])) {
-      $$project_io{'compile'}{$$inputs[0]} = $$root_cmd{'opts'}{'output'};
+    if (1 == scalar @$inputs && &is_dk_path($$inputs[0]) && !$$root_cmd{'opts'}{'precompile'}) {
+      &dakota::util::project_io_add($$root_cmd{'project.io'}, 'compile', $$inputs[0], $$root_cmd{'opts'}{'output'});
       my $original_state;
-      &scalar_to_file($project_io_path, $project_io, $original_state = 1);
+      &dakota::util::project_io_to_file($project_io_path, $project_io);
     }
   }
 }
 if (!$$root_cmd{'opts'}{'compile'} && scalar values %{$$project_io{'compile'}}) {
-  foreach my $input (@$inputs) {
-    if ($$project_io{'compile'}{$input}) {
-      delete $$project_io{'compile'}{$input};
-    }
-  }
+  &dakota::util::project_io_remove($project_io, 'compile', $inputs);
   push @$inputs, values %{$$project_io{'compile'}};
   foreach my $input (@{$$project{'inputs'}}) {
     if ($input =~ /\.$so_ext$/) { # is_so_path()
@@ -441,14 +437,14 @@ sub use_project {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},
                                'target' => &lib_from_lib_name($$project{'target'}), 'builddir' => undef };
-    &scalar_to_file($project_io_path, $default_project_io, $original_state = 1);
+    &dakota::util::project_io_to_file($project_io_path, $default_project_io);
   }
-  $project_io = &scalar_from_file($project_io_path);
+  $project_io = &dakota::util::project_io_from_file($project_io_path);
   $$project_io{'inputs'} = { map { &canon_path($_) => &find_library($_, $$root_cmd{'opts'}{'found-library'}) } @{$$project{'inputs'}} };
   if ($$project{'builddir'}) {
     $$project_io{'builddir'} = &canon_path($$project{'builddir'});
   }
-  &scalar_to_file($project_io_path, $project_io, $original_state = 1);
+  &dakota::util::project_io_to_file($project_io_path, $project_io);
   return ($project, $project_io);
 } # use_project
 sub project_clean {
@@ -472,11 +468,15 @@ sub project_clean {
     $$project_io{'all'} = {};
     $$project_io{'compile'} = {};
     my $original_state;
-    &scalar_to_file($project_io_path, $project_io, $original_state = 1);
+    &dakota::util::project_io_to_file($project_io_path, $project_io);
   }
   foreach my $path (sort keys %$remove) {
-    print "rm $path\n";
-    unlink $path;
+    if (! -e $path) {
+      print STDERR $0 . ": warning: rm $path # no-such-file" . $nl;
+    } else {
+      print "rm $path" . $nl;
+      unlink $path;
+    }
   }
 }
 sub default_target {

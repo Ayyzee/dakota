@@ -630,7 +630,7 @@ sub project_io_at {
   my $value = $$project_io{$key};
   return $value;
 }
-my $skip_project_io_write = 1;
+my $skip_project_io_write = 0;
 sub project_io_assign {
   my ($project_io_path, $key, $value) = @_;
   if ($skip_project_io_write) {
@@ -670,14 +670,21 @@ sub project_io_add {
   if ($skip_project_io_write) {
     return;
   }
-  $input = &canon_path($input);
   $depend = &canon_path($depend);
   my $project_io = &project_io_from_file($project_io_path);
-  if (! $$project_io{$key}{$input} || $depend ne $$project_io{$key}{$input}) {
+  $depend = &canon_path($depend);
+  if (&is_array($input)) {
+    foreach my $in (@$input) {
+      $in = &canon_path($in);
+      &project_io_append([$key, $in, $depend]);
+      $$project_io{$key}{$in} = $depend;
+    }
+  } else {
+    $input = &canon_path($input);
     &project_io_append([$key, $input, $depend]);
     $$project_io{$key}{$input} = $depend;
-    &project_io_to_file($project_io_path, $project_io);
   }
+  &project_io_to_file($project_io_path, $project_io);
 }
 sub project_io_add_all {
   my ($project_io_path, $key, $input, $depend) = @_;
@@ -1115,7 +1122,7 @@ sub filestr_to_file {
 sub scalar_to_file {
   my ($file, $ref, $original_state) = @_;
   if (!defined $ref) {
-    print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file($ref)\n";
+    print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file(\"$file\", $ref)\n";
   }
   my $refstr = &Dumper($ref);
   if (!$original_state) {
