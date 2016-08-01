@@ -92,6 +92,11 @@ sub build_precompile_cmd {
   if ($project) {
     push @$cmd, ('--project', $project);
   }
+  if ($$info{'define-macro'}) {
+    foreach my $macro (@{$$info{'define-macro'}}) {
+      push @$cmd, ('--define-macro', $$macro[1]);
+    }
+  }
   push @$cmd, '--precompile';
   if ($$info{'major-mode'}) {
     push @$cmd, '--' . $$info{'major-mode'}[1];
@@ -148,6 +153,7 @@ sub detect_gcc_opts {
   my ($cmd, $info) = @_;
   $$info{'library-directory'} = [];
   $$info{'library'} = [];
+  $$info{'define-macro'} = [];
   $$info{'inputs'} = [];
   my $ordered_input_args = [];
   for (my $i = 1; $i < @$cmd; $i++) {
@@ -157,9 +163,10 @@ sub detect_gcc_opts {
     } elsif ($$major_mode_tbl{$arg}) {
       $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
     } elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
-      push @$ordered_input_args, '--library-directory=' . $$pair[1];
+      push @$ordered_input_args, ('--library-directory', $$pair[1]);
     } elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
-      push @$ordered_input_args, '--library=' . $$pair[1];
+      push @$ordered_input_args, ('--library', $$pair[1]);
+    } elsif (&path_opt($cmd, \$i, 'D', 'define-macro',      $info)) {
     } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
     } elsif ($arg !~ /^-/) {
       if ($arg =~ /^([^\s]+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
