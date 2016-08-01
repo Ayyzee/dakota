@@ -807,7 +807,9 @@ sub start_cmd {
   my $is_exe = &is_exe($cmd_info);
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
-      &gen_target_hh($cmd_info, $is_exe);
+      if (! &project_io_at($$cmd_info{'project.io'}, 'target-hh')) {
+        &gen_target_hh($cmd_info, $is_exe);
+      }
     }
   }
   if ($should_lock) {
