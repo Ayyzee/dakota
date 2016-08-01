@@ -16,11 +16,11 @@ all \
 check \
 clean \
 no-project:
-	time $(MAKE) $(MAKEFLAGS) --directory lib $@
-	time $(MAKE) $(MAKEFLAGS) --directory exe $@
+	$(MAKE) $(MAKEFLAGS) --directory lib $@
+	$(MAKE) $(MAKEFLAGS) --directory exe $@
 
 check-exe: check
-	time $(MAKE) $(MAKEFLAGS) --directory exe $@
+	$(MAKE) $(MAKEFLAGS) --directory exe $@
 
 install: all
 uninstall:

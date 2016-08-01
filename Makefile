@@ -18,18 +18,18 @@ include $(rootdir)/makeflags.mk
 
 all:
 	sudo true # so password prompt is immediate
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso all install
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog all install
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library all install
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso all install
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog all install
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library all install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core all install
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota all install
 
 uninstall:
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
 
 check \
 check-exe \
@@ -40,9 +40,9 @@ goal-clean \
 install \
 installcheck \
 precompile:
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dso $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota-core $@
 	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/dakota $@
-	time $(MAKE) $(MAKEFLAGS) --directory $(rootdir)/test $@
+	$(MAKE) $(MAKEFLAGS) --directory $(rootdir)/test $@
