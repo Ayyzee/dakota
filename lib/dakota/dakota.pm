@@ -238,96 +238,6 @@ sub is_array {
   }
   return $state;
 }
-sub project_io_from_file {
-  my ($project_io_path) = @_;
-  my $project_io = &scalar_from_file($project_io_path);
-  return $project_io;
-}
-sub project_io_to_file {
-  my ($project_io_path, $project_io) = @_;
-  &scalar_to_file($project_io_path, $project_io);
-}
-sub project_io_append {
-  my ($line) = @_;
-  $$line[-1] = 'undef' if ! $$line[-1];
-  #print STDERR join(' ', @$line) . $nl;
-}
-sub project_io_at {
-  my ($project_io_path, $key) = @_;
-  my $project_io = &project_io_from_file($project_io_path);
-  my $value = $$project_io{$key};
-  return $value;
-}
-my $skip_project_io_write = 1;
-sub project_io_assign {
-  my ($project_io_path, $key, $value) = @_;
-  if ($skip_project_io_write) {
-    return;
-  }
-  $value = &canon_path($value);
-  my $project_io = &project_io_from_file($project_io_path);
-  if (! $$project_io{$key} || $value ne $$project_io{$key}) {
-    &project_io_append([$key, $value]);
-    $$project_io{$key} = $value;
-    &project_io_to_file($project_io_path, $project_io);
-  }
-}
-sub project_io_add {
-  my ($project_io_path, $key, $input, $depend) = @_;
-  if ($skip_project_io_write) {
-    return;
-  }
-  $input = &canon_path($input);
-  $depend = &canon_path($depend);
-  my $project_io = &project_io_from_file($project_io_path);
-  if (! $$project_io{$key}{$input} || $depend ne $$project_io{$key}{$input}) {
-    &project_io_append([$key, $input, $depend]);
-    $$project_io{$key}{$input} = $depend;
-    &project_io_to_file($project_io_path, $project_io);
-  }
-}
-sub project_io_add_all {
-  my ($project_io_path, $key, $input, $depend) = @_;
-  if ($skip_project_io_write) {
-    return;
-  }
-  die if &is_array($input) && &is_array($depend);
-  my $should_write = 0;
-  my $project_io = &project_io_from_file($project_io_path);
-
-  if (&is_array($input)) {
-    $depend = &canon_path($depend);
-    foreach my $in (@$input) {
-      $in = &canon_path($in);
-      if (!exists $$project_io{$key}{$in}{$depend}) {
-        &project_io_append([$key, $in, $depend, undef]);
-        $$project_io{$key}{$in}{$depend} = undef;
-        $should_write = 1;
-      }
-    }
-  } elsif (&is_array($depend)) {
-    $input = &canon_path($input);
-    foreach my $dp (@$depend) {
-      $dp = &canon_path($dp);
-      if (!exists $$project_io{$key}{$input}{$dp}) {
-        &project_io_append([$key, $input, $dp, undef]);
-        $$project_io{$key}{$input}{$dp} = undef;
-        $should_write = 1;
-      }
-    }
-  } else {
-    $input = &canon_path($input);
-    $depend = &canon_path($depend);
-    if (!exists $$project_io{$key}{$input}{$depend}) {
-      &project_io_append([$key, $input, $depend, undef]);
-      $$project_io{$key}{$input}{$depend} = undef;
-      $should_write = 1;
-    }
-  }
-  if ($should_write) {
-    &project_io_to_file($project_io_path, $project_io);
-  }
-}
 sub add_visibility_file {
   my ($arg) = @_;
   #print STDERR "&add_visibility_file(path=\"$arg\")\n";
@@ -807,7 +717,7 @@ sub start_cmd {
   my $is_exe = &is_exe($cmd_info);
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
-      if (! &project_io_at($$cmd_info{'project.io'}, 'target-hh')) {
+      if (! &dakota::util::project_io_at($$cmd_info{'project.io'}, 'target-hh')) {
         &gen_target_hh($cmd_info, $is_exe);
       }
     }
@@ -826,7 +736,7 @@ sub start_cmd {
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'init'}) {
-        if (! &project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
+        if (! &dakota::util::project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
           &gen_target_o($cmd_info, $is_exe);
         }
       }
@@ -841,7 +751,7 @@ sub start_cmd {
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'init'}) {
-        if (! &project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
+        if (! &dakota::util::project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
           &gen_target_o($cmd_info, $is_exe);
         }
       }
@@ -906,9 +816,9 @@ sub loop_ast_from_so {
       my $ctlg_path = &ctlg_path_from_so_path($input);
       my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
       $input = &canon_path($input);
-      &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
-      &project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
-      &project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,  $target_ast_path);
+      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
+      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
+      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,  $target_ast_path);
     }
   }
   return $cmd_info;
@@ -933,23 +843,23 @@ sub ast_from_inputs {
   if ($result) {
     if (0 != @{$$ast_cmd{'asts'} ||= []}) {
       my $target_ast_path = &target_ast_path($cmd_info);
-      &project_io_add_all($$cmd_info{'project.io'}, 'all', $$ast_cmd{'asts'}, $target_ast_path);
+      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $$ast_cmd{'asts'}, $target_ast_path);
     }
     foreach my $input (@{$$ast_cmd{'inputs'}}) {
       if (&is_so_path($input)) {
         my $ctlg_path = &ctlg_path_from_so_path($input);
         my $ast_path = &ast_path_from_ctlg_path($ctlg_path);
         &check_path($ast_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
       } elsif (&is_dk_path($input)) {
         my $ast_path = &ast_path_from_dk_path($input);
         &check_path($ast_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
       } elsif (&is_ctlg_path($input)) {
         my $ast_path = &ast_path_from_ctlg_path($input);
         &check_path($ast_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
       } else {
         #print "skipping $input, line=" . __LINE__ . $nl;
       }
@@ -1099,7 +1009,7 @@ sub o_from_dk {
       $$ast_cmd{'project.io'} =  $$cmd_info{'project.io'};
       $num_out_of_date_infiles = &ast_from_inputs($ast_cmd);
       if ($num_out_of_date_infiles) {
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $ast_path);
       }
       &ordered_set_add($$cmd_info{'asts'}, $ast_path, __FILE__, __LINE__);
     }
@@ -1112,7 +1022,7 @@ sub o_from_dk {
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
       my $target_ast_path = &target_ast_path($cmd_info);
-      &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, [ $hh_path, $src_path]);
+      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, [ $hh_path, $src_path]);
     }
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
@@ -1124,14 +1034,14 @@ sub o_from_dk {
       delete $$o_cmd{'opts'}{'output'};
       $num_out_of_date_infiles = &o_from_cc($o_cmd, &compile_opts_path(), $cxx_compile_flags);
 
-      &project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path);
+      &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path);
 
       if ($num_out_of_date_infiles) {
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $hh_path,      $o_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $user_dk_path, $o_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $src_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $hh_path,      $o_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $user_dk_path, $o_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $src_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
       }
       $outfile = $$o_cmd{'output'};
     }
@@ -1268,13 +1178,13 @@ sub target_from_ast {
       }
     }
   }
-  &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_hh_path);
-  &project_io_assign($$cmd_info{'project.io'}, 'target-hh', $target_hh_path);
+  &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_hh_path);
+  &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-hh', $target_hh_path);
 
   if ($is_defn) {
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_cc_path);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', [ $target_hh_path, $target_cc_path ],  $target_o_path);
-    &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
+    &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_cc_path);
+    &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', [ $target_hh_path, $target_cc_path ],  $target_o_path);
+    &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
   my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
@@ -1369,7 +1279,7 @@ sub linked_output_from_o {
   }
   my $result = &outfile_from_infiles($cmd, $should_echo);
   if ($result) {
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $$cmd{'inputs'}, $$cmd{'output'});
+    &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $$cmd{'inputs'}, $$cmd{'output'});
   }
   return $result;
 }
@@ -1451,12 +1361,12 @@ sub outfile_from_infiles {
     }
 
     if (0) {
-      &project_io_add_all($$cmd_info{'project.io'}, 'all', $infiles, $output);
+      &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $infiles, $output);
     } else {
       foreach my $input (@$infiles) {
         $input =~ s=^--library-directory\s+(.+)\s+-l(.+)$=$1/lib$2.$so_ext=;
         $input = &canon_path($input);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $output);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $input, $output);
       }
     }
   }
@@ -1511,8 +1421,8 @@ sub precompiled_inputs {
 
         $input = &canon_path($input);
 
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
-        &project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $input,     $ctlg_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ctlg_path, $ast_path);
       } elsif (&is_dk_src_path($input)) {
         $ast_path = &ast_path_from_dk_path($input);
         &check_path($ast_path);

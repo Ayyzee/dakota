@@ -113,6 +113,12 @@ our @EXPORT= qw(
                  builddir
                  pann
                  parameter_types_str
+                 project_io_add
+                 project_io_add_all
+                 project_io_append
+                 project_io_assign
+                 project_io_from_file
+                 project_io_to_file
                  rel_path_canon
                  relpath
                  remove_extra_whitespace
@@ -592,6 +598,96 @@ sub set_global_project_ast {
   my ($project_ast_path) = @_;
   $global_project_ast = &scalar_from_file($project_ast_path);
   return $global_project_ast;
+}
+sub project_io_from_file {
+  my ($project_io_path) = @_;
+  my $project_io = &scalar_from_file($project_io_path);
+  return $project_io;
+}
+sub project_io_to_file {
+  my ($project_io_path, $project_io) = @_;
+  &scalar_to_file($project_io_path, $project_io);
+}
+sub project_io_append {
+  my ($line) = @_;
+  $$line[-1] = 'undef' if ! $$line[-1];
+  #print STDERR join(' ', @$line) . $nl;
+}
+sub project_io_at {
+  my ($project_io_path, $key) = @_;
+  my $project_io = &project_io_from_file($project_io_path);
+  my $value = $$project_io{$key};
+  return $value;
+}
+my $skip_project_io_write = 1;
+sub project_io_assign {
+  my ($project_io_path, $key, $value) = @_;
+  if ($skip_project_io_write) {
+    return;
+  }
+  $value = &canon_path($value);
+  my $project_io = &project_io_from_file($project_io_path);
+  if (! $$project_io{$key} || $value ne $$project_io{$key}) {
+    &project_io_append([$key, $value]);
+    $$project_io{$key} = $value;
+    &project_io_to_file($project_io_path, $project_io);
+  }
+}
+sub project_io_add {
+  my ($project_io_path, $key, $input, $depend) = @_;
+  if ($skip_project_io_write) {
+    return;
+  }
+  $input = &canon_path($input);
+  $depend = &canon_path($depend);
+  my $project_io = &project_io_from_file($project_io_path);
+  if (! $$project_io{$key}{$input} || $depend ne $$project_io{$key}{$input}) {
+    &project_io_append([$key, $input, $depend]);
+    $$project_io{$key}{$input} = $depend;
+    &project_io_to_file($project_io_path, $project_io);
+  }
+}
+sub project_io_add_all {
+  my ($project_io_path, $key, $input, $depend) = @_;
+  if ($skip_project_io_write) {
+    return;
+  }
+  die if &is_array($input) && &is_array($depend);
+  my $should_write = 0;
+  my $project_io = &project_io_from_file($project_io_path);
+
+  if (&is_array($input)) {
+    $depend = &canon_path($depend);
+    foreach my $in (@$input) {
+      $in = &canon_path($in);
+      if (!exists $$project_io{$key}{$in}{$depend}) {
+        &project_io_append([$key, $in, $depend, undef]);
+        $$project_io{$key}{$in}{$depend} = undef;
+        $should_write = 1;
+      }
+    }
+  } elsif (&is_array($depend)) {
+    $input = &canon_path($input);
+    foreach my $dp (@$depend) {
+      $dp = &canon_path($dp);
+      if (!exists $$project_io{$key}{$input}{$dp}) {
+        &project_io_append([$key, $input, $dp, undef]);
+        $$project_io{$key}{$input}{$dp} = undef;
+        $should_write = 1;
+      }
+    }
+  } else {
+    $input = &canon_path($input);
+    $depend = &canon_path($depend);
+    if (!exists $$project_io{$key}{$input}{$depend}) {
+      &project_io_append([$key, $input, $depend, undef]);
+      $$project_io{$key}{$input}{$depend} = undef;
+      $should_write = 1;
+    }
+  }
+  if ($should_write) {
+    &project_io_to_file($project_io_path, $project_io);
+  }
 }
 sub is_va {
   my ($method) = @_;
