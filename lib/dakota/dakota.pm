@@ -805,7 +805,7 @@ sub start_cmd {
   &set_global_project_ast($target_ast_path);
 
   my $is_exe = &is_exe($cmd_info);
-  if ($ENV{'DK_TARGET_COMMON_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
+  if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
       &gen_target_hh($cmd_info, $is_exe);
     }

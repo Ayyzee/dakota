@@ -81,7 +81,7 @@
       '$(srcdir)/../include',
     ],
     'macros' => [ # cmd-line
-      'DK_TARGET_COMMON_HEADER=1',
+      'DK_SRC_UNIQUE_HEADER=0',
     ],
     'target' => 'dakota-core', # cmd-line
     'target.lib?' => 1,
