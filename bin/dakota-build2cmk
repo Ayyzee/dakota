@@ -50,7 +50,6 @@ sub start {
   my ($argv) = @_;
   my $build = &scalar_from_file($$argv[0]);
   my $file = $$argv[1];
-  my $build = &scalar_from_file($$argv[1]);
   if (3 == scalar @ARGV) {
     my $name = $$argv[2];
     $build = $$build{$name};
