@@ -120,6 +120,7 @@
         '$(DESTDIR)$(prefix)/bin/dakota',
         '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr',
         '$(DESTDIR)$(prefix)/bin/dakota-build',
+        '$(DESTDIR)$(prefix)/bin/dakota-build2cmk',
         '$(DESTDIR)$(prefix)/bin/dakota-build2mk',
         '$(DESTDIR)$(prefix)/bin/dakota-build2project',
         '$(DESTDIR)$(prefix)/bin/dk',
