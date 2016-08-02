@@ -40,7 +40,8 @@
       #'DK_INLINE_KLASS_FUNCS=0',
     ],
     'target' => 'dakota', # cmd-line
-    'target.lib?' => 1,
+    'target.lib?' => 1, # MUST REMOVE
+    'is-lib' => 1,
     'compatibility-version' => '1.0.0',                      # cmd-line
     'current-version' =>       '1.0.0',                      # cmd-line
     'soname' => 'libdakota.$(so_ext)', # cmd-line

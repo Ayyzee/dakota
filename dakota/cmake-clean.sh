@@ -10,4 +10,6 @@ rm -f  install_manifest.txt
 rm -f  Makefile
 rm -f  CMakeCache.txt
 rm -fr CMakeFiles
+rm -f  default.cmk
+rm -f  default.project
 rm -fr $builddir # created by dakota

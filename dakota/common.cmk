@@ -1,35 +1,17 @@
 # -*- mode: cmake -*-
-set (dakota       dakota)
-set (dakota-build dakota-build)
+set (CMAKE_VERBOSE_MAKEFILE ON)
+set (dakota dakota)
 set (dk-cxx-compiler clang++)
 
+string (REGEX REPLACE .project$ .cmk vars-path ${project-path})
+include (${vars-path})
+
+set (project ${target})
 project (${project} LANGUAGES CXX)
 set (CMAKE_CXX_COMPILER dk)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
 list (APPEND CMAKE_CXX_FLAGS "--project ${project-path} --cxx ${dk-cxx-compiler}")
-
-macro (set_from_project_info output path key)
-  set (command ${dakota-build} --build ${path} ${key})
-  execute_process (COMMAND ${command}
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    RESULT_VARIABLE result
-    OUTPUT_VARIABLE ${output}
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    if (NOT "${result}" STREQUAL "0")
-      message (FATAL_ERROR "process '${command}' failed result='${result}'")
-    endif ()
-
-    separate_arguments (${output})
-endmacro (set_from_project_info)
-
-set_from_project_info (builddir ${project-path} "builddir")
-set_from_project_info (srcs     ${project-path} "srcs")
-set_from_project_info (libs     ${project-path} "libs")
-set_from_project_info (target   ${project-path} "target")
-set_from_project_info (defines  ${project-path} "macros")
-set_from_project_info (include-dirs ${project-path} "include-dirs")
 
 include_directories (${include-dirs})
 
@@ -62,11 +44,16 @@ list (APPEND srcs ${target-src})
 set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
 set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD 11)
 
-add_library (${target} SHARED ${srcs})
-set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/lib)
+if (${is-lib})
+  add_library (${target} SHARED ${srcs})
+  set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/lib)
+else ()
+  add_executable (${target} ${srcs})
+  set (targets-install-dir ${CMAKE_INSTALL_PREFIX}/bin)
+endif ()
 
 install (TARGETS ${target} DESTINATION ${targets-install-dir})
 target_compile_definitions (${target} PRIVATE ${defines})
-target_compile_options (${target} PRIVATE --warn-no-multichar)
+target_compile_options (${target} PRIVATE --warn-no-multichar) # unfortunate
 set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD 11)
 target_link_libraries (${target} ${link-libs})
