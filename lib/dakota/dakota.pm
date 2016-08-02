@@ -235,6 +235,7 @@ sub add_visibility_file {
   &add_visibility($root);
   &dakota::parse::scalar_to_file($arg, $root);
 }
+my $debug_exported = 0;
 sub add_visibility {
   my ($root) = @_;
   my $debug = 0;
@@ -255,7 +256,10 @@ sub add_visibility {
         if ($$root{'klasses'}{$klass_name} &&
             $$root{'klasses'}{$klass_name}{'slots'} &&
             $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
-          $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
+          $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = 1;
+          if ($debug_exported) {
+            $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
+          }
         }
       } elsif ($str =~ /^((klass|trait)\s+)?($rid)$/) {
         my ($klass_type, $klass_name) = ($2, $3);
@@ -264,10 +268,16 @@ sub add_visibility {
         if ($$root{'klasses'}{$klass_name} &&
             $$root{'klasses'}{$klass_name}{'module'} &&
             $$root{'klasses'}{$klass_name}{'module'} eq $name) {
-          $$root{'klasses'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+          $$root{'klasses'}{$klass_name}{'exported?'} = 1;
+          if ($debug_exported) {
+            $$root{'klasses'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+          }
         }
         if ($$root{'traits'}{$klass_name}) {
-          $$root{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+          $$root{'traits'}{$klass_name}{'exported?'} = 1;
+          if ($debug_exported) {
+            $$root{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+          }
         }
       } elsif ($str =~ /^((klass|trait)\s+)?($rid)::($msig)$/) {
         my ($klass_type, $klass_name, $method_name) = ($2, $3, $4);
@@ -288,7 +298,10 @@ sub add_visibility {
                 if ($sig_min eq $method_name) {
                   if ($debug) { print STDERR "$sig == $method_name\n"; }
                   if ($debug) { print STDERR "$sig_min == $method_name\n"; }
-                  $$scope{'exported?'} = __FILE__ . '::' . __LINE__;
+                  $$scope{'exported?'} = 1;
+                  if ($debug_exported) {
+                    $$scope{'exported?'} = __FILE__ . '::' . __LINE__; 
+                  }
                 }
               }
             }
