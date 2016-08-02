@@ -987,8 +987,8 @@ sub is_exe {
     $is_exe = 0;
   }
   my $project = &scalar_from_file($$cmd_info{'opts'}{'project'});
-  if (! $is_exe && ! $$project{'target.lib?'}) {
-    print STDERR $0 . ": warning: missing '\"target.lib?\" : 1' in " . $$cmd_info{'opts'}{'project'} . $nl;
+  if (! $is_exe && ! $$project{'is-lib'}) {
+    print STDERR $0 . ": warning: missing '\"is-lib\" : 1' in " . $$cmd_info{'opts'}{'project'} . $nl;
   }
   return $is_exe;
 }

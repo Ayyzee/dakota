@@ -86,7 +86,7 @@
       #'DK_INLINE_KLASS_FUNCS=0',
     ],
     'target' => 'dakota-core', # cmd-line
-    'target.lib?' => 1,
+    'is-lib' => 1,
     'compatibility-version' => '1.0.0',                 # cmd-line
     'current-version' =>       '1.0.0',                 # cmd-line
     'soname' => 'libdakota-core.$(so_ext)', # cmd-line

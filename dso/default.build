@@ -8,7 +8,7 @@
     'dl',
   ],
   'target' => 'dso',
-  'target.lib?' => 1,
+  'is-lib' => 1,
   'install' => {
     '-rules' => [
     ],
