@@ -15,7 +15,7 @@ opts =     $(macros:%=--define-macro %) $(include-dirs:%=--include-directory %) 
 	./$< > $@
 
 %.project: %.build
-	$(rootdir)/bin/dakota-build2project $@ $<
+	$(rootdir)/bin/dakota-build2project $< $@
 
 $(srcdir)/lib%.$(so_ext): $(srcdir)/%.$(cc_ext)
 	$(MAKE) default.project
