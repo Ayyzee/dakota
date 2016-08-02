@@ -1,9 +1,9 @@
 rootdir := ..
 
-builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk dakota.build)
 target := lib$(target).$(so_ext)
 
 .PRECIOUS: %.project
@@ -25,7 +25,7 @@ check: all
 check-exe: all
 
 clean:
-	$(RM) $(RMFLAGS) $(target) $(target).$(cxx_debug_symbols_ext) default.project
+	$(RM) $(RMFLAGS) $(target) $(target).$(cxx_debug_symbols_ext) dakota.project
 	$(RM) $(RMFLAGS) $(builddir)/build.mk
 	$(RM) $(RMFLAGS) $(builddir)
 

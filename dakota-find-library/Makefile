@@ -2,10 +2,10 @@ rootdir := ..
 
 srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
-builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk dakota.build)
 
 .PRECIOUS: %.project
 
@@ -41,7 +41,7 @@ goal-clean:
 	$(RM) $(RMFLAGS) $(target)
 
 clean: goal-clean
-	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext) default.project
+	$(RM) $(RMFLAGS) $(target).$(cxx_debug_symbols_ext) dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
 
 distclean: clean

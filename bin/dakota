@@ -82,7 +82,7 @@ $Data::Dumper::Indent    = 1; # default = 2
 use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
-my $default_project_path = 'default.project';
+my $default_project_path = 'dakota.project';
 
 my $root_cmd = {
   'asts' => [],

@@ -4,10 +4,10 @@ srcdir := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 export DKT_EXCLUDE_LIBS = 1
 
-builddir := $(shell $(rootdir)/bin/dakota-build builddir default.build)
+builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk default.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk dakota.build)
 target := lib$(target).$(so_ext)
 
 .PRECIOUS: %.project
@@ -29,7 +29,7 @@ all: $(target)
 
 $(target): $(srcs)
 
-single: $(srcs) | default.project
+single: $(srcs) | dakota.project
 	for input in $(srcs); do\
     if [[ $$input =~ \.dk$$ ]]; then\
       $(DAKOTA-BASE) $(macros:%=--define-macro %) $(include-dirs:%=--include-directory %) --compile --output $(builddir)/$$input.o $$input;\
@@ -55,9 +55,9 @@ installcheck: check install
 goal-clean:
 	$(RM) $(RMFLAGS) $(target)
 
-clean: goal-clean | default.project
+clean: goal-clean | dakota.project
 	$(DAKOTA-BASE) --clean
-	$(RM) $(RMFLAGS) default.project
+	$(RM) $(RMFLAGS) dakota.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
