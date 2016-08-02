@@ -143,6 +143,7 @@ our @EXPORT= qw(
                  use_abs_path
                  set_root_cmd
                  root_cmd
+                 src_unique_header
               );
 use Cwd;
 use File::Spec;
@@ -167,6 +168,9 @@ sub set_root_cmd {
 }
 sub root_cmd {
   return $root_cmd;
+}
+sub src_unique_header {
+  return $$root_cmd{'opts'}{'src-unique-header'};
 }
 sub at {
   my ($tbl, $key) = @_;

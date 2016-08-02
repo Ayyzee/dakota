@@ -338,7 +338,7 @@ sub generate_src {
   my $str;
   my $strings;
   if (&is_src_decl()) {
-    return undef if !$ENV{'DK_SRC_UNIQUE_HEADER'};
+    return undef if !&src_unique_header();
     $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
     $strings = [ undef,
                  '# pragma once' . $nl,
@@ -2584,7 +2584,7 @@ sub is_same_file {
 sub is_same_src_file {
   my ($klass_scope) = @_;
   if ($gbl_src_file && $$klass_scope{'file'}) {
-    return 1 if !$ENV{'DK_SRC_UNIQUE_HEADER'};
+    return 1 if !&src_unique_header();
     return 1 if $gbl_src_file eq &canon_path($$klass_scope{'file'});
   }
   return 0;
@@ -2653,7 +2653,7 @@ sub has_exported_slots {
 }
 sub should_export_slots {
   my ($klass_scope) = @_;
-  return (!$ENV{'DK_SRC_UNIQUE_HEADER'} && &has_slots($klass_scope)) || &has_exported_slots($klass_scope);
+  return (!&src_unique_header() && &has_slots($klass_scope)) || &has_exported_slots($klass_scope);
 }
 sub has_methods {
   my ($klass_scope) = @_;
