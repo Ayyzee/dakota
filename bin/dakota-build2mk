@@ -145,7 +145,6 @@ sub tsv_set {
   my $lhs = &lhs($scopes, $prefix);
   return $lhs;
 }
-
 # scalar is member of rhs seq
 sub process_scalar {
   my ($data, $opts, $lhs, $out) = @_;
