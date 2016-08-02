@@ -11,4 +11,4 @@ dir=.
 cmake -Wdev $dir
 #
 ./build-clean.sh $dir
-./build.sh $dir
+./build-all.sh $dir
