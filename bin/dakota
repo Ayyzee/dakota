@@ -114,7 +114,6 @@ my $root_cmd = {
             'path-only',
             'precompile',           # gcc-ish (--compile)
             'project=s',
-            'src-unique-header',
             'target',
 
             'clean',                # make target like
@@ -296,7 +295,8 @@ if ($$root_cmd{'opts'}{'include-directory'}) {
   }
   $ENV{'CXXFLAGS'} .= $flags;
 }
-my $env_vars = { 'DK_INLINE_GENERIC_FUNCS' => undef,
+my $env_vars = { 'DK_SRC_UNIQUE_HEADER' => undef,
+                 'DK_INLINE_GENERIC_FUNCS' => undef,
                  'DK_INLINE_KLASS_FUNCS' => undef,
                };
 if ($$root_cmd{'opts'}{'define-macro'}) {

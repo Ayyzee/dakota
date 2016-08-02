@@ -499,7 +499,7 @@ sub loop_cc_from_dk {
     &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,           $srcs_cc_path);
     &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $srcs_cc_path);
     &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $cc_path);
-    if (&src_unique_header()) {
+    if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
       &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
     }
 
@@ -720,7 +720,7 @@ sub start_cmd {
   &set_global_project_ast($target_ast_path);
 
   my $is_exe = &is_exe($cmd_info);
-  if (!&src_unique_header() || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
+  if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (! &dakota::util::project_io_at($$cmd_info{'project.io'}, 'target-hh')) {
         &gen_target_hh($cmd_info, $is_exe);
@@ -1028,7 +1028,7 @@ sub o_from_dk {
     if ($num_out_of_date_infiles) {
       my $target_ast_path = &target_ast_path($cmd_info);
       &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $src_path);
-      if (&src_unique_header()) {
+      if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
       }
     }
@@ -1047,7 +1047,7 @@ sub o_from_dk {
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $srcs_cc_path, $o_path);
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $src_path);
-        if (&src_unique_header()) {
+        if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
           &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
           &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $hh_path,      $o_path);
         }

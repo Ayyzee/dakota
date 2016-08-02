@@ -35,6 +35,7 @@
       '$(srcdir)/../include',
     ],
     'macros' => [ # cmd-line
+      #'DK_SRC_UNIQUE_HEADER=0',
       #'DK_INLINE_GENERIC_FUNCS=0',
       #'DK_INLINE_KLASS_FUNCS=0',
     ],
