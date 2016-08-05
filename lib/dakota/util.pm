@@ -329,7 +329,7 @@ sub is_symbol_candidate {
 }
 sub as_literal_symbol_interior {
   my ($str) = @_;
-  $str =~ s/^#\|(.+?)\|$/#$1/; # strip only the framing | while leave leading #
+  $str =~ s/^#\|(.*)\|$/#$1/; # strip only the framing | while leave leading #
   $str =~ s/^#//; # now remove leading #
   return $str;
 }
@@ -348,15 +348,30 @@ sub as_literal_symbol {
 sub encode_char { my ($char) = @_; return sprintf("%02x", ord($char)); }
 sub dk_mangle {
   my ($symbol) = @_;
+  # remove \ preceeding |
+  $symbol =~ s/\\\|/\|/g;
+  my $fix = 1;
+  my $fix_str;
+
+  if ($fix) {
+    # prevent the (-) from -> to be converted to (_)
+    $fix_str = &rand_str();
+    $symbol =~ s/->/$fix_str/g;
+  }
   # swap underscore (_) with dash (-)
   my $rand_str = &rand_str();
   $symbol =~ s/_/$rand_str/g;
   $symbol =~ s/-/_/g;
   $symbol =~ s/$rand_str/-/g;
+
+  if ($fix) {
+    $symbol =~ s/$fix_str/->/g;
+  }
   my $ident_symbol = [];
-  &dakota::util::add_first($ident_symbol, '_');
 
   my $chars = [split //, $symbol];
+  my $num_encoded = 0;
+  my $last_encoded_char;
 
   foreach my $char (@$chars) {
     my $part;
@@ -364,10 +379,23 @@ sub dk_mangle {
       $part = $char;
     } else {
       $part = &encode_char($char);
+      $last_encoded_char = $char;
+      $num_encoded++;
     }
     &dakota::util::add_last($ident_symbol, $part);
   }
-  &dakota::util::add_last($ident_symbol, '_');
+  my $legal_last_chars = { '?' => 1, '!' => 1 };
+  if ($num_encoded && ! (1 == $num_encoded && $$legal_last_chars{$last_encoded_char})) {
+    if (1) {
+      &dakota::util::add_first($ident_symbol, '_');
+      &dakota::util::add_last( $ident_symbol, '_');
+    } else {
+      &dakota::util::add_first($ident_symbol, &encode_char('|'));
+      &dakota::util::add_last( $ident_symbol, &encode_char('|'));
+    }
+  }
+  &dakota::util::add_first($ident_symbol, '_');
+  &dakota::util::add_last( $ident_symbol, '_');
   my $value = &ct($ident_symbol);
   return $value;
 }

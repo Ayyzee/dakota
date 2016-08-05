@@ -2336,7 +2336,7 @@ sub ast_tree_from_dk_path {
     &add_keyword($gbl_root, $1);
   }
   pos $_ = 0;
-  while (m/(#$bid|#\|.+?\|)/g) {
+  while (m/(#$bid|#\|.*?(?<!\\)\|)/g) {
     &add_symbol($gbl_root, &as_literal_symbol_interior($1));
   }
   &decode_comments(\$_, $parts);

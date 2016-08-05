@@ -563,7 +563,7 @@ sub symbol {
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/\#($bid)/&symbol($1)/ge;
-  $$filestr_ref =~ s/\#\|(.+?)\|/&symbol($1)/ge;
+  $$filestr_ref =~ s/\#\|(.*?(?<!\\))\|/&symbol($1)/ge;
 }
 sub literal_str {
   my ($string) = @_;

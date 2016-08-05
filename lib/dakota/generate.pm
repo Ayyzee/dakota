@@ -4055,6 +4055,18 @@ sub should_ann {
   $result = 1 if !(($ln + 1) % $adjusted_ann_interval);
   return $result;
 }
+sub almost_symbol {
+  my ($ident) = @_;
+  if (1) {
+    $ident =~ s/^(_*)//;
+    my $leading = $1;
+    $ident =~ s/(_*)$//;
+    my $trailing = $1;
+    $ident =~ s/(\w)_(\w)/$1-$2/g;
+    $ident = $leading . $ident . $trailing;
+  }
+  return $ident;
+}
 sub linkage_unit::generate_symbols {
   my ($file, $symbols) = @_;
   my $col = '';
@@ -4102,13 +4114,14 @@ sub linkage_unit::generate_symbols {
   while (my ($ln, $symbol) = each @$symbol_keys) {
     $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
+    $ident = &almost_symbol($ident);
     my $width = length($ident);
-    $ident =~ s/(\w)_(\w)/$1-$2/g;
     my $pad = ' ' x ($max_width - $width);
     if (&is_src_decl() || &is_target_decl()) {
       $scratch_str .= $col . "extern symbol-t $ident;" . ' /* ' . &as_literal_symbol($symbol) . ' */' . $nl;
     } elsif (&is_target_defn()) {
       $symbol =~ s|"|\\"|g;
+      $symbol =~ s/\\\|/\|/g;
       if (&should_ann($ln, $num_lns)) {
         $scratch_str .= $col . "symbol-t $ident = " . $pad . "dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . $nl;
       } else {
@@ -4154,8 +4167,8 @@ sub linkage_unit::generate_keywords {
   while (my ($ln, $symbol) = each @$symbol_keys) {
     $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
+    $ident = &almost_symbol($ident);
     my $width = length($ident);
-    $ident =~ s/(\w)_(\w)/$1-$2/g;
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
       if (&is_decl()) {
