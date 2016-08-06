@@ -411,8 +411,14 @@ sub target_cc_path {
 }
 sub target_o_path {
   my ($cmd_info, $target_cc_path) = @_;
-  # should look in project_io/project.io
-  my $target_o_path = &o_path_from_cc_path($target_cc_path);
+  my $target_o_path;
+  my $project_io = &project_io_from_file($$cmd_info{'project.io'});
+  if ($$project_io{'target-cc'} && $$project_io{'compile'}{$$project_io{'target-cc'}}) {
+    $target_o_path = $$project_io{'compile'}{$$project_io{'target-cc'}};
+  } else {
+    $target_o_path = &o_path_from_cc_path($target_cc_path);
+    #print STDERR "target_o_path=$target_o_path not in project.io" . $nl;
+  }
   return $target_o_path;
 }
 sub rel_target_hh_path {
@@ -1171,7 +1177,7 @@ sub target_from_ast {
   my $target_cc_path =  &target_cc_path($cmd_info);
   my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
   &check_path($target_ast_path);
-  my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
+  my $target_o_path;
   if (!$$cmd_info{'opts'}{'silent'}) {
     if ($$cmd_info{'opts'}{'precompile'}) {
       if ($is_defn) {
@@ -1189,6 +1195,7 @@ sub target_from_ast {
       }
     } else {
       if ($is_defn) {
+        $target_o_path = &target_o_path($cmd_info, $target_cc_path);
         if (&is_out_of_date($target_ast_path, $target_o_path)) {
           print $target_o_path . $nl;
         } else {
@@ -1236,6 +1243,7 @@ sub target_from_ast {
     &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
 
+  if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {
   my $o_info = {'opts' => {}, 'inputs' => [ $target_cc_path ], 'output' => $target_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};
   if ($$cmd_info{'opts'}{'precompile'}) {
@@ -1247,7 +1255,6 @@ sub target_from_ast {
   if ($$cmd_info{'opts'}{'compiler-flags'}) {
     $$o_info{'opts'}{'compiler-flags'} = $$cmd_info{'opts'}{'compiler-flags'};
   }
-  if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {
     &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
     &add_first($$cmd_info{'inputs'}, $target_o_path);
     &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', [ $target_hh_path, $target_cc_path ],  $target_o_path);
@@ -1356,6 +1363,7 @@ sub outfile_from_infiles {
   }
   my $num_out_of_date_infiles = @$infiles;
   if (0 != $num_out_of_date_infiles) {
+    #print STDERR "outfile=$outfile, infiles=[ " . join(' ', @$infiles) . ' ]' . $nl;
     &make_dir_part($$cmd_info{'output'}, $should_echo);
     if ($show_outfile_info) {
       print "MK $$cmd_info{'output'}\n";
