@@ -324,7 +324,7 @@ sub generate_src {
   my ($dir, $name, $ext) = &split_path($path, $id);
   $dir = '.' if !$dir;
   my $src_hh_path = "$name.$hh_ext";
-  my $srcs_inc_path = '+srcs/' . $name . '.inc';
+  my $inc_path = $name . '.inc';
   my ($generics, $symbols) = &generics::parse($file);
   my $suffix = &suffix();
   my $output = &canon_path("$dir/$name.$suffix");
@@ -351,7 +351,7 @@ sub generate_src {
       "  # include \"$src_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# endif" . $nl .
       $nl .
-      "# include \"$srcs_inc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to inc)
+      "# include \"$inc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to inc)
       $nl .
       &dk_generate_cc_footer($file);
     $strings = [ undef,
