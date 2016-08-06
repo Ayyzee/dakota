@@ -972,8 +972,9 @@ sub gen_target {
     $$other{'name'} = $$cmd_info{'output'};
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
-  &target_hh_from_ast($cmd_info, $other, $is_exe);
-  if ($is_defn) {
+  if (!$is_defn) {
+    &target_hh_from_ast($cmd_info, $other, $is_exe);
+  } else {
     &target_o_from_ast($cmd_info, $other, $is_exe);
   }
 } # gen_target_o
@@ -1210,10 +1211,10 @@ sub target_from_ast {
       }
     }
   }
-  &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_hh_path);
-  &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-hh', $target_hh_path);
-
-  if ($is_defn) {
+  if (!$is_defn) {
+    &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_hh_path);
+    &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-hh', $target_hh_path);
+  } else {
     &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $target_cc_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
