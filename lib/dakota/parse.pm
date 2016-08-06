@@ -145,7 +145,7 @@ our @EXPORT= qw(
                  colout
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
-                 srcs_cc_path_from_dk_path
+                 srcs_inc_path_from_dk_path
                  hh_path_from_cc_path
                  hh_path_from_src_path
                  init_global_target_ast
@@ -363,12 +363,12 @@ sub str_from_cmd_info {
   $str =~ s|(\s)\s+|$1|g;
   return $str;
 }
-sub srcs_cc_path_from_dk_path {
+sub srcs_inc_path_from_dk_path {
   my ($path) = @_;
   my ($dir, $name) = &split_path($path);
-  $name =~ s/\.dk$/.$cc_ext/;
-  my $srcs_cc_path = &builddir() . '/' . $dir . '/+srcs/'. $name;
-  return &canon_path($srcs_cc_path);
+  $name =~ s/\.dk$/.inc/;
+  my $srcs_inc_path = &builddir() . '/' . $dir . '/+srcs/'. $name;
+  return &canon_path($srcs_inc_path);
 }
 sub o_path_from_dk_path {
   my ($path) = @_;

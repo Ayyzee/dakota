@@ -506,18 +506,18 @@ sub loop_cc_from_dk {
       $cc_path = "$input_dir/$input_name.$cc_ext";
     }
     my $target_ast_path = &target_ast_path($cmd_info);
-    my $srcs_cc_path = &srcs_cc_path_from_dk_path($input);
+    my $srcs_inc_path = &srcs_inc_path_from_dk_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,           $srcs_cc_path);
-    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $srcs_cc_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $input,           $srcs_inc_path);
+    &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $srcs_inc_path);
     &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $cc_path);
     if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
       &project_io_add_all($$cmd_info{'project.io'}, 'all', $target_ast_path, $hh_path);
     }
 
     &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input, $srcs_cc_path, $global_target_ast);
+    &dakota::generate::dk_generate_cc($input, $srcs_inc_path, $global_target_ast);
     &src::add_extra_symbols($file);
     &src::add_extra_klass_decls($file);
     &src::add_extra_keywords($file);
@@ -989,7 +989,7 @@ sub o_from_dk {
     }
     $outfile = $input;
   } else {
-    my $srcs_cc_path = &srcs_cc_path_from_dk_path($input);
+    my $srcs_inc_path = &srcs_inc_path_from_dk_path($input);
     my $o_path;
     if ($$cmd_info{'output'} && &is_o_path($$cmd_info{'output'})) {
       $o_path = $$cmd_info{'output'};
@@ -1059,7 +1059,7 @@ sub o_from_dk {
       &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path); # should also be in dk
       if ($num_out_of_date_infiles) {
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $src_path,     $o_path);
-        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $srcs_cc_path, $o_path);
+        &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $srcs_inc_path, $o_path);
         &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $src_path);
         if ($ENV{'DK_SRC_UNIQUE_HEADER'}) {
           &dakota::util::project_io_add_all($$cmd_info{'project.io'}, 'all', $ast_path,     $hh_path);
