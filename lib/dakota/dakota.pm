@@ -81,7 +81,6 @@ our @EXPORT= qw(
                  is_dk_path
                  is_o_path
                  target_cc_path
-                 target_o_path
                  rel_target_hh_path
                  target_klass_func_defns_path
                  target_generic_func_defns_path
@@ -133,6 +132,14 @@ sub is_so_path {
   my $result = $name =~ m=^(.*/)?(lib([.\w-]+))(\.$so_ext((\.\d+)+)?|((\.\d+)+)?\.$so_ext)$=; # so-regex
   #my $libname = $2 . ".$so_ext";
   return $result;
+}
+sub is_cc_path {
+  my ($arg) = @_;
+  if ($arg =~ m/\.$cc_ext$/) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 sub is_dk_path {
   my ($arg) = @_;
@@ -1071,6 +1078,8 @@ sub loop_o_from_dk {
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_path($input)) {
       push @$outfiles, &o_from_dk($cmd_info, $input);
+    } elsif (&is_cc_path($input)) {
+      push @$outfiles, &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
     } else {
       push @$outfiles, $input;
     }
@@ -1120,13 +1129,18 @@ sub o_from_cc {
   $opts =~ s/\s+$//gs;
   $opts =~ s/\s+/\n/g;
   &filestr_to_file($opts, $opts_path);
-  my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
+  my $o_cmd = { 'opts' => $$cmd_info{'opts'}, 'inputs' => [] };
   $$o_cmd{'project.io'} =  $$cmd_info{'project.io'};
   $$o_cmd{'project.target'} = $$cmd_info{'project.target'};
   $$o_cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
   $$o_cmd{'cmd-flags'} = '@' . $opts_path;
   $$o_cmd{'output'} = $$cmd_info{'output'};
-  $$o_cmd{'inputs'} = $$cmd_info{'inputs'};
+
+  foreach my $input (@{$$cmd_info{'inputs'}}) {
+    if (&is_cc_path($input)) {
+      push @{$$o_cmd{'inputs'}}, $input;
+    }
+  }
   my $should_echo = 0;
   if ($ENV{'DK_ECHO_COMPILE_CMD'}) {
     $should_echo = 1;
@@ -1136,7 +1150,9 @@ sub o_from_cc {
     return &outfile_from_infiles($o_cmd, $should_echo);
     $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
   }
-  return &outfile_from_infiles($o_cmd, $should_echo);
+  my $count = &outfile_from_infiles($o_cmd, $should_echo);
+  &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $$o_cmd{'inputs'}, $$o_cmd{'output'});
+  return $count;
 }
 sub target_hh_from_ast {
   my ($cmd_info, $other, $is_exe) = @_;
