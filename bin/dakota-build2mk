@@ -206,8 +206,10 @@ sub start {
   my $fh;
 
   if ($$opts{'output'}) {
-    my $dir = $$opts{'output'} =~ s|^(.+)/.+$|$1|r;
-    if (! -e $dir) {
+    my $dir = $$opts{'output'} =~ s|([^/]+)$||r;
+    $dir =~ s|/+$||;
+    my $xdirs = { '' => 1, '.' => 1, '..' => 1 };
+    if (!$$xdirs{$dir} && ! -d $dir) {
       `mkdir -p $dir`;
     }
     open($fh, ">", $$opts{'output'})
