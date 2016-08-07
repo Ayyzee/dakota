@@ -114,7 +114,6 @@ our @EXPORT= qw(
                  pann
                  parameter_types_str
                  project_io_add
-                 project_io_add_all
                  project_io_remove
                  project_io_append
                  project_io_assign
@@ -707,48 +706,6 @@ sub project_io_add {
     $$project_io{$key}{$input} = $depend;
   }
   &project_io_to_file($project_io_path, $project_io);
-}
-sub project_io_add_all {
-  my ($project_io_path, $key, $input, $depend) = @_;
-  if ($skip_project_io_all_write) {
-    return;
-  }
-  die if &is_array($input) && &is_array($depend);
-  my $should_write = 0;
-  my $project_io = &project_io_from_file($project_io_path);
-
-  if (&is_array($input)) {
-    $depend = &canon_path($depend);
-    foreach my $in (@$input) {
-      $in = &canon_path($in);
-      if (!exists $$project_io{$key}{$in}{$depend}) {
-        &project_io_append([$key, $in, $depend, undef]);
-        $$project_io{$key}{$in}{$depend} = undef;
-        $should_write = 1;
-      }
-    }
-  } elsif (&is_array($depend)) {
-    $input = &canon_path($input);
-    foreach my $dp (@$depend) {
-      $dp = &canon_path($dp);
-      if (!exists $$project_io{$key}{$input}{$dp}) {
-        &project_io_append([$key, $input, $dp, undef]);
-        $$project_io{$key}{$input}{$dp} = undef;
-        $should_write = 1;
-      }
-    }
-  } else {
-    $input = &canon_path($input);
-    $depend = &canon_path($depend);
-    if (!exists $$project_io{$key}{$input}{$depend}) {
-      &project_io_append([$key, $input, $depend, undef]);
-      $$project_io{$key}{$input}{$depend} = undef;
-      $should_write = 1;
-    }
-  }
-  if ($should_write) {
-    &project_io_to_file($project_io_path, $project_io);
-  }
 }
 sub is_va {
   my ($method) = @_;
