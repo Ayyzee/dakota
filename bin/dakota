@@ -433,12 +433,13 @@ sub use_project {
   $project_io_path = $$root_cmd{'project.io'};
   if (! -e $project_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
-    my $default_project_io = { 'all' => {}, 'compile' => {}, 'inputs' => {},
+    my $default_project_io = { 'compile' => {},
                                'target' => &lib_from_lib_name($$project{'target'}), 'builddir' => undef };
     &dakota::util::project_io_to_file($project_io_path, $default_project_io);
   }
   $project_io = &dakota::util::project_io_from_file($project_io_path);
-  $$project_io{'inputs'} = { map { &canon_path($_) => &find_library($_, $$root_cmd{'opts'}{'found-library'}) } @{$$project{'inputs'}} };
+  my $libs = [ map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
+  $$project_io{'libs'} = { map { &canon_path($_) => &find_library($_, $$root_cmd{'opts'}{'found-library'}) } @$libs };
   if ($$project{'builddir'}) {
     $$project_io{'builddir'} = &canon_path($$project{'builddir'});
   }
@@ -448,32 +449,25 @@ sub use_project {
 sub project_clean {
   my ($root_cmd, $project, $project_io) = @_;
   my $remove = {};
-  # {'all'}{$in}{$out} = undef
   if ($project_io) {
-    while (my ($in_path, $out_paths) = each (%{$$project_io{'all'}})) {
-      $in_path = &canon_path($in_path);
-      foreach my $out_path (keys %$out_paths) {
+    if ($$project_io{'builddir'}) {
+      print "rm -r $$project_io{'builddir'}" . $nl;
+      `rm -r $$project_io{'builddir'}`;
+    }
+    if (1) { # cmake writes .o files in its own build dir
+      foreach my $out_path (values %{$$project_io{'compile'}}) {
         if (-e $out_path) {
           $$remove{$out_path} = undef;
         }
       }
-      if (! $$project_io{'inputs'}{$in_path}) {
-        if (-e $in_path) {
-          #$$remove{$in_path} = undef; # too dangerous
-        }
+      $$project_io{'compile'} = {};
+      my $original_state;
+      &dakota::util::project_io_to_file($project_io_path, $project_io);
+
+      foreach my $path (sort keys %$remove) {
+        print "rm $path" . $nl;
+        unlink $path;
       }
-    }
-    $$project_io{'all'} = {};
-    $$project_io{'compile'} = {};
-    my $original_state;
-    &dakota::util::project_io_to_file($project_io_path, $project_io);
-  }
-  foreach my $path (sort keys %$remove) {
-    if (! -e $path) {
-      print STDERR $0 . ": warning: rm $path # no-such-file" . $nl;
-    } else {
-      print "rm $path" . $nl;
-      unlink $path;
     }
   }
 }

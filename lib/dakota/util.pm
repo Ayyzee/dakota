@@ -658,12 +658,9 @@ sub project_io_at {
   my $value = $$project_io{$key};
   return $value;
 }
-my $skip_project_io_write = 0;
+my $skip_project_io_all_write = 1;
 sub project_io_assign {
   my ($project_io_path, $key, $value) = @_;
-  if ($skip_project_io_write) {
-    return;
-  }
   $value = &canon_path($value);
   my $project_io = &project_io_from_file($project_io_path);
   if (! $$project_io{$key} || $value ne $$project_io{$key}) {
@@ -695,9 +692,6 @@ sub project_io_path_remove {
 }
 sub project_io_add {
   my ($project_io_path, $key, $input, $depend) = @_;
-  if ($skip_project_io_write) {
-    return;
-  }
   $depend = &canon_path($depend);
   my $project_io = &project_io_from_file($project_io_path);
   $depend = &canon_path($depend);
@@ -716,7 +710,7 @@ sub project_io_add {
 }
 sub project_io_add_all {
   my ($project_io_path, $key, $input, $depend) = @_;
-  if ($skip_project_io_write) {
+  if ($skip_project_io_all_write) {
     return;
   }
   die if &is_array($input) && &is_array($depend);
