@@ -434,12 +434,14 @@ sub use_project {
   if (! -e $project_io_path) {
     # dk2ast : $foo{'dk'}{$dk_path}{'ast'}{$ast_path}
     my $default_project_io = { 'compile' => {},
-                               'target' => &lib_from_lib_name($$project{'target'}), 'builddir' => undef };
+                               'builddir' => undef };
     &dakota::util::project_io_to_file($project_io_path, $default_project_io);
   }
   $project_io = &dakota::util::project_io_from_file($project_io_path);
-  my $libs = [ map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
-  $$project_io{'libs'} = { map { &canon_path($_) => &find_library($_, $$root_cmd{'opts'}{'found-library'}) } @$libs };
+  if (0) {
+    my $libs = [ map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
+    $$project_io{'libs'} = { map { &canon_path($_) => &find_library($_, $$root_cmd{'opts'}{'found-library'}) } @$libs };
+  }
   if ($$project{'builddir'}) {
     $$project_io{'builddir'} = &canon_path($$project{'builddir'});
   }
