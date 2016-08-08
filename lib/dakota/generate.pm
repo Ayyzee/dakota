@@ -458,19 +458,19 @@ sub generate_target {
   }
   return $output;
 } # sub generate_target
+sub desuffix {
+  my ($str) = @_;
+  $str =~ s/-($hh_ext|$cc_ext)$//;
+  return $str;
+}
 sub labeled_src_str {
   my ($tbl, $key) = @_;
-  my $str;
-  if (! $tbl) {
-    #$key = uc($key);
-    $str = "# undef $key" . $nl;
-  } else {
-    $str = "# undef $key" . $nl;
+  my $str = "//--" . &desuffix($key) . '--' . $nl;
+  if ($tbl) {
     $str .= $$tbl{$key};
     if (!exists $$tbl{$key}) {
-      print STDERR "NO SUCH KEY $key\n";
+      die "NO SUCH KEY $key";
     }
-    $str .= "//--$key-end--" . $nl;
   }
   return $str;
 }
