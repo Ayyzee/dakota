@@ -402,7 +402,7 @@ sub generate_target {
   }
   my $output_runtime;
   if (&is_target_defn()) {
-    $output_runtime = "$dir/$name-runtime-info.inc";
+    $output_runtime = "$dir/$name.inc";
     my $pre_output_runtime = &pre_output_path_from_any_path($output_runtime);
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output_runtime = $ENV{'DKT_DIR'} . '/' . $output_runtime;
