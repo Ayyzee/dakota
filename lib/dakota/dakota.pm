@@ -727,9 +727,7 @@ sub start_cmd {
   my $is_exe = &is_exe($cmd_info);
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
-      if (! &dakota::util::project_io_at($$cmd_info{'project.io'}, 'target-hh')) {
         &gen_target_hh($cmd_info, $is_exe);
-      }
     }
   }
   if ($should_lock) {
@@ -746,9 +744,7 @@ sub start_cmd {
     # translation unit specific .h file (like in the case of inline funcs)
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'init'}) {
-        if (! &dakota::util::project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
           &gen_target_o($cmd_info, $is_exe);
-        }
       }
     }
     if (!$$cmd_info{'opts'}{'init'} && !$$cmd_info{'opts'}{'target'}) {
@@ -761,9 +757,7 @@ sub start_cmd {
     }
     if (!$$cmd_info{'opts'}{'compile'}) {
       if (!$$cmd_info{'opts'}{'init'}) {
-        if (! &dakota::util::project_io_at($$cmd_info{'project.io'}, 'target-cc')) {
           &gen_target_o($cmd_info, $is_exe);
-        }
       }
     }
   }
@@ -1178,9 +1172,6 @@ sub target_from_ast {
         }
       }
     }
-  }
-  if (!$is_defn) {
-    &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-hh', $target_hh_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
   my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);

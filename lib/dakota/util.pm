@@ -651,12 +651,6 @@ sub project_io_append {
   $$line[-1] = 'undef' if ! $$line[-1];
   #print STDERR join(' ', @$line) . $nl;
 }
-sub project_io_at {
-  my ($project_io_path, $key) = @_;
-  my $project_io = &project_io_from_file($project_io_path);
-  my $value = $$project_io{$key};
-  return $value;
-}
 my $skip_project_io_all_write = 1;
 sub project_io_assign {
   my ($project_io_path, $key, $value) = @_;
