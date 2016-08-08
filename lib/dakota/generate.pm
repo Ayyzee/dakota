@@ -711,7 +711,7 @@ sub generate_target_runtime {
   $target_cc_str .= $nl;
   $target_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t name = \"$$file{'other'}{'name'}\";" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(\"$$file{'other'}{'name'}\");" . $nl;
   $target_cc_str .= $nl;
   #my $col;
   $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
