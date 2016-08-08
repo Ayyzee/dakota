@@ -1900,12 +1900,7 @@ sub method {
   }
   return;
 }
-my $global_root_cmd;
 my $global_target_ast;
-sub init_cc_from_dk_vars {
-  my ($cmd_info) = @_;
-  $global_root_cmd = $cmd_info;
-}
 sub generics::klass_type_from_klass_name {
   my ($klass_name) = @_;
   my $cmd_info = &root_cmd();
@@ -1919,7 +1914,8 @@ sub generics::klass_type_from_klass_name {
   } elsif ($$cmd_info{'opts'}{'precompile'}) {
     $klass_type = 'klass||trait';
   } else {
-    my $ast_path_var = [join '::', @{$$global_root_cmd{'asts'}}];
+    my $root_cmd = &root_cmd();
+    my $ast_path_var = [join '::', @{$$root_cmd{'asts'}}];
     die __FILE__, ":", __LINE__,
       ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }
@@ -1939,7 +1935,8 @@ sub generics::klass_scope_from_klass_name {
   } elsif ($$cmd_info{'opts'}{'precompile'}) {
     $klass_scope = {};
   } else {
-    my $ast_path_var = [join '::', @{$$global_root_cmd{'asts'} ||= []}];
+    my $root_cmd = &root_cmd();
+    my $ast_path_var = [join '::', @{$$root_cmd{'asts'} ||= []}];
     die __FILE__, ":", __LINE__,
       ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }

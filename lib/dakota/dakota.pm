@@ -459,8 +459,6 @@ sub loop_cc_from_dk {
     print STDERR '  &loop_cc_from_dk --output ' .
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
-  &dakota::parse::init_cc_from_dk_vars($cmd_info);
-
   my $inputs = [];
   my $ast;
   if ($$cmd_info{'asts'}) {
