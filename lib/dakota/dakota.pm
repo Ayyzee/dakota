@@ -643,7 +643,7 @@ sub add_target_o_path_to_inputs {
 }
 my $root_cmd;
 sub start_cmd {
-  my ($cmd_info) = @_;
+  my ($cmd_info, $project) = @_;
   $root_cmd = $cmd_info;
   $builddir = &dakota::util::builddir();
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'path-only'}) {
@@ -721,7 +721,7 @@ sub start_cmd {
   }
   &set_global_project_ast($target_ast_path);
 
-  my $is_exe = &is_exe($cmd_info);
+  my $is_exe = &is_exe($cmd_info, $project);
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
         &gen_target_hh($cmd_info, $is_exe);

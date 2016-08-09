@@ -322,7 +322,7 @@ if (scalar @{$$root_cmd{'opts'}{'directory'}}) {
     }
   }
 }
-my $result = &dakota::dakota::start_cmd($root_cmd);
+my $result = &dakota::dakota::start_cmd($root_cmd, $project);
 exit $result;
 
 sub create_missing_project {
