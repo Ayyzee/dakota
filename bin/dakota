@@ -269,7 +269,7 @@ $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
 # dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
 
 if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-  $$root_cmd{'opts'}{'output'} = &canon_path(&default_target($root_cmd, $$root_cmd{'inputs'}));
+  $$root_cmd{'opts'}{'output'} = &canon_path(&default_target($root_cmd, $project, $$root_cmd{'inputs'}));
 }
 if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
@@ -413,7 +413,7 @@ sub use_project {
     $$project{'inputs'} = [ @{$$project{'inputs'}}, map { &lib_from_lib_name($_) } @{$$project{'libs'}} ];
   }
   if (! $$project{'target'}) {
-    $$project{'target'} = &canon_path(&default_target($root_cmd, $$project{'inputs'}));
+    $$project{'target'} = &canon_path(&default_target($root_cmd, $project, $$project{'inputs'}));
   }
   if (! &is_exe($root_cmd)) {
     $$project{'is-lib'} = 1;
@@ -474,13 +474,13 @@ sub project_clean {
   }
 }
 sub default_target {
-  my ($root_cmd, $inputs) = @_;
+  my ($root_cmd, $project, $inputs) = @_;
   my $output;
   if ($$root_cmd{'project.target'}) {
     $output = $$root_cmd{'project.target'};
   } else {
     $output = &project_base($inputs);
-    if ($$root_cmd{'opts'}{'shared'}) {
+    if ($$project{'is-lib'}) {
       $output .= ".$so_ext";
       print STDERR $0 . ": info: using implicit lib name: $output" . $nl;
     } else {
