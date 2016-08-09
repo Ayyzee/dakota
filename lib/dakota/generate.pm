@@ -291,7 +291,8 @@ sub write_to_file_converted_strings {
   }
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
   &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics, $remove); # costly (< 3/4 of total)
-  &filestr_to_file($converted_string, $path);
+  my $should_echo;
+  &filestr_to_file($converted_string, $path, $should_echo = 0);
 }
 sub generate_src_decl {
   my ($path, $file, $project_ast, $target_hh_path) = @_;

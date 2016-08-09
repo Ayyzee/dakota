@@ -1086,11 +1086,12 @@ sub write_filestr_to_file {
   close FILE            or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
 }
 sub filestr_to_file {
-  my ($filestr, $file) = @_;
+  my ($filestr, $file, $should_echo) = @_;
   my $file_md5 = "$file.md5";
   my $filestr_sig = &digsig($filestr);
   if (1) {
     &write_filestr_to_file($filestr,     $file);
+    print STDERR '_io_ ' . $filestr_sig . ' ' . $file . $nl if $should_echo;
     &write_filestr_to_file($filestr_sig, $file_md5);
   }
 }
