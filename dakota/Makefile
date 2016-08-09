@@ -41,7 +41,7 @@ check-exe: all
 	echo "klass hashed-table; func main() -> int-t { object-t o = make(hashed-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
 	rm -f exe
-	DKT_EXCLUDE_LIBS=0 $(DAKOTA-BASE) --project exe.project exe.dk
+	DKT_EXCLUDE_LIBS=0 $(DAKOTA-BASE) --project exe.project
 	./exe
 
 check: all
