@@ -30,7 +30,7 @@ endforeach (lib)
 
 # phony target 'init'
 add_custom_target (
-  init ALL
+  init
   COMMAND ${dakota} --project ${project-path} --init ${found-libs}
   VERBATIM)
 # get target-cc path
