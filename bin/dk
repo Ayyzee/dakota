@@ -174,6 +174,7 @@ my $major_mode_tbl = {
 };
 sub detect_gcc_opts {
   my ($cmd, $info) = @_;
+  my $num_dk_files = 0;
   $$info{'library-directory'} = [];
   $$info{'library'} = [];
   $$info{'define-macro'} = [];
@@ -196,10 +197,13 @@ sub detect_gcc_opts {
         $pair = [$i, $arg];
         push @{$$info{'inputs'}}, $pair;
         push @$ordered_input_args, $$pair[1];
+        if ($arg =~ /\.dk$/) {
+          $num_dk_files++;
+        }
       }
     }
   }
-  return $ordered_input_args;
+  return ($num_dk_files, $ordered_input_args);
 }
 sub project_io_path_from_project_path {
   my ($project_path) = @_;
@@ -228,22 +232,30 @@ sub convert_and_exec_cmd {
   my $gcc_cmd = [@$cmd];
   $$gcc_cmd[0] = $$dakota_opts{'cxx'};
   my $info = {};
-  my $ordered_input_args = &detect_gcc_opts($gcc_cmd, $info);
-  my $precompile_cmd = &build_precompile_cmd($dakota_opts, $info, $ordered_input_args);
-  my $precompile_cmd_str = join(' ', @$precompile_cmd) ;
-  if ($verbose) {
-    print '# 2/3 ' . $precompile_cmd_str . $nl;
+  my ($num_dk_files, $ordered_input_args) = &detect_gcc_opts($gcc_cmd, $info);
+  my $cc_paths;
+  if ($num_dk_files) {
+    my $precompile_cmd = &build_precompile_cmd($dakota_opts, $info, $ordered_input_args);
+    my $precompile_cmd_str = join(' ', @$precompile_cmd) ;
+    if ($verbose) {
+      print '# 2/3 ' . $precompile_cmd_str . $nl;
+    }
+    my $outstr = `$precompile_cmd_str`;
+    my $val = $? >> 8;
+    if (0 != $val) {
+      print $outstr;
+      exit $val;
+    }
+    if (!defined $outstr) {
+      die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
+    }
+    $cc_paths = [split $nl, $outstr];
+  } else {
+    if ($verbose) {
+      print '# 2/3 (skipped)' . $nl;
+    }
+    $cc_paths = [];
   }
-  my $outstr = `$precompile_cmd_str`;
-  my $val = $? >> 8;
-  if (0 != $val) {
-    #print $outstr;
-    exit $val;
-  }
-  if (!defined $outstr) {
-    die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
-  }
-  my $cc_paths = [split $nl, $outstr];
   if (0 != @$cc_paths) {
     &translate_dk_to_cc($gcc_cmd, $cc_paths);
   }
