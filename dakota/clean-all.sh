@@ -13,8 +13,8 @@ dir=.
 cmake -Wdev $dir
 #
 ./build-clean.sh $dir
-echo +++
+echo ++build-all++
 ./build-all.sh $dir
 #
-echo +++
-./show.sh
+#echo ++show++
+#./show.sh
