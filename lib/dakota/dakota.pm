@@ -107,7 +107,6 @@ my $exit_status = 0;
 my $dk_exe_type = undef;
 
 my $cxx_compile_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
-my $cxx_output_flags =  &dakota::util::var($gbl_compiler, 'CXX_OUTPUT_FLAGS',  '--output');
 my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',  '--shared');
 my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', '--dynamic');
 
@@ -674,9 +673,9 @@ sub start_cmd {
     $dk_exe_type = '#lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
-      $cxx_shared_flags .= &for_linker($ld_soname_flags);
+      $cxx_dynamic_flags .= &for_linker($ld_soname_flags);
     }
-    $cxx_shared_flags .= &for_linker($no_undefined_flags);
+    $cxx_dynamic_flags .= &for_linker($no_undefined_flags);
     $dk_exe_type = '#lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
 	   && !$$cmd_info{'opts'}{'shared'}
