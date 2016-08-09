@@ -269,7 +269,13 @@ $$root_cmd{'inputs'} = [ @$inputs, @{$$root_cmd{'inputs'}} ];
 # dakota           --output <> {o}+ [build/+rt/<>.o] {so}*
 
 if (!$$root_cmd{'opts'}{'output'} && !$$root_cmd{'opts'}{'compile'}) {
-  $$root_cmd{'opts'}{'output'} = &canon_path(&default_target($root_cmd, $project, $$root_cmd{'inputs'}));
+  if ($$project{'target'} =~ /\.$so_ext$/) { # is_so_path()
+    $$root_cmd{'opts'}{'output'} = $$project{'target'};
+  } elsif ($$project{'is-lib'}) {
+    $$root_cmd{'opts'}{'output'} = &lib_from_lib_name($$project{'target'});
+  } else {
+    $$root_cmd{'opts'}{'output'} = &exe_from_exe_name($$project{'target'});
+  }
 }
 if ($$root_cmd{'opts'}{'output'}) {
   $$root_cmd{'opts'}{'output'} = &canon_path($$root_cmd{'opts'}{'output'});
@@ -396,6 +402,10 @@ sub lib_from_lib_name {
     return $name;
   }
   return 'lib' . $name . ".$so_ext";
+}
+sub exe_from_exe_name {
+  my ($name) = @_;
+  return $name;
 }
 sub use_project {
   my ($root_cmd) = @_;

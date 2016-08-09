@@ -634,18 +634,25 @@ sub update_target_ast_from_all_inputs {
 }
 sub add_target_o_path_to_inputs {
   my ($cmd_info) = @_;
+  $$cmd_info{'inputs'} = &clean_paths($$cmd_info{'inputs'});
   my $target_cc_path = &target_cc_path($cmd_info);
   my $target_o_path =  &target_o_path($cmd_info, $target_cc_path);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     return if $input eq $target_o_path;
   }
   unshift @{$$cmd_info{'inputs'}}, $target_o_path;
+  $$cmd_info{'inputs'} = &clean_paths($$cmd_info{'inputs'});
 }
 my $root_cmd;
 sub start_cmd {
   my ($cmd_info, $project) = @_;
   $root_cmd = $cmd_info;
   my $is_exe = &is_exe($cmd_info, $project);
+  if ($is_exe) {
+    $dk_exe_type = '#exe';
+  } else {
+    $dk_exe_type = '#lib';
+  }
   $builddir = &dakota::util::builddir();
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'path-only'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
@@ -671,17 +678,14 @@ sub start_cmd {
       $cxx_shared_flags .= &for_linker($ld_soname_flags);
     }
     $cxx_shared_flags .= &for_linker($no_undefined_flags);
-    $dk_exe_type = '#lib';
   } elsif ($$cmd_info{'opts'}{'dynamic'}) {
     if ($$cmd_info{'opts'}{'soname'}) {
       $cxx_dynamic_flags .= &for_linker($ld_soname_flags);
     }
     $cxx_dynamic_flags .= &for_linker($no_undefined_flags);
-    $dk_exe_type = '#lib';
   } elsif (!$$cmd_info{'opts'}{'compile'}
 	   && !$$cmd_info{'opts'}{'shared'}
 	   && !$$cmd_info{'opts'}{'dynamic'}) {
-    $dk_exe_type = '#exe';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
@@ -772,9 +776,14 @@ sub start_cmd {
     } elsif (!$$cmd_info{'opts'}{'compile'} &&
              !$$cmd_info{'opts'}{'shared'}  &&
              !$$cmd_info{'opts'}{'dynamic'}) {
-      my $mode_flags;
       &add_target_o_path_to_inputs($cmd_info);
-      &linked_output_from_o($cmd_info, &link_exe_opts_path(), $mode_flags = undef);
+      if ($is_exe) {
+        my $mode_flags;
+        &linked_output_from_o($cmd_info, &link_exe_opts_path(), $mode_flags = undef);
+      } else {
+        # default to shared, not dynamic
+        &linked_output_from_o($cmd_info, &link_so_opts_path(), $cxx_shared_flags);
+      }
     } else {
       die __FILE__, ":", __LINE__, ": error:\n";
     }
