@@ -1091,7 +1091,7 @@ sub filestr_to_file {
   my $filestr_sig = &digsig($filestr);
   if (1) {
     &write_filestr_to_file($filestr,     $file);
-    print STDERR '_io_ ' . $filestr_sig . ' ' . $file . $nl if $should_echo;
+    print STDERR '_output_  ' . $filestr_sig . '  ' . $file . $nl if $should_echo;
     &write_filestr_to_file($filestr_sig, $file_md5);
   }
 }
