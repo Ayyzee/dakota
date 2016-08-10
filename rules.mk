@@ -18,19 +18,19 @@ opts =     $(macros:%=--define-macro %) $(include-dirs:%=--include-directory %) 
 	$(rootdir)/bin/dakota-build2project $< $@
 
 $(srcdir)/lib%.$(so_ext): $(srcdir)/%.$(cc_ext)
-	$(MAKE) dakota.project
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(cxx-opts) $(CXX_SHARED_FLAGS) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(srcdir)/%: $(srcdir)/%.$(cc_ext)
-	$(MAKE) dakota.project
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
 	$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(cxx-opts) $(CXX_OUTPUT_FLAGS) $@ $^
 
 $(srcdir)/%: $(srcdir)/%.dk
-	$(MAKE) dakota.project
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
 	$(DAKOTA) --project dakota.project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(opts) --output $@ $?
 
 $(srcdir)/lib%.$(so_ext): $(srcdir)/%.dk
-	$(MAKE) dakota.project
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) dakota.project
 	$(DAKOTA) --project dakota.project $(DAKOTAFLAGS) $(EXTRA_DAKOTAFLAGS) $(opts) --soname $(soname) --shared --output $@ $?
 
 $(DESTDIR)$(prefix)/lib/dakota/%.json: $(srcdir)/../lib/dakota/%.json

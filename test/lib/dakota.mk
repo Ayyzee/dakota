@@ -29,4 +29,4 @@ check: all
 
 clean:
 	$(RM) $(RMFLAGS) $(builddir)
-	$(RM) $(RMFLAGS) $(target) dakota.mk
+	$(RM) $(RMFLAGS) $(target)

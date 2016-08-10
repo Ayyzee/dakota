@@ -31,10 +31,10 @@ check-exe: all
 check: all
 	if [[ -e $(rootdir)/lib/libdakota-core.$(so_ext) ]]; then $(target) $(rootdir)/lib/libdakota-core.$(so_ext); fi
 	if [[ -e $(rootdir)/lib/libdakota.$(so_ext) ]]; then $(target) $(rootdir)/lib/libdakota.$(so_ext); fi
-	$(MAKE) $(MAKEFLAGS) check-exe
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) check-exe
 
 installcheck: check install
-	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
@@ -65,7 +65,7 @@ install-links := $(install-dir-links) $(install-file-links)
 install: all $(install-dirs) $(install.files) $(install-links)
 
 precompile:
-	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install.files) $(install-file-links)

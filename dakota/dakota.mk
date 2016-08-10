@@ -46,10 +46,10 @@ check-exe: all
 
 check: all
 	dakota-catalog --silent $(target)
-	$(MAKE) $(MAKEFLAGS) check-exe
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) check-exe
 
 installcheck: check install
-	$(MAKE) $(MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) install # hackhack: the 'install' on the RHS of the phony installcheck target should take care of this
 	if [[ -e $@.sh ]]; then ./$@.sh; fi
 
 goal-clean:
@@ -73,7 +73,7 @@ $(install-dirs):
 install: all $(install-dirs) $(install.files)
 
 precompile:
-	$(MAKE) $(MAKEFLAGS) DAKOTAFLAGS=--$@ all
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
 	sudo $(RM) $(RMFLAGS) $(install.files)

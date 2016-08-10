@@ -16,11 +16,11 @@ all \
 check \
 clean \
 no-project:
-	$(MAKE) $(MAKEFLAGS) --directory lib $@
-	$(MAKE) $(MAKEFLAGS) --directory exe $@
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory lib $@
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory exe $@
 
 check-exe: check
-	$(MAKE) $(MAKEFLAGS) --directory exe $@
+	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory exe $@
 
 install: all
 uninstall:
