@@ -2198,6 +2198,16 @@ sub linkage_unit::generate_klasses_body_funcs_klass {
     }
   }
 }
+sub linkage_unit::generate_klasses_body_funcs_box {
+  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
+  my $scratch_str_ref = &global_scratch_str_ref();
+
+  if ('klass' eq $klass_type) {
+    if (&has_slots($klass_scope)) {
+      $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
+    } # if (&has_slots()
+  }
+}
 sub linkage_unit::generate_klasses_body_funcs {
   my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -2206,7 +2216,6 @@ sub linkage_unit::generate_klasses_body_funcs {
     if (&has_slots($klass_scope)) {
       my $is_klass_defn = scalar keys %$klass_scope;
       $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
-      $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
     } # if (&has_slots()
     my $object_method_defns = {};
     foreach my $method (sort method::compare values %{$$klass_scope{'slots-methods'}}) {
@@ -2841,6 +2850,10 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs($scope, $col, $klass_path, $klass_name);
   }
+  $$scratch_str_ref .= '//--box--' . $nl;
+  foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
+    &linkage_unit::generate_klasses_klass_funcs_box($scope, $col, $klass_path, $klass_name);
+  }
   &set_global_scratch_str_ref($original_scratch_str_ref);
   return $$scratch_str_ref;
 }
@@ -2970,6 +2983,15 @@ sub linkage_unit::generate_klasses_klass_funcs_klass {
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
   &linkage_unit::generate_klasses_body_funcs_klass($klass_scope, $col, $klass_type, $klass_path, $klass_name);
+  &path::remove_last($klass_path);
+}
+sub linkage_unit::generate_klasses_klass_funcs_box {
+  my ($scope, $col, $klass_path, $klass_name) = @_;
+  my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
+  my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  &path::add_last($klass_path, $klass_name);
+  my $scratch_str_ref = &global_scratch_str_ref();
+  &linkage_unit::generate_klasses_body_funcs_box($klass_scope, $col, $klass_type, $klass_path, $klass_name);
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs {
