@@ -2194,7 +2194,7 @@ sub linkage_unit::generate_klasses_body_funcs_klass {
     if (&is_src_decl() || &is_target_decl()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t self) -> object-t { return \$klass-with-trait(klass-of(self), __name__); } }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t self) -> object-t { return klass-with-trait(klass-of(self), __name__); } }" . &ann(__FILE__, __LINE__) . $nl;
     }
   }
 }

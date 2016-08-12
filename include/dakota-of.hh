@@ -43,3 +43,15 @@ inline FUNC superklass_of(object_t kls) -> object_t {
 inline FUNC name_of(object_t kls) -> symbol_t {
   return klass::unbox(kls).name;
 }
+inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
+  while (!(nullptr == kls || null == kls)) { // !root-superklass?(kls)
+    const symbol_t* traits = klass::unbox(kls).traits;
+    while (nullptr != traits && nullptr != *traits) {
+      if (trait == *traits++) {
+        return kls;
+      }
+    }
+    kls = superklass_of(kls);
+  }
+  return nullptr;
+}

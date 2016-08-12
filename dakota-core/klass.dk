@@ -774,17 +774,7 @@ klass klass {
     return state;
   }
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
-    object-t kls = self;
-    while (!root-superklass?(kls)) {
-      const symbol-t* traits = unbox(kls).traits;
-      while (nullptr != traits && nullptr != *traits) {
-        if (trait == *traits++) {
-          return kls;
-        }
-      }
-      kls = superklass-of(kls);
-    }
-    return nullptr;
+    return ::klass-with-trait(self, trait);
   }
   method str(object-t self) -> str-t {
     symbol-t name = name-of(self);
