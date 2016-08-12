@@ -2,4 +2,4 @@
 set -o errexit -o nounset -o pipefail
 IFS=$'\t\n'
 
-make -f dakota.mk $@
+time make -f dakota.mk $@

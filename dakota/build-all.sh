@@ -10,6 +10,6 @@ jobs=$(getconf _NPROCESSORS_ONLN)
 #jobs=1
 export DKT_EXCLUDE_LIBS=2
 echo ++init++
-cmake --build $dir --target init
+time cmake --build $dir --target init
 echo ++default++
-cmake --build $dir -- --jobs $jobs
+time cmake --build $dir -- --jobs $jobs
