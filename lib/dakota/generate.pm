@@ -536,7 +536,7 @@ sub generate_generics_and_write_to_file_converted {
 my $use_inline_attrs = 1;
 my $inline_attrs = '';
 if ($use_inline_attrs) {
-  $inline_attrs = '[[gnu::flatten, gnu::always_inline]]';
+  $inline_attrs = '[[inline-attrs]]';
 }
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
