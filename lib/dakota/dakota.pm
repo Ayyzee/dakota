@@ -380,31 +380,12 @@ sub sig1 {
 }
 sub target_ast_path {
   my ($cmd_info) = @_;
-  my $target_ast_path;
-  if (&is_so_path($$cmd_info{'project.target'})) {
-    $target_ast_path = &target_ast_path_from_so_path($$cmd_info{'project.target'}); # should be from_so_path
-  } else {
-    $target_ast_path = &target_ast_path_from_any_path($$cmd_info{'project.target'}); # _from_exe_path
-  }
+  my $target_ast_path = &target_cc_path($cmd_info) =~ s/\.$cc_ext$/.ast/r;
   return $target_ast_path;
 }
 sub target_cc_path {
   my ($cmd_info) = @_;
-  my $target_cc_path;
-  if ($$cmd_info{'project.target.output'}) {
-    return $$cmd_info{'project.target.output'};
-  }
-  if (1) {
-    my $root_cmd = &root_cmd();
-    if ($$root_cmd{'project.target.output'}) {
-      return $$root_cmd{'project.target.output'};
-    }
-  }
-  if (&is_so_path($$cmd_info{'project.target'})) {
-    $target_cc_path = &target_cc_path_from_so_path($$cmd_info{'project.target'});
-  } else {
-    $target_cc_path = &target_cc_path_from_any_path($$cmd_info{'project.target'});
-  }
+  my $target_cc_path = &builddir . '/+/target.' . $cc_ext;
   return $target_cc_path;
 }
 sub target_o_path {

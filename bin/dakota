@@ -244,9 +244,6 @@ if (0) {
     }
   }
 }
-if ($$root_cmd{'opts'}{'target'} && $$root_cmd{'opts'}{'output'}) {
-  $$root_cmd{'project.target.output'} = $$root_cmd{'opts'}{'output'};
-}
 if (!$$root_cmd{'opts'}{'compile'} && 1 >= scalar @$inputs) { # only the implied libdakota-core.so
   if (1 >= scalar $$root_cmd{'project.inputs'}) {
     die "$0: error: inputs are requried either in the project file or the command line." . $nl;

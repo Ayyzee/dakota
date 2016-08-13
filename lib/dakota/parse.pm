@@ -85,15 +85,7 @@ my $patterns = {
   'ast_path_from_dk_path' =>   '$(builddir)/%.ast      : %.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
-  # +target also used in dakota.pm
-  'target_ast_path_from_any_path' => '$(builddir)/+target/%.ast : %', # _from_exe_path
-  'target_ast_path_from_so_path' =>  '$(builddir)/+target/%.ast : %.$(so_ext)',
-
   'ctlg_path_from_so_path' =>   '$(builddir)/%.$(so_ext).ctlg : %.$(so_ext)',
-
-  # +target also used in dakota.pm
-  'target_cc_path_from_any_path' => '$(builddir)/+target/%.$(cc_ext) : %', # _from_exe_path
-  'target_cc_path_from_so_path' =>  '$(builddir)/+target/%.$(cc_ext) : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
@@ -156,10 +148,6 @@ our @EXPORT= qw(
                  ast_path_from_ctlg_path
                  ast_path_from_o_path
                  ast_merge
-                 target_ast_path_from_any_path
-                 target_ast_path_from_so_path
-                 target_cc_path_from_any_path
-                 target_cc_path_from_so_path
                  str_from_cmd_info
               );
 my $colon = ':'; # key/element delim only
@@ -378,10 +366,6 @@ sub o_path_from_cc_path {
   my ($path) = @_;
   return &out_path_from_in_path('o_path_from_cc_path', $path);
 }
-sub target_ast_path_from_any_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('target_ast_path_from_any_path', $path);
-}
 sub ctlg_path_from_so_path {
   my ($in_path) = @_;
   $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
@@ -403,30 +387,6 @@ sub ast_path_from_dk_path {
     $in_path = &Cwd::abs_path($in_path);
   }
   my $out_path = &out_path_from_in_path('ast_path_from_dk_path', $in_path);
-  return $out_path;
-}
-sub target_ast_path_from_so_path {
-  my ($in_path) = @_;
-  $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
-  my $vers = $1;
-  my $out_path = &out_path_from_in_path('target_ast_path_from_so_path', $in_path);
-  if (defined $vers) {
-    $out_path =~ s/\.$so_ext\.ast$/.$so_ext$vers.ast/;
-  }
-  return $out_path;
-}
-sub target_cc_path_from_any_path {
-  my ($path) = @_;
-  return &out_path_from_in_path('target_cc_path_from_any_path', $path);
-}
-sub target_cc_path_from_so_path {
-  my ($in_path) = @_;
-  $in_path =~ s/\.$so_ext((\.\d+)+)$/.$so_ext/;
-  my $vers = $1;
-  my $out_path = &out_path_from_in_path('target_cc_path_from_so_path', $in_path);
-  if (defined $vers) {
-    $out_path =~ s/\.$so_ext$/.$so_ext$vers/;
-  }
   return $out_path;
 }
 sub var_perl_from_make { # convert variable syntax to perl from make
