@@ -533,6 +533,11 @@ sub generate_generics_and_write_to_file_converted {
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
   &write_to_file_converted_strings($output, $strings);
 }
+my $use_always_inline_attr = 0;
+my $inline_attrs = '';
+if ($use_always_inline_attr) {
+  $inline_attrs = '[[gnu::always_inline]]';
+}
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
   $dir = '.' if !$dir;
@@ -560,7 +565,7 @@ sub generate_decl_defn {
                      "  # define INLINE" . $nl .
                      "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
-                     "  # define INLINE inline" . $nl .
+                     "  # define INLINE $inline_attrs inline" . $nl .
                      "  # include \"$target_klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
@@ -570,7 +575,7 @@ sub generate_decl_defn {
                      "  # define INLINE" . $nl .
                      "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
-                     "  # define INLINE inline" . $nl .
+                     "  # define INLINE $inline_attrs inline" . $nl .
                      "  # include \"$klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
@@ -596,7 +601,7 @@ sub generate_decl_defn {
                      "  # include \"$generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
-                     "  # define INLINE inline" . $nl .
+                     "  # define INLINE $inline_attrs inline" . $nl .
                      "  # include \"$target_generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
@@ -608,7 +613,7 @@ sub generate_decl_defn {
                      "  # include \"$generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
-                     "  # define INLINE inline" . $nl .
+                     "  # define INLINE $inline_attrs inline" . $nl .
                      "  # include \"$generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
