@@ -533,10 +533,10 @@ sub generate_generics_and_write_to_file_converted {
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
   &write_to_file_converted_strings($output, $strings);
 }
-my $use_always_inline_attr = 0;
+my $use_inline_attrs = 1;
 my $inline_attrs = '';
-if ($use_always_inline_attr) {
-  $inline_attrs = '[[gnu::always_inline]]';
+if ($use_inline_attrs) {
+  $inline_attrs = '[[gnu::flatten, gnu::always_inline]]';
 }
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
@@ -2854,6 +2854,12 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   $$scratch_str_ref .= $nl;
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs($scope, $col, $klass_path, $klass_name);
+  }
+  if (1) {
+    $$scratch_str_ref .=
+      $col . "# if !defined DK-USE-MAKE-MACRO" . $nl .
+      $col . "[[sentinel]] INLINE func make(object-t kls, ...) -> object-t;" .  "// hackhack" . $nl .
+      $col . "# endif" . $nl;
   }
   $$scratch_str_ref .= '//--box--' . $nl;
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
