@@ -9,7 +9,7 @@
             #'-ObjC++'
            ],
   'CXXFLAGS' => [ '-std=c++11', '-fvisibility=hidden',
-                  '-fuse-ld=gold',
+                 #'-fuse-ld=gold',
                  #'-use-gold-plugin', '-flto',
                   '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
                   '-fobjc-exceptions', '-lobjc'

@@ -73,12 +73,16 @@
       '$(srcdir)/unbox-illegal-klass-exception.dk',
       '$(srcdir)/vector.dk',
     ],
+    'lib-dirs' => [ # cmd-line
+      '/usr/local/lib',
+    ],
     'libs' => [ # cmd-line
       'dso',
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)',
       '$(srcdir)/../include',
+      '/usr/local/include',
     ],
     'macros' => [ # cmd-line
       #'DK_SRC_UNIQUE_HEADER=0',

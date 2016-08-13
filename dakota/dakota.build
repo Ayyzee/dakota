@@ -27,12 +27,16 @@
       '$(srcdir)/type-predicate.dk',
       '$(srcdir)/xml-object-output-stream.dk',
     ],
+    'lib-dirs' => [ # cmd-line
+      '/usr/local/lib',
+    ],
     'libs' => [ # cmd-line
       'dso',
       'dakota-core',
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)/../include',
+      '/usr/local/include',
     ],
     'macros' => [ # cmd-line
       #'DK_SRC_UNIQUE_HEADER=0',

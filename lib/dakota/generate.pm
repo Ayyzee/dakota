@@ -2100,8 +2100,15 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           if ($$klass_scope{'init-supports-kw-slots?'}) {
-            $result .=
-              $col . "object-t result = make(klass, \#slots : *arg);" . $nl;
+            my $type = "$klass_name\::slots-t";
+            my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
+            if ($promoted_type) {
+              $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
+                $col . "object-t result = make(klass, \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
+            } else {
+              $result .=
+                $col . "object-t result = make(klass, \#slots : *arg);" . $nl;
+            }
           } else {
             $result .=
               $col . "object-t result = make(klass);" . $nl .
@@ -3954,10 +3961,12 @@ sub generate_kw_args_method_defn {
     $col = &colin($col);
     if (defined $$kw_arg{'default'}) {
       my $kw_arg_default = $$kw_arg{'default'};
-      if ($kw_arg_type =~ /\[\]$/ && $kw_arg_default =~ /^\{/) {
+      if ('nullptr' eq $kw_arg_default) {
+        $$scratch_str_ref .= $col . "$kw_arg_name = $kw_arg_default;" . $nl;
+      } elsif ($kw_arg_type =~ /\[\]$/ && $kw_arg_default =~ /^\{/) {
         $$scratch_str_ref .= $col . "$kw_arg_name = cast($kw_arg_type)$kw_arg_default;" . $nl;
       } else {
-        $$scratch_str_ref .= $col . "$kw_arg_name = $kw_arg_default;" . $nl;
+        $$scratch_str_ref .= $col . "$kw_arg_name = cast(decltype($kw_arg_name))$kw_arg_default;" . $nl;
       }
     } else {
       $$scratch_str_ref .=

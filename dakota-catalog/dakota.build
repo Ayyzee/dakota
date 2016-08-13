@@ -4,12 +4,16 @@
     'srcs' => [ # cmd-line
       '$(srcdir)/dakota-catalog.$(cc_ext)',
     ],
+    'lib-dirs' => [ # cmd-line
+      '/usr/local/lib',
+    ],
     'libs' => [ # cmd-line
       'dso',
     ],
     'include-dirs' => [ # cmd-line
       '$(srcdir)',
       '$(srcdir)/../include',
+      '/usr/local/include',
     ],
     'target' => 'dakota-catalog', # cmd-line
     'install' => {
