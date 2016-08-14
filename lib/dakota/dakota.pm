@@ -383,6 +383,12 @@ sub target_ast_path {
   my $target_ast_path = &target_cc_path($cmd_info) =~ s/\.$cc_ext$/.ast/r;
   return $target_ast_path;
 }
+sub target_hh_path {
+  my ($cmd_info) = @_;
+  my $target_cc_path = &target_cc_path($cmd_info);
+  my $target_hh_path = $target_cc_path =~ s/\.$cc_ext$/.$hh_ext/r;
+  return $target_hh_path;
+}
 sub target_cc_path {
   my ($cmd_info) = @_;
   my $target_cc_path = &builddir . '/+/target.' . $cc_ext;
@@ -400,37 +406,38 @@ sub target_o_path {
   }
   return $target_o_path;
 }
-sub rel_target_hh_path {
-  my ($cmd_info) = @_;
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $rel_target_hh_path = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
-  return $rel_target_hh_path;
-}
 sub default_cmd_info {
   my $cmd_info = { 'project.target' => &global_project_target() };
   return $cmd_info;
 }
-#sub target_generic_func_decls_path {
-#  my ($cmd_info) = @_;
-#  $cmd_info = &default_cmd_info() if ! $cmd_info;
-#  my $target_cc_path = &target_cc_path($cmd_info);
-#  my $result = $target_cc_path =~ s=^$builddir/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
-#  return $result;
-#}
+sub rel_target_hh_path {
+  my ($cmd_info) = @_;
+  $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  return $result;
+}
+sub target_klass_func_decls_path {
+  my ($cmd_info) = @_;
+  $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-klass-func-decls.inc=r;
+  return $result;
+}
 sub target_klass_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $result = $target_cc_path =~ s=^(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
-  $result =~ s=^$builddir/+==;
+  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-klass-func-defns.inc=r;
+  return $result;
+}
+sub target_generic_func_decls_path {
+  my ($cmd_info) = @_;
+  $cmd_info = &default_cmd_info() if ! $cmd_info;
+  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-generic-func-decls.inc=r;
   return $result;
 }
 sub target_generic_func_defns_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $result = $target_cc_path =~ s=^(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
-  $result =~ s=^$builddir/+==;
+  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
 sub loop_cc_from_dk {

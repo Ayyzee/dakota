@@ -533,11 +533,6 @@ sub generate_generics_and_write_to_file_converted {
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
   &write_to_file_converted_strings($output, $strings);
 }
-my $use_inline_attrs = 1;
-my $inline_attrs = '';
-if ($use_inline_attrs) {
-  $inline_attrs = '[[inline-attrs]]';
-}
 sub generate_decl_defn {
   my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
   $dir = '.' if !$dir;
@@ -557,6 +552,7 @@ sub generate_decl_defn {
   my $klass_func_decls_path = "$name-klass-func-decls.inc";
 
   my $target_klass_func_defns_path = &dakota::dakota::target_klass_func_defns_path();
+  my $target_klass_func_decls_path = &dakota::dakota::target_klass_func_decls_path();
 
   if (&is_src_decl()) {
     &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_decls_path");
@@ -565,7 +561,8 @@ sub generate_decl_defn {
                      "  # define INLINE" . $nl .
                      "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
-                     "  # define INLINE $inline_attrs inline" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$target_klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "  # include \"$target_klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
@@ -575,7 +572,8 @@ sub generate_decl_defn {
                      "  # define INLINE" . $nl .
                      "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
-                     "  # define INLINE $inline_attrs inline" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$klass_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "  # include \"$klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
@@ -589,8 +587,8 @@ sub generate_decl_defn {
   my $generic_func_defns_path = "$name-generic-func-defns.inc";
   my $generic_func_decls_path = "$name-generic-func-decls.inc";
 
-  #my $target_generic_func_decls_path = &dakota::dakota::target_generic_func_decls_path();
   my $target_generic_func_defns_path = &dakota::dakota::target_generic_func_defns_path();
+  my $target_generic_func_decls_path = &dakota::dakota::target_generic_func_decls_path();
 
   if (&is_src_decl()) {
     &generate_generics_and_write_to_file_converted($generics, "$dir/$generic_func_decls_path");
@@ -601,7 +599,8 @@ sub generate_decl_defn {
                      "  # include \"$generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
-                     "  # define INLINE $inline_attrs inline" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$target_generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "  # include \"$target_generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
@@ -613,7 +612,8 @@ sub generate_decl_defn {
                      "  # include \"$generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# else" . $nl .
                      "  # define STATIC" . $nl .
-                     "  # define INLINE $inline_attrs inline" . $nl .
+                     "  # define INLINE inline" . $nl .
+                     "  # include \"$generic_func_decls_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "  # include \"$generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
@@ -2410,7 +2410,7 @@ sub generate_object_method_defn {
     $visibility = '[[export]] ';
   }
   my $method_name = &ct($$method{'name'});
-  $$scratch_str_ref .= $col . "$klass_type @$klass_path { " . $visibility . "METHOD $method_name($$new_arg_list) -> $return_type";
+  $$scratch_str_ref .= $col . "$klass_type @$klass_path { " . $visibility . "INLINE METHOD $method_name($$new_arg_list) -> $return_type";
 
   my $new_unboxed_arg_names = &arg_type::names_unboxed($$non_object_method{'parameter-types'});
   my $new_unboxed_arg_names_list = &arg_type::list_names($new_unboxed_arg_names);
