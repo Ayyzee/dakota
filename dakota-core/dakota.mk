@@ -7,7 +7,7 @@ export DKT_EXCLUDE_LIBS = 1
 builddir := $(shell $(rootdir)/bin/dakota-build builddir dakota.build)
 
 include $(rootdir)/common.mk
-include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/default.mk dakota.build)
+include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/dakota.mk dakota.build)
 target := lib$(target).$(so_ext)
 
 .PRECIOUS: %.project
@@ -41,7 +41,7 @@ check-exe: all
 	echo "klass sorted-table; func main() -> int-t { object-t o = make(sorted-table::klass); USE(o); return 0; }" > exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
 	rm -f exe
-	DKT_EXCLUDE_LIBS=2 $(DAKOTA-BASE) --project exe.project
+	DKT_EXCLUDE_LIBS=2 $(DAKOTA) --project exe.project
 	./exe
 
 check: all
