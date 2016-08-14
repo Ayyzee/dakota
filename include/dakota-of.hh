@@ -29,7 +29,7 @@
 KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
   return arg;
 }}
-KLASS_NS klass { [[unbox_attrs]] inline FUNC unbox(object_t object) -> slots_t& {
+KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t object) -> slots_t& {
   DKT_UNBOX_CHECK(object, klass); // optional
   slots_t& s = *cast(slots_t*)(cast(uint8_t*)object + sizeof(object::slots_t));
   return s;

@@ -60,8 +60,8 @@
 # define sentinel            gnu::sentinel
 # define unused              gnu::unused
 
-# define unbox_attrs gnu::pure,gnu::hot,gnu::nothrow
-# define inline_attrs gnu::flatten,gnu::always_inline
+# define UNBOX_ATTRS  gnu::pure,gnu::hot,gnu::nothrow
+# define INLINE_ATTRS gnu::flatten,gnu::always_inline
 
 # if defined _WIN32 || defined _WIN64
   # define so_import ms::dllimport
