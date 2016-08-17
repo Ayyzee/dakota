@@ -14,7 +14,7 @@ if (NOT DEFINED ${cc-ext})
   set (cc-ext cc)
 endif ()
 
-set (target-src ${builddir}/+/target.${cc-ext})
+set (target-src ${builddir}/x/target.${cc-ext})
 set (project ${target})
 project (${project} LANGUAGES CXX)
 set (CMAKE_CXX_COMPILER dk)
