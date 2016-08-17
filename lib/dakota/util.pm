@@ -1092,7 +1092,7 @@ sub filestr_to_file {
   if (1) {
     &write_filestr_to_file($filestr,     $file);
     print STDERR '_output_  ' . $filestr_sig . '  ' . $file . $nl if $should_echo;
-    &write_filestr_to_file($filestr_sig, $file_md5);
+    &write_filestr_to_file($filestr_sig . $nl, $file_md5);
   }
 }
 sub scalar_to_file {
