@@ -404,22 +404,20 @@ sub dk_mangle_seq {
   return &ct($ident_symbols);
 }
 sub ann {
-  my ($file, $line, $msg) = @_;
+  my ($file, $line, $should_skip) = @_;
   my $string = '';
+  return $string if defined $should_skip && 0 != $should_skip;
   if (1) {
     $file =~ s|^.*/(.+)|$1|;
     $string = " // $file:$line:";
-    if ($msg) {
-      $string .= " $msg";
-    }
   }
   return $string;
 }
 sub pann {
-  my ($file, $line, $msg) = @_;
+  my ($file, $line) = @_;
   my $string = '';
   if (0) {
-    $string = &ann($file, $line, $msg);
+    $string = &ann($file, $line);
   }
   return $string;
 }
@@ -650,7 +648,6 @@ sub project_io_append {
   $$line[-1] = 'undef' if ! $$line[-1];
   #print STDERR join(' ', @$line) . $nl;
 }
-my $skip_project_io_all_write = 1;
 sub project_io_assign {
   my ($project_io_path, $key, $value) = @_;
   $value = &canon_path($value);

@@ -2176,31 +2176,31 @@ sub generate_klass_construct {
   return $result;
 }
 sub linkage_unit::generate_klasses_body_vars {
-  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width) = @_;
+  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width, $should_ann) = @_;
   my $width = length($klass_name);
   my $pad = ' ' x ($max_width - $width);
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if (&is_src_decl() || &is_target_decl()) {
     #$$scratch_str_ref .= $col . "extern symbol-t __type__;" . $nl;
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern symbol-t __name__; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern symbol-t __name__; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
   } elsif (&is_target_defn()) {
     #$$scratch_str_ref .= $col . "symbol-t __type__ = \$$klass_type;" . $nl;
     my $literal_symbol = &as_literal_symbol(&ct($klass_path));
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { symbol-t __name__ = $literal_symbol; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { symbol-t __name__ = $literal_symbol; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
   }
   if ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern object-t klass [[read-only]]; }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern object-t klass [[read-only]]; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
     }
   }
     if (!&is_target_defn()) {
       my $is_exported;
       if (exists $$klass_scope{'const'}) {
         foreach my $const (@{$$klass_scope{'const'}}) {
-          $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern const $$const{'type'} $$const{'name'}; }" . &ann(__FILE__, __LINE__) . $nl;
+          $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern const $$const{'type'} $$const{'name'}; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
         }
       }
     }
@@ -2242,7 +2242,7 @@ sub linkage_unit::generate_klasses_body_funcs {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'parameter-types'}[0])) {
             my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
-            #$$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "REMOVE") . $nl;
+            #$$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref } // REMOVE" . &ann(__FILE__, __LINE__) . $nl;
             if (!&has_object_method_defn($klass_scope, $method)) {
               my $object_method = &convert_to_object_method($method);
               my $sig = &func::overloadsig($object_method, []);
@@ -2256,7 +2256,7 @@ sub linkage_unit::generate_klasses_body_funcs {
       } else {
         if (!&is_va($method)) {
           my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
-          $$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "DUPLICATE") . $nl;
+          $$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref } // DUPLICATE" . &ann(__FILE__, __LINE__) . $nl;
           my $object_method = &convert_to_object_method($method);
           my $sig = &func::overloadsig($object_method, []);
           if (!$$object_method_defns{$sig}) {
@@ -2308,7 +2308,7 @@ sub linkage_unit::generate_klasses_body_funcs {
       if (&is_same_src_file($klass_scope) || &is_target()) { #rn3
         if (!&is_va($method)) {
           my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
-          $$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "DUPLICATE") . $nl;
+          $$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref } // DUPLICATE" . &ann(__FILE__, __LINE__) . $nl;
         }
       }
     }
@@ -2342,9 +2342,9 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
     foreach my $method (@$va_list_methods) {
       my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
       if (exists $$method{'keyword-types'}) {
-        $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //kw-args" . &ann(__FILE__, __LINE__, "stmt1") . $nl;
+        $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //kw-args // stmt1" . &ann(__FILE__, __LINE__) . $nl;
       } else {
-        $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //va" . &ann(__FILE__, __LINE__, "stmt1") . $nl;
+        $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //va // stmt1" . &ann(__FILE__, __LINE__) . $nl;
       }
     }
   }
@@ -2361,7 +2361,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
               my $last = &dakota::util::remove_last($$va_method{'parameter-types'});
               die if 'va-list-t' ne &ct($last);
               my ($visibility, $method_decl_ref) = &func::decl($va_method, $klass_path);
-              $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " {" . $visibility . " METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__, "stmt2") . $nl;
+              $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " {" . $visibility . " METHOD $$method_decl_ref } // stmt2" . &ann(__FILE__, __LINE__) . $nl;
               &dakota::util::add_last($$va_method{'parameter-types'}, $last);
             }
           }
@@ -2386,7 +2386,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
                 if ($$method{'inline?'}) {
                   #$$scratch_str_ref .= 'INLINE ';
                 }
-                $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " {" . $visibility . " METHOD $other_method_decl; }" . &ann(__FILE__, __LINE__, "stmt3") . $nl;
+                $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " {" . $visibility . " METHOD $other_method_decl; } // stmt3" . &ann(__FILE__, __LINE__) . $nl;
               }
             }
           }
@@ -2913,11 +2913,13 @@ sub linkage_unit::generate_klasses {
   &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $ordered_klass_names);
 
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-vars" . '-' . &suffix());
-  foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
-    &linkage_unit::generate_klasses_klass_vars($scope, $col, $klass_path, $klass_name, $max_width);
+  my $sorted_klass_names = [sort @$ordered_klass_names];
+  my $num_lns = @$sorted_klass_names;
+  while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
+    &linkage_unit::generate_klasses_klass_vars($scope, $col, $klass_path, $klass_name, $max_width, &should_ann($ln, $num_lns));
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs-non-inline" . '-' . &suffix());
-  foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
+  while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs_non_inline($scope, $col, $klass_path, $klass_name, $max_width);
   }
   return $$scratch_str_ref;
@@ -3005,12 +3007,12 @@ sub linkage_unit::generate_klasses_types_after {
   }
 }
 sub linkage_unit::generate_klasses_klass_vars {
-  my ($scope, $col, $klass_path, $klass_name, $max_width) = @_;
+  my ($scope, $col, $klass_path, $klass_name, $max_width, $should_ann) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_body_vars($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width);
+  &linkage_unit::generate_klasses_body_vars($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width, $should_ann);
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs_klass {
@@ -4183,20 +4185,13 @@ sub linkage_unit::generate_symbols {
     $ident = &almost_symbol($ident);
     my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
+    my $should_ann = &should_ann($ln, $num_lns);
     if (&is_src_decl() || &is_target_decl()) {
-      if (&should_ann($ln, $num_lns)) {
-        $scratch_str .= $col . "extern symbol-t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . &ann(__FILE__, __LINE__) . $nl;
-      } else {
-        $scratch_str .= $col . "extern symbol-t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . $nl;
-      }
+      $scratch_str .= $col . "extern symbol-t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
     } elsif (&is_target_defn()) {
       $symbol =~ s|"|\\"|g;
       $symbol =~ s/\\\|/\|/g;
-      if (&should_ann($ln, $num_lns)) {
-        $scratch_str .= $col . "symbol-t $ident =" . $pad . " dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__) . $nl;
-      } else {
-        $scratch_str .= $col . "symbol-t $ident =" . $pad . " dk-intern(\"$symbol\");" . $nl;
-      }
+      $scratch_str .= $col . "symbol-t $ident =" . $pad . " dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
     }
   }
   $col = &colout($col);
@@ -4242,20 +4237,13 @@ sub linkage_unit::generate_keywords {
     my $width = length($ident);
     my $pad = ' ' x ($max_width - $width);
     if (defined $ident) {
+      my $should_ann = &should_ann($ln, $num_lns);
       if (&is_decl()) {
-        if (&should_ann($ln, $num_lns)) {
-          $scratch_str .= $col . "extern keyword-t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . &ann(__FILE__, __LINE__) . $nl;
-        } else {
-          $scratch_str .= $col . "extern keyword-t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . $nl;
-        }
+        $scratch_str .= $col . "extern keyword-t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
       } else {
         my $in = &ident_comment($symbol);
         # keyword-defn
-        if (&should_ann($ln, $num_lns)) {
-          $scratch_str .= $col . "keyword-t $ident =" . $pad . " { dk-hash(\"$symbol\")," . $pad . " #$symbol };" . $in . &ann(__FILE__, __LINE__) . $nl;
-        } else {
-          $scratch_str .= $col . "keyword-t $ident =" . $pad . " { dk-hash(\"$symbol\")," . $pad . " #$symbol };" . $in . $nl;
-        }
+        $scratch_str .= $col . "keyword-t $ident =" . $pad . " { dk-hash(\"$symbol\")," . $pad . " #$symbol };" . $in . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
       }
     }
   }
@@ -4399,7 +4387,7 @@ sub generate_target_runtime_property_tbl {
       $max_key_width = $key_width;
     }
   }
-  $result .= "static property-t $name\[] = {" . &ann(__FILE__, $line) . " //ro-data" . $nl;
+  $result .= "static property-t $name\[] = { //ro-data" . &ann(__FILE__, $line) . $nl;
   $col = &colin($col);
   $num = 1;
   foreach my $key (@$sorted_keys) {
