@@ -211,7 +211,7 @@ sub tear {
   my ($filestr) = @_;
   my $tbl = { 'src' => '', 'src-comments' => '' };
   foreach my $line (split /\n/, $filestr) {
-    if ($line =~ m=^(.*?)(((/\*.*\*/\s*)*(//.*))|/\*.*\*/)?$=m) {
+    if ($line =~ m=^(.*?)(//.*)?$=m) {
       $$tbl{'src'} .= $1 . $nl;
       if ($2) {
         $$tbl{'src-comments'} .= $2;
@@ -408,11 +408,10 @@ sub ann {
   my $string = '';
   if (1) {
     $file =~ s|^.*/(.+)|$1|;
-    $string = " /* $file:$line:";
+    $string = " // $file:$line:";
     if ($msg) {
       $string .= " $msg";
     }
-    $string .= " */";
   }
   return $string;
 }

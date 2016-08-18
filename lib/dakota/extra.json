@@ -21,8 +21,6 @@
     '#objects' => undef,         # implied when using some literal constructs
     '#signature' => undef,     # kw-args processing funcs (throw)
     '#slots' => undef,
-    '#src-time' => undef,
-    '#src-date' => undef,
     '#src-file' => undef,
     '#src-line' => undef,
   },
@@ -73,7 +71,6 @@
     '#boole-t' => undef, # hardcode typealias
     '#cat' => undef,
     '#char8-t' => undef, # hardcode typealias
-    '#date' => undef,
     '#dir' => undef,
     '#element' => undef,
     '#enum' => undef,
@@ -129,7 +126,6 @@
     '#str-ptrs' => undef,
     '#struct' => undef,
     '#superklass-name' => undef,
-    '#time' => undef,
     '#trait' => undef,
     '#traits' => undef,
     '#type' => undef,
