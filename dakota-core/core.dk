@@ -398,11 +398,11 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
               defined = 1;
           }
           j++;
-          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'parameter-types' : '%s', 'defined?' : '%zu' },\n",
-                                  method-signature->name, method-signature->parameter-types,
+          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'param-types' : '%s', 'defined?' : '%zu' },\n",
+                                  method-signature->name, method-signature->param-types,
                                   method-signature->return-type,
                                   method-signature->name,
-                                  method-signature->parameter-types,
+                                  method-signature->param-types,
                                   defined);
         }
         ostream::col-decr(ostrm);
@@ -941,7 +941,7 @@ static func max-slot-name-width(named-info-t* slots-info) -> int-t {
 static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
   ostream::println-format(ostrm, "method %s(%s) -> %s;\n",
                   info->name,
-                  info->parameter-types,
+                  info->param-types,
                   info->return-type);
   return;
 }

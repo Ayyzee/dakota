@@ -112,7 +112,7 @@ our @EXPORT= qw(
                  needs_hex_encoding
                  builddir
                  pann
-                 parameter_types_str
+                 param_types_str
                  project_io_add
                  project_io_remove
                  project_io_append
@@ -578,16 +578,16 @@ sub str_from_seq {
   my $str = &remove_extra_whitespace(join(' ', @$seq)); # str is lexically correct
   return $str;
 }
-sub parameter_types_str {
-  my ($parameter_types) = @_;
+sub param_types_str {
+  my ($param_types) = @_;
   my $strs = [];
-  foreach my $type (@$parameter_types) {
+  foreach my $type (@$param_types) {
     &add_last($strs, &str_from_seq($type));
   }
   my $result = join(',', @$strs);
   return $result;
 }
-# [ name, fixed-parameter-types ]
+# [ name, fixed-param-types ]
 # [ [ x :: signal ], [ object-t, int64-t, ... ] ]
 sub kw_args_generics_sig {
   my ($generic) = @_;
@@ -595,9 +595,9 @@ sub kw_args_generics_sig {
   if ($$generic{'kw-arg-names'} && 0 < scalar @{$$generic{'kw-arg-names'}}) {
     $kw_types_len = scalar @{$$generic{'kw-arg-names'}};
   }
-  my $parameter_types = &deep_copy($$generic{'parameter-types'});
-  my $offset = scalar @$parameter_types - $kw_types_len;
-  my $kw_types = [splice @$parameter_types, 0, $offset];
+  my $param_types = &deep_copy($$generic{'param-types'});
+  my $offset = scalar @$param_types - $kw_types_len;
+  my $kw_types = [splice @$param_types, 0, $offset];
   &add_last($kw_types, ['...']);
   return ($$generic{'name'}, $kw_types);
 }
@@ -699,9 +699,9 @@ sub project_io_add {
 }
 sub is_va {
   my ($method) = @_;
-  my $num_args = @{$$method{'parameter-types'}};
+  my $num_args = @{$$method{'param-types'}};
 
-  if ('va-list-t' eq &ct($$method{'parameter-types'}[-1])) {
+  if ('va-list-t' eq &ct($$method{'param-types'}[-1])) {
     return 1;
   } else {
     return 0;
@@ -712,7 +712,7 @@ sub is_kw_args_generic {
   my $state = 0;
   my ($name, $types) = &kw_args_generics_sig($generic);
   my $name_str =  &str_from_seq($name);
-  my $types_str = &parameter_types_str($types);
+  my $types_str = &param_types_str($types);
   my $global_project_ast = &global_project_ast();
   my $tbl = $$global_project_ast{'kw-arg-generics'};
 
@@ -1006,7 +1006,7 @@ sub deep_copy {
 sub remove_name_va_scope {
   my ($method) = @_;
   #die if 'va' ne $$method{'name'}[0];
-  #die if 'va-list-t' ne $$method{'parameter-types'}[-1];
+  #die if 'va-list-t' ne $$method{'param-types'}[-1];
   if (3 == scalar @{$$method{'name'}} && 'va' eq $$method{'name'}[0] && '::' eq $$method{'name'}[1]) {
     &remove_first($$method{'name'});
     &remove_first($$method{'name'});

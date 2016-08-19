@@ -479,7 +479,7 @@ klass klass {
         method-t m = method-for-signature(&s->methods, signature);
         if (nullptr != m) {
           ssize-t width = cast(ssize-t)safe-strlen(signature->name) + 1 +
-                          cast(ssize-t)safe-strlen(signature->parameter-types) + 1;
+                          cast(ssize-t)safe-strlen(signature->param-types) + 1;
           if (width > max-width)
             max-width = width;
         }
@@ -493,9 +493,9 @@ klass klass {
       method-t m = method-for-signature(&s->methods, signature);
 
       if (nullptr != m) {
-        fprintf(out, "  '%s(%s)'", signature->name, signature->parameter-types);
+        fprintf(out, "  '%s(%s)'", signature->name, signature->param-types);
         ssize-t width = cast(ssize-t)safe-strlen(signature->name) + 1 +
-                        cast(ssize-t)safe-strlen(signature->parameter-types) + 1;
+                        cast(ssize-t)safe-strlen(signature->param-types) + 1;
         while (width < max-width) {
           fprintf(out, " ");
           width++;

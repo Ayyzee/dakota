@@ -49,7 +49,7 @@ klass collection {
   // method add-all(object-t self, const str-t* strings, symbol-t encoding : #utf-8) -> object-t {
   //   assert(nullptr != strings) -> object-t;
   //   assert(nullptr != encoding);
-  //   while (nullptr != *strings) // rnielsen: modifying a parameter - bad practice?
+  //   while (nullptr != *strings) // rnielsen: modifying a param - bad practice?
   //   {
   //     object-t string = make(string::klass, #bytes : *strings, #encoding : encoding);
   //     strings++;

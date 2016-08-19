@@ -72,13 +72,13 @@ klass no-such-method-exception {
                            name-of(self.context.object),
                            name-of(kls),
                            self.signature->name,
-                           self.signature->parameter-types);
+                           self.signature->param-types);
         } else {
           $print-format(out, ", \"instance\": %s, \"klass\": \"%s\", \"method\": \"%s(%s)\"",
                            $str(self.context.object),
                            name-of(kls),
                            self.signature->name,
-                           self.signature->parameter-types);
+                           self.signature->param-types);
         }
       } else {
         if ($instance?(self.context.object, klass::klass)) {
@@ -86,13 +86,13 @@ klass no-such-method-exception {
                            name-of(self.context.object),
                            name-of(kls),
                            self.signature->name,
-                           self.signature->parameter-types);
+                           self.signature->param-types);
         } else {
           $print-format(out, ", \"instance\": %s, \"klass\": \"%s\". \"method\": \"%s(%s)\"",
                            $str(self.context.object),
                            name-of(kls),
                            self.signature->name,
-                           self.signature->parameter-types);
+                           self.signature->param-types);
         }
       }
     }

@@ -374,7 +374,7 @@ sub sig1 {
   my $result = '';
   $result .= &ct($$scope{'name'});
   $result .= '(';
-  $result .= &ct($$scope{'parameter-types'}[0]);
+  $result .= &ct($$scope{'param-types'}[0]);
   $result .= ')';
   return $result;
 }

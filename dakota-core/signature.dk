@@ -25,16 +25,16 @@ module dakota-core;
 klass signature {
   slots {
     str-t name;
-    str-t parameter-types;
+    str-t param-types;
     str-t return-type; // not considered in compare()
   }
-  method init(object-t self, slots-t slots : {.name = nullptr, .parameter-types = nullptr, .return-type = nullptr}) -> object-t {
+  method init(object-t self, slots-t slots : {.name = nullptr, .param-types = nullptr, .return-type = nullptr}) -> object-t {
     self = $init(super);
     unbox(self) = slots;
     return self;
   }
   method dump(slots-t* s) -> slots-t*{
-    printf("%s(%s)", s->name, s->parameter-types);
+    printf("%s(%s)", s->name, s->param-types);
     return s;
   }
   method compare(slots-t* s, slots-t* other-s) -> int-t {
@@ -43,7 +43,7 @@ klass signature {
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
     int-t result = safe-strcmp(s->name, other-s->name);
     if (0 == result)
-      result = safe-strcmp(s->parameter-types, other-s->parameter-types);
+      result = safe-strcmp(s->param-types, other-s->param-types);
     result = dkt-normalize-compare-result(result);
     return result;
   }

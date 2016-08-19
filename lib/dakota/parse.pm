@@ -197,7 +197,7 @@ sub kw_args_translate {
             my $kw_args_name;        # not used
             foreach $kw_args_name (@{$$method{'kw-arg-names'}}) {
               my $kw_args_type =
-                &dakota::util::remove_last($$method{'parameter-types'});
+                &dakota::util::remove_last($$method{'param-types'});
               &dakota::util::add_last($kw_arg_types, $kw_args_type);
             }
             &update_to_kw_args($method);
@@ -243,9 +243,9 @@ sub kw_args_translate {
 }
 sub update_to_kw_args {
   my ($method) = @_;
-  die if $$method{'parameter-types'}[-1][0] eq 'va-list-t';
+  die if $$method{'param-types'}[-1][0] eq 'va-list-t';
   die if $$method{'kw-types'};
-  &dakota::util::add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
+  &dakota::util::add_last($$method{'param-types'}, [ 'va-list-t' ]);
   $$method{'kw-types'} = [];
 }
 sub tbl_add_info {
@@ -1515,44 +1515,44 @@ sub kw_arg_offsets {
   }
   return 0; # illegal offset value since type and name preceed colon
 }
-sub parameter_list {
-  my ($parameter_types) = @_;
-  #print STDERR Dumper $parameter_types;
+sub param_list {
+  my ($param_types) = @_;
+  #print STDERR Dumper $param_types;
   my $params = [];
-  my $parameter_token;
-  my $len = @$parameter_types;
+  my $param_token;
+  my $len = @$param_types;
   my $i = 0;
   while ($i < $len) {
-    my $parameter_n = [];
+    my $param_n = [];
     my $opens = 0;
     while ($i < $len) {
-      for ($$parameter_types[$i]) {
+      for ($$param_types[$i]) {
         if (m/^\,$/) {
           if ($opens) {
-            &dakota::util::add_last($parameter_n, $$parameter_types[$i]);
+            &dakota::util::add_last($param_n, $$param_types[$i]);
             $i++;
           } else {
             $i++;
-            &dakota::util::add_last($params, $parameter_n);
-            $parameter_n = [];
+            &dakota::util::add_last($params, $param_n);
+            $param_n = [];
             next;
           }
         } elsif (m/^\{|\($/) {
           $opens++;
-          &dakota::util::add_last($parameter_n, $$parameter_types[$i]);
+          &dakota::util::add_last($param_n, $$param_types[$i]);
           $i++;
         } elsif (m/^\)|\}$/) {
           $opens--;
-          &dakota::util::add_last($parameter_n, $$parameter_types[$i]);
+          &dakota::util::add_last($param_n, $$param_types[$i]);
           $i++;
         } else {
-          &dakota::util::add_last($parameter_n, $$parameter_types[$i]);
+          &dakota::util::add_last($param_n, $$param_types[$i]);
           $i++;
         }
       }
     }
     $i++;
-    &dakota::util::add_last($params, $parameter_n);
+    &dakota::util::add_last($params, $param_n);
   }
   #print STDERR Dumper $params;
   my $types = [];
@@ -1670,7 +1670,7 @@ sub kw_args_generics_add {
   my ($target_ast, $method) = @_;
   my ($name, $types) = &kw_args_generics_sig($method);
   my $name_str =  &str_from_seq($name);
-  my $types_str = &parameter_types_str($types);
+  my $types_str = &param_types_str($types);
   $$target_ast{'kw-arg-generics'}{$name_str}{$types_str} = [ $name, $types ];
 }
 
@@ -1755,13 +1755,13 @@ sub method {
   if ($open_paren_index + 1 == $close_paren_index) {
     &error(__FILE__, __LINE__, $close_paren_index);
   }
-  my $parameter_types = &sst::token_seq($gbl_sst,
+  my $param_types = &sst::token_seq($gbl_sst,
                                         $open_paren_index + 1,
                                         $close_paren_index - 1);
-  $parameter_types = &token_seq::simple_seq($parameter_types);
-  my ($kw_arg_parameter_types, $kw_arg_names, $kw_arg_defaults) =
-    &parameter_list($parameter_types);
-  $$method{'parameter-types'} = $kw_arg_parameter_types;
+  $param_types = &token_seq::simple_seq($param_types);
+  my ($kw_arg_param_types, $kw_arg_names, $kw_arg_defaults) =
+    &param_list($param_types);
+  $$method{'param-types'} = $kw_arg_param_types;
   # if method has kw-arg-names, then its a kw arg
   # but it could still be a kw arg
 
@@ -2042,7 +2042,7 @@ sub generics::parse {
   #my $generic;
   while (my ($generic_key, $generic) = each(%$generics_tbl)) {
     &dakota::util::add_last($generics_seq, $generic);
-    foreach my $arg (@{$$generic{'parameter-types'}}) {
+    foreach my $arg (@{$$generic{'param-types'}}) {
       &add_type([$arg]);
     }
     foreach my $arg (@{$$generic{'kw-types'} ||= []}) {
@@ -2073,7 +2073,7 @@ sub generics::_parse { # no longer recursive
     $$generic{'return-type'} =
       &dakota::generate::type_trans($$generic{'return-type'});
 
-    my $args =    $$generic{'parameter-types'};
+    my $args =    $$generic{'param-types'};
     my $num_args = @$args;
     my $arg_num;
     for ($arg_num = 0; $arg_num < $num_args; $arg_num++) {

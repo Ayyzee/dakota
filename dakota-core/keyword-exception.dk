@@ -49,7 +49,7 @@ klass keyword-exception {
     fprintf(stderr, ", \"signature\": [ %p, \"%s(%s)\" ]",
             cast(ptr-t)self.signature,
             self.signature->name,
-            self.signature->parameter-types);
+            self.signature->param-types);
     fprintf(stderr, ", \"keyword\": [ %p, \"#%s\" ]",
             cast(ptr-t)self.keyword,
             self.keyword);
@@ -76,7 +76,7 @@ klass keyword-exception {
                   ", \"method\": \"%s(%s)\"",
                   self.keyword,
                   name-of(klass-of(self.object)),
-                  self.signature->name, self.signature->parameter-types);
+                  self.signature->name, self.signature->param-types);
     return self;
   }
 }

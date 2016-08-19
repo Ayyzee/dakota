@@ -53,7 +53,7 @@ klass no-such-slot-exception {
                     ", \"slot-name\": \"#%s\"",
                     name-of(self.object),
                     name-of(klass-of(self.object)),
-                    self.signature->name, self.signature->parameter-types,
+                    self.signature->name, self.signature->param-types,
                     self.name);
     } else {
       $print-format(out,
@@ -63,7 +63,7 @@ klass no-such-slot-exception {
                     ", \"slot-name\": \"#%s\"",
                     $str(self.object),
                     name-of(klass-of(self.object)),
-                    self.signature->name, self.signature->parameter-types,
+                    self.signature->name, self.signature->param-types,
                     self.name);
     }
     return self;

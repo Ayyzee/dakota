@@ -49,7 +49,7 @@ func dkt-va-trace-before(const signature-t* signature, method-t m, super-t conte
   int-t result = 0;
   if (nullptr != getenv("DK_ENABLE_TRACE")) {
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
-                           signature->name, signature->parameter-types + sizeof("object-t") - 1,
+                           signature->name, signature->param-types + sizeof("object-t") - 1,
                            cast(ptr-t)(context.object), name-of(klass-of(context.object)),
                            cast(ptr-t)(context.klass), name-of(context.klass),
                            cast(ptr-t)cast(size-t)(m));
@@ -62,7 +62,7 @@ func dkt-va-trace-before(const signature-t* signature, method-t m, object-t obje
   int-t result = 0;
   if (nullptr != getenv("DK_ENABLE_TRACE")) {
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
-                           signature->name, signature->parameter-types,
+                           signature->name, signature->param-types,
                            cast(ptr-t)(object), name-of(klass-of(object)),
                            cast(ptr-t)cast(size-t)(m));
     trace-column-in();
@@ -75,7 +75,7 @@ func dkt-va-trace-after(const signature-t* signature, method-t m, super-t contex
   int-t result = 0;
   if (nullptr != getenv("DK_ENABLE_TRACE"))
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
-                           signature->name, signature->parameter-types + sizeof("object-t") - 1,
+                           signature->name, signature->param-types + sizeof("object-t") - 1,
                            cast(ptr-t)(context.object), name-of(klass-of(context.object)),
                            cast(ptr-t)(context.klass), name-of(context.klass),
                            cast(ptr-t)cast(size-t)(m));
@@ -87,7 +87,7 @@ func dkt-va-trace-after(const signature-t* signature, method-t m, object-t objec
   int-t result = 0;
   if (nullptr != getenv("DK_ENABLE_TRACE"))
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
-                           signature->name, signature->parameter-types,
+                           signature->name, signature->param-types,
                            cast(ptr-t)(object), name-of(klass-of(object)),
                            cast(ptr-t)cast(size-t)(m));
   return result;
