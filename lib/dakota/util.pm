@@ -92,12 +92,12 @@ our @EXPORT= qw(
                  is_exe
                  is_symbol_candidate
                  is_debug
-                 is_kw_args_generic
+                 is_kw_args_method
                  is_out_of_date
                  is_va
                  kw_arg_generics
-                 kw_args_generics_sig
                  kw_arg_placeholders
+                 kw_args_method_sig
                  last
                  at
                  dk_mangle_seq
@@ -589,7 +589,7 @@ sub param_types_str {
 }
 # [ name, fixed-param-types ]
 # [ [ x :: signal ], [ object-t, int64-t, ... ] ]
-sub kw_args_generics_sig {
+sub kw_args_method_sig {
   my ($generic) = @_;
   my $kw_types_len = 0;
   if ($$generic{'kw-arg-names'} && 0 < scalar @{$$generic{'kw-arg-names'}}) {
@@ -707,10 +707,10 @@ sub is_va {
     return 0;
   }
 }
-sub is_kw_args_generic {
-  my ($generic) = @_;
+sub is_kw_args_method {
+  my ($method) = @_;
   my $state = 0;
-  my ($name, $types) = &kw_args_generics_sig($generic);
+  my ($name, $types) = &kw_args_method_sig($method);
   my $name_str =  &str_from_seq($name);
   my $types_str = &param_types_str($types);
   my $global_project_ast = &global_project_ast();
@@ -718,9 +718,9 @@ sub is_kw_args_generic {
 
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
     $state = 1;
-  } elsif (defined $$generic{'kw-arg-names'} && 0 < @{$$generic{'kw-arg-names'}}) {
+  } elsif (defined $$method{'kw-arg-names'} && 0 < @{$$method{'kw-arg-names'}}) {
     $state = 1;
-  } elsif (defined $$generic{'kw-types'} && 0 < @{$$generic{'kw-types'}}) {
+  } elsif (defined $$method{'kw-types'} && 0 < @{$$method{'kw-types'}}) {
     $state = 1;
   }
   return $state;

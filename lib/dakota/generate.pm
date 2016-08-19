@@ -1110,7 +1110,7 @@ sub generate_va_generic_defn {
   if (&is_exported($va_method)) {
     $visibility = ' [[export]]';
   }
-  if (&is_kw_args_generic($vararg_method)) {
+  if (&is_kw_args_method($vararg_method)) {
     $part .= ' [[sentinel]]';
   }
   if (&is_src_decl() || &is_target_decl()) {

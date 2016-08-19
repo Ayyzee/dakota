@@ -229,7 +229,7 @@ sub kw_args_translate {
             delete $$method{'kw-arg-names'};
             delete $$method{'kw-arg-defaults'};
           } else {
-            if (&is_kw_args_generic($method)) {
+            if (&is_kw_args_method($method)) {
               if (!&dakota::generate::is_va($method)) {
                 &update_to_kw_args($method);
               }
@@ -1668,7 +1668,7 @@ sub add_generics_used {
 }
 sub kw_args_generics_add {
   my ($target_ast, $method) = @_;
-  my ($name, $types) = &kw_args_generics_sig($method);
+  my ($name, $types) = &kw_args_method_sig($method);
   my $name_str =  &str_from_seq($name);
   my $types_str = &param_types_str($types);
   $$target_ast{'kw-arg-generics'}{$name_str}{$types_str} = [ $name, $types ];
