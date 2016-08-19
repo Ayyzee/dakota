@@ -340,7 +340,7 @@ sub vars_from_defn {
   }
 
   if (exists $$kw_args_generics{$name}) { # hackhack
-    # replace keyword args with va-list-t
+    # replace kw args with va-list-t
     $params =~ s|,[^,]+?/\*$colon.*?\*/||g;
     $params .= ", va-list-t";
     $result .= " static const signature-t* __method__ = KW-ARGS-METHOD-SIGNATURE(va::$name,($params)); USE(__method__);";

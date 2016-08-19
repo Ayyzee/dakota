@@ -591,15 +591,15 @@ sub parameter_types_str {
 # [ [ x :: signal ], [ object-t, int64-t, ... ] ]
 sub kw_args_generics_sig {
   my ($generic) = @_;
-  my $keyword_types_len = 0;
+  my $kw_types_len = 0;
   if ($$generic{'kw-args-names'} && 0 < scalar @{$$generic{'kw-args-names'}}) {
-    $keyword_types_len = scalar @{$$generic{'kw-args-names'}};
+    $kw_types_len = scalar @{$$generic{'kw-args-names'}};
   }
   my $parameter_types = &deep_copy($$generic{'parameter-types'});
-  my $offset = scalar @$parameter_types - $keyword_types_len;
-  my $keyword_types = [splice @$parameter_types, 0, $offset];
-  &add_last($keyword_types, ['...']);
-  return ($$generic{'name'}, $keyword_types);
+  my $offset = scalar @$parameter_types - $kw_types_len;
+  my $kw_types = [splice @$parameter_types, 0, $offset];
+  &add_last($kw_types, ['...']);
+  return ($$generic{'name'}, $kw_types);
 }
 my $global_project;
 sub global_project {
@@ -720,7 +720,7 @@ sub is_kw_args_generic {
     $state = 1;
   } elsif (defined $$generic{'kw-args-names'} && 0 < @{$$generic{'kw-args-names'}}) {
     $state = 1;
-  } elsif (defined $$generic{'keyword-types'} && 0 < @{$$generic{'keyword-types'}}) {
+  } elsif (defined $$generic{'kw-types'} && 0 < @{$$generic{'kw-types'}}) {
     $state = 1;
   }
   return $state;

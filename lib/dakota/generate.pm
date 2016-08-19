@@ -936,7 +936,7 @@ sub method::kw_list_types {
       $delim = ', '; # extra whitespace
     }
   }
-  foreach my $kw_arg (@{$$method{'keyword-types'}}) {
+  foreach my $kw_arg (@{$$method{'kw-types'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
     my $kw_arg_type = &arg::type($$kw_arg{'type'});
 
@@ -1001,7 +1001,7 @@ sub klass::kw_args_methods {
   my $kw_args_methods_seq = [];
 
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}) {
-    if ($$method{'keyword-types'}) {
+    if ($$method{'kw-types'}) {
       &dakota::util::add_last($kw_args_methods_seq, $method);
     }
   }
@@ -1257,11 +1257,11 @@ sub common::generate_signature_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
-      my $keyword_types = $$generic{'keyword-types'} ||= undef;
+      my $kw_types = $$generic{'kw-types'} ||= undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_signature($generic, $col, ['signature', ':', 'va']);
       }
-      $$generic{'keyword-types'} = $keyword_types;
+      $$generic{'kw-types'} = $kw_types;
     }
   }
   $col = &colout($col);
@@ -1274,11 +1274,11 @@ sub common::generate_signature_defns {
     foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
         my $var_args_generic = &method::var_args_from_qual_va_list($generic);
-        my $keyword_types = $$var_args_generic{'keyword-types'} ||= undef;
+        my $kw_types = $$var_args_generic{'kw-types'} ||= undef;
         #if (!&is_slots($var_args_generic)) {
         $scratch_str .= &common::print_signature($var_args_generic, $col, ['signature']);
         #}
-        $$var_args_generic{'keyword-types'} = $keyword_types;
+        $$var_args_generic{'kw-types'} = $kw_types;
       }
     }
     $col = &colout($col);
@@ -1289,11 +1289,11 @@ sub common::generate_signature_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
-      my $keyword_types = $$generic{'keyword-types'} ||= undef;
+      my $kw_types = $$generic{'kw-types'} ||= undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_signature($generic, $col, ['signature']);
       }
-      $$generic{'keyword-types'} = $keyword_types;
+      $$generic{'kw-types'} = $kw_types;
     }
   }
   $col = &colout($col);
@@ -1359,11 +1359,11 @@ sub common::generate_selector_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
-      my $keyword_types = $$generic{'keyword-types'} ||= undef;
+      my $kw_types = $$generic{'kw-types'} ||= undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_selector($generic, $col, ['__selector', '::', 'va']);
       }
-      $$generic{'keyword-types'} = $keyword_types;
+      $$generic{'kw-types'} = $kw_types;
     }
   }
   $col = &colout($col);
@@ -1376,11 +1376,11 @@ sub common::generate_selector_defns {
     foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
         my $var_args_generic = &method::var_args_from_qual_va_list($generic);
-        my $keyword_types = $$var_args_generic{'keyword-types'} ||= undef;
+        my $kw_types = $$var_args_generic{'kw-types'} ||= undef;
         if (!&is_slots($generic)) {
           $scratch_str .= &common::print_selector($var_args_generic, $col, ['__selector']);
         }
-        $$var_args_generic{'keyword-types'} = $keyword_types;
+        $$var_args_generic{'kw-types'} = $kw_types;
       }
     }
     $col = &colout($col);
@@ -1391,11 +1391,11 @@ sub common::generate_selector_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
-      my $keyword_types = $$generic{'keyword-types'} ||= undef;
+      my $kw_types = $$generic{'kw-types'} ||= undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_selector($generic, $col, ['__selector']);
       }
-      $$generic{'keyword-types'} = $keyword_types;
+      $$generic{'kw-types'} = $kw_types;
     }
   }
   $col = &colout($col);
@@ -2342,7 +2342,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
     #print STDERR Dumper($va_list_methods);
     foreach my $method (@$va_list_methods) {
       my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
-      if (exists $$method{'keyword-types'}) {
+      if (exists $$method{'kw-types'}) {
         $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //kw-args // stmt1" . &ann(__FILE__, __LINE__) . $nl;
       } else {
         $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //va // stmt1" . &ann(__FILE__, __LINE__) . $nl;
@@ -2356,9 +2356,9 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
         #$$va_method{'inline?'} = 1;
         #if (&is_decl() || &is_same_file($klass_scope)) #rn1
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
-          if (defined $$method{'keyword-types'}) {
+          if (defined $$method{'kw-types'}) {
             &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
-            if (0 == @{$$va_method{'keyword-types'}}) {
+            if (0 == @{$$va_method{'kw-types'}}) {
               my $last = &dakota::util::remove_last($$va_method{'parameter-types'});
               die if 'va-list-t' ne &ct($last);
               my ($visibility, $method_decl_ref) = &func::decl($va_method, $klass_path);
@@ -2374,8 +2374,8 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
         }
         if (&is_decl) {
           if (&is_same_src_file($klass_scope) || &is_target()) { #rn2
-            if (defined $$method{'keyword-types'}) {
-              if (0 != @{$$method{'keyword-types'}}) {
+            if (defined $$method{'kw-types'}) {
+              if (0 != @{$$method{'kw-types'}}) {
                 my $other_method_decl = &kw_args_method::type_decl($method);
 
                 #my $scope = &ct($klass_path);
@@ -3095,13 +3095,13 @@ sub method::type_decl {
 sub kw_args_method::type {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
-  my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
+  my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'kw-types'});
   return "(*)($$arg_type_list) -> $return_type";
 }
 sub kw_args_method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
-  my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'keyword-types'});
+  my $arg_type_list = &kw_arg_type::list_types($$method{'parameter-types'}, $$method{'kw-types'});
   my $name = &dakota::util::last($$method{'name'});
   return "(*$name)($$arg_type_list) -> $return_type";
 }
@@ -3754,7 +3754,7 @@ sub dk_generate_cc_footer_klass {
 sub generate_kw_args_method_signature_decls {
   my ($methods, $klass_name, $col, $klass_type, $max_width) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    if ($$method{'keyword-types'}) {
+    if ($$method{'kw-types'}) {
       &generate_kw_args_method_signature_decl($method, $klass_name, $col, $klass_type, $max_width);
     }
   }
@@ -3762,7 +3762,7 @@ sub generate_kw_args_method_signature_decls {
 sub generate_kw_args_method_signature_defns {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    if ($$method{'keyword-types'}) {
+    if ($$method{'kw-types'}) {
       &generate_kw_args_method_signature_defn($method, $klass_name, $col, $klass_type);
     }
   }
@@ -3802,9 +3802,9 @@ sub generate_kw_args_method_signature_defn {
  #$kw_list_types = &remove_extra_whitespace($kw_list_types);
   if (1) { # optional?
     my $defs = [];
-    foreach my $keyword_types (@{$$method{'keyword-types'}}) {
-      if (defined $$keyword_types{'default'}) {
-        my $def = $$keyword_types{'default'};
+    foreach my $kw_types (@{$$method{'kw-types'}}) {
+      if (defined $$kw_types{'default'}) {
+        my $def = $$kw_types{'default'};
         $def =~ s/"/\\"/g;
         &add_last($defs, $def);
       }
@@ -3863,7 +3863,7 @@ sub generate_slots_method_signature_defn {
 sub generate_kw_args_method_defns {
   my ($slots, $methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    if ($$method{'keyword-types'}) {
+    if ($$method{'kw-types'}) {
       &generate_kw_args_method_defn($slots, $method, $klass_name, $col, $klass_type);
     }
   }
@@ -3914,7 +3914,7 @@ sub generate_kw_args_method_defn {
   my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'parameter-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
 
-  if (scalar @{$$method{'keyword-types'}}) {
+  if (scalar @{$$method{'kw-types'}}) {
     #my $param = &dakota::util::remove_last($$method{'parameter-types'}); # remove intptr-t type
     $method_type_decl = &kw_args_method::type_decl($method);
     #&dakota::util::add_last($$method{'parameter-types'}, $param);
@@ -3927,10 +3927,10 @@ sub generate_kw_args_method_defn {
     #&dakota::util::add_last($$method{'parameter-types'}, $param2);
     &dakota::util::add_last($$method{'parameter-types'}, $param1);
   }
-  if (scalar @{$$method{'keyword-types'}}) {
+  if (scalar @{$$method{'kw-types'}}) {
     $$scratch_str_ref .= $col;
     my $delim = '';
-    foreach my $kw_arg (@{$$method{'keyword-types'}}) {
+    foreach my $kw_arg (@{$$method{'kw-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
       my $kw_arg_type = &arg::type($$kw_arg{'type'});
       $kw_arg_type =~ s/\[\s*\]$/*/; # to change object-t[] objects to object-t* objects
@@ -3941,7 +3941,7 @@ sub generate_kw_args_method_defn {
     $$scratch_str_ref .= $col . "struct {";
     my $initializer = '';
     $delim = '';
-    foreach my $kw_arg (@{$$method{'keyword-types'}}) {
+    foreach my $kw_arg (@{$$method{'kw-types'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
       $$scratch_str_ref .= " boole-t $kw_arg_name;";
       $initializer .= "${delim}false";
@@ -3958,7 +3958,7 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated." . $nl;
   $col = &colin($col);
 
-  foreach my $kw_arg (@{$$method{'keyword-types'}}) {
+  foreach my $kw_arg (@{$$method{'kw-types'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
     my $kw_arg_type = &arg::type($$kw_arg{'type'});
     $$scratch_str_ref .= $col . "case \#$kw_arg_name: // dk-hash() is a constexpr. its compile-time evaluated." . $nl;
@@ -4002,7 +4002,7 @@ sub generate_kw_args_method_defn {
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}" . $nl;
 
-  foreach my $kw_arg (@{$$method{'keyword-types'}}) {
+  foreach my $kw_arg (@{$$method{'kw-types'}}) {
     my $kw_arg_type =  &arg::type($$kw_arg{'type'});
     my $kw_arg_name =    $$kw_arg{'name'};
     $$scratch_str_ref .= $col . "unless (_state_.$kw_arg_name)" . $nl;
@@ -4034,7 +4034,7 @@ sub generate_kw_args_method_defn {
     $delim = ', ';
   }
   #&dakota::util::add_last($new_arg_names, $last_arg_name); # add name associated with intptr-t type
-  foreach my $kw_arg (@{$$method{'keyword-types'}}) {
+  foreach my $kw_arg (@{$$method{'kw-types'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
     $args .= ", $kw_arg_name";
   }

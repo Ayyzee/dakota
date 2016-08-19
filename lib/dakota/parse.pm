@@ -219,12 +219,12 @@ sub kw_args_translate {
             }
             my $kw_args_type;
             while (scalar @$kw_args_types) {
-              my $keyword_type = {
+              my $kw_type = {
                 type =>    &dakota::util::remove_last($kw_args_types),
                 default => &dakota::util::remove_last($kw_args_defaults),
                 name =>    &dakota::util::remove_first($$method{'kw-args-names'}) };
 
-              &dakota::util::add_last($$method{'keyword-types'}, $keyword_type);
+              &dakota::util::add_last($$method{'kw-types'}, $kw_type);
             }
             delete $$method{'kw-args-names'};
             delete $$method{'kw-args-defaults'};
@@ -244,9 +244,9 @@ sub kw_args_translate {
 sub update_to_kw_args {
   my ($method) = @_;
   die if $$method{'parameter-types'}[-1][0] eq 'va-list-t';
-  die if $$method{'keyword-types'};
+  die if $$method{'kw-types'};
   &dakota::util::add_last($$method{'parameter-types'}, [ 'va-list-t' ]);
-  $$method{'keyword-types'} = [];
+  $$method{'kw-types'} = [];
 }
 sub tbl_add_info {
   my ($root_tbl, $tbl) = @_;
@@ -2045,7 +2045,7 @@ sub generics::parse {
     foreach my $arg (@{$$generic{'parameter-types'}}) {
       &add_type([$arg]);
     }
-    foreach my $arg (@{$$generic{'keyword-types'} ||= []}) {
+    foreach my $arg (@{$$generic{'kw-types'} ||= []}) {
       &add_type([$arg]);
       &add_symbol($gbl_root, $$arg{'name'});
     }
