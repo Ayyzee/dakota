@@ -219,12 +219,12 @@ sub kw_args_translate {
             }
             my $kw_args_type;
             while (scalar @$kw_arg_types) {
-              my $kw_type = {
+              my $kw_arg = {
                 type =>    &dakota::util::remove_last($kw_arg_types),
                 default => &dakota::util::remove_last($kw_arg_defaults),
                 name =>    &dakota::util::remove_first($$method{'kw-arg-names'}) };
 
-              &dakota::util::add_last($$method{'kw-types'}, $kw_type);
+              &dakota::util::add_last($$method{'kw-args'}, $kw_arg);
             }
             delete $$method{'kw-arg-names'};
             delete $$method{'kw-arg-defaults'};
@@ -244,9 +244,9 @@ sub kw_args_translate {
 sub update_to_kw_args {
   my ($method) = @_;
   die if $$method{'param-types'}[-1][0] eq 'va-list-t';
-  die if $$method{'kw-types'};
+  die if $$method{'kw-args'};
   &dakota::util::add_last($$method{'param-types'}, [ 'va-list-t' ]);
-  $$method{'kw-types'} = [];
+  $$method{'kw-args'} = [];
 }
 sub tbl_add_info {
   my ($root_tbl, $tbl) = @_;
@@ -2045,7 +2045,7 @@ sub generics::parse {
     foreach my $arg (@{$$generic{'param-types'}}) {
       &add_type([$arg]);
     }
-    foreach my $arg (@{$$generic{'kw-types'} ||= []}) {
+    foreach my $arg (@{$$generic{'kw-args'} ||= []}) {
       &add_type([$arg]);
       &add_symbol($gbl_root, $$arg{'name'});
     }
@@ -2126,8 +2126,8 @@ sub init_global_target_ast {
   #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
   $global_target_ast = &ast_merge($asts);
   $global_target_ast = &kw_args_translate($global_target_ast);
-  if (0) {
-    &scalar_to_file("global-target.ast", $global_target_ast);
+  if (1) {
+    &scalar_to_file(&builddir() . '/x/kw-args-target.ast', $global_target_ast);
   }
   #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
   return $global_target_ast;

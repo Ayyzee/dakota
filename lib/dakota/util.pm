@@ -590,16 +590,18 @@ sub param_types_str {
 # [ name, fixed-param-types ]
 # [ [ x :: signal ], [ object-t, int64-t, ... ] ]
 sub kw_args_method_sig {
-  my ($generic) = @_;
-  my $kw_types_len = 0;
-  if ($$generic{'kw-arg-names'} && 0 < scalar @{$$generic{'kw-arg-names'}}) {
-    $kw_types_len = scalar @{$$generic{'kw-arg-names'}};
+  my ($method) = @_;
+  my $len = 0;
+  if ($$method{'kw-arg-names'} && 0 < scalar @{$$method{'kw-arg-names'}}) {
+    $len = scalar @{$$method{'kw-arg-names'}};
+  } elsif ($$method{'kw-args'} && 0 < scalar @{$$method{'kw-args'}}) {
+    $len = scalar @{$$method{'kw-args'}};
   }
-  my $param_types = &deep_copy($$generic{'param-types'});
-  my $offset = scalar @$param_types - $kw_types_len;
-  my $kw_types = [splice @$param_types, 0, $offset];
-  &add_last($kw_types, ['...']);
-  return ($$generic{'name'}, $kw_types);
+  my $param_types = &deep_copy($$method{'param-types'});
+  my $offset = scalar @$param_types - $len;
+  my $kw_args = [splice @$param_types, 0, $offset];
+  &add_last($kw_args, ['...']);
+  return ($$method{'name'}, $kw_args);
 }
 my $global_project;
 sub global_project {
@@ -720,7 +722,7 @@ sub is_kw_args_method {
     $state = 1;
   } elsif (defined $$method{'kw-arg-names'} && 0 < @{$$method{'kw-arg-names'}}) {
     $state = 1;
-  } elsif (defined $$method{'kw-types'} && 0 < @{$$method{'kw-types'}}) {
+  } elsif (defined $$method{'kw-args'} && 0 < @{$$method{'kw-args'}}) {
     $state = 1;
   }
   return $state;
