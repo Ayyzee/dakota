@@ -2183,19 +2183,20 @@ sub linkage_unit::generate_klasses_body_vars {
 
   if (&is_src_decl() || &is_target_decl()) {
     #$$scratch_str_ref .= $col . "extern symbol-t __type__;" . $nl;
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern symbol-t __name__; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern symbol-t __name__;";
   } elsif (&is_target_defn()) {
     #$$scratch_str_ref .= $col . "symbol-t __type__ = \$$klass_type;" . $nl;
     my $literal_symbol = &as_literal_symbol(&ct($klass_path));
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { symbol-t __name__ = $literal_symbol; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { symbol-t __name__ = $literal_symbol;";
   }
   if ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern object-t klass [[read-only]]; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
+      $$scratch_str_ref .= " extern object-t klass [[read-only]];";
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { object-t klass = nullptr; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
+      $$scratch_str_ref .= $pad . " object-t klass = nullptr;";
     }
   }
+  $$scratch_str_ref .= ' }' . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
     if (!&is_target_defn()) {
       my $is_exported;
       if (exists $$klass_scope{'const'}) {
@@ -2528,12 +2529,18 @@ sub is_array_type {
   return $is_array_type;
 }
 sub generate_exported_slots_decls {
-  my ($scope, $col, $klass_path, $klass_name, $klass_scope, $max_width) = @_;
-  my $pad = '';
-  $max_width = undef; # yes, short circuiting formatting code below
-  if ($max_width) {
+  my ($scope, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2) = @_;
+  my $pad1 = '';
+  if ($max_width1) {
     my $width = length($klass_name);
-    $pad = ' ' x ($max_width - $width);
+    $pad1 = ' ' x ($max_width1 - $width);
+  }
+  my $slots_decl = &slots_decl($$klass_scope{'slots'});
+  my $typealias_slots_t = ' ' . &typealias_slots_t($klass_name);
+  my $pad2 = '';
+  if ($max_width2) {
+    my $width = length($slots_decl);
+    $pad2 = ' ' x ($max_width2 - $width);
   }
   if (!$klass_scope) {
     $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
@@ -2543,29 +2550,29 @@ sub generate_exported_slots_decls {
   if ('object' eq "$klass_name") {
     if ('struct' eq $slots_cat ||
         'union'  eq $slots_cat) {
-      $$scratch_str_ref .= $col . "klass $klass_name" . $pad . " {" . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     } elsif ('enum' eq $slots_cat) {
-      $$scratch_str_ref .= $col . "//klass $klass_name" . $pad . " {" . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "//klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     } else {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . &ann(__FILE__, __LINE__) . $nl; # special-case
+    $$scratch_str_ref .= $pad2 . $typealias_slots_t . &ann(__FILE__, __LINE__) . $nl; # special-case
   } elsif (&should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
-    $$scratch_str_ref .= $col . "klass $klass_name" . $pad . " {" . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
                            'wchar-t'  => undef, # __WCHAR_MAX__, __WCHAR_TYPE__
                          };
     if (!exists $$excluded_types{"$klass_name-t"}) {
-      $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . $nl;
+      $$scratch_str_ref .= $pad2 . $typealias_slots_t . &ann(__FILE__, __LINE__) . $nl;
     }
   } elsif (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
     if ('struct' eq $slots_cat ||
         'union'  eq $slots_cat) {
-      $$scratch_str_ref .= $col . "klass $klass_name" . $pad . " {" . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     } elsif ('enum' eq $slots_cat) {
-      $$scratch_str_ref .= $col . "klass $klass_name" . $pad . " {";
+      $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {";
       my $is_exported;
       my $is_slots;
       &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
@@ -2574,7 +2581,7 @@ sub generate_exported_slots_decls {
       print STDERR &Dumper($$klass_scope{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
-    $$scratch_str_ref .= $col . &typealias_slots_t($klass_name) . $nl;
+    $$scratch_str_ref .= $pad2 . $typealias_slots_t . &ann(__FILE__, __LINE__) . $nl;
   }
 }
 sub linkage_unit::generate_headers {
@@ -2902,7 +2909,7 @@ sub linkage_unit::generate_klasses {
       $max_width = $width;
     }
   }
-  &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path, $ordered_klass_names, $max_width);
+  &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path, $ordered_klass_names);
   if (&is_decl()) {
     $$scratch_str_ref .=
       $nl .
@@ -2925,14 +2932,30 @@ sub linkage_unit::generate_klasses {
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses_types_before {
-  my ($scope, $col, $klass_path, $ordered_klass_names, $max_width) = @_;
+  my ($scope, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_decl()) {
+    my $max_width1 = 0;
+    my $max_width2 = 0;
     foreach my $klass_name (@$ordered_klass_names) { # do not sort!
       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
       if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
-        &generate_exported_slots_decls($scope, $col, $klass_path, $klass_name, $klass_scope, $max_width);
+        my $width1 = length($klass_name);
+        if ($width1 > $max_width1) {
+          $max_width1 = $width1;
+        }
+        my $width2 = length(&slots_decl($$klass_scope{'slots'}));
+        if ($width2 > $max_width2) {
+          $max_width2 = $width2;
+        }
+      }
+    }
+    foreach my $klass_name (@$ordered_klass_names) { # do not sort!
+      my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+
+      if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
+        &generate_exported_slots_decls($scope, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2);
       } else {
         &generate_slots_decls($scope, $col, $klass_path, $klass_name, $klass_scope);
       }
