@@ -95,9 +95,9 @@ our @EXPORT= qw(
                  is_kw_args_generic
                  is_out_of_date
                  is_va
-                 kw_args_generics
+                 kw_arg_generics
                  kw_args_generics_sig
-                 kw_args_placeholders
+                 kw_arg_placeholders
                  last
                  at
                  dk_mangle_seq
@@ -421,7 +421,7 @@ sub pann {
   }
   return $string;
 }
-sub kw_args_placeholders {
+sub kw_arg_placeholders {
   return { 'default' => '{}', 'nodefault' => '{~}' };
 }
 # literal symbol/keyword grammar: ^_* ... _*$
@@ -592,8 +592,8 @@ sub parameter_types_str {
 sub kw_args_generics_sig {
   my ($generic) = @_;
   my $kw_types_len = 0;
-  if ($$generic{'kw-args-names'} && 0 < scalar @{$$generic{'kw-args-names'}}) {
-    $kw_types_len = scalar @{$$generic{'kw-args-names'}};
+  if ($$generic{'kw-arg-names'} && 0 < scalar @{$$generic{'kw-arg-names'}}) {
+    $kw_types_len = scalar @{$$generic{'kw-arg-names'}};
   }
   my $parameter_types = &deep_copy($$generic{'parameter-types'});
   my $offset = scalar @$parameter_types - $kw_types_len;
@@ -714,11 +714,11 @@ sub is_kw_args_generic {
   my $name_str =  &str_from_seq($name);
   my $types_str = &parameter_types_str($types);
   my $global_project_ast = &global_project_ast();
-  my $tbl = $$global_project_ast{'kw-args-generics'};
+  my $tbl = $$global_project_ast{'kw-arg-generics'};
 
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
     $state = 1;
-  } elsif (defined $$generic{'kw-args-names'} && 0 < @{$$generic{'kw-args-names'}}) {
+  } elsif (defined $$generic{'kw-arg-names'} && 0 < @{$$generic{'kw-arg-names'}}) {
     $state = 1;
   } elsif (defined $$generic{'kw-types'} && 0 < @{$$generic{'kw-types'}}) {
     $state = 1;

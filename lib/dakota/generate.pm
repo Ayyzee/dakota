@@ -100,7 +100,7 @@ our @EXPORT= qw(
               );
 
 my $colon = ':'; # key/element delim only
-my $kw_args_placeholders = &kw_args_placeholders();
+my $kw_arg_placeholders = &kw_arg_placeholders();
 my ($id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 
@@ -283,12 +283,12 @@ sub write_to_file_converted_strings {
     $filestr .= $string;
   }
   my $sst = &sst::make($filestr, ">$path"); # costly (< 1/4 of total)
-  my $kw_args_generics = $$project_ast{'kw-args-generics'};
+  my $kw_arg_generics = $$project_ast{'kw-arg-generics'};
   if ($use_new_macro_system) {
-    &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_args_generics);
+    &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_arg_generics);
   }
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
-  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_args_generics, $remove); # costly (< 3/4 of total)
+  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_arg_generics, $remove); # costly (< 3/4 of total)
   my $should_echo;
   &filestr_to_file($converted_string, $path, $should_echo = 0);
 }
@@ -941,7 +941,7 @@ sub method::kw_list_types {
     my $kw_arg_type = &arg::type($$kw_arg{'type'});
 
     if (defined $$kw_arg{'default'}) {
-      my $kw_arg_default_placeholder = $$kw_args_placeholders{'default'};
+      my $kw_arg_default_placeholder = $$kw_arg_placeholders{'default'};
       $result .= "$delim$kw_arg_type $kw_arg_name:$kw_arg_default_placeholder"; # extra whitespace
     } else {
       $result .= "$delim$kw_arg_type $kw_arg_name:"; # extra whitespace
@@ -995,7 +995,7 @@ sub klass::va_list_methods {
   }
   return $va_methods_seq;
 }
-sub klass::kw_args_methods {
+sub klass::kw_arg_methods {
   my ($klass_scope) = @_;
   my $method;
   my $kw_args_methods_seq = [];
@@ -2328,9 +2328,9 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
   if (&is_decl() && $$klass_scope{'has-finalize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
-  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
-  if (&is_decl() && @$kw_args_methods) {
-    &generate_kw_args_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type, $max_width);
+  my $kw_arg_methods = &klass::kw_arg_methods($klass_scope);
+  if (&is_decl() && @$kw_arg_methods) {
+    &generate_kw_arg_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type, $max_width);
   }
   if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
     &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type, $max_width);
@@ -3307,7 +3307,7 @@ sub dk_generate_cc_footer_klass {
 
   my $method_aliases = &klass::method_aliases($klass_scope);
   my $va_list_methods = &klass::va_list_methods($klass_scope);
-  my $kw_args_methods = &klass::kw_args_methods($klass_scope);
+  my $kw_arg_methods = &klass::kw_arg_methods($klass_scope);
 
   #my $num_va_methods = @$va_list_methods;
 
@@ -3405,11 +3405,11 @@ sub dk_generate_cc_footer_klass {
   #$$scratch_str_ref .= $col . "}" . $nl;
   #}
   ###
-  if (@$kw_args_methods) {
+  if (@$kw_arg_methods) {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __kw-args-method-signatures[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     #$$scratch_str_ref .= "\#if 0" . $nl;
-    foreach my $kw_args_method (@$kw_args_methods) {
+    foreach my $kw_args_method (@$kw_arg_methods) {
       $kw_args_method = &dakota::util::deep_copy($kw_args_method);
       my $list_types = &arg_type::list_types($$kw_args_method{'parameter-types'});
       my $method_name = &ct($$kw_args_method{'name'});
@@ -3680,7 +3680,7 @@ sub dk_generate_cc_footer_klass {
   if (&has_const_info($klass_scope)) {
     $$tbbl{'#const-info'} = '__const-info';
   }
-  if (@$kw_args_methods) {
+  if (@$kw_arg_methods) {
     $$tbbl{'#kw-args-method-signatures'} = '__kw-args-method-signatures';
   }
   if (values %{$$klass_scope{'methods'}}) {
@@ -3751,7 +3751,7 @@ sub dk_generate_cc_footer_klass {
   &dakota::util::add_last($global_klass_defns, "$symbol\::__klass-props");
   return $$scratch_str_ref;
 }
-sub generate_kw_args_method_signature_decls {
+sub generate_kw_arg_method_signature_decls {
   my ($methods, $klass_name, $col, $klass_type, $max_width) = @_;
   foreach my $method (sort method::compare values %$methods) {
     if ($$method{'kw-types'}) {
@@ -3759,7 +3759,7 @@ sub generate_kw_args_method_signature_decls {
     }
   }
 }
-sub generate_kw_args_method_signature_defns {
+sub generate_kw_arg_method_signature_defns {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
     if ($$method{'kw-types'}) {
@@ -3809,7 +3809,7 @@ sub generate_kw_args_method_signature_defn {
         &add_last($defs, $def);
       }
     }
-    my $kw_arg_default_placeholder = $$kw_args_placeholders{'default'};
+    my $kw_arg_default_placeholder = $$kw_arg_placeholders{'default'};
     foreach my $def (@$defs) {
       if (1) {
         $def =~ s/dk::/\$/g;
@@ -3860,7 +3860,7 @@ sub generate_slots_method_signature_defn {
   $col = &colout($col);
   $$scratch_str_ref .= $col . "}}}" . $nl;
 }
-sub generate_kw_args_method_defns {
+sub generate_kw_arg_method_defns {
   my ($slots, $methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
     if ($$method{'kw-types'}) {
@@ -4058,8 +4058,8 @@ sub dk_generate_cc_footer {
   my $col = '';
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &dk_generate_kw_args_method_defns($scope, $stack, 'trait', $col);
-  &dk_generate_kw_args_method_defns($scope, $stack, 'klass', $col);
+  &dk_generate_kw_arg_method_defns($scope, $stack, 'trait', $col);
+  &dk_generate_kw_arg_method_defns($scope, $stack, 'klass', $col);
 
   if (&is_target_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
@@ -4092,7 +4092,7 @@ sub dk_generate_cc_footer {
   }
   return $$scratch_str_ref;
 }
-sub dk_generate_kw_args_method_defns {
+sub dk_generate_kw_arg_method_defns {
   my ($scope, $stack, $klass_type, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
@@ -4101,8 +4101,8 @@ sub dk_generate_kw_args_method_defns {
       if (&is_target_defn()) {
         &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
       } else {
-        &generate_kw_args_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
-        &generate_kw_args_method_defns($$klass_scope{'slots'}, $$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+        &generate_kw_arg_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+        &generate_kw_arg_method_defns($$klass_scope{'slots'}, $$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
       }
       &path::remove_last($stack);
     }

@@ -329,7 +329,7 @@ sub rewrite_syntax {
   $$filestr_ref =~ s/([a-zA-Z0-9])(-+)(?=[a-zA-Z0-9])/&convert_dash_syntax($1, $2)/ge;
 }
 sub vars_from_defn {
-  my ($defn, $name, $params, $kw_args_generics) = @_;
+  my ($defn, $name, $params, $kw_arg_generics) = @_;
   my $result = '';
   $result .= $defn;
 
@@ -339,7 +339,7 @@ sub vars_from_defn {
     $result .= "//";
   }
 
-  if (exists $$kw_args_generics{$name}) { # hackhack
+  if (exists $$kw_arg_generics{$name}) { # hackhack
     # replace kw args with va-list-t
     $params =~ s|,[^,]+?/\*$colon.*?\*/||g;
     $params .= ", va-list-t";
@@ -350,8 +350,8 @@ sub vars_from_defn {
   return $result;
 }
 sub rewrite_methods {
-  my ($filestr_ref, $kw_args_generics) = @_;
-  $$filestr_ref =~ s|((\[\[.+?\]\])?\s*method\s+($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_args_generics)|ges;
+  my ($filestr_ref, $kw_arg_generics) = @_;
+  $$filestr_ref =~ s|((\[\[.+?\]\])?\s*method\s+($rmid)\((object-t self.*?)\)\s*->\s*(.+?)\s*\{)|&vars_from_defn($1, $3, $4, $kw_arg_generics)|ges;
   $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)\[\[alias\(($id)\)\]\](\s*)method(\s+)|$1ALIAS($2)$3METHOD$4|gs;
   $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)(\s*(\[\[.+?\]\])*)(\s*)method(\s+)($id)|$1$2$4METHOD$5$6|gs; #hackhack
   $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)method(\s+)($id)|$1METHOD$2$3|gs; #hackhack
@@ -841,8 +841,8 @@ sub rewrite_keyword_use {
   return "$arg1$list";
 }
 sub rewrite_keyword_syntax {
-  my ($filestr_ref, $kw_args_generics) = @_;
-  foreach my $name (keys %$kw_args_generics) {
+  my ($filestr_ref, $kw_arg_generics) = @_;
+  foreach my $name (keys %$kw_arg_generics) {
     $$filestr_ref =~ s/(method.*?)($name)($main::list)/&rewrite_keyword_syntax_list($1, $2, $3)/ge;
     $$filestr_ref =~ s/(dk::$name)($main::list)/&rewrite_keyword_use($1, $2)/ge;
   }
@@ -851,8 +851,8 @@ sub rewrite_keyword_syntax {
   $$filestr_ref =~ s|__MAKE__|make|gs;
 }
 sub rewrite_sentinal_generic_uses_sub {
-  my ($name, $arg_list, $kw_args_generics) = @_;
-  &rewrite_sentinal_generic_uses(\$arg_list, $kw_args_generics);
+  my ($name, $arg_list, $kw_arg_generics) = @_;
+  &rewrite_sentinal_generic_uses(\$arg_list, $kw_arg_generics);
   if (1) {
     $arg_list =~ s/$/, SENTINAL-PTR/g;
     $arg_list =~ s/,\s*SENTINAL-PTR\s*,\s*SENTINAL-PTR\s*$/, SENTINAL-PTR/g;
@@ -861,15 +861,15 @@ sub rewrite_sentinal_generic_uses_sub {
   return "$name\($arg_list\)";
 }
 sub rewrite_sentinal_generic_uses {
-  my ($filestr_ref, $kw_args_generics) = @_;
-  $$kw_args_generics{'make'} = undef;
-  foreach my $name (sort keys %$kw_args_generics) {
+  my ($filestr_ref, $kw_arg_generics) = @_;
+  $$kw_arg_generics{'make'} = undef;
+  foreach my $name (sort keys %$kw_arg_generics) {
     if ('make' ne $name && $name !~ m/^dk::/) {
       $name = "dk::$name";
     }
-    $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinal_generic_uses_sub($1, $2, $kw_args_generics)/egms;
+    $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinal_generic_uses_sub($1, $2, $kw_arg_generics)/egms;
   }
-  delete $$kw_args_generics{'make'};
+  delete $$kw_arg_generics{'make'};
 }
 sub wrapped_rewrite {
   my ($filestr_ref, $lhs, $rhs) = @_;
@@ -1016,7 +1016,7 @@ sub rewrite_method_chaining {
       &rewrite_method_chaining_replacement($2, $1, $3)/egs;
 }
 sub convert_dk_to_cc {
-  my ($filestr_ref, $kw_args_generics, $remove) = @_;
+  my ($filestr_ref, $kw_arg_generics, $remove) = @_;
   &rewrite_literal_strs($filestr_ref);
   &encode_strings($filestr_ref);
   my $parts = &encode_comments($filestr_ref);
@@ -1080,10 +1080,10 @@ sub convert_dk_to_cc {
 
   &rewrite_signatures($filestr_ref);
   &rewrite_selectors($filestr_ref);
-  &rewrite_keyword_syntax($filestr_ref, $kw_args_generics);
-  &rewrite_sentinal_generic_uses($filestr_ref, $kw_args_generics);
+  &rewrite_keyword_syntax($filestr_ref, $kw_arg_generics);
+  &rewrite_sentinal_generic_uses($filestr_ref, $kw_arg_generics);
   &rewrite_array_types($filestr_ref);
-  &rewrite_methods($filestr_ref, $kw_args_generics);
+  &rewrite_methods($filestr_ref, $kw_arg_generics);
   &rewrite_initialze_finalize($filestr_ref);
   &rewrite_funcs($filestr_ref);
   &rewrite_map($filestr_ref);
@@ -1116,16 +1116,16 @@ sub convert_dk_to_cc {
   return $filestr_ref;
 }
 sub dakota_lang_user_data_old {
-  my $kw_args_generics;
+  my $kw_arg_generics;
   if ($ENV{'DKT_KW_ARGS_GENERICS'}) {
-    $kw_args_generics = do $ENV{'DKT_KW_ARGS_GENERICS'} or die "do $ENV{'DKT_KW_ARGS_GENERICS'} failed: $!\n";
+    $kw_arg_generics = do $ENV{'DKT_KW_ARGS_GENERICS'} or die "do $ENV{'DKT_KW_ARGS_GENERICS'} failed: $!\n";
   } elsif ($gbl_prefix) {
-    $kw_args_generics = do "$gbl_prefix/src/kw-args-generics.pl" or die "do $gbl_prefix/src/kw-args-generics.pl failed: $!\n";
+    $kw_arg_generics = do "$gbl_prefix/src/kw-arg-generics.pl" or die "do $gbl_prefix/src/kw-arg-generics.pl failed: $!\n";
   } else {
     die;
   }
 
-  my $user_data = { 'kw-args-generics' => $kw_args_generics };
+  my $user_data = { 'kw-arg-generics' => $kw_arg_generics };
   return $user_data;
 }
 sub start {
@@ -1135,7 +1135,7 @@ sub start {
   foreach my $arg (@$argv) {
     my $filestr = &dakota::util::filestr_from_file($arg);
 
-    &convert_dk_to_cc(\$filestr, $$user_data{'kw-args-generics'});
+    &convert_dk_to_cc(\$filestr, $$user_data{'kw-arg-generics'});
     print $filestr;
   }
 }

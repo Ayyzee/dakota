@@ -565,23 +565,23 @@ sub for_linker {
   }
   return $result;
 }
-sub update_kw_args_generics {
+sub update_kw_arg_generics {
   my ($asts) = @_;
-  my $kw_args_generics = {};
+  my $kw_arg_generics = {};
   foreach my $path (@$asts) {
     my $ast = &scalar_from_file($path);
-    my $tbl = $$ast{'kw-args-generics'};
+    my $tbl = $$ast{'kw-arg-generics'};
     if ($tbl) {
       while (my ($name, $params_tbl) = each(%$tbl)) {
         while (my ($params_str, $params) = each(%$params_tbl)) {
-          $$kw_args_generics{$name}{$params_str} = $params;
+          $$kw_arg_generics{$name}{$params_str} = $params;
         }
       }
     }
   }
   my $path = $$asts[-1]; # only update the project file ast
   my $ast = &scalar_from_file($path);
-  $$ast{'kw-args-generics'} = $kw_args_generics;
+  $$ast{'kw-arg-generics'} = $kw_arg_generics;
   &scalar_to_file($path, $ast);
 }
 sub update_target_ast_from_all_inputs {
@@ -605,7 +605,7 @@ sub update_target_ast_from_all_inputs {
   die if $$cmd_info{'asts'}[-1] ne $target_ast_path; # assert
   &add_visibility_file($target_ast_path);
 
-  &update_kw_args_generics($$cmd_info{'asts'});
+  &update_kw_arg_generics($$cmd_info{'asts'});
   $$cmd_info{'inputs'} = $$orig{'inputs'};
   $$cmd_info{'output'} = $$orig{'output'};
   $$cmd_info{'opts'} =   $$orig{'opts'};

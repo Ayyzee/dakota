@@ -151,7 +151,7 @@ our @EXPORT= qw(
                  str_from_cmd_info
               );
 my $colon = ':'; # key/element delim only
-my $kw_args_placeholders = &kw_args_placeholders();
+my $kw_arg_placeholders = &kw_arg_placeholders();
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
 my $h =  &dakota::util::header_file_regex();
@@ -192,42 +192,42 @@ sub kw_args_translate {
             &remove_name_va_scope($method);
           }
 
-          if ($$method{'kw-args-names'}) {
-            my $kw_args_types = [];
+          if ($$method{'kw-arg-names'}) {
+            my $kw_arg_types = [];
             my $kw_args_name;        # not used
-            foreach $kw_args_name (@{$$method{'kw-args-names'}}) {
+            foreach $kw_args_name (@{$$method{'kw-arg-names'}}) {
               my $kw_args_type =
                 &dakota::util::remove_last($$method{'parameter-types'});
-              &dakota::util::add_last($kw_args_types, $kw_args_type);
+              &dakota::util::add_last($kw_arg_types, $kw_args_type);
             }
             &update_to_kw_args($method);
-            my $kw_args_defaults = [];
+            my $kw_arg_defaults = [];
             my $kw_args_default;
-            if (exists  $$method{'kw-args-defaults'} &&
-                defined $$method{'kw-args-defaults'}) {
+            if (exists  $$method{'kw-arg-defaults'} &&
+                defined $$method{'kw-arg-defaults'}) {
               while ($kw_args_default =
-                       &dakota::util::remove_last($$method{'kw-args-defaults'})) {
+                       &dakota::util::remove_last($$method{'kw-arg-defaults'})) {
                 my $val = join(' ', @$kw_args_default);
                 $val = &remove_extra_whitespace($val);
-                &dakota::util::add_last($kw_args_defaults, $val);
+                &dakota::util::add_last($kw_arg_defaults, $val);
               }
             } # if
-            my $no_default = @$kw_args_types - @$kw_args_defaults;
+            my $no_default = @$kw_arg_types - @$kw_arg_defaults;
             while ($no_default) {
               $no_default--;
-              &dakota::util::add_last($kw_args_defaults, undef);
+              &dakota::util::add_last($kw_arg_defaults, undef);
             }
             my $kw_args_type;
-            while (scalar @$kw_args_types) {
+            while (scalar @$kw_arg_types) {
               my $kw_type = {
-                type =>    &dakota::util::remove_last($kw_args_types),
-                default => &dakota::util::remove_last($kw_args_defaults),
-                name =>    &dakota::util::remove_first($$method{'kw-args-names'}) };
+                type =>    &dakota::util::remove_last($kw_arg_types),
+                default => &dakota::util::remove_last($kw_arg_defaults),
+                name =>    &dakota::util::remove_first($$method{'kw-arg-names'}) };
 
               &dakota::util::add_last($$method{'kw-types'}, $kw_type);
             }
-            delete $$method{'kw-args-names'};
-            delete $$method{'kw-args-defaults'};
+            delete $$method{'kw-arg-names'};
+            delete $$method{'kw-arg-defaults'};
           } else {
             if (&is_kw_args_generic($method)) {
               if (!&dakota::generate::is_va($method)) {
@@ -1493,7 +1493,7 @@ sub types {
   }
   return $result;
 }
-sub kw_args_offsets {
+sub kw_arg_offsets {
   my ($seq, $gbl_token) = @_;
   my $opens = 0;
   # start at 2 since type and name preceed colon
@@ -1556,19 +1556,19 @@ sub parameter_list {
   }
   #print STDERR Dumper $params;
   my $types = [];
-  my $kw_args_names = [];
-  my $kw_args_defaults = [];
+  my $kw_arg_names = [];
+  my $kw_arg_defaults = [];
   foreach my $type (@$params) {
     if (':' eq $$type[-1]) {
-      push @$type, split('', $$kw_args_placeholders{'nodefault'});
+      push @$type, split('', $$kw_arg_placeholders{'nodefault'});
     }
-    my $colon_offset = &kw_args_offsets($type);
+    my $colon_offset = &kw_arg_offsets($type);
 
     if ($colon_offset) {
       my $kw_args_name = $colon_offset - 1;
       my $kw_args_default = [splice(@$type, $colon_offset)];
       my $colon_tkn = &dakota::util::remove_first($kw_args_default);
-      my $kw_arg_nodefault_placeholder = $$kw_args_placeholders{'nodefault'};
+      my $kw_arg_nodefault_placeholder = $$kw_arg_placeholders{'nodefault'};
       my $kw_arg_nodefault_placeholder_tkns = [split('', $kw_arg_nodefault_placeholder)]; # assume no multi-character tokens (dangerous)
       if (scalar @$kw_arg_nodefault_placeholder_tkns == scalar @$kw_args_default) {
         my $is_default = 0;
@@ -1579,17 +1579,17 @@ sub parameter_list {
           }
         }
         if ($is_default) {
-          &dakota::util::add_last($kw_args_defaults, $kw_args_default);
+          &dakota::util::add_last($kw_arg_defaults, $kw_args_default);
         }
       } else {
-        &dakota::util::add_last($kw_args_defaults, $kw_args_default);
+        &dakota::util::add_last($kw_arg_defaults, $kw_args_default);
       }
       my $kw_args_name_str = $$type[$kw_args_name];
       &add_keyword($gbl_root, $kw_args_name_str);
       my $kw_args_name_seq = [splice(@$type, $kw_args_name)];
       #print STDERR Dumper $kw_args_name_seq;
       #print STDERR Dumper $type;
-      &dakota::util::add_last($kw_args_names, &dakota::util::remove_last($kw_args_name_seq));
+      &dakota::util::add_last($kw_arg_names, &dakota::util::remove_last($kw_args_name_seq));
     } else {
       my $ident = &dakota::util::remove_last($type);
       if ($ident =~ m/\-t$/) {
@@ -1601,14 +1601,14 @@ sub parameter_list {
     &dakota::util::add_last($types, $type);
   }
 
-  if (0 == @$kw_args_names) {
-    $kw_args_names = undef;
+  if (0 == @$kw_arg_names) {
+    $kw_arg_names = undef;
   }
 
-  if (0 == @$kw_args_defaults) {
-    $kw_args_defaults = undef;
+  if (0 == @$kw_arg_defaults) {
+    $kw_arg_defaults = undef;
   }
-  return ($types, $kw_args_names, $kw_args_defaults);
+  return ($types, $kw_arg_names, $kw_arg_defaults);
 }
 sub add_klasses_used {
   my ($scope, $gbl_sst_cursor) = @_;
@@ -1671,7 +1671,7 @@ sub kw_args_generics_add {
   my ($name, $types) = &kw_args_generics_sig($method);
   my $name_str =  &str_from_seq($name);
   my $types_str = &parameter_types_str($types);
-  $$target_ast{'kw-args-generics'}{$name_str}{$types_str} = [ $name, $types ];
+  $$target_ast{'kw-arg-generics'}{$name_str}{$types_str} = [ $name, $types ];
 }
 
 # 'methods'
@@ -1759,31 +1759,31 @@ sub method {
                                         $open_paren_index + 1,
                                         $close_paren_index - 1);
   $parameter_types = &token_seq::simple_seq($parameter_types);
-  my ($kw_args_parameter_types, $kw_args_names, $kw_args_defaults) =
+  my ($kw_arg_parameter_types, $kw_arg_names, $kw_arg_defaults) =
     &parameter_list($parameter_types);
-  $$method{'parameter-types'} = $kw_args_parameter_types;
+  $$method{'parameter-types'} = $kw_arg_parameter_types;
   # if method has kw-arg-names, then its a kw arg
   # but it could still be a kw arg
 
-  if ($kw_args_names) {
+  if ($kw_arg_names) {
     my $method_name = &str_from_seq($$method{'name'});
-    $$method{'kw-args-names'} = $kw_args_names;
-    if ($kw_args_defaults) {
-      $$method{'kw-args-defaults'} = $kw_args_defaults;
+    $$method{'kw-arg-names'} = $kw_arg_names;
+    if ($kw_arg_defaults) {
+      $$method{'kw-arg-defaults'} = $kw_arg_defaults;
     }
     &kw_args_generics_add($gbl_root, $method);
 
     if ('init' eq $method_name) {
-      foreach my $kw_arg_name (@$kw_args_names) {
+      foreach my $kw_arg_name (@$kw_arg_names) {
         if ('slots' eq $kw_arg_name) {
-          if (1 == @$kw_args_names) {
+          if (1 == @$kw_arg_names) {
             # only one kw-arg and its slots (does not matter aggregate or not)
             $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
           } elsif ($$gbl_current_scope{'slots'} && $$gbl_current_scope{'slots'}{'type'}) {
             # not an aggregate
             $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
           } else {
-            my $kw_arg_names_list = join(', #', @$kw_args_names);
+            my $kw_arg_names_list = join(', #', @$kw_arg_names);
             print STDERR "warning: slots is an aggregate and init(#$kw_arg_names_list) supports more than just #slots.\n";
           }
         }
@@ -2311,7 +2311,7 @@ sub ast_tree_from_dk_path {
   my $result = &parse_root($gbl_sst_cursor, $exported = 0);
   &add_object_methods_decls($result);
   #print STDERR &Dumper($result);
-  #print &Dumper(&kw_args_generics());
+  #print &Dumper(&kw_arg_generics());
   return $result;
 }
 sub start {
