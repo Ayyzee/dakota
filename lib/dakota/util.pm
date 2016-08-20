@@ -126,6 +126,8 @@ our @EXPORT= qw(
                  remove_last
                  remove_non_newlines
                  remove_name_va_scope
+                 _replace_first
+                 _replace_last
                  rewrite_klass_defn_with_implicit_metaklass_defn
                  scalar_from_file
                  scalar_to_file
@@ -381,20 +383,20 @@ sub dk_mangle {
       $last_encoded_char = $char;
       $num_encoded++;
     }
-    &dakota::util::add_last($ident_symbol, $part);
+    &add_last($ident_symbol, $part);
   }
   my $legal_last_chars = { '?' => 1, '!' => 1 };
   if ($num_encoded && ! (1 == $num_encoded && $$legal_last_chars{$last_encoded_char})) {
     if (1) {
-      &dakota::util::add_first($ident_symbol, '_');
-      &dakota::util::add_last( $ident_symbol, '_');
+      &add_first($ident_symbol, '_');
+      &add_last( $ident_symbol, '_');
     } else {
-      &dakota::util::add_first($ident_symbol, &encode_char('|'));
-      &dakota::util::add_last( $ident_symbol, &encode_char('|'));
+      &add_first($ident_symbol, &encode_char('|'));
+      &add_last( $ident_symbol, &encode_char('|'));
     }
   }
-  &dakota::util::add_first($ident_symbol, '_');
-  &dakota::util::add_last( $ident_symbol, '_');
+  &add_first($ident_symbol, '_');
+  &add_last( $ident_symbol, '_');
   my $value = &ct($ident_symbol);
   return $value;
 }
@@ -492,7 +494,7 @@ sub sqstr_regex {
 sub dir_part {
   my ($path) = @_;
   my $parts = [split /\//, $path];
-  &dakota::util::remove_last($parts);
+  &remove_last($parts);
   my $dir = join '/', @$parts;
   return $dir;
 }
@@ -1047,8 +1049,8 @@ sub _replace_last {
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-  my $old_last = &dakota::util::remove_last($seq);
-  &dakota::util::add_last($seq, $element);
+  my $old_last = &remove_last($seq);
+  &add_last($seq, $element);
   return $old_last;
 }
 sub unwrap_seq {

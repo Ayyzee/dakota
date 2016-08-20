@@ -321,7 +321,7 @@ sub sst::add_token {
     $$token{'leading-ws'} = $$sst{'leading-ws'};
     $$sst{'leading-ws'} = '';
   }
-  &dakota::util::add_last($$sst{'tokens'}, $token);
+  &add_last($$sst{'tokens'}, $token);
   $$sst{'tokens-count'} = scalar @{$$sst{'tokens'}};
 }
 sub sst::add_comment {
@@ -458,7 +458,7 @@ sub sst::_process_ws {
       $lhs_token = { 'str' => undef };
     }
     $$lhs_token{'str'} = $$seq[$i]{'str'};
-    &dakota::util::add_last($new_seq, $lhs_token);
+    &add_last($new_seq, $lhs_token);
   }
   return $new_seq;
 }
@@ -543,7 +543,7 @@ sub constraint_literal_dquoted_cstring {
 
   if ($token =~ m/\#$dqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &dakota::util::add_last($result_rhs, $token);
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -554,7 +554,7 @@ sub constraint_literal_squoted_cstring {
 
   if ($token =~ m/\#$sqstr/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &dakota::util::add_last($result_rhs, $token);
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -565,7 +565,7 @@ sub constraint_ident {
 
   if ($token =~ m/$id/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &dakota::util::add_last($result_rhs, $token);
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -606,7 +606,7 @@ sub constraint_qual_ident {
 
   if ($token =~ m/^$id$/) {
     $result_lhs = [ $$range[0], $i ];
-    &dakota::util::add_last($result_rhs, $token);
+    &add_last($result_rhs, $token);
 
     while (1) {
       $i++;
@@ -618,8 +618,8 @@ sub constraint_qual_ident {
         #print "TKN: " . '{' . $token . '}' . $nl;
         if ($token =~ m/^$id$/) {
           $result_lhs = [ $$range[0], $i ];
-          &dakota::util::add_last($result_rhs, $sro);
-          &dakota::util::add_last($result_rhs, $token);
+          &add_last($result_rhs, $sro);
+          &add_last($result_rhs, $token);
         } else {
           last;
         }
@@ -640,7 +640,7 @@ sub constraint_method_name {
 
   if ($token =~ m/$mid/) {
     $result_lhs = [ $$range[0], $$range[0] ];
-    &dakota::util::add_last($result_rhs, $token);
+    &add_last($result_rhs, $token);
   }
   return ($result_lhs, $result_rhs);
 }
@@ -675,9 +675,9 @@ sub constraint_balenced {
       my $token = &sst::at($sst, $close_token_index);
 
       if (&sst::is_open_token($token, $user_data)) {
-        &dakota::util::add_last($opens, $token);
+        &add_last($opens, $token);
       } elsif (&sst::is_close_token($token, $user_data)) {
-        my $open_token = &dakota::util::remove_last($opens);
+        my $open_token = &remove_last($opens);
 
         if (!defined $open_token) {
           return undef;
@@ -686,7 +686,7 @@ sub constraint_balenced {
         my $open_tokens = &sst::open_tokens_for_close_token($token, $user_data);
         die if ! exists $$open_tokens{$open_token}
       }
-      &dakota::util::add_last($result_rhs, $token);
+      &add_last($result_rhs, $token);
 
       if (0 == @$opens) {
         $result_lhs = [ $$range[0], $close_token_index ];
@@ -710,7 +710,7 @@ sub constraint_balenced_in {
 
       for (my $i = $$result_lhs[0]; $i < $$result_lhs[1]; $i++) {
         my $token = &sst::at($sst, $i);
-        &dakota::util::add_last($result_rhs, $token);
+        &add_last($result_rhs, $token);
       }
     }
   }
@@ -764,8 +764,8 @@ sub sst_cursor::match_pattern_seq {
         if ($result_lhs) {
           $range = $result_lhs;
           $$matches{$pattern_token} = $result_rhs;
-          &dakota::util::add_last($all_index, $$result_lhs[0]);
-          &dakota::util::add_last($all_index, $$result_lhs[1]);
+          &add_last($all_index, $$result_lhs[0]);
+          &add_last($all_index, $$result_lhs[1]);
           if ('?qual-scope' eq $pattern_token) {
             my $prev_indent = $Data::Dumper::Indent;
             $Data::Dumper::Indent = 0;
@@ -783,7 +783,7 @@ sub sst_cursor::match_pattern_seq {
           $range = [ $$sst_cursor{'first-token-index'} + $i,
                      $$sst_cursor{'first-token-index'} + $i ];
 
-          &dakota::util::add_last($all_index, $$sst_cursor{'first-token-index'} + $i);
+          &add_last($all_index, $$sst_cursor{'first-token-index'} + $i);
 
           if (0) {
             my $prev_indent = $Data::Dumper::Indent;
@@ -801,8 +801,8 @@ sub sst_cursor::match_pattern_seq {
     }
     if ($range && 0 != @$range) {
       my $sorted_all_index = [sort {$a <=> $b} @$all_index];
-      my $first_token_index = &dakota::util::first($sorted_all_index);
-      my $last_token_index = &dakota::util::last($sorted_all_index);
+      my $first_token_index = &first($sorted_all_index);
+      my $last_token_index = &last($sorted_all_index);
       my $from_index = 0;
       my $to_index = $from_index + $last_token_index - $first_token_index;
       $range = [ $from_index, $to_index ];
@@ -911,9 +911,9 @@ sub sst_cursor::balenced {
     my $token = &sst::at($$sst_cursor{'sst'}, $i);
     if (&sst::is_open_token($token, $user_data)) {
       my $expected_close_token = &sst::close_token_for_open_token($token, $user_data);
-      &dakota::util::add_last($stk, $expected_close_token);
+      &add_last($stk, $expected_close_token);
     } elsif (&sst::is_close_token($token, $user_data)) {
-      my $expected_close_token = &dakota::util::remove_last($stk);
+      my $expected_close_token = &remove_last($stk);
 
       if ($expected_close_token ne $token) {
         &sst_cursor::error($sst_cursor, $i,  "expected $expected_close_token but got $token");

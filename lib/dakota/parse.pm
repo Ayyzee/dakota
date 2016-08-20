@@ -197,8 +197,8 @@ sub kw_args_translate {
             my $kw_args_name;        # not used
             foreach $kw_args_name (@{$$method{'kw-arg-names'}}) {
               my $kw_args_type =
-                &dakota::util::remove_last($$method{'param-types'});
-              &dakota::util::add_last($kw_arg_types, $kw_args_type);
+                &remove_last($$method{'param-types'});
+              &add_last($kw_arg_types, $kw_args_type);
             }
             &update_to_kw_args($method);
             my $kw_arg_defaults = [];
@@ -206,25 +206,25 @@ sub kw_args_translate {
             if (exists  $$method{'kw-arg-defaults'} &&
                 defined $$method{'kw-arg-defaults'}) {
               while ($kw_args_default =
-                       &dakota::util::remove_last($$method{'kw-arg-defaults'})) {
+                       &remove_last($$method{'kw-arg-defaults'})) {
                 my $val = join(' ', @$kw_args_default);
                 $val = &remove_extra_whitespace($val);
-                &dakota::util::add_last($kw_arg_defaults, $val);
+                &add_last($kw_arg_defaults, $val);
               }
             } # if
             my $no_default = @$kw_arg_types - @$kw_arg_defaults;
             while ($no_default) {
               $no_default--;
-              &dakota::util::add_last($kw_arg_defaults, undef);
+              &add_last($kw_arg_defaults, undef);
             }
             my $kw_args_type;
             while (scalar @$kw_arg_types) {
               my $kw_arg = {
-                type =>    &dakota::util::remove_last($kw_arg_types),
-                default => &dakota::util::remove_last($kw_arg_defaults),
-                name =>    &dakota::util::remove_first($$method{'kw-arg-names'}) };
+                type =>    &remove_last($kw_arg_types),
+                default => &remove_last($kw_arg_defaults),
+                name =>    &remove_first($$method{'kw-arg-names'}) };
 
-              &dakota::util::add_last($$method{'kw-args'}, $kw_arg);
+              &add_last($$method{'kw-args'}, $kw_arg);
             }
             delete $$method{'kw-arg-names'};
             delete $$method{'kw-arg-defaults'};
@@ -245,7 +245,7 @@ sub update_to_kw_args {
   my ($method) = @_;
   die if $$method{'param-types'}[-1][0] eq 'va-list-t';
   die if $$method{'kw-args'};
-  &dakota::util::add_last($$method{'param-types'}, [ 'va-list-t' ]);
+  &add_last($$method{'param-types'}, [ 'va-list-t' ]);
   $$method{'kw-args'} = [];
 }
 sub tbl_add_info {
@@ -491,7 +491,7 @@ sub token_seq::simple_seq {
   my $seq = [];
   my $tkn;
   for $tkn (@$tokens) {
-    &dakota::util::add_last($seq, $$tkn{'str'});
+    &add_last($seq, $$tkn{'str'});
   }
   return $seq;
 }
@@ -659,7 +659,7 @@ sub trait {
         }
         foreach my $trait (@$seq) {
          #&add_trait_decl($gbl_root, $trait);
-          &dakota::util::add_last($$gbl_current_scope{'traits'}, $trait);
+          &add_last($$gbl_current_scope{'traits'}, $trait);
         }
         last;
       }
@@ -669,7 +669,7 @@ sub trait {
         if (!defined $$gbl_current_scope{'requires'}) {
           $$gbl_current_scope{'requires'} = [];
         }
-        &dakota::util::add_last($$gbl_current_scope{'requires'}, &ct($seq));
+        &add_last($$gbl_current_scope{'requires'}, &ct($seq));
         last;
       }
       if (m/^provide$/) {
@@ -678,7 +678,7 @@ sub trait {
         if (!defined $$gbl_current_scope{'provides'}) {
           $$gbl_current_scope{'provides'} = [];
         }
-        &dakota::util::add_last($$gbl_current_scope{'provides'}, &ct($seq));
+        &add_last($$gbl_current_scope{'provides'}, &ct($seq));
         last;
       }
       if (m/^\{$/) {
@@ -710,19 +710,19 @@ sub slots_seq {
       $has_expr = 1;
     }
     if (';' ne $$tkn{'str'}) {
-      &dakota::util::add_last($type, $$tkn{'str'});
+      &add_last($type, $$tkn{'str'});
     } else {
       my $expr = [];
       if ($has_expr) {
         while (scalar @$type) {
-          &add_first($expr, &dakota::util::remove_last($type));
+          &add_first($expr, &remove_last($type));
           if ('=' eq &last($type)) {
-            &dakota::util::remove_last($type);
+            &remove_last($type);
             last;
           }
         }
       }
-      my $name = &dakota::util::remove_last($type);
+      my $name = &remove_last($type);
       &add_symbol($gbl_root, $name);
       my $arg_type = &arg::type($type);
       my $slot_info = { 'name' => $name,
@@ -731,7 +731,7 @@ sub slots_seq {
       if (scalar @$expr) {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
-      &dakota::util::add_last($seq, $slot_info);
+      &add_last($seq, $slot_info);
       &maybe_add_exported_header_for_symbol_seq($type);
       $has_expr = 0;
       $type = [];
@@ -745,7 +745,7 @@ sub enum_seq {
   my $expr = [];
   foreach my $tkn (@$tkns) {
     if (',' ne $$tkn{'str'}) {
-      &dakota::util::add_last($expr, $$tkn{'str'});
+      &add_last($expr, $$tkn{'str'});
     } else {
       my $name = &remove_first($expr);
       my $slot_info = { 'name' => $name };
@@ -756,7 +756,7 @@ sub enum_seq {
         }
         $$slot_info{'expr'} = join(' ', @$expr);
       }
-      &dakota::util::add_last($seq, $slot_info);
+      &add_last($seq, $slot_info);
       &maybe_add_exported_header_for_symbol_seq($expr);
       $expr = [];
     }
@@ -771,7 +771,7 @@ sub enum_seq {
       }
       $$slot_info{'expr'} = join(' ', @$expr);
     }
-    &dakota::util::add_last($seq, $slot_info);
+    &add_last($seq, $slot_info);
     &maybe_add_exported_header_for_symbol_seq($expr);
   }
   #print 'enum_seq: ' . &Dumper($seq);
@@ -794,13 +794,13 @@ sub slots {
   while (';' ne &sst_cursor::current_token($gbl_sst_cursor) &&
          '{' ne &sst_cursor::current_token($gbl_sst_cursor)) {
     my $tkn = &match_any();
-    &dakota::util::add_last($type, $tkn);
+    &add_last($type, $tkn);
   }
   my $cat = 'struct';
   if (@$type && 3 == @$type) {
-    if ('enum' eq &dakota::util::first($type)) {
-      my $enum_base = &dakota::util::remove_last($type);
-      my $tkn =    &dakota::util::remove_last($type);
+    if ('enum' eq &first($type)) {
+      my $enum_base = &remove_last($type);
+      my $tkn =    &remove_last($type);
       die if ':' ne $tkn; # not key/element delim
       $$gbl_current_scope{'slots'}{'enum-base'} = $enum_base;
       &add_symbol($gbl_root, $enum_base);
@@ -808,10 +808,10 @@ sub slots {
     }
   }
   if (@$type && 1 == @$type) {
-    if ('struct' eq &dakota::util::first($type) ||
-        'union' eq  &dakota::util::first($type) ||
-        'enum' eq   &dakota::util::first($type)) {
-      if ('enum' eq &dakota::util::first($type)) {
+    if ('struct' eq &first($type) ||
+        'union' eq  &first($type) ||
+        'enum' eq   &first($type)) {
+      if ('enum' eq &first($type)) {
         &add_symbol($gbl_root, 'enum-info');
         &add_symbol($gbl_root, 'const-info');
 
@@ -819,7 +819,7 @@ sub slots {
         &add_klass_decl($gbl_root, 'named-enum-info');
         &add_klass_decl($gbl_root, 'const-info');
       }
-      $cat = &dakota::util::remove_first($type);
+      $cat = &remove_first($type);
       $$gbl_current_scope{'slots'}{'cat'} = $cat;
     }
   }
@@ -873,16 +873,16 @@ sub const {
   my $type = [];
   while (';' ne &sst_cursor::current_token($gbl_sst_cursor)) {
     my $tkn = &match_any();
-    &dakota::util::add_last($type, $tkn);
+    &add_last($type, $tkn);
   }
   my $rhs = [];
   if (&ct($type) =~ m/=/) {
-    while ('=' ne &dakota::util::last($type)) {
-      &dakota::util::add_first($rhs, &dakota::util::remove_last($type));
+    while ('=' ne &last($type)) {
+      &add_first($rhs, &remove_last($type));
     }
-    &dakota::util::remove_last($type); # '='
+    &remove_last($type); # '='
   }
-  my $name = &dakota::util::remove_last($type);
+  my $name = &remove_last($type);
   &add_symbol($gbl_root, $name); # const var name
   if (@$type) {
     $$const{'type'} = &arg::type($type);
@@ -891,7 +891,7 @@ sub const {
   }
   if (';' eq &sst_cursor::current_token($gbl_sst_cursor)) {
     &match(__FILE__, __LINE__, ';');
-    &dakota::util::add_last($$gbl_current_scope{'const'}, $const);
+    &add_last($$gbl_current_scope{'const'}, $const);
     return;
   }
 }
@@ -909,7 +909,7 @@ sub enum {
   while (';' ne &sst_cursor::current_token($gbl_sst_cursor) &&
          '{' ne &sst_cursor::current_token($gbl_sst_cursor)) {
     my $tkn = &match_any();
-    &dakota::util::add_last($type, $tkn);
+    &add_last($type, $tkn);
   }
   if (@$type) {
     &add_type($type);
@@ -918,7 +918,7 @@ sub enum {
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^;$/) {
       &match(__FILE__, __LINE__, ';');
-      &dakota::util::add_last($$gbl_current_scope{'enum'}, $enum);
+      &add_last($$gbl_current_scope{'enum'}, $enum);
       return;
     }
     if (m/^\{$/) {
@@ -941,7 +941,7 @@ sub enum {
       &add_klass_decl($gbl_root, 'enum-info');
       &add_klass_decl($gbl_root, 'named-enum-info');
       &add_klass_decl($gbl_root, 'const-info');
-      &dakota::util::add_last($$gbl_current_scope{'enum'}, $enum);
+      &add_last($$gbl_current_scope{'enum'}, $enum);
       return;
     }
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
@@ -1150,7 +1150,7 @@ sub module_export_defn {
 sub interpose {
   my ($args) = @_;
   my $seq = &dkdecl_list('interpose');
-  my $first = &dakota::util::remove_first($seq);
+  my $first = &remove_first($seq);
   if ($$gbl_root{'interposers'}{$first}) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
@@ -1167,7 +1167,7 @@ sub match_qual_ident {
   while (&sst_cursor::current_token($gbl_sst_cursor) ne ',' &&
          &sst_cursor::current_token($gbl_sst_cursor) ne ';') {
     my $token = &match_any();
-    &dakota::util::add_last($seq, $token);
+    &add_last($seq, $token);
   }
   if (0 == @$seq) {
     $seq = undef;
@@ -1308,7 +1308,7 @@ sub klass {
         }
         foreach my $trait (@$seq) {
           &add_trait_decl($gbl_root, $trait);
-          &dakota::util::add_last($$gbl_current_scope{'traits'}, $trait);
+          &add_last($$gbl_current_scope{'traits'}, $trait);
         }
         last;
       }
@@ -1319,7 +1319,7 @@ sub klass {
           $$gbl_current_scope{'requires'} = [];
         }
         my $path = &ct($seq);
-        &dakota::util::add_last($$gbl_current_scope{'requires'}, $path);
+        &add_last($$gbl_current_scope{'requires'}, $path);
         &add_klass_decl($gbl_root, $path);
         last;
       }
@@ -1330,7 +1330,7 @@ sub klass {
           $$gbl_current_scope{'provides'} = [];
         }
         my $path = &ct($seq);
-        &dakota::util::add_last($$gbl_current_scope{'provides'}, $path);
+        &add_last($$gbl_current_scope{'provides'}, $path);
         &add_klass_decl($gbl_root, $path);
         last;
       }
@@ -1344,11 +1344,11 @@ sub klass {
         if (!$$gbl_root{'interposers'}{$name} &&
             !$$gbl_root{'interposers-unordered'}{$name}) {
           $$gbl_root{'interposers'}{$name} = [];
-          &dakota::util::add_last($$gbl_root{'interposers'}{$name}, $construct_name);
+          &add_last($$gbl_root{'interposers'}{$name}, $construct_name);
         } elsif ($$gbl_root{'interposers'}{$name}) {
           $$gbl_root{'interposers-unordered'}{$name} = $$gbl_root{'interposers'}{$name};
           delete $$gbl_root{'interposers'}{$name};
-          &dakota::util::add_last($$gbl_root{'interposers-unordered'}{$name}, $construct_name);
+          &add_last($$gbl_root{'interposers-unordered'}{$name}, $construct_name);
         } else {
           die __FILE__, ":", __LINE__, ": error:\n";
         }
@@ -1412,13 +1412,13 @@ sub dkdecl {
 
   while (&sst_cursor::current_token($gbl_sst_cursor) ne ';' &&
          &sst_cursor::current_token($gbl_sst_cursor) ne '{') {
-    &dakota::util::add_last($parts, &sst_cursor::current_token($gbl_sst_cursor));
+    &add_last($parts, &sst_cursor::current_token($gbl_sst_cursor));
     $$gbl_sst_cursor{'current-token-index'}++;
   }
 
   #    if ('::' ne $parts[0])
   #    {
-  #        &dakota::util::add_first($parts, '::');
+  #        &add_first($parts, '::');
   #    }
   my $body = &ct($parts);
   return ($body, $parts);
@@ -1443,12 +1443,12 @@ sub dkdecl_list {
       #my $token = &match_any($gbl_sst);
     } else {
       #&match(__FILE__, __LINE__, ',');
-      &dakota::util::add_last($parts, $body);
+      &add_last($parts, $body);
       $body = '';
     }
     $$gbl_sst_cursor{'current-token-index'}++;
   }
-  &dakota::util::add_last($parts, $body);
+  &add_last($parts, $body);
   return $parts;
 }
 sub expand_type {
@@ -1460,7 +1460,7 @@ sub expand_type {
   }
   if (1 < @$type &&
       $$type[@$type - 1] =~ /$id/) {
-    &dakota::util::remove_last($type);
+    &remove_last($type);
   }
   foreach my $token (@$type) {
     &add_type([$token]);
@@ -1479,7 +1479,7 @@ sub split_seq {
       $i++;
       $$result[$i] = [];
     } else {
-      &dakota::util::add_last($$result[$i], $tkn);
+      &add_last($$result[$i], $tkn);
     }
   }
   return $result;
@@ -1529,30 +1529,30 @@ sub param_list {
       for ($$param_types[$i]) {
         if (m/^\,$/) {
           if ($opens) {
-            &dakota::util::add_last($param_n, $$param_types[$i]);
+            &add_last($param_n, $$param_types[$i]);
             $i++;
           } else {
             $i++;
-            &dakota::util::add_last($params, $param_n);
+            &add_last($params, $param_n);
             $param_n = [];
             next;
           }
         } elsif (m/^\{|\($/) {
           $opens++;
-          &dakota::util::add_last($param_n, $$param_types[$i]);
+          &add_last($param_n, $$param_types[$i]);
           $i++;
         } elsif (m/^\)|\}$/) {
           $opens--;
-          &dakota::util::add_last($param_n, $$param_types[$i]);
+          &add_last($param_n, $$param_types[$i]);
           $i++;
         } else {
-          &dakota::util::add_last($param_n, $$param_types[$i]);
+          &add_last($param_n, $$param_types[$i]);
           $i++;
         }
       }
     }
     $i++;
-    &dakota::util::add_last($params, $param_n);
+    &add_last($params, $param_n);
   }
   #print STDERR Dumper $params;
   my $types = [];
@@ -1567,7 +1567,7 @@ sub param_list {
     if ($colon_offset) {
       my $kw_args_name = $colon_offset - 1;
       my $kw_args_default = [splice(@$type, $colon_offset)];
-      my $colon_tkn = &dakota::util::remove_first($kw_args_default);
+      my $colon_tkn = &remove_first($kw_args_default);
       my $kw_arg_nodefault_placeholder = $$kw_arg_placeholders{'nodefault'};
       my $kw_arg_nodefault_placeholder_tkns = [split('', $kw_arg_nodefault_placeholder)]; # assume no multi-character tokens (dangerous)
       if (scalar @$kw_arg_nodefault_placeholder_tkns == scalar @$kw_args_default) {
@@ -1579,26 +1579,26 @@ sub param_list {
           }
         }
         if ($is_default) {
-          &dakota::util::add_last($kw_arg_defaults, $kw_args_default);
+          &add_last($kw_arg_defaults, $kw_args_default);
         }
       } else {
-        &dakota::util::add_last($kw_arg_defaults, $kw_args_default);
+        &add_last($kw_arg_defaults, $kw_args_default);
       }
       my $kw_args_name_str = $$type[$kw_args_name];
       &add_keyword($gbl_root, $kw_args_name_str);
       my $kw_args_name_seq = [splice(@$type, $kw_args_name)];
       #print STDERR Dumper $kw_args_name_seq;
       #print STDERR Dumper $type;
-      &dakota::util::add_last($kw_arg_names, &dakota::util::remove_last($kw_args_name_seq));
+      &add_last($kw_arg_names, &remove_last($kw_args_name_seq));
     } else {
-      my $ident = &dakota::util::remove_last($type);
+      my $ident = &remove_last($type);
       if ($ident =~ m/\-t$/) {
-        &dakota::util::add_last($type, $ident);
+        &add_last($type, $ident);
       } elsif (!($ident =~ m/$id/)) {
-        &dakota::util::add_last($type, $ident);
+        &add_last($type, $ident);
       }
     }
-    &dakota::util::add_last($types, $type);
+    &add_last($types, $type);
   }
 
   if (0 == @$kw_arg_names) {
@@ -1701,7 +1701,7 @@ sub method {
         if (!exists $$method{'attributes'}) {
           $$method{'attributes'} = [];
         }
-        &dakota::util::add_last($$method{'attributes'}, $attr);
+        &add_last($$method{'attributes'}, $attr);
       }
     }
   }
@@ -2001,7 +2001,7 @@ sub generics::parse {
 
       foreach my $generic (@$data) {
         if (exists $$generics_used{&ct($$generic{'name'})}) {
-          &dakota::util::add_last($big_cahuna, $generic);
+          &add_last($big_cahuna, $generic);
         }
       }
     }
@@ -2011,7 +2011,7 @@ sub generics::parse {
       my $alias_generic = &dakota::util::deep_copy($generic1);
       $$alias_generic{'name'} = $$alias_generic{'alias'};
       delete $$alias_generic{'alias'};
-      &dakota::util::add_last($big_cahuna, $alias_generic);
+      &add_last($big_cahuna, $alias_generic);
     }
   }
   # do the $is_va_list = 0 first, and the $is_va_list = 1 last
@@ -2041,7 +2041,7 @@ sub generics::parse {
   my $generics_seq = [];
   #my $generic;
   while (my ($generic_key, $generic) = each(%$generics_tbl)) {
-    &dakota::util::add_last($generics_seq, $generic);
+    &add_last($generics_seq, $generic);
     foreach my $arg (@{$$generic{'param-types'}}) {
       &add_type([$arg]);
     }
@@ -2066,8 +2066,8 @@ sub generics::_parse { # no longer recursive
     #    delete $$generic{'alias'};
     #}
 
-    #&dakota::util::add_last($data, $generic);
-    &dakota::util::add_last($data, $generic);
+    #&add_last($data, $generic);
+    &add_last($data, $generic);
 
     # not sure if we should type translate the return type
     $$generic{'return-type'} =

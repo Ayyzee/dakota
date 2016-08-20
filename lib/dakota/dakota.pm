@@ -215,11 +215,11 @@ sub loop_merged_ast_from_inputs {
       }
       &check_path($ast_path);
       $root_ast_path = $ast_path;
-      &dakota::util::add_last($ast_files, $ast_path); # _from_dk_src_path
+      &add_last($ast_files, $ast_path); # _from_dk_src_path
     } elsif (&is_ast_path($input)) {
       $root = &scalar_from_file($input);
       $root_ast_path = $input;
-      &dakota::util::add_last($ast_files, $input);
+      &add_last($ast_files, $input);
     } else {
       die __FILE__, ":", __LINE__, ": ERROR\n";
     }
@@ -455,9 +455,9 @@ sub loop_cc_from_dk {
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_ast_path($input)) {
-      &dakota::util::add_last($ast, $input);
+      &add_last($ast, $input);
     } else {
-      &dakota::util::add_last($inputs, $input);
+      &add_last($inputs, $input);
     }
   }
   $$cmd_info{'asts'} = $ast;
@@ -1390,7 +1390,7 @@ sub precompiled_inputs {
   my $precompiled_inputs = [];
   foreach my $input (@$inputs) {
     if (-e $input) {
-      &dakota::util::add_last($precompiled_inputs, $input);
+      &add_last($precompiled_inputs, $input);
     } else {
       my $ast_path;
       if (&is_so_path($input)) {
@@ -1403,8 +1403,8 @@ sub precompiled_inputs {
       } else {
         #print "skipping $input, line=" . __LINE__ . $nl;
       }
-      #&dakota::util::add_last($precompiled_inputs, $input);
-      #&dakota::util::add_last($precompiled_inputs, $ast_path);
+      #&add_last($precompiled_inputs, $input);
+      #&add_last($precompiled_inputs, $ast_path);
     }
   }
   return $precompiled_inputs;
@@ -1417,7 +1417,7 @@ sub ordered_set_add {
       return;
     }
   }
-  &dakota::util::add_last($ordered_set, $element);
+  &add_last($ordered_set, $element);
 }
 sub ordered_set_add_first {
   my ($ordered_set, $element, $file, $line) = @_;
@@ -1427,7 +1427,7 @@ sub ordered_set_add_first {
       return;
     }
   }
-  &dakota::util::add_first($ordered_set, $element);
+  &add_first($ordered_set, $element);
 }
 sub start {
   my ($argv) = @_;

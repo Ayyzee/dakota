@@ -908,10 +908,10 @@ sub rewrite {
         if ($tkn =~ m/^\?/) {
           my $seq = $$match[1]{$tkn};
           foreach my $seq_tkn (@$seq) {
-            &dakota::util::add_last($result, $seq_tkn);
+            &add_last($result, $seq_tkn);
           }
         } else {
-          &dakota::util::add_last($result, $tkn);
+          &add_last($result, $tkn);
         }
       }
       my $index = $$match[0][0];

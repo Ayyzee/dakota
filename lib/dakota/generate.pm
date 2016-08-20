@@ -494,7 +494,7 @@ sub colout {
 sub add_labeled_src {
   my ($result, $label, $src) = @_;
   if (!$$result{'--labels'}) { $$result{'--labels'} = []; }
-  &dakota::util::add_last($$result{'--labels'}, $label);
+  &add_last($$result{'--labels'}, $label);
   $$result{$label} = $src;
 }
 sub generate_klass_funcs_and_write_to_file_converted {
@@ -754,16 +754,16 @@ sub generate_target_runtime {
 sub path::add_last {
   my ($stack, $part) = @_;
   if (0 != @$stack) {
-    &dakota::util::add_last($stack, '::');
+    &add_last($stack, '::');
   }
-  &dakota::util::add_last($stack, $part);
+  &add_last($stack, $part);
 }
 sub path::remove_last {
   my ($stack) = @_;
-  &dakota::util::remove_last($stack); # remove $part
+  &remove_last($stack); # remove $part
 
   if (0 != @$stack) {
-    &dakota::util::remove_last($stack); # remove '::'
+    &remove_last($stack); # remove '::'
   }
 }
 sub arg::type {
@@ -990,7 +990,7 @@ sub klass::va_list_methods {
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if (&is_va($method)) {
-      &dakota::util::add_last($va_methods_seq, $method);
+      &add_last($va_methods_seq, $method);
     }
   }
   return $va_methods_seq;
@@ -1002,7 +1002,7 @@ sub klass::kw_arg_methods {
 
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}) {
     if ($$method{'kw-args'}) {
-      &dakota::util::add_last($kw_args_methods_seq, $method);
+      &add_last($kw_args_methods_seq, $method);
     }
   }
   return $kw_args_methods_seq;
@@ -1015,7 +1015,7 @@ sub klass::method_aliases {
   #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
     if ($$method{'alias'}) {
-      &dakota::util::add_last($method_aliases_seq, $method);
+      &add_last($method_aliases_seq, $method);
     }
   }
   return $method_aliases_seq;
@@ -1062,7 +1062,7 @@ sub method::var_args_from_qual_va_list {
     &remove_name_va_scope($new_method);
   }
   if (exists $$new_method{'param-types'}) {
-    &dakota::util::_replace_last($$new_method{'param-types'}, ['...']);
+    &_replace_last($$new_method{'param-types'}, ['...']);
   }
   return $new_method;
 }
@@ -1133,11 +1133,11 @@ sub generate_va_generic_defn {
     $$scratch_str_ref .= $col . $part . "; }" . &ann(__FILE__, $line) . $nl;
   } elsif ($$va_method{'defined?'} && (&is_target_defn())) {
     $$scratch_str_ref .= $col . $part;
-    my $name = &dakota::util::last($$va_method{'name'});
+    my $name = &last($$va_method{'name'});
     my $va_name = "_func_";
-    &dakota::util::_replace_last($$va_method{'name'}, $va_name);
+    &_replace_last($$va_method{'name'}, $va_name);
     my $method_type_decl = &method::type_decl($va_method);
-    &dakota::util::_replace_last($$va_method{'name'}, $name);
+    &_replace_last($$va_method{'name'}, $name);
     my $scope_str = &ct($scope);
     $$scratch_str_ref .= " {" . &ann(__FILE__, $line) . $nl;
     $col = &colin($col);
@@ -1411,9 +1411,9 @@ sub va_generics {
   foreach my $generic (sort method::compare @$generics) {
     if (!$name || $name eq &ct($$generic{'name'})) {
       if (&is_va($generic)) {
-        &dakota::util::add_last($va_generics, $generic);
+        &add_last($va_generics, $generic);
       } else {
-        &dakota::util::add_last($fa_generics, $generic);
+        &add_last($fa_generics, $generic);
       }
     }
   }
@@ -1631,7 +1631,7 @@ sub generate_generic_defn {
     }
     $new_arg_names = &arg_type::names($new_arg_type);
     if (&is_super($generic)) {
-      &dakota::util::_replace_first($new_arg_names, "context.object");
+      &_replace_first($new_arg_names, "context.object");
     }
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
@@ -2359,11 +2359,11 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
           if (defined $$method{'kw-args'}) {
             &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
             if (0 == @{$$va_method{'kw-args'}}) {
-              my $last = &dakota::util::remove_last($$va_method{'param-types'});
+              my $last = &remove_last($$va_method{'param-types'});
               die if 'va-list-t' ne &ct($last);
               my ($visibility, $method_decl_ref) = &func::decl($va_method, $klass_path);
               $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " {" . $visibility . " METHOD $$method_decl_ref } // stmt2" . &ann(__FILE__, __LINE__) . $nl;
-              &dakota::util::add_last($$va_method{'param-types'}, $last);
+              &add_last($$va_method{'param-types'}, $last);
             }
           }
           else {
@@ -2474,7 +2474,7 @@ sub typealias_slots_t {
   } else {
     my $parts = [split(/::/, $klass_name)];
     if (1 < scalar @$parts) {
-      my $basename = &dakota::util::remove_last($parts);
+      my $basename = &remove_last($parts);
       my $inner_ns = join('::', @$parts);
       $result = "namespace $inner_ns { typealias $basename-t = $basename\::slots-t; }";
     } else {
@@ -2846,7 +2846,7 @@ sub add_ordered {
   my ($ordered_klasses, $str) = @_;
   if (!$$ordered_klasses{'set'}{$str}) {
     $$ordered_klasses{'set'}{$str} = 1;
-    &dakota::util::add_last($$ordered_klasses{'seq'}, $str);
+    &add_last($$ordered_klasses{'seq'}, $str);
   } else {
     $$ordered_klasses{'set'}{$str}++;
   }
@@ -3089,7 +3089,7 @@ sub method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &arg_type::list_types($$method{'param-types'});
-  my $name = &dakota::util::last($$method{'name'});
+  my $name = &last($$method{'name'});
   return "(*$name)($$arg_type_list) -> $return_type";
 }
 sub kw_args_method::type {
@@ -3102,7 +3102,7 @@ sub kw_args_method::type_decl {
   my ($method) = @_;
   my $return_type = &arg::type($$method{'return-type'});
   my $arg_type_list = &kw_arg_type::list_types($$method{'param-types'}, $$method{'kw-args'});
-  my $name = &dakota::util::last($$method{'name'});
+  my $name = &last($$method{'name'});
   return "(*$name)($$arg_type_list) -> $return_type";
 }
 sub slots_signature_body {
@@ -3566,7 +3566,7 @@ sub dk_generate_cc_footer_klass {
         my $prop_name = sprintf("%s-%s", $root_name, $$slot_cat_info{'name'});
         $$scratch_str_ref .=
           $col . "$klass_type @$klass_name { " . &generate_target_runtime_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
-        &dakota::util::add_last($seq, "$prop_name");
+        &add_last($seq, "$prop_name");
         $prop_num++;
       }
       $$scratch_str_ref .=
@@ -3593,7 +3593,7 @@ sub dk_generate_cc_footer_klass {
         my $prop_name = sprintf("%s-%s", $root_name, $$slot_cat_info{'name'});
         $$scratch_str_ref .=
           $col . "$klass_type @$klass_name { " . &generate_target_runtime_property_tbl($prop_name, $tbl, $col, $symbols, __LINE__) . " }" . $nl;
-        &dakota::util::add_last($seq, "$prop_name");
+        &add_last($seq, "$prop_name");
         $prop_num++;
       }
       $$scratch_str_ref .=
@@ -3748,7 +3748,7 @@ sub dk_generate_cc_footer_klass {
   $$scratch_str_ref .=
     $col . "$klass_type @$klass_name { " . &generate_target_runtime_property_tbl('__klass-props', $tbbl, $col, $symbols, __LINE__) .
     $col . " }" . $nl;
-  &dakota::util::add_last($global_klass_defns, "$symbol\::__klass-props");
+  &add_last($global_klass_defns, "$symbol\::__klass-props");
   return $$scratch_str_ref;
 }
 sub generate_kw_arg_method_signature_decls {
@@ -3880,8 +3880,8 @@ sub generate_kw_args_method_defn {
   my $new_arg_type_list = &arg_type::list_types($new_arg_type);
   $new_arg_type = $$method{'param-types'};
   my $new_arg_names = &arg_type::names($new_arg_type);
-  &dakota::util::_replace_first($new_arg_names, 'self');
-  &dakota::util::_replace_last($new_arg_names, '_args_');
+  &_replace_first($new_arg_names, 'self');
+  &_replace_last($new_arg_names, '_args_');
   my $new_arg_list =  &arg_type::list_pair($new_arg_type, $new_arg_names);
   my $return_type = &arg::type($$method{'return-type'});
   my $visibility = '';
@@ -3915,17 +3915,17 @@ sub generate_kw_args_method_defn {
   my $arg_names_list = &arg_type::list_names($arg_names);
 
   if (scalar @{$$method{'kw-args'}}) {
-    #my $param = &dakota::util::remove_last($$method{'param-types'}); # remove intptr-t type
+    #my $param = &remove_last($$method{'param-types'}); # remove intptr-t type
     $method_type_decl = &kw_args_method::type_decl($method);
-    #&dakota::util::add_last($$method{'param-types'}, $param);
+    #&add_last($$method{'param-types'}, $param);
   } else {
-    my $param1 = &dakota::util::remove_last($$method{'param-types'}); # remove va-list-t type
+    my $param1 = &remove_last($$method{'param-types'}); # remove va-list-t type
     # should test $param1
-    #my $param2 = &dakota::util::remove_last($$method{'param-types'}); # remove intptr-t type
+    #my $param2 = &remove_last($$method{'param-types'}); # remove intptr-t type
     ## should test $param2
     $method_type_decl = &method::type_decl($method);
-    #&dakota::util::add_last($$method{'param-types'}, $param2);
-    &dakota::util::add_last($$method{'param-types'}, $param1);
+    #&add_last($$method{'param-types'}, $param2);
+    &add_last($$method{'param-types'}, $param1);
   }
   if (scalar @{$$method{'kw-args'}}) {
     $$scratch_str_ref .= $col;
@@ -4026,14 +4026,14 @@ sub generate_kw_args_method_defn {
     $col = &colout($col);
   }
   my $delim = '';
-  #my $last_arg_name = &dakota::util::remove_last($new_arg_names); # remove name associated with intptr-t type
+  #my $last_arg_name = &remove_last($new_arg_names); # remove name associated with intptr-t type
   my $args = '';
 
   for (my $i = 0; $i < @$new_arg_names - 1; $i++) {
     $args .= "$delim$$new_arg_names[$i]";
     $delim = ', ';
   }
-  #&dakota::util::add_last($new_arg_names, $last_arg_name); # add name associated with intptr-t type
+  #&add_last($new_arg_names, $last_arg_name); # add name associated with intptr-t type
   foreach my $kw_arg (@{$$method{'kw-args'}}) {
     my $kw_arg_name = $$kw_arg{'name'};
     $args .= ", $kw_arg_name";
