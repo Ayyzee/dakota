@@ -58,6 +58,8 @@ sub dk_prefix {
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
+  use dakota::rewrite;
+  use dakota::util;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
     or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
   $gbl_compiler_default_argument_promotions = do "$gbl_prefix/lib/dakota/compiler/default-argument-promotions.json"
@@ -68,13 +70,11 @@ BEGIN {
   while (($key, $values) = each (%$platform)) {
     $$gbl_compiler{$key} = $values;
   }
-  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
-  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
+  $hh_ext = &var($gbl_compiler, 'hh_ext', undef);
+  $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
 };
 my $use_new_macro_system = 0;
 
-use dakota::rewrite;
-use dakota::util;
 if ($use_new_macro_system) {
   #use dakota::macro_system;
 }
@@ -102,7 +102,7 @@ our @EXPORT= qw(
 my $colon = ':'; # key/element delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
 my ($id,  $mid,  $bid,  $tid,
-    $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+    $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
 my $global_should_echo = 0;
 my $global_is_defn = undef; # klass decl vs defn
@@ -123,7 +123,7 @@ my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
 # not used. left over (converted) from old code gen model
 sub src_path {
   my ($name, $ext) = @_;
-  $builddir = &dakota::util::builddir();
+  $builddir = &builddir();
   if ($ENV{'DK_ABS_PATH'}) {
     my $cwd = &getcwd();
     return "$cwd/$builddir/$name.$ext";
@@ -779,7 +779,7 @@ sub arg_type::super {
   my ($arg_type_ref) = @_;
   my $num_args =       @$arg_type_ref;
 
-  my $new_arg_type_ref = &dakota::util::deep_copy($arg_type_ref);
+  my $new_arg_type_ref = &deep_copy($arg_type_ref);
 
   #if (object-t eq $$new_arg_type_ref[0]) {
   $$new_arg_type_ref[0] = $global_seq_super_t; # replace_first
@@ -792,7 +792,7 @@ sub arg_type::var_args {
   my ($arg_type_ref) = @_;
   my $num_args =       @$arg_type_ref;
 
-  my $new_arg_type_ref = &dakota::util::deep_copy($arg_type_ref);
+  my $new_arg_type_ref = &deep_copy($arg_type_ref);
   die if 'va-list-t' ne &ct($$new_arg_type_ref[-1]);
   $$new_arg_type_ref[$num_args - 1] = $global_seq_ellipsis;
   return $new_arg_type_ref;
@@ -1056,7 +1056,7 @@ sub func::overloadsig {
 }
 sub method::var_args_from_qual_va_list {
   my ($method) = @_;
-  my $new_method = &dakota::util::deep_copy($method);
+  my $new_method = &deep_copy($method);
 
   if ('va' eq $$new_method{'name'}[0]) {
     &remove_name_va_scope($new_method);
@@ -1555,7 +1555,7 @@ sub generate_va_generic_defns {
     if (&is_va($generic)) {
       my $scope = [];
       &path::add_last($scope, $ns);
-      my $new_generic = &dakota::util::deep_copy($generic);
+      my $new_generic = &deep_copy($generic);
       $$new_generic{'inline?'} = $is_inline;
 
       $$new_generic{'defined?'} = 1; # hackhack
@@ -1619,7 +1619,7 @@ sub generate_generic_defn {
     }
     my $arg_names_list;
     if ($big_generic) {
-      my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$generic{'param-types'})));
+      my $arg_names = &deep_copy(&arg_type::names(&deep_copy($$generic{'param-types'})));
       $arg_names_list = &arg_type::list_names($arg_names);
 
       if ($ENV{'DK_ENABLE_TRACE_MACROS'}) {
@@ -1868,7 +1868,7 @@ sub generate_va_make_defn {
 sub dk_parse {
   my ($dk_path) = @_; # string.dk
   my $ast_path = &dakota::parse::ast_path_from_dk_path($dk_path);
-  my $file = &dakota::util::scalar_from_file($ast_path);
+  my $file = &scalar_from_file($ast_path);
   $file = &dakota::parse::kw_args_translate($file);
   return $file;
 }
@@ -2352,7 +2352,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
   if (@$va_list_methods) {
     foreach my $method (@$va_list_methods) {
       if (1) {
-        my $va_method = &dakota::util::deep_copy($method);
+        my $va_method = &deep_copy($method);
         #$$va_method{'inline?'} = 1;
         #if (&is_decl() || &is_same_file($klass_scope)) #rn1
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
@@ -2458,7 +2458,7 @@ sub convert_to_object_type {
 }
 sub convert_to_object_method {
   my ($non_object_method) = @_;
-  my $method = &dakota::util::deep_copy($non_object_method);
+  my $method = &deep_copy($non_object_method);
   $$method{'return-type'} = &convert_to_object_type($$method{'return-type'});
 
   foreach my $param_type (@{$$method{'param-types'}}) {
@@ -3360,7 +3360,7 @@ sub dk_generate_cc_footer_klass {
 
     my $max_width = 0;
     foreach my $va_method (@$sorted_va_methods) {
-      $va_method = &dakota::util::deep_copy($va_method);
+      $va_method = &deep_copy($va_method);
       my $va_method_type = &method::type($va_method);
       my $width = length($va_method_type);
       if ($width > $max_width) {
@@ -3368,7 +3368,7 @@ sub dk_generate_cc_footer_klass {
       }
     }
     foreach my $va_method (@$sorted_va_methods) {
-      $va_method = &dakota::util::deep_copy($va_method);
+      $va_method = &deep_copy($va_method);
       my $va_method_type = &method::type($va_method);
       my $width = length($va_method_type);
       my $pad = ' ' x ($max_width - $width);
@@ -3410,7 +3410,7 @@ sub dk_generate_cc_footer_klass {
     $col = &colin($col);
     #$$scratch_str_ref .= "\#if 0" . $nl;
     foreach my $kw_args_method (@$kw_arg_methods) {
-      $kw_args_method = &dakota::util::deep_copy($kw_args_method);
+      $kw_args_method = &deep_copy($kw_args_method);
       my $list_types = &arg_type::list_types($$kw_args_method{'param-types'});
       my $method_name = &ct($$kw_args_method{'name'});
       my $in = &ident_comment($method_name);
@@ -3911,7 +3911,7 @@ sub generate_kw_args_method_defn {
   #$$scratch_str_ref .=
   #  $col . "static const signature-t* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);" . $nl;
 
-  my $arg_names = &dakota::util::deep_copy(&arg_type::names(&dakota::util::deep_copy($$method{'param-types'})));
+  my $arg_names = &deep_copy(&arg_type::names(&deep_copy($$method{'param-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
 
   if (scalar @{$$method{'kw-args'}}) {
@@ -4482,7 +4482,7 @@ sub pad {
 sub dk_generate_cc {
   my ($file, $path_name, $project_ast) = @_;
   my ($dir, $file_basename) = &split_path($file);
-  my $filestr = &dakota::util::filestr_from_file($file);
+  my $filestr = &filestr_from_file($file);
   my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
@@ -4511,7 +4511,7 @@ sub dk_generate_cc {
 sub start {
   my ($argv) = @_;
   foreach my $in_path (@$argv) {
-    my $filestr = &dakota::util::filestr_from_file($in_path);
+    my $filestr = &filestr_from_file($in_path);
     my $path;
     my $remove;
     my $project_ast;

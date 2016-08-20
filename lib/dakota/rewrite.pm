@@ -107,7 +107,7 @@ my $k = qr/[\w-]/;
 my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
 my $stmt_boundry = qr/\{|\}|\)|:|;/s;
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 my $sqstr = &sqstr_regex();
@@ -1133,7 +1133,7 @@ sub start {
   my $user_data = &dakota_lang_user_data_old();
 
   foreach my $arg (@$argv) {
-    my $filestr = &dakota::util::filestr_from_file($arg);
+    my $filestr = &filestr_from_file($arg);
 
     &convert_dk_to_cc(\$filestr, $$user_data{'kw-arg-generics'});
     print $filestr;

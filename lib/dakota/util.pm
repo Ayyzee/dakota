@@ -153,7 +153,7 @@ my $show_stat_info = 0;
 my $global_should_echo = 0;
 
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
 my $ENCODED_COMMENT_BEGIN = 'ENCODEDCOMMENTBEGIN';
 my $ENCODED_COMMENT_END =   'ENCODEDCOMMENTEND';

@@ -107,10 +107,10 @@ BEGIN {
     or die "do $prefix/lib/dakota/header-from-symbol.json failed: $!\n";
   $gbl_used = do "$prefix/lib/dakota/used.json"
     or die "do $prefix/lib/dakota/used.json failed: $!\n";
-  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', undef);
-  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', undef);
-  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext', undef);
-  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+  $hh_ext = &var($gbl_compiler, 'hh_ext', undef);
+  $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
+  $o_ext =  &var($gbl_compiler, 'o_ext', undef);
+  $so_ext = &var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -153,8 +153,8 @@ our @EXPORT= qw(
 my $colon = ':'; # key/element delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
-my $h =  &dakota::util::header_file_regex();
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+my $h =  &header_file_regex();
 
 $ENV{'DKT-DEBUG'} = 0;
 
@@ -279,7 +279,7 @@ sub _ast_merge { # recursive
           }
         } else {
           if (!$$root_ref{$name1}{$name2}) {
-            $$root_ref{$name1}{$name2} = &dakota::util::deep_copy($$scope{$name1}{$name2});
+            $$root_ref{$name1}{$name2} = &deep_copy($$scope{$name1}{$name2});
           } else {
             foreach my $name3 (sort keys %{$$scope{$name1}{$name2}}) {
               if (&is_tbl($$scope{$name1}{$name2}{$name3})) {
@@ -297,7 +297,7 @@ sub ast_merge {
   my ($argv) = @_;
   my $root_ref = {};
   foreach my $file (@$argv) {
-    my $parse_tree = &dakota::util::scalar_from_file($file);
+    my $parse_tree = &scalar_from_file($file);
     &_ast_merge($root_ref, $parse_tree);
   }
   return $root_ref;
@@ -419,7 +419,7 @@ sub expand_tbl_values {
 sub out_path_from_in_path {
   my ($pattern_name, $path_in) = @_;
   $path_in = &canon_path($path_in);
-  $builddir = &dakota::util::builddir();
+  $builddir = &builddir();
   my $expanded_patterns = &expand_tbl_values($patterns);
   my $pattern = $$expanded_patterns{$pattern_name} =~ s|\s*:\s*|:|r; # just hygenic
   my ($pattern_replacement, $pattern_template) = split(/\s*:\s*/, $pattern);
@@ -564,7 +564,7 @@ sub trait {
     if ($$args{'exported?'}) {
       $$gbl_root{'exported-trait-decls'}{$body} = {};
       $$gbl_current_scope{'exported-trait-decls'} =
-        &dakota::util::deep_copy($$gbl_root{'exported-trait-decls'});
+        &deep_copy($$gbl_root{'exported-trait-decls'});
     }
     return $body;
   }
@@ -1185,7 +1185,7 @@ sub klass {
     if ($$args{'exported?'}) {
       $$gbl_root{'exported-klass-decls'}{$body} = {};
       $$gbl_current_scope{'exported-klass-decls'} =
-        &dakota::util::deep_copy($$gbl_root{'exported-klass-decls'});
+        &deep_copy($$gbl_root{'exported-klass-decls'});
     }
     return $body;
   }
@@ -2008,7 +2008,7 @@ sub generics::parse {
   }
   foreach my $generic1 (@$big_cahuna) {
     if ($$generic1{'alias'}) {
-      my $alias_generic = &dakota::util::deep_copy($generic1);
+      my $alias_generic = &deep_copy($generic1);
       $$alias_generic{'name'} = $$alias_generic{'alias'};
       delete $$alias_generic{'alias'};
       &add_last($big_cahuna, $alias_generic);
@@ -2057,7 +2057,7 @@ sub generics::parse {
 sub generics::_parse { # no longer recursive
   my ($data, $klass_scope) = @_;
   foreach my $method (values %{$$klass_scope{'methods'}}) {
-    my $generic = &dakota::util::deep_copy($method);
+    my $generic = &deep_copy($method);
     $$generic{'exported?'} = 0;
     #$$generic{'inline?'} = 1;
 
@@ -2264,7 +2264,7 @@ sub ast_tree_from_dk_path {
   my ($arg) = @_;
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);
-  local $_ = &dakota::util::filestr_from_file($gbl_filename);
+  local $_ = &filestr_from_file($gbl_filename);
   while (m/^\s*\#\s*include\s+(<.*?>)/gm) {
     &add_system_include($gbl_root, $1);
   }

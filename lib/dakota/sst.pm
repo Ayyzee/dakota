@@ -96,10 +96,10 @@ our @EXPORT= qw(
              );
 
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
-my $h =  &dakota::util::header_file_regex();
-my $dqstr = &dakota::util::dqstr_regex();
-my $sqstr = &dakota::util::sqstr_regex();
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+my $h =  &header_file_regex();
+my $dqstr = &dqstr_regex();
+my $sqstr = &sqstr_regex();
 
 my $gbl_user_data = &lang_user_data();
 

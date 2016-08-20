@@ -68,10 +68,10 @@ BEGIN {
   }
   $extra = do "$gbl_prefix/lib/dakota/extra.json"
     or die "do $gbl_prefix/lib/dakota/extra.json failed: $!\n";
-  $hh_ext = &dakota::util::var($gbl_compiler, 'hh_ext', 'hh');
-  $cc_ext = &dakota::util::var($gbl_compiler, 'cc_ext', 'cc');
-  $o_ext =  &dakota::util::var($gbl_compiler, 'o_ext',  'o');
-  $so_ext = &dakota::util::var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
+  $hh_ext = &var($gbl_compiler, 'hh_ext', 'hh');
+  $cc_ext = &var($gbl_compiler, 'cc_ext', 'cc');
+  $o_ext =  &var($gbl_compiler, 'o_ext',  'o');
+  $so_ext = &var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
 };
 #use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
@@ -106,12 +106,12 @@ my $global_should_echo = 0;
 my $exit_status = 0;
 my $dk_exe_type = undef;
 
-my $cxx_compile_flags = &dakota::util::var($gbl_compiler, 'CXX_COMPILE_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
-my $cxx_shared_flags =  &dakota::util::var($gbl_compiler, 'CXX_SHARED_FLAGS',  '--shared');
-my $cxx_dynamic_flags = &dakota::util::var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', '--dynamic');
+my $cxx_compile_flags = &var($gbl_compiler, 'CXX_COMPILE_FLAGS', [ '--compile', '--PIC' ]); # or -fPIC
+my $cxx_shared_flags =  &var($gbl_compiler, 'CXX_SHARED_FLAGS',  '--shared');
+my $cxx_dynamic_flags = &var($gbl_compiler, 'CXX_DYNAMIC_FLAGS', '--dynamic');
 
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &dakota::util::ident_regex();
+   $rid, $rmid, $rbid, $rtid) = &ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 
@@ -558,7 +558,7 @@ sub inputs_tbl {
 }
 sub for_linker {
   my ($tkns) = @_;
-  my $for_linker = &dakota::util::var($gbl_compiler, 'CXX_FOR_LINKER_FLAGS', [ '--for-linker' ]);
+  my $for_linker = &var($gbl_compiler, 'CXX_FOR_LINKER_FLAGS', [ '--for-linker' ]);
   my $result = '';
   foreach my $tkn (@$tkns) {
     $result .= ' ' . $for_linker . ' ' . $tkn;
@@ -641,23 +641,23 @@ sub start_cmd {
   } else {
     $dk_exe_type = '#lib';
   }
-  $builddir = &dakota::util::builddir();
+  $builddir = &builddir();
   if ($$cmd_info{'opts'}{'target'} && $$cmd_info{'opts'}{'path-only'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
     print $target_cc_path . $nl;
     return $exit_status;
   }
   if (!$$cmd_info{'opts'}{'compiler'}) {
-    my $cxx = &dakota::util::var($gbl_compiler, 'CXX', 'g++');
+    my $cxx = &var($gbl_compiler, 'CXX', 'g++');
     $$cmd_info{'opts'}{'compiler'} = $cxx;
   }
   if (!$$cmd_info{'opts'}{'compiler-flags'}) {
-    my $cxxflags =       &dakota::util::var($gbl_compiler, 'CXXFLAGS', [ '-std=c++11', '--visibility=hidden' ]);
-    my $extra_cxxflags = &dakota::util::var($gbl_compiler, 'EXTRA_CXXFLAGS', '');
+    my $cxxflags =       &var($gbl_compiler, 'CXXFLAGS', [ '-std=c++11', '--visibility=hidden' ]);
+    my $extra_cxxflags = &var($gbl_compiler, 'EXTRA_CXXFLAGS', '');
     $$cmd_info{'opts'}{'compiler-flags'} = $cxxflags . ' ' . $extra_cxxflags;
   }
-  my $ld_soname_flags =    &dakota::util::var_array($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
-  my $no_undefined_flags = &dakota::util::var_array($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', '--no-undefined');
+  my $ld_soname_flags =    &var_array($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
+  my $no_undefined_flags = &var_array($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', '--no-undefined');
   push @$ld_soname_flags, $$cmd_info{'opts'}{'soname'};
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_exe_type = undef;
@@ -1021,7 +1021,7 @@ sub o_from_dk {
       delete $$o_cmd{'opts'}{'output'};
       $num_out_of_date_infiles = &o_from_cc($o_cmd, &compile_opts_path(), $cxx_compile_flags);
 
-      &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path); # should also be in dk
+      &project_io_add($$cmd_info{'project.io'}, 'compile', $input, $o_path); # should also be in dk
       $outfile = $$o_cmd{'output'};
     }
   }
@@ -1114,7 +1114,7 @@ sub o_from_cc {
     $$o_cmd{'cmd-flags'} =~ s/ -MMD//g;
   }
   my $count = &outfile_from_infiles($o_cmd, $should_echo);
-  &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $$o_cmd{'inputs'}, $$o_cmd{'output'});
+  &project_io_add($$cmd_info{'project.io'}, 'compile', $$o_cmd{'inputs'}, $$o_cmd{'output'});
   return $count;
 }
 sub target_hh_from_ast {
@@ -1191,7 +1191,7 @@ sub target_from_ast {
   &dakota::generate::generate_target_decl($target_cc_path, $file, $project_ast = undef, $is_exe);
   if ($is_defn) {
     &dakota::generate::generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
-    &dakota::util::project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
+    &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
 
   if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {
@@ -1208,7 +1208,7 @@ sub target_from_ast {
   }
     &o_from_cc($o_info, &compile_opts_path(), $cxx_compile_flags);
     &add_first($$cmd_info{'inputs'}, $target_o_path);
-    &dakota::util::project_io_add($$cmd_info{'project.io'}, 'compile', $target_cc_path, $target_o_path); # should also be in dk
+    &project_io_add($$cmd_info{'project.io'}, 'compile', $target_cc_path, $target_o_path); # should also be in dk
   }
 }
 sub gcc_libraries_str {
@@ -1237,8 +1237,8 @@ sub linked_output_from_o {
   my ($cmd_info, $opts_path, $mode_flags) = @_;
   my $cmd = { 'opts' => $$cmd_info{'opts'} };
   $$cmd{'project.io'} =  $$cmd_info{'project.io'};
-  my $ldflags =       &dakota::util::var($gbl_compiler, 'LDFLAGS', '');
-  my $extra_ldflags = &dakota::util::var($gbl_compiler, 'EXTRA_LDFLAGS', '');
+  my $ldflags =       &var($gbl_compiler, 'LDFLAGS', '');
+  my $extra_ldflags = &var($gbl_compiler, 'EXTRA_LDFLAGS', '');
   my $opts = '';
   $opts .= $mode_flags . $nl if $mode_flags;
   $opts .=
