@@ -861,7 +861,7 @@ sub klass::kw_arg_methods {
   my $kw_args_methods_seq = [];
 
   foreach $method (sort method::compare values %{$$klass_scope{'methods'}}) {
-    if ($$method{'kw-args'}) {
+    if (&has_kw_args($method)) {
       &add_last($kw_args_methods_seq, $method);
     }
   }
@@ -2181,7 +2181,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
     #print STDERR Dumper($va_list_methods);
     foreach my $method (@$va_list_methods) {
       my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
-      if (exists $$method{'kw-args'}) {
+      if (&has_kw_args($method)) {
         $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //kw-args // stmt1" . &ann(__FILE__, __LINE__) . $nl;
       } else {
         $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { namespace va {" . $visibility . " METHOD $$method_decl_ref }} //va // stmt1" . &ann(__FILE__, __LINE__) . $nl;
@@ -2195,9 +2195,9 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
         #$$va_method{'inline?'} = 1;
         #if (&is_decl() || &is_same_file($klass_scope)) #rn1
         if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
-          if (defined $$method{'kw-args'}) {
+          if (&has_kw_args($method)) {
             &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
-            if (0 == @{$$va_method{'kw-args'}}) {
+            if (0 == &num_kw_args($va_method)) {
               my $last = &remove_last($$va_method{'param-types'});
               die if 'va-list-t' ne &ct($last);
               my ($visibility, $method_decl_ref) = &func::decl($va_method, $klass_path);
@@ -2213,8 +2213,8 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
         }
         if (&is_decl) {
           if (&is_same_src_file($klass_scope) || &is_target()) { #rn2
-            if (defined $$method{'kw-args'}) {
-              if (0 != @{$$method{'kw-args'}}) {
+            if (&has_kw_args($method)) {
+              if (&num_kw_args($method)) {
                 my $other_method_decl = &kw_args_method::type_decl($method);
 
                 #my $scope = &ct($klass_path);
@@ -3568,7 +3568,7 @@ sub dk_generate_cc_footer_klass {
 sub generate_kw_arg_method_signature_decls {
   my ($methods, $klass_name, $col, $klass_type, $max_width) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    if ($$method{'kw-args'}) {
+    if (&has_kw_args($method)) {
       &generate_kw_args_method_signature_decl($method, $klass_name, $col, $klass_type, $max_width);
     }
   }
@@ -3576,7 +3576,7 @@ sub generate_kw_arg_method_signature_decls {
 sub generate_kw_arg_method_signature_defns {
   my ($methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    if ($$method{'kw-args'}) {
+    if (&has_kw_args($method)) {
       &generate_kw_args_method_signature_defn($method, $klass_name, $col, $klass_type);
     }
   }
@@ -3677,7 +3677,7 @@ sub generate_slots_method_signature_defn {
 sub generate_kw_arg_method_defns {
   my ($slots, $methods, $klass_name, $col, $klass_type) = @_;
   foreach my $method (sort method::compare values %$methods) {
-    if ($$method{'kw-args'}) {
+    if (&has_kw_args($method)) {
       &generate_kw_args_method_defn($slots, $method, $klass_name, $col, $klass_type);
     }
   }
@@ -3728,7 +3728,7 @@ sub generate_kw_args_method_defn {
   my $arg_names = &deep_copy(&arg_type::names(&deep_copy($$method{'param-types'})));
   my $arg_names_list = &arg_type::list_names($arg_names);
 
-  if (scalar @{$$method{'kw-args'}}) {
+  if (&num_kw_args($method)) {
     #my $param = &remove_last($$method{'param-types'}); # remove intptr-t type
     $method_type_decl = &kw_args_method::type_decl($method);
     #&add_last($$method{'param-types'}, $param);
@@ -3741,7 +3741,7 @@ sub generate_kw_args_method_defn {
     #&add_last($$method{'param-types'}, $param2);
     &add_last($$method{'param-types'}, $param1);
   }
-  if (scalar @{$$method{'kw-args'}}) {
+  if (&num_kw_args($method)) {
     $$scratch_str_ref .= $col;
     my $delim = '';
     foreach my $kw_arg (@{$$method{'kw-args'}}) {

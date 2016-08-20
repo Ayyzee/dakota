@@ -95,6 +95,7 @@ our @EXPORT= qw(
                  global_project
                  global_project_ast
                  global_project_target
+                 has_kw_args
                  header_file_regex
                  ident_regex
                  is_abs
@@ -131,6 +132,8 @@ our @EXPORT= qw(
                  min
                  mtime
                  needs_hex_encoding
+                 num_kw_args
+                 builddir
                  pann
                  param_types_str
                  project_io_add
@@ -889,6 +892,14 @@ sub is_va {
   } else {
     return 0;
   }
+}
+sub num_kw_args {
+  my ($func) = @_;
+  return scalar @{$$func{'kw-args'} ||= []};
+}
+sub has_kw_args {
+  my ($func) = @_;
+  return $$func{'kw-args'};
 }
 sub is_kw_args_method {
   my ($method) = @_;
