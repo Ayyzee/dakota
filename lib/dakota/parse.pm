@@ -92,7 +92,6 @@ my $patterns = {
 BEGIN {
   my $prefix = &dk_prefix($0);
   unshift @INC, "$prefix/lib";
-  use dakota::generate;
   use dakota::sst;
   use dakota::util;
   $gbl_compiler = do "$prefix/lib/dakota/compiler/command-line.json"
