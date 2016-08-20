@@ -82,10 +82,11 @@ our @EXPORT= qw(
                  is_o_path
                  target_cc_path
                  rel_target_hh_path
+                 target_klass_func_decls_path
                  target_klass_func_defns_path
+                 target_generic_func_decls_path
                  target_generic_func_defns_path
              );
-                #target_generic_func_decls_path
 
 use Data::Dumper;
 $Data::Dumper::Terse =     1;
