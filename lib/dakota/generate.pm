@@ -89,6 +89,7 @@ use Data::Dumper;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT= qw(
+                 dk_generate_cc
                  empty_klass_defns
                  func::overloadsig
                  generate_src_decl
@@ -194,7 +195,7 @@ sub write_to_file_converted_strings {
     &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_arg_generics);
   }
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
-  &dakota::rewrite::convert_dk_to_cc(\$converted_string, $kw_arg_generics, $remove); # costly (< 3/4 of total)
+  &convert_dk_to_cc(\$converted_string, $kw_arg_generics, $remove); # costly (< 3/4 of total)
   my $should_echo;
   &filestr_to_file($converted_string, $path, $should_echo = 0);
 }
@@ -1045,13 +1046,6 @@ sub property::compare {
   my ($a_key, $a_val) = %$a;
   my ($b_key, $b_val) = %$b;
   $a_key cmp $b_key;
-}
-sub type_trans {
-  my ($arg_type_ref) = @_;
-  if (defined $arg_type_ref) {
-    my $arg_type = &ct($arg_type_ref);
-  }
-  return $arg_type_ref;
 }
 sub common::print_signature {
   my ($generic, $col, $path) = @_;

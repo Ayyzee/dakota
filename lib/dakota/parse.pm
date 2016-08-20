@@ -2053,6 +2053,13 @@ sub generics::parse {
   $generics = $sorted_generics_seq;
   return ($generics, $symbols);
 }
+sub type_trans {
+  my ($arg_type_ref) = @_;
+  if (defined $arg_type_ref) {
+    my $arg_type = &ct($arg_type_ref);
+  }
+  return $arg_type_ref;
+}
 sub generics::_parse { # no longer recursive
   my ($data, $klass_scope) = @_;
   foreach my $method (values %{$$klass_scope{'methods'}}) {
@@ -2070,13 +2077,13 @@ sub generics::_parse { # no longer recursive
 
     # not sure if we should type translate the return type
     $$generic{'return-type'} =
-      &dakota::generate::type_trans($$generic{'return-type'});
+      &type_trans($$generic{'return-type'});
 
     my $args =    $$generic{'param-types'};
     my $num_args = @$args;
     my $arg_num;
     for ($arg_num = 0; $arg_num < $num_args; $arg_num++) {
-      $$args[$arg_num] = &dakota::generate::type_trans($$args[$arg_num]);
+      $$args[$arg_num] = &type_trans($$args[$arg_num]);
     }
   }
 }

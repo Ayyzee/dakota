@@ -501,16 +501,16 @@ sub loop_cc_from_dk {
     my $inc_path = &inc_path_from_dk_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
-    &dakota::generate::empty_klass_defns();
-    &dakota::generate::dk_generate_cc($input, $inc_path, $global_target_ast);
+    &empty_klass_defns();
+    &dk_generate_cc($input, $inc_path, $global_target_ast);
     &src::add_extra_symbols($file);
     &src::add_extra_klass_decls($file);
     &src::add_extra_keywords($file);
     &src::add_extra_generics($file);
     my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
 
-    &dakota::generate::generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
-    &dakota::generate::generate_src_defn($cc_path, $file, $global_target_ast, $rel_target_hh_path); # rel_target_hh_path not used
+    &generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
+    &generate_src_defn($cc_path, $file, $global_target_ast, $rel_target_hh_path); # rel_target_hh_path not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -1196,9 +1196,9 @@ sub target_from_ast {
   &src::add_extra_generics($file);
 
   my $project_ast;
-  &dakota::generate::generate_target_decl($target_cc_path, $file, $project_ast = undef, $is_exe);
+  &generate_target_decl($target_cc_path, $file, $project_ast = undef, $is_exe);
   if ($is_defn) {
-    &dakota::generate::generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
+    &generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
     &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
 
