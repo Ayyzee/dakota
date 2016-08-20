@@ -463,7 +463,7 @@ sub loop_cc_from_dk {
   $$cmd_info{'asts'} = $ast;
   $$cmd_info{'inputs'} = $inputs;
 
-  my $global_target_ast = &init_global_target_ast($$cmd_info{'asts'}); # within loop_cc_from_dk
+  my $global_target_ast = &global_target_ast($$cmd_info{'asts'}); # within loop_cc_from_dk
   my $num_inputs = @{$$cmd_info{'inputs'}};
   if (0 == $num_inputs) {
     die "$0: error: arguments are requried\n";
@@ -1171,7 +1171,7 @@ sub target_from_ast {
   my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
-  my $global_target_ast = &init_global_target_ast($$cmd_info{'asts'}); # within target_o_from_ast
+  my $global_target_ast = &global_target_ast($$cmd_info{'asts'}); # within target_o_from_ast
   $file = &scalar_from_file($target_ast_path);
   die if $$file{'other'};
   $$file{'other'} = $other;

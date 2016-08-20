@@ -140,7 +140,7 @@ our @EXPORT= qw(
                  inc_path_from_dk_path
                  hh_path_from_cc_path
                  hh_path_from_src_path
-                 init_global_target_ast
+                 global_target_ast
                  kw_args_translate
                  o_path_from_dk_path
                  o_path_from_cc_path
@@ -2119,8 +2119,9 @@ sub dk_klass_names_from_file {
   }
   return $klass_names_set;
 }
-sub init_global_target_ast {
+sub global_target_ast {
   my ($asts) = @_;
+  return $global_target_ast if $global_target_ast;
   #my $reinit = 0;
   #if ($global_target_ast) { $reinit = 1; }
   #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
