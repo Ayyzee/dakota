@@ -133,8 +133,6 @@ our @EXPORT= qw(
                  add_trait_decl
                  ast_tree_from_dk_path
                  cc_path_from_dk_path
-                 colin
-                 colout
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
                  inc_path_from_dk_path
@@ -1915,7 +1913,7 @@ sub _add_indirect_klasses { # recursive
     if ('klass' ne $$klass_scope{'klass'}) {
       &_add_indirect_klasses($klass_names_set,
                              $$klass_scope{'klass'},
-                             &dakota::generate::colin($col));
+                             &colin($col));
     }
   }
   if (defined $$klass_scope{'interpose'}) {
@@ -1924,7 +1922,7 @@ sub _add_indirect_klasses { # recursive
     if ('object' ne $$klass_scope{'interpose'}) {
       &_add_indirect_klasses($klass_names_set,
                              $$klass_scope{'interpose'},
-                             &dakota::generate::colin($col));
+                             &colin($col));
     }
   }
   if (defined $$klass_scope{'superklass'}) {
@@ -1933,7 +1931,7 @@ sub _add_indirect_klasses { # recursive
     if ('object' ne $$klass_scope{'superklass'}) {
       &_add_indirect_klasses($klass_names_set,
                              $$klass_scope{'superklass'},
-                             &dakota::generate::colin($col));
+                             &colin($col));
     }
   }
   if (defined $$klass_scope{'traits'}) {
@@ -1942,7 +1940,7 @@ sub _add_indirect_klasses { # recursive
       if ($klass_name ne $trait) {
         &_add_indirect_klasses($klass_names_set,
                                $trait,
-                               &dakota::generate::colin($col));
+                               &colin($col));
       }
     }
   }
@@ -1952,7 +1950,7 @@ sub _add_indirect_klasses { # recursive
       if ($klass_name ne $reqr) {
         &_add_indirect_klasses($klass_names_set,
                                $reqr,
-                               &dakota::generate::colin($col));
+                               &colin($col));
       }
     }
   }
@@ -1962,7 +1960,7 @@ sub _add_indirect_klasses { # recursive
       if ($klass_name ne $reqr) {
         &_add_indirect_klasses($klass_names_set,
                                $reqr,
-                               &dakota::generate::colin($col));
+                               &colin($col));
       }
     }
   }

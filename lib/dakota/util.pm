@@ -72,6 +72,8 @@ our @EXPORT= qw(
                  builddir
                  canon_path
                  clean_paths
+                 colin
+                 colout
                  cpp_directives
                  ct
                  decode_comments
@@ -1088,6 +1090,24 @@ sub clean_paths {
     $$in{$key} = $elements;
   }
   return $elements;
+}
+my $gbl_col_width = '  ';
+sub colin {
+  my ($col) = @_;
+  my $len = length($col)/length($gbl_col_width);
+  #print STDERR "$len" . "++" . $nl;
+  $len++;
+  my $result = $gbl_col_width x $len;
+  return $result;
+}
+sub colout {
+  my ($col) = @_;
+  &confess("Aborted because of &colout(0)") if '' eq $col;
+  my $len = length($col)/length($gbl_col_width);
+  #print STDERR "$len" . "--" . $nl;
+  $len--;
+  my $result = $gbl_col_width x $len;
+  return $result;
 }
 sub copy_no_dups {
   my ($strs) = @_;

@@ -379,24 +379,6 @@ sub labeled_src_str {
   }
   return $str;
 }
-my $gbl_col_width = '  ';
-sub colin {
-  my ($col) = @_;
-  my $len = length($col)/length($gbl_col_width);
-  #print STDERR "$len" . "++" . $nl;
-  $len++;
-  my $result = $gbl_col_width x $len;
-  return $result;
-}
-sub colout {
-  my ($col) = @_;
-  &confess("Aborted because of &colout(0)") if '' eq $col;
-  my $len = length($col)/length($gbl_col_width);
-  #print STDERR "$len" . "--" . $nl;
-  $len--;
-  my $result = $gbl_col_width x $len;
-  return $result;
-}
 sub add_labeled_src {
   my ($result, $label, $src) = @_;
   if (!$$result{'--labels'}) { $$result{'--labels'} = []; }
