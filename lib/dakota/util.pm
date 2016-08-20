@@ -126,8 +126,8 @@ our @EXPORT= qw(
                  remove_last
                  remove_non_newlines
                  remove_name_va_scope
-                 _replace_first
-                 _replace_last
+                 replace_first
+                 replace_last
                  rewrite_klass_defn_with_implicit_metaklass_defn
                  scalar_from_file
                  scalar_to_file
@@ -1035,7 +1035,7 @@ sub first {
 sub last {
   my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last =  $$seq[-1]; return $last;
 }
-sub _replace_first {
+sub replace_first {
   my ($seq, $element) = @_;
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";
@@ -1044,7 +1044,7 @@ sub _replace_first {
   &add_first($seq, $element);
   return $old_first;
 }
-sub _replace_last {
+sub replace_last {
   my ($seq, $element) = @_;
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";

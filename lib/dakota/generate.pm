@@ -1062,7 +1062,7 @@ sub method::var_args_from_qual_va_list {
     &remove_name_va_scope($new_method);
   }
   if (exists $$new_method{'param-types'}) {
-    &_replace_last($$new_method{'param-types'}, ['...']);
+    &replace_last($$new_method{'param-types'}, ['...']);
   }
   return $new_method;
 }
@@ -1135,9 +1135,9 @@ sub generate_va_generic_defn {
     $$scratch_str_ref .= $col . $part;
     my $name = &last($$va_method{'name'});
     my $va_name = "_func_";
-    &_replace_last($$va_method{'name'}, $va_name);
+    &replace_last($$va_method{'name'}, $va_name);
     my $method_type_decl = &method::type_decl($va_method);
-    &_replace_last($$va_method{'name'}, $name);
+    &replace_last($$va_method{'name'}, $name);
     my $scope_str = &ct($scope);
     $$scratch_str_ref .= " {" . &ann(__FILE__, $line) . $nl;
     $col = &colin($col);
@@ -1631,7 +1631,7 @@ sub generate_generic_defn {
     }
     $new_arg_names = &arg_type::names($new_arg_type);
     if (&is_super($generic)) {
-      &_replace_first($new_arg_names, "context.object");
+      &replace_first($new_arg_names, "context.object");
     }
     my $new_arg_names_list = &arg_type::list_names($new_arg_names);
 
@@ -3880,8 +3880,8 @@ sub generate_kw_args_method_defn {
   my $new_arg_type_list = &arg_type::list_types($new_arg_type);
   $new_arg_type = $$method{'param-types'};
   my $new_arg_names = &arg_type::names($new_arg_type);
-  &_replace_first($new_arg_names, 'self');
-  &_replace_last($new_arg_names, '_args_');
+  &replace_first($new_arg_names, 'self');
+  &replace_last($new_arg_names, '_args_');
   my $new_arg_list =  &arg_type::list_pair($new_arg_type, $new_arg_names);
   my $return_type = &arg::type($$method{'return-type'});
   my $visibility = '';
