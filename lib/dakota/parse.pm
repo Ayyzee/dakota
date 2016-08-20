@@ -132,12 +132,14 @@ our @EXPORT= qw(
                  add_str
                  add_symbol
                  add_trait_decl
+                 ast_tree_from_dk_path
                  cc_path_from_dk_path
                  colin
                  colout
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
                  inc_path_from_dk_path
+                 init_ast_from_inputs_vars
                  hh_path_from_cc_path
                  hh_path_from_src_path
                  global_target_ast

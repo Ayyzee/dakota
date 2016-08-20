@@ -58,6 +58,7 @@ sub dk_prefix {
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
   unshift @INC, "$gbl_prefix/lib";
+  use dakota::parse;
   use dakota::rewrite;
   use dakota::util;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
@@ -1865,13 +1866,6 @@ sub generate_va_make_defn {
 }
 ## exists()  (does this key exist)
 ## defined() (is the value (for this key) non-undef)
-sub dk_parse {
-  my ($dk_path) = @_; # string.dk
-  my $ast_path = &dakota::parse::ast_path_from_dk_path($dk_path);
-  my $file = &scalar_from_file($ast_path);
-  $file = &dakota::parse::kw_args_translate($file);
-  return $file;
-}
 sub slots_decl {
   my ($slots_scope) = @_;
   my $result = ' slots';

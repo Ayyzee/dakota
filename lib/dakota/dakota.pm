@@ -195,7 +195,7 @@ sub loop_merged_ast_from_inputs {
     print STDERR '  &loop_merged_ast_from_inputs --output ' .
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
-  &dakota::parse::init_ast_from_inputs_vars($cmd_info);
+  &init_ast_from_inputs_vars($cmd_info);
   my $ast_files = [];
   if ($$cmd_info{'asts'}) {
     $ast_files = $$cmd_info{'asts'};
@@ -204,7 +204,7 @@ sub loop_merged_ast_from_inputs {
   my $root_ast_path;
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
-      $root = &dakota::parse::ast_tree_from_dk_path($input);
+      $root = &ast_tree_from_dk_path($input);
       my $ast_path;
       if (&is_dk_path($input)) {
         $ast_path = &ast_path_from_dk_path($input);
@@ -226,10 +226,10 @@ sub loop_merged_ast_from_inputs {
   }
   if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
     if (1 == @{$$cmd_info{'inputs'}}) {
-      &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
+      &scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
     } elsif (1 < @{$$cmd_info{'inputs'}}) {
       my $ast = &ast_merge($ast_files);
-      &dakota::parse::scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
+      &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     }
   }
 } # loop_merged_ast_from_inputs
@@ -238,7 +238,7 @@ sub add_visibility_file {
   #print STDERR "&add_visibility_file(path=\"$arg\")\n";
   my $root = &scalar_from_file($arg);
   &add_visibility($root);
-  &dakota::parse::scalar_to_file($arg, $root);
+  &scalar_to_file($arg, $root);
 }
 my $debug_exported = 0;
 sub add_visibility {
@@ -359,14 +359,14 @@ sub src::add_extra_symbols {
   my ($file) = @_;
   my $symbols = $$extra{'src_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
-    &dakota::parse::add_symbol($file, $symbol);
+    &add_symbol($file, $symbol);
   }
 }
 sub target::add_extra_symbols {
   my ($file) = @_;
   my $symbols = $$extra{'target_extra_symbols'};
   foreach my $symbol (sort keys %$symbols) {
-    &dakota::parse::add_symbol($file, $symbol);
+    &add_symbol($file, $symbol);
   }
 }
 sub sig1 {
@@ -440,6 +440,13 @@ sub target_generic_func_defns_path {
   my $result = &target_cc_path($cmd_info) =~ s=^$builddir/\+/(.+?)\.$cc_ext$=$1-generic-func-defns.inc=r;
   return $result;
 }
+sub dk_parse {
+  my ($dk_path) = @_; # string.dk
+  my $ast_path = &ast_path_from_dk_path($dk_path);
+  my $file = &scalar_from_file($ast_path);
+  $file = &kw_args_translate($file);
+  return $file;
+}
 sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
   if ($should_echo) {
@@ -482,7 +489,7 @@ sub loop_cc_from_dk {
     }
 
     my ($input_dir, $input_name) = &split_path($input, $id);
-    my $file = &dakota::generate::dk_parse($input);
+    my $file = &dk_parse($input);
     my $cc_path;
     if ($$cmd_info{'opts'}{'output'}) {
       $cc_path = $$cmd_info{'opts'}{'output'};
