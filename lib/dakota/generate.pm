@@ -106,12 +106,6 @@ my ($id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &ident_regex();
 
 my $global_should_echo = 0;
-my $global_is_defn = undef; # klass decl vs defn
-my $global_is_target = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
-my $global_is_exe_target = undef;
-my $global_suffix = undef;
-
-my $gbl_src_file = undef;
 my $global_scratch_str_ref;
 #my $global_src_cc_str;
 
@@ -142,43 +136,6 @@ sub set_global_scratch_str_ref {
   my ($ref) = @_;
   $global_scratch_str_ref = $ref;
 }
-sub set_src_decl {
-  my ($path) = @_;
-  my ($dir, $name, $ext) = &split_path($path, $id);
-  $gbl_src_file = &canon_path("$name.dk");
-  $global_is_target =   0;
-  $global_is_defn = 0;
-  $global_suffix = $hh_ext;
-}
-sub set_src_defn {
-  my ($path) = @_;
-  my ($dir, $name, $ext) = &split_path($path, $id);
-  $gbl_src_file = &canon_path("$name.dk");
-  $global_is_target =   0;
-  $global_is_defn = 1;
-  $global_suffix = $ext;
-}
-sub set_target_decl {
-  my ($path) = @_;
-  $gbl_src_file = undef;
-  $global_is_target =   1;
-  $global_is_defn = 0;
-  $global_suffix = $hh_ext;
-}
-sub set_target_defn {
-  my ($path) = @_;
-  $gbl_src_file = undef;
-  $global_is_target =   1;
-  $global_is_defn = 1;
-  $global_suffix = $cc_ext;
-}
-sub set_exe_target {
-  my ($path) = @_;
-  $global_is_exe_target = $path;
-}
-sub suffix {
-  return $global_suffix
-}
 sub extra_dakota_headers {
   my ($name) = @_;
   my $result = '';
@@ -203,58 +160,6 @@ sub extra_dakota_headers {
       "bug-in-code-gen" . $nl;
   }
   return $result;
-}
-sub is_src_decl {
-  if (!$global_is_target && !$global_is_defn) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_src_defn {
-  if (!$global_is_target && $global_is_defn) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_target_decl {
-  if ($global_is_target && !$global_is_defn) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_target_defn {
-  if ($global_is_target && $global_is_defn) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_src {
-  if (!$global_is_target) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_target {
-  if ($global_is_target) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_decl {
-  if (!$global_is_defn) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_exe_target {
-  return $global_is_exe_target;
 }
 sub write_to_file_strings {
   my ($path, $strings) = @_;
@@ -820,35 +725,6 @@ sub arg_type::names {
     }
   }
   return $arg_names;
-}
-sub is_exported {
-  my ($method) = @_;
-  if (exists $$method{'exported?'} && $$method{'exported?'}) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_slots {
-  my ($method) = @_;
-  if ('object-t' ne $$method{'param-types'}[0][0]) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-sub is_box_type {
-  my ($type_seq) = @_;
-  my $result;
-  my $type_str = &ct($type_seq);
-
-  if ('slots-t*' eq $type_str ||
-      'slots-t'  eq $type_str) {
-    $result = 1;
-  } else {
-    $result = 0;
-  }
-  return $result;
 }
 sub arg_type::names_unboxed {
   my ($arg_type_ref) = @_;
@@ -1568,13 +1444,6 @@ sub generate_va_generic_defns {
       &path::remove_last($scope);
     }
   }
-}
-sub is_super {
-  my ($generic) = @_;
-  if ('super-t' eq $$generic{'param-types'}[0][0]) {
-    return 1;
-  }
-  return 0;
 }
 my $big_generic = 0;
 sub generate_generic_defn {
@@ -2513,15 +2382,6 @@ sub generate_slots_decls {
     $$scratch_str_ref .= $col . '// ' . &typealias_slots_t($klass_name) . $nl;
   }
 }
-sub is_array_type {
-  my ($type) = @_;
-  my $is_array_type = 0;
-
-  if ($type && $type =~ m|\[.*?\]$|) {
-    $is_array_type = 1;
-  }
-  return $is_array_type;
-}
 sub generate_exported_slots_decls {
   my ($scope, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2) = @_;
   my $pad1 = '';
@@ -2610,22 +2470,6 @@ sub linkage_unit::generate_headers {
   }
   $result .= $extra_dakota_headers;
   return $result;
-}
-sub is_same_file {
-  my ($klass_scope) = @_;
-  my $slots_file = &at($$klass_scope{'slots'}, 'file');
-  if ($gbl_src_file && $slots_file) {
-    return 1 if $gbl_src_file eq &canon_path($slots_file);
-  }
-  return 0;
-}
-sub is_same_src_file {
-  my ($klass_scope) = @_;
-  if ($gbl_src_file && $$klass_scope{'file'}) {
-    return 1 if !$ENV{'DK_SRC_UNIQUE_HEADER'};
-    return 1 if $gbl_src_file eq &canon_path($$klass_scope{'file'});
-  }
-  return 0;
 }
 sub has_slots_type {
   my ($klass_scope) = @_;

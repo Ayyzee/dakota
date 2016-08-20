@@ -232,7 +232,7 @@ sub kw_args_translate {
             delete $$method{'kw-arg-defaults'};
           } else {
             if (&is_kw_args_method($method)) {
-              if (!&dakota::generate::is_va($method)) {
+              if (!&is_va($method)) {
                 &update_to_kw_args($method);
               }
             }
@@ -1835,26 +1835,26 @@ sub method {
   my $signature = &func::overloadsig($method, undef);
 
   if (0) {
-  } elsif (&dakota::generate::is_slots($method) &&
-           &dakota::generate::is_va($method)) { # 11
+  } elsif (&is_slots($method) &&
+           &is_va($method)) { # 11
     if (!defined $$gbl_current_scope{'slots-methods'}) {
       $$gbl_current_scope{'slots-methods'} = {};
     }
     $$gbl_current_scope{'slots-methods'}{$signature} = $method;
-  } elsif (&dakota::generate::is_slots($method) &&
-          !&dakota::generate::is_va($method)) { # 10
+  } elsif (&is_slots($method) &&
+          !&is_va($method)) { # 10
     if (!defined $$gbl_current_scope{'slots-methods'}) {
       $$gbl_current_scope{'slots-methods'} = {};
     }
     $$gbl_current_scope{'slots-methods'}{$signature} = $method;
-  } elsif (!&dakota::generate::is_slots($method) &&
-            &dakota::generate::is_va($method)) { # 01
+  } elsif (!&is_slots($method) &&
+            &is_va($method)) { # 01
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }
     $$gbl_current_scope{'methods'}{$signature} = $method;
-  } elsif (!&dakota::generate::is_slots($method) &&
-           !&dakota::generate::is_va($method)) { # 00
+  } elsif (!&is_slots($method) &&
+           !&is_va($method)) { # 00
     if (!defined $$gbl_current_scope{'methods'}) {
       $$gbl_current_scope{'methods'} = {};
     }
@@ -2021,7 +2021,7 @@ sub generics::parse {
   # (keep $is_va_list = 1 and toss $is_va_list = 0)
 
   foreach my $generic (@$big_cahuna) {
-    if (!&dakota::generate::is_va($generic)) {
+    if (!&is_va($generic)) {
       my $scope = [];
       &path::add_last($scope, 'dk');
       my $generics_key = &func::overloadsig($generic, $scope);
@@ -2030,7 +2030,7 @@ sub generics::parse {
     }
   }
   foreach my $generic (@$big_cahuna) {
-    if (&dakota::generate::is_va($generic)) {
+    if (&is_va($generic)) {
       my $scope = [];
       &path::add_last($scope, 'dk');
       &path::add_last($scope, 'va');

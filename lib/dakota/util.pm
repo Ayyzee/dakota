@@ -32,6 +32,9 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 
 my $nl = "\n";
 my $gbl_prefix;
+my $gbl_compiler;
+my $hh_ext;
+my $cc_ext;
 
 sub dk_prefix {
   my ($path) = @_;
@@ -46,9 +49,6 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-BEGIN {
-  $gbl_prefix = &dk_prefix($0);
-};
 use Carp; $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 use Data::Dumper;
@@ -68,6 +68,8 @@ our @EXPORT= qw(
                  ann
                  as_literal_symbol
                  as_literal_symbol_interior
+                 at
+                 builddir
                  canon_path
                  clean_paths
                  cpp_directives
@@ -76,6 +78,8 @@ our @EXPORT= qw(
                  decode_strings
                  deep_copy
                  dir_part
+                 dk_mangle
+                 dk_mangle_seq
                  dmp
                  dqstr_regex
                  encode_char
@@ -86,22 +90,37 @@ our @EXPORT= qw(
                  find_library
                  first
                  flatten
+                 global_project
+                 global_project_ast
+                 global_project_target
                  header_file_regex
                  ident_regex
                  is_abs
-                 is_exe
-                 is_symbol_candidate
+                 is_array_type
+                 is_box_type
                  is_debug
+                 is_decl
+                 is_exe
+                 is_exe_target
+                 is_exported
                  is_kw_args_method
                  is_out_of_date
+                 is_same_file
+                 is_same_src_file
+                 is_slots
+                 is_src
+                 is_src_decl
+                 is_src_defn
+                 is_super
+                 is_symbol_candidate
+                 is_target
+                 is_target_decl
+                 is_target_defn
                  is_va
                  kw_arg_generics
                  kw_arg_placeholders
                  kw_args_method_sig
                  last
-                 at
-                 dk_mangle_seq
-                 dk_mangle
                  make_dir
                  make_dir_part
                  max
@@ -110,41 +129,43 @@ our @EXPORT= qw(
                  min
                  mtime
                  needs_hex_encoding
-                 builddir
                  pann
                  param_types_str
                  project_io_add
-                 project_io_remove
                  project_io_append
                  project_io_assign
                  project_io_from_file
+                 project_io_remove
                  project_io_to_file
                  rel_path_canon
                  relpath
                  remove_extra_whitespace
                  remove_first
                  remove_last
-                 remove_non_newlines
                  remove_name_va_scope
+                 remove_non_newlines
                  replace_first
                  replace_last
                  rewrite_klass_defn_with_implicit_metaklass_defn
+                 root_cmd
                  scalar_from_file
                  scalar_to_file
+                 set_exe_target
+                 set_global_project
+                 set_global_project_ast
+                 set_root_cmd
+                 set_src_decl
+                 set_src_defn
+                 set_target_decl
+                 set_target_defn
                  split_path
                  sqstr_regex
                  str_from_seq
+                 suffix
+                 use_abs_path
                  var
                  var_array
-                 global_project
-                 set_global_project
-                 global_project_ast
-                 set_global_project_ast
-                 global_project_target
-                 use_abs_path
-                 set_root_cmd
-                 root_cmd
-              );
+ );
 use Cwd;
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
@@ -627,6 +648,162 @@ sub set_global_project_ast {
   my ($project_ast_path) = @_;
   $global_project_ast = &scalar_from_file($project_ast_path);
   return $global_project_ast;
+}
+my $gbl_src_file = undef;
+my $global_is_target = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
+my $global_is_defn = undef; # klass decl vs defn
+my $global_suffix = undef;
+my $global_is_exe_target = undef;
+
+sub set_src_decl {
+  my ($path) = @_;
+  my ($dir, $name, $ext) = &split_path($path, $id);
+  $gbl_src_file = &canon_path("$name.dk");
+  $global_is_target =   0;
+  $global_is_defn = 0;
+  $global_suffix = $hh_ext;
+}
+sub set_src_defn {
+  my ($path) = @_;
+  my ($dir, $name, $ext) = &split_path($path, $id);
+  $gbl_src_file = &canon_path("$name.dk");
+  $global_is_target =   0;
+  $global_is_defn = 1;
+  $global_suffix = $ext;
+}
+sub set_target_decl {
+  my ($path) = @_;
+  $gbl_src_file = undef;
+  $global_is_target =   1;
+  $global_is_defn = 0;
+  $global_suffix = $hh_ext;
+}
+sub set_target_defn {
+  my ($path) = @_;
+  $gbl_src_file = undef;
+  $global_is_target =   1;
+  $global_is_defn = 1;
+  $global_suffix = $cc_ext;
+}
+sub set_exe_target {
+  my ($path) = @_;
+  $global_is_exe_target = $path;
+}
+sub suffix {
+  return $global_suffix
+}
+sub is_src_decl {
+  if (!$global_is_target && !$global_is_defn) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_src_defn {
+  if (!$global_is_target && $global_is_defn) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_target_decl {
+  if ($global_is_target && !$global_is_defn) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_target_defn {
+  if ($global_is_target && $global_is_defn) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_src {
+  if (!$global_is_target) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_target {
+  if ($global_is_target) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_decl {
+  if (!$global_is_defn) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_exe_target {
+  return $global_is_exe_target;
+}
+sub is_exported {
+  my ($method) = @_;
+  if (exists $$method{'exported?'} && $$method{'exported?'}) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_slots {
+  my ($method) = @_;
+  if ('object-t' ne $$method{'param-types'}[0][0]) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub is_box_type {
+  my ($type_seq) = @_;
+  my $result;
+  my $type_str = &ct($type_seq);
+
+  if ('slots-t*' eq $type_str ||
+      'slots-t'  eq $type_str) {
+    $result = 1;
+  } else {
+    $result = 0;
+  }
+  return $result;
+}
+sub is_super {
+  my ($generic) = @_;
+  if ('super-t' eq $$generic{'param-types'}[0][0]) {
+    return 1;
+  }
+  return 0;
+}
+sub is_array_type {
+  my ($type) = @_;
+  my $is_array_type = 0;
+
+  if ($type && $type =~ m|\[.*?\]$|) {
+    $is_array_type = 1;
+  }
+  return $is_array_type;
+}
+sub is_same_file {
+  my ($klass_scope) = @_;
+  my $slots_file = &at($$klass_scope{'slots'}, 'file');
+  if ($gbl_src_file && $slots_file) {
+    return 1 if $gbl_src_file eq &canon_path($slots_file);
+  }
+  return 0;
+}
+sub is_same_src_file {
+  my ($klass_scope) = @_;
+  if ($gbl_src_file && $$klass_scope{'file'}) {
+    return 1 if !$ENV{'DK_SRC_UNIQUE_HEADER'};
+    return 1 if $gbl_src_file eq &canon_path($$klass_scope{'file'});
+  }
+  return 0;
 }
 sub is_array {
   my ($ref) = @_;
@@ -1113,6 +1290,13 @@ sub start {
   my ($argv) = @_;
   # just in case ...
 }
+BEGIN {
+  $gbl_prefix = &dk_prefix($0);
+  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
+    or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
+  $hh_ext = &var($gbl_compiler, 'hh_ext', undef);
+  $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
+};
 unless (caller) {
   &start(\@ARGV);
 }
