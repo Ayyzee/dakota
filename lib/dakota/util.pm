@@ -622,10 +622,9 @@ sub param_types_str {
 sub kw_args_method_sig {
   my ($method) = @_;
   my $len = 0;
-  if ($$method{'kw-arg-names'} && 0 < scalar @{$$method{'kw-arg-names'}}) {
-    $len = scalar @{$$method{'kw-arg-names'}};
-  } elsif ($$method{'kw-args'} && 0 < scalar @{$$method{'kw-args'}}) {
-    $len = scalar @{$$method{'kw-args'}};
+  if (0) {
+  } elsif ($len = &num_kw_arg_names($method)) {
+  } elsif ($len = &num_kw_args($method)) {
   }
   my $param_types = &deep_copy($$method{'param-types'});
   my $offset = scalar @$param_types - $len;
