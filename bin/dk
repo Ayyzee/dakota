@@ -72,7 +72,7 @@ sub path_opt {
   }
   if ($pair) {
     if ('ARRAY' eq ref($$info{$long})) {
-      push @{$$info{$long}}, $pair;
+      &add_last($$info{$long}, $pair);
     } else {
       $$info{$long} = $pair;
     }
@@ -102,7 +102,7 @@ sub translate_dk_to_cc {
     my $arg = $$cmd[$i];
     die if ! $arg || '' eq $arg;
     if ($arg =~ /\.dk$/) {
-      my $cc_path = shift @$cc_paths;
+      my $cc_path = &remove_first($cc_paths);
       die if ! $cc_path || '' eq $cc_path;
       &check_paths($arg, $cc_path);
       $$cmd[$i] = $cc_path;
@@ -114,19 +114,19 @@ sub build_precompile_cmd {
   my $project = $$dakota_opts{'project'};
   my $cmd = [ 'dakota' ];
   if ($project) {
-    push @$cmd, ('--project', $project);
+    &add_last($cmd, ('--project', $project));
   }
   if ($$info{'define-macro'}) {
     foreach my $macro (@{$$info{'define-macro'}}) {
-      push @$cmd, ('--define-macro', $$macro[1]);
+      &add_last($cmd, ('--define-macro', $$macro[1]));
     }
   }
-  push @$cmd, '--precompile';
+  &add_last($cmd, '--precompile');
   if ($$info{'major-mode'}) {
-    push @$cmd, '--' . $$info{'major-mode'}[1];
+    &add_last($cmd, '--' . $$info{'major-mode'}[1]);
   }
-  push @$cmd, ('--output', $$info{'output'}[1]);
-  push @$cmd, (@$ordered_input_args);
+  &add_last($cmd, ('--output', $$info{'output'}[1]));
+  &add_last($cmd, (@$ordered_input_args));
   return $cmd;
 }
 sub get_dakota_opts {
@@ -141,8 +141,8 @@ sub get_dakota_opts {
       $$info{$opt} = undef if !exists $$info{$opt};
       if ($arg =~ /^--$opt$/) {
         $$info{$opt} = $$cmd[$i + 1];
-        unshift @$to_remove, $i;
-        unshift @$to_remove, $i + 1;
+        &add_first($to_remove, $i);
+        &add_first($to_remove, $i + 1);
         last;
       }
     }
@@ -187,16 +187,16 @@ sub detect_gcc_opts {
     } elsif ($$major_mode_tbl{$arg}) {
       $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
     } elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
-      push @$ordered_input_args, ('--library-directory', $$pair[1]);
+      &add_last($ordered_input_args, ('--library-directory', $$pair[1]));
     } elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
-      push @$ordered_input_args, ('--library', $$pair[1]);
+      &add_last($ordered_input_args, ('--library', $$pair[1]));
     } elsif (&path_opt($cmd, \$i, 'D', 'define-macro',      $info)) {
     } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
     } elsif ($arg !~ /^-/) {
       if ($arg =~ /^([^\s]+?\.(dk|$cc_ext|$o_ext|$so_ext))$/) {
         $pair = [$i, $arg];
-        push @{$$info{'inputs'}}, $pair;
-        push @$ordered_input_args, $$pair[1];
+        &add_last($$info{'inputs'}, $pair);
+        &add_last($ordered_input_args, $$pair[1]);
         if ($arg =~ /\.dk$/) {
           $num_dk_files++;
         }
@@ -269,7 +269,7 @@ sub convert_and_exec_cmd {
     foreach my $pair (@{$$info{'inputs'}}) {
       my $input = &relpath($$pair[1]);
       if ($input =~ /\.(dk|$cc_ext)$/) {
-        push @$inputs, $input;
+        &add_last($inputs, $input);
       }
     }
     if (0 != @$inputs && !&is_so_path($output)) {

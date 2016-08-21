@@ -344,7 +344,7 @@ sub generate_target {
     }
     if ($output_runtime) {
       my $output_runtime_name = $output_runtime =~ s|^.*?([^/]+)$|$1|r;
-      push @$strings, "# include \"$output_runtime_name\"" . &ann(__FILE__, __LINE__) . $nl;
+      &add_last($strings, "# include \"$output_runtime_name\"" . &ann(__FILE__, __LINE__) . $nl);
     }
     if ($should_write_pre_output) {
       $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;

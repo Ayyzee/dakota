@@ -376,7 +376,7 @@ sub arglist_members {
   while (scalar @$chars > $i) {
     if (!$is_framed) {
       if (',' eq $$chars[$i]) {
-        push @$result, $tkn; $tkn = '';
+        &add_last($result, $tkn); $tkn = '';
         $i++; # eat comma
         while ($$chars[$i] =~ m/(\s|\n)/) { $i++; } # eat whitespace
       } elsif (')' eq $$chars[$i]) {
@@ -393,7 +393,7 @@ sub arglist_members {
     $i++;
   }
   if ($tkn) {
-    push @$result, $tkn;
+    &add_last($result, $tkn);
   }
   return [ $i , $result ];
 }

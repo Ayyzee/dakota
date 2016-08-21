@@ -636,7 +636,7 @@ sub add_target_o_path_to_inputs {
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     return if $input eq $target_o_path;
   }
-  unshift @{$$cmd_info{'inputs'}}, $target_o_path;
+  &add_first($$cmd_info{'inputs'}, $target_o_path);
   $$cmd_info{'inputs'} = &clean_paths($$cmd_info{'inputs'});
 }
 my $root_cmd;
@@ -666,7 +666,7 @@ sub start_cmd {
   }
   my $ld_soname_flags =    &var_array($gbl_compiler, 'LD_SONAME_FLAGS', '-soname');
   my $no_undefined_flags = &var_array($gbl_compiler, 'LD_NO_UNDEFINED_FLAGS', '--no-undefined');
-  push @$ld_soname_flags, $$cmd_info{'opts'}{'soname'};
+  &add_last($ld_soname_flags, $$cmd_info{'opts'}{'soname'});
   if ($$cmd_info{'opts'}{'compile'}) {
     $dk_exe_type = undef;
   } elsif ($$cmd_info{'opts'}{'shared'}) {
@@ -1048,11 +1048,11 @@ sub loop_o_from_dk {
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_path($input)) {
-      push @$outfiles, &o_from_dk($cmd_info, $input);
+      &add_last($outfiles, &o_from_dk($cmd_info, $input));
     } elsif (&is_cc_path($input)) {
-      push @$outfiles, &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags);
+      &add_last($outfiles, &o_from_cc($cmd_info, &compile_opts_path(), $cxx_compile_flags));
     } else {
-      push @$outfiles, $input;
+      &add_last($outfiles, $input);
     }
   }
   if ($has_multiple_inputs) {
@@ -1109,7 +1109,7 @@ sub o_from_cc {
 
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_cc_path($input)) {
-      push @{$$o_cmd{'inputs'}}, $input;
+      &add_last($$o_cmd{'inputs'}, $input);
     }
   }
   my $should_echo = 0;
@@ -1223,7 +1223,7 @@ sub gcc_libraries_str {
   my ($library_names) = @_;
   my $gcc_libraries = [];
   foreach my $library_name (@$library_names) {
-    push @$gcc_libraries, &gcc_library_from_library_name($library_name);
+    &add_last($gcc_libraries, &gcc_library_from_library_name($library_name));
   }
   my $result = join(' ', @$gcc_libraries);
   return $result;
@@ -1310,7 +1310,7 @@ sub outfile_from_infiles {
     $infiles = [];
     foreach my $infile (@{$$cmd_info{'inputs'}}) {
       if (&is_out_of_date($infile, $outfile, $file_db)) {
-        push @$infiles, $infile;
+        &add_last($infiles, $infile);
       }
     }
   } else {

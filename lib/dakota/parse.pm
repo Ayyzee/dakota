@@ -617,7 +617,7 @@ sub trait {
           last;
         }
         $attrs = [];
-        push @$attrs, '[';
+        &add_last($attrs, '[');
         while (0 < $layer) {
           my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
           if (0) {
@@ -631,7 +631,7 @@ sub trait {
           } else {
             &match_any();
           }
-          push @$attrs, $current_token;
+          &add_last($attrs, $current_token);
         }
         last;
       }
@@ -1110,7 +1110,7 @@ sub module_export_defn {
       if (0) {
       } elsif (m/^\{$/) {
         $depth++;
-        push @$seq, $_;
+        &add_last($seq, $_);
       } elsif (m/^\}$/) {
         die if 0 == $depth;
         $depth--;
@@ -1124,7 +1124,7 @@ sub module_export_defn {
           $$gbl_root{'modules'}{$gbl_current_module}{'export'} = $tbl;
           return;
         } elsif (1 == $depth) {
-          push @$seq, $_;
+          &add_last($seq, $_);
           my $seqstr = &fragment_str($seq);
           $$tbl{$seqstr} = $seq;
           $seq= [];
@@ -1137,10 +1137,10 @@ sub module_export_defn {
           $$tbl{$seqstr} = $seq;
           $seq= [];
         } else {
-          push @$seq, $_;
+          &add_last($seq, $_);
         }
       } else {
-        push @$seq, $_;
+        &add_last($seq, $_);
       }
       &match_any();
     }
@@ -1266,7 +1266,7 @@ sub klass {
           last;
         }
         $attrs = [];
-        push @$attrs, '[';
+        &add_last($attrs, '[');
         while (0 < $layer) {
           my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
           if (0) {
@@ -1280,7 +1280,7 @@ sub klass {
           } else {
             &match_any();
           }
-          push @$attrs, $current_token;
+          &add_last($attrs, $current_token);
         }
         last;
       }
@@ -1559,7 +1559,7 @@ sub param_list {
   my $kw_arg_defaults = [];
   foreach my $type (@$params) {
     if (':' eq $$type[-1]) {
-      push @$type, split('', $$kw_arg_placeholders{'nodefault'});
+      &add_last($type, split('', $$kw_arg_placeholders{'nodefault'}));
     }
     my $colon_offset = &kw_arg_offsets($type);
 
@@ -1706,11 +1706,11 @@ sub method {
   }
   my $is_va = 0;
   my $name = [];
-  push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
+  &add_last($name, &match_re(__FILE__, __LINE__, '[\w-]+'));
   if ('va' eq $$name[0]) {
     $is_va = 1;
-    push @$name, &match(__FILE__, __LINE__, '::');
-    push @$name, &match_re(__FILE__, __LINE__, '[\w-]+');
+    &add_last($name, &match(__FILE__, __LINE__, '::'));
+    &add_last($name, &match_re(__FILE__, __LINE__, '[\w-]+'));
   }
   my ($open_paren_index, $close_paren_index)
     = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
@@ -1722,10 +1722,10 @@ sub method {
     &match(__FILE__, __LINE__, ')');
     &match(__FILE__, __LINE__, '=>');
     my $realname = [];
-    push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
+    &add_last($realname, &match_re(__FILE__, __LINE__, '[\w-]+'));
     if ($is_va) {
-      push @$realname, &match(__FILE__, __LINE__, '::');
-      push @$realname, &match_re(__FILE__, __LINE__, '[\w-]+');
+      &add_last($realname, &match(__FILE__, __LINE__, '::'));
+      &add_last($realname, &match_re(__FILE__, __LINE__, '[\w-]+'));
     }
     my ($open_index, $close_index)
       = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
@@ -1798,7 +1798,7 @@ sub method {
   my $return_type = [];
   while (&sst::at($$gbl_sst_cursor{'sst'},
                   $$gbl_sst_cursor{'current-token-index'}) !~ m/^(\;|\{)$/) {
-    push @$return_type, &match_any();
+    &add_last($return_type, &match_any());
   }
   if ('void' eq &ct($return_type)) {
     $$method{'return-type'} = undef;

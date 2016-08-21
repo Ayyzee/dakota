@@ -1070,9 +1070,9 @@ sub all_files_recursive {
     if ('.' ne $leaf && '..' ne $leaf) {
       my $path = $dir . '/' . $leaf;
       if (-d $path) {
-        push @$dirs, $leaf;
+        &add_last($dirs, $leaf);
         &all_files_recursive($dirs, $include_regex, $exclude_regex, $files);
-        pop @$dirs; # remove $leaf
+        &remove_last($dirs); # remove $leaf
       } elsif (-e $path) {
         if (!defined $include_regex || $path =~ m{$include_regex}) {
           if (!defined $exclude_regex || $path !~ m{$exclude_regex}) {
@@ -1144,7 +1144,7 @@ sub copy_no_dups {
       $str = &relpath($str);
     }
     if (!$$str_set{$str}) {
-      push @$result, $str;
+      &add_last($result, $str);
       $$str_set{$str} = 1;
     } else {
       #printf "$0: warning: removing duplicate $str\n";
@@ -1233,10 +1233,12 @@ sub remove_name_va_scope {
   else { print "not-va-method: " . &Dumper($method); }
 }
 sub add_first {
-  my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             unshift @$seq, $element; return;
+  my $seq = shift @_;
+  if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             unshift @$seq, @_; return;
 }
 sub add_last {
-  my ($seq, $element) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             push    @$seq, $element; return;
+  my $seq = shift @_;
+  if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; }             push    @$seq, @_; return;
 }
 sub remove_first {
   my ($seq) =           @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $first = shift   @$seq;           return $first;
@@ -1251,21 +1253,21 @@ sub last {
   my ($seq) = @_; if (!defined $seq) { die __FILE__, ":", __LINE__, ": error:\n"; } my $last =  $$seq[-1]; return $last;
 }
 sub replace_first {
-  my ($seq, $element) = @_;
+  my $seq = shift @_;
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
   my $old_first = &remove_first($seq);
-  &add_first($seq, $element);
+  &add_first($seq, @_);
   return $old_first;
 }
 sub replace_last {
-  my ($seq, $element) = @_;
+  my $seq = shift @_;
   if (!defined $seq) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
   my $old_last = &remove_last($seq);
-  &add_last($seq, $element);
+  &add_last($seq, @_);
   return $old_last;
 }
 sub unwrap_seq {
