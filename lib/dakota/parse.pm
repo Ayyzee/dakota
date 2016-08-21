@@ -1863,7 +1863,7 @@ my $_global_target_ast;
 sub global_target_ast {
   my ($asts, $is_init) = @_;
   return $_global_target_ast if $_global_target_ast;
-  my $global_target_ast_path = &builddir() . '/x/target-global.ast';
+  my $global_target_ast_path = &target_builddir() . '/target-global.ast';
   if (!$is_init && -e $global_target_ast_path) {
     $_global_target_ast = &scalar_from_file($global_target_ast_path);
     return $_global_target_ast;

@@ -169,6 +169,7 @@ our @EXPORT= qw(
                  sqstr_regex
                  str_from_seq
                  suffix
+                 target_builddir
                  use_abs_path
                  var
                  var_array
@@ -570,6 +571,9 @@ sub builddir {
     &make_dir($builddir, $global_should_echo);
   }
   return $builddir;
+}
+sub target_builddir {
+  return &builddir . '/x';
 }
 
 # 1. cmd line

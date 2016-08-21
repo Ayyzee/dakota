@@ -392,7 +392,7 @@ sub target_hh_path {
 }
 sub target_cc_path {
   my ($cmd_info) = @_;
-  my $target_cc_path = &builddir . '/x/target.' . $cc_ext;
+  my $target_cc_path = &target_builddir . '/target.' . $cc_ext;
   return $target_cc_path;
 }
 sub target_o_path {
