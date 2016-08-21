@@ -421,8 +421,8 @@ sub sst::_process_ws_first {
   my $empty_rhs_ws = '';
   if (0 == scalar @$seq) {
     for (my $i = $index; $i < $index + $length; $i++) {
-      $empty_rhs_ws .= $$sst{'tokens'}[$i]{'leading-ws'}  ||= '';
-      $empty_rhs_ws .= $$sst{'tokens'}[$i]{'trailing-ws'} ||= '';
+      $empty_rhs_ws .= $$sst{'tokens'}[$i]{'leading-ws'}  || '';
+      $empty_rhs_ws .= $$sst{'tokens'}[$i]{'trailing-ws'} || '';
     }
   }
   return $empty_rhs_ws;
@@ -990,12 +990,12 @@ sub sst_cursor::warning {
 
   if ($msg) {
     printf STDERR "%s:%i: %s\n",
-      $$sst{'file'} ||= "<unknown>",
+      $$sst{'file'} || "<unknown>",
       $line,
       $msg;
   } else {
     printf STDERR "%s:%i: did not expect \'%s\'\n",
-      $$sst{'file'} ||= "<unknown>",
+      $$sst{'file'} || "<unknown>",
       $line,
       &sst::at($sst, $token_index);
   }

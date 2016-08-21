@@ -1614,8 +1614,8 @@ sub add_klasses_used {
   my $seqs = $$gbl_used{'used-klasses'};
   my $size = &sst_cursor::size($gbl_sst_cursor);
   for (my $i = 0; $i < $size - 2; $i++) {
-    my $first_index = $$gbl_sst_cursor{'first-token-index'} ||= 0;
-    my $last_index = $$gbl_sst_cursor{'last-token-index'} ||= undef;
+    my $first_index = $$gbl_sst_cursor{'first-token-index'} || 0;
+    my $last_index = $$gbl_sst_cursor{'last-token-index'} || undef;
     my $new_sst_cursor = &sst_cursor::make($$gbl_sst_cursor{'sst'}, $first_index + $i, $last_index);
 
     foreach my $args (@$seqs) {
@@ -1655,8 +1655,8 @@ sub add_generics_used {
   my $seqs = $$gbl_used{'used-generics'};
   my $size = &sst_cursor::size($gbl_sst_cursor);
   for (my $i = 0; $i < $size - 2; $i++) {
-    my $first_index = $$gbl_sst_cursor{'first-token-index'} ||= 0;
-    my $last_index = $$gbl_sst_cursor{'last-token-index'} ||= undef;
+    my $first_index = $$gbl_sst_cursor{'first-token-index'} || 0;
+    my $last_index = $$gbl_sst_cursor{'last-token-index'} || undef;
     my $new_sst_cursor = &sst_cursor::make($$gbl_sst_cursor{'sst'}, $first_index + $i, $last_index);
 
     foreach my $seq (@$seqs) {
@@ -1895,7 +1895,7 @@ sub generics::klass_scope_from_klass_name {
     $klass_scope = {};
   } else {
     my $root_cmd = &root_cmd();
-    my $ast_path_var = [join '::', @{$$root_cmd{'asts'} ||= []}];
+    my $ast_path_var = [join '::', @{$$root_cmd{'asts'} || []}];
     die __FILE__, ":", __LINE__,
       ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }
@@ -2044,7 +2044,7 @@ sub generics::parse {
     foreach my $arg (@{$$generic{'param-types'}}) {
       &add_type([$arg]);
     }
-    foreach my $arg (@{$$generic{'kw-args'} ||= []}) {
+    foreach my $arg (@{$$generic{'kw-args'} || []}) {
       &add_type([$arg]);
       &add_symbol($gbl_root, $$arg{'name'});
     }

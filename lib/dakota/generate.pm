@@ -903,7 +903,7 @@ sub func::overloadsig_parts {
   my ($func, $scope) = @_;
   my $last_element = $$func{'param-types'}[-1];
   my $last_type = &arg::type($last_element);
-  my $name = &ct($$func{'name'} ||= []); # rnielsenrnielsen hackhack
+  my $name = &ct($$func{'name'} || []); # rnielsenrnielsen hackhack
   #if ($name eq '') { return undef; }
   my $param_types = &arg_type::list_types($$func{'param-types'});
   return ($name, $$param_types);
@@ -1110,7 +1110,7 @@ sub common::generate_signature_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
-      my $kw_args = $$generic{'kw-args'} ||= undef;
+      my $kw_args = $$generic{'kw-args'} || undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_signature($generic, $col, ['signature', ':', 'va']);
       }
@@ -1127,7 +1127,7 @@ sub common::generate_signature_defns {
     foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
         my $var_args_generic = &method::var_args_from_qual_va_list($generic);
-        my $kw_args = $$var_args_generic{'kw-args'} ||= undef;
+        my $kw_args = $$var_args_generic{'kw-args'} || undef;
         #if (!&is_slots($var_args_generic)) {
         $scratch_str .= &common::print_signature($var_args_generic, $col, ['signature']);
         #}
@@ -1142,7 +1142,7 @@ sub common::generate_signature_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
-      my $kw_args = $$generic{'kw-args'} ||= undef;
+      my $kw_args = $$generic{'kw-args'} || undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_signature($generic, $col, ['signature']);
       }
@@ -1212,7 +1212,7 @@ sub common::generate_selector_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
-      my $kw_args = $$generic{'kw-args'} ||= undef;
+      my $kw_args = $$generic{'kw-args'} || undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_selector($generic, $col, ['__selector', '::', 'va']);
       }
@@ -1229,7 +1229,7 @@ sub common::generate_selector_defns {
     foreach my $generic (sort method::compare @$generics) {
       if (&is_va($generic)) {
         my $var_args_generic = &method::var_args_from_qual_va_list($generic);
-        my $kw_args = $$var_args_generic{'kw-args'} ||= undef;
+        my $kw_args = $$var_args_generic{'kw-args'} || undef;
         if (!&is_slots($generic)) {
           $scratch_str .= &common::print_selector($var_args_generic, $col, ['__selector']);
         }
@@ -1244,7 +1244,7 @@ sub common::generate_selector_defns {
   $col = &colin($col);
   foreach my $generic (sort method::compare @$generics) {
     if (!&is_va($generic)) {
-      my $kw_args = $$generic{'kw-args'} ||= undef;
+      my $kw_args = $$generic{'kw-args'} || undef;
       if (!&is_slots($generic)) {
         $scratch_str .= &common::print_selector($generic, $col, ['__selector']);
       }
@@ -2785,7 +2785,7 @@ sub linkage_unit::generate_klasses_types_after {
 
     if (&is_decl()) {
       if (&has_enums($klass_scope)) {
-        foreach my $enum (@{$$klass_scope{'enum'} ||= []}) {
+        foreach my $enum (@{$$klass_scope{'enum'} || []}) {
           if (&is_exported($enum)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
             &generate_enum_defn(&colin($col), $enum, $is_exported = 1, $is_slots = 0);
@@ -3234,13 +3234,13 @@ sub dk_generate_cc_footer_klass {
     $col = &colout($col);
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
-  if (values %{$$klass_scope{'methods'} ||= []}) {
+  if (values %{$$klass_scope{'methods'} || []}) {
     $$scratch_str_ref .=
       $col . "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
       $col . &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
       $col . "};}" . $nl;
   }
-  if (values %{$$klass_scope{'methods'} ||= []}) {
+  if (values %{$$klass_scope{'methods'} || []}) {
     $$scratch_str_ref .=
       $col . "$klass_type @$klass_name { static method-t __method-addresses[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
       $col . &address_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
@@ -3256,7 +3256,7 @@ sub dk_generate_cc_footer_klass {
   my $exported_methods =     &exported_methods($klass_scope);
   my $exported_slots_methods = &exported_slots_methods($klass_scope);
 
-  if (values %{$exported_methods ||= []}) {
+  if (values %{$exported_methods || []}) {
     $$scratch_str_ref .=
       $col . "$klass_type @$klass_name { static const signature-t* const __exported-method-signatures[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
       $col . &signature_body($klass_name, $exported_methods, &colin($col)) .
@@ -3265,7 +3265,7 @@ sub dk_generate_cc_footer_klass {
       $col . &address_body($klass_name, $exported_methods, &colin($col)) .
       $col . "};}" . $nl;
   }
-  if (values %{$exported_slots_methods ||= []}) {
+  if (values %{$exported_slots_methods || []}) {
     $$scratch_str_ref .=
       $col . "$klass_type @$klass_name { static const signature-t* const __exported-slots-method-signatures[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
       $col . &slots_signature_body($klass_name, $exported_slots_methods, &colin($col)) .
@@ -3279,7 +3279,7 @@ sub dk_generate_cc_footer_klass {
   ###
   #$$scratch_str_ref .= $nl;
 
-  my $num_traits = @{( $$klass_scope{'traits'} ||= [] )}; # how to get around 'strict'
+  my $num_traits = @{( $$klass_scope{'traits'} || [] )}; # how to get around 'strict'
   if ($num_traits > 0) {
     $$scratch_str_ref .= $nl;
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __traits[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
@@ -3502,11 +3502,11 @@ sub dk_generate_cc_footer_klass {
   if ($num_method_aliases) {
     $$tbbl{'#method-aliases'} = '&__method-aliases';
   }
-  if (values %{$exported_methods ||= []}) {
+  if (values %{$exported_methods || []}) {
     $$tbbl{'#exported-method-signatures'} = '__exported-method-signatures';
     $$tbbl{'#exported-method-addresses'} =  '__exported-method-addresses';
   }
-  if (values %{$exported_slots_methods ||= []}) {
+  if (values %{$exported_slots_methods || []}) {
     $$tbbl{'#exported-slots-method-signatures'} = '__exported-slots-method-signatures';
     $$tbbl{'#exported-slots-method-addresses'} =  '__exported-slots-method-addresses';
   }

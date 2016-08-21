@@ -886,8 +886,8 @@ sub rewrite {
   my $size = &sst_cursor::size($sst_cursor);
   my $all_matches = [];
   for (my $i = 0; $i < $size - @$lhs; $i++) {
-    my $first_index = $$sst_cursor{'first-token-index'} ||= 0;
-    my $last_index = $$sst_cursor{'last-token-index'} ||= undef;
+    my $first_index = $$sst_cursor{'first-token-index'} || 0;
+    my $last_index = $$sst_cursor{'last-token-index'} || undef;
     my $new_sst_cursor = &sst_cursor::make($$sst_cursor{'sst'}, $first_index + $i, $last_index);
     my ($range, $matches) = &sst_cursor::match_pattern_seq($new_sst_cursor, $lhs);
 

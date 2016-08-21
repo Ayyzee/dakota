@@ -844,7 +844,7 @@ sub ast_from_inputs {
   my $should_echo;
   my $result = &outfile_from_infiles($ast_cmd, $should_echo = 0);
   if ($result) {
-    if (0 != @{$$ast_cmd{'asts'} ||= []}) {
+    if (0 != @{$$ast_cmd{'asts'} || []}) {
       my $target_ast_path = &target_ast_path($cmd_info);
     }
     foreach my $input (@{$$ast_cmd{'inputs'}}) {
