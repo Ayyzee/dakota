@@ -96,6 +96,7 @@ our @EXPORT= qw(
                  global_project_ast
                  global_project_target
                  has_kw_args
+                 has_kw_arg_names
                  header_file_regex
                  ident_regex
                  is_abs
@@ -133,6 +134,7 @@ our @EXPORT= qw(
                  mtime
                  needs_hex_encoding
                  num_kw_args
+                 num_kw_arg_names
                  builddir
                  pann
                  param_types_str
@@ -893,9 +895,17 @@ sub is_va {
     return 0;
   }
 }
+sub num_kw_arg_names {
+  my ($func) = @_;
+  return scalar @{$$func{'kw-arg-names'} || []};
+}
+sub has_kw_arg_names {
+  my ($func) = @_;
+  return $$func{'kw-arg-names'};
+}
 sub num_kw_args {
   my ($func) = @_;
-  return scalar @{$$func{'kw-args'} ||= []};
+  return scalar @{$$func{'kw-args'} || []};
 }
 sub has_kw_args {
   my ($func) = @_;
@@ -903,6 +913,8 @@ sub has_kw_args {
 }
 sub is_kw_args_method {
   my ($method) = @_;
+  return 1 if &num_kw_args($method);
+  return 1 if &num_kw_arg_names($method);
   my $state = 0;
   my ($name, $types) = &kw_args_method_sig($method);
   my $name_str =  &str_from_seq($name);
@@ -911,10 +923,6 @@ sub is_kw_args_method {
   my $tbl = $$global_project_ast{'kw-arg-generics'};
 
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
-    $state = 1;
-  } elsif (defined $$method{'kw-arg-names'} && 0 < @{$$method{'kw-arg-names'}}) {
-    $state = 1;
-  } elsif (defined $$method{'kw-args'} && 0 < @{$$method{'kw-args'}}) {
     $state = 1;
   }
   return $state;
