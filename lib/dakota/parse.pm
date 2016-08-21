@@ -1860,7 +1860,21 @@ sub method {
   return;
 }
 my $global_target_ast;
-sub generics::klass_type_from_klass_name {
+sub global_target_ast {
+  my ($asts) = @_;
+  return $global_target_ast if $global_target_ast;
+  #my $reinit = 0;
+  #if ($global_target_ast) { $reinit = 1; }
+  #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
+  $global_target_ast = &ast_merge($asts);
+  $global_target_ast = &kw_args_translate($global_target_ast);
+  if (1) {
+    &scalar_to_file(&builddir() . '/x/kw-args-target.ast', $global_target_ast);
+  }
+  #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
+  return $global_target_ast;
+}
+sub generics::klass_type_from_klass_name { ###
   my ($klass_name) = @_;
   my $cmd_info = &root_cmd();
   my $klass_type;
@@ -2124,20 +2138,6 @@ sub dk_klass_names_from_file {
     }
   }
   return $klass_names_set;
-}
-sub global_target_ast {
-  my ($asts) = @_;
-  return $global_target_ast if $global_target_ast;
-  #my $reinit = 0;
-  #if ($global_target_ast) { $reinit = 1; }
-  #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
-  $global_target_ast = &ast_merge($asts);
-  $global_target_ast = &kw_args_translate($global_target_ast);
-  if (1) {
-    &scalar_to_file(&builddir() . '/x/kw-args-target.ast', $global_target_ast);
-  }
-  #if ($reinit) { print STDERR &Dumper([keys %{$$global_target_ast{'klasses'}}]); }
-  return $global_target_ast;
 }
 sub parse_root {
   my ($gbl_sst_cursor, $exported) = @_;
