@@ -1861,17 +1861,20 @@ sub method {
 }
 my $_global_target_ast;
 sub global_target_ast {
-  my ($asts) = @_;
+  my ($asts, $is_init) = @_;
   return $_global_target_ast if $_global_target_ast;
+  my $global_target_ast_path = &builddir() . '/x/target-global.ast';
+  if (!$is_init && -e $global_target_ast_path) {
+    $_global_target_ast = &scalar_from_file($global_target_ast_path);
+    return $_global_target_ast;
+  }
   die if !$asts;
   #my $reinit = 0;
   #if ($_global_target_ast) { $reinit = 1; }
   #if ($reinit) { print STDERR &Dumper([keys %{$$_global_target_ast{'klasses'}}]); }
   $_global_target_ast = &ast_merge($asts);
   $_global_target_ast = &kw_args_translate($_global_target_ast);
-  if (1) {
-    &scalar_to_file(&builddir() . '/x/kw-args-target.ast', $_global_target_ast);
-  }
+  &scalar_to_file($global_target_ast_path, $_global_target_ast);
   #if ($reinit) { print STDERR &Dumper([keys %{$$_global_target_ast{'klasses'}}]); }
   return $_global_target_ast;
 }

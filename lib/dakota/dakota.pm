@@ -1180,7 +1180,7 @@ sub target_from_ast {
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
   # $global_target_ast not used, called for side-effect
-  my $global_target_ast = &global_target_ast($$cmd_info{'asts'}); # within target_o_from_ast
+  my $global_target_ast = &global_target_ast($$cmd_info{'asts'}, $$cmd_info{'init'}); # within target_o_from_ast
   $file = &scalar_from_file($target_ast_path);
   die if $$file{'other'};
   $$file{'other'} = $other;
