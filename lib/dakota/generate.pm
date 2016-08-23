@@ -197,7 +197,14 @@ sub write_to_file_converted_strings {
   my $converted_string = &sst_fragment::filestr($$sst{'tokens'});
   &convert_dk_to_cc(\$converted_string, $kw_arg_generics, $remove); # costly (< 3/4 of total)
   my $should_echo;
-  &filestr_to_file($converted_string, $path, $should_echo = 0);
+  if (!&is_silent()) {
+    $should_echo = 1 if $path =~ /target\.($hh_ext|$cc_ext)$/;
+  }
+  &filestr_to_file($converted_string, $path, $should_echo);
+}
+sub is_silent {
+  my $root_cmd = &root_cmd();
+  return $$root_cmd{'opts'}{'silent'};
 }
 sub generate_src_decl {
   my ($path, $file, $project_ast, $target_hh_path) = @_;
@@ -212,8 +219,8 @@ sub generate_src_defn {
   return &generate_src($path, $file, $project_ast, $target_hh_path);
 }
 my $im_suffix_for_suffix = {
-  $cc_ext => 'cc.dkt',
-  $hh_ext => 'hh.dkt',
+  $cc_ext => "$cc_ext.dkt",
+  $hh_ext => "$hh_ext.dkt",
   'inc'   => 'inc.dkt',
 };
 sub pre_output_path_from_any_path {

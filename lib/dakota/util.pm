@@ -79,11 +79,13 @@ our @EXPORT= qw(
                  decode_comments
                  decode_strings
                  deep_copy
+                 digsig
                  dir_part
                  dk_mangle
                  dk_mangle_seq
                  dmp
                  dqstr_regex
+                 echo_output_path
                  encode_char
                  encode_comments
                  encode_strings
@@ -1290,14 +1292,30 @@ sub write_filestr_to_file {
   flock FILE, LOCK_UN or die;
   close FILE            or die __FILE__, ":", __LINE__, ": ERROR: " . &cwd() . " / " . $file . ": $!" . $nl;
 }
+sub echo_output_path {
+  my ($file, $filestr_sig, $filestr) = @_;
+  if (1) {
+    if (1) {
+      print $file . $nl;
+    } else {
+      if (!filestr_sig) {
+        if (!$filestr) {
+          $filestr = &filestr_from_file($file);
+        }
+        $filestr_sig = &digsig($filestr);
+      }
+      print '_output_  ' . $filestr_sig . '  ' . $file . $nl;
+    }
+  }
+}
 sub filestr_to_file {
   my ($filestr, $file, $should_echo) = @_;
   my $file_md5 = "$file.md5";
-  my $filestr_sig = &digsig($filestr);
   if (1) {
-    &write_filestr_to_file($filestr,     $file);
-    print STDERR '_output_  ' . $filestr_sig . '  ' . $file . $nl if $should_echo;
+    &write_filestr_to_file($filestr, $file);
+    my $filestr_sig = &digsig($filestr);
     &write_filestr_to_file($filestr_sig . $nl, $file_md5);
+    &echo_output_path($file, $filestr_sig, $filestr) if $should_echo;
   }
 }
 sub scalar_to_file {

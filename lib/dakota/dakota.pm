@@ -977,28 +977,6 @@ sub o_from_dk {
       $o_path =  &o_path_from_dk_path($input);
     }
     my $src_path = &cc_path_from_dk_path($input);
-    if ($$cmd_info{'opts'}{'echo-inputs'}) {
-      if ($$cmd_info{'opts'}{'precompile'}) {
-        if (&is_out_of_date($input, $src_path)) {
-          print $input . $nl;
-        }
-      } else {
-        if (&is_out_of_date($input, $o_path)) {
-          print $input . $nl;
-        }
-      }
-    }
-    if (!$$cmd_info{'opts'}{'silent'}) {
-      if ($$cmd_info{'opts'}{'precompile'}) {
-        if (&is_out_of_date($input, $src_path)) {
-          print $src_path . $nl;
-        }
-      } else {
-        if (&is_out_of_date($input, $o_path)) {
-          print $o_path . $nl;
-        }
-      }
-    }
     my $hh_path = &hh_path_from_src_path($src_path);
     if (!$want_separate_ast_pass) {
       &check_path($ast_path);
@@ -1021,6 +999,9 @@ sub o_from_dk {
     }
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
+      if ($num_out_of_date_infiles) {
+        &echo_output_path($outfile); # required by bin/dk
+      }
     } else {
       my $o_cmd = { 'opts' => $$cmd_info{'opts'} };
       $$o_cmd{'inputs'} = [ $src_path ];
@@ -1142,38 +1123,16 @@ sub target_from_ast {
   my $target_cc_path =  &target_cc_path($cmd_info);
   my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
   &check_path($target_ast_path);
-  my $target_o_path;
-  if (!$$cmd_info{'opts'}{'silent'}) {
+  my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
+
+  if ($is_defn) {
     if ($$cmd_info{'opts'}{'precompile'}) {
-      if ($is_defn) {
-        if (&is_out_of_date($target_ast_path, $target_cc_path)) {
-          print $target_cc_path . $nl;
-        } else {
-          return;
-        }
-      } else {
-        if (&is_out_of_date($target_ast_path, $target_hh_path)) {
-          print $target_hh_path . $nl;
-        } else {
-          return;
-        }
-      }
+      return if !&is_out_of_date($target_ast_path, $target_cc_path);
     } else {
-      if ($is_defn) {
-        $target_o_path = &target_o_path($cmd_info, $target_cc_path);
-        if (&is_out_of_date($target_ast_path, $target_o_path)) {
-          print $target_o_path . $nl;
-        } else {
-          return;
-        }
-      } else {
-        if (&is_out_of_date($target_ast_path, $target_hh_path)) {
-          print $target_hh_path . $nl;
-        } else {
-          return;
-        }
-      }
+      return if !&is_out_of_date($target_ast_path, $target_o_path);
     }
+  } else {
+    return if !&is_out_of_date($target_ast_path, $target_hh_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
   my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
@@ -1206,6 +1165,9 @@ sub target_from_ast {
   if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {
   my $o_info = {'opts' => {}, 'inputs' => [ $target_cc_path ], 'output' => $target_o_path };
   $$o_info{'project.io'} =  $$cmd_info{'project.io'};
+  if ($$cmd_info{'opts'}{'silent'}) {
+    $$o_info{'opts'}{'silent'} = $$cmd_info{'opts'}{'silent'};
+  }
   if ($$cmd_info{'opts'}{'precompile'}) {
     $$o_info{'opts'}{'precompile'} = $$cmd_info{'opts'}{'precompile'};
   }
@@ -1348,6 +1310,9 @@ sub outfile_from_infiles {
       &loop_cc_from_dk($cmd_info, $global_should_echo || $should_echo);
     } else {
       &exec_cmd($cmd_info, $should_echo);
+      if (!$$cmd_info{'opts'}{'silent'}) {
+        &echo_output_path($output, &digsig(&filestr_from_file($output))) if &is_o_path($output);
+      }
     }
 
     if (1) {
