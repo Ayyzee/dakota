@@ -1860,12 +1860,11 @@ sub method {
   return;
 }
 my $_global_target_ast;
-my $_is_inited = 0;
 sub global_target_ast {
-  my ($asts, $is_init) = @_;
+  my ($asts, $is_precompile) = @_;
   return $_global_target_ast if $_global_target_ast;
   my $global_target_ast_path = &target_builddir() . '/target-global.ast';
-  if ((!$is_init || $_is_inited) && -e $global_target_ast_path) {
+  if ($is_precompile && -e $global_target_ast_path) {
     $_global_target_ast = &scalar_from_file($global_target_ast_path);
     return $_global_target_ast;
   }
@@ -1874,7 +1873,6 @@ sub global_target_ast {
   #my $reinit = 0;
   #if ($_global_target_ast) { $reinit = 1; }
   #if ($reinit) { print STDERR &Dumper([keys %{$$_global_target_ast{'klasses'}}]); }
-  $_is_inited = 1;
   $_global_target_ast = &ast_merge($asts);
   $_global_target_ast = &kw_args_translate($_global_target_ast);
   &scalar_to_file($global_target_ast_path, $_global_target_ast);
