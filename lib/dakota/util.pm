@@ -1298,13 +1298,13 @@ sub echo_output_path {
     if (1) {
       print $file . $nl;
     } else {
-      if (!filestr_sig) {
+      if (!$filestr_sig) {
         if (!$filestr) {
           $filestr = &filestr_from_file($file);
         }
         $filestr_sig = &digsig($filestr);
       }
-      print '_output_  ' . $filestr_sig . '  ' . $file . $nl;
+      print $file . '  ' . $filestr_sig . $nl;
     }
   }
 }
