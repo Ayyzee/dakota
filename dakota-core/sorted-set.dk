@@ -39,7 +39,7 @@ klass sorted-set {
     sorted-ptr-array::slots-t sa;
     int64-t                   iterator-state;
   }
-  static const int64-t gbl-default-capacity = 64; // shall never be 0
+  static const ssize-t gbl-default-capacity = 64; // shall never be 0
 
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
@@ -52,7 +52,7 @@ klass sorted-set {
     return result;
   }
   method init(object-t   self,
-              int64-t    initial-capacity : gbl-default-capacity,
+              ssize-t    initial-capacity : gbl-default-capacity,
               object-t   elements :         nullptr,
               object-t[] objects :          nullptr) -> object-t {
     assert(0 != initial-capacity);
@@ -81,18 +81,18 @@ klass sorted-set {
   method add(object-t self, object-t element) -> object-t {
     self.iterator-state++;
 
-    result-t result = sorted-ptr-array::search(&self.sa, element);
+    result-t found-result = sorted-ptr-array::search(&self.sa, element);
 
-//     if (throw? && nullptr != result.element)
+//     if (throw? && nullptr != found-result.element)
 //       throw make(exception::klass, #msg : "oops");
 
-  //if (nullptr == result.element)
+  //if (nullptr == found-result.element)
     {
       if (self.sa.count == self.sa.capacity) {
         self.sa.capacity *= 2; // the growth algorithm should be consumer setable
         self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity, self.sa.elements);
       }
-      sorted-ptr-array::add-at(&self.sa, element, result.offset);
+      sorted-ptr-array::add-at(&self.sa, element, found-result.offset);
     }
     return element;
   }
@@ -101,56 +101,50 @@ klass sorted-set {
     self.sa.count = 0; // hackhack
     return self;
   }
-  method in(object-t self, object-t object1, object-t default-value) -> object-t {
-    object-t object2 = default-value;
-    result-t result = sorted-ptr-array::search(&self.sa, object1);
+  method in(object-t self, object-t element, object-t default-result) -> object-t {
+    object-t result = default-result;
+    result-t found-result = sorted-ptr-array::search(&self.sa, element);
 
-    if (nullptr != result.element)
-      object2 = cast(object-t)sorted-ptr-array::at(&self.sa, result.offset);
-    return object2;
+    if (nullptr != found-result.element)
+      result = cast(object-t)sorted-ptr-array::at(&self.sa, found-result.offset);
+    return result;
   }
-  method in(object-t self, object-t object1) -> object-t {
-    object-t result = $in(self, object1, cast(object-t)nullptr);
+  method in(object-t self, object-t element) -> object-t {
+    object-t result = $in(self, element, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #msg : "oops");
     return result;
   }
-  method in?(object-t self, object-t key) -> boole-t {
-    boole-t state;
-
-    if (nullptr == $in(self, key, cast(object-t)nullptr))
-      state = false;
-    else
+  method in?(object-t self, object-t element) -> boole-t {
+    boole-t state = false;
+    if (nullptr != $in(self, element, cast(object-t)nullptr))
       state = true;
     return state;
   }
   method empty?(object-t self) -> boole-t {
-    boole-t state;
-
+    boole-t state = false;
     if (0 == self.sa.count)
       state = true;
-    else
-      state = false;
     return state;
   }
   method remove(object-t self, object-t element) -> object-t {
-    result-t result = sorted-ptr-array::search(&self.sa, element);
-    object-t object = null;
+    result-t found-result = sorted-ptr-array::search(&self.sa, element);
+    object-t prev-element = nullptr;
 
-    if (nullptr != result.element) {
+    if (nullptr != found-result.element) {
       self.iterator-state++;
       // element not required
-      object = cast(object-t)sorted-ptr-array::remove-at(&self.sa, element, result.offset);
+      prev-element = cast(object-t)sorted-ptr-array::remove-at(&self.sa, element, found-result.offset);
     }
-    return object;
+    return prev-element; // returns nullptr on error
   }
   method remove-last(object-t self) -> object-t {
-    object-t object = nullptr;
+    object-t prev-element = nullptr;
     if (0 != self.sa.count) {
       self.iterator-state++;
-      object = cast(object-t)sorted-ptr-array::remove-last(&self.sa);
+      prev-element = cast(object-t)sorted-ptr-array::remove-last(&self.sa);
     }
-    return object; // returns nullptr on error
+    return prev-element; // returns nullptr on error
   }
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
@@ -197,9 +191,9 @@ klass sorted-set-forward-iterator {
 
   slots {
     object-t sorted-set;
-    ssize-t offset;
+    ssize-t  offset;
 
-    int64-t   iterator-state;
+    int64-t  iterator-state;
   }
   method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);
@@ -222,12 +216,10 @@ klass sorted-set-forward-iterator {
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-    boole-t result;
+    boole-t state = false;
     if (self.offset < ss.sa.count)
-      result = true;
-    else
-      result = false;
-    return result;
+      state = true;
+    return state;
   }
   method next(object-t self) -> object-t {
     check-iterator-state(self);

@@ -26,7 +26,7 @@ module dakota;
 //  512: 509
 // 1024: 1021
 
-static const int64-t gbl-prime = 127;
+static const ssize-t gbl-prime = 127;
 
 // when the user submits a non-prime number, decrement until a prime is found
 
@@ -70,33 +70,33 @@ klass hashed-set {
       $add-objects(self, objects);
     return self;
   }
-  method add(object-t self, object-t object1) -> object-t {
-    ssize-t index = cast(ssize-t)($hash(object1) % cast(hash-t)self.num-buckets);
+  method add(object-t self, object-t element) -> object-t {
+    ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
       deque = make(deque::klass);
       self.iterator-state++;
       self.size++; // bugbug - could wrap
-      $add-first(deque, object1);
+      $add-first(deque, element);
       // why use replace-at?  should be add-at
       $replace-at(self.buckets, index, deque);
     } else {
-      object-t element = nullptr;
+      object-t found-element = nullptr;
 
-      for (object-t object2 in deque) {
-        if ($equal?(object2, object1)) { // arg order matters here!!
-          element = object2;
+      for (object-t e in deque) {
+        if ($equal?(e, element)) { // arg order matters here!!
+          found-element = e;
           break;
         }
       }
-      if (nullptr == element) {
+      if (nullptr == found-element) {
         self.iterator-state++;
         self.size++; // bugbug - could wrap
-        $add-first(deque, object1);
+        $add-first(deque, element);
       }
     }
-    return object1;
+    return element;
   }
   method empty(object-t self) -> object-t {
     if (0 != self.size) {
@@ -105,68 +105,62 @@ klass hashed-set {
     }
     return self;
   }
-  method in(object-t self, object-t object1, object-t default-value) -> object-t {
-    ssize-t index = cast(ssize-t)($hash(object1) % cast(hash-t)self.num-buckets);
+  method in(object-t self, object-t element, object-t default-result) -> object-t {
+    object-t result = default-result;
+    ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
-    object-t result = default-value;
 
     if (nullptr != deque) {
-      for (object-t object2 in deque) {
-        if ($equal?(object2, object1)) { // arg order matters here!!
-          result = object2;
+      for (object-t e in deque) {
+        if ($equal?(e, element)) { // arg order matters here!!
+          result = e;
           break;
         }
       }
     }
     return result;
   }
-  method in(object-t self, object-t object) -> object-t {
-    object-t result = $in(self, object, cast(object-t)nullptr);
+  method in(object-t self, object-t element) -> object-t {
+    object-t result = $in(self, element, cast(object-t)nullptr);
     if (nullptr == result)
       throw make(exception::klass, #msg : "oops");
     return result;
   }
-  method in?(object-t self, object-t key) -> boole-t {
-    boole-t state;
-
-    if (nullptr == $in(self, key, cast(object-t)nullptr))
-      state = false;
-    else
+  method in?(object-t self, object-t element) -> boole-t {
+    boole-t state = false;
+    if (nullptr != $in(self, element, cast(object-t)nullptr))
       state = true;
     return state;
   }
   method empty?(object-t self) -> boole-t {
-    boole-t state;
-
+    boole-t state = false;
     if (0 == self.size)
       state = true;
-    else
-      state = false;
     return state;
   }
-  method remove(object-t self, object-t element1) -> object-t {
-    object-t object = null;
+  method remove(object-t self, object-t element) -> object-t {
+    object-t prev-element = nullptr;
 
-    ssize-t index = cast(ssize-t)($hash(element1) % cast(hash-t)self.num-buckets);
+    ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr != deque) {
       for (object-t forward-iterator = $forward-iterator(deque);
-           object-t element2 = $next(forward-iterator); ) {
+           object-t e = $next(forward-iterator); /**/) {
         //printf("element: %s\n", $name(element));
-        //printf("element2: %s\n", $name(element2));
+        //printf("e: %s\n", $name(e));
 
-        if ($equal?(element2, element1)) { // arg order matters here!!
+        if ($equal?(e, element)) { // arg order matters here!!
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           self.iterator-state++;
-          object = $remove(forward-iterator); //element2
+          prev-element = $remove(forward-iterator); //e
           self.size--;
           break;
         }
       }
     }
-    return object;
+    return prev-element; // returns nullptr on error
   }
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
@@ -215,7 +209,7 @@ klass hashed-set-forward-iterator {
     object-t vector-iter; // set one time per instantiation
     object-t deque-iter;  // set many times per instantiation
 
-    int64-t   iterator-state;
+    int64-t  iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
@@ -241,10 +235,10 @@ klass hashed-set-forward-iterator {
   }
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
-    boole-t result = false;
+    boole-t state = false;
     if (nullptr != self.deque-iter)
-      result = $next?(self.deque-iter);
-    return result;
+      state = $next?(self.deque-iter);
+    return state;
   }
   static func next-deque-iterator(object-t vector-iter) -> object-t {
     object-t deque = $next(vector-iter);
