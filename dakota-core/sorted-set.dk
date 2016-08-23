@@ -37,7 +37,7 @@ klass sorted-set {
 
   slots {
     sorted-ptr-array::slots-t sa;
-    int64-t                   iterator-state;
+    ssize-t                   iterator-state;
   }
   static const ssize-t gbl-default-capacity = 64; // shall never be 0
 
@@ -193,7 +193,7 @@ klass sorted-set-forward-iterator {
     object-t sorted-set;
     ssize-t  offset;
 
-    int64-t  iterator-state;
+    ssize-t  iterator-state;
   }
   method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);

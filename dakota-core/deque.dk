@@ -35,7 +35,7 @@ klass node {
     node->next =    next;
     return node;
   }
-  static func dump-prev(slots-t* s, int64-t iterator-state) -> void {
+  static func dump-prev(slots-t* s, ssize-t iterator-state) -> void {
     if (nullptr != s) {
       // fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
       //         "<tr><td port=\"element\">element</td></tr>"
@@ -63,7 +63,7 @@ klass node {
     }
     return;
   }
-  static func dump-next(slots-t* s, int64-t iterator-state) -> void {
+  static func dump-next(slots-t* s, ssize-t iterator-state) -> void {
     if (nullptr != s) {
       fprintf(stderr, "    \"%p-%zi\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"
@@ -100,7 +100,7 @@ klass deque {
     node::slots-t* last;  // if (nullptr != last)   last->next =  nullptr;
     ssize-t        size;
 
-    int64-t iterator-state;
+    ssize-t        iterator-state;
   }
   method test-dump(object-t self) -> object-t {
     slots-t& s = unbox(self);
@@ -355,10 +355,10 @@ klass deque-forward-iterator {
   trait forward-iterator;
 
   slots {
-    object-t deque; // needed for iterator-state
+    object-t       deque; // needed for iterator-state
     node::slots-t* node;
 
-    int64-t iterator-state;
+    ssize-t        iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     deque::slots-t& d = deque::unbox(self.deque);

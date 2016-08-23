@@ -20,24 +20,25 @@ module dakota-core;
 # include <cstring>
 # include <cinttypes>
 
-inline func min(int64-t a, int64-t b) -> int64-t {
-  int64-t r = a < b ? a : b;
+inline func min(ssize-t a, ssize-t b) -> ssize-t {
+  ssize-t r = a < b ? a : b;
   return r;
 }
-inline func max(int64-t a, int64-t b) -> int64-t {
-  int64-t r = a > b ? a : b;
+inline func max(ssize-t a, ssize-t b) -> ssize-t {
+  ssize-t r = a > b ? a : b;
   return r;
 }
-inline func host-to-little(uint32-t arg) -> uint32-t {
-# if 0
+[[unused]] static func host-to-little(uint32-t arg) -> uint32-t {
+# if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return arg;
-# endif
+# else
   uint32-t result = 
     ((arg << 24) & 0xff000000) |
     ((arg <<  8) & 0x00ff0000) |
     ((arg >>  8) & 0x0000ff00) |
     ((arg >> 24) & 0x000000ff);
   return result;
+# endif
 }
 [[unused]] static func reverse(uint64-t arg) -> uint64-t {
 # if 0
@@ -53,8 +54,8 @@ inline func host-to-little(uint32-t arg) -> uint32-t {
   }
   return result;
 }
-static func ceiling-divide(int64-t numerator, int64-t denominator) -> int64-t {
-  int64-t result = (numerator + denominator - 1) / denominator;
+static func ceiling-divide(ssize-t numerator, ssize-t denominator) -> ssize-t {
+  ssize-t result = (numerator + denominator - 1) / denominator;
   return result;
 }
 klass bit-vector-op {
@@ -68,7 +69,7 @@ klass bit-vector {
   //ssize-t   size; // 1 bit
   }
   static const ssize-t gbl-element-width = (ssizeof((cast(slots-t*)0)->elements[0]) * 8);
-  static const int64-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
+  static const ssize-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const ssize-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
 
   method init(object-t self, ssize-t initial-capacity : gbl-default-initial-capacity) -> object-t {

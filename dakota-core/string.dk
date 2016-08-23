@@ -35,9 +35,9 @@ klass string {
   slots {
     symbol-t encoding;
     char8-t* ptr;
-    int64-t len;
+    ssize-t  len;
   }
-  //int64-t size; // sizeof(ptr[0])
+  //ssize-t size; // sizeof(ptr[0])
 
   method init(object-t self,
                        symbol-t       encoding : #utf-8,

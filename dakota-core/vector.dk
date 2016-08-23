@@ -75,7 +75,7 @@ klass vector {
     ssize-t   size; // sizeof(elements[0])
 
     object-t  fill-element;
-    int64-t   iterator-state;
+    ssize-t   iterator-state;
   }
   initialize(object-t kls) -> void {
     $set-resize-factor(kls, 2);
@@ -365,7 +365,7 @@ klass vector-forward-iterator {
     ssize-t count;
     ssize-t index;
 
-    int64-t iterator-state;
+    ssize-t iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     vector::slots-t& d = vector::unbox(self.vector);

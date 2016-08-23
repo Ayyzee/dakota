@@ -20,7 +20,7 @@ module dakota;
 klass slot-info {
   slots {
     symbol-t type;   // never nullptr
-    int64-t size;   // never 0
+    ssize-t  size;   // never 0
   }
 
   method init(object-t self, slots-t slots : {.type = nullptr, .size = 0}) -> object-t {

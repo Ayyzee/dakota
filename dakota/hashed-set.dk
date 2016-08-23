@@ -46,7 +46,7 @@ klass hashed-set {
     object-t buckets; // a vector of deques
     ssize-t  size;
 
-    int64-t iterator-state;
+    ssize-t  iterator-state;
   }
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
@@ -209,7 +209,7 @@ klass hashed-set-forward-iterator {
     object-t vector-iter; // set one time per instantiation
     object-t deque-iter;  // set many times per instantiation
 
-    int64-t  iterator-state;
+    ssize-t  iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
