@@ -249,7 +249,7 @@ sub convert_and_exec_cmd {
     if (!defined $outstr) {
       die $0 . ': error: cmd: ' . $precompile_cmd_str . $nl;
     }
-    $cc_paths = [split $nl, $outstr];
+    $cc_paths = [split /\s+/, $outstr];
   } else {
     if ($verbose) {
       print '# 2/3 (skipped)' . $nl;
