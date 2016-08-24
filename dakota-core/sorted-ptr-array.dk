@@ -34,8 +34,8 @@ klass sorted-ptr-array {
     std-compare-t compare;
   }
   func create(ssize-t capacity, ssize-t size, std-compare-t compare) -> slots-t* {
-    assert(0 != capacity);
-    assert(0 != size);
+    assert(0 < capacity);
+    assert(0 < size);
     assert(nullptr != compare);
     slots-t* result = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
     result->elements = cast(ptr-t*)dkt::alloc(size * capacity);
@@ -86,6 +86,7 @@ klass sorted-ptr-array {
   }
   func add-at(slots-t* t, const void* key, ssize-t offset) -> slots-t* {
     assert(nullptr != key);
+    assert(0 <= offset);
     assert(offset <= t->count);
 
     memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
@@ -96,6 +97,7 @@ klass sorted-ptr-array {
     return t;
   }
   func at(slots-t* t, ssize-t offset) -> const void* {
+    assert(0 <= offset);
     assert(offset < t->count);
     assert(0 < t->count);
 
@@ -104,6 +106,8 @@ klass sorted-ptr-array {
   }
   // key not required
   func remove-at(slots-t* t, const void* key, ssize-t offset) -> const void* {
+    assert(nullptr != key);
+    assert(0 <= offset);
     assert(offset < t->count);
     assert(0 < t->count);
 
