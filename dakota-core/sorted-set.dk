@@ -46,19 +46,15 @@ klass sorted-set {
   // using compound literals 'objects' can be used as follows:
   // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
-  static func swap-compare(object-t first, object-t second) -> int-t {
-    int-t result = $compare(second, first);
-    result *= -1;
-    return result;
-  }
   method init(object-t   self,
+              compare-t  compare :          $compare,
               ssize-t    initial-capacity : gbl-default-capacity,
               object-t   elements :         nullptr,
               object-t[] objects :          nullptr) -> object-t {
     assert(0 != initial-capacity);
 
     self = $init(super);
-    self.sa.compare = cast(std-compare-t)cast(compare-t)swap-compare;
+    self.sa.compare = cast(std-compare-t)compare;
     self.sa.size =    ssizeof(self.sa.elements[0]);
     self.sa.capacity = gbl-default-capacity;
     self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity);

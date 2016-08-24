@@ -65,13 +65,13 @@ klass sorted-array {
     while (l < u) {
       i = l + ((u - l) / 2); // calc midpoint without overflowing
       const void* p = cast(const void*)(cast(uint8-t*)(t->elements) + (i * t->size));
-      comparison = t->compare(key, p);
+      comparison = t->compare(p, key);
 
-      if (0 > comparison) {
+      if (0 < comparison) {
         increment? = false;
         u = i;
       }
-      else-if (0 < comparison) {
+      else-if (0 > comparison) {
         increment? = true;
         l = i + 1;
       } else {
@@ -116,7 +116,7 @@ klass sorted-array {
             cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
             cast(size-t)((t->count - offset - 1) * t->size)); // this arg may be zero
     if (nullptr != key)
-      assert(0 == t->compare(key, element));
+      assert(0 == t->compare(element, key));
     memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, cast(size-t)t->size);
     t->count--;
     return element;
