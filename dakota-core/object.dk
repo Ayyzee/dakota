@@ -151,6 +151,8 @@ func dkt-dump(object-t object) -> object-t {
   return $dump(object);
 }
 func dkt-unbox-check(object-t object, object-t kls) -> void {
+  assert(nullptr != object);
+  assert(nullptr != kls);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
                         __func__, cast(ptr-t)(object), $name(kls));
   unless (object::instance?(object, kls)) {

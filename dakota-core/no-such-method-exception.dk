@@ -36,7 +36,7 @@ klass no-such-method-exception {
     self = $init(super, #src-file : src-file, #src-line : src-line);
     self.signature = signature;
     if ((!object && !context.object) || (object && context.object))
-      abort();
+      std::abort();
     self.context = { nullptr, nullptr };
     if (nullptr != context.object)
       self.context = context;

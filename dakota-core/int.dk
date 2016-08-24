@@ -170,16 +170,14 @@ klass uint32 {
 
   // UINT32_C(v)
 
-  static func compare(slots-t slots, slots-t other-slots) -> int-t {
-    int-t result = cast(int-t)(slots - other-slots);
-    result = dkt-normalize-compare-result(result);
-    return result;
-  }
   method compare(object-t self, object-t other) -> int-t {
     assert(nullptr != other);
-    if (!$instance?(other, klass))
-      return $compare(super, other);
-    return compare(unbox(self), unbox(other));
+    int-t result;
+    if (klass-of(other) == klass || $instance?(other, klass))
+      result = dkt-normalize-compare-result(cast(int-t)(unbox(self) - unbox(other)));
+    else
+      result = $compare(super, other);
+    return result;
   }
 }
 klass uint64 {
