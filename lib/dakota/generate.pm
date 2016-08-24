@@ -2224,7 +2224,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
                 my $other_method_decl = &kw_args_method::type_decl($method);
 
                 #my $scope = &ct($klass_path);
-                $other_method_decl =~ s|\(\*($id)\)| $1|;
+                $other_method_decl =~ s|\(\*($id)\)|$1|;
                 my $visibility = '';
                 if (&is_exported($method)) {
                   $visibility = ' [[export]]';

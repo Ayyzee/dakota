@@ -221,7 +221,7 @@ sub is_so_path {
   #my $libname = $2 . ".$so_ext";
   return $result;
 }
-my $verbose = 0;
+my $verbose = $ENV{'DK_VERBOSE'};
 sub convert_and_exec_cmd {
   my ($argv) = @_;
   my $cmd = [$0, @$argv];
