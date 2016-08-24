@@ -164,8 +164,8 @@ klass vector {
   method in?(object-t self, object-t element) -> boole-t {
     boole-t state = false;
 
-    for (object-t element2 in self) {
-      if ($equal?(element, element2)) {
+    for (object-t e in self) {
+      if ($equal?(e, element)) {
         state = true;
         break;
       }
@@ -202,7 +202,8 @@ klass vector {
     object-t object = null; // returns 'null' if element was not present
 
     for (ssize-t index = 0; index < self.count; index++) {
-      if ($equal?(element, self.elements[index])) {
+      object-t e = self.elements[index];
+      if ($equal?(e, element)) {
         remove-at(self, index);
         object = element;
       }
@@ -231,7 +232,7 @@ klass vector {
     for (object-t forward-iterator = $forward-iterator(self);
          $next?(forward-iterator);
          $next(forward-iterator)) {
-      if ($equal?(object1, $element(forward-iterator)))
+      if ($equal?($element(forward-iterator), object1))
         $set-element(forward-iterator, object2);
     }
     return object1;
