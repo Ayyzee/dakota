@@ -48,10 +48,6 @@ klass symbol {
     //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
     return result;
   }
-  method compare(slots-t* s, slots-t* other-s) -> int-t {
-    int-t result = compare(*s, *other-s);
-    return result;
-  }
   method compare(object-t self, object-t other) -> int-t {
     int-t result;
 
