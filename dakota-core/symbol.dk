@@ -24,7 +24,7 @@ module dakota-core;
 klass hash;
 
 klass symbol-compare {
-  slots (*)(symbol-t*, symbol-t*) -> int-t;
+  slots (*)(symbol-t, symbol-t) -> int-t;
 }
 klass symbol {
   slots str-t;

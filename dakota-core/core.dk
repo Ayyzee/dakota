@@ -147,7 +147,7 @@ static func init-runtime-ds() -> void {
                          ssizeof(symbol-t),
                          cast(std-compare-t)
                          cast(symbol-compare-t)symbol::compare,
-                         ptr? = false);
+                         ptr? = true);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -167,9 +167,9 @@ klass x::stat {
 // this is quick and dirty!!!!!!!!!!!!!!!!
 static func init-imported-klasses() -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
-  symbol-t* imported-klass-name-ptr;
-  while (nullptr != (imported-klass-name-ptr = cast(symbol-t*)sorted-array::remove-last(gbl-imported-klasses-file-table)))
-    dk-klass-for-name(*imported-klass-name-ptr);
+  symbol-t imported-klass-name;
+  while (nullptr != (imported-klass-name = cast(symbol-t)sorted-array::remove-last(gbl-imported-klasses-file-table)))
+    dk-klass-for-name(imported-klass-name);
   return;
 }
 static func file-name-from-klass-name(symbol-t klass-name) -> str-t {
@@ -546,13 +546,13 @@ static func import-klass(symbol-t klass-name, assoc-node-t* node) -> void {
   if (nullptr == found-named-node) {
     named-node.node->next = nullptr;
     sorted-array::add(gbl-imported-klasses-table, &named-node);
-    sorted-array::add(gbl-imported-klasses-file-table, &klass-name);
+    sorted-array::add(gbl-imported-klasses-file-table, klass-name);
   } else {
     node->next = found-named-node->node;
     found-named-node->node = node;
 
     if (nullptr == found-named-node->node)
-      sorted-array::add(gbl-imported-klasses-file-table, &klass-name);
+      sorted-array::add(gbl-imported-klasses-file-table, klass-name);
   }
   return;
 }
@@ -1629,7 +1629,7 @@ func dk-intern(str-t key) -> symbol-t {
                                                              ssizeof(symbol-t),
                                                              cast(std-compare-t)
                                                              cast(symbol-compare-t)symbol::compare,
-                                                             ptr? = false);
+                                                             ptr? = true);
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;
@@ -1638,7 +1638,7 @@ func dk-intern(str-t key) -> symbol-t {
 # if 0
   symbol-t val = key;
 # else
-  symbol-t val = *(cast(symbol-t*)sorted-array::intern(intern-array, cast(const void*)(&key)));
+  symbol-t val = cast(symbol-t)sorted-array::intern(intern-array, cast(const void*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 # endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
