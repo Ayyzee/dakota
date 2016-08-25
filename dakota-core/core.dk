@@ -40,7 +40,6 @@ module dakota-core;
 # include "dakota-rt-private.hh"
 # include "dso.hh" // dso-*()
 # include "sorted-array.hh"
-# include "sorted-ptr-array.hh"
 
 extern boole-t pre-main?; // to quiet clang
 boole-t pre-main? = true;
@@ -68,7 +67,7 @@ klass sigsegv-exception;
 klass signal-exception;
 klass singleton-klass;
 klass sorted-array;
-klass sorted-ptr-array;
+klass sorted-array;
 klass std-compare;
 klass str128;
 klass stream;
@@ -1621,7 +1620,7 @@ func dk-intern(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
   boole-t ptr?;
-  static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), ssizeof(symbol-t), cast(std-compare-t)safe-strcmp, ptr? = true);
+  static sorted-array-t* intern-array = sorted-array::create((4096/2)/sizeof(symbol-t), ssizeof(symbol-t), cast(std-compare-t)safe-strcmp, ptr? = true);
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;
@@ -1630,7 +1629,7 @@ func dk-intern(str-t key) -> symbol-t {
 # if 0
   symbol-t val = key;
 # else
-  symbol-t val = cast(symbol-t)sorted-ptr-array::intern(intern-array, cast(const void*)(key));
+  symbol-t val = cast(symbol-t)sorted-array::intern(intern-array, cast(const void*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 # endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);

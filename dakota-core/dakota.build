@@ -51,7 +51,6 @@
       '$(srcdir)/size.dk',
       '$(srcdir)/sorted-array.dk',
       '$(srcdir)/sorted-counted-set.dk',
-      '$(srcdir)/sorted-ptr-array.dk',
       '$(srcdir)/sorted-set.dk',
       '$(srcdir)/sorted-table.dk',
       '$(srcdir)/stack.dk',

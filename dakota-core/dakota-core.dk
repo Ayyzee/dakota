@@ -186,8 +186,6 @@ export dakota-core {
   sorted-array::slots-t;
   sorted-array;
   sorted-counted-set;
-  sorted-ptr-array::slots-t;
-  sorted-ptr-array;
   sorted-set;
   sorted-table;
   ssize::slots-t;

@@ -21,13 +21,13 @@ module dakota-core;
 # include <cstdlib>
 # include <cstring>
 
-# include "sorted-ptr-array.hh"
+# include "sorted-array.hh"
 
 klass exception;
 klass equal-predicate;
 klass object-output-stream;
 klass result;
-klass sorted-ptr-array;
+klass sorted-array;
 klass std-compare;
 
 klass sorted-set {
@@ -36,8 +36,8 @@ klass sorted-set {
   trait set;
 
   slots {
-    sorted-ptr-array::slots-t sa;
-    ssize-t                   iterator-state;
+    sorted-array::slots-t sa;
+    ssize-t               iterator-state;
   }
   static const ssize-t gbl-default-capacity = 64; // shall never be 0
 
@@ -55,11 +55,11 @@ klass sorted-set {
 
     self = $init(super);
     boole-t ptr?;
-    sorted-ptr-array::create(&self.sa,
-                             gbl-default-capacity,
-                             ssizeof((cast(ptr-t*)self.sa.elements)[0]),
-                             cast(std-compare-t)compare,
-                             ptr? = true);
+    sorted-array::create(&self.sa,
+                         gbl-default-capacity,
+                         ssizeof((cast(ptr-t*)self.sa.elements)[0]),
+                         cast(std-compare-t)compare,
+                         ptr? = true);
     self.iterator-state = 0;
 
     if (nullptr != elements)
@@ -76,14 +76,14 @@ klass sorted-set {
   }
   method add(object-t self, object-t element) -> object-t {
     self.iterator-state++;
-    result-t found-result = sorted-ptr-array::search(&self.sa, element);
+    result-t found-result = sorted-array::search(&self.sa, element);
 
     if (nullptr == found-result.element) {
       if (self.sa.count == self.sa.capacity) {
         self.sa.capacity *= 2; // the growth algorithm should be consumer setable
         self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity, self.sa.elements);
       }
-      sorted-ptr-array::add-at(&self.sa, element, found-result.offset);
+      sorted-array::add-at(&self.sa, element, found-result.offset);
     }
     return element;
   }
@@ -94,10 +94,10 @@ klass sorted-set {
   }
   method in(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
-    result-t found-result = sorted-ptr-array::search(&self.sa, element);
+    result-t found-result = sorted-array::search(&self.sa, element);
 
     if (nullptr != found-result.element)
-      result = cast(object-t)sorted-ptr-array::at(&self.sa, found-result.offset);
+      result = cast(object-t)sorted-array::at(&self.sa, found-result.offset);
     return result;
   }
   method in(object-t self, object-t element) -> object-t {
@@ -119,13 +119,13 @@ klass sorted-set {
     return state;
   }
   method remove(object-t self, object-t element) -> object-t {
-    result-t found-result = sorted-ptr-array::search(&self.sa, element);
+    result-t found-result = sorted-array::search(&self.sa, element);
     object-t prev-element = nullptr;
 
     if (nullptr != found-result.element) {
       self.iterator-state++;
       // element not required
-      prev-element = cast(object-t)sorted-ptr-array::remove-at(&self.sa, element, found-result.offset);
+      prev-element = cast(object-t)sorted-array::remove-at(&self.sa, element, found-result.offset);
     }
     return prev-element; // returns nullptr on error
   }
@@ -133,7 +133,7 @@ klass sorted-set {
     object-t prev-element = nullptr;
     if (0 != self.sa.count) {
       self.iterator-state++;
-      prev-element = cast(object-t)sorted-ptr-array::remove-last(&self.sa);
+      prev-element = cast(object-t)sorted-array::remove-last(&self.sa);
     }
     return prev-element; // returns nullptr on error
   }
@@ -226,7 +226,7 @@ klass sorted-set-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-      element = cast(object-t)sorted-ptr-array::at(&ss.sa, self.offset);
+      element = cast(object-t)sorted-array::at(&ss.sa, self.offset);
       assert(nullptr != element);
     }
     return element; // returns nullptr on error
