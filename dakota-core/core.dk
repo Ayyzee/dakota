@@ -1620,7 +1620,8 @@ func dk-intern-free(str-t key) -> symbol-t {
 func dk-intern(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
-  static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), ssizeof(symbol-t), cast(std-compare-t)safe-strcmp);
+  boole-t ptr?;
+  static sorted-ptr-array-t* intern-array = sorted-ptr-array::create((4096/2)/sizeof(symbol-t), ssizeof(symbol-t), cast(std-compare-t)safe-strcmp, ptr? = true);
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;

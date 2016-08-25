@@ -22,8 +22,8 @@ module dakota-core;
 # include <cstdlib>
 # include <cstring>
 
-# define ref(p)   &(p)
-# define deref(p) *(cast(ptr-t*)(p))
+# define   ref(t, p) !(t->ptr?) ? (p) : &(p)
+# define deref(t, p) !(t->ptr?) ? (p) : *(cast(const void**)(p))
 
 klass result;
 klass std-compare;
@@ -35,21 +35,23 @@ klass sorted-ptr-array {
     ssize-t       capacity;
     ssize-t       size;
     std-compare-t compare;
+    boole-t       ptr?;
   }
-  func create(slots-t* slots, ssize-t capacity, ssize-t size, std-compare-t compare) -> slots-t* {
+  func create(slots-t* slots, ssize-t capacity, ssize-t size, std-compare-t compare, boole-t ptr?) -> slots-t* {
     slots->elements = cast(ptr-t)dkt::alloc(size * capacity);
     slots->count =    0;
     slots->capacity = capacity;
     slots->size =     size;
     slots->compare =  compare;
+    slots->ptr? =     ptr?;
     return slots;
   }
-  func create(ssize-t capacity, ssize-t size, std-compare-t compare) -> slots-t* {
+  func create(ssize-t capacity, ssize-t size, std-compare-t compare, boole-t ptr?) -> slots-t* {
     assert(0 < capacity);
     assert(0 < size);
     assert(nullptr != compare);
     slots-t* slots = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
-    create(slots, capacity, size, compare);
+    create(slots, capacity, size, compare, ptr?);
     return slots;
   }
   func sort(slots-t* t) -> slots-t* {
@@ -72,7 +74,7 @@ klass sorted-ptr-array {
     while (l < u) {
       i = l + ((u - l) / 2); // calc midpoint without overflowing
       const void* p = cast(const void*)(cast(uint8-t*)(t->elements) + (i * t->size));
-      comparison = t->compare(deref(p), key);
+      comparison = t->compare(deref(t, p), key);
 
       if (0 < comparison) {
         increment? = false;
@@ -82,7 +84,7 @@ klass sorted-ptr-array {
         increment? = true;
         l = i + 1;
       } else {
-        result.element = deref(p);
+        result.element = deref(t, p);
         break;
       }
     }
@@ -99,7 +101,7 @@ klass sorted-ptr-array {
     memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
             cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
             cast(size-t)((t->count - offset) * t->size));
-    memcpy(cast(uint8-t*)(t->elements) + (t->size * (offset + 0)), ref(key), cast(size-t)t->size);
+    memcpy(cast(uint8-t*)(t->elements) + (t->size * (offset + 0)), ref(t, key), cast(size-t)t->size);
     t->count++;
     return t;
   }
@@ -108,7 +110,7 @@ klass sorted-ptr-array {
     assert(offset < t->count);
     assert(0 < t->count);
 
-    const void* element = deref(cast(const void*)(cast(uint8-t*)(t->elements) + (t->size * offset)));
+    const void* element = deref(t, cast(const void*)(cast(uint8-t*)(t->elements) + (t->size * offset)));
     return element;
   }
   // key not required
