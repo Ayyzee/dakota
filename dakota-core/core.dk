@@ -123,22 +123,25 @@ static sorted-array-t* gbl-imported-klasses-file-table;
 static func init-runtime-ds() -> void {
   const int64-t num-klasses = 256;
 
+  boole-t ptr?;
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
                          ssizeof(named-assoc-node::slots-t),
                          cast(std-compare-t)
-                         cast(named-assoc-node-compare-t)named-assoc-node::compare);
+                         cast(named-assoc-node-compare-t)named-assoc-node::compare,
+                         ptr? = false);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
                          ssizeof(named-info::slots-t*),
                          cast(std-compare-t)
-                         cast(named-info-compare-t)named-info::compare);
+                         cast(named-info-compare-t)named-info::compare,
+                         ptr? = false);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                          ssizeof(property::slots-t),
                          cast(std-compare-t)
-                         cast(property-compare-t)property::compare);
-  boole-t ptr?;
+                         cast(property-compare-t)property::compare,
+                         ptr? = false);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                          ssizeof(symbol-t),
