@@ -138,11 +138,13 @@ static func init-runtime-ds() -> void {
                          ssizeof(property::slots-t),
                          cast(std-compare-t)
                          cast(property-compare-t)property::compare);
+  boole-t ptr?;
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                          ssizeof(symbol-t),
                          cast(std-compare-t)
-                         cast(symbol-compare-t)symbol::compare);
+                         cast(symbol-compare-t)symbol::compare,
+                         ptr? = false);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -1620,7 +1622,11 @@ func dk-intern(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
   boole-t ptr?;
-  static sorted-array-t* intern-array = sorted-array::create((4096/2)/sizeof(symbol-t), ssizeof(symbol-t), cast(std-compare-t)safe-strcmp, ptr? = true);
+  static sorted-array-t* intern-array = sorted-array::create((4096/2)/sizeof(symbol-t),
+                                                             ssizeof(symbol-t),
+                                                             cast(std-compare-t)
+                                                             cast(symbol-compare-t)symbol::compare,
+                                                             ptr? = false);
 
   if (intern-array->count == intern-array->capacity) {
     intern-array->capacity *= 2;
@@ -1629,7 +1635,7 @@ func dk-intern(str-t key) -> symbol-t {
 # if 0
   symbol-t val = key;
 # else
-  symbol-t val = cast(symbol-t)sorted-array::intern(intern-array, cast(const void*)(key));
+  symbol-t val = *(cast(symbol-t*)sorted-array::intern(intern-array, cast(const void*)(&key)));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 # endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
