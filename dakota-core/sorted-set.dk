@@ -54,12 +54,10 @@ klass sorted-set {
     assert(0 != initial-capacity);
 
     self = $init(super);
-    self.sa.compare = cast(std-compare-t)compare;
-    self.sa.size =    ssizeof(self.sa.elements[0]);
-    self.sa.capacity = gbl-default-capacity;
-    self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity);
-    self.sa.count = 0;
-
+    sorted-ptr-array::create(&self.sa,
+                             gbl-default-capacity,
+                             ssizeof((cast(ptr-t*)self.sa.elements)[0]),
+                             cast(std-compare-t)compare);
     self.iterator-state = 0;
 
     if (nullptr != elements)
