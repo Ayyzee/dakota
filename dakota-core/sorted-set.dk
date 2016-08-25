@@ -76,14 +76,9 @@ klass sorted-set {
   }
   method add(object-t self, object-t element) -> object-t {
     self.iterator-state++;
-
     result-t found-result = sorted-ptr-array::search(&self.sa, element);
 
-//     if (throw? && nullptr != found-result.element)
-//       throw make(exception::klass, #msg : "oops");
-
-  //if (nullptr == found-result.element)
-    {
+    if (nullptr == found-result.element) {
       if (self.sa.count == self.sa.capacity) {
         self.sa.capacity *= 2; // the growth algorithm should be consumer setable
         self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity, self.sa.elements);
