@@ -56,8 +56,8 @@ klass sorted-set {
     self = $init(super);
     boole-t ptr?;
     sorted-array::create(&self.sa,
-                         gbl-default-capacity,
-                         ssizeof((cast(ptr-t*)self.sa.elements)[0]),
+                         initial-capacity,
+                         ssizeof(ptr-t),
                          cast(std-compare-t)compare,
                          ptr? = true);
     self.iterator-state = 0;
