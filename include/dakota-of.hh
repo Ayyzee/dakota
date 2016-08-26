@@ -35,15 +35,20 @@ KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t object) -> slots_t& 
   return s;
 }}
 inline FUNC klass_of(object_t object) -> object_t {
+  assert(nullptr != object);
   return object->klass;
 }
 inline FUNC superklass_of(object_t kls) -> object_t {
+  assert(nullptr != kls);
   return klass::unbox(kls).superklass;
 }
 inline FUNC name_of(object_t kls) -> symbol_t {
+  assert(nullptr != kls);
   return klass::unbox(kls).name;
 }
 inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
+  assert(nullptr != kls);
+  assert(nullptr != trait);
   while (!(nullptr == kls || null == kls)) { // !root-superklass?(kls)
     const symbol_t* traits = klass::unbox(kls).traits;
     while (nullptr != traits && nullptr != *traits) {
