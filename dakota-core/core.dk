@@ -541,11 +541,12 @@ static func import-klass(symbol-t klass-name, assoc-node-t* node) -> void {
   assert-valid-str(klass-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { .name = klass-name, .node = node };
-  named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
+  result-t found-result = sorted-array::search(gbl-imported-klasses-table, &named-node);
+  named-assoc-node-t* found-named-node = cast(decltype(found-named-node))found-result.element;
 
   if (nullptr == found-named-node) {
     named-node.node->next = nullptr;
-    sorted-array::add(gbl-imported-klasses-table, &named-node);
+    sorted-array::add-at(gbl-imported-klasses-table, &named-node, found-result.offset);
     sorted-array::add(gbl-imported-klasses-file-table, klass-name);
   } else {
     node->next = found-named-node->node;
@@ -588,9 +589,11 @@ func dk-register-klass(named-info-t* klass-info) -> object-t {
     assert(#klass == type);
     add-interpose-prop(interpose-name, name);
   }
-  named-info-t* found-klass-info = cast(named-info-t*)sorted-array::bsearch(gbl-klass-defns-table, klass-info);
+  result-t found-result = sorted-array::search(gbl-klass-defns-table, klass-info);
+  named-info-t* found-klass-info = cast(decltype(found-klass-info))found-result.element;
+
   if (nullptr == found-klass-info) {
-    sorted-array::add(gbl-klass-defns-table, klass-info);
+    sorted-array::add-at(gbl-klass-defns-table, klass-info, found-result.offset);
   } else {
     assert(nullptr == klass-info->next);
     named-info-t* prev = found-klass-info->next;
@@ -1631,11 +1634,6 @@ func dk-intern(str-t key) -> symbol-t {
                                                              cast(std-compare-t)
                                                              cast(symbol-compare-t)symbol::compare,
                                                              ptr? = true);
-
-  if (intern-array->count == intern-array->capacity) {
-    intern-array->capacity *= 2;
-    intern-array->elements = cast(ptr-t*)dkt::alloc(intern-array->size * intern-array->capacity, intern-array->elements);
-  }
 # if 0
   symbol-t val = key;
 # else

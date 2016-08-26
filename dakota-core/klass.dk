@@ -144,12 +144,13 @@ static func method-for-signature(methods::slots-t* methods, const signature-t* s
     if (nullptr == signature)
       break;
     selector-pair-t pair = { .key = signature, .element = selector-node };
-    selector-pair-t* found-pair =
-      cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
+    result-t found-result = sorted-array::search(&gbl-selectors-table, &pair);
+    selector-pair-t* found-pair = cast(decltype(found-pair))found-result.element;
+
     if (nullptr == found-pair) {
       *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count); // may be zero
       pair.element->next = nullptr;
-      sorted-array::add(&gbl-selectors-table, &pair);
+      sorted-array::add-at(&gbl-selectors-table, &pair, found-result.offset);
     } else {
       *(selector-node->ptr) = *(found-pair->element->ptr);
       selector-node->next = found-pair->element;

@@ -79,10 +79,6 @@ klass sorted-set {
     result-t found-result = sorted-array::search(&self.sa, element);
 
     if (nullptr == found-result.element) {
-      if (self.sa.count == self.sa.capacity) {
-        self.sa.capacity *= 2; // the growth algorithm should be consumer setable
-        self.sa.elements = cast(ptr-t*)dkt::alloc(self.sa.size * self.sa.capacity, self.sa.elements);
-      }
       sorted-array::add-at(&self.sa, element, found-result.offset);
     }
     return element;
