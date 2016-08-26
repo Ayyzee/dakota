@@ -29,7 +29,7 @@ klass std-compare;
 klass symbol;
 
 klass named-info-compare {
-  slots (*)(named-info-t**, named-info-t**) -> int-t;
+  slots (*)(named-info-t*, named-info-t*) -> int-t;
 }
 klass named-info {
   slots {
@@ -109,10 +109,6 @@ klass named-info {
     symbol-t other-name = cast(symbol-t)at(other-s, #name);
     //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
     int-t result = symbol::compare(s-name, other-name);
-    return result;
-  }
-  method compare(slots-t** s, slots-t** other-s) -> int-t {
-    int-t result = compare(*s, *other-s);
     return result;
   }
   method compare(object-t self, object-t other) -> int-t {

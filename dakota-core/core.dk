@@ -135,7 +135,7 @@ static func init-runtime-ds() -> void {
                          ssizeof(named-info::slots-t*),
                          cast(std-compare-t)
                          cast(named-info-compare-t)named-info::compare,
-                         ptr? = false);
+                         ptr? = true);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                          ssizeof(property::slots-t),
@@ -588,12 +588,14 @@ func dk-register-klass(named-info-t* klass-info) -> object-t {
     assert(#klass == type);
     add-interpose-prop(interpose-name, name);
   }
-  named-info-t** klass-info-ptr = cast(named-info-t**)sorted-array::bsearch(gbl-klass-defns-table, &klass-info);
-  if (nullptr == klass-info-ptr) {
-    sorted-array::add(gbl-klass-defns-table, &klass-info);
+  named-info-t* found-klass-info = cast(named-info-t*)sorted-array::bsearch(gbl-klass-defns-table, klass-info);
+  if (nullptr == found-klass-info) {
+    sorted-array::add(gbl-klass-defns-table, klass-info);
   } else {
-    klass-info->next = *klass-info-ptr;
-    *klass-info-ptr = klass-info;
+    assert(nullptr == klass-info->next);
+    named-info-t* prev = found-klass-info->next;
+    found-klass-info->next = klass-info;
+    klass-info->next = prev;
   }
   object-t klass = nullptr;
   if (min-runtime?)  // this is a late (post-init) registration
@@ -1581,10 +1583,9 @@ func dk-klass-for-name(symbol-t name) -> object-t {
   assert-valid-str(klass-name);
   property-t[] properties = { { .key = #name, .element = cast(intptr-t)klass-name } };
   named-info-t info = { .next = nullptr, .count = scountof(properties), .elements = properties };
-  named-info-t* info-ptr = &info;
-  named-info-t** klass-info-ptr = cast(named-info-t**)sorted-array::bsearch(gbl-klass-defns-table, &info-ptr);
+  named-info-t* klass-info = cast(named-info-t*)sorted-array::bsearch(gbl-klass-defns-table, &info);
 
-  if (nullptr == klass-info-ptr) {
+  if (nullptr == klass-info) {
     str-t klasspath = getenv("KLASSPATH");
 
     if (nullptr == klasspath) {
@@ -1609,7 +1610,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
       throw "bummer";
     }
   }
-  return *klass-info-ptr; // rnielsen: should have only one return per func
+  return klass-info; // rnielsen: should have only one return per func
 }
 /*
   dk-intern needs to be able to be used **early** in the static initialization
