@@ -37,7 +37,11 @@ klass sorted-array {
     std-compare-t compare;
     boole-t       ptr?;
   }
-  func create(slots-t* slots, ssize-t capacity, ssize-t size, std-compare-t compare, boole-t ptr?) -> slots-t* {
+  func create(slots-t* slots,
+              ssize-t capacity,
+              ssize-t size,
+              std-compare-t compare,
+              boole-t ptr?) -> slots-t* {
     slots->elements = cast(ptr-t)dkt::alloc(size * capacity);
     slots->count =    0;
     slots->capacity = capacity;
@@ -46,7 +50,10 @@ klass sorted-array {
     slots->ptr? =     ptr?;
     return slots;
   }
-  func create(ssize-t capacity, ssize-t size, std-compare-t compare, boole-t ptr?) -> slots-t* {
+  func create(ssize-t capacity,
+              ssize-t size,
+              std-compare-t compare,
+              boole-t ptr?) -> slots-t* {
     assert(0 < capacity);
     assert(0 < size);
     assert(nullptr != compare);

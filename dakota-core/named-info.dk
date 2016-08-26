@@ -60,8 +60,12 @@ klass named-info {
   }
   method search(slots-t* s, symbol-t key) -> property-t* {
     property::slots-t property = {.key = cast(symbol-t)key, .element = cast(intptr-t)nullptr};
-    property::slots-t* result = cast(property::slots-t*)bsearch(&property, s->elements, cast(size-t)s->count, sizeof(s->elements[0]),
-                                                                cast(std-compare-t)cast(property-compare-t)property::compare);
+    property::slots-t* result = cast(property::slots-t*)bsearch(&property,
+                                                                s->elements,
+                                                                cast(size-t)s->count,
+                                                                sizeof(s->elements[0]),
+                                                                cast(std-compare-t)
+                                                                cast(property-compare-t)property::compare);
     return result;
   }
   method at(slots-t* s, symbol-t key) -> ssize-t {
@@ -105,21 +109,23 @@ klass named-info {
     return s;
   }
   method compare(slots-t* s, slots-t* other-s) -> int-t {
-    symbol-t s-name = cast(symbol-t)at(s, #name);
-    symbol-t other-name = cast(symbol-t)at(other-s, #name);
-    //printf("%s(): %s ?= %s\n", __func__, s-name, other-name);
-    int-t result = symbol::compare(s-name, other-name);
+    int-t result = 0;
+    if (s != other-s) {
+      symbol-t s-name =       cast(symbol-t)at(s,       #name);
+      symbol-t other-s-name = cast(symbol-t)at(other-s, #name);
+      result = symbol::compare(s-name, other-s-name);
+      result = dkt-normalize-compare-result(result);
+    }
     return result;
   }
   method compare(object-t self, object-t other) -> int-t {
-    int-t result;
-
-    if ($instance?(other, klass)) {
-      slots-t& s1 = unbox(self);
-      slots-t& s2 = unbox(other);
-      result = compare(&s1, &s2);
-    } else {
-      result = $compare(super, other);
+    int-t result = 0;
+    if (self != other) {
+      if (klass == klass-of(other) || $instance?(other, klass))
+        result = compare(&unbox(self), &unbox(other));
+      else
+        result = $compare(super, other);
+      result = dkt-normalize-compare-result(result);
     }
     return result;
   }
