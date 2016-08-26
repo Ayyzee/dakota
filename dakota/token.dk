@@ -208,7 +208,7 @@ klass token {
   method compare(object-t self, object-t other) -> int-t {
     int-t result;
     if ($instance?(other, klass)) {
-      result = safe-strcmp(self.buffer, unbox(other).buffer);
+      result = safe-strcmp(unbox(self).buffer, unbox(other).buffer);
       result = dkt-normalize-compare-result(result);
     } else {
       result = $compare(super, other);

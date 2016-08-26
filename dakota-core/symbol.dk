@@ -39,26 +39,23 @@ klass symbol {
     return result;
   }
   method compare(slots-t s, slots-t other-s) -> int-t {
-    int-t result;
-    if (s == other-s)
-      result = 0;
-    else
+    int-t result = 0;
+    if (s != other-s) {
       result = cast(int-t)safe-strcmp(s, other-s);
-    result = dkt-normalize-compare-result(result);
+      result = dkt-normalize-compare-result(result);
+    }
     //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
     return result;
   }
   method compare(object-t self, object-t other) -> int-t {
-    int-t result;
-
-    if ($instance?(other, klass)) {
-      slots-t& s1 = unbox(self);
-      slots-t& s2 = unbox(other);
-      result = compare(s1, s2);
-    } else {
-      result = $compare(super, other);
+    int-t result = 0;
+    if (self != other) {
+      if (klass == klass-of(other) || $instance?(other, klass))
+        result = compare(unbox(self), unbox(other));
+      else
+        result = $compare(super, other);
+      result = dkt-normalize-compare-result(result);
     }
-    result = dkt-normalize-compare-result(result);
     return result;
   }
   method dump(object-t self) -> object-t {
