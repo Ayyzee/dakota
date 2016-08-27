@@ -13,7 +13,7 @@
       '$(srcdir)/dakota-core.dk',
       '$(srcdir)/deque.dk',
       '$(srcdir)/enum-info.dk',
-      '$(srcdir)/equal-func.dk',
+      '$(srcdir)/equal.dk',
       '$(srcdir)/exception.dk',
       '$(srcdir)/forward-iterator.dk',
       '$(srcdir)/hash.dk',

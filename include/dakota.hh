@@ -204,7 +204,6 @@ extern THREAD_LOCAL const signature_t* dkt_current_signature [[so_export]];
 extern THREAD_LOCAL super_t            dkt_null_context      [[so_export]];
 extern THREAD_LOCAL super_t            dkt_current_context   [[so_export]];
 
-typealias compare_t =               FUNC (*)(object_t, object_t) -> int_t; // comparitor
 typealias dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
 typealias dkt_selector_func_t =     FUNC (*)() -> selector_t*;        // rw
 typealias dkt_generic_func_func_t = FUNC (*)() -> generic_func_t*;    // rw

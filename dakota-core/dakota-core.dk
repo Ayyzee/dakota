@@ -35,6 +35,8 @@ export dakota-core {
   char8::slots-t;
   char8;
   collection;
+  compare::slots-t;
+  compare;
   const-info::slots-t;
   const-info;
   counted-set;
@@ -43,8 +45,8 @@ export dakota-core {
   each-box-func;
   enum-info::slots-t;
   enum-info;
-  equal-func::slots-t;
-  equal-func;
+  equal::slots-t;
+  equal;
   exception;
   forward-iterator;
   generic-func;

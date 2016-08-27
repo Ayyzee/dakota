@@ -23,8 +23,9 @@ module dakota-core;
 
 # include "sorted-array.hh"
 
+klass compare;
 klass exception;
-klass equal-func;
+klass equal;
 klass object-output-stream;
 klass result;
 klass sorted-array;

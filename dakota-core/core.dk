@@ -1218,14 +1218,14 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
   }
   return;
 } // dump-klass-defns()
-klass get-segment-data {
+klass get-segment-data-func {
   slots (*)(str-t, ptr-t*, size-t*) -> ptr-t;
 }
 klass registration-info {
   slots {
     str-t              dir;
     generic-func-t*    generic-func-ptrs;
-    get-segment-data-t get-segment-data;
+    get-segment-data-func-t get-segment-data;
     symbol-t*          imported-klass-names;
     assoc-node-t*      imported-klass-ptrs;
     property-t*        interposers;
@@ -1383,7 +1383,7 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   }
   return r;
 }
-static func set-read-only(str-t segment, get-segment-data-t get-segment-data) -> int-t {
+static func set-read-only(str-t segment, get-segment-data-func-t get-segment-data) -> int-t {
   assert-valid-str(segment);
   ptr-t addr = nullptr;
   size-t size = 0;
@@ -1404,7 +1404,7 @@ static func set-read-only-all(str-t segment) -> int-t {
   while (nullptr != ni) {
     registration-info-t ri {};
     named-info-to-registration-info(ni, &ri);
-    int-t r = set-read-only(segment, cast(get-segment-data-t)ri.get-segment-data);
+    int-t r = set-read-only(segment, cast(get-segment-data-func-t)ri.get-segment-data);
     if (0 != r) result = r;
     ni = ni->next;
   }

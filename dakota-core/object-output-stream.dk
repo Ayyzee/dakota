@@ -37,7 +37,7 @@ klass object-output-stream {
   method init(object-t self, stream-t stream : stdout) -> object-t {
     self = $init(super, #slots : stream);
     assert(nullptr != stream);
-//     equal-func-t equal? = cast(equal-func-t)$method-for-selector(object::klass,
+//     equal-t equal? = cast(equal-t)$method-for-selector(object::klass,
 //                                                                                        SELECTOR(equal?(object-t, object-t));
 //     compare-t compare = cast(compare-t)$method-for-selector(object::klass,
 //                                                                SELECTOR(compare(object-t, object-t));

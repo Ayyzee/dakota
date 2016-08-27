@@ -16,6 +16,9 @@
 
 module dakota-core;
 
-klass equal-func {
+klass equal {
   slots (*)(object-t, object-t) -> boole-t;
+}
+klass compare {
+  slots (*)(object-t, object-t) -> int-t;
 }

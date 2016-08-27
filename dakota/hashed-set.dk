@@ -31,7 +31,7 @@ static const ssize-t gbl-prime = 127;
 // when the user submits a non-prime number, decrement until a prime is found
 
 klass deque;
-klass equal-func;
+klass equal;
 klass exception;
 klass object-output-stream;
 klass vector;
@@ -42,7 +42,7 @@ klass hashed-set {
   trait set;
 
   slots {
-    equal-func-t equal?;
+    equal-t equal?;
     ssize-t  num-buckets;
     object-t buckets; // a vector of deques
     ssize-t  size;
