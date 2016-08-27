@@ -29,7 +29,7 @@ space?(int-t c) {
 
 klass exception;
 klass token;
-klass type-predicate;
+klass type-func;
 klass str128;
 klass stream;
 klass system-exception;
@@ -119,7 +119,7 @@ klass input-file {
     }
     return c;
   }
-  method split(object-t self, type-predicate-t type?) -> object-t {
+  method split(object-t self, type-func-t type?) -> object-t {
     object-t result = make(vector::klass);
 
     if (nullptr == type?)

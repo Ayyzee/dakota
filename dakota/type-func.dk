@@ -16,6 +16,6 @@
 
 module dakota;
 
-klass type-predicate {
+klass type-func {
   slots (*)(int-t) -> boole-t;
 }

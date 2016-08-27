@@ -24,7 +24,7 @@
       '$(srcdir)/text-output-stream.dk',
       '$(srcdir)/token.dk',
       '$(srcdir)/tokenid.dk',
-      '$(srcdir)/type-predicate.dk',
+      '$(srcdir)/type-func.dk',
       '$(srcdir)/xml-object-output-stream.dk',
     ],
     'lib-dirs' => [ # cmd-line

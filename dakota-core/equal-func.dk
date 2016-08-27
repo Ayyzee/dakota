@@ -16,6 +16,6 @@
 
 module dakota-core;
 
-klass equal-predicate {
+klass equal-func {
   slots (*)(object-t, object-t) -> boole-t;
 }

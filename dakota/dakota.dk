@@ -49,7 +49,7 @@ export dakota {
   token;
   tokenid::slots-t;
   tokenid;
-  type-predicate::slots-t;
-  type-predicate;
+  type-func::slots-t;
+  type-func;
   xml-object-output-stream;
 }

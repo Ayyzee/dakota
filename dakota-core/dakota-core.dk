@@ -43,8 +43,8 @@ export dakota-core {
   each-box-func;
   enum-info::slots-t;
   enum-info;
-  equal-predicate::slots-t;
-  equal-predicate;
+  equal-func::slots-t;
+  equal-func;
   exception;
   forward-iterator;
   generic-func;
