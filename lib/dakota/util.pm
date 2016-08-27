@@ -377,7 +377,16 @@ sub as_literal_symbol {
   }
   return $result;
 }
-sub encode_char { my ($char) = @_; return sprintf("%02x", ord($char)); }
+my $trans_tbl = { '?' => 'qq',
+                  '!' => 'jj' };
+sub encode_char {
+  my ($char) = @_;
+  my $val = $$trans_tbl{$char};
+  if ($val) {
+    return $val;
+  }
+  return sprintf("%02x", ord($char));
+}
 sub dk_mangle {
   my ($symbol) = @_;
   # remove \ preceeding |

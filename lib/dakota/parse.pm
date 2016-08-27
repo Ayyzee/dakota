@@ -1251,9 +1251,11 @@ sub klass {
         last;
       }
       if (m/^slots$/) {
+        if (&sst_cursor::next_token($gbl_sst_cursor) !~ /^(\.|->|,|\+)$/) {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) || '{' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
           &slots({ 'exported?' => $$args{'exported?'} });
           last;
+        }
         }
       }
       # [[export]] method
