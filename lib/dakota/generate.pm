@@ -172,7 +172,7 @@ sub write_to_file_strings {
 }
 my $gbl_macros;
 sub write_to_file_converted_strings {
-  my ($path, $strings, $remove, $project_ast) = @_;
+  my ($path, $strings, $remove, $target_inputs_ast) = @_;
   if ($use_new_macro_system) {
     if (!defined $gbl_macros) {
       if ($ENV{'DK_MACROS_PATH'}) {
@@ -190,7 +190,7 @@ sub write_to_file_converted_strings {
     $filestr .= $string;
   }
   my $sst = &sst::make($filestr, ">$path"); # costly (< 1/4 of total)
-  my $kw_arg_generics = $$project_ast{'kw-arg-generics'};
+  my $kw_arg_generics = $$target_inputs_ast{'kw-arg-generics'};
   if ($use_new_macro_system) {
     &dakota::macro_system::macros_expand($sst, $gbl_macros, $kw_arg_generics);
   }
@@ -207,16 +207,16 @@ sub is_silent {
   return $$root_cmd{'opts'}{'silent'};
 }
 sub generate_src_decl {
-  my ($path, $file, $project_ast, $target_hh_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_hh_path) = @_;
   #print "generate_src_decl($path, ...)" . $nl;
   &set_src_decl($path);
-  return &generate_src($path, $file, $project_ast, $target_hh_path);
+  return &generate_src($path, $file_ast, $target_inputs_ast, $target_hh_path);
 }
 sub generate_src_defn {
-  my ($path, $file, $project_ast, $target_hh_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_hh_path) = @_;
   #print "generate_src_defn($path, ...)" . $nl;
   &set_src_defn($path);
-  return &generate_src($path, $file, $project_ast, $target_hh_path);
+  return &generate_src($path, $file_ast, $target_inputs_ast, $target_hh_path);
 }
 my $im_suffix_for_suffix = {
   $cc_ext => "$cc_ext.dkt",
@@ -233,12 +233,12 @@ sub pre_output_path_from_any_path {
   return $pre_output;
 }
 sub generate_src {
-  my ($path, $file, $project_ast, $target_hh_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $dir = '.' if !$dir;
   my $src_hh_path = "$name.$hh_ext";
   my $inc_path = $name . '.inc';
-  my ($generics, $symbols) = &generics::parse($file);
+  my ($generics, $symbols) = &generics::parse($file_ast);
   my $suffix = &suffix();
   my $output = &canon_path("$dir/$name.$suffix");
   my $pre_output = &pre_output_path_from_any_path($output);
@@ -252,7 +252,7 @@ sub generate_src {
   my $strings;
   if (&is_src_decl()) {
     return undef if !$ENV{'DK_SRC_UNIQUE_HEADER'};
-    $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix);
+    $str = &generate_decl_defn($file_ast, $generics, $symbols, $dir, $name, $suffix);
     $strings = [ undef,
                  '# pragma once' . $nl,
                  $str ];
@@ -266,7 +266,7 @@ sub generate_src {
       $nl .
       "# include \"$inc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to inc)
       $nl .
-      &dk_generate_cc_footer($file);
+      &dk_generate_cc_footer($file_ast);
     $strings = [ undef,
                  $str ];
   }
@@ -279,32 +279,32 @@ sub generate_src {
   }
   $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
   my $remove;
-  &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
+  &write_to_file_converted_strings($output, $strings, $remove = undef, $target_inputs_ast);
   return $output;
 } # sub generate_src
 sub generate_target_decl {
-  my ($path, $file, $project_ast, $is_exe) = @_;
+  my ($path, $target_ast, $target_inputs_ast, $is_exe) = @_;
   #print "generate_target_decl($path, ...)" . $nl;
   &set_target_decl($path);
   if ($is_exe) {
     &set_exe_target($path);
   }
-  return &generate_target($path, $file, $project_ast);
+  return &generate_target($path, $target_ast, $target_inputs_ast);
 }
 sub generate_target_defn {
-  my ($path, $file, $project_ast, $is_exe) = @_;
+  my ($path, $target_ast, $target_inputs_ast, $is_exe) = @_;
   #print "generate_target_defn($path, ...)" . $nl;
   &set_target_defn($path);
   if ($is_exe) {
     &set_exe_target($path);
   }
-  return &generate_target($path, $file, $project_ast);
+  return &generate_target($path, $target_ast, $target_inputs_ast);
 }
 sub generate_target {
-  my ($path, $file, $project_ast) = @_;
+  my ($path, $target_ast, $target_inputs_ast) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $dir = '.' if !$dir;
-  my ($generics, $symbols) = &generics::parse($file);
+  my ($generics, $symbols) = &generics::parse($target_ast);
   my $suffix = &suffix();
   my $output = &canon_path("$dir/$name.$suffix");
   my $start_time;
@@ -320,7 +320,7 @@ sub generate_target {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output_runtime = $ENV{'DKT_DIR'} . '/' . $output_runtime;
     }
-    my $str = &generate_target_runtime($file, $generics);
+    my $str = &generate_target_runtime($target_ast, $generics);
     my $strings = [ undef,
                     $str ];
     if ($should_write_pre_output) {
@@ -332,14 +332,14 @@ sub generate_target {
     }
     $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
     my $remove;
-    &write_to_file_converted_strings($output_runtime, $strings, $remove = undef, $project_ast);
+    &write_to_file_converted_strings($output_runtime, $strings, $remove = undef, $target_inputs_ast);
   }
   if (1) {
     my $pre_output = &pre_output_path_from_any_path($output);
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output;
     }
-    my $str = &generate_decl_defn($file, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
+    my $str = &generate_decl_defn($target_ast, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
     my $strings;
     if (&is_decl()) {
       $strings = [ undef,
@@ -362,7 +362,7 @@ sub generate_target {
     }
     $$strings[0] = '// ' . $emacs_cxx_mode_file_variables . $nl;
     my $remove;
-    &write_to_file_converted_strings($output, $strings, $remove = undef, $project_ast);
+    &write_to_file_converted_strings($output, $strings, $remove = undef, $target_inputs_ast);
   }
   if (&is_debug()) {
     $end_time = time;
@@ -394,10 +394,10 @@ sub add_labeled_src {
   $$result{$label} = $src;
 }
 sub generate_klass_funcs_and_write_to_file_converted {
-  my ($file, $ordered_klass_names, $output) = @_;
+  my ($ast, $ordered_klass_names, $output) = @_;
   my $col = '';
   my $strings = [ undef,
-                  &linkage_unit::generate_klasses_funcs($file, $ordered_klass_names) ];
+                  &linkage_unit::generate_klasses_funcs($ast, $ordered_klass_names) ];
   if ($should_write_pre_output) {
     my $pre_output = &pre_output_path_from_any_path($output);
     $$strings[0] = '// ' . $emacs_dakota_mode_file_variables . $nl;
@@ -428,18 +428,18 @@ sub generate_generics_and_write_to_file_converted {
   &write_to_file_converted_strings($output, $strings);
 }
 sub generate_decl_defn {
-  my ($file, $generics, $symbols, $dir, $name, $suffix) = @_;
+  my ($ast, $generics, $symbols, $dir, $name, $suffix) = @_;
   $dir = '.' if !$dir;
   my $result = {};
   my $extra_dakota_headers = &extra_dakota_headers($name);
-  my $ordered_klass_names = &order_klasses($file);
+  my $ordered_klass_names = &order_klasses($ast);
 
-  &add_labeled_src($result, "headers-$suffix",  &linkage_unit::generate_headers( $file, $ordered_klass_names, $extra_dakota_headers));
-  &add_labeled_src($result, "symbols-$suffix",  &linkage_unit::generate_symbols( $file, $symbols));
-  &add_labeled_src($result, "klasses-$suffix",  &linkage_unit::generate_klasses( $file, $ordered_klass_names));
-  &add_labeled_src($result, "keywords-$suffix", &linkage_unit::generate_keywords($file));
-  &add_labeled_src($result, "strs-$suffix",     &linkage_unit::generate_strs(    $file));
-  &add_labeled_src($result, "ints-$suffix",     &linkage_unit::generate_ints(    $file));
+  &add_labeled_src($result, "headers-$suffix",  &linkage_unit::generate_headers( $ast, $ordered_klass_names, $extra_dakota_headers));
+  &add_labeled_src($result, "symbols-$suffix",  &linkage_unit::generate_symbols( $ast, $symbols));
+  &add_labeled_src($result, "klasses-$suffix",  &linkage_unit::generate_klasses( $ast, $ordered_klass_names));
+  &add_labeled_src($result, "keywords-$suffix", &linkage_unit::generate_keywords($ast));
+  &add_labeled_src($result, "strs-$suffix",     &linkage_unit::generate_strs(    $ast));
+  &add_labeled_src($result, "ints-$suffix",     &linkage_unit::generate_ints(    $ast));
   my $col = '';
 
   my $klass_func_defns_path = "$name-klass-func-defns.inc";
@@ -449,7 +449,7 @@ sub generate_decl_defn {
   my $target_klass_func_decls_path = &dakota::dakota::target_klass_func_decls_path();
 
   if (&is_src_decl()) {
-    &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_decls_path");
+    &generate_klass_funcs_and_write_to_file_converted($ast, $ordered_klass_names, "$dir/$klass_func_decls_path");
     &add_labeled_src($result, "klass-funcs-$suffix",
                      "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
@@ -460,7 +460,7 @@ sub generate_decl_defn {
                      "  # include \"$target_klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_decl()) {
-    &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_decls_path");
+    &generate_klass_funcs_and_write_to_file_converted($ast, $ordered_klass_names, "$dir/$klass_func_decls_path");
     &add_labeled_src($result, "klass-funcs-$suffix",
                      "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
@@ -471,7 +471,7 @@ sub generate_decl_defn {
                      "  # include \"$klass_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   } elsif (&is_target_defn()) {
-    &generate_klass_funcs_and_write_to_file_converted($file, $ordered_klass_names, "$dir/$klass_func_defns_path");
+    &generate_klass_funcs_and_write_to_file_converted($ast, $ordered_klass_names, "$dir/$klass_func_defns_path");
     &add_labeled_src($result, "klass-funcs-$suffix",
                      "# if !defined DK_INLINE_KLASS_FUNCS || 0 == DK_INLINE_KLASS_FUNCS" . $nl .
                      "  # define INLINE" . $nl .
@@ -542,18 +542,18 @@ sub generate_decl_defn {
   return $str;
 } # generate_decl_defn
 sub generate_target_runtime {
-  my ($file, $generics) = @_;
+  my ($target_ast, $generics) = @_;
   my $target_cc_str = '';
   my $col = '';
-  my $keys_count = keys %{$$file{'klasses'}};
+  my $keys_count = keys %{$$target_ast{'klasses'}};
   if (0 == $keys_count) {
     $target_cc_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
     $target_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;" . $nl;
   } else {
     $target_cc_str .= $col . "static symbol-t imported-klass-names[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    my $num_klasses = scalar keys %{$$file{'klasses'}};
-    foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
+    my $num_klasses = scalar keys %{$$target_ast{'klasses'}};
+    foreach my $klass_name (sort keys %{$$target_ast{'klasses'}}) {
       $target_cc_str .= $col . "$klass_name\::__name__," . $nl;
     }
     $target_cc_str .= $col . "nullptr" . $nl;
@@ -562,8 +562,8 @@ sub generate_target_runtime {
     ###
     $target_cc_str .= $col . "static assoc-node-t imported-klass-ptrs[] = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    $num_klasses = scalar keys %{$$file{'klasses'}};
-    foreach my $klass_name (sort keys %{$$file{'klasses'}}) {
+    $num_klasses = scalar keys %{$$target_ast{'klasses'}};
+    foreach my $klass_name (sort keys %{$$target_ast{'klasses'}}) {
       $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::klass }," . $nl;
     }
     $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
@@ -572,10 +572,10 @@ sub generate_target_runtime {
     $target_cc_str .= &linkage_unit::generate_target_runtime_selectors_seq( $generics);
     $target_cc_str .= &linkage_unit::generate_target_runtime_signatures_seq($generics);
     $target_cc_str .= &linkage_unit::generate_target_runtime_generic_func_ptrs_seq($generics);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_strs_seq($file);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_ints_seq($file);
+    $target_cc_str .= &linkage_unit::generate_target_runtime_strs_seq($target_ast);
+    $target_cc_str .= &linkage_unit::generate_target_runtime_ints_seq($target_ast);
 
-    $target_cc_str .= &dk_generate_cc_footer($file);
+    $target_cc_str .= &dk_generate_cc_footer($target_ast);
   }
   #$target_cc_str .= $col . "extern \"C\$nl;
   #$target_cc_str .= $col . "{" . $nl;
@@ -593,17 +593,17 @@ sub generate_target_runtime {
                   "\#name" => 'name',
                   "\#selectors" =>  'selectors',
                   "\#signatures" => 'signatures',
-                  "\#type" => $$file{'other'}{'type'},
+                  "\#type" => $$target_ast{'other'}{'type'},
                   "\#va-generic-func-ptrs" => 'va-generic-func-ptrs',
                   "\#va-selectors" =>  'va-selectors',
                   "\#va-signatures" => 'va-signatures',
                  };
-  if (0 < scalar keys %{$$file{'literal-strs'}}) {
+  if (0 < scalar keys %{$$target_ast{'literal-strs'}}) {
     $$info_tbl{"\#str-literals"} = '__str-literals';
     $$info_tbl{"\#str-names"} =    '__str-names';
     $$info_tbl{"\#str-ptrs"} =     '__str-ptrs';
   }
-  if (0 < scalar keys %{$$file{'literal-ints'}}) {
+  if (0 < scalar keys %{$$target_ast{'literal-ints'}}) {
     $$info_tbl{"\#int-literals"} = '__int-literals';
     $$info_tbl{"\#int-names"} =    '__int-names';
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
@@ -611,10 +611,10 @@ sub generate_target_runtime {
   $target_cc_str .= $nl;
   $target_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(\"$$file{'other'}{'name'}\");" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(\"$$target_ast{'other'}{'name'}\");" . $nl;
   $target_cc_str .= $nl;
   #my $col;
-  $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$file{'symbols'}, __LINE__);
+  $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_ast{'symbols'}, __LINE__);
 
   $target_cc_str .= $nl;
   $target_cc_str .= $col . "static func __initial() -> void {" . &ann(__FILE__, __LINE__) . $nl;
@@ -1672,16 +1672,16 @@ sub linkage_unit::generate_target_runtime_selectors_seq {
   return $scratch_str;
 }
 sub linkage_unit::generate_generics {
-  my ($scope, $col) = @_;
+  my ($ast, $col) = @_;
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   my ($is_inline, $ns);
-  &generate_generic_defns($scope, $is_inline = 0, $col, $ns = 'dk');
+  &generate_generic_defns($ast, $is_inline = 0, $col, $ns = 'dk');
 
   $$scratch_str_ref .=
     $nl .
     $col . "# if !defined DK-USE-MAKE-MACRO" . $nl .
-    &generate_va_make_defn($scope, $is_inline = 1, &colin($col)) .
+    &generate_va_make_defn($ast, $is_inline = 1, &colin($col)) .
     $col . "# endif" . $nl;
   return $$scratch_str_ref;
 }
@@ -2333,7 +2333,7 @@ sub typealias_slots_t {
 #
 # {'slots'}{'cat-info'} = aggregate elements
 sub generate_slots_decls {
-  my ($scope, $col, $klass_path, $klass_name, $klass_scope) = @_;
+  my ($ast, $col, $klass_path, $klass_name, $klass_scope) = @_;
   if (!$klass_scope) {
     $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   }
@@ -2364,7 +2364,7 @@ sub generate_slots_decls {
   }
 }
 sub generate_exported_slots_decls {
-  my ($scope, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2) = @_;
+  my ($ast, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2) = @_;
   my $pad1 = '';
   if ($max_width1) {
     my $width = length($klass_name);
@@ -2420,7 +2420,7 @@ sub generate_exported_slots_decls {
   }
 }
 sub linkage_unit::generate_headers {
-  my ($scope, $klass_names, $extra_dakota_headers) = @_;
+  my ($ast, $klass_names, $extra_dakota_headers) = @_;
   my $result = '';
 
   if (&is_decl()) {
@@ -2439,7 +2439,7 @@ sub linkage_unit::generate_headers {
     }
     my $all_headers = {};
     my $header_name;
-    foreach $header_name (keys %{$$scope{'includes'}}) {
+    foreach $header_name (keys %{$$ast{'includes'}}) {
       $$all_headers{$header_name} = undef;
     }
     foreach $header_name (keys %$exported_headers) {
@@ -2535,15 +2535,15 @@ sub has_exported_methods {
   return 0;
 }
 sub order_klasses {
-  my ($scope) = @_;
+  my ($ast) = @_;
   my $type_aliases = {};
   my $depends = {};
   my $verbose = 0;
   my ($klass_name, $klass_scope);
 
   foreach my $klass_type_plural ('traits', 'klasses') {
-    foreach $klass_name (sort keys %{$$scope{$klass_type_plural}}) {
-      $klass_scope = $$scope{$klass_type_plural}{$klass_name};
+    foreach $klass_name (sort keys %{$$ast{$klass_type_plural}}) {
+      $klass_scope = $$ast{$klass_type_plural}{$klass_name};
       if (!$klass_scope || !$$klass_scope{'slots'}) {
         # if one has a klass scope locally (like adding a method on klass object)
         # dont use it since it won't have a slots defn
@@ -2565,8 +2565,8 @@ sub order_klasses {
                   if ($verbose) {
                     print STDERR "    $type\n      $type_klass_name" . $nl;
                   }
-                  if (!exists $$scope{'klasses'}{$type_klass_name}) {
-                    #$$scope{$klass_type_plural}{$type_klass_name}
+                  if (!exists $$ast{'klasses'}{$type_klass_name}) {
+                    #$$ast{$klass_type_plural}{$type_klass_name}
                     #  = &generics::klass_scope_from_klass_name($type_klass_name);
                   }
                 }
@@ -2582,8 +2582,8 @@ sub order_klasses {
     print STDERR &Dumper($type_aliases);
   }
   foreach my $klass_type_plural ('traits', 'klasses') {
-    foreach $klass_name (sort keys %{$$scope{$klass_type_plural}}) {
-      $klass_scope = $$scope{$klass_type_plural}{$klass_name};
+    foreach $klass_name (sort keys %{$$ast{$klass_type_plural}}) {
+      $klass_scope = $$ast{$klass_type_plural}{$klass_name};
       if (!$klass_scope || !$$klass_scope{'slots'}) {
         # if one has a klass scope locally (like adding a method on klass object)
         # dont use it since it won't have a slots defn
@@ -2688,7 +2688,7 @@ sub klass_part {
   }
 }
 sub linkage_unit::generate_klasses_funcs { # optionally inline
-  my ($scope, $ordered_klass_names) = @_;
+  my ($ast, $ordered_klass_names) = @_;
   my $col = '';
   my $klass_path = [];
   my $original_scratch_str_ref = &global_scratch_str_ref();
@@ -2696,11 +2696,11 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   my $scratch_str_ref = &global_scratch_str_ref();
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs" . '-' . &suffix());
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
-    &linkage_unit::generate_klasses_klass_funcs_klass($scope, $col, $klass_path, $klass_name);
+    &linkage_unit::generate_klasses_klass_funcs_klass($ast, $col, $klass_path, $klass_name);
   }
   $$scratch_str_ref .= $nl;
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
-    &linkage_unit::generate_klasses_klass_funcs($scope, $col, $klass_path, $klass_name);
+    &linkage_unit::generate_klasses_klass_funcs($ast, $col, $klass_path, $klass_name);
   }
   if (1) {
     $$scratch_str_ref .=
@@ -2710,13 +2710,13 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   }
   $$scratch_str_ref .= '//--box--' . $nl;
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
-    &linkage_unit::generate_klasses_klass_funcs_box($scope, $col, $klass_path, $klass_name);
+    &linkage_unit::generate_klasses_klass_funcs_box($ast, $col, $klass_path, $klass_name);
   }
   &set_global_scratch_str_ref($original_scratch_str_ref);
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses {
-  my ($scope, $ordered_klass_names) = @_;
+  my ($ast, $ordered_klass_names) = @_;
   my $col = '';
   my $klass_path = [];
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
@@ -2728,7 +2728,7 @@ sub linkage_unit::generate_klasses {
       $max_width = $width;
     }
   }
-  &linkage_unit::generate_klasses_types_before($scope, $col, $klass_path, $ordered_klass_names);
+  &linkage_unit::generate_klasses_types_before($ast, $col, $klass_path, $ordered_klass_names);
   if (&is_decl()) {
     $$scratch_str_ref .=
       $nl .
@@ -2736,22 +2736,22 @@ sub linkage_unit::generate_klasses {
       $nl;
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots" . '-' . &suffix());
-  &linkage_unit::generate_klasses_types_after($scope, $col, $klass_path, $ordered_klass_names);
+  &linkage_unit::generate_klasses_types_after($ast, $col, $klass_path, $ordered_klass_names);
 
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-vars" . '-' . &suffix());
   my $sorted_klass_names = [sort @$ordered_klass_names];
   my $num_lns = @$sorted_klass_names;
   while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
-    &linkage_unit::generate_klasses_klass_vars($scope, $col, $klass_path, $klass_name, $max_width, &should_ann($ln, $num_lns));
+    &linkage_unit::generate_klasses_klass_vars($ast, $col, $klass_path, $klass_name, $max_width, &should_ann($ln, $num_lns));
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs-non-inline" . '-' . &suffix());
   while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
-    &linkage_unit::generate_klasses_klass_funcs_non_inline($scope, $col, $klass_path, $klass_name, $max_width);
+    &linkage_unit::generate_klasses_klass_funcs_non_inline($ast, $col, $klass_path, $klass_name, $max_width);
   }
   return $$scratch_str_ref;
 }
 sub linkage_unit::generate_klasses_types_before {
-  my ($scope, $col, $klass_path, $ordered_klass_names) = @_;
+  my ($ast, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   if (&is_decl()) {
     my $max_width1 = 0;
@@ -2774,15 +2774,15 @@ sub linkage_unit::generate_klasses_types_before {
       my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
 
       if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
-        &generate_exported_slots_decls($scope, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2);
+        &generate_exported_slots_decls($ast, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2);
       } else {
-        &generate_slots_decls($scope, $col, $klass_path, $klass_name, $klass_scope);
+        &generate_slots_decls($ast, $col, $klass_path, $klass_name, $klass_scope);
       }
     }
   }
 }
 sub linkage_unit::generate_klasses_types_after {
-  my ($scope, $col, $klass_path, $ordered_klass_names) = @_;
+  my ($ast, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   foreach my $klass_name (@$ordered_klass_names) { # do not sort!
     my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
@@ -2849,7 +2849,7 @@ sub linkage_unit::generate_klasses_types_after {
   }
 }
 sub linkage_unit::generate_klasses_klass_vars {
-  my ($scope, $col, $klass_path, $klass_name, $max_width, $should_ann) = @_;
+  my ($ast, $col, $klass_path, $klass_name, $max_width, $should_ann) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
@@ -2858,7 +2858,7 @@ sub linkage_unit::generate_klasses_klass_vars {
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs_klass {
-  my ($scope, $col, $klass_path, $klass_name) = @_;
+  my ($ast, $col, $klass_path, $klass_name) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
@@ -2867,7 +2867,7 @@ sub linkage_unit::generate_klasses_klass_funcs_klass {
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs_box {
-  my ($scope, $col, $klass_path, $klass_name) = @_;
+  my ($ast, $col, $klass_path, $klass_name) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
@@ -2876,7 +2876,7 @@ sub linkage_unit::generate_klasses_klass_funcs_box {
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs {
-  my ($scope, $col, $klass_path, $klass_name) = @_;
+  my ($ast, $col, $klass_path, $klass_name) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
@@ -2885,7 +2885,7 @@ sub linkage_unit::generate_klasses_klass_funcs {
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs_non_inline {
-  my ($scope, $col, $klass_path, $klass_name, $max_width) = @_;
+  my ($ast, $col, $klass_path, $klass_name, $max_width) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
   my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
@@ -3872,13 +3872,13 @@ sub generate_kw_args_method_defn {
   #&path::remove_last($klass_name);
 }
 sub dk_generate_cc_footer {
-  my ($scope) = @_;
+  my ($ast) = @_;
   my $stack = [];
   my $col = '';
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &dk_generate_kw_arg_method_defns($scope, $stack, 'trait', $col);
-  &dk_generate_kw_arg_method_defns($scope, $stack, 'klass', $col);
+  &dk_generate_kw_arg_method_defns($ast, $stack, 'trait', $col);
+  &dk_generate_kw_arg_method_defns($ast, $stack, 'klass', $col);
 
   if (&is_target_defn()) {
     my $num_klasses = scalar @$global_klass_defns;
@@ -3888,12 +3888,12 @@ sub dk_generate_cc_footer {
     } else {
       $$scratch_str_ref .= &generate_target_runtime_info_seq('klass-defns', [sort @$global_klass_defns], $col, __LINE__);
     }
-    if (0 == keys %{$$scope{'interposers'}}) {
+    if (0 == keys %{$$ast{'interposers'}}) {
       $$scratch_str_ref .= $nl;
       $$scratch_str_ref .= $col . "static property-t* interposers = nullptr;" . &ann(__FILE__, __LINE__) . $nl;
     } else {
-      #print STDERR Dumper $$scope{'interposers'};
-      my $interposers = &many_1_to_1_from_1_to_many($$scope{'interposers'});
+      #print STDERR Dumper $$ast{'interposers'};
+      my $interposers = &many_1_to_1_from_1_to_many($$ast{'interposers'});
       #print STDERR Dumper $interposers;
 
       $$scratch_str_ref .= $col . "static property-t interposers[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
@@ -3912,13 +3912,13 @@ sub dk_generate_cc_footer {
   return $$scratch_str_ref;
 }
 sub dk_generate_kw_arg_method_defns {
-  my ($scope, $stack, $klass_type, $col) = @_;
+  my ($ast, $stack, $klass_type, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  while (my ($klass_name, $klass_scope) = each(%{$$scope{$$plural_from_singular{$klass_type}}})) {
+  while (my ($klass_name, $klass_scope) = each(%{$$ast{$$plural_from_singular{$klass_type}}})) {
     if ($klass_scope && 0 < keys(%$klass_scope)) { #print STDERR &Dumper($klass_scope);
       &path::add_last($stack, $klass_name);
       if (&is_target_defn()) {
-        &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$scope{'symbols'});
+        &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$ast{'symbols'});
       } else {
         &generate_kw_arg_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
         &generate_kw_arg_method_defns($$klass_scope{'slots'}, $$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
@@ -3978,32 +3978,32 @@ sub almost_symbol {
   return $ident;
 }
 sub linkage_unit::generate_symbols {
-  my ($file, $symbols) = @_;
+  my ($ast, $symbols) = @_;
   my $col = '';
 
   while (my ($symbol, $symbol_seq) = each(%$symbols)) {
     my $ident_symbol = &dk_mangle_seq($symbol_seq);
     $$symbols{$symbol} = $ident_symbol;
   }
-  foreach my $symbol (keys %{$$file{'symbols'}}) {
-    &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol);
+  foreach my $symbol (keys %{$$ast{'symbols'}}) {
+    &add_symbol_to_ident_symbol($$ast{'symbols'}, $symbols, $symbol);
   }
   foreach my $klass_type ('klasses', 'traits') {
-    foreach my $symbol (keys %{$$file{$klass_type}}) {
-      &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $$file{$klass_type}{$symbol}{'module'});
+    foreach my $symbol (keys %{$$ast{$klass_type}}) {
+      &add_symbol_to_ident_symbol($$ast{'symbols'}, $symbols, $$ast{$klass_type}{$symbol}{'module'});
 
       if (!exists $$symbols{$symbol}) {
-        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $symbol);
+        &add_symbol_to_ident_symbol($$ast{'symbols'}, $symbols, $symbol);
       }
       my $slots = "$symbol\::slots-t";
 
       if (!exists $$symbols{$slots}) {
-        #&add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $slots);
+        #&add_symbol_to_ident_symbol($$ast{'symbols'}, $symbols, $slots);
       }
       my $klass_typealias = "$symbol-t";
 
       if (!exists $$symbols{$klass_typealias}) {
-        &add_symbol_to_ident_symbol($$file{'symbols'}, $symbols, $klass_typealias);
+        &add_symbol_to_ident_symbol($$ast{'symbols'}, $symbols, $klass_typealias);
       }
     }
   }
@@ -4053,11 +4053,11 @@ sub ident_comment {
   return $result;
 }
 sub linkage_unit::generate_keywords {
-  my ($file) = @_;
+  my ($ast) = @_;
   my $col = '';
 
   my ($symbol, $symbol_seq);
-  my $symbol_keys = [sort symbol::compare keys %{$$file{'keywords'}}];
+  my $symbol_keys = [sort symbol::compare keys %{$$ast{'keywords'}}];
   my $max_width = 0;
   foreach $symbol (@$symbol_keys) {
     $symbol =~ s/^#//;
@@ -4094,12 +4094,12 @@ sub linkage_unit::generate_keywords {
   return $scratch_str;
 }
 sub linkage_unit::generate_strs {
-  my ($file) = @_;
+  my ($ast) = @_;
   my $scratch_str = "";
   my $col = '';
   $scratch_str .= $col . "namespace __literal::__str {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
-  foreach my $str (sort keys %{$$file{'literal-strs'}}) {
+  foreach my $str (sort keys %{$$ast{'literal-strs'}}) {
     my $str_ident = &dk_mangle($str);
     if (&is_decl()) {
       $scratch_str .= $col . "extern object-t $str_ident; // \"$str\"" . $nl;
@@ -4112,16 +4112,16 @@ sub linkage_unit::generate_strs {
   return $scratch_str;
 }
 sub linkage_unit::generate_target_runtime_strs_seq {
-  my ($file) = @_;
+  my ($target_ast) = @_;
   my $scratch_str = "";
   my $col = '';
-  if (0 == scalar keys %{$$file{'literal-strs'}}) {
+  if (0 == scalar keys %{$$target_ast{'literal-strs'}}) {
     $scratch_str .= $col . "//static str-t const __str-literals[] = { nullptr }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $scratch_str .= $col . "//static object-t* __str-ptrs[] = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
     $scratch_str .= $col . "static str-t const __str-literals[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $str (sort keys %{$$file{'literal-strs'}}) {
+    foreach my $str (sort keys %{$$target_ast{'literal-strs'}}) {
       $scratch_str .= $col . "\"$str\"," . $nl;
     }
     $scratch_str .= $col . "nullptr" . $nl;
@@ -4130,7 +4130,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
 
     $scratch_str .= $col . "static symbol-t __str-names[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $str (sort keys %{$$file{'literal-strs'}}) {
+    foreach my $str (sort keys %{$$target_ast{'literal-strs'}}) {
       my $ident = &dk_mangle($str);
       $scratch_str .= $col . "__symbol::$ident," . $nl;
     }
@@ -4140,7 +4140,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
 
     $scratch_str .= $col . "static assoc-node-t __str-ptrs[] = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $str (sort keys %{$$file{'literal-strs'}}) {
+    foreach my $str (sort keys %{$$target_ast{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
       $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__str::$str_ident }," . $nl;
     }
@@ -4151,12 +4151,12 @@ sub linkage_unit::generate_target_runtime_strs_seq {
   return $scratch_str;
 }
 sub linkage_unit::generate_ints {
-  my ($file) = @_;
+  my ($ast) = @_;
   my $scratch_str = "";
   my $col = '';
   $scratch_str .= $col . "namespace __literal::__int {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
-  foreach my $int (sort keys %{$$file{'literal-ints'}}) {
+  foreach my $int (sort keys %{$$ast{'literal-ints'}}) {
     my $int_ident = &dk_mangle($int);
     if (&is_decl()) {
       $scratch_str .= $col . "extern object-t $int_ident;" . $nl;
@@ -4169,16 +4169,16 @@ sub linkage_unit::generate_ints {
   return $scratch_str;
 }
 sub linkage_unit::generate_target_runtime_ints_seq {
-  my ($file) = @_;
+  my ($target_ast) = @_;
   my $scratch_str = "";
   my $col = '';
-  if (0 == scalar keys %{$$file{'literal-ints'}}) {
+  if (0 == scalar keys %{$$target_ast{'literal-ints'}}) {
     $scratch_str .= $col . "//static intptr-t const __int-literals[] = { 0 }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $scratch_str .= $col . "//static object-t* __int-ptrs[] = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
     $scratch_str .= $col . "static intptr-t const __int-literals[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $int (sort keys %{$$file{'literal-ints'}}) {
+    foreach my $int (sort keys %{$$target_ast{'literal-ints'}}) {
       $scratch_str .= $col . "$int," . $nl;
     }
     $scratch_str .= $col . "0 // nullptr" . $nl;
@@ -4187,7 +4187,7 @@ sub linkage_unit::generate_target_runtime_ints_seq {
 
     $scratch_str .= $col . "static symbol-t __int-names[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $int (sort keys %{$$file{'literal-ints'}}) {
+    foreach my $int (sort keys %{$$target_ast{'literal-ints'}}) {
       my $ident = &dk_mangle($int);
       $scratch_str .= $col . "__symbol::$ident," . $nl;
     }
@@ -4197,7 +4197,7 @@ sub linkage_unit::generate_target_runtime_ints_seq {
 
     $scratch_str .= $col . "static assoc-node-t __int-ptrs[] = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $int (sort keys %{$$file{'literal-ints'}}) {
+    foreach my $int (sort keys %{$$target_ast{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
       $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__int::$int_ident }," . $nl;
     }
@@ -4299,7 +4299,7 @@ sub pad {
   return $result_str;
 }
 sub dk_generate_cc {
-  my ($file, $path_name, $project_ast) = @_;
+  my ($file, $path_name, $target_inputs_ast) = @_;
   my ($dir, $file_basename) = &split_path($file);
   my $filestr = &filestr_from_file($file);
   my $output = $path_name =~ s/\.dk$/\.$cc_ext/r;
@@ -4313,17 +4313,17 @@ sub dk_generate_cc {
   my $remove;
 
   if ($ENV{'DK_NO_LINE'}) {
-    &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1, $project_ast);
+    &write_to_file_converted_strings("$output", [ $filestr ], $remove = 1, $target_inputs_ast);
   } else {
     if ($ENV{'DK_ABS_PATH'}) {
       my $cwd = &getcwd();
       &write_to_file_converted_strings("$output", [ "# line 1 \"$cwd/$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
                                                     $filestr ],
-                                       $remove = 1, $project_ast);
+                                       $remove = 1, $target_inputs_ast);
     } else {
       &write_to_file_converted_strings("$output", [ "# line 1 \"$file_basename\"" . &ann(__FILE__, __LINE__) . $nl,
                                                     $filestr ],
-                                       $remove = 1, $project_ast);
+                                       $remove = 1, $target_inputs_ast);
     }
   }
 }
@@ -4333,8 +4333,8 @@ sub start {
     my $filestr = &filestr_from_file($in_path);
     my $path;
     my $remove;
-    my $project_ast;
-    &write_to_file_converted_strings($path = undef, [ $filestr ], $remove = undef, $project_ast = undef);
+    my $target_inputs_ast;
+    &write_to_file_converted_strings($path = undef, [ $filestr ], $remove = undef, $target_inputs_ast = undef);
   }
 }
 unless (caller) {

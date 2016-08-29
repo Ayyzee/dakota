@@ -131,7 +131,7 @@ our @EXPORT= qw(
                  add_str
                  add_symbol
                  add_trait_decl
-                 ast_tree_from_dk_path
+                 ast_from_dk_path
                  cc_path_from_dk_path
                  ctlg_path_from_so_path
                  dk_path_from_cc_path
@@ -139,7 +139,7 @@ our @EXPORT= qw(
                  init_ast_from_inputs_vars
                  hh_path_from_cc_path
                  hh_path_from_src_path
-                 global_target_ast
+                 target_inputs_ast
                  kw_args_translate
                  o_path_from_dk_path
                  o_path_from_cc_path
@@ -170,22 +170,22 @@ sub maybe_add_exported_header_for_symbol_seq {
   }
 }
 sub kw_args_translate {
-  my ($parse_tree) = @_;
-  my $keys = [sort keys %{$$parse_tree{'generics'}}];
+  my ($ast) = @_;
+  my $keys = [sort keys %{$$ast{'generics'}}];
   foreach my $generic (@$keys) {
     my $va_generic = $generic;
 
     if ($generic =~ s/^va:://) {
-      delete $$parse_tree{'generics'}{$va_generic};
-      $$parse_tree{'generics'}{$generic} = undef;
+      delete $$ast{'generics'}{$va_generic};
+      $$ast{'generics'}{$generic} = undef;
     }
   }
 
   my $constructs = [ 'klasses', 'traits' ];
   foreach my $construct (@$constructs) {
     my ($name, $scope);
-    if ($$parse_tree{$construct}) {
-      while (($name, $scope) = each %{$$parse_tree{$construct}}) {
+    if ($$ast{$construct}) {
+      while (($name, $scope) = each %{$$ast{$construct}}) {
         foreach my $method (values %{$$scope{'methods'}}, values %{$$scope{'slots-methods'}}) {
           if ('va' eq $$method{'name'}[0]) {
             &remove_name_va_scope($method);
@@ -238,7 +238,7 @@ sub kw_args_translate {
       }
     }
   }
-  return $parse_tree;
+  return $ast;
 }
 sub update_to_kw_args {
   my ($method) = @_;
@@ -294,12 +294,13 @@ sub _ast_merge { # recursive
 }
 sub ast_merge {
   my ($argv) = @_;
-  my $root_ref = {};
+  #print STDERR 'ast_merge(): ' . &Dumper($argv);
+  my $ast = {};
   foreach my $file (@$argv) {
-    my $parse_tree = &scalar_from_file($file);
-    &_ast_merge($root_ref, $parse_tree);
+    my $file_ast = &scalar_from_file($file);
+    &_ast_merge($ast, $file_ast);
   }
-  return $root_ref;
+  return $ast;
 }
 
 my $gbl_sst = undef;
@@ -1861,36 +1862,36 @@ sub method {
   }
   return;
 }
-my $_global_target_ast;
-sub global_target_ast {
+my $_target_inputs_ast;
+sub target_inputs_ast {
   my ($asts, $is_precompile) = @_;
-  return $_global_target_ast if $_global_target_ast;
-  my $global_target_ast_path = &target_builddir() . '/target-global.ast';
-  if ($is_precompile && -e $global_target_ast_path) {
-    $_global_target_ast = &scalar_from_file($global_target_ast_path);
-    return $_global_target_ast;
+  return $_target_inputs_ast if $_target_inputs_ast;
+  my $target_inputs_ast_path = &target_builddir() . '/target-inputs.ast';
+  if ($is_precompile && -e $target_inputs_ast_path) {
+    $_target_inputs_ast = &scalar_from_file($target_inputs_ast_path);
+    return $_target_inputs_ast;
   }
   die if !$asts;
-  if (0) { print STDERR "global_target_ast()" . $nl; }
+  if (0) { print STDERR "target_inputs_ast()" . $nl; }
   #my $reinit = 0;
-  #if ($_global_target_ast) { $reinit = 1; }
-  #if ($reinit) { print STDERR &Dumper([keys %{$$_global_target_ast{'klasses'}}]); }
-  $_global_target_ast = &ast_merge($asts);
-  $_global_target_ast = &kw_args_translate($_global_target_ast);
-  &scalar_to_file($global_target_ast_path, $_global_target_ast);
-  #if ($reinit) { print STDERR &Dumper([keys %{$$_global_target_ast{'klasses'}}]); }
-  return $_global_target_ast;
+  #if ($_target_inputs_ast) { $reinit = 1; }
+  #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
+  $_target_inputs_ast = &ast_merge($asts);
+  $_target_inputs_ast = &kw_args_translate($_target_inputs_ast);
+  &scalar_to_file($target_inputs_ast_path, $_target_inputs_ast);
+  #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
+  return $_target_inputs_ast;
 }
 sub generics::klass_type_from_klass_name { ###
   my ($klass_name) = @_;
-  my $global_target_ast = &global_target_ast();
+  my $target_inputs_ast = &target_inputs_ast();
   my $cmd_info = &root_cmd();
   my $klass_type;
 
   if (0) {
-  } elsif ($$global_target_ast{'klasses'}{$klass_name}) {
+  } elsif ($$target_inputs_ast{'klasses'}{$klass_name}) {
     $klass_type = 'klass';
-  } elsif ($$global_target_ast{'traits'}{$klass_name}) {
+  } elsif ($$target_inputs_ast{'traits'}{$klass_name}) {
     $klass_type = 'trait';
   } elsif ($$cmd_info{'opts'}{'precompile'}) {
     $klass_type = 'klass||trait';
@@ -1904,16 +1905,16 @@ sub generics::klass_type_from_klass_name { ###
 }
 sub generics::klass_scope_from_klass_name {
   my ($klass_name, $type) = @_; # $type currently unused (should be 'klasses' or 'traits')
-  my $global_target_ast = &global_target_ast();
+  my $target_inputs_ast = &target_inputs_ast();
   my $cmd_info = &root_cmd();
   my $klass_scope;
 
   # should use $type
   if (0) {
-  } elsif ($$global_target_ast{'klasses'}{$klass_name}) {
-    $klass_scope = $$global_target_ast{'klasses'}{$klass_name};
-  } elsif ($$global_target_ast{'traits'}{$klass_name}) {
-    $klass_scope = $$global_target_ast{'traits'}{$klass_name};
+  } elsif ($$target_inputs_ast{'klasses'}{$klass_name}) {
+    $klass_scope = $$target_inputs_ast{'klasses'}{$klass_name};
+  } elsif ($$target_inputs_ast{'traits'}{$klass_name}) {
+    $klass_scope = $$target_inputs_ast{'traits'}{$klass_name};
   } elsif ($$cmd_info{'opts'}{'precompile'}) {
     $klass_scope = {};
   } else {
@@ -2000,15 +2001,15 @@ sub add_indirect_klasses {
   }
 }
 sub generics::parse {
-  my ($parse_tree) = @_;
-  my $klass_names_set = &dk_klass_names_from_file($parse_tree);
+  my ($ast) = @_;
+  my $klass_names_set = &dk_klass_names_from_file($ast);
   my $klass_name;
   my $generics;
   my $symbols = {};
   my $generics_tbl = {};
   my $big_cahuna = [];
 
-  my $generics_used = $$parse_tree{'generics'};
+  my $generics_used = $$ast{'generics'};
   # used in catch() rewrites
   #    $$generics_used{'instance?'} = undef; # hopefully the rhs is undef, otherwise we just lost it
 
@@ -2261,13 +2262,13 @@ sub add_object_methods_decls_to_klass {
   }
 }
 sub add_object_methods_decls {
-  my ($root) = @_;
-  #print STDERR &Dumper($root);
+  my ($ast) = @_;
+  #print STDERR &Dumper($ast);
 
   foreach my $construct ('klasses', 'traits') {
-    if (exists $$root{$construct}) {
+    if (exists $$ast{$construct}) {
       while (my ($klass_name, $klass_scope) =
-               each (%{$$root{$construct}})) {
+               each (%{$$ast{$construct}})) {
         &add_object_methods_decls_to_klass($klass_scope,
                                            'methods',
                                            'slots-methods');
@@ -2275,7 +2276,7 @@ sub add_object_methods_decls {
     }
   }
 }
-sub ast_tree_from_dk_path {
+sub ast_from_dk_path {
   my ($arg) = @_;
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);

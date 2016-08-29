@@ -201,11 +201,11 @@ sub loop_merged_ast_from_inputs {
   if ($$cmd_info{'asts'}) {
     $ast_files = $$cmd_info{'asts'};
   }
-  my $root;
+  my $ast;
   my $root_ast_path;
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_dk_src_path($input)) {
-      $root = &ast_tree_from_dk_path($input);
+      $ast = &ast_from_dk_path($input);
       my $ast_path;
       if (&is_dk_path($input)) {
         $ast_path = &ast_path_from_dk_path($input);
@@ -218,7 +218,7 @@ sub loop_merged_ast_from_inputs {
       $root_ast_path = $ast_path;
       &add_last($ast_files, $ast_path); # _from_dk_src_path
     } elsif (&is_ast_path($input)) {
-      $root = &scalar_from_file($input);
+      $ast = &scalar_from_file($input);
       $root_ast_path = $input;
       &add_last($ast_files, $input);
     } else {
@@ -227,7 +227,7 @@ sub loop_merged_ast_from_inputs {
   }
   if ($$cmd_info{'opts'}{'output'} && !exists $$cmd_info{'opts'}{'ctlg'}) {
     if (1 == @{$$cmd_info{'inputs'}}) {
-      &scalar_to_file($$cmd_info{'opts'}{'output'}, $root);
+      &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     } elsif (1 < @{$$cmd_info{'inputs'}}) {
       my $ast = &ast_merge($ast_files);
       &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
@@ -235,19 +235,19 @@ sub loop_merged_ast_from_inputs {
   }
 } # loop_merged_ast_from_inputs
 sub add_visibility_file {
-  my ($arg) = @_;
-  #print STDERR "&add_visibility_file(path=\"$arg\")\n";
-  my $root = &scalar_from_file($arg);
-  &add_visibility($root);
-  &scalar_to_file($arg, $root);
+  my ($ast_path) = @_;
+  #print STDERR "&add_visibility_file(path=\"$ast_path\")\n";
+  my $ast = &scalar_from_file($ast_path);
+  &add_visibility($ast);
+  &scalar_to_file($ast_path, $ast);
 }
 my $debug_exported = 0;
 sub add_visibility {
-  my ($root) = @_;
+  my ($ast) = @_;
   my $debug = 0;
-  my $names = [keys %{$$root{'modules'}}];
+  my $names = [keys %{$$ast{'modules'}}];
   foreach my $name (@$names) {
-    my $tbl = $$root{'modules'}{$name}{'export'};
+    my $tbl = $$ast{'modules'}{$name}{'export'};
     my $strs = [sort keys %$tbl];
     foreach my $str (@$strs) {
       $str =~ s/\s*;\s*$//;
@@ -259,30 +259,30 @@ sub add_visibility {
         my ($klass_type, $klass_name, $type_name) = ($2, $3, $4);
         # klass slots
         if ($debug) { print STDERR "$klass_type    slots:  $klass_name|$type_name\n"; }
-        if ($$root{'klasses'}{$klass_name} &&
-            $$root{'klasses'}{$klass_name}{'slots'} &&
-            $$root{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
-          $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = 1;
+        if ($$ast{'klasses'}{$klass_name} &&
+            $$ast{'klasses'}{$klass_name}{'slots'} &&
+            $$ast{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
+          $$ast{'klasses'}{$klass_name}{'slots'}{'exported?'} = 1;
           if ($debug_exported) {
-            $$root{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
+            $$ast{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
           }
         }
       } elsif ($str =~ /^((klass|trait)\s+)?($rid)$/) {
         my ($klass_type, $klass_name) = ($2, $3);
         # klass/trait
         if ($debug) { print STDERR "klass-type: <$klass_type>:        klass-name: <$klass_name>\n"; }
-        if ($$root{'klasses'}{$klass_name} &&
-            $$root{'klasses'}{$klass_name}{'module'} &&
-            $$root{'klasses'}{$klass_name}{'module'} eq $name) {
-          $$root{'klasses'}{$klass_name}{'exported?'} = 1;
+        if ($$ast{'klasses'}{$klass_name} &&
+            $$ast{'klasses'}{$klass_name}{'module'} &&
+            $$ast{'klasses'}{$klass_name}{'module'} eq $name) {
+          $$ast{'klasses'}{$klass_name}{'exported?'} = 1;
           if ($debug_exported) {
-            $$root{'klasses'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+            $$ast{'klasses'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
           }
         }
-        if ($$root{'traits'}{$klass_name}) {
-          $$root{'traits'}{$klass_name}{'exported?'} = 1;
+        if ($$ast{'traits'}{$klass_name}) {
+          $$ast{'traits'}{$klass_name}{'exported?'} = 1;
           if ($debug_exported) {
-            $$root{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+            $$ast{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
           }
         }
       } elsif ($str =~ /^((klass|trait)\s+)?($rid)::($msig)$/) {
@@ -290,11 +290,11 @@ sub add_visibility {
         # klass/trait method
         if ($debug) { print STDERR "$klass_type method $klass_name:$method_name\n"; }
         foreach my $constructs ('klasses', 'traits') {
-          if ($$root{$constructs}{$klass_name} &&
-              $$root{$constructs}{$klass_name}{'module'} eq $name) {
+          if ($$ast{$constructs}{$klass_name} &&
+              $$ast{$constructs}{$klass_name}{'module'} eq $name) {
             foreach my $method_type ('slots-methods', 'methods') {
-              if ($debug) { print STDERR &Dumper($$root{$constructs}{$klass_name}); }
-              while (my ($sig, $scope) = each (%{$$root{$constructs}{$klass_name}{$method_type}})) {
+              if ($debug) { print STDERR &Dumper($$ast{$constructs}{$klass_name}); }
+              while (my ($sig, $scope) = each (%{$$ast{$constructs}{$klass_name}{$method_type}})) {
                 my $sig_min = &sig1($scope);
                 if ($method_name =~ m/\(\)$/) {
                   $sig_min =~ s/\(.*?\)$/\(\)/;
@@ -444,9 +444,9 @@ sub target_generic_func_defns_path {
 sub dk_parse {
   my ($dk_path) = @_; # string.dk
   my $ast_path = &ast_path_from_dk_path($dk_path);
-  my $file = &scalar_from_file($ast_path);
-  $file = &kw_args_translate($file);
-  return $file;
+  my $ast = &scalar_from_file($ast_path);
+  $ast = &kw_args_translate($ast);
+  return $ast;
 }
 sub loop_cc_from_dk {
   my ($cmd_info, $should_echo) = @_;
@@ -471,7 +471,7 @@ sub loop_cc_from_dk {
   $$cmd_info{'asts'} = $ast;
   $$cmd_info{'inputs'} = $inputs;
 
-  my $global_target_ast = &global_target_ast($$cmd_info{'asts'}); # within loop_cc_from_dk
+  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within loop_cc_from_dk
   my $num_inputs = @{$$cmd_info{'inputs'}};
   if (0 == $num_inputs) {
     die "$0: error: arguments are requried\n";
@@ -490,7 +490,7 @@ sub loop_cc_from_dk {
     }
 
     my ($input_dir, $input_name) = &split_path($input, $id);
-    my $file = &dk_parse($input);
+    my $file_ast = &dk_parse($input);
     my $cc_path;
     if ($$cmd_info{'opts'}{'output'}) {
       $cc_path = $$cmd_info{'opts'}{'output'};
@@ -502,15 +502,15 @@ sub loop_cc_from_dk {
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
     &empty_klass_defns();
-    &dk_generate_cc($input, $inc_path, $global_target_ast);
-    &src::add_extra_symbols($file);
-    &src::add_extra_klass_decls($file);
-    &src::add_extra_keywords($file);
-    &src::add_extra_generics($file);
+    &dk_generate_cc($input, $inc_path, $target_inputs_ast);
+    &src::add_extra_symbols($file_ast);
+    &src::add_extra_klass_decls($file_ast);
+    &src::add_extra_keywords($file_ast);
+    &src::add_extra_generics($file_ast);
     my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
 
-    &generate_src_decl($cc_path, $file, $global_target_ast, $rel_target_hh_path);
-    &generate_src_defn($cc_path, $file, $global_target_ast, $rel_target_hh_path); # rel_target_hh_path not used
+    &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_hh_path);
+    &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_hh_path); # rel_target_hh_path not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -720,7 +720,7 @@ sub start_cmd {
     }
     return $exit_status;
   }
-  &set_global_project_ast($target_ast_path);
+  &set_target_ast($target_ast_path);
 
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
@@ -1135,30 +1135,30 @@ sub target_from_ast {
     return if !&is_out_of_date($target_ast_path, $target_hh_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
-  my ($path, $file_basename, $file) = ($target_cc_path, $target_cc_path, undef);
+  my ($path, $file_basename, $target_ast) = ($target_cc_path, $target_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
-  # $global_target_ast not used, called for side-effect
-  my $global_target_ast = &global_target_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_o_from_ast
-  $file = &scalar_from_file($target_ast_path);
-  die if $$file{'other'};
-  $$file{'other'} = $other;
-  $file = &kw_args_translate($file);
-  $$file{'should-generate-make'} = 1;
+  # $target_inputs_ast not used, called for side-effect
+  my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_o_from_ast
+  $target_ast = &scalar_from_file($target_ast_path);
+  die if $$target_ast{'other'};
+  $$target_ast{'other'} = $other;
+  $target_ast = &kw_args_translate($target_ast);
+  $$target_ast{'should-generate-make'} = 1;
 
-  &target::add_extra_symbols($file);
-  &target::add_extra_klass_decls($file);
-  &target::add_extra_keywords($file);
+  &target::add_extra_symbols($target_ast);
+  &target::add_extra_klass_decls($target_ast);
+  &target::add_extra_keywords($target_ast);
 
-  &src::add_extra_symbols($file);
-  &src::add_extra_klass_decls($file);
-  &src::add_extra_keywords($file);
-  &src::add_extra_generics($file);
+  &src::add_extra_symbols($target_ast);
+  &src::add_extra_klass_decls($target_ast);
+  &src::add_extra_keywords($target_ast);
+  &src::add_extra_generics($target_ast);
 
-  my $project_ast;
-  &generate_target_decl($target_cc_path, $file, $project_ast = undef, $is_exe);
+  #my $target_inputs_ast;
+  &generate_target_decl($target_cc_path, $target_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
   if ($is_defn) {
-    &generate_target_defn($target_cc_path, $file, $project_ast = undef, $is_exe);
+    &generate_target_defn($target_cc_path, $target_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
     &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
 
