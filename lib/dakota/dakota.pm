@@ -382,18 +382,17 @@ sub sig1 {
 }
 sub target_srcs_ast_path {
   my ($cmd_info) = @_;
-  my $target_srcs_ast_path = &target_cc_path($cmd_info) =~ s/target\.$cc_ext$/srcs.ast/r;
+  my $target_srcs_ast_path = &target_builddir() . '/srcs.ast';
   return $target_srcs_ast_path;
 }
 sub target_hh_path {
   my ($cmd_info) = @_;
-  my $target_cc_path = &target_cc_path($cmd_info);
-  my $target_hh_path = $target_cc_path =~ s/\.$cc_ext$/.$hh_ext/r;
+  my $target_hh_path = &target_builddir() . '/target.' . $hh_ext;
   return $target_hh_path;
 }
 sub target_cc_path {
   my ($cmd_info) = @_;
-  my $target_cc_path = &target_builddir . '/target.' . $cc_ext;
+  my $target_cc_path = &target_builddir() . '/target.' . $cc_ext;
   return $target_cc_path;
 }
 sub target_o_path {
