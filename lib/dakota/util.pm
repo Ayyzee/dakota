@@ -377,11 +377,11 @@ sub as_literal_symbol {
   }
   return $result;
 }
-my $trans_tbl = { '?' => 'qq',
-                  '!' => 'jj' };
+my $legal_last_chars = { '?' => 'qq',
+                         '!' => 'jj' };
 sub encode_char {
   my ($char) = @_;
-  my $val = $$trans_tbl{$char};
+  my $val = $$legal_last_chars{$char};
   if ($val) {
     return $val;
   }
@@ -425,7 +425,6 @@ sub dk_mangle {
     }
     &add_last($ident_symbol, $part);
   }
-  my $legal_last_chars = { '?' => 1, '!' => 1 };
   if ($num_encoded && ! (1 == $num_encoded && $$legal_last_chars{$last_encoded_char})) {
     if (1) {
       &add_first($ident_symbol, '_');
