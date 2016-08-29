@@ -455,20 +455,20 @@ sub loop_cc_from_dk {
       $$cmd_info{'opts'}{'output'} . ' ' . join(' ', @{$$cmd_info{'inputs'}}) . $nl;
   }
   my $inputs = [];
-  my $ast;
+  my $asts;
   if ($$cmd_info{'asts'}) {
-    $ast = $$cmd_info{'asts'};
+    $asts = $$cmd_info{'asts'};
   } else {
-    $ast = [];
+    $asts = [];
   }
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_ast_path($input)) {
-      &add_last($ast, $input);
+      &add_last($asts, $input);
     } else {
       &add_last($inputs, $input);
     }
   }
-  $$cmd_info{'asts'} = $ast;
+  $$cmd_info{'asts'} = $asts;
   $$cmd_info{'inputs'} = $inputs;
 
   my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}); # within loop_cc_from_dk
