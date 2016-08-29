@@ -380,10 +380,10 @@ sub sig1 {
   $result .= ')';
   return $result;
 }
-sub target_ast_path {
+sub target_srcs_ast_path {
   my ($cmd_info) = @_;
-  my $target_ast_path = &target_cc_path($cmd_info) =~ s/\.$cc_ext$/.ast/r;
-  return $target_ast_path;
+  my $target_srcs_ast_path = &target_cc_path($cmd_info) =~ s/target\.$cc_ext$/srcs.ast/r;
+  return $target_srcs_ast_path;
 }
 sub target_hh_path {
   my ($cmd_info) = @_;
@@ -498,7 +498,7 @@ sub loop_cc_from_dk {
     } else {
       $cc_path = "$input_dir/$input_name.$cc_ext";
     }
-    my $target_ast_path = &target_ast_path($cmd_info);
+    my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     my $inc_path = &inc_path_from_dk_path($input);
     my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
     $input = &canon_path($input);
@@ -593,8 +593,8 @@ sub update_kw_arg_generics {
   $$ast{'kw-arg-generics'} = $kw_arg_generics;
   &scalar_to_file($path, $ast);
 }
-sub update_target_ast_from_all_inputs {
-  my ($cmd_info, $target_ast_path) = @_;
+sub update_target_srcs_ast_from_all_inputs {
+  my ($cmd_info, $target_srcs_ast_path) = @_;
   my $start_time = time;
   my $orig = { 'inputs' => $$cmd_info{'inputs'},
                'output' => $$cmd_info{'output'},
@@ -605,14 +605,14 @@ sub update_target_ast_from_all_inputs {
   $$cmd_info{'opts'}{'echo-inputs'} = 0;
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
-  &check_path($target_ast_path);
+  &check_path($target_srcs_ast_path);
   if (&is_debug()) {
-    print STDERR "creating $target_ast_path" . &pann(__FILE__, __LINE__) . $nl;
+    print STDERR "creating $target_srcs_ast_path" . &pann(__FILE__, __LINE__) . $nl;
   }
   $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_inputs($cmd_info);
-  die if $$cmd_info{'asts'}[-1] ne $target_ast_path; # assert
-  &add_visibility_file($target_ast_path);
+  die if $$cmd_info{'asts'}[-1] ne $target_srcs_ast_path; # assert
+  &add_visibility_file($target_srcs_ast_path);
 
   &update_kw_arg_generics($$cmd_info{'asts'});
   $$cmd_info{'inputs'} = $$orig{'inputs'};
@@ -622,7 +622,7 @@ sub update_target_ast_from_all_inputs {
   if (&is_debug()) {
     my $end_time = time;
     my $elapsed_time = $end_time - $start_time;
-    print STDERR "creating $target_ast_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
+    print STDERR "creating $target_srcs_ast_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
   }
   if ($ENV{'DAKOTA_CREATE_REP_ONLY'}) {
     exit 0;
@@ -702,18 +702,18 @@ sub start_cmd {
   if ($should_replace_library_path_with_lib_opts) {
     $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
   }
-  my $target_ast_path = &target_ast_path($cmd_info);
-  my $lock_file = $target_ast_path . '.flock';
-  &make_dir_part($target_ast_path);
+  my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+  my $lock_file = $target_srcs_ast_path . '.flock';
+  &make_dir_part($target_srcs_ast_path);
 
   my $should_lock = 0;
   if ($should_lock) {
     open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
     flock LOCK_FILE, LOCK_EX or die;
   }
-  $cmd_info = &update_target_ast_from_all_inputs($cmd_info, $target_ast_path);
+  $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
   if ($$cmd_info{'opts'}{'parse'}) {
-    print $target_ast_path . $nl;
+    print $target_srcs_ast_path . $nl;
     if ($should_lock) {
       flock LOCK_FILE, LOCK_UN or die;
       close LOCK_FILE or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
@@ -721,7 +721,7 @@ sub start_cmd {
     }
     return $exit_status;
   }
-  &set_target_ast($target_ast_path);
+  &set_target_srcs_ast($target_srcs_ast_path);
 
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
@@ -816,7 +816,7 @@ sub ast_from_so {
 }
 sub loop_ast_from_so {
   my ($cmd_info) = @_;
-  my $target_ast_path = &target_ast_path($cmd_info);
+  my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   foreach my $input (@{$$cmd_info{'inputs'}}) {
     if (&is_so_path($input)) {
       &ast_from_so($cmd_info, $input);
@@ -846,7 +846,7 @@ sub ast_from_inputs {
   my $result = &outfile_from_infiles($ast_cmd, $should_echo = 0);
   if ($result) {
     if (0 != @{$$ast_cmd{'asts'} || []}) {
-      my $target_ast_path = &target_ast_path($cmd_info);
+      my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     }
     foreach my $input (@{$$ast_cmd{'inputs'}}) {
       if (&is_so_path($input)) {
@@ -888,13 +888,13 @@ sub loop_ast_from_inputs {
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'} && !$$cmd_info{'opts'}{'compile'}) {
     if (0 != @$ast_files) {
-      my $target_ast_path = &target_ast_path($cmd_info);
-      &check_path($target_ast_path);
-      &ordered_set_add($$cmd_info{'asts'}, $target_ast_path, __FILE__, __LINE__);
+      my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+      &check_path($target_srcs_ast_path);
+      &ordered_set_add($$cmd_info{'asts'}, $target_srcs_ast_path, __FILE__, __LINE__);
       my $ast_cmd = {
         'opts' =>        $$cmd_info{'opts'},
         'project.io' =>  $$cmd_info{'project.io'},
-        'output' => $target_ast_path,
+        'output' => $target_srcs_ast_path,
         'inputs' => $ast_files,
       };
       &ast_from_inputs($ast_cmd); # multiple inputs
@@ -938,9 +938,9 @@ sub gen_target {
       }
     }
   }
-  my $target_ast_path = &target_ast_path($cmd_info);
-  &check_path($target_ast_path);
-  $$cmd_info{'ast'} = $target_ast_path;
+  my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
+  &check_path($target_srcs_ast_path);
+  $$cmd_info{'ast'} = $target_srcs_ast_path;
   my $flags = $$cmd_info{'opts'}{'compiler-flags'};
   my $other = {};
   if ($dk_exe_type) {
@@ -996,7 +996,7 @@ sub o_from_dk {
     $$cc_cmd{'project.target'} = $$cmd_info{'project.target'};
     $num_out_of_date_infiles = &cc_from_dk($cc_cmd);
     if ($num_out_of_date_infiles) {
-      my $target_ast_path = &target_ast_path($cmd_info);
+      my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     }
     if ($$cmd_info{'opts'}{'precompile'}) {
       $outfile = $$cc_cmd{'output'};
@@ -1120,46 +1120,46 @@ sub target_o_from_ast {
 sub target_from_ast {
   my ($cmd_info, $other, $is_exe, $is_defn) = @_;
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
-  my $target_ast_path = &target_ast_path($cmd_info);
+  my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   my $target_cc_path =  &target_cc_path($cmd_info);
   my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
-  &check_path($target_ast_path);
+  &check_path($target_srcs_ast_path);
   my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
 
   if ($is_defn) {
     if ($$cmd_info{'opts'}{'precompile'}) {
-      return if !&is_out_of_date($target_ast_path, $target_cc_path);
+      return if !&is_out_of_date($target_srcs_ast_path, $target_cc_path);
     } else {
-      return if !&is_out_of_date($target_ast_path, $target_o_path);
+      return if !&is_out_of_date($target_srcs_ast_path, $target_o_path);
     }
   } else {
-    return if !&is_out_of_date($target_ast_path, $target_hh_path);
+    return if !&is_out_of_date($target_srcs_ast_path, $target_hh_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
-  my ($path, $file_basename, $target_ast) = ($target_cc_path, $target_cc_path, undef);
+  my ($path, $file_basename, $target_srcs_ast) = ($target_cc_path, $target_cc_path, undef);
   $path =~ s|/[^/]*$||;
   $file_basename =~ s|^[^/]*/||;       # strip off leading $builddir/
   # $target_inputs_ast not used, called for side-effect
   my $target_inputs_ast = &target_inputs_ast($$cmd_info{'asts'}, $$cmd_info{'precompile'}); # within target_o_from_ast
-  $target_ast = &scalar_from_file($target_ast_path);
-  die if $$target_ast{'other'};
-  $$target_ast{'other'} = $other;
-  $target_ast = &kw_args_translate($target_ast);
-  $$target_ast{'should-generate-make'} = 1;
+  $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
+  die if $$target_srcs_ast{'other'};
+  $$target_srcs_ast{'other'} = $other;
+  $target_srcs_ast = &kw_args_translate($target_srcs_ast);
+  $$target_srcs_ast{'should-generate-make'} = 1;
 
-  &target::add_extra_symbols($target_ast);
-  &target::add_extra_klass_decls($target_ast);
-  &target::add_extra_keywords($target_ast);
+  &target::add_extra_symbols($target_srcs_ast);
+  &target::add_extra_klass_decls($target_srcs_ast);
+  &target::add_extra_keywords($target_srcs_ast);
 
-  &src::add_extra_symbols($target_ast);
-  &src::add_extra_klass_decls($target_ast);
-  &src::add_extra_keywords($target_ast);
-  &src::add_extra_generics($target_ast);
+  &src::add_extra_symbols($target_srcs_ast);
+  &src::add_extra_klass_decls($target_srcs_ast);
+  &src::add_extra_keywords($target_srcs_ast);
+  &src::add_extra_generics($target_srcs_ast);
 
   #my $target_inputs_ast;
-  &generate_target_decl($target_cc_path, $target_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
+  &generate_target_decl($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
   if ($is_defn) {
-    &generate_target_defn($target_cc_path, $target_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
+    &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
     &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
 

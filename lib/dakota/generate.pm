@@ -283,28 +283,28 @@ sub generate_src {
   return $output;
 } # sub generate_src
 sub generate_target_decl {
-  my ($path, $target_ast, $target_inputs_ast, $is_exe) = @_;
+  my ($path, $target_srcs_ast, $target_inputs_ast, $is_exe) = @_;
   #print "generate_target_decl($path, ...)" . $nl;
   &set_target_decl($path);
   if ($is_exe) {
     &set_exe_target($path);
   }
-  return &generate_target($path, $target_ast, $target_inputs_ast);
+  return &generate_target($path, $target_srcs_ast, $target_inputs_ast);
 }
 sub generate_target_defn {
-  my ($path, $target_ast, $target_inputs_ast, $is_exe) = @_;
+  my ($path, $target_srcs_ast, $target_inputs_ast, $is_exe) = @_;
   #print "generate_target_defn($path, ...)" . $nl;
   &set_target_defn($path);
   if ($is_exe) {
     &set_exe_target($path);
   }
-  return &generate_target($path, $target_ast, $target_inputs_ast);
+  return &generate_target($path, $target_srcs_ast, $target_inputs_ast);
 }
 sub generate_target {
-  my ($path, $target_ast, $target_inputs_ast) = @_;
+  my ($path, $target_srcs_ast, $target_inputs_ast) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $dir = '.' if !$dir;
-  my ($generics, $symbols) = &generics::parse($target_ast);
+  my ($generics, $symbols) = &generics::parse($target_srcs_ast);
   my $suffix = &suffix();
   my $output = &canon_path("$dir/$name.$suffix");
   my $start_time;
@@ -320,7 +320,7 @@ sub generate_target {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output_runtime = $ENV{'DKT_DIR'} . '/' . $output_runtime;
     }
-    my $str = &generate_target_runtime($target_ast, $generics);
+    my $str = &generate_target_runtime($target_srcs_ast, $generics);
     my $strings = [ undef,
                     $str ];
     if ($should_write_pre_output) {
@@ -339,7 +339,7 @@ sub generate_target {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output;
     }
-    my $str = &generate_decl_defn($target_ast, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
+    my $str = &generate_decl_defn($target_srcs_ast, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
     my $strings;
     if (&is_decl()) {
       $strings = [ undef,
@@ -542,18 +542,18 @@ sub generate_decl_defn {
   return $str;
 } # generate_decl_defn
 sub generate_target_runtime {
-  my ($target_ast, $generics) = @_;
+  my ($target_srcs_ast, $generics) = @_;
   my $target_cc_str = '';
   my $col = '';
-  my $keys_count = keys %{$$target_ast{'klasses'}};
+  my $keys_count = keys %{$$target_srcs_ast{'klasses'}};
   if (0 == $keys_count) {
     $target_cc_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
     $target_cc_str .= $col . "static assoc-node-t*   imported-klass-ptrs =  nullptr;" . $nl;
   } else {
     $target_cc_str .= $col . "static symbol-t imported-klass-names[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    my $num_klasses = scalar keys %{$$target_ast{'klasses'}};
-    foreach my $klass_name (sort keys %{$$target_ast{'klasses'}}) {
+    my $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
+    foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
       $target_cc_str .= $col . "$klass_name\::__name__," . $nl;
     }
     $target_cc_str .= $col . "nullptr" . $nl;
@@ -562,8 +562,8 @@ sub generate_target_runtime {
     ###
     $target_cc_str .= $col . "static assoc-node-t imported-klass-ptrs[] = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    $num_klasses = scalar keys %{$$target_ast{'klasses'}};
-    foreach my $klass_name (sort keys %{$$target_ast{'klasses'}}) {
+    $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
+    foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
       $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::klass }," . $nl;
     }
     $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
@@ -572,10 +572,10 @@ sub generate_target_runtime {
     $target_cc_str .= &linkage_unit::generate_target_runtime_selectors_seq( $generics);
     $target_cc_str .= &linkage_unit::generate_target_runtime_signatures_seq($generics);
     $target_cc_str .= &linkage_unit::generate_target_runtime_generic_func_ptrs_seq($generics);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_strs_seq($target_ast);
-    $target_cc_str .= &linkage_unit::generate_target_runtime_ints_seq($target_ast);
+    $target_cc_str .= &linkage_unit::generate_target_runtime_strs_seq($target_srcs_ast);
+    $target_cc_str .= &linkage_unit::generate_target_runtime_ints_seq($target_srcs_ast);
 
-    $target_cc_str .= &dk_generate_cc_footer($target_ast);
+    $target_cc_str .= &dk_generate_cc_footer($target_srcs_ast);
   }
   #$target_cc_str .= $col . "extern \"C\$nl;
   #$target_cc_str .= $col . "{" . $nl;
@@ -593,17 +593,17 @@ sub generate_target_runtime {
                   "\#name" => 'name',
                   "\#selectors" =>  'selectors',
                   "\#signatures" => 'signatures',
-                  "\#type" => $$target_ast{'other'}{'type'},
+                  "\#type" => $$target_srcs_ast{'other'}{'type'},
                   "\#va-generic-func-ptrs" => 'va-generic-func-ptrs',
                   "\#va-selectors" =>  'va-selectors',
                   "\#va-signatures" => 'va-signatures',
                  };
-  if (0 < scalar keys %{$$target_ast{'literal-strs'}}) {
+  if (0 < scalar keys %{$$target_srcs_ast{'literal-strs'}}) {
     $$info_tbl{"\#str-literals"} = '__str-literals';
     $$info_tbl{"\#str-names"} =    '__str-names';
     $$info_tbl{"\#str-ptrs"} =     '__str-ptrs';
   }
-  if (0 < scalar keys %{$$target_ast{'literal-ints'}}) {
+  if (0 < scalar keys %{$$target_srcs_ast{'literal-ints'}}) {
     $$info_tbl{"\#int-literals"} = '__int-literals';
     $$info_tbl{"\#int-names"} =    '__int-names';
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
@@ -611,10 +611,10 @@ sub generate_target_runtime {
   $target_cc_str .= $nl;
   $target_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(\"$$target_ast{'other'}{'name'}\");" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(\"$$target_srcs_ast{'other'}{'name'}\");" . $nl;
   $target_cc_str .= $nl;
   #my $col;
-  $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_ast{'symbols'}, __LINE__);
+  $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);
 
   $target_cc_str .= $nl;
   $target_cc_str .= $col . "static func __initial() -> void {" . &ann(__FILE__, __LINE__) . $nl;
@@ -4112,16 +4112,16 @@ sub linkage_unit::generate_strs {
   return $scratch_str;
 }
 sub linkage_unit::generate_target_runtime_strs_seq {
-  my ($target_ast) = @_;
+  my ($target_srcs_ast) = @_;
   my $scratch_str = "";
   my $col = '';
-  if (0 == scalar keys %{$$target_ast{'literal-strs'}}) {
+  if (0 == scalar keys %{$$target_srcs_ast{'literal-strs'}}) {
     $scratch_str .= $col . "//static str-t const __str-literals[] = { nullptr }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $scratch_str .= $col . "//static object-t* __str-ptrs[] = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
     $scratch_str .= $col . "static str-t const __str-literals[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $str (sort keys %{$$target_ast{'literal-strs'}}) {
+    foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
       $scratch_str .= $col . "\"$str\"," . $nl;
     }
     $scratch_str .= $col . "nullptr" . $nl;
@@ -4130,7 +4130,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
 
     $scratch_str .= $col . "static symbol-t __str-names[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $str (sort keys %{$$target_ast{'literal-strs'}}) {
+    foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
       my $ident = &dk_mangle($str);
       $scratch_str .= $col . "__symbol::$ident," . $nl;
     }
@@ -4140,7 +4140,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
 
     $scratch_str .= $col . "static assoc-node-t __str-ptrs[] = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $str (sort keys %{$$target_ast{'literal-strs'}}) {
+    foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
       $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__str::$str_ident }," . $nl;
     }
@@ -4169,16 +4169,16 @@ sub linkage_unit::generate_ints {
   return $scratch_str;
 }
 sub linkage_unit::generate_target_runtime_ints_seq {
-  my ($target_ast) = @_;
+  my ($target_srcs_ast) = @_;
   my $scratch_str = "";
   my $col = '';
-  if (0 == scalar keys %{$$target_ast{'literal-ints'}}) {
+  if (0 == scalar keys %{$$target_srcs_ast{'literal-ints'}}) {
     $scratch_str .= $col . "//static intptr-t const __int-literals[] = { 0 }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $scratch_str .= $col . "//static object-t* __int-ptrs[] = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
     $scratch_str .= $col . "static intptr-t const __int-literals[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $int (sort keys %{$$target_ast{'literal-ints'}}) {
+    foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       $scratch_str .= $col . "$int," . $nl;
     }
     $scratch_str .= $col . "0 // nullptr" . $nl;
@@ -4187,7 +4187,7 @@ sub linkage_unit::generate_target_runtime_ints_seq {
 
     $scratch_str .= $col . "static symbol-t __int-names[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $int (sort keys %{$$target_ast{'literal-ints'}}) {
+    foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       my $ident = &dk_mangle($int);
       $scratch_str .= $col . "__symbol::$ident," . $nl;
     }
@@ -4197,7 +4197,7 @@ sub linkage_unit::generate_target_runtime_ints_seq {
 
     $scratch_str .= $col . "static assoc-node-t __int-ptrs[] = { //rw-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    foreach my $int (sort keys %{$$target_ast{'literal-ints'}}) {
+    foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
       $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__int::$int_ident }," . $nl;
     }

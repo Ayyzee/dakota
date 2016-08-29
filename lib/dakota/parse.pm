@@ -1669,11 +1669,11 @@ sub add_generics_used {
   #print STDERR &sst::filestr($$gbl_sst_cursor{'sst'});
 }
 sub kw_args_generics_add {
-  my ($target_ast, $method) = @_;
+  my ($target_srcs_ast, $method) = @_;
   my ($name, $types) = &kw_args_method_sig($method);
   my $name_str =  &str_from_seq($name);
   my $types_str = &param_types_str($types);
-  $$target_ast{'kw-arg-generics'}{$name_str}{$types_str} = [ $name, $types ];
+  $$target_srcs_ast{'kw-arg-generics'}{$name_str}{$types_str} = [ $name, $types ];
 }
 
 # 'methods'
@@ -1866,7 +1866,7 @@ my $_target_inputs_ast;
 sub target_inputs_ast {
   my ($asts, $is_precompile) = @_;
   return $_target_inputs_ast if $_target_inputs_ast;
-  my $target_inputs_ast_path = &target_builddir() . '/target-inputs.ast';
+  my $target_inputs_ast_path = &target_builddir() . '/inputs.ast';
   if ($is_precompile && -e $target_inputs_ast_path) {
     $_target_inputs_ast = &scalar_from_file($target_inputs_ast_path);
     return $_target_inputs_ast;

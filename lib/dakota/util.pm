@@ -95,7 +95,7 @@ our @EXPORT= qw(
                  first
                  flatten
                  global_project
-                 target_ast
+                 target_srcs_ast
                  global_project_target
                  has_kw_args
                  has_kw_arg_names
@@ -161,7 +161,7 @@ our @EXPORT= qw(
                  scalar_to_file
                  set_exe_target
                  set_global_project
-                 set_target_ast
+                 set_target_srcs_ast
                  set_root_cmd
                  set_src_decl
                  set_src_defn
@@ -661,14 +661,14 @@ sub set_global_project {
   $global_project = &scalar_from_file($project_path);
   return $global_project;
 }
-my $target_ast;
-sub target_ast {
-  return $target_ast;
+my $target_srcs_ast;
+sub target_srcs_ast {
+  return $target_srcs_ast;
 }
-sub set_target_ast {
-  my ($target_ast_path) = @_;
-  $target_ast = &scalar_from_file($target_ast_path);
-  return $target_ast;
+sub set_target_srcs_ast {
+  my ($target_srcs_ast_path) = @_;
+  $target_srcs_ast = &scalar_from_file($target_srcs_ast_path);
+  return $target_srcs_ast;
 }
 my $gbl_src_file = undef;
 my $global_is_target = undef; # <klass>--klasses.{h,cc} vs lib/libdakota--klasses.{h,cc}
@@ -933,8 +933,8 @@ sub is_kw_args_method {
   my ($name, $types) = &kw_args_method_sig($method);
   my $name_str =  &str_from_seq($name);
   my $types_str = &param_types_str($types);
-  my $target_ast = &target_ast();
-  my $tbl = $$target_ast{'kw-arg-generics'};
+  my $target_srcs_ast = &target_srcs_ast();
+  my $tbl = $$target_srcs_ast{'kw-arg-generics'};
 
   if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
     $state = 1;
