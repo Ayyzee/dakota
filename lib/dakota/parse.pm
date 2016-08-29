@@ -268,22 +268,22 @@ sub is_tbl {
   return $result;
 }
 sub _ast_merge { # recursive
-  my ($root_ref, $scope) = @_;
-  foreach my $name1 (sort keys %$scope) {
-    if (&is_tbl($$scope{$name1})) {
-      foreach my $name2 (sort keys %{$$scope{$name1}}) {
-        if (!$$scope{$name1}{$name2}) {
-          if (!exists $$root_ref{$name1}{$name2}) {
-            $$root_ref{$name1}{$name2} = undef;
+  my ($root_ast, $ast) = @_;
+  foreach my $name1 (sort keys %$ast) {
+    if (&is_tbl($$ast{$name1})) {
+      foreach my $name2 (sort keys %{$$ast{$name1}}) {
+        if (!$$ast{$name1}{$name2}) {
+          if (!exists $$root_ast{$name1}{$name2}) {
+            $$root_ast{$name1}{$name2} = undef;
           }
         } else {
-          if (!$$root_ref{$name1}{$name2}) {
-            $$root_ref{$name1}{$name2} = &deep_copy($$scope{$name1}{$name2});
+          if (!$$root_ast{$name1}{$name2}) {
+            $$root_ast{$name1}{$name2} = &deep_copy($$ast{$name1}{$name2});
           } else {
-            foreach my $name3 (sort keys %{$$scope{$name1}{$name2}}) {
-              if (&is_tbl($$scope{$name1}{$name2}{$name3})) {
-                &tbl_add_info($$root_ref{$name1}{$name2}{$name3},
-                              $$scope{$name1}{$name2}{$name3});
+            foreach my $name3 (sort keys %{$$ast{$name1}{$name2}}) {
+              if (&is_tbl($$ast{$name1}{$name2}{$name3})) {
+                &tbl_add_info($$root_ast{$name1}{$name2}{$name3},
+                              $$ast{$name1}{$name2}{$name3});
               }
             }
           }
@@ -307,17 +307,17 @@ my $gbl_sst = undef;
 my $gbl_sst_cursor = undef;
 my $gbl_user_data = &dakota::sst::lang_user_data();
 
-my $gbl_root = {};
-my $gbl_current_scope = $gbl_root;
+my $gbl_root_ast = {};
+my $gbl_current_ast_scope = $gbl_root_ast;
 my $gbl_current_module = undef;
 my $gbl_filename = undef;
 sub init_ast_from_inputs_vars {
   my ($cmd_info) = @_;
-  $gbl_root = {};
-  $$gbl_root{'keywords'} = {};
-  $$gbl_root{'symbols'} =  {};
+  $gbl_root_ast = {};
+  $$gbl_root_ast{'keywords'} = {};
+  $$gbl_root_ast{'symbols'} =  {};
 
-  $gbl_current_scope = $gbl_root;
+  $gbl_current_ast_scope = $gbl_root_ast;
   $gbl_filename = undef;
 }
 sub str_from_cmd_info {
@@ -545,7 +545,7 @@ my $enable_exported_header = 1;
 sub add_exported_header {
   my ($tkn) = @_;
   if ($enable_exported_header) {
-    $$gbl_root{'exported-headers'}{$tkn} = undef;
+    $$gbl_root_ast{'exported-headers'}{$tkn} = undef;
   }
 }
 sub exported_header {
@@ -558,30 +558,30 @@ sub trait {
   my ($body, $seq) = &dkdecl('trait');
 
   if (&sst_cursor::current_token($gbl_sst_cursor) eq ';') {
-    $$gbl_root{'traits'}{$body} = undef;
+    $$gbl_root_ast{'traits'}{$body} = undef;
     &match(__FILE__, __LINE__, ';');
 
     if ($$args{'exported?'}) {
-      $$gbl_root{'exported-trait-decls'}{$body} = {};
-      $$gbl_current_scope{'exported-trait-decls'} =
-        &deep_copy($$gbl_root{'exported-trait-decls'});
+      $$gbl_root_ast{'exported-trait-decls'}{$body} = {};
+      $$gbl_current_ast_scope{'exported-trait-decls'} =
+        &deep_copy($$gbl_root_ast{'exported-trait-decls'});
     }
     return $body;
   }
   &match(__FILE__, __LINE__, '{');
   my $braces = 1;
-  my $previous_scope = $gbl_current_scope;
+  my $previous_scope = $gbl_current_ast_scope;
   my $construct_name = $body;
 
-  if (!defined $$gbl_current_scope{'traits'}{$construct_name}) {
-    $$gbl_current_scope{'traits'}{$construct_name}{'defined?'} = 1;
+  if (!defined $$gbl_current_ast_scope{'traits'}{$construct_name}) {
+    $$gbl_current_ast_scope{'traits'}{$construct_name}{'defined?'} = 1;
   }
   if ($$args{'exported?'}) {
-    $$gbl_current_scope{'traits'}{$construct_name}{'exported?'} = 1;
+    $$gbl_current_ast_scope{'traits'}{$construct_name}{'exported?'} = 1;
   }
-  $gbl_current_scope = $$gbl_current_scope{'traits'}{$construct_name};
-  $$gbl_current_scope{'module'} = $gbl_current_module;
-  $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
+  $gbl_current_ast_scope = $$gbl_current_ast_scope{'traits'}{$construct_name};
+  $$gbl_current_ast_scope{'module'} = $gbl_current_module;
+  $$gbl_current_ast_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
   my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -601,8 +601,8 @@ sub trait {
           # [[sentinel]] method
           # [[alias(...)]] method
           if (m/^method$/) {
-            $$gbl_root{'traits'}{$construct_name}{'exported?'} = 1; # export trait if any method is exported
-            $$gbl_root{'traits'}{$construct_name}{'behavior-exported?'} = 1;
+            $$gbl_root_ast{'traits'}{$construct_name}{'exported?'} = 1; # export trait if any method is exported
+            $$gbl_root_ast{'traits'}{$construct_name}{'behavior-exported?'} = 1;
             &method( {'exported?' => 1 });
             last;
           }
@@ -654,31 +654,31 @@ sub trait {
       if (m/^trait$/) {
         my $seq = &dkdecl_list('trait');
         &match(__FILE__, __LINE__, ';');
-        if (!exists $$gbl_current_scope{'traits'}) {
-          $$gbl_current_scope{'traits'} = [];
+        if (!exists $$gbl_current_ast_scope{'traits'}) {
+          $$gbl_current_ast_scope{'traits'} = [];
         }
         foreach my $trait (@$seq) {
-         #&add_trait_decl($gbl_root, $trait);
-          &add_last($$gbl_current_scope{'traits'}, $trait);
+         #&add_trait_decl($gbl_root_ast, $trait);
+          &add_last($$gbl_current_ast_scope{'traits'}, $trait);
         }
         last;
       }
       if (m/^require$/) {
         my ($body, $seq) = &dkdecl('require');
         &match(__FILE__, __LINE__, ';');
-        if (!defined $$gbl_current_scope{'requires'}) {
-          $$gbl_current_scope{'requires'} = [];
+        if (!defined $$gbl_current_ast_scope{'requires'}) {
+          $$gbl_current_ast_scope{'requires'} = [];
         }
-        &add_last($$gbl_current_scope{'requires'}, &ct($seq));
+        &add_last($$gbl_current_ast_scope{'requires'}, &ct($seq));
         last;
       }
       if (m/^provide$/) {
         my ($body, $seq) = &dkdecl('provide');
         &match(__FILE__, __LINE__, ';');
-        if (!defined $$gbl_current_scope{'provides'}) {
-          $$gbl_current_scope{'provides'} = [];
+        if (!defined $$gbl_current_ast_scope{'provides'}) {
+          $$gbl_current_ast_scope{'provides'} = [];
         }
-        &add_last($$gbl_current_scope{'provides'}, &ct($seq));
+        &add_last($$gbl_current_ast_scope{'provides'}, &ct($seq));
         last;
       }
       if (m/^\{$/) {
@@ -691,7 +691,7 @@ sub trait {
         &match(__FILE__, __LINE__, '}');
 
         if (0 == $braces) {
-          $gbl_current_scope = $previous_scope;
+          $gbl_current_ast_scope = $previous_scope;
           return;
         }
         last;
@@ -723,11 +723,11 @@ sub slots_seq {
         }
       }
       my $name = &remove_last($type);
-      &add_symbol($gbl_root, $name);
+      &add_symbol($gbl_root_ast, $name);
       my $arg_type = &arg::type($type);
       my $slot_info = { 'name' => $name,
                         'type' => $arg_type };
-      &add_symbol($gbl_root, $arg_type);
+      &add_symbol($gbl_root_ast, $arg_type);
       if (scalar @$expr) {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
@@ -749,7 +749,7 @@ sub enum_seq {
     } else {
       my $name = &remove_first($expr);
       my $slot_info = { 'name' => $name };
-      &add_symbol($gbl_root, $name);
+      &add_symbol($gbl_root_ast, $name);
       if (scalar @$expr) {
         if ('=' ne &remove_first($expr)) {
           die __FILE__, ":", __LINE__, ": error:\n";
@@ -764,7 +764,7 @@ sub enum_seq {
   if (scalar @$expr) {
     my $name = &remove_first($expr);
     my $slot_info = { 'name' => $name };
-    &add_symbol($gbl_root, $name);
+    &add_symbol($gbl_root_ast, $name);
     if (scalar @$expr) {
       if ('=' ne &remove_first($expr)) {
         die __FILE__, ":", __LINE__, ": error:\n";
@@ -785,10 +785,10 @@ sub slots {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'slots');
   if ($$args{'exported?'}) {
-    $$gbl_current_scope{'slots'}{'exported?'} = 1;
+    $$gbl_current_ast_scope{'slots'}{'exported?'} = 1;
   }
   # slots are always in same module as klass
-  $$gbl_current_scope{'slots'}{'module'} = $$gbl_current_scope{'module'};
+  $$gbl_current_ast_scope{'slots'}{'module'} = $$gbl_current_ast_scope{'module'};
 
   my $type = [];
   while (';' ne &sst_cursor::current_token($gbl_sst_cursor) &&
@@ -802,9 +802,9 @@ sub slots {
       my $enum_base = &remove_last($type);
       my $tkn =    &remove_last($type);
       die if ':' ne $tkn; # not key/element delim
-      $$gbl_current_scope{'slots'}{'enum-base'} = $enum_base;
-      &add_symbol($gbl_root, $enum_base);
-      #print STDERR &Dumper($$gbl_current_scope{'slots'});
+      $$gbl_current_ast_scope{'slots'}{'enum-base'} = $enum_base;
+      &add_symbol($gbl_root_ast, $enum_base);
+      #print STDERR &Dumper($$gbl_current_ast_scope{'slots'});
     }
   }
   if (@$type && 1 == @$type) {
@@ -812,24 +812,24 @@ sub slots {
         'union' eq  &first($type) ||
         'enum' eq   &first($type)) {
       if ('enum' eq &first($type)) {
-        &add_symbol($gbl_root, 'enum-info');
-        &add_symbol($gbl_root, 'const-info');
+        &add_symbol($gbl_root_ast, 'enum-info');
+        &add_symbol($gbl_root_ast, 'const-info');
 
-        &add_klass_decl($gbl_root, 'enum-info');
-        &add_klass_decl($gbl_root, 'named-enum-info');
-        &add_klass_decl($gbl_root, 'const-info');
+        &add_klass_decl($gbl_root_ast, 'enum-info');
+        &add_klass_decl($gbl_root_ast, 'named-enum-info');
+        &add_klass_decl($gbl_root_ast, 'const-info');
       }
       $cat = &remove_first($type);
-      $$gbl_current_scope{'slots'}{'cat'} = $cat;
+      $$gbl_current_ast_scope{'slots'}{'cat'} = $cat;
     }
   }
   if (@$type) {
     &add_type($type);
     my $arg_type = &arg::type($type);
-    &add_symbol($gbl_root, &remove_extra_whitespace($arg_type));
-    $$gbl_current_scope{'slots'}{'type'} = $arg_type;
+    &add_symbol($gbl_root_ast, &remove_extra_whitespace($arg_type));
+    $$gbl_current_ast_scope{'slots'}{'type'} = $arg_type;
   } else {
-    $$gbl_current_scope{'slots'}{'cat'} = $cat;
+    $$gbl_current_ast_scope{'slots'}{'cat'} = $cat;
   }
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^;$/) {
@@ -840,19 +840,19 @@ sub slots {
       if (@$type) {
         &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
       }
-      $$gbl_current_scope{'slots'}{'cat-info'} = [];
-      $$gbl_current_scope{'slots'}{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
+      $$gbl_current_ast_scope{'slots'}{'cat-info'} = [];
+      $$gbl_current_ast_scope{'slots'}{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $slots_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
         if ('enum' eq $cat) {
-          &enum_seq($slots_defs, $$gbl_current_scope{'slots'}{'cat-info'});
+          &enum_seq($slots_defs, $$gbl_current_ast_scope{'slots'}{'cat-info'});
         } else {
-          &slots_seq($slots_defs, $$gbl_current_scope{'slots'}{'cat-info'});
+          &slots_seq($slots_defs, $$gbl_current_ast_scope{'slots'}{'cat-info'});
         }
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      &add_symbol($gbl_root, 'size');
+      &add_symbol($gbl_root_ast, 'size');
       return;
     }
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
@@ -863,8 +863,8 @@ sub slots {
 sub const {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'const');
-  if (!exists $$gbl_current_scope{'const'}) {
-    $$gbl_current_scope{'const'} = [];
+  if (!exists $$gbl_current_ast_scope{'const'}) {
+    $$gbl_current_ast_scope{'const'} = [];
   }
   my $const = {};
   if ($$args{'exported?'}) {
@@ -883,7 +883,7 @@ sub const {
     &remove_last($type); # '='
   }
   my $name = &remove_last($type);
-  &add_symbol($gbl_root, $name); # const var name
+  &add_symbol($gbl_root_ast, $name); # const var name
   if (@$type) {
     $$const{'type'} = &arg::type($type);
     $$const{'name'} = $name;
@@ -891,15 +891,15 @@ sub const {
   }
   if (';' eq &sst_cursor::current_token($gbl_sst_cursor)) {
     &match(__FILE__, __LINE__, ';');
-    &add_last($$gbl_current_scope{'const'}, $const);
+    &add_last($$gbl_current_ast_scope{'const'}, $const);
     return;
   }
 }
 sub enum {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'enum');
-  if (!exists $$gbl_current_scope{'enum'}) {
-    $$gbl_current_scope{'enum'} = [];
+  if (!exists $$gbl_current_ast_scope{'enum'}) {
+    $$gbl_current_ast_scope{'enum'} = [];
   }
   my $enum = {};
   if ($$args{'exported?'}) {
@@ -918,7 +918,7 @@ sub enum {
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^;$/) {
       &match(__FILE__, __LINE__, ';');
-      &add_last($$gbl_current_scope{'enum'}, $enum);
+      &add_last($$gbl_current_ast_scope{'enum'}, $enum);
       return;
     }
     if (m/^\{$/) {
@@ -935,13 +935,13 @@ sub enum {
         &enum_seq($enum_defs, $$enum{'cat-info'});
       }
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
-      &add_symbol($gbl_root, 'enum-info');
-      &add_symbol($gbl_root, 'const-info');
+      &add_symbol($gbl_root_ast, 'enum-info');
+      &add_symbol($gbl_root_ast, 'const-info');
 
-      &add_klass_decl($gbl_root, 'enum-info');
-      &add_klass_decl($gbl_root, 'named-enum-info');
-      &add_klass_decl($gbl_root, 'const-info');
-      &add_last($$gbl_current_scope{'enum'}, $enum);
+      &add_klass_decl($gbl_root_ast, 'enum-info');
+      &add_klass_decl($gbl_root_ast, 'named-enum-info');
+      &add_klass_decl($gbl_root_ast, 'const-info');
+      &add_last($$gbl_current_ast_scope{'enum'}, $enum);
       return;
     }
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
@@ -968,8 +968,8 @@ sub initialize {
   &match(__FILE__, __LINE__, 'void');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
-      &add_symbol($gbl_root, 'initialize');
-      $$gbl_current_scope{'has-initialize'} = 1;
+      &add_symbol($gbl_root_ast, 'initialize');
+      $$gbl_current_ast_scope{'has-initialize'} = 1;
       my ($open_curley_index, $close_curley_index) =
         &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
@@ -1002,8 +1002,8 @@ sub finalize {
   &match(__FILE__, __LINE__, 'void');
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^\{$/) {
-      &add_symbol($gbl_root, 'finalize');
-      $$gbl_current_scope{'has-finalize'} = 1;
+      &add_symbol($gbl_root_ast, 'finalize');
+      $$gbl_current_ast_scope{'has-finalize'} = 1;
       my ($open_curley_index, $close_curley_index) =
         &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       $$gbl_sst_cursor{'current-token-index'} = $close_curley_index + 1;
@@ -1049,7 +1049,7 @@ sub module_import_defn {
         $depth--;
         if (0 == $depth) {
           &match(__FILE__, __LINE__, '}');
-          $$gbl_root{'modules'}{$gbl_current_module}{'import'} = $tbl;
+          $$gbl_root_ast{'modules'}{$gbl_current_module}{'import'} = $tbl;
           return;
         } else {
           die;
@@ -1122,7 +1122,7 @@ sub module_export_defn {
             $$tbl{$seqstr} = $seq;
             $seq= [];
           }
-          $$gbl_root{'modules'}{$gbl_current_module}{'export'} = $tbl;
+          $$gbl_root_ast{'modules'}{$gbl_current_module}{'export'} = $tbl;
           return;
         } elsif (1 == $depth) {
           &add_last($seq, $_);
@@ -1151,14 +1151,14 @@ sub interpose {
   my ($args) = @_;
   my $seq = &dkdecl_list('interpose');
   my $first = &remove_first($seq);
-  if ($$gbl_root{'interposers'}{$first}) {
+  if ($$gbl_root_ast{'interposers'}{$first}) {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-  if ($$gbl_root{'interposers-unordered'}{$first}) {
+  if ($$gbl_root_ast{'interposers-unordered'}{$first}) {
     # check for sameness here
-    delete $$gbl_root{'interposers-unordered'}{$first};
+    delete $$gbl_root_ast{'interposers-unordered'}{$first};
   }
-  $$gbl_root{'interposers'}{$first} = $seq;
+  $$gbl_root_ast{'interposers'}{$first} = $seq;
 }
 # this works for methods because zero or one params are allowed, so comma is not seen in a a param list
 sub match_qual_ident {
@@ -1179,30 +1179,30 @@ sub klass {
   my ($body, $seq) = &dkdecl('klass');
 
   if (&sst_cursor::current_token($gbl_sst_cursor) eq ';') {
-    $$gbl_root{'klasses'}{$body} = undef;
+    $$gbl_root_ast{'klasses'}{$body} = undef;
     &match(__FILE__, __LINE__, ';');
 
     if ($$args{'exported?'}) {
-      $$gbl_root{'exported-klass-decls'}{$body} = {};
-      $$gbl_current_scope{'exported-klass-decls'} =
-        &deep_copy($$gbl_root{'exported-klass-decls'});
+      $$gbl_root_ast{'exported-klass-decls'}{$body} = {};
+      $$gbl_current_ast_scope{'exported-klass-decls'} =
+        &deep_copy($$gbl_root_ast{'exported-klass-decls'});
     }
     return $body;
   }
   &match(__FILE__, __LINE__, '{');
   my $braces = 1;
-  my $previous_scope = $gbl_current_scope;
+  my $previous_scope = $gbl_current_ast_scope;
   my $construct_name = $body;
 
-  if (!defined $$gbl_current_scope{'klasses'}{$construct_name}) {
-    $$gbl_current_scope{'klasses'}{$construct_name}{'defined?'} = 1;
+  if (!defined $$gbl_current_ast_scope{'klasses'}{$construct_name}) {
+    $$gbl_current_ast_scope{'klasses'}{$construct_name}{'defined?'} = 1;
   }
   if ($$args{'exported?'}) {
-    $$gbl_current_scope{'klasses'}{$construct_name}{'exported?'} = 1;
+    $$gbl_current_ast_scope{'klasses'}{$construct_name}{'exported?'} = 1;
   }
-  $gbl_current_scope = $$gbl_current_scope{'klasses'}{$construct_name};
-  $$gbl_current_scope{'module'} = $gbl_current_module;
-  $$gbl_current_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
+  $gbl_current_ast_scope = $$gbl_current_ast_scope{'klasses'}{$construct_name};
+  $$gbl_current_ast_scope{'module'} = $gbl_current_module;
+  $$gbl_current_ast_scope{'file'} = $$gbl_sst_cursor{'sst'}{'file'};
 
   my $attrs = [];
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -1220,21 +1220,21 @@ sub klass {
         for (&sst_cursor::current_token($gbl_sst_cursor)) {
           if (m/^const$/) {
             if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$') {
-              $$gbl_root{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either enums or slots or methods are exported
+              $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either enums or slots or methods are exported
               &const({ 'exported?' => 1 });
               last;
             }
           }
           if (m/^enum$/) {
             if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$') {
-              $$gbl_root{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either enums or slots or methods are exported
+              $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either enums or slots or methods are exported
               &enum({ 'exported?' => 1 });
               last;
             }
           }
           if (m/^slots$/) {
             if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$') {
-              $$gbl_root{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
+              $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
               &slots({ 'exported?' => 1 });
               last;
             }
@@ -1243,8 +1243,8 @@ sub klass {
           # [[sentinel]] method
           # [[alias(...)]] method
           if (m/^method$/) {
-            $$gbl_root{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
-            $$gbl_root{'klasses'}{$construct_name}{'behavior-exported?'} = 1;
+            $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
+            $$gbl_root_ast{'klasses'}{$construct_name}{'behavior-exported?'} = 1;
             &method({ 'exported?' => 1 });
             last;
           }
@@ -1305,52 +1305,52 @@ sub klass {
       if (m/^trait$/) {
         my $seq = &dkdecl_list('trait');
         &match(__FILE__, __LINE__, ';');
-        if (!exists $$gbl_current_scope{'traits'}) {
-          $$gbl_current_scope{'traits'} = [];
+        if (!exists $$gbl_current_ast_scope{'traits'}) {
+          $$gbl_current_ast_scope{'traits'} = [];
         }
         foreach my $trait (@$seq) {
-          &add_trait_decl($gbl_root, $trait);
-          &add_last($$gbl_current_scope{'traits'}, $trait);
+          &add_trait_decl($gbl_root_ast, $trait);
+          &add_last($$gbl_current_ast_scope{'traits'}, $trait);
         }
         last;
       }
       if (m/^require$/) {
         my ($body, $seq) = &dkdecl('require');
         &match(__FILE__, __LINE__, ';');
-        if (!defined $$gbl_current_scope{'requires'}) {
-          $$gbl_current_scope{'requires'} = [];
+        if (!defined $$gbl_current_ast_scope{'requires'}) {
+          $$gbl_current_ast_scope{'requires'} = [];
         }
         my $path = &ct($seq);
-        &add_last($$gbl_current_scope{'requires'}, $path);
-        &add_klass_decl($gbl_root, $path);
+        &add_last($$gbl_current_ast_scope{'requires'}, $path);
+        &add_klass_decl($gbl_root_ast, $path);
         last;
       }
       if (m/^provide$/) {
         my ($body, $seq) = &dkdecl('provide');
         &match(__FILE__, __LINE__, ';');
-        if (!defined $$gbl_current_scope{'provides'}) {
-          $$gbl_current_scope{'provides'} = [];
+        if (!defined $$gbl_current_ast_scope{'provides'}) {
+          $$gbl_current_ast_scope{'provides'} = [];
         }
         my $path = &ct($seq);
-        &add_last($$gbl_current_scope{'provides'}, $path);
-        &add_klass_decl($gbl_root, $path);
+        &add_last($$gbl_current_ast_scope{'provides'}, $path);
+        &add_klass_decl($gbl_root_ast, $path);
         last;
       }
       if (m/^interpose$/) {
         my ($body, $seq) = &dkdecl('interpose');
         &match(__FILE__, __LINE__, ';');
         my $name = &ct($seq);
-        $$gbl_current_scope{'interpose'} = $name;
-        &add_klass_decl($gbl_root, $name);
+        $$gbl_current_ast_scope{'interpose'} = $name;
+        &add_klass_decl($gbl_root_ast, $name);
 
-        if (!$$gbl_root{'interposers'}{$name} &&
-            !$$gbl_root{'interposers-unordered'}{$name}) {
-          $$gbl_root{'interposers'}{$name} = [];
-          &add_last($$gbl_root{'interposers'}{$name}, $construct_name);
-        } elsif ($$gbl_root{'interposers'}{$name}) {
-          $$gbl_root{'interposers-unordered'}{$name} = $$gbl_root{'interposers'}{$name};
-          delete $$gbl_root{'interposers'}{$name};
-          &add_last($$gbl_root{'interposers-unordered'}{$name}, $construct_name);
+        if (!$$gbl_root_ast{'interposers'}{$name} &&
+            !$$gbl_root_ast{'interposers-unordered'}{$name}) {
+          $$gbl_root_ast{'interposers'}{$name} = [];
+          &add_last($$gbl_root_ast{'interposers'}{$name}, $construct_name);
+        } elsif ($$gbl_root_ast{'interposers'}{$name}) {
+          $$gbl_root_ast{'interposers-unordered'}{$name} = $$gbl_root_ast{'interposers'}{$name};
+          delete $$gbl_root_ast{'interposers'}{$name};
+          &add_last($$gbl_root_ast{'interposers-unordered'}{$name}, $construct_name);
         } else {
           die __FILE__, ":", __LINE__, ": error:\n";
         }
@@ -1364,8 +1364,8 @@ sub klass {
               my ($body, $seq) = &dkdecl('superklass');
               &match(__FILE__, __LINE__, ';');
               my $path = &ct($seq);
-              $$gbl_current_scope{'superklass'} = $path;
-              &add_klass_decl($gbl_root, $path);
+              $$gbl_current_ast_scope{'superklass'} = $path;
+              &add_klass_decl($gbl_root_ast, $path);
               last;
             }
           }
@@ -1380,8 +1380,8 @@ sub klass {
               my ($body, $seq) = &dkdecl('klass');
               &match(__FILE__, __LINE__, ';');
               my $path = &ct($seq);
-              $$gbl_current_scope{'klass'} = $path;
-              &add_klass_decl($gbl_root, $path);
+              $$gbl_current_ast_scope{'klass'} = $path;
+              &add_klass_decl($gbl_root_ast, $path);
               last;
             }
           }
@@ -1397,7 +1397,7 @@ sub klass {
         &match(__FILE__, __LINE__, '}');
 
         if (0 == $braces) {
-          $gbl_current_scope = $previous_scope;
+          $gbl_current_ast_scope = $previous_scope;
           return &ct($seq);
         }
         last;
@@ -1587,7 +1587,7 @@ sub param_list {
         &add_last($kw_arg_defaults, $kw_args_default);
       }
       my $kw_args_name_str = $$type[$kw_args_name];
-      &add_keyword($gbl_root, $kw_args_name_str);
+      &add_keyword($gbl_root_ast, $kw_args_name_str);
       my $kw_args_name_seq = [splice(@$type, $kw_args_name)];
       #print STDERR Dumper $kw_args_name_seq;
       #print STDERR Dumper $type;
@@ -1612,7 +1612,7 @@ sub param_list {
   }
   return ($types, $kw_arg_names, $kw_arg_defaults);
 }
-sub add_klasses_used {
+sub add_klasses_used { # not currently used
   my ($scope, $gbl_sst_cursor) = @_;
   my $seqs = $$gbl_used{'used-klasses'};
   my $size = &sst_cursor::size($gbl_sst_cursor);
@@ -1636,7 +1636,7 @@ sub add_klasses_used {
           print "RANGE: " . &Dumper($range) . ", MATCHES: " . &Dumper($matches) . ", NAME: " . $name . $nl;
           $Data::Dumper::Indent = $prev_indent;
         }
-        &add_klass_decl($gbl_root, $name);
+        &add_klass_decl($gbl_root_ast, $name);
       }
     }
   }
@@ -1740,11 +1740,11 @@ sub method {
     &match(__FILE__, __LINE__, ';');
     $$method{'alias'} = $realname;
     $$method{'name'} = $name;
-    ###&add_generic($gbl_root, &ct($$method{'name'}));
+    ###&add_generic($gbl_root_ast, &ct($$method{'name'}));
     return;
   } else {
     $$method{'name'} = $name;
-    &add_generic($gbl_root, &ct($$method{'name'}));
+    &add_generic($gbl_root_ast, &ct($$method{'name'}));
   }
   if ('object-t' eq &sst::at($gbl_sst, $open_paren_index + 1)) {
     if (',' ne &sst::at($gbl_sst, $open_paren_index + 1 + 1) &&
@@ -1773,17 +1773,17 @@ sub method {
     if ($kw_arg_defaults) {
       $$method{'kw-arg-defaults'} = $kw_arg_defaults;
     }
-    &kw_args_generics_add($gbl_root, $method);
+    &kw_args_generics_add($gbl_root_ast, $method);
 
     if ('init' eq $method_name) {
       foreach my $kw_arg_name (@$kw_arg_names) {
         if ('slots' eq $kw_arg_name) {
           if (1 == @$kw_arg_names) {
             # only one kw-arg and its slots (does not matter aggregate or not)
-            $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
-          } elsif ($$gbl_current_scope{'slots'} && $$gbl_current_scope{'slots'}{'type'}) {
+            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = 1;
+          } elsif ($$gbl_current_ast_scope{'slots'} && $$gbl_current_ast_scope{'slots'}{'type'}) {
             # not an aggregate
-            $$gbl_current_scope{'init-supports-kw-slots?'} = 1;
+            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = 1;
           } else {
             my $kw_arg_names_list = join(', #', @$kw_arg_names);
             print STDERR "warning: slots is an aggregate and init(#$kw_arg_names_list) supports more than just #slots.\n";
@@ -1837,28 +1837,28 @@ sub method {
   if (0) {
   } elsif (&is_slots($method) &&
            &is_va($method)) { # 11
-    if (!defined $$gbl_current_scope{'slots-methods'}) {
-      $$gbl_current_scope{'slots-methods'} = {};
+    if (!defined $$gbl_current_ast_scope{'slots-methods'}) {
+      $$gbl_current_ast_scope{'slots-methods'} = {};
     }
-    $$gbl_current_scope{'slots-methods'}{$signature} = $method;
+    $$gbl_current_ast_scope{'slots-methods'}{$signature} = $method;
   } elsif (&is_slots($method) &&
           !&is_va($method)) { # 10
-    if (!defined $$gbl_current_scope{'slots-methods'}) {
-      $$gbl_current_scope{'slots-methods'} = {};
+    if (!defined $$gbl_current_ast_scope{'slots-methods'}) {
+      $$gbl_current_ast_scope{'slots-methods'} = {};
     }
-    $$gbl_current_scope{'slots-methods'}{$signature} = $method;
+    $$gbl_current_ast_scope{'slots-methods'}{$signature} = $method;
   } elsif (!&is_slots($method) &&
             &is_va($method)) { # 01
-    if (!defined $$gbl_current_scope{'methods'}) {
-      $$gbl_current_scope{'methods'} = {};
+    if (!defined $$gbl_current_ast_scope{'methods'}) {
+      $$gbl_current_ast_scope{'methods'} = {};
     }
-    $$gbl_current_scope{'methods'}{$signature} = $method;
+    $$gbl_current_ast_scope{'methods'}{$signature} = $method;
   } elsif (!&is_slots($method) &&
            !&is_va($method)) { # 00
-    if (!defined $$gbl_current_scope{'methods'}) {
-      $$gbl_current_scope{'methods'} = {};
+    if (!defined $$gbl_current_ast_scope{'methods'}) {
+      $$gbl_current_ast_scope{'methods'} = {};
     }
-    $$gbl_current_scope{'methods'}{$signature} = $method;
+    $$gbl_current_ast_scope{'methods'}{$signature} = $method;
   }
   return;
 }
@@ -2070,7 +2070,7 @@ sub generics::parse {
     }
     foreach my $arg (@{$$generic{'kw-args'} || []}) {
       &add_type([$arg]);
-      &add_symbol($gbl_root, $$arg{'name'});
+      &add_symbol($gbl_root_ast, $$arg{'name'});
     }
   }
   my $sorted_generics_seq = [sort method::compare @$generics_seq];
@@ -2152,7 +2152,7 @@ sub dk_klass_names_from_file {
 sub parse_root {
   my ($gbl_sst_cursor, $exported) = @_;
   my $depth = 0;
-  $gbl_current_scope = $gbl_root;
+  $gbl_current_ast_scope = $gbl_root_ast;
 
   # root
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
@@ -2216,25 +2216,25 @@ sub parse_root {
   }
   if ($enable_exported_header) {
   foreach my $klass_type ( 'klasses', 'traits' ) {
-    if (exists  $$gbl_root{'exported-headers'} &&
-        defined $$gbl_root{'exported-headers'}) {
+    if (exists  $$gbl_root_ast{'exported-headers'} &&
+        defined $$gbl_root_ast{'exported-headers'}) {
       while (my ($header, $dummy) =
-               each(%{$$gbl_root{'exported-headers'}})) {
-        $$gbl_root{'exported-headers'}{$header} = undef;
+               each(%{$$gbl_root_ast{'exported-headers'}})) {
+        $$gbl_root_ast{'exported-headers'}{$header} = undef;
       }
-      while (my ($klass, $info) = each(%{$$gbl_root{$klass_type}})) {
+      while (my ($klass, $info) = each(%{$$gbl_root_ast{$klass_type}})) {
         if ($info) {
-          $$info{'exported-headers'} = $$gbl_root{'exported-headers'};
+          $$info{'exported-headers'} = $$gbl_root_ast{'exported-headers'};
         }
       }
     }
   }
   }
-  if (exists $$gbl_root{'generics'}) {
-    delete $$gbl_root{'generics'}{'make'};
+  if (exists $$gbl_root_ast{'generics'}) {
+    delete $$gbl_root_ast{'generics'}{'make'};
   }
-  $$gbl_root{'should-generate-make'} = 1; # always generate make()
-  return $gbl_root;
+  $$gbl_root_ast{'should-generate-make'} = 1; # always generate make()
+  return $gbl_root_ast;
 }
 sub add_object_methods_decls_to_klass {
   my ($klass_ast, $methods_key, $slots_methods_key) = @_;
@@ -2282,15 +2282,15 @@ sub ast_from_dk_path {
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &filestr_from_file($gbl_filename);
   while (m/^\s*\#\s*include\s+(<.*?>)/gm) {
-    &add_system_include($gbl_root, $1);
+    &add_system_include($gbl_root_ast, $1);
   }
   pos $_ = 0;
   while (m/\#((0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|[1-9]\d*)([uUiI](32|64|128))?)/g) {
-    &add_int($gbl_root, $1);
+    &add_int($gbl_root_ast, $1);
   }
   pos $_ = 0;
   while (m/\#"(.*?)"/g) {
-    &add_str($gbl_root, $1);
+    &add_str($gbl_root_ast, $1);
   }
   &encode_strings(\$_);
   my $parts = &encode_comments(\$_);
@@ -2307,11 +2307,11 @@ sub ast_from_dk_path {
   $_ =~ s/(\bcase\s)\s+/$1/g;
   pos $_ = 0;
   while (m/(?<!\bcase\b)\s*(#$bid)\s*$colon/g) { # kw-args use
-    &add_keyword($gbl_root, $1);
+    &add_keyword($gbl_root_ast, $1);
   }
   pos $_ = 0;
   while (m/(#$bid|#\|.*?(?<!\\)\|)/g) {
-    &add_symbol($gbl_root, &as_literal_symbol_interior($1));
+    &add_symbol($gbl_root_ast, &as_literal_symbol_interior($1));
   }
   &decode_comments(\$_, $parts);
   &decode_strings(\$_);
@@ -2319,10 +2319,10 @@ sub ast_from_dk_path {
   $gbl_sst = &sst::make($_, $gbl_filename);
 
   #$gbl_sst_cursor = &sst_cursor::make($gbl_sst);
-  #&add_klasses_used($gbl_root, $gbl_sst_cursor);
+  #&add_klasses_used($gbl_root_ast, $gbl_sst_cursor);
 
   $gbl_sst_cursor = &sst_cursor::make($gbl_sst);
-  &add_generics_used($gbl_root, $gbl_sst_cursor);
+  &add_generics_used($gbl_root_ast, $gbl_sst_cursor);
 
   my $exported;
   my $result = &parse_root($gbl_sst_cursor, $exported = 0);
