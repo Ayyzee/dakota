@@ -368,13 +368,13 @@ sub arglist_members {
   my ($arglist, $i) = @_;
   my $result = [];
   my $tkn = '';
-  my $is_framed = 0;
+  my $is_bracketed = 0;
   my $chars = [split(//, $arglist)];
   if (!$i) { $i = 0; }
   #print STDERR scalar @$chars . $nl;
 
   while (scalar @$chars > $i) {
-    if (!$is_framed) {
+    if (!$is_bracketed) {
       if (',' eq $$chars[$i]) {
         &add_last($result, $tkn); $tkn = '';
         $i++; # eat comma
@@ -385,9 +385,9 @@ sub arglist_members {
       }
     }
     if ($$chars[$i] =~ m/\{|\(/) {
-      $is_framed++;
-    } elsif ($$chars[$i] =~ m/\)|\}/ && $is_framed) {
-      $is_framed--;
+      $is_bracketed++;
+    } elsif ($$chars[$i] =~ m/\)|\}/ && $is_bracketed) {
+      $is_bracketed--;
     }
     $tkn .= $$chars[$i];
     $i++;
