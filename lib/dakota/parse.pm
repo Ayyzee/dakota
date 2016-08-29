@@ -1903,63 +1903,63 @@ sub generics::klass_type_from_klass_name { ###
   }
   return $klass_type;
 }
-sub generics::klass_scope_from_klass_name {
+sub generics::klass_ast_from_klass_name {
   my ($klass_name, $type) = @_; # $type currently unused (should be 'klasses' or 'traits')
   my $target_inputs_ast = &target_inputs_ast();
   my $cmd_info = &root_cmd();
-  my $klass_scope;
+  my $klass_ast;
 
   # should use $type
   if (0) {
   } elsif ($$target_inputs_ast{'klasses'}{$klass_name}) {
-    $klass_scope = $$target_inputs_ast{'klasses'}{$klass_name};
+    $klass_ast = $$target_inputs_ast{'klasses'}{$klass_name};
   } elsif ($$target_inputs_ast{'traits'}{$klass_name}) {
-    $klass_scope = $$target_inputs_ast{'traits'}{$klass_name};
+    $klass_ast = $$target_inputs_ast{'traits'}{$klass_name};
   } elsif ($$cmd_info{'opts'}{'precompile'}) {
-    $klass_scope = {};
+    $klass_ast = {};
   } else {
     my $root_cmd = &root_cmd();
     my $ast_path_var = [join '::', @{$$root_cmd{'asts'} || []}];
     die __FILE__, ":", __LINE__,
       ': ERROR: klass/trait "' . $klass_name . '" absent from ast(s) "' . &ct($ast_path_var) . '"' . $nl;
   }
-  return $klass_scope;
+  return $klass_ast;
 }
 
 sub _add_indirect_klasses { # recursive
   my ($klass_names_set, $klass_name, $col) = @_;
-  my $klass_scope =
-    &generics::klass_scope_from_klass_name($klass_name);
+  my $klass_ast =
+    &generics::klass_ast_from_klass_name($klass_name);
 
-  if (defined $$klass_scope{'klass'}) {
-    $$klass_names_set{'klasses'}{$$klass_scope{'klass'}} = undef;
+  if (defined $$klass_ast{'klass'}) {
+    $$klass_names_set{'klasses'}{$$klass_ast{'klass'}} = undef;
 
-    if ('klass' ne $$klass_scope{'klass'}) {
+    if ('klass' ne $$klass_ast{'klass'}) {
       &_add_indirect_klasses($klass_names_set,
-                             $$klass_scope{'klass'},
+                             $$klass_ast{'klass'},
                              &colin($col));
     }
   }
-  if (defined $$klass_scope{'interpose'}) {
-    $$klass_names_set{'klasses'}{$$klass_scope{'interpose'}} = undef;
+  if (defined $$klass_ast{'interpose'}) {
+    $$klass_names_set{'klasses'}{$$klass_ast{'interpose'}} = undef;
 
-    if ('object' ne $$klass_scope{'interpose'}) {
+    if ('object' ne $$klass_ast{'interpose'}) {
       &_add_indirect_klasses($klass_names_set,
-                             $$klass_scope{'interpose'},
+                             $$klass_ast{'interpose'},
                              &colin($col));
     }
   }
-  if (defined $$klass_scope{'superklass'}) {
-    $$klass_names_set{'klasses'}{$$klass_scope{'superklass'}} = undef;
+  if (defined $$klass_ast{'superklass'}) {
+    $$klass_names_set{'klasses'}{$$klass_ast{'superklass'}} = undef;
 
-    if ('object' ne $$klass_scope{'superklass'}) {
+    if ('object' ne $$klass_ast{'superklass'}) {
       &_add_indirect_klasses($klass_names_set,
-                             $$klass_scope{'superklass'},
+                             $$klass_ast{'superklass'},
                              &colin($col));
     }
   }
-  if (defined $$klass_scope{'traits'}) {
-    foreach my $trait (@{$$klass_scope{'traits'}}) {
+  if (defined $$klass_ast{'traits'}) {
+    foreach my $trait (@{$$klass_ast{'traits'}}) {
       $$klass_names_set{'traits'}{$trait} = undef;
       if ($klass_name ne $trait) {
         &_add_indirect_klasses($klass_names_set,
@@ -1968,8 +1968,8 @@ sub _add_indirect_klasses { # recursive
       }
     }
   }
-  if (defined $$klass_scope{'requires'}) {
-    foreach my $reqr (@{$$klass_scope{'requires'}}) {
+  if (defined $$klass_ast{'requires'}) {
+    foreach my $reqr (@{$$klass_ast{'requires'}}) {
       $$klass_names_set{'requires'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
         &_add_indirect_klasses($klass_names_set,
@@ -1978,8 +1978,8 @@ sub _add_indirect_klasses { # recursive
       }
     }
   }
-  if (defined $$klass_scope{'provides'}) {
-    foreach my $reqr (@{$$klass_scope{'provides'}}) {
+  if (defined $$klass_ast{'provides'}) {
+    foreach my $reqr (@{$$klass_ast{'provides'}}) {
       $$klass_names_set{'provides'}{$reqr} = undef;
       if ($klass_name ne $reqr) {
         &_add_indirect_klasses($klass_names_set,
@@ -2017,10 +2017,10 @@ sub generics::parse {
 
   foreach my $construct ('klasses', 'traits', 'requires') {
     foreach $klass_name (keys %{$$klass_names_set{$construct}}) {
-      my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+      my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
 
       my $data = [];
-      &generics::_parse($data, $klass_scope);
+      &generics::_parse($data, $klass_ast);
 
       foreach my $generic (@$data) {
         if (exists $$generics_used{&ct($$generic{'name'})}) {
@@ -2085,8 +2085,8 @@ sub type_trans {
   return $arg_type_ref;
 }
 sub generics::_parse { # no longer recursive
-  my ($data, $klass_scope) = @_;
-  foreach my $method (values %{$$klass_scope{'methods'}}) {
+  my ($data, $klass_ast) = @_;
+  foreach my $method (values %{$$klass_ast{'methods'}}) {
     my $generic = &deep_copy($method);
     $$generic{'exported?'} = 0;
     #$$generic{'inline?'} = 1;
@@ -2122,28 +2122,28 @@ sub add_direct_constructs {
 sub dk_klass_names_from_file {
   my ($file) = @_;
   my $klass_names_set = {};
-  while (my ($klass_name, $klass_scope) = each(%{$$file{'klasses'}})) {
+  while (my ($klass_name, $klass_ast) = each(%{$$file{'klasses'}})) {
     $$klass_names_set{'klasses'}{$klass_name} = undef;
-    if (defined $klass_scope) {
+    if (defined $klass_ast) {
       my $klass = 'klass';
-      if (defined $$klass_scope{'klass'}) {
-        $klass = $$klass_scope{'klass'};
+      if (defined $$klass_ast{'klass'}) {
+        $klass = $$klass_ast{'klass'};
       }
       $$klass_names_set{'klasses'}{$klass} = undef;
       my $superklass = 'object';
-      if (defined $$klass_scope{'superklass'}) {
-        $superklass = $$klass_scope{'superklass'};
+      if (defined $$klass_ast{'superklass'}) {
+        $superklass = $$klass_ast{'superklass'};
       }
       $$klass_names_set{'klasses'}{$superklass} = undef;
 
-      &add_direct_constructs($klass_names_set, $klass_scope, 'traits');
+      &add_direct_constructs($klass_names_set, $klass_ast, 'traits');
     }
   }
   if (exists $$file{'traits'}) {
-    while (my ($klass_name, $klass_scope) = each(%{$$file{'traits'}})) {
+    while (my ($klass_name, $klass_ast) = each(%{$$file{'traits'}})) {
       $$klass_names_set{'traits'}{$klass_name} = undef;
-      if (defined $klass_scope) {
-        &add_direct_constructs($klass_names_set, $klass_scope, 'traits');
+      if (defined $klass_ast) {
+        &add_direct_constructs($klass_names_set, $klass_ast, 'traits');
       }
     }
   }
@@ -2237,24 +2237,24 @@ sub parse_root {
   return $gbl_root;
 }
 sub add_object_methods_decls_to_klass {
-  my ($klass_scope, $methods_key, $slots_methods_key) = @_;
-  if (exists $$klass_scope{$slots_methods_key}) {
+  my ($klass_ast, $methods_key, $slots_methods_key) = @_;
+  if (exists $$klass_ast{$slots_methods_key}) {
     while (my ($slots_method_sig, $slots_method_info) =
-             each (%{$$klass_scope{$slots_methods_key}})) {
+             each (%{$$klass_ast{$slots_methods_key}})) {
       if ($$slots_method_info{'defined?'}) {
         my $object_method_info =
           &dakota::generate::convert_to_object_method($slots_method_info);
         my $object_method_signature =
           &func::overloadsig($object_method_info, undef);
 
-        if (($$klass_scope{'methods'}{$object_method_signature} &&
-             $$klass_scope{'methods'}{$object_method_signature}{'defined?'})) {
+        if (($$klass_ast{'methods'}{$object_method_signature} &&
+             $$klass_ast{'methods'}{$object_method_signature}{'defined?'})) {
         } else {
           $$object_method_info{'defined?'} = 0;
           $$object_method_info{'generated?'} = 1;
           #print STDERR "$object_method_signature\n";
           #print STDERR &Dumper($object_method_info);
-          $$klass_scope{$methods_key}{$object_method_signature} =
+          $$klass_ast{$methods_key}{$object_method_signature} =
             $object_method_info;
         }
       }
@@ -2267,9 +2267,9 @@ sub add_object_methods_decls {
 
   foreach my $construct ('klasses', 'traits') {
     if (exists $$ast{$construct}) {
-      while (my ($klass_name, $klass_scope) =
+      while (my ($klass_name, $klass_ast) =
                each (%{$$ast{$construct}})) {
-        &add_object_methods_decls_to_klass($klass_scope,
+        &add_object_methods_decls_to_klass($klass_ast,
                                            'methods',
                                            'slots-methods');
       }

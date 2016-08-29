@@ -850,12 +850,12 @@ sub kw_arg_type::list_types {
   return \$list;
 }
 sub klass::va_list_methods {
-  my ($klass_scope) = @_;
+  my ($klass_ast) = @_;
   my $method;
   my $va_methods_seq = [];
 
-  #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
+  #foreach $method (sort method::compare values %{$$klass_ast{'methods'}})
+  foreach $method (sort method::compare values %{$$klass_ast{'methods'}}, values %{$$klass_ast{'slots-methods'}}) {
     if (&is_va($method)) {
       &add_last($va_methods_seq, $method);
     }
@@ -863,11 +863,11 @@ sub klass::va_list_methods {
   return $va_methods_seq;
 }
 sub klass::kw_arg_methods {
-  my ($klass_scope) = @_;
+  my ($klass_ast) = @_;
   my $method;
   my $kw_args_methods_seq = [];
 
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}) {
+  foreach $method (sort method::compare values %{$$klass_ast{'methods'}}) {
     if (&has_kw_args($method)) { # leave, don't change to num_kw_args()
       &add_last($kw_args_methods_seq, $method);
     }
@@ -875,12 +875,12 @@ sub klass::kw_arg_methods {
   return $kw_args_methods_seq;
 }
 sub klass::method_aliases {
-  my ($klass_scope) = @_;
+  my ($klass_ast) = @_;
   my $method;
   my $method_aliases_seq = [];
 
-  #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
+  #foreach $method (sort method::compare values %{$$klass_ast{'methods'}})
+  foreach $method (sort method::compare values %{$$klass_ast{'methods'}}, values %{$$klass_ast{'slots-methods'}}) {
     if ($$method{'alias'}) {
       &add_last($method_aliases_seq, $method);
     }
@@ -1719,44 +1719,44 @@ sub generate_va_make_defn {
 ## exists()  (does this key exist)
 ## defined() (is the value (for this key) non-undef)
 sub slots_decl {
-  my ($slots_scope) = @_;
+  my ($slots_ast) = @_;
   my $result = ' slots';
-  if ($$slots_scope{'cat'}) {
-    if ('struct' ne $$slots_scope{'cat'}) {
-      $result .= ' ' . $$slots_scope{'cat'};
+  if ($$slots_ast{'cat'}) {
+    if ('struct' ne $$slots_ast{'cat'}) {
+      $result .= ' ' . $$slots_ast{'cat'};
     }
-    if ('enum' eq $$slots_scope{'cat'}) {
-      if ($$slots_scope{'enum-base'}) {
-        $result .= ' : ' . $$slots_scope{'enum-base'};
+    if ('enum' eq $$slots_ast{'cat'}) {
+      if ($$slots_ast{'enum-base'}) {
+        $result .= ' : ' . $$slots_ast{'enum-base'};
       } else {
         $result .= ' : ' . 'int-t';
       }
     }
-  } elsif ($$slots_scope{'type'}) {
-    $result .= ' ' . $$slots_scope{'type'};
+  } elsif ($$slots_ast{'type'}) {
+    $result .= ' ' . $$slots_ast{'type'};
   }
   return $result;
 }
 sub generate_struct_or_union_decl {
-  my ($col, $slots_scope, $is_exported, $is_slots) = @_;
+  my ($col, $slots_ast, $is_exported, $is_slots) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $slots_cat_info = $$slots_scope{'cat-info'};
+  my $slots_cat_info = $$slots_ast{'cat-info'};
 
-  if ('struct' eq $$slots_scope{'cat'} ||
-      'union'  eq $$slots_scope{'cat'}) {
-    $$scratch_str_ref .= &slots_decl($slots_scope) . '; ';
+  if ('struct' eq $$slots_ast{'cat'} ||
+      'union'  eq $$slots_ast{'cat'}) {
+    $$scratch_str_ref .= &slots_decl($slots_ast) . '; ';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
 }
 sub generate_struct_or_union_defn {
-  my ($col, $slots_scope, $is_exported, $is_slots) = @_;
+  my ($col, $slots_ast, $is_exported, $is_slots) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $slots_cat_info = $$slots_scope{'cat-info'};
+  my $slots_cat_info = $$slots_ast{'cat-info'};
 
-  if ('struct' eq $$slots_scope{'cat'} ||
-      'union'  eq $$slots_scope{'cat'}) {
-    $$scratch_str_ref .= &slots_decl($slots_scope) . ' {' . &ann(__FILE__, __LINE__) . $nl;
+  if ('struct' eq $$slots_ast{'cat'} ||
+      'union'  eq $$slots_ast{'cat'}) {
+    $$scratch_str_ref .= &slots_decl($slots_ast) . ' {' . &ann(__FILE__, __LINE__) . $nl;
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
@@ -1863,14 +1863,14 @@ sub param_list_from_slots_cat_info {
   return ($names, $pairs, $pairs_w_expr);
 }
 sub has_object_method_defn {
-  my ($klass_scope, $slots_method_info) = @_;
+  my ($klass_ast, $slots_method_info) = @_;
   my $result = 0;
 
   my $object_method_info = &convert_to_object_method($slots_method_info);
   my $object_method_sig = &func::overloadsig($object_method_info, []);
 
-  if ($$klass_scope{'methods'}{$object_method_sig} &&
-      $$klass_scope{'methods'}{$object_method_sig}{'defined?'}) {
+  if ($$klass_ast{'methods'}{$object_method_sig} &&
+      $$klass_ast{'methods'}{$object_method_sig}{'defined?'}) {
     $result = 1;
   }
   return $result;
@@ -1883,8 +1883,8 @@ sub generate_klass_unbox {
                         'klass'  => 1 };
   if (! $$special_cases{$klass_name}) {
     ### unbox() same for all types
-    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
-    if ($is_klass_defn || (&should_export_slots($klass_scope) && &has_slots_cat_info($klass_scope))) {
+    my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
+    if ($is_klass_defn || (&should_export_slots($klass_ast) && &has_slots_cat_info($klass_ast))) {
       $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox(object-t object) -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
@@ -1901,17 +1901,17 @@ sub generate_klass_unbox {
   return $result;
 }
 sub generate_klass_box {
-  my ($klass_scope, $klass_path, $klass_name) = @_;
+  my ($klass_ast, $klass_path, $klass_name) = @_;
   my $result = '';
-  if (!&has_slots_defn($klass_scope)) {
+  if (!&has_slots_defn($klass_ast)) {
     return $result;
   }
   my $col = '';
 
   if ('object' ne &ct($klass_path)) {
-    if (&should_export_slots($klass_scope)) {
+    if (&should_export_slots($klass_ast)) {
       ### box()
-      my $slots_type = &at($$klass_scope{'slots'}, 'type');
+      my $slots_type = &at($$klass_ast{'slots'}, 'type');
       if (&is_array_type($slots_type)) {
         ### box() array-type
         $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> object-t";
@@ -1950,7 +1950,7 @@ sub generate_klass_box {
         } elsif (&is_target_defn()) {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
-          if ($$klass_scope{'init-supports-kw-slots?'}) {
+          if ($$klass_ast{'init-supports-kw-slots?'}) {
             my $type = "$klass_name\::slots-t";
             my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
             if ($promoted_type) {
@@ -1985,20 +1985,20 @@ sub generate_klass_box {
       }
     }
   }
-  if ((&is_src_decl() || &is_target_decl) && &should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  if ((&is_src_decl() || &is_target_decl) && &should_export_slots($klass_ast) && &has_slots_type($klass_ast)) {
     $result .= $col . "using $klass_name\::box;" . &ann(__FILE__, __LINE__) . $nl;
   }
   return $result;
 }
 sub generate_klass_construct {
-  my ($klass_scope, $klass_name) = @_;
+  my ($klass_ast, $klass_name) = @_;
   my $result = '';
   my $col = '';
-  my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
-  my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
+  my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
+  my $slots_cat_info = &at($$klass_ast{'slots'}, 'cat-info');
   if ($slots_cat && ('struct' eq $slots_cat)) {
     if ($ENV{'DK_NO_COMPOUND_LITERALS'}) {
-      if (&has_slots_cat_info($klass_scope)) {
+      if (&has_slots_cat_info($klass_ast)) {
         my ($names, $pairs, $pairs_w_expr) = &param_list_from_slots_cat_info($slots_cat_info);
         #print "generate-klass-construct: " . &Dumper($slots_cat_info);
 
@@ -2022,7 +2022,7 @@ sub generate_klass_construct {
   return $result;
 }
 sub linkage_unit::generate_klasses_body_vars {
-  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width, $should_ann) = @_;
+  my ($klass_ast, $col, $klass_type, $klass_path, $klass_name, $max_width, $should_ann) = @_;
   my $width = length($klass_name);
   my $pad = ' ' x ($max_width - $width);
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -2045,15 +2045,15 @@ sub linkage_unit::generate_klasses_body_vars {
   $$scratch_str_ref .= ' }' . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
     if (!&is_target_defn()) {
       my $is_exported;
-      if (exists $$klass_scope{'const'}) {
-        foreach my $const (@{$$klass_scope{'const'}}) {
+      if (exists $$klass_ast{'const'}) {
+        foreach my $const (@{$$klass_ast{'const'}}) {
           $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { extern const $$const{'type'} $$const{'name'}; }" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
         }
       }
     }
 }
 sub linkage_unit::generate_klasses_body_funcs_klass {
-  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
+  my ($klass_ast, $col, $klass_type, $klass_path, $klass_name) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ('trait' eq $klass_type) {
@@ -2065,32 +2065,32 @@ sub linkage_unit::generate_klasses_body_funcs_klass {
   }
 }
 sub linkage_unit::generate_klasses_body_funcs_box {
-  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
+  my ($klass_ast, $col, $klass_type, $klass_path, $klass_name) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ('klass' eq $klass_type) {
-    if (&has_slots($klass_scope)) {
-      $$scratch_str_ref .= &generate_klass_box($klass_scope, $klass_path, $klass_name);
+    if (&has_slots($klass_ast)) {
+      $$scratch_str_ref .= &generate_klass_box($klass_ast, $klass_path, $klass_name);
     } # if (&has_slots()
   }
 }
 sub linkage_unit::generate_klasses_body_funcs {
-  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name) = @_;
+  my ($klass_ast, $col, $klass_type, $klass_path, $klass_name) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ('klass' eq $klass_type) {
-    if (&has_slots($klass_scope)) {
-      my $is_klass_defn = scalar keys %$klass_scope;
+    if (&has_slots($klass_ast)) {
+      my $is_klass_defn = scalar keys %$klass_ast;
       $$scratch_str_ref .= &generate_klass_unbox($klass_path, $klass_name, $is_klass_defn);
     } # if (&has_slots()
     my $object_method_defns = {};
-    foreach my $method (sort method::compare values %{$$klass_scope{'slots-methods'}}) {
+    foreach my $method (sort method::compare values %{$$klass_ast{'slots-methods'}}) {
       if (&is_src_defn() || &is_target_defn() || &is_exported($method)) {
         if (!&is_va($method)) {
           if (&is_box_type($$method{'param-types'}[0])) {
             my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
             #$$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref } // REMOVE" . &ann(__FILE__, __LINE__) . $nl;
-            if (!&has_object_method_defn($klass_scope, $method)) {
+            if (!&has_object_method_defn($klass_ast, $method)) {
               my $object_method = &convert_to_object_method($method);
               my $sig = &func::overloadsig($object_method, []);
               if (!$$object_method_defns{$sig}) {
@@ -2113,7 +2113,7 @@ sub linkage_unit::generate_klasses_body_funcs {
         }
       }
     }
-    my $exported_slots_methods = &exported_slots_methods($klass_scope);
+    my $exported_slots_methods = &exported_slots_methods($klass_ast);
     foreach my $method (sort method::compare values %$exported_slots_methods) {
       die if !&is_exported($method);
       if (&is_src_defn() || &is_target_defn()) {
@@ -2121,7 +2121,7 @@ sub linkage_unit::generate_klasses_body_funcs {
           if (&is_box_type($$method{'param-types'}[0])) {
             my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
             $$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref }" . &ann(__FILE__, __LINE__) . $nl;
-            if (!&has_object_method_defn($klass_scope, $method)) {
+            if (!&has_object_method_defn($klass_ast, $method)) {
               my $object_method = &convert_to_object_method($method);
               my $sig = &func::overloadsig($object_method, []);
               if (!$$object_method_defns{$sig}) {
@@ -2145,14 +2145,14 @@ sub linkage_unit::generate_klasses_body_funcs {
     if (0 < keys %$object_method_defns) {
       #print STDERR &Dumper($object_method_defns);
     }
-    if (&should_export_slots($klass_scope)) {
-      $$scratch_str_ref .= &generate_klass_construct($klass_scope, $klass_name);
+    if (&should_export_slots($klass_ast)) {
+      $$scratch_str_ref .= &generate_klass_construct($klass_ast, $klass_name);
     }
   } # if ('klass' eq $klass_type)
-  #foreach $method (sort method::compare values %{$$klass_scope{'methods'}})
-  foreach my $method (sort method::compare values %{$$klass_scope{'methods'}}, values %{$$klass_scope{'slots-methods'}}) {
+  #foreach $method (sort method::compare values %{$$klass_ast{'methods'}})
+  foreach my $method (sort method::compare values %{$$klass_ast{'methods'}}, values %{$$klass_ast{'slots-methods'}}) {
     if (&is_decl) {
-      if (&is_same_src_file($klass_scope) || &is_target()) { #rn3
+      if (&is_same_src_file($klass_ast) || &is_target()) { #rn3
         if (!&is_va($method)) {
           my ($visibility, $method_decl_ref) = &func::decl($method, $klass_path);
           $$scratch_str_ref .= $col . "$klass_type $klass_name {" . $visibility . " METHOD $$method_decl_ref } // DUPLICATE" . &ann(__FILE__, __LINE__) . $nl;
@@ -2162,27 +2162,27 @@ sub linkage_unit::generate_klasses_body_funcs {
   }
 }
 sub linkage_unit::generate_klasses_body_funcs_non_inline {
-  my ($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width) = @_;
+  my ($klass_ast, $col, $klass_type, $klass_path, $klass_name, $max_width) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   my $width = length($klass_name);
   my $pad = ' ' x ($max_width - $width);
 
-  my $va_list_methods = &klass::va_list_methods($klass_scope);
-  if (&is_decl() && $$klass_scope{'has-initialize'}) {
+  my $va_list_methods = &klass::va_list_methods($klass_ast);
+  if (&is_decl() && $$klass_ast{'has-initialize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
-  if (&is_decl() && $$klass_scope{'has-finalize'}) {
+  if (&is_decl() && $$klass_ast{'has-finalize'}) {
     $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
-  my $kw_arg_methods = &klass::kw_arg_methods($klass_scope);
+  my $kw_arg_methods = &klass::kw_arg_methods($klass_ast);
   if (&is_decl() && @$kw_arg_methods) {
-    &generate_kw_arg_method_signature_decls($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type, $max_width);
+    &generate_kw_arg_method_signature_decls($$klass_ast{'methods'}, [ $klass_name ], $col, $klass_type, $max_width);
   }
-  if (&is_decl() && defined $$klass_scope{'slots-methods'}) {
-    &generate_slots_method_signature_decls($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type, $max_width);
+  if (&is_decl() && defined $$klass_ast{'slots-methods'}) {
+    &generate_slots_method_signature_decls($$klass_ast{'slots-methods'}, [ $klass_name ], $col, $klass_type, $max_width);
   }
-  if (&is_target() && !&is_decl() && defined $$klass_scope{'slots-methods'}) {
-    &generate_slots_method_signature_defns($$klass_scope{'slots-methods'}, [ $klass_name ], $col, $klass_type);
+  if (&is_target() && !&is_decl() && defined $$klass_ast{'slots-methods'}) {
+    &generate_slots_method_signature_defns($$klass_ast{'slots-methods'}, [ $klass_name ], $col, $klass_type);
   }
   if (&is_decl() && @$va_list_methods) { #rn0
     #print STDERR Dumper($va_list_methods);
@@ -2200,8 +2200,8 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
       if (1) {
         my $va_method = &deep_copy($method);
         #$$va_method{'inline?'} = 1;
-        #if (&is_decl() || &is_same_file($klass_scope)) #rn1
-        if (&is_same_src_file($klass_scope) || &is_decl()) { #rn1
+        #if (&is_decl() || &is_same_file($klass_ast)) #rn1
+        if (&is_same_src_file($klass_ast) || &is_decl()) { #rn1
           if (&has_kw_args($method)) { # leave, don't change to num_kw_args() (only missing-prototype warning)
             &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
             if (0 == &num_kw_args($va_method)) {
@@ -2219,7 +2219,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
           &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
         }
         if (&is_decl) {
-          if (&is_same_src_file($klass_scope) || &is_target()) { #rn2
+          if (&is_same_src_file($klass_ast) || &is_target()) { #rn2
               if (&num_kw_args($method)) {
                 my $other_method_decl = &kw_args_method::type_decl($method);
 
@@ -2333,54 +2333,54 @@ sub typealias_slots_t {
 #
 # {'slots'}{'cat-info'} = aggregate elements
 sub generate_slots_decls {
-  my ($ast, $col, $klass_path, $klass_name, $klass_scope) = @_;
-  if (!$klass_scope) {
-    $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  my ($ast, $col, $klass_path, $klass_name, $klass_ast) = @_;
+  if (!$klass_ast) {
+    $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
   }
   my $scratch_str_ref = &global_scratch_str_ref();
-  if (!&should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
-    $$scratch_str_ref .= $col . "klass $klass_name {" . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
-    if (&is_same_src_file($klass_scope)) {
+  if (!&should_export_slots($klass_ast) && &has_slots_type($klass_ast)) {
+    $$scratch_str_ref .= $col . "klass $klass_name {" . &slots_decl($$klass_ast{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
+    if (&is_same_src_file($klass_ast)) {
       $$scratch_str_ref .= $col .        &typealias_slots_t($klass_name) . $nl;
     } else {
       $$scratch_str_ref .= $col . '//' . &typealias_slots_t($klass_name) . $nl;
     }
-  } elsif (!&should_export_slots($klass_scope) && &has_slots($klass_scope)) {
-    my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+  } elsif (!&should_export_slots($klass_ast) && &has_slots($klass_ast)) {
+    my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
     if ('struct' eq $slots_cat ||
         'union'  eq $slots_cat) {
-      $$scratch_str_ref .= $col . "klass $klass_name {" . &slots_decl($$klass_scope{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "klass $klass_name {" . &slots_decl($$klass_ast{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
     } elsif ('enum' eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name {";
       my $is_exported;
       my $is_slots;
-      &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
+      &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
       $$scratch_str_ref .= $col . "}" . $nl;
     } else {
-      print STDERR &Dumper($$klass_scope{'slots'});
+      print STDERR &Dumper($$klass_ast{'slots'});
       die __FILE__, ":", __LINE__, ": error:" . $nl;
     }
     $$scratch_str_ref .= $col . '// ' . &typealias_slots_t($klass_name) . $nl;
   }
 }
 sub generate_exported_slots_decls {
-  my ($ast, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2) = @_;
+  my ($ast, $col, $klass_path, $klass_name, $klass_ast, $max_width1, $max_width2) = @_;
   my $pad1 = '';
   if ($max_width1) {
     my $width = length($klass_name);
     $pad1 = ' ' x ($max_width1 - $width);
   }
-  my $slots_decl = &slots_decl($$klass_scope{'slots'});
+  my $slots_decl = &slots_decl($$klass_ast{'slots'});
   my $typealias_slots_t = ' ' . &typealias_slots_t($klass_name);
   my $pad2 = '';
   if ($max_width2) {
     my $width = length($slots_decl);
     $pad2 = ' ' x ($max_width2 - $width);
   }
-  if (!$klass_scope) {
-    $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  if (!$klass_ast) {
+    $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
   }
-  my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+  my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
   my $scratch_str_ref = &global_scratch_str_ref();
   if ('object' eq "$klass_name") {
     if ('struct' eq $slots_cat ||
@@ -2389,11 +2389,11 @@ sub generate_exported_slots_decls {
     } elsif ('enum' eq $slots_cat) {
       $$scratch_str_ref .= $col . "//klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     } else {
-      print STDERR &Dumper($$klass_scope{'slots'});
+      print STDERR &Dumper($$klass_ast{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
     $$scratch_str_ref .= $pad2 . $typealias_slots_t . &ann(__FILE__, __LINE__) . $nl; # special-case
-  } elsif (&should_export_slots($klass_scope) && &has_slots_type($klass_scope)) {
+  } elsif (&should_export_slots($klass_ast) && &has_slots_type($klass_ast)) {
     $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     my $excluded_types = { 'char16-t' => '__STDC_UTF_16__',
                            'char32-t' => '__STDC_UTF_32__',
@@ -2402,7 +2402,7 @@ sub generate_exported_slots_decls {
     if (!exists $$excluded_types{"$klass_name-t"}) {
       $$scratch_str_ref .= $pad2 . $typealias_slots_t . &ann(__FILE__, __LINE__) . $nl;
     }
-  } elsif (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
+  } elsif (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
     if ('struct' eq $slots_cat ||
         'union'  eq $slots_cat) {
       $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
@@ -2410,10 +2410,10 @@ sub generate_exported_slots_decls {
       $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {";
       my $is_exported;
       my $is_slots;
-      &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
+      &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);
       $$scratch_str_ref .= $col . "}" . $nl;
     } else {
-      print STDERR &Dumper($$klass_scope{'slots'});
+      print STDERR &Dumper($$klass_ast{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
     }
     $$scratch_str_ref .= $pad2 . $typealias_slots_t . &ann(__FILE__, __LINE__) . $nl;
@@ -2429,10 +2429,10 @@ sub linkage_unit::generate_headers {
     $$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
 
     foreach my $klass_name (@$klass_names) {
-      my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+      my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
 
-      if (exists $$klass_scope{'exported-headers'} && defined $$klass_scope{'exported-headers'}) {
-        while (my ($header, $klasses) = each (%{$$klass_scope{'exported-headers'}})) {
+      if (exists $$klass_ast{'exported-headers'} && defined $$klass_ast{'exported-headers'}) {
+        while (my ($header, $klasses) = each (%{$$klass_ast{'exported-headers'}})) {
           $$exported_headers{$header} = undef;
         }
       }
@@ -2453,83 +2453,83 @@ sub linkage_unit::generate_headers {
   return $result;
 }
 sub has_slots_type {
-  my ($klass_scope) = @_;
-  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'type')) {
+  my ($klass_ast) = @_;
+  if (&has_slots($klass_ast) && &at($$klass_ast{'slots'}, 'type')) {
     return 1;
   }
   return 0;
 }
 sub has_slots_cat_info {
-  my ($klass_scope) = @_;
-  if (&has_slots($klass_scope) && &at($$klass_scope{'slots'}, 'cat-info')) {
+  my ($klass_ast) = @_;
+  if (&has_slots($klass_ast) && &at($$klass_ast{'slots'}, 'cat-info')) {
     return 1;
   }
   return 0;
 }
 sub has_enum_info {
-  my ($klass_scope) = @_;
-  if (exists $$klass_scope{'enum'} && $$klass_scope{'enum'}) {
+  my ($klass_ast) = @_;
+  if (exists $$klass_ast{'enum'} && $$klass_ast{'enum'}) {
     return 1;
   } else {
     return 0;
   }
 }
 sub has_const_info {
-  my ($klass_scope) = @_;
-  if (exists $$klass_scope{'const'} && $$klass_scope{'const'}) {
+  my ($klass_ast) = @_;
+  if (exists $$klass_ast{'const'} && $$klass_ast{'const'}) {
     return 1;
   } else {
     return 0;
   }
 }
 sub has_enums {
-  my ($klass_scope) = @_;
-  if (exists $$klass_scope{'enum'} && $$klass_scope{'enum'} && 0 < scalar(@{$$klass_scope{'enum'}})) {
+  my ($klass_ast) = @_;
+  if (exists $$klass_ast{'enum'} && $$klass_ast{'enum'} && 0 < scalar(@{$$klass_ast{'enum'}})) {
     return 1;
   } else {
     return 0;
   }
 }
 sub has_slots {
-  my ($klass_scope) = @_;
-  if (exists $$klass_scope{'slots'} && $$klass_scope{'slots'}) {
+  my ($klass_ast) = @_;
+  if (exists $$klass_ast{'slots'} && $$klass_ast{'slots'}) {
     return 1;
   }
   return 0;
 }
 sub has_slots_defn {
-  my ($klass_scope) = @_;
-  if (&has_slots($klass_scope)) {
-    if (&at($$klass_scope{'slots'}, 'cat-info') ||
-        &at($$klass_scope{'slots'}, 'type')) {
+  my ($klass_ast) = @_;
+  if (&has_slots($klass_ast)) {
+    if (&at($$klass_ast{'slots'}, 'cat-info') ||
+        &at($$klass_ast{'slots'}, 'type')) {
       return 1;
     }
   }
   return 0;
 }
 sub has_exported_slots {
-  my ($klass_scope) = @_;
-  if (&has_slots($klass_scope)) {
-    return &is_exported($$klass_scope{'slots'});
+  my ($klass_ast) = @_;
+  if (&has_slots($klass_ast)) {
+    return &is_exported($$klass_ast{'slots'});
   }
   return 0;
 }
 sub should_export_slots {
-  my ($klass_scope) = @_;
-  return (!$ENV{'DK_SRC_UNIQUE_HEADER'} && &has_slots($klass_scope)) || &has_exported_slots($klass_scope);
+  my ($klass_ast) = @_;
+  return (!$ENV{'DK_SRC_UNIQUE_HEADER'} && &has_slots($klass_ast)) || &has_exported_slots($klass_ast);
 }
 sub has_methods {
-  my ($klass_scope) = @_;
-  if (exists $$klass_scope{'methods'} && 0 != keys %{$$klass_scope{'methods'}}) {
+  my ($klass_ast) = @_;
+  if (exists $$klass_ast{'methods'} && 0 != keys %{$$klass_ast{'methods'}}) {
     return 1;
   }
   return 0;
 }
 sub has_exported_methods {
-  my ($klass_scope) = @_;
-  if (&has_methods($klass_scope)) {
-    if (exists $$klass_scope{'behavior-exported?'} && defined $$klass_scope{'behavior-exported?'}) {
-      return $$klass_scope{'behavior-exported?'};
+  my ($klass_ast) = @_;
+  if (&has_methods($klass_ast)) {
+    if (exists $$klass_ast{'behavior-exported?'} && defined $$klass_ast{'behavior-exported?'}) {
+      return $$klass_ast{'behavior-exported?'};
     }
   }
   return 0;
@@ -2539,22 +2539,22 @@ sub order_klasses {
   my $type_aliases = {};
   my $depends = {};
   my $verbose = 0;
-  my ($klass_name, $klass_scope);
+  my ($klass_name, $klass_ast);
 
   foreach my $klass_type_plural ('traits', 'klasses') {
     foreach $klass_name (sort keys %{$$ast{$klass_type_plural}}) {
-      $klass_scope = $$ast{$klass_type_plural}{$klass_name};
-      if (!$klass_scope || !$$klass_scope{'slots'}) {
+      $klass_ast = $$ast{$klass_type_plural}{$klass_name};
+      if (!$klass_ast || !$$klass_ast{'slots'}) {
         # if one has a klass scope locally (like adding a method on klass object)
         # dont use it since it won't have a slots defn
-        $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+        $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
       }
-      if ($klass_scope) {
-        if (&has_slots($klass_scope)) {
+      if ($klass_ast) {
+        if (&has_slots($klass_ast)) {
           # even if not exported
           $$type_aliases{"$klass_name-t"} = "$klass_name\::slots-t";
           # hackhack
-          my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
+          my $slots_cat_info = &at($$klass_ast{'slots'}, 'cat-info');
           if ($slots_cat_info) {
             foreach my $slot_cat_info (@$slots_cat_info) {
               my $types = [values %$slot_cat_info];
@@ -2567,7 +2567,7 @@ sub order_klasses {
                   }
                   if (!exists $$ast{'klasses'}{$type_klass_name}) {
                     #$$ast{$klass_type_plural}{$type_klass_name}
-                    #  = &generics::klass_scope_from_klass_name($type_klass_name);
+                    #  = &generics::klass_ast_from_klass_name($type_klass_name);
                   }
                 }
               }
@@ -2583,19 +2583,19 @@ sub order_klasses {
   }
   foreach my $klass_type_plural ('traits', 'klasses') {
     foreach $klass_name (sort keys %{$$ast{$klass_type_plural}}) {
-      $klass_scope = $$ast{$klass_type_plural}{$klass_name};
-      if (!$klass_scope || !$$klass_scope{'slots'}) {
+      $klass_ast = $$ast{$klass_type_plural}{$klass_name};
+      if (!$klass_ast || !$$klass_ast{'slots'}) {
         # if one has a klass scope locally (like adding a method on klass object)
         # dont use it since it won't have a slots defn
-        $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+        $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
       }
-      if ($klass_scope) {
+      if ($klass_ast) {
         if ($verbose) {
           print STDERR "klass-name: $klass_name" . $nl;
         }
-        my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
-        if (&has_slots($klass_scope)) {
-          my $slots_type = &at($$klass_scope{'slots'}, 'type');
+        my $slots_cat_info = &at($$klass_ast{'slots'}, 'cat-info');
+        if (&has_slots($klass_ast)) {
+          my $slots_type = &at($$klass_ast{'slots'}, 'type');
           if ($slots_type) {
             if ($verbose) {
               print STDERR "  type:" . $nl;
@@ -2757,26 +2757,26 @@ sub linkage_unit::generate_klasses_types_before {
     my $max_width1 = 0;
     my $max_width2 = 0;
     foreach my $klass_name (@$ordered_klass_names) { # do not sort!
-      my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+      my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
 
-      if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
+      if (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
         my $width1 = length($klass_name);
         if ($width1 > $max_width1) {
           $max_width1 = $width1;
         }
-        my $width2 = length(&slots_decl($$klass_scope{'slots'}));
+        my $width2 = length(&slots_decl($$klass_ast{'slots'}));
         if ($width2 > $max_width2) {
           $max_width2 = $width2;
         }
       }
     }
     foreach my $klass_name (@$ordered_klass_names) { # do not sort!
-      my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+      my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
 
-      if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
-        &generate_exported_slots_decls($ast, $col, $klass_path, $klass_name, $klass_scope, $max_width1, $max_width2);
+      if (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
+        &generate_exported_slots_decls($ast, $col, $klass_path, $klass_name, $klass_ast, $max_width1, $max_width2);
       } else {
-        &generate_slots_decls($ast, $col, $klass_path, $klass_name, $klass_scope);
+        &generate_slots_decls($ast, $col, $klass_path, $klass_name, $klass_ast);
       }
     }
   }
@@ -2785,14 +2785,14 @@ sub linkage_unit::generate_klasses_types_after {
   my ($ast, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   foreach my $klass_name (@$ordered_klass_names) { # do not sort!
-    my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
-    my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+    my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
+    my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
     my $is_exported;
     my $is_slots;
 
     if (&is_decl()) {
-      if (&has_enums($klass_scope)) {
-        foreach my $enum (@{$$klass_scope{'enum'} || []}) {
+      if (&has_enums($klass_ast)) {
+        foreach my $enum (@{$$klass_ast{'enum'} || []}) {
           if (&is_exported($enum)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
             &generate_enum_defn(&colin($col), $enum, $is_exported = 1, $is_slots = 0);
@@ -2801,32 +2801,32 @@ sub linkage_unit::generate_klasses_types_after {
         }
       }
     }
-    if (&has_slots_cat_info($klass_scope)) {
+    if (&has_slots_cat_info($klass_ast)) {
       if (&is_decl()) {
-        if (&should_export_slots($klass_scope) || (&has_slots($klass_scope) && &is_same_file($klass_scope))) {
+        if (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
           $$scratch_str_ref .= $col . "klass $klass_name {";
           if ('struct' eq $slots_cat ||
               'union'  eq $slots_cat) {
-            &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
+            &generate_struct_or_union_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);
           } elsif ('enum' eq $slots_cat) {
-            &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 1, $is_slots = 1);
+            &generate_enum_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);
           } else {
-            print STDERR &Dumper($$klass_scope{'slots'});
+            print STDERR &Dumper($$klass_ast{'slots'});
             die __FILE__, ":", __LINE__, ": error:\n";
           }
           $$scratch_str_ref .= $col . "}" . $nl;
         }
       } elsif (&is_src_defn() || &is_target_defn()) {
-        if (!&should_export_slots($klass_scope)) {
-          if (&is_exported($klass_scope)) {
+        if (!&should_export_slots($klass_ast)) {
+          if (&is_exported($klass_ast)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
             if ('struct' eq $slots_cat ||
                 'union'  eq $slots_cat) {
-              &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
+              &generate_struct_or_union_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
             } elsif ('enum' eq $slots_cat) {
-              &generate_enum_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
+              &generate_enum_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
             } else {
-              print STDERR &Dumper($$klass_scope{'slots'});
+              print STDERR &Dumper($$klass_ast{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
             $$scratch_str_ref .= $col . "}" . $nl;
@@ -2834,11 +2834,11 @@ sub linkage_unit::generate_klasses_types_after {
             $$scratch_str_ref .= $col . "klass $klass_name {";
             if ('struct' eq $slots_cat ||
                 'union'  eq $slots_cat) {
-              &generate_struct_or_union_defn(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
+              &generate_struct_or_union_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
             } elsif ('enum' eq $slots_cat) {
-              &generate_enum_decl(&colin($col), $$klass_scope{'slots'}, $is_exported = 0, $is_slots = 1);
+              &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
             } else {
-              print STDERR &Dumper($$klass_scope{'slots'});
+              print STDERR &Dumper($$klass_ast{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
             $$scratch_str_ref .= $col . "}" . $nl;
@@ -2851,46 +2851,46 @@ sub linkage_unit::generate_klasses_types_after {
 sub linkage_unit::generate_klasses_klass_vars {
   my ($ast, $col, $klass_path, $klass_name, $max_width, $should_ann) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
-  my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_body_vars($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width, $should_ann);
+  &linkage_unit::generate_klasses_body_vars($klass_ast, $col, $klass_type, $klass_path, $klass_name, $max_width, $should_ann);
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs_klass {
   my ($ast, $col, $klass_path, $klass_name) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
-  my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_body_funcs_klass($klass_scope, $col, $klass_type, $klass_path, $klass_name);
+  &linkage_unit::generate_klasses_body_funcs_klass($klass_ast, $col, $klass_type, $klass_path, $klass_name);
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs_box {
   my ($ast, $col, $klass_path, $klass_name) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
-  my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_body_funcs_box($klass_scope, $col, $klass_type, $klass_path, $klass_name);
+  &linkage_unit::generate_klasses_body_funcs_box($klass_ast, $col, $klass_type, $klass_path, $klass_name);
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs {
   my ($ast, $col, $klass_path, $klass_name) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
-  my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_body_funcs($klass_scope, $col, $klass_type, $klass_path, $klass_name);
+  &linkage_unit::generate_klasses_body_funcs($klass_ast, $col, $klass_type, $klass_path, $klass_name);
   &path::remove_last($klass_path);
 }
 sub linkage_unit::generate_klasses_klass_funcs_non_inline {
   my ($ast, $col, $klass_path, $klass_name, $max_width) = @_;
   my $klass_type = &generics::klass_type_from_klass_name($klass_name); # hackhack: name could be both a trait & a klass
-  my $klass_scope = &generics::klass_scope_from_klass_name($klass_name);
+  my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
   &path::add_last($klass_path, $klass_name);
   my $scratch_str_ref = &global_scratch_str_ref();
-  &linkage_unit::generate_klasses_body_funcs_non_inline($klass_scope, $col, $klass_type, $klass_path, $klass_name, $max_width);
+  &linkage_unit::generate_klasses_body_funcs_non_inline($klass_ast, $col, $klass_type, $klass_path, $klass_name, $max_width);
   &path::remove_last($klass_path);
 }
 sub method::type {
@@ -3091,10 +3091,10 @@ sub export_pair {
   return ($lhs, $rhs);
 }
 sub exported_methods {
-  my ($klass_scope) = @_;
+  my ($klass_ast) = @_;
   my $exported_methods = {};
   {
-    while (my ($key, $val) = each (%{$$klass_scope{'methods'}})) {
+    while (my ($key, $val) = each (%{$$klass_ast{'methods'}})) {
       if (&is_exported($val)) {
         $$exported_methods{$key} = $val;
       }
@@ -3103,10 +3103,10 @@ sub exported_methods {
   return $exported_methods;
 }
 sub exported_slots_methods {
-  my ($klass_scope) = @_;
+  my ($klass_ast) = @_;
   my $exported_slots_methods = {};
   {
-    while (my ($key, $val) = each (%{$$klass_scope{'slots-methods'}})) {
+    while (my ($key, $val) = each (%{$$klass_ast{'slots-methods'}})) {
       if (&is_exported($val)) {
         $$exported_slots_methods{$key} = $val;
       }
@@ -3115,7 +3115,7 @@ sub exported_slots_methods {
   return $exported_slots_methods;
 }
 sub dk_generate_cc_footer_klass {
-  my ($klass_scope, $klass_name, $col, $klass_type, $symbols) = @_;
+  my ($klass_ast, $klass_name, $col, $klass_type, $symbols) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
   #$$scratch_str_ref .= $col . "// generate_cc_footer_klass()" . $nl;
 
@@ -3124,9 +3124,9 @@ sub dk_generate_cc_footer_klass {
   my $slot_type;
   my $slot_name;
 
-  my $method_aliases = &klass::method_aliases($klass_scope);
-  my $va_list_methods = &klass::va_list_methods($klass_scope);
-  my $kw_arg_methods = &klass::kw_arg_methods($klass_scope);
+  my $method_aliases = &klass::method_aliases($klass_ast);
+  my $va_list_methods = &klass::va_list_methods($klass_ast);
+  my $kw_arg_methods = &klass::kw_arg_methods($klass_ast);
 
   #my $num_va_methods = @$va_list_methods;
 
@@ -3241,27 +3241,27 @@ sub dk_generate_cc_footer_klass {
     $col = &colout($col);
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
-  if (values %{$$klass_scope{'methods'} || []}) {
+  if (values %{$$klass_ast{'methods'} || []}) {
     $$scratch_str_ref .=
       $col . "$klass_type @$klass_name { static const signature-t* const __method-signatures[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
-      $col . &signature_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
+      $col . &signature_body($klass_name, $$klass_ast{'methods'}, &colin($col)) .
       $col . "};}" . $nl;
   }
-  if (values %{$$klass_scope{'methods'} || []}) {
+  if (values %{$$klass_ast{'methods'} || []}) {
     $$scratch_str_ref .=
       $col . "$klass_type @$klass_name { static method-t __method-addresses[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
-      $col . &address_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
+      $col . &address_body($klass_name, $$klass_ast{'methods'}, &colin($col)) .
       $col . "};}" . $nl;
   }
   my $num_method_aliases = scalar(@$method_aliases);
   if ($num_method_aliases) {
     $$scratch_str_ref .=
       $col . "$klass_type @$klass_name { static method-alias-t __method-aliases[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
-      $col . &alias_body($klass_name, $$klass_scope{'methods'}, &colin($col)) .
+      $col . &alias_body($klass_name, $$klass_ast{'methods'}, &colin($col)) .
       $col . "};}" . $nl;
   }
-  my $exported_methods =     &exported_methods($klass_scope);
-  my $exported_slots_methods = &exported_slots_methods($klass_scope);
+  my $exported_methods =     &exported_methods($klass_ast);
+  my $exported_slots_methods = &exported_slots_methods($klass_ast);
 
   if (values %{$exported_methods || []}) {
     $$scratch_str_ref .=
@@ -3286,14 +3286,14 @@ sub dk_generate_cc_footer_klass {
   ###
   #$$scratch_str_ref .= $nl;
 
-  my $num_traits = @{( $$klass_scope{'traits'} || [] )}; # how to get around 'strict'
+  my $num_traits = @{( $$klass_ast{'traits'} || [] )}; # how to get around 'strict'
   if ($num_traits > 0) {
     $$scratch_str_ref .= $nl;
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t __traits[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     my $trait_num = 0;
     for ($trait_num = 0; $trait_num < $num_traits; $trait_num++) {
-      my $path = "$$klass_scope{'traits'}[$trait_num]";
+      my $path = "$$klass_ast{'traits'}[$trait_num]";
       $$scratch_str_ref .= $col . "$path\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
@@ -3301,8 +3301,8 @@ sub dk_generate_cc_footer_klass {
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
   my $num_requires = 0;
-  if (exists $$klass_scope{'requires'} && defined $$klass_scope{'requires'}) {
-    $num_requires = scalar @{$$klass_scope{'requires'}};
+  if (exists $$klass_ast{'requires'} && defined $$klass_ast{'requires'}) {
+    $num_requires = scalar @{$$klass_ast{'requires'}};
   }
   if ($num_requires > 0) {
     $$scratch_str_ref .= $nl;
@@ -3310,7 +3310,7 @@ sub dk_generate_cc_footer_klass {
     $col = &colin($col);
     my $require_num = 0;
     for ($require_num = 0; $require_num < $num_requires; $require_num++) {
-      my $path = "$$klass_scope{'requires'}[$require_num]";
+      my $path = "$$klass_ast{'requires'}[$require_num]";
       $$scratch_str_ref .= $col . "$path\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
@@ -3318,8 +3318,8 @@ sub dk_generate_cc_footer_klass {
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
   my $num_provides = 0;
-  if (exists $$klass_scope{'provides'} && defined $$klass_scope{'provides'}) {
-    $num_provides = scalar @{$$klass_scope{'provides'}};
+  if (exists $$klass_ast{'provides'} && defined $$klass_ast{'provides'}) {
+    $num_provides = scalar @{$$klass_ast{'provides'}};
   }
   if ($num_provides > 0) {
     $$scratch_str_ref .= $nl;
@@ -3327,14 +3327,14 @@ sub dk_generate_cc_footer_klass {
     $col = &colin($col);
     my $provide_num = 0;
     for ($provide_num = 0; $provide_num < $num_provides; $provide_num++) {
-      my $path = "$$klass_scope{'provides'}[$provide_num]";
+      my $path = "$$klass_ast{'provides'}[$provide_num]";
       $$scratch_str_ref .= $col . "$path\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
     $col = &colout($col);
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
-  while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}})) {
+  while (my ($key, $val) = each(%{$$klass_ast{'imported-klasses'}})) {
     my $token;
     my $token_seq = $key;
     if (0 != length $token_seq) {
@@ -3345,11 +3345,11 @@ sub dk_generate_cc_footer_klass {
       }
     }
   }
-  my $num_bound = keys %{$$klass_scope{'imported-klasses'}};
+  my $num_bound = keys %{$$klass_ast{'imported-klasses'}};
   if ($num_bound) {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const __imported-klasses[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
-    while (my ($key, $val) = each(%{$$klass_scope{'imported-klasses'}})) {
+    while (my ($key, $val) = each(%{$$klass_ast{'imported-klasses'}})) {
       $$scratch_str_ref .= $col . "$key\::__name__," . $nl;
     }
     $$scratch_str_ref .= $col . "nullptr" . $nl;
@@ -3368,9 +3368,9 @@ sub dk_generate_cc_footer_klass {
       $$token_registry{$path} = 1;
     }
   }
-  my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
-  if (&has_slots_cat_info($klass_scope)) {
-    my $slots_cat_info = &at($$klass_scope{'slots'}, 'cat-info');
+  my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
+  if (&has_slots_cat_info($klass_ast)) {
+    my $slots_cat_info = &at($$klass_ast{'slots'}, 'cat-info');
     my $root_name = '__slots-info';
     if ('enum' eq $slots_cat) {
       my $seq = [];
@@ -3419,9 +3419,9 @@ sub dk_generate_cc_footer_klass {
         $col . "$klass_type @$klass_name { " . &generate_target_runtime_info_seq($root_name, $seq, $col, __LINE__) . " }" . $nl;
     }
   }
-  if (&has_enum_info($klass_scope)) {
+  if (&has_enum_info($klass_ast)) {
     my $num = 0;
-    foreach my $enum (@{$$klass_scope{'enum'}}) {
+    foreach my $enum (@{$$klass_ast{'enum'}}) {
       $$scratch_str_ref .= $col . "$klass_type @$klass_name { static enum-info-t __enum-info-$num\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
       $col = &colin($col);
 
@@ -3444,7 +3444,7 @@ sub dk_generate_cc_footer_klass {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static named-enum-info-t __enum-info[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $num = 0;
-    foreach my $enum (@{$$klass_scope{'enum'}}) {
+    foreach my $enum (@{$$klass_ast{'enum'}}) {
       if ($$enum{'type'}) {
         my $type = &ct($$enum{'type'});
         $$scratch_str_ref .= $col . "{ .name = \"$type\", .info = __enum-info-$num }," . $nl;
@@ -3457,11 +3457,11 @@ sub dk_generate_cc_footer_klass {
     $col = &colout($col);
     $$scratch_str_ref .= $col . "};}" . $nl;
   }
-  if (&has_const_info($klass_scope)) {
+  if (&has_const_info($klass_ast)) {
     $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const-info-t __const-info[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
 
-    foreach my $const (@{$$klass_scope{'const'}}) {
+    foreach my $const (@{$$klass_ast{'const'}}) {
       my $value = join(' ', @{$$const{'rhs'}});
       $value =~ s/"/\\"/g;
       $$scratch_str_ref .= $col . "{ .name = \#$$const{'name'}, .type = \"$$const{'type'}\", .value = \"$value\" }," . $nl;
@@ -3474,35 +3474,35 @@ sub dk_generate_cc_footer_klass {
   $$tbbl{'#name'} = '__name__';
   $$tbbl{'#type'} = "\#$klass_type";
 
-  if (&has_slots_type($klass_scope)) {
-    my $slots_type = &at($$klass_scope{'slots'}, 'type');
+  if (&has_slots_type($klass_ast)) {
+    my $slots_type = &at($$klass_ast{'slots'}, 'type');
     my $slots_type_ident = &dk_mangle($slots_type);
     $$tbbl{'#slots-type'} = &as_literal_symbol($slots_type);
     my $tp = 'slots-t';
    #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
     $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
-  } elsif (&has_slots_cat_info($klass_scope)) {
-    my $slots_cat = &at($$klass_scope{'slots'}, 'cat');
+  } elsif (&has_slots_cat_info($klass_ast)) {
+    my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
     $$tbbl{'#cat'} = "\#$slots_cat";
     $$tbbl{'#slots-info'} = '__slots-info';
   }
-  my $slots_enum_base = &at($$klass_scope{'slots'}, 'enum-base');
+  my $slots_enum_base = &at($$klass_ast{'slots'}, 'enum-base');
   if ($slots_enum_base) {
     $$tbbl{'#enum-base'} = '#' . $slots_enum_base;
   }
-  if (&has_slots_type($klass_scope) || &has_slots_cat_info($klass_scope)) {
+  if (&has_slots_type($klass_ast) || &has_slots_cat_info($klass_ast)) {
     $$tbbl{'#size'} = 'sizeof(slots-t)';
   }
-  if (&has_enum_info($klass_scope)) {
+  if (&has_enum_info($klass_ast)) {
     $$tbbl{'#enum-info'} = '__enum-info';
   }
-  if (&has_const_info($klass_scope)) {
+  if (&has_const_info($klass_ast)) {
     $$tbbl{'#const-info'} = '__const-info';
   }
   if (@$kw_arg_methods) {
     $$tbbl{'#kw-args-method-signatures'} = '__kw-args-method-signatures';
   }
-  if (values %{$$klass_scope{'methods'}}) {
+  if (values %{$$klass_ast{'methods'}}) {
     $$tbbl{'#method-signatures'} = '__method-signatures';
     $$tbbl{'#method-addresses'} =  '__method-addresses';
   }
@@ -3521,19 +3521,19 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#va-method-signatures'} =       '__va-method-signatures';
     $$tbbl{'#var-args-method-addresses'} =  '__var-args-method-addresses';
   }
-  $token_seq = $$klass_scope{'interpose'};
+  $token_seq = $$klass_ast{'interpose'};
   if ($token_seq) {
-    my $path = $$klass_scope{'interpose'};
+    my $path = $$klass_ast{'interpose'};
     $$tbbl{'#interpose-name'} = "$path\::__name__";
   }
-  $token_seq = $$klass_scope{'superklass'};
+  $token_seq = $$klass_ast{'superklass'};
   if ($token_seq) {
-    my $path = $$klass_scope{'superklass'};
+    my $path = $$klass_ast{'superklass'};
     $$tbbl{'#superklass-name'} = "$path\::__name__";
   }
-  $token_seq = $$klass_scope{'klass'};
+  $token_seq = $$klass_ast{'klass'};
   if ($token_seq) {
-    my $path = $$klass_scope{'klass'};
+    my $path = $$klass_ast{'klass'};
     $$tbbl{'#klass-name'} = "$path\::__name__";
   }
   if ($num_traits > 0) {
@@ -3545,23 +3545,23 @@ sub dk_generate_cc_footer_klass {
   if ($num_provides > 0) {
     $$tbbl{'#provides'} = '__provides';
   }
-  if (&is_exported($klass_scope)) {
+  if (&is_exported($klass_ast)) {
     $$tbbl{'#exported?'} = '1';
   }
-  if (&has_exported_slots($klass_scope)) {
+  if (&has_exported_slots($klass_ast)) {
     $$tbbl{'#state-exported?'} = '1';
   }
-  if (&has_exported_methods($klass_scope)) {
+  if (&has_exported_methods($klass_ast)) {
     $$tbbl{'#behavior-exported?'} = '1';
   }
-  if ($$klass_scope{'has-initialize'}) {
+  if ($$klass_ast{'has-initialize'}) {
     $$tbbl{'#initialize'} = 'cast(method-t)initialize';
   }
-  if ($$klass_scope{'has-finalize'}) {
+  if ($$klass_ast{'has-finalize'}) {
     $$tbbl{'#finalize'} = 'cast(method-t)finalize';
   }
-  if ($$klass_scope{'module'}) {
-    $$tbbl{'#module'} = "\#$$klass_scope{'module'}";
+  if ($$klass_ast{'module'}) {
+    $$tbbl{'#module'} = "\#$$klass_ast{'module'}";
   }
   $$tbbl{'#file'} = '__FILE__';
   $$scratch_str_ref .=
@@ -3914,14 +3914,14 @@ sub dk_generate_cc_footer {
 sub dk_generate_kw_arg_method_defns {
   my ($ast, $stack, $klass_type, $col) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
-  while (my ($klass_name, $klass_scope) = each(%{$$ast{$$plural_from_singular{$klass_type}}})) {
-    if ($klass_scope && 0 < keys(%$klass_scope)) { #print STDERR &Dumper($klass_scope);
+  while (my ($klass_name, $klass_ast) = each(%{$$ast{$$plural_from_singular{$klass_type}}})) {
+    if ($klass_ast && 0 < keys(%$klass_ast)) { #print STDERR &Dumper($klass_ast);
       &path::add_last($stack, $klass_name);
       if (&is_target_defn()) {
-        &dk_generate_cc_footer_klass($klass_scope, $stack, $col, $klass_type, $$ast{'symbols'});
+        &dk_generate_cc_footer_klass($klass_ast, $stack, $col, $klass_type, $$ast{'symbols'});
       } else {
-        &generate_kw_arg_method_signature_defns($$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
-        &generate_kw_arg_method_defns($$klass_scope{'slots'}, $$klass_scope{'methods'}, [ $klass_name ], $col, $klass_type);
+        &generate_kw_arg_method_signature_defns($$klass_ast{'methods'}, [ $klass_name ], $col, $klass_type);
+        &generate_kw_arg_method_defns($$klass_ast{'slots'}, $$klass_ast{'methods'}, [ $klass_name ], $col, $klass_type);
       }
       &path::remove_last($stack);
     }
