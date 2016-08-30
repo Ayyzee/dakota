@@ -230,7 +230,7 @@ sub loop_merged_ast_from_inputs {
       &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     } elsif (1 < @{$$cmd_info{'inputs'}}) {
       my $ast = &ast_merge($ast_files);
-      $ast = &kw_args_translate($ast);
+      #$ast = &kw_args_translate($ast);
       &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     }
   }
