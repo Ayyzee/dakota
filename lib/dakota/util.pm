@@ -379,19 +379,22 @@ sub as_literal_symbol {
 }
 my $legal_last_chars = { '?' => 'qq',
                          '!' => 'jj' };
+my $alphabet = [split(//, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")];
+my $alphabet_len = scalar @$alphabet;
 sub encode_char {
   my ($char) = @_;
   my $val = $$legal_last_chars{$char};
   if ($val) {
     return $val;
   }
-  return sprintf("%02x", ord($char));
+  #return sprintf("%02x", ord($char));
+  return $$alphabet[ord($char) % $alphabet_len];
 }
 sub dk_mangle {
   my ($symbol) = @_;
   # remove \ preceeding |
   $symbol =~ s/\\\|/\|/g;
-  my $fix = 1;
+  my $fix = 0;
   my $fix_str;
 
   if ($fix) {
@@ -426,7 +429,7 @@ sub dk_mangle {
     &add_last($ident_symbol, $part);
   }
   if ($num_encoded && ! (1 == $num_encoded && $$legal_last_chars{$last_encoded_char})) {
-    if (1) {
+    if (0) {
       &add_first($ident_symbol, '_');
       &add_last( $ident_symbol, '_');
     } else {
