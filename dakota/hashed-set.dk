@@ -26,10 +26,6 @@ module dakota;
 //  512: 509
 // 1024: 1021
 
-static const ssize-t gbl-prime = 127;
-
-// when the user submits a non-prime number, decrement until a prime is found
-
 klass deque;
 klass equal;
 klass exception;
@@ -42,7 +38,7 @@ klass hashed-set {
   trait set;
 
   slots {
-    equal-t equal?;
+    equal-t  equal?;
     ssize-t  num-buckets;
     object-t buckets; // a vector of deques
     ssize-t  size;
@@ -55,11 +51,13 @@ klass hashed-set {
   // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t   self,
+              ssize-t    initial-capacity : 251, // should be prime
               object-t   elements : nullptr,
               object-t[] objects :  nullptr) -> object-t {
+    assert(0 < initial-capacity);
     self = $init(super);
     self.equal? = $equal?;
-    self.num-buckets = gbl-prime;
+    self.num-buckets = initial-capacity;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill-element : nullptr);
     self.size = 0;
 

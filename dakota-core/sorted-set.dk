@@ -40,8 +40,6 @@ klass sorted-set {
     sorted-array::slots-t sa;
     ssize-t               iterator-state;
   }
-  static const ssize-t gbl-default-capacity = 64; // shall never be 0
-
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
   // using compound literals 'objects' can be used as follows:
@@ -49,11 +47,10 @@ klass sorted-set {
 
   method init(object-t   self,
               compare-t  compare :          $compare,
-              ssize-t    initial-capacity : gbl-default-capacity,
+              ssize-t    initial-capacity : 64,
               object-t   elements :         nullptr,
               object-t[] objects :          nullptr) -> object-t {
-    assert(0 != initial-capacity);
-
+    assert(0 < initial-capacity);
     self = $init(super);
     boole-t ptr?;
     sorted-array::create(&self.sa,
