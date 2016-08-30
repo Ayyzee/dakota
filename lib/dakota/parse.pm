@@ -455,6 +455,12 @@ sub add_generic {
   my ($file, $generic) = @_;
   $$file{'generics'}{$generic} = undef;
 }
+sub remove_generic {
+  my ($file, $generic) = @_;
+  if (exists $$file{'generics'}{$generic}) {
+    delete $$file{'generics'}{$generic};
+  }
+}
 sub add_symbol {
   my ($file, $ident) = @_;
   $ident = &as_literal_symbol_interior($ident);
@@ -2230,8 +2236,9 @@ sub parse_root {
     }
   }
   }
-  if (exists $$gbl_root_ast{'generics'}) {
-    delete $$gbl_root_ast{'generics'}{'make'};
+  if (exists $$gbl_root_ast{'generics'} && exists $$gbl_root_ast{'generics'}{'make'}) {
+    &remove_generic($gbl_root_ast, 'make');
+    &add_generic($gbl_root_ast, 'init');
   }
   $$gbl_root_ast{'should-generate-make'} = 1; # always generate make()
   return $gbl_root_ast;
