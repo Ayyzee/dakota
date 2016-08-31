@@ -1092,9 +1092,9 @@ sub common::print_signature {
     }
     my $padlen = length($col);
     $padlen += length("static const signature-t result = { ");
-    my $arg_list =    "static const signature-t result = { .name =            \"$name_str\"," . $nl .
+    my $arg_list =    "static const signature-t result = { .name =        \"$name_str\"," . $nl .
       (' ' x $padlen) . ".param-types = \"$$new_arg_type_list\"," . $nl .
-      (' ' x $padlen) . ".return-type =     \"$return_type_str\" };" . $nl;
+      (' ' x $padlen) . ".return-type = \"$return_type_str\" };" . $nl;
     $scratch_str .=
       $col . "$arg_list" . $nl .
       $col . "return &result;" . $nl;
@@ -3639,9 +3639,9 @@ sub generate_kw_args_method_signature_defn {
   }
   my $padlen = length($col);
   $padlen += length("static const signature-t result = { ");
-  my $kw_arg_list = "static const signature-t result = { .name =            \"$method_name\"," . $nl .
+  my $kw_arg_list = "static const signature-t result = { .name =        \"$method_name\"," . $nl .
     (' ' x $padlen) . ".param-types = \"$kw_list_types\"," . $nl .
-    (' ' x $padlen) . ".return-type =     \"$return_type\" };" . $nl;
+    (' ' x $padlen) . ".return-type = \"$return_type\" };" . $nl;
   $$scratch_str_ref .=
     $col . "$kw_arg_list" . $nl .
     $col . "return &result;" . $nl;
@@ -3670,9 +3670,9 @@ sub generate_slots_method_signature_defn {
   $method_list_types = &remove_extra_whitespace($method_list_types);
   my $padlen = length($col);
   $padlen += length("static const signature-t result = { ");
-  my $arg_list =    "static const signature-t result = { .name =            \"$method_name\"," . $nl .
+  my $arg_list =    "static const signature-t result = { .name =        \"$method_name\"," . $nl .
     (' ' x $padlen) . ".param-types = \"$method_list_types\"," . $nl .
-    (' ' x $padlen) . ".return-type =     \"$return_type\" };";
+    (' ' x $padlen) . ".return-type = \"$return_type\" };";
   $$scratch_str_ref .=
     $col . "$arg_list" . $nl .
     $col . "return &result;" . $nl;
@@ -4021,7 +4021,8 @@ sub linkage_unit::generate_symbols {
   $scratch_str .= $col . 'namespace __symbol {' . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   my $num_lns = @$symbol_keys;
-  while (my ($ln, $symbol) = each @$symbol_keys) {
+  my $sorted_symbol_keys = [sort @$symbol_keys];
+  while (my ($ln, $symbol) = each @$sorted_symbol_keys) {
     $symbol =~ s/^#//;
     my $ident = &dk_mangle($symbol);
     $ident = &almost_symbol($ident);
