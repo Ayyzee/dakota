@@ -73,13 +73,15 @@ klass sorted-set {
     return result;
   }
   method add(object-t self, object-t element) -> object-t {
+    object-t result = element;
     self.iterator-state++;
     result-t found-result = sorted-array::search(&self.sa, element);
 
-    if (nullptr == found-result.element) {
+    if (nullptr == found-result.element)
       sorted-array::add-at(&self.sa, element, found-result.offset);
-    }
-    return element;
+    else
+      result = cast(object-t)found-result.element;
+    return result;
   }
   method empty(object-t self) -> object-t {
     self.iterator-state++;

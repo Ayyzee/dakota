@@ -71,6 +71,7 @@ klass hashed-set {
     return self;
   }
   method add(object-t self, object-t element) -> object-t {
+    object-t result = element;
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
@@ -86,7 +87,7 @@ klass hashed-set {
 
       for (object-t e in deque) {
         if (self.equal?(e, element)) { // arg order matters here!!
-          found-element = e;
+          result = found-element = e;
           break;
         }
       }
@@ -96,7 +97,7 @@ klass hashed-set {
         $add-first(deque, element);
       }
     }
-    return element;
+    return result;
   }
   method empty(object-t self) -> object-t {
     if (0 != self.size) {
