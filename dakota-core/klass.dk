@@ -193,52 +193,52 @@ static func size-from-info(named-info-t* info, symbol-t key) -> ssize-t {
   return element;
 }
 static func superklass-from-info(named-info-t* info) -> object-t {
-  object-t superklass = cast(object-t)ptr-from-info(info, #superklass);
-  return superklass;
+  object-t superkls = cast(object-t)ptr-from-info(info, #superklass);
+  return superkls;
 }
 // the extra arg (name) is so we can determin if there is an interposer registered
 static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t {
-  object-t superklass = superklass-from-info(info);
+  object-t superkls = superklass-from-info(info);
   USE(name);
-  return superklass;
+  return superkls;
 }
 /*LOCAL*/ func superklass-name-from-info(named-info-t* info) -> symbol-t {
-  symbol-t superklass-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
+  symbol-t superkls-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
 
-  if (nullptr == superklass-name && #object != name-from-info(info))
-    superklass-name = default-superklass-name();
-  return superklass-name;
+  if (nullptr == superkls-name && #object != name-from-info(info))
+    superkls-name = default-superklass-name();
+  return superkls-name;
 }
 /*LOCAL*/ func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t {
-  symbol-t superklass-name = superklass-name-from-info(info);
-  if (nullptr == superklass-name) {
-    object-t superklass = superklass-from-info(info, name);
-    if (!root-superklass?(superklass))
-      superklass-name = name-of(superklass);
+  symbol-t superkls-name = superklass-name-from-info(info);
+  if (nullptr == superkls-name) {
+    object-t superkls = superklass-from-info(info, name);
+    if (!root-superklass?(superkls))
+      superkls-name = name-of(superkls);
   }
   if (nullptr != name) {
     symbol-t interposer-name = interposer-name-for-klass-name(name);
     if (nullptr != interposer-name) {
 //       fprintf(stderr, "{ name: %s, interposer-name: %s },\n", name, interposer-name);
-      if (nullptr != superklass-name && interposer-name != superklass-name) {
-//         fprintf(stderr, "{ interposer-name: %s, superklass-name: %s },\n", interposer-name, superklass-name);
-        add-interpose-prop(interposer-name, superklass-name);
-        superklass-name = interposer-name;
+      if (nullptr != superkls-name && interposer-name != superkls-name) {
+//         fprintf(stderr, "{ interposer-name: %s, superklass-name: %s },\n", interposer-name, superkls-name);
+        add-interpose-prop(interposer-name, superkls-name);
+        superkls-name = interposer-name;
       }
     }
   }
-  return superklass-name;
+  return superkls-name;
 }
 /*LOCAL*/ func name-from-info(named-info-t* info) -> symbol-t {
   symbol-t name = cast(symbol-t)ptr-from-info(info, #name);
   return name;
 }
 /*LOCAL*/ func klass-name-from-info(named-info-t* info) -> symbol-t {
-  symbol-t klass-name = cast(symbol-t)ptr-from-info(info, #klass-name);
+  symbol-t kls-name = cast(symbol-t)ptr-from-info(info, #klass-name);
 
-  if (nullptr == klass-name)
-    klass-name = default-klass-name();
-  return klass-name;
+  if (nullptr == kls-name)
+    kls-name = default-klass-name();
+  return kls-name;
 }
 const size-t k-alignment = 8;
 
@@ -259,13 +259,13 @@ inline func round-alignment(size-t n) -> size-t {
   { // klass is "object"
     result = 0;
   } else {
-    symbol-t superklass-name = superklass-name-from-info(info, name);
-    if (nullptr == superklass-name)
-      superklass-name = default-superklass-name();
-    named-info-t* superklass-info = info-for-name(superklass-name);
-    ssize-t superklass-offset = offset-from-info(superklass-info); // recursive
-    ssize-t superklass-size =   size-from-info(superklass-info);
-    result = superklass-offset + superklass-size;
+    symbol-t superkls-name = superklass-name-from-info(info, name);
+    if (nullptr == superkls-name)
+      superkls-name = default-superklass-name();
+    named-info-t* superkls-info = info-for-name(superkls-name);
+    ssize-t superkls-offset = offset-from-info(superkls-info); // recursive
+    ssize-t superkls-size =   size-from-info(superkls-info);
+    result = superkls-offset + superkls-size;
   }
   result = cast(ssize-t)round-alignment(cast(size-t)result);
   return result;
@@ -707,11 +707,11 @@ klass klass {
     self.size = size-from-info(self.info);
     self.superklass = superklass-from-info(self.info, name-of(self)); // interposing
     if (nullptr == superklass-of(self)) {
-      symbol-t superklass-name = superklass-name-from-info(self.info, name-of(self));
-      if (nullptr == superklass-name)
+      symbol-t superkls-name = superklass-name-from-info(self.info, name-of(self));
+      if (nullptr == superkls-name)
         self.superklass = default-superklass();
       else
-        self.superklass = dk-klass-for-name(superklass-name);
+        self.superklass = dk-klass-for-name(superkls-name);
     }
     self.methods = { .addrs = nullptr, .count = 0 };
     self.behavior = nullptr;

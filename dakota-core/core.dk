@@ -167,31 +167,31 @@ klass x::stat {
 // this is quick and dirty!!!!!!!!!!!!!!!!
 static func init-imported-klasses() -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
-  symbol-t imported-klass-name;
-  while (nullptr != (imported-klass-name = cast(symbol-t)sorted-array::remove-last(gbl-imported-klasses-file-table)))
-    dk-klass-for-name(imported-klass-name);
+  symbol-t imported-kls-name;
+  while (nullptr != (imported-kls-name = cast(symbol-t)sorted-array::remove-last(gbl-imported-klasses-file-table)))
+    dk-klass-for-name(imported-kls-name);
   return;
 }
-static func file-name-from-klass-name(symbol-t klass-name) -> str-t {
-  char8-t* file-name = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (symbol::length(klass-name) + 1));
+static func file-name-from-klass-name(symbol-t kls-name) -> str-t {
+  char8-t* file-name = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (symbol::length(kls-name) + 1));
   file-name[0] = NUL;
   int64-t kn = 0;
   int64-t fn = 0;
 
-  while (':' == klass-name[kn])
+  while (':' == kls-name[kn])
     kn++;
-  while (NUL != klass-name[kn]) {
-    if (':' == klass-name[kn]) {
+  while (NUL != kls-name[kn]) {
+    if (':' == kls-name[kn]) {
       do {
         kn++;
-      } while (':' == klass-name[kn]);
+      } while (':' == kls-name[kn]);
 
-      if (NUL != klass-name[kn]) {
+      if (NUL != kls-name[kn]) {
         file-name[fn] = gbl-delimiter;
         fn++;
       }
     } else {
-      file-name[fn] = klass-name[kn];
+      file-name[fn] = kls-name[kn];
       kn++;
       fn++;
     }
@@ -251,13 +251,13 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
 }
 static func alloc-klass(symbol-t name) -> object-t {
   named-info-t* info = info-for-name(name);
-  symbol-t klass-name = klass-name-from-info(info);
-  if (nullptr == klass-name)
-    klass-name = default-klass-name();
-  named-info-t* klass-info = info-for-name(klass-name);
+  symbol-t kls-name = klass-name-from-info(info);
+  if (nullptr == kls-name)
+    kls-name = default-klass-name();
+  named-info-t* kls-info = info-for-name(kls-name);
   
-  ssize-t offset = offset-from-info(klass-info);
-  ssize-t size =   size-from-info(klass-info);
+  ssize-t offset = offset-from-info(kls-info);
+  ssize-t size =   size-from-info(kls-info);
   //fprintf(stderr, "%s(#%s):\toffset=%i + size=%i\n", __func__, name, offset, size);
 
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -331,8 +331,8 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
   int64-t klasses-count = 0;
   int64-t methods-count = 0;
   for (int64-t i = 0; i < klass-defns-table->count; i++) {
-    named-info-t* klass-info = *cast(named-info-t**)sorted-array::at(klass-defns-table, i);
-    named-info-t* current-info = klass-info;
+    named-info-t* kls-info = *cast(named-info-t**)sorted-array::at(klass-defns-table, i);
+    named-info-t* current-info = kls-info;
 
     do {
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(ssize-t)#klass);
@@ -368,22 +368,22 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
   ostream::col-incr(ostrm);
 
   for (int64-t i = 0; i < klass-defns-table->count; i++) {
-    named-info-t* klass-info = *cast(named-info-t**)sorted-array::at(klass-defns-table, i);
-    named-info-t* current-info = klass-info;
+    named-info-t* kls-info = *cast(named-info-t**)sorted-array::at(klass-defns-table, i);
+    named-info-t* current-info = kls-info;
 
     do {
       symbol-t name =            name-from-info(current-info);
-      symbol-t klass-name =      klass-name-from-info(current-info);
-      symbol-t superklass-name = superklass-name-from-info(current-info);
+      symbol-t kls-name =      klass-name-from-info(current-info);
+      symbol-t superkls-name = superklass-name-from-info(current-info);
       ostream::println-format(ostrm, "'%s' :\n", name);
       ostream::println-format(ostrm, "{\n");
       ostream::col-incr(ostrm);
       symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(ssize-t)#klass);
       ostream::println-format(ostrm, "'type' : '%s',\n", type);
-      if (nullptr != klass-name)
-        ostream::println-format(ostrm, "'klass' : '%s',\n",      klass-name);
-      if (nullptr != superklass-name)
-        ostream::println-format(ostrm, "'superklass' : '%s',\n", superklass-name);
+      if (nullptr != kls-name)
+        ostream::println-format(ostrm, "'klass' : '%s',\n",      kls-name);
+      if (nullptr != superkls-name)
+        ostream::println-format(ostrm, "'superklass' : '%s',\n", superkls-name);
       
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method-signatures);
       if (nullptr != method-signatures) {
@@ -422,36 +422,36 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
 }
 static named-info-t* gbl-registration-info-list;
 
-// func dk-make-simple-singleton(symbol-t name, symbol-t superklass-name) -> object-t {
-//   object-t kls = dk-make-simple-klass(name, superklass-name, #singleton-klass);
+// func dk-make-simple-singleton(symbol-t name, symbol-t superkls-name) -> object-t {
+//   object-t kls = dk-make-simple-klass(name, superkls-name, #singleton-klass);
 //   object-t singleton = make(kls);
 //   return singleton;
 // }
-func dk-make-simple-klass(symbol-t name, symbol-t superklass-name, symbol-t klass-name) -> object-t {
-  //fprintf(stderr, "%s(#%s, #%s, #%s)\n", __func__, name, superklass-name, klass-name);
+func dk-make-simple-klass(symbol-t name, symbol-t superkls-name, symbol-t kls-name) -> object-t {
+  //fprintf(stderr, "%s(#%s, #%s, #%s)\n", __func__, name, superkls-name, kls-name);
   assert(nullptr != name);
-  int64-t num-klass-props = 1;
-  if (nullptr != superklass-name)
-    num-klass-props++;
-  if (nullptr != klass-name)
-    num-klass-props++;
+  int64-t num-kls-props = 1;
+  if (nullptr != superkls-name)
+    num-kls-props++;
+  if (nullptr != kls-name)
+    num-kls-props++;
 
-  property-t*   klass-props = cast(property-t*)  dkt::alloc(ssizeof(property-t) * num-klass-props);
-  named-info-t* klass-info =  cast(named-info-t*)dkt::alloc(ssizeof(named-info-t));
+  property-t*   kls-props = cast(property-t*)  dkt::alloc(ssizeof(property-t) * num-kls-props);
+  named-info-t* kls-info =  cast(named-info-t*)dkt::alloc(ssizeof(named-info-t));
 
   // need to be sorted
   uint_t i = 0;
-  if (nullptr != klass-name)
-    klass-props[i++] = { .key = #klass-name,      .element = cast(intptr-t)klass-name     };
+  if (nullptr != kls-name)
+    kls-props[i++] = { .key = #klass-name,      .element = cast(intptr-t)kls-name     };
 
-  klass-props[i++] =   { .key = #name,            .element = cast(intptr-t)name           };
+  kls-props[i++] =   { .key = #name,            .element = cast(intptr-t)name           };
 
-  if (nullptr != superklass-name)
-    klass-props[i++] = { .key = #superklass-name, .element = cast(intptr-t)superklass-name};
+  if (nullptr != superkls-name)
+    kls-props[i++] = { .key = #superklass-name, .element = cast(intptr-t)superkls-name};
 
-  *klass-info = { .next = nullptr, .count = num-klass-props, .elements = klass-props};
-  object-t klass = dk-register-klass(klass-info);
-  return klass;
+  *kls-info = { .next = nullptr, .count = num-kls-props, .elements = kls-props};
+  object-t kls = dk-register-klass(kls-info);
+  return kls;
 }
 klass each-box-func   { slots (*)(...) -> object-t; }
 klass named-info-func { slots (*)(named-info-t*, each-box-func-t) -> void; }
@@ -537,37 +537,37 @@ static func named-info-to-registration-info(named-info-t* ni, registration-info-
   };
   return;
 }
-static func import-klass(symbol-t klass-name, assoc-node-t* node) -> void {
-  assert-valid-str(klass-name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, klass-name, cast(ptr-t)(node));
-  named-assoc-node-t named-node = { .name = klass-name, .node = node };
+static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
+  assert-valid-str(kls-name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, kls-name, cast(ptr-t)(node));
+  named-assoc-node-t named-node = { .name = kls-name, .node = node };
   result-t found-result = sorted-array::search(gbl-imported-klasses-table, &named-node);
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))found-result.element;
 
   if (nullptr == found-named-node) {
     named-node.node->next = nullptr;
     sorted-array::add-at(gbl-imported-klasses-table, &named-node, found-result.offset);
-    sorted-array::add(gbl-imported-klasses-file-table, klass-name);
+    sorted-array::add(gbl-imported-klasses-file-table, kls-name);
   } else {
     node->next = found-named-node->node;
     found-named-node->node = node;
 
     if (nullptr == found-named-node->node)
-      sorted-array::add(gbl-imported-klasses-file-table, klass-name);
+      sorted-array::add(gbl-imported-klasses-file-table, kls-name);
   }
   return;
 }
-static func import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc) -> void {
+static func import-klasses(symbol-t* kls-names, assoc-node-t* kls-assoc) -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%p']",
                         __func__,
-                        cast(ptr-t)(klass-names),
-                        cast(ptr-t)(klass-assoc));
-  assert((nullptr != klass-names) &&
-         (nullptr != klass-assoc));
+                        cast(ptr-t)(kls-names),
+                        cast(ptr-t)(kls-assoc));
+  assert((nullptr != kls-names) &&
+         (nullptr != kls-assoc));
   int64-t i = 0;
   while (1) {
-    symbol-t name =        klass-names[i];
-    assoc-node-t* assoc = &klass-assoc[i];
+    symbol-t name =        kls-names[i];
+    assoc-node-t* assoc = &kls-assoc[i];
     i++;
     if (nullptr == name)
       break;
@@ -576,49 +576,49 @@ static func import-klasses(symbol-t* klass-names, assoc-node-t* klass-assoc) -> 
   }
   return;
 }
-func dk-register-klass(named-info-t* klass-info) -> object-t {
-  //fprintf(stderr, "%s(#%s)\n", __func__, cast(symbol-t)named-info::at(klass-info, #name));
-  named-info::sort(klass-info);
-  symbol-t name = name-from-info(klass-info);
+func dk-register-klass(named-info-t* kls-info) -> object-t {
+  //fprintf(stderr, "%s(#%s)\n", __func__, cast(symbol-t)named-info::at(kls-info, #name));
+  named-info::sort(kls-info);
+  symbol-t name = name-from-info(kls-info);
   assert-valid-str(name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(klass-info), name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p'],'klass-name':'%s'", __func__, cast(ptr-t)(kls-info), name);
 
-  symbol-t interpose-name = cast(symbol-t)named-info::at(klass-info, #interpose-name);
+  symbol-t interpose-name = cast(symbol-t)named-info::at(kls-info, #interpose-name);
   if (nullptr != interpose-name) {
-    symbol-t type = cast(symbol-t)named-info::at(klass-info, #type, cast(ssize-t)#klass);
+    symbol-t type = cast(symbol-t)named-info::at(kls-info, #type, cast(ssize-t)#klass);
     assert(#klass == type);
     add-interpose-prop(interpose-name, name);
   }
-  result-t found-result = sorted-array::search(gbl-klass-defns-table, klass-info);
-  named-info-t* found-klass-info = cast(decltype(found-klass-info))found-result.element;
+  result-t found-result = sorted-array::search(gbl-klass-defns-table, kls-info);
+  named-info-t* found-kls-info = cast(decltype(found-kls-info))found-result.element;
 
-  if (nullptr == found-klass-info) {
-    sorted-array::add-at(gbl-klass-defns-table, klass-info, found-result.offset);
+  if (nullptr == found-kls-info) {
+    sorted-array::add-at(gbl-klass-defns-table, kls-info, found-result.offset);
   } else {
-    assert(nullptr == klass-info->next);
-    named-info-t* prev = found-klass-info->next;
-    found-klass-info->next = klass-info;
-    klass-info->next = prev;
+    assert(nullptr == kls-info->next);
+    named-info-t* prev = found-kls-info->next;
+    found-kls-info->next = kls-info;
+    kls-info->next = prev;
   }
-  object-t klass = nullptr;
+  object-t kls = nullptr;
   if (min-runtime?)  // this is a late (post-init) registration
-    klass = dk-klass-for-name(name);
-  return klass;
+    kls = dk-klass-for-name(name);
+  return kls;
 }
-static func export-klasses(named-info-t* klass-info) -> void {
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p']", __func__, cast(ptr-t)(klass-info));
+static func export-klasses(named-info-t* kls-info) -> void {
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p']", __func__, cast(ptr-t)(kls-info));
   int64-t i = 0;
 
   while (1) {
-    named-info-t* var-klass-info = &klass-info[i++];
-    if (nullptr == var-klass-info->elements)
+    named-info-t* var-kls-info = &kls-info[i++];
+    if (nullptr == var-kls-info->elements)
       break;
-    dk-register-klass(var-klass-info);
+    dk-register-klass(var-kls-info);
   }
   return;
 }
-/*LOCAL*/ func interposer-name-for-klass-name(symbol-t klass-name) -> symbol-t {
-  property-t key = { .key = klass-name, .element = cast(intptr-t)nullptr };
+/*LOCAL*/ func interposer-name-for-klass-name(symbol-t kls-name) -> symbol-t {
+  property-t key = { .key = kls-name, .element = cast(intptr-t)nullptr };
   property-t* assoc-ptr = cast(property-t*)sorted-array::bsearch(gbl-interposers-table, &key);
   symbol-t result;
 
@@ -629,8 +629,8 @@ static func export-klasses(named-info-t* klass-info) -> void {
     result = cast(symbol-t)(assoc.element);
   }
 //   if (nullptr != result)
-//     fprintf(stderr, "%s = %s(%s)\n", result, __func__, klass-name);
-  assert(klass-name != result);
+//     fprintf(stderr, "%s = %s(%s)\n", result, __func__, kls-name);
+  assert(kls-name != result);
   return result;
 }
 /*LOCAL*/ func add-interpose-prop(symbol-t key, symbol-t element) -> void {
@@ -788,10 +788,10 @@ func dk-init-runtime() -> void {
 
   return;
 }
-/*LOCAL*/ func imported-klasses-for-klass(symbol-t klass-name) -> assoc-node-t* {
-  assert-valid-str(klass-name);
-  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, klass-name);
-  named-assoc-node-t named-node = { .name = klass-name, .node = nullptr };
+/*LOCAL*/ func imported-klasses-for-klass(symbol-t kls-name) -> assoc-node-t* {
+  assert-valid-str(kls-name);
+  DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, kls-name);
+  named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
   named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node); // hackhack
   assoc-node-t* result;
 
@@ -809,10 +809,10 @@ static func dump-interposers(ostream-t ostrm, named-info-t* registration-info) -
   }
   return;
 }
-static func dump?(named-info-t* klass-info, str-t only) -> boole-t {
-  assert(nullptr != klass-info);
+static func dump?(named-info-t* kls-info, str-t only) -> boole-t {
+  assert(nullptr != kls-info);
   assert-valid-str(only);
-  symbol-t name = name-from-info(klass-info);
+  symbol-t name = name-from-info(kls-info);
   assert-valid-str(name);
 
   boole-t result = true;
@@ -954,13 +954,13 @@ static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
                   info->return-type);
   return;
 }
-static func klass-exported?(named-info-t* klass-info,
+static func klass-exported?(named-info-t* kls-info,
                             boole-t*      exportedp-ptr = nullptr,
                             boole-t*      state-exportedp-ptr = nullptr,
                             boole-t*      behavior-exportedp-ptr = nullptr) -> boole-t {
-  boole-t exported? =          cast(boole-t)named-info::at(klass-info, #exported?);
-  boole-t state-exported? =    cast(boole-t)named-info::at(klass-info, #state-exported?);
-  boole-t behavior-exported? = cast(boole-t)named-info::at(klass-info, #behavior-exported?);
+  boole-t exported? =          cast(boole-t)named-info::at(kls-info, #exported?);
+  boole-t state-exported? =    cast(boole-t)named-info::at(kls-info, #state-exported?);
+  boole-t behavior-exported? = cast(boole-t)named-info::at(kls-info, #behavior-exported?);
 
   if (exportedp-ptr)
     *exportedp-ptr = exported?;
@@ -972,13 +972,13 @@ static func klass-exported?(named-info-t* klass-info,
   boole-t result = (exported? || state-exported? || behavior-exported?);
   return result;
 }
-static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-module) -> symbol-t {
+static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-module) -> symbol-t {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
-  assert(nullptr != klass-info);
+  assert(nullptr != kls-info);
 
   catalog-info::slots-t ci {};
-  named-info-to-catalog-info(klass-info, &ci);
+  named-info-to-catalog-info(kls-info, &ci);
 
   assert-valid-str(ci.type);
   assert-valid-str(ci.name);
@@ -1015,7 +1015,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* klass-info, symbol-t prev-
   boole-t exported? =          false;
   boole-t state-exported? =    false;
   boole-t behavior-exported? = false;
-  if (klass-exported?(klass-info, &exported?, &state-exported?, &behavior-exported?))
+  if (klass-exported?(kls-info, &exported?, &state-exported?, &behavior-exported?))
     ostream::println-format(ostrm, "export %s %s {\n", ci.type, ci.name);
   else
     ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
@@ -1188,21 +1188,21 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
     }
     symbol-t prev-module = nullptr;
     while (1) {
-      named-info-t* klass-info = &klass-defns[i++];
-      assert(nullptr != klass-info);
-      if (nullptr == klass-info->elements)
+      named-info-t* kls-info = &klass-defns[i++];
+      assert(nullptr != kls-info);
+      if (nullptr == kls-info->elements)
         break;
-      if (exported-only? && !klass-exported?(klass-info))
+      if (exported-only? && !klass-exported?(kls-info))
         continue;
-      if (nullptr == only || dump?(klass-info, only)) {
+      if (nullptr == only || dump?(kls-info, only)) {
         if (1)
-          prev-module = dump-klass(ostrm, klass-info, prev-module);
+          prev-module = dump-klass(ostrm, kls-info, prev-module);
         if (nullptr != output-dir) {
             char8-t[255 + (1)] klass-file = "";
-            symbol-t klass-name = name-from-info(klass-info);
-            snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, klass-name);
+            symbol-t kls-name = name-from-info(kls-info);
+            snprintf(klass-file, sizeof(klass-file), "%s/%s.ctlg", output-dir, kls-name);
             ostream-t dostrm = ostream::fopen(klass-file);
-            dump-klass(dostrm, klass-info, nullptr);
+            dump-klass(dostrm, kls-info, nullptr);
 # if defined DKT-ENABLE-EXPORT-GROUP
             ostream::col-decr(dostrm);
             ostream::println-format(dostrm, "} // export\n"); // closes "export {" from dump-klass()
@@ -1505,26 +1505,26 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
     int64-t i = 0;
       
     while (1) {
-      named-info-t* klass-info = &klass-defns[i++];
-      assert(nullptr != klass-info);
-      if (nullptr == klass-info->elements)
+      named-info-t* kls-info = &klass-defns[i++];
+      assert(nullptr != kls-info);
+      if (nullptr == kls-info->elements)
         break;
-      symbol-t klass-name = name-from-info(klass-info);
-      // const symbol-t* traits = cast(const symbol-t*)named-info::at(klass-info, #traits);
+      symbol-t kls-name = name-from-info(kls-info);
+      // const symbol-t* traits = cast(const symbol-t*)named-info::at(kls-info, #traits);
       // if (nullptr != traits) {
-      //   object-t kls = dk-klass-for-name(klass-name);
+      //   object-t kls = dk-klass-for-name(kls-name);
       //   klass::traits-finalize(kls, traits);
       // }
       typealias finalize-func-t = initialize-func-t;
-      finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(klass-info, #finalize);
+      finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(kls-info, #finalize);
       if (nullptr != klass-finalize) {
-        named-assoc-node-t named-node = { .name = klass-name, .node = nullptr };
+        named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
         named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
         if (nullptr != found-named-node) {
           object-t kls = cast(object-t)(found-named-node->node->element);
           DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
-                                "finalize", "klass", klass-name,
-                                cast(symbol-t)named-info::at(klass-info, #file));
+                                "finalize", "klass", kls-name,
+                                cast(symbol-t)named-info::at(kls-info, #file));
 
           klass-finalize(kls);
         }
@@ -1537,11 +1537,11 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   return;
 }
 static func klass-for-name-simple(symbol-t name) -> object-t {
-  assoc-node-t* klass-assoc = imported-klasses-for-klass(name);
-  // if (nullptr == klass-assoc) printf("klass='%s', not imported\n", name);
+  assoc-node-t* kls-assoc = imported-klasses-for-klass(name);
+  // if (nullptr == kls-assoc) printf("klass='%s', not imported\n", name);
   object-t kls = nullptr;
-  if (nullptr != klass-assoc)
-    kls = *cast(object-t*)(klass-assoc->element);
+  if (nullptr != kls-assoc)
+    kls = *cast(object-t*)(kls-assoc->element);
   return kls; // may be nullptr
 }
 static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
@@ -1551,22 +1551,22 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   named-info-t* info-slots = info-for-name(name);
   assert(nullptr != info-slots);
   assert(#klass == cast(symbol-t)named-info::at(info-slots, #type, cast(ssize-t)#klass));
-  object-t klass = klass-for-name-simple(name);
+  object-t kls = klass-for-name-simple(name);
 
-  if (nullptr != klass)
-    return klass;
+  if (nullptr != kls)
+    return kls;
 
   // superklass chain first
-  symbol-t superklass-name;
-  if (nullptr != (superklass-name = superklass-name-from-info(info-slots)))
-    if (nullptr == klass-for-name-simple(superklass-name))
-      klass-for-name(superklass-name, column + 1); // recursive
+  symbol-t superkls-name;
+  if (nullptr != (superkls-name = superklass-name-from-info(info-slots)))
+    if (nullptr == klass-for-name-simple(superkls-name))
+      klass-for-name(superkls-name, column + 1); // recursive
 
-  symbol-t klass-name;
+  symbol-t kls-name;
   object-t klass-klass;
-  if (nullptr != (klass-name = klass-name-from-info(info-slots))) {
-    if (nullptr == (klass-klass = klass-for-name-simple(klass-name)))
-      klass-klass = klass-for-name(klass-name, column + 1); // recursive
+  if (nullptr != (kls-name = klass-name-from-info(info-slots))) {
+    if (nullptr == (klass-klass = klass-for-name-simple(kls-name)))
+      klass-klass = klass-for-name(kls-name, column + 1); // recursive
   }
   else
     klass-klass = klass::klass;
@@ -1574,29 +1574,29 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   if (klass-klass != klass::klass && !klass::subklass?(klass-klass, klass::klass)) // hardhard
     throw make(illegal-klass-exception::klass);
 
-  klass = make(klass-klass, #info-slots : info-slots);
-  return klass;
+  kls = make(klass-klass, #info-slots : info-slots);
+  return kls;
 }
 func dk-klass-for-name(symbol-t name) -> object-t {
   ssize-t column;
-  object-t klass = klass-for-name(name, column = 0);
-  return klass;
+  object-t kls = klass-for-name(name, column = 0);
+  return kls;
 }
-/*LOCAL*/ func info-for-name(symbol-t klass-name) -> named-info-t* {
-  assert-valid-str(klass-name);
-  property-t[] properties = { { .key = #name, .element = cast(intptr-t)klass-name } };
+/*LOCAL*/ func info-for-name(symbol-t kls-name) -> named-info-t* {
+  assert-valid-str(kls-name);
+  property-t[] properties = { { .key = #name, .element = cast(intptr-t)kls-name } };
   named-info-t info = { .next = nullptr, .count = scountof(properties), .elements = properties };
-  named-info-t* klass-info = cast(named-info-t*)sorted-array::bsearch(gbl-klass-defns-table, &info);
+  named-info-t* kls-info = cast(named-info-t*)sorted-array::bsearch(gbl-klass-defns-table, &info);
 
-  if (nullptr == klass-info) {
+  if (nullptr == kls-info) {
     str-t klasspath = getenv("KLASSPATH");
 
     if (nullptr == klasspath) {
-      fprintf(stderr, "%s:%i: ERROR: klass '%s' not found and KLASSPATH not set.\n", __FILE__, __LINE__, klass-name);
+      fprintf(stderr, "%s:%i: ERROR: klass '%s' not found and KLASSPATH not set.\n", __FILE__, __LINE__, kls-name);
       throw "bummer";
     } else {
       //fprintf(stdout, "KLASSPATH=%s\n", klasspath);
-      str-t file-name = file-name-from-klass-name(klass-name);
+      str-t file-name = file-name-from-klass-name(kls-name);
       str-t file = find-file(klasspath, file-name, so-ext);
 
       if (nullptr != file) {
@@ -1606,14 +1606,14 @@ func dk-klass-for-name(symbol-t name) -> object-t {
 
         //init-imported-klasses();
 
-        named-info-t* loaded-klass-info = info-for-name(klass-name); // recursive
-        return loaded-klass-info; // rnielsen: should have only one return per func
+        named-info-t* loaded-kls-info = info-for-name(kls-name); // recursive
+        return loaded-kls-info; // rnielsen: should have only one return per func
       }
-      fprintf(stderr, "%s:%i: ERROR: klass '%s' not found.\n", __FILE__, __LINE__, klass-name);
+      fprintf(stderr, "%s:%i: ERROR: klass '%s' not found.\n", __FILE__, __LINE__, kls-name);
       throw "bummer";
     }
   }
-  return klass-info; // rnielsen: should have only one return per func
+  return kls-info; // rnielsen: should have only one return per func
 }
 /*
   dk-intern needs to be able to be used **early** in the static initialization
@@ -1644,9 +1644,9 @@ func dk-intern(str-t key) -> symbol-t {
   return val;
 }
 static func get-klass-chain(object-t kls, char8-t* buf, int64-t buf-len) -> char8-t* {
-  object-t superklass = superklass-of(kls);
-  if (!root-superklass?(superklass))
-    get-klass-chain(superklass, buf, buf-len); // recursive
+  object-t superkls = superklass-of(kls);
+  if (!root-superklass?(superkls))
+    get-klass-chain(superkls, buf, buf-len); // recursive
   str-t kls-name = name-of(kls);
   strcat(buf, "/");
   strcat(buf, kls-name);

@@ -22,7 +22,7 @@ module dakota;
 klass ascii-number;
 klass named-info;
 
-static object-t gbl-base2-ascii-number-klass-info;
+static object-t gbl-base2-ascii-number-kls-info;
 
 klass ascii-number-klass {
   superklass klass;
@@ -31,7 +31,7 @@ klass ascii-number-klass {
     str-t digits;
   }
   method init(object-t self,
-                       object-t       info :   gbl-base2-ascii-number-klass-info,
+                       object-t       info :   gbl-base2-ascii-number-kls-info,
                        str-t digits : "01") -> object-t {
     self = $init(super, #info : info);
     assert(nullptr != digits);
@@ -44,9 +44,9 @@ klass ascii-number-klass {
     return digits;
   }
   klass initialize(object-t) -> void {
-    gbl-base2-ascii-number-klass-info = dk-make-named-info(#base2-ascii-number-klass,
-                                                           #superklass-name, cast(size-t)#ascii-number,
-                                                           nullptr);
+    gbl-base2-ascii-number-kls-info = dk-make-named-info(#base2-ascii-number-klass,
+                                                         #superklass-name, cast(intptr-t)#ascii-number,
+                                                         nullptr);
     return;
   }
   klass finalize(object-t) -> void {
