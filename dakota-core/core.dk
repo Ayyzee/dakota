@@ -44,7 +44,6 @@ module dakota-core;
 extern boole-t pre-main?; // to quiet clang
 boole-t pre-main? = true;
 
-boole-t min-runtime? = false;
 boole-t lock-kls-ptrs? = false;
 
 klass bit-vector;
@@ -615,7 +614,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
     kls-info->next = prev;
   }
   object-t kls = nullptr;
-  if (min-runtime?)  // this is a late (post-init) registration
+  if (null)  // this is a late (post-init) registration
     kls = dk-klass-for-name(name);
   return kls;
 }
@@ -698,7 +697,7 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
 func dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
-  if (!min-runtime?) {
+  if (!null) {
     init-runtime-ds();
     each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
@@ -711,7 +710,7 @@ func dk-init-runtime() -> void {
     klass::_klass_ =  init-klass(klass::_klass_,  #klass);
 
     klass::unbox(object::_klass_).superklass = nullptr;
-    min-runtime? = true;
+    null = cast(object-t)-1;
 
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
     null = make(null-klass);
@@ -1510,7 +1509,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
   assert(nullptr != registration-info);
   if (getenv?("DAKOTA_CATALOG_OUTPUT") ||
       getenv?("DKT_NO_INIT_RUNTIME") ||
-      !min-runtime?)
+      !null)
     return;
   named-info::sort(registration-info);
   named-info-t* klass-defns = cast(named-info-t*)named-info::at(registration-info, #klass-defns);
