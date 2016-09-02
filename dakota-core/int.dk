@@ -21,6 +21,35 @@ module dakota-core;
 
 klass number;
 
+klass intmax {
+  superklass number;
+  
+  slots intmax-t;
+
+  const slots-t min = INTMAX_MIN;
+  const slots-t max = INTMAX_MAX;
+
+  // INTMAX_C(v)
+
+  method compare(slots-t a, slots-t b) -> cmp-t {
+    cmp-t result = (a < b) ? -1 : (a > b) ? 1 : 0;
+    return result;
+  }
+}
+klass uintmax {
+  superklass number;
+  
+  slots uintmax-t;
+
+  const slots-t max = UINTMAX_MAX;
+
+  // UINTMAX_C(v)
+
+  method compare(slots-t a, slots-t b) -> cmp-t {
+    cmp-t result = (a < b) ? -1 : (a > b) ? 1 : 0;
+    return result;
+  }
+}
 klass int8 {
   superklass number;
   
@@ -125,16 +154,6 @@ klass int-least64 {
   const slots-t min = INT_LEAST64_MIN;
   const slots-t max = INT_LEAST64_MAX;
 }
-klass intmax {
-  superklass number;
-  
-  slots intmax-t;
-
-  const slots-t min = INTMAX_MIN;
-  const slots-t max = INTMAX_MAX;
-
-  // INTMAX_C(v)
-}
 klass intptr {
   superklass number;
   
@@ -172,11 +191,13 @@ klass uint32 {
 
   method compare(object-t self, object-t other) -> cmp-t {
     assert(nullptr != other);
-    cmp-t result;
-    if (klass-of(other) == klass || $instance?(other, klass))
-      result = dkt-normalize-compare-result(cast(cmp-t)(unbox(self) - unbox(other)));
-    else
-      result = $compare(super, other);
+    cmp-t result = 0;
+    if (self != other) {
+      if (klass-of(other) == klass || $instance?(other, klass))
+        result = uintmax::compare(unbox(self), unbox(other));
+      else
+        result = $compare(super, other);
+    }
     return result;
   }
 }
@@ -244,15 +265,6 @@ klass uint-least64 {
   slots uint-least64-t;
 
   const slots-t max = UINT_LEAST64_MAX;
-}
-klass uintmax {
-  superklass number;
-  
-  slots uintmax-t;
-
-  const slots-t max = UINTMAX_MAX;
-
-  // UINTMAX_C(v)
 }
 klass uintptr {
   superklass number;
