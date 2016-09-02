@@ -57,17 +57,17 @@ klass symbol {
     ssize-t result = cast(ssize-t)safe-strlen(s);
     return result;
   }
-  method compare(slots-t s, slots-t other-s) -> int-t {
-    int-t result = 0;
+  method compare(slots-t s, slots-t other-s) -> cmp-t {
+    cmp-t result = 0;
     if (s != other-s) {
-      result = cast(int-t)safe-strcmp(s, other-s);
+      result = cast(cmp-t)safe-strcmp(s, other-s);
       result = dkt-normalize-compare-result(result);
     }
     //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
     return result;
   }
-  method compare(object-t self, object-t other) -> int-t {
-    int-t result = 0;
+  method compare(object-t self, object-t other) -> cmp-t {
+    cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == klass || $instance?(other, klass))
         result = compare(unbox(self), unbox(other));

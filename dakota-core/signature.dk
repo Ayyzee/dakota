@@ -37,18 +37,18 @@ klass signature {
     printf("%s(%s)", s->name, s->param-types);
     return s;
   }
-  method compare(slots-t* s, slots-t* other-s) -> int-t {
+  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
-    int-t result = safe-strcmp(s->name, other-s->name);
+    cmp-t result = safe-strcmp(s->name, other-s->name);
     if (0 == result)
       result = safe-strcmp(s->param-types, other-s->param-types);
     result = dkt-normalize-compare-result(result);
     return result;
   }
-  method compare(object-t self, object-t other) -> int-t {
-    int-t result;
+  method compare(object-t self, object-t other) -> cmp-t {
+    cmp-t result;
 
     if (klass-of(other) == klass || $instance?(other, klass)) {
       slots-t& s1 = unbox(self);

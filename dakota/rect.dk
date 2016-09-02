@@ -29,8 +29,8 @@ klass rect {
     unbox(self) = slots;
     return self;
   }
-  method compare(slots-t* slots, slots-t* other-slots) -> int-t {
-    int-t result = 0;
+  method compare(slots-t* slots, slots-t* other-slots) -> cmp-t {
+    cmp-t result = 0;
     if (slots != other-slots) {
       intmax-t diff = 0;
       if (0)

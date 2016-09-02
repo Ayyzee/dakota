@@ -33,8 +33,8 @@ klass property {
     unbox(self) = slots;
     return self;
   }
-  method compare(slots-t* s, slots-t* other-s) -> int-t {
-    int-t result = symbol::compare(s->key, other-s->key);
+  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+    cmp-t result = symbol::compare(s->key, other-s->key);
     return result;
   }
   method check(slots-t* s) -> ssize-t {
@@ -42,8 +42,8 @@ klass property {
       std::abort();
     return 0;
   }
-  method compare(object-t self, object-t other) -> int-t {
-    int-t result;
+  method compare(object-t self, object-t other) -> cmp-t {
+    cmp-t result;
 
     if (klass-of(other) == klass || $instance?(other, klass)) {
       slots-t& s1 = unbox(self);

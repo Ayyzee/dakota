@@ -111,11 +111,11 @@ klass named-assoc-node {
     symbol-t name;
     assoc-node-t* node;
   }
-  method compare(slots-t* s, slots-t* other-s) -> int-t {
+  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
-    int-t result = symbol::compare(s->name, other-s->name);
+    cmp-t result = symbol::compare(s->name, other-s->name);
     return result;
   }
 //   slots-t* dump(slots-t* s)
@@ -909,7 +909,7 @@ static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* 
   return;
 }
 static func max-enum-name-width(enum-info-t* enum-info) -> int-t {
-  int-t result = 0;
+  cmp-t result = 0;
   int-t i = 0;
   str-t name;
   while (nullptr != (name = enum-info[i++].name)) {
@@ -920,7 +920,7 @@ static func max-enum-name-width(enum-info-t* enum-info) -> int-t {
   return result;
 }
 static func max-slot-type-width(named-info-t* slots-info) -> int-t {
-  int-t result = 0;
+  cmp-t result = 0;
   int-t i = 0;
   while (nullptr != slots-info[i].elements) {
     str-t slot-type = cast(str-t)named-info::at(&slots-info[i], #type);
@@ -932,7 +932,7 @@ static func max-slot-type-width(named-info-t* slots-info) -> int-t {
   return result;
 }
 static func max-slot-name-width(named-info-t* slots-info) -> int-t {
-  int-t result = 0;
+  cmp-t result = 0;
   int-t i = 0;
   while (nullptr != slots-info[i].elements) {
     str-t slot-name = cast(str-t)named-info::at(&slots-info[i], #name);
@@ -1392,7 +1392,7 @@ static func set-protection(str-t segment, int-t protection, get-segment-data-fun
   return result;
 }
 static func set-protection-all(str-t segment, int-t protection) -> int-t {
-  int-t result = 0;
+  cmp-t result = 0;
   named-info-t* ni = gbl-registration-info-list;
   while (nullptr != ni) {
     registration-info-t ri {};

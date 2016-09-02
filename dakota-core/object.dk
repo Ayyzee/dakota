@@ -50,10 +50,10 @@ klass object {
     $write-slots-end(out);
     return self;
   }
-  method compare(object-t self, object-t other) -> int-t {
+  method compare(object-t self, object-t other) -> cmp-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     intmax-t diff = cast(uint8-t*)self - cast(uint8-t*)(other);
-    int-t result = dkt-normalize-compare-result(diff);
+    cmp-t result = dkt-normalize-compare-result(diff);
     return result;
   }
   method equals?(object-t self, object-t other) -> boole-t {

@@ -57,7 +57,7 @@ klass pair {
     $write-slots-end(out);
     return self;
   }
-  method compare(object-t self, object-t other) -> int-t {
+  method compare(object-t self, object-t other) -> cmp-t {
     object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
@@ -68,7 +68,7 @@ klass pair {
     else
       other-first = other;
     assert(nullptr != other-first);
-    int-t result = $compare(first, other-first);
+    cmp-t result = $compare(first, other-first);
     return result;
   }
   method hash(object-t self) -> hash-t {

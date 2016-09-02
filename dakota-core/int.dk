@@ -170,11 +170,11 @@ klass uint32 {
 
   // UINT32_C(v)
 
-  method compare(object-t self, object-t other) -> int-t {
+  method compare(object-t self, object-t other) -> cmp-t {
     assert(nullptr != other);
-    int-t result;
+    cmp-t result;
     if (klass-of(other) == klass || $instance?(other, klass))
-      result = dkt-normalize-compare-result(cast(int-t)(unbox(self) - unbox(other)));
+      result = dkt-normalize-compare-result(cast(cmp-t)(unbox(self) - unbox(other)));
     else
       result = $compare(super, other);
     return result;

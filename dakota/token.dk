@@ -205,8 +205,8 @@ klass token {
     self.buffer[len + 1] = NUL;
     return self;
   }
-  method compare(object-t self, object-t other) -> int-t {
-    int-t result;
+  method compare(object-t self, object-t other) -> cmp-t {
+    cmp-t result;
     if (klass-of(other) == klass || $instance?(other, klass)) {
       result = safe-strcmp(unbox(self).buffer, unbox(other).buffer);
       result = dkt-normalize-compare-result(result);

@@ -34,8 +34,8 @@ klass ssize {
     unbox(self) = slots;
     return self;
   }
-  method compare(slots-t slots, slots-t other) -> int-t {
-    int-t result = slots < other ? -1 : 1;
+  method compare(slots-t slots, slots-t other) -> cmp-t {
+    cmp-t result = slots < other ? -1 : 1;
     return result;
   }
 }

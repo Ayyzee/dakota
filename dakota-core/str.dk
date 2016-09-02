@@ -73,10 +73,10 @@ klass str {
     hash-t result = dk-hash(slots);
     return result;
   }
-  method compare(object-t self, object-t other) -> int-t {
+  method compare(object-t self, object-t other) -> cmp-t {
     assert(nullptr != other);
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    int-t result;
+    cmp-t result;
 
     if (klass-of(other) == klass || $instance?(other, klass)) {
       assert(klass-of(self) == str-klass::klass || $instance?(klass-of(self), str-klass::klass));

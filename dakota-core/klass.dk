@@ -76,11 +76,11 @@ klass selector-pair {
     const signature-t* key;
     selector-node-t*   element;
   }
-  method compare(slots-t* s, slots-t* other-s) -> int-t {
+  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
-    int-t result = signature::compare(const-cast<signature-t*>(s->key),
+    cmp-t result = signature::compare(const-cast<signature-t*>(s->key),
                                       const-cast<signature-t*>(other-s->key)); // hackhack
     return result;
   }

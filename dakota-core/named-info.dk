@@ -108,8 +108,8 @@ klass named-info {
     }
     return s;
   }
-  method compare(slots-t* s, slots-t* other-s) -> int-t {
-    int-t result = 0;
+  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+    cmp-t result = 0;
     if (s != other-s) {
       symbol-t s-name =       cast(symbol-t)at(s,       #name);
       symbol-t other-s-name = cast(symbol-t)at(other-s, #name);
@@ -118,8 +118,8 @@ klass named-info {
     }
     return result;
   }
-  method compare(object-t self, object-t other) -> int-t {
-    int-t result = 0;
+  method compare(object-t self, object-t other) -> cmp-t {
+    cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == klass || $instance?(other, klass))
         result = compare(&unbox(self), &unbox(other));

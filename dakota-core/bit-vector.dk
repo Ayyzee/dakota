@@ -209,9 +209,9 @@ klass bit-vector {
     boole-t result = op-common?(self, other, op-bit-xor);
     return result;
   }
-  method compare(object-t self, object-t other) -> int-t {
+  method compare(object-t self, object-t other) -> cmp-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    int-t result = 0;
+    cmp-t result = 0;
 
     if (klass-of(other) == klass || $instance?(other, klass)) {
       slots-t& self-slots =  unbox(self);

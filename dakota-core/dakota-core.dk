@@ -34,6 +34,8 @@ export dakota-core {
   char32;
   char8::slots-t;
   char8;
+  cmp::slots-t;
+  cmp;
   collection;
   compare::slots-t;
   compare;

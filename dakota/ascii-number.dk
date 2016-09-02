@@ -36,9 +36,9 @@ klass ascii-number {
     size-t result = cast(size-t)(self.number);
     return result;
   }
-  method compare(object-t self, object-t other) -> int-t {
+  method compare(object-t self, object-t other) -> cmp-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    int-t result;
+    cmp-t result;
     if (klass-of(other) == klass || $instance?(other, klass)) {
       slots-t& s1 = unbox(self);
       slots-t& s2 = unbox(other);
