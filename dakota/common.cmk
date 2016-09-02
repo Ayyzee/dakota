@@ -14,7 +14,6 @@ if (NOT DEFINED ${cc-ext})
   set (cc-ext cc)
 endif ()
 
-set (target-src ${builddir}/x/target.${cc-ext})
 set (project ${target})
 project (${project} LANGUAGES CXX)
 set (CMAKE_CXX_COMPILER dk)
@@ -38,6 +37,11 @@ add_custom_target (
   init
   COMMAND ${dakota} --project ${project-path} --init ${found-libs}
   VERBATIM)
+# get target-cc path
+execute_process (
+  COMMAND ${dakota} --project ${project-path} --target --path-only
+  OUTPUT_VARIABLE target-src
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 # generate target-cc
 add_custom_command (
   OUTPUT ${target-src}
