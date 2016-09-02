@@ -489,8 +489,9 @@ sub add_str {
 }
 sub add_int {
   my ($file, $val) = @_;
-  $$file{'literal-ints'}{$val} = undef;
-  &add_symbol($file, $val);
+  my $int = &int_from_str($val);
+  $$file{'literal-ints'}{$val}{$int} = undef;
+  #&add_symbol($file, $val);
 }
 sub token_seq::simple_seq {
   my ($tokens) = @_;

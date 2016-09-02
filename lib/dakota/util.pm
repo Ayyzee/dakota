@@ -101,6 +101,7 @@ our @EXPORT= qw(
                  has_kw_arg_names
                  header_file_regex
                  ident_regex
+                 int_from_str
                  is_abs
                  is_array_type
                  is_box_type
@@ -324,6 +325,22 @@ sub remove_extra_whitespace {
     $str =~ s/\s*,\s*/, /g;
   }
   return $str;
+}
+# oct: 0[0-7]
+# hex: 0x
+# bin: 0b
+sub int_from_str {
+  my ($str) = @_;
+  my $int = $str;
+  my $chars = [split(//, $str)];
+  if ('0' eq $$chars[0] && 1 < scalar @$chars) {
+    if ($$chars[1] =~ /[0-7]|(x|X)|(b|B)/) {
+      $int = oct($str);
+    } else {
+      die;
+    }
+  }
+  return $int;
 }
 sub needs_hex_encoding {
   my ($str) = @_;
