@@ -44,8 +44,6 @@ module dakota-core;
 extern boole-t pre-main?; // to quiet clang
 boole-t pre-main? = true;
 
-boole-t lock-kls-ptrs? = false;
-
 klass bit-vector;
 klass const-info;
 klass enum-info;
@@ -715,7 +713,12 @@ func dk-init-runtime() -> void {
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
     null = make(null-klass);
     klass::unbox(object::_klass_).superklass = null;
-    lock-kls-ptrs? = true;
+
+    std::terminate-handler previous-terminate = std::set-terminate(verbose-terminate);
+    assert(previous-terminate == pre-runtime-verbose-terminate);
+
+    std::terminate-handler previous-unexpected = std::set-unexpected(verbose-unexpected);
+    assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
     // core runtime klasses are setup
     // klasses: object, klass, singleton-klass, null
@@ -761,12 +764,6 @@ func dk-init-runtime() -> void {
          cast(named-info-func-t)cast(func (*)(named-info-t*, int-box-func-t) -> void)each-int,
          cast(each-box-func-t)cast(int-box-func-t)intmax::box);
     set-read-only();
-
-    std::terminate-handler previous-terminate = std::set-terminate(verbose-terminate);
-    assert(previous-terminate == pre-runtime-verbose-terminate);
-
-    std::terminate-handler previous-unexpected = std::set-unexpected(verbose-unexpected);
-    assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
 # if 0
     $dump(object::klass);
