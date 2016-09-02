@@ -18,8 +18,8 @@ module dakota;
 
 klass point {
   slots {
-    int64-t x;
-    int64-t y;
+    ssize-t x;
+    ssize-t y;
   }
   method init(object-t self, slots-t slots : {.x = 0, .y = 0}) -> object-t {
     self = $init(super);

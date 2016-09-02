@@ -56,11 +56,11 @@ klass object {
     int-t result = dkt-normalize-compare-result(diff);
     return result;
   }
-  method equal?(object-t self, object-t other) -> boole-t {
+  method equals?(object-t self, object-t other) -> boole-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     boole-t state = false;
 
-    if (0 == compare(self, other))
+    if (0 == $compare(self, other))
       state = true;
     return state;
   }

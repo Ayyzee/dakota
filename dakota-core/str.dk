@@ -67,15 +67,6 @@ klass str {
             cast(ptr-t)self, cast(ptr-t)unbox(self), unbox(self));
     return self;
   }
-  method equal?(object-t self, object-t other) -> boole-t {
-    assert(nullptr != other);
-    boole-t state;
-    if (0 == $compare(self, other))
-      state = true;
-    else
-      state = false;
-    return state;
-  }
   method hash(object-t self) -> hash-t {
     slots-t slots = unbox(self);
     assert(nullptr != slots);
@@ -87,8 +78,8 @@ klass str {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 
-    if ($instance?(other, klass)) {
-      assert($instance?(klass-of(self), str-klass::klass));
+    if (klass-of(other) == klass || $instance?(other, klass)) {
+      assert(klass-of(self) == str-klass::klass || $instance?(klass-of(self), str-klass::klass));
       str-klass::slots-t& ks = str-klass::unbox(klass-of(self));
       // what if both strs are nullptr?
       // what if only one str is nullptr?

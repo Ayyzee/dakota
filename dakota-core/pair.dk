@@ -57,20 +57,6 @@ klass pair {
     $write-slots-end(out);
     return self;
   }
-  method equal?(object-t self, object-t other) -> boole-t {
-    object-t first = self.first;
-    assert(nullptr != first);
-    object-t other-first;
-    if (klass == klass-of(other))
-      other-first = unbox(other).first;
-    else-if ($method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
-      other-first = $first(other);
-    else
-      other-first = other;
-    assert(nullptr != other-first);
-    boole-t result = $equal?(first, other-first);
-    return result;
-  }
   method compare(object-t self, object-t other) -> int-t {
     object-t first = self.first;
     assert(nullptr != first);

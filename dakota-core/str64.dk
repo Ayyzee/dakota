@@ -49,7 +49,7 @@ klass str64 {
   method compare(object-t self, object-t other) -> int-t {
     int-t result;
 
-    if ($instance?(other, klass)) {
+    if (klass-of(other) == klass || $instance?(other, klass)) {
       slots-t& s1 = unbox(self);
       slots-t& s2 = unbox(other);
       result = compare(&s1, &s2);

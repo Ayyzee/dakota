@@ -38,7 +38,7 @@ klass hashed-set {
   trait set;
 
   slots {
-    equal-t  equal?;
+    equal-t  equals?;
     ssize-t  num-buckets;
     object-t buckets; // a vector of deques
     ssize-t  size;
@@ -56,7 +56,7 @@ klass hashed-set {
               object-t[] objects :  nullptr) -> object-t {
     assert(0 < initial-capacity);
     self = $init(super);
-    self.equal? = $equal?;
+    self.equals? = $equals?;
     self.num-buckets = initial-capacity;
     self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill-element : nullptr);
     self.size = 0;
@@ -86,7 +86,7 @@ klass hashed-set {
       object-t found-element = nullptr;
 
       for (object-t e in deque) {
-        if (self.equal?(e, element)) { // arg order matters here!!
+        if (self.equals?(e, element)) { // arg order matters here!!
           result = found-element = e;
           break;
         }
@@ -113,7 +113,7 @@ klass hashed-set {
 
     if (nullptr != deque) {
       for (object-t e in deque) {
-        if (self.equal?(e, element)) { // arg order matters here!!
+        if (self.equals?(e, element)) { // arg order matters here!!
           result = e;
           break;
         }
@@ -151,7 +151,7 @@ klass hashed-set {
         //printf("element: %s\n", $name(element));
         //printf("e: %s\n", $name(e));
 
-        if (self.equal?(e, element)) { // arg order matters here!!
+        if (self.equals?(e, element)) { // arg order matters here!!
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           self.iterator-state++;

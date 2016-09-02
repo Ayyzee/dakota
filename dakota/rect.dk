@@ -29,16 +29,21 @@ klass rect {
     unbox(self) = slots;
     return self;
   }
-  method equal?(slots-t* slots, slots-t* other-slots) -> boole-t {
-    boole-t result = true;
-
+  method compare(slots-t* slots, slots-t* other-slots) -> int-t {
+    int-t result = 0;
     if (slots != other-slots) {
-      if (slots->point.x != other-slots->point.x ||
-          slots->point.y != other-slots->point.y ||
-          slots->dimension.width  != other-slots->dimension.width ||
-          slots->dimension.height != other-slots->dimension.height) {
-        result = false;
-      }
+      intmax-t diff = 0;
+      if (0)
+        ;
+      else if (0 != (diff = slots->point.x - other-slots->point.x))
+        ;
+      else if (0 != (diff = slots->point.y - other-slots->point.y))
+        ;
+      else if (0 != (diff = slots->dimension.width  - other-slots->dimension.width))
+        ;
+      else if (0 != (diff = slots->dimension.height - other-slots->dimension.height))
+        ;
+      result = dkt-normalize-compare-result(diff);
     }
     return result;
   }

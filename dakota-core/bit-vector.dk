@@ -213,7 +213,7 @@ klass bit-vector {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result = 0;
 
-    if ($instance?(other, klass)) {
+    if (klass-of(other) == klass || $instance?(other, klass)) {
       slots-t& self-slots =  unbox(self);
       slots-t& other-slots = unbox(other);
       assert(self-slots.capacity == other-slots.capacity);

@@ -148,7 +148,7 @@ klass string {
   }
   // returns an vector of string objects
   method tokenize(object-t self, object-t delimiter) -> object-t {
-    assert($instance?(delimiter, klass));
+    assert(klass-of(delimiter) == klass || $instance?(delimiter, klass));
     slots-t& d = unbox(delimiter);
     object-t result = $tokenize(self, d.ptr);
     return result;
@@ -199,7 +199,7 @@ klass string {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     int-t result;
 
-    if ($instance?(other, klass)) {
+    if (klass-of(other) == klass || $instance?(other, klass)) {
       // what if both strs are nullptr?
       // what if only one str is nullptr?
       slots-t& s1 = unbox(self);
