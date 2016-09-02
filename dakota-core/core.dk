@@ -713,32 +713,32 @@ func dk-init-runtime() -> void {
     klass::unbox(object::_klass_).superklass = nullptr;
     min-runtime? = true;
 
-    object-t null-singleton-kls = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
-    null = make(null-singleton-kls);
+    object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
+    null = make(null-klass);
     klass::unbox(object::_klass_).superklass = null;
     lock-kls-ptrs? = true;
 
     // core runtime klasses are setup
-    // klasses: object, klass, singleton-klass, null-singleton
+    // klasses: object, klass, singleton-klass, null
     // and (null)
 
     // instantiation hier:
     //   klass <- klass
     //   klass <- object
-    //   klass <- singleton-klass <- null-singleton <- (null)
+    //   klass <- singleton-klass <- null <- (null)
     // inheritance hier:
     //   (null) <- object <- klass <- singleton-klass
-    //   (null) <- object <- null-singleton
+    //   (null) <- object <- null
 
     assert(klass::klass           == klass-of(klass::klass));
     assert(klass::klass           == klass-of(singleton-klass::klass));
     assert(klass::klass           == klass-of(object::klass));
-    assert(singleton-klass::klass == klass-of(null-singleton-kls));
-    assert(null-singleton-kls     == klass-of(null));
+    assert(singleton-klass::klass == klass-of(null-klass));
+    assert(null-klass             == klass-of(null));
 
     assert(null          == superklass-of(object::klass));
     assert(object::klass == superklass-of(klass::klass));
-    assert(object::klass == superklass-of(null-singleton-kls));
+    assert(object::klass == superklass-of(null-klass));
     assert(klass::klass  == superklass-of(singleton-klass::klass));
     assert(object::klass == superklass-of(klass-of(null)));
 
@@ -746,13 +746,13 @@ func dk-init-runtime() -> void {
     $behavior(object::klass);
     $behavior(klass::klass);
     $behavior(singleton-klass::klass);
-    $behavior(null-singleton-kls);
+    $behavior(null-klass);
     $behavior(bit-vector::klass);
 # else
     klass::unbox(object::klass).behavior =          nullptr;
     klass::unbox(klass::klass).behavior =           nullptr;
     klass::unbox(singleton-klass::klass).behavior = nullptr;
-    klass::unbox(null-singleton-kls).behavior =     nullptr;
+    klass::unbox(null-klass).behavior =             nullptr;
     klass::unbox(bit-vector::klass).behavior =      nullptr;
 # endif
 
@@ -782,7 +782,7 @@ func dk-init-runtime() -> void {
     fprintf(stderr, "---\n");
     $dump(singleton-klass::klass);
     fprintf(stderr, "---\n");
-    $dump(null-singleton-kls);
+    $dump(null-klass);
 # if !defined DKT-OMIT-BEHAVIOR
     fprintf(stderr, "---\n");
     $dump(bit-vector::klass);
