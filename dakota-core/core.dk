@@ -461,9 +461,7 @@ func dk-make-simple-klass(symbol-t name, symbol-t superkls-name, symbol-t kls-na
   uint_t i = 0;
   if (nullptr != kls-name)
     kls-props[i++] = { .key = #klass-name,      .element = cast(intptr-t)kls-name     };
-
-  kls-props[i++] =   { .key = #name,            .element = cast(intptr-t)name           };
-
+  kls-props[i++] =   { .key = #name,            .element = cast(intptr-t)name         };
   if (nullptr != superkls-name)
     kls-props[i++] = { .key = #superklass-name, .element = cast(intptr-t)superkls-name};
 
@@ -1593,9 +1591,9 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
       kls-klass = klass-for-name(kls-name, column + 1); // recursive
   }
   else
-    kls-klass = klass::_klass_;
+    kls-klass = klass::klass;
 
-  if (kls-klass != klass::_klass_ && !klass::subklass?(kls-klass, klass::_klass_)) // hardhard
+  if (kls-klass != klass::klass && !klass::subklass?(kls-klass, klass::klass)) // hardhard
     throw make(illegal-klass-exception::klass);
 
   kls = make(kls-klass, #info-slots : info-slots);
