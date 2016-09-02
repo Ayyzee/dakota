@@ -677,12 +677,12 @@ klass klass {
     return result;
   }
   static func set-all-klass-ptrs(object-t self) -> void {
-    assoc-node-t* imported-klasses = imported-klasses-for-klass(name-of(self));
-    assoc-node-t* current-imported-klass = imported-klasses; // to ease debugging
-    while (nullptr != current-imported-klass) {
-      *(cast(object-t*)(current-imported-klass->element)) = self;
-      current-imported-klass = current-imported-klass->next;
-    }
+    assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
+    if (lock-kls-ptrs?)
+      set-read-write();
+    assoc-node::set-elements(imported-klss, self); // write-kls-ptr
+    if (lock-kls-ptrs?)
+      set-read-only();
     return;
   }
   static func dump-random(object-t self) -> void {
@@ -700,6 +700,7 @@ klass klass {
     named-info::sort(info);
     self.info = info;
     self.name = name-from-info(self.info);
+//     printf("init(): kls-name: %s\n", self.name);
     assert(nullptr != name-of(self));
     assert(#trait != cast(symbol-t)named-info::at(self.info, #type));
     // fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
@@ -716,7 +717,7 @@ klass klass {
     self.methods = { .addrs = nullptr, .count = 0 };
     self.behavior = nullptr;
 # if !defined DKT-OMIT-BEHAVIOR
-    if (nullptr != bit-vector::klass)
+    if (nullptr != bit-vector::_klass_) // don't change to bit-vector::klass, it will fail
       self.behavior = behavior(self, selector-count());
 # endif
     alloc-methods(self, selector-count());

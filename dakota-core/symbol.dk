@@ -32,7 +32,6 @@ klass symbol-klass {
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
-    dk-klass-for-name(#sorted-set); // hackhack
     self.set = make(sorted-set::klass); // should be consumer settable
     return self;
   }

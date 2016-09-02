@@ -196,9 +196,9 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4) -> uint32_t 
 # define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 
 extern object_t null       [[so_export]] [[read_only]];
-extern object_t std_input  [[so_export]] [[read_only]];
-extern object_t std_output [[so_export]] [[read_only]];
-extern object_t std_error  [[so_export]] [[read_only]];
+extern object_t std_input  [[so_export]];
+extern object_t std_output [[so_export]];
+extern object_t std_error  [[so_export]];
 
 extern THREAD_LOCAL const signature_t* dkt_current_signature [[so_export]];
 extern THREAD_LOCAL super_t            dkt_null_context      [[so_export]];

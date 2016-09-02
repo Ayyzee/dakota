@@ -674,6 +674,25 @@ sub rewrite_supers {
   $$filestr_ref =~ s/\b(klass)\s+($rid)\s*(.*?$main::block)/&rewrite_supers_in_klass($1, $2, $3)/egs;
   $$filestr_ref =~ s/\b(trait)\s+($rid)\s*(.*?$main::block)/&rewrite_supers_in_trait($1, $2, $3)/egs;
 }
+sub rewrite_klass_vars {
+  my ($filestr_ref) = @_;
+  # klass klass    ;|{
+  # klass x::thing ;|{
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)klass(\s+)klass(\s*)(;|\{)/$1__K_L_A_S_S__$2__K_L_A_S_S__$3$4/gs;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)klass(\s+)($rid)(\s*)(;|\{)/$1__K_L_A_S_S__$2$3$4$5/gs;
+  # .klass
+  # ->klass
+  $$filestr_ref =~ s/(\.|->)klass([^\w-])/$1__K_L_A_S_S__$2/gs;
+  # offsetof(slots-t, klass)
+  # sizeof(slots-t::klass)
+  # INTERNED-DEMANGLED-TYPEID-NAME(slots-t::klass)
+  $$filestr_ref =~ s/offsetof\((slots-t),\s*klass\s*\)/offsetof($1, __K_L_A_S_S__)/gs;
+  $$filestr_ref =~ s/(sizeof|INTERNED-DEMANGLED-TYPEID-NAME)\((slots-t)::klass\s*\)/$1($2::__K_L_A_S_S__)/gs;
+
+  $$filestr_ref =~ s/(::|\(|\)|\{|\}|,|!|=)(\s*)klass([^\(:\w-])/$1$2klass()$3/gs;
+
+  $$filestr_ref =~ s/__K_L_A_S_S__/klass/g;
+}
 #sub rewrite_makes
 #{
 #    my ($filestr_ref) = @_;
@@ -1098,6 +1117,7 @@ sub convert_dk_to_cc {
   &rewrite_unless($filestr_ref);
   &rewrite_creates($filestr_ref);
   &rewrite_supers($filestr_ref);
+  &rewrite_klass_vars($filestr_ref);
   &rewrite_compound_literal_cstring_null($filestr_ref);
   &rewrite_compound_literal_cstring($filestr_ref);
   &rewrite_compound_literal($filestr_ref);

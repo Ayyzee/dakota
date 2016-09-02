@@ -564,7 +564,7 @@ sub generate_target_runtime {
     $col = &colin($col);
     $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
     foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
-      $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::klass }," . $nl;
+      $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::_klass_ }," . $nl;
     }
     $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
     $col = &colout($col);
@@ -2037,9 +2037,11 @@ sub linkage_unit::generate_klasses_body_vars {
   }
   if ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= " extern object-t klass [[read-only]];";
+      $$scratch_str_ref .= " extern object-t _klass_ [[read-only]];";
+      $$scratch_str_ref .= " extern func klass() -> object-t;";
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $pad . " object-t klass = nullptr;";
+      $$scratch_str_ref .= $pad . " object-t _klass_ = nullptr;";
+      $$scratch_str_ref .= " func klass() -> object-t { return klass-for-name(__name__, _klass_); }";
     }
   }
   $$scratch_str_ref .= ' }' . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
@@ -4174,10 +4176,10 @@ sub linkage_unit::generate_target_runtime_ints_seq {
   my $scratch_str = "";
   my $col = '';
   if (0 == scalar keys %{$$target_srcs_ast{'literal-ints'}}) {
-    $scratch_str .= $col . "//static intptr-t const __int-literals[] = { 0 }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "//static intmax-t const __int-literals[] = { 0 }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $scratch_str .= $col . "//static object-t* __int-ptrs[] = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
-    $scratch_str .= $col . "static intptr-t const __int-literals[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static intmax-t const __int-literals[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       $scratch_str .= $col . "$int," . $nl;
@@ -4200,9 +4202,9 @@ sub linkage_unit::generate_target_runtime_ints_seq {
     $col = &colin($col);
     foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
-      $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__int::$int_ident }," . $nl;
+      $scratch_str .= $col . "{ .next = nullptr, .element = cast(intmax-t)&__literal::__int::$int_ident }," . $nl;
     }
-    $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
+    $scratch_str .= $col . "{ .next = nullptr, .element = cast(intmax-t)nullptr }" . $nl;
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
   }

@@ -19,6 +19,11 @@
 # include "dakota.hh"
 # include "declare-klass-type.hh"
 
+extern boole_t min_runtimeqq; // min-runtime?
+extern boole_t lock_kls_ptrsqq; // lock-kls-ptrs?
+
 dkt_declare_klass_type_struct(assoc_node);
 
 FUNC imported_klasses_for_klass(symbol_t) -> assoc_node_t*;
+FUNC set_read_only() -> int_t;
+FUNC set_read_write() -> int_t;

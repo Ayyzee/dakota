@@ -44,8 +44,8 @@ module dakota-core;
 extern boole-t pre-main?; // to quiet clang
 boole-t pre-main? = true;
 
-extern boole-t min-runtime?; // to quiet clang
 boole-t min-runtime? = false;
+boole-t lock-kls-ptrs? = false;
 
 klass bit-vector;
 klass const-info;
@@ -86,6 +86,24 @@ klass assoc-node {
   slots {
     slots-t*  next;
     intptr-t element;
+  }
+  method set-element(slots-t* slots, object-t element) -> object-t {
+    *(cast(object-t*)(slots->element)) = element;
+    return element;
+  }
+  method set-elements(slots-t* slots, object-t element) -> object-t {
+    slots-t* node = slots;
+    while (nullptr != node) {
+      assoc-node::set-element(node, element);
+      node = node->next;
+    }
+    return element;
+  }
+  method element?(slots-t* slots) -> boole-t {
+    boole-t state? = false;
+    if (0 != slots->element)
+      state? = true;
+    return state?;
   }
 }
 klass named-assoc-node-compare {
@@ -165,7 +183,7 @@ klass x::stat {
   slots struct stat;
 }
 // this is quick and dirty!!!!!!!!!!!!!!!!
-static func init-imported-klasses() -> void {
+[[unused]] static func init-imported-klasses() -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   symbol-t imported-kls-name;
   while (nullptr != (imported-kls-name = cast(symbol-t)sorted-array::remove-last(gbl-imported-klasses-file-table)))
@@ -266,8 +284,8 @@ static func alloc-klass(symbol-t name) -> object-t {
 # endif
 
   object-t kls = cast(object-t)dkt::alloc(offset + size);
-  if (nullptr != klass::klass)
-    kls->klass = klass::klass;
+  if (nullptr != klass::_klass_)
+    kls->klass = klass::_klass_;
   else
     kls->klass = kls; // klass klass's klass is klass klass
   kls->retain-count = 1;
@@ -483,9 +501,9 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
       symbol-t      name =    names[i];
 # endif
       str-t         literal = literals[i];
-      if (nullptr == cast(object-t*)assoc.element)
+      if (!assoc-node::element?(&assoc))
         break;
-      *(cast(object-t*)assoc.element) = box-func(literal);
+      assoc-node::set-element(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -507,9 +525,9 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
       symbol-t      name =    names[i];
 # endif
       intmax-t      literal = literals[i];
-      if (nullptr == cast(object-t*)assoc.element)
+      if (!assoc-node::element?(&assoc))
         break;
-      *(cast(object-t*)assoc.element) = box-func(literal);
+      assoc-node::set-element(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -689,21 +707,21 @@ func dk-init-runtime() -> void {
     each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
     // alloc
-    klass::klass =  alloc-klass(#klass); // must be first
-    object::klass = alloc-klass(#object);
+    klass::_klass_ =  alloc-klass(#klass); // must be first
+    object::_klass_ = alloc-klass(#object);
 
     // init()
-    object::klass = init-klass(object::klass, #object); // must be first
-    klass::klass =  init-klass(klass::klass,  #klass);
+    object::_klass_ = init-klass(object::_klass_, #object); // must be first
+    klass::_klass_ =  init-klass(klass::_klass_,  #klass);
 
-    klass::unbox(object::klass).superklass = nullptr;
+    klass::unbox(object::_klass_).superklass = nullptr;
     min-runtime? = true;
 
-# if 1
-    null-singleton::klass = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
-    null = make(null-singleton::klass);
-    klass::unbox(object::klass).superklass = null;
-# endif
+    object-t null-singleton-kls = dk-make-simple-klass(#null-singleton, #object, #singleton-klass);
+    null = make(null-singleton-kls);
+    klass::unbox(object::_klass_).superklass = null;
+    lock-kls-ptrs? = true;
+
     // core runtime klasses are setup
     // klasses: object, klass, (optionally) singleton-klass
     // and (optionally) null-singleton and null (singleton)
@@ -727,11 +745,7 @@ func dk-init-runtime() -> void {
     assert(object::klass == superklass-of(null-singleton::klass));
     assert(klass::klass  == superklass-of(singleton-klass::klass));
 
-    dk-klass-for-name(#illegal-klass-exception); // can be thrown by dk-klass-for-name()
-    dk-klass-for-name(#unbox-illegal-klass-exception); // can be thrown by any unbox()
-
 # if !defined DKT-OMIT-BEHAVIOR
-    dk-klass-for-name(#bit-vector);
 
     $behavior(object::klass);
     $behavior(klass::klass);
@@ -747,22 +761,19 @@ func dk-init-runtime() -> void {
       klass::unbox(null-singleton::klass).behavior = nullptr;
 # endif
 # if 1
-    dk-klass-for-name(#input-stream);
-    dk-klass-for-name(#output-stream);
-
     std-input =  make(input-stream::klass,  #slots : stdin);
     std-output = make(output-stream::klass, #slots : stdout);
     std-error =  make(output-stream::klass, #slots : stderr);
 # endif
 
-    dk-klass-for-name(#str);
+    set-read-write();
     each(gbl-registration-info-list,
          cast(named-info-func-t)cast(func (*)(named-info-t*, str-box-func-t) -> void)each-str,
          cast(each-box-func-t)cast(str-box-func-t)str::box);
-    dk-klass-for-name(#intptr);
     each(gbl-registration-info-list,
          cast(named-info-func-t)cast(func (*)(named-info-t*, int-box-func-t) -> void)each-int,
-         cast(each-box-func-t)cast(int-box-func-t)intptr::box);
+         cast(each-box-func-t)cast(int-box-func-t)intmax::box);
+    set-read-only();
 
     std::terminate-handler previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
@@ -784,8 +795,7 @@ func dk-init-runtime() -> void {
     }
 # endif
   }
-  init-imported-klasses();
-
+  //init-imported-klasses();
   return;
 }
 /*LOCAL*/ func imported-klasses-for-klass(symbol-t kls-name) -> assoc-node-t* {
@@ -1383,7 +1393,7 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   }
   return r;
 }
-static func set-read-only(str-t segment, get-segment-data-func-t get-segment-data) -> int-t {
+static func set-protection(str-t segment, int-t protection, get-segment-data-func-t get-segment-data) -> int-t {
   assert-valid-str(segment);
   ptr-t addr = nullptr;
   size-t size = 0;
@@ -1391,24 +1401,37 @@ static func set-read-only(str-t segment, get-segment-data-func-t get-segment-dat
 
   int-t result = -1;
   if (nullptr != addr) {
-    result = mprotect(addr, size, PROT-READ);
+    result = mprotect(addr, size, protection);
     if (-1 == result) {
       exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
     }
   }
   return result;
 }
-static func set-read-only-all(str-t segment) -> int-t {
+static func set-protection-all(str-t segment, int-t protection) -> int-t {
   int-t result = 0;
   named-info-t* ni = gbl-registration-info-list;
   while (nullptr != ni) {
     registration-info-t ri {};
     named-info-to-registration-info(ni, &ri);
-    int-t r = set-read-only(segment, cast(get-segment-data-func-t)ri.get-segment-data);
-    if (0 != r) result = r;
+    int-t r = set-protection(segment, protection, cast(get-segment-data-func-t)ri.get-segment-data);
+    if (0 != r)
+      result = r;
     ni = ni->next;
   }
   return result;
+}
+func set-read-only() -> int-t {
+  int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ);
+  if (0 != r)
+    exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
+  return r;
+}
+func set-read-write() -> int-t {
+  int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ | PROT-WRITE);
+  if (0 != r)
+    exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
+  return r;
 }
 static func dump-random() -> void {
   if (getenv?("DKT_DUMP_RANDOM")) {
@@ -1423,8 +1446,9 @@ static func last-user-code-before-main() -> void  {
   sigaction-setup(SIGBUS,  bus-segv-handler);
   sigaction-setup(SIGSEGV, bus-segv-handler);
   // must match segment portion of attribute [[read-only]] defined in dakota-decl.hh
-  int-t r = set-read-only-all("__DKT_READ_ONLY");
-  if (-1 == r)
+
+  int-t r = set-read-only();
+  if (0 != r)
     fprintf(stderr, "[[read-only]] not being used\n");
   return;
 }
@@ -1563,18 +1587,18 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
       klass-for-name(superkls-name, column + 1); // recursive
 
   symbol-t kls-name;
-  object-t klass-klass;
+  object-t kls-klass;
   if (nullptr != (kls-name = klass-name-from-info(info-slots))) {
-    if (nullptr == (klass-klass = klass-for-name-simple(kls-name)))
-      klass-klass = klass-for-name(kls-name, column + 1); // recursive
+    if (nullptr == (kls-klass = klass-for-name-simple(kls-name)))
+      kls-klass = klass-for-name(kls-name, column + 1); // recursive
   }
   else
-    klass-klass = klass::klass;
+    kls-klass = klass::_klass_;
 
-  if (klass-klass != klass::klass && !klass::subklass?(klass-klass, klass::klass)) // hardhard
+  if (kls-klass != klass::_klass_ && !klass::subklass?(kls-klass, klass::_klass_)) // hardhard
     throw make(illegal-klass-exception::klass);
 
-  kls = make(klass-klass, #info-slots : info-slots);
+  kls = make(kls-klass, #info-slots : info-slots);
   return kls;
 }
 func dk-klass-for-name(symbol-t name) -> object-t {
@@ -1603,8 +1627,6 @@ func dk-klass-for-name(symbol-t name) -> object-t {
         dso-open(file, 0);
 
         // aggregate klass here
-
-        //init-imported-klasses();
 
         named-info-t* loaded-kls-info = info-for-name(kls-name); // recursive
         return loaded-kls-info; // rnielsen: should have only one return per func
