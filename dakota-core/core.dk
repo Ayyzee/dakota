@@ -748,12 +748,6 @@ func dk-init-runtime() -> void {
     $behavior(singleton-klass::klass);
     $behavior(null-klass);
     $behavior(bit-vector::klass);
-# else
-    klass::unbox(object::klass).behavior =          nullptr;
-    klass::unbox(klass::klass).behavior =           nullptr;
-    klass::unbox(singleton-klass::klass).behavior = nullptr;
-    klass::unbox(null-klass).behavior =             nullptr;
-    klass::unbox(bit-vector::klass).behavior =      nullptr;
 # endif
 
     std-input =  make(input-stream::klass,  #slots : stdin);

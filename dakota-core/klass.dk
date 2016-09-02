@@ -656,8 +656,8 @@ klass klass {
     assert(0 < methods-count);
     assert(selector-count-max > methods-count);
     assert(nullptr == self.behavior);
-    object-t result = make(bit-vector::klass, #initial-capacity : methods-count);
-    return result;
+    self.behavior = make(bit-vector::klass, #initial-capacity : methods-count);
+    return self.behavior;
   }
   method behavior(object-t self) -> object-t {
 # if defined DKT-OMIT-BEHAVIOR
