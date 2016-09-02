@@ -1285,10 +1285,7 @@ klass addr2name-pair {
   }
 }
 static addr2name-pair-t named-instances[] = {
-  { .addr = cast(ptr-t*)&null,       .name = #null       },
-  { .addr = cast(ptr-t*)&std-input,  .name = #std-input  },
-  { .addr = cast(ptr-t*)&std-output, .name = #std-output },
-  { .addr = cast(ptr-t*)&std-error,  .name = #std-error  },
+  { .addr = cast(ptr-t*)&null, .name = #null },
 };
 klass so-symbol-info {
   slots {
@@ -1346,7 +1343,7 @@ static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -
       syslog(LOG-ERR, "caught sig%s at named-instance \"%s\" %p\n",
              strsignal-name(sig), info.sname, si->si-addr);
     } else {
-      syslog(LOG-ERR, "caught sig%s in \"%s/%s\" at \"%s::klass\" %p\n",
+      syslog(LOG-ERR, "caught sig%s in \"%s/%s\" at \"%s::_klass_\" %p\n",
              strsignal-name(sig), info.fdir, info.fname, info.sname, si->si-addr);
     }
   }
@@ -1431,14 +1428,6 @@ static func dump-random() -> void {
 }
 static func last-user-code-before-main() -> void  {
   dump-random();
-  openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
-  sigaction-setup(SIGBUS,  bus-segv-handler);
-  sigaction-setup(SIGSEGV, bus-segv-handler);
-  // must match segment portion of attribute [[read-only]] defined in dakota-decl.hh
-
-  int-t r = set-read-only();
-  if (0 != r)
-    fprintf(stderr, "[[read-only]] not being used\n");
   return;
 }
 func dkt-register-info(named-info-t* registration-info) -> void {
@@ -1488,6 +1477,9 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       break;
     case #exe:
     default:
+      openlog(getprogname(), LOG-CONS | LOG-PID | LOG-PERROR, LOG-USER);
+      sigaction-setup(SIGBUS,  bus-segv-handler);
+      sigaction-setup(SIGSEGV, bus-segv-handler);
       add-registration-info(registration-info);
       if (!getenv?("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
