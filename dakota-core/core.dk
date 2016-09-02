@@ -172,8 +172,6 @@ static func init-runtime-ds() -> void {
 extern resource-usage::slots-t gbl-ru;
 # endif
 
-klass null-singleton { klass singleton-klass; }
-
 object-t null =       nullptr;
 object-t std-input =  nullptr;
 object-t std-output = nullptr;
@@ -721,48 +719,46 @@ func dk-init-runtime() -> void {
     lock-kls-ptrs? = true;
 
     // core runtime klasses are setup
-    // klasses: object, klass, (optionally) singleton-klass
-    // and (optionally) null-singleton and null (singleton)
+    // klasses: object, klass, singleton-klass, null-singleton
+    // and (null)
 
     // instantiation hier:
     //   klass <- klass
     //   klass <- object
-    //   klass <- singleton-klass <- null-singleton <- null
+    //   klass <- singleton-klass <- null-singleton <- (null)
     // inheritance hier:
-    //   null <- object <- klass <- singleton-klass
-    //   null <- object <- null-singleton
+    //   (null) <- object <- klass <- singleton-klass
+    //   (null) <- object <- null-singleton
 
     assert(klass::klass           == klass-of(klass::klass));
     assert(klass::klass           == klass-of(singleton-klass::klass));
     assert(klass::klass           == klass-of(object::klass));
-    assert(singleton-klass::klass == klass-of(null-singleton::klass));
-    assert(null-singleton::klass  == klass-of(null));
+    assert(singleton-klass::klass == klass-of(null-singleton-kls));
+    assert(null-singleton-kls     == klass-of(null));
 
     assert(null          == superklass-of(object::klass));
     assert(object::klass == superklass-of(klass::klass));
-    assert(object::klass == superklass-of(null-singleton::klass));
+    assert(object::klass == superklass-of(null-singleton-kls));
     assert(klass::klass  == superklass-of(singleton-klass::klass));
+    assert(object::klass == superklass-of(klass-of(null)));
 
 # if !defined DKT-OMIT-BEHAVIOR
-
     $behavior(object::klass);
     $behavior(klass::klass);
+    $behavior(singleton-klass::klass);
+    $behavior(null-singleton-kls);
     $behavior(bit-vector::klass);
-
-    if (null-singleton::klass)
-      $behavior(null-singleton::klass);
 # else
-    klass::unbox(object::klass).behavior =     nullptr;
-    klass::unbox(klass::klass).behavior =      nullptr;
-    klass::unbox(bit-vector::klass).behavior = nullptr;
-    if (null-singleton::klass)
-      klass::unbox(null-singleton::klass).behavior = nullptr;
+    klass::unbox(object::klass).behavior =          nullptr;
+    klass::unbox(klass::klass).behavior =           nullptr;
+    klass::unbox(singleton-klass::klass).behavior = nullptr;
+    klass::unbox(null-singleton-kls).behavior =     nullptr;
+    klass::unbox(bit-vector::klass).behavior =      nullptr;
 # endif
-# if 1
+
     std-input =  make(input-stream::klass,  #slots : stdin);
     std-output = make(output-stream::klass, #slots : stdout);
     std-error =  make(output-stream::klass, #slots : stderr);
-# endif
 
     set-read-write();
     each(gbl-registration-info-list,
@@ -785,12 +781,14 @@ func dk-init-runtime() -> void {
     $dump(klass::klass);
     fprintf(stderr, "---\n");
     $dump(singleton-klass::klass);
-    if (nullptr != null) {
-      fprintf(stderr, "---\n");
-      $dump(null-singleton::klass);
-      fprintf(stderr, "---\n");
-      $dump(null);
-    }
+    fprintf(stderr, "---\n");
+    $dump(null-singleton-kls);
+# if !defined DKT-OMIT-BEHAVIOR
+    fprintf(stderr, "---\n");
+    $dump(bit-vector::klass);
+# endif
+    fprintf(stderr, "---\n");
+    $dump(null);
 # endif
   }
   //init-imported-klasses();
