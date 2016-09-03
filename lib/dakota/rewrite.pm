@@ -1034,6 +1034,10 @@ sub rewrite_method_chaining {
       # $1: leading-expr, $2: func-name, $3: args
       &rewrite_method_chaining_replacement($2, $1, $3)/egs;
 }
+sub rewrite_xsymbol_syntax {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/#\|($mid)\|/#$1/g;
+}
 sub convert_dk_to_cc {
   my ($filestr_ref, $kw_arg_generics, $remove) = @_;
   &rewrite_literal_strs($filestr_ref);
@@ -1045,6 +1049,7 @@ sub convert_dk_to_cc {
   if ($remove) {
     &remove_system_includes($filestr_ref);
   }
+  &rewrite_xsymbol_syntax($filestr_ref);
  #&convert_types_to_include($filestr_ref);
   &rewrite_literal_booles($filestr_ref);
   &rewrite_literal_chars($filestr_ref);
