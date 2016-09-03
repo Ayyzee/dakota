@@ -804,13 +804,13 @@ sub slots {
     &add_last($type, $tkn);
   }
   my $cat = 'struct';
-  if (@$type && 3 == @$type) {
+  if (@$type && 3 <= @$type) {
     if ('enum' eq &first($type)) {
-      my $enum_base = &remove_last($type);
+      my $enum_base = [splice(@$type, 2, scalar(@$type) - 1)];
       my $tkn =    &remove_last($type);
       die if ':' ne $tkn; # not key/element delim
       $$gbl_current_ast_scope{'slots'}{'enum-base'} = $enum_base;
-      &add_symbol($gbl_root_ast, $enum_base);
+      &add_symbol($gbl_root_ast, join('', @$enum_base));
       #print STDERR &Dumper($$gbl_current_ast_scope{'slots'});
     }
   }

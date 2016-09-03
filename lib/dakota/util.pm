@@ -496,10 +496,10 @@ sub ident_regex {
   my $tid = qr/[_a-zA-Z]   [_a-zA-Z0-9-]*?-t/x;                          # type   ident
 
   my $sro =  qr/::/;
-  my $rid =  qr/(?:$id$sro)*$id/;
-  my $rmid = qr/(?:$id$sro)*$mid/;
-  my $rbid = qr/(?:$id$sro)*$bid/;
-  my $rtid = qr/(?:$id$sro)*$tid/;
+  my $rid =  qr/$sro?(?:$id$sro)*$id/;
+  my $rmid = qr/$sro?(?:$id$sro)*$mid/;
+  my $rbid = qr/$sro?(?:$id$sro)*$bid/;
+  my $rtid = qr/$sro?(?:$id$sro)*$tid/;
  #my $qtid = qr/(?:$sro?$tid)|(?:$id$sro(?:$id$sro)*$tid)/;
 
   return ( $id,  $mid,  $bid,  $tid,

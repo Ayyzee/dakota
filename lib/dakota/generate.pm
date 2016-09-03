@@ -1727,7 +1727,7 @@ sub slots_decl {
     }
     if ('enum' eq $$slots_ast{'cat'}) {
       if ($$slots_ast{'enum-base'}) {
-        $result .= ' : ' . $$slots_ast{'enum-base'};
+        $result .= ' : ' . join('', @{$$slots_ast{'enum-base'}});
       } else {
         $result .= ' : ' . 'int-t';
       }
@@ -1790,12 +1790,12 @@ sub generate_enum_decl {
     $$scratch_str_ref .= ' slots enum';
   }
   elsif ($$enum{'type'}) {
-    $$scratch_str_ref .= ' enum' . @{$$enum{'type'}};
+    $$scratch_str_ref .= ' enum ' . join('', @{$$enum{'type'}});
   } else {
     $$scratch_str_ref .= ' enum';
   }
   if ($$enum{'enum-base'}) {
-    $$scratch_str_ref .= ' : ' . $$enum{'enum-base'} . ';';
+    $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}}) . ';';
   } else {
     $$scratch_str_ref .= ' : int-t;';
   }
@@ -1807,19 +1807,19 @@ sub generate_enum_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
 
   if ($is_slots) {
-    $$scratch_str_ref .= 'slots enum';
+    $$scratch_str_ref .= ' slots enum';
   }
   elsif ($$enum{'type'}) {
-    $$scratch_str_ref .= 'enum' . " @{$$enum{'type'}}";
+    $$scratch_str_ref .= ' enum ' . join('', @{$$enum{'type'}});
   } else {
-    $$scratch_str_ref .= 'enum';
+    $$scratch_str_ref .= ' enum';
   }
   if ($$enum{'enum-base'}) {
-    $$scratch_str_ref .= ' : ' . $$enum{'enum-base'};
+    $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}});
   } else {
     $$scratch_str_ref .= ' : int-t';
   }
-  $$scratch_str_ref .= " {" . &ann(__FILE__, __LINE__) . $nl;
+  $$scratch_str_ref .= ' {' . &ann(__FILE__, __LINE__) . $nl;
   my $max_width = 0;
   foreach my $slot_cat_info (@$slots_cat_info) {
     my $width = length($$slot_cat_info{'name'});
@@ -3490,7 +3490,11 @@ sub dk_generate_cc_footer_klass {
   }
   my $slots_enum_base = &at($$klass_ast{'slots'}, 'enum-base');
   if ($slots_enum_base) {
-    $$tbbl{'#enum-base'} = '#' . $slots_enum_base;
+    if (1 == scalar @$slots_enum_base) {
+      $$tbbl{'#enum-base'} = '#' . $$slots_enum_base[0];
+    } else {
+      $$tbbl{'#enum-base'} = '#|' . join('', @$slots_enum_base) . '|';
+    }
   }
   if (&has_slots_type($klass_ast) || &has_slots_cat_info($klass_ast)) {
     $$tbbl{'#size'} = 'sizeof(slots-t)';

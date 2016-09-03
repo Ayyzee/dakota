@@ -10,7 +10,7 @@
     '-std=c++11', '-fvisibility=hidden',
     '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
     '-ObjC++', '-fobjc-exceptions', '-lobjc',
-    '-flto',
+    #'-flto',
     #'-fuse-ld=gold', '-use-gold-plugin',
   ],
   'CXX_COMPILE_FLAGS' => [
