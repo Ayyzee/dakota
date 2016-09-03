@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cassert>
-# include <cstring>
 # include <cinttypes>
+# include <cstring>
+
+module dakota-core;
 
 inline func min(ssize-t a, ssize-t b) -> ssize-t {
   ssize-t r = a < b ? a : b;

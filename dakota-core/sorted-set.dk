@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cassert>
 # include <cinttypes>
 # include <cstdlib>
 # include <cstring>
 
 # include "sorted-array.hh"
+
+module dakota-core;
 
 klass compare;
 klass exception;

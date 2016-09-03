@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cstring>
 
 # include "private.hh"
+
+module dakota-core;
 
 klass property-compare {
   slots (*)(property-t*, property-t*) -> int-t;

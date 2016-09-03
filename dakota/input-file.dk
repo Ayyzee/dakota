@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota;
-
 # include <cassert>
 # include <cctype>
 # include <cerrno>
 # include <cstdio>
 # include <cstring>
+
+module dakota;
 
 static boole-t
 space?(int-t c) {

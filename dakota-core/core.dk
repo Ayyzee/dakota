@@ -14,9 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cxxabi.h>
+
 # include <sys/mman.h>
 # include <sys/stat.h> // struct stat, stat()
 # include <syslog.h>
@@ -40,6 +39,8 @@ module dakota-core;
 # include "dakota-rt-private.hh"
 # include "dso.hh" // dso-*()
 # include "sorted-array.hh"
+
+module dakota-core;
 
 extern boole-t pre-main?; // to quiet clang
 boole-t pre-main? = true;

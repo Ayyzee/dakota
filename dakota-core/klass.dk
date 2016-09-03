@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cassert>
 # include <cinttypes>
 # include <cstdio>
@@ -46,6 +44,8 @@ inline func METHOD-FOR-SELECTOR(methods::slots-t* methods,
   return methods->addrs[selector];
 }
 # endif
+
+module dakota-core;
 
 klass assoc-node;
 klass bit-vector;

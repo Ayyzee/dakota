@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cassert>
 # include <cstring>
 
 # include "safe-str.hh"
 # include "private.hh"
+
+module dakota-core;
 
 klass signature {
   slots {

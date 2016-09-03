@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cinttypes>
 # include <cstdlib>
 # include <cstring>
 
 # include "private.hh"
 # include "named-info.hh"
+
+module dakota-core;
 
 klass property-compare;
 klass property;

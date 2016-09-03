@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota;
-
 # include <cassert>
 # include <cctype>
 # include <cerrno>
 # include <cinttypes>
 # include <cstdlib>
 # include <cstring>
+
+module dakota;
 
 klass exception;
 klass hashed-table;

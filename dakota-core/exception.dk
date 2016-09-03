@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cerrno>
 # include <cstdio>
 # include <cstdlib>
@@ -25,6 +23,8 @@ module dakota-core;
 
 # include "config.hh"
 # include "private.hh"
+
+module dakota-core;
 
 klass output-stream;
 klass system-exception;

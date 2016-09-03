@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include "sorted-array.hh"
 
 # include <cassert>
@@ -24,6 +22,8 @@ module dakota-core;
 
 # define   ref(t, p) !(t->ptr?) ? (p) : &(p)
 # define deref(t, p) !(t->ptr?) ? (p) : *(cast(const void**)(p))
+
+module dakota-core;
 
 klass result;
 klass std-compare;

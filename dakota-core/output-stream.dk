@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module dakota-core;
-
 # include <cassert>
 # include <cerrno>
 # include <cstdio>
@@ -24,6 +22,8 @@ module dakota-core;
 # include "config.hh"
 # include "private.hh"
 # include "safe-str.hh"
+
+module dakota-core;
 
 klass ptr;
 klass stream;
