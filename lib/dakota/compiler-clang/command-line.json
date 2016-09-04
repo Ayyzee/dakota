@@ -10,7 +10,7 @@
     '-std=c++11', '-fvisibility=hidden',
     '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
     '-ObjC++', '-fobjc-exceptions', '-lobjc',
-    #'-flto',
+    #'-flto', # must also be in LDFLAGS!!!
     #'-fuse-ld=gold', '-use-gold-plugin',
   ],
   'CXX_COMPILE_FLAGS' => [
@@ -43,6 +43,7 @@
     '--warn-no-unknown-warning-option',
     '--warn-no-unused-command-line-argument',
   ],
+  #'LDFLAGS' => [ '-flto' ], # must also be in CXXFLAGS!!!
   'LD_NO_UNDEFINED_FLAGS' => [ '--no-undefined' ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
   'cc_ext' => 'cc',

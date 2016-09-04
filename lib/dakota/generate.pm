@@ -4129,7 +4129,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
     $scratch_str .= $col . "static str-t const __str-literals[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
-      $scratch_str .= $col . "\"$str\"," . $nl;
+      $scratch_str .= $col . "#|$str|," . $nl;
     }
     $scratch_str .= $col . "nullptr" . $nl;
     $col = &colout($col);
@@ -4138,8 +4138,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
     $scratch_str .= $col . "static symbol-t __str-names[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
-      my $ident = &dk_mangle($str);
-      $scratch_str .= $col . "__symbol::$ident," . $nl;
+      $scratch_str .= $col . "#|$str|," . $nl;
     }
     $scratch_str .= $col . "nullptr" . $nl;
     $col = &colout($col);

@@ -1219,6 +1219,7 @@ sub linked_output_from_o {
   $opts =~ s/^\s+//gs;
   $opts =~ s/\s+$//gs;
   $opts =~ s/\s+/\n/g;
+  $opts .= $nl;
   &filestr_to_file($opts, $opts_path);
   $$cmd{'cmd'} = $$cmd_info{'opts'}{'compiler'};
   $$cmd{'cmd-flags'} = '@' . $opts_path;
