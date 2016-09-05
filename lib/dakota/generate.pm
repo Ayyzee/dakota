@@ -3846,7 +3846,7 @@ sub generate_kw_args_method_defn {
         $col . "throw make(missing-keyword-exception::klass," . $nl .
         $col . "           \#object $colon    self," . $nl .
         $col . "           \#signature $colon __method-signature__," . $nl .
-        $col . "           \#keyword $colon   _keyword_->symbol);" . $nl;
+        $col . "           \#keyword $colon   \#$kw_arg_name);" . $nl;
     }
     $col = &colout($col);
   }
