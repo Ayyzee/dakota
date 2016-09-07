@@ -43,7 +43,7 @@ klass object {
   // }
   method write-slots(object-t self, object-t out) -> object-t {
   //$write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-element-idref(out, klass-of(self), "klass");
 
@@ -89,7 +89,7 @@ klass object {
   }
   method copy(object-t self) -> object-t {
     USE(self);
-    throw make(exception::klass, #msg : "not yet implemented");
+    throw make(exception::klass(), #msg : "not yet implemented");
     return nullptr;
   }
   method dealloc(object-t self) -> object-t {
@@ -108,7 +108,7 @@ klass object {
     return self;
   }
   method autorelease(object-t self) -> object-t {
-    object-t current-pool = $current-pool(autorelease-pool::klass);
+    object-t current-pool = $current-pool(autorelease-pool::klass());
     $add(current-pool, self);
     return self;
   }
@@ -117,7 +117,7 @@ klass object {
     return result;
   }
   method dump(object-t self) -> object-t {
-    // if (klass::klass != klass-of(self))
+    // if (klass::klass() != klass-of(self))
     //   $dump(klass-of(self));
 
     fprintf(stderr, "%p:%p { klass=%p <%s> }\n",
@@ -159,14 +159,14 @@ func dkt-unbox-check(object-t object, object-t kls) -> void {
     str-t object-kls-name = name-of(klass-of(object));
     str-t kls-name = name-of(kls);
 
-    if (object::instance?(object, klass::klass))
+    if (object::instance?(object, klass::klass()))
       dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s', name='%s'})",
               kls-name, cast(ptr-t)object, object-kls-name, name-of(object));
     else
       dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s'})",
               kls-name, cast(ptr-t)object, object-kls-name);
 
-    throw make(unbox-illegal-klass-exception::klass);
+    throw make(unbox-illegal-klass-exception::klass());
   }
   return;
 }

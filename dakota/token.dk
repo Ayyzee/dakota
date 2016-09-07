@@ -46,7 +46,7 @@ klass token {
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-element(out, self.line,   "line");
     $write-element(out, self.column, "column");
@@ -87,7 +87,7 @@ klass token {
   method equal?(object-t self, object-t other) -> boole-t {
     boole-t state;
 
-    if ($instance?(other, klass)) {
+    if ($instance?(other, _klass_)) {
       if (0 == $compare(self, other))
         state = true;
       else
@@ -207,7 +207,7 @@ klass token {
   }
   method compare(object-t self, object-t other) -> cmp-t {
     cmp-t result;
-    if (klass-of(other) == klass || $instance?(other, klass)) {
+    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
       result = safe-strcmp(unbox(self).buffer, unbox(other).buffer);
       result = dkt-normalize-compare-result(result);
     } else {

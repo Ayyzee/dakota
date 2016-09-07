@@ -34,7 +34,7 @@ klass str64 {
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-element(out, unbox(self), "contents");
 
@@ -49,7 +49,7 @@ klass str64 {
   method compare(object-t self, object-t other) -> cmp-t {
     cmp-t result;
 
-    if (klass-of(other) == klass || $instance?(other, klass)) {
+    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
       slots-t& s1 = unbox(self);
       slots-t& s2 = unbox(other);
       result = compare(&s1, &s2);

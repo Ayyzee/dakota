@@ -48,7 +48,7 @@ klass input-stream {
       unbox(self) = fopen(file, "r");
 
       if (nullptr == unbox(self))
-        throw make(system-exception::klass, #errnum : errno);
+        throw make(system-exception::klass(), #errnum : errno);
     }
     return self;
   }
@@ -61,7 +61,7 @@ klass input-stream {
     int-t rtn = fclose(slots);
 
     if (0 != rtn)
-      throw make(system-exception::klass, #errnum : errno);
+      throw make(system-exception::klass(), #errnum : errno);
     return self;
   }
   method read(object-t self,

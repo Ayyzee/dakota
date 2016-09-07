@@ -121,7 +121,7 @@ klass named-info {
   method compare(object-t self, object-t other) -> cmp-t {
     cmp-t result = 0;
     if (self != other) {
-      if (klass-of(other) == klass || $instance?(other, klass))
+      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
         result = compare(&unbox(self), &unbox(other));
       else
         result = $compare(super, other);

@@ -60,7 +60,7 @@ klass input-file {
       stream = fopen(file, "r");
 
       if (nullptr == stream)
-        throw make(system-exception::klass, #errnum : errno);
+        throw make(system-exception::klass(), #errnum : errno);
     }
     self.file = file; // copycopy: should make a copy?
     fpos-t fpos;
@@ -95,9 +95,9 @@ klass input-file {
   
   method put-char8(object-t self, char8-t c) -> object-t {
     if (0 == self.current-position)
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     if (c != self.buffer[self.current-position - 1])
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     self.current-position--;
     if ('\n' == c) {
       self.line--;
@@ -120,7 +120,7 @@ klass input-file {
     return c;
   }
   method split(object-t self, type-func-t type?) -> object-t {
-    object-t result = make(vector::klass);
+    object-t result = make(vector::klass());
 
     if (nullptr == type?)
       type? = space?;
@@ -147,7 +147,7 @@ klass input-file {
         buf-pos++;
         buf[buf-pos] = NUL;
       }
-      object-t t = make(token::klass, #line : self.line, #column : self.column, #buffer : buf);
+      object-t t = make(token::klass(), #line : self.line, #column : self.column, #buffer : buf);
       $add-last(result, t);
 
       if (NUL == c)

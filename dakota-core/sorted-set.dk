@@ -99,7 +99,7 @@ klass sorted-set {
   method in(object-t self, object-t element) -> object-t {
     object-t result = $in(self, element, cast(object-t)nullptr);
     if (nullptr == result)
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
@@ -148,7 +148,7 @@ klass sorted-set {
     return self.sa.count;
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = make(sorted-set-forward-iterator::klass, #sorted-set : self);
+    object-t forward-iterator = make(sorted-set-forward-iterator::klass(), #sorted-set : self);
     return forward-iterator;
   }
   method dump(object-t self) -> object-t {
@@ -161,7 +161,7 @@ klass sorted-set {
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-sequence-start(out, "elements");
 
@@ -184,7 +184,7 @@ klass sorted-set-forward-iterator {
   }
   method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);
-    assert(klass-of(sorted-set) == sorted-set::klass || $instance?(sorted-set, sorted-set::klass));
+    assert(klass-of(sorted-set) == sorted-set::klass() || $instance?(sorted-set, sorted-set::klass()));
     sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
     self.sorted-set = sorted-set;
     self.offset = 0;
@@ -196,7 +196,7 @@ klass sorted-set-forward-iterator {
 
     if (self.iterator-state != ss.iterator-state) {
       fprintf(stderr, "%zi == %zi\n", self.iterator-state, ss.iterator-state);
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     }
     return;
   }

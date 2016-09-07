@@ -39,7 +39,7 @@ klass ascii-number {
   method compare(object-t self, object-t other) -> cmp-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     cmp-t result;
-    if (klass-of(other) == klass || $instance?(other, klass)) {
+    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
       slots-t& s1 = unbox(self);
       slots-t& s2 = unbox(other);
       result = dkt-normalize-compare-result(s1.number - s2.number);

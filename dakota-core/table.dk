@@ -35,7 +35,7 @@ trait table {
     return result;
   }
   method elements(object-t self) -> object-t {
-    object-t result = make(vector::klass, #size : $size(self));
+    object-t result = make(vector::klass(), #size : $size(self));
     for (pair-t& pair in self) {
       object-t last = pair.last;
       $add-last(result, last);
@@ -66,7 +66,7 @@ trait table {
     object-t current-last = pair;
 
     if (pair) {
-      if ($instance?(pair, pair::klass)) {
+      if ($instance?(pair, pair::klass())) {
         current-last = pair::unbox(pair).last;
         if (!$equals?(current-last, last))
           pair::unbox(pair).last = last;
@@ -80,7 +80,7 @@ trait table {
   }
   method at(object-t self, object-t first) -> object-t {
     object-t last = $in(super, first);
-    if ($instance?(last, pair::klass))
+    if ($instance?(last, pair::klass()))
       last = pair::unbox(last).last;
     return last;
   }
@@ -88,7 +88,7 @@ trait table {
     object-t last = $in(super, first, cast(object-t)nullptr);
     if (nullptr == last)
       last = default-last;
-    if (last && $instance?(last, pair::klass))
+    if (last && $instance?(last, pair::klass()))
       last = pair::unbox(last).last;
     return last;
   }

@@ -258,7 +258,7 @@ klass vector {
   method at(object-t self, ssize-t index) -> object-t {
     object-t element = $at(self, index, cast(object-t)nullptr);
     if (nullptr == element)
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     return element;
   }
   // should be auto-generated!!!
@@ -269,7 +269,7 @@ klass vector {
   }
   method replace-at(object-t self, ssize-t index, object-t object) -> object-t {
     if (index >= self.capacity)
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
 
     object-t rtn = self.elements[index];
     self.elements[index] = object;
@@ -321,12 +321,12 @@ klass vector {
     return self.elements[self.count - 1];
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = make(vector-forward-iterator::klass, #vector : self);
+    object-t forward-iterator = make(vector-forward-iterator::klass(), #vector : self);
     return forward-iterator;
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-sequence-start(out, "elements");
 
@@ -372,7 +372,7 @@ klass vector-forward-iterator {
     vector::slots-t& d = vector::unbox(self.vector);
 
     if (self.iterator-state != d.iterator-state)
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     return;
   }
   method init(object-t self, object-t vector :) -> object-t {

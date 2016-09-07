@@ -33,7 +33,7 @@ klass autorelease-pool-klass {
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
-    self.pools = make(deque::klass);
+    self.pools = make(deque::klass());
     return self;
   }
   method pools(object-t self) -> object-t {
@@ -54,7 +54,7 @@ klass autorelease-pool {
   }
   method init(object-t self) -> object-t {
     self = $init(super);
-    self.counted-elements = make(sorted-counted-set::klass);
+    self.counted-elements = make(sorted-counted-set::klass());
     object-t kls = klass-of(self);
     object-t pools = $pools(kls);
     $push(pools, self);

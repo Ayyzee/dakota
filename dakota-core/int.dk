@@ -193,7 +193,7 @@ klass uint32 {
     assert(nullptr != other);
     cmp-t result = 0;
     if (self != other) {
-      if (klass-of(other) == klass || $instance?(other, klass))
+      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
         result = uintmax::compare(unbox(self), unbox(other));
       else
         result = $compare(super, other);

@@ -37,13 +37,13 @@ klass object-output-stream {
   method init(object-t self, stream-t stream : stdout) -> object-t {
     self = $init(super, #slots : stream);
     assert(nullptr != stream);
-//     equal-t equals? = cast(equal-t)$method-for-selector(object::klass,
+//     equal-t equals? = cast(equal-t)$method-for-selector(object::klass(),
 //                                                                                        SELECTOR(equals?(object-t, object-t));
-//     compare-t compare = cast(compare-t)$method-for-selector(object::klass,
+//     compare-t compare = cast(compare-t)$method-for-selector(object::klass(),
 //                                                                SELECTOR(compare(object-t, object-t));
-    self.objects =        make(sorted-set::klass);
-    self.object-from-id = make(sorted-table::klass);
-    self.id-from-object = make(sorted-table::klass);
+    self.objects =        make(sorted-set::klass());
+    self.object-from-id = make(sorted-table::klass());
+    self.id-from-object = make(sorted-table::klass());
     self.id =         0;
     return self;
   }
@@ -78,7 +78,7 @@ klass object-output-stream {
 //       object-t object-klass = klass-of(object);
 //       $write-element(self, $name(object-klass), "-klass");
 
-//       if ($instance?(object, klass::klass))
+//       if ($instance?(object, klass::klass()))
 //         $write-element(self, $name(object), "name");
 
       $write-slots(object, self);

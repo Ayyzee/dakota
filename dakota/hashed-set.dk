@@ -58,7 +58,7 @@ klass hashed-set {
     self = $init(super);
     self.equals? = $equals?;
     self.num-buckets = initial-capacity;
-    self.buckets = make(vector::klass, #initial-capacity : self.num-buckets, #fill-element : nullptr);
+    self.buckets = make(vector::klass(), #initial-capacity : self.num-buckets, #fill-element : nullptr);
     self.size = 0;
 
     self.iterator-state = 0;
@@ -76,7 +76,7 @@ klass hashed-set {
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
     if (nullptr == deque) {
-      deque = make(deque::klass);
+      deque = make(deque::klass());
       self.iterator-state++;
       self.size++; // bugbug - could wrap
       $add-first(deque, element);
@@ -124,7 +124,7 @@ klass hashed-set {
   method in(object-t self, object-t element) -> object-t {
     object-t result = $in(self, element, cast(object-t)nullptr);
     if (nullptr == result)
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
@@ -177,7 +177,7 @@ klass hashed-set {
     return self.size;
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = make(hashed-set-forward-iterator::klass, #hashed-set : self);
+    object-t forward-iterator = make(hashed-set-forward-iterator::klass(), #hashed-set : self);
     return forward-iterator;
   }
   method dump(object-t self) -> object-t {
@@ -190,7 +190,7 @@ klass hashed-set {
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-sequence-start(out, "elements");
 
@@ -216,7 +216,7 @@ klass hashed-set-forward-iterator {
     hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
 
     if (self.iterator-state != hs.iterator-state)
-      throw make(exception::klass, #msg : "oops");
+      throw make(exception::klass(), #msg : "oops");
     return;
   }
   method init(object-t self, object-t hashed-set :) -> object-t {

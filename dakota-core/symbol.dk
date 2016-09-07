@@ -32,7 +32,7 @@ klass symbol-klass {
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
-    self.set = make(sorted-set::klass); // should be consumer settable
+    self.set = make(sorted-set::klass()); // should be consumer settable
     return self;
   }
   method add(object-t self, object-t element) -> object-t {
@@ -69,7 +69,7 @@ klass symbol {
   method compare(object-t self, object-t other) -> cmp-t {
     cmp-t result = 0;
     if (self != other) {
-      if (klass-of(other) == klass || $instance?(other, klass))
+      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
         result = compare(unbox(self), unbox(other));
       else
         result = $compare(super, other);

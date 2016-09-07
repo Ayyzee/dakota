@@ -244,18 +244,18 @@ sub rewrite_declarations {
 }
 
 my $use_catch_macros = 0;
-my $catch_block =  qr/catch\s*\(\s*$rid?::klass\s*$k*\s*\)\s*($main::block)/;
+my $catch_block =  qr/catch\s*\(\s*$rid?::(_klass_|klass\(\))\s*$k*\s*\)\s*($main::block)/;
 my $catch_object = qr/\}(\s*$catch_block)+/;
 sub rewrite_catch_block {
   my ($str_in) = @_;
   my $str_out = '';
 
   while (1) {
-    if ($str_in =~ m/\Gcatch\s*\(\s*($rid?::klass)\s*($k*)\s*\)(\s*)\{/gc) {
+    if ($str_in =~ m/\Gcatch\s*\(\s*($rid?::(_klass_|klass\(\)))\s*($k*)\s*\)(\s*)\{/gc) {
       if ($use_catch_macros) {
-        $str_out .= "DKT-CATCH($1, _exception_)$3\{ object-t $2 = _exception_;";
+        $str_out .= "DKT-CATCH($1, _exception_)$4\{ object-t $3 = _exception_;";
       } else {
-        $str_out .= "else-if (dk::instance?(_exception_, $1))$3\{ object-t $2 = _exception_;";
+        $str_out .= "else-if (dk::instance?(_exception_, $1))$4\{ object-t $3 = _exception_;";
       }
     } elsif ($str_in =~ m/\G(.)/gc) {
       $str_out .= $1;
@@ -673,25 +673,6 @@ sub rewrite_supers {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/\b(klass)\s+($rid)\s*(.*?$main::block)/&rewrite_supers_in_klass($1, $2, $3)/egs;
   $$filestr_ref =~ s/\b(trait)\s+($rid)\s*(.*?$main::block)/&rewrite_supers_in_trait($1, $2, $3)/egs;
-}
-sub rewrite_klass_vars {
-  my ($filestr_ref) = @_;
-  # klass klass    ;|{
-  # klass x::thing ;|{
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)klass(\s+)klass(\s*)(;|\{)/$1__K_L_A_S_S__$2__K_L_A_S_S__$3$4/gs;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)klass(\s+)($rid)(\s*)(;|\{)/$1__K_L_A_S_S__$2$3$4$5/gs;
-  # .klass
-  # ->klass
-  $$filestr_ref =~ s/(\.|->)klass([^\w-])/$1__K_L_A_S_S__$2/gs;
-  # offsetof(slots-t, klass)
-  # sizeof(slots-t::klass)
-  # INTERNED-DEMANGLED-TYPEID-NAME(slots-t::klass)
-  $$filestr_ref =~ s/offsetof\((slots-t),\s*klass\s*\)/offsetof($1, __K_L_A_S_S__)/gs;
-  $$filestr_ref =~ s/(sizeof|INTERNED-DEMANGLED-TYPEID-NAME)\((slots-t)::klass\s*\)/$1($2::__K_L_A_S_S__)/gs;
-
-  $$filestr_ref =~ s/(::|\(|\)|\{|\}|,|!|=)(\s*)klass([^\(:\w-])/$1$2klass()$3/gs;
-
-  $$filestr_ref =~ s/__K_L_A_S_S__/klass/g;
 }
 #sub rewrite_makes
 #{
@@ -1122,7 +1103,6 @@ sub convert_dk_to_cc {
   &rewrite_unless($filestr_ref);
   &rewrite_creates($filestr_ref);
   &rewrite_supers($filestr_ref);
-  &rewrite_klass_vars($filestr_ref);
   &rewrite_compound_literal_cstring_null($filestr_ref);
   &rewrite_compound_literal_cstring($filestr_ref);
   &rewrite_compound_literal($filestr_ref);

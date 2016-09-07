@@ -49,7 +49,7 @@ klass pair {
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-element-idref(out, self.first, "first");
     $write-element-idref(out, self.last,  "last");
@@ -61,7 +61,7 @@ klass pair {
     object-t first = self.first;
     assert(nullptr != first);
     object-t other-first;
-    if (klass-of(other) == klass)
+    if (klass-of(other) == _klass_)
       other-first = unbox(other).first;
     else-if ($method-for-selector?(klass-of(other), SELECTOR(first(object-t))))
       other-first = $first(other);

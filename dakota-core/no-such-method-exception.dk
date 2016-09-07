@@ -53,7 +53,7 @@ klass no-such-method-exception {
       kls = superklass-of(self.context.klass);
 
     if (nullptr == self.signature) {
-      if ($instance?(self.context.object, klass::klass)) {
+      if ($instance?(self.context.object, klass::_klass_)) {
         $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\"",
                          name-of(self.context.object),
                          name-of(klass-of(self.context.object)));
@@ -67,7 +67,7 @@ klass no-such-method-exception {
              kls == superklass-of(klass-of(self.context.object)));
 
       if (superklass-of(kls) == kls) {
-        if ($instance?(self.context.object, klass::klass)) {
+        if ($instance?(self.context.object, klass::_klass_)) {
           $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\", \"method\": \"%s(%s)\"",
                            name-of(self.context.object),
                            name-of(kls),
@@ -81,7 +81,7 @@ klass no-such-method-exception {
                            self.signature->param-types);
         }
       } else {
-        if ($instance?(self.context.object, klass::klass)) {
+        if ($instance?(self.context.object, klass::_klass_)) {
           $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\", \"method\": \"%s(%s)\"",
                            name-of(self.context.object),
                            name-of(kls),

@@ -65,7 +65,7 @@ klass json-parser {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s: %s", file, buf);
-        throw make(exception::klass, #msg : "oops");
+        throw make(exception::klass(), #msg : "oops");
       }
     } else {
       self.file = nullptr;
@@ -115,15 +115,15 @@ klass json-parser {
       { return null; }
       switch (c) {
         // self.column needs to be adjusted by the length of the token
-        case '[': { return make(token::klass, #tokenid : '[', #buffer : "[",
+        case '[': { return make(token::klass(), #tokenid : '[', #buffer : "[",
                                 #line : self.line, #column : self.column - 1); }
-        case ']': { return make(token::klass, #tokenid : ']', #buffer : "]",
+        case ']': { return make(token::klass(), #tokenid : ']', #buffer : "]",
                                 #line : self.line, #column : self.column - 1); }
-        case '{': { return make(token::klass, #tokenid : '{', #buffer : "{",
+        case '{': { return make(token::klass(), #tokenid : '{', #buffer : "{",
                                 #line : self.line, #column : self.column - 1); }
-        case '}': { return make(token::klass, #tokenid : '}', #buffer : "}",
+        case '}': { return make(token::klass(), #tokenid : '}', #buffer : "}",
                                 #line : self.line, #column : self.column - 1); }
-        case ',': { return make(token::klass, #tokenid : ',', #buffer : ",",
+        case ',': { return make(token::klass(), #tokenid : ',', #buffer : ",",
                                 #line : self.line, #column : self.column - 1); }
         case '#': {
           while ('\n' != (c = json-parser::get(self))) {
@@ -138,13 +138,13 @@ klass json-parser {
             print-error(self.file, self.line, self.column - 2, "unknown token '='\n");
             return null;
           } else {
-            return make(token::klass, #tokenid : ':', #buffer : ":",
+            return make(token::klass(), #tokenid : ':', #buffer : ":",
                         #line : self.line, #column : self.column - 2);
           }
         }
         case '\'': {
           int64-t quote-type = '\'';
-          object-t token = make(token::klass, #tokenid : 'sqst',
+          object-t token = make(token::klass(), #tokenid : 'sqst',
                                 #line : self.line, #column : self.column - 1);
           boole-t escaped?;
           c = json-parser::get(self);
@@ -188,7 +188,7 @@ klass json-parser {
         case '5': case '6': case '7': case '8': case '9':
             
         case '_': {
-          object-t token = make(token::klass, #tokenid : 'st', // 'st' should be 'idnt'
+          object-t token = make(token::klass(), #tokenid : 'st', // 'st' should be 'idnt'
                                 #line : self.line, #column : self.column - 1);
           do {
             $append-char(token, cast(int64-t)c);
@@ -218,13 +218,13 @@ klass json-parser {
     object-t key;
     switch ($tokenid(token)) {
       case 'sqst':
-        key = make(string::klass, #bytes : $buffer(token));
+        key = make(string::klass(), #bytes : $buffer(token));
         break;
       case 'dqst':
-        key = make(string::klass, #bytes : $buffer(token));
+        key = make(string::klass(), #bytes : $buffer(token));
         break;
       case 'st':
-        key = make(string::klass, #bytes : $buffer(token));
+        key = make(string::klass(), #bytes : $buffer(token));
         break;
       case '}':
         return null;
@@ -244,7 +244,7 @@ klass json-parser {
       print-error(self.file, self.line, self.column, "expected ':' but got '%s'\n", $buffer(token));
       return null;
     }
-    return make(string::klass, #bytes : $buffer(token));
+    return make(string::klass(), #bytes : $buffer(token));
   }
   // get table element - element is NOT optional
   /* method */ static func get-element(object-t self) -> object-t {
@@ -259,13 +259,13 @@ klass json-parser {
         element = null;
         break;
       case 'sqst':
-        element = make(string::klass, #bytes : $buffer(token));
+        element = make(string::klass(), #bytes : $buffer(token));
         break;
       case 'dqst':
-        element = make(string::klass, #bytes : $buffer(token));
+        element = make(string::klass(), #bytes : $buffer(token));
         break;
       case 'st':
-        element = make(string::klass, #bytes : $buffer(token));
+        element = make(string::klass(), #bytes : $buffer(token));
         break;
       case '{':
         element = json-parser::get-table(self);
@@ -292,13 +292,13 @@ klass json-parser {
         element = null;
         break;
       case 'sqst':
-        element = make(string::klass, #bytes : $buffer(token));
+        element = make(string::klass(), #bytes : $buffer(token));
         break;
       case 'dqst':
-        element = make(string::klass, #bytes : $buffer(token));
+        element = make(string::klass(), #bytes : $buffer(token));
         break;
       case 'st':
-        element = make(string::klass, #bytes : $buffer(token));
+        element = make(string::klass(), #bytes : $buffer(token));
         break;
       case '{':
         element = json-parser::get-table(self);
@@ -328,7 +328,7 @@ klass json-parser {
   }
   // hackhack - multiple return statements
   /* method */ func get-vector(object-t self) -> object-t {
-    object-t vector = make(vector::klass);
+    object-t vector = make(vector::klass());
     object-t token;
     do {
       object-t element = json-parser::element(self);
@@ -353,7 +353,7 @@ klass json-parser {
     return vector;
   }
   /* method */ func get-table(object-t self) -> object-t {
-    object-t table = make(hashed-table::klass);
+    object-t table = make(hashed-table::klass());
     object-t token;
     do {
       object-t table-pair = json-parser::get-table-pair(self);
@@ -393,11 +393,11 @@ klass json-parser {
       case 'null':
         return null;
       case 'sqst':
-        return make(string::klass, #bytes : $buffer(token));
+        return make(string::klass(), #bytes : $buffer(token));
       case 'dqst':
-        return make(string::klass, #bytes : $buffer(token));
+        return make(string::klass(), #bytes : $buffer(token));
       case 'st':
-        return make(string::klass, #bytes : $buffer(token));
+        return make(string::klass(), #bytes : $buffer(token));
       case '{':
         return json-parser::get-table(self);
       case '[':

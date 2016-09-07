@@ -83,7 +83,7 @@ klass string {
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
-    $write-slots-start(out, klass);
+    $write-slots-start(out, _klass_);
 
     $write-element(out, self.ptr, "ptr");
     $write-element(out, self.len, "len");
@@ -149,13 +149,13 @@ klass string {
   }
   // returns an vector of string objects
   method tokenize(object-t self, object-t delimiter) -> object-t {
-    assert(klass-of(delimiter) == klass || $instance?(delimiter, klass));
+    assert(klass-of(delimiter) == _klass_ || $instance?(delimiter, _klass_));
     slots-t& d = unbox(delimiter);
     object-t result = $tokenize(self, d.ptr);
     return result;
   }
   method tokenize(object-t self, str-t delimiter) -> object-t {
-    object-t result = make(vector::klass);
+    object-t result = make(vector::klass());
     ssize-t delimiter-length = cast(ssize-t)safe-strlen(delimiter);
     str-t p1 = self.ptr;
     str-t p2;
@@ -200,7 +200,7 @@ klass string {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     cmp-t result;
 
-    if (klass-of(other) == klass || $instance?(other, klass)) {
+    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
       // what if both strs are nullptr?
       // what if only one str is nullptr?
       slots-t& s1 = unbox(self);

@@ -65,7 +65,7 @@ klass keyword-exception {
     assert(nullptr != self.signature);
     assert(nullptr != self.keyword);
 
-    // if ($instance?(self.object, klass::klass)) {
+    // if ($instance?(self.object, klass::klass())) {
     //   $print-format(out, ", \"instance\": \"%s\"", name-of(self.object));
     // } else {
     //   $print-format(out, ", \"instance\": \"%s\"", $str(self.object));

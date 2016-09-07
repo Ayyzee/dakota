@@ -29,7 +29,7 @@ func map(object-t seq, method-t f) -> object-t {
   return result;
 }
 func map(object-t[] objects, method-t f) -> object-t {
-  object-t result = make(vector::klass);
+  object-t result = make(vector::klass());
   object-t o;
   object-t* args = objects;
   while (nullptr != (o = *args++)) {

@@ -78,8 +78,8 @@ klass str {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     cmp-t result;
 
-    if (klass-of(other) == klass || $instance?(other, klass)) {
-      assert(klass-of(self) == str-klass::klass || $instance?(klass-of(self), str-klass::klass));
+    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
+      assert(klass-of(self) == str-klass::klass() || $instance?(klass-of(self), str-klass::klass()));
       str-klass::slots-t& ks = str-klass::unbox(klass-of(self));
       // what if both strs are nullptr?
       // what if only one str is nullptr?
