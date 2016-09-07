@@ -12,20 +12,17 @@ digraph {
   "i-(null)" -> "i-object" -> "i-klass" -> "i-singleton-klass";
   "i-object" -> "i-null";
 
-  "k-(null)" [ shape = plaintext ];
-  "i-(null)" [ shape = plaintext ];
-
   "k-object" [ label = "object" ];
   "k-klass"  [ label = "klass" ];
   "k-singleton-klass" [ label = "singleton-klass" ];
   "k-null"   [ label = "null" ];
-  "k-(null)" [ label = "(null)" ];
+  "k-(null)" [ label = "null", shape = plaintext ];
 
   "i-object" [ label = "object" ];
   "i-klass"  [ label = "klass" ];
   "i-singleton-klass" [ label = "singleton-klass" ];
   "i-null"   [ label = "null" ];
-  "i-(null)" [ label = "(null)" ];
+  "i-(null)" [ label = "null", shape = plaintext ];
 
   subgraph { graph [ rank = same ]; "k-object"; "i-klass"; }
 }
