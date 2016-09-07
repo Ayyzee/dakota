@@ -722,7 +722,7 @@ func dk-init-runtime() -> void {
     assert(previous-unexpected == pre-runtime-verbose-unexpected);
 
     // core runtime klasses are setup
-    // klasses: object, _klass_, singleton-klass, null
+    // klasses: object, klass, singleton-klass, null
     // and (null)
 
     // instantiation hier:
