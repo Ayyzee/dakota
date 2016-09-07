@@ -116,8 +116,8 @@ static const int64-t selector-count-max = 255;
   return #object;
 }
 static func default-superklass() -> object-t {
-  assert(nullptr != object::klass());
-  return object::klass();
+  assert(nullptr != object::_klass_);
+  return object::_klass_;
 }
 static func selector-for-signature(const signature-t* signature) -> selector-t {
   selector-pair-t pair = { .key = signature, .element = nullptr };

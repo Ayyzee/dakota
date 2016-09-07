@@ -117,7 +117,7 @@ klass object {
     return result;
   }
   method dump(object-t self) -> object-t {
-    // if (klass::klass() != klass-of(self))
+    // if (klass::_klass_ != klass-of(self))
     //   $dump(klass-of(self));
 
     fprintf(stderr, "%p:%p { klass=%p <%s> }\n",
@@ -159,7 +159,7 @@ func dkt-unbox-check(object-t object, object-t kls) -> void {
     str-t object-kls-name = name-of(klass-of(object));
     str-t kls-name = name-of(kls);
 
-    if (object::instance?(object, klass::klass()))
+    if (object::instance?(object, klass::_klass_))
       dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s', name='%s'})",
               kls-name, cast(ptr-t)object, object-kls-name, name-of(object));
     else

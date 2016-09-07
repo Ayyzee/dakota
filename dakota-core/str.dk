@@ -79,7 +79,7 @@ klass str {
     cmp-t result;
 
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      assert(klass-of(self) == str-klass::klass() || $instance?(klass-of(self), str-klass::klass()));
+      assert(klass-of(self) == str-klass::_klass_ || $instance?(klass-of(self), str-klass::_klass_));
       str-klass::slots-t& ks = str-klass::unbox(klass-of(self));
       // what if both strs are nullptr?
       // what if only one str is nullptr?

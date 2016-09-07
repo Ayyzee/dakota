@@ -184,7 +184,7 @@ klass sorted-set-forward-iterator {
   }
   method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);
-    assert(klass-of(sorted-set) == sorted-set::klass() || $instance?(sorted-set, sorted-set::klass()));
+    assert(klass-of(sorted-set) == sorted-set::_klass_ || $instance?(sorted-set, sorted-set::_klass_));
     sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
     self.sorted-set = sorted-set;
     self.offset = 0;
