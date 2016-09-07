@@ -661,7 +661,7 @@ sub rewrite_creates {
 }
 sub rewrite_supers_in_klass {
   my ($type, $name, $block) = @_;
-  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b(?!\()/$1(super(self, klass)/g;
+  $block =~ s/((dk|dk::va)::$mid\s*)\(\s*super\b(?!\()/$1(super(self, _klass_)/g;
   return $type . ' ' . $name . ' ' . $block;
 }
 sub rewrite_supers_in_trait {

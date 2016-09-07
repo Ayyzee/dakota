@@ -733,24 +733,24 @@ func dk-init-runtime() -> void {
     //   (null) <- object <- klass <- singleton-klass
     //   (null) <- object <- null
 
-    assert(klass::klass           == klass-of(klass::klass));
-    assert(klass::klass           == klass-of(singleton-klass::klass));
-    assert(klass::klass           == klass-of(object::klass));
-    assert(singleton-klass::klass == klass-of(null-klass));
-    assert(null-klass             == klass-of(null));
+    assert(klass::_klass_           == klass-of(klass::_klass_));
+    assert(klass::_klass_           == klass-of(singleton-klass::_klass_));
+    assert(klass::_klass_           == klass-of(object::_klass_));
+    assert(singleton-klass::_klass_ == klass-of(null-klass));
+    assert(null-klass               == klass-of(null));
 
-    assert(null          == superklass-of(object::klass));
-    assert(object::klass == superklass-of(klass::klass));
-    assert(object::klass == superklass-of(null-klass));
-    assert(klass::klass  == superklass-of(singleton-klass::klass));
-    assert(object::klass == superklass-of(klass-of(null)));
+    assert(null            == superklass-of(object::_klass_));
+    assert(object::_klass_ == superklass-of(klass::_klass_));
+    assert(object::_klass_ == superklass-of(null-klass));
+    assert(klass::_klass_  == superklass-of(singleton-klass::_klass_));
+    assert(object::_klass_ == superklass-of(klass-of(null)));
 
 # if !defined DKT-OMIT-BEHAVIOR
-    $behavior(object::klass);
-    $behavior(klass::klass);
-    $behavior(singleton-klass::klass);
+    $behavior(object::_klass_);
+    $behavior(klass::_klass_);
+    $behavior(singleton-klass::_klass_);
     $behavior(null-klass);
-    $behavior(bit-vector::klass);
+    $behavior(bit-vector::_klass_);
 # endif
 
     std-input =  make(input-stream::klass,  #slots : stdin);
@@ -767,16 +767,16 @@ func dk-init-runtime() -> void {
     set-read-only();
 
 # if 0
-    $dump(object::klass);
+    $dump(object::_klass_);
     fprintf(stderr, "---\n");
-    $dump(klass::klass);
+    $dump(klass::_klass_);
     fprintf(stderr, "---\n");
-    $dump(singleton-klass::klass);
+    $dump(singleton-klass::_klass_);
     fprintf(stderr, "---\n");
     $dump(null-klass);
 # if !defined DKT-OMIT-BEHAVIOR
     fprintf(stderr, "---\n");
-    $dump(bit-vector::klass);
+    $dump(bit-vector::_klass_);
 # endif
     fprintf(stderr, "---\n");
     $dump(null);
@@ -1572,9 +1572,9 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
       kls-klass = klass-for-name(kls-name, column + 1); // recursive
   }
   else
-    kls-klass = klass::klass;
+    kls-klass = klass::_klass_;
 
-  if (kls-klass != klass::klass && !klass::subklass?(kls-klass, klass::klass)) // hardhard
+  if (kls-klass != klass::_klass_ && !klass::subklass?(kls-klass, klass::_klass_)) // hardhard
     throw make(illegal-klass-exception::klass);
 
   kls = make(kls-klass, #info-slots : info-slots);

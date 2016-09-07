@@ -1891,8 +1891,8 @@ sub generate_klass_unbox {
       } elsif (&is_target_defn()) {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . $nl .
-          $col . "  DKT-UNBOX-CHECK(object, klass); // optional" . $nl .
-          $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(klass).offset);" . $nl .
+          $col . "  DKT-UNBOX-CHECK(object, _klass_); // optional" . $nl .
+          $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(_klass_).offset);" . $nl .
           $col . "  return s;" . $nl .
           $col . "}}" . $nl;
       }
@@ -1922,7 +1922,7 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
-            $col . "object-t result = make(klass);" . $nl .
+            $col . "object-t result = make(klass());" . $nl .
             $col . "memcpy(unbox(result), arg, sizeof(slots-t)); // unfortunate" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
@@ -1955,14 +1955,14 @@ sub generate_klass_box {
             my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
             if ($promoted_type) {
               $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
-                $col . "object-t result = make(klass, \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
+                $col . "object-t result = make(klass(), \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
             } else {
               $result .=
-                $col . "object-t result = make(klass, \#slots : *arg);" . $nl;
+                $col . "object-t result = make(klass(), \#slots : *arg);" . $nl;
             }
           } else {
             $result .=
-              $col . "object-t result = make(klass);" . $nl .
+              $col . "object-t result = make(klass());" . $nl .
               $col . "unbox(result) = *arg;" . $nl;
           }
           $result .= $col . "return result;" . $nl;
@@ -3816,7 +3816,7 @@ sub generate_kw_args_method_defn {
   #$$scratch_str_ref .= $col . "{" . $nl;
   $col = &colin($col);
   $$scratch_str_ref .=
-    $col . "throw make(no-such-keyword-exception::klass," . $nl .
+    $col . "throw make(no-such-keyword-exception::klass()," . $nl .
     $col . "           \#object $colon    self," . $nl .
     $col . "           \#signature $colon __method-signature__," . $nl .
     $col . "           \#keyword $colon   _keyword_->symbol);" . $nl;
@@ -3843,7 +3843,7 @@ sub generate_kw_args_method_defn {
       }
     } else {
       $$scratch_str_ref .=
-        $col . "throw make(missing-keyword-exception::klass," . $nl .
+        $col . "throw make(missing-keyword-exception::klass()," . $nl .
         $col . "           \#object $colon    self," . $nl .
         $col . "           \#signature $colon __method-signature__," . $nl .
         $col . "           \#keyword $colon   \#$kw_arg_name);" . $nl;
