@@ -1,0 +1,31 @@
+digraph {
+  graph [ rankdir = LR ];
+  node [ shape = rect, style = rounded ];
+  edge [ dir = back ];
+
+  edge [ color = blue ];
+  "k-klass" -> "k-singleton-klass" -> "k-null" -> "k-(null)";
+  "k-klass":w -> "k-klass":w;
+  "k-klass" -> "k-object";
+
+  edge [ color = green ];
+  "i-(null)" -> "i-object" -> "i-klass" -> "i-singleton-klass";
+  "i-object" -> "i-null";
+
+  "k-(null)" [ shape = plaintext ];
+  "i-(null)" [ shape = plaintext ];
+
+  "k-object" [ label = "object" ];
+  "k-klass"  [ label = "klass" ];
+  "k-singleton-klass" [ label = "singleton-klass" ];
+  "k-null"   [ label = "null" ];
+  "k-(null)" [ label = "(null)" ];
+
+  "i-object" [ label = "object" ];
+  "i-klass"  [ label = "klass" ];
+  "i-singleton-klass" [ label = "singleton-klass" ];
+  "i-null"   [ label = "null" ];
+  "i-(null)" [ label = "(null)" ];
+
+  subgraph { graph [ rank = same ]; "k-object"; "i-klass"; }
+}
