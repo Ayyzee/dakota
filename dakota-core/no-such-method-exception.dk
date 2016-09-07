@@ -66,7 +66,7 @@ klass no-such-method-exception {
       assert(kls == klass-of(self.context.object) ||
              kls == superklass-of(klass-of(self.context.object)));
 
-      if (kls == superklass-of(kls)) {
+      if (superklass-of(kls) == kls) {
         if ($instance?(self.context.object, klass::klass)) {
           $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\", \"method\": \"%s(%s)\"",
                            name-of(self.context.object),
