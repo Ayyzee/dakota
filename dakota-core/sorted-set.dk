@@ -25,7 +25,7 @@ module dakota-core;
 
 klass compare;
 klass exception;
-klass equal;
+klass equals;
 klass object-output-stream;
 klass result;
 klass sorted-array;

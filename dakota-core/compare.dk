@@ -16,7 +16,7 @@
 
 module dakota-core;
 
-klass equal {
+klass equals {
   slots (*)(object-t, object-t) -> boole-t;
 }
 klass cmp {

@@ -27,7 +27,7 @@
 module dakota;
 
 klass deque;
-klass equal;
+klass equals;
 klass exception;
 klass object-output-stream;
 klass vector;
@@ -38,7 +38,7 @@ klass hashed-set {
   trait set;
 
   slots {
-    equal-t  equals?;
+    equals-t equals?;
     ssize-t  num-buckets;
     object-t buckets; // a vector of deques
     ssize-t  size;
