@@ -265,7 +265,7 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 [[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, super_t,  ...) -> int_t;
 [[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, object_t, ...) -> int_t;
 
-[[debug_export]] FUNC dkt_get_klass_chain(object_t kls, char8_t* buf, int64_t buf_len) -> char8_t*;
+[[debug_export]] FUNC dkt_get_klass_chain(object_t kls, char8_t* buf, ssize_t buf_len) -> char8_t*;
 
 [[debug_export]] FUNC dkt_dump_methods(object_t)        -> ssize_t;
 [[debug_export]] FUNC dkt_dump_methods(klass::slots_t*) -> ssize_t;
