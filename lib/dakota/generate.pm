@@ -200,6 +200,8 @@ sub write_to_file_converted_strings {
   if (!&is_silent()) {
     $should_echo = 1 if $path =~ /target\.($hh_ext|$cc_ext)$/;
   }
+  # swap "# line 1" followed by "// -*- mode:" so the emacs mode line is first
+  $converted_string =~ s=^(\s*#\s+line)\s+1(\s+.*?\n)(\s*//\s+-\*-\s+mode:.*?\n)=$3$1 2$2=s;
   &filestr_to_file($converted_string, $path, $should_echo);
 }
 sub is_silent {
