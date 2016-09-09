@@ -70,7 +70,6 @@ klass symbol {
         result = compare(unbox(self), unbox(other));
       else
         result = $compare(super, other);
-      result = dkt-normalize-compare-result(result);
     }
     return result;
   }

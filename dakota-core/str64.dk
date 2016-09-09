@@ -42,8 +42,7 @@ klass str64 {
     return self;
   }
   method compare(slots-t* s, slots-t* other-s) -> cmp-t {
-    cmp-t result = cast(cmp-t)safe-strncmp(cast(str-t)(s), cast(str-t)(other-s), sizeof(slots-t));
-    result = dkt-normalize-compare-result(result);
+    cmp-t result = dkt-normalize-compare-result(safe-strncmp(cast(str-t)(s), cast(str-t)(other-s), sizeof(slots-t)));
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
@@ -56,7 +55,6 @@ klass str64 {
     } else {
       result = $compare(super, other);
     }
-    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

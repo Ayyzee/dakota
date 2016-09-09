@@ -52,8 +52,7 @@ klass object {
   }
   method compare(object-t self, object-t other) -> cmp-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    intmax-t diff = cast(uint8-t*)self - cast(uint8-t*)(other);
-    cmp-t result = dkt-normalize-compare-result(diff);
+    cmp-t result = intptr-compare(cast(intptr-t)self, cast(intptr-t)other);
     return result;
   }
   method equals?(object-t self, object-t other) -> boole-t {

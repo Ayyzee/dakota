@@ -106,7 +106,7 @@ klass sorted-array {
     assert(offset <= t->count);
 
     if (t->count == t->capacity) {
-      t->capacity *= 2; // the growth algorithm should be consumer setable
+      t->capacity *= 2; // the growth algorithm should be consumer settable
       t->elements = cast(ptr-t*)dkt::alloc(t->size * t->capacity, t->elements);
     }
     memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),

@@ -52,7 +52,6 @@ klass property {
     } else {
       result = $compare(super, other);
     }
-    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

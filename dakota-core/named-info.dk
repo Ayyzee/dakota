@@ -114,7 +114,6 @@ klass named-info {
       symbol-t s-name =       cast(symbol-t)at(s,       #name);
       symbol-t other-s-name = cast(symbol-t)at(other-s, #name);
       result = symbol::compare(s-name, other-s-name);
-      result = dkt-normalize-compare-result(result);
     }
     return result;
   }
@@ -125,7 +124,6 @@ klass named-info {
         result = compare(&unbox(self), &unbox(other));
       else
         result = $compare(super, other);
-      result = dkt-normalize-compare-result(result);
     }
     return result;
   }

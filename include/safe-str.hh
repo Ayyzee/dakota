@@ -30,7 +30,7 @@ inline FUNC safe_strcmp(str_t s1, str_t s2) -> int_t {
     else if (nullptr == s2)
       value = 1;
   } else {
-    value = strcmp(s1, s2);
+    value = dkt_normalize_compare_result(strcmp(s1, s2));
   }
   return value;
 }
@@ -58,7 +58,7 @@ inline FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t {
     else if (nullptr == s2)
       value = 1;
   } else {
-    value = strncmp(s1, s2, n);
+    value = dkt_normalize_compare_result(strncmp(s1, s2, n));
   }
   return value;
 }

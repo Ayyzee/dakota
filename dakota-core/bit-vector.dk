@@ -220,19 +220,13 @@ klass bit-vector {
       self-slots.count = max(self-slots.count, other-slots.count);
       for (ssize-t offset = 0; offset < self-slots.count; offset++) {
         ssize-t i = self-slots.count - 1 - offset;
-        if (self-slots.elements[i] > other-slots.elements[i]) {
-          result = +1;
+        result = uintptr-compare(self-slots.elements[i], other-slots.elements[i]);
+        if (0 != result)
           break;
-        }
-        else-if (self-slots.elements[i] < other-slots.elements[i]) {
-          result = -1;
-          break;
-        }
       }
     } else {
       result = $compare(super, other);
     }
-    result = dkt-normalize-compare-result(result);
     return result;
   }
 }

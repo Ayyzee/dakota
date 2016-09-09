@@ -41,7 +41,7 @@ klass str-klass {
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
-    self.strcmp = safe-strcmp;
+    self.strcmp = safe-strcmp; // should be consumer settable
     return self;
   }
 }
@@ -85,8 +85,7 @@ klass str {
       // what if only one str is nullptr?
       slots-t s1 = unbox(self);
       slots-t s2 = unbox(other);
-      result = ks.strcmp(s1, s2);
-      result = dkt-normalize-compare-result(result);
+      result = dkt-normalize-compare-result(ks.strcmp(s1, s2));
     } else {
       result = $compare(super, other);
     }

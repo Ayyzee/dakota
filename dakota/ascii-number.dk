@@ -42,7 +42,7 @@ klass ascii-number {
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
       slots-t& s1 = unbox(self);
       slots-t& s2 = unbox(other);
-      result = dkt-normalize-compare-result(s1.number - s2.number);
+      result = intptr-compare(s1.number, s2.number);
     } else {
       result = $compare(super, other);
     }

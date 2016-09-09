@@ -206,11 +206,9 @@ klass string {
       slots-t& s1 = unbox(self);
       slots-t& s2 = unbox(other);
       result = safe-strcmp(s1.ptr, s2.ptr);
-      result = dkt-normalize-compare-result(result);
     } else {
       result = $compare(super, other);
     }
-    result = dkt-normalize-compare-result(result);
     return result;
   }
   method print(object-t self, object-t out) -> object-t {

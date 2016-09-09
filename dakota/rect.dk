@@ -32,18 +32,16 @@ klass rect {
   method compare(slots-t* slots, slots-t* other-slots) -> cmp-t {
     cmp-t result = 0;
     if (slots != other-slots) {
-      intmax-t diff = 0;
       if (0)
         ;
-      else if (0 != (diff = slots->point.x - other-slots->point.x))
+      else if (0 != (result = intptr-compare(slots->point.x, other-slots->point.x)))
         ;
-      else if (0 != (diff = slots->point.y - other-slots->point.y))
+      else if (0 != (result = intptr-compare(slots->point.y, other-slots->point.y)))
         ;
-      else if (0 != (diff = slots->dimension.width  - other-slots->dimension.width))
+      else if (0 != (result = intptr-compare(slots->dimension.width, other-slots->dimension.width)))
         ;
-      else if (0 != (diff = slots->dimension.height - other-slots->dimension.height))
+      else if (0 != (result = intptr-compare(slots->dimension.height, other-slots->dimension.height)))
         ;
-      result = dkt-normalize-compare-result(diff);
     }
     return result;
   }

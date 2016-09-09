@@ -209,7 +209,6 @@ klass token {
     cmp-t result;
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
       result = safe-strcmp(unbox(self).buffer, unbox(other).buffer);
-      result = dkt-normalize-compare-result(result);
     } else {
       result = $compare(super, other);
     }
