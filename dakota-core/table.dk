@@ -25,6 +25,10 @@ trait table {
   //provides set;
   require collection;
 
+  func initialize(object-t) -> void {
+    pair::klass();
+    return;
+  }
   method keys(object-t self) -> object-t {
     object-t set-kls = superklass-of(klass-of(self));
     object-t result = make(set-kls);
@@ -61,12 +65,26 @@ trait table {
     $write(out, "}");
     return self;
   }
+  method at(object-t self, object-t first) -> object-t {
+    object-t last = $in(super, first);
+    if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))
+      last = pair::unbox(last).last;
+    return last;
+  }
+  method at(object-t self, object-t first, object-t default-last) -> object-t {
+    object-t last = $in(super, first, cast(object-t)nullptr);
+    if (nullptr == last)
+      last = default-last;
+    if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
+      last = pair::unbox(last).last;
+    return last;
+  }
   method add(object-t self, object-t first, object-t last) -> object-t {
     object-t pair = $at(self, first, cast(object-t)nullptr);
     object-t current-last = pair;
 
     if (pair) {
-      if ($instance?(pair, pair::klass())) {
+      if (klass-of(pair) == pair::_klass_ || $instance?(pair, pair::_klass_)) {
         current-last = pair::unbox(pair).last;
         if (!$equals?(current-last, last))
           pair::unbox(pair).last = last;
@@ -77,19 +95,5 @@ trait table {
       $add(self, pair);
     }
     return current-last;
-  }
-  method at(object-t self, object-t first) -> object-t {
-    object-t last = $in(super, first);
-    if ($instance?(last, pair::klass()))
-      last = pair::unbox(last).last;
-    return last;
-  }
-  method at(object-t self, object-t first, object-t default-last) -> object-t {
-    object-t last = $in(super, first, cast(object-t)nullptr);
-    if (nullptr == last)
-      last = default-last;
-    if (last && $instance?(last, pair::klass()))
-      last = pair::unbox(last).last;
-    return last;
   }
 }
