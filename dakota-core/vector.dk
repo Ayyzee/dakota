@@ -77,7 +77,7 @@ klass vector {
     object-t  fill-element;
     ssize-t   iterator-state;
   }
-  initialize(object-t kls) -> void {
+  func initialize(object-t kls) -> void {
     $set-resize-factor(kls, 2);
     $set-fill-element(kls, null);
     $set-initial-capacity(kls, 64);

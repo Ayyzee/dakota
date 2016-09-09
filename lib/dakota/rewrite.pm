@@ -965,10 +965,6 @@ sub rewrite_method_aliases {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s+)method\s+((va::)?$mid\s*\(\s*\))\s*=>\s*((va::)?$mid\s*$main::list)\s*;/$1METHOD-ALIAS($2, $4);/gs
 }
-sub rewrite_initialze_finalize {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\s)((initialize|finalize)\s*\([^)]+\)\s*->\s*[^{]+\s*\{)/$1func $2/gs;
-}
 sub rewrite_multi_char_consts {
   my ($filestr_ref) = @_;
   my $c = ' ';
@@ -1089,7 +1085,6 @@ sub convert_dk_to_cc {
   &rewrite_sentinal_generic_uses($filestr_ref, $kw_arg_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_arg_generics);
-  &rewrite_initialze_finalize($filestr_ref);
   &rewrite_funcs($filestr_ref);
   &rewrite_map($filestr_ref);
   &rewrite_for_each($filestr_ref);

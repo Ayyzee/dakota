@@ -43,13 +43,13 @@ klass ascii-number-klass {
     str-t digits = self.digits;
     return digits;
   }
-  klass initialize(object-t) -> void {
+  klass func initialize(object-t) -> void {
     gbl-base2-ascii-number-kls-info = dk-make-named-info(#base2-ascii-number-klass,
                                                          #superklass-name, cast(intptr-t)#ascii-number,
                                                          nullptr);
     return;
   }
-  klass finalize(object-t) -> void {
+  klass func finalize(object-t) -> void {
     return;
   }
 }

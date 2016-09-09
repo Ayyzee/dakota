@@ -47,7 +47,7 @@ klass boole { // a doubleton :-)
     unbox(self) = v;
     return self;
   }
-  initialize(object-t kls) -> void {
+  func initialize(object-t kls) -> void {
     boole-t f = false;
     (boole-klass::unbox(kls))[f] = mk(kls, f);
     boole-t t = true;

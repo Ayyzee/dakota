@@ -2173,10 +2173,10 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
 
   my $va_list_methods = &klass::va_list_methods($klass_ast);
   if (&is_decl() && $$klass_ast{'has-initialize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { func initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
   if (&is_decl() && $$klass_ast{'has-finalize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { func finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
   my $kw_arg_methods = &klass::kw_arg_methods($klass_ast);
   if (&is_decl() && @$kw_arg_methods) {

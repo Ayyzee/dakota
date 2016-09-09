@@ -505,7 +505,7 @@ sub ident_regex {
   return ( $id,  $mid,  $bid,  $tid,
           $rid, $rmid, $rbid, $rtid);
 }
-my $implicit_metaklass_stmts = qr/( *klass\s+(((klass|trait|superklass)\s+[\w:-]+)|(slots|method|initialize|finalize)).*)/s;
+my $implicit_metaklass_stmts = qr/( *klass\s+(((klass|trait|superklass)\s+[\w:-]+)|(slots|method|func)).*)/s;
 sub rewrite_metaklass_stmts {
   my ($stmts) = @_;
   my $result = $stmts;
@@ -514,8 +514,7 @@ sub rewrite_metaklass_stmts {
   $result =~ s/klass\s+(superklass\s+[\w:-]+)/$1/x;
   $result =~ s/klass\s+(slots)               /$1/x;
   $result =~ s/klass\s+(method)              /$1/gx;
-  $result =~ s/klass\s+(initialize)          /$1/gx;
-  $result =~ s/klass\s+(finalize)            /$1/gx;
+  $result =~ s/klass\s+(func)                /$1/gx;
   return $result;
 }
 sub rewrite_klass_defn_with_implicit_metaklass_defn_replacement {
