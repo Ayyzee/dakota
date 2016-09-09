@@ -142,6 +142,7 @@ namespace va { [[noreturn]] [[format_va_printf(1)]] static inline FUNC exit_fail
 # endif
 
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> cmp_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
+inline FUNC intptr_compare(intptr_t i1, intptr_t i2) -> cmp_t { return (i1 < i2) ? -1 : (i1 > i2) ? 1 : 0; }
 
 // klass/trait scope
 # define METHOD_SIGNATURE(name, args)         (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __method_signature::name))()

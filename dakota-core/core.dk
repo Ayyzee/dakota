@@ -136,6 +136,15 @@ static sorted-array-t* gbl-klass-defns-table;
 static sorted-array-t* gbl-interposers-table;
 static sorted-array-t* gbl-imported-klasses-file-table;
 
+static func symbol-str-compare(symbol-t s1, str-t s2) -> cmp-t {
+  cmp-t result = 0;
+  if (s1 != s2) {
+    result = cast(cmp-t)safe-strcmp(s1, s2);
+    result = dkt-normalize-compare-result(result);
+  }
+  //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
+  return result;
+}
 static func init-runtime-ds() -> void {
   const ssize-t num-klasses = 256;
 
@@ -162,7 +171,7 @@ static func init-runtime-ds() -> void {
     sorted-array::create(num-klasses,
                          ssizeof(symbol-t),
                          cast(std-compare-t)
-                         cast(symbol-compare-t)symbol::compare,
+                         cast(symbol-compare-t)symbol-str-compare,
                          ptr? = true);
   return;
 }
@@ -1633,7 +1642,7 @@ func dk-intern(str-t key) -> symbol-t {
   static sorted-array-t* intern-array = sorted-array::create((4096/2)/sizeof(symbol-t),
                                                              ssizeof(symbol-t),
                                                              cast(std-compare-t)
-                                                             cast(symbol-compare-t)symbol::compare,
+                                                             cast(symbol-compare-t)symbol-str-compare,
                                                              ptr? = true);
 # if 0
   symbol-t val = key;
