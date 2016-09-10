@@ -110,6 +110,7 @@ export dakota-core {
   int8::min;
   int8::slots-t;
   int8;
+  intern-pool-klass;
   intmax::max;
   intmax::min;
   intmax::slots-t;

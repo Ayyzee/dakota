@@ -24,19 +24,19 @@ module dakota-core;
 klass hash;
 klass sorted-set;
 
-klass symbol-klass {
+klass intern-pool-klass {
   superklass klass;
 
   slots {
-    object-t set;
+    object-t pool; // set
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
-    self.set = make(sorted-set::klass()); // should be consumer settable
+    self.pool = make(sorted-set::klass()); // should be consumer settable
     return self;
   }
   method add(object-t self, object-t element) -> object-t {
-    object-t result = $add(self.set, element);
+    object-t result = $add(self.pool, element);
     return result;
   }
 }
@@ -44,7 +44,7 @@ klass symbol-compare {
   slots (*)(symbol-t, symbol-t) -> int-t;
 }
 klass symbol {
-  klass symbol-klass;
+  klass intern-pool-klass;
   slots str-t;
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
