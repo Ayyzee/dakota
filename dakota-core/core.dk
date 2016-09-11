@@ -724,6 +724,8 @@ func dk-init-runtime() -> void {
     null = make(null-klass);
     klass::unbox(object::_klass_).superklass = null;
 
+    // core runtime initialized
+
     std::terminate-handler previous-terminate = std::set-terminate(verbose-terminate);
     assert(previous-terminate == pre-runtime-verbose-terminate);
 
