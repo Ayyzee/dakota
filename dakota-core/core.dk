@@ -1638,6 +1638,8 @@ func dk-intern-free(str-t key) -> symbol-t {
   return result;
 }
 func dk-intern(str-t key) -> symbol-t {
+  assert(nullptr != key);
+  assert(NUL != key[0]);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
   boole-t ptr?;
@@ -1655,7 +1657,7 @@ func dk-intern(str-t key) -> symbol-t {
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
   return val;
 }
-static func get-klass-chain(object-t kls, char8-t* buf, ssize-t buf-len) -> char8-t* {
+static func get-klass-chain(object-t kls, char8-t* buf, ssize-t buf-len) -> char8-t* { // recursive
   object-t superkls = superklass-of(kls);
   if (!root-superklass?(superkls))
     get-klass-chain(superkls, buf, buf-len); // recursive

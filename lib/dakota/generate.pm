@@ -2040,10 +2040,8 @@ sub linkage_unit::generate_klasses_body_vars {
   if ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
       $$scratch_str_ref .= " extern object-t _klass_ [[read-only]];";
-      $$scratch_str_ref .= " extern func klass() -> object-t;";
     } elsif (&is_target_defn()) {
       $$scratch_str_ref .= $pad . " object-t _klass_ = nullptr;";
-      $$scratch_str_ref .= " func klass() -> object-t { return klass-for-name(__name__, _klass_); }";
     }
   }
   $$scratch_str_ref .= ' }' . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
@@ -2066,7 +2064,13 @@ sub linkage_unit::generate_klasses_body_funcs_klass {
     } elsif (&is_target_defn()) {
       $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t self) -> object-t { return klass-with-trait(klass-of(self), __name__); }}" . &ann(__FILE__, __LINE__) . $nl;
     }
-  }
+  } elsif ('klass' eq $klass_type) { # not a trait
+    if (&is_src_decl() || &is_target_decl()) {
+      $$scratch_str_ref .= "$klass_type $klass_name { INLINE func klass() -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
+    } elsif (&is_target_defn()) {
+      $$scratch_str_ref .= "$klass_type $klass_name { INLINE func klass() -> object-t { return klass-for-name(__name__, _klass_); }}" . &ann(__FILE__, __LINE__) . $nl;
+    }
+  } else { die }
 }
 sub linkage_unit::generate_klasses_body_funcs_box {
   my ($klass_ast, $col, $klass_type, $klass_path, $klass_name) = @_;
@@ -2359,7 +2363,7 @@ sub generate_slots_decls {
       my $is_exported;
       my $is_slots;
       &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
-      $$scratch_str_ref .= $col . "}" . $nl;
+      $$scratch_str_ref .= $col . "}";
     } else {
       print STDERR &Dumper($$klass_ast{'slots'});
       die __FILE__, ":", __LINE__, ": error:" . $nl;
@@ -2415,7 +2419,7 @@ sub generate_exported_slots_decls {
       my $is_exported;
       my $is_slots;
       &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);
-      $$scratch_str_ref .= $col . "}" . $nl;
+      $$scratch_str_ref .= $col . "}";
     } else {
       print STDERR &Dumper($$klass_ast{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
