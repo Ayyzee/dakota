@@ -85,7 +85,7 @@ my $patterns = {
   'ast_path_from_dk_path' =>   '$(builddir)/%.ast      : %.dk',
   'ast_path_from_ctlg_path' => '%.ctlg.ast : %.ctlg',
 
-  'ctlg_path_from_so_path' =>   '$(builddir)/%.$(so_ext).ctlg : %.$(so_ext)',
+  'ctlg_path_from_so_path' =>   '$(builddir)/%.ctlg : %.$(so_ext)',
 };
 #print STDERR &Dumper($expanded_patterns);
 
