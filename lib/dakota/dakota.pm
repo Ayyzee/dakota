@@ -623,7 +623,7 @@ sub update_target_srcs_ast_from_all_inputs {
     my $elapsed_time = $end_time - $start_time;
     print STDERR "creating $target_srcs_ast_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
   }
-  if ($ENV{'DAKOTA_CREATE_REP_ONLY'}) {
+  if ($ENV{'DAKOTA_CREATE_AST_ONLY'}) {
     exit 0;
   }
   return $cmd_info;
