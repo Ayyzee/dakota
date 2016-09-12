@@ -1155,10 +1155,9 @@ sub target_from_ast {
   &src::add_extra_keywords($target_srcs_ast);
   &src::add_extra_generics($target_srcs_ast);
 
-  #my $target_inputs_ast;
-  &generate_target_decl($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
+  &generate_target_decl($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
   if ($is_defn) {
-    &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe); #$target_inputs_ast = undef
+    &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
     &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   }
 
