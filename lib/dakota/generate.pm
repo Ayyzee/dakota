@@ -2480,15 +2480,6 @@ sub linkage_unit::generate_headers {
     $$exported_headers{'<cstdarg>'}{'hardcoded-by-rnielsen'} = undef; # va-list
     $$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
 
-    foreach my $klass_name (@$klass_names) {
-      my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
-
-      if (exists $$klass_ast{'exported-headers'} && defined $$klass_ast{'exported-headers'}) {
-        while (my ($header, $klasses) = each (%{$$klass_ast{'exported-headers'}})) {
-          $$exported_headers{$header} = undef;
-        }
-      }
-    }
     my $all_headers = {};
     my $header_name;
     foreach $header_name (values %{$$ast{'include-types'}}) {

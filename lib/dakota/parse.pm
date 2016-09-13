@@ -29,7 +29,6 @@ use warnings;
 use sort 'stable';
 
 my $gbl_compiler;
-my $gbl_header_from_symbol;
 my $gbl_used;
 my $builddir;
 my $hh_ext;
@@ -102,8 +101,6 @@ BEGIN {
   while (($key, $values) = each (%$platform)) {
     $$gbl_compiler{$key} = $values;
   }
-  $gbl_header_from_symbol = do "$prefix/lib/dakota/header-from-symbol.json"
-    or die "do $prefix/lib/dakota/header-from-symbol.json failed: $!\n";
   $gbl_used = do "$prefix/lib/dakota/used.json"
     or die "do $prefix/lib/dakota/used.json failed: $!\n";
   $hh_ext = &var($gbl_compiler, 'hh_ext', undef);
@@ -157,18 +154,6 @@ my $h =  &header_file_regex();
 
 $ENV{'DKT-DEBUG'} = 0;
 
-sub maybe_add_exported_header_for_symbol {
-  my ($symbol) = @_;
-  if ($$gbl_header_from_symbol{$symbol}) {
-    &add_exported_header($$gbl_header_from_symbol{$symbol});
-  }
-}
-sub maybe_add_exported_header_for_symbol_seq {
-  my ($seq) = @_;
-  foreach my $symbol (@$seq) {
-    &maybe_add_exported_header_for_symbol($symbol);
-  }
-}
 sub kw_args_translate {
   my ($ast) = @_;
   my $keys = [sort keys %{$$ast{'generics'}}];
@@ -471,10 +456,6 @@ sub add_symbol {
   $ident = &as_literal_symbol($ident);
   $$file{'symbols'}{$ident} = undef;
 }
-sub add_type {
-  my ($seq) = @_;
-  &maybe_add_exported_header_for_symbol_seq($seq);
-}
 sub add_keyword {
   my ($file, $ident) = @_;
   $ident = &as_literal_symbol_interior($ident);
@@ -548,17 +529,9 @@ sub match_re {
   }
   return &sst::at($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'} - 1);
 }
-my $enable_exported_header = 0;
-sub add_exported_header {
-  my ($tkn) = @_;
-  if ($enable_exported_header) {
-    $$gbl_root_ast{'exported-headers'}{$tkn} = undef;
-  }
-}
 sub exported_header {
   my $tkn = &match_any();
   &match(__FILE__, __LINE__, ';');
-  &add_exported_header($tkn);
 }
 sub trait {
   my ($args) = @_;
@@ -739,7 +712,6 @@ sub slots_seq {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
       &add_last($seq, $slot_info);
-      &maybe_add_exported_header_for_symbol_seq($type);
       $has_expr = 0;
       $type = [];
     }
@@ -764,7 +736,6 @@ sub enum_seq {
         $$slot_info{'expr'} = join(' ', @$expr);
       }
       &add_last($seq, $slot_info);
-      &maybe_add_exported_header_for_symbol_seq($expr);
       $expr = [];
     }
   }
@@ -779,7 +750,6 @@ sub enum_seq {
       $$slot_info{'expr'} = join(' ', @$expr);
     }
     &add_last($seq, $slot_info);
-    &maybe_add_exported_header_for_symbol_seq($expr);
   }
   #print 'enum_seq: ' . &Dumper($seq);
   return;
@@ -831,7 +801,6 @@ sub slots {
     }
   }
   if (@$type) {
-    &add_type($type);
     my $arg_type = &arg::type($type);
     &add_symbol($gbl_root_ast, &remove_extra_whitespace($arg_type));
     $$gbl_current_ast_scope{'slots'}{'type'} = $arg_type;
@@ -919,7 +888,6 @@ sub enum {
     &add_last($type, $tkn);
   }
   if (@$type) {
-    &add_type($type);
     $$enum{'type'} = &arg::type($type);
   }
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
@@ -1504,9 +1472,6 @@ sub expand_type {
   if (1 < @$type &&
       $$type[@$type - 1] =~ /$id/) {
     &remove_last($type);
-  }
-  foreach my $token (@$type) {
-    &add_type([$token]);
   }
   return $type;
 }
@@ -2106,11 +2071,7 @@ sub generics::parse {
   #my $generic;
   while (my ($generic_key, $generic) = each(%$generics_tbl)) {
     &add_last($generics_seq, $generic);
-    foreach my $arg (@{$$generic{'param-types'}}) {
-      &add_type([$arg]);
-    }
     foreach my $arg (@{$$generic{'kw-args'} || []}) {
-      &add_type([$arg]);
       &add_symbol($gbl_root_ast, $$arg{'name'});
     }
   }
@@ -2258,22 +2219,6 @@ sub parse_root {
       }
       $$gbl_sst_cursor{'current-token-index'}++;
     }
-  }
-  if ($enable_exported_header) {
-  foreach my $klass_type ( 'klasses', 'traits' ) {
-    if (exists  $$gbl_root_ast{'exported-headers'} &&
-        defined $$gbl_root_ast{'exported-headers'}) {
-      while (my ($header, $dummy) =
-               each(%{$$gbl_root_ast{'exported-headers'}})) {
-        $$gbl_root_ast{'exported-headers'}{$header} = undef;
-      }
-      while (my ($klass, $info) = each(%{$$gbl_root_ast{$klass_type}})) {
-        if ($info) {
-          $$info{'exported-headers'} = $$gbl_root_ast{'exported-headers'};
-        }
-      }
-    }
-  }
   }
   if (exists $$gbl_root_ast{'generics'} && exists $$gbl_root_ast{'generics'}{'make'}) {
     &remove_generic($gbl_root_ast, 'make');
