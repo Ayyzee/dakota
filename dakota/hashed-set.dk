@@ -51,12 +51,13 @@ klass hashed-set {
   // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t   self,
+              equals-t   equals? : $equals?,
               ssize-t    initial-capacity : 251, // should be prime
               object-t   elements : nullptr,
               object-t[] objects :  nullptr) -> object-t {
     assert(0 < initial-capacity);
     self = $init(super);
-    self.equals? = $equals?;
+    self.equals? = equals?;
     self.num-buckets = initial-capacity;
     self.buckets = make(vector::klass(), #initial-capacity : self.num-buckets, #fill-element : nullptr);
     self.size = 0;
