@@ -998,12 +998,12 @@ sub fragment_str {
   $argstr = &remove_extra_whitespace($argstr);
   return $argstr;
 }
-# include-type <...>|"..." type1 [, type2 ...] ;
-# include-type <sys/socket.h> struct sockaddr, struct sockproto ;
+# include-for <...>|"..." type1 [, type2 ...] ;
+# include-for <sys/socket.h> struct sockaddr, struct sockproto ;
 my $last_for_first = { '<' => '>',
                        '"' => '"' };
-sub include_type {
-  my $seq = &dkdecl('include-type');
+sub include_for {
+  my $seq = &dkdecl('include-for');
   my $index = 0;
   my $last = $$last_for_first{$$seq[0]};
   foreach my $part (@$seq) {
@@ -1025,11 +1025,11 @@ sub include_type {
     }
   }
   foreach my $type (@$types, @$abbrev_types) {
-    if (defined $$gbl_root_ast{'include-types'}{$type}
-             && $$gbl_root_ast{'include-types'}{$type} ne $header) {
+    if (defined $$gbl_root_ast{'include-fors'}{$type}
+             && $$gbl_root_ast{'include-fors'}{$type} ne $header) {
       die;
     }
-   $$gbl_root_ast{'include-types'}{$type} = $header;
+   $$gbl_root_ast{'include-fors'}{$type} = $header;
   }
 }
 sub module_decl {
@@ -2159,8 +2159,8 @@ sub parse_root {
   # root
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
-      if (m/^include-type$/) {
-        &include_type();
+      if (m/^include-for$/) {
+        &include_for();
         last;
       }
       if (m/^module$/) {

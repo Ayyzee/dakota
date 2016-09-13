@@ -17,7 +17,7 @@
 # include <cxxabi.h>
 
 # include <sys/mman.h>
-include-type <sys/stat.h> struct stat;
+include-for <sys/stat.h> struct stat;
 # include <syslog.h>
 # include <unistd.h>
 
@@ -1178,27 +1178,27 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
   ostream::println-format(ostrm, "}\n");
   return ci.modulee;
 }
-static func dump-include-type-decls(ostream-t ostrm, named-info-t* registration-info) -> void {
+static func dump-include-for-decls(ostream-t ostrm, named-info-t* registration-info) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != registration-info);
 
-  const str-t* include-types = cast(decltype(include-types))named-info::at(registration-info, #include-types);
+  const str-t* include-fors = cast(decltype(include-fors))named-info::at(registration-info, #include-fors);
 
-  if (include-types) {
+  if (include-fors) {
     ssize-t i = 0;
     while (1) {
-      str-t h = include-types[i++];
+      str-t h = include-fors[i++];
       assert(nullptr != h);
-      ostream::println-format(ostrm, "include-type %s", h);
+      ostream::println-format(ostrm, "include-for %s", h);
       str-t d = " ";
       str-t t;
-      while (nullptr != (t = include-types[i++])) {
+      while (nullptr != (t = include-fors[i++])) {
         ostream::println-format(ostrm, "%s%s", d, t);
         d = ", ";
       }
       ostream::println-format(ostrm, ";\n");
-      if (nullptr == include-types[i])
+      if (nullptr == include-fors[i])
         break;
     }
   }
@@ -1500,7 +1500,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     str-t name-base = remove-dir(name);
 
     if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
-      dump-include-type-decls(ostrm, registration-info);
+      dump-include-for-decls(ostrm, registration-info);
       dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only?);
       dump-interposers(ostrm, registration-info);
     }

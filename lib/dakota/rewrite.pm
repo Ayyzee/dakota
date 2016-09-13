@@ -953,10 +953,10 @@ sub rewrite_export_method {
     }
   }
 }
-sub rewrite_include_types {
+sub rewrite_include_fors {
   my ($filestr_ref) = @_;
   my $h =  &header_file_regex();
-  $$filestr_ref =~ s=^include-type(\s*)(<$h+>|"$h+")(.*?);=# include$1$2 //$3=gm;
+  $$filestr_ref =~ s=^include-for(\s*)(<$h+>|"$h+")(.*?);=# include$1$2 /*$3 */=gsm;
 }
 #sub convert_types_to_include {
 #  my ($filestr_ref) = @_;
@@ -1024,7 +1024,7 @@ sub convert_dk_to_cc {
   &rewrite_method_chaining($filestr_ref);
   #&rewrite_method_aliases($filestr_ref);
 
-  &rewrite_include_types($filestr_ref);
+  &rewrite_include_fors($filestr_ref);
   &rewrite_xsymbol_syntax($filestr_ref);
  #&convert_types_to_include($filestr_ref);
   &rewrite_literal_booles($filestr_ref);

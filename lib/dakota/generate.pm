@@ -234,16 +234,16 @@ sub pre_output_path_from_any_path {
   my $pre_output = $path =~ s/\.$ext$/.$pre_output_ext/r;
   return $pre_output;
 }
-sub add_include_types {
-  my ($ast, $include_types) = @_;
-  if (!$$ast{'include-types'}) {
-    $$ast{'include-types'} = {};
+sub add_include_fors {
+  my ($ast, $include_fors) = @_;
+  if (!$$ast{'include-fors'}) {
+    $$ast{'include-fors'} = {};
   }
-  while (my ($type, $include) = each(%$include_types)) {
-    if ($$ast{'include-types'}{$type} && $$ast{'include-types'}{$type} ne $include) {
+  while (my ($type, $include) = each(%$include_fors)) {
+    if ($$ast{'include-fors'}{$type} && $$ast{'include-fors'}{$type} ne $include) {
       die;
     }
-    $$ast{'include-types'}{$type} = $include;
+    $$ast{'include-fors'}{$type} = $include;
   }
 }
 sub generate_src {
@@ -262,8 +262,8 @@ sub generate_src {
   if (&is_debug()) {
     print "    creating $output" . &pann(__FILE__, __LINE__) . $nl;
   }
-  if ($$target_inputs_ast{'include-types'}) {
-    &add_include_types($file_ast, $$target_inputs_ast{'include-types'});
+  if ($$target_inputs_ast{'include-fors'}) {
+    &add_include_fors($file_ast, $$target_inputs_ast{'include-fors'});
   }
   my $str;
   my $strings;
@@ -356,8 +356,8 @@ sub generate_target {
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output;
     }
-    if ($$target_inputs_ast{'include-types'}) {
-      &add_include_types($target_srcs_ast, $$target_inputs_ast{'include-types'});
+    if ($$target_inputs_ast{'include-fors'}) {
+      &add_include_fors($target_srcs_ast, $$target_inputs_ast{'include-fors'});
     }
     my $str = &generate_decl_defn($target_srcs_ast, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
     my $strings;
@@ -564,8 +564,8 @@ sub generate_decl_defn {
 sub generate_target_runtime {
   my ($target_srcs_ast, $generics) = @_;
   my $symbols_from_header = {};
-  if ($$target_srcs_ast{'include-types'}) {
-    while (my ($symbol, $header) = each (%{$$target_srcs_ast{'include-types'}})) {
+  if ($$target_srcs_ast{'include-fors'}) {
+    while (my ($symbol, $header) = each (%{$$target_srcs_ast{'include-fors'}})) {
       if (!defined $$symbols_from_header{$header}) {
         $$symbols_from_header{$header} = {}
       }
@@ -574,7 +574,7 @@ sub generate_target_runtime {
   }
   my $target_cc_str = '';
   my $col = '';
-  $target_cc_str .= $col . "static const str-t include-types[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+  $target_cc_str .= $col . "static const str-t include-fors[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   foreach my $header (sort keys %$symbols_from_header) {
     $target_cc_str .= $col . "\"$header\",";
@@ -641,7 +641,7 @@ sub generate_target_runtime {
                   "\#va-signatures" => 'va-signatures',
                  };
   if (0 < scalar keys %$symbols_from_header) {
-    $$info_tbl{"\#include-types"} = 'include-types';
+    $$info_tbl{"\#include-fors"} = 'include-fors';
   }
   if (0 < scalar keys %{$$target_srcs_ast{'literal-strs'}}) {
     $$info_tbl{"\#str-literals"} = '__str-literals';
@@ -2481,7 +2481,7 @@ sub linkage_unit::generate_headers {
 
     my $all_headers = {};
     my $header_name;
-    foreach $header_name (values %{$$ast{'include-types'}}) {
+    foreach $header_name (values %{$$ast{'include-fors'}}) {
       $$all_headers{$header_name} = undef;
     }
     foreach $header_name (keys %$exported_headers) {
