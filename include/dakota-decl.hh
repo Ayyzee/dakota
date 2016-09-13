@@ -25,7 +25,7 @@
 
 # define ALIAS(m)
 # define METHOD_ALIAS(a, r)
-# define INCLUDE_TYPE(f, t, ...)
+# define INCLUDE_TYPE(f, ...)
 # define INTERPOSE(k)
 # define MODULE(n)
 # define MODULE_EXPORT(n, ...)
