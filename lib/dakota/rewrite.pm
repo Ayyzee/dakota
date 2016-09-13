@@ -956,7 +956,7 @@ sub rewrite_export_method {
 sub rewrite_include_types {
   my ($filestr_ref) = @_;
   my $h =  &header_file_regex();
-  $$filestr_ref =~ s/^(\s*)include-type(\s*)(<$h+>|"$h+")(.*?)(\s*);/$1INCLUDE-TYPE($3,$4)$5;/gm;
+  $$filestr_ref =~ s=^include-type(\s*)(<$h+>|"$h+")(.*?);=# include$1$2 //$3=gm;
 }
 #sub convert_types_to_include {
 #  my ($filestr_ref) = @_;

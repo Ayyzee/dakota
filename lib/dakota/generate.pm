@@ -234,6 +234,18 @@ sub pre_output_path_from_any_path {
   my $pre_output = $path =~ s/\.$ext$/.$pre_output_ext/r;
   return $pre_output;
 }
+sub add_include_types {
+  my ($ast, $include_types) = @_;
+  if (!$$ast{'include-types'}) {
+    $$ast{'include-types'} = {};
+  }
+  while (my ($type, $include) = each(%$include_types)) {
+    if ($$ast{'include-types'}{$type} && $$ast{'include-types'}{$type} ne $include) {
+      die;
+    }
+    $$ast{'include-types'}{$type} = $include;
+  }
+}
 sub generate_src {
   my ($path, $file_ast, $target_inputs_ast, $target_hh_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
@@ -249,6 +261,9 @@ sub generate_src {
   }
   if (&is_debug()) {
     print "    creating $output" . &pann(__FILE__, __LINE__) . $nl;
+  }
+  if ($$target_inputs_ast{'include-types'}) {
+    &add_include_types($file_ast, $$target_inputs_ast{'include-types'});
   }
   my $str;
   my $strings;
@@ -340,6 +355,9 @@ sub generate_target {
     my $pre_output = &pre_output_path_from_any_path($output);
     if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
       $output = $ENV{'DKT_DIR'} . '/' . $output;
+    }
+    if ($$target_inputs_ast{'include-types'}) {
+      &add_include_types($target_srcs_ast, $$target_inputs_ast{'include-types'});
     }
     my $str = &generate_decl_defn($target_srcs_ast, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
     my $strings;
@@ -2459,6 +2477,7 @@ sub linkage_unit::generate_headers {
   if (&is_decl()) {
     my $exported_headers = {};
     $$exported_headers{'<cassert>'}{'hardcoded-by-rnielsen'} = undef; # assert()
+    $$exported_headers{'<cstdarg>'}{'hardcoded-by-rnielsen'} = undef; # va-list
     $$exported_headers{'<cstring>'}{'hardcoded-by-rnielsen'} = undef; # memcpy()
 
     foreach my $klass_name (@$klass_names) {

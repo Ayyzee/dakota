@@ -267,7 +267,7 @@ sub is_tbl {
   }
   return $result;
 }
-sub _ast_merge { # recursive
+sub _ast_merge {
   my ($root_ast, $ast) = @_;
   foreach my $name1 (sort keys %$ast) {
     if (&is_tbl($$ast{$name1})) {
@@ -280,11 +280,15 @@ sub _ast_merge { # recursive
           if (!$$root_ast{$name1}{$name2}) {
             $$root_ast{$name1}{$name2} = &deep_copy($$ast{$name1}{$name2});
           } else {
-            foreach my $name3 (sort keys %{$$ast{$name1}{$name2}}) {
-              if (&is_tbl($$ast{$name1}{$name2}{$name3})) {
-                &tbl_add_info($$root_ast{$name1}{$name2}{$name3},
-                              $$ast{$name1}{$name2}{$name3});
+            if (&is_tbl($$ast{$name1}{$name2})) {
+              foreach my $name3 (sort keys %{$$ast{$name1}{$name2}}) {
+                if (&is_tbl($$ast{$name1}{$name2}{$name3})) {
+                  &tbl_add_info($$root_ast{$name1}{$name2}{$name3},
+                                $$ast{$name1}{$name2}{$name3});
+                }
               }
+            } else {
+              $$root_ast{$name1}{$name2} = $$ast{$name1}{$name2};
             }
           }
         }
@@ -544,7 +548,7 @@ sub match_re {
   }
   return &sst::at($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'} - 1);
 }
-my $enable_exported_header = 1;
+my $enable_exported_header = 0;
 sub add_exported_header {
   my ($tkn) = @_;
   if ($enable_exported_header) {
