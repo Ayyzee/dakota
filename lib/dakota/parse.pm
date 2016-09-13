@@ -467,10 +467,6 @@ sub add_symbol {
   $ident = &as_literal_symbol($ident);
   $$file{'symbols'}{$ident} = undef;
 }
-sub add_system_include {
-  my ($file, $system_include) = @_;
-  $$file{'includes'}{$system_include} = undef;
-}
 sub add_type {
   my ($seq) = @_;
   &maybe_add_exported_header_for_symbol_seq($seq);
@@ -1029,6 +1025,40 @@ sub fragment_str {
   my $argstr = join(' ', @$arg);
   $argstr = &remove_extra_whitespace($argstr);
   return $argstr;
+}
+# include-type <...>|"..." type1 [, type2 ...] ;
+# include-type <sys/socket.h> struct sockaddr, struct sockproto ;
+my $last_for_first = { '<' => '>',
+                       '"' => '"' };
+sub include_type {
+  my $seq = &dkdecl('include-type');
+  my $index = 0;
+  my $last = $$last_for_first{$$seq[0]};
+  foreach my $part (@$seq) {
+    last if $last eq $part;
+    $index++;
+  }
+  my $header_seq = [splice @$seq, 0, $index + 1];
+  my $header = &ct($header_seq);
+  my $types_str = "@$seq";
+  $types_str =~ s/\s+/ /g;
+  my $types = [split(/ , /, $types_str)];
+  my $abbrev_types = [];
+  if (0) {
+    foreach my $type (@$types) {
+      if ($type =~ /^(class|struct|union|enum)\s/) {
+        my $abbrev_type = $type =~ s/^(class|struct|union|enum)\s//r;
+        &add_last($abbrev_types, $abbrev_type);
+      }
+    }
+  }
+  foreach my $type (@$types, @$abbrev_types) {
+    if (defined $$gbl_root_ast{'include-types'}{$type}
+             && $$gbl_root_ast{'include-types'}{$type} ne $header) {
+      die;
+    }
+   $$gbl_root_ast{'include-types'}{$type} = $header;
+  }
 }
 sub module_decl {
   &match(__FILE__, __LINE__, 'module');
@@ -2164,6 +2194,10 @@ sub parse_root {
   # root
   while ($$gbl_sst_cursor{'current-token-index'} < &sst::size($$gbl_sst_cursor{'sst'})) {
     for (&sst_cursor::current_token($gbl_sst_cursor)) {
+      if (m/^include-type$/) {
+        &include_type();
+        last;
+      }
       if (m/^module$/) {
         &module_decl();
         last;
@@ -2289,10 +2323,6 @@ sub ast_from_dk_path {
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &filestr_from_file($gbl_filename);
-  while (m/^\s*\#\s*include\s+(<.*?>)/gm) {
-    &add_system_include($gbl_root_ast, $1);
-  }
-  pos $_ = 0;
   while (m/\#((0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|[1-9]\d*)([uUiI](32|64|128))?)/g) {
     &add_int($gbl_root_ast, $1);
   }

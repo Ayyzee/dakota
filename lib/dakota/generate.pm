@@ -545,8 +545,30 @@ sub generate_decl_defn {
 } # generate_decl_defn
 sub generate_target_runtime {
   my ($target_srcs_ast, $generics) = @_;
+  my $symbols_from_header = {};
+  if ($$target_srcs_ast{'include-types'}) {
+    while (my ($symbol, $header) = each (%{$$target_srcs_ast{'include-types'}})) {
+      if (!defined $$symbols_from_header{$header}) {
+        $$symbols_from_header{$header} = {}
+      }
+      $$symbols_from_header{$header}{$symbol} = undef;
+    }
+  }
   my $target_cc_str = '';
   my $col = '';
+  $target_cc_str .= $col . "static const str-t include-types[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+  $col = &colin($col);
+  foreach my $header (sort keys %$symbols_from_header) {
+    $target_cc_str .= $col . "\"$header\",";
+    foreach my $type (sort keys %{$$symbols_from_header{$header}}) {
+      $target_cc_str .= $col . "\"$type\",";
+    }
+    $target_cc_str .= $col . "nullptr," . $nl;
+  }
+  $target_cc_str .= $col . "nullptr" . $nl;
+  $col = &colout($col);
+  $target_cc_str .= $col . "};" . $nl;
+
   my $keys_count = keys %{$$target_srcs_ast{'klasses'}};
   if (0 == $keys_count) {
     $target_cc_str .= $col . "static const symbol-t* imported-klass-names = nullptr;" . $nl;
@@ -600,6 +622,9 @@ sub generate_target_runtime {
                   "\#va-selectors" =>  'va-selectors',
                   "\#va-signatures" => 'va-signatures',
                  };
+  if (0 < scalar keys %$symbols_from_header) {
+    $$info_tbl{"\#include-types"} = 'include-types';
+  }
   if (0 < scalar keys %{$$target_srcs_ast{'literal-strs'}}) {
     $$info_tbl{"\#str-literals"} = '__str-literals';
     $$info_tbl{"\#str-names"} =    '__str-names';
@@ -2447,7 +2472,7 @@ sub linkage_unit::generate_headers {
     }
     my $all_headers = {};
     my $header_name;
-    foreach $header_name (keys %{$$ast{'includes'}}) {
+    foreach $header_name (values %{$$ast{'include-types'}}) {
       $$all_headers{$header_name} = undef;
     }
     foreach $header_name (keys %$exported_headers) {

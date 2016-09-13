@@ -1178,6 +1178,28 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
   ostream::println-format(ostrm, "}\n");
   return ci.modulee;
 }
+static func dump-include-type-decls(ostream-t ostrm, named-info-t* registration-info) -> void {
+  assert(nullptr != ostrm.output);
+  assert(8 > ostrm.col);
+  assert(nullptr != registration-info);
+
+  const str-t* include-types = cast(decltype(include-types))named-info::at(registration-info, #include-types);
+
+  if (include-types) {
+    ssize-t i = 0;
+    while (1) {
+      str-t h = include-types[i++];
+      assert(nullptr != h);
+      str-t t;
+      while (nullptr != (t = include-types[i++])) {
+        ostream::println-format(ostrm, "include-type %s %s;\n", h, t);
+      }
+      if (nullptr == include-types[i])
+        break;
+    }
+  }
+  return;
+}
 static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only, boole-t exported-only?) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
@@ -1474,6 +1496,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     str-t name-base = remove-dir(name);
 
     if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
+      dump-include-type-decls(ostrm, registration-info);
       dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only?);
       dump-interposers(ostrm, registration-info);
     }
