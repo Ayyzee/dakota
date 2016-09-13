@@ -1025,9 +1025,6 @@ sub generate_va_generic_defn {
   if (&is_kw_args_method($vararg_method)) {
     $part .= ' [[sentinel]]';
   }
-  if (&is_src_decl() || &is_target_decl()) {
-    $part .= ' extern';
-  }
   my $func_spec = '';
   if ($is_inline) {
     $func_spec = ' INLINE';
@@ -1075,7 +1072,7 @@ sub generate_va_generic_defn {
       $$scratch_str_ref .= $col . "return;" . $nl;
     }
     $col = &colout($col);
-    $$scratch_str_ref .= $col . "}}" . $nl;
+    $$scratch_str_ref .= $col . "}} // @$scope::$va_method_name(...)" . $nl;
   }
 }
 sub method::compare {
@@ -1939,7 +1936,7 @@ sub generate_klass_unbox {
           $col . "  DKT-UNBOX-CHECK(object, _klass_); // optional" . $nl .
           $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(_klass_).offset);" . $nl .
           $col . "  return s;" . $nl .
-          $col . "}}" . $nl;
+          $col . "}} // $klass_name\::unbox()" . $nl;
       }
     }
   }
@@ -1971,7 +1968,7 @@ sub generate_klass_box {
             $col . "memcpy(unbox(result), arg, sizeof(slots-t)); // unfortunate" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}}" . $nl;
+          $result .= $col . "}} // $klass_name\::box()" . $nl;
         }
         $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> object-t";
 
@@ -1984,7 +1981,7 @@ sub generate_klass_box {
             $col . "object-t result = box(*arg);" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}}" . $nl;
+          $result .= $col . "}} // $klass_name\::box()" . $nl;
         }
       } else { # !&is_array_type()
         ### box() non-array-type
@@ -2012,7 +2009,7 @@ sub generate_klass_box {
           }
           $result .= $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}}" . $nl;
+          $result .= $col . "}} // $klass_name\::box()" . $nl;
         }
         $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> object-t";
 
@@ -2025,7 +2022,7 @@ sub generate_klass_box {
             $col . "object-t result = $klass_name\::box(&arg);" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}}" . $nl;
+          $result .= $col . "}} // $klass_name\::box()" . $nl;
         }
       }
     }
@@ -2058,7 +2055,7 @@ sub generate_klass_construct {
               $col . "slots-t result = cast(slots-t){ $names };" . $nl .
               $col . "return result;" . $nl;
             $col = &colout($col);
-            $result .= $col . "}}" . $nl;
+            $result .= $col . "}} // $klass_name\::construct()" . $nl;
           }
         }
       }
@@ -2339,7 +2336,7 @@ sub generate_object_method_defn {
       $$scratch_str_ref .= $col . "return;" . $nl;
     }
     $col = &colout($col);
-    $$scratch_str_ref .= $col . "}}" . $nl;
+    $$scratch_str_ref .= $col . "}} // @$klass_path\::$method_name" . $nl;
   }
 }
 sub convert_to_object_type {
@@ -2452,6 +2449,8 @@ sub generate_exported_slots_decls {
                          };
     if (!exists $$excluded_types{"$klass_name-t"}) {
       $$scratch_str_ref .= $pad2 . $typealias_slots_t . &ann(__FILE__, __LINE__) . $nl;
+    } else {
+      $$scratch_str_ref .= &ann(__FILE__, __LINE__) . $nl;
     }
   } elsif (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
     if ('struct' eq $slots_cat ||
@@ -2839,7 +2838,7 @@ sub linkage_unit::generate_klasses_types_after {
           if (&is_exported($enum)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
             &generate_enum_defn(&colin($col), $enum, $is_exported = 1, $is_slots = 0);
-            $$scratch_str_ref .= $col . "}" . $nl;
+            $$scratch_str_ref .= $col . "} // $klass_name\::slots-t" . $nl;
           }
         }
       }
@@ -2857,7 +2856,7 @@ sub linkage_unit::generate_klasses_types_after {
             print STDERR &Dumper($$klass_ast{'slots'});
             die __FILE__, ":", __LINE__, ": error:\n";
           }
-          $$scratch_str_ref .= $col . "}" . $nl;
+          $$scratch_str_ref .= $col . "} // $klass_name\::slots-t" . $nl;
         }
       } elsif (&is_src_defn() || &is_target_defn()) {
         if (!&should_export_slots($klass_ast)) {
@@ -2872,7 +2871,7 @@ sub linkage_unit::generate_klasses_types_after {
               print STDERR &Dumper($$klass_ast{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
-            $$scratch_str_ref .= $col . "}" . $nl;
+            $$scratch_str_ref .= $col . "} // $klass_name\::slots-t" . $nl;
           } else {
             $$scratch_str_ref .= $col . "klass $klass_name {";
             if ('struct' eq $slots_cat ||
@@ -2884,7 +2883,7 @@ sub linkage_unit::generate_klasses_types_after {
               print STDERR &Dumper($$klass_ast{'slots'});
               die __FILE__, ":", __LINE__, ": error:\n";
             }
-            $$scratch_str_ref .= $col . "}" . $nl;
+            $$scratch_str_ref .= $col . "} // $klass_name\::slots-t" . $nl;
           }
         }
       }
@@ -3693,7 +3692,7 @@ sub generate_kw_args_method_signature_defn {
     $col . "$kw_arg_list" . $nl .
     $col . "return &result;" . $nl;
   $col = &colout($col);
-  $$scratch_str_ref .= $col . "}}}}" . $nl;
+  $$scratch_str_ref .= $col . "}}}} // @$klass_name\::__method-signature\::va\::$method_name()" . $nl;
 }
 sub generate_slots_method_signature_decl {
   my ($method, $klass_name, $col, $klass_type, $max_width) = @_;
@@ -3724,7 +3723,7 @@ sub generate_slots_method_signature_defn {
     $col . "$arg_list" . $nl .
     $col . "return &result;" . $nl;
   $col = &colout($col);
-  $$scratch_str_ref .= $col . "}}}" . $nl;
+  $$scratch_str_ref .= $col . "}}} // @$klass_name\::__method-signature\::$method_name()" . $nl;
 }
 sub generate_kw_arg_method_defns {
   my ($slots, $methods, $klass_name, $col, $klass_type) = @_;
@@ -3915,7 +3914,7 @@ sub generate_kw_args_method_defn {
       $col . "return;" . $nl;
   }
   $col = &colout($col);
-  $$scratch_str_ref .= $col . "}}}" . $nl;
+  $$scratch_str_ref .= $col . "}}} // @$klass_name\::va\::$method_name()" . $nl;
   #&path::remove_last($klass_name);
 }
 sub dk_generate_cc_footer {
