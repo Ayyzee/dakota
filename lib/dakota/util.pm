@@ -558,7 +558,7 @@ sub dir_part {
 }
 sub make_dir {
   my ($path, $should_echo) = @_;
-  $path = join('/', @$path) if 'ARRAY' eq ref($path);
+  $path = join('/', @$path) if &is_array($path);
   if (! -e $path) {
     if ($should_echo) {
       print STDERR $0 . ': info: make_dir(' . $path . ')' . $nl;
@@ -613,7 +613,7 @@ sub target_builddir {
 sub var {
   my ($compiler, $lhs, $default_rhs) = @_;
   my $result = &var_array($compiler, $lhs, $default_rhs);
-  if ('ARRAY' eq ref($result)) {
+  if (&is_array($result)) {
     $result = join(' ', @$result);
   }
   return $result;
@@ -1081,7 +1081,7 @@ sub rel_path_canon {
 }
 sub all_files {
   my ($dirs, $include_regex, $exclude_regex) = @_;
-  if ('ARRAY' ne ref($dirs)) {
+  if (!is_array($dirs)) {
     $dirs = [$dirs];
   }
   my $files = {};
