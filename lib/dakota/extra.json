@@ -32,7 +32,7 @@
     'boole' => undef,
     'char8' => undef,
     'compare' => undef, # hackhack
-    'equals' => undef, # hackhack
+    'equals' => undef, # hackhack (workaround for dakota-test/should-pass/pass/sets/)
     'generic-func' => undef,
     'hash' => undef,
     'input-stream' => undef, # std-input
