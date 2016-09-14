@@ -260,7 +260,7 @@ sub generate_src {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
   if ($$target_inputs_ast{'include-fors'}) {
-    &add_include_fors($file_ast, $$target_inputs_ast{'include-fors'});
+    &add_include_fors($file_ast, $$target_inputs_ast{'include-fors'}); # BUGBUG
   }
   my $str;
   my $strings;
@@ -354,7 +354,7 @@ sub generate_target {
       $output = $ENV{'DKT_DIR'} . '/' . $output;
     }
     if ($$target_inputs_ast{'include-fors'}) {
-      &add_include_fors($target_srcs_ast, $$target_inputs_ast{'include-fors'});
+      &add_include_fors($target_srcs_ast, $$target_inputs_ast{'include-fors'}); # BUGBUG
     }
     my $str = &generate_decl_defn($target_srcs_ast, $generics, $symbols, $dir, $name, $suffix); # costly (> 1/8 of total)
     my $strings;

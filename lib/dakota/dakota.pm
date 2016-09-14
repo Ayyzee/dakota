@@ -689,7 +689,7 @@ sub start_cmd {
     open(LOCK_FILE, ">", $lock_file) or die __FILE__, ":", __LINE__, ": ERROR: $lock_file: $!\n";
     flock LOCK_FILE, LOCK_EX or die;
   }
-  $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path);
+  $cmd_info = &update_target_srcs_ast_from_all_inputs($cmd_info, $target_srcs_ast_path); # BUGUBUG: called even when not out of date
   if ($$cmd_info{'opts'}{'parse'}) {
     print $target_srcs_ast_path . $nl;
     if ($should_lock) {
@@ -1119,7 +1119,7 @@ sub target_from_ast {
   &src::add_extra_keywords($target_srcs_ast);
   &src::add_extra_generics($target_srcs_ast);
 
-  &generate_target_decl($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
+  &generate_target_decl($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe); # BUGBUG
   if ($is_defn) {
     &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
     &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
