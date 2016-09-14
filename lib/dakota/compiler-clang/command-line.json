@@ -9,9 +9,10 @@
   'CXXFLAGS' => [
     '-std=c++11', '-fvisibility=hidden',
     '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
+    '-ftrapv',
     '-ObjC++', '-fobjc-exceptions', '-lobjc',
-    #'-flto', # must also be in LDFLAGS!!!
     #'-fuse-ld=gold', '-use-gold-plugin',
+    #'-flto', # must also be in LDFLAGS!!!
   ],
   'CXX_COMPILE_FLAGS' => [
     '--compile', '-fPIC',
