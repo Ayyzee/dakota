@@ -259,9 +259,6 @@ sub generate_src {
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output;
   }
-  if (&is_debug()) {
-    print "    creating $output" . &pann(__FILE__, __LINE__) . $nl;
-  }
   if ($$target_inputs_ast{'include-fors'}) {
     &add_include_fors($file_ast, $$target_inputs_ast{'include-fors'});
   }
@@ -328,7 +325,7 @@ sub generate_target {
   my $end_time;
   if (&is_debug()) {
     $start_time = time;
-    print "    creating $output" . &pann(__FILE__, __LINE__) . $nl;
+    print "  creating $output" . &pann(__FILE__, __LINE__) . $nl;
   }
   my $output_runtime;
   if (&is_target_defn()) {
@@ -387,7 +384,7 @@ sub generate_target {
   if (&is_debug()) {
     $end_time = time;
     my $elapsed_time = $end_time - $start_time;
-    print "    creating $output ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
+    print "  creating $output ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
   }
   return $output;
 } # sub generate_target
@@ -4352,9 +4349,6 @@ sub dk_generate_cc {
   $output =~ s|^\./||;
   if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
     $output = $ENV{'DKT_DIR'} . '/' . $output
-  }
-  if (&is_debug()) {
-    print "    creating $output" . &pann(__FILE__, __LINE__) . $nl; # user-dk-cc
   }
   my $remove;
 

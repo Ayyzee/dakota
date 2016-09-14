@@ -594,7 +594,6 @@ sub update_kw_arg_generics {
 }
 sub update_target_srcs_ast_from_all_inputs {
   my ($cmd_info, $target_srcs_ast_path) = @_;
-  my $start_time = time;
   my $orig = { 'inputs' => $$cmd_info{'inputs'},
                'output' => $$cmd_info{'output'},
                'opts' =>   &deep_copy($$cmd_info{'opts'}),
@@ -605,9 +604,6 @@ sub update_target_srcs_ast_from_all_inputs {
   $$cmd_info{'opts'}{'silent'} = 1;
   delete $$cmd_info{'opts'}{'compile'};
   &check_path($target_srcs_ast_path);
-  if (&is_debug()) {
-    print STDERR "creating $target_srcs_ast_path" . &pann(__FILE__, __LINE__) . $nl;
-  }
   $cmd_info = &loop_ast_from_so($cmd_info);
   $cmd_info = &loop_ast_from_inputs($cmd_info);
   die if $$cmd_info{'asts'}[-1] ne $target_srcs_ast_path; # assert
@@ -618,11 +614,6 @@ sub update_target_srcs_ast_from_all_inputs {
   $$cmd_info{'output'} = $$orig{'output'};
   $$cmd_info{'opts'} =   $$orig{'opts'};
 
-  if (&is_debug()) {
-    my $end_time = time;
-    my $elapsed_time = $end_time - $start_time;
-    print STDERR "creating $target_srcs_ast_path ... done ($elapsed_time secs)" . &pann(__FILE__, __LINE__) . $nl;
-  }
   if ($ENV{'DAKOTA_CREATE_AST_ONLY'}) {
     exit 0;
   }
@@ -685,19 +676,7 @@ sub start_cmd {
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
   }
-  $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'};
-  if ($$cmd_info{'output'}) {
-    if ($$cmd_info{'opts'}{'precompile'}) {
-      if (&is_debug()) {
-        my $target_cc_path = &target_cc_path($cmd_info);
-        print STDERR "creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
-      }
-    } else {
-      if (&is_debug()) {
-        print STDERR "creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
-      }
-    }
-  }
+  $$cmd_info{'output'} = $$cmd_info{'opts'}{'output'}; ###
   if ($should_replace_library_path_with_lib_opts) {
     $$cmd_info{'inputs-tbl'} = &inputs_tbl($$cmd_info{'inputs'});
   }
@@ -920,21 +899,6 @@ sub gen_target {
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
       my $target_dk_path = &dk_path_from_cc_path($target_cc_path);
       print $target_dk_path . $nl;
-    }
-    if (&is_debug()) {
-      if ($$cmd_info{'opts'}{'precompile'}) {
-        if ($is_defn) {
-          print STDERR "  creating $target_cc_path" . &pann(__FILE__, __LINE__) . $nl;
-        } else {
-          print STDERR "  creating $target_hh_path" . &pann(__FILE__, __LINE__) . $nl;
-        }
-      } else {
-        if ($is_defn) {
-          print STDERR "  creating $$cmd_info{'output'}" . &pann(__FILE__, __LINE__) . $nl;
-        } else {
-          print STDERR "  creating $target_hh_path" . &pann(__FILE__, __LINE__) . $nl;
-        }
-      }
     }
   }
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
@@ -1294,7 +1258,6 @@ sub outfile_from_infiles {
       if ($ENV{'DKT_DIR'} && '.' ne $ENV{'DKT_DIR'} && './' ne $ENV{'DKT_DIR'}) {
         $output = $ENV{'DKT_DIR'} . '/' . $output
       }
-      #print STDERR "    creating $output # output" . &pann(__FILE__, __LINE__) . $nl;
     }
     if ('&loop_merged_ast_from_inputs' eq $$cmd_info{'cmd'}) {
       $$cmd_info{'opts'}{'output'} = $$cmd_info{'output'};
