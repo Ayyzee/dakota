@@ -282,13 +282,24 @@ sub _ast_merge {
   }
 }
 sub ast_merge {
-  my ($argv) = @_;
-  #print STDERR 'ast_merge(): ' . &Dumper($argv);
+  my ($outpath, $argv, $should_translate) = @_;
   my $ast = {};
-  foreach my $file (@$argv) {
+  my $files = &out_of_date($argv, $outpath);
+  if (-e $outpath) {
+    $ast = &scalar_from_file($outpath);
+    if (0 == scalar @$files) {
+      return $ast;
+    }
+  }
+  #print STDERR "ast_merge(): $outpath: " . &Dumper($files);
+  foreach my $file (@$files) {
     my $file_ast = &scalar_from_file($file);
     &_ast_merge($ast, $file_ast);
   }
+  if ($should_translate) {
+    $ast = &kw_args_translate($ast);
+  }
+  &scalar_to_file($outpath, $ast);
   return $ast;
 }
 
@@ -1882,9 +1893,8 @@ sub target_inputs_ast {
   #my $reinit = 0;
   #if ($_target_inputs_ast) { $reinit = 1; }
   #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
-  $_target_inputs_ast = &ast_merge($asts);
-  $_target_inputs_ast = &kw_args_translate($_target_inputs_ast);
-  &scalar_to_file($target_inputs_ast_path, $_target_inputs_ast);
+  my $should_translate;
+  $_target_inputs_ast = &ast_merge($target_inputs_ast_path, $asts, $should_translate = 1);
   #if ($reinit) { print STDERR &Dumper([keys %{$$_target_inputs_ast{'klasses'}}]); }
   return $_target_inputs_ast;
 }

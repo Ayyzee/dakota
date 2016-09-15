@@ -112,6 +112,7 @@ our @EXPORT= qw(
                  is_exported
                  is_kw_args_method
                  is_out_of_date
+                 out_of_date
                  is_same_file
                  is_same_src_file
                  is_slots
@@ -1008,26 +1009,39 @@ sub digsig {
   return $sig;
 }
 sub is_out_of_date {
-  my ($infile, $outfile, $file_db) = @_;
-  if (! -e $infile) {
-    my $tmp_infile = &find_library($infile);
-    if ($tmp_infile) {
-      $infile = $tmp_infile;
+  my ($infiles, $outfile, $file_db) = @_;
+  my $files = &out_of_date($infiles, $outfile, $file_db);
+  my $result = scalar @$files;
+  return $result;
+}
+sub out_of_date {
+  my ($infiles, $outfile, $file_db) = @_;
+  my $result = [];
+  $file_db = {} if ! defined $file_db;
+  if (!&is_array($infiles)) {
+    $infiles = [$infiles];
+  }
+  my $outfile_stat = &path_stat($file_db, $outfile, '--output');
+  if (!$$outfile_stat{'mtime'}) {
+    return $infiles;
+  }
+  foreach my $infile (@$infiles) {
+    if (! -e $infile) {
+      my $tmp_infile = &find_library($infile);
+      if ($tmp_infile) {
+        $infile = $tmp_infile;
+      }
+    }
+    my $infile_stat =  &path_stat($file_db, $infile,  '--inputs');
+
+    if (!$$infile_stat{'mtime'}) {
+      die $0 . ': warning: no-such-file: ' . $infile . ' on which ' . $outfile . ' depends' . $nl;
+    }
+    if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
+      &add_last($result, $infile);
     }
   }
-  my $infile_stat =  &path_stat($file_db, $infile,  '--inputs');
-  my $outfile_stat = &path_stat($file_db, $outfile, '--output');
-
-  if (!$$infile_stat{'mtime'}) {
-    die $0 . ': warning: no-such-file: ' . $infile . ' on which ' . $outfile . ' depends' . $nl;
-  }
-  if (!$$outfile_stat{'mtime'}) {
-    return 1;
-  }
-  if ($$outfile_stat{'mtime'} < $$infile_stat{'mtime'}) {
-    return 1;
-  }
-  return 0;
+  return $result;
 }
 sub flatten {
     my ($a_of_a) = @_;

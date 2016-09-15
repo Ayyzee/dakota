@@ -229,9 +229,8 @@ sub loop_merged_ast_from_inputs {
     if (1 == @{$$cmd_info{'inputs'}}) {
       &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
     } elsif (1 < @{$$cmd_info{'inputs'}}) {
-      my $ast = &ast_merge($ast_files);
-      #$ast = &kw_args_translate($ast);
-      &scalar_to_file($$cmd_info{'opts'}{'output'}, $ast);
+      my $should_translate;
+      &ast_merge($$cmd_info{'opts'}{'output'}, $ast_files, $should_translate = 0);
     }
   }
 } # loop_merged_ast_from_inputs
@@ -1231,19 +1230,9 @@ sub outfile_from_infiles {
   my $outfile = $$cmd_info{'output'};
   &make_dir_part($outfile, $should_echo);
   if ($outfile =~ m|^$builddir/$builddir/|) { die "found double builddir/builddir: $outfile"; } # likely a double $builddir prepend
-  my $infiles;
-  if (-e $outfile) {
-    my $file_db = {};
-    $infiles = [];
-    foreach my $infile (@{$$cmd_info{'inputs'}}) {
-      if (&is_out_of_date($infile, $outfile, $file_db)) {
-        &add_last($infiles, $infile);
-      }
-    }
-  } else {
-    $infiles = $$cmd_info{'inputs'};
-  }
-  my $num_out_of_date_infiles = @$infiles;
+  my $file_db = {};
+  my $infiles = &out_of_date($$cmd_info{'inputs'}, $outfile, $file_db);
+  my $num_out_of_date_infiles = scalar @$infiles;
   if (0 != $num_out_of_date_infiles) {
     #print STDERR "outfile=$outfile, infiles=[ " . join(' ', @$infiles) . ' ]' . $nl;
     &make_dir_part($$cmd_info{'output'}, $should_echo);
