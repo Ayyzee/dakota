@@ -31,8 +31,8 @@ use sort 'stable';
 my $should_write_pre_output = 1;
 my $gbl_ann_interval = 30;
 
-my $emacs_cxx_mode_file_variables =    '-*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
-my $emacs_dakota_mode_file_variables = '-*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-';
+my $emacs_cxx_mode_file_variables =    '-*- mode: c++ -*-';
+my $emacs_dakota_mode_file_variables = '-*- mode: dakota -*-';
 
 my $gbl_prefix;
 my $gbl_compiler;

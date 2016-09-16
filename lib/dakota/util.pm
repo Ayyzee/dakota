@@ -1364,7 +1364,7 @@ sub scalar_to_file {
   if (!defined $ref) {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_to_file(\"$file\", $ref)\n";
   }
-  my $refstr = &Dumper($ref);
+  my $refstr = '# -*- mode: perl -*-' . $nl . &Dumper($ref);
   &filestr_to_file($refstr, $file);
 }
 sub scalar_from_file {
