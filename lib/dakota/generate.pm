@@ -32,7 +32,7 @@ my $should_write_pre_output = 1;
 my $gbl_ann_interval = 30;
 
 my $emacs_cxx_mode_file_variables =    '-*- mode: c++ -*-';
-my $emacs_dakota_mode_file_variables = '-*- mode: dakota -*-';
+my $emacs_dakota_mode_file_variables = '-*- mode: c++; mode: dakota -*-'; # fallback to c++ mode if dakota mode is not found
 
 my $gbl_prefix;
 my $gbl_compiler;
