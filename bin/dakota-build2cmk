@@ -113,9 +113,13 @@ sub scalar_to_file {
   flock FILE, 2; # LOCK_EX
   truncate FILE, 0;
   print FILE '# -*- mode: cmake -*-' . $nl;
-  foreach my $key (keys %$ref) {
+  foreach my $key (sort keys %$ref) {
     if ('ARRAY' eq ref($$ref{$key})) {
-      print FILE "set (" . join(' ', ($key, @{$$ref{$key}})) . ')' . $nl;
+      print FILE "set ($key" . $nl;
+      foreach my $element (@{$$ref{$key}}) {
+        print FILE "  $element" . $nl;
+      }
+      print FILE ")" . $nl;
     } else {
       print FILE "set ($key $$ref{$key})" . $nl;
     }
