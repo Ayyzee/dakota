@@ -1,4 +1,4 @@
-// -*- mode: Dakota -*-
+// -*- mode: dakota -*-
 
 klass aa-flintstones {
   method bb-wilma(object-t self) -> object-t {

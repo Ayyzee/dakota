@@ -1,4 +1,4 @@
-// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
+// -*- mode: dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
 // Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
 //
@@ -1494,7 +1494,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
 
     symbol-t name = name-from-info(registration-info);
     assert-valid-str(name);
-    ostream::println-format(ostrm, "// -*- mode: Dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-\n");
+    ostream::println-format(ostrm, "// -*- mode: dakota; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-\n");
     ostream::println-format(ostrm, "// arg = %s\n",  ctlg-arg);
     ostream::println-format(ostrm, "// name = %s\n", name);
     str-t arg-base =  remove-dir(ctlg-arg);

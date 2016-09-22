@@ -1,4 +1,4 @@
-// -*- mode: Dakota -*-
+// -*- mode: dakota -*-
 
 klass aa-rubbles {
   method bb-betty(object-t self) -> object-t {
