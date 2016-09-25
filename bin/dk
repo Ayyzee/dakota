@@ -71,10 +71,13 @@ sub path_opt {
     $$ir++;
   }
   if ($pair) {
-    if ('ARRAY' eq ref($$info{$long})) {
-      &add_last($$info{$long}, $pair);
-    } else {
+    if (exists $$info{$long} && 'ARRAY' ne ref($$info{$long})) {
       $$info{$long} = $pair;
+    } else {
+      if (!defined $$info{$long}) {
+        $$info{$long} = [];
+      }
+      &add_last($$info{$long}, $pair);
     }
   }
   return $pair;
@@ -175,9 +178,7 @@ my $major_mode_tbl = {
 sub detect_gcc_opts {
   my ($cmd, $info) = @_;
   my $num_dk_files = 0;
-  $$info{'library-directory'} = [];
-  $$info{'library'} = [];
-  $$info{'define-macro'} = [];
+  $$info{'output'} = undef;
   $$info{'inputs'} = [];
   my $ordered_input_args = [];
   for (my $i = 1; $i < @$cmd; $i++) {
