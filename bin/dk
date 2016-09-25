@@ -187,10 +187,10 @@ sub detect_gcc_opts {
     if (0) {
     } elsif ($$major_mode_tbl{$arg}) {
       $$info{'major-mode'} = [$i, $$major_mode_tbl{$arg}];
-    } elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
-      &add_last($ordered_input_args, ('--library-directory', $$pair[1]));
-    } elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
-      &add_last($ordered_input_args, ('--library', $$pair[1]));
+    #} elsif ($pair = &path_opt($cmd, \$i, 'L', 'library-directory', $info)) {
+    #  &add_last($ordered_input_args, ('--library-directory', $$pair[1]));
+    #} elsif ($pair = &path_opt($cmd, \$i, 'l', 'library',           $info)) {
+    #  &add_last($ordered_input_args, ('--library', $$pair[1]));
     } elsif (&path_opt($cmd, \$i, 'D', 'define-macro',      $info)) {
     } elsif (&path_opt($cmd, \$i, 'o', 'output',            $info)) {
     } elsif ($arg !~ /^-/) {
