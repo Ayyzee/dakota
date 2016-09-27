@@ -24,48 +24,45 @@ digraph "slots-fsm" {
   node [ shape = circle, fontsize = 12, width = 0.3, fixedsize = true ];
   node [ label = "", width = 0.1 ];
 
-  000:n -> 010:w [ label = "slots", weigth = 5 ];
-  010 -> 020 [ label = "enum", weight = 5 ];
-  010:n -> 030:n [ label = "enum" ];
-  010:n -> 050:n [ label = "enum" ];
-  020 -> 030 [ label = "struct", weight = 5 ];
-  020:s -> 025:w [ label = ";" ];
-  030 -> 040 [ label = ":", weight = 5 ];
-  030:s -> 035:w [ label = ";" ];
-  040 -> 050 [ label = "<fq-type>", fontcolor = blue, weight = 5 ];
-  050:s -> 055:w [ label = ";" ];
-  050 -> 060 [ label = "{", weight = 5 ];
+  000 -> 010 [ label = "slots" ];
+  010 -> 020 [ label = "enum" ];
+  010 -> 030 [ label = "enum" ];
+  010 -> 050 [ label = "enum" ];
+  020 -> 030 [ label = "struct" ];
+  010 -> 015 [ label = ";" ];
+  020 -> 025 [ label = ";" ];
+  030 -> 040 [ label = ":" ];
+  030 -> 035 [ label = ";" ];
+  040 -> 050 [ label = "<fq-type>", fontcolor = blue ];
+  050 -> 060 [ label = "{" ];
+  050 -> 055 [ label = ";" ];
   060 -> 070 [ label = "<enum-body-in>", fontcolor = blue ];
   070 -> 080 [ label = "}" ];
 
-  000:s -> 100:s [ label = "slots" ];
-  140 -> 100 [ label = "struct", weight = 5 ];
-  140:n -> 100:n [ label = "union" ];
-  100 -> 110 [ label = "{", weight = 5 ];
-  100:n -> 105:w [ label = ";" ];
+  010 -> 100 [ label = "union" ];
+  010 -> 100 [ label = "struct" ];
+  010 -> 110 [ label = "{" ];
+  100 -> 110 [ label = "{" ];
+  100 -> 105 [ label = ";" ];
   110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
   120 -> 130 [ label = "}" ];
 
-  000 -> 140 [ label = "slots", weight = 3 ];
-  140:n -> 150:w [ label = "<fq-type>", fontcolor = blue ];
-  150 -> 155 [ label = ";", weight = 2 ];
+  010 -> 140 [ label = "<fq-type>", fontcolor = blue ];
+  140 -> 145 [ label = ";" ];
 
   subgraph {
     graph [ rank = same ];
     050;
     100;
-  }
-  subgraph {
-    graph [ rank = same ];
-    040;
     140;
   }
   subgraph {
     graph [ rank = same ];
+    015;
     025;
     035;
     055;
     105;
-    155;
+    145;
   }
 }
