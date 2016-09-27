@@ -39,8 +39,9 @@ digraph "slots-fsm" {
   070 -> 080 [ label = "}" ];
 
   000:s -> 100:s [ label = "slots" ];
-  140 -> 100 [ label = "struct\nunion", weight = 4 ];
-  100 -> 110 [ label = "{", weight = 4 ];
+  140 -> 100 [ label = "struct", weight = 5 ];
+  140:n -> 100:n [ label = "union" ];
+  100 -> 110 [ label = "{", weight = 5 ];
   100:n -> 105:w [ label = ";" ];
   110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
   120 -> 130 [ label = "}" ];
