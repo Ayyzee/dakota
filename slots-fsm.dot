@@ -68,20 +68,4 @@ digraph "slots-fsm" {
   150 -> 160 [ label = ";" ];
   110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
   120 -> 130 [ label = "}" ];
-
-//   subgraph {
-//     graph [ rank = same ];
-//     050;
-//     100;
-//     140;
-//   }
-//   subgraph {
-//     graph [ rank = same ];
-//     015;
-//     025;
-//     035;
-//     055;
-//     105;
-//     145;
-//   }
 }
