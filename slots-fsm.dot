@@ -34,11 +34,19 @@ digraph "slots-fsm" {
   node [ label = "", width = 0.1 ];
 
   000 -> 010 [ label = "slots" ];
+
+  010 -> 015 [ label = ";" ];
+  010 -> 140 [ label = "<fq-type>", fontcolor = blue ];
+  010 -> 141 [ label = "<array-type>", fontcolor = blue ];
+  010 -> 142 [ label = "<func-ptr-type>", fontcolor = blue ];
+  140 -> 145 [ label = ";" ];
+  141 -> 146 [ label = ";" ];
+  142 -> 147 [ label = ";" ];
+
   010 -> 020 [ label = "enum" ];
   010 -> 030 [ label = "enum" ];
   010 -> 050 [ label = "enum" ];
   020 -> 030 [ label = "struct" ];
-  010 -> 015 [ label = ";" ];
   020 -> 025 [ label = ";" ];
   030 -> 040 [ label = ":" ];
   030 -> 035 [ label = ";" ];
@@ -60,13 +68,6 @@ digraph "slots-fsm" {
   150 -> 160 [ label = ";" ];
   110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
   120 -> 130 [ label = "}" ];
-
-  010 -> 140 [ label = "<fq-type>", fontcolor = blue ];
-  010 -> 141 [ label = "<array-type>", fontcolor = blue ];
-  010 -> 142 [ label = "<func-ptr-type>", fontcolor = blue ];
-  140 -> 145 [ label = ";" ];
-  141 -> 146 [ label = ";" ];
-  142 -> 147 [ label = ";" ];
 
 //   subgraph {
 //     graph [ rank = same ];
