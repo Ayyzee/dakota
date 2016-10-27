@@ -23,8 +23,8 @@
 // slots enum           : <> ;        =>  enum        slots-t             : <>    ;
 // slots enum           : <> { ... }  =>  enum        slots-t             : <>    { ... }
 
-// slots enum struct         ;        =>  enum struct slots-t             : int-t ;
-// slots enum struct         { ... }  =>  enum struct slots-t             : int-t { ... }
+// slots enum struct         ;        =>  enum struct slots-t                     ;
+// slots enum struct         { ... }  =>  enum struct slots-t                     { ... }
 //
 // slots enum struct    : <> ;        =>  enum struct slots-t             : <>    ;
 // slots enum struct    : <> { ... }  =>  enum struct slots-t             : <>    { ... }
