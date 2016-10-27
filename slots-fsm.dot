@@ -50,9 +50,9 @@ digraph "slots-fsm" {
   020 -> 025 [ label = ";" ];
   030 -> 040 [ label = ":" ];
   030 -> 035 [ label = ";" ];
-  030 -> 060 [ label = "{" ];
   030 -> 170 [ label = "<fq-type>", fontcolor = blue ];
   170 -> 180 [ label = ";" ];
+  030 -> 060 [ label = "{" ];
   040 -> 050 [ label = "<fq-int-type>", fontcolor = blue ];
   050 -> 060 [ label = "{" ];
   050 -> 055 [ label = ";" ];
