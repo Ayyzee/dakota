@@ -1,33 +1,32 @@
 // -*- mode: c++ -*-
 
-// slots                  ;        =>  struct      slots-t                          ;
-// slots               <> ;        =>  typealias   slots-t =             <>         ;
-// slots                  { ... }  =>  struct      slots-t                          { ... }
+// slots             <>      ;        =>  typealias   slots-t =        <>         ;
+// slots                     ;        =>  struct      slots-t                     ;
+// slots                     { ... }  =>  struct      slots-t                     { ... }
 
-// slots struct           ;        =>  struct      slots-t                          ;
-// slots struct        <> ;        =>  typealias   slots-t = struct      <>         ;
-// slots struct           { ... }  =>  struct      slots-t                          { ... }
+// slots struct      <>      ;        =>  typealias   slots-t = struct <>         ;
+// slots struct              ;        =>  struct      slots-t                     ;
+// slots struct              { ... }  =>  struct      slots-t                     { ... }
 
-// slots union            ;        =>  union       slots-t                          ;
-// slots union         <> ;        =>  typealias   slots-t = union       <>         ;
-// slots union            { ... }  =>  union       slots-t                          { ... }
+// slots union       <>      ;        =>  typealias   slots-t = union  <>         ;
+// slots union               ;        =>  union       slots-t                     ;
+// slots union               { ... }  =>  union       slots-t                     { ... }
 
-// slots enum             ;        =>  enum        slots-t                  : int-t ;
-// slots enum          <> ;        =>  typealias   slots-t = enum        <> : int-t ;
-// slots enum             { ... }  =>  enum        slots-t                  : int-t { ... }
+// slots enum        <>      ;        =>  typealias   slots-t = enum   <>         ;
+// slots enum                ;        =>  enum        slots-t             : int-t ;
+// slots enum                { ... }  =>  enum        slots-t             : int-t { ... }
 //
-// slots enum        : <> ;        =>  enum        slots-t                  : <>    ;
-// slots enum        : <> { ... }  =>  enum        slots-t                  : <>    { ... }
+// slots enum           : <> ;        =>  enum        slots-t             : <>    ;
+// slots enum           : <> { ... }  =>  enum        slots-t             : <>    { ... }
 
-// slots enum struct      ;        =>  enum struct slots-t                  : int-t ;
-// slots enum struct   <> ;        =>  typealias   slots-t = enum struct <> : int-t ;
-// slots enum struct      { ... }  =>  enum struct slots-t                  : int-t { ... }
+// slots enum struct         ;        =>  enum struct slots-t             : int-t ;
+// slots enum struct         { ... }  =>  enum struct slots-t             : int-t { ... }
 //
-// slots enum struct : <> ;        =>  enum struct slots-t                  : <>    ;
-// slots enum struct : <> { ... }  =>  enum struct slots-t                  : <>    { ... }
+// slots enum struct    : <> ;        =>  enum struct slots-t             : <>    ;
+// slots enum struct    : <> { ... }  =>  enum struct slots-t             : <>    { ... }
 
-// slots <array-type>     ;        =>  typealias   slots-t = <array-type>           ;
-// slots <func-ptr-type>  ;        =>  typealias   slots-t = <func-ptr-type>        ;
+// slots <array-type>        ;        =>  typealias   slots-t = <array-type>      ;
+// slots <func-ptr-type>     ;        =>  typealias   slots-t = <func-ptr-type>   ;
 
 digraph "slots-fsm" {
   graph [ rankdir = LR, label = "\G", fontcolor = red ];
@@ -54,15 +53,15 @@ digraph "slots-fsm" {
   110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
   120 -> 130 [ label = "}" ];
 
+  010 -> 031 [ label = "enum" ];
+  031 -> 170 [ label = "<fq-type>", fontcolor = blue ];
+  170 -> 180 [ label = ";" ];
+  030 -> 035 [ label = ";" ];
   010 -> 020 [ label = "enum" ];
-  010 -> 030 [ label = "enum" ];
   010 -> 050 [ label = "enum" ];
   020 -> 030 [ label = "struct" ];
   020 -> 025 [ label = ";" ];
   030 -> 040 [ label = ":" ];
-  030 -> 035 [ label = ";" ];
-  030 -> 170 [ label = "<fq-type>", fontcolor = blue ];
-  170 -> 180 [ label = ";" ];
   030 -> 060 [ label = "{" ];
   040 -> 050 [ label = "<fq-int-type>", fontcolor = blue ];
   050 -> 060 [ label = "{" ];
