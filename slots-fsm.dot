@@ -42,6 +42,9 @@ digraph "slots-fsm" {
   020 -> 025 [ label = ";" ];
   030 -> 040 [ label = ":" ];
   030 -> 035 [ label = ";" ];
+  030 -> 060 [ label = "{" ];
+  030 -> 170 [ label = "<fq-type>", fontcolor = blue ];
+  170 -> 180 [ label = ";" ];
   040 -> 050 [ label = "<fq-int-type>", fontcolor = blue ];
   050 -> 060 [ label = "{" ];
   050 -> 055 [ label = ";" ];
@@ -53,6 +56,8 @@ digraph "slots-fsm" {
   010 -> 110 [ label = "{" ];
   100 -> 110 [ label = "{" ];
   100 -> 105 [ label = ";" ];
+  100 -> 150 [ label = "<fq-type>", fontcolor = blue ];
+  150 -> 160 [ label = ";" ];
   110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
   120 -> 130 [ label = "}" ];
 
