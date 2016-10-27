@@ -1,33 +1,33 @@
 // -*- mode: c++ -*-
 
-// slots                  ;
-// slots               <> ;
-// slots                  { ... }
+// slots                  ;        =>  struct      slots-t                          ;
+// slots               <> ;        =>  typealias   slots-t =             <>         ;
+// slots                  { ... }  =>  struct      slots-t                          { ... }
 
-// slots struct           ;
-// slots struct        <> ;
-// slots struct           { ... }
+// slots struct           ;        =>  struct      slots-t                          ;
+// slots struct        <> ;        =>  typealias   slots-t = struct      <>         ;
+// slots struct           { ... }  =>  struct      slots-t                          { ... }
 
-// slots union            ;
-// slots union         <> ;
-// slots union            { ... }
+// slots union            ;        =>  union       slots-t                          ;
+// slots union         <> ;        =>  typealias   slots-t = union       <>         ;
+// slots union            { ... }  =>  union       slots-t                          { ... }
 
-// slots enum             ;
-// slots enum          <> ;
-// slots enum             { ... }
+// slots enum             ;        =>  enum        slots-t                  : int-t ;
+// slots enum          <> ;        =>  typealias   slots-t = enum        <> : int-t ;
+// slots enum             { ... }  =>  enum        slots-t                  : int-t { ... }
 //
-// slots enum        : <> ;
-// slots enum        : <> { ... }
+// slots enum        : <> ;        =>  enum        slots-t                  : <>    ;
+// slots enum        : <> { ... }  =>  enum        slots-t                  : <>    { ... }
 
-// slots enum struct      ;
-// slots enum struct   <> ;
-// slots enum struct      { ... }
+// slots enum struct      ;        =>  enum struct slots-t                  : int-t ;
+// slots enum struct   <> ;        =>  typealias   slots-t = enum struct <> : int-t ;
+// slots enum struct      { ... }  =>  enum struct slots-t                  : int-t { ... }
 //
-// slots enum struct : <> ;
-// slots enum struct : <> { ... }
+// slots enum struct : <> ;        =>  enum struct slots-t                  : <>    ;
+// slots enum struct : <> { ... }  =>  enum struct slots-t                  : <>    { ... }
 
-// slots <array-type>     ;
-// slots <func-ptr-type>  ;
+// slots <array-type>     ;        =>  typealias   slots-t = <array-type>           ;
+// slots <func-ptr-type>  ;        =>  typealias   slots-t = <func-ptr-type>        ;
 
 digraph "slots-fsm" {
   graph [ rankdir = LR, label = "\G", fontcolor = red ];
@@ -38,12 +38,21 @@ digraph "slots-fsm" {
   000 -> 010 [ label = "slots" ];
 
   010 -> 015 [ label = ";" ];
-  010 -> 140 [ label = "<fq-type>", fontcolor = blue ];
   010 -> 141 [ label = "<array-type>", fontcolor = blue ];
   010 -> 142 [ label = "<func-ptr-type>", fontcolor = blue ];
+  010 -> 140 [ label = "<fq-type>", fontcolor = blue ];
   140 -> 145 [ label = ";" ];
   141 -> 146 [ label = ";" ];
   142 -> 147 [ label = ";" ];
+
+  010 -> 100 [ label = "struct\nunion" ];
+  010 -> 110 [ label = "{" ];
+  100 -> 110 [ label = "{" ];
+  100 -> 105 [ label = ";" ];
+  100 -> 150 [ label = "<fq-type>", fontcolor = blue ];
+  150 -> 160 [ label = ";" ];
+  110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
+  120 -> 130 [ label = "}" ];
 
   010 -> 020 [ label = "enum" ];
   010 -> 030 [ label = "enum" ];
@@ -60,13 +69,4 @@ digraph "slots-fsm" {
   050 -> 055 [ label = ";" ];
   060 -> 070 [ label = "<enum-body-in>", fontcolor = blue ];
   070 -> 080 [ label = "}" ];
-
-  010 -> 100 [ label = "struct\nunion" ];
-  010 -> 110 [ label = "{" ];
-  100 -> 110 [ label = "{" ];
-  100 -> 105 [ label = ";" ];
-  100 -> 150 [ label = "<fq-type>", fontcolor = blue ];
-  150 -> 160 [ label = ";" ];
-  110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
-  120 -> 130 [ label = "}" ];
 }
