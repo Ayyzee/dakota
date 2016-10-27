@@ -31,6 +31,8 @@
 
 digraph "slots-fsm" {
   graph [ rankdir = LR, label = "\G", fontcolor = red ];
+  //graph [ page = "8.5,11" ];
+  graph [ size = "7.5,10" ];
   edge [ fontsize = 16, fontname = "courier-bold", color = grey ];
   node [ shape = circle, fontsize = 12, width = 0.3, fixedsize = true ];
   node [ label = "", width = 0.1 ];
