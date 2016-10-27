@@ -15,12 +15,14 @@
 // slots enum             ;
 // slots enum          <> ;
 // slots enum             { ... }
+//
 // slots enum        : <> ;
 // slots enum        : <> { ... }
 
 // slots enum struct      ;
 // slots enum struct   <> ;
 // slots enum struct      { ... }
+//
 // slots enum struct : <> ;
 // slots enum struct : <> { ... }
 
@@ -29,7 +31,7 @@
 
 digraph "slots-fsm" {
   graph [ rankdir = LR, label = "\G", fontcolor = red ];
-  edge [ fontname = "courier" ];
+  edge [ fontsize = 16, fontname = "courier-bold", color = grey ];
   node [ shape = circle, fontsize = 12, width = 0.3, fixedsize = true ];
   node [ label = "", width = 0.1 ];
 
@@ -59,8 +61,7 @@ digraph "slots-fsm" {
   060 -> 070 [ label = "<enum-body-in>", fontcolor = blue ];
   070 -> 080 [ label = "}" ];
 
-  010 -> 100 [ label = "union" ];
-  010 -> 100 [ label = "struct" ];
+  010 -> 100 [ label = "struct\nunion" ];
   010 -> 110 [ label = "{" ];
   100 -> 110 [ label = "{" ];
   100 -> 105 [ label = ";" ];
