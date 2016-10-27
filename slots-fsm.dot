@@ -1,22 +1,31 @@
 // -*- mode: c++ -*-
 
-// slots <fq-type> ;
+// slots                  ;
+// slots               <> ;
+// slots                  { ... }
 
-// slots        ;
-// slots        { ... }
-// slots struct ;
-// slots struct { ... }
-// slots union  ;
-// slots union  { ... }
+// slots struct           ;
+// slots struct        <> ;
+// slots struct           { ... }
 
-// slots enum                    ;
-// slots enum                    { ... }
-// slots enum        : <fq-type> ;
-// slots enum        : <fq-type> { ... }
-// slots enum struct             ;
-// slots enum struct             { ... }
-// slots enum struct : <fq-type> ;
-// slots enum struct : <fq-type> { ... }
+// slots union            ;
+// slots union         <> ;
+// slots union            { ... }
+
+// slots enum             ;
+// slots enum          <> ;
+// slots enum             { ... }
+// slots enum        : <> ;
+// slots enum        : <> { ... }
+
+// slots enum struct      ;
+// slots enum struct   <> ;
+// slots enum struct      { ... }
+// slots enum struct : <> ;
+// slots enum struct : <> { ... }
+
+// slots <array-type>     ;
+// slots <func-ptr-type>  ;
 
 digraph "slots-fsm" {
   graph [ rankdir = LR, label = "\G", fontcolor = red ];
@@ -33,7 +42,7 @@ digraph "slots-fsm" {
   020 -> 025 [ label = ";" ];
   030 -> 040 [ label = ":" ];
   030 -> 035 [ label = ";" ];
-  040 -> 050 [ label = "<fq-type>", fontcolor = blue ];
+  040 -> 050 [ label = "<fq-int-type>", fontcolor = blue ];
   050 -> 060 [ label = "{" ];
   050 -> 055 [ label = ";" ];
   060 -> 070 [ label = "<enum-body-in>", fontcolor = blue ];
@@ -48,21 +57,23 @@ digraph "slots-fsm" {
   120 -> 130 [ label = "}" ];
 
   010 -> 140 [ label = "<fq-type>", fontcolor = blue ];
+  010 -> 140 [ label = "<array-type>", fontcolor = blue ];
+  010 -> 140 [ label = "<func-ptr-type>", fontcolor = blue ];
   140 -> 145 [ label = ";" ];
 
-  subgraph {
-    graph [ rank = same ];
-    050;
-    100;
-    140;
-  }
-  subgraph {
-    graph [ rank = same ];
-    015;
-    025;
-    035;
-    055;
-    105;
-    145;
-  }
+//   subgraph {
+//     graph [ rank = same ];
+//     050;
+//     100;
+//     140;
+//   }
+//   subgraph {
+//     graph [ rank = same ];
+//     015;
+//     025;
+//     035;
+//     055;
+//     105;
+//     145;
+//   }
 }
