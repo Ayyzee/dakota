@@ -17,17 +17,8 @@
 // slots union               ;        =>  union       slots-t                     ;
 // slots union               { ... }  =>  union       slots-t                     { ... }
 
-// slots enum                ;        =>  enum        slots-t             : int-t ;
-// slots enum                { ... }  =>  enum        slots-t             : int-t { ... }
-//
-// slots enum           : <> ;        =>  enum        slots-t             : <>    ;
-// slots enum           : <> { ... }  =>  enum        slots-t             : <>    { ... }
-
-// slots enum struct         ;        =>  enum struct slots-t                     ;
-// slots enum struct         { ... }  =>  enum struct slots-t                     { ... }
-//
-// slots enum struct    : <> ;        =>  enum struct slots-t             : <>    ;
-// slots enum struct    : <> { ... }  =>  enum struct slots-t             : <>    { ... }
+// slots enum                ;        =>  enum struct slots-t                     ;
+// slots enum                { ... }  =>  enum struct slots-t                     { ... }
 
 digraph "slots-fsm" {
   graph [ rankdir = LR, label = "\G", fontcolor = red ];
@@ -56,18 +47,11 @@ digraph "slots-fsm" {
   110 -> 120 [ label = "<struct-union-body-in>", fontcolor = blue ];
   120 -> 130 [ label = "}" ];
 
-  010 -> 031 [ label = "enum" ];
-  031 -> 170 [ label = "<fq-type>", fontcolor = blue ];
+  010 -> 030 [ label = "enum" ];
+  030 -> 170 [ label = "<fq-type>", fontcolor = blue ];
   170 -> 180 [ label = ";" ];
   030 -> 035 [ label = ";" ];
-  010 -> 020 [ label = "enum" ];
-  010 -> 030 [ label = "enum" ];
-  020 -> 030 [ label = "struct" ];
-  030 -> 040 [ label = ":" ];
   030 -> 060 [ label = "{" ];
-  040 -> 050 [ label = "<fq-int-type>", fontcolor = blue ];
-  050 -> 060 [ label = "{" ];
-  050 -> 055 [ label = ";" ];
   060 -> 070 [ label = "<enum-body-in>", fontcolor = blue ];
   070 -> 080 [ label = "}" ];
 }
