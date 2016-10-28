@@ -19,7 +19,7 @@
 module dakota;
 
 klass features {
-  slots enum : int64-t {
+  slots enum {
     k-none =             0,
     k-indent =           1 << 0,
     k-leading-newline =  1 << 1,
