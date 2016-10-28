@@ -769,25 +769,34 @@ sub errdump {
   my ($ref) = @_;
   print STDERR Dumper $ref;
 }
-# slots <array-type>    ;
-# slots <func-ptr-type> ;
+# slots <array-type>        ;        =>  typealias   slots-t = <array-type>      ;
+# slots <func-ptr-type>     ;        =>  typealias   slots-t = <func-ptr-type>   ;
 
-# slots         <>      ;
-# slots struct  <>      ;
-# slots union   <>      ;
-# slots enum    <>      ;
+# slots             <>      ;        =>  typealias   slots-t =        <>         ;
+# slots struct      <>      ;        =>  typealias   slots-t = struct <>         ;
+# slots union       <>      ;        =>  typealias   slots-t = union  <>         ;
+# slots enum        <>      ;        =>  typealias   slots-t = enum   <>         ;
 
-# slots                 ;
-# slots                 { ... }
+# slots                     ;        =>  struct      slots-t                     ;
+# slots                     { ... }  =>  struct      slots-t                     { ... }
 
-# slots struct          ;
-# slots struct          { ... }
+# slots struct              ;        =>  struct      slots-t                     ;
+# slots struct              { ... }  =>  struct      slots-t                     { ... }
 
-# slots union           ;
-# slots union           { ... }
+# slots union               ;        =>  union       slots-t                     ;
+# slots union               { ... }  =>  union       slots-t                     { ... }
 
-# slots enum            ;
-# slots enum            { ... }
+# slots enum                ;        =>  enum        slots-t             : int-t ;
+# slots enum                { ... }  =>  enum        slots-t             : int-t { ... }
+#
+# slots enum           : <> ;        =>  enum        slots-t             : <>    ;
+# slots enum           : <> { ... }  =>  enum        slots-t             : <>    { ... }
+
+# slots enum struct         ;        =>  enum struct slots-t                     ;
+# slots enum struct         { ... }  =>  enum struct slots-t                     { ... }
+#
+# slots enum struct    : <> ;        =>  enum struct slots-t             : <>    ;
+# slots enum struct    : <> { ... }  =>  enum struct slots-t             : <>    { ... }
 sub slots {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'slots');
