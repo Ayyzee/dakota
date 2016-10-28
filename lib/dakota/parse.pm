@@ -769,6 +769,25 @@ sub errdump {
   my ($ref) = @_;
   print STDERR Dumper $ref;
 }
+# slots <array-type>    ;
+# slots <func-ptr-type> ;
+
+# slots         <>      ;
+# slots struct  <>      ;
+# slots union   <>      ;
+# slots enum    <>      ;
+
+# slots                 ;
+# slots                 { ... }
+
+# slots struct          ;
+# slots struct          { ... }
+
+# slots union           ;
+# slots union           { ... }
+
+# slots enum            ;
+# slots enum            { ... }
 sub slots {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'slots');
