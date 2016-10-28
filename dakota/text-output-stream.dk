@@ -28,13 +28,6 @@ klass features {
     k-trailing-ws =      1 << 4
   }
 }
-using features::k-none;
-using features::k-indent;
-using features::k-leading-newline;
-using features::k-trailing-newline;
-using features::k-leading-ws;
-using features::k-trailing-ws;
-
 klass text-output-stream {
   superklass object-output-stream;
   klass      klass;
@@ -61,7 +54,7 @@ klass text-output-stream {
     if (column-width > scountof(ws))
       column-width = scountof(ws);
     self.column-width = column-width;
-    self.previous-features = k-trailing-newline;
+    self.previous-features = features-t::k-trailing-newline;
     return self;
   }
   method column-incr(object-t self) -> object-t {
@@ -74,27 +67,27 @@ klass text-output-stream {
     return self;
   }
   method write(object-t self, str-t string, features-t features) -> object-t {
-    assert(!((features & k-indent) &&
-             (features & k-leading-ws)));
+    assert(!((features & features-t::k-indent) &&
+             (features & features-t::k-leading-ws)));
 
-    if (0 != (features & k-indent))
+    if (0 != (features & features-t::k-indent))
       for (int64-t i = 0; i < self.column; i++)
         $write(self, ws[self.column-width]);
 
-    if (0 != (features & k-leading-ws))
-      if (0 == (self.previous-features & k-trailing-newline))
+    if (0 != (features & features-t::k-leading-ws))
+      if (0 == (self.previous-features & features-t::k-trailing-newline))
         $write(self, " ");
 
-    if (0 != (features & k-leading-newline))
-      if (0 == (self.previous-features & k-trailing-newline))
+    if (0 != (features & features-t::k-leading-newline))
+      if (0 == (self.previous-features & features-t::k-trailing-newline))
         $write(self, "\n");
 
     $write(self, string);
 
-    if (0 != (features & k-trailing-ws))
+    if (0 != (features & features-t::k-trailing-ws))
       $write(self, " ");
 
-    if (0 != (features & k-trailing-newline))
+    if (0 != (features & features-t::k-trailing-newline))
       $write(self, "\n");
 
     self.previous-features = features;
