@@ -115,9 +115,6 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
 
 [[noreturn]] func pre-runtime-verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
-  str-t src-file = current-exception-src-file;
-  int-t src-line = current-exception-src-line;
-
   str-t current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr);
   dkt-log(dkt::k-log-error, "uncaught/unexpected exception");
 
@@ -126,8 +123,8 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
             ": \"src-file\": \"%s\""
             ", \"src-line\": %i"
             ", \"exception-str\": \"%s\"" "\n",
-            src-file,
-            src-line,
+            current-exception-src-file,
+            current-exception-src-line,
             current-exception-str);
   else
     fprintf(stderr, "\n");
@@ -138,12 +135,10 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
 }
 [[noreturn]] func verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
-  str-t src-file = current-exception-src-file;
-  int-t src-line = current-exception-src-line;
-
   str-t    current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr);
   object-t current-exception =     dkt-capture-current-exception(cast(object-t)nullptr);
-  $set-src(current-exception, src-file, src-line);
+  if (nullptr != current-exception)
+    $set-src(current-exception, current-exception-src-file, current-exception-src-line);
 
   if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
@@ -165,8 +160,8 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
                   ", \"src-file\": \"%s\""
                   ", \"src-line\": %i"
                   ", \"exception-str\": \"%s\"",
-                  src-file,
-                  src-line,
+                  current-exception-src-file,
+                  current-exception-src-line,
                   current-exception-str);
   else
     $print(std-error, "");
