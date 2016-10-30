@@ -35,9 +35,9 @@ static THREAD-LOCAL int-t current-exception-src-line;
 func dkt-capture-current-exception(object-t arg,
                                    str-t    src-file,
                                    int-t    src-line) -> object-t {
+  static THREAD_LOCAL object-t result;
   current-exception-src-file = src-file;
   current-exception-src-line = src-line;
-  static THREAD_LOCAL object-t result;
   if (nullptr != arg)
     result = arg;
   return result;
@@ -45,9 +45,9 @@ func dkt-capture-current-exception(object-t arg,
 func dkt-capture-current-exception(str-t arg,
                                    str-t src-file,
                                    int-t src-line) -> str-t {
+  static THREAD_LOCAL str-t result;
   current-exception-src-file = src-file;
   current-exception-src-line = src-line;
-  static THREAD_LOCAL str-t result;
   if (nullptr != arg)
     result = arg;
   return result;
