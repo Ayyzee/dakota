@@ -32,7 +32,11 @@ klass system-exception;
 static THREAD-LOCAL str-t current-exception-src-file;
 static THREAD-LOCAL int-t current-exception-src-line;
 
-func dkt-capture-current-exception(object-t arg) -> object-t {
+func dkt-capture-current-exception(object-t arg,
+                                   str-t    src-file,
+                                   int-t    src-line) -> object-t {
+  current-exception-src-file = src-file;
+  current-exception-src-line = src-line;
   static THREAD_LOCAL object-t result;
   if (nullptr != arg)
     result = arg;
@@ -114,7 +118,7 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
   str-t src-file = current-exception-src-file;
   int-t src-line = current-exception-src-line;
 
-  str-t current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, 0);
+  str-t current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr);
   dkt-log(dkt::k-log-error, "uncaught/unexpected exception");
 
   if (nullptr != current-exception-str)
@@ -137,8 +141,9 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
   str-t src-file = current-exception-src-file;
   int-t src-line = current-exception-src-line;
 
-  str-t    current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr, nullptr, 0);
+  str-t    current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr);
   object-t current-exception =     dkt-capture-current-exception(cast(object-t)nullptr);
+  $set-src(current-exception, src-file, src-line);
 
   if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     if (nullptr != current-exception)
@@ -191,12 +196,19 @@ klass exception {
   }
   method init(object-t self,
               str-t    src-file : nullptr,
-              int-t    src-line : -1,
+              int-t    src-line : 0,
               str-t    msg : name-of(klass-of(self))) -> object-t {
     self = $init(super);
     self.src-file = src-file;
     self.src-line = src-line;
     self.msg = msg;
+    return self;
+  }
+  method set-src(object-t self, str-t src-file, int-t src-line) -> object-t {
+    if (nullptr != src-file && 0 < src-line) {
+      self.src-file = src-file;
+      self.src-line = src-line;
+    }
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
