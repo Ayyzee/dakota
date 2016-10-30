@@ -110,29 +110,9 @@ func getprogname() -> str-t {
   va-end(args);
   return result;
 }
-static /*THREAD-LOCAL*/ std::terminate-handler original-terminate =  std::set-terminate(pre-runtime-verbose-terminate);
-static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-unexpected(pre-runtime-verbose-unexpected);
+static /*THREAD-LOCAL*/ std::terminate-handler original-terminate =  std::set-terminate(verbose-terminate);
+static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-unexpected(verbose-unexpected);
 
-[[noreturn]] func pre-runtime-verbose-terminate() noexcept -> void {
-//   dkt-log(dkt::k-log-info, "%s()", __func__);
-  str-t current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr);
-  dkt-log(dkt::k-log-error, "uncaught/unexpected exception");
-
-  if (nullptr != current-exception-str)
-    fprintf(stderr,
-            ": \"src-file\": \"%s\""
-            ", \"src-line\": %i"
-            ", \"exception-str\": \"%s\"" "\n",
-            current-exception-src-file,
-            current-exception-src-line,
-            current-exception-str);
-  else
-    fprintf(stderr, "\n");
-
-  if (nullptr != original-terminate)
-    original-terminate();
-  std::abort(); // should never get called
-}
 [[noreturn]] func verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
   str-t    current-exception-str = dkt-capture-current-exception(cast(str-t)nullptr);
@@ -170,11 +150,6 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
   if (nullptr != original-terminate)
     original-terminate();
   std::abort(); // should never get called
-}
-[[noreturn]] func pre-runtime-verbose-unexpected() noexcept -> void {
-//   dkt-log(dkt::k-log-info, "%s()", __func__);
-
-  pre-runtime-verbose-terminate();
 }
 [[noreturn]] func verbose-unexpected() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
