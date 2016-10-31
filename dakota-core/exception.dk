@@ -110,36 +110,37 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
     $dump(current-exception);
 
   $print-format(std-error,
-                "{ \"program-name\": \"%s\""
-                ", \"process-id\": %i"
-                ", \"root-msg\": \"%s\"",
-                getprogname(),
-                getpid(),
-                "uncaught/unexpected exception");
+                "{ \"uncaught/unexpected exception\": ");
   $print(current-exception, std-error);
-  $println(std-error, " }");
+  $println(std-error, "}");
   original-terminate();
   std::abort(); // should never get called
 }
-[[noreturn]] static func verbose-terminate-other(str-t mangled-type-name, str-t desc) noexcept -> void {
+[[noreturn]] static func verbose-terminate-other(str-t mangled-type-name, str-t msg) noexcept -> void {
   str-t type-name = dkt::demangle(mangled-type-name);
   if (!type-name)
     type-name = mangled-type-name;
   fprintf(stderr,
+          "{ \"uncaught/unexpected exception\": "
           "{ \"program-name\": \"%s\""
-          ", \"process-id\": %i"
-          ", \"root-msg\": \"%s\""
-          ", \"src-file\": \"%s\""
-          ", \"src-line\": \"%i\""
-          ", \"type\": \"%s\""
-          ", \"msg\": \"%s\" }\n",
+          ", \"process-id\": %i",
           getprogname(),
-          getpid(),
-          "uncaught/unexpected exception",
-          dkt-throw-src.file,
-          dkt-throw-src.line,
-          type-name,
-          desc);
+          getpid());
+  if (dkt-throw-src.file)
+    fprintf(stderr,
+            ", \"src-file\": \"%s\""
+            ", \"src-line\": %i",
+            dkt-throw-src.file,
+            dkt-throw-src.line);
+  fprintf(stderr,
+          ", \"type\": \"%s\"",
+          type-name);
+  if (msg)
+    fprintf(stderr,
+            ", \"msg\": \"%s\"",
+            msg);
+  fprintf(stderr,
+          " }}\n");
   if (type-name != mangled-type-name)
     dkt::demangle-free(type-name);
   original-terminate();
@@ -157,7 +158,7 @@ static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-un
   } catch(const char* e) {
     verbose-terminate-other(typeid(e).name(), e);
   } catch (...) {
-    verbose-terminate-other("???", "???");
+    verbose-terminate-other("???", nullptr);
   }
 }
 [[noreturn]] static func verbose-unexpected() noexcept -> void {
@@ -176,7 +177,7 @@ klass exception {
   method init(object-t self,
               str-t    src-file : nullptr,
               int-t    src-line : 0,
-              str-t    msg : name-of(klass-of(self))) -> object-t {
+              str-t    msg : nullptr) -> object-t {
     self = $init(super);
     self.src-file = src-file;
     self.src-line = src-line;
@@ -193,16 +194,24 @@ klass exception {
   method print(object-t self, object-t out) -> object-t {
     if (nullptr == out || null == out)
       out = std-error;
+    $print-format(out,
+                  "{ \"program-name\": \"%s\""
+                  ", \"process-id\": %i",
+                  getprogname(),
+                  getpid());
     if (self.src-file)
       $print-format(out,
                     ", \"src-file\": \"%s\""
-                    ", \"src-line\": %i"
-                    ", \"msg\": \"%s\"",
+                    ", \"src-line\": %i",
                     self.src-file,
-                    self.src-line,
-                    self.msg);
+                    self.src-line);
+    $print-format(out,
+                  ", \"type\": \"%s\"",
+                  name-of(klass-of(self)));
+    if (self.msg)
+      $print-format(out, ", \"msg\": \"%s\" }", self.msg);
     else
-      $print-format(out, ", \"msg\": \"%s\"", self.msg);
+      $print-format(out, " }");
     return self;
   }
 }
