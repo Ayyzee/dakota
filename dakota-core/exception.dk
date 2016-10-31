@@ -102,70 +102,6 @@ func getprogname() -> str-t {
 static /*THREAD-LOCAL*/ std::terminate-handler original-terminate =  std::set-terminate(verbose-terminate);
 static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-unexpected(verbose-unexpected);
 
-[[noreturn]] static func verbose-terminate-object(object-t current-exception) noexcept -> void {
-  if (1)
-    $set-src(current-exception, dkt-throw-src.file, dkt-throw-src.line);
-
-  if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
-    $dump(current-exception);
-
-  $print-format(std-error,
-                "{ \"uncaught/unexpected exception\": ");
-  $print(current-exception, std-error);
-  $println(std-error, "}");
-  original-terminate();
-  std::abort(); // should never get called
-}
-[[noreturn]] static func verbose-terminate-other(str-t mangled-type-name, str-t msg) noexcept -> void {
-  str-t type-name = dkt::demangle(mangled-type-name);
-  if (!type-name)
-    type-name = mangled-type-name;
-  fprintf(stderr,
-          "{ \"uncaught/unexpected exception\": "
-          "{ \"program-name\": \"%s\""
-          ", \"process-id\": %i",
-          getprogname(),
-          getpid());
-  if (dkt-throw-src.file)
-    fprintf(stderr,
-            ", \"src-file\": \"%s\""
-            ", \"src-line\": %i",
-            dkt-throw-src.file,
-            dkt-throw-src.line);
-  fprintf(stderr,
-          ", \"type\": \"%s\"",
-          type-name);
-  if (msg)
-    fprintf(stderr,
-            ", \"msg\": \"%s\"",
-            msg);
-  fprintf(stderr,
-          " }}\n");
-  if (type-name != mangled-type-name)
-    dkt::demangle-free(type-name);
-  original-terminate();
-  std::abort(); // should never get called
-}
-[[noreturn]] static func verbose-terminate() noexcept -> void {
-//   dkt-log(dkt::k-log-info, "%s()", __func__);
-  std::exception-ptr eptr = std::current-exception();
-  try {
-    std::rethrow-exception(eptr);
-  } catch(object-t e) {
-    verbose-terminate-object(e);
-  } catch(const std::exception& e) {
-    verbose-terminate-other(typeid(e).name(), e.what());
-  } catch(const char* e) {
-    verbose-terminate-other(typeid(e).name(), e);
-  } catch (...) {
-    verbose-terminate-other("???", nullptr);
-  }
-}
-[[noreturn]] static func verbose-unexpected() noexcept -> void {
-//   dkt-log(dkt::k-log-info, "%s()", __func__);
-
-  verbose-terminate();
-}
 klass exception {
   superklass object;
 
@@ -209,9 +145,72 @@ klass exception {
                   ", \"type\": \"%s\"",
                   name-of(klass-of(self)));
     if (self.msg)
-      $print-format(out, ", \"msg\": \"%s\" }", self.msg);
-    else
-      $print-format(out, " }");
+      $print-format(out,
+                    ", \"msg\": \"%s\"",
+                    self.msg);
+    $print-format(out, " }");
     return self;
   }
+}
+[[noreturn]] static func verbose-terminate-other(str-t mangled-type-name, str-t msg) noexcept -> void {
+  str-t type-name = dkt::demangle(mangled-type-name);
+  if (!type-name)
+    type-name = mangled-type-name;
+  fprintf(stderr,
+          "{ \"uncaught/unexpected exception\": "
+          "{ \"program-name\": \"%s\""
+          ", \"process-id\": %i",
+          getprogname(),
+          getpid());
+  if (dkt-throw-src.file)
+    fprintf(stderr,
+            ", \"src-file\": \"%s\""
+            ", \"src-line\": %i",
+            dkt-throw-src.file,
+            dkt-throw-src.line);
+  fprintf(stderr,
+          ", \"type\": \"%s\"",
+          type-name);
+  if (msg)
+    fprintf(stderr,
+            ", \"msg\": \"%s\"",
+            msg);
+  fprintf(stderr, " }}\n");
+
+  if (type-name && (type-name != mangled-type-name))
+    dkt::demangle-free(type-name);
+  original-terminate();
+  std::abort(); // should never get called
+}
+[[noreturn]] static func verbose-terminate-object(object-t current-exception) noexcept -> void {
+  if (1)
+    $set-src(current-exception, dkt-throw-src.file, dkt-throw-src.line);
+  if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
+    $dump(current-exception);
+  $print-format(std-error,
+                "{ \"uncaught/unexpected exception\": ");
+  $print(current-exception, std-error);
+  $println(std-error, "}");
+  original-terminate();
+  std::abort(); // should never get called
+}
+[[noreturn]] static func verbose-terminate() noexcept -> void {
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
+  std::exception-ptr eptr = std::current-exception();
+  try {
+    std::rethrow-exception(eptr);
+  } catch(object-t e) {
+    verbose-terminate-object(e);
+  } catch(const std::exception& e) {
+    verbose-terminate-other(typeid(e).name(), e.what());
+  } catch(const char* e) {
+    verbose-terminate-other(typeid(e).name(), e);
+  } catch (...) {
+    verbose-terminate-other("???", nullptr);
+  }
+}
+[[noreturn]] static func verbose-unexpected() noexcept -> void {
+//   dkt-log(dkt::k-log-info, "%s()", __func__);
+
+  verbose-terminate();
 }
