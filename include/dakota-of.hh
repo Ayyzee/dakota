@@ -26,6 +26,10 @@
   # define DKT_UNBOX_CHECK(object, kls) dkt_unbox_check(object, kls)
 # endif
 
+# define THROW throw
+
+extern THREAD_LOCAL throw_src_t dkt_throw_src [[so_export]];
+
 KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
   return arg;
 }}

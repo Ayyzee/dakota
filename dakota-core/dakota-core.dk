@@ -225,6 +225,8 @@ export dakota-core {
   symbol;
   system-exception;
   table;
+  throw-src::slots-t;
+  throw-src;
   uchar8::slots-t;
   uchar8;
   uint-fast16::max;

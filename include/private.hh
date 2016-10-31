@@ -60,11 +60,6 @@ KLASS_NS klass {
 KLASS_NS bit_vector {
   METHOD set_bit(object_t, ssize_t, boole_t) -> object_t;
 }
-[[noreturn]] FUNC verbose_terminate()  noexcept -> void;
-[[noreturn]] FUNC verbose_unexpected() noexcept -> void;
-[[noreturn]] FUNC pre_runtime_verbose_terminate() noexcept -> void;
-[[noreturn]] FUNC pre_runtime_verbose_unexpected() noexcept -> void;
-
 inline FUNC root_superklassqq(object_t object) -> boole_t {
   if (nullptr == object || null == object)
     return true;

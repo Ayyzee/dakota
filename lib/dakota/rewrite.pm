@@ -399,31 +399,8 @@ sub arglist_members {
 }
 sub rewrite_throws {
   my ($filestr_ref) = @_;
-  # throw "..."
-  # throw #foo
-  # throw #|foo bar|
-  # throw #"..." ;
-  # throw #[...] ;
-  # throw #{...} ;
-  # throw #(...) ;
-  # throw #<...> followed by [|{|( ... )|}|]
-  # throw box(...) ;
-  # throw foo::box(...) ;
-  # throw make(...) ;
-  # throw klass ;
-  # throw self ;
-  # throw ;  =>  dkt-capture-current-exception(_e_) ; throw ;
-
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*);/$1RETHROW$2;/gsx;
-
-  # dont want to rewrite #define THROW throw
-  # in parens
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)\(($main::list_in)\)/       $1throw$2 $3/gsx;
-  # not in parens
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s+)(make\s*\($main::list_in\))/$1throw$2dkt-capture-current-exception($3, __FILE__, __LINE__)/gsx;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*)(".*?")/                    $1throw$2dkt-capture-current-exception($3, __FILE__, __LINE__)/gsx;
-
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)RETHROW(\s*);/$1throw$2;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw((\s|\().+?);/$1\{ dkt-throw-src = \{ __FILE__, __LINE__ \}; THROW$2; \}/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)throw(\s*);       /$1\{ dkt-throw-src = \{ __FILE__, __LINE__ \}; THROW$2; \}/gsx;
 }
 sub rewrite_slots_typealias {
   my ($ws1, $ws2, $tkns, $ws3) = @_;
