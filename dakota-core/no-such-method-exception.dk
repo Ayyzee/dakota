@@ -29,7 +29,7 @@ klass no-such-method-exception {
   }
   method init(object-t     self,
               str-t        src-file : nullptr,
-              int-t        src-line : -1,
+              int-t        src-line : 0,
               object-t     object : nullptr,
               super-t      context : { nullptr, nullptr },
               signature-t* signature : nullptr) -> object-t {

@@ -131,7 +131,7 @@ klass exception {
     if (nullptr == out || null == out)
       out = std-error;
     $print-format(out,
-                  "{ \"program-name\": \"%s\""
+                  " \"program-name\": \"%s\""
                   ", \"process-id\": %i",
                   getprogname(),
                   getpid());
@@ -148,7 +148,6 @@ klass exception {
       $print-format(out,
                     ", \"msg\": \"%s\"",
                     self.msg);
-    $print-format(out, " }");
     return self;
   }
 }
@@ -157,8 +156,8 @@ klass exception {
   if (!type-name)
     type-name = mangled-type-name;
   fprintf(stderr,
-          "{ \"uncaught/unexpected exception\": "
-          "{ \"program-name\": \"%s\""
+          "{ \"uncaught/unexpected exception\": {"
+          " \"program-name\": \"%s\""
           ", \"process-id\": %i",
           getprogname(),
           getpid());
@@ -188,9 +187,9 @@ klass exception {
   if (nullptr != (getenv("DKT_DUMP_UNHANDLED_EXCEPTION")))
     $dump(current-exception);
   $print-format(std-error,
-                "{ \"uncaught/unexpected exception\": ");
+                "{ \"uncaught/unexpected exception\": {");
   $print(current-exception, std-error);
-  $println(std-error, "}");
+  $println(std-error, " }}");
   original-terminate();
   std::abort(); // should never get called
 }
