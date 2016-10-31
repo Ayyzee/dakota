@@ -70,10 +70,12 @@
   # define so_export gnu::visibility("default")
 # endif
 
+# define _dkt_typeinfo_ so_export
+
 # if 0
-  # define dkt_enable_typeinfo [[so_export]]
+  # define dkt_typeinfo _dkt_typeinfo_
 # else
-  # define dkt_enable_typeinfo
+  # define dkt_typeinfo
 # endif
 
 typealias boole_t = bool;
@@ -99,6 +101,7 @@ namespace std { typealias float64_t =       double; }
 namespace std { typealias float128_t = long double; }
 
 // symbols are defined before klasses
+namespace object       { struct [[_dkt_typeinfo_]] slots_t; }
 namespace object       { typealias slots_t = struct slots_t;                 } typealias object_t =       object::slots_t*;
 namespace cmp          { typealias slots_t = int_t;                          } typealias cmp_t =          cmp::slots_t;
 namespace compare      { typealias slots_t = FUNC (*)(object_t, object_t) -> cmp_t; } typealias compare_t = compare::slots_t;
