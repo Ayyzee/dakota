@@ -18,6 +18,7 @@
 # include <cstdio>
 # include <cstdlib>
 # include <cstring>
+# include <string>
 # include <exception>
 # include <unistd.h> // getpid()
 
@@ -195,21 +196,14 @@ klass exception {
 }
 [[noreturn]] static func verbose-terminate() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
-  std::exception-ptr eptr = std::current-exception();
-  try {
-    std::rethrow-exception(eptr);
-  } catch(object-t e) {
-    verbose-terminate-object(e);
-  } catch(const std::exception& e) {
-    verbose-terminate-other(typeid(e).name(), e.what());
-  } catch(const char* e) {
-    verbose-terminate-other(typeid(e).name(), e);
-  } catch (...) {
-    verbose-terminate-other("???", nullptr);
-  }
+  try { std::rethrow-exception(std::current-exception()); }
+  catch (const object-t        e) { verbose-terminate-object(e); }
+  catch (const std::exception& e) { verbose-terminate-other(typeid(e).name(), e.what());  }
+  catch (const std::string&    e) { verbose-terminate-other(typeid(e).name(), e.c-str()); }
+  catch (const char*           e) { verbose-terminate-other(typeid(e).name(), e);         }
+  catch (...)                     { verbose-terminate-other("???", nullptr); }
 }
 [[noreturn]] static func verbose-unexpected() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
-
   verbose-terminate();
 }
