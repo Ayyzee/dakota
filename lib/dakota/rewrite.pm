@@ -411,6 +411,8 @@ sub rewrite_slots {
   #$$filestr_ref =~ s{(import|export|noexport)(\s+)(slots\s+)}{/*$1*/$2$3}g;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(            \s*$main::block)/$1$3$2\[\[dkt-typeinfo\]\] slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(struct|union)(\s*);                       /$1$3$2\[\[dkt-typeinfo\]\] slots-t$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(type-enum)   (\s*:\s*$rtid\s*$main::block)/$1 enum struct$2\[\[dkt-typeinfo\]\] slots-t$4;/gsx;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(type-enum)   (\s*:\s*$rtid\s*);           /$1 enum struct$2\[\[dkt-typeinfo\]\] slots-t$4;/gsx; # forward decl
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$rtid\s*$main::block)/$1$3$2\[\[dkt-typeinfo\]\] slots-t$4;/gsx;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(enum)        (\s*:\s*$rtid\s*);           /$1$3$2\[\[dkt-typeinfo\]\] slots-t$4;/gsx; # forward decl
  #$$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)func(\s|\()/$1slots$2$3/gsx; # lose 'func' when preceeded by 'slots'
@@ -764,7 +766,7 @@ sub add_implied_slots_struct {
 sub remove_exported_slots {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s=(\[\[export\]\])(\s+slots\s+)=/*$1*/$2=gs;
-  $$filestr_ref =~ s=(slots)(\s+)(struct|union|enum)(\s*)([^;]*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5, $6)=gse;
+  $$filestr_ref =~ s=(slots)(\s+)(struct|union|type-enum|enum)(\s*)([^;]*?)(\{.*?\})=&exported_slots_body($1, $2, $3, $4, $5, $6)=gse;
 }
 sub exported_enum_body {
   my ($a, $b, $c, $d, $e) = @_;

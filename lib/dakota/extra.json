@@ -133,6 +133,7 @@
     '#trait' => undef,
     '#traits' => undef,
     '#type' => undef,
+    '#type-enum' => undef,
     '#typeid' => undef,
     '#uchar8-t' => undef, # hardcode typealias
     '#uint-t' => undef,  # hardcode typealias

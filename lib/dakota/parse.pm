@@ -792,11 +792,14 @@ sub errdump {
 # slots enum           : <> ;        =>  enum        slots-t             : <>    ;
 # slots enum           : <> { ... }  =>  enum        slots-t             : <>    { ... }
 
-# slots enum struct         ;        =>  enum struct slots-t                     ;
-# slots enum struct         { ... }  =>  enum struct slots-t                     { ... }
+# slots type-enum           ;        =>  enum struct slots-t                     ;
+# slots type-enum           { ... }  =>  enum struct slots-t                     { ... }
 #
-# slots enum struct    : <> ;        =>  enum struct slots-t             : <>    ;
-# slots enum struct    : <> { ... }  =>  enum struct slots-t             : <>    { ... }
+# slots type-enum      : <> ;        =>  enum struct slots-t             : <>    ;
+# slots type-enum      : <> { ... }  =>  enum struct slots-t             : <>    { ... }
+
+my $enum_set = { 'enum'      => 1,
+                 'type-enum' => 1 };
 sub slots {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'slots');
@@ -812,9 +815,13 @@ sub slots {
     my $tkn = &match_any();
     &add_last($type, $tkn);
   }
+  my $aggr_set = { 'struct'    => 1,
+                   'union'     => 1,
+                   'type-enum' => 1,
+                   'enum'      => 1 };
   my $cat = 'struct';
   if (@$type && 3 <= @$type) {
-    if ('enum' eq &first($type)) {
+    if ($$enum_set{&first($type)}) {
       my $enum_base = [splice(@$type, 2, scalar(@$type) - 1)];
       my $tkn =    &remove_last($type);
       die if ':' ne $tkn; # not key/element delim
@@ -824,10 +831,8 @@ sub slots {
     }
   }
   if (@$type && 1 == @$type) {
-    if ('struct' eq &first($type) ||
-        'union' eq  &first($type) ||
-        'enum' eq   &first($type)) {
-      if ('enum' eq &first($type)) {
+    if ($$aggr_set{&first($type)}) {
+      if ($$enum_set{&first($type)}) {
         &add_symbol($gbl_root_ast, 'enum-info');
         &add_symbol($gbl_root_ast, 'const-info');
 
@@ -860,7 +865,7 @@ sub slots {
       my ($open_curley_index, $close_curley_index) = &sst_cursor::balenced($gbl_sst_cursor, $gbl_user_data);
       if ($open_curley_index + 1 != $close_curley_index) {
         my $slots_defs = &sst::token_seq($gbl_sst, $open_curley_index + 1, $close_curley_index - 1);
-        if ('enum' eq $cat) {
+        if ($$enum_set{$cat}) {
           &enum_seq($slots_defs, $$gbl_current_ast_scope{'slots'}{'cat-info'});
         } else {
           &slots_seq($slots_defs, $$gbl_current_ast_scope{'slots'}{'cat-info'});
@@ -912,9 +917,9 @@ sub const {
 }
 sub enum {
   my ($args) = @_;
-  &match(__FILE__, __LINE__, 'enum');
-  if (!exists $$gbl_current_ast_scope{'enum'}) {
-    $$gbl_current_ast_scope{'enum'} = [];
+  my $cat = &match_re(__FILE__, __LINE__, 'type-enum|enum');
+  if (!exists $$gbl_current_ast_scope{$cat}) {
+    $$gbl_current_ast_scope{$cat} = [];
   }
   my $enum = {};
   if ($$args{'exported?'}) {
@@ -932,7 +937,7 @@ sub enum {
   for (&sst_cursor::current_token($gbl_sst_cursor)) {
     if (m/^;$/) {
       &match(__FILE__, __LINE__, ';');
-      &add_last($$gbl_current_ast_scope{'enum'}, $enum);
+      &add_last($$gbl_current_ast_scope{$cat}, $enum);
       return;
     }
     if (m/^\{$/) {
@@ -955,7 +960,7 @@ sub enum {
       &add_klass_decl($gbl_root_ast, 'enum-info');
       &add_klass_decl($gbl_root_ast, 'named-enum-info');
       &add_klass_decl($gbl_root_ast, 'const-info');
-      &add_last($$gbl_current_ast_scope{'enum'}, $enum);
+      &add_last($$gbl_current_ast_scope{$cat}, $enum);
       return;
     }
     &error(__FILE__, __LINE__, $$gbl_sst_cursor{'current-token-index'});
