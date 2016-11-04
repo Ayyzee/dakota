@@ -1837,10 +1837,11 @@ sub generate_enum_decl {
     $$scratch_str_ref .= ' ' . $cat;
   }
   if ($$enum{'enum-base'}) {
-    $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}}) . ';';
-  } else {
-    $$scratch_str_ref .= ' : int-t;';
+    $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}});
+  } elsif ('type-enum' ne $cat) {
+    $$scratch_str_ref .= ' : int-t'; # default enum base
   }
+  $$scratch_str_ref .= ';';
 }
 sub generate_enum_defn {
   my ($col, $enum, $is_exported, $is_slots) = @_;
@@ -1859,8 +1860,8 @@ sub generate_enum_defn {
   }
   if ($$enum{'enum-base'}) {
     $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}});
-  } else {
-    $$scratch_str_ref .= ' : int-t';
+  } elsif ('type-enum' ne $cat) {
+    $$scratch_str_ref .= ' : int-t'; # default enum base
   }
   $$scratch_str_ref .= ' {' . &ann(__FILE__, __LINE__) . $nl;
   my $max_width = 0;
@@ -2404,7 +2405,7 @@ sub generate_slots_decls {
       my $is_exported;
       my $is_slots;
       &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
-      $$scratch_str_ref .= $col . "}";
+      $$scratch_str_ref .= $col . " }";
     } else {
       print STDERR &Dumper($$klass_ast{'slots'});
       die __FILE__, ":", __LINE__, ": error:" . $nl;
@@ -2462,7 +2463,7 @@ sub generate_exported_slots_decls {
       my $is_exported;
       my $is_slots;
       &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);
-      $$scratch_str_ref .= $col . "}";
+      $$scratch_str_ref .= $col . " }";
     } else {
       print STDERR &Dumper($$klass_ast{'slots'});
       die __FILE__, ":", __LINE__, ": error:\n";
