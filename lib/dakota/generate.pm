@@ -537,12 +537,15 @@ sub generate_decl_defn {
                      "  # include \"$generic_func_defns_path\"" . &ann(__FILE__, __LINE__) . $nl .
                      "# endif" . $nl);
   }
-
-  my $is_inline;
   my $str =
     &labeled_src_str($result, "headers-$suffix") .
     &labeled_src_str($result, "symbols-$suffix") .
     &labeled_src_str($result, "klasses-$suffix");
+
+  $str .=
+    &labeled_src_str($result, "keywords-$suffix") .
+    &labeled_src_str($result, "strs-$suffix") .
+    &labeled_src_str($result, "ints-$suffix");
 
   if (&is_decl()) {
     $str .=
@@ -551,9 +554,6 @@ sub generate_decl_defn {
       $nl;
   }
   $str .=
-    &labeled_src_str($result, "keywords-$suffix") .
-    &labeled_src_str($result, "strs-$suffix") .
-    &labeled_src_str($result, "ints-$suffix") .
     &labeled_src_str($result, "klass-funcs-$suffix") .
     &labeled_src_str($result, "generic-funcs-$suffix");
 
@@ -2779,7 +2779,6 @@ sub linkage_unit::generate_klasses {
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots" . '-' . &suffix());
   &linkage_unit::generate_klasses_types_after($ast, $col, $klass_path, $ordered_klass_names);
-  &linkage_unit::generate_type_traits_checks($ast, $col, $klass_path, $ordered_klass_names);
 
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-vars" . '-' . &suffix());
   my $sorted_klass_names = [sort @$ordered_klass_names];
@@ -2787,6 +2786,9 @@ sub linkage_unit::generate_klasses {
   while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_vars($ast, $col, $klass_path, $klass_name, $max_width, &should_ann($ln, $num_lns));
   }
+  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots-type-traits" . '-' . &suffix());
+  &linkage_unit::generate_type_traits_checks($ast, $col, $klass_path, $ordered_klass_names);
+
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs-non-inline" . '-' . &suffix());
   while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs_non_inline($ast, $col, $klass_path, $klass_name, $max_width);
@@ -2844,9 +2846,8 @@ sub linkage_unit::generate_type_traits_checks {
       "# include <type_traits>" . $nl .
       $nl;
 
-    foreach my $klass_name (sort @$ordered_klass_names) {
+    foreach my $klass_name (@$ordered_klass_names) {
       my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
-      my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
 
       if (&has_slots_cat_info($klass_ast)) {
         $$scratch_str_ref .= &static_assert_check_type_traits($col, "$klass_name\::slots-t");
