@@ -14,6 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+include-for <cstddef>     size-t;
+include-for <sys/types.h> ssize-t;
+
+include-for <cstdint>     intptr-t,
+                          uintptr-t;
 module dakota-core;
 
 klass size {
@@ -39,8 +44,9 @@ klass ssize {
     return result;
   }
 }
-
-static-assert(sizeof( size-t) == sizeof(uintptr-t),  "size-t is synonymous with uintptr-t");
-static-assert(sizeof(ssize-t) == sizeof( intptr-t), "ssize-t is synonymous with intptr-t");
+static-assert(sizeof(size-t) == sizeof(uintptr-t),
+              "The types size-t and uintptr-t must be interchangable with respect to their size.");
+static-assert(sizeof(ssize-t) == sizeof(intptr-t),
+              "The types ssize-t and intptr-t must be interchangable with respect to their size.");
 static-assert(sizeof(ssize-t) == sizeof(size-t),
               "The types ssize-t and size-t must be interchangable with respect to their size.");

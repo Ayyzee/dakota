@@ -101,7 +101,6 @@
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)/default-argument-promotions.json',
         '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json',
-        '$(DESTDIR)$(prefix)/lib/dakota/header-from-symbol.json',
         '$(DESTDIR)$(prefix)/lib/dakota/lang-user-data.json',
         '$(DESTDIR)$(prefix)/lib/dakota/used.json',
 
