@@ -143,7 +143,7 @@ klass exception {
                     self.src-file,
                     self.src-line);
     $print-format(out,
-                  ", \"type\": \"%s\"",
+                  ", \"exception-type\": \"%s\"",
                   name-of(klass-of(self)));
     if (self.msg)
       $print-format(out,
@@ -169,7 +169,7 @@ klass exception {
             dkt-throw-src.file,
             dkt-throw-src.line);
   fprintf(stderr,
-          ", \"type\": \"%s\"",
+          ", \"exception-type\": \"%s\"",
           type-name);
   if (msg)
     fprintf(stderr,
@@ -199,9 +199,9 @@ klass exception {
   try { std::rethrow-exception(std::current-exception()); }
   catch (const object-t        e) { verbose-terminate-object(e); }
   catch (const std::exception& e) { verbose-terminate-other(typeid(e).name(), e.what());  }
-  catch (const std::string&    e) { verbose-terminate-other(typeid(e).name(), e.c-str()); }
-  catch (const char*           e) { verbose-terminate-other(typeid(e).name(), e);         }
-  catch (...)                     { verbose-terminate-other("???", nullptr); }
+  catch (const std::string&    e) { verbose-terminate-other("std::string",    e.c-str()); }
+  catch (str-t                 e) { verbose-terminate-other("str-t",          e);         }
+  catch (...)                     { verbose-terminate-other("???",            nullptr); }
 }
 [[noreturn]] static func verbose-unexpected() noexcept -> void {
 //   dkt-log(dkt::k-log-info, "%s()", __func__);
