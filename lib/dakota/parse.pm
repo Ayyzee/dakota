@@ -1056,7 +1056,7 @@ sub include_for {
   }
   my $header_seq = [splice @$seq, 0, $index + 1];
   my $header = &ct($header_seq);
-  my $types_str = "@$seq";
+  my $types_str = &remove_extra_whitespace(join(' ', @$seq));
   $types_str =~ s/\s+/ /g;
   my $types = [split(/ , /, $types_str)];
   my $abbrev_types = [];
