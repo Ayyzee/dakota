@@ -287,7 +287,7 @@ sub encode_strings {
   my $h =  &header_file_regex();
   my $sqstr = &sqstr_regex();
   $$filestr_ref =~ s|($dqstr)|&encode_strings1($1)|eg;
-  $$filestr_ref =~ s|(<$h+>)|&encode_strings1($1)|eg;
+  $$filestr_ref =~ s|(#\s+\w+\s*)(<$h+>)|$1 . &encode_strings1($2)|eg;
   $$filestr_ref =~ s|($sqstr)|&encode_strings1($1)|eg;
 }
 sub decode_comments {
