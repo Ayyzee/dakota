@@ -28,6 +28,7 @@ use strict;
 use warnings;
 use sort 'stable';
 
+my $should_check_type_traits = 1;
 my $should_write_pre_output = 1;
 my $gbl_ann_interval = 30;
 
@@ -1757,6 +1758,8 @@ sub generate_va_make_defn {
 }
 my $enum_set = { 'type-enum' => 1,
                  'enum'      => 1 };
+my $struct_union_set = { 'struct' => 1,
+                         'union'  => 1 };
 ## exists()  (does this key exist)
 ## defined() (is the value (for this key) non-undef)
 sub slots_decl {
@@ -1783,8 +1786,7 @@ sub generate_struct_or_union_decl {
   my $scratch_str_ref = &global_scratch_str_ref();
   my $slots_cat_info = $$slots_ast{'cat-info'};
 
-  if ('struct' eq $$slots_ast{'cat'} ||
-      'union'  eq $$slots_ast{'cat'}) {
+  if ($$struct_union_set{$$slots_ast{'cat'}}) {
     $$scratch_str_ref .= &slots_decl($slots_ast) . '; ';
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
@@ -1795,8 +1797,7 @@ sub generate_struct_or_union_defn {
   my $scratch_str_ref = &global_scratch_str_ref();
   my $slots_cat_info = $$slots_ast{'cat-info'};
 
-  if ('struct' eq $$slots_ast{'cat'} ||
-      'union'  eq $$slots_ast{'cat'}) {
+  if ($$struct_union_set{$$slots_ast{'cat'}}) {
     $$scratch_str_ref .= &slots_decl($slots_ast) . ' {' . &ann(__FILE__, __LINE__) . $nl;
   } else {
     die __FILE__, ":", __LINE__, ": error:\n";
@@ -2397,8 +2398,7 @@ sub generate_slots_decls {
     }
   } elsif (!&should_export_slots($klass_ast) && &has_slots($klass_ast)) {
     my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
-    if ('struct' eq $slots_cat ||
-        'union'  eq $slots_cat) {
+    if ($$struct_union_set{$slots_cat}) {
       $$scratch_str_ref .= $col . "klass $klass_name {" . &slots_decl($$klass_ast{'slots'}) . '; }' . &ann(__FILE__, __LINE__) . $nl;
     } elsif ($$enum_set{$slots_cat}) {
       $$scratch_str_ref .= $col . "klass $klass_name {";
@@ -2433,8 +2433,7 @@ sub generate_exported_slots_decls {
   my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
   my $scratch_str_ref = &global_scratch_str_ref();
   if ('object' eq "$klass_name") {
-    if ('struct' eq $slots_cat ||
-        'union'  eq $slots_cat) {
+    if ($$struct_union_set{$slots_cat}) {
       $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     } elsif ($$enum_set{$slots_cat}) {
       $$scratch_str_ref .= $col . "//klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
@@ -2455,8 +2454,7 @@ sub generate_exported_slots_decls {
       $$scratch_str_ref .= &ann(__FILE__, __LINE__) . $nl;
     }
   } elsif (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
-    if ('struct' eq $slots_cat ||
-        'union'  eq $slots_cat) {
+    if ($$struct_union_set{$slots_cat}) {
       $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {" . $slots_decl . '; }';
     } elsif ($$enum_set{$slots_cat}) {
       $$scratch_str_ref .= $col . "klass $klass_name" . $pad1 . " {";
@@ -2781,6 +2779,7 @@ sub linkage_unit::generate_klasses {
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots" . '-' . &suffix());
   &linkage_unit::generate_klasses_types_after($ast, $col, $klass_path, $ordered_klass_names);
+  &linkage_unit::generate_type_traits_checks($ast, $col, $klass_path, $ordered_klass_names);
 
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-vars" . '-' . &suffix());
   my $sorted_klass_names = [sort @$ordered_klass_names];
@@ -2825,6 +2824,36 @@ sub linkage_unit::generate_klasses_types_before {
     }
   }
 }
+sub static_assert_check_type_traits {
+  my ($col, $type) = @_;
+  my $outstr = '';
+  if ($should_check_type_traits) {
+    $outstr .= $col . "static-assert(true == std::is-pod            <$type>::value, \"type not pod\");" . $nl;
+    $outstr .= $col . "static-assert(true == std::is-trivial        <$type>::value, \"type not trivial\");" . $nl;
+    $outstr .= $col . "static-assert(true == std::is-standard-layout<$type>::value, \"type not standard-layout\");" . $nl;
+  }
+  return $outstr;
+}
+sub linkage_unit::generate_type_traits_checks {
+  my ($ast, $col, $klass_path, $ordered_klass_names) = @_;
+  my $scratch_str_ref = &global_scratch_str_ref();
+
+  if ($should_check_type_traits && (&is_src_defn() || &is_target_defn())) {
+    $$scratch_str_ref .=
+      $nl .
+      "# include <type_traits>" . $nl .
+      $nl;
+
+    foreach my $klass_name (sort @$ordered_klass_names) {
+      my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
+      my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
+
+      if (&has_slots_cat_info($klass_ast)) {
+        $$scratch_str_ref .= &static_assert_check_type_traits($col, "$klass_name\::slots-t");
+      }
+    }
+  }
+}
 sub linkage_unit::generate_klasses_types_after {
   my ($ast, $col, $klass_path, $ordered_klass_names) = @_;
   my $scratch_str_ref = &global_scratch_str_ref();
@@ -2849,8 +2878,7 @@ sub linkage_unit::generate_klasses_types_after {
       if (&is_decl()) {
         if (&should_export_slots($klass_ast) || (&has_slots($klass_ast) && &is_same_file($klass_ast))) {
           $$scratch_str_ref .= $col . "klass $klass_name {";
-          if ('struct' eq $slots_cat ||
-              'union'  eq $slots_cat) {
+          if ($$struct_union_set{$slots_cat}) {
             &generate_struct_or_union_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);
           } elsif ($$enum_set{$slots_cat}) {
             &generate_enum_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 1, $is_slots = 1);
@@ -2864,8 +2892,7 @@ sub linkage_unit::generate_klasses_types_after {
         if (!&should_export_slots($klass_ast)) {
           if (&is_exported($klass_ast)) {
             $$scratch_str_ref .= $col . "klass $klass_name {";
-            if ('struct' eq $slots_cat ||
-                'union'  eq $slots_cat) {
+            if ($$struct_union_set{$slots_cat}) {
               &generate_struct_or_union_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
             } elsif ($$enum_set{$slots_cat}) {
               &generate_enum_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
@@ -2876,8 +2903,7 @@ sub linkage_unit::generate_klasses_types_after {
             $$scratch_str_ref .= $col . "} // $klass_name\::slots-t" . $nl;
           } else {
             $$scratch_str_ref .= $col . "klass $klass_name {";
-            if ('struct' eq $slots_cat ||
-                'union'  eq $slots_cat) {
+            if ($$struct_union_set{$slots_cat}) {
               &generate_struct_or_union_defn(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
             } elsif ($$enum_set{$slots_cat}) {
               &generate_enum_decl(&colin($col), $$klass_ast{'slots'}, $is_exported = 0, $is_slots = 1);
