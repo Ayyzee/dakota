@@ -142,10 +142,11 @@ klass exception {
                     ", \"src-line\": %i",
                     self.src-file,
                     self.src-line);
+    str-t exception-type = name-of(klass-of(self));
     $print-format(out,
                   ", \"exception-type\": \"%s\"",
-                  name-of(klass-of(self)));
-    if (self.msg)
+                  exception-type);
+    if (self.msg && 0 != strcmp(exception-type, self.msg))
       $print-format(out,
                     ", \"msg\": \"%s\"",
                     self.msg);
@@ -171,7 +172,7 @@ klass exception {
   fprintf(stderr,
           ", \"exception-type\": \"%s\"",
           type-name);
-  if (msg)
+  if (msg && 0 != strcmp(type-name, msg))
     fprintf(stderr,
             ", \"msg\": \"%s\"",
             msg);
