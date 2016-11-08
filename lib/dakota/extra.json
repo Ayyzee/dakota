@@ -33,8 +33,10 @@
     'char8' => undef,
     'compare' => undef, # hackhack
     'equals' => undef, # hackhack (workaround for dakota-test/should-pass/pass/sets/)
+    'finalize-func' => undef,
     'generic-func' => undef,
     'hash' => undef,
+    'initialize-func' => undef,
     'input-stream' => undef, # std-input
     'iter-pair' => undef,
     'keyword' => undef,

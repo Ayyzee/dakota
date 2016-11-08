@@ -50,6 +50,7 @@ klass bit-vector;
 klass const-info;
 klass enum-info;
 klass exception;
+klass finalize-func;
 klass illegal-klass-exception;
 klass initialize-func;
 klass intptr;
@@ -1551,7 +1552,6 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       //   object-t kls = dk-klass-for-name(kls-name);
       //   klass::traits-finalize(kls, traits);
       // }
-      typealias finalize-func-t = initialize-func-t;
       finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(kls-info, #finalize);
       if (nullptr != klass-finalize) {
         named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };

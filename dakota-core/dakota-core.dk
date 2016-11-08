@@ -50,6 +50,8 @@ export dakota-core {
   equals::slots-t;
   equals;
   exception;
+  finalize-func::slots-t;
+  finalize-func;
   forward-iterator;
   generic-func;
   generic-func::slots-t;

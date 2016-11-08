@@ -3630,10 +3630,10 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#behavior-exported?'} = '1';
   }
   if ($$klass_ast{'has-initialize'}) {
-    $$tbbl{'#initialize'} = 'cast(method-t)initialize';
+    $$tbbl{'#initialize'} = 'cast(initialize-func-t)initialize';
   }
   if ($$klass_ast{'has-finalize'}) {
-    $$tbbl{'#finalize'} = 'cast(method-t)finalize';
+    $$tbbl{'#finalize'} = 'cast(finalize-func-t)finalize';
   }
   if ($$klass_ast{'module'}) {
     $$tbbl{'#module'} = "\#$$klass_ast{'module'}";

@@ -305,6 +305,7 @@ resource-usage::slots-t gbl-ru = { .memory = 0, .instances = 0, .method-memory =
 # endif
 
 klass initialize-func { slots (*)(object-t) -> void; }
+klass finalize-func   { slots (*)(object-t) -> void; }
 
 klass methods {
   slots {
