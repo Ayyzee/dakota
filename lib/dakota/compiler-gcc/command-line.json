@@ -7,7 +7,7 @@
 {
   'CXX' => [ 'g++' ],
   'CXXFLAGS' => [
-    '-std=c++11', '--visibility=hidden',
+    '-std=c++14', '--visibility=hidden',
     '--non-call-exceptions', '--asynchronous-unwind-tables',
     '--trapv',
     '-ObjC++', '--objc-exceptions', '-lobjc',

@@ -7,7 +7,7 @@
 {
   'CXX' => [ 'clang++' ],
   'CXXFLAGS' => [
-    '-std=c++11', '-fvisibility=hidden',
+    '-std=c++14', '-fvisibility=hidden',
     '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
     '-ftrapv',
     '-ObjC++', '-fobjc-exceptions', '-lobjc',
@@ -29,7 +29,6 @@
   'EXTRA_CXXFLAGS' => [
     '--warn-everything',
     '--warn-no-class-varargs',
-    '--warn-no-c++1y-extensions',
     '--warn-no-c++98-compat',
     '--warn-no-c++98-compat-pedantic',
     '--warn-no-c99-extensions', # c99 designated initializers, c99 compound literals
