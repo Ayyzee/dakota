@@ -3,3 +3,4 @@ EXTRA_MAKEFLAGS := \
  --no-builtin-variables \
  --warn-undefined-variables \
  --file dakota.mk \
+ --print-directory \
