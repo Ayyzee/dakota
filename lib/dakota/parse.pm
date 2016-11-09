@@ -172,7 +172,7 @@ sub kw_args_translate {
     if ($$ast{$construct}) {
       while (($name, $scope) = each %{$$ast{$construct}}) {
         foreach my $method (values %{$$scope{'methods'}}, values %{$$scope{'slots-methods'}}) {
-          if ('va' eq $$method{'name'}[0]) {
+          if (&is_va($method)) {
             &remove_name_va_scope($method);
           }
 
@@ -227,7 +227,7 @@ sub kw_args_translate {
 }
 sub update_to_kw_args {
   my ($method) = @_;
-  die if $$method{'param-types'}[-1][0] eq 'va-list-t';
+  die if &is_va($method);
   die if $$method{'kw-args'};
   &add_last($$method{'param-types'}, [ 'va-list-t' ]);
   $$method{'kw-args'} = [];

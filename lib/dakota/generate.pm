@@ -732,7 +732,7 @@ sub arg_type::var_args {
   my $num_args =       @$arg_type_ref;
 
   my $new_arg_type_ref = &deep_copy($arg_type_ref);
-  die if 'va-list-t' ne &ct($$new_arg_type_ref[-1]);
+  die if 'va-list-t' ne $$new_arg_type_ref[-1][0];
   $$new_arg_type_ref[$num_args - 1] = $global_seq_ellipsis;
   return $new_arg_type_ref;
 }
@@ -751,7 +751,7 @@ sub arg_type::names {
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
     if (&ct($global_seq_ellipsis) eq &ct($$arg_type_ref[$arg_num])) {
       $$arg_names[$arg_num] = undef;
-    } elsif ('va-list-t' eq &ct($$arg_type_ref[$arg_num])) {
+    } elsif ('va-list-t' eq $$arg_type_ref[$arg_num][0]) {
       $$arg_names[$arg_num] = "args";
     } else {
       $$arg_names[$arg_num] = "arg$arg_num";
@@ -2257,7 +2257,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
             &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
             if (0 == &num_kw_args($va_method)) {
               my $last = &remove_last($$va_method{'param-types'});
-              die if 'va-list-t' ne &ct($last);
+              die if 'va-list-t' ne $$last[0];
               my ($visibility, $method_decl_ref) = &func::decl($va_method, $klass_path);
               $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " {" . $visibility . " METHOD $$method_decl_ref } // stmt2" . &ann(__FILE__, __LINE__) . $nl;
               &add_last($$va_method{'param-types'}, $last);

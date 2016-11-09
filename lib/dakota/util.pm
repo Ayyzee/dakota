@@ -920,9 +920,7 @@ sub project_io_add {
 }
 sub is_va {
   my ($method) = @_;
-  my $num_args = @{$$method{'param-types'}};
-
-  if ('va-list-t' eq &ct($$method{'param-types'}[-1])) {
+  if ('va-list-t' eq $$method{'param-types'}[-1][0]) {
     return 1;
   } else {
     return 0;
