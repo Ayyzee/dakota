@@ -303,7 +303,7 @@ static func init-klass(object-t kls, symbol-t name) -> object-t {
     kls = klass::init(kls, info);
     return kls;
 }
-KLASS-NS ostream { namespace va { [[format-va-printf(2)]] static func println-format(slots-t, str-t, va-list-t) -> slots-t; }}
+KLASS-NS ostream { [[format-va-printf(2)]] static func println-format(slots-t, str-t, va-list-t) -> slots-t; }
 klass ostream {
   slots {
     stream-t output;
@@ -324,7 +324,7 @@ klass ostream {
       fprintf(s.output, "  "); // two spaces per column :-) [my way]
     return s;
   }
-  [[format-va-printf(2)]] static func va::println-format(slots-t s, str-t format, va-list-t args) -> slots-t {
+  [[format-va-printf(2)]] static func println-format(slots-t s, str-t format, va-list-t args) -> slots-t {
     pad(s);
     vfprintf(s.output, format, args);
     return s;
@@ -332,7 +332,7 @@ klass ostream {
   [[format-printf(2)]] static func println-format(slots-t s, str-t format, ...) -> slots-t {
     va-list-t args;
     va-start(args, format);
-    va::println-format(s, format, args);
+    println-format(s, format, args);
     va-end(args);
     return s;
   }
