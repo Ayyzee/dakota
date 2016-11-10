@@ -223,15 +223,6 @@ sub rewrite_selsig_replacement {
   my $result = $aa . &encode_char($bb);
   return $result;
 }
-sub rewrite_funcs_replacement {
-  my ($aa, $bb, $cc) = @_;
-  my $result = $aa . &encode_char($bb) . $cc;
-  return $result;
-}
-sub rewrite_funcs {
-  my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/((xxx::va|xxx|va)::)(\?|\!)(\(|\))/&rewrite_funcs_replacement($1, $3, $4)/gesx;
-}
 sub rewrite_declarations {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s|(?<=$stmt_boundry)(\s*)interpose \s+([^;])+\s*;|$1INTERPOSE($2);|gsx;
@@ -1065,7 +1056,6 @@ sub convert_dk_to_cc {
   &rewrite_sentinal_generic_uses($filestr_ref, $kw_arg_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_arg_generics);
-  &rewrite_funcs($filestr_ref);
   &rewrite_map($filestr_ref);
   &rewrite_for_each($filestr_ref);
   &rewrite_unboxes($filestr_ref);
