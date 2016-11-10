@@ -1595,13 +1595,13 @@ sub generate_generic_func_defn {
     $opt_va_prefix = 'va::';
     $opt_va_close = '}'
   }
-  #namespace dk { INLINE generic-func add(object-t arg0, object-t arg1) -> object-t {
+  #namespace $ns { INLINE generic-func add(object-t arg0, object-t arg1) -> object-t {
   #  typealias func-t = func (*)(object-t, object-t) -> object-t; // no runtime cost
   #  func-t _func_ = cast(func-t)GENERIC-FUNC(add(object-t, object-t)); // static would be faster, but more rigid
   #  return _func_(arg0, arg1);
   #}}
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $part = 'namespace dk {' . $opt_va_open . ' INLINE func ' . $generic_name . '(' . $$arg_list . ') -> ' . $return_type_str;
+  my $part = "namespace $ns {" . $opt_va_open . ' INLINE func ' . $generic_name . '(' . $$arg_list . ') -> ' . $return_type_str;
 
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
