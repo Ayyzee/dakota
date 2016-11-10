@@ -968,7 +968,7 @@ sub method::var_args_from_qual_va_list {
   my ($method) = @_;
   my $new_method = &deep_copy($method);
 
-  if ('va' eq $$new_method{'name'}[0]) {
+  if (&has_va_prefix($new_method)) {
     &remove_name_va_scope($new_method);
   }
   if (exists $$new_method{'param-types'}) {

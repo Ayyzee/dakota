@@ -125,6 +125,7 @@ our @EXPORT= qw(
                  is_target_decl
                  is_target_defn
                  is_va
+                 has_va_prefix
                  kw_arg_generics
                  kw_arg_placeholders
                  kw_args_method_sig
@@ -921,6 +922,14 @@ sub project_io_add {
 sub is_va {
   my ($method) = @_;
   if ('va-list-t' eq $$method{'param-types'}[-1][0]) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+sub has_va_prefix {
+  my ($method) = @_;
+  if ('va' eq $$method{'name'}[0]) {
     return 1;
   } else {
     return 0;

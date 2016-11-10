@@ -172,7 +172,7 @@ sub kw_args_translate {
     if ($$ast{$construct}) {
       while (($name, $scope) = each %{$$ast{$construct}}) {
         foreach my $method (values %{$$scope{'methods'}}, values %{$$scope{'slots-methods'}}) {
-          if (&is_va($method)) {
+          if (&has_va_prefix($method)) {
             &remove_name_va_scope($method);
           }
 
