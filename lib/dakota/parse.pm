@@ -2325,7 +2325,7 @@ sub ast_from_dk_path {
   &encode_strings(\$_);
   my $parts = &encode_comments(\$_);
 
-  $_ =~ s/\$/dk::/g;
+  $_ =~ s/\$/xxx::/g;
 
   &rewrite_klass_defn_with_implicit_metaklass_defn(\$_);
 

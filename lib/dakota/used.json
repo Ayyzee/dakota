@@ -21,11 +21,11 @@
     #{ 'pattern' => [ '?qual-scope', '::', 'slots-t' ], },
   ],
   'used-generics' => [
-    { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name', '(', 'super' ], },
-    { 'name' => 'supers',   'range' => [2,2], 'pattern' => [ 'dk', '::',              '?method-name', '(', 'super' ], },
+    { 'name' => 'supers',   'range' => [2,4], 'pattern' => [ 'xxx', '::',  'va', '::', '?method-name', '(', 'super' ], },
+    { 'name' => 'supers',   'range' => [2,2], 'pattern' => [ 'xxx', '::',              '?method-name', '(', 'super' ], },
 
-    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'dk', '::',  'va', '::', '?method-name'               ], },
-    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'dk', '::',              '?method-name'               ], },
+    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'xxx', '::',  'va', '::', '?method-name'               ], },
+    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'xxx', '::',              '?method-name'               ], },
 
     { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'SELECTOR',  '(', 'va', '::', '?method-name', '('     ], },
     { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'SELECTOR',  '(',             '?method-name', '('     ], },

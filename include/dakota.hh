@@ -195,9 +195,9 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4) -> uint32_t 
 
 # if defined DKT_USE_MAKE_MACRO
   # if defined DEBUG
-    # define make(kls, ...) dk::init(dk::alloc(kls, __FILE__, __LINE__), __VA_ARGS__)
+    # define make(kls, ...) xxx::init(xxx::alloc(kls, __FILE__, __LINE__), __VA_ARGS__)
   # else
-    # define make(kls, ...) dk::init(dk::alloc(kls), __VA_ARGS__)
+    # define make(kls, ...) xxx::init(xxx::alloc(kls), __VA_ARGS__)
   # endif
 # endif
 

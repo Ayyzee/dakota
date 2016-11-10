@@ -1492,7 +1492,7 @@ sub generate_generic_defn {
   }
   my $scratch_str_ref = &global_scratch_str_ref();
   my $in = &ident_comment($generic_name);
-  $$scratch_str_ref .= $col . '// dk::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
+  $$scratch_str_ref .= $col . '// xxx::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
   my $part = 'namespace __generic-func {' . $opt_va_open . ' STATIC INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
 
   if (&is_src_decl() || &is_target_decl()) {
@@ -1716,7 +1716,7 @@ sub linkage_unit::generate_generics {
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   my ($is_inline, $ns);
-  &generate_generic_defns($ast, $is_inline = 0, $col, $ns = 'dk');
+  &generate_generic_defns($ast, $is_inline = 0, $col, $ns = 'xxx');
 
   $$scratch_str_ref .=
     $nl .
@@ -1739,15 +1739,15 @@ sub generate_va_make_defn {
     $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $result .=
-      $col . "static $alloc_type_decl = dk::alloc;" . $nl .
-      $col . "static $init_type_decl = dk::va::init;" . $nl .
+      $col . "static $alloc_type_decl = xxx::alloc;" . $nl .
+      $col . "static $init_type_decl = xxx::va::init;" . $nl .
       $nl .
       $col . "object-t instance = alloc(kls);" . $nl .
       $nl .
       $col . "va-list-t args;" . $nl .
       $col . "va-start(args, kls);" . $nl .
       #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
-      $col . "instance = _func_(instance, args); // dk::va::init(object-t, va-list-t)" . $nl .
+      $col . "instance = _func_(instance, args); // xxx::va::init(object-t, va-list-t)" . $nl .
       #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
       $col . "va-end(args);" . $nl .
       $col . "return instance;" . $nl;
@@ -3706,7 +3706,7 @@ sub generate_kw_args_method_signature_defn {
     my $kw_arg_default_placeholder = $$kw_arg_placeholders{'default'};
     foreach my $def (@$defs) {
       if (1) {
-        $def =~ s/dk::/\$/g;
+        $def =~ s/xxx::/\$/g;
       }
       my $count = $kw_list_types =~ s/$kw_arg_default_placeholder/ $def/; # extra whitespace
       die if 1 != $count;
