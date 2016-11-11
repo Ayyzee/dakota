@@ -51,16 +51,16 @@ FUNC selector_count() -> int64_t;
 
 KLASS_NS object {
   METHOD dump(object_t) -> object_t;
-  METHOD instanceqq(object_t, object_t) -> boole_t; // instance?()
+  METHOD instanceQ(object_t, object_t) -> boole_t; // instance?()
 }
 KLASS_NS klass {
   METHOD init(object_t, named_info_t*) -> object_t;
-  METHOD subklassqq(object_t, object_t) -> boole_t; // subklass?()
+  METHOD subklassQ(object_t, object_t) -> boole_t; // subklass?()
 }
 KLASS_NS bit_vector {
   METHOD set_bit(object_t, ssize_t, boole_t) -> object_t;
 }
-inline FUNC root_superklassqq(object_t object) -> boole_t {
+inline FUNC root_superklassQ(object_t object) -> boole_t {
   if (nullptr == object || null == object)
     return true;
   else

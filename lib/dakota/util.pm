@@ -396,8 +396,8 @@ sub as_literal_symbol {
   }
   return $result;
 }
-my $legal_last_chars = { '?' => 'qq',
-                         '!' => 'jj' };
+my $legal_last_chars = { '?' => 'Q',
+                         '!' => 'J' };
 my $alphabet = [split(//, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")];
 my $alphabet_len = scalar @$alphabet;
 sub encode_char {
