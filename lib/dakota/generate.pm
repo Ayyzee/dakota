@@ -240,11 +240,10 @@ sub add_include_fors {
   if (!$$ast{'include-fors'}) {
     $$ast{'include-fors'} = {};
   }
-  while (my ($type, $include) = each(%$include_fors)) {
-    if ($$ast{'include-fors'}{$type} && $$ast{'include-fors'}{$type} ne $include) {
-      die;
+  while (my ($type, $includes) = each(%$include_fors)) {
+    foreach my $include (keys %$includes) {
+      $$ast{'include-fors'}{$type}{$include} = 1;
     }
-    $$ast{'include-fors'}{$type} = $include;
   }
 }
 sub generate_src {
@@ -563,11 +562,13 @@ sub generate_target_runtime {
   my ($target_srcs_ast, $generics) = @_;
   my $symbols_from_header = {};
   if ($$target_srcs_ast{'include-fors'}) {
-    while (my ($symbol, $header) = each (%{$$target_srcs_ast{'include-fors'}})) {
-      if (!defined $$symbols_from_header{$header}) {
-        $$symbols_from_header{$header} = {}
+    while (my ($symbol, $headers) = each (%{$$target_srcs_ast{'include-fors'}})) {
+      foreach my $header (sort keys %$headers) {
+        if (!defined $$symbols_from_header{$header}) {
+          $$symbols_from_header{$header} = {}
+        }
+        $$symbols_from_header{$header}{$symbol} = undef;
       }
-      $$symbols_from_header{$header}{$symbol} = undef;
     }
   }
   my $target_cc_str = '';
@@ -2481,8 +2482,10 @@ sub linkage_unit::generate_headers {
 
     my $all_headers = {};
     my $header_name;
-    foreach $header_name (values %{$$ast{'include-fors'}}) {
-      $$all_headers{$header_name} = undef;
+    foreach my $header_names (values %{$$ast{'include-fors'}}) {
+      foreach my $header_name (keys %$header_names) {
+        $$all_headers{$header_name} = undef;
+      }
     }
     foreach $header_name (keys %$exported_headers) {
       $$all_headers{$header_name} = undef;

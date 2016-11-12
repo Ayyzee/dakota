@@ -1069,11 +1069,7 @@ sub include_for {
     }
   }
   foreach my $type (@$types, @$abbrev_types) {
-    if (defined $$gbl_root_ast{'include-fors'}{$type}
-             && $$gbl_root_ast{'include-fors'}{$type} ne $header) {
-      die;
-    }
-   $$gbl_root_ast{'include-fors'}{$type} = $header;
+    $$gbl_root_ast{'include-fors'}{$type}{$header} = 1;
   }
 }
 sub module_decl {
