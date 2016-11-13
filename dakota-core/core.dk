@@ -1305,7 +1305,7 @@ static func index-from-sig(int-t sig) -> int8-t {
   return 0;
   return index-from-sig-data[sig];
 }
-static x::sigaction-pair-t sa-pairs[] = {
+static x::sigaction-pair-t[] sa-pairs = {
   { .handler = nullptr, .prev-sa = {} },
   { .handler = nullptr, .prev-sa = {} },
 };
@@ -1315,7 +1315,7 @@ klass addr2name-pair {
     symbol-t name;
   }
 }
-static addr2name-pair-t named-instances[] = {
+static addr2name-pair-t[] named-instances = {
   { .addr = cast(ptr-t*)&null, .name = #null },
 };
 klass so-symbol-info {
