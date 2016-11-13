@@ -111,8 +111,8 @@ my $global_should_echo = 0;
 my $global_scratch_str_ref;
 #my $global_src_cc_str;
 
-my $global_seq_super_t =   [ 'super-t' ]; # special (used in eq compare)
-my $global_seq_ellipsis =  [ '...' ];
+my $global_seq_super_t =   ['super-t']; # special (used in eq compare)
+my $global_seq_ellipsis =  ['...'];
 my $global_klass_defns = [];
 
 my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
@@ -709,7 +709,7 @@ sub path::remove_last {
 sub arg::type {
   my ($arg) = @_;
   if (!defined $arg) {
-    $arg = [ 'void' ];
+    $arg = ['void'];
   }
   $arg = join(' ', @$arg);
   $arg = &remove_extra_whitespace($arg);
@@ -733,7 +733,7 @@ sub arg_type::var_args {
   my $num_args =       @$arg_type_ref;
 
   my $new_arg_type_ref = &deep_copy($arg_type_ref);
-  die if 'va-list-t' ne $$new_arg_type_ref[-1][0];
+  die if 'va-list-t' ne $$new_arg_type_ref[-1][-1];
   $$new_arg_type_ref[$num_args - 1] = $global_seq_ellipsis;
   return $new_arg_type_ref;
 }
@@ -743,16 +743,16 @@ sub arg_type::names {
   my $arg_num =        0;
   my $arg_names = [];
 
-  if (&ct($global_seq_super_t) eq &ct($$arg_type_ref[0])) {
+  if (0 == &type::compare($global_seq_super_t, $$arg_type_ref[0])) {
     $$arg_names[0] = "context";    # replace_first
   } else {
     $$arg_names[0] = 'object';  # replace_first
   }
 
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
-    if (&ct($global_seq_ellipsis) eq &ct($$arg_type_ref[$arg_num])) {
+    if (0 == &type::compare($global_seq_ellipsis, $$arg_type_ref[$arg_num])) {
       $$arg_names[$arg_num] = undef;
-    } elsif ('va-list-t' eq $$arg_type_ref[$arg_num][0]) {
+    } elsif ('va-list-t' eq $$arg_type_ref[$arg_num][-1]) {
       $$arg_names[$arg_num] = "args";
     } else {
       $$arg_names[$arg_num] = "arg$arg_num";
@@ -840,10 +840,8 @@ sub method::kw_list_types {
   my $result = '';
   my $delim = '';
   foreach my $arg (@{$$method{'param-types'}}) {
-    my $arg_type = &arg::type($arg);
-
-    if ('va-list-t' ne $arg_type) {
-      $result .= $delim . $arg_type;
+    if ('va-list-t' ne $$arg[-1]) {
+      $result .= $delim . &arg::type($arg);
       $delim = ', '; # extra whitespace
     }
   }
@@ -865,10 +863,8 @@ sub method::list_types {
   my $result = '';
   my $delim = '';
   foreach my $arg (@{$$method{'param-types'}}) {
-    my $arg_type = &arg::type($arg);
-
-    if ('va-list-t' ne $arg_type) {
-      $result .= $delim . $arg_type;
+    if ('va-list-t' ne $$arg[-1]) {
+      $result .= $delim . &arg::type($arg);
       $delim = ', ';
     }
   }
@@ -1093,6 +1089,10 @@ sub symbol::compare {
 }
 sub string::compare {
   $a cmp $b;
+}
+sub type::compare {
+  my ($a, $b) = @_;
+  return &ct($a) cmp &ct($b);
 }
 sub property::compare {
   my ($a_key, $a_val) = %$a;
@@ -1478,11 +1478,11 @@ sub generate_generic_defn {
   my ($generic, $is_inline, $col, $ns) = @_;
   my $generic_name = $$generic{'name'}[0];
   my $orig_arg_type_list = &arg_type::list_types($$generic{'param-types'});
-  my $tmp = $$generic{'param-types'}[0][0];
-  $$generic{'param-types'}[0][0] = 'object-t';
+  my $tmp = &deep_copy($$generic{'param-types'}[0]);
+  $$generic{'param-types'}[0] = ['object-t'];
   my $new_arg_type =            $$generic{'param-types'};
   my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
-  $$generic{'param-types'}[0][0] = $tmp;
+  $$generic{'param-types'}[0] = $tmp;
   $new_arg_type =            $$generic{'param-types'};
   my $new_arg_names =           &arg_type::names($new_arg_type);
   my $new_arg_list =            &arg_type::list_pair($new_arg_type, $new_arg_names);
@@ -1651,7 +1651,7 @@ sub generate_generic_defns {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
-        $$copy{'param-types'}[0][0] = 'super-t';
+        $$copy{'param-types'}[0] = ['super-t'];
         if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($copy, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
@@ -1681,7 +1681,7 @@ sub generate_generic_defns {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
-        $$copy{'param-types'}[0][0] = 'super-t';
+        $$copy{'param-types'}[0] = ['super-t'];
         if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($copy, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
@@ -2270,7 +2270,7 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
             &generate_va_generic_defn($va_method, $klass_path, $col, $klass_type, $max_width, __LINE__);
             if (0 == &num_kw_args($va_method)) {
               my $last = &remove_last($$va_method{'param-types'});
-              die if 'va-list-t' ne $$last[0];
+              die if 'va-list-t' ne $$last[-1];
               my ($visibility, $method_decl_ref) = &func::decl($va_method, $klass_path);
               $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " {" . $visibility . " METHOD $$method_decl_ref } // stmt2" . &ann(__FILE__, __LINE__) . $nl;
               &add_last($$va_method{'param-types'}, $last);
@@ -2360,7 +2360,7 @@ sub convert_to_object_type {
   my $result = $type_seq;
 
   if (&is_box_type($type_seq)) {
-    $result = [ 'object-t' ];
+    $result = ['object-t'];
   }
   return $result;
 }
@@ -3811,7 +3811,7 @@ sub generate_kw_args_method_defn {
   $$scratch_str_ref .=
     $col . "static const signature-t* __method-signature__ = KW-ARGS-METHOD-SIGNATURE(va::$method_name($$list_types)); USE(__method-signature__);" . $nl;
 
-  $$method{'name'} = [ '_func_' ];
+  $$method{'name'} = ['_func_'];
   my $func_name = &ct($$method{'name'});
 
   #$$scratch_str_ref .=
@@ -4425,3 +4425,7 @@ unless (caller) {
   &start(\@ARGV);
 }
 1;
+
+# object-t
+# super-t
+# va-list-t
