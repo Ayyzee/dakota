@@ -33,6 +33,7 @@
     '--warn-no-c++98-compat-pedantic',
     '--warn-no-c99-extensions', # c99 designated initializers, c99 compound literals
     '--warn-no-cast-align',
+    '--warn-no-dollar-in-identifier-extension',
     '--warn-no-disabled-macro-expansion',
     '--warn-no-exit-time-destructors',
     '--warn-no-four-char-constants',

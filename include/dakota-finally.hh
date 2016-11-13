@@ -44,6 +44,6 @@ finally_t<F> finally(F f) {
 // }
 
 # define DKT_CATCH_BEGIN(e) catch (object_t e) { if (0) {}
-# define DKT_CATCH(k, e)    else if (xxx::instanceQ(e, k)) // xxx::instance?(e, k)
+# define DKT_CATCH(k, e)    else if ($instanceQ(e, k)) // $instance?(e, k)
 # define DKT_CATCH_END(e)   else { throw; } }
 # define DKT_FINALLY(block) auto _finally_ = finally([&]() block)

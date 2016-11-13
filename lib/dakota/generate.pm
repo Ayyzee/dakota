@@ -1012,9 +1012,6 @@ sub generate_va_generic_defn {
   if ($klass_type) {
     $part .= $klass_type . " @$scope" . $pad . " {";
   }
-  else {
-    $part .= "namespace" . " @$scope" . $pad . " {";
-  }
   my $vararg_method = &deep_copy($va_method);
   $$vararg_method{'param-types'} = &arg_type::var_args($$vararg_method{'param-types'});
   my $visibility = '';
@@ -1035,10 +1032,14 @@ sub generate_va_generic_defn {
   else {
     $part .= ' func';
   }
-  $part .= " $va_method_name($$new_arg_list_va_ref) -> $return_type";
+  $part .= ' ';
+  if (! $klass_type) {
+    $part .= '$';
+  }
+  $part .= "$va_method_name($$new_arg_list_va_ref) -> $return_type";
 
   if (!$$va_method{'defined?'} || &is_src_decl() || &is_target_decl()) {
-    $$scratch_str_ref .= $col . $part . "; }" . &ann(__FILE__, $line) . $nl;
+    $$scratch_str_ref .= $col . $part . ";" . &ann(__FILE__, $line) . $nl;
   } elsif ($$va_method{'defined?'} && (&is_target_defn())) {
     $$scratch_str_ref .= $col . $part;
     my $name = &last($$va_method{'name'});
@@ -1050,7 +1051,7 @@ sub generate_va_generic_defn {
     $$scratch_str_ref .= " {" . &ann(__FILE__, $line) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .=
-      $col . "static func $method_type_decl = $scope_str\::va::$va_method_name;" . $nl .
+      $col . "static func $method_type_decl = \$va::$va_method_name;" . $nl .
       $col . "va-list-t args;" . $nl .
       $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);" . $nl;
 
@@ -1071,7 +1072,10 @@ sub generate_va_generic_defn {
       $$scratch_str_ref .= $col . "return;" . $nl;
     }
     $col = &colout($col);
-    $$scratch_str_ref .= $col . "}} // @$scope::$va_method_name(...)" . $nl;
+    $$scratch_str_ref .= $col . "}" . $nl;
+  }
+  if ($klass_type) {
+    $$scratch_str_ref .= " }";
   }
 }
 sub method::compare {
@@ -1339,7 +1343,7 @@ sub linkage_unit::generate_target_runtime_generic_func_ptrs_seq {
       my $new_arg_type_list = &arg_type::list_types($$generic{'param-types'});
       my $generic_name = &ct($$generic{'name'});
       my $in = &ident_comment($generic_name);
-      $scratch_str .= $col . "GENERIC-FUNC-PTR-PTR(va::$generic_name($$new_arg_type_list))," . $in . $nl;
+      $scratch_str .= $col . "GENERIC-FUNC-PTR-PTR(\$va::$generic_name($$new_arg_type_list))," . $in . $nl;
     }
     $scratch_str .= $col . "nullptr," . $nl;
     $col = &colout($col);
@@ -1355,7 +1359,7 @@ sub linkage_unit::generate_target_runtime_generic_func_ptrs_seq {
         my $new_arg_type_list = &arg_type::list_types($$generic{'param-types'});
         my $generic_name = &ct($$generic{'name'});
         my $in = &ident_comment($generic_name);
-        $scratch_str .= $col . "GENERIC-FUNC-PTR-PTR($generic_name($$new_arg_type_list))," . $in . $nl;
+        $scratch_str .= $col . "GENERIC-FUNC-PTR-PTR(\$$generic_name($$new_arg_type_list))," . $in . $nl;
       }
     }
     $scratch_str .= $col . "nullptr," . $nl;
@@ -1455,7 +1459,7 @@ sub generate_va_generic_defns {
   foreach my $generic (sort method::compare @$generics) {
     if (&is_va($generic)) {
       my $scope = [];
-      &path::add_last($scope, $ns);
+      &path::add_last($scope, $ns) if ($ns);
       my $new_generic = &deep_copy($generic);
       $$new_generic{'inline?'} = $is_inline;
 
@@ -1485,16 +1489,20 @@ sub generate_generic_defn {
   my $return_type = &arg::type($$generic{'return-type'});
   my $opt_va_open = '';
   my $opt_va_prefix = '';
+  my $opt_va_prefix_method = '';
+  my $opt_name_prefix = '$';
   my $opt_va_close = '';
   if (&is_va($generic)) {
-    $opt_va_open = ' namespace va {';
-    $opt_va_prefix = 'va::';
+    $opt_va_open = ' namespace $va {';
+    $opt_va_prefix = '$va::';
+    $opt_va_prefix_method = 'va::';
+    $opt_name_prefix = '';
     $opt_va_close = '}'
   }
   my $scratch_str_ref = &global_scratch_str_ref();
   my $in = &ident_comment($generic_name);
-  $$scratch_str_ref .= $col . '// xxx::' . $opt_va_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
-  my $part = 'namespace __generic-func {' . $opt_va_open . ' STATIC INLINE func ' . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
+  $$scratch_str_ref .= $col . '// ' . $opt_va_prefix . $opt_name_prefix . $generic_name . '(' . $$orig_arg_type_list . ')' . ' -> ' . $return_type . $nl;
+  my $part = 'namespace __generic-func {' . $opt_va_open . ' STATIC INLINE func ' . $opt_name_prefix . $generic_name . '(' . $$new_arg_list . ") -> $return_type";
 
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
@@ -1502,8 +1510,8 @@ sub generate_generic_defn {
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
-    $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($opt_va_prefix$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
-    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($opt_va_prefix$generic_name($$new_arg_type_list)););" . ' // one time initialization' . $nl;
+    $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($opt_va_prefix_method$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
+    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($opt_va_prefix_method$generic_name($$new_arg_type_list)););" . ' // one time initialization' . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = context;);" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
@@ -1553,10 +1561,12 @@ sub generate_generic_func_ptr_defn {
   my $in = &ident_comment($generic_name);
   my $opt_va_open = '';
   my $opt_va_prefix = '';
+  my $opt_name_prefix = '$';
   my $opt_va_close = '';
   if (&is_va($generic)) {
-    $opt_va_open = ' namespace va {';
-    $opt_va_prefix = 'va::';
+    $opt_va_open = ' namespace $va {';
+    $opt_va_prefix = '$va::';
+    $opt_name_prefix = '';
     $opt_va_close = '}'
   }
   #namespace __generic-func-ptr { INLINE func add(object-t, object-t) -> generic-func-t* {
@@ -1565,7 +1575,7 @@ sub generate_generic_func_ptr_defn {
   #  return &result;
   #}}
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $part = 'namespace __generic-func-ptr {' . $opt_va_open . ' STATIC INLINE func ' . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
+  my $part = 'namespace __generic-func-ptr {' . $opt_va_open . ' STATIC INLINE func ' . $opt_name_prefix . $generic_name . '(' . $$list_types_str_ref . ') -> generic-func-t*';
 
   if (&is_src_decl() || &is_target_decl()) {
     $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
@@ -1573,7 +1583,7 @@ sub generate_generic_func_ptr_defn {
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
-    $$scratch_str_ref .= $col . 'static generic-func-t result = cast(generic-func-t)cast(func-t)(__generic-func::' . $opt_va_prefix . $generic_name . ');' . $nl;
+    $$scratch_str_ref .= $col . 'static generic-func-t result = cast(generic-func-t)cast(func-t)(__generic-func::' . $opt_va_prefix . $opt_name_prefix . $generic_name . ');' . $nl;
     $$scratch_str_ref .= $col . 'return &result;' . $nl;
     $col = &colout($col);
     $$scratch_str_ref .= $col . '}}' . $opt_va_close . $nl;
@@ -1590,10 +1600,12 @@ sub generate_generic_func_defn {
   my $in = &ident_comment($generic_name);
   my $opt_va_open = '';
   my $opt_va_prefix = '';
+  my $opt_name_prefix = '$';
   my $opt_va_close = '';
   if (&is_va($generic)) {
-    $opt_va_open = ' namespace va {';
-    $opt_va_prefix = 'va::';
+    $opt_va_open = ' namespace $va {';
+    $opt_va_prefix = '$va::';
+    $opt_name_prefix = '';
     $opt_va_close = '}'
   }
   #namespace $ns { INLINE generic-func add(object-t arg0, object-t arg1) -> object-t {
@@ -1602,18 +1614,18 @@ sub generate_generic_func_defn {
   #  return _func_(arg0, arg1);
   #}}
   my $scratch_str_ref = &global_scratch_str_ref();
-  my $part = "namespace $ns {" . $opt_va_open . ' INLINE func ' . $generic_name . '(' . $$arg_list . ') -> ' . $return_type_str;
+  my $part = $opt_va_open . ' INLINE func ' . $opt_name_prefix . $generic_name . '(' . $$arg_list . ') -> ' . $return_type_str;
 
   if (&is_src_decl() || &is_target_decl()) {
-    $$scratch_str_ref .= $col . $part . "; }" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . $part . ";" . $opt_va_close . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
-    $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
+    $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $opt_name_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
     $$scratch_str_ref .= $col . 'return _func_(' . $list_names_str . ');' . $nl;
     $col = &colout($col);
-    $$scratch_str_ref .= $col . '}}' . $opt_va_close . $nl;
+    $$scratch_str_ref .= $col . '}' . $opt_va_close . $nl;
   }
 }
 sub generate_generic_defns {
@@ -1717,7 +1729,7 @@ sub linkage_unit::generate_generics {
   my $scratch_str = ''; &set_global_scratch_str_ref(\$scratch_str);
   my $scratch_str_ref = &global_scratch_str_ref();
   my ($is_inline, $ns);
-  &generate_generic_defns($ast, $is_inline = 0, $col, $ns = 'xxx');
+  &generate_generic_defns($ast, $is_inline = 0, $col, $ns = undef);
 
   $$scratch_str_ref .=
     $nl .
@@ -1740,15 +1752,15 @@ sub generate_va_make_defn {
     $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $result .=
-      $col . "static $alloc_type_decl = xxx::alloc;" . $nl .
-      $col . "static $init_type_decl = xxx::va::init;" . $nl .
+      $col . "static $alloc_type_decl = \$alloc;" . $nl .
+      $col . "static $init_type_decl = \$va::init;" . $nl .
       $nl .
       $col . "object-t instance = alloc(kls);" . $nl .
       $nl .
       $col . "va-list-t args;" . $nl .
       $col . "va-start(args, kls);" . $nl .
       #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
-      $col . "instance = _func_(instance, args); // xxx::va::init(object-t, va-list-t)" . $nl .
+      $col . "instance = _func_(instance, args); // \$va::init(object-t, va-list-t)" . $nl .
       #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
       $col . "va-end(args);" . $nl .
       $col . "return instance;" . $nl;
@@ -3708,9 +3720,6 @@ sub generate_kw_args_method_signature_defn {
     }
     my $kw_arg_default_placeholder = $$kw_arg_placeholders{'default'};
     foreach my $def (@$defs) {
-      if (1) {
-        $def =~ s/xxx::/\$/g;
-      }
       my $count = $kw_list_types =~ s/$kw_arg_default_placeholder/ $def/; # extra whitespace
       die if 1 != $count;
     }

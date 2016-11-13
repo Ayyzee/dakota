@@ -1692,6 +1692,7 @@ sub add_all_generics_used {
   my ($range, $matches) = &sst_cursor::match_pattern_seq($gbl_sst_cursor, $$args{'pattern'});
   if ($range) {
     my $name = &sst_cursor::str($gbl_sst_cursor, $$args{'range'});
+    $name =~ s/^\$//;
     $$scope{$$args{'name'}}{$name} = undef;
     #&errdump($range);
     #&errdump($matches);
@@ -2089,7 +2090,6 @@ sub generics::parse {
   foreach my $generic (@$big_cahuna) {
     if (!&is_va($generic)) {
       my $scope = [];
-      &path::add_last($scope, 'dk');
       my $generics_key = &func::overloadsig($generic, $scope);
       &path::remove_last($scope);
       $$generics_tbl{$generics_key} = $generic;
@@ -2098,8 +2098,7 @@ sub generics::parse {
   foreach my $generic (@$big_cahuna) {
     if (&is_va($generic)) {
       my $scope = [];
-      &path::add_last($scope, 'dk');
-      &path::add_last($scope, 'va');
+      &path::add_last($scope, '$va');
       my $generics_key = &func::overloadsig($generic, $scope);
       &path::remove_last($scope);
       &path::remove_last($scope);
@@ -2320,9 +2319,6 @@ sub ast_from_dk_path {
   }
   &encode_strings(\$_);
   my $parts = &encode_comments(\$_);
-
-  $_ =~ s/\$/xxx::/g;
-
   &rewrite_klass_defn_with_implicit_metaklass_defn(\$_);
 
   #my $__sub__ = (caller(0))[3];

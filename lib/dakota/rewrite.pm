@@ -246,7 +246,7 @@ sub rewrite_catch_block {
       if ($use_catch_macros) {
         $str_out .= "DKT-CATCH($1, _exception_)$4\{ object-t $3 = _exception_;";
       } else {
-        $str_out .= "else-if (xxx::instance?(_exception_, $1))$4\{ object-t $3 = _exception_;";
+        $str_out .= "else-if (\$instance?(_exception_, $1))$4\{ object-t $3 = _exception_;";
       }
     } elsif ($str_in =~ m/\G(.)/gc) {
       $str_out .= $1;
@@ -634,12 +634,12 @@ sub rewrite_creates {
 }
 sub rewrite_supers_in_klass {
   my ($type, $name, $block) = @_;
-  $block =~ s/((xxx|xxx::va)::$mid\s*)\(\s*super\b(?!\()/$1(super(self, _klass_)/g;
+  $block =~ s/(\$va::$mid|\$$mid)\s*\(\s*super\b(?!\()/$1(super(self, _klass_)/g; # klass()
   return $type . ' ' . $name . ' ' . $block;
 }
 sub rewrite_supers_in_trait {
   my ($type, $name, $block) = @_;
-  $block =~ s/((xxx|xxx::va)::$mid\s*)\(\s*super\b(?!\()/$1(super(self, klass(self))/g;
+  $block =~ s/(\$va::$mid|\$$mid)\s*\(\s*super\b(?!\()/$1(super(self, klass(self))/g;
   return $type . ' ' . $name . ' ' . $block;
 }
 sub rewrite_supers {
@@ -651,12 +651,12 @@ sub rewrite_supers {
 #{
 #    my ($filestr_ref) = @_;
 #    ## regex should be (:)?(\w+:)*\w+ ?
-#    $$filestr_ref =~ s/make\(([_a-z0-9:-]+)/xxx::init(xxx::alloc($1)/g;
+#    $$filestr_ref =~ s/make\(([_a-z0-9:-]+)/\$init(\$alloc($1)/g;
 #}
 sub rewrite_for_each_replacement {
   my ($type, $element, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
   my $first_stmt = '';
-  my $result = "for (iter-pair-t _iter-pair = xxx::iter-pair($sequence);";
+  my $result = "for (iter-pair-t _iter-pair = \$iter-pair($sequence);";
 
   if ('object-t' eq $type) {
     $result .= " object-t $element = _iter-pair.next(_iter-pair.iter);";
@@ -773,8 +773,8 @@ sub remove_exported_enum {
 # method init( ... , object-t #arg1, object-t #arg2 = ...) {|;
 # method init( ... , object-t  arg1, object-t  arg2      ) {|;
 
-# xxx::init(...,        #arg1 =      ...,         #arg2 =      ...)
-# xxx::init(..., SYMBOL(_arg1) , ARG(...), SYMBOL(_arg2) , ARG(...), nullptr)
+# $init(...,        #arg1 =      ...,         #arg2 =      ...)
+# $init(..., SYMBOL(_arg1) , ARG(...), SYMBOL(_arg2) , ARG(...), nullptr)
 sub rewrite_keyword_syntax_list {
   my ($arg1, $arg2, $arg3) = @_;
   my $list = $arg3;
@@ -817,7 +817,7 @@ sub rewrite_keyword_syntax {
   my ($filestr_ref, $kw_arg_generics) = @_;
   foreach my $name (keys %$kw_arg_generics) {
     $$filestr_ref =~ s/(method.*?)($name)($main::list)/&rewrite_keyword_syntax_list($1, $2, $3)/ge;
-    $$filestr_ref =~ s/(xxx::$name)($main::list)/&rewrite_keyword_use($1, $2)/ge;
+    $$filestr_ref =~ s/(\$$name)($main::list)/&rewrite_keyword_use($1, $2)/ge;
   }
   $$filestr_ref =~ s|make(\([^\)]+?\.\.\.\))|__MAKE__$1|gs;
   $$filestr_ref =~ s/(make)($main::list)/&rewrite_keyword_use($1, $2)/ge;
@@ -837,8 +837,8 @@ sub rewrite_sentinal_generic_uses {
   my ($filestr_ref, $kw_arg_generics) = @_;
   $$kw_arg_generics{'make'} = undef;
   foreach my $name (sort keys %$kw_arg_generics) {
-    if ('make' ne $name && $name !~ m/^xxx::/) {
-      $name = "xxx::$name";
+    if ('make' ne $name && $name !~ m/^\$/) {
+      $name = "\$$name";
     }
     $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinal_generic_uses_sub($1, $2, $kw_arg_generics)/egms;
   }
@@ -952,8 +952,12 @@ sub rewrite_map {
 sub rewrite_func {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/(\s)func(\s+$rmid\s*\()/$1FUNC$2/g;
+  $$filestr_ref =~ s/(\s)func(\s+\$$rmid\s*\()/$1FUNC$2/g;
+  $$filestr_ref =~ s/(\s)func(\s+va::$rmid\s*\()/$1FUNC$2/g;
+  $$filestr_ref =~ s/(\s)func(\s+\$va::$rmid\s*\()/$1FUNC$2/g;
   $$filestr_ref =~ s/\bfunc(\s*\(\s*\*\s*\))/FUNC$1/g;
   $$filestr_ref =~ s/\bfunc(\s*\(\s*\*\s*$mid\s*\))/FUNC$1/g;
+  $$filestr_ref =~ s/\bfunc(\s*\(\s*\*\s*\$$mid\s*\))/FUNC$1/g;
   $$filestr_ref =~ s/\bcast(\s*)\((\s*)func(\s+|\()/cast$1($2FUNC$3/g;
   $$filestr_ref =~ s/\bstatic(\s+)func(\s+)/static$1FUNC$2/g;
 }
@@ -971,7 +975,7 @@ sub rewrite_method_chaining_replacement {
 }
 sub rewrite_method_chaining {
   my ($filestr_ref) = @_;
-  my $gf = qr/\$|xxx::/;
+  my $gf = qr/\$/;
   my $leading_expr = qr/(?:$gf?$id(?:::$id)*(?:$main::list|$main::seq+)?(?:\s*(?:\.|->)\s*$gf?$id(?:$main::list|$main::seq+)?)*|$main::list)/s;
 
   while ($$filestr_ref =~
@@ -1003,9 +1007,6 @@ sub convert_dk_to_cc {
   &rewrite_literal_booles($filestr_ref);
   &rewrite_literal_chars($filestr_ref);
   &rewrite_literal_ints($filestr_ref);
-
-  $$filestr_ref =~ s/\$/xxx::/g;
-
   &rewrite_switch($filestr_ref);
 
   &rewrite_objects($filestr_ref); # must be before line removing leading #

@@ -35,6 +35,7 @@
     '--warn-format=2',
     '--warn-missing-format-attribute',
     '--warn-missing-include-dirs',
+    '--warn-no-dollar-in-identifier-extension',
     '--warn-no-multichar',
     '--warn-no-variadic-macros',
     '--warn-pointer-arith',

@@ -184,7 +184,7 @@ sub sst::make {
     elsif (m/\G(include)(\s*)($dqstr)/gc) { &sst::add_tokens3($sst, $1, $2, $3); }
     elsif (m|\G(\#)($mid)|gc)             { &sst::add_token($sst, "$1$2"); } # same as rewrite_symbols() in rewrite.pm
     elsif (m|\G(\#)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
-    elsif (m|\G($mid)|gc)                 { &sst::add_token($sst, $1); }
+    elsif (m|\G(\$?$mid)|gc)              { &sst::add_token($sst, $1); }
     elsif (m|\G(\?)($id)|gc)              { &sst::add_token($sst, "$1$2"); }
     elsif (m/\G(\#(\(|\{|\[))/gc)         { &sst::add_token($sst, $1); }
     elsif (m|\G($id)|gc)                  { &sst::add_token($sst, $1); }
@@ -644,6 +644,17 @@ sub constraint_method_name {
   }
   return ($result_lhs, $result_rhs);
 }
+sub constraint_generic_name {
+  my ($sst, $range, $user_data) = @_;
+  my ($result_lhs, $result_rhs) = (undef, []);
+  my $token = &sst::at($sst, $$range[0]);
+
+  if ($token =~ m/\$$mid/) {
+    $result_lhs = [ $$range[0], $$range[0] ];
+    &add_last($result_rhs, $token);
+  }
+  return ($result_lhs, $result_rhs);
+}
 sub constraint_block {
   my ($sst, $range, $user_data) = @_;
   return &constraint_balenced($sst, $range, $user_data);
@@ -721,7 +732,8 @@ sub constraint_for_name {
   my $constraint_tbl = {
     #'?qual-ident' => \&constraint_qual_ident,
     #'?qual-scope' => \&constraint_qual_scope,
-    '?method-name' => \&constraint_method_name,
+    '?method-name' =>  \&constraint_method_name,
+    '?generic-name' => \&constraint_generic_name,
     '?literal-dquoted-cstring' => \&constraint_literal_dquoted_cstring,
     '?literal-squoted-cstring' => \&constraint_literal_squoted_cstring,
     '?ident' => \&constraint_ident,
