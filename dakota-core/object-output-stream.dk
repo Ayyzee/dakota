@@ -38,9 +38,9 @@ klass object-output-stream {
     self = $init(super, #slots : stream);
     assert(nullptr != stream);
 //     equal-t equals? = cast(equal-t)$method-for-selector(object::_klass_,
-//                                                         SELECTOR(equals?(object-t, object-t));
+//                                                         selector(equals?(object-t, object-t));
 //     compare-t compare = cast(compare-t)$method-for-selector(object::_klass_,
-//                                                             SELECTOR(compare(object-t, object-t));
+//                                                             selector(compare(object-t, object-t));
     self.objects =        make(sorted-set::klass());
     self.object-from-id = make(sorted-table::klass());
     self.id-from-object = make(sorted-table::klass());

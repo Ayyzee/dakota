@@ -72,7 +72,7 @@ klass collection {
   }
   method iter-pair(object-t self) -> iter-pair::slots-t {
     object-t iter = $forward-iterator(self);
-    method-t next = $method-for-selector(klass-of(iter), SELECTOR(next(object-t)));
+    method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
     return cast(iter-pair-t){ .iter = iter, .next = next };
   }
   method add(object-t self, object-t element) -> object-t;

@@ -184,9 +184,9 @@ sub rewrite_klass_defn {
 }
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(?<!$k)(SIGNATURE        \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(SIGNATURE        \s*\(.*?)(\()          /$1,$2/gx;
-  $$filestr_ref =~ s/(?<!$k)(SIGNATURE        \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(signature        \s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
+  $$filestr_ref =~ s/(?<!$k)(signature        \s*\(.*?)(\()          /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(signature        \s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
 
   $$filestr_ref =~ s/(?<!$k)(KW-ARGS-METHOD-SIGNATURE\s*\(\s*$rid)(\?|\!)   /&rewrite_selsig_replacement($1, $2)/gex;
   $$filestr_ref =~ s/(?<!$k)(KW-ARGS-METHOD-SIGNATURE\s*\(\s*$rid)\s*,\s*,  /$1,  /gx; # hackhack
@@ -210,9 +210,9 @@ sub rewrite_selectors {
   $$filestr_ref =~ s/(?<!$k)(  SELECTOR-PTR\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
   $$filestr_ref =~ s/(?<!$k)(  SELECTOR-PTR\s*\(.*?)(\()        /$1,$2/gx;
   ###
-  $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
-  $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
-  $$filestr_ref =~ s/(?<!$k)(  SELECTOR\s*\(.*?)(\()        /$1,$2/gx;
+  $$filestr_ref =~ s/(?<!$k)(  selector\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
+  $$filestr_ref =~ s/(?<!$k)(  selector\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
+  $$filestr_ref =~ s/(?<!$k)(  selector\s*\(.*?)(\()        /$1,$2/gx;
   ###
   $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rid)(\?|\!) /&rewrite_selsig_replacement($1, $2)/gex;
   $$filestr_ref =~ s/(?<!$k)(__selector\s*\(\s*$rid)\s*,\s*,/$1,  /gx; # hackhack
@@ -336,7 +336,7 @@ sub vars_from_defn {
     $params .= ", va-list-t";
     $result .= " static const signature-t* __method__ = KW-ARGS-METHOD-SIGNATURE(va::$name,($params)); USE(__method__);";
   } else {
-    $result .= " static const signature-t* __method__ = SIGNATURE($name,($params)); USE(__method__);";
+    $result .= " static const signature-t* __method__ = signature($name,($params)); USE(__method__);";
   }
   return $result;
 }

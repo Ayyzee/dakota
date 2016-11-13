@@ -1391,7 +1391,7 @@ sub generics::generate_signature_seq {
       my $new_arg_type_list = &arg_type::list_types($$generic{'param-types'});
       my $generic_name = &ct($$generic{'name'});
       my $in = &ident_comment($generic_name);
-      $scratch_str .= $col . "SIGNATURE(va::$generic_name($$new_arg_type_list))," . $in . $nl;
+      $scratch_str .= $col . "signature(va::$generic_name($$new_arg_type_list))," . $in . $nl;
     }
     $scratch_str .= $col . "nullptr," . $nl;
     $col = &colout($col);
@@ -1407,7 +1407,7 @@ sub generics::generate_signature_seq {
         my $new_arg_type_list = &arg_type::list_types($$generic{'param-types'});
         my $generic_name = &ct($$generic{'name'});
         my $in = &ident_comment($generic_name);
-        $scratch_str .= $col . "SIGNATURE($generic_name($$new_arg_type_list))," . $in . $nl;
+        $scratch_str .= $col . "signature($generic_name($$new_arg_type_list))," . $in . $nl;
       }
     }
     $scratch_str .= $col . "nullptr," . $nl;
@@ -1515,8 +1515,8 @@ sub generate_generic_defn {
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
-    $$scratch_str_ref .= $col . "static selector-t selector = SELECTOR($opt_va_prefix_method$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
-    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = SIGNATURE($opt_va_prefix_method$generic_name($$new_arg_type_list)););" . ' // one time initialization' . $nl;
+    $$scratch_str_ref .= $col . "static selector-t selector = selector($opt_va_prefix_method$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
+    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = signature($opt_va_prefix_method$generic_name($$new_arg_type_list)););" . ' // one time initialization' . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = context;);" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
@@ -1764,9 +1764,9 @@ sub generate_va_make_defn {
       $nl .
       $col . "$va_list_t args;" . $nl .
       $col . "va-start(args, kls);" . $nl .
-      #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
+      #$col . "DKT-VA-TRACE-BEFORE(signature(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
       $col . "instance = _func_(instance, args); // \$va::init($object_t, $va_list_t)" . $nl .
-      #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
+      #$col . "DKT-VA-TRACE-AFTER( signature(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
       $col . "va-end(args);" . $nl .
       $col . "return instance;" . $nl;
     $col = &colout($col);
@@ -3081,9 +3081,9 @@ sub signature_body_common {
       my $generic_name = &ct($$method{'name'});
       my $in = &ident_comment($generic_name);
       if (&is_va($method)) {
-        $result .= $col . "SIGNATURE(va::$generic_name($$new_arg_type_list))," . $in . $nl;
+        $result .= $col . "signature(va::$generic_name($$new_arg_type_list))," . $in . $nl;
       } else {
-        $result .= $col . "SIGNATURE($generic_name($$new_arg_type_list))," . $in . $nl;
+        $result .= $col . "signature($generic_name($$new_arg_type_list))," . $in . $nl;
       }
     }
   }
@@ -3162,9 +3162,9 @@ sub alias_body {
       my $generic_name = &ct($$method{'name'});
       my $alias_name = &ct($$method{'alias'});
       if (&is_va($method)) {
-        $result .= $col . "{ .alias-signature = SIGNATURE(va::$alias_name($$new_arg_type_list)), .method-signature = SIGNATURE(va::$generic_name($$new_arg_type_list)) }," . $nl;
+        $result .= $col . "{ .alias-signature = signature(va::$alias_name($$new_arg_type_list)), .method-signature = signature(va::$generic_name($$new_arg_type_list)) }," . $nl;
       } else {
-        $result .= $col . "{ .alias-signature = SIGNATURE($alias_name($$new_arg_type_list)), .method-signature = SIGNATURE($generic_name($$new_arg_type_list)) }," . $nl;
+        $result .= $col . "{ .alias-signature = signature($alias_name($$new_arg_type_list)), .method-signature = signature($generic_name($$new_arg_type_list)) }," . $nl;
       }
     }
     $method_num++;
@@ -3237,7 +3237,7 @@ sub dk_generate_cc_footer_klass {
         my $new_arg_type_list = &arg_type::list_types($$va_method{'param-types'});
         my $generic_name = &ct($$va_method{'name'});
         my $in = &ident_comment($generic_name);
-        $$scratch_str_ref .= $col . "SIGNATURE(va::$generic_name($$new_arg_type_list))," . $in . $nl;
+        $$scratch_str_ref .= $col . "signature(va::$generic_name($$new_arg_type_list))," . $in . $nl;
         my $method_name;
 
         if ($$va_method{'alias'}) {

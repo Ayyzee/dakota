@@ -158,9 +158,9 @@ inline FUNC uintptr_compare(uintptr_t i1, uintptr_t i2) -> cmp_t { return (i1 < 
 # define SLOTS_METHOD_SIGNATURE(name, args)   METHOD_SIGNATURE(name, args)
 
 // file scope
-# define SIGNATURE(name, args)                (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __signature::name))()
+# define signature(name, args)                (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __signature::name))()
 # define SELECTOR_PTR(name, args)             (cast(dkt_selector_func_t) (cast(FUNC (*)args ->       selector_t* ) __selector::name))()
-# define SELECTOR(name, args)                *SELECTOR_PTR(name, args)
+# define selector(name, args)                *SELECTOR_PTR(name, args)
 
 # define GENERIC_FUNC_PTR_PTR(name, args)     (cast(dkt_generic_func_func_t)(cast(FUNC (*)args -> generic_func_t*) __generic_func_ptr::name))()
 # define GENERIC_FUNC_PTR(name, args)        *GENERIC_FUNC_PTR_PTR(name, args)
