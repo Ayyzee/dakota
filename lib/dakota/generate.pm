@@ -111,8 +111,13 @@ my $global_should_echo = 0;
 my $global_scratch_str_ref;
 #my $global_src_cc_str;
 
-my $global_seq_super_t =   ['super-t']; # special (used in eq compare)
-my $global_seq_ellipsis =  ['...'];
+my $seq_super_t =   ['super-t']; # special (used in eq compare)
+my $seq_ellipsis =  ['...'];
+my $seq_object_t =  ['object-t'];
+my $seq_va_list_t = ['va-list-t'];
+my $object_t =  'object-t';
+my $super_t =   'super-t';
+my $va_list_t = 'va-list-t';
 my $global_klass_defns = [];
 
 my $plural_from_singular = { 'klass', => 'klasses', 'trait' => 'traits' };
@@ -722,7 +727,7 @@ sub arg_type::super {
   my $new_arg_type_ref = &deep_copy($arg_type_ref);
 
   #if (object-t eq $$new_arg_type_ref[0]) {
-  $$new_arg_type_ref[0] = $global_seq_super_t; # replace_first
+  $$new_arg_type_ref[0] = $seq_super_t; # replace_first
   #} else {
   #    $$new_arg_type_ref[0] = 'UNKNOWN-T';
   #}
@@ -734,7 +739,7 @@ sub arg_type::var_args {
 
   my $new_arg_type_ref = &deep_copy($arg_type_ref);
   die if 'va-list-t' ne $$new_arg_type_ref[-1][-1];
-  $$new_arg_type_ref[$num_args - 1] = $global_seq_ellipsis;
+  $$new_arg_type_ref[$num_args - 1] = $seq_ellipsis;
   return $new_arg_type_ref;
 }
 sub arg_type::names {
@@ -743,14 +748,14 @@ sub arg_type::names {
   my $arg_num =        0;
   my $arg_names = [];
 
-  if (0 == &type::compare($global_seq_super_t, $$arg_type_ref[0])) {
+  if (0 == &type::compare($seq_super_t, $$arg_type_ref[0])) {
     $$arg_names[0] = "context";    # replace_first
   } else {
     $$arg_names[0] = 'object';  # replace_first
   }
 
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
-    if (0 == &type::compare($global_seq_ellipsis, $$arg_type_ref[$arg_num])) {
+    if (0 == &type::compare($seq_ellipsis, $$arg_type_ref[$arg_num])) {
       $$arg_names[$arg_num] = undef;
     } elsif ('va-list-t' eq $$arg_type_ref[$arg_num][-1]) {
       $$arg_names[$arg_num] = "args";
@@ -969,7 +974,7 @@ sub method::var_args_from_qual_va_list {
     &remove_name_va_scope($new_method);
   }
   if (exists $$new_method{'param-types'}) {
-    &replace_last($$new_method{'param-types'}, ['...']);
+    &replace_last($$new_method{'param-types'}, $seq_ellipsis);
   }
   return $new_method;
 }
@@ -1048,7 +1053,7 @@ sub generate_va_generic_defn {
     $col = &colin($col);
     $$scratch_str_ref .=
       $col . "static func $method_type_decl = \$va::$va_method_name;" . $nl .
-      $col . "va-list-t args;" . $nl .
+      $col . "$va_list_t args;" . $nl .
       $col . "va-start(args, $$new_arg_names_ref[$num_args - 2]);" . $nl;
 
     if (defined $$va_method{'return-type'}) {
@@ -1079,8 +1084,8 @@ sub method::compare {
   my $a_string = &func::overloadsig($a, $scope = []); # the a and b values sometimes
   my $b_string = &func::overloadsig($b, $scope = []); # are missing the 'name' key
 
-  $a_string =~ s/(.*?va-list-t.*?)/ $1/;
-  $b_string =~ s/(.*?va-list-t.*?)/ $1/;
+  $a_string =~ s/(.*?$va_list_t.*?)/ $1/;
+  $b_string =~ s/(.*?$va_list_t.*?)/ $1/;
 
   $a_string cmp $b_string;
 }
@@ -1467,7 +1472,7 @@ sub generate_va_generic_defns {
 
       my ($klass_type, $max_width);
       &generate_va_generic_defn($new_generic, $scope, $col, $klass_type = undef, $max_width = undef, __LINE__); # object-t
-      $$new_generic{'param-types'}[0] = $global_seq_super_t; # replace_first
+      $$new_generic{'param-types'}[0] = $seq_super_t; # replace_first
       &generate_va_generic_defn($new_generic, $scope, $col, $klass_type = undef, $max_width = undef, __LINE__); # super-t
       &path::remove_last($scope);
     }
@@ -1479,7 +1484,7 @@ sub generate_generic_defn {
   my $generic_name = $$generic{'name'}[0];
   my $orig_arg_type_list = &arg_type::list_types($$generic{'param-types'});
   my $tmp = &deep_copy($$generic{'param-types'}[0]);
-  $$generic{'param-types'}[0] = ['object-t'];
+  $$generic{'param-types'}[0] = $seq_object_t;
   my $new_arg_type =            $$generic{'param-types'};
   my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
   $$generic{'param-types'}[0] = $tmp;
@@ -1651,7 +1656,7 @@ sub generate_generic_defns {
     if (&is_va($generic)) {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
-        $$copy{'param-types'}[0] = ['super-t'];
+        $$copy{'param-types'}[0] = $seq_super_t;
         if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($copy, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
@@ -1681,7 +1686,7 @@ sub generate_generic_defns {
     if (!&is_va($generic)) {
       if (!&is_slots($generic)) {
         my $copy = &deep_copy($generic);
-        $$copy{'param-types'}[0] = ['super-t'];
+        $$copy{'param-types'}[0] = $seq_super_t;
         if (!&is_src_decl() && !&is_target_decl()) {
           &generate_generic_defn($copy, $is_inline, $col, $ns);
           &generate_generic_func_ptr_defn($copy, $is_inline, $col, $ns);
@@ -1742,12 +1747,12 @@ sub generate_va_make_defn {
   my ($generics, $is_inline, $col) = @_;
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()" . $nl;
-  $result .= $col . "[[sentinel]] INLINE func make(object-t kls, ...) -> object-t";
+  $result .= $col . "[[sentinel]] INLINE func make($object_t kls, ...) -> $object_t";
   if (&is_src_decl() || &is_target_decl()) {
     $result .= ";" . $nl;
   } elsif (&is_target_defn()) {
-    my $alloc_type_decl = "func (*alloc)(object-t) -> object-t"; ### should use method::type_decl
-    my $init_type_decl =  "func (*_func_)(object-t, va-list-t) -> object-t"; ### should use method::type_decl
+    my $alloc_type_decl = "func (*alloc)($object_t) -> $object_t"; ### should use method::type_decl
+    my $init_type_decl =  "func (*_func_)($object_t, $va_list_t) -> $object_t"; ### should use method::type_decl
 
     $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
@@ -1755,13 +1760,13 @@ sub generate_va_make_defn {
       $col . "static $alloc_type_decl = \$alloc;" . $nl .
       $col . "static $init_type_decl = \$va::init;" . $nl .
       $nl .
-      $col . "object-t instance = alloc(kls);" . $nl .
+      $col . "$object_t instance = alloc(kls);" . $nl .
       $nl .
-      $col . "va-list-t args;" . $nl .
+      $col . "$va_list_t args;" . $nl .
       $col . "va-start(args, kls);" . $nl .
-      #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
-      $col . "instance = _func_(instance, args); // \$va::init(object-t, va-list-t)" . $nl .
-      #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init(object-t, va-list-t)), cast(method-t)_func_, instance, args);" . $nl .
+      #$col . "DKT-VA-TRACE-BEFORE(SIGNATURE(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
+      $col . "instance = _func_(instance, args); // \$va::init($object_t, $va_list_t)" . $nl .
+      #$col . "DKT-VA-TRACE-AFTER( SIGNATURE(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
       $col . "va-end(args);" . $nl .
       $col . "return instance;" . $nl;
     $col = &colout($col);
@@ -1943,7 +1948,7 @@ sub generate_klass_unbox {
     ### unbox() same for all types
     my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
     if ($is_klass_defn || (&should_export_slots($klass_ast) && &has_slots_cat_info($klass_ast))) {
-      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox(object-t object) -> slots-t&";
+      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox($object_t object) -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
       } elsif (&is_target_defn()) {
@@ -1972,7 +1977,7 @@ sub generate_klass_box {
       my $slots_type = &at($$klass_ast{'slots'}, 'type');
       if (&is_array_type($slots_type)) {
         ### box() array-type
-        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> $object_t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -1980,13 +1985,13 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
-            $col . "object-t result = make(klass());" . $nl .
+            $col . "$object_t result = make(klass());" . $nl .
             $col . "memcpy(unbox(result), arg, sizeof(slots-t)); // unfortunate" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
           $result .= $col . "}} // $klass_name\::box()" . $nl;
         }
-        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> $object_t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -1994,14 +1999,14 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
-            $col . "object-t result = box(*arg);" . $nl .
+            $col . "$object_t result = box(*arg);" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
           $result .= $col . "}} // $klass_name\::box()" . $nl;
         }
       } else { # !&is_array_type()
         ### box() non-array-type
-        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> $object_t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2013,21 +2018,21 @@ sub generate_klass_box {
             my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
             if ($promoted_type) {
               $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
-                $col . "object-t result = make(klass(), \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
+                $col . "$object_t result = make(klass(), \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
             } else {
               $result .=
-                $col . "object-t result = make(klass(), \#slots : *arg);" . $nl;
+                $col . "$object_t result = make(klass(), \#slots : *arg);" . $nl;
             }
           } else {
             $result .=
-              $col . "object-t result = make(klass());" . $nl .
+              $col . "$object_t result = make(klass());" . $nl .
               $col . "unbox(result) = *arg;" . $nl;
           }
           $result .= $col . "return result;" . $nl;
           $col = &colout($col);
           $result .= $col . "}} // $klass_name\::box()" . $nl;
         }
-        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> object-t";
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> $object_t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2035,7 +2040,7 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
-            $col . "object-t result = $klass_name\::box(&arg);" . $nl .
+            $col . "$object_t result = $klass_name\::box(&arg);" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
           $result .= $col . "}} // $klass_name\::box()" . $nl;
@@ -2095,9 +2100,9 @@ sub linkage_unit::generate_klasses_body_vars {
   }
   if ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= " extern object-t _klass_ [[read-only]];";
+      $$scratch_str_ref .= " extern $object_t _klass_ [[read-only]];";
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $pad . " object-t _klass_ = nullptr;";
+      $$scratch_str_ref .= $pad . " $object_t _klass_ = nullptr;";
     }
   }
   $$scratch_str_ref .= ' }' . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
@@ -2116,15 +2121,15 @@ sub linkage_unit::generate_klasses_body_funcs_klass {
 
   if ('trait' eq $klass_type) {
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t) -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass($object_t) -> $object_t; }" . &ann(__FILE__, __LINE__) . $nl;
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass(object-t self) -> object-t { return klass-with-trait(klass-of(self), __name__); }}" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= $col . "$klass_type $klass_name { INLINE func klass($object_t self) -> $object_t { return klass-with-trait(klass-of(self), __name__); }}" . &ann(__FILE__, __LINE__) . $nl;
     }
   } elsif ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= "$klass_type $klass_name { INLINE func klass() -> object-t; }" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= "$klass_type $klass_name { INLINE func klass() -> $object_t; }" . &ann(__FILE__, __LINE__) . $nl;
     } elsif (&is_target_defn()) {
-      $$scratch_str_ref .= "$klass_type $klass_name { INLINE func klass() -> object-t { return klass-for-name(__name__, _klass_); }}" . &ann(__FILE__, __LINE__) . $nl;
+      $$scratch_str_ref .= "$klass_type $klass_name { INLINE func klass() -> $object_t { return klass-for-name(__name__, _klass_); }}" . &ann(__FILE__, __LINE__) . $nl;
     }
   } else { die }
 }
@@ -2233,10 +2238,10 @@ sub linkage_unit::generate_klasses_body_funcs_non_inline {
 
   my $va_list_methods = &klass::va_list_methods($klass_ast);
   if (&is_decl() && $$klass_ast{'has-initialize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { func initialize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { func initialize($object_t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
   if (&is_decl() && $$klass_ast{'has-finalize'}) {
-    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { func finalize(object-t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type $klass_name" . $pad . " { func finalize($object_t kls) -> void; }" . &ann(__FILE__, __LINE__) . $nl;
   }
   my $kw_arg_methods = &klass::kw_arg_methods($klass_ast);
   if (&is_decl() && @$kw_arg_methods) {
@@ -2360,7 +2365,7 @@ sub convert_to_object_type {
   my $result = $type_seq;
 
   if (&is_box_type($type_seq)) {
-    $result = ['object-t'];
+    $result = $seq_object_t;
   }
   return $result;
 }
@@ -2762,7 +2767,7 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   if (1) {
     $$scratch_str_ref .=
       $col . "# if !defined DK-USE-MAKE-MACRO" . $nl .
-      $col . "[[sentinel]] INLINE func make(object-t kls, ...) -> object-t;" .  "// hackhack" . $nl .
+      $col . "[[sentinel]] INLINE func make($object_t kls, ...) -> $object_t;" .  "// hackhack" . $nl .
       $col . "# endif" . $nl;
   }
   $$scratch_str_ref .= '//--box--' . $nl;
@@ -4190,9 +4195,9 @@ sub linkage_unit::generate_strs {
   foreach my $str (sort keys %{$$ast{'literal-strs'}}) {
     my $str_ident = &dk_mangle($str);
     if (&is_decl()) {
-      $scratch_str .= $col . "extern object-t $str_ident; // \"$str\"" . $nl;
+      $scratch_str .= $col . "extern $object_t $str_ident; // \"$str\"" . $nl;
     } else {
-      $scratch_str .= $col . "object-t $str_ident = nullptr; // \"$str\"" . $nl;
+      $scratch_str .= $col . "$object_t $str_ident = nullptr; // \"$str\"" . $nl;
     }
   }
   $col = &colout($col);
@@ -4205,7 +4210,7 @@ sub linkage_unit::generate_target_runtime_strs_seq {
   my $col = '';
   if (0 == scalar keys %{$$target_srcs_ast{'literal-strs'}}) {
     $scratch_str .= $col . "//static str-t const[] __str-literals = { nullptr }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
-    $scratch_str .= $col . "//static object-t*[] __str-ptrs = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "//static $object_t*[] __str-ptrs = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
     $scratch_str .= $col . "static str-t const[] __str-literals = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
@@ -4246,9 +4251,9 @@ sub linkage_unit::generate_ints {
   foreach my $int (sort keys %{$$ast{'literal-ints'}}) {
     my $int_ident = &dk_mangle($int);
     if (&is_decl()) {
-      $scratch_str .= $col . "extern object-t $int_ident;" . $nl;
+      $scratch_str .= $col . "extern $object_t $int_ident;" . $nl;
     } else {
-      $scratch_str .= $col . "object-t $int_ident = nullptr;" . $nl;
+      $scratch_str .= $col . "$object_t $int_ident = nullptr;" . $nl;
     }
   }
   $col = &colout($col);
@@ -4261,7 +4266,7 @@ sub linkage_unit::generate_target_runtime_ints_seq {
   my $col = '';
   if (0 == scalar keys %{$$target_srcs_ast{'literal-ints'}}) {
     $scratch_str .= $col . "//static intmax-t const[] __int-literals = { 0 }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
-    $scratch_str .= $col . "//static object-t*[] __int-ptrs = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "//static $object_t*[] __int-ptrs = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
     $scratch_str .= $col . "static intmax-t const[] __int-literals = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
@@ -4425,7 +4430,3 @@ unless (caller) {
   &start(\@ARGV);
 }
 1;
-
-# object-t
-# super-t
-# va-list-t
