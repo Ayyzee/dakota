@@ -525,7 +525,7 @@ sub rewrite_const {
 }
 sub rewrite_array_types {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/($tid)(\s*)($main::seq)(\s*)($id)/$1$2$4$5$3/gm;
+  $$filestr_ref =~ s/($tid)(\s*)($main::seq)(\s*)($mid)/$1$2$4$5$3/gm;
 }
 sub symbol {
   my ($symbol) = @_;
