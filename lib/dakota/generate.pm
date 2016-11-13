@@ -1333,7 +1333,7 @@ sub linkage_unit::generate_target_runtime_generic_func_ptrs_seq {
   if (0 == @$va_generics) {
     $scratch_str .= $col . "static generic-func-t** va-generic-func-ptrs = nullptr;" . $nl;
   } else {
-    $scratch_str .= $col . "static generic-func-t* va-generic-func-ptrs\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static generic-func-t*\[] va-generic-func-ptrs = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach $generic (sort method::compare @$va_generics) {
       my $new_arg_type_list = &arg_type::list_types($$generic{'param-types'});
@@ -1348,7 +1348,7 @@ sub linkage_unit::generate_target_runtime_generic_func_ptrs_seq {
   if (0 == @$fa_generics) {
     $scratch_str .= $col . "static generic-func-t** generic-func-ptrs = nullptr;" . $nl;
   } else {
-    $scratch_str .= $col . "static generic-func-t* generic-func-ptrs\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static generic-func-t*\[] generic-func-ptrs = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach $generic (sort method::compare @$fa_generics) {
       if (!&is_slots($generic)) {
@@ -1376,7 +1376,7 @@ sub generics::generate_signature_seq {
   if (0 == @$va_generics) {
     $scratch_str .= $col . "static const signature-t* const* va-signatures = nullptr;" . $nl;
   } else {
-    $scratch_str .= $col . "static const signature-t* const va-signatures\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static const signature-t* const\[] va-signatures = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach $generic (sort method::compare @$va_generics) {
       my $new_arg_type_list = &arg_type::list_types($$generic{'param-types'});
@@ -1391,7 +1391,7 @@ sub generics::generate_signature_seq {
   if (0 == @$fa_generics) {
     $scratch_str .= $col . "static const signature-t* const* signatures = nullptr;" . $nl;
   } else {
-    $scratch_str .= $col . "static const signature-t* const signatures\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static const signature-t* const\[] signatures = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach $generic (sort method::compare @$fa_generics) {
       if (!&is_slots($generic)) {
@@ -3210,7 +3210,7 @@ sub dk_generate_cc_footer_klass {
   #$col = &colin($col);
   ###
   if (@$va_list_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __va-method-signatures\[] = { // redundant" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const\[] __va-method-signatures = { // redundant" . &ann(__FILE__, __LINE__) . $nl;
 
     my $sorted_va_methods = [sort method::compare @$va_list_methods];
 
@@ -3299,7 +3299,7 @@ sub dk_generate_cc_footer_klass {
   #}
   ###
   if (@$kw_arg_methods) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const __kw-args-method-signatures\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static const signature-t* const\[] __kw-args-method-signatures = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     #$$scratch_str_ref .= "\#if 0" . $nl;
     foreach my $kw_args_method (@$kw_arg_methods) {
@@ -3317,7 +3317,7 @@ sub dk_generate_cc_footer_klass {
   }
   if (values %{$$klass_ast{'methods'} || []}) {
     $$scratch_str_ref .=
-      $col . "$klass_type @$klass_name { static const signature-t* const __method-signatures\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
+      $col . "$klass_type @$klass_name { static const signature-t* const\[] __method-signatures = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
       $col . &signature_body($klass_name, $$klass_ast{'methods'}, &colin($col)) .
       $col . "};}" . $nl;
   }
@@ -3339,7 +3339,7 @@ sub dk_generate_cc_footer_klass {
 
   if (values %{$exported_methods || []}) {
     $$scratch_str_ref .=
-      $col . "$klass_type @$klass_name { static const signature-t* const __exported-method-signatures\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
+      $col . "$klass_type @$klass_name { static const signature-t* const\[] __exported-method-signatures = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
       $col . &signature_body($klass_name, $exported_methods, &colin($col)) .
       $col . "};}" . $nl .
       $col . "$klass_type @$klass_name { static method-t[] __exported-method-addresses = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
@@ -3348,7 +3348,7 @@ sub dk_generate_cc_footer_klass {
   }
   if (values %{$exported_slots_methods || []}) {
     $$scratch_str_ref .=
-      $col . "$klass_type @$klass_name { static const signature-t* const __exported-slots-method-signatures\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
+      $col . "$klass_type @$klass_name { static const signature-t* const\[] __exported-slots-method-signatures = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
       $col . &slots_signature_body($klass_name, $exported_slots_methods, &colin($col)) .
       $col . "};}" . $nl .
       $col . "$klass_type @$klass_name { static method-t[] __exported-slots-method-addresses = { //ro-data" . &ann(__FILE__, __LINE__) . $nl .
@@ -3421,7 +3421,7 @@ sub dk_generate_cc_footer_klass {
   }
   my $num_bound = keys %{$$klass_ast{'imported-klasses'}};
   if ($num_bound) {
-    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const __imported-klasses\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $$scratch_str_ref .= $col . "$klass_type @$klass_name { static symbol-t const\[] __imported-klasses = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     while (my ($key, $val) = each(%{$$klass_ast{'imported-klasses'}})) {
       $$scratch_str_ref .= $col . "$key\::__name__," . $nl;
@@ -4195,10 +4195,10 @@ sub linkage_unit::generate_target_runtime_strs_seq {
   my $scratch_str = "";
   my $col = '';
   if (0 == scalar keys %{$$target_srcs_ast{'literal-strs'}}) {
-    $scratch_str .= $col . "//static str-t const __str-literals\[] = { nullptr }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
-    $scratch_str .= $col . "//static object-t* __str-ptrs\[] = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "//static str-t const\[] __str-literals = { nullptr }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "//static object-t*\[] __str-ptrs = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
-    $scratch_str .= $col . "static str-t const __str-literals\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static str-t const\[] __str-literals = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
       $scratch_str .= $col . "#|$str|," . $nl;
@@ -4251,10 +4251,10 @@ sub linkage_unit::generate_target_runtime_ints_seq {
   my $scratch_str = "";
   my $col = '';
   if (0 == scalar keys %{$$target_srcs_ast{'literal-ints'}}) {
-    $scratch_str .= $col . "//static intmax-t const __int-literals\[] = { 0 }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
-    $scratch_str .= $col . "//static object-t* __int-ptrs\[] = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "//static intmax-t const\[] __int-literals = { 0 }; //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "//static object-t*\[] __int-ptrs = { nullptr }; //rw-data" . &ann(__FILE__, __LINE__) . $nl;
   } else {
-    $scratch_str .= $col . "static intmax-t const __int-literals\[] = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
+    $scratch_str .= $col . "static intmax-t const\[] __int-literals = { //ro-data" . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       $scratch_str .= $col . "$int," . $nl;
