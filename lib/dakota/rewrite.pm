@@ -975,7 +975,7 @@ sub rewrite_method_chaining_replacement {
 }
 sub rewrite_method_chaining {
   my ($filestr_ref) = @_;
-  my $gf = qr/\$/;
+  my $gf = qr/(?:\$|\$va::)/;
   my $leading_expr = qr/(?:$gf?$id(?:::$id)*(?:$main::list|$main::seq+)?(?:\s*(?:\.|->)\s*$gf?$id(?:$main::list|$main::seq+)?)*|$main::list)/s;
 
   while ($$filestr_ref =~
