@@ -169,10 +169,21 @@ inline FUNC uintptr_compare(uintptr_t i1, uintptr_t i2) -> cmp_t { return (i1 < 
 # define until(e)  while (0 == (e))
 
 inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4) -> uint32_t {
-  return ((((cast(uint32_t)cast(uchar8_t) c1) << 24) & 0xff000000) |
-          (((cast(uint32_t)cast(uchar8_t) c2) << 16) & 0x00ff0000) |
-          (((cast(uint32_t)cast(uchar8_t) c3) <<  8) & 0x0000ff00) |
-          (((cast(uint32_t)cast(uchar8_t) c4) <<  0) & 0x000000ff));
+  return ((((cast(uint32_t)cast(uchar8_t) c1) << (32 -  8)) & 0xff000000) |
+          (((cast(uint32_t)cast(uchar8_t) c2) << (32 - 16)) & 0x00ff0000) |
+          (((cast(uint32_t)cast(uchar8_t) c3) << (32 - 24)) & 0x0000ff00) |
+          (((cast(uint32_t)cast(uchar8_t) c4) << (32 - 32)) & 0x000000ff));
+}
+inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
+                    char8_t c5, char8_t c6, char8_t c7, char8_t c8) -> uint64_t {
+  return ((((cast(uint64_t)cast(uchar8_t) c1) << (64 -  8)) & 0xff00000000000000) |
+          (((cast(uint64_t)cast(uchar8_t) c2) << (64 - 16)) & 0x00ff000000000000) |
+          (((cast(uint64_t)cast(uchar8_t) c3) << (64 - 24)) & 0x0000ff0000000000) |
+          (((cast(uint64_t)cast(uchar8_t) c4) << (64 - 32)) & 0x000000ff00000000) |
+          (((cast(uint64_t)cast(uchar8_t) c5) << (64 - 40)) & 0x00000000ff000000) |
+          (((cast(uint64_t)cast(uchar8_t) c6) << (64 - 48)) & 0x0000000000ff0000) |
+          (((cast(uint64_t)cast(uchar8_t) c7) << (64 - 56)) & 0x000000000000ff00) |
+          (((cast(uint64_t)cast(uchar8_t) c8) << (64 - 64)) & 0x00000000000000ff));
 }
 
 # if !defined NUL
