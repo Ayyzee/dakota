@@ -51,6 +51,7 @@ inline FUNC name_of(object_t kls) -> symbol_t {
   return klass::unbox(kls).name;
 }
 inline FUNC klass_for_name(symbol_t name, object_t kls) -> object_t {
+  assert(nullptr != name);
   return kls ? kls : dk_klass_for_name(name);
 }
 inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
