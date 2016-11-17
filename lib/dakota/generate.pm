@@ -1747,7 +1747,7 @@ sub generate_va_make_defn {
   my ($generics, $is_inline, $col) = @_;
   my $result = '';
   #$result .= $col . "// generate_va_make_defn()" . $nl;
-  $result .= $col . "[[sentinel]] INLINE func make($object_t kls, ...) -> $object_t";
+  $result .= $col . "[[sentinel]] INLINE func \$make($object_t kls, ...) -> $object_t";
   if (&is_src_decl() || &is_target_decl()) {
     $result .= ";" . $nl;
   } elsif (&is_target_defn()) {
@@ -1985,7 +1985,7 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
-            $col . "$object_t result = make(klass());" . $nl .
+            $col . "$object_t result = \$make(klass());" . $nl .
             $col . "memcpy(unbox(result), arg, sizeof(slots-t)); // unfortunate" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
@@ -2018,14 +2018,14 @@ sub generate_klass_box {
             my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
             if ($promoted_type) {
               $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
-                $col . "$object_t result = make(klass(), \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
+                $col . "$object_t result = \$make(klass(), \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
             } else {
               $result .=
-                $col . "$object_t result = make(klass(), \#slots : *arg);" . $nl;
+                $col . "$object_t result = \$make(klass(), \#slots : *arg);" . $nl;
             }
           } else {
             $result .=
-              $col . "$object_t result = make(klass());" . $nl .
+              $col . "$object_t result = \$make(klass());" . $nl .
               $col . "unbox(result) = *arg;" . $nl;
           }
           $result .= $col . "return result;" . $nl;
@@ -2766,9 +2766,7 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   }
   if (1) {
     $$scratch_str_ref .=
-      $col . "# if !defined DK-USE-MAKE-MACRO" . $nl .
-      $col . "[[sentinel]] INLINE func make($object_t kls, ...) -> $object_t;" .  "// hackhack" . $nl .
-      $col . "# endif" . $nl;
+      $col . "[[sentinel]] INLINE func \$make($object_t kls, ...) -> $object_t;" .  "// hackhack" . $nl;
   }
   $$scratch_str_ref .= '//--box--' . $nl;
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
@@ -3902,10 +3900,10 @@ sub generate_kw_args_method_defn {
   #$$scratch_str_ref .= $col . "{" . $nl;
   $col = &colin($col);
   $$scratch_str_ref .=
-    $col . "throw make(no-such-keyword-exception::klass()," . $nl .
-    $col . "           \#object $colon    self," . $nl .
-    $col . "           \#signature $colon __method-signature__," . $nl .
-    $col . "           \#keyword $colon   _keyword_->symbol);" . $nl;
+    $col . "throw \$make(no-such-keyword-exception::klass()," . $nl .
+    $col . "            \#object $colon    self," . $nl .
+    $col . "            \#signature $colon __method-signature__," . $nl .
+    $col . "            \#keyword $colon   _keyword_->symbol);" . $nl;
   $col = &colout($col);
   #$$scratch_str_ref .= $col . "}" . $nl;
   $col = &colout($col);
@@ -3929,10 +3927,10 @@ sub generate_kw_args_method_defn {
       }
     } else {
       $$scratch_str_ref .=
-        $col . "throw make(missing-keyword-exception::klass()," . $nl .
-        $col . "           \#object $colon    self," . $nl .
-        $col . "           \#signature $colon __method-signature__," . $nl .
-        $col . "           \#keyword $colon   \#$kw_arg_name);" . $nl;
+        $col . "throw \$make(missing-keyword-exception::klass()," . $nl .
+        $col . "            \#object $colon    self," . $nl .
+        $col . "            \#signature $colon __method-signature__," . $nl .
+        $col . "            \#keyword $colon   \#$kw_arg_name);" . $nl;
     }
     $col = &colout($col);
   }

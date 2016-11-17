@@ -66,7 +66,7 @@ THREAD-LOCAL super-t            dkt-current-context;
 THREAD-LOCAL super-t            dkt-null-context;
 
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
-  throw make(no-such-method-exception::klass(), #object : object, #context : dkt-current-context, #signature : dkt-current-signature);
+  throw $make(no-such-method-exception::klass(), #object : object, #context : dkt-current-context, #signature : dkt-current-signature);
 }
 klass selector-pair-compare {
   slots (*)(selector-pair-t*, selector-pair-t*) -> int-t;
@@ -373,7 +373,7 @@ klass klass {
     return self;
   }
   // method va-method-for-selector(object-t self, selector-t selector) {
-  //   throw make(exception::klass(), #msg : "not yet implemented") -> va-method-t;
+  //   throw $make(exception::klass(), #msg : "not yet implemented") -> va-method-t;
   //   // return nullptr
   // }
   method method-for-selector?(object-t self, selector-t selector) -> boole-t {
@@ -457,7 +457,7 @@ klass klass {
     return self;
   }
   method traits(object-t self) -> object-t {
-    object-t seq = make(vector::klass());
+    object-t seq = $make(vector::klass());
     const symbol-t* traits = self.traits;;
     
     if (nullptr != traits) {
@@ -657,7 +657,7 @@ klass klass {
     assert(0 < methods-count);
     assert(selector-count-max > methods-count);
     assert(nullptr == self.behavior);
-    self.behavior = make(bit-vector::klass(), #initial-capacity : methods-count);
+    self.behavior = $make(bit-vector::klass(), #initial-capacity : methods-count);
     return self.behavior;
   }
   method behavior(object-t self) -> object-t {

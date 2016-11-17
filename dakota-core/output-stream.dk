@@ -50,7 +50,7 @@ klass output-stream {
       unbox(self) = fopen(file, "w");
 
       if (nullptr == unbox(self))
-        throw make(system-exception::klass(), #errnum : errno);
+        throw $make(system-exception::klass(), #errnum : errno);
     }
     return self;
   }
@@ -65,7 +65,7 @@ klass output-stream {
     int-t rtn = fclose(slots);
 
     if (0 != rtn)
-      throw make(system-exception::klass(), #errnum : errno);
+      throw $make(system-exception::klass(), #errnum : errno);
     return self;
   }
   // hackhack?  use print below?

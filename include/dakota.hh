@@ -204,14 +204,6 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
   # define DKT_TRACE(statement)
 # endif
 
-# if defined DKT_USE_MAKE_MACRO
-  # if defined DEBUG
-    # define make(kls, ...) $init($alloc(kls, __FILE__, __LINE__), __VA_ARGS__)
-  # else
-    # define make(kls, ...) $init($alloc(kls), __VA_ARGS__)
-  # endif
-# endif
-
 // width of hex string representation of a uintptr-t
 # define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 

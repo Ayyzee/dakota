@@ -51,7 +51,7 @@ klass collection {
   //   assert(nullptr != encoding);
   //   while (nullptr != *strings) // rnielsen: modifying a param - bad practice?
   //   {
-  //     object-t string = make(string::klass(), #bytes : *strings, #encoding : encoding);
+  //     object-t string = $make(string::klass(), #bytes : *strings, #encoding : encoding);
   //     strings++;
   //     $add(self, string);
   //   }

@@ -66,7 +66,7 @@ klass lexer {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s", buf);
-        throw make(exception::klass(), #msg : "oops");
+        throw $make(exception::klass(), #msg : "oops");
       }
       fseeko(stream, 0L, SEEK-END);
       self.length = ftello(stream);
@@ -95,7 +95,7 @@ klass lexer {
     self.previous-column = 0;
     self.column =   0;
 
-    self.open-tokens = make(deque::klass());
+    self.open-tokens = $make(deque::klass());
     return self;
   }
   method dealloc(object-t self) -> object-t {
@@ -151,9 +151,9 @@ klass lexer {
     return c;
   }
   method tokenize(object-t self) -> object-t {
-    object-t seq = make(vector::klass());
+    object-t seq = $make(vector::klass());
     object-t token;
-    object-t leading-ws = make(vector::klass());
+    object-t leading-ws = $make(vector::klass());
 
     while (nullptr != (token = $lex(self))) {
       if (0 == $tokenid(token)) {
@@ -161,7 +161,7 @@ klass lexer {
       } else {
         unless ($empty?(leading-ws)) {
           $set-leading-ws(token, leading-ws);
-          leading-ws = make(vector::klass());
+          leading-ws = $make(vector::klass());
         }
         $add-last(seq, token);
       }
@@ -187,7 +187,7 @@ klass lexer {
               }
               default: {
                 unget-char8(self);
-                object-t token = make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
+                object-t token = $make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
                                       #line : -1, #column : -1);
                 return token;
               }
@@ -211,7 +211,7 @@ klass lexer {
                   escaped? = false;
                 } else {
                   escaped? = false;
-                  object-t token = make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
                                         #line : -1, #column : -1);
                   return token;
                 }
@@ -235,7 +235,7 @@ klass lexer {
                   str-buffer::concat(&buf, c3);
                   switch (c3) {
                     case '\n': {
-                      object-t token = make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
+                      object-t token = $make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
                                             #line : -1, #column : -1);
                       return token;
                     }
@@ -257,14 +257,14 @@ klass lexer {
                     break;
                 }
                 str-buffer::concat(&buf, c4);
-                object-t token = make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
+                object-t token = $make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
                                       #line : -1, #column : -1);
                 return token;
                 // / op
               }
             } // switch (c2)
             unget-char8(self);
-            object-t token = make(token::klass(), #tokenid : '/', #buffer : buf.ptr,
+            object-t token = $make(token::klass(), #tokenid : '/', #buffer : buf.ptr,
                                   #line : self.line, #column : self.column - buf.len);
             return token;
           } // while (1)
@@ -288,7 +288,7 @@ klass lexer {
                   escaped? = false;
                 } else {
                   escaped? = false;
-                  object-t token = make(token::klass(), #tokenid : 'sqst', #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : 'sqst', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
@@ -315,7 +315,7 @@ klass lexer {
                   escaped? = false;
                 } else {
                   escaped? = false;
-                  object-t token = make(token::klass(), #tokenid : 'dqst', #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : 'dqst', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
@@ -336,7 +336,7 @@ klass lexer {
                 c2 = get-char8(self);
               }while (isxdigit(c2));
               unget-char8(self);
-              object-t token = make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
@@ -346,13 +346,13 @@ klass lexer {
                 c2 = get-char8(self);
               }while (isdigit(c2) && '8' != c2 && '9' != c2);
               unget-char8(self);
-              object-t token = make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -364,7 +364,7 @@ klass lexer {
             c1 = get-char8(self);
           }while (isdigit(c1));
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : 'nmbr', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -395,7 +395,7 @@ klass lexer {
           tokenid-t tokenid = 'idnt';
           if (ident-type?(buf))
             tokenid = 'type';
-          object-t token = make(token::klass(), #tokenid : tokenid, #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : tokenid, #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -406,26 +406,26 @@ klass lexer {
           switch (c2) {
             case '!': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '!!', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '!!', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '!=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '!=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '!', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '!', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '$': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : '$', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '$', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -436,13 +436,13 @@ klass lexer {
           switch (c2) {
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '%=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '%=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '%', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '%', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -453,26 +453,26 @@ klass lexer {
           switch (c2) {
             case '&': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '&&', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '&&', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '&=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '&=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '&', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '&', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '(': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t open-token = make(open-token::klass(), #tokenid : '(', #buffer : buf.ptr,
+          object-t open-token = $make(open-token::klass(), #tokenid : '(', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
           $push(self.open-tokens, open-token);
           return open-token;
@@ -480,7 +480,7 @@ klass lexer {
         case ')': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : ')', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : ')', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           object-t open-token;
           do {
@@ -488,7 +488,7 @@ klass lexer {
           } while ('<' == $tokenid(open-token));
 
           if ('(' != $tokenid(open-token))
-            throw make(syntax-exception::klass(), #token : token, #file : self.file, #msg : "not balenced");
+            throw $make(syntax-exception::klass(), #token : token, #file : self.file, #msg : "not balenced");
           $set-close-token(open-token, token);
           return token;
         }
@@ -499,19 +499,19 @@ klass lexer {
           switch (c2) {
             case '/': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '*/', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '*/', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '*=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '*=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '*', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '*', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -522,26 +522,26 @@ klass lexer {
           switch (c2) {
             case '+': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '++', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '++', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '+=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '+=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '+', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '+', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case ',': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : ',', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : ',', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -552,13 +552,13 @@ klass lexer {
           switch (c2) {
             case '-': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '--', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '--', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '-=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '-=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
@@ -568,19 +568,19 @@ klass lexer {
               switch (c3) {
                 case '*': {
                   str-buffer::concat(&buf, c3);
-                  object-t token = make(token::klass(), #tokenid : '->*', #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : '->*', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
               }
               unget-char8(self);
-              object-t token = make(token::klass(), #tokenid : '->', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '->', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '-', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '-', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -591,7 +591,7 @@ klass lexer {
           switch (c2) {
             case '*': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '.*', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '.*', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
@@ -601,19 +601,19 @@ klass lexer {
               switch (c3) {
                 case '.': {
                   str-buffer::concat(&buf, c3);
-                  object-t token = make(token::klass(), #tokenid : '...', #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : '...', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
               }
               unget-char8(self);
-              object-t token = make(token::klass(), #tokenid : '..', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '..', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '.', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '.', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -628,26 +628,26 @@ klass lexer {
               switch (c3) {
                 case '*': {
                   str-buffer::concat(&buf, c3);
-                  object-t token = make(token::klass(), #tokenid : '::*', #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : '::*', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
               }
               unget-char8(self);
-              object-t token = make(token::klass(), #tokenid : '::', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '::', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : ':', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : ':', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case ';': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : ';', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : ';', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -662,25 +662,25 @@ klass lexer {
               switch (c3) {
                 case '=': {
                   str-buffer::concat(&buf, c3);
-                  object-t token = make(token::klass(), #tokenid : '<<=', #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : '<<=', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
               }
               unget-char8(self);
-              object-t token = make(token::klass(), #tokenid : '<<', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '<<', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '<=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '<=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t open-token = make(open-token::klass(), #tokenid : '<', #buffer : buf.ptr,
+          object-t open-token = $make(open-token::klass(), #tokenid : '<', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
           $push(self.open-tokens, open-token);
           return open-token;
@@ -692,19 +692,19 @@ klass lexer {
           switch (c2) {
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '==', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '==', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '>': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : ':', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : ':', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '=', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '=', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -715,7 +715,7 @@ klass lexer {
           switch (c2) {
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '>=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '>=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
@@ -724,19 +724,19 @@ klass lexer {
               switch (c3) {
                 case '=': {
                   str-buffer::concat(&buf, c3);
-                  object-t token = make(token::klass(), #tokenid : '>>=', #buffer : buf.ptr,
+                  object-t token = $make(token::klass(), #tokenid : '>>=', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
               }
               unget-char8(self);
-              object-t token = make(token::klass(), #tokenid : '>>', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '>>', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '>', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '>', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           object-t open-token = $pop(self.open-tokens);
           if ('<' != $tokenid(open-token))
@@ -748,21 +748,21 @@ klass lexer {
         case '?': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : '?', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '?', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '@': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : '@', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '@', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '[': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t open-token = make(open-token::klass(), #tokenid : '[', #buffer : buf.ptr,
+          object-t open-token = $make(open-token::klass(), #tokenid : '[', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
           $push(self.open-tokens, open-token);
           return open-token;
@@ -770,7 +770,7 @@ klass lexer {
         case ']': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : ']', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : ']', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           object-t open-token;
           do {
@@ -778,7 +778,7 @@ klass lexer {
           } while ('<' == $tokenid(open-token));
 
           if ('[' != $tokenid(open-token))
-            throw make(syntax-exception::klass(), #token : token, #file : self.file, #msg : "not balenced");
+            throw $make(syntax-exception::klass(), #token : token, #file : self.file, #msg : "not balenced");
           $set-close-token(open-token, token);
           return token;
         }
@@ -789,27 +789,27 @@ klass lexer {
           switch (c2) {
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '^=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '^=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '^', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '^', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '`': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : '`', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '`', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '{': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t open-token = make(open-token::klass(), #tokenid : '{', #buffer : buf.ptr,
+          object-t open-token = $make(open-token::klass(), #tokenid : '{', #buffer : buf.ptr,
                                      #line : self.line, #column : self.column - buf.len);
           $push(self.open-tokens, open-token);
           return open-token;
@@ -821,26 +821,26 @@ klass lexer {
           switch (c2) {
             case '=': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '|=', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '|=', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
             case '|': {
               str-buffer::concat(&buf, c2);
-              object-t token = make(token::klass(), #tokenid : '||', #buffer : buf.ptr,
+              object-t token = $make(token::klass(), #tokenid : '||', #buffer : buf.ptr,
                                     #line : self.line, #column : self.column - buf.len);
               return token;
             }
           }
           unget-char8(self);
-          object-t token = make(token::klass(), #tokenid : '|', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '|', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
         case '}': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : '}', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '}', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           object-t open-token;
           do {
@@ -848,14 +848,14 @@ klass lexer {
           } while ('<' == $tokenid(open-token));
 
           if ('{' != $tokenid(open-token))
-            throw make(syntax-exception::klass(), #token : token, #file : self.file, #msg : "not balenced");
+            throw $make(syntax-exception::klass(), #token : token, #file : self.file, #msg : "not balenced");
           $set-close-token(open-token, token);
           return token;
         }
         case '~': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : '~', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : '~', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }
@@ -864,7 +864,7 @@ klass lexer {
             return nullptr;
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          object-t token = make(token::klass(), #tokenid : 'undf', #buffer : buf.ptr,
+          object-t token = $make(token::klass(), #tokenid : 'undf', #buffer : buf.ptr,
                                 #line : self.line, #column : self.column - buf.len);
           return token;
         }

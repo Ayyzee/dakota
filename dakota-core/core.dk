@@ -449,7 +449,7 @@ static named-info-t* gbl-registration-info-list;
 
 // func dk-make-simple-singleton(symbol-t name, symbol-t superkls-name) -> object-t {
 //   object-t kls = dk-make-simple-klass(name, superkls-name, #singleton-klass);
-//   object-t singleton = make(kls);
+//   object-t singleton = $make(kls);
 //   return singleton;
 // }
 func dk-make-simple-klass(symbol-t name, symbol-t superkls-name, symbol-t kls-name) -> object-t {
@@ -723,7 +723,7 @@ func dk-init-runtime() -> void {
     null = cast(object-t)-1;
 
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
-    null = make(null-klass);
+    null = $make(null-klass);
     klass::unbox(object::_klass_).superklass = null;
 
     // core runtime initialized
@@ -760,9 +760,9 @@ func dk-init-runtime() -> void {
     $behavior(bit-vector::_klass_);
 # endif
 
-    std-input =  make(input-stream::klass(),  #slots : stdin);
-    std-output = make(output-stream::klass(), #slots : stdout);
-    std-error =  make(output-stream::klass(), #slots : stderr);
+    std-input =  $make(input-stream::klass(),  #slots : stdin);
+    std-output = $make(output-stream::klass(), #slots : stdout);
+    std-error =  $make(output-stream::klass(), #slots : stderr);
 
     set-read-write();
     each(gbl-registration-info-list,
@@ -1388,13 +1388,13 @@ static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -
   }
   switch (sig) {
     case SIGBUS:
-      throw make(sigbus-exception::klass());
+      throw $make(sigbus-exception::klass());
       break;
     case SIGSEGV:
-      throw make(sigsegv-exception::klass());
+      throw $make(sigsegv-exception::klass());
       break;
     default:
-      throw make(signal-exception::klass());
+      throw $make(signal-exception::klass());
   }
 }
 static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) -> int-t {
@@ -1608,9 +1608,9 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
     kls-klass = klass::_klass_;
 
   if (kls-klass != klass::_klass_ && !klass::subklass?(kls-klass, klass::_klass_)) // hardhard
-    throw make(illegal-klass-exception::klass());
+    throw $make(illegal-klass-exception::klass());
 
-  kls = make(kls-klass, #info-slots : info-slots);
+  kls = $make(kls-klass, #info-slots : info-slots);
   return kls;
 }
 func dk-klass-for-name(symbol-t name) -> object-t {

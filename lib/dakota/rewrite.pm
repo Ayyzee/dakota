@@ -454,7 +454,7 @@ sub rewrite_objects {
 sub rewrite_table_literal_replacement {
   my ($body) = @_;
   my $result = '';
-  $result .= "make(DEFAULT-TABLE-KLASS";
+  $result .= "\$make(DEFAULT-TABLE-KLASS";
   my $pairs = [split /,/, $body];
 
   if (0 != @$pairs && '' ne $$pairs[0]) {
@@ -497,7 +497,7 @@ sub rewrite_sequence_literal {
 sub rewrite_list_literal_replacement {
   my ($body, $type) = @_;
   my $result = '';
-  $result .= "make(DEFAULT-$type-KLASS";
+  $result .= "\$make(DEFAULT-$type-KLASS";
   my $pairs = [split /,/, $body];
   $pairs = [map {&trim($_)} @$pairs];
 
@@ -819,9 +819,9 @@ sub rewrite_keyword_syntax {
     $$filestr_ref =~ s/(method.*?)($name)($main::list)/&rewrite_keyword_syntax_list($1, $2, $3)/ge;
     $$filestr_ref =~ s/(\$$name)($main::list)/&rewrite_keyword_use($1, $2)/ge;
   }
-  $$filestr_ref =~ s|make(\([^\)]+?\.\.\.\))|__MAKE__$1|gs;
-  $$filestr_ref =~ s/(make)($main::list)/&rewrite_keyword_use($1, $2)/ge;
-  $$filestr_ref =~ s|__MAKE__|make|gs;
+  $$filestr_ref =~ s|\$make(\([^\)]+?\.\.\.\))|__MAKE__$1|gs;
+  $$filestr_ref =~ s/(\$make)($main::list)/&rewrite_keyword_use($1, $2)/ge;
+  $$filestr_ref =~ s|__MAKE__|\$make|gs;
 }
 sub rewrite_sentinal_generic_uses_sub {
   my ($name, $arg_list, $kw_arg_generics) = @_;

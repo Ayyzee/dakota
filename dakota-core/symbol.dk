@@ -32,7 +32,7 @@ klass intern-pool-klass {
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
-    self.pool = make(sorted-set::klass()); // should be consumer settable
+    self.pool = $make(sorted-set::klass()); // should be consumer settable
     return self;
   }
   method add(object-t self, object-t element) -> object-t {

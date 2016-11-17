@@ -26,27 +26,27 @@ trait set {
   method all-in?(object-t self, object-t collection) -> boole-t {
     USE(self);
     USE(collection);
-    throw make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg : "not yet implemented");
     return false;
   }
   method any-in?(object-t self, object-t collection) -> boole-t {
     USE(self);
     USE(collection);
-    throw make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg : "not yet implemented");
     return false;
   }
   // complement (if collection is set)
   method remove-all(object-t self, object-t collection) -> object-t {
     USE(self);
     USE(collection);
-    throw make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg : "not yet implemented");
     return null;
   }
   // intersection (if collection is set)
   method retain-all(object-t self, object-t collection) -> object-t {
     USE(self);
     USE(collection);
-    throw make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg : "not yet implemented");
     return null;
   }
   method write-lite(object-t self, object-t out) -> object-t {

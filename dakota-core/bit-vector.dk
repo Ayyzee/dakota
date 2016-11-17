@@ -90,7 +90,7 @@ klass bit-vector {
   }
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
-    object-t copy = make(kls);
+    object-t copy = $make(kls);
     slots-t& s1 = unbox(self);
     slots-t& s2 = unbox(copy);
     s2 = s1;

@@ -99,7 +99,7 @@ klass sorted-set {
   method in(object-t self, object-t element) -> object-t {
     object-t result = $in(self, element, cast(object-t)nullptr);
     if (nullptr == result)
-      throw make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
@@ -135,7 +135,7 @@ klass sorted-set {
   }
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
-    object-t copy = make(kls);
+    object-t copy = $make(kls);
     slots-t& s1 = unbox(self);
     slots-t& s2 = unbox(copy);
     s2 = s1;
@@ -148,7 +148,7 @@ klass sorted-set {
     return self.sa.count;
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = make(sorted-set-forward-iterator::klass(), #sorted-set : self);
+    object-t forward-iterator = $make(sorted-set-forward-iterator::klass(), #sorted-set : self);
     return forward-iterator;
   }
   method dump(object-t self) -> object-t {
@@ -196,7 +196,7 @@ klass sorted-set-forward-iterator {
 
     if (self.iterator-state != ss.iterator-state) {
       fprintf(stderr, "%zi == %zi\n", self.iterator-state, ss.iterator-state);
-      throw make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg : "oops");
     }
     return;
   }
