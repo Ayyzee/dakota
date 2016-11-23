@@ -37,7 +37,7 @@
 # define TRAIT(t)
 # define TRAITS(t1, ...)
 
-# define SENTINAL_PTR nullptr
+# define SENTINAL_PTR cast(keyword_t*)nullptr
 
 # define typealias using
 

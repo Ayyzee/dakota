@@ -3862,7 +3862,7 @@ sub generate_kw_args_method_defn {
   #$col = &colin($col);
   $$scratch_str_ref .=
     $col . "keyword-t* _keyword_;" . $nl .
-    $col . "while (nullptr != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {" . &ann(__FILE__, __LINE__) . $nl;
+    $col . "while (SENTINAL-PTR != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated." . $nl;
   $col = &colin($col);
