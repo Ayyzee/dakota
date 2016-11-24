@@ -809,7 +809,7 @@ sub rewrite_keyword_use {
   #print STDERR "$arg1$list\n";
   $list =~ s/\#?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
   $list =~ s/\#?($id)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
-  $list =~ s/\)$/, SENTINAL-PTR\)/g;
+  $list =~ s/\)$/, SENTINEL-PTR\)/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";
 }
@@ -823,24 +823,24 @@ sub rewrite_keyword_syntax {
   $$filestr_ref =~ s/(\$make)($main::list)/&rewrite_keyword_use($1, $2)/ge;
   $$filestr_ref =~ s|__MAKE__|\$make|gs;
 }
-sub rewrite_sentinal_generic_uses_sub {
+sub rewrite_sentinel_generic_uses_sub {
   my ($name, $arg_list, $kw_arg_generics) = @_;
-  &rewrite_sentinal_generic_uses(\$arg_list, $kw_arg_generics);
+  &rewrite_sentinel_generic_uses(\$arg_list, $kw_arg_generics);
   if (1) {
-    $arg_list =~ s/$/, SENTINAL-PTR/g;
-    $arg_list =~ s/,\s*SENTINAL-PTR\s*,\s*SENTINAL-PTR\s*$/, SENTINAL-PTR/g;
-    $arg_list =~ s/^(\s*(object-t|super-t)\s*.*?),\s*SENTINAL-PTR\s*$/$1/g;
+    $arg_list =~ s/$/, SENTINEL-PTR/g;
+    $arg_list =~ s/,\s*SENTINEL-PTR\s*,\s*SENTINEL-PTR\s*$/, SENTINEL-PTR/g;
+    $arg_list =~ s/^(\s*(object-t|super-t)\s*.*?),\s*SENTINEL-PTR\s*$/$1/g;
   }
   return "$name\($arg_list\)";
 }
-sub rewrite_sentinal_generic_uses {
+sub rewrite_sentinel_generic_uses {
   my ($filestr_ref, $kw_arg_generics) = @_;
   $$kw_arg_generics{'make'} = undef;
   foreach my $name (sort keys %$kw_arg_generics) {
     if ('make' ne $name && $name !~ m/^\$/) {
       $name = "\$$name";
     }
-    $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinal_generic_uses_sub($1, $2, $kw_arg_generics)/egms;
+    $$filestr_ref =~ s/\b($name)\s*\(($main::list_in)\)/&rewrite_sentinel_generic_uses_sub($1, $2, $kw_arg_generics)/egms;
   }
   delete $$kw_arg_generics{'make'};
 }
@@ -1055,7 +1055,7 @@ sub convert_dk_to_cc {
   &rewrite_signatures($filestr_ref);
   &rewrite_selectors($filestr_ref);
   &rewrite_keyword_syntax($filestr_ref, $kw_arg_generics);
-  &rewrite_sentinal_generic_uses($filestr_ref, $kw_arg_generics);
+  &rewrite_sentinel_generic_uses($filestr_ref, $kw_arg_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_arg_generics);
   &rewrite_map($filestr_ref);
