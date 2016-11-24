@@ -1738,9 +1738,7 @@ sub linkage_unit::generate_generics {
 
   $$scratch_str_ref .=
     $nl .
-    $col . "# if !defined DK-USE-MAKE-MACRO" . $nl .
-    &generate_va_make_defn($ast, $is_inline = 1, &colin($col)) .
-    $col . "# endif" . $nl;
+    &generate_va_make_defn($ast, $is_inline = 1, '');
   return $$scratch_str_ref;
 }
 sub generate_va_make_defn {
