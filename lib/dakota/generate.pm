@@ -1748,7 +1748,7 @@ sub generate_va_make_defn {
   #$result .= $col . "// generate_va_make_defn()" . $nl;
   $result .= $col . "[[sentinel]] INLINE func \$make($object_t kls, ...) -> $object_t";
   if (&is_src_decl() || &is_target_decl()) {
-    $result .= ";" . $nl;
+    $result .= ";" . &ann(__FILE__, __LINE__) . $nl;
   } elsif (&is_target_defn()) {
     my $alloc_type_decl = "func (*alloc)($object_t) -> $object_t"; ### should use method::type_decl
     my $init_type_decl =  "func (*_func_)($object_t, $va_list_t) -> $object_t"; ### should use method::type_decl

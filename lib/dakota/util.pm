@@ -958,11 +958,10 @@ sub is_kw_args_method {
   my $state = 0;
   my ($name, $types) = &kw_args_method_sig($method);
   my $name_str =  &str_from_seq($name);
-  my $types_str = &param_types_str($types);
   my $target_srcs_ast = &target_srcs_ast();
   my $tbl = $$target_srcs_ast{'kw-arg-generics'};
 
-  if (exists $$tbl{$name_str} && exists $$tbl{$name_str}{$types_str}) {
+  if (exists $$tbl{$name_str}) {
     $state = 1;
   }
   return $state;
