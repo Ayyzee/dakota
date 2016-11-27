@@ -27,11 +27,11 @@ klass pair {
     object-t last;
   }
   // other pairs:
-  //   { object-t, symbol-t }, { object-t, symbol-t, int64-t }
+  //   { object-t, symbol-t }, { object-t, symbol-t, ssize-t }
   //   klass symbol-object-pair { slots { symbol-t first; object-t last; } }
   //   klass symbol-symbol-pair { slots { symbol-t first; symbol-t last; } }
-  //   klass symbol-int64-pair { slots { symbol-t first; int64-t last; } }
-  //   klass object-int64-pair { slots { object-t first; int64-t last; } }
+  //   klass symbol-ssize-pair { slots { symbol-t first; ssize-t last; } }
+  //   klass object-ssize-pair { slots { object-t first; ssize-t last; } }
   
   method init(object-t self,
               object-t first : null,

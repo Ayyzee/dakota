@@ -19,7 +19,7 @@
 module dakota;
 
 klass tokenid {
-  slots int64-t;
+  slots ssize-t;
 
   method init(object-t self, slots-t slots : 0) -> object-t {
     self = $init(super);
