@@ -3821,7 +3821,7 @@ sub generate_kw_args_method_defn {
   #$$scratch_str_ref .= $col . "if (nullptr != $$new_arg_names[-1]) {" . $nl;
   #$col = &colin($col);
   $$scratch_str_ref .=
-    $col . "$keyword_t* _keyword_;" . $nl .
+    $col . "const $keyword_t* _keyword_;" . $nl .
     $col . "while (SENTINEL-PTR != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated." . $nl;
@@ -4132,11 +4132,11 @@ sub linkage_unit::generate_keywords {
     if (defined $ident) {
       my $should_ann = &should_ann($ln, $num_lns);
       if (&is_decl()) {
-        $scratch_str .= $col . "extern $keyword_t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
+        $scratch_str .= $col . "extern const $keyword_t $ident;" . $pad . ' // ' . &as_literal_symbol($symbol) . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
       } else {
         my $in = &ident_comment($symbol);
         # keyword-defn
-        $scratch_str .= $col . "$keyword_t $ident =" . $pad . " { dk-hash(\"$symbol\")," . $pad . " #$symbol };" . $in . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
+        $scratch_str .= $col . "const $keyword_t $ident =" . $pad . " { dk-hash(\"$symbol\")," . $pad . " #$symbol };" . $in . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
       }
     }
   }
