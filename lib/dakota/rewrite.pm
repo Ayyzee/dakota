@@ -1076,6 +1076,7 @@ sub convert_dk_to_cc {
   &rewrite_klass_defn($filestr_ref);
   &nest_namespaces($filestr_ref);
   &rewrite_syntax($filestr_ref);
+  $$filestr_ref =~ s|\$(make[^\w-])|$1|g; #hackhack
   &rewrite_declarations($filestr_ref);
 
   $$filestr_ref =~ s/else[_-]if/else if/gs;

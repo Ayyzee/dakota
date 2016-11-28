@@ -1736,42 +1736,7 @@ sub linkage_unit::generate_generics {
   my $scratch_str_ref = &global_scratch_str_ref();
   my ($is_inline, $ns);
   &generate_generic_defns($ast, $is_inline = 0, $col, $ns = undef);
-
-  $$scratch_str_ref .=
-    $nl .
-    &generate_va_make_defn($ast, $is_inline = 1, '');
   return $$scratch_str_ref;
-}
-sub generate_va_make_defn {
-  my ($generics, $is_inline, $col) = @_;
-  my $result = '';
-  #$result .= $col . "// generate_va_make_defn()" . $nl;
-  $result .= $col . "[[sentinel]] INLINE func \$make($object_t kls, ...) -> $object_t";
-  if (&is_src_decl() || &is_target_decl()) {
-    $result .= ";" . &ann(__FILE__, __LINE__) . $nl;
-  } elsif (&is_target_defn()) {
-    my $alloc_type_decl = "func (*alloc)($object_t) -> $object_t"; ### should use method::type_decl
-    my $init_type_decl =  "func (*_func_)($object_t, $va_list_t) -> $object_t"; ### should use method::type_decl
-
-    $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
-    $col = &colin($col);
-    $result .=
-      $col . "static $alloc_type_decl = \$alloc;" . $nl .
-      $col . "static $init_type_decl = \$va::init;" . $nl .
-      $nl .
-      $col . "$object_t instance = alloc(kls);" . $nl .
-      $nl .
-      $col . "$va_list_t args;" . $nl .
-      $col . "va-start(args, kls);" . $nl .
-      #$col . "DKT-VA-TRACE-BEFORE(signature(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
-      $col . "instance = _func_(instance, args); // \$va::init($object_t, $va_list_t)" . $nl .
-      #$col . "DKT-VA-TRACE-AFTER( signature(va::init($object_t, $va_list_t)), cast(method-t)_func_, instance, args);" . $nl .
-      $col . "va-end(args);" . $nl .
-      $col . "return instance;" . $nl;
-    $col = &colout($col);
-    $result .= $col . "}" . $nl;
-  }
-  return $result;
 }
 my $enum_set = { 'type-enum' => 1,
                  'enum'      => 1 };
@@ -2762,10 +2727,6 @@ sub linkage_unit::generate_klasses_funcs { # optionally inline
   $$scratch_str_ref .= $nl;
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs($ast, $col, $klass_path, $klass_name);
-  }
-  if (1) {
-    $$scratch_str_ref .=
-      $col . "[[sentinel]] INLINE func \$make($object_t kls, ...) -> $object_t;" .  "// hackhack" . $nl;
   }
   $$scratch_str_ref .= '//--box--' . $nl;
   foreach my $klass_name (sort @$ordered_klass_names) { # ok to sort
