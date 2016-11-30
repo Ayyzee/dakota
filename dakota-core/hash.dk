@@ -19,9 +19,9 @@ module dakota-core;
 klass hash {
   slots size-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t value : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
 }

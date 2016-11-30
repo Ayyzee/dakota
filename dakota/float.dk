@@ -21,9 +21,9 @@ klass float32 {
   
   slots std::float32-t;
 
-  method init(object-t self, slots-t slots : 0.0) -> object-t {
+  method init(object-t self, slots-t value : 0.0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
 }
@@ -32,9 +32,9 @@ klass float64 {
   
   slots std::float64-t;
 
-  method init(object-t self, slots-t slots : 0.0) -> object-t {
+  method init(object-t self, slots-t value : 0.0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
 }
@@ -43,9 +43,9 @@ klass float128 {
   
   slots std::float128-t;
 
-  method init(object-t self, slots-t slots : 0.0) -> object-t {
+  method init(object-t self, slots-t value : 0.0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
 }

@@ -34,17 +34,17 @@ klass boole { // a doubleton :-)
 
   slots boole-t;
 
-  method init(object-t self, slots-t slots : false) -> object-t {
+  method init(object-t self, slots-t value : false) -> object-t {
     // intentionally not chaining $init()
     assert(false == unbox(self));
-    if (slots)
-      self = (boole-klass::unbox(klass-of(self)))[slots];
+    if (value)
+      self = (boole-klass::unbox(klass-of(self)))[value];
     return self;
   }
-  static func mk(object-t k, boole-t v) -> object-t {
-    object-t self = $alloc(super(k, klass-of(k)));
+  static func mk(object-t kls, boole-t value) -> object-t {
+    object-t self = $alloc(super(kls, klass-of(kls)));
     self = $init(super);
-    unbox(self) = v;
+    unbox(self) = value;
     return self;
   }
   func initialize(object-t kls) -> void {

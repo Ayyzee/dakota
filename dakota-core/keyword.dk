@@ -26,9 +26,10 @@ klass keyword {
   }
   //slots-t null{};
 
-  method init(object-t self, slots-t slots : {.hash = 0, .symbol = nullptr}) -> object-t {
+  method init(object-t self, hash-t hash : 0, symbol-t symbol : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    self.hash =   hash;
+    self.symbol = symbol;
     return self;
   }
 }

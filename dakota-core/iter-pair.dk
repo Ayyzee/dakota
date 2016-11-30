@@ -22,9 +22,10 @@ klass iter-pair {
     method-t next;
   }
 
-  method init(object-t self, slots-t slots : {.iter = nullptr, .next = nullptr}) -> object-t {
+  method init(object-t self, object-t iter : nullptr, method-t next : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    self.iter = iter;
+    self.next = next;
     return self;
   }
 }

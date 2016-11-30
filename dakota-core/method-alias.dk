@@ -24,9 +24,10 @@ klass method-alias {
     const signature-t* method-signature;
   }
 
-  method init(object-t self, slots-t slots : {.alias-signature = nullptr, .method-signature = nullptr}) -> object-t {
+  method init(object-t self, const signature-t* alias-signature : nullptr, const signature-t* method-signature : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    self.alias-signature =  alias-signature;
+    self.method-signature = method-signature;
     return self;
   }
 }

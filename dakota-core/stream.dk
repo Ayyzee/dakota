@@ -21,9 +21,9 @@ module dakota-core;
 klass stream {
   slots FILE*; // not currently used (both input-stream and output-stream have their own)
 
-  method init(object-t self, slots-t slots : nullptr) -> object-t {
+  method init(object-t self, slots-t value : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
 }

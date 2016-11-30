@@ -21,9 +21,10 @@ klass dimension {
     ssize-t width;
     ssize-t height;
   }
-  method init(object-t self, slots-t slots : {.width = 0, .height = 0}) -> object-t {
+  method init(object-t self, ssize-t width : 0, ssize-t height : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    self.width =  width;
+    self.height = height;
     return self;
   }
 }

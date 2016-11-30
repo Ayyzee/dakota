@@ -26,9 +26,9 @@ klass str;
 klass str-compare {
   slots (*)(str-t, str-t) -> int-t;
 
-  method init(object-t self, slots-t slots : nullptr) -> object-t {
+  method init(object-t self, slots-t value : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
 }
@@ -50,9 +50,9 @@ klass str {
 
   slots const char8-t*;
 
-  method init(object-t self, slots-t slots : "") -> object-t {
+  method init(object-t self, slots-t value : "") -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
   // causes make-format(object-t, str-t, ...) to be generated
@@ -68,9 +68,9 @@ klass str {
     return self;
   }
   method hash(object-t self) -> hash-t {
-    slots-t slots = unbox(self);
-    assert(nullptr != slots);
-    hash-t result = dk-hash(slots);
+    slots-t value = unbox(self);
+    assert(nullptr != value);
+    hash-t result = dk-hash(value);
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {

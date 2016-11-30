@@ -21,9 +21,9 @@ module dakota;
 klass tokenid {
   slots ssize-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t value : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     return self;
   }
   method str(slots-t s, char8-t* str, ssize-t len) -> str-t {

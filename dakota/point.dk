@@ -21,9 +21,10 @@ klass point {
     ssize-t x;
     ssize-t y;
   }
-  method init(object-t self, slots-t slots : {.x = 0, .y = 0}) -> object-t {
+  method init(object-t self, ssize-t x : 0, ssize-t y : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    self.x = x;
+    self.y = y;
     return self;
   }
 }

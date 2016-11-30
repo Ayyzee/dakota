@@ -28,9 +28,10 @@ klass property {
     symbol-t key;
     intptr-t element;
   }
-  method init(object-t self, slots-t slots : {.key = nullptr, .element = 0}) -> object-t {
+  method init(object-t self, symbol-t key : nullptr, intptr-t element : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    self.key =     key;
+    self.element = element;
     return self;
   }
   method compare(slots-t* s, slots-t* other-s) -> cmp-t {

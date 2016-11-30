@@ -23,9 +23,10 @@ klass slot-info {
     ssize-t  size;   // never 0
   }
 
-  method init(object-t self, slots-t slots : {.type = nullptr, .size = 0}) -> object-t {
+  method init(object-t self, symbol-t type : nullptr, ssize-t size : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    self.type = type;
+    self.size = size;
     return self;
   }
 }

@@ -47,9 +47,9 @@ klass symbol {
   klass intern-pool-klass;
   slots str-t;
 
-  method init(object-t self, slots-t slots : nullptr) -> object-t {
+  method init(object-t self, slots-t value : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    unbox(self) = value;
     self = $add(klass-of(self), self); // leakleak
     return self;
   }
