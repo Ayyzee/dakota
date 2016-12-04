@@ -801,13 +801,19 @@ sub is_slots {
     return 0;
   }
 }
+my $box_type_set = {
+  'const slots-t*' => 1,
+  'const slots-t&' => 1,
+  'slots-t*' => 1,
+  'slots-t&' => 1,
+  'slots-t'  => 1,
+};
 sub is_box_type {
   my ($type_seq) = @_;
   my $result;
-  my $type_str = &ct($type_seq);
+  my $type_str = &remove_extra_whitespace(join(' ', @$type_seq));
 
-  if ('slots-t*' eq $type_str ||
-      'slots-t'  eq $type_str) {
+  if ($$box_type_set{$type_str}) {
     $result = 1;
   } else {
     $result = 0;

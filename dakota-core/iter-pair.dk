@@ -24,7 +24,7 @@ klass iter-pair {
 
   method init(object-t self, slots-t slots : {.iter = nullptr, .next = nullptr}) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

@@ -33,9 +33,14 @@ extern THREAD_LOCAL throw_src_t dkt_throw_src [[so_export]];
 KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
   return arg;
 }}
-KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t object) -> slots_t& {
+KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC mutable_unbox(object_t object) -> slots_t& {
   DKT_UNBOX_CHECK(object, _klass_); // optional
   slots_t& s = *cast(slots_t*)(cast(uint8_t*)object + sizeof(object::slots_t));
+  return s;
+}}
+KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t object) -> const slots_t& {
+  DKT_UNBOX_CHECK(object, _klass_); // optional
+  const slots_t& s = *cast(slots_t*)(cast(uint8_t*)object + sizeof(object::slots_t));
   return s;
 }}
 inline FUNC klass_of(object_t object) -> object_t {

@@ -76,7 +76,7 @@ klass token {
     if (nullptr == buffer)
       self.buffer[0] = NUL;
     else
-      strcpy(self.buffer, buffer);
+      strcpy(mutable-unbox(self).buffer, buffer);
     self.leading-ws = nullptr;
     return self;
   }

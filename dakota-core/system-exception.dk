@@ -41,7 +41,7 @@ klass system-exception {
     assert(0 != errnum);
     self.errnum = errnum;
     self.name = strerror-name(self.errnum);
-    strerror-r(self.errnum, self.strerror, sizeof(self.strerror));
+    strerror-r(self.errnum, mutable-unbox(self).strerror, sizeof(self.strerror));
     return self;
   }
   method print(object-t self, object-t out) -> object-t {

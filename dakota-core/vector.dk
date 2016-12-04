@@ -133,8 +133,8 @@ klass vector {
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = $make(kls, #capacity : self.capacity);
-    slots-t& s1 = unbox(self);
-    slots-t& s2 = unbox(copy);
+    const slots-t& s1 = unbox(self);
+    slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
     memcpy(s2.elements, s1.elements, cast(size-t)(s2.size * s2.capacity));
     s2.iterator-state = 0;
@@ -369,7 +369,7 @@ klass vector-forward-iterator {
     ssize-t iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
-    vector::slots-t& d = vector::unbox(self.vector);
+    const vector::slots-t& d = vector::unbox(self.vector);
 
     if (self.iterator-state != d.iterator-state)
       throw $make(exception::klass(), #msg : "oops");
@@ -378,7 +378,7 @@ klass vector-forward-iterator {
   method init(object-t self, object-t vector :) -> object-t {
     self = $init(super);
     assert(null != vector);
-    vector::slots-t& a = vector::unbox(vector);
+    const vector::slots-t& a = vector::unbox(vector);
     self.vector =       vector;
     self.count = a.count;
     self.index = vector::first-index(self.vector);

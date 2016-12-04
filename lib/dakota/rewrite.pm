@@ -653,7 +653,7 @@ sub rewrite_supers {
 #    ## regex should be (:)?(\w+:)*\w+ ?
 #    $$filestr_ref =~ s/make\(([_a-z0-9:-]+)/\$init(\$alloc($1)/g;
 #}
-sub rewrite_for_each_replacement {
+sub rewrite_for_in_replacement {
   my ($type, $element, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
   my $first_stmt = '';
   my $result = "for (iter-pair-t _iter-pair = \$iter-pair($sequence);";
@@ -671,9 +671,9 @@ sub rewrite_for_each_replacement {
     $result .= " /**/)";
 
     if (!$open_brace) { # $ws2 will be undefined
-      $first_stmt .= "$ws1\{ $type $element = unbox(_element_); $stmt \}$ws3";
+      $first_stmt .= "$ws1\{ $type $element = mutable-unbox(_element_); $stmt \}$ws3";
     } else {
-      $first_stmt .= "$ws1\{$ws2$type $element = unbox(_element_); $stmt$ws3";
+      $first_stmt .= "$ws1\{$ws2$type $element = mutable-unbox(_element_); $stmt$ws3";
     }
   } elsif ($type =~ m|($tid)|) {
     my $klass_name = $1;
@@ -682,9 +682,9 @@ sub rewrite_for_each_replacement {
     $klass_name =~ s/-t$//;
 
     if (!$open_brace) { # $ws2 will be undefined
-      $first_stmt .= "$ws1\{ $type $element = $klass_name\::unbox(_element_); $stmt \}$ws3";
+      $first_stmt .= "$ws1\{ $type $element = $klass_name\::mutable-unbox(_element_); $stmt \}$ws3";
     } else {
-      $first_stmt .= "$ws1\{$ws2$type $element = $klass_name\::unbox(_element_); $stmt$ws3";
+      $first_stmt .= "$ws1\{$ws2$type $element = $klass_name\::mutable-unbox(_element_); $stmt$ws3";
     }
   } else {
     die __FILE__, ":", __LINE__, ": error: type: $type\n";
@@ -692,14 +692,15 @@ sub rewrite_for_each_replacement {
   $result .= $first_stmt;
   return $result;
 }
-sub rewrite_for_each {
+sub rewrite_for_in {
   my ($filestr_ref) = @_;
   # for ( object-t xx : yy )
   # for ( pair-t& xx : yy )
-  $$filestr_ref =~ s=for\s*\(\s*($id(\*|&)?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_each_replacement($1, $3, $4, $5, $6, $7, $8, $9)=gse;
+  $$filestr_ref =~ s=for\s*\(\s*($id(\*|&)?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_in_replacement($1, $3, $4, $5, $6, $7, $8, $9)=gse;
 }
 sub rewrite_slot_access {
   my ($filestr_ref) = @_;
+  $$filestr_ref =~ s^self\.($k+(\[.+?\])?((\.|->)$k+(\[.+?\])?)*\??\s*(=|--|\+\+|\+=|-=|\*=|/=))^mutable-unbox(self).$1^g;
   $$filestr_ref =~ s/self\./unbox(self)./g;
 
   #    $$filestr_ref =~ s/unbox\((.*?)\)\./unbox($1)->/g;
@@ -1059,7 +1060,7 @@ sub convert_dk_to_cc {
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_arg_generics);
   &rewrite_map($filestr_ref);
-  &rewrite_for_each($filestr_ref);
+  &rewrite_for_in($filestr_ref);
   &rewrite_unboxes($filestr_ref);
   &rewrite_func($filestr_ref);
 

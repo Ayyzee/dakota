@@ -99,7 +99,7 @@ klass assoc-node {
     }
     return element;
   }
-  method element?(slots-t* slots) -> boole-t {
+  method element?(const slots-t* slots) -> boole-t {
     boole-t state? = false;
     if (0 != slots->element)
       state? = true;
@@ -107,14 +107,14 @@ klass assoc-node {
   }
 }
 klass named-assoc-node-compare {
-  slots (*)(named-assoc-node-t*, named-assoc-node-t*) -> int-t;
+  slots (*)(const named-assoc-node-t*, const named-assoc-node-t*) -> cmp-t;
 }
 klass named-assoc-node {
   slots {
     symbol-t name;
     assoc-node-t* node;
   }
-  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
@@ -719,12 +719,12 @@ func dk-init-runtime() -> void {
     object::_klass_ = init-klass(object::_klass_, #object); // must be first
     klass::_klass_ =  init-klass(klass::_klass_,  #klass);
 
-    klass::unbox(object::_klass_).superklass = nullptr;
+    klass::mutable-unbox(object::_klass_).superklass = nullptr;
     null = cast(object-t)-1;
 
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
     null = $make(null-klass);
-    klass::unbox(object::_klass_).superklass = null;
+    klass::mutable-unbox(object::_klass_).superklass = null;
 
     // core runtime initialized
 

@@ -26,7 +26,7 @@ klass size {
 
   method init(object-t self, slots-t slots : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }
@@ -36,7 +36,7 @@ klass ssize {
 
   method init(object-t self, slots-t slots : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
   method compare(slots-t slots, slots-t other) -> cmp-t {

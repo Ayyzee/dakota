@@ -87,7 +87,7 @@ trait table {
       if (klass-of(pair) == pair::_klass_ || $instance?(pair, pair::_klass_)) {
         current-last = pair::unbox(pair).last;
         if (!$equals?(current-last, last))
-          pair::unbox(pair).last = last;
+          pair::mutable-unbox(pair).last = last;
       }
     } else {
       current-last = last;

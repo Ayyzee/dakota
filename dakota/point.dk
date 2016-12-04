@@ -23,7 +23,7 @@ klass point {
   }
   method init(object-t self, slots-t slots : {.x = 0, .y = 0}) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

@@ -41,7 +41,7 @@ klass str64 {
     $write-slots-end(out);
     return self;
   }
-  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     cmp-t result = dkt-normalize-compare-result(safe-strncmp(cast(str-t)(s), cast(str-t)(other-s), sizeof(slots-t)));
     return result;
   }
@@ -49,8 +49,8 @@ klass str64 {
     cmp-t result;
 
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      slots-t& s1 = unbox(self);
-      slots-t& s2 = unbox(other);
+      const slots-t& s1 = unbox(self);
+      const slots-t& s2 = unbox(other);
       result = compare(&s1, &s2);
     } else {
       result = $compare(super, other);

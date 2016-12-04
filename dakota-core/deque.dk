@@ -103,7 +103,7 @@ klass deque {
     ssize-t        iterator-state;
   }
   method test-dump(object-t self) -> object-t {
-    slots-t& s = unbox(self);
+    const slots-t& s = unbox(self);
     // if (nullptr != &s) {
       fprintf(stderr, "  subgraph \"cluster-%p-%zi\"\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "  {\n");
@@ -361,7 +361,7 @@ klass deque-forward-iterator {
     ssize-t        iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
-    deque::slots-t& d = deque::unbox(self.deque);
+    const deque::slots-t& d = deque::unbox(self.deque);
 
     if (self.iterator-state != d.iterator-state)
       throw $make(exception::klass(), #msg : "oops");
@@ -370,7 +370,7 @@ klass deque-forward-iterator {
   method init(object-t self, object-t deque :) -> object-t {
     self = $init(super);
     assert(klass-of(deque) == deque::_klass_ || $instance?(deque, deque::_klass_));
-    deque::slots-t& d = deque::unbox(deque);
+    const deque::slots-t& d = deque::unbox(deque);
 
     self.deque =          deque;
     self.node =           d.first;
@@ -390,8 +390,8 @@ klass deque-forward-iterator {
     node->next = nullptr; // gc help
 
     self.iterator-state++;
-    deque::unbox(self.deque).iterator-state++;
-    deque::unbox(self.deque).size--;
+    deque::mutable-unbox(self.deque).iterator-state++;
+    deque::mutable-unbox(self.deque).size--;
     return node->element;
   }
   method set-element(object-t self, object-t element) -> object-t {

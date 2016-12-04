@@ -20,8 +20,10 @@
 
 module dakota-core;
 
+klass cmp;
+
 klass property-compare {
-  slots (*)(property-t*, property-t*) -> int-t;
+  slots (*)(const property-t*, const property-t*) -> cmp-t;
 }
 klass property {
   slots {
@@ -30,10 +32,10 @@ klass property {
   }
   method init(object-t self, slots-t slots : {.key = nullptr, .element = 0}) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
-  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     cmp-t result = symbol::compare(s->key, other-s->key);
     return result;
   }
@@ -46,8 +48,8 @@ klass property {
     cmp-t result;
 
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      slots-t& s1 = unbox(self);
-      slots-t& s2 = unbox(other);
+      const slots-t& s1 = unbox(self);
+      const slots-t& s2 = unbox(other);
       result = compare(&s1, &s2);
     } else {
       result = $compare(super, other);

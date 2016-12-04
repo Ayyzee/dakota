@@ -91,8 +91,8 @@ klass bit-vector {
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = $make(kls);
-    slots-t& s1 = unbox(self);
-    slots-t& s2 = unbox(copy);
+    const slots-t& s1 = unbox(self);
+    slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
     ssize-t num-elements = ceiling-divide(self.capacity, ssizeof(self.elements[0]));
     s2.elements = cast(uint64-t*)(dkt::alloc(ssizeof(self.elements[0]) * num-elements));
@@ -157,14 +157,14 @@ klass bit-vector {
     return i1 ^ i2;
   }
   method bit-not(object-t self) -> object-t {
-    slots-t& self-slots =  unbox(self);
+    slots-t& self-slots = mutable-unbox(self);
     for (ssize-t offset = 0; offset < self-slots.count; offset++)
       self-slots.elements[offset] = ~self-slots.elements[offset];
     return self;
   }
   static func op-common(object-t self, object-t other, bit-vector-op-func-t op) -> object-t {
-    slots-t& self-slots =  unbox(self);
-    slots-t& other-slots = unbox(other);
+    slots-t& self-slots = mutable-unbox(self);
+    const slots-t& other-slots = unbox(other);
     assert(self-slots.capacity == other-slots.capacity);
     self-slots.count = max(self-slots.count, other-slots.count);
     for (ssize-t offset = 0; offset < self-slots.count; offset++)
@@ -173,8 +173,8 @@ klass bit-vector {
   }
   static func op-common?(object-t self, object-t other, bit-vector-op-func-t op) -> boole-t {
     boole-t result = false;
-    slots-t& self-slots =  unbox(self);
-    slots-t& other-slots = unbox(other);
+    slots-t& self-slots = mutable-unbox(self);
+    const slots-t& other-slots = unbox(other);
     assert(self-slots.capacity == other-slots.capacity);
     self-slots.count = max(self-slots.count, other-slots.count);
     for (ssize-t offset = 0; offset < self-slots.count; offset++) {
@@ -214,8 +214,8 @@ klass bit-vector {
     cmp-t result = 0;
 
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      slots-t& self-slots =  unbox(self);
-      slots-t& other-slots = unbox(other);
+      slots-t& self-slots = mutable-unbox(self);
+      const slots-t& other-slots = unbox(other);
       assert(self-slots.capacity == other-slots.capacity);
       self-slots.count = max(self-slots.count, other-slots.count);
       for (ssize-t offset = 0; offset < self-slots.count; offset++) {

@@ -772,23 +772,35 @@ sub arg_type::names_unboxed {
   my $arg_num =        0;
   my $arg_names = [];
 
-  if ('slots-t*' eq &ct($$arg_type_ref[0])) {
+  my $type_str = &remove_extra_whitespace(join(' ', @{$$arg_type_ref[$arg_num]}));
+  if (0) {
+  } elsif ('const slots-t*' eq $type_str) {
     $$arg_names[0] = '&unbox(object)';
-  } elsif ('slots-t' eq &ct($$arg_type_ref[0])) {
+  } elsif ('const slots-t&' eq $type_str) {
     $$arg_names[0] = 'unbox(object)';
-  } elsif ('slots-t&' eq &ct($$arg_type_ref[0])) {
+  } elsif ('slots-t*' eq $type_str) {
+    $$arg_names[0] = '&mutable-unbox(object)';
+  } elsif ('slots-t&' eq $type_str) {
+    $$arg_names[0] = 'mutable-unbox(object)';
+  } elsif ('slots-t' eq $type_str) {
     $$arg_names[0] = 'unbox(object)';
   } else {
     $$arg_names[0] = 'object';
   }
 
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
-    if ('slots-t*' eq &ct($$arg_type_ref[$arg_num])) {
+    my $type_str = &remove_extra_whitespace(join(' ', @{$$arg_type_ref[$arg_num]}));
+    if (0) {
+    } elsif ('const slots-t*' eq $type_str) {
       $$arg_names[$arg_num] = "\&unbox(arg$arg_num)";
-    } elsif ('slots-t' eq &ct($$arg_type_ref[$arg_num])) {
+    } elsif ('const slots-t&' eq $type_str) {
       $$arg_names[$arg_num] = "unbox(arg$arg_num)";
-    } elsif ('slots-t&' eq &ct($$arg_type_ref[$arg_num])) {
-      $$arg_names[$arg_num] = "unbox(arg$arg_num)";
+    } elsif ('slots-t*' eq $type_str) {
+      $$arg_names[$arg_num] = "\&mutable-unbox(arg$arg_num)";
+    } elsif ('slots-t&' eq $type_str) {
+      $$arg_names[$arg_num] = "mutable-unbox(arg$arg_num)";
+    } elsif ('slots-t' eq $type_str) {
+      $$arg_names[$arg_num] = "mutable-unbox(arg$arg_num)";
     } else {
       $$arg_names[$arg_num] = "arg$arg_num";
     }
@@ -1912,7 +1924,7 @@ sub generate_klass_unbox {
     ### unbox() same for all types
     my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
     if ($is_klass_defn || (&should_export_slots($klass_ast) && &has_slots_cat_info($klass_ast))) {
-      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox($object_t object) -> slots-t&";
+      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func mutable-unbox($object_t object) -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
       } elsif (&is_target_defn()) {
@@ -1920,6 +1932,18 @@ sub generate_klass_unbox {
           " {" . &ann(__FILE__, __LINE__) . $nl .
           $col . "  DKT-UNBOX-CHECK(object, _klass_); // optional" . $nl .
           $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(_klass_).offset);" . $nl .
+          $col . "  return s;" . $nl .
+          $col . "}} // $klass_name\::unbox()" . $nl;
+      }
+
+      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox($object_t object) -> const slots-t&";
+      if (&is_src_decl() || &is_target_decl()) {
+        $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
+      } elsif (&is_target_defn()) {
+        $result .=
+          " {" . &ann(__FILE__, __LINE__) . $nl .
+          $col . "  DKT-UNBOX-CHECK(object, _klass_); // optional" . $nl .
+          $col . "  const slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(_klass_).offset);" . $nl .
           $col . "  return s;" . $nl .
           $col . "}} // $klass_name\::unbox()" . $nl;
       }
@@ -1950,7 +1974,7 @@ sub generate_klass_box {
           $col = &colin($col);
           $result .=
             $col . "$object_t result = \$make(klass());" . $nl .
-            $col . "memcpy(unbox(result), arg, sizeof(slots-t)); // unfortunate" . $nl .
+            $col . "memcpy(mutable-unbox(result), arg, sizeof(slots-t)); // unfortunate" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
           $result .= $col . "}} // $klass_name\::box()" . $nl;
@@ -1990,7 +2014,7 @@ sub generate_klass_box {
           } else {
             $result .=
               $col . "$object_t result = \$make(klass());" . $nl .
-              $col . "unbox(result) = *arg;" . $nl;
+              $col . "mutable-unbox(result) = *arg;" . $nl;
           }
           $result .= $col . "return result;" . $nl;
           $col = &colout($col);

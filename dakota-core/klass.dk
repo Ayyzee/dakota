@@ -39,8 +39,8 @@ inline func SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
   methods->addrs[selector] = method;
   return;
 }
-inline func METHOD-FOR-SELECTOR(methods::slots-t* methods,
-                                selector-t        selector) -> method-t {
+inline func METHOD-FOR-SELECTOR(const methods::slots-t* methods,
+                                selector-t              selector) -> method-t {
   return methods->addrs[selector];
 }
 # endif
@@ -69,14 +69,14 @@ THREAD-LOCAL super-t            dkt-null-context;
   throw $make(no-such-method-exception::klass(), #object : object, #context : dkt-current-context, #signature : dkt-current-signature);
 }
 klass selector-pair-compare {
-  slots (*)(selector-pair-t*, selector-pair-t*) -> int-t;
+  slots (*)(const selector-pair-t*, const selector-pair-t*) -> cmp-t;
 }
 klass selector-pair {
   slots {
     const signature-t* key;
     selector-node-t*   element;
   }
-  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
     //printf("%s(): %s ?= %s\n", __func__, s, other-s);
@@ -126,7 +126,7 @@ static func selector-for-signature(const signature-t* signature) -> selector-t {
   selector-t selector = *(found-pair->element->ptr);
   return selector;
 }
-static func method-for-signature(methods::slots-t* methods, const signature-t* signature) -> method-t {
+static func method-for-signature(const methods::slots-t* methods, const signature-t* signature) -> method-t {
   selector-t selector = selector-for-signature(signature);
   assert(selector < methods->count);
   method-t m = METHOD-FOR-SELECTOR(methods, selector);
@@ -393,7 +393,7 @@ klass klass {
   method remove-method-for-selector(object-t self, selector-t selector) -> method-t {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
-    SET-METHOD-FOR-SELECTOR(&self.methods, selector, DKT-NULL-METHOD); // hackhack
+    SET-METHOD-FOR-SELECTOR(&mutable-unbox(self).methods, selector, DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
       bit-vector::set-bit(self.behavior, cast(ssize-t)selector, false);
     return m;
@@ -401,7 +401,7 @@ klass klass {
   method add-method-for-selector(object-t self, selector-t selector, method-t m) -> method-t {
     assert(selector < self.methods.count);
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
-    SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
+    SET-METHOD-FOR-SELECTOR(&mutable-unbox(self).methods, selector, m); // hackhack
     if (nullptr != self.behavior)
       bit-vector::set-bit(self.behavior, cast(ssize-t)selector, true);
     return prev-m;
@@ -469,7 +469,7 @@ klass klass {
     }
     return seq;
   }
-  method dump-methods(slots-t* s) -> ssize-t {
+  method dump-methods(const slots-t* s) -> ssize-t {
     if (nullptr != s->behavior)
       $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
@@ -763,7 +763,7 @@ klass klass {
     if (nullptr == info)
       tmp-info-slots = info-slots;
     else
-      tmp-info-slots = &named-info::unbox(info);
+      tmp-info-slots = &named-info::mutable-unbox(info);
     object-t result = init(self, tmp-info-slots);
     return result;
   }
@@ -802,10 +802,10 @@ klass klass {
     return self;
   }
 }
-func dkt-dump-methods(klass::slots-t* s) -> ssize-t {
+func dkt-dump-methods(const klass::slots-t* s) -> ssize-t {
   return klass::dump-methods(s);
 }
 func dkt-dump-methods(object-t kls) -> ssize-t {
-  klass::slots-t& kls-s = unbox(kls);
+  const klass::slots-t& kls-s = unbox(kls);
   return dkt-dump-methods(&kls-s);
 }

@@ -49,7 +49,7 @@ klass symbol {
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     self = $add(klass-of(self), self); // leakleak
     return self;
   }

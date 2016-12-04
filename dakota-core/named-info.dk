@@ -23,13 +23,14 @@
 
 module dakota-core;
 
+klass cmp;
 klass property-compare;
 klass property;
 klass std-compare;
 klass symbol;
 
 klass named-info-compare {
-  slots (*)(named-info-t*, named-info-t*) -> int-t;
+  slots (*)(const named-info-t*, const named-info-t*) -> cmp-t;
 }
 klass named-info {
   slots {
@@ -41,7 +42,7 @@ klass named-info {
   }
   method init(object-t self, slots-t slots : {.next = nullptr, .count = 0, .elements = nullptr}) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
   method check(slots-t* s) -> ssize-t {
@@ -58,7 +59,7 @@ klass named-info {
           cast(std-compare-t)cast(property-compare-t)property::compare);
     return s;
   }
-  method search(slots-t* s, symbol-t key) -> property-t* {
+  method search(const slots-t* s, symbol-t key) -> property-t* {
     property::slots-t property = {.key = cast(symbol-t)key, .element = cast(intptr-t)nullptr};
     property::slots-t* result = cast(property::slots-t*)bsearch(&property,
                                                                 s->elements,
@@ -68,14 +69,14 @@ klass named-info {
                                                                 cast(property-compare-t)property::compare);
     return result;
   }
-  method at(slots-t* s, symbol-t key) -> intptr-t {
+  method at(const slots-t* s, symbol-t key) -> intptr-t {
     intptr-t element = cast(intptr-t)nullptr;
     property::slots-t* property = search(s, key);
     if (nullptr != property)
       element = property->element;
     return element;
   }
-  method at(slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
+  method at(const slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
     intptr-t element = at(s, key);
     if (cast(intptr-t)nullptr == element) // nullptr (i.e. zero) must be illegal for this to work
       element = default-element;
@@ -108,7 +109,7 @@ klass named-info {
     }
     return s;
   }
-  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     cmp-t result = 0;
     if (s != other-s) {
       symbol-t s-name =       cast(symbol-t)at(s,       #name);

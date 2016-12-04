@@ -44,14 +44,14 @@ klass boole { // a doubleton :-)
   static func mk(object-t k, boole-t v) -> object-t {
     object-t self = $alloc(super(k, klass-of(k)));
     self = $init(super);
-    unbox(self) = v;
+    mutable-unbox(self) = v;
     return self;
   }
   func initialize(object-t kls) -> void {
     boole-t f = false;
-    (boole-klass::unbox(kls))[f] = mk(kls, f);
+    (boole-klass::mutable-unbox(kls))[f] = mk(kls, f);
     boole-t t = true;
-    (boole-klass::unbox(kls))[t] = mk(kls, t);
+    (boole-klass::mutable-unbox(kls))[t] = mk(kls, t);
     return;
   }
 }

@@ -53,7 +53,7 @@ klass sorted-set {
     assert(0 < initial-capacity);
     self = $init(super);
     boole-t ptr?;
-    sorted-array::create(&self.sa,
+    sorted-array::create(&mutable-unbox(self).sa,
                          initial-capacity,
                          ssizeof(ptr-t),
                          cast(std-compare-t)compare,
@@ -75,10 +75,10 @@ klass sorted-set {
   method add(object-t self, object-t element) -> object-t {
     object-t result = element;
     self.iterator-state++;
-    result-t found-result = sorted-array::search(&self.sa, element);
+    result-t found-result = sorted-array::search(&mutable-unbox(self).sa, element);
 
     if (nullptr == found-result.element)
-      sorted-array::add-at(&self.sa, element, found-result.offset);
+      sorted-array::add-at(&mutable-unbox(self).sa, element, found-result.offset);
     else
       result = cast(object-t)found-result.element;
     return result;
@@ -121,7 +121,7 @@ klass sorted-set {
     if (nullptr != found-result.element) {
       self.iterator-state++;
       // element not required
-      prev-element = cast(object-t)sorted-array::remove-at(&self.sa, element, found-result.offset);
+      prev-element = cast(object-t)sorted-array::remove-at(&mutable-unbox(self).sa, element, found-result.offset);
     }
     return prev-element; // returns nullptr on error
   }
@@ -129,15 +129,15 @@ klass sorted-set {
     object-t prev-element = nullptr;
     if (0 != self.sa.count) {
       self.iterator-state++;
-      prev-element = cast(object-t)sorted-array::remove-last(&self.sa);
+      prev-element = cast(object-t)sorted-array::remove-last(&mutable-unbox(self).sa);
     }
     return prev-element; // returns nullptr on error
   }
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = $make(kls);
-    slots-t& s1 = unbox(self);
-    slots-t& s2 = unbox(copy);
+    const slots-t& s1 = unbox(self);
+    slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
     s2.sa.elements = cast(ptr-t*)dkt::alloc(s2.sa.size * s2.sa.capacity);
     memcpy(s2.sa.elements, s1.sa.elements, cast(size-t)(s2.sa.size * s2.sa.capacity));
@@ -185,14 +185,14 @@ klass sorted-set-forward-iterator {
   method init(object-t self, object-t sorted-set :) -> object-t {
     self = $init(super);
     assert(klass-of(sorted-set) == sorted-set::_klass_ || $instance?(sorted-set, sorted-set::_klass_));
-    sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
+    const sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
     self.sorted-set = sorted-set;
     self.offset = 0;
     self.iterator-state = ss.iterator-state;
     return self;
   }
   static func check-iterator-state(object-t self) -> void {
-    sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
+    const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
 
     if (self.iterator-state != ss.iterator-state) {
       fprintf(stderr, "%zi == %zi\n", self.iterator-state, ss.iterator-state);
@@ -202,7 +202,7 @@ klass sorted-set-forward-iterator {
   }
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
-    sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
+    const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
     boole-t state = false;
     if (self.offset < ss.sa.count)
       state = true;
@@ -221,7 +221,7 @@ klass sorted-set-forward-iterator {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
-      sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
+      const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
       element = cast(object-t)sorted-array::at(&ss.sa, self.offset);
       assert(nullptr != element);
     }

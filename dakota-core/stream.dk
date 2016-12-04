@@ -23,7 +23,7 @@ klass stream {
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

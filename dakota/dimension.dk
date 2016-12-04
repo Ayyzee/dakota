@@ -23,7 +23,7 @@ klass dimension {
   }
   method init(object-t self, slots-t slots : {.width = 0, .height = 0}) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

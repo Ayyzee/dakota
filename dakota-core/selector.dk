@@ -21,7 +21,7 @@ klass selector {
 
   method init(object-t self, slots-t slots : 0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

@@ -25,7 +25,7 @@ klass slot-info {
 
   method init(object-t self, slots-t slots : {.type = nullptr, .size = 0}) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

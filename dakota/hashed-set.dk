@@ -167,8 +167,8 @@ klass hashed-set {
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = $make(kls);
-    slots-t& s1 = unbox(self);
-    slots-t& s2 = unbox(copy);
+    const slots-t& s1 = unbox(self);
+    slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
     s2.buckets = $copy-shallow(s1.buckets);
     s2.iterator-state = 0;
@@ -214,7 +214,7 @@ klass hashed-set-forward-iterator {
     ssize-t  iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
-    hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
+    const hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
 
     if (self.iterator-state != hs.iterator-state)
       throw $make(exception::klass(), #msg : "oops");
@@ -223,7 +223,7 @@ klass hashed-set-forward-iterator {
   method init(object-t self, object-t hashed-set :) -> object-t {
     self = $init(super);
     assert(null != hashed-set);
-    hashed-set::slots-t& hs = hashed-set::unbox(hashed-set);
+    const hashed-set::slots-t& hs = hashed-set::unbox(hashed-set);
     self.hashed-set = hashed-set;
     self.vector-iter = $forward-iterator(hs.buckets);
     self.iterator-state = hs.iterator-state;

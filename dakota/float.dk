@@ -23,7 +23,7 @@ klass float32 {
 
   method init(object-t self, slots-t slots : 0.0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }
@@ -34,7 +34,7 @@ klass float64 {
 
   method init(object-t self, slots-t slots : 0.0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }
@@ -45,7 +45,7 @@ klass float128 {
 
   method init(object-t self, slots-t slots : 0.0) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

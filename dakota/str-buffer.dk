@@ -62,7 +62,7 @@ klass str-buffer {
             cast(ptr-t)nullptr, cast(ptr-t)(s), s->ptr, s->len, s->capacity);
     return s;
   }
-  method compare(slots-t* s, slots-t* other-s) -> cmp-t {
+  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     cmp-t result = safe-strcmp(s->ptr, other-s->ptr);
     return result;
   }
@@ -70,8 +70,8 @@ klass str-buffer {
     cmp-t result;
 
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      slots-t& s1 = unbox(self);
-      slots-t& s2 = unbox(other);
+      const slots-t& s1 = unbox(self);
+      const slots-t& s2 = unbox(other);
       result = compare(&s1, &s2);
     } else {
       result = $compare(super, other);

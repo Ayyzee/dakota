@@ -28,7 +28,7 @@ klass keyword {
 
   method init(object-t self, slots-t slots : {.hash = 0, .symbol = nullptr}) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     return self;
   }
 }

@@ -67,7 +67,7 @@ klass sorted-array {
   }
   
   //(-(insertion point) - 1)
-  func search(slots-t* t, const void* key) -> result-t {
+  func search(const slots-t* t, const void* key) -> result-t {
     assert(nullptr != key);
 
     result-t result = { .element = nullptr, .offset = -1 };
@@ -116,7 +116,7 @@ klass sorted-array {
     t->count++;
     return t;
   }
-  func at(slots-t* t, ssize-t offset) -> const void* {
+  func at(const slots-t* t, ssize-t offset) -> const void* {
     assert(0 <= offset);
     assert(offset < t->count);
     assert(0 < t->count);
@@ -173,7 +173,7 @@ klass sorted-array {
     }
     return element;
   }
-  func bsearch(slots-t* t, const void* key) -> const void* {
+  func bsearch(const slots-t* t, const void* key) -> const void* {
     assert(nullptr != key);
  
     result-t result = search(t, key);

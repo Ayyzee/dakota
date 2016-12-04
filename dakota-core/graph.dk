@@ -57,7 +57,7 @@ klass attrs {
   method init(object-t self,
                        object-t attrs :) -> object-t {
     self = $init(super);
-    unbox(self) = attrs;
+    mutable-unbox(self) = attrs;
     return self;
   }
 }

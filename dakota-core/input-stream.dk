@@ -38,14 +38,14 @@ klass input-stream {
               slots-t  slots : stdin,
               str-t    file :  nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = slots;
+    mutable-unbox(self) = slots;
     assert(stdout != slots);
 
     if (nullptr == slots && nullptr == file)
-      unbox(self) = stdin; // default
+      mutable-unbox(self) = stdin; // default
 
     if (nullptr != file) {
-      unbox(self) = fopen(file, "r");
+      mutable-unbox(self) = fopen(file, "r");
 
       if (nullptr == unbox(self))
         throw $make(system-exception::klass(), #errnum : errno);
