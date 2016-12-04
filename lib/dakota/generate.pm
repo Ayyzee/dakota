@@ -1977,10 +1977,22 @@ sub generate_klass_box {
         } elsif (&is_target_defn()) {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
-          $result .=
-            $col . "$object_t result = \$make(klass());" . $nl .
-            $col . "unbox(result) = *arg;" . $nl .
-            $col . "return result;" . $nl;
+          if ($$klass_ast{'init-supports-kw-slots?'}) {
+            my $type = "$klass_name\::slots-t";
+            my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
+            if ($promoted_type) {
+              $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
+                $col . "$object_t result = \$make(klass(), \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
+            } else {
+              $result .=
+                $col . "$object_t result = \$make(klass(), \#slots : *arg);" . $nl;
+            }
+          } else {
+            $result .=
+              $col . "$object_t result = \$make(klass());" . $nl .
+              $col . "unbox(result) = *arg;" . $nl;
+          }
+          $result .= $col . "return result;" . $nl;
           $col = &colout($col);
           $result .= $col . "}} // $klass_name\::box()" . $nl;
         }

@@ -28,11 +28,9 @@ klass signature {
     str-t param-types;
     str-t return-type; // not considered in compare()
   }
-  method init(object-t self, str-t name : nullptr, str-t param-types : nullptr, str-t return-type : nullptr) -> object-t {
+  method init(object-t self, slots-t slots : {.name = nullptr, .param-types = nullptr, .return-type = nullptr}) -> object-t {
     self = $init(super);
-    self.name =        name;
-    self.param-types = param-types;
-    self.return-type = return-type;
+    unbox(self) = slots;
     return self;
   }
   method dump(slots-t* s) -> slots-t*{

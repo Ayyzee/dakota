@@ -39,11 +39,9 @@ klass named-info {
   //            size = sizeof(property::slots-t)
   //            compare = property::compare()
   }
-  method init(object-t self, slots-t* next : nullptr, ssize-t count : 0, property-t* elements : nullptr) -> object-t {
+  method init(object-t self, slots-t slots : {.next = nullptr, .count = 0, .elements = nullptr}) -> object-t {
     self = $init(super);
-    self.next =     next;
-    self.count =    count;
-    self.elements = elements;
+    unbox(self) = slots;
     return self;
   }
   method check(slots-t* s) -> ssize-t {

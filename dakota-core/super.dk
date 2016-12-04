@@ -22,10 +22,9 @@ klass super {
     object-t klass;
   }
 
-  method init(object-t self, object-t object : nullptr, object-t klass : nullptr) -> object-t {
+  method init(object-t self, slots-t slots : {.object = nullptr, .klass = nullptr}) -> object-t {
     self = $init(super);
-    self.object = object;
-    self.klass =  klass;
+    unbox(self) = slots;
     return self;
   }
 }

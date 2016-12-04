@@ -37,13 +37,13 @@ klass output-stream {
   slots stream-t;
 
   method init(object-t self,
-              slots-t  value : stdout,
+              slots-t  slots : stdout,
               str-t    file :  nullptr) -> object-t {
     self = $init(super);
-    unbox(self) = value;
-    assert(stdin != value);
+    unbox(self) = slots;
+    assert(stdin != slots);
 
-    if (nullptr == value && nullptr == file)
+    if (nullptr == slots && nullptr == file)
       unbox(self) = stdout; // default
 
     if (nullptr != file) {
@@ -55,14 +55,14 @@ klass output-stream {
     return self;
   }
   method close(object-t self) -> object-t {
-    slots-t value = unbox(self);
+    slots-t slots = unbox(self);
 # if defined DEBUG
-    if (stdout == value)
+    if (stdout == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stdout\"");
-    else-if (stderr == value)
+    else-if (stderr == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
 # endif // DEBUG
-    int-t rtn = fclose(value);
+    int-t rtn = fclose(slots);
 
     if (0 != rtn)
       throw $make(system-exception::klass(), #errnum : errno);

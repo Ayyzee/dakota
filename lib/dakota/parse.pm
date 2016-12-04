@@ -1821,6 +1821,23 @@ sub method {
       $$method{'kw-arg-defaults'} = $kw_arg_defaults;
     }
     &kw_args_generics_add($gbl_root_ast, $method);
+
+    if ('init' eq $method_name) {
+      foreach my $kw_arg_name (@$kw_arg_names) {
+        if ('slots' eq $kw_arg_name) {
+          if (1 == @$kw_arg_names) {
+            # only one kw-arg and its slots (does not matter aggregate or not)
+            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = 1;
+          } elsif ($$gbl_current_ast_scope{'slots'} && $$gbl_current_ast_scope{'slots'}{'type'}) {
+            # not an aggregate
+            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = 1;
+          } else {
+            my $kw_arg_names_list = join(', #', @$kw_arg_names);
+            print STDERR "warning: slots is an aggregate and init(#$kw_arg_names_list) supports more than just #slots.\n";
+          }
+        }
+      }
+    }
   }
   $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
 
