@@ -1933,7 +1933,7 @@ sub generate_klass_unbox {
           $col . "  DKT-UNBOX-CHECK(object, _klass_); // optional" . $nl .
           $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(_klass_).offset);" . $nl .
           $col . "  return s;" . $nl .
-          $col . "}} // $klass_name\::unbox()" . $nl;
+          $col . "}} // $klass_name\::mutable-unbox()" . $nl;
       }
 
       $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox($object_t object) -> const slots-t&";
@@ -1942,8 +1942,7 @@ sub generate_klass_unbox {
       } elsif (&is_target_defn()) {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . $nl .
-          $col . "  DKT-UNBOX-CHECK(object, _klass_); // optional" . $nl .
-          $col . "  const slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(_klass_).offset);" . $nl .
+          $col . "  const slots-t& s = mutable-unbox(object);" . $nl .
           $col . "  return s;" . $nl .
           $col . "}} // $klass_name\::unbox()" . $nl;
       }
