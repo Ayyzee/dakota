@@ -53,7 +53,7 @@ klass sorted-set {
     assert(0 < initial-capacity);
     self = $init(super);
     boole-t ptr?;
-    sorted-array::create(&mutable-unbox(self).sa,
+    sorted-array::create(&self.sa,
                          initial-capacity,
                          ssizeof(ptr-t),
                          cast(std-compare-t)compare,
@@ -75,10 +75,10 @@ klass sorted-set {
   method add(object-t self, object-t element) -> object-t {
     object-t result = element;
     self.iterator-state++;
-    result-t found-result = sorted-array::search(&mutable-unbox(self).sa, element);
+    result-t found-result = sorted-array::search(&self.sa, element);
 
     if (nullptr == found-result.element)
-      sorted-array::add-at(&mutable-unbox(self).sa, element, found-result.offset);
+      sorted-array::add-at(&self.sa, element, found-result.offset);
     else
       result = cast(object-t)found-result.element;
     return result;
@@ -121,7 +121,7 @@ klass sorted-set {
     if (nullptr != found-result.element) {
       self.iterator-state++;
       // element not required
-      prev-element = cast(object-t)sorted-array::remove-at(&mutable-unbox(self).sa, element, found-result.offset);
+      prev-element = cast(object-t)sorted-array::remove-at(&self.sa, element, found-result.offset);
     }
     return prev-element; // returns nullptr on error
   }
@@ -129,7 +129,7 @@ klass sorted-set {
     object-t prev-element = nullptr;
     if (0 != self.sa.count) {
       self.iterator-state++;
-      prev-element = cast(object-t)sorted-array::remove-last(&mutable-unbox(self).sa);
+      prev-element = cast(object-t)sorted-array::remove-last(&self.sa);
     }
     return prev-element; // returns nullptr on error
   }

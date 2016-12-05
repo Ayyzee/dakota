@@ -700,10 +700,7 @@ sub rewrite_for_in {
 }
 sub rewrite_slot_access {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s^self\.($k+(\[.+?\])?((\.|->)$k+(\[.+?\])?)*\??\s*(=|--|\+\+|\+=|-=|\*=|/=))^mutable-unbox(self).$1^g;
-  $$filestr_ref =~ s/self\./unbox(self)./g;
-
-  #    $$filestr_ref =~ s/unbox\((.*?)\)\./unbox($1)->/g;
+  $$filestr_ref =~ s/self\./mutable-unbox(self)./g;
 }
 sub hash {
   my ($keyword) = @_;

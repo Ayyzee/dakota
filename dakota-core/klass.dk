@@ -393,7 +393,7 @@ klass klass {
   method remove-method-for-selector(object-t self, selector-t selector) -> method-t {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
-    SET-METHOD-FOR-SELECTOR(&mutable-unbox(self).methods, selector, DKT-NULL-METHOD); // hackhack
+    SET-METHOD-FOR-SELECTOR(&self.methods, selector, DKT-NULL-METHOD); // hackhack
     if (nullptr != self.behavior)
       bit-vector::set-bit(self.behavior, cast(ssize-t)selector, false);
     return m;
@@ -401,7 +401,7 @@ klass klass {
   method add-method-for-selector(object-t self, selector-t selector, method-t m) -> method-t {
     assert(selector < self.methods.count);
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
-    SET-METHOD-FOR-SELECTOR(&mutable-unbox(self).methods, selector, m); // hackhack
+    SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
     if (nullptr != self.behavior)
       bit-vector::set-bit(self.behavior, cast(ssize-t)selector, true);
     return prev-m;
