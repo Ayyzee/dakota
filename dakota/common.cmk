@@ -16,6 +16,7 @@ endif ()
 
 set (project ${target})
 project (${project} LANGUAGES CXX)
+set (cxx-standard 14)
 set (CMAKE_CXX_COMPILER dk)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
@@ -50,7 +51,7 @@ add_custom_command (
 list (APPEND srcs ${target-src})
 
 set_directory_properties (PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${builddir})
-set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD 14)
+set_source_files_properties (${srcs} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 
 if (${is-lib})
   add_library (${target} SHARED ${srcs})
@@ -63,5 +64,5 @@ endif ()
 install (TARGETS ${target} DESTINATION ${targets-install-dir})
 target_compile_definitions (${target} PRIVATE ${macros})
 target_compile_options (${target} PRIVATE --warn-no-multichar) # unfortunate
-set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD 14)
+set_target_properties (${target} PROPERTIES LANGUAGE CXX CXX_STANDARD ${cxx-standard})
 target_link_libraries (${target} ${link-libs})
