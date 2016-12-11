@@ -16,6 +16,8 @@
 
 # pragma once
 
+# include <type_traits> // add-const<>(), remove-const<>()
+
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
 
@@ -42,6 +44,8 @@
 # define typealias using
 
 # define cast(t) (t)
+# define add_const_cast(v)    cast(std::   add_const<decltype(v)>::type)
+# define remove_const_cast(v) cast(std::remove_const<decltype(v)>::type)
 
 // gcc has bug in code generation so the assembler omit the quotes
 # if defined __clang__
