@@ -378,12 +378,12 @@ klass klass {
   // }
   method method-for-selector?(object-t self, selector-t selector) -> boole-t {
     assert(selector < self.methods.count);
-    boole-t result = false;
+    boole-t result? = false;
     method-t m = $method-for-selector(self, selector);
     if (DKT-NULL-METHOD != m) {
-      result = true;
+      result? = true;
     }
-    return result;
+    return result?;
   }
   method method-for-selector(object-t self, selector-t selector) -> method-t {
     assert(selector < self.methods.count);
@@ -647,8 +647,8 @@ klass klass {
     return false;
 # endif
     assert((nullptr != self.behavior) || (nullptr != unbox(kls).behavior));
-    boole-t state = $bit-and?(self.behavior, unbox(kls).behavior);
-    return state;
+    boole-t state? = $bit-and?(self.behavior, unbox(kls).behavior);
+    return state?;
   }
   static func behavior(object-t self, ssize-t methods-count) -> object-t {
 # if defined DKT-OMIT-BEHAVIOR
@@ -768,16 +768,16 @@ klass klass {
     return result;
   }
   method subklass?(object-t self, object-t kls) -> boole-t {
-    boole-t state = false;
+    boole-t state? = false;
     object-t tmp-kls = self;
 
     while (!root-superklass?((tmp-kls = superklass-of(tmp-kls)))) {
       if (tmp-kls == kls) {
-        state = true;
+        state? = true;
         break;
       }
     }
-    return state;
+    return state?;
   }
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
     return ::klass-with-trait(self, trait);

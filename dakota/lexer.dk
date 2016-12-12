@@ -33,13 +33,13 @@ klass tokenid;
 klass vector;
 
 static func ident-type?(str-buffer-t buf) -> boole-t {
-  boole-t result = false;
+  boole-t result? = false;
   if (3 <= buf.len)
     if ((('_' == buf.ptr[buf.len - 2]) ||
          ('-' == buf.ptr[buf.len - 2])) &&
          ('t' == buf.ptr[buf.len - 1]))
-      result = true;
-  return result;
+      result? = true;
+  return result?;
 }
 klass lexer {
   slots {

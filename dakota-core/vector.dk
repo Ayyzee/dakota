@@ -141,13 +141,13 @@ klass vector {
     return copy;
   }
   method empty?(object-t self) -> boole-t {
-    boole-t state;
+    boole-t state?;
 
     if (0 == self.count)
-      state = true;
+      state? = true;
     else
-      state = false;
-    return state;
+      state? = false;
+    return state?;
   }
   method empty(object-t self) -> object-t {
     self.count = 0;
@@ -162,15 +162,15 @@ klass vector {
   }
   // maybe could return number present
   method in?(object-t self, object-t element) -> boole-t {
-    boole-t state = false;
+    boole-t state? = false;
 
     for (object-t e in self) {
       if ($equals?(e, element)) {
-        state = true;
+        state? = true;
         break;
       }
     }
-    return state;
+    return state?;
   }
   // reverse in place
   method reverse(object-t self) -> object-t {
@@ -386,12 +386,12 @@ klass vector-forward-iterator {
     return self;
   }
   method first?(object-t self) -> boole-t {
-    boole-t state;
+    boole-t state?;
     if (0 == self.index)
-      state = true;
+      state? = true;
     else
-      state = false;
-    return state;
+      state? = false;
+    return state?;
   }
   method set-element(object-t self, object-t element) -> object-t {
     $replace-at(self.vector, self.index, element);
@@ -399,12 +399,12 @@ klass vector-forward-iterator {
   }
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
-    boole-t result;
+    boole-t result?;
     if (nullptr != $at(self.vector, self.index, cast(object-t)nullptr))
-      result = true;
+      result? = true;
     else
-      result = false;
-    return result;
+      result? = false;
+    return result?;
   }
   method next(object-t self) -> object-t {
     check-iterator-state(self);

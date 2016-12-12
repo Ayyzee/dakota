@@ -817,24 +817,24 @@ static func dump?(named-info-t* kls-info, str-t only) -> boole-t {
   symbol-t name = name-from-info(kls-info);
   assert-valid-str(name);
 
-  boole-t result = true;
+  boole-t result? = true;
   ssize-t only-len = cast(ssize-t)safe-strlen(only);
   if ('-' == only[0]) {
     ssize-t name-len = cast(ssize-t)safe-strlen(name);
     if (name-len < only-len)
-      result = false;
+      result? = false;
 
     if (0 != safe-strcmp(name + name-len - only-len, only))
-      result = false;
+      result? = false;
   }
   else-if ('-' == only[only-len - 1]) {
     if (0 != safe-strncmp(name, only, cast(size-t)only-len))
-      result = false;
+      result? = false;
   } else {
     if (0 != safe-strcmp(name, only))
-      result = false;
+      result? = false;
   }
-  return result;
+  return result?;
 }
 static func remove-dir(str-t path) -> str-t {
   str-t result = strrchr(path, '/');
@@ -957,19 +957,19 @@ static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
   return;
 }
 static func klass-exported?(named-info-t* kls-info,
-                            boole-t*      exportedp-ptr = nullptr,
-                            boole-t*      state-exportedp-ptr = nullptr,
-                            boole-t*      behavior-exportedp-ptr = nullptr) -> boole-t {
+                            boole-t*      exported-ptr = nullptr,
+                            boole-t*      state-exported-ptr = nullptr,
+                            boole-t*      behavior-exported-ptr = nullptr) -> boole-t {
   boole-t exported? =          cast(boole-t)named-info::at(kls-info, #exported?);
   boole-t state-exported? =    cast(boole-t)named-info::at(kls-info, #state-exported?);
   boole-t behavior-exported? = cast(boole-t)named-info::at(kls-info, #behavior-exported?);
 
-  if (exportedp-ptr)
-    *exportedp-ptr = exported?;
-  if (state-exportedp-ptr)
-    *state-exportedp-ptr = state-exported?;
-  if (behavior-exportedp-ptr)
-    *behavior-exportedp-ptr = behavior-exported?;
+  if (exported-ptr)
+    *exported-ptr = exported?;
+  if (state-exported-ptr)
+    *state-exported-ptr = state-exported?;
+  if (behavior-exported-ptr)
+    *behavior-exported-ptr = behavior-exported?;
 
   boole-t result = (exported? || state-exported? || behavior-exported?);
   return result;
@@ -986,9 +986,9 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
   assert-valid-str(ci.name);
   assert(!(nullptr != ci.interpose-name && nullptr != ci.superklass-name));
 
-  boole-t verbose = 0;
+  boole-t verbose? = 0;
 
-  if (verbose) {
+  if (verbose?) {
     if (nullptr == ci.superklass-name)
       ci.superklass-name = default-superklass-name();
     if (nullptr == ci.klass-name)
@@ -1267,12 +1267,12 @@ klass registration-info {
   }
 }
 static func getenv?(str-t name) -> boole-t {
-  boole-t value = false;
+  boole-t value? = false;
   str-t value-str = getenv(name);
 
   if (nullptr != value-str && 0 != safe-strcmp("0", value-str))
-    value = true;
-  return value;
+    value? = true;
+  return value?;
 }
 static func add-registration-info(named-info-t* registration-info) -> void {
   assert(nullptr == registration-info->next);
