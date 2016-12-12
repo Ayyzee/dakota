@@ -120,13 +120,11 @@ klass bit-vector {
       self.elements[offset] |= mask;  // set bit to one
     return self;
   }
-//   method clr-bit(object-t self, ssize-t index)
-//   {
-//     return set-bit(self, index, false) -> object-t;
+//   method clr-bit(object-t self, ssize-t index) -> object-t {
+//     return set-bit(self, index, false);
 //   }
-//   method set-bit(object-t self, ssize-t index)
-//   {
-//     return set-bit(self, index, true) -> object-t;
+//   method set-bit(object-t self, ssize-t index) -> object-t {
+//     return set-bit(self, index, true);
 //   }
   method dump(object-t self) -> object-t {
     $dump(super);

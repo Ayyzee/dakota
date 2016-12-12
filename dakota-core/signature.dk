@@ -33,7 +33,7 @@ klass signature {
     mutable-unbox(self) = slots;
     return self;
   }
-  method dump(slots-t* s) -> slots-t*{
+  method dump(const slots-t* s) -> const slots-t* {
     printf("%s(%s)", s->name, s->param-types);
     return s;
   }

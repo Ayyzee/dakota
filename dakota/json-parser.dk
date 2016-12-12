@@ -377,11 +377,10 @@ klass json-parser {
     return table;
   }
     
-  //      method read-property-list(object-t self)
-  //      {
+  //      method read-property-list(object-t self) -> object-t {
   //        object-t token;
   //        while (null != (token = json-parser::lex(self)))
-  //          $token::print(token, stdout) -> object-t _;
+  //          $token::print(token, stdout);
   //        return null;
   //      }
   method read-property-list(object-t self) -> object-t {

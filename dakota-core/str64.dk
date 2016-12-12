@@ -27,7 +27,7 @@ klass object-output-stream;
 klass str64 {
   slots char8-t[64];
 
-  method dump(slots-t* s) -> slots-t*{
+  method dump(const slots-t* s) -> const slots-t* {
   //$dump(super);
     fprintf(stderr, "%p:%p { \"%s\" }\n", cast(ptr-t)nullptr, cast(ptr-t)(s), *s);
     return s;

@@ -77,11 +77,11 @@ klass pair {
     hash-t result = $hash(first);
     return result;
   }
-  method first(slots-t* s) -> object-t {
+  method first(const slots-t* s) -> object-t {
     object-t result = s->first;
     return result;
   }
-  method last(slots-t* s) -> object-t {
+  method last(const slots-t* s) -> object-t {
     object-t result = s->last;
     return result;
   }

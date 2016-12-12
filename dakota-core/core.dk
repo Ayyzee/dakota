@@ -121,12 +121,10 @@ klass named-assoc-node {
     cmp-t result = symbol::compare(s->name, other-s->name);
     return result;
   }
-//   slots-t* dump(slots-t* s)
-//   {
+//   method dump(const slots-t* s) -> const slots-t* {
 //     printf("\"%s\"\n", s->name);
 //     assoc-node-t* node = s->node;
-//     while (nullptr != node)
-//     {
+//     while (nullptr != node) {
 //       printf("  element=%p, next=%p\n", node->element, node->next);
 //       node = node->next;
 //     }
@@ -319,7 +317,7 @@ klass ostream {
     }
     return s;
   }
-  static func pad(slots-t& s) -> slots-t& {
+  static func pad(const slots-t& s) -> const slots-t& {
     for (ssize-t i = 0; i < s.col; i++)
       fprintf(s.output, "  "); // two spaces per column :-) [my way]
     return s;
@@ -343,7 +341,7 @@ klass ostream {
       exit-fail-with-msg("ERROR: %s: \"%s\"", path, strerror(errno));
     return s;
   }
-  static func fclose(slots-t& s) -> slots-t& {
+  static func fclose(const slots-t& s) -> const slots-t& {
     int n = ::fclose(s.output);
     if (-1 == n)
       non-exit-fail-with-msg("ERROR: %s: \"%s\"", "fclose", strerror(errno));

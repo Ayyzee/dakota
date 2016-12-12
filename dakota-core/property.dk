@@ -39,7 +39,7 @@ klass property {
     cmp-t result = symbol::compare(s->key, other-s->key);
     return result;
   }
-  method check(slots-t* s) -> ssize-t {
+  method check(const slots-t* s) -> ssize-t {
     if (nullptr == s->key)
       std::abort();
     return 0;

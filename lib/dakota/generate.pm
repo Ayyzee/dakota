@@ -775,9 +775,9 @@ sub arg_type::names_unboxed {
   my $type_str = &remove_extra_whitespace(join(' ', @{$$arg_type_ref[$arg_num]}));
   if (0) {
   } elsif ('const slots-t*' eq $type_str) {
-    $$arg_names[0] = '&unbox(object)';
+    $$arg_names[0] = '&mutable-unbox(object)';
   } elsif ('const slots-t&' eq $type_str) {
-    $$arg_names[0] = 'unbox(object)';
+    $$arg_names[0] = 'mutable-unbox(object)';
   } elsif ('slots-t*' eq $type_str) {
     $$arg_names[0] = '&mutable-unbox(object)';
   } elsif ('slots-t&' eq $type_str) {
@@ -1964,7 +1964,7 @@ sub generate_klass_box {
       my $slots_type = &at($$klass_ast{'slots'}, 'type');
       if (&is_array_type($slots_type)) {
         ### box() array-type
-        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> $object_t";
+        $result .= $col . "klass $klass_name { INLINE func box(const slots-t arg) -> $object_t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -1976,7 +1976,35 @@ sub generate_klass_box {
             $col . "memcpy(mutable-unbox(result), arg, sizeof(slots-t)); // unfortunate" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}} // $klass_name\::box()" . $nl;
+          $result .= $col . "}} // $klass_name\::box(const slots-t)" . $nl;
+        }
+
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> $object_t";
+
+        if (&is_src_decl() || &is_target_decl()) {
+          $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
+        } elsif (&is_target_defn()) {
+          $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
+          $col = &colin($col);
+          $result .=
+            $col . "$object_t result = $klass_name\::box(cast(std::decay<const slots-t>::type)arg);" . $nl .
+            $col . "return result;" . $nl;
+          $col = &colout($col);
+          $result .= $col . "}} // $klass_name\::box(slots-t)" . $nl;
+        }
+
+        $result .= $col . "klass $klass_name { INLINE func box(const slots-t* arg) -> $object_t";
+
+        if (&is_src_decl() || &is_target_decl()) {
+          $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
+        } elsif (&is_target_defn()) {
+          $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
+          $col = &colin($col);
+          $result .=
+            $col . "$object_t result = $klass_name\::box(*arg);" . $nl .
+            $col . "return result;" . $nl;
+          $col = &colout($col);
+          $result .= $col . "}} // $klass_name\::box(const slots-t*)" . $nl;
         }
         $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> $object_t";
 
@@ -1986,14 +2014,14 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           $result .=
-            $col . "$object_t result = box(*arg);" . $nl .
+            $col . "$object_t result = $klass_name\::box(cast(const slots-t*)*arg);" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}} // $klass_name\::box()" . $nl;
+          $result .= $col . "}} // $klass_name\::box(slots-t*)" . $nl;
         }
       } else { # !&is_array_type()
         ### box() non-array-type
-        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> $object_t";
+        $result .= $col . "klass $klass_name { INLINE func box(const slots-t* arg) -> $object_t";
 
         if (&is_src_decl() || &is_target_decl()) {
           $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
@@ -2017,8 +2045,22 @@ sub generate_klass_box {
           }
           $result .= $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}} // $klass_name\::box()" . $nl;
+          $result .= $col . "}} // $klass_name\::box(const slots-t*)" . $nl;
         }
+
+        $result .= $col . "klass $klass_name { INLINE func box(slots-t* arg) -> $object_t";
+
+        if (&is_src_decl() || &is_target_decl()) {
+          $result .= "; }" . &ann(__FILE__, __LINE__) . $nl;
+        } elsif (&is_target_defn()) {
+          $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
+          $col = &colin($col);
+          $result .= $col . "object-t result = $klass_name\::box(cast(const slots-t*)arg);" . $nl;
+          $result .= $col . "return result;" . $nl;
+          $col = &colout($col);
+          $result .= $col . "}} // $klass_name\::box(slots-t*)" . $nl;
+        }
+
         $result .= $col . "klass $klass_name { INLINE func box(slots-t arg) -> $object_t";
 
         if (&is_src_decl() || &is_target_decl()) {
@@ -2030,7 +2072,7 @@ sub generate_klass_box {
             $col . "$object_t result = $klass_name\::box(&arg);" . $nl .
             $col . "return result;" . $nl;
           $col = &colout($col);
-          $result .= $col . "}} // $klass_name\::box()" . $nl;
+          $result .= $col . "}} // $klass_name\::box(const slot-t)" . $nl;
         }
       }
     }

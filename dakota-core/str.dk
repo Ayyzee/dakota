@@ -56,7 +56,7 @@ klass str {
     return self;
   }
   // causes make-format(object-t, str-t, ...) to be generated
-  // method va::init-format(object-t self, str-t format, va-list-t args) {
+  // method va::init-format(object-t self, str-t format, va-list-t args) -> object-t {
   //   self = $init(super);
   //   //
   //   return self;

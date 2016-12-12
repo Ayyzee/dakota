@@ -45,7 +45,7 @@ klass named-info {
     mutable-unbox(self) = slots;
     return self;
   }
-  method check(slots-t* s) -> ssize-t {
+  method check(const slots-t* s) -> ssize-t {
     for (int64-t i = 0; i < s->count; i++) {
       // need to add test for #name (since its required)
 
@@ -82,8 +82,8 @@ klass named-info {
       element = default-element;
     return element;
   }
-  method dump(slots-t* s) -> slots-t* {
-    slots-t* current = s;
+  method dump(const slots-t* s) -> const slots-t* {
+    const slots-t* current = s;
     while (nullptr != current) {
       printf("{\n");
       for (int64-t i = 0; i < current->count; i++) {
@@ -180,6 +180,6 @@ func dk-va-make-named-info(symbol-t name, va-list-t args) -> object-t {
   va-end(args);
   return info;
 }
-func dkt-dump-named-info(named-info-t* info) -> named-info-t* {
+func dkt-dump-named-info(const named-info-t* info) -> const named-info-t* {
   return named-info::dump(info);
 }

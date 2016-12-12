@@ -56,7 +56,7 @@ klass str-buffer {
     $write-slots-end(out);
     return self;
   }
-  method dump(slots-t* s) -> slots-t*{
+  method dump(const slots-t* s) -> const slots-t* {
   //$dump(super);
     fprintf(stderr, "%p:%p { ptr=\"%s\", len=%zi, capacity=%zi }\n",
             cast(ptr-t)nullptr, cast(ptr-t)(s), s->ptr, s->len, s->capacity);
@@ -79,13 +79,13 @@ klass str-buffer {
     return result;
   }
   method length(slots-t* s) -> ssize-t {
-    if (0    == s->len &&
+    if (0       == s->len &&
         nullptr != s->ptr &&
-        NUL  != s->ptr[0])
+        NUL     != s->ptr[0])
       s->len = cast(ssize-t)safe-strlen(s->ptr);
     return s->len;
   }
-  method concat(slots-t* s, char8-t c) -> slots-t*{
+  method concat(slots-t* s, char8-t c) -> slots-t* {
     assert(NUL != c);
     assert(s->len + 1 != s->capacity);
       

@@ -35,7 +35,7 @@ klass node {
     node->next =    next;
     return node;
   }
-  static func dump-prev(slots-t* s, ssize-t iterator-state) -> void {
+  static func dump-prev(const slots-t* s, ssize-t iterator-state) -> void {
     if (nullptr != s) {
       // fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
       //         "<tr><td port=\"element\">element</td></tr>"
@@ -63,7 +63,7 @@ klass node {
     }
     return;
   }
-  static func dump-next(slots-t* s, ssize-t iterator-state) -> void {
+  static func dump-next(const slots-t* s, ssize-t iterator-state) -> void {
     if (nullptr != s) {
       fprintf(stderr, "    \"%p-%zi\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"

@@ -282,7 +282,7 @@ klass resource-usage {
     s->memory += size;
     return s;
   }
-  method log-alloc(slots-t* s, object-t o) -> slots-t* {
+  method log-alloc(const slots-t* s, object-t o) -> const slots-t* {
     printf("%3zi, size = %2zi, total-memory = %4zi, name = \"%s\"\n",
            s->instances,
            klass::unbox(o).offset + klass::unbox(o).size,
@@ -290,12 +290,12 @@ klass resource-usage {
            name-of(o));
     return s;
   }
-  method log-alloc(slots-t* s, ssize-t size, symbol-t name) -> slots-t*{
+  method log-alloc(const slots-t* s, ssize-t size, symbol-t name) -> const slots-t* {
     printf("%3zi, size = %2zi, total-memory = %4zi, name = \"%s\"~\n",
            s->instances, size, s->memory, name);
     return s;
   }
-  method log-method-alloc(slots-t* s) -> slots-t*{
+  method log-method-alloc(const slots-t* s) -> const slots-t* {
     printf("method-count=%zi, method-memory=%zi\n", s->method-count, s->method-memory);
     return s;
   }
@@ -372,8 +372,8 @@ klass klass {
     }
     return self;
   }
-  // method va-method-for-selector(object-t self, selector-t selector) {
-  //   throw $make(exception::klass(), #msg : "not yet implemented") -> va-method-t;
+  // method va-method-for-selector(object-t self, selector-t selector) -> va-method-t {
+  //   throw $make(exception::klass(), #msg : "not yet implemented");
   //   // return nullptr
   // }
   method method-for-selector?(object-t self, selector-t selector) -> boole-t {
