@@ -60,7 +60,7 @@ klass symbol {
   method compare(slots-t s, slots-t other-s) -> cmp-t {
     cmp-t result = 0;
     if (s != other-s)
-      result = intptr-compare(cast(intptr-t)s, cast(intptr-t)other-s);
+      result = dk-cmp(cast(intptr-t)s, cast(intptr-t)other-s);
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {

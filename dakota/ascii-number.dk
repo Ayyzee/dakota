@@ -42,7 +42,7 @@ klass ascii-number {
     if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
       const slots-t& s1 = unbox(self);
       const slots-t& s2 = unbox(other);
-      result = intptr-compare(s1.number, s2.number);
+      result = dk-cmp(s1.number, s2.number);
     } else {
       result = $compare(super, other);
     }

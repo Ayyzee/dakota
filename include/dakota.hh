@@ -149,8 +149,7 @@ namespace dkt { inline FUNC alloc(ssize_t size, void* ptr) -> void* {
 # endif
 
 inline FUNC dkt_normalize_compare_result(intmax_t n) -> cmp_t { return (n < 0) ? -1 : (n > 0) ? 1 : 0; }
-inline FUNC intptr_compare(intptr_t i1, intptr_t i2) -> cmp_t { return (i1 < i2) ? -1 : (i1 > i2) ? 1 : 0; }
-inline FUNC uintptr_compare(uintptr_t i1, uintptr_t i2) -> cmp_t { return (i1 < i2) ? -1 : (i1 > i2) ? 1 : 0; }
+template<typename T> inline FUNC dk_cmp(T a, T b)    -> cmp_t { return (a < b) ? -1 : (a > b) ? 1 : 0; }
 
 // klass/trait scope
 # define METHOD_SIGNATURE(name, args)         (cast(dkt_signature_func_t)(cast(FUNC (*)args -> const signature_t*) __method_signature::name))()
