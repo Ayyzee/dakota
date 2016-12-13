@@ -28,6 +28,10 @@ include-for <cstdint> int8-t,
                       uint64-t,
                       uintmax-t,
                       uintptr-t;
+
+// should be template func
+# define CMP(a, b) (a < b) ? -1 : (a > b) ? 1 : 0
+
 module dakota-core;
 
 klass number;
@@ -43,7 +47,7 @@ klass intmax {
   // INTMAX_C(v)
 
   method compare(slots-t a, slots-t b) -> cmp-t {
-    cmp-t result = (a < b) ? -1 : (a > b) ? 1 : 0;
+    cmp-t result = CMP(a, b);
     return result;
   }
 }
@@ -57,7 +61,7 @@ klass uintmax {
   // UINTMAX_C(v)
 
   method compare(slots-t a, slots-t b) -> cmp-t {
-    cmp-t result = (a < b) ? -1 : (a > b) ? 1 : 0;
+    cmp-t result = CMP(a, b);
     return result;
   }
 }
