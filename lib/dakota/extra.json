@@ -20,7 +20,9 @@
     '#object' => undef,        # kw-args processing funcs (throw)
     '#objects' => undef,         # implied when using some literal constructs
     '#signature' => undef,     # kw-args processing funcs (throw)
+    '#slots!' => undef,
     '#slots' => undef,
+    '#slots?' => undef,
     '#src-file' => undef,
     '#src-line' => undef,
   },

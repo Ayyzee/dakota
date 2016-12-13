@@ -149,7 +149,7 @@ our @EXPORT= qw(
 my $colon = ':'; # key/element delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+   $rid, $rmid, $rbid, $rtid, $uint) = &ident_regex();
 my $h =  &header_file_regex();
 
 $ENV{'DKT-DEBUG'} = 0;
@@ -1824,17 +1824,18 @@ sub method {
 
     if ('init' eq $method_name) {
       foreach my $kw_arg_name (@$kw_arg_names) {
-        if ('slots' eq $kw_arg_name) {
+        if ($kw_arg_name =~ /^slots(\?|\!)?$/) {
           if (1 == @$kw_arg_names) {
             # only one kw-arg and its slots (does not matter aggregate or not)
-            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = 1;
+            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = $kw_arg_name;
           } elsif ($$gbl_current_ast_scope{'slots'} && $$gbl_current_ast_scope{'slots'}{'type'}) {
             # not an aggregate
-            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = 1;
+            $$gbl_current_ast_scope{'init-supports-kw-slots?'} = $kw_arg_name;
           } else {
             my $kw_arg_names_list = join(', #', @$kw_arg_names);
             print STDERR "warning: slots is an aggregate and init(#$kw_arg_names_list) supports more than just #slots.\n";
           }
+          &add_keyword($gbl_root_ast, $kw_arg_name);
         }
       }
     }
@@ -2310,7 +2311,7 @@ sub ast_from_dk_path {
   $gbl_filename = $arg;
   #print STDERR &sst::filestr($gbl_sst);
   local $_ = &filestr_from_file($gbl_filename);
-  while (m/\#((0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|[1-9]\d*)([uUiI](32|64|128))?)/g) {
+  while (m/#(($uint)([uUiI](32|64|128))?)/g) {
     &add_int($gbl_root_ast, $1);
   }
   pos $_ = 0;
@@ -2328,12 +2329,16 @@ sub ast_from_dk_path {
   pos $_ = 0;
   $_ =~ s/(\bcase\s)\s+/$1/g;
   pos $_ = 0;
-  while (m/(?<!\bcase\b)\s*(#$bid)\s*$colon/g) { # kw-args use
+  while (m/(?<!\bcase\b)\s*(#$mid)\s*$colon/g) { # kw-args use
     &add_keyword($gbl_root_ast, $1);
   }
   pos $_ = 0;
-  while (m/(#$bid|#\|.*?(?<!\\)\|)/g) {
+  while (m/(#$mid|#\|.*?(?<!\\)\|)/g) {
     &add_symbol($gbl_root_ast, &as_literal_symbol_interior($1));
+  }
+  pos $_ = 0;
+  while (m/(#($uint))/g) {
+    &add_symbol($gbl_root_ast, $2);
   }
   &decode_comments(\$_, $parts);
   &decode_strings(\$_);

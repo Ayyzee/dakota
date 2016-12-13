@@ -107,7 +107,7 @@ my $k = qr/[\w-]/;
 my $t = qr/[_A-Za-z0-9-\+\/\*()\[\].,: ]/;
 my $stmt_boundry = qr/\{|\}|\)|:|;/s;
 my ($id,  $mid,  $bid,  $tid,
-   $rid, $rmid, $rbid, $rtid) = &ident_regex();
+   $rid, $rmid, $rbid, $rtid, $uint) = &ident_regex();
 my $msig_type = &method_sig_type_regex();
 my $msig = &method_sig_regex();
 my $sqstr = &sqstr_regex();
@@ -535,7 +535,7 @@ sub symbol {
 }
 sub rewrite_symbols {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/\#($bid)/&symbol($1)/ge;
+  $$filestr_ref =~ s/\#($mid)/&symbol($1)/ge;
   $$filestr_ref =~ s/\#\|(.*?(?<!\\))\|/&symbol($1)/ge;
 }
 sub literal_str {
@@ -554,7 +554,7 @@ sub literal_int {
 }
 sub rewrite_literal_ints {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(\#(0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+))/&literal_int($2)/ge;
+  $$filestr_ref =~ s/(#($uint))/&literal_int($2)/ge;
   # '' multibyte char
 }
 # 'a'
@@ -720,7 +720,7 @@ sub encode_str {
 }
 sub rewrite_switch_replacement {
   my ($expr, $body) = @_;
-  if ($body =~ m/\bcase\s*(".*?"|\#$bid|\#\|.+?\||dk-hash\s*$main::list)\s*:/g) {
+  if ($body =~ m/\bcase\s*(".*?"|\#$mid|\#\|.+?\||dk-hash\s*$main::list)\s*:/g) {
     $expr =~ s/^(\s*)(.+)$/$1(dk-hash-switch$2)/s;
     $body =~ s/(\bcase\s*)(".*?")(\s*:)/$1 . 'dk-hash(' .             $2 . ')' . $3/egsx;
     $body =~ s/(\bcase\s*)(\#.+?)(\s*:)/$1 . 'dk-hash(' . &encode_str($2) .')' . $3/egsx; # __hash::_abc_def
@@ -797,7 +797,7 @@ sub rewrite_keyword_syntax_list {
 }
 sub keyword_use {
   my ($arg1, $arg2) = @_;
-  my $arg1_ident = &dakota::generate::dk_mangle($arg1);
+  my $arg1_ident = &dk_mangle($arg1);
   return "&__keyword::$arg1_ident$arg2,";
 }
 sub rewrite_keyword_use {
@@ -1008,7 +1008,7 @@ sub convert_dk_to_cc {
   &rewrite_switch($filestr_ref);
 
   &rewrite_objects($filestr_ref); # must be before line removing leading #
-  $$filestr_ref =~ s/\#($bid\s+$colon)/$1/g; # just remove leading #, rnielsen
+  $$filestr_ref =~ s/\#($mid\s+$colon)/$1/g; # just remove leading #, rnielsen
   #&wrapped_rewrite($filestr_ref, [ '?literal-squoted-cstring' ], [ 'DKT-SYMBOL', '(', '?literal-squoted-cstring', ')' ]);
   &rewrite_symbols($filestr_ref);
 

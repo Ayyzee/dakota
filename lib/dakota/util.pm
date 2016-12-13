@@ -372,7 +372,7 @@ sub is_debug {
 }
 sub is_symbol_candidate {
   my ($str) = @_;
-  if ($str =~ m/^$bid$/) {
+  if ($str =~ m/^$mid$/) {
     return 1;
   } else {
     return 0;
@@ -492,7 +492,7 @@ sub kw_arg_placeholders {
 # last only chars: ? !
 sub ident_regex {
   my $id =  qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9]              )?/x;
-  my $mid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!])/x; # method ident
+  my $mid = qr/[_a-zA-Z](?:(?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?\!])|(?:[\?\!]))?/x; # method ident
  #my $bid = qr/[_a-zA-Z](?:[_a-zA-Z0-9-]*[_a-zA-Z0-9\?]  )|(?:[\?]  )/x; # bool   ident
   my $bid = qr/[\w-]+\??/x; # bool   ident
   my $tid = qr/[_a-zA-Z]   [_a-zA-Z0-9-]*?-t/x;                          # type   ident
@@ -502,10 +502,11 @@ sub ident_regex {
   my $rmid = qr/$sro?(?:$id$sro)*$mid/;
   my $rbid = qr/$sro?(?:$id$sro)*$bid/;
   my $rtid = qr/$sro?(?:$id$sro)*$tid/;
+  my $uint =  qr/0[xX][0-9a-fA-F]+|0[bB][01]+|0[0-7]+|\d+/;
  #my $qtid = qr/(?:$sro?$tid)|(?:$id$sro(?:$id$sro)*$tid)/;
 
   return ( $id,  $mid,  $bid,  $tid,
-          $rid, $rmid, $rbid, $rtid);
+          $rid, $rmid, $rbid, $rtid, $uint);
 }
 my $implicit_metaklass_stmts = qr/( *klass\s+(((klass|trait|superklass)\s+[\w:-]+)|(slots|method|func)).*)/s;
 sub rewrite_metaklass_stmts {

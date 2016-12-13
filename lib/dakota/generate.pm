@@ -2029,14 +2029,15 @@ sub generate_klass_box {
           $result .= " {" . &ann(__FILE__, __LINE__) . $nl;
           $col = &colin($col);
           if ($$klass_ast{'init-supports-kw-slots?'}) {
+            my $kw_arg_name = $$klass_ast{'init-supports-kw-slots?'};
             my $type = "$klass_name\::slots-t";
             my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
             if ($promoted_type) {
               $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
-                $col . "$object_t result = \$make(klass(), \#slots : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
+                $col . "$object_t result = \$make(klass(), \#$kw_arg_name : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
             } else {
               $result .=
-                $col . "$object_t result = \$make(klass(), \#slots : *arg);" . $nl;
+                $col . "$object_t result = \$make(klass(), \#$kw_arg_name : *arg);" . $nl;
             }
           } else {
             $result .=
