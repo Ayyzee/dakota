@@ -57,24 +57,24 @@ klass object {
   }
   method equals?(object-t self, object-t other) -> boole-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    boole-t state? = false;
+    boole-t state = false;
 
     if (0 == $compare(self, other))
-      state? = true;
-    return state?;
+      state = true;
+    return state;
   }
   method instance?(object-t self, object-t kls) -> boole-t {
-    boole-t state? = false;
+    boole-t state = false;
     object-t tmp-kls = klass-of(self);
 
     while (!root-superklass?(tmp-kls)) {
       if (tmp-kls == kls) {
-        state? = true;
+        state = true;
         break;
       }
       tmp-kls = superklass-of(tmp-kls);
     }
-    return state?;
+    return state;
   }
   method perform-method-for-selector(object-t self, selector-t selector) -> object-t {
     object-t kls = klass-of(self);

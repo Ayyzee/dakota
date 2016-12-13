@@ -85,23 +85,23 @@ klass token {
     return result;
   }
   method equal?(object-t self, object-t other) -> boole-t {
-    boole-t state?;
+    boole-t state;
 
     if ($instance?(other, _klass_)) {
       if (0 == $compare(self, other))
-        state? = true;
+        state = true;
       else
-        state? = false;
+        state = false;
     } else {
-      state? = false;
+      state = false;
     }
-    return state?;
+    return state;
   }
   method empty?(object-t self) -> boole-t {
-    boole-t result? = false;
+    boole-t result = false;
     if (NUL == self.buffer[0])
-      result? = true;
-    return result?;
+      result = true;
+    return result;
   }
   method empty(object-t self) -> object-t {
     self.line =      0;
@@ -111,12 +111,12 @@ klass token {
     return self;
   }
   method tokenid?(object-t self, tokenid-t tokenid) -> boole-t {
-    boole-t result?;
+    boole-t result;
     if (self.tokenid == tokenid)
-      result? = true;
+      result = true;
     else
-      result? = false;
-    return result?;
+      result = false;
+    return result;
   }
   method set-tokenid(object-t self, tokenid-t tokenid) -> object-t {
     self.tokenid = tokenid;
@@ -132,12 +132,12 @@ klass token {
     return self;
   }
   method leading-ws?(object-t self) -> boole-t {
-    boole-t result?;
+    boole-t result;
     if (nullptr == self.leading-ws)
-      result? = false;
+      result = false;
     else
-      result? = true;
-    return result?;
+      result = true;
+    return result;
   }
   method leading-ws(object-t self) -> object-t {
     return self.leading-ws;

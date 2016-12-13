@@ -146,7 +146,7 @@ klass json-parser {
           int64-t quote-type = '\'';
           object-t token = $make(token::klass(), #tokenid : 'sqst',
                                 #line : self.line, #column : self.column - 1);
-          boole-t escaped?;
+          boole-t is-escaped;
           c = json-parser::get(self);
           if (EOF == c) {
             print-error(self.file, self.line, self.column, "unterminated string\n");
@@ -158,16 +158,16 @@ klass json-parser {
             $append-char(token, cast(int64-t)c);
 
             if ('\\' == c)
-              escaped? = true;
+              is-escaped = true;
             else
-              escaped? = false;
+              is-escaped = false;
 
             c = json-parser::get(self);
             if (EOF == c) {
               print-error(self.file, self.line, self.column, "unterminated string\n");
               return null;
             }
-          } while ((quote-type != c) || escaped?);
+          } while ((quote-type != c) || is-escaped);
             
           return token;
         }

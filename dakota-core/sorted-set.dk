@@ -52,12 +52,12 @@ klass sorted-set {
               object-t[] objects :          nullptr) -> object-t {
     assert(0 < initial-capacity);
     self = $init(super);
-    boole-t ptr?;
+    boole-t is-ptr;
     sorted-array::create(&self.sa,
                          initial-capacity,
                          ssizeof(ptr-t),
                          cast(std-compare-t)compare,
-                         ptr? = true);
+                         is-ptr = true);
     self.iterator-state = 0;
 
     if (nullptr != elements)
@@ -103,16 +103,16 @@ klass sorted-set {
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
-    boole-t state? = false;
+    boole-t state = false;
     if (nullptr != $in(self, element, cast(object-t)nullptr))
-      state? = true;
-    return state?;
+      state = true;
+    return state;
   }
   method empty?(object-t self) -> boole-t {
-    boole-t state? = false;
+    boole-t state = false;
     if (0 == self.sa.count)
-      state? = true;
-    return state?;
+      state = true;
+    return state;
   }
   method remove(object-t self, object-t element) -> object-t {
     result-t found-result = sorted-array::search(&self.sa, element);
@@ -203,10 +203,10 @@ klass sorted-set-forward-iterator {
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-    boole-t state? = false;
+    boole-t state = false;
     if (self.offset < ss.sa.count)
-      state? = true;
-    return state?;
+      state = true;
+    return state;
   }
   method next(object-t self) -> object-t {
     check-iterator-state(self);

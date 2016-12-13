@@ -43,8 +43,8 @@ include-for <sys/stat.h> struct stat;
 
 module dakota-core;
 
-extern boole-t pre-main?; // to quiet clang
-boole-t pre-main? = true;
+extern boole-t is-pre-main; // to quiet clang
+boole-t is-pre-main = true;
 
 klass bit-vector;
 klass const-info;
@@ -100,10 +100,10 @@ klass assoc-node {
     return element;
   }
   method element?(const slots-t* slots) -> boole-t {
-    boole-t state? = false;
+    boole-t state = false;
     if (0 != slots->element)
-      state? = true;
-    return state?;
+      state = true;
+    return state;
   }
 }
 klass named-assoc-node-compare {
@@ -148,31 +148,31 @@ static func symbol-str-compare(symbol-t s1, str-t s2) -> cmp-t {
 static func init-runtime-ds() -> void {
   const ssize-t num-klasses = 256;
 
-  boole-t ptr?;
+  boole-t is-ptr;
   gbl-imported-klasses-table =
     sorted-array::create(num-klasses,
                          ssizeof(named-assoc-node::slots-t),
                          cast(std-compare-t)
                          cast(named-assoc-node-compare-t)named-assoc-node::compare,
-                         ptr? = false);
+                         is-ptr = false);
   gbl-klass-defns-table =
     sorted-array::create(num-klasses,
                          ssizeof(named-info::slots-t*),
                          cast(std-compare-t)
                          cast(named-info-compare-t)named-info::compare,
-                         ptr? = true);
+                         is-ptr = true);
   gbl-interposers-table =
     sorted-array::create(num-klasses,
                          ssizeof(property::slots-t),
                          cast(std-compare-t)
                          cast(property-compare-t)property::compare,
-                         ptr? = false);
+                         is-ptr = false);
   gbl-imported-klasses-file-table =
     sorted-array::create(num-klasses,
                          ssizeof(symbol-t),
                          cast(std-compare-t)
                          cast(symbol-compare-t)symbol-str-compare,
-                         ptr? = true);
+                         is-ptr = true);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -817,24 +817,24 @@ static func dump?(named-info-t* kls-info, str-t only) -> boole-t {
   symbol-t name = name-from-info(kls-info);
   assert-valid-str(name);
 
-  boole-t result? = true;
+  boole-t result = true;
   ssize-t only-len = cast(ssize-t)safe-strlen(only);
   if ('-' == only[0]) {
     ssize-t name-len = cast(ssize-t)safe-strlen(name);
     if (name-len < only-len)
-      result? = false;
+      result = false;
 
     if (0 != safe-strcmp(name + name-len - only-len, only))
-      result? = false;
+      result = false;
   }
   else-if ('-' == only[only-len - 1]) {
     if (0 != safe-strncmp(name, only, cast(size-t)only-len))
-      result? = false;
+      result = false;
   } else {
     if (0 != safe-strcmp(name, only))
-      result? = false;
+      result = false;
   }
-  return result?;
+  return result;
 }
 static func remove-dir(str-t path) -> str-t {
   str-t result = strrchr(path, '/');
@@ -960,18 +960,18 @@ static func klass-exported?(named-info-t* kls-info,
                             boole-t*      exported-ptr = nullptr,
                             boole-t*      state-exported-ptr = nullptr,
                             boole-t*      behavior-exported-ptr = nullptr) -> boole-t {
-  boole-t exported? =          cast(boole-t)named-info::at(kls-info, #exported?);
-  boole-t state-exported? =    cast(boole-t)named-info::at(kls-info, #state-exported?);
-  boole-t behavior-exported? = cast(boole-t)named-info::at(kls-info, #behavior-exported?);
+  boole-t has-exported =          cast(boole-t)named-info::at(kls-info, #exported?);
+  boole-t has-state-exported =    cast(boole-t)named-info::at(kls-info, #state-exported?);
+  boole-t has-behavior-exported = cast(boole-t)named-info::at(kls-info, #behavior-exported?);
 
   if (exported-ptr)
-    *exported-ptr = exported?;
+    *exported-ptr = has-exported;
   if (state-exported-ptr)
-    *state-exported-ptr = state-exported?;
+    *state-exported-ptr = has-state-exported;
   if (behavior-exported-ptr)
-    *behavior-exported-ptr = behavior-exported?;
+    *behavior-exported-ptr = has-behavior-exported;
 
-  boole-t result = (exported? || state-exported? || behavior-exported?);
+  boole-t result = (has-exported || has-state-exported || has-behavior-exported);
   return result;
 }
 static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-module) -> symbol-t {
@@ -986,9 +986,9 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
   assert-valid-str(ci.name);
   assert(!(nullptr != ci.interpose-name && nullptr != ci.superklass-name));
 
-  boole-t verbose? = 0;
+  boole-t is-verbose = 0;
 
-  if (verbose?) {
+  if (is-verbose) {
     if (nullptr == ci.superklass-name)
       ci.superklass-name = default-superklass-name();
     if (nullptr == ci.klass-name)
@@ -1014,10 +1014,10 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
 # if defined DKT-ENABLE-EXPORT-GROUP
   ostream::col-incr(ostrm);
 # endif
-  boole-t exported? =          false;
-  boole-t state-exported? =    false;
-  boole-t behavior-exported? = false;
-  if (klass-exported?(kls-info, &exported?, &state-exported?, &behavior-exported?))
+  boole-t has-exported =          false;
+  boole-t has-state-exported =    false;
+  boole-t has-behavior-exported = false;
+  if (klass-exported?(kls-info, &has-exported, &has-state-exported, &has-behavior-exported))
     ostream::println-format(ostrm, "export %s %s {\n", ci.type, ci.name);
   else
     ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
@@ -1087,7 +1087,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
     }
   }
 # define DKT-DEBUG-CODEGEN 0
-  if (DKT-DEBUG-CODEGEN || state-exported?) {
+  if (DKT-DEBUG-CODEGEN || has-state-exported) {
     if (nullptr != ci.slots-type) {
       ostream::println-format(ostrm, "slots %s;\n", ci.slots-type);
     }
@@ -1136,7 +1136,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
       } else {
         fprintf(stderr, "%s:%i: ERROR: %s %s: exported slots without type or info\n", __FILE__, __LINE__, ci.type, ci.name);
     }
-  } // if (state-exported?
+  } // if (has-state-exported)
   if ((nullptr != ci.superklass-name || nullptr != ci.klass-name || nullptr != ci.traits || nullptr != ci.requires || nullptr != ci.provides)
       && nullptr != ci.method-signatures) {
     ostream::println-format(ostrm, "\n");
@@ -1198,7 +1198,7 @@ static func dump-include-for-decls(ostream-t ostrm, named-info-t* registration-i
   }
   return;
 }
-static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only, boole-t exported-only?) -> void {
+static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, str-t only, boole-t exported-only) -> void {
   assert(nullptr != ostrm.output);
   assert(8 > ostrm.col);
   assert(nullptr != registration-info);
@@ -1220,7 +1220,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
       assert(nullptr != kls-info);
       if (nullptr == kls-info->elements)
         break;
-      if (exported-only? && !klass-exported?(kls-info))
+      if (exported-only && !klass-exported?(kls-info))
         continue;
       if (nullptr == only || dump?(kls-info, only)) {
         if (1)
@@ -1267,12 +1267,12 @@ klass registration-info {
   }
 }
 static func getenv?(str-t name) -> boole-t {
-  boole-t value? = false;
+  boole-t value = false;
   str-t value-str = getenv(name);
 
   if (nullptr != value-str && 0 != safe-strcmp("0", value-str))
-    value? = true;
-  return value?;
+    value = true;
+  return value;
 }
 static func add-registration-info(named-info-t* registration-info) -> void {
   assert(nullptr == registration-info->next);
@@ -1467,7 +1467,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   int-t overwrite;
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
-  boole-t exported-only? = getenv?("DAKOTA_CATALOG_EXPORTED_ONLY");
+  boole-t exported-only = getenv?("DAKOTA_CATALOG_EXPORTED_ONLY");
   stream-t ctlg-output = nullptr;
   str-t output-path = getenv("DAKOTA_CATALOG_OUTPUT");
   if (nullptr != output-path) {
@@ -1495,7 +1495,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
 
     if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
       dump-include-for-decls(ostrm, registration-info);
-      dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only?);
+      dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only);
       dump-interposers(ostrm, registration-info);
     }
   }
@@ -1520,7 +1520,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       last-user-code-before-main();
       if (getenv?("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
-      pre-main? = false;
+      is-pre-main = false;
   }
   if (nullptr != output-path && NUL != output-path[0] && nullptr != ctlg-output)
     fclose(ctlg-output);
@@ -1662,12 +1662,12 @@ func dk-intern(str-t key) -> symbol-t {
   assert(NUL != key[0]);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of intern memory
-  boole-t ptr?;
+  boole-t is-ptr;
   static sorted-array-t* intern-array = sorted-array::create((4096/2)/sizeof(symbol-t),
                                                              ssizeof(symbol-t),
                                                              cast(std-compare-t)
                                                              cast(symbol-compare-t)symbol-str-compare,
-                                                             ptr? = true);
+                                                             is-ptr = true);
 # if 0
   symbol-t val = key;
 # else

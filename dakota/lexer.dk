@@ -33,13 +33,13 @@ klass tokenid;
 klass vector;
 
 static func ident-type?(str-buffer-t buf) -> boole-t {
-  boole-t result? = false;
+  boole-t result = false;
   if (3 <= buf.len)
     if ((('_' == buf.ptr[buf.len - 2]) ||
          ('-' == buf.ptr[buf.len - 2])) &&
          ('t' == buf.ptr[buf.len - 1]))
-      result? = true;
-  return result?;
+      result = true;
+  return result;
 }
 klass lexer {
   slots {
@@ -198,26 +198,26 @@ klass lexer {
         case '#': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          boole-t escaped? = false;
+          boole-t is-escaped = false;
           while (1) {
             char8-t c2 = get-char8(self);
             str-buffer::concat(&buf, c2);
             switch (c2) {
               case '\\':
-                escaped? = true;
+                is-escaped = true;
                 break;
               case '\n':
-                if (escaped?) {
-                  escaped? = false;
+                if (is-escaped) {
+                  is-escaped = false;
                 } else {
-                  escaped? = false;
+                  is-escaped = false;
                   object-t token = $make(token::klass(), #tokenid : 0, #buffer : buf.ptr,
                                         #line : -1, #column : -1);
                   return token;
                 }
                 break;
               default:
-                escaped? = false;
+                is-escaped = false;
             }
           }
         }
@@ -275,26 +275,26 @@ klass lexer {
         case '\'': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          boole-t escaped? = false;
+          boole-t is-escaped = false;
           while (1) {
             char8-t c2 = get-char8(self);
             str-buffer::concat(&buf, c2);
             switch (c2) {
               case '\\':
-                escaped? = !escaped?;
+                is-escaped = !is-escaped;
                 break;
               case '\'':
-                if (escaped?) {
-                  escaped? = false;
+                if (is-escaped) {
+                  is-escaped = false;
                 } else {
-                  escaped? = false;
+                  is-escaped = false;
                   object-t token = $make(token::klass(), #tokenid : 'sqst', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
                 break;
               default:
-                escaped? = false;
+                is-escaped = false;
             }
           }
         }
@@ -302,26 +302,26 @@ klass lexer {
         case '"': {
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
-          boole-t escaped? = false;
+          boole-t is-escaped = false;
           while (1) {
             char8-t c2 = get-char8(self);
             str-buffer::concat(&buf, c2);
             switch (c2) {
               case '\\':
-                escaped? = !escaped?;
+                is-escaped = !is-escaped;
                 break;
               case '"':
-                if (escaped?) {
-                  escaped? = false;
+                if (is-escaped) {
+                  is-escaped = false;
                 } else {
-                  escaped? = false;
+                  is-escaped = false;
                   object-t token = $make(token::klass(), #tokenid : 'dqst', #buffer : buf.ptr,
                                         #line : self.line, #column : self.column - buf.len);
                   return token;
                 }
                 break;
               default:
-                escaped? = false;
+                is-escaped = false;
             }
           }
         }

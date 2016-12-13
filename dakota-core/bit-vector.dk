@@ -105,16 +105,16 @@ klass bit-vector {
     if (self.count < (offset + 1))
       self.count = (offset + 1);
 
-    boole-t result? = (self.elements[offset] & mask);
-    return result?;
+    boole-t result = (self.elements[offset] & mask);
+    return result;
   }
-  method set-bit(object-t self, ssize-t index, boole-t value?) -> object-t {
+  method set-bit(object-t self, ssize-t index, boole-t value) -> object-t {
     ssize-t offset = index/gbl-element-width;
     uint64-t mask = 1 << (index % gbl-element-width);
     if (self.count < (offset + 1))
       self.count = (offset + 1);
 
-    if (false == value?)
+    if (false == value)
       self.elements[offset] &= ~mask; // set bit to zero
     else
       self.elements[offset] |= mask;  // set bit to one
@@ -135,9 +135,9 @@ klass bit-vector {
       if (0 != i && 0 == (i % 8))
         fprintf(out, " ");
 
-      boole-t value? = bit(self, i);
+      boole-t value = bit(self, i);
 
-      if (false == value?)
+      if (false == value)
         fprintf(out, "0");
       else
         fprintf(out, "1");
@@ -170,18 +170,18 @@ klass bit-vector {
     return self;
   }
   static func op-common?(object-t self, object-t other, bit-vector-op-func-t op) -> boole-t {
-    boole-t result? = false;
+    boole-t result = false;
     slots-t& self-slots = mutable-unbox(self);
     const slots-t& other-slots = unbox(other);
     assert(self-slots.capacity == other-slots.capacity);
     self-slots.count = max(self-slots.count, other-slots.count);
     for (ssize-t offset = 0; offset < self-slots.count; offset++) {
       if (0 != (self-slots.elements[offset] = op(self-slots.elements[offset], other-slots.elements[offset]))) {
-        result? = true;
+        result = true;
         break;
       }
     }
-    return result?;
+    return result;
   }
   method bit-and(object-t self, object-t other) -> object-t {
     op-common(self, other, op-bit-and);

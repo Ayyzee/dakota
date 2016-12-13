@@ -107,12 +107,12 @@ klass string {
   }
   method boole-value(object-t self) -> boole-t {
     uintmax-t uint-value = cast(uintmax-t)strtoumax(self.ptr, nullptr, 10);
-    boole-t result?;
+    boole-t result;
     if (0 == uint-value)
-      result? = false;
+      result = false;
     else
-      result? = true;
-    return result?;
+      result = true;
+    return result;
   }
   // // sentinel method must be va:: and va-list-t (and be last)
   // [[sentinel]] method va::concat(object-t self, va-list-t args) -> object-t {

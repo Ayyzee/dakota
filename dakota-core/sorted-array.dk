@@ -20,8 +20,8 @@
 # include <cstdlib>
 # include <cstring>
 
-# define   ref(t, p) !(t->ptr?) ? (p) : &(p)
-# define deref(t, p) !(t->ptr?) ? (p) : *(cast(const void**)(p))
+# define   ref(t, p) !(t->is-ptr) ? (p) : &(p)
+# define deref(t, p) !(t->is-ptr) ? (p) : *(cast(const void**)(p))
 
 module dakota-core;
 
@@ -35,30 +35,30 @@ klass sorted-array {
     ssize-t       capacity;
     ssize-t       size;
     std-compare-t compare;
-    boole-t       ptr?;
+    boole-t       is-ptr;
   }
   func create(slots-t* slots,
               ssize-t capacity,
               ssize-t size,
               std-compare-t compare,
-              boole-t ptr?) -> slots-t* {
+              boole-t is-ptr) -> slots-t* {
     slots->elements = cast(ptr-t)dkt::alloc(size * capacity);
     slots->count =    0;
     slots->capacity = capacity;
     slots->size =     size;
     slots->compare =  compare;
-    slots->ptr? =     ptr?;
+    slots->is-ptr =   is-ptr;
     return slots;
   }
   func create(ssize-t capacity,
               ssize-t size,
               std-compare-t compare,
-              boole-t ptr?) -> slots-t* {
+              boole-t is-ptr) -> slots-t* {
     assert(0 < capacity);
     assert(0 < size);
     assert(nullptr != compare);
     slots-t* slots = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
-    create(slots, capacity, size, compare, ptr?);
+    create(slots, capacity, size, compare, is-ptr);
     return slots;
   }
   func sort(slots-t* t) -> slots-t* {
@@ -72,7 +72,7 @@ klass sorted-array {
 
     result-t result = { .element = nullptr, .offset = -1 };
     int-t comparison;
-    boole-t increment? = false;
+    boole-t should-increment = false;
 
     int64-t i = 0;
     int64-t l = 0;
@@ -84,18 +84,18 @@ klass sorted-array {
       comparison = t->compare(deref(t, p), key);
 
       if (0 < comparison) {
-        increment? = false;
+        should-increment = false;
         u = i;
       }
       else-if (0 > comparison) {
-        increment? = true;
+        should-increment = true;
         l = i + 1;
       } else {
         result.element = deref(t, p);
         break;
       }
     }
-    if (nullptr == result.element && increment?)
+    if (nullptr == result.element && should-increment)
       i++;
     result.offset = i;
     return result;

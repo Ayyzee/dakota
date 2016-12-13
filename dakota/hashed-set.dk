@@ -129,16 +129,16 @@ klass hashed-set {
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
-    boole-t state? = false;
+    boole-t state = false;
     if (nullptr != $in(self, element, cast(object-t)nullptr))
-      state? = true;
-    return state?;
+      state = true;
+    return state;
   }
   method empty?(object-t self) -> boole-t {
-    boole-t state? = false;
+    boole-t state = false;
     if (0 == self.size)
-      state? = true;
-    return state?;
+      state = true;
+    return state;
   }
   method remove(object-t self, object-t element) -> object-t {
     object-t prev-element = nullptr;
@@ -237,10 +237,10 @@ klass hashed-set-forward-iterator {
   }
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
-    boole-t state? = false;
+    boole-t state = false;
     if (nullptr != self.deque-iter)
-      state? = $next?(self.deque-iter);
-    return state?;
+      state = $next?(self.deque-iter);
+    return state;
   }
   static func next-deque-iterator(object-t vector-iter) -> object-t {
     object-t deque = $next(vector-iter);
