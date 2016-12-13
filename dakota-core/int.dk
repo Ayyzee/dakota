@@ -38,175 +38,165 @@ klass intmax {
   
   slots intmax-t;
 
-  const slots-t min = INTMAX_MIN;
-  const slots-t max = INTMAX_MAX;
+  const slots-t min = INTMAX-MIN;
+  const slots-t max = INTMAX-MAX;
 
-  // INTMAX_C(v)
-
-  method compare(slots-t a, slots-t b) -> cmp-t {
-    cmp-t result = dk-cmp(a, b);
-    return result;
-  }
+  // INTMAX-C(v)
 }
 klass uintmax {
   superklass number;
   
   slots uintmax-t;
 
-  const slots-t max = UINTMAX_MAX;
+  const slots-t max = UINTMAX-MAX;
 
-  // UINTMAX_C(v)
-
-  method compare(slots-t a, slots-t b) -> cmp-t {
-    cmp-t result = dk-cmp(a, b);
-    return result;
-  }
+  // UINTMAX-C(v)
 }
 klass int8 {
   superklass number;
   
   slots int8-t;
 
-  const slots-t min = INT8_MIN;
-  const slots-t max = INT8_MAX;
+  const slots-t min = INT8-MIN;
+  const slots-t max = INT8-MAX;
 
-  // INT8_C(v)
+  // INT8-C(v)
 }
 klass int16 {
   superklass number;
   
   slots int16-t;
 
-  const slots-t min = INT16_MIN;
-  const slots-t max = INT16_MAX;
+  const slots-t min = INT16-MIN;
+  const slots-t max = INT16-MAX;
 
-  // INT16_C(v)
+  // INT16-C(v)
 }
 klass int32 {
   superklass number;
   
   slots int32-t;
 
-  const slots-t min = INT32_MIN;
-  const slots-t max = INT32_MAX;
+  const slots-t min = INT32-MIN;
+  const slots-t max = INT32-MAX;
 
-  // INT32_C(v)
+  // INT32-C(v)
 }
 klass int64 {
   superklass number;
   
   slots int64-t;
 
-  const slots-t min = INT64_MIN;
-  const slots-t max = INT64_MAX;
+  const slots-t min = INT64-MIN;
+  const slots-t max = INT64-MAX;
 
-  // INT64_C(v)
+  // INT64-C(v)
 }
 klass int-fast8 {
   superklass number;
   
   slots int-fast8-t;
 
-  const slots-t min = INT_FAST8_MIN;
-  const slots-t max = INT_FAST8_MAX;
+  const slots-t min = INT-FAST8-MIN;
+  const slots-t max = INT-FAST8-MAX;
 }
 klass int-fast16 {
   superklass number;
   
   slots int-fast16-t;
 
-  const slots-t min = INT_FAST16_MIN;
-  const slots-t max = INT_FAST16_MAX;
+  const slots-t min = INT-FAST16-MIN;
+  const slots-t max = INT-FAST16-MAX;
 }
 klass int-fast32 {
   superklass number;
   
   slots int-fast32-t;
 
-  const slots-t min = INT_FAST32_MIN;
-  const slots-t max = INT_FAST32_MAX;
+  const slots-t min = INT-FAST32-MIN;
+  const slots-t max = INT-FAST32-MAX;
 }
 klass int-fast64 {
   superklass number;
   
   slots int-fast64-t;
 
-  const slots-t min = INT_FAST64_MIN;
-  const slots-t max = INT_FAST64_MAX;
+  const slots-t min = INT-FAST64-MIN;
+  const slots-t max = INT-FAST64-MAX;
 }
 klass int-least8 {
   superklass number;
   
   slots int-least8-t;
 
-  const slots-t min = INT_LEAST8_MIN;
-  const slots-t max = INT_LEAST8_MAX;
+  const slots-t min = INT-LEAST8-MIN;
+  const slots-t max = INT-LEAST8-MAX;
 }
 klass int-least16 {
   superklass number;
   
   slots int-least16-t;
 
-  const slots-t min = INT_LEAST16_MIN;
-  const slots-t max = INT_LEAST16_MAX;
+  const slots-t min = INT-LEAST16-MIN;
+  const slots-t max = INT-LEAST16-MAX;
 }
 klass int-least32 {
   superklass number;
   
   slots int-least32-t;
 
-  const slots-t min = INT_LEAST32_MIN;
-  const slots-t max = INT_LEAST32_MAX;
+  const slots-t min = INT-LEAST32-MIN;
+  const slots-t max = INT-LEAST32-MAX;
 }
 klass int-least64 {
   superklass number;
   
   slots int-least64-t;
 
-  const slots-t min = INT_LEAST64_MIN;
-  const slots-t max = INT_LEAST64_MAX;
+  const slots-t min = INT-LEAST64-MIN;
+  const slots-t max = INT-LEAST64-MAX;
 }
 klass intptr {
   superklass number;
   
   slots intptr-t;
 
-  const slots-t min = INTPTR_MIN;
-  const slots-t max = INTPTR_MAX;
+  const slots-t min = INTPTR-MIN;
+  const slots-t max = INTPTR-MAX;
 }
 klass uint8 {
   superklass number;
   
   slots uint8-t;
 
-  const slots-t max = UINT8_MAX;
+  const slots-t max = UINT8-MAX;
 
-  // UINT8_C(v)
+  // UINT8-C(v)
 }
 klass uint16 {
   superklass number;
   
   slots uint16-t;
 
-  const slots-t max = UINT16_MAX;
+  const slots-t max = UINT16-MAX;
 
-  // UINT16_C(v)
+  // UINT16-C(v)
 }
 klass uint32 {
   superklass number;
   
   slots uint32-t;
 
-  const slots-t max = UINT32_MAX;
+  const slots-t max = UINT32-MAX;
 
-  // UINT32_C(v)
+  // UINT32-C(v)
 
   method compare(object-t self, object-t other) -> cmp-t {
     assert(nullptr != other);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))
-        result = uintmax::compare(unbox(self), unbox(other));
+        result = dk-cmp(unbox(self), unbox(other));
       else
         result = $compare(super, other);
     }
@@ -218,72 +208,72 @@ klass uint64 {
   
   slots uint64-t;
 
-  const slots-t max = UINT64_MAX;
+  const slots-t max = UINT64-MAX;
 
-  // UINT64_C(v)
+  // UINT64-C(v)
 }
 klass uint-fast8 {
   superklass number;
   
   slots uint-fast8-t;
 
-  const slots-t max = UINT_FAST8_MAX;
+  const slots-t max = UINT-FAST8-MAX;
 }
 klass uint-fast16 {
   superklass number;
   
   slots uint-fast16-t;
 
-  const slots-t max = UINT_FAST16_MAX;
+  const slots-t max = UINT-FAST16-MAX;
 }
 klass uint-fast32 {
   superklass number;
   
   slots uint-fast32-t;
 
-  const slots-t max = UINT_FAST32_MAX;
+  const slots-t max = UINT-FAST32-MAX;
 }
 klass uint-fast64 {
   superklass number;
   
   slots uint-fast64-t;
 
-  const slots-t max = UINT_FAST64_MAX;
+  const slots-t max = UINT-FAST64-MAX;
 }
 klass uint-least8 {
   superklass number;
   
   slots uint-least8-t;
 
-  const slots-t max = UINT_LEAST8_MAX;
+  const slots-t max = UINT-LEAST8-MAX;
 }
 klass uint-least16 {
   superklass number;
   
   slots uint-least16-t;
 
-  const slots-t max = UINT_LEAST16_MAX;
+  const slots-t max = UINT-LEAST16-MAX;
 }
 klass uint-least32 {
   superklass number;
   
   slots uint-least32-t;
 
-  const slots-t max = UINT_LEAST32_MAX;
+  const slots-t max = UINT-LEAST32-MAX;
 }
 klass uint-least64 {
   superklass number;
   
   slots uint-least64-t;
 
-  const slots-t max = UINT_LEAST64_MAX;
+  const slots-t max = UINT-LEAST64-MAX;
 }
 klass uintptr {
   superklass number;
   
   slots uintptr-t;
 
-  const slots-t max = UINTPTR_MAX;
+  const slots-t max = UINTPTR-MAX;
 
   method dump(object-t self) -> object-t {
     $dump(super);
