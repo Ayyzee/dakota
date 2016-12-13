@@ -3665,13 +3665,13 @@ sub dk_generate_cc_footer_klass {
     $$tbbl{'#provides'} = '__provides';
   }
   if (&is_exported($klass_ast)) {
-    $$tbbl{'#exported?'} = '1';
+    $$tbbl{'#is-exported'} = '1';
   }
   if (&has_exported_slots($klass_ast)) {
-    $$tbbl{'#state-exported?'} = '1';
+    $$tbbl{'#has-exported-state'} = '1';
   }
   if (&has_exported_methods($klass_ast)) {
-    $$tbbl{'#behavior-exported?'} = '1';
+    $$tbbl{'#has-exported-behavior'} = '1';
   }
   if ($$klass_ast{'has-initialize'}) {
     $$tbbl{'#initialize'} = 'cast(initialize-func-t)initialize';

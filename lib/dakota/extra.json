@@ -74,7 +74,7 @@
   'src_extra_symbols' => {
   },
   'target_extra_symbols' => {
-    '#behavior-exported?' => undef,
+    '#has-exported-behavior' => undef,
     '#boole-t' => undef, # hardcode typealias
     '#cat' => undef,
     '#char8-t' => undef, # hardcode typealias
@@ -88,7 +88,7 @@
     '#exported-method-signatures' => undef,
     '#exported-slots-method-addresses' => undef,
     '#exported-slots-method-signatures' => undef,
-    '#exported?' => undef,
+    '#is-exported' => undef,
     '#exports' => undef,
     '#expr' => undef,
     '#expr-str' => undef,
@@ -128,7 +128,7 @@
     '#slots-info' => undef,
     '#slots-type' => undef,
     '#slots-typeid' => undef,
-    '#state-exported?' => undef,
+    '#has-exported-state' => undef,
     '#str-literals' => undef,
     '#str-names' => undef,
     '#str-ptrs' => undef,

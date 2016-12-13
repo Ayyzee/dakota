@@ -957,21 +957,21 @@ static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
   return;
 }
 static func klass-exported?(named-info-t* kls-info,
-                            boole-t*      exported-ptr = nullptr,
-                            boole-t*      state-exported-ptr = nullptr,
-                            boole-t*      behavior-exported-ptr = nullptr) -> boole-t {
-  boole-t has-exported =          cast(boole-t)named-info::at(kls-info, #exported?);
-  boole-t has-state-exported =    cast(boole-t)named-info::at(kls-info, #state-exported?);
-  boole-t has-behavior-exported = cast(boole-t)named-info::at(kls-info, #behavior-exported?);
+                            boole-t*      is-exported-ptr =           nullptr,
+                            boole-t*      has-exported-state-ptr =    nullptr,
+                            boole-t*      has-exported-behavior-ptr = nullptr) -> boole-t {
+  boole-t is-exported =           cast(boole-t)named-info::at(kls-info, #is-exported);
+  boole-t has-exported-state =    cast(boole-t)named-info::at(kls-info, #has-exported-state);
+  boole-t has-exported-behavior = cast(boole-t)named-info::at(kls-info, #has-exported-behavior);
 
-  if (exported-ptr)
-    *exported-ptr = has-exported;
-  if (state-exported-ptr)
-    *state-exported-ptr = has-state-exported;
-  if (behavior-exported-ptr)
-    *behavior-exported-ptr = has-behavior-exported;
+  if (is-exported-ptr)
+    *is-exported-ptr = is-exported;
+  if (has-exported-state-ptr)
+    *has-exported-state-ptr = has-exported-state;
+  if (has-exported-behavior-ptr)
+    *has-exported-behavior-ptr = has-exported-behavior;
 
-  boole-t result = (has-exported || has-state-exported || has-behavior-exported);
+  boole-t result = (is-exported || has-exported-state || has-exported-behavior);
   return result;
 }
 static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-module) -> symbol-t {
@@ -1014,10 +1014,10 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
 # if defined DKT-ENABLE-EXPORT-GROUP
   ostream::col-incr(ostrm);
 # endif
-  boole-t has-exported =          false;
-  boole-t has-state-exported =    false;
-  boole-t has-behavior-exported = false;
-  if (klass-exported?(kls-info, &has-exported, &has-state-exported, &has-behavior-exported))
+  boole-t is-exported =          false;
+  boole-t has-exported-state =    false;
+  boole-t has-exported-behavior = false;
+  if (klass-exported?(kls-info, &is-exported, &has-exported-state, &has-exported-behavior))
     ostream::println-format(ostrm, "export %s %s {\n", ci.type, ci.name);
   else
     ostream::println-format(ostrm, "%s %s {\n", ci.type, ci.name);
@@ -1087,7 +1087,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
     }
   }
 # define DKT-DEBUG-CODEGEN 0
-  if (DKT-DEBUG-CODEGEN || has-state-exported) {
+  if (DKT-DEBUG-CODEGEN || has-exported-state) {
     if (nullptr != ci.slots-type) {
       ostream::println-format(ostrm, "slots %s;\n", ci.slots-type);
     }
@@ -1136,7 +1136,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
       } else {
         fprintf(stderr, "%s:%i: ERROR: %s %s: exported slots without type or info\n", __FILE__, __LINE__, ci.type, ci.name);
     }
-  } // if (has-state-exported)
+  } // if (has-exported-state)
   if ((nullptr != ci.superklass-name || nullptr != ci.klass-name || nullptr != ci.traits || nullptr != ci.requires || nullptr != ci.provides)
       && nullptr != ci.method-signatures) {
     ostream::println-format(ostrm, "\n");
