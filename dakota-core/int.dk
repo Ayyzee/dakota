@@ -29,8 +29,9 @@ include-for <cstdint> int8-t,
                       uintmax-t,
                       uintptr-t;
 
-// should be template func
-# define CMP(a, b) (a < b) ? -1 : (a > b) ? 1 : 0
+template<typename T> inline func CMP(T a, T b) -> cmp-t {
+  return (a < b) ? -1 : (a > b) ? 1 : 0;
+}
 
 module dakota-core;
 
