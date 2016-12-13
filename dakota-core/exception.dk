@@ -112,9 +112,9 @@ klass exception {
     str-t msg;
   }
   method init(object-t self,
+              str-t    msg :      nullptr,
               str-t    src-file : nullptr,
-              int-t    src-line : 0,
-              str-t    msg : nullptr) -> object-t {
+              int-t    src-line : 0) -> object-t {
     self = $init(super);
     self.src-file = src-file;
     self.src-line = src-line;
