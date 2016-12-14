@@ -108,6 +108,7 @@ namespace object       { typealias slots_t = struct slots_t;                 } t
 namespace cmp          { typealias slots_t = int_t;                          } typealias cmp_t =          cmp::slots_t;
 namespace compare      { typealias slots_t = FUNC (*)(object_t, object_t) -> cmp_t; } typealias compare_t = compare::slots_t;
 namespace generic_func { typealias slots_t = FUNC (*)(object_t) -> object_t; } typealias generic_func_t = generic_func::slots_t;
+namespace ptr          { typealias slots_t = void*;                          } typealias ptr_t =          ptr::slots_t;
 namespace str          { typealias slots_t = const char8_t*;                 } typealias str_t =          str::slots_t;
 namespace symbol       { typealias slots_t = str_t;                          } typealias symbol_t =       symbol::slots_t;
 
