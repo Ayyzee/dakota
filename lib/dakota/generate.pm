@@ -939,7 +939,7 @@ sub klass::method_aliases {
 
   #foreach $method (sort method::compare values %{$$klass_ast{'methods'}})
   foreach $method (sort method::compare values %{$$klass_ast{'methods'}}, values %{$$klass_ast{'slots-methods'}}) {
-    if ($$method{'alias'}) {
+    if ($$method{'alias-dst'}) {
       &add_last($method_aliases_seq, $method);
     }
   }
@@ -1014,8 +1014,8 @@ sub generate_va_generic_defn {
   my $return_type = &arg::type($$va_method{'return-type'});
   my $va_method_name;
 
-  #if ($$va_method{'alias'}) {
-  #$va_method_name = &ct($$va_method{'alias'});
+  #if ($$va_method{'alias-dst'}) {
+  #$va_method_name = &ct($$va_method{'alias-dst'});
   #}
   #else {
   $va_method_name = &ct($$va_method{'name'});
@@ -3058,7 +3058,7 @@ sub slots_signature_body {
     my $width = length($method_type);
     my $pad = ' ' x ($max_width - $width);
 
-    if (!$$method{'alias'}) {
+    if (!$$method{'alias-dst'}) {
       my $new_arg_type_list = &arg_type::list_types($$method{'param-types'});
       my $generic_name = &ct($$method{'name'});
       if (&is_va($method)) {
@@ -3068,8 +3068,8 @@ sub slots_signature_body {
       }
       my $method_name;
 
-      if ($$method{'alias'}) {
-        $method_name = &ct($$method{'alias'});
+      if ($$method{'alias-dst'}) {
+        $method_name = &ct($$method{'alias-dst'});
       } else {
         $method_name = &ct($$method{'name'});
       }
@@ -3085,7 +3085,7 @@ sub split_methods_by_addr {
   my $methods_w_addr = [];
   my $methods_wo_addr = [];
   foreach my $method (@$sorted_methods) {
-    if (!$$method{'alias'}) {
+    if (!$$method{'alias-dst'}) {
       if ($$method{'defined?'} || $$method{'generated?'}) {
         &add_last($methods_w_addr, $method);
       } else {
@@ -3100,7 +3100,7 @@ sub signature_body_common {
   my $result = '';
 
   foreach my $method (@$methods) {
-    if (!$$method{'alias'}) {
+    if (!$$method{'alias-dst'}) {
       my $new_arg_type_list = &arg_type::list_types($$method{'param-types'});
       my $generic_name = &ct($$method{'name'});
       my $in = &ident_comment($generic_name);
@@ -3132,7 +3132,7 @@ sub address_body {
   my $result = '';
   my $max_width = 0;
   foreach my $method (@$sorted_methods) {
-    if (!$$method{'alias'}) {
+    if (!$$method{'alias-dst'}) {
       if ($$method{'defined?'} || $$method{'generated?'}) {
         my $method_type = &method::type($method);
         my $width = length("cast(func $method_type)");
@@ -3146,7 +3146,7 @@ sub address_body {
   }
   my ($methods_w_addr, $methods_wo_addr) = &split_methods_by_addr($sorted_methods);
   foreach my $method (@$methods_w_addr) {
-    if (!$$method{'alias'}) {
+    if (!$$method{'alias-dst'}) {
       my $method_type = &method::type($method);
       my $width = length("cast(func $method_type)");
       my $pad = ' ' x ($max_width - $width);
@@ -3165,7 +3165,7 @@ sub address_body {
     $result .= $nl;
   }
   foreach my $method (@$methods_wo_addr) {
-    if (!$$method{'alias'}) {
+    if (!$$method{'alias-dst'}) {
       my $generic_name = &ct($$method{'name'});
       my $new_arg_type_list = &arg_type::list_types($$method{'param-types'});
       my $return_type = &arg::type($$method{'return-type'});
@@ -3181,10 +3181,10 @@ sub alias_body {
   my $result = '';
   my $method_num =  0;
   foreach my $method (@$sorted_methods) {
-    if ($$method{'alias'}) {
+    if ($$method{'alias-dst'}) {
       my $new_arg_type_list = &arg_type::list_types($$method{'param-types'});
       my $generic_name = &ct($$method{'name'});
-      my $alias_name = &ct($$method{'alias'});
+      my $alias_name = &ct($$method{'alias-dst'});
       if (&is_va($method)) {
         $result .= $col . "{ .alias-signature = signature(va::$alias_name($$new_arg_type_list)), .method-signature = signature(va::$generic_name($$new_arg_type_list)) }," . $nl;
       } else {
@@ -3257,15 +3257,15 @@ sub dk_generate_cc_footer_klass {
 
     $col = &colin($col);
     foreach my $va_method (@$sorted_va_methods) {
-      if ($$va_method{'defined?'} || $$va_method{'alias'}) {
+      if ($$va_method{'defined?'} || $$va_method{'alias-dst'}) {
         my $new_arg_type_list = &arg_type::list_types($$va_method{'param-types'});
         my $generic_name = &ct($$va_method{'name'});
         my $in = &ident_comment($generic_name);
         $$scratch_str_ref .= $col . "signature(va::$generic_name($$new_arg_type_list))," . $in . $nl;
         my $method_name;
 
-        if ($$va_method{'alias'}) {
-          $method_name = &ct($$va_method{'alias'});
+        if ($$va_method{'alias-dst'}) {
+          $method_name = &ct($$va_method{'alias-dst'});
         } else {
           $method_name = &ct($$va_method{'name'});
         }
@@ -3307,18 +3307,18 @@ sub dk_generate_cc_footer_klass {
       my $width = length($va_method_type);
       my $pad = ' ' x ($max_width - $width);
 
-      if ($$va_method{'defined?'} || $$va_method{'alias'}) {
+      if ($$va_method{'defined?'} || $$va_method{'alias-dst'}) {
         my $new_arg_names_list = &arg_type::list_types($$va_method{'param-types'});
 
         my $generic_name = &ct($$va_method{'name'});
         my $method_name;
 
-        if ($$va_method{'alias'}) {
-          $method_name = &ct($$va_method{'alias'});
+        if ($$va_method{'alias-dst'}) {
+          $method_name = &ct($$va_method{'alias-dst'});
         } else {
           $method_name = &ct($$va_method{'name'});
         }
-        die if (!$$va_method{'defined?'} && !$$va_method{'alias'} && !$$va_method{'generated?'});
+        die if (!$$va_method{'defined?'} && !$$va_method{'alias-dst'} && !$$va_method{'generated?'});
 
         my $old_param_types = $$va_method{'param-types'};
         $$va_method{'param-types'} = &arg_type::var_args($$va_method{'param-types'});

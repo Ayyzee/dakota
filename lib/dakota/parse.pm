@@ -1745,7 +1745,7 @@ sub method {
 
       if (0) {
       } elsif ('alias' eq $attr) {
-        $$method{'alias'} = [ $attr_arg ];
+        $$method{'alias-dst'} = [ $attr_arg ];
       } elsif ('format-printf' eq $attr || 'format-va-printf' eq $attr) {
         if (!exists $$method{'attributes'}) {
           $$method{'attributes'} = [];
@@ -1785,7 +1785,7 @@ sub method {
     &match(__FILE__, __LINE__, '(');
     &match(__FILE__, __LINE__, ')');
     &match(__FILE__, __LINE__, ';');
-    $$method{'alias'} = $realname;
+    $$method{'alias-dst'} = $realname;
     $$method{'name'} = $name;
     ###&add_generic($gbl_root_ast, &ct($$method{'name'}));
     return;
@@ -2077,10 +2077,10 @@ sub generics::parse {
     }
   }
   foreach my $generic1 (@$big_cahuna) {
-    if ($$generic1{'alias'}) {
+    if ($$generic1{'alias-dst'}) {
       my $alias_generic = &deep_copy($generic1);
-      $$alias_generic{'name'} = $$alias_generic{'alias'};
-      delete $$alias_generic{'alias'};
+      $$alias_generic{'name'} = $$alias_generic{'alias-dst'};
+      delete $$alias_generic{'alias-dst'};
       &add_last($big_cahuna, $alias_generic);
     }
   }
@@ -2132,9 +2132,9 @@ sub generics::_parse { # no longer recursive
     $$generic{'exported?'} = 0;
     #$$generic{'inline?'} = 1;
 
-    #if ($$generic{'alias'}) {
-    #    $$generic{'name'} = $$generic{'alias'};
-    #    delete $$generic{'alias'};
+    #if ($$generic{'alias-dst'}) {
+    #    $$generic{'name'} = $$generic{'alias-dst'};
+    #    delete $$generic{'alias-dst'};
     #}
 
     #&add_last($data, $generic);
