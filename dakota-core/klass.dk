@@ -739,8 +739,8 @@ klass klass {
         selector-t alias-selector =  selector-for-signature(alias-signature);
         selector-t method-selector = selector-for-signature(method-signature);
         add-method-for-selector(self,
-                                method-selector,
-                                METHOD-FOR-SELECTOR(&self.methods, alias-selector));
+                                alias-selector,
+                                METHOD-FOR-SELECTOR(&self.methods, method-selector));
         i++;
       }
     }

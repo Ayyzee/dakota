@@ -220,8 +220,7 @@ klass vector {
     self.count--;
     return element;
   }
-  [[alias(remove-last)]] method pop(object-t self) -> object-t;
-  method remove-last(object-t self) -> object-t {
+  [[alias(pop)]] method remove-last(object-t self) -> object-t {
     assert(0 != self.count);
     object-t element = self.elements[self.count - 1];
     self.elements[self.count - 1] = self.fill-element;
@@ -278,7 +277,6 @@ klass vector {
       self.count = index + 1;
     return rtn;
   }
-//[[alias(size)]] method ssize(object-t self, object-t element) -> ssize-t;
   method size(object-t self) -> ssize-t {
     return self.count;
   }
@@ -297,9 +295,9 @@ klass vector {
   }
   //     method add-at(object-t self, object-t element, ssize-t index) -> object-t;
 
-  [[alias(add-last)]] method add(object-t self, object-t element) -> object-t;
-  [[alias(add-last)]] method push(object-t self, object-t element) -> object-t;
-  method add-last(object-t self, object-t element) -> object-t {
+  method add(object-t self, object-t element) -> object-t { return $add-last(self, element); } // hackhack
+  //[[alias(add-last)]] method add(object-t self, object-t element) -> object-t;
+  [[alias(push)]] method add-last(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {
@@ -315,8 +313,7 @@ klass vector {
     assert(0 != self.count);
     return self.elements[0];
   }
-  [[alias(last)]] method top(object-t self) -> object-t;
-  method last(object-t self) -> object-t {
+  [[alias(top)]] method last(object-t self) -> object-t {
     assert(0 != self.count);
     return self.elements[self.count - 1];
   }
