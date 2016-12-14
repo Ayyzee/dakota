@@ -140,7 +140,6 @@ static func symbol-str-compare(symbol-t s1, str-t s2) -> cmp-t {
   cmp-t result = 0;
   if (s1 != s2) {
     result = cast(cmp-t)safe-strcmp(s1, s2);
-    result = dkt-normalize-compare-result(result);
   }
   //fprintf(stderr, "%s(\"%s\" (%p), \"%s\" (%p)) = %i\n", __func__, s, s, other-s, other-s, result);
   return result;

@@ -86,7 +86,7 @@ klass str {
       // what if only one str is nullptr?
       slots-t s1 = unbox(self);
       slots-t s2 = unbox(other);
-      result = dkt-normalize-compare-result(ks.compare(s1, s2));
+      result = ks.compare(s1, s2);
     } else {
       result = $compare(super, other);
     }

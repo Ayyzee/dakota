@@ -44,7 +44,6 @@ klass signature {
     cmp-t result = safe-strcmp(s->name, other-s->name);
     if (0 == result)
       result = safe-strcmp(s->param-types, other-s->param-types);
-    result = dkt-normalize-compare-result(result);
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
