@@ -197,17 +197,13 @@ klass string {
     return self;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    cmp-t result;
-
-    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      // what if both strs are nullptr?
-      // what if only one str is nullptr?
-      const slots-t& s1 = unbox(self);
-      const slots-t& s2 = unbox(other);
-      result = safe-strcmp(s1.ptr, s2.ptr);
-    } else {
-      result = $compare(super, other);
+    assert(nullptr != other);
+    cmp-t result = 0;
+    if (self != other) {
+      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+        result = safe-strcmp(unbox(self).ptr, unbox(other).ptr);
+      else
+        result = $compare(super, other);
     }
     return result;
   }

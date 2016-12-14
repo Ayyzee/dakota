@@ -76,19 +76,12 @@ klass str {
   }
   method compare(object-t self, object-t other) -> cmp-t {
     assert(nullptr != other);
-    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    cmp-t result;
-
-    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      assert(klass-of(self) == str-klass::_klass_ || $instance?(klass-of(self), str-klass::_klass_));
-      const str-klass::slots-t& ks = str-klass::unbox(klass-of(self));
-      // what if both strs are nullptr?
-      // what if only one str is nullptr?
-      slots-t s1 = unbox(self);
-      slots-t s2 = unbox(other);
-      result = ks.compare(s1, s2);
-    } else {
-      result = $compare(super, other);
+    cmp-t result = 0;
+    if (self != other) {
+      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+        result = str-klass::unbox(klass-of(self)).compare(unbox(self), unbox(other));
+      else
+        result = $compare(super, other);
     }
     return result;
   }

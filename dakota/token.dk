@@ -206,11 +206,13 @@ klass token {
     return self;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    cmp-t result;
-    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      result = safe-strcmp(unbox(self).buffer, unbox(other).buffer);
-    } else {
-      result = $compare(super, other);
+    assert(nullptr != other);
+    cmp-t result = 0;
+    if (self != other) {
+      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+        result = safe-strcmp(unbox(self).buffer, unbox(other).buffer);
+      else
+        result = $compare(super, other);
     }
     return result;
   }

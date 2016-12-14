@@ -119,6 +119,7 @@ klass named-info {
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
+    assert(nullptr != other);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))

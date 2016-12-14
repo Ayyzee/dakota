@@ -37,14 +37,13 @@ klass ascii-number {
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    cmp-t result;
-    if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
-      const slots-t& s1 = unbox(self);
-      const slots-t& s2 = unbox(other);
-      result = dk-cmp(s1.number, s2.number);
-    } else {
-      result = $compare(super, other);
+    assert(nullptr != other);
+    cmp-t result = 0;
+    if (self != other) {
+      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+        result = dk-cmp(unbox(self).number, unbox(other).number);
+      else
+        result = $compare(super, other);
     }
     return result;
   }
