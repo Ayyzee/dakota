@@ -16,8 +16,10 @@
 
 module dakota-core;
 
+klass cmp;
+
 klass std-compare {
-  slots (*)(const void*, const void*) -> int-t;
+  slots (*)(const void*, const void*) -> cmp-t;
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
