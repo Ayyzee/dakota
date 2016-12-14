@@ -36,21 +36,24 @@
 # define DKT_MEM_MGMT_NEW    1
 # define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
 
+# if !defined NUL
+  # define    NUL cast(char8_t)0
+# endif
+
 # if defined __GNUG__
-namespace dkt { inline FUNC demangle(str_t mangled_name) -> str_t {
-  int_t status = -1;
-  str_t name = abi::__cxa_demangle(mangled_name, 0, 0, &status); // must be free()d
-  if (0 == status)
-    return name;
-  else
-    return nullptr;
+namespace dkt { inline FUNC demangle(str_t mangled_name, char8_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
+  int_t status = 0;
+  str_t result = abi::__cxa_demangle(mangled_name, buffer, &buffer_len, &status); // must be free()ed if buffer is non-nullptr
+  if (0 != status)
+    return nullptr; // silent failure
+  return result;
 }}
 namespace dkt { inline FUNC demangle_free(str_t name) -> void {
   free(cast(ptr_t)name);
   return;
 }}
 # else // does nothing if not gcc/clang (g++/clang++)
-namespace dkt { inline FUNC demangle(str_t mangled_name) -> str_t {
+namespace dkt { inline FUNC demangle(str_t mangled_name, char8_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
   return name;
 }}
 namespace dkt { inline FUNC demangle_free(str_t name) -> void {
@@ -185,10 +188,6 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
           (((cast(uint64_t)cast(uchar8_t) c7) << (64 - 56)) & 0x000000000000ff00) |
           (((cast(uint64_t)cast(uchar8_t) c8) << (64 - 64)) & 0x00000000000000ff));
 }
-
-# if !defined NUL
-  # define    NUL cast(char8_t)0
-# endif
 
 # if defined DEBUG && defined DK_ENABLE_TRACE_MACROS
   # define DKT_VA_TRACE_BEFORE(signature, method, object, args)               dkt_va_trace_before(signature, method, object, args)
