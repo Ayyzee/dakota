@@ -3066,13 +3066,7 @@ sub slots_signature_body {
       } else {
         $result .= $col . "(cast(dkt-signature-func-t)cast(func $method_type)" . $pad . "__method-signature::$generic_name)()," . $nl;
       }
-      my $method_name;
-
-      if ($$method{'alias-dst'}) {
-        $method_name = &ct($$method{'alias-dst'});
-      } else {
-        $method_name = &ct($$method{'name'});
-      }
+      my $method_name = &ct($$method{'name'});
     }
     $method_num++;
   }
