@@ -2079,6 +2079,7 @@ sub generics::parse {
   foreach my $generic1 (@$big_cahuna) {
     if ($$generic1{'alias-dst'}) {
       my $alias_generic = &deep_copy($generic1);
+      $$alias_generic{'alias-src'} = $$alias_generic{'name'};
       $$alias_generic{'name'} = $$alias_generic{'alias-dst'};
       delete $$alias_generic{'alias-dst'};
       &add_last($big_cahuna, $alias_generic);
