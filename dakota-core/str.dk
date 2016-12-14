@@ -20,11 +20,12 @@
 module dakota-core;
 
 klass char8;
+klass cmp;
 klass hash;
 klass str;
 
 klass str-compare {
-  slots (*)(str-t, str-t) -> int-t;
+  slots (*)(str-t, str-t) -> cmp-t;
 
   method init(object-t self, slots-t slots : nullptr) -> object-t {
     self = $init(super);
@@ -37,11 +38,11 @@ klass str-klass {
   superklass klass;
 
   slots {
-    str-compare::slots-t strcmp;
+    str-compare-t compare;
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
-    self.strcmp = safe-strcmp; // should be consumer settable
+    self.compare = safe-strcmp; // should be consumer settable
     return self;
   }
 }
@@ -85,7 +86,7 @@ klass str {
       // what if only one str is nullptr?
       slots-t s1 = unbox(self);
       slots-t s2 = unbox(other);
-      result = dkt-normalize-compare-result(ks.strcmp(s1, s2));
+      result = dkt-normalize-compare-result(ks.compare(s1, s2));
     } else {
       result = $compare(super, other);
     }
