@@ -35,14 +35,14 @@ klass property {
     mutable-unbox(self) = slots;
     return self;
   }
-  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
-    cmp-t result = symbol::compare(s->key, other-s->key);
-    return result;
-  }
   method check(const slots-t* s) -> ssize-t {
     if (nullptr == s->key)
       std::abort();
     return 0;
+  }
+  method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
+    cmp-t result = symbol::compare(s->key, other-s->key);
+    return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
     assert(nullptr != other);

@@ -41,10 +41,10 @@ klass string {
   //ssize-t size; // sizeof(ptr[0])
 
   method init(object-t self,
-                       symbol-t       encoding : #utf-8,
-                       str-t bytes :    "",
-                       ssize-t        start :    0,
-                       ssize-t        length :   cast(ssize-t)safe-strlen(bytes) - start) -> object-t {
+              symbol-t encoding : #utf-8,
+              str-t    bytes :    "",
+              ssize-t  start :    0,
+              ssize-t  length :   cast(ssize-t)safe-strlen(bytes) - start) -> object-t {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = $init(super);
     assert(nullptr != bytes);
@@ -64,9 +64,9 @@ klass string {
     return result;
   }
   method length(object-t self) -> ssize-t {
-    if (0    == self.len &&
+    if (0       == self.len &&
         nullptr != self.ptr &&
-        NUL  != self.ptr[0])
+        NUL     != self.ptr[0])
       self.len = cast(ssize-t)safe-strlen(self.ptr);
     return self.len;
   }

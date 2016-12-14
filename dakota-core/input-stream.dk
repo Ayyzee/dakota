@@ -65,13 +65,13 @@ klass input-stream {
     return self;
   }
   method read(object-t self,
-                       ptr-t    buffer,
-                       ssize-t element-size,
-                       ssize-t num-elements-max) -> ssize-t {
+              ptr-t    buffer,
+              ssize-t  element-size,
+              ssize-t  num-elements-max) -> ssize-t {
     ssize-t num-elements-read = cast(ssize-t)fread(buffer,
-                                                     cast(size-t)element-size,
-                                                     cast(size-t)num-elements-max,
-                                                     unbox(self));
+                                                   cast(size-t)element-size,
+                                                   cast(size-t)num-elements-max,
+                                                   unbox(self));
 
     // fread() does not distinguish between end-of-file and error, and callers must use
     // feof(3) and ferror(3) to determine which occurred.

@@ -32,7 +32,7 @@ klass unbox-illegal-klass-exception;
 klass object {
   slots {
     object-t klass;
-    int64-t retain-count;
+    int64-t  retain-count;
   }
   //     klass klass;
 

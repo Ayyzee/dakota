@@ -49,7 +49,7 @@ klass system-exception {
       out = std-error;
     $print(super, out);
     $print-format(out, ": errno=%s (\"%s\")\n",
-                    self.name, self.strerror);
+                  self.name, self.strerror);
     return self;
   }
 }

@@ -88,10 +88,10 @@ klass selector-pair {
 static const int64-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
 static sorted-array-t gbl-selectors-table = { .elements = gbl-selectors,
-                                              .count = 0,
+                                              .count =    0,
                                               .capacity = scountof(gbl-selectors),
-                                              .size = ssizeof(gbl-selectors[0]),
-                                              .compare = cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
+                                              .size =     ssizeof(gbl-selectors[0]),
+                                              .compare =  cast(std-compare-t)cast(selector-pair-compare-t)selector-pair::compare };
 static const int64-t selector-count-max = 255;
 /*LOCAL*/ func selector-count() -> int64-t {
   assert(0 < gbl-selectors-table.count);
@@ -315,14 +315,14 @@ klass methods {
 }
 klass klass {
   slots {
-    ssize-t              offset; // first so its offset is 0
-    methods-t            methods;
-    ssize-t              size;
-    object-t             superklass;
-    symbol-t             name; // redundant but convenient
-    const symbol-t*      traits; // redundant but convenient
-    named-info-t*        info;
-    object-t             behavior; // bit-vector
+    ssize-t          offset; // first so its offset is 0
+    methods-t        methods;
+    ssize-t          size;
+    object-t         superklass;
+    symbol-t         name; // redundant but convenient
+    const symbol-t*  traits; // redundant but convenient
+    named-info-t*    info;
+    object-t         behavior; // bit-vector
   }
   method alloc(object-t self, str-t file, ssize-t line) -> object-t {
     DKT-LOG-OBJECT-ALLOC("'file':'%s','line':'%zi','func':'%s','args':['%s']",
@@ -463,9 +463,8 @@ klass klass {
     if (nullptr != traits) {
       ssize-t i = 0;
       symbol-t trait-name;
-      while (nullptr != (trait-name = traits[i++])) {
+      while (nullptr != (trait-name = traits[i++]))
         $add-last(seq, symbol::box(trait-name));
-      }
     }
     return seq;
   }
@@ -505,8 +504,9 @@ klass klass {
         str-t symbol-name = dso-symbol-name-for-addr(cast(ptr-t)(m));
 
         if (nullptr != symbol-name) {
-          // should demangle here
-          fprintf(out, " : '%s',", symbol-name);
+          str-t demangled-symbol-name = dkt::demangle(symbol-name);
+          fprintf(out, " : '%s',", demangled-symbol-name);
+          dkt::demangle-free(demangled-symbol-name);
         } else {
           fprintf(out, " : %p,", cast(ptr-t)m);
         }
@@ -517,10 +517,11 @@ klass klass {
     return s->methods.count;
   }
   // use for both klasses (and klass-x) and traits (and trait-x)
-  static func add-methods(object-t self,
+  static func add-methods(object-t      self,
                           named-info-t* info,
-                          symbol-t symbol-method-signatures,
-                          symbol-t symbol-method-addresses, boole-t should-override) -> void {
+                          symbol-t      symbol-method-signatures,
+                          symbol-t      symbol-method-addresses,
+                          boole-t       should-override) -> void {
     named-info-t* current-info = info;
     do {
       signature-t** method-signatures = cast(signature-t**)named-info::at(current-info, symbol-method-signatures);
@@ -753,7 +754,7 @@ klass klass {
     dump-random(self);
     return self;
   } // init(object-t self, named-info-t*)
-  method init(object-t self,
+  method init(object-t      self,
               named-info-t* info-slots : nullptr,
               object-t      info :       nullptr) -> object-t {
     self = $init(super);

@@ -26,7 +26,6 @@
 module dakota-core;
 
 klass ptr;
-klass stream;
 klass system-exception;
 
 klass output-stream {

@@ -394,7 +394,7 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
     named-info-t* current-info = kls-info;
 
     do {
-      symbol-t name =            name-from-info(current-info);
+      symbol-t name =          name-from-info(current-info);
       symbol-t kls-name =      klass-name-from-info(current-info);
       symbol-t superkls-name = superklass-name-from-info(current-info);
       ostream::println-format(ostrm, "'%s' :\n", name);
@@ -1013,7 +1013,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
 # if defined DKT-ENABLE-EXPORT-GROUP
   ostream::col-incr(ostrm);
 # endif
-  boole-t is-exported =          false;
+  boole-t is-exported =           false;
   boole-t has-exported-state =    false;
   boole-t has-exported-behavior = false;
   if (klass-exported?(kls-info, &is-exported, &has-exported-state, &has-exported-behavior))
@@ -1646,10 +1646,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
   }
   return kls-info; // rnielsen: should have only one return per func
 }
-/*
-  dk-intern needs to be able to be used **early** in the static initialization
-  sequence.
- */
+// dk-intern needs to be able to be used **early** in the static initialization sequence.
 func dk-intern-free(str-t key) -> symbol-t {
   symbol-t result = dk-intern(key);
   if (result != key)
