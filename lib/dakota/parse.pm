@@ -636,7 +636,7 @@ sub trait {
           if (0 < @$attrs) {
             $$args{'attrs'} = &deep_copy($attrs);
             $attrs = [];
-            #print &Dumper($$args{'attrs'});
+            #print __LINE__ . ": " . &Dumper($$args{'attrs'});
           }
           &method($args);
           last;
@@ -1345,7 +1345,7 @@ sub klass {
           if (0 < @$attrs) {
             $$args{'attrs'} = &deep_copy($attrs);
             $attrs = [];
-            #print &Dumper($$args{'attrs'});
+            #print __LINE__ . ": " . &Dumper($$args{'attrs'});
           }
           &method($args);
           last;
@@ -1737,7 +1737,7 @@ sub method {
     $$method{'exported?'} = 1;
   }
   if ($$args{'attrs'}) {
-    #print &Dumper($$args{'attrs'});
+    #print __LINE__ . ": " . &Dumper($$args{'attrs'});
     my $attrs = &ct($$args{'attrs'});
     my ($attr, $attr_arg);
     if ($attrs =~ /^\[\[\s*([\w-]+)\s*\(\s*([\w-]+)\s*\)\s*\]\]$/) {
