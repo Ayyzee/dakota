@@ -22,6 +22,7 @@
 # include <cstdarg> // va-list
 # include <cstdint>
 # include <cstring> // memcpy()
+# include <functional>
 # include <new> // std::bad-alloc
 
 # include <syslog.h>
@@ -239,8 +240,8 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 [[so_export]] FUNC dk_intern_free(str_t) -> symbol_t;
 [[so_export]] FUNC dk_klass_for_name(symbol_t) -> object_t;
 
-[[so_export]] FUNC map(object_t, method_t)   -> object_t;
-[[so_export]] FUNC map(object_t[], method_t) -> object_t;
+[[so_export]] FUNC map(object_t,   std::function<object_t (object_t)>) -> object_t;
+[[so_export]] FUNC map(object_t[], std::function<object_t (object_t)>) -> object_t;
 
 [[so_export]] FUNC dkt_register_info(named_info_t*)   -> void;
 [[so_export]] FUNC dkt_deregister_info(named_info_t*) -> void;

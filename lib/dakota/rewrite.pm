@@ -945,7 +945,7 @@ sub rewrite_multi_char_consts {
 }
 sub rewrite_map {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/(map\s*\($rid\s*,\s*)\{/$1\[\](object-t _) -> object-t {/g;
+  $$filestr_ref =~ s/(map\s*\($rid\s*,\s*)\{/$1\[=\](object-t _) -> object-t {/g;
 }
 sub rewrite_func {
   my ($filestr_ref) = @_;

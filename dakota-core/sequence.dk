@@ -14,12 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+# include <functional>
+
 module dakota-core;
 
 klass vector;
 trait forward-iterator;
 
-func map(object-t seq, method-t f) -> object-t {
+func map(object-t seq, std::function<object-t (object-t)> f) -> object-t {
   object-t result = $make(klass-of(seq));
   for (object-t o in seq) {
     object-t e = f(o);
@@ -28,7 +30,7 @@ func map(object-t seq, method-t f) -> object-t {
   }
   return result;
 }
-func map(object-t[] objects, method-t f) -> object-t {
+func map(object-t[] objects, std::function<object-t (object-t)> f) -> object-t {
   object-t result = $make(vector::klass());
   object-t o;
   object-t* args = objects;
