@@ -239,9 +239,7 @@ klass deque {
     self.iterator-state++;
     return self;
   }
-  method add(object-t self, object-t element) -> object-t { return $add-last(self, element); } // hackhack
-  //[[alias(add-last)]] method add(object-t self, object-t element) -> object-t;
-  [[alias(push)]] method add-last(object-t self, object-t element) -> object-t {
+  [[alias(add,push)]] method add-last(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
     node::slots-t* node = node::create(self.last, element, nullptr); // self.last may be nullptr
     if (nullptr != self.last)

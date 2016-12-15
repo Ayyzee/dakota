@@ -295,9 +295,7 @@ klass vector {
   }
   //     method add-at(object-t self, object-t element, ssize-t index) -> object-t;
 
-  method add(object-t self, object-t element) -> object-t { return $add-last(self, element); } // hackhack
-  //[[alias(add-last)]] method add(object-t self, object-t element) -> object-t;
-  [[alias(push)]] method add-last(object-t self, object-t element) -> object-t {
+  [[alias(add,push)]] method add-last(object-t self, object-t element) -> object-t {
     assert(nullptr != element);
 
     if (self.count == self.capacity) {

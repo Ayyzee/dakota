@@ -3178,11 +3178,12 @@ sub alias_body {
     if ($$method{'alias-src'}) {
       my $new_arg_type_list = &arg_type::list_types($$method{'param-types'});
       my $generic_name = &ct($$method{'name'});
-      my $alias_name = &ct($$method{'alias-src'});
-      if (&is_va($method)) {
-        $result .= $col . "{ .alias-signature = signature(va::$alias_name($$new_arg_type_list)), .method-signature = signature(va::$generic_name($$new_arg_type_list)) }," . $nl;
-      } else {
-        $result .= $col . "{ .alias-signature = signature($alias_name($$new_arg_type_list)), .method-signature = signature($generic_name($$new_arg_type_list)) }," . $nl;
+      foreach my $alias_name (@{$$method{'alias-src'}}) {
+        if (&is_va($method)) {
+          $result .= $col . "{ .alias-signature = signature(va::$alias_name($$new_arg_type_list)), .method-signature = signature(va::$generic_name($$new_arg_type_list)) }," . $nl;
+        } else {
+          $result .= $col . "{ .alias-signature = signature($alias_name($$new_arg_type_list)), .method-signature = signature($generic_name($$new_arg_type_list)) }," . $nl;
+        }
       }
     }
     $method_num++;

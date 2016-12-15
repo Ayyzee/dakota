@@ -25,7 +25,7 @@
 # define FUNC    auto
 # define METHOD  auto
 
-# define ALIAS(m)
+# define ALIAS(...)
 # define METHOD_ALIAS(a, r)
 # define INTERPOSE(k)
 # define MODULE(n)
