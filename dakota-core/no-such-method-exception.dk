@@ -88,7 +88,7 @@ klass no-such-method-exception {
                            self.signature->name,
                            self.signature->param-types);
         } else {
-          $print-format(out, ", \"instance\": %s, \"klass\": \"%s\". \"method\": \"%s(%s)\"",
+          $print-format(out, ", \"instance\": %s, \"klass\": \"%s\", \"method\": \"%s(%s)\"",
                            $str(self.context.object),
                            name-of(kls),
                            self.signature->name,
