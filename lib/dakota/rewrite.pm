@@ -592,6 +592,8 @@ sub rewrite_boxes {
   # <non-colon>box($foo)  =>  symbol::box($foo)
   $$filestr_ref =~ s/(?<!::)(box\s*\(\s*\#$id        \))/symbol::$1/g;
   $$filestr_ref =~ s/(?<!::)(box\s*\(\s*__symbol::.+?\))/symbol::$1/g;
+
+  $$filestr_ref =~ s/(?<!::)(box\s*\(\s*cast\s*\(\s*(.+?)-t\s*\))/$2::$1/g;
 }
 sub rewrite_unless {
   my ($filestr_ref) = @_;
