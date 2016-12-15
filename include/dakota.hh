@@ -103,10 +103,10 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
 # if defined DEBUG
   # include <typeinfo>
   # define DKT_UNBOX_CHECK_ENABLED 1
-  # define DEBUG_STMT(stmt) stmt
+  # define DEBUG_STMT(...) __VA_ARGS__
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) dk_intern_free(dkt::demangle(typeid(t).name()))
 # else
-  # define DEBUG_STMT(stmt)
+  # define DEBUG_STMT(...)
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) nullptr
 # endif
 
