@@ -81,9 +81,7 @@ klass selector-pair {
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
-    //printf("%s(): %s ?= %s\n", __func__, s, other-s);
-    cmp-t result = signature::compare(const-cast<signature-t*>(s->key),
-                                      const-cast<signature-t*>(other-s->key)); // hackhack
+    cmp-t result = signature::compare(s->key, other-s->key);
     return result;
   }
 }

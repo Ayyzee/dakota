@@ -844,10 +844,10 @@ static func remove-dir(str-t path) -> str-t {
   assert-valid-str(result);
   return result;
 }
-[[unused]] static func remove-ext(char8-t* path) -> str-t {
-  const char8-t* dot = strrchr(cast(const char8-t*)path, '.');
+[[unused]] static func remove-ext(char8-t* path) -> char8-t* {
+  char8-t* dot = strrchr(cast(const char8-t*)path, '.');
   if (nullptr != dot)
-    *(const-cast<char8-t*>(dot)) = NUL;
+    *dot = NUL;
   assert-valid-str(path);
   return path;
 }
