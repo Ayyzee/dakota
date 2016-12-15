@@ -45,7 +45,7 @@ namespace dkt { inline FUNC demangle(str_t mangled_name, char8_t* buffer = nullp
   int_t status = 0;
   str_t result = abi::__cxa_demangle(mangled_name, buffer, &buffer_len, &status); // must be free()ed if buffer is non-nullptr
   if (0 != status)
-    return nullptr; // silent failure
+    result = mangled_name; // silent failure
   return result;
 }}
 namespace dkt { inline FUNC demangle_free(str_t name) -> void {
