@@ -16,7 +16,7 @@
 
 module dakota-core;
 
-klass int64;
+klass ssize;
 klass pair;
 klass vector;
 
@@ -87,10 +87,10 @@ trait counted-set {
     if (pair) {
       if (klass-of(pair) == pair::_klass_ || $instance?(pair, pair::_klass_))
         last = pair::unbox(pair).last;
-      int64-t& count-ptr = int64::mutable-unbox(last);
+      ssize-t& count-ptr = ssize::mutable-unbox(last);
       count-ptr++;
     } else {
-      last = int64::box(1);
+      last = ssize::box(1);
       pair = pair::box({first, last});
       $add(super, pair);
     }
