@@ -578,9 +578,9 @@ sub rewrite_literal_booles {
 }
 sub rewrite_boxes {
   my ($filestr_ref) = @_;
-  # #[   as(size)   3,   as(uint32)   5 ]
+  # #[   as(size)   3,   as(uint64)   5 ]
   # or
-  # #[ cast(size-t) 3, cast(uint32-t) 5 ]
+  # #[ cast(size-t) 3, cast(uint64-t) 5 ]
 
   #$$filestr_ref =~ s/(?<!::)box\(\s*as\s*\(($rid)\)\s*(.+?)\s*\)/$1::box($1::construct($2))/g;
 
