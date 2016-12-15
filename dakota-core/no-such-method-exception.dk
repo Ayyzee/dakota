@@ -24,15 +24,15 @@ klass no-such-method-exception {
   superklass exception;
 
   slots {
-    super-t      context; // used as context xor just .object (for object-t self aka 'object')
+    super-t            context; // used as context xor just .object (for object-t self aka 'object')
     const signature-t* signature;
   }
-  method init(object-t     self,
-              object-t     object :    nullptr,
-              super-t      context :   { nullptr, nullptr },
+  method init(object-t           self,
+              object-t           object :    nullptr,
+              super-t            context :   { nullptr, nullptr },
               const signature-t* signature : nullptr,
-              str-t        src-file :  nullptr,
-              int-t        src-line :  0) -> object-t {
+              str-t              src-file :  nullptr,
+              int-t              src-line :  0) -> object-t {
     self = $init(super, #src-file : src-file, #src-line : src-line);
     self.signature = signature;
     if ((!object && !context.object) || (object && context.object))
