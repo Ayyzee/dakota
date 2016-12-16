@@ -30,7 +30,7 @@ klass ascii-number {
 
   slots {
     char8-t* ascii-string;
-    int64-t   number;
+    int64-t  number;
   }
   method hash(object-t self) -> hash-t {
     size-t result = cast(size-t)(self.number);
@@ -77,7 +77,7 @@ klass ascii-number {
     return;
   }
   static func convert(ssize-t num, ssize-t base, str-t digits, char8-t* buffer) -> void {
-    ssize-t   digit-num = 1;
+    ssize-t digit-num = 1;
     ssize-t offset =    0;
 
     do {
