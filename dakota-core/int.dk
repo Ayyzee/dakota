@@ -16,6 +16,10 @@
 
 //# include <cinttypes>
 
+include-for <climits> INT-MIN,
+                      INT-MAX,
+                      UINT-MAX;
+
 include-for <cstdint> int8-t,
                       int16-t,
                       int32-t,
@@ -33,6 +37,21 @@ module dakota-core;
 
 klass number;
 
+klass fnd-int {
+  superklass number;
+  
+  slots int;
+
+  const slots-t min = INT-MIN;
+  const slots-t max = INT-MAX;
+}
+klass fnd-uint {
+  superklass number;
+  
+  slots unsigned int;
+
+  const slots-t max = UINT-MAX;
+}
 klass intmax {
   superklass number;
   

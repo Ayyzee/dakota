@@ -52,6 +52,13 @@ export dakota-core {
   exception;
   finalize-func::slots-t;
   finalize-func;
+  fnd-int::max;
+  fnd-int::min;
+  fnd-int::slots-t;
+  fnd-int;
+  fnd-uint::max;
+  fnd-uint::slots-t;
+  fnd-uint;
   forward-iterator;
   generic-func;
   generic-func::slots-t;
