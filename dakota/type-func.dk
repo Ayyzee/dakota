@@ -17,5 +17,5 @@
 module dakota;
 
 klass type-func {
-  slots (*)(int-t) -> boole-t;
+  slots (*)(fnd-int-t) -> boole-t;
 }

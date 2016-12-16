@@ -22,5 +22,5 @@
 dkt_declare_klass_type_struct(assoc_node);
 
 FUNC imported_klasses_for_klass(symbol_t) -> assoc_node_t*;
-FUNC set_read_only() -> int_t;
-FUNC set_read_write() -> int_t;
+FUNC set_read_only() -> fnd_int_t;
+FUNC set_read_write() -> fnd_int_t;

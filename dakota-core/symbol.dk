@@ -41,7 +41,7 @@ klass intern-pool-klass {
   }
 }
 klass symbol-compare {
-  slots (*)(symbol-t, symbol-t) -> int-t;
+  slots (*)(symbol-t, symbol-t) -> fnd-int-t;
 }
 klass symbol {
   klass intern-pool-klass;

@@ -33,7 +33,7 @@ klass tokenid;
 klass vector;
 
 [[format-printf(4)]]
-static func print-error(str-t file, ssize-t line, ssize-t column, str-t format, ...) -> int-t {
+static func print-error(str-t file, ssize-t line, ssize-t column, str-t format, ...) -> fnd-int-t {
   cmp-t result = fprintf(stderr, "%s:%zi:%zi ", file, line, column);
   if (-1 != result) {
     va-list-t args;
@@ -83,7 +83,7 @@ klass json-parser {
     
     return num-elements-read;
   }
-  /* method */ static func putback(object-t self, int-t c) -> void {
+  /* method */ static func putback(object-t self, fnd-int-t c) -> void {
     if ('\n' == c)
       self.line--;
       // where is column left?
@@ -92,8 +92,8 @@ klass json-parser {
     ungetc(c, self.in);
     return;
   }
-  /* method */ static func get(object-t self) -> int-t {
-    int-t c = getc(self.in);
+  /* method */ static func get(object-t self) -> fnd-int-t {
+    fnd-int-t c = getc(self.in);
     if (EOF != c) {
       if ('\n' == c) {
         self.line++;
@@ -107,7 +107,7 @@ klass json-parser {
   //static func error-msg(char8-t* file, ssize-t line, ssize-t column, str-t msg0, ...) -> void; // one or more msg strings
 
   /* method */ static func lex(object-t self) -> object-t {
-    int-t c;
+    fnd-int-t c;
     while (1) {
       while (isspace(c = json-parser::get(self))) {
       }

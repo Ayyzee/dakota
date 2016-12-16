@@ -23,7 +23,7 @@
 module dakota;
 
 static boole-t
-space?(int-t c) {
+space?(fnd-int-t c) {
   return isspace(c);
 }
 

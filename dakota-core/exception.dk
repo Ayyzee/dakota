@@ -33,7 +33,7 @@ klass system-exception;
 klass throw-src {
   slots {
     str-t file;
-    int-t line;
+    fnd-int-t line;
   }
 }
 
@@ -57,7 +57,7 @@ func getprogname() -> str-t {
 # endif
 # endif
 
-[[format-va-printf(2)]] static func va-log(int64-t priority, str-t format, va-list-t args) -> int-t {
+[[format-va-printf(2)]] static func va-log(int64-t priority, str-t format, va-list-t args) -> fnd-int-t {
   stream-t log-file = stderr;
 
   if (nullptr != getenv("DEBUG")) {
@@ -81,19 +81,19 @@ func getprogname() -> str-t {
     }
   }
   fprintf(log-file, "{");
-  int-t result = vfprintf(log-file, format, args);
+  fnd-int-t result = vfprintf(log-file, format, args);
   fprintf(log-file, "},\n");
   // bugbug: need to adjust result
   return result;
 }
-[[format-va-printf(2)]] func dkt-va-log(int64-t priority, str-t format, va-list-t args) -> int-t {
+[[format-va-printf(2)]] func dkt-va-log(int64-t priority, str-t format, va-list-t args) -> fnd-int-t {
   cmp-t result = va-log(priority, format, args);
   return result;
 }
-[[format-printf(2)]] func dkt-log(int64-t priority, str-t format, ...) -> int-t {
+[[format-printf(2)]] func dkt-log(int64-t priority, str-t format, ...) -> fnd-int-t {
   va-list-t args;
   va-start(args, format);
-  int-t result = dkt-va-log(priority, format, args);
+  fnd-int-t result = dkt-va-log(priority, format, args);
   va-end(args);
   return result;
 }
@@ -108,20 +108,20 @@ klass exception {
 
   slots {
     str-t src-file;
-    int-t src-line;
+    fnd-int-t src-line;
     str-t msg;
   }
   method init(object-t self,
               str-t    msg :      nullptr,
               str-t    src-file : nullptr,
-              int-t    src-line : 0) -> object-t {
+              fnd-int-t    src-line : 0) -> object-t {
     self = $init(super);
     self.src-file = src-file;
     self.src-line = src-line;
     self.msg = msg;
     return self;
   }
-  method set-src(object-t self, str-t src-file, int-t src-line) -> object-t {
+  method set-src(object-t self, str-t src-file, fnd-int-t src-line) -> object-t {
     if (nullptr != src-file && 0 < src-line) {
       self.src-file = src-file;
       self.src-line = src-line;

@@ -80,38 +80,40 @@
   # define dkt_typeinfo
 # endif
 
-typealias boole_t = bool;
-
 typealias  char8_t =          char; // may be signed or unsigned (same with wchar-t)
 typealias schar8_t =   signed char;
 typealias uchar8_t = unsigned char;
 
 // integer promotions are
-//   float -> double
-//   char  -> int or unsigned int
-//   bool  -> unsigned int
-
-typealias double_t = double;
-typealias  int_t =          int; // no corresponding klass/slots defn
-typealias uint_t = unsigned int; // no corresponding klass/slots defn
+//   float              -> double
+//   char               -> int or unsigned int
+//   signed char        -> int
+//   unsigned char      -> unsigned int
+//   short int          -> int
+//   unsigned short int -> unsigned int
+//   bool               -> unsigned int
 
 typealias va_list_t = va_list; // no corresponding klass/slots defn
 
 // <cstdfloat>
-namespace std { typealias float32_t =  float; }
-namespace std { typealias float64_t =       double; }
-namespace std { typealias float128_t = long double; }
+typealias float32_t =  float;
+typealias float64_t =       double;
+typealias float128_t = long double;
+
+static_assert( 32/8 == sizeof( float32_t), "The sizeof std::float32-t  must equal  32/8 bytes in size");
+static_assert( 64/8 == sizeof( float64_t), "The sizeof std::float64-t  must equal  64/8 bytes in size");
+static_assert(128/8 == sizeof(float128_t), "The sizeof std::float128-t must equal 128/8 bytes in size");
 
 // symbols are defined before klasses
 namespace object       { struct [[_dkt_typeinfo_]] slots_t; }
 namespace object       { typealias slots_t = struct slots_t;                 } typealias object_t =       object::slots_t*;
-namespace cmp          { typealias slots_t = int_t;                          } typealias cmp_t =          cmp::slots_t;
+namespace boole        { typealias slots_t = bool;                           } typealias boole_t =        boole::slots_t;
+namespace fnd_double   { typealias slots_t = double;                         } typealias fnd_double_t =   fnd_double::slots_t;
+namespace fnd_int      { typealias slots_t = int;                            } typealias fnd_int_t =      fnd_int::slots_t;
+namespace fnd_uint     { typealias slots_t = unsigned int;                   } typealias fnd_uint_t =     fnd_uint::slots_t;
+namespace cmp          { typealias slots_t = fnd_int_t;                      } typealias cmp_t =          cmp::slots_t;
 namespace compare      { typealias slots_t = FUNC (*)(object_t, object_t) -> cmp_t; } typealias compare_t = compare::slots_t;
 namespace generic_func { typealias slots_t = FUNC (*)(object_t) -> object_t; } typealias generic_func_t = generic_func::slots_t;
 namespace ptr          { typealias slots_t = void*;                          } typealias ptr_t =          ptr::slots_t;
 namespace str          { typealias slots_t = const char8_t*;                 } typealias str_t =          str::slots_t;
 namespace symbol       { typealias slots_t = str_t;                          } typealias symbol_t =       symbol::slots_t;
-
-static_assert(32/8  == sizeof(std::float32_t),  "The sizeof std::float32-t  must equal  32/8 bytes in size");
-static_assert(64/8  == sizeof(std::float64_t),  "The sizeof std::float64-t  must equal  64/8 bytes in size");
-static_assert(128/8 == sizeof(std::float128_t), "The sizeof std::float128-t must equal 128/8 bytes in size");

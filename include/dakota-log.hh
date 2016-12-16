@@ -23,15 +23,15 @@
 
 # include <dakota-decl.hh>
 
-[[so_export]] [[format_va_printf(2)]] FUNC dkt_va_log(int64_t priority, str_t format, va_list_t args) -> int_t;
-[[so_export]] [[format_printf(   2)]] FUNC dkt_log(   int64_t priority, str_t format, ...) -> int_t;
+[[so_export]] [[format_va_printf(2)]] FUNC dkt_va_log(int64_t priority, str_t format, va_list_t args) -> fnd_int_t;
+[[so_export]] [[format_printf(   2)]] FUNC dkt_log(   int64_t priority, str_t format, ...) -> fnd_int_t;
 
 # define log_method()     dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"method\": \"%s\",\"params\": \"%s\"", __name__, __method__->name, __method__->param_types)
 # define log_klass_func() dkt_log(dkt::k_log_debug, "\"klass\": \"%s\",\"func\": \"%s\"", __name__, __func__)
 # define log_func()       dkt_log(dkt::k_log_debug, "\"func\": \"%s\"", __func__)
 
 namespace dkt {
-  enum log_priority_t : uint_t {
+  enum log_priority_t : fnd_int_t {
     k_log_emergency = LOG_EMERG,
     k_log_alert =     LOG_ALERT,
     k_log_critical =  LOG_CRIT,

@@ -30,18 +30,18 @@
 
 TYPEALIAS str_t = const char*;
 TYPEALIAS ptr_t = void*;
-TYPEALIAS int_t = int;
+TYPEALIAS fnd_int_t = int;
 
 struct dso_open_mode_t {
   // xor
-  int_t NOW; // default
-  int_t LAZY;
+  fnd_int_t NOW; // default
+  fnd_int_t LAZY;
 
   // xor
-  int_t GLOBAL; // default
-  int_t LOCAL;
+  fnd_int_t GLOBAL; // default
+  fnd_int_t LOCAL;
 
-  int_t NOLOAD;
+  fnd_int_t NOLOAD;
 };
 struct dso_symbol_handle_t {
   ptr_t DEFAULT;
@@ -51,9 +51,9 @@ struct dso_symbol_handle_t {
 [[so_export]] extern const dso_symbol_handle_t DSO_SYMBOL_HANDLE;
 
 extern "C" {
-[[so_export]] FUNC dso_open(str_t path, int_t mode) -> ptr_t;
+[[so_export]] FUNC dso_open(str_t path, fnd_int_t mode) -> ptr_t;
 [[so_export]] FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t;
-[[so_export]] FUNC dso_close(ptr_t handle) -> int_t;
+[[so_export]] FUNC dso_close(ptr_t handle) -> fnd_int_t;
 [[so_export]] FUNC dso_error() -> str_t;
 [[so_export]] FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t;
 [[so_export]] FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t;

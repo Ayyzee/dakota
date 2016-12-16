@@ -23,11 +23,11 @@
 # include "config.hh"
 # include "private.hh"
 
-static func set-name(int-t, str-t) -> void;
+static func set-name(fnd-int-t, str-t) -> void;
 
 # include "strerror-name.tbl"
 
-static func set-name(int-t errnum, str-t name) -> void {
+static func set-name(fnd-int-t errnum, str-t name) -> void {
   assert(0 != errnum);
   assert(nullptr != name);
   assert(NUL != name[0]);
@@ -50,7 +50,7 @@ static func set-name(int-t errnum, str-t name) -> void {
   return;
 }
 # if !defined HAVE-STRERROR-NAME
-func strerror-name(int-t errnum) -> str-t {
+func strerror-name(fnd-int-t errnum) -> str-t {
   assert(errnum <= scountof(gbl-sys-err-names));
   str-t name = gbl-sys-err-names[errnum];
   return name;

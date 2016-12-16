@@ -19,7 +19,7 @@ module dakota;
 klass float32 {
   superklass number;
   
-  slots std::float32-t;
+  slots float32-t;
 
   method init(object-t self, slots-t slots : 0.0) -> object-t {
     self = $init(super);
@@ -30,7 +30,7 @@ klass float32 {
 klass float64 {
   superklass number;
   
-  slots std::float64-t;
+  slots float64-t;
 
   method init(object-t self, slots-t slots : 0.0) -> object-t {
     self = $init(super);
@@ -41,7 +41,7 @@ klass float64 {
 klass float128 {
   superklass number;
   
-  slots std::float128-t;
+  slots float128-t;
 
   method init(object-t self, slots-t slots : 0.0) -> object-t {
     self = $init(super);
@@ -49,6 +49,6 @@ klass float128 {
     return self;
   }
 }
-static-assert(32/8  == sizeof(std::float32-t),  "The slots type of klass std::float32  must be  4 bytes in size");
-static-assert(64/8  == sizeof(std::float64-t),  "The slots type of klass std::float64  must be  8 bytes in size");
-static-assert(128/8 == sizeof(std::float128-t), "The slots type of klass std::float128 must be 16 bytes in size");
+static-assert(32/8  == sizeof(float32-t),  "The slots type of klass float32  must be  4 bytes in size");
+static-assert(64/8  == sizeof(float64-t),  "The slots type of klass float64  must be  8 bytes in size");
+static-assert(128/8 == sizeof(float128-t), "The slots type of klass float128 must be 16 bytes in size");

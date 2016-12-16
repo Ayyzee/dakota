@@ -61,7 +61,7 @@ klass output-stream {
     else-if (stderr == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
 # endif // DEBUG
-    int-t rtn = fclose(slots);
+    fnd-int-t rtn = fclose(slots);
 
     if (0 != rtn)
       throw $make(system-exception::klass(), #errnum : errno);

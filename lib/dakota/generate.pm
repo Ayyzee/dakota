@@ -1767,7 +1767,7 @@ sub slots_decl {
       if ($$slots_ast{'enum-base'}) {
         $result .= ' : ' . join('', @{$$slots_ast{'enum-base'}});
       } else {
-        $result .= ' : ' . 'int-t';
+        $result .= ' : ' . 'fnd-int-t';
       }
     }
   } elsif ($$slots_ast{'type'}) {
@@ -1834,7 +1834,7 @@ sub generate_enum_decl {
   if ($$enum{'enum-base'}) {
     $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}});
   } elsif ('type-enum' ne $cat) {
-    $$scratch_str_ref .= ' : int-t'; # default enum base
+    $$scratch_str_ref .= ' : fnd-int-t'; # default enum base
   }
   $$scratch_str_ref .= ';';
 }
@@ -1856,7 +1856,7 @@ sub generate_enum_defn {
   if ($$enum{'enum-base'}) {
     $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}});
   } elsif ('type-enum' ne $cat) {
-    $$scratch_str_ref .= ' : int-t'; # default enum base
+    $$scratch_str_ref .= ' : fnd-int-t'; # default enum base
   }
   $$scratch_str_ref .= ' {' . &ann(__FILE__, __LINE__) . $nl;
   my $max_width = 0;

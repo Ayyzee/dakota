@@ -101,7 +101,7 @@
     '#int-literals' => undef,
     '#int-names' => undef,
     '#int-ptrs' => undef,
-    '#int-t' => undef, # hardcode typealias
+    '#fnd-int-t' => undef, # hardcode typealias
     '#interpose-name' => undef,
     '#interposers' => undef,
     '#ints' => undef,
@@ -140,7 +140,7 @@
     '#type-enum' => undef,
     '#typeid' => undef,
     '#uchar8-t' => undef, # hardcode typealias
-    '#uint-t' => undef,  # hardcode typealias
+    '#fnd-uint-t' => undef,  # hardcode typealias
     '#union' => undef,
     '#va-generic-func-ptrs' => undef,
     '#va-method' => undef,

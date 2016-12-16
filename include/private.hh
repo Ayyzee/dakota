@@ -29,13 +29,13 @@ FUNC add_interpose_prop(symbol_t key, symbol_t element) -> void;
 
 FUNC info_for_name(symbol_t) -> named_info_t*;
 
-FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> int_t;
-FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t;
+FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> fnd_int_t;
+FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> fnd_int_t;
 
-FUNC safe_strcmp(str_t, str_t) -> int_t;
+FUNC safe_strcmp(str_t, str_t) -> fnd_int_t;
 FUNC safe_strlen(str_t) -> size_t;
 
-FUNC strerror_name(int_t errnum) -> str_t;
+FUNC strerror_name(fnd_int_t errnum) -> str_t;
 
 FUNC size_from_info(named_info_t* info) -> ssize_t;
 FUNC offset_from_info(named_info_t* info) -> ssize_t;

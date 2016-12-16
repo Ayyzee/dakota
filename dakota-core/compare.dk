@@ -20,7 +20,7 @@ klass equals {
   slots (*)(object-t, object-t) -> boole-t;
 }
 klass cmp {
-  slots int-t;
+  slots fnd-int-t;
 }
 klass compare {
   slots (*)(object-t, object-t) -> cmp-t;

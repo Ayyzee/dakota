@@ -14,7 +14,7 @@ use warnings;
 my $extra = 2; # NEVER set this to 1
 
 my $type_tbl = {
-  'int-t' => {
+  'fnd-int-t' => {
     'schar8-t'             => 1,
     'schar8::slots-t'      => 1,
 
@@ -45,7 +45,7 @@ my $type_tbl = {
     'int-fast64-t'         => 1,
     'int-fast64::slots-t'  => 1,
   },
-  'uint-t' => {
+  'fnd-uint-t' => {
     'boole-t'               => 1,
     'boole::slots-t'        => 1,
 
@@ -85,12 +85,10 @@ my $type_tbl = {
     'uint-fast64-t'         => 1,
     'uint-fast64::slots-t'  => 1,
   },
-  'double-t' => {
-    'std::float32-t'    => 1,
+  'fnd-double-t' => {
     'float32-t'         => 1,
     'float32::slots-t'  => 1,
 
-    'std::float64-t'    => 1,
     'float64-t'         => 1,
     'float64::slots-t'  => 1,
   },
@@ -110,7 +108,7 @@ my $o_exts = {
 };
 my $compiler_tbl = {
   'clang++' => 'clang',
-  'g++' => 'gcc',
+  'g++' =>     'gcc',
 };
 my $cxx = $ARGV[0];
 my $compiler = $cxx =~ s|^(.*?)([\w-]+)(\+\+)?$|$2$3|r;
@@ -120,7 +118,7 @@ my $fn = $ARGV[1];
 
 `$cxx -std=c++11 --language c++ --output char-is-signed char-is-signed.cc`;
 my $index = `./char-is-signed`;
-my $int_types = [ 'uint-t', 'int-t' ];
+my $int_types = [ 'fnd-uint-t', 'fnd-int-t' ];
 
 foreach my $type (sort keys %$implementation_defined_signedness) {
   if ($type && $extra != $$implementation_defined_signedness{$type} ) {

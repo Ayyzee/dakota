@@ -42,7 +42,7 @@
 
 # if defined __GNUG__
 namespace dkt { inline FUNC demangle(str_t mangled_name, char8_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
-  int_t status = 0;
+  fnd_int_t status = 0;
   str_t result = abi::__cxa_demangle(mangled_name, buffer, &buffer_len, &status); // must be free()ed if buffer is non-nullptr
   if (0 != status)
     result = mangled_name; // silent failure
@@ -123,7 +123,7 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
 # define countof(array) (sizeof((array))/sizeof((array)[0]))
 # define scountof(array) cast(ssize_t)countof(array)
 
-[[format_va_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, va_list_t args) -> int_t {
+[[format_va_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, va_list_t args) -> fnd_int_t {
   if (1) {
     va_list syslog_args;
     va_copy(syslog_args, args);
@@ -132,10 +132,10 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   vfprintf(stderr, format, args);
   return EXIT_FAILURE;
 }
-[[format_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, ...) -> int_t {
+[[format_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, ...) -> fnd_int_t {
   va_list_t args;
   va_start(args, format);
-  int_t val = non_exit_fail_with_msg(format, args);
+  fnd_int_t val = non_exit_fail_with_msg(format, args);
   va_end(args);
   return val;
 }
@@ -210,7 +210,7 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
 # endif
 
 // width of hex string representation of a uintptr-t
-# define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
+# define PRIxPTR_WIDTH cast(fnd_int_t)(2 * sizeof(uintptr_t))
 
 extern object_t null       [[so_export]] [[read_only]];
 extern object_t std_input  [[so_export]];
@@ -269,15 +269,15 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 
 [[so_export]] [[noreturn]] FUNC dkt_null_method(object_t, ...) -> void;
 
-[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, object_t, va_list_t) -> int_t;
-[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, super_t,  va_list_t) -> int_t;
-[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, object_t, va_list_t) -> int_t;
-[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, super_t,  va_list_t) -> int_t;
+[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, object_t, va_list_t) -> fnd_int_t;
+[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, super_t,  va_list_t) -> fnd_int_t;
+[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, object_t, va_list_t) -> fnd_int_t;
+[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, super_t,  va_list_t) -> fnd_int_t;
 
-[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, super_t,  ...) -> int_t;
-[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, object_t, ...) -> int_t;
-[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, super_t,  ...) -> int_t;
-[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, object_t, ...) -> int_t;
+[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, super_t,  ...) -> fnd_int_t;
+[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, object_t, ...) -> fnd_int_t;
+[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, super_t,  ...) -> fnd_int_t;
+[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, object_t, ...) -> fnd_int_t;
 
 [[debug_export]] FUNC dkt_get_klass_chain(object_t kls, char8_t* buf, ssize_t buf_len) -> char8_t*;
 

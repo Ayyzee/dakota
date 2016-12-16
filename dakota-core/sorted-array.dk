@@ -71,7 +71,7 @@ klass sorted-array {
     assert(nullptr != key);
 
     result-t result = { .element = nullptr, .offset = -1 };
-    int-t comparison;
+    fnd-int-t comparison;
     boole-t should-increment = false;
 
     int64-t i = 0;

@@ -239,7 +239,7 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
       strcat(file, ".");
       strcat(file, suffix);
       x::stat-t status;
-      int-t err = stat(file, &status);
+      fnd-int-t err = stat(file, &status);
 
       if (0 == err) {
         if (0 == S-ISREG(status.st-mode)) { // NOT a regular file
@@ -462,7 +462,7 @@ func dk-make-simple-klass(symbol-t name, symbol-t superkls-name, symbol-t kls-na
   named-info-t* kls-info =  cast(named-info-t*)dkt::alloc(ssizeof(named-info-t));
 
   // need to be sorted
-  uint_t i = 0;
+  fnd-uint-t i = 0;
   if (nullptr != kls-name)
     kls-props[i++] = { .key = #klass-name,      .element = cast(intptr-t)kls-name     };
   kls-props[i++] =   { .key = #name,            .element = cast(intptr-t)name         };
@@ -913,37 +913,37 @@ static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* 
   };
   return;
 }
-static func max-enum-name-width(enum-info-t* enum-info) -> int-t {
+static func max-enum-name-width(enum-info-t* enum-info) -> fnd-int-t {
   cmp-t result = 0;
-  int-t i = 0;
+  fnd-int-t i = 0;
   str-t name;
   while (nullptr != (name = enum-info[i++].name)) {
     ssize-t width = cast(ssize-t)safe-strlen(name);
     if (width > result)
-      result = cast(int-t)width;
+      result = cast(fnd-int-t)width;
   }
   return result;
 }
-static func max-slot-type-width(named-info-t* slots-info) -> int-t {
+static func max-slot-type-width(named-info-t* slots-info) -> fnd-int-t {
   cmp-t result = 0;
-  int-t i = 0;
+  fnd-int-t i = 0;
   while (nullptr != slots-info[i].elements) {
     str-t slot-type = cast(str-t)named-info::at(&slots-info[i], #type);
     ssize-t width = cast(ssize-t)safe-strlen(slot-type);
     if (width > result)
-      result = cast(int-t)width;
+      result = cast(fnd-int-t)width;
     i++;
   }
   return result;
 }
-static func max-slot-name-width(named-info-t* slots-info) -> int-t {
+static func max-slot-name-width(named-info-t* slots-info) -> fnd-int-t {
   cmp-t result = 0;
-  int-t i = 0;
+  fnd-int-t i = 0;
   while (nullptr != slots-info[i].elements) {
     str-t slot-name = cast(str-t)named-info::at(&slots-info[i], #name);
     ssize-t width = cast(ssize-t)safe-strlen(slot-name);
     if (width > result)
-      result = cast(int-t)width;
+      result = cast(fnd-int-t)width;
     i++;
   }
   return result;
@@ -1061,8 +1061,8 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
         ostream::println-format(ostrm, "enum\n");
       ostream::println-format(ostrm, "{\n");
       ostream::col-incr(ostrm);
-      int-t max-name-width = max-enum-name-width(ci.enum-info[i].info);
-      int-t j = 0;
+      fnd-int-t max-name-width = max-enum-name-width(ci.enum-info[i].info);
+      fnd-int-t j = 0;
       while (nullptr != ci.enum-info[i].info[j].name) {
         ostream::println-format(ostrm, "%-*s = %s,\n",
                                 max-name-width,
@@ -1099,8 +1099,8 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
           ostream::println-format(ostrm, "slots %s {\n", ci.cat);
         ostream::col-incr(ostrm);
         if (#enum == ci.cat) {
-          int-t max-type-width = max-slot-name-width(ci.slots-info);
-          int-t i = 0;
+          fnd-int-t max-type-width = max-slot-name-width(ci.slots-info);
+          fnd-int-t i = 0;
           while (nullptr != ci.slots-info[i].elements) {
             symbol-t slot-name = name-from-info(&ci.slots-info[i]);
             assert-valid-str(slot-name);
@@ -1111,7 +1111,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
             i++;
           }
         } else {
-          int-t max-type-width = max-slot-type-width(ci.slots-info);
+          fnd-int-t max-type-width = max-slot-type-width(ci.slots-info);
           ssize-t i = 0;
           while (nullptr != ci.slots-info[i].elements) {
             str-t slot-type =   cast(str-t)named-info::at(&ci.slots-info[i], #type, cast(ssize-t)#object-t);
@@ -1209,7 +1209,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
     ssize-t i = 0;
       
     if (nullptr != output-dir) {
-      int-t n = mkdir(output-dir, 0755);
+      fnd-int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
         exit-fail-with-msg("ERROR: %s: \"%s\"", output-dir, strerror(errno));
     }
@@ -1283,7 +1283,7 @@ klass x::siginfo {
   slots siginfo-t;
 }
 klass x::sigaction-handler {
-  slots (*)(int-t, x::siginfo-t*, ptr-t) -> void;
+  slots (*)(fnd-int-t, x::siginfo-t*, ptr-t) -> void;
 }
 klass x::sigaction {
   slots struct sigaction;
@@ -1298,7 +1298,7 @@ static int8-t const index-from-sig-data[NSIG] = {
   // [SIGBUS] =  0,
   // [SIGSEGV] = 1,
 };
-static func index-from-sig(int-t sig) -> int8-t {
+static func index-from-sig(fnd-int-t sig) -> int8-t {
   return 0;
   return index-from-sig-data[sig];
 }
@@ -1340,7 +1340,7 @@ static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -
     //printf("name: \"%s\"\n", ri.name);
 
     // imported-klasses
-    for (uint-t i = 0; nullptr != cast(object-t*)ri.imported-klass-ptrs[i].element; i++) {
+    for (fnd-int-t i = 0; nullptr != cast(object-t*)ri.imported-klass-ptrs[i].element; i++) {
       if (cast(object-t*)ri.imported-klass-ptrs[i].element == cast(object-t*)addr) {
         info->fdir =  ri.dir;
         info->fname = ri.name;
@@ -1352,7 +1352,7 @@ static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -
   }
   return nullptr;
 }
-[[noreturn]] static func bus-segv-handler(int-t sig, x::siginfo-t *si, void *dummy) -> void {
+[[noreturn]] static func bus-segv-handler(fnd-int-t sig, x::siginfo-t *si, void *dummy) -> void {
   str-t sname-mangled = dso-symbol-name-for-addr(si->si-addr);
   if (nullptr != sname-mangled) {
       int status = -1;
@@ -1394,26 +1394,26 @@ static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -
       throw $make(signal-exception::klass());
   }
 }
-static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) -> int-t {
+static func sigaction-setup(fnd-int-t sig, x::sigaction-handler-t bus-segv-handler) -> fnd-int-t {
   x::sigaction-t sa {};
   sa.sa-flags = cast(decltype(sa.sa-flags))(SA-SIGINFO | SA-RESETHAND | SA-RESTART);
   sigemptyset(&sa.sa-mask);
   sa.sa-sigaction = bus-segv-handler;
   
   sa-pairs[index-from-sig(sig)].prev-sa.sa-sigaction = nullptr;
-  int-t r = sigaction(sig, &sa, &sa-pairs[index-from-sig(sig)].prev-sa);
+  fnd-int-t r = sigaction(sig, &sa, &sa-pairs[index-from-sig(sig)].prev-sa);
   if (-1 == r) {
     exit-fail-with-msg("ERROR: %s: \"%s\"", "sigaction", strerror(errno));
   }
   return r;
 }
-static func set-protection(str-t segment, int-t protection, get-segment-data-func-t get-segment-data) -> int-t {
+static func set-protection(str-t segment, fnd-int-t protection, get-segment-data-func-t get-segment-data) -> fnd-int-t {
   assert-valid-str(segment);
   ptr-t addr = nullptr;
   size-t size = 0;
   get-segment-data(segment, &addr, &size); // code-generated in each lib/exe
 
-  int-t result = -1;
+  fnd-int-t result = -1;
   if (nullptr != addr) {
     result = mprotect(addr, size, protection);
     if (-1 == result) {
@@ -1422,27 +1422,27 @@ static func set-protection(str-t segment, int-t protection, get-segment-data-fun
   }
   return result;
 }
-static func set-protection-all(str-t segment, int-t protection) -> int-t {
+static func set-protection-all(str-t segment, fnd-int-t protection) -> fnd-int-t {
   cmp-t result = 0;
   named-info-t* ni = gbl-registration-info-list;
   while (nullptr != ni) {
     registration-info-t ri {};
     named-info-to-registration-info(ni, &ri);
-    int-t r = set-protection(segment, protection, cast(get-segment-data-func-t)ri.get-segment-data);
+    fnd-int-t r = set-protection(segment, protection, cast(get-segment-data-func-t)ri.get-segment-data);
     if (0 != r)
       result = r;
     ni = ni->next;
   }
   return result;
 }
-func set-read-only() -> int-t {
-  int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ);
+func set-read-only() -> fnd-int-t {
+  fnd-int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ);
   if (0 != r)
     exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
   return r;
 }
-func set-read-write() -> int-t {
-  int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ | PROT-WRITE);
+func set-read-write() -> fnd-int-t {
+  fnd-int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ | PROT-WRITE);
   if (0 != r)
     exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
   return r;
@@ -1463,7 +1463,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   assert(nullptr != registration-info);
   // str-t dso-path = dso-abs-path-containing-addr(registration-info);
   // if (nullptr != dso-path)  {
-  //   int-t overwrite;
+  //   fnd-int-t overwrite;
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
   boole-t exported-only = getenv?("DAKOTA_CATALOG_EXPORTED_ONLY");
