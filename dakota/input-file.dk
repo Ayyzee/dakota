@@ -42,12 +42,12 @@ klass input-file {
     char8-t* buffer;
 
     str-t    file;
-    int64-t   line;
-    int64-t   column;
+    int64-t  line;
+    int64-t  column;
   }
   method init(object-t self,
-                       stream-t stream :   nullptr,
-                       str-t    file : nullptr) -> object-t {
+              stream-t stream : nullptr,
+              str-t    file :   nullptr) -> object-t {
     self = $init(super);
     assert(!(nullptr != stream && nullptr != file)); // these are mutually exclusive
     assert(stdout != stream);
