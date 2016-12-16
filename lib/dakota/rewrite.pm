@@ -593,6 +593,7 @@ sub rewrite_boxes {
   $$filestr_ref =~ s/(?<!::)(box\s*\(\s*\#$id        \))/symbol::$1/g;
   $$filestr_ref =~ s/(?<!::)(box\s*\(\s*__symbol::.+?\))/symbol::$1/g;
 
+  # box(cast(ssize-t)0)  =>  ssize::box(cast(ssize-t)0)
   $$filestr_ref =~ s/(?<!::)(box\s*\(\s*cast\s*\(\s*(.+?)-t\s*\))/$2::$1/g;
 }
 sub rewrite_unless {
