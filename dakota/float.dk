@@ -14,8 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+include-for <cfloat> DBL-MIN
+                     DBL-MAX;
 module dakota;
 
+klass fnd-double {
+  superklass number;
+  
+  slots double;
+
+  const slots-t min = DBL-MIN;
+  const slots-t max = DBL-MAX;
+
+  method init(object-t self, slots-t slots : 0.0) -> object-t {
+    self = $init(super);
+    mutable-unbox(self) = slots;
+    return self;
+  }
+}
 klass float32 {
   superklass number;
   
