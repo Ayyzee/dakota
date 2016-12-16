@@ -65,6 +65,6 @@ klass float128 {
     return self;
   }
 }
-static-assert(32/8  == sizeof(float32-t),  "The slots type of klass float32  must be  4 bytes in size");
-static-assert(64/8  == sizeof(float64-t),  "The slots type of klass float64  must be  8 bytes in size");
+static-assert( 32/8 == sizeof( float32-t), "The slots type of klass float32  must be  4 bytes in size");
+static-assert( 64/8 == sizeof( float64-t), "The slots type of klass float64  must be  8 bytes in size");
 static-assert(128/8 == sizeof(float128-t), "The slots type of klass float128 must be 16 bytes in size");
