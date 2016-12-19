@@ -540,6 +540,29 @@ sub match_re {
   }
   return &sst::at($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'} - 1);
 }
+sub attrs {
+  my ($args) = @_;
+  &match(__FILE__, __LINE__, '[[');
+  my $layer = 1;
+  my $attrs = [];
+  &add_last($attrs, '[[');
+  while (0 < $layer) {
+    my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
+    if (0) {
+    } elsif ('[[' eq $current_token) {
+      &match(__FILE__, __LINE__, '[[');
+      $layer++;
+    } elsif (']]' eq $current_token) {
+      &match(__FILE__, __LINE__, ']]');
+      die if 0 == $layer;
+      $layer--;
+    } else {
+      &match_any();
+    }
+    &add_last($attrs, $current_token);
+  }
+  return $attrs;
+}
 sub trait {
   my ($args) = @_;
   my ($body, $seq) = &dkdecl('trait');
@@ -599,25 +622,7 @@ sub trait {
       # [[sentinel]] method
       # [[alias(...)]] method
       if (m/^\[\[$/) {
-        &match(__FILE__, __LINE__, '[[');
-        my $layer = 1;
-        $attrs = [];
-        &add_last($attrs, '[[');
-        while (0 < $layer) {
-          my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
-          if (0) {
-          } elsif ('[[' eq $current_token) {
-            &match(__FILE__, __LINE__, '[[');
-            $layer++;
-          } elsif (']]' eq $current_token) {
-            &match(__FILE__, __LINE__, ']]');
-            die if 0 == $layer;
-            $layer--;
-          } else {
-            &match_any();
-          }
-          &add_last($attrs, $current_token);
-        }
+        $attrs = &attrs($args);
         last;
       }
       if (m/^method$/) {
@@ -1305,25 +1310,7 @@ sub klass {
       # [[sentinel]] method
       # [[alias(...)]] method
       if (m/^\[\[$/) {
-        &match(__FILE__, __LINE__, '[[');
-        my $layer = 1;
-        $attrs = [];
-        &add_last($attrs, '[[');
-        while (0 < $layer) {
-          my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
-          if (0) {
-          } elsif ('[[' eq $current_token) {
-            &match(__FILE__, __LINE__, '[[');
-            $layer++;
-          } elsif (']]' eq $current_token) {
-            &match(__FILE__, __LINE__, ']]');
-            die if 0 == $layer;
-            $layer--;
-          } else {
-            &match_any();
-          }
-          &add_last($attrs, $current_token);
-        }
+        $attrs = &attrs($args);
         last;
       }
       if (m/^method$/) {
