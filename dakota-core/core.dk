@@ -1088,15 +1088,15 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
 # define DKT-DEBUG-CODEGEN 0
   if (DKT-DEBUG-CODEGEN || has-exported-state) {
     if (nullptr != ci.slots-type) {
-      ostream::println-format(ostrm, "slots %s;\n", ci.slots-type);
+      ostream::println-format(ostrm, "export slots %s;\n", ci.slots-type);
     }
     else-if (nullptr != ci.slots-info) {
         if (nullptr == ci.cat || #struct == ci.cat)
-          ostream::println-format(ostrm, "slots {\n");
+          ostream::println-format(ostrm, "export slots {\n");
         else-if (ci.enum-base)
-                  ostream::println-format(ostrm, "slots %s : %s {\n", ci.cat, ci.enum-base);
+                  ostream::println-format(ostrm, "export slots %s : %s {\n", ci.cat, ci.enum-base);
         else
-          ostream::println-format(ostrm, "slots %s {\n", ci.cat);
+          ostream::println-format(ostrm, "export slots %s {\n", ci.cat);
         ostream::col-incr(ostrm);
         if (#enum == ci.cat) {
           fnd-int-t max-type-width = max-slot-name-width(ci.slots-info);
