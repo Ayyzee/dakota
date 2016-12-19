@@ -544,8 +544,7 @@ sub match_attrs {
   my ($args) = @_;
   &match(__FILE__, __LINE__, '[[');
   my $layer = 1;
-  my $attrs = [];
-  &add_last($attrs, '[[');
+  my $attrs = ['[['];
   while (0 < $layer) {
     my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
     if (0) {
@@ -553,8 +552,8 @@ sub match_attrs {
       &match(__FILE__, __LINE__, '[[');
       $layer++;
     } elsif (']]' eq $current_token) {
-      &match(__FILE__, __LINE__, ']]');
       die if 0 == $layer;
+      &match(__FILE__, __LINE__, ']]');
       $layer--;
     } else {
       &match_any();
