@@ -2620,8 +2620,8 @@ sub has_methods {
 sub has_exported_methods {
   my ($klass_ast) = @_;
   if (&has_methods($klass_ast)) {
-    if (exists $$klass_ast{'behavior-exported?'} && defined $$klass_ast{'behavior-exported?'}) {
-      return $$klass_ast{'behavior-exported?'};
+    if (exists $$klass_ast{'has-exported-behavior'} && defined $$klass_ast{'has-exported-behavior'}) {
+      return $$klass_ast{'has-exported-behavior'};
     }
   }
   return 0;

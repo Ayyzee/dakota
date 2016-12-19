@@ -788,7 +788,7 @@ sub is_exe_target {
 }
 sub is_exported {
   my ($method) = @_;
-  if (exists $$method{'exported?'} && $$method{'exported?'}) {
+  if (exists $$method{'is-exported'} && $$method{'is-exported'}) {
     return 1;
   } else {
     return 0;

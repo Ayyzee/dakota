@@ -552,7 +552,7 @@ sub trait {
     $$gbl_root_ast{'traits'}{$body} = undef;
     &match(__FILE__, __LINE__, ';');
 
-    if ($$args{'exported?'}) {
+    if ($$args{'is-exported'}) {
       $$gbl_root_ast{'exported-trait-decls'}{$body} = {};
       $$gbl_current_ast_scope{'exported-trait-decls'} =
         &deep_copy($$gbl_root_ast{'exported-trait-decls'});
@@ -567,8 +567,8 @@ sub trait {
   if (!defined $$gbl_current_ast_scope{'traits'}{$construct_name}) {
     $$gbl_current_ast_scope{'traits'}{$construct_name}{'defined?'} = 1;
   }
-  if ($$args{'exported?'}) {
-    $$gbl_current_ast_scope{'traits'}{$construct_name}{'exported?'} = 1;
+  if ($$args{'is-exported'}) {
+    $$gbl_current_ast_scope{'traits'}{$construct_name}{'is-exported'} = 1;
   }
   $gbl_current_ast_scope = $$gbl_current_ast_scope{'traits'}{$construct_name};
   $$gbl_current_ast_scope{'module'} = $gbl_current_module;
@@ -592,9 +592,9 @@ sub trait {
           # [[sentinel]] method
           # [[alias(...)]] method
           if (m/^method$/) {
-            $$gbl_root_ast{'traits'}{$construct_name}{'exported?'} = 1; # export trait if any method is exported
-            $$gbl_root_ast{'traits'}{$construct_name}{'behavior-exported?'} = 1;
-            &method( {'exported?' => 1 });
+            $$gbl_root_ast{'traits'}{$construct_name}{'is-exported'} = 1; # export trait if any method is exported
+            $$gbl_root_ast{'traits'}{$construct_name}{'has-exported-behavior'} = 1;
+            &method( {'is-exported' => 1 });
             last;
           }
         }
@@ -632,7 +632,7 @@ sub trait {
             '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '}' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             ']' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
-          my $args = { 'exported?' => 0 };
+          my $args = { 'is-exported' => 0 };
           if (0 < @$attrs) {
             $$args{'attrs'} = &deep_copy($attrs);
             $attrs = [];
@@ -803,8 +803,8 @@ my $enum_set = { 'enum'      => 1,
 sub slots {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'slots');
-  if ($$args{'exported?'}) {
-    $$gbl_current_ast_scope{'slots'}{'exported?'} = 1;
+  if ($$args{'is-exported'}) {
+    $$gbl_current_ast_scope{'slots'}{'is-exported'} = 1;
   }
   # slots are always in same module as klass
   $$gbl_current_ast_scope{'slots'}{'module'} = $$gbl_current_ast_scope{'module'};
@@ -887,8 +887,8 @@ sub const {
     $$gbl_current_ast_scope{'const'} = [];
   }
   my $const = {};
-  if ($$args{'exported?'}) {
-    $$const{'exported?'} = 1;
+  if ($$args{'is-exported'}) {
+    $$const{'is-exported'} = 1;
   }
   my $type = [];
   while (';' ne &sst_cursor::current_token($gbl_sst_cursor)) {
@@ -922,8 +922,8 @@ sub enum {
     $$gbl_current_ast_scope{$cat} = [];
   }
   my $enum = {};
-  if ($$args{'exported?'}) {
-    $$enum{'exported?'} = 1;
+  if ($$args{'is-exported'}) {
+    $$enum{'is-exported'} = 1;
   }
   my $type = [];
   while (';' ne &sst_cursor::current_token($gbl_sst_cursor) &&
@@ -1231,7 +1231,7 @@ sub klass {
     $$gbl_root_ast{'klasses'}{$body} = undef;
     &match(__FILE__, __LINE__, ';');
 
-    if ($$args{'exported?'}) {
+    if ($$args{'is-exported'}) {
       $$gbl_root_ast{'exported-klass-decls'}{$body} = {};
       $$gbl_current_ast_scope{'exported-klass-decls'} =
         &deep_copy($$gbl_root_ast{'exported-klass-decls'});
@@ -1246,8 +1246,8 @@ sub klass {
   if (!defined $$gbl_current_ast_scope{'klasses'}{$construct_name}) {
     $$gbl_current_ast_scope{'klasses'}{$construct_name}{'defined?'} = 1;
   }
-  if ($$args{'exported?'}) {
-    $$gbl_current_ast_scope{'klasses'}{$construct_name}{'exported?'} = 1;
+  if ($$args{'is-exported'}) {
+    $$gbl_current_ast_scope{'klasses'}{$construct_name}{'is-exported'} = 1;
   }
   $gbl_current_ast_scope = $$gbl_current_ast_scope{'klasses'}{$construct_name};
   $$gbl_current_ast_scope{'module'} = $gbl_current_module;
@@ -1269,22 +1269,22 @@ sub klass {
         for (&sst_cursor::current_token($gbl_sst_cursor)) {
           if (m/^const$/) {
             if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$') {
-              $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either enums or slots or methods are exported
-              &const({ 'exported?' => 1 });
+              $$gbl_root_ast{'klasses'}{$construct_name}{'is-exported'} = 1; # export klass if either enums or slots or methods are exported
+              &const({ 'is-exported' => 1 });
               last;
             }
           }
           if (m/^enum$/) {
             if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$') {
-              $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either enums or slots or methods are exported
-              &enum({ 'exported?' => 1 });
+              $$gbl_root_ast{'klasses'}{$construct_name}{'is-exported'} = 1; # export klass if either enums or slots or methods are exported
+              &enum({ 'is-exported' => 1 });
               last;
             }
           }
           if (m/^slots$/) {
             if (&sst_cursor::previous_token($gbl_sst_cursor) ne '$') {
-              $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
-              &slots({ 'exported?' => 1 });
+              $$gbl_root_ast{'klasses'}{$construct_name}{'is-exported'} = 1; # export klass if either slots or methods are exported
+              &slots({ 'is-exported' => 1 });
               last;
             }
           }
@@ -1292,9 +1292,9 @@ sub klass {
           # [[sentinel]] method
           # [[alias(...)]] method
           if (m/^method$/) {
-            $$gbl_root_ast{'klasses'}{$construct_name}{'exported?'} = 1; # export klass if either slots or methods are exported
-            $$gbl_root_ast{'klasses'}{$construct_name}{'behavior-exported?'} = 1;
-            &method({ 'exported?' => 1 });
+            $$gbl_root_ast{'klasses'}{$construct_name}{'is-exported'} = 1; # export klass if either slots or methods are exported
+            $$gbl_root_ast{'klasses'}{$construct_name}{'has-exported-behavior'} = 1;
+            &method({ 'is-exported' => 1 });
             last;
           }
         }
@@ -1303,7 +1303,7 @@ sub klass {
       if (m/^slots$/) {
         if (&sst_cursor::next_token($gbl_sst_cursor) !~ /^(\.|->|,|\+)$/) {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) || '{' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
-          &slots({ 'exported?' => $$args{'exported?'} });
+          &slots({ 'is-exported' => $$args{'is-exported'} });
           last;
         }
         }
@@ -1341,7 +1341,7 @@ sub klass {
             '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '}' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             ']' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
-          my $args = { 'exported?' => 0 };
+          my $args = { 'is-exported' => 0 };
           if (0 < @$attrs) {
             $$args{'attrs'} = &deep_copy($attrs);
             $attrs = [];
@@ -1733,8 +1733,8 @@ sub method {
   my ($args) = @_;
   &match(__FILE__, __LINE__, 'method');
   my $method = {};
-  if ($$args{'exported?'}) {
-    $$method{'exported?'} = 1;
+  if ($$args{'is-exported'}) {
+    $$method{'is-exported'} = 1;
   }
   if ($$args{'attrs'}) {
     #print __LINE__ . ": " . &Dumper($$args{'attrs'});
@@ -2132,7 +2132,7 @@ sub generics::_parse { # no longer recursive
   my ($data, $klass_ast) = @_;
   foreach my $method (values %{$$klass_ast{'methods'}}) {
     my $generic = &deep_copy($method);
-    $$generic{'exported?'} = 0;
+    $$generic{'is-exported'} = 0;
     #$$generic{'inline?'} = 1;
 
     #if ($$generic{'alias-dst'}) {
@@ -2238,7 +2238,7 @@ sub parse_root {
           my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
           if ($next_token) {
             if ($next_token =~ m/$id/) {
-              &klass({'exported?' => $exported});
+              &klass({'is-exported' => $exported});
               if ($exported == $exported_single) {
                 $exported = 0;
               }
@@ -2251,7 +2251,7 @@ sub parse_root {
         my $next_token = &sst_cursor::next_token($gbl_sst_cursor);
         if ($next_token) {
           if ($next_token =~ m/$id/) {
-            &trait({'exported?' => $exported});
+            &trait({'is-exported' => $exported});
             if ($exported == $exported_single) {
               $exported = 0;
             }

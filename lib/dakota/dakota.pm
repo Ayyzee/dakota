@@ -262,9 +262,9 @@ sub add_visibility {
         if ($$ast{'klasses'}{$klass_name} &&
             $$ast{'klasses'}{$klass_name}{'slots'} &&
             $$ast{'klasses'}{$klass_name}{'slots'}{'module'} eq $name) {
-          $$ast{'klasses'}{$klass_name}{'slots'}{'exported?'} = 1;
+          $$ast{'klasses'}{$klass_name}{'slots'}{'is-exported'} = 1;
           if ($debug_exported) {
-            $$ast{'klasses'}{$klass_name}{'slots'}{'exported?'} = __FILE__ . '::' . __LINE__;
+            $$ast{'klasses'}{$klass_name}{'slots'}{'is-exported'} = __FILE__ . '::' . __LINE__;
           }
         }
       } elsif ($str =~ /^((klass|trait)\s+)?($rid)$/) {
@@ -274,15 +274,15 @@ sub add_visibility {
         if ($$ast{'klasses'}{$klass_name} &&
             $$ast{'klasses'}{$klass_name}{'module'} &&
             $$ast{'klasses'}{$klass_name}{'module'} eq $name) {
-          $$ast{'klasses'}{$klass_name}{'exported?'} = 1;
+          $$ast{'klasses'}{$klass_name}{'is-exported'} = 1;
           if ($debug_exported) {
-            $$ast{'klasses'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+            $$ast{'klasses'}{$klass_name}{'is-exported'} = __FILE__ . '::' . __LINE__;
           }
         }
         if ($$ast{'traits'}{$klass_name}) {
-          $$ast{'traits'}{$klass_name}{'exported?'} = 1;
+          $$ast{'traits'}{$klass_name}{'is-exported'} = 1;
           if ($debug_exported) {
-            $$ast{'traits'}{$klass_name}{'exported?'} = __FILE__ . '::' . __LINE__;
+            $$ast{'traits'}{$klass_name}{'is-exported'} = __FILE__ . '::' . __LINE__;
           }
         }
       } elsif ($str =~ /^((klass|trait)\s+)?($rid)::($msig)$/) {
@@ -304,9 +304,9 @@ sub add_visibility {
                 if ($sig_min eq $method_name) {
                   if ($debug) { print STDERR "$sig == $method_name\n"; }
                   if ($debug) { print STDERR "$sig_min == $method_name\n"; }
-                  $$scope{'exported?'} = 1;
+                  $$scope{'is-exported'} = 1;
                   if ($debug_exported) {
-                    $$scope{'exported?'} = __FILE__ . '::' . __LINE__; 
+                    $$scope{'is-exported'} = __FILE__ . '::' . __LINE__; 
                   }
                 }
               }
