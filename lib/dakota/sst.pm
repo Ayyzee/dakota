@@ -195,6 +195,8 @@ sub sst::make {
     elsif (m|\G(>>)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(::)|gc)                   { &sst::add_token($sst, $1); }
     elsif (m|\G(##)|gc)                   { &sst::add_token($sst, $1); }
+    elsif (m|\G(\[\[)|gc)                 { &sst::add_token($sst, $1); }
+    elsif (m|\G(\]\])|gc)                 { &sst::add_token($sst, $1); }
     elsif (m|\G(#)|gc)                    { &sst::add_token($sst, $1); }
     elsif (m|\G($dqstr)|gc)               { &sst::add_token($sst, $1); }
     elsif (m|\G($sqstr)|gc)               { &sst::add_token($sst, $1); }

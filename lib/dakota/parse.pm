@@ -598,22 +598,19 @@ sub trait {
       # [[export]] method
       # [[sentinel]] method
       # [[alias(...)]] method
-      if (m/^\[$/) {
-        &match(__FILE__, __LINE__, '[');
+      if (m/^\[\[$/) {
+        &match(__FILE__, __LINE__, '[[');
         my $layer = 1;
-        if ('[' ne &sst_cursor::current_token($gbl_sst_cursor)) {
-          last;
-        }
         $attrs = [];
-        &add_last($attrs, '[');
+        &add_last($attrs, '[[');
         while (0 < $layer) {
           my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
           if (0) {
-          } elsif ('[' eq $current_token) {
-            &match(__FILE__, __LINE__, '[');
+          } elsif ('[[' eq $current_token) {
+            &match(__FILE__, __LINE__, '[[');
             $layer++;
-          } elsif (']' eq $current_token) {
-            &match(__FILE__, __LINE__, ']');
+          } elsif (']]' eq $current_token) {
+            &match(__FILE__, __LINE__, ']]');
             die if 0 == $layer;
             $layer--;
           } else {
@@ -627,7 +624,7 @@ sub trait {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '}' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
-            ']' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
+            ']]' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
           my $args = { 'is-exported' => 0 };
           if (0 < @$attrs) {
             $$args{'attrs'} = &deep_copy($attrs);
@@ -1307,22 +1304,19 @@ sub klass {
       # [[export]] method
       # [[sentinel]] method
       # [[alias(...)]] method
-      if (m/^\[$/) {
-        &match(__FILE__, __LINE__, '[');
+      if (m/^\[\[$/) {
+        &match(__FILE__, __LINE__, '[[');
         my $layer = 1;
-        if ('[' ne &sst_cursor::current_token($gbl_sst_cursor)) {
-          last;
-        }
         $attrs = [];
-        &add_last($attrs, '[');
+        &add_last($attrs, '[[');
         while (0 < $layer) {
           my $current_token = &sst_cursor::current_token($gbl_sst_cursor);
           if (0) {
-          } elsif ('[' eq $current_token) {
-            &match(__FILE__, __LINE__, '[');
+          } elsif ('[[' eq $current_token) {
+            &match(__FILE__, __LINE__, '[[');
             $layer++;
-          } elsif (']' eq $current_token) {
-            &match(__FILE__, __LINE__, ']');
+          } elsif (']]' eq $current_token) {
+            &match(__FILE__, __LINE__, ']]');
             die if 0 == $layer;
             $layer--;
           } else {
@@ -1336,7 +1330,7 @@ sub klass {
         if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '{' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
             '}' eq &sst_cursor::previous_token($gbl_sst_cursor) ||
-            ']' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
+            ']]' eq &sst_cursor::previous_token($gbl_sst_cursor)) { # stmt-boundry
           my $args = { 'is-exported' => 0 };
           if (0 < @$attrs) {
             $$args{'attrs'} = &deep_copy($attrs);
