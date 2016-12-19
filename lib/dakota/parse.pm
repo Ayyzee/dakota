@@ -540,10 +540,6 @@ sub match_re {
   }
   return &sst::at($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'} - 1);
 }
-sub exported_header {
-  my $tkn = &match_any();
-  &match(__FILE__, __LINE__, ';');
-}
 sub trait {
   my ($args) = @_;
   my ($body, $seq) = &dkdecl('trait');
