@@ -540,7 +540,7 @@ sub match_re {
   }
   return &sst::at($$gbl_sst_cursor{'sst'}, $$gbl_sst_cursor{'current-token-index'} - 1);
 }
-sub attrs {
+sub match_attrs {
   my ($args) = @_;
   &match(__FILE__, __LINE__, '[[');
   my $layer = 1;
@@ -622,7 +622,7 @@ sub trait {
       # [[sentinel]] method
       # [[alias(...)]] method
       if (m/^\[\[$/) {
-        $attrs = &attrs($args);
+        $attrs = &match_attrs($args);
         last;
       }
       if (m/^method$/) {
@@ -1310,7 +1310,7 @@ sub klass {
       # [[sentinel]] method
       # [[alias(...)]] method
       if (m/^\[\[$/) {
-        $attrs = &attrs($args);
+        $attrs = &match_attrs($args);
         last;
       }
       if (m/^method$/) {
