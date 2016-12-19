@@ -349,11 +349,13 @@ sub create_missing_project {
   } else {
     $project_base = &project_base($inputs);
     if (! &is_exe($root_cmd)) {
-      $$project{'is-lib'} = 1;
       $$project{'target'} = $project_base . ".$so_ext";
     } else {
       $$project{'target'} = $project_base;
     }
+  }
+  if (! &is_exe($root_cmd)) {
+    $$project{'is-lib'} = 1;
   }
   $project_path = $default_project_path;
   if (-e $project_path) {

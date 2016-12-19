@@ -1218,7 +1218,7 @@ sub is_exe {
   if ($$cmd_info{'opts'}{'dynamic'} || $$cmd_info{'opts'}{'shared'}) {
     $is_exe = 0;
   }
-  if (!$project) {
+  if (!$project && $$cmd_info{'opts'}{'project'}) {
     $project = &scalar_from_file($$cmd_info{'opts'}{'project'});
   }
   if (! $is_exe && ! $$project{'is-lib'}) {
