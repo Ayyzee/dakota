@@ -28,6 +28,10 @@ klass size {
     mutable-unbox(self) = slots;
     return self;
   }
+  method compare(slots-t slots, slots-t other) -> cmp-t {
+    cmp-t result = dk-cmp(slots, other);
+    return result;
+  }
 }
 // essentially a signed size-t
 klass ssize {
@@ -39,7 +43,7 @@ klass ssize {
     return self;
   }
   method compare(slots-t slots, slots-t other) -> cmp-t {
-    cmp-t result = slots < other ? -1 : 1;
+    cmp-t result = dk-cmp(slots, other);
     return result;
   }
 }

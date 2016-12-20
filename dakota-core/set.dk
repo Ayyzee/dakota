@@ -61,6 +61,12 @@ trait set {
     $write(out, "}");
     return self;
   }
+  method add!(object-t self, object-t element) -> object-t {
+    if ($in?(self, element))
+      throw $make(exception::klass(), #msg : "element already in set");
+    object-t result = $add(self, element);
+    return result;
+  }
   method forward-iterator(object-t) -> object-t; // hackhack
   method in( object-t self, object-t element, object-t default-element) -> object-t;
   method in( object-t self, object-t element) -> object-t;
