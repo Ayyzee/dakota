@@ -63,7 +63,11 @@ klass str-buffer {
     return s;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
-    cmp-t result = safe-strcmp(s->ptr, other-s->ptr);
+    assert(nullptr != s);
+    assert(nullptr != other-s);
+    cmp-t result = 0;
+    if (s->ptr != other-s->ptr)
+      result = safe-strcmp(s->ptr, other-s->ptr);
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {

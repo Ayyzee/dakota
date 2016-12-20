@@ -41,7 +41,11 @@ klass property {
     return 0;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
-    cmp-t result = symbol::compare(s->key, other-s->key);
+    assert(nullptr != s);
+    assert(nullptr != other-s);
+    cmp-t result = 0;
+    if (s->key != other-s->key)
+      result = symbol::compare(s->key, other-s->key);
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {

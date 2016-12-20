@@ -81,7 +81,9 @@ klass selector-pair {
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
-    cmp-t result = signature::compare(s->key, other-s->key);
+    cmp-t result = 0;
+    if (s->key != other-s->key)
+      result = signature::compare(s->key, other-s->key);
     return result;
   }
 }

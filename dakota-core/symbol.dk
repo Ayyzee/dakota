@@ -58,6 +58,8 @@ klass symbol {
     return result;
   }
   method compare(slots-t s, slots-t other-s) -> cmp-t {
+    assert(nullptr != s);
+    assert(nullptr != other-s);
     cmp-t result = 0;
     if (s != other-s)
       result = dk-cmp(cast(intptr-t)s, cast(intptr-t)other-s);

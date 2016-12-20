@@ -117,8 +117,9 @@ klass named-assoc-node {
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
-    //printf("%s(): %s ?= %s\n", __func__, s, other-s);
-    cmp-t result = symbol::compare(s->name, other-s->name);
+    cmp-t result = 0;
+    if (s != other-s)
+      result = symbol::compare(s->name, other-s->name);
     return result;
   }
 //   method dump(const slots-t* s) -> const slots-t* {

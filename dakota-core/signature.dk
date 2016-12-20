@@ -40,9 +40,10 @@ klass signature {
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(nullptr != s);
     assert(nullptr != other-s);
-    //printf("%s(): %s ?= %s\n", __func__, s, other-s);
-    cmp-t result = safe-strcmp(s->name, other-s->name);
-    if (0 == result)
+    cmp-t result = 0;
+    if (s->name != other-s->name)
+      result = safe-strcmp(s->name, other-s->name);
+    if (0 == result && s->param-types != other-s->param-types)
       result = safe-strcmp(s->param-types, other-s->param-types);
     return result;
   }

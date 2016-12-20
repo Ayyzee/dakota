@@ -110,6 +110,8 @@ klass named-info {
     return s;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
+    assert(nullptr != s);
+    assert(nullptr != other-s);
     cmp-t result = 0;
     if (s != other-s) {
       symbol-t s-name =       cast(symbol-t)at(s,       #name);
