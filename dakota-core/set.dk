@@ -16,6 +16,7 @@
 
 module dakota-core;
 
+klass element-already-present-exception;
 klass exception;
 klass collection; // add()
 klass klass;
@@ -63,7 +64,7 @@ trait set {
   }
   method add!(object-t self, object-t element) -> object-t {
     if ($in?(self, element))
-      throw $make(exception::klass(), #msg : "element already in set");
+      throw $make(element-already-present-exception::klass());
     object-t result = $add(self, element);
     return result;
   }
