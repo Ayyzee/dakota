@@ -58,7 +58,7 @@ klass output-stream {
 # if defined DEBUG
     if (stdout == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stdout\"");
-    else-if (stderr == slots)
+    else if (stderr == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
 # endif // DEBUG
     fnd-int-t rtn = fclose(slots);

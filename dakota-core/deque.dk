@@ -161,7 +161,7 @@ klass deque {
                                char8-t* buf, ssize-t buf-len) -> object-t {
     if (self.first == mn && self.first != nullptr)
       snprintf(buf, cast(size-t)buf-len, "%s", "first     ");
-    else-if (self.last == mn && self.last != nullptr)
+    else if (self.last == mn && self.last != nullptr)
       snprintf(buf, cast(size-t)buf-len, "%s", "last      ");
     else
       snprintf(buf, cast(size-t)buf-len, "%p", cast(ptr-t)mn);

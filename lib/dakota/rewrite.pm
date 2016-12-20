@@ -246,7 +246,7 @@ sub rewrite_catch_block {
       if ($use_catch_macros) {
         $str_out .= "DKT-CATCH($1, _exception_)$4\{ object-t $3 = _exception_;";
       } else {
-        $str_out .= "else-if (\$instance?(_exception_, $1))$4\{ object-t $3 = _exception_;";
+        $str_out .= "else if (\$instance?(_exception_, $1))$4\{ object-t $3 = _exception_;";
       }
     } elsif ($str_in =~ m/\G(.)/gc) {
       $str_out .= $1;

@@ -246,7 +246,7 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
         if (0 == S-ISREG(status.st-mode)) { // NOT a regular file
           fprintf(stderr, "%s:%i: ERROR: %s: not a regular file.\n", __FILE__, __LINE__, file);
         }
-        else-if (0 == (S-IRUSR & status.st-mode)) { // user DOES NOT have read permission
+        else if (0 == (S-IRUSR & status.st-mode)) { // user DOES NOT have read permission
           fprintf(stderr, "%s:%i: ERROR: %s: user does not have read permission.\n", __FILE__, __LINE__, file);
         } else {
           //fprintf(stdout, "%s: IS a regular file AND user DOES have read permission\n", file);
@@ -827,7 +827,7 @@ static func dump?(named-info-t* kls-info, str-t only) -> boole-t {
     if (0 != safe-strcmp(name + name-len - only-len, only))
       result = false;
   }
-  else-if ('-' == only[only-len - 1]) {
+  else if ('-' == only[only-len - 1]) {
     if (0 != safe-strncmp(name, only, cast(size-t)only-len))
       result = false;
   } else {
@@ -1091,10 +1091,10 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
     if (nullptr != ci.slots-type) {
       ostream::println-format(ostrm, "export slots %s;\n", ci.slots-type);
     }
-    else-if (nullptr != ci.slots-info) {
+    else if (nullptr != ci.slots-info) {
         if (nullptr == ci.cat || #struct == ci.cat)
           ostream::println-format(ostrm, "export slots {\n");
-        else-if (ci.enum-base)
+        else if (ci.enum-base)
                   ostream::println-format(ostrm, "export slots %s : %s {\n", ci.cat, ci.enum-base);
         else
           ostream::println-format(ostrm, "export slots %s {\n", ci.cat);

@@ -87,7 +87,7 @@ klass sorted-array {
         should-increment = false;
         u = i;
       }
-      else-if (0 > comparison) {
+      else if (0 > comparison) {
         should-increment = true;
         l = i + 1;
       } else {
