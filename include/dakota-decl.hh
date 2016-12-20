@@ -66,9 +66,11 @@
 
 # if defined _WIN32 || defined _WIN64
   # define so_import ms::dllimport
+//# define so_hidden
   # define so_export ms::dllexport
 # else
   # define so_import
+  # define so_hidden gnu::visibility("hidden")
   # define so_export gnu::visibility("default")
 # endif
 

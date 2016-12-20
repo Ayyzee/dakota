@@ -689,7 +689,7 @@ sub generate_target_runtime {
   #$target_cc_str .= $col . "};" . $nl;
 
   $target_cc_str .=
-    $col . "namespace { struct [[gnu::visibility(\"hidden\")]] __ddl_t {" . &ann(__FILE__, __LINE__) . $nl .
+    $col . "namespace { struct [[so-hidden]] __ddl_t {" . &ann(__FILE__, __LINE__) . $nl .
     $col . "  __ddl_t(const __ddl_t&) = default;" . $nl .
     $col . "  __ddl_t()  { __initial(); }" . $nl .
     $col . "  ~__ddl_t() { __final();   }" . $nl .
