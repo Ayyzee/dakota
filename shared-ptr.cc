@@ -2,56 +2,48 @@
 
 // http://stackoverflow.com/questions/9200664/how-is-the-stdtr1shared-ptr-implemented
 
-# include <chrono>
-# include <iostream>
-# include <memory>
-# include <mutex>
-# include <thread>
+// # include <memory>
+// # include <mutex>
+// # include <thread>
 
-template<typename T> struct shared_ptr {
-  struct aux {
-    unsigned count;
-    aux() : count(1) {}
-    virtual ~aux() {} // must be polymorphic
-    virtual auto destroy() -> void = 0;
-  };
-  template<typename U, typename Deleter> struct auximpl : public aux {
-    U*      p;
-    Deleter d;
-    auximpl(U* pu, Deleter x) : p(pu), d(x) {}
-    virtual auto destroy() -> void { d(p); } 
-  };
-  template<typename U> struct default_deleter { auto operator()(U* p) const -> void { delete p; } };
-  aux* pa;
-  T*   pt;
-  // object_t klass;
-  // boole_t is_weak;
-  auto inc() -> void { if (pa) interloked_inc(pa->count); }
-  auto dec() -> void { 
-    if (pa && !interlocked_dec(pa->count)) {
-      pa->destroy();
-      delete pa;
+# include <cstdio>
+# include <cstdint>
+
+inline auto interlock_incr(int64_t* i) -> int64_t {
+  return __sync_add_and_fetch(i, 1); // gcc/clang specific
+}
+inline auto interlock_decr(int64_t* i) -> int64_t {
+  return __sync_sub_and_fetch(i, 1); // gcc/clang specific
+}
+namespace object { struct slots_t; } using object_t = object::slots_t*;
+namespace object {
+  struct slots_t {
+    object_t klass;
+    int64_t  retain_count;
+  //unsigned weak_retain_count;
+
+    auto incr() -> void {
+      interlock_incr(&this->retain_count);
     }
-  }
-  shared_ptr(const shared_ptr& s) : pa(s.pa), pt(s.pt) { inc(); }
-  shared_ptr() : pa(), pt() {}
-  ~shared_ptr() { dec(); }
-  template<typename U, typename Deleter> shared_ptr(U* pu, Deleter d) : pa(new auximpl<U,Deleter>(pu, d)), pt(pu) {}
-  template<typename U> explicit shared_ptr(U* pu) : pa(new auximpl<U, default_deleter<U> >(pu, default_deleter<U>())), pt(pu) {}
-  template<typename U> shared_ptr(const shared_ptr<U>& s) : pa(s.pa), pt(s.pt) { inc(); }
-  auto operator=(const shared_ptr& s) -> shared_ptr& {
-    if (this != &s) {
-      dec();
-      pa = s.pa;
-      pt = s.pt;
-      inc();
+    auto decr() -> void {
+      if (0 == interlock_decr(&this->retain_count))
+        delete this;
     }
-    return *this;
-  }
-  auto operator->() const -> T* { return  pt; }
-  auto operator*()  const -> T& { return *pt; }
-};
+    auto operator=(const slots_t& s) -> slots_t& {
+      if (this != &s) {
+        decr();
+        this->retain_count = s.retain_count;
+        incr();
+      }
+      return *this;
+    }
+    slots_t(const slots_t& s) : retain_count{s.retain_count} { incr(); }
+    slots_t()                 : retain_count{0}              { incr(); }
+    ~slots_t()                                               { decr(); }
+  };
+}
 auto main() -> int {
+  printf("%zu\n", sizeof(object::slots_t));
   return 0;
 }
 // shared_ptr must manage a reference counter and the carrying of a deleter functor
@@ -76,5 +68,12 @@ auto main() -> int {
 //     explicit constructor (or the default deletor just doing delete p,
 //     where p is the U* above)
 //   - the override of the destroy method, calling the deleter functor.
+
+// Where weak_ptr interoperability is required a second counter
+// (weak_count) is required in aux (will be incremented / decremented by
+// weak_ptr), and delete pa must happen only when both the counters reach
+// zero.
+
+
 
 // clang++ -std=c++14 --warn-everything --warn-no-c++98-compat --warn-no-old-style-cast --output shared-ptr shared-ptr.cc
