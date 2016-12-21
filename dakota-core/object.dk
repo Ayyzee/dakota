@@ -32,7 +32,7 @@ klass unbox-illegal-klass-exception;
 klass object {
   slots {
     object-t klass;
-    int64-t  retain-count;
+    int64-t  count;
   }
   //     klass klass;
 
@@ -99,12 +99,12 @@ klass object {
     return nullptr;
   }
   method retain(object-t self) -> object-t {
-    self->retain-count++;
+    self->count++;
     return self;
   }
   method release(object-t self) -> object-t {
-    self->retain-count--;
-    if (0 == self->retain-count)
+    self->count--;
+    if (0 == self->count)
       self = $dealloc(self);
     return self;
   }
