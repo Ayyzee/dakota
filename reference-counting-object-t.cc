@@ -89,4 +89,4 @@ auto main() -> int {
   tst();
   return 0;
 }
-// clang++ -std=c++14 --warn-everything --warn-no-c++98-compat --warn-no-old-style-cast --warn-no-c99-extensions --debug=3 --output reference-counting-object-t.cc reference-counting-object-t.cc.cc
+// clang++ -std=c++14 --warn-everything --warn-no-c++98-compat --warn-no-old-style-cast --warn-no-c99-extensions --debug=3 --output reference-counting-object-t reference-counting-object-t.cc && ./reference-counting-object-t
