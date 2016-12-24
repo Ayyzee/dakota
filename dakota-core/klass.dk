@@ -344,7 +344,7 @@ klass klass {
     memset(instance, 0, size);
 # endif
     instance->klass = self;
-    instance->retain-count = 1;
+    instance->ref-count = 1;
     return instance;
   }
   method name(object-t self) -> symbol-t {

@@ -19,8 +19,6 @@ export dakota-core {
   addr2name-pair;
   assoc-node::slots-t;
   assoc-node;
-  autorelease-pool-klass;
-  autorelease-pool;
   bit-vector-op::slots-t;
   bit-vector-op;
   bit-vector;

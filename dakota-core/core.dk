@@ -293,7 +293,7 @@ static func alloc-klass(symbol-t name) -> object-t {
     kls->klass = klass::_klass_;
   else
     kls->klass = kls; // klass klass's klass is klass klass
-  kls->retain-count = 1;
+  kls->ref-count = 1;
   return kls;
 }
 static func init-klass(object-t kls, symbol-t name) -> object-t {

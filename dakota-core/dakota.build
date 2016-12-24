@@ -2,7 +2,6 @@
 {
     'builddir' => 'dkt',
     'srcs' => [ # cmd-line
-      '$(srcdir)/autorelease-pool.dk',
       '$(srcdir)/bit-vector.dk',
       '$(srcdir)/boole.dk',
       '$(srcdir)/char.dk',

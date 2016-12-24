@@ -21,7 +21,6 @@
 
 module dakota-core;
 
-klass autorelease-pool;
 klass exception;
 klass hash;
 klass resource-usage;
@@ -32,7 +31,7 @@ klass unbox-illegal-klass-exception;
 klass object {
   slots {
     object-t klass;
-    int64-t  count;
+    int64-t  ref-count;
   }
   //     klass klass;
 
@@ -94,24 +93,8 @@ klass object {
     return nullptr;
   }
   method dealloc(object-t self) -> object-t {
-    $release(klass-of(self));
     dkt::dealloc(self);
     return nullptr;
-  }
-  method retain(object-t self) -> object-t {
-    self->count++;
-    return self;
-  }
-  method release(object-t self) -> object-t {
-    self->count--;
-    if (0 == self->count)
-      self = $dealloc(self);
-    return self;
-  }
-  method autorelease(object-t self) -> object-t {
-    object-t current-pool = $current-pool(autorelease-pool::klass());
-    $add(current-pool, self);
-    return self;
   }
   method hash(object-t self) -> hash-t {
     size-t result = cast(size-t)self;
