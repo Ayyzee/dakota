@@ -28,7 +28,7 @@
 
 # define THROW throw
 
-extern THREAD_LOCAL throw_src_t dkt_throw_src [[so_export]];
+[[so_export]] extern THREAD_LOCAL throw_src_t dkt_throw_src;
 
 KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
   return arg;
@@ -44,27 +44,27 @@ KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t object) -> const slo
   return s;
 }}
 inline FUNC klass_of(object_t object) -> object_t {
-  assert(nullptr != object);
+  assert(object != nullptr);
   return object->klass;
 }
 inline FUNC superklass_of(object_t kls) -> object_t {
-  assert(nullptr != kls);
+  assert(kls != nullptr);
   return klass::unbox(kls).superklass;
 }
 inline FUNC name_of(object_t kls) -> symbol_t {
-  assert(nullptr != kls);
+  assert(kls != nullptr);
   return klass::unbox(kls).name;
 }
 inline FUNC klass_for_name(symbol_t name, object_t kls) -> object_t {
-  assert(nullptr != name);
+  assert(name != nullptr);
   return kls ? kls : dk_klass_for_name(name);
 }
 inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
-  assert(nullptr != kls);
-  assert(nullptr != trait);
-  while (!(nullptr == kls || null == kls)) { // !root-superklass?(kls)
+  assert(kls != nullptr);
+  assert(trait != nullptr);
+  while (!(kls == nullptr || kls == null)) { // !root-superklass?(kls)
     const symbol_t* traits = klass::unbox(kls).traits;
-    while (nullptr != traits && nullptr != *traits) {
+    while (traits != nullptr && *traits != nullptr) {
       if (trait == *traits++) {
         return kls;
       }

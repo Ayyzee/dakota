@@ -22,12 +22,12 @@
 inline FUNC safe_strcmp(str_t s1, str_t s2) -> fnd_int_t {
   fnd_int_t value = 0;
 
-  if (nullptr == s1 || nullptr == s2) {
+  if (s1 == nullptr || s2 == nullptr) {
     if (nullptr == s1 && nullptr == s2)
       value = 0;
-    else if (nullptr == s1)
+    else if (s1 == nullptr)
       value = -1;
-    else if (nullptr == s2)
+    else if (s2 == nullptr)
       value = 1;
   } else {
     value = dkt_normalize_compare_result(strcmp(s1, s2));
@@ -36,12 +36,12 @@ inline FUNC safe_strcmp(str_t s1, str_t s2) -> fnd_int_t {
 }
 inline FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> fnd_int_t {
   str_t s1;
-  if (nullptr == sp1)
+  if (sp1 == nullptr)
     s1 = nullptr;
   else
     s1 = *sp1;
   str_t s2;
-  if (nullptr == sp2)
+  if (sp2 == nullptr)
     s2 = nullptr;
   else
     s2 = *sp2;
@@ -50,12 +50,12 @@ inline FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> fnd_int_t {
 inline FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> fnd_int_t {
   fnd_int_t value = 0;
 
-  if (nullptr == s1 || nullptr == s2) {
-    if (nullptr == s1 && nullptr == s2)
+  if (s1 == nullptr || s2 == nullptr) {
+    if (s1 == nullptr && s2 == nullptr)
       value = 0;
-    else if (nullptr == s1)
+    else if (s1 == nullptr)
       value = -1;
-    else if (nullptr == s2)
+    else if (s2 == nullptr)
       value = 1;
   } else {
     value = dkt_normalize_compare_result(strncmp(s1, s2, n));
@@ -65,7 +65,7 @@ inline FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> fnd_int_t {
 inline FUNC safe_strlen(str_t str) -> size_t {
   size_t len;
 
-  if (nullptr == str)
+  if (str == nullptr)
     len = 0;
   else
     len = strlen(str);

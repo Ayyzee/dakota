@@ -77,7 +77,7 @@ namespace dkt { inline FUNC alloc(ssize_t size) -> ptr_t {
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
   buf = malloc(cast(size_t)size);
 
-  if (nullptr == buf)
+  if (buf == nullptr)
     throw std::bad_alloc();
 # else
   # error DK_MEM_MGMT
@@ -93,7 +93,7 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
   buf = realloc(ptr, cast(size_t)size);
 
-  if (nullptr == buf)
+  if (buf == nullptr)
     throw std::bad_alloc();
 # else
   # error DK_MEM_MGMT

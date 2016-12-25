@@ -61,7 +61,7 @@ KLASS_NS bit_vector {
   METHOD set_bit(object_t, ssize_t, boole_t) -> object_t;
 }
 inline FUNC root_superklassQ(object_t object) -> boole_t {
-  if (nullptr == object || null == object)
+  if (object == nullptr || object == null)
     return true;
   else
     return false;
