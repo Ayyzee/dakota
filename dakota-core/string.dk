@@ -164,7 +164,7 @@ klass string {
     object-t delimiter-object = $make(kls, #bytes : delimiter);
 
     // leading 'delimiter'
-    if (0 == strncmp(self.ptr, delimiter, cast(size-t)delimiter-length)) {
+    if (strncmp(self.ptr, delimiter, cast(size-t)delimiter-length) == 0) {
       $add-last(result, delimiter-object);
       p1 += delimiter-length;
     }

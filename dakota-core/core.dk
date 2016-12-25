@@ -824,14 +824,14 @@ static func dump?(named-info-t* kls-info, str-t only) -> boole-t {
     if (name-len < only-len)
       result = false;
 
-    if (0 != safe-strcmp(name + name-len - only-len, only))
+    if (safe-strcmp(name + name-len - only-len, only) != 0)
       result = false;
   }
   else if ('-' == only[only-len - 1]) {
-    if (0 != safe-strncmp(name, only, cast(size-t)only-len))
+    if (safe-strncmp(name, only, cast(size-t)only-len) != 0)
       result = false;
   } else {
-    if (0 != safe-strcmp(name, only))
+    if (safe-strcmp(name, only) != 0)
       result = false;
   }
   return result;
@@ -1270,7 +1270,7 @@ static func getenv?(str-t name) -> boole-t {
   boole-t value = false;
   str-t value-str = getenv(name);
 
-  if (value-str != nullptr && 0 != safe-strcmp("0", value-str))
+  if (value-str != nullptr && safe-strcmp("0", value-str) != 0)
     value = true;
   return value;
 }
@@ -1493,7 +1493,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     str-t arg-base =  remove-dir(ctlg-arg);
     str-t name-base = remove-dir(name);
 
-    if (ctlg-recursive || (0 == safe-strcmp(arg-base, name-base))) {
+    if (ctlg-recursive || (safe-strcmp(arg-base, name-base) == 0)) {
       dump-include-for-decls(ostrm, registration-info);
       dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only);
       dump-interposers(ostrm, registration-info);

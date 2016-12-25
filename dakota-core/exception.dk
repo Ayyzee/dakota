@@ -146,7 +146,7 @@ klass exception {
     $print-format(out,
                   ", \"exception-type\": \"%s\"",
                   exception-type);
-    if (self.msg && 0 != strcmp(exception-type, self.msg))
+    if (self.msg && strcmp(exception-type, self.msg) != 0)
       $print-format(out,
                     ", \"msg\": \"%s\"",
                     self.msg);
@@ -172,7 +172,7 @@ klass exception {
   fprintf(stderr,
           ", \"exception-type\": \"%s\"",
           type-name);
-  if (msg && 0 != strcmp(type-name, msg))
+  if (msg && strcmp(type-name, msg) != 0)
     fprintf(stderr,
             ", \"msg\": \"%s\"",
             msg);
