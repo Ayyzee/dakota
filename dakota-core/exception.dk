@@ -37,7 +37,7 @@ klass throw-src {
   }
 }
 
-THREAD-LOCAL throw-src-t dkt-throw-src = { nullptr, 0 };
+thread-local throw-src-t dkt-throw-src = { nullptr, 0 };
 
 # if !defined HAVE-GETPROGNAME
 # if defined HAVE-PROCFS
@@ -100,8 +100,8 @@ func getprogname() -> str-t {
 [[noreturn]] static func verbose-terminate()  noexcept -> void;
 [[noreturn]] static func verbose-unexpected() noexcept -> void;
 
-static /*THREAD-LOCAL*/ std::terminate-handler original-terminate =  std::set-terminate(verbose-terminate);
-static /*THREAD-LOCAL*/ std::terminate-handler original-unexpected = std::set-unexpected(verbose-unexpected);
+static /*thread-local*/ std::terminate-handler original-terminate =  std::set-terminate(verbose-terminate);
+static /*thread-local*/ std::terminate-handler original-unexpected = std::set-unexpected(verbose-unexpected);
 
 klass exception {
   superklass object;

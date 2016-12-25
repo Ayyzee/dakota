@@ -28,7 +28,7 @@
 
 # define THROW throw
 
-[[so_export]] extern THREAD_LOCAL throw_src_t dkt_throw_src;
+[[so_export]] extern thread_local throw_src_t dkt_throw_src;
 
 KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
   return arg;

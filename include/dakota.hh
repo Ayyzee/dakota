@@ -110,8 +110,6 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) nullptr
 # endif
 
-# define THREAD_LOCAL __thread // bummer that clang does not support thread-local on darwin
-
 # if defined DEBUG
   # define debug_export so_export
   # define debug_import so_import
@@ -217,9 +215,9 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
 [[so_export]] extern object_t std_output;
 [[so_export]] extern object_t std_error;
 
-[[so_export]] extern THREAD_LOCAL const signature_t* dkt_current_signature;
-[[so_export]] extern THREAD_LOCAL super_t            dkt_null_context;
-[[so_export]] extern THREAD_LOCAL super_t            dkt_current_context;
+[[so_export]] extern thread_local const signature_t* dkt_current_signature;
+[[so_export]] extern thread_local super_t            dkt_null_context;
+[[so_export]] extern thread_local super_t            dkt_current_context;
 
 typealias dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
 typealias dkt_selector_func_t =     FUNC (*)() -> selector_t*;        // rw

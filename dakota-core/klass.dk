@@ -61,9 +61,9 @@ klass std-compare;
 klass symbol;
 klass vector;
 
-THREAD-LOCAL const signature-t* dkt-current-signature;
-THREAD-LOCAL super-t            dkt-current-context;
-THREAD-LOCAL super-t            dkt-null-context;
+thread-local const signature-t* dkt-current-signature;
+thread-local super-t            dkt-current-context;
+thread-local super-t            dkt-null-context;
 
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
   const signature-t* signature = dkt-current-signature;
