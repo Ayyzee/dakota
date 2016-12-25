@@ -45,7 +45,7 @@ klass system-exception {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-error;
     $print(super, out);
     $print-format(out, ": errno=%s (\"%s\")\n",

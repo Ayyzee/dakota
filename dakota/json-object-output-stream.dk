@@ -75,7 +75,7 @@ klass json-object-output-stream {
   }
   method write-element(object-t self, str-t element, str-t key) -> object-t {
     char8-t[128] buffer;
-    if (nullptr != key)
+    if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s\"%s\"%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "\"%s\"%s", element, self.element-delim);
@@ -84,7 +84,7 @@ klass json-object-output-stream {
   }
   method write-element(object-t self, ssize-t element, str-t key) -> object-t {
     char8-t[128] buffer;
-    if (nullptr != key)
+    if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "%zi%s", element, self.element-delim);
@@ -93,7 +93,7 @@ klass json-object-output-stream {
   }
   method write-element(object-t self, size-t element, str-t key) -> object-t {
     char8-t[128] buffer;
-    if (nullptr != key)
+    if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
     else
       snprintf(buffer, sizeof(buffer), "%zi%s", element, self.element-delim);
@@ -102,7 +102,7 @@ klass json-object-output-stream {
   }
   method write-table-start(object-t self, str-t key) -> object-t {
     char8-t[128] buffer;
-    if (nullptr != key)
+    if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-tbl-delim);
     else
       snprintf(buffer, sizeof(buffer), "%s", self.start-tbl-delim);
@@ -119,7 +119,7 @@ klass json-object-output-stream {
   }
   method write-sequence-start(object-t self, str-t key) -> object-t {
     char8-t[128] buffer;
-    if (nullptr != key)
+    if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-seq-delim);
     else
       snprintf(buffer, sizeof(buffer), "%s", self.start-seq-delim);

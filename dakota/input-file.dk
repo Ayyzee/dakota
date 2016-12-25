@@ -49,17 +49,17 @@ klass input-file {
               stream-t stream : nullptr,
               str-t    file :   nullptr) -> object-t {
     self = $init(super);
-    assert(!(nullptr != stream && nullptr != file)); // these are mutually exclusive
+    assert(!(stream != nullptr && file != nullptr)); // these are mutually exclusive
     assert(stdout != stream);
     assert(stderr != stream);
 
-    if (nullptr == stream && nullptr == file)
+    if (stream == nullptr && file == nullptr)
       stream = stdin; // default
 
-    if (nullptr != file) {
+    if (file != nullptr) {
       stream = fopen(file, "r");
 
-      if (nullptr == stream)
+      if (stream == nullptr)
         throw $make(system-exception::klass(), #errnum : errno);
     }
     self.file = file; // copycopy: should make a copy?
@@ -74,7 +74,7 @@ klass input-file {
 
     // check for embedded NUL?
 
-    if (nullptr != file)
+    if (file != nullptr)
       fclose(stream);
     else
       fsetpos(stream, &fpos);
@@ -122,7 +122,7 @@ klass input-file {
   method split(object-t self, type-func-t type?) -> object-t {
     object-t result = $make(vector::klass());
 
-    if (nullptr == type?)
+    if (type? == nullptr)
       type? = space?;
     
     char8-t c = NUL;
@@ -136,7 +136,7 @@ klass input-file {
         ws-buf[ws-buf-pos] = NUL;
       }
     # endif
-      if (NUL == c)
+      if (c == NUL)
         return result;
       $put-char8(self, c);
 
@@ -150,7 +150,7 @@ klass input-file {
       object-t t = $make(token::klass(), #line : self.line, #column : self.column, #buffer : buf);
       $add-last(result, t);
 
-      if (NUL == c)
+      if (c == NUL)
         return result;
     }
     return result;

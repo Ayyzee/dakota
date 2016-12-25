@@ -36,7 +36,7 @@ klass object-output-stream {
   }
   method init(object-t self, stream-t stream : stdout) -> object-t {
     self = $init(super, #slots : stream);
-    assert(nullptr != stream);
+    assert(stream != nullptr);
 //     equal-t equals? = cast(equal-t)$method-for-selector(object::_klass_,
 //                                                         selector(equals?(object-t, object-t));
 //     compare-t compare = cast(compare-t)$method-for-selector(object::_klass_,
@@ -68,7 +68,7 @@ klass object-output-stream {
       $add(self.objects, object); // only grows, never shrinks
       object-t id = $at(self.id-from-object, object, cast(object-t)nullptr);
 
-      if (nullptr == id) {
+      if (id == nullptr) {
         id = int64::box(self.id);
         $add(self.id-from-object, object, id);
         self.id++;
@@ -93,7 +93,7 @@ klass object-output-stream {
     // bugbug: key == nullptr is valid
     object-t id = $at(self.id-from-object, object, cast(object-t)nullptr);
     
-    if (nullptr == id) {
+    if (id == nullptr) {
       id = int64::box(self.id);
       $add(self.id-from-object, object, id);
       self.id++;

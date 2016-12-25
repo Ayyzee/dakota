@@ -36,20 +36,20 @@ klass property {
     return self;
   }
   method check(const slots-t* s) -> ssize-t {
-    if (nullptr == s->key)
+    if (s->key == nullptr)
       std::abort();
     return 0;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
-    assert(nullptr != s);
-    assert(nullptr != other-s);
+    assert(s != nullptr);
+    assert(other-s != nullptr);
     cmp-t result = 0;
     if (s->key != other-s->key)
       result = symbol::compare(s->key, other-s->key);
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))

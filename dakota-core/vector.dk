@@ -110,10 +110,10 @@ klass vector {
     for (ssize-t index = 0; index < self.capacity; index++)
       self.elements[index] = self.fill-element;
 
-    if (nullptr != elements)
+    if (elements != nullptr)
       $add-all(self, elements);
 
-    if (nullptr != objects)
+    if (objects != nullptr)
       $add-objects(self, objects);
     return self;
   }
@@ -243,8 +243,8 @@ klass vector {
     object-t element = default-result;
     if (self.count > index) {
       element = self.elements[index];
-      if (nullptr != default-result)
-        assert(nullptr != element);
+      if (default-result != nullptr)
+        assert(element != nullptr);
     }
     return element;
   }
@@ -256,7 +256,7 @@ klass vector {
   }
   method at(object-t self, ssize-t index) -> object-t {
     object-t element = $at(self, index, cast(object-t)nullptr);
-    if (nullptr == element)
+    if (element == nullptr)
       throw $make(exception::klass(), #msg : "oops");
     return element;
   }
@@ -281,7 +281,7 @@ klass vector {
     return self.count;
   }
   method add-first(object-t self, object-t element) -> object-t {
-    assert(nullptr != element);
+    assert(element != nullptr);
 
     if (self.count == self.capacity) {
       self.capacity *= $resize-factor(klass-of(self));
@@ -296,7 +296,7 @@ klass vector {
   //     method add-at(object-t self, object-t element, ssize-t index) -> object-t;
 
   [[alias(add,push)]] method add-last(object-t self, object-t element) -> object-t {
-    assert(nullptr != element);
+    assert(element != nullptr);
 
     if (self.count == self.capacity) {
       self.capacity *= $resize-factor(klass-of(self));
@@ -336,7 +336,7 @@ klass vector {
     //assert(index <= self.count);
     ssize-t result = index;
     if (result < self.count) {
-      while (nullptr == self.elements[result]) {
+      while (self.elements[result] == nullptr) {
         result++;
         if (result == self.count)
           break;
@@ -372,7 +372,7 @@ klass vector-forward-iterator {
   }
   method init(object-t self, object-t vector :) -> object-t {
     self = $init(super);
-    assert(null != vector);
+    assert(vector != null);
     const vector::slots-t& a = vector::unbox(vector);
     self.vector =       vector;
     self.count = a.count;
@@ -395,7 +395,7 @@ klass vector-forward-iterator {
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     boole-t result;
-    if (nullptr != $at(self.vector, self.index, cast(object-t)nullptr))
+    if ($at(self.vector, self.index, cast(object-t)nullptr) != nullptr)
       result = true;
     else
       result = false;
@@ -417,7 +417,7 @@ klass vector-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       element = $at(self.vector, self.index);
-      assert(nullptr != element);
+      assert(element != nullptr);
     }
     return element; // returns nullptr on error
   }

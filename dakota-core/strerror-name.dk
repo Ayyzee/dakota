@@ -29,8 +29,8 @@ static func set-name(fnd-int-t, str-t) -> void;
 
 static func set-name(fnd-int-t errnum, str-t name) -> void {
   assert(0 != errnum);
-  assert(nullptr != name);
-  assert(NUL != name[0]);
+  assert(name != nullptr);
+  assert(name[0] != NUL);
 //   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);
   assert(errnum <= scountof(gbl-sys-err-names));
   if (isdigit(gbl-sys-err-names[errnum][0])) {

@@ -42,12 +42,12 @@ klass open-token {
     return self;
   }
   method set-close-token(object-t self, object-t close-token) -> object-t {
-    assert(null == self.close-token);
+    assert(self.close-token == null);
     self.close-token = close-token;
     return self;
   }
   method close-token(object-t self) -> object-t {
-    assert(null != self.close-token);
+    assert(self.close-token != null);
     return self.close-token;
   }
 }

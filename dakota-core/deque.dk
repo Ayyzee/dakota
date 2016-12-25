@@ -36,7 +36,7 @@ klass node {
     return node;
   }
   static func dump-prev(const slots-t* s, ssize-t iterator-state) -> void {
-    if (nullptr != s) {
+    if (s != nullptr) {
       // fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
       //         "<tr><td port=\"element\">element</td></tr>"
       //         "<tr><td port=\"prev\">prev</td></tr>"
@@ -49,7 +49,7 @@ klass node {
       //         cast(ptr-t)(s), iterator-state,
       //         cast(ptr-t)(s->element), iterator-state);
 
-      if (nullptr != s->prev)
+      if (s->prev != nullptr)
         fprintf(stderr, "    \"%p-%zi\" -> \"%p-%zi\":prev [ dir = back ];\n",
                 cast(ptr-t)(s->prev), iterator-state, cast(ptr-t)(s), iterator-state);
       else {
@@ -58,13 +58,13 @@ klass node {
         fprintf(stderr, "    \"%p-%zi-prev-nullptr\" -> \"%p-%zi\":prev [ dir = back ];\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
       }
-      if (nullptr != s->prev)
+      if (s->prev != nullptr)
         dump-prev(s->prev, iterator-state);
     }
     return;
   }
   static func dump-next(const slots-t* s, ssize-t iterator-state) -> void {
-    if (nullptr != s) {
+    if (s != nullptr) {
       fprintf(stderr, "    \"%p-%zi\" [ label = < <table>"
               "<tr><td port=\"element\">element</td></tr>"
               "<tr><td port=\"prev\">prev</td></tr>"
@@ -76,7 +76,7 @@ klass node {
       fprintf(stderr, "    \"%p-%zi\":element -> \"%p-%zi\";\n",
               cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->element), iterator-state);
 
-      if (nullptr != s->next)
+      if (s->next != nullptr)
         fprintf(stderr, "    \"%p-%zi\":next -> \"%p-%zi\";\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s->next), iterator-state);
       else {
@@ -85,7 +85,7 @@ klass node {
         fprintf(stderr, "    \"%p-%zi\":next -> \"%p-%zi-next-nullptr\";\n",
                 cast(ptr-t)(s), iterator-state, cast(ptr-t)(s), iterator-state);
       }
-      if (nullptr != s->next)
+      if (s->next != nullptr)
         dump-next(s->next, iterator-state);
     }
     return;
@@ -96,15 +96,15 @@ klass deque {
   trait      stack;
 
   slots {
-    node::slots-t* first; // if (nullptr != first)  first->prev = nullptr;
-    node::slots-t* last;  // if (nullptr != last)   last->next =  nullptr;
+    node::slots-t* first; // if (first != nullptr)  first->prev = nullptr;
+    node::slots-t* last;  // if (last != nullptr)   last->next =  nullptr;
     ssize-t        size;
 
     ssize-t        iterator-state;
   }
   method test-dump(object-t self) -> object-t {
     const slots-t& s = unbox(self);
-    // if (nullptr != &s) {
+    // if (&s != nullptr) {
       fprintf(stderr, "  subgraph \"cluster-%p-%zi\"\n", cast(ptr-t)(&s), s.iterator-state);
       fprintf(stderr, "  {\n");
 
@@ -117,7 +117,7 @@ klass deque {
               "<tr><td port=\"last\">last</td></tr>"
               "<tr><td port=\"size\">size=%zi</td></tr>"
               "</table> > ];\n", cast(ptr-t)(&s), s.iterator-state, s.size);
-      if (nullptr == s.first && nullptr == s.last) {
+      if (s.first == nullptr && s.last == nullptr) {
         fprintf(stderr, "    \"%p-%zi-nullptr\" [ label = \"nullptr\" ];\n",
                 cast(ptr-t)(&s), s.iterator-state);
         fprintf(stderr, "    \"%p-%zi\":first -> \"%p-%zi-nullptr\";\n",
@@ -142,7 +142,7 @@ klass deque {
   method init(object-t self, object-t element : nullptr) -> object-t {
     self = $init(super);
 
-    if (nullptr == element) {
+    if (element == nullptr) {
       self.first = nullptr;
       self.last =  nullptr;
       self.size =  0;
@@ -179,7 +179,7 @@ klass deque {
     node::slots-t* last =  self.last;
     char8-t[16] buf = "";
 
-    if (nullptr == first) {
+    if (first == nullptr) {
       fprintf(stdout, " %p", cast(ptr-t)first);
       fprintf(stdout, "\n");
     } else {
@@ -190,7 +190,7 @@ klass deque {
       fprintf(stdout, " %s", buf);
       fprintf(stdout, "\n");
     }
-    if (nullptr == last) {
+    if (last == nullptr) {
       fprintf(stdout, " %p\n", cast(ptr-t)last);
     } else {
       deque::string-from-node(self, last->prev, buf, ssizeof(buf));
@@ -230,7 +230,7 @@ klass deque {
     return null;
   }
   method add-first(object-t self, object-t element) -> object-t {
-    assert(nullptr != element);
+    assert(element != nullptr);
     node::slots-t* node = node::create(nullptr, element, self.first); // self.first may be nullptr
     // node->prev = nullptr;
     // node->next = self.first;
@@ -240,14 +240,14 @@ klass deque {
     return self;
   }
   [[alias(add,push)]] method add-last(object-t self, object-t element) -> object-t {
-    assert(nullptr != element);
+    assert(element != nullptr);
     node::slots-t* node = node::create(self.last, element, nullptr); // self.last may be nullptr
-    if (nullptr != self.last)
+    if (self.last != nullptr)
       self.last->next = node;
 
     self.last = node;
 
-    if (nullptr == self.first)
+    if (self.first == nullptr)
       self.first = self.last;
 
     self.size++;
@@ -257,34 +257,34 @@ klass deque {
   }
   method first(object-t self) -> object-t {
     assert(0 != self.size);
-    //assert(nullptr != self.first);
+    //assert(self.first != nullptr);
     object-t element = nullptr;
-    if (nullptr != self.first)
+    if (self.first != nullptr)
       element = self.first->element;
     return element;
   }
   [[alias(top)]] method last(object-t self) -> object-t {
     assert(0 != self.size);
-    //assert(nullptr != self.last);
+    //assert(self.last != nullptr);
     object-t element = nullptr;
-    if (nullptr != self.last)
+    if (self.last != nullptr)
       element = self.last->element;
     return element;
   }
   method remove-first(object-t self) -> object-t {
     assert(0 != self.size);
-    assert(nullptr != self.first);
+    assert(self.first != nullptr);
     object-t element = nullptr;
 
     if (self.last == self.first) {
       self.last = nullptr;
     }
-    //if (nullptr != self.first)
+    //if (self.first != nullptr)
     {
       node::slots-t* node = self.first;
       self.first = self.first->next;
 
-      if (nullptr != self.first)
+      if (self.first != nullptr)
         self.first->prev = nullptr;
 # if 0
       else {
@@ -300,11 +300,11 @@ klass deque {
   }
   [[alias(pop)]] method remove-last(object-t self) -> object-t {
     assert(0 != self.size);
-    //assert(nullptr != self.last);
+    //assert(self.last != nullptr);
     node::slots-t* node = self.last;
     self.last = self.last->prev;
 
-    if (nullptr != self.last)
+    if (self.last != nullptr)
       self.last->next = nullptr;
 
     node->prev = nullptr;
@@ -327,7 +327,7 @@ klass deque {
     return forward-iterator;
   }
   // method write-element(object-t self, object-t out, str-t name) -> object-t {
-  //   if (null == out)
+  //   if (out == null)
   //     { out = std-output; } // wrong! should be system::object-out
   //   char8-t[128] buffer;
   //   snprintf(buffer, sizeof(buffer), "<sequence name=\"%s\" size=\"%u\">", name, self.size);
@@ -339,7 +339,7 @@ klass deque {
       
   //     do {
   // 	$write-element-idref(out, node->element);
-  //     } while (nullptr != (node = node->next));
+  //     } while ((node = node->next) != nullptr);
   //   }
   //   $decrement-column(out);
   //   snprintf(buffer, sizeof(buffer), "</sequence>");
@@ -375,12 +375,12 @@ klass deque-forward-iterator {
   }
   method remove(object-t self) -> object-t {
     check-iterator-state(self);
-    //assert(nullptr != self.node);
+    //assert(self.node != nullptr);
     node::slots-t* node = self.node;
 
-    if (nullptr != self.node->prev)
+    if (self.node->prev != nullptr)
       self.node->prev->next = self.node->next;
-    if (nullptr != self.node->next)
+    if (self.node->next != nullptr)
       self.node->next->prev = self.node->prev;
     node->prev = nullptr; // gc help
     node->next = nullptr; // gc help
@@ -397,14 +397,14 @@ klass deque-forward-iterator {
   }
   // method last?(object-t self) -> boole-t {
   //   deque::slots-t& d = deque::unbox(self.deque);
-  //   boole-t state = (null == d.next);
+  //   boole-t state = (d.next == null);
 
   //   return state;
   // }
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     boole-t result;
-    if (nullptr != self.node)
+    if (self.node != nullptr)
       result = true;
     else
       result = false;
@@ -426,7 +426,7 @@ klass deque-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       element = self.node->element;
-      assert(nullptr != element);
+      assert(element != nullptr);
     }
     return element; // returns nullptr on error
   }

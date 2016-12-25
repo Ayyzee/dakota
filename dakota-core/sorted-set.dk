@@ -60,10 +60,10 @@ klass sorted-set {
                          is-ptr = true);
     self.iterator-state = 0;
 
-    if (nullptr != elements)
+    if (elements != nullptr)
       $add-all(self, elements);
 
-    if (nullptr != objects)
+    if (objects != nullptr)
       $add-objects(self, objects);
     return self;
   }
@@ -77,7 +77,7 @@ klass sorted-set {
     self.iterator-state++;
     result-t found-result = sorted-array::search(&self.sa, element);
 
-    if (nullptr == found-result.element)
+    if (found-result.element == nullptr)
       sorted-array::add-at(&self.sa, element, found-result.offset);
     else
       result = cast(object-t)found-result.element;
@@ -92,19 +92,19 @@ klass sorted-set {
     object-t result = default-result;
     result-t found-result = sorted-array::search(&self.sa, element);
 
-    if (nullptr != found-result.element)
+    if (found-result.element != nullptr)
       result = cast(object-t)sorted-array::at(&self.sa, found-result.offset);
     return result;
   }
   method in(object-t self, object-t element) -> object-t {
     object-t result = $in(self, element, cast(object-t)nullptr);
-    if (nullptr == result)
+    if (result == nullptr)
       throw $make(exception::klass(), #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
     boole-t state = false;
-    if (nullptr != $in(self, element, cast(object-t)nullptr))
+    if ($in(self, element, cast(object-t)nullptr) != nullptr)
       state = true;
     return state;
   }
@@ -118,7 +118,7 @@ klass sorted-set {
     result-t found-result = sorted-array::search(&self.sa, element);
     object-t prev-element = nullptr;
 
-    if (nullptr != found-result.element) {
+    if (found-result.element != nullptr) {
       self.iterator-state++;
       // element not required
       prev-element = cast(object-t)sorted-array::remove-at(&self.sa, element, found-result.offset);
@@ -223,7 +223,7 @@ klass sorted-set-forward-iterator {
     if ($next?(self)) {
       const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
       element = cast(object-t)sorted-array::at(&ss.sa, self.offset);
-      assert(nullptr != element);
+      assert(element != nullptr);
     }
     return element; // returns nullptr on error
   }

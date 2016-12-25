@@ -58,15 +58,15 @@ klass symbol {
     return result;
   }
   method compare(slots-t s, slots-t other-s) -> cmp-t {
-    assert(nullptr != s);
-    assert(nullptr != other-s);
+    assert(s != nullptr);
+    assert(other-s != nullptr);
     cmp-t result = 0;
     if (s != other-s)
       result = dk-cmp(cast(intptr-t)s, cast(intptr-t)other-s);
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))

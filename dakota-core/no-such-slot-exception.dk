@@ -41,7 +41,7 @@ klass no-such-slot-exception {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-error;
     $print(super, out);
 

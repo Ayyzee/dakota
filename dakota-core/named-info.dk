@@ -72,19 +72,19 @@ klass named-info {
   method at(const slots-t* s, symbol-t key) -> intptr-t {
     intptr-t element = cast(intptr-t)nullptr;
     property::slots-t* property = search(s, key);
-    if (nullptr != property)
+    if (property != nullptr)
       element = property->element;
     return element;
   }
   method at(const slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
     intptr-t element = at(s, key);
-    if (cast(intptr-t)nullptr == element) // nullptr (i.e. zero) must be illegal for this to work
+    if (element == cast(intptr-t)nullptr) // nullptr (i.e. zero) must be illegal for this to work
       element = default-element;
     return element;
   }
   method dump(const slots-t* s) -> const slots-t* {
     const slots-t* current = s;
-    while (nullptr != current) {
+    while (current != nullptr) {
       printf("{\n");
       for (int64-t i = 0; i < current->count; i++) {
         symbol-t key = current->elements[i].key;
@@ -110,8 +110,8 @@ klass named-info {
     return s;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
-    assert(nullptr != s);
-    assert(nullptr != other-s);
+    assert(s != nullptr);
+    assert(other-s != nullptr);
     cmp-t result = 0;
     if (s != other-s) {
       symbol-t s-name =       cast(symbol-t)at(s,       #name);
@@ -121,7 +121,7 @@ klass named-info {
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))
@@ -133,7 +133,7 @@ klass named-info {
   }
 }
 func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
-//   assert(nullptr != name);
+//   assert(name != nullptr);
   symbol-t key;
   intptr-t element;
 
@@ -146,7 +146,7 @@ func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t*
   count++;
 
   // symbol-t, intptr-t, <repeat>
-  while (nullptr != (key = va-arg(args, symbol-t))) {
+  while ((key = va-arg(args, symbol-t)) != nullptr) {
     element = va-arg(args, intptr-t);
     if (props-capacity == count + 1) {
       props-capacity *= 2;

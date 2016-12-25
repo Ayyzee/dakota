@@ -50,7 +50,7 @@ klass object {
     return self;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other)
       result = dk-cmp(cast(intptr-t)self, cast(intptr-t)other);
@@ -117,14 +117,14 @@ klass object {
     return cast(str-t)(buffer);
   }
   method print(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-output;
     str-t str = $str(self);
     $print(out, str);
     return self;
   }
   method println(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-output;
     $print(self, out);
     $print(out, "\n");
@@ -135,8 +135,8 @@ func dkt-dump(object-t object) -> object-t {
   return $dump(object);
 }
 func dkt-unbox-check(object-t object, object-t kls) -> void {
-  assert(nullptr != object);
-  assert(nullptr != kls);
+  assert(object != nullptr);
+  assert(kls != nullptr);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
                         __func__, cast(ptr-t)(object), $name(kls));
   unless (object::instance?(object, kls)) {

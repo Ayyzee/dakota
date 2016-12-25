@@ -57,7 +57,7 @@ trait counted-set {
       $write(out, delim);
       $write-lite(first, out); // must be primitive type
       $write(out, ":");
-      if (nullptr == last || null == last)
+      if (last == nullptr || last == null)
         $write(out, "null");
       else
         $write-lite(last, out);
@@ -74,7 +74,7 @@ trait counted-set {
   }
   method at(object-t self, object-t first, object-t default-last) -> object-t {
     object-t last = $in(super, first, cast(object-t)nullptr);
-    if (nullptr == last)
+    if (last == nullptr)
       last = default-last;
     if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
       last = pair::unbox(last).last;

@@ -34,7 +34,7 @@ klass ascii-number-klass {
                        object-t       info :   gbl-base2-ascii-number-kls-info,
                        str-t digits : "01") -> object-t {
     self = $init(super, #info : info);
-    assert(nullptr != digits);
+    assert(digits != nullptr);
     self.digits = digits;
     // should confirm the digits are unique
     return self;

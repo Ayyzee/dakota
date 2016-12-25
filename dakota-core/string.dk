@@ -47,8 +47,8 @@ klass string {
               ssize-t  length :   cast(ssize-t)safe-strlen(bytes) - start) -> object-t {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = $init(super);
-    assert(nullptr != bytes);
-    assert(nullptr != encoding);
+    assert(bytes != nullptr);
+    assert(encoding != nullptr);
     assert(start <= length);
     USE(encoding);
     self.encoding = encoding;
@@ -65,8 +65,8 @@ klass string {
   }
   method length(object-t self) -> ssize-t {
     if (0       == self.len &&
-        nullptr != self.ptr &&
-        NUL     != self.ptr[0])
+        self.ptr != nullptr &&
+        self.ptr[0] != NUL)
       self.len = cast(ssize-t)safe-strlen(self.ptr);
     return self.len;
   }
@@ -118,7 +118,7 @@ klass string {
   // [[sentinel]] method va::concat(object-t self, va-list-t args) -> object-t {
   //   // walk twice using va-copy()
   //   str-t str;
-  //   while (nullptr != (str = va-arg(args, decltype(str)))) {
+  //   while ((str = va-arg(args, decltype(str))) != nullptr) {
   //     USE(str);
   //   }
   //   return self;
@@ -128,14 +128,14 @@ klass string {
   //   // walk twice
   //   ssize-t i = 0;
   //   str-t str;
-  //   while (nullptr != (str = strs[i++])) {
+  //   while ((str = strs[i++]) != nullptr) {
   //     USE(str);
   //   }
   //   return self;
   // }
   method append(object-t self, str-t bytes, symbol-t encoding : #utf-8) -> object-t {
-    assert(nullptr != bytes);
-    assert(nullptr != encoding);
+    assert(bytes != nullptr);
+    assert(encoding != nullptr);
     assert(#utf-8 != encoding);
     USE(encoding);
     ssize-t len = cast(ssize-t)safe-strlen(bytes);
@@ -169,14 +169,14 @@ klass string {
       p1 += delimiter-length;
     }
     // 'part' 'delimiter' pairs
-    while (nullptr != (p2 = strstr(p1, delimiter))) {
+    while ((p2 = strstr(p1, delimiter)) != nullptr) {
       object-t part-object = $make(kls, #bytes : cast(str-t)(p1), #length : cast(ssize-t)(p2 - p1));
       $add-last(result, part-object);
       $add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
     }
     // trailing 'part'
-    if (NUL != *p1) {
+    if (*p1 != NUL) {
       object-t part-object = $make(kls, #bytes : p1);
       $add-last(result, part-object);
     }
@@ -197,7 +197,7 @@ klass string {
     return self;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))
@@ -208,13 +208,13 @@ klass string {
     return result;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-output;
     $print(out, $str(self));
     return self;
   }
   method println(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-output;
     $println(out, $str(self));
     return self;

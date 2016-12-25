@@ -58,12 +58,12 @@ klass keyword-exception {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-error;
     $print(super, out);
-    assert(nullptr != self.object);
-    assert(nullptr != self.signature);
-    assert(nullptr != self.keyword);
+    assert(self.object != nullptr);
+    assert(self.signature != nullptr);
+    assert(self.keyword != nullptr);
 
     // if ($instance?(self.object, klass::_klass_)) {
     //   $print-format(out, ", \"instance\": \"%s\"", name-of(self.object));

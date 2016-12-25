@@ -59,10 +59,10 @@ klass lexer {
               str-t    file : nullptr) -> object-t {
     self = $init(super);
 
-    if (nullptr != file) {
+    if (file != nullptr) {
       self.file = file;
       stream = fopen(self.file, "r");
-      if (nullptr == stream) {
+      if (stream == nullptr) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s", buf);
@@ -137,7 +137,7 @@ klass lexer {
   /* method */ inline func get-char8(object-t self) -> char8-t {
     char8-t c = current-char8(self);
     self.current-position++;
-    if (NUL != c) {
+    if (c != NUL) {
       if ('\n' == c) {
         self.previous-column = self.column + 1;
         self.line++;
@@ -155,7 +155,7 @@ klass lexer {
     object-t token;
     object-t leading-ws = $make(vector::klass());
 
-    while (nullptr != (token = $lex(self))) {
+    while ((token = $lex(self)) != nullptr) {
       if (0 == $tokenid(token)) {
         $add-last(leading-ws, token);
       } else {
@@ -860,7 +860,7 @@ klass lexer {
           return token;
         }
         default: {
-          if (NUL == c1)
+          if (c1 == NUL)
             return nullptr;
           char8-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);

@@ -73,7 +73,7 @@ klass token {
     self.line =    line;
     self.column =  column;
     self.tokenid = tokenid;
-    if (nullptr == buffer)
+    if (buffer == nullptr)
       self.buffer[0] = NUL;
     else
       strcpy(self.buffer, buffer);
@@ -99,7 +99,7 @@ klass token {
   }
   method empty?(object-t self) -> boole-t {
     boole-t result = false;
-    if (NUL == self.buffer[0])
+    if (self.buffer[0] == NUL)
       result = true;
     return result;
   }
@@ -127,13 +127,13 @@ klass token {
     return result;
   }
   method set-leading-ws(object-t self, object-t leading-ws) -> object-t {
-    assert(nullptr == self.leading-ws);
+    assert(self.leading-ws == nullptr);
     self.leading-ws = leading-ws;
     return self;
   }
   method leading-ws?(object-t self) -> boole-t {
     boole-t result;
-    if (nullptr == self.leading-ws)
+    if (self.leading-ws == nullptr)
       result = false;
     else
       result = true;
@@ -169,7 +169,7 @@ klass token {
 //     fprintf(stderr, "%p:%p { line=%i, buffer=\"",
 //             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.line);
 
-    for (int64-t i = 0; NUL != self.buffer[i]; i++) {
+    for (int64-t i = 0; self.buffer[i] != NUL; i++) {
       switch (self.buffer[i]) {
         case '\n':
           fprintf(stderr, "\\n");
@@ -193,7 +193,7 @@ klass token {
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-output;
     $print(out, $str(self));
     return self;
@@ -206,7 +206,7 @@ klass token {
     return self;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))

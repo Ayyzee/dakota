@@ -79,8 +79,8 @@ klass selector-pair {
     selector-node-t*   element;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
-    assert(nullptr != s);
-    assert(nullptr != other-s);
+    assert(s != nullptr);
+    assert(other-s != nullptr);
     cmp-t result = 0;
     if (s->key != other-s->key)
       result = signature::compare(s->key, other-s->key);
@@ -118,7 +118,7 @@ static const int64-t selector-count-max = 255;
   return #object;
 }
 static func default-superklass() -> object-t {
-  assert(nullptr != object::_klass_);
+  assert(object::_klass_ != nullptr);
   return object::_klass_;
 }
 static func selector-for-signature(const signature-t* signature) -> selector-t {
@@ -141,15 +141,15 @@ static func method-for-signature(const methods::slots-t* methods, const signatur
     selector-node-t* selector-node = &selector-nodes[i];
     i++;
 
-    assert((nullptr == signature && nullptr == selector-node->ptr) ||
-           (nullptr != signature && nullptr != selector-node->ptr));
-    if (nullptr == signature)
+    assert((signature == nullptr && selector-node->ptr == nullptr) ||
+           (signature != nullptr && selector-node->ptr != nullptr));
+    if (signature == nullptr)
       break;
     selector-pair-t pair = { .key = signature, .element = selector-node };
     result-t found-result = sorted-array::search(&gbl-selectors-table, &pair);
     selector-pair-t* found-pair = cast(decltype(found-pair))found-result.element;
 
-    if (nullptr == found-pair) {
+    if (found-pair == nullptr) {
       *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count); // may be zero
       pair.element->next = nullptr;
       sorted-array::add-at(&gbl-selectors-table, &pair, found-result.offset);
@@ -168,12 +168,12 @@ static func ptr-from-info(named-info-t* info, symbol-t key) -> const void* {
   const void* element = nullptr;
   do {
     element = cast(const void*)named-info::at(current-info, key);
-    assert((nullptr == previous-element && nullptr != element) ||
-           (nullptr != previous-element && nullptr == element) ||
+    assert((previous-element == nullptr && element != nullptr) ||
+           (previous-element != nullptr && element == nullptr) ||
            (previous-element == element));
-    if (nullptr == element && nullptr != previous-element)
+    if (element == nullptr && previous-element != nullptr)
       element = previous-element;
-  } while (nullptr != (current-info = current-info->next));
+  } while ((current-info = current-info->next) != nullptr);
 
   return element;
 }
@@ -190,7 +190,7 @@ static func size-from-info(named-info-t* info, symbol-t key) -> ssize-t {
       element = previous-element;
     else
       previous-element = element;
-  } while (nullptr != (current-info = current-info->next));
+  } while ((current-info = current-info->next) != nullptr);
 
   return element;
 }
@@ -207,22 +207,22 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
 /*LOCAL*/ func superklass-name-from-info(named-info-t* info) -> symbol-t {
   symbol-t superkls-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
 
-  if (nullptr == superkls-name && #object != name-from-info(info))
+  if (superkls-name == nullptr && #object != name-from-info(info))
     superkls-name = default-superklass-name();
   return superkls-name;
 }
 /*LOCAL*/ func superklass-name-from-info(named-info-t* info, symbol-t name) -> symbol-t {
   symbol-t superkls-name = superklass-name-from-info(info);
-  if (nullptr == superkls-name) {
+  if (superkls-name == nullptr) {
     object-t superkls = superklass-from-info(info, name);
     if (!root-superklass?(superkls))
       superkls-name = name-of(superkls);
   }
-  if (nullptr != name) {
+  if (name != nullptr) {
     symbol-t interposer-name = interposer-name-for-klass-name(name);
-    if (nullptr != interposer-name) {
+    if (interposer-name != nullptr) {
 //       fprintf(stderr, "{ name: %s, interposer-name: %s },\n", name, interposer-name);
-      if (nullptr != superkls-name && interposer-name != superkls-name) {
+      if (superkls-name != nullptr && superkls-name != interposer-name) {
 //         fprintf(stderr, "{ interposer-name: %s, superklass-name: %s },\n", interposer-name, superkls-name);
         add-interpose-prop(interposer-name, superkls-name);
         superkls-name = interposer-name;
@@ -238,7 +238,7 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
 /*LOCAL*/ func klass-name-from-info(named-info-t* info) -> symbol-t {
   symbol-t kls-name = cast(symbol-t)ptr-from-info(info, #klass-name);
 
-  if (nullptr == kls-name)
+  if (kls-name == nullptr)
     kls-name = default-klass-name();
   return kls-name;
 }
@@ -262,7 +262,7 @@ inline func round-alignment(size-t n) -> size-t {
     result = 0;
   } else {
     symbol-t superkls-name = superklass-name-from-info(info, name);
-    if (nullptr == superkls-name)
+    if (superkls-name == nullptr)
       superkls-name = default-superklass-name();
     named-info-t* superkls-info = info-for-name(superkls-name);
     ssize-t superkls-offset = offset-from-info(superkls-info); // recursive
@@ -382,7 +382,7 @@ klass klass {
     assert(selector < self.methods.count);
     boole-t result = false;
     method-t m = $method-for-selector(self, selector);
-    if (DKT-NULL-METHOD != m) {
+    if (m != DKT-NULL-METHOD) {
       result = true;
     }
     return result;
@@ -396,7 +396,7 @@ klass klass {
     assert(selector < self.methods.count);
     method-t m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, DKT-NULL-METHOD); // hackhack
-    if (nullptr != self.behavior)
+    if (self.behavior != nullptr)
       bit-vector::set-bit(self.behavior, cast(ssize-t)selector, false);
     return m;
   }
@@ -404,7 +404,7 @@ klass klass {
     assert(selector < self.methods.count);
     method-t prev-m = METHOD-FOR-SELECTOR(&self.methods, selector);
     SET-METHOD-FOR-SELECTOR(&self.methods, selector, m); // hackhack
-    if (nullptr != self.behavior)
+    if (self.behavior != nullptr)
       bit-vector::set-bit(self.behavior, cast(ssize-t)selector, true);
     return prev-m;
   }
@@ -413,7 +413,7 @@ klass klass {
     fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)&unbox(self));
 
     // name
-    if (nullptr != name-of(self))
+    if (name-of(self) != nullptr)
       fprintf(stderr, " name=%p #%s", cast(ptr-t)(name-of(self)), name-of(self));
     else
       fprintf(stderr, " name=%s", #nullptr);
@@ -421,9 +421,9 @@ klass klass {
     // superklass
     if (!root-superklass?(superklass-of(self)))
       fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)superklass-of(self), name-of(superklass-of(self)));
-    else if (null == superklass-of(self))
+    else if (superklass-of(self) == null)
       fprintf(stderr, ", superklass=%p %s", cast(ptr-t)superklass-of(self), #null);
-    else if (nullptr == superklass-of(self))
+    else if (superklass-of(self) == nullptr)
       fprintf(stderr, ", superklass=%s", #nullptr);
 
     // size
@@ -438,12 +438,12 @@ klass klass {
     // traits
     fprintf(stderr, ", traits=["); {
       const symbol-t* traits = self.traits;;
-      if (nullptr != traits) {
+      if (traits != nullptr) {
         fprintf(stderr, " ");
         str-t delim = "";
         ssize-t i = 0;
         symbol-t trait-name;
-        while (nullptr != (trait-name = traits[i++])) {
+        while ((trait-name = traits[i++]) != nullptr) {
           fprintf(stderr, "%s#%s", delim, trait-name);
           delim = ", ";
         }
@@ -454,7 +454,7 @@ klass klass {
     fprintf(stderr, ", behavior=%p", cast(ptr-t)self.behavior);
     fprintf(stderr, " }\n");
     if (0)
-      if (nullptr != self.behavior)
+      if (self.behavior != nullptr)
         $dump(self.behavior);
     return self;
   }
@@ -462,16 +462,16 @@ klass klass {
     object-t seq = $make(vector::klass());
     const symbol-t* traits = self.traits;;
     
-    if (nullptr != traits) {
+    if (traits != nullptr) {
       ssize-t i = 0;
       symbol-t trait-name;
-      while (nullptr != (trait-name = traits[i++]))
+      while ((trait-name = traits[i++]) != nullptr)
         $add-last(seq, symbol::box(trait-name));
     }
     return seq;
   }
   method dump-methods(const slots-t* s) -> ssize-t {
-    if (nullptr != s->behavior)
+    if (s->behavior != nullptr)
       $dump(s->behavior);
     selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
     ssize-t max-width = 0;
@@ -480,7 +480,7 @@ klass klass {
       for (ssize-t index = 0; index < s->methods.count; index++) {
         const signature-t* signature = cast(const signature-t*)selectors[index].key;
         method-t m = method-for-signature(&s->methods, signature);
-        if (nullptr != m) {
+        if (m != nullptr) {
           ssize-t width = cast(ssize-t)safe-strlen(signature->name) + 1 +
                           cast(ssize-t)safe-strlen(signature->param-types) + 1;
           if (width > max-width)
@@ -495,7 +495,7 @@ klass klass {
       const signature-t* signature =  cast(const signature-t*)selectors[index].key;
       method-t m = method-for-signature(&s->methods, signature);
 
-      if (nullptr != m) {
+      if (m != nullptr) {
         fprintf(out, "  '%s(%s)'", signature->name, signature->param-types);
         ssize-t width = cast(ssize-t)safe-strlen(signature->name) + 1 +
                         cast(ssize-t)safe-strlen(signature->param-types) + 1;
@@ -505,7 +505,7 @@ klass klass {
         }
         str-t symbol-name = dso-symbol-name-for-addr(cast(ptr-t)(m));
 
-        if (nullptr != symbol-name) {
+        if (symbol-name != nullptr) {
           str-t demangled-symbol-name = dkt::demangle(symbol-name);
           fprintf(out, " : '%s',", demangled-symbol-name);
           dkt::demangle-free(demangled-symbol-name);
@@ -528,30 +528,30 @@ klass klass {
     do {
       signature-t** method-signatures = cast(signature-t**)named-info::at(current-info, symbol-method-signatures);
       method-t*    method-addresses = cast(method-t*)named-info::at(current-info, symbol-method-addresses);
-      assert((nullptr != method-signatures && nullptr != method-addresses) ||
-             (nullptr == method-signatures && nullptr == method-addresses));
-      if (nullptr != method-signatures) {
+      assert((method-signatures != nullptr && method-addresses != nullptr) ||
+             (method-signatures == nullptr && method-addresses == nullptr));
+      if (method-signatures != nullptr) {
         ssize-t index = 0;
         signature-t* signature;
         method-t   address;
 
         FUNC add-method-and-set-behavior = [&](selector-t _selector, method-t _address) -> method-t {
           method-t prev-address = add-method-for-selector(self, _selector, _address);
-          if (nullptr != self.behavior) {
+          if (self.behavior != nullptr) {
             bit-vector::set-bit(self.behavior, cast(ssize-t)_selector, true); // $set-bit()
           }
           return prev-address;
         };
 
-        while (nullptr != (signature = method-signatures[index])) {
-          if (nullptr != (address = method-addresses[index])) {
+        while ((signature = method-signatures[index]) != nullptr) {
+          if ((address = method-addresses[index]) != nullptr) {
             // can NOT dynamicly dispatch
             selector-t selector = selector-for-signature(signature); // $selector-for-signature()
             if (!should-override) { // don't set if an already valid method is present
               method-t prev-address = method-for-selector(self, selector);
-              if (nullptr == prev-address || cast(method-t)dkt-null-method == prev-address) { // not DKT-NULL-METHOD
+              if (prev-address == nullptr || prev-address == cast(method-t)dkt-null-method) { // not DKT-NULL-METHOD
                 prev-address = add-method-and-set-behavior(selector, address);
-                assert(nullptr == prev-address || cast(method-t)dkt-null-method == prev-address); // not DKT-NULL-METHOD
+                assert(prev-address == nullptr || prev-address == cast(method-t)dkt-null-method); // not DKT-NULL-METHOD
               }
             } else {
               add-method-and-set-behavior(selector, address);
@@ -562,26 +562,26 @@ klass klass {
           index++;
         }
       }
-    } while (nullptr != (current-info = current-info->next));
+    } while ((current-info = current-info->next) != nullptr);
     return;
   }
   static func load-traits(const symbol-t* traits) -> void {
-    if (nullptr == traits || nullptr == traits[0])
+    if (traits == nullptr || traits[0] == nullptr)
       return;
     ssize-t i = 0;
     symbol-t trait-name;
-    while (nullptr != (trait-name = traits[i++])) {
+    while ((trait-name = traits[i++]) != nullptr) {
       named-info-t* trait-info = info-for-name(trait-name);
       load-traits(cast(const symbol-t*)named-info::at(trait-info, #traits));
     }
     return;
   }
   static func add-traits(object-t self, const symbol-t* traits) -> void {
-    if (nullptr == traits || nullptr == traits[0])
+    if (traits == nullptr || traits[0] == nullptr)
       return;
     ssize-t i = 0;
     symbol-t trait-name;
-    while (nullptr != (trait-name = traits[i++])) {
+    while ((trait-name = traits[i++]) != nullptr) {
       named-info-t* trait-info = info-for-name(trait-name);
       add-traits(self, cast(const symbol-t*)named-info::at(trait-info, #traits));
       boole-t should-override;
@@ -591,14 +591,14 @@ klass klass {
     return;
   }
   static func traits-initialize(object-t self, const symbol-t* traits) -> void {
-    if (nullptr == traits || nullptr == traits[0])
+    if (traits == nullptr || traits[0] == nullptr)
       return;
     ssize-t i = 0;
     symbol-t trait-name;
-    while (nullptr != (trait-name = traits[i++])) {
+    while ((trait-name = traits[i++]) != nullptr) {
       named-info-t* trait-info = info-for-name(trait-name);
       initialize-func-t initialize = cast(initialize-func-t)named-info::at(trait-info, #initialize);
-      if (nullptr != initialize) {
+      if (initialize != nullptr) {
         DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
                               "initialize", trait-name, "klass", name-of(self),
                               cast(symbol-t)named-info::at(self.info, #file));
@@ -608,10 +608,10 @@ klass klass {
     return;
   }
   static func klass-initialize(object-t self) -> void {
-    if (nullptr != self.traits)
+    if (self.traits != nullptr)
       traits-initialize(self, self.traits); // calls user code (eventually)
     initialize-func-t initialize = cast(initialize-func-t)named-info::at(self.info, #initialize);
-    if (nullptr != initialize) {
+    if (initialize != nullptr) {
       DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                             "initialize", "klass", name-of(self),
                             cast(symbol-t)named-info::at(self.info, #file));
@@ -620,21 +620,21 @@ klass klass {
     return;
   }
   // func traits-finalize(object-t self, const symbol-t* traits) -> void {
-  //   if (nullptr == traits || nullptr == traits[0])
+  //   if (traits == nullptr || traits[ == nullptr0])
   //     return;
   //   ssize-t i = 0;
   //   symbol-t trait-name;
   //   // finalization must be in the opposite order of initialization
-  //   while (nullptr != traits[i])
+  //   while (traits[i] != nullptr)
   //     i++;
   //   // traits[i] is nullptr here
   //   while (0 < i) {
   //     trait-name = traits[--i];
   //     named-info-t* info = info-for-name(trait-name);
 
-  //     if (nullptr != info) {
+  //     if (info != nullptr) {
   //       method-t trait-finalize = cast(method-t)named-info::at(info, #finalize);
-  //       if (nullptr != trait-finalize) {
+  //       if (trait-finalize != nullptr) {
   //         DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s:%s'],'klass':'%s','file':'%s'",
   //                               "finalize", trait-name, "klass",
   //                               cast(symbol-t)named-info::at(self.info, #name),
@@ -649,7 +649,7 @@ klass klass {
 # if defined DKT-OMIT-BEHAVIOR
     return false;
 # endif
-    assert((nullptr != self.behavior) || (nullptr != unbox(kls).behavior));
+    assert((self.behavior != nullptr) || (unbox(kls).behavior != nullptr));
     boole-t state = $bit-and?(self.behavior, unbox(kls).behavior);
     return state;
   }
@@ -659,7 +659,7 @@ klass klass {
 # endif
     assert(0 < methods-count);
     assert(selector-count-max > methods-count);
-    assert(nullptr == self.behavior);
+    assert(self.behavior == nullptr);
     self.behavior = $make(bit-vector::klass(), #initial-capacity : methods-count);
     return self.behavior;
   }
@@ -667,11 +667,11 @@ klass klass {
 # if defined DKT-OMIT-BEHAVIOR
     return nullptr;
 # endif
-    if (nullptr != self.behavior)
+    if (self.behavior != nullptr)
       return self.behavior;
     self.behavior = behavior(self, selector-count());
     for (ssize-t index = 0; index < self.methods.count; index++)
-      if (DKT-NULL-METHOD != self.methods.addrs[index])
+      if (self.methods.addrs[index] != DKT-NULL-METHOD)
         bit-vector::set-bit(self.behavior, index, true);
     return self.behavior;
   }
@@ -693,7 +693,7 @@ klass klass {
     return;
   }
   static func dump-random(object-t self) -> void {
-    if (nullptr != getenv("DKT_DUMP_RANDOM")) {
+    if (getenv("DKT_DUMP_RANDOM") != nullptr) {
       printf("klass: %s\n", name-of(self));
       for (ssize-t index = 0; index < self.methods.count; index++) {
         printf("method: %p\n", cast(ptr-t)self.methods.addrs[index]);
@@ -703,20 +703,20 @@ klass klass {
   }
   // called from init-klass() from dk-init-runtime()
   /*LOCAL*/ func init(object-t self, named-info-t* info) -> object-t {
-    assert(nullptr != info);
+    assert(info != nullptr);
     named-info::sort(info);
     self.info = info;
     self.name = name-from-info(self.info);
 //     printf("init(): kls-name: %s\n", self.name);
-    assert(nullptr != name-of(self));
+    assert(name-of(self) != nullptr);
     assert(#trait != cast(symbol-t)named-info::at(self.info, #type));
     // fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
     self.offset = offset-from-info(self.info);
     self.size = size-from-info(self.info);
     self.superklass = superklass-from-info(self.info, name-of(self)); // interposing
-    if (nullptr == superklass-of(self)) {
+    if (superklass-of(self) == nullptr) {
       symbol-t superkls-name = superklass-name-from-info(self.info, name-of(self));
-      if (nullptr == superkls-name)
+      if (superkls-name == nullptr)
         self.superklass = default-superklass();
       else
         self.superklass = dk-klass-for-name(superkls-name);
@@ -724,7 +724,7 @@ klass klass {
     self.methods = { .addrs = nullptr, .count = 0 };
     self.behavior = nullptr;
 # if !defined DKT-OMIT-BEHAVIOR
-    if (nullptr != bit-vector::_klass_) // don't change to bit-vector::klass(), it will fail
+    if (bit-vector::_klass_ != nullptr) // don't change to bit-vector::klass(), it will fail
       self.behavior = behavior(self, selector-count());
 # endif
     alloc-methods(self, selector-count());
@@ -733,10 +733,10 @@ klass klass {
     add-methods(self, self.info, #method-signatures, #method-addresses, should-override = true);
     add-methods(self, self.info, #exported-method-signatures, #exported-method-addresses, should-override = true);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info, #method-aliases);
-    if (nullptr != method-aliases) {
+    if (method-aliases != nullptr) {
       ssize-t i = 0;
       const signature-t* method-signature;
-      while (nullptr != (method-signature = method-aliases[i].method-signature)) {
+      while ((method-signature = method-aliases[i].method-signature) != nullptr) {
         const signature-t* alias-signature = method-aliases[i].alias-signature;
         selector-t alias-selector =  selector-for-signature(alias-signature);
         selector-t method-selector = selector-for-signature(method-signature);
@@ -747,7 +747,7 @@ klass klass {
       }
     }
     self.traits = cast(const symbol-t*)named-info::at(self.info, #traits);
-    if (nullptr != self.traits) {
+    if (self.traits != nullptr) {
       load-traits(self.traits);
       add-traits(self, self.traits);
     }
@@ -760,10 +760,10 @@ klass klass {
               named-info-t* info-slots : nullptr,
               object-t      info :       nullptr) -> object-t {
     self = $init(super);
-    assert(!(nullptr == info-slots &&
-             nullptr == info));
+    assert(!(info-slots == nullptr &&
+             info == nullptr));
     named-info-t* tmp-info-slots;
-    if (nullptr == info)
+    if (info == nullptr)
       tmp-info-slots = info-slots;
     else
       tmp-info-slots = &named-info::mutable-unbox(info);

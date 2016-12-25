@@ -64,10 +64,10 @@ klass hashed-set {
 
     self.iterator-state = 0;
 
-    if (nullptr != elements)
+    if (elements != nullptr)
       $add-all(self, elements);
 
-    if (nullptr != objects)
+    if (objects != nullptr)
       $add-objects(self, objects);
     return self;
   }
@@ -76,7 +76,7 @@ klass hashed-set {
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
-    if (nullptr == deque) {
+    if (deque == nullptr) {
       deque = $make(deque::klass());
       self.iterator-state++;
       self.size++; // bugbug - could wrap
@@ -92,7 +92,7 @@ klass hashed-set {
           break;
         }
       }
-      if (nullptr == found-element) {
+      if (found-element == nullptr) {
         self.iterator-state++;
         self.size++; // bugbug - could wrap
         $add-first(deque, element);
@@ -112,7 +112,7 @@ klass hashed-set {
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
-    if (nullptr != deque) {
+    if (deque != nullptr) {
       for (object-t e in deque) {
         if (self.equals?(e, element)) { // arg order matters here!!
           result = e;
@@ -124,13 +124,13 @@ klass hashed-set {
   }
   method in(object-t self, object-t element) -> object-t {
     object-t result = $in(self, element, cast(object-t)nullptr);
-    if (nullptr == result)
+    if (result == nullptr)
       throw $make(exception::klass(), #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
     boole-t state = false;
-    if (nullptr != $in(self, element, cast(object-t)nullptr))
+    if ($in(self, element, cast(object-t)nullptr) != nullptr)
       state = true;
     return state;
   }
@@ -146,7 +146,7 @@ klass hashed-set {
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
 
-    if (nullptr != deque) {
+    if (deque != nullptr) {
       for (object-t forward-iterator = $forward-iterator(deque);
            object-t e = $next(forward-iterator); /**/) {
         //printf("element: %s\n", $name(element));
@@ -222,14 +222,14 @@ klass hashed-set-forward-iterator {
   }
   method init(object-t self, object-t hashed-set :) -> object-t {
     self = $init(super);
-    assert(null != hashed-set);
+    assert(hashed-set != null);
     const hashed-set::slots-t& hs = hashed-set::unbox(hashed-set);
     self.hashed-set = hashed-set;
     self.vector-iter = $forward-iterator(hs.buckets);
     self.iterator-state = hs.iterator-state;
     self.deque-iter = nullptr;
     object-t deque = $next(self.vector-iter);
-    if (nullptr != deque) {
+    if (deque != nullptr) {
       assert(0 != $size(deque));
       self.deque-iter = $forward-iterator(deque);
     }
@@ -238,14 +238,14 @@ klass hashed-set-forward-iterator {
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     boole-t state = false;
-    if (nullptr != self.deque-iter)
+    if (self.deque-iter != nullptr)
       state = $next?(self.deque-iter);
     return state;
   }
   static func next-deque-iterator(object-t vector-iter) -> object-t {
     object-t deque = $next(vector-iter);
     object-t deque-iter = nullptr;
-    if (nullptr != deque) {
+    if (deque != nullptr) {
       assert(0 != $size(deque));
       deque-iter = $forward-iterator(deque);
     }
@@ -256,13 +256,13 @@ klass hashed-set-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       element = $next(self.deque-iter);
-      if (nullptr == element) {
+      if (element == nullptr) {
         self.deque-iter = next-deque-iterator(self.vector-iter);
-        if (nullptr != self.deque-iter)
+        if (self.deque-iter != nullptr)
           element = $next(self.deque-iter); // may return nullptr
       }
-      if (nullptr != element)
-        if (nullptr != self.deque-iter)
+      if (element != nullptr)
+        if (self.deque-iter != nullptr)
           unless ($next?(self.deque-iter))
             self.deque-iter = next-deque-iterator(self.vector-iter); // may return nullptr
     }
@@ -273,7 +273,7 @@ klass hashed-set-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       element = $element(self.deque-iter);
-      assert(nullptr != element);
+      assert(element != nullptr);
     }
     return element; // returns nullptr on error
   }

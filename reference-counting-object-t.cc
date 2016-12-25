@@ -34,6 +34,9 @@ struct object_t {
     }
     return *this;
   }
+  inline auto operator!=(const object_t& rval) -> bool {
+    return this->object != rval.object;
+  }
   inline object_t(const object_t& rval) {
     this->object = rval.object;
     if (nullptr != this->object)
@@ -78,12 +81,17 @@ static auto foo(object_t o1) -> void {
   object_t o2 = o1;
 }
 static auto tst() -> void {
+  object_t n = { nullptr };
   object_t o;
   object_t o1 = make({});
   object_t o2 = o1;
   object_t o3;
   o3 = o1;
   foo(o3);
+  if (n != nullptr)
+    ;
+//   if (nullptr != n)
+//     ;
 }
 auto main() -> int {
   tst();

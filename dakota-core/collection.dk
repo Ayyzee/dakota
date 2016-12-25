@@ -21,7 +21,7 @@ klass std-compare;
 
 // func dk-va-add-all(object-t self, va-list-t args) -> object-t {
 //   object-t element;
-//   while (nullptr != (element = va-arg(args, object-t)))
+//   while ((element = va-arg(args, object-t)) != nullptr)
 //     $add(self, element);
 //   return self;
 // }
@@ -47,9 +47,9 @@ klass collection {
     return self;
   }
   // method add-all(object-t self, const str-t* strings, symbol-t encoding : #utf-8) -> object-t {
-  //   assert(nullptr != strings) -> object-t;
-  //   assert(nullptr != encoding);
-  //   while (nullptr != *strings) // rnielsen: modifying a param - bad practice?
+  //   assert(strings != nullptr) -> object-t;
+  //   assert(encoding != nullptr);
+  //   while (*strings != nullptr) // rnielsen: modifying a param - bad practice?
   //   {
   //     object-t string = $make(string::klass(), #bytes : *strings, #encoding : encoding);
   //     strings++;
@@ -66,7 +66,7 @@ klass collection {
   method add-objects(object-t self, object-t[] objects) -> object-t {
     object-t arg;
     object-t* args = objects;
-    while (nullptr != (arg = *args++))
+    while ((arg = *args++) != nullptr)
       $add(self, arg);
     return self; // nullnull?
   }

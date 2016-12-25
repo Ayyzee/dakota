@@ -56,11 +56,11 @@ klass json-parser {
     assert(!(stdin != stream &&
              nullptr  != file)); // these are mutually exclusive
 
-    if (nullptr != file) {
+    if (file != nullptr) {
       self.file = file;
       self.in =   fopen(self.file, "r");
   
-      if (nullptr == self.in) {
+      if (self.in == nullptr) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s: %s", file, buf);
@@ -210,7 +210,7 @@ klass json-parser {
 
   /* method */ static func key(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
-    if (null == token) {
+    if (token == null) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
@@ -235,7 +235,7 @@ klass json-parser {
   }
   /* method */ static func get-corresponds-to(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
-    if (null == token) {
+    if (token == null) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
@@ -248,7 +248,7 @@ klass json-parser {
   // get table element - element is NOT optional
   /* method */ static func get-element(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
-    if (null == token) {
+    if (token == null) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
@@ -281,7 +281,7 @@ klass json-parser {
   // get vector element - element is optional
   /* method */ static func element(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
-    if (null == token) {
+    if (token == null) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
@@ -315,13 +315,13 @@ klass json-parser {
   }
   /* method */ static func get-table-pair(object-t self) -> object-t {
     object-t key = json-parser::key(self);
-    if (null == key)
+    if (key == null)
       return nullptr;
     object-t corresponds-to = json-parser::get-corresponds-to(self);
-    if (null == corresponds-to)
+    if (corresponds-to == null)
       return nullptr;
     object-t element = json-parser::get-element(self);
-    if (null == element)
+    if (element == null)
       return nullptr;
     return pair::box({key, element});
   }
@@ -331,14 +331,14 @@ klass json-parser {
     object-t token;
     do {
       object-t element = json-parser::element(self);
-      if (null == element)
+      if (element == null)
         return vector;
 
       // add 'element' to 'vector'
       $add-last(vector, element);
 
       token = json-parser::lex(self);
-      if (null == token) {
+      if (token == null) {
         print-error(self.file, self.line, self.column, "incomplete vector\n");
         return null;
       }
@@ -356,14 +356,14 @@ klass json-parser {
     object-t token;
     do {
       object-t table-pair = json-parser::get-table-pair(self);
-      if (nullptr == table-pair)
+      if (table-pair == nullptr)
         return table;
 
       // add 'table-pair' to 'table'
       $add(table, table-pair);
 
       token = json-parser::lex(self);
-      if (null == token) {
+      if (token == null) {
         print-error(self.file, self.line, self.column, "incomplete table\n");
         return null;
       }
@@ -378,13 +378,13 @@ klass json-parser {
     
   //      method read-property-list(object-t self) -> object-t {
   //        object-t token;
-  //        while (null != (token = json-parser::lex(self)))
+  //        while ((token = json-parser::lex(self)) != null)
   //          $token::print(token, stdout);
   //        return null;
   //      }
   method read-property-list(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
-    if (null == token)
+    if (token == null)
       return null;
 
     switch ($tokenid(token)) {

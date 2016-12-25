@@ -41,13 +41,13 @@ klass input-stream {
     mutable-unbox(self) = slots;
     assert(stdout != slots);
 
-    if (nullptr == slots && nullptr == file)
+    if (slots == nullptr && file == nullptr)
       mutable-unbox(self) = stdin; // default
 
-    if (nullptr != file) {
+    if (file != nullptr) {
       mutable-unbox(self) = fopen(file, "r");
 
-      if (nullptr == unbox(self))
+      if (unbox(self) == nullptr)
         throw $make(system-exception::klass(), #errnum : errno);
     }
     return self;

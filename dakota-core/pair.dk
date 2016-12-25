@@ -58,7 +58,7 @@ klass pair {
     return self;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
       object-t first =       self.first;
@@ -67,15 +67,15 @@ klass pair {
         other-first = unbox(other).first;
       else if ($method-for-selector?(klass-of(other), selector(first(object-t))))
         other-first = $first(other);
-      assert(nullptr != first);
-      assert(nullptr != other-first);
+      assert(first != nullptr);
+      assert(other-first != nullptr);
       result = $compare(first, other-first);
     }
     return result;
   }
   method hash(object-t self) -> hash-t {
     object-t first = self.first;
-    assert(nullptr != first);
+    assert(first != nullptr);
     hash-t result = $hash(first);
     return result;
   }

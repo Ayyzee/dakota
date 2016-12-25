@@ -56,7 +56,7 @@ klass sorted-array {
               boole-t       is-ptr) -> slots-t* {
     assert(0 < capacity);
     assert(0 < size);
-    assert(nullptr != compare);
+    assert(compare != nullptr);
     slots-t* slots = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
     create(slots, capacity, size, compare, is-ptr);
     return slots;
@@ -68,7 +68,7 @@ klass sorted-array {
   
   //(-(insertion point) - 1)
   func search(const slots-t* t, const void* key) -> result-t {
-    assert(nullptr != key);
+    assert(key != nullptr);
 
     result-t result = { .element = nullptr, .offset = -1 };
     fnd-int-t comparison;
@@ -95,13 +95,13 @@ klass sorted-array {
         break;
       }
     }
-    if (nullptr == result.element && should-increment)
+    if (result.element == nullptr && should-increment)
       i++;
     result.offset = i;
     return result;
   }
   func add-at(slots-t* t, const void* key, ssize-t offset) -> slots-t* {
-    assert(nullptr != key);
+    assert(key != nullptr);
     assert(0 <= offset);
     assert(offset <= t->count);
 
@@ -126,7 +126,7 @@ klass sorted-array {
   }
   // key not required
   func remove-at(slots-t* t, const void* key, ssize-t offset) -> const void* {
-    assert(nullptr != key);
+    assert(key != nullptr);
     assert(0 <= offset);
     assert(offset < t->count);
     assert(0 < t->count);
@@ -135,26 +135,26 @@ klass sorted-array {
     memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
             cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
             cast(size-t)((t->count - offset - 1) * t->size)); // this arg may be zero
-    if (nullptr != key)
+    if (key != nullptr)
       assert(0 == t->compare(element, key));
     memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, cast(size-t)t->size);
     t->count--;
     return element;
   }
   func add(slots-t* t, const void* key) -> slots-t* {
-    assert(nullptr != key);
+    assert(key != nullptr);
 
     result-t result = search(t, key);
-    if (nullptr == result.element)
+    if (result.element == nullptr)
       add-at(t, key, result.offset);
     return t;
   }
   func intern(slots-t* t, const void* key) -> const void* {
-    assert(nullptr != key);
+    assert(key != nullptr);
     const void* element = key;
     result-t result = search(t, key);
 
-    if (nullptr != result.element)
+    if (result.element != nullptr)
       element = result.element;
     else
       add-at(t, key, result.offset);
@@ -174,7 +174,7 @@ klass sorted-array {
     return element;
   }
   func bsearch(const slots-t* t, const void* key) -> const void* {
-    assert(nullptr != key);
+    assert(key != nullptr);
  
     result-t result = search(t, key);
     return result.element;

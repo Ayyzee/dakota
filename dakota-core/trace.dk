@@ -47,7 +47,7 @@ static func trace-column-out() -> void {
 func dkt-va-trace-before(const signature-t* signature, method-t m, super-t context, va-list-t args) -> fnd-int-t {
   USE(args);
   fnd-int-t result = 0;
-  if (nullptr != getenv("DK_ENABLE_TRACE")) {
+  if (getenv("DK_ENABLE_TRACE") != nullptr) {
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p\n",
                            signature->name, signature->param-types + sizeof("object-t") - 1,
                            cast(ptr-t)(context.object), name-of(klass-of(context.object)),
@@ -60,7 +60,7 @@ func dkt-va-trace-before(const signature-t* signature, method-t m, super-t conte
 func dkt-va-trace-before(const signature-t* signature, method-t m, object-t object, va-list-t args) -> fnd-int-t {
   USE(args);
   fnd-int-t result = 0;
-  if (nullptr != getenv("DK_ENABLE_TRACE")) {
+  if (getenv("DK_ENABLE_TRACE") != nullptr) {
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p\n",
                            signature->name, signature->param-types,
                            cast(ptr-t)(object), name-of(klass-of(object)),
@@ -73,7 +73,7 @@ func dkt-va-trace-after(const signature-t* signature, method-t m, super-t contex
   USE(args);
   trace-column-out();
   fnd-int-t result = 0;
-  if (nullptr != getenv("DK_ENABLE_TRACE"))
+  if (getenv("DK_ENABLE_TRACE") != nullptr)
     result = trace-fprintf(stderr, "dk:%s(super-t%s) ({%p '%s', %p \"%s\"}) method=%p result=???\n",
                            signature->name, signature->param-types + sizeof("object-t") - 1,
                            cast(ptr-t)(context.object), name-of(klass-of(context.object)),
@@ -85,7 +85,7 @@ func dkt-va-trace-after(const signature-t* signature, method-t m, object-t objec
   USE(args);
   trace-column-out();
   fnd-int-t result = 0;
-  if (nullptr != getenv("DK_ENABLE_TRACE"))
+  if (getenv("DK_ENABLE_TRACE") != nullptr)
     result = trace-fprintf(stderr, "dk:%s(%s) (%p '%s') method=%p result=???\n",
                            signature->name, signature->param-types,
                            cast(ptr-t)(object), name-of(klass-of(object)),
@@ -96,7 +96,7 @@ func dkt-trace-before(const signature-t* signature, method-t m, super-t context,
   cmp-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (nullptr != getenv("DK_ENABLE_TRACE"))
+  if (getenv("DK_ENABLE_TRACE") != nullptr)
     result = dkt-va-trace-before(signature, m, context, args);
   va-end(args);
   return result;
@@ -105,7 +105,7 @@ func dkt-trace-before(const signature-t* signature, method-t m, object-t object,
   cmp-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (nullptr != getenv("DK_ENABLE_TRACE"))
+  if (getenv("DK_ENABLE_TRACE") != nullptr)
     result = dkt-va-trace-before(signature, m, object, args);
   va-end(args);
   return result;
@@ -114,7 +114,7 @@ func dkt-trace-after(const signature-t* signature, method-t m, super-t context, 
   cmp-t result = 0;
   va-list-t args;
   va-start(args, context);
-  if (nullptr != getenv("DK_ENABLE_TRACE"))
+  if (getenv("DK_ENABLE_TRACE") != nullptr)
     result = dkt-va-trace-after(signature, m, context, args);
   va-end(args);
   return result;
@@ -123,7 +123,7 @@ func dkt-trace-after(const signature-t* signature, method-t m, object-t object, 
   cmp-t result = 0;
   va-list-t args;
   va-start(args, object);
-  if (nullptr != getenv("DK_ENABLE_TRACE"))
+  if (getenv("DK_ENABLE_TRACE") != nullptr)
     result = dkt-va-trace-after(signature, m, object, args);
   va-end(args);
   return result;

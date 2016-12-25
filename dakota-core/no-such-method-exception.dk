@@ -38,21 +38,21 @@ klass no-such-method-exception {
     if ((!object && !context.object) || (object && context.object))
       std::abort();
     self.context = { nullptr, nullptr };
-    if (nullptr != context.object)
+    if (context.object != nullptr)
       self.context = context;
-    else if (nullptr != object) 
+    else if (object != nullptr) 
       self.context.object = object;
     return self;
   }
   method print(object-t self, object-t out) -> object-t {
-    if (nullptr == out || null == out)
+    if (out == nullptr || out == null)
       out = std-error;
     $print(super, out);
     object-t kls = klass-of(self.context.object);
     if (self.context.klass)
       kls = superklass-of(self.context.klass);
 
-    if (nullptr == self.signature) {
+    if (self.signature == nullptr) {
       if ($instance?(self.context.object, klass::_klass_)) {
         $print-format(out, ", \"instance\": \"%s\", \"klass\": \"%s\"",
                          name-of(self.context.object),

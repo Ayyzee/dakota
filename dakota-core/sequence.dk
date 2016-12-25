@@ -25,7 +25,7 @@ func map(object-t seq, std::function<object-t (object-t)> f) -> object-t {
   object-t result = $make(klass-of(seq));
   for (object-t o in seq) {
     object-t e = f(o);
-    if (nullptr != e)
+    if (e != nullptr)
       $add(result, e);
   }
   return result;
@@ -34,9 +34,9 @@ func map(object-t[] objects, std::function<object-t (object-t)> f) -> object-t {
   object-t result = $make(vector::klass());
   object-t o;
   object-t* args = objects;
-  while (nullptr != (o = *args++)) {
+  while ((o = *args++) != nullptr) {
     object-t e = f(o);
-    if (nullptr != e)
+    if (e != nullptr)
       $add(result, e);
   }
   return result;

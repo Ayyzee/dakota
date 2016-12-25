@@ -38,8 +38,8 @@ klass signature {
     return s;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
-    assert(nullptr != s);
-    assert(nullptr != other-s);
+    assert(s != nullptr);
+    assert(other-s != nullptr);
     cmp-t result = 0;
     if (s->name != other-s->name)
       result = safe-strcmp(s->name, other-s->name);
@@ -48,7 +48,7 @@ klass signature {
     return result;
   }
   method compare(object-t self, object-t other) -> cmp-t {
-    assert(nullptr != other);
+    assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
       if (klass-of(other) == _klass_ || $instance?(other, _klass_))
