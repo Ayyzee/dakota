@@ -26,24 +26,24 @@ struct object_t {
   inline auto operator*() const -> object::slots_t& {
     return *this->object;
   }
-  inline auto operator=(const object_t& rval) -> object_t& {
-    if (this != &rval) {
-      this->object = rval.object;
+  inline auto operator=(const object_t& r) -> object_t& {
+    if (this != &r) {
+      this->object = r.object;
       if (nullptr != this->object)
         incr();
     }
     return *this;
   }
-  inline auto operator!=(const object_t& rval) -> bool {
-    return this->object != rval.object;
+  inline auto operator!=(const object_t& r) -> bool {
+    return this->object != r.object;
   }
-  inline object_t(const object_t& rval) {
-    this->object = rval.object;
+  inline object_t(const object_t& r) {
+    this->object = r.object;
     if (nullptr != this->object)
       incr();
   }
-  inline object_t(object::slots_t* o) {
-    this->object = o;
+  inline object_t(object::slots_t* r) {
+    this->object = r;
     if (nullptr != this->object)
       incr();
   }
