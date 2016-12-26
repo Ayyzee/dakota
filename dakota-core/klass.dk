@@ -681,7 +681,7 @@ klass klass {
     return result;
   }
   static func valid-null?() -> boole-t {
-    return nullptr != null && cast(object-t)-1 != null;
+    return null != nullptr && null != cast(object-t)-1;
   }
   static func set-all-klass-ptrs(object-t self) -> void {
     assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
