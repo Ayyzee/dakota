@@ -97,14 +97,14 @@ klass sorted-set {
     return result;
   }
   method in(object-t self, object-t element) -> object-t {
-    object-t result = $in(self, element, cast(object-t)nullptr);
+    object-t result = $in(self, element, nullptr);
     if (result == nullptr)
       throw $make(exception::klass(), #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
     boole-t state = false;
-    if ($in(self, element, cast(object-t)nullptr) != nullptr)
+    if ($in(self, element, nullptr) != nullptr)
       state = true;
     return state;
   }

@@ -255,7 +255,7 @@ klass vector {
     return result;
   }
   method at(object-t self, ssize-t index) -> object-t {
-    object-t element = $at(self, index, cast(object-t)nullptr);
+    object-t element = $at(self, index, nullptr);
     if (element == nullptr)
       throw $make(exception::klass(), #msg : "oops");
     return element;
@@ -395,7 +395,7 @@ klass vector-forward-iterator {
   method next?(object-t self) -> boole-t {
     check-iterator-state(self);
     boole-t result;
-    if ($at(self.vector, self.index, cast(object-t)nullptr) != nullptr)
+    if ($at(self.vector, self.index, nullptr) != nullptr)
       result = true;
     else
       result = false;

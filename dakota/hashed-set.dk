@@ -74,7 +74,7 @@ klass hashed-set {
   method add(object-t self, object-t element) -> object-t {
     object-t result = element;
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
-    object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
+    object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque == nullptr) {
       deque = $make(deque::klass());
@@ -110,7 +110,7 @@ klass hashed-set {
   method in(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
-    object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
+    object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque != nullptr) {
       for (object-t e in deque) {
@@ -123,14 +123,14 @@ klass hashed-set {
     return result;
   }
   method in(object-t self, object-t element) -> object-t {
-    object-t result = $in(self, element, cast(object-t)nullptr);
+    object-t result = $in(self, element, nullptr);
     if (result == nullptr)
       throw $make(exception::klass(), #msg : "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
     boole-t state = false;
-    if ($in(self, element, cast(object-t)nullptr) != nullptr)
+    if ($in(self, element, nullptr) != nullptr)
       state = true;
     return state;
   }
@@ -144,7 +144,7 @@ klass hashed-set {
     object-t prev-element = nullptr;
 
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
-    object-t deque = $at(self.buckets, index, cast(object-t)nullptr);
+    object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque != nullptr) {
       for (object-t forward-iterator = $forward-iterator(deque);

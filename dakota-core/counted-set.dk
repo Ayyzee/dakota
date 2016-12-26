@@ -73,7 +73,7 @@ trait counted-set {
     return last;
   }
   method at(object-t self, object-t first, object-t default-last) -> object-t {
-    object-t last = $in(super, first, cast(object-t)nullptr);
+    object-t last = $in(super, first, nullptr);
     if (last == nullptr)
       last = default-last;
     if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
@@ -81,7 +81,7 @@ trait counted-set {
     return last;
   }
   method add(object-t self, object-t first) -> object-t {
-    object-t pair = $at(self, first, cast(object-t)nullptr);
+    object-t pair = $at(self, first, nullptr);
     object-t last = pair;
 
     if (pair) {
@@ -105,7 +105,7 @@ trait counted-set {
   }
   method count-at(object-t self, object-t first, ssize-t default-count) -> ssize-t {
     ssize-t count = default-count;
-    object-t last = $at(self, first, cast(object-t)nullptr);
+    object-t last = $at(self, first, nullptr);
 
     if (last) {
       if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))

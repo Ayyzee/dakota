@@ -72,7 +72,7 @@ trait table {
     return last;
   }
   method at(object-t self, object-t first, object-t default-last) -> object-t {
-    object-t last = $in(super, first, cast(object-t)nullptr);
+    object-t last = $in(super, first, nullptr);
     if (last == nullptr)
       last = default-last;
     if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
@@ -80,7 +80,7 @@ trait table {
     return last;
   }
   method add(object-t self, object-t first, object-t last) -> object-t {
-    object-t pair = $at(self, first, cast(object-t)nullptr);
+    object-t pair = $at(self, first, nullptr);
     object-t current-last = pair;
 
     if (pair) {
