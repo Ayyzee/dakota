@@ -2830,9 +2830,6 @@ sub linkage_unit::generate_klasses {
   while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_vars($ast, $col, $klass_path, $klass_name, $max_width, &should_ann($ln, $num_lns));
   }
-  $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots-type-traits" . '-' . &suffix());
-  &linkage_unit::generate_type_traits_checks($ast, $col, $klass_path, $ordered_klass_names);
-
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-klass-funcs-non-inline" . '-' . &suffix());
   while (my ($ln, $klass_name) = each @$sorted_klass_names) { # ok to sort
     &linkage_unit::generate_klasses_klass_funcs_non_inline($ast, $col, $klass_path, $klass_name, $max_width);
@@ -2866,35 +2863,6 @@ sub linkage_unit::generate_klasses_types_before {
         &generate_exported_slots_decls($ast, $col, $klass_path, $klass_name, $klass_ast, $max_width1, $max_width2);
       } else {
         &generate_slots_decls($ast, $col, $klass_path, $klass_name, $klass_ast);
-      }
-    }
-  }
-}
-sub static_assert_check_type_traits {
-  my ($col, $type) = @_;
-  my $outstr = '';
-  if ($should_check_type_traits) {
-    $outstr .= $col . "static-assert(true == std::is-pod            <$type>::value, \"type not pod\");" . $nl;
-    $outstr .= $col . "static-assert(true == std::is-trivial        <$type>::value, \"type not trivial\");" . $nl;
-    $outstr .= $col . "static-assert(true == std::is-standard-layout<$type>::value, \"type not standard-layout\");" . $nl;
-  }
-  return $outstr;
-}
-sub linkage_unit::generate_type_traits_checks {
-  my ($ast, $col, $klass_path, $ordered_klass_names) = @_;
-  my $scratch_str_ref = &global_scratch_str_ref();
-
-  if ($should_check_type_traits && (&is_src_defn() || &is_target_defn())) {
-    $$scratch_str_ref .=
-      $nl .
-      "# include <type_traits>" . $nl .
-      $nl;
-
-    foreach my $klass_name (@$ordered_klass_names) {
-      my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
-
-      if (&has_slots_cat_info($klass_ast)) {
-        $$scratch_str_ref .= &static_assert_check_type_traits($col, "$klass_name\::slots-t");
       }
     }
   }
