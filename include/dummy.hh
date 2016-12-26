@@ -13,7 +13,8 @@ dkt_declare_klass_type_typealias(str,      const char*);
 dkt_declare_klass_type_typealias(symbol,   const char*);
 dkt_declare_klass_type_typealias(uchar8,   unsigned char);
 
-dkt_declare_klass_type_structptr(object);
+KLASS_NS object { struct [[_dkt_typeinfo_]] slots_t; }
+KLASS_NS object { typealias slots_t = struct slots_t; }
 
 dkt_declare_klass_type_struct(klass);
 dkt_declare_klass_type_struct(named_info);
