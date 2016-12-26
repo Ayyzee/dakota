@@ -2411,7 +2411,7 @@ sub convert_to_object_method {
 }
 sub typealias_slots_t {
   my ($klass_name) = @_;
-  my $result;
+  my $result = '';
   if ('object' eq $klass_name) {
     $result = "typealias $klass_name-t = $klass_name\::slots-t*; // special-case"; # special-case
   } else {
