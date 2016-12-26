@@ -1323,11 +1323,11 @@ klass so-symbol-info {
     str-t sname;
   }
 }
-static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
+static func symbol-name-for-addr(ptr-t addr, so-symbol-info::slots-t* info) -> so-symbol-info::slots-t* { // slowslow
   // named-instances
   for (ssize-t i = 0; i < scountof(named-instances); i++) {
     addr2name-pair-t named-instance = named-instances[i];
-    if (named-instance.addr == cast(decltype(named-instance.addr))addr) {
+    if (named-instance.addr == addr) {
         info->fdir =  nullptr; // fixfix
         info->fname = nullptr; // fixfix
         info->sname = named-instance.name;
@@ -1367,7 +1367,7 @@ static func symbol-name-for-addr(object-t addr, so-symbol-info::slots-t* info) -
   } // else {}
   so-symbol-info::slots-t info {};
   // could use dso-symbol-name-for-addr()
-  if (symbol-name-for-addr(cast(object-t)si->si-addr, &info)) {
+  if (symbol-name-for-addr(si->si-addr, &info)) {
     if (info.fname == nullptr) {
       syslog(LOG-ERR, "caught sig%s at named-instance \"%s\" %p\n",
              strsignal-name(sig), info.sname, si->si-addr);
