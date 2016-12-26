@@ -33,13 +33,7 @@ klass object {
     object-t klass;
     int64-t  ref-count;
   }
-  //     klass klass;
 
-  // keep private, or koenig lookup will cause all
-  // hell to break loose :-)
-  // slots-t* unbox(object-t object) { // special-case
-  //   return object;
-  // }
   method write-slots(object-t self, object-t out) -> object-t {
   //$write-slots(super, out);
     $write-slots-start(out, _klass_);

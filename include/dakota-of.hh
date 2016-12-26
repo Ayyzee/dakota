@@ -18,8 +18,6 @@
 
 # include <dakota-decl.hh>
 
-// no generated object::unbox() due to Koenig lookup (AKA: argument dependant lookup)
-
 # if !defined DKT_UNBOX_CHECK_ENABLED || 0 == DKT_UNBOX_CHECK_ENABLED
   # define DKT_UNBOX_CHECK(object, kls)
 # else
