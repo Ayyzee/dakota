@@ -3851,7 +3851,7 @@ sub generate_kw_args_method_defn {
   #$col = &colin($col);
   $$scratch_str_ref .=
     $col . "const $keyword_t* _keyword_;" . $nl .
-    $col . "while (SENTINEL-PTR != (_keyword_ = va-arg(_args_, decltype(_keyword_)))) {" . &ann(__FILE__, __LINE__) . $nl;
+    $col . "while (SENTINEL-PTR != (_keyword_ = va-arg(_args_, $keyword_t*))) {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated." . $nl;
   $col = &colin($col);
@@ -3875,8 +3875,10 @@ sub generate_kw_args_method_defn {
       $$scratch_str_ref .=
         $col . "$kw_arg_name = cast($kw_arg_type)va-arg($$new_arg_names[-1], $promoted_type); // special-case: default argument promotions" . $nl;
     } else {
+      my $kw_arg_type = &arg::type($$kw_arg{'type'});
+      $kw_arg_type =~ s/\[\]$/\*/;
       $$scratch_str_ref .=
-        $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));" . $nl;
+        $col . "$kw_arg_name = va-arg($$new_arg_names[-1], $kw_arg_type);" . $nl;
     }
 
     $$scratch_str_ref .=
