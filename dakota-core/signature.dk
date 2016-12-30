@@ -28,7 +28,7 @@ klass signature {
     str-t param-types;
     str-t return-type; // not considered in compare()
   }
-  method init(object-t self, slots-t slots : {.name = nullptr, .param-types = nullptr, .return-type = nullptr}) -> object-t {
+  method init(object-t self, slots-t slots: {.name = nullptr, .param-types = nullptr, .return-type = nullptr}) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

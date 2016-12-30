@@ -48,18 +48,18 @@ klass hashed-set {
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
   // using compound literals 'objects' can be used as follows:
-  // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
+  // $init(o, #objects: cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t   self,
-              equals-t   equals? : $equals?,
-              ssize-t    initial-capacity : 251, // should be prime
-              object-t   elements : nullptr,
-              object-t[] objects :  nullptr) -> object-t {
+              equals-t   equals?: $equals?,
+              ssize-t    initial-capacity: 251, // should be prime
+              object-t   elements: nullptr,
+              object-t[] objects:  nullptr) -> object-t {
     assert(0 < initial-capacity);
     self = $init(super);
     self.equals? = equals?;
     self.num-buckets = initial-capacity;
-    self.buckets = $make(vector::klass(), #initial-capacity : self.num-buckets, #fill-element : nullptr);
+    self.buckets = $make(vector::klass(), #initial-capacity: self.num-buckets, #fill-element: nullptr);
     self.size = 0;
 
     self.iterator-state = 0;
@@ -125,7 +125,7 @@ klass hashed-set {
   method in(object-t self, object-t element) -> object-t {
     object-t result = $in(self, element, nullptr);
     if (result == nullptr)
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
@@ -178,7 +178,7 @@ klass hashed-set {
     return self.size;
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(hashed-set-forward-iterator::klass(), #hashed-set : self);
+    object-t forward-iterator = $make(hashed-set-forward-iterator::klass(), #hashed-set: self);
     return forward-iterator;
   }
   method dump(object-t self) -> object-t {
@@ -217,10 +217,10 @@ klass hashed-set-forward-iterator {
     const hashed-set::slots-t& hs = hashed-set::unbox(self.hashed-set);
 
     if (self.iterator-state != hs.iterator-state)
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
     return;
   }
-  method init(object-t self, object-t hashed-set :) -> object-t {
+  method init(object-t self, object-t hashed-set:) -> object-t {
     self = $init(super);
     assert(hashed-set != null);
     const hashed-set::slots-t& hs = hashed-set::unbox(hashed-set);

@@ -27,7 +27,7 @@ klass str;
 klass str-compare {
   slots (*)(str-t, str-t) -> cmp-t;
 
-  method init(object-t self, slots-t slots : nullptr) -> object-t {
+  method init(object-t self, slots-t slots: nullptr) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -51,7 +51,7 @@ klass str {
 
   slots const char8-t*;
 
-  method init(object-t self, slots-t slots : "") -> object-t {
+  method init(object-t self, slots-t slots: "") -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

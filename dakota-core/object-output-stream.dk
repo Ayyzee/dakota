@@ -34,8 +34,8 @@ klass object-output-stream {
     int64-t  id;
     object-t id-from-object;        // sorted-table (ptr) key=object, value=id
   }
-  method init(object-t self, stream-t stream : stdout) -> object-t {
-    self = $init(super, #slots : stream);
+  method init(object-t self, stream-t stream: stdout) -> object-t {
+    self = $init(super, #slots: stream);
     assert(stream != nullptr);
 //     equal-t equals? = cast(equal-t)$method-for-selector(object::_klass_,
 //                                                         selector(equals?(object-t, object-t));

@@ -21,11 +21,11 @@
 module dakota-core;
 
 inline func min(ssize-t a, ssize-t b) -> ssize-t {
-  ssize-t r = a < b ? a : b;
+  ssize-t r = a < b ? a: b;
   return r;
 }
 inline func max(ssize-t a, ssize-t b) -> ssize-t {
-  ssize-t r = a > b ? a : b;
+  ssize-t r = a > b ? a: b;
   return r;
 }
 [[unused]] static func host-to-little(uint32-t arg) -> uint32-t {
@@ -72,7 +72,7 @@ klass bit-vector {
   static const ssize-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const ssize-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
 
-  method init(object-t self, ssize-t initial-capacity : gbl-default-initial-capacity) -> object-t {
+  method init(object-t self, ssize-t initial-capacity: gbl-default-initial-capacity) -> object-t {
     self = $init(super);
     if (0 == initial-capacity)
       initial-capacity = gbl-default-initial-capacity;

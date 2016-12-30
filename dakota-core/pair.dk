@@ -34,8 +34,8 @@ klass pair {
   //   klass object-ssize-pair { slots { object-t first; ssize-t last; } }
   
   method init(object-t self,
-              object-t first : null,
-              object-t last :  null) -> object-t {
+              object-t first: null,
+              object-t last:  null) -> object-t {
     self = $init(super);
     self.first = first;
     self.last =  last;

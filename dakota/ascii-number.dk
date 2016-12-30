@@ -91,7 +91,7 @@ klass ascii-number {
     reverse(buffer, offset);
     return;
   }
-  method init(object-t self, ssize-t number : 0) -> object-t {
+  method init(object-t self, ssize-t number: 0) -> object-t {
     self = $init(super);
     self.number = number;
     self.ascii-string = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (32 + 1));

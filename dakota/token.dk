@@ -56,10 +56,10 @@ klass token {
     return self;
   }
   method init(object-t self,
-                       ssize-t        line :    0,
-                       ssize-t        column :  0,
-                       tokenid-t      tokenid : 0,
-                       str-t buffer :  nullptr) -> object-t {
+                       ssize-t        line:    0,
+                       ssize-t        column:  0,
+                       tokenid-t      tokenid: 0,
+                       str-t buffer:  nullptr) -> object-t {
     self = $init(super);
 # if 0
     if (0 != tokenid) {

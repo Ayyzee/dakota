@@ -43,13 +43,13 @@ klass sorted-set {
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
   // using compound literals 'objects' can be used as follows:
-  // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
+  // $init(o, #objects: cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t   self,
-              compare-t  compare :          $compare,
-              ssize-t    initial-capacity : 64,
-              object-t   elements :         nullptr,
-              object-t[] objects :          nullptr) -> object-t {
+              compare-t  compare:          $compare,
+              ssize-t    initial-capacity: 64,
+              object-t   elements:         nullptr,
+              object-t[] objects:          nullptr) -> object-t {
     assert(0 < initial-capacity);
     self = $init(super);
     boole-t is-ptr;
@@ -99,7 +99,7 @@ klass sorted-set {
   method in(object-t self, object-t element) -> object-t {
     object-t result = $in(self, element, nullptr);
     if (result == nullptr)
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> boole-t {
@@ -148,7 +148,7 @@ klass sorted-set {
     return self.sa.count;
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(sorted-set-forward-iterator::klass(), #sorted-set : self);
+    object-t forward-iterator = $make(sorted-set-forward-iterator::klass(), #sorted-set: self);
     return forward-iterator;
   }
   method dump(object-t self) -> object-t {
@@ -182,7 +182,7 @@ klass sorted-set-forward-iterator {
 
     ssize-t  iterator-state;
   }
-  method init(object-t self, object-t sorted-set :) -> object-t {
+  method init(object-t self, object-t sorted-set:) -> object-t {
     self = $init(super);
     assert(klass-of(sorted-set) == sorted-set::_klass_ || $instance?(sorted-set, sorted-set::_klass_));
     const sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
@@ -196,7 +196,7 @@ klass sorted-set-forward-iterator {
 
     if (self.iterator-state != ss.iterator-state) {
       fprintf(stderr, "%zi == %zi\n", self.iterator-state, ss.iterator-state);
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
     }
     return;
   }

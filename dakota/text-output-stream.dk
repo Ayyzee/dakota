@@ -48,8 +48,8 @@ klass text-output-stream {
     "       ",
     "        ",
   };
-  method init(object-t self, stream-t stream : stdout, ssize-t column-width : 2) -> object-t {
-    self = $init(super, #stream : stream);
+  method init(object-t self, stream-t stream: stdout, ssize-t column-width: 2) -> object-t {
+    self = $init(super, #stream: stream);
     self.column = 0;
     if (column-width > scountof(ws))
       column-width = scountof(ws);

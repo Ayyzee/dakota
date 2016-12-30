@@ -26,7 +26,7 @@ static func trace-column-out() -> void {
     gbl-trace-column--;
 }
 [[format-va-printf(2)]] static func trace-vfprintf(stream-t stream, str-t format, va-list-t args) -> fnd-int-t {
-  str-t col = "  "; // two spaces per column :-) [my way]
+  str-t col = "  "; // two spaces per column:-) [my way]
   for (int64-t i = 0; i < gbl-trace-column; i++) {
     if (0 == i)
       fprintf(stream, "%s", col);

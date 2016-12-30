@@ -21,7 +21,7 @@ klass cmp;
 klass std-compare {
   slots (*)(const void*, const void*) -> cmp-t;
 
-  method init(object-t self, slots-t slots : nullptr) -> object-t {
+  method init(object-t self, slots-t slots: nullptr) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

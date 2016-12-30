@@ -24,7 +24,7 @@ klass method-alias {
     const signature-t* method-signature;
   }
 
-  method init(object-t self, slots-t slots : {.alias-signature = nullptr, .method-signature = nullptr}) -> object-t {
+  method init(object-t self, slots-t slots: {.alias-signature = nullptr, .method-signature = nullptr}) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

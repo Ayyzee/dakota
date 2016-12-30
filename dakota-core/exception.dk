@@ -45,7 +45,7 @@ static char8-t[4 * 1024] gbl-buf;
 func getprogname() -> str-t {
   ssize-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
-    throw $make(system-exception::klass(), #errnum : errno);
+    throw $make(system-exception::klass(), #errnum: errno);
   gbl-buf[n] = NUL;
   str-t progname = strrchr(gbl-buf, '/');
   if (progname != nullptr)
@@ -112,9 +112,9 @@ klass exception {
     str-t msg;
   }
   method init(object-t self,
-              str-t    msg :      nullptr,
-              str-t    src-file : nullptr,
-              fnd-int-t    src-line : 0) -> object-t {
+              str-t    msg:      nullptr,
+              str-t    src-file: nullptr,
+              fnd-int-t    src-line: 0) -> object-t {
     self = $init(super);
     self.src-file = src-file;
     self.src-line = src-line;

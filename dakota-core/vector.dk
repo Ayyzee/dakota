@@ -87,13 +87,13 @@ klass vector {
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
   // using compound literals 'objects' can be used as follows:
-  // $init(o, #objects : cast(object-t[]){ o1, o2, nullptr });
+  // $init(o, #objects: cast(object-t[]){ o1, o2, nullptr });
 
   method init(object-t   self,
-              ssize-t    initial-capacity : $initial-capacity(klass-of(self)),
-              object-t   fill-element :     $fill-element(klass-of(self)),
-              object-t   elements :         nullptr,
-              object-t[] objects :          nullptr) -> object-t {
+              ssize-t    initial-capacity: $initial-capacity(klass-of(self)),
+              object-t   fill-element:     $fill-element(klass-of(self)),
+              object-t   elements:         nullptr,
+              object-t[] objects:          nullptr) -> object-t {
     // it IS legal to have the 'fill-element' value be nullptr
     // it is required for the hashed-set implementation
     assert(0 != initial-capacity);
@@ -132,7 +132,7 @@ klass vector {
   }
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
-    object-t copy = $make(kls, #capacity : self.capacity);
+    object-t copy = $make(kls, #capacity: self.capacity);
     const slots-t& s1 = unbox(self);
     slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
@@ -257,7 +257,7 @@ klass vector {
   method at(object-t self, ssize-t index) -> object-t {
     object-t element = $at(self, index, nullptr);
     if (element == nullptr)
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
     return element;
   }
   // should be auto-generated!!!
@@ -268,7 +268,7 @@ klass vector {
   }
   method replace-at(object-t self, ssize-t index, object-t object) -> object-t {
     if (index >= self.capacity)
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
 
     object-t rtn = self.elements[index];
     self.elements[index] = object;
@@ -316,7 +316,7 @@ klass vector {
     return self.elements[self.count - 1];
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(vector-forward-iterator::klass(), #vector : self);
+    object-t forward-iterator = $make(vector-forward-iterator::klass(), #vector: self);
     return forward-iterator;
   }
   method write-slots(object-t self, object-t out) -> object-t {
@@ -367,10 +367,10 @@ klass vector-forward-iterator {
     const vector::slots-t& d = vector::unbox(self.vector);
 
     if (self.iterator-state != d.iterator-state)
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
     return;
   }
-  method init(object-t self, object-t vector :) -> object-t {
+  method init(object-t self, object-t vector:) -> object-t {
     self = $init(super);
     assert(vector != null);
     const vector::slots-t& a = vector::unbox(vector);

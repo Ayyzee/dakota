@@ -139,7 +139,7 @@ klass deque {
     // }
     return self;
   }
-  method init(object-t self, object-t element : nullptr) -> object-t {
+  method init(object-t self, object-t element: nullptr) -> object-t {
     self = $init(super);
 
     if (element == nullptr) {
@@ -204,7 +204,7 @@ klass deque {
   }
   method copy-shallow(object-t self) -> object-t {
     USE(self);
-    throw $make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg: "not yet implemented");
     return null;
   }
   // insert-before
@@ -226,7 +226,7 @@ klass deque {
   }
   method empty(object-t self) -> object-t {
     USE(self);
-    throw $make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg: "not yet implemented");
     return null;
   }
   method add-first(object-t self, object-t element) -> object-t {
@@ -319,11 +319,11 @@ klass deque {
   // reverse in place
   method reverse(object-t self) -> object-t {
     USE(self);
-    throw $make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg: "not yet implemented");
     return null;
   }
   method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(deque-forward-iterator::klass(), #deque : self);
+    object-t forward-iterator = $make(deque-forward-iterator::klass(), #deque: self);
     return forward-iterator;
   }
   // method write-element(object-t self, object-t out, str-t name) -> object-t {
@@ -360,10 +360,10 @@ klass deque-forward-iterator {
     const deque::slots-t& d = deque::unbox(self.deque);
 
     if (self.iterator-state != d.iterator-state)
-      throw $make(exception::klass(), #msg : "oops");
+      throw $make(exception::klass(), #msg: "oops");
     return;
   }
-  method init(object-t self, object-t deque :) -> object-t {
+  method init(object-t self, object-t deque:) -> object-t {
     self = $init(super);
     assert(klass-of(deque) == deque::_klass_ || $instance?(deque, deque::_klass_));
     const deque::slots-t& d = deque::unbox(deque);

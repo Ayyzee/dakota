@@ -19,7 +19,7 @@ module dakota-core;
 klass selector {
   slots ssize-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

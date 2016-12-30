@@ -29,12 +29,12 @@ klass no-such-slot-exception {
     signature-t* signature;
   }
   method init(object-t     self,
-              object-t     object :,
-              symbol-t     name :,
-              signature-t* signature :,
-              str-t        src-file : nullptr,
-              fnd-int-t        src-line : 0) -> object-t {
-    self = $init(super, #src-file : src-file, #src-line : src-line);
+              object-t     object:,
+              symbol-t     name:,
+              signature-t* signature:,
+              str-t        src-file: nullptr,
+              fnd-int-t        src-line: 0) -> object-t {
+    self = $init(super, #src-file: src-file, #src-line: src-line);
     self.object = object;
     self.name = name;
     self.signature = signature;

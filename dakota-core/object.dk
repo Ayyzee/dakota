@@ -83,7 +83,7 @@ klass object {
   }
   method copy(object-t self) -> object-t {
     USE(self);
-    throw $make(exception::klass(), #msg : "not yet implemented");
+    throw $make(exception::klass(), #msg: "not yet implemented");
     return nullptr;
   }
   method dealloc(object-t self) -> object-t {

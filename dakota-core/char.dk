@@ -23,7 +23,7 @@ klass char8 {
   
   slots char8-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -34,7 +34,7 @@ klass uchar8 {
   
   slots uchar8-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -45,7 +45,7 @@ klass schar8 {
   
   slots schar8-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -56,7 +56,7 @@ klass char16 {
   
   slots char16-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -67,7 +67,7 @@ klass char32 {
   
   slots char32-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -78,7 +78,7 @@ klass wchar {
   
   slots wchar-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

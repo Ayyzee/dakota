@@ -319,7 +319,7 @@ klass ostream {
   }
   static func pad(const slots-t& s) -> const slots-t& {
     for (ssize-t i = 0; i < s.col; i++)
-      fprintf(s.output, "  "); // two spaces per column :-) [my way]
+      fprintf(s.output, "  "); // two spaces per column:-) [my way]
     return s;
   }
   [[format-va-printf(2)]] static func println-format(slots-t s, str-t format, va-list-t args) -> slots-t {
@@ -758,9 +758,9 @@ func dk-init-runtime() -> void {
     $behavior(bit-vector::_klass_);
 # endif
 
-    std-input =  $make(input-stream::klass(),  #slots : stdin);
-    std-output = $make(output-stream::klass(), #slots : stdout);
-    std-error =  $make(output-stream::klass(), #slots : stderr);
+    std-input =  $make(input-stream::klass(),  #slots: stdin);
+    std-output = $make(output-stream::klass(), #slots: stdout);
+    std-error =  $make(output-stream::klass(), #slots: stderr);
 
     set-read-write();
     each(gbl-registration-info-list,
@@ -1095,7 +1095,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
         if (ci.cat == nullptr || #struct == ci.cat)
           ostream::println-format(ostrm, "export slots {\n");
         else if (ci.enum-base)
-                  ostream::println-format(ostrm, "export slots %s : %s {\n", ci.cat, ci.enum-base);
+                  ostream::println-format(ostrm, "export slots %s: %s {\n", ci.cat, ci.enum-base);
         else
           ostream::println-format(ostrm, "export slots %s {\n", ci.cat);
         ostream::col-incr(ostrm);
@@ -1608,7 +1608,7 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   if (kls-klass != klass::_klass_ && !klass::subklass?(kls-klass, klass::_klass_)) // hardhard
     throw $make(illegal-klass-exception::klass());
 
-  kls = $make(kls-klass, #info-slots : info-slots);
+  kls = $make(kls-klass, #info-slots: info-slots);
   return kls;
 }
 func dk-klass-for-name(symbol-t name) -> object-t {

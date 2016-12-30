@@ -35,8 +35,8 @@ klass input-stream {
   slots stream-t;
 
   method init(object-t self,
-              slots-t  slots : stdin,
-              str-t    file :  nullptr) -> object-t {
+              slots-t  slots: stdin,
+              str-t    file:  nullptr) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     assert(stdout != slots);
@@ -48,7 +48,7 @@ klass input-stream {
       mutable-unbox(self) = fopen(file, "r");
 
       if (unbox(self) == nullptr)
-        throw $make(system-exception::klass(), #errnum : errno);
+        throw $make(system-exception::klass(), #errnum: errno);
     }
     return self;
   }
@@ -61,7 +61,7 @@ klass input-stream {
     fnd-int-t rtn = fclose(slots);
 
     if (0 != rtn)
-      throw $make(system-exception::klass(), #errnum : errno);
+      throw $make(system-exception::klass(), #errnum: errno);
     return self;
   }
   method read(object-t self,

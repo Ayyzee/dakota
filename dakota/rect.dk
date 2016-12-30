@@ -24,7 +24,7 @@ klass rect {
     point::slots-t     point;
     dimension::slots-t dimension;
   }
-  method init(object-t self, slots-t slots : {{.x = 0, .y = 0}, {.width = 0, .height = 0}}) -> object-t {
+  method init(object-t self, slots-t slots: {{.x = 0, .y = 0}, {.width = 0, .height = 0}}) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

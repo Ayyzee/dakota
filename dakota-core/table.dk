@@ -39,7 +39,7 @@ trait table {
     return result;
   }
   method elements(object-t self) -> object-t {
-    object-t result = $make(vector::klass(), #size : $size(self));
+    object-t result = $make(vector::klass(), #size: $size(self));
     for (pair-t& pair in self) {
       object-t last = pair.last;
       $add-last(result, last);

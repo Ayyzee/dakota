@@ -30,7 +30,7 @@ klass property {
     symbol-t key;
     intptr-t element;
   }
-  method init(object-t self, slots-t slots : {.key = nullptr, .element = 0}) -> object-t {
+  method init(object-t self, slots-t slots: {.key = nullptr, .element = 0}) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

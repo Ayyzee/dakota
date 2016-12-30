@@ -41,10 +41,10 @@ klass string {
   //ssize-t size; // sizeof(ptr[0])
 
   method init(object-t self,
-              symbol-t encoding : #utf-8,
-              str-t    bytes :    "",
-              ssize-t  start :    0,
-              ssize-t  length :   cast(ssize-t)safe-strlen(bytes) - start) -> object-t {
+              symbol-t encoding: #utf-8,
+              str-t    bytes:    "",
+              ssize-t  start:    0,
+              ssize-t  length:   cast(ssize-t)safe-strlen(bytes) - start) -> object-t {
     // bugbug, 0 - 1 = -1 (what if start is >0 and bytes == nullptr)
     self = $init(super);
     assert(bytes != nullptr);
@@ -133,7 +133,7 @@ klass string {
   //   }
   //   return self;
   // }
-  method append(object-t self, str-t bytes, symbol-t encoding : #utf-8) -> object-t {
+  method append(object-t self, str-t bytes, symbol-t encoding: #utf-8) -> object-t {
     assert(bytes != nullptr);
     assert(encoding != nullptr);
     assert(#utf-8 != encoding);
@@ -161,7 +161,7 @@ klass string {
     str-t p2;
 
     object-t kls = klass-of(self);
-    object-t delimiter-object = $make(kls, #bytes : delimiter);
+    object-t delimiter-object = $make(kls, #bytes: delimiter);
 
     // leading 'delimiter'
     if (strncmp(self.ptr, delimiter, cast(size-t)delimiter-length) == 0) {
@@ -170,14 +170,14 @@ klass string {
     }
     // 'part' 'delimiter' pairs
     while ((p2 = strstr(p1, delimiter)) != nullptr) {
-      object-t part-object = $make(kls, #bytes : cast(str-t)(p1), #length : cast(ssize-t)(p2 - p1));
+      object-t part-object = $make(kls, #bytes: cast(str-t)(p1), #length: cast(ssize-t)(p2 - p1));
       $add-last(result, part-object);
       $add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
     }
     // trailing 'part'
     if (*p1 != NUL) {
-      object-t part-object = $make(kls, #bytes : p1);
+      object-t part-object = $make(kls, #bytes: p1);
       $add-last(result, part-object);
     }
     return result;

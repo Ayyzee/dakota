@@ -23,7 +23,7 @@ module dakota-core;
 klass size {
   slots size-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -39,7 +39,7 @@ klass size {
 klass ssize {
   slots ssize-t;
 
-  method init(object-t self, slots-t slots : 0) -> object-t {
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

@@ -26,7 +26,7 @@ klass fnd-double {
   const slots-t min = DBL-MIN;
   const slots-t max = DBL-MAX;
 
-  method init(object-t self, slots-t slots : 0.0) -> object-t {
+  method init(object-t self, slots-t slots: 0.0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -37,7 +37,7 @@ klass float32 {
   
   slots float32-t;
 
-  method init(object-t self, slots-t slots : 0.0) -> object-t {
+  method init(object-t self, slots-t slots: 0.0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -48,7 +48,7 @@ klass float64 {
   
   slots float64-t;
 
-  method init(object-t self, slots-t slots : 0.0) -> object-t {
+  method init(object-t self, slots-t slots: 0.0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -59,7 +59,7 @@ klass float128 {
   
   slots float128-t;
 
-  method init(object-t self, slots-t slots : 0.0) -> object-t {
+  method init(object-t self, slots-t slots: 0.0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

@@ -26,8 +26,8 @@ klass node {
     object-t attrs; // <table>
   }
   method init(object-t self,
-              str-t    name :,
-              object-t attrs : null) -> object-t {
+              str-t    name:,
+              object-t attrs: null) -> object-t {
     self = $init(super);
     return self;
   }
@@ -41,9 +41,9 @@ klass edge {
     object-t attrs;    // <table>
   }
   method init(object-t self,
-              str-t    lhs-name :,
-              str-t    rhs-name :,
-              object-t attrs :    null) -> object-t {
+              str-t    lhs-name:,
+              str-t    rhs-name:,
+              object-t attrs:    null) -> object-t {
     self = $init(super);
     self.lhs-name = lhs-name;
     self.rhs-name = rhs-name;
@@ -55,7 +55,7 @@ klass attrs {
   slots object-t;
 
   method init(object-t self,
-                       object-t attrs :) -> object-t {
+                       object-t attrs:) -> object-t {
     self = $init(super);
     mutable-unbox(self) = attrs;
     return self;
@@ -70,9 +70,9 @@ klass graph {
     object-t stmts; // <sequence>
   }
   method init(object-t self,
-              symbol-t type :  #graph,
-              str-t    name :  nullptr,
-              object-t attrs : null) -> object-t {
+              symbol-t type:  #graph,
+              str-t    name:  nullptr,
+              object-t attrs: null) -> object-t {
     self = $init(super);
     self.type = type;
     self.name = name;

@@ -32,7 +32,7 @@ klass str-buffer {
     ssize-t  len;
     ssize-t  capacity;
   }
-  method init(object-t self, ssize-t capacity : 8) -> object-t {
+  method init(object-t self, ssize-t capacity: 8) -> object-t {
     self = $init(super);
     self.ptr = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * capacity);
     self.ptr[0] = NUL;

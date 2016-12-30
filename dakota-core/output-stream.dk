@@ -36,8 +36,8 @@ klass output-stream {
   slots stream-t;
 
   method init(object-t self,
-              slots-t  slots : stdout,
-              str-t    file :  nullptr) -> object-t {
+              slots-t  slots: stdout,
+              str-t    file:  nullptr) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     assert(stdin != slots);
@@ -49,7 +49,7 @@ klass output-stream {
       mutable-unbox(self) = fopen(file, "w");
 
       if (unbox(self) == nullptr)
-        throw $make(system-exception::klass(), #errnum : errno);
+        throw $make(system-exception::klass(), #errnum: errno);
     }
     return self;
   }
@@ -64,7 +64,7 @@ klass output-stream {
     fnd-int-t rtn = fclose(slots);
 
     if (0 != rtn)
-      throw $make(system-exception::klass(), #errnum : errno);
+      throw $make(system-exception::klass(), #errnum: errno);
     return self;
   }
   // hackhack?  use print below?
@@ -75,7 +75,7 @@ klass output-stream {
   }
   static func pad-to-col(object-t self, ssize-t col) -> object-t {
     for (int64-t i = 0; i < col; i++)
-      $print(self, "  "); // two spaces per column :-) [my way]
+      $print(self, "  "); // two spaces per column:-) [my way]
     return self;
   }
   [[format-va-printf(2)]] method va::print-format(object-t self, str-t format, va-list-t args) -> object-t {

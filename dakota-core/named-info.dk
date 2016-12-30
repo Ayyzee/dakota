@@ -40,7 +40,7 @@ klass named-info {
   //            size = sizeof(property::slots-t)
   //            compare = property::compare()
   }
-  method init(object-t self, slots-t slots : {.next = nullptr, .count = 0, .elements = nullptr}) -> object-t {
+  method init(object-t self, slots-t slots: {.next = nullptr, .count = 0, .elements = nullptr}) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;
@@ -89,7 +89,7 @@ klass named-info {
       for (int64-t i = 0; i < current->count; i++) {
         symbol-t key = current->elements[i].key;
         intptr-t element = current->elements[i].element;
-        printf("  #%s : %p", key, cast(ptr-t)element);
+        printf("  #%s: %p", key, cast(ptr-t)element);
 
         switch (key) {
           case #file:

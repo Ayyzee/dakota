@@ -23,7 +23,7 @@ klass selector-node {
     slots-t*    next;
     selector-t* ptr;
   }
-  method init(object-t self, slots-t slots : {.next = nullptr, .ptr = nullptr}) -> object-t {
+  method init(object-t self, slots-t slots: {.next = nullptr, .ptr = nullptr}) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

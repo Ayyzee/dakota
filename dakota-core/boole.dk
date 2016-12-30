@@ -28,13 +28,13 @@ klass boole-klass {
     return unbox(self)[0]; // return false object by default
   }
 }
-klass boole { // a doubleton :-)
+klass boole { // a doubleton:-)
   superklass number;
   klass      boole-klass;
 
   slots boole-t;
 
-  method init(object-t self, slots-t slots : false) -> object-t {
+  method init(object-t self, slots-t slots: false) -> object-t {
     // intentionally not chaining $init()
     assert(false == unbox(self));
     if (slots)

@@ -68,7 +68,7 @@ thread-local super-t            dkt-null-context;
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
   const signature-t* signature = dkt-current-signature;
   super-t            context =   dkt-current-context;
-  throw $make(no-such-method-exception::klass(), #object : object, #context : context, #signature : signature);
+  throw $make(no-such-method-exception::klass(), #object: object, #context: context, #signature: signature);
 }
 klass selector-pair-compare {
   slots (*)(const selector-pair-t*, const selector-pair-t*) -> cmp-t;
@@ -375,7 +375,7 @@ klass klass {
     return self;
   }
   // method va-method-for-selector(object-t self, selector-t selector) -> va-method-t {
-  //   throw $make(exception::klass(), #msg : "not yet implemented");
+  //   throw $make(exception::klass(), #msg: "not yet implemented");
   //   // return nullptr
   // }
   method method-for-selector?(object-t self, selector-t selector) -> boole-t {
@@ -660,7 +660,7 @@ klass klass {
     assert(0 < methods-count);
     assert(selector-count-max > methods-count);
     assert(self.behavior == nullptr);
-    self.behavior = $make(bit-vector::klass(), #initial-capacity : methods-count);
+    self.behavior = $make(bit-vector::klass(), #initial-capacity: methods-count);
     return self.behavior;
   }
   method behavior(object-t self) -> object-t {
@@ -757,8 +757,8 @@ klass klass {
     return self;
   } // init(object-t self, named-info-t*)
   method init(object-t      self,
-              named-info-t* info-slots : nullptr,
-              object-t      info :       nullptr) -> object-t {
+              named-info-t* info-slots: nullptr,
+              object-t      info:       nullptr) -> object-t {
     self = $init(super);
     assert(!(info-slots == nullptr &&
              info == nullptr));
@@ -783,7 +783,7 @@ klass klass {
     return state;
   }
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
-    return ::klass-with-trait(self, trait);
+    return::klass-with-trait(self, trait);
   }
   method str(object-t self) -> str-t {
     symbol-t name = name-of(self);
