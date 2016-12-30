@@ -26,6 +26,12 @@ MKDIRFLAGS ?= --parents
 
 platform := $(shell source $(rootdir)/common.sh; platform)
 compiler := $(shell source $(rootdir)/common.sh; compiler)
+debugger := gdb
+ifeq ($(compiler), clang)
+  debugger := lldb
+else ifeq ($(compiler), gcc)
+  debugger := gdb
+endif
 
 include $(shell $(rootdir)/bin/dakota-build2mk --output $(builddir)/compiler.mk\
  $(rootdir)/lib/dakota/compiler/command-line.json\
@@ -55,6 +61,12 @@ LD_PRELOAD ?= LD_PRELOAD
 
 EXTRA_CXXFLAGS += --optimize=0 --debug=3 # debug flags
 EXTRA_CXXFLAGS += --define-macro DEBUG   # debug flags
+ifeq ($(debugger), lldb)
+  EXTRA_CXXFLAGS += -dllvm # debug flags
+else ifeq ($(debugger), gdb)
+  EXTRA_CXXFLAGS += -dgdb # debug flags
+endif
+
 #EXTRA_CXXFLAGS += $(CXX_COMPILE_THREAD_FLAGS)
 #EXTRA_CXXFLAGS += -MMD -MP
 
