@@ -29,6 +29,7 @@
   'EXTRA_CXXFLAGS' => [
     '--warn-everything',
     '--warn-no-class-varargs',
+    '--warn-non-pod-varargs', # must follow --warn-no-class-varargs
     '--warn-no-c++98-compat',
     '--warn-no-c++98-compat-pedantic',
     '--warn-no-c99-extensions', # c99 designated initializers, c99 compound literals
