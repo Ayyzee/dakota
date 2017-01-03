@@ -170,7 +170,7 @@ klass string {
     }
     // 'part' 'delimiter' pairs
     while ((p2 = strstr(p1, delimiter)) != nullptr) {
-      object-t part-object = $make(kls, #bytes: cast(str-t)(p1), #length: cast(ssize-t)(p2 - p1));
+      object-t part-object = $make(kls, #bytes: cast(str-t)p1, #length: cast(ssize-t)(p2 - p1));
       $add-last(result, part-object);
       $add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;
@@ -191,7 +191,7 @@ klass string {
       str-t str = $str(element);
       ssize-t length = cast(ssize-t)safe-strlen(str);
       self.len += cast(ssize-t)(length);
-      self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * ssizeof(char8-t)), self.ptr);
+      self.ptr = cast(char8-t*)dkt::alloc(((self.len + 1) * ssizeof(char8-t)), self.ptr);
       strcat(self.ptr, str);
     }
     return self;
@@ -207,22 +207,22 @@ klass string {
     }
     return result;
   }
+  method print(object-t self) -> object-t {
+    return $print(self, null);
+  }
   method print(object-t self, object-t out) -> object-t {
     if (out == nullptr || out == null)
       out = std-output;
     $print(out, $str(self));
     return self;
   }
+  method println(object-t self) -> object-t {
+    return $println(self, null);
+  }
   method println(object-t self, object-t out) -> object-t {
     if (out == nullptr || out == null)
       out = std-output;
     $println(out, $str(self));
     return self;
-  }
-  method print(object-t self) -> object-t {
-    return $print(self, null);
-  }
-  method println(object-t self) -> object-t {
-    return $println(self, null);
   }
 }
