@@ -2034,7 +2034,7 @@ sub generate_klass_box {
             my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
             if ($promoted_type) {
               $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
-                $col . "$object_t result = \$make(klass(), \#$kw_arg_name : cast($promoted_type)*arg); // special-case: default argument promotions" . $nl;
+                $col . "$object_t result = \$make(klass(), \#$kw_arg_name : cast($promoted_type)*arg); // special-case: default argument promotions ($type => $promoted_type)" . $nl;
             } else {
               $result .=
                 $col . "$object_t result = \$make(klass(), \#$kw_arg_name : *arg);" . $nl;
@@ -3851,7 +3851,7 @@ sub generate_kw_args_method_defn {
   #$col = &colin($col);
   $$scratch_str_ref .=
     $col . "const $keyword_t* _keyword_;" . $nl .
-    $col . "while ((_keyword_ = va-arg(_args_, $keyword_t*)) != SENTINEL-PTR) {" . &ann(__FILE__, __LINE__) . $nl;
+    $col . "while ((_keyword_ = va-arg(_args_, decltype(_keyword_))) != SENTINEL-PTR) {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   $$scratch_str_ref .= $col . "switch (_keyword_->hash) { // hash is a constexpr. its compile-time evaluated." . $nl;
   $col = &colin($col);
@@ -3873,12 +3873,11 @@ sub generate_kw_args_method_defn {
     }
     if ($promoted_type) {
       $$scratch_str_ref .=
-        $col . "$kw_arg_name = cast($kw_arg_type)va-arg($$new_arg_names[-1], $promoted_type); // special-case: default argument promotions" . $nl;
+        $col . "$kw_arg_name = cast(decltype($kw_arg_name))va-arg($$new_arg_names[-1], $promoted_type); // special-case: default argument promotions ($kw_arg_type => $promoted_type)" . $nl;
     } else {
       my $kw_arg_type = &arg::type($$kw_arg{'type'});
-      $kw_arg_type =~ s/\[\]$/\*/;
       $$scratch_str_ref .=
-        $col . "$kw_arg_name = va-arg($$new_arg_names[-1], $kw_arg_type);" . $nl;
+        $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));" . $nl;
     }
 
     $$scratch_str_ref .=
