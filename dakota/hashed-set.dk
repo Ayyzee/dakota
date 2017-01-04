@@ -48,7 +48,7 @@ klass hashed-set {
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
   // using compound literals 'objects' can be used as follows:
-  // $init(o, #objects: cast(object-t[]){ o1, o2, nullptr });
+  // $init(o, #objects: { o1, o2 });
 
   method init(object-t   self,
               equals-t   equals?: $equals?,
