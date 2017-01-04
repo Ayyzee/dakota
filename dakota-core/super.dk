@@ -21,10 +21,4 @@ klass super {
     object-t object;
     object-t klass;
   }
-
-  method init(object-t self, slots-t slots: {.object = nullptr, .klass = nullptr}) -> object-t {
-    self = $init(super);
-    mutable-unbox(self) = slots;
-    return self;
-  }
 }

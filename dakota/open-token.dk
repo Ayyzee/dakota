@@ -27,9 +27,9 @@ klass open-token {
   slots {
     object-t close-token;
   }
-  method init(object-t self, slots-t slots: {.close-token = null}) -> object-t {
+  method init(object-t self) -> object-t {
     self = $init(super);
-    mutable-unbox(self) = slots;
+    self.close-token = nullptr;
     return self;
   }
   method write-slots(object-t self, object-t out) -> object-t {

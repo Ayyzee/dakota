@@ -22,10 +22,4 @@ klass slot-info {
     symbol-t type;   // never nullptr
     ssize-t  size;   // never 0
   }
-
-  method init(object-t self, slots-t slots: {.type = nullptr, .size = 0}) -> object-t {
-    self = $init(super);
-    mutable-unbox(self) = slots;
-    return self;
-  }
 }

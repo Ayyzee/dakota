@@ -22,10 +22,4 @@ klass enum-info {
     str-t name;  // never nullptr
     str-t expr;  // never nullptr
   }
-
-  method init(object-t self, slots-t slots: {.name = nullptr, .expr = nullptr}) -> object-t {
-    self = $init(super);
-    mutable-unbox(self) = slots;
-    return self;
-  }
 }

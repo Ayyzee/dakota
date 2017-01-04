@@ -21,9 +21,4 @@ klass result {
     const void* element; // nullptr when not found
     ssize-t     offset;  // either offset of found element, or offset to insert element
   }
-  method init(object-t self, slots-t slots: {.element = nullptr, .offset = 0}) -> object-t {
-    self = $init(super);
-    mutable-unbox(self) = slots;
-    return self;
-  }
 }

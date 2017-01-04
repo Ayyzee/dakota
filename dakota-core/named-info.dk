@@ -40,9 +40,11 @@ klass named-info {
   //            size = sizeof(property::slots-t)
   //            compare = property::compare()
   }
-  method init(object-t self, slots-t slots: {.next = nullptr, .count = 0, .elements = nullptr}) -> object-t {
+  method init(object-t self) -> object-t {
     self = $init(super);
-    mutable-unbox(self) = slots;
+    self.next =     nullptr;
+    self.count =    0;
+    self.elements = nullptr;
     return self;
   }
   method check(const slots-t* s) -> ssize-t {

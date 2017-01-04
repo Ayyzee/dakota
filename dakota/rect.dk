@@ -24,9 +24,10 @@ klass rect {
     point::slots-t     point;
     dimension::slots-t dimension;
   }
-  method init(object-t self, slots-t slots: {{.x = 0, .y = 0}, {.width = 0, .height = 0}}) -> object-t {
+  method init(object-t self) -> object-t {
     self = $init(super);
-    mutable-unbox(self) = slots;
+    self.point =     { 0, 0 };
+    self.dimension = { 0, 0 };
     return self;
   }
   method compare(const slots-t* slots, const slots-t* other-slots) -> cmp-t {
