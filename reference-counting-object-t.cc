@@ -29,7 +29,7 @@ struct object_t {
   inline auto operator=(const object_t& r) -> object_t& {
     if (this != &r) {
       this->object = r.object;
-      if (nullptr != this->object)
+      if (this->object)
         incr();
     }
     return *this;
@@ -39,19 +39,19 @@ struct object_t {
   }
   inline object_t(const object_t& r) {
     this->object = r.object;
-    if (nullptr != this->object)
+    if (this->object)
       incr();
   }
   inline object_t(object::slots_t* r) {
     this->object = r;
-    if (nullptr != this->object)
+    if (this->object)
       incr();
   }
   inline object_t() {
     this->object = nullptr;
   }
   inline ~object_t() {
-    if (nullptr != this->object)
+    if (this->object)
       decr();
   }
 };
@@ -65,7 +65,7 @@ inline auto object_t::decr() -> void {
   assert(nullptr != this->object);
   assert(0 < this->object->count);
   atomic_decr(&this->object->count);
-  if (0 == this->object->count) {
+  if (this->object->count == 0) {
     printf("%i: %p: %s(): count=%lli\n", __LINE__, cast(void*)this, "DELETE", this->object->count);
     // dealloc(this->object);
   }
