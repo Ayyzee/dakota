@@ -29,17 +29,18 @@ klass no-such-method-exception {
   }
   method init(object-t           self,
               object-t           object:    nullptr,
-              super-t            context:   { nullptr, nullptr },
+              object-t           context-object: nullptr,
+              object-t           context-klass:  nullptr,
               const signature-t* signature: nullptr,
               str-t              src-file:  nullptr,
               fnd-int-t              src-line:  0) -> object-t {
     self = $init(super, #src-file: src-file, #src-line: src-line);
     self.signature = signature;
-    if ((!object && !context.object) || (object && context.object))
+    if ((!object && !context-object) || (object && context-object))
       std::abort();
     self.context = { nullptr, nullptr };
-    if (context.object != nullptr)
-      self.context = context;
+    if (context-object != nullptr)
+      self.context = { .object = context-object, .klass = context-klass };
     else if (object != nullptr) 
       self.context.object = object;
     return self;
