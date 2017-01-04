@@ -801,7 +801,7 @@ sub rewrite_keyword_syntax_list {
 sub keyword_use {
   my ($arg1, $arg2) = @_;
   my $arg1_ident = &dk_mangle($arg1);
-  return "&__keyword::$arg1_ident$arg2,";
+  return "&__keyword::$arg1_ident$arg2, cast(intptr-t)";
 }
 sub rewrite_keyword_use {
   my ($arg1, $arg2) = @_;

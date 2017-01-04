@@ -170,7 +170,7 @@ klass string {
     }
     // 'part' 'delimiter' pairs
     while ((p2 = strstr(p1, delimiter)) != nullptr) {
-      object-t part-object = $make(kls, #bytes: p1, #length: p2 - p1);
+      object-t part-object = $make(kls, #bytes: p1, #length: (p2 - p1));
       $add-last(result, part-object);
       $add-last(result, delimiter-object);
       p1 = p2 + delimiter-length;

@@ -37,7 +37,6 @@ my $emacs_dakota_mode_file_variables = '-*- mode: c++; mode: dakota -*-'; # fall
 
 my $gbl_prefix;
 my $gbl_compiler;
-my $gbl_compiler_default_argument_promotions;
 my $builddir;
 my $hh_ext;
 my $cc_ext;
@@ -64,8 +63,6 @@ BEGIN {
   use dakota::util;
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
     or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
-  $gbl_compiler_default_argument_promotions = do "$gbl_prefix/lib/dakota/compiler/default-argument-promotions.json"
-    or die "do $gbl_prefix/lib/dakota/compiler/default-argument-promotions.json failed: $!\n";
   my $platform = do "$gbl_prefix/lib/dakota/platform.json"
     or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
   my ($key, $values);
@@ -2031,14 +2028,8 @@ sub generate_klass_box {
           if ($$klass_ast{'init-supports-kw-slots?'}) {
             my $kw_arg_name = $$klass_ast{'init-supports-kw-slots?'};
             my $type = "$klass_name\::slots-t";
-            my $promoted_type = $$gbl_compiler_default_argument_promotions{$type};
-            if ($promoted_type) {
-              $result .= # this adds casts even where the compiler does not complain (not sure why since they are convertable types)
-                $col . "$object_t result = \$make(klass(), \#$kw_arg_name : cast($promoted_type)*arg); // special-case: default argument promotions ($type => $promoted_type)" . $nl;
-            } else {
               $result .=
                 $col . "$object_t result = \$make(klass(), \#$kw_arg_name : *arg);" . $nl;
-            }
           } else {
             $result .=
               $col . "$object_t result = \$make(klass());" . $nl .
@@ -3865,20 +3856,8 @@ sub generate_kw_args_method_defn {
     # should do this for other types (char=>int, float=>double, ... ???
     $$scratch_str_ref .=
       $col . "assert(_keyword_->symbol == \#$kw_arg_name);" . $nl;
-    my $promoted_type;
-    if ($$gbl_compiler_default_argument_promotions{$kw_arg_type}) {
-      $promoted_type = $$gbl_compiler_default_argument_promotions{$kw_arg_type};
-    } elsif ($$slots{'type'} && $$gbl_compiler_default_argument_promotions{$$slots{'type'}}) {
-      $promoted_type = $$gbl_compiler_default_argument_promotions{$$slots{'type'}};
-    }
-    if ($promoted_type) {
       $$scratch_str_ref .=
-        $col . "$kw_arg_name = cast(decltype($kw_arg_name))va-arg($$new_arg_names[-1], $promoted_type); // special-case: default argument promotions ($kw_arg_type => $promoted_type)" . $nl;
-    } else {
-      my $kw_arg_type = &arg::type($$kw_arg{'type'});
-      $$scratch_str_ref .=
-        $col . "$kw_arg_name = va-arg($$new_arg_names[-1], decltype($kw_arg_name));" . $nl;
-    }
+        $col . "$kw_arg_name = cast(decltype($kw_arg_name))va-arg($$new_arg_names[-1], intptr-t);" . $nl;
 
     $$scratch_str_ref .=
       $col . "_state_.$kw_arg_name = true;" . $nl .
