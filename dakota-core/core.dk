@@ -288,7 +288,7 @@ static func alloc-klass(symbol-t name) -> object-t {
   resource-usage::log-alloc(&gbl-ru, offset + size, name);
 # endif
 
-  object-t kls = cast(object-t)dkt::alloc(offset + size);
+  object-t kls = object-t{dkt::alloc(offset + size)};
   if (klass::_klass_ != nullptr)
     kls->klass = klass::_klass_;
   else
@@ -718,7 +718,7 @@ func dk-init-runtime() -> void {
     klass::_klass_ =  init-klass(klass::_klass_,  #klass);
 
     klass::mutable-unbox(object::_klass_).superklass = nullptr;
-    null = cast(object-t)-1;
+    null = object-t{cast(intptr-t)-1};
 
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
     null = $make(null-klass);
@@ -1555,7 +1555,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
         named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
         named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
         if (found-named-node != nullptr) {
-          object-t kls = cast(object-t)(found-named-node->node->element);
+          object-t kls = object-t{found-named-node->node->element};
           DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
                                 "finalize", "klass", kls-name,
                                 cast(symbol-t)named-info::at(kls-info, #file));

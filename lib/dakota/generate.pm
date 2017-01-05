@@ -2403,9 +2403,7 @@ sub convert_to_object_method {
 sub typealias_slots_t {
   my ($klass_name) = @_;
   my $result = '';
-  if ('object' eq $klass_name) {
-    $result = "typealias $klass_name-t = $klass_name\::slots-t*; // special-case"; # special-case
-  } else {
+  if ('object' ne $klass_name) {
     my $parts = [split(/::/, $klass_name)];
     if (1 < scalar @$parts) {
       my $basename = &remove_last($parts);
@@ -3856,8 +3854,14 @@ sub generate_kw_args_method_defn {
     # should do this for other types (char=>int, float=>double, ... ???
     $$scratch_str_ref .=
       $col . "assert(_keyword_->symbol == \#$kw_arg_name);" . $nl;
+    my $types_requiring_construction = { 'object-t' => 1 };
+    if ($$types_requiring_construction{$kw_arg_type}) {
+      $$scratch_str_ref .=
+        $col . "$kw_arg_name = $kw_arg_type\{va-arg($$new_arg_names[-1], intptr-t)\};" . $nl;
+    } else {
       $$scratch_str_ref .=
         $col . "$kw_arg_name = cast(decltype($kw_arg_name))va-arg($$new_arg_names[-1], intptr-t);" . $nl;
+    }
 
     $$scratch_str_ref .=
       $col . "_state_.$kw_arg_name = true;" . $nl .

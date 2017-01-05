@@ -195,7 +195,7 @@ static func size-from-info(named-info-t* info, symbol-t key) -> ssize-t {
   return element;
 }
 static func superklass-from-info(named-info-t* info) -> object-t {
-  object-t superkls = cast(object-t)ptr-from-info(info, #superklass);
+  object-t superkls = object-t{ptr-from-info(info, #superklass)};
   return superkls;
 }
 // the extra arg (name) is so we can determin if there is an interposer registered
@@ -339,7 +339,7 @@ klass klass {
     resource-usage::add-alloc(&gbl-ru, size);
     resource-usage::log-alloc(&gbl-ru, self);
 # endif
-    object-t instance = cast(object-t)dkt::alloc(size);
+    object-t instance = object-t{dkt::alloc(size)};
 # if 0
     memset(instance, 0, size);
 # endif
@@ -681,7 +681,7 @@ klass klass {
     return result;
   }
   static func valid-null?() -> boole-t {
-    return null != nullptr && null != cast(object-t)-1;
+    return null != nullptr && null != object-t{cast(intptr-t)-1};
   }
   static func set-all-klass-ptrs(object-t self) -> void {
     assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));

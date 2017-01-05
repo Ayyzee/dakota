@@ -29,7 +29,13 @@
 [[so_export]] extern thread_local throw_src_t dkt_throw_src;
 
 KLASS_NS object { inline FUNC box(slots_t* arg) -> object_t {
-  return arg;
+  return object_t{arg};
+}}
+KLASS_NS object { inline FUNC unbox(object_t obj) -> const slots_t* {
+  return obj.object;
+}}
+KLASS_NS object { inline FUNC mutable_unbox(object_t obj) -> slots_t* {
+  return obj.object;
 }}
 KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC mutable_unbox(object_t obj) -> slots_t& {
   DKT_UNBOX_CHECK(obj, _klass_); // optional

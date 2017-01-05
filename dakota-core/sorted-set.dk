@@ -31,6 +31,14 @@ klass result;
 klass sorted-array;
 klass std-compare;
 
+static func object-slots-compare(object::slots-t* s1, object::slots-t* s2) -> cmp-t {
+  cmp-t result = 0;
+  if (s1 != s2) {
+    result = $compare(object-t{s1}, object-t{s2});
+  }
+  return result;
+}
+
 klass sorted-set {
   superklass collection;
 
@@ -46,7 +54,7 @@ klass sorted-set {
   // $init(o, #objects: { o1, o2 });
 
   method init(object-t   self,
-              compare-t  compare:          $compare,
+              compare-t  compare:          cast(compare-t)object-slots-compare,
               ssize-t    initial-capacity: 64,
               object-t   elements:         nullptr,
               object-t[] objects:          nullptr) -> object-t {
@@ -80,7 +88,7 @@ klass sorted-set {
     if (found-result.element == nullptr)
       sorted-array::add-at(&self.sa, cast(const void*)element, found-result.offset);
     else
-      result = cast(object-t)found-result.element;
+      result = object-t{found-result.element};
     return result;
   }
   method empty(object-t self) -> object-t {
@@ -93,7 +101,7 @@ klass sorted-set {
     result-t found-result = sorted-array::search(&self.sa, cast(const void*)element);
 
     if (found-result.element != nullptr)
-      result = cast(object-t)sorted-array::at(&self.sa, found-result.offset);
+      result = object-t{sorted-array::at(&self.sa, found-result.offset)};
     return result;
   }
   method in(object-t self, object-t element) -> object-t {
@@ -121,7 +129,7 @@ klass sorted-set {
     if (found-result.element != nullptr) {
       self.iterator-state++;
       // element not required
-      prev-element = cast(object-t)sorted-array::remove-at(&self.sa, cast(const void*)element, found-result.offset);
+      prev-element = object-t{sorted-array::remove-at(&self.sa, cast(const void*)element, found-result.offset)};
     }
     return prev-element; // returns nullptr on error
   }
@@ -129,7 +137,7 @@ klass sorted-set {
     object-t prev-element = nullptr;
     if (0 != self.sa.count) {
       self.iterator-state++;
-      prev-element = cast(object-t)sorted-array::remove-last(&self.sa);
+      prev-element = object-t{sorted-array::remove-last(&self.sa)};
     }
     return prev-element; // returns nullptr on error
   }
@@ -222,7 +230,7 @@ klass sorted-set-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-      element = cast(object-t)sorted-array::at(&ss.sa, self.offset);
+      element = object-t{sorted-array::at(&ss.sa, self.offset)};
       assert(element != nullptr);
     }
     return element; // returns nullptr on error

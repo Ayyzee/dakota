@@ -107,8 +107,9 @@ static_assert( 64/8 == sizeof( float64_t), "The sizeof std::float64-t  must equa
 static_assert(128/8 == sizeof(float128_t), "The sizeof std::float128-t must equal 128/8 bytes in size");
 
 // symbols are defined before klasses
-KLASS_NS object       { struct [[_dkt_typeinfo_]] slots_t; }
-KLASS_NS object       { typealias slots_t = struct slots_t;                 } typealias object_t =       object::slots_t*;
+
+# include <dakota-object.hh>
+
 KLASS_NS boole        { typealias slots_t = bool;                           } typealias boole_t =        boole::slots_t;
 KLASS_NS fnd_double   { typealias slots_t = double;                         } typealias fnd_double_t =   fnd_double::slots_t;
 KLASS_NS fnd_int      { typealias slots_t = int;                            } typealias fnd_int_t =      fnd_int::slots_t;
