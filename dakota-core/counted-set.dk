@@ -67,13 +67,13 @@ trait counted-set {
     return self;
   }
   method at(object-t self, object-t first) -> object-t {
-    object-t last = $in(super, first);
+    object-t last = $in(self, first);
     if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))
       last = pair::unbox(last).last;
     return last;
   }
   method at(object-t self, object-t first, object-t default-last) -> object-t {
-    object-t last = $in(super, first, nullptr);
+    object-t last = $in(self, first, nullptr);
     if (last == nullptr)
       last = default-last;
     if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
