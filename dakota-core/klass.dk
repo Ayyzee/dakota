@@ -680,15 +680,12 @@ klass klass {
     object-t result = $dealloc(super);
     return result;
   }
-  static func valid-null?() -> boole-t {
-    return null != nullptr && null != object-t{cast(intptr-t)-1};
-  }
   static func set-all-klass-ptrs(object-t self) -> void {
     assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
-    if (valid-null?())
+    if (null)
       set-read-write();
     assoc-node::set-elements(imported-klss, self); // write-kls-ptr
-    if (valid-null?())
+    if (null)
       set-read-only();
     return;
   }

@@ -622,7 +622,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
     kls-info->next = prev;
   }
   object-t kls = nullptr;
-  if (null)  // this is a late (post-init) registration
+  if (object::_klass_)  // this is a late (post dk-init-runtime()) registration
     kls = dk-klass-for-name(name);
   return kls;
 }
@@ -705,7 +705,7 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
 func dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
-  if (!null) {
+  if (!object::_klass_) {
     init-runtime-ds();
     each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
@@ -718,7 +718,6 @@ func dk-init-runtime() -> void {
     klass::_klass_ =  init-klass(klass::_klass_,  #klass);
 
     klass::mutable-unbox(object::_klass_).superklass = nullptr;
-    null = object-t{cast(intptr-t)-1};
 
     object-t null-klass = dk-make-simple-klass(#null, #object, #singleton-klass);
     null = $make(null-klass);
