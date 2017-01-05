@@ -1423,7 +1423,7 @@ static func set-protection(str-t segment, fnd-int-t protection, get-segment-data
   return result;
 }
 static func set-protection-all(str-t segment, fnd-int-t protection) -> fnd-int-t {
-  cmp-t result = 0;
+  fnd-int-t result = 0;
   named-info-t* ni = gbl-registration-info-list;
   while (ni != nullptr) {
     registration-info-t ri {};
