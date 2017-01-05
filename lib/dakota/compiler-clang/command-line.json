@@ -10,13 +10,13 @@
     '-std=c++14', '-fvisibility=hidden',
     '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
     '-ftrapv',
-    '-ObjC++', '-fobjc-exceptions', '-lobjc',
+    #'-ObjC++', '-fobjc-exceptions', '-lobjc',
     #'-fuse-ld=gold', '-use-gold-plugin',
     #'-flto', # must also be in LDFLAGS!!!
   ],
   'CXX_COMPILE_FLAGS' => [
     '--compile', '-fPIC',
-    '--language=objective-c++',
+    #'--language=objective-c++',
   ],
   'CXX_DEFINE_MACRO_FLAGS' => [ '--define-macro' ],
   'CXX_FOR_LINKER_FLAGS' => [ '--for-linker' ],
