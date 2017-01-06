@@ -1555,15 +1555,16 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
       // }
       finalize-func-t klass-finalize = cast(finalize-func-t)named-info::at(kls-info, #finalize);
       if (klass-finalize != nullptr) {
-        named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
-        named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node);
-        if (found-named-node != nullptr) {
-          object-t kls = object-t{found-named-node->node->element};
-          DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
-                                "finalize", "klass", kls-name,
-                                cast(symbol-t)named-info::at(kls-info, #file));
+        assoc-node-t* kls-assoc = imported-klasses-for-klass(kls-name);
+        if (kls-assoc != nullptr) {
+          object-t kls = *cast(object-t*)(kls-assoc->element);
+          if (kls != nullptr) {
+            DKT-LOG-INITIAL-FINAL("'action':'%s','args':['%s'],'klass':'%s','file':'%s'",
+                                  "finalize", "klass", kls-name,
+                                  cast(symbol-t)named-info::at(kls-info, #file));
 
-          klass-finalize(kls);
+            klass-finalize(kls);
+          }
         }
       }
     }
