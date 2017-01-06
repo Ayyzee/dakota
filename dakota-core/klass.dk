@@ -339,12 +339,13 @@ klass klass {
     resource-usage::add-alloc(&gbl-ru, size);
     resource-usage::log-alloc(&gbl-ru, self);
 # endif
-    object-t instance = object-t{dkt::alloc(size)};
+    object::slots-t* instance-slots = cast(object::slots-t*)dkt::alloc(size);
 # if 0
-    memset(instance, 0, size);
+    memset(instance-slots, 0, size);
 # endif
-    instance->klass = self;
-    instance->ref-count = 1;
+    instance-slots->klass =     self;
+    instance-slots->ref-count = 0;
+    object-t instance = object-t{instance-slots};
     return instance;
   }
   method name(object-t self) -> symbol-t {

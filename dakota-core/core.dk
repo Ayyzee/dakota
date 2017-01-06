@@ -288,12 +288,15 @@ static func alloc-klass(symbol-t name) -> object-t {
   resource-usage::log-alloc(&gbl-ru, offset + size, name);
 # endif
 
-  object-t kls = object-t{dkt::alloc(offset + size)};
-  if (klass::_klass_ != nullptr)
-    kls->klass = klass::_klass_;
-  else
+  object::slots-t* kls-slots = cast(object::slots-t*)dkt::alloc(offset + size);
+# if 0
+    memset(kls-slots, 0, offset + size);
+# endif
+  kls-slots->klass =     klass::_klass_;
+  kls-slots->ref-count = 0;
+  object-t kls = object-t{kls-slots};
+  if (kls->klass == nullptr)
     kls->klass = kls; // klass klass's klass is klass klass
-  kls->ref-count = 1;
   return kls;
 }
 static func init-klass(object-t kls, symbol-t name) -> object-t {
