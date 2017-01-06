@@ -42,7 +42,9 @@ struct [[_dkt_typeinfo_]] object_t {
     return this->object != r.object;
   }
   inline auto operator=(const object_t& r) -> object_t& {
-    this->object = r.object;
+    if (this != &r) {
+      this->object = r.object;
+    }
     return *this;
   }
   inline object_t(const object_t& r) {
