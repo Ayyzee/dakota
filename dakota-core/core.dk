@@ -289,6 +289,7 @@ static func alloc-klass(symbol-t name) -> object-t {
   resource-usage::log-alloc(&gbl-ru, total-size, name);
 # endif
   object::slots-t* kls-slots = cast(object::slots-t*)dkt::alloc(total-size);
+  //printf("%p alloc-klass() %s\n", cast(void*)kls-slots, name);
 # if 0
     memset(kls-slots, 0, total-size);
 # endif
