@@ -16,10 +16,20 @@
 
 # pragma once
 
+inline auto atomic_incr(int64_t* i) -> int64_t {
+  return __sync_add_and_fetch(i, 1); // gcc/clang specific
+}
+inline auto atomic_decr(int64_t* i) -> int64_t {
+  return __sync_sub_and_fetch(i, 1); // gcc/clang specific
+}
 KLASS_NS object       { struct [[_dkt_typeinfo_]] slots_t; }
 KLASS_NS object       { typealias slots_t = struct slots_t; }
 struct [[_dkt_typeinfo_]] object_t {
   object::slots_t* object;
+
+  inline auto add_ref() -> void;
+  inline auto remove_ref() -> void;
+
   inline auto operator->() const -> object::slots_t* { return  this->object; }
   inline auto operator*()  const -> object::slots_t& { return *this->object; }
 
@@ -44,30 +54,39 @@ struct [[_dkt_typeinfo_]] object_t {
   inline auto operator=(const object_t& r) -> object_t& {
     if (this != &r) {
       this->object = r.object;
+      add_ref();
     }
     return *this;
   }
   inline object_t(const object_t& r) {
     this->object = r.object;
+    add_ref();
   }
   inline object_t(object::slots_t* r) {
     this->object = r;
+    add_ref();
   }
   inline object_t(void* r) {
     this->object = cast(object::slots_t*)r;
+    add_ref();
   }
   inline object_t(const void* r) {
     this->object = cast(object::slots_t*)r;
+    add_ref();
   }
   inline object_t(intptr_t r) {
     this->object = cast(object::slots_t*)r;
+    add_ref();
   }
   inline object_t(uintptr_t r) {
     this->object = cast(object::slots_t*)r;
+    add_ref();
   }
   inline object_t(std::nullptr_t r = nullptr) {
     this->object = cast(object::slots_t*)r;
+    add_ref();
   }
   inline ~object_t() {
+    remove_ref();
   }
 };

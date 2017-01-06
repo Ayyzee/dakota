@@ -77,3 +77,17 @@ inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
   }
   return nullptr;
 }
+inline auto object_t::add_ref() -> void {
+  if (this->object) {
+    atomic_incr(&this->object->ref_count);
+  }
+}
+inline auto object_t::remove_ref() -> void {
+  if (this->object) {
+    assert(this->object->ref_count != 0);
+    atomic_decr(&this->object->ref_count);
+    if (this->object->ref_count == 0) {
+      //this->object = cast(object::slots_t*)dkt::dealloc(cast(void*)*this);
+    }
+  }
+}
