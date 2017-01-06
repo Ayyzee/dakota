@@ -333,15 +333,15 @@ klass klass {
     return instance;
   }
   method alloc(object-t self) -> object-t {
-    ssize-t size = self.offset + self.size;
+    ssize-t total-size = self.offset + self.size;
 
 # if defined DKT-DUMP-MEM-FOOTPRINT
-    resource-usage::add-alloc(&gbl-ru, size);
+    resource-usage::add-alloc(&gbl-ru, total-size);
     resource-usage::log-alloc(&gbl-ru, self);
 # endif
-    object::slots-t* instance-slots = cast(object::slots-t*)dkt::alloc(size);
+    object::slots-t* instance-slots = cast(object::slots-t*)dkt::alloc(total-size);
 # if 0
-    memset(instance-slots, 0, size);
+    memset(instance-slots, 0, total-size);
 # endif
     instance-slots->klass =     self;
     instance-slots->ref-count = 0;
