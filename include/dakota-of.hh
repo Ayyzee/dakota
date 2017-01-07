@@ -89,7 +89,7 @@ inline auto object_t::remove_ref() -> void {
     //printf("%p: %lli--\n", cast(void*)this->object, this->object->ref_count);
     atomic_decr(&this->object->ref_count);
     if (this->object->ref_count == 0) {
-      //printf("%p dealloc()\n", cast(void*)*this);
+      //printf("%p dealloc-instance()\n", cast(void*)*this);
       //this->object = cast(object::slots_t*)dkt::dealloc(cast(void*)*this);
     }
   }

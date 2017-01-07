@@ -33,6 +33,11 @@
 
 # else
 
+func alloc-instance(ssize-t total-size) -> object::slots-t* {
+  object::slots-t* instance = cast(object::slots-t*)dkt::alloc(total-size);
+  //printf("%p alloc-instance()\n", cast(void*)instance);
+  return instance;
+}
 inline func SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
                                     selector-t        selector,
                                     method-t          method) -> void {
@@ -339,8 +344,7 @@ klass klass {
     resource-usage::add-alloc(&gbl-ru, total-size);
     resource-usage::log-alloc(&gbl-ru, self);
 # endif
-    object::slots-t* instance-slots = cast(object::slots-t*)dkt::alloc(total-size);
-    //printf("%p alloc() %s\n", cast(void*)instance-slots, name-of(self));
+    object::slots-t* instance-slots = alloc-instance(total-size);
 # if 0
     memset(instance-slots, 0, total-size);
 # endif

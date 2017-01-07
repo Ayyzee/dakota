@@ -24,6 +24,7 @@ dkt_declare_klass_type_struct(selector_node);
 
 FUNC import_selectors(signature_t** signatures, selector_node_t* selector_nodes) -> void;
 
+FUNC alloc_instance(ssize_t total_size) -> object::slots_t*;
 FUNC interposer_name_for_klass_name(symbol_t klass_name) -> symbol_t;
 FUNC add_interpose_prop(symbol_t key, symbol_t element) -> void;
 
