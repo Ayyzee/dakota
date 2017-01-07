@@ -3874,9 +3874,9 @@ sub generate_kw_args_method_defn {
   $col = &colin($col);
   $$scratch_str_ref .=
     $col . "throw \$make(no-such-keyword-exception::klass()," . $nl .
-    $col . "            \#object $colon    self," . $nl .
-    $col . "            \#signature $colon __method-signature__," . $nl .
-    $col . "            \#keyword $colon   _keyword_->symbol);" . $nl;
+    $col . "            \#object$colon    self," . $nl .
+    $col . "            \#signature$colon __method-signature__," . $nl .
+    $col . "            \#keyword$colon   _keyword_->symbol);" . $nl;
   $col = &colout($col);
   #$$scratch_str_ref .= $col . "}" . $nl;
   $col = &colout($col);
@@ -3901,9 +3901,9 @@ sub generate_kw_args_method_defn {
     } else {
       $$scratch_str_ref .=
         $col . "throw \$make(missing-keyword-exception::klass()," . $nl .
-        $col . "            \#object $colon    self," . $nl .
-        $col . "            \#signature $colon __method-signature__," . $nl .
-        $col . "            \#keyword $colon   \#$kw_arg_name);" . $nl;
+        $col . "            \#object$colon    self," . $nl .
+        $col . "            \#signature$colon __method-signature__," . $nl .
+        $col . "            \#keyword$colon   \#$kw_arg_name);" . $nl;
     }
     $col = &colout($col);
   }
