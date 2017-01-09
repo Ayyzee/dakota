@@ -16,12 +16,6 @@
 
 # pragma once
 
-inline auto atomic_incr(int64_t* i) -> int64_t {
-  return __sync_add_and_fetch(i, 1); // gcc/clang specific
-}
-inline auto atomic_decr(int64_t* i) -> int64_t {
-  return __sync_sub_and_fetch(i, 1); // gcc/clang specific
-}
 KLASS_NS object       { struct [[_dkt_typeinfo_]] slots_t; }
 KLASS_NS object       { typealias slots_t = struct slots_t; }
 struct [[_dkt_typeinfo_]] object_t {
