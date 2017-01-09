@@ -3854,10 +3854,11 @@ sub generate_kw_args_method_defn {
     # should do this for other types (char=>int, float=>double, ... ???
     $$scratch_str_ref .=
       $col . "assert(_keyword_->symbol == \#$kw_arg_name);" . $nl;
-    my $types_requiring_construction = { 'object-t' => 1 };
+    my $types_requiring_construction = { 'object-t' => 'object::slots-t*' };
     if ($$types_requiring_construction{$kw_arg_type}) {
+      my $type = $$types_requiring_construction{$kw_arg_type};
       $$scratch_str_ref .=
-        $col . "$kw_arg_name = $kw_arg_type\{va-arg($$new_arg_names[-1], intptr-t)\};" . $nl;
+        $col . "$kw_arg_name = $kw_arg_type\{cast($type)va-arg($$new_arg_names[-1], intptr-t)\};" . $nl;
     } else {
       $$scratch_str_ref .=
         $col . "$kw_arg_name = cast(decltype($kw_arg_name))va-arg($$new_arg_names[-1], intptr-t);" . $nl;
