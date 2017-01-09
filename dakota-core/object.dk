@@ -16,6 +16,7 @@
 
 # include <cinttypes>
 # include <cstdlib>
+# include <atomic>
 
 # include "private.hh"
 
@@ -31,7 +32,7 @@ klass unbox-illegal-klass-exception;
 klass object {
   slots {
     object-t klass;
-    int64-t  ref-count;
+    std::atomic<int64-t> ref-count;
   }
 
   method write-slots(object-t self, object-t out) -> object-t {
