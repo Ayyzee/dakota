@@ -40,7 +40,7 @@
   # define    NUL cast(char8_t)0
 # endif
 
-# if defined __GNUG__
+# if defined __GNUC__
 namespace dkt { inline FUNC demangle(str_t mangled_name, char8_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
   fnd_int_t status = 0;
   str_t result = abi::__cxa_demangle(mangled_name, buffer, &buffer_len, &status); // must be free()ed if buffer is non-nullptr

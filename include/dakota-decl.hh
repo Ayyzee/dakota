@@ -48,10 +48,10 @@
 // gcc has bug in code generation so the assembler omit the quotes
 # if defined __clang__
   # define read_only  gnu::section("__DKT_READ_ONLY, __dkt_read_only")
-# elif defined __GNUG__
+# elif defined __GNUC__
   # define read_only  gnu::section("\"__DKT_READ_ONLY, __dkt_read_only\"")
 # else
-  # error "Neither __clang__ nor __GNUG__ is defined."
+  # error "Neither __clang__ nor __GNUC__ is defined."
 #endif
 
 # define format_va_printf(n) gnu::format(__printf__, n, 0)
