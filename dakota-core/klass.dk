@@ -200,8 +200,11 @@ static func size-from-info(named-info-t* info, symbol-t key) -> ssize-t {
   return element;
 }
 static func superklass-from-info(named-info-t* info) -> object-t {
-  object-t superkls = object-t{ptr-from-info(info, #superklass)};
-  return superkls;
+  object-t result = nullptr;
+  object-t* superkls-ptr = cast(object-t*)ptr-from-info(info, #superklass);
+  if (superkls-ptr)
+    result = *superkls-ptr;
+  return result;
 }
 // the extra arg (name) is so we can determin if there is an interposer registered
 static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t {
