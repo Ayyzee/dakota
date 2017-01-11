@@ -68,7 +68,7 @@ klass bit-vector {
     ssize-t   capacity; // number of bits
   //ssize-t   size; // 1 bit
   }
-  static const ssize-t gbl-element-width = (ssizeof((cast(slots-t*)0)->elements[0]) * 8);
+  static const ssize-t gbl-element-width = ssizeof(slots-t::elements[0]) * 8;
   static const ssize-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
   static const ssize-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
 
@@ -94,7 +94,7 @@ klass bit-vector {
     const slots-t& s1 = unbox(self);
     slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
-    ssize-t num-elements = ceiling-divide(self.capacity, ssizeof(self.elements[0]));
+    ssize-t num-elements = ceiling-divide(self.capacity, gbl-element-width);
     s2.elements = cast(uint64-t*)(dkt::alloc(ssizeof(self.elements[0]) * num-elements));
     memcpy(s2.elements, self.elements, sizeof(self.elements[0]) * cast(size-t)num-elements);
     return copy;
