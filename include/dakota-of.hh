@@ -77,19 +77,19 @@ inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
   }
   return nullptr;
 }
-// inline auto atomic_incr(int64_t* i) -> int64_t {
+// inline FUNC atomic_incr(int64_t* i) -> int64_t {
 //   return __sync_add_and_fetch(i, 1); // gcc/clang specific
 // }
-// inline auto atomic_decr(int64_t* i) -> int64_t {
+// inline FUNC atomic_decr(int64_t* i) -> int64_t {
 //   return __sync_sub_and_fetch(i, 1); // gcc/clang specific
 // }
-inline auto object_t::add_ref() -> void {
+inline FUNC object_t::add_ref() -> void {
   if (this->object) {
     //printf("%p: %lli++\n", cast(void*)this->object, this->object->ref_count);
     this->object->ref_count++;
   }
 }
-inline auto object_t::remove_ref() -> void {
+inline FUNC object_t::remove_ref() -> void {
   if (this->object) {
     assert(this->object->ref_count != 0);
     //printf("%p: %lli--\n", cast(void*)this->object, this->object->ref_count);

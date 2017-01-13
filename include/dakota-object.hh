@@ -21,11 +21,11 @@ KLASS_NS object       { typealias slots_t = struct slots_t; }
 struct [[_dkt_typeinfo_]] object_t {
   object::slots_t* object;
 
-  inline auto add_ref() -> void;
-  inline auto remove_ref() -> void;
+  inline FUNC add_ref() -> void;
+  inline FUNC remove_ref() -> void;
 
-  inline auto operator->() const -> object::slots_t* { return  this->object; }
-  inline auto operator*()  const -> object::slots_t& { return *this->object; }
+  inline FUNC operator->() const -> object::slots_t* { return  this->object; }
+  inline FUNC operator*()  const -> object::slots_t& { return *this->object; }
 
   explicit inline operator intptr_t()               const { return cast(intptr_t)       this->object; }
   explicit inline operator uintptr_t()              const { return cast(uintptr_t)      this->object; }
@@ -39,13 +39,13 @@ struct [[_dkt_typeinfo_]] object_t {
   explicit inline operator const void*()            const { return cast(const void*)    this->object; }
   explicit inline operator bool()                   const { return this->object != nullptr; }
 
-  inline auto operator==(const object_t& r) const -> bool {
+  inline FUNC operator==(const object_t& r) const -> bool {
     return this->object == r.object;
   }
-  inline auto operator!=(const object_t& r) const -> bool {
+  inline FUNC operator!=(const object_t& r) const -> bool {
     return this->object != r.object;
   }
-  inline auto operator=(const object_t& r) -> object_t& {
+  inline FUNC operator=(const object_t& r) -> object_t& {
     if (this != &r) {
       this->object = r.object;
       add_ref();
