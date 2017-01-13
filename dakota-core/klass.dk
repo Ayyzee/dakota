@@ -352,7 +352,7 @@ klass klass {
     memset(instance-slots, 0, total-size);
 # endif
     instance-slots->klass =     self;
-    instance-slots->ref-count = 0;
+    instance-slots->ref-count = 1; // ref-count is 1 based, not 0 based, 0 indicates being dealloc()ed
     object-t instance = object-t{instance-slots};
     return instance;
   }

@@ -8,6 +8,7 @@
  #'target_extra_generics' => {},
   'src_extra_generics' => {
     'alloc' => undef,
+    'dealloc' => undef,
     'forward-iterator' => undef,
     'init' => undef,
     'instance?' => undef,
