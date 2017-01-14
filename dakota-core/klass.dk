@@ -71,9 +71,9 @@ thread-local super-t            dkt-current-context;
 thread-local super-t            dkt-null-context;
 
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
-  const signature-t* signature = dkt-current-signature;
-  super-t            context =   dkt-current-context;
-  throw $make(no-such-method-exception::klass(), #object: object, #context-object: context.object, #context-klass: context.klass, #signature: signature);
+  const signature-t* signature = dkt-current-signature; // needed because these get rewritten in following throw
+  super-t*           context =   &dkt-current-context;  // needed because these get rewritten in following throw
+  throw $make(no-such-method-exception::klass(), #object: object, #context: context, #signature: signature);
 }
 klass selector-pair-compare {
   slots (*)(const selector-pair-t*, const selector-pair-t*) -> cmp-t;

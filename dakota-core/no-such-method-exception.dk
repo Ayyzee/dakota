@@ -18,6 +18,8 @@
 
 module dakota-core;
 
+extern thread-local super-t dkt-null-context;
+
 klass output-stream;
 
 klass no-such-method-exception {
@@ -29,19 +31,17 @@ klass no-such-method-exception {
   }
   method init(object-t           self,
               object-t           object:    nullptr,
-              object-t           context-object: nullptr,
-              object-t           context-klass:  nullptr,
+              super-t*           context:   &dkt-null-context,
               const signature-t* signature: nullptr,
               str-t              src-file:  nullptr,
-              fnd-int-t              src-line:  0) -> object-t {
+              fnd-int-t          src-line:  0) -> object-t {
     self = $init(super, #src-file: src-file, #src-line: src-line);
+    if (context == nullptr)
+      context = &dkt-null-context;
+    assert((object || context->object) && !(object && context->object));
     self.signature = signature;
-    if ((!object && !context-object) || (object && context-object))
-      std::abort();
-    self.context = { nullptr, nullptr };
-    if (context-object != nullptr)
-      self.context = { .object = context-object, .klass = context-klass };
-    else if (object != nullptr) 
+    self.context =   *context;
+    if (object != nullptr) 
       self.context.object = object;
     return self;
   }
