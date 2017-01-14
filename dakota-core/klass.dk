@@ -67,8 +67,8 @@ klass symbol;
 klass vector;
 
 thread-local const signature-t* dkt-current-signature;
-thread-local super-t            dkt-current-context;
-thread-local super-t            dkt-null-context;
+thread-local super-t dkt-current-context = {nullptr, nullptr};
+thread-local super-t dkt-null-context =    {nullptr, nullptr};
 
 [[noreturn]] func dkt-null-method(object-t object, ...) -> void {
   throw $make(no-such-method-exception::klass(), #object: object, #context: &dkt-current-context, #signature: dkt-current-signature);
