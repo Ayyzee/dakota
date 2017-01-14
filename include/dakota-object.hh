@@ -37,8 +37,12 @@ struct [[_dkt_typeinfo_]] object_t {
   explicit inline operator const uint8_t*()         const { return cast(const uint8_t*) this->object; }
   explicit inline operator void*()                  const { return cast(void*)          this->object; }
   explicit inline operator const void*()            const { return cast(const void*)    this->object; }
+
   explicit inline operator bool()                   const { return this->object != nullptr; }
 
+  inline FUNC operator!() const -> bool {
+    return !this->object;
+  }
   inline FUNC operator==(const object_t& r) const -> bool {
     return this->object == r.object;
   }
