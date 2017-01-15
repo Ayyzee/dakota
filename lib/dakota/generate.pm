@@ -749,7 +749,7 @@ sub arg_type::names {
   if (0 == &type::compare($seq_super_t, $$arg_type_ref[0])) {
     $$arg_names[0] = "context";    # replace_first
   } else {
-    $$arg_names[0] = 'object';  # replace_first
+    $$arg_names[0] = 'o';  # replace_first
   }
 
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
@@ -772,17 +772,17 @@ sub arg_type::names_unboxed {
   my $type_str = &remove_extra_whitespace(join(' ', @{$$arg_type_ref[$arg_num]}));
   if (0) {
   } elsif ('const slots-t*' eq $type_str) {
-    $$arg_names[0] = '&mutable-unbox(object)';
+    $$arg_names[0] = '&mutable-unbox(o)';
   } elsif ('const slots-t&' eq $type_str) {
-    $$arg_names[0] = 'mutable-unbox(object)';
+    $$arg_names[0] = 'mutable-unbox(o)';
   } elsif ('slots-t*' eq $type_str) {
-    $$arg_names[0] = '&mutable-unbox(object)';
+    $$arg_names[0] = '&mutable-unbox(o)';
   } elsif ('slots-t&' eq $type_str) {
-    $$arg_names[0] = 'mutable-unbox(object)';
+    $$arg_names[0] = 'mutable-unbox(o)';
   } elsif ('slots-t' eq $type_str) {
-    $$arg_names[0] = 'unbox(object)';
+    $$arg_names[0] = 'unbox(o)';
   } else {
-    $$arg_names[0] = 'object';
+    $$arg_names[0] = 'o';
   }
 
   for ($arg_num = 1; $arg_num < $num_args; $arg_num++) {
@@ -1532,7 +1532,7 @@ sub generate_generic_defn {
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
     } else {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = {nullptr, nullptr});" . $nl;
-      $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(object)).methods.addrs[selector];" . $nl;
+      $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(o)).methods.addrs[selector];" . $nl;
     }
     my $arg_names_list;
     if ($big_generic) {
@@ -1921,25 +1921,25 @@ sub generate_klass_unbox {
     ### unbox() same for all types
     my $klass_ast = &generics::klass_ast_from_klass_name($klass_name);
     if ($is_klass_defn || (&should_export_slots($klass_ast) && &has_slots_cat_info($klass_ast))) {
-      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func mutable-unbox($object_t object) -> slots-t&";
+      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func mutable-unbox($object_t o) -> slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
       } elsif (&is_target_defn()) {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . $nl .
-          $col . "  DKT-UNBOX-CHECK(object, _klass_); // optional" . $nl .
-          $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)object + klass::unbox(_klass_).offset);" . $nl .
+          $col . "  DKT-UNBOX-CHECK(o, _klass_); // optional" . $nl .
+          $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)o + klass::unbox(_klass_).offset);" . $nl .
           $col . "  return s;" . $nl .
           $col . "}} // $klass_name\::mutable-unbox()" . $nl;
       }
 
-      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox($object_t object) -> const slots-t&";
+      $result .= $col . "klass $klass_name { [[UNBOX-ATTRS]] INLINE func unbox($object_t o) -> const slots-t&";
       if (&is_src_decl() || &is_target_decl()) {
         $result .= "; }" . &ann(__FILE__, __LINE__) . $nl; # general-case
       } elsif (&is_target_defn()) {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . $nl .
-          $col . "  const slots-t& s = mutable-unbox(object);" . $nl .
+          $col . "  const slots-t& s = mutable-unbox(o);" . $nl .
           $col . "  return s;" . $nl .
           $col . "}} // $klass_name\::unbox()" . $nl;
       }
