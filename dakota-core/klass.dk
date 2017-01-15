@@ -69,8 +69,8 @@ klass vector;
 thread-local super-t            dkt-current-context =   {nullptr, nullptr};
 thread-local const signature-t* dkt-current-signature = nullptr;
 
-[[noreturn]] func dkt-null-method(object-t object, ...) -> void {
-  throw $make(no-such-method-exception::klass(), #object: object, #context: &dkt-current-context, #signature: dkt-current-signature);
+[[so-export, noreturn]] func dkt-null-method(object-t o, ...) -> void {
+  throw $make(no-such-method-exception::klass(), #object: o, #context: &dkt-current-context, #signature: dkt-current-signature);
 }
 klass selector-pair-compare {
   slots (*)(const selector-pair-t*, const selector-pair-t*) -> cmp-t;
