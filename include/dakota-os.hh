@@ -19,10 +19,10 @@
 # include <dakota-decl.hh>
 
 # if defined __linux__
-  static inline FUNC dkt_get_segment_data(str_t, void**, size_t*) -> void* {
+  inline FUNC dkt_get_segment_data(str_t, void**, size_t*) -> void* {
     return nullptr;
   }
-  static inline FUNC strsignal_name(int) -> str_t {
+  inline FUNC strsignal_name(int) -> str_t {
     return "not-yet-implimented: strsignal-name(int-t) -> str-t";
   }
 # elif defined __APPLE__ && defined __MACH__
@@ -31,11 +31,11 @@
 
   extern void* __dso_handle;
 
-  static inline FUNC dkt_get_segment_data(str_t segment, void** addr_out, size_t* size_out) -> void* {
+  inline FUNC dkt_get_segment_data(str_t segment, void** addr_out, size_t* size_out) -> void* {
     *addr_out = cast(void*)getsegmentdata(cast(const struct mach_header_64*)&__dso_handle, segment, size_out);
     return *addr_out;
   }
-  static inline FUNC strsignal_name(int sig) -> str_t {
+  inline FUNC strsignal_name(int sig) -> str_t {
     return sys_signame[sig];
   }
 # else

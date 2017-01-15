@@ -122,7 +122,7 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
 # define countof(array) (sizeof((array))/sizeof((array)[0]))
 # define scountof(array) cast(ssize_t)countof(array)
 
-[[format_va_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, va_list_t args) -> fnd_int_t {
+[[format_va_printf(1)]] inline FUNC non_exit_fail_with_msg(const char8_t* format, va_list_t args) -> fnd_int_t {
   if (1) {
     va_list syslog_args;
     va_copy(syslog_args, args);
@@ -131,17 +131,17 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   vfprintf(stderr, format, args);
   return EXIT_FAILURE;
 }
-[[format_printf(1)]] static inline FUNC non_exit_fail_with_msg(const char8_t* format, ...) -> fnd_int_t {
+[[format_printf(1)]] inline FUNC non_exit_fail_with_msg(const char8_t* format, ...) -> fnd_int_t {
   va_list_t args;
   va_start(args, format);
   fnd_int_t val = non_exit_fail_with_msg(format, args);
   va_end(args);
   return val;
 }
-[[format_va_printf(1), noreturn]] static inline FUNC exit_fail_with_msg(const char8_t* format, va_list_t args) -> void {
+[[format_va_printf(1), noreturn]] inline FUNC exit_fail_with_msg(const char8_t* format, va_list_t args) -> void {
   exit(non_exit_fail_with_msg(format, args));
 }
-[[format_printf(1), noreturn]] static inline FUNC exit_fail_with_msg(const char8_t* format, ...) -> void {
+[[format_printf(1), noreturn]] inline FUNC exit_fail_with_msg(const char8_t* format, ...) -> void {
   va_list_t args;
   va_start(args, format);
   exit_fail_with_msg(format, args);
