@@ -265,7 +265,7 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
   # define DKT_NULL_METHOD cast(method_t)dkt_null_method
 # endif
 
-[[so_export, noreturn]] FUNC dkt_null_method(object_t) -> void;
+FUNC dkt_null_method(object_t) -> object_t;
 
 [[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, object_t, va_list_t) -> fnd_int_t;
 [[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, super_t,  va_list_t) -> fnd_int_t;
