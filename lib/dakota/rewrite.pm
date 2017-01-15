@@ -801,7 +801,7 @@ sub rewrite_keyword_syntax_list {
 sub keyword_use {
   my ($arg1, $arg2) = @_;
   my $arg1_ident = &dk_mangle($arg1);
-  return "&__keyword::$arg1_ident$arg2, cast(intptr-t)";
+  return "&__keyword::$arg1_ident$arg2,cast(intptr-t)";
 }
 sub rewrite_keyword_use {
   my ($arg1, $arg2) = @_;
@@ -811,6 +811,7 @@ sub rewrite_keyword_use {
   $list =~ s/\#?($mid)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
   $list =~ s/\#?($id)(\s*)(?<!$colon)$colon(?!$colon)/&keyword_use($1, $2)/ge;
   $list =~ s/\)$/, SENTINEL-PTR\)/g;
+  $list =~ s/(cast\(.+?\))(\s+)/$2$1/g;
   #print STDERR "$arg1$list\n";
   return "$arg1$list";
 }
