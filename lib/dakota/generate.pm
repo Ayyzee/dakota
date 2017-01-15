@@ -1531,7 +1531,7 @@ sub generate_generic_defn {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = context);" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
     } else {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = dkt-null-context);" . $nl;
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = {nullptr, nullptr});" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(object)).methods.addrs[selector];" . $nl;
     }
     my $arg_names_list;

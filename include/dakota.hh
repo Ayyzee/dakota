@@ -217,7 +217,6 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
 [[so_export]] extern object_t std_error;
 
 [[so_export]] extern thread_local const signature_t* dkt_current_signature;
-[[so_export]] extern thread_local super_t            dkt_null_context;
 [[so_export]] extern thread_local super_t            dkt_current_context;
 
 typealias dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
