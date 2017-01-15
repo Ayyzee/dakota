@@ -34,7 +34,7 @@ klass no-such-method-exception {
               str-t              src-file:  nullptr,
               fnd-int-t          src-line:  0) -> object-t {
     self = $init(super, #src-file: src-file, #src-line: src-line);
-    assert((object || context->object) && !(object && context->object));
+    //assert((object || context->object) && !(object && context->object));
     self.signature = signature;
     self.context =   {object, nullptr};
     if (context != nullptr) 
