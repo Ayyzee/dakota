@@ -159,6 +159,7 @@ our @EXPORT= qw(
                  replace_first
                  replace_last
                  rewrite_klass_defn_with_implicit_metaklass_defn
+                 rewrite_scoped_int_uint
                  root_cmd
                  scalar_from_file
                  scalar_to_file
@@ -533,6 +534,31 @@ sub rewrite_klass_defn_with_implicit_metaklass_defn_replacement {
 sub rewrite_klass_defn_with_implicit_metaklass_defn {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/^klass(\s+)([\w:-]+)(\s*)\{(\s*$main::block_in\s*)\}/&rewrite_klass_defn_with_implicit_metaklass_defn_replacement($1, $2, $3, $4)/egms;
+}
+my $int_tbl = {
+   'int' =>  'int32',
+  'uint' => 'uint32',
+};
+sub rewrite_scoped_int_uint_replacement1 {
+  my ($name, $rhs) = @_;
+  if ($$int_tbl{$name}) {
+    $name = $$int_tbl{$name};
+  }
+  return "$name$rhs";
+}
+sub rewrite_scoped_int_uint_replacement2 {
+  my ($lhs, $name) = @_;
+  if ($$int_tbl{$name}) {
+    $name = $$int_tbl{$name};
+  }
+  return "$lhs$name";
+}
+sub rewrite_scoped_int_uint {
+  my ($filestr_ref) = @_;
+  # int :: => int64 ::
+  # klass int => klass int64
+  $$filestr_ref =~ s/($id)(\s*::)/&rewrite_scoped_int_uint_replacement1($1, $2)/ge;
+  $$filestr_ref =~ s/(klass\s+)($id)/&rewrite_scoped_int_uint_replacement2($1, $2)/ge;
 }
 sub header_file_regex {
   return qr|[/.\w-]|;

@@ -219,6 +219,16 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
 [[so_export]] extern thread_local const signature_t* dkt_current_signature;
 [[so_export]] extern thread_local super_t            dkt_current_context;
 
+# if    INT_MAX == INT32_MAX
+  typealias  int_t =  int32_t; //  int :: =>  int32 :: / klass  int => klass  int32
+  typealias uint_t = uint32_t; // uint :: => uint32 :: / klass uint => klass uint32
+# elif  INT_MAX == INT64_MAX
+  typealias  int_t =  int64_t; //  int :: =>  int64 :: / klass  int => klass  int64
+  typealias uint_t = uint64_t; // uint :: => uint64 :: / klass uint => klass uint64
+# else
+  # error "Unable to alias int-t and uint-t."
+# endif
+
 typealias dkt_signature_func_t =    FUNC (*)() -> const signature_t*; // ro
 typealias dkt_selector_func_t =     FUNC (*)() -> selector_t*;        // rw
 typealias dkt_generic_func_func_t = FUNC (*)() -> generic_func_t*;    // rw

@@ -2289,6 +2289,7 @@ sub ast_from_dk_path {
   &encode_strings(\$_);
   my $parts = &encode_comments(\$_);
   &rewrite_klass_defn_with_implicit_metaklass_defn(\$_);
+  &rewrite_scoped_int_uint(\$_);
 
   #my $__sub__ = (caller(0))[3];
   #&log_sub_name($__sub__);

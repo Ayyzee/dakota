@@ -1009,6 +1009,7 @@ sub convert_dk_to_cc {
   &rewrite_literal_booles($filestr_ref);
   &rewrite_literal_chars($filestr_ref);
   &rewrite_literal_ints($filestr_ref);
+  &rewrite_scoped_int_uint($filestr_ref);
   &rewrite_switch($filestr_ref);
 
   &rewrite_objects($filestr_ref); # must be before line removing leading #
