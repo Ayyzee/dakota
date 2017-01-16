@@ -302,15 +302,14 @@ sub ast_merge {
   &scalar_to_file($outpath, $ast);
   return $ast;
 }
-
 my $gbl_sst = undef;
 my $gbl_sst_cursor = undef;
 my $gbl_user_data = &dakota::sst::lang_user_data();
-
 my $gbl_root_ast = {};
 my $gbl_current_ast_scope = $gbl_root_ast;
 my $gbl_current_module = undef;
 my $gbl_filename = undef;
+
 sub init_ast_from_inputs_vars {
   my ($cmd_info) = @_;
   $gbl_root_ast = {};
@@ -1299,10 +1298,10 @@ sub klass {
       }
       if (m/^slots$/) {
         if (&sst_cursor::next_token($gbl_sst_cursor) !~ /^(\.|->|,|\+)$/) {
-        if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) || '{' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
-          &slots({ 'is-exported' => $$args{'is-exported'} });
-          last;
-        }
+          if (';' eq &sst_cursor::previous_token($gbl_sst_cursor) || '{' eq &sst_cursor::previous_token($gbl_sst_cursor)) {
+            &slots({ 'is-exported' => $$args{'is-exported'} });
+            last;
+          }
         }
       }
       # [[export]] method
@@ -1624,11 +1623,9 @@ sub param_list {
     }
     &add_last($types, $type);
   }
-
   if (0 == @$kw_arg_names) {
     $kw_arg_names = undef;
   }
-
   if (0 == @$kw_arg_defaults) {
     $kw_arg_defaults = undef;
   }
@@ -1698,12 +1695,9 @@ sub kw_args_generics_add {
   my $types_str = &param_types_str($types);
   $$target_srcs_ast{'kw-arg-generics'}{$name_str}{$types_str} = [ $name, $types ];
 }
-
 # 'methods'
 # 'slots-methods'
-
 # exported or not, slots or not, va or not
-
 # exported-va-slots-methods
 sub method {
   my ($args) = @_;
@@ -1817,10 +1811,8 @@ sub method {
     }
   }
   $$gbl_sst_cursor{'current-token-index'} = $close_paren_index + 1;
-
   #print STDERR &Dumper($method);
   &match(__FILE__, __LINE__, '->'); # this syntax is similiar to how Lambda funcs are specified in C++11
-
   ### RETURN-TYPE
   my $return_type = [];
   while (&sst::at($$gbl_sst_cursor{'sst'},
@@ -1948,7 +1940,6 @@ sub generics::klass_ast_from_klass_name {
   }
   return $klass_ast;
 }
-
 sub _add_indirect_klasses { # recursive
   my ($klass_names_set, $klass_name, $col) = @_;
   my $klass_ast =
@@ -2031,11 +2022,9 @@ sub generics::parse {
   my $symbols = {};
   my $generics_tbl = {};
   my $big_cahuna = [];
-
   my $generics_used = $$ast{'generics'};
   # used in catch() rewrites
   #    $$generics_used{'instance?'} = undef; # hopefully the rhs is undef, otherwise we just lost it
-
   &add_indirect_klasses($klass_names_set);
 
   foreach my $construct ('klasses', 'traits', 'requires') {
