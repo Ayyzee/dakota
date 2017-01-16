@@ -149,7 +149,7 @@ klass sorted-array {
       add-at(t, key, result.offset);
     return t;
   }
-  func intern(slots-t* t, const void* key) -> const void* {
+  func symbolize(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
     const void* element = key;
     result-t result = search(t, key);

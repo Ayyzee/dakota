@@ -658,7 +658,7 @@ sub generate_target_runtime {
   $target_cc_str .= $nl;
   $target_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
-  $target_cc_str .= "[[read-only]] static symbol-t name = dk-intern(\"$$target_srcs_ast{'other'}{'name'}\");" . $nl;
+  $target_cc_str .= "[[read-only]] static symbol-t name = dk-symbolize(\"$$target_srcs_ast{'other'}{'name'}\");" . $nl;
   $target_cc_str .= $nl;
   #my $col;
   $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);
@@ -3546,7 +3546,7 @@ sub dk_generate_cc_footer_klass {
     my $slots_type_ident = &dk_mangle($slots_type);
     $$tbbl{'#slots-type'} = &as_literal_symbol($slots_type);
     my $tp = 'slots-t';
-   #$$tbbl{'#slots-typeid'} = 'dk-intern-free(dkt::demangle(typeid(' . $tp . ').name()))';
+   #$$tbbl{'#slots-typeid'} = 'dk-symbolize-free(dkt::demangle(typeid(' . $tp . ').name()))';
     $$tbbl{'#slots-typeid'} = 'INTERNED-DEMANGLED-TYPEID-NAME(' . $tp . ')';
   } elsif (&has_slots_cat_info($klass_ast)) {
     my $slots_cat = &at($$klass_ast{'slots'}, 'cat');
@@ -4098,7 +4098,7 @@ sub linkage_unit::generate_symbols {
     } elsif (&is_target_defn()) {
       $symbol =~ s|"|\\"|g;
       $symbol =~ s/\\\|/\|/g;
-      $scratch_str .= $col . "symbol-t $ident =" . $pad . " dk-intern(\"$symbol\");" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
+      $scratch_str .= $col . "symbol-t $ident =" . $pad . " dk-symbolize(\"$symbol\");" . &ann(__FILE__, __LINE__, !$should_ann) . $nl;
     }
   }
   $col = &colout($col);
@@ -4313,7 +4313,7 @@ sub generate_target_runtime_property_tbl {
       if ($$symbols{$literal_symbol}) {
         $element = $literal_symbol;
       } else {
-        $element = "dk-intern($element)";
+        $element = "dk-symbolize($element)";
       }
     }
     my $in1 = &ident_comment($key, 1);

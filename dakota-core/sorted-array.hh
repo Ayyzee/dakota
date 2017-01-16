@@ -24,7 +24,7 @@ KLASS_NS sorted_array {
 
   METHOD search(const slots_t* t, const void* key) -> result_t;
   METHOD sort(slots_t* t) -> slots_t*;
-  METHOD intern(slots_t* t, const void* key) -> const void*;
+  METHOD symbolize(slots_t* t, const void* key) -> const void*;
   METHOD at(const slots_t* t, ssize_t offset) -> const void*;
   METHOD remove_last(slots_t* t) -> const void*;
 

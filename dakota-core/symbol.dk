@@ -24,7 +24,7 @@ module dakota-core;
 klass hash;
 klass sorted-set;
 
-klass intern-pool-klass {
+klass symbol-klass {
   superklass klass;
 
   slots {
@@ -44,7 +44,7 @@ klass symbol-compare {
   slots (*)(symbol-t, symbol-t) -> fnd-int-t;
 }
 klass symbol {
-  klass intern-pool-klass;
+  klass symbol-klass;
   slots str-t;
 
   method init(object-t self, slots-t slots: nullptr) -> object-t {

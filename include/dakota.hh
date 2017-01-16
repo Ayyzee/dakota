@@ -105,7 +105,7 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   # include <typeinfo>
   # define DKT_UNBOX_CHECK_ENABLED 1
   # define DEBUG_STMT(...) __VA_ARGS__
-  # define INTERNED_DEMANGLED_TYPEID_NAME(t) dk_intern_free(dkt::demangle(typeid(t).name()))
+  # define INTERNED_DEMANGLED_TYPEID_NAME(t) dk_symbolize_free(dkt::demangle(typeid(t).name()))
 # else
   # define DEBUG_STMT(...)
   # define INTERNED_DEMANGLED_TYPEID_NAME(t) nullptr
@@ -233,8 +233,8 @@ constexpr FUNC dk_hash_switch(str_t str) -> hash_t { return dk_hash(str); }
 constexpr FUNC dk_hash_switch(ssize_t val) -> ssize_t { return val; }
 constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 
-[[so_export]] FUNC dk_intern(str_t)      -> symbol_t;
-[[so_export]] FUNC dk_intern_free(str_t) -> symbol_t;
+[[so_export]] FUNC dk_symbolize(str_t)      -> symbol_t;
+[[so_export]] FUNC dk_symbolize_free(str_t) -> symbol_t;
 [[so_export]] FUNC dk_klass_for_name(symbol_t) -> object_t;
 
 [[so_export]] FUNC map(object_t,   std::function<object_t (object_t)>) -> object_t;
