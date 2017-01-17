@@ -16,11 +16,23 @@
 
 //# include <cinttypes>
 
-# include <cstdint>
-
 include-for <climits> INT-MAX,
                       INT-MIN,
                       UINT-MAX;
+
+
+include-for <cstdint> int8-t,
+                      int16-t,
+                      int32-t,
+                      int64-t,
+                      intmax-t,
+                      intptr-t,
+                      uint8-t,
+                      uint16-t,
+                      uint32-t,
+                      uint64-t,
+                      uintmax-t,
+                      uintptr-t;
 
 module dakota-core;
 
