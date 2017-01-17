@@ -16,22 +16,11 @@
 
 //# include <cinttypes>
 
-include-for <climits> INT-MIN,
-                      INT-MAX,
-                      UINT-MAX;
+# include <cstdint>
 
-include-for <cstdint> int8-t,
-                      int16-t,
-                      int32-t,
-                      int64-t,
-                      intmax-t,
-                      intptr-t,
-                      uint8-t,
-                      uint16-t,
-                      uint32-t,
-                      uint64-t,
-                      uintmax-t,
-                      uintptr-t;
+include-for <climits> INT-MAX,
+                      INT-MIN,
+                      UINT-MAX;
 
 module dakota-core;
 
@@ -283,6 +272,20 @@ klass uintptr {
     $dump(super);
     fprintf(stderr, "%p:%p { slots=\"%lu\" }\n",
             cast(ptr-t)self, cast(ptr-t)unbox(self), unbox(self));
+    return self;
+  }
+}
+klass sig-atomic {
+  superklass number;
+  
+  slots sig-atomic-t;
+
+  const slots-t max = SIG-ATOMIC-MAX;
+  const slots-t min = SIG-ATOMIC-MIN;
+
+  method init(object-t self, slots-t slots: 0) -> object-t {
+    self = $init(super);
+    mutable-unbox(self) = slots;
     return self;
   }
 }

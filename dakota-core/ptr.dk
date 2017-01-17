@@ -14,12 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+include-for <cstdint> PTRDIFF-MAX,
+                      PTRDIFF-MIN;
+
 module dakota-core;
 
 klass ptr {
   slots void*;
 
   method init(object-t self, slots-t slots: nullptr) -> object-t {
+    self = $init(super);
+    mutable-unbox(self) = slots;
+    return self;
+  }
+}
+klass ptrdiff {
+  slots ptrdiff-t;
+
+  const slots-t max = PTRDIFF-MAX;
+  const slots-t min = PTRDIFF-MIN;
+
+  method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
     return self;

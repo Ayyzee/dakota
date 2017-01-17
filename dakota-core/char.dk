@@ -14,6 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+include-for <cwchar> wchar-t,
+                     wint-t;
+include-for <cstdint> CHAR-MAX,
+                      CHAR-MIN,
+                      SCHAR-MAX,
+                      SCHAR-MIN,
+                      UCHAR-MAX,
+                      WCHAR-MAX,
+                      WCHAR-MIN,
+                      WINT-MAX,
+                      WINT-MIN;
 module dakota-core;
 
 klass number;
@@ -22,6 +33,9 @@ klass char8 {
   superklass number;
   
   slots char8-t;
+
+  const slots-t max = CHAR-MAX;
+  const slots-t min = CHAR-MIN;
 
   method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
@@ -34,6 +48,8 @@ klass uchar8 {
   
   slots uchar8-t;
 
+  const slots-t max = UCHAR-MAX;
+
   method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;
@@ -44,6 +60,9 @@ klass schar8 {
   superklass number;
   
   slots schar8-t;
+
+  const slots-t max = SCHAR-MAX;
+  const slots-t min = SCHAR-MIN;
 
   method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
@@ -77,6 +96,23 @@ klass wchar {
   superklass number;
   
   slots wchar-t;
+
+  const slots-t max = WCHAR-MAX;
+  const slots-t min = WCHAR-MIN;
+
+  method init(object-t self, slots-t slots: 0) -> object-t {
+    self = $init(super);
+    mutable-unbox(self) = slots;
+    return self;
+  }
+}
+klass wint {
+  superklass number;
+  
+  slots wint-t;
+
+  const slots-t max = WINT-MAX;
+  const slots-t min = WINT-MIN;
 
   method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);

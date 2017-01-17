@@ -23,6 +23,8 @@ module dakota-core;
 klass size {
   slots size-t;
 
+  const slots-t max = SIZE-MAX;
+
   method init(object-t self, slots-t slots: 0) -> object-t {
     self = $init(super);
     mutable-unbox(self) = slots;

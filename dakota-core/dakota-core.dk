@@ -165,6 +165,8 @@ export dakota-core {
   property;
   ptr::slots-t;
   ptr;
+  ptrdiff::slots-t;
+  ptrdiff;
   registration-info::slots-t;
   registration-info;
   result::slots-t;
@@ -181,6 +183,8 @@ export dakota-core {
   selector;
   sequence;
   set;
+  sig-atomic::slots-t;
+  sig-atomic;
   sigbus-exception;
   signal-exception;
   signature::slots-t;
@@ -279,6 +283,8 @@ export dakota-core {
   vector;
   wchar::slots-t;
   wchar;
+  wint::slots-t;
+  wint;
   x::sigaction-handler::slots-t;
   x::sigaction-handler;
   x::sigaction-pair::slots-t;
