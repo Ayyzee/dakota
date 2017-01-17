@@ -542,6 +542,8 @@ my $int_tbl = {
    'char' =>  'char8',
   'uchar' => 'uchar8',
   'schar' => 'schar8',
+
+   'bool' => 'boole',
 };
 sub rewrite_scoped_int_uint_replacement1 {
   my ($name, $rhs) = @_;
