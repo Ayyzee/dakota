@@ -102,7 +102,6 @@
     '#int-literals' => undef,
     '#int-names' => undef,
     '#int-ptrs' => undef,
-    '#fnd-double-t' => undef,
     '#int-t' => undef,
     '#uint-t' => undef,
     '#interpose-name' => undef,
@@ -143,7 +142,6 @@
     '#type-enum' => undef,
     '#typeid' => undef,
     '#uchar-t' => undef, # hardcode typealias
-    '#fnd-double-t' => undef,
     '#int-t' => undef,
     '#uint-t' => undef,
     '#union' => undef,

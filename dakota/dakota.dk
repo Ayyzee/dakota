@@ -27,10 +27,6 @@ export dakota {
   float32;
   float64::slots-t;
   float64;
-  fnd-double::max;
-  fnd-double::min;
-  fnd-double::slots-t;
-  fnd-double;
   hashed-counted-set;
   hashed-set;
   hashed-table;

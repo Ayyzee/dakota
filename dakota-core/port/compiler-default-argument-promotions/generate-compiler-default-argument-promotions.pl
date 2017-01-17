@@ -88,13 +88,6 @@ my $type_tbl = {
     'uint-fast64-t'         => 1,
     'uint-fast64::slots-t'  => 1,
   },
-  'fnd-double-t' => {
-    'float32-t'         => 1,
-    'float32::slots-t'  => 1,
-
-    'float64-t'         => 1,
-    'float64::slots-t'  => 1,
-  },
 };
 my $implementation_defined_signedness = {
   'char-t'           => 1,

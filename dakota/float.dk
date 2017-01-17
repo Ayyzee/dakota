@@ -14,24 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-include-for <cfloat> DBL-MIN
-                     DBL-MAX;
 module dakota;
 
-klass fnd-double {
-  superklass number;
-  
-  slots double;
-
-  const slots-t min = DBL-MIN;
-  const slots-t max = DBL-MAX;
-
-  method init(object-t self, slots-t slots: 0.0) -> object-t {
-    self = $init(super);
-    mutable-unbox(self) = slots;
-    return self;
-  }
-}
 klass float32 {
   superklass number;
   
@@ -65,6 +49,6 @@ klass float128 {
     return self;
   }
 }
-static-assert( 32/8 == sizeof( float32-t), "The slots type of klass float32  must be  4 bytes in size");
-static-assert( 64/8 == sizeof( float64-t), "The slots type of klass float64  must be  8 bytes in size");
-static-assert(128/8 == sizeof(float128-t), "The slots type of klass float128 must be 16 bytes in size");
+static-assert( 32/8 == sizeof( float32-t), "The slots float32-t  must be  4 bytes in size");
+static-assert( 64/8 == sizeof( float64-t), "The slots float64-t  must be  8 bytes in size");
+static-assert(128/8 == sizeof(float128-t), "The slots float128-t must be 16 bytes in size");
