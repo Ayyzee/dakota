@@ -86,9 +86,9 @@ typealias  char_t =          char; // may be signed or unsigned (same with wchar
 typealias schar_t =   signed char;
 typealias uchar_t = unsigned char;
 
-typealias  char_t =  char_t;
-typealias schar_t = schar_t;
-typealias uchar_t = uchar_t;
+typealias  char8_t =  char_t;
+typealias schar8_t = schar_t;
+typealias uchar8_t = uchar_t;
 
 // integer promotions are
 //   float              -> double
