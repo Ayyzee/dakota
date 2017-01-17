@@ -28,13 +28,13 @@ klass object-output-stream;
 
 klass str-buffer {
   slots {
-    char8-t* ptr;
+    char-t* ptr;
     ssize-t  len;
     ssize-t  capacity;
   }
   method init(object-t self, ssize-t capacity: 8) -> object-t {
     self = $init(super);
-    self.ptr = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * capacity);
+    self.ptr = cast(char-t*)dkt::alloc(ssizeof(char-t) * capacity);
     self.ptr[0] = NUL;
     self.len = 0;
     self.capacity = capacity;
@@ -88,7 +88,7 @@ klass str-buffer {
       s->len = cast(ssize-t)safe-strlen(s->ptr);
     return s->len;
   }
-  method concat(slots-t* s, char8-t c) -> slots-t* {
+  method concat(slots-t* s, char-t c) -> slots-t* {
     assert(c != NUL);
     assert(s->len + 1 != s->capacity);
       

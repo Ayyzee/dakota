@@ -110,7 +110,7 @@ static const int64-t selector-count-max = 255;
 //     {
 //       symbol-t   selector =  gbl-selectors[index]->name;
 //       int64-t selector =  *gbl-selectors[index]->ptr;
-//       char8-t[1024] buffer; buffer[0] = NUL;
+//       char-t[1024] buffer; buffer[0] = NUL;
 
 //       printf("pair[%03u]: selector = %03u, selector = %s\n",
 //              index, selector, selector);
@@ -385,9 +385,9 @@ klass klass {
   //   throw $make(exception::klass(), #msg: "not yet implemented");
   //   // return nullptr
   // }
-  method method-for-selector?(object-t self, selector-t selector) -> boole-t {
+  method method-for-selector?(object-t self, selector-t selector) -> bool-t {
     assert(selector < self.methods.count);
-    boole-t result = false;
+    bool-t result = false;
     method-t m = $method-for-selector(self, selector);
     if (m != DKT-NULL-METHOD) {
       result = true;
@@ -530,7 +530,7 @@ klass klass {
                           named-info-t* info,
                           symbol-t      symbol-method-signatures,
                           symbol-t      symbol-method-addresses,
-                          boole-t       should-override) -> void {
+                          bool-t       should-override) -> void {
     named-info-t* current-info = info;
     do {
       signature-t** method-signatures = cast(signature-t**)named-info::at(current-info, symbol-method-signatures);
@@ -591,7 +591,7 @@ klass klass {
     while ((trait-name = traits[i++]) != nullptr) {
       named-info-t* trait-info = info-for-name(trait-name);
       add-traits(self, cast(const symbol-t*)named-info::at(trait-info, #traits));
-      boole-t should-override;
+      bool-t should-override;
       add-methods(self, trait-info, #method-signatures, #method-addresses, should-override = false);
       add-methods(self, trait-info, #exported-method-signatures, #exported-method-addresses, should-override = false);
     }
@@ -652,12 +652,12 @@ klass klass {
   //   }
   //   return;
   // }
-  method behavior?(object-t self, object-t kls) -> boole-t {
+  method behavior?(object-t self, object-t kls) -> bool-t {
 # if defined DKT-OMIT-BEHAVIOR
     return false;
 # endif
     assert((self.behavior != nullptr) || (unbox(kls).behavior != nullptr));
-    boole-t state = $bit-and?(self.behavior, unbox(kls).behavior);
+    bool-t state = $bit-and?(self.behavior, unbox(kls).behavior);
     return state;
   }
   static func behavior(object-t self, ssize-t methods-count) -> object-t {
@@ -733,7 +733,7 @@ klass klass {
 # endif
     alloc-methods(self, selector-count());
     init-methods(self);
-    boole-t should-override;
+    bool-t should-override;
     add-methods(self, self.info, #method-signatures, #method-addresses, should-override = true);
     add-methods(self, self.info, #exported-method-signatures, #exported-method-addresses, should-override = true);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info, #method-aliases);
@@ -774,8 +774,8 @@ klass klass {
     object-t result = init(self, tmp-info-slots);
     return result;
   }
-  method subklass?(object-t self, object-t kls) -> boole-t {
-    boole-t state = false;
+  method subklass?(object-t self, object-t kls) -> bool-t {
+    bool-t state = false;
     object-t tmp-kls = self;
 
     while (!root-superklass?((tmp-kls = superklass-of(tmp-kls)))) {
@@ -792,7 +792,7 @@ klass klass {
   method str(object-t self) -> str-t {
     symbol-t name = name-of(self);
     ssize-t name-len = cast(ssize-t)safe-strlen(name);
-    char8-t* buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (name-len + (1)));
+    char-t* buffer = cast(char-t*)dkt::alloc(ssizeof(char-t) * (name-len + (1)));
     snprintf(buffer, cast(size-t)(name-len + (1)), "%s", name);
     return buffer;
   }

@@ -26,19 +26,19 @@ klass tokenid {
     mutable-unbox(self) = slots;
     return self;
   }
-  method str(slots-t s, char8-t* str, ssize-t len) -> str-t {
+  method str(slots-t s, char-t* str, ssize-t len) -> str-t {
     //# if LITTLE-ENDIAN
     if (128 > s) {
       assert(1 <= len);
-      str[0] = cast(char8-t)s;
+      str[0] = cast(char-t)s;
       if (1 + (1) <= len)
         str[1] = NUL;
     } else {
       assert(4 <= len);
-      str[0] = cast(char8-t)((s >> 24) & 0x000000ff);
-      str[1] = cast(char8-t)((s >> 16) & 0x000000ff);
-      str[2] = cast(char8-t)((s >>  8) & 0x000000ff);
-      str[3] = cast(char8-t)((s >>  0) & 0x000000ff);
+      str[0] = cast(char-t)((s >> 24) & 0x000000ff);
+      str[1] = cast(char-t)((s >> 16) & 0x000000ff);
+      str[2] = cast(char-t)((s >>  8) & 0x000000ff);
+      str[3] = cast(char-t)((s >>  0) & 0x000000ff);
       if (4 + (1) <= len)
         str[4] = NUL;
     }

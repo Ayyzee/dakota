@@ -128,14 +128,14 @@ klass hashed-set {
       throw $make(exception::klass(), #msg: "oops");
     return result;
   }
-  method in?(object-t self, object-t element) -> boole-t {
-    boole-t state = false;
+  method in?(object-t self, object-t element) -> bool-t {
+    bool-t state = false;
     if ($in(self, element, nullptr) != nullptr)
       state = true;
     return state;
   }
-  method empty?(object-t self) -> boole-t {
-    boole-t state = false;
+  method empty?(object-t self) -> bool-t {
+    bool-t state = false;
     if (0 == self.size)
       state = true;
     return state;
@@ -235,9 +235,9 @@ klass hashed-set-forward-iterator {
     }
     return self;
   }
-  method next?(object-t self) -> boole-t {
+  method next?(object-t self) -> bool-t {
     check-iterator-state(self);
-    boole-t state = false;
+    bool-t state = false;
     if (self.deque-iter != nullptr)
       state = $next?(self.deque-iter);
     return state;

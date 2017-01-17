@@ -32,7 +32,7 @@ klass boole { // a doubleton:-)
   superklass number;
   klass      boole-klass;
 
-  slots boole-t;
+  slots bool-t;
 
   method init(object-t self, slots-t slots: false) -> object-t {
     // intentionally not chaining $init()
@@ -41,16 +41,16 @@ klass boole { // a doubleton:-)
       self = (boole-klass::unbox(klass-of(self)))[slots];
     return self;
   }
-  static func mk(object-t k, boole-t v) -> object-t {
+  static func mk(object-t k, bool-t v) -> object-t {
     object-t self = $alloc(super(k, klass-of(k)));
     self = $init(super);
     mutable-unbox(self) = v;
     return self;
   }
   func initialize(object-t kls) -> void {
-    boole-t f = false;
+    bool-t f = false;
     (boole-klass::mutable-unbox(kls))[f] = mk(kls, f);
-    boole-t t = true;
+    bool-t t = true;
     (boole-klass::mutable-unbox(kls))[t] = mk(kls, t);
     return;
   }

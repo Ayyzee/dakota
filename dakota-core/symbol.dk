@@ -41,7 +41,7 @@ klass symbol-klass {
   }
 }
 klass symbol-compare {
-  slots (*)(symbol-t, symbol-t) -> fnd-int-t;
+  slots (*)(symbol-t, symbol-t) -> int-t;
 }
 klass symbol {
   klass symbol-klass;

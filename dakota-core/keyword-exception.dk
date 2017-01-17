@@ -33,7 +33,7 @@ klass keyword-exception {
               signature-t* signature:,
               symbol-t     keyword:,
               str-t        src-file:  nullptr,
-              fnd-int-t        src-line:  0) -> object-t {
+              int-t        src-line:  0) -> object-t {
     self = $init(super, #src-file: src-file, #src-line: src-line);
     self.object =    object;
     self.signature = signature;

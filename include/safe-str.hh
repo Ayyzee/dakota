@@ -19,8 +19,8 @@
 # include <cstdlib>
 # include <cstring>
 
-inline FUNC safe_strcmp(str_t s1, str_t s2) -> fnd_int_t {
-  fnd_int_t value = 0;
+inline FUNC safe_strcmp(str_t s1, str_t s2) -> int_t {
+  int_t value = 0;
 
   if (s1 == nullptr || s2 == nullptr) {
     if (nullptr == s1 && nullptr == s2)
@@ -34,7 +34,7 @@ inline FUNC safe_strcmp(str_t s1, str_t s2) -> fnd_int_t {
   }
   return value;
 }
-inline FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> fnd_int_t {
+inline FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> int_t {
   str_t s1;
   if (sp1 == nullptr)
     s1 = nullptr;
@@ -47,8 +47,8 @@ inline FUNC safe_strptrcmp(const str_t* sp1, const str_t* sp2) -> fnd_int_t {
     s2 = *sp2;
   return safe_strcmp(s1, s2);
 }
-inline FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> fnd_int_t {
-  fnd_int_t value = 0;
+inline FUNC safe_strncmp(str_t s1, str_t s2, size_t n) -> int_t {
+  int_t value = 0;
 
   if (s1 == nullptr || s2 == nullptr) {
     if (s1 == nullptr && s2 == nullptr)

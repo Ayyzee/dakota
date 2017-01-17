@@ -14,7 +14,8 @@ use warnings;
 my $extra = 2; # NEVER set this to 1
 
 my $type_tbl = {
-  'fnd-int-t' => {
+  'int-t' => {
+    'schar-t'              => 1,
     'schar8-t'             => 1,
     'schar8::slots-t'      => 1,
 
@@ -45,10 +46,12 @@ my $type_tbl = {
     'int-fast64-t'         => 1,
     'int-fast64::slots-t'  => 1,
   },
-  'fnd-uint-t' => {
+  'uint-t' => {
+    'bool-t'                => 1,
     'boole-t'               => 1,
     'boole::slots-t'        => 1,
 
+    'uchar-t'               => 1,
     'uchar8-t'              => 1,
     'uchar8::slots-t'       => 1,
 
@@ -94,6 +97,7 @@ my $type_tbl = {
   },
 };
 my $implementation_defined_signedness = {
+  'char-t'           => 1,
   'char8-t'          => 1,
   'char8::slots-t'   => 1,
 
@@ -118,7 +122,7 @@ my $fn = $ARGV[1];
 
 `$cxx -std=c++11 --language c++ --output char-is-signed char-is-signed.cc`;
 my $index = `./char-is-signed`;
-my $int_types = [ 'fnd-uint-t', 'fnd-int-t' ];
+my $int_types = [ 'uint-t', 'int-t' ];
 
 foreach my $type (sort keys %$implementation_defined_signedness) {
   if ($type && $extra != $$implementation_defined_signedness{$type} ) {

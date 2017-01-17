@@ -82,13 +82,13 @@
   # define dkt_typeinfo
 # endif
 
-typealias  char8_t =          char; // may be signed or unsigned (same with wchar-t)
-typealias schar8_t =   signed char;
-typealias uchar8_t = unsigned char;
+typealias  char_t =          char; // may be signed or unsigned (same with wchar-t)
+typealias schar_t =   signed char;
+typealias uchar_t = unsigned char;
 
-typealias  char_t =  char8_t;
-typealias schar_t = schar8_t;
-typealias uchar_t = uchar8_t;
+typealias  char_t =  char_t;
+typealias schar_t = schar_t;
+typealias uchar_t = uchar_t;
 
 // integer promotions are
 //   float              -> double
@@ -114,13 +114,13 @@ static_assert(128/8 == sizeof(float128_t), "The sizeof std::float128-t must equa
 
 # include <dakota-object.hh>
 
-KLASS_NS boole        { typealias slots_t = bool;                           } typealias boole_t =        boole::slots_t;
+KLASS_NS boole        { typealias slots_t = bool;                           } typealias bool_t =        boole::slots_t;
 KLASS_NS fnd_double   { typealias slots_t = double;                         } typealias fnd_double_t =   fnd_double::slots_t;
-KLASS_NS fnd_int      { typealias slots_t = int;                            } typealias fnd_int_t =      fnd_int::slots_t;
-KLASS_NS fnd_uint     { typealias slots_t = unsigned int;                   } typealias fnd_uint_t =     fnd_uint::slots_t;
-KLASS_NS cmp          { typealias slots_t = fnd_int_t;                      } typealias cmp_t =          cmp::slots_t;
+KLASS_NS fnd_int      { typealias slots_t = int;                            } typealias int_t =      fnd_int::slots_t;
+KLASS_NS fnd_uint     { typealias slots_t = unsigned int;                   } typealias uint_t =     fnd_uint::slots_t;
+KLASS_NS cmp          { typealias slots_t = int_t;                      } typealias cmp_t =          cmp::slots_t;
 KLASS_NS compare      { typealias slots_t = FUNC (*)(object_t, object_t) -> cmp_t; } typealias compare_t = compare::slots_t;
 KLASS_NS generic_func { typealias slots_t = FUNC (*)(object_t) -> object_t; } typealias generic_func_t = generic_func::slots_t;
 KLASS_NS ptr          { typealias slots_t = void*;                          } typealias ptr_t =          ptr::slots_t;
-KLASS_NS str          { typealias slots_t = const char8_t*;                 } typealias str_t =          str::slots_t;
+KLASS_NS str          { typealias slots_t = const char_t*;                 } typealias str_t =          str::slots_t;
 KLASS_NS symbol       { typealias slots_t = str_t;                          } typealias symbol_t =       symbol::slots_t;

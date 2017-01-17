@@ -37,21 +37,6 @@ module dakota-core;
 
 klass number;
 
-klass fnd-int {
-  superklass number;
-  
-  slots int;
-
-  const slots-t min = INT-MIN;
-  const slots-t max = INT-MAX;
-}
-klass fnd-uint {
-  superklass number;
-  
-  slots unsigned int;
-
-  const slots-t max = UINT-MAX;
-}
 klass intmax {
   superklass number;
   

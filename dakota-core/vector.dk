@@ -140,8 +140,8 @@ klass vector {
     s2.iterator-state = 0;
     return copy;
   }
-  method empty?(object-t self) -> boole-t {
-    boole-t state;
+  method empty?(object-t self) -> bool-t {
+    bool-t state;
 
     if (0 == self.count)
       state = true;
@@ -161,8 +161,8 @@ klass vector {
     return self;
   }
   // maybe could return number present
-  method in?(object-t self, object-t element) -> boole-t {
-    boole-t state = false;
+  method in?(object-t self, object-t element) -> bool-t {
+    bool-t state = false;
 
     for (object-t e in self) {
       if ($equals?(e, element)) {
@@ -380,8 +380,8 @@ klass vector-forward-iterator {
     self.iterator-state = a.iterator-state;
     return self;
   }
-  method first?(object-t self) -> boole-t {
-    boole-t state;
+  method first?(object-t self) -> bool-t {
+    bool-t state;
     if (0 == self.index)
       state = true;
     else
@@ -392,9 +392,9 @@ klass vector-forward-iterator {
     $replace-at(self.vector, self.index, element);
     return self;
   }
-  method next?(object-t self) -> boole-t {
+  method next?(object-t self) -> bool-t {
     check-iterator-state(self);
-    boole-t result;
+    bool-t result;
     if ($at(self.vector, self.index, nullptr) != nullptr)
       result = true;
     else

@@ -23,11 +23,11 @@
 # include "config.hh"
 # include "private.hh"
 
-static func set-name(fnd-int-t, str-t) -> void;
+static func set-name(int-t, str-t) -> void;
 
 # include "strerror-name.tbl"
 
-static func set-name(fnd-int-t errnum, str-t name) -> void {
+static func set-name(int-t errnum, str-t name) -> void {
   assert(0 != errnum);
   assert(name != nullptr);
   assert(name[0] != NUL);
@@ -39,7 +39,7 @@ static func set-name(fnd-int-t errnum, str-t name) -> void {
   else {
     str-t delim = "|";
     ssize-t len = cast(ssize-t)strlen(gbl-sys-err-names[errnum]) + cast(ssize-t)strlen(delim) + cast(ssize-t)strlen(name) + (1);
-    char8-t* buf = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * len); // leakleak
+    char-t* buf = cast(char-t*)dkt::alloc(ssizeof(char-t) * len); // leakleak
     buf[0] = NUL;
     strcat(buf, gbl-sys-err-names[errnum]);
     strcat(buf, delim);
@@ -50,7 +50,7 @@ static func set-name(fnd-int-t errnum, str-t name) -> void {
   return;
 }
 # if !defined HAVE-STRERROR-NAME
-func strerror-name(fnd-int-t errnum) -> str-t {
+func strerror-name(int-t errnum) -> str-t {
   assert(errnum <= scountof(gbl-sys-err-names));
   str-t name = gbl-sys-err-names[errnum];
   return name;

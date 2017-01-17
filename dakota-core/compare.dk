@@ -17,10 +17,10 @@
 module dakota-core;
 
 klass equals {
-  slots (*)(object-t, object-t) -> boole-t;
+  slots (*)(object-t, object-t) -> bool-t;
 }
 klass cmp {
-  slots fnd-int-t;
+  slots int-t;
 }
 klass compare {
   slots (*)(object-t, object-t) -> cmp-t;

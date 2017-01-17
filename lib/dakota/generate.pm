@@ -656,7 +656,7 @@ sub generate_target_runtime {
     $$info_tbl{"\#int-ptrs"} =     '__int-ptrs';
   }
   $target_cc_str .= $nl;
-  $target_cc_str .= "[[read-only]] static char8-t  dir-buffer[4096] = \"\";" . $nl;
+  $target_cc_str .= "[[read-only]] static char-t  dir-buffer[4096] = \"\";" . $nl;
   $target_cc_str .= "[[read-only]] static str-t    dir = getcwd(dir-buffer, countof(dir-buffer));" . $nl;
   $target_cc_str .= "[[read-only]] static symbol-t name = dk-symbolize(\"$$target_srcs_ast{'other'}{'name'}\");" . $nl;
   $target_cc_str .= $nl;
@@ -1764,7 +1764,7 @@ sub slots_decl {
       if ($$slots_ast{'enum-base'}) {
         $result .= ' : ' . join('', @{$$slots_ast{'enum-base'}});
       } else {
-        $result .= ' : ' . 'fnd-int-t';
+        $result .= ' : ' . 'int-t';
       }
     }
   } elsif ($$slots_ast{'type'}) {
@@ -1831,7 +1831,7 @@ sub generate_enum_decl {
   if ($$enum{'enum-base'}) {
     $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}});
   } elsif ('type-enum' ne $cat) {
-    $$scratch_str_ref .= ' : fnd-int-t'; # default enum base
+    $$scratch_str_ref .= ' : int-t'; # default enum base
   }
   $$scratch_str_ref .= ';';
 }
@@ -1853,7 +1853,7 @@ sub generate_enum_defn {
   if ($$enum{'enum-base'}) {
     $$scratch_str_ref .= ' : ' . join('', @{$$enum{'enum-base'}});
   } elsif ('type-enum' ne $cat) {
-    $$scratch_str_ref .= ' : fnd-int-t'; # default enum base
+    $$scratch_str_ref .= ' : int-t'; # default enum base
   }
   $$scratch_str_ref .= ' {' . &ann(__FILE__, __LINE__) . $nl;
   my $max_width = 0;
@@ -3830,7 +3830,7 @@ sub generate_kw_args_method_defn {
     $delim = '';
     foreach my $kw_arg (@{$$method{'kw-args'}}) {
       my $kw_arg_name = $$kw_arg{'name'};
-      $$scratch_str_ref .= " boole-t $kw_arg_name;";
+      $$scratch_str_ref .= " bool-t $kw_arg_name;";
       $initializer .= "${delim}false";
       $delim = ', ';
     }

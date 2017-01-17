@@ -19,8 +19,8 @@
 # include "dakota.hh"
 
 KLASS_NS sorted_array {
-  FUNC   create(slots_t* slots, ssize_t capacity, ssize_t size, std_compare_t compare, boole_t is_ptr) -> slots_t*;
-  FUNC   create(ssize_t capacity, ssize_t size, std_compare_t compare, boole_t is_ptr) -> slots_t*;
+  FUNC   create(slots_t* slots, ssize_t capacity, ssize_t size, std_compare_t compare, bool_t is_ptr) -> slots_t*;
+  FUNC   create(ssize_t capacity, ssize_t size, std_compare_t compare, bool_t is_ptr) -> slots_t*;
 
   METHOD search(const slots_t* t, const void* key) -> result_t;
   METHOD sort(slots_t* t) -> slots_t*;

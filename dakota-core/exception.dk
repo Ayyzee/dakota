@@ -33,7 +33,7 @@ klass system-exception;
 klass throw-src {
   slots {
     str-t file;
-    fnd-int-t line;
+    int-t line;
   }
 }
 
@@ -41,7 +41,7 @@ thread-local throw-src-t dkt-throw-src = { nullptr, 0 };
 
 # if !defined HAVE-GETPROGNAME
 # if defined HAVE-PROCFS
-static char8-t[4 * 1024] gbl-buf;
+static char-t[4 * 1024] gbl-buf;
 func getprogname() -> str-t {
   ssize-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
   if (-1 == n)
@@ -57,7 +57,7 @@ func getprogname() -> str-t {
 # endif
 # endif
 
-[[format-va-printf(2)]] static func va-log(int64-t priority, str-t format, va-list-t args) -> fnd-int-t {
+[[format-va-printf(2)]] static func va-log(int64-t priority, str-t format, va-list-t args) -> int-t {
   stream-t log-file = stderr;
 
   if (getenv("DEBUG") != nullptr) {
@@ -81,19 +81,19 @@ func getprogname() -> str-t {
     }
   }
   fprintf(log-file, "{");
-  fnd-int-t result = vfprintf(log-file, format, args);
+  int-t result = vfprintf(log-file, format, args);
   fprintf(log-file, "},\n");
   // bugbug: need to adjust result
   return result;
 }
-[[format-va-printf(2)]] func dkt-va-log(int64-t priority, str-t format, va-list-t args) -> fnd-int-t {
+[[format-va-printf(2)]] func dkt-va-log(int64-t priority, str-t format, va-list-t args) -> int-t {
   cmp-t result = va-log(priority, format, args);
   return result;
 }
-[[format-printf(2)]] func dkt-log(int64-t priority, str-t format, ...) -> fnd-int-t {
+[[format-printf(2)]] func dkt-log(int64-t priority, str-t format, ...) -> int-t {
   va-list-t args;
   va-start(args, format);
-  fnd-int-t result = dkt-va-log(priority, format, args);
+  int-t result = dkt-va-log(priority, format, args);
   va-end(args);
   return result;
 }
@@ -108,20 +108,20 @@ klass exception {
 
   slots {
     str-t src-file;
-    fnd-int-t src-line;
+    int-t src-line;
     str-t msg;
   }
   method init(object-t self,
               str-t    msg:      nullptr,
               str-t    src-file: nullptr,
-              fnd-int-t    src-line: 0) -> object-t {
+              int-t    src-line: 0) -> object-t {
     self = $init(super);
     self.src-file = src-file;
     self.src-line = src-line;
     self.msg = msg;
     return self;
   }
-  method set-src(object-t self, str-t src-file, fnd-int-t src-line) -> object-t {
+  method set-src(object-t self, str-t src-file, int-t src-line) -> object-t {
     if (src-file != nullptr && 0 < src-line) {
       self.src-file = src-file;
       self.src-line = src-line;

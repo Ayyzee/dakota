@@ -61,7 +61,7 @@ klass output-stream {
     else if (stderr == slots)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
 # endif // DEBUG
-    fnd-int-t rtn = fclose(slots);
+    int-t rtn = fclose(slots);
 
     if (0 != rtn)
       throw $make(system-exception::klass(), #errnum: errno);
@@ -70,7 +70,7 @@ klass output-stream {
   // hackhack?  use print below?
   method write(object-t self, str-t string) -> object-t {
     ssize-t len = cast(ssize-t)safe-strlen(string);
-    fwrite(string, sizeof(char8-t), cast(size-t)len, unbox(self));
+    fwrite(string, sizeof(char-t), cast(size-t)len, unbox(self));
     return self;
   }
   static func pad-to-col(object-t self, ssize-t col) -> object-t {
@@ -79,20 +79,20 @@ klass output-stream {
     return self;
   }
   [[format-va-printf(2)]] method va::print-format(object-t self, str-t format, va-list-t args) -> object-t {
-    char8-t[256] buffer = ""; // hackhack - magic number
+    char-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     $print(self, cast(str-t)(buffer));
     return self;
   }
   [[format-va-printf(2)]] method va::println-format(object-t self, str-t format, va-list-t args) -> object-t {
-    char8-t[256] buffer = ""; // hackhack - magic number
+    char-t[256] buffer = ""; // hackhack - magic number
     vsnprintf(buffer, sizeof(buffer), format, args);
     $println(self, cast(str-t)(buffer));
     return self;
   }
   method print(object-t self, str-t string) -> object-t {
     ssize-t len = cast(ssize-t)safe-strlen(string);
-    fwrite(string, sizeof(char8-t), cast(size-t)len, unbox(self));
+    fwrite(string, sizeof(char-t), cast(size-t)len, unbox(self));
     return self;
   }
   method print(object-t self, object-t object) -> object-t {

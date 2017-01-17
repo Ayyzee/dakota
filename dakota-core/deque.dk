@@ -158,7 +158,7 @@ klass deque {
     return self;
   }
   static func string-from-node(object-t self, node::slots-t* mn,
-                               char8-t* buf, ssize-t buf-len) -> object-t {
+                               char-t* buf, ssize-t buf-len) -> object-t {
     if (self.first == mn && self.first != nullptr)
       snprintf(buf, cast(size-t)buf-len, "%s", "first     ");
     else if (self.last == mn && self.last != nullptr)
@@ -177,7 +177,7 @@ klass deque {
     //        __func__, cast(ptr-t)deque);
     node::slots-t* first = self.first;
     node::slots-t* last =  self.last;
-    char8-t[16] buf = "";
+    char-t[16] buf = "";
 
     if (first == nullptr) {
       fprintf(stdout, " %p", cast(ptr-t)first);
@@ -215,8 +215,8 @@ klass deque {
   method size(object-t self) -> ssize-t {
     return self.size;
   }
-  method empty?(object-t self) -> boole-t {
-    boole-t state;
+  method empty?(object-t self) -> bool-t {
+    bool-t state;
 
     if (0 == self.size)
       state = true;
@@ -329,7 +329,7 @@ klass deque {
   // method write-element(object-t self, object-t out, str-t name) -> object-t {
   //   if (out == null)
   //     { out = std-output; } // wrong! should be system::object-out
-  //   char8-t[128] buffer;
+  //   char-t[128] buffer;
   //   snprintf(buffer, sizeof(buffer), "<sequence name=\"%s\" size=\"%u\">", name, self.size);
   //   $writeln(out, buffer);
   //   $increment-column(out);
@@ -395,15 +395,15 @@ klass deque-forward-iterator {
     self.node->element = element;
     return self;
   }
-  // method last?(object-t self) -> boole-t {
+  // method last?(object-t self) -> bool-t {
   //   deque::slots-t& d = deque::unbox(self.deque);
-  //   boole-t state = (d.next == null);
+  //   bool-t state = (d.next == null);
 
   //   return state;
   // }
-  method next?(object-t self) -> boole-t {
+  method next?(object-t self) -> bool-t {
     check-iterator-state(self);
-    boole-t result;
+    bool-t result;
     if (self.node != nullptr)
       result = true;
     else

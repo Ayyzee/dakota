@@ -51,16 +51,16 @@ klass object {
       result = dk-cmp(cast(intptr-t)self, cast(intptr-t)other);
     return result;
   }
-  method equals?(object-t self, object-t other) -> boole-t {
+  method equals?(object-t self, object-t other) -> bool-t {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
-    boole-t state = false;
+    bool-t state = false;
 
     if (0 == $compare(self, other))
       state = true;
     return state;
   }
-  method instance?(object-t self, object-t kls) -> boole-t {
-    boole-t state = false;
+  method instance?(object-t self, object-t kls) -> bool-t {
+    bool-t state = false;
     object-t tmp-kls = klass-of(self);
 
     while (!root-superklass?(tmp-kls)) {
@@ -110,7 +110,7 @@ klass object {
   }
   method str(object-t self) -> str-t {
     ssize-t len = 2 + PRIxPTR-WIDTH + (1);
-    char8-t* buffer = cast(char8-t*)dkt::alloc(len);
+    char-t* buffer = cast(char-t*)dkt::alloc(len);
     snprintf(buffer, cast(size-t)len, "%p", cast(ptr-t)self);
     return cast(str-t)(buffer);
   }

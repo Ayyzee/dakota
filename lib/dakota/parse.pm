@@ -782,8 +782,8 @@ sub errdump {
 # slots union               ;        =>  union       slots-t                     ;
 # slots union               { ... }  =>  union       slots-t                     { ... }
 
-# slots enum                ;        =>  enum        slots-t             : fnd-int-t ;
-# slots enum                { ... }  =>  enum        slots-t             : fnd-int-t { ... }
+# slots enum                ;        =>  enum        slots-t             : int-t ;
+# slots enum                { ... }  =>  enum        slots-t             : int-t { ... }
 #
 # slots enum           : <> ;        =>  enum        slots-t             : <>    ;
 # slots enum           : <> { ... }  =>  enum        slots-t             : <>    { ... }

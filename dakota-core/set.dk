@@ -24,13 +24,13 @@ klass klass;
 trait forward-iterator;
 
 trait set {
-  method all-in?(object-t self, object-t collection) -> boole-t {
+  method all-in?(object-t self, object-t collection) -> bool-t {
     USE(self);
     USE(collection);
     throw $make(exception::klass(), #msg: "not yet implemented");
     return false;
   }
-  method any-in?(object-t self, object-t collection) -> boole-t {
+  method any-in?(object-t self, object-t collection) -> bool-t {
     USE(self);
     USE(collection);
     throw $make(exception::klass(), #msg: "not yet implemented");
@@ -71,5 +71,5 @@ trait set {
   method forward-iterator(object-t) -> object-t; // hackhack
   method in( object-t self, object-t element, object-t default-element) -> object-t;
   method in( object-t self, object-t element) -> object-t;
-  method in?(object-t self, object-t element) -> boole-t;
+  method in?(object-t self, object-t element) -> bool-t;
 }

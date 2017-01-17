@@ -35,7 +35,7 @@ klass syntax-exception {
               str-t    file:,
               str-t    msg:      name-of(klass-of(self)),
               str-t    src-file: nullptr,
-              fnd-int-t    src-line: 0) -> object-t {
+              int-t    src-line: 0) -> object-t {
     self = $init(super, #src-file: src-file, #src-line: src-line);
     self.token = token;
     self.file =  file;

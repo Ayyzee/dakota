@@ -75,9 +75,9 @@
   'src_extra_symbols' => {
   },
   'target_extra_symbols' => {
-    '#boole-t' => undef, # hardcode typealias
+    '#bool-t' => undef, # hardcode typealias
     '#cat' => undef,
-    '#char8-t' => undef, # hardcode typealias
+    '#char-t' => undef, # hardcode typealias
     '#dir' => undef,
     '#element' => undef,
     '#enum' => undef,
@@ -103,8 +103,8 @@
     '#int-names' => undef,
     '#int-ptrs' => undef,
     '#fnd-double-t' => undef,
-    '#fnd-int-t' => undef,
-    '#fnd-uint-t' => undef,
+    '#int-t' => undef,
+    '#uint-t' => undef,
     '#interpose-name' => undef,
     '#interposers' => undef,
     '#ints' => undef,
@@ -125,7 +125,7 @@
     '#node' => undef,
     '#offset' => undef,
     '#requires' => undef,
-    '#schar8-t' => undef, # hardcode typealias
+    '#schar-t' => undef, # hardcode typealias
     '#selectors' => undef,
     '#signatures' => undef,
     '#size' => undef,
@@ -142,10 +142,10 @@
     '#type' => undef,
     '#type-enum' => undef,
     '#typeid' => undef,
-    '#uchar8-t' => undef, # hardcode typealias
+    '#uchar-t' => undef, # hardcode typealias
     '#fnd-double-t' => undef,
-    '#fnd-int-t' => undef,
-    '#fnd-uint-t' => undef,
+    '#int-t' => undef,
+    '#uint-t' => undef,
     '#union' => undef,
     '#va-generic-func-ptrs' => undef,
     '#va-method' => undef,

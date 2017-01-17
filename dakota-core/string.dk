@@ -35,7 +35,7 @@ klass vector;
 klass string {
   slots {
     symbol-t encoding;
-    char8-t* ptr;
+    char-t* ptr;
     ssize-t  len;
   }
   //ssize-t size; // sizeof(ptr[0])
@@ -53,7 +53,7 @@ klass string {
     USE(encoding);
     self.encoding = encoding;
     self.len = length;
-    self.ptr = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (self.len + 1));
+    self.ptr = cast(char-t*)dkt::alloc(ssizeof(char-t) * (self.len + 1));
     strncpy(self.ptr, bytes + start, cast(size-t)self.len);
     self.ptr[self.len] = NUL;
     return self;
@@ -105,9 +105,9 @@ klass string {
     uintmax-t result = cast(uintmax-t)strtoumax(self.ptr, nullptr, 10);
     return result;
   }
-  method boole-value(object-t self) -> boole-t {
+  method bool-value(object-t self) -> bool-t {
     uintmax-t uint-value = cast(uintmax-t)strtoumax(self.ptr, nullptr, 10);
-    boole-t result;
+    bool-t result;
     if (0 == uint-value)
       result = false;
     else
@@ -140,7 +140,7 @@ klass string {
     USE(encoding);
     ssize-t len = cast(ssize-t)safe-strlen(bytes);
     self.len += len;
-    self.ptr = cast(char8-t*)dkt::alloc((self.len + 1 * ssizeof(char8-t)), self.ptr);
+    self.ptr = cast(char-t*)dkt::alloc((self.len + 1 * ssizeof(char-t)), self.ptr);
     strcat(self.ptr, bytes);
     return self;
   }
@@ -191,7 +191,7 @@ klass string {
       str-t str = $str(element);
       ssize-t length = cast(ssize-t)safe-strlen(str);
       self.len += cast(ssize-t)(length);
-      self.ptr = cast(char8-t*)dkt::alloc(((self.len + 1) * ssizeof(char8-t)), self.ptr);
+      self.ptr = cast(char-t*)dkt::alloc(((self.len + 1) * ssizeof(char-t)), self.ptr);
       strcat(self.ptr, str);
     }
     return self;

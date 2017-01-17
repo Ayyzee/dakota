@@ -25,7 +25,7 @@ module dakota-core;
 klass object-output-stream;
 
 klass str64 {
-  slots char8-t[64];
+  slots char-t[64];
 
   method dump(const slots-t* s) -> const slots-t* {
   //$dump(super);

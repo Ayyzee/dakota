@@ -49,7 +49,7 @@ klass str-klass {
 klass str {
   klass str-klass;
 
-  slots const char8-t*;
+  slots const char-t*;
 
   method init(object-t self, slots-t slots: "") -> object-t {
     self = $init(super);

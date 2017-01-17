@@ -63,7 +63,7 @@ klass token {
     self = $init(super);
 # if 0
     if (0 != tokenid) {
-      char8-t[4 + (1)] tokenid-str = "";
+      char-t[4 + (1)] tokenid-str = "";
       tokenid::str(tokenid, tokenid-str, sizeof(tokenid-str));
 
       printf("{ 'line':'%i', 'column':'%i', 'tokenid':'%s', 'buffer':'%s' },\n",
@@ -84,8 +84,8 @@ klass token {
     hash-t result = dk-hash(self.buffer);
     return result;
   }
-  method equal?(object-t self, object-t other) -> boole-t {
-    boole-t state;
+  method equal?(object-t self, object-t other) -> bool-t {
+    bool-t state;
 
     if ($instance?(other, _klass_)) {
       if (0 == $compare(self, other))
@@ -97,8 +97,8 @@ klass token {
     }
     return state;
   }
-  method empty?(object-t self) -> boole-t {
-    boole-t result = false;
+  method empty?(object-t self) -> bool-t {
+    bool-t result = false;
     if (self.buffer[0] == NUL)
       result = true;
     return result;
@@ -110,8 +110,8 @@ klass token {
     self.buffer[0] = NUL;
     return self;
   }
-  method tokenid?(object-t self, tokenid-t tokenid) -> boole-t {
-    boole-t result;
+  method tokenid?(object-t self, tokenid-t tokenid) -> bool-t {
+    bool-t result;
     if (self.tokenid == tokenid)
       result = true;
     else
@@ -131,8 +131,8 @@ klass token {
     self.leading-ws = leading-ws;
     return self;
   }
-  method leading-ws?(object-t self) -> boole-t {
-    boole-t result;
+  method leading-ws?(object-t self) -> bool-t {
+    bool-t result;
     if (self.leading-ws == nullptr)
       result = false;
     else
@@ -151,8 +151,8 @@ klass token {
   method buffer(object-t self) -> str-t {
     return cast(str-t)(self.buffer);
   }
-  method first-char8(object-t self) -> char8-t {
-    const char8-t result = self.buffer[0];
+  method first-char8(object-t self) -> char-t {
+    const char-t result = self.buffer[0];
     return result;
   }
   // this should be merged with buffer - this is a hackhack
@@ -201,7 +201,7 @@ klass token {
   // should be in superklass string??
   method append-char(object-t self, int64-t c) -> object-t {
     ssize-t len = cast(ssize-t)safe-strlen(self.buffer);
-    self.buffer[len] =     cast(char8-t)(c);
+    self.buffer[len] =     cast(char-t)(c);
     self.buffer[len + 1] = NUL;
     return self;
   }

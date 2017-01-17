@@ -22,8 +22,8 @@
 
 module dakota;
 
-static boole-t
-space?(fnd-int-t c) {
+static bool-t
+space?(int-t c) {
   return isspace(c);
 }
 
@@ -39,7 +39,7 @@ klass input-file {
   slots {
     off-t    length;
     off-t    current-position;
-    char8-t* buffer;
+    char-t* buffer;
 
     str-t    file;
     int64-t  line;
@@ -68,8 +68,8 @@ klass input-file {
     fseeko(stream, 0L, SEEK-END);
     self.length = ftello(stream); // this might be longer than needed
     fsetpos(stream, &fpos);
-    self.buffer = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (self.length + 1));
-    fread(self.buffer, sizeof(char8-t), cast(size-t)self.length, stream);
+    self.buffer = cast(char-t*)dkt::alloc(ssizeof(char-t) * (self.length + 1));
+    fread(self.buffer, sizeof(char-t), cast(size-t)self.length, stream);
     self.buffer[self.length] = NUL;
 
     // check for embedded NUL?
@@ -93,7 +93,7 @@ klass input-file {
     return cast(str-t)(self.file);
   }
   
-  method put-char8(object-t self, char8-t c) -> object-t {
+  method put-char8(object-t self, char-t c) -> object-t {
     if (0 == self.current-position)
       throw $make(exception::klass(), #msg: "oops");
     if (c != self.buffer[self.current-position - 1])
@@ -107,8 +107,8 @@ klass input-file {
     }
     return null;
   }
-  method get-char8(object-t self) -> char8-t {
-    char8-t c = self.buffer[self.current-position++];
+  method get-char8(object-t self) -> char-t {
+    char-t c = self.buffer[self.current-position++];
     if (0 != c) {
       if ('\n' == c) {
         self.line++;
@@ -125,7 +125,7 @@ klass input-file {
     if (type? == nullptr)
       type? = space?;
     
-    char8-t c = NUL;
+    char-t c = NUL;
     while (1) {
     # if 0
       str128-t  ws-buf = "";

@@ -38,12 +38,12 @@
 # define DKT_MEM_MGMT        DKT_MEM_MGMT_MALLOC
 
 # if !defined NUL
-  # define    NUL cast(char8_t)0
+  # define    NUL cast(char_t)0
 # endif
 
 # if defined __GNUC__
-namespace dkt { inline FUNC demangle(str_t mangled_name, char8_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
-  fnd_int_t status = 0;
+namespace dkt { inline FUNC demangle(str_t mangled_name, char_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
+  int_t status = 0;
   str_t result = abi::__cxa_demangle(mangled_name, buffer, &buffer_len, &status); // must be free()ed if buffer is non-nullptr
   if (0 != status)
     result = mangled_name; // silent failure
@@ -54,7 +54,7 @@ namespace dkt { inline FUNC demangle_free(str_t name) -> void {
   return;
 }}
 # else // does nothing if not gcc/clang (g++/clang++)
-namespace dkt { inline FUNC demangle(str_t mangled_name, char8_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
+namespace dkt { inline FUNC demangle(str_t mangled_name, char_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
   return name;
 }}
 namespace dkt { inline FUNC demangle_free(str_t name) -> void {
@@ -123,7 +123,7 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
 # define countof(array) (sizeof((array))/sizeof((array)[0]))
 # define scountof(array) cast(ssize_t)countof(array)
 
-[[format_va_printf(1)]] inline FUNC non_exit_fail_with_msg(const char8_t* format, va_list_t args) -> fnd_int_t {
+[[format_va_printf(1)]] inline FUNC non_exit_fail_with_msg(const char_t* format, va_list_t args) -> int_t {
   if (1) {
     va_list syslog_args;
     va_copy(syslog_args, args);
@@ -132,17 +132,17 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   vfprintf(stderr, format, args);
   return EXIT_FAILURE;
 }
-[[format_printf(1)]] inline FUNC non_exit_fail_with_msg(const char8_t* format, ...) -> fnd_int_t {
+[[format_printf(1)]] inline FUNC non_exit_fail_with_msg(const char_t* format, ...) -> int_t {
   va_list_t args;
   va_start(args, format);
-  fnd_int_t val = non_exit_fail_with_msg(format, args);
+  int_t val = non_exit_fail_with_msg(format, args);
   va_end(args);
   return val;
 }
-[[format_va_printf(1), noreturn]] inline FUNC exit_fail_with_msg(const char8_t* format, va_list_t args) -> void {
+[[format_va_printf(1), noreturn]] inline FUNC exit_fail_with_msg(const char_t* format, va_list_t args) -> void {
   exit(non_exit_fail_with_msg(format, args));
 }
-[[format_printf(1), noreturn]] inline FUNC exit_fail_with_msg(const char8_t* format, ...) -> void {
+[[format_printf(1), noreturn]] inline FUNC exit_fail_with_msg(const char_t* format, ...) -> void {
   va_list_t args;
   va_start(args, format);
   exit_fail_with_msg(format, args);
@@ -171,22 +171,22 @@ template<typename T> inline FUNC dk_cmp(T a, T b)    -> cmp_t { return (a < b) ?
 # define unless(e) if (0 == (e))
 # define until(e)  while (0 == (e))
 
-inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4) -> uint32_t {
-  return ((((cast(uint32_t)cast(uchar8_t) c1) << (32 -  8)) & 0xff000000) |
-          (((cast(uint32_t)cast(uchar8_t) c2) << (32 - 16)) & 0x00ff0000) |
-          (((cast(uint32_t)cast(uchar8_t) c3) << (32 - 24)) & 0x0000ff00) |
-          (((cast(uint32_t)cast(uchar8_t) c4) << (32 - 32)) & 0x000000ff));
+inline FUNC uintstr(char_t c1, char_t c2, char_t c3, char_t c4) -> uint32_t {
+  return ((((cast(uint32_t)cast(uchar_t) c1) << (32 -  8)) & 0xff000000) |
+          (((cast(uint32_t)cast(uchar_t) c2) << (32 - 16)) & 0x00ff0000) |
+          (((cast(uint32_t)cast(uchar_t) c3) << (32 - 24)) & 0x0000ff00) |
+          (((cast(uint32_t)cast(uchar_t) c4) << (32 - 32)) & 0x000000ff));
 }
-inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
-                    char8_t c5, char8_t c6, char8_t c7, char8_t c8) -> uint64_t {
-  return ((((cast(uint64_t)cast(uchar8_t) c1) << (64 -  8)) & 0xff00000000000000) |
-          (((cast(uint64_t)cast(uchar8_t) c2) << (64 - 16)) & 0x00ff000000000000) |
-          (((cast(uint64_t)cast(uchar8_t) c3) << (64 - 24)) & 0x0000ff0000000000) |
-          (((cast(uint64_t)cast(uchar8_t) c4) << (64 - 32)) & 0x000000ff00000000) |
-          (((cast(uint64_t)cast(uchar8_t) c5) << (64 - 40)) & 0x00000000ff000000) |
-          (((cast(uint64_t)cast(uchar8_t) c6) << (64 - 48)) & 0x0000000000ff0000) |
-          (((cast(uint64_t)cast(uchar8_t) c7) << (64 - 56)) & 0x000000000000ff00) |
-          (((cast(uint64_t)cast(uchar8_t) c8) << (64 - 64)) & 0x00000000000000ff));
+inline FUNC uintstr(char_t c1, char_t c2, char_t c3, char_t c4,
+                    char_t c5, char_t c6, char_t c7, char_t c8) -> uint64_t {
+  return ((((cast(uint64_t)cast(uchar_t) c1) << (64 -  8)) & 0xff00000000000000) |
+          (((cast(uint64_t)cast(uchar_t) c2) << (64 - 16)) & 0x00ff000000000000) |
+          (((cast(uint64_t)cast(uchar_t) c3) << (64 - 24)) & 0x0000ff0000000000) |
+          (((cast(uint64_t)cast(uchar_t) c4) << (64 - 32)) & 0x000000ff00000000) |
+          (((cast(uint64_t)cast(uchar_t) c5) << (64 - 40)) & 0x00000000ff000000) |
+          (((cast(uint64_t)cast(uchar_t) c6) << (64 - 48)) & 0x0000000000ff0000) |
+          (((cast(uint64_t)cast(uchar_t) c7) << (64 - 56)) & 0x000000000000ff00) |
+          (((cast(uint64_t)cast(uchar_t) c8) << (64 - 64)) & 0x00000000000000ff));
 }
 
 # if defined DEBUG && defined DK_ENABLE_TRACE_MACROS
@@ -210,7 +210,7 @@ inline FUNC uintstr(char8_t c1, char8_t c2, char8_t c3, char8_t c4,
 # endif
 
 // width of hex string representation of a uintptr-t
-# define PRIxPTR_WIDTH cast(fnd_int_t)(2 * sizeof(uintptr_t))
+# define PRIxPTR_WIDTH cast(int_t)(2 * sizeof(uintptr_t))
 
 [[so_export, read_only]] extern object_t null;
 [[so_export]] extern object_t std_input;
@@ -278,17 +278,17 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 
 [[so_export]] FUNC dkt_null_method(object_t) -> object_t;
 
-[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, object_t, va_list_t) -> fnd_int_t;
-[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, super_t,  va_list_t) -> fnd_int_t;
-[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, object_t, va_list_t) -> fnd_int_t;
-[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, super_t,  va_list_t) -> fnd_int_t;
+[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, object_t, va_list_t) -> int_t;
+[[debug_export]] FUNC dkt_va_trace_before(const signature_t*, method_t, super_t,  va_list_t) -> int_t;
+[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, object_t, va_list_t) -> int_t;
+[[debug_export]] FUNC dkt_va_trace_after( const signature_t*, method_t, super_t,  va_list_t) -> int_t;
 
-[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, super_t,  ...) -> fnd_int_t;
-[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, object_t, ...) -> fnd_int_t;
-[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, super_t,  ...) -> fnd_int_t;
-[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, object_t, ...) -> fnd_int_t;
+[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, super_t,  ...) -> int_t;
+[[debug_export]] FUNC dkt_trace_before(const signature_t*, method_t, object_t, ...) -> int_t;
+[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, super_t,  ...) -> int_t;
+[[debug_export]] FUNC dkt_trace_after( const signature_t*, method_t, object_t, ...) -> int_t;
 
-[[debug_export]] FUNC dkt_get_klass_chain(object_t kls, char8_t* buf, ssize_t buf_len) -> char8_t*;
+[[debug_export]] FUNC dkt_get_klass_chain(object_t kls, char_t* buf, ssize_t buf_len) -> char_t*;
 
 [[debug_export]] FUNC dkt_dump_methods(object_t)              -> ssize_t;
 [[debug_export]] FUNC dkt_dump_methods(const klass::slots_t*) -> ssize_t;

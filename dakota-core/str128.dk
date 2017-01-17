@@ -17,5 +17,5 @@
 module dakota-core;
 
 klass str128 {
-  slots char8-t[128];
+  slots char-t[128];
 }

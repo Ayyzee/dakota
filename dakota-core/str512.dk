@@ -17,5 +17,5 @@
 module dakota-core;
 
 klass str512 {
-  slots char8-t[512];
+  slots char-t[512];
 }

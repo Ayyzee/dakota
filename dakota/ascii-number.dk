@@ -29,7 +29,7 @@ klass ascii-number {
   klass klass;
 
   slots {
-    char8-t* ascii-string;
+    char-t* ascii-string;
     int64-t  number;
   }
   method hash(object-t self) -> hash-t {
@@ -63,12 +63,12 @@ klass ascii-number {
     return rtn;
   }
   // hackhack: similiar code in string.dk
-  static func reverse(char8-t* buffer, ssize-t length) -> void {
+  static func reverse(char-t* buffer, ssize-t length) -> void {
     if (0 != length) {
       ssize-t head-offset = 0, tail-offset = length - 1;
 
       while (head-offset < tail-offset) {
-        char8-t head-char = buffer[head-offset];
+        char-t head-char = buffer[head-offset];
         buffer[head-offset] = buffer[tail-offset];
         buffer[tail-offset] = head-char;
         head-offset++; tail-offset--;
@@ -76,13 +76,13 @@ klass ascii-number {
     }
     return;
   }
-  static func convert(ssize-t num, ssize-t base, str-t digits, char8-t* buffer) -> void {
+  static func convert(ssize-t num, ssize-t base, str-t digits, char-t* buffer) -> void {
     ssize-t digit-num = 1;
     ssize-t offset =    0;
 
     do {
       ssize-t digit-pos = (num % power(base, digit-num))/(power(base, digit-num - 1));
-      char8-t digit = digits[digit-pos];
+      char-t digit = digits[digit-pos];
       buffer[offset] = digit;
       offset++;
     } until (num < power(base, digit-num++));
@@ -94,7 +94,7 @@ klass ascii-number {
   method init(object-t self, ssize-t number: 0) -> object-t {
     self = $init(super);
     self.number = number;
-    self.ascii-string = cast(char8-t*)dkt::alloc(ssizeof(char8-t) * (32 + 1));
+    self.ascii-string = cast(char-t*)dkt::alloc(ssizeof(char-t) * (32 + 1));
     object-t kls = klass-of(self);
     str-t digits = $digits(kls);
     ssize-t base = cast(ssize-t)safe-strlen(digits);

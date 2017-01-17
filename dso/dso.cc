@@ -38,7 +38,7 @@
 
 # if defined __linux__
 struct dso_info_request_t {
-  fnd_int_t LINKMAP;
+  int_t LINKMAP;
 };
 const dso_info_request_t DSO_INFO_REQUEST = {
   .LINKMAP = RTLD_DI_LINKMAP,
@@ -58,22 +58,22 @@ const dso_symbol_handle_t DSO_SYMBOL_HANDLE = {
   .DEFAULT = RTLD_DEFAULT,
   .NEXT =    RTLD_NEXT,
 };
-TYPEALIAS boole_t = bool;
-TYPEALIAS fnd_ufnd_int_t = unsigned int;
+TYPEALIAS bool_t = bool;
+TYPEALIAS fnd_uint_t = unsigned int;
 
-static boole_t is_bit_set(fnd_int_t word, fnd_ufnd_int_t pos) {
-  boole_t state = word & (1 << pos);
+static bool_t is_bit_set(int_t word, fnd_uint_t pos) {
+  bool_t state = word & (1 << pos);
   return state;
 }
-static boole_t is_bit_set(fnd_int_t word, fnd_int_t pos) {
-  return is_bit_set(word, cast(fnd_ufnd_int_t)pos);
+static bool_t is_bit_set(int_t word, int_t pos) {
+  return is_bit_set(word, cast(fnd_uint_t)pos);
 }
 namespace dso_info {
   TYPEALIAS slots_t = Dl_info;
 }
 TYPEALIAS dso_info_t = dso_info::slots_t;
 
-FUNC dso_open(str_t name, fnd_int_t mode) -> ptr_t {
+FUNC dso_open(str_t name, int_t mode) -> ptr_t {
   assert(nullptr != name);
 # if defined WIN32
   USE(mode);
@@ -96,9 +96,9 @@ FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t {
 # endif
   return result;
 }
-FUNC dso_close(ptr_t handle) -> fnd_int_t {
+FUNC dso_close(ptr_t handle) -> int_t {
   assert(nullptr != handle);
-  fnd_int_t result;
+  int_t result;
 # if defined WIN32
 # error "not yet implemented on win32"
 # else
@@ -135,7 +135,7 @@ FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t {
     return result;
 # if defined __linux__
   struct link_map l_map = {};
-  fnd_int_t r = dlinfo(handle, DSO_INFO_REQUEST.LINKMAP, &l_map);
+  int_t r = dlinfo(handle, DSO_INFO_REQUEST.LINKMAP, &l_map);
   if (0 == r && nullptr != l_map.l_name)
     result = l_map.l_name;
 # elif defined __APPLE__

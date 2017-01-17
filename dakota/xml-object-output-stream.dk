@@ -64,14 +64,14 @@ klass xml-object-output-stream {
     }
     return self;
   }
-  static func features(object-t self, fnd-int-t flags) -> features-t {
+  static func features(object-t self, int-t flags) -> features-t {
     if (0 != self.indent-level)
       return cast(features-t)(flags);
     else
       return k-none;
   }
   method write-element(object-t self, str-t element, str-t key) -> object-t {
-    char8-t[128] buffer;
+    char-t[128] buffer;
     if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s\"%s\"%s",  key, self.key-delim, element, self.element-delim);
     else
@@ -80,7 +80,7 @@ klass xml-object-output-stream {
     return self;
   }
   method write-element(object-t self, ssize-t element, str-t key) -> object-t {
-    char8-t[128] buffer;
+    char-t[128] buffer;
     if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
     else
@@ -89,7 +89,7 @@ klass xml-object-output-stream {
     return self;
   }
   method write-element(object-t self, size-t element, str-t key) -> object-t {
-    char8-t[128] buffer;
+    char-t[128] buffer;
     if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
     else
@@ -98,7 +98,7 @@ klass xml-object-output-stream {
     return self;
   }
   method write-table-start(object-t self, str-t key) -> object-t {
-    char8-t[128] buffer;
+    char-t[128] buffer;
     if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-tbl-delim);
     else
@@ -108,14 +108,14 @@ klass xml-object-output-stream {
     return self;
   }
   method write-table-end(object-t self) -> object-t {
-    char8-t[128] buffer;
+    char-t[128] buffer;
     snprintf(buffer, sizeof(buffer), "%s%s", self.end-tbl-delim, self.element-delim);
     $column-decr(self);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
   method write-sequence-start(object-t self, str-t key) -> object-t {
-    char8-t[128] buffer;
+    char-t[128] buffer;
     if (key != nullptr)
       snprintf(buffer, sizeof(buffer), "\"%s\"%s%s", key, self.key-delim, self.start-seq-delim);
     else
@@ -125,7 +125,7 @@ klass xml-object-output-stream {
     return self;
   }
   method write-sequence-end(object-t self) -> object-t {
-    char8-t[128] buffer;
+    char-t[128] buffer;
     snprintf(buffer, sizeof(buffer), "%s%s", self.end-seq-delim, self.element-delim);
     $column-decr(self);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
