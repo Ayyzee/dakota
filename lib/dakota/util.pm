@@ -538,6 +538,10 @@ sub rewrite_klass_defn_with_implicit_metaklass_defn {
 my $int_tbl = {
    'int' =>  'int32',
   'uint' => 'uint32',
+
+   'char' =>  'char8',
+  'uchar' => 'uchar8',
+  'schar' => 'schar8',
 };
 sub rewrite_scoped_int_uint_replacement1 {
   my ($name, $rhs) = @_;

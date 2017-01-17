@@ -23,6 +23,7 @@
 # include <cstdint>
 # include <cstring> // memcpy()
 # include <functional>
+# include <limits>
 # include <new> // std::bad-alloc
 
 # include <syslog.h>

@@ -86,6 +86,10 @@ typealias  char8_t =          char; // may be signed or unsigned (same with wcha
 typealias schar8_t =   signed char;
 typealias uchar8_t = unsigned char;
 
+typealias  char_t =  char8_t;
+typealias schar_t = schar8_t;
+typealias uchar_t = uchar8_t;
+
 // integer promotions are
 //   float              -> double
 //   char               -> int or unsigned int
