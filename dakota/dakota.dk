@@ -21,6 +21,8 @@ export dakota {
   dimension;
   features::slots-t;
   features;
+  floatmax::slots-t;
+  floatmax;
   float128::slots-t;
   float128;
   float32::slots-t;
