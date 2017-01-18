@@ -368,7 +368,7 @@ klass klass {
     gbl-ru.method-count =  self.methods.count;
     gbl-ru.method-memory += gbl-ru.method-count * ssizeof(method-t);
     resource-usage::log-method-alloc(&gbl-ru);
-# endif    
+# endif
 
     for (ssize-t index = 0; index < self.methods.count; index++)
       self.methods.addrs[index] = DKT-NULL-METHOD;
@@ -468,7 +468,7 @@ klass klass {
   method traits(object-t self) -> object-t {
     object-t seq = $make(vector::klass());
     const symbol-t* traits = self.traits;;
-    
+
     if (traits != nullptr) {
       ssize-t i = 0;
       symbol-t trait-name;
@@ -496,7 +496,7 @@ klass klass {
       }
     }
     stream-t out = stdout;
-    
+
     fprintf(out, "{\n");
     for (ssize-t index = 0; index < s->methods.count; index++) {
       const signature-t* signature =  cast(const signature-t*)selectors[index].key;

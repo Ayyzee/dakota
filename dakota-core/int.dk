@@ -39,7 +39,7 @@ klass number;
 
 klass int8 {
   superklass number;
-  
+
   slots int8-t;
 
   const slots-t max = INT8-MAX;
@@ -49,7 +49,7 @@ klass int8 {
 }
 klass uint8 {
   superklass number;
-  
+
   slots uint8-t;
 
   const slots-t max = UINT8-MAX;
@@ -58,7 +58,7 @@ klass uint8 {
 }
 klass int16 {
   superklass number;
-  
+
   slots int16-t;
 
   const slots-t max = INT16-MAX;
@@ -68,7 +68,7 @@ klass int16 {
 }
 klass uint16 {
   superklass number;
-  
+
   slots uint16-t;
 
   const slots-t max = UINT16-MAX;
@@ -77,7 +77,7 @@ klass uint16 {
 }
 klass int32 {
   superklass number;
-  
+
   slots int32-t;
 
   const slots-t max = INT32-MAX;
@@ -87,7 +87,7 @@ klass int32 {
 }
 klass uint32 {
   superklass number;
-  
+
   slots uint32-t;
 
   const slots-t max = UINT32-MAX;
@@ -108,7 +108,7 @@ klass uint32 {
 }
 klass int64 {
   superklass number;
-  
+
   slots int64-t;
 
   const slots-t max = INT64-MAX;
@@ -118,7 +118,7 @@ klass int64 {
 }
 klass uint64 {
   superklass number;
-  
+
   slots uint64-t;
 
   const slots-t max = UINT64-MAX;
@@ -127,7 +127,7 @@ klass uint64 {
 }
 klass int-fast8 {
   superklass number;
-  
+
   slots int-fast8-t;
 
   const slots-t max = INT-FAST8-MAX;
@@ -137,7 +137,7 @@ klass int-fast8 {
 }
 klass uint-fast8 {
   superklass number;
-  
+
   slots uint-fast8-t;
 
   const slots-t max = UINT-FAST8-MAX;
@@ -146,7 +146,7 @@ klass uint-fast8 {
 }
 klass int-fast16 {
   superklass number;
-  
+
   slots int-fast16-t;
 
   const slots-t max = INT-FAST16-MAX;
@@ -156,7 +156,7 @@ klass int-fast16 {
 }
 klass uint-fast16 {
   superklass number;
-  
+
   slots uint-fast16-t;
 
   const slots-t max = UINT-FAST16-MAX;
@@ -165,7 +165,7 @@ klass uint-fast16 {
 }
 klass int-fast32 {
   superklass number;
-  
+
   slots int-fast32-t;
 
   const slots-t max = INT-FAST32-MAX;
@@ -175,7 +175,7 @@ klass int-fast32 {
 }
 klass uint-fast32 {
   superklass number;
-  
+
   slots uint-fast32-t;
 
   const slots-t max = UINT-FAST32-MAX;
@@ -184,7 +184,7 @@ klass uint-fast32 {
 }
 klass int-fast64 {
   superklass number;
-  
+
   slots int-fast64-t;
 
   const slots-t max = INT-FAST64-MAX;
@@ -194,7 +194,7 @@ klass int-fast64 {
 }
 klass uint-fast64 {
   superklass number;
-  
+
   slots uint-fast64-t;
 
   const slots-t max = UINT-FAST64-MAX;
@@ -203,7 +203,7 @@ klass uint-fast64 {
 }
 klass int-least8 {
   superklass number;
-  
+
   slots int-least8-t;
 
   const slots-t max = INT-LEAST8-MAX;
@@ -213,7 +213,7 @@ klass int-least8 {
 }
 klass uint-least8 {
   superklass number;
-  
+
   slots uint-least8-t;
 
   const slots-t max = UINT-LEAST8-MAX;
@@ -222,7 +222,7 @@ klass uint-least8 {
 }
 klass int-least16 {
   superklass number;
-  
+
   slots int-least16-t;
 
   const slots-t max = INT-LEAST16-MAX;
@@ -232,7 +232,7 @@ klass int-least16 {
 }
 klass uint-least16 {
   superklass number;
-  
+
   slots uint-least16-t;
 
   const slots-t max = UINT-LEAST16-MAX;
@@ -241,7 +241,7 @@ klass uint-least16 {
 }
 klass int-least32 {
   superklass number;
-  
+
   slots int-least32-t;
 
   const slots-t max = INT-LEAST32-MAX;
@@ -251,7 +251,7 @@ klass int-least32 {
 }
 klass uint-least32 {
   superklass number;
-  
+
   slots uint-least32-t;
 
   const slots-t max = UINT-LEAST32-MAX;
@@ -260,7 +260,7 @@ klass uint-least32 {
 }
 klass int-least64 {
   superklass number;
-  
+
   slots int-least64-t;
 
   const slots-t max = INT-LEAST64-MAX;
@@ -270,7 +270,7 @@ klass int-least64 {
 }
 klass uint-least64 {
   superklass number;
-  
+
   slots uint-least64-t;
 
   const slots-t max = UINT-LEAST64-MAX;
@@ -279,7 +279,7 @@ klass uint-least64 {
 }
 klass intmax {
   superklass number;
-  
+
   slots intmax-t;
 
   const slots-t max = INTMAX-MAX;
@@ -289,7 +289,7 @@ klass intmax {
 }
 klass uintmax {
   superklass number;
-  
+
   slots uintmax-t;
 
   const slots-t max = UINTMAX-MAX;
@@ -298,7 +298,7 @@ klass uintmax {
 }
 klass intptr {
   superklass number;
-  
+
   slots intptr-t;
 
   const slots-t max = INTPTR-MAX;
@@ -308,7 +308,7 @@ klass intptr {
 }
 klass uintptr {
   superklass number;
-  
+
   slots uintptr-t;
 
   const slots-t max = UINTPTR-MAX;
@@ -322,6 +322,7 @@ klass uintptr {
     return self;
   }
 }
+
 klass ptrdiff {
   slots ptrdiff-t;
 
@@ -330,7 +331,7 @@ klass ptrdiff {
 }
 klass sig-atomic {
   superklass number;
-  
+
   slots sig-atomic-t;
 
   const slots-t max = SIG-ATOMIC-MAX;

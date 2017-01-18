@@ -91,7 +91,7 @@ klass str-buffer {
   method concat(slots-t* s, char-t c) -> slots-t* {
     assert(c != NUL);
     assert(s->len + 1 != s->capacity);
-      
+
     s->ptr[s->len] = c;
     s->len++;
     s->ptr[s->len] = NUL;

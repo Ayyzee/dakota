@@ -31,7 +31,7 @@ klass system-exception;
 
 klass input-stream {
   superklass stream;
-  
+
   slots stream-t;
 
   method init(object-t self,

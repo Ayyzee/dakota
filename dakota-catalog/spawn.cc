@@ -33,7 +33,7 @@ spawn(const char* arg) {
   pid_t pid = fork();
   if (-1 == pid)
     return -1;
-  
+
   if (0 == pid) { // child
     close(errno_pipe[0]); // close read side of pipe
     char* args[] = { const_cast<char*>(arg), nullptr };

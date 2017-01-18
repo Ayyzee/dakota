@@ -92,7 +92,7 @@ klass input-file {
   method file(object-t self) -> str-t {
     return cast(str-t)(self.file);
   }
-  
+
   method put-char8(object-t self, char-t c) -> object-t {
     if (0 == self.current-position)
       throw $make(exception::klass(), #msg: "oops");
@@ -124,7 +124,7 @@ klass input-file {
 
     if (type? == nullptr)
       type? = space?;
-    
+
     char-t c = NUL;
     while (1) {
     # if 0

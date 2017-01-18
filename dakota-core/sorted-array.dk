@@ -65,7 +65,7 @@ klass sorted-array {
     qsort(t->elements, cast(size-t)t->count, cast(size-t)t->size, t->compare);
     return t;
   }
-  
+
   //(-(insertion point) - 1)
   func search(const slots-t* t, const void* key) -> result-t {
     assert(key != nullptr);
@@ -175,7 +175,7 @@ klass sorted-array {
   }
   func bsearch(const slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
- 
+
     result-t result = search(t, key);
     return result.element;
   }

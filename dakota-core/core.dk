@@ -278,7 +278,7 @@ static func alloc-klass(symbol-t name) -> object-t {
   if (kls-name == nullptr)
     kls-name = default-klass-name();
   named-info-t* kls-info = info-for-name(kls-name);
-  
+
   ssize-t offset = offset-from-info(kls-info);
   ssize-t size =   size-from-info(kls-info);
   ssize-t total-size = offset + size;
@@ -410,7 +410,7 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
         ostream::println-format(ostrm, "'klass' : '%s',\n",      kls-name);
       if (superkls-name != nullptr)
         ostream::println-format(ostrm, "'superklass' : '%s',\n", superkls-name);
-      
+
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method-signatures);
       if (method-signatures != nullptr) {
         ostream::println-format(ostrm, "'methods' :\n");
@@ -419,7 +419,7 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
         const method-t* method-addresses = cast(const method-t*)named-info::at(current-info, #method-addresses);
         ssize-t j = 0;
         const signature-t* method-signature;
-        
+
         while ((method-signature = method-signatures[j]) != nullptr) {
           size-t defined = 0;
           if (method-addresses != nullptr) {
@@ -1109,7 +1109,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
             assert-valid-str(slot-name);
             str-t slot-expr-str = cast(str-t)named-info::at(&ci.slots-info[i], #expr-str);
             assert-valid-str(slot-expr-str);
-            
+
             ostream::println-format(ostrm, "%-*s = %s,\n", max-type-width, slot-name, slot-expr-str);
             i++;
           }
@@ -1125,7 +1125,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
             assert-valid-str(slot-name);
             // printf("%s::%s, type: %s, typeid: %s\n", name, slot-name, slot-type, slot-typeid);
             str-t slot-expr-str = cast(str-t)named-info::at(&ci.slots-info[i], #expr-str);
-            
+
             if (slot-expr-str != nullptr)
               ostream::println-format(ostrm, "%-*s %s = %s;\n", max-type-width, slot-type, slot-name, slot-expr-str);
             else
@@ -1210,7 +1210,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
 
   if (klass-defns != nullptr) {
     ssize-t i = 0;
-      
+
     if (output-dir != nullptr) {
       int-t n = mkdir(output-dir, 0755);
       if (-1 == n && EEXIST != errno)
@@ -1402,7 +1402,7 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
   sa.sa-flags = cast(decltype(sa.sa-flags))(SA-SIGINFO | SA-RESETHAND | SA-RESTART);
   sigemptyset(&sa.sa-mask);
   sa.sa-sigaction = bus-segv-handler;
-  
+
   sa-pairs[index-from-sig(sig)].prev-sa.sa-sigaction = nullptr;
   int-t r = sigaction(sig, &sa, &sa-pairs[index-from-sig(sig)].prev-sa);
   if (-1 == r) {
@@ -1541,7 +1541,7 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
 
   if (klass-defns != nullptr) { // this should be done in reverse
     ssize-t i = 0;
-      
+
     while (1) {
       named-info-t* kls-info = &klass-defns[i++];
       assert(kls-info != nullptr);

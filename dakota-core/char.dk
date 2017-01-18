@@ -31,7 +31,7 @@ klass number;
 
 klass char8 {
   superklass number;
-  
+
   slots char8-t;
 
   const slots-t max = CHAR-MAX;
@@ -45,7 +45,7 @@ klass char8 {
 }
 klass uchar8 {
   superklass number;
-  
+
   slots uchar8-t;
 
   const slots-t max = UCHAR-MAX;
@@ -58,7 +58,7 @@ klass uchar8 {
 }
 klass schar8 {
   superklass number;
-  
+
   slots schar8-t;
 
   const slots-t max = SCHAR-MAX;
@@ -72,7 +72,7 @@ klass schar8 {
 }
 klass char16 {
   superklass number;
-  
+
   slots char16-t;
 
   method init(object-t self, slots-t slots: 0) -> object-t {
@@ -83,7 +83,7 @@ klass char16 {
 }
 klass char32 {
   superklass number;
-  
+
   slots char32-t;
 
   method init(object-t self, slots-t slots: 0) -> object-t {
@@ -94,7 +94,7 @@ klass char32 {
 }
 klass wchar {
   superklass number;
-  
+
   slots wchar-t;
 
   const slots-t max = WCHAR-MAX;
@@ -108,7 +108,7 @@ klass wchar {
 }
 klass wint {
   superklass number;
-  
+
   slots wint-t;
 
   const slots-t max = WINT-MAX;

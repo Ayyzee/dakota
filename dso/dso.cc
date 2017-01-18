@@ -139,7 +139,7 @@ FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t {
   if (0 == r && nullptr != l_map.l_name)
     result = l_map.l_name;
 # elif defined __APPLE__
-  int32_t image_count = cast(int32_t)_dyld_image_count(); 
+  int32_t image_count = cast(int32_t)_dyld_image_count();
   for (int32_t i = 0; i < image_count; i++) {
     str_t image_name = _dyld_get_image_name(cast(uint32_t)i);
     ptr_t image_handle = dso_open(image_name, DSO_OPEN_MODE.NOLOAD);

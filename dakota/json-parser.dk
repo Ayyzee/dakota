@@ -42,7 +42,7 @@ klass vector;
   }
   return result;
 }
-klass json-parser {  
+klass json-parser {
   slots {
     stream-t in;
     str-t    file;
@@ -59,7 +59,7 @@ klass json-parser {
     if (file != nullptr) {
       self.file = file;
       self.in =   fopen(self.file, "r");
-  
+
       if (self.in == nullptr) {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
@@ -76,10 +76,10 @@ klass json-parser {
   }
   method read(object-t self, ptr-t buffer, ssize-t element-size, ssize-t num-elements-max) -> ssize-t {
     ssize-t num-elements-read = cast(ssize-t)fread(buffer, cast(size-t)element-size, cast(size-t)num-elements-max, self.in);
-    
+
     // fread() does not distinguish between end-of-file and error, and callers must use
     // feof(3) and ferror(3) to determine which occurred.
-    
+
     return num-elements-read;
   }
   /* method */ static func putback(object-t self, int-t c) -> void {
@@ -167,7 +167,7 @@ klass json-parser {
               return null;
             }
           } while ((quote-type != c) || is-escaped);
-            
+
           return token;
         }
         //case '"':
@@ -185,7 +185,7 @@ klass json-parser {
 
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':
-            
+
         case '_': {
           object-t token = $make(token::klass(), #tokenid: 'st', // 'st' should be 'idnt'
                                 #line: self.line, #column: self.column - 1);
@@ -204,7 +204,7 @@ klass json-parser {
       }
     }
   }
-    
+
   /* method */ func get-table(object-t self) -> object-t;
   /* method */ func get-vector(object-t self) -> object-t;
 
@@ -343,8 +343,8 @@ klass json-parser {
         return null;
       }
     } while (',' == $tokenid(token));
-      
-      
+
+
     if (']' != $tokenid(token)) {
       print-error(self.file, self.line, self.column, "expected ',' or ']' but got '%s'\n", $buffer(token));
       return null;
@@ -368,14 +368,14 @@ klass json-parser {
         return null;
       }
     } while (',' == $tokenid(token));
-      
+
     if ('}' != $tokenid(token)) {
       print-error(self.file, self.line, self.column, "expected ',' or '}' but got '%s'\n", $buffer(token));
       return null;
     }
     return table;
   }
-    
+
   //      method read-property-list(object-t self) -> object-t {
   //        object-t token;
   //        while ((token = json-parser::lex(self)) != null)

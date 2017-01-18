@@ -18,7 +18,7 @@ module dakota;
 
 klass float32 {
   superklass number;
-  
+
   slots float32-t;
 
   method init(object-t self, slots-t slots: 0.0) -> object-t {
@@ -29,7 +29,7 @@ klass float32 {
 }
 klass float64 {
   superklass number;
-  
+
   slots float64-t;
 
   method init(object-t self, slots-t slots: 0.0) -> object-t {
@@ -40,7 +40,7 @@ klass float64 {
 }
 klass float128 {
   superklass number;
-  
+
   slots float128-t;
 
   method init(object-t self, slots-t slots: 0.0) -> object-t {

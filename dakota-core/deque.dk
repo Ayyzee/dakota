@@ -333,10 +333,10 @@ klass deque {
   //   snprintf(buffer, sizeof(buffer), "<sequence name=\"%s\" size=\"%u\">", name, self.size);
   //   $writeln(out, buffer);
   //   $increment-column(out);
-    
+
   //   if (0 != self.size) {
   //     node::slots-t* node = self.first;
-      
+
   //     do {
   // 	$write-element-idref(out, node->element);
   //     } while ((node = node->next) != nullptr);
@@ -346,7 +346,7 @@ klass deque {
   //   $writeln(out, buffer);
   //   return null;
   // }
-} 
+}
 klass deque-forward-iterator {
   trait forward-iterator;
 

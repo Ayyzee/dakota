@@ -32,7 +32,7 @@ klass pair {
   //   klass symbol-symbol-pair { slots { symbol-t first; symbol-t last; } }
   //   klass symbol-ssize-pair { slots { symbol-t first; ssize-t last; } }
   //   klass object-ssize-pair { slots { object-t first; ssize-t last; } }
-  
+
   method init(object-t self,
               object-t first: null,
               object-t last:  null) -> object-t {

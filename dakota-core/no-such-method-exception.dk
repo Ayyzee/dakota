@@ -37,7 +37,7 @@ klass no-such-method-exception {
     //assert((object || context->object) && !(object && context->object));
     self.signature = signature;
     self.context =   {object, nullptr};
-    if (context != nullptr) 
+    if (context != nullptr)
       self.context = *context;
     return self;
   }

@@ -106,7 +106,7 @@ klass lexer {
   method file(object-t self) -> str-t {
     return cast(str-t)(self.file);
   }
-    
+
   /* method */ inline func previous-char8(object-t self) -> char-t {
     assert(0 != self.current-position);
     char-t c = self.buffer[self.current-position - 1];
@@ -194,7 +194,7 @@ klass lexer {
             }
           }
         }
-        // cpp directive 
+        // cpp directive
         case '#': {
           char-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
