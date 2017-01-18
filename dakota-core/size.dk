@@ -14,10 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined SSIZE-MAX
-  # define SSIZE-MAX ((ssize-t) (SIZE-MAX / 2))
-# endif
-
 include-for <sys/types.h> ssize-t;
 include-for <cstddef>     size-t;
 include-for <cstdint>     intptr-t,
