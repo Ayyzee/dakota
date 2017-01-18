@@ -338,7 +338,7 @@ klass deque {
   //     node::slots-t* node = self.first;
 
   //     do {
-  // 	$write-element-idref(out, node->element);
+  //   $write-element-idref(out, node->element);
   //     } while ((node = node->next) != nullptr);
   //   }
   //   $decrement-column(out);
@@ -418,7 +418,7 @@ klass deque-forward-iterator {
       self.node = self.node->next;
     }
     // printf("%s:%s(%p) = %p\n",
-    // 	   "deque-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
+    //      "deque-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
     return element;
   }
   method element(object-t self) -> object-t {
