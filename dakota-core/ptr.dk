@@ -28,15 +28,3 @@ klass ptr {
     return self;
   }
 }
-klass ptrdiff {
-  slots ptrdiff-t;
-
-  const slots-t max = PTRDIFF-MAX;
-  const slots-t min = PTRDIFF-MIN;
-
-  method init(object-t self, slots-t slots: 0) -> object-t {
-    self = $init(super);
-    mutable-unbox(self) = slots;
-    return self;
-  }
-}

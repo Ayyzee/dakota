@@ -20,7 +20,6 @@ include-for <climits> INT-MAX,
                       INT-MIN,
                       UINT-MAX;
 
-
 include-for <cstdint> int8-t,
                       int16-t,
                       int32-t,
@@ -323,6 +322,12 @@ klass uintptr {
     return self;
   }
 }
+klass ptrdiff {
+  slots ptrdiff-t;
+
+  const slots-t max = PTRDIFF-MAX;
+  const slots-t min = PTRDIFF-MIN;
+}
 klass sig-atomic {
   superklass number;
   
@@ -330,10 +335,4 @@ klass sig-atomic {
 
   const slots-t max = SIG-ATOMIC-MAX;
   const slots-t min = SIG-ATOMIC-MIN;
-
-  method init(object-t self, slots-t slots: 0) -> object-t {
-    self = $init(super);
-    mutable-unbox(self) = slots;
-    return self;
-  }
 }
