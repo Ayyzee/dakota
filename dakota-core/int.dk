@@ -38,136 +38,15 @@ module dakota-core;
 
 klass number;
 
-klass intmax {
-  superklass number;
-  
-  slots intmax-t;
-
-  const slots-t min = INTMAX-MIN;
-  const slots-t max = INTMAX-MAX;
-
-  // INTMAX-C(v)
-}
-klass uintmax {
-  superklass number;
-  
-  slots uintmax-t;
-
-  const slots-t max = UINTMAX-MAX;
-
-  // UINTMAX-C(v)
-}
 klass int8 {
   superklass number;
   
   slots int8-t;
 
-  const slots-t min = INT8-MIN;
   const slots-t max = INT8-MAX;
+  const slots-t min = INT8-MIN;
 
   // INT8-C(v)
-}
-klass int16 {
-  superklass number;
-  
-  slots int16-t;
-
-  const slots-t min = INT16-MIN;
-  const slots-t max = INT16-MAX;
-
-  // INT16-C(v)
-}
-klass int32 {
-  superklass number;
-  
-  slots int32-t;
-
-  const slots-t min = INT32-MIN;
-  const slots-t max = INT32-MAX;
-
-  // INT32-C(v)
-}
-klass int64 {
-  superklass number;
-  
-  slots int64-t;
-
-  const slots-t min = INT64-MIN;
-  const slots-t max = INT64-MAX;
-
-  // INT64-C(v)
-}
-klass int-fast8 {
-  superklass number;
-  
-  slots int-fast8-t;
-
-  const slots-t min = INT-FAST8-MIN;
-  const slots-t max = INT-FAST8-MAX;
-}
-klass int-fast16 {
-  superklass number;
-  
-  slots int-fast16-t;
-
-  const slots-t min = INT-FAST16-MIN;
-  const slots-t max = INT-FAST16-MAX;
-}
-klass int-fast32 {
-  superklass number;
-  
-  slots int-fast32-t;
-
-  const slots-t min = INT-FAST32-MIN;
-  const slots-t max = INT-FAST32-MAX;
-}
-klass int-fast64 {
-  superklass number;
-  
-  slots int-fast64-t;
-
-  const slots-t min = INT-FAST64-MIN;
-  const slots-t max = INT-FAST64-MAX;
-}
-klass int-least8 {
-  superklass number;
-  
-  slots int-least8-t;
-
-  const slots-t min = INT-LEAST8-MIN;
-  const slots-t max = INT-LEAST8-MAX;
-}
-klass int-least16 {
-  superklass number;
-  
-  slots int-least16-t;
-
-  const slots-t min = INT-LEAST16-MIN;
-  const slots-t max = INT-LEAST16-MAX;
-}
-klass int-least32 {
-  superklass number;
-  
-  slots int-least32-t;
-
-  const slots-t min = INT-LEAST32-MIN;
-  const slots-t max = INT-LEAST32-MAX;
-}
-klass int-least64 {
-  superklass number;
-  
-  slots int-least64-t;
-
-  const slots-t min = INT-LEAST64-MIN;
-  const slots-t max = INT-LEAST64-MAX;
-}
-klass intptr {
-  superklass number;
-  
-  slots intptr-t;
-
-  const slots-t min = INTPTR-MIN;
-  const slots-t max = INTPTR-MAX;
 }
 klass uint8 {
   superklass number;
@@ -178,6 +57,16 @@ klass uint8 {
 
   // UINT8-C(v)
 }
+klass int16 {
+  superklass number;
+  
+  slots int16-t;
+
+  const slots-t max = INT16-MAX;
+  const slots-t min = INT16-MIN;
+
+  // INT16-C(v)
+}
 klass uint16 {
   superklass number;
   
@@ -186,6 +75,16 @@ klass uint16 {
   const slots-t max = UINT16-MAX;
 
   // UINT16-C(v)
+}
+klass int32 {
+  superklass number;
+  
+  slots int32-t;
+
+  const slots-t max = INT32-MAX;
+  const slots-t min = INT32-MIN;
+
+  // INT32-C(v)
 }
 klass uint32 {
   superklass number;
@@ -208,6 +107,16 @@ klass uint32 {
     return result;
   }
 }
+klass int64 {
+  superklass number;
+  
+  slots int64-t;
+
+  const slots-t max = INT64-MAX;
+  const slots-t min = INT64-MIN;
+
+  // INT64-C(v)
+}
 klass uint64 {
   superklass number;
   
@@ -217,12 +126,34 @@ klass uint64 {
 
   // UINT64-C(v)
 }
+klass int-fast8 {
+  superklass number;
+  
+  slots int-fast8-t;
+
+  const slots-t max = INT-FAST8-MAX;
+  const slots-t min = INT-FAST8-MIN;
+
+  // INT-FAST8-C(v)
+}
 klass uint-fast8 {
   superklass number;
   
   slots uint-fast8-t;
 
   const slots-t max = UINT-FAST8-MAX;
+
+  // UINT-FAST8-C(v)
+}
+klass int-fast16 {
+  superklass number;
+  
+  slots int-fast16-t;
+
+  const slots-t max = INT-FAST16-MAX;
+  const slots-t min = INT-FAST16-MIN;
+
+  // INT-FAST16-C(v)
 }
 klass uint-fast16 {
   superklass number;
@@ -230,6 +161,18 @@ klass uint-fast16 {
   slots uint-fast16-t;
 
   const slots-t max = UINT-FAST16-MAX;
+
+  // UINT-FAST16-C(v)
+}
+klass int-fast32 {
+  superklass number;
+  
+  slots int-fast32-t;
+
+  const slots-t max = INT-FAST32-MAX;
+  const slots-t min = INT-FAST32-MIN;
+
+  // INT-FAST32-C(v)
 }
 klass uint-fast32 {
   superklass number;
@@ -237,6 +180,18 @@ klass uint-fast32 {
   slots uint-fast32-t;
 
   const slots-t max = UINT-FAST32-MAX;
+
+  // UINT-FAST32-C(v)
+}
+klass int-fast64 {
+  superklass number;
+  
+  slots int-fast64-t;
+
+  const slots-t max = INT-FAST64-MAX;
+  const slots-t min = INT-FAST64-MIN;
+
+  // INT-FAST64-C(v)
 }
 klass uint-fast64 {
   superklass number;
@@ -244,6 +199,18 @@ klass uint-fast64 {
   slots uint-fast64-t;
 
   const slots-t max = UINT-FAST64-MAX;
+
+  // UINT-FAST64-C(v)
+}
+klass int-least8 {
+  superklass number;
+  
+  slots int-least8-t;
+
+  const slots-t max = INT-LEAST8-MAX;
+  const slots-t min = INT-LEAST8-MIN;
+
+  // INT-LEAST8-C(v)
 }
 klass uint-least8 {
   superklass number;
@@ -251,6 +218,18 @@ klass uint-least8 {
   slots uint-least8-t;
 
   const slots-t max = UINT-LEAST8-MAX;
+
+  // UINT-LEAST8-C(v)
+}
+klass int-least16 {
+  superklass number;
+  
+  slots int-least16-t;
+
+  const slots-t max = INT-LEAST16-MAX;
+  const slots-t min = INT-LEAST16-MIN;
+
+  // INT-LEAST16-C(v)
 }
 klass uint-least16 {
   superklass number;
@@ -258,6 +237,18 @@ klass uint-least16 {
   slots uint-least16-t;
 
   const slots-t max = UINT-LEAST16-MAX;
+
+  // UINT-LEAST16-C(v)
+}
+klass int-least32 {
+  superklass number;
+  
+  slots int-least32-t;
+
+  const slots-t max = INT-LEAST32-MAX;
+  const slots-t min = INT-LEAST32-MIN;
+
+  // INT-LEAST32-C(v)
 }
 klass uint-least32 {
   superklass number;
@@ -265,6 +256,18 @@ klass uint-least32 {
   slots uint-least32-t;
 
   const slots-t max = UINT-LEAST32-MAX;
+
+  // UINT-LEAST32-C(v)
+}
+klass int-least64 {
+  superklass number;
+  
+  slots int-least64-t;
+
+  const slots-t max = INT-LEAST64-MAX;
+  const slots-t min = INT-LEAST64-MIN;
+
+  // INT-LEAST64-C(v)
 }
 klass uint-least64 {
   superklass number;
@@ -272,6 +275,37 @@ klass uint-least64 {
   slots uint-least64-t;
 
   const slots-t max = UINT-LEAST64-MAX;
+
+  // UINT-LEAST64-C(v)
+}
+klass intmax {
+  superklass number;
+  
+  slots intmax-t;
+
+  const slots-t max = INTMAX-MAX;
+  const slots-t min = INTMAX-MIN;
+
+  // INTMAX-C(v)
+}
+klass uintmax {
+  superklass number;
+  
+  slots uintmax-t;
+
+  const slots-t max = UINTMAX-MAX;
+
+  // UINTMAX-C(v)
+}
+klass intptr {
+  superklass number;
+  
+  slots intptr-t;
+
+  const slots-t max = INTPTR-MAX;
+  const slots-t min = INTPTR-MIN;
+
+  // INTPTR-C(v)
 }
 klass uintptr {
   superklass number;
@@ -279,6 +313,8 @@ klass uintptr {
   slots uintptr-t;
 
   const slots-t max = UINTPTR-MAX;
+
+  // INTPTR-C(v)
 
   method dump(object-t self) -> object-t {
     $dump(super);
