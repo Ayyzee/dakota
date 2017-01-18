@@ -27,8 +27,8 @@ klass open-token {
   slots {
     object-t close-token;
   }
-  method init(object-t self) -> object-t {
-    self = $init(super);
+  method va::init(object-t self, va-list-t args) -> object-t {
+    self = $va::init(super, args);
     self.close-token = nullptr;
     return self;
   }
@@ -42,12 +42,12 @@ klass open-token {
     return self;
   }
   method set-close-token(object-t self, object-t close-token) -> object-t {
-    assert(self.close-token == null);
+    assert(close-token != nullptr);
     self.close-token = close-token;
     return self;
   }
   method close-token(object-t self) -> object-t {
-    assert(self.close-token != null);
+    assert(self.close-token != nullptr);
     return self.close-token;
   }
 }
