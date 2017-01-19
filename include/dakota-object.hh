@@ -60,10 +60,6 @@ struct [[_dkt_typeinfo_]] object_t {
     this->object = r;
     add_ref();
   }
-  inline object_t(void* r) {
-    this->object = cast(object::slots_t*)r;
-    add_ref();
-  }
   inline object_t(intptr_t r) {
     this->object = cast(object::slots_t*)r;
     add_ref();
