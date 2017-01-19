@@ -334,7 +334,7 @@ klass lexer {
               do {
                 str-buffer::concat(&buf, c2);
                 c2 = get-char8(self);
-              }while (isxdigit(c2));
+              } while (isxdigit(c2));
               unget-char8(self);
               object-t token = $make(token::klass(), #tokenid: 'nmbr', #buffer: buf.ptr,
                                      #line: self.line, #column: self.column - buf.len);
@@ -344,7 +344,7 @@ klass lexer {
               do {
                 str-buffer::concat(&buf, c2);
                 c2 = get-char8(self);
-              }while (isdigit(c2) && '8' != c2 && '9' != c2);
+              } while (isdigit(c2) && '8' != c2 && '9' != c2);
               unget-char8(self);
               object-t token = $make(token::klass(), #tokenid: 'nmbr', #buffer: buf.ptr,
                                      #line: self.line, #column: self.column - buf.len);
@@ -362,7 +362,7 @@ klass lexer {
           do {
             str-buffer::concat(&buf, c1);
             c1 = get-char8(self);
-          }while (isdigit(c1));
+          } while (isdigit(c1));
           unget-char8(self);
           object-t token = $make(token::klass(), #tokenid: 'nmbr', #buffer: buf.ptr,
                                  #line: self.line, #column: self.column - buf.len);
@@ -385,7 +385,7 @@ klass lexer {
           do {
             str-buffer::concat(&buf, c1);
             c1 = get-char8(self);
-          }while (isalnum(c1) || '_' == c1 || '-' == c1);
+          } while (isalnum(c1) || '_' == c1 || '-' == c1);
           unget-char8(self);
           while (!isalnum(previous-char8(self)) && '_' != previous-char8(self)) {
             unget-char8(self);
