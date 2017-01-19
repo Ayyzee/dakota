@@ -30,13 +30,9 @@ struct [[_dkt_typeinfo_]] object_t {
   explicit inline operator intptr_t()               const { return cast(intptr_t)       this->object; }
   explicit inline operator uintptr_t()              const { return cast(uintptr_t)      this->object; }
   explicit inline operator object::slots_t*()       const { return                      this->object; }
-  explicit inline operator const object::slots_t*() const { return                      this->object; }
   explicit inline operator int8_t*()                const { return cast(int8_t*)        this->object; }
-  explicit inline operator const int8_t*()          const { return cast(const int8_t*)  this->object; }
   explicit inline operator uint8_t*()               const { return cast(uint8_t*)       this->object; }
-  explicit inline operator const uint8_t*()         const { return cast(const uint8_t*) this->object; }
   explicit inline operator void*()                  const { return cast(void*)          this->object; }
-  explicit inline operator const void*()            const { return cast(const void*)    this->object; }
 
   explicit inline operator bool()                   const { return this->object != nullptr; }
 
@@ -65,10 +61,6 @@ struct [[_dkt_typeinfo_]] object_t {
     add_ref();
   }
   inline object_t(void* r) {
-    this->object = cast(object::slots_t*)r;
-    add_ref();
-  }
-  inline object_t(const void* r) {
     this->object = cast(object::slots_t*)r;
     add_ref();
   }
