@@ -16,25 +16,26 @@
 
 # pragma once
 
-KLASS_NS object       { struct [[_dkt_typeinfo_]] slots_t; }
-KLASS_NS object       { typealias slots_t = struct slots_t; }
+KLASS_NS object { struct [[_dkt_typeinfo_]] slots_t; }
+KLASS_NS object { typealias slots_t = struct slots_t; }
+
 struct [[_dkt_typeinfo_]] object_t {
   object::slots_t* object;
 
-  inline FUNC add_ref() -> void;
+  inline FUNC add_ref()    -> void;
   inline FUNC remove_ref() -> void;
 
   inline FUNC operator->() const -> object::slots_t* { return  this->object; }
   inline FUNC operator*()  const -> object::slots_t& { return *this->object; }
 
-  explicit inline operator intptr_t()               const { return cast(intptr_t)       this->object; }
-  explicit inline operator uintptr_t()              const { return cast(uintptr_t)      this->object; }
-  explicit inline operator object::slots_t*()       const { return                      this->object; }
-  explicit inline operator int8_t*()                const { return cast(int8_t*)        this->object; }
-  explicit inline operator uint8_t*()               const { return cast(uint8_t*)       this->object; }
-  explicit inline operator void*()                  const { return cast(void*)          this->object; }
+  explicit inline operator object::slots_t*() const { return                 this->object; }
+  explicit inline operator intptr_t()         const { return cast(intptr_t)  this->object; }
+  explicit inline operator uintptr_t()        const { return cast(uintptr_t) this->object; }
+  explicit inline operator void*()            const { return cast(void*)     this->object; }
+  explicit inline operator int8_t*()          const { return cast(int8_t*)   this->object; }
+  explicit inline operator uint8_t*()         const { return cast(uint8_t*)  this->object; }
 
-  explicit inline operator bool()                   const { return this->object != nullptr; }
+  explicit inline operator bool()             const { return this->object != nullptr; }
 
   inline FUNC operator!() const -> bool {
     return !this->object;
