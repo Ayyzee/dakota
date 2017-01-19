@@ -102,8 +102,8 @@ klass object {
     // if (klass::_klass_ != klass-of(self))
     //   $dump(klass-of(self));
 
-    fprintf(stderr, "%p:%p { klass=%p <%s> }\n",
-            cast(ptr-t)self, cast(ptr-t)self,
+    fprintf(stderr, "%p { klass=%p <%s> }\n",
+            cast(ptr-t)self,
             cast(ptr-t)klass-of(self),
             name-of(klass-of(self)));
     return self;

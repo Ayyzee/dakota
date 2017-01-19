@@ -78,8 +78,8 @@ klass symbol {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { \"%s\" }\n",
-            cast(ptr-t)(self), cast(ptr-t)unbox(self), $str(self));
+    fprintf(stderr, "%p { \"%s\" }\n",
+            cast(ptr-t)self, $str(self));
     return self;
   }
   method hash(slots-t s) -> hash-t {

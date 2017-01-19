@@ -29,7 +29,7 @@ klass str64 {
 
   method dump(const slots-t* s) -> const slots-t* {
   //$dump(super);
-    fprintf(stderr, "%p:%p { \"%s\" }\n", cast(ptr-t)nullptr, cast(ptr-t)(s), *s);
+    fprintf(stderr, "<%p> { \"%s\" }\n", cast(ptr-t)s, *s);
     return s;
   }
   method write-slots(object-t self, object-t out) -> object-t {

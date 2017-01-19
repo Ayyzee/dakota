@@ -64,8 +64,8 @@ klass str {
   // }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { slots=\"%s\" }\n",
-            cast(ptr-t)self, cast(ptr-t)unbox(self), unbox(self));
+    fprintf(stderr, "%p { slots=\"%s\" }\n",
+            cast(ptr-t)self, unbox(self));
     return self;
   }
   method hash(object-t self) -> hash-t {

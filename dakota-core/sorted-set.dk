@@ -153,8 +153,8 @@ klass sorted-set {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { count=%zi, capacity=%zi, elements=[] }\n",
-            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.sa.count, self.sa.capacity);
+    fprintf(stderr, "%p { count=%zi, capacity=%zi, elements=[] }\n",
+            cast(ptr-t)self, self.sa.count, self.sa.capacity);
     for (object-t element in self)
       $dump(element);
     return self;

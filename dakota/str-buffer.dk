@@ -58,8 +58,8 @@ klass str-buffer {
   }
   method dump(const slots-t* s) -> const slots-t* {
   //$dump(super);
-    fprintf(stderr, "%p:%p { ptr=\"%s\", len=%zi, capacity=%zi }\n",
-            cast(ptr-t)nullptr, cast(ptr-t)(s), s->ptr, s->len, s->capacity);
+    fprintf(stderr, "<%p> { ptr=\"%s\", len=%zi, capacity=%zi }\n",
+            cast(ptr-t)s, s->ptr, s->len, s->capacity);
     return s;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {

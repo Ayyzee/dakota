@@ -166,8 +166,8 @@ klass token {
       fprintf(stderr, "%s\n", self.buffer);
     return self;
 # else
-//     fprintf(stderr, "%p:%p { line=%i, buffer=\"",
-//             cast(ptr-t)(self), cast(ptr-t)unbox(self), self.line);
+//     fprintf(stderr, "%p { line=%i, buffer=\"",
+//             cast(ptr-t)self, self.line);
 
     for (int64-t i = 0; self.buffer[i] != NUL; i++) {
       switch (self.buffer[i]) {
@@ -188,8 +188,8 @@ klass token {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p { buffer=\"%s\" }\n",
-            cast(ptr-t)(self), cast(ptr-t)&unbox(self), self.buffer);
+    fprintf(stderr, "%p { buffer=\"%s\" }\n",
+            cast(ptr-t)self, self.buffer);
     return self;
   }
   method print(object-t self, object-t out) -> object-t {

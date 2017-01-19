@@ -417,7 +417,7 @@ klass klass {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p:%p {", cast(ptr-t)(self), cast(ptr-t)&unbox(self));
+    fprintf(stderr, "%p {", cast(ptr-t)self);
 
     // name
     if (name-of(self) != nullptr)
@@ -714,7 +714,7 @@ klass klass {
 //     printf("init(): kls-name: %s\n", self.name);
     assert(name-of(self) != nullptr);
     assert(#trait != cast(symbol-t)named-info::at(self.info, #type));
-    // fprintf(stderr, "%p: { name=%s }\n", cast(ptr-t)(self), name-of(self));
+    // fprintf(stderr, "%p { name=%s }\n", cast(ptr-t)self, name-of(self));
     self.offset = offset-from-info(self.info);
     self.size = size-from-info(self.info);
     self.superklass = superklass-from-info(self.info, name-of(self)); // interposing

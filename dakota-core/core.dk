@@ -421,19 +421,19 @@ static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
         const signature-t* method-signature;
 
         while ((method-signature = method-signatures[j]) != nullptr) {
-          size-t defined = 0;
+          bool-t is-defined = false;
           if (method-addresses != nullptr) {
             method-t method-address = method-addresses[j];
             if (method-address != nullptr && method-address != DKT-NULL-METHOD)
-              defined = 1;
+              is-defined = true;
           }
           j++;
-          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'param-types' : '%s', 'defined?' : '%zu' },\n",
+          ostream::println-format(ostrm, "'%s(%s)' : { 'return-type' : '%s', 'name' : '%s', 'param-types' : '%s', 'is-defined' : '%zi' },\n",
                                   method-signature->name, method-signature->param-types,
                                   method-signature->return-type,
                                   method-signature->name,
                                   method-signature->param-types,
-                                  defined);
+                                  is-defined);
         }
         ostream::col-decr(ostrm);
         ostream::println-format(ostrm, "},\n");
