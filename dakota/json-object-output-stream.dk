@@ -57,7 +57,7 @@ klass json-object-output-stream {
     self.start-tbl-delim = "{";
     self.end-tbl-delim = "}";
 
-    if (0 != self.indent-level) {
+    if (self.indent-level != 0) {
       self.key-delim = " : ";
       self.element-delim = ", ";
 
@@ -68,7 +68,7 @@ klass json-object-output-stream {
     return self;
   }
   static func features(object-t self, int-t flags) -> features-t {
-    if (0 != self.indent-level)
+    if (self.indent-level != 0)
       return cast(features-t)(flags);
     else
       return k-none;

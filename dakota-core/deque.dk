@@ -218,7 +218,7 @@ klass deque {
   method empty?(object-t self) -> bool-t {
     bool-t state;
 
-    if (0 == self.size)
+    if (self.size == 0)
       state = true;
     else
       state = false;
@@ -256,7 +256,7 @@ klass deque {
     return self;
   }
   method first(object-t self) -> object-t {
-    assert(0 != self.size);
+    assert(self.size != 0);
     //assert(self.first != nullptr);
     object-t element = nullptr;
     if (self.first != nullptr)
@@ -264,7 +264,7 @@ klass deque {
     return element;
   }
   [[alias(top)]] method last(object-t self) -> object-t {
-    assert(0 != self.size);
+    assert(self.size != 0);
     //assert(self.last != nullptr);
     object-t element = nullptr;
     if (self.last != nullptr)
@@ -272,7 +272,7 @@ klass deque {
     return element;
   }
   method remove-first(object-t self) -> object-t {
-    assert(0 != self.size);
+    assert(self.size != 0);
     assert(self.first != nullptr);
     object-t element = nullptr;
 
@@ -299,7 +299,7 @@ klass deque {
     return element;
   }
   [[alias(pop)]] method remove-last(object-t self) -> object-t {
-    assert(0 != self.size);
+    assert(self.size != 0);
     //assert(self.last != nullptr);
     node::slots-t* node = self.last;
     self.last = self.last->prev;
@@ -334,7 +334,7 @@ klass deque {
   //   $writeln(out, buffer);
   //   $increment-column(out);
 
-  //   if (0 != self.size) {
+  //   if (self.size != 0) {
   //     node::slots-t* node = self.first;
 
   //     do {

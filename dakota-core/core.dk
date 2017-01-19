@@ -101,7 +101,7 @@ klass assoc-node {
   }
   method element?(const slots-t* slots) -> bool-t {
     bool-t state = false;
-    if (0 != slots->element)
+    if (slots->element != 0)
       state = true;
     return state;
   }
@@ -231,7 +231,7 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
 
   while (j1 <= cast(ssize-t)safe-strlen(path)) {
     if (path[j1] == NUL || ':' == path[j1]) {
-      if (0 != j2 && gbl-delimiter != file[j2 - 1]) {
+      if (j2 != 0 && gbl-delimiter != file[j2 - 1]) {
         file[j2] = gbl-delimiter;
         j2++;
       }
@@ -242,11 +242,11 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
       x::stat-t status;
       int-t err = stat(file, &status);
 
-      if (0 == err) {
-        if (0 == S-ISREG(status.st-mode)) { // NOT a regular file
+      if (err == 0) {
+        if (S-ISREG(status.st-mode) == 0) { // NOT a regular file
           fprintf(stderr, "%s:%i: ERROR: %s: not a regular file.\n", __FILE__, __LINE__, file);
         }
-        else if (0 == (S-IRUSR & status.st-mode)) { // user DOES NOT have read permission
+        else if ((S-IRUSR & status.st-mode) == 0) { // user DOES NOT have read permission
           fprintf(stderr, "%s:%i: ERROR: %s: user does not have read permission.\n", __FILE__, __LINE__, file);
         } else {
           //fprintf(stdout, "%s: IS a regular file AND user DOES have read permission\n", file);
@@ -315,7 +315,7 @@ klass ostream {
     return s;
   }
   static func col-decr(slots-t& s) -> slots-t& {
-    if (0 != s.col) {
+    if (s.col != 0) {
       s.col--;
     }
     return s;
@@ -538,7 +538,7 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
       i++;
     }
     assert(names[i] == nullptr);
-    assert(0 == literals[i]); // nullptr
+    assert(literals[i] == 0); // nullptr
   }
   return;
 }
@@ -1360,11 +1360,11 @@ static func symbol-name-for-addr(ptr-t addr, so-symbol-info::slots-t* info) -> s
   if (sname-mangled != nullptr) {
       int status = -1;
       str-t sname-demangled = abi::__cxa_demangle(sname-mangled, nullptr, nullptr, &status);
-      if (0 != status)
+      if (status != 0)
         sname-demangled = sname-mangled;
       syslog(LOG-ERR, "caught sig%s in \"%s\" at \"%s\" %p\n",
              strsignal-name(sig), dso-abs-path-containing-addr(si->si-addr), sname-demangled, si->si-addr);
-      if (0 == status)
+      if (status == 0)
         free(cast(ptr-t)sname-demangled);
   } // else {}
   so-symbol-info::slots-t info {};
@@ -1432,7 +1432,7 @@ static func set-protection-all(str-t segment, int-t protection) -> int-t {
     registration-info-t ri {};
     named-info-to-registration-info(ni, &ri);
     int-t r = set-protection(segment, protection, cast(get-segment-data-func-t)ri.get-segment-data);
-    if (0 != r)
+    if (r != 0)
       result = r;
     ni = ni->next;
   }
@@ -1440,13 +1440,13 @@ static func set-protection-all(str-t segment, int-t protection) -> int-t {
 }
 func set-read-only() -> int-t {
   int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ);
-  if (0 != r)
+  if (r != 0)
     exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
   return r;
 }
 func set-read-write() -> int-t {
   int-t r = set-protection-all("__DKT_READ_ONLY", PROT-READ | PROT-WRITE);
-  if (0 != r)
+  if (r != 0)
     exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
   return r;
 }

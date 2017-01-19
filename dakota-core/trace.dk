@@ -22,13 +22,13 @@ static func trace-column-in() -> void {
   gbl-trace-column++;
 }
 static func trace-column-out() -> void {
-  if (0 != gbl-trace-column)
+  if (gbl-trace-column != 0)
     gbl-trace-column--;
 }
 [[format-va-printf(2)]] static func trace-vfprintf(stream-t stream, str-t format, va-list-t args) -> int-t {
   str-t col = "  "; // two spaces per column:-) [my way]
   for (int64-t i = 0; i < gbl-trace-column; i++) {
-    if (0 == i)
+    if (i == 0)
       fprintf(stream, "%s", col);
     else
       fprintf(stream, "%c%s", '.', col);

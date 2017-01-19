@@ -62,7 +62,7 @@ klass token {
                        str-t buffer:  nullptr) -> object-t {
     self = $init(super);
 # if 0
-    if (0 != tokenid) {
+    if (tokenid != 0) {
       char-t[4 + (1)] tokenid-str = "";
       tokenid::str(tokenid, tokenid-str, sizeof(tokenid-str));
 
@@ -88,7 +88,7 @@ klass token {
     bool-t state;
 
     if ($instance?(other, _klass_)) {
-      if (0 == $compare(self, other))
+      if ($compare(self, other) == 0)
         state = true;
       else
         state = false;
@@ -162,7 +162,7 @@ klass token {
   }
   method dump-shallow(object-t self) -> object-t {
 # if 0
-    if (0 != self.tokenid)
+    if (self.tokenid != 0)
       fprintf(stderr, "%s\n", self.buffer);
     return self;
 # else

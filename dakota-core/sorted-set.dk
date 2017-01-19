@@ -110,7 +110,7 @@ klass sorted-set {
   }
   method empty?(object-t self) -> bool-t {
     bool-t state = false;
-    if (0 == self.sa.count)
+    if (self.sa.count == 0)
       state = true;
     return state;
   }
@@ -127,7 +127,7 @@ klass sorted-set {
   }
   method remove-last(object-t self) -> object-t {
     object-t prev-element = nullptr;
-    if (0 != self.sa.count) {
+    if (self.sa.count != 0) {
       self.iterator-state++;
       prev-element = *(cast(object-t*)sorted-array::remove-last(&self.sa));
     }

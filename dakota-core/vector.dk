@@ -96,7 +96,7 @@ klass vector {
               object-t[] objects:          nullptr) -> object-t {
     // it IS legal to have the 'fill-element' value be nullptr
     // it is required for the hashed-set implementation
-    assert(0 != initial-capacity);
+    assert(initial-capacity != 0);
 
     self = $init(super);
 
@@ -143,7 +143,7 @@ klass vector {
   method empty?(object-t self) -> bool-t {
     bool-t state;
 
-    if (0 == self.count)
+    if (self.count == 0)
       state = true;
     else
       state = false;
@@ -213,7 +213,7 @@ klass vector {
     return object;
   }
   method remove-first(object-t self) -> object-t {
-    assert(0 != self.count);
+    assert(self.count != 0);
     object-t element = self.elements[0];
     memmove(self.elements, self.elements + 1, cast(size-t)(self.size * (self.count - 1)));
     self.elements[self.count - 1] = self.fill-element;
@@ -221,7 +221,7 @@ klass vector {
     return element;
   }
   [[alias(pop)]] method remove-last(object-t self) -> object-t {
-    assert(0 != self.count);
+    assert(self.count != 0);
     object-t element = self.elements[self.count - 1];
     self.elements[self.count - 1] = self.fill-element;
     self.count--;
@@ -308,11 +308,11 @@ klass vector {
     return element;
   }
   method first(object-t self) -> object-t {
-    assert(0 != self.count);
+    assert(self.count != 0);
     return self.elements[0];
   }
   [[alias(top)]] method last(object-t self) -> object-t {
-    assert(0 != self.count);
+    assert(self.count != 0);
     return self.elements[self.count - 1];
   }
   method forward-iterator(object-t self) -> object-t {
@@ -382,7 +382,7 @@ klass vector-forward-iterator {
   }
   method first?(object-t self) -> bool-t {
     bool-t state;
-    if (0 == self.index)
+    if (self.index == 0)
       state = true;
     else
       state = false;

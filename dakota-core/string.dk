@@ -108,7 +108,7 @@ klass string {
   method bool-value(object-t self) -> bool-t {
     uintmax-t uint-value = cast(uintmax-t)strtoumax(self.ptr, nullptr, 10);
     bool-t result;
-    if (0 == uint-value)
+    if (uint-value == 0)
       result = false;
     else
       result = true;

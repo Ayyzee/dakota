@@ -55,5 +55,5 @@ klass boole { // a doubleton:-)
     return;
   }
 }
-static-assert(0 == false, "Boolean false must equal 0");
-static-assert(1 == true,  "Boolean true must equal 1");
+static-assert(false == 0, "Boolean false must equal 0");
+static-assert(true  == 1, "Boolean true must equal 1");

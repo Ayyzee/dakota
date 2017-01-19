@@ -62,7 +62,7 @@ klass text-output-stream {
     return self;
   }
   method column-decr(object-t self) -> object-t {
-    if (0 != self.column)
+    if (self.column != 0)
       self.column--;
     return self;
   }
@@ -70,24 +70,24 @@ klass text-output-stream {
     assert(!((features & features-t::k-indent) &&
              (features & features-t::k-leading-ws)));
 
-    if (0 != (features & features-t::k-indent))
+    if ((features & features-t::k-indent) != 0)
       for (int64-t i = 0; i < self.column; i++)
         $write(self, ws[self.column-width]);
 
-    if (0 != (features & features-t::k-leading-ws))
-      if (0 == (self.previous-features & features-t::k-trailing-newline))
+    if ((features & features-t::k-leading-ws) != 0)
+      if ((self.previous-features & features-t::k-trailing-newline) == 0)
         $write(self, " ");
 
-    if (0 != (features & features-t::k-leading-newline))
-      if (0 == (self.previous-features & features-t::k-trailing-newline))
+    if ((features & features-t::k-leading-newline) != 0)
+      if ((self.previous-features & features-t::k-trailing-newline) == 0)
         $write(self, "\n");
 
     $write(self, string);
 
-    if (0 != (features & features-t::k-trailing-ws))
+    if ((features & features-t::k-trailing-ws) != 0)
       $write(self, " ");
 
-    if (0 != (features & features-t::k-trailing-newline))
+    if ((features & features-t::k-trailing-newline) != 0)
       $write(self, "\n");
 
     self.previous-features = features;

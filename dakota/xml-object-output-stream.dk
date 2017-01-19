@@ -54,7 +54,7 @@ klass xml-object-output-stream {
     self.start-tbl-delim = "<table>";
     self.end-tbl-delim = "</table>";
 
-    if (0 != self.indent-level) {
+    if (self.indent-level != 0) {
       self.key-delim = "";
       self.element-delim = "";
 
@@ -65,7 +65,7 @@ klass xml-object-output-stream {
     return self;
   }
   static func features(object-t self, int-t flags) -> features-t {
-    if (0 != self.indent-level)
+    if (self.indent-level != 0)
       return cast(features-t)(flags);
     else
       return k-none;

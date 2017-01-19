@@ -35,13 +35,13 @@ klass rect {
     if (slots != other-slots) {
       if (0)
         ;
-      else if (0 != (result = dk-cmp(slots->point.x, other-slots->point.x)))
+      else if ((result = dk-cmp(slots->point.x, other-slots->point.x)) != 0)
         ;
-      else if (0 != (result = dk-cmp(slots->point.y, other-slots->point.y)))
+      else if ((result = dk-cmp(slots->point.y, other-slots->point.y)) != 0)
         ;
-      else if (0 != (result = dk-cmp(slots->dimension.width, other-slots->dimension.width)))
+      else if ((result = dk-cmp(slots->dimension.width, other-slots->dimension.width)) != 0)
         ;
-      else if (0 != (result = dk-cmp(slots->dimension.height, other-slots->dimension.height)))
+      else if ((result = dk-cmp(slots->dimension.height, other-slots->dimension.height)) != 0)
         ;
     }
     return result;

@@ -136,7 +136,7 @@ klass sorted-array {
             cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
             cast(size-t)((t->count - offset - 1) * t->size)); // this arg may be zero
     if (key != nullptr)
-      assert(0 == t->compare(element, key));
+      assert(t->compare(element, key) == 0);
     memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, cast(size-t)t->size);
     t->count--;
     return element;
@@ -164,7 +164,7 @@ klass sorted-array {
   //assert(0 < t->count);
 
     const void* element;
-    if (0 != t->count) {
+    if (t->count != 0) {
       element = at(t, t->count - 1);
       memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, cast(size-t)t->size);
       t->count--;

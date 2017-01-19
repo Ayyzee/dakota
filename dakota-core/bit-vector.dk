@@ -74,7 +74,7 @@ klass bit-vector {
 
   method init(object-t self, ssize-t initial-capacity: gbl-default-initial-capacity) -> object-t {
     self = $init(super);
-    if (0 == initial-capacity)
+    if (initial-capacity == 0)
       initial-capacity = gbl-default-initial-capacity;
     self.count = 0;
     ssize-t num-elements = ceiling-divide(initial-capacity, gbl-element-width);
@@ -132,7 +132,7 @@ klass bit-vector {
     fprintf(out, "%p { count=%zi, capacity=%zi, elements=\"",
             cast(ptr-t)self, self.count, self.capacity);
     for (ssize-t i = 0; i < self.count * gbl-element-width; i++) {
-      if (0 != i && 0 == (i % 8))
+      if (i != 0 && (i % 8) == 0)
         fprintf(out, " ");
 
       bool-t value = bit(self, i);
@@ -176,7 +176,7 @@ klass bit-vector {
     assert(self-slots.capacity == other-slots.capacity);
     self-slots.count = max(self-slots.count, other-slots.count);
     for (ssize-t offset = 0; offset < self-slots.count; offset++) {
-      if (0 != (self-slots.elements[offset] = op(self-slots.elements[offset], other-slots.elements[offset]))) {
+      if ((self-slots.elements[offset] = op(self-slots.elements[offset], other-slots.elements[offset])) != 0) {
         result = true;
         break;
       }
@@ -219,7 +219,7 @@ klass bit-vector {
         for (ssize-t offset = 0; offset < count; offset++) {
           ssize-t i = count - 1 - offset;
           result = dk-cmp(self-slots.elements[i], other-slots.elements[i]);
-          if (0 != result)
+          if (result != 0)
             break;
         }
       } else {

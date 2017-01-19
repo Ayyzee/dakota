@@ -50,7 +50,7 @@ klass ascii-number {
   static func power(int64-t base, int64-t exp) -> int64-t {
     int64-t rtn;
 
-    if (0 == exp) {
+    if (exp == 0) {
       rtn = 1;
     } else {
       rtn = base;
@@ -64,7 +64,7 @@ klass ascii-number {
   }
   // hackhack: similiar code in string.dk
   static func reverse(char-t* buffer, ssize-t length) -> void {
-    if (0 != length) {
+    if (length != 0) {
       ssize-t head-offset = 0, tail-offset = length - 1;
 
       while (head-offset < tail-offset) {

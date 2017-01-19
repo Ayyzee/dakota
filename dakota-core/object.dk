@@ -55,7 +55,7 @@ klass object {
     //printf("%s('%s', '%s')\n", __method__, name-of(klass-of(self)), name-of(klass-of(other)));
     bool-t state = false;
 
-    if (0 == $compare(self, other))
+    if ($compare(self, other) == 0)
       state = true;
     return state;
   }

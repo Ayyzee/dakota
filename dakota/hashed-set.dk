@@ -101,7 +101,7 @@ klass hashed-set {
     return result;
   }
   method empty(object-t self) -> object-t {
-    if (0 != self.size) {
+    if (self.size != 0) {
       self.iterator-state++;
       $empty(self.buckets);
     }
@@ -136,7 +136,7 @@ klass hashed-set {
   }
   method empty?(object-t self) -> bool-t {
     bool-t state = false;
-    if (0 == self.size)
+    if (self.size == 0)
       state = true;
     return state;
   }
@@ -230,7 +230,7 @@ klass hashed-set-forward-iterator {
     self.deque-iter = nullptr;
     object-t deque = $next(self.vector-iter);
     if (deque != nullptr) {
-      assert(0 != $size(deque));
+      assert($size(deque) != 0);
       self.deque-iter = $forward-iterator(deque);
     }
     return self;
@@ -246,7 +246,7 @@ klass hashed-set-forward-iterator {
     object-t deque = $next(vector-iter);
     object-t deque-iter = nullptr;
     if (deque != nullptr) {
-      assert(0 != $size(deque));
+      assert($size(deque) != 0);
       deque-iter = $forward-iterator(deque);
     }
     return deque-iter;

@@ -108,7 +108,7 @@ klass lexer {
   }
 
   /* method */ inline func previous-char8(object-t self) -> char-t {
-    assert(0 != self.current-position);
+    assert(self.current-position != 0);
     char-t c = self.buffer[self.current-position - 1];
     return c;
   }
@@ -117,14 +117,14 @@ klass lexer {
     return c;
   }
   /* method */ inline func unget-char8(object-t self) -> void {
-    assert(0 != self.current-position);
+    assert(self.current-position != 0);
     self.current-position--;
     char-t c = current-char8(self);
     if ('\n' == c) {
       self.line--;
       self.column = self.previous-column;
     } else {
-      if (0 == self.column) {
+      if (self.column == 0) {
         self.line--;
         self.column = self.previous-column;
       } else {
@@ -156,7 +156,7 @@ klass lexer {
     object-t leading-ws = $make(vector::klass());
 
     while ((token = $lex(self)) != nullptr) {
-      if (0 == $tokenid(token)) {
+      if ($tokenid(token) == 0) {
         $add-last(leading-ws, token);
       } else {
         unless ($empty?(leading-ws)) {

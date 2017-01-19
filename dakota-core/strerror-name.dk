@@ -28,7 +28,7 @@ static func set-name(int-t, str-t) -> void;
 # include "strerror-name.tbl"
 
 static func set-name(int-t errnum, str-t name) -> void {
-  assert(0 != errnum);
+  assert(errnum != 0);
   assert(name != nullptr);
   assert(name[0] != NUL);
 //   fprintf(stdout, "%s(%3i, %s)\n", __func__, errnum, name);

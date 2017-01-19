@@ -186,10 +186,10 @@ static func size-from-info(named-info-t* info, symbol-t key) -> ssize-t {
   ssize-t element = 0;
   do {
     element = named-info::at(current-info, key);
-    assert((0 == previous-element && 0 != element) ||
-           (0 != previous-element && 0 == element) ||
-           (previous-element ==  element));
-    if (0 == element && 0 != previous-element)
+    assert((previous-element == 0 && element != 0) ||
+           (previous-element != 0 && element == 0) ||
+           (previous-element == element));
+    if (element == 0 && previous-element != 0)
       element = previous-element;
     else
       previous-element = element;

@@ -45,7 +45,7 @@ klass signature {
     cmp-t result = 0;
     if (s->name != other-s->name)
       result = safe-strcmp(s->name, other-s->name);
-    if (0 == result && s->param-types != other-s->param-types)
+    if (result == 0 && s->param-types != other-s->param-types)
       result = safe-strcmp(s->param-types, other-s->param-types);
     return result;
   }
