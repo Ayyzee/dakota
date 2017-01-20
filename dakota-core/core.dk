@@ -43,9 +43,6 @@ include-for <sys/stat.h> struct stat;
 
 module dakota-core;
 
-extern bool-t is-pre-main; // to quiet clang
-bool-t is-pre-main = true;
-
 klass bit-vector;
 klass const-info;
 klass enum-info;
@@ -1522,7 +1519,6 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       last-user-code-before-main();
       if (getenv?("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
-      is-pre-main = false;
   }
   if (output-path != nullptr && output-path[0] != NUL && ctlg-output != nullptr)
     fclose(ctlg-output);
