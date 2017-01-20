@@ -273,7 +273,7 @@ constexpr FUNC dk_hash_switch(size_t  val) -> size_t  { return val; }
 # if 0
   # define DKT_NULL_METHOD cast(method_t)nullptr
 # else
-  # define DKT_NULL_METHOD cast(method_t)dkt_null_method
+  # define DKT_NULL_METHOD dkt_null_method
 # endif
 
 [[so_export]] FUNC dkt_null_method(object_t) -> object_t;
