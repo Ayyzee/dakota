@@ -198,13 +198,13 @@ static func file-name-from-klass-name(symbol-t kls-name) -> str-t {
   ssize-t kn = 0;
   ssize-t fn = 0;
 
-  while (':' == kls-name[kn])
+  while (kls-name[kn] == ':')
     kn++;
   while (kls-name[kn] != NUL) {
-    if (':' == kls-name[kn]) {
+    if (kls-name[kn] == ':') {
       do {
         kn++;
-      } while (':' == kls-name[kn]);
+      } while (kls-name[kn] == ':');
 
       if (kls-name[kn] != NUL) {
         file-name[fn] = gbl-delimiter;
@@ -227,7 +227,7 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
   str-t rtn = nullptr;
 
   while (j1 <= cast(ssize-t)safe-strlen(path)) {
-    if (path[j1] == NUL || ':' == path[j1]) {
+    if (path[j1] == NUL || path[j1] == ':') {
       if (j2 != 0 && gbl-delimiter != file[j2 - 1]) {
         file[j2] = gbl-delimiter;
         j2++;
@@ -343,7 +343,7 @@ klass ostream {
   }
   static func fclose(const slots-t& s) -> const slots-t& {
     int n = ::fclose(s.output);
-    if (-1 == n)
+    if (n == -1)
       non-exit-fail-with-msg("ERROR: %s: \"%s\"", "fclose", strerror(errno));
     return s;
   }
@@ -818,7 +818,7 @@ static func dump?(named-info-t* kls-info, str-t only) -> bool-t {
 
   bool-t result = true;
   ssize-t only-len = cast(ssize-t)safe-strlen(only);
-  if ('-' == only[0]) {
+  if (only[0] == '-') {
     ssize-t name-len = cast(ssize-t)safe-strlen(name);
     if (name-len < only-len)
       result = false;
@@ -826,7 +826,7 @@ static func dump?(named-info-t* kls-info, str-t only) -> bool-t {
     if (safe-strcmp(name + name-len - only-len, only) != 0)
       result = false;
   }
-  else if ('-' == only[only-len - 1]) {
+  else if (only[only-len - 1] == '-') {
     if (safe-strncmp(name, only, cast(size-t)only-len) != 0)
       result = false;
   } else {
@@ -1210,7 +1210,7 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
 
     if (output-dir != nullptr) {
       int-t n = mkdir(output-dir, 0755);
-      if (-1 == n && EEXIST != errno)
+      if (n == -1 && errno != EEXIST)
         exit-fail-with-msg("ERROR: %s: \"%s\"", output-dir, strerror(errno));
     }
     symbol-t prev-module = nullptr;
@@ -1402,7 +1402,7 @@ static func sigaction-setup(int-t sig, x::sigaction-handler-t bus-segv-handler) 
 
   sa-pairs[index-from-sig(sig)].prev-sa.sa-sigaction = nullptr;
   int-t r = sigaction(sig, &sa, &sa-pairs[index-from-sig(sig)].prev-sa);
-  if (-1 == r) {
+  if (r == -1) {
     exit-fail-with-msg("ERROR: %s: \"%s\"", "sigaction", strerror(errno));
   }
   return r;
@@ -1416,7 +1416,7 @@ static func set-protection(str-t segment, int-t protection, get-segment-data-fun
   int-t result = -1;
   if (addr != nullptr) {
     result = mprotect(addr, size, protection);
-    if (-1 == result) {
+    if (result == -1) {
       exit-fail-with-msg("ERROR: %s: \"%s\"", "mprotect", strerror(errno));
     }
   }

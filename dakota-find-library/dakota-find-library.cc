@@ -25,7 +25,7 @@ static FUNC echo_abs_path_for_lib_name(str_t lib_name) -> int {
   int exit_value = EXIT_SUCCESS;
   str_t abs_path = dso_abs_path_for_lib_name(lib_name);
   printf("%s\n", abs_path ? abs_path : lib_name);
-  if (nullptr == abs_path) {
+  if (abs_path == nullptr) {
     fprintf(stderr, "%s: error: %s\n", progname, dso_error());
     exit_value = EXIT_FAILURE;
   }

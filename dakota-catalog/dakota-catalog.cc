@@ -51,18 +51,18 @@ struct opts_t {
   bool  recursive;
   bool  silent;
 };
-static opts_t opts {};
+static opts_t opts = {};
 
 static FUNC usage(str_t progname, option* options) -> int {
   str_t tmp_progname = strrchr(progname, '/');
-  if (nullptr != tmp_progname)
+  if (tmp_progname != nullptr)
     tmp_progname++;
   else
     tmp_progname = progname;
   fprintf(stdout, "usage: %s", tmp_progname);
   int result = 0;
 
-  while (nullptr != options->name) {
+  while (options->name != nullptr) {
     switch (options->has_arg) {
       case no_argument:
         fprintf(stdout, " [--%s]", options->name);
@@ -99,7 +99,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
   };
   int opt;
 
-  while (-1 != (opt = getopt_long(*argc, *argv, "", longopts, nullptr))) {
+  while ((opt = getopt_long(*argc, *argv, "", longopts, nullptr)) != -1) {
     switch (opt) {
       case DAKOTA_CATALOG_HELP:
         usage(progname, longopts);
@@ -132,7 +132,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         unrecognized_opt_cnt++;
     }
   }
-  if (0 != unrecognized_opt_cnt || (1 == optind && 1 == *argc)) {
+  if (unrecognized_opt_cnt != 0 || (optind == 1 && *argc == 1)) {
     usage(progname, longopts);
     exit(EXIT_FAILURE);
   }
@@ -154,7 +154,7 @@ static FUNC setenv_boole(str_t name, bool value, int overwrite) -> int {
 static FUNC file_exists(str_t path, int flags = O_RDONLY) -> bool {
   bool state;
   int fd = open(path, flags);
-  if (-1 == fd) {
+  if (fd == -1) {
     state = false;
   } else {
     state = true;
@@ -174,21 +174,21 @@ FUNC main(int argc, char** argv) -> int {
   char buffer[MAXPATHLEN] = "";
   char* output_pid = buffer;
 
-  if (nullptr != opts.directory) {
+  if (opts.directory != nullptr) {
     int n = chdir(opts.directory);
-    if (-1 == n) exit_fail_with_msg("ERROR:8 %s: \"%s\"\n", opts.directory, strerror(errno));
+    if (n == -1) exit_fail_with_msg("ERROR:8 %s: \"%s\"\n", opts.directory, strerror(errno));
   }
-  if (nullptr != opts.output) {
-    if (0 == strcmp(dev_null, opts.output)) {
+  if (opts.output != nullptr) {
+    if (strcmp(dev_null, opts.output) == 0) {
       output_pid = cast(char*)dev_null;
     } else {
       pid_t pid = getpid();
       snprintf(output_pid, sizeof(buffer), "%s-%i", opts.output, pid);
       // create an empty file
       int fd = open(output_pid, O_CREAT | O_TRUNC, 0644);
-      if (-1 == fd) exit_fail_with_msg("ERROR:7 %s: \"%s\"\n", output_pid, strerror(errno));
+      if (fd == -1) exit_fail_with_msg("ERROR:7 %s: \"%s\"\n", output_pid, strerror(errno));
       int n = close(fd);
-      if (-1 == n) exit_value = non_exit_fail_with_msg("ERROR:6 %s: \"%s\"\n", output_pid, strerror(errno));
+      if (n == -1) exit_value = non_exit_fail_with_msg("ERROR:6 %s: \"%s\"\n", output_pid, strerror(errno));
     }
   }
   int overwrite;
@@ -197,16 +197,16 @@ FUNC main(int argc, char** argv) -> int {
   if (!opts.path_only) {
     setenv("DAKOTA_CATALOG_OUTPUT", output_pid, overwrite = 1);
 
-    if (nullptr != opts.output_directory)
+    if (opts.output_directory != nullptr)
       setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
-    if (nullptr != opts.only)
+    if (opts.only != nullptr)
       setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1);
     if (opts.recursive)
       setenv_boole("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
   }
   int i = 0;
   str_t arg = nullptr;
-  while (nullptr != (arg = argv[i++])) {
+  while ((arg = argv[i++]) != nullptr) {
     if (!opts.path_only) {
       setenv("DKT_NO_INIT_RUNTIME",  "", overwrite = 1);
       setenv("DKT_EXIT_BEFORE_MAIN", "", overwrite = 1);
@@ -217,7 +217,7 @@ FUNC main(int argc, char** argv) -> int {
     if (!opts.path_only) {
       status = spawn(arg);
     }
-    if (-1 == status) {
+    if (status == -1) {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
       if (!opts.path_only) {
         unsetenv("DKT_NO_INIT_RUNTIME");
@@ -228,32 +228,32 @@ FUNC main(int argc, char** argv) -> int {
 
       // if the shared library is not found in the search path
       // and the argument *could* be relative to the cwd
-      if (nullptr == handle && nullptr == strchr(arg, '/')) {
+      if (handle == nullptr && strchr(arg, '/') == nullptr) {
         char rel_arg[MAXPATHLEN] = "";
         strcat(rel_arg, "./");
         strcat(rel_arg, arg);
         if (file_exists(rel_arg))
           handle = dso_open(rel_arg, DSO_OPEN_MODE.NOW | DSO_OPEN_MODE.LOCAL);
       }
-      if (nullptr != handle) {
+      if (handle != nullptr) {
         if (! opts.silent) {
           // str_t l_name = getenv("DKT_SHARED_LIBRARY_PATH");
           str_t l_name = dso_abs_path_for_handle(handle);
-          if (nullptr != l_name)
+          if (l_name != nullptr)
             printf("%s\n", l_name);
           else
             exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_abs_path_for_handle()", arg, dso_error()); // dso_close() failure
         }
-        if (0 != dso_close(handle))
+        if (dso_close(handle) != 0)
           exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_close()", arg, dso_error()); // dso_close() failure
       } else
         exit_value = non_exit_fail_with_msg("ERROR: %s: %s: \"%s\"\n", "dso_open", arg, dso_error());   // dso_open() failure
     }
   }
-  if (nullptr != opts.output) {
+  if (opts.output != nullptr) {
     if (dev_null != output_pid) {
       int n = rename(output_pid, opts.output);
-      if (-1 == n) exit_value = non_exit_fail_with_msg("ERROR:1 %s: \"%s\"\n", opts.output, strerror(errno));
+      if (n == -1) exit_value = non_exit_fail_with_msg("ERROR:1 %s: \"%s\"\n", opts.output, strerror(errno));
     }
   }
   return exit_value;

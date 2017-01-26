@@ -35,9 +35,9 @@ klass vector;
 static func ident-type?(str-buffer-t buf) -> bool-t {
   bool-t result = false;
   if (3 <= buf.len)
-    if ((('_' == buf.ptr[buf.len - 2]) ||
-         ('-' == buf.ptr[buf.len - 2])) &&
-         ('t' == buf.ptr[buf.len - 1]))
+    if (((buf.ptr[buf.len - 2] == '_') ||
+         (buf.ptr[buf.len - 2] == '-')) &&
+         (buf.ptr[buf.len - 1] == 't'))
       result = true;
   return result;
 }
@@ -120,7 +120,7 @@ klass lexer {
     assert(self.current-position != 0);
     self.current-position--;
     char-t c = current-char8(self);
-    if ('\n' == c) {
+    if (c == '\n') {
       self.line--;
       self.column = self.previous-column;
     } else {
@@ -138,7 +138,7 @@ klass lexer {
     char-t c = current-char8(self);
     self.current-position++;
     if (c != NUL) {
-      if ('\n' == c) {
+      if (c == '\n') {
         self.previous-column = self.column + 1;
         self.line++;
         self.column = 0;
@@ -253,7 +253,7 @@ klass lexer {
                   str-buffer::concat(&buf, c3);
                   c4 = get-char8(self);
 
-                  if ('*' == c3 && '/' == c4)
+                  if (c3 == '*' && c4 == '/')
                     break;
                 }
                 str-buffer::concat(&buf, c4);
@@ -344,7 +344,7 @@ klass lexer {
               do {
                 str-buffer::concat(&buf, c2);
                 c2 = get-char8(self);
-              } while (isdigit(c2) && '8' != c2 && '9' != c2);
+              } while (isdigit(c2) && c2 != '8' && c2 != '9');
               unget-char8(self);
               object-t token = $make(token::klass(), #tokenid: 'nmbr', #buffer: buf.ptr,
                                      #line: self.line, #column: self.column - buf.len);
@@ -385,9 +385,9 @@ klass lexer {
           do {
             str-buffer::concat(&buf, c1);
             c1 = get-char8(self);
-          } while (isalnum(c1) || '_' == c1 || '-' == c1);
+          } while (isalnum(c1) || c1 == '_' || c1 == '-');
           unget-char8(self);
-          while (!isalnum(previous-char8(self)) && '_' != previous-char8(self)) {
+          while (!isalnum(previous-char8(self)) && previous-char8(self) != '_') {
             unget-char8(self);
             buf.ptr[buf.len - 1] = NUL;
             buf.len--;
@@ -485,9 +485,9 @@ klass lexer {
           object-t open-token;
           do {
             open-token = $pop(self.open-tokens);
-          } while ('<' == $tokenid(open-token));
+          } while ($tokenid(open-token) == '<');
 
-          if ('(' != $tokenid(open-token))
+          if ($tokenid(open-token) != '(')
             throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balenced");
           $set-close-token(open-token, token);
           return token;
@@ -739,7 +739,7 @@ klass lexer {
           object-t token = $make(token::klass(), #tokenid: '>', #buffer: buf.ptr,
                                  #line: self.line, #column: self.column - buf.len);
           object-t open-token = $pop(self.open-tokens);
-          if ('<' != $tokenid(open-token))
+          if ($tokenid(open-token) != '<')
             $push(self.open-tokens, open-token);
           else
             $set-close-token(open-token, token);
@@ -775,9 +775,9 @@ klass lexer {
           object-t open-token;
           do {
             open-token = $pop(self.open-tokens);
-          } while ('<' == $tokenid(open-token));
+          } while ($tokenid(open-token) == '<');
 
-          if ('[' != $tokenid(open-token))
+          if ($tokenid(open-token) != '[')
             throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balenced");
           $set-close-token(open-token, token);
           return token;
@@ -845,9 +845,9 @@ klass lexer {
           object-t open-token;
           do {
             open-token = $pop(self.open-tokens);
-          } while ('<' == $tokenid(open-token));
+          } while ($tokenid(open-token) == '<');
 
-          if ('{' != $tokenid(open-token))
+          if ($tokenid(open-token) != '{')
             throw $make(syntax-exception::klass(), #token: token, #file: self.file, #msg: "not balenced");
           $set-close-token(open-token, token);
           return token;
