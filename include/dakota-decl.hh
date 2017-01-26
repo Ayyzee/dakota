@@ -110,6 +110,10 @@ typealias float32_t =  float;
 typealias float64_t =       double;
 typealias float128_t = long double;
 
+static_assert( 32/8 == sizeof( float32_t), "The type float32-t  must be  4 bytes in size");
+static_assert( 64/8 == sizeof( float64_t), "The type float64-t  must be  8 bytes in size");
+static_assert(128/8 == sizeof(float128_t), "The type float128-t must be 16 bytes in size");
+
 // symbols are defined before klasses
 
 KLASS_NS object { struct [[_dkt_typeinfo_]] slots_t; }
