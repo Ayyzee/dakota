@@ -119,6 +119,7 @@
         '$(DESTDIR)$(prefix)/include/dakota-object.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota-of.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota-os.$(hh_ext)',
+        '$(DESTDIR)$(prefix)/include/dakota-weak-object.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota.$(hh_ext)',
 
         '$(DESTDIR)$(prefix)/bin/dakota',

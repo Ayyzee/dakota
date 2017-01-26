@@ -16,15 +16,13 @@
 
 # pragma once
 
-struct [[_dkt_typeinfo_]] object_t {
+struct [[_dkt_typeinfo_]] weak_object_t {
   object::slots_t* object;
 
   inline FUNC operator->() const -> object::slots_t* { return  this->object; }
   inline FUNC operator*()  const -> object::slots_t& { return *this->object; }
 
-  inline FUNC add_ref()    -> void;
-  inline FUNC remove_ref() -> void;
-
+           inline operator object_t()         const { return object_t{this->object}; } // convert from weak-object-t to object-t
   explicit inline operator object::slots_t*() const { return                 this->object; }
   explicit inline operator intptr_t()         const { return cast(intptr_t)  this->object; }
   explicit inline operator uintptr_t()        const { return cast(uintptr_t) this->object; }
@@ -37,40 +35,36 @@ struct [[_dkt_typeinfo_]] object_t {
   inline FUNC operator!() const -> bool {
     return !this->object;
   }
-  inline FUNC operator==(const object_t& r) const -> bool {
+  inline FUNC operator==(const weak_object_t& r) const -> bool {
     return this->object == r.object;
   }
-  inline FUNC operator!=(const object_t& r) const -> bool {
+  inline FUNC operator!=(const weak_object_t& r) const -> bool {
     return this->object != r.object;
   }
-  inline FUNC operator=(const object_t& r) -> object_t& {
+  inline FUNC operator=(const weak_object_t& r) -> weak_object_t& {
     if (this != &r) {
       this->object = r.object;
-      add_ref();
     }
     return *this;
   }
-  inline object_t(const object_t& r) {
+  inline weak_object_t(const weak_object_t& r) {
     this->object = r.object;
-    add_ref();
   }
-  inline object_t(object::slots_t* r = nullptr) {
+  inline weak_object_t(object::slots_t* r = nullptr) {
     this->object = r;
-    add_ref();
   }
-  inline object_t(intptr_t r) {
+  inline weak_object_t(intptr_t r) {
     this->object = cast(object::slots_t*)r;
-    add_ref();
   }
-  inline object_t(uintptr_t r) {
+  inline weak_object_t(uintptr_t r) {
     this->object = cast(object::slots_t*)r;
-    add_ref();
   }
-  inline object_t(std::nullptr_t r) {
+  inline weak_object_t(std::nullptr_t r) {
     this->object = cast(object::slots_t*)r;
-    add_ref();
   }
-  inline ~object_t() {
-    remove_ref();
+  inline ~weak_object_t() {
+  }
+  inline weak_object_t(const object_t& r) { // convert from object-t to weak-object-t
+    this->object = r.object;
   }
 };

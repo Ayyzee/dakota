@@ -112,7 +112,16 @@ typealias float128_t = long double;
 
 // symbols are defined before klasses
 
+KLASS_NS object { struct [[_dkt_typeinfo_]] slots_t; }
+KLASS_NS object { typealias slots_t = struct slots_t; }
+
 # include <dakota-object.hh>
+# include <dakota-weak-object.hh>
+
+static_assert(sizeof(weak_object_t) == sizeof(object_t),
+              "The types weak-object-t and object-t are different sizes.");
+static_assert(offsetof(weak_object_t, object) == offsetof(object_t, object),
+              "The types weak-object-t and object-t have different layouts.");
 
 KLASS_NS boole        { typealias slots_t = bool_t;                                } typealias bool_t =         boole::slots_t;
 KLASS_NS cmp          { typealias slots_t = int_t;                                 } typealias cmp_t =          cmp::slots_t;
