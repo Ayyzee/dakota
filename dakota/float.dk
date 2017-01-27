@@ -60,6 +60,6 @@ klass floatmax {
     return self;
   }
 }
-static-assert( 32/8 == sizeof( float32-t), "The type float32-t  must be  4 bytes in size");
-static-assert( 64/8 == sizeof( float64-t), "The type float64-t  must be  8 bytes in size");
-static-assert(128/8 == sizeof(float128-t), "The type float128-t must be 16 bytes in size");
+static-assert(sizeof(float32-t)  == 32/8,  "The type float32-t  must be  4 bytes in size");
+static-assert(sizeof(float64-t)  == 64/8,  "The type float64-t  must be  8 bytes in size");
+static-assert(sizeof(float128-t) == 128/8, "The type float128-t must be 16 bytes in size");
