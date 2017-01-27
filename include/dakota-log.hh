@@ -21,7 +21,7 @@
 
 # include <syslog.h>
 
-# include <dakota-decl.hh>
+# include <dakota.hh>
 
 [[so_export]] [[format_va_printf(2)]] FUNC dkt_va_log(int64_t priority, str_t format, va_list_t args) -> int_t;
 [[so_export]] [[format_printf(   2)]] FUNC dkt_log(   int64_t priority, str_t format, ...) -> int_t;

@@ -113,14 +113,14 @@
 
         '$(DESTDIR)$(prefix)/lib/libdakota-core.$(so_ext)',
 
-        '$(DESTDIR)$(prefix)/include/dakota-decl.$(hh_ext)',
+        '$(DESTDIR)$(prefix)/include/dakota.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota-finally.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota-log.$(hh_ext)',
-        '$(DESTDIR)$(prefix)/include/dakota-object.$(hh_ext)',
-        '$(DESTDIR)$(prefix)/include/dakota-of.$(hh_ext)',
+        '$(DESTDIR)$(prefix)/include/dakota-object.inc',
+        '$(DESTDIR)$(prefix)/include/dakota-of.inc',
         '$(DESTDIR)$(prefix)/include/dakota-os.$(hh_ext)',
-        '$(DESTDIR)$(prefix)/include/dakota-weak-object.$(hh_ext)',
-        '$(DESTDIR)$(prefix)/include/dakota.$(hh_ext)',
+        '$(DESTDIR)$(prefix)/include/dakota-weak-object.inc',
+        '$(DESTDIR)$(prefix)/include/dakota-other.inc',
 
         '$(DESTDIR)$(prefix)/bin/dakota',
         '$(DESTDIR)$(prefix)/bin/dakota-fixup-stderr',

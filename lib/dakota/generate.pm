@@ -151,7 +151,7 @@ sub extra_dakota_headers {
     }
     $result .=
       $nl .
-      "# include <dakota-decl.$hh_ext>" . $nl .
+      "# include <dakota.$hh_ext>" . $nl .
       "# include <dakota-log.$hh_ext> // optional" . $nl;
     if (&is_target()) {
       $result .=
@@ -552,7 +552,7 @@ sub generate_decl_defn {
   if (&is_decl()) {
     $str .=
       $nl .
-      "# include <dakota-of.$hh_ext> // klass-of(), superklass-of(), name-of()" . $nl .
+      "# include <dakota-of.inc> // klass-of(), superklass-of(), name-of()" . $nl .
       $nl;
   }
   $str .=

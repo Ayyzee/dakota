@@ -119,8 +119,8 @@ static_assert(sizeof(float128_t) == 128/8, "The type float128-t must be 16 bytes
 KLASS_NS object { struct [[_dkt_typeinfo_]] slots_t; }
 KLASS_NS object { typealias slots_t = struct slots_t; }
 
-# include <dakota-object.hh>
-# include <dakota-weak-object.hh>
+# include <dakota-object.inc>
+# include <dakota-weak-object.inc>
 
 static_assert(sizeof(weak_object_t) == sizeof(object_t),
               "The types weak-object-t and object-t are different sizes.");
