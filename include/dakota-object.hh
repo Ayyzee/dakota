@@ -52,23 +52,28 @@ struct [[_dkt_typeinfo_]] object_t {
   }
   inline object_t(const object_t& r) {
     this->object = r.object;
-    this->add_ref();
+    if (this->object)
+      this->add_ref();
   }
   inline object_t(object::slots_t* r = nullptr) {
     this->object = r;
-    this->add_ref();
+    if (this->object)
+      this->add_ref();
   }
   inline object_t(intptr_t r) {
     this->object = cast(object::slots_t*)r;
-    this->add_ref();
+    if (this->object)
+      this->add_ref();
   }
   inline object_t(uintptr_t r) {
     this->object = cast(object::slots_t*)r;
-    this->add_ref();
+    if (this->object)
+      this->add_ref();
   }
   inline object_t(std::nullptr_t r) {
     this->object = cast(object::slots_t*)r;
-    this->add_ref();
+    if (this->object)
+      this->add_ref();
   }
   inline ~object_t() {
     this->remove_ref();
