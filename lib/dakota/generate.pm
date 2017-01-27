@@ -2807,7 +2807,7 @@ sub linkage_unit::generate_klasses {
   if (&is_decl()) {
     $$scratch_str_ref .=
       $nl .
-      "# include <dakota.$hh_ext>" . $nl .
+      "# include <dakota-other.inc>" . $nl .
       $nl;
   }
   $$scratch_str_ref .= &labeled_src_str(undef, "klasses-slots" . '-' . &suffix());

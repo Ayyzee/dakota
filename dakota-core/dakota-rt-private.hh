@@ -16,7 +16,6 @@
 
 # pragma once
 
-# include "dakota.hh"
 # include "declare-klass-type.hh"
 
 dkt_declare_klass_type_struct(assoc_node);

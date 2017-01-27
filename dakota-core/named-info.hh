@@ -16,8 +16,6 @@
 
 # pragma once
 
-# include "dakota.hh"
-
 KLASS_NS named_info {
   METHOD compare(object_t self, object_t other) -> int_t;
   METHOD compare(slots_t*  s, slots_t*  other_s) -> int_t;

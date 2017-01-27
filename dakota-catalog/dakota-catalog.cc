@@ -26,7 +26,7 @@
 # include <sys/wait.h>
 
 # include "dummy.hh"
-# include "dakota.hh" // format_printf(), format_va_printf()
+# include "dakota-other.inc" // format_printf(), format_va_printf()
 
 # include "dso.hh"
 

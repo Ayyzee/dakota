@@ -17,7 +17,6 @@
 # pragma once
 
 # include "dummy.hh"
-# include "dakota.hh"
 
 dkt_declare_klass_type_struct(selector_node);
 //dkt-declare-klass-type-struct(signature);
