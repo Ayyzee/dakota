@@ -46,31 +46,31 @@ struct [[_dkt_typeinfo_]] object_t {
   inline FUNC operator=(const object_t& r) -> object_t& {
     if (this != &r) {
       this->object = r.object;
-      add_ref();
+      this->add_ref();
     }
     return *this;
   }
   inline object_t(const object_t& r) {
     this->object = r.object;
-    add_ref();
+    this->add_ref();
   }
   inline object_t(object::slots_t* r = nullptr) {
     this->object = r;
-    add_ref();
+    this->add_ref();
   }
   inline object_t(intptr_t r) {
     this->object = cast(object::slots_t*)r;
-    add_ref();
+    this->add_ref();
   }
   inline object_t(uintptr_t r) {
     this->object = cast(object::slots_t*)r;
-    add_ref();
+    this->add_ref();
   }
   inline object_t(std::nullptr_t r) {
     this->object = cast(object::slots_t*)r;
-    add_ref();
+    this->add_ref();
   }
   inline ~object_t() {
-    remove_ref();
+    this->remove_ref();
   }
 };
