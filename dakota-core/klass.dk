@@ -213,7 +213,7 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
 /*LOCAL*/ func superklass-name-from-info(named-info-t* info) -> symbol-t {
   symbol-t superkls-name = cast(symbol-t)ptr-from-info(info, #superklass-name);
 
-  if (superkls-name == nullptr && #object != name-from-info(info))
+  if (superkls-name == nullptr && name-from-info(info) != #object)
     superkls-name = default-superklass-name();
   return superkls-name;
 }
@@ -263,7 +263,7 @@ inline func round-alignment(size-t n) -> size-t {
   ssize-t result;
 
   symbol-t name = name-from-info(info);
-  if (#object == name)
+  if (name == #object)
   { // klass is "object"
     result = 0;
   } else {

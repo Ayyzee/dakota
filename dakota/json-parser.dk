@@ -34,7 +34,7 @@ klass vector;
 
 [[format-printf(4)]] static func print-error(str-t file, ssize-t line, ssize-t column, str-t format, ...) -> int-t {
   cmp-t result = fprintf(stderr, "%s:%zi:%zi ", file, line, column);
-  if (-1 != result) {
+  if (result != -1) {
     va-list-t args;
     va-start(args, format);
     result += vfprintf(stderr, format, args);
@@ -83,7 +83,7 @@ klass json-parser {
     return num-elements-read;
   }
   /* method */ static func putback(object-t self, int-t c) -> void {
-    if ('\n' == c)
+    if (c == '\n')
       self.line--;
       // where is column left?
     else
@@ -93,8 +93,8 @@ klass json-parser {
   }
   /* method */ static func get(object-t self) -> int-t {
     int-t c = getc(self.in);
-    if (EOF != c) {
-      if ('\n' == c) {
+    if (c != EOF) {
+      if (c == '\n') {
         self.line++;
         self.column = 0;
       } else {
@@ -110,7 +110,7 @@ klass json-parser {
     while (1) {
       while (isspace(c = json-parser::get(self))) {
       }
-      if (EOF == c)
+      if (c == EOF)
       { return null; }
       switch (c) {
         // self.column needs to be adjusted by the length of the token
@@ -125,15 +125,15 @@ klass json-parser {
         case ',': { return $make(token::klass(), #tokenid: ',', #buffer: ",",
                                 #line: self.line, #column: self.column - 1); }
         case '#': {
-          while ('\n' != (c = json-parser::get(self))) {
-            if (EOF == c)
+          while ((c = json-parser::get(self)) != '\n') {
+            if (c == EOF)
               return null;
           }
           break;
         }
         case '=': {
           c = json-parser::get(self);
-          if (EOF == c || '>' != c) {
+          if (c == EOF || c != '>') {
             print-error(self.file, self.line, self.column - 2, "unknown token '='\n");
             return null;
           } else {
@@ -147,7 +147,7 @@ klass json-parser {
                                 #line: self.line, #column: self.column - 1);
           bool-t is-escaped;
           c = json-parser::get(self);
-          if (EOF == c) {
+          if (c == EOF) {
             print-error(self.file, self.line, self.column, "unterminated string\n");
             return null;
           }
@@ -156,13 +156,13 @@ klass json-parser {
           do {
             $append-char(token, cast(int64-t)c);
 
-            if ('\\' == c)
+            if (c == '\\')
               is-escaped = true;
             else
               is-escaped = false;
 
             c = json-parser::get(self);
-            if (EOF == c) {
+            if (c == EOF) {
               print-error(self.file, self.line, self.column, "unterminated string\n");
               return null;
             }
@@ -192,8 +192,8 @@ klass json-parser {
           do {
             $append-char(token, cast(int64-t)c);
             c = json-parser::get(self);
-          } while (isalnum(c) || '_' == c);
-          if (EOF != c)
+          } while (isalnum(c) || c == '_');
+          if (c != EOF)
             json-parser::putback(self, c);
           return token;
         }
@@ -342,10 +342,10 @@ klass json-parser {
         print-error(self.file, self.line, self.column, "incomplete vector\n");
         return null;
       }
-    } while (',' == $tokenid(token));
+    } while ($tokenid(token) == ',');
 
 
-    if (']' != $tokenid(token)) {
+    if ($tokenid(token) != ']') {
       print-error(self.file, self.line, self.column, "expected ',' or ']' but got '%s'\n", $buffer(token));
       return null;
     }
@@ -367,9 +367,9 @@ klass json-parser {
         print-error(self.file, self.line, self.column, "incomplete table\n");
         return null;
       }
-    } while (',' == $tokenid(token));
+    } while ($tokenid(token) == ',');
 
-    if ('}' != $tokenid(token)) {
+    if ($tokenid(token) != '}') {
       print-error(self.file, self.line, self.column, "expected ',' or '}' but got '%s'\n", $buffer(token));
       return null;
     }

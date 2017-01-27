@@ -55,7 +55,7 @@ klass ascii-number {
     } else {
       rtn = base;
 
-      while (1 != exp) {
+      while (exp != 1) {
         rtn *= base;
         exp--;
       }

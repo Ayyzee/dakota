@@ -44,7 +44,7 @@ thread-local throw-src-t dkt-throw-src = { nullptr, 0 };
 static char-t[4 * 1024] gbl-buf;
 func getprogname() -> str-t {
   ssize-t n = readlink("/proc/self/exe", gbl-buf, sizeof(gbl-buf) - 1);
-  if (-1 == n)
+  if (n == -1)
     throw $make(system-exception::klass(), #errnum: errno);
   gbl-buf[n] = NUL;
   str-t progname = strrchr(gbl-buf, '/');

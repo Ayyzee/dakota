@@ -82,9 +82,9 @@ klass str-buffer {
     return result;
   }
   method length(slots-t* s) -> ssize-t {
-    if (0       == s->len &&
+    if (s->len == 0 &&
         s->ptr != nullptr &&
-        NUL     != s->ptr[0])
+        s->ptr[0] != NUL)
       s->len = cast(ssize-t)safe-strlen(s->ptr);
     return s->len;
   }

@@ -99,7 +99,7 @@ klass input-file {
     if (c != self.buffer[self.current-position - 1])
       throw $make(exception::klass(), #msg: "oops");
     self.current-position--;
-    if ('\n' == c) {
+    if (c == '\n') {
       self.line--;
       // where is column left?
     } else {
@@ -110,7 +110,7 @@ klass input-file {
   method get-char8(object-t self) -> char-t {
     char-t c = self.buffer[self.current-position++];
     if (c != 0) {
-      if ('\n' == c) {
+      if (c == '\n') {
         self.line++;
         self.column = 0;
       } else {

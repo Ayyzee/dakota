@@ -14,27 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+# define FUNC auto
+
 // similiar to add-nonblock in fd.dk
-static int
-add_nonblock(int fd) {
+static FUNC
+add_nonblock(int fd) -> int {
   int flags, n;
   flags = n = fcntl(fd, F_GETFL, 0);
-  if (-1 != n) {
+  if (n != -1) {
     flags |= O_NONBLOCK;
     n = fcntl(fd, F_SETFL, flags);
   }
   return n;
 }
-static int
-spawn(const char* arg) {
+static FUNC
+spawn(const char* arg) -> int {
   int errno_pipe[2];
   pipe(errno_pipe);
   char child_errno_str[3 + (1)] = "";
   pid_t pid = fork();
-  if (-1 == pid)
+  if (pid == -1)
     return -1;
 
-  if (0 == pid) { // child
+  if (pid == 0) { // child
     close(errno_pipe[0]); // close read side of pipe
     char* args[] = { const_cast<char*>(arg), nullptr };
     execv(args[0], args);
@@ -49,18 +51,18 @@ spawn(const char* arg) {
     close(errno_pipe[1]); // close write side of pipe
     int status;
     int child_pid = waitpid(pid, &status, 0);
-    if (-1 == child_pid)
+    if (child_pid == -1)
       return -1;
     if (WIFEXITED(status)) {
       int exit_status = WEXITSTATUS(status);
-      if (EXIT_SUCCESS != exit_status) {
+      if (exit_status != EXIT_SUCCESS) {
         ssize_t n;
         n = add_nonblock(errno_pipe[0]);
-        if (-1 == n)
+        if (n == -1)
           std::abort();
         n = read(errno_pipe[0], child_errno_str, sizeof(child_errno_str) - 1);
-        if (-1 != n) {
-          if (sizeof(child_errno_str) - 1 == n) {
+        if (n != -1) {
+          if (n == sizeof(child_errno_str) - 1) {
             child_errno_str[sizeof(child_errno_str) - 1] = NUL;
             int child_errno;
             sscanf(child_errno_str, "%i", &child_errno);
@@ -70,14 +72,14 @@ spawn(const char* arg) {
           else // we expect exactly sizeof(child_errno_str) - 1 bytes
             std::abort();
         }
-        else if (EAGAIN != errno)
+        else if (errno != EAGAIN)
           std::abort();
       }
       return exit_status;
     }
     else if (WIFSIGNALED(status)) { // needed for x86-64-linux 2.6.20-15
       int sig = WTERMSIG(status);
-      if (SIGSEGV == sig)
+      if (sig == SIGSEGV)
         errno = ENOEXEC;
       return -1;
     }

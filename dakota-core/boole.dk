@@ -36,7 +36,7 @@ klass boole { // a doubleton:-)
 
   method init(object-t self, slots-t slots: false) -> object-t {
     // intentionally not chaining $init()
-    assert(false == unbox(self));
+    assert(unbox(self) == false);
     if (slots)
       self = (boole-klass::unbox(klass-of(self)))[slots];
     return self;

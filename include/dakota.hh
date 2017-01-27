@@ -45,7 +45,7 @@
 namespace dkt { inline FUNC demangle(str_t mangled_name, char_t* buffer = nullptr, size_t buffer_len = 0) -> str_t {
   int_t status = 0;
   str_t result = abi::__cxa_demangle(mangled_name, buffer, &buffer_len, &status); // must be free()ed if buffer is non-nullptr
-  if (0 != status)
+  if (status != 0)
     result = mangled_name; // silent failure
   return result;
 }}
@@ -168,8 +168,8 @@ template<typename T> inline FUNC dk_cmp(T a, T b)    -> cmp_t { return (a < b) ?
 # define GENERIC_FUNC_PTR_PTR(name, args)     (cast(dkt_generic_func_func_t)(cast(FUNC (*)args -> generic_func_t*) __generic_func_ptr::name))()
 # define GENERIC_FUNC_PTR(name, args)        *GENERIC_FUNC_PTR_PTR(name, args)
 
-# define unless(e) if (0 == (e))
-# define until(e)  while (0 == (e))
+# define unless(e) if ((e) == 0)
+# define until(e)  while ((e) == 0)
 
 inline FUNC uintstr(char_t c1, char_t c2, char_t c3, char_t c4) -> uint32_t {
   return ((((cast(uint32_t)cast(uchar_t) c1) << (32 -  8)) & 0xff000000) |

@@ -23,7 +23,7 @@ inline FUNC safe_strcmp(str_t s1, str_t s2) -> int_t {
   int_t value = 0;
 
   if (s1 == nullptr || s2 == nullptr) {
-    if (nullptr == s1 && nullptr == s2)
+    if (s1 == nullptr && s2 == nullptr)
       value = 0;
     else if (s1 == nullptr)
       value = -1;

@@ -56,9 +56,9 @@ klass output-stream {
   method close(object-t self) -> object-t {
     slots-t slots = unbox(self);
 # if defined DEBUG
-    if (stdout == slots)
+    if (slots == stdout)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stdout\"");
-    else if (stderr == slots)
+    else if (slots == stderr)
       dkt-log(dkt::k-log-warning, "\"close\" : \"stderr\"");
 # endif // DEBUG
     int-t rtn = fclose(slots);

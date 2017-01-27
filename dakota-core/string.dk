@@ -64,7 +64,7 @@ klass string {
     return result;
   }
   method length(object-t self) -> ssize-t {
-    if (0       == self.len &&
+    if (self.len == 0 &&
         self.ptr != nullptr &&
         self.ptr[0] != NUL)
       self.len = cast(ssize-t)safe-strlen(self.ptr);
