@@ -933,6 +933,10 @@ sub rewrite_include_fors {
   my $h =  &header_file_regex();
   $$filestr_ref =~ s=^include-for(\s*)(<$h+>|"$h+")(.*?);=# include$1$2 /*$3 */=gsm;
 }
+sub rewrite_weak_objects {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/\[\[\s*weak\s*\]\](\s*)object-t/$1weak-object-t/g;
+}
 #sub convert_types_to_include {
 #  my ($filestr_ref) = @_;
 #  $$filestr_ref =~ s/((?:klass|trait)\s+$rid\s+\{\s*)types(\s*(?:".+?"|<.+?>)\s*);([^\n]*)\n(\s*)/# include$2$3$4\n$1/gs;
@@ -1004,6 +1008,7 @@ sub convert_dk_to_cc {
   #&rewrite_method_aliases($filestr_ref);
 
   &rewrite_include_fors($filestr_ref);
+  &rewrite_weak_objects($filestr_ref);
   &rewrite_xsymbol_syntax($filestr_ref);
  #&convert_types_to_include($filestr_ref);
   &rewrite_literal_booles($filestr_ref);
