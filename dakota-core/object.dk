@@ -112,9 +112,13 @@ klass object {
 # if defined DEBUG
     echo-stuff(self, "dealloc");
 # endif
-    //void* ptr = cast(void*)self;
+    object::slots-t* ptr = cast(object::slots-t*)self;
     self = nullptr;
-    //dkt::dealloc(ptr);
+# if 0
+    dkt::dealloc(cast(ptr-t)ptr);
+# else
+    USE(ptr);
+# endif
     return nullptr;
   }
   method hash(object-t self) -> hash-t {
