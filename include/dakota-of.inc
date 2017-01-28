@@ -85,13 +85,13 @@ inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
 // }
 FUNC $dealloc(object_t) -> object_t;
 inline FUNC object_t::add_ref() -> void {
-  if (this->object && this->object->ref_count != -1) { // -1 indicates being dealloc()ed
+  if (this->object->ref_count != -1) { // -1 indicates being dealloc()ed
     //printf("%p: %lli++\n", cast(void*)this->object, this->object->ref_count);
     this->object->ref_count++;
   }
 }
 inline FUNC object_t::remove_ref() -> void {
-  if (this->object && this->object->ref_count != -1) { // -1 indicates being dealloc()ed
+  if (this->object->ref_count != -1) { // -1 indicates being dealloc()ed
     assert(this->object->ref_count != 0);
     //printf("%p: %lli--\n", cast(void*)this->object, this->object->ref_count);
     this->object->ref_count--;
