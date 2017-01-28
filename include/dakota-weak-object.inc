@@ -42,7 +42,7 @@ struct [[_dkt_typeinfo_]] weak_object_t {
     return this->object != r.object;
   }
   inline FUNC operator=(const weak_object_t& r) -> weak_object_t& {
-    if (this != &r) {
+    if (this->object != r.object) {
       this->object = r.object;
     }
     return *this;
