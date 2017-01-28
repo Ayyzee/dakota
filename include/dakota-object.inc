@@ -44,9 +44,10 @@ struct [[_dkt_typeinfo_]] object_t {
     return this->object != r.object;
   }
   inline FUNC operator=(const object_t& r) -> object_t& {
-    if (this != &r) {
+    if (this->object != r.object) {
       this->object = r.object;
-      this->add_ref();
+      if (this->object)
+        this->add_ref();
     }
     return *this;
   }
