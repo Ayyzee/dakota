@@ -98,7 +98,9 @@ klass object {
   }
   // documented to do nothing
   method init(object-t self) -> object-t {
+# if defined DEBUG
     echo-stuff(self, "init");
+# endif
     return self;
   }
   method copy(object-t self) -> object-t {
@@ -107,7 +109,9 @@ klass object {
     return nullptr;
   }
   method dealloc(object-t self) -> object-t {
+# if defined DEBUG
     echo-stuff(self, "dealloc");
+# endif
     //void* ptr = cast(void*)self;
     self = nullptr;
     //dkt::dealloc(ptr);

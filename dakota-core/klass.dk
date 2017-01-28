@@ -35,7 +35,9 @@
 
 func alloc-instance(ssize-t total-size, symbol-t kls-name, symbol-t instance-name) -> object::slots-t* {
   object::slots-t* instance = cast(object::slots-t*)dkt::alloc(total-size);
+# if defined DEBUG
   echo-stuff(instance, "alloc", kls-name, instance-name);
+# endif
   return instance;
 }
 inline func SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
@@ -680,7 +682,9 @@ klass klass {
     return self.behavior;
   }
   method dealloc(object-t self) -> object-t {
+# if defined DEBUG
     echo-stuff(cast(object::slots-t*)self, "dealloc", name-of(klass-of(self)));
+# endif
     dkt::dealloc(self.methods.addrs);
     object-t result = $dealloc(super);
     return result;
@@ -770,7 +774,9 @@ klass klass {
     else
       tmp-info-slots = &named-info::mutable-unbox(info);
     object-t result = init(self, tmp-info-slots);
+# if defined DEBUG
     echo-stuff(cast(object::slots-t*)self, "init", name-of(klass-of(self)), name-of(self));
+# endif
     return result;
   }
   method subklass?(object-t self, object-t kls) -> bool-t {
