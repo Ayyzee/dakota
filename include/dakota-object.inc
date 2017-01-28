@@ -79,6 +79,7 @@ struct [[_dkt_typeinfo_]] object_t {
       this->add_ref();
   }
   inline ~object_t() {
-    this->remove_ref();
+    if (this->object)
+      this->remove_ref();
   }
 };
