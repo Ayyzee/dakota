@@ -286,9 +286,6 @@ static func alloc-klass(symbol-t name) -> object-t {
   resource-usage::log-alloc(&gbl-ru, total-size, name);
 # endif
   object::slots-t* kls-slots = alloc-instance(total-size);
-# if 0
-    memset(kls-slots, 0, total-size);
-# endif
   kls-slots->klass =     klass::_klass_;
   kls-slots->ref-count = 0; // -1 indicates being dealloc()ed
   object-t kls = object-t{kls-slots};

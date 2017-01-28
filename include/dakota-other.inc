@@ -84,6 +84,7 @@ namespace dkt { inline FUNC alloc(ssize_t size) -> ptr_t {
 # else
   # error DK_MEM_MGMT
 # endif
+  memset(buf, 0, cast(size_t)size);
   return buf;
 }}
 namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
