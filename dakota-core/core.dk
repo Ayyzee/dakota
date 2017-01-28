@@ -285,7 +285,7 @@ static func alloc-klass(symbol-t name) -> object-t {
   resource-usage::add-alloc(&gbl-ru, total-size);
   resource-usage::log-alloc(&gbl-ru, total-size, name);
 # endif
-  object::slots-t* kls-slots = alloc-instance(total-size);
+  object::slots-t* kls-slots = alloc-instance(total-size, kls-name, name); // instance-name
   kls-slots->klass =     klass::_klass_;
   kls-slots->ref-count = 0; // -1 indicates being dealloc()ed
   object-t kls = object-t{kls-slots};
@@ -706,6 +706,11 @@ func dk-init-runtime() -> void {
     init-runtime-ds();
     each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
+# if 0
+    int-t overwrite;
+    setenv("DKT_ECHO_ALLOC_INIT_DEALLOC", "1", overwrite = 1);
+# endif
+
     // alloc
     klass::_klass_ =  alloc-klass(#klass); // must be first
     object::_klass_ = alloc-klass(#object);
@@ -752,6 +757,11 @@ func dk-init-runtime() -> void {
     $behavior(singleton-klass::_klass_);
     $behavior(null-klass);
     $behavior(bit-vector::_klass_);
+# endif
+
+# if 0
+    int-t overwrite;
+    setenv("DKT_ECHO_ALLOC_INIT_DEALLOC", "1", overwrite = 1);
 # endif
 
     std-input =  $make(input-stream::klass(),  #slots: stdin);
@@ -1262,11 +1272,11 @@ klass registration-info {
     signature-t**      va-signatures;
   }
 }
-static func getenv?(str-t name) -> bool-t {
+func getenv?(str-t name) -> bool-t {
   bool-t value = false;
   str-t value-str = getenv(name);
 
-  if (value-str != nullptr && safe-strcmp("0", value-str) != 0)
+  if (value-str != nullptr && value-str[0] != NUL && safe-strcmp("0", value-str) != 0)
     value = true;
   return value;
 }

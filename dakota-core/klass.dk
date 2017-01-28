@@ -33,9 +33,9 @@
 
 # else
 
-func alloc-instance(ssize-t total-size) -> object::slots-t* {
+func alloc-instance(ssize-t total-size, symbol-t kls-name, symbol-t instance-name) -> object::slots-t* {
   object::slots-t* instance = cast(object::slots-t*)dkt::alloc(total-size);
-  //printf("%p alloc-instance()\n", cast(void*)instance);
+  echo-stuff(instance, "alloc", kls-name, instance-name);
   return instance;
 }
 inline func SET-METHOD-FOR-SELECTOR(methods::slots-t* methods,
@@ -345,10 +345,7 @@ klass klass {
     resource-usage::add-alloc(&gbl-ru, total-size);
     resource-usage::log-alloc(&gbl-ru, self);
 # endif
-    object::slots-t* instance-slots = alloc-instance(total-size);
-# if 0
-    memset(instance-slots, 0, total-size);
-# endif
+    object::slots-t* instance-slots = alloc-instance(total-size, name-of(self));
     instance-slots->klass =     self;
     instance-slots->ref-count = 0; // -1 indicates being dealloc()ed
     object-t instance = object-t{instance-slots};
@@ -683,6 +680,7 @@ klass klass {
     return self.behavior;
   }
   method dealloc(object-t self) -> object-t {
+    echo-stuff(cast(object::slots-t*)self, "dealloc", name-of(klass-of(self)));
     dkt::dealloc(self.methods.addrs);
     object-t result = $dealloc(super);
     return result;
@@ -772,6 +770,7 @@ klass klass {
     else
       tmp-info-slots = &named-info::mutable-unbox(info);
     object-t result = init(self, tmp-info-slots);
+    echo-stuff(cast(object::slots-t*)self, "init", name-of(klass-of(self)), name-of(self));
     return result;
   }
   method subklass?(object-t self, object-t kls) -> bool-t {

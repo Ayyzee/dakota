@@ -96,7 +96,6 @@ inline FUNC object_t::remove_ref() -> void {
     //printf("%p: %lli--\n", cast(void*)this->object, this->object->ref_count);
     this->object->ref_count--;
     if (this->object->ref_count == 0) {
-      //printf("%p dealloc-instance()\n", cast(void*)*this);
       this->object->ref_count = -1; // -1 indicates being dealloc()ed
       $dealloc(*this);
     }

@@ -29,6 +29,24 @@ klass object-output-stream;
 klass output-stream;
 klass unbox-illegal-klass-exception;
 
+static func echo-stuff-common(void* instance, str-t action, symbol-t kls-name, symbol-t instance-name = nullptr) -> void {
+  if (instance-name)
+    printf("%p %s #instance-of %s #name %s\n", instance, action, kls-name, instance-name);
+  else
+    printf("%p %s #instance-of %s\n", instance, action, kls-name);
+  return;
+}
+static func echo-stuff(object-t instance, str-t action) -> void {
+  if (getenv?("DKT_ECHO_ALLOC_INIT_DEALLOC"))
+    if (!$instance?(instance, klass::_klass_))
+      echo-stuff-common(cast(void*)instance, action, name-of(klass-of(instance)));
+  return;
+}
+func echo-stuff(object::slots-t* instance, str-t action, symbol-t kls-name, symbol-t instance-name) -> void {
+  if (getenv?("DKT_ECHO_ALLOC_INIT_DEALLOC"))
+    echo-stuff-common(cast(void*)instance, action, kls-name, instance-name);
+  return;
+}
 klass object {
   slots {
     object-t klass;
@@ -80,6 +98,7 @@ klass object {
   }
   // documented to do nothing
   method init(object-t self) -> object-t {
+    echo-stuff(self, "init");
     return self;
   }
   method copy(object-t self) -> object-t {
@@ -88,7 +107,7 @@ klass object {
     return nullptr;
   }
   method dealloc(object-t self) -> object-t {
-    //printf("%p object::dealloc()\n", cast(void*)self);
+    echo-stuff(self, "dealloc");
     //void* ptr = cast(void*)self;
     self = nullptr;
     //dkt::dealloc(ptr);
