@@ -45,6 +45,8 @@ struct [[_dkt_typeinfo_]] object_t {
   }
   inline FUNC operator=(const object_t& r) -> object_t& {
     if (this->object != r.object) {
+      if (this->object)
+        this->remove_ref();
       this->object = r.object;
       if (this->object)
         this->add_ref();
