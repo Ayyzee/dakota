@@ -290,7 +290,7 @@ static func alloc-klass(symbol-t name) -> object-t {
     memset(kls-slots, 0, total-size);
 # endif
   kls-slots->klass =     klass::_klass_;
-  kls-slots->ref-count = 1; // ref-count is 1 based, not 0 based, 0 indicates being dealloc()ed
+  kls-slots->ref-count = 0; // -1 indicates being dealloc()ed
   object-t kls = object-t{kls-slots};
   if (kls->klass == nullptr)
     kls->klass = kls; // klass klass's klass is klass klass

@@ -32,7 +32,7 @@ klass unbox-illegal-klass-exception;
 klass object {
   slots {
     object-t klass;
-    std::atomic<int64-t> ref-count; // ref-count is 1 based, not 0 based, 0 indicates being dealloc()ed
+    std::atomic<int-fast32-t> ref-count; // -1 indicates being dealloc()ed
   }
 
   method write-slots(object-t self, object-t out) -> object-t {
