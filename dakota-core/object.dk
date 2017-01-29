@@ -49,8 +49,8 @@ func echo-stuff(object::slots-t* instance, str-t action, symbol-t kls-name, symb
 }
 klass object {
   slots {
-    object-t klass;
-    std::atomic<int-fast32-t> ref-count; // -1 indicates being dealloc()ed
+    object-t                  klass;
+    std::atomic<int-fast32-t> ref-count;
   }
 
   method write-slots(object-t self, object-t out) -> object-t {

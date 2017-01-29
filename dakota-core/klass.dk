@@ -349,7 +349,7 @@ klass klass {
 # endif
     object::slots-t* instance-slots = alloc-instance(total-size, name-of(self));
     instance-slots->klass =     self;
-    instance-slots->ref-count = 0; // -1 indicates being dealloc()ed
+    instance-slots->ref-count = 0;
     object-t instance = object-t{instance-slots};
     return instance;
   }
