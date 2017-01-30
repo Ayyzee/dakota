@@ -16,7 +16,7 @@
 
 # pragma once
 
-# include <type_traits> // add-const<>(), remove-const<>()
+# include <cstddef>
 
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
