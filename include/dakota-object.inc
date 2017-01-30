@@ -32,7 +32,7 @@ struct [[_dkt_typeinfo_]] object_t {
   explicit inline operator uint8_t*()         const { return cast(uint8_t*)  this->object; }
   explicit inline operator void*()            const { return cast(void*)     this->object; }
 
-  explicit inline operator bool()             const { return this->object != nullptr; }
+  explicit inline operator bool()             const { return this->object; }
 
   inline FUNC operator!() const -> bool {
     return !this->object;
