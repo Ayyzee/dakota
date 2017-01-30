@@ -93,6 +93,10 @@ inline FUNC object_t::remove_ref() -> void {
     if (this->object->ref_count == 0) {
       this->object->ref_count = k_dealloc_initiated;
       $dealloc(*this);
+# if 0
+      dkt::dealloc(this->object);
+# endif
+      this->object = nullptr;
     }
   }
 }

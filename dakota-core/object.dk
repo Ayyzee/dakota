@@ -103,16 +103,10 @@ klass object {
 # endif
     return self;
   }
+  // documented to do nothing
   method dealloc(object-t self) -> object-t {
 # if defined DEBUG
     echo-stuff(self, "dealloc");
-# endif
-    object::slots-t* ptr = cast(object::slots-t*)self;
-    self = nullptr;
-# if 0
-    dkt::dealloc(cast(ptr-t)ptr);
-# else
-    USE(ptr);
 # endif
     return nullptr;
   }
