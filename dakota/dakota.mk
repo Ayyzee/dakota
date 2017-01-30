@@ -45,7 +45,7 @@ check-exe: all
 	./exe
 
 check: all
-	dakota-catalog --silent $(target)
+	dakota-catalog --silent $(target) > $(target).out
 	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) check-exe
 
 installcheck: check install
