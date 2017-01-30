@@ -103,11 +103,6 @@ klass object {
 # endif
     return self;
   }
-  method copy(object-t self) -> object-t {
-    USE(self);
-    throw $make(exception::klass(), #msg: "not yet implemented");
-    return nullptr;
-  }
   method dealloc(object-t self) -> object-t {
 # if defined DEBUG
     echo-stuff(self, "dealloc");
@@ -119,6 +114,11 @@ klass object {
 # else
     USE(ptr);
 # endif
+    return nullptr;
+  }
+  method copy(object-t self) -> object-t {
+    USE(self);
+    throw $make(exception::klass(), #msg: "not yet implemented");
     return nullptr;
   }
   method hash(object-t self) -> hash-t {
