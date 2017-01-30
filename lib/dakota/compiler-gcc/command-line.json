@@ -7,14 +7,15 @@
 {
   'CXX' => [ 'g++' ],
   'CXXFLAGS' => [
-    '-std=c++14', '--visibility=hidden',
-    '--non-call-exceptions', '--asynchronous-unwind-tables',
-    '--trapv',
-    #'-ObjC++', '--objc-exceptions', '-lobjc',
+    '-std=c++14', '-fvisibility=hidden',
+    '-fnon-call-exceptions', '-fasynchronous-unwind-tables',
+    '-ftrapv',
+    '-fsanitize=address',
+    #'-ObjC++', '-fobjc-exceptions', '-lobjc',
     #'-fuse-ld=gold', '-use-gold-plugin',
   ],
   'CXX_COMPILE_FLAGS' => [
-    '--compile', '--PIC',
+    '--compile', '-fPIC',
     #'--language=objective-c++',
   ],
   'CXX_DEFINE_MACRO_FLAGS' => [ '--define-macro' ],
@@ -28,7 +29,7 @@
   'EXTRA_CXXFLAGS' => [
     '--all-warnings',
     '--no-common',
-    '--trapv',
+    '-ftrapv',
     '--warn-cast-qual',
     '--warn-conversion',
     '--warn-extra',
