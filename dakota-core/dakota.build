@@ -98,7 +98,6 @@
       ],
       'files' => [ # install.files
         '$(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)/command-line.json',
-        '$(DESTDIR)$(prefix)/lib/dakota/compiler-$(compiler)/default-argument-promotions.json',
         '$(DESTDIR)$(prefix)/lib/dakota/extra.json',
         '$(DESTDIR)$(prefix)/lib/dakota/platform-$(platform).json',
         '$(DESTDIR)$(prefix)/lib/dakota/lang-user-data.json',
