@@ -2,6 +2,7 @@ SHELL := /bin/bash -o errexit -o nounset -o pipefail
 
 rootdir ?= .
 include $(rootdir)/makeflags.mk
+dirs := dso dakota-catalog dakota-find-library dakota-core dakota
 
 .PHONY: \
  all \
@@ -18,18 +19,10 @@ include $(rootdir)/makeflags.mk
 
 all:
 	sudo true # so password prompt is immediate
-	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dso all install
-	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-catalog all install
-	DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-find-library all install
-	DKT_INITIAL_WORKDIR=$(PWD) time $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-core all install
-	DKT_INITIAL_WORKDIR=$(PWD) time $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota all install
+	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir $@ install; done
 
 uninstall:
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dso $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-core $@
+	for dir in $(dirs); do $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir $@; done
 
 check \
 check-exe \
@@ -40,9 +33,4 @@ goal-clean \
 install \
 installcheck \
 precompile:
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dso $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-catalog $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-find-library $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota-core $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/dakota $@
-	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/test $@
+	for dir in $(dirs) test; do $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir $@; done
