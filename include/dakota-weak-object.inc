@@ -19,49 +19,70 @@
 struct [[_dkt_typeinfo_]] weak_object_t {
   object::slots_t* object;
 
-  inline FUNC operator->() const -> object::slots_t* { return  this->object; }
-  inline FUNC operator*()  const -> object::slots_t& { return *this->object; }
+  inline FUNC operator->() const -> object::slots_t*;
+  inline FUNC operator*()  const -> object::slots_t&;
 
-           inline operator object_t()         const { return object_t{this->object}; } // convert from weak-object-t to object-t
-  explicit inline operator object::slots_t*() const { return                 this->object; }
-  explicit inline operator ptr_t()            const { return cast(ptr_t)     this->object; }
-  explicit inline operator intptr_t()         const { return cast(intptr_t)  this->object; }
-  explicit inline operator uintptr_t()        const { return cast(uintptr_t) this->object; }
-  explicit inline operator bool()             const { return cast(bool)      this->object; }
+           inline operator object_t()         const;
+  explicit inline operator object::slots_t*() const;
+  explicit inline operator ptr_t()            const;
+  explicit inline operator intptr_t()         const;
+  explicit inline operator uintptr_t()        const;
+  explicit inline operator bool()             const;
 
-  inline FUNC operator!() const -> bool {
-    return !this->object;
-  }
-  inline FUNC operator==(const weak_object_t& r) const -> bool {
-    return this->object == r.object;
-  }
-  inline FUNC operator!=(const weak_object_t& r) const -> bool {
-    return this->object != r.object;
-  }
-  inline FUNC operator=(const weak_object_t& r) -> weak_object_t& {
-    if (this->object != r.object) {
-      this->object = r.object;
-    }
-    return *this;
-  }
-  inline weak_object_t(const weak_object_t& r) {
-    this->object = r.object;
-  }
-  inline weak_object_t(object::slots_t* r = nullptr) {
-    this->object = r;
-  }
-  inline weak_object_t(intptr_t r) {
-    this->object = cast(object::slots_t*)r;
-  }
-  inline weak_object_t(uintptr_t r) {
-    this->object = cast(object::slots_t*)r;
-  }
-  inline weak_object_t(std::nullptr_t r) {
-    this->object = cast(object::slots_t*)r;
-  }
-  inline ~weak_object_t() {
-  }
-  inline weak_object_t(const object_t& r) { // convert from object-t to weak-object-t
-    this->object = r.object;
-  }
+  inline FUNC operator!() const -> bool;
+  inline FUNC operator==(const weak_object_t& r) const -> bool;
+  inline FUNC operator!=(const weak_object_t& r) const -> bool;
+  inline FUNC operator=(const weak_object_t& r) -> weak_object_t&;
+  inline weak_object_t(const weak_object_t& r);
+  inline weak_object_t(object::slots_t* r = nullptr);
+  inline weak_object_t(intptr_t r);
+  inline weak_object_t(uintptr_t r);
+  inline weak_object_t(std::nullptr_t r);
+  inline ~weak_object_t();
+  inline weak_object_t(const object_t& r); // convert from object-t to weak-object-t
 };
+inline FUNC weak_object_t::operator->() const -> object::slots_t* { return  this->object; }
+inline FUNC weak_object_t::operator*()  const -> object::slots_t& { return *this->object; }
+
+inline weak_object_t::operator object_t()         const { return object_t{this->object}; } // convert from weak-object-t to object-t
+inline weak_object_t::operator object::slots_t*() const { return                 this->object; }
+inline weak_object_t::operator ptr_t()            const { return cast(ptr_t)     this->object; }
+inline weak_object_t::operator intptr_t()         const { return cast(intptr_t)  this->object; }
+inline weak_object_t::operator uintptr_t()        const { return cast(uintptr_t) this->object; }
+inline weak_object_t::operator bool()             const { return cast(bool)      this->object; }
+
+inline FUNC weak_object_t::operator!() const -> bool {
+  return !this->object;
+}
+inline FUNC weak_object_t::operator==(const weak_object_t& r) const -> bool {
+  return this->object == r.object;
+}
+inline FUNC weak_object_t::operator!=(const weak_object_t& r) const -> bool {
+  return this->object != r.object;
+}
+inline FUNC weak_object_t::operator=(const weak_object_t& r) -> weak_object_t& {
+  if (this->object != r.object) {
+    this->object = r.object;
+  }
+  return *this;
+}
+inline weak_object_t::weak_object_t(const weak_object_t& r) {
+  this->object = r.object;
+}
+inline weak_object_t::weak_object_t(object::slots_t* r) {
+  this->object = r;
+}
+inline weak_object_t::weak_object_t(intptr_t r) {
+  this->object = cast(object::slots_t*)r;
+}
+inline weak_object_t::weak_object_t(uintptr_t r) {
+  this->object = cast(object::slots_t*)r;
+}
+inline weak_object_t::weak_object_t(std::nullptr_t r) {
+  this->object = cast(object::slots_t*)r;
+}
+inline weak_object_t::~weak_object_t() {
+}
+inline weak_object_t::weak_object_t(const object_t& r) { // convert from object-t to weak-object-t
+  this->object = r.object;
+}
