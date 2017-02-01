@@ -30,9 +30,10 @@ klass output-stream;
 klass unbox-illegal-klass-exception; 
 static func echo-stuff-common(object::slots-t* instance, str-t action, symbol-t kls-name, symbol-t instance-name = nullptr) -> void {
   if (instance-name)
-    printf("%p %s #instance-of %s #name %s\n", cast(ptr-t)instance, action, kls-name, instance-name);
+    fprintf(stdout, "%p %s #instance-of %s #name %s\n", cast(ptr-t)instance, action, kls-name, instance-name);
   else
-    printf("%p %s #instance-of %s\n", cast(ptr-t)instance, action, kls-name);
+    fprintf(stdout, "%p %s #instance-of %s\n", cast(ptr-t)instance, action, kls-name);
+  fflush(stdout);
   return;
 }
 static func echo-stuff(object::slots-t* instance, str-t action) -> void {
