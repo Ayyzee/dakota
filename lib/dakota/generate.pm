@@ -1928,7 +1928,7 @@ sub generate_klass_unbox {
         $result .=
           " {" . &ann(__FILE__, __LINE__) . $nl .
           $col . "  DKT-UNBOX-CHECK(o, _klass_); // optional" . $nl .
-          $col . "  slots-t& s = *cast(slots-t*)(cast(uint8-t*)o + klass::unbox(_klass_).offset);" . $nl .
+          $col . "  slots-t& s = *cast(slots-t*)(cast(intptr-t)o + klass::unbox(_klass_).offset);" . $nl .
           $col . "  return s;" . $nl .
           $col . "}} // $klass_name\::mutable-unbox()" . $nl;
       }

@@ -39,12 +39,12 @@ KLASS_NS object { inline FUNC mutable_unbox(object_t obj) -> slots_t* {
 }}
 KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC mutable_unbox(object_t obj) -> slots_t& {
   DKT_UNBOX_CHECK(obj, _klass_); // optional
-  slots_t& s = *cast(slots_t*)(cast(uint8_t*)obj + sizeof(object::slots_t));
+  slots_t& s = *cast(slots_t*)(cast(intptr_t)obj + cast(intptr_t)sizeof(object::slots_t));
   return s;
 }}
 KLASS_NS klass { [[UNBOX_ATTRS]] inline FUNC unbox(object_t obj) -> const slots_t& {
   DKT_UNBOX_CHECK(obj, _klass_); // optional
-  const slots_t& s = *cast(slots_t*)(cast(uint8_t*)obj + sizeof(object::slots_t));
+  const slots_t& s = *cast(slots_t*)(cast(intptr_t)obj + cast(intptr_t)sizeof(object::slots_t));
   return s;
 }}
 inline FUNC klass_of(object_t object) -> object_t {
