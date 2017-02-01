@@ -26,7 +26,7 @@ struct [[_dkt_typeinfo_]] object_t {
   inline FUNC remove_ref() -> void;
 
   explicit inline operator object::slots_t*() const { return                 this->object; }
-  explicit inline operator void*()            const { return cast(void*)     this->object; }
+  explicit inline operator ptr_t()            const { return cast(ptr_t)     this->object; }
   explicit inline operator intptr_t()         const { return cast(intptr_t)  this->object; }
   explicit inline operator uintptr_t()        const { return cast(uintptr_t) this->object; }
   explicit inline operator bool()             const { return cast(bool)      this->object; }

@@ -17,7 +17,7 @@
 module dakota-core;
 
 klass ptr {
-  slots void*;
+  slots ptr-t;
 
   method init(object-t self, slots-t slots: nullptr) -> object-t {
     self = $init(super);

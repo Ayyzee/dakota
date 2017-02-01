@@ -81,14 +81,14 @@ FUNC $dealloc(object_t) -> object_t;
 const int_fast32_t k_dealloc_initiated = -1;
 inline FUNC object_t::add_ref() -> void {
   if (this->object->ref_count != k_dealloc_initiated) {
-    //printf("%p: %i++\n", cast(void*)this->object, this->object->ref_count);
+    //printf("%p: %i++\n", cast(ptr-t)this->object, this->object->ref_count);
     this->object->ref_count++;
   }
 }
 inline FUNC object_t::remove_ref() -> void {
   if (this->object->ref_count != k_dealloc_initiated) {
     assert(this->object->ref_count != 0);
-    //printf("%p: %i--\n", cast(void*)this->object, this->object->ref_count);
+    //printf("%p: %i--\n", cast(ptr-t)this->object, this->object->ref_count);
     this->object->ref_count--;
     if (this->object->ref_count == 0) {
       this->object->ref_count = k_dealloc_initiated;

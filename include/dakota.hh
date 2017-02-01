@@ -119,6 +119,8 @@ static_assert(sizeof(float128_t) == 128/8, "The type float128-t must be 16 bytes
 KLASS_NS object { struct [[_dkt_typeinfo_]] slots_t; }
 KLASS_NS object { typealias slots_t = struct slots_t; }
 
+KLASS_NS ptr          { typealias slots_t = void*;                                 } typealias ptr_t =          ptr::slots_t;
+
 # include <dakota-object.inc>
 # include <dakota-weak-object.inc>
 
@@ -131,6 +133,5 @@ KLASS_NS boole        { typealias slots_t = bool_t;                             
 KLASS_NS cmp          { typealias slots_t = int_t;                                 } typealias cmp_t =          cmp::slots_t;
 KLASS_NS compare      { typealias slots_t = FUNC (*)(object_t, object_t) -> cmp_t; } typealias compare_t =      compare::slots_t;
 KLASS_NS generic_func { typealias slots_t = FUNC (*)(object_t) -> object_t;        } typealias generic_func_t = generic_func::slots_t;
-KLASS_NS ptr          { typealias slots_t = void*;                                 } typealias ptr_t =          ptr::slots_t;
 KLASS_NS str          { typealias slots_t = const char_t*;                         } typealias str_t =          str::slots_t;
 KLASS_NS symbol       { typealias slots_t = str_t;                                 } typealias symbol_t =       symbol::slots_t;
