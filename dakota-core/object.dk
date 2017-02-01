@@ -28,22 +28,22 @@ klass resource-usage;
 klass object-output-stream;
 klass output-stream;
 klass unbox-illegal-klass-exception; 
-static func echo-stuff-common(ptr-t instance, str-t action, symbol-t kls-name, symbol-t instance-name = nullptr) -> void {
+static func echo-stuff-common(object::slots-t* instance, str-t action, symbol-t kls-name, symbol-t instance-name = nullptr) -> void {
   if (instance-name)
-    printf("%p %s #instance-of %s #name %s\n", instance, action, kls-name, instance-name);
+    printf("%p %s #instance-of %s #name %s\n", cast(ptr-t)instance, action, kls-name, instance-name);
   else
-    printf("%p %s #instance-of %s\n", instance, action, kls-name);
+    printf("%p %s #instance-of %s\n", cast(ptr-t)instance, action, kls-name);
   return;
 }
-static func echo-stuff(object-t instance, str-t action) -> void {
+static func echo-stuff(object::slots-t* instance, str-t action) -> void {
   if (getenv?("DKT_ECHO_ALLOC_INIT_DEALLOC"))
     if (!$instance?(instance, klass::_klass_))
-      echo-stuff-common(cast(ptr-t)instance, action, name-of(klass-of(instance)));
+      echo-stuff-common(instance, action, name-of(klass-of(instance)));
   return;
 }
 func echo-stuff(object::slots-t* instance, str-t action, symbol-t kls-name, symbol-t instance-name) -> void {
   if (getenv?("DKT_ECHO_ALLOC_INIT_DEALLOC"))
-    echo-stuff-common(cast(ptr-t)instance, action, kls-name, instance-name);
+    echo-stuff-common(instance, action, kls-name, instance-name);
   return;
 }
 klass object {
@@ -98,14 +98,14 @@ klass object {
   // documented to do nothing
   method init(object-t self) -> object-t {
 # if defined DEBUG
-    echo-stuff(self, "init");
+    echo-stuff(cast(object::slots-t*)self, "init");
 # endif
     return self;
   }
   // documented to do nothing
   method dealloc(object-t self) -> object-t {
 # if defined DEBUG
-    echo-stuff(self, "dealloc");
+    echo-stuff(cast(object::slots-t*)self, "dealloc");
 # endif
     return nullptr;
   }
