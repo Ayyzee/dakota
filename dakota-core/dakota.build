@@ -116,9 +116,11 @@
         '$(DESTDIR)$(prefix)/include/dakota-finally.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota-log.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota-object.inc',
+        '$(DESTDIR)$(prefix)/include/dakota-object-defn.inc',
         '$(DESTDIR)$(prefix)/include/dakota-of.inc',
         '$(DESTDIR)$(prefix)/include/dakota-os.$(hh_ext)',
         '$(DESTDIR)$(prefix)/include/dakota-weak-object.inc',
+        '$(DESTDIR)$(prefix)/include/dakota-weak-object-defn.inc',
         '$(DESTDIR)$(prefix)/include/dakota-other.inc',
 
         '$(DESTDIR)$(prefix)/bin/dakota',
