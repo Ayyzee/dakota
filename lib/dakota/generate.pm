@@ -552,8 +552,10 @@ sub generate_decl_defn {
   if (&is_decl()) {
     $str .=
       $nl .
-      "# include <dakota-object-defn.inc> // object-t" . $nl .
-      "# include <dakota-weak-object-defn.inc> // weak-object-t" . $nl .
+      "# if (OUT_OF_LINE_REF_COUNTING == 0)" . $nl .
+      "  # include <dakota-object-defn.inc> // object-t" . $nl .
+      "  # include <dakota-weak-object-defn.inc> // weak-object-t" . $nl .
+      "# endif" . $nl .
       "# include <dakota-of.inc> // klass-of(), superklass-of(), name-of()" . $nl .
       $nl;
   }

@@ -121,8 +121,15 @@ KLASS_NS object { typealias slots_t = struct slots_t; }
 
 KLASS_NS ptr          { typealias slots_t = void*;                                 } typealias ptr_t =          ptr::slots_t;
 
-# define OBJECT_T_INLINE      inline
-# define WEAK_OBJECT_T_INLINE inline
+# define OUT_OF_LINE_REF_COUNTING 0
+
+# if (OUT_OF_LINE_REF_COUNTING != 0)
+  # define OBJECT_T_INLINE
+  # define WEAK_OBJECT_T_INLINE
+# else
+  # define OBJECT_T_INLINE      inline
+  # define WEAK_OBJECT_T_INLINE inline
+# endif
 
 # include <dakota-object.inc>
 # include <dakota-weak-object.inc>

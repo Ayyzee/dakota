@@ -173,3 +173,7 @@ func dkt-unbox-check(object-t obj, object-t kls) -> void {
   }
   return;
 }
+# if (OUT_OF_LINE_REF_COUNTING != 0)
+  # include <dakota-object-defn.inc>
+  # include <dakota-weak-object-defn.inc>
+# endif
