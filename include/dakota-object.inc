@@ -19,26 +19,26 @@
 struct [[_dkt_typeinfo_]] object_t {
   object::slots_t* object;
 
-  OBJECT_T_INLINE FUNC operator->() const -> object::slots_t*;
-  OBJECT_T_INLINE FUNC operator*()  const -> object::slots_t&;
+  REF_COUNTING_INLINE FUNC operator->() const -> object::slots_t*;
+  REF_COUNTING_INLINE FUNC operator*()  const -> object::slots_t&;
 
-  OBJECT_T_INLINE FUNC add_ref()    -> void;
-  OBJECT_T_INLINE FUNC remove_ref() -> void;
+  REF_COUNTING_INLINE FUNC add_ref()    -> void;
+  REF_COUNTING_INLINE FUNC remove_ref() -> void;
 
-  explicit OBJECT_T_INLINE operator object::slots_t*() const;
-  explicit OBJECT_T_INLINE operator ptr_t()            const;
-  explicit OBJECT_T_INLINE operator intptr_t()         const;
-  explicit OBJECT_T_INLINE operator uintptr_t()        const;
-  explicit OBJECT_T_INLINE operator bool()             const;
+  explicit REF_COUNTING_INLINE operator object::slots_t*() const;
+  explicit REF_COUNTING_INLINE operator ptr_t()            const;
+  explicit REF_COUNTING_INLINE operator intptr_t()         const;
+  explicit REF_COUNTING_INLINE operator uintptr_t()        const;
+  explicit REF_COUNTING_INLINE operator bool()             const;
 
-  OBJECT_T_INLINE FUNC operator!() const -> bool;
-  OBJECT_T_INLINE FUNC operator==(const object_t& r) const -> bool;
-  OBJECT_T_INLINE FUNC operator!=(const object_t& r) const -> bool;
-  OBJECT_T_INLINE FUNC operator=(const object_t& r) -> object_t&;
-  OBJECT_T_INLINE object_t(const object_t& r);
-  OBJECT_T_INLINE object_t(object::slots_t* r = nullptr);
-  OBJECT_T_INLINE object_t(intptr_t r);
-  OBJECT_T_INLINE object_t(uintptr_t r);
-  OBJECT_T_INLINE object_t(std::nullptr_t r);
-  OBJECT_T_INLINE ~object_t();
+  REF_COUNTING_INLINE FUNC operator!() const -> bool;
+  REF_COUNTING_INLINE FUNC operator==(const object_t& r) const -> bool;
+  REF_COUNTING_INLINE FUNC operator!=(const object_t& r) const -> bool;
+  REF_COUNTING_INLINE FUNC operator=(const object_t& r) -> object_t&;
+  REF_COUNTING_INLINE object_t(const object_t& r);
+  REF_COUNTING_INLINE object_t(object::slots_t* r = nullptr);
+  REF_COUNTING_INLINE object_t(intptr_t r);
+  REF_COUNTING_INLINE object_t(uintptr_t r);
+  REF_COUNTING_INLINE object_t(std::nullptr_t r);
+  REF_COUNTING_INLINE ~object_t();
 };

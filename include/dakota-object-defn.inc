@@ -18,14 +18,14 @@
 
 FUNC $dealloc(object_t) -> object_t;
 const int_fast32_t k_dealloc_initiated = -1;
-OBJECT_T_INLINE FUNC object_t::add_ref() -> void {
+REF_COUNTING_INLINE FUNC object_t::add_ref() -> void {
   if (this->object->ref_count != k_dealloc_initiated) {
     //fprintf(stdout, "%p: %i++\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
     //fflush(stdout);
     this->object->ref_count++;
   }
 }
-OBJECT_T_INLINE FUNC object_t::remove_ref() -> void {
+REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
   if (this->object->ref_count != k_dealloc_initiated) {
     assert(this->object->ref_count != 0);
     //fprintf(stdout, "%p: %i--\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
@@ -41,25 +41,25 @@ OBJECT_T_INLINE FUNC object_t::remove_ref() -> void {
     }
   }
 }
-OBJECT_T_INLINE FUNC object_t::operator->() const -> object::slots_t* { return  this->object; }
-OBJECT_T_INLINE FUNC object_t::operator*()  const -> object::slots_t& { return *this->object; }
+REF_COUNTING_INLINE FUNC object_t::operator->() const -> object::slots_t* { return  this->object; }
+REF_COUNTING_INLINE FUNC object_t::operator*()  const -> object::slots_t& { return *this->object; }
 
-OBJECT_T_INLINE object_t::operator object::slots_t*() const { return                 this->object; }
-OBJECT_T_INLINE object_t::operator ptr_t()            const { return cast(ptr_t)     this->object; }
-OBJECT_T_INLINE object_t::operator intptr_t()         const { return cast(intptr_t)  this->object; }
-OBJECT_T_INLINE object_t::operator uintptr_t()        const { return cast(uintptr_t) this->object; }
-OBJECT_T_INLINE object_t::operator bool()             const { return cast(bool)      this->object; }
+REF_COUNTING_INLINE object_t::operator object::slots_t*() const { return                 this->object; }
+REF_COUNTING_INLINE object_t::operator ptr_t()            const { return cast(ptr_t)     this->object; }
+REF_COUNTING_INLINE object_t::operator intptr_t()         const { return cast(intptr_t)  this->object; }
+REF_COUNTING_INLINE object_t::operator uintptr_t()        const { return cast(uintptr_t) this->object; }
+REF_COUNTING_INLINE object_t::operator bool()             const { return cast(bool)      this->object; }
 
-OBJECT_T_INLINE FUNC object_t::operator!() const -> bool {
+REF_COUNTING_INLINE FUNC object_t::operator!() const -> bool {
   return !this->object;
 }
-OBJECT_T_INLINE FUNC object_t::operator==(const object_t& r) const -> bool {
+REF_COUNTING_INLINE FUNC object_t::operator==(const object_t& r) const -> bool {
   return this->object == r.object;
 }
-OBJECT_T_INLINE FUNC object_t::operator!=(const object_t& r) const -> bool {
+REF_COUNTING_INLINE FUNC object_t::operator!=(const object_t& r) const -> bool {
   return this->object != r.object;
 }
-OBJECT_T_INLINE FUNC object_t::operator=(const object_t& r) -> object_t& {
+REF_COUNTING_INLINE FUNC object_t::operator=(const object_t& r) -> object_t& {
   if (this->object != r.object) {
     if (this->object)
       this->remove_ref();
@@ -69,32 +69,32 @@ OBJECT_T_INLINE FUNC object_t::operator=(const object_t& r) -> object_t& {
   }
   return *this;
 }
-OBJECT_T_INLINE object_t::object_t(const object_t& r) {
+REF_COUNTING_INLINE object_t::object_t(const object_t& r) {
   this->object = r.object;
   if (this->object)
     this->add_ref();
 }
-OBJECT_T_INLINE object_t::object_t(object::slots_t* r) {
+REF_COUNTING_INLINE object_t::object_t(object::slots_t* r) {
   this->object = r;
   if (this->object)
     this->add_ref();
 }
-OBJECT_T_INLINE object_t::object_t(intptr_t r) {
+REF_COUNTING_INLINE object_t::object_t(intptr_t r) {
   this->object = cast(object::slots_t*)r;
   if (this->object)
     this->add_ref();
 }
-OBJECT_T_INLINE object_t::object_t(uintptr_t r) {
+REF_COUNTING_INLINE object_t::object_t(uintptr_t r) {
   this->object = cast(object::slots_t*)r;
   if (this->object)
     this->add_ref();
 }
-OBJECT_T_INLINE object_t::object_t(std::nullptr_t r) {
+REF_COUNTING_INLINE object_t::object_t(std::nullptr_t r) {
   this->object = cast(object::slots_t*)r;
   if (this->object)
     this->add_ref();
 }
-OBJECT_T_INLINE object_t::~object_t() {
+REF_COUNTING_INLINE object_t::~object_t() {
   if (this->object)
     this->remove_ref();
 }

@@ -19,25 +19,25 @@
 struct [[_dkt_typeinfo_]] weak_object_t {
   object::slots_t* object;
 
-  WEAK_OBJECT_T_INLINE FUNC operator->() const -> object::slots_t*;
-  WEAK_OBJECT_T_INLINE FUNC operator*()  const -> object::slots_t&;
+  REF_COUNTING_INLINE FUNC operator->() const -> object::slots_t*;
+  REF_COUNTING_INLINE FUNC operator*()  const -> object::slots_t&;
 
-           WEAK_OBJECT_T_INLINE operator object_t()         const;
-  explicit WEAK_OBJECT_T_INLINE operator object::slots_t*() const;
-  explicit WEAK_OBJECT_T_INLINE operator ptr_t()            const;
-  explicit WEAK_OBJECT_T_INLINE operator intptr_t()         const;
-  explicit WEAK_OBJECT_T_INLINE operator uintptr_t()        const;
-  explicit WEAK_OBJECT_T_INLINE operator bool()             const;
+           REF_COUNTING_INLINE operator object_t()         const;
+  explicit REF_COUNTING_INLINE operator object::slots_t*() const;
+  explicit REF_COUNTING_INLINE operator ptr_t()            const;
+  explicit REF_COUNTING_INLINE operator intptr_t()         const;
+  explicit REF_COUNTING_INLINE operator uintptr_t()        const;
+  explicit REF_COUNTING_INLINE operator bool()             const;
 
-  WEAK_OBJECT_T_INLINE FUNC operator!() const -> bool;
-  WEAK_OBJECT_T_INLINE FUNC operator==(const weak_object_t& r) const -> bool;
-  WEAK_OBJECT_T_INLINE FUNC operator!=(const weak_object_t& r) const -> bool;
-  WEAK_OBJECT_T_INLINE FUNC operator=(const weak_object_t& r) -> weak_object_t&;
-  WEAK_OBJECT_T_INLINE weak_object_t(const weak_object_t& r);
-  WEAK_OBJECT_T_INLINE weak_object_t(object::slots_t* r = nullptr);
-  WEAK_OBJECT_T_INLINE weak_object_t(intptr_t r);
-  WEAK_OBJECT_T_INLINE weak_object_t(uintptr_t r);
-  WEAK_OBJECT_T_INLINE weak_object_t(std::nullptr_t r);
-  WEAK_OBJECT_T_INLINE ~weak_object_t();
-  WEAK_OBJECT_T_INLINE weak_object_t(const object_t& r); // convert from object-t to weak-object-t
+  REF_COUNTING_INLINE FUNC operator!() const -> bool;
+  REF_COUNTING_INLINE FUNC operator==(const weak_object_t& r) const -> bool;
+  REF_COUNTING_INLINE FUNC operator!=(const weak_object_t& r) const -> bool;
+  REF_COUNTING_INLINE FUNC operator=(const weak_object_t& r) -> weak_object_t&;
+  REF_COUNTING_INLINE weak_object_t(const weak_object_t& r);
+  REF_COUNTING_INLINE weak_object_t(object::slots_t* r = nullptr);
+  REF_COUNTING_INLINE weak_object_t(intptr_t r);
+  REF_COUNTING_INLINE weak_object_t(uintptr_t r);
+  REF_COUNTING_INLINE weak_object_t(std::nullptr_t r);
+  REF_COUNTING_INLINE ~weak_object_t();
+  REF_COUNTING_INLINE weak_object_t(const object_t& r); // convert from object-t to weak-object-t
 };
