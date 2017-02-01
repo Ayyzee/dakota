@@ -19,25 +19,25 @@
 struct [[_dkt_typeinfo_]] weak_object_t {
   object::slots_t* object;
 
-  inline FUNC operator->() const -> object::slots_t*;
-  inline FUNC operator*()  const -> object::slots_t&;
+  WEAK_OBJECT_T_INLINE FUNC operator->() const -> object::slots_t*;
+  WEAK_OBJECT_T_INLINE FUNC operator*()  const -> object::slots_t&;
 
-           inline operator object_t()         const;
-  explicit inline operator object::slots_t*() const;
-  explicit inline operator ptr_t()            const;
-  explicit inline operator intptr_t()         const;
-  explicit inline operator uintptr_t()        const;
-  explicit inline operator bool()             const;
+           WEAK_OBJECT_T_INLINE operator object_t()         const;
+  explicit WEAK_OBJECT_T_INLINE operator object::slots_t*() const;
+  explicit WEAK_OBJECT_T_INLINE operator ptr_t()            const;
+  explicit WEAK_OBJECT_T_INLINE operator intptr_t()         const;
+  explicit WEAK_OBJECT_T_INLINE operator uintptr_t()        const;
+  explicit WEAK_OBJECT_T_INLINE operator bool()             const;
 
-  inline FUNC operator!() const -> bool;
-  inline FUNC operator==(const weak_object_t& r) const -> bool;
-  inline FUNC operator!=(const weak_object_t& r) const -> bool;
-  inline FUNC operator=(const weak_object_t& r) -> weak_object_t&;
-  inline weak_object_t(const weak_object_t& r);
-  inline weak_object_t(object::slots_t* r = nullptr);
-  inline weak_object_t(intptr_t r);
-  inline weak_object_t(uintptr_t r);
-  inline weak_object_t(std::nullptr_t r);
-  inline ~weak_object_t();
-  inline weak_object_t(const object_t& r); // convert from object-t to weak-object-t
+  WEAK_OBJECT_T_INLINE FUNC operator!() const -> bool;
+  WEAK_OBJECT_T_INLINE FUNC operator==(const weak_object_t& r) const -> bool;
+  WEAK_OBJECT_T_INLINE FUNC operator!=(const weak_object_t& r) const -> bool;
+  WEAK_OBJECT_T_INLINE FUNC operator=(const weak_object_t& r) -> weak_object_t&;
+  WEAK_OBJECT_T_INLINE weak_object_t(const weak_object_t& r);
+  WEAK_OBJECT_T_INLINE weak_object_t(object::slots_t* r = nullptr);
+  WEAK_OBJECT_T_INLINE weak_object_t(intptr_t r);
+  WEAK_OBJECT_T_INLINE weak_object_t(uintptr_t r);
+  WEAK_OBJECT_T_INLINE weak_object_t(std::nullptr_t r);
+  WEAK_OBJECT_T_INLINE ~weak_object_t();
+  WEAK_OBJECT_T_INLINE weak_object_t(const object_t& r); // convert from object-t to weak-object-t
 };

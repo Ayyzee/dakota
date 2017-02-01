@@ -19,26 +19,26 @@
 struct [[_dkt_typeinfo_]] object_t {
   object::slots_t* object;
 
-  inline FUNC operator->() const -> object::slots_t*;
-  inline FUNC operator*()  const -> object::slots_t&;
+  OBJECT_T_INLINE FUNC operator->() const -> object::slots_t*;
+  OBJECT_T_INLINE FUNC operator*()  const -> object::slots_t&;
 
-  inline FUNC add_ref()    -> void;
-  inline FUNC remove_ref() -> void;
+  OBJECT_T_INLINE FUNC add_ref()    -> void;
+  OBJECT_T_INLINE FUNC remove_ref() -> void;
 
-  explicit inline operator object::slots_t*() const;
-  explicit inline operator ptr_t()            const;
-  explicit inline operator intptr_t()         const;
-  explicit inline operator uintptr_t()        const;
-  explicit inline operator bool()             const;
+  explicit OBJECT_T_INLINE operator object::slots_t*() const;
+  explicit OBJECT_T_INLINE operator ptr_t()            const;
+  explicit OBJECT_T_INLINE operator intptr_t()         const;
+  explicit OBJECT_T_INLINE operator uintptr_t()        const;
+  explicit OBJECT_T_INLINE operator bool()             const;
 
-  inline FUNC operator!() const -> bool;
-  inline FUNC operator==(const object_t& r) const -> bool;
-  inline FUNC operator!=(const object_t& r) const -> bool;
-  inline FUNC operator=(const object_t& r) -> object_t&;
-  inline object_t(const object_t& r);
-  inline object_t(object::slots_t* r = nullptr);
-  inline object_t(intptr_t r);
-  inline object_t(uintptr_t r);
-  inline object_t(std::nullptr_t r);
-  inline ~object_t();
+  OBJECT_T_INLINE FUNC operator!() const -> bool;
+  OBJECT_T_INLINE FUNC operator==(const object_t& r) const -> bool;
+  OBJECT_T_INLINE FUNC operator!=(const object_t& r) const -> bool;
+  OBJECT_T_INLINE FUNC operator=(const object_t& r) -> object_t&;
+  OBJECT_T_INLINE object_t(const object_t& r);
+  OBJECT_T_INLINE object_t(object::slots_t* r = nullptr);
+  OBJECT_T_INLINE object_t(intptr_t r);
+  OBJECT_T_INLINE object_t(uintptr_t r);
+  OBJECT_T_INLINE object_t(std::nullptr_t r);
+  OBJECT_T_INLINE ~object_t();
 };
