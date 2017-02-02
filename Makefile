@@ -4,6 +4,12 @@ rootdir ?= .
 include $(rootdir)/makeflags.mk
 dirs := dso dakota-catalog dakota-find-library dakota-core dakota
 
+# dakota:              dakota-core
+# dakota-core:         dakota-catalog
+#                      dakota-find-library
+# dakota-catalog
+# dakota-find-library: dso
+
 .PHONY: \
  all \
  check \
