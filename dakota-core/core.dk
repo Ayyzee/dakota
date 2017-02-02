@@ -692,6 +692,9 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
 
   return;
 }
+static int-t register-count = 0;
+int-t deregister-count;
+
 // object         klass' superklass is null instance (singleton)
 // klass          klass' superklass is object klass
 // null-singleton klass' superklass is object klass
@@ -701,6 +704,7 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
 // null-singleton klass' klass is klass klass
 func dk-init-runtime() -> void {
   //fprintf(stderr, "%s()\n", __func__);
+  deregister-count = 0;
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   if (!object::_klass_) {
     init-runtime-ds();
@@ -1468,6 +1472,7 @@ static func last-user-code-before-main() -> void  {
 func dkt-register-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(registration-info != nullptr);
+  register-count++;
   // str-t dso-path = dso-abs-path-containing-addr(registration-info);
   // if (dso-path != nullptr)  {
   //   int-t overwrite;
@@ -1533,6 +1538,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
 }
 func dkt-deregister-info(named-info-t* registration-info) -> void {
   //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
+  deregister-count++;
   assert(registration-info != nullptr);
   set-read-write();
   if (getenv?("DAKOTA_CATALOG_OUTPUT") ||
