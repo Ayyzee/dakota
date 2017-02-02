@@ -668,7 +668,7 @@ sub generate_target_runtime {
   $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);
 
   $target_cc_str .= $nl;
-  $target_cc_str .= $col . "static func __initial-epilog() -> void {" . &ann(__FILE__, __LINE__) . $nl;
+  $target_cc_str .= $col . "static func __initial-epilog() -> void {" . $nl;
   $col = &colin($col);
   $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
@@ -677,7 +677,7 @@ sub generate_target_runtime {
     $col . "return;" . $nl;
   $col = &colout($col);
   $target_cc_str .= $col . "}" . $nl;
-  $target_cc_str .= $col . "static func __final-epilog() -> void {" . &ann(__FILE__, __LINE__) . $nl;
+  $target_cc_str .= $col . "static func __final-epilog() -> void {" . $nl;
   $col = &colin($col);
   $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
@@ -690,7 +690,7 @@ sub generate_target_runtime {
   #$target_cc_str .= $col . "};" . $nl;
 
   $target_cc_str .=
-    $col . "static __ddl_t __ddl-epilog = __ddl_t{__initial-epilog, __final-epilog};" . $nl;
+    $col . "static __ddl-t __ddl-epilog = __ddl-t{__initial-epilog, __final-epilog};" . &ann(__FILE__, __LINE__) . $nl;
   return $target_cc_str;
 }
 sub path::add_last {
@@ -4052,7 +4052,7 @@ sub linkage_unit::generate_symbols {
     $scratch_str .=
       $col . "static func __initial-prolog() -> void { dkt-register-info(nullptr); }" .
       $col . "static func __final-prolog()   -> void { dkt-deregister-info(nullptr); }" .
-      $col . "static __ddl_t __ddl-prolog = __ddl_t{__initial-prolog, __final-prolog};" . &ann(__FILE__, __LINE__) . $nl .
+      $col . "static __ddl-t __ddl-prolog = __ddl-t{__initial-prolog, __final-prolog};" . &ann(__FILE__, __LINE__) . $nl .
       $nl;
   }
   while (my ($symbol, $symbol_seq) = each(%$symbols)) {
