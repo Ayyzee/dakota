@@ -1532,7 +1532,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   return;
 }
 func dkt-deregister-info(named-info-t* registration-info) -> void {
-  //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #file));
+  //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
   assert(registration-info != nullptr);
   set-read-write();
   if (getenv?("DAKOTA_CATALOG_OUTPUT") ||

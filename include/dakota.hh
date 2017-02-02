@@ -119,7 +119,7 @@ static_assert(sizeof(float128_t) == 128/8, "The type float128-t must be 16 bytes
 KLASS_NS object { struct [[_dkt_typeinfo_]] slots_t; }
 KLASS_NS object { typealias slots_t = struct slots_t; }
 
-KLASS_NS ptr          { typealias slots_t = void*;                                 } typealias ptr_t =          ptr::slots_t;
+KLASS_NS ptr { typealias slots_t = void*; } typealias ptr_t = ptr::slots_t;
 
 # define OUT_OF_LINE_REF_COUNTING 0
 
