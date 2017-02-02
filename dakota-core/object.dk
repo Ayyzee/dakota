@@ -123,10 +123,11 @@ klass object {
     // if (klass::_klass_ != klass-of(self))
     //   $dump(klass-of(self));
 
-    fprintf(stderr, "%p { klass=%p <%s> }\n",
+    fprintf(stderr, "%p { klass=%p <%s>, ref-count=%i }\n",
             cast(ptr-t)self,
             cast(ptr-t)klass-of(self),
-            name-of(klass-of(self)));
+            name-of(klass-of(self)),
+            cast(int-fast32-t)self->ref-count);
     return self;
   }
   method str(object-t self) -> str-t {
