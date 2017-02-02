@@ -693,7 +693,6 @@ static func register-info-common(named-info-t* ni, each-box-func-t) -> void {
   return;
 }
 static int-t register-count = 0;
-extern int-t deregister-count;
 int-t deregister-count;
 
 // object         klass' superklass is null instance (singleton)

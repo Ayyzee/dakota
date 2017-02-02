@@ -36,7 +36,7 @@ static func echo-stuff-common(object::slots-t* instance, str-t action, symbol-t 
   fflush(stdout);
   return;
 }
-static func echo-stuff(object::slots-t* instance, str-t action) -> void {
+func echo-stuff(object::slots-t* instance, str-t action) -> void {
   if (getenv?("DKT_ECHO_ALLOC_INIT_DEALLOC"))
     if (instance->klass != klass::_klass_) // not completely correct (should be !instance?())
       echo-stuff-common(instance, action, name-of(klass-of(instance)));
