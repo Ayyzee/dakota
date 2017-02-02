@@ -672,7 +672,7 @@ sub generate_target_runtime {
   $col = &colin($col);
   $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
-    $col . "dkt-register-info(&reg-info, #epilog);" . $nl .
+    $col . "dkt-register-info(&reg-info);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
@@ -681,7 +681,7 @@ sub generate_target_runtime {
   $col = &colin($col);
   $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
-    $col . "dkt-deregister-info(&reg-info, #epilog);" . $nl .
+    $col . "dkt-deregister-info(&reg-info);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
@@ -4047,6 +4047,14 @@ sub linkage_unit::generate_symbols {
   my ($ast, $symbols) = @_;
   my $col = '';
 
+  my $scratch_str = '';
+  if (&is_target_defn()) {
+    $scratch_str .=
+      $col . "static func __initial-prolog() -> void { dkt-register-info(nullptr); }" .
+      $col . "static func __final-prolog()   -> void { dkt-deregister-info(nullptr); }" .
+      $col . "static __ddl_t __ddl-prolog = __ddl_t{__initial-prolog, __final-prolog};" . &ann(__FILE__, __LINE__) . $nl .
+      $nl;
+  }
   while (my ($symbol, $symbol_seq) = each(%$symbols)) {
     my $ident_symbol = &dk_mangle_seq($symbol_seq);
     $$symbols{$symbol} = $ident_symbol;
@@ -4074,7 +4082,6 @@ sub linkage_unit::generate_symbols {
     }
   }
   my $symbol_keys = [sort symbol::compare keys %$symbols];
-  my $scratch_str = "";
   my $max_width = 0;
   foreach my $symbol (@$symbol_keys) {
     $symbol = &as_literal_symbol_interior($symbol);

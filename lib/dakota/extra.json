@@ -82,7 +82,6 @@
     '#element' => undef,
     '#enum' => undef,
     '#enum-base' => undef,
-    '#epilog' => undef,
     '#exe' => undef,
     '#executable' => undef,
     '#exported-method-addresses' => undef,
