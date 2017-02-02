@@ -668,20 +668,20 @@ sub generate_target_runtime {
   $target_cc_str .= &generate_target_runtime_info('reg-info', $info_tbl, $col, $$target_srcs_ast{'symbols'}, __LINE__);
 
   $target_cc_str .= $nl;
-  $target_cc_str .= $col . "static func __initial() -> void {" . &ann(__FILE__, __LINE__) . $nl;
+  $target_cc_str .= $col . "static func __initial-epilog() -> void {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
-    $col . "dkt-register-info(&reg-info);" . $nl .
+    $col . "dkt-register-info(&reg-info, #epilog);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
   $target_cc_str .= $col . "}" . $nl;
-  $target_cc_str .= $col . "static func __final() -> void {" . &ann(__FILE__, __LINE__) . $nl;
+  $target_cc_str .= $col . "static func __final-epilog() -> void {" . &ann(__FILE__, __LINE__) . $nl;
   $col = &colin($col);
   $target_cc_str .=
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"before\", dir, name);" . $nl .
-    $col . "dkt-deregister-info(&reg-info);" . $nl .
+    $col . "dkt-deregister-info(&reg-info, #epilog);" . $nl .
     $col . "DKT-LOG-INITIAL-FINAL(\"'func':'%s','context':'%s','dir':'%s','name':'%s'\", __func__, \"after\",  dir, name);" . $nl .
     $col . "return;" . $nl;
   $col = &colout($col);
@@ -690,12 +690,7 @@ sub generate_target_runtime {
   #$target_cc_str .= $col . "};" . $nl;
 
   $target_cc_str .=
-    $col . "namespace { struct [[so-hidden]] __ddl_t {" . &ann(__FILE__, __LINE__) . $nl .
-    $col . "  __ddl_t(const __ddl_t&) = default;" . $nl .
-    $col . "  __ddl_t()  { __initial(); }" . $nl .
-    $col . "  ~__ddl_t() { __final();   }" . $nl .
-    $col . "};}" . $nl .
-    $col . "static __ddl_t __ddl = __ddl_t();" . $nl;
+    $col . "static __ddl_t __ddl-epilog = __ddl_t{__initial-epilog, __final-epilog};" . $nl;
   return $target_cc_str;
 }
 sub path::add_last {

@@ -143,3 +143,17 @@ KLASS_NS compare      { typealias slots_t = FUNC (*)(object_t, object_t) -> cmp_
 KLASS_NS generic_func { typealias slots_t = FUNC (*)(object_t) -> object_t;        } typealias generic_func_t = generic_func::slots_t;
 KLASS_NS str          { typealias slots_t = const char_t*;                         } typealias str_t =          str::slots_t;
 KLASS_NS symbol       { typealias slots_t = str_t;                                 } typealias symbol_t =       symbol::slots_t;
+
+struct [[so_hidden]] __ddl_t {
+  FUNC (*_final)() -> void;
+
+  __ddl_t(const __ddl_t&) = default;
+
+  inline __ddl_t(FUNC (*initial)() -> void, FUNC (*final)() -> void)  {
+    this->_final = final;
+    initial();
+  }
+  inline ~__ddl_t() {
+    this->_final();
+  }
+};

@@ -1469,10 +1469,11 @@ static func last-user-code-before-main() -> void  {
   dump-random();
   return;
 }
-func dkt-register-info(named-info-t* registration-info) -> void {
-  //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
+func dkt-register-info(named-info-t* registration-info, symbol-t position) -> void {
+  //fprintf(stderr, "%s(#%s, \"%s\")\n", __func__, position, cast(symbol-t)named-info::at(registration-info, #name));
   assert(registration-info != nullptr);
-  register-count++;
+  if (position == #epilog)
+    register-count++;
   // str-t dso-path = dso-abs-path-containing-addr(registration-info);
   // if (dso-path != nullptr)  {
   //   int-t overwrite;
@@ -1536,9 +1537,10 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     fclose(ctlg-output);
   return;
 }
-func dkt-deregister-info(named-info-t* registration-info) -> void {
-  //fprintf(stderr, "%s(\"%s\")\n", __func__, cast(symbol-t)named-info::at(registration-info, #name));
-  deregister-count++;
+func dkt-deregister-info(named-info-t* registration-info, symbol-t position) -> void {
+  //fprintf(stderr, "%s(#%s, \"%s\")\n", __func__, position, cast(symbol-t)named-info::at(registration-info, #name));
+  if (position == #epilog)
+    deregister-count++;
   assert(registration-info != nullptr);
   set-read-write();
   if (getenv?("DAKOTA_CATALOG_OUTPUT") ||

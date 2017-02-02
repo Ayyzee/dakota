@@ -66,10 +66,4 @@ static func __initial() -> void {
 static func __final() -> void {
   return;
 }
-namespace { struct [[so-hidden]] __ddl_t {
-  __ddl_t(const __ddl_t&) = default;
-
-  __ddl_t()  { __initial(); }
-  ~__ddl_t() { __final();   }
-}; }
-static __ddl_t __ddl = __ddl_t();
+static __ddl_t __ddl = __ddl_t{__initial, __final};
