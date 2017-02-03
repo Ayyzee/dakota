@@ -38,7 +38,7 @@ rm -f installcheck-so.dk installcheck-util-so.dk
 
 # compile/link <> executable
 rm -f installcheck installcheck-util
-src="func main(int-t, const str-t[]) -> int-t { return 0; }" 
+src="func main(int-t, const str-t[]) -> int-t { EXIT(0); }" 
 echo $src > installcheck.dk
 echo $src > installcheck-util.dk
 rm -f installcheck installcheck-util
