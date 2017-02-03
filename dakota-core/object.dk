@@ -105,9 +105,7 @@ klass object {
   }
   // documented to do nothing
   method dealloc(object-t self) -> object-t {
-# if defined DEBUG
-    echo-stuff(cast(object::slots-t*)self, "dealloc");
-# endif
+    USE(self);
     return nullptr;
   }
   method copy(object-t self) -> object-t {

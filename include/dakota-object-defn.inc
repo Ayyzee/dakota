@@ -33,8 +33,11 @@ REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
     this->object->ref_count--;
     if (this->object->ref_count == 0) {
       this->object->ref_count = k_dealloc_initiated;
-      $dealloc(*this);
+# if defined DEBUG
+      echo_stuff(this->object, "dealloc");
+# endif
 # if 0
+      $dealloc(*this);
       dkt::dealloc(this->object);
 # endif
       this->object = nullptr;
