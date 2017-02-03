@@ -18,8 +18,6 @@
 
 # include "dummy.hh"
 
-extern int_t deregister_count;
-
 dkt_declare_klass_type_struct(selector_node);
 //dkt-declare-klass-type-struct(signature);
 
