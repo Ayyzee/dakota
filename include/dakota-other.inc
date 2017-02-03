@@ -149,13 +149,19 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   exit_fail_with_msg(format, args);
   va_end(args);
 }
-inline FUNC getenv_int(str_t s) -> int_t {
-  int_t value = 0;
-  str_t value_str = getenv(s);
+inline FUNC getenv_int(str_t lhs) -> int_t {
+  int_t rhs = 0;
+  str_t rhs_str = getenv(lhs);
 
-  if (value_str != nullptr && value_str[0] != NUL && strcmp(value_str, "0x0"))
-    value = atoi(value_str);
-  return value;
+  if (rhs_str != nullptr && rhs_str[0] != NUL && strcmp(rhs_str, "0x0"))
+    rhs = atoi(rhs_str);
+  return rhs;
+}
+inline FUNC setenv_int(str_t lhs, int_t rhs) -> int_t { // allways overwrite
+  char_t rhs_str[sizeof(int_t) * 3] = "";
+  sprintf(rhs_str, "%i", rhs);
+  int_t overwrite;
+  return setenv(lhs, rhs_str, overwrite = 1);
 }
 # if !defined USE
   # define    USE(v) cast(void)v

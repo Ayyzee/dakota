@@ -60,7 +60,7 @@ func getprogname() -> str-t {
 [[format-va-printf(2)]] static func va-log(int64-t priority, str-t format, va-list-t args) -> int-t {
   stream-t log-file = stderr;
 
-  if (getenv("DEBUG") != nullptr) {
+  if (getenv-int("DKT_LOG_DEBUG")) {
     fprintf(log-file, "%s[%i]: ", getprogname(), getpid());
 
     switch (priority) {
@@ -186,7 +186,7 @@ klass exception {
 [[noreturn]] static func verbose-terminate-object(object-t current-exception) noexcept -> void {
   if (1)
     $set-src(current-exception, dkt-throw-src.file, dkt-throw-src.line);
-  if (getenv("DKT_DUMP_UNHANDLED_EXCEPTION") != nullptr)
+  if (getenv-int("DKT_DUMP_UNHANDLED_EXCEPTION"))
     $dump(current-exception);
   $print-format(std-error,
                 "{ \"uncaught/unexpected exception\": {");

@@ -711,8 +711,7 @@ func dk-init-runtime() -> void {
     each(gbl-registration-info-list, register-info-common, cast(each-box-func-t)nullptr);
 
 # if 0
-    int-t overwrite;
-    setenv("DKT_ECHO_ALLOC_INIT_DEALLOC", "1", overwrite = 1);
+    setenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC", 1);
 # endif
 
     // alloc
@@ -764,8 +763,7 @@ func dk-init-runtime() -> void {
 # endif
 
 # if 0
-    int-t overwrite;
-    setenv("DKT_ECHO_ALLOC_INIT_DEALLOC", "1", overwrite = 1);
+    setenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC", 1);
 # endif
 
     std-input =  $make(input-stream::klass(),  #slots: stdin);

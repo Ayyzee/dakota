@@ -699,7 +699,7 @@ klass klass {
     return;
   }
   static func dump-random(object-t self) -> void {
-    if (getenv("DKT_DUMP_RANDOM") != nullptr) {
+    if (getenv-int("DKT_DUMP_RANDOM")) {
       printf("klass: %s\n", name-of(self));
       for (ssize-t index = 0; index < self.methods.count; index++) {
         printf("method: %p\n", cast(ptr-t)self.methods.addrs[index]);
