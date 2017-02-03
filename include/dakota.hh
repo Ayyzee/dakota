@@ -17,6 +17,7 @@
 # pragma once
 
 # include <cstddef>
+# include <cstdlib> // exit(), quick_exit()
 
 # define KLASS_NS namespace
 # define TRAIT_NS namespace
