@@ -1276,14 +1276,6 @@ klass registration-info {
     signature-t**      va-signatures;
   }
 }
-func getenv-int(str-t s) -> int-t {
-  int-t value = 0;
-  str-t value-str = getenv(s);
-
-  if (value-str != nullptr && value-str[0] != NUL)
-    value = atoi(value-str);
-  return value;
-}
 static func add-registration-info(named-info-t* registration-info) -> void {
   assert(registration-info->next == nullptr);
   registration-info->next = gbl-registration-info-list;

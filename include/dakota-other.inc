@@ -149,6 +149,14 @@ namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   exit_fail_with_msg(format, args);
   va_end(args);
 }
+inline FUNC getenv_int(str_t s) -> int_t {
+  int_t value = 0;
+  str_t value_str = getenv(s);
+
+  if (value_str != nullptr && value_str[0] != NUL && strcmp(value_str, "0x0"))
+    value = atoi(value_str);
+  return value;
+}
 # if !defined USE
   # define    USE(v) cast(void)v
 # endif
