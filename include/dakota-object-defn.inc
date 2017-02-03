@@ -20,16 +20,24 @@ FUNC $dealloc(object_t) -> object_t;
 const int_fast32_t k_dealloc_initiated = -1;
 REF_COUNTING_INLINE FUNC object_t::add_ref() -> void {
   if (this->object->ref_count != k_dealloc_initiated) {
-    //fprintf(stdout, "%p: %i++\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
-    //fflush(stdout);
+# if 1
+    if (getenv_int("DKT_ECHO_REF_COUNT") != 0) {
+      fprintf(stdout, "%p: %i++\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
+      fflush(stdout);
+    }
+# endif
     this->object->ref_count++;
   }
 }
 REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
   if (this->object->ref_count != k_dealloc_initiated) {
     assert(this->object->ref_count != 0);
-    //fprintf(stdout, "%p: %i--\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
-    //fflush(stdout);
+# if 1
+    if (getenv_int("DKT_ECHO_REF_COUNT") != 0) {
+      fprintf(stdout, "%p: %i--\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
+      fflush(stdout);
+    }
+# endif
     this->object->ref_count--;
     if (this->object->ref_count == 0) {
       this->object->ref_count = k_dealloc_initiated;
