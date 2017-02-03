@@ -1276,12 +1276,12 @@ klass registration-info {
     signature-t**      va-signatures;
   }
 }
-func getenv?(str-t name) -> bool-t {
-  bool-t value = false;
-  str-t value-str = getenv(name);
+func getenv-int(str-t s) -> int-t {
+  int-t value = 0;
+  str-t value-str = getenv(s);
 
-  if (value-str != nullptr && value-str[0] != NUL && safe-strcmp("0", value-str) != 0)
-    value = true;
+  if (value-str != nullptr && value-str[0] != NUL)
+    value = atoi(value-str);
   return value;
 }
 static func add-registration-info(named-info-t* registration-info) -> void {
@@ -1459,7 +1459,7 @@ func set-read-write() -> int-t {
   return r;
 }
 static func dump-random() -> void {
-  if (getenv?("DKT_DUMP_RANDOM")) {
+  if (getenv-int("DKT_DUMP_RANDOM")) {
     printf("null-method: %p\n", cast(ptr-t)DKT-NULL-METHOD);
     printf("num-generics: %zi\n", selector-count());
   }
@@ -1479,7 +1479,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   int-t overwrite;
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
-  bool-t exported-only = getenv?("DAKOTA_CATALOG_EXPORTED_ONLY");
+  bool-t exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
   stream-t ctlg-output = nullptr;
   str-t output-path = getenv("DAKOTA_CATALOG_OUTPUT");
   if (output-path != nullptr) {
@@ -1492,7 +1492,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
     }
   }
   if (ctlg-output != nullptr) {
-    bool-t ctlg-recursive = getenv?("DAKOTA_CATALOG_RECURSIVE");
+    bool-t ctlg-recursive = getenv-int("DAKOTA_CATALOG_RECURSIVE");
     str-t ctlg-only = getenv("DAKOTA_CATALOG_ONLY");
     str-t ctlg-arg =  getenv("DAKOTA_CATALOG_ARG");
     ostream-t ostrm = { .output = ctlg-output, .col = 0 };
@@ -1523,14 +1523,14 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       sigaction-setup(SIGBUS,  bus-segv-handler);
       sigaction-setup(SIGSEGV, bus-segv-handler);
       add-registration-info(registration-info);
-      if (!getenv?("DKT_NO_INIT_RUNTIME"))
+      if (!getenv-int("DKT_NO_INIT_RUNTIME"))
         dk-init-runtime();
-      if (getenv?("DKT_JSON_DUMP_KLASSES"))
+      if (getenv-int("DKT_JSON_DUMP_KLASSES"))
         json-dump-klass-defns(gbl-klass-defns-table);
-      if (getenv?("DKT_JSON_DUMP_RESOURCE_INFO"))
+      if (getenv-int("DKT_JSON_DUMP_RESOURCE_INFO"))
         json-dump-resource-info(gbl-klass-defns-table);
       last-user-code-before-main();
-      if (getenv?("DKT_EXIT_BEFORE_MAIN"))
+      if (getenv-int("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
   }
   if (output-path != nullptr && output-path[0] != NUL && ctlg-output != nullptr)
@@ -1544,8 +1544,8 @@ func dkt-deregister-info(named-info-t* registration-info) -> void {
     return;
   }
   set-read-write();
-  if (getenv?("DAKOTA_CATALOG_OUTPUT") ||
-      getenv?("DKT_NO_INIT_RUNTIME") ||
+  if (getenv-int("DAKOTA_CATALOG_OUTPUT") ||
+      getenv-int("DKT_NO_INIT_RUNTIME") ||
       !null)
     return;
   named-info::sort(registration-info);
