@@ -38,6 +38,7 @@
 # define KLASS(k)
 # define TRAIT(t)
 # define TRAITS(t1, ...)
+# define EXIT(v) exit(v)
 
 # define SENTINEL_PTR cast(const keyword_t*)nullptr
 
