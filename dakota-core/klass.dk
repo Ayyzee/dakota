@@ -690,6 +690,7 @@ klass klass {
     return result;
   }
   static func set-all-klass-ptrs(object-t self) -> void {
+    (self).add-ref(); // hackhack: to prevent dealloc on exit() (parens prevent rewriting of self.<>)
     assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
     if (null)
       set-read-write();
