@@ -19,8 +19,8 @@
 struct [[_dkt_typeinfo_]] object_t {
   object::slots_t* object;
 
-  REF_COUNTING_INLINE FUNC operator->() const -> object::slots_t*;
-  REF_COUNTING_INLINE FUNC operator*()  const -> object::slots_t&;
+  REF_COUNTING_INLINE FUNC operator ->() const -> object::slots_t*;
+  REF_COUNTING_INLINE FUNC operator *()  const -> object::slots_t&;
 
   REF_COUNTING_INLINE FUNC add_ref()    -> void;
   REF_COUNTING_INLINE FUNC remove_ref() -> void;
@@ -31,10 +31,10 @@ struct [[_dkt_typeinfo_]] object_t {
   explicit REF_COUNTING_INLINE operator uintptr_t()        const;
   explicit REF_COUNTING_INLINE operator bool()             const;
 
-  REF_COUNTING_INLINE FUNC operator!() const -> bool;
-  REF_COUNTING_INLINE FUNC operator==(const object_t& r) const -> bool;
-  REF_COUNTING_INLINE FUNC operator!=(const object_t& r) const -> bool;
-  REF_COUNTING_INLINE FUNC operator=(const object_t& r) -> object_t&;
+  REF_COUNTING_INLINE FUNC operator !() const -> bool;
+  REF_COUNTING_INLINE FUNC operator ==(const object_t& r) const -> bool;
+  REF_COUNTING_INLINE FUNC operator !=(const object_t& r) const -> bool;
+  REF_COUNTING_INLINE FUNC operator =(const object_t& r) -> object_t&;
   REF_COUNTING_INLINE object_t(const object_t& r);
   REF_COUNTING_INLINE object_t(object::slots_t* r = nullptr);
   REF_COUNTING_INLINE object_t(intptr_t r);

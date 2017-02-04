@@ -52,8 +52,8 @@ REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
     }
   }
 }
-REF_COUNTING_INLINE FUNC object_t::operator->() const -> object::slots_t* { return  this->object; }
-REF_COUNTING_INLINE FUNC object_t::operator*()  const -> object::slots_t& { return *this->object; }
+REF_COUNTING_INLINE FUNC object_t::operator ->() const -> object::slots_t* { return  this->object; }
+REF_COUNTING_INLINE FUNC object_t::operator *()  const -> object::slots_t& { return *this->object; }
 
 REF_COUNTING_INLINE object_t::operator object::slots_t*() const { return                 this->object; }
 REF_COUNTING_INLINE object_t::operator ptr_t()            const { return cast(ptr_t)     this->object; }
@@ -61,16 +61,16 @@ REF_COUNTING_INLINE object_t::operator intptr_t()         const { return cast(in
 REF_COUNTING_INLINE object_t::operator uintptr_t()        const { return cast(uintptr_t) this->object; }
 REF_COUNTING_INLINE object_t::operator bool()             const { return cast(bool)      this->object; }
 
-REF_COUNTING_INLINE FUNC object_t::operator!() const -> bool {
+REF_COUNTING_INLINE FUNC object_t::operator !() const -> bool {
   return !this->object;
 }
-REF_COUNTING_INLINE FUNC object_t::operator==(const object_t& r) const -> bool {
+REF_COUNTING_INLINE FUNC object_t::operator ==(const object_t& r) const -> bool {
   return this->object == r.object;
 }
-REF_COUNTING_INLINE FUNC object_t::operator!=(const object_t& r) const -> bool {
+REF_COUNTING_INLINE FUNC object_t::operator !=(const object_t& r) const -> bool {
   return this->object != r.object;
 }
-REF_COUNTING_INLINE FUNC object_t::operator=(const object_t& r) -> object_t& {
+REF_COUNTING_INLINE FUNC object_t::operator =(const object_t& r) -> object_t& {
   if (this->object != r.object) {
     if (this->object)
       this->remove_ref();

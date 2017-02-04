@@ -16,8 +16,8 @@
 
 # pragma once
 
-REF_COUNTING_INLINE FUNC weak_object_t::operator->() const -> object::slots_t* { return  this->object; }
-REF_COUNTING_INLINE FUNC weak_object_t::operator*()  const -> object::slots_t& { return *this->object; }
+REF_COUNTING_INLINE FUNC weak_object_t::operator ->() const -> object::slots_t* { return  this->object; }
+REF_COUNTING_INLINE FUNC weak_object_t::operator *()  const -> object::slots_t& { return *this->object; }
 
 REF_COUNTING_INLINE weak_object_t::operator object_t()         const { return object_t{this->object}; } // convert from weak-object-t to object-t
 REF_COUNTING_INLINE weak_object_t::operator object::slots_t*() const { return                 this->object; }
@@ -26,16 +26,16 @@ REF_COUNTING_INLINE weak_object_t::operator intptr_t()         const { return ca
 REF_COUNTING_INLINE weak_object_t::operator uintptr_t()        const { return cast(uintptr_t) this->object; }
 REF_COUNTING_INLINE weak_object_t::operator bool()             const { return cast(bool)      this->object; }
 
-REF_COUNTING_INLINE FUNC weak_object_t::operator!() const -> bool {
+REF_COUNTING_INLINE FUNC weak_object_t::operator !() const -> bool {
   return !this->object;
 }
-REF_COUNTING_INLINE FUNC weak_object_t::operator==(const weak_object_t& r) const -> bool {
+REF_COUNTING_INLINE FUNC weak_object_t::operator ==(const weak_object_t& r) const -> bool {
   return this->object == r.object;
 }
-REF_COUNTING_INLINE FUNC weak_object_t::operator!=(const weak_object_t& r) const -> bool {
+REF_COUNTING_INLINE FUNC weak_object_t::operator !=(const weak_object_t& r) const -> bool {
   return this->object != r.object;
 }
-REF_COUNTING_INLINE FUNC weak_object_t::operator=(const weak_object_t& r) -> weak_object_t& {
+REF_COUNTING_INLINE FUNC weak_object_t::operator =(const weak_object_t& r) -> weak_object_t& {
   if (this->object != r.object) {
     this->object = r.object;
   }
