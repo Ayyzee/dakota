@@ -23,9 +23,11 @@ dirs := dso dakota-catalog dakota-find-library dakota-core dakota
  precompile \
  uninstall \
 
-all:
+all: all-install
+
+all-install:
 	sudo true # so password prompt is immediate
-	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir $@ install; done
+	for dir in $(dirs); do DKT_INITIAL_WORKDIR=$(PWD) $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir all install; done
 
 uninstall:
 	for dir in $(dirs); do $(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) --directory $(rootdir)/$$dir $@; done
