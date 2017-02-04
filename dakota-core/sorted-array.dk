@@ -71,7 +71,7 @@ klass sorted-array {
     assert(key != nullptr);
 
     result-t result = { .element = nullptr, .offset = -1 };
-    int-t comparison;
+    cmp-t cmp;
     bool-t should-increment = false;
 
     int64-t i = 0;
@@ -81,13 +81,13 @@ klass sorted-array {
     while (l < u) {
       i = l + ((u - l) / 2); // calc midpoint without overflowing
       const void* p = cast(const void*)(cast(uint8-t*)(t->elements) + (i * t->size));
-      comparison = t->compare(deref(t, p), key);
+      cmp = t->compare(deref(t, p), key);
 
-      if (0 < comparison) {
+      if (0 < cmp) {
         should-increment = false;
         u = i;
       }
-      else if (0 > comparison) {
+      else if (0 > cmp) {
         should-increment = true;
         l = i + 1;
       } else {
