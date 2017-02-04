@@ -102,7 +102,7 @@ klass ascii-number {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    dkt::dealloc(self.ascii-string);
+    self.ascii-string = dkt::dealloc(self.ascii-string);
     object-t result = $dealloc(super);
     return result;
   }

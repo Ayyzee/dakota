@@ -685,7 +685,7 @@ klass klass {
 # if defined DEBUG
     echo-stuff(cast(object::slots-t*)self, "dealloc", name-of(klass-of(self)));
 # endif
-    dkt::dealloc(self.methods.addrs);
+    self.methods.addrs = dkt::dealloc(self.methods.addrs);
     object-t result = $dealloc(super);
     return result;
   }

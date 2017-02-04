@@ -84,7 +84,7 @@ klass bit-vector {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    dkt::dealloc(self.elements);
+    self.elements = dkt::dealloc(self.elements);
     object-t result = $dealloc(super);
     return result;
   }

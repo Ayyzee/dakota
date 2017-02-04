@@ -99,7 +99,7 @@ klass lexer {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    dkt::dealloc(self.buffer);
+    self.buffer = dkt::dealloc(self.buffer);
     object-t result = $dealloc(super);
     return result;
   }

@@ -68,7 +68,7 @@ klass sorted-set {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    dkt::dealloc(self.sa.elements);
+    self.sa.elements = dkt::dealloc(self.sa.elements);
     object-t result = $dealloc(super);
     return result;
   }

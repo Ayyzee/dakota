@@ -41,7 +41,7 @@ klass str-buffer {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    dkt::dealloc(self.ptr);
+    self.ptr = dkt::dealloc(self.ptr);
     object-t result = $dealloc(super);
     return result;
   }
