@@ -4050,8 +4050,8 @@ sub linkage_unit::generate_symbols {
   my $scratch_str = '';
   if (&is_target_defn()) {
     $scratch_str .=
-      $col . "static func __initial-prolog() -> void { dkt-register-info(nullptr); }" .
-      $col . "static func __final-prolog()   -> void { dkt-deregister-info(nullptr); }" .
+      $col . "static func __initial-prolog() -> void { dkt-register-info(nullptr); }" . $nl .
+      $col . "static func __final-prolog()   -> void { dkt-deregister-info(nullptr); }" . $nl .
       $col . "static __ddl-t __ddl-prolog = __ddl-t{__initial-prolog, __final-prolog};" . &ann(__FILE__, __LINE__) . $nl .
       $nl;
   }
