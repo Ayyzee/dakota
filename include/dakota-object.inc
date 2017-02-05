@@ -21,6 +21,7 @@ struct [[_dkt_typeinfo_]] object_t {
 
   REF_COUNTING_INLINE FUNC operator ->() const -> object::slots_t*;
   REF_COUNTING_INLINE FUNC operator *()  const -> object::slots_t&;
+  REF_COUNTING_INLINE FUNC operator &()        -> object_t*;
 
   REF_COUNTING_INLINE FUNC add_ref()    -> void;
   REF_COUNTING_INLINE FUNC remove_ref() -> void;
