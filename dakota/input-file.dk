@@ -86,8 +86,7 @@ klass input-file {
   }
   method dealloc(object-t self) -> object-t {
     self.buffer = dkt::dealloc(self.buffer);
-    object-t result = $dealloc(super);
-    return result;
+    return $dealloc(super);
   }
   method file(object-t self) -> str-t {
     return cast(str-t)(self.file);

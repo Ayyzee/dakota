@@ -61,6 +61,10 @@ klass sorted-array {
     create(slots, capacity, size, compare, is-ptr);
     return slots;
   }
+  func destroy(slots-t* slots) -> std::nullptr-t {
+    slots->elements = dkt::dealloc(slots->elements);
+    return nullptr;
+  }
   func sort(slots-t* t) -> slots-t* {
     qsort(t->elements, cast(size-t)t->count, cast(size-t)t->size, t->compare);
     return t;

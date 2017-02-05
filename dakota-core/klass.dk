@@ -686,8 +686,9 @@ klass klass {
     echo-stuff(cast(object::slots-t*)self, "dealloc", name-of(klass-of(self)));
 # endif
     self.methods.addrs = dkt::dealloc(self.methods.addrs);
-    object-t result = $dealloc(super);
-    return result;
+    self.superklass = nullptr;
+    self.behavior =   nullptr;
+    return $dealloc(super);
   }
   static func set-all-klass-ptrs(object-t self) -> void {
     (self).add-ref(); // hackhack: to prevent dealloc on exit() (parens prevent rewriting of self.<>)

@@ -60,8 +60,7 @@ klass string {
   }
   method dealloc(object-t self) -> object-t {
     self.ptr = dkt::dealloc(self.ptr);
-    object-t result = $dealloc(super);
-    return result;
+    return $dealloc(super);
   }
   method length(object-t self) -> ssize-t {
     if (self.len == 0 &&

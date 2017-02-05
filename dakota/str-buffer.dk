@@ -42,8 +42,7 @@ klass str-buffer {
   }
   method dealloc(object-t self) -> object-t {
     self.ptr = dkt::dealloc(self.ptr);
-    object-t result = $dealloc(super);
-    return result;
+    return $dealloc(super);
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);

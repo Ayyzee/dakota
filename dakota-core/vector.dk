@@ -118,9 +118,10 @@ klass vector {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    self.elements = dkt::dealloc(self.elements);
-    object-t result = $dealloc(super);
-    return result;
+    $empty(self);
+    self.elements =     dkt::dealloc(self.elements);
+    self.fill-element = nullptr;
+    return $dealloc(super);
   }
   method dump(object-t self) -> object-t {
     $dump(super);
@@ -150,13 +151,8 @@ klass vector {
     return state;
   }
   method empty(object-t self) -> object-t {
-    self.count = 0;
-
-    for (object-t forward-iterator = $forward-iterator(self);
-         $next?(forward-iterator);
-         $next(forward-iterator)) {
-      $set-element(forward-iterator, self.fill-element);
-    }
+    for (ssize-t i = 0; i < self.count; i++)
+      self.elements[i] = self.fill-element;
     self.iterator-state++;
     return self;
   }

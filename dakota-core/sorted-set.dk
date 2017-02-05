@@ -68,9 +68,9 @@ klass sorted-set {
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    self.sa.elements = dkt::dealloc(self.sa.elements);
-    object-t result = $dealloc(super);
-    return result;
+    $empty(self);
+    //sorted-array::destroy(self.sa.elements);
+    return $dealloc(super);
   }
   method add(object-t self, object-t element) -> object-t {
     object-t result = element;
@@ -84,8 +84,9 @@ klass sorted-set {
     return result;
   }
   method empty(object-t self) -> object-t {
+    while (self.sa.count != 0)
+      *(cast(object-t*)sorted-array::remove-last(&self.sa)) = nullptr;
     self.iterator-state++;
-    self.sa.count = 0; // hackhack
     return self;
   }
   method in(object-t self, object-t element, object-t default-result) -> object-t {
