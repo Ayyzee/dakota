@@ -42,7 +42,7 @@ func map(object-t[] objects, std::function<object-t (object-t)> f) -> object-t {
   return result;
 }
 
-/// first, last, at, ...
+// first, last, at, ...
 klass sequence {
   superklass collection;
 
