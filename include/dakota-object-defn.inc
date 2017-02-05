@@ -74,7 +74,7 @@ REF_COUNTING_INLINE FUNC object_t::operator !=(const object_t& r) const -> bool 
   return this->object != r.object;
 }
 REF_COUNTING_INLINE FUNC object_t::operator =(const object_t& r) -> object_t& {
-  if (this->object != r.object) {
+  if (this != &r) {
     if (this->object && (this->object->ref_count > 0))
       this->remove_ref();
     this->object = r.object;
