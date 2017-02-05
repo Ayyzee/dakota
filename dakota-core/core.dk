@@ -767,9 +767,9 @@ func dk-init-runtime() -> void {
     std-input =  $make(input-stream::klass(),  #slots: stdin);
     std-output = $make(output-stream::klass(), #slots: stdout);
     std-error =  $make(output-stream::klass(), #slots: stderr);
-    //std-input.add-ref();  // hackhack: to prevent dealloc on exit()
-    //std-output.add-ref(); // hackhack: to prevent dealloc on exit()
-    //std-error.add-ref();  // hackhack: to prevent dealloc on exit()
+    std-input.add-ref();  // hackhack: to prevent dealloc on exit()
+    std-output.add-ref(); // hackhack: to prevent dealloc on exit()
+    std-error.add-ref();  // hackhack: to prevent dealloc on exit()
 
     set-read-write();
     each(gbl-registration-info-list,
