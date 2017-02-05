@@ -75,10 +75,11 @@ klass sorted-set {
   method add(object-t self, object-t element) -> object-t {
     object-t result = element;
     self.iterator-state++;
-    result-t found-result = sorted-array::search(&self.sa, &element); /// &object-t
+    object-t* element-ptr = &element; /// &object-t
+    result-t found-result = sorted-array::search(&self.sa, element-ptr);
 
     if (found-result.element == nullptr)
-      sorted-array::add-at(&self.sa, &element, found-result.offset); /// &object-t
+      sorted-array::add-at(&self.sa, element-ptr, found-result.offset);
     else
       result = *(cast(object-t*)found-result.element);
     return result;
@@ -91,7 +92,8 @@ klass sorted-set {
   }
   method in(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
-    result-t found-result = sorted-array::search(&self.sa, &element); /// &object-t
+    object-t* element-ptr = &element; /// &object-t
+    result-t found-result = sorted-array::search(&self.sa, element-ptr);
 
     if (found-result.element != nullptr)
       result = *(cast(object-t*)sorted-array::at(&self.sa, found-result.offset));
@@ -116,13 +118,14 @@ klass sorted-set {
     return state;
   }
   method remove(object-t self, object-t element) -> object-t {
-    result-t found-result = sorted-array::search(&self.sa, &element); /// &object-t
+    object-t* element-ptr = &element; /// &object-t
+    result-t found-result = sorted-array::search(&self.sa, element-ptr);
     object-t prev-element = nullptr;
 
     if (found-result.element != nullptr) {
       self.iterator-state++;
       // element not required
-      prev-element = *(cast(object-t*)sorted-array::remove-at(&self.sa, &element, found-result.offset)); /// &object-t
+      prev-element = *(cast(object-t*)sorted-array::remove-at(&self.sa, element-ptr, found-result.offset));
     }
     return prev-element; // returns nullptr on error
   }
