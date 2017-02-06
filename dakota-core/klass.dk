@@ -128,8 +128,8 @@ static func default-superklass() -> object-t {
 }
 static func selector-for-signature(const signature-t* signature) -> selector-t {
   selector-pair-t pair = { .key = signature, .element = nullptr };
-  selector-pair-t* found-pair =
-    cast(selector-pair-t*)sorted-array::bsearch(&gbl-selectors-table, &pair);
+  result-t pair-result = sorted-array::at(&gbl-selectors-table, &pair);
+  selector-pair-t* found-pair = cast(decltype(found-pair))pair-result.element;
   selector-t selector = *(found-pair->element->ptr);
   return selector;
 }
@@ -151,7 +151,7 @@ static func method-for-signature(const methods::slots-t* methods, const signatur
     if (signature == nullptr)
       break;
     selector-pair-t pair = { .key = signature, .element = selector-node };
-    result-t found-result = sorted-array::search(&gbl-selectors-table, &pair);
+    result-t found-result = sorted-array::at(&gbl-selectors-table, &pair);
     selector-pair-t* found-pair = cast(decltype(found-pair))found-result.element;
 
     if (found-pair == nullptr) {

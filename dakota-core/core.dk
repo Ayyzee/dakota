@@ -559,7 +559,7 @@ static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, kls-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { .name = kls-name, .node = node };
-  result-t found-result = sorted-array::search(gbl-imported-klasses-table, &named-node);
+  result-t found-result = sorted-array::at(gbl-imported-klasses-table, &named-node);
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))found-result.element;
 
   if (found-named-node == nullptr) {
@@ -607,7 +607,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
     assert(type == #klass);
     add-interpose-prop(interpose-name, name);
   }
-  result-t found-result = sorted-array::search(gbl-klass-defns-table, kls-info);
+  result-t found-result = sorted-array::at(gbl-klass-defns-table, kls-info);
   named-info-t* found-kls-info = cast(decltype(found-kls-info))found-result.element;
 
   if (found-kls-info == nullptr) {
@@ -637,7 +637,8 @@ static func export-klasses(named-info-t* kls-info) -> void {
 }
 /*LOCAL*/ func interposer-name-for-klass-name(symbol-t kls-name) -> symbol-t {
   property-t key = { .key = kls-name, .element = cast(intptr-t)nullptr };
-  property-t* assoc-ptr = cast(property-t*)sorted-array::bsearch(gbl-interposers-table, &key);
+  result-t assoc-result = sorted-array::at(gbl-interposers-table, &key);
+  property-t* assoc-ptr = cast(decltype(assoc-ptr))assoc-result.element;
   symbol-t result;
 
   if (assoc-ptr == nullptr) {
@@ -803,7 +804,8 @@ func dk-init-runtime() -> void {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, kls-name);
   named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
-  named-assoc-node-t* found-named-node = cast(named-assoc-node-t*)sorted-array::bsearch(gbl-imported-klasses-table, &named-node); // hackhack
+  result-t node-result = sorted-array::at(gbl-imported-klasses-table, &named-node); // hackhack
+  named-assoc-node-t* found-named-node = cast(decltype(found-named-node))node-result.element;
   assoc-node-t* result;
 
   if (found-named-node == nullptr)
@@ -1627,7 +1629,8 @@ func dk-klass-for-name(symbol-t name) -> object-t {
   assert-valid-str(kls-name);
   property-t[] properties = { { .key = #name, .element = cast(intptr-t)kls-name } };
   named-info-t info = { .next = nullptr, .count = scountof(properties), .elements = properties };
-  named-info-t* kls-info = cast(named-info-t*)sorted-array::bsearch(gbl-klass-defns-table, &info);
+  result-t info-result = sorted-array::at(gbl-klass-defns-table, &info);
+  named-info-t* kls-info = cast(decltype(kls-info))info-result.element;
 
   if (kls-info == nullptr) {
     str-t klasspath = getenv("KLASSPATH");

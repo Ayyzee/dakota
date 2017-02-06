@@ -21,7 +21,7 @@ KLASS_NS sorted_array {
   FUNC   create(ssize_t capacity, ssize_t size, std_compare_t compare, bool_t is_ptr) -> slots_t*;
   FUNC   destroy(slots_t* slots) -> std::nullptr_t;
 
-  METHOD search(const slots_t* t, const void* key) -> result_t;
+  METHOD at(const slots_t* t, const void* key) -> result_t;
   METHOD sort(slots_t* t) -> slots_t*;
   METHOD symbolize(slots_t* t, const void* key) -> const void*;
   METHOD at(const slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;

@@ -71,7 +71,7 @@ klass sorted-array {
   }
 
   //(-(insertion point) - 1)
-  func search(const slots-t* t, const void* key) -> result-t {
+  func at(const slots-t* t, const void* key) -> result-t {
     assert(key != nullptr);
 
     result-t result = { .element = nullptr, .offset = -1 };
@@ -150,7 +150,7 @@ klass sorted-array {
   func add(slots-t* t, const void* key) -> slots-t* {
     assert(key != nullptr);
 
-    result-t result = search(t, key);
+    result-t result = at(t, key);
     if (result.element == nullptr)
       add-at(t, result.offset, key);
     return t;
@@ -158,7 +158,7 @@ klass sorted-array {
   func symbolize(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
     const void* element = key;
-    result-t result = search(t, key);
+    result-t result = at(t, key);
 
     if (result.element != nullptr)
       element = result.element;
@@ -178,11 +178,5 @@ klass sorted-array {
       element = nullptr;
     }
     return element;
-  }
-  func bsearch(const slots-t* t, const void* key) -> const void* {
-    assert(key != nullptr);
-
-    result-t result = search(t, key);
-    return result.element;
   }
 }
