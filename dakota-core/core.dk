@@ -725,6 +725,7 @@ func dk-init-runtime() -> void {
     null = $make(null-klass);
     klass::mutable-unbox(object::_klass_).superklass = null;
     null.add-ref(); // hackhack: to prevent dealloc on exit()
+    null.add-ref(); // hackhack: to prevent dealloc on exit()
 
     // core runtime initialized
 

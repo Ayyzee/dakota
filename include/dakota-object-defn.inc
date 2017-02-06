@@ -53,10 +53,12 @@ REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
 REF_COUNTING_INLINE FUNC object_t::operator ->() const -> object::slots_t* { return  this->object; }
 REF_COUNTING_INLINE FUNC object_t::operator *()  const -> object::slots_t& { return *this->object; }
 
-REF_COUNTING_INLINE FUNC object_t::operator &()        -> object_t* { // remember to add to weak-object-t
-  this->add_ref();
-  return this;
-}
+// REF_COUNTING_INLINE FUNC object_t::operator &()        -> object_t* { // remember to add to weak-object-t
+//   static int i = 0;
+//   fprintf(stderr, "%p: ++%03i++\n", cast(ptr_t)this->object, ++i);
+//   this->add_ref();
+//   return this;
+// }
 REF_COUNTING_INLINE object_t::operator object::slots_t*() const { return                 this->object; }
 REF_COUNTING_INLINE object_t::operator ptr_t()            const { return cast(ptr_t)     this->object; }
 REF_COUNTING_INLINE object_t::operator intptr_t()         const { return cast(intptr_t)  this->object; }
