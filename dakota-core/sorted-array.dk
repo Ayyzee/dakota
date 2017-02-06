@@ -104,7 +104,7 @@ klass sorted-array {
     result.offset = i;
     return result;
   }
-  func add-at(slots-t* t, const void* key, ssize-t offset) -> slots-t* {
+  func add-at(slots-t* t, ssize-t offset, const void* key) -> slots-t* {
     assert(key != nullptr);
     assert(0 <= offset);
     assert(offset <= t->count);
@@ -120,16 +120,18 @@ klass sorted-array {
     t->count++;
     return t;
   }
-  func at(const slots-t* t, ssize-t offset) -> const void* {
+  func at(const slots-t* t, ssize-t offset, const void* key) -> const void* { // key is optional
     assert(0 <= offset);
     assert(offset < t->count);
     assert(0 < t->count);
 
     const void* element = deref(t, cast(const void*)(cast(uint8-t*)(t->elements) + (t->size * offset)));
+    if (key != nullptr)
+      assert(t->compare(element, key) == 0);
     return element;
   }
-  // key not required
-  func remove-at(slots-t* t, const void* key, ssize-t offset) -> const void* {
+  
+  func remove-at(slots-t* t, ssize-t offset, const void* key) -> const void* { // key is optional
     assert(key != nullptr);
     assert(0 <= offset);
     assert(offset < t->count);
@@ -150,7 +152,7 @@ klass sorted-array {
 
     result-t result = search(t, key);
     if (result.element == nullptr)
-      add-at(t, key, result.offset);
+      add-at(t, result.offset, key);
     return t;
   }
   func symbolize(slots-t* t, const void* key) -> const void* {
@@ -161,7 +163,7 @@ klass sorted-array {
     if (result.element != nullptr)
       element = result.element;
     else
-      add-at(t, key, result.offset);
+      add-at(t, result.offset, key);
     return element;
   }
   func remove-last(slots-t* t) -> const void* {

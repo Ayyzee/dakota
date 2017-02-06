@@ -564,7 +564,7 @@ static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
 
   if (found-named-node == nullptr) {
     named-node.node->next = nullptr;
-    sorted-array::add-at(gbl-imported-klasses-table, &named-node, found-result.offset);
+    sorted-array::add-at(gbl-imported-klasses-table, found-result.offset, &named-node);
     sorted-array::add(gbl-imported-klasses-file-table, kls-name);
   } else {
     node->next = found-named-node->node;
@@ -611,7 +611,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
   named-info-t* found-kls-info = cast(decltype(found-kls-info))found-result.element;
 
   if (found-kls-info == nullptr) {
-    sorted-array::add-at(gbl-klass-defns-table, kls-info, found-result.offset);
+    sorted-array::add-at(gbl-klass-defns-table, found-result.offset, kls-info);
   } else {
     assert(kls-info->next == nullptr);
     named-info-t* prev = found-kls-info->next;

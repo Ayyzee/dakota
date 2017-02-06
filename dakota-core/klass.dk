@@ -157,7 +157,7 @@ static func method-for-signature(const methods::slots-t* methods, const signatur
     if (found-pair == nullptr) {
       *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count); // may be zero
       pair.element->next = nullptr;
-      sorted-array::add-at(&gbl-selectors-table, &pair, found-result.offset);
+      sorted-array::add-at(&gbl-selectors-table, found-result.offset, &pair);
     } else {
       *(selector-node->ptr) = *(found-pair->element->ptr);
       selector-node->next = found-pair->element;

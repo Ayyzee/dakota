@@ -24,11 +24,11 @@ KLASS_NS sorted_array {
   METHOD search(const slots_t* t, const void* key) -> result_t;
   METHOD sort(slots_t* t) -> slots_t*;
   METHOD symbolize(slots_t* t, const void* key) -> const void*;
-  METHOD at(const slots_t* t, ssize_t offset) -> const void*;
+  METHOD at(const slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;
   METHOD remove_last(slots_t* t) -> const void*;
 
   METHOD add(slots_t* t, const void* key) -> slots_t*;
   METHOD bsearch(const slots_t* t, const void* key) -> const void*;
-  METHOD remove_at(slots_t* t, const void* key, ssize_t offset) -> const void*;
-  METHOD add_at(slots_t* t, const void* key, ssize_t offset) -> slots_t*;
+  METHOD remove_at(slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;
+  METHOD add_at(slots_t* t, ssize_t offset, const void* key) -> slots_t*;
 }
