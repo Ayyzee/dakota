@@ -1317,6 +1317,9 @@ klass addr2name-pair {
 }
 static addr2name-pair-t[] named-instances = {
   { .addr = cast(ptr-t*)&null, .name = #null }, /// &object-t
+//{ .addr = cast(ptr-t*)&std-input,  .name = #std-input  }, /// &object-t
+//{ .addr = cast(ptr-t*)&std-output, .name = #std-output }, /// &object-t
+//{ .addr = cast(ptr-t*)&std-error,  .name = #std-error  }, /// &object-t
 };
 klass so-symbol-info {
   slots {
