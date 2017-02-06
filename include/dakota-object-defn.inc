@@ -22,6 +22,7 @@ REF_COUNTING_INLINE FUNC object_t::add_ref() -> void {
   if (this->object && this->object->ref_count != k_dealloc_initiated) {
     this->object->ref_count++;
   }
+  return;
 }
 REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
   if (this->object && this->object->ref_count != k_dealloc_initiated) {
@@ -37,7 +38,13 @@ REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
       this->object = dkt::dealloc(this->object);
     }
   }
+  return;
 }
+REF_COUNTING_INLINE FUNC object_t::has_exit_time_dtor() -> void {
+  this->add_ref();
+  return;
+}
+
 REF_COUNTING_INLINE FUNC object_t::operator ->() const -> object::slots_t* { return  this->object; }
 REF_COUNTING_INLINE FUNC object_t::operator *()  const -> object::slots_t& { return *this->object; }
 

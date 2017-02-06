@@ -25,6 +25,8 @@ struct [[_dkt_typeinfo_]] object_t {
   REF_COUNTING_INLINE FUNC add_ref()    -> void;
   REF_COUNTING_INLINE FUNC remove_ref() -> void;
 
+  REF_COUNTING_INLINE FUNC has_exit_time_dtor() -> void;
+
   explicit REF_COUNTING_INLINE operator object::slots_t*() const;
   explicit REF_COUNTING_INLINE operator ptr_t()            const;
   explicit REF_COUNTING_INLINE operator intptr_t()         const;
