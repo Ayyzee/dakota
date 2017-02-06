@@ -2120,7 +2120,7 @@ sub linkage_unit::generate_klasses_body_vars {
   }
   if ('klass' eq $klass_type) { # not a trait
     if (&is_src_decl() || &is_target_decl()) {
-      $$scratch_str_ref .= " extern $object_t _klass_ [[read-only]];";
+      $$scratch_str_ref .= " [[read-only]] extern $object_t _klass_;";
     } elsif (&is_target_defn()) {
       $$scratch_str_ref .= $pad . " $object_t _klass_ = nullptr;";
     }
