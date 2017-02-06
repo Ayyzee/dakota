@@ -131,15 +131,9 @@ klass json-parser {
           }
           break;
         }
-        case '=': {
-          c = json-parser::get(self);
-          if (c == EOF || c != '>') {
-            print-error(self.file, self.line, self.column - 2, "unknown token '='\n");
-            return null;
-          } else {
-            return $make(token::klass(), #tokenid: ':', #buffer: ":",
-                        #line: self.line, #column: self.column - 2);
-          }
+        case ':': {
+          return $make(token::klass(), #tokenid: ':', #buffer: ":",
+                       #line: self.line, #column: self.column - 1);
         }
         case '\'': {
           int64-t quote-type = '\'';
@@ -186,13 +180,14 @@ klass json-parser {
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':
 
+        case '-':
         case '_': {
           object-t token = $make(token::klass(), #tokenid: 'st', // 'st' should be 'idnt'
                                 #line: self.line, #column: self.column - 1);
           do {
             $append-char(token, cast(int64-t)c);
             c = json-parser::get(self);
-          } while (isalnum(c) || c == '_');
+          } while (isalnum(c) || c == '-' || c == '_');
           if (c != EOF)
             json-parser::putback(self, c);
           return token;
