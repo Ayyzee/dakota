@@ -612,7 +612,7 @@ sub generate_target_runtime {
     $col = &colin($col);
     $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
     foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
-      $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::_klass_ }," . $nl;
+      $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::_klass_ }, /// &object-t" . $nl;
     }
     $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
     $col = &colout($col);
