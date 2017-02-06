@@ -1525,8 +1525,6 @@ sub generate_generic_defn {
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
     $$scratch_str_ref .= $col . "static selector-t selector = selector($opt_va_prefix_method$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
-    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = signature($opt_va_prefix_method$generic_name($$new_arg_type_list)));" . ' // one time initialization' . $nl;
-    $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature);" . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
     } else {
@@ -1606,6 +1604,11 @@ sub generate_generic_func_defn {
   my ($generic, $is_inline, $col, $ns) = @_;
   my $generic_name = $$generic{'name'}[0];
   my $list_types_str_ref = &arg_type::list_types($$generic{'param-types'});
+  my $tmp = &deep_copy($$generic{'param-types'}[0]);
+  $$generic{'param-types'}[0] = $seq_object_t;
+  my $new_arg_type =            $$generic{'param-types'};
+  my $new_arg_type_list =   &arg_type::list_types($new_arg_type);
+  $$generic{'param-types'}[0] = $tmp;
   my $list_names = &arg_type::names($$generic{'param-types'});
   my $list_names_str =  &remove_extra_whitespace(join(', ', @$list_names));
   my $arg_list =  &arg_type::list_pair($$generic{'param-types'}, $list_names);
@@ -1613,11 +1616,13 @@ sub generate_generic_func_defn {
   my $in = &ident_comment($generic_name);
   my $opt_va_open = '';
   my $opt_va_prefix = '';
+  my $opt_va_prefix_method = '';
   my $opt_name_prefix = '$';
   my $opt_va_close = '';
   if (&is_va($generic)) {
     $opt_va_open = ' namespace $va {';
     $opt_va_prefix = '$va::';
+    $opt_va_prefix_method = 'va::';
     $opt_name_prefix = '';
     $opt_va_close = '}'
   }
@@ -1635,19 +1640,20 @@ sub generate_generic_func_defn {
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
+    $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = signature($opt_va_prefix_method$generic_name($$new_arg_type_list)));" . ' // one time initialization' . $nl;
+    $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature);" . $nl;
     if (&is_super($generic)) {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = context);" . $nl;
     } else {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = {nullptr, nullptr});" . $nl;
     }
     $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $opt_name_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
+    $$scratch_str_ref .= $col . $return_type_str . ' result = _func_(' . $list_names_str . ');' . $nl;
+    $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = nullptr);" . $nl;
     if (&is_super($generic)) {
-      $$scratch_str_ref .= $col . $return_type_str . ' result = _func_(' . $list_names_str . ');' . $nl;
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = {nullptr, nullptr});" . $nl;
-      $$scratch_str_ref .= $col . 'return result;' . $nl;
-    } else {
-      $$scratch_str_ref .= $col . 'return _func_(' . $list_names_str . ');' . $nl;
     }
+    $$scratch_str_ref .= $col . 'return result;' . $nl;
     $col = &colout($col);
     $$scratch_str_ref .= $col . '}' . $opt_va_close . $nl;
   }
