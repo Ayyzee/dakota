@@ -19,34 +19,22 @@
 FUNC $dealloc(object_t) -> object_t;
 const int_fast32_t k_dealloc_initiated = -1;
 REF_COUNTING_INLINE FUNC object_t::add_ref() -> void {
-  if (this->object && this->object->ref_count >= 0) {
-# if 1
-    if (getenv_int("DKT_ECHO_REF_COUNT"))
-      fprintf(stderr, "%p: %i++\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
-# endif
+  if (this->object && this->object->ref_count != k_dealloc_initiated) {
     this->object->ref_count++;
   }
 }
 REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
-  if (this->object && this->object->ref_count > 0) {
-    //assert(this->object->ref_count != 0);
-# if 1
-    if (getenv_int("DKT_ECHO_REF_COUNT"))
-      fprintf(stderr, "%p: %i--\n", cast(ptr_t)this->object, cast(int_fast32_t)this->object->ref_count);
-# endif
+  if (this->object && this->object->ref_count != k_dealloc_initiated) {
+    assert(this->object->ref_count != 0);
     this->object->ref_count--;
     if (this->object->ref_count == 0) {
       this->object->ref_count = k_dealloc_initiated;
 # if defined DEBUG
       echo_stuff(this->object, "dealloc");
 # endif
-      if (!getenv_int("SKIP_DEALLOC")) {
-        $dealloc(*this);
-        this->object->ref_count = -2;
-        this->object->klass = nullptr;
-        this->object = dkt::dealloc(this->object);
-      }
-      this->object = nullptr;
+      $dealloc(*this);
+      this->object->klass = nullptr;
+      this->object = dkt::dealloc(this->object);
     }
   }
 }

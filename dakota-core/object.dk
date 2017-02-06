@@ -28,6 +28,7 @@ klass resource-usage;
 klass object-output-stream;
 klass output-stream;
 klass unbox-illegal-klass-exception;
+# if defined DEBUG
 static func echo-stuff-common(object::slots-t* instance, str-t action, symbol-t kls-name, symbol-t instance-name = nullptr) -> void {
   if (instance-name)
     fprintf(stderr, "%p %s #instance-of %s #name %s\n", cast(ptr-t)instance, action, kls-name, instance-name);
@@ -46,6 +47,7 @@ func echo-stuff(object::slots-t* instance, str-t action, symbol-t kls-name, symb
     echo-stuff-common(instance, action, kls-name, instance-name);
   return;
 }
+# endif
 klass object {
   slots {
     object-t                  klass;
