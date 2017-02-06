@@ -933,9 +933,13 @@ sub rewrite_include_fors {
   my $h =  &header_file_regex();
   $$filestr_ref =~ s=^include-for(\s*)(<$h+>|"$h+")(.*?);=# include$1$2 /*$3 */=gsm;
 }
+#                     weak-object-t <ident> =
+# =>
+# object-t _<ident>_; weak-object-t <ident> = _<ident>_ =
 sub rewrite_weak_objects {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/\[\[\s*weak\s*\]\](\s*)object-t/$1weak-object-t/g;
+  $$filestr_ref =~ s/(weak-object-t\s+($id)\s*=)/object-t _$2_; $1 _$2_ =/g;
 }
 #sub convert_types_to_include {
 #  my ($filestr_ref) = @_;
