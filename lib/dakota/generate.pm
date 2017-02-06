@@ -1526,11 +1526,10 @@ sub generate_generic_defn {
     $$scratch_str_ref .= $col . "typealias func-t = func (*)($$new_arg_type_list) -> $return_type;" . ' // no runtime cost' . $nl;
     $$scratch_str_ref .= $col . "static selector-t selector = selector($opt_va_prefix_method$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
     $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = signature($opt_va_prefix_method$generic_name($$new_arg_type_list)));" . ' // one time initialization' . $nl;
+    $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature);" . $nl;
     if (&is_super($generic)) {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = context); dkt-current-context.object.add-ref(); dkt-current-context.klass.add-ref();" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
     } else {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = {nullptr, nullptr});" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(klass-of(o)).methods.addrs[selector];" . $nl;
     }
     my $arg_names_list;
@@ -1636,8 +1635,19 @@ sub generate_generic_func_defn {
     $$scratch_str_ref .= $col . $part . " {" . $in . &ann(__FILE__, __LINE__) . $nl;
     $col = &colin($col);
     $$scratch_str_ref .= $col . "typealias func-t = func (\*)($$list_types_str_ref) -> $return_type_str;" . ' // no runtime cost' . $nl;
+    if (&is_super($generic)) {
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = context);" . $nl;
+    } else {
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = {nullptr, nullptr});" . $nl;
+    }
     $$scratch_str_ref .= $col . 'func-t _func_ = cast(func-t)GENERIC-FUNC-PTR(' . $opt_va_prefix . $opt_name_prefix . $generic_name . '(' . $$list_types_str_ref . '));' . $nl;
-    $$scratch_str_ref .= $col . 'return _func_(' . $list_names_str . ');' . $nl;
+    if (&is_super($generic)) {
+      $$scratch_str_ref .= $col . $return_type_str . ' result = _func_(' . $list_names_str . ');' . $nl;
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-context = {nullptr, nullptr});" . $nl;
+      $$scratch_str_ref .= $col . 'return result;' . $nl;
+    } else {
+      $$scratch_str_ref .= $col . 'return _func_(' . $list_names_str . ');' . $nl;
+    }
     $col = &colout($col);
     $$scratch_str_ref .= $col . '}' . $opt_va_close . $nl;
   }
