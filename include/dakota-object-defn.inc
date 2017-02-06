@@ -43,7 +43,7 @@ REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
       if (!getenv_int("SKIP_DEALLOC")) {
         $dealloc(*this);
         this->object->ref_count = -2;
-        //this->object->klass = nullptr;
+        this->object->klass = nullptr;
         this->object = dkt::dealloc(this->object);
       }
       this->object = nullptr;

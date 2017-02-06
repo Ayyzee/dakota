@@ -1527,7 +1527,7 @@ sub generate_generic_defn {
     $$scratch_str_ref .= $col . "static selector-t selector = selector($opt_va_prefix_method$generic_name($$new_arg_type_list));" . ' // one time initialization' . $nl;
     $$scratch_str_ref .= $col . "DEBUG-STMT(static const signature-t* signature = signature($opt_va_prefix_method$generic_name($$new_arg_type_list)));" . ' // one time initialization' . $nl;
     if (&is_super($generic)) {
-      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = context);" . $nl;
+      $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = context); dkt-current-context.object.add-ref(); dkt-current-context.klass.add-ref();" . $nl;
       $$scratch_str_ref .= $col . "func-t _func_ = cast(func-t)klass::unbox(superklass-of(context.klass)).methods.addrs[selector];" . $nl;
     } else {
       $$scratch_str_ref .= $col . "DEBUG-STMT(dkt-current-signature = signature; dkt-current-context = {nullptr, nullptr});" . $nl;
