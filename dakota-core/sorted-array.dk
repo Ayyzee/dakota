@@ -28,7 +28,7 @@ module dakota-core;
 klass result;
 klass std-compare;
 
-klass sorted-array {
+klass sorted-set-core {
   slots {
     ptr-t         elements;
     ssize-t       count;
@@ -155,7 +155,7 @@ klass sorted-array {
       add-at(t, result.offset, key);
     return t;
   }
-  func symbolize(slots-t* t, const void* key) -> const void* {
+  func intern(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
     const void* element = key;
     result-t result = at(t, key);

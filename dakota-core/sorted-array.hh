@@ -16,19 +16,18 @@
 
 # pragma once
 
-KLASS_NS sorted_array {
+KLASS_NS sorted_set_core {
   FUNC   create(slots_t* slots, ssize_t capacity, ssize_t size, std_compare_t compare, bool_t is_ptr) -> slots_t*;
   FUNC   create(ssize_t capacity, ssize_t size, std_compare_t compare, bool_t is_ptr) -> slots_t*;
   FUNC   destroy(slots_t* slots) -> std::nullptr_t;
 
   METHOD at(const slots_t* t, const void* key) -> result_t;
-  METHOD sort(slots_t* t) -> slots_t*;
-  METHOD symbolize(slots_t* t, const void* key) -> const void*;
   METHOD at(const slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;
+  METHOD sort(slots_t* t) -> slots_t*;
+  METHOD intern(slots_t* t, const void* key) -> const void*;
   METHOD remove_last(slots_t* t) -> const void*;
 
   METHOD add(slots_t* t, const void* key) -> slots_t*;
-  METHOD bsearch(const slots_t* t, const void* key) -> const void*;
   METHOD remove_at(slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;
   METHOD add_at(slots_t* t, ssize_t offset, const void* key) -> slots_t*;
 }

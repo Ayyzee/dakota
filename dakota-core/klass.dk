@@ -63,7 +63,7 @@ klass object-output-stream;
 klass property;
 klass result;
 klass selector-node;
-klass sorted-array;
+klass sorted-set-core;
 klass std-compare;
 klass symbol;
 klass vector;
@@ -94,7 +94,7 @@ klass selector-pair {
 }
 static const int64-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
-static sorted-array-t gbl-selectors-table = { .elements = gbl-selectors,
+static sorted-set-core-t gbl-selectors-table = { .elements = gbl-selectors,
                                               .count =    0,
                                               .capacity = scountof(gbl-selectors),
                                               .size =     ssizeof(gbl-selectors[0]),
@@ -128,7 +128,7 @@ static func default-superklass() -> object-t {
 }
 static func selector-for-signature(const signature-t* signature) -> selector-t {
   selector-pair-t pair = { .key = signature, .element = nullptr };
-  result-t pair-result = sorted-array::at(&gbl-selectors-table, &pair);
+  result-t pair-result = sorted-set-core::at(&gbl-selectors-table, &pair);
   selector-pair-t* found-pair = cast(decltype(found-pair))pair-result.element;
   selector-t selector = *(found-pair->element->ptr);
   return selector;
@@ -151,13 +151,13 @@ static func method-for-signature(const methods::slots-t* methods, const signatur
     if (signature == nullptr)
       break;
     selector-pair-t pair = { .key = signature, .element = selector-node };
-    result-t found-result = sorted-array::at(&gbl-selectors-table, &pair);
+    result-t found-result = sorted-set-core::at(&gbl-selectors-table, &pair);
     selector-pair-t* found-pair = cast(decltype(found-pair))found-result.element;
 
     if (found-pair == nullptr) {
       *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count); // may be zero
       pair.element->next = nullptr;
-      sorted-array::add-at(&gbl-selectors-table, found-result.offset, &pair);
+      sorted-set-core::add-at(&gbl-selectors-table, found-result.offset, &pair);
     } else {
       *(selector-node->ptr) = *(found-pair->element->ptr);
       selector-node->next = found-pair->element;

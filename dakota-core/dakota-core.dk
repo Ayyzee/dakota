@@ -193,8 +193,8 @@ export dakota-core {
   singleton-klass;
   size::slots-t;
   size;
-  sorted-array::slots-t;
-  sorted-array;
+  sorted-set-core::slots-t;
+  sorted-set-core;
   sorted-counted-set;
   sorted-set;
   sorted-table;

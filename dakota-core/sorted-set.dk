@@ -28,7 +28,7 @@ klass exception;
 klass equals;
 klass object-output-stream;
 klass result;
-klass sorted-array;
+klass sorted-set-core;
 klass std-compare;
 
 klass sorted-set {
@@ -37,8 +37,8 @@ klass sorted-set {
   trait set;
 
   slots {
-    sorted-array::slots-t sa;
-    ssize-t               iterator-state;
+    sorted-set-core::slots-t sa;
+    ssize-t                  iterator-state;
   }
   // 'elements' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
@@ -53,11 +53,11 @@ klass sorted-set {
     assert(0 < initial-capacity);
     self = $init(super);
     bool-t is-ptr;
-    sorted-array::create(&self.sa,
-                         initial-capacity,
-                         ssizeof(object-t),
-                         cast(std-compare-t)compare,
-                         is-ptr = false);
+    sorted-set-core::create(&self.sa,
+                            initial-capacity,
+                            ssizeof(object-t),
+                            cast(std-compare-t)compare,
+                            is-ptr = false);
     self.iterator-state = 0;
 
     if (elements != nullptr)
@@ -69,18 +69,18 @@ klass sorted-set {
   }
   method dealloc(object-t self) -> object-t {
     $empty(self);
-    //sorted-array::destroy(self.sa.elements);
+    //sorted-set-core::destroy(self.sa.elements);
     return $dealloc(super);
   }
   method add(object-t self, object-t element) -> object-t {
     object-t result = element;
     self.iterator-state++;
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-array::at(&self.sa, element-ptr);
+    result-t found-result = sorted-set-core::at(&self.sa, element-ptr);
 
     if (found-result.element == nullptr) {
       element.add-ref();
-      sorted-array::add-at(&self.sa, found-result.offset, element-ptr);
+      sorted-set-core::add-at(&self.sa, found-result.offset, element-ptr);
     }
     else
       result = *(cast(object-t*)found-result.element);
@@ -88,7 +88,7 @@ klass sorted-set {
   }
   method empty(object-t self) -> object-t {
     while (self.sa.count != 0) {
-      object-t element = *(cast(object-t*)sorted-array::remove-last(&self.sa));
+      object-t element = *(cast(object-t*)sorted-set-core::remove-last(&self.sa));
       element.remove-ref();
     }
     self.iterator-state++;
@@ -97,11 +97,11 @@ klass sorted-set {
   method in(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-array::at(&self.sa, element-ptr);
+    result-t found-result = sorted-set-core::at(&self.sa, element-ptr);
 
     if (found-result.element != nullptr)
-      result = *(cast(object-t*)sorted-array::at(&self.sa,
-                                                 found-result.offset, element-ptr)); // element-ptr is optional
+      result = *(cast(object-t*)sorted-set-core::at(&self.sa,
+                                                    found-result.offset, element-ptr)); // element-ptr is optional
     return result;
   }
   method in(object-t self, object-t element) -> object-t {
@@ -124,13 +124,13 @@ klass sorted-set {
   }
   method remove(object-t self, object-t element) -> object-t {
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-array::at(&self.sa, element-ptr);
+    result-t found-result = sorted-set-core::at(&self.sa, element-ptr);
     object-t prev-element = nullptr;
 
     if (found-result.element != nullptr) {
       self.iterator-state++;
-      prev-element = *(cast(object-t*)sorted-array::remove-at(&self.sa,
-                                                              found-result.offset, element-ptr)); // element-ptr is optional
+      prev-element = *(cast(object-t*)sorted-set-core::remove-at(&self.sa,
+                                                                 found-result.offset, element-ptr)); // element-ptr is optional
       prev-element.remove-ref();
     }
     return prev-element; // returns nullptr on error
@@ -139,7 +139,7 @@ klass sorted-set {
     object-t prev-element = nullptr;
     if (self.sa.count != 0) {
       self.iterator-state++;
-      prev-element = *(cast(object-t*)sorted-array::remove-last(&self.sa));
+      prev-element = *(cast(object-t*)sorted-set-core::remove-last(&self.sa));
       prev-element.remove-ref();
     }
     return prev-element; // returns nullptr on error
@@ -233,7 +233,7 @@ klass sorted-set-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-      element = *(cast(object-t*)sorted-array::at(&ss.sa, self.offset));
+      element = *(cast(object-t*)sorted-set-core::at(&ss.sa, self.offset));
       assert(element != nullptr);
     }
     return element; // returns nullptr on error

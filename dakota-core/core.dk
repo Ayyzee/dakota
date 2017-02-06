@@ -63,8 +63,7 @@ klass sigbus-exception;
 klass sigsegv-exception;
 klass signal-exception;
 klass singleton-klass;
-klass sorted-array;
-klass sorted-array;
+klass sorted-set-core;
 klass std-compare;
 klass str128;
 klass stream;
@@ -129,10 +128,10 @@ klass named-assoc-node {
 //     return s;
 //   }
 }
-static sorted-array-t* gbl-imported-klasses-table;
-static sorted-array-t* gbl-klass-defns-table;
-static sorted-array-t* gbl-interposers-table;
-static sorted-array-t* gbl-imported-klasses-file-table;
+static sorted-set-core-t* gbl-imported-klasses-table;
+static sorted-set-core-t* gbl-klass-defns-table;
+static sorted-set-core-t* gbl-interposers-table;
+static sorted-set-core-t* gbl-imported-klasses-file-table;
 
 static func symbol-str-compare(symbol-t s1, str-t s2) -> cmp-t {
   cmp-t result = 0;
@@ -147,29 +146,29 @@ static func init-runtime-ds() -> void {
 
   bool-t is-ptr;
   gbl-imported-klasses-table =
-    sorted-array::create(num-klasses,
-                         ssizeof(named-assoc-node::slots-t),
-                         cast(std-compare-t)
-                         cast(named-assoc-node-compare-t)named-assoc-node::compare,
-                         is-ptr = false);
+    sorted-set-core::create(num-klasses,
+                            ssizeof(named-assoc-node::slots-t),
+                            cast(std-compare-t)
+                            cast(named-assoc-node-compare-t)named-assoc-node::compare,
+                            is-ptr = false);
   gbl-klass-defns-table =
-    sorted-array::create(num-klasses,
-                         ssizeof(named-info::slots-t*),
-                         cast(std-compare-t)
-                         cast(named-info-compare-t)named-info::compare,
-                         is-ptr = true);
+    sorted-set-core::create(num-klasses,
+                            ssizeof(named-info::slots-t*),
+                            cast(std-compare-t)
+                            cast(named-info-compare-t)named-info::compare,
+                            is-ptr = true);
   gbl-interposers-table =
-    sorted-array::create(num-klasses,
-                         ssizeof(property::slots-t),
-                         cast(std-compare-t)
-                         cast(property-compare-t)property::compare,
-                         is-ptr = false);
+    sorted-set-core::create(num-klasses,
+                            ssizeof(property::slots-t),
+                            cast(std-compare-t)
+                            cast(property-compare-t)property::compare,
+                            is-ptr = false);
   gbl-imported-klasses-file-table =
-    sorted-array::create(num-klasses,
-                         ssizeof(symbol-t),
-                         cast(std-compare-t)
-                         cast(symbol-compare-t)symbol-str-compare,
-                         is-ptr = true);
+    sorted-set-core::create(num-klasses,
+                            ssizeof(symbol-t),
+                            cast(std-compare-t)
+                            cast(symbol-compare-t)symbol-str-compare,
+                            is-ptr = true);
   return;
 }
 # if defined DKT-DUMP-MEM-FOOTPRINT
@@ -188,7 +187,7 @@ klass x::stat {
 [[unused]] static func init-imported-klasses() -> void {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':[]", __func__);
   symbol-t imported-kls-name;
-  while ((imported-kls-name = cast(symbol-t)sorted-array::remove-last(gbl-imported-klasses-file-table)) != nullptr)
+  while ((imported-kls-name = cast(symbol-t)sorted-set-core::remove-last(gbl-imported-klasses-file-table)) != nullptr)
     dk-klass-for-name(imported-kls-name);
   return;
 }
@@ -346,12 +345,12 @@ klass ostream {
   }
 }
 # if 1
-extern sorted-array-t gbl-selectors-table;
-static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
+extern sorted-set-core-t gbl-selectors-table;
+static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> void {
   ssize-t klasses-count = 0;
   ssize-t methods-count = 0;
   for (ssize-t i = 0; i < klass-defns-table->count; i++) {
-    named-info-t* kls-info = *cast(named-info-t**)sorted-array::at(klass-defns-table, i);
+    named-info-t* kls-info = *cast(named-info-t**)sorted-set-core::at(klass-defns-table, i);
     named-info-t* current-info = kls-info;
 
     do {
@@ -382,13 +381,13 @@ static func json-dump-resource-info(sorted-array-t* klass-defns-table) -> void {
 }
 # endif
 
-static func json-dump-klass-defns(sorted-array-t* klass-defns-table) -> void {
+static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table) -> void {
   ostream-t ostrm = { .output = stdout, .col = 0 };
   ostream::println-format(ostrm, "{\n");
   ostream::col-incr(ostrm);
 
   for (ssize-t i = 0; i < klass-defns-table->count; i++) {
-    named-info-t* kls-info = *cast(named-info-t**)sorted-array::at(klass-defns-table, i);
+    named-info-t* kls-info = *cast(named-info-t**)sorted-set-core::at(klass-defns-table, i);
     named-info-t* current-info = kls-info;
 
     do {
@@ -559,19 +558,19 @@ static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, kls-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { .name = kls-name, .node = node };
-  result-t found-result = sorted-array::at(gbl-imported-klasses-table, &named-node);
+  result-t found-result = sorted-set-core::at(gbl-imported-klasses-table, &named-node);
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))found-result.element;
 
   if (found-named-node == nullptr) {
     named-node.node->next = nullptr;
-    sorted-array::add-at(gbl-imported-klasses-table, found-result.offset, &named-node);
-    sorted-array::add(gbl-imported-klasses-file-table, kls-name);
+    sorted-set-core::add-at(gbl-imported-klasses-table, found-result.offset, &named-node);
+    sorted-set-core::add(gbl-imported-klasses-file-table, kls-name);
   } else {
     node->next = found-named-node->node;
     found-named-node->node = node;
 
     if (found-named-node->node == nullptr)
-      sorted-array::add(gbl-imported-klasses-file-table, kls-name);
+      sorted-set-core::add(gbl-imported-klasses-file-table, kls-name);
   }
   return;
 }
@@ -607,11 +606,11 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
     assert(type == #klass);
     add-interpose-prop(interpose-name, name);
   }
-  result-t found-result = sorted-array::at(gbl-klass-defns-table, kls-info);
+  result-t found-result = sorted-set-core::at(gbl-klass-defns-table, kls-info);
   named-info-t* found-kls-info = cast(decltype(found-kls-info))found-result.element;
 
   if (found-kls-info == nullptr) {
-    sorted-array::add-at(gbl-klass-defns-table, found-result.offset, kls-info);
+    sorted-set-core::add-at(gbl-klass-defns-table, found-result.offset, kls-info);
   } else {
     assert(kls-info->next == nullptr);
     named-info-t* prev = found-kls-info->next;
@@ -637,7 +636,7 @@ static func export-klasses(named-info-t* kls-info) -> void {
 }
 /*LOCAL*/ func interposer-name-for-klass-name(symbol-t kls-name) -> symbol-t {
   property-t key = { .key = kls-name, .element = cast(intptr-t)nullptr };
-  result-t assoc-result = sorted-array::at(gbl-interposers-table, &key);
+  result-t assoc-result = sorted-set-core::at(gbl-interposers-table, &key);
   property-t* assoc-ptr = cast(decltype(assoc-ptr))assoc-result.element;
   symbol-t result;
 
@@ -655,7 +654,7 @@ static func export-klasses(named-info-t* kls-info) -> void {
 /*LOCAL*/ func add-interpose-prop(symbol-t key, symbol-t element) -> void {
 //   dkt-log(dkt::k-log-info, "%s(%s, %s)", __func__, key, element);
   property-t prop = { .key = key, .element = cast(intptr-t)element };
-  sorted-array::add(gbl-interposers-table, &prop);
+  sorted-set-core::add(gbl-interposers-table, &prop);
   return;
 }
 static func add-interposers(property-t* interposers) -> void {
@@ -804,7 +803,7 @@ func dk-init-runtime() -> void {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, kls-name);
   named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
-  result-t node-result = sorted-array::at(gbl-imported-klasses-table, &named-node); // hackhack
+  result-t node-result = sorted-set-core::at(gbl-imported-klasses-table, &named-node); // hackhack
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))node-result.element;
   assoc-node-t* result;
 
@@ -1629,7 +1628,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
   assert-valid-str(kls-name);
   property-t[] properties = { { .key = #name, .element = cast(intptr-t)kls-name } };
   named-info-t info = { .next = nullptr, .count = scountof(properties), .elements = properties };
-  result-t info-result = sorted-array::at(gbl-klass-defns-table, &info);
+  result-t info-result = sorted-set-core::at(gbl-klass-defns-table, &info);
   named-info-t* kls-info = cast(decltype(kls-info))info-result.element;
 
   if (kls-info == nullptr) {
@@ -1670,15 +1669,15 @@ func dk-symbolize(str-t key) -> symbol-t {
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
   // start with half a page (4096/2 bytes) of symbolize memory
   bool-t is-ptr;
-  static sorted-array-t* symbolize-array = sorted-array::create((4096/2)/sizeof(symbol-t),
-                                                             ssizeof(symbol-t),
-                                                             cast(std-compare-t)
-                                                             cast(symbol-compare-t)symbol-str-compare,
-                                                             is-ptr = true);
+  static sorted-set-core-t* symbolize-array = sorted-set-core::create((4096/2)/sizeof(symbol-t),
+                                                                      ssizeof(symbol-t),
+                                                                      cast(std-compare-t)
+                                                                      cast(symbol-compare-t)symbol-str-compare,
+                                                                      is-ptr = true);
 # if 0
   symbol-t val = key;
 # else
-  symbol-t val = cast(symbol-t)sorted-array::symbolize(symbolize-array, cast(const void*)(key));
+  symbol-t val = cast(symbol-t)sorted-set-core::intern(symbolize-array, cast(const void*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 # endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);
