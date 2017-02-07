@@ -71,7 +71,7 @@ klass sorted-set-core {
   }
 
   //(-(insertion point) - 1)
-  func at(const slots-t* t, const void* key) -> result-t {
+  func result-at(const slots-t* t, const void* key) -> result-t {
     assert(key != nullptr);
 
     result-t result = { .element = nullptr, .offset = -1 };
@@ -149,7 +149,7 @@ klass sorted-set-core {
   }
   func remove(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
-    result-t result = at(t, key);
+    result-t result = result-at(t, key);
     const void* element = remove-at(t, result.offset, result.element);
     return element;
   }
@@ -172,7 +172,7 @@ klass sorted-set-core {
   func add(slots-t* t, const void* key) -> slots-t* {
     assert(key != nullptr);
 
-    result-t result = at(t, key);
+    result-t result = result-at(t, key);
     if (result.element == nullptr)
       add-at(t, result.offset, key);
     return t;
@@ -180,7 +180,7 @@ klass sorted-set-core {
   func intern(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
     const void* element = key;
-    result-t result = at(t, key);
+    result-t result = result-at(t, key);
 
     if (result.element != nullptr)
       element = result.element;

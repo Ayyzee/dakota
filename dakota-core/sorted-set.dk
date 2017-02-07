@@ -76,7 +76,7 @@ klass sorted-set {
     object-t result = element;
     self.iterator-state++;
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-set-core::at(&self.sa, element-ptr);
+    result-t found-result = sorted-set-core::result-at(&self.sa, element-ptr);
 
     if (found-result.element == nullptr) {
       element.add-ref();
@@ -97,7 +97,7 @@ klass sorted-set {
   method in(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-set-core::at(&self.sa, element-ptr);
+    result-t found-result = sorted-set-core::result-at(&self.sa, element-ptr);
 
     if (found-result.element != nullptr)
       result = *(cast(object-t*)sorted-set-core::at(&self.sa,
@@ -124,7 +124,7 @@ klass sorted-set {
   }
   method remove(object-t self, object-t element) -> object-t {
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-set-core::at(&self.sa, element-ptr);
+    result-t found-result = sorted-set-core::result-at(&self.sa, element-ptr);
     object-t prev-element = nullptr;
 
     if (found-result.element != nullptr) {

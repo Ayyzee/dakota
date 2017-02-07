@@ -558,7 +558,7 @@ static func import-klass(symbol-t kls-name, assoc-node-t* node) -> void {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s','%p']", __func__, kls-name, cast(ptr-t)(node));
   named-assoc-node-t named-node = { .name = kls-name, .node = node };
-  result-t found-result = sorted-set-core::at(gbl-imported-klasses-table, &named-node);
+  result-t found-result = sorted-set-core::result-at(gbl-imported-klasses-table, &named-node);
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))found-result.element;
 
   if (found-named-node == nullptr) {
@@ -606,7 +606,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
     assert(type == #klass);
     add-interpose-prop(interpose-name, name);
   }
-  result-t found-result = sorted-set-core::at(gbl-klass-defns-table, kls-info);
+  result-t found-result = sorted-set-core::result-at(gbl-klass-defns-table, kls-info);
   named-info-t* found-kls-info = cast(decltype(found-kls-info))found-result.element;
 
   if (found-kls-info == nullptr) {
@@ -636,7 +636,7 @@ static func export-klasses(named-info-t* kls-info) -> void {
 }
 /*LOCAL*/ func interposer-name-for-klass-name(symbol-t kls-name) -> symbol-t {
   property-t key = { .key = kls-name, .element = cast(intptr-t)nullptr };
-  result-t assoc-result = sorted-set-core::at(gbl-interposers-table, &key);
+  result-t assoc-result = sorted-set-core::result-at(gbl-interposers-table, &key);
   property-t* assoc-ptr = cast(decltype(assoc-ptr))assoc-result.element;
   symbol-t result;
 
@@ -803,7 +803,7 @@ func dk-init-runtime() -> void {
   assert-valid-str(kls-name);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, kls-name);
   named-assoc-node-t named-node = { .name = kls-name, .node = nullptr };
-  result-t node-result = sorted-set-core::at(gbl-imported-klasses-table, &named-node); // hackhack
+  result-t node-result = sorted-set-core::result-at(gbl-imported-klasses-table, &named-node); // hackhack
   named-assoc-node-t* found-named-node = cast(decltype(found-named-node))node-result.element;
   assoc-node-t* result;
 
@@ -1628,7 +1628,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
   assert-valid-str(kls-name);
   property-t[] properties = { { .key = #name, .element = cast(intptr-t)kls-name } };
   named-info-t info = { .next = nullptr, .count = scountof(properties), .elements = properties };
-  result-t info-result = sorted-set-core::at(gbl-klass-defns-table, &info);
+  result-t info-result = sorted-set-core::result-at(gbl-klass-defns-table, &info);
   named-info-t* kls-info = cast(decltype(kls-info))info-result.element;
 
   if (kls-info == nullptr) {
