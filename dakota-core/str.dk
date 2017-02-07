@@ -62,6 +62,14 @@ klass str {
   //   //
   //   return self;
   // }
+  method length(object-t self) -> ssize-t {
+    ssize-t result = cast(ssize-t)safe-strlen(unbox(self));
+    return result;
+  }
+  method intern(slots-t s) -> symbol-t {
+    symbol-t result = dk-intern(s);
+    return result;
+  }
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p { slots=\"%s\" }\n",
