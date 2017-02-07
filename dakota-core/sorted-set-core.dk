@@ -157,6 +157,18 @@ klass sorted-set-core {
     const void* element = remove-at(t, 0);
     return element;
   }
+  func first(slots-t* t) -> const void* {
+    ssize-t offset;
+    const void* element = at(t, offset = 0); // returns nullptr when empty
+    return element;
+  }
+  func last(slots-t* t) -> const void* {
+    const void* element = nullptr;
+    ssize-t offset;
+    if (t->count != 0)
+      element = at(t, offset = t->count - 1);
+    return element;
+  }
   func add(slots-t* t, const void* key) -> slots-t* {
     assert(key != nullptr);
 
