@@ -35,13 +35,16 @@ klass sorted-set-core {
     ssize-t       capacity;
     ssize-t       size;
     std-compare-t compare;
-    bool-t       is-ptr;
+    bool-t        is-ptr;
   }
-  func create(slots-t*      slots,
-              ssize-t       capacity,
+  func create(ssize-t       capacity,
               ssize-t       size,
               std-compare-t compare,
-              bool-t       is-ptr) -> slots-t* {
+              bool-t        is-ptr) -> slots-t* {
+    assert(capacity > 0);
+    assert(size > 0);
+    assert(compare != nullptr);
+    slots-t* slots = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
     slots->elements = cast(ptr-t)dkt::alloc(size * capacity);
     slots->count =    0;
     slots->capacity = capacity;
@@ -50,19 +53,9 @@ klass sorted-set-core {
     slots->is-ptr =   is-ptr;
     return slots;
   }
-  func create(ssize-t       capacity,
-              ssize-t       size,
-              std-compare-t compare,
-              bool-t       is-ptr) -> slots-t* {
-    assert(0 < capacity);
-    assert(0 < size);
-    assert(compare != nullptr);
-    slots-t* slots = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
-    create(slots, capacity, size, compare, is-ptr);
-    return slots;
-  }
   func destroy(slots-t* slots) -> std::nullptr-t {
     slots->elements = dkt::dealloc(slots->elements);
+    slots =           dkt::dealloc(slots);
     return nullptr;
   }
   func sort(slots-t* t) -> slots-t* {
