@@ -231,8 +231,8 @@ klass sorted-set-forward-iterator {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
-      const sorted-set::slots-t* ss = &sorted-set::unbox(self.sorted-set);
-      element = *(cast(object-t*)sorted-set-core::at(ss->sa, self.offset));
+      const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
+      element = *(cast(object-t*)sorted-set-core::at(ss.sa, self.offset));
       assert(element != nullptr);
     }
     return element; // returns nullptr on error
