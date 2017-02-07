@@ -25,6 +25,8 @@ KLASS_NS sorted_set_core {
   METHOD at(const slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;
   METHOD sort(slots_t* t) -> slots_t*;
   METHOD intern(slots_t* t, const void* key) -> const void*;
+  METHOD remove(slots_t* t, const void* key) -> const void*;
+  METHOD remove_first(slots_t* t) -> const void*;
   METHOD remove_last(slots_t* t) -> const void*;
 
   METHOD add(slots_t* t, const void* key) -> slots_t*;
