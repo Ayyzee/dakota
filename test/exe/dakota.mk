@@ -18,7 +18,8 @@ target := $(target-base)
 all: $(target)
 
 $(target-base).dk: 
-	echo "klass hashed-table; func main() -> int-t { object-t o = \$$make(hashed-table::klass()); USE(o); EXIT(0); }" > $@
+	echo "# include \"test.hh\"" > $@
+	echo "klass sorted-table; func main() -> int-t { object-t o = \$$make(sorted-table::klass()); USE(o); EXIT(0); }" >> $@
 
 dakota.project: $(target-base).dk
 	$(DAKOTA-BASE) --create-project $@ --output $(target) $^
