@@ -1656,20 +1656,20 @@ func dk-klass-for-name(symbol-t name) -> object-t {
   }
   return kls-info; // rnielsen: should have only one return per func
 }
-// dk-symbolize needs to be able to be used **early** in the static initialization sequence.
-func dk-symbolize-free(str-t key) -> symbol-t {
-  symbol-t result = dk-symbolize(key);
+// dk-intern needs to be able to be used **early** in the static initialization sequence.
+func dk-intern-free(str-t key) -> symbol-t {
+  symbol-t result = dk-intern(key);
   if (result != key)
     free(cast(ptr-t)key);
   return result;
 }
-func dk-symbolize(str-t key) -> symbol-t {
+func dk-intern(str-t key) -> symbol-t {
   assert(key != nullptr);
   assert(key[0] != NUL);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%s']", __func__, key);
-  // start with half a page (4096/2 bytes) of symbolize memory
+  // start with half a page (4096/2 bytes) of intern memory
   bool-t is-ptr;
-  static sorted-set-core-t* symbolize-array = sorted-set-core::create((4096/2)/sizeof(symbol-t),
+  static sorted-set-core-t* intern-array = sorted-set-core::create((4096/2)/sizeof(symbol-t),
                                                                       ssizeof(symbol-t),
                                                                       cast(std-compare-t)
                                                                       cast(symbol-compare-t)symbol-str-compare,
@@ -1677,7 +1677,7 @@ func dk-symbolize(str-t key) -> symbol-t {
 # if 0
   symbol-t val = key;
 # else
-  symbol-t val = cast(symbol-t)sorted-set-core::add(symbolize-array, cast(const void*)(key));
+  symbol-t val = cast(symbol-t)sorted-set-core::add(intern-array, cast(const void*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 # endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);

@@ -69,8 +69,8 @@ klass string {
       self.len = cast(ssize-t)safe-strlen(self.ptr);
     return self.len;
   }
-  method symbolize(object-t self) -> symbol-t {
-    symbol-t result = dk-symbolize(cast(symbol-t)(self.ptr));
+  method intern(object-t self) -> symbol-t {
+    symbol-t result = dk-intern(cast(symbol-t)(self.ptr));
     return result;
   }
   method write-lite(object-t self, object-t out) -> object-t {
