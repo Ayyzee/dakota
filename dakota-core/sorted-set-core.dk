@@ -120,19 +120,16 @@ klass sorted-set-core {
     t->count++;
     return t;
   }
-  func at(const slots-t* t, ssize-t offset, const void* key) -> const void* { // key is optional
+  func at(const slots-t* t, ssize-t offset) -> const void* {
     assert(0 <= offset);
     assert(offset < t->count);
     assert(0 < t->count);
 
     const void* element = deref(t, cast(const void*)(cast(uint8-t*)(t->elements) + (t->size * offset)));
-    if (key != nullptr)
-      assert(t->compare(element, key) == 0);
     return element;
   }
   
-  func remove-at(slots-t* t, ssize-t offset, const void* key) -> const void* { // key is optional
-    assert(key != nullptr);
+  func remove-at(slots-t* t, ssize-t offset) -> const void* {
     assert(0 <= offset);
     assert(offset < t->count);
     assert(0 < t->count);
@@ -141,8 +138,6 @@ klass sorted-set-core {
     memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
             cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
             cast(size-t)((t->count - offset - 1) * t->size)); // this arg may be zero
-    if (key != nullptr)
-      assert(t->compare(element, key) == 0);
     memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, cast(size-t)t->size);
     t->count--;
     return element;
@@ -150,7 +145,7 @@ klass sorted-set-core {
   func remove(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
     result-t result = result-at(t, key);
-    const void* element = remove-at(t, result.offset, result.element);
+    const void* element = remove-at(t, result.offset);
     return element;
   }
   func remove-first(slots-t* t) -> const void* {

@@ -101,7 +101,7 @@ klass sorted-set {
 
     if (found-result.element != nullptr)
       result = *(cast(object-t*)sorted-set-core::at(&self.sa,
-                                                    found-result.offset, element-ptr)); // element-ptr is optional
+                                                    found-result.offset));
     return result;
   }
   method in(object-t self, object-t element) -> object-t {
@@ -130,7 +130,7 @@ klass sorted-set {
     if (found-result.element != nullptr) {
       self.iterator-state++;
       prev-element = *(cast(object-t*)sorted-set-core::remove-at(&self.sa,
-                                                                 found-result.offset, element-ptr)); // element-ptr is optional
+                                                                 found-result.offset));
       prev-element.remove-ref();
     }
     return prev-element; // returns nullptr on error

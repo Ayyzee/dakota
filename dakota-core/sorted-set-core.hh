@@ -22,7 +22,7 @@ KLASS_NS sorted_set_core {
   FUNC destroy(slots_t* slots) -> std::nullptr_t;
 
   FUNC result_at(const slots_t* t, const void* key) -> result_t;
-  FUNC at(const slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;
+  FUNC at(const slots_t* t, ssize_t offset) -> const void*;
   FUNC sort(slots_t* t) -> slots_t*;
   FUNC intern(slots_t* t, const void* key) -> const void*;
   FUNC remove(slots_t* t, const void* key) -> const void*;
@@ -32,6 +32,6 @@ KLASS_NS sorted_set_core {
   FUNC last(slots_t* t) -> const void*;
 
   FUNC add(slots_t* t, const void* key) -> slots_t*;
-  FUNC remove_at(slots_t* t, ssize_t offset, const void* key = nullptr) -> const void*;
+  FUNC remove_at(slots_t* t, ssize_t offset) -> const void*;
   FUNC add_at(slots_t* t, ssize_t offset, const void* key) -> slots_t*;
 }
