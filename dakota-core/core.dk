@@ -1677,7 +1677,7 @@ func dk-symbolize(str-t key) -> symbol-t {
 # if 0
   symbol-t val = key;
 # else
-  symbol-t val = cast(symbol-t)sorted-set-core::intern(symbolize-array, cast(const void*)(key));
+  symbol-t val = cast(symbol-t)sorted-set-core::add(symbolize-array, cast(const void*)(key));
 //fprintf(stderr, "%s(\"%s\" {%p}) = \"%s\" {%p}\n", __func__, key, key, val, val);
 # endif
   //dkt-log(dkt::k-log-info, "%s(\"%s\" {%p}) = \"%s\" {%p}", __func__, key, key, val, val);

@@ -104,7 +104,7 @@ klass sorted-set-core {
     result.offset = i;
     return result;
   }
-  func add-at(slots-t* t, ssize-t offset, const void* key) -> slots-t* {
+  func add-at(slots-t* t, ssize-t offset, const void* key) -> const void* {
     assert(key != nullptr);
     assert(0 <= offset);
     assert(offset <= t->count);
@@ -118,7 +118,7 @@ klass sorted-set-core {
             cast(size-t)((t->count - offset) * t->size));
     memcpy(cast(uint8-t*)(t->elements) + (t->size * (offset + 0)), ref(t, key), cast(size-t)t->size);
     t->count++;
-    return t;
+    return key;
   }
   func at(const slots-t* t, ssize-t offset) -> const void* {
     assert(0 <= offset);
@@ -164,23 +164,14 @@ klass sorted-set-core {
       element = at(t, offset = t->count - 1);
     return element;
   }
-  func add(slots-t* t, const void* key) -> slots-t* {
+  func add(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
-
+    const void* element;
     result-t result = result-at(t, key);
     if (result.element == nullptr)
-      add-at(t, result.offset, key);
-    return t;
-  }
-  func intern(slots-t* t, const void* key) -> const void* {
-    assert(key != nullptr);
-    const void* element = key;
-    result-t result = result-at(t, key);
-
-    if (result.element != nullptr)
-      element = result.element;
+      element = add-at(t, result.offset, key);
     else
-      add-at(t, result.offset, key);
+      element = result.element;
     return element;
   }
   func remove-last(slots-t* t) -> const void* {
