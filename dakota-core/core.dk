@@ -39,7 +39,7 @@ include-for <sys/stat.h> struct stat;
 # include "private.hh"
 # include "dakota-rt-private.hh"
 # include "dso.hh" // dso-*()
-# include "sorted-array.hh"
+# include "sorted-set-core.hh"
 
 module dakota-core;
 

@@ -19,7 +19,7 @@
 # include <cstdlib>
 # include <cstring>
 
-# include "sorted-array.hh"
+# include "sorted-set-core.hh"
 
 module dakota-core;
 

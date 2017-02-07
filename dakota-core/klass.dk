@@ -24,7 +24,7 @@
 # include "dso.hh" // dso-symbol-for-address()
 # include "private.hh"
 # include "safe-str.hh"
-# include "sorted-array.hh"
+# include "sorted-set-core.hh"
 
 # if 0
 
