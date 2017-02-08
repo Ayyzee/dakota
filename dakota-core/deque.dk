@@ -102,6 +102,24 @@ klass deque {
 
     ssize-t        iterator-state;
   }
+  method init(object-t self, object-t element: nullptr) -> object-t {
+    self = $init(super);
+
+    if (element == nullptr) {
+      self.first = nullptr;
+      self.last =  nullptr;
+      self.size =  0;
+    } else {
+      node::slots-t* node = node::create(nullptr, element, nullptr);
+      // node->prev = nullptr;
+      // node->next = nullptr;
+      self.first = node;
+      self.last =  node;
+      self.size =  1;
+    }
+    self.iterator-state = 0;
+    return self;
+  }
   method test-dump(object-t self) -> object-t {
     const slots-t& s = unbox(self);
     // if (&s != nullptr) {
@@ -137,24 +155,6 @@ klass deque {
 
     //   size
     // }
-    return self;
-  }
-  method init(object-t self, object-t element: nullptr) -> object-t {
-    self = $init(super);
-
-    if (element == nullptr) {
-      self.first = nullptr;
-      self.last =  nullptr;
-      self.size =  0;
-    } else {
-      node::slots-t* node = node::create(nullptr, element, nullptr);
-      // node->prev = nullptr;
-      // node->next = nullptr;
-      self.first = node;
-      self.last =  node;
-      self.size =  1;
-    }
-    self.iterator-state = 0;
     return self;
   }
   static func string-from-node(object-t self, node::slots-t* mn,
