@@ -37,7 +37,7 @@ klass sorted-set {
   trait set;
 
   slots {
-    sorted-set-core::slots-t* sa;
+    sorted-set-core::slots-t* ssc;
     ssize-t                   iterator-state;
   }
   // 'elements' is a collection (of objects)
@@ -53,10 +53,10 @@ klass sorted-set {
     assert(0 < initial-capacity);
     self = $init(super);
     bool-t is-ptr;
-    self.sa = sorted-set-core::create(initial-capacity,
-                                      ssizeof(object-t),
-                                      cast(std-compare-t)compare,
-                                      is-ptr = false);
+    self.ssc = sorted-set-core::create(initial-capacity,
+                                       ssizeof(object-t),
+                                       cast(std-compare-t)compare,
+                                       is-ptr = false);
     self.iterator-state = 0;
 
     if (elements != nullptr)
@@ -68,16 +68,16 @@ klass sorted-set {
   }
   method dealloc(object-t self) -> object-t {
     $empty(self);
-    sorted-set-core::destroy(self.sa);
+    sorted-set-core::destroy(self.ssc);
     return $dealloc(super);
   }
   method in(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-set-core::result-at(self.sa, element-ptr);
+    result-t found-result = sorted-set-core::result-at(self.ssc, element-ptr);
 
     if (found-result.element != nullptr)
-      result = *(cast(object-t*)sorted-set-core::at(self.sa,
+      result = *(cast(object-t*)sorted-set-core::at(self.ssc,
                                                     found-result.offset));
     return result;
   }
@@ -97,11 +97,11 @@ klass sorted-set {
     object-t result = element;
     self.iterator-state++;
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-set-core::result-at(self.sa, element-ptr);
+    result-t found-result = sorted-set-core::result-at(self.ssc, element-ptr);
 
     if (found-result.element == nullptr) {
       element.add-ref();
-      sorted-set-core::add-at(self.sa, found-result.offset, element-ptr);
+      sorted-set-core::add-at(self.ssc, found-result.offset, element-ptr);
     }
     else
       result = *(cast(object-t*)found-result.element);
@@ -109,12 +109,12 @@ klass sorted-set {
   }
   method remove(object-t self, object-t element) -> object-t {
     object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-set-core::result-at(self.sa, element-ptr);
+    result-t found-result = sorted-set-core::result-at(self.ssc, element-ptr);
     object-t prev-element = nullptr;
 
     if (found-result.element != nullptr) {
       self.iterator-state++;
-      prev-element = *(cast(object-t*)sorted-set-core::remove-at(self.sa,
+      prev-element = *(cast(object-t*)sorted-set-core::remove-at(self.ssc,
                                                                  found-result.offset));
       prev-element.remove-ref();
     }
@@ -122,15 +122,15 @@ klass sorted-set {
   }
   method remove-last(object-t self) -> object-t {
     object-t prev-element = nullptr;
-    if (self.sa->count != 0) {
+    if (self.ssc->count != 0) {
       self.iterator-state++;
-      prev-element = *(cast(object-t*)sorted-set-core::remove-last(self.sa));
+      prev-element = *(cast(object-t*)sorted-set-core::remove-last(self.ssc));
       prev-element.remove-ref();
     }
     return prev-element; // returns nullptr on error
   }
   method empty(object-t self) -> object-t {
-    while (self.sa->count != 0) {
+    while (self.ssc->count != 0) {
       $remove-last(self);
       self.iterator-state++;
     }
@@ -138,7 +138,7 @@ klass sorted-set {
   }
   method empty?(object-t self) -> bool-t {
     bool-t state = false;
-    if (self.sa->count == 0)
+    if (self.ssc->count == 0)
       state = true;
     return state;
   }
@@ -148,13 +148,13 @@ klass sorted-set {
     const slots-t& s1 = unbox(self);
     slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
-    s2.sa->elements = cast(ptr-t*)dkt::alloc(s2.sa->size * s2.sa->capacity);
-    memcpy(s2.sa->elements, s1.sa->elements, cast(size-t)(s2.sa->size * s2.sa->capacity));
+    s2.ssc->elements = cast(ptr-t*)dkt::alloc(s2.ssc->size * s2.ssc->capacity);
+    memcpy(s2.ssc->elements, s1.ssc->elements, cast(size-t)(s2.ssc->size * s2.ssc->capacity));
     s2.iterator-state = 0;
     return copy;
   }
   method size(object-t self) -> ssize-t {
-    return self.sa->count;
+    return self.ssc->count;
   }
   method forward-iterator(object-t self) -> object-t {
     object-t forward-iterator = $make(sorted-set-forward-iterator::klass(), #sorted-set: self);
@@ -163,7 +163,7 @@ klass sorted-set {
   method dump(object-t self) -> object-t {
     $dump(super);
     fprintf(stderr, "%p { count=%zi, capacity=%zi, elements=[] }\n",
-            cast(ptr-t)self, self.sa->count, self.sa->capacity);
+            cast(ptr-t)self, self.ssc->count, self.ssc->capacity);
     for (object-t element in self)
       $dump(element);
     return self;
@@ -213,7 +213,7 @@ klass sorted-set-forward-iterator {
     check-iterator-state(self);
     const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
     bool-t state = false;
-    if (self.offset < ss.sa->count)
+    if (self.offset < ss.ssc->count)
       state = true;
     return state;
   }
@@ -231,7 +231,7 @@ klass sorted-set-forward-iterator {
     object-t element = nullptr;
     if ($next?(self)) {
       const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-      element = *(cast(object-t*)sorted-set-core::at(ss.sa, self.offset));
+      element = *(cast(object-t*)sorted-set-core::at(ss.ssc, self.offset));
       assert(element != nullptr);
     }
     return element; // returns nullptr on error
