@@ -16,6 +16,7 @@
 
 # pragma once
 
+//FUNC $dealloc(object_t) -> object_t;
 REF_COUNTING_INLINE FUNC dk_dealloc(object_t o) -> void;
 REF_COUNTING_INLINE FUNC dk_dealloc(object_t o) -> void {
 # if defined DEBUG
@@ -25,8 +26,6 @@ REF_COUNTING_INLINE FUNC dk_dealloc(object_t o) -> void {
   o.object = dkt::dealloc(o.object);
   return;
 }
-
-FUNC $dealloc(object_t) -> object_t;
 const int_fast32_t k_dealloc_initiated = -1;
 REF_COUNTING_INLINE FUNC object_t::add_ref() -> void {
   if (this->object && this->object->ref_count != k_dealloc_initiated) {
