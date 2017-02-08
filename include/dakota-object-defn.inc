@@ -16,6 +16,16 @@
 
 # pragma once
 
+REF_COUNTING_INLINE FUNC dk_dealloc(object_t o) -> void;
+REF_COUNTING_INLINE FUNC dk_dealloc(object_t o) -> void {
+# if defined DEBUG
+  echo_stuff(o.object, "dealloc");
+# endif
+  $dealloc(o);
+  o.object = dkt::dealloc(o.object);
+  return;
+}
+
 FUNC $dealloc(object_t) -> object_t;
 const int_fast32_t k_dealloc_initiated = -1;
 REF_COUNTING_INLINE FUNC object_t::add_ref() -> void {
@@ -30,11 +40,7 @@ REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
     this->object->ref_count--;
     if (this->object->ref_count == 0) {
       this->object->ref_count = k_dealloc_initiated;
-# if defined DEBUG
-      echo_stuff(this->object, "dealloc");
-# endif
-      $dealloc(*this);
-      this->object = dkt::dealloc(this->object);
+      dk_dealloc(*this);
     }
   }
   return;
