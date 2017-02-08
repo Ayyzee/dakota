@@ -16,4 +16,4 @@
 
 # pragma once
 
-# define EXIT(v) exit(v)
+# define EXIT(v) return(v)
