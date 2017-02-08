@@ -87,10 +87,9 @@ klass sorted-set {
   }
   method empty(object-t self) -> object-t {
     while (self.sa->count != 0) {
-      object-t element = *(cast(object-t*)sorted-set-core::remove-last(self.sa));
-      element.remove-ref();
+      $remove-last(self);
+      self.iterator-state++;
     }
-    self.iterator-state++;
     return self;
   }
   method in(object-t self, object-t element, object-t default-result) -> object-t {
