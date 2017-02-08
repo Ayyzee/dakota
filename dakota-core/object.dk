@@ -54,6 +54,17 @@ klass object {
     std::atomic<int-fast32-t> ref-count;
   }
 
+  // documented to do nothing
+  method init(object-t self) -> object-t {
+# if defined DEBUG
+    echo-stuff(cast(object::slots-t*)self, "init");
+# endif
+    return self;
+  }
+  method dealloc(object-t self) -> object-t {
+    self->klass = nullptr;
+    return nullptr;
+  }
   method write-slots(object-t self, object-t out) -> object-t {
   //$write-slots(super, out);
     $write-slots-start(out, _klass_);
@@ -96,18 +107,6 @@ klass object {
     method-t m = $method-for-selector(kls, selector);
     object-t value = m(self);
     return value;
-  }
-  // documented to do nothing
-  method init(object-t self) -> object-t {
-# if defined DEBUG
-    echo-stuff(cast(object::slots-t*)self, "init");
-# endif
-    return self;
-  }
-  // documented to do nothing
-  method dealloc(object-t self) -> object-t {
-    self->klass = nullptr;
-    return nullptr;
   }
   method copy(object-t self) -> object-t {
     USE(self);
