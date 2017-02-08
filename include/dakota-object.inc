@@ -31,11 +31,11 @@ struct [[_dkt_typeinfo_]] object_t {
   explicit REF_COUNTING_INLINE operator ptr_t()            const;
   explicit REF_COUNTING_INLINE operator intptr_t()         const;
   explicit REF_COUNTING_INLINE operator uintptr_t()        const;
-  explicit REF_COUNTING_INLINE operator bool()             const;
+  explicit REF_COUNTING_INLINE operator bool_t()           const;
 
-  REF_COUNTING_INLINE FUNC operator !() const -> bool;
-  REF_COUNTING_INLINE FUNC operator ==(const object_t& r) const -> bool;
-  REF_COUNTING_INLINE FUNC operator !=(const object_t& r) const -> bool;
+  REF_COUNTING_INLINE FUNC operator !() const -> bool_t;
+  REF_COUNTING_INLINE FUNC operator ==(const object_t& r) const -> bool_t;
+  REF_COUNTING_INLINE FUNC operator !=(const object_t& r) const -> bool_t;
   REF_COUNTING_INLINE FUNC operator =(const object_t& r) -> object_t&;
   REF_COUNTING_INLINE object_t(const object_t& r);
   REF_COUNTING_INLINE object_t(object::slots_t* r = nullptr);
