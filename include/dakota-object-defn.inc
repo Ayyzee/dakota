@@ -34,7 +34,6 @@ REF_COUNTING_INLINE FUNC object_t::remove_ref() -> void {
       echo_stuff(this->object, "dealloc");
 # endif
       $dealloc(*this);
-      this->object->klass = nullptr;
       this->object = dkt::dealloc(this->object);
     }
   }

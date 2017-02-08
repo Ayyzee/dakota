@@ -106,7 +106,7 @@ klass object {
   }
   // documented to do nothing
   method dealloc(object-t self) -> object-t {
-    USE(self);
+    self->klass = nullptr;
     return nullptr;
   }
   method copy(object-t self) -> object-t {
