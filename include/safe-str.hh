@@ -1,6 +1,6 @@
 // -*- mode: C++; c-basic-offset: 2; tab-width: 2; indent-tabs-mode: nil -*-
 
-// Copyright (C) 2007 - 2015 Robert Nielsen <robert@dakota.org>
+// Copyright (C) 2007 - 2017 Robert Nielsen <robert@dakota.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
