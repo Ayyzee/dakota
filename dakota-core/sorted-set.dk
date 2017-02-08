@@ -24,8 +24,8 @@
 module dakota-core;
 
 klass compare;
-klass exception;
 klass equals;
+klass exception;
 klass object-output-stream;
 klass result;
 klass sorted-set-core;
@@ -71,27 +71,6 @@ klass sorted-set {
     sorted-set-core::destroy(self.sa);
     return $dealloc(super);
   }
-  method add(object-t self, object-t element) -> object-t {
-    object-t result = element;
-    self.iterator-state++;
-    object-t* element-ptr = &element; /// &object-t
-    result-t found-result = sorted-set-core::result-at(self.sa, element-ptr);
-
-    if (found-result.element == nullptr) {
-      element.add-ref();
-      sorted-set-core::add-at(self.sa, found-result.offset, element-ptr);
-    }
-    else
-      result = *(cast(object-t*)found-result.element);
-    return result;
-  }
-  method empty(object-t self) -> object-t {
-    while (self.sa->count != 0) {
-      $remove-last(self);
-      self.iterator-state++;
-    }
-    return self;
-  }
   method in(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
     object-t* element-ptr = &element; /// &object-t
@@ -114,11 +93,19 @@ klass sorted-set {
       state = true;
     return state;
   }
-  method empty?(object-t self) -> bool-t {
-    bool-t state = false;
-    if (self.sa->count == 0)
-      state = true;
-    return state;
+  method add(object-t self, object-t element) -> object-t {
+    object-t result = element;
+    self.iterator-state++;
+    object-t* element-ptr = &element; /// &object-t
+    result-t found-result = sorted-set-core::result-at(self.sa, element-ptr);
+
+    if (found-result.element == nullptr) {
+      element.add-ref();
+      sorted-set-core::add-at(self.sa, found-result.offset, element-ptr);
+    }
+    else
+      result = *(cast(object-t*)found-result.element);
+    return result;
   }
   method remove(object-t self, object-t element) -> object-t {
     object-t* element-ptr = &element; /// &object-t
@@ -141,6 +128,19 @@ klass sorted-set {
       prev-element.remove-ref();
     }
     return prev-element; // returns nullptr on error
+  }
+  method empty(object-t self) -> object-t {
+    while (self.sa->count != 0) {
+      $remove-last(self);
+      self.iterator-state++;
+    }
+    return self;
+  }
+  method empty?(object-t self) -> bool-t {
+    bool-t state = false;
+    if (self.sa->count == 0)
+      state = true;
+    return state;
   }
   method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
