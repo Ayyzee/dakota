@@ -17,6 +17,10 @@
 # pragma once
 
 # include <cassert>
+# include <cctype>
+# include <cstdint>
 # include <cstdio>
+# include <cstdlib>
+# include <cstring>
 
 # define EXIT(v) return(v)
