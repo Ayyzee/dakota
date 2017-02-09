@@ -35,6 +35,12 @@ klass node {
     node->next =    next;
     return node;
   }
+  static func destroy(slots-t* s) -> std::nullptr-t {
+    s->element = nullptr;
+    s->prev =    nullptr;
+    s->next =    nullptr;
+    return dkt::dealloc(s);
+  }
   static func dump-prev(const slots-t* s, ssize-t iterator-state) -> void {
     if (s != nullptr) {
       // fprintf(stderr, "    \"%p-%i\" [ label = < <table>"
@@ -229,30 +235,44 @@ klass deque {
     throw $make(exception::klass(), #msg: "not yet implemented");
     return null;
   }
+  static func health-check(object-t self) -> void {
+    assert((self.first == nullptr && self.last == nullptr) ||
+           (self.first != nullptr && self.last != nullptr));
+    if (self.first != nullptr) {
+      assert(self.first->prev == nullptr);
+      assert(self.last->next == nullptr);
+    }
+    assert(($size(self) == 0 && self.first == nullptr && self.last == nullptr) ||
+           ($size(self) != 0 && self.first != nullptr && self.last != nullptr));
+  }
   method add-first(object-t self, object-t element) -> object-t {
     assert(element != nullptr);
-    node::slots-t* node = node::create(nullptr, element, self.first); // self.first may be nullptr
-    // node->prev = nullptr;
-    // node->next = self.first;
-    self.first = node;
+    node::slots-t* n = node::create(nullptr, element, self.first); // self.first may be nullptr
+
+    if (self.first != nullptr)
+      self.first->prev = n;
+    self.first = n;
+
+    if (self.last == nullptr)
+      self.last = self.first;
     self.size++;
     self.iterator-state++;
+    health-check(self);
     return self;
   }
   [[alias(add,push)]] method add-last(object-t self, object-t element) -> object-t {
     assert(element != nullptr);
-    node::slots-t* node = node::create(self.last, element, nullptr); // self.last may be nullptr
-    if (self.last != nullptr)
-      self.last->next = node;
+    node::slots-t* n = node::create(self.last, element, nullptr); // self.last may be nullptr
 
-    self.last = node;
+    if (self.last != nullptr)
+      self.last->next = n;
+    self.last = n;
 
     if (self.first == nullptr)
       self.first = self.last;
-
     self.size++;
     self.iterator-state++;
-    //   deque::dump(self, stderr);
+    health-check(self);
     return self;
   }
   method first(object-t self) -> object-t {
@@ -274,44 +294,36 @@ klass deque {
   method remove-first(object-t self) -> object-t {
     assert(self.size != 0);
     assert(self.first != nullptr);
-    object-t element = nullptr;
+    node::slots-t* n = self.first;
+    object-t element = self.first->element;
+    self.first = self.first->next;
 
-    if (self.last == self.first) {
+    if (self.first == nullptr)
       self.last = nullptr;
-    }
-    //if (self.first != nullptr)
-    {
-      node::slots-t* node = self.first;
-      self.first = self.first->next;
-
-      if (self.first != nullptr)
-        self.first->prev = nullptr;
-# if 0
-      else {
-        //node->prev = nullptr;
-        node->next = nullptr;
-      }
-# endif
-      element = node->element;
-    }
+    else
+      self.first->prev = nullptr;
     self.size--;
     self.iterator-state++;
+    n = node::destroy(n);
+    health-check(self);
     return element;
   }
   [[alias(pop)]] method remove-last(object-t self) -> object-t {
     assert(self.size != 0);
-    //assert(self.last != nullptr);
-    node::slots-t* node = self.last;
+    assert(self.last != nullptr);
+    node::slots-t* n = self.last;
+    object-t element = self.last->element;
     self.last = self.last->prev;
 
-    if (self.last != nullptr)
+    if (self.last == nullptr)
+      self.first = nullptr;
+    else
       self.last->next = nullptr;
-
-    node->prev = nullptr;
-    //node->next = nullptr;
     self.size--;
     self.iterator-state++;
-    return node->element;
+    n = node::destroy(n);
+    health-check(self);
+    return element;
   }
   // method replace-first(object-t self, object-t element) -> object-t;
   // method replace-last(object-t self, object-t element) -> object-t;
