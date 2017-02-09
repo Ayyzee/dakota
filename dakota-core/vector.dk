@@ -211,15 +211,15 @@ klass vector {
   method remove-first(object-t self) -> object-t {
     assert(self.count != 0);
     object-t element = self.elements[0];
+    self.elements[0] = nullptr;
     memmove(self.elements, self.elements + 1, cast(size-t)(self.size * (self.count - 1)));
-    self.elements[self.count - 1] = self.fill-element;
     self.count--;
     return element;
   }
   [[alias(pop)]] method remove-last(object-t self) -> object-t {
     assert(self.count != 0);
     object-t element = self.elements[self.count - 1];
-    self.elements[self.count - 1] = self.fill-element;
+    self.elements[self.count - 1] = nullptr;
     self.count--;
     return element;
   }
@@ -284,8 +284,9 @@ klass vector {
       self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
     memmove(self.elements + 1, self.elements, cast(size-t)(self.size * self.count));
-    self.count++;
+    memset(&self.elements[0], NUL, cast(size-t)self.size); // for ref-counting
     self.elements[0] = element;
+    self.count++;
     self.iterator-state++;
     return element;
   }
@@ -298,8 +299,9 @@ klass vector {
       self.capacity *= $resize-factor(klass-of(self));
       self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
     }
+    memset(&self.elements[self.count], NUL, cast(size-t)self.size); // for ref-counting
+    self.elements[self.count] = element;
     self.count++;
-    self.elements[self.count - 1] = element;
     self.iterator-state++;
     return element;
   }
