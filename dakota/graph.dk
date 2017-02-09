@@ -18,7 +18,7 @@ klass sequence;
 
 klass statement {
 }
-klass node {
+klass graph-node {
   superklass statement;
 
   slots {
@@ -32,7 +32,7 @@ klass node {
     return self;
   }
 }
-klass edge {
+klass graph-edge {
   superklass statement;
 
   slots {
@@ -51,11 +51,11 @@ klass edge {
     return self;
   }
 }
-klass attrs {
+klass graph-attrs {
   slots object-t;
 
   method init(object-t self,
-                       object-t attrs:) -> object-t {
+              object-t attrs:) -> object-t {
     self = $init(super);
     mutable-unbox(self) = attrs;
     return self;
