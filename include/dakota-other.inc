@@ -64,7 +64,7 @@ namespace dkt { inline FUNC demangle_free(str_t name) -> void {
 
 namespace dkt { inline FUNC dealloc(ptr_t ptr) -> std::nullptr_t {
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
-  operator delete(ptr);
+  broken
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
   free(ptr);
 # else
@@ -75,7 +75,7 @@ namespace dkt { inline FUNC dealloc(ptr_t ptr) -> std::nullptr_t {
 namespace dkt { inline FUNC alloc(ssize_t size) -> ptr_t {
   ptr_t buf;
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
-  buf = operator new(size);
+  broken
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
   buf = malloc(cast(size_t)size);
 
@@ -90,9 +90,7 @@ namespace dkt { inline FUNC alloc(ssize_t size) -> ptr_t {
 namespace dkt { inline FUNC alloc(ssize_t size, ptr_t ptr) -> ptr_t {
   ptr_t buf;
 # if (DKT_MEM_MGMT == DKT_MEM_MGMT_NEW)
-  buf = dkt::alloc(size);
-  memcpy(buf, ptr, size);
-  ptr = dkt::dealloc(ptr);
+  broken
 # elif (DKT_MEM_MGMT == DKT_MEM_MGMT_MALLOC)
   buf = realloc(ptr, cast(size_t)size);
 
