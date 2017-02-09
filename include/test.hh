@@ -16,4 +16,7 @@
 
 # pragma once
 
+# include <cassert>
+# include <cstdio>
+
 # define EXIT(v) return(v)
