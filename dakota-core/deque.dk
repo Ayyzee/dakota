@@ -22,10 +22,10 @@ module dakota-core;
 
 klass exception;
 
-klass node {
+klass deque-node {
   slots {
-    object-t element; // may NOT be nullptr, may be null
     slots-t* prev;    // nullptr (not null) for first
+    object-t element; // may NOT be nullptr, may be null
     slots-t* next;    // nullptr (not null) for last
   }
   static func create(slots-t* prev, object-t element, slots-t* next) -> slots-t* {
@@ -36,8 +36,8 @@ klass node {
     return node;
   }
   static func destroy(slots-t* s) -> std::nullptr-t {
-    s->element = nullptr;
     s->prev =    nullptr;
+    s->element = nullptr;
     s->next =    nullptr;
     return dkt::dealloc(s);
   }
@@ -102,11 +102,10 @@ klass deque {
   trait      stack;
 
   slots {
-    node::slots-t* first; // if (first != nullptr)  first->prev = nullptr;
-    node::slots-t* last;  // if (last != nullptr)   last->next =  nullptr;
-    ssize-t        size;
-
-    ssize-t        iterator-state;
+    deque-node::slots-t* first; // if (first != nullptr)  first->prev = nullptr;
+    deque-node::slots-t* last;  // if (last != nullptr)   last->next =  nullptr;
+    ssize-t              size;
+    ssize-t              iterator-state;
   }
   method init(object-t self, object-t element: nullptr) -> object-t {
     self = $init(super);
@@ -116,7 +115,7 @@ klass deque {
       self.last =  nullptr;
       self.size =  0;
     } else {
-      node::slots-t* node = node::create(nullptr, element, nullptr);
+      deque-node::slots-t* node = deque-node::create(nullptr, element, nullptr);
       // node->prev = nullptr;
       // node->next = nullptr;
       self.first = node;
@@ -154,8 +153,8 @@ klass deque {
         fprintf(stderr, "    \"%p-%zi\":last  -> \"%p-%zi\";\n",
                 cast(ptr-t)(&s), s.iterator-state, cast(ptr-t)(s.last), s.iterator-state);
       }
-      node::dump-next(s.first, s.iterator-state);
-      node::dump-prev(s.last,  s.iterator-state);
+      deque-node::dump-next(s.first, s.iterator-state);
+      deque-node::dump-prev(s.last,  s.iterator-state);
 
       fprintf(stderr, "  }\n");
 
@@ -163,14 +162,14 @@ klass deque {
     // }
     return self;
   }
-  static func string-from-node(object-t self, node::slots-t* mn,
+  static func string-from-node(object-t self, deque-node::slots-t* node,
                                char-t* buf, ssize-t buf-len) -> object-t {
-    if (self.first == mn && self.first != nullptr)
+    if (self.first == node && self.first != nullptr)
       snprintf(buf, cast(size-t)buf-len, "%s", "first     ");
-    else if (self.last == mn && self.last != nullptr)
+    else if (self.last == node && self.last != nullptr)
       snprintf(buf, cast(size-t)buf-len, "%s", "last      ");
     else
-      snprintf(buf, cast(size-t)buf-len, "%p", cast(ptr-t)mn);
+      snprintf(buf, cast(size-t)buf-len, "%p", cast(ptr-t)node);
     return self;
   }
   method dump(object-t self) -> object-t {
@@ -181,8 +180,8 @@ klass deque {
     $write-slots(super, out);
     // dkt-log(stdout, "deque: %s(%p, ...)\n",
     //        __func__, cast(ptr-t)deque);
-    node::slots-t* first = self.first;
-    node::slots-t* last =  self.last;
+    deque-node::slots-t* first = self.first;
+    deque-node::slots-t* last =  self.last;
     char-t[16] buf = "";
 
     if (first == nullptr) {
@@ -247,11 +246,11 @@ klass deque {
   }
   method add-first(object-t self, object-t element) -> object-t {
     assert(element != nullptr);
-    node::slots-t* n = node::create(nullptr, element, self.first); // self.first may be nullptr
+    deque-node::slots-t* node = deque-node::create(nullptr, element, self.first); // self.first may be nullptr
 
     if (self.first != nullptr)
-      self.first->prev = n;
-    self.first = n;
+      self.first->prev = node;
+    self.first = node;
 
     if (self.last == nullptr)
       self.last = self.first;
@@ -262,11 +261,11 @@ klass deque {
   }
   [[alias(add,push)]] method add-last(object-t self, object-t element) -> object-t {
     assert(element != nullptr);
-    node::slots-t* n = node::create(self.last, element, nullptr); // self.last may be nullptr
+    deque-node::slots-t* node = deque-node::create(self.last, element, nullptr); // self.last may be nullptr
 
     if (self.last != nullptr)
-      self.last->next = n;
-    self.last = n;
+      self.last->next = node;
+    self.last = node;
 
     if (self.first == nullptr)
       self.first = self.last;
@@ -294,7 +293,7 @@ klass deque {
   method remove-first(object-t self) -> object-t {
     assert(self.size != 0);
     assert(self.first != nullptr);
-    node::slots-t* n = self.first;
+    deque-node::slots-t* node = self.first;
     object-t element = self.first->element;
     self.first = self.first->next;
 
@@ -304,14 +303,14 @@ klass deque {
       self.first->prev = nullptr;
     self.size--;
     self.iterator-state++;
-    n = node::destroy(n);
+    node = deque-node::destroy(node);
     health-check(self);
     return element;
   }
   [[alias(pop)]] method remove-last(object-t self) -> object-t {
     assert(self.size != 0);
     assert(self.last != nullptr);
-    node::slots-t* n = self.last;
+    deque-node::slots-t* node = self.last;
     object-t element = self.last->element;
     self.last = self.last->prev;
 
@@ -321,7 +320,7 @@ klass deque {
       self.last->next = nullptr;
     self.size--;
     self.iterator-state++;
-    n = node::destroy(n);
+    node = deque-node::destroy(node);
     health-check(self);
     return element;
   }
@@ -347,7 +346,7 @@ klass deque {
   //   $increment-column(out);
 
   //   if (self.size != 0) {
-  //     node::slots-t* node = self.first;
+  //     deque-node::slots-t* node = self.first;
 
   //     do {
   //   $write-element-idref(out, node->element);
@@ -363,10 +362,9 @@ klass deque-forward-iterator {
   trait forward-iterator;
 
   slots {
-    object-t       deque; // needed for iterator-state
-    node::slots-t* node;
-
-    ssize-t        iterator-state;
+    object-t             deque; // needed for iterator-state
+    deque-node::slots-t* node;
+    ssize-t              iterator-state;
   }
   static func check-iterator-state(object-t self) -> void {
     const deque::slots-t& d = deque::unbox(self.deque);
@@ -388,7 +386,7 @@ klass deque-forward-iterator {
   method remove(object-t self) -> object-t {
     check-iterator-state(self);
     //assert(self.node != nullptr);
-    node::slots-t* node = self.node;
+    deque-node::slots-t* node = self.node;
 
     if (self.node->prev != nullptr)
       self.node->prev->next = self.node->next;
