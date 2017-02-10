@@ -571,17 +571,17 @@ klass klass {
     } while ((current-info = current-info->next) != nullptr);
     return;
   }
-  static func load-traits(const symbol-t* traits) -> void {
-    if (traits == nullptr || traits[0] == nullptr)
-      return;
-    ssize-t i = 0;
-    symbol-t trait-name;
-    while ((trait-name = traits[i++]) != nullptr) {
-      named-info-t* trait-info = info-for-name(trait-name);
-      load-traits(cast(const symbol-t*)named-info::at(trait-info, #traits));
-    }
-    return;
-  }
+//   static func load-traits(const symbol-t* traits) -> void {
+//     if (traits == nullptr || traits[0] == nullptr)
+//       return;
+//     ssize-t i = 0;
+//     symbol-t trait-name;
+//     while ((trait-name = traits[i++]) != nullptr) {
+//       named-info-t* trait-info = info-for-name(trait-name);
+//       load-traits(cast(const symbol-t*)named-info::at(trait-info, #traits));
+//     }
+//     return;
+//   }
   static func add-traits(object-t self, const symbol-t* traits) -> void {
     if (traits == nullptr || traits[0] == nullptr)
       return;
@@ -739,10 +739,8 @@ klass klass {
     init-methods(self);
     bool-t should-override;
     self.traits = cast(const symbol-t*)named-info::at(self.info, #traits);
-    if (self.traits != nullptr) {
-      load-traits(self.traits);
+    if (self.traits != nullptr)
       add-traits(self, self.traits);
-    }
     add-methods(self, self.info, #method-signatures, #method-addresses, should-override = true);
     add-methods(self, self.info, #exported-method-signatures, #exported-method-addresses, should-override = true);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info, #method-aliases);
