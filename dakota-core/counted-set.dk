@@ -26,20 +26,8 @@ trait counted-set {
   //provides set;
   require collection;
 
-  func initialize(object-t kls) -> void {
+  func initialize(object-t) -> void {
     pair::klass();
-    typealias add-t = func (*)(object-t, object-t) -> object-t;
-    $add-method-for-selector(kls,
-                             selector(add(object-t, object-t)),
-                             cast(method-t)cast(add-t)add);
-    typealias at2-t = func (*)(object-t, object-t) -> object-t;
-    $add-method-for-selector(kls,
-                             selector(at(object-t, object-t)),
-                             cast(method-t)cast(at2-t)at);
-    typealias at3-t = func (*)(object-t, object-t, object-t) -> object-t;
-    $add-method-for-selector(kls,
-                             selector(at(object-t, object-t, object-t)),
-                             cast(method-t)cast(at3-t)at);
     return;
   }
   method firsts(object-t self) -> object-t {

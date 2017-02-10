@@ -591,8 +591,8 @@ klass klass {
       named-info-t* trait-info = info-for-name(trait-name);
       add-traits(self, cast(const symbol-t*)named-info::at(trait-info, #traits));
       bool-t should-override;
-      add-methods(self, trait-info, #method-signatures, #method-addresses, should-override = false);
-      add-methods(self, trait-info, #exported-method-signatures, #exported-method-addresses, should-override = false);
+      add-methods(self, trait-info, #method-signatures, #method-addresses, should-override = true);
+      add-methods(self, trait-info, #exported-method-signatures, #exported-method-addresses, should-override = true);
     }
     return;
   }
@@ -738,6 +738,11 @@ klass klass {
     alloc-methods(self, selector-count());
     init-methods(self);
     bool-t should-override;
+    self.traits = cast(const symbol-t*)named-info::at(self.info, #traits);
+    if (self.traits != nullptr) {
+      load-traits(self.traits);
+      add-traits(self, self.traits);
+    }
     add-methods(self, self.info, #method-signatures, #method-addresses, should-override = true);
     add-methods(self, self.info, #exported-method-signatures, #exported-method-addresses, should-override = true);
     method-alias-t* method-aliases = cast(method-alias-t*)named-info::at(self.info, #method-aliases);
@@ -753,11 +758,6 @@ klass klass {
                                 METHOD-FOR-SELECTOR(&self.methods, method-selector));
         i++;
       }
-    }
-    self.traits = cast(const symbol-t*)named-info::at(self.info, #traits);
-    if (self.traits != nullptr) {
-      load-traits(self.traits);
-      add-traits(self, self.traits);
     }
     set-all-klass-ptrs(self); // do this as late as possible, but before calling klass-initialize()
     klass-initialize(self);
