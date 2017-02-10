@@ -71,7 +71,7 @@ klass sorted-set {
     sorted-set-core::destroy(self.ssc);
     return $dealloc(super);
   }
-  method in(object-t self, object-t element, object-t default-result) -> object-t {
+  method at(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
     object-t* element-ptr = &element; /// &object-t
     result-t found-result = sorted-set-core::result-at(self.ssc, element-ptr);
@@ -81,15 +81,15 @@ klass sorted-set {
                                                     found-result.offset));
     return result;
   }
-  method in(object-t self, object-t element) -> object-t {
-    object-t result = $in(self, element, nullptr);
+  method at(object-t self, object-t element) -> object-t {
+    object-t result = $at(self, element, nullptr);
     if (result == nullptr)
       throw $make(exception::klass(), #msg: "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> bool-t {
     bool-t state = false;
-    if ($in(self, element, nullptr) != nullptr)
+    if ($at(self, element, nullptr) != nullptr)
       state = true;
     return state;
   }

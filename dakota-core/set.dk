@@ -69,7 +69,5 @@ trait set {
     return result;
   }
   method forward-iterator(object-t) -> object-t; // hackhack
-  method in( object-t self, object-t element, object-t default-element) -> object-t;
-  method in( object-t self, object-t element) -> object-t;
   method in?(object-t self, object-t element) -> bool-t;
 }

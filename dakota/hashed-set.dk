@@ -107,7 +107,7 @@ klass hashed-set {
     }
     return self;
   }
-  method in(object-t self, object-t element, object-t default-result) -> object-t {
+  method at(object-t self, object-t element, object-t default-result) -> object-t {
     object-t result = default-result;
     ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, nullptr);
@@ -122,15 +122,15 @@ klass hashed-set {
     }
     return result;
   }
-  method in(object-t self, object-t element) -> object-t {
-    object-t result = $in(self, element, nullptr);
+  method at(object-t self, object-t element) -> object-t {
+    object-t result = $at(self, element, nullptr);
     if (result == nullptr)
       throw $make(exception::klass(), #msg: "oops");
     return result;
   }
   method in?(object-t self, object-t element) -> bool-t {
     bool-t state = false;
-    if ($in(self, element, nullptr) != nullptr)
+    if ($at(self, element, nullptr) != nullptr)
       state = true;
     return state;
   }

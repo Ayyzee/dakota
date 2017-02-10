@@ -25,8 +25,20 @@ trait table {
   //provides set;
   require collection;
 
-  func initialize(object-t) -> void {
+  func initialize(object-t kls) -> void {
     pair::klass();
+    typealias add-t = func (*)(object-t, object-t, object-t) -> object-t;
+    $add-method-for-selector(kls,
+                             selector(add(object-t, object-t, object-t)),
+                             cast(method-t)cast(add-t)add);
+    typealias at2-t = func (*)(object-t, object-t) -> object-t;
+    $add-method-for-selector(kls,
+                             selector(at(object-t, object-t)),
+                             cast(method-t)cast(at2-t)at);
+    typealias at3-t = func (*)(object-t, object-t, object-t) -> object-t;
+    $add-method-for-selector(kls,
+                             selector(at(object-t, object-t, object-t)),
+                             cast(method-t)cast(at3-t)at);
     return;
   }
   method firsts(object-t self) -> object-t {
@@ -66,13 +78,13 @@ trait table {
     return self;
   }
   method at(object-t self, object-t first) -> object-t {
-    object-t last = $in(self, first);
+    object-t last = $at(super, first);
     if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))
       last = pair::unbox(last).last;
     return last;
   }
   method at(object-t self, object-t first, object-t default-last) -> object-t {
-    object-t last = $in(self, first, nullptr);
+    object-t last = $at(super, first, nullptr);
     if (last == nullptr)
       last = default-last;
     if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
@@ -80,19 +92,18 @@ trait table {
     return last;
   }
   method add(object-t self, object-t first, object-t last) -> object-t {
-    object-t pair = $at(self, first, nullptr);
+    object-t pair = $at(super, first, nullptr);
     object-t current-last = pair;
 
     if (pair) {
-      if (klass-of(pair) == pair::_klass_ || $instance?(pair, pair::_klass_)) {
+      if (klass-of(pair) == pair::_klass_ || $instance?(pair, pair::_klass_))
         current-last = pair::unbox(pair).last;
-        if (!$equals?(current-last, last))
-          pair::mutable-unbox(pair).last = last;
-      }
+      if (!$equals?(current-last, last))
+        pair::mutable-unbox(pair).last = last;
     } else {
       current-last = last;
-      pair = pair::box({first, last});
-      $add(self, pair);
+      pair = pair::box({first, current-last});
+      $add(super, pair);
     }
     return current-last;
   }
