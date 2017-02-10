@@ -30,7 +30,7 @@ trait counted-set {
     pair::klass();
     return;
   }
-  method elements(object-t self) -> object-t {
+  method firsts(object-t self) -> object-t {
     object-t set-kls = superklass-of(klass-of(self));
     object-t result = $make(set-kls);
     for (pair-t& pair in self) {
@@ -39,7 +39,7 @@ trait counted-set {
     }
     return result;
   }
-  method counts(object-t self) -> object-t {
+  method lasts(object-t self) -> object-t {
     object-t result = $make(vector::klass(), #size: $size(self));
     for (pair-t& pair in self) {
       object-t last = pair.last;
@@ -95,23 +95,5 @@ trait counted-set {
       $add(super, pair);
     }
     return last;
-  }
-  method count-at(object-t self, object-t first) -> ssize-t {
-    object-t last = $at(self, first);
-    if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))
-      last = pair::unbox(last).last;
-    ssize-t count = ssize::unbox(last);
-    return count;
-  }
-  method count-at(object-t self, object-t first, ssize-t default-count) -> ssize-t {
-    ssize-t count = default-count;
-    object-t last = $at(self, first, nullptr);
-
-    if (last) {
-      if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))
-        last = pair::unbox(last).last;
-      count = ssize::unbox(last);
-    }
-    return count;
   }
 }
