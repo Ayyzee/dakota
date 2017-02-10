@@ -34,10 +34,10 @@ struct [[_dkt_typeinfo_]] weak_object_t {
   REF_COUNTING_INLINE FUNC operator !=(const weak_object_t& r) const -> bool_t;
   REF_COUNTING_INLINE FUNC operator =(const weak_object_t& r) -> weak_object_t&;
   REF_COUNTING_INLINE weak_object_t(const weak_object_t& r);
-  REF_COUNTING_INLINE weak_object_t(object::slots_t* r = nullptr);
+  REF_COUNTING_INLINE weak_object_t(object::slots_t* r);
   REF_COUNTING_INLINE weak_object_t(intptr_t r);
   REF_COUNTING_INLINE weak_object_t(uintptr_t r);
-  REF_COUNTING_INLINE weak_object_t(std::nullptr_t r);
+  REF_COUNTING_INLINE weak_object_t();
   REF_COUNTING_INLINE ~weak_object_t();
   REF_COUNTING_INLINE weak_object_t(const object_t& r); // convert from object-t to weak-object-t
 };

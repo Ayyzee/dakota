@@ -38,9 +38,9 @@ struct [[_dkt_typeinfo_]] object_t {
   REF_COUNTING_INLINE FUNC operator !=(const object_t& r) const -> bool_t;
   REF_COUNTING_INLINE FUNC operator =(const object_t& r) -> object_t&;
   REF_COUNTING_INLINE object_t(const object_t& r);
-  REF_COUNTING_INLINE object_t(object::slots_t* r = nullptr);
+  REF_COUNTING_INLINE object_t(object::slots_t* r);
   REF_COUNTING_INLINE object_t(intptr_t r);
   REF_COUNTING_INLINE object_t(uintptr_t r);
-  REF_COUNTING_INLINE object_t(std::nullptr_t r);
+  REF_COUNTING_INLINE object_t();
   REF_COUNTING_INLINE ~object_t();
 };

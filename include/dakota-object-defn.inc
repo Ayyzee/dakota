@@ -91,9 +91,8 @@ REF_COUNTING_INLINE object_t::object_t(uintptr_t r) {
   this->object = cast(object::slots_t*)r;
   this->add_ref();
 }
-REF_COUNTING_INLINE object_t::object_t(std::nullptr_t r) {
-  this->object = cast(object::slots_t*)r;
-  this->add_ref();
+REF_COUNTING_INLINE object_t::object_t() {
+  this->object = nullptr;
 }
 REF_COUNTING_INLINE object_t::~object_t() {
   this->remove_ref();

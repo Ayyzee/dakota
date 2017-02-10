@@ -53,8 +53,8 @@ REF_COUNTING_INLINE weak_object_t::weak_object_t(intptr_t r) {
 REF_COUNTING_INLINE weak_object_t::weak_object_t(uintptr_t r) {
   this->object = cast(object::slots_t*)r;
 }
-REF_COUNTING_INLINE weak_object_t::weak_object_t(std::nullptr_t r) {
-  this->object = cast(object::slots_t*)r;
+REF_COUNTING_INLINE weak_object_t::weak_object_t() {
+  this->object = nullptr;
 }
 REF_COUNTING_INLINE weak_object_t::~weak_object_t() {
 }
