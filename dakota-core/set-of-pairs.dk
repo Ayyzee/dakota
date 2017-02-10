@@ -32,7 +32,7 @@ trait set-of-pairs {
   method firsts(object-t self) -> object-t {
     object-t set-kls = superklass-of(klass-of(self));
     object-t result = $make(set-kls);
-    for (pair-t& pair in self) {
+    for (pair-t& pair in self) { // hackhack: const pair-t&
       object-t first = pair.first;
       $add(result, first);
     }
@@ -40,7 +40,7 @@ trait set-of-pairs {
   }
   method lasts(object-t self) -> object-t {
     object-t result = $make(vector::klass(), #size: $size(self));
-    for (pair-t& pair in self) {
+    for (pair-t& pair in self) { // hackhack: const pair-t&
       object-t last = pair.last;
       $add-last(result, last);
     }
@@ -50,7 +50,7 @@ trait set-of-pairs {
     $write(out, "{");
     str-t delim = "";
 
-    for (pair-t& pair in self) {
+    for (pair-t& pair in self) { // hackhack: const pair-t&
       object-t first = pair.first;
       object-t last =  pair.last;
       $write(out, delim);
