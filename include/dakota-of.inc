@@ -63,17 +63,15 @@ inline FUNC klass_for_name(symbol_t name, object_t kls) -> object_t {
   assert(name != nullptr);
   return kls ? kls : dk_klass_for_name(name);
 }
+FUNC $has_traitQ(object_t, symbol_t) -> bool_t;
 inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
   assert(kls != nullptr);
   assert(trait != nullptr);
   while (!(kls == nullptr || kls == null)) { // !root-superklass?(kls)
-    const symbol_t* traits = klass::unbox(kls).traits;
-    while (traits != nullptr && *traits != nullptr) {
-      if (trait == *traits++) {
-        return kls;
-      }
-    }
+    if ($has_traitQ(kls, trait))
+      return kls;
     kls = superklass_of(kls);
   }
+  throw "oops!";
   return nullptr;
 }

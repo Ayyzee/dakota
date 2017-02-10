@@ -26,59 +26,11 @@ trait counted-set {
   //provides set;
   require collection;
 
+  trait set-of-pairs;
+
   func initialize(object-t) -> void {
     pair::klass();
     return;
-  }
-  method firsts(object-t self) -> object-t {
-    object-t set-kls = superklass-of(klass-of(self));
-    object-t result = $make(set-kls);
-    for (pair-t& pair in self) {
-      object-t first = pair.first;
-      $add(result, first);
-    }
-    return result;
-  }
-  method lasts(object-t self) -> object-t {
-    object-t result = $make(vector::klass(), #size: $size(self));
-    for (pair-t& pair in self) {
-      object-t last = pair.last;
-      $add-last(result, last);
-    }
-    return result;
-  }
-  method write-lite(object-t self, object-t out) -> object-t {
-    $write(out, "{");
-    str-t delim = "";
-
-    for (pair-t& pair in self) {
-      object-t first = pair.first;
-      object-t last =  pair.last;
-      $write(out, delim);
-      $write-lite(first, out); // must be primitive type
-      $write(out, ":");
-      if (last == nullptr || last == null)
-        $write(out, "null");
-      else
-        $write-lite(last, out);
-      delim = ",";
-    }
-    $write(out, "}");
-    return self;
-  }
-  method at(object-t self, object-t first) -> object-t {
-    object-t last = $at(super, first);
-    if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))
-      last = pair::unbox(last).last;
-    return last;
-  }
-  method at(object-t self, object-t first, object-t default-last) -> object-t {
-    object-t last = $at(super, first, nullptr);
-    if (last == nullptr)
-      last = default-last;
-    if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
-      last = pair::unbox(last).last;
-    return last;
   }
   method add(object-t self, object-t first) -> object-t {
     object-t pair = $at(super, first, nullptr);

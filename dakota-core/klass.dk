@@ -571,17 +571,23 @@ klass klass {
     } while ((current-info = current-info->next) != nullptr);
     return;
   }
-//   static func load-traits(const symbol-t* traits) -> void {
-//     if (traits == nullptr || traits[0] == nullptr)
-//       return;
-//     ssize-t i = 0;
-//     symbol-t trait-name;
-//     while ((trait-name = traits[i++]) != nullptr) {
-//       named-info-t* trait-info = info-for-name(trait-name);
-//       load-traits(cast(const symbol-t*)named-info::at(trait-info, #traits));
-//     }
-//     return;
-//   }
+  static func has-trait?(const symbol-t* traits, symbol-t name) -> bool-t {
+    if (traits == nullptr || traits[0] == nullptr)
+      return false;
+    ssize-t i = 0;
+    symbol-t trait-name;
+    while ((trait-name = traits[i++]) != nullptr) {
+      if (trait-name == name)
+        return true;
+      named-info-t* trait-info = info-for-name(trait-name);
+      if (has-trait?(cast(const symbol-t*)named-info::at(trait-info, #traits), name))
+        return true;
+    }
+    return false;
+  }
+  method has-trait?(object-t self, symbol-t name) -> bool-t {
+    return has-trait?(self.traits, name);
+  }
   static func add-traits(object-t self, const symbol-t* traits) -> void {
     if (traits == nullptr || traits[0] == nullptr)
       return;

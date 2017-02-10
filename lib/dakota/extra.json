@@ -10,6 +10,7 @@
     'alloc' => undef,
     'dealloc' => undef,
     'forward-iterator' => undef,
+    'has-trait?' => undef,
     'init' => undef,
     'instance?' => undef,
     'iter-pair' => undef,
