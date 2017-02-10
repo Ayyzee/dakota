@@ -882,6 +882,7 @@ klass catalog-info {
     const symbol-t*           traits;
     const symbol-t*           requires;
     const symbol-t*           provides;
+    const signature-t* const* method-aliases;
     const signature-t* const* method-signatures;
     const signature-t* const* kw-args-method-signatures;
     const signature-t* const* exported-method-signatures;
@@ -909,6 +910,7 @@ static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* 
     .traits =                           cast(decltype(ci->traits))                            named-info::at(ni, #traits),
     .requires =                         cast(decltype(ci->requires))                          named-info::at(ni, #requires),
     .provides =                         cast(decltype(ci->provides))                          named-info::at(ni, #provides),
+    .method-aliases =                   cast(decltype(ci->method-aliases))                    named-info::at(ni, #method-aliases),
     .method-signatures =                cast(decltype(ci->method-signatures))                 named-info::at(ni, #method-signatures),
     .kw-args-method-signatures =        cast(decltype(ci->kw-args-method-signatures))         named-info::at(ni, #kw-args-method-signatures),
     .exported-method-signatures =       cast(decltype(ci->exported-method-signatures))        named-info::at(ni, #exported-method-signatures),
@@ -959,11 +961,18 @@ static func max-slot-name-width(named-info-t* slots-info) -> int-t {
   }
   return result;
 }
-static func dump-method(ostream-t ostrm, const signature-t* info) -> void {
-  ostream::println-format(ostrm, "method %s(%s) -> %s;\n",
-                  info->name,
-                  info->param-types,
-                  info->return-type);
+static func dump-method(ostream-t ostrm, const signature-t* info, str-t comment = nullptr) -> void {
+  if (comment == nullptr)
+    ostream::println-format(ostrm, "method %s(%s) -> %s;\n",
+                            info->name,
+                            info->param-types,
+                            info->return-type);
+  else
+    ostream::println-format(ostrm, "method %s(%s) -> %s; // %s\n",
+                            info->name,
+                            info->param-types,
+                            info->return-type,
+                            comment);
   return;
 }
 static func klass-exported?(named-info-t* kls-info,
@@ -1177,6 +1186,20 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
   if (ci.exported-slots-method-signatures != nullptr)
     while ((sig = ci.exported-slots-method-signatures[index++]) != nullptr)
       dump-method(ostrm, sig);
+# if 0
+  index = 0;
+  if (ci.method-aliases != nullptr) {
+    ostream::println-format(ostrm, "\n");
+    char-t[128] comment = "";
+    while ((sig = ci.method-aliases[index++]) != nullptr) {
+      const signature-t* alias = ci.method-aliases[index++];
+      int-t len = snprintf(comment, sizeof(comment), "[[alias(%s)]]", alias->name);
+      if (len >= cast(int-t)sizeof(comment))
+        comment[sizeof(comment) - 1] = NUL;
+      dump-method(ostrm, sig, comment);
+    }
+  }
+# endif
 
   ostream::col-decr(ostrm);
   ostream::println-format(ostrm, "}\n");
