@@ -16,6 +16,9 @@
 
 # include <cstring>
 
+include-for <cinttypes> strtoimax;
+include-for <cerrno>    errno;
+
 # include "safe-str.hh"
 # include "private.hh"
 
@@ -52,6 +55,13 @@ klass symbol {
     mutable-unbox(self) = slots;
     self = $add(klass-of(self), self); // leakleak
     return self;
+  }
+  method intmax-value(object-t self) -> ssize-t {
+    errno = 0;
+    intmax-t result = cast(intmax-t)strtoimax(unbox(self), nullptr, 10); // base 10
+    if (errno)
+      throw "oop!";
+    return result;
   }
   method length(slots-t s) -> ssize-t {
     ssize-t result = cast(ssize-t)safe-strlen(s);

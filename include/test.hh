@@ -24,3 +24,9 @@
 # include <cstring>
 
 # define EXIT(v) return(v)
+
+inline FUNC str_from(ssize_t value) -> str_t {
+  char_t* result = nullptr;
+  asprintf(&result, "%zi", value); // malloc()s result!!
+  return result;
+}
