@@ -44,7 +44,6 @@ trait set {
     }
     return result;
   }
-  method remove-at(object-t self, object-t element) -> object-t;
   // complement (if collection is set)
   method remove-all(object-t self, object-t collection) -> object-t {
     for (object-t e in collection)
@@ -71,6 +70,7 @@ trait set {
     object-t result = $add(self, element);
     return result;
   }
+  method remove-at(object-t self, object-t element) -> object-t;
 //   method forward-iterator(object-t) -> object-t; // hackhack
 //   method in?(object-t self, object-t element) -> bool-t;
 }
