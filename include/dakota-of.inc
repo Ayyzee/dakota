@@ -72,6 +72,5 @@ inline FUNC klass_with_trait(object_t kls, symbol_t trait) -> object_t {
       return kls;
     kls = superklass_of(kls);
   }
-  throw "oops!";
-  return nullptr;
+  throw "bummer";;
 }

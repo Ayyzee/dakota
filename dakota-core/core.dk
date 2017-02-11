@@ -253,7 +253,7 @@ static func find-file(str-t path, str-t file-name, str-t suffix) -> str-t {
         str128-t buf = "";
         strerror-r(errno, buf, sizeof(buf));
         fprintf(stderr, "%s:%i: INFO: %s: %s\n", __FILE__, __LINE__, file, buf);
-        throw "bummer";
+        throw $make(exception::klass(), #msg: "bummer");
       }
       j1++;
       j2 = 0;
@@ -1659,7 +1659,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
 
     if (klasspath == nullptr) {
       fprintf(stderr, "%s:%i: ERROR: klass '%s' not found and KLASSPATH not set.\n", __FILE__, __LINE__, kls-name);
-      throw "bummer";
+      throw $make(exception::klass(), #msg: "bummer");
     } else {
       //fprintf(stdout, "KLASSPATH=%s\n", klasspath);
       str-t file-name = file-name-from-klass-name(kls-name);
@@ -1674,7 +1674,7 @@ func dk-klass-for-name(symbol-t name) -> object-t {
         return loaded-kls-info; // rnielsen: should have only one return per func
       }
       fprintf(stderr, "%s:%i: ERROR: klass '%s' not found.\n", __FILE__, __LINE__, kls-name);
-      throw "bummer";
+      throw $make(exception::klass(), #msg: "bummer");
     }
   }
   return kls-info; // rnielsen: should have only one return per func

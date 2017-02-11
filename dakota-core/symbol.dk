@@ -24,6 +24,7 @@ include-for <cerrno>    errno;
 
 module dakota-core;
 
+klass exception;
 klass hash;
 klass sorted-set;
 
@@ -60,7 +61,7 @@ klass symbol {
     errno = 0;
     intmax-t result = cast(intmax-t)strtoimax(unbox(self), nullptr, 10); // base 10
     if (errno)
-      throw "oop!";
+      throw $make(exception::klass(), #msg: "bummer");
     return result;
   }
   method length(slots-t s) -> ssize-t {
