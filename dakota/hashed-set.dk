@@ -147,8 +147,8 @@ klass hashed-set {
     object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque != nullptr) {
-      for (object-t forward-iterator = $forward-iterator(deque);
-           object-t e = $next(forward-iterator); /**/) {
+      for (object-t iterator = $iterator(deque);
+           object-t e = $next(iterator); /**/) {
         //printf("element: %s\n", $name(element));
         //printf("e: %s\n", $name(e));
 
@@ -156,7 +156,7 @@ klass hashed-set {
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           self.iterator-state++;
-          prev-element = $remove(forward-iterator); //e
+          prev-element = $remove(iterator); //e
           self.size--;
           break;
         }
@@ -177,9 +177,9 @@ klass hashed-set {
   method size(object-t self) -> ssize-t {
     return self.size;
   }
-  method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(hashed-set-forward-iterator::klass(), #hashed-set: self);
-    return forward-iterator;
+  method iterator(object-t self) -> object-t {
+    object-t iterator = $make(hashed-set-iterator::klass(), #hashed-set: self);
+    return iterator;
   }
   method dump(object-t self) -> object-t {
     $dump(super);
@@ -203,8 +203,8 @@ klass hashed-set {
     return self;
   }
 }
-klass hashed-set-forward-iterator {
-  trait forward-iterator;
+klass hashed-set-iterator {
+  trait iterator;
 
   slots {
     object-t hashed-set;
@@ -225,13 +225,13 @@ klass hashed-set-forward-iterator {
     assert(hashed-set != null);
     const hashed-set::slots-t& hs = hashed-set::unbox(hashed-set);
     self.hashed-set = hashed-set;
-    self.vector-iter = $forward-iterator(hs.buckets);
+    self.vector-iter = $iterator(hs.buckets);
     self.iterator-state = hs.iterator-state;
     self.deque-iter = nullptr;
     object-t deque = $next(self.vector-iter);
     if (deque != nullptr) {
       assert($size(deque) != 0);
-      self.deque-iter = $forward-iterator(deque);
+      self.deque-iter = $iterator(deque);
     }
     return self;
   }
@@ -247,7 +247,7 @@ klass hashed-set-forward-iterator {
     object-t deque-iter = nullptr;
     if (deque != nullptr) {
       assert($size(deque) != 0);
-      deque-iter = $forward-iterator(deque);
+      deque-iter = $iterator(deque);
     }
     return deque-iter;
   }

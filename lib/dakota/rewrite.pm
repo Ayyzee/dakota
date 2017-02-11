@@ -659,7 +659,7 @@ sub rewrite_supers {
 sub rewrite_for_in_replacement {
   my ($type, $element, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
   my $first_stmt = '';
-  my $result = "for (forward-iterator-context-t _context = \$forward-iterator-context($sequence);";
+  my $result = "for (iterator-context-t _context = \$iterator-context($sequence, selector(next,(object-t)));";
 
   if ('object-t' eq $type) {
     $result .= " object-t $element = _context.next(_context.iter);";

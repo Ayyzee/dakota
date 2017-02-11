@@ -19,9 +19,6 @@ export dakota-core {
   addr2name-pair;
   assoc-node::slots-t;
   assoc-node;
-  backward-iterator-context::slots-t;
-  backward-iterator-context;
-  backward-iterator;
   bit-vector-op::slots-t;
   bit-vector-op;
   bit-vector;
@@ -54,9 +51,9 @@ export dakota-core {
   exception;
   finalize-func::slots-t;
   finalize-func;
-  forward-iterator-context::slots-t;
-  forward-iterator-context;
-  forward-iterator;
+  iterator-context::slots-t;
+  iterator-context;
+  iterator;
   generic-func;
   generic-func::slots-t;
   get-segment-data::slots-t;

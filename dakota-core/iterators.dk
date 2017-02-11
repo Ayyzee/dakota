@@ -16,28 +16,15 @@
 
 module dakota-core;
 
-klass forward-iterator-context {
+klass iterator-context {
   slots {
     object-t iter;
     method-t next;
   }
 }
-klass backward-iterator-context {
-  slots {
-    object-t iter;
-    method-t prev;
-  }
-}
-trait forward-iterator {
+trait iterator {
   method next(object-t self) -> object-t;
   method next?(object-t self) -> bool-t;
-  method element(object-t self) -> object-t;
-  method set-element(object-t self, object-t element) -> object-t;
-  method remove(object-t self) -> object-t;
-}
-trait backward-iterator {
-  method prev(object-t self) -> object-t;
-  method prev?(object-t self) -> bool-t;
   method element(object-t self) -> object-t;
   method set-element(object-t self, object-t element) -> object-t;
   method remove(object-t self) -> object-t;

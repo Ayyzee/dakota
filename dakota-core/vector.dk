@@ -212,11 +212,11 @@ klass vector {
     return element;
   }
   method replace(object-t self, object-t object1, object-t object2) -> object-t {
-    for (object-t forward-iterator = $forward-iterator(self);
-         $next?(forward-iterator);
-         $next(forward-iterator)) {
-      if ($equals?($element(forward-iterator), object1))
-        $set-element(forward-iterator, object2);
+    for (object-t iterator = $iterator(self);
+         $next?(iterator);
+         $next(iterator)) {
+      if ($equals?($element(iterator), object1))
+        $set-element(iterator, object2);
     }
     return object1;
   }
@@ -301,9 +301,9 @@ klass vector {
     assert(self.count != 0);
     return self.elements[self.count - 1];
   }
-  method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(vector-forward-iterator::klass(), #vector: self);
-    return forward-iterator;
+  method iterator(object-t self) -> object-t {
+    object-t iterator = $make(vector-iterator::klass(), #vector: self);
+    return iterator;
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
@@ -339,8 +339,8 @@ klass vector {
     return result;
   }
 }
-klass vector-forward-iterator {
-  trait forward-iterator;
+klass vector-iterator {
+  trait iterator;
 
   slots {
     object-t vector;
@@ -395,7 +395,7 @@ klass vector-forward-iterator {
       self.index = vector::next-index(self.vector, self.index + 1);
     }
     //       printf("%s:%s(%p) = %p\n",
-    //              "vector-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
+    //              "vector-iterator", __func__, (ptr-t)self, (ptr-t)element);
     return element;
   }
   method element(object-t self) -> object-t {

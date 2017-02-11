@@ -16,8 +16,7 @@
 
 module dakota-core;
 
-klass forward-iterator-context;
-klass backward-iterator-context;
+klass iterator-context;
 klass std-compare;
 
 // func dk-va-add-all(object-t self, va-list-t args) -> object-t {
@@ -36,8 +35,7 @@ klass std-compare;
 klass collection {
   superklass object;
 
-  trait forward-iterator;
-  trait backward-iterator;
+  trait iterator;
 
   method write-lite(object-t self, object-t out) -> object-t {
     USE(out);
@@ -72,20 +70,13 @@ klass collection {
       $add(self, arg);
     return self; // nullnull?
   }
-  method forward-iterator-context(object-t self) -> forward-iterator-context-t {
-    object-t iter = $forward-iterator(self);
-    method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
-    return cast(forward-iterator-context-t){ .iter = iter, .next = next };
+  method iterator-context(object-t self, selector-t s) -> iterator-context-t {
+    object-t iter = $iterator(self);
+    method-t next = $method-for-selector(klass-of(iter), s);
+    return cast(iterator-context-t){ .iter = iter, .next = next };
   }
-  method backward-iterator-context(object-t self) -> backward-iterator-context-t {
-    object-t iter = $backward-iterator(self);
-    method-t prev = $method-for-selector(klass-of(iter), selector(prev(object-t)));
-    return cast(backward-iterator-context-t){ .iter = iter, .prev = prev };
-  }
-  method forward-iterator(object-t self) -> object-t;
-  method backward-iterator(object-t self) -> object-t;
+  method iterator(object-t self) -> object-t;
 //   method add(object-t self, object-t element) -> object-t;
-//   method forward-iterator(object-t self) -> object-t;
 
   // method size(object-t self) -> ssize-t;
   // method empty?(object-t self) -> bool-t;

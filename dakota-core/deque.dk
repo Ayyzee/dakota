@@ -333,9 +333,9 @@ klass deque {
     throw $make(exception::klass(), #msg: "not yet implemented");
     return null;
   }
-  method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(deque-forward-iterator::klass(), #deque: self);
-    return forward-iterator;
+  method iterator(object-t self) -> object-t {
+    object-t iterator = $make(deque-iterator::klass(), #deque: self);
+    return iterator;
   }
   // method write-element(object-t self, object-t out, str-t name) -> object-t {
   //   if (out == null)
@@ -358,8 +358,8 @@ klass deque {
   //   return null;
   // }
 }
-klass deque-forward-iterator {
-  trait forward-iterator;
+klass deque-iterator {
+  trait iterator;
 
   slots {
     object-t             deque; // needed for iterator-state
@@ -428,7 +428,7 @@ klass deque-forward-iterator {
       self.node = self.node->next;
     }
     // printf("%s:%s(%p) = %p\n",
-    //      "deque-forward-iterator", __func__, (ptr-t)self, (ptr-t)element);
+    //      "deque-iterator", __func__, (ptr-t)self, (ptr-t)element);
     return element;
   }
   method element(object-t self) -> object-t {

@@ -165,9 +165,9 @@ klass sorted-set {
   method size(object-t self) -> ssize-t {
     return self.ssc->count;
   }
-  method forward-iterator(object-t self) -> object-t {
-    object-t forward-iterator = $make(sorted-set-forward-iterator::klass(), #sorted-set: self);
-    return forward-iterator;
+  method iterator(object-t self) -> object-t {
+    object-t iterator = $make(sorted-set-iterator::klass(), #sorted-set: self);
+    return iterator;
   }
   method dump(object-t self) -> object-t {
     $dump(super);
@@ -191,8 +191,8 @@ klass sorted-set {
     return self;
   }
 }
-klass sorted-set-forward-iterator {
-  trait forward-iterator;
+klass sorted-set-iterator {
+  trait iterator;
 
   slots {
     object-t sorted-set;

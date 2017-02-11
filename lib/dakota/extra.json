@@ -8,14 +8,12 @@
  #'target_extra_generics' => {},
   'src_extra_generics' => {
     'alloc' => undef,
-    'backward-iterator-context' => undef,
-    'backward-iterator' => undef,
     'dealloc' => undef,
-    'forward-iterator-context' => undef,
-    'forward-iterator' => undef,
     'has-trait?' => undef,
     'init' => undef,
     'instance?' => undef,
+    'iterator-context' => undef,
+    'iterator' => undef,
     'klass-with-trait' => undef,
     'next' => undef,
   },
@@ -35,17 +33,16 @@
     '#symbol' => undef,
   },
   'src_extra_klass_decls' => {
-    'backward-iterator-context' => undef,
     'boole' => undef,
     'char8' => undef,
     'compare' => undef, # hackhack
     'equals' => undef, # hackhack (workaround for dakota-test/should-pass/pass/sets/)
     'finalize-func' => undef,
-    'forward-iterator-context' => undef,
     'generic-func' => undef,
     'hash' => undef,
     'initialize-func' => undef,
     'input-stream' => undef, # std-input
+    'iterator-context' => undef,
     'keyword' => undef,
     'klass' => undef,
     'method' => undef,
