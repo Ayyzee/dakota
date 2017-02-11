@@ -51,7 +51,7 @@ func echo-stuff(object::slots-t* instance, str-t action, symbol-t kls-name, symb
 klass object {
   slots {
     object-t                  klass;
-    std::atomic<int-fast32-t> ref-count;
+    std::atomic<int-fast32-t> ref-count; // for single threaded just use int-fast32-t
   }
 
   // documented to do nothing
@@ -64,6 +64,9 @@ klass object {
   method dealloc(object-t self) -> object-t {
     self->klass = nullptr;
     return nullptr;
+  }
+  method self(object-t self) -> object-t {
+    return self;
   }
   method write-slots(object-t self, object-t out) -> object-t {
   //$write-slots(super, out);

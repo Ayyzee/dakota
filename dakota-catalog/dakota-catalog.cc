@@ -111,7 +111,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         opts.exported_only = true;
         break;
       case DAKOTA_CATALOG_ONLY:
-        opts.only = optarg;
+        opts.only = optarg; // should be an array
         break;
       case DAKOTA_CATALOG_OUTPUT:
         opts.output = optarg;
@@ -200,7 +200,7 @@ FUNC main(int argc, char** argv) -> int {
     if (opts.output_directory != nullptr)
       setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
     if (opts.only != nullptr)
-      setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1);
+      setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1); // should be space delimitted list
     if (opts.recursive)
       setenv_boole("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
   }
