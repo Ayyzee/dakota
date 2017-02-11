@@ -106,11 +106,11 @@ klass object-output-stream {
 
     return self;
   }
-//   method write-element(object-t self, str-t t, str-t key) -> object-t;
-//   method write-element(object-t self, ssize-t t, str-t key) -> object-t;
-//   method write-element(object-t self, ssize-t t, str-t key) -> object-t;
-//   method write-sequence-start(object-t self, str-t key) -> object-t;
-//   method write-sequence-end(object-t self) -> object-t;
-//   method write-table-start(object-t self, str-t key) -> object-t;
-//   method write-table-end(object-t self) -> object-t;
+  method write-element(object-t self, str-t t, str-t key) -> object-t;
+  method write-element(object-t self, ssize-t t, str-t key) -> object-t;
+  method write-element(object-t self, ssize-t t, str-t key) -> object-t;
+  method write-sequence-start(object-t self, str-t key) -> object-t;
+  method write-sequence-end(object-t self) -> object-t;
+  method write-table-start(object-t self, str-t key) -> object-t;
+  method write-table-end(object-t self) -> object-t;
 }
