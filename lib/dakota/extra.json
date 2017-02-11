@@ -8,6 +8,8 @@
  #'target_extra_generics' => {},
   'src_extra_generics' => {
     'alloc' => undef,
+    'backward-iterator-context' => undef,
+    'backward-iterator' => undef,
     'dealloc' => undef,
     'forward-iterator-context' => undef,
     'forward-iterator' => undef,
@@ -33,6 +35,7 @@
     '#symbol' => undef,
   },
   'src_extra_klass_decls' => {
+    'backward-iterator-context' => undef,
     'boole' => undef,
     'char8' => undef,
     'compare' => undef, # hackhack

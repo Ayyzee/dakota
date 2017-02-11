@@ -20,6 +20,7 @@ module dakota-core;
 
 klass vector;
 trait forward-iterator;
+trait backward-iterator;
 
 func map(object-t seq, std::function<object-t (object-t)> f) -> object-t {
   object-t result = $make(klass-of(seq));

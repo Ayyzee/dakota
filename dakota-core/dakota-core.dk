@@ -19,6 +19,9 @@ export dakota-core {
   addr2name-pair;
   assoc-node::slots-t;
   assoc-node;
+  backward-iterator-context::slots-t;
+  backward-iterator-context;
+  backward-iterator;
   bit-vector-op::slots-t;
   bit-vector-op;
   bit-vector;

@@ -22,9 +22,22 @@ klass forward-iterator-context {
     method-t next;
   }
 }
+klass backward-iterator-context {
+  slots {
+    object-t iter;
+    method-t prev;
+  }
+}
 trait forward-iterator {
-  method next(object-t self) -> object-t; // returns nullptr on end
+  method next(object-t self) -> object-t;
   method next?(object-t self) -> bool-t;
+  method element(object-t self) -> object-t;
+  method set-element(object-t self, object-t element) -> object-t;
+  method remove(object-t self) -> object-t;
+}
+trait backward-iterator {
+  method prev(object-t self) -> object-t;
+  method prev?(object-t self) -> bool-t;
   method element(object-t self) -> object-t;
   method set-element(object-t self, object-t element) -> object-t;
   method remove(object-t self) -> object-t;
