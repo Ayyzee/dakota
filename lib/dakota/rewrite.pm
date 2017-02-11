@@ -656,10 +656,18 @@ sub rewrite_supers {
 #    ## regex should be (:)?(\w+:)*\w+ ?
 #    $$filestr_ref =~ s/make\(([_a-z0-9:-]+)/\$init(\$alloc($1)/g;
 #}
+my $dir2method_name = {
+  'forward'  => 'next',
+  'backward' => 'prev',
+};
 sub rewrite_for_in_replacement {
-  my ($type, $element, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
+  my ($dir, $type, $element, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
+  my $method_name = 'next';
+  if ($dir) {
+    $method_name = $$dir2method_name{$dir};
+  }
   my $first_stmt = '';
-  my $result = "for (iterator-context-t _context = \$iterator-context($sequence, selector(next,(object-t)));";
+  my $result = "for (iterator-context-t _context = \$iterator-context($sequence, selector($method_name,(object-t)));";
 
   if ('object-t' eq $type) {
     $result .= " object-t $element = _context.next(_context.iter);";
@@ -699,7 +707,7 @@ sub rewrite_for_in {
   my ($filestr_ref) = @_;
   # for ( object-t xx : yy )
   # for ( pair-t& xx : yy )
-  $$filestr_ref =~ s=for\s*\(\s*($id(\*|&)?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_in_replacement($1, $3, $4, $5, $6, $7, $8, $9)=gse;
+  $$filestr_ref =~ s=for\s*(forward|backward)?\s*\(\s*($id(\*|&)?)\s*($id)\s+in\s+(.*?)\s*\)(\s*)(\{?)(\s*)(.*?;)(\s*)=&rewrite_for_in_replacement($1, $2, $4, $5, $6, $7, $8, $9, $10)=gse;
 }
 sub rewrite_slot_access {
   my ($filestr_ref) = @_;

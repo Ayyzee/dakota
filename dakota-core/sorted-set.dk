@@ -235,6 +235,22 @@ klass sorted-set-iterator {
     }
     return element;
   }
+  method prev?(object-t self) -> bool-t {
+    check-iterator-state(self);
+    bool-t state = false;
+    if (self.offset > 0)
+      state = true;
+    return state;
+  }
+  method prev(object-t self) -> object-t {
+    check-iterator-state(self);
+    object-t element = nullptr;
+    if ($prev?(self)) {
+      element = $element(self);
+      self.offset--;
+    }
+    return element;
+  }
   method element(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
