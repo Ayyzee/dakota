@@ -16,14 +16,7 @@
 
 module dakota-core;
 
-klass std-compare; // hackhack
-
 klass sorted-counted-set {
   superklass sorted-set;
   trait      counted-set;
-
-  method va::init(object-t self, va-list-t args) -> object-t {
-    self = $va::init(super, args);
-    return self;
-  }
 }

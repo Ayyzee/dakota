@@ -75,8 +75,8 @@ klass collection {
     method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
     return cast(iter-pair-t){ .iter = iter, .next = next };
   }
-  method add(object-t self, object-t element) -> object-t;
-  method forward-iterator(object-t self) -> object-t;
+//   method add(object-t self, object-t element) -> object-t;
+//   method forward-iterator(object-t self) -> object-t;
 
   // method size(object-t self) -> ssize-t;
   // method empty?(object-t self) -> bool-t;

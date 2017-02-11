@@ -68,10 +68,20 @@ klass sequence {
       $add-last(self, element);
     return collection;
   }
-  method add-first(object-t self, object-t element) -> object-t;
-  method add-last(object-t self, object-t element) -> object-t;
-  method remove-first(object-t self) -> object-t;
-  method remove-last(object-t self) -> object-t;
+  method in?(object-t self, object-t element) -> bool-t {
+    bool-t state = false;
+    for (object-t e in self) {
+      if ($equals?(e, element)) {
+        state = true;
+        break;
+      }
+    }
+    return state;
+  }
+//   method add-first(object-t self, object-t element) -> object-t;
+//   method add-last(object-t self, object-t element) -> object-t;
+//   method remove-first(object-t self) -> object-t;
+//   method remove-last(object-t self) -> object-t;
 
   //     method first-index(object-t self, object-t element) -> ssize-t;
   //     method last-index(object-t self, object-t element) -> ssize-t;

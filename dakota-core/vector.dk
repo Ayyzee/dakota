@@ -156,18 +156,6 @@ klass vector {
     self.iterator-state++;
     return self;
   }
-  // maybe could return number present
-  method in?(object-t self, object-t element) -> bool-t {
-    bool-t state = false;
-
-    for (object-t e in self) {
-      if ($equals?(e, element)) {
-        state = true;
-        break;
-      }
-    }
-    return state;
-  }
   // reverse in place
   method reverse(object-t self) -> object-t {
     ssize-t head-offset = 0, tail-offset = self.count - 1;

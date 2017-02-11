@@ -19,9 +19,4 @@ module dakota;
 klass hashed-counted-set {
   superklass hashed-set;
   trait      counted-set;
-
-  method va::init(object-t self, va-list-t args) -> object-t {
-    self = $va::init(super, args);
-    return self;
-  }
 }

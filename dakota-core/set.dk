@@ -68,6 +68,6 @@ trait set {
     object-t result = $add(self, element);
     return result;
   }
-  method forward-iterator(object-t) -> object-t; // hackhack
-  method in?(object-t self, object-t element) -> bool-t;
+//   method forward-iterator(object-t) -> object-t; // hackhack
+//   method in?(object-t self, object-t element) -> bool-t;
 }
