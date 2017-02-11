@@ -571,7 +571,9 @@ klass klass {
     } while ((current-info = current-info->next) != nullptr);
     return;
   }
-  static func has-trait?(const symbol-t* traits, symbol-t name) -> bool-t {
+  // this is really slow for uses of super in trait method defns.
+  // needs to be reworked so it will have very little overhead
+  static func has-trait?(const symbol-t* traits, symbol-t name) -> bool-t { // recursive
     if (traits == nullptr || traits[0] == nullptr)
       return false;
     ssize-t i = 0;
@@ -580,8 +582,9 @@ klass klass {
       if (trait-name == name)
         return true;
       named-info-t* trait-info = info-for-name(trait-name);
-      if (has-trait?(cast(const symbol-t*)named-info::at(trait-info, #traits), name))
-        return true;
+      if (trait-info != nullptr)
+        if (has-trait?(cast(const symbol-t*)named-info::at(trait-info, #traits), name))
+          return true;
     }
     return false;
   }
@@ -741,6 +744,9 @@ klass klass {
     if (bit-vector::_klass_ != nullptr) // don't change to bit-vector::klass(), it will fail
       self.behavior = behavior(self, selector-count());
 # endif
+    // 1. start with method table of superklass
+    // 2. lay down traits (recursively) writing over superklass methods (just like a subklass would do)
+    // 3. lay down the methods defined in this klass writing over prev methods
     alloc-methods(self, selector-count());
     init-methods(self);
     bool-t should-override;
@@ -798,7 +804,7 @@ klass klass {
     return state;
   }
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
-    return::klass-with-trait(self, trait);
+    return ::klass-with-trait(self, trait);
   }
   method str(object-t self) -> str-t {
     symbol-t name = name-of(self);
