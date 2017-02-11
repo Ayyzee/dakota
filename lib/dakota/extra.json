@@ -9,11 +9,11 @@
   'src_extra_generics' => {
     'alloc' => undef,
     'dealloc' => undef,
+    'forward-iterator-context' => undef,
     'forward-iterator' => undef,
     'has-trait?' => undef,
     'init' => undef,
     'instance?' => undef,
-    'iter-pair' => undef,
     'klass-with-trait' => undef,
     'next' => undef,
   },
@@ -38,11 +38,11 @@
     'compare' => undef, # hackhack
     'equals' => undef, # hackhack (workaround for dakota-test/should-pass/pass/sets/)
     'finalize-func' => undef,
+    'forward-iterator-context' => undef,
     'generic-func' => undef,
     'hash' => undef,
     'initialize-func' => undef,
     'input-stream' => undef, # std-input
-    'iter-pair' => undef,
     'keyword' => undef,
     'klass' => undef,
     'method' => undef,

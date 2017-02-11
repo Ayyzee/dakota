@@ -120,8 +120,8 @@ export dakota-core {
   intptr::min;
   intptr::slots-t;
   intptr;
-  iter-pair::slots-t;
-  iter-pair;
+  forward-iterator-context::slots-t;
+  forward-iterator-context;
   keyword-exception;
   keyword::slots-t;
   keyword;

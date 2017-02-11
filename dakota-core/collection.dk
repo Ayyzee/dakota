@@ -16,7 +16,7 @@
 
 module dakota-core;
 
-klass iter-pair;
+klass forward-iterator-context;
 klass std-compare;
 
 // func dk-va-add-all(object-t self, va-list-t args) -> object-t {
@@ -70,10 +70,10 @@ klass collection {
       $add(self, arg);
     return self; // nullnull?
   }
-  method iter-pair(object-t self) -> iter-pair::slots-t {
+  method forward-iterator-context(object-t self) -> forward-iterator-context-t {
     object-t iter = $forward-iterator(self);
     method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
-    return cast(iter-pair-t){ .iter = iter, .next = next };
+    return cast(forward-iterator-context-t){ .iter = iter, .next = next };
   }
 //   method add(object-t self, object-t element) -> object-t;
 //   method forward-iterator(object-t self) -> object-t;

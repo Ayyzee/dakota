@@ -16,7 +16,7 @@
 
 module dakota-core;
 
-klass iter-pair {
+klass forward-iterator-context {
   slots {
     object-t iter;
     method-t next;
