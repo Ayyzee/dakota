@@ -120,6 +120,15 @@ klass sorted-set {
     }
     return prev-element; // returns nullptr on error
   }
+  method remove-first(object-t self) -> object-t {
+    object-t prev-element = nullptr;
+    if (self.ssc->count != 0) {
+      self.iterator-state++;
+      prev-element = *(cast(object-t*)sorted-set-core::remove-first(self.ssc));
+      prev-element.remove-ref();
+    }
+    return prev-element; // returns nullptr on error
+  }
   method remove-last(object-t self) -> object-t {
     object-t prev-element = nullptr;
     if (self.ssc->count != 0) {
