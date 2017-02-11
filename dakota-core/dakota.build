@@ -19,7 +19,7 @@
       '$(srcdir)/illegal-klass-exception.dk',
       '$(srcdir)/input-stream.dk',
       '$(srcdir)/int.dk',
-      '$(srcdir)/iterators.dk',
+      '$(srcdir)/iterator.dk',
       '$(srcdir)/keyword-exception.dk',
       '$(srcdir)/keyword.dk',
       '$(srcdir)/klass.dk',
