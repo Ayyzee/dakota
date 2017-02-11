@@ -25,31 +25,34 @@ trait forward-iterator;
 
 trait set {
   method all-in?(object-t self, object-t collection) -> bool-t {
-    USE(self);
-    USE(collection);
-    throw $make(exception::klass(), #msg: "not yet implemented");
-    return false;
+    bool-t result = true;
+    for (object-t e in collection) {
+      if (!$in?(self, e)) {
+        result = false;
+        break;
+      }
+    }
+    return result;
   }
   method any-in?(object-t self, object-t collection) -> bool-t {
-    USE(self);
-    USE(collection);
-    throw $make(exception::klass(), #msg: "not yet implemented");
-    return false;
+    bool-t result = false;
+    for (object-t e in collection) {
+      if ($in?(self, e)) {
+        result = true;
+        break;
+      }
+    }
+    return result;
   }
+  method remove-at(object-t self, object-t element) -> object-t;
   // complement (if collection is set)
   method remove-all(object-t self, object-t collection) -> object-t {
-    USE(self);
-    USE(collection);
-    throw $make(exception::klass(), #msg: "not yet implemented");
-    return null;
+    for (object-t e in collection)
+      $remove-at(self, e);
+    return self;
   }
   // intersection (if collection is set)
-  method retain-all(object-t self, object-t collection) -> object-t {
-    USE(self);
-    USE(collection);
-    throw $make(exception::klass(), #msg: "not yet implemented");
-    return null;
-  }
+//   method retain-all(object-t self, object-t collection) -> object-t
   method write-lite(object-t self, object-t out) -> object-t {
     $write(out, "{");
     str-t delim = "";
