@@ -42,3 +42,11 @@ trait backward-iterator {
   method set-element(object-t self, object-t element) -> object-t;
   method remove(object-t self) -> object-t;
 }
+
+// only next() (or prev()) (iterator-context() is already provided)
+
+// for (object-t e in s)
+// =>
+// for (iterator-context-t _c_ = $iterator-context(self, selector(next(object-t)); object-t e = _c_.next(_c_.iter); /**/)
+// or
+// for (iterator-context-t _c_ = $iterator-context(self, selector(prev(object-t)); object-t e = _c_.next(_c_.iter); /**/)
