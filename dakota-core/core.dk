@@ -927,7 +927,7 @@ static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* 
   return;
 }
 static func max-enum-name-width(enum-info-t* enum-info) -> int-t {
-  cmp-t result = 0;
+  int-t result = 0;
   int-t i = 0;
   str-t name;
   while ((name = enum-info[i++].name) != nullptr) {
@@ -938,7 +938,7 @@ static func max-enum-name-width(enum-info-t* enum-info) -> int-t {
   return result;
 }
 static func max-slot-type-width(named-info-t* slots-info) -> int-t {
-  cmp-t result = 0;
+  int-t result = 0;
   int-t i = 0;
   while (slots-info[i].elements != nullptr) {
     str-t slot-type = cast(str-t)named-info::at(&slots-info[i], #type);
@@ -950,7 +950,7 @@ static func max-slot-type-width(named-info-t* slots-info) -> int-t {
   return result;
 }
 static func max-slot-name-width(named-info-t* slots-info) -> int-t {
-  cmp-t result = 0;
+  int-t result = 0;
   int-t i = 0;
   while (slots-info[i].elements != nullptr) {
     str-t slot-name = cast(str-t)named-info::at(&slots-info[i], #name);
