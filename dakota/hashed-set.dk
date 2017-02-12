@@ -128,14 +128,6 @@ klass hashed-set {
       throw $make(exception::klass(), #msg: "oops");
     return result;
   }
-  method in?(object-t self, object-t element) -> bool-t {
-    bool-t state = ($at(self, element, nullptr) != nullptr);
-    return state;
-  }
-  method empty?(object-t self) -> bool-t {
-    bool-t state = (self.size == 0);
-    return state;
-  }
   method remove(object-t self, object-t element) -> object-t {
     object-t prev-element = nullptr;
 

@@ -142,13 +142,8 @@ klass vector {
     return copy;
   }
   method empty?(object-t self) -> bool-t {
-    bool-t state;
-
-    if (self.count == 0)
-      state = true;
-    else
-      state = false;
-    return state;
+    bool-t result = (self.count == 0);
+    return result;
   }
   method empty(object-t self) -> object-t {
     for (ssize-t i = 0; i < self.count; i++)

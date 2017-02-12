@@ -87,10 +87,6 @@ klass sorted-set {
       throw $make(exception::klass(), #msg: "oops");
     return result;
   }
-  method in?(object-t self, object-t element) -> bool-t {
-    bool-t state = ($at(self, element, nullptr) != nullptr);
-    return state;
-  }
   method add(object-t self, object-t element) -> object-t {
     object-t result = element;
     self.iterator-state++;
@@ -142,10 +138,6 @@ klass sorted-set {
       self.iterator-state++;
     }
     return self;
-  }
-  method empty?(object-t self) -> bool-t {
-    bool-t state = (self.ssc->count == 0);
-    return state;
   }
   [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);

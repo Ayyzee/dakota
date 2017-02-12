@@ -104,7 +104,7 @@ klass input-file {
     } else {
       self.column--;
     }
-    return null;
+    return self;
   }
   method get-char8(object-t self) -> char-t {
     char-t c = self.buffer[self.current-position++];

@@ -22,9 +22,6 @@ klass vector;
 trait set;
 
 trait table {
-  //provides set;
-  require collection;
-
   trait set-of-pairs;
 
   func initialize(object-t) -> void {

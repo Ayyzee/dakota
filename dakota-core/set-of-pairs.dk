@@ -22,8 +22,7 @@ klass vector;
 trait set;
 
 trait set-of-pairs {
-  //provides set;
-  require collection;
+  trait set;
 
   func initialize(object-t) -> void {
     pair::klass();

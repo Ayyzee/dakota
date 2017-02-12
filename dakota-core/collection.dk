@@ -55,7 +55,7 @@ klass collection {
   //     strings++;
   //     $add(self, string);
   //   }
-  //   return null;
+  //   return self;
   // }
   method add-all(object-t self, object-t collection) -> object-t {
     for (object-t element in collection)
@@ -69,6 +69,24 @@ klass collection {
     while ((arg = *args++) != nullptr)
       $add(self, arg);
     return self; // nullnull?
+  }
+  method all-in?(object-t self, object-t collection) -> bool-t {
+    bool-t result = true;
+    for (object-t e in collection)
+      if (!(result = $in?(self, e)))
+        break;
+    return result;
+  }
+  method any-in?(object-t self, object-t collection) -> bool-t {
+    bool-t result = false;
+    for (object-t e in collection)
+      if ((result = $in?(self, e)))
+        break;
+    return result;
+  }
+  method empty?(object-t self) -> bool-t {
+    bool-t state = ($size(self) == 0);
+    return state;
   }
   [[alias(iterator-context)]] method forward-iterator-context(object-t self) -> iterator-context-t {
     object-t iter = $forward-iterator(self);

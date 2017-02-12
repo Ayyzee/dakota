@@ -23,9 +23,6 @@ klass vector;
 trait set;
 
 trait counted-set {
-  //provides set;
-  require collection;
-
   trait set-of-pairs;
 
   func initialize(object-t) -> void {

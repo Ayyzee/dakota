@@ -210,7 +210,7 @@ klass deque {
   [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
     USE(self);
     throw $make(exception::klass(), #msg: "not yet implemented");
-    return null;
+    return self;
   }
   // insert-before
   // insert-after
@@ -221,18 +221,13 @@ klass deque {
     return self.size;
   }
   method empty?(object-t self) -> bool-t {
-    bool-t state;
-
-    if (self.size == 0)
-      state = true;
-    else
-      state = false;
-    return state;
+    bool-t result = (self.size == 0);
+    return result;
   }
   method empty(object-t self) -> object-t {
-    USE(self);
-    throw $make(exception::klass(), #msg: "not yet implemented");
-    return null;
+    while (self.size != 0)
+      $remove-last(self);
+    return self;
   }
   static func health-check(object-t self) -> void {
     assert((self.first == nullptr && self.last == nullptr) ||
@@ -331,7 +326,7 @@ klass deque {
   method reverse(object-t self) -> object-t {
     USE(self);
     throw $make(exception::klass(), #msg: "not yet implemented");
-    return null;
+    return self;
   }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
     object-t iterator = $make(deque-iterator::klass(), #deque: self);
@@ -355,7 +350,7 @@ klass deque {
   //   $decrement-column(out);
   //   snprintf(buffer, sizeof(buffer), "</sequence>");
   //   $writeln(out, buffer);
-  //   return null;
+  //   return self;
   // }
 }
 klass deque-iterator {
