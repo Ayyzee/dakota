@@ -16,6 +16,7 @@
 
 module dakota-core;
 
+// returned by $iterator-context() or collection::iterator-context()
 klass iterator-context {
   slots {
     object-t iter;
@@ -32,8 +33,13 @@ trait iterator {
 
 // only next() (or prev()) (iterator-context() is already provided)
 
-// for (object-t e in s)
+// for|loop [forward] (object-t e in s)
 // =>
-// for (iterator-context-t _c_ = $iterator-context(self, selector(next(object-t)); object-t e = _c_.next(_c_.iter); /**/)
+// for (iterator-context-t _c_ = $iterator-context(self, selector(next(object-t));
+//                                                 object-t e = _c_.next(_c_.iter); /**/)
 // or
-// for (iterator-context-t _c_ = $iterator-context(self, selector(prev(object-t)); object-t e = _c_.next(_c_.iter); /**/)
+//
+// for|loop backward (object-t e in s)
+// =>
+// for (iterator-context-t _c_ = $iterator-context(self, selector(prev(object-t));
+//                                                 object-t e = _c_.next(_c_.iter); /**/)
