@@ -164,7 +164,7 @@ klass hashed-set {
     }
     return prev-element; // returns nullptr on error
   }
-  method copy-shallow(object-t self) -> object-t {
+  [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = $make(kls);
     const slots-t& s1 = unbox(self);

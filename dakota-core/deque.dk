@@ -207,7 +207,7 @@ klass deque {
     }
     return self;
   }
-  method copy-shallow(object-t self) -> object-t {
+  [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
     USE(self);
     throw $make(exception::klass(), #msg: "not yet implemented");
     return null;

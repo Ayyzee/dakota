@@ -87,7 +87,7 @@ klass bit-vector {
     self.elements = dkt::dealloc(self.elements);
     return $dealloc(super);
   }
-  method copy-shallow(object-t self) -> object-t {
+  [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
     object-t copy = $make(kls);
     const slots-t& s1 = unbox(self);
