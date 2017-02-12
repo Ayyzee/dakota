@@ -35,11 +35,8 @@ trait iterator {
 
 // for|loop [forward] (object-t e in s)
 // =>
-// for (iterator-context-t _c_ = $iterator-context(self, selector(next(object-t));
-//                                                 object-t e = _c_.next(_c_.iter); /**/)
-// or
-//
+// for (iterator-context-t _c_ = $forward-iterator-context(self); object-t e = _c_.next(_c_.iter); /**/)
+
 // for|loop backward (object-t e in s)
 // =>
-// for (iterator-context-t _c_ = $iterator-context(self, selector(prev(object-t));
-//                                                 object-t e = _c_.next(_c_.iter); /**/)
+// for (iterator-context-t _c_ = $backward-iterator-context(self); object-t e = _c_.next(_c_.iter); /**/)

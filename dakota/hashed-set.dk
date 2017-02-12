@@ -177,7 +177,7 @@ klass hashed-set {
   method size(object-t self) -> ssize-t {
     return self.size;
   }
-  method iterator(object-t self) -> object-t {
+  [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
     object-t iterator = $make(hashed-set-iterator::klass(), #hashed-set: self);
     return iterator;
   }

@@ -70,12 +70,19 @@ klass collection {
       $add(self, arg);
     return self; // nullnull?
   }
-  method iterator-context(object-t self, selector-t s) -> iterator-context-t {
-    object-t iter = $iterator(self);
-    method-t next = $method-for-selector(klass-of(iter), s);
+  [[alias(iterator-context)]] method forward-iterator-context(object-t self) -> iterator-context-t {
+    object-t iter = $forward-iterator(self);
+    method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
     return cast(iterator-context-t){ .iter = iter, .next = next };
   }
-  method iterator(object-t self) -> object-t;
+  method backward-iterator-context(object-t self) -> iterator-context-t {
+    object-t iter = $backward-iterator(self);
+    method-t next = $method-for-selector(klass-of(iter), selector(next(object-t)));
+    return cast(iterator-context-t){ .iter = iter, .next = next };
+  }
+//   method iterator(object-t self) -> object-t;
+//   method forward-iterator(object-t self) -> object-t;
+//   method backward-iterator(object-t self) -> object-t;
 //   method add(object-t self, object-t element) -> object-t;
 
   // method size(object-t self) -> ssize-t;

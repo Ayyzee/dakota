@@ -333,7 +333,7 @@ klass deque {
     throw $make(exception::klass(), #msg: "not yet implemented");
     return null;
   }
-  method iterator(object-t self) -> object-t {
+  [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
     object-t iterator = $make(deque-iterator::klass(), #deque: self);
     return iterator;
   }

@@ -165,9 +165,13 @@ klass sorted-set {
   method size(object-t self) -> ssize-t {
     return self.ssc->count;
   }
-  method iterator(object-t self) -> object-t {
-    object-t iterator = $make(sorted-set-iterator::klass(), #sorted-set: self);
-    return iterator;
+  [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
+    object-t result = $make(sorted-set-iterator::klass(), #sorted-set: self, #direction: #forward);
+    return result;
+  }
+  method backward-iterator(object-t self) -> object-t {
+    object-t result = $make(sorted-set-iterator::klass(), #sorted-set: self, #direction: #backward);
+    return result;
   }
   method dump(object-t self) -> object-t {
     $dump(super);
@@ -197,15 +201,17 @@ klass sorted-set-iterator {
   slots {
     object-t sorted-set;
     ssize-t  offset;
+    symbol-t direction;
 
     ssize-t  iterator-state;
   }
-  method init(object-t self, object-t sorted-set:) -> object-t {
+  method init(object-t self, object-t sorted-set:, symbol-t direction: #forward) -> object-t {
     self = $init(super);
     assert(klass-of(sorted-set) == sorted-set::_klass_ || $instance?(sorted-set, sorted-set::_klass_));
     const sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
     self.sorted-set = sorted-set;
     self.offset = 0;
+    self.direction = direction;
     self.iterator-state = ss.iterator-state;
     return self;
   }
@@ -235,28 +241,15 @@ klass sorted-set-iterator {
     }
     return element;
   }
-  method prev?(object-t self) -> bool-t {
-    check-iterator-state(self);
-    bool-t state = false;
-    if (self.offset > 0)
-      state = true;
-    return state;
-  }
-  method prev(object-t self) -> object-t {
-    check-iterator-state(self);
-    object-t element = nullptr;
-    if ($prev?(self)) {
-      element = $element(self);
-      self.offset--;
-    }
-    return element;
-  }
   method element(object-t self) -> object-t {
     check-iterator-state(self);
     object-t element = nullptr;
     if ($next?(self)) {
       const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-      element = *(cast(object-t*)sorted-set-core::at(ss.ssc, self.offset));
+      if (self.direction == #backward)
+        element = *(cast(object-t*)sorted-set-core::at(ss.ssc, ss.ssc->count - self.offset - 1));
+      else
+        element = *(cast(object-t*)sorted-set-core::at(ss.ssc, self.offset));
       assert(element != nullptr);
     }
     return element; // returns nullptr on error

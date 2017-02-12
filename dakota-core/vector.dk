@@ -301,7 +301,7 @@ klass vector {
     assert(self.count != 0);
     return self.elements[self.count - 1];
   }
-  method iterator(object-t self) -> object-t {
+  [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
     object-t iterator = $make(vector-iterator::klass(), #vector: self);
     return iterator;
   }

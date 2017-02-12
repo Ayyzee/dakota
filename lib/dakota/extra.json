@@ -8,15 +8,18 @@
  #'target_extra_generics' => {},
   'src_extra_generics' => {
     'alloc' => undef,
+    'backward-iterator' => undef,
+    'backward-iterator-context' => undef,
     'dealloc' => undef,
+    'forward-iterator' => undef,
+    'forward-iterator-context' => undef,
     'has-trait?' => undef,
     'init' => undef,
     'instance?' => undef,
-    'iterator-context' => undef,
     'iterator' => undef,
+    'iterator-context' => undef,
     'klass-with-trait' => undef,
     'next' => undef,
-    'prev' => undef,
   },
   'src_extra_keywords' => {
     '#keyword' => undef,       # kw-args processing funcs (throw)
