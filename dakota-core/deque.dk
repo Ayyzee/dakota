@@ -323,11 +323,11 @@ klass deque {
   // method replace-last(object-t self, object-t element) -> object-t;
 
   // reverse in place
-  method reverse(object-t self) -> object-t {
-    USE(self);
-    throw $make(exception::klass(), #msg: "not yet implemented");
-    return self;
-  }
+//   method reverse!(object-t self) -> object-t {
+//     USE(self);
+//     throw $make(exception::klass(), #msg: "not yet implemented");
+//     return self;
+//   }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
     object-t iterator = $make(deque-iterator::klass(), #deque: self);
     return iterator;

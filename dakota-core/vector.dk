@@ -152,7 +152,7 @@ klass vector {
     return self;
   }
   // reverse in place
-  method reverse(object-t self) -> object-t {
+  method reverse!(object-t self) -> object-t {
     ssize-t head-offset = 0, tail-offset = self.count - 1;
     while (head-offset < tail-offset) {
       object-t head-element = self.elements[head-offset];
@@ -162,6 +162,11 @@ klass vector {
     }
     self.iterator-state++;
     return self;
+  }
+  method remove-at(object-t self, object-t element) -> object-t {
+    ssize-t index = ssize::unbox(element);
+    object-t result = $remove-at(self, index);
+    return element;
   }
   method remove-at(object-t self, ssize-t index) -> object-t {
     object-t element = self.elements[index];
@@ -174,8 +179,7 @@ klass vector {
     self.capacity--; // dumb
     return element;
   }
-  // should also have remove-all
-  method remove(object-t self, object-t element) -> object-t {
+  method remove-all(object-t self, object-t element) -> object-t {
     // element could be null
     // any/all elements could be null
     object-t object = null; // returns 'null' if element was not present
@@ -206,7 +210,7 @@ klass vector {
     self.count--;
     return element;
   }
-  method replace(object-t self, object-t object1, object-t object2) -> object-t {
+  method replace-all(object-t self, object-t object1, object-t object2) -> object-t {
     for (object-t iterator = $iterator(self);
          $next?(iterator);
          $next(iterator)) {

@@ -76,6 +76,11 @@ klass sequence {
     }
     return state;
   }
+  method reverse(object-t self) -> object-t {
+    object-t copy = $copy(self);
+    $reverse!(copy);
+    return copy;
+  }
 //   method add-first(object-t self, object-t element) -> object-t;
 //   method add-last(object-t self, object-t element) -> object-t;
 //   method remove-first(object-t self) -> object-t;
