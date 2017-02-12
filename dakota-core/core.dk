@@ -961,18 +961,18 @@ static func max-slot-name-width(named-info-t* slots-info) -> int-t {
   }
   return result;
 }
-static func dump-method(ostream-t ostrm, const signature-t* info, str-t comment = nullptr) -> void {
-  if (comment == nullptr)
+static func dump-method(ostream-t ostrm, const signature-t* info, str-t attrs = nullptr) -> void {
+  if (attrs == nullptr)
     ostream::print-format(ostrm, "method %s(%s) -> %s;\n",
                           info->name,
                           info->param-types,
                           info->return-type);
   else
-    ostream::print-format(ostrm, "method %s(%s) -> %s; // %s\n",
+    ostream::print-format(ostrm, "%s method %s(%s) -> %s;\n",
+                          attrs,
                           info->name,
                           info->param-types,
-                          info->return-type,
-                          comment);
+                          info->return-type);
   return;
 }
 static func klass-exported?(named-info-t* kls-info,
@@ -1186,21 +1186,20 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
   if (ci.exported-slots-method-signatures != nullptr)
     while ((sig = ci.exported-slots-method-signatures[index++]) != nullptr)
       dump-method(ostrm, sig);
-# if 0
+
   index = 0;
   if (ci.method-aliases != nullptr) {
     ostream::print-format(ostrm, "\n");
-    char-t[128] comment = "";
-    while ((sig = ci.method-aliases[index++]) != nullptr) {
-      const signature-t* alias = ci.method-aliases[index++];
-      int-t len = snprintf(comment, sizeof(comment), "[[alias(%s)]]", alias->name);
-      if (len >= cast(int-t)sizeof(comment))
-        comment[sizeof(comment) - 1] = NUL;
-      dump-method(ostrm, sig, comment);
+    char-t[128] attrs = "";
+    const signature-t* alias;
+    while ((alias = ci.method-aliases[index++]) != nullptr) {
+      sig = ci.method-aliases[index++];
+      int-t len = snprintf(attrs, sizeof(attrs), "[[alias(%s)]]", alias->name);
+      if (len >= cast(int-t)sizeof(attrs))
+        attrs[sizeof(attrs) - 1] = NUL;
+      dump-method(ostrm, sig, attrs);
     }
   }
-# endif
-
   ostream::col-decr(ostrm);
   ostream::print-format(ostrm, "}\n");
   return ci.modulee;
