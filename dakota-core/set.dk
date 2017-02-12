@@ -36,12 +36,9 @@ trait set {
   }
   method any-in?(object-t self, object-t collection) -> bool-t {
     bool-t result = false;
-    for (object-t e in collection) {
-      if ($in?(self, e)) {
-        result = true;
+    for (object-t e in collection)
+      if ((result = $in?(self, e)))
         break;
-      }
-    }
     return result;
   }
   // complement (if collection is set)

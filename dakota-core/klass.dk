@@ -386,11 +386,8 @@ klass klass {
   // }
   method method-for-selector?(object-t self, selector-t selector) -> bool-t {
     assert(selector < self.methods.count);
-    bool-t result = false;
     method-t m = $method-for-selector(self, selector);
-    if (m != DKT-NULL-METHOD) {
-      result = true;
-    }
+    bool-t result = (m != DKT-NULL-METHOD);
     return result;
   }
   method method-for-selector(object-t self, selector-t selector) -> method-t {

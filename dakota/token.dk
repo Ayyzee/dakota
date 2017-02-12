@@ -98,9 +98,7 @@ klass token {
     return state;
   }
   method empty?(object-t self) -> bool-t {
-    bool-t result = false;
-    if (self.buffer[0] == NUL)
-      result = true;
+    bool-t result = (self.buffer[0] == NUL);
     return result;
   }
   method empty(object-t self) -> object-t {

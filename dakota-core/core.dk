@@ -96,9 +96,7 @@ klass assoc-node {
     return element;
   }
   method element?(const slots-t* slots) -> bool-t {
-    bool-t state = false;
-    if (slots->element != 0)
-      state = true;
+    bool-t state = (slots->element != 0);
     return state;
   }
 }
@@ -1014,7 +1012,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
   assert-valid-str(ci.name);
   assert(!(ci.interpose-name != nullptr && ci.superklass-name != nullptr));
 
-  bool-t is-verbose = 0;
+  bool-t is-verbose = false;
 
   if (is-verbose) {
     if (ci.superklass-name == nullptr)

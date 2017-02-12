@@ -71,10 +71,8 @@ klass sequence {
   method in?(object-t self, object-t element) -> bool-t {
     bool-t state = false;
     for (object-t e in self) {
-      if ($equals?(e, element)) {
-        state = true;
+      if ((state = $equals?(e, element)))
         break;
-      }
     }
     return state;
   }

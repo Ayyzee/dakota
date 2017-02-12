@@ -88,9 +88,7 @@ klass sorted-set {
     return result;
   }
   method in?(object-t self, object-t element) -> bool-t {
-    bool-t state = false;
-    if ($at(self, element, nullptr) != nullptr)
-      state = true;
+    bool-t state = ($at(self, element, nullptr) != nullptr);
     return state;
   }
   method add(object-t self, object-t element) -> object-t {
@@ -146,9 +144,7 @@ klass sorted-set {
     return self;
   }
   method empty?(object-t self) -> bool-t {
-    bool-t state = false;
-    if (self.ssc->count == 0)
-      state = true;
+    bool-t state = (self.ssc->count == 0);
     return state;
   }
   [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
@@ -227,9 +223,7 @@ klass sorted-set-iterator {
   method next?(object-t self) -> bool-t {
     check-iterator-state(self);
     const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-    bool-t state = false;
-    if (self.offset < ss.ssc->count)
-      state = true;
+    bool-t state = (self.offset < ss.ssc->count);
     return state;
   }
   method next(object-t self) -> object-t {

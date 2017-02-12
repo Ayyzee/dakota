@@ -129,15 +129,11 @@ klass hashed-set {
     return result;
   }
   method in?(object-t self, object-t element) -> bool-t {
-    bool-t state = false;
-    if ($at(self, element, nullptr) != nullptr)
-      state = true;
+    bool-t state = ($at(self, element, nullptr) != nullptr);
     return state;
   }
   method empty?(object-t self) -> bool-t {
-    bool-t state = false;
-    if (self.size == 0)
-      state = true;
+    bool-t state = (self.size == 0);
     return state;
   }
   method remove(object-t self, object-t element) -> object-t {
