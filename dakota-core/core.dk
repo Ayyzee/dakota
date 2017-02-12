@@ -961,6 +961,18 @@ static func max-slot-name-width(named-info-t* slots-info) -> int-t {
   }
   return result;
 }
+static func max-alias-name-width(const signature-t* const* method-aliases) -> int-t {
+  int-t result = 0;
+  int-t i = 0;
+  const signature-t* alias;
+  while ((alias = method-aliases[i]) != nullptr) {
+    ssize-t width = cast(ssize-t)safe-strlen(alias->name);
+    if (width > result)
+      result = cast(int-t)width;
+    i += 2;
+  }
+  return result;
+}
 static func dump-method(ostream-t ostrm, const signature-t* info, str-t attrs = nullptr) -> void {
   if (attrs == nullptr)
     ostream::print-format(ostrm, "method %s(%s) -> %s;\n",
@@ -1189,12 +1201,15 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
 
   index = 0;
   if (ci.method-aliases != nullptr) {
+    int-t max-width = max-alias-name-width(ci.method-aliases);
     ostream::print-format(ostrm, "\n");
     char-t[128] attrs = "";
     const signature-t* alias;
     while ((alias = ci.method-aliases[index++]) != nullptr) {
       sig = ci.method-aliases[index++];
-      int-t len = snprintf(attrs, sizeof(attrs), "[[alias(%s)]]", alias->name);
+      ssize-t width = cast(ssize-t)safe-strlen(alias->name);
+      int-t pad-width = cast(int-t)(max-width - width);
+      int-t len = snprintf(attrs, sizeof(attrs), "[[alias(%s)]]%*s", alias->name, pad-width, "");
       if (len >= cast(int-t)sizeof(attrs))
         attrs[sizeof(attrs) - 1] = NUL;
       dump-method(ostrm, sig, attrs);
