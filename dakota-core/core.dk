@@ -863,7 +863,6 @@ static func remove-dir(str-t path) -> str-t {
 }
 [[unused]] static func pad(char-t* buf, ssize-t buf-len, ssize-t len) -> char-t* {
   assert(buf-len >= len);
-  buf[0] = NUL;
   snprintf(buf, sizeof(buf), "%*s", cast(int-t)len, "");
   return buf;
 }
