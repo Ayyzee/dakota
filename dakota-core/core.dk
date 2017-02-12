@@ -314,8 +314,7 @@ klass ostream {
     return s;
   }
   static func pad(const slots-t& s) -> const slots-t& {
-    for (ssize-t i = 0; i < s.col; i++)
-      fprintf(s.output, "  "); // two spaces per column:-) [my way]
+    fprintf(s.output, "%*s", cast(int-t)s.col * 2, ""); // two spaces per column:-) [my way]
     return s;
   }
   [[format-va-printf(2)]] static func print-format(slots-t s, str-t format, va-list-t args) -> slots-t {
@@ -865,8 +864,7 @@ static func remove-dir(str-t path) -> str-t {
 [[unused]] static func pad(char-t* buf, ssize-t buf-len, ssize-t len) -> char-t* {
   assert(buf-len >= len);
   buf[0] = NUL;
-  for (ssize-t i = 0; i < len; i++)
-    strcat(buf, " ");
+  snprintf(buf, sizeof(buf), "%*s", cast(int-t)len, "");
   return buf;
 }
 klass catalog-info {
