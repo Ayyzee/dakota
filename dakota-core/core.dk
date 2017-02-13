@@ -83,20 +83,24 @@ klass assoc-node {
     slots-t*  next;
     intptr-t item;
   }
-  method set-item(slots-t* slots, object-t item) -> object-t {
+  method set-first(slots-t* slots, object-t item) -> object-t {
     *(cast(object-t*)(slots->item)) = item;
     return item;
   }
-  method set-items(slots-t* slots, object-t item) -> object-t {
+  method set-all(slots-t* slots, object-t item) -> object-t {
     slots-t* node = slots;
     while (node != nullptr) {
-      assoc-node::set-item(node, item);
+      assoc-node::set-first(node, item);
       node = node->next;
     }
     return item;
   }
-  method item?(const slots-t* slots) -> bool-t {
+  method first?(const slots-t* slots) -> bool-t {
     bool-t result = (slots->item != 0);
+    return result;
+  }
+  method first(const slots-t* slots) -> object-t {
+    object-t result = slots->item;
     return result;
   }
 }
@@ -493,13 +497,13 @@ static func each-str(named-info-t* info, str-box-func-t box-func) -> void  {
     ssize-t i = 0;
     while (1) {
       assoc-node-t& assoc = assocs[i];
-      if (!assoc-node::item?(&assoc))
+      if (!assoc-node::first?(&assoc))
         break;
 # if 0
       symbol-t name =    names[i];
 # endif
       str-t    literal = literals[i];
-      assoc-node::set-item(&assoc, box-func(literal)); // write-kls-ptr
+      assoc-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }
@@ -517,13 +521,13 @@ static func each-int(named-info-t* info, int-box-func-t box-func) -> void  {
     ssize-t i = 0;
     while (1) {
       assoc-node-t& assoc = assocs[i];
-      if (!assoc-node::item?(&assoc))
+      if (!assoc-node::first?(&assoc))
         break;
 # if 0
       symbol-t name =    names[i];
 # endif
       intmax-t literal = literals[i];
-      assoc-node::set-item(&assoc, box-func(literal)); // write-kls-ptr
+      assoc-node::set-first(&assoc, box-func(literal)); // write-kls-ptr
       // loop here over chain
       i++;
     }

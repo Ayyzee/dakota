@@ -701,7 +701,7 @@ klass klass {
     assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
     if (null)
       set-read-write();
-    assoc-node::set-items(imported-klss, self); // write-kls-ptr
+    assoc-node::set-all(imported-klss, self); // write-kls-ptr
     if (null)
       set-read-only();
     return;
