@@ -81,7 +81,7 @@ klass selector-pair-compare {
 klass selector-pair {
   slots {
     const signature-t* key;
-    selector-node-t*   element;
+    selector-node-t*   item;
   }
   method compare(const slots-t* s, const slots-t* other-s) -> cmp-t {
     assert(s != nullptr);
@@ -94,7 +94,7 @@ klass selector-pair {
 }
 static const int64-t gbl-num-generics = 512;
 static selector-pair-t[gbl-num-generics] gbl-selectors;
-static sorted-set-core-t gbl-selectors-table = { .elements = gbl-selectors,
+static sorted-set-core-t gbl-selectors-table = { .items = gbl-selectors,
                                               .count =    0,
                                               .capacity = scountof(gbl-selectors),
                                               .size =     ssizeof(gbl-selectors[0]),
@@ -127,10 +127,10 @@ static func default-superklass() -> object-t {
   return object::_klass_;
 }
 static func selector-for-signature(const signature-t* signature) -> selector-t {
-  selector-pair-t pair = { .key = signature, .element = nullptr };
+  selector-pair-t pair = { .key = signature, .item = nullptr };
   result-t pair-result = sorted-set-core::result-at(&gbl-selectors-table, &pair);
-  selector-pair-t* found-pair = cast(decltype(found-pair))pair-result.element;
-  selector-t selector = *(found-pair->element->ptr);
+  selector-pair-t* found-pair = cast(decltype(found-pair))pair-result.item;
+  selector-t selector = *(found-pair->item->ptr);
   return selector;
 }
 static func method-for-signature(const methods::slots-t* methods, const signature-t* signature) -> method-t {
@@ -150,18 +150,18 @@ static func method-for-signature(const methods::slots-t* methods, const signatur
            (signature != nullptr && selector-node->ptr != nullptr));
     if (signature == nullptr)
       break;
-    selector-pair-t pair = { .key = signature, .element = selector-node };
+    selector-pair-t pair = { .key = signature, .item = selector-node };
     result-t found-result = sorted-set-core::result-at(&gbl-selectors-table, &pair);
-    selector-pair-t* found-pair = cast(decltype(found-pair))found-result.element;
+    selector-pair-t* found-pair = cast(decltype(found-pair))found-result.item;
 
     if (found-pair == nullptr) {
-      *(pair.element->ptr) = cast(selector-t)(gbl-selectors-table.count); // may be zero
-      pair.element->next = nullptr;
+      *(pair.item->ptr) = cast(selector-t)(gbl-selectors-table.count); // may be zero
+      pair.item->next = nullptr;
       sorted-set-core::add-at(&gbl-selectors-table, found-result.offset, &pair);
     } else {
-      *(selector-node->ptr) = *(found-pair->element->ptr);
-      selector-node->next = found-pair->element;
-      found-pair->element->next = selector-node;
+      *(selector-node->ptr) = *(found-pair->item->ptr);
+      selector-node->next = found-pair->item;
+      found-pair->item->next = selector-node;
     }
   }
   return;
@@ -169,35 +169,35 @@ static func method-for-signature(const methods::slots-t* methods, const signatur
 // iterate over list of named-info-t
 static func ptr-from-info(named-info-t* info, symbol-t key) -> const void* {
   named-info-t* current-info = info;
-  const void* previous-element = nullptr;
-  const void* element = nullptr;
+  const void* previous-item = nullptr;
+  const void* item = nullptr;
   do {
-    element = cast(const void*)named-info::at(current-info, key);
-    assert((previous-element == nullptr && element != nullptr) ||
-           (previous-element != nullptr && element == nullptr) ||
-           (previous-element == element));
-    if (element == nullptr && previous-element != nullptr)
-      element = previous-element;
+    item = cast(const void*)named-info::at(current-info, key);
+    assert((previous-item == nullptr && item != nullptr) ||
+           (previous-item != nullptr && item == nullptr) ||
+           (previous-item == item));
+    if (item == nullptr && previous-item != nullptr)
+      item = previous-item;
   } while ((current-info = current-info->next) != nullptr);
 
-  return element;
+  return item;
 }
 static func size-from-info(named-info-t* info, symbol-t key) -> ssize-t {
   named-info-t* current-info = info;
-  ssize-t previous-element = 0;
-  ssize-t element = 0;
+  ssize-t previous-item = 0;
+  ssize-t item = 0;
   do {
-    element = named-info::at(current-info, key);
-    assert((previous-element == 0 && element != 0) ||
-           (previous-element != 0 && element == 0) ||
-           (previous-element == element));
-    if (element == 0 && previous-element != 0)
-      element = previous-element;
+    item = named-info::at(current-info, key);
+    assert((previous-item == 0 && item != 0) ||
+           (previous-item != 0 && item == 0) ||
+           (previous-item == item));
+    if (item == 0 && previous-item != 0)
+      item = previous-item;
     else
-      previous-element = element;
+      previous-item = item;
   } while ((current-info = current-info->next) != nullptr);
 
-  return element;
+  return item;
 }
 static func superklass-from-info(named-info-t* info) -> object-t {
   object-t result = nullptr;
@@ -476,7 +476,7 @@ klass klass {
   method dump-methods(const slots-t* s) -> ssize-t {
     if (s->behavior != nullptr)
       $dump(s->behavior);
-    selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.elements);
+    selector-pair-t* selectors = cast(selector-pair-t*)(gbl-selectors-table.items);
     ssize-t max-width = 0;
 
     if (1) {
@@ -701,7 +701,7 @@ klass klass {
     assoc-node-t* imported-klss = imported-klasses-for-klass(name-of(self));
     if (null)
       set-read-write();
-    assoc-node::set-elements(imported-klss, self); // write-kls-ptr
+    assoc-node::set-items(imported-klss, self); // write-kls-ptr
     if (null)
       set-read-only();
     return;
@@ -812,10 +812,10 @@ klass klass {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element(out, name-of(self),   "name");
-    $write-element(out, self.size,   "size");
-    $write-element(out, self.offset, "offset");
-    $write-element-idref(out, superklass-of(self), "superklass");
+    $write-item(out, name-of(self),   "name");
+    $write-item(out, self.size,   "size");
+    $write-item(out, self.offset, "offset");
+    $write-item-idref(out, superklass-of(self), "superklass");
 
     $write-slots-end(out);
     return self;

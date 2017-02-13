@@ -1337,24 +1337,24 @@ sub precompiled_inputs {
   return $precompiled_inputs;
 }
 sub ordered_set_add {
-  my ($ordered_set, $element, $file, $line) = @_;
+  my ($ordered_set, $item, $file, $line) = @_;
   foreach my $member (@$ordered_set) {
-    if ($element eq $member) {
-      #printf STDERR "%s:%i: warning: element \"$element\" already present\n", $file, $line;
+    if ($item eq $member) {
+      #printf STDERR "%s:%i: warning: item \"$item\" already present\n", $file, $line;
       return;
     }
   }
-  &add_last($ordered_set, $element);
+  &add_last($ordered_set, $item);
 }
 sub ordered_set_add_first {
-  my ($ordered_set, $element, $file, $line) = @_;
+  my ($ordered_set, $item, $file, $line) = @_;
   foreach my $member (@$ordered_set) {
-    if ($element eq $member) {
-      #printf STDERR "%s:%i: warning: element \"$element\" already present\n", $file, $line;
+    if ($item eq $member) {
+      #printf STDERR "%s:%i: warning: item \"$item\" already present\n", $file, $line;
       return;
     }
   }
-  &add_first($ordered_set, $element);
+  &add_first($ordered_set, $item);
 }
 sub start {
   my ($argv) = @_;

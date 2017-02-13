@@ -146,7 +146,7 @@ our @EXPORT= qw(
                  ast_merge
                  str_from_cmd_info
               );
-my $colon = ':'; # key/element delim only
+my $colon = ':'; # key/item delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
 my ($id,  $mid,  $bid,  $tid,
    $rid, $rmid, $rbid, $rtid, $uint) = &ident_regex();
@@ -234,7 +234,7 @@ sub update_to_kw_args {
 }
 sub tbl_add_info {
   my ($root_tbl, $tbl) = @_;
-  while (my ($key, $element) = each %$tbl) {
+  while (my ($key, $item) = each %$tbl) {
     if (!exists $$root_tbl{$key}) {
       $$root_tbl{$key} = $$tbl{$key};
     } elsif (exists  $$root_tbl{$key} &&
@@ -820,7 +820,7 @@ sub slots {
     if ($$enum_set{&first($type)}) {
       my $enum_base = [splice(@$type, 2, scalar(@$type) - 1)];
       my $tkn =    &remove_last($type);
-      die if ':' ne $tkn; # not key/element delim
+      die if ':' ne $tkn; # not key/item delim
       $$gbl_current_ast_scope{'slots'}{'enum-base'} = $enum_base;
       &add_symbol($gbl_root_ast, join('', @$enum_base));
       #print STDERR &Dumper($$gbl_current_ast_scope{'slots'});

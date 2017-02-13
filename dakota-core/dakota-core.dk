@@ -43,7 +43,7 @@ export dakota-core {
   deque;
   each-box-func::slots-t;
   each-box-func;
-  element-already-present-exception;
+  item-already-present-exception;
   enum-info::slots-t;
   enum-info;
   equals::slots-t;

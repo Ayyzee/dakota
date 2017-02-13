@@ -51,8 +51,8 @@ klass pair {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element-idref(out, self.first, "first");
-    $write-element-idref(out, self.last,  "last");
+    $write-item-idref(out, self.first, "first");
+    $write-item-idref(out, self.last,  "last");
 
     $write-slots-end(out);
     return self;

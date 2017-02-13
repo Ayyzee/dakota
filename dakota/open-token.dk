@@ -36,7 +36,7 @@ klass open-token {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element-idref(out, self.close-token, "close-token");
+    $write-item-idref(out, self.close-token, "close-token");
 
     $write-slots-end(out);
     return self;

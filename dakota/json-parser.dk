@@ -74,13 +74,13 @@ klass json-parser {
     self.column = 0;
     return self;
   }
-  method read(object-t self, ptr-t buffer, ssize-t element-size, ssize-t num-elements-max) -> ssize-t {
-    ssize-t num-elements-read = cast(ssize-t)fread(buffer, cast(size-t)element-size, cast(size-t)num-elements-max, self.in);
+  method read(object-t self, ptr-t buffer, ssize-t item-size, ssize-t num-items-max) -> ssize-t {
+    ssize-t num-items-read = cast(ssize-t)fread(buffer, cast(size-t)item-size, cast(size-t)num-items-max, self.in);
 
     // fread() does not distinguish between end-of-file and error, and callers must use
     // feof(3) and ferror(3) to determine which occurred.
 
-    return num-elements-read;
+    return num-items-read;
   }
   /* method */ static func putback(object-t self, int-t c) -> void {
     if (c == '\n')
@@ -240,73 +240,73 @@ klass json-parser {
     }
     return $make(string::klass(), #bytes: $buffer(token));
   }
-  // get table element - element is NOT optional
-  /* method */ static func get-element(object-t self) -> object-t {
+  // get table item - item is NOT optional
+  /* method */ static func get-item(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
     if (token == null) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
-    object-t element;
+    object-t item;
     switch ($tokenid(token)) {
       case 'null':
-        element = null;
+        item = null;
         break;
       case 'sqst':
-        element = $make(string::klass(), #bytes: $buffer(token));
+        item = $make(string::klass(), #bytes: $buffer(token));
         break;
       case 'dqst':
-        element = $make(string::klass(), #bytes: $buffer(token));
+        item = $make(string::klass(), #bytes: $buffer(token));
         break;
       case 'st':
-        element = $make(string::klass(), #bytes: $buffer(token));
+        item = $make(string::klass(), #bytes: $buffer(token));
         break;
       case '{':
-        element = json-parser::get-table(self);
+        item = json-parser::get-table(self);
         break;
       case '[':
-        element = json-parser::get-vector(self);
+        item = json-parser::get-vector(self);
         break;
       default:
         print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' but got '%s'\n", $buffer(token));
         return null;
     }
-    return element;
+    return item;
   }
-  // get vector element - element is optional
-  /* method */ static func element(object-t self) -> object-t {
+  // get vector item - item is optional
+  /* method */ static func item(object-t self) -> object-t {
     object-t token = json-parser::lex(self);
     if (token == null) {
       print-error(self.file, self.line, self.column, "incomplete table\n");
       return null;
     }
-    object-t element;
+    object-t item;
     switch ($tokenid(token)) {
       case 'null':
-        element = null;
+        item = null;
         break;
       case 'sqst':
-        element = $make(string::klass(), #bytes: $buffer(token));
+        item = $make(string::klass(), #bytes: $buffer(token));
         break;
       case 'dqst':
-        element = $make(string::klass(), #bytes: $buffer(token));
+        item = $make(string::klass(), #bytes: $buffer(token));
         break;
       case 'st':
-        element = $make(string::klass(), #bytes: $buffer(token));
+        item = $make(string::klass(), #bytes: $buffer(token));
         break;
       case '{':
-        element = json-parser::get-table(self);
+        item = json-parser::get-table(self);
         break;
       case '[':
-        element = json-parser::get-vector(self);
+        item = json-parser::get-vector(self);
         break;
-      case ']': // only difference from get-element()
+      case ']': // only difference from get-item()
         return null;
       default:
         print-error(self.file, self.line, self.column, "expected <string> or 'null' or '{' or '[' or ']' but got '%s'\n", $buffer(token));
         return null;
     }
-    return element;
+    return item;
   }
   /* method */ static func get-table-pair(object-t self) -> object-t {
     object-t key = json-parser::key(self);
@@ -315,22 +315,22 @@ klass json-parser {
     object-t corresponds-to = json-parser::get-corresponds-to(self);
     if (corresponds-to == null)
       return nullptr;
-    object-t element = json-parser::get-element(self);
-    if (element == null)
+    object-t item = json-parser::get-item(self);
+    if (item == null)
       return nullptr;
-    return pair::box({key, element});
+    return pair::box({key, item});
   }
   // hackhack - multiple return statements
   /* method */ func get-vector(object-t self) -> object-t {
     object-t vector = $make(vector::klass());
     object-t token;
     do {
-      object-t element = json-parser::element(self);
-      if (element == null)
+      object-t item = json-parser::item(self);
+      if (item == null)
         return vector;
 
-      // add 'element' to 'vector'
-      $add-last(vector, element);
+      // add 'item' to 'vector'
+      $add-last(vector, item);
 
       token = json-parser::lex(self);
       if (token == null) {

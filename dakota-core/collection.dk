@@ -20,9 +20,9 @@ klass iterator-context;
 klass std-compare;
 
 // func dk-va-add-all(object-t self, va-list-t args) -> object-t {
-//   object-t element;
-//   while ((element = va-arg(args, object-t)) != nullptr)
-//     $add(self, element);
+//   object-t item;
+//   while ((item = va-arg(args, object-t)) != nullptr)
+//     $add(self, item);
 //   return self;
 // }
 // [[sentinel]] func dk-add-all(object-t self, ...) -> object-t {
@@ -58,8 +58,8 @@ klass collection {
   //   return self;
   // }
   method add-all(object-t self, object-t collection) -> object-t {
-    for (object-t element in collection)
-      $add(self, element);
+    for (object-t item in collection)
+      $add(self, item);
     return collection;
   }
   // objects is a nullptr terminated list of objects
@@ -101,7 +101,7 @@ klass collection {
 //   method iterator(object-t self) -> object-t;
 //   method forward-iterator(object-t self) -> object-t;
 //   method backward-iterator(object-t self) -> object-t;
-//   method add(object-t self, object-t element) -> object-t;
+//   method add(object-t self, object-t item) -> object-t;
 
   // method size(object-t self) -> ssize-t;
   // method empty?(object-t self) -> bool-t;

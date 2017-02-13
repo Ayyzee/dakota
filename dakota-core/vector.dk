@@ -31,13 +31,13 @@ klass vector-klass {
 
   slots {
     ssize-t  resize-factor;
-    object-t fill-element;
+    object-t fill-item;
     ssize-t  initial-capacity;
   }
   method va::init(object-t self, va-list-t args) -> object-t {
     self = $va::init(super, args);
     self.resize-factor = 2;
-    self.fill-element = null;
+    self.fill-item = null;
     self.initial-capacity = 64;
     return self;
   }
@@ -45,8 +45,8 @@ klass vector-klass {
     self.resize-factor = resize-factor;
     return self;
   }
-  method set-fill-element(object-t self, object-t fill-element) -> object-t {
-    self.fill-element = fill-element;
+  method set-fill-item(object-t self, object-t fill-item) -> object-t {
+    self.fill-item = fill-item;
     return self;
   }
   method set-initial-capacity(object-t self, ssize-t initial-capacity) -> object-t {
@@ -56,8 +56,8 @@ klass vector-klass {
   method resize-factor(object-t self) -> ssize-t {
     return self.resize-factor;
   }
-  method fill-element(object-t self) -> object-t {
-    return self.fill-element;
+  method fill-item(object-t self) -> object-t {
+    return self.fill-item;
   }
   method initial-capacity(object-t self) -> ssize-t {
     return self.initial-capacity;
@@ -69,49 +69,49 @@ klass vector {
   trait      stack;
 
   slots {
-    object-t* elements;
+    object-t* items;
     ssize-t   count;
     ssize-t   capacity;
-    ssize-t   size; // sizeof(elements[0])
+    ssize-t   size; // sizeof(items[0])
 
-    object-t  fill-element;
+    object-t  fill-item;
     ssize-t   iterator-state;
   }
   func initialize(object-t kls) -> void {
     $set-resize-factor(kls, 2);
-    $set-fill-element(kls, null);
+    $set-fill-item(kls, null);
     $set-initial-capacity(kls, 64);
     return;
   }
 
-  // 'elements' is a collection (of objects)
+  // 'items' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
   // using compound literals 'objects' can be used as follows:
   // $init(o, #objects: { o1, o2 });
 
   method init(object-t   self,
               ssize-t    initial-capacity: $initial-capacity(klass-of(self)),
-              object-t   fill-element:     $fill-element(klass-of(self)),
-              object-t   elements:         nullptr,
+              object-t   fill-item:     $fill-item(klass-of(self)),
+              object-t   items:         nullptr,
               object-t[] objects:          nullptr) -> object-t {
-    // it IS legal to have the 'fill-element' value be nullptr
+    // it IS legal to have the 'fill-item' value be nullptr
     // it is required for the hashed-set implementation
     assert(initial-capacity != 0);
 
     self = $init(super);
 
-    self.fill-element = fill-element;
+    self.fill-item = fill-item;
     self.count = 0;
     self.iterator-state = 0;
     self.capacity = initial-capacity;
-    self.size = ssizeof(self.elements[0]);
-    self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity); // want to be able to realloc()
+    self.size = ssizeof(self.items[0]);
+    self.items = cast(object-t*)dkt::alloc(self.size * self.capacity); // want to be able to realloc()
 
     for (ssize-t index = 0; index < self.capacity; index++)
-      self.elements[index] = self.fill-element;
+      self.items[index] = self.fill-item;
 
-    if (elements != nullptr)
-      $add-all(self, elements);
+    if (items != nullptr)
+      $add-all(self, items);
 
     if (objects != nullptr)
       $add-objects(self, objects);
@@ -119,16 +119,16 @@ klass vector {
   }
   method dealloc(object-t self) -> object-t {
     $empty(self);
-    self.elements =     dkt::dealloc(self.elements);
-    self.fill-element = nullptr;
+    self.items =     dkt::dealloc(self.items);
+    self.fill-item = nullptr;
     return $dealloc(super);
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p { count=%zi, capacity=%zi, elements=[] }\n",
+    fprintf(stderr, "%p { count=%zi, capacity=%zi, items=[] }\n",
             cast(ptr-t)self, self.count, self.capacity);
-    for (object-t element in self)
-      $dump(element);
+    for (object-t item in self)
+      $dump(item);
     return self;
   }
   [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
@@ -137,7 +137,7 @@ klass vector {
     const slots-t& s1 = unbox(self);
     slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
-    memcpy(s2.elements, s1.elements, cast(size-t)(s2.size * s2.capacity));
+    memcpy(s2.items, s1.items, cast(size-t)(s2.size * s2.capacity));
     s2.iterator-state = 0;
     return copy;
   }
@@ -147,7 +147,7 @@ klass vector {
   }
   method empty(object-t self) -> object-t {
     for (ssize-t i = 0; i < self.count; i++)
-      self.elements[i] = self.fill-element;
+      self.items[i] = self.fill-item;
     self.iterator-state++;
     return self;
   }
@@ -155,81 +155,81 @@ klass vector {
   method reverse!(object-t self) -> object-t {
     ssize-t head-offset = 0, tail-offset = self.count - 1;
     while (head-offset < tail-offset) {
-      object-t head-element = self.elements[head-offset];
-      self.elements[head-offset] = self.elements[tail-offset];
-      self.elements[tail-offset] = head-element;
+      object-t head-item = self.items[head-offset];
+      self.items[head-offset] = self.items[tail-offset];
+      self.items[tail-offset] = head-item;
       head-offset++; tail-offset--;
     }
     self.iterator-state++;
     return self;
   }
-  method remove-at(object-t self, object-t element) -> object-t {
-    ssize-t index = ssize::unbox(element);
+  method remove-at(object-t self, object-t item) -> object-t {
+    ssize-t index = ssize::unbox(item);
     object-t result = $remove-at(self, index);
-    return element;
+    return item;
   }
   method remove-at(object-t self, ssize-t index) -> object-t {
-    object-t element = self.elements[index];
+    object-t item = self.items[index];
 
     if (index + 1 < self.capacity)
-      memmove(&self.elements[index],
-              &self.elements[index + 1], cast(size-t)(self.size * (self.count - index - 1)));
-    self.elements[self.capacity - 1] = self.fill-element;
+      memmove(&self.items[index],
+              &self.items[index + 1], cast(size-t)(self.size * (self.count - index - 1)));
+    self.items[self.capacity - 1] = self.fill-item;
     self.count--;
     self.capacity--; // dumb
-    return element;
+    return item;
   }
-  method remove-all(object-t self, object-t element) -> object-t {
-    // element could be null
-    // any/all elements could be null
-    object-t object = null; // returns 'null' if element was not present
+  method remove-all(object-t self, object-t item) -> object-t {
+    // item could be null
+    // any/all items could be null
+    object-t object = null; // returns 'null' if item was not present
 
     for (ssize-t index = 0; index < self.count; index++) {
-      object-t e = self.elements[index];
-      if ($equals?(e, element)) {
+      object-t e = self.items[index];
+      if ($equals?(e, item)) {
         remove-at(self, index);
-        object = element;
+        object = item;
       }
     }
-    self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements); // dumb
+    self.items = cast(object-t*)dkt::alloc(self.size * self.capacity, self.items); // dumb
     self.iterator-state++;
     return object;
   }
   method remove-first(object-t self) -> object-t {
     assert(self.count != 0);
-    object-t element = self.elements[0];
-    self.elements[0] = nullptr;
-    memmove(self.elements, self.elements + 1, cast(size-t)(self.size * (self.count - 1)));
+    object-t item = self.items[0];
+    self.items[0] = nullptr;
+    memmove(self.items, self.items + 1, cast(size-t)(self.size * (self.count - 1)));
     self.count--;
-    return element;
+    return item;
   }
   [[alias(pop)]] method remove-last(object-t self) -> object-t {
     assert(self.count != 0);
-    object-t element = self.elements[self.count - 1];
-    self.elements[self.count - 1] = nullptr;
+    object-t item = self.items[self.count - 1];
+    self.items[self.count - 1] = nullptr;
     self.count--;
-    return element;
+    return item;
   }
   method replace-all(object-t self, object-t object1, object-t object2) -> object-t {
     for (object-t iterator = $iterator(self);
          $next?(iterator);
          $next(iterator)) {
-      if ($equals?($element(iterator), object1))
-        $set-element(iterator, object2);
+      if ($equals?($item(iterator), object1))
+        $set-item(iterator, object2);
     }
     return object1;
   }
-  //     method replace-first(object-t self, object-t element) -> object-t;
-  //     method replace-last(object-t self, object-t element) -> object-t;
+  //     method replace-first(object-t self, object-t item) -> object-t;
+  //     method replace-last(object-t self, object-t item) -> object-t;
 
   method at(object-t self, ssize-t index, object-t default-result) -> object-t {
-    object-t element = default-result;
+    object-t item = default-result;
     if (self.count > index) {
-      element = self.elements[index];
+      item = self.items[index];
       if (default-result != nullptr)
-        assert(element != nullptr);
+        assert(item != nullptr);
     }
-    return element;
+    return item;
   }
   // should be auto-generated!!!
   method at(object-t self, object-t boxed-index, object-t default-result) -> object-t {
@@ -238,10 +238,10 @@ klass vector {
     return result;
   }
   method at(object-t self, ssize-t index) -> object-t {
-    object-t element = $at(self, index, nullptr);
-    if (element == nullptr)
+    object-t item = $at(self, index, nullptr);
+    if (item == nullptr)
       throw $make(exception::klass(), #msg: "oops");
-    return element;
+    return item;
   }
   // should be auto-generated!!!
   method at(object-t self, object-t boxed-index) -> object-t {
@@ -253,8 +253,8 @@ klass vector {
     if (index >= self.capacity)
       throw $make(exception::klass(), #msg: "oops");
 
-    object-t rtn = self.elements[index];
-    self.elements[index] = object;
+    object-t rtn = self.items[index];
+    self.items[index] = object;
 
     if (self.count < index + 1)
       self.count = index + 1;
@@ -263,42 +263,42 @@ klass vector {
   method size(object-t self) -> ssize-t {
     return self.count;
   }
-  method add-first(object-t self, object-t element) -> object-t {
-    assert(element != nullptr);
+  method add-first(object-t self, object-t item) -> object-t {
+    assert(item != nullptr);
 
     if (self.count == self.capacity) {
       self.capacity *= $resize-factor(klass-of(self));
-      self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
+      self.items = cast(object-t*)dkt::alloc(self.size * self.capacity, self.items);
     }
-    memmove(self.elements + 1, self.elements, cast(size-t)(self.size * self.count));
-    self.elements[0].object = nullptr; // for ref-counting
-    self.elements[0] = element;
+    memmove(self.items + 1, self.items, cast(size-t)(self.size * self.count));
+    self.items[0].object = nullptr; // for ref-counting
+    self.items[0] = item;
     self.count++;
     self.iterator-state++;
-    return element;
+    return item;
   }
-  //     method add-at(object-t self, object-t element, ssize-t index) -> object-t;
+  //     method add-at(object-t self, object-t item, ssize-t index) -> object-t;
 
-  [[alias(add,push)]] method add-last(object-t self, object-t element) -> object-t {
-    assert(element != nullptr);
+  [[alias(add,push)]] method add-last(object-t self, object-t item) -> object-t {
+    assert(item != nullptr);
 
     if (self.count == self.capacity) {
       self.capacity *= $resize-factor(klass-of(self));
-      self.elements = cast(object-t*)dkt::alloc(self.size * self.capacity, self.elements);
+      self.items = cast(object-t*)dkt::alloc(self.size * self.capacity, self.items);
     }
-    self.elements[self.count].object = nullptr; // for ref-counting
-    self.elements[self.count] = element;
+    self.items[self.count].object = nullptr; // for ref-counting
+    self.items[self.count] = item;
     self.count++;
     self.iterator-state++;
-    return element;
+    return item;
   }
   method first(object-t self) -> object-t {
     assert(self.count != 0);
-    return self.elements[0];
+    return self.items[0];
   }
   [[alias(top)]] method last(object-t self) -> object-t {
     assert(self.count != 0);
-    return self.elements[self.count - 1];
+    return self.items[self.count - 1];
   }
   [[alias(iterator)]] method forward-iterator(object-t self) -> object-t {
     object-t iterator = $make(vector-iterator::klass(), #vector: self);
@@ -308,10 +308,10 @@ klass vector {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-sequence-start(out, "elements");
+    $write-sequence-start(out, "items");
 
     for (ssize-t index = 0; index < self.count; index++)
-      $write-element-idref(out, self.elements[index], cast(str-t)nullptr);
+      $write-item-idref(out, self.items[index], cast(str-t)nullptr);
     $write-sequence-end(out);
 
     $write-slots-end(out);
@@ -321,7 +321,7 @@ klass vector {
     //assert(index <= self.count);
     ssize-t result = index;
     if (result < self.count) {
-      while (self.elements[result] == nullptr) {
+      while (self.items[result] == nullptr) {
         result++;
         if (result == self.count)
           break;
@@ -373,8 +373,8 @@ klass vector-iterator {
       result = false;
     return result;
   }
-  method set-element(object-t self, object-t element) -> object-t {
-    $replace-at(self.vector, self.index, element);
+  method set-item(object-t self, object-t item) -> object-t {
+    $replace-at(self.vector, self.index, item);
     return self;
   }
   method next?(object-t self) -> bool-t {
@@ -388,22 +388,22 @@ klass vector-iterator {
   }
   method next(object-t self) -> object-t {
     check-iterator-state(self);
-    object-t element = nullptr;
+    object-t item = nullptr;
     if ($next?(self)) {
-      element = $element(self);
+      item = $item(self);
       self.index = vector::next-index(self.vector, self.index + 1);
     }
     //       printf("%s:%s(%p) = %p\n",
-    //              "vector-iterator", __func__, (ptr-t)self, (ptr-t)element);
-    return element;
+    //              "vector-iterator", __func__, (ptr-t)self, (ptr-t)item);
+    return item;
   }
-  method element(object-t self) -> object-t {
+  method item(object-t self) -> object-t {
     check-iterator-state(self);
-    object-t element = nullptr;
+    object-t item = nullptr;
     if ($next?(self)) {
-      element = $at(self.vector, self.index);
-      assert(element != nullptr);
+      item = $at(self.vector, self.index);
+      assert(item != nullptr);
     }
-    return element; // returns nullptr on error
+    return item; // returns nullptr on error
   }
 }

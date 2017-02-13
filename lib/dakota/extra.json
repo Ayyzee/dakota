@@ -84,7 +84,7 @@
     '#cat' => undef,
     '#char-t' => undef, # hardcode typealias
     '#dir' => undef,
-    '#element' => undef,
+    '#item' => undef,
     '#enum' => undef,
     '#enum-base' => undef,
     '#exe' => undef,

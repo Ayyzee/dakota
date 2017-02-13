@@ -1190,16 +1190,16 @@ sub clean_paths {
   if ($key && !exists $$in{$key}) {
     die &Dumper($in);
   }
-  my $elements_in = $in;
+  my $items_in = $in;
   if ($key) {
-    $elements_in = $$in{$key};
+    $items_in = $$in{$key};
   }
-  my $elements = [map { &canon_path($_) } @$elements_in];
-  $elements = &copy_no_dups($elements);
+  my $items = [map { &canon_path($_) } @$items_in];
+  $items = &copy_no_dups($items);
   if ($key) {
-    $$in{$key} = $elements;
+    $$in{$key} = $items;
   }
-  return $elements;
+  return $items;
 }
 my $gbl_col_width = '  ';
 sub colin {

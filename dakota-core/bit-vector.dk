@@ -63,28 +63,28 @@ klass bit-vector-op-func {
 }
 klass bit-vector {
   slots {
-    uint64-t* elements;
-    ssize-t   count; // number of elements
+    uint64-t* items;
+    ssize-t   count; // number of items
     ssize-t   capacity; // number of bits
   //ssize-t   size; // 1 bit
   }
-  static const ssize-t gbl-element-width = ssizeof(slots-t::elements[0]) * 8;
+  static const ssize-t gbl-item-width = ssizeof(slots-t::items[0]) * 8;
   static const ssize-t gbl-resize-factor = 2; // hackhack - should be a consumer settable fraction
-  static const ssize-t gbl-default-initial-capacity = 6 * gbl-element-width; // shall never be 0
+  static const ssize-t gbl-default-initial-capacity = 6 * gbl-item-width; // shall never be 0
 
   method init(object-t self, ssize-t initial-capacity: gbl-default-initial-capacity) -> object-t {
     self = $init(super);
     if (initial-capacity == 0)
       initial-capacity = gbl-default-initial-capacity;
     self.count = 0;
-    ssize-t num-elements = ceiling-divide(initial-capacity, gbl-element-width);
-    self.capacity = num-elements * gbl-element-width;
-    self.elements = cast(uint64-t*)(dkt::alloc(ssizeof(self.elements[0]) * num-elements));
-    memset(self.elements, 0, sizeof(self.elements[0]) * cast(size-t)num-elements);
+    ssize-t num-items = ceiling-divide(initial-capacity, gbl-item-width);
+    self.capacity = num-items * gbl-item-width;
+    self.items = cast(uint64-t*)(dkt::alloc(ssizeof(self.items[0]) * num-items));
+    memset(self.items, 0, sizeof(self.items[0]) * cast(size-t)num-items);
     return self;
   }
   method dealloc(object-t self) -> object-t {
-    self.elements = dkt::dealloc(self.elements);
+    self.items = dkt::dealloc(self.items);
     return $dealloc(super);
   }
   [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
@@ -93,30 +93,30 @@ klass bit-vector {
     const slots-t& s1 = unbox(self);
     slots-t& s2 = mutable-unbox(copy);
     s2 = s1;
-    ssize-t num-elements = ceiling-divide(self.capacity, gbl-element-width);
-    s2.elements = cast(uint64-t*)(dkt::alloc(ssizeof(self.elements[0]) * num-elements));
-    memcpy(s2.elements, self.elements, sizeof(self.elements[0]) * cast(size-t)num-elements);
+    ssize-t num-items = ceiling-divide(self.capacity, gbl-item-width);
+    s2.items = cast(uint64-t*)(dkt::alloc(ssizeof(self.items[0]) * num-items));
+    memcpy(s2.items, self.items, sizeof(self.items[0]) * cast(size-t)num-items);
     return copy;
   }
   method bit(object-t self, ssize-t index) -> bool-t {
-    ssize-t offset = index/gbl-element-width;
-    uint64-t mask = 1 << (index % gbl-element-width);
+    ssize-t offset = index/gbl-item-width;
+    uint64-t mask = 1 << (index % gbl-item-width);
     if (self.count < (offset + 1))
       self.count = (offset + 1);
 
-    bool-t result = (self.elements[offset] & mask);
+    bool-t result = (self.items[offset] & mask);
     return result;
   }
   method set-bit(object-t self, ssize-t index, bool-t value) -> object-t {
-    ssize-t offset = index/gbl-element-width;
-    uint64-t mask = 1 << (index % gbl-element-width);
+    ssize-t offset = index/gbl-item-width;
+    uint64-t mask = 1 << (index % gbl-item-width);
     if (self.count < (offset + 1))
       self.count = (offset + 1);
 
     if (value == false)
-      self.elements[offset] &= ~mask; // set bit to zero
+      self.items[offset] &= ~mask; // set bit to zero
     else
-      self.elements[offset] |= mask;  // set bit to one
+      self.items[offset] |= mask;  // set bit to one
     return self;
   }
 //   method clr-bit(object-t self, ssize-t index) -> object-t {
@@ -128,9 +128,9 @@ klass bit-vector {
   method dump(object-t self) -> object-t {
     $dump(super);
     stream-t out = stderr;
-    fprintf(out, "%p { count=%zi, capacity=%zi, elements=\"",
+    fprintf(out, "%p { count=%zi, capacity=%zi, items=\"",
             cast(ptr-t)self, self.count, self.capacity);
-    for (ssize-t i = 0; i < self.count * gbl-element-width; i++) {
+    for (ssize-t i = 0; i < self.count * gbl-item-width; i++) {
       if (i != 0 && (i % 8) == 0)
         fprintf(out, " ");
 
@@ -156,7 +156,7 @@ klass bit-vector {
   method bit-not(object-t self) -> object-t {
     slots-t& self-slots = mutable-unbox(self);
     for (ssize-t offset = 0; offset < self-slots.count; offset++)
-      self-slots.elements[offset] = ~self-slots.elements[offset];
+      self-slots.items[offset] = ~self-slots.items[offset];
     return self;
   }
   static func op-common(object-t self, object-t other, bit-vector-op-func-t op) -> object-t {
@@ -165,7 +165,7 @@ klass bit-vector {
     assert(self-slots.capacity == other-slots.capacity);
     self-slots.count = max(self-slots.count, other-slots.count);
     for (ssize-t offset = 0; offset < self-slots.count; offset++)
-      self-slots.elements[offset] = op(self-slots.elements[offset], other-slots.elements[offset]);
+      self-slots.items[offset] = op(self-slots.items[offset], other-slots.items[offset]);
     return self;
   }
   static func op-common?(object-t self, object-t other, bit-vector-op-func-t op) -> bool-t {
@@ -175,7 +175,7 @@ klass bit-vector {
     assert(self-slots.capacity == other-slots.capacity);
     self-slots.count = max(self-slots.count, other-slots.count);
     for (ssize-t offset = 0; offset < self-slots.count; offset++) {
-      if ((self-slots.elements[offset] = op(self-slots.elements[offset], other-slots.elements[offset])) != 0) {
+      if ((self-slots.items[offset] = op(self-slots.items[offset], other-slots.items[offset])) != 0) {
         result = true;
         break;
       }
@@ -217,7 +217,7 @@ klass bit-vector {
         ssize-t count = max(self-slots.count, other-slots.count);
         for (ssize-t offset = 0; offset < count; offset++) {
           ssize-t i = count - 1 - offset;
-          result = dk-cmp(self-slots.elements[i], other-slots.elements[i]);
+          result = dk-cmp(self-slots.items[i], other-slots.items[i]);
           if (result != 0)
             break;
         }

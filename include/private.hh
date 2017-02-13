@@ -29,7 +29,7 @@ FUNC echo_stuff(object::slots_t* instance, str_t action, symbol_t kls_name, symb
 # endif
 FUNC echo_stuff(object::slots_t* instance, str_t action) -> void;
 FUNC interposer_name_for_klass_name(symbol_t klass_name) -> symbol_t;
-FUNC add_interpose_prop(symbol_t key, symbol_t element) -> void;
+FUNC add_interpose_prop(symbol_t key, symbol_t item) -> void;
 
 FUNC info_for_name(symbol_t) -> named_info_t*;
 

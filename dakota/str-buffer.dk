@@ -48,9 +48,9 @@ klass str-buffer {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element(out, self.ptr, "ptr");
-    $write-element(out, self.len, "len");
-    $write-element(out, self.capacity, "capacity");
+    $write-item(out, self.ptr, "ptr");
+    $write-item(out, self.len, "len");
+    $write-item(out, self.capacity, "capacity");
 
     $write-slots-end(out);
     return self;

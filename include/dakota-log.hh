@@ -42,7 +42,7 @@ namespace dkt {
     k_log_debug =     LOG_DEBUG,
   };
 
-  enum log_element_t : uint64_t {
+  enum log_item_t : uint64_t {
     k_log_null =           0,
 
     k_log_mem_footprint =  1 <<  0,
@@ -50,7 +50,7 @@ namespace dkt {
     k_log_initial_final =  1 <<  2,
     k_log_trace_runtime =  1 <<  3,
 
-    k_log_all = ~(cast(log_element_t)0)
+    k_log_all = ~(cast(log_item_t)0)
   };
   const uint64_t log_flags = k_log_null;
   //k-log-mem-footprint | k-log-object-alloc | k-log-initial-final | k-log-trace-runtime;

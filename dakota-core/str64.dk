@@ -36,7 +36,7 @@ klass str64 {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element(out, unbox(self), "contents");
+    $write-item(out, unbox(self), "contents");
 
     $write-slots-end(out);
     return self;

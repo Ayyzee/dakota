@@ -84,8 +84,8 @@ klass string {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element(out, self.ptr, "ptr");
-    $write-element(out, self.len, "len");
+    $write-item(out, self.ptr, "ptr");
+    $write-item(out, self.len, "len");
 
     $write-slots-end(out);
     return self;
@@ -186,8 +186,8 @@ klass string {
     return result;
   }
   method append-sequence(object-t self, object-t sequence) -> object-t {
-    for (object-t element in sequence) {
-      str-t str = $str(element);
+    for (object-t item in sequence) {
+      str-t str = $str(item);
       ssize-t length = cast(ssize-t)safe-strlen(str);
       self.len += cast(ssize-t)(length);
       self.ptr = cast(char-t*)dkt::alloc(((self.len + 1) * ssizeof(char-t)), self.ptr);

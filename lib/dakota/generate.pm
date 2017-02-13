@@ -99,7 +99,7 @@ our @EXPORT= qw(
                  should_use_include
               );
 
-my $colon = ':'; # key/element delim only
+my $colon = ':'; # key/item delim only
 my $kw_arg_placeholders = &kw_arg_placeholders();
 my ($id,  $mid,  $bid,  $tid,
     $rid, $rmid, $rbid, $rtid) = &ident_regex();
@@ -612,9 +612,9 @@ sub generate_target_runtime {
     $col = &colin($col);
     $num_klasses = scalar keys %{$$target_srcs_ast{'klasses'}};
     foreach my $klass_name (sort keys %{$$target_srcs_ast{'klasses'}}) {
-      $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&$klass_name\::_klass_ }, /// &object-t" . $nl;
+      $target_cc_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)&$klass_name\::_klass_ }, /// &object-t" . $nl;
     }
-    $target_cc_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
+    $target_cc_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)nullptr }" . $nl;
     $col = &colout($col);
     $target_cc_str .= $col . "};" . $nl;
     $target_cc_str .= &linkage_unit::generate_target_runtime_selectors_seq( $generics);
@@ -962,8 +962,8 @@ sub func::decl {
 }
 sub func::overloadsig_parts {
   my ($func, $scope) = @_;
-  my $last_element = $$func{'param-types'}[-1];
-  my $last_type = &arg::type($last_element);
+  my $last_item = $$func{'param-types'}[-1];
+  my $last_type = &arg::type($last_item);
   my $name = &ct($$func{'name'} || []); # rnielsenrnielsen hackhack
   #if ($name eq '') { return undef; }
   my $param_types = &arg_type::list_types($$func{'param-types'});
@@ -2434,7 +2434,7 @@ sub typealias_slots_t {
 # {'slots'}{'cat'} = aggregate struct|union|enum
 # {'slots'}{'type'} = typealias type
 #
-# {'slots'}{'cat-info'} = aggregate elements
+# {'slots'}{'cat-info'} = aggregate items
 sub generate_slots_decls {
   my ($ast, $col, $klass_path, $klass_name, $klass_ast) = @_;
   if (!$klass_ast) {
@@ -3164,9 +3164,9 @@ sub alias_body {
   return $result;
 }
 sub export_pair {
-  my ($symbol, $element) = @_;
-  my $name = &ct($$element{'name'});
-  my $type0 = &ct($$element{'param-types'}[0]);
+  my ($symbol, $item) = @_;
+  my $name = &ct($$item{'name'});
+  my $type0 = &ct($$item{'param-types'}[0]);
   $type0 = ''; # hackhack
   my $lhs = "\"$symbol::$name($type0)\"";
   my $rhs = 1;
@@ -3970,9 +3970,9 @@ sub dk_generate_cc_footer {
       my $num_klasses = scalar keys %$interposers;
       foreach $key (sort keys %$interposers) {
         $val = $$interposers{$key};
-        $$scratch_str_ref .= $col . "{ .key = $key\::__name__, .element = cast(intptr-t)$val\::__name__ }," . $nl;
+        $$scratch_str_ref .= $col . "{ .key = $key\::__name__, .item = cast(intptr-t)$val\::__name__ }," . $nl;
       }
-      $$scratch_str_ref .= $col . "{ .key = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
+      $$scratch_str_ref .= $col . "{ .key = nullptr, .item = cast(intptr-t)nullptr }" . $nl;
       $col = &colout($col);
       $$scratch_str_ref .= $col . "};" . $nl;
     }
@@ -4000,8 +4000,8 @@ sub many_1_to_1_from_1_to_many {
   my $result = {};
   while (my ($key, $subseq) = each(%$tbl)) {
     my $lhs = $key;
-    foreach my $element (@$subseq) {
-      my $rhs = $element;
+    foreach my $item (@$subseq) {
+      my $rhs = $item;
       $$result{$lhs} = $rhs;
       $lhs = $rhs;
     }
@@ -4217,9 +4217,9 @@ sub linkage_unit::generate_target_runtime_strs_seq {
     $col = &colin($col);
     foreach my $str (sort keys %{$$target_srcs_ast{'literal-strs'}}) {
       my $str_ident = &dk_mangle($str);
-      $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)&__literal::__str::$str_ident }," . $nl;
+      $scratch_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)&__literal::__str::$str_ident }," . $nl;
     }
-    $scratch_str .= $col . "{ .next = nullptr, .element = cast(intptr-t)nullptr }" . $nl;
+    $scratch_str .= $col . "{ .next = nullptr, .item = cast(intptr-t)nullptr }" . $nl;
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
   }
@@ -4274,9 +4274,9 @@ sub linkage_unit::generate_target_runtime_ints_seq {
     $col = &colin($col);
     foreach my $int (sort keys %{$$target_srcs_ast{'literal-ints'}}) {
       my $int_ident = &dk_mangle($int);
-      $scratch_str .= $col . "{ .next = nullptr, .element = cast(intmax-t)&__literal::__int::$int_ident }," . $nl;
+      $scratch_str .= $col . "{ .next = nullptr, .item = cast(intmax-t)&__literal::__int::$int_ident }," . $nl;
     }
-    $scratch_str .= $col . "{ .next = nullptr, .element = cast(intmax-t)nullptr }" . $nl;
+    $scratch_str .= $col . "{ .next = nullptr, .item = cast(intmax-t)nullptr }" . $nl;
     $col = &colout($col);
     $scratch_str .= $col . "};" . $nl;
   }
@@ -4290,14 +4290,14 @@ sub generate_target_runtime_property_tbl {
   my $max_key_width = 0;
   my $num = 1;
   foreach my $key (@$sorted_keys) {
-    my $element = $$tbl{$key};
+    my $item = $$tbl{$key};
 
-    if ('HASH' eq ref $element) {
-      $result .= &generate_target_runtime_info("$name-$num", $element, $col, $symbols, $line);
-      $element = "&$name-$num";
+    if ('HASH' eq ref $item) {
+      $result .= &generate_target_runtime_info("$name-$num", $item, $col, $symbols, $line);
+      $item = "&$name-$num";
       $num++;
-    } elsif (!defined $element) {
-      $element = "nullptr";
+    } elsif (!defined $item) {
+      $item = "nullptr";
     }
     my $key_width = length($key);
     if ($key_width > $max_key_width) {
@@ -4308,28 +4308,28 @@ sub generate_target_runtime_property_tbl {
   $col = &colin($col);
   $num = 1;
   foreach my $key (@$sorted_keys) {
-    my $element = $$tbl{$key};
+    my $item = $$tbl{$key};
 
-    if ('HASH' eq ref $element) {
-      $element = "&$name-$num";
+    if ('HASH' eq ref $item) {
+      $item = "&$name-$num";
       $num++;
-    } elsif (!defined $element) {
-      $element = "nullptr";
+    } elsif (!defined $item) {
+      $item = "nullptr";
     }
     my $key_width = length($key);
     my $pad = ' ' x ($max_key_width - $key_width);
 
-    if ($element =~ /^"(.*)"$/) {
+    if ($item =~ /^"(.*)"$/) {
       my $literal_symbol = &as_literal_symbol($1);
       if ($$symbols{$literal_symbol}) {
-        $element = $literal_symbol;
+        $item = $literal_symbol;
       } else {
-        $element = "dk-intern($element)";
+        $item = "dk-intern($item)";
       }
     }
     my $in1 = &ident_comment($key, 1);
-    my $in2 = &ident_comment($element, 1);
-    $result .= $col . "{ .key = $key," . $pad . " .element = cast(intptr-t)$element }," . $in1 . $in2 . $nl;
+    my $in2 = &ident_comment($item, 1);
+    $result .= $col . "{ .key = $key," . $pad . " .item = cast(intptr-t)$item }," . $in1 . $in2 . $nl;
   }
   $col = &colout($col);
   $result .= $col . "};";
@@ -4339,7 +4339,7 @@ sub generate_target_runtime_info {
   my ($name, $tbl, $col, $symbols, $line) = @_;
   my $result = &generate_target_runtime_property_tbl("$name-props", $tbl, $col, $symbols, $line);
   $result .= $nl;
-  $result .= $col . "static named-info-t $name = { .next = nullptr, .count = countof($name-props), .elements = $name-props };" . &ann(__FILE__, $line) . $nl;
+  $result .= $col . "static named-info-t $name = { .next = nullptr, .count = countof($name-props), .items = $name-props };" . &ann(__FILE__, $line) . $nl;
   return $result;
 }
 sub generate_target_runtime_info_seq {
@@ -4350,18 +4350,18 @@ sub generate_target_runtime_info_seq {
   $col = &colin($col);
 
   my $max_width = 0;
-  foreach my $element (@$seq) {
-    my $width = length($element);
+  foreach my $item (@$seq) {
+    my $width = length($item);
     if ($width > $max_width) {
       $max_width = $width;
     }
   }
-  foreach my $element (@$seq) {
-    my $width = length($element);
+  foreach my $item (@$seq) {
+    my $width = length($item);
     my $pad = ' ' x ($max_width - $width);
-    $result .= $col . "{ .next = nullptr, .count = countof($element)," . $pad . " .elements = $element }," . $nl;
+    $result .= $col . "{ .next = nullptr, .count = countof($item)," . $pad . " .items = $item }," . $nl;
   }
-  $result .= $col . "{ .next = nullptr, .count = 0, .elements = nullptr }" . $nl;
+  $result .= $col . "{ .next = nullptr, .count = 0, .items = nullptr }" . $nl;
   $col = &colout($col);
   $result .= $col . "};";
   return $result;

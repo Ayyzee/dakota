@@ -36,7 +36,7 @@ klass xml-object-output-stream {
     ssize-t indent-level;
 
     str-t key-delim;
-    str-t element-delim;
+    str-t item-delim;
 
     str-t start-seq-delim;
     str-t end-seq-delim;
@@ -56,11 +56,11 @@ klass xml-object-output-stream {
 
     if (self.indent-level != 0) {
       self.key-delim = "";
-      self.element-delim = "";
+      self.item-delim = "";
 
     } else {
       self.key-delim = "";
-      self.element-delim = "";
+      self.item-delim = "";
     }
     return self;
   }
@@ -70,30 +70,30 @@ klass xml-object-output-stream {
     else
       return k-none;
   }
-  method write-element(object-t self, str-t element, str-t key) -> object-t {
+  method write-item(object-t self, str-t item, str-t key) -> object-t {
     char-t[128] buffer;
     if (key != nullptr)
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s\"%s\"%s",  key, self.key-delim, element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s\"%s\"%s",  key, self.key-delim, item, self.item-delim);
     else
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s", element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s", item, self.item-delim);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method write-element(object-t self, ssize-t element, str-t key) -> object-t {
+  method write-item(object-t self, ssize-t item, str-t key) -> object-t {
     char-t[128] buffer;
     if (key != nullptr)
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, item, self.item-delim);
     else
-      snprintf(buffer, sizeof(buffer), "%zi%s", element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "%zi%s", item, self.item-delim);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
-  method write-element(object-t self, size-t element, str-t key) -> object-t {
+  method write-item(object-t self, size-t item, str-t key) -> object-t {
     char-t[128] buffer;
     if (key != nullptr)
-      snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "\"%s\"%s%zi%s",  key, self.key-delim, item, self.item-delim);
     else
-      snprintf(buffer, sizeof(buffer), "%zi%s", element, self.element-delim);
+      snprintf(buffer, sizeof(buffer), "%zi%s", item, self.item-delim);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
   }
@@ -109,7 +109,7 @@ klass xml-object-output-stream {
   }
   method write-table-end(object-t self) -> object-t {
     char-t[128] buffer;
-    snprintf(buffer, sizeof(buffer), "%s%s", self.end-tbl-delim, self.element-delim);
+    snprintf(buffer, sizeof(buffer), "%s%s", self.end-tbl-delim, self.item-delim);
     $column-decr(self);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;
@@ -126,7 +126,7 @@ klass xml-object-output-stream {
   }
   method write-sequence-end(object-t self) -> object-t {
     char-t[128] buffer;
-    snprintf(buffer, sizeof(buffer), "%s%s", self.end-seq-delim, self.element-delim);
+    snprintf(buffer, sizeof(buffer), "%s%s", self.end-seq-delim, self.item-delim);
     $column-decr(self);
     $write(self, buffer, features(self, k-indent | k-trailing-newline));
     return self;

@@ -26,8 +26,8 @@ klass iterator-context {
 trait iterator {
   method next(object-t self) -> object-t;
   method next?(object-t self) -> bool-t;
-  method element(object-t self) -> object-t;
-  method set-element(object-t self, object-t element) -> object-t;
+  method item(object-t self) -> object-t;
+  method set-item(object-t self, object-t item) -> object-t;
   method remove(object-t self) -> object-t;
 }
 

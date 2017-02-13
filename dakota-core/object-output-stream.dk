@@ -50,7 +50,7 @@ klass object-output-stream {
   method write-slots-start(object-t self, object-t kls) -> object-t {
     $write-table-start(self, cast(str-t)nullptr);
     if (1)
-      $write-element(self, $name(kls), "-slots"); //optional
+      $write-item(self, $name(kls), "-slots"); //optional
     return self;
   }
   method write-slots-end(object-t self) -> object-t {
@@ -59,11 +59,11 @@ klass object-output-stream {
   }
   method write(object-t self, object-t object) -> object-t {
     $write-table-start(self, cast(str-t)nullptr);
-    $write-element-id(self, object);
+    $write-item-id(self, object);
     $write-table-end(self);
     return self;
   }
-  method write-element-id(object-t self, object-t object) -> object-t {
+  method write-item-id(object-t self, object-t object) -> object-t {
     unless ($in?(self.objects, object)) {
       $add(self.objects, object); // only grows, never shrinks
       object-t id = $at(self.id-from-object, object, nullptr);
@@ -76,20 +76,20 @@ klass object-output-stream {
       $remove(self.object-from-id, id); // remove if present
       $write-sequence-start(self, $str(id));
 //       object-t object-klass = klass-of(object);
-//       $write-element(self, $name(object-klass), "-klass");
+//       $write-item(self, $name(object-klass), "-klass");
 
 //       if ($instance?(object, klass::_klass_))
-//         $write-element(self, $name(object), "name");
+//         $write-item(self, $name(object), "name");
 
       $write-slots(object, self);
       $write-sequence-end(self);
 
       while (object-t o = $remove-last(self.object-from-id))
-        $write-element-id(self, $first(o)); // recursive
+        $write-item-id(self, $first(o)); // recursive
     }
     return self;
   }
-  method write-element-idref(object-t self, object-t object, str-t key) -> object-t {
+  method write-item-idref(object-t self, object-t object, str-t key) -> object-t {
     // bugbug: key == nullptr is valid
     object-t id = $at(self.id-from-object, object, nullptr);
 
@@ -101,14 +101,14 @@ klass object-output-stream {
     $add(self.object-from-id, id, object);
 
     $write-table-start(self, key);
-    $write-element(self, $str(id), "idref");
+    $write-item(self, $str(id), "idref");
     $write-table-end(self);
 
     return self;
   }
-  method write-element(object-t self, str-t t, str-t key) -> object-t;
-  method write-element(object-t self, ssize-t t, str-t key) -> object-t;
-  method write-element(object-t self, ssize-t t, str-t key) -> object-t;
+  method write-item(object-t self, str-t t, str-t key) -> object-t;
+  method write-item(object-t self, ssize-t t, str-t key) -> object-t;
+  method write-item(object-t self, ssize-t t, str-t key) -> object-t;
   method write-sequence-start(object-t self, str-t key) -> object-t;
   method write-sequence-end(object-t self) -> object-t;
   method write-table-start(object-t self, str-t key) -> object-t;

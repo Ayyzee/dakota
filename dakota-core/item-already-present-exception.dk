@@ -16,6 +16,6 @@
 
 module dakota-core;
 
-klass element-already-present-exception {
+klass item-already-present-exception {
   superklass exception;
 }

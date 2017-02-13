@@ -45,7 +45,7 @@ klass hashed-set {
 
     ssize-t  iterator-state;
   }
-  // 'elements' is a collection (of objects)
+  // 'items' is a collection (of objects)
   // 'objects' is a nullptr terminated array (of objects)
   // using compound literals 'objects' can be used as follows:
   // $init(o, #objects: { o1, o2 });
@@ -53,49 +53,49 @@ klass hashed-set {
   method init(object-t   self,
               equals-t   equals?: $equals?,
               ssize-t    initial-capacity: 251, // should be prime
-              object-t   elements: nullptr,
+              object-t   items: nullptr,
               object-t[] objects:  nullptr) -> object-t {
     assert(0 < initial-capacity);
     self = $init(super);
     self.equals? = equals?;
     self.num-buckets = initial-capacity;
-    self.buckets = $make(vector::klass(), #initial-capacity: self.num-buckets, #fill-element: nullptr);
+    self.buckets = $make(vector::klass(), #initial-capacity: self.num-buckets, #fill-item: nullptr);
     self.size = 0;
 
     self.iterator-state = 0;
 
-    if (elements != nullptr)
-      $add-all(self, elements);
+    if (items != nullptr)
+      $add-all(self, items);
 
     if (objects != nullptr)
       $add-objects(self, objects);
     return self;
   }
-  method add(object-t self, object-t element) -> object-t {
-    object-t result = element;
-    ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
+  method add(object-t self, object-t item) -> object-t {
+    object-t result = item;
+    ssize-t index = cast(ssize-t)($hash(item) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque == nullptr) {
       deque = $make(deque::klass());
       self.iterator-state++;
       self.size++; // bugbug - could wrap
-      $add-first(deque, element);
+      $add-first(deque, item);
       // why use replace-at?  should be add-at
       $replace-at(self.buckets, index, deque);
     } else {
-      object-t found-element = nullptr;
+      object-t found-item = nullptr;
 
       for (object-t e in deque) {
-        if (self.equals?(e, element)) { // arg order matters here!!
-          result = found-element = e;
+        if (self.equals?(e, item)) { // arg order matters here!!
+          result = found-item = e;
           break;
         }
       }
-      if (found-element == nullptr) {
+      if (found-item == nullptr) {
         self.iterator-state++;
         self.size++; // bugbug - could wrap
-        $add-first(deque, element);
+        $add-first(deque, item);
       }
     }
     return result;
@@ -107,14 +107,14 @@ klass hashed-set {
     }
     return self;
   }
-  method at(object-t self, object-t element, object-t default-result) -> object-t {
+  method at(object-t self, object-t item, object-t default-result) -> object-t {
     object-t result = default-result;
-    ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
+    ssize-t index = cast(ssize-t)($hash(item) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque != nullptr) {
       for (object-t e in deque) {
-        if (self.equals?(e, element)) { // arg order matters here!!
+        if (self.equals?(e, item)) { // arg order matters here!!
           result = e;
           break;
         }
@@ -122,35 +122,35 @@ klass hashed-set {
     }
     return result;
   }
-  method at(object-t self, object-t element) -> object-t {
-    object-t result = $at(self, element, nullptr);
+  method at(object-t self, object-t item) -> object-t {
+    object-t result = $at(self, item, nullptr);
     if (result == nullptr)
       throw $make(exception::klass(), #msg: "oops");
     return result;
   }
-  method remove(object-t self, object-t element) -> object-t {
-    object-t prev-element = nullptr;
+  method remove(object-t self, object-t item) -> object-t {
+    object-t prev-item = nullptr;
 
-    ssize-t index = cast(ssize-t)($hash(element) % cast(hash-t)self.num-buckets);
+    ssize-t index = cast(ssize-t)($hash(item) % cast(hash-t)self.num-buckets);
     object-t deque = $at(self.buckets, index, nullptr);
 
     if (deque != nullptr) {
       for (object-t iterator = $iterator(deque);
            object-t e = $next(iterator); /**/) {
-        //printf("element: %s\n", $name(element));
+        //printf("item: %s\n", $name(item));
         //printf("e: %s\n", $name(e));
 
-        if (self.equals?(e, element)) { // arg order matters here!!
+        if (self.equals?(e, item)) { // arg order matters here!!
           //            object-t remove-not-yet-tested;
           // NOT TESTED!!!
           self.iterator-state++;
-          prev-element = $remove(iterator); //e
+          prev-item = $remove(iterator); //e
           self.size--;
           break;
         }
       }
     }
-    return prev-element; // returns nullptr on error
+    return prev-item; // returns nullptr on error
   }
   [[alias(copy)]] method copy-shallow(object-t self) -> object-t {
     object-t kls = klass-of(self);
@@ -171,20 +171,20 @@ klass hashed-set {
   }
   method dump(object-t self) -> object-t {
     $dump(super);
-    fprintf(stderr, "%p { size=%zi, elements=[] }\n",
+    fprintf(stderr, "%p { size=%zi, items=[] }\n",
             cast(ptr-t)self, self.size);
-    for (object-t element in self)
-      $dump(element);
+    for (object-t item in self)
+      $dump(item);
     return self;
   }
   method write-slots(object-t self, object-t out) -> object-t {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-sequence-start(out, "elements");
+    $write-sequence-start(out, "items");
 
-    for (object-t element in self)
-      $write-element-idref(out, element, cast(str-t)nullptr);
+    for (object-t item in self)
+      $write-item-idref(out, item, cast(str-t)nullptr);
     $write-sequence-end(out);
 
     $write-slots-end(out);
@@ -241,28 +241,28 @@ klass hashed-set-iterator {
   }
   method next(object-t self) -> object-t {
     check-iterator-state(self);
-    object-t element = nullptr;
+    object-t item = nullptr;
     if ($next?(self)) {
-      element = $next(self.deque-iter);
-      if (element == nullptr) {
+      item = $next(self.deque-iter);
+      if (item == nullptr) {
         self.deque-iter = next-deque-iterator(self.vector-iter);
         if (self.deque-iter != nullptr)
-          element = $next(self.deque-iter); // may return nullptr
+          item = $next(self.deque-iter); // may return nullptr
       }
-      if (element != nullptr)
+      if (item != nullptr)
         if (self.deque-iter != nullptr)
           unless ($next?(self.deque-iter))
             self.deque-iter = next-deque-iterator(self.vector-iter); // may return nullptr
     }
-    return element;
+    return item;
   }
-  method element(object-t self) -> object-t {
+  method item(object-t self) -> object-t {
     check-iterator-state(self);
-    object-t element = nullptr;
+    object-t item = nullptr;
     if ($next?(self)) {
-      element = $element(self.deque-iter);
-      assert(element != nullptr);
+      item = $item(self.deque-iter);
+      assert(item != nullptr);
     }
-    return element; // returns nullptr on error
+    return item; // returns nullptr on error
   }
 }

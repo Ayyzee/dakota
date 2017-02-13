@@ -28,12 +28,12 @@ klass property-compare {
 klass property {
   slots {
     symbol-t key;
-    intptr-t element;
+    intptr-t item;
   }
   method init(object-t self) -> object-t {
     self = $init(super);
     self.key =     nullptr;
-    self.element = 0;
+    self.item = 0;
     return self;
   }
   method check(const slots-t* s) -> ssize-t {

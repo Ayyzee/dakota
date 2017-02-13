@@ -12,7 +12,7 @@
       '$(srcdir)/counted-set.dk',
       '$(srcdir)/dakota-core.dk',
       '$(srcdir)/deque.dk',
-      '$(srcdir)/element-already-present-exception.dk',
+      '$(srcdir)/item-already-present-exception.dk',
       '$(srcdir)/enum-info.dk',
       '$(srcdir)/exception.dk',
       '$(srcdir)/hash.dk',

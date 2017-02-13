@@ -16,7 +16,7 @@
 
 module dakota-core;
 
-klass element-already-present-exception;
+klass item-already-present-exception;
 klass exception;
 klass collection;
 klass klass;
@@ -26,8 +26,8 @@ trait iterator;
 trait set {
   require collection;
 
-  method in?(object-t self, object-t element) -> bool-t {
-    bool-t result = ($at(self, element, nullptr) != nullptr);
+  method in?(object-t self, object-t item) -> bool-t {
+    bool-t result = ($at(self, item, nullptr) != nullptr);
     return result;
   }
   // complement (if collection is set)
@@ -43,19 +43,19 @@ trait set {
     $write(out, "{");
     str-t delim = "";
 
-    for (object-t element in self) {
+    for (object-t item in self) {
       $write(out, delim);
-      $write-lite(element, out); // must be primitive type
+      $write-lite(item, out); // must be primitive type
       delim = ",";
     }
     $write(out, "}");
     return self;
   }
-  method add!(object-t self, object-t element) -> object-t {
-    if ($in?(self, element))
-      throw $make(element-already-present-exception::klass());
-    object-t result = $add(self, element);
+  method add!(object-t self, object-t item) -> object-t {
+    if ($in?(self, item))
+      throw $make(item-already-present-exception::klass());
+    object-t result = $add(self, item);
     return result;
   }
-  method remove-at(object-t self, object-t element) -> object-t; ///
+  method remove-at(object-t self, object-t item) -> object-t; ///
 }

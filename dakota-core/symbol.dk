@@ -39,8 +39,8 @@ klass symbol-klass {
     self.pool = $make(sorted-set::klass()); // should be consumer settable
     return self;
   }
-  method add(object-t self, object-t element) -> object-t {
-    object-t result = $add(self.pool, element);
+  method add(object-t self, object-t item) -> object-t {
+    object-t result = $add(self.pool, item);
     return result;
   }
 }

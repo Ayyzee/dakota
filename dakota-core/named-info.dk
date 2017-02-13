@@ -36,7 +36,7 @@ klass named-info {
   slots {
     slots-t*    next;
     ssize-t     count;    // sizeof(property)/sizeof(property[0])
-    property-t* elements; // property
+    property-t* items; // property
   //            size = sizeof(property::slots-t)
   //            compare = property::compare()
   }
@@ -44,58 +44,58 @@ klass named-info {
     self = $init(super);
     self.next =     nullptr;
     self.count =    0;
-    self.elements = nullptr;
+    self.items = nullptr;
     return self;
   }
   method check(const slots-t* s) -> ssize-t {
     for (int64-t i = 0; i < s->count; i++) {
       // need to add test for #name (since its required)
 
-      property-t element = s->elements[i];
-      property::check(&element);
+      property-t item = s->items[i];
+      property::check(&item);
     }
     return 0;
   }
   method sort(slots-t* s) -> slots-t* {
-    qsort(s->elements, cast(size-t)s->count, sizeof(s->elements[0]),
+    qsort(s->items, cast(size-t)s->count, sizeof(s->items[0]),
           cast(std-compare-t)cast(property-compare-t)property::compare);
     return s;
   }
   method at(const slots-t* s, symbol-t key) -> intptr-t {
-    intptr-t element = cast(intptr-t)nullptr;
-    property::slots-t property = {.key = cast(symbol-t)key, .element = cast(intptr-t)nullptr};
+    intptr-t item = cast(intptr-t)nullptr;
+    property::slots-t property = {.key = cast(symbol-t)key, .item = cast(intptr-t)nullptr};
     property::slots-t* property-result = cast(property::slots-t*)bsearch(&property,
-                                                                         s->elements,
+                                                                         s->items,
                                                                          cast(size-t)s->count,
-                                                                         sizeof(s->elements[0]),
+                                                                         sizeof(s->items[0]),
                                                                          cast(std-compare-t)
                                                                          cast(property-compare-t)property::compare);
     if (property-result != nullptr)
-      element = property-result->element;
-    return element;
+      item = property-result->item;
+    return item;
   }
-  method at(const slots-t* s, symbol-t key, intptr-t default-element) -> intptr-t {
-    intptr-t element = at(s, key);
-    if (element == cast(intptr-t)nullptr) // nullptr (i.e. zero) must be illegal for this to work
-      element = default-element;
-    return element;
+  method at(const slots-t* s, symbol-t key, intptr-t default-item) -> intptr-t {
+    intptr-t item = at(s, key);
+    if (item == cast(intptr-t)nullptr) // nullptr (i.e. zero) must be illegal for this to work
+      item = default-item;
+    return item;
   }
   method dump(const slots-t* s) -> const slots-t* {
     const slots-t* current = s;
     while (current != nullptr) {
       printf("{\n");
       for (int64-t i = 0; i < current->count; i++) {
-        symbol-t key = current->elements[i].key;
-        intptr-t element = current->elements[i].element;
-        printf("  #%s: %p", key, cast(ptr-t)element);
+        symbol-t key = current->items[i].key;
+        intptr-t item = current->items[i].item;
+        printf("  #%s: %p", key, cast(ptr-t)item);
 
         switch (key) {
           case #file:
-            printf("  \"%s\",", cast(str-t)(element));
+            printf("  \"%s\",", cast(str-t)(item));
             break;
           case #name:
           case #type:
-            printf("  #%s,",    cast(symbol-t)(element));
+            printf("  #%s,",    cast(symbol-t)(item));
             break;
           default:
             ;
@@ -133,30 +133,30 @@ klass named-info {
 func dk-va-make-named-info-slots(symbol-t name, va-list-t args) -> named-info-t* {
 //   assert(name != nullptr);
   symbol-t key;
-  intptr-t element;
+  intptr-t item;
 
   int64-t props-capacity = 4;
   property-t* props = cast(property-t*)dkt::alloc(ssizeof(property-t) * props-capacity);
   ssize-t count = 0;
 
   props[count].key = #name;
-  props[count].element = cast(intptr-t)(name);
+  props[count].item = cast(intptr-t)(name);
   count++;
 
   // symbol-t, intptr-t, <repeat>
   while ((key = va-arg(args, symbol-t)) != nullptr) {
-    element = va-arg(args, intptr-t);
+    item = va-arg(args, intptr-t);
     if (props-capacity == count + 1) {
       props-capacity *= 2;
       props = cast(property-t*)dkt::alloc(ssizeof(property-t) * props-capacity, props);
     }
     props[count].key =     key;
-    props[count].element = element;
+    props[count].item = item;
     count++;
   }
   // hackhack: should be allocated in previous (initial) dkt::alloc()
   named-info-t* info = cast(named-info-t*)dkt::alloc(ssizeof(named-info-t));
-  info->elements = props;
+  info->items = props;
   info->count = count;
   info->next = nullptr;
   sort(info);

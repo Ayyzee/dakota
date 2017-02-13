@@ -48,9 +48,9 @@ klass token {
     $write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element(out, self.line,   "line");
-    $write-element(out, self.column, "column");
-    $write-element(out, self.buffer, "buffer");
+    $write-item(out, self.line,   "line");
+    $write-item(out, self.column, "column");
+    $write-item(out, self.buffer, "buffer");
 
     $write-slots-end(out);
     return self;

@@ -72,7 +72,7 @@ klass object {
   //$write-slots(super, out);
     $write-slots-start(out, _klass_);
 
-    $write-element-idref(out, klass-of(self), "klass");
+    $write-item-idref(out, klass-of(self), "klass");
 
     $write-slots-end(out);
     return self;

@@ -30,7 +30,7 @@ klass std-compare;
 
 klass sorted-set-core {
   slots {
-    ptr-t         elements;
+    ptr-t         items;
     ssize-t       count;
     ssize-t       capacity;
     ssize-t       size;
@@ -45,7 +45,7 @@ klass sorted-set-core {
     assert(size > 0);
     assert(compare != nullptr);
     slots-t* slots = cast(slots-t*)dkt::alloc(ssizeof(slots-t));
-    slots->elements = cast(ptr-t)dkt::alloc(size * capacity);
+    slots->items = cast(ptr-t)dkt::alloc(size * capacity);
     slots->count =    0;
     slots->capacity = capacity;
     slots->size =     size;
@@ -54,12 +54,12 @@ klass sorted-set-core {
     return slots;
   }
   func destroy(slots-t* slots) -> std::nullptr-t {
-    slots->elements = dkt::dealloc(slots->elements);
+    slots->items = dkt::dealloc(slots->items);
     slots =           dkt::dealloc(slots);
     return nullptr;
   }
   func sort(slots-t* t) -> slots-t* {
-    qsort(t->elements, cast(size-t)t->count, cast(size-t)t->size, t->compare);
+    qsort(t->items, cast(size-t)t->count, cast(size-t)t->size, t->compare);
     return t;
   }
 
@@ -67,7 +67,7 @@ klass sorted-set-core {
   func result-at(const slots-t* t, const void* key) -> result-t {
     assert(key != nullptr);
 
-    result-t result = { .element = nullptr, .offset = -1 };
+    result-t result = { .item = nullptr, .offset = -1 };
     cmp-t cmp;
     bool-t should-increment = false;
 
@@ -77,7 +77,7 @@ klass sorted-set-core {
 
     while (l < u) {
       i = l + ((u - l) / 2); // calc midpoint without overflowing
-      const void* p = cast(const void*)(cast(uint8-t*)(t->elements) + (i * t->size));
+      const void* p = cast(const void*)(cast(uint8-t*)(t->items) + (i * t->size));
       cmp = t->compare(deref(t, p), key);
 
       if (0 < cmp) {
@@ -88,11 +88,11 @@ klass sorted-set-core {
         should-increment = true;
         l = i + 1;
       } else {
-        result.element = deref(t, p);
+        result.item = deref(t, p);
         break;
       }
     }
-    if (result.element == nullptr && should-increment)
+    if (result.item == nullptr && should-increment)
       i++;
     result.offset = i;
     return result;
@@ -104,12 +104,12 @@ klass sorted-set-core {
 
     if (t->count == t->capacity) {
       t->capacity *= 2; // the growth algorithm should be consumer settable
-      t->elements = cast(ptr-t*)dkt::alloc(t->size * t->capacity, t->elements);
+      t->items = cast(ptr-t*)dkt::alloc(t->size * t->capacity, t->items);
     }
-    memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
-            cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
+    memmove(cast(ptr-t)(cast(uint8-t*)(t->items) + (t->size * (offset + 1))),
+            cast(ptr-t)(cast(uint8-t*)(t->items) + (t->size * (offset + 0))),
             cast(size-t)((t->count - offset) * t->size));
-    memcpy(cast(uint8-t*)(t->elements) + (t->size * (offset + 0)), ref(t, key), cast(size-t)t->size);
+    memcpy(cast(uint8-t*)(t->items) + (t->size * (offset + 0)), ref(t, key), cast(size-t)t->size);
     t->count++;
     return key;
   }
@@ -118,8 +118,8 @@ klass sorted-set-core {
     assert(offset < t->count);
     assert(0 < t->count);
 
-    const void* element = deref(t, cast(const void*)(cast(uint8-t*)(t->elements) + (t->size * offset)));
-    return element;
+    const void* item = deref(t, cast(const void*)(cast(uint8-t*)(t->items) + (t->size * offset)));
+    return item;
   }
   
   func remove-at(slots-t* t, ssize-t offset) -> const void* {
@@ -127,57 +127,57 @@ klass sorted-set-core {
     assert(offset < t->count);
     assert(0 < t->count);
 
-    const void* element = at(t, offset);
-    memmove(cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 0))),
-            cast(ptr-t)(cast(uint8-t*)(t->elements) + (t->size * (offset + 1))),
+    const void* item = at(t, offset);
+    memmove(cast(ptr-t)(cast(uint8-t*)(t->items) + (t->size * (offset + 0))),
+            cast(ptr-t)(cast(uint8-t*)(t->items) + (t->size * (offset + 1))),
             cast(size-t)((t->count - offset - 1) * t->size)); // this arg may be zero
-    memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, cast(size-t)t->size);
+    memset(cast(uint8-t*)(t->items) + (t->size * t->count), 0, cast(size-t)t->size);
     t->count--;
-    return element;
+    return item;
   }
   func remove(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
     result-t result = result-at(t, key);
-    const void* element = remove-at(t, result.offset);
-    return element;
+    const void* item = remove-at(t, result.offset);
+    return item;
   }
   func remove-first(slots-t* t) -> const void* {
-    const void* element = remove-at(t, 0);
-    return element;
+    const void* item = remove-at(t, 0);
+    return item;
   }
   func first(slots-t* t) -> const void* {
     ssize-t offset;
-    const void* element = at(t, offset = 0); // returns nullptr when empty
-    return element;
+    const void* item = at(t, offset = 0); // returns nullptr when empty
+    return item;
   }
   func last(slots-t* t) -> const void* {
-    const void* element = nullptr;
+    const void* item = nullptr;
     ssize-t offset;
     if (t->count != 0)
-      element = at(t, offset = t->count - 1);
-    return element;
+      item = at(t, offset = t->count - 1);
+    return item;
   }
   func add(slots-t* t, const void* key) -> const void* {
     assert(key != nullptr);
-    const void* element;
+    const void* item;
     result-t result = result-at(t, key);
-    if (result.element == nullptr)
-      element = add-at(t, result.offset, key);
+    if (result.item == nullptr)
+      item = add-at(t, result.offset, key);
     else
-      element = result.element;
-    return element;
+      item = result.item;
+    return item;
   }
   func remove-last(slots-t* t) -> const void* {
   //assert(0 < t->count);
 
-    const void* element;
+    const void* item;
     if (t->count != 0) {
-      element = at(t, t->count - 1);
-      memset(cast(uint8-t*)(t->elements) + (t->size * t->count), 0, cast(size-t)t->size);
+      item = at(t, t->count - 1);
+      memset(cast(uint8-t*)(t->items) + (t->size * t->count), 0, cast(size-t)t->size);
       t->count--;
     } else {
-      element = nullptr;
+      item = nullptr;
     }
-    return element;
+    return item;
   }
 }

@@ -18,7 +18,7 @@ module dakota-core;
 
 klass result {
   slots {
-    const void* element; // nullptr when not found
-    ssize-t     offset;  // either offset of found element, or offset to insert element
+    const void* item; // nullptr when not found
+    ssize-t     offset;  // either offset of found item, or offset to insert item
   }
 }
