@@ -85,19 +85,19 @@ klass object {
     return result;
   }
   method equals?(object-t self, object-t other) -> bool-t {
-    bool-t state = ($compare(self, other) == 0);
-    return state;
+    bool-t result = ($compare(self, other) == 0);
+    return result;
   }
   method instance?(object-t self, object-t kls) -> bool-t {
-    bool-t state = false;
+    bool-t result = false;
     object-t tmp-kls = klass-of(self);
 
     while (!root-superklass?(tmp-kls)) {
-      if ((state = (tmp-kls == kls)))
+      if ((result = (tmp-kls == kls)))
         break;
       tmp-kls = superklass-of(tmp-kls);
     }
-    return state;
+    return result;
   }
   method perform-method-for-selector(object-t self, selector-t selector) -> object-t {
     object-t kls = klass-of(self);

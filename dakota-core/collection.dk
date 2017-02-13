@@ -85,8 +85,8 @@ klass collection {
     return result;
   }
   method empty?(object-t self) -> bool-t {
-    bool-t state = ($size(self) == 0);
-    return state;
+    bool-t result = ($size(self) == 0);
+    return result;
   }
   [[alias(iterator-context)]] method forward-iterator-context(object-t self) -> iterator-context-t {
     object-t iter = $forward-iterator(self);

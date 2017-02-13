@@ -662,8 +662,8 @@ klass klass {
     return false;
 # endif
     assert((self.behavior != nullptr) || (unbox(kls).behavior != nullptr));
-    bool-t state = $bit-and?(self.behavior, unbox(kls).behavior);
-    return state;
+    bool-t result = $bit-and?(self.behavior, unbox(kls).behavior);
+    return result;
   }
   static func behavior(object-t self, ssize-t methods-count) -> object-t {
 # if defined DKT-OMIT-BEHAVIOR
@@ -789,14 +789,14 @@ klass klass {
     return result;
   }
   method subklass?(object-t self, object-t kls) -> bool-t {
-    bool-t state = false;
+    bool-t result = false;
     object-t tmp-kls = self;
 
     while (!root-superklass?((tmp-kls = superklass-of(tmp-kls)))) {
-      if ((state = (tmp-kls == kls)))
+      if ((result = (tmp-kls == kls)))
         break;
     }
-    return state;
+    return result;
   }
   method klass-with-trait(object-t self, symbol-t trait) -> object-t {
     return ::klass-with-trait(self, trait);

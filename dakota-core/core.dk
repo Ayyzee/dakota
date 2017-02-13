@@ -96,8 +96,8 @@ klass assoc-node {
     return element;
   }
   method element?(const slots-t* slots) -> bool-t {
-    bool-t state = (slots->element != 0);
-    return state;
+    bool-t result = (slots->element != 0);
+    return result;
   }
 }
 klass named-assoc-node-compare {

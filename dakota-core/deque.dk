@@ -402,9 +402,9 @@ klass deque-iterator {
   }
   // method last?(object-t self) -> bool-t {
   //   deque::slots-t& d = deque::unbox(self.deque);
-  //   bool-t state = (d.next == null);
+  //   bool-t result = (d.next == null);
 
-  //   return state;
+  //   return result;
   // }
   method next?(object-t self) -> bool-t {
     check-iterator-state(self);

@@ -366,12 +366,12 @@ klass vector-iterator {
     return self;
   }
   method first?(object-t self) -> bool-t {
-    bool-t state;
+    bool-t result;
     if (self.index == 0)
-      state = true;
+      result = true;
     else
-      state = false;
-    return state;
+      result = false;
+    return result;
   }
   method set-element(object-t self, object-t element) -> object-t {
     $replace-at(self.vector, self.index, element);

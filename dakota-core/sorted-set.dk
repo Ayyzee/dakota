@@ -215,8 +215,8 @@ klass sorted-set-iterator {
   method next?(object-t self) -> bool-t {
     check-iterator-state(self);
     const sorted-set::slots-t& ss = sorted-set::unbox(self.sorted-set);
-    bool-t state = (self.offset < ss.ssc->count);
-    return state;
+    bool-t result = (self.offset < ss.ssc->count);
+    return result;
   }
   method next(object-t self) -> object-t {
     check-iterator-state(self);

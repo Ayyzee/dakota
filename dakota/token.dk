@@ -85,17 +85,17 @@ klass token {
     return result;
   }
   method equal?(object-t self, object-t other) -> bool-t {
-    bool-t state;
+    bool-t result;
 
     if ($instance?(other, _klass_)) {
       if ($compare(self, other) == 0)
-        state = true;
+        result = true;
       else
-        state = false;
+        result = false;
     } else {
-      state = false;
+      result = false;
     }
-    return state;
+    return result;
   }
   method empty?(object-t self) -> bool-t {
     bool-t result = (self.buffer[0] == NUL);

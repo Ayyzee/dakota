@@ -225,10 +225,10 @@ klass hashed-set-iterator {
   }
   method next?(object-t self) -> bool-t {
     check-iterator-state(self);
-    bool-t state = false;
+    bool-t result = false;
     if (self.deque-iter != nullptr)
-      state = $next?(self.deque-iter);
-    return state;
+      result = $next?(self.deque-iter);
+    return result;
   }
   static func next-deque-iterator(object-t vector-iter) -> object-t {
     object-t deque = $next(vector-iter);

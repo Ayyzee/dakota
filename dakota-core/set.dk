@@ -27,8 +27,8 @@ trait set {
   require collection;
 
   method in?(object-t self, object-t element) -> bool-t {
-    bool-t state = ($at(self, element, nullptr) != nullptr);
-    return state;
+    bool-t result = ($at(self, element, nullptr) != nullptr);
+    return result;
   }
   // complement (if collection is set)
   method remove-all(object-t self, object-t collection) -> object-t {

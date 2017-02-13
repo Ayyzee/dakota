@@ -69,12 +69,12 @@ klass sequence {
     return collection;
   }
   method in?(object-t self, object-t element) -> bool-t {
-    bool-t state = false;
+    bool-t result = false;
     for (object-t e in self) {
-      if ((state = $equals?(e, element)))
+      if ((result = $equals?(e, element)))
         break;
     }
-    return state;
+    return result;
   }
   method reverse(object-t self) -> object-t {
     object-t copy = $copy(self);
