@@ -571,19 +571,18 @@ klass klass {
   // this is really slow for uses of super in trait method defns.
   // needs to be reworked so it will have very little overhead
   static func has-trait?(const symbol-t* traits, symbol-t name) -> bool-t { // recursive
+    bool-t result = false;
     if (traits == nullptr || traits[0] == nullptr)
       return false;
-    ssize-t i = 0;
-    symbol-t trait-name;
-    while ((trait-name = traits[i++]) != nullptr) {
-      if (trait-name == name)
-        return true;
-      named-info-t* trait-info = info-for-name(trait-name);
-      if (trait-info != nullptr)
-        if (has-trait?(cast(const symbol-t*)named-info::at(trait-info, #traits), name))
-          return true;
+    for (ssize-t i = 0; symbol-t trait-name = traits[i]; i++) {
+      if ((result = (trait-name == name)))
+        break;
+      named-info-t* trait-info;
+      if ((trait-info = info-for-name(trait-name)))
+        if ((result = has-trait?(cast(const symbol-t*)named-info::at(trait-info, #traits), name)))
+          break;
     }
-    return false;
+    return result;
   }
   method has-trait?(object-t self, symbol-t name) -> bool-t {
     return has-trait?(self.traits, name);
