@@ -585,7 +585,8 @@ klass klass {
     return result;
   }
   method has-trait?(object-t self, symbol-t name) -> bool-t {
-    return has-trait?(self.traits, name);
+    bool-t result = has-trait?(self.traits, name);
+    return result;
   }
   static func add-traits(object-t self, const symbol-t* traits) -> void {
     if (traits == nullptr || traits[0] == nullptr)
