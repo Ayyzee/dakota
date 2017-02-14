@@ -1529,13 +1529,13 @@ func dkt-register-info(named-info-t* registration-info) -> void {
 
     symbol-t name = name-from-info(registration-info);
     assert-valid-str(name);
-    ostream::print-format(ostrm, "// -*- mode: c++; mode: dakota -*-\n");
-  //ostream::print-format(ostrm, "// arg = %s\n",  ctlg-arg);
-  //ostream::print-format(ostrm, "// name = %s\n", name);
+  //fprintf(stderr, "arg = %s\n",  ctlg-arg);
+  //fprintf(stderr, "name = %s\n", name);
     str-t arg-base =  remove-dir(ctlg-arg);
     str-t name-base = remove-dir(name);
 
     if (ctlg-recursive || (safe-strcmp(arg-base, name-base) == 0)) {
+      ostream::print-format(ostrm, "// -*- mode: c++; mode: dakota -*-\n\n");
       dump-include-for-decls(ostrm, registration-info);
       dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only);
       dump-interposers(ostrm, registration-info);
