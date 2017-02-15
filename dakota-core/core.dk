@@ -1509,35 +1509,35 @@ func dkt-register-info(named-info-t* registration-info) -> void {
   //   int-t overwrite;
   //   setenv("DKT_SHARED_LIBRARY_PATH", dso-path, overwrite = 1);
   // }
-  bool-t exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
-  stream-t ctlg-output = nullptr;
-  str-t output-path = getenv("DAKOTA_CATALOG_OUTPUT");
-  if (output-path != nullptr) {
-    if (output-path[0] == NUL) // empty-string ("") means use default-value
-      ctlg-output = stdout;
+  bool-t ctlg-exported-only = getenv-int("DAKOTA_CATALOG_EXPORTED_ONLY");
+  stream-t output = nullptr;
+  str-t ctlg-output-path = getenv("DAKOTA_CATALOG_OUTPUT");
+  if (ctlg-output-path != nullptr) {
+    if (ctlg-output-path[0] == NUL) // empty-string ("") means use default-value
+      output = stdout;
     else {
-      ctlg-output = fopen(output-path, "a"); // output-path is initially truncated by dakota-catalog
-      if (ctlg-output == nullptr)
-        exit-fail-with-msg("ERROR: %s: \"%s\"", output-path, strerror(errno));
+      output = fopen(ctlg-output-path, "a"); // ctlg-output-path is initially truncated by dakota-catalog
+      if (output == nullptr)
+        exit-fail-with-msg("ERROR: %s: \"%s\"", ctlg-output-path, strerror(errno));
     }
   }
-  if (ctlg-output != nullptr) {
+  if (output != nullptr) {
     bool-t ctlg-recursive = getenv-int("DAKOTA_CATALOG_RECURSIVE");
     str-t ctlg-only = getenv("DAKOTA_CATALOG_ONLY");
     str-t ctlg-arg =  getenv("DAKOTA_CATALOG_ARG");
-    ostream-t ostrm = { .output = ctlg-output, .col = 0 };
+    ostream-t ostrm = { .output = output, .col = 0 };
 
     symbol-t name = name-from-info(registration-info);
     assert-valid-str(name);
   //fprintf(stderr, "arg = %s\n",  ctlg-arg);
   //fprintf(stderr, "name = %s\n", name);
-    str-t arg-base =  remove-dir(ctlg-arg);
+    str-t ctlg-arg-base =  remove-dir(ctlg-arg);
     str-t name-base = remove-dir(name);
 
-    if (ctlg-recursive || (safe-strcmp(arg-base, name-base) == 0)) {
+    if (ctlg-recursive || (safe-strcmp(ctlg-arg-base, name-base) == 0)) {
       ostream::print-format(ostrm, "// -*- mode: c++; mode: dakota -*-\n\n");
       dump-include-for-decls(ostrm, registration-info);
-      dump-klass-defns(ostrm, registration-info, ctlg-only, exported-only);
+      dump-klass-defns(ostrm, registration-info, ctlg-only, ctlg-exported-only);
       dump-interposers(ostrm, registration-info);
     }
   }
@@ -1563,8 +1563,8 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       if (getenv-int("DKT_EXIT_BEFORE_MAIN"))
         exit(EXIT-SUCCESS);
   }
-  if (output-path != nullptr && output-path[0] != NUL && ctlg-output != nullptr)
-    fclose(ctlg-output);
+  if (ctlg-output-path != nullptr && ctlg-output-path[0] != NUL && output != nullptr)
+    fclose(output);
   return;
 }
 func dkt-deregister-info(named-info-t* registration-info) -> void {
