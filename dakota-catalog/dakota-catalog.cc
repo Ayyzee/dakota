@@ -30,6 +30,7 @@
 
 # include "dso.hh"
 
+const str_t dev_null = "/dev/null";
 enum {
   DAKOTA_CATALOG_HELP = 256,
   DAKOTA_CATALOG_DIRECTORY,
@@ -115,6 +116,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
         break;
       case DAKOTA_CATALOG_OUTPUT:
         opts.output = optarg;
+        assert(opts.output[0] != NUL);
         break;
       case DAKOTA_CATALOG_OUTPUT_DIRECTORY:
         opts.output_directory = optarg;
@@ -143,7 +145,7 @@ static FUNC handle_opts(int* argc, char*** argv) -> void {
 
 # include "spawn.cc"
 
-static FUNC setenv_boole(str_t name, bool value, int overwrite) -> int {
+static FUNC setenv_bool(str_t name, bool value, int overwrite) -> int {
   int result = 0;
   if (value)
     result = setenv(name, "1", overwrite);
@@ -162,47 +164,50 @@ static FUNC file_exists(str_t path, int flags = O_RDONLY) -> bool {
   }
   return state;
 }
-
+static FUNC create_empty_file(str_t path) -> int_t {
+  assert(path != nullptr);
+  assert(path[0] != NUL);
+  int exit_value = 0;
+  int fd = open(path, O_CREAT | O_TRUNC, 0644);
+  if (fd == -1) exit_fail_with_msg("ERROR:7 %s: \"%s\"\n", path, strerror(errno));
+  int n = close(fd);
+  if (n == -1) exit_value = non_exit_fail_with_msg("ERROR:6 %s: \"%s\"\n", path, strerror(errno));
+  return 0;
+}
 // 1: try to spawn() path
 //    if that fails
 // 2: try to dso_open() path
-
 FUNC main(int argc, char** argv) -> int {
-  int exit_value = 0;
   handle_opts(&argc, &argv);
-  str_t dev_null = "/dev/null";
-  char buffer[MAXPATHLEN] = "";
-  char* output_pid = buffer;
-
-  if (opts.directory != nullptr) {
-    int n = chdir(opts.directory);
-    if (n == -1) exit_fail_with_msg("ERROR:8 %s: \"%s\"\n", opts.directory, strerror(errno));
-  }
-  if (opts.output != nullptr) {
-    if (strcmp(dev_null, opts.output) == 0) {
-      output_pid = cast(char*)dev_null;
-    } else {
-      pid_t pid = getpid();
-      snprintf(output_pid, sizeof(buffer), "%s-%i", opts.output, pid);
-      // create an empty file
-      int fd = open(output_pid, O_CREAT | O_TRUNC, 0644);
-      if (fd == -1) exit_fail_with_msg("ERROR:7 %s: \"%s\"\n", output_pid, strerror(errno));
-      int n = close(fd);
-      if (n == -1) exit_value = non_exit_fail_with_msg("ERROR:6 %s: \"%s\"\n", output_pid, strerror(errno));
-    }
-  }
+  int exit_value = 0;
+  char tmp_output_buffer[MAXPATHLEN] = "";
+  char* tmp_output = tmp_output_buffer;
   int overwrite;
-  if (opts.exported_only)
-    setenv_boole("DAKOTA_CATALOG_EXPORTED_ONLY", opts.exported_only, overwrite = 1);
+
   if (!opts.path_only) {
-    setenv("DAKOTA_CATALOG_OUTPUT", output_pid, overwrite = 1);
+    if (opts.directory != nullptr) {
+      int n = chdir(opts.directory);
+      if (n == -1) exit_fail_with_msg("ERROR:8 %s: \"%s\"\n", opts.directory, strerror(errno));
+    }
+    if (opts.output != nullptr) {
+      if (strcmp(opts.output, dev_null) == 0) {
+        tmp_output = opts.output;
+      } else {
+        snprintf(tmp_output_buffer, sizeof(tmp_output_buffer), "%s-%i", opts.output, getpid());
+        create_empty_file(tmp_output);
+      }
+    }
+    if (opts.exported_only)
+      setenv_bool("DAKOTA_CATALOG_EXPORTED_ONLY", opts.exported_only, overwrite = 1);
+
+    setenv("DAKOTA_CATALOG_OUTPUT", tmp_output, overwrite = 1); // may be empty-string ("")
 
     if (opts.output_directory != nullptr)
       setenv("DAKOTA_CATALOG_OUTPUT_DIRECTORY", opts.output_directory, overwrite = 1);
     if (opts.only != nullptr)
       setenv("DAKOTA_CATALOG_ONLY", opts.only, overwrite = 1); // should be space delimitted list
     if (opts.recursive)
-      setenv_boole("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
+      setenv_bool("DAKOTA_CATALOG_RECURSIVE", opts.recursive, overwrite = 1);
   }
   int i = 0;
   str_t arg = nullptr;
@@ -214,9 +219,8 @@ FUNC main(int argc, char** argv) -> int {
       setenv("DAKOTA_CATALOG_ARG_TYPE", "exe", overwrite = 1); // not currently used
     }
     int status = -1;
-    if (!opts.path_only) {
+    if (!opts.path_only)
       status = spawn(arg);
-    }
     if (status == -1) {
       //fprintf(stderr, "errno=%i \"%s\"\n", errno, strerror(errno));
       if (!opts.path_only) {
@@ -251,8 +255,9 @@ FUNC main(int argc, char** argv) -> int {
     }
   }
   if (opts.output != nullptr) {
-    if (output_pid != dev_null) {
-      int n = rename(output_pid, opts.output);
+    if (strcmp(opts.output, tmp_output) != 0) {
+      assert(tmp_output[0] != NUL);
+      int n = rename(tmp_output, opts.output);
       if (n == -1) exit_value = non_exit_fail_with_msg("ERROR:1 %s: \"%s\"\n", opts.output, strerror(errno));
     }
   }
