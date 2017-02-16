@@ -1396,10 +1396,10 @@ sub echo_output_path {
 }
 sub filestr_to_file {
   my ($filestr, $file, $should_echo) = @_;
-  my $file_md5 = "$file.md5";
-  if (1) {
-    &write_filestr_to_file($filestr, $file);
+  &write_filestr_to_file($filestr, $file);
+  if (0) {
     my $filestr_sig = &digsig($filestr);
+    my $file_md5 = "$file.md5";
     &write_filestr_to_file($filestr_sig . $nl, $file_md5);
     &echo_output_path($file, $filestr_sig, $filestr) if $should_echo;
   }
