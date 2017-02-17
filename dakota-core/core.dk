@@ -355,7 +355,7 @@ static func json-dump-resource-info(sorted-set-core-t* klass-defns-table) -> voi
     named-info-t* current-info = kls-info;
 
     do {
-      symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(ssize-t)#klass);
+      symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(intptr-t)#klass);
       if (type == #klass)
         klasses-count++;
       const signature-t* const* method-signatures = cast(const signature-t* const*)named-info::at(current-info, #method-signatures);
@@ -398,7 +398,7 @@ static func json-dump-klass-defns(sorted-set-core-t* klass-defns-table) -> void 
       ostream::print-format(ostrm, "'%s' :\n", name);
       ostream::print-format(ostrm, "{\n");
       ostream::col-incr(ostrm);
-      symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(ssize-t)#klass);
+      symbol-t type = cast(symbol-t)named-info::at(current-info, #type, cast(intptr-t)#klass);
       ostream::print-format(ostrm, "'type' : '%s',\n", type);
       if (kls-name != nullptr)
         ostream::print-format(ostrm, "'klass' : '%s',\n",      kls-name);
@@ -603,7 +603,7 @@ func dk-register-klass(named-info-t* kls-info) -> object-t {
 
   symbol-t interpose-name = cast(symbol-t)named-info::at(kls-info, #interpose-name);
   if (interpose-name != nullptr) {
-    symbol-t type = cast(symbol-t)named-info::at(kls-info, #type, cast(ssize-t)#klass);
+    symbol-t type = cast(symbol-t)named-info::at(kls-info, #type, cast(intptr-t)#klass);
     assert(type == #klass);
     add-interpose-prop(interpose-name, name);
   }
@@ -903,8 +903,8 @@ static func named-info-to-catalog-info(named-info-t* ni, catalog-info::slots-t* 
     .klass-name =      klass-name-from-info(ni),
 
     .modulee =                          cast(decltype(ci->modulee))                           named-info::at(ni, #module),
-    .cat =                              cast(decltype(ci->cat))                               named-info::at(ni, #cat, cast(ssize-t)#struct),
-    .type =                             cast(decltype(ci->type))                              named-info::at(ni, #type, cast(ssize-t)#klass),
+    .cat =                              cast(decltype(ci->cat))                               named-info::at(ni, #cat, cast(intptr-t)#struct),
+    .type =                             cast(decltype(ci->type))                              named-info::at(ni, #type, cast(intptr-t)#klass),
     .interpose-name =                   cast(decltype(ci->interpose-name))                    named-info::at(ni, #interpose-name),
     .traits =                           cast(decltype(ci->traits))                            named-info::at(ni, #traits),
     .requires =                         cast(decltype(ci->requires))                          named-info::at(ni, #requires),
@@ -1145,7 +1145,7 @@ static func dump-klass(ostream-t ostrm, named-info-t* kls-info, symbol-t prev-mo
           int-t max-type-width = max-slot-type-width(ci.slots-info);
           ssize-t i = 0;
           while (ci.slots-info[i].items != nullptr) {
-            str-t slot-type =   cast(str-t)named-info::at(&ci.slots-info[i], #type, cast(ssize-t)#object-t);
+            str-t slot-type =   cast(str-t)named-info::at(&ci.slots-info[i], #type, cast(intptr-t)#object-t);
             str-t slot-typeid = cast(str-t)named-info::at(&ci.slots-info[i], #typeid);
             USE(slot-typeid);
             assert-valid-str(slot-type);
@@ -1541,7 +1541,7 @@ func dkt-register-info(named-info-t* registration-info) -> void {
       dump-interposers(ostrm, registration-info);
     }
   }
-  symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(ssize-t)#exe);
+  symbol-t type = cast(symbol-t)named-info::at(registration-info, #type, cast(intptr-t)#exe);
 
   switch (type) {
     case #lib:
@@ -1628,7 +1628,7 @@ static func klass-for-name(symbol-t name, ssize-t column) -> object-t {
   assert-valid-str(name);
   named-info-t* info-slots = info-for-name(name);
   assert(info-slots != nullptr);
-  assert(cast(symbol-t)named-info::at(info-slots, #type, cast(ssize-t)#klass) == #klass);
+  assert(cast(symbol-t)named-info::at(info-slots, #type, cast(intptr-t)#klass) == #klass);
   object-t kls = klass-for-name-simple(name);
 
   if (kls != nullptr)
