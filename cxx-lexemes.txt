@@ -3,7 +3,15 @@
 !=  not_eq
 " ... "
 #   %:
+#" ... "
 ##  %:%:
+#' ... '
+#(
+#[
+#float/int/oct/hex/binary
+#ident
+#{
+#| ... |
 %
 %=
 &   bitand
@@ -48,6 +56,13 @@
 >>
 >>=
 ?
+@" ... "
+@' ... '
+@(
+@[
+@float/int/oct/hex/binary
+@ident
+@{
 [   <:
 [] operator
 \
