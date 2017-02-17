@@ -49,6 +49,7 @@
 ?
 [   <:
 [] operator
+\
 ]   :>
 ^   xor
 ^=  xor_eq
