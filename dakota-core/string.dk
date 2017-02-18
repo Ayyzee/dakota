@@ -148,7 +148,7 @@ klass string {
   }
   // returns an vector of string objects
   method tokenize(object-t self, object-t delimiter) -> object-t {
-    assert(klass-of(delimiter) == _klass_ || $instance?(delimiter, _klass_));
+    assert(klass-of(delimiter) == _klass_ || $instance-of?(delimiter, _klass_));
     const slots-t& d = unbox(delimiter);
     object-t result = $tokenize(self, d.ptr);
     return result;
@@ -199,7 +199,7 @@ klass string {
     assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
-      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+      if (klass-of(other) == _klass_ || $instance-of?(other, _klass_))
         result = safe-strcmp(unbox(self).ptr, unbox(other).ptr);
       else
         result = $compare(super, other);

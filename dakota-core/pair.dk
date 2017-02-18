@@ -63,7 +63,7 @@ klass pair {
     if (self != other) {
       object-t first =       self.first;
       object-t other-first = other;
-      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+      if (klass-of(other) == _klass_ || $instance-of?(other, _klass_))
         other-first = unbox(other).first;
       else if ($method-for-selector?(klass-of(other), selector(first(object-t))))
         other-first = $first(other);

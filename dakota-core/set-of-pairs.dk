@@ -66,7 +66,7 @@ trait set-of-pairs {
   }
   method at(object-t self, object-t first) -> object-t {
     object-t last = $at(super, first);
-    if (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_))
+    if (klass-of(last) == pair::_klass_ || $instance-of?(last, pair::_klass_))
       last = pair::unbox(last).last;
     return last;
   }
@@ -74,7 +74,7 @@ trait set-of-pairs {
     object-t last = $at(super, first, nullptr);
     if (last == nullptr)
       last = default-last;
-    if (last && (klass-of(last) == pair::_klass_ || $instance?(last, pair::_klass_)))
+    if (last && (klass-of(last) == pair::_klass_ || $instance-of?(last, pair::_klass_)))
       last = pair::unbox(last).last;
     return last;
   }

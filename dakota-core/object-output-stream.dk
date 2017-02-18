@@ -78,7 +78,7 @@ klass object-output-stream {
 //       object-t object-klass = klass-of(object);
 //       $write-item(self, $name(object-klass), "-klass");
 
-//       if ($instance?(object, klass::_klass_))
+//       if ($instance-of?(object, klass::_klass_))
 //         $write-item(self, $name(object), "name");
 
       $write-slots(object, self);

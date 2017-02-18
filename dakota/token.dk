@@ -87,7 +87,7 @@ klass token {
   method equal?(object-t self, object-t other) -> bool-t {
     bool-t result;
 
-    if ($instance?(other, _klass_)) {
+    if ($instance-of?(other, _klass_)) {
       if ($compare(self, other) == 0)
         result = true;
       else
@@ -207,7 +207,7 @@ klass token {
     assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
-      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+      if (klass-of(other) == _klass_ || $instance-of?(other, _klass_))
         result = safe-strcmp(unbox(self).buffer, unbox(other).buffer);
       else
         result = $compare(super, other);

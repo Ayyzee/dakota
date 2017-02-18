@@ -370,7 +370,7 @@ klass deque-iterator {
   }
   method init(object-t self, object-t deque:) -> object-t {
     self = $init(super);
-    assert(klass-of(deque) == deque::_klass_ || $instance?(deque, deque::_klass_));
+    assert(klass-of(deque) == deque::_klass_ || $instance-of?(deque, deque::_klass_));
     const deque::slots-t& d = deque::unbox(deque);
 
     self.deque =          deque;

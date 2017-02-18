@@ -15,7 +15,7 @@
     'forward-iterator-context' => undef,
     'has-trait?' => undef,
     'init' => undef,
-    'instance?' => undef,
+    'instance-of?' => undef,
     'iterator' => undef,
     'iterator-context' => undef,
     'klass-with-trait' => undef,

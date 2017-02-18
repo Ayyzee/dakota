@@ -2024,7 +2024,7 @@ sub generics::parse {
   my $big_cahuna = [];
   my $generics_used = $$ast{'generics'};
   # used in catch() rewrites
-  #    $$generics_used{'instance?'} = undef; # hopefully the rhs is undef, otherwise we just lost it
+  #    $$generics_used{'instance-of?'} = undef; # hopefully the rhs is undef, otherwise we just lost it
   &add_indirect_klasses($klass_names_set);
 
   foreach my $construct ('klasses', 'traits', 'requires') {

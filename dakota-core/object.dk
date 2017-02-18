@@ -38,7 +38,7 @@ static func echo-stuff-common(object::slots-t* instance, str-t action, symbol-t 
 }
 func echo-stuff(object::slots-t* instance, str-t action) -> void {
   if (getenv-int("DKT_ECHO_ALLOC_INIT_DEALLOC"))
-    if (instance->klass != klass::_klass_) // not completely correct (should be !instance?())
+    if (instance->klass != klass::_klass_) // not completely correct (should be !instance-of?())
       echo-stuff-common(instance, action, name-of(instance->klass));
   return;
 }
@@ -88,7 +88,7 @@ klass object {
     bool-t result = ($compare(self, other) == 0);
     return result;
   }
-  method instance?(object-t self, object-t kls) -> bool-t {
+  method instance-of?(object-t self, object-t kls) -> bool-t {
     bool-t result = false;
     object-t tmp-kls = klass-of(self);
 
@@ -154,11 +154,11 @@ func dkt-unbox-check(object-t obj, object-t kls) -> void {
   assert(kls != nullptr);
   DKT-LOG-TRACE-RUNTIME("'func':'%s','args':['%p','%s::klass']",
                         __func__, cast(ptr-t)(obj), $name(kls));
-  unless (object::instance?(obj, kls)) {
+  unless (object::instance-of?(obj, kls)) {
     str-t object-kls-name = name-of(klass-of(obj));
     str-t kls-name = name-of(kls);
 
-    if (object::instance?(obj, klass::_klass_))
+    if (object::instance-of?(obj, klass::_klass_))
       dkt-log(dkt::k-log-error, "%s::unbox(%p {klass='%s', name='%s'})",
               kls-name, cast(ptr-t)obj, object-kls-name, name-of(obj));
     else

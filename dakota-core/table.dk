@@ -33,7 +33,7 @@ trait table {
     object-t current-last = pair;
 
     if (pair) {
-      if (klass-of(pair) == pair::_klass_ || $instance?(pair, pair::_klass_))
+      if (klass-of(pair) == pair::_klass_ || $instance-of?(pair, pair::_klass_))
         current-last = pair::unbox(pair).last;
       if (!$equals?(current-last, last))
         pair::mutable-unbox(pair).last = last;

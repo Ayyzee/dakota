@@ -210,7 +210,7 @@ klass bit-vector {
     assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
-      if (klass-of(other) == _klass_ || $instance?(other, _klass_)) {
+      if (klass-of(other) == _klass_ || $instance-of?(other, _klass_)) {
         const slots-t& self-slots =  unbox(self);
         const slots-t& other-slots = unbox(other);
         assert(self-slots.capacity == other-slots.capacity);

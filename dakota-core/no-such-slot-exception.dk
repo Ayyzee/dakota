@@ -45,7 +45,7 @@ klass no-such-slot-exception {
       out = std-error;
     $print(super, out);
 
-    if ($instance?(self.object, klass::_klass_)) {
+    if ($instance-of?(self.object, klass::_klass_)) {
       $print-format(out,
                     ", \"instance\": \"%s\""
                     ", \"klass\": \"%s\""

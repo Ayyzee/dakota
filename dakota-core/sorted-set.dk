@@ -195,7 +195,7 @@ klass sorted-set-iterator {
   }
   method init(object-t self, object-t sorted-set:, symbol-t direction: #forward) -> object-t {
     self = $init(super);
-    assert(klass-of(sorted-set) == sorted-set::_klass_ || $instance?(sorted-set, sorted-set::_klass_));
+    assert(klass-of(sorted-set) == sorted-set::_klass_ || $instance-of?(sorted-set, sorted-set::_klass_));
     const sorted-set::slots-t& ss = sorted-set::unbox(sorted-set);
     self.sorted-set = sorted-set;
     self.offset = 0;

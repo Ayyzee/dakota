@@ -73,7 +73,7 @@ klass str-buffer {
     assert(other != nullptr);
     cmp-t result = 0;
     if (self != other) {
-      if (klass-of(other) == _klass_ || $instance?(other, _klass_))
+      if (klass-of(other) == _klass_ || $instance-of?(other, _klass_))
         result = compare(&unbox(self), &unbox(other));
       else
         result = $compare(super, other);
