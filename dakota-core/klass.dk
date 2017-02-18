@@ -223,7 +223,7 @@ static func superklass-from-info(named-info-t* info, symbol-t name) -> object-t 
   symbol-t superkls-name = superklass-name-from-info(info);
   if (superkls-name == nullptr) {
     object-t superkls = superklass-from-info(info, name);
-    if (!root-superklass?(superkls))
+    if (superkls != null)
       superkls-name = name-of(superkls);
   }
   if (name != nullptr) {
@@ -374,7 +374,7 @@ klass klass {
     return self;
   }
   static func init-methods(object-t self) -> object-t {
-    if (!root-superklass?(superklass-of(self))) {
+    if (superklass-of(self) != null) {
       memcpy(self.methods.addrs, unbox(superklass-of(self)).methods.addrs,
              cast(size-t)(ssizeof(method-t) * unbox(superklass-of(self)).methods.count));
     }
@@ -422,7 +422,7 @@ klass klass {
       fprintf(stderr, " name=%s", #nullptr);
 
     // superklass
-    if (!root-superklass?(superklass-of(self)))
+    if (superklass-of(self) != null)
       fprintf(stderr, ", superklass=%p <%s>", cast(ptr-t)superklass-of(self), name-of(superklass-of(self)));
     else if (superklass-of(self) == null)
       fprintf(stderr, ", superklass=%p %s", cast(ptr-t)superklass-of(self), #null);
@@ -792,7 +792,7 @@ klass klass {
     bool-t result = false;
     object-t tmp-kls = self;
 
-    while (!root-superklass?((tmp-kls = superklass-of(tmp-kls)))) {
+    while ((tmp-kls = superklass-of(tmp-kls)) != null) {
       if ((result = (tmp-kls == kls)))
         break;
     }

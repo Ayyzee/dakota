@@ -1721,7 +1721,7 @@ func dk-intern(str-t key) -> symbol-t {
 }
 static func get-klass-chain(object-t kls, char-t* buf, ssize-t buf-len) -> char-t* { // recursive
   object-t superkls = superklass-of(kls);
-  if (!root-superklass?(superkls))
+  if (superkls != null)
     get-klass-chain(superkls, buf, buf-len); // recursive
   str-t kls-name = name-of(kls);
   strcat(buf, "/");

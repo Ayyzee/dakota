@@ -92,7 +92,7 @@ klass object {
     bool-t result = false;
     object-t tmp-kls = klass-of(self);
 
-    while (!root-superklass?(tmp-kls)) {
+    while (tmp-kls != null) {
       if ((result = (tmp-kls == kls)))
         break;
       tmp-kls = superklass-of(tmp-kls);
