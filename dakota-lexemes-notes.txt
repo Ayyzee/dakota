@@ -8,5 +8,24 @@ objective-c boxing:
   NSDictionary* dictionary = @{ id1 : id2, id3 : id4, ... }
                              @( expression )
 
-#| ... | returns a symbol-t (not an object-t)
+#| ... | returns a symbol-t (not an object-t) (same at dk-intern("..."))
 @| ... | not supported in objective c
+
+#<...>(
+#<...>[
+#<...>{
+
+:=
+~~
+==~
+>>>
+>>>=
+
+similar to (sizeof(), offsetof(), typeof()
+  klassof(1)
+  klassof?(2)
+  superklassof(1)
+  superklassof?(2)
+  nameof(1)
+  nameof?(2)
+  instanceof?(2)
