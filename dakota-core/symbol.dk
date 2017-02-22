@@ -45,7 +45,7 @@ klass symbol-klass {
   }
 }
 klass symbol-compare {
-  slots (*)(symbol-t, symbol-t) -> int-t;
+  slots (*)(symbol-t, symbol-t) -> cmp-t;
 }
 klass symbol {
   klass symbol-klass;
