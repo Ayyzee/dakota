@@ -51,8 +51,8 @@ export dakota-core {
   exception;
   finalize-func::slots-t;
   finalize-func;
-  iterator-context::slots-t;
-  iterator-context;
+  iterator-func::slots-t;
+  iterator-func;
   iterator;
   generic-func;
   generic-func::slots-t;

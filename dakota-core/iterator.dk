@@ -14,14 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+include-for <functional> std::function;
+
 module dakota-core;
 
-// returned by $iterator-context() or collection::iterator-context()
-klass iterator-context {
-  slots {
-    object-t iter;
-    method-t next;
-  }
+// returned by $iterator-func(), $forward-iterator-func(), $backward-iterator-func()
+klass iterator-func {
+  slots std::function<object-t ()>;
 }
 trait iterator {
   method next(object-t self) -> object-t;
@@ -31,12 +30,18 @@ trait iterator {
   method remove(object-t self) -> object-t;
 }
 
-// only next() (or prev()) (iterator-context() is already provided)
-
-// for|loop [forward] (object-t e in s)
+// for|loop [forward] ([object-t] i in s)
 // =>
-// for (iterator-context-t _c_ = $forward-iterator-context(self); object-t e = _c_.next(_c_.iter); /**/)
+// for (iterator-func-t _f = $forward-iterator-func(s); object-t i = _f(); /**/)
 
-// for|loop backward (object-t e in s)
+// for|loop backward ([object-t] i in s)
 // =>
-// for (iterator-context-t _c_ = $backward-iterator-context(self); object-t e = _c_.next(_c_.iter); /**/)
+// for (iterator-func-t _f = $backward-iterator-func(s); object-t i = _f(); /**/)
+
+// s.each[-forward] { |[object-t] i| ... }
+// =>
+// for (iterator-func-t _f = $forward-iterator-func(s); object-t i = _f(); /**/) { ... }
+
+// s.each-backward { |[object-t] i| ... }
+// =>
+// for (iterator-func-t _f = $backward-iterator-func(s); object-t i = _f(); /**/) { ... }

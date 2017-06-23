@@ -657,18 +657,18 @@ sub rewrite_supers {
 #    $$filestr_ref =~ s/make\(([_a-z0-9:-]+)/\$init(\$alloc($1)/g;
 #}
 my $dir2method_name = {
-  'forward'  => 'forward-iterator-context',
-  'backward' => 'backward-iterator-context',
+  'forward'  => 'forward-iterator-func',
+  'backward' => 'backward-iterator-func',
 };
 sub rewrite_for_in_replacement {
   my ($dir, $type, $item, $sequence, $ws1, $open_brace, $ws2, $stmt, $ws3) = @_;
   $dir = 'forward' if !$dir;
   my $method_name = $$dir2method_name{$dir};
   my $first_stmt = '';
-  my $result = "for (iterator-context-t _context = \$$method_name($sequence);";
+  my $result = "for (iterator-func-t _f = \$$method_name($sequence);";
 
   if ('object-t' eq $type) {
-    $result .= " object-t $item = _context.next(_context.iter);";
+    $result .= " object-t $item = _f();";
     $result .= " /**/)";
     if (!$open_brace) { # $ws2 will be undefined
       $first_stmt .= "$ws1$stmt$ws3";
@@ -676,7 +676,7 @@ sub rewrite_for_in_replacement {
       $first_stmt .= "$ws1\{$ws2$stmt$ws3";
     }
   } elsif ('slots-t*' eq $type) {
-    $result .= " object-t $item = _context.next(_context.iter);";
+    $result .= " object-t $item = _f();";
     $result .= " /**/)";
 
     if (!$open_brace) { # $ws2 will be undefined
@@ -686,7 +686,7 @@ sub rewrite_for_in_replacement {
     }
   } elsif ($type =~ m|($tid)|) {
     my $klass_name = $1;
-    $result .= " object-t _item_ = _context.next(_context.iter);";
+    $result .= " object-t _item_ = _f();";
     $result .= " /**/)";
     $klass_name =~ s/-t$//;
 
