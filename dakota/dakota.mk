@@ -63,6 +63,7 @@ clean: goal-clean | dakota.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
+	$(RM) $(RMFLAGS) $(target).out
 	./cmake-clean.sh
 
 cleanx:
