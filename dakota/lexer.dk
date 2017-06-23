@@ -194,7 +194,14 @@ klass lexer {
             }
           }
         }
-        // cpp directive
+        // NEED TO ADD:
+        //   cpp directive (# <space> ident)
+        //   cpp directive str concat (##)
+        //   symbol (#ident)
+        //   xsymbol (#|...|)
+        //   (#[)
+        //   (#()
+        //   (#{)
         case '#': {
           char-t[512] chunk = ""; str-buffer-t buf = { chunk, 0, ssizeof(chunk) };
           str-buffer::concat(&buf, c1);
