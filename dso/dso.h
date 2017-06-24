@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dso_hh
-# define      dso_hh
+# if !defined dso_h
+# define      dso_h
 
 # define FUNC      auto
 # define TYPEALIAS using

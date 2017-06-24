@@ -9,7 +9,7 @@ srcdir ?= .
 
 prefix ?= /usr/local
 
-hh_ext := hh
+h_ext := h
 cc_ext := cc
 
 CP := cp
