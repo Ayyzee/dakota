@@ -14,8 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-# if !defined dso_h
-# define      dso_h
+# pragma once
 
 # define FUNC      auto
 # define TYPEALIAS using
@@ -51,14 +50,14 @@ struct dso_symbol_handle_t {
 [[so_export]] extern const dso_symbol_handle_t DSO_SYMBOL_HANDLE;
 
 extern "C" {
-[[so_export]] FUNC dso_open(str_t path, int_t mode) -> ptr_t;
-[[so_export]] FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t;
-[[so_export]] FUNC dso_close(ptr_t handle) -> int_t;
-[[so_export]] FUNC dso_error() -> str_t;
-[[so_export]] FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t;
-[[so_export]] FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t;
-[[so_export]] FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t;
-[[so_export]] FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t;
+  [[so_export]] FUNC dso_open(str_t path, int_t mode) -> ptr_t;
+  [[so_export]] FUNC dso_symbol(ptr_t handle, str_t symbol_name) -> ptr_t;
+  [[so_export]] FUNC dso_close(ptr_t handle) -> int_t;
+  [[so_export]] FUNC dso_error() -> str_t;
+  [[so_export]] FUNC dso_symbol_name_for_addr(ptr_t addr) -> str_t;
+  [[so_export]] FUNC dso_abs_path_for_handle(ptr_t handle) -> str_t;
+  [[so_export]] FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t;
+  [[so_export]] FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t;
 }
 
 # endif
