@@ -20,8 +20,8 @@
 # include <cstdio>
 # include <cstring>
 
-# include "config.hh"
-# include "private.hh"
+# include "config.h"
+# include "private.h"
 
 static func set-name(int-t, str-t) -> void;
 

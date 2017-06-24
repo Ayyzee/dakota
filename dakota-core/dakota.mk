@@ -39,7 +39,7 @@ single: $(srcs) | dakota.project
 	$(DAKOTA-BASE) --shared
 
 check-exe: all
-	echo "# include \"test.hh\"" > exe.dk
+	echo "# include \"test.h\"" > exe.dk
 	echo "klass sorted-table; func main() -> int-t { object-t o = \$$make(sorted-table::klass()); USE(o); EXIT(0); }" >> exe.dk
 	echo '{ "srcs" => [ "exe.dk" ], "builddir" => "dkt-exe" }' > exe.project
 	rm -f exe

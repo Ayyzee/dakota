@@ -8,7 +8,7 @@ cat $builddir/dakota.io
 
 if [[ -d $builddir ]]; then
     {
-        find $builddir  -name "*.hh"
+        find $builddir  -name "*.h"
         find $builddir  -name "*.cc"
         find $builddir  -name "*.inc"
     } | sort

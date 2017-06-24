@@ -8,7 +8,7 @@ source $DIR/common.sh
 
 rm -f config.mk
 rm -f config.sh
-rm -f dakota-core/config.hh
+rm -f dakota-core/config.h
 rm -f lib/dakota/compiler
 rm -f lib/dakota/platform.json
 
@@ -25,7 +25,7 @@ $LN $LNFLAGS config-$sysname.mk config.mk
 $LN $LNFLAGS config-$sysname.sh config.sh
 
 pushd dakota-core > /dev/null 2>&1
-$LN $LNFLAGS config-$sysname.hh config.hh
+$LN $LNFLAGS config-$sysname.h config.h
 popd > /dev/null 2>&1
 
 canon_compiler=$(compiler $compiler)

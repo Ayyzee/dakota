@@ -51,7 +51,7 @@
   'LD_NO_UNDEFINED_FLAGS' => [ '--no-undefined' ],
   'LD_SONAME_FLAGS' => [ '-soname' ],
   'cc_ext' => 'cc',
-  'hh_ext' => 'hh',
+  'h_ext' => 'h',
   'o_ext' =>  'o',
   'so_ext' => 'so',
 }

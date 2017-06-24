@@ -18,7 +18,7 @@ target := $(target-base)
 all: $(target)
 
 $(target-base).dk: 
-	echo "# include \"test.hh\"" > $@
+	echo "# include \"test.h\"" > $@
 	echo "klass sorted-table; func main() -> int-t { object-t o = \$$make(sorted-table::klass()); USE(o); EXIT(0); }" >> $@
 
 dakota.project: $(target-base).dk

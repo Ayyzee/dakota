@@ -33,7 +33,7 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 my $nl = "\n";
 my $gbl_prefix;
 my $gbl_compiler;
-my $hh_ext;
+my $h_ext;
 my $cc_ext;
 
 sub dk_prefix {
@@ -735,7 +735,7 @@ sub set_src_decl {
   $gbl_src_file = &canon_path("$name.dk");
   $global_is_target =   0;
   $global_is_defn = 0;
-  $global_suffix = $hh_ext;
+  $global_suffix = $h_ext;
 }
 sub set_src_defn {
   my ($path) = @_;
@@ -750,7 +750,7 @@ sub set_target_decl {
   $gbl_src_file = undef;
   $global_is_target =   1;
   $global_is_defn = 0;
-  $global_suffix = $hh_ext;
+  $global_suffix = $h_ext;
 }
 sub set_target_defn {
   my ($path) = @_;
@@ -1442,7 +1442,7 @@ BEGIN {
   $gbl_prefix = &dk_prefix($0);
   $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
     or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
-  $hh_ext = &var($gbl_compiler, 'hh_ext', undef);
+  $h_ext = &var($gbl_compiler, 'h_ext', undef);
   $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
 };
 unless (caller) {

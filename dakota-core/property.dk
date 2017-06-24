@@ -16,7 +16,7 @@
 
 # include <cstring>
 
-# include "private.hh"
+# include "private.h"
 
 module dakota-core;
 

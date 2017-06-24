@@ -29,7 +29,7 @@
 # include <syslog.h>
 # include <cxxabi.h>
 
-# include <dakota-finally.hh>
+# include <dakota-finally.h>
 
 # define ssizeof(t) (cast(ssize_t)sizeof(t))
 

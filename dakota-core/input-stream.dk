@@ -19,9 +19,9 @@
 # include <cstdio>
 # include <cstring>
 
-# include "config.hh"
-# include "private.hh"
-# include "safe-str.hh"
+# include "config.h"
+# include "private.h"
+# include "safe-str.h"
 
 module dakota-core;
 

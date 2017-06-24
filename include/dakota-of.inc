@@ -16,7 +16,7 @@
 
 # pragma once
 
-# include <dakota.hh>
+# include <dakota.h>
 
 # if !defined DKT_UNBOX_CHECK_ENABLED || 0 == DKT_UNBOX_CHECK_ENABLED
   # define DKT_UNBOX_CHECK(object, kls)

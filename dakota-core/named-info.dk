@@ -18,8 +18,8 @@
 # include <cstdlib>
 # include <cstring>
 
-# include "private.hh"
-# include "named-info.hh"
+# include "private.h"
+# include "named-info.h"
 
 module dakota-core;
 

@@ -32,14 +32,14 @@
 
 include-for <sys/stat.h> struct stat;
 
-# include "dakota-os.hh"
+# include "dakota-os.h"
 
-# include "config.hh"
+# include "config.h"
 
-# include "private.hh"
-# include "dakota-rt-private.hh"
-# include "dso.hh" // dso-*()
-# include "sorted-set-core.hh"
+# include "private.h"
+# include "dakota-rt-private.h"
+# include "dso.h" // dso-*()
+# include "sorted-set-core.h"
 
 module dakota-core;
 

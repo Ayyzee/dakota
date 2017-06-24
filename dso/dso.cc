@@ -27,7 +27,7 @@
 
 # include <cassert>
 
-# include "dso.hh"
+# include "dso.h"
 
 # define cast(t) (t)
 

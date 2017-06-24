@@ -16,7 +16,7 @@
 
 # pragma once
 
-# include "declare-klass-type.hh"
+# include "declare-klass-type.h"
 
 dkt_declare_klass_type_struct(assoc_node);
 

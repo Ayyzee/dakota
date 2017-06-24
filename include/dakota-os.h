@@ -16,7 +16,7 @@
 
 # pragma once
 
-# include <dakota.hh>
+# include <dakota.h>
 
 # if defined __linux__
   inline FUNC dkt_get_segment_data(str_t, void**, size_t*) -> void* {

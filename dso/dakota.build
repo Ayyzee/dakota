@@ -13,7 +13,7 @@
     '-rules' => [
     ],
     'files' => [ # install.files
-      '$(DESTDIR)$(prefix)/include/dso.$(hh_ext)',
+      '$(DESTDIR)$(prefix)/include/dso.$(h_ext)',
       '$(DESTDIR)$(prefix)/lib/libdso.$(so_ext)',
     ],
   }

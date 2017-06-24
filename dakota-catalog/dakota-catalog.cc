@@ -25,10 +25,10 @@
 # include <cstring>
 # include <sys/wait.h>
 
-# include "dummy.hh"
+# include "dummy.h"
 # include "dakota-other.inc" // format_printf(), format_va_printf()
 
-# include "dso.hh"
+# include "dso.h"
 
 const str_t dev_null = "/dev/null";
 enum {

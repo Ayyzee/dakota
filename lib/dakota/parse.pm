@@ -31,7 +31,7 @@ use sort 'stable';
 my $gbl_compiler;
 my $gbl_used;
 my $builddir;
-my $hh_ext;
+my $h_ext;
 my $cc_ext;
 my $o_ext;
 my $so_ext;
@@ -50,10 +50,10 @@ sub dk_prefix {
     die "Could not determine \$prefix from executable path $0: $!\n";
   }
 }
-sub hh_path_from_cc_path {
+sub h_path_from_cc_path {
   my ($cc_path) = @_;
-  my $hh_path = $cc_path =~ s/\.$cc_ext/\.$hh_ext/r;
-  return $hh_path;
+  my $h_path = $cc_path =~ s/\.$cc_ext/\.$h_ext/r;
+  return $h_path;
 }
 # related to generate.pm:pre_output_path_from_any_path()
 sub dk_path_from_cc_path { # reverse dependency
@@ -65,10 +65,10 @@ sub cc_path_from_dk_path {
   my ($path) = @_;
   return &out_path_from_in_path('cc_path_from_dk_path', $path);
 }
-sub hh_path_from_src_path {
+sub h_path_from_src_path {
   my ($src_path) = @_;
-  my $hh_path = $src_path =~ s/\.(dk|$cc_ext)$/.$hh_ext/r;
-  return $hh_path;
+  my $h_path = $src_path =~ s/\.(dk|$cc_ext)$/.$h_ext/r;
+  return $h_path;
 }
 sub ast_path_from_o_path {
   my ($in_path) = @_;
@@ -103,7 +103,7 @@ BEGIN {
   }
   $gbl_used = do "$prefix/lib/dakota/used.json"
     or die "do $prefix/lib/dakota/used.json failed: $!\n";
-  $hh_ext = &var($gbl_compiler, 'hh_ext', undef);
+  $h_ext = &var($gbl_compiler, 'h_ext', undef);
   $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
   $o_ext =  &var($gbl_compiler, 'o_ext', undef);
   $so_ext = &var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
@@ -134,8 +134,8 @@ our @EXPORT= qw(
                  dk_path_from_cc_path
                  inc_path_from_dk_path
                  init_ast_from_inputs_vars
-                 hh_path_from_cc_path
-                 hh_path_from_src_path
+                 h_path_from_cc_path
+                 h_path_from_src_path
                  target_inputs_ast
                  kw_args_translate
                  o_path_from_dk_path

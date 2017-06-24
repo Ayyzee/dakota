@@ -17,7 +17,7 @@
 # include <cstdio>  // printf(), fprintf(), stderr
 # include <cstdlib> // EXIT_SUCCESS, EXIT_FAILURE
 
-# include "dso.hh"
+# include "dso.h"
 
 static str_t progname;
 

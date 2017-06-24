@@ -22,8 +22,8 @@
 # include <exception>
 # include <unistd.h> // getpid()
 
-# include "config.hh"
-# include "private.hh"
+# include "config.h"
+# include "private.h"
 
 module dakota-core;
 

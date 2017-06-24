@@ -16,7 +16,7 @@
 
 # pragma once
 
-# include "dummy.hh"
+# include "dummy.h"
 
 dkt_declare_klass_type_struct(selector_node);
 //dkt-declare-klass-type-struct(signature);

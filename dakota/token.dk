@@ -17,8 +17,8 @@
 # include <cassert>
 # include <cstring>
 
-# include "safe-str.hh"
-# include "private.hh"
+# include "safe-str.h"
+# include "private.h"
 
 module dakota;
 

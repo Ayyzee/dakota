@@ -2,6 +2,6 @@
 *.dSYM
 .DS_Store
 config.mk
-dakota-core/config.hh
+dakota-core/config.h
 lib/dakota/compiler
 lib/dakota/platform.json 

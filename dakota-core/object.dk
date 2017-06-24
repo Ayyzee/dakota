@@ -18,7 +18,7 @@
 # include <cstdlib>
 # include <atomic>
 
-# include "private.hh"
+# include "private.h"
 
 module dakota-core;
 

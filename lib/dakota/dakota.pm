@@ -33,7 +33,7 @@ my $gbl_prefix;
 my $gbl_compiler;
 my $extra;
 my $builddir;
-my $hh_ext;
+my $h_ext;
 my $cc_ext;
 my $o_ext;
 my $so_ext;
@@ -68,7 +68,7 @@ BEGIN {
   }
   $extra = do "$gbl_prefix/lib/dakota/extra.json"
     or die "do $gbl_prefix/lib/dakota/extra.json failed: $!\n";
-  $hh_ext = &var($gbl_compiler, 'hh_ext', 'hh');
+  $h_ext = &var($gbl_compiler, 'h_ext', 'h');
   $cc_ext = &var($gbl_compiler, 'cc_ext', 'cc');
   $o_ext =  &var($gbl_compiler, 'o_ext',  'o');
   $so_ext = &var($gbl_compiler, 'so_ext', 'so'); # default dynamic shared object/library extension
@@ -81,7 +81,7 @@ our @EXPORT= qw(
                  is_dk_path
                  is_o_path
                  target_cc_path
-                 rel_target_hh_path
+                 rel_target_h_path
                  target_klass_func_decls_path
                  target_klass_func_defns_path
                  target_generic_func_decls_path
@@ -384,10 +384,10 @@ sub target_srcs_ast_path {
   my $target_srcs_ast_path = &target_builddir() . '/srcs.ast';
   return $target_srcs_ast_path;
 }
-sub target_hh_path {
+sub target_h_path {
   my ($cmd_info) = @_;
-  my $target_hh_path = &target_builddir() . '/target.' . $hh_ext;
-  return $target_hh_path;
+  my $target_h_path = &target_builddir() . '/target.' . $h_ext;
+  return $target_h_path;
 }
 sub target_cc_path {
   my ($cmd_info) = @_;
@@ -410,10 +410,10 @@ sub default_cmd_info {
   my $cmd_info = { 'project.target' => &global_project_target() };
   return $cmd_info;
 }
-sub rel_target_hh_path {
+sub rel_target_h_path {
   my ($cmd_info) = @_;
   $cmd_info = &default_cmd_info() if ! $cmd_info;
-  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$hh_ext=r;
+  my $result = &target_cc_path($cmd_info) =~ s=^$builddir/(.+?)\.$cc_ext$=$1.$h_ext=r;
   return $result;
 }
 sub target_klass_func_decls_path {
@@ -498,7 +498,7 @@ sub loop_cc_from_dk {
     }
     my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
     my $inc_path = &inc_path_from_dk_path($input);
-    my $hh_path = $cc_path =~ s/\.$cc_ext$/\.$hh_ext/r;
+    my $h_path = $cc_path =~ s/\.$cc_ext$/\.$h_ext/r;
     $input = &canon_path($input);
     &empty_klass_defns();
     &dk_generate_cc($input, $inc_path, $target_inputs_ast);
@@ -506,10 +506,10 @@ sub loop_cc_from_dk {
     &src::add_extra_klass_decls($file_ast);
     &src::add_extra_keywords($file_ast);
     &src::add_extra_generics($file_ast);
-    my $rel_target_hh_path = &rel_target_hh_path($cmd_info);
+    my $rel_target_h_path = &rel_target_h_path($cmd_info);
 
-    &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_hh_path);
-    &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_hh_path); # rel_target_hh_path not used
+    &generate_src_decl($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path);
+    &generate_src_defn($cc_path, $file_ast, $target_inputs_ast, $rel_target_h_path); # rel_target_h_path not used
   }
   return $num_inputs;
 } # loop_cc_from_dk
@@ -702,7 +702,7 @@ sub start_cmd {
 
   if (!$ENV{'DK_SRC_UNIQUE_HEADER'} || $ENV{'DK_INLINE_GENERIC_FUNCS'} || $ENV{'DK_INLINE_KLASS_FUNCS'}) {
     if (!$$cmd_info{'opts'}{'compile'}) {
-        &gen_target_hh($cmd_info, $is_exe);
+        &gen_target_h($cmd_info, $is_exe);
     }
   }
   if ($should_lock) {
@@ -879,7 +879,7 @@ sub loop_ast_from_inputs {
   }
   return $cmd_info;
 } # loop_ast_from_inputs
-sub gen_target_hh {
+sub gen_target_h {
   my ($cmd_info, $is_exe) = @_;
   my $is_defn;
   return &gen_target($cmd_info, $is_exe, $is_defn = 0);
@@ -894,7 +894,7 @@ sub gen_target {
   die if ! $$cmd_info{'output'};
   if ($$cmd_info{'output'}) {
     my $target_cc_path = &target_cc_path($cmd_info);
-    my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
+    my $target_h_path = &builddir() . '/' . &rel_target_h_path($cmd_info);
     if ($$cmd_info{'opts'}{'echo-inputs'}) {
       my $target_dk_path = &dk_path_from_cc_path($target_cc_path);
       print $target_dk_path . $nl;
@@ -916,7 +916,7 @@ sub gen_target {
   }
   $$cmd_info{'opts'}{'compiler-flags'} = $flags;
   if (!$is_defn) {
-    &target_hh_from_ast($cmd_info, $other, $is_exe);
+    &target_h_from_ast($cmd_info, $other, $is_exe);
   } else {
     &target_o_from_ast($cmd_info, $other, $is_exe);
   }
@@ -940,7 +940,7 @@ sub o_from_dk {
       $o_path =  &o_path_from_dk_path($input);
     }
     my $src_path = &cc_path_from_dk_path($input);
-    my $hh_path = &hh_path_from_src_path($src_path);
+    my $h_path = &h_path_from_src_path($src_path);
     if (!$want_separate_ast_pass) {
       &check_path($ast_path);
       my $ast_cmd = { 'opts' => $$cmd_info{'opts'} };
@@ -1069,7 +1069,7 @@ sub o_from_cc {
   &project_io_add($$cmd_info{'project.io'}, 'compile', $$o_cmd{'inputs'}, $$o_cmd{'output'});
   return $count;
 }
-sub target_hh_from_ast {
+sub target_h_from_ast {
   my ($cmd_info, $other, $is_exe) = @_;
   my $is_defn;
   return &target_from_ast($cmd_info, $other, $is_exe, $is_defn = 0);
@@ -1084,7 +1084,7 @@ sub target_from_ast {
   die if ! defined $$cmd_info{'asts'} || 0 == @{$$cmd_info{'asts'}};
   my $target_srcs_ast_path = &target_srcs_ast_path($cmd_info);
   my $target_cc_path =  &target_cc_path($cmd_info);
-  my $target_hh_path = &builddir() . '/' . &rel_target_hh_path($cmd_info);
+  my $target_h_path = &builddir() . '/' . &rel_target_h_path($cmd_info);
   &check_path($target_srcs_ast_path);
   my $target_o_path = &target_o_path($cmd_info, $target_cc_path);
 
@@ -1095,7 +1095,7 @@ sub target_from_ast {
       return if !&is_out_of_date($target_srcs_ast_path, $target_o_path);
     }
   } else {
-    return if !&is_out_of_date($target_srcs_ast_path, $target_hh_path);
+    return if !&is_out_of_date($target_srcs_ast_path, $target_h_path);
   }
   &make_dir_part($target_cc_path, $global_should_echo);
   my ($path, $file_basename, $target_srcs_ast) = ($target_cc_path, $target_cc_path, undef);
@@ -1122,7 +1122,7 @@ sub target_from_ast {
     &generate_target_defn($target_cc_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
     &project_io_assign($$cmd_info{'project.io'}, 'target-cc', $target_cc_path);
   } else {
-    &generate_target_decl($target_hh_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
+    &generate_target_decl($target_h_path, $target_srcs_ast, $target_inputs_ast, $is_exe);
   }
 
   if ($is_defn && !$$cmd_info{'opts'}{'precompile'}) {

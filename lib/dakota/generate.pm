@@ -38,7 +38,7 @@ my $emacs_dakota_mode_file_variables = '-*- mode: c++; mode: dakota -*-'; # fall
 my $gbl_prefix;
 my $gbl_compiler;
 my $builddir;
-my $hh_ext;
+my $h_ext;
 my $cc_ext;
 my $nl = "\n";
 
@@ -69,7 +69,7 @@ BEGIN {
   while (($key, $values) = each (%$platform)) {
     $$gbl_compiler{$key} = $values;
   }
-  $hh_ext = &var($gbl_compiler, 'hh_ext', undef);
+  $h_ext = &var($gbl_compiler, 'h_ext', undef);
   $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
 };
 my $use_new_macro_system = 0;
@@ -151,15 +151,15 @@ sub extra_dakota_headers {
     }
     $result .=
       $nl .
-      "# include <dakota.$hh_ext>" . $nl .
-      "# include <dakota-log.$hh_ext> // optional" . $nl;
+      "# include <dakota.$h_ext>" . $nl .
+      "# include <dakota-log.$h_ext> // optional" . $nl;
     if (&is_target()) {
       $result .=
-        "# include <dakota-os.$hh_ext>" . $nl;
+        "# include <dakota-os.$h_ext>" . $nl;
     }
-  } elsif (&is_target_defn()) { # generated target hh file
+  } elsif (&is_target_defn()) { # generated target h file
     $result .=
-      "# include \"$name.$hh_ext\"" . $nl;
+      "# include \"$name.$h_ext\"" . $nl;
   } else {
     $result .=
       "bug-in-code-gen" . $nl;
@@ -202,7 +202,7 @@ sub write_to_file_converted_strings {
   &convert_dk_to_cc(\$converted_string, $kw_arg_generics, $remove); # costly (< 3/4 of total)
   my $should_echo;
   if (!&is_silent()) {
-    $should_echo = 1 if $path =~ /target\.($hh_ext|$cc_ext)$/;
+    $should_echo = 1 if $path =~ /target\.($h_ext|$cc_ext)$/;
   }
   # swap "# line 1" followed by "// -*- mode:" so the emacs mode line is first
   $converted_string =~ s=^(\s*#\s+line)\s+1(\s+.*?\n)(\s*//\s+-\*-\s+mode:.*?\n)=$3$1 2$2=s;
@@ -213,20 +213,20 @@ sub is_silent {
   return $$root_cmd{'opts'}{'silent'};
 }
 sub generate_src_decl {
-  my ($path, $file_ast, $target_inputs_ast, $target_hh_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_h_path) = @_;
   #print "generate_src_decl($path, ...)" . $nl;
   &set_src_decl($path);
-  return &generate_src($path, $file_ast, $target_inputs_ast, $target_hh_path);
+  return &generate_src($path, $file_ast, $target_inputs_ast, $target_h_path);
 }
 sub generate_src_defn {
-  my ($path, $file_ast, $target_inputs_ast, $target_hh_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_h_path) = @_;
   #print "generate_src_defn($path, ...)" . $nl;
   &set_src_defn($path);
-  return &generate_src($path, $file_ast, $target_inputs_ast, $target_hh_path);
+  return &generate_src($path, $file_ast, $target_inputs_ast, $target_h_path);
 }
 my $im_suffix_for_suffix = {
   $cc_ext => "$cc_ext.dkt",
-  $hh_ext => "$hh_ext.dkt",
+  $h_ext => "$h_ext.dkt",
   'inc'   => 'inc.dkt',
 };
 sub pre_output_path_from_any_path {
@@ -250,10 +250,10 @@ sub add_include_fors {
   }
 }
 sub generate_src {
-  my ($path, $file_ast, $target_inputs_ast, $target_hh_path) = @_;
+  my ($path, $file_ast, $target_inputs_ast, $target_h_path) = @_;
   my ($dir, $name, $ext) = &split_path($path, $id);
   $dir = '.' if !$dir;
-  my $src_hh_path = "$name.$hh_ext";
+  my $src_h_path = "$name.$h_ext";
   my $inc_path = $name . '.inc';
   my ($generics, $symbols) = &generics::parse($file_ast);
   my $suffix = &suffix();
@@ -276,9 +276,9 @@ sub generate_src {
   } else {
     $str =
       "# if !defined DK_SRC_UNIQUE_HEADER || 0 == DK_SRC_UNIQUE_HEADER" . $nl .
-      "  # include \"$target_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+      "  # include \"$target_h_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# else" . $nl .
-      "  # include \"$src_hh_path\"" . &ann(__FILE__, __LINE__) . $nl .
+      "  # include \"$src_h_path\"" . &ann(__FILE__, __LINE__) . $nl .
       "# endif" . $nl .
       $nl .
       "# include \"$inc_path\"" . &ann(__FILE__, __LINE__) . $nl . # user-code (converted from dk to inc)
@@ -393,7 +393,7 @@ sub generate_target {
 } # sub generate_target
 sub desuffix {
   my ($str) = @_;
-  $str =~ s/-($hh_ext|$cc_ext)$//;
+  $str =~ s/-($h_ext|$cc_ext)$//;
   return $str;
 }
 sub labeled_src_str {

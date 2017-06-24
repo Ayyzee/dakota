@@ -2,7 +2,7 @@
 
 # pragma once
 
-# include <dakota.hh>
+# include <dakota.h>
 
 # define dkt_declare_klass_type_typealias(k, t) namespace k { typealias slots_t = t;                  } typealias k ## _t = k::slots_t
 # define dkt_declare_klass_type_struct(k)       namespace k { struct [[dkt_typeinfo]]   slots_t;      } typealias k ## _t = k::slots_t

@@ -19,8 +19,8 @@
 include-for <cinttypes> strtoimax;
 include-for <cerrno>    errno;
 
-# include "safe-str.hh"
-# include "private.hh"
+# include "safe-str.h"
+# include "private.h"
 
 module dakota-core;
 

@@ -20,8 +20,8 @@
 # include <cstdlib>
 # include <cstring>
 
-# include "safe-str.hh"
-# include "private.hh"
+# include "safe-str.h"
+# include "private.h"
 
 // 2^32 - 5 = 4294967291 or 0xfffffffb
 // const size-t max-prime32 = 0xfffffffb;

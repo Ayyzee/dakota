@@ -19,12 +19,12 @@
 # include <cstdio>
 # include <cstring>
 
-# include "config.hh"
-# include "dakota-rt-private.hh"
-# include "dso.hh" // dso-symbol-for-address()
-# include "private.hh"
-# include "safe-str.hh"
-# include "sorted-set-core.hh"
+# include "config.h"
+# include "dakota-rt-private.h"
+# include "dso.h" // dso-symbol-for-address()
+# include "private.h"
+# include "safe-str.h"
+# include "sorted-set-core.h"
 
 # if 0
 
