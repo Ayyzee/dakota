@@ -59,5 +59,3 @@ extern "C" {
   [[so_export]] FUNC dso_abs_path_for_lib_name(str_t lib_name) -> str_t;
   [[so_export]] FUNC dso_abs_path_containing_addr(ptr_t addr) -> str_t;
 }
-
-# endif
