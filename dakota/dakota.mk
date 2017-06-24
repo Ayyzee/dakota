@@ -17,7 +17,6 @@ target := lib$(target).$(so_ext)
  check\
  check-exe\
  clean\
- cleanx\
  distclean\
  goal-clean\
  install\
@@ -65,10 +64,6 @@ clean: goal-clean | dakota.project
 	$(RM) $(RMFLAGS) dkt-exe
 	$(RM) $(RMFLAGS) $(target).ctlg
 	./cmake-clean.sh
-
-cleanx:
-	$(RM) $(RMFLAGS) $(builddir)/x
-	$(MKDIR) $(builddir)/x
 
 distclean: clean
 	cd $(rootdir); ./configure-common
