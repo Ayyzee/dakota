@@ -47,7 +47,7 @@ check-exe: all
 	./exe
 
 check: all
-	dakota-catalog --silent $(target) > $(target).out
+	dakota-catalog --silent $(target) > $(target).ctlg
 	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) check-exe
 
 installcheck: check install
@@ -63,7 +63,7 @@ clean: goal-clean | dakota.project
 	$(RM) $(RMFLAGS) exe exe.dk exe.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
-	$(RM) $(RMFLAGS) $(target).out
+	$(RM) $(RMFLAGS) $(target).ctlg
 	./cmake-clean.sh
 
 cleanx:
