@@ -56,6 +56,8 @@ installcheck: check install
 goal-clean:
 	$(RM) $(RMFLAGS) $(target)
 
+install-links :=
+
 clean: goal-clean | dakota.project
 	$(DAKOTA-BASE) --clean
 	$(RM) $(RMFLAGS) dakota.project
@@ -72,10 +74,10 @@ install-dirs := $(DESTDIR)$(prefix)/{bin,include,lib/dakota/compiler-$(compiler)
 $(install-dirs):
 	sudo $(MKDIR) $(MKDIRFLAGS) $@
 
-install: all $(install-dirs) $(install.files)
+install: all $(install-dirs) $(install.files) $(install-links)
 
 precompile:
 	$(MAKE) $(MAKEFLAGS) $(EXTRA_MAKEFLAGS) DAKOTAFLAGS=--$@ all
 
 uninstall:
-	sudo $(RM) $(RMFLAGS) $(install.files)
+	sudo $(RM) $(RMFLAGS) $(install.files) $(install-links)
