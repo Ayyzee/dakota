@@ -16,7 +16,7 @@ endif ()
 
 set (project ${target})
 project (${project} LANGUAGES CXX)
-set (cxx-standard 14)
+set (cxx-standard 17)
 set (CMAKE_CXX_COMPILER dk)
 set (CMAKE_COMPILER_IS_GNUCXX TRUE)
 # unfortunately quotes are required because we appending to CMAKE_CXX_FLAGS
