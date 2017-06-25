@@ -158,15 +158,23 @@ sub rewrite_compound_literal_cstring_null {
     $$filestr_ref =~ s|($name)-null|     $1::construct (nullptr, 0 )|gx;
   }
 }
+my $ns_uc = {
+  'klass' => 'KLASS-NS',
+  'trait' => 'TRAIT-NS'
+};
+my $uc = {
+  'klass' => 'KLASS',
+  'trait' => 'TRAIT'
+};
 sub rewrite_klass_decl {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s=^     (klass|trait)\s+($rid)\s*;=uc($1) . "($2);"=gemx;
-  $$filestr_ref =~ s=^(\s+)(klass|trait)\s+($rid)\s*;=$1 . uc($2) . "($3);"=gemx;
+  $$filestr_ref =~      s=^(klass|trait)\s+($rid)\s*;=$$uc{$1}($2);=gm;
+  $$filestr_ref =~ s=^(\s+)(klass|trait)\s+($rid)\s*;=$1$$uc{$2}($3);=gm;
 }
 sub rewrite_klass_defn {
   my ($filestr_ref) = @_;
-  $$filestr_ref =~ s/^                 (\s*)(klass|trait)(\s+$rid\s*)(\{)/$1 . uc($2) . "-NS" . $3 . $4/gemx;
-  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)(klass|trait)(\s+$rid\s*)(\{)/$1 . uc($2) . "-NS" . $3 . $4/gemx;
+  $$filestr_ref =~                  s/^(\s*)(klass|trait)(\s+$rid\s*)(\{)/$1$$ns_uc{$2}$3$4/gm;
+  $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)(klass|trait)(\s+$rid\s*)(\{)/$1$$ns_uc{$2}$3$4/gm;
 }
 sub rewrite_signatures {
   my ($filestr_ref) = @_;
@@ -1049,7 +1057,7 @@ sub convert_dk_to_cc {
   # [?klass-type is 'klass' xor 'trait']
   # using ?klass-type ?qual-ident;
   # ?klass-type ?ident = ?qual-ident;
-  $$filestr_ref =~ s/\b(using\s+)(klass|trait)(\s+)/$1 . uc($2) . "-NS" . $3/ge;
+  $$filestr_ref =~ s/\b(using\s+)(klass|trait)(\s+)/$1$$ns_uc{$2}$3/g;
 
   #&nest_generics($filestr_ref);
   &rewrite_slots($filestr_ref);
