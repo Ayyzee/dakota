@@ -25,7 +25,7 @@
 
 static func set-name(int-t, str-t) -> void;
 
-# include "strerror-name.tbl"
+# include "strerror-name.inc"
 
 static func set-name(int-t errnum, str-t name) -> void {
   assert(errnum != 0);
