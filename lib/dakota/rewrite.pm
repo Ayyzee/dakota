@@ -158,20 +158,6 @@ sub rewrite_compound_literal_cstring_null {
     $$filestr_ref =~ s|($name)-null|     $1::construct (nullptr, 0 )|gx;
   }
 }
-sub nest_namespaces {
-  my ($filestr_ref) = @_;
-  my $tbl = {
-    'klass' =>     'KLASS-NS',
-    'trait' =>     'TRAIT-NS',
-    'KLASS-NS' =>  'KLASS-NS',
-    'TRAIT-NS' =>  'TRAIT-NS',
-    'namespace' => 'namespace',
-  };
-  foreach my $kind (keys %$tbl) {
-    while ($$filestr_ref =~ s/$kind(\s+)(::)?($id)::($rid)(\s*)($main::block)/namespace $3 { $kind$1$4$5$6 }/gs) { # intentionally omitted $2
-    }
-  }
-}
 sub rewrite_klass_decl {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s=^     (klass|trait)\s+($rid)\s*;=uc($1) . "($2);"=gemx;
@@ -1092,7 +1078,6 @@ sub convert_dk_to_cc {
   &rewrite_compound_literal_cstring($filestr_ref);
   &rewrite_compound_literal($filestr_ref);
   &rewrite_klass_defn($filestr_ref);
-  &nest_namespaces($filestr_ref);
   &rewrite_syntax($filestr_ref);
   $$filestr_ref =~ s|\$(make[^\w-])|$1|g; #hackhack
   &rewrite_declarations($filestr_ref);
