@@ -406,6 +406,11 @@ sub rewrite_slots {
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s+)(\w+.*?)(\s*);/&rewrite_slots_typealias($1, $2, $3, $4)/egs;
   $$filestr_ref =~ s/(?<=$stmt_boundry)(\s*)slots(\s*\(\s*\*\s*\)\s*$main::list\s*->\s*.+?);/$1typealias slots-t = func$2;/gs;
 }
+sub rewrite_multiple_return_values {
+  my ($filestr_ref) = @_;
+  $$filestr_ref =~ s/(->\s*)(<|\[)(.+?)(>|\])/$1std::tuple<$3>/g;
+  $$filestr_ref =~ s/(return\s*)\[(.+?)\]/$1\{$2\}/g;
+}
 sub rewrite_set_literal {
   my ($filestr_ref) = @_;
   $$filestr_ref =~ s/\#\{(.*?)\}/&rewrite_set_literal_both_replacement($1)/ge;
@@ -1070,6 +1075,7 @@ sub convert_dk_to_cc {
   &rewrite_sentinel_generic_uses($filestr_ref, $kw_arg_generics);
   &rewrite_array_types($filestr_ref);
   &rewrite_methods($filestr_ref, $kw_arg_generics);
+  &rewrite_multiple_return_values($filestr_ref);
   &rewrite_map($filestr_ref);
   &rewrite_for_in($filestr_ref);
   &rewrite_unboxes($filestr_ref);
@@ -1090,6 +1096,7 @@ sub convert_dk_to_cc {
   $$filestr_ref =~ s|\$(make[^\w-])|$1|g; #hackhack
   &rewrite_declarations($filestr_ref);
 
+  $$filestr_ref =~ s/cast\(/\(/gs;
   $$filestr_ref =~ s/else[_-]if/else if/gs;
 
   $$filestr_ref =~ s/,(\s*\})/$1/gs; # remove harmless trailing comma

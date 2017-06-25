@@ -25,6 +25,7 @@
 # include <functional>
 # include <limits>
 # include <new> // std::bad-alloc
+# include <tuple>
 
 # include <syslog.h>
 # include <cxxabi.h>
