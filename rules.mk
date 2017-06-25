@@ -14,7 +14,7 @@ endif
 cxx-opts = $(macros:%=$(CXX_DEFINE_MACRO_FLAGS) %) $(include-dirs:%=$(CXX_INCLUDE_DIRECTORY_FLAGS) %) $(lib-dirs:%=$(CXX_LIBRARY_DIRECTORY_FLAGS) %) $(libs:%=$(CXX_LIBRARY_FLAGS) %)
 opts =     $(macros:%=--define-macro %) $(include-dirs:%=--include-directory %) $(lib-dirs:%=--library-directory %) $(libs:%=--library %)
 
-%.tbl: $(srcdir)/%.pl
+%.inc: $(srcdir)/%.pl
 	./$< > $@
 
 %.project: %.build

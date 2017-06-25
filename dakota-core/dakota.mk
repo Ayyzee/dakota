@@ -65,9 +65,9 @@ clean: goal-clean | dakota.project
 	$(RM) $(RMFLAGS) $(builddir)
 	$(RM) $(RMFLAGS) dkt-exe
 	$(RM) $(RMFLAGS) $(target).ctlg
-	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.tbl
+	$(RM) $(RMFLAGS) $(srcdir)/strerror-name.inc
 
-$(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.tbl
+$(srcdir)/strerror-name.dk: $(srcdir)/strerror-name.inc
 
 distclean: clean
 	cd $(rootdir); ./configure-common
