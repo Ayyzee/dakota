@@ -1028,10 +1028,10 @@ sub lang_user_data {
   my $user_data;
   if ($ENV{'DK_LANG_USER_DATA_PATH'}) {
     my $path = $ENV{'DK_LANG_USER_DATA_PATH'};
-    $user_data = do $path or die "do $path failed: $!\n";
+    $user_data = &do_json($path) or die "&do_json(\"$path\") failed: $!\n";
   } elsif ($gbl_prefix) {
     my $path = "$gbl_prefix/lib/dakota/lang-user-data.json";
-    $user_data = do $path or die "do $path failed: $!\n";
+    $user_data = &do_json($path) or die "&do_json(\"$path\") failed: $!\n";
   } else {
     die;
   }
