@@ -61,10 +61,10 @@ BEGIN {
   use dakota::parse;
   use dakota::rewrite;
   use dakota::util;
-  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
-    or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
-  my $platform = do "$gbl_prefix/lib/dakota/platform.json"
-    or die "do $gbl_prefix/lib/dakota/platform.json failed: $!\n";
+  $gbl_compiler = &do_json("$gbl_prefix/lib/dakota/compiler/command-line.json")
+    or die "&do_json(\"$gbl_prefix/lib/dakota/compiler/command-line.json\") failed: $!\n";
+  my $platform = &do_json("$gbl_prefix/lib/dakota/platform.json")
+    or die "&do_json(\"$gbl_prefix/lib/dakota/platform.json\") failed: $!\n";
   my ($key, $values);
   while (($key, $values) = each (%$platform)) {
     $$gbl_compiler{$key} = $values;
@@ -180,9 +180,9 @@ sub write_to_file_converted_strings {
   if ($use_new_macro_system) {
     if (!defined $gbl_macros) {
       if ($ENV{'DK_MACROS_PATH'}) {
-        $gbl_macros = do $ENV{'DK_MACROS_PATH'} or die "do $ENV{'DK_MACROS_PATH'} failed: $!\n";
+        $gbl_macros = &do_json($ENV{'DK_MACROS_PATH'}) or die "&do_json(\"$ENV{'DK_MACROS_PATH'}\") failed: $!\n";
       } elsif ($gbl_prefix) {
-        $gbl_macros = do "$gbl_prefix/lib/dakota/macros.pl" or die "do $gbl_prefix/lib/dakota/macros.pl failed: $!\n";
+        $gbl_macros = &do_json("$gbl_prefix/lib/dakota/macros.pl") or die "&do_json(\"$gbl_prefix/lib/dakota/macros.pl\") failed: $!\n";
       } else {
         die;
       }

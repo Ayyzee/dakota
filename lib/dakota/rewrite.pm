@@ -1109,9 +1109,9 @@ sub convert_dk_to_cc {
 sub dakota_lang_user_data_old {
   my $kw_arg_generics;
   if ($ENV{'DKT_KW_ARGS_GENERICS'}) {
-    $kw_arg_generics = do $ENV{'DKT_KW_ARGS_GENERICS'} or die "do $ENV{'DKT_KW_ARGS_GENERICS'} failed: $!\n";
+    $kw_arg_generics = &do_json($ENV{'DKT_KW_ARGS_GENERICS'}) or die "&do_json(\"$ENV{'DKT_KW_ARGS_GENERICS'}\") failed: $!\n";
   } elsif ($gbl_prefix) {
-    $kw_arg_generics = do "$gbl_prefix/src/kw-arg-generics.pl" or die "do $gbl_prefix/src/kw-arg-generics.pl failed: $!\n";
+    $kw_arg_generics = &do_json("$gbl_prefix/src/kw-arg-generics.pl") or die "&do_json(\"$gbl_prefix/src/kw-arg-generics.pl\") failed: $!\n";
   } else {
     die;
   }

@@ -84,6 +84,7 @@ our @EXPORT= qw(
                  dk_mangle
                  dk_mangle_seq
                  dmp
+                 do_json
                  dqstr_regex
                  echo_output_path
                  encode_char
@@ -1314,6 +1315,14 @@ sub deep_copy {
   my ($ref) = @_;
   return eval &Dumper($ref);
 }
+sub do_json {
+  my ($path) = @_;
+  local undef $/;
+  open(my $fh, "<", $path);
+  my $str = <$fh>;
+  close($fh);
+  return eval($str);
+}
 sub remove_name_va_scope {
   my ($method) = @_;
   #die if 'va' ne $$method{'name'}[0];
@@ -1440,8 +1449,8 @@ sub start {
 }
 BEGIN {
   $gbl_prefix = &dk_prefix($0);
-  $gbl_compiler = do "$gbl_prefix/lib/dakota/compiler/command-line.json"
-    or die "do $gbl_prefix/lib/dakota/compiler/command-line.json failed: $!\n";
+  $gbl_compiler = &do_json("$gbl_prefix/lib/dakota/compiler/command-line.json")
+    or die "&do_json(\"$gbl_prefix/lib/dakota/compiler/command-line.json\") failed: $!\n";
   $h_ext = &var($gbl_compiler, 'h_ext', undef);
   $cc_ext = &var($gbl_compiler, 'cc_ext', undef);
 };
