@@ -304,9 +304,9 @@ sub sst::add_token {
     }
     $$token{'begin-word'} = 1;
   } else {
-    if (';' eq &sst::prev_token_str($sst) || # lang-user-data.pl?
-        '{' eq &sst::prev_token_str($sst) || # lang-user-data.pl?
-        '}' eq &sst::prev_token_str($sst)) { # lang-user-data.pl?
+    if (';' eq &sst::prev_token_str($sst) || # lang-user-data.json?
+        '{' eq &sst::prev_token_str($sst) || # lang-user-data.json?
+        '}' eq &sst::prev_token_str($sst)) { # lang-user-data.json?
       if ($str =~ m|$id|) {
         if ($sst_debug) {
           print STDERR "$str\n";

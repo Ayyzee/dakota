@@ -182,7 +182,7 @@ sub write_to_file_converted_strings {
       if ($ENV{'DK_MACROS_PATH'}) {
         $gbl_macros = &do_json($ENV{'DK_MACROS_PATH'}) or die "&do_json(\"$ENV{'DK_MACROS_PATH'}\") failed: $!\n";
       } elsif ($gbl_prefix) {
-        $gbl_macros = &do_json("$gbl_prefix/lib/dakota/macros.pl") or die "&do_json(\"$gbl_prefix/lib/dakota/macros.pl\") failed: $!\n";
+        $gbl_macros = &do_json("$gbl_prefix/lib/dakota/macros.json") or die "&do_json(\"$gbl_prefix/lib/dakota/macros.json\") failed: $!\n";
       } else {
         die;
       }
