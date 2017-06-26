@@ -5,5 +5,5 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'LD' => 'ld.gold',
+  "LD"=> "ld.gold",
 }

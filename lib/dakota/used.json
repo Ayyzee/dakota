@@ -5,35 +5,35 @@
 # -*- cperl-indent-parens-as-block: t -*-
 # -*- cperl-tab-always-indent: t -*-
 {
-  'used-klasses' => [
-    #{ 'pattern' => [ '#(', '?ident', ':'   ], 'result' => [ 'pair'                 ] },
+  "used-klasses"=> [
+    #{ "pattern"=> [ "#(", "?ident", ":"   ], "result"=> [ "pair"                 ] },
 
-    #{ 'pattern' => [ '#[',           ','   ], 'result' => [ 'vector'               ] },
-    #{ 'pattern' => [ '#[', '?ident', ','   ], 'result' => [ 'vector'               ] },
+    #{ "pattern"=> [ "#[",           ","   ], "result"=> [ "vector"               ] },
+    #{ "pattern"=> [ "#[", "?ident", ","   ], "result"=> [ "vector"               ] },
 
-    #{ 'pattern' => [ '#{',           ','   ], 'result' => [ 'hashed-set'           ] },
-    #{ 'pattern' => [ '#{',           ':'   ], 'result' => [ 'hashed-table', 'pair' ] },
-    #{ 'pattern' => [ '#{', '?ident', ','   ], 'result' => [ 'hashed-set'           ] },
-    #{ 'pattern' => [ '#{', '?ident', ':'   ], 'result' => [ 'hashed-table', 'pair' ] },
+    #{ "pattern"=> [ "#{",           ","   ], "result"=> [ "hashed-set"           ] },
+    #{ "pattern"=> [ "#{",           ":"   ], "result"=> [ "hashed-table", "pair" ] },
+    #{ "pattern"=> [ "#{", "?ident", ","   ], "result"=> [ "hashed-set"           ] },
+    #{ "pattern"=> [ "#{", "?ident", ":"   ], "result"=> [ "hashed-table", "pair" ] },
 
-    #{ 'pattern' => [ '?qual-scope', '::', 'box',    ], },
-    #{ 'pattern' => [ '?qual-scope', '::', 'unbox',  ], },
-    #{ 'pattern' => [ '?qual-scope', '::', 'slots-t' ], },
+    #{ "pattern"=> [ "?qual-scope", "::", "box",    ], },
+    #{ "pattern"=> [ "?qual-scope", "::", "unbox",  ], },
+    #{ "pattern"=> [ "?qual-scope", "::", "slots-t" ], },
   ],
-  'used-generics' => [
-    { 'name' => 'supers',   'range' => [0,2], 'pattern' => [ '$va', '::', '?method-name',  '(', 'super' ], },
-    { 'name' => 'supers',   'range' => [0,0], 'pattern' => [              '?generic-name', '(', 'super' ], },
+  "used-generics"=> [
+    { "name"=> "supers",   "range"=> [0,2], "pattern"=> [ "\$va", "::", "?method-name",  "(", "super" ], },
+    { "name"=> "supers",   "range"=> [0,0], "pattern"=> [               "?generic-name", "(", "super" ], },
 
-    { 'name' => 'generics', 'range' => [0,2], 'pattern' => [ '$va', '::', '?method-name'                ], },
-    { 'name' => 'generics', 'range' => [0,0], 'pattern' => [              '?generic-name'               ], },
+    { "name"=> "generics", "range"=> [0,2], "pattern"=> [ "\$va", "::", "?method-name"                ], },
+    { "name"=> "generics", "range"=> [0,0], "pattern"=> [               "?generic-name"               ], },
 
-    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'SELECTOR',  '(', 'va', '::', '?method-name', '('     ], },
-    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'SELECTOR',  '(',             '?method-name', '('     ], },
+    { "name"=> "generics", "range"=> [2,4], "pattern"=> [ "SELECTOR",  "(", "va", "::", "?method-name", "("     ], },
+    { "name"=> "generics", "range"=> [2,2], "pattern"=> [ "SELECTOR",  "(",             "?method-name", "("     ], },
 
-    { 'name' => 'generics', 'range' => [2,4], 'pattern' => [ 'SIGNATURE', '(', 'va', '::', '?method-name', '('     ], },
-    { 'name' => 'generics', 'range' => [2,2], 'pattern' => [ 'SIGNATURE', '(',             '?method-name', '('     ], },
+    { "name"=> "generics", "range"=> [2,4], "pattern"=> [ "SIGNATURE", "(", "va", "::", "?method-name", "("     ], },
+    { "name"=> "generics", "range"=> [2,2], "pattern"=> [ "SIGNATURE", "(",             "?method-name", "("     ], },
 
-    { 'name' => 'generics', 'range' => [0,2], 'pattern' => [ 'va', '::', 'make', '(' ], },
-    { 'name' => 'generics', 'range' => [0,0], 'pattern' => [             'make', '(' ], },
+    { "name"=> "generics", "range"=> [0,2], "pattern"=> [ "va", "::", "make", "(" ], },
+    { "name"=> "generics", "range"=> [0,0], "pattern"=> [             "make", "(" ], },
   ],
 }

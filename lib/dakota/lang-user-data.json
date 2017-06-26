@@ -6,38 +6,38 @@
 # -*- cperl-tab-always-indent: t -*-
 
 {
-  'kw-args-ident' => {          # variable per project (lib or exe)
-    'init'   => 1,              # rhs = num-fixed args
-    'append' => 2               # rhs = num-fixed args
+  "kw-args-ident"=> {          # variable per project (lib or exe)
+    "init"=> 1,              # rhs = num-fixed args
+    "append"=> 2               # rhs = num-fixed args
   },
-  'visibility' => {             # constant for a language
-    'SO-EXPORT'   => 1,
-    'SO-IMPORT'   => 1,
+  "visibility"=> {             # constant for a language
+    "SO-EXPORT"=> 1,
+    "SO-IMPORT"=> 1,
   },
-    'array' =>            { 'open'  => { '[' => 1 },
-                            'close' => { ']' => 1 } },
+    "array"=>            { "open"=> { "["=> 1 },
+                            "close"=> { "]"=> 1 } },
 
-    'list' =>             { 'open'  => { '(' => 1 },
-                            'sep'   => { ',' => 1 },
-                            'close' => { ')' => 1 } },
+    "list"=>             { "open"=> { "("=> 1 },
+                            "sep"=> { ","=> 1 },
+                            "close"=> { ")"=> 1 } },
 
-    'initializer-list' => { 'open' =>  { '{' => 1 },
-                            'sep' =>   { ',' => 1 },
-                            'close' => { '}' => 1 } },
+    "initializer-list"=> { "open"=>  { "{"=> 1 },
+                            "sep"=>   { ","=> 1 },
+                            "close"=> { "}"=> 1 } },
 
-    'literal-sequence' => { 'open'  => { '#[' => 1 },
-                            'sep' =>   { ',' =>  1 },
-                            'close' => { ']' =>  1 } },
+    "literal-sequence"=> { "open"=> { "#["=> 1 },
+                            "sep"=>   { ","=>  1 },
+                            "close"=> { "]"=>  1 } },
 
-    'literal-assoc' =>    { 'open'  => { '#(' => 1 },
-                            'op' =>    { ':' => 1 },
-                            'close' => { ')' =>  1 } },
+    "literal-assoc"=>    { "open"=> { "#("=> 1 },
+                            "op"=>    { ":"=> 1 },
+                            "close"=> { ")"=>  1 } },
 
-    'literal-set' =>      { 'open'  => { '#{' => 1 },
-                            'sep' =>   { ',' =>  1 },
-                            'close' => { '}' =>  1 } },
+    "literal-set"=>      { "open"=> { "#{"=> 1 },
+                            "sep"=>   { ","=>  1 },
+                            "close"=> { "}"=>  1 } },
 
-    'literal-table' =>    { 'open'  => { '#{' => 1 },
-                            'sep' =>   { ',' =>  1 }, # comma separated list of assoc-in
-                            'close' => { '}' =>  1 } },
+    "literal-table"=>    { "open"=> { "#{"=> 1 },
+                            "sep"=>   { ","=>  1 }, # comma separated list of assoc-in
+                            "close"=> { "}"=>  1 } },
 }
