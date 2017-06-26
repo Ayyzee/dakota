@@ -1424,12 +1424,24 @@ sub scalar_to_file {
 sub scalar_from_file {
   my ($file) = @_;
   die if ! -e $file;
-  my $filestr = &filestr_from_file($file);
-  my $result = eval $filestr;
+  my $initial_count = 10; # total hack to hide race condition
+  my $count = $initial_count;
+  my $fail_count = $count;
+  my $result;
+  while ($count--) {
+    my $filestr = &filestr_from_file($file);
+    $result = eval $filestr;
 
-  if (!defined $result) {
+    if (!defined $result) {
+      print STDERR __FILE__, ":", __LINE__, ": WARNING: scalar_from_file(\"$file\")\n";
+      #print STDERR "<" . $filestr . ">" . $nl;
+      $fail_count--;
+      next;
+    }
+    last;
+  }
+  if ($fail_count == 0) {
     print STDERR __FILE__, ":", __LINE__, ": ERROR: scalar_from_file(\"$file\")\n";
-    print STDERR "<" . $filestr . ">" . $nl;
   }
   return $result;
 }
