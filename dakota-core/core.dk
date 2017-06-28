@@ -830,13 +830,13 @@ static func dump?(named-info-t* kls-info, str-t only) -> bool-t {
 
   bool-t result = true;
   ssize-t only-len = cast(ssize-t)safe-strlen(only);
-  if (only[0] == '-') {
+  if (only[0] == '*') {
     ssize-t name-len = cast(ssize-t)safe-strlen(name);
-    if (name-len < only-len || safe-strcmp(name + name-len - only-len, only) != 0)
+    if (name-len < (only-len - 1) || safe-strcmp(name + name-len - (only-len - 1), only + 1) != 0)
       result = false;
   }
-  else if (only[only-len - 1] == '-') {
-    if (safe-strncmp(name, only, cast(size-t)only-len) != 0)
+  else if (only[only-len - 1] == '*') {
+    if (safe-strncmp(name, only, cast(size-t)(only-len - 1)) != 0)
       result = false;
   } else {
     if (safe-strcmp(name, only) != 0)
