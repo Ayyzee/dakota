@@ -1264,7 +1264,8 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
         break;
       if (exported-only && !klass-exported?(kls-info))
         continue;
-      if (only == nullptr || dump?(kls-info, only)) {
+      if (only != nullptr && !dump?(kls-info, only))
+        continue;
         if (1)
           prev-module = dump-klass(ostrm, kls-info, prev-module);
         if (output-dir != nullptr) {
@@ -1279,7 +1280,6 @@ static func dump-klass-defns(ostream-t ostrm, named-info-t* registration-info, s
 # endif
             ostream::fclose(dostrm);
         }
-      }
     }
 # if defined DKT-ENABLE-EXPORT-GROUP
     ostream::col-decr(ostrm);
